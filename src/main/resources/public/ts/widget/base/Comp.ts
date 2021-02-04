@@ -257,7 +257,7 @@ export abstract class Comp<S extends BaseCompState = any> implements CompIntf {
     }
 
     focus(): void {
-        this.whenElm((elm: HTMLSelectElement) => {
+        this.whenElm((elm: HTMLElement) => {
             S.util.delayedFocus(this.getId());
         });
     }
@@ -395,8 +395,7 @@ export abstract class Comp<S extends BaseCompState = any> implements CompIntf {
             ret = this.compRender();
         }
         catch (e) {
-            // todo-1: this is not logging the stack
-            console.error("Failed to render child (in render method)" + this.jsClassName + " attribs.key=" + this.attribs.key + " Error: " + e);
+            console.error("Failed to render child (in render method)" + this.jsClassName + " attribs.key=" + this.attribs.key + "\nError: " + e);
         }
 
         return ret;

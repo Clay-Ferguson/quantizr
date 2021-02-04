@@ -167,15 +167,18 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
 
     upload = async (): Promise<boolean> => {
         return new Promise<boolean>(async (resolve, reject) => {
-            if (this.filesAreValid()) {
-                const files = this.dropzone.getAcceptedFiles();
+            try {
+                if (this.filesAreValid()) {
+                    const files = this.dropzone.getAcceptedFiles();
 
-                if (files) {
-                    this.numFiles = files.length;
-                    this.dropzone.processQueue();
+                    if (files) {
+                        this.numFiles = files.length;
+                        this.dropzone.processQueue();
+                    }
                 }
+            } finally {
+                resolve(true);
             }
-            resolve(true);
         });
     }
 

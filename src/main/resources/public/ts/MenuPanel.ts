@@ -85,7 +85,7 @@ export class MenuPanel extends Div {
 
             new MenuItem("Delete", () => S.edit.deleteSelNodes(null, state), !state.isAnonUser && selNodeIsMine) //
 
-            // todo-1: disabled during mongo conversion
+            // todo-2: disabled during mongo conversion
             // new MenuItem("Set Node A", view.setCompareNodeA, () => { return state.isAdminUser && highlightNode != null }, () => { return state.isAdminUser }), //
             // new MenuItem("Compare as B (to A)", view.compareAsBtoA, //
             //    () => { return state.isAdminUser && highlightNode != null }, //
@@ -167,7 +167,7 @@ export class MenuPanel extends Div {
         // //need to make export safe for end users to use (recarding file sizes)
         // if (state.isAdminUser) {
         //     children.push(new Menu("Admin Tools", [
-        //         //todo-1: disabled during mongo conversion
+        //         //todo-2: disabled during mongo conversion
         //         //new MenuItem("Set Node A", view.setCompareNodeA, () => { return state.isAdminUser && highlightNode != null }, () => { return state.isAdminUser }), //
         //         //new MenuItem("Compare as B (to A)", view.compareAsBtoA, //
         //         //    () => { return state.isAdminUser && highlightNode != null }, //

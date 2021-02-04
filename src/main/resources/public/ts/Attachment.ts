@@ -53,32 +53,35 @@ export class Attachment implements AttachmentIntf {
 
     deleteAttachment = (node: J.NodeInfo, state: AppState): Promise<boolean> => {
         return new Promise<boolean>(async (resolve, reject) => {
-            node = node || S.meta64.getHighlightedNode(state);
             let deleted = false;
-            let delPromise: AxiosPromise<any> = null;
-            if (node) {
-                const dlg = new ConfirmDlg("Delete the Attachment on the Node?", "Confirm", //
-                    () => {
-                        delPromise = S.util.ajax<J.DeleteAttachmentRequest, J.DeleteAttachmentResponse>("deleteAttachment", {
-                            nodeId: node.id
-                        }, (res: J.DeleteAttachmentResponse): void => {
-                            this.deleteAttachmentResponse(res, node.id, state);
-                            deleted = true;
-                        });
-                    }, null, null, null, state
-                );
-                await dlg.open();
-                if (delPromise) {
-                    await delPromise;
+            try {
+                node = node || S.meta64.getHighlightedNode(state);
+                let delPromise: AxiosPromise<any> = null;
+                if (node) {
+                    const dlg = new ConfirmDlg("Delete the Attachment on the Node?", "Confirm", //
+                        () => {
+                            delPromise = S.util.ajax<J.DeleteAttachmentRequest, J.DeleteAttachmentResponse>("deleteAttachment", {
+                                nodeId: node.id
+                            }, (res: J.DeleteAttachmentResponse): void => {
+                                this.deleteAttachmentResponse(res, node.id, state);
+                                deleted = true;
+                            });
+                        }, null, null, null, state
+                    );
+                    await dlg.open();
+                    if (delPromise) {
+                        await delPromise;
+                    }
                 }
+            } finally {
+                resolve(deleted);
             }
-            resolve(deleted);
         });
     }
 
     /* Queries the server for the purpose of just loading the binary properties into node, and leaving everything else intact */
-    refreshBinaryPropsFromServer = (node: J.NodeInfo): Promise<any> => {
-        return new Promise<boolean>(async (resolve, reject) => {
+    refreshBinaryPropsFromServer = (node: J.NodeInfo): Promise<void> => {
+        return new Promise<void>(async (resolve, reject) => {
             S.util.ajax<J.RenderNodeRequest, J.RenderNodeResponse>("renderNode", {
                 nodeId: node.id,
                 upLevel: false,
@@ -90,10 +93,14 @@ export class Attachment implements AttachmentIntf {
                 singleNode: true
             },
                 (res: J.RenderNodeResponse) => {
-                    if (res.node.properties) {
-                        S.props.transferBinaryProps(res.node, node);
+                    try {
+                        if (res.node.properties) {
+                            S.props.transferBinaryProps(res.node, node);
+                        }
                     }
-                    resolve();
+                    finally {
+                        resolve();
+                    }
                 });
 
         });

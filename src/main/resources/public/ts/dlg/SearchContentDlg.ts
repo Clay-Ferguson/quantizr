@@ -30,7 +30,7 @@ export class SearchContentDlg extends DialogBase {
         super("Search Content", "app-modal-content-medium-width", null, state);
         S.srch.searchText = null;
 
-        this.whenElm((elm: HTMLSelectElement) => {
+        this.whenElm((elm: HTMLElement) => {
             this.searchTextField.focus();
         });
 

@@ -25,7 +25,7 @@ export class ChangePasswordDlg extends DialogBase {
 
     constructor(private passCode: string, state: AppState) {
         super(passCode ? "Password Reset" : "Change Password", "app-modal-content-narrow-width", false, state);
-        this.whenElm((elm: HTMLSelectElement) => {
+        this.whenElm((elm: HTMLElement) => {
             this.passwordField.focus();
         });
     }

@@ -87,7 +87,7 @@ export class Encryption implements EncryptionIntf {
         WARNING: If you change this you will NEVER be able to recover any data encrypted with it in effect, even with the correct password. So
         beware if you change this you've basically lost ALL your passwords. So just don't change it.
 
-        todo-1: According to some crypto experts, this initialization vector should not be reused like this but instead stored
+        todo-2: According to some crypto experts, this initialization vector should not be reused like this but instead stored
         along with the encryption key.
         */
         // iv = window.crypto.getRandomValues(new Uint8Array(16)); <--- I saw this in a reputable example. Try it out!
@@ -134,68 +134,76 @@ export class Encryption implements EncryptionIntf {
 
     symetricEncryptionTest = async (): Promise<boolean> => {
         return new Promise<boolean>(async (resolve, reject) => {
-            const clearText = "Encrypt this string.";
+            try {
+                const clearText = "Encrypt this string.";
 
-            // test symetric encryption
-            const obj: any = await S.localDB.readObject(this.STORE_SYMKEY);
-            if (obj) {
-                // simple encrypt/decrypt
-                const key: CryptoKey = obj.val;
-                const encHex = await this.symEncryptString(key, clearText);
-                const unencText = await this.symDecryptString(key, encHex);
-                S.util.assert(clearText === unencText, "Symmetric decrypt");
+                // test symetric encryption
+                const obj: any = await S.localDB.readObject(this.STORE_SYMKEY);
+                if (obj) {
+                    // simple encrypt/decrypt
+                    const key: CryptoKey = obj.val;
+                    const encHex = await this.symEncryptString(key, clearText);
+                    const unencText = await this.symDecryptString(key, encHex);
+                    S.util.assert(clearText === unencText, "Symmetric decrypt");
 
-                // test symetric key export/import
-                const keyDat: JsonWebKey = await crypto.subtle.exportKey(this.DEFAULT_KEY_FORMAT, key) as JsonWebKey;
+                    // test symetric key export/import
+                    const keyDat: JsonWebKey = await crypto.subtle.exportKey(this.DEFAULT_KEY_FORMAT, key) as JsonWebKey;
 
-                const key2: CryptoKey = await crypto.subtle.importKey(this.DEFAULT_KEY_FORMAT, keyDat, this.SYM_ALGO /* as AlgorithmIdentifier */, true, this.OP_ENC_DEC as KeyUsage[]);
+                    const key2: CryptoKey = await crypto.subtle.importKey(this.DEFAULT_KEY_FORMAT, keyDat, this.SYM_ALGO /* as AlgorithmIdentifier */, true, this.OP_ENC_DEC as KeyUsage[]);
 
-                const encHex2 = await this.symEncryptString(key2, clearText);
-                const unencText2 = await this.symDecryptString(key2, encHex2);
-                S.util.assert(clearText === unencText2, "Symetric decrypt, using imported key");
-                console.log("sym enc test: OK");
+                    const encHex2 = await this.symEncryptString(key2, clearText);
+                    const unencText2 = await this.symDecryptString(key2, encHex2);
+                    S.util.assert(clearText === unencText2, "Symetric decrypt, using imported key");
+                    console.log("sym enc test: OK");
+                }
             }
-
-            resolve(true);
+            finally {
+                resolve(true);
+            }
         });
     }
 
     runPublicKeyTest = async (): Promise<boolean> => {
         return new Promise<boolean>(async (resolve, reject) => {
             const clearText = "Encrypt this string.";
+            let ret: boolean = false;
 
-            // test public key encryption
-            const obj: any = await S.localDB.readObject(this.STORE_ASYMKEY);
-            if (obj) {
-                // results += "STORE_ASYMKEY: \n"+S.util.prettyPrint(obj)+"\n\n";
+            try {
+                // test public key encryption
+                const obj: any = await S.localDB.readObject(this.STORE_ASYMKEY);
+                if (obj) {
+                    // results += "STORE_ASYMKEY: \n"+S.util.prettyPrint(obj)+"\n\n";
 
-                // simple encrypt/decrypt
-                const encHex = await this.asymEncryptString(obj.val.publicKey, clearText);
-                const unencText = await this.asymDecryptString(obj.val.privateKey, encHex);
-                S.util.assert(clearText === unencText, "Asym encryption");
+                    // simple encrypt/decrypt
+                    const encHex = await this.asymEncryptString(obj.val.publicKey, clearText);
+                    const unencText = await this.asymDecryptString(obj.val.privateKey, encHex);
+                    S.util.assert(clearText === unencText, "Asym encryption");
 
-                // Export keys to a string format
-                const publicKeyStr = await crypto.subtle.exportKey(this.DEFAULT_KEY_FORMAT, obj.val.publicKey);
-                // console.log("EXPORTED PUBLIC KEY: " + S.util.toJson(publicKeyStr) + "\n");
-                const privateKeyStr = await crypto.subtle.exportKey(this.DEFAULT_KEY_FORMAT, obj.val.privateKey);
-                // console.log("EXPORTED PRIVATE KEY: " + S.util.toJson(publicKeyStr) + "\n");
+                    // Export keys to a string format
+                    const publicKeyStr = await crypto.subtle.exportKey(this.DEFAULT_KEY_FORMAT, obj.val.publicKey);
+                    // console.log("EXPORTED PUBLIC KEY: " + S.util.toJson(publicKeyStr) + "\n");
+                    const privateKeyStr = await crypto.subtle.exportKey(this.DEFAULT_KEY_FORMAT, obj.val.privateKey);
+                    // console.log("EXPORTED PRIVATE KEY: " + S.util.toJson(publicKeyStr) + "\n");
 
-                const publicKey = await crypto.subtle.importKey(this.DEFAULT_KEY_FORMAT, publicKeyStr, {
-                    name: this.ASYM_ALGO,
-                    hash: this.HASH_ALGO
-                }, true, this.OP_ENC);
+                    const publicKey = await crypto.subtle.importKey(this.DEFAULT_KEY_FORMAT, publicKeyStr, {
+                        name: this.ASYM_ALGO,
+                        hash: this.HASH_ALGO
+                    }, true, this.OP_ENC);
 
-                const privateKey = await crypto.subtle.importKey(this.DEFAULT_KEY_FORMAT, privateKeyStr, {
-                    name: this.ASYM_ALGO,
-                    hash: this.HASH_ALGO
-                }, true, this.OP_DEC);
+                    const privateKey = await crypto.subtle.importKey(this.DEFAULT_KEY_FORMAT, privateKeyStr, {
+                        name: this.ASYM_ALGO,
+                        hash: this.HASH_ALGO
+                    }, true, this.OP_DEC);
 
-                const encHex2 = await this.asymEncryptString(publicKey, clearText);
-                const unencText2 = await this.asymDecryptString(privateKey, encHex2);
-                S.util.assert(clearText === unencText2, "Asym encrypt test using imported keys.");
+                    const encHex2 = await this.asymEncryptString(publicKey, clearText);
+                    const unencText2 = await this.asymDecryptString(privateKey, encHex2);
+                    S.util.assert(clearText === unencText2, "Asym encrypt test using imported keys.");
 
-                console.log("publicKeyTest: OK");
-                resolve(true);
+                    console.log("publicKeyTest: OK");
+                    ret = true;
+                }
+            } finally {
+                resolve(ret);
             }
         });
     }
@@ -240,7 +248,9 @@ export class Encryption implements EncryptionIntf {
             catch (e) {
                 // leave ret == false.
             }
-            resolve(ret);
+            finally {
+                resolve(ret);
+            }
         });
     }
 

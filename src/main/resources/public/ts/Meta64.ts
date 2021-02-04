@@ -204,7 +204,7 @@ export class Meta64 implements Meta64Intf {
 
     selectAllNodes = (nodeIds: string[]) => {
         // DO NOT DELETE (feature work in progress)
-        // //todo-1: large numbers of selected nodes isn't going to scale well in this design
+        // //todo-2: large numbers of selected nodes isn't going to scale well in this design
         // // but i am not letting perfection be the enemy of good here (yet)
         // this.selectedNodes = {};
         // nodeIds.forEach( (nodeId, index) => {
@@ -686,7 +686,7 @@ export class Meta64 implements Meta64Intf {
         });
     }
 
-    // todo-1: need to decide if I want this. It's disabled currently (not called)
+    // todo-2: need to decide if I want this. It's disabled currently (not called)
     removeRedundantFeedItems = (feedResults: J.NodeInfo[]): J.NodeInfo[] => {
         if (!feedResults || feedResults.length === 0) return feedResults;
 

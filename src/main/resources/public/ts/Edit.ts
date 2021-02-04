@@ -91,9 +91,7 @@ export class Edit implements EditIntf {
                 const dlg = new EditNodeDlg(res.nodeInfo, res.parentInfo, state);
                 dlg.open();
             } else {
-                /* todo-1: when edit mode is not on, and a user tries to use the social 'reply' button this error comes up
-                which is completely wrong an misleading in that context. */
-                S.util.showMessage("You cannot edit nodes that you don't own.", "Warning");
+                S.util.showMessage("Editing not allowed on node.", "Warning");
             }
         }
     }
@@ -245,31 +243,38 @@ export class Edit implements EditIntf {
     saveNodeResponse = async (node: J.NodeInfo, res: J.SaveNodeResponse, allowScroll: boolean, state: AppState): Promise<void> => {
         return new Promise<void>(async (resolve, reject) => {
             if (S.util.checkSuccess("Save node", res)) {
-                await this.distributeKeys(node, res.aclEntries);
-                S.view.refreshTree(null, false, false, node.id, false, allowScroll, false, state);
-                if (state.fullScreenCalendarId) {
-                    S.render.showCalendar(state.fullScreenCalendarId, state);
+                try {
+                    await this.distributeKeys(node, res.aclEntries);
+                    S.view.refreshTree(null, false, false, node.id, false, allowScroll, false, state);
+                    if (state.fullScreenCalendarId) {
+                        S.render.showCalendar(state.fullScreenCalendarId, state);
+                    }
                 }
-                resolve();
+                finally {
+                    resolve();
+                }
             }
         });
     }
 
     distributeKeys = async (node: J.NodeInfo, aclEntries: J.AccessControlInfo[]): Promise<void> => {
         return new Promise<void>(async (resolve, reject) => {
-            if (!aclEntries || !S.props.isEncrypted(node)) {
+            try {
+                if (!aclEntries || !S.props.isEncrypted(node)) {
+                    return;
+                }
+
+                for (let i = 0; i < aclEntries.length; i++) {
+                    const ac = aclEntries[i];
+                    // console.log("Distribute Key to Principal: " + S.util.prettyPrint(ac));
+                    await S.share.addCipherKeyToNode(node, ac.publicKey, ac.principalNodeId);
+                }
+
+                console.log("Key distribution complete.");
+            }
+            finally {
                 resolve();
-                return;
             }
-
-            for (let i = 0; i < aclEntries.length; i++) {
-                const ac = aclEntries[i];
-                // console.log("Distribute Key to Principal: " + S.util.prettyPrint(ac));
-                await S.share.addCipherKeyToNode(node, ac.publicKey, ac.principalNodeId);
-            }
-
-            console.log("Key distribution complete.");
-            resolve();
         });
     }
 
@@ -627,7 +632,7 @@ export class Edit implements EditIntf {
         this.pasteSelNodes(nodeId, "inside", state);
     }
 
-    // location=inside | inline | inline-above (todo-1: put in java-aware enum)
+    // location=inside | inline | inline-above (todo-2: put in java-aware enum)
     pasteSelNodes = (nodeId: string, location: string, state?: AppState): void => {
         state = appState(state);
         /*

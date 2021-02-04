@@ -41,13 +41,12 @@ export class TextField extends Div implements I.TextEditorIntf, I.ValueIntf {
 
     // Overriding base class so we can focus the correct part of this composite component.
     focus(): void {
-        this.whenElm((elm: HTMLSelectElement) => {
+        this.whenElm((elm: HTMLElement) => {
             this.input.focus();
         });
     }
 
     insertTextAtCursor(text: string) {
-        // should we implement this ? todo-1
     }
 
     setWordWrap(wordWrap: boolean): void {

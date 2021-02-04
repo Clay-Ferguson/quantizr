@@ -485,7 +485,7 @@ export class Render implements RenderIntf {
             title: "User: " + node.owner + "\n\nClick for Bio",
             // align: "left", // causes text to flow around
 
-            onClick: (evt) => {
+            onClick: (evt: any) => {
                 // show profile dialog only for local users (no '@' in name)
                 // todo-1: Need to have a way to make a click on avatar show this dialog if the user is importet locally
                 // or if not at least make it pull up in a new browser tab the user's remote page, which should be the url from

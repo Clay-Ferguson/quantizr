@@ -17,7 +17,7 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
 export class NodeCompMarkdown extends Html {
 
     // This flag makes encrypted text always decrypt and display immediately. Setting to true works, but the markdown rendering part is
-    // not working and it shows up without markdown formatting. Will fix later (todo-1)
+    // not working and it shows up without markdown formatting. Will fix later (todo-2)
     private autoDecrypting: boolean = false;
 
     constructor(public node: J.NodeInfo, private appState: AppState) {
@@ -72,7 +72,7 @@ export class NodeCompMarkdown extends Html {
         else {
             S.render.initMarkdown();
 
-            // todo-1: put some more thought into this...
+            // todo-2: put some more thought into this...
             // turning this off because when it appears in a url, blows up the link. Need to find some better way.
             // if (S.srch.searchText) {
             //     /* This results in a <strong><em> wrapping the text, which we have a special styling for with a green background for each

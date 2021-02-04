@@ -523,18 +523,21 @@ export class EditNodeDlg extends DialogBase {
 
     deleteUpload = async (): Promise<void> => {
         return new Promise<void>(async (resolve, reject) => {
-            let state = this.getState();
+            try {
+                let state = this.getState();
 
-            /* Note: This doesn't resolve until either user clicks no on confirmation dialog or else has clicked yes and the delete
-            call has fully completed. */
-            let deleted: boolean = await S.attachment.deleteAttachment(state.node, this.appState);
+                /* Note: This doesn't resolve until either user clicks no on confirmation dialog or else has clicked yes and the delete
+                call has fully completed. */
+                let deleted: boolean = await S.attachment.deleteAttachment(state.node, this.appState);
 
-            if (deleted) {
-                S.attachment.removeBinaryProperties(state.node);
-                this.mergeState({ node: state.node });
-                this.binaryDirty = true;
+                if (deleted) {
+                    S.attachment.removeBinaryProperties(state.node);
+                    this.mergeState({ node: state.node });
+                    this.binaryDirty = true;
+                }
+            } finally {
+                resolve();
             }
-            resolve();
         });
     }
 
@@ -619,7 +622,7 @@ export class EditNodeDlg extends DialogBase {
             if (this.contentEditor) {
                 content = this.contentEditor.getValue();
 
-                // todo-1: an optimization can be done here such that if we just ENCRYPTED the node, we use this.skpd.symKey because that
+                // todo-2: an optimization can be done here such that if we just ENCRYPTED the node, we use this.skpd.symKey because that
                 // will already be available
                 let cipherKey = S.props.getCryptoKey(state.node, this.appState);
                 if (cipherKey) {
