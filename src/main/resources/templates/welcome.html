@@ -17,13 +17,13 @@
     <meta property="og:type" content="website" />
     <meta property="og:title" th:attr="content=${brandingAppName}" />
     <meta property="og:description" th:attr="content=${introSubtitle}" />
-    <meta property="og:image" content="/images/logo-150px-tr.jpg" />
+    <meta property="og:image" content="/branding/logo-150px-tr.jpg" />
     <meta property="og:url" th:attr="content=${hostUrl}" />
 
     <meta name="twitter:card" content="summary" />
     <meta name="twitter:title" th:attr="content=${brandingAppName}" />
     <meta name="twitter:description" th:attr="content=${introSubtitle}" />
-    <meta name="twitter:image" content="/images/logo-150px-tr.jpg" />
+    <meta name="twitter:image" content="/branding/logo-150px-tr.jpg" />
 
     <title th:text="${brandingAppName}"></title>
     <link rel="stylesheet" th:href="'/css/meta64.css?v='+${MAIN_CSS_HASH}" />
@@ -42,10 +42,8 @@
                         <h4 class="alert alert-info justify-content-center"
                             th:if="${not #strings.isEmpty(signupResponse)}" th:text="${signupResponse}"></h4>
 
-                        <img class="mainLogoImg" src="/images/logo-250px-tr.jpg"></img>
-
+                        <img class="mainLogoImg" src="branding/logo-250px-tr.jpg"></img>
                         <h1 class="text-center">Quanta</h1>
-
                         <h3 class="text-center" th:text="${introSubtitle}"></h3>
 
                         <p>&nbsp</p>
@@ -77,14 +75,14 @@
             <p>
                 <a href="https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=YD984BLHTSZYL&currency_code=USD&source=url"
                     target="_blank">
-                    <img src='/images/btn_donateCC_LG.gif' title='PayPal - The safer, easier way to pay online!'
+                    <img src='/branding/btn_donateCC_LG.gif' title='PayPal - The safer, easier way to pay online!'
                         alt='Donate with PayPal button' />
                 </a>
             </p>
 
             <a href="https://github.com/Clay-Ferguson/quantizr">
                 <p>GitHub: Project Quantizr (MIT License)</p>
-                <img src="/images/GitHub-Mark-Light-32px.png"></img>
+                <img src="/branding/GitHub-Mark-Light-32px.png"></img>
             </a>
         </div>
 

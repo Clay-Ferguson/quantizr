@@ -68,5 +68,7 @@ cp ${SCRIPTS}/_backup--localhost-test.sh ${DEPLOY_TARGET}/dumps/_backup--localho
 cp ${SCRIPTS}/restore--localhost-test.sh ${DEPLOY_TARGET}/restore--localhost-test.sh
 cp ${SCRIPTS}/_restore--localhost-test.sh ${DEPLOY_TARGET}/dumps/_restore--localhost-test.sh
 
+rsync -aAX --delete --force --progress --stats "./branding/" "${DEPLOY_TARGET}/branding/"
+
 read -p "Build Complete. press a key"
 

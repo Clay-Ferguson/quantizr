@@ -65,6 +65,9 @@ services:
             - '${DATA_FOLDER}/tmp:/tmp'
             - '${DATA_FOLDER}/log:/log'
             - '/etc/letsencrypt/live/${quanta_domain}:/letsencrypt'
+
+             # This maps '/app' to be the current folder where you run docker from (where the yaml file is normally)
+            - $PWD:/app
         ports:
             - '443:443'
             - '80:80'

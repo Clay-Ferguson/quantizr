@@ -57,6 +57,9 @@ services:
         volumes:
             - "${DEPLOY_TARGET}/tmp:/tmp"
             - "${DEPLOY_TARGET}/log:/log"
+
+             # This maps '/app' to be the current folder where you run docker from (where the yaml file is normally)
+            - $PWD:/app
         ports:
             - "8181:8181"
             # Uncomment for debugging...

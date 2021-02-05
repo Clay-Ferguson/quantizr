@@ -100,7 +100,7 @@ export class Meta64 implements Meta64Intf {
 
                     /* Chrome is showing it's own icon/image instead of the custom one and I'm not sure why. I've tried
                      both image and icon here and neither works. */
-                    image: window.location.origin + "/images/logo-50px-tr.jpg"
+                    image: window.location.origin + "/branding/logo-50px-tr.jpg"
                 });
             });
         }

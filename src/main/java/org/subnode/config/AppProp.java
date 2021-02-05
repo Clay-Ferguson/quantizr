@@ -174,10 +174,6 @@ public class AppProp /* implements EnvironmentAware */ {
 		return env.getProperty("intro2");
 	}
 
-	public String getResourcesBaseFolder() {
-		return env.getProperty("resourcesBaseFolder");
-	}
-
 	public String getSolrSearchHost() {
 		return env.getProperty("solr.search.host");
 	}

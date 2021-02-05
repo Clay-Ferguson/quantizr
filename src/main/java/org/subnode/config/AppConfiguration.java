@@ -1,15 +1,7 @@
 package org.subnode.config;
 
-import java.io.File;
-import java.util.List;
-
-import org.subnode.util.XString;
-import org.thymeleaf.spring5.SpringTemplateEngine;
-import org.thymeleaf.spring5.view.ThymeleafViewResolver;
-import org.thymeleaf.templateresolver.ClassLoaderTemplateResolver;
 import org.apache.catalina.Context;
 import org.apache.catalina.connector.Connector;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.tomcat.util.descriptor.web.SecurityCollection;
 import org.apache.tomcat.util.descriptor.web.SecurityConstraint;
 import org.slf4j.Logger;
@@ -25,9 +17,10 @@ import org.springframework.scheduling.TaskScheduler;
 import org.springframework.scheduling.concurrent.ConcurrentTaskScheduler;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.servlet.ViewResolver;
-import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistration;
-import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+import org.thymeleaf.spring5.SpringTemplateEngine;
+import org.thymeleaf.spring5.view.ThymeleafViewResolver;
+import org.thymeleaf.templateresolver.ClassLoaderTemplateResolver;
 
 /**
  * Standard Spring WebMvcConfigurerAdapter-derived class.
@@ -53,73 +46,48 @@ public class AppConfiguration implements WebMvcConfigurer {
 		return new ConcurrentTaskScheduler(); // single threaded by default
 	}
 
-	@Override
-	public void addResourceHandlers(ResourceHandlerRegistry registry) {
-		// registry
-		// .addResourceHandler("/public/**")
-		// .addResourceLocations("/public/");
+	/*
+	 * This method is removed because we switched to using the spring.resources.static-locations
+	 * property in application.properties file to accomplish loading static files
+	 */
+	// import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistration;
+	// import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
+	// import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+	// import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
 
-		/*
-		 * This is how we enable the JS files to be edited and tested without doing a rebuild and restart of
-		 * server code. We can just run TSC compile to generate the new JS files (or let webpack do that),
-		 * and then refresh the browser to reload them. This jsBaseFolder should of course be empty (unused)
-		 * in production environment, or any time the JAR (build) should be used exclusively at runtime,
-		 * rather than serving from actual directories at runtime
-		 * 
-		 * NOTE: There is another way to do this also:
-		 * https://stackoverflow.com/questions/21123437/how-do-i-use-spring-boot-to-
-		 * serve-static-content-located-in-dropbox-folder
-		 */
-		// if (!StringUtils.isEmpty(appProp.getJsBaseFolder())) {
-		// ResourceHandlerRegistration reg = registry.addResourceHandler("/js/**");
+	// @Override
+	// public void addResourceHandlers(ResourceHandlerRegistry registry) {
 
-		// List<String> folders = XString.tokenize(appProp.getJsBaseFolder(), ",",
-		// true);
-		// if (folders != null) {
-		// for (String folder : folders) {
-		// reg.addResourceLocations(folder);
-		// }
-		// }
-		// }
+	// /*
+	// * This is how we enable the JS files to be edited and tested without doing a rebuild and restart
+	// of
+	// * server code. We can just run TSC compile to generate the new JS files (or let webpack do that),
+	// * and then refresh the browser to reload them. This jsBaseFolder should of course be empty
+	// (unused)
+	// * in production environment, or any time the JAR (build) should be used exclusively at runtime,
+	// * rather than serving from actual directories at runtime
+	// *
+	// * NOTE: There is another way to do this also:
+	// * https://stackoverflow.com/questions/21123437/how-do-i-use-spring-boot-to-serve-static-content-
+	// * located-in-dropbox-folder
+	// */
+	// if (!StringUtils.isEmpty(appProp.getResourcesBaseFolder())) {
+	// ResourceHandlerRegistration reg = registry.addResourceHandler("/**");
 
-		/*
-		 * I was using this property as a way to be able to load resources
-		 * 
-		 * todo-1: the 'resourceBaseFolder' can actually be removed now, but just for a short time I want to
-		 * leave it in place, before I comment out. I will not be deleting but commenting.
-		 */
-		if (!StringUtils.isEmpty(appProp.getResourcesBaseFolder())) {
-			ResourceHandlerRegistration reg = registry.addResourceHandler("/**");
-
-			List<String> folders = XString.tokenize(appProp.getResourcesBaseFolder(), ",", true);
-			if (folders != null) {
-				for (String folder : folders) {
-
-					File dir = new File(folder);
-					if (dir.isDirectory()) {
-						log.error("Live Resources Dir not found: " + folder);
-					} else {
-						log.debug("Live Resource Dir found ok:" + folder);
-					}
-					reg.addResourceLocations(folder);
-				}
-			}
-		}
-
-		// if (!StringUtils.isEmpty(appProp.getJsBaseFolder())) {
-		// ResourceHandlerRegistration reg = registry.addResourceHandler("/**");
-
-		// //remove hardcoded value. was only a test.
-		// //List<String> folders =
-		// XString.tokenize("file:///home/clay/ferguson/SubNode-Project/src/main/resources/public/",
-		// ",", true);
-		// //if (folders != null) {
-		// // for (String folder : folders) {
-		// reg.addResourceLocations("");
-		// // }
-		// //}
-		// }
-	}
+	// List<String> folders = XString.tokenize(appProp.getResourcesBaseFolder(), ",", true);
+	// if (folders != null) {
+	// for (String folder : folders) {
+	// File dir = new File(folder);
+	// if (dir.isDirectory()) {
+	// log.error("Resource Dir not found: " + folder);
+	// } else {
+	// log.debug("Resource Dir found ok:" + folder);
+	// }
+	// reg.addResourceLocations(folder);
+	// }
+	// }
+	// }
+	// }
 
 	@Bean
 	public GracefulShutdown gracefulShutdown() {
