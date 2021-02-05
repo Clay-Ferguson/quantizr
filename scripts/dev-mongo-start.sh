@@ -9,7 +9,6 @@ clear
 # set -x
 
 source ./define-functions.sh
-source ./setenv-common.sh
 source ./setenv--localhost-dev.sh
 
 sudo chown 999:999 ${SECRETS}/mongod--localhost-dev.conf

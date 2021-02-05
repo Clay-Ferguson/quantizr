@@ -16,7 +16,6 @@ fi
 cd /home/clay/ferguson/subnode-run
 
 source ./define-functions.sh
-source ./setenv-common.sh
 source ./setenv--localhost-test.sh
 
 docker-compose -f ${docker_compose_yaml} down --remove-orphans
@@ -30,14 +29,14 @@ sudo chown 999:999 ${SECRETS}/mongod.conf
 echo "removing logs"
 rm -f ./log/*
 
-docker load -i ./subnode-test.tar
-verifySuccess "Docker Load subnode-test.tar"
+docker load -i ./quanta-test.tar
+verifySuccess "Docker Load quanta-test.tar"
 
 # IMPORTANT: Use this to troubeshoot the variable substitutions in the yaml file
 # docker-compose -f ${docker_compose_yaml} config
 # read -p "Config look ok?"
 
-docker-compose -f ${docker_compose_yaml} up -d subnode-test
+docker-compose -f ${docker_compose_yaml} up -d quanta-test
 verifySuccess "Docker Compose: up"
 
 # sleep 10
@@ -45,7 +44,7 @@ verifySuccess "Docker Compose: up"
 # docker-compose -f ${docker_compose_yaml} logs ipfs-test
 # verifySuccess "Docker Compose: logs"
 
-dockerCheck "subnode-test"
+dockerCheck "quanta-test"
 
 echo ==========================
 echo Quantizr Started OK!

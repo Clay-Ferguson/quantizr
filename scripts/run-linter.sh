@@ -5,7 +5,6 @@ if [ -f ./vscode-cwd.sh ]; then
 fi
 
 source ./define-functions.sh
-source ./setenv-common.sh
 source ./setenv--localhost-dev.sh
 
 cd ${PRJROOT}/src/main/resources/public

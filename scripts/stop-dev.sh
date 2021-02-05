@@ -5,7 +5,6 @@ if [ -f ./vscode-cwd.sh ]; then
 fi
 
 source ./define-functions.sh
-source ./setenv-common.sh
 source ./setenv--localhost-dev.sh
 
 docker-compose -f ${docker_compose_yaml} down --remove-orphans

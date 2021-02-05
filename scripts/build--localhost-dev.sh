@@ -18,8 +18,9 @@ clear
 # set -x
 
 source ./define-functions.sh
-source ./setenv-common.sh
 source ./setenv--localhost-dev.sh
+
+mkdir -p ${DEPLOY_TARGET}
 
 sudo chown 999:999 ${SECRETS}/mongod--localhost-dev.conf
 
@@ -28,6 +29,7 @@ sudo mkdir -p ${QUANTA_BASE}/tmp
 sudo mkdir -p ${QUANTA_BASE}/lucene
 
 sudo rm -f ${QUANTA_BASE}/log/*
+mkdir -p ${ipfs_data}
 mkdir -p ${ipfs_staging}
 
 cd ${PRJROOT}
@@ -41,7 +43,7 @@ docker-compose -f ${docker_compose_mongo_yaml} up -d mongo-dev
 verifySuccess "Docker Compose (Mongo): up"
 dockerCheck "mongo-dev"
 
-docker-compose -f ${docker_compose_yaml} up -d subnode-dev
+docker-compose -f ${docker_compose_yaml} up -d quanta-dev
 verifySuccess "Docker Compose (Quanta-dev): up"
 
 # sleep 10
@@ -49,6 +51,6 @@ verifySuccess "Docker Compose (Quanta-dev): up"
 # docker-compose -f ${docker_compose_yaml} logs ipfs-dev
 # verifySuccess "Docker Compose: logs"
 
-dockerCheck "subnode-dev"
+dockerCheck "quanta-dev"
 
 # read -p "Build and Start Complete. press a key"

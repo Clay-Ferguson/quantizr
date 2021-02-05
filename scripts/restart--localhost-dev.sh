@@ -9,7 +9,6 @@ clear
 # set -x
 
 source ./define-functions.sh
-source ./setenv-common.sh
 source ./setenv--localhost-dev.sh
 
 # go back to folder with this script in it. sort of 'home' for this script
@@ -21,5 +20,5 @@ cd $PRJROOT
 
 mvn --offline compiler:compile -DskipTests=true -Pjava-compile
 
-docker restart subnode-dev
+docker restart quanta-dev
 verifySuccess "Docker Restart"

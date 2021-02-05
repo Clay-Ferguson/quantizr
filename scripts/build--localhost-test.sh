@@ -1,12 +1,15 @@
 #!/bin/bash
 
+# NOTE: If you don't know why this file is here then you can ignore it. This script being run here
+# only contains a command to change to the [project]/scripts/ direcory when it's run from inside VSCode
+# so if you are running this builder outside of VSCode terminal you can ignoure this 'vscode-cwd.sh' stuff 
 if [ -f ./vscode-cwd.sh ]; then
   source ./vscode-cwd.sh
 fi
 
 ###############################################################################
 # 
-# This script builds a deployable subnode-test.tar, which is able to be 
+# This script builds a deployable quanta-test.tar, which is able to be 
 # deployed stand-alone somewhere at localhost, normally for testing, or just
 # for using Quanta as a personal/local productivity tool. It's configured
 # to run at http://locahost:8181
@@ -22,7 +25,6 @@ clear
 # set -x
 
 source ./define-functions.sh
-source ./setenv-common.sh
 source ./setenv--localhost-test.sh
 
 mkdir -p ${DEPLOY_TARGET}
@@ -35,15 +37,16 @@ cd ${DEPLOY_TARGET}
 . ${SCRIPTS}/stop-test.sh
 
 sudo rm -f ${DEPLOY_TARGET}/log/*
+mkdir -p ${ipfs_data}
 mkdir -p ${ipfs_staging}
 
 # Wipe some existing stuff to ensure with certainty it gets rebuilt
-rm -rf ${DEPLOY_TARGET}/subnode-test.tar
+rm -rf ${DEPLOY_TARGET}/quanta-test.tar
 
 cd ${PRJROOT}
 . ${SCRIPTS}/_build.sh
 
-docker save -o ${DEPLOY_TARGET}/subnode-test.tar subnode-test
+docker save -o ${DEPLOY_TARGET}/quanta-test.tar quanta-test
 verifySuccess "Docker Save"
 
 cd ${PRJROOT}
@@ -52,7 +55,6 @@ cd ${PRJROOT}
 sudo cp ${SCRIPTS}/mongod--localhost-test.conf ${DEPLOY_TARGET}/mongod.conf
 
 cp ${SCRIPTS}/setenv--localhost-test.sh ${DEPLOY_TARGET}/setenv--localhost-test.sh
-cp ${SCRIPTS}/setenv-common.sh ${DEPLOY_TARGET}/setenv-common.sh
 cp ${SCRIPTS}/run-test.sh ${DEPLOY_TARGET}/run-test.sh
 cp ${SCRIPTS}/stop-test.sh ${DEPLOY_TARGET}/stop-test.sh
 

@@ -14,8 +14,8 @@ that's used during builds.
 	<artifactId>org.subnode</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<packaging>jar</packaging>
-	<name>SubNode</name>
-	<description>SubNode - Content Platform for the Web</description>
+	<name>Quanta</name>
+	<description>Quanta - Content Platform for the Web</description>
 
 	<parent>
 		<groupId>org.springframework.boot</groupId>

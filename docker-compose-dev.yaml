@@ -61,11 +61,11 @@ services:
             - net-dev
         image: ipfs/go-ipfs:v0.7.0
 
-    subnode-dev:
+    quanta-dev:
         build: 
             context: .
             dockerfile: ./dockerfile-dev
-        container_name: subnode-dev
+        container_name: quanta-dev
         expose:
             - '8182'
             - '8000'
@@ -134,7 +134,7 @@ services:
             ipfs.gatewayPort: "8080"
             # This is the node name for a feed like this: http://localhost:8182/multiRss?id=:podcast-set to cause that feed to precache
             rssAggregatePreCacheNodeId_XX: ":podcast-set"
-        image: subnode-dev
+        image: quanta-dev
         depends_on:
             # - mongo-dev (uncomment: for mongo internal to this docker)
             - ipfs-dev
