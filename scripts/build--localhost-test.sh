@@ -28,47 +28,58 @@ source ./setenv--localhost-test.sh
 
 mkdir -p ${DEPLOY_TARGET}
 
+# copy docker files to deploy target
 cp ${PRJROOT}/docker-compose-test.yaml    ${DEPLOY_TARGET}/docker-compose-test.yaml
 cp ${PRJROOT}/dockerfile-test             ${DEPLOY_TARGET}/dockerfile-test
+
+# copy scripts needed to start/stop to deploy target
 cp ${SCRIPTS}/run-test.sh                 ${DEPLOY_TARGET}/run-test.sh
 cp ${SCRIPTS}/stop-test.sh                ${DEPLOY_TARGET}/stop-test.sh
 cp ${SCRIPTS}/define-functions.sh         ${DEPLOY_TARGET}/define-functions.sh
 cp ${SCRIPTS}/setenv--localhost-test.sh   ${DEPLOY_TARGET}/setenv--localhost-test.sh
 
-cd ${DEPLOY_TARGET}
-. ${SCRIPTS}/stop-test.sh
-
-sudo rm -rf ${DEPLOY_TARGET}/log/*
-mkdir -p ${ipfs_data}
-mkdir -p ${ipfs_staging}
-
-# Wipe some existing stuff to ensure with certainty it gets rebuilt
-rm -rf ${DEPLOY_TARGET}/quanta-test.tar
-
-cd ${PRJROOT}
-. ${SCRIPTS}/_build.sh
-
-docker save -o ${DEPLOY_TARGET}/quanta-test.tar quanta-test
-verifySuccess "Docker Save"
-
-cd ${PRJROOT}
-
 # this is a special file we alter the owner of in the run script.
-sudo cp ${SCRIPTS}/mongod--localhost-test.conf ${DEPLOY_TARGET}/mongod.conf
+cp ${SCRIPTS}/mongod--localhost-test.conf ${DEPLOY_TARGET}/mongod.conf
 
 # Note: this 'dumps' folder is mapped onto a volume in 'docker-compose-test.yaml' and the 'backup-local.sh'
 #       script should only be run from 'inside' the docker container, which is what 'mongodb-backup.sh' actually does.
 mkdir -p ${DEPLOY_TARGET}/dumps
 
+# copy our secrets (passwords, etc) to deploy location
 cp ${SECRETS}/secrets.sh                  ${DEPLOY_TARGET}/dumps/secrets.sh
 
+# copy the database backup scripts to deploy location
 cp ${SCRIPTS}/backup--localhost-test.sh   ${DEPLOY_TARGET}/backup--localhost-test.sh
 cp ${SCRIPTS}/_backup--localhost-test.sh  ${DEPLOY_TARGET}/dumps/_backup--localhost-test.sh
 
+# copy the database restore scripts to deploy target
 cp ${SCRIPTS}/restore--localhost-test.sh  ${DEPLOY_TARGET}/restore--localhost-test.sh
 cp ${SCRIPTS}/_restore--localhost-test.sh ${DEPLOY_TARGET}/dumps/_restore--localhost-test.sh
 
+# copy our banding folder to deploy target
 rsync -aAX --delete --force --progress --stats "./branding/" "${DEPLOY_TARGET}/branding/"
+
+# stop te server if running
+cd ${DEPLOY_TARGET}
+. ${SCRIPTS}/stop-test.sh
+
+# ensure logs is cleaned up
+sudo rm -rf ${DEPLOY_TARGET}/log/*
+
+# ensure the IPFS folders exist
+mkdir -p ${ipfs_data}
+mkdir -p ${ipfs_staging}
+
+# Wipe previous deployment to ensure it can't be used again.
+rm -rf ${DEPLOY_TARGET}/quanta-test.tar
+
+# build the project (comile source)
+cd ${PRJROOT}
+. ${SCRIPTS}/_build.sh
+
+# move deployment binary into target location
+docker save -o ${DEPLOY_TARGET}/quanta-test.tar quanta-test
+verifySuccess "Docker Save"
 
 read -p "Build Complete. press a key"
 

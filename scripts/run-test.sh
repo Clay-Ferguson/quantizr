@@ -4,7 +4,6 @@ if [ -f ./vscode-cwd.sh ]; then
   source ./vscode-cwd.sh
 fi
 
-
 ###############################################################################
 # This script can serve as an example of how to run any app tar file that's
 # built by any of the builders and is specifically used by Quanta dev team to

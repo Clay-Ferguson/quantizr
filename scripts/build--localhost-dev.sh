@@ -19,8 +19,6 @@ clear
 
 source ./setenv--localhost-dev.sh
 
-mkdir -p ${DEPLOY_TARGET}
-
 sudo chown 999:999 ${SECRETS}/mongod--localhost-dev.conf
 
 sudo mkdir -p ${QUANTA_BASE}/log

@@ -1,3 +1,5 @@
+# NOTE: This file is not normally used because the main app deployer starts mongo internally inside 'docker-compose-prod.yaml'
+
 version: '3.7'
 services:
 
