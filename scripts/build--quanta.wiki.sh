@@ -13,16 +13,6 @@ clear
 # show commands as they are run.
 set -x
 
-# secrets.sh is required to be a file that contains at a minimum props like the example below, and you can
-# put the file anywhere you want as long as you assign SECRETS variable and then 'source' that file
-# as done below.
-#
-# example 'secrets.sh' file content:
-#     #!/bin/bash
-#     export emailPassword=???
-#     export devEmail=???
-#     export subnodePassword=???
-
 export SECRETS=/home/clay/ferguson/secrets
 source ${SECRETS}/secrets.sh
 

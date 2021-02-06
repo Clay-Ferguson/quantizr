@@ -1,21 +1,10 @@
 #!/bin/bash
 
-# secrets.sh is required to be a file that contains at a minimum props like the example below, and you can
-# put the file anywhere you want as long as you assign SECRETS variable and then 'source' that file
-# as done below.
-#
-# example 'secrets.sh' file content:
-#     #!/bin/bash
-#     export emailPassword=???
-#     export devEmail=???
-#     export subnodePassword=???
+export PRJROOT=/home/clay/ferguson/Quantizr
+export SCRIPTS=${PRJROOT}/scripts
 
 export SECRETS=/home/clay/ferguson/secrets
 source ${SECRETS}/secrets.sh
-
-# Directory that contains the Quanta project (pom.xml is here, for example). 
-export PRJROOT=/home/clay/ferguson/Quantizr
-export SCRIPTS=${PRJROOT}/scripts
 
 export ipfs_data=/home/clay/ferguson/subnode-run/ipfs
 export ipfs_staging=/home/clay/ferguson/subnode-run/ipfs/staging

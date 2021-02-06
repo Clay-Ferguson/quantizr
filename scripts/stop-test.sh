@@ -12,10 +12,9 @@ fi
 # (see file `build--localhost-test.sh`)
 ###############################################################################
 
-cd ${DEPLOY_TARGET}
-
 source ./define-functions.sh
 source ./setenv--localhost-test.sh
 
+cd ${DEPLOY_TARGET}
 docker-compose -f ${docker_compose_yaml} down --remove-orphans
 verifySuccess "Docker Compose: down"

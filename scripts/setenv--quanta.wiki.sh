@@ -1,5 +1,8 @@
 #!/bin/bash
 
+export PRJROOT=/home/clay/ferguson/Quantizr
+export SCRIPTS=${PRJROOT}/scripts
+
 export quanta_domain=quanta.wiki
 
 # INSTANCE_FOLDER tells docker yaml volume where to find mongo-scripts folder and mongod.conf file.
