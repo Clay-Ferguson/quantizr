@@ -4,37 +4,31 @@ services:
     # # Note: Container Names are automatically available as 'host names' (as in networking http://host:port)
     # # Networked service-to-service communication use the CONTAINER_PORT in [host]:[container] pairs below.
 
-    # _________________________________________________________________________
-    # DO NOT DELETE
-    # Let's keep this example of how to run mongo-dev from this same yaml in case we ever want to do this again.
-    #+++++++++++++++++++
-    # (uncomment: for mongo internal to this docker)
-    # # Theoretically it should have been possible to let mongo run internally on 27017 (it's default) and then expose it
-    # # to the outside as 27016, but I never could get that to work, so I'm just setting it up to run at 27016 both
-    # # internaly and externally
-    # #
-    # # NOTE: Minimal requirements for the mongod.conf is to have the port set as 27016, and the data db set
-    # mongo-dev: 
-    #     container_name: mongo-dev 
-    #     # WARNING: volumes will not handle '~' character for home folder. Do not use.
-    #     volumes:
-    #         - '${MONGO_BASE}/mongodb-data-dev:/data/db'
-    #         - '${MONGO_BASE}/mongo-dumps-dev:/mongo-dumps'
-    #         - '${MONGO_BASE}/mongo-scripts-dev:/mongo-scripts'
-    #         - '${MONGO_BASE}/secrets/mongod--localhost-dev.conf:/etc/mongod.conf'
-    #     #NOTE: This 'command' property is only needed when we want to start mongod on a port other than 27017    
-    #     command: mongod --config /etc/mongod.conf
-    #     #entrypoint: ["mongod","--config","/etc/mongod.conf"]
-    #     ports:
-    #         - '27016:27016'
-    #     env_file: 
-    #         - '../secrets/mongo.env'
-    #     networks:
-    #        - net-dev
-    #     # Always specify version of mongo. When it upgrades automatically there can be database issues that need to be resolved
-    #     # and we don't want that happening unexpectedly
-    #     image: mongo:4.0
-    # _________________________________________________________________________
+    # Theoretically it should have been possible to let mongo run internally on 27017 (it's default) and then expose it
+    # to the outside as 27016, but I never could get that to work, so I'm just setting it up to run at 27016 both
+    # internaly and externally
+    #
+    # NOTE: Minimal requirements for the mongod.conf is to have the port set as 27016, and the data db set
+    mongo-dev: 
+        container_name: mongo-dev 
+        # WARNING: volumes will not handle '~' character for home folder. Do not use.
+        volumes:
+            - '${MONGO_BASE}/mongodb-data-dev:/data/db'
+            - '${MONGO_BASE}/mongo-dumps-dev:/mongo-dumps'
+            - '${MONGO_BASE}/mongo-scripts-dev:/mongo-scripts'
+            - '../secrets/mongod--localhost-dev.conf:/etc/mongod.conf'
+        #NOTE: This 'command' property is only needed when we want to start mongod on a port other than 27017    
+        command: mongod --config /etc/mongod.conf
+        #entrypoint: ["mongod","--config","/etc/mongod.conf"]
+        ports:
+            - '27016:27016'
+        env_file: 
+            - '../secrets/mongo.env'
+        networks:
+           - net-dev
+        # Always specify version of mongo. When it upgrades automatically there can be database issues that need to be resolved
+        # and we don't want that happening unexpectedly
+        image: mongo:4.0
 
     # https://hub.docker.com/r/ipfs/go-ipfs/
     ipfs-dev: 
@@ -136,20 +130,19 @@ services:
             rssAggregatePreCacheNodeId_XX: ":podcast-set"
         image: quanta-dev
         depends_on:
-            # - mongo-dev (uncomment: for mongo internal to this docker)
+            - mongo-dev
             - ipfs-dev
 
 # https://docs.docker.com/compose/networking/
 
-# (uncomment: for mongo internal to this docker)
-# networks:
-#   net-dev:
-#     driver: bridge
-#     external: false
-#     name: net-dev
-
-# Using external network which we start in our mongo compose yaml
 networks:
   net-dev:
-    external:
-      name: net-dev
+    driver: bridge
+    external: false
+    name: net-dev
+
+# If you're starting mongo in a separate yaml (docker-cokmpose-dev-mongo.yaml) then use this as your 'network' setup.
+# networks:
+#   net-dev:
+#     external:
+#       name: net-dev

@@ -12,7 +12,6 @@ fi
 # (see file `build--localhost-test.sh`)
 ###############################################################################
 
-source ./define-functions.sh
 source ./setenv--localhost-test.sh
 
 cd ${DEPLOY_TARGET}

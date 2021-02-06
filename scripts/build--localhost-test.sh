@@ -24,16 +24,15 @@ clear
 # show commands as they are run.
 # set -x
 
-source ./define-functions.sh
 source ./setenv--localhost-test.sh
 
 mkdir -p ${DEPLOY_TARGET}
 
 cp ${PRJROOT}/docker-compose-test.yaml    ${DEPLOY_TARGET}/docker-compose-test.yaml
 cp ${PRJROOT}/dockerfile-test             ${DEPLOY_TARGET}/dockerfile-test
-cp ${SCRIPTS}/define-functions.sh         ${DEPLOY_TARGET}/define-functions.sh
 cp ${SCRIPTS}/run-test.sh                 ${DEPLOY_TARGET}/run-test.sh
 cp ${SCRIPTS}/stop-test.sh                ${DEPLOY_TARGET}/stop-test.sh
+cp ${SCRIPTS}/define-functions.sh         ${DEPLOY_TARGET}/define-functions.sh
 cp ${SCRIPTS}/setenv--localhost-test.sh   ${DEPLOY_TARGET}/setenv--localhost-test.sh
 
 cd ${DEPLOY_TARGET}

@@ -17,7 +17,6 @@ clear
 # show commands as they are run.
 # set -x
 
-source ./define-functions.sh
 source ./setenv--localhost-dev.sh
 
 mkdir -p ${DEPLOY_TARGET}
@@ -39,9 +38,11 @@ cd ${PRJROOT}
 # We run mongo using a separate compose, just because we want it fully decoupled
 # for preparation and testing getting ready for running the APP in a load balancer
 cd ${PRJROOT}
-docker-compose -f ${docker_compose_mongo_yaml} up -d mongo-dev
-verifySuccess "Docker Compose (Mongo): up"
-dockerCheck "mongo-dev"
+
+# Not used: mongo is setup inside the docker-compose-dev.yaml for now
+# docker-compose -f ${docker_compose_mongo_yaml} up -d mongo-dev
+# verifySuccess "Docker Compose (Mongo): up"
+# dockerCheck "mongo-dev"
 
 docker-compose -f ${docker_compose_yaml} up -d quanta-dev
 verifySuccess "Docker Compose (Quanta-dev): up"

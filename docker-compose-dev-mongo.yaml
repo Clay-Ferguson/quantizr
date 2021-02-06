@@ -1,3 +1,6 @@
+# NOTE: This file is currently not being used, because we currently have the mongo-dev being defined
+# internal so 'docker-compose-dev.yaml'
+
 version: '3.7'
 services:
     

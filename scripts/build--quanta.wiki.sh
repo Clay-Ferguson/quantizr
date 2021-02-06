@@ -1,4 +1,5 @@
 #!/bin/bash
+
 ###############################################################################
 # This script builds a deployable quanta-prod.tar, which is able to be 
 # deployed stand-alone at https://quanta.wiki. This is the production builder
@@ -13,17 +14,7 @@ clear
 # show commands as they are run.
 set -x
 
-export SECRETS=/home/clay/ferguson/secrets
-source ${SECRETS}/secrets.sh
-
-# Directory that contains the Quanta project (pom.xml is here, for example). 
-export PRJROOT=/home/clay/ferguson/Quantizr
-export SCRIPTS=${PRJROOT}/scripts
-
-source ./define-functions.sh
 source ./setenv--quanta.wiki.sh
-
-mkdir -p ${DEPLOY_TARGET}
 
 # Wipe some existing stuff to ensure with certainty it gets rebuilt
 rm -rf ${PROD_DEPLOYER_BASE}/${quanta_domain}/quanta-prod.tar

@@ -8,7 +8,6 @@ clear
 # show commands as they are run.
 # set -x
 
-source ./define-functions.sh
 source ./setenv--localhost-dev.sh
 
 # go back to folder with this script in it. sort of 'home' for this script
