@@ -321,7 +321,7 @@ public abstract class ExportArchiveBase {
 					ext = "." + ext;
 				}
 			}
-			final String binFileNameStr = binFileNameProp != null ? binFileNameProp : "binary";
+			String binFileNameStr = binFileNameProp != null ? binFileNameProp : "binary";
 
 			// final String ipfsLink = node.getStringProp(NodeProp.IPFS_LINK.s());
 			final String mimeType = node.getStrProp(NodeProp.BIN_MIME.s());
@@ -334,7 +334,6 @@ public abstract class ExportArchiveBase {
 			 * if this is a 'data:' encoded image read it from binary storage and put that directly in url src
 			 */
 			final String dataUrl = node.getStrProp(NodeProp.BIN_DATA_URL.s());
-
 			if ("t".equals(dataUrl)) {
 				imgUrl = attachmentService.getStringByNode(session, node);
 
@@ -352,14 +351,23 @@ public abstract class ExportArchiveBase {
 			if (!rawDataUrl && mimeType != null) {
 				// Otherwise if this is an ordinary binary image, encode the link to it.
 				if (imgUrl == null && mimeType.startsWith("image/")) {
-					final String relImgPath = writeFile ? "" : (fileName + "/");
-					/*
-					 * embeds an image that's 400px wide until you click it which makes it go fullsize
-					 * 
-					 */
 
-					imgUrl = "./" + relImgPath + nodeId + ext;
+					// If this is an external URL (just a URL to an image on the web)
+					String extUrl = node.getStrProp(NodeProp.BIN_URL.s());
+					if (extUrl != null) {
+						binFileNameStr = "External image";
+						imgUrl = extUrl;
+					} 
+					// otherwise it's an internal image so get imgUrl that way
+					else {
+						final String relImgPath = writeFile ? "" : (fileName + "/");
+						/*
+						 * embeds an image that's 400px wide until you click it which makes it go fullsize
+						 * 
+						 */
 
+						imgUrl = "./" + relImgPath + nodeId + ext;
+					}
 					html.append("<img title='" + binFileNameStr + "' id='img_" + nodeId
 							+ "' style='width:200px' onclick='document.getElementById(\"img_" + nodeId
 							+ "\").style.width=\"\"' src='" + imgUrl + "'/>");
