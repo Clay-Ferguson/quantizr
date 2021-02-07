@@ -265,12 +265,12 @@ public class AppController implements ErrorController {
 
 		thymeleafAttribs = new HashMap<String, String>();
 
-		thymeleafAttribs.put("brandingAppName", appProp.getBrandingAppName());
-		thymeleafAttribs.put("brandingMetaContent", appProp.getBrandingMetaContent());
+		thymeleafAttribs.put("brandingAppName", appProp.getConfigText("brandingAppName"));
+		thymeleafAttribs.put("brandingMetaContent", appProp.getConfigText("brandingMetaContent"));
 		thymeleafAttribs.put("hostUrl", appProp.getProtocolHostAndPort());
-		thymeleafAttribs.put("introSubtitle", appProp.getIntroSubtitle());
-		thymeleafAttribs.put("intro1", appProp.getIntro1());
-		thymeleafAttribs.put("intro2", appProp.getIntro2());
+		thymeleafAttribs.put("introSubtitle", appProp.getConfigText("introSubtitle"));
+		thymeleafAttribs.put("intro1", appProp.getConfigText("intro1"));
+		thymeleafAttribs.put("intro2", appProp.getConfigText("intro2"));
 
 		thymeleafAttribs.put("BUNDLE_JS_HASH", fileUtils.genHashOfClasspathResource("/public/bundle.js"));
 		thymeleafAttribs.put("MAIN_CSS_HASH", fileUtils.genHashOfClasspathResource("/public/css/meta64.css"));

@@ -1,7 +1,6 @@
 package org.subnode.mongo;
 
 import javax.annotation.PreDestroy;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,24 +38,23 @@ public class MongoRepository {
 	private ActPubService actPub;
 
 	/*
-	 * Because of the criticality of this variable, I am not using the Spring getter
-	 * to get it, but just using a private static. It's slightly safer and better
-	 * for the purpose of cleanup in the shutdown hook which is all it's used for.
+	 * Because of the criticality of this variable, I am not using the Spring getter to get it, but just
+	 * using a private static. It's slightly safer and better for the purpose of cleanup in the shutdown
+	 * hook which is all it's used for.
 	 */
 	private static MongoRepository instance;
 
 	/*
-	 * We only need this lock to protect against startup and/or shutdown
-	 * concurrency. Remember during debugging, etc the server process can be
-	 * shutdown (CTRL-C) even while it's in the startup phase.
+	 * We only need this lock to protect against startup and/or shutdown concurrency. Remember during
+	 * debugging, etc the server process can be shutdown (CTRL-C) even while it's in the startup phase.
 	 */
 	private static final Object lock = new Object();
 
 	private boolean initialized = false;
 
 	/*
-	 * Warning: Spring will NOT be fully initialized in this constructor when this
-	 * runs. Use @PostConstruct instead for spring processing.
+	 * Warning: Spring will NOT be fully initialized in this constructor when this runs.
+	 * Use @PostConstruct instead for spring processing.
 	 */
 	public MongoRepository() {
 		instance = this;
@@ -78,8 +76,8 @@ public class MongoRepository {
 	}
 
 	/*
-	 * Called from SpringContextUtil#setApplicationContext, because we want to call
-	 * only after all of Spring context is fully initialized
+	 * Called from SpringContextUtil#setApplicationContext, because we want to call only after all of
+	 * Spring context is fully initialized
 	 */
 	public void init() {
 		if (initialized)
@@ -96,9 +94,8 @@ public class MongoRepository {
 			log.debug("initializing MongoRepository");
 
 			/*
-			 * IMPORTANT: Do not move this line below this point. An infinite loop of
-			 * re-entry can occur into this method because of calls to getRepository()
-			 * always doing an init.
+			 * IMPORTANT: Do not move this line below this point. An infinite loop of re-entry can occur into
+			 * this method because of calls to getRepository() always doing an init.
 			 */
 			initialized = true;
 

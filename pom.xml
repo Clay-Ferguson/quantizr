@@ -232,6 +232,11 @@ of the spring configs for security are also perfected.
     <version>2.0.1.Final</version>
 </dependency>
 
+<dependency>
+    <groupId>com.fasterxml.jackson.dataformat</groupId>
+    <artifactId>jackson-dataformat-yaml</artifactId>
+</dependency>
+
 			</dependencies>
 
 			<build>
@@ -624,6 +629,17 @@ of the spring configs for security are also perfected.
     <version>2.0.1.Final</version>
 </dependency>
 
+<dependency>
+    <groupId>com.fasterxml.jackson.dataformat</groupId>
+    <artifactId>jackson-dataformat-yaml</artifactId>
+    <!-- WARNING: this needs to match the jackson depencency version we inherited from SpringBoot which of course you can
+    find by running "mvn dependency:tree" 
+    
+    todo-0: I think we can just remove this version, and it inherits right ?
+    <version>2.10.1</version>
+    -->
+</dependency>
+
 			</dependencies>
 
 			<build>
@@ -854,6 +870,17 @@ of the spring configs for security are also perfected.
     <groupId>javax.validation</groupId>
     <artifactId>validation-api</artifactId>
     <version>2.0.1.Final</version>
+</dependency>
+
+<dependency>
+    <groupId>com.fasterxml.jackson.dataformat</groupId>
+    <artifactId>jackson-dataformat-yaml</artifactId>
+    <!-- WARNING: this needs to match the jackson depencency version we inherited from SpringBoot which of course you can
+    find by running "mvn dependency:tree" 
+    
+    todo-0: I think we can just remove this version, and it inherits right ?
+    <version>2.10.1</version>
+    -->
 </dependency>
 
 			</dependencies>
@@ -1262,6 +1289,17 @@ of the spring configs for security are also perfected.
     <groupId>javax.validation</groupId>
     <artifactId>validation-api</artifactId>
     <version>2.0.1.Final</version>
+</dependency>
+
+<dependency>
+    <groupId>com.fasterxml.jackson.dataformat</groupId>
+    <artifactId>jackson-dataformat-yaml</artifactId>
+    <!-- WARNING: this needs to match the jackson depencency version we inherited from SpringBoot which of course you can
+    find by running "mvn dependency:tree" 
+    
+    todo-0: I think we can just remove this version, and it inherits right ?
+    <version>2.10.1</version>
+    -->
 </dependency>
 
 			</dependencies>

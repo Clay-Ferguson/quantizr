@@ -23,6 +23,7 @@ sudo chown 999:999 ${SECRETS}/mongod--localhost-dev.conf
 
 sudo mkdir -p ${QUANTA_BASE}/log
 sudo mkdir -p ${QUANTA_BASE}/tmp
+sudo mkdir -p ${QUANTA_BASE}/config
 sudo mkdir -p ${QUANTA_BASE}/lucene
 
 sudo rm -f ${QUANTA_BASE}/log/*

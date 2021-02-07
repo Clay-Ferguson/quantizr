@@ -8,20 +8,22 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.StringTokenizer;
-
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
+import org.apache.commons.io.IOUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.core.io.Resource;
 import org.subnode.config.SpringContextUtil;
 import org.subnode.exception.base.RuntimeEx;
-import org.apache.commons.io.IOUtils;
-import org.springframework.core.io.Resource;
 
 /**
  * General string utilities.
  */
 public class XString {
+	private static final Logger log = LoggerFactory.getLogger(XString.class);
 
 	public static final ObjectMapper jsonMapper = new ObjectMapper();
 	static {
@@ -191,9 +193,9 @@ public class XString {
 	}
 
 	/*
-	 * Ensures string containing val which is number is prepended with leading
-	 * zeroes to make the string 'count' chars long. Using simplest inefficient
-	 * algorithm for now. Can be done faster with one concat
+	 * Ensures string containing val which is number is prepended with leading zeroes to make the string
+	 * 'count' chars long. Using simplest inefficient algorithm for now. Can be done faster with one
+	 * concat
 	 */
 	public final static String addLeadingZeroes(String val, int count) {
 		while (val.length() < count) {

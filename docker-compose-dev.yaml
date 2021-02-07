@@ -65,6 +65,7 @@ services:
         volumes:
             - '${QUANTA_BASE}/tmp:/tmp'
             - '${QUANTA_BASE}/log:/log'
+            - '${QUANTA_BASE}/config:/config'
             - '${QUANTA_BASE}/lucene:/subnode-lucene'
             - '${PRJROOT}/src/main/resources/public:/dev-resource-base'
             - '${PRJROOT}/target/classes:/loader-path'
@@ -78,11 +79,6 @@ services:
         networks:
             - net-dev
         environment:
-            brandingAppName: Quanta
-            brandingMetaContent: "Quanta: Social Media Micro-blogging Platform for the Fediverse!"
-            introSubtitle: Welcome to the Fediverse!
-            intro1: Quanta is a decentralized and federated content management, social media, and publishing platform. Join the Fediverse Revolution!
-            intro2:
 
             # Can be a comma-delimited list of TestIntf-derived tests to run
             # runTests: "ActPubTest"

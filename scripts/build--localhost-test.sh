@@ -45,6 +45,8 @@ cp ${SCRIPTS}/mongod--localhost-test.conf ${DEPLOY_TARGET}/mongod.conf
 #       script should only be run from 'inside' the docker container, which is what 'mongodb-backup.sh' actually does.
 mkdir -p ${DEPLOY_TARGET}/dumps
 
+mkdir -p ${DEPLOY_TARGET}/config
+
 # copy our secrets (passwords, etc) to deploy location
 cp ${SECRETS}/secrets.sh                  ${DEPLOY_TARGET}/dumps/secrets.sh
 

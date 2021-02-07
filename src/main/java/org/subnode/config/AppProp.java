@@ -1,16 +1,24 @@
 package org.subnode.config;
 
+import java.io.File;
+import java.io.InputStream;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
-
-import org.subnode.util.XString;
-
+import java.util.Map;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
+import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Component;
+import org.subnode.util.ExUtil;
+import org.subnode.util.StreamUtil;
+import org.subnode.util.XString;
 
 /**
  * Primary class for accessing application properties.
@@ -26,6 +34,98 @@ public class AppProp /* implements EnvironmentAware */ {
 	private Environment env;
 
 	private String protocolHostAndPort = null;
+
+	public static final ObjectMapper yamlMapper = new ObjectMapper(new YAMLFactory());
+
+	Map<String, Object> helpMapExternal = null;
+	Map<String, Object> configMapExternal = null;
+	Map<String, Object> helpMapInternal = null;
+	Map<String, Object> configMapInternal = null;
+
+	/* Gets help text from external file if found, and it not gets property from internal */
+	public String getHelpText(String prop) {
+		if (helpMapExternal == null) {
+			helpMapExternal = readYamlExternal("help-text.yaml");
+		}
+
+		String ret = (String) helpMapExternal.get(prop);
+		if (ret == null) {
+			if (helpMapInternal == null) {
+				helpMapInternal = readYamlInternal("help-text.yaml");
+			}
+			ret = (String) helpMapInternal.get(prop);
+		}
+		return ret;
+	}
+
+	/* Gets config text from external file if found, and it not gets property from internal */
+	public String getConfigText(String prop) {
+		if (configMapExternal == null) {
+			configMapExternal = readYamlExternal("config-text.yaml");
+		}
+
+		String ret = (String) configMapExternal.get(prop);
+		if (ret == null) {
+			if (configMapInternal == null) {
+				configMapInternal = readYamlInternal("config-text.yaml");
+			}
+	
+			ret = (String) configMapInternal.get(prop);
+		}
+		return ret;
+	}
+
+	/*
+	 * Reads a yaml file into a map from internal file at "classname:[fileName]
+	 */
+	public static Map<String, Object> readYamlInternal(String fileName) {
+		synchronized (yamlMapper) {
+			InputStream is = null;
+			Map<String, Object> map = null;
+
+			try {
+				log.debug("Loading config from internal classpath: " + fileName);
+				Resource resource = SpringContextUtil.getApplicationContext().getResource("classpath:" + fileName);
+				is = resource.getInputStream();
+
+				map = yamlMapper.readValue(is, new TypeReference<Map<String, Object>>() {
+				});
+
+				if (map == null) {
+					map = new HashMap<String, Object>();
+				}
+
+			} catch (Exception e) {
+				ExUtil.error(log, "failed to load help-text.yaml", e);
+			} finally {
+				StreamUtil.close(is);
+			}
+			return map;
+		}
+	}
+
+	public static Map<String, Object> readYamlExternal(String fileName) {
+		synchronized (yamlMapper) {
+			Map<String, Object> map = null;
+			try {
+				File file = new File("/config/" + fileName);
+
+				// if an external config file is found use it.
+				if (file.isFile()) {
+					log.debug("Loading config from file system: " + fileName);
+					map = yamlMapper.readValue(file, new TypeReference<Map<String, Object>>() {
+					});
+				}
+
+				if (map == null) {
+					map = new HashMap<String, Object>();
+				}
+			} catch (Exception e) {
+				ExUtil.error(log, "failed to load help-text.yaml", e);
+			}
+			return map;
+		}
+	}
 
 	public String getHostAndPort() {
 		return getHttpProtocol() + "://" + getMetaHost() + ":" + getServerPort();
@@ -152,26 +252,6 @@ public class AppProp /* implements EnvironmentAware */ {
 
 	public String getUserLandingPageNode() {
 		return env.getProperty("anonUserLandingPageNode");
-	}
-
-	public String getBrandingMetaContent() {
-		return env.getProperty("brandingMetaContent");
-	}
-
-	public String getBrandingAppName() {
-		return env.getProperty("brandingAppName");
-	}
-
-	public String getIntroSubtitle() {
-		return env.getProperty("introSubtitle");
-	}
-
-	public String getIntro1() {
-		return env.getProperty("intro1");
-	}
-
-	public String getIntro2() {
-		return env.getProperty("intro2");
 	}
 
 	public String getSolrSearchHost() {

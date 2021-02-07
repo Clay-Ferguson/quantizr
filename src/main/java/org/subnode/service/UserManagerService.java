@@ -509,11 +509,13 @@ public class UserManagerService {
 		 */
 		log.debug("Signup URL: " + signupLink);
 
-		content = "Welcome to " + appProp.getBrandingAppName() + ":" + userName + //
+		String brandingAppName = appProp.getConfigText("brandingAppName");
+
+		content = "Welcome to " + brandingAppName + ":" + userName + //
 				"<p>\nClick this link to complete signup: <br>\n" + signupLink;
 
 		if (!StringUtils.isEmpty(appProp.getMailHost())) {
-			outboxMgr.queueEmail(email, appProp.getBrandingAppName() + " - Account Signup", content);
+			outboxMgr.queueEmail(email, brandingAppName + " - Account Signup", content);
 		}
 	}
 
@@ -853,10 +855,12 @@ public class UserManagerService {
 			String passCode = ownerNode.getId().toHexString() + "-" + String.valueOf(authCode);
 			String link = appProp.getHostAndPort() + "/app?passCode=" + passCode;
 
-			String content = "Password reset was requested on " + appProp.getBrandingAppName() + " account: " + user + //
+			String brandingAppName = appProp.getConfigText("brandingAppName");
+
+			String content = "Password reset was requested on " + brandingAppName + " account: " + user + //
 			"<p>\nGo to this link to reset your password: <br>\n" + link;
 
-			outboxMgr.queueEmail(email, appProp.getBrandingAppName() + " Password Reset", content);
+			outboxMgr.queueEmail(email, brandingAppName + " Password Reset", content);
 
 			res.setMessage("A password reset link has been sent to your email. Check your email in a minute or so.");
 			res.setSuccess(true);

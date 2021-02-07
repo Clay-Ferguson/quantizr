@@ -64,6 +64,7 @@ services:
             - '${DATA_FOLDER}/docs:/docs'
             - '${DATA_FOLDER}/tmp:/tmp'
             - '${DATA_FOLDER}/log:/log'
+            - '${DATA_FOLDER}/config:/config'
             - '/etc/letsencrypt/live/${quanta_domain}:/letsencrypt'
 
              # This maps '/app' to be the current folder where you run docker from (where the yaml file is normally)
@@ -77,11 +78,6 @@ services:
         networks:
             - net-prod
         environment:
-            brandingAppName: Quanta
-            brandingMetaContent: "Quanta: Social Media Micro-blogging Platform for the Fediverse!"
-            introSubtitle: Welcome to the Fediverse!
-            intro1: Quanta is a decentralized and federated content management, social media, and publishing platform. Join the Fediverse Revolution!
-            intro2:
             mongoAdminPassword: "${subnodePassword}"
             reCaptcha3SiteKey: "${reCaptcha3SiteKey}"
             reCaptcha3SecretKey: "${reCaptcha3SecretKey}" 
