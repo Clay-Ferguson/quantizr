@@ -141,6 +141,13 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
 
                     this.dropzone.addFile(blob);
                     this.runButtonEnablement();
+
+                    // My personal preference is that a click on "From Clipboard" should instantly upload the image
+                    // and close the upload dialog, so let's call upload() now (same as using clicking Upload button).
+                    // For taking notes online this is a common scenario and saving one click goes a long way towards
+                    // better usability, but this line of code is completely optional.
+                    this.upload();
+
                     done = true;
                     break;
                 }
