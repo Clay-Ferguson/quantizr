@@ -43,7 +43,7 @@ public class ExportZipService extends ExportArchiveBase {
         while (fileName.startsWith("/")) {
             fileName = fileName.substring(1);
         }
-        log.debug("Add Entry: " + fileName + " bytes.length=" + bytes.length);
+        log.debug("Add Entry3: " + fileName + " bytes.length=" + bytes.length);
         try {
             ZipArchiveEntry entry = new ZipArchiveEntry(fileName);
 
@@ -66,7 +66,7 @@ public class ExportZipService extends ExportArchiveBase {
         while (fileName.startsWith("/")) {
             fileName = fileName.substring(1);
         }
-        log.debug("Add Entry: " + fileName);
+        log.debug("Add Entry4: " + fileName);
         try {
             ZipArchiveEntry entry = new ZipArchiveEntry(fileName);
 

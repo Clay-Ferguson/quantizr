@@ -39,11 +39,10 @@ import org.subnode.util.XString;
 /**
  * Base class for exporting to archives (ZIP and TAR).
  * 
- * NOTE: Derived classes are expected to be 'prototype' scope so we can keep
- * state in this object on a per-export basis. That is, each time a user does an
- * export, a new instance of this class is created that is dedicated just do
- * doing that one export and so any member varibles in this class have just that
- * one export as their 'scope'
+ * NOTE: Derived classes are expected to be 'prototype' scope so we can keep state in this object on
+ * a per-export basis. That is, each time a user does an export, a new instance of this class is
+ * created that is dedicated just do doing that one export and so any member varibles in this class
+ * have just that one export as their 'scope'
  */
 public abstract class ExportArchiveBase {
 	private static final Logger log = LoggerFactory.getLogger(ExportArchiveBase.class);
@@ -69,9 +68,8 @@ public abstract class ExportArchiveBase {
 	private String rootPathParent;
 
 	/*
-	 * It's possible that nodes recursively contained under a given node can have
-	 * same name, so we have to detect that and number them, so we use this hashset
-	 * to detect existing filenames.
+	 * It's possible that nodes recursively contained under a given node can have same name, so we have
+	 * to detect that and number them, so we use this hashset to detect existing filenames.
 	 */
 	private final HashSet<String> fileNameSet = new HashSet<String>();
 
@@ -188,13 +186,12 @@ public abstract class ExportArchiveBase {
 		/* process the current node */
 		final ValContainer<String> fileName = new ValContainer<String>();
 
-		final Iterable<SubNode> iter = read.getChildren(session, node,
-				Sort.by(Sort.Direction.ASC, SubNode.FIELD_ORDINAL), null, 0);
+		final Iterable<SubNode> iter =
+				read.getChildren(session, node, Sort.by(Sort.Direction.ASC, SubNode.FIELD_ORDINAL), null, 0);
 		final List<SubNode> children = read.iterateToList(iter);
 
 		/*
-		 * This is the header row at the top of the page. The rest of the page is
-		 * children of this node
+		 * This is the header row at the top of the page. The rest of the page is children of this node
 		 */
 		html.append("<div class='top-row'/>\n");
 		processNodeExport(session, parentFolder, "", node, html, true, fileName, true, 0, true);
@@ -203,8 +200,7 @@ public abstract class ExportArchiveBase {
 
 		if (children != null) {
 			/*
-			 * First pass over children is to embed their content onto the child display on
-			 * the current page
+			 * First pass over children is to embed their content onto the child display on the current page
 			 */
 			for (final SubNode n : children) {
 				final String inlineChildren = n.getStrProp(NodeProp.INLINE_CHILDREN.s());
@@ -240,24 +236,22 @@ public abstract class ExportArchiveBase {
 		}
 	}
 
-	private void inlineChildren(final StringBuilder html, final SubNode node, final String parentFolder,
-			final String deeperPath, final int level) {
-		final Iterable<SubNode> iter = read.getChildren(session, node,
-				Sort.by(Sort.Direction.ASC, SubNode.FIELD_ORDINAL), null, 0);
+	private void inlineChildren(final StringBuilder html, final SubNode node, final String parentFolder, final String deeperPath,
+			final int level) {
+		final Iterable<SubNode> iter =
+				read.getChildren(session, node, Sort.by(Sort.Direction.ASC, SubNode.FIELD_ORDINAL), null, 0);
 		final List<SubNode> children = read.iterateToList(iter);
 
 		if (children != null) {
 			/*
-			 * First pass over children is to embed their content onto the child display on
-			 * the current page
+			 * First pass over children is to embed their content onto the child display on the current page
 			 */
 			for (final SubNode n : children) {
 				final String inlineChildren = n.getStrProp(NodeProp.INLINE_CHILDREN.s());
 				final boolean allowOpenButton = !"1".equals(inlineChildren);
 				final String folder = n.getId().toHexString();
 
-				processNodeExport(session, parentFolder, deeperPath, n, html, false, null, allowOpenButton, level,
-						false);
+				processNodeExport(session, parentFolder, deeperPath, n, html, false, null, allowOpenButton, level, false);
 
 				if ("1".equals(inlineChildren)) {
 					inlineChildren(html, n, parentFolder, deeperPath + folder + "/", level + 1);
@@ -267,18 +261,16 @@ public abstract class ExportArchiveBase {
 	}
 
 	/*
-	 * NOTE: It's correct that there's no finally block in here enforcing the
-	 * closeEntry, becasue we let exceptions bubble all the way up to abort and even
-	 * cause the zip file itself (to be deleted) since it was unable to be written
-	 * to.
+	 * NOTE: It's correct that there's no finally block in here enforcing the closeEntry, becasue we let
+	 * exceptions bubble all the way up to abort and even cause the zip file itself (to be deleted)
+	 * since it was unable to be written to.
 	 * 
-	 * fileNameCont is an output parameter that has the complete filename minus the
-	 * period and extension.
+	 * fileNameCont is an output parameter that has the complete filename minus the period and
+	 * extension.
 	 */
 	private void processNodeExport(final MongoSession session, final String parentFolder, final String deeperPath,
-			final SubNode node, final StringBuilder html, final boolean writeFile,
-			final ValContainer<String> fileNameCont, final boolean allowOpenButton, final int level,
-			final boolean isTopRow) {
+			final SubNode node, final StringBuilder html, final boolean writeFile, final ValContainer<String> fileNameCont,
+			final boolean allowOpenButton, final int level, final boolean isTopRow) {
 		try {
 			// log.debug("Processing Node: " + node.getContent()+" parentFolder:
 			// "+parentFolder);
@@ -292,19 +284,17 @@ public abstract class ExportArchiveBase {
 				indenter = " style='margin-left:" + String.valueOf(level * 30) + "px'";
 			}
 			html.append("<div href='#" + nodeId + "' " + rowClass + " id='" + nodeId + "' " + indenter + ">\n");
-
 			html.append("<div class='meta-info'>" + nodeId + "</div>\n");
 
 			/*
-			 * If we aren't writing the file we know we need the text appended to include a
-			 * link to open the content
+			 * If we aren't writing the file we know we need the text appended to include a link to open the
+			 * content
 			 */
 			if (!writeFile && allowOpenButton) {
 				/*
-				 * This is a slight ineffeciency for now, to call getChildCount, because
-				 * eventually we will be trying to get the children for all nodes we encounter,
-				 * so this will be redundant, but I don't want to refactor now to solve this
-				 * yet. That's almost an optimization that should come later
+				 * This is a slight ineffeciency for now, to call getChildCount, because eventually we will be
+				 * trying to get the children for all nodes we encounter, so this will be redundant, but I don't
+				 * want to refactor now to solve this yet. That's almost an optimization that should come later
 				 */
 				boolean hasChildren = read.hasChildren(session, node);
 				if (hasChildren) {
@@ -341,8 +331,7 @@ public abstract class ExportArchiveBase {
 			boolean rawDataUrl = false;
 
 			/*
-			 * if this is a 'data:' encoded image read it from binary storage and put that
-			 * directly in url src
+			 * if this is a 'data:' encoded image read it from binary storage and put that directly in url src
 			 */
 			final String dataUrl = node.getStrProp(NodeProp.BIN_DATA_URL.s());
 
@@ -365,8 +354,7 @@ public abstract class ExportArchiveBase {
 				if (imgUrl == null && mimeType.startsWith("image/")) {
 					final String relImgPath = writeFile ? "" : (fileName + "/");
 					/*
-					 * embeds an image that's 400px wide until you click it which makes it go
-					 * fullsize
+					 * embeds an image that's 400px wide until you click it which makes it go fullsize
 					 * 
 					 */
 
@@ -378,13 +366,12 @@ public abstract class ExportArchiveBase {
 				} else {
 					final String relPath = writeFile ? "" : (fileName + "/");
 					/*
-					 * embeds an image that's 400px wide until you click it which makes it go
-					 * fullsize
+					 * embeds an image that's 400px wide until you click it which makes it go fullsize
 					 */
 					attachmentUrl = "./" + relPath + nodeId + ext;
 
-					html.append("<a class='link' target='_blank' href='" + attachmentUrl + "'>Attachment: "
-							+ binFileNameStr + "</a>");
+					html.append("<a class='link' target='_blank' href='" + attachmentUrl + "'>Attachment: " + binFileNameStr
+							+ "</a>");
 				}
 			}
 
@@ -394,8 +381,7 @@ public abstract class ExportArchiveBase {
 				fileNameCont.setVal(parentFolder + "/" + fileName + "/" + fileName);
 
 				/*
-				 * Pretty print the node having the relative path, and then restore the node to
-				 * the full path
+				 * Pretty print the node having the relative path, and then restore the node to the full path
 				 */
 				final String fullPath = node.getPath();
 				final String relPath = fullPath.substring(rootPathParent.length());
@@ -403,8 +389,7 @@ public abstract class ExportArchiveBase {
 				final String json = XString.prettyPrint(node);
 				node.setPath(fullPath);
 
-				addFileEntry(parentFolder + "/" + fileName + "/" + fileName + ".json",
-						json.getBytes(StandardCharsets.UTF_8));
+				addFileEntry(parentFolder + "/" + fileName + "/" + fileName + ".json", json.getBytes(StandardCharsets.UTF_8));
 
 				/* If content property was found write it into separate file */
 				if (StringUtils.isNotEmpty(content)) {
@@ -413,30 +398,33 @@ public abstract class ExportArchiveBase {
 				}
 
 				/*
-				 * If we had a binary property on this node we write the binary file into a
-				 * separate file, but for ipfs links we do NOT do this
+				 * If we had a binary property on this node we write the binary file into a separate file, but for
+				 * ipfs links we do NOT do this
 				 */
 				if (!rawDataUrl && mimeType != null) {
 
 					InputStream is = null;
 					try {
 						is = attachmentService.getStream(session, "", node, false);
-						final BufferedInputStream bis = new BufferedInputStream(is);
-						final long length = node.getIntProp(NodeProp.BIN_SIZE.s());
-						final String binFileName = parentFolder + "/" + fileName + "/" + nodeId + ext;
+						if (is != null) {
+							final BufferedInputStream bis = new BufferedInputStream(is);
+							final long length = node.getIntProp(NodeProp.BIN_SIZE.s());
+							final String binFileName = parentFolder + "/" + fileName + "/" + nodeId + ext;
 
-						if (length > 0) {
-							/* NOTE: the archive WILL fail if no length exists in this codepath */
-							addFileEntry(binFileName, bis, length);
-						} else {
-							/*
-							 * This *should* never happen that we fall back to writing as an array from the
-							 * input stream because normally we will always have the length saved on the
-							 * node. But re are trying to be as resilient as possible here falling back to
-							 * this rather than failing the entire export
-							 */
-							addFileEntry(binFileName, IOUtils.toByteArray(bis));
+							if (length > 0) {
+								/* NOTE: the archive WILL fail if no length exists in this codepath */
+								addFileEntry(binFileName, bis, length);
+							} else {
+								/*
+								 * This *should* never happen that we fall back to writing as an array from the input stream
+								 * because normally we will always have the length saved on the node. But re are trying to be as
+								 * resilient as possible here falling back to this rather than failing the entire export
+								 */
+								addFileEntry(binFileName, IOUtils.toByteArray(bis));
+							}
 						}
+					} catch (Exception e) {
+						throw ExUtil.wrapEx(e);
 					} finally {
 						StreamUtil.close(is);
 					}
@@ -456,9 +444,9 @@ public abstract class ExportArchiveBase {
 	}
 
 	private void addFileEntry(String fileName, final byte[] bytes) {
+		log.debug("addFileEntry: " + fileName);
 		/*
-		 * If we have duplicated a filename, number it sequentially to create a unique
-		 * file
+		 * If we have duplicated a filename, number it sequentially to create a unique file
 		 */
 		if (fileNameSet.contains(fileName)) {
 			int idx = 1;
@@ -479,8 +467,7 @@ public abstract class ExportArchiveBase {
 			throw new RuntimeEx("length is required");
 		}
 		/*
-		 * If we have duplicated a filename, number it sequentially to create a unique
-		 * file
+		 * If we have duplicated a filename, number it sequentially to create a unique file
 		 */
 		if (fileNameSet.contains(fileName)) {
 			int idx = 1;
@@ -492,7 +479,6 @@ public abstract class ExportArchiveBase {
 		}
 
 		fileNameSet.add(fileName);
-
 		addEntry(fileName, is, length);
 	}
 
@@ -513,7 +499,6 @@ public abstract class ExportArchiveBase {
 		}
 
 		fileName = cleanupFileName(fileName);
-
 		log.debug(" nodePath=[" + node.getPath() + "] fileName=[" + fileName + "]");
 
 		fileName = XString.trimToMaxLen(fileName, 40);
