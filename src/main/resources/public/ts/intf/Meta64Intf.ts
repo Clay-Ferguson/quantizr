@@ -5,6 +5,7 @@ import { CompIntf } from "../widget/base/CompIntf";
 
 export interface Meta64Intf {
 
+    config: any;
     mainMenu: MainMenuDlg;
     app: CompIntf;
 

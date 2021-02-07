@@ -1,5 +1,6 @@
 package org.subnode.response;
 
+import java.util.HashMap;
 import org.subnode.model.UserPreferences;
 import org.subnode.response.base.ResponseBase;
 
@@ -16,15 +17,17 @@ public class LoginResponse extends ResponseBase {
 	private String anonUserLandingPageNode;
 
 	/*
-	 * we can optionally send back something here to force the client to load the
-	 * specified node instead of whatever other node it would have loaded for
-	 * whatever series of reasons. This is a hard override for anything else.
+	 * we can optionally send back something here to force the client to load the specified node instead
+	 * of whatever other node it would have loaded for whatever series of reasons. This is a hard
+	 * override for anything else.
 	 */
 	private String homeNodeOverride;
 
 	private UserPreferences userPreferences;
 
 	private boolean allowFileSystemSearch;
+
+	private HashMap<String, Object> config;
 
 	public String getUserName() {
 		return userName;
@@ -80,5 +83,13 @@ public class LoginResponse extends ResponseBase {
 
 	public void setAllowFileSystemSearch(boolean allowFileSystemSearch) {
 		this.allowFileSystemSearch = allowFileSystemSearch;
+	}
+
+	public HashMap<String, Object> getConfig() {
+		return config;
+	}
+
+	public void setConfig(HashMap<String, Object> config) {
+		this.config = config;
 	}
 }

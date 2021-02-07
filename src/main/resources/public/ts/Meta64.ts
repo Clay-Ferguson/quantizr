@@ -20,6 +20,7 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (s: Singletons) => {
 
 export class Meta64 implements Meta64Intf {
 
+    config: any;
     mainMenu: MainMenuDlg;
 
     app: CompIntf;
@@ -634,6 +635,10 @@ export class Meta64 implements Meta64Intf {
 
         S.util.ajax<J.RenderNodeRequest, J.RenderNodeResponse>("anonPageLoad", null,
             (res: J.RenderNodeResponse): void => {
+                if (res.config) {
+                    S.meta64.config = res.config;
+                }
+
                 if (!res.success || res.exceptionType === "auth") {
                     S.util.showMessage("Unable to access the requested page without being logged in. Try loading the URL without parameters, or log in.", "Warning");
                 }

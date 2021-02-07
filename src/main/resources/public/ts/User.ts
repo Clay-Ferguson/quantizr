@@ -100,6 +100,10 @@ export class User implements UserIntf {
                         tzOffset: new Date().getTimezoneOffset(),
                         dst: S.util.daylightSavingsTime
                     }, async (res: J.LoginResponse) => {
+
+                        // console.log("config: " + S.util.prettyPrint(res.config));
+                        S.meta64.config = res.config;
+
                         if (res && !res.success) {
                             await S.user.deleteAllUserLocalDbEntries();
                         }

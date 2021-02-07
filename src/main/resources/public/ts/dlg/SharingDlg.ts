@@ -29,10 +29,7 @@ export class SharingDlg extends DialogBase {
     renderDlg(): CompIntf[] {
         return [
             new Form(null, [
-                new CollapsibleHelpPanel("Help", "Configures who is allowed to see and/or append subnodes under this node.<p>" +
-                    "You can share to as many people as you want and they'll be able to see and reply (create subnodes).<p>" +
-                    "When sharing to 'Public' you can choose the 'Read-Only' option if you want to disable other users from being able to create subnodes under.<p>" +
-                    "If you pick one of the 'Public' options then you don't need to specifically add any individual persons by name.",
+                new CollapsibleHelpPanel("Help", S.meta64.config.help.sharing.dialog,
                     (state: boolean) => {
                         SharingDlg.helpExpanded = state;
                     }, SharingDlg.helpExpanded),

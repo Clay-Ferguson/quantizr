@@ -5,3 +5,48 @@ intro1: >-
   Quanta is a decentralized and federated content management, social media, and publishing platform. 
   Join the Fediverse Revolution!
 intro2:
+
+help:
+  type:
+    friend: >-
+      This node defines a friend on this server or another federated server. <br>
+      You can send a DM to this person using the 'Message' button, or delete this node to stop following the person.
+    
+    friendsList: >-
+      This node defines your list of friends, as it's subnodes (i.e. who you follow on the Fediverse or this server will be defined by the children of this node).<p>
+      Use the 'Add Friend' button to add a new friend, and their content will then show up in your Feed tab <p>
+      You can access your Feed by clicking the 'Feed' link at the top of the page.
+
+  fediverse:
+    feed: >-
+      This is your Fediverse <b>feed</b> that shows a reverse chronological stream of posts from people you Follow.<p>
+      Use the 'Friends' button to jump over to the part of your main tree where your Friends List is stored to manage your friends.<p>
+      Use any 'Jump' button in the feed to go the the main content tree location of that post. Unlike other social media apps 
+      this platform stores all content on a Tree Structure, so in addition to appearing in the Feed, all nodes have a more permanent location on this large global tree.
+      <p>
+      <h4>Filter Options</h4>
+      Friends &rarr; Includes your Friends <br>
+      To Me &rarr; Includes nodes shared to you by name <br>
+      From Me &rarr; Includes nodes you created <br>
+      Fediverse &rarr; Includes nodes that are shared to everyone (public sharing) <br>
+      NSFW &rarr; Includes nodes flagged as 'sensitive' or potentially offensive or NSFW
+
+  gettingStarted: >-
+    <h3>Getting Started</h3>
+    After logged in: To create your first Social Media post, click the <b>'Feed'</b> tab, and then click <b>'New Post'</b>, enter a messsage, and click <b>'Save'</b><p> 
+    <p>--OR--<p> Turn on <b>'Edit Mode'</b> by clicking the <b>pencil icon</b> on the right-hand side of the page. This will allow you to start creating, editing, and sharing nodes. 
+    <h4>Public Posts</h4>
+    Any nodes you Share to 'Public' (using Share button on the Editor Dialog) will show up in everyone elses Feed tab automatically.<p> 
+    <h4>Private Posts</h4>
+    To share a node only to specific people, use the Share button on the node and add them. That will post to their feed and also if 
+    they want they can use the 'direct link' to any node to go directly to it in the future without going thru their Feed tab.<p> 
+    <p>If you get lost, click the 'cylinder' icon to get back to your Account Node.<p> 
+    To learn more click <b>'Site Nav &rarr; User Guide'</b> 
+  
+  sharing:
+    dialog: >-
+      Configures who is allowed to see and/or append subnodes under this node.<p>
+      You can share to as many people as you want and they'll be able to see and reply (create subnodes).<p>
+      When sharing to 'Public' you can choose the 'Read-Only' option if you want to disable other users from being able to create subnodes under.<p>
+      If you pick one of the 'Public' options then you don't need to specifically add any individual persons by name.
+

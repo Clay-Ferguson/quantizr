@@ -77,19 +77,7 @@ export class FeedView extends Div {
         children.push(refreshFeedButtonBar);
         children.push(new Div(null, { className: "clearfix" }));
 
-        let helpPanel = new CollapsibleHelpPanel("Help",
-            "This is your Fediverse <b>feed</b> that shows a reverse chronological stream of posts from people you Follow.<p>" +
-            "Use the 'Friends' button to jump over to the part of your main tree where your Friends List is stored to manage your friends.<p>" +
-            "Use any 'Jump' button in the feed to go the the main content tree location of that post. Unlike other social media apps " +
-            "this platform stores all content on a Tree Structure, so in addition to appearing in the Feed, all nodes have a more permanent location on this large global tree." +
-            "<p>" +
-            "<h4>Filter Options</h4>" +
-            "Friends &rarr; Includes your Friends <br>" +
-            "To Me &rarr; Includes nodes shared to you by name <br>" +
-            "From Me &rarr; Includes nodes you created <br>" +
-            "Fediverse &rarr; Includes nodes that are shared to everyone (public sharing) <br>" +
-            "NSFW &rarr; Includes nodes flagged as 'sensitive' or potentially offensive or NSFW"
-            ,
+        let helpPanel = new CollapsibleHelpPanel("Help", S.meta64.config.help.fediverse.feed,
             (state: boolean) => {
                 FeedView.helpExpanded = state;
             }, FeedView.helpExpanded);

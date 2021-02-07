@@ -421,6 +421,7 @@ export interface LoginResponse extends ResponseBase {
     homeNodeOverride: string;
     userPreferences: UserPreferences;
     allowFileSystemSearch: boolean;
+    config: { [index: string]: any };
 }
 
 export interface LogoutResponse extends ResponseBase {
@@ -475,6 +476,7 @@ export interface RenderNodeResponse extends ResponseBase {
     endReached: boolean;
     noDataResponse: string;
     breadcrumbs: BreadcrumbInfo[];
+    config: { [index: string]: any };
 }
 
 export interface ResetPasswordResponse extends ResponseBase {

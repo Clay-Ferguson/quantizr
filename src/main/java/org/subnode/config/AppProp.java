@@ -5,7 +5,6 @@ import java.io.InputStream;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
@@ -36,59 +35,57 @@ public class AppProp /* implements EnvironmentAware */ {
 	private String protocolHostAndPort = null;
 
 	public static final ObjectMapper yamlMapper = new ObjectMapper(new YAMLFactory());
+	HashMap<String, Object> configMap = null;
 
-	Map<String, Object> helpMapExternal = null;
-	Map<String, Object> configMapExternal = null;
-	Map<String, Object> helpMapInternal = null;
-	Map<String, Object> configMapInternal = null;
-
-	/* Gets help text from external file if found, and it not gets property from internal */
-	public String getHelpText(String prop) {
-		if (helpMapExternal == null) {
-			helpMapExternal = readYamlExternal("help-text.yaml");
+	public HashMap<String, Object> getConfig() {
+		if (configMap != null) {
+			return configMap;
 		}
 
-		String ret = (String) helpMapExternal.get(prop);
-		if (ret == null) {
-			if (helpMapInternal == null) {
-				helpMapInternal = readYamlInternal("help-text.yaml");
+		synchronized (yamlMapper) {
+			try {
+				HashMap<String, Object> configMapInternal = readYamlInternal("config-text.yaml");
+				HashMap<String, Object> configMapExternal = readYamlExternal("config-text.yaml");
+
+				/* For every key in internal set, override with the external val if found */
+				for (String key : configMapInternal.keySet()) {
+					Object val = configMapExternal.get(key);
+					if (val != null) {
+						configMapInternal.put(key, val);
+					}
+				}
+
+				configMap = configMapInternal;
+			} catch (Exception e) {
+				ExUtil.error(log, "failed to load help-text.yaml", e);
 			}
-			ret = (String) helpMapInternal.get(prop);
+
+			if (configMap == null) {
+				configMap = new HashMap<String, Object>();
+			}
+			return configMap;
 		}
-		return ret;
 	}
 
 	/* Gets config text from external file if found, and it not gets property from internal */
 	public String getConfigText(String prop) {
-		if (configMapExternal == null) {
-			configMapExternal = readYamlExternal("config-text.yaml");
-		}
-
-		String ret = (String) configMapExternal.get(prop);
-		if (ret == null) {
-			if (configMapInternal == null) {
-				configMapInternal = readYamlInternal("config-text.yaml");
-			}
-	
-			ret = (String) configMapInternal.get(prop);
-		}
-		return ret;
+		return (String) getConfig().get(prop);
 	}
 
 	/*
 	 * Reads a yaml file into a map from internal file at "classname:[fileName]
 	 */
-	public static Map<String, Object> readYamlInternal(String fileName) {
+	public static HashMap<String, Object> readYamlInternal(String fileName) {
 		synchronized (yamlMapper) {
 			InputStream is = null;
-			Map<String, Object> map = null;
+			HashMap<String, Object> map = null;
 
 			try {
 				log.debug("Loading config from internal classpath: " + fileName);
 				Resource resource = SpringContextUtil.getApplicationContext().getResource("classpath:" + fileName);
 				is = resource.getInputStream();
 
-				map = yamlMapper.readValue(is, new TypeReference<Map<String, Object>>() {
+				map = yamlMapper.readValue(is, new TypeReference<HashMap<String, Object>>() {
 				});
 
 				if (map == null) {
@@ -104,16 +101,16 @@ public class AppProp /* implements EnvironmentAware */ {
 		}
 	}
 
-	public static Map<String, Object> readYamlExternal(String fileName) {
+	public static HashMap<String, Object> readYamlExternal(String fileName) {
 		synchronized (yamlMapper) {
-			Map<String, Object> map = null;
+			HashMap<String, Object> map = null;
 			try {
 				File file = new File("/config/" + fileName);
 
 				// if an external config file is found use it.
 				if (file.isFile()) {
 					log.debug("Loading config from file system: " + fileName);
-					map = yamlMapper.readValue(file, new TypeReference<Map<String, Object>>() {
+					map = yamlMapper.readValue(file, new TypeReference<HashMap<String, Object>>() {
 					});
 				}
 

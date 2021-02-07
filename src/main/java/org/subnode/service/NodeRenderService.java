@@ -475,7 +475,9 @@ public class NodeRenderService {
 		log.debug("Anon Render Node ID: " + id);
 		req.setNodeId(id);
 
-		return renderNode(session, req);
+		RenderNodeResponse res = renderNode(session, req);
+		res.setConfig(appProp.getConfig());
+		return res;
 	}
 
 	/*

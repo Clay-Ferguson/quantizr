@@ -1,5 +1,6 @@
 package org.subnode.response;
 
+import java.util.HashMap;
 import java.util.LinkedList;
 
 import org.subnode.model.BreadcrumbInfo;
@@ -22,6 +23,9 @@ public class RenderNodeResponse extends ResponseBase {
 	private String noDataResponse;
 
 	private LinkedList<BreadcrumbInfo> breadcrumbs;
+
+	/* We can optionally update the config any time by populating this. Normally it's left null */
+	private HashMap<String, Object> config;
 
 	public NodeInfo getNode() {
 		return node;
@@ -54,4 +58,12 @@ public class RenderNodeResponse extends ResponseBase {
     public void setBreadcrumbs(LinkedList<BreadcrumbInfo> breadcrumbs) {
         this.breadcrumbs = breadcrumbs;
     }
+
+	public HashMap<String, Object> getConfig() {
+		return config;
+	}
+
+	public void setConfig(HashMap<String, Object> config) {
+		this.config = config;
+	}
 }
