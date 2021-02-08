@@ -17,7 +17,7 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
 export class IPFSNodeTypeHandler extends TypeBase {
 
     constructor() {
-        super(J.NodeType.IPFS_NODE, "IPFS Node", "fa-sitemap", true);
+        super(J.NodeType.IPFS_NODE, "IPFS Node", "fa-sitemap", false);
     }
 
     allowPropertyEdit(propName: string): boolean {

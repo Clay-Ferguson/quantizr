@@ -22,7 +22,7 @@ export class FriendsListTypeHandler extends TypeBase {
     static helpExpanded: boolean;
 
     constructor() {
-        super(J.NodeType.FRIEND_LIST, "Friends List", "fa-users", true);
+        super(J.NodeType.FRIEND_LIST, "Friends List", "fa-users", false);
     }
 
     allowAction(action: NodeActionType, node: J.NodeInfo, appState: AppState): boolean {
@@ -48,7 +48,7 @@ export class FriendsListTypeHandler extends TypeBase {
                 })
             ], null, "float-right marginBottom"),
             new Div(null, { className: "clearfix" }),
-            new CollapsibleHelpPanel("Help", S.meta64.config.help.type.friendsList,
+            new CollapsibleHelpPanel("Help", S.meta64.config.help.type.friendsList.render,
                 (state: boolean) => {
                     FriendsListTypeHandler.helpExpanded = state;
                 }, FriendsListTypeHandler.helpExpanded)

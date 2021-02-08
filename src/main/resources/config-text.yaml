@@ -8,14 +8,36 @@ intro2:
 
 help:
   type:
-    friend: >-
-      This node defines a friend on this server or another federated server. <br>
-      You can send a DM to this person using the 'Message' button, or delete this node to stop following the person.
+    calculator:
+      editor: >-
+        Calculator type allows Javascript. For security reasons, only the owner of a calculator node will see the results of the script run.
+        <p>
+        Enter any valid JS and log output onto the node like this:
+        <p>
+        <pre>
+        qc.log("Hello world");
+        </pre>
+        The 'qc.log' function is automatically available.
+
+    friend:
+      render: >-
+        This node defines a friend on this server or another federated server. <br>
+        You can send a DM to this person using the 'Message' button, or delete this node to stop following the person.
     
-    friendsList: >-
-      This node defines your list of friends, as it's subnodes (i.e. who you follow on the Fediverse or this server will be defined by the children of this node).<p>
-      Use the 'Add Friend' button to add a new friend, and their content will then show up in your Feed tab <p>
-      You can access your Feed by clicking the 'Feed' link at the top of the page.
+      editor: >-
+        Enter the name of a friend on the local server as something like <b>'bob'</b> (without quotes)
+        <p>
+        or enter a Foreign Fediverse server user name formatted like this <b>'bob@domain.com'</b> (without quotes)
+    
+    friendsList: 
+      render: >-
+        This node defines your list of friends, as it's subnodes (i.e. who you follow on the Fediverse or this server will be defined by the children of this node).
+        <p>
+        Use the 'Add Friend' button to add a new friend, and their content will then show up in your Feed tab 
+        <p>
+        You can access your Feed by clicking the 'Feed' link at the top of the page.
+
+
 
   fediverse:
     feed: >-

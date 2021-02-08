@@ -716,8 +716,6 @@ public class MongoRead {
                 }
             } else {
                 String str = m.group(2);
-
-                // todo-0: document in UserGuide these advanced search options.
                 if (str.startsWith("-")) {
                     str = str.substring(1);
                     // log.debug("SEARCH: not [" + str + "]");

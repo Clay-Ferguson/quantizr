@@ -22,6 +22,10 @@ export class CalcTypeHandler extends TypeBase {
         super(J.NodeType.CALCULATOR, "Calculator", "fa-calculator", true);
     }
 
+    getEditorHelp(): string {
+        return S.meta64.config.help.type.calculator.editor;
+    }
+
     allowAction(action: NodeActionType, node: J.NodeInfo, appState: AppState): boolean {
         return true;
     }

@@ -23,12 +23,11 @@ export class FriendTypeHandler extends TypeBase {
     static helpExpanded: boolean;
 
     constructor() {
-        super(J.NodeType.FRIEND, "Friend", "fa-user", true);
+        super(J.NodeType.FRIEND, "Friend", "fa-user", false);
     }
 
     getEditorHelp(): string {
-        return "Enter the name of a friend on the local server as something like <b>'bob'</b> (without quotes)<p>" +
-            "or enter a Foreign Fediverse server user name formatted like this <b>'bob@domain.com'</b> (without quotes)";
+        return S.meta64.config.help.type.friend.editor;
     }
 
     allowAction(action: NodeActionType, node: J.NodeInfo, appState: AppState): boolean {
@@ -122,7 +121,7 @@ export class FriendTypeHandler extends TypeBase {
                     })
                 ], null, "float-right marginBottom"),
                 new Div(null, { className: "clearfix" })]),
-            new CollapsibleHelpPanel("Help", S.meta64.config.help.type.friend,
+            new CollapsibleHelpPanel("Help", S.meta64.config.help.type.friend.render,
                 (state: boolean) => {
                     FriendTypeHandler.helpExpanded = state;
                 }, FriendTypeHandler.helpExpanded)

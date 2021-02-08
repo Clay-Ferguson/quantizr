@@ -370,7 +370,7 @@ export class EditNodeDlg extends DialogBase {
         let helpPanel = this.editorHelp ? new CollapsibleHelpPanel("Help", this.editorHelp,
             (state: boolean) => {
                 EditNodeDlg.helpExpanded = state;
-            }, EditNodeDlg.helpExpanded) : null;
+            }, EditNodeDlg.helpExpanded, "span") : null;
 
         let parentDisplay = null;
         if (this.parentNode) {
@@ -390,11 +390,15 @@ export class EditNodeDlg extends DialogBase {
                 ], false,
                     (state: boolean) => {
                         EditNodeDlg.parentDisplayExpanded = state;
-                    }, EditNodeDlg.parentDisplayExpanded);
+                    }, EditNodeDlg.parentDisplayExpanded, "", "", "span");
             }
         }
 
-        this.propertyEditFieldContainer.setChildren([helpPanel, mainPropsTable, sharingSpan, binarySection, collapsiblePanel, parentDisplay]);
+        let expandables = new Div(null, { className: "marginBottom" }, [
+            parentDisplay,
+            helpPanel]);
+
+        this.propertyEditFieldContainer.setChildren([mainPropsTable, sharingSpan, binarySection, collapsiblePanel, expandables]);
         return children;
     }
 
