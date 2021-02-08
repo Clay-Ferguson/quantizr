@@ -366,8 +366,9 @@ public abstract class ExportArchiveBase {
 						 * 
 						 */
 
-						imgUrl = "./" + relImgPath + nodeId + ext;
+						imgUrl = "./" + deeperPath + relImgPath + nodeId + ext;
 					}
+
 					html.append("<img title='" + binFileNameStr + "' id='img_" + nodeId
 							+ "' style='width:200px' onclick='document.getElementById(\"img_" + nodeId
 							+ "\").style.width=\"\"' src='" + imgUrl + "'/>");
@@ -376,7 +377,7 @@ public abstract class ExportArchiveBase {
 					/*
 					 * embeds an image that's 400px wide until you click it which makes it go fullsize
 					 */
-					attachmentUrl = "./" + relPath + nodeId + ext;
+					attachmentUrl = "./" + deeperPath + relPath + nodeId + ext;
 
 					html.append("<a class='link' target='_blank' href='" + attachmentUrl + "'>Attachment: " + binFileNameStr
 							+ "</a>");
