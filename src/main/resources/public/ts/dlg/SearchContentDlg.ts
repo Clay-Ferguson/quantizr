@@ -14,6 +14,7 @@ import { HorizontalLayout } from "../widget/HorizontalLayout";
 import { TextContent } from "../widget/TextContent";
 import { TextField } from "../widget/TextField";
 import { MessageDlg } from "./MessageDlg";
+import { CollapsibleHelpPanel } from "../widget/CollapsibleHelpPanel";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
@@ -22,6 +23,7 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
 
 export class SearchContentDlg extends DialogBase {
 
+    static helpExpanded: boolean = false;
     static defaultSearchText: string = "";
     searchTextField: TextField;
     searchTextState: ValidatedState<any> = new ValidatedState<any>();
@@ -78,6 +80,10 @@ export class SearchContentDlg extends DialogBase {
                         }
                     })
                 ], "marginBottom"),
+                new CollapsibleHelpPanel("Help", S.meta64.config.help.search.dialog,
+                    (state: boolean) => {
+                        SearchContentDlg.helpExpanded = state;
+                    }, SearchContentDlg.helpExpanded),
                 new ButtonBar([
                     new Button("Search", this.search, null, "btn-primary"),
                     new Button("Graph", this.graph, null, "btn-primary"),

@@ -1,5 +1,4 @@
 #!/bin/bash
-# todo-0: fix paths
 
 if [ -f ./vscode-cwd.sh ]; then
   source ./vscode-cwd.sh

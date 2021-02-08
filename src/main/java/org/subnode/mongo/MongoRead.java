@@ -637,7 +637,6 @@ public class MongoRead {
                     query.addCriteria(Criteria.where(prop).regex(text, "i"));
                 }
             } else {
-                // /////
                 // Query query = Query.query(
                 // Criteria.where("aBooleanProperty").is(true).
                 // and(anIntegerProperty).is(1)).
@@ -647,7 +646,6 @@ public class MongoRead {
 
                 // List<YourDocumentType> result = mongoTemplate.findAll(query.
                 // YourDocumentType.class);
-                // /////
 
                 TextCriteria textCriteria = TextCriteria.forDefaultLanguage();
                 populateTextCriteria(textCriteria, text);
@@ -707,12 +705,27 @@ public class MongoRead {
         while (m.find()) {
             if (m.group(1) != null) {
                 String str = m.group(1);
-                log.debug("SEARCH: Quoted [" + str + "]");
-                criteria.matchingPhrase(str);
+
+                if (str.startsWith("-")) {
+                    str = str.substring(1);
+                    // log.debug("SEARCH: quoted not [" + str + "]");
+                    criteria.notMatchingPhrase(str);
+                } else {
+                    // log.debug("SEARCH: Quoted [" + str + "]");
+                    criteria.matchingPhrase(str);
+                }
             } else {
                 String str = m.group(2);
-                log.debug("SEARCH: Plain [" + str + "]");
-                criteria.matching(str);
+
+                // todo-0: document in UserGuide these advanced search options.
+                if (str.startsWith("-")) {
+                    str = str.substring(1);
+                    // log.debug("SEARCH: not [" + str + "]");
+                    criteria.notMatching(str);
+                } else {
+                    // log.debug("SEARCH: Plain [" + str + "]");
+                    criteria.matching(str);
+                }
             }
         }
     }

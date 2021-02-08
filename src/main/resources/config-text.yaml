@@ -33,20 +33,41 @@ help:
 
   gettingStarted: >-
     <h3>Getting Started</h3>
-    After logged in: To create your first Social Media post, click the <b>'Feed'</b> tab, and then click <b>'New Post'</b>, enter a messsage, and click <b>'Save'</b><p> 
-    <p>--OR--<p> Turn on <b>'Edit Mode'</b> by clicking the <b>pencil icon</b> on the right-hand side of the page. This will allow you to start creating, editing, and sharing nodes. 
+    After logged in: To create your first Social Media post, click the <b>'Feed'</b> tab, and then click <b>'New Post'</b>, 
+    enter a messsage, and click <b>'Save'</b>
+    <p> 
+    <p>
+    --OR--
+    <p>
+    Turn on <b>'Edit Mode'</b> by clicking the <b>pencil icon</b> on the right-hand side of the page. 
+    This will allow you to start creating, editing, and sharing nodes. 
     <h4>Public Posts</h4>
-    Any nodes you Share to 'Public' (using Share button on the Editor Dialog) will show up in everyone elses Feed tab automatically.<p> 
+    Any nodes you Share to 'Public' (using Share button on the Editor Dialog) will show up in everyone elses Feed tab automatically.
+    <p> 
     <h4>Private Posts</h4>
     To share a node only to specific people, use the Share button on the node and add them. That will post to their feed and also if 
-    they want they can use the 'direct link' to any node to go directly to it in the future without going thru their Feed tab.<p> 
-    <p>If you get lost, click the 'cylinder' icon to get back to your Account Node.<p> 
+    they want they can use the 'direct link' to any node to go directly to it in the future without going thru their Feed tab.
+    <p> 
+    <p>
+    If you get lost, click the 'cylinder' icon to get back to your Account Node.<p> 
     To learn more click <b>'Site Nav &rarr; User Guide'</b> 
   
   sharing:
     dialog: >-
       Configures who is allowed to see and/or append subnodes under this node.<p>
       You can share to as many people as you want and they'll be able to see and reply (create subnodes).<p>
-      When sharing to 'Public' you can choose the 'Read-Only' option if you want to disable other users from being able to create subnodes under.<p>
+      When sharing to 'Public' you can choose the 'Read-Only' option if you want to disable other users from being able to create 
+      subnodes under.
+      <p>
       If you pick one of the 'Public' options then you don't need to specifically add any individual persons by name.
 
+  search:
+    dialog: >-
+      <h4>Search Tips</h4>
+      <ul>
+        <li>To search for a multi-word phrase enclose it in double quotes.</li>
+        <li>To find substrings in words use the "Fuzzy Search" option.</li>
+        <li>To find all nodes that contain any of a list words enter the words with spaces between them</li>
+        <li>To exclude search results that contain some word, put a '-' (minus) right in front of the word.</li>
+        <li>To exclude a phrase put a minus as the first character. Example: "-my short phrase"</li>
+      </ul>
