@@ -73,8 +73,6 @@ export class NodeCompContent extends Div {
         let timestampVal = S.props.getNodePropVal(propName, node);
         if (timestampVal) {
             let dateVal: Date = new Date(parseInt(timestampVal));
-            // This will safely remove just the seconds if they are zero.
-            let timeStr = dateVal.toLocaleTimeString().replace(":00 ", " ");
             let diffTime = dateVal.getTime() - (new Date().getTime());
             let diffDays: number = Math.round(diffTime / (1000 * 3600 * 24));
             let diffStr = "";
@@ -98,7 +96,7 @@ export class NodeCompContent extends Div {
                 }
             }
 
-            children.push(new Heading(5, displayName + ": " + dateVal.toLocaleDateString() + " " + timeStr + //
+            children.push(new Heading(5, displayName + ": " + S.util.formatDate(dateVal) + //
                 " - " + S.util.getDayOfWeek(dateVal) + diffStr, {
                 className: "marginLeft marginTop"
             }));
