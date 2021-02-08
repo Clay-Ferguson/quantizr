@@ -134,9 +134,18 @@ public class MongoEventListener extends AbstractMongoEventListener<SubNode> {
 
 		removeDefaultProps(node);
 
-		// Remove any share to self because that never makes sense
 		if (node.getAc() != null) {
-			if (node.getAc().remove(node.getOwner().toHexString()) != null) {
+			/* we need to ensure that we never save an empty Acl, but null instead, because some parts of the code
+			assume that if the AC is non-null then there ARE some shares on the node.
+
+			This 'fix' only started being necessary I think once I added the safeGetAc, and that check ends up causing
+			the AC to contain an empty object sometimes */
+			if (node.getAc().size() == 0) {
+				node.setAc(null);
+				dbObj.put(SubNode.FIELD_AC, null);
+			}
+			// Remove any share to self because that never makes sense
+			else if (node.getAc().remove(node.getOwner().toHexString()) != null) {
 				dbObj.put(SubNode.FIELD_AC, node.getAc());
 			}
 		}

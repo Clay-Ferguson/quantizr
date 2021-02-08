@@ -43,11 +43,12 @@ export class Search implements SearchIntf {
             ? res.searchResults.length : 0;
     }
 
-    searchNodesResponse = (res: J.NodeSearchResponse) => {
+    searchNodesResponse = (res: J.NodeSearchResponse, searchDescription: string) => {
         dispatch({
             type: "Action_RenderSearchResults",
             update: (s: AppState): void => {
                 s.searchResults = res.searchResults;
+                s.searchDescription = searchDescription;
             }
         });
 

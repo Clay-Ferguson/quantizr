@@ -84,7 +84,7 @@ export class SearchFileSystemDlg extends DialogBase {
         }, this.searchNodesResponse);
     }
 
-    searchNodesResponse = (res: J.NodeSearchResponse) => {
+    searchNodesResponse = (res: J.LuceneSearchResponse) => {
         S.util.showMessage(res.message, "Note", true, "modal-lg");
         this.close();
     }

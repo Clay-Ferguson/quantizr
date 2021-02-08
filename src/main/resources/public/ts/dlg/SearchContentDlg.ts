@@ -147,7 +147,7 @@ export class SearchContentDlg extends DialogBase {
 
     searchNodesResponse = (res: J.NodeSearchResponse) => {
         if (S.srch.numSearchResults(res) > 0) {
-            S.srch.searchNodesResponse(res);
+            S.srch.searchNodesResponse(res, "Search results for: " + SearchContentDlg.defaultSearchText);
             this.close();
         }
         else {

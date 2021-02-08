@@ -50,6 +50,7 @@ export class AppState {
     endReached: boolean;
 
     searchResults: NodeInfo[];
+    searchDescription: string;
     timelineResults: NodeInfo[];
     feedResults: NodeInfo[];
     feedEndReached: boolean = false;

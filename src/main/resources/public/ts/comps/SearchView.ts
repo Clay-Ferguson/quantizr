@@ -6,6 +6,7 @@ import { PubSub } from "../PubSub";
 import { Singletons } from "../Singletons";
 import { Comp } from "../widget/base/Comp";
 import { Div } from "../widget/Div";
+import { TextContent } from "../widget/TextContent";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
@@ -45,6 +46,11 @@ export class SearchView extends Div {
          */
         let rowCount = 0;
         let children: Comp[] = [];
+
+        if (state.searchDescription) {
+            children.push(new TextContent(state.searchDescription));
+        }
+
         let i = 0;
         results.forEach(function(node: J.NodeInfo) {
             S.srch.initSearchNode(node);
