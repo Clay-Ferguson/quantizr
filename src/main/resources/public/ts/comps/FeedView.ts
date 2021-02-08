@@ -115,7 +115,6 @@ export class FeedView extends Div {
         }
 
         children.push(helpPanel);
-
         this.setChildren(children);
     }
 
@@ -164,6 +163,7 @@ export class FeedView extends Div {
                     return store.getState().feedFilterToMe;
                 }
             }),
+
             state.isAnonUser ? null : new Checkbox("From Me", {
                 title: "Include Nodes created by you"
             }, {
@@ -185,6 +185,7 @@ export class FeedView extends Div {
                     return store.getState().feedFilterFromMe;
                 }
             }),
+
             state.isAnonUser ? null : new Checkbox("Fediverse", {
                 title: "Include Nodes shared to 'Public' (everyone)"
             }, {
@@ -206,6 +207,7 @@ export class FeedView extends Div {
                     return store.getState().feedFilterToPublic;
                 }
             }),
+
             new Checkbox("NSFW", {
                 title: "Include NSFW Content (Allows material flagged as 'Sensitive')"
             }, {

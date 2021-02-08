@@ -152,27 +152,4 @@ export class NodeCompRow extends Div {
             this.allowHeaders ? new NodeCompRowFooter(node, false) : null
         ]);
     }
-
-    /* Return an object such that, if this object changes, we must render, or else we don't need to render
-
-    This implementation is technically very incorrect, but was enough to just use the selection state and ID to
-    determine of the caching of ReactNodes (via. Comp.memoMap) rather than constructing them from scratch
-    on every render was enough to create a noticeable performance gain. Unfortunately it WAS NOT. So the 'memoMap'
-    experimental code is being left in place for now, but the approach didn't work. There's more notes in Comp.ts
-    about this performance hack attempt.
-    */
-    makeCacheKeyObj(appState: AppState, state: any, props: any) {
-        let focusNode: J.NodeInfo = S.meta64.getHighlightedNode(appState);
-        let selected: boolean = (focusNode && focusNode.id === this.node.id);
-        let key = this.node.id + " " + selected;
-        // console.log("cache key: " + key + " for element: " + this.jsClassName);
-        return key;
-        // state = this.getState();
-        // return {
-        //     nodeId: this.node.id,
-        //     content: this.node.content,
-        //     stateEnabled: state.enabled,
-        //     props,
-        // };
-    }
 }

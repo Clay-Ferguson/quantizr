@@ -50,7 +50,6 @@ export class NodeCompRowFooter extends Div {
                 }));
             }
         }
-
         this.setChildren(children);
     }
 }

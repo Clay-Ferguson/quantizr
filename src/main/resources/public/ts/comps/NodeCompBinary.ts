@@ -57,8 +57,8 @@ export class NodeCompBinary extends Div {
             if (!imgSize.endsWith("%") && !imgSize.endsWith("px")) {
                 imgSize += "%";
             }
-            style.maxWidth = "calc(" + imgSize + " - 12px)";
-            style.width = "calc(" + imgSize + " - 12px)";
+            style.maxWidth = `calc(${imgSize} - 12px)`;
+            style.width = `calc(${imgSize} - 12px)`;
         }
 
         return new Img(node.id, {
@@ -144,7 +144,7 @@ export class NodeCompBinary extends Div {
 
             this.setChildren([new Div("", {
                 className: "binary-link",
-                title: "File Size:" + fileSize + " Type:" + fileType
+                title: `File Size:${fileSize} Type:${fileType}`
             }, [
                 new Icon({
                     style: { marginRight: "12px", verticalAlign: "middle" },

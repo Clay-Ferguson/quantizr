@@ -199,7 +199,6 @@ export abstract class DialogBase<S extends BaseCompState = any> extends Div<S> i
         }
 
         const contentDiv = new Div(null, contentAttribs, this.renderDlg());
-
         children.push(contentDiv);
 
         let buttons: CompIntf = this.renderButtons();

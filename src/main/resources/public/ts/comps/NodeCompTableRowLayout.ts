@@ -62,10 +62,6 @@ export class NodeCompTableRowLayout extends Div {
 
         let allowInsert = S.edit.isInsertAllowed(this.node, state);
 
-        // if (allowInsert && typeHandler) {
-        //     allowInsert = state.isAdminUser || typeHandler.allowAction(NodeActionType.addChild, this.node, state);
-        // }
-
         let curCols = 0;
         let lastNode: J.NodeInfo = null;
         for (let i = 0; i < this.node.children.length; i++) {
@@ -138,7 +134,6 @@ export class NodeCompTableRowLayout extends Div {
                 }
             }
         }
-
         this.setChildren(children);
     }
 }

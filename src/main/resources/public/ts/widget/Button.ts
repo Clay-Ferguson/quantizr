@@ -13,11 +13,12 @@ export class Button extends Comp {
 
     constructor(text: string, public callback: Function, _attribs: Object = null, moreClasses: string = "btn-secondary") {
         super(_attribs);
-        S.util.mergeAndMixProps(this.attribs, {
-            className: "btn " + moreClasses, /* also: secondary, info, success, danger, warning */
-            type: "button"
-        }, " ");
+        if (!this.attribs.className) {
+            this.attribs.className = "";
+        }
 
+        this.attribs.className += " btn " + moreClasses;
+        this.attribs.type = "button";
         this.attribs.onClick = callback;
         this.setText(text);
     }

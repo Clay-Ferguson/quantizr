@@ -1,5 +1,4 @@
 import { appState, dispatch, store } from "./AppRedux";
-import { useSelector } from "react-redux";
 import { AppState } from "./AppState";
 import { Constants as C } from "./Constants";
 import { AudioPlayerDlg } from "./dlg/AudioPlayerDlg";
@@ -334,7 +333,7 @@ export class Meta64 implements Meta64Intf {
 
     initApp = async (): Promise<void> => {
         return new Promise<void>(async (resolve, reject) => {
-            console.log("initApp running.");
+            console.log("initApp()");
 
             const state: AppState = store.getState();
             state.pendingLocationHash = window.location.hash;
@@ -469,14 +468,6 @@ export class Meta64 implements Meta64Intf {
             //     return "Leave [appName] ?";
             // };
 
-            /*
-             * I thought this was a good idea, but actually it destroys the session, when the user is entering an
-             * "id=\my\path" type of url to open a specific node. Need to rethink  Basically for now I'm thinking
-             * going to a different url shouldn't blow up the session, which is what 'logout' does.
-             *
-             * $ (window).on("unload", function() { user.logout(false); });
-             */
-
             this.deviceWidth = window.innerWidth;
             this.deviceHeight = window.innerHeight;
 
@@ -511,7 +502,6 @@ export class Meta64 implements Meta64Intf {
             S.push.init();
 
             this.playAudioIfRequested();
-
             console.log("initApp complete.");
             resolve();
         });

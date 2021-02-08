@@ -87,9 +87,7 @@ export interface UtilIntf {
     setElmDisplay(elm: HTMLElement, showing: boolean);
     getPropertyCount(obj: Object): number;
     forEachElmBySel(sel: string, callback: Function): void;
-    mergeAndMixProps(dst: Object, src: Object, mixPrefix: string): void;
     forEachProp(obj: Object, callback: I.PropertyIterator): void;
-    printObject(obj: Object): string;
     printKeys(obj: Object): string;
     setEnablement(elmId: string, enable: boolean): void;
     getInstance<T>(context: Object, name: string, ...args: any[]): T;

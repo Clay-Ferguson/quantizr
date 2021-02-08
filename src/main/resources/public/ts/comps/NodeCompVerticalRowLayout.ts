@@ -1,7 +1,6 @@
 import { useSelector } from "react-redux";
 import { AppState } from "../AppState";
 import { Constants as C } from "../Constants";
-import { NodeActionType } from "../enums/NodeActionType";
 import { TypeHandlerIntf } from "../intf/TypeHandlerIntf";
 import * as J from "../JavaIntf";
 import { PubSub } from "../PubSub";

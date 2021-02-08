@@ -865,22 +865,6 @@ export class Util implements UtilIntf {
         Array.prototype.forEach.call(elements, callback);
     }
 
-    /* Very similar to ES6 Object.assign(), but slightly different. Takes all properties from src and merges them onto dst, except this one
-    will notice if the src and dest both have any of the keys defined and will combine the dest by concatinating it to the source
-    rather than setting (overwriting) that property value from the source */
-    mergeAndMixProps = (dst: Object, src: Object, mixPrefix: string): void => {
-        if (!src) return;
-        this.forEachProp(src, (k, v): boolean => {
-            if (dst[k] && (typeof dst[k] === "string")) {
-                dst[k] += mixPrefix + v;
-            }
-            else {
-                dst[k] = v;
-            }
-            return true;
-        });
-    }
-
     /* Iterates by callling callback with property key/value pairs for each property in the object
     check to see if tyescript has a better native way to iterate 'hasOwn' properties */
     forEachProp = (obj: Object, callback: I.PropertyIterator): void => {
@@ -892,33 +876,6 @@ export class Util implements UtilIntf {
                 if (callback(prop, obj[prop]) === false) return;
             }, this);
         }
-    }
-
-    /*
-     * iterates over an object creating a string containing it's keys and values
-     */
-    printObject = (obj: Object): string => {
-        if (!obj) {
-            return "null";
-        }
-
-        let val: string = "";
-        try {
-            let count: number = 0;
-            this.forEachProp(obj, (prop, v): boolean => {
-                console.log("Property[" + count + "]");
-                count++;
-                return true;
-            });
-
-            this.forEachProp(obj, (k, v): boolean => {
-                val += k + " , " + v + "\n";
-                return true;
-            });
-        } catch (err) {
-            return "err";
-        }
-        return val;
     }
 
     /* iterates over an object creating a string containing it's keys */
