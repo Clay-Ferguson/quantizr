@@ -451,8 +451,8 @@ export class EditNodeDlg extends DialogBase {
 
             /*
             Now that we have a "Create" menu for adding any kind of type we no longer need the ability to change the type
-            from the editor (that I can think of) but I have a hunch I should not remove this code but simply leave it for 
-            possible future use, and just disable it by removing this button for now 
+            from the editor (that I can think of) but I have a hunch I should not remove this code but simply leave it for
+            possible future use, and just disable it by removing this button for now
             */
             // !typeLocked ? new Button("Type", this.openChangeNodeTypeDlg) : null,
             !customProps ? new Button("Encrypt", this.openEncryptionDlg) : null,
