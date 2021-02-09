@@ -770,15 +770,14 @@ export class Edit implements EditIntf {
         });
     }
 
-    /* This starts editing an actual Friend Node that when the user is presumably editing inside their FRIENDS_LIST node */
-    addFriend = (node: J.NodeInfo, state: AppState) => {
+    createNode = (node: J.NodeInfo, typeName: string, state: AppState) => {
         state = appState(state);
 
         S.util.ajax<J.CreateSubNodeRequest, J.CreateSubNodeResponse>("createSubNode", {
             pendingEdit: false,
             nodeId: node.id,
             newNodeName: "",
-            typeName: J.NodeType.FRIEND,
+            typeName,
             createAtTop: true,
             content: null,
             typeLock: true,

@@ -1,4 +1,3 @@
-import { compose } from "redux";
 import { AppState } from "../AppState";
 import { DialogBase } from "../DialogBase";
 import { ValueIntf } from "../Interfaces";

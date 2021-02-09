@@ -43,7 +43,7 @@ export class FriendsListTypeHandler extends TypeBase {
                 className: "marginAll"
             }),
             new ButtonBar([
-                new Button("Add Friend", () => S.edit.addFriend(node, state), {
+                new Button("Add Friend", () => S.edit.createNode(node, J.NodeType.FRIEND, state), {
                     title: "Add a new friend to this list of friends."
                 })
             ], null, "float-right marginBottom"),

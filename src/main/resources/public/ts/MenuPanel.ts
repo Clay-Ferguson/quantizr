@@ -9,6 +9,7 @@ import { SearchByNameDlg } from "./dlg/SearchByNameDlg";
 import { SearchContentDlg } from "./dlg/SearchContentDlg";
 import { SplitNodeDlg } from "./dlg/SplitNodeDlg";
 import { TransferNodeDlg } from "./dlg/TransferNodeDlg";
+import { TypeHandlerIntf } from "./intf/TypeHandlerIntf";
 import * as J from "./JavaIntf";
 import { PubSub } from "./PubSub";
 import { Singletons } from "./Singletons";
@@ -35,8 +36,8 @@ export class MenuPanel extends Div {
     preRender(): void {
         const state: AppState = useSelector((state: AppState) => state);
 
-        const selNodeCount = S.util.getPropertyCount(state.selectedNodes);
-        const hltNode = S.meta64.getHighlightedNode(state);
+        // const selNodeCount = S.util.getPropertyCount(state.selectedNodes);
+        const hltNode: J.NodeInfo = S.meta64.getHighlightedNode(state);
         const selNodeIsMine = !!hltNode && (hltNode.owner === state.userName || state.userName === "admin");
 
         const importFeatureEnabled = selNodeIsMine || (!!hltNode && state.homeNodeId === hltNode.id);
@@ -92,6 +93,18 @@ export class MenuPanel extends Div {
             //    true
             // ), //
         ]));
+
+        let createMenuItems = [];
+        let typeHandlers = S.plugin.getAllTypeHandlers();
+        S.util.forEachProp(typeHandlers, (k, typeHandler: TypeHandlerIntf): boolean => {
+            if (state.isAdminUser || typeHandler.getAllowUserSelect()) {
+                createMenuItems.push(new MenuItem(typeHandler.getName(), () => S.edit.createNode(hltNode, typeHandler.getTypeName(), state), //
+                    !state.isAnonUser && !!hltNode));
+            }
+            return true;
+        });
+
+        children.push(new Menu("Create", createMenuItems));
 
         children.push(new Menu("Share", [
             // moved into editor dialog
