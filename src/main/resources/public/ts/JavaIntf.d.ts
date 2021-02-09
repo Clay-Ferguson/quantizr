@@ -72,6 +72,9 @@ export interface FileSystemReindexRequest extends RequestBase {
     nodeId: string;
 }
 
+export interface GetConfigRequest extends RequestBase {
+}
+
 export interface GetFriendsRequest extends RequestBase {
 }
 
@@ -358,6 +361,10 @@ export interface FriendInfo {
     userName: string;
 }
 
+export interface GetConfigResponse extends ResponseBase {
+    config: { [index: string]: any };
+}
+
 export interface GetFriendsResponse extends ResponseBase {
     friends: FriendInfo[];
 }
@@ -428,7 +435,6 @@ export interface LoginResponse extends ResponseBase {
     homeNodeOverride: string;
     userPreferences: UserPreferences;
     allowFileSystemSearch: boolean;
-    config: { [index: string]: any };
 }
 
 export interface LogoutResponse extends ResponseBase {
@@ -483,7 +489,6 @@ export interface RenderNodeResponse extends ResponseBase {
     endReached: boolean;
     noDataResponse: string;
     breadcrumbs: BreadcrumbInfo[];
-    config: { [index: string]: any };
 }
 
 export interface ResetPasswordResponse extends ResponseBase {

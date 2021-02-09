@@ -27,8 +27,6 @@ public class LoginResponse extends ResponseBase {
 
 	private boolean allowFileSystemSearch;
 
-	private HashMap<String, Object> config;
-
 	public String getUserName() {
 		return userName;
 	}
@@ -83,13 +81,5 @@ public class LoginResponse extends ResponseBase {
 
 	public void setAllowFileSystemSearch(boolean allowFileSystemSearch) {
 		this.allowFileSystemSearch = allowFileSystemSearch;
-	}
-
-	public HashMap<String, Object> getConfig() {
-		return config;
-	}
-
-	public void setConfig(HashMap<String, Object> config) {
-		this.config = config;
 	}
 }

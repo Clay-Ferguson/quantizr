@@ -136,8 +136,7 @@ public class UserManagerService {
 	 */
 	public LoginResponse postLogin(MongoSession session, RequestBase req) {
 		LoginResponse res = new LoginResponse();
-		res.setConfig(appProp.getConfig());
-
+	
 		if (session == null) {
 			session = ThreadLocals.getMongoSession();
 		}

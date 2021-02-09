@@ -502,6 +502,15 @@ export class Meta64 implements Meta64Intf {
             S.push.init();
 
             this.playAudioIfRequested();
+
+            S.util.ajax<J.GetConfigRequest, J.GetConfigResponse>("getConfig", {
+            },
+                (res: J.GetConfigResponse): void => {
+                    if (res.config) {
+                        S.meta64.config = res.config;
+                    }
+                });
+
             console.log("initApp complete.");
             resolve();
         });
@@ -625,10 +634,6 @@ export class Meta64 implements Meta64Intf {
 
         S.util.ajax<J.RenderNodeRequest, J.RenderNodeResponse>("anonPageLoad", null,
             (res: J.RenderNodeResponse): void => {
-                if (res.config) {
-                    S.meta64.config = res.config;
-                }
-
                 if (!res.success || res.exceptionType === "auth") {
                     S.util.showMessage("Unable to access the requested page without being logged in. Try loading the URL without parameters, or log in.", "Warning");
                 }

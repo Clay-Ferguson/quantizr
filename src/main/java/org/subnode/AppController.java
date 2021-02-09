@@ -54,6 +54,7 @@ import org.subnode.request.DeleteNodesRequest;
 import org.subnode.request.DeletePropertyRequest;
 import org.subnode.request.ExecuteNodeRequest;
 import org.subnode.request.ExportRequest;
+import org.subnode.request.GetConfigRequest;
 import org.subnode.request.GetFriendsRequest;
 import org.subnode.request.GetNodePrivilegesRequest;
 import org.subnode.request.GetServerInfoRequest;
@@ -97,6 +98,7 @@ import org.subnode.request.UploadFromUrlRequest;
 import org.subnode.response.CloseAccountResponse;
 import org.subnode.response.ExecuteNodeResponse;
 import org.subnode.response.ExportResponse;
+import org.subnode.response.GetConfigResponse;
 import org.subnode.response.GetServerInfoResponse;
 import org.subnode.response.GraphResponse;
 import org.subnode.response.InfoMessage;
@@ -1141,6 +1143,13 @@ public class AppController implements ErrorController {
 		return callProc.run("getUserAcccountInfo", req, session, ms -> {
 			return userManagerService.getUserAccountInfo(req);
 		});
+	}
+
+	@RequestMapping(value = API_PATH + "/getConfig", method = RequestMethod.POST)
+	public @ResponseBody Object getConfig(@RequestBody GetConfigRequest req, HttpSession session) {
+		GetConfigResponse res = new GetConfigResponse();
+		res.setConfig(appProp.getConfig());
+		return res;
 	}
 
 	@RequestMapping(value = API_PATH + "/getServerInfo", method = RequestMethod.POST)

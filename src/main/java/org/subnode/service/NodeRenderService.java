@@ -476,7 +476,6 @@ public class NodeRenderService {
 		req.setNodeId(id);
 
 		RenderNodeResponse res = renderNode(session, req);
-		res.setConfig(appProp.getConfig());
 		return res;
 	}
 
