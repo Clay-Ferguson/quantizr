@@ -335,8 +335,8 @@ export class EditNodeDlg extends DialogBase {
             let mime = S.props.getNodePropVal(J.NodeProp.BIN_MIME, state.node);
 
             // NOTE: col numbers in the children of LayoutRow must add up to 12 (per bootstrap)!
-            binarySection = new LayoutRow([
-                new Div(null, { className: "col-6 editBinaryContainer" }, [
+            let topBinRow = new LayoutRow([
+                new Div(null, { className: "col-6" }, [
                     new Div((ipfsLink ? "IPFS " : "") + "Attachment", {
                         className: "smallHeading"
                     }),
@@ -350,14 +350,23 @@ export class EditNodeDlg extends DialogBase {
                         imgSizeSelection,
                         new ButtonBar([
                             this.deleteUploadButton = new Button("Delete", this.deleteUpload, { title: "Delete this Attachment" }),
-                            this.uploadButton = new Button("Replace", this.upload, { title: "Upload a new Attachment" }),
-                            ipfsLink ? new Button("IPFS Link", () => S.render.showNodeUrl(state.node, this.appState), { title: "Show the IPFS URL for the attached file." }) : null
-                        ], null, "float-right")
-                    ])
-                ]),
-                ipfsLink ? new Div(`IPFS CID: ${ipfsLink} (${mime})`, { className: "marginTop" }) : null
+                            this.uploadButton = new Button("Replace", this.upload, { title: "Upload a new Attachment" })
 
-            ], "binaryEditorSection");
+                            // todo-1: this is not doing what I want but it unimportant so removing it for now.
+                            // ipfsLink ? new Button("IPFS Link", () => S.render.showNodeUrl(state.node, this.appState), { title: "Show the IPFS URL for the attached file." }) : null
+                        ], null, "float-right marginRight")
+                    ])
+                ])
+            ]);
+
+            let bottomBinRow = new Div(null, { className: "marginTop" }, [
+                ipfsLink ? new Div(`CID: ${ipfsLink}`) : null,
+                ipfsLink ? new Div(`Type: ${mime}`) : null
+            ]);
+
+            binarySection = new Div(null, { className: "marginLeft binaryEditorSection editBinaryContainer" }, [
+                topBinRow, bottomBinRow
+            ]);
         }
 
         this.nameState.setValue(state.node.name);
