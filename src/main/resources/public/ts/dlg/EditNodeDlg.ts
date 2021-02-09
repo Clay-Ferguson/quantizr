@@ -332,11 +332,12 @@ export class EditNodeDlg extends DialogBase {
         let binarySection: LayoutRow = null;
         if (hasAttachment) {
             let ipfsLink = S.props.getNodePropVal(J.NodeProp.IPFS_LINK, state.node);
+            let mime = S.props.getNodePropVal(J.NodeProp.BIN_MIME, state.node);
 
             // NOTE: col numbers in the children of LayoutRow must add up to 12 (per bootstrap)!
             binarySection = new LayoutRow([
                 new Div(null, { className: "col-6 editBinaryContainer" }, [
-                    new Div("Attachment", {
+                    new Div((ipfsLink ? "IPFS " : "") + "Attachment", {
                         className: "smallHeading"
                     }),
                     new NodeCompBinary(state.node, true, false, null)
@@ -351,10 +352,10 @@ export class EditNodeDlg extends DialogBase {
                             this.deleteUploadButton = new Button("Delete", this.deleteUpload, { title: "Delete this Attachment" }),
                             this.uploadButton = new Button("Replace", this.upload, { title: "Upload a new Attachment" }),
                             ipfsLink ? new Button("IPFS Link", () => S.render.showNodeUrl(state.node, this.appState), { title: "Show the IPFS URL for the attached file." }) : null
-                        ], null, "float-right"),
-                        ipfsLink ? new Div("Stored on IPFS", { className: "marginTop" }) : null
+                        ], null, "float-right")
                     ])
-                ])
+                ]),
+                ipfsLink ? new Div(`IPFS CID: ${ipfsLink} (${mime})`, { className: "marginTop" }) : null
 
             ], "binaryEditorSection");
         }

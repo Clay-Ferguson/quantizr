@@ -92,6 +92,7 @@ import org.subnode.request.SignupRequest;
 import org.subnode.request.SplitNodeRequest;
 import org.subnode.request.TransferNodeRequest;
 import org.subnode.request.UpdateHeadingsRequest;
+import org.subnode.request.UploadFromIPFSRequest;
 import org.subnode.request.UploadFromUrlRequest;
 import org.subnode.response.CloseAccountResponse;
 import org.subnode.response.ExecuteNodeResponse;
@@ -368,7 +369,8 @@ public class AppController implements ErrorController {
 			Model model) {
 		initThymeleafAttribs();
 
-		// NOTE: Not currently used. For now we are not initializing any of these page properties from the tree (database)
+		// NOTE: Not currently used. For now we are not initializing any of these page properties from the
+		// tree (database)
 		if (THYMELEAF_VARS_FROM_TREE) {
 			/*
 			 * Note: this refreshes only when ADMIN is accessing it, so it's slow in this case.
@@ -888,6 +890,8 @@ public class AppController implements ErrorController {
 	/*
 	 * binId param not uses currently but the client will send either the gridId or the ipfsHash of the
 	 * node depending on which type of attachment it sees on the node
+	 * 
+	 * Note: binId path param will be 'ipfs' for an ipfs attachment on the node.
 	 */
 	@RequestMapping(value = API_PATH + "/bin/{binId}", method = RequestMethod.GET)
 	public void getBinary(@PathVariable("binId") String binId, //
@@ -1066,6 +1070,13 @@ public class AppController implements ErrorController {
 	public @ResponseBody Object uploadFromUrl(@RequestBody UploadFromUrlRequest req, HttpSession session) {
 		return callProc.run("uploadFromUrl", req, session, ms -> {
 			return attachmentService.readFromUrl(ms, req);
+		});
+	}
+
+	@RequestMapping(value = API_PATH + "/uploadFromIPFS", method = RequestMethod.POST)
+	public @ResponseBody Object uploadFromIPFS(@RequestBody UploadFromIPFSRequest req, HttpSession session) {
+		return callProc.run("uploadFromIPFS", req, session, ms -> {
+			return attachmentService.attachFromIPFS(ms, req);
 		});
 	}
 

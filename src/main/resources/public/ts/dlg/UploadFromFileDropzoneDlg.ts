@@ -68,6 +68,7 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
                 new ButtonBar([
                     this.uploadButton = new Button(this.importMode ? "Import" : "Upload", this.upload, null, "btn-primary"),
                     this.importMode ? null : new Button("From URL", this.uploadFromUrl),
+                    this.importMode ? null : new Button("From IPFS", this.uploadFromIPFS),
                     this.importMode ? null : new Button("From Clipboard", this.uploadFromClipboard),
 
                     this.importMode || !this.allowRecording ? null : new IconButton("fa-microphone", /* "From Mic" */ null, {
@@ -113,6 +114,16 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
     uploadFromUrl = (): void => {
         let state = this.getState();
         S.attachment.openUploadFromUrlDlg(this.nodeId, null, () => {
+            this.close();
+            if (this.afterUploadFunc) {
+                this.afterUploadFunc();
+            }
+        }, state);
+    }
+
+    uploadFromIPFS = (): void => {
+        let state = this.getState();
+        S.attachment.openUploadFromIPFSDlg(this.nodeId, null, () => {
             this.close();
             if (this.afterUploadFunc) {
                 this.afterUploadFunc();

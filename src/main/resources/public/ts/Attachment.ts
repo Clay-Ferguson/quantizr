@@ -5,6 +5,7 @@ import { Constants as C } from "./Constants";
 import { ConfirmDlg } from "./dlg/ConfirmDlg";
 import { UploadFromFileDropzoneDlg } from "./dlg/UploadFromFileDropzoneDlg";
 import { UploadFromUrlDlg } from "./dlg/UploadFromUrlDlg";
+import { UploadFromIPFSDlg } from "./dlg/UploadFromIPFSDlg";
 import { AttachmentIntf } from "./intf/AttachmentIntf";
 import * as J from "./JavaIntf";
 import { PubSub } from "./PubSub";
@@ -48,6 +49,20 @@ export class Attachment implements AttachmentIntf {
         }
 
         const dlg = new UploadFromUrlDlg(nodeId, defaultUrl, onUploadFunc, state);
+        dlg.open();
+    }
+
+    openUploadFromIPFSDlg = (nodeId: string, defaultCid: string, onUploadFunc: Function, state: AppState): void => {
+        if (!nodeId) {
+            let node = S.meta64.getHighlightedNode(state);
+            if (!node) {
+                S.util.showMessage("No node is selected.", "Warning");
+                return;
+            }
+            nodeId = node.id;
+        }
+
+        const dlg = new UploadFromIPFSDlg(nodeId, defaultCid, onUploadFunc, state);
         dlg.open();
     }
 

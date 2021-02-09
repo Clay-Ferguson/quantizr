@@ -13,6 +13,7 @@ import java.net.URLConnection;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Iterator;
+import javax.activation.MimetypesFileTypeMap;
 import javax.imageio.ImageIO;
 import javax.imageio.ImageReader;
 import javax.imageio.stream.ImageInputStream;
@@ -66,8 +67,10 @@ import org.subnode.mongo.RunAsMongoAdminEx;
 import org.subnode.mongo.model.SubNode;
 import org.subnode.mongo.model.SubNodePropVal;
 import org.subnode.request.DeleteAttachmentRequest;
+import org.subnode.request.UploadFromIPFSRequest;
 import org.subnode.request.UploadFromUrlRequest;
 import org.subnode.response.DeleteAttachmentResponse;
+import org.subnode.response.UploadFromIPFSResponse;
 import org.subnode.response.UploadFromUrlResponse;
 import org.subnode.util.Const;
 import org.subnode.util.ExUtil;
@@ -743,12 +746,41 @@ public class AttachmentService {
 	}
 
 	/*
-	 * Uploads an image attachment not from the user's machine but from some arbitrary internet URL they
-	 * have provided, that could be pointing to an image or any other kind of content actually.
+	 * Uploads an attachment not from the user's machine but from some arbitrary internet URL they have
+	 * provided, that could be pointing to an image or any other kind of content actually.
 	 */
 	public UploadFromUrlResponse readFromUrl(final MongoSession session, final UploadFromUrlRequest req) {
 		final UploadFromUrlResponse res = new UploadFromUrlResponse();
 		readFromUrl(session, req.getSourceUrl(), req.getNodeId(), null, 0, req.isStoreLocally());
+		res.setSuccess(true);
+		return res;
+	}
+
+	public UploadFromIPFSResponse attachFromIPFS(final MongoSession session, final UploadFromIPFSRequest req) {
+		final UploadFromIPFSResponse res = new UploadFromIPFSResponse();
+		if (req.getNodeId() == null) {
+			throw new RuntimeException("null nodeId");
+		}
+
+		SubNode node = read.getNode(session, req.getNodeId());
+		if (node == null) {
+			throw new RuntimeException("node not found: id=" + req.getNodeId());
+		}
+
+		auth.auth(session, node, PrivilegeType.WRITE);
+		node.setProp(NodeProp.IPFS_LINK.s(), req.getCid().trim());
+		String mime = req.getMime().trim().replace(".", "");
+
+		// If an extension was given (not a mime), then use it to make a filename, and generate the mime from it.
+		if (!mime.contains("/")) {
+			node.setProp(NodeProp.BIN_FILENAME.s(), "file." + mime);
+
+			// Note: I think Tika also has a version of this class which may be better?
+			mime = MimetypesFileTypeMap.getDefaultFileTypeMap().getContentType("file." + mime);
+		}
+
+		node.setProp(NodeProp.BIN_MIME.s(), mime);
+		update.save(session, node);
 		res.setSuccess(true);
 		return res;
 	}

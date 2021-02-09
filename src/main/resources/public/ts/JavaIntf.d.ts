@@ -278,6 +278,13 @@ export interface UpdateHeadingsRequest extends RequestBase {
     nodeId: string;
 }
 
+export interface UploadFromIPFSRequest extends RequestBase {
+    pinLocally: boolean;
+    nodeId: string;
+    cid: string;
+    mime: string;
+}
+
 export interface UploadFromUrlRequest extends RequestBase {
     storeLocally: boolean;
     nodeId: string;
@@ -529,6 +536,9 @@ export interface TransferNodeResponse extends ResponseBase {
 }
 
 export interface UpdateHeadingsResponse extends ResponseBase {
+}
+
+export interface UploadFromIPFSResponse extends ResponseBase {
 }
 
 export interface UploadFromUrlResponse extends ResponseBase {
