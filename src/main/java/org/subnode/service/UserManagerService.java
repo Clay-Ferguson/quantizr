@@ -921,7 +921,7 @@ public class UserManagerService {
 
 		adminRunner.run(session -> {
 			final Iterable<SubNode> accountNodes =
-					read.getChildrenUnderParentPath(session, NodeName.ROOT_OF_ALL_USERS, null, null, 0);
+					read.getChildrenUnderParentPath(session, NodeName.ROOT_OF_ALL_USERS, null, null, 0, null, null);
 
 			for (final SubNode accountNode : accountNodes) {
 				String userName = accountNode.getStrProp(NodeProp.USER);
@@ -953,7 +953,7 @@ public class UserManagerService {
 
 		StringBuilder sb = new StringBuilder();
 		final Iterable<SubNode> accountNodes =
-				read.getChildrenUnderParentPath(session, NodeName.ROOT_OF_ALL_USERS, null, null, 0);
+				read.getChildrenUnderParentPath(session, NodeName.ROOT_OF_ALL_USERS, null, null, 0, null, null);
 
 		for (final SubNode accountNode : accountNodes) {
 			String userName = accountNode.getStrProp(NodeProp.USER);

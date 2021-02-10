@@ -94,7 +94,10 @@ export class Search implements SearchIntf {
             searchProp: null,
             fuzzy: false,
             caseSensitive: false,
-            searchDefinition: ""
+            searchDefinition: "",
+            userSearch: false,
+            localUserSearch: false,
+            foreignUserSearch: false
         }, this.timelineResponse);
     }
 

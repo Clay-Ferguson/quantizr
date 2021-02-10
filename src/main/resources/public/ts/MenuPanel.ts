@@ -120,7 +120,7 @@ export class MenuPanel extends Div {
 
         children.push(new Menu("Search", [
 
-            new MenuItem("All Content", () => { new SearchContentDlg(state).open(); }, //
+            new MenuItem("By Content", () => { new SearchContentDlg(state).open(); }, //
                 !state.isAnonUser && !!hltNode), //
 
             new MenuItem("By Name", () => { new SearchByNameDlg(state).open(); }, //

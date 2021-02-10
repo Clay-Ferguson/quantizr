@@ -459,12 +459,8 @@ export class EditNodeDlg extends DialogBase {
             this.uploadButton = (!hasAttachment && allowUpload) ? new Button("Upload", this.upload) : null,
             allowShare ? new Button("Share", this.share) : null,
 
-            /*
-            Now that we have a "Create" menu for adding any kind of type we no longer need the ability to change the type
-            from the editor (that I can think of) but I have a hunch I should not remove this code but simply leave it for
-            possible future use, and just disable it by removing this button for now
-            */
-            // !typeLocked ? new Button("Type", this.openChangeNodeTypeDlg) : null,
+            /* Right now 'admin' is the only user who will really ever need to set the type on an existing node. */
+           this.appState.isAdminUser ? new Button("Type", this.openChangeNodeTypeDlg) : null,
             !customProps ? new Button("Encrypt", this.openEncryptionDlg) : null,
 
             // show delete button only if we're in a fullscreen viewer (like Calendar view)

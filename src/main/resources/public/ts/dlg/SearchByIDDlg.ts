@@ -86,7 +86,10 @@ export class SearchByIDDlg extends DialogBase {
             searchProp: "node.id",
             fuzzy: false,
             caseSensitive: false,
-            searchDefinition: ""
+            searchDefinition: "",
+            userSearch: false,
+            localUserSearch: false,
+            foreignUserSearch: false
         }, this.searchNodesResponse);
     }
 

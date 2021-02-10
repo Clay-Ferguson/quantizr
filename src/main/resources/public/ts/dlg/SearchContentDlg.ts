@@ -38,6 +38,9 @@ export class SearchContentDlg extends DialogBase {
 
         this.mergeState({
             fuzzy: false,
+            userSearch: false,
+            localUserSearch: false,
+            foreignUserSearch: false,
             caseSensitive: false
         });
         this.searchTextState.setValue(SearchContentDlg.defaultSearchText);
@@ -46,18 +49,50 @@ export class SearchContentDlg extends DialogBase {
     validate = (): boolean => {
         let valid = true;
 
-        if (!this.searchTextState.getValue()) {
-            this.searchTextState.setError("Cannot be empty.");
-            valid = false;
-        }
-        else {
-            this.searchTextState.setError(null);
-        }
+        // disable this for now since userSearch doesn't need this check.
+        // if (!this.searchTextState.getValue()) {
+        //     this.searchTextState.setError("Cannot be empty.");
+        //     valid = false;
+        // }
+        // else {
+        //     this.searchTextState.setError(null);
+        // }
 
         return valid;
     }
 
     renderDlg(): CompIntf[] {
+
+        let adminOptions = null;
+        if (this.appState.isAdminUser) {
+            adminOptions = new HorizontalLayout([
+                new Checkbox("Search All Users", null, {
+                    setValue: (checked: boolean): void => {
+                        this.mergeState({ userSearch: checked });
+                    },
+                    getValue: (): boolean => {
+                        return this.getState().userSearch;
+                    }
+                }),
+                new Checkbox("Search Local Users", null, {
+                    setValue: (checked: boolean): void => {
+                        this.mergeState({ localUserSearch: checked });
+                    },
+                    getValue: (): boolean => {
+                        return this.getState().localUserSearch;
+                    }
+                }),
+                new Checkbox("Search Foreign Users", null, {
+                    setValue: (checked: boolean): void => {
+                        this.mergeState({ foreignUserSearch: checked });
+                    },
+                    getValue: (): boolean => {
+                        return this.getState().foreignUserSearch;
+                    }
+                })
+            ], "marginBottom");
+        }
+
         return [
             new Form(null, [
                 new TextContent("All sub-nodes under the selected node will be searched."),
@@ -80,6 +115,7 @@ export class SearchContentDlg extends DialogBase {
                         }
                     })
                 ], "marginBottom"),
+                adminOptions,
                 new CollapsibleHelpPanel("Help", S.meta64.config.help.search.dialog,
                     (state: boolean) => {
                         SearchContentDlg.helpExpanded = state;
@@ -141,13 +177,25 @@ export class SearchContentDlg extends DialogBase {
             searchProp: "",
             fuzzy: this.getState().fuzzy,
             caseSensitive: this.getState().caseSensitive,
+            userSearch: this.getState().userSearch,
+            localUserSearch: this.getState().localUserSearch,
+            foreignUserSearch: this.getState().foreignUserSearch,
             searchDefinition: ""
         }, this.searchNodesResponse);
     }
 
     searchNodesResponse = (res: J.NodeSearchResponse) => {
         if (S.srch.numSearchResults(res) > 0) {
-            S.srch.searchNodesResponse(res, "Search results for: " + SearchContentDlg.defaultSearchText);
+
+            let desc = null;
+            if (this.getState().userSearch || this.getState().localUserSearch || this.getState().foreignUserSearch) {
+                desc = "Search of Users for: " + SearchContentDlg.defaultSearchText;
+            }
+            else {
+                desc = "Search results for: " + SearchContentDlg.defaultSearchText;
+            }
+
+            S.srch.searchNodesResponse(res, desc);
             this.close();
         }
         else {

@@ -6,8 +6,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.TextCriteria;
 import org.springframework.stereotype.Component;
+import org.subnode.config.NodeName;
 import org.subnode.model.NodeInfo;
+import org.subnode.model.client.NodeProp;
 import org.subnode.mongo.MongoAuth;
 import org.subnode.mongo.MongoRead;
 import org.subnode.mongo.MongoSession;
@@ -18,6 +22,7 @@ import org.subnode.response.GetSharedNodesResponse;
 import org.subnode.response.NodeSearchResponse;
 import org.subnode.util.Convert;
 import org.subnode.util.ThreadLocals;
+import opennlp.tools.util.StringUtil;
 
 /**
  * Service for searching the repository. This searching is currently very basic, and just grabs the
@@ -49,6 +54,12 @@ public class NodeSearchService {
 		int MAX_NODES = 100;
 
 		String searchText = req.getSearchText();
+		if (StringUtil.isEmpty(searchText) && //
+				!req.isUserSearch() && //
+				!req.isLocalUserSearch() && //
+				!req.isForeignUserSearch()) {
+			throw new RuntimeException("Search text required.");
+		}
 
 		List<NodeInfo> searchResults = new LinkedList<NodeInfo>();
 		res.setSearchResults(searchResults);
@@ -74,21 +85,60 @@ public class NodeSearchService {
 				searchResults.add(info);
 			}
 		}
-		// othwerwise we're searching all node properties, only under the selected node.
+		// othwerwise we're searching all node properties
 		else {
-			SubNode searchRoot = read.getNode(session, req.getNodeId());
+			/* If we're searching just for users do this */
+			if (req.isUserSearch() || req.isLocalUserSearch() || req.isForeignUserSearch()) {
 
-			for (SubNode node : read.searchSubGraph(session, searchRoot, req.getSearchProp(), searchText, req.getSortField(),
-					MAX_NODES, req.getFuzzy(), req.getCaseSensitive())) {
-		
-				NodeInfo info = convert.convertToNodeInfo(ThreadLocals.getSessionContext(), session, node, true, false,
-						counter + 1, false, false);
-				searchResults.add(info);
-				if (counter++ > MAX_NODES) {
-					break;
+				TextCriteria textCriteria = null;
+				if (!StringUtil.isEmpty(req.getSearchText())) {
+					textCriteria = TextCriteria.forDefaultLanguage();
+					MongoRead.populateTextCriteria(textCriteria, req.getSearchText());
+					textCriteria.caseSensitive(false);
+				}
+
+				Criteria moreCriteria = null;
+				// todo-0: add foreign and local criteria
+				if (req.isForeignUserSearch()) {
+					moreCriteria =
+							Criteria.where(SubNode.FIELD_PROPERTIES + "." + NodeProp.ACT_PUB_ACTOR_URL.s() + ".value").ne(null);
+				} else if (req.isLocalUserSearch()) {
+					moreCriteria =
+							Criteria.where(SubNode.FIELD_PROPERTIES + "." + NodeProp.ACT_PUB_ACTOR_URL.s() + ".value").is(null);
+				}
+
+				final Iterable<SubNode> accountNodes = read.getChildrenUnderParentPath(session, NodeName.ROOT_OF_ALL_USERS, null,
+						null, 0, textCriteria, moreCriteria);
+				/*
+				 * scan all userAccountNodes, and set a zero amount for those not found (which will be the correct
+				 * amount).
+				 */
+				for (final SubNode node : accountNodes) {
+					NodeInfo info = convert.convertToNodeInfo(ThreadLocals.getSessionContext(), session, node, true, false,
+							counter + 1, false, false);
+					searchResults.add(info);
+					if (counter++ > MAX_NODES) {
+						break;
+					}
+				}
+			}
+			// else we're doing a normal subgraph search for the text
+			else {
+				SubNode searchRoot = read.getNode(session, req.getNodeId());
+				for (SubNode node : read.searchSubGraph(session, searchRoot, req.getSearchProp(), searchText, req.getSortField(),
+						MAX_NODES, req.getFuzzy(), req.getCaseSensitive())) {
+
+					NodeInfo info = convert.convertToNodeInfo(ThreadLocals.getSessionContext(), session, node, true, false,
+							counter + 1, false, false);
+					searchResults.add(info);
+					if (counter++ > MAX_NODES) {
+						break;
+					}
 				}
 			}
 		}
+
+
 		res.setSuccess(true);
 		return res;
 	}

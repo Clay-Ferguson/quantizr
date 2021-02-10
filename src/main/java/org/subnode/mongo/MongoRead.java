@@ -368,7 +368,8 @@ public class MongoRead {
      * If node is null it's path is considered empty string, and it represents the 'root' of the tree.
      * There is no actual NODE that is root node,
      */
-    public Iterable<SubNode> getChildrenUnderParentPath(MongoSession session, String path, Sort sort, Integer limit, int skip) {
+    public Iterable<SubNode> getChildrenUnderParentPath(MongoSession session, String path, Sort sort, Integer limit, int skip,
+            TextCriteria textCriteria, Criteria moreCriteria) {
 
         Query query = new Query();
         if (limit != null && limit.intValue() > 0) {
@@ -392,6 +393,14 @@ public class MongoRead {
          */
         Criteria criteria = Criteria.where(SubNode.FIELD_PATH).regex(util.regexDirectChildrenOfPath(path));
 
+        if (textCriteria != null) {
+            query.addCriteria(textCriteria);
+        }
+
+        if (moreCriteria != null) {
+            query.addCriteria(moreCriteria);
+        }
+
         if (sort != null) {
             query.with(sort);
         }
@@ -406,7 +415,7 @@ public class MongoRead {
      */
     public Iterable<SubNode> getChildren(MongoSession session, SubNode node, Sort sort, Integer limit, int skip) {
         auth.auth(session, node, PrivilegeType.READ);
-        return getChildrenUnderParentPath(session, node.getPath(), sort, limit, skip);
+        return getChildrenUnderParentPath(session, node.getPath(), sort, limit, skip, null, null);
     }
 
     /*
