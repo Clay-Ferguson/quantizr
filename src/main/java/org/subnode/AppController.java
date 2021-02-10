@@ -265,7 +265,7 @@ public class AppController implements ErrorController {
 
 		if (thymeleafAttribs != null)
 			return;
-
+			
 		thymeleafAttribs = new HashMap<String, String>();
 
 		thymeleafAttribs.put("brandingAppName", appProp.getConfigText("brandingAppName"));

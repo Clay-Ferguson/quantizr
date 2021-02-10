@@ -205,23 +205,29 @@ public class SubNodeUtil {
 			return null;
 		NodeMetaInfo ret = new NodeMetaInfo();
 
-		String content = node.getContent();
-		if (content != null) {
-			int newLineIdx = content.indexOf("\n");
-			if (newLineIdx != -1) {
-				String ogTitle = content.substring(0, newLineIdx).trim();
-
-				// remove leading hash marks which will be there if this is a markdown heading.
-				while (ogTitle.startsWith("#")) {
-					ogTitle = XString.stripIfStartsWith(ogTitle, "#");
-				}
-				ogTitle = ogTitle.trim();
-
-				ret.setTitle(ogTitle);
-				ret.setDescription(content.substring(newLineIdx + 1).trim());
+		String description = node.getContent();
+		if (description == null) {
+			if (node.getName() != null) {
+				description = "Node Name: " + node.getName();
 			} else {
-				ret.setDescription(content);
+				description = "Node ID: " + node.getId().toHexString();
 			}
+		}
+
+		int newLineIdx = description.indexOf("\n");
+		if (newLineIdx != -1) {
+			String ogTitle = description.substring(0, newLineIdx).trim();
+
+			// remove leading hash marks which will be there if this is a markdown heading.
+			while (ogTitle.startsWith("#")) {
+				ogTitle = XString.stripIfStartsWith(ogTitle, "#");
+			}
+			ogTitle = ogTitle.trim();
+
+			ret.setTitle(ogTitle);
+			ret.setDescription(description.substring(newLineIdx + 1).trim());
+		} else {
+			ret.setDescription(description);
 		}
 
 		ret.setLink(getAttachmentUrl(node));

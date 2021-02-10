@@ -76,8 +76,10 @@ public class NodeRenderService {
 	public RenderNodeResponse renderNode(MongoSession session, RenderNodeRequest req) {
 
 		boolean isWelcomePage = req.getNodeId().equals(":welcome-page");
-		/* Return cached version of welcome page if generated, but not for admin because admin
-		should be able to make edits and then those edits update the cache */
+		/*
+		 * Return cached version of welcome page if generated, but not for admin because admin should be
+		 * able to make edits and then those edits update the cache
+		 */
 		if (isWelcomePage && welcomePage != null && !session.isAdmin()) {
 			return welcomePage;
 		}
@@ -486,8 +488,7 @@ public class NodeRenderService {
 	 * 
 	 * Returns true if there was a node at 'nodeName' and false otherwise.
 	 */
-	public boolean thymeleafRenderNode(HashMap<String, String> model,
-			String nodeName) {
+	public boolean thymeleafRenderNode(HashMap<String, String> model, String nodeName) {
 		MongoSession session = auth.getAdminSession();
 		boolean ret = false;
 
@@ -511,7 +512,7 @@ public class NodeRenderService {
 	}
 
 	public void populateSocialCardProps(SubNode node, Model model) {
-		if (node != null)
+		if (node == null)
 			return;
 		NodeMetaInfo metaInfo = subNodeUtil.getNodeMetaInfo(node);
 		model.addAttribute("ogTitle", metaInfo.getTitle());
