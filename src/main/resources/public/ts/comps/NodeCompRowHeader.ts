@@ -30,8 +30,10 @@ export class NodeCompRowHeader extends Div {
         let children = [];
         // console.log("NodeCompHeaderRow: " + S.util.prettyPrint(node));
 
+        let isPageRootOrDifferentOwner = node.id === state.node.id || node.owner !== state.node.owner;
+
         let avatarImg: Img = null;
-        if ((this.allowAvatars || node.id === state.node.id) && node.owner !== J.PrincipalName.ADMIN) {
+        if ((this.allowAvatars || node.id === state.node.id) && node.owner !== J.PrincipalName.ADMIN && isPageRootOrDifferentOwner) {
             avatarImg = S.render.makeAvatarImage(node, state);
             if (avatarImg) {
                 children.push(avatarImg);
