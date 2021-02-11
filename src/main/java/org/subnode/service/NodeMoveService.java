@@ -249,7 +249,7 @@ public class NodeMoveService {
 		log.debug("originalPath (graphRoot.path): " + originalPath);
 		int originalParentPathLen = graphRoot.getParentPath().length();
 
-		for (SubNode node : read.getSubGraph(session, graphRoot)) {
+		for (SubNode node : read.getSubGraph(session, graphRoot, null, 0)) {
 			if (!node.getPath().startsWith(originalPath)) {
 				throw new RuntimeEx(
 						"Algorighm failure: path " + node.getPath() + " should have started with " + originalPath);

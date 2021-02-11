@@ -153,15 +153,6 @@ export class MenuPanel extends Div {
             // I decided with this on the toolbar we don't need it repliated here.
             // !state.isAnonUser ? new MenuItem("Save clipboard to my NOTES node", () => S.edit.saveClipboardToChildNode("~" + J.NodeType.NOTES)) : null, //
 
-            new MenuItem("Show URLs", () => S.render.showNodeUrl(null, state), !!hltNode), //
-
-            new MenuItem("Show Raw Data", () => S.view.runServerCommand("getJson", "Node JSON Data", "The actual data stored on the server for this node...", state), //
-                !state.isAnonUser && selNodeIsMine), //
-
-            // Warning: this can put heavy load on server. Maybe make this kinda thing a "paid" feature?
-            new MenuItem("Node Stats", () => S.view.getNodeStats(state), //
-                !state.isAnonUser /* state.isAdminUser */), //
-
             new MenuItemSeparator(), //
 
             new MenuItem("Import", () => S.edit.openImportDlg(state), importFeatureEnabled),
@@ -171,6 +162,27 @@ export class MenuPanel extends Div {
 
             new MenuItem("Test Microphone", () => { new MediaRecorderDlg(state, false, false).open(); }, !state.isAnonUser),
             new MenuItem("Test Web Cam", () => { new MediaRecorderDlg(state, true, false).open(); }, !state.isAnonUser)
+        ]));
+
+        // todo-0: need to update User Guide per this new menu
+        children.push(new Menu("Node Info", [
+
+            // I decided with this on the toolbar we don't need it repliated here.
+            // !state.isAnonUser ? new MenuItem("Save clipboard to my NOTES node", () => S.edit.saveClipboardToChildNode("~" + J.NodeType.NOTES)) : null, //
+
+            new MenuItem("Show URLs", () => S.render.showNodeUrl(null, state), !!hltNode), //
+
+            new MenuItem("Show Raw Data", () => S.view.runServerCommand("getJson", "Node JSON Data", "The actual data stored on the server for this node...", state), //
+                !state.isAnonUser && selNodeIsMine), //
+
+                new MenuItemSeparator(), //
+
+            // Warning: this can put heavy load on server. Maybe make this kinda thing a "paid" feature?
+            new MenuItem("Node Stats", () => S.view.getNodeStats(state, false), //
+                !state.isAnonUser /* state.isAdminUser */), //
+
+            new MenuItem("Trending Stats", () => S.view.getNodeStats(state, true), //
+                !state.isAnonUser /* state.isAdminUser */) //
         ]));
 
         children.push(new Menu("Encrypt", [

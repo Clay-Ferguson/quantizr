@@ -657,7 +657,7 @@ public class NodeEditService {
 			 * todo-1: It would be more performant to build the "fromUserObjId.equals(toUserObjId)" condition
 			 * into the query itself and let MongoDB to the filtering for us
 			 */
-			for (SubNode n : read.getSubGraph(session, node)) {
+			for (SubNode n : read.getSubGraph(session, node, null, 0)) {
 				// log.debug("Node: path=" + path + " content=" + n.getContent());
 				if (fromUserNode == null) {
 					n.setOwner(toUserNode.getOwner());

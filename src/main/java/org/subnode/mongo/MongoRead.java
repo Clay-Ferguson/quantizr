@@ -519,7 +519,7 @@ public class MongoRead {
     /*
      * Gets (recursively) all nodes under 'node', by using all paths starting with the path of that node
      */
-    public Iterable<SubNode> getSubGraph(MongoSession session, SubNode node) {
+    public Iterable<SubNode> getSubGraph(MongoSession session, SubNode node, Sort sort, int limit) {
         auth.auth(session, node, PrivilegeType.READ);
 
         Query query = new Query();
@@ -530,6 +530,14 @@ public class MongoRead {
          */
         Criteria criteria = Criteria.where(SubNode.FIELD_PATH).regex(util.regexRecursiveChildrenOfPath(node.getPath()));
         query.addCriteria(criteria);
+        
+        if (sort!=null) {
+            query.with(sort);
+        }
+
+        if (limit > 0) {
+            query.limit(limit);
+        }
 
         return getOps(session).find(query, SubNode.class);
     }

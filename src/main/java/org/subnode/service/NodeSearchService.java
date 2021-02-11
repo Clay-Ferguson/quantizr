@@ -62,6 +62,8 @@ public class NodeSearchService {
 	// Warning: Do not add '#' or '@', those are special (see below)
 	static final String WORD_DELIMS = " \n\r\t,-;:\"'`()*{}[]<>=\\/.!?&“";
 
+	static final int TRENDING_LIMIT = 500;
+
 	public NodeSearchResponse search(MongoSession session, NodeSearchRequest req) {
 		NodeSearchResponse res = new NodeSearchResponse();
 		if (session == null) {
@@ -230,7 +232,14 @@ public class NodeSearchService {
 		long nodeCount = 0;
 		long totalWords = 0;
 
-		Iterable<SubNode> iter = read.getSubGraph(session, searchRoot);
+		Sort sort = null;
+		int limit = 0;
+		if (req.isTrending()) {
+			sort = Sort.by(Sort.Direction.DESC, SubNode.FIELD_MODIFY_TIME);
+			limit = TRENDING_LIMIT;
+		}
+
+		Iterable<SubNode> iter = read.getSubGraph(session, searchRoot, sort, limit);
 		for (SubNode node : iter) {
 			if (node.getContent() == null)
 				continue;
@@ -323,7 +332,7 @@ public class NodeSearchService {
 		sb.append("Unique Words: " + wordList.size());
 		res.setStats(sb.toString());
 
-		analyzeSentences(session, searchRoot, res, wordMap, 10);
+		analyzeSentences(session, searchRoot, req.isTrending(), res, wordMap, 10);
 
 		ArrayList<String> topWords = new ArrayList<String>();
 		res.setTopWords(topWords);
@@ -359,11 +368,18 @@ public class NodeSearchService {
 	 * good ordering the synthetic text of actual sentences will not be in the order they appear on the
 	 * actual nodes.
 	 */
-	public void analyzeSentences(MongoSession session, SubNode searchRoot, GetNodeStatsResponse res,
+	public void analyzeSentences(MongoSession session, SubNode searchRoot, boolean trending, GetNodeStatsResponse res,
 			HashMap<String, WordStats> wordMap, int maxCount) {
 		ArrayList<SentenceStats> sentenceList = new ArrayList<SentenceStats>();
 
-		Iterable<SubNode> iter = read.getSubGraph(session, searchRoot);
+		Sort sort = null;
+		int limit = 0;
+		if (trending) {
+			sort = Sort.by(Sort.Direction.DESC, SubNode.FIELD_MODIFY_TIME);
+			limit = TRENDING_LIMIT;
+		}
+
+		Iterable<SubNode> iter = read.getSubGraph(session, searchRoot, sort, limit);
 		int sentenceIdx = 0;
 		for (SubNode node : iter) {
 			if (node.getContent() == null)

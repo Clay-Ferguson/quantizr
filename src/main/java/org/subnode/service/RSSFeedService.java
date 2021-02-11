@@ -166,7 +166,7 @@ public class RSSFeedService {
 			feed.setEntries(entries);
 			List<String> urls = new LinkedList<String>();
 
-			final Iterable<SubNode> iter = read.getSubGraph(mongoSession, node);
+			final Iterable<SubNode> iter = read.getSubGraph(mongoSession, node, null, 0);
 			final List<SubNode> children = read.iterateToList(iter);
 
 			// Scan to collect all the urls.

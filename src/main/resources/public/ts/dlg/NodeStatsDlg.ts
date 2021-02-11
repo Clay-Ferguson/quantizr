@@ -23,8 +23,8 @@ export class NodeStatsDlg extends DialogBase {
     static sentencesExpanded: boolean;
     static helpExpanded: boolean;
 
-    constructor(private res: J.GetNodeStatsResponse, state: AppState) {
-        super("Node Stats", null, false, state);
+    constructor(private res: J.GetNodeStatsResponse, trending: boolean, state: AppState) {
+        super(trending ? "Trending Stats" : "Node Stats", null, false, state);
     }
 
     renderDlg = (): CompIntf[] => {

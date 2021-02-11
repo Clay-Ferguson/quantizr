@@ -539,7 +539,7 @@ public class ActPubService {
         /*
          * Query all existing known outbox items we have already saved for this foreign user
          */
-        Iterable<SubNode> outboxItems = read.getSubGraph(session, outboxNode);
+        Iterable<SubNode> outboxItems = read.getSubGraph(session, outboxNode, null, 0);
 
         String outboxUrl = AP.str(actor, "outbox");
         Object outbox = getOutbox(outboxUrl);
