@@ -1,7 +1,7 @@
 import { fastDispatch } from "./AppRedux";
 import { AppState } from "./AppState";
 import { Constants as C } from "./Constants";
-import { InboxNotifyDlg } from "./dlg/InboxNotifyDlg";
+import { NodeStatsDlg } from "./dlg/NodeStatsDlg";
 import { ViewIntf } from "./intf/ViewIntf";
 import * as J from "./JavaIntf";
 import { PubSub } from "./PubSub";
@@ -229,7 +229,7 @@ export class View implements ViewIntf {
             nodeId: node.id
         },
             (res: J.GetNodeStatsResponse) => {
-                S.util.showMessage(res.stats, "Node Stats", true);
+                new NodeStatsDlg(res, state).open();
             });
     }
 

@@ -158,8 +158,9 @@ export class MenuPanel extends Div {
             new MenuItem("Show Raw Data", () => S.view.runServerCommand("getJson", "Node JSON Data", "The actual data stored on the server for this node...", state), //
                 !state.isAnonUser && selNodeIsMine), //
 
+            // Warning: this can put heavy load on server. Maybe make this kinda thing a "paid" feature?
             new MenuItem("Node Stats", () => S.view.getNodeStats(state), //
-                state.isAdminUser && selNodeIsMine), //
+                !state.isAnonUser /* state.isAdminUser */), //
 
             new MenuItemSeparator(), //
 

@@ -383,6 +383,10 @@ export interface GetNodePrivilegesResponse extends ResponseBase {
 
 export interface GetNodeStatsResponse extends ResponseBase {
     stats: string;
+    topSentences: string[];
+    topWords: string[];
+    topTags: string[];
+    topMentions: string[];
 }
 
 export interface GetPublicServerInfoResponse extends ResponseBase {

@@ -29,6 +29,7 @@ import org.subnode.response.GetNodeStatsResponse;
 import org.subnode.response.GetSharedNodesResponse;
 import org.subnode.response.NodeSearchResponse;
 import org.subnode.util.Convert;
+import org.subnode.util.EnglishDictionary;
 import org.subnode.util.ThreadLocals;
 import opennlp.tools.util.StringUtil;
 
@@ -53,6 +54,13 @@ public class NodeSearchService {
 
 	@Autowired
 	private Convert convert;
+
+	@Autowired
+	private EnglishDictionary englishDictionary;
+
+	static final String SENTENCE_DELIMS = ".!?";
+	// Warning: Do not add '#' or '@', those are special (see below)
+	static final String WORD_DELIMS = " \n\r\t,-;:\"'`()*{}[]<>=\\/.!?&“";
 
 	public NodeSearchResponse search(MongoSession session, NodeSearchRequest req) {
 		NodeSearchResponse res = new NodeSearchResponse();
@@ -199,65 +207,245 @@ public class NodeSearchService {
 		return res;
 	}
 
+	// replace #<span> with " #". This is a quick and dirty way to fix the way Mastodon mangles hashes
+	// in the text.
+	public String fixMastodonMangles(String content) {
+		if (content == null)
+			return null;
+		content = content.replace("#\\u003cspan\\u003e", " #");
+		content = content.replace("#<span>", " #");
+		content = content.replace("\\u003c", " ");
+		content = content.replace("\\u003e", " ");
+		log.debug("unmangled content: " + content);
+		return content;
+	}
+
 	public void getNodeStats(GetNodeStatsRequest req, GetNodeStatsResponse res) {
 		MongoSession session = ThreadLocals.getMongoSession();
 		SubNode searchRoot = read.getNode(session, req.getNodeId());
 		HashMap<String, WordStats> wordMap = new HashMap<String, WordStats>();
+		HashMap<String, WordStats> tagMap = new HashMap<String, WordStats>();
+		HashMap<String, WordStats> mentionMap = new HashMap<String, WordStats>();
 
 		long nodeCount = 0;
 		long totalWords = 0;
 
 		Iterable<SubNode> iter = read.getSubGraph(session, searchRoot);
 		for (SubNode node : iter) {
-			if (node.getContent() != null) {
-				StringTokenizer tokens = new StringTokenizer(node.getContent(), " \n\r\t.,-;:\"'`!?()*", false);
-				while (tokens.hasMoreTokens()) {
-					String token = tokens.nextToken().trim();
+			if (node.getContent() == null)
+				continue;
 
-					// only consider words that are all alpha characters
-					if (!StringUtils.isAlpha(token) || token.length() < 5) {
-						// log.debug(" ignoring: " + token);
-						continue;
+			String content = node.getContent();
+			content = fixMastodonMangles(content);
+
+			StringTokenizer tokens = new StringTokenizer(content, WORD_DELIMS, false);
+			while (tokens.hasMoreTokens()) {
+				String token = tokens.nextToken().trim();
+
+				if (!englishDictionary.isStopWord(token)) {
+					String lcToken = token.toLowerCase();
+
+					// if word is a mention.
+					if (token.startsWith("@")) {
+						if (token.length() == 1)
+							continue;
+
+						WordStats ws = mentionMap.get(lcToken);
+						if (ws == null) {
+							ws = new WordStats(token);
+							mentionMap.put(lcToken, ws);
+						}
+						ws.count++;
 					}
-					token = token.toLowerCase();
-					WordStats ws = wordMap.get(token);
-					if (ws == null) {
-						ws = new WordStats(token);
-						wordMap.put(token, ws);
+					// if word is a hashtag.
+					else if (token.startsWith("#")) {
+						if (token.endsWith("#") || token.length() == 1)
+							continue;
+
+						// ignore stuff like #1 #23
+						String numCheck = token.substring(1);
+						if (StringUtils.isNumeric(numCheck))
+							continue;
+
+						WordStats ws = tagMap.get(lcToken);
+						if (ws == null) {
+							ws = new WordStats(token);
+							tagMap.put(lcToken, ws);
+						}
+						ws.count++;
 					}
-					totalWords++;
-					ws.count++;
+					// ordinary word
+					else {
+						if (!StringUtils.isAlpha(token)) {
+							continue;
+						}
+
+						WordStats ws = wordMap.get(lcToken);
+						if (ws == null) {
+							ws = new WordStats(token);
+							wordMap.put(lcToken, ws);
+						}
+						ws.count++;
+					}
 				}
+				totalWords++;
 			}
 			nodeCount++;
 		}
-
 		List<WordStats> wordList = new ArrayList<WordStats>(wordMap.values());
-		wordMap = null;
+		List<WordStats> tagList = new ArrayList<WordStats>(tagMap.values());
+		List<WordStats> mentionList = new ArrayList<WordStats>(mentionMap.values());
 
 		Collections.sort(wordList, new Comparator<WordStats>() {
 			@Override
 			public int compare(WordStats s1, WordStats s2) {
-				return (int)(s2.count - s1.count);
+				return (int) (s2.count - s1.count);
+			}
+		});
+
+		Collections.sort(tagList, new Comparator<WordStats>() {
+			@Override
+			public int compare(WordStats s1, WordStats s2) {
+				return (int) (s2.count - s1.count);
+			}
+		});
+
+		Collections.sort(mentionList, new Comparator<WordStats>() {
+			@Override
+			public int compare(WordStats s1, WordStats s2) {
+				return (int) (s2.count - s1.count);
 			}
 		});
 
 		StringBuilder sb = new StringBuilder();
-		sb.append("Node Stats:\n\n");
-		sb.append("Node count: " + nodeCount+ "\n");
-		sb.append("Total Words: "+ totalWords + "\n");
-		sb.append("Unique Words: "+ wordList.size() + "\n");
-		sb.append("\n");
+		sb.append("Node count: " + nodeCount + ", ");
+		sb.append("Total Words: " + totalWords + ", ");
+		sb.append("Unique Words: " + wordList.size());
+		res.setStats(sb.toString());
 
-		int idx = 0;
+		analyzeSentences(session, searchRoot, res, wordMap, 10);
+
+		ArrayList<String> topWords = new ArrayList<String>();
+		res.setTopWords(topWords);
 		for (WordStats ws : wordList) {
-			sb.append(ws.word); 
-			sb.append(","); 
-			sb.append(String.valueOf(ws.count));
-			sb.append(++idx % 6 == 0 ? "\n" : "  ");
+			topWords.add(ws.word); // + "," + ws.count);
+			if (topWords.size() >= 200)
+				break;
 		}
 
-		res.setStats(sb.toString());
+		ArrayList<String> topTags = new ArrayList<String>();
+		res.setTopTags(topTags);
+		for (WordStats ws : tagList) {
+			topTags.add(ws.word); // + "," + ws.count);
+			if (topTags.size() >= 200)
+				break;
+		}
+
+		ArrayList<String> topMentions = new ArrayList<String>();
+		res.setTopMentions(topMentions);
+		for (WordStats ws : mentionList) {
+			topMentions.add(ws.word); // + "," + ws.count);
+			if (topMentions.size() >= 200)
+				break;
+		}
+
 		res.setSuccess(true);
+	}
+
+	/*
+	 * This uses a very simple statistics algorithm to extract the top 10 most important sentences in a
+	 * text, by summing the weightings of each word in any sentence according to how frequent that word
+	 * is in the whole body of the text. Since we are just using 'getSubGraph' which doesn't guarantee
+	 * good ordering the synthetic text of actual sentences will not be in the order they appear on the
+	 * actual nodes.
+	 */
+	public void analyzeSentences(MongoSession session, SubNode searchRoot, GetNodeStatsResponse res,
+			HashMap<String, WordStats> wordMap, int maxCount) {
+		ArrayList<SentenceStats> sentenceList = new ArrayList<SentenceStats>();
+
+		Iterable<SubNode> iter = read.getSubGraph(session, searchRoot);
+		int sentenceIdx = 0;
+		for (SubNode node : iter) {
+			if (node.getContent() == null)
+				continue;
+
+			String content = node.getContent();
+			content = fixMastodonMangles(content);
+
+			StringTokenizer sentences = new StringTokenizer(content, SENTENCE_DELIMS, false);
+			while (sentences.hasMoreTokens()) {
+				String sentence = sentences.nextToken().trim();
+				int score = 0;
+
+				StringTokenizer words = new StringTokenizer(sentence, WORD_DELIMS, false);
+				int sentenceWordCount = 0;
+				while (words.hasMoreTokens()) {
+					String word = words.nextToken().trim();
+
+					// only consider words that are all alpha characters
+					if (!StringUtils.isAlpha(word)) {
+						// log.debug(" ignoring: " + token);
+						continue;
+					}
+
+					if (englishDictionary.isStopWord(word))
+						continue;
+
+					/*
+					 * if this word is an 'important' one, tally in it's weighted contribution to the score, as the
+					 * number of times that word appears in the text
+					 */
+					WordStats ws = wordMap.get(word.toLowerCase());
+					if (ws != null) {
+						score += ws.count;
+					}
+					sentenceWordCount++;
+				}
+
+				if (sentenceWordCount > 0) {
+					sentenceList.add(new SentenceStats(sentence, score, ++sentenceIdx));
+				}
+			}
+		}
+
+		Collections.sort(sentenceList, new Comparator<SentenceStats>() {
+			@Override
+			public int compare(SentenceStats s1, SentenceStats s2) {
+				return (int) (s2.score - s1.score);
+			}
+		});
+
+		/*
+		 * At this point we have the sentenceList ordered by rank only and not chronological of order of
+		 * appearance in the text, so now we need to order in the order it appears in the text.
+		 */
+
+		ArrayList<SentenceStats> chronoList = new ArrayList<SentenceStats>();
+		int count = 0;
+		for (SentenceStats ss : sentenceList) {
+			chronoList.add(ss);
+			if (++count > maxCount)
+				break;
+		}
+
+		/*
+		 * sort ascending to put sentences in the order they appeared in the text. oops, the query itself
+		 * doesn't return records in the proper chrono order, so only once we make the query return the text
+		 * in an order will this be correct. For not it's picking the top sentences but just not presenting
+		 * them in a correct order that they appear on the tree
+		 */
+		// Collections.sort(chronoList, new Comparator<SentenceStats>() {
+		// @Override
+		// public int compare(SentenceStats s1, SentenceStats s2) {
+		// return (int) (s1.sentenceIdx - s2.sentenceIdx);
+		// }
+		// });
+
+		ArrayList<String> list = new ArrayList<String>();
+		res.setTopSentences(list);
+
+		for (SentenceStats ss : chronoList) {
+			list.add(ss.sentence + ". (score=" + ss.score + ")");
+		}
 	}
 }

@@ -97,6 +97,16 @@ $smallBorderSize: 3px;
     overflow-y: auto;
 }
 
+.wordStatsArea {
+    font-family: Courier New,Courier,Lucida Sans Typewriter,Lucida Typewriter,monospace;
+    font-size: 110%;
+    max-height: 300px;
+    overflow-y: auto;
+    border: 2px solid $nodeBorderBottomColor;
+    padding: $smallGap;
+    margin-bottom: $smallGap;
+}
+
 .d3Graph {
     // margin: 2em;
     // border: 1px solid gray;
