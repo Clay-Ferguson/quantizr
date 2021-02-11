@@ -158,6 +158,9 @@ export class MenuPanel extends Div {
             new MenuItem("Show Raw Data", () => S.view.runServerCommand("getJson", "Node JSON Data", "The actual data stored on the server for this node...", state), //
                 !state.isAnonUser && selNodeIsMine), //
 
+            new MenuItem("Node Stats", () => S.view.getNodeStats(state), //
+                state.isAdminUser && selNodeIsMine), //
+
             new MenuItemSeparator(), //
 
             new MenuItem("Import", () => S.edit.openImportDlg(state), importFeatureEnabled),

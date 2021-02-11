@@ -57,6 +57,7 @@ import org.subnode.request.ExportRequest;
 import org.subnode.request.GetConfigRequest;
 import org.subnode.request.GetFriendsRequest;
 import org.subnode.request.GetNodePrivilegesRequest;
+import org.subnode.request.GetNodeStatsRequest;
 import org.subnode.request.GetServerInfoRequest;
 import org.subnode.request.GetSharedNodesRequest;
 import org.subnode.request.GetUserAccountInfoRequest;
@@ -99,6 +100,7 @@ import org.subnode.response.CloseAccountResponse;
 import org.subnode.response.ExecuteNodeResponse;
 import org.subnode.response.ExportResponse;
 import org.subnode.response.GetConfigResponse;
+import org.subnode.response.GetNodeStatsResponse;
 import org.subnode.response.GetServerInfoResponse;
 import org.subnode.response.GraphResponse;
 import org.subnode.response.InfoMessage;
@@ -1150,6 +1152,15 @@ public class AppController implements ErrorController {
 		GetConfigResponse res = new GetConfigResponse();
 		res.setConfig(appProp.getConfig());
 		return res;
+	}
+
+	@RequestMapping(value = API_PATH + "/getNodeStats", method = RequestMethod.POST)
+	public @ResponseBody Object getNodeStats(@RequestBody GetNodeStatsRequest req, HttpSession session) {
+		return callProc.run("getNodeStats", req, session, ms -> {
+			GetNodeStatsResponse res = new GetNodeStatsResponse();
+			nodeSearchService.getNodeStats(req, res);
+			return res;
+		});
 	}
 
 	@RequestMapping(value = API_PATH + "/getServerInfo", method = RequestMethod.POST)

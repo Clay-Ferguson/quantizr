@@ -84,6 +84,10 @@ export interface GetNodePrivilegesRequest extends RequestBase {
     includeOwners: boolean;
 }
 
+export interface GetNodeStatsRequest extends RequestBase {
+    nodeId: string;
+}
+
 export interface GetServerInfoRequest extends RequestBase {
     command: string;
     nodeId: string;
@@ -375,6 +379,10 @@ export interface GetFriendsResponse extends ResponseBase {
 export interface GetNodePrivilegesResponse extends ResponseBase {
     aclEntries: AccessControlInfo[];
     owners: string[];
+}
+
+export interface GetNodeStatsResponse extends ResponseBase {
+    stats: string;
 }
 
 export interface GetPublicServerInfoResponse extends ResponseBase {

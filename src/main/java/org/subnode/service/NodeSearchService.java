@@ -1,7 +1,13 @@
 package org.subnode.service;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.StringTokenizer;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,8 +22,10 @@ import org.subnode.mongo.MongoAuth;
 import org.subnode.mongo.MongoRead;
 import org.subnode.mongo.MongoSession;
 import org.subnode.mongo.model.SubNode;
+import org.subnode.request.GetNodeStatsRequest;
 import org.subnode.request.GetSharedNodesRequest;
 import org.subnode.request.NodeSearchRequest;
+import org.subnode.response.GetNodeStatsResponse;
 import org.subnode.response.GetSharedNodesResponse;
 import org.subnode.response.NodeSearchResponse;
 import org.subnode.util.Convert;
@@ -102,7 +110,7 @@ public class NodeSearchService {
 				if (req.isForeignUserSearch()) {
 					moreCriteria =
 							Criteria.where(SubNode.FIELD_PROPERTIES + "." + NodeProp.ACT_PUB_ACTOR_URL.s() + ".value").ne(null);
-				} 
+				}
 				// searching only Local users
 				else if (req.isLocalUserSearch()) {
 					moreCriteria =
@@ -189,5 +197,67 @@ public class NodeSearchService {
 		res.setSuccess(true);
 		log.debug("search results count: " + counter);
 		return res;
+	}
+
+	public void getNodeStats(GetNodeStatsRequest req, GetNodeStatsResponse res) {
+		MongoSession session = ThreadLocals.getMongoSession();
+		SubNode searchRoot = read.getNode(session, req.getNodeId());
+		HashMap<String, WordStats> wordMap = new HashMap<String, WordStats>();
+
+		long nodeCount = 0;
+		long totalWords = 0;
+
+		Iterable<SubNode> iter = read.getSubGraph(session, searchRoot);
+		for (SubNode node : iter) {
+			if (node.getContent() != null) {
+				StringTokenizer tokens = new StringTokenizer(node.getContent(), " \n\r\t.,-;:\"'`!?()*", false);
+				while (tokens.hasMoreTokens()) {
+					String token = tokens.nextToken().trim();
+
+					// only consider words that are all alpha characters
+					if (!StringUtils.isAlpha(token) || token.length() < 5) {
+						// log.debug(" ignoring: " + token);
+						continue;
+					}
+					token = token.toLowerCase();
+					WordStats ws = wordMap.get(token);
+					if (ws == null) {
+						ws = new WordStats(token);
+						wordMap.put(token, ws);
+					}
+					totalWords++;
+					ws.count++;
+				}
+			}
+			nodeCount++;
+		}
+
+		List<WordStats> wordList = new ArrayList<WordStats>(wordMap.values());
+		wordMap = null;
+
+		Collections.sort(wordList, new Comparator<WordStats>() {
+			@Override
+			public int compare(WordStats s1, WordStats s2) {
+				return (int)(s2.count - s1.count);
+			}
+		});
+
+		StringBuilder sb = new StringBuilder();
+		sb.append("Node Stats:\n\n");
+		sb.append("Node count: " + nodeCount+ "\n");
+		sb.append("Total Words: "+ totalWords + "\n");
+		sb.append("Unique Words: "+ wordList.size() + "\n");
+		sb.append("\n");
+
+		int idx = 0;
+		for (WordStats ws : wordList) {
+			sb.append(ws.word); 
+			sb.append(","); 
+			sb.append(String.valueOf(ws.count));
+			sb.append(++idx % 6 == 0 ? "\n" : "  ");
+		}
+
+		res.setStats(sb.toString());
+		res.setSuccess(true);
 	}
 }
