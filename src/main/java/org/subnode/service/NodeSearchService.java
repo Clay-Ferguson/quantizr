@@ -98,11 +98,13 @@ public class NodeSearchService {
 				}
 
 				Criteria moreCriteria = null;
-				// todo-0: add foreign and local criteria
+				// searching only Foreign users
 				if (req.isForeignUserSearch()) {
 					moreCriteria =
 							Criteria.where(SubNode.FIELD_PROPERTIES + "." + NodeProp.ACT_PUB_ACTOR_URL.s() + ".value").ne(null);
-				} else if (req.isLocalUserSearch()) {
+				} 
+				// searching only Local users
+				else if (req.isLocalUserSearch()) {
 					moreCriteria =
 							Criteria.where(SubNode.FIELD_PROPERTIES + "." + NodeProp.ACT_PUB_ACTOR_URL.s() + ".value").is(null);
 				}
