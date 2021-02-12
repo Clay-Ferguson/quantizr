@@ -36,7 +36,6 @@ import { LayoutRow } from "../widget/LayoutRow";
 import { Selection } from "../widget/Selection";
 import { Span } from "../widget/Span";
 import { TextArea } from "../widget/TextArea";
-import { TextContent } from "../widget/TextContent";
 import { TextField } from "../widget/TextField";
 import { ChangeNodeTypeDlg } from "./ChangeNodeTypeDlg";
 import { ConfirmDlg } from "./ConfirmDlg";
@@ -135,6 +134,7 @@ export class EditNodeDlg extends DialogBase {
             { key: "50px", val: "50px" },
             { key: "100px", val: "100px" },
             { key: "200px", val: "200px" },
+            { key: "300px", val: "300px" },
             { key: "400px", val: "400px" },
             { key: "800px", val: "800px" },
             { key: "1000px", val: "1000px" }
