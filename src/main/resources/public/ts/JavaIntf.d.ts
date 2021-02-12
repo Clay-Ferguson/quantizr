@@ -87,6 +87,7 @@ export interface GetNodePrivilegesRequest extends RequestBase {
 export interface GetNodeStatsRequest extends RequestBase {
     nodeId: string;
     trending: boolean;
+    feed: boolean;
 }
 
 export interface GetServerInfoRequest extends RequestBase {

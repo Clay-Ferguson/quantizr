@@ -16,7 +16,7 @@ export class AppState {
     where we want it. */
     rendering: boolean = false;
 
-    /* flag that indicates the user can click "Refresh Feed" because there are new changes read */
+    /* flag that indicates the user can click "Refresh" because there are new changes read */
     feedDirty: boolean = false;
     feedLoading: boolean = false;
 

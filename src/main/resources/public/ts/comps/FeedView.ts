@@ -56,19 +56,14 @@ export class FeedView extends Div {
         let refreshFeedButtonBar = new ButtonBar([
             state.isAnonUser ? null : new Button("New Post", () => S.edit.addComment(null, state), { title: "Post something awesome on the Fediverse!" }, "btn-primary"),
             state.isAnonUser ? null : new Button("Friends", () => S.nav.openContentNode("~" + J.NodeType.FRIEND_LIST, state), { title: "Manage your list of frenz!" }),
+            new Button("Trending", () => {
+                S.view.getNodeStats(state, true, true);
+            }),
             new Span(null, {
                 className: ((state.feedDirty || state.feedWaitingForUserRefresh) ? "feedDirtyButton" : "feedNotDirtyButton")
             }, [
-                new Button("Refresh Feed" + (state.feedDirty ? " (New Posts)" : ""), () => {
-                    FeedView.page = 0;
-                    dispatch({
-                        type: "Action_SetFeedFilterType",
-                        update: (s: AppState): void => {
-                            s.feedLoading = true;
-                        }
-                    });
-
-                    S.srch.feed("~" + J.NodeType.FRIEND_LIST, null, FeedView.page, FeedView.searchTextState.getValue());
+                new Button("Refresh" + (state.feedDirty ? " (New Posts)" : ""), () => {
+                    FeedView.refresh();
                 })
             ])
         ], null, "float-right marginBottom");
@@ -89,7 +84,7 @@ export class FeedView extends Div {
             children.push(new Heading(4, "Loading feed..."));
         }
         else if (state.feedWaitingForUserRefresh) {
-            children.push(new Div("Make selections, then 'Refresh Feed'"));
+            children.push(new Div("Make selections, then 'Refresh'"));
         }
         else if (!state.feedResults || state.feedResults.length === 0) {
             children.push(new Div("Nothing to display."));
@@ -116,6 +111,18 @@ export class FeedView extends Div {
 
         children.push(helpPanel);
         this.setChildren(children);
+    }
+
+    static refresh = () => {
+        FeedView.page = 0;
+        dispatch({
+            type: "Action_SetFeedFilterType",
+            update: (s: AppState): void => {
+                s.feedLoading = true;
+            }
+        });
+
+        S.srch.feed("~" + J.NodeType.FRIEND_LIST, null, FeedView.page, FeedView.searchTextState.getValue());
     }
 
     makeFilterButtonsBar = (state: AppState): Span => {

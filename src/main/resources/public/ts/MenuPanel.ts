@@ -178,10 +178,10 @@ export class MenuPanel extends Div {
                 new MenuItemSeparator(), //
 
             // Warning: this can put heavy load on server. Maybe make this kinda thing a "paid" feature?
-            new MenuItem("Node Stats", () => S.view.getNodeStats(state, false), //
+            new MenuItem("Node Stats", () => S.view.getNodeStats(state, false, false), //
                 !state.isAnonUser /* state.isAdminUser */), //
 
-            new MenuItem("Trending Stats", () => S.view.getNodeStats(state, true), //
+            new MenuItem("Trending Stats", () => S.view.getNodeStats(state, true, false), //
                 !state.isAnonUser /* state.isAdminUser */) //
         ]));
 

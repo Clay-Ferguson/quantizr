@@ -12,15 +12,19 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.TextCriteria;
 import org.springframework.stereotype.Component;
 import org.subnode.config.NodeName;
 import org.subnode.model.NodeInfo;
 import org.subnode.model.client.NodeProp;
+import org.subnode.model.client.NodeType;
 import org.subnode.mongo.MongoAuth;
 import org.subnode.mongo.MongoRead;
 import org.subnode.mongo.MongoSession;
+import org.subnode.mongo.MongoUtil;
 import org.subnode.mongo.model.SubNode;
 import org.subnode.request.GetNodeStatsRequest;
 import org.subnode.request.GetSharedNodesRequest;
@@ -57,6 +61,15 @@ public class NodeSearchService {
 
 	@Autowired
 	private EnglishDictionary englishDictionary;
+
+	@Autowired
+	private MongoTemplate ops;
+
+	@Autowired
+	private MongoUtil util;
+
+	public static Object trendingFeedInfoLock = new Object();
+	public static GetNodeStatsResponse trendingFeedInfo;
 
 	static final String SENTENCE_DELIMS = ".!?";
 	// Warning: Do not add '#' or '@', those are special (see below)
@@ -223,6 +236,18 @@ public class NodeSearchService {
 	}
 
 	public void getNodeStats(GetNodeStatsRequest req, GetNodeStatsResponse res) {
+		synchronized (NodeSearchService.trendingFeedInfoLock) {
+			if (req.isFeed() && NodeSearchService.trendingFeedInfo != null) {
+				res.setStats(NodeSearchService.trendingFeedInfo.getStats());
+				res.setTopMentions(NodeSearchService.trendingFeedInfo.getTopMentions());
+				res.setTopSentences(NodeSearchService.trendingFeedInfo.getTopSentences());
+				res.setTopTags(NodeSearchService.trendingFeedInfo.getTopTags());
+				res.setTopWords(NodeSearchService.trendingFeedInfo.getTopWords());
+				res.setSuccess(true);
+				return;
+			}
+		}
+
 		MongoSession session = ThreadLocals.getMongoSession();
 		SubNode searchRoot = read.getNode(session, req.getNodeId());
 		HashMap<String, WordStats> wordMap = new HashMap<String, WordStats>();
@@ -231,15 +256,54 @@ public class NodeSearchService {
 
 		long nodeCount = 0;
 		long totalWords = 0;
+		Iterable<SubNode> iter = null;
 
-		Sort sort = null;
-		int limit = 0;
-		if (req.isTrending()) {
-			sort = Sort.by(Sort.Direction.DESC, SubNode.FIELD_MODIFY_TIME);
-			limit = TRENDING_LIMIT;
+		/*
+		 * NOTE: This query is similat to the one in UserFeedService.java, but simpler since we don't handle
+		 * a bunch of options but just the public feed query
+		 */
+		if (req.isFeed()) {
+			/* Finds nodes that have shares to any of the people listed in sharedToAny */
+			List<String> sharedToAny = new LinkedList<String>();
+			sharedToAny.add("public");
+
+			String pathToSearch = NodeName.ROOT_OF_ALL_USERS;
+
+			Query query = new Query();
+			Criteria criteria = Criteria.where(SubNode.FIELD_PATH).regex(util.regexRecursiveChildrenOfPath(pathToSearch)) //
+
+					// This pattern is what is required when you have multiple conditions added to a single field.
+					.andOperator(Criteria.where(SubNode.FIELD_TYPE).ne(NodeType.FRIEND.s()), //
+							Criteria.where(SubNode.FIELD_TYPE).ne(NodeType.POSTS.s()), //
+							Criteria.where(SubNode.FIELD_TYPE).ne(NodeType.ACT_PUB_POSTS.s()));
+
+			List<Criteria> orCriteria = new LinkedList<Criteria>();
+
+			// or a node that is shared to any of the sharedToAny users
+			for (String share : sharedToAny) {
+				orCriteria.add(Criteria.where(SubNode.FIELD_AC + "." + share).ne(null));
+			}
+
+			criteria.orOperator((Criteria[]) orCriteria.toArray(new Criteria[orCriteria.size()]));
+
+			query.addCriteria(criteria);
+			query.with(Sort.by(Sort.Direction.DESC, SubNode.FIELD_MODIFY_TIME));
+			query.limit(TRENDING_LIMIT);
+
+			iter = ops.find(query, SubNode.class);
+		}
+		// Otherwise this is not a Feed Tab query but just an arbitrary node stats request.
+		else {
+			Sort sort = null;
+			int limit = 0;
+			if (req.isTrending()) {
+				sort = Sort.by(Sort.Direction.DESC, SubNode.FIELD_MODIFY_TIME);
+				limit = TRENDING_LIMIT;
+			}
+
+			iter = read.getSubGraph(session, searchRoot, sort, limit);
 		}
 
-		Iterable<SubNode> iter = read.getSubGraph(session, searchRoot, sort, limit);
 		for (SubNode node : iter) {
 			if (node.getContent() == null)
 				continue;
@@ -359,6 +423,13 @@ public class NodeSearchService {
 		}
 
 		res.setSuccess(true);
+
+		/* If this is a feed query cache it. Only will refresh every 30mins based on a @Schedule event */
+		if (req.isFeed()) {
+			synchronized (NodeSearchService.trendingFeedInfoLock) {
+				NodeSearchService.trendingFeedInfo = res;
+			}
+		}
 	}
 
 	/*

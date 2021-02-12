@@ -2034,6 +2034,9 @@ public class ActPubService {
     @Scheduled(fixedDelay = 30 * DateUtil.MINUTE_MILLIS)
     public void bigRefresh() {
         refreshForeignUsers();
+        synchronized (NodeSearchService.trendingFeedInfoLock) {
+            NodeSearchService.trendingFeedInfo = null;
+        }
     }
 
     /* Run every few seconds */

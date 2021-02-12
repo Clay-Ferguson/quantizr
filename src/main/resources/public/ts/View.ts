@@ -222,15 +222,16 @@ export class View implements ViewIntf {
         });
     }
 
-    getNodeStats = (state: AppState, trending: boolean) => {
+    getNodeStats = (state: AppState, trending: boolean, feed: boolean) => {
         const node = S.meta64.getHighlightedNode(state);
 
         S.util.ajax<J.GetNodeStatsRequest, J.GetNodeStatsResponse>("getNodeStats", {
-            nodeId: node.id,
-            trending
+            nodeId: node ? node.id : null,
+            trending,
+            feed
         },
             (res: J.GetNodeStatsResponse) => {
-                new NodeStatsDlg(res, trending, state).open();
+                new NodeStatsDlg(res, trending, feed, state).open();
             });
     }
 

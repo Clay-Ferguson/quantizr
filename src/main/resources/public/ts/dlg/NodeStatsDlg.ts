@@ -1,4 +1,5 @@
 import { AppState } from "../AppState";
+import { FeedView } from "../comps/FeedView";
 import { Constants as C } from "../Constants";
 import { DialogBase } from "../DialogBase";
 import * as J from "../JavaIntf";
@@ -26,8 +27,8 @@ export class NodeStatsDlg extends DialogBase {
     static sentencesExpanded: boolean;
     static helpExpanded: boolean;
 
-    constructor(private res: J.GetNodeStatsResponse, trending: boolean, state: AppState) {
-        super(trending ? "Trending Stats" : "Node Stats", null, false, state);
+    constructor(private res: J.GetNodeStatsResponse, public trending: boolean, public feed: boolean, state: AppState) {
+        super(trending ? "Trending Now" : "Node Stats", null, false, state);
     }
 
     renderDlg = (): CompIntf[] => {
@@ -72,20 +73,20 @@ export class NodeStatsDlg extends DialogBase {
         }
 
         return [
-            new TextContent(this.res.stats, null, false),
+            this.trending ? null : new TextContent(this.res.stats, null, false),
 
             // Needs more tuning (todo-0) need to capture the NODE content itself
             // and not the individual sentences in nodes. This is trivially easy to do,
             // with a small server side tweak.
             // sentencePanel,
 
-            tagPanel.childrenExist() ? new Heading(3, "Top 200 Tags") : null,
+            tagPanel.childrenExist() ? new Heading(3, this.trending ? "Tags" : "Top Tags") : null,
             tagPanel.childrenExist() ? tagPanel : null,
 
-            mentionPanel.childrenExist() ? new Heading(3, "Top 200 Mentions") : null,
+            mentionPanel.childrenExist() ? new Heading(3, this.trending ? "Mentions" : "Top Mentions") : null,
             mentionPanel.childrenExist() ? mentionPanel : null,
 
-            wordPanel.childrenExist() ? new Heading(3, "Top 200 Words") : null,
+            wordPanel.childrenExist() ? new Heading(3, this.trending ? "Words" : "Top Words") : null,
             wordPanel.childrenExist() ? wordPanel : null,
 
             new CollapsibleHelpPanel("Help: About Node Stats", S.meta64.config.help.nodeStats.dialog,
@@ -103,7 +104,14 @@ export class NodeStatsDlg extends DialogBase {
 
     searchWord = (word: string) => {
         this.close();
-        SearchContentDlg.defaultSearchText = word;
-        new SearchContentDlg(this.appState).open(); 
+
+        if (this.feed) {
+            FeedView.searchTextState.setValue(word);
+            FeedView.refresh();
+        }
+        else {
+            SearchContentDlg.defaultSearchText = word;
+            new SearchContentDlg(this.appState).open();
+        }
     }
 }

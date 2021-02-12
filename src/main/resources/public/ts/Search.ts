@@ -134,6 +134,7 @@ export class Search implements SearchIntf {
     }
 
     initSearchNode = (node: J.NodeInfo) => {
+        if (!node) return;
         this.idToNodeMap[node.id] = node;
 
         // NOTE: only the getFeed call (Feed tab) will have items with some parents populated.
@@ -146,6 +147,7 @@ export class Search implements SearchIntf {
      * Renders a single line of search results on the search results page.
      */
     renderSearchResultAsListItem = (node: J.NodeInfo, index: number, count: number, rowCount: number, prefix: string, isFeed: boolean, isParent: boolean, allowAvatars: boolean, state: AppState): Comp => {
+        if (!node) return;
 
         /* If there's a parent on this node it's a 'feed' item and this parent is what the user was replyig to so we display it just above the
         item we are rendering */

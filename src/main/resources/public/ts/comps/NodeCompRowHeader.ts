@@ -24,16 +24,18 @@ export class NodeCompRowHeader extends Div {
         });
     }
 
+    // todo-0: make all these calls able to log a good exception message (including classname mainly) when there's a NPE or exception
     preRender(): void {
         let state: AppState = useSelector((state: AppState) => state);
         let node = this.node;
         let children = [];
         // console.log("NodeCompHeaderRow: " + S.util.prettyPrint(node));
 
-        let isPageRootOrDifferentOwner = node.id === state.node.id || node.owner !== state.node.owner;
+        // todo-0: had a NPE here where 'state.node' is null. Check this in other places.
+        let isPageRootOrDifferentOwner = state.node && (node.id === state.node.id || node.owner !== state.node.owner);
 
         let avatarImg: Img = null;
-        if ((this.allowAvatars || node.id === state.node.id) && node.owner !== J.PrincipalName.ADMIN && isPageRootOrDifferentOwner) {
+        if ((this.allowAvatars || (state.node && node.id === state.node.id)) && node.owner !== J.PrincipalName.ADMIN && isPageRootOrDifferentOwner) {
             avatarImg = S.render.makeAvatarImage(node, state);
             if (avatarImg) {
                 children.push(avatarImg);
