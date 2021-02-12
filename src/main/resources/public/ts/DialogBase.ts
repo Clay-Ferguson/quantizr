@@ -1,6 +1,5 @@
 import * as ReactDOM from "react-dom";
 import { Provider } from "react-redux";
-import { store } from "./AppRedux";
 import { AppState } from "./AppState";
 import clientInfo from "./ClientInfo";
 import { Constants as C } from "./Constants";
@@ -12,6 +11,7 @@ import { Comp } from "./widget/base/Comp";
 import { CompIntf } from "./widget/base/CompIntf";
 import { Div } from "./widget/Div";
 import { Span } from "./widget/Span";
+import { appState, dispatch, store } from "./AppRedux";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (s: Singletons) => {
@@ -40,7 +40,12 @@ export abstract class DialogBase<S extends BaseCompState = any> extends Div<S> i
     /* I added this capability to make the internals of the dialog scroll, but didn't like it ultimately */
     internalScrolling: boolean = false;
 
-    constructor(public title: string, private overrideClass: string, private closeByOutsideClick: boolean, appState: AppState) {
+    /*
+    NOTE: the 'popup' option/arg was experimental and does work just fine, but one additional thing is needed
+    which is to store the browser scroll position in the dialog, so it can be restored back after editing is complete, and the 
+    experimental overrideClass used for testing was "embedded-dlg" 
+    */
+    constructor(public title: string, private overrideClass: string, private closeByOutsideClick: boolean, appState: AppState, private popup: boolean = true) {
         super(null);
         this.appState = appState;
 
@@ -55,27 +60,29 @@ export abstract class DialogBase<S extends BaseCompState = any> extends Div<S> i
         this.opened = true;
         return new Promise<DialogBase>(async (resolve, reject) => {
 
-            // Create dialog container and attach to document.body.
-            this.backdrop = document.createElement("div");
-            this.backdrop.setAttribute("id", DialogBase.BACKDROP_PREFIX + this.getId());
+            if (this.popup) {
+                // Create dialog container and attach to document.body.
+                this.backdrop = document.createElement("div");
+                this.backdrop.setAttribute("id", DialogBase.BACKDROP_PREFIX + this.getId());
 
-            // WARNING: Don't use 'className' here, this is pure javascript.
-            this.backdrop.setAttribute("class", "app-modal");
-            this.backdrop.setAttribute("style", "z-index: " + (++DialogBase.backdropZIndex));
-            document.body.appendChild(this.backdrop);
+                // WARNING: Don't use 'className' here, this is pure javascript, and not React!
+                this.backdrop.setAttribute("class", "app-modal");
+                this.backdrop.setAttribute("style", "z-index: " + (++DialogBase.backdropZIndex));
+                document.body.appendChild(this.backdrop);
 
-            // clicking outside the dialog will close it. We only use this for the main menu of the app, because clicking outside a dialog
-            // is too easy to do while your editing and can cause loss of work/editing.
-            if (this.closeByOutsideClick) {
-                this.backdrop.addEventListener("click", (evt: any) => {
-                    // get our dialog itself.
-                    const contentElm: any = S.util.domElm(this.getId());
+                // clicking outside the dialog will close it. We only use this for the main menu of the app, because clicking outside a dialog
+                // is too easy to do while your editing and can cause loss of work/editing.
+                if (this.closeByOutsideClick) {
+                    this.backdrop.addEventListener("click", (evt: any) => {
+                        // get our dialog itself.
+                        const contentElm: any = S.util.domElm(this.getId());
 
-                    // check if the click was outside the dialog.
-                    if (!!contentElm && !contentElm.contains(evt.target)) {
-                        this.close();
-                    }
-                });
+                        // check if the click was outside the dialog.
+                        if (!!contentElm && !contentElm.contains(evt.target)) {
+                            this.close();
+                        }
+                    });
+                }
             }
 
             /* If the dialog has a function to load from server, call here first */
@@ -84,15 +91,25 @@ export abstract class DialogBase<S extends BaseCompState = any> extends Div<S> i
                 await queryServerPromise;
             }
 
-            // this renders the dlgComp onto the screen (on the backdrop elm)
-            this.domRender();
+            if (this.popup) {
+                // this renders the dlgComp onto the screen (on the backdrop elm)
+                this.domRender();
 
-            if (++DialogBase.refCounter === 1) {
-                /* we only hide and reshow the scroll bar and disable scrolling when we're in mobile mode, because that's when
-                full-screen dialogs are in use, which is when we need this. */
-                if (clientInfo.isMobile) {
-                    document.body.style.overflow = "hidden";
+                if (++DialogBase.refCounter === 1) {
+                    /* we only hide and reshow the scroll bar and disable scrolling when we're in mobile mode, because that's when
+                    full-screen dialogs are in use, which is when we need this. */
+                    if (clientInfo.isMobile) {
+                        document.body.style.overflow = "hidden";
+                    }
                 }
+            }
+            else {
+                dispatch({
+                    type: "Action_OpenDialog",
+                    update: (s: AppState): void => {
+                        s.dialogStack.push(this);
+                    }
+                });
             }
 
             this.resolve = resolve;
@@ -118,17 +135,31 @@ export abstract class DialogBase<S extends BaseCompState = any> extends Div<S> i
         if (!this.opened) return;
         this.opened = false;
         this.resolve(this);
-        if (this.getElement()) {
-            this.preUnmount();
-            ReactDOM.unmountComponentAtNode(this.backdrop);
-            S.util.domElmRemove(this.getId());
-            S.util.domElmRemove(DialogBase.BACKDROP_PREFIX + this.getId());
 
-            if (--DialogBase.refCounter <= 0) {
-                if (clientInfo.isMobile) {
-                    document.body.style.overflow = "auto";
+        if (this.popup) {
+            if (this.getElement()) {
+                this.preUnmount();
+                ReactDOM.unmountComponentAtNode(this.backdrop);
+                S.util.domElmRemove(this.getId());
+                S.util.domElmRemove(DialogBase.BACKDROP_PREFIX + this.getId());
+
+                if (--DialogBase.refCounter <= 0) {
+                    if (clientInfo.isMobile) {
+                        document.body.style.overflow = "auto";
+                    }
                 }
             }
+        }
+        else {
+            dispatch({
+                type: "Action_CloseDialog",
+                update: (s: AppState): void => {
+                    const index = s.dialogStack.indexOf(this);
+                    if (index > -1) {
+                        s.dialogStack.splice(index, 1);
+                    }
+                }
+            });
         }
     }
 

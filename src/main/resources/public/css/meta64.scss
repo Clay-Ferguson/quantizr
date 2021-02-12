@@ -523,6 +523,17 @@ entire thing down some times, if it's jutting up against something */
 
 /* Modal Content/ Dialog Box. This is the outter frame of the dialog itself */
 
+/* class for dialogs that are non-popup types */
+.embedded-dlg {
+    border: 2px solid $modal-content-border-color;
+    margin-top: 20px;
+    margin-left: $smallGap auto;
+    margin-right: $smallGap auto;
+    padding: $smallGap;
+    width: 100%;
+    border-radius: .7em;
+}
+
 .app-modal-content {
     background-color: $modal-content-bg;
     border: 2px solid $modal-content-border-color;

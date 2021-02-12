@@ -1,11 +1,14 @@
 import * as J from "./JavaIntf";
 import { NodeInfo } from "./JavaIntf";
 import { EventInput } from "@fullcalendar/react";
+import { DialogBase } from "./DialogBase";
 
 /* root react Redux state for entire app */
 export class AppState {
     // up until guiReady the main App component will just render "loading..."
     guiReady: boolean = false;
+
+    dialogStack: DialogBase[] = [];
 
     /* text at top of page, when user tries to upLevel too far etc */
     pageMessage: string = null;
