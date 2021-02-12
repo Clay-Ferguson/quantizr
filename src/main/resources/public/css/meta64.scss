@@ -70,8 +70,14 @@ $smallBorderSize: 3px;
 //     }
 // }
 
+.feedClearButton {
+    display: inline-block;
+}
+
 .feedSearchField {
-    max-width: 30em;
+    width: 30em;
+    display: inline-block;
+    margin-right: 5px;
 }
 
 .signupLinkText {

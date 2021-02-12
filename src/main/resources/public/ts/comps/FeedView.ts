@@ -77,8 +77,11 @@ export class FeedView extends Div {
                 FeedView.helpExpanded = state;
             }, FeedView.helpExpanded);
 
-        let searchPanel = new TextField("Search", false, null, "feedSearchField float-right", false, FeedView.searchTextState);
-        children.push(searchPanel);
+        let searchDiv = new ButtonBar([
+            new Span(null, { className: "feedSearchField" }, [new TextField("Search", false, null, null, false, FeedView.searchTextState)]),
+            new Button("Clear", () => { this.clearSearch(); }, { className: "feedClearButton" })
+        ]);
+        children.push(searchDiv);
 
         if (state.feedLoading) {
             children.push(new Heading(4, "Loading feed..."));
@@ -111,6 +114,13 @@ export class FeedView extends Div {
 
         children.push(helpPanel);
         this.setChildren(children);
+    }
+
+    clearSearch = () => {
+        if (FeedView.searchTextState.getValue()) {
+            FeedView.searchTextState.setValue("");
+            FeedView.refresh();
+        }
     }
 
     static refresh = () => {
