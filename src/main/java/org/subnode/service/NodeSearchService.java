@@ -248,8 +248,6 @@ public class NodeSearchService {
 			}
 		}
 
-		MongoSession session = ThreadLocals.getMongoSession();
-		SubNode searchRoot = read.getNode(session, req.getNodeId());
 		HashMap<String, WordStats> wordMap = new HashMap<String, WordStats>();
 		HashMap<String, WordStats> tagMap = new HashMap<String, WordStats>();
 		HashMap<String, WordStats> mentionMap = new HashMap<String, WordStats>();
@@ -294,6 +292,9 @@ public class NodeSearchService {
 		}
 		// Otherwise this is not a Feed Tab query but just an arbitrary node stats request.
 		else {
+			MongoSession session = ThreadLocals.getMongoSession();
+			SubNode searchRoot = read.getNode(session, req.getNodeId());
+			
 			Sort sort = null;
 			int limit = 0;
 			if (req.isTrending()) {
@@ -396,7 +397,10 @@ public class NodeSearchService {
 		sb.append("Unique Words: " + wordList.size());
 		res.setStats(sb.toString());
 
-		analyzeSentences(session, searchRoot, req.isTrending(), res, wordMap, 10);
+		// todo-0: disabled pending refactor to do full node content, not sentences.
+		// analyzeSentences(session, searchRoot, req.isTrending(), res, wordMap, 10);
+		ArrayList<String> list = new ArrayList<String>();
+		res.setTopSentences(list);
 
 		ArrayList<String> topWords = new ArrayList<String>();
 		res.setTopWords(topWords);

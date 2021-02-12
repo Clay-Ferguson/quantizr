@@ -234,6 +234,8 @@ public class MongoRead {
      * </pre>
      */
     public SubNode getNode(MongoSession session, String identifier, boolean allowAuth) {
+        if (identifier == null)
+            return null;
         if (identifier.equals("/")) {
             throw new RuntimeEx(
                     "SubNode doesn't implement the root node. Root is implicit and never needs an actual node to represent it.");
@@ -530,8 +532,8 @@ public class MongoRead {
          */
         Criteria criteria = Criteria.where(SubNode.FIELD_PATH).regex(util.regexRecursiveChildrenOfPath(node.getPath()));
         query.addCriteria(criteria);
-        
-        if (sort!=null) {
+
+        if (sort != null) {
             query.with(sort);
         }
 

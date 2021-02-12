@@ -32,29 +32,38 @@ export class NodeStatsDlg extends DialogBase {
     }
 
     renderDlg = (): CompIntf[] => {
-        let tagPanel = new Div();
-        this.res.topTags.forEach((word: string) => {
-            tagPanel.addChild(new Span(word, {
-                className: "statsWord",
-                onClick: () => this.searchWord(word)
-            }));
-        });
+        let tagPanel = new Div(null, { className: "wordStatsArea" });
+        if (this.res.topTags && this.res.topTags.length > 0) {
+            tagPanel.addChild(new Heading(4, this.trending ? "Hashtags" : "Top Hashtags"));
+            this.res.topTags.forEach((word: string) => {
+                tagPanel.addChild(new Span(word, {
+                    className: "statsWord",
+                    onClick: () => this.searchWord(word)
+                }));
+            });
+        }
 
-        let mentionPanel = new Div();
-        this.res.topMentions.forEach((word: string) => {
-            mentionPanel.addChild(new Span(word, {
-                className: "statsWord",
-                onClick: () => this.searchWord(word)
-            }));
-        });
+        let mentionPanel = new Div(null, { className: "wordStatsArea" });
+        if (this.res.topMentions && this.res.topMentions.length > 0) {
+            mentionPanel.addChild(new Heading(4, this.trending ? "Mentions" : "Top Mentions"));
+            this.res.topMentions.forEach((word: string) => {
+                mentionPanel.addChild(new Span(word, {
+                    className: "statsWord",
+                    onClick: () => this.searchWord(word)
+                }));
+            });
+        }
 
-        let wordPanel = new Div();
-        this.res.topWords.forEach((word: string) => {
-            wordPanel.addChild(new Span(word, {
-                className: "statsWord",
-                onClick: () => this.searchWord(word)
-            }));
-        });
+        let wordPanel = new Div(null, { className: "wordStatsArea" });
+        if (this.res.topWords && this.res.topWords.length > 0) {
+            wordPanel.addChild(new Heading(4, this.trending ? "Words" : "Top Words"));
+            this.res.topWords.forEach((word: string) => {
+                wordPanel.addChild(new Span(word, {
+                    className: "statsWord",
+                    onClick: () => this.searchWord(word)
+                }));
+            });
+        }
 
         let sentences: Comp[] = [];
         this.res.topSentences.forEach((sentence: string) => {
@@ -80,13 +89,8 @@ export class NodeStatsDlg extends DialogBase {
             // with a small server side tweak.
             // sentencePanel,
 
-            tagPanel.childrenExist() ? new Heading(3, this.trending ? "Tags" : "Top Tags") : null,
             tagPanel.childrenExist() ? tagPanel : null,
-
-            mentionPanel.childrenExist() ? new Heading(3, this.trending ? "Mentions" : "Top Mentions") : null,
             mentionPanel.childrenExist() ? mentionPanel : null,
-
-            wordPanel.childrenExist() ? new Heading(3, this.trending ? "Words" : "Top Words") : null,
             wordPanel.childrenExist() ? wordPanel : null,
 
             new CollapsibleHelpPanel("Help: About Node Stats", S.meta64.config.help.nodeStats.dialog,
