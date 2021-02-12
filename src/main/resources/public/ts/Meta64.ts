@@ -122,7 +122,12 @@ export class Meta64 implements Meta64Intf {
         dispatch({
             type: "Action_SelectTab",
             update: (s: AppState): void => {
-                s.activeTab = tabName;
+                if (tabName === "mainTab" && !s.node) {
+                    S.nav.navHome(s);
+                }
+                else {
+                    s.activeTab = tabName;
+                }
             }
         });
     }

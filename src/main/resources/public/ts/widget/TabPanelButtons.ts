@@ -46,12 +46,7 @@ export class TabPanelButtons extends Div {
                         "data-toggle": "tab",
                         className: "nav-link" + (state.activeTab === "mainTab" ? " active" : ""),
                         onClick: () => {
-                            dispatch({
-                                type: "Action_SetTab",
-                                update: (s: AppState): void => {
-                                    s.activeTab = "mainTab";
-                                }
-                            });
+                            S.meta64.selectTab("mainTab");
                         }
                     })]
                 ),
@@ -64,12 +59,7 @@ export class TabPanelButtons extends Div {
                         "data-toggle": "tab",
                         className: "nav-link" + (state.activeTab === "searchTab" ? " active" : ""),
                         onClick: () => {
-                            dispatch({
-                                type: "Action_SetTab",
-                                update: (s: AppState): void => {
-                                    s.activeTab = "searchTab";
-                                }
-                            });
+                            S.meta64.selectTab("searchTab");
                         }
                     })]
                 ),
@@ -82,12 +72,7 @@ export class TabPanelButtons extends Div {
                         "data-toggle": "tab",
                         className: "nav-link" + (state.activeTab === "timelineTab" ? " active" : ""),
                         onClick: () => {
-                            dispatch({
-                                type: "Action_SetTab",
-                                update: (s: AppState): void => {
-                                    s.activeTab = "timelineTab";
-                                }
-                            });
+                            S.meta64.selectTab("timelineTab");
                         }
                     })]
                 ),
@@ -100,12 +85,7 @@ export class TabPanelButtons extends Div {
                         "data-toggle": "tab",
                         className: "nav-link" + (state.activeTab === "feedTab" ? " active" : ""),
                         onClick: () => {
-                            dispatch({
-                                type: "Action_SetTab",
-                                update: (s: AppState): void => {
-                                    s.activeTab = "feedTab";
-                                }
-                            });
+                            S.meta64.selectTab("feedTab");
                         }
                     })]
                 )]
