@@ -1,7 +1,7 @@
 import { AppState } from "../AppState";
+import { Constants as C } from "../Constants";
 import { DialogBase } from "../DialogBase";
 import * as J from "../JavaIntf";
-import { Constants as C } from "../Constants";
 import { PubSub } from "../PubSub";
 import { Singletons } from "../Singletons";
 import { Comp } from "../widget/base/Comp";
@@ -10,8 +10,11 @@ import { Button } from "../widget/Button";
 import { ButtonBar } from "../widget/ButtonBar";
 import { CollapsibleHelpPanel } from "../widget/CollapsibleHelpPanel";
 import { CollapsiblePanel } from "../widget/CollapsiblePanel";
+import { Div } from "../widget/Div";
 import { Heading } from "../widget/Heading";
+import { Span } from "../widget/Span";
 import { TextContent } from "../widget/TextContent";
+import { SearchContentDlg } from "./SearchContentDlg";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (s: Singletons) => {
@@ -28,19 +31,28 @@ export class NodeStatsDlg extends DialogBase {
     }
 
     renderDlg = (): CompIntf[] => {
-        let tagHtml = "";
+        let tagPanel = new Div();
         this.res.topTags.forEach((word: string) => {
-            tagHtml += word + " ";
+            tagPanel.addChild(new Span(word, {
+                className: "statsWord",
+                onClick: () => this.searchWord(word)
+            }));
         });
 
-        let mentionHtml = "";
+        let mentionPanel = new Div();
         this.res.topMentions.forEach((word: string) => {
-            mentionHtml += word + " ";
+            mentionPanel.addChild(new Span(word, {
+                className: "statsWord",
+                onClick: () => this.searchWord(word)
+            }));
         });
 
-        let wordHtml = "";
+        let wordPanel = new Div();
         this.res.topWords.forEach((word: string) => {
-            wordHtml += word + " ";
+            wordPanel.addChild(new Span(word, {
+                className: "statsWord",
+                onClick: () => this.searchWord(word)
+            }));
         });
 
         let sentences: Comp[] = [];
@@ -62,23 +74,24 @@ export class NodeStatsDlg extends DialogBase {
         return [
             new TextContent(this.res.stats, null, false),
 
-            // Needs more tuning (todo-0) need to capture the NODE itself
-            // and not the individual sentences. Trivially easy to do.
+            // Needs more tuning (todo-0) need to capture the NODE content itself
+            // and not the individual sentences in nodes. This is trivially easy to do,
+            // with a small server side tweak.
             // sentencePanel,
 
-            tagHtml ? new Heading(3, "Top 200 Tags") : null,
-            tagHtml ? new TextContent(tagHtml, "wordStatsArea", false) : null,
+            tagPanel.childrenExist() ? new Heading(3, "Top 200 Tags") : null,
+            tagPanel.childrenExist() ? tagPanel : null,
 
-            mentionHtml ? new Heading(3, "Top 200 Mentions") : null,
-            mentionHtml ? new TextContent(mentionHtml, "wordStatsArea", false) : null,
+            mentionPanel.childrenExist() ? new Heading(3, "Top 200 Mentions") : null,
+            mentionPanel.childrenExist() ? mentionPanel : null,
 
-            wordHtml ? new Heading(3, "Top 200 Words") : null,
-            wordHtml ? new TextContent(wordHtml, "wordStatsArea", false) : null,
+            wordPanel.childrenExist() ? new Heading(3, "Top 200 Words") : null,
+            wordPanel.childrenExist() ? wordPanel : null,
 
             new CollapsibleHelpPanel("Help: About Node Stats", S.meta64.config.help.nodeStats.dialog,
-            (state: boolean) => {
-                NodeStatsDlg.helpExpanded = state;
-            }, NodeStatsDlg.helpExpanded),
+                (state: boolean) => {
+                    NodeStatsDlg.helpExpanded = state;
+                }, NodeStatsDlg.helpExpanded),
 
             new ButtonBar([
                 new Button("Ok", () => {
@@ -86,5 +99,11 @@ export class NodeStatsDlg extends DialogBase {
                 }, null, "btn-primary")
             ])
         ];
+    }
+
+    searchWord = (word: string) => {
+        this.close();
+        SearchContentDlg.defaultSearchText = word;
+        new SearchContentDlg(this.appState).open(); 
     }
 }

@@ -97,6 +97,15 @@ $smallBorderSize: 3px;
     overflow-y: auto;
 }
 
+.statsWord {
+    margin-right: $smallGap;
+    display: inline-block;
+    cursor: pointer;
+    // border: 1px solid cadetblue;
+    // padding: 3px;
+    // border-radius: 3px;
+}
+
 .wordStatsArea {
     font-family: Courier New,Courier,Lucida Sans Typewriter,Lucida Typewriter,monospace;
     font-size: 110%;
