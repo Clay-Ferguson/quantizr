@@ -240,8 +240,8 @@ public class UserFeedService {
 
 		if (!StringUtils.isEmpty(req.getSearchText())) {
 			TextCriteria textCriteria = TextCriteria.forDefaultLanguage();
-			MongoRead.populateTextCriteria(textCriteria, req.getSearchText());
-			textCriteria.caseSensitive(true);
+			textCriteria.matching(req.getSearchText());
+			textCriteria.caseSensitive(false);
 			query.addCriteria(textCriteria);
 		}
 

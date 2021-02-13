@@ -97,6 +97,7 @@ help:
         <li>To search for a multi-word phrase enclose it in double quotes.</li>
         <li>To find substrings in words use the "Fuzzy Search" option.</li>
         <li>To find all nodes that contain any of a list words enter the words with spaces between them</li>
-        <li>To exclude search results that contain some word, put a '-' (minus) right in front of the word.</li>
-        <li>To exclude a phrase put a minus as the first character. Example: "-my short phrase"</li>
+        <li>To exclude search results that contain some word, put a '-' (minus) right in front of the word (or right in front of a quoted string)</li>
+        <li>Normally searching will find *any* of the words you enter, however if you want to require *all* words to be found
+        then enclose each word in a double quotes</li>
       </ul>

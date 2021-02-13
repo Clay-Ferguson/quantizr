@@ -2,8 +2,6 @@ package org.subnode.mongo;
 
 import java.util.LinkedList;
 import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import org.apache.commons.lang3.StringUtils;
 import org.bson.types.ObjectId;
 import org.slf4j.Logger;
@@ -667,7 +665,7 @@ public class MongoRead {
                 // YourDocumentType.class);
 
                 TextCriteria textCriteria = TextCriteria.forDefaultLanguage();
-                populateTextCriteria(textCriteria, text);
+                textCriteria.matching(text);
                 textCriteria.caseSensitive(caseSensitive);
                 query.addCriteria(textCriteria);
             }
@@ -711,40 +709,6 @@ public class MongoRead {
         query.addCriteria(criteria);
 
         return getOps(session).find(query, SubNode.class);
-    }
-
-    /*
-     * Builds the 'criteria' object using the kind of searching Google does where anything in quotes is
-     * considered a phrase and anything else separated by spaces are separate search terms.
-     */
-    public static void populateTextCriteria(TextCriteria criteria, String text) {
-        String regex = "\"([^\"]*)\"|(\\S+)";
-
-        Matcher m = Pattern.compile(regex).matcher(text);
-        while (m.find()) {
-            if (m.group(1) != null) {
-                String str = m.group(1);
-
-                if (str.startsWith("-")) {
-                    str = str.substring(1);
-                    // log.debug("SEARCH: quoted not [" + str + "]");
-                    criteria.notMatchingPhrase(str);
-                } else {
-                    // log.debug("SEARCH: Quoted [" + str + "]");
-                    criteria.matchingPhrase(str);
-                }
-            } else {
-                String str = m.group(2);
-                if (str.startsWith("-")) {
-                    str = str.substring(1);
-                    // log.debug("SEARCH: not [" + str + "]");
-                    criteria.notMatching(str);
-                } else {
-                    // log.debug("SEARCH: Plain [" + str + "]");
-                    criteria.matching(str);
-                }
-            }
-        }
     }
 
     /*

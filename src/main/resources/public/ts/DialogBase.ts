@@ -42,8 +42,8 @@ export abstract class DialogBase<S extends BaseCompState = any> extends Div<S> i
 
     /*
     NOTE: the 'popup' option/arg was experimental and does work just fine, but one additional thing is needed
-    which is to store the browser scroll position in the dialog, so it can be restored back after editing is complete, and the 
-    experimental overrideClass used for testing was "embedded-dlg" 
+    which is to store the browser scroll position in the dialog, so it can be restored back after editing is complete, and the
+    experimental overrideClass used for testing was "embedded-dlg"
     */
     constructor(public title: string, private overrideClass: string, private closeByOutsideClick: boolean, appState: AppState, private popup: boolean = true) {
         super(null);

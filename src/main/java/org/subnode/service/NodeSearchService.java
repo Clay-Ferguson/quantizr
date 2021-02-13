@@ -124,8 +124,8 @@ public class NodeSearchService {
 				TextCriteria textCriteria = null;
 				if (!StringUtil.isEmpty(req.getSearchText())) {
 					textCriteria = TextCriteria.forDefaultLanguage();
-					MongoRead.populateTextCriteria(textCriteria, req.getSearchText());
-					textCriteria.caseSensitive(false);
+					textCriteria.matching(req.getSearchText());
+					textCriteria.caseSensitive(req.getCaseSensitive());
 				}
 
 				Criteria moreCriteria = null;
@@ -294,7 +294,7 @@ public class NodeSearchService {
 		else {
 			MongoSession session = ThreadLocals.getMongoSession();
 			SubNode searchRoot = read.getNode(session, req.getNodeId());
-			
+
 			Sort sort = null;
 			int limit = 0;
 			if (req.isTrending()) {
