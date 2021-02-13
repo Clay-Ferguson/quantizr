@@ -107,7 +107,7 @@ export class App extends Div {
 
             let prefsButton = !fullScreenViewer ? new IconButton("fa-certificate", null, {
                 onClick: e => { S.edit.toggleShowMetaData(state); },
-                title: state.userPreferences.showMetaData ? "Hide node metadata" : "Show node metadata"
+                title: state.userPreferences.showMetaData ? "Hide Avatars and Metadata" : "Show Avatars and Metadata"
             }, "btn-secondary floatingControlBarItem", state.userPreferences.showMetaData ? "on" : "off") : null;
 
             let rootButton = !state.isAnonUser ? new IconButton("fa-database", null, {
