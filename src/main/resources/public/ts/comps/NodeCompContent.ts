@@ -18,17 +18,12 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
 /* General Widget that doesn't fit any more reusable or specific category other than a plain Div, but inherits capability of Comp class */
 export class NodeCompContent extends Div {
 
-    static showRowHeader: boolean = true;
     domPreUpdateFunc: Function;
 
     constructor(public node: J.NodeInfo, public rowStyling: boolean, public showHeader: boolean, public idPrefix?: string, public isFeed?: boolean, public imgSizeOverride?: string) {
         super(null, {
             id: (idPrefix ? idPrefix : "c") + node.id
         });
-
-        if (!NodeCompContent.showRowHeader) {
-            this.showHeader = false;
-        }
     }
 
     preRender(): void {

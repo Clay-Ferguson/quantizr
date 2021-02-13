@@ -88,7 +88,9 @@ public class NodeSearchService {
 		if (StringUtil.isEmpty(searchText) && //
 				!req.isUserSearch() && //
 				!req.isLocalUserSearch() && //
-				!req.isForeignUserSearch()) {
+				!req.isForeignUserSearch() &&
+				//note: for timelines this is called but with a sort
+				StringUtil.isEmpty(req.getSortField())) {
 			throw new RuntimeException("Search text required.");
 		}
 

@@ -8,11 +8,8 @@ import { SearchIntf } from "./intf/SearchIntf";
 import * as J from "./JavaIntf";
 import { PubSub } from "./PubSub";
 import { Singletons } from "./Singletons";
-import { State } from "./State";
 import { Comp } from "./widget/base/Comp";
-import { Button } from "./widget/Button";
 import { Div } from "./widget/Div";
-import { HorizontalLayout } from "./widget/HorizontalLayout";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (s: Singletons) => {
@@ -193,7 +190,7 @@ export class Search implements SearchIntf {
             onClick: S.meta64.getNodeFunc(this.cached_clickOnSearchResultRow, "S.srch.clickOnSearchResultRow", node.id),
             id: cssId
         }, [
-            new NodeCompRowHeader(node, isFeed, true),
+            new NodeCompRowHeader(node, true, isFeed, true),
             content,
             new NodeCompRowFooter(node, isFeed)
         ]);
