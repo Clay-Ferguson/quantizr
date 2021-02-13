@@ -411,14 +411,14 @@ export class Render implements RenderIntf {
          */
         const layout = S.props.getNodePropVal(J.NodeProp.LAYOUT, node);
         if (!layout || layout === "v") {
-            return new NodeCompVerticalRowLayout(node, level, allowNodeMove, allowAvatars, true);
+            return new NodeCompVerticalRowLayout(node, level, allowNodeMove, true);
         }
         else if (layout.indexOf("c") === 0) {
-            return new NodeCompTableRowLayout(node, level, layout, allowNodeMove, allowAvatars, true);
+            return new NodeCompTableRowLayout(node, level, layout, allowNodeMove, true);
         }
         else {
             // of no layout is valid, fall back on vertical.
-            return new NodeCompVerticalRowLayout(node, level, allowNodeMove, allowAvatars, true);
+            return new NodeCompVerticalRowLayout(node, level, allowNodeMove, true);
         }
     }
 

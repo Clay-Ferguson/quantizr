@@ -38,8 +38,8 @@ export class WelcomePanel extends Div {
         if (this.getState().welcomeNode) {
             this.setChildren([
                 new NodeCompContent(this.getState().welcomeNode, false, false, null, null, null),
-                !clientInfo.isMobile ? new NodeCompTableRowLayout(this.getState().welcomeNode, 1, "c", false, false, false)
-                    : new NodeCompVerticalRowLayout(this.getState().welcomeNode, 1, false, false, false)
+                !clientInfo.isMobile ? new NodeCompTableRowLayout(this.getState().welcomeNode, 1, "c", false, false)
+                    : new NodeCompVerticalRowLayout(this.getState().welcomeNode, 1, false, false)
             ]);
         }
         else {

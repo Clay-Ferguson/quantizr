@@ -193,7 +193,7 @@ export class Search implements SearchIntf {
             onClick: S.meta64.getNodeFunc(this.cached_clickOnSearchResultRow, "S.srch.clickOnSearchResultRow", node.id),
             id: cssId
         }, [
-            new NodeCompRowHeader(node, allowAvatars, isFeed, true),
+            new NodeCompRowHeader(node, isFeed, true),
             content,
             new NodeCompRowFooter(node, isFeed)
         ]);

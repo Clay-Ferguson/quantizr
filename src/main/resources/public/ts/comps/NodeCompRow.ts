@@ -27,7 +27,7 @@ export class NodeCompRow extends Div {
     static showButtonBar: boolean = true;
 
     constructor(public node: J.NodeInfo, public index: number, public count: number, public rowCount: number, public level: number,
-        public isTableCell: boolean, public allowNodeMove: boolean, public imgSizeOverride: string, private allowAvatars: boolean, private allowHeaders: boolean,
+        public isTableCell: boolean, public allowNodeMove: boolean, public imgSizeOverride: string, private allowHeaders: boolean,
         appState: AppState) {
         super(null, {
             id: S.nav._UID_ROWID_PREFIX + node.id
@@ -93,7 +93,7 @@ export class NodeCompRow extends Div {
 
         let buttonBar: Comp = null;
         if (this.allowHeaders && NodeCompRow.showButtonBar && !state.inlineEditId) {
-            buttonBar = new NodeCompButtonBar(node, this.allowAvatars, this.allowNodeMove, this.level, this.isTableCell ? [insertInlineButton] : null);
+            buttonBar = new NodeCompButtonBar(node, this.allowNodeMove, this.level, this.isTableCell ? [insertInlineButton] : null);
         }
 
         let layoutClass = this.isTableCell ? "node-grid-item" : "node-table-row";

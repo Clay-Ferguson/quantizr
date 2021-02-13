@@ -30,12 +30,8 @@ export class NodeCompRowHeader extends Div {
         let node = this.node;
         let children = [];
         // console.log("NodeCompHeaderRow: " + S.util.prettyPrint(node));
-
-        // todo-0: had a NPE here where 'state.node' is null. Check this in other places.
-        let isPageRootOrDifferentOwner = state.node && (node.id === state.node.id || node.owner !== state.node.owner);
-
         let avatarImg: Img = null;
-        if ((this.allowAvatars || (state.node && node.id === state.node.id)) && node.owner !== J.PrincipalName.ADMIN && isPageRootOrDifferentOwner) {
+        if (this.allowAvatars && node.owner !== J.PrincipalName.ADMIN) {
             avatarImg = S.render.makeAvatarImage(node, state);
             if (avatarImg) {
                 children.push(avatarImg);
