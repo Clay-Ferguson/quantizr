@@ -35,7 +35,6 @@ import org.subnode.response.NodeSearchResponse;
 import org.subnode.util.Convert;
 import org.subnode.util.EnglishDictionary;
 import org.subnode.util.ThreadLocals;
-import opennlp.tools.util.StringUtil;
 
 /**
  * Service for searching the repository. This searching is currently very basic, and just grabs the
@@ -85,10 +84,10 @@ public class NodeSearchService {
 		int MAX_NODES = 100;
 
 		String searchText = req.getSearchText();
-		if (StringUtil.isEmpty(searchText) && //
-				StringUtil.isEmpty(req.getUserSearchType()) && //
+		if (StringUtils.isEmpty(searchText) && //
+				StringUtils.isEmpty(req.getUserSearchType()) && //
 				// note: for timelines this is called but with a sort
-				StringUtil.isEmpty(req.getSortField())) {
+				StringUtils.isEmpty(req.getSortField())) {
 			throw new RuntimeException("Search text required.");
 		}
 
@@ -122,7 +121,7 @@ public class NodeSearchService {
 			if (!StringUtils.isEmpty(req.getUserSearchType())) {
 
 				TextCriteria textCriteria = null;
-				if (!StringUtil.isEmpty(req.getSearchText())) {
+				if (!StringUtils.isEmpty(req.getSearchText())) {
 					textCriteria = TextCriteria.forDefaultLanguage();
 					textCriteria.matching(req.getSearchText());
 					textCriteria.caseSensitive(req.getCaseSensitive());
