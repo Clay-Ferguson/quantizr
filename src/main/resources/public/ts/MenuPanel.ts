@@ -7,6 +7,7 @@ import { MediaRecorderDlg } from "./dlg/MediaRecorderDlg";
 import { SearchByIDDlg } from "./dlg/SearchByIDDlg";
 import { SearchByNameDlg } from "./dlg/SearchByNameDlg";
 import { SearchContentDlg } from "./dlg/SearchContentDlg";
+import { SearchUsersDlg } from "./dlg/SearchUsersDlg";
 import { SplitNodeDlg } from "./dlg/SplitNodeDlg";
 import { TransferNodeDlg } from "./dlg/TransferNodeDlg";
 import { TypeHandlerIntf } from "./intf/TypeHandlerIntf";
@@ -127,6 +128,11 @@ export class MenuPanel extends Div {
                 !state.isAnonUser && !!hltNode), //
 
             new MenuItem("By ID", () => { new SearchByIDDlg(state).open(); }, //
+                !state.isAnonUser && !!hltNode), //
+
+            new MenuItemSeparator(), //
+
+            new MenuItem("Find Users", () => { new SearchUsersDlg(state).open(); }, //
                 !state.isAnonUser && !!hltNode) //
 
             // new MenuItem("Files", nav.searchFiles, () => { return  !state.isAnonUser && S.meta64.allowFileSystemSearch },
@@ -175,7 +181,7 @@ export class MenuPanel extends Div {
             new MenuItem("Show Raw Data", () => S.view.runServerCommand("getJson", "Node JSON Data", "The actual data stored on the server for this node...", state), //
                 !state.isAnonUser && selNodeIsMine), //
 
-                new MenuItemSeparator(), //
+            new MenuItemSeparator(), //
 
             // Warning: this can put heavy load on server. Maybe make this kinda thing a "paid" feature?
             new MenuItem("Node Stats", () => S.view.getNodeStats(state, false, false), //

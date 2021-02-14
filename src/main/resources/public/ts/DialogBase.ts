@@ -229,7 +229,14 @@ export abstract class DialogBase<S extends BaseCompState = any> extends Div<S> i
             };
         }
 
-        const contentDiv = new Div(null, contentAttribs, this.renderDlg());
+        let renderComps: CompIntf[] = null;
+        try {
+            renderComps = this.renderDlg();
+        }
+        catch (ex) {
+            S.util.logAndReThrow("renderDlg failed on " + this.getId(), ex);
+        }
+        const contentDiv = new Div(null, contentAttribs, renderComps);
         children.push(contentDiv);
 
         let buttons: CompIntf = this.renderButtons();

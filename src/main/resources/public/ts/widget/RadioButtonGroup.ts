@@ -18,7 +18,7 @@ export class RadioButtonGroup extends Comp {
         this.setChildren(initialButtons);
 
         initialButtons.forEach(function(row: RadioButton) {
-            if (row.attribs.checked === "checked") {
+            if (row && row.attribs && row.attribs.checked === "checked") {
                 this.attribs.selected = (<any>row.attribs).name;
             }
         }, this);

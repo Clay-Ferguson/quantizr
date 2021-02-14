@@ -86,10 +86,8 @@ public class NodeSearchService {
 
 		String searchText = req.getSearchText();
 		if (StringUtil.isEmpty(searchText) && //
-				!req.isUserSearch() && //
-				!req.isLocalUserSearch() && //
-				!req.isForeignUserSearch() &&
-				//note: for timelines this is called but with a sort
+				StringUtil.isEmpty(req.getUserSearchType()) && //
+				// note: for timelines this is called but with a sort
 				StringUtil.isEmpty(req.getSortField())) {
 			throw new RuntimeException("Search text required.");
 		}
@@ -120,8 +118,8 @@ public class NodeSearchService {
 		}
 		// othwerwise we're searching all node properties
 		else {
-			/* If we're searching just for users do this */
-			if (req.isUserSearch() || req.isLocalUserSearch() || req.isForeignUserSearch()) {
+			/* If we're searching just for users do this. */
+			if (!StringUtils.isEmpty(req.getUserSearchType())) {
 
 				TextCriteria textCriteria = null;
 				if (!StringUtil.isEmpty(req.getSearchText())) {
@@ -132,12 +130,12 @@ public class NodeSearchService {
 
 				Criteria moreCriteria = null;
 				// searching only Foreign users
-				if (req.isForeignUserSearch()) {
+				if ("foreign".equals(req.getUserSearchType())) {
 					moreCriteria =
 							Criteria.where(SubNode.FIELD_PROPERTIES + "." + NodeProp.ACT_PUB_ACTOR_URL.s() + ".value").ne(null);
 				}
 				// searching only Local users
-				else if (req.isLocalUserSearch()) {
+				else if ("local".equals(req.getUserSearchType())) {
 					moreCriteria =
 							Criteria.where(SubNode.FIELD_PROPERTIES + "." + NodeProp.ACT_PUB_ACTOR_URL.s() + ".value").is(null);
 				}

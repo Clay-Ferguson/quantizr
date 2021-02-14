@@ -9,27 +9,27 @@ import { CompIntf } from "../widget/base/CompIntf";
 import { Button } from "../widget/Button";
 import { ButtonBar } from "../widget/ButtonBar";
 import { Checkbox } from "../widget/Checkbox";
+import { CollapsibleHelpPanel } from "../widget/CollapsibleHelpPanel";
 import { Form } from "../widget/Form";
 import { HorizontalLayout } from "../widget/HorizontalLayout";
-import { TextContent } from "../widget/TextContent";
+import { RadioButton } from "../widget/RadioButton";
+import { RadioButtonGroup } from "../widget/RadioButtonGroup";
 import { TextField } from "../widget/TextField";
 import { MessageDlg } from "./MessageDlg";
-import { CollapsibleHelpPanel } from "../widget/CollapsibleHelpPanel";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
     S = ctx;
 });
 
-export class SearchContentDlg extends DialogBase {
-
+export class SearchUsersDlg extends DialogBase {
     static helpExpanded: boolean = false;
     static defaultSearchText: string = "";
     searchTextField: TextField;
     searchTextState: ValidatedState<any> = new ValidatedState<any>();
 
     constructor(state: AppState) {
-        super("Search Content", "app-modal-content-medium-width", null, state);
+        super("Search Users", "app-modal-content-medium-width", null, state);
         S.srch.searchText = null;
 
         this.whenElm((elm: HTMLElement) => {
@@ -38,28 +38,67 @@ export class SearchContentDlg extends DialogBase {
 
         this.mergeState({
             fuzzy: false,
+            userSearchType: "local",
             caseSensitive: false
         });
-        this.searchTextState.setValue(SearchContentDlg.defaultSearchText);
+        this.searchTextState.setValue(SearchUsersDlg.defaultSearchText);
     }
 
     validate = (): boolean => {
         let valid = true;
-        if (!this.searchTextState.getValue()) {
-            this.searchTextState.setError("Cannot be empty.");
-            valid = false;
-        }
-        else {
-            this.searchTextState.setError(null);
-        }
+
+        // disable this for now since userSearch doesn't need this check
+        // todo-0: but do this if "all" checkbox isn't checked
+        // if (!this.searchTextState.getValue()) {
+        //     this.searchTextState.setError("Cannot be empty.");
+        //     valid = false;
+        // }
+        // else {
+        //     this.searchTextState.setError(null);
+        // }
+
         return valid;
     }
 
     renderDlg(): CompIntf[] {
+        let adminOptions = null;
+
+        adminOptions = new RadioButtonGroup([
+            this.appState.isAdminUser ? new RadioButton("Search All Users", false, "optionsGroup", null, {
+                setValue: (checked: boolean): void => {
+                    if (checked) {
+                        this.mergeState({ userSearchType: "all" });
+                    }
+                },
+                getValue: (): boolean => {
+                    return this.getState().userSearchType === "all";
+                }
+            }) : null,
+            new RadioButton("Search Local Users", true, "optionsGroup", null, {
+                setValue: (checked: boolean): void => {
+                    if (checked) {
+                        this.mergeState({ userSearchType: "local" });
+                    }
+                },
+                getValue: (): boolean => {
+                    return this.getState().userSearchType === "local";
+                }
+            }),
+            new RadioButton("Search Foreign Users", false, "optionsGroup", null, {
+                setValue: (checked: boolean): void => {
+                    if (checked) {
+                        this.mergeState({ userSearchType: "foreign" });
+                    }
+                },
+                getValue: (): boolean => {
+                    return this.getState().userSearchType === "foreign";
+                }
+            })
+        ], "marginBottom");
+
         return [
             new Form(null, [
-                new TextContent("All sub-nodes under the selected node will be searched."),
-                this.searchTextField = new TextField("Search", false, this.search, null, false, this.searchTextState),
+                this.searchTextField = new TextField("User Name", false, this.search, null, false, this.searchTextState),
                 new HorizontalLayout([
                     new Checkbox("Fuzzy Search (slower)", null, {
                         setValue: (checked: boolean): void => {
@@ -78,39 +117,20 @@ export class SearchContentDlg extends DialogBase {
                         }
                     })
                 ], "marginBottom"),
+                adminOptions,
                 new CollapsibleHelpPanel("Help", S.meta64.config.help.search.dialog,
                     (state: boolean) => {
-                        SearchContentDlg.helpExpanded = state;
-                    }, SearchContentDlg.helpExpanded),
+                        SearchUsersDlg.helpExpanded = state;
+                    }, SearchUsersDlg.helpExpanded),
                 new ButtonBar([
                     new Button("Search", this.search, null, "btn-primary"),
-                    new Button("Graph", this.graph, null, "btn-primary"),
+                    // this Graph button will work, but why graph users? ... there are no linkages between them... yet.
+                    // new Button("Graph", this.graph, null, "btn-primary"),
+                    // we can steal the 'graph' from from the other dialogs when needed.
                     new Button("Close", this.close)
                 ])
             ])
         ];
-    }
-
-    graph = () => {
-        if (!this.validate()) {
-            return;
-        }
-
-        if (!S.util.ajaxReady("searchNodes")) {
-            return;
-        }
-
-        // until we have better validation
-        let node = S.meta64.getHighlightedNode(this.appState);
-        if (!node) {
-            S.util.showMessage("No node is selected to search under.", "Warning");
-            return;
-        }
-
-        SearchContentDlg.defaultSearchText = this.searchTextState.getValue();
-
-        this.close();
-        S.render.showGraph(null, SearchContentDlg.defaultSearchText, this.appState);
     }
 
     search = () => {
@@ -129,24 +149,25 @@ export class SearchContentDlg extends DialogBase {
             return;
         }
 
-        SearchContentDlg.defaultSearchText = S.srch.searchText = this.searchTextState.getValue();
+        SearchUsersDlg.defaultSearchText = S.srch.searchText = this.searchTextState.getValue();
 
         S.util.ajax<J.NodeSearchRequest, J.NodeSearchResponse>("nodeSearch", {
             nodeId: node.id,
-            searchText: SearchContentDlg.defaultSearchText,
+            searchText: SearchUsersDlg.defaultSearchText,
             sortDir: "",
             sortField: "",
             searchProp: "",
             fuzzy: this.getState().fuzzy,
             caseSensitive: this.getState().caseSensitive,
-            userSearchType: null,
+            userSearchType: this.getState().userSearchType,
             searchDefinition: ""
         }, this.searchNodesResponse);
     }
 
     searchNodesResponse = (res: J.NodeSearchResponse) => {
         if (S.srch.numSearchResults(res) > 0) {
-            S.srch.searchNodesResponse(res, "Search results for: " + SearchContentDlg.defaultSearchText);
+            let desc = "Search of Users for: " + SearchUsersDlg.defaultSearchText;
+            S.srch.searchNodesResponse(res, desc);
             this.close();
         }
         else {

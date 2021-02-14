@@ -25,9 +25,7 @@ public class NodeSearchRequest extends RequestBase {
 	//special definition name for pre-defined searches like "AllUserSharedNodes", or "AllPublicNodes"
 	private String searchDefinition;
 
-	private boolean userSearch;
-	private boolean localUserSearch;
-	private boolean foreignUserSearch;
+	private String userSearchType;
 
 	public String getNodeId() {
 		return nodeId;
@@ -93,27 +91,11 @@ public class NodeSearchRequest extends RequestBase {
 		this.searchDefinition = searchDefinition;
 	}
 
-	public boolean isUserSearch() {
-		return userSearch;
+	public String getUserSearchType() {
+		return userSearchType;
 	}
 
-	public void setUserSearch(boolean userSearch) {
-		this.userSearch = userSearch;
-	}
-
-	public boolean isLocalUserSearch() {
-		return localUserSearch;
-	}
-
-	public void setLocalUserSearch(boolean localUserSearch) {
-		this.localUserSearch = localUserSearch;
-	}
-
-	public boolean isForeignUserSearch() {
-		return foreignUserSearch;
-	}
-
-	public void setForeignUserSearch(boolean foreignUserSearch) {
-		this.foreignUserSearch = foreignUserSearch;
+	public void setUserSearchType(String userSearchType) {
+		this.userSearchType = userSearchType;
 	}
 }

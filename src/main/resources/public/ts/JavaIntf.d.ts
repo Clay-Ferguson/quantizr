@@ -183,9 +183,7 @@ export interface NodeSearchRequest extends RequestBase {
     fuzzy: boolean;
     caseSensitive: boolean;
     searchDefinition: string;
-    userSearch: boolean;
-    localUserSearch: boolean;
-    foreignUserSearch: boolean;
+    userSearchType: string;
 }
 
 export interface OpenSystemFileRequest extends RequestBase {
