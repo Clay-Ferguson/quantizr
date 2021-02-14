@@ -30,7 +30,6 @@ export class RssTypeHandler extends TypeBase {
 
     // NOTE: Same value appears in RSSFeedService.ts
     static MAX_FEED_ITEMS: number = 200;
-
     static expansionState: any = {};
 
     constructor() {
@@ -88,10 +87,7 @@ export class RssTypeHandler extends TypeBase {
         }
 
         let feedSrcHash = S.util.hashOfString(feedSrc);
-        let content = node.content;
-        let itemListContainer: Div = new Div("", { className: "rss-feed-listing" }, [
-            new Heading(3, content)
-        ]);
+        let itemListContainer: Div = new Div("", { className: "rss-feed-listing" });
 
         let parser = new RssParser({
             customFields: {
@@ -159,10 +155,24 @@ export class RssTypeHandler extends TypeBase {
         return itemListContainer;
     }
 
+    stripHtml = (val: string): string => {
+        if (!val) return val;
+        // console.log(" INPUT: " + val);
+        val = S.util.replaceAll(val, "<br>", "\n");
+        val = S.util.replaceAll(val, "<p>", "\n");
+        val = val.replace(/<[^>]*>?/gm, "");
+        val = S.util.replaceAll(val, "\n\n\n", "<br>");
+        val = S.util.replaceAll(val, "\n\n", "<br>");
+        val = S.util.replaceAll(val, "\n", "<br>");
+        // console.log("OUTPUT: " + val);
+        return val;
+    }
+
     renderItem(feed: any, feedSrc: string, itemListContainer: Comp, state: AppState) {
         let feedOut: Comp[] = [];
         // console.log("FEED: " + S.util.prettyPrint(feed));
 
+        /* Main Feed Image */
         if (feed.image) {
             feedOut.push(new Img(null, {
                 className: "rss-feed-image",
@@ -179,6 +189,7 @@ export class RssTypeHandler extends TypeBase {
             }));
         }
 
+        /* Main Feed Title */
         if (feed.title) {
             if (feed.link) {
                 feedOut.push(new Anchor(feed.link, feed.title, {
@@ -196,7 +207,7 @@ export class RssTypeHandler extends TypeBase {
         feedOut.push(new Div(null, { className: "clearBoth" }));
 
         if (feed.description) {
-            feedOut.push(new Html(feed.description));
+            feedOut.push(new Div(this.stripHtml(feed.description)));
         }
 
         // A bit of a hack to avoid showing the feed URL of our own aggregate feeds. We could publish this but no need to and
@@ -214,6 +225,7 @@ export class RssTypeHandler extends TypeBase {
         let itemCount = 0;
 
         for (let item of feed.items) {
+            // console.log("FEED ITEM: " + S.util.prettyPrint(item));
             itemListContainer.getChildren().push(this.buildFeedItem(feed, item, state));
             if (++itemCount >= RssTypeHandler.MAX_FEED_ITEMS) {
                 break;
@@ -226,6 +238,7 @@ export class RssTypeHandler extends TypeBase {
         let headerDivChildren = [];
 
         if (entry.mediaThumbnail && entry.mediaThumbnail.$) {
+            console.log("mediaThumbnail: " + entry.mediaThumbnail.$.url);
             let style: any = {};
 
             if (entry.mediaThumbnail.$.width) {
@@ -244,6 +257,7 @@ export class RssTypeHandler extends TypeBase {
             }));
         }
         else if (entry.itunesImage && entry.itunesImage.$) {
+            // console.log("mediaThumbnail: " + entry.itunesImage.$.href);
             headerDivChildren.push(new Img(null, {
                 className: "rss-feed-image",
                 src: entry.itunesImage.$.href,
@@ -297,22 +311,21 @@ export class RssTypeHandler extends TypeBase {
         }
 
         children.push(new Div(null, { className: "clearBoth" }));
-        let contentDiv = null;
+
+        let textContent = null;
         if (entry.content) {
-            /* set the dangerously flag for this stuff and render as html */
-            contentDiv = new Html(entry.content);
+            textContent = entry.content;
         }
         else if (entry["content:encoded"]) {
-            /* set the dangerously flag for this stuff and render as html */
-            contentDiv = new Html(entry["content:encoded"]);
+            textContent = entry["content:encoded"];
         }
         else if (entry.contentSnippet) {
-            contentDiv = new Html(entry.contentSnippet);
+            textContent = entry.contentSnippet;
         }
 
-        if (contentDiv) {
+        if (textContent) {
             children.push(new CollapsiblePanel(null, null, null, [
-               contentDiv
+                new Html(this.stripHtml(textContent))
             ], false,
                 (state: boolean) => {
                     RssTypeHandler.expansionState[entry.guid] = state;
