@@ -94,7 +94,7 @@ export class SearchByNameDlg extends DialogBase {
 
     searchNodesResponse = (res: J.NodeSearchResponse) => {
         if (S.srch.numSearchResults(res) > 0) {
-            S.srch.searchNodesResponse(res, "Search for node " + this.searchTextState.getValue());
+            S.srch.searchNodesResponse(res, "Search for node " + this.searchTextState.getValue(), false);
             this.close();
         }
         else {

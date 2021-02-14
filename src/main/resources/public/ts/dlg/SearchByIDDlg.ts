@@ -93,7 +93,7 @@ export class SearchByIDDlg extends DialogBase {
 
     searchNodesResponse = (res: J.NodeSearchResponse) => {
         if (S.srch.numSearchResults(res) > 0) {
-            S.srch.searchNodesResponse(res, "Showing search for ID " + SearchByIDDlg.defaultSearchText);
+            S.srch.searchNodesResponse(res, "Showing search for ID " + SearchByIDDlg.defaultSearchText, false);
             this.close();
         }
         else {

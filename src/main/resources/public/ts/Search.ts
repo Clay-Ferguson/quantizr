@@ -40,11 +40,12 @@ export class Search implements SearchIntf {
             ? res.searchResults.length : 0;
     }
 
-    searchNodesResponse = (res: J.NodeSearchResponse, searchDescription: string) => {
+    searchNodesResponse = (res: J.NodeSearchResponse, searchDescription: string, isUserSearch: boolean) => {
         dispatch({
             type: "Action_RenderSearchResults",
             update: (s: AppState): void => {
                 s.searchResults = res.searchResults;
+                s.isUserSearch = isUserSearch;
                 s.searchDescription = searchDescription;
             }
         });
@@ -141,14 +142,14 @@ export class Search implements SearchIntf {
     /*
      * Renders a single line of search results on the search results page.
      */
-    renderSearchResultAsListItem = (node: J.NodeInfo, index: number, count: number, rowCount: number, prefix: string, isFeed: boolean, isParent: boolean, allowAvatars: boolean, state: AppState): Comp => {
+    renderSearchResultAsListItem = (node: J.NodeInfo, index: number, count: number, rowCount: number, prefix: string, isFeed: boolean, isParent: boolean, allowAvatars: boolean, jumpButton: boolean, state: AppState): Comp => {
         if (!node) return;
 
         /* If there's a parent on this node it's a 'feed' item and this parent is what the user was replyig to so we display it just above the
         item we are rendering */
         let parentItem: Comp = null;
         if (node.parent) {
-            parentItem = this.renderSearchResultAsListItem(node.parent, index, count, rowCount, prefix, isFeed, true, allowAvatars, state);
+            parentItem = this.renderSearchResultAsListItem(node.parent, index, count, rowCount, prefix, isFeed, true, allowAvatars, jumpButton, state);
         }
 
         const cssId = this._UID_ROWID_PREFIX + node.id;
@@ -188,7 +189,7 @@ export class Search implements SearchIntf {
             onClick: S.meta64.getNodeFunc(this.cached_clickOnSearchResultRow, "S.srch.clickOnSearchResultRow", node.id),
             id: cssId
         }, [
-            new NodeCompRowHeader(node, true, isFeed, true),
+            new NodeCompRowHeader(node, true, isFeed, jumpButton),
             content,
             new NodeCompRowFooter(node, isFeed)
         ]);

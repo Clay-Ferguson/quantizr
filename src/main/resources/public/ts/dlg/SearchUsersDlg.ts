@@ -167,7 +167,7 @@ export class SearchUsersDlg extends DialogBase {
     searchNodesResponse = (res: J.NodeSearchResponse) => {
         if (S.srch.numSearchResults(res) > 0) {
             let desc = "Search of Users for: " + SearchUsersDlg.defaultSearchText;
-            S.srch.searchNodesResponse(res, desc);
+            S.srch.searchNodesResponse(res, desc, true);
             this.close();
         }
         else {

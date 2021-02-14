@@ -133,7 +133,7 @@ export class MenuPanel extends Div {
             new MenuItemSeparator(), //
 
             new MenuItem("Find Users", () => { new SearchUsersDlg(state).open(); }, //
-                !state.isAnonUser && !!hltNode) //
+                !state.isAnonUser) //
 
             // new MenuItem("Files", nav.searchFiles, () => { return  !state.isAnonUser && S.meta64.allowFileSystemSearch },
             //    () => { return  !state.isAnonUser && S.meta64.allowFileSystemSearch })

@@ -52,9 +52,10 @@ export class SearchView extends Div {
         }
 
         let i = 0;
+        let jumpButton = state.isAdminUser || !state.isUserSearch;
         results.forEach(function(node: J.NodeInfo) {
             S.srch.initSearchNode(node);
-            children.push(S.srch.renderSearchResultAsListItem(node, i, childCount, rowCount, "srch", false, false, true, state));
+            children.push(S.srch.renderSearchResultAsListItem(node, i, childCount, rowCount, "srch", false, false, true, jumpButton, state));
             i++;
             rowCount++;
         });
