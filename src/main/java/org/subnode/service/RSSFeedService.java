@@ -147,7 +147,7 @@ public class RSSFeedService {
 			SubNode node = null;
 			try {
 				node = read.getNode(mongoSession, nodeId);
-				if (node==null) {
+				if (node == null) {
 					return;
 				}
 			} catch (NodeAuthFailedException e) {
@@ -248,7 +248,6 @@ public class RSSFeedService {
 			URL inputUrl = new URL(url);
 			SyndFeedInput input = new SyndFeedInput();
 			inFeed = input.build(new XmlReader(inputUrl));
-			// log.debug("FEED: " + XString.prettyPrint(inFeed));
 
 			// we update the cache regardless of 'fromCache' val. this is correct.
 			feedCache.put(url, inFeed);
@@ -261,6 +260,16 @@ public class RSSFeedService {
 			ExUtil.error(log, "Error: ", e);
 			return null;
 		}
+	}
+
+	// I started to evaluate the concept of sanitizing the feed, but decided this is
+	// really a very low priority.
+	public void sanitizeFeed(SyndFeed feed) {
+		// https://github.com/OWASP/java-html-sanitizer
+		// PolicyFactory policy = new
+		// HtmlPolicyBuilder().allowElements("a").allowUrlProtocols("https").allowAttributes("href")
+		// .onElements("a").requireRelNofollowOnLinks().build();
+		// String safeHTML = policy.sanitize(untrustedHTML);
 	}
 
 	public void revChronSortEntries(List<SyndEntry> entries) {
@@ -313,7 +322,9 @@ public class RSSFeedService {
 		/* If not an aggregate return the one external feed itself */
 		else {
 			String url = urlList.get(0);
-			feed = getFeed(url, true);
+			// boolean useCache = appProp.getProfileName().equals("prod");
+			boolean useCache = true;
+			feed = getFeed(url, useCache);
 		}
 
 		if (feed != null) {
@@ -401,12 +412,13 @@ public class RSSFeedService {
 
 	private void writeFeed(SyndFeed feed, Writer writer) {
 		if (writer != null) {
-			fixFeed(feed);
-			SyndFeedOutput output = new SyndFeedOutput();
-			String feedStr = null;
 			try {
-				feedStr = output.outputString(feed, false); // prettyPrint=false
+				fixFeed(feed);
+				SyndFeedOutput output = new SyndFeedOutput();
+				boolean prettyPrint = true;
+				String feedStr = output.outputString(feed, prettyPrint);
 				feedStr = convertStreamChars(feedStr);
+				// log.debug("FEED XML: " + feedStr);
 				writer.write(feedStr);
 			} catch (Exception e) {
 				ExUtil.error(log, "multiRssFeed Error: ", e);
