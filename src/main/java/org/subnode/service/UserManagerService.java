@@ -693,6 +693,8 @@ public class UserManagerService {
 				res.setAvatarVer(userNode.getStrProp(NodeProp.BIN.s()));
 				res.setHeaderImageVer(userNode.getStrProp(NodeProp.BIN.s() + "Header"));
 				res.setUserNodeId(userNode.getId().toHexString());
+				res.setApIconUrl(userNode.getStrProp(NodeProp.ACT_PUB_USER_ICON_URL));
+				res.setActorUrl(userNode.getStrProp(NodeProp.ACT_PUB_ACTOR_URL));
 				res.setSuccess(true);
 			}
 		});

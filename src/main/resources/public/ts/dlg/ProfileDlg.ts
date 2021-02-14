@@ -23,20 +23,22 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
 });
 
 export class ProfileDlg extends DialogBase {
-    // userNameTextField: TextField;
     bioState: ValidatedState<any> = new ValidatedState<any>();
 
+    /* Note: Even if this is a foreign user the userId is expected to be imported into our system and will
+    have a username like "myname@foreignserver.com" */
     constructor(state: AppState, private readOnly: boolean, private userId: string, private userName: string) {
         super("User Profile: " + (userName || state.userName), null, false, state);
     }
 
     renderDlg(): CompIntf[] {
+        let state = this.getState();
         let profileImg: CompIntf = this.makeProfileImg();
-        let profileHeaderImg: CompIntf = this.makeProfileHeaderImg();
+        let profileHeaderImg: CompIntf = this.userName.indexOf("@") === -1 ? this.makeProfileHeaderImg() : null;
 
         let children = [
             new Form(null, [
-                new Div(null, {
+                profileHeaderImg ? new Div(null, {
                     className: "row"
                 }, [
                     new Div(null, {
@@ -47,7 +49,7 @@ export class ProfileDlg extends DialogBase {
                         ]),
                         profileHeaderImg
                     ])
-                ]),
+                ]) : null,
 
                 new Div(null, {
                     className: "row"
@@ -81,7 +83,10 @@ export class ProfileDlg extends DialogBase {
                     }, [
                         new ButtonBar([
                             this.readOnly ? null : new Button("Save", this.save, null, "btn-primary"),
-                            (this.readOnly && this.userName.indexOf("@") === -1 && this.userName !== this.appState.userName) ? new Button("Add as Friend", this.addFriend) : null,
+                            this.readOnly && this.userName !== this.appState.userName ? new Button("Add as Friend", this.addFriend) : null,
+                            state.actorUrl ? new Button("Go to User Page", () => {
+                                window.open(state.actorUrl, "_blank");
+                            }) : null,
                             new Button(this.readOnly ? "Close" : "Cancel", this.close)
                         ], null, "marginTop")
                     ])
@@ -105,12 +110,15 @@ export class ProfileDlg extends DialogBase {
             S.util.ajax<J.GetUserProfileRequest, J.GetUserProfileResponse>("getUserProfile", {
                 userId: this.userId
             }, (res: J.GetUserProfileResponse): void => {
+                // console.log("UserProfile Response: " + S.util.prettyPrint(res));
                 if (res) {
+                    this.userName = res.userName;
                     this.mergeState({
-                        defaultUserName: res.userName,
                         avatarVer: res.avatarVer,
                         headerImageVer: res.headerImageVer,
-                        userNodeId: res.userNodeId
+                        userNodeId: res.userNodeId,
+                        apIconUrl: res.apIconUrl,
+                        actorUrl: res.actorUrl
                     });
                     this.bioState.setValue(res.userBio);
                 }
@@ -121,7 +129,7 @@ export class ProfileDlg extends DialogBase {
 
     save = (): void => {
         S.util.ajax<J.SaveUserProfileRequest, J.SaveUserProfileResponse>("saveUserProfile", {
-            userName: null, // this.userNameTextField.getValue(),
+            userName: null,
             userBio: this.bioState.getValue()
         }, this.saveResponse);
     }
@@ -137,17 +145,6 @@ export class ProfileDlg extends DialogBase {
     saveResponse = (res: J.SaveUserPreferencesResponse): void => {
         if (S.util.checkSuccess("Saving Profile", res)) {
             let state: AppState = store.getState();
-
-            // DO NOT DELETE: this will come back eventually
-            // let userName = this.userNameTextField.getValue();
-            // dispatch({
-            //     type: "Action_UpdateUserProfile", state,
-            //     update: (s: AppState): void => {
-            //         s.userName = userName;
-            //         s.title = "User: " + userName;
-            //     },
-            // });
-
             S.meta64.refresh(state);
             this.close();
         }
@@ -155,8 +152,17 @@ export class ProfileDlg extends DialogBase {
 
     makeProfileImg(): CompIntf {
         let state = this.getState();
-        let avatarVer = this.getState().avatarVer;
-        let src: string = S.render.getAvatarImgUrl(this.userId || this.appState.homeNodeId, avatarVer);
+
+        let src: string = null;
+
+        // if ActivityPub icon exists, we know that's the one to use.
+        if (state.apIconUrl) {
+            src = state.apIconUrl;
+        }
+        else {
+            let avatarVer = this.getState().avatarVer;
+            src = S.render.getAvatarImgUrl(this.userId || this.appState.homeNodeId, avatarVer);
+        }
 
         let onClick = (evt) => {
             if (this.readOnly) return;

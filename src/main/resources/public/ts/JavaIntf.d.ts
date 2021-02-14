@@ -412,6 +412,8 @@ export interface GetUserProfileResponse extends ResponseBase {
     avatarVer: string;
     headerImageVer: string;
     userNodeId: string;
+    apIconUrl: string;
+    actorUrl: string;
 }
 
 export interface GraphResponse extends ResponseBase {

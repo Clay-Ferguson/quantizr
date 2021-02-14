@@ -14,6 +14,12 @@ public class GetUserProfileResponse extends ResponseBase {
 
 	private String userNodeId;
 
+	/* for foreign users this will point to their user avatar image */
+	private String apIconUrl;
+
+	/* for foreign users this will be their actor url */
+	private String actorUrl;
+
 	public String getUserName() {
 		return userName;
 	}
@@ -52,5 +58,21 @@ public class GetUserProfileResponse extends ResponseBase {
 
 	public void setHeaderImageVer(String headerImageVer) {
 		this.headerImageVer = headerImageVer;
+	}
+
+	public String getApIconUrl() {
+		return apIconUrl;
+	}
+
+	public void setApIconUrl(String apIconUrl) {
+		this.apIconUrl = apIconUrl;
+	}
+
+	public String getActorUrl() {
+		return actorUrl;
+	}
+
+	public void setActorUrl(String actorUrl) {
+		this.actorUrl = actorUrl;
 	}
 }

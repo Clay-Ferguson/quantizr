@@ -93,6 +93,7 @@ export class FriendTypeHandler extends TypeBase {
                 align: "left", // causes text to flow around
                 src,
                 onClick: actPubActorUrl ? () => {
+                    // todo-0: this should go to ProfileDialog() internal which has a link to external embedded in it.
                     window.open(actPubActorUrl, "_blank");
                 } : null
             });

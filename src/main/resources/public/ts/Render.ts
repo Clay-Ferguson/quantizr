@@ -489,19 +489,7 @@ export class Render implements RenderIntf {
             // align: "left", // causes text to flow around
 
             onClick: (evt: any) => {
-                // show profile dialog only for local users (no '@' in name)
-                // todo-1: Need to have a way to make a click on avatar show this dialog if the user is importet locally
-                // or if not at least make it pull up in a new browser tab the user's remote page, which should be the url from
-                // their ActivityPub Actor object
-                if (node.owner.indexOf("@") === -1) {
-                    new ProfileDlg(state, true, node.ownerId, node.owner).open();
-                }
-                else {
-                    let attributedTo = S.props.getNodePropVal(J.NodeProp.ACT_PUB_OBJ_ATTRIBUTED_TO, node);
-                    if (attributedTo) {
-                        window.open(attributedTo, "_blank");
-                    }
-                }
+                new ProfileDlg(state, true, node.ownerId, node.owner).open();
             }
         });
     }

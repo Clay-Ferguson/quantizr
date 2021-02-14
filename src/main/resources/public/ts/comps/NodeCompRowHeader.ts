@@ -24,7 +24,6 @@ export class NodeCompRowHeader extends Div {
         });
     }
 
-    // todo-0: make all these calls able to log a good exception message (including classname mainly) when there's a NPE or exception
     preRender(): void {
         let state: AppState = useSelector((state: AppState) => state);
         let node = this.node;
