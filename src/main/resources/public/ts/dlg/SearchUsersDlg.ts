@@ -45,19 +45,7 @@ export class SearchUsersDlg extends DialogBase {
     }
 
     validate = (): boolean => {
-        let valid = true;
-
-        // disable this for now since userSearch doesn't need this check
-        // todo-0: but do this if "all" checkbox isn't checked
-        // if (!this.searchTextState.getValue()) {
-        //     this.searchTextState.setError("Cannot be empty.");
-        //     valid = false;
-        // }
-        // else {
-        //     this.searchTextState.setError(null);
-        // }
-
-        return valid;
+        return true;
     }
 
     renderDlg(): CompIntf[] {

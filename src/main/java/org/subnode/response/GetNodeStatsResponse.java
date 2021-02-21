@@ -5,7 +5,6 @@ import org.subnode.response.base.ResponseBase;
 
 public class GetNodeStatsResponse extends ResponseBase {
     private String stats;
-    private ArrayList<String> topSentences;
     private ArrayList<String> topWords;
     private ArrayList<String> topTags;
     private ArrayList<String> topMentions;
@@ -16,14 +15,6 @@ public class GetNodeStatsResponse extends ResponseBase {
 
     public void setStats(String stats) {
         this.stats = stats;
-    }
-
-    public ArrayList<String> getTopSentences() {
-        return topSentences;
-    }
-
-    public void setTopSentences(ArrayList<String> topSentences) {
-        this.topSentences = topSentences;
     }
 
     public ArrayList<String> getTopWords() {

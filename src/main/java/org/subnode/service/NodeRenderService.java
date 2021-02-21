@@ -76,6 +76,7 @@ public class NodeRenderService {
 	public RenderNodeResponse renderNode(MongoSession session, RenderNodeRequest req) {
 
 		boolean isWelcomePage = req.getNodeId().equals(":welcome-page");
+
 		/*
 		 * Return cached version of welcome page if generated, but not for admin because admin should be
 		 * able to make edits and then those edits update the cache
@@ -196,7 +197,16 @@ public class NodeRenderService {
 			isWelcomePage = true;
 		}
 
-		NodeInfo nodeInfo = processRenderNode(session, req, res, node, scanToNode, -1, 0, isWelcomePage ? 100 : ROWS_PER_PAGE);
+		int limit = ROWS_PER_PAGE;
+		if (node != null) {
+			// add pageSize hack to docs and admin part of user guide.
+			Long pageSize = node.getIntProp("pageSize");
+			if (pageSize != null && pageSize.intValue() > ROWS_PER_PAGE) {
+				limit = pageSize.intValue();
+			}
+		}
+
+		NodeInfo nodeInfo = processRenderNode(session, req, res, node, scanToNode, -1, 0, limit);
 		res.setNode(nodeInfo);
 		res.setSuccess(true);
 

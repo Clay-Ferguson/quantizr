@@ -24,7 +24,6 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (s: Singletons) => {
 
 export class NodeStatsDlg extends DialogBase {
 
-    static sentencesExpanded: boolean;
     static helpExpanded: boolean;
 
     constructor(private res: J.GetNodeStatsResponse, public trending: boolean, public feed: boolean, state: AppState) {
@@ -65,30 +64,8 @@ export class NodeStatsDlg extends DialogBase {
             });
         }
 
-        let sentences: Comp[] = [];
-        this.res.topSentences.forEach((sentence: string) => {
-            sentences.push(new TextContent(sentence));
-        });
-
-        let sentencePanel = null;
-        if (sentences.length > 0) {
-            sentencePanel = new CollapsiblePanel("Show Top Sentences", "Hide Top Sentences", null, [
-                new Heading(3, "Top 10 Sentences (by word frequency analysis)"),
-                ...sentences
-            ], false,
-                (state: boolean) => {
-                    NodeStatsDlg.sentencesExpanded = state;
-                }, NodeStatsDlg.sentencesExpanded, "", "", "div");
-        }
-
         return [
             this.trending ? null : new TextContent(this.res.stats, null, false),
-
-            // Needs more tuning (todo-0) need to capture the NODE content itself
-            // and not the individual sentences in nodes. This is trivially easy to do,
-            // with a small server side tweak.
-            // sentencePanel,
-
             tagPanel.childrenExist() ? tagPanel : null,
             mentionPanel.childrenExist() ? mentionPanel : null,
             wordPanel.childrenExist() ? wordPanel : null,

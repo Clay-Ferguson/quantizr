@@ -31,6 +31,7 @@ export class RssTypeHandler extends TypeBase {
     // NOTE: Same value appears in RSSFeedService.ts
     static MAX_FEED_ITEMS: number = 200;
     static expansionState: any = {};
+    static TEXT_COLLAPSED: boolean = false;
 
     constructor() {
         super(J.NodeType.RSS_FEED, "RSS Feed", "fa-rss", true);
@@ -324,12 +325,17 @@ export class RssTypeHandler extends TypeBase {
         }
 
         if (textContent) {
-            children.push(new CollapsiblePanel(null, null, null, [
-                new Html(this.stripHtml(textContent))
-            ], false,
-                (state: boolean) => {
-                    RssTypeHandler.expansionState[entry.guid] = state;
-                }, RssTypeHandler.expansionState[entry.guid], "float-right"));
+            if (RssTypeHandler.TEXT_COLLAPSED) {
+                children.push(new CollapsiblePanel(null, null, null, [
+                    new Html(this.stripHtml(textContent))
+                ], false,
+                    (state: boolean) => {
+                        RssTypeHandler.expansionState[entry.guid] = state;
+                    }, RssTypeHandler.expansionState[entry.guid], "float-right"));
+            }
+            else {
+                children.push(new Html(this.stripHtml(textContent)));
+            }
         }
 
         let dateStr = entry.pubDate;

@@ -239,7 +239,6 @@ public class NodeSearchService {
 			if (req.isFeed() && NodeSearchService.trendingFeedInfo != null) {
 				res.setStats(NodeSearchService.trendingFeedInfo.getStats());
 				res.setTopMentions(NodeSearchService.trendingFeedInfo.getTopMentions());
-				res.setTopSentences(NodeSearchService.trendingFeedInfo.getTopSentences());
 				res.setTopTags(NodeSearchService.trendingFeedInfo.getTopTags());
 				res.setTopWords(NodeSearchService.trendingFeedInfo.getTopWords());
 				res.setSuccess(true);
@@ -396,11 +395,6 @@ public class NodeSearchService {
 		sb.append("Unique Words: " + wordList.size());
 		res.setStats(sb.toString());
 
-		// todo-0: disabled pending refactor to do full node content, not sentences.
-		// analyzeSentences(session, searchRoot, req.isTrending(), res, wordMap, 10);
-		ArrayList<String> list = new ArrayList<String>();
-		res.setTopSentences(list);
-
 		ArrayList<String> topWords = new ArrayList<String>();
 		res.setTopWords(topWords);
 		for (WordStats ws : wordList) {
@@ -432,110 +426,6 @@ public class NodeSearchService {
 			synchronized (NodeSearchService.trendingFeedInfoLock) {
 				NodeSearchService.trendingFeedInfo = res;
 			}
-		}
-	}
-
-	/*
-	 * This uses a very simple statistics algorithm to extract the top 10 most important sentences in a
-	 * text, by summing the weightings of each word in any sentence according to how frequent that word
-	 * is in the whole body of the text. Since we are just using 'getSubGraph' which doesn't guarantee
-	 * good ordering the synthetic text of actual sentences will not be in the order they appear on the
-	 * actual nodes.
-	 */
-	public void analyzeSentences(MongoSession session, SubNode searchRoot, boolean trending, GetNodeStatsResponse res,
-			HashMap<String, WordStats> wordMap, int maxCount) {
-		ArrayList<SentenceStats> sentenceList = new ArrayList<SentenceStats>();
-
-		Sort sort = null;
-		int limit = 0;
-		if (trending) {
-			sort = Sort.by(Sort.Direction.DESC, SubNode.FIELD_MODIFY_TIME);
-			limit = TRENDING_LIMIT;
-		}
-
-		Iterable<SubNode> iter = read.getSubGraph(session, searchRoot, sort, limit);
-		int sentenceIdx = 0;
-		for (SubNode node : iter) {
-			if (node.getContent() == null)
-				continue;
-
-			String content = node.getContent();
-			content = fixMastodonMangles(content);
-
-			StringTokenizer sentences = new StringTokenizer(content, SENTENCE_DELIMS, false);
-			while (sentences.hasMoreTokens()) {
-				String sentence = sentences.nextToken().trim();
-				int score = 0;
-
-				StringTokenizer words = new StringTokenizer(sentence, WORD_DELIMS, false);
-				int sentenceWordCount = 0;
-				while (words.hasMoreTokens()) {
-					String word = words.nextToken().trim();
-
-					// only consider words that are all alpha characters
-					if (!StringUtils.isAlpha(word)) {
-						// log.debug(" ignoring: " + token);
-						continue;
-					}
-
-					if (englishDictionary.isStopWord(word))
-						continue;
-
-					/*
-					 * if this word is an 'important' one, tally in it's weighted contribution to the score, as the
-					 * number of times that word appears in the text
-					 */
-					WordStats ws = wordMap.get(word.toLowerCase());
-					if (ws != null) {
-						score += ws.count;
-					}
-					sentenceWordCount++;
-				}
-
-				if (sentenceWordCount > 0) {
-					sentenceList.add(new SentenceStats(sentence, score, ++sentenceIdx));
-				}
-			}
-		}
-
-		Collections.sort(sentenceList, new Comparator<SentenceStats>() {
-			@Override
-			public int compare(SentenceStats s1, SentenceStats s2) {
-				return (int) (s2.score - s1.score);
-			}
-		});
-
-		/*
-		 * At this point we have the sentenceList ordered by rank only and not chronological of order of
-		 * appearance in the text, so now we need to order in the order it appears in the text.
-		 */
-
-		ArrayList<SentenceStats> chronoList = new ArrayList<SentenceStats>();
-		int count = 0;
-		for (SentenceStats ss : sentenceList) {
-			chronoList.add(ss);
-			if (++count > maxCount)
-				break;
-		}
-
-		/*
-		 * sort ascending to put sentences in the order they appeared in the text. oops, the query itself
-		 * doesn't return records in the proper chrono order, so only once we make the query return the text
-		 * in an order will this be correct. For not it's picking the top sentences but just not presenting
-		 * them in a correct order that they appear on the tree
-		 */
-		// Collections.sort(chronoList, new Comparator<SentenceStats>() {
-		// @Override
-		// public int compare(SentenceStats s1, SentenceStats s2) {
-		// return (int) (s1.sentenceIdx - s2.sentenceIdx);
-		// }
-		// });
-
-		ArrayList<String> list = new ArrayList<String>();
-		res.setTopSentences(list);
-
-		for (SentenceStats ss : chronoList) {
-			list.add(ss.sentence + ". (score=" + ss.score + ")");
 		}
 	}
 }
