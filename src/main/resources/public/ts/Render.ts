@@ -2,6 +2,7 @@ import * as highlightjs from "highlightjs";
 import * as marked from "marked";
 import { dispatch } from "./AppRedux";
 import { AppState } from "./AppState";
+import clientInfo from "./ClientInfo";
 import { NodeCompTableRowLayout } from "./comps/NodeCompTableRowLayout";
 import { NodeCompVerticalRowLayout } from "./comps/NodeCompVerticalRowLayout";
 import { Constants as C } from "./Constants";
@@ -403,14 +404,17 @@ export class Render implements RenderIntf {
     renderChildren = (node: J.NodeInfo, level: number, allowNodeMove: boolean): Comp => {
         if (!node || !node.children) return null;
 
-        let allowAvatars = true; // !S.util.allChildrenAreSameOwner(node);
+        let allowAvatars = true;
 
         /*
          * Number of rows that have actually made it onto the page to far. Note: some nodes get filtered out on
          * the client side for various reasons.
          */
         const layout = S.props.getNodePropVal(J.NodeProp.LAYOUT, node);
-        if (!layout || layout === "v") {
+
+        /* Note: for mobile devices, always use vertical layout. TODO-1: we could make this dynamic and use bootstrap to do responsive
+        layout based on screensize, but really just using a vertical layout always on mobile should be fine or even better. */
+        if (clientInfo.isMobile || !layout || layout === "v") {
             return new NodeCompVerticalRowLayout(node, level, allowNodeMove, true);
         }
         else if (layout.indexOf("c") === 0) {
