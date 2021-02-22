@@ -1,8 +1,13 @@
 import { State } from "./State";
 
+/* todo-0: Finish making this type safe, and don't use 'any' inside here */
 export class ValidatedState<S> {
     v: State<S> = new State<S>();
     e: State<S> = new State<S>();
+
+    constructor(val: any = null) {
+        this.setValue(val);
+    }
 
     getValue(): any {
         return this.v.state.value;

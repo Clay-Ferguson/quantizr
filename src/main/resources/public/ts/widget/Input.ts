@@ -20,7 +20,7 @@ export class Input extends Comp {
     }
 
     compRender(): ReactNode {
-        this.attribs.value = this.getState().value;
+        this.attribs.value = this.getState().value || "";
         return this.e("input", this.attribs);
     }
 }

@@ -66,6 +66,9 @@ export class EditNodeDlg extends DialogBase {
     parentContentEditorState: ValidatedState<any> = new ValidatedState<any>();
     nameState: ValidatedState<any> = new ValidatedState<any>();
 
+    // holds a map of states by property names.
+    propStates: { [key: string]: ValidatedState<any> } = {};
+
     static morePanelExpanded: boolean = false;
 
     skdp: SymKeyDataPackage;
@@ -77,8 +80,7 @@ export class EditNodeDlg extends DialogBase {
     this initialProps clone so we can 'rollback' properties if use clicks cancel */
     initialProps: J.PropertyInfo[];
 
-    // holds a map of states by property names.
-    propStates: { [key: string]: ValidatedState<any> } = {};
+    allowEditAllProps: boolean = false;
 
     constructor(node: J.NodeInfo, public parentNode: J.NodeInfo, state: AppState) {
         super("Edit", "app-modal-content", false, state);
@@ -88,7 +90,100 @@ export class EditNodeDlg extends DialogBase {
             // selected props is used as a set of all 'selected' (via checkbox) property names
             selectedProps: new Set<string>()
         });
+        this.allowEditAllProps = this.appState.isAdminUser;
+        this.initStates();
         this.initialProps = S.util.arrayClone(node.properties);
+    }
+
+    initStates = (): void => {
+        let state = this.getState();
+
+        /* Init main content text on node */
+        let value = state.node.content || "";
+        value = S.util.escapeForAttrib(value);
+        if (!value.startsWith(J.Constant.ENC_TAG)) {
+            this.contentEditorState.setValue(value);
+        }
+        else {
+            this.contentEditorState.setValue("");
+        }
+
+        /* Init parent node text */
+        let parentValue = (this.parentNode ? this.parentNode.content : null) || "";
+        parentValue = S.util.escapeForAttrib(parentValue);
+        if (!parentValue.startsWith(J.Constant.ENC_TAG)) {
+            this.parentContentEditorState.setValue(parentValue);
+        }
+        else {
+            this.parentContentEditorState.setValue("");
+        }
+
+        /* Initialize node name state */
+        this.nameState.setValue(state.node.name);
+
+        this.initPropStates();
+    }
+
+    initPropStates = (): any => {
+        let state = this.getState();
+        let typeHandler: TypeHandlerIntf = S.plugin.getTypeHandler(state.node.type);
+        let customProps: string[] = null;
+        if (typeHandler) {
+            customProps = typeHandler.getCustomProperties();
+            typeHandler.ensureDefaultProperties(state.node);
+        }
+
+        if (state.node.properties) {
+            state.node.properties.forEach((prop: J.PropertyInfo) => {
+
+                if (!this.allowEditAllProps && !S.render.allowPropertyEdit(state.node, prop.name, this.appState)) {
+                    console.log("Hiding property: " + prop.name);
+                    return;
+                }
+
+                if (this.allowEditAllProps || (
+                    !S.render.isReadOnlyProperty(prop.name) || S.edit.showReadOnlyProperties)) {
+
+                    if (!this.isGuiControlBasedProp(prop)) {
+                        let allowSelection = !customProps || !customProps.find(p => p === prop.name);
+                        this.initPropState(typeHandler, prop, allowSelection);
+                    }
+                }
+            });
+        }
+    }
+
+    initPropState = (typeHandler: TypeHandlerIntf, propEntry: J.PropertyInfo, allowCheckbox: boolean): void => {
+        let allowEditAllProps: boolean = this.appState.isAdminUser;
+        let isReadOnly = S.render.isReadOnlyProperty(propEntry.name);
+        let propVal = propEntry.value;
+        let propValStr = propVal || "";
+        propValStr = S.util.escapeForAttrib(propValStr);
+        // console.log("making single prop editor: prop[" + propEntry.property.name + "] val[" + propEntry.property.value
+        //     + "] fieldId=" + propEntry.id);
+
+        let propState: ValidatedState<any> = this.propStates[propEntry.name];
+        if (!propState) {
+            propState = new ValidatedState<any>();
+            this.propStates[propEntry.name] = propState;
+        }
+
+        if (!allowEditAllProps && isReadOnly) {
+            propState.setValue(propValStr);
+        }
+        else {
+            let val = S.props.getNodePropVal(propEntry.name, this.getState().node);
+            propState.setValue(val);
+
+            /* todo-1: eventually we will have data types, but for now we use a hack
+            to detect to treat a string as a date based on its property name. */
+            if (propEntry.name === "date") {
+                // Ensure we have set the default time if none is yet set.
+                if (!propState.getValue()) {
+                    propState.setValue("" + new Date().getTime());
+                }
+            }
+        }
     }
 
     createLayoutSelection = (): Selection => {
@@ -202,10 +297,6 @@ export class EditNodeDlg extends DialogBase {
 
         let allowContentEdit: boolean = typeHandler ? typeHandler.getAllowContentEdit() : true;
 
-        // This flag can be turned on during debugging to force ALL properties to be editable. Maybe there should be some way for users
-        // to dangerously opt into this also without hacking the code with this var.
-        let allowEditAllProps: boolean = this.appState.isAdminUser;
-
         // let allowUpload: boolean = typeHandler ? (state.isAdminUser || typeHandler.allowAction(NodeActionType.upload, state.node, this.appState)) : true;
         // let allowShare = true;
 
@@ -293,12 +384,12 @@ export class EditNodeDlg extends DialogBase {
             // This loop creates all the editor input fields for all the properties
             state.node.properties.forEach((prop: J.PropertyInfo) => {
 
-                if (!allowEditAllProps && !S.render.allowPropertyEdit(state.node, prop.name, this.appState)) {
+                if (!this.allowEditAllProps && !S.render.allowPropertyEdit(state.node, prop.name, this.appState)) {
                     console.log("Hiding property: " + prop.name);
                     return;
                 }
 
-                if (allowEditAllProps || (
+                if (this.allowEditAllProps || (
                     !S.render.isReadOnlyProperty(prop.name) || S.edit.showReadOnlyProperties)) {
 
                     if (!this.isGuiControlBasedProp(prop)) {
@@ -369,8 +460,6 @@ export class EditNodeDlg extends DialogBase {
             ]);
         }
 
-        this.nameState.setValue(state.node.name);
-
         let sharingNames = S.util.getSharingNames(state.node, false);
         let sharingSpan = null;
         if (sharingNames) {
@@ -387,8 +476,6 @@ export class EditNodeDlg extends DialogBase {
             let parentContentEditor = new TextArea(null, { rows: "5" }, this.parentContentEditorState);
             let parentVal = this.parentNode.content || "";
             if (!parentVal.startsWith(J.Constant.ENC_TAG)) {
-                this.parentContentEditorState.setValue(parentVal);
-
                 let wrap: boolean = S.props.getNodePropVal(J.NodeProp.NOWRAP, this.parentNode) !== "1";
                 parentContentEditor.setWordWrap(wrap);
 
@@ -439,10 +526,6 @@ export class EditNodeDlg extends DialogBase {
         // //regardless of value, if this property is present we consider the type locked
         // let typeLocked = !!S.props.getNodePropVal(J.NodeProp.TYPE_LOCK, state.node);
 
-        // //This flag can be turned on during debugging to force ALL properties to be editable. Maybe there should be some way for users
-        // //to dangerously opt into this also without hacking the code with this var.
-        // let allowEditAllProps: boolean = this.appState.isAdminUser;
-
         let allowUpload: boolean = typeHandler ? (state.isAdminUser || typeHandler.allowAction(NodeActionType.upload, state.node, this.appState)) : true;
         let allowShare: boolean = typeHandler ? (state.isAdminUser || typeHandler.allowAction(NodeActionType.share, state.node, this.appState)) : true;
 
@@ -460,7 +543,7 @@ export class EditNodeDlg extends DialogBase {
             allowShare ? new Button("Share", this.share) : null,
 
             /* Right now 'admin' is the only user who will really ever need to set the type on an existing node. */
-           this.appState.isAdminUser ? new Button("Type", this.openChangeNodeTypeDlg) : null,
+            this.appState.isAdminUser ? new Button("Type", this.openChangeNodeTypeDlg) : null,
             !customProps ? new Button("Encrypt", this.openEncryptionDlg) : null,
 
             // show delete button only if we're in a fullscreen viewer (like Calendar view)
@@ -693,11 +776,12 @@ export class EditNodeDlg extends DialogBase {
             this.propStates[propEntry.name] = propState;
         }
 
+        // WARNING: propState.setValue() calls will have been done in initStates, and should NOT be set here, because this can run during render callstacks
+        // which is not a valid time to be updating states
+
         // todo-1: actually this is wrong to just do a Textarea when it's readonly. It might be a non-multiline item here
         // and be better with a Textfield based editor
         if (!allowEditAllProps && isReadOnly) {
-            propState.setValue(propValStr);
-
             let textarea = new TextArea(label + " (read-only)", {
                 readOnly: "readOnly",
                 disabled: "disabled"
@@ -706,9 +790,6 @@ export class EditNodeDlg extends DialogBase {
             formGroup.addChild(textarea);
         }
         else {
-            let val = S.props.getNodePropVal(propEntry.name, this.getState().node);
-            propState.setValue(val);
-
             if (allowCheckbox) {
                 let checkbox: Checkbox = new Checkbox(label, { className: "checkboxContainerHeight" }, {
                     setValue: (checked: boolean): void => {
@@ -750,10 +831,6 @@ export class EditNodeDlg extends DialogBase {
                 /* todo-1: eventually we will have data types, but for now we use a hack
                 to detect to treat a string as a date based on its property name. */
                 if (propEntry.name === "date") {
-                    // Ensure we have set the default time if none is yet set.
-                    if (!propState.getValue()) {
-                        propState.setValue("" + new Date().getTime());
-                    }
                     valEditor = new DateTimeField(propState);
                 }
                 else {
@@ -818,12 +895,6 @@ export class EditNodeDlg extends DialogBase {
         }
         else {
             this.contentEditor = new TextArea(null, { rows }, this.contentEditorState);
-            if (!value.startsWith(J.Constant.ENC_TAG)) {
-                this.contentEditorState.setValue(value);
-            }
-            else {
-                this.contentEditorState.setValue("");
-            }
 
             let wrap: boolean = S.props.getNodePropVal(J.NodeProp.NOWRAP, this.appState.node) !== "1";
             this.contentEditor.setWordWrap(wrap);
