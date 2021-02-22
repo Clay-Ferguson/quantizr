@@ -10,7 +10,6 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
     S = ctx;
 });
 
-/* Can this be combined with textarea? making of course the tag naem itself a variable ? */
 export class Input extends Comp {
 
     constructor(attribs: Object = {}, s?: State<any>) {

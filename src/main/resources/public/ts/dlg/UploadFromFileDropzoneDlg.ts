@@ -1,7 +1,7 @@
 import { AppState } from "../AppState";
+import clientInfo from "../ClientInfo";
 import { Constants as C, Constants } from "../Constants";
 import { DialogBase } from "../DialogBase";
-import * as J from "../JavaIntf";
 import { PubSub } from "../PubSub";
 import { Singletons } from "../Singletons";
 import { CompIntf } from "../widget/base/CompIntf";
@@ -11,10 +11,9 @@ import { Checkbox } from "../widget/Checkbox";
 import { Div } from "../widget/Div";
 import { Form } from "../widget/Form";
 import { HorizontalLayout } from "../widget/HorizontalLayout";
+import { IconButton } from "../widget/IconButton";
 import { ConfirmDlg } from "./ConfirmDlg";
 import { MediaRecorderDlg } from "./MediaRecorderDlg";
-import { IconButton } from "../widget/IconButton";
-import clientInfo from "../ClientInfo";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
@@ -46,8 +45,6 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
     errorShown: boolean = false;
     numFiles: number = 0;
 
-    ipfsCheckbox: Checkbox;
-
     /* We allow either nodeId or 'node' to be passed in here */
     constructor(private nodeId: string, private binSuffix: string, private toIpfs: boolean, //
         private autoAddFile: File, private importMode: boolean, public allowRecording: boolean, state: AppState, public afterUploadFunc: Function) {
@@ -61,7 +58,14 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
                     /* Having this checkbox and caling the setState here causes a full rerender of this dialog, and this needs work eventually
                     to have a React-compatable way of rendering a dropzone dialog that doesn't blow away the existing dropzone div
                     and create a new one any time there's a state change and rerender */
-                    this.ipfsCheckbox = new Checkbox("Save to IPFS", null, null)
+                    new Checkbox("Save to IPFS", null, {
+                        setValue: (checked: boolean): void => {
+                            this.toIpfs = checked;
+                        },
+                        getValue: (): boolean => {
+                            return this.toIpfs;
+                        }
+                    })
                 ]),
                 this.dropzoneDiv = new Div("", { className: "dropzone" }),
                 this.hiddenInputContainer = new Div(null, { style: { display: "none" } }),
@@ -103,9 +107,6 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
         ];
 
         this.uploadButton.setVisible(false);
-        if (this.ipfsCheckbox) {
-            this.ipfsCheckbox.setChecked(this.toIpfs);
-        }
         this.configureDropZone();
         this.runButtonEnablement();
         return children;
@@ -278,7 +279,7 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
                         formData.append("binSuffix", dlg.binSuffix);
                         formData.append("explodeZips", dlg.explodeZips ? "true" : "false");
                         formData.append("saveAsPdf", false); // todo-1: fix (work in progress: Save HTML from clipboard as PDF) #saveAsPdf work in progress:
-                        formData.append("ipfs", dlg.ipfsCheckbox && dlg.ipfsCheckbox.getChecked() ? "true" : "false");
+                        formData.append("ipfs", dlg.toIpfs ? "true" : "false");
                         formData.append("createAsChildren", dlg.numFiles > 1 ? "true" : "false");
                     }
 
