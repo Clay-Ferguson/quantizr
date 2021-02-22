@@ -1350,11 +1350,16 @@ i'm backing out for now
 }
 
 .rss-feed-item {
-    border-radius: $borderRadiusMedium;
-    border: 2px solid $nodeBorderBottomColor;
-    margin: 12px;
-    padding: 13px;
+    border-left: 2px solid $nodeBorderBottomColor;
+    border-top: 2px solid $nodeBorderBottomColor;
+    border-right: 2px solid $nodeBorderBottomColor;
+    padding: 12px;
 }
+
+.rss-feed-item:last-child {
+    border-bottom: 2px solid $nodeBorderBottomColor;
+}
+
 
 .rss-feed-listing {
     margin-top: $smallGap;
