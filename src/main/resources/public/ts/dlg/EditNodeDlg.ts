@@ -188,12 +188,12 @@ export class EditNodeDlg extends DialogBase {
 
     createLayoutSelection = (): Selection => {
         let selection: Selection = new Selection(null, "Layout", [
-            { key: "v", val: "Vertical" },
-            { key: "c2", val: "2 Columns" },
-            { key: "c3", val: "3 Columns" },
-            { key: "c4", val: "4 Columns" },
-            { key: "c5", val: "5 Columns" },
-            { key: "c6", val: "6 Columns" }
+            { key: "v", val: "1 column" },
+            { key: "c2", val: "2 columns" },
+            { key: "c3", val: "3 columns" },
+            { key: "c4", val: "4 columns" },
+            { key: "c5", val: "5 columns" },
+            { key: "c6", val: "6 columns" }
         ], "m-2", "", new PropValueHolder(this.getState().node, J.NodeProp.LAYOUT, "v")); // w-25
         return selection;
     }
