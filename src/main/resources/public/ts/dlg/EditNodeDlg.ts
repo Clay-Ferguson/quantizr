@@ -121,22 +121,42 @@ export class EditNodeDlg extends DialogBase {
         /* Initialize node name state */
         this.nameState.setValue(state.node.name);
 
-        this.initPropStates();
+        this.initPropStates(state.node, false);
     }
 
-    initPropStates = (): any => {
-        let state = this.getState();
-        let typeHandler: TypeHandlerIntf = S.plugin.getTypeHandler(state.node.type);
+    /* Initializes the propStates for every property in 'node', and optionally if 'onlyBinaries==true' then we process ONLY
+    the properties on node that are in 'S.props.allBinaryProps' list, which is how we have to update the propStates after
+    an upload has been added or removed. */
+    initPropStates = (node: J.NodeInfo, onlyBinaries: boolean): any => {
+        let typeHandler: TypeHandlerIntf = S.plugin.getTypeHandler(node.type);
         let customProps: string[] = null;
         if (typeHandler) {
             customProps = typeHandler.getCustomProperties();
-            typeHandler.ensureDefaultProperties(state.node);
+            typeHandler.ensureDefaultProperties(node);
         }
 
-        if (state.node.properties) {
-            state.node.properties.forEach((prop: J.PropertyInfo) => {
+        /* If we're updating binaries from the node properties, we need to wipe all the existing ones first to account for 
+        props that need to be removed */
+        if (onlyBinaries) {
+            S.props.allBinaryProps.forEach(s => {
+                if (this.propStates[s]) {
+                    delete this.propStates[s];
+                }
+            });
+        }
 
-                if (!this.allowEditAllProps && !S.render.allowPropertyEdit(state.node, prop.name, this.appState)) {
+        if (node.properties) {
+            node.properties.forEach((prop: J.PropertyInfo) => {
+
+                // if onlyBinaries and this is NOT a binary prop then skip it.
+                if (onlyBinaries) {
+                    if (S.props.allBinaryProps.has(prop.name)) {
+                        this.initPropState(node, typeHandler, prop, false);
+                    }
+                    return;
+                }
+
+                if (!this.allowEditAllProps && !S.render.allowPropertyEdit(node, prop.name, this.appState)) {
                     console.log("Hiding property: " + prop.name);
                     return;
                 }
@@ -146,14 +166,14 @@ export class EditNodeDlg extends DialogBase {
 
                     if (!this.isGuiControlBasedProp(prop)) {
                         let allowSelection = !customProps || !customProps.find(p => p === prop.name);
-                        this.initPropState(typeHandler, prop, allowSelection);
+                        this.initPropState(node, typeHandler, prop, allowSelection);
                     }
                 }
             });
         }
     }
 
-    initPropState = (typeHandler: TypeHandlerIntf, propEntry: J.PropertyInfo, allowCheckbox: boolean): void => {
+    initPropState = (node: J.NodeInfo, typeHandler: TypeHandlerIntf, propEntry: J.PropertyInfo, allowCheckbox: boolean): void => {
         let allowEditAllProps: boolean = this.appState.isAdminUser;
         let isReadOnly = S.render.isReadOnlyProperty(propEntry.name);
         let propVal = propEntry.value;
@@ -172,7 +192,7 @@ export class EditNodeDlg extends DialogBase {
             propState.setValue(propValStr);
         }
         else {
-            let val = S.props.getNodePropVal(propEntry.name, this.getState().node);
+            let val = S.props.getNodePropVal(propEntry.name, node);
             propState.setValue(val);
 
             /* todo-1: eventually we will have data types, but for now we use a hack
@@ -612,11 +632,39 @@ export class EditNodeDlg extends DialogBase {
         let state = this.getState();
 
         let dlg = new UploadFromFileDropzoneDlg(state.node.id, "", state.toIpfs, null, false, true, this.appState, async () => {
-            await S.attachment.refreshBinaryPropsFromServer(state.node);
+            await this.refreshBinaryPropsFromServer(state.node);
+            this.initPropStates(state.node, true);
             this.mergeState({ node: state.node });
             this.binaryDirty = true;
         });
         await dlg.open();
+    }
+
+    /* Queries the server for the purpose of just loading the binary properties into node, and leaving everything else intact */
+    refreshBinaryPropsFromServer = (node: J.NodeInfo): Promise<void> => {
+        return new Promise<void>(async (resolve, reject) => {
+            S.util.ajax<J.RenderNodeRequest, J.RenderNodeResponse>("renderNode", {
+                nodeId: node.id,
+                upLevel: false,
+                siblingOffset: 0,
+                renderParentIfLeaf: false,
+                offset: 0,
+                goToLastPage: false,
+                forceIPFSRefresh: false,
+                singleNode: true
+            },
+                (res: J.RenderNodeResponse) => {
+                    try {
+                        if (res.node.properties) {
+                            S.props.transferBinaryProps(res.node, node);
+                        }
+                    }
+                    finally {
+                        resolve();
+                    }
+                });
+
+        });
     }
 
     deleteUpload = async (): Promise<void> => {
@@ -630,6 +678,7 @@ export class EditNodeDlg extends DialogBase {
 
                 if (deleted) {
                     S.attachment.removeBinaryProperties(state.node);
+                    this.initPropStates(state.node, true);
                     this.mergeState({ node: state.node });
                     this.binaryDirty = true;
                 }

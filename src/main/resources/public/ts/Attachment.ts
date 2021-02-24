@@ -94,33 +94,6 @@ export class Attachment implements AttachmentIntf {
         });
     }
 
-    /* Queries the server for the purpose of just loading the binary properties into node, and leaving everything else intact */
-    refreshBinaryPropsFromServer = (node: J.NodeInfo): Promise<void> => {
-        return new Promise<void>(async (resolve, reject) => {
-            S.util.ajax<J.RenderNodeRequest, J.RenderNodeResponse>("renderNode", {
-                nodeId: node.id,
-                upLevel: false,
-                siblingOffset: 0,
-                renderParentIfLeaf: false,
-                offset: 0,
-                goToLastPage: false,
-                forceIPFSRefresh: false,
-                singleNode: true
-            },
-                (res: J.RenderNodeResponse) => {
-                    try {
-                        if (res.node.properties) {
-                            S.props.transferBinaryProps(res.node, node);
-                        }
-                    }
-                    finally {
-                        resolve();
-                    }
-                });
-
-        });
-    }
-
     deleteAttachmentResponse = (res: J.DeleteAttachmentResponse, id: string, state: AppState): void => {
         if (S.util.checkSuccess("Delete attachment", res)) {
             // but for now just do a dispatch that forces a refresh from client memory (not server)

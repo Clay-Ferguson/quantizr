@@ -8,5 +8,4 @@ export interface AttachmentIntf {
     deleteAttachment(node: J.NodeInfo, state: AppState): Promise<boolean>;
     deleteAttachmentResponse(res: J.DeleteAttachmentResponse, uid: string, state: AppState): void;
     removeBinaryProperties(node: J.NodeInfo): void;
-    refreshBinaryPropsFromServer(node: J.NodeInfo): Promise<void>;
 }
