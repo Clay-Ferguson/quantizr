@@ -170,7 +170,6 @@ export class MenuPanel extends Div {
             new MenuItem("Test Web Cam", () => { new MediaRecorderDlg(state, true, false).open(); }, !state.isAnonUser)
         ]));
 
-        // todo-0: need to update User Guide per this new menu
         children.push(new Menu("Node Info", [
 
             // I decided with this on the toolbar we don't need it repliated here.
@@ -185,10 +184,15 @@ export class MenuPanel extends Div {
 
             // Warning: this can put heavy load on server. Maybe make this kinda thing a "paid" feature?
             new MenuItem("Node Stats", () => S.view.getNodeStats(state, false, false), //
-                !state.isAnonUser /* state.isAdminUser */), //
-
-            new MenuItem("Trending Stats", () => S.view.getNodeStats(state, true, false), //
                 !state.isAnonUser /* state.isAdminUser */) //
+
+            // This menu item works, but will have little value to users, because the only difference between this and 'Node Stats', is that
+            // the 'trending' stats is defined as the 'Node Stats' for the most recent 500 results in the query. I had a need for this early on
+            // because this is how the Feed View (Fediverse) stats is done, using arbitrarily chosen number 500 most recent posts as the universe
+            // of data to pick the statistics from, but this arbitrary number 500 just won't be helpful on any sub-graph for any ordinary users (yet)
+            // because you'd need a document with many thousands of nodes before the "top 500" will have any real significance as a 'trending' definition.
+            // new MenuItem("Trending Stats", () => S.view.getNodeStats(state, true, false), //
+            //     !state.isAnonUser /* state.isAdminUser */) //
         ]));
 
         children.push(new Menu("Encrypt", [

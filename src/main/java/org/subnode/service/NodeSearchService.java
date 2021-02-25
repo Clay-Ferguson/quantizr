@@ -235,6 +235,11 @@ public class NodeSearchService {
 	}
 
 	public void getNodeStats(GetNodeStatsRequest req, GetNodeStatsResponse res) {
+
+		/*
+		 * If this is the 'feed' being queried, then get the data from trendingFeedInfo (the cache), or else
+		 * cache it
+		 */
 		synchronized (NodeSearchService.trendingFeedInfoLock) {
 			if (req.isFeed() && NodeSearchService.trendingFeedInfo != null) {
 				res.setStats(NodeSearchService.trendingFeedInfo.getStats());
@@ -255,7 +260,7 @@ public class NodeSearchService {
 		Iterable<SubNode> iter = null;
 
 		/*
-		 * NOTE: This query is similat to the one in UserFeedService.java, but simpler since we don't handle
+		 * NOTE: This query is similar to the one in UserFeedService.java, but simpler since we don't handle
 		 * a bunch of options but just the public feed query
 		 */
 		if (req.isFeed()) {
@@ -288,7 +293,10 @@ public class NodeSearchService {
 
 			iter = ops.find(query, SubNode.class);
 		}
-		// Otherwise this is not a Feed Tab query but just an arbitrary node stats request.
+		/*
+		 * Otherwise this is not a Feed Tab query but just an arbitrary node stats request, like a user
+		 * running a stats request under the 'Node Info' main menu
+		 */
 		else {
 			MongoSession session = ThreadLocals.getMongoSession();
 			SubNode searchRoot = read.getNode(session, req.getNodeId());

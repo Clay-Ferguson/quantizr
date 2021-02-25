@@ -249,9 +249,9 @@ export class View implements ViewIntf {
                         /* a bit confusing here but this command is the same as the name of the AJAX call above (getServerInfo), but
                       there are other commands that exist also */
                         if (command === "getServerInfo") {
-                            m.message += "<br>Browser Memory: " + S.util.getBrowserMemoryInfo();
-                            m.message += "<br>Build Time: " + BUILDTIME;
-                            m.message += "<br>Profile: " + PROFILE;
+                            m.message += "\nBrowser Memory: " + S.util.getBrowserMemoryInfo() + "\n";
+                            m.message += "Build Time: " + BUILDTIME + "\n";
+                            m.message += "Profile: " + PROFILE + "\n";
                         }
 
                         /* For now just prefix description onto the text. This will be made 'prettier' later todo-2 */

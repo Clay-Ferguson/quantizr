@@ -34,6 +34,8 @@ public class DateUtil {
 	/** Used to format date values */
 	public static final Locale DATE_FORMAT_LOCALE = Locale.US;
 
+	private final static SimpleDateFormat DATE_FORMATTER = new SimpleDateFormat("MM/dd/yyyy HH:mm:ss");
+
 	/* Note: this object is Session-specific to the timezone will be per user */
 	private static final SimpleDateFormat dateFormat = new SimpleDateFormat(DATE_FORMAT_NO_TIMEZONE,
 			DateUtil.DATE_FORMAT_LOCALE);
@@ -75,6 +77,10 @@ public class DateUtil {
 
 	public static String getUSTimezone(int hours, boolean dst) {
 		return zoneMap.get(String.valueOf(hours) + (dst ? "D" : "S"));
+	}
+
+	public static String getFormattedDate(long time) {
+		return DATE_FORMATTER.format(time);
 	}
 
 	public static String getFileNameCompatDate() {

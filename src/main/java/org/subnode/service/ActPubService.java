@@ -78,6 +78,11 @@ public class ActPubService {
     public static final int MAX_MESSAGES = 10;
     public static final int MAX_FOLLOWERS = 20;
     public static int outboxQueryCount = 0;
+    public static int cycleOutboxQueryCount = 0;
+    public static int newPostsInCycle = 0;
+    public static int refreshForeignUsersCycles = 0;
+    public static int refreshForeignUsersQueuedCount = 0;
+    public static String lastRefreshForeignUsersCycleTime = "n/a";
     public static int inboxCount = 0;
     private static final Logger log = LoggerFactory.getLogger(ActPubService.class);
 
@@ -592,6 +597,7 @@ public class ActPubService {
                         } //
                         else if ("Note".equals(AP.str(object, "type"))) {
                             try {
+                                newPostsInCycle++;
                                 saveNote(session, _userNode, outboxNode, object, true, true);
                                 count.setVal(count.getVal() + 1);
                             } catch (Exception e) {
@@ -826,7 +832,8 @@ public class ActPubService {
         if (url == null)
             return null;
         APObj outbox = getJson(url, new MediaType("application", "ld+json"));
-        ActPubService.outboxQueryCount++;
+        outboxQueryCount++;
+        cycleOutboxQueryCount++;
         // log.debug("Outbox: " + XString.prettyPrint(outbox));
         return outbox;
     }
@@ -2036,6 +2043,17 @@ public class ActPubService {
         refreshForeignUsers();
     }
 
+    public static int queuedUserCount() {
+        int count = 0;
+        for (String apUserName : userNamesPendingMessageRefresh.keySet()) {
+            Boolean done = userNamesPendingMessageRefresh.get(apUserName);
+            if (!done) {
+                count++;
+            }
+        }
+        return count;
+    }
+
     /* Run every few seconds */
     @Scheduled(fixedDelay = 3 * 1000)
     public void messageRefresh() {
@@ -2079,22 +2097,45 @@ public class ActPubService {
 
         log.debug("refreshForeignUsers()");
 
+        lastRefreshForeignUsersCycleTime = DateUtil.getFormattedDate(new Date().getTime());
+        refreshForeignUsersCycles++;
+        refreshForeignUsersQueuedCount = 0;
+        cycleOutboxQueryCount = 0;
+        newPostsInCycle = 0;
+
         adminRunner.run(session -> {
             Iterable<SubNode> accountNodes =
                     read.findTypedNodesUnderPath(session, NodeName.ROOT_OF_ALL_USERS, NodeType.ACCOUNT.s());
+
             for (SubNode node : accountNodes) {
                 String userName = node.getStrProp(NodeProp.USER.s());
                 if (userName == null || !userName.contains("@"))
                     continue;
 
+                refreshForeignUsersQueuedCount++;
                 queueUserForRefresh(userName, true);
             }
 
+            /* Setting the trending data to null causes it to refresh itself the next time it needs to. */
             synchronized (NodeSearchService.trendingFeedInfoLock) {
                 NodeSearchService.trendingFeedInfo = null;
             }
 
             return null;
         });
+    }
+
+    public static String getStatsReport() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("\nActivityPub Stats:\n");
+        sb.append("Users Currently Queued (for refresh): " + queuedUserCount() + "\n");
+        sb.append("Refresh Foreign Users Cycles: " + refreshForeignUsersCycles + "\n");
+        sb.append("Last Foreign Users Refresh Time: " + lastRefreshForeignUsersCycleTime + "\n");
+        sb.append("Number of Users Queued at last Cycle: " + refreshForeignUsersQueuedCount + "\n");
+        sb.append("Cycle Foreign Outbox Queries: " + cycleOutboxQueryCount + "\n");
+        sb.append("Total Foreign Outbox Queries: " + outboxQueryCount + "\n");
+        sb.append("New Incomming Posts last cycle: " + newPostsInCycle + "\n");
+        sb.append("Inbox Post count:" + inboxCount + "\n");
+        return sb.toString();
     }
 }

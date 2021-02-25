@@ -967,8 +967,8 @@ public class UserManagerService {
 				localUserCount++;
 			}
 		}
-		sb.append("Local User Count: " + localUserCount + "<br>");
-		sb.append("Foreign User Count: " + foreignUserCount + "<br>");
+		sb.append("Local User Count: " + localUserCount + "\n");
+		sb.append("Foreign User Count: " + foreignUserCount + "\n");
 		return sb.toString();
 	}
 }

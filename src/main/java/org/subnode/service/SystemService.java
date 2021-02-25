@@ -78,9 +78,10 @@ public class SystemService {
 		try {
 			update.releaseOrphanIPFSPins();
 		} catch (Exception e) {
-			// I noticed this failing in Jan 2021. I think IPFS made and API change we aren't accounting for yet. 
+			// I noticed this failing in Jan 2021. I think IPFS made and API change we aren't accounting for
+			// yet.
 			// needs research (todo-1)
-			//log.error("releaseOrphanIPFSPins failed.", e);
+			// log.error("releaseOrphanIPFSPins failed.", e);
 		}
 
 		MongoDatabase database = mac.mongoClient().getDatabase(MongoAppConfig.databaseName);
@@ -133,15 +134,14 @@ public class SystemService {
 		Runtime runtime = Runtime.getRuntime();
 		runtime.gc();
 		long freeMem = runtime.freeMemory() / Const.ONE_MB;
-		sb.append(String.format("Server Free Memory: %dMB<br>", freeMem));
-		sb.append(String.format("Session Count: %d<br>", AppSessionListener.getSessionCounter()));
+		sb.append(String.format("Server Free Memory: %dMB\n", freeMem));
+		sb.append(String.format("Session Count: %d\n", AppSessionListener.getSessionCounter()));
 		sb.append(getIpReport());
-		sb.append("<p>Node Count: " + read.getNodeCount(null));
-		sb.append("<p>Attachment Count: " + attachmentService.getGridItemCount());
-		sb.append("<p>" + userManagerService.getUserAccountsReport(null));
-		sb.append("<p>");
-		sb.append("ActivityPub Foreign Outbox Retrievals: " + ActPubService.outboxQueryCount + "<br>");
-		sb.append("ActivityPub Inbox Posts " + ActPubService.inboxCount + "<br>");
+		sb.append("Node Count: " + read.getNodeCount(null) + "\n");
+		sb.append("Attachment Count: " + attachmentService.getGridItemCount() + "\n");
+		sb.append(userManagerService.getUserAccountsReport(null));
+
+		sb.append(ActPubService.getStatsReport());
 
 		// oops this is worthless, because it's inside the docker image, but I'm leaving
 		// in place just in case in the future we do need to run some commands docker
@@ -181,7 +181,7 @@ public class SystemService {
 	}
 
 	private static String getIpReport() {
-		return "Number of Unique IPs since startup: " + AppFilter.getUniqueIpHits().size();
+		return "Number of Unique IPs since startup: " + AppFilter.getUniqueIpHits().size() + "\n";
 		// StringBuilder sb = new StringBuilder();
 		// sb.append("Unique IPs During Run<br>");
 		// int count = 0;
