@@ -135,7 +135,7 @@ export class EditNodeDlg extends DialogBase {
             typeHandler.ensureDefaultProperties(node);
         }
 
-        /* If we're updating binaries from the node properties, we need to wipe all the existing ones first to account for 
+        /* If we're updating binaries from the node properties, we need to wipe all the existing ones first to account for
         props that need to be removed */
         if (onlyBinaries) {
             S.props.allBinaryProps.forEach(s => {
