@@ -270,6 +270,8 @@ a {
     max-height: 80px;
     cursor: pointer;
     margin-bottom: $tinyGap;
+    border: 1px solid gray;
+    border-radius: 4px;
     // margin-left: $smallGap; //NO. When metadata is off this will be wrong, so add this margin to the metadata container itself.
 }
 
@@ -1066,9 +1068,8 @@ input[type="radio"] {
 
 .header-text {
     font-size: small;
-    margin-left: $smallGap;
+    margin-left: 10px;
     margin-bottom: 8px;
-    //padding-top: $microGap;
     cursor: pointer;
 }
 
@@ -1441,6 +1442,20 @@ i'm backing out for now
     font-size: 1.2rem;
     font-weight: 500;
     line-height: 1.2;
+}
+
+.friendListText {
+    font-size: 1.2rem;
+    font-weight: 500;
+    margin-left: 12px;
+}
+
+.friendListImage {
+    max-width: 48px;
+    max-height: 80px;
+    cursor: pointer;
+    border: 1px solid gray;
+    border-radius: 4px;
 }
 
 .dialogContentArea {

@@ -13,16 +13,18 @@ import com.fasterxml.jackson.annotation.JsonInclude.Include;
 public class AccessControlInfo {
 	private String principalName;
 	private String principalNodeId;
+	private String avatarVer;
 	private List<PrivilegeInfo> privileges;
 	private String publicKey;
 
 	public AccessControlInfo() {
 	}
 
-	public AccessControlInfo(String principalName, String principalNodeId, String publicKey) {
+	public AccessControlInfo(String principalName, String principalNodeId, String publicKey, String avatarVer) {
 		this.principalName = principalName;
 		this.principalNodeId = principalNodeId;
 		this.publicKey = publicKey;
+		this.avatarVer = avatarVer;
 	}
 
 	public String getPrincipalName() {
@@ -62,5 +64,13 @@ public class AccessControlInfo {
 
 	public void setPublicKey(String publicKey) {
 		this.publicKey = publicKey;
+	}
+
+	public String getAvatarVer() {
+		return avatarVer;
+	}
+
+	public void setAvatarVer(String avatarVer) {
+		this.avatarVer = avatarVer;
 	}
 }

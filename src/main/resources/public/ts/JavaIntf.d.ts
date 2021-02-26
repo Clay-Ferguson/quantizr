@@ -366,6 +366,8 @@ export interface FileSystemReindexResponse extends ResponseBase {
 
 export interface FriendInfo {
     userName: string;
+    avatarVer: string;
+    userNodeId: string;
 }
 
 export interface GetConfigResponse extends ResponseBase {
@@ -614,6 +616,7 @@ export interface UserPreferences {
 export interface AccessControlInfo {
     principalName: string;
     principalNodeId: string;
+    avatarVer: string;
     privileges: PrivilegeInfo[];
     publicKey: string;
 }

@@ -7,7 +7,6 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -50,7 +49,7 @@ public class Convert {
 
 	@Autowired
 	private RunAsMongoAdminEx adminRunner;
-	
+
 	public static final PropertyInfoComparator propertyInfoComparator = new PropertyInfoComparator();
 
 	private static final Logger log = LoggerFactory.getLogger(Convert.class);
@@ -323,6 +322,14 @@ public class Convert {
 		if (principalId != null) {
 			adminRunner.run(s -> {
 				acInfo.setPrincipalName(auth.getUserNameFromAccountNodeId(s, principalId));
+
+				// currently don't ever need this info for displaying rows, so don't waste the CPU cycles to get it.
+				// if (!"public".equals(principalId)) {
+				// 	SubNode accountNode = read.getNode(s, principalId);
+				// 	if (accountNode != null) {
+				// 		acInfo.setAvatarVer(accountNode.getStrProp(NodeProp.BIN));
+				// 	}
+				// }
 				return null;
 			});
 		}

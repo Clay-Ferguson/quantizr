@@ -2,6 +2,8 @@ package org.subnode.response;
 
 public class FriendInfo {
    private String userName;
+   private String avatarVer;
+   private String userNodeId;
 
    public String getUserName() {
        return userName;
@@ -9,5 +11,21 @@ public class FriendInfo {
 
    public void setUserName(String userName) {
        this.userName = userName;
+   }
+
+   public String getAvatarVer() {
+       return avatarVer;
+   }
+
+   public void setAvatarVer(String avatarVer) {
+       this.avatarVer = avatarVer;
+   }
+
+   public String getUserNodeId() {
+       return userNodeId;
+   }
+
+   public void setUserNodeId(String userNodeId) {
+       this.userNodeId = userNodeId;
    }
 }

@@ -136,7 +136,7 @@ public class UserManagerService {
 	 */
 	public LoginResponse postLogin(MongoSession session, RequestBase req) {
 		LoginResponse res = new LoginResponse();
-	
+
 		if (session == null) {
 			session = ThreadLocals.getMongoSession();
 		}
@@ -882,6 +882,13 @@ public class UserManagerService {
 			if (userName != null) {
 				FriendInfo fi = new FriendInfo();
 				fi.setUserName(userName);
+				String userNodeId = friendNode.getStrProp(NodeProp.USER_NODE_ID);
+
+				SubNode friendAccountNode = read.getNode(session, userNodeId, false);
+				if (friendAccountNode != null) {
+					fi.setAvatarVer(friendAccountNode.getStrProp(NodeProp.BIN));
+				}
+				fi.setUserNodeId(userNodeId);
 				friends.add(fi);
 			}
 		}

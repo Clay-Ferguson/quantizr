@@ -97,7 +97,7 @@ public class MongoAuth {
 			return "public";
 		}
 
-		// if the userName is cached get it from the cache, and then continue looping.
+		// if the userName is cached get it from the cache.
 		synchronized (userNamesByAccountId) {
 			String userName = userNamesByAccountId.get(accountId);
 			if (userName != null) {
@@ -410,6 +410,7 @@ public class MongoAuth {
 	public AccessControlInfo createAccessControlInfo(MongoSession session, String principalId, String authType) {
 		String principalName = null;
 		String publicKey = null;
+		String avatarVer = null;
 
 		/* If this is a share to public we don't need to lookup a user name */
 		if (principalId.equalsIgnoreCase(PrincipalName.PUBLIC.s())) {
@@ -423,9 +424,10 @@ public class MongoAuth {
 			}
 			principalName = principalNode.getStrProp(NodeProp.USER.s());
 			publicKey = principalNode.getStrProp(NodeProp.USER_PREF_PUBLIC_KEY.s());
+			avatarVer = principalNode.getStrProp(NodeProp.BIN);
 		}
 
-		AccessControlInfo info = new AccessControlInfo(principalName, principalId, publicKey);
+		AccessControlInfo info = new AccessControlInfo(principalName, principalId, publicKey, avatarVer);
 		info.addPrivilege(new PrivilegeInfo(authType));
 		return info;
 	}

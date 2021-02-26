@@ -1,4 +1,4 @@
-import { store } from "../AppRedux";
+import { appState, store } from "../AppRedux";
 import { AppState } from "../AppState";
 import { Constants as C } from "../Constants";
 import { DialogBase } from "../DialogBase";

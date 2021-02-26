@@ -1,5 +1,6 @@
 import { AppState } from "../AppState";
 import { Constants as C } from "../Constants";
+import { ProfileDlg } from "../dlg/ProfileDlg";
 import { NodeActionType } from "../enums/NodeActionType";
 import * as J from "../JavaIntf";
 import { PubSub } from "../PubSub";
@@ -75,33 +76,27 @@ export class FriendTypeHandler extends TypeBase {
         let userNodeId: string = S.props.getNodePropVal(J.NodeProp.USER_NODE_ID, node);
 
         let img: Img = null;
-        let src: string = null;
+        let imgSrc: string = null;
         if (avatarVer) {
-            src = S.render.getAvatarImgUrl(userNodeId, avatarVer);
+            imgSrc = S.render.getAvatarImgUrl(userNodeId, avatarVer);
         }
 
         // finally resort to looking for avatar url as a client property which will be how it's found for Foreign Federated users.
-        if (!src) {
-            src = S.props.getClientPropVal(J.NodeProp.ACT_PUB_USER_ICON_URL, node);
+        if (!imgSrc) {
+            imgSrc = S.props.getClientPropVal(J.NodeProp.ACT_PUB_USER_ICON_URL, node);
         }
 
-        let actPubActorUrl = S.props.getClientPropVal(J.NodeProp.ACT_PUB_ACTOR_URL, node);
+        let actorUrl = S.props.getClientPropVal(J.NodeProp.ACT_PUB_ACTOR_URL, node);
 
-        if (src) {
+        if (imgSrc) {
             img = new Img(null, {
                 className: "friendImage",
                 align: "left", // causes text to flow around
-                src,
-                onClick: actPubActorUrl ? () => {
-                    // todo-0: this should go to ProfileDialog() internal which has a link to external embedded in it.
-                    window.open(actPubActorUrl, "_blank");
-                } : null
+                src: imgSrc,
+                onClick: (evt: any) => {
+                    new ProfileDlg(state, true, userNodeId, user).open();
+                }
             });
-        }
-
-        // todo-1: this is a slight hack but the users can get the idea who this is from the URL (for now)
-        if (!user) {
-            user = actPubActorUrl;
         }
 
         return new Div(null, {
@@ -119,7 +114,10 @@ export class FriendTypeHandler extends TypeBase {
                 new ButtonBar([
                     new Button("Message", S.meta64.getNodeFunc(S.edit.cached_newSubNode, "S.edit.newSubNode", node.id), {
                         title: "Send Private Message"
-                    })
+                    }),
+                    actorUrl ? new Button("Go to User Page", () => {
+                        window.open(actorUrl, "_blank");
+                    }) : null
                 ], null, "float-right marginBottom"),
                 new Div(null, { className: "clearfix" })]),
             new CollapsibleHelpPanel("Help", S.meta64.config.help.type.friend.render,
