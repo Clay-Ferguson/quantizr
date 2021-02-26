@@ -182,7 +182,11 @@ of the spring configs for security are also perfected.
     <artifactId>rome-modules</artifactId>
     <version>1.15.0</version>
 </dependency>
-
+<dependency>
+    <groupId>com.googlecode.owasp-java-html-sanitizer</groupId>
+    <artifactId>owasp-java-html-sanitizer</artifactId>
+    <version>20180219.1</version>
+</dependency>
 
 <!--
 <dependency>
@@ -580,7 +584,11 @@ of the spring configs for security are also perfected.
     <artifactId>rome-modules</artifactId>
     <version>1.15.0</version>
 </dependency>
-
+<dependency>
+    <groupId>com.googlecode.owasp-java-html-sanitizer</groupId>
+    <artifactId>owasp-java-html-sanitizer</artifactId>
+    <version>20180219.1</version>
+</dependency>
 
 <!--
 <dependency>
@@ -818,7 +826,11 @@ of the spring configs for security are also perfected.
     <artifactId>rome-modules</artifactId>
     <version>1.15.0</version>
 </dependency>
-
+<dependency>
+    <groupId>com.googlecode.owasp-java-html-sanitizer</groupId>
+    <artifactId>owasp-java-html-sanitizer</artifactId>
+    <version>20180219.1</version>
+</dependency>
 
 <!--
 <dependency>
@@ -1232,7 +1244,11 @@ of the spring configs for security are also perfected.
     <artifactId>rome-modules</artifactId>
     <version>1.15.0</version>
 </dependency>
-
+<dependency>
+    <groupId>com.googlecode.owasp-java-html-sanitizer</groupId>
+    <artifactId>owasp-java-html-sanitizer</artifactId>
+    <version>20180219.1</version>
+</dependency>
 
 <!--
 <dependency>

@@ -117,6 +117,7 @@ export class RssTypeHandler extends TypeBase {
                 className: "marginAll"
             });
         }
+        /* if the feedCache doesn't contain either "failed" or "loading" then treat it like data and render it */
         else if (state.feedCache[feedSrcHash]) {
             this.renderItem(state.feedCache[feedSrcHash], feedSrc, itemListContainer, state);
         }
@@ -154,19 +155,6 @@ export class RssTypeHandler extends TypeBase {
             });
         }
         return itemListContainer;
-    }
-
-    stripHtml = (val: string): string => {
-        if (!val) return val;
-        // console.log(" INPUT: " + val);
-        val = S.util.replaceAll(val, "<br>", "\n");
-        val = S.util.replaceAll(val, "<p>", "\n");
-        val = val.replace(/<[^>]*>?/gm, "");
-        val = S.util.replaceAll(val, "\n\n\n", "<br>");
-        val = S.util.replaceAll(val, "\n\n", "<br>");
-        val = S.util.replaceAll(val, "\n", "<br>");
-        // console.log("OUTPUT: " + val);
-        return val;
     }
 
     renderItem(feed: any, feedSrc: string, itemListContainer: Comp, state: AppState) {
@@ -208,7 +196,7 @@ export class RssTypeHandler extends TypeBase {
         feedOut.push(new Div(null, { className: "clearBoth" }));
 
         if (feed.description) {
-            feedOut.push(new Div(this.stripHtml(feed.description)));
+            feedOut.push(new Html(feed.description));
         }
 
         // A bit of a hack to avoid showing the feed URL of our own aggregate feeds. We could publish this but no need to and
@@ -327,14 +315,14 @@ export class RssTypeHandler extends TypeBase {
         if (textContent) {
             if (RssTypeHandler.TEXT_COLLAPSED) {
                 children.push(new CollapsiblePanel(null, null, null, [
-                    new Html(this.stripHtml(textContent))
+                    new Html(textContent)
                 ], false,
                     (state: boolean) => {
                         RssTypeHandler.expansionState[entry.guid] = state;
                     }, RssTypeHandler.expansionState[entry.guid], "float-right"));
             }
             else {
-                children.push(new Html(this.stripHtml(textContent)));
+                children.push(new Html(textContent));
             }
         }
 

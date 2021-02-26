@@ -17,6 +17,8 @@ import com.rometools.rome.io.SyndFeedInput;
 import com.rometools.rome.io.SyndFeedOutput;
 import com.rometools.rome.io.XmlReader;
 import org.apache.commons.lang3.StringUtils;
+import org.owasp.html.PolicyFactory;
+import org.owasp.html.Sanitizers;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -54,6 +56,9 @@ public class RSSFeedService {
 	private RunAsMongoAdmin adminRunner;
 
 	private static boolean refreshingCache = false;
+
+	private static final Object policyLock = new Object();
+	PolicyFactory policy = null;
 
 	/*
 	 * Cache of all feeds.
@@ -248,6 +253,7 @@ public class RSSFeedService {
 			URL inputUrl = new URL(url);
 			SyndFeedInput input = new SyndFeedInput();
 			inFeed = input.build(new XmlReader(inputUrl));
+			sanitizeFeed(inFeed);
 
 			// we update the cache regardless of 'fromCache' val. this is correct.
 			feedCache.put(url, inFeed);
@@ -262,14 +268,31 @@ public class RSSFeedService {
 		}
 	}
 
-	// I started to evaluate the concept of sanitizing the feed, but decided this is
-	// really a very low priority.
 	public void sanitizeFeed(SyndFeed feed) {
-		// https://github.com/OWASP/java-html-sanitizer
-		// PolicyFactory policy = new
-		// HtmlPolicyBuilder().allowElements("a").allowUrlProtocols("https").allowAttributes("href")
-		// .onElements("a").requireRelNofollowOnLinks().build();
-		// String safeHTML = policy.sanitize(untrustedHTML);
+		// log.debug("SyndFeed: " + XString.prettyPrint(feed));
+
+		feed.setDescription(sanitizeHtml(feed.getDescription()));
+		for (SyndEntry entry : feed.getEntries()) {
+			entry.getDescription().setValue(sanitizeHtml(entry.getDescription().getValue()));
+
+			for (SyndContent content : entry.getContents()) {
+				content.setValue(sanitizeHtml(content.getValue()));
+			}
+		}
+	}
+
+	// See also: https://github.com/OWASP/java-html-sanitizer
+	private String sanitizeHtml(String html) {
+		if (StringUtils.isEmpty(html))
+			return html;
+
+		if (policy == null) {
+			synchronized (policyLock) {
+				policy = Sanitizers.FORMATTING.and(Sanitizers.BLOCKS).and(Sanitizers.IMAGES).and(Sanitizers.LINKS)//
+						.and(Sanitizers.STYLES).and(Sanitizers.TABLES);
+			}
+		}
+		return policy.sanitize(html);
 	}
 
 	public void revChronSortEntries(List<SyndEntry> entries) {
