@@ -418,6 +418,11 @@ public class MongoRead {
         return getChildrenUnderParentPath(session, node.getPath(), sort, limit, skip, null, null);
     }
 
+    public Iterable<SubNode> getChildren(MongoSession session, SubNode node) {
+        auth.auth(session, node, PrivilegeType.READ);
+        return getChildrenUnderParentPath(session, node.getPath(), null, null, 0, null, null);
+    }
+
     /*
      * All we need to do here is query for children an do a "max(ordinal)" operation on that, but
      * digging the information off the web for how to do this appears to be something that may take a

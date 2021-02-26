@@ -689,6 +689,10 @@ public class NodeEditService {
 		return false;
 	}
 
+	/*
+	 * This makes ALL the headings of all the sibling nodes match the heading level of the req.nodeId
+	 * passed in.
+	 */
 	public UpdateHeadingsResponse updateHeadings(MongoSession session, UpdateHeadingsRequest req) {
 		UpdateHeadingsResponse res = new UpdateHeadingsResponse();
 		if (session == null) {
@@ -700,7 +704,14 @@ public class NodeEditService {
 		if (content != null) {
 			content = content.trim();
 			int baseLevel = XString.getHeadingLevel(content);
-			updateHeadingsForNode(session, node, 0, baseLevel);
+
+			SubNode parent = read.getParent(session, node);
+			if (parent != null) {
+				for (SubNode n : read.getChildren(session, parent)) {
+					updateHeadingsForNode(session, n, baseLevel);
+				}
+				update.saveSession(session);
+			}
 		}
 		return res;
 	}
@@ -709,66 +720,62 @@ public class NodeEditService {
 	 * todo-1: update to use subgraph query and then just use the slash-count in the path to determine
 	 * relative tree level here. Relative part being important of course.
 	 */
-	private void updateHeadingsForNode(MongoSession session, SubNode node, int level, int baseLevel) {
-		// This needs to be re-written to be compatible with hashtags, so for now we will remove it.
-		// if (node == null)
-		// 	return;
+	private void updateHeadingsForNode(MongoSession session, SubNode node, int level) {
+		if (node == null)
+			return;
 
-		// String nodeContent = node.getContent();
-		// String content = nodeContent;
-		// if (content.startsWith("#") && content.indexOf(" ") < 7) {
-		// 	int spaceIdx = content.indexOf(" ");
-		// 	if (spaceIdx != -1) {
-		// 		content = content.substring(spaceIdx + 1);
+		String nodeContent = node.getContent();
+		String content = nodeContent;
 
-		// 		/*
-		// 		 * These strings (pound sign headings) could be generated dynamically, but this switch with them
-		// 		 * hardcoded is more performant
-		// 		 */
-		// 		switch (level + baseLevel) {
-		// 			case 0: // this will be the root node (user selected node)
-		// 				break;
-		// 			case 1:
-		// 				if (!nodeContent.startsWith("# ")) {
-		// 					node.setContent("# " + content);
-		// 				}
-		// 				break;
-		// 			case 2:
-		// 				if (!nodeContent.startsWith("## ")) {
-		// 					node.setContent("## " + content);
-		// 				}
-		// 				break;
-		// 			case 3:
-		// 				if (!nodeContent.startsWith("### ")) {
-		// 					node.setContent("### " + content);
-		// 				}
-		// 				break;
-		// 			case 4:
-		// 				if (!nodeContent.startsWith("#### ")) {
-		// 					node.setContent("#### " + content);
-		// 				}
-		// 				break;
-		// 			case 5:
-		// 				if (!nodeContent.startsWith("##### ")) {
-		// 					node.setContent("##### " + content);
-		// 				}
-		// 				break;
-		// 			case 6:
-		// 				if (!nodeContent.startsWith("###### ")) {
-		// 					node.setContent("###### " + content);
-		// 				}
-		// 				break;
-		// 			default:
-		// 				break;
-		// 		}
-		// 	}
-		// }
+		// if this node starts with a heading (hash marks)
+		if (content.startsWith("#") && content.indexOf(" ") < 7) {
+			int spaceIdx = content.indexOf(" ");
+			if (spaceIdx != -1) {
 
-		// Sort sort = Sort.by(Sort.Direction.ASC, SubNode.FIELD_ORDINAL);
-		// for (SubNode n : read.getChildren(session, node, sort, null, 0)) {
-		// 	updateHeadingsForNode(session, n, level + 1, baseLevel);
-		// }
+				// strip the pre-existing hashes off
+				content = content.substring(spaceIdx + 1);
 
-		// update.saveSession(session);
+				/*
+				 * These strings (pound sign headings) could be generated dynamically, but this switch with them
+				 * hardcoded is more performant
+				 */
+				switch (level) {
+					case 0: // this will be the root node (user selected node)
+						break;
+					case 1:
+						if (!nodeContent.startsWith("# ")) {
+							node.setContent("# " + content);
+						}
+						break;
+					case 2:
+						if (!nodeContent.startsWith("## ")) {
+							node.setContent("## " + content);
+						}
+						break;
+					case 3:
+						if (!nodeContent.startsWith("### ")) {
+							node.setContent("### " + content);
+						}
+						break;
+					case 4:
+						if (!nodeContent.startsWith("#### ")) {
+							node.setContent("#### " + content);
+						}
+						break;
+					case 5:
+						if (!nodeContent.startsWith("##### ")) {
+							node.setContent("##### " + content);
+						}
+						break;
+					case 6:
+						if (!nodeContent.startsWith("###### ")) {
+							node.setContent("###### " + content);
+						}
+						break;
+					default:
+						break;
+				}
+			}
+		}
 	}
 }
