@@ -14,8 +14,8 @@ import { Button } from "../widget/Button";
 import { ButtonBar } from "../widget/ButtonBar";
 import { CollapsiblePanel } from "../widget/CollapsiblePanel";
 import { Div } from "../widget/Div";
-import { Heading } from "../widget/Heading";
 import { Html } from "../widget/Html";
+import { IconButton } from "../widget/IconButton";
 import { Img } from "../widget/Img";
 import { Span } from "../widget/Span";
 import { TextContent } from "../widget/TextContent";
@@ -27,11 +27,10 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
 });
 
 export class RssTypeHandler extends TypeBase {
-
-    // NOTE: Same value appears in RSSFeedService.ts
-    static MAX_FEED_ITEMS: number = 200;
     static expansionState: any = {};
     static TEXT_COLLAPSED: boolean = false;
+
+    static lastGoodFeed: any;
 
     constructor() {
         super(J.NodeType.RSS_FEED, "RSS Feed", "fa-rss", true);
@@ -128,7 +127,13 @@ export class RssTypeHandler extends TypeBase {
             itemListContainer.addChild(new Div("Loading RSS Feed..."));
             itemListContainer.addChild(new Div("(For large feeds this can take a few seconds)"));
 
-            let url = S.util.getRemoteHost() + "/multiRssFeed?url=" + encodeURIComponent(feedSrc);
+            let page: number = state.feedPage[feedSrcHash];
+            if (!page) {
+                page = 1;
+                state.feedPage[feedSrcHash] = page;
+            }
+
+            let url = S.util.getRemoteHost() + "/multiRssFeed?url=" + encodeURIComponent(feedSrc) + "&page=" + page;
 
             // console.log("Reading RSS: " + url);
             parser.parseURL(url, (err, feed) => {
@@ -148,7 +153,16 @@ export class RssTypeHandler extends TypeBase {
                         type: "Action_RSSUpdated",
                         state,
                         update: (s: AppState): void => {
-                            s.feedCache[feedSrcHash] = feed;
+                            if (!feed.items || feed.items.length === 0) {
+                                s.feedCache[feedSrcHash] = RssTypeHandler.lastGoodFeed;
+                                setTimeout(() => {
+                                    S.util.showMessage("No more RSS items found.", "RSS");
+                                }, 250);
+                            }
+                            else {
+                                s.feedCache[feedSrcHash] = feed;
+                                RssTypeHandler.lastGoodFeed = feed;
+                            }
                         }
                     });
                 }
@@ -211,15 +225,53 @@ export class RssTypeHandler extends TypeBase {
 
         let feedOutDiv = new Div(null, null, feedOut);
         itemListContainer.getChildren().push(feedOutDiv);
-        let itemCount = 0;
 
         for (let item of feed.items) {
             // console.log("FEED ITEM: " + S.util.prettyPrint(item));
             itemListContainer.getChildren().push(this.buildFeedItem(feed, item, state));
-            if (++itemCount >= RssTypeHandler.MAX_FEED_ITEMS) {
-                break;
-            }
         }
+
+        let feedSrcHash = S.util.hashOfString(feedSrc);
+
+        itemListContainer.getChildren().push(//
+            new ButtonBar([
+                new IconButton("fa-rss", "Refresh", {
+                    onClick: () => {
+                        dispatch({
+                            type: "Action_RSSUpdated",
+                            state,
+                            update: (s: AppState): void => {
+                                // deleting will force a requery from the server
+                                delete s.feedCache[feedSrcHash];
+
+                                /* Resetting to page 1 is enough to do the Refresh. Server is caching so we aren't REALLY
+                                refreshing from the actual RSS feed itself until the server does so every 30 minutes only */
+                                s.feedPage[feedSrcHash] = 1;
+                            }
+                        });
+                    },
+                    title: "Refresh RSS Feed"
+                }),
+                new IconButton("fa-angle-right", "More", {
+                    onClick: () => {
+                        dispatch({
+                            type: "Action_RSSUpdated",
+                            state,
+                            update: (s: AppState): void => {
+                                // deleting will force a requery from the server
+                                delete s.feedCache[feedSrcHash];
+
+                                let page: number = state.feedPage[feedSrcHash];
+                                if (!page) {
+                                    page = 1;
+                                }
+                                s.feedPage[feedSrcHash] = page + 1;
+                            }
+                        });
+                    },
+                    title: "Next Page"
+                })
+            ], "text-center marginTop marginBottom"));
     }
 
     buildFeedItem(feed: any, entry: any, state: AppState): Comp {
@@ -259,21 +311,25 @@ export class RssTypeHandler extends TypeBase {
         }
 
         let colonIdx = entry.title.indexOf(" :: ");
+        let headerPart = null;
         if (colonIdx !== -1) {
-            let headerPart = entry.title.substring(0, colonIdx);
-            headerDivChildren.push(new Heading(4, headerPart));
+            headerPart = entry.title.substring(0, colonIdx);
 
             let title = entry.title.substring(colonIdx + 4);
-            headerDivChildren.push(new Anchor(entry.link, title, {
-                className: "rssAnchor",
-                target: "_blank"
-            }));
+            headerDivChildren.push(new Div(null, { className: "marginBottom" }, [
+                new Anchor(entry.link, title, {
+                    className: "rssAnchor",
+                    target: "_blank"
+                })
+            ]));
         }
         else {
-            headerDivChildren.push(new Anchor(entry.link, entry.title, {
-                className: "rssAnchor",
-                target: "_blank"
-            }));
+            headerDivChildren.push(new Div(null, { className: "marginBottom" }, [
+                new Anchor(entry.link, entry.title, {
+                    className: "rssAnchor marginBottom",
+                    target: "_blank"
+                })
+            ]));
         }
 
         if (entry.itunesSubtitle && entry.itunesSubtitle !== entry.title) {
@@ -333,7 +389,7 @@ export class RssTypeHandler extends TypeBase {
                 dateStr = S.util.formatDateShort(new Date(date));
             }
         }
-        children.push(new Div(dateStr, { className: "float-right marginRight" }));
+        children.push(new Div((headerPart ? headerPart + " - " : "") + dateStr, { className: "float-right marginRight" }));
         children.push(new Div(null, { className: "clearfix" }));
 
         return new Div(null, { className: "rss-feed-item" }, children);

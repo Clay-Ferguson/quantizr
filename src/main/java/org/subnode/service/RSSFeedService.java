@@ -78,14 +78,14 @@ public class RSSFeedService {
 	private static int runCount = 0;
 
 	// NOTE: Same value appears in RSSTypeHandler.ts
-	private static final int MAX_FEED_ITEMS = 200;
+	private static final int MAX_FEED_ITEMS = 50;
 
 	private static final int MAX_FEEDS_PER_AGGREGATE = 40;
 
 	/*
-	 * Runs immediately at startup, and then every 120 minutes, to refresh the feedCache.
+	 * Runs immediately at startup, and then every 30 minutes, to refresh the feedCache.
 	 */
-	@Scheduled(fixedDelay = 120 * 60 * 1000)
+	@Scheduled(fixedDelay = 30 * 60 * 1000)
 	public void run() {
 		runCount++;
 		if (runCount == 1) {
@@ -143,6 +143,8 @@ public class RSSFeedService {
 	 * 
 	 * If writer is null it means we are just running without writing to a server like only to prewarm
 	 * the cache during app startup called from startupPreCache
+	 * 
+	 * NOTE: pagination isn't supported yet in this. See "1" arg below, which means first page
 	 */
 	public void multiRss(MongoSession mongoSession, final String nodeId, Writer writer) {
 		SyndFeed feed = aggregateCache.get(nodeId);
@@ -192,7 +194,7 @@ public class RSSFeedService {
 				}
 			}
 
-			aggregateFeeds(urls, entries);
+			aggregateFeeds(urls, entries, "1");
 			aggregateCache.put(nodeId, feed);
 		}
 
@@ -205,7 +207,7 @@ public class RSSFeedService {
 	 * to the end. Need some new algo where we ensure at least X-number of items from each feed is
 	 * include unless they are at least a full day old.
 	 */
-	public void aggregateFeeds(List<String> urls, List<SyndEntry> entries) {
+	public void aggregateFeeds(List<String> urls, List<SyndEntry> entries, String page) {
 		try {
 			for (String url : urls) {
 				SyndFeed inFeed = getFeed(url, true);
@@ -225,14 +227,31 @@ public class RSSFeedService {
 			revChronSortEntries(entries);
 
 			/*
-			 * this number has to be as large at least as the number the browser will try to show currently,
-			 * because the aggregator code is sharing this object with the ordinary single RSS feed retrival and
-			 * so this number chops it down. Need to rethink this, and only chop down what the aggreggator is
-			 * working with
+			 * Now from the complete 'entries' list we extract out just the page we need into 'pageEntires' and
+			 * then stuff pageEntries back into 'entries' to send out of this method
 			 */
-			while (entries.size() > MAX_FEED_ITEMS) {
-				entries.remove(entries.size() - 1);
+			List<SyndEntry> pageEntries = new LinkedList<SyndEntry>();
+			int pageNo = 1;
+			try {
+				pageNo = Integer.parseInt(page);
+			} catch (Exception e) {
+				// ignore, and leave as 1 if page is invalid
 			}
+			// make page zero-offset before using.
+			pageNo--;
+			int startIdx = pageNo * MAX_FEED_ITEMS;
+			int idx = 0;
+			for (SyndEntry entry : entries) {
+				if (idx >= startIdx) {
+					pageEntries.add(entry);
+					if (pageEntries.size() >= MAX_FEED_ITEMS) {
+						break;
+					}
+				}
+				idx++;
+			}
+			entries.clear();
+			entries.addAll(pageEntries);
 		} catch (Exception e) {
 			ExUtil.error(log, "Error: ", e);
 		}
@@ -253,6 +272,7 @@ public class RSSFeedService {
 			URL inputUrl = new URL(url);
 			SyndFeedInput input = new SyndFeedInput();
 			inFeed = input.build(new XmlReader(inputUrl));
+			// log.debug("Feed " + url + " has " + inFeed.getEntries().size() + " entries.");
 			sanitizeFeed(inFeed);
 
 			// we update the cache regardless of 'fromCache' val. this is correct.
@@ -319,17 +339,18 @@ public class RSSFeedService {
 	/*
 	 * Takes a newline delimited list of rss feed urls, and returns the feed for them as an aggregate
 	 * while also updating our caching
+	 * 
+	 * Page will be 1 offset (1, 2, 3, ...)
 	 */
-	public void multiRssFeed(String urls, Writer writer) {
+	public void multiRssFeed(String urls, Writer writer, String page) {
 
 		List<String> urlList = XString.tokenize(urls, "\n", true);
 		urlList.removeIf(url -> url.startsWith("#") || StringUtils.isEmpty(url.trim()));
 
-		SyndFeed feed = null;
+		SyndFeed feed = new SyndFeedImpl();
 
 		/* If multiple feeds we build an aggregate */
 		if (urlList.size() > 1) {
-			feed = new SyndFeedImpl();
 
 			feed.setEncoding("UTF-8");
 			feed.setFeedType("rss_2.0");
@@ -339,7 +360,8 @@ public class RSSFeedService {
 			feed.setLink("");
 			List<SyndEntry> entries = new LinkedList<SyndEntry>();
 			feed.setEntries(entries);
-			aggregateFeeds(urlList, entries);
+			aggregateFeeds(urlList, entries, page);
+			// log.debug("Sending back " + entries.size() + " entries.");
 			writeFeed(feed, writer);
 		}
 		/* If not an aggregate return the one external feed itself */
@@ -347,11 +369,48 @@ public class RSSFeedService {
 			String url = urlList.get(0);
 			// boolean useCache = appProp.getProfileName().equals("prod");
 			boolean useCache = true;
-			feed = getFeed(url, useCache);
+			SyndFeed cachedFeed = getFeed(url, useCache);
+			cloneFeedForPage(feed, cachedFeed, page);
 		}
 
 		if (feed != null) {
 			writeFeed(feed, writer);
+		}
+	}
+
+	/*
+	 * Makes feed be a cloned copy of cachedFeed but with only the specific 'page' of results extracted
+	 */
+	private void cloneFeedForPage(SyndFeed feed, SyndFeed cachedFeed, String page) {
+
+		feed.setEncoding(cachedFeed.getEncoding());
+		feed.setFeedType(cachedFeed.getFeedType());
+		feed.setTitle(cachedFeed.getTitle());
+		feed.setDescription(cachedFeed.getDescription());
+		feed.setAuthor(cachedFeed.getAuthor());
+		feed.setLink(cachedFeed.getLink());
+
+		List<SyndEntry> entries = new LinkedList<SyndEntry>();
+		feed.setEntries(entries);
+
+		int pageNo = 1;
+		try {
+			pageNo = Integer.parseInt(page);
+		} catch (Exception e) {
+			// ignore, and leave as 1 if page is invalid
+		}
+		// make page zero-offset before using.
+		pageNo--;
+		int startIdx = pageNo * MAX_FEED_ITEMS;
+		int idx = 0;
+		for (SyndEntry entry : cachedFeed.getEntries()) {
+			if (idx >= startIdx) {
+				entries.add(entry);
+				if (entries.size() >= MAX_FEED_ITEMS) {
+					break;
+				}
+			}
+			idx++;
 		}
 	}
 
