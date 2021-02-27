@@ -12,9 +12,9 @@ import { Comp } from "../widget/base/Comp";
 import { CompIntf } from "../widget/base/CompIntf";
 import { Button } from "../widget/Button";
 import { ButtonBar } from "../widget/ButtonBar";
-import { CollapsiblePanel } from "../widget/CollapsiblePanel";
 import { Div } from "../widget/Div";
 import { Html } from "../widget/Html";
+import { Icon } from "../widget/Icon";
 import { IconButton } from "../widget/IconButton";
 import { Img } from "../widget/Img";
 import { Span } from "../widget/Span";
@@ -28,8 +28,6 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
 
 export class RssTypeHandler extends TypeBase {
     static expansionState: any = {};
-    static TEXT_COLLAPSED: boolean = false;
-
     static lastGoodFeed: any;
 
     constructor() {
@@ -369,17 +367,7 @@ export class RssTypeHandler extends TypeBase {
         }
 
         if (textContent) {
-            if (RssTypeHandler.TEXT_COLLAPSED) {
-                children.push(new CollapsiblePanel(null, null, null, [
-                    new Html(textContent)
-                ], false,
-                    (state: boolean) => {
-                        RssTypeHandler.expansionState[entry.guid] = state;
-                    }, RssTypeHandler.expansionState[entry.guid], "float-right"));
-            }
-            else {
-                children.push(new Html(textContent));
-            }
+            children.push(new Html(textContent));
         }
 
         let dateStr = entry.pubDate;
@@ -389,7 +377,21 @@ export class RssTypeHandler extends TypeBase {
                 dateStr = S.util.formatDateShort(new Date(date));
             }
         }
-        children.push(new Div((headerPart ? headerPart + " - " : "") + dateStr, { className: "float-right marginRight" }));
+
+        let linkSpan = new Icon({
+            className: "fa fa-link fa-lg rssLinkIcon",
+            title: "Copy URL into clipboard",
+            onClick: () => {
+                S.util.copyToClipboard(entry.link);
+                S.util.flashMessage("Copied to Clipboard: " + entry.link, "Clipboard", true);
+            }
+        });
+
+        let footerSpan = new Span((headerPart ? headerPart + " - " : "") + dateStr, { className: "marginRight" });
+
+        children.push(new Div(null, { className: "float-right" }, [
+            footerSpan, linkSpan
+        ]));
         children.push(new Div(null, { className: "clearfix" }));
 
         return new Div(null, { className: "rss-feed-item" }, children);

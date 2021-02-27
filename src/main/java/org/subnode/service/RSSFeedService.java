@@ -2,8 +2,10 @@ package org.subnode.service;
 
 import java.io.Writer;
 import java.net.URL;
+import java.net.URLConnection;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
@@ -65,6 +67,9 @@ public class RSSFeedService {
 	 */
 	private static final ConcurrentHashMap<String, SyndFeed> feedCache = new ConcurrentHashMap<String, SyndFeed>();
 
+	/* keep track of which feeds failed so we don't try them again until another 30-min cycle */
+	private static final HashSet<String> failedFeeds = new HashSet<String>();
+
 	/*
 	 * Cache of all aggregates
 	 */
@@ -118,6 +123,8 @@ public class RSSFeedService {
 		if (refreshingCache) {
 			return "Cache refresh was already in progress.";
 		}
+
+		failedFeeds.clear();
 
 		try {
 			refreshingCache = true;
@@ -194,7 +201,7 @@ public class RSSFeedService {
 				}
 			}
 
-			aggregateFeeds(urls, entries, "1");
+			aggregateFeeds(urls, entries, 1);
 			aggregateCache.put(nodeId, feed);
 		}
 
@@ -207,7 +214,7 @@ public class RSSFeedService {
 	 * to the end. Need some new algo where we ensure at least X-number of items from each feed is
 	 * include unless they are at least a full day old.
 	 */
-	public void aggregateFeeds(List<String> urls, List<SyndEntry> entries, String page) {
+	public void aggregateFeeds(List<String> urls, List<SyndEntry> entries, int page) {
 		try {
 			for (String url : urls) {
 				SyndFeed inFeed = getFeed(url, true);
@@ -231,14 +238,7 @@ public class RSSFeedService {
 			 * then stuff pageEntries back into 'entries' to send out of this method
 			 */
 			List<SyndEntry> pageEntries = new LinkedList<SyndEntry>();
-			int pageNo = 1;
-			try {
-				pageNo = Integer.parseInt(page);
-			} catch (Exception e) {
-				// ignore, and leave as 1 if page is invalid
-			}
-			// make page zero-offset before using.
-			pageNo--;
+			int pageNo = page - 1;
 			int startIdx = pageNo * MAX_FEED_ITEMS;
 			int idx = 0;
 			for (SyndEntry entry : entries) {
@@ -258,6 +258,16 @@ public class RSSFeedService {
 	}
 
 	public SyndFeed getFeed(String url, boolean fromCache) {
+
+		/*
+		 * if this feed failed don't try it again. Whenever we DO force the system to try a feed again
+		 * that's done by wiping failedFeeds clean but this 'getFeed' method should just bail out if the
+		 * feed has failed
+		 */
+		if (failedFeeds.contains(url)) {
+			return null;
+		}
+
 		try {
 			SyndFeed inFeed = null;
 
@@ -268,10 +278,15 @@ public class RSSFeedService {
 					return inFeed;
 				}
 			}
-
-			URL inputUrl = new URL(url);
+			
+			/* This is not a memory leak that we don't close the connection. This is correct. No need to close */
+			URLConnection conn = new URL(url).openConnection();
+			conn.setConnectTimeout(10000);
+			conn.setReadTimeout(10000);
+			XmlReader reader = new XmlReader(conn);
 			SyndFeedInput input = new SyndFeedInput();
-			inFeed = input.build(new XmlReader(inputUrl));
+			inFeed = input.build(reader);
+
 			// log.debug("Feed " + url + " has " + inFeed.getEntries().size() + " entries.");
 			sanitizeFeed(inFeed);
 
@@ -284,6 +299,7 @@ public class RSSFeedService {
 			 * remains in place rather than getting forgotten just because it's currently unavailable
 			 */
 			ExUtil.error(log, "Error: ", e);
+			failedFeeds.add(url);
 			return null;
 		}
 	}
@@ -293,10 +309,16 @@ public class RSSFeedService {
 
 		feed.setDescription(sanitizeHtml(feed.getDescription()));
 		for (SyndEntry entry : feed.getEntries()) {
-			entry.getDescription().setValue(sanitizeHtml(entry.getDescription().getValue()));
+
+			// sanitize entry.description.value
+			if (entry.getDescription() != null && entry.getDescription().getValue() != null) {
+				entry.getDescription().setValue(sanitizeHtml(entry.getDescription().getValue()));
+			}
 
 			for (SyndContent content : entry.getContents()) {
-				content.setValue(sanitizeHtml(content.getValue()));
+				if (content.getValue() != null) {
+					content.setValue(sanitizeHtml(content.getValue()));
+				}
 			}
 		}
 	}
@@ -342,7 +364,7 @@ public class RSSFeedService {
 	 * 
 	 * Page will be 1 offset (1, 2, 3, ...)
 	 */
-	public void multiRssFeed(String urls, Writer writer, String page) {
+	public void multiRssFeed(String urls, Writer writer, int page) {
 
 		List<String> urlList = XString.tokenize(urls, "\n", true);
 		urlList.removeIf(url -> url.startsWith("#") || StringUtils.isEmpty(url.trim()));
@@ -381,7 +403,7 @@ public class RSSFeedService {
 	/*
 	 * Makes feed be a cloned copy of cachedFeed but with only the specific 'page' of results extracted
 	 */
-	private void cloneFeedForPage(SyndFeed feed, SyndFeed cachedFeed, String page) {
+	private void cloneFeedForPage(SyndFeed feed, SyndFeed cachedFeed, int page) {
 
 		feed.setEncoding(cachedFeed.getEncoding());
 		feed.setFeedType(cachedFeed.getFeedType());
@@ -393,14 +415,8 @@ public class RSSFeedService {
 		List<SyndEntry> entries = new LinkedList<SyndEntry>();
 		feed.setEntries(entries);
 
-		int pageNo = 1;
-		try {
-			pageNo = Integer.parseInt(page);
-		} catch (Exception e) {
-			// ignore, and leave as 1 if page is invalid
-		}
 		// make page zero-offset before using.
-		pageNo--;
+		int pageNo = page - 1;
 		int startIdx = pageNo * MAX_FEED_ITEMS;
 		int idx = 0;
 		for (SyndEntry entry : cachedFeed.getEntries()) {

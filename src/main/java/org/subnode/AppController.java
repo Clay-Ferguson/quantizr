@@ -515,11 +515,19 @@ public class AppController implements ErrorController {
 	/* url can be a single RSS url, or multiple newline delimted ones */
 	@GetMapping(value = {"/multiRssFeed"})
 	public void multiRssFeed(@RequestParam(value = "url", required = true) String url, //
-			@RequestParam(value = "page", required = false) String page, //
+			@RequestParam(value = "page", required = false) String pageStr, //
 			HttpServletResponse response, //
 			HttpSession session) {
 		callProc.run("multiRssFeed", null, session, ms -> {
 			try {
+				int page = 1;
+				if (pageStr != null) {
+					try {
+						page = Integer.parseInt(pageStr);
+					} catch (Exception e) {
+						// ignore, and leave as 1 if page is invalid
+					}
+				}
 				rssFeedService.multiRssFeed(url, response.getWriter(), page);
 			} catch (Exception e) {
 				ExUtil.error(log, "multiRssFeed Error: ", e);
