@@ -1,5 +1,7 @@
 package org.subnode.service;
 
+import java.io.InputStream;
+import java.io.Reader;
 import java.io.Writer;
 import java.net.URL;
 import java.net.URLConnection;
@@ -18,7 +20,14 @@ import com.rometools.rome.feed.synd.SyndFeedImpl;
 import com.rometools.rome.io.SyndFeedInput;
 import com.rometools.rome.io.SyndFeedOutput;
 import com.rometools.rome.io.XmlReader;
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.io.input.CharSequenceReader;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.config.RequestConfig;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.client.HttpClientBuilder;
 import org.owasp.html.PolicyFactory;
 import org.owasp.html.Sanitizers;
 import org.slf4j.Logger;
@@ -36,7 +45,9 @@ import org.subnode.mongo.MongoRead;
 import org.subnode.mongo.MongoSession;
 import org.subnode.mongo.RunAsMongoAdmin;
 import org.subnode.mongo.model.SubNode;
+import org.subnode.util.Const;
 import org.subnode.util.ExUtil;
+import org.subnode.util.StreamUtil;
 import org.subnode.util.SubNodeUtil;
 import org.subnode.util.XString;
 
@@ -61,6 +72,8 @@ public class RSSFeedService {
 
 	private static final Object policyLock = new Object();
 	PolicyFactory policy = null;
+
+	private boolean USE_HTTP_READER = false;
 
 	/*
 	 * Cache of all feeds.
@@ -124,13 +137,27 @@ public class RSSFeedService {
 			return "Cache refresh was already in progress.";
 		}
 
-		failedFeeds.clear();
-
 		try {
 			refreshingCache = true;
 			int count = 0, fails = 0;
 
+			if (failedFeeds.size() > 0) {
+				List<String> failedFeedsList = new LinkedList<String>(failedFeeds);
+				failedFeeds.clear();
+
+				for (String url : failedFeedsList) {
+					log.debug("Retrying previously failed feed: " + url);
+					SyndFeed feed = getFeed(url, false);
+					if (feed != null) {
+						count++;
+					} else {
+						fails++;
+					}
+				}
+			}
+
 			for (String url : feedCache.keySet()) {
+				log.debug("Refreshing feed: " + url);
 				SyndFeed feed = getFeed(url, false);
 				if (feed != null) {
 					count++;
@@ -215,6 +242,7 @@ public class RSSFeedService {
 	 * include unless they are at least a full day old.
 	 */
 	public void aggregateFeeds(List<String> urls, List<SyndEntry> entries, int page) {
+		log.debug("Generating aggregateFeed.");
 		try {
 			for (String url : urls) {
 				SyndFeed inFeed = getFeed(url, true);
@@ -258,16 +286,18 @@ public class RSSFeedService {
 	}
 
 	public SyndFeed getFeed(String url, boolean fromCache) {
+		log.debug("getFeed: " + url);
 
 		/*
 		 * if this feed failed don't try it again. Whenever we DO force the system to try a feed again
 		 * that's done by wiping failedFeeds clean but this 'getFeed' method should just bail out if the
 		 * feed has failed
 		 */
-		if (failedFeeds.contains(url)) {
+		if (fromCache && failedFeeds.contains(url)) {
 			return null;
 		}
 
+		Reader reader = null;
 		try {
 			SyndFeed inFeed = null;
 
@@ -278,12 +308,45 @@ public class RSSFeedService {
 					return inFeed;
 				}
 			}
-			
-			/* This is not a memory leak that we don't close the connection. This is correct. No need to close */
-			URLConnection conn = new URL(url).openConnection();
-			conn.setConnectTimeout(10000);
-			conn.setReadTimeout(10000);
-			XmlReader reader = new XmlReader(conn);
+
+			int timeout = 60; //seconds
+			log.debug("Reading RSS stream");
+			if (!USE_HTTP_READER) {
+				/*
+				 * This is not a memory leak that we don't close the connection. This is correct. No need to close
+				 */
+				URLConnection conn = new URL(url).openConnection();
+
+				conn.setConnectTimeout(timeout * 1000);
+				conn.setReadTimeout(timeout * 1000);
+				reader = new XmlReader(conn);
+			}
+			/*
+			 * I was experimenting this this way of getting a reader as a last attempt to get a specific
+			 * problematic URL to work, that keeps causing a timeout when I try to read from it thru the server
+			 * side, even though the same url works fine when entered into my browser url, so one trick that has
+			 * worked in the past was to masquerade as a browser using the 'user agent'. So this code DOES work,
+			 * but never did solve the problem with that one specific URL that simply refuses to send data to
+			 * the Quanta server. So I ended up just going back also to the simpler URLConnection based
+			 * XmlReader above, but I want to keep this code also for future reference or needs.
+			 */
+			else {
+				RequestConfig config = RequestConfig.custom() //
+						.setConnectTimeout(timeout * 1000) //
+						.setConnectionRequestTimeout(timeout * 1000) //
+						.setSocketTimeout(timeout * 1000).build();
+
+				HttpClient client = HttpClientBuilder.create().setDefaultRequestConfig(config).build();
+				HttpGet request = new HttpGet(url);
+
+				request.addHeader("User-Agent", Const.FAKE_USER_AGENT);
+				HttpResponse response = client.execute(request);
+				InputStream is = response.getEntity().getContent();
+
+				byte[] buffer = IOUtils.toByteArray(is);
+				reader = new CharSequenceReader(new String(buffer));
+			}
+
 			SyndFeedInput input = new SyndFeedInput();
 			inFeed = input.build(reader);
 
@@ -298,9 +361,13 @@ public class RSSFeedService {
 			 * Leave feedCache with any existing mapping it has when it fails. Worst case here is a stale cache
 			 * remains in place rather than getting forgotten just because it's currently unavailable
 			 */
-			ExUtil.error(log, "Error: ", e);
+			ExUtil.error(log, "Error reading feed: " + url, e);
 			failedFeeds.add(url);
 			return null;
+		} finally {
+			if (reader != null) {
+				StreamUtil.close(reader);
+			}
 		}
 	}
 
@@ -369,11 +436,12 @@ public class RSSFeedService {
 		List<String> urlList = XString.tokenize(urls, "\n", true);
 		urlList.removeIf(url -> url.startsWith("#") || StringUtils.isEmpty(url.trim()));
 
-		SyndFeed feed = new SyndFeedImpl();
+		SyndFeed feed = null;
 
 		/* If multiple feeds we build an aggregate */
 		if (urlList.size() > 1) {
 
+			feed = new SyndFeedImpl();
 			feed.setEncoding("UTF-8");
 			feed.setFeedType("rss_2.0");
 			feed.setTitle("");
@@ -389,10 +457,11 @@ public class RSSFeedService {
 		/* If not an aggregate return the one external feed itself */
 		else {
 			String url = urlList.get(0);
-			// boolean useCache = appProp.getProfileName().equals("prod");
-			boolean useCache = true;
-			SyndFeed cachedFeed = getFeed(url, useCache);
-			cloneFeedForPage(feed, cachedFeed, page);
+			SyndFeed cachedFeed = getFeed(url, true);
+			if (cachedFeed != null) {
+				feed = new SyndFeedImpl();
+				cloneFeedForPage(feed, cachedFeed, page);
+			}
 		}
 
 		if (feed != null) {
