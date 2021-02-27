@@ -7,7 +7,6 @@ import { NavIntf } from "./intf/NavIntf";
 import { PluginMgrIntf } from "./intf/PluginMgrIntf";
 import { PropsIntf } from "./intf/PropsIntf";
 import { RenderIntf } from "./intf/RenderIntf";
-import { RSSReaderIntf } from "./intf/RSSReaderIntf";
 import { SearchIntf } from "./intf/SearchIntf";
 import { ServerPushIntf } from "./intf/ServerPushIntf";
 import { ShareIntf } from "./intf/ShareIntf";
@@ -32,6 +31,5 @@ export interface Singletons {
     share: ShareIntf;
     user: UserIntf;
     view: ViewIntf;
-    rssReader: RSSReaderIntf;
     localDB: LocalDBIntf;
 }

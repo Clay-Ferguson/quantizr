@@ -23,7 +23,6 @@ import { PluginMgr } from "./PluginMgr";
 import { Props } from "./Props";
 import { PubSub } from "./PubSub";
 import { Render } from "./Render";
-import { RSSReader } from "./RSSReader";
 import { Search } from "./Search";
 import { ServerPush } from "./ServerPush";
 import { Share } from "./Share";
@@ -55,7 +54,6 @@ export class Factory {
             share: new Share(),
             user: new User(),
             view: new View(),
-            rssReader: new RSSReader(),
             localDB: new LocalDB()
         };
 

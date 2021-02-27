@@ -494,7 +494,8 @@ public class NodeRenderService {
 	/*
 	 * Reads all subnodes under name 'nodeName' (currently assumed to be an admin-owned node and shared
 	 * to public), and populates them into model, recursively building a tree structure as flat property
-	 * names in 'model' where each property is the 'content' of the node.
+	 * names in 'model' where each property is the 'content' of the node, and the key is the 'name' of
+	 * the node
 	 * 
 	 * Returns true if there was a node at 'nodeName' and false otherwise.
 	 */
