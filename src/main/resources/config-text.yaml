@@ -94,7 +94,7 @@ help:
     dialog: >-
       <h4>Search Tips</h4>
       <ul>
-        <li>To search for a multi-word phrase enclose it in double quotes.</li>
+        <li>To search for a multi-word phrase (or an exact match on a word) enclose it in double quotes.</li>
         <li>To find substrings in words use the "Fuzzy Search" option.</li>
         <li>To find all nodes that contain any of a list words enter the words with spaces between them</li>
         <li>To exclude search results that contain some word, put a '-' (minus) right in front of the word (or right in front of a quoted string)</li>

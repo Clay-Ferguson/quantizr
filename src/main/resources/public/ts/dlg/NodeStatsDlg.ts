@@ -27,7 +27,7 @@ export class NodeStatsDlg extends DialogBase {
     static helpExpanded: boolean;
 
     constructor(private res: J.GetNodeStatsResponse, public trending: boolean, public feed: boolean, state: AppState) {
-        super(trending ? "Trending Now" : "Node Stats", null, false, state);
+        super(trending ? "Trending Now" : "Node Statistics", null, false, state);
     }
 
     renderDlg = (): CompIntf[] => {
@@ -87,7 +87,8 @@ export class NodeStatsDlg extends DialogBase {
         this.close();
 
         if (this.feed) {
-            FeedView.searchTextState.setValue(word);
+            /* put word in quotes to do an exact match */
+            FeedView.searchTextState.setValue("\"" + word + "\"");
             FeedView.refresh();
         }
         else {
