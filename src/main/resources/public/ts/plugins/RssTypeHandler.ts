@@ -29,6 +29,7 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
 export class RssTypeHandler extends TypeBase {
     static expansionState: any = {};
     static lastGoodFeed: any;
+    static lastGoodPage: number;
 
     constructor() {
         super(J.NodeType.RSS_FEED, "RSS Feed", "fa-rss", true);
@@ -153,6 +154,7 @@ export class RssTypeHandler extends TypeBase {
                         update: (s: AppState): void => {
                             if (!feed.items || feed.items.length === 0) {
                                 s.feedCache[feedSrcHash] = RssTypeHandler.lastGoodFeed;
+                                s.feedPage[feedSrcHash] = RssTypeHandler.lastGoodPage;
                                 setTimeout(() => {
                                     S.util.showMessage("No more RSS items found.", "RSS");
                                 }, 250);
@@ -160,6 +162,7 @@ export class RssTypeHandler extends TypeBase {
                             else {
                                 s.feedCache[feedSrcHash] = feed;
                                 RssTypeHandler.lastGoodFeed = feed;
+                                RssTypeHandler.lastGoodPage = s.feedPage[feedSrcHash];
                             }
                         }
                     });
@@ -231,45 +234,48 @@ export class RssTypeHandler extends TypeBase {
 
         let feedSrcHash = S.util.hashOfString(feedSrc);
 
+        let page: number = state.feedPage[feedSrcHash];
+        if (!page) {
+            page = 1;
+        }
+
         itemListContainer.getChildren().push(//
             new ButtonBar([
-                new IconButton("fa-rss", "Refresh", {
-                    onClick: () => {
-                        dispatch({
-                            type: "Action_RSSUpdated",
-                            state,
-                            update: (s: AppState): void => {
-                                // deleting will force a requery from the server
-                                delete s.feedCache[feedSrcHash];
-
-                                /* Resetting to page 1 is enough to do the Refresh. Server is caching so we aren't REALLY
-                                refreshing from the actual RSS feed itself until the server does so every 30 minutes only */
-                                s.feedPage[feedSrcHash] = 1;
-                            }
-                        });
-                    },
-                    title: "Refresh RSS Feed"
-                }),
+                page > 1 ? new IconButton("fa-angle-double-left", null, {
+                    onClick: () => this.setPage(feedSrcHash, state, 1),
+                    title: "First Page"
+                }) : null,
+                page > 1 ? new IconButton("fa-angle-left", null, {
+                    onClick: () => this.pageBump(feedSrcHash, state, -1),
+                    title: "Previous Page"
+                }) : null,
                 new IconButton("fa-angle-right", "More", {
-                    onClick: () => {
-                        dispatch({
-                            type: "Action_RSSUpdated",
-                            state,
-                            update: (s: AppState): void => {
-                                // deleting will force a requery from the server
-                                delete s.feedCache[feedSrcHash];
-
-                                let page: number = state.feedPage[feedSrcHash];
-                                if (!page) {
-                                    page = 1;
-                                }
-                                s.feedPage[feedSrcHash] = page + 1;
-                            }
-                        });
-                    },
+                    onClick: () => this.pageBump(feedSrcHash, state, 1),
                     title: "Next Page"
                 })
             ], "text-center marginTop marginBottom"));
+    }
+
+    /* cleverly does both prev or next paging */
+    pageBump = (feedSrcHash: string, state: AppState, bump: number) => {
+        let page: number = state.feedPage[feedSrcHash];
+        if (!page) {
+            page = 1;
+        }
+        if (page + bump < 1) return;
+        this.setPage(feedSrcHash, state, page + bump);
+    }
+
+    setPage = (feedSrcHash: string, state: AppState, page: number) => {
+        dispatch({
+            type: "Action_RSSUpdated",
+            state,
+            update: (s: AppState): void => {
+                // deleting will force a requery from the server
+                delete s.feedCache[feedSrcHash];
+                s.feedPage[feedSrcHash] = page;
+            }
+        });
     }
 
     buildFeedItem(feed: any, entry: any, state: AppState): Comp {
@@ -380,7 +386,7 @@ export class RssTypeHandler extends TypeBase {
 
         let linkSpan = new Icon({
             className: "fa fa-link fa-lg rssLinkIcon",
-            title: "Copy URL into clipboard",
+            title: "Copy RSS Item URL into clipboard",
             onClick: () => {
                 S.util.copyToClipboard(entry.link);
                 S.util.flashMessage("Copied to Clipboard: " + entry.link, "Clipboard", true);
@@ -400,9 +406,23 @@ export class RssTypeHandler extends TypeBase {
     /* This will process all the images loaded by the RSS Feed content to make sure they're all 300px wide because
     otherwise we get rediculously large images */
     getDomPreUpdateFunction(parent: CompIntf): void {
+        const urlSet: Set<string> = new Set<string>();
+
         S.util.forEachElmBySel("#" + parent.getId() + " .rss-feed-listing img", (el: HTMLElement, i) => {
+
+            /* Because some feeds use the same image in the header and content we try to detect that here
+            and remove any but the first ocurrance of any given image on the entier page */
+            let src: string = (el as any).src;
+            if (urlSet.has(src)) {
+                el.style.display = "none";
+                return;
+            }
+            urlSet.add(src);
+
+            // console.log("IMG SRC: " + (el as any).src);
             el.style.borderRadius = ".6em";
             el.style.border = "1px solid gray";
+            el.style.marginBottom = "12px";
 
             /* Setting width to 100% and always removing height ensures the image does fit into our colum display
             and also will not stretch */
