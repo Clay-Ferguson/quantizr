@@ -146,7 +146,6 @@ export class MenuPanel extends Div {
                 !state.isAnonUser && !!hltNode) //
         ]));
 
-        // todo-0: Update user guide for Calendar items and add some videos.
         children.push(new Menu("Calendar", [
 
            !state.isAnonUser ? new MenuItem("Show", () => S.render.showCalendar(null, state), !!hltNode) : null, //

@@ -198,7 +198,7 @@ export class EditNodeDlg extends DialogBase {
 
             /* todo-1: eventually we will have data types, but for now we use a hack
             to detect to treat a string as a date based on its property name. */
-            if (propEntry.name === "date") {
+            if (propEntry.name === J.NodeProp.DATE) {
                 // Ensure we have set the default time if none is yet set.
                 if (!propState.getValue()) {
                     propState.setValue("" + new Date().getTime());
@@ -552,7 +552,7 @@ export class EditNodeDlg extends DialogBase {
         let allowShare: boolean = typeHandler ? (state.isAdminUser || typeHandler.allowAction(NodeActionType.share, state.node, this.appState)) : true;
 
         let typeLocked = !!S.props.getNodePropVal(J.NodeProp.TYPE_LOCK, state.node);
-        let datePropExists = S.props.getNodeProp("date", state.node);
+        let datePropExists = S.props.getNodeProp(J.NodeProp.DATE, state.node);
 
         return new ButtonBar([
             new Button("Save", () => {
@@ -631,18 +631,17 @@ export class EditNodeDlg extends DialogBase {
             state.node.properties = [];
         }
 
-        // todo-0: change "date" hardcoded string to the variable in NodeProps
-        if (S.props.getNodeProp("date", state.node)) {
+        if (S.props.getNodeProp(J.NodeProp.DATE, state.node)) {
             return;
         }
 
         state.node.properties.push({
-            name: "date",
+            name: J.NodeProp.DATE,
             value: new Date().getTime()
         });
 
         state.node.properties.push({
-            name: "duration",
+            name: J.NodeProp.DURATION,
             value: "01:00"
         });
 
@@ -792,7 +791,7 @@ export class EditNodeDlg extends DialogBase {
                 if (propState) {
 
                     // hack to store dates as numeric prop (todo-1: need a systematic way to assign JSON types to properties)
-                    if (prop.name === "date" && (typeof propState.getValue() === "string")) {
+                    if (prop.name === J.NodeProp.DATE && (typeof propState.getValue() === "string")) {
                         try {
                             prop.value = parseInt(propState.getValue());
                         }
@@ -926,7 +925,7 @@ export class EditNodeDlg extends DialogBase {
             else {
                 /* todo-1: eventually we will have data types, but for now we use a hack
                 to detect to treat a string as a date based on its property name. */
-                if (propEntry.name === "date") {
+                if (propEntry.name === J.NodeProp.DATE) {
                     valEditor = new DateTimeField(propState);
                 }
                 else {

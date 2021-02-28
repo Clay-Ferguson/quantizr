@@ -803,7 +803,7 @@ export class Edit implements EditIntf {
             createAtTop: true,
             content: null,
             typeLock: true,
-            properties: [{ name: "date", value: "" + initDate }]
+            properties: [{ name: J.NodeProp.DATE, value: "" + initDate }]
         }, (res) => {
             this.createSubNodeResponse(res, state);
         });
