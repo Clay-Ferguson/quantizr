@@ -1,5 +1,6 @@
 package org.subnode.service;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.Reader;
 import java.io.Writer;
@@ -17,6 +18,7 @@ import com.rometools.rome.feed.synd.SyndEntry;
 import com.rometools.rome.feed.synd.SyndEntryImpl;
 import com.rometools.rome.feed.synd.SyndFeed;
 import com.rometools.rome.feed.synd.SyndFeedImpl;
+import com.rometools.rome.io.FeedException;
 import com.rometools.rome.io.SyndFeedInput;
 import com.rometools.rome.io.SyndFeedOutput;
 import com.rometools.rome.io.XmlReader;
@@ -34,8 +36,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.HttpMethod;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
+import org.springframework.web.client.RestTemplate;
 import org.subnode.AppServer;
 import org.subnode.config.AppProp;
 import org.subnode.exception.NodeAuthFailedException;
@@ -49,6 +53,7 @@ import org.subnode.util.Const;
 import org.subnode.util.ExUtil;
 import org.subnode.util.StreamUtil;
 import org.subnode.util.SubNodeUtil;
+import org.subnode.util.Util;
 import org.subnode.util.XString;
 
 /* Proof of Concept RSS Publishing */
@@ -74,6 +79,10 @@ public class RSSFeedService {
 	PolicyFactory policy = null;
 
 	private boolean USE_HTTP_READER = false;
+	private boolean USE_URL_READER = false;
+	private boolean USE_SPRING_READER = true;
+
+	private static final RestTemplate restTemplate = new RestTemplate(Util.getClientHttpRequestFactory());
 
 	/*
 	 * Cache of all feeds.
@@ -309,9 +318,10 @@ public class RSSFeedService {
 				}
 			}
 
-			int timeout = 60; //seconds
+			int timeout = 60; // seconds
 			log.debug("Reading RSS stream");
-			if (!USE_HTTP_READER) {
+
+			if (USE_URL_READER) {
 				/*
 				 * This is not a memory leak that we don't close the connection. This is correct. No need to close
 				 */
@@ -320,17 +330,24 @@ public class RSSFeedService {
 				conn.setConnectTimeout(timeout * 1000);
 				conn.setReadTimeout(timeout * 1000);
 				reader = new XmlReader(conn);
+
+				SyndFeedInput input = new SyndFeedInput();
+				inFeed = input.build(reader);
 			}
+
 			/*
 			 * I was experimenting this this way of getting a reader as a last attempt to get a specific
 			 * problematic URL to work, that keeps causing a timeout when I try to read from it thru the server
 			 * side, even though the same url works fine when entered into my browser url, so one trick that has
 			 * worked in the past was to masquerade as a browser using the 'user agent'. So this code DOES work,
 			 * but never did solve the problem with that one specific URL that simply refuses to send data to
-			 * the Quanta server. So I ended up just going back also to the simpler URLConnection based
-			 * XmlReader above, but I want to keep this code also for future reference or needs.
+			 * the Quanta server.
+			 * 
+			 * UPDATE: I'm leaving the long explanation above, but once I tried the code inside USE_SPRING_READER=true,
+			 * block suddenly all the RSS feeds no longer have any timeout issues. My best theory for why is that my
+			 * restTemplate is doing something special that fixes these issues.
 			 */
-			else {
+			if (USE_HTTP_READER) {
 				RequestConfig config = RequestConfig.custom() //
 						.setConnectTimeout(timeout * 1000) //
 						.setConnectionRequestTimeout(timeout * 1000) //
@@ -345,10 +362,32 @@ public class RSSFeedService {
 
 				byte[] buffer = IOUtils.toByteArray(is);
 				reader = new CharSequenceReader(new String(buffer));
+
+				SyndFeedInput input = new SyndFeedInput();
+				inFeed = input.build(reader);
 			}
 
-			SyndFeedInput input = new SyndFeedInput();
-			inFeed = input.build(reader);
+			if (USE_SPRING_READER) {
+				inFeed = restTemplate.execute(url, HttpMethod.GET, null, response -> {
+					SyndFeedInput input = new SyndFeedInput();
+					try {
+						return input.build(new XmlReader(response.getBody()));
+					} catch (FeedException e) {
+						throw new IOException("Could not parse response", e);
+					}
+				});
+			}
+
+			// another example from online (that I've never tried):
+			// try (CloseableHttpClient client = HttpClients.createMinimal()) {
+			// 	HttpUriRequest request = new HttpGet(url);
+			// 	try (CloseableHttpResponse response = client.execute(request);
+			// 		 InputStream stream = response.getEntity().getContent()) {
+			// 	  SyndFeedInput input = new SyndFeedInput();
+			// 	  SyndFeed feed = input.build(new XmlReader(stream));
+			// 	  System.out.println(feed.getTitle());
+			// 	}
+			//   }
 
 			// log.debug("Feed " + url + " has " + inFeed.getEntries().size() + " entries.");
 			sanitizeFeed(inFeed);
