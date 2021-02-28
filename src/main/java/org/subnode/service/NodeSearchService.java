@@ -158,7 +158,7 @@ public class NodeSearchService {
 			else {
 				SubNode searchRoot = read.getNode(session, req.getNodeId());
 				for (SubNode node : read.searchSubGraph(session, searchRoot, req.getSearchProp(), searchText, req.getSortField(),
-						MAX_NODES, req.getFuzzy(), req.getCaseSensitive())) {
+						MAX_NODES, req.getFuzzy(), req.getCaseSensitive(), req.getTimeRangeType())) {
 
 					NodeInfo info = convert.convertToNodeInfo(ThreadLocals.getSessionContext(), session, node, true, false,
 							counter + 1, false, false);

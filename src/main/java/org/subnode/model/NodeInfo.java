@@ -115,7 +115,7 @@ public class NodeInfo {
 
 	@Transient
 	@JsonIgnore
-	public String getPropVal(String propName) {
+	public Object getPropVal(String propName) {
 		if (properties == null)
 			return null;
 
@@ -129,7 +129,7 @@ public class NodeInfo {
 
 	@Transient
 	@JsonIgnore
-	public void setPropVal(String propName, String val) {
+	public void setPropVal(String propName, Object val) {
 		if (properties == null) {
 			safeGetProperties().add(new PropertyInfo(propName, val));
 			return;

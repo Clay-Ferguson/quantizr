@@ -76,7 +76,7 @@ export class FullScreenCalendar extends Main {
                         }
                     },
                     closeCalendarButton: {
-                        text: "Close Calendar",
+                        text: "Close",
                         click: () => {
                             S.nav.closeFullScreenViewer(this.state);
                         }

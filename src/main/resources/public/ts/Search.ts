@@ -77,7 +77,7 @@ export class Search implements SearchIntf {
     }
 
     /* prop = mtm (modification time) | ctm (create time) */
-    timeline = (prop: string, state: AppState) => {
+    timeline = (prop: string, state: AppState, timeRangeType: string) => {
         const node = S.meta64.getHighlightedNode(state);
         if (!node) {
             S.util.showMessage("No node is selected to 'timeline' under.", "Warning");
@@ -93,7 +93,8 @@ export class Search implements SearchIntf {
             fuzzy: false,
             caseSensitive: false,
             searchDefinition: "",
-            userSearchType: null
+            userSearchType: null,
+            timeRangeType
         }, this.timelineResponse);
     }
 

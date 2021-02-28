@@ -87,7 +87,8 @@ export class SearchByNameDlg extends DialogBase {
             fuzzy: false,
             caseSensitive: false,
             searchDefinition: "",
-            userSearchType: null
+            userSearchType: null,
+            timeRangeType: null
         }, this.searchNodesResponse);
     }
 

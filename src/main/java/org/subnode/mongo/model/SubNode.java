@@ -32,9 +32,8 @@ import org.springframework.data.mongodb.core.mapping.Field;
  * 
  * /id1/id2/id2
  * 
- * Any nodes that are 'named' can have friendly names right in the path in leu
- * of any or all IDs. Requirement for a successful insert is merely that the
- * parent must exist.
+ * Any nodes that are 'named' can have friendly names right in the path in leu of any or all IDs.
+ * Requirement for a successful insert is merely that the parent must exist.
  * 
  * Forward slash delimited ids.
  * 
@@ -42,28 +41,25 @@ import org.springframework.data.mongodb.core.mapping.Field;
  * 
  * https://docs.mongodb.com/manual/applications/data-models-tree-structures/
  * 
- * Node ordering of child nodes is done via 'ordinal' which is child position
- * index.
+ * Node ordering of child nodes is done via 'ordinal' which is child position index.
  * 
- * todo-2: One enhancement here would be to let all the 'setter' methods check
- * to see if it is genuinely CHANGING the value as opposed to keeping same
- * value, and in that case avoid the call to MongoSession.dirty(this);
+ * todo-2: One enhancement here would be to let all the 'setter' methods check to see if it is
+ * genuinely CHANGING the value as opposed to keeping same value, and in that case avoid the call to
+ * MongoSession.dirty(this);
  * 
- * todo-2: Also similar to above note, a 'dirty' flag right inside this object
- * would be good, to set so that even direct calls to api.save(node) would
- * bypass any actual saving if the object is known to not be dirty. (Don't
- * forget to default to 'dirty==true' for all new objects created, but not ones
- * loaded from DB. Be carful with this! This would be a very LATE STAGE
- * optimization.)
+ * todo-2: Also similar to above note, a 'dirty' flag right inside this object would be good, to set
+ * so that even direct calls to api.save(node) would bypass any actual saving if the object is known
+ * to not be dirty. (Don't forget to default to 'dirty==true' for all new objects created, but not
+ * ones loaded from DB. Be carful with this! This would be a very LATE STAGE optimization.)
  * 
  * todo-p0: should all @JsonIgnores in here also be @Transient ?
  */
 @Document(collection = "nodes")
 @TypeAlias("n1")
 @JsonInclude(Include.NON_NULL)
-@JsonPropertyOrder({ SubNode.FIELD_PATH, SubNode.FIELD_PATH_HASH, SubNode.FIELD_CONTENT, SubNode.FIELD_NAME,
-		SubNode.FIELD_ID, SubNode.FIELD_MAX_CHILD_ORDINAL, SubNode.FIELD_ORDINAL, SubNode.FIELD_OWNER,
-		SubNode.FIELD_CREATE_TIME, SubNode.FIELD_MODIFY_TIME, SubNode.FIELD_AC, SubNode.FIELD_PROPERTIES })
+@JsonPropertyOrder({SubNode.FIELD_PATH, SubNode.FIELD_PATH_HASH, SubNode.FIELD_CONTENT, SubNode.FIELD_NAME, SubNode.FIELD_ID,
+		SubNode.FIELD_MAX_CHILD_ORDINAL, SubNode.FIELD_ORDINAL, SubNode.FIELD_OWNER, SubNode.FIELD_CREATE_TIME,
+		SubNode.FIELD_MODIFY_TIME, SubNode.FIELD_AC, SubNode.FIELD_PROPERTIES})
 public class SubNode {
 	public static final String FIELD_ID = "_id";
 
@@ -86,11 +82,10 @@ public class SubNode {
 	private String path;
 
 	/*
-	 * This property gets updated during the save event processing, and we store the
-	 * hash of the path in here, so that we can achieve the equivalent of a unique
-	 * key on the path (indirectly via this hash) because the full path becomes to
-	 * long for MongoDb indexes to allow, but also becasue using the hash for
-	 * uniqueness is faster
+	 * This property gets updated during the save event processing, and we store the hash of the path in
+	 * here, so that we can achieve the equivalent of a unique key on the path (indirectly via this
+	 * hash) because the full path becomes to long for MongoDb indexes to allow, but also becasue using
+	 * the hash for uniqueness is faster
 	 */
 	public static final String FIELD_PATH_HASH = "phash";
 	@Field(FIELD_PATH_HASH)
@@ -127,10 +122,9 @@ public class SubNode {
 	/*
 	 * ACL=Access Control List
 	 * 
-	 * Keys are userNodeIds, and values is a comma delimited list of any of
-	 * PrivilegeType.java values. However in addition to userNodeIds identifying
-	 * users the additional key of "public" is allowed as a key which indicates
-	 * privileges granted to everyone (the entire public)
+	 * Keys are userNodeIds, and values is a comma delimited list of any of PrivilegeType.java values.
+	 * However in addition to userNodeIds identifying users the additional key of "public" is allowed as
+	 * a key which indicates privileges granted to everyone (the entire public)
 	 */
 	public static final String FIELD_AC = "ac";
 	@Field(FIELD_AC)
@@ -166,10 +160,9 @@ public class SubNode {
 	@JsonProperty(FIELD_ID)
 	public void setId(ObjectId id) {
 		/*
-		 * If we are setting this 'id' to null we need to remove it from the dirty
-		 * cache, because if not we end up tracking the wrong objects and can have a
-		 * corruption when old/wrong data gets written out during the final dirty-nodes
-		 * save
+		 * If we are setting this 'id' to null we need to remove it from the dirty cache, because if not we
+		 * end up tracking the wrong objects and can have a corruption when old/wrong data gets written out
+		 * during the final dirty-nodes save
 		 */
 		if (id == null && this.id != null) {
 			MongoThreadLocal.clean(this);
@@ -215,8 +208,8 @@ public class SubNode {
 		MongoThreadLocal.dirty(this);
 
 		/*
-		 * nullify path hash if the path is changing so that MongoEventListener will
-		 * update the value when saving
+		 * nullify path hash if the path is changing so that MongoEventListener will update the value when
+		 * saving
 		 */
 		if (!path.equals(this.path)) {
 			this.pathHash = null;
@@ -247,17 +240,16 @@ public class SubNode {
 	}
 
 	/*
-	 * todo-2: review that this maxordinal is the best pattern/design, and also need
-	 * to review that it's always maintained, and even maybe create an admin option
-	 * i can run that forcably updates all these values based on current db content
+	 * todo-2: review that this maxordinal is the best pattern/design, and also need to review that it's
+	 * always maintained, and even maybe create an admin option i can run that forcably updates all
+	 * these values based on current db content
 	 */
 	@JsonProperty(FIELD_MAX_CHILD_ORDINAL)
 	public void setMaxChildOrdinal(Long maxChildOrdinal) {
 		/*
-		 * todo-2: what about logic that says if this node IS already persisted, and we
-		 * are not actually changing the value here, we can bypass setting this 'dirty'
-		 * flag? I probably have this performance/optimization on my todo list but i'm
-		 * putting this note here just in case
+		 * todo-2: what about logic that says if this node IS already persisted, and we are not actually
+		 * changing the value here, we can bypass setting this 'dirty' flag? I probably have this
+		 * performance/optimization on my todo list but i'm putting this note here just in case
 		 */
 		MongoThreadLocal.dirty(this);
 		this.maxChildOrdinal = maxChildOrdinal;
@@ -281,10 +273,9 @@ public class SubNode {
 	}
 
 	/*
-	 * todo-1: All dates need to be stored as UTC/GMC so that the timezone offset is
-	 * zero, because there's no timezone information stored anywhere, and the only
-	 * place any timezones ever come into play is when displaying the time to a
-	 * user.
+	 * todo-1: All dates need to be stored as UTC/GMC so that the timezone offset is zero, because
+	 * there's no timezone information stored anywhere, and the only place any timezones ever come into
+	 * play is when displaying the time to a user.
 	 */
 	@JsonProperty(FIELD_CREATE_TIME)
 	public Date getCreateTime() {
@@ -354,94 +345,7 @@ public class SubNode {
 	}
 
 	@JsonIgnore
-	public boolean setProp(String key, String val) {
-		MongoThreadLocal.dirty(this);
-		boolean changed = false;
-		if (val == null) {
-			changed = properties().containsKey(key);
-			properties().remove(key);
-		} else {
-			SubNodePropVal curVal = properties().get(key);
-			changed = curVal == null || !val.equals(curVal.getValue());
-			properties().put(key, new SubNodePropVal(val));
-		}
-		return changed;
-	}
-
-	@JsonIgnore
-	public boolean setProp(SubNodeProperty prop, String val) {
-		return setProp(prop.getName(), val);
-	}
-
-	@JsonIgnore
-	public boolean setProp(String key, Date val) {
-		MongoThreadLocal.dirty(this);
-		boolean changed = false;
-		if (val == null) {
-			changed = properties().containsKey(key);
-			properties().remove(key);
-		} else {
-			SubNodePropVal curVal = properties().get(key);
-			changed = curVal == null || !val.equals(curVal.getValue());
-			properties().put(key, new SubNodePropVal(val));
-		}
-		return changed;
-	}
-
-	@JsonIgnore
-	public boolean setProp(String key, Double val) {
-		MongoThreadLocal.dirty(this);
-		boolean changed = false;
-		if (val == null) {
-			changed = properties().containsKey(key);
-			properties().remove(key);
-		} else {
-			SubNodePropVal curVal = properties().get(key);
-			// todo-1: Do we want an 'equals' here or should we build in a small range check
-			// which is the normal way to
-			// compare floats.
-			changed = curVal == null || !val.equals(curVal.getValue());
-			properties().put(key, new SubNodePropVal(val));
-		}
-		return changed;
-	}
-
-	@JsonIgnore
-	public boolean setProp(String key, Boolean val) {
-		MongoThreadLocal.dirty(this);
-		boolean changed = false;
-		if (val == null) {
-			changed = properties().containsKey(key);
-			properties().remove(key);
-		} else {
-			SubNodePropVal curVal = properties().get(key);
-			changed = curVal == null || !val.equals(curVal.getValue());
-			properties().put(key, new SubNodePropVal(val));
-		}
-		return changed;
-	}
-
-	@JsonIgnore
-	// todo-1: all these 'setProp' functions should be smart enough to detect if the
-	// property set
-	// will have no effect (value not changing), and in that case then NOT add to
-	// the list of dirty nodes.
-	public boolean setProp(String key, Long val) {
-		MongoThreadLocal.dirty(this);
-		boolean changed = false;
-		if (val == null) {
-			changed = properties().containsKey(key);
-			properties().remove(key);
-		} else {
-			SubNodePropVal curVal = properties().get(key);
-			changed = curVal == null || !val.equals(curVal.getValue());
-			properties().put(key, new SubNodePropVal(val));
-		}
-		return changed;
-	}
-
-	@JsonIgnore
-	public boolean setProp(String key, Integer val) {
+	public boolean setProp(String key, Object val) {
 		MongoThreadLocal.dirty(this);
 		boolean changed = false;
 		if (val == null) {
@@ -471,17 +375,10 @@ public class SubNode {
 	public String getStrProp(String key) {
 		try {
 			SubNodePropVal v = properties().get(key);
-			if (v == null)
+			if (v == null || v.getValue() == null)
 				return null;
 
-			if (v.getValue() instanceof Integer) {
-				return String.valueOf((Integer) v.getValue());
-			}
-			if (v.getValue() instanceof Long) {
-				return String.valueOf((Long) v.getValue());
-			}
-
-			return (String) v.getValue();
+			return v.getValue().toString();
 		} catch (Exception e) {
 			ExUtil.error(log, "failed to get String from key: " + key, e);
 			return null;
@@ -492,7 +389,7 @@ public class SubNode {
 	public Long getIntProp(String key) {
 		try {
 			SubNodePropVal v = properties().get(key);
-			if (v == null)
+			if (v == null || v.getValue() == null)
 				return 0L;
 			Object val = v.getValue();
 
@@ -519,7 +416,7 @@ public class SubNode {
 	public Date getDateProp(String key) {
 		try {
 			SubNodePropVal v = properties().get(key);
-			if (v == null)
+			if (v == null || v.getValue() == null)
 				return null;
 			return (Date) v.getValue();
 		} catch (Exception e) {
@@ -535,7 +432,7 @@ public class SubNode {
 	public Double getFloatProp(String key) {
 		try {
 			SubNodePropVal v = properties().get(key);
-			if (v == null)
+			if (v == null || v.getValue() == null)
 				return 0.0;
 			return (Double) v.getValue();
 		} catch (Exception e) {
@@ -548,7 +445,7 @@ public class SubNode {
 	public Boolean getBooleanProp(String key) {
 		try {
 			SubNodePropVal v = properties().get(key);
-			if (v == null)
+			if (v == null || v.getValue() == null)
 				return false;
 
 			// Our current property editor only knows how to save strings, so we just cope

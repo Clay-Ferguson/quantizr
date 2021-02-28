@@ -147,6 +147,7 @@ export class EditNodeDlg extends DialogBase {
 
         if (node.properties) {
             node.properties.forEach((prop: J.PropertyInfo) => {
+                // console.log("prop: " + S.util.prettyPrint(prop));
 
                 // if onlyBinaries and this is NOT a binary prop then skip it.
                 if (onlyBinaries) {
@@ -403,6 +404,7 @@ export class EditNodeDlg extends DialogBase {
         if (state.node.properties) {
             // This loop creates all the editor input fields for all the properties
             state.node.properties.forEach((prop: J.PropertyInfo) => {
+                // console.log("prop=" + S.util.prettyPrint(prop));
 
                 if (!this.allowEditAllProps && !S.render.allowPropertyEdit(state.node, prop.name, this.appState)) {
                     console.log("Hiding property: " + prop.name);
@@ -636,7 +638,12 @@ export class EditNodeDlg extends DialogBase {
 
         state.node.properties.push({
             name: "date",
-            value: ""
+            value: new Date().getTime()
+        });
+
+        state.node.properties.push({
+            name: "duration",
+            value: "01:00"
         });
 
         // Ensure the have the panel expanded so we can see the new date.
@@ -783,8 +790,20 @@ export class EditNodeDlg extends DialogBase {
                 // console.log("Save prop iterator: name=" + prop.name);
                 let propState = this.propStates[prop.name];
                 if (propState) {
-                    prop.value = propState.getValue();
-                    // console.log("   val=" + prop.value);
+
+                    // hack to store dates as numeric prop (todo-1: need a systematic way to assign JSON types to properties)
+                    if (prop.name === "date" && (typeof propState.getValue() === "string")) {
+                        try {
+                            prop.value = parseInt(propState.getValue());
+                        }
+                        catch (e) {
+                            console.error("failed to parse date number: " + propState.getValue());
+                        }
+                    }
+                    else {
+                        prop.value = propState.getValue();
+                        // console.log("   val=" + prop.value);
+                    }
                 }
             });
         }
@@ -845,12 +864,11 @@ export class EditNodeDlg extends DialogBase {
         let label = typeHandler ? typeHandler.getEditLabelForProp(propEntry.name) : propEntry.name;
         let propValStr = propVal || "";
         propValStr = S.util.escapeForAttrib(propValStr);
-        // console.log("making single prop editor: prop[" + propEntry.property.name + "] val[" + propEntry.property.value
-        //     + "] fieldId=" + propEntry.id);
+        // console.log("making single prop editor: prop[" + propEntry.name + "] val[" + propEntry.value + "]");
 
         let propState: ValidatedState<any> = this.propStates[propEntry.name];
         if (!propState) {
-            propState = new ValidatedState<any>();
+            propState = new ValidatedState<any>(propEntry.value);
             this.propStates[propEntry.name] = propState;
         }
 

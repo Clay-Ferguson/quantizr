@@ -140,7 +140,8 @@ export class SearchContentDlg extends DialogBase {
             fuzzy: this.getState().fuzzy,
             caseSensitive: this.getState().caseSensitive,
             userSearchType: null,
-            searchDefinition: ""
+            searchDefinition: "",
+            timeRangeType: null
         }, this.searchNodesResponse);
     }
 

@@ -339,7 +339,7 @@ public class NodeEditService {
 		 * No duplicate friend nodes.
 		 */
 		if (node.getType().equals(NodeType.FRIEND.s())) {
-			String friendUserName = nodeInfo.getPropVal(NodeProp.USER.s());
+			String friendUserName = (String)nodeInfo.getPropVal(NodeProp.USER.s());
 			if (friendUserName.startsWith("@")) {
 				friendUserName = XString.stripIfStartsWith(friendUserName, "@");
 				nodeInfo.setPropVal(NodeProp.USER.s(), friendUserName);

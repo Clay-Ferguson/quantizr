@@ -8,6 +8,10 @@ public class SubNodePropVal {
 	public SubNodePropVal() {
 	}
 
+	public SubNodePropVal(Object val) {
+		value = val;
+	}
+
 	public SubNodePropVal(Long val) {
 		value = val;
 	}

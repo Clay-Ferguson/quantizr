@@ -1,5 +1,6 @@
 package org.subnode.mongo;
 
+import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 import org.apache.commons.lang3.StringUtils;
@@ -627,9 +628,11 @@ public class MongoRead {
      * prop is optional and if non-null means we should search only that one field.
      * 
      * WARNING. "SubNode.prp" is a COLLECTION and therefore not searchable. Beware.
+     * 
+     * timeRangeType: futureOnly, pastOnly, null
      */
     public Iterable<SubNode> searchSubGraph(MongoSession session, SubNode node, String prop, String text, String sortField,
-            int limit, boolean fuzzy, boolean caseSensitive) {
+            int limit, boolean fuzzy, boolean caseSensitive, String timeRangeType) {
         auth.auth(session, node, PrivilegeType.READ);
 
         Query query = new Query();
@@ -676,8 +679,30 @@ public class MongoRead {
             }
         }
 
+        boolean revChron = true;
         if (!StringUtils.isEmpty(sortField)) {
-            query.with(Sort.by(Sort.Direction.DESC, sortField));
+            if ("prp.date.value".equals(sortField) && timeRangeType != null) {
+                // example date RANGE condition:
+                // query.addCriteria(Criteria.where("startDate").gte(startDate).lt(endDate));
+                // and this 'may' be the same:
+                // Query query = new
+                // Query(Criteria.where("ip").is(ip).andOperator(Criteria.where("createdDate").lt(endDate),
+                // Criteria.where("createdDate").gte(startDate)));
+                if ("futureOnly".equals(timeRangeType)) {
+                    // because we want to show the soonest items on top, for "future" query, we have to sort in order (not rev-chron)
+                    revChron = false;
+                    query.addCriteria(Criteria.where(sortField).gt(new Date().getTime()));
+                } //
+                else if ("pastOnly".equals(timeRangeType)) {
+                    query.addCriteria(Criteria.where(sortField).lt(new Date().getTime()));
+                }
+                // if showing all dates the condition here is that the e at least IS a 'date' prop on the node
+                else {
+                    query.addCriteria(Criteria.where(sortField).ne(null));
+                }
+            }
+            
+            query.with(Sort.by(revChron ? Sort.Direction.DESC : Sort.Direction.ASC, sortField));
         }
 
         return getOps(session).find(query, SubNode.class);

@@ -139,13 +139,27 @@ export class MenuPanel extends Div {
 
         children.push(new Menu("Timeline", [
 
-            new MenuItem("Created", () => S.srch.timeline("ctm", state), //
+            new MenuItem("Created", () => S.srch.timeline("ctm", state, null), //
                 !state.isAnonUser && !!hltNode), //
 
-            new MenuItem("Modified", () => S.srch.timeline("mtm", state), //
+            new MenuItem("Modified", () => S.srch.timeline("mtm", state, null), //
+                !state.isAnonUser && !!hltNode) //
+        ]));
+
+        // todo-0: Update user guide for Calendar items and add some videos.
+        children.push(new Menu("Calendar", [
+
+           !state.isAnonUser ? new MenuItem("Show", () => S.render.showCalendar(null, state), !!hltNode) : null, //
+
+            new MenuItemSeparator(), //
+
+            new MenuItem("Future Dates", () => S.srch.timeline("prp.date.value", state, "futureOnly"), //
                 !state.isAnonUser && !!hltNode), //
 
-            new MenuItem("Date", () => S.srch.timeline("prp.date.value", state), //
+            new MenuItem("Past Dates", () => S.srch.timeline("prp.date.value", state, "pastOnly"), //
+                !state.isAnonUser && !!hltNode), //
+
+            new MenuItem("All Dates", () => S.srch.timeline("prp.date.value", state, null), //
                 !state.isAnonUser && !!hltNode) //
         ]));
 
@@ -154,8 +168,6 @@ export class MenuPanel extends Div {
 
             // this is broken, so I'm just disabling it for now, since this is low priority. todo-1
             // new MenuItem("Toggle Properties", S.props.propsToggle, () => { return propsToggle }, () => { return !state.isAnonUser }), //
-
-            !state.isAnonUser ? new MenuItem("Show Calendar", () => S.render.showCalendar(null, state), !!hltNode) : null, //
 
             // I decided with this on the toolbar we don't need it repliated here.
             // !state.isAnonUser ? new MenuItem("Save clipboard to my NOTES node", () => S.edit.saveClipboardToChildNode("~" + J.NodeType.NOTES)) : null, //

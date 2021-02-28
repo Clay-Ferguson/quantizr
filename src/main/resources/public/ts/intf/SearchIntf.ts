@@ -18,7 +18,7 @@ export interface SearchIntf {
     searchNodesResponse(res: J.NodeSearchResponse, searchDescription: string, isUserSearch: boolean): any;
     timelineResponse(res: J.NodeSearchResponse): any;
     searchFilesResponse(res: J.FileSearchResponse, state: AppState): any;
-    timeline(prop: string, state: AppState): any;
+    timeline(prop: string, state: AppState, timeRangeType: string): any;
     initSearchNode(node: J.NodeInfo): any;
     renderSearchResultAsListItem(node: J.NodeInfo, index: number, count: number, rowCount: number, prefix: string, isFeed: boolean, isParent: boolean, allowAvatars: boolean, jumpButton: boolean, state: AppState): any;
     cached_clickOnSearchResultRow(id : string): any;

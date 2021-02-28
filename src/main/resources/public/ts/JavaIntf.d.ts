@@ -184,6 +184,7 @@ export interface NodeSearchRequest extends RequestBase {
     caseSensitive: boolean;
     searchDefinition: string;
     userSearchType: string;
+    timeRangeType: string;
 }
 
 export interface OpenSystemFileRequest extends RequestBase {
@@ -577,7 +578,7 @@ export interface ResponseBase {
 
 export interface PropertyInfo {
     name: string;
-    value: string;
+    value: any;
 }
 
 export interface NodeInfo {

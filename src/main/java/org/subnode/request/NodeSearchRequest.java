@@ -27,6 +27,8 @@ public class NodeSearchRequest extends RequestBase {
 
 	private String userSearchType;
 
+	private String timeRangeType;
+
 	public String getNodeId() {
 		return nodeId;
 	}
@@ -97,5 +99,13 @@ public class NodeSearchRequest extends RequestBase {
 
 	public void setUserSearchType(String userSearchType) {
 		this.userSearchType = userSearchType;
+	}
+
+	public String getTimeRangeType() {
+		return timeRangeType;
+	}
+
+	public void setTimeRangeType(String timeRangeType) {
+		this.timeRangeType = timeRangeType;
 	}
 }
