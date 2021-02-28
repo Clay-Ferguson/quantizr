@@ -184,11 +184,6 @@ export class Nav implements NavIntf {
          */
         S.meta64.highlightNode(node, false, state);
 
-        /* We do this async just to make the fastest possible response when clicking on a node */
-        setTimeout(() => {
-            S.util.updateHistory(null, node, state);
-        }, 10);
-
         // There's a wierd event/ording probelm where, without this timer (delay) clicking a checkbox on a node
         // row won't get it's setter (onChange) called in time, because this refresh blows away too much state. This
         // is related to the Checkbox.ts class.

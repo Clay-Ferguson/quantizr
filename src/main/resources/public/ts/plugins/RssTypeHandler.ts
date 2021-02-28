@@ -277,7 +277,7 @@ export class RssTypeHandler extends TypeBase {
         let headerDivChildren = [];
 
         if (entry.mediaThumbnail && entry.mediaThumbnail.$) {
-            console.log("mediaThumbnail: " + entry.mediaThumbnail.$.url);
+            // console.log("mediaThumbnail: " + entry.mediaThumbnail.$.url);
             let style: any = {};
 
             if (entry.mediaThumbnail.$.width) {

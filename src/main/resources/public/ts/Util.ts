@@ -979,15 +979,11 @@ export class Util implements UtilIntf {
         return (date.getMonth() + 1) + "/" + date.getDate() + "/" + date.getFullYear();
     }
 
-    /* Our 'hash' part of the history works perfectly when entering into browser and refreshing browser,
-    but in general using the back button is not working correctly quite yet (will come back to this later. is good enough for now)
-    todo-1
-
-    NOTE: There's also a 'history.replaceState()' which doesn't build onto the history but modifies what it thinks
+    /* NOTE: There's also a 'history.replaceState()' which doesn't build onto the history but modifies what it thinks
     the current location is.
 
-    NOTE: todo-1 We don't currently have a call to updateHistory for 1) initial page load 2) Search results click 3) timeline click, but those
-    would be nice additions.
+    todo-1: would be nice to have the hash part able to be the node name whenever the selected child node on the page
+    has a 'name' because right now the only time the url will show the naem is when it's the page root.
     */
     updateHistory = (node: J.NodeInfo, childNode: J.NodeInfo = null, appState: AppState): void => {
         if (!node) {
@@ -996,6 +992,8 @@ export class Util implements UtilIntf {
         if (!node) {
             return;
         }
+
+        // console.log("updateHistory: id=" + node.id + " name=" + node.name);
         let url, title, state;
         if (node.name) {
             const queryPath = this.getPathPartForNamedNode(node);
