@@ -550,6 +550,7 @@ export class EditNodeDlg extends DialogBase {
         let allowShare: boolean = typeHandler ? (state.isAdminUser || typeHandler.allowAction(NodeActionType.share, state.node, this.appState)) : true;
 
         let typeLocked = !!S.props.getNodePropVal(J.NodeProp.TYPE_LOCK, state.node);
+        let datePropExists = S.props.getNodeProp("date", state.node);
 
         return new ButtonBar([
             new Button("Save", () => {
@@ -577,7 +578,12 @@ export class EditNodeDlg extends DialogBase {
                 className: "fa fa-clock-o fa-lg insertTimeIcon",
                 title: "Insert current time at editor cursor.",
                 onClick: this.insertTime
-            })
+            }),
+            !datePropExists ? new Icon({
+                className: "fa fa-calendar fa-lg insertTimeIcon",
+                title: "Insert Date property on node",
+                onClick: this.addDateProperty
+            }) : null
         ]);
     }
 
@@ -615,6 +621,27 @@ export class EditNodeDlg extends DialogBase {
         if (this.contentEditor) {
             this.contentEditor.insertTextAtCursor("[" + S.util.formatDate(new Date()) + "]");
         }
+    }
+
+    addDateProperty = (): void => {
+        let state = this.getState();
+        if (!state.node.properties) {
+            state.node.properties = [];
+        }
+
+        // todo-0: change "date" hardcoded string to the variable in NodeProps
+        if (S.props.getNodeProp("date", state.node)) {
+            return;
+        }
+
+        state.node.properties.push({
+            name: "date",
+            value: ""
+        });
+
+        // Ensure the have the panel expanded so we can see the new date.
+        EditNodeDlg.morePanelExpanded = true;
+        this.mergeState({ state });
     }
 
     openChangeNodeTypeDlg = (): void => {
@@ -753,9 +780,11 @@ export class EditNodeDlg extends DialogBase {
         let state = this.getState();
         if (state.node.properties) {
             state.node.properties.forEach((prop: J.PropertyInfo) => {
+                // console.log("Save prop iterator: name=" + prop.name);
                 let propState = this.propStates[prop.name];
                 if (propState) {
                     prop.value = propState.getValue();
+                    // console.log("   val=" + prop.value);
                 }
             });
         }

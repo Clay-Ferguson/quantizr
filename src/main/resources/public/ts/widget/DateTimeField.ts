@@ -22,12 +22,41 @@ export class DateTimeField extends Span {
             className: "input-group"
         });
 
+        this.dateState.v.stateTranslator = (s: any): any => {
+            try {
+                let newTimestamp = s.value + " " + this.timeState.getValue() + ":00";
+                let newDate = new Date(newTimestamp);
+                this.dateTimeState.setValue("" + newDate.getTime());
+            }
+            catch (e) {
+                console.log("ignoring date error");
+            }
+            return s;
+        };
+
+        this.timeState.v.stateTranslator = (s: any): any => {
+            try {
+                let newTimestamp = this.dateState.getValue() + " " + s.value + ":00";
+                let newDate = new Date(newTimestamp);
+                this.dateTimeState.setValue("" + newDate.getTime());
+            }
+            catch (e) {
+                console.log("ignoring time error");
+            }
+            return s;
+        };
+
         let dateTimeStr: string = dateTimeState.getValue();
         let dateTime: Date;
 
         try {
-            dateTime = new Date(parseInt(dateTimeStr));
-            dateTime = S.util.addTimezoneOffset(dateTime, -1);
+            if (!dateTimeStr) {
+                dateTime = S.util.addTimezoneOffset(new Date(), -1);
+            }
+            else {
+                dateTime = new Date(parseInt(dateTimeStr));
+                dateTime = S.util.addTimezoneOffset(dateTime, -1);
+            }
         }
         catch (e) {
             console.log("Unable to parse: " + dateTimeStr);
@@ -52,30 +81,6 @@ export class DateTimeField extends Span {
 
         let timeStr = hourStr + ":" + minStr;
         this.timeState.setValue(timeStr);
-
-        this.dateState.v.stateTranslator = (s: any): any => {
-            try {
-                let newTimestamp = s.value + " " + this.timeState.getValue() + ":00";
-                let newDate = new Date(newTimestamp);
-                this.dateTimeState.setValue("" + newDate.getTime());
-            }
-            catch (e) {
-                console.log("ignoring date error");
-            }
-            return s;
-        };
-
-        this.timeState.v.stateTranslator = (s: any): any => {
-            try {
-                let newTimestamp = this.dateState.getValue() + " " + s.value + ":00";
-                let newDate = new Date(newTimestamp);
-                this.dateTimeState.setValue("" + newDate.getTime());
-            }
-            catch (e) {
-                console.log("ignoring time error");
-            }
-            return s;
-        };
     }
 
     preRender(): void {

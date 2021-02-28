@@ -677,7 +677,6 @@ public class MongoRead {
         }
 
         if (!StringUtils.isEmpty(sortField)) {
-            // todo-1: sort dir is being passed from client but not used here?
             query.with(Sort.by(Sort.Direction.DESC, sortField));
         }
 
@@ -685,17 +684,17 @@ public class MongoRead {
     }
 
     /**
-     * Special purpose query to get nodes that have dueDate or time properties.
+     * Special purpose query to get all nodes that have a "date" property.
      */
     public Iterable<SubNode> getCalendar(MongoSession session, SubNode node) {
         auth.auth(session, node, PrivilegeType.READ);
 
         Query query = new Query();
-        // query.limit(limit);
-
         Criteria criteria = Criteria.where(SubNode.FIELD_PATH).regex(util.regexRecursiveChildrenOfPath(node.getPath()));
-        criteria = criteria.and(SubNode.FIELD_MODIFY_TIME).ne(null);
 
+        // this mod time condition is simply to be sure the user has 'saved' the node and not pick up new
+        // node currently being crafted
+        criteria = criteria.and(SubNode.FIELD_MODIFY_TIME).ne(null);
         query.addCriteria(criteria);
         query.addCriteria(Criteria.where(SubNode.FIELD_PROPERTIES + "." + NodeProp.DATE + ".value").ne(null));
 

@@ -538,13 +538,13 @@ public class NodeRenderService {
 			session = ThreadLocals.getMongoSession();
 		}
 
-		LinkedList<CalendarItem> items = new LinkedList<CalendarItem>();
-		res.setItems(items);
-
 		SubNode node = read.getNode(session, req.getNodeId());
 		if (node == null) {
 			return res;
 		}
+
+		LinkedList<CalendarItem> items = new LinkedList<CalendarItem>();
+		res.setItems(items);
 
 		for (SubNode n : read.getCalendar(session, node)) {
 			CalendarItem item = new CalendarItem();

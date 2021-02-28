@@ -143,6 +143,9 @@ export class MenuPanel extends Div {
                 !state.isAnonUser && !!hltNode), //
 
             new MenuItem("Modified", () => S.srch.timeline("mtm", state), //
+                !state.isAnonUser && !!hltNode), //
+
+            new MenuItem("Date", () => S.srch.timeline("prp.date.value", state), //
                 !state.isAnonUser && !!hltNode) //
         ]));
 
