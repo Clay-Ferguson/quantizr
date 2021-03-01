@@ -6,6 +6,7 @@ import { PubSub } from "../PubSub";
 import { Singletons } from "../Singletons";
 import { Comp } from "../widget/base/Comp";
 import { Div } from "../widget/Div";
+import { TextContent } from "../widget/TextContent";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
@@ -40,13 +41,13 @@ export class TimelineView extends Div {
         }
 
         let childCount = results.length;
-
-        /*
-         * Number of rows that have actually made it onto the page to far. Note: some nodes get filtered out on the
-         * client side for various reasons.
-         */
         let rowCount = 0;
         let children: Comp[] = [];
+
+        if (state.timelineDescription) {
+            children.push(new TextContent(state.timelineDescription));
+        }
+
         let i = 0;
         results.forEach((node: J.NodeInfo) => {
             // console.log("TIMELINE: node id=" + node.id + " content: " + node.content);

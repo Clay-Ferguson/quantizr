@@ -55,7 +55,9 @@ export class AppState {
     searchResults: NodeInfo[];
     searchDescription: string;
     isUserSearch: boolean = false;
+
     timelineResults: NodeInfo[];
+    timelineDescription: string;
     feedResults: NodeInfo[];
     feedEndReached: boolean = false;
 

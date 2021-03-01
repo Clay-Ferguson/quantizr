@@ -298,7 +298,7 @@ export class Nav implements NavIntf {
     runTimeline = (): void => {
         const state = appState();
         this.cached_clickNodeRow(state.node.id);
-        S.srch.timeline("mtm", state, null);
+        S.srch.timeline("mtm", state, null, "Timeline based on Modification Time");
     }
 
     closeFullScreenViewer = (appState: AppState): void => {

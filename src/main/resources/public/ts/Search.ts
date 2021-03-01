@@ -53,11 +53,12 @@ export class Search implements SearchIntf {
         S.meta64.selectTab("searchTab");
     }
 
-    timelineResponse = (res: J.NodeSearchResponse) => {
+    timelineResponse = (res: J.NodeSearchResponse, timelineDescription: string) => {
         dispatch({
             type: "Action_RenderTimelineResults",
             update: (s: AppState): void => {
                 s.timelineResults = res.searchResults;
+                s.timelineDescription = timelineDescription;
             }
         });
         S.meta64.selectTab("timelineTab");
@@ -77,7 +78,7 @@ export class Search implements SearchIntf {
     }
 
     /* prop = mtm (modification time) | ctm (create time) */
-    timeline = (prop: string, state: AppState, timeRangeType: string) => {
+    timeline = (prop: string, state: AppState, timeRangeType: string, timelineDescription: string) => {
         const node = S.meta64.getHighlightedNode(state);
         if (!node) {
             S.util.showMessage("No node is selected to 'timeline' under.", "Warning");
@@ -95,7 +96,7 @@ export class Search implements SearchIntf {
             searchDefinition: "",
             userSearchType: null,
             timeRangeType
-        }, this.timelineResponse);
+        }, (res) => { this.timelineResponse(res, timelineDescription); });
     }
 
     feed = (nodeId: string, feedUserName: string, page: number, searchText: string) => {

@@ -139,10 +139,10 @@ export class MenuPanel extends Div {
 
         children.push(new Menu("Timeline", [
 
-            new MenuItem("Created", () => S.srch.timeline("ctm", state, null), //
+            new MenuItem("Created", () => S.srch.timeline("ctm", state, null, "Timeline based on Create Time"), //
                 !state.isAnonUser && !!hltNode), //
 
-            new MenuItem("Modified", () => S.srch.timeline("mtm", state, null), //
+            new MenuItem("Modified", () => S.srch.timeline("mtm", state, null, "Timeline based on Modification Time"), //
                 !state.isAnonUser && !!hltNode) //
         ]));
 
@@ -152,13 +152,13 @@ export class MenuPanel extends Div {
 
             new MenuItemSeparator(), //
 
-            new MenuItem("Future Dates", () => S.srch.timeline("prp.date.value", state, "futureOnly"), //
+            new MenuItem("Future Dates", () => S.srch.timeline("prp.date.value", state, "futureOnly", "Future calendar dates"), //
                 !state.isAnonUser && !!hltNode), //
 
-            new MenuItem("Past Dates", () => S.srch.timeline("prp.date.value", state, "pastOnly"), //
+            new MenuItem("Past Dates", () => S.srch.timeline("prp.date.value", state, "pastOnly", "Past calendar dates"), //
                 !state.isAnonUser && !!hltNode), //
 
-            new MenuItem("All Dates", () => S.srch.timeline("prp.date.value", state, null), //
+            new MenuItem("All Dates", () => S.srch.timeline("prp.date.value", state, null, "All calendar dates"), //
                 !state.isAnonUser && !!hltNode) //
         ]));
 
