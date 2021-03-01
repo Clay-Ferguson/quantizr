@@ -738,7 +738,6 @@ export const enum NodeType {
     FS_FOLDER = "fs:folder",
     FS_LUCENE = "fs:lucene",
     IPFS_NODE = "sn:ipfsNode",
-    CALENDAR_ENTRY = "sn:cal",
 }
 
 export const enum PrincipalName {

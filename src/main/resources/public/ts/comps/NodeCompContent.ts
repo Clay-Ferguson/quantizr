@@ -37,7 +37,6 @@ export class NodeCompContent extends Div {
 
         let children: CompIntf[] = [];
         let typeHandler: TypeHandlerIntf = S.plugin.getTypeHandler(node.type);
-        this.maybeRenderDateTime(children, J.NodeProp.DATE, "Date", node);
 
         if (state.showProperties) {
             let propTable = S.props.renderProperties(node.properties);
@@ -61,6 +60,7 @@ export class NodeCompContent extends Div {
             children.push(new NodeCompBinary(node, false, false, this.imgSizeOverride));
         }
 
+        this.maybeRenderDateTime(children, J.NodeProp.DATE, "Date", node);
         this.setChildren(children);
     }
 

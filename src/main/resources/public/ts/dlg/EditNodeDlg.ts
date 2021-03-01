@@ -261,18 +261,32 @@ export class EditNodeDlg extends DialogBase {
 
     getTitleIconComp(): CompIntf {
         let state = this.getState();
+        let span: Span = null;
 
         let typeHandler: TypeHandlerIntf = S.plugin.getTypeHandler(state.node.type);
         if (typeHandler) {
             let iconClass = typeHandler.getIconClass();
             if (iconClass) {
-                return new Icon({
+                if (!span) span = new Span();
+                span.addChild(new Icon({
+                    title: `Node is a '${typeHandler.getName()}' type.`,
                     style: { marginRight: "12px", verticalAlign: "middle" },
                     className: iconClass
-                });
+                }));
             }
         }
-        return null;
+
+        if (S.props.getNodePropVal(J.NodeProp.DATE, state.node)) {
+            EditNodeDlg.morePanelExpanded = true;
+            if (!span) span = new Span();
+            span.addChild(new Icon({
+                title: "Node has a 'Date' property.",
+                style: { marginRight: "12px", verticalAlign: "middle" },
+                className: "fa fa-calendar fa-lg"
+            }));
+        }
+
+        return span;
     }
 
     getTitleText(): string {

@@ -24,7 +24,9 @@ help:
         Enter any valid JS and log output onto the node like this:
         <p>
         <pre>
-        qc.log("Hello world");
+        var sum = 2 + 3;
+        qc.log("Hello world!");
+        qc.log("Two plus Three equals "+sum);
         </pre>
         The 'qc.log' function is automatically available.
 

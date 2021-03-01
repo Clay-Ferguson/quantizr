@@ -32,6 +32,12 @@ export class TypeBase implements TypeHandlerIntf {
     }
 
     getEditLabelForProp(propName: string): string {
+        if (propName === J.NodeProp.DATE) {
+            return "Date";
+        }
+        else if (propName === J.NodeProp.DURATION) {
+            return "Duration (HH:MM)";
+        }
         return propName;
     }
 
@@ -84,18 +90,6 @@ export class TypeBase implements TypeHandlerIntf {
 
         let prop: J.PropertyInfo = S.props.getNodeProp(J.NodeProp.ORDER_BY, node);
 
-        let showCalendarButton = S.util.nodeHasChildrenOfType(node, J.NodeType.CALENDAR_ENTRY);
-        if (showCalendarButton) {
-            return new Div(null, { className: "marginBottom marginLeft" }, [
-                new NodeCompMarkdown(node, state),
-                new ButtonBar([
-                    new Button("Show Calendar", () => {
-                        S.render.showCalendar(node.id, state);
-                    })
-                ])
-            ]);
-        }
-
         // I was trying to let this button decrypt, but react is saying the component got unmounted
         // and thrownging an error when the decrypt call below tries to update the state on a component
         // that somehow is already gone by the time it runs.
@@ -113,9 +107,7 @@ export class TypeBase implements TypeHandlerIntf {
         //         ], null, "marginLeft marginBottom")
         //     ]);
         // }
-        else {
-            return new NodeCompMarkdown(node, state);
-        }
+        return new NodeCompMarkdown(node, state);
     }
 
     orderProps(node: J.NodeInfo, _props: J.PropertyInfo[]): J.PropertyInfo[] {

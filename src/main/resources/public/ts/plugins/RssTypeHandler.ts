@@ -13,6 +13,7 @@ import { CompIntf } from "../widget/base/CompIntf";
 import { Button } from "../widget/Button";
 import { ButtonBar } from "../widget/ButtonBar";
 import { Div } from "../widget/Div";
+import { Heading } from "../widget/Heading";
 import { Html } from "../widget/Html";
 import { Icon } from "../widget/Icon";
 import { IconButton } from "../widget/IconButton";
@@ -315,9 +316,8 @@ export class RssTypeHandler extends TypeBase {
         }
 
         let colonIdx = entry.title.indexOf(" :: ");
-        let headerPart = null;
         if (colonIdx !== -1) {
-            headerPart = entry.title.substring(0, colonIdx);
+            headerDivChildren.push(new Heading(5, entry.title.substring(0, colonIdx)));
 
             let title = entry.title.substring(colonIdx + 4);
             headerDivChildren.push(new Div(null, { className: "marginBottom" }, [
@@ -393,7 +393,7 @@ export class RssTypeHandler extends TypeBase {
             }
         });
 
-        let footerSpan = new Span((headerPart ? headerPart + " - " : "") + dateStr, { className: "marginRight" });
+        let footerSpan = new Span(dateStr, { className: "marginRight" });
 
         children.push(new Div(null, { className: "float-right" }, [
             footerSpan, linkSpan

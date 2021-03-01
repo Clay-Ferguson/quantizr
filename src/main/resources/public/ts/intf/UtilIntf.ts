@@ -113,7 +113,6 @@ export interface UtilIntf {
     buildCalendarData(items: J.CalendarItem[]): EventInput[];
     markdown(val: string): any;
     allChildrenAreSameOwner(node: J.NodeInfo): boolean;
-    nodeHasChildrenOfType(node: J.NodeInfo, type: string): boolean;
     formatCurrency(n: number): string;
     publishNodeToIpfs(node: J.NodeInfo): any;
     loadNodeFromIpfs(node: J.NodeInfo): any;

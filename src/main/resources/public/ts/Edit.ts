@@ -799,7 +799,7 @@ export class Edit implements EditIntf {
             pendingEdit: false,
             nodeId: state.fullScreenCalendarId,
             newNodeName: "",
-            typeName: J.NodeType.CALENDAR_ENTRY,
+            typeName: J.NodeType.NONE,
             createAtTop: true,
             content: null,
             typeLock: true,
