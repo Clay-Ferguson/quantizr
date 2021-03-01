@@ -38,7 +38,7 @@ export class NodeCompMarkdown extends Html {
         }
         else {
             let val = this.renderRawMarkdown(node);
-            val = S.render.injectSubstitutions(val);
+            val = S.render.injectSubstitutions(node, val);
             att.content = val;
         }
 

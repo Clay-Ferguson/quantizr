@@ -579,8 +579,7 @@ export class EditNodeDlg extends DialogBase {
             this.uploadButton = (!hasAttachment && allowUpload) ? new Button("Upload", this.upload) : null,
             allowShare ? new Button("Share", this.share) : null,
 
-            /* Right now 'admin' is the only user who will really ever need to set the type on an existing node. */
-            this.appState.isAdminUser ? new Button("Type", this.openChangeNodeTypeDlg) : null,
+            new Button("Type", this.openChangeNodeTypeDlg),
             !customProps ? new Button("Encrypt", this.openEncryptionDlg) : null,
 
             // show delete button only if we're in a fullscreen viewer (like Calendar view)

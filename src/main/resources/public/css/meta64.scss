@@ -742,6 +742,24 @@ input[type="radio"] {
     margin-right: $smallGap;
 }
 
+.img-upper-left {
+    margin-right: 12px;
+    margin-bottom: 12px;
+    float: left !important;
+    border-radius: .6em;
+    border: 1px solid $gray-700;
+    vertical-align: top;
+}
+
+.img-upper-right {
+    margin-left: 12px;
+    margin-bottom: 12px;
+    float: right !important;
+    border-radius: .6em;
+    border: 1px solid $gray-700;
+    vertical-align: top;
+}
+
 .microMarginTop {
     margin-top: $microGap;
 }

@@ -15,7 +15,7 @@ export interface RenderIntf {
 
     setNodeDropHandler(attribs: any, node: J.NodeInfo, isFirst: boolean, state: AppState): void;
     initMarkdown(): void;
-    injectSubstitutions(content: string): string;
+    injectSubstitutions(node: J.NodeInfo, content: string): string;
     showNodeUrl(node: J.NodeInfo, state: AppState): void;
     showGraph(node: J.NodeInfo, searchText: string, state: AppState): void;
     showCalendar(nodeId: string, state: AppState): void;

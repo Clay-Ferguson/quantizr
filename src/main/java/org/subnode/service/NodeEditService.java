@@ -339,7 +339,7 @@ public class NodeEditService {
 		 * No duplicate friend nodes.
 		 */
 		if (node.getType().equals(NodeType.FRIEND.s())) {
-			String friendUserName = (String)nodeInfo.getPropVal(NodeProp.USER.s());
+			String friendUserName = (String) nodeInfo.getPropVal(NodeProp.USER.s());
 			if (friendUserName.startsWith("@")) {
 				friendUserName = XString.stripIfStartsWith(friendUserName, "@");
 				nodeInfo.setPropVal(NodeProp.USER.s(), friendUserName);
@@ -726,6 +726,8 @@ public class NodeEditService {
 
 		String nodeContent = node.getContent();
 		String content = nodeContent;
+		if (content == null)
+			return;
 
 		// if this node starts with a heading (hash marks)
 		if (content.startsWith("#") && content.indexOf(" ") < 7) {

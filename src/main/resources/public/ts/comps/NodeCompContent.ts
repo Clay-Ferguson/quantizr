@@ -38,6 +38,8 @@ export class NodeCompContent extends Div {
         let children: CompIntf[] = [];
         let typeHandler: TypeHandlerIntf = S.plugin.getTypeHandler(node.type);
 
+        let embeddedImg = false;
+
         if (state.showProperties) {
             let propTable = S.props.renderProperties(node.properties);
             if (propTable) {
@@ -48,6 +50,9 @@ export class NodeCompContent extends Div {
                 typeHandler = S.plugin.getTypeHandler(J.NodeType.NONE);
             }
 
+            if (node.content && node.content.indexOf("{{imgUrl}}") !== -1) {
+                embeddedImg = true;
+            }
             this.domPreUpdateFunc = typeHandler.getDomPreUpdateFunction;
             children.push(typeHandler.render(node, this.rowStyling, state));
         }
@@ -56,7 +61,7 @@ export class NodeCompContent extends Div {
          showing the normal attachment for this node, because that will the same as the avatar */
         let isAnAccountNode = node.ownerId && node.id === node.ownerId;
 
-        if (S.props.hasBinary(node) && !isAnAccountNode) {
+        if (!embeddedImg && S.props.hasBinary(node) && !isAnAccountNode) {
             children.push(new NodeCompBinary(node, false, false, this.imgSizeOverride));
         }
 

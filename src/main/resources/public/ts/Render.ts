@@ -36,11 +36,26 @@ export class Render implements RenderIntf {
     fadeInId: string;
     allowFadeInId: boolean = false;
 
-    injectSubstitutions = (val: string): string => {
+    injectSubstitutions = (node: J.NodeInfo, val: string): string => {
         val = S.util.replaceAll(val, "{{locationOrigin}}", window.location.origin);
 
         if (val.indexOf("{{paypal-button}}") !== -1) {
             val = S.util.replaceAll(val, "{{paypal-button}}", C.PAY_PAL_BUTTON);
+        }
+
+        /* Allow the <img> tag to be supported inside the markdown for any node and let {{imgUrl}}, be able to be used in
+         that to reference the url of any attached image.
+
+         This allows the following type of thing to be put inside the markdown at the beginning of the text:,
+         whenever you want to make the text flow around an image. This text currently has to be entered
+         manually but in the future we'll have a way to generate this more 'automatically' based on editor options.
+
+         <img class="img-upper-left" width="100px" src="{{imgUrl}}">
+         <div class="clearfix"/>
+         */
+        if (val.indexOf("{{imgUrl}}")) {
+            let src: string = S.render.getUrlForNodeAttachment(node, false);
+            val = val.replace("{{imgUrl}}", src);
         }
         return val;
     }
