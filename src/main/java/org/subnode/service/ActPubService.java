@@ -1079,6 +1079,7 @@ public class ActPubService {
 
         // I took this replacement logic from 'Smitherene' project, and it seems to work
         // ok, but I haven't really fully vetted it myself.
+        // WARNING: This is a REGEX. replaceAll() uses REGEX.
         pkeyEncoded = pkeyEncoded.replaceAll("-----(BEGIN|END) (RSA )?PUBLIC KEY-----", "").replace("\n", "").trim();
 
         byte[] key = Base64.getDecoder().decode(pkeyEncoded);

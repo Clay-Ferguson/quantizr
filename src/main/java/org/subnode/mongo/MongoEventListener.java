@@ -120,9 +120,9 @@ public class MongoEventListener extends AbstractMongoEventListener<SubNode> {
 		String nodeName = node.getName();
 		if (nodeName != null) {
 
-			nodeName = nodeName.replaceAll(":", "-");
-			nodeName = nodeName.replaceAll("~", "-");
-			nodeName = nodeName.replaceAll("/", "-");
+			nodeName = nodeName.replace(":", "-");
+			nodeName = nodeName.replace("~", "-");
+			nodeName = nodeName.replace("/", "-");
 
 			// Warning: this is not a redundant null check. Some code in this block CAN set
 			// to null.

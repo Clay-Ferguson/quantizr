@@ -344,9 +344,9 @@ public class RSSFeedService {
 			 * but never did solve the problem with that one specific URL that simply refuses to send data to
 			 * the Quanta server.
 			 * 
-			 * UPDATE: I'm leaving the long explanation above, but once I tried the code inside USE_SPRING_READER=true,
-			 * block suddenly all the RSS feeds no longer have any timeout issues. My best theory for why is that my
-			 * restTemplate is doing something special that fixes these issues.
+			 * UPDATE: I'm leaving the long explanation above, but once I tried the code inside
+			 * USE_SPRING_READER=true, block suddenly all the RSS feeds no longer have any timeout issues. My
+			 * best theory for why is that my restTemplate is doing something special that fixes these issues.
 			 */
 			if (USE_HTTP_READER) {
 				RequestConfig config = RequestConfig.custom() //
@@ -373,7 +373,7 @@ public class RSSFeedService {
 				inFeed = restTemplate.execute(url, HttpMethod.GET, null, response -> {
 					SyndFeedInput input = new SyndFeedInput();
 					try {
-						return input.build(new XmlReader(response.getBody()));
+						return input.build(new XmlReader(new LimitedInputStreamEx(response.getBody(), 2 * Const.ONE_MB)));
 					} catch (FeedException e) {
 						throw new IOException("Could not parse response", e);
 					}
@@ -382,14 +382,14 @@ public class RSSFeedService {
 
 			// another example from online (that I've never tried):
 			// try (CloseableHttpClient client = HttpClients.createMinimal()) {
-			// 	HttpUriRequest request = new HttpGet(url);
-			// 	try (CloseableHttpResponse response = client.execute(request);
-			// 		 InputStream stream = response.getEntity().getContent()) {
-			// 	  SyndFeedInput input = new SyndFeedInput();
-			// 	  SyndFeed feed = input.build(new XmlReader(stream));
-			// 	  System.out.println(feed.getTitle());
-			// 	}
-			//   }
+			// HttpUriRequest request = new HttpGet(url);
+			// try (CloseableHttpResponse response = client.execute(request);
+			// InputStream stream = response.getEntity().getContent()) {
+			// SyndFeedInput input = new SyndFeedInput();
+			// SyndFeed feed = input.build(new XmlReader(stream));
+			// System.out.println(feed.getTitle());
+			// }
+			// }
 
 			// log.debug("Feed " + url + " has " + inFeed.getEntries().size() + " entries.");
 			sanitizeFeed(inFeed);
@@ -413,14 +413,17 @@ public class RSSFeedService {
 	}
 
 	public void sanitizeFeed(SyndFeed feed) {
-		// log.debug("SyndFeed: " + XString.prettyPrint(feed));
-
 		feed.setDescription(sanitizeHtml(feed.getDescription()));
 		for (SyndEntry entry : feed.getEntries()) {
 
+			// sanitize entry.title
+			if (entry.getTitle() != null) {
+				entry.setTitle(quoteFix(entry.getTitle()));
+			}
+
 			// sanitize entry.description.value
 			if (entry.getDescription() != null && entry.getDescription().getValue() != null) {
-				entry.getDescription().setValue(sanitizeHtml(entry.getDescription().getValue()));
+				entry.getDescription().setValue(quoteFix(entry.getDescription().getValue()));
 			}
 
 			for (SyndContent content : entry.getContents()) {
@@ -429,12 +432,26 @@ public class RSSFeedService {
 				}
 			}
 		}
+		// log.debug("SyndFeed: " + XString.prettyPrint(feed));
+	}
+
+	private String quoteFix(String html) {
+		html = html.replace("&#8221;", "'");
+		html = html.replace("&#8220;", "'");
+
+		// Warning these ARE two different characters, even though they look the same.
+		html = html.replace("’", "'");
+		html = html.replace("‘", "'");
+		return html;
 	}
 
 	// See also: https://github.com/OWASP/java-html-sanitizer
 	private String sanitizeHtml(String html) {
 		if (StringUtils.isEmpty(html))
 			return html;
+
+		// this sanitizer seems to choke on these special quotes so replace them first.
+		html = quoteFix(html);
 
 		if (policy == null) {
 			synchronized (policyLock) {

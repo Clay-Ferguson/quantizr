@@ -390,6 +390,7 @@ public class MultipartFileSender {
             Arrays.sort(acceptValues);
 
             return Arrays.binarySearch(acceptValues, toAccept) > -1
+                //warning: replaceAll uses REGEX!
                     || Arrays.binarySearch(acceptValues, toAccept.replaceAll("/.*$", "/*")) > -1
                     || Arrays.binarySearch(acceptValues, "*/*") > -1;
         }
