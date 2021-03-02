@@ -14,6 +14,7 @@ export interface SearchIntf {
 
     idToNodeMap: { [key: string]: J.NodeInfo };
 
+    searchAndReplace(recursive: boolean, nodeId: string, search: string, replace: string, state: AppState): any;
     numSearchResults(res: J.NodeSearchResponse): number;
     searchNodesResponse(res: J.NodeSearchResponse, searchDescription: string, isUserSearch: boolean): any;
     timelineResponse(res: J.NodeSearchResponse, timelineDescription: string): any;

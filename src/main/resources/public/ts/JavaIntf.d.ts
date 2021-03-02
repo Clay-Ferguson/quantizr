@@ -244,6 +244,13 @@ export interface SaveUserProfileRequest extends RequestBase {
     userBio: string;
 }
 
+export interface SearchAndReplaceRequest extends RequestBase {
+    recursive: boolean;
+    nodeId: string;
+    search: string;
+    replace: string;
+}
+
 export interface SelectAllNodesRequest extends RequestBase {
     parentNodeId: string;
 }
@@ -525,6 +532,9 @@ export interface SaveUserPreferencesResponse extends ResponseBase {
 }
 
 export interface SaveUserProfileResponse extends ResponseBase {
+}
+
+export interface SearchAndReplaceResponse extends ResponseBase {
 }
 
 export interface SelectAllNodesResponse extends ResponseBase {

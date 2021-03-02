@@ -4,6 +4,7 @@ import { Constants as C } from "./Constants";
 import { ImportCryptoKeyDlg } from "./dlg/ImportCryptoKeyDlg";
 import { ManageEncryptionKeysDlg } from "./dlg/ManageEncryptionKeysDlg";
 import { MediaRecorderDlg } from "./dlg/MediaRecorderDlg";
+import { SearchAndReplaceDlg } from "./dlg/SearchAndReplaceDlg";
 import { SearchByIDDlg } from "./dlg/SearchByIDDlg";
 import { SearchByNameDlg } from "./dlg/SearchByNameDlg";
 import { SearchContentDlg } from "./dlg/SearchContentDlg";
@@ -69,6 +70,7 @@ export class MenuPanel extends Div {
             new MenuItem("Split Node", () => new SplitNodeDlg(null, state).open(), !state.isAnonUser && selNodeIsMine), //
             new MenuItem("Transfer Node", () => { new TransferNodeDlg(state).open(); }, !state.isAnonUser && selNodeIsMine), //
             new MenuItem("Update Headings", () => { S.edit.updateHeadings(state); }, !state.isAnonUser && selNodeIsMine), //
+            new MenuItem("Search and Replace", () => { new SearchAndReplaceDlg(state).open(); }, !state.isAnonUser && selNodeIsMine), //
 
             new MenuItemSeparator(), //
 

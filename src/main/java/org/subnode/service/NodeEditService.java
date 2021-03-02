@@ -33,6 +33,7 @@ import org.subnode.request.CreateSubNodeRequest;
 import org.subnode.request.DeletePropertyRequest;
 import org.subnode.request.InsertNodeRequest;
 import org.subnode.request.SaveNodeRequest;
+import org.subnode.request.SearchAndReplaceRequest;
 import org.subnode.request.SplitNodeRequest;
 import org.subnode.request.TransferNodeRequest;
 import org.subnode.request.UpdateHeadingsRequest;
@@ -41,6 +42,7 @@ import org.subnode.response.CreateSubNodeResponse;
 import org.subnode.response.DeletePropertyResponse;
 import org.subnode.response.InsertNodeResponse;
 import org.subnode.response.SaveNodeResponse;
+import org.subnode.response.SearchAndReplaceResponse;
 import org.subnode.response.SplitNodeResponse;
 import org.subnode.response.TransferNodeResponse;
 import org.subnode.response.UpdateHeadingsResponse;
@@ -779,5 +781,48 @@ public class NodeEditService {
 				}
 			}
 		}
+	}
+
+	public SearchAndReplaceResponse searchAndReplace(MongoSession session, SearchAndReplaceRequest req) {
+		SearchAndReplaceResponse res = new SearchAndReplaceResponse();
+		if (session == null) {
+			session = ThreadLocals.getMongoSession();
+		}
+		int replacements = 0;
+		String nodeId = req.getNodeId();
+
+		// log.debug("searchingAndReplace node: " + nodeId);
+		SubNode node = read.getNode(session, nodeId);
+		auth.authRequireOwnerOfNode(session, node);
+
+		if (replaceText(session, node, req.getSearch(), req.getReplace())) {
+			replacements++;
+		}
+
+		if (req.isRecursive()) {
+			for (SubNode n : read.getSubGraph(session, node, null, 0)) {
+				if (replaceText(session, n, req.getSearch(), req.getReplace())) {
+					replacements++;
+				}
+			}
+		}
+
+		if (replacements > 0) {
+			update.saveSession(session);
+		}
+
+		res.setMessage(String.valueOf(replacements) + " nodes were updated.");
+		res.setSuccess(true);
+		return res;
+	}
+
+	private boolean replaceText(MongoSession session, SubNode node, String search, String replace) {
+		String content = node.getContent();
+		if (content==null) return false;
+		if (content.contains(search)) {
+			node.setContent(content.replace(search, replace));
+			return true;
+		}
+		return false;
 	}
 }

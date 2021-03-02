@@ -9,12 +9,11 @@ import { CompIntf } from "../widget/base/CompIntf";
 import { Button } from "../widget/Button";
 import { ButtonBar } from "../widget/ButtonBar";
 import { Checkbox } from "../widget/Checkbox";
+import { CollapsibleHelpPanel } from "../widget/CollapsibleHelpPanel";
 import { Form } from "../widget/Form";
 import { HorizontalLayout } from "../widget/HorizontalLayout";
-import { TextContent } from "../widget/TextContent";
 import { TextField } from "../widget/TextField";
 import { MessageDlg } from "./MessageDlg";
-import { CollapsibleHelpPanel } from "../widget/CollapsibleHelpPanel";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
@@ -26,7 +25,7 @@ export class SearchContentDlg extends DialogBase {
     static helpExpanded: boolean = false;
     static defaultSearchText: string = "";
     searchTextField: TextField;
-    searchTextState: ValidatedState<any> = new ValidatedState<any>();
+    static searchTextState: ValidatedState<any> = new ValidatedState<any>();
 
     constructor(state: AppState) {
         super("Search Content", "app-modal-content-medium-width", null, state);
@@ -40,17 +39,17 @@ export class SearchContentDlg extends DialogBase {
             fuzzy: false,
             caseSensitive: false
         });
-        this.searchTextState.setValue(SearchContentDlg.defaultSearchText);
+        SearchContentDlg.searchTextState.setValue(SearchContentDlg.defaultSearchText);
     }
 
     validate = (): boolean => {
         let valid = true;
-        if (!this.searchTextState.getValue()) {
-            this.searchTextState.setError("Cannot be empty.");
+        if (!SearchContentDlg.searchTextState.getValue()) {
+            SearchContentDlg.searchTextState.setError("Cannot be empty.");
             valid = false;
         }
         else {
-            this.searchTextState.setError(null);
+            SearchContentDlg.searchTextState.setError(null);
         }
         return valid;
     }
@@ -58,7 +57,7 @@ export class SearchContentDlg extends DialogBase {
     renderDlg(): CompIntf[] {
         return [
             new Form(null, [
-                this.searchTextField = new TextField("Search", false, this.search, null, false, this.searchTextState),
+                this.searchTextField = new TextField("Search", false, this.search, null, false, SearchContentDlg.searchTextState),
                 new HorizontalLayout([
                     // Allow fuzzy search for admin only. It's cpu intensive.
                     this.appState.isAdminUser ? new Checkbox("Fuzzy Search (slower)", null, {
@@ -107,7 +106,7 @@ export class SearchContentDlg extends DialogBase {
             return;
         }
 
-        SearchContentDlg.defaultSearchText = this.searchTextState.getValue();
+        SearchContentDlg.defaultSearchText = SearchContentDlg.searchTextState.getValue();
 
         this.close();
         S.render.showGraph(null, SearchContentDlg.defaultSearchText, this.appState);
@@ -129,7 +128,7 @@ export class SearchContentDlg extends DialogBase {
             return;
         }
 
-        SearchContentDlg.defaultSearchText = S.srch.searchText = this.searchTextState.getValue();
+        SearchContentDlg.defaultSearchText = S.srch.searchText = SearchContentDlg.searchTextState.getValue();
 
         S.util.ajax<J.NodeSearchRequest, J.NodeSearchResponse>("nodeSearch", {
             nodeId: node.id,

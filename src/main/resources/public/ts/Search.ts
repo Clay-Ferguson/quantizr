@@ -224,4 +224,16 @@ export class Search implements SearchIntf {
 
         S.view.refreshTree(this.highlightRowNode.id, true, true, this.highlightRowNode.id, false, true, true, state);
     }
+
+    searchAndReplace = (recursive: boolean, nodeId: string, search: string, replace: string, state: AppState): void => {
+        S.util.ajax<J.SearchAndReplaceRequest, J.SearchAndReplaceResponse>("searchAndReplace", {
+            recursive,
+            nodeId,
+            search,
+            replace
+        }, (res: J.SearchAndReplaceResponse) => {
+            S.view.refreshTree(null, false, false, null, false, true, true, state);
+            S.util.showMessage(res.message, "Success");
+        });
+    }
 }

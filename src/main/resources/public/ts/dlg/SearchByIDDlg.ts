@@ -22,7 +22,7 @@ export class SearchByIDDlg extends DialogBase {
 
     static defaultSearchText: string = "";
     searchTextField: TextField;
-    searchTextState: ValidatedState<any> = new ValidatedState<any>();
+    static searchTextState: ValidatedState<any> = new ValidatedState<any>();
 
     constructor(state: AppState) {
         super("Search by Node ID", "app-modal-content-medium-width", false, state);
@@ -30,18 +30,18 @@ export class SearchByIDDlg extends DialogBase {
             this.searchTextField.focus();
         });
 
-        this.searchTextState.setValue(SearchByIDDlg.defaultSearchText);
+        SearchByIDDlg.searchTextState.setValue(SearchByIDDlg.defaultSearchText);
     }
 
     validate = (): boolean => {
         let valid = true;
 
-        if (!this.searchTextState.getValue()) {
-            this.searchTextState.setError("Cannot be empty.");
+        if (!SearchByIDDlg.searchTextState.getValue()) {
+            SearchByIDDlg.searchTextState.setError("Cannot be empty.");
             valid = false;
         }
         else {
-            this.searchTextState.setError(null);
+            SearchByIDDlg.searchTextState.setError(null);
         }
 
         return valid;
@@ -50,7 +50,7 @@ export class SearchByIDDlg extends DialogBase {
     renderDlg(): CompIntf[] {
         return [
             new Form(null, [
-                this.searchTextField = new TextField("Node ID", false, this.search, null, false, this.searchTextState),
+                this.searchTextField = new TextField("Node ID", false, this.search, null, false, SearchByIDDlg.searchTextState),
                 new ButtonBar([
                     new Button("Search", this.search, null, "btn-primary"),
                     new Button("Close", this.close)
@@ -75,7 +75,7 @@ export class SearchByIDDlg extends DialogBase {
             return;
         }
 
-        SearchByIDDlg.defaultSearchText = this.searchTextState.getValue();
+        SearchByIDDlg.defaultSearchText = SearchByIDDlg.searchTextState.getValue();
 
         S.util.ajax<J.NodeSearchRequest, J.NodeSearchResponse>("nodeSearch", {
             nodeId: node.id,

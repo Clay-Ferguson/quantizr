@@ -85,6 +85,7 @@ import org.subnode.request.SaveNodeRequest;
 import org.subnode.request.SavePublicKeyRequest;
 import org.subnode.request.SaveUserPreferencesRequest;
 import org.subnode.request.SaveUserProfileRequest;
+import org.subnode.request.SearchAndReplaceRequest;
 import org.subnode.request.SelectAllNodesRequest;
 import org.subnode.request.SendTestEmailRequest;
 import org.subnode.request.SetCipherKeyRequest;
@@ -695,6 +696,13 @@ public class AppController implements ErrorController {
 	public @ResponseBody Object transferNode(@RequestBody TransferNodeRequest req, HttpSession session) {
 		return callProc.run("export", req, session, ms -> {
 			return nodeEditService.transferNode(ms, req);
+		});
+	}
+
+	@RequestMapping(value = API_PATH + "/searchAndReplace", method = RequestMethod.POST)
+	public @ResponseBody Object searchAndReplace(@RequestBody SearchAndReplaceRequest req, HttpSession session) {
+		return callProc.run("searchAndReplace", req, session, ms -> {
+			return nodeEditService.searchAndReplace(ms, req);
 		});
 	}
 
