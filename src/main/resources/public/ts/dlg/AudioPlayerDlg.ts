@@ -149,7 +149,8 @@ export class AudioPlayerDlg extends DialogBase {
                     })
                 ]),
                 new ButtonBar([
-                    new Button("Copy", this.copyToClipboard)
+                    new Button("Copy", this.copyToClipboard),
+                    new Button("Post", this.postComment)
                 ]),
                 this.customDiv
             ])
@@ -209,11 +210,21 @@ export class AudioPlayerDlg extends DialogBase {
         this.cancel();
     }
 
+    postComment = (): void => {
+        let link = this.getLink();
+        S.edit.addComment(null, "\n\n" + link, this.appState);
+    }
+
     copyToClipboard = (): void => {
-        let port = (location.port !== "80" && location.port !== "443") ? (":" + location.port) : "";
-        let link = location.protocol + "//" + location.hostname + port + "/app?audioUrl=" + this.sourceUrl + "&t=" + Math.trunc(this.player.currentTime);
+        let link = this.getLink();
         S.util.copyToClipboard(link);
         S.util.flashMessage("Copied link clipboard, with timecode.", "Clipboard", true);
+    }
+
+    getLink = (): string => {
+        let port = (location.port !== "80" && location.port !== "443") ? (":" + location.port) : "";
+        let link = location.protocol + "//" + location.hostname + port + "/app?audioUrl=" + this.sourceUrl + "&t=" + Math.trunc(this.player.currentTime);
+        return link;
     }
 
     restoreStartTime = () => {
