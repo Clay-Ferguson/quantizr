@@ -38,7 +38,7 @@ export class NodeCompBinary extends Div {
             imgSize = state.fullScreenImageSize;
         }
         else if (this.isEditorEmbed) {
-            imgSize = "200px";
+            imgSize = "120px";
         }
         else {
             imgSize = (this.imgSizeOverride && this.imgSizeOverride !== "n") ? this.imgSizeOverride : S.props.getNodePropVal(J.NodeProp.IMG_SIZE, node);

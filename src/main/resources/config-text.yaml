@@ -103,3 +103,18 @@ help:
         <li>Normally searching will find *any* of the words you enter, however if you want to require *all* words to be found
         then enclose each word in a double quotes</li>
       </ul>
+
+  editor:
+    dialog: >
+      <h4>Node Editing Tips</h4>
+      To left or right justify images attached to the node use the following markdown:
+      <p>
+      <pre>&lt;img class="img-upper-left" width="100px" src="{{imgUrl}}"&gt;
+
+      &lt;div class="clearfix"/&gt;
+      </pre>
+
+      Class can be 'img-upper-left' or 'img-upper-right'
+      <p>
+
+
