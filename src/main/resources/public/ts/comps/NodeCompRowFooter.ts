@@ -29,7 +29,7 @@ export class NodeCompRowFooter extends Div {
             children.push(new Icon({
                 title: "Reply to this Node",
                 className: "fa fa-reply fa-lg rowFooterIcon",
-                onClick: () => S.edit.addComment(this.node, state)
+                onClick: () => S.edit.addComment(this.node, null, state)
             }));
         }
 

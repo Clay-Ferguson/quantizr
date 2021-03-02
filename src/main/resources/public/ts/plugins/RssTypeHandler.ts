@@ -384,7 +384,7 @@ export class RssTypeHandler extends TypeBase {
             }
         }
 
-        let linkSpan = new Icon({
+        let linkIcon = new Icon({
             className: "fa fa-link fa-lg rssLinkIcon",
             title: "Copy RSS Item URL into clipboard",
             onClick: () => {
@@ -393,10 +393,18 @@ export class RssTypeHandler extends TypeBase {
             }
         });
 
+        let postIcon = !state.isAnonUser ? new Icon({
+            className: "fa fa-comment fa-lg rssPostIcon",
+            title: "Post a comment about this Article/Link",
+            onClick: () => {
+                S.edit.addComment(null, entry.title + "\n\n" + entry.link, state);
+            }
+        }) : null;
+
         let footerSpan = new Span(dateStr, { className: "marginRight" });
 
         children.push(new Div(null, { className: "float-right" }, [
-            footerSpan, linkSpan
+            footerSpan, postIcon, linkIcon
         ]));
         children.push(new Div(null, { className: "clearfix" }));
 
