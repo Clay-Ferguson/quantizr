@@ -51,6 +51,7 @@ import org.subnode.mongo.RunAsMongoAdmin;
 import org.subnode.mongo.model.SubNode;
 import org.subnode.util.Const;
 import org.subnode.util.ExUtil;
+import org.subnode.util.LimitedInputStreamEx;
 import org.subnode.util.StreamUtil;
 import org.subnode.util.SubNodeUtil;
 import org.subnode.util.Util;
@@ -359,8 +360,9 @@ public class RSSFeedService {
 				request.addHeader("User-Agent", Const.FAKE_USER_AGENT);
 				HttpResponse response = client.execute(request);
 				InputStream is = response.getEntity().getContent();
+				LimitedInputStreamEx limitedIs = new LimitedInputStreamEx(is, 2 * Const.ONE_MB);
 
-				byte[] buffer = IOUtils.toByteArray(is);
+				byte[] buffer = IOUtils.toByteArray(limitedIs);
 				reader = new CharSequenceReader(new String(buffer));
 
 				SyndFeedInput input = new SyndFeedInput();
