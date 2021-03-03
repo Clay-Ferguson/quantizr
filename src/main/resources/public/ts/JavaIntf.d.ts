@@ -198,9 +198,6 @@ export interface PublishNodeToIpfsRequest extends RequestBase {
     nodeId: string;
 }
 
-export interface RebuildIndexesRequest extends RequestBase {
-}
-
 export interface RemovePrivilegeRequest extends RequestBase {
     nodeId: string;
     principalNodeId: string;
@@ -498,9 +495,6 @@ export interface PingResponse extends ResponseBase {
 }
 
 export interface PublishNodeToIpfsResponse extends ResponseBase {
-}
-
-export interface RebuildIndexesResponse extends ResponseBase {
 }
 
 export interface RemovePrivilegeResponse extends ResponseBase {

@@ -72,12 +72,6 @@ export class Meta64 implements Meta64Intf {
         return this.fc[k];
     }
 
-    rebuildIndexes = (): void => {
-        S.util.ajax<J.RebuildIndexesRequest, J.RebuildIndexesResponse>("rebuildIndexes", {}, function (res: J.RebuildIndexesResponse) {
-            S.util.showMessage("Index rebuild complete.", "Note");
-        });
-    }
-
     shutdownServerNode = (): void => {
         S.util.ajax<J.ShutdownServerNodeRequest, J.ShutdownServerNodeResponse>("shutdownServerNode", {}, function (res: J.ShutdownServerNodeResponse) {
             S.util.showMessage("Server Node Shutdown initiated.", "Note");

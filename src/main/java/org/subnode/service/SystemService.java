@@ -17,9 +17,12 @@ import org.subnode.mongo.MongoDelete;
 import org.subnode.mongo.MongoRead;
 import org.subnode.mongo.MongoSession;
 import org.subnode.mongo.MongoUpdate;
+import org.subnode.mongo.MongoUtil;
 import org.subnode.mongo.RunAsMongoAdmin;
 import org.subnode.mongo.model.SubNode;
 import org.subnode.util.Const;
+import org.subnode.util.ExUtil;
+import org.subnode.util.ThreadLocals;
 import org.subnode.util.ValContainer;
 import org.subnode.util.XString;
 
@@ -41,6 +44,9 @@ public class SystemService {
 
 	@Autowired
 	private MongoUpdate update;
+
+	@Autowired
+	private MongoUtil mongoUtil;
 
 	@Autowired
 	private RunAsMongoAdmin adminRunner;
@@ -67,6 +73,17 @@ public class SystemService {
 		});
 
 		return ret.getVal();
+	}
+
+	public String rebuildIndexes() {
+		if (!ThreadLocals.getSessionContext().isAdmin()) {
+			throw ExUtil.wrapEx("admin only function.");
+		}
+
+		adminRunner.run(mongoSession -> {
+			mongoUtil.rebuildIndexes(mongoSession);
+		});
+		return "success.";
 	}
 
 	public String compactDb() {

@@ -76,7 +76,6 @@ import org.subnode.request.NodeFeedRequest;
 import org.subnode.request.NodeSearchRequest;
 import org.subnode.request.PingRequest;
 import org.subnode.request.PublishNodeToIpfsRequest;
-import org.subnode.request.RebuildIndexesRequest;
 import org.subnode.request.RemovePrivilegeRequest;
 import org.subnode.request.RenderCalendarRequest;
 import org.subnode.request.RenderNodeRequest;
@@ -107,7 +106,6 @@ import org.subnode.response.GraphResponse;
 import org.subnode.response.InfoMessage;
 import org.subnode.response.LogoutResponse;
 import org.subnode.response.PingResponse;
-import org.subnode.response.RebuildIndexesResponse;
 import org.subnode.response.SendTestEmailResponse;
 import org.subnode.response.ShutdownServerNodeResponse;
 import org.subnode.service.AclService;
@@ -1204,6 +1202,9 @@ public class AppController implements ErrorController {
 			if (req.getCommand().equalsIgnoreCase("validateDb")) {
 				res.getMessages().add(new InfoMessage(systemService.validateDb(), null));
 			} //
+			if (req.getCommand().equalsIgnoreCase("rebuildIndexes")) {
+				res.getMessages().add(new InfoMessage(systemService.rebuildIndexes(), null));
+			} //
 			else if (req.getCommand().equalsIgnoreCase("refreshRssCache")) {
 				res.getMessages().add(new InfoMessage(rssFeedService.refreshFeedCache(), null));
 			} //
@@ -1268,23 +1269,6 @@ public class AppController implements ErrorController {
 		return callProc.run("ping", req, session, ms -> {
 			PingResponse res = new PingResponse();
 			res.setServerInfo("Server: t=" + System.currentTimeMillis());
-			res.setSuccess(true);
-			return res;
-		});
-	}
-
-	@RequestMapping(value = API_PATH + "/rebuildIndexes", method = RequestMethod.POST)
-	public @ResponseBody Object rebuildIndexes(@RequestBody RebuildIndexesRequest req, HttpSession session) {
-		return callProc.run("rebuildIndexes", req, session, ms -> {
-			RebuildIndexesResponse res = new RebuildIndexesResponse();
-			if (!ThreadLocals.getSessionContext().isAdmin()) {
-				throw ExUtil.wrapEx("admin only function.");
-			}
-
-			adminRunner.run(mongoSession -> {
-				mongoUtil.rebuildIndexes(mongoSession);
-			});
-
 			res.setSuccess(true);
 			return res;
 		});

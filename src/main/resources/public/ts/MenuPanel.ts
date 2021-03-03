@@ -289,7 +289,7 @@ export class MenuPanel extends Div {
 
                 new MenuItem("DB - Validate", () => S.view.runServerCommand("validateDb", "Validate DB Response", null, state)), //
                 new MenuItem("DB - Compact", () => S.view.runServerCommand("compactDb", "Compact DB Response", null, state)), //
-                new MenuItem("DB - Rebuild Indexes", () => S.meta64.rebuildIndexes()),
+                new MenuItem("DB - Rebuild Indexes", () => S.view.runServerCommand("rebuildIndexes", "Rebuild Indexes Response", null, state)), //
                 new MenuItemSeparator(), //
 
                 new MenuItem("TEST - Send Email", () => S.meta64.sendTestEmail(state)),
