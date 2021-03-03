@@ -78,21 +78,32 @@ public class SystemService {
 		try {
 			update.releaseOrphanIPFSPins();
 		} catch (Exception e) {
-			// I noticed this failing in Jan 2021. I think IPFS made and API change we aren't accounting for
-			// yet.
-			// needs research (todo-1)
+			/*
+			 * I noticed this failing in Jan 2021. I think IPFS made and API change we aren't accounting for
+			 * yet. needs research (todo-1)
+			 */
 			// log.error("releaseOrphanIPFSPins failed.", e);
 		}
 
+		String ret = runMongoDbCommand(new Document("compact", "nodes"));
+		return ret;
+	}
+
+	public String validateDb() {
+		// https://docs.mongodb.com/manual/reference/command/validate/
+		String ret = runMongoDbCommand(new Document("validate", "nodes").append("full", true));
+		return ret;
+	}
+
+	public String runMongoDbCommand(Document doc) {
 		MongoDatabase database = mac.mongoClient().getDatabase(MongoAppConfig.databaseName);
-		Document result = database.runCommand(new Document("compact", "nodes"));
+		Document result = database.runCommand(doc);
 
 		StringBuilder ret = new StringBuilder();
-		ret.append("Compact Results:\n");
+		ret.append("Results:\n");
 		for (Map.Entry<String, Object> set : result.entrySet()) {
-			ret.append(String.format("%s: %s%n", set.getKey(), set.getValue()));
+			ret.append(String.format("%s: %s\n", set.getKey(), set.getValue()));
 		}
-
 		return ret.toString();
 	}
 

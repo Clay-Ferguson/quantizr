@@ -276,24 +276,29 @@ export class MenuPanel extends Div {
 
         if (state.isAdminUser) {
             children.push(new Menu("Admin", [
+
+                // new MenuItem("Backup DB", () => S.view.runServerCommand("BackupDb", "Backup DB Response", null, state)), //
                 new MenuItem("Server Info", () => S.view.runServerCommand("getServerInfo", "Server Info", null, state)), //
-                new MenuItem("Compact DB", () => S.view.runServerCommand("compactDb", "Compact DB Response", null, state)), //
                 new MenuItem("Refresh RSS Cache", () => S.view.runServerCommand("refreshRssCache", "Refresh RSS Cache", null, state)), //
                 new MenuItem("Refresh Fediverse", () => S.view.runServerCommand("refreshFediverseUsers", "Refresh Fediverse Users", null, state)), //
-
-                new MenuItem("Backup DB", () => S.view.runServerCommand("BackupDb", "Backup DB Response", null, state)), //
                 new MenuItem("Reset Public Node", () => S.view.runServerCommand("initializeAppContent", null, null, state)), //
                 new MenuItem("Insert Book: War and Peace", () => S.edit.insertBookWarAndPeace(state)),
-
-                new MenuItem("Rebuild Indexes", () => S.meta64.rebuildIndexes()),
                 new MenuItem("Shutdown Server Node", () => S.meta64.shutdownServerNode(state)),
-                new MenuItem("Send Test Email", () => S.meta64.sendTestEmail(state)),
-                new MenuItem("Test Notification Display", () => S.meta64.showSystemNotification("Test Title", "This is a test message")),
-                new MenuItem("Encryption Test", async () => {
+
+                new MenuItemSeparator(), //
+
+                new MenuItem("DB - Validate", () => S.view.runServerCommand("validateDb", "Validate DB Response", null, state)), //
+                new MenuItem("DB - Compact", () => S.view.runServerCommand("compactDb", "Compact DB Response", null, state)), //
+                new MenuItem("DB - Rebuild Indexes", () => S.meta64.rebuildIndexes()),
+                new MenuItemSeparator(), //
+
+                new MenuItem("TEST - Send Email", () => S.meta64.sendTestEmail(state)),
+                new MenuItem("TEST - Notification Display", () => S.meta64.showSystemNotification("Test Title", "This is a test message")),
+                new MenuItem("TEST - Encryption", async () => {
                     await S.encryption.test();
                     S.util.showMessage("Encryption Test Complete. Check browser console for output.", "Note", true);
                 }),
-                new MenuItem("TTS Test", async () => {
+                new MenuItem("TEST - Text to Speech", async () => {
                     const tts = window.speechSynthesis;
                     // let voices = tts.getVoices();
                     // for (let i = 0; i < voices.length; i++) {
