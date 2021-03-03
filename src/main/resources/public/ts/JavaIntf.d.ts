@@ -266,9 +266,6 @@ export interface SetNodePositionRequest extends RequestBase {
     targetName: string;
 }
 
-export interface ShutdownServerNodeRequest extends RequestBase {
-}
-
 export interface SignupRequest extends RequestBase {
     userName: string;
     password: string;
@@ -546,9 +543,6 @@ export interface SetCipherKeyResponse extends ResponseBase {
 }
 
 export interface SetNodePositionResponse extends ResponseBase {
-}
-
-export interface ShutdownServerNodeResponse extends ResponseBase {
 }
 
 export interface SignupResponse extends ResponseBase {

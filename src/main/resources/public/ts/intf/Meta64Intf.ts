@@ -37,7 +37,6 @@ export interface Meta64Intf {
     getNodeFunc(func: (id: string) => void, name: string, id: string): () => void;
 
     setOverlay(showOverlay: boolean): void;
-    shutdownServerNode(string): void;
     sendTestEmail(string): void;
     showSystemNotification(title: string, message: string): void;
     refresh(state: AppState): void;

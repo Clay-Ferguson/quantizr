@@ -72,12 +72,6 @@ export class Meta64 implements Meta64Intf {
         return this.fc[k];
     }
 
-    shutdownServerNode = (): void => {
-        S.util.ajax<J.ShutdownServerNodeRequest, J.ShutdownServerNodeResponse>("shutdownServerNode", {}, function (res: J.ShutdownServerNodeResponse) {
-            S.util.showMessage("Server Node Shutdown initiated.", "Note");
-        });
-    }
-
     sendTestEmail = (): void => {
         S.util.ajax<J.SendTestEmailRequest, J.SendTestEmailResponse>("sendTestEmail", {}, function (res: J.SendTestEmailResponse) {
             S.util.showMessage("Send Test Email Initiated.", "Note");

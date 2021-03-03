@@ -283,8 +283,6 @@ export class MenuPanel extends Div {
                 new MenuItem("Refresh Fediverse", () => S.view.runServerCommand("refreshFediverseUsers", "Refresh Fediverse Users", null, state)), //
                 new MenuItem("Reset Public Node", () => S.view.runServerCommand("initializeAppContent", null, null, state)), //
                 new MenuItem("Insert Book: War and Peace", () => S.edit.insertBookWarAndPeace(state)),
-                new MenuItem("Shutdown Server Node", () => S.meta64.shutdownServerNode(state)),
-
                 new MenuItemSeparator(), //
 
                 new MenuItem("DB - Validate", () => S.view.runServerCommand("validateDb", "Validate DB Response", null, state)), //

@@ -89,7 +89,6 @@ import org.subnode.request.SelectAllNodesRequest;
 import org.subnode.request.SendTestEmailRequest;
 import org.subnode.request.SetCipherKeyRequest;
 import org.subnode.request.SetNodePositionRequest;
-import org.subnode.request.ShutdownServerNodeRequest;
 import org.subnode.request.SignupRequest;
 import org.subnode.request.SplitNodeRequest;
 import org.subnode.request.TransferNodeRequest;
@@ -107,7 +106,6 @@ import org.subnode.response.InfoMessage;
 import org.subnode.response.LogoutResponse;
 import org.subnode.response.PingResponse;
 import org.subnode.response.SendTestEmailResponse;
-import org.subnode.response.ShutdownServerNodeResponse;
 import org.subnode.service.AclService;
 import org.subnode.service.ActPubService;
 import org.subnode.service.AttachmentService;
@@ -1195,37 +1193,45 @@ public class AppController implements ErrorController {
 			}
 
 			log.debug("Command: " + req.getCommand());
+			switch (req.getCommand()) {
+				case "compactDb":
+					res.getMessages().add(new InfoMessage(systemService.compactDb(), null));
+					break;
 
-			if (req.getCommand().equalsIgnoreCase("compactDb")) {
-				res.getMessages().add(new InfoMessage(systemService.compactDb(), null));
-			} //
-			else if (req.getCommand().equalsIgnoreCase("validateDb")) {
-				res.getMessages().add(new InfoMessage(systemService.validateDb(), null));
-			} //
-			else if (req.getCommand().equalsIgnoreCase("rebuildIndexes")) {
-				res.getMessages().add(new InfoMessage(systemService.rebuildIndexes(), null));
-			} //
-			else if (req.getCommand().equalsIgnoreCase("refreshRssCache")) {
-				res.getMessages().add(new InfoMessage(rssFeedService.refreshFeedCache(), null));
-			} //
-			else if (req.getCommand().equalsIgnoreCase("refreshFediverseUsers")) {
-				actPub.refreshForeignUsers();
-				res.getMessages().add(new InfoMessage("Fediverse refresh initiated...", null));
-			} //
-			else if (req.getCommand().equalsIgnoreCase("initializeAppContent")) {
-				log.error("initializeAppContent is obsolet, and was also refactored without being retested");
-				// res.setServerInfo(systemService.initializeAppContent());
-			} //
-			else if (req.getCommand().equalsIgnoreCase("getServerInfo")) {
-				res.getMessages().add(new InfoMessage(systemService.getSystemInfo(), null));
-			} //
-			else if (req.getCommand().equalsIgnoreCase("getJson")) {
-				res.getMessages().add(new InfoMessage(systemService.getJson(ms, req.getNodeId()), null));
-			} else {
-				throw new RuntimeEx("Invalid command: " + req.getCommand());
+				case "validateDb":
+					res.getMessages().add(new InfoMessage(systemService.validateDb(), null));
+					break;
+
+				case "rebuildIndexes":
+					res.getMessages().add(new InfoMessage(systemService.rebuildIndexes(), null));
+					break;
+
+				case "refreshRssCache":
+					res.getMessages().add(new InfoMessage(rssFeedService.refreshFeedCache(), null));
+					break;
+
+				case "refreshFediverseUsers":
+					actPub.refreshForeignUsers();
+					res.getMessages().add(new InfoMessage("Fediverse refresh initiated...", null));
+					break;
+
+				case "initializeAppContent":
+					log.error("initializeAppContent is obsolet, and was also refactored without being retested");
+					// res.setServerInfo(systemService.initializeAppContent());
+					break;
+
+				case "getServerInfo":
+					res.getMessages().add(new InfoMessage(systemService.getSystemInfo(), null));
+					break;
+
+				case "getJson":
+					res.getMessages().add(new InfoMessage(systemService.getJson(ms, req.getNodeId()), null));
+					break;
+
+				default:
+					throw new RuntimeEx("Invalid command: " + req.getCommand());
 			}
 			res.setSuccess(true);
-
 			return res;
 		});
 	}
@@ -1270,32 +1276,6 @@ public class AppController implements ErrorController {
 			PingResponse res = new PingResponse();
 			res.setServerInfo("Server: t=" + System.currentTimeMillis());
 			res.setSuccess(true);
-			return res;
-		});
-	}
-
-	@RequestMapping(value = API_PATH + "/shutdownServerNode", method = RequestMethod.POST)
-	public @ResponseBody Object shutdownServerNode(@RequestBody ShutdownServerNodeRequest req, HttpSession session) {
-		return callProc.run("shutdownServerNode", req, session, ms -> {
-			ShutdownServerNodeResponse res = new ShutdownServerNodeResponse();
-			if (!ThreadLocals.getSessionContext().isAdmin()) {
-				throw ExUtil.wrapEx("admin only function.");
-			}
-
-			Runnable runnable = () -> {
-				try {
-					Thread.sleep(5000);
-				} catch (Exception e) {
-				}
-				Runtime runtime = Runtime.getRuntime();
-				System.out.println("About to halt the current jvm");
-				runtime.halt(0);
-			};
-			Thread thread = new Thread(runnable);
-			thread.start();
-
-			res.setSuccess(true);
-
 			return res;
 		});
 	}
