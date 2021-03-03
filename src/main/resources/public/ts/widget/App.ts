@@ -127,9 +127,16 @@ export class App extends Div {
                 title: "Save clipboard text to my NOTES node"
             }, "btn-secondary floatingControlBarItem", "off") : null;
 
+            let addNoteButton = !state.isAnonUser ? new IconButton("fa-sticky-note", null, {
+                onClick: e => {
+                    S.edit.addNode("~" + J.NodeType.NOTES, null, state);
+                },
+                title: "Save new note to my NOTES node"
+            }, "btn-secondary floatingControlBarItem", "off") : null;
+
             // these are the buttons at the upper right of the page.
             if (topScrollUpButton || rootButton || homeButton || prefsButton || editButton) {
-                floatingControlBar = new Div(null, { className: "floatingControlBar" }, [topScrollUpButton, rootButton, homeButton, clipboardPasteButton, prefsButton, editButton]);
+                floatingControlBar = new Div(null, { className: "floatingControlBar" }, [topScrollUpButton, rootButton, homeButton, addNoteButton, clipboardPasteButton, prefsButton, editButton]);
             }
         }
 

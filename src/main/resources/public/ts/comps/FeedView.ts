@@ -54,7 +54,7 @@ export class FeedView extends Div {
         let children: Comp[] = [];
 
         let refreshFeedButtonBar = new ButtonBar([
-            state.isAnonUser ? null : new Button("New Post", () => S.edit.addComment(null, null, state), { title: "Post something awesome on the Fediverse!" }, "btn-primary"),
+            state.isAnonUser ? null : new Button("New Post", () => S.edit.addNode(null, null, state), { title: "Post something awesome on the Fediverse!" }, "btn-primary"),
             state.isAnonUser ? null : new Button("Friends", () => S.nav.openContentNode("~" + J.NodeType.FRIEND_LIST, state), { title: "Manage your list of frenz!" }),
             new Button("Trending", () => {
                 S.view.getNodeStats(state, true, true);

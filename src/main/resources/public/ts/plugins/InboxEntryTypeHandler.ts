@@ -48,7 +48,7 @@ export class InboxEntryTypeHandler extends TypeBase {
     //             new Icon({
     //                 title: "Reply",
     //                 className: "fa fa-comment fa-lg rowFooterIcon",
-    //                 onClick: () => S.edit.addComment(node, null, state)
+    //                 onClick: () => S.edit.addNode(node, null, state)
     //             })
     //         ])
     //     ]);
