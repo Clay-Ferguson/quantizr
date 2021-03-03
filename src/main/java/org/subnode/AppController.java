@@ -1199,10 +1199,10 @@ public class AppController implements ErrorController {
 			if (req.getCommand().equalsIgnoreCase("compactDb")) {
 				res.getMessages().add(new InfoMessage(systemService.compactDb(), null));
 			} //
-			if (req.getCommand().equalsIgnoreCase("validateDb")) {
+			else if (req.getCommand().equalsIgnoreCase("validateDb")) {
 				res.getMessages().add(new InfoMessage(systemService.validateDb(), null));
 			} //
-			if (req.getCommand().equalsIgnoreCase("rebuildIndexes")) {
+			else if (req.getCommand().equalsIgnoreCase("rebuildIndexes")) {
 				res.getMessages().add(new InfoMessage(systemService.rebuildIndexes(), null));
 			} //
 			else if (req.getCommand().equalsIgnoreCase("refreshRssCache")) {
