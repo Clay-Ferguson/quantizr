@@ -508,7 +508,7 @@ export class Render implements RenderIntf {
 
             onClick: (evt: any) => {
                 // new ProfileDlg(state, true, node.ownerId, node.owner).open();
-                S.meta64.userProfileView.open(true, node.ownerId); 
+                S.meta64.userProfileView.open(true, node.ownerId);
             }
         });
     }

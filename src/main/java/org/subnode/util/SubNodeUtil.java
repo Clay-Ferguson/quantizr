@@ -230,7 +230,11 @@ public class SubNodeUtil {
 			ret.setDescription(description);
 		}
 
-		ret.setLink(getAttachmentUrl(node));
+		String link = getAttachmentUrl(node);
+		if (link == null) {
+			link = appProp.getHostAndPort() + "/branding/logo-200px-tr.jpg";
+		}
+		ret.setLink(link);
 		ret.setUrl(appProp.getHostAndPort() + "/app?id=" + node.getId().toHexString());
 		return ret;
 	}
