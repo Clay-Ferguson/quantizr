@@ -1,5 +1,9 @@
 import { appState, dispatch, store } from "./AppRedux";
 import { AppState } from "./AppState";
+import { FeedView } from "./comps/FeedView";
+import { MainTabComp } from "./comps/MainTabComp";
+import { SearchView } from "./comps/SearchView";
+import { TimelineView } from "./comps/TimelineView";
 import { Constants as C } from "./Constants";
 import { AudioPlayerDlg } from "./dlg/AudioPlayerDlg";
 import { ChangePasswordDlg } from "./dlg/ChangePasswordDlg";
@@ -9,6 +13,7 @@ import * as J from "./JavaIntf";
 import { PubSub } from "./PubSub";
 import { Singletons } from "./Singletons";
 import { App } from "./widget/App";
+import { AppTab } from "./widget/AppTab";
 import { CompIntf } from "./widget/base/CompIntf";
 import { WelcomePanel } from "./widget/WelcomePanel";
 
@@ -59,6 +64,13 @@ export class Meta64 implements Meta64Intf {
     // maps the hash of an encrypted block of text to the unencrypted text, so that we never run the same
     // decryption code twice.
     decryptCache: { [key: string]: string } = {};
+
+    tabs: AppTab[] = [
+        new MainTabComp(),
+        new SearchView(),
+        new TimelineView(),
+        new FeedView()
+    ];
 
     /* Creates/Access a function that does operation 'name' on a node identified by 'id' */
     getNodeFunc = (func: (id: string) => void, op: string, id: string): () => void => {

@@ -6,6 +6,8 @@ import * as J from "../JavaIntf";
 import { PubSub } from "../PubSub";
 import { Singletons } from "../Singletons";
 import { ValidatedState } from "../ValidatedState";
+import { Anchor } from "../widget/Anchor";
+import { AppTab } from "../widget/AppTab";
 import { Comp } from "../widget/base/Comp";
 import { Button } from "../widget/Button";
 import { ButtonBar } from "../widget/ButtonBar";
@@ -14,6 +16,7 @@ import { CollapsibleHelpPanel } from "../widget/CollapsibleHelpPanel";
 import { Div } from "../widget/Div";
 import { Heading } from "../widget/Heading";
 import { IconButton } from "../widget/IconButton";
+import { Li } from "../widget/Li";
 import { Span } from "../widget/Span";
 import { TextField } from "../widget/TextField";
 
@@ -23,7 +26,7 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
 });
 
 /* General Widget that doesn't fit any more reusable or specific category other than a plain Div, but inherits capability of Comp class */
-export class FeedView extends Div {
+export class FeedView extends AppTab {
 
     static searchTextState: ValidatedState<any> = new ValidatedState<any>();
 
@@ -34,9 +37,24 @@ export class FeedView extends Div {
     static helpExpanded: boolean = false;
 
     constructor() {
-        super(null, {
+        super({
             id: "feedTab"
         });
+    }
+
+    getTabButton(state: AppState): Li {
+        return new Li(null, {
+            className: "nav-item navItem",
+            style: { display: "inline" }
+        }, [
+            new Anchor("#feedTab", "Feed", {
+                "data-toggle": "tab",
+                className: "nav-link" + (state.activeTab === "feedTab" ? " active" : ""),
+                onClick: () => {
+                    S.meta64.selectTab("feedTab");
+                }
+            })
+        ]);
     }
 
     preRender(): void {

@@ -4,8 +4,11 @@ import { Constants as C } from "../Constants";
 import * as J from "../JavaIntf";
 import { PubSub } from "../PubSub";
 import { Singletons } from "../Singletons";
+import { Anchor } from "../widget/Anchor";
+import { AppTab } from "../widget/AppTab";
 import { Comp } from "../widget/base/Comp";
 import { Div } from "../widget/Div";
+import { Li } from "../widget/Li";
 import { TextContent } from "../widget/TextContent";
 
 let S: Singletons;
@@ -14,12 +17,27 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
 });
 
 /* General Widget that doesn't fit any more reusable or specific category other than a plain Div, but inherits capability of Comp class */
-export class TimelineView extends Div {
+export class TimelineView extends AppTab {
 
     constructor() {
-        super(null, {
+        super({
             id: "timelineTab"
         });
+    }
+
+    getTabButton(state: AppState): Li {
+        return new Li(null, {
+            className: "nav-item navItem",
+            style: { display: state.timelineResults ? "inline" : "none" }
+        }, [
+            new Anchor("#timelineTab", "Timeline", {
+                "data-toggle": "tab",
+                className: "nav-link" + (state.activeTab === "timelineTab" ? " active" : ""),
+                onClick: () => {
+                    S.meta64.selectTab("timelineTab");
+                }
+            })
+        ]);
     }
 
     preRender(): void {

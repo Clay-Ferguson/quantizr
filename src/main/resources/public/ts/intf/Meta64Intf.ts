@@ -1,6 +1,7 @@
 import { AppState } from "../AppState";
 import { MainMenuDlg } from "../dlg/MainMenuDlg";
 import * as J from "../JavaIntf";
+import { AppTab } from "../widget/AppTab";
 import { CompIntf } from "../widget/base/CompIntf";
 
 export interface Meta64Intf {
@@ -8,6 +9,7 @@ export interface Meta64Intf {
     config: any;
     mainMenu: MainMenuDlg;
     app: CompIntf;
+    tabs: AppTab[];
 
     appInitialized: boolean;
 

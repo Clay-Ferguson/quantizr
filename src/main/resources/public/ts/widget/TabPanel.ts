@@ -1,17 +1,13 @@
+import { useSelector } from "react-redux";
 import { AppState } from "../AppState";
 import clientInfo from "../ClientInfo";
-import { FeedView } from "../comps/FeedView";
-import { MainTabComp } from "../comps/MainTabComp";
-import { SearchView } from "../comps/SearchView";
-import { TimelineView } from "../comps/TimelineView";
 import { Constants as C } from "../Constants";
+import { DialogBase } from "../DialogBase";
 import { PubSub } from "../PubSub";
 import { Singletons } from "../Singletons";
+import { CompIntf } from "./base/CompIntf";
 import { Div } from "./Div";
 import { TabPanelButtons } from "./TabPanelButtons";
-import { useSelector } from "react-redux";
-import { DialogBase } from "../DialogBase";
-import { CompIntf } from "./base/CompIntf";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (s: Singletons) => {
@@ -38,12 +34,7 @@ export class TabPanel extends Div {
             dialog = state.dialogStack[state.dialogStack.length - 1];
         }
 
-        let children: CompIntf[] = dialog ? [dialog] : [
-            new MainTabComp(),
-            new SearchView(),
-            new TimelineView(),
-            new FeedView()
-        ];
+        let children: CompIntf[] = dialog ? [dialog] : S.meta64.tabs;
 
         let tabContent = new Div(null, {
             className: "row tab-content",
