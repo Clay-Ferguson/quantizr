@@ -24,7 +24,6 @@ export class TabPanelButtons extends Div {
             className: "tab-buttons-container"
         }, [
             new Ul(null, {
-                // append 'flex-column' to className for vertical buttons
                 className: "nav nav-tabs",
                 id: "navTabs"
             }, this.buildTabButtons(state))]

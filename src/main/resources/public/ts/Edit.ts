@@ -7,7 +7,6 @@ import { EditNodeDlg } from "./dlg/EditNodeDlg";
 import { ExportDlg } from "./dlg/ExportDlg";
 import { ManageAccountDlg } from "./dlg/ManageAccountDlg";
 import { PrefsDlg } from "./dlg/PrefsDlg";
-import { ProfileDlg } from "./dlg/ProfileDlg";
 import { UploadFromFileDropzoneDlg } from "./dlg/UploadFromFileDropzoneDlg";
 import { EditIntf } from "./intf/EditIntf";
 import * as J from "./JavaIntf";
@@ -23,10 +22,6 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (s: Singletons) => {
 export class Edit implements EditIntf {
 
     showReadOnlyProperties: boolean = false;
-
-    openProfileDlg = (state: AppState): void => {
-        new ProfileDlg(state, false, null, null).open();
-    }
 
     openChangePasswordDlg = (state: AppState): void => {
         new ChangePasswordDlg(null, state).open();

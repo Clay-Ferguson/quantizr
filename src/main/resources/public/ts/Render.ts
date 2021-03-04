@@ -7,7 +7,6 @@ import { NodeCompTableRowLayout } from "./comps/NodeCompTableRowLayout";
 import { NodeCompVerticalRowLayout } from "./comps/NodeCompVerticalRowLayout";
 import { Constants as C } from "./Constants";
 import { MessageDlg } from "./dlg/MessageDlg";
-import { ProfileDlg } from "./dlg/ProfileDlg";
 import { NodeActionType } from "./enums/NodeActionType";
 import { RenderIntf } from "./intf/RenderIntf";
 import { TypeHandlerIntf } from "./intf/TypeHandlerIntf";
@@ -508,7 +507,8 @@ export class Render implements RenderIntf {
             // align: "left", // causes text to flow around
 
             onClick: (evt: any) => {
-                new ProfileDlg(state, true, node.ownerId, node.owner).open();
+                // new ProfileDlg(state, true, node.ownerId, node.owner).open();
+                S.meta64.userProfileView.open(true, node.ownerId); 
             }
         });
     }

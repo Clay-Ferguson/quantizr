@@ -2,6 +2,7 @@ import * as J from "./JavaIntf";
 import { NodeInfo } from "./JavaIntf";
 import { EventInput } from "@fullcalendar/react";
 import { DialogBase } from "./DialogBase";
+import { ProfileState } from "./comps/ProfileState";
 
 /* root react Redux state for entire app */
 export class AppState {
@@ -119,4 +120,7 @@ export class AppState {
     // Similar to feedCache but holds the current 'page' the user is on (1, 2, 3,...) based on the user
     // being able to click 'more...' button to page thru a feed.
     feedPage = {};
+
+    // If non-null holds the state of the user info being displayed in the ProfileTab view
+    userProfile: ProfileState;
 }

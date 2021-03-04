@@ -4,6 +4,7 @@ import { FeedView } from "./comps/FeedView";
 import { MainTabComp } from "./comps/MainTabComp";
 import { SearchView } from "./comps/SearchView";
 import { TimelineView } from "./comps/TimelineView";
+import { UserProfileView } from "./comps/UserProfileView";
 import { Constants as C } from "./Constants";
 import { AudioPlayerDlg } from "./dlg/AudioPlayerDlg";
 import { ChangePasswordDlg } from "./dlg/ChangePasswordDlg";
@@ -65,11 +66,14 @@ export class Meta64 implements Meta64Intf {
     // decryption code twice.
     decryptCache: { [key: string]: string } = {};
 
+    userProfileView: UserProfileView = new UserProfileView();
+
     tabs: AppTab[] = [
         new MainTabComp(),
         new SearchView(),
         new TimelineView(),
-        new FeedView()
+        new FeedView(),
+        this.userProfileView
     ];
 
     /* Creates/Access a function that does operation 'name' on a node identified by 'id' */

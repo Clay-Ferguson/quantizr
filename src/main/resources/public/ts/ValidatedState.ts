@@ -10,11 +10,11 @@ export class ValidatedState<S> {
     }
 
     getValue(): any {
-        return this.v.state.value;
+        return this.v.state.value || "";
     }
 
     setValue(value: any): any {
-        this.v.mergeState({ value });
+        this.v.mergeState({ value: value || "" });
     }
 
     getError(): string {

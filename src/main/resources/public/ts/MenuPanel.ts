@@ -1,5 +1,6 @@
 import { useSelector } from "react-redux";
 import { AppState } from "./AppState";
+import { UserProfileView } from "./comps/UserProfileView";
 import { Constants as C } from "./Constants";
 import { ImportCryptoKeyDlg } from "./dlg/ImportCryptoKeyDlg";
 import { ManageEncryptionKeysDlg } from "./dlg/ManageEncryptionKeysDlg";
@@ -237,7 +238,7 @@ export class MenuPanel extends Div {
         // let fileSystemMenu = makeTopLevelMenu("FileSys", fileSystemMenuItems);
 
         children.push(new Menu("Account", [
-            new MenuItem("Profile", () => S.edit.openProfileDlg(state), !state.isAnonUser), //
+            new MenuItem("Profile", () => S.meta64.userProfileView.open(false, null)), //
 
             // For now there is only ONE button on the Perferences dialog that is accessible as a toolbar button already, so
             // until we have at least one more preference the preferences dialog is not needed.

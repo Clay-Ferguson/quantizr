@@ -1,6 +1,5 @@
 import { appState } from "../AppRedux";
 import { Constants as C } from "../Constants";
-import { ProfileDlg } from "../dlg/ProfileDlg";
 import { FriendInfo } from "../JavaIntf";
 import { PubSub } from "../PubSub";
 import { Singletons } from "../Singletons";
@@ -33,7 +32,8 @@ export class FriendsTableRow extends ListBoxRow {
                 className: "friendListImage",
                 src: src,
                 onClick: (evt: any) => {
-                    new ProfileDlg(state, true, this.friend.userNodeId, this.friend.userName).open();
+                    // new ProfileDlg(state, true, this.friend.userNodeId, this.friend.userName).open();
+                    S.meta64.userProfileView.open(true, this.friend.userNodeId);
                 }
             });
         }

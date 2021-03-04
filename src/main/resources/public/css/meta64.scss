@@ -277,9 +277,9 @@ a {
 
 .profileImageBase {
     border-radius: $borderRadiusLarge;
-    width: $profileImgSize;
+    // width: $profileImgSize;
     cursor: pointer;
-    padding: 8px;
+    // padding: 8px;
     // these three props shift the image to overlay on the main header image
     // position: relative;
     // top: -100px;
