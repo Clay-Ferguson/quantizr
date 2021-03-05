@@ -277,19 +277,22 @@ a {
 
 .profileImageBase {
     border-radius: $borderRadiusLarge;
-    // width: $profileImgSize;
     cursor: pointer;
-    // padding: 8px;
-    // these three props shift the image to overlay on the main header image
-    // position: relative;
-    // top: -100px;
-    // left: 50px;
+    top: -90px;
+    left: 35px;
+    position: relative;
+    background-color: $modal-content-bg;
+    max-width: 150px;
+}
+
+.profileBioPanel {
+    top: -60px;
+    position: relative;
 }
 
 .profileHeaderImageBase {
     border-radius: $borderRadiusLarge;
     cursor: pointer;
-    padding: 8px;
     width: 100%;
     max-height: $profileImgSize;
     object-fit: cover;

@@ -71,46 +71,31 @@ export class UserProfileView extends AppTab {
                 profileHeaderImg ? new Div(null, null, [
                     new Div(null, null, [
                         !state.userProfile.readOnly ? new Div(null, null, [
-                            new Label("Header Image")
+                            new Label("Header & Avatar Images")
                         ]) : null,
                         profileHeaderImg
                     ])
                 ]) : null,
 
-                new Div(null, {
-                    className: "row marginTop marginBottom"
-                }, [
-                    new Div(null, { className: "col-4" }, [
-                        new Div(null, null, [
-                            !state.userProfile.readOnly ? new Div(null, null, [
-                                new Label("Avatar Image")
-                            ]) : null,
-                            profileImg
-                        ])
-                    ]),
+                profileImg,
 
-                    new Div(null, { className: "col-8" }, [
-                        new Div(null, { className: "marginTop" }, [
-                            state.userProfile.readOnly
-                                ? new Html(S.util.markdown(state.userProfile.userBio) || "This user hasn't entered a bio yet")
-                                : new TextArea("Bio", {
-                                    rows: 8
-                                },
-                                    this.bioState)
-                        ])
-                    ])
+                new Div(null, { className: "marginBottom profileBioPanel" }, [
+                    state.userProfile.readOnly
+                        ? new Html(S.util.markdown(state.userProfile.userBio) || "This user hasn't entered a bio yet")
+                        : new TextArea("Bio", {
+                            rows: 8
+                        },
+                            this.bioState)
                 ]),
 
-                new Div(null, null, [
-                    new ButtonBar([
-                        state.userProfile.readOnly ? null : new Button("Save", this.save, null, "btn-primary"),
-                        new Button("Close", this.close, null),
-                        state.userProfile.readOnly && state.userProfile.userName !== state.userName ? new Button("Add as Friend", this.addFriend) : null,
-                        state.userProfile.actorUrl ? new Button("Go to User Page", () => {
-                            window.open(state.userProfile.actorUrl, "_blank");
-                        }) : null
-                    ], null, "marginTop")
-                ])
+                new ButtonBar([
+                    state.userProfile.readOnly ? null : new Button("Save", this.save, null, "btn-primary"),
+                    new Button("Close", this.close, null),
+                    state.userProfile.readOnly && state.userProfile.userName !== state.userName ? new Button("Add as Friend", this.addFriend) : null,
+                    state.userProfile.actorUrl ? new Button("Go to User Page", () => {
+                        window.open(state.userProfile.actorUrl, "_blank");
+                    }) : null
+                ], null, "marginTop")
             ])
         ];
 
