@@ -528,7 +528,7 @@ export class EditNodeDlg extends DialogBase {
             helpPanel]);
 
         // if this props table would be empty don't display it (set to null)
-        if (!propsTable.childrenExist()) {
+        if (propsTable && !propsTable.childrenExist()) {
             propsTable = null;
         }
 

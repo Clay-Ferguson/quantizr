@@ -301,7 +301,7 @@ export class NodeCompButtonBar extends HorizontalLayout {
             }
         }
 
-        if (!buttonBar.childrenExist()) {
+        if (buttonBar && !buttonBar.childrenExist()) {
             buttonBar = null;
         }
 
