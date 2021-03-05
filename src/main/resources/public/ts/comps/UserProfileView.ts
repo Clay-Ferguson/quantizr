@@ -79,7 +79,7 @@ export class UserProfileView extends AppTab {
 
                 profileImg,
 
-                new Div(null, { className: "marginBottom profileBioPanel" }, [
+                new Div(null, { className: "marginBottom " + (profileHeaderImg ? "profileBioPanel" : "profileBioPanelNoHeader") }, [
                     state.userProfile.readOnly
                         ? new Html(S.util.markdown(state.userProfile.userBio) || "")
                         : new TextArea("Bio", {
