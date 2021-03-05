@@ -294,6 +294,7 @@ a {
     border-radius: $borderRadiusLarge;
     cursor: pointer;
     width: 100%;
+    height: 200px;
     max-height: $profileImgSize;
     object-fit: cover;
 }
@@ -331,20 +332,16 @@ a {
 }
 
 .profileImageHolder {
-    border-radius: $borderRadiusLarge;
-    width: $profileImgSize;
-    height: $profileImgSize;
-    cursor: pointer;
-    padding: 8px;
-    border: 6px dotted $nodeBorderBottomColor;
+    @extend .profileImageBase;
+    border: 4px dotted $nodeBorderBottomColor;
+    padding: 12px;
 }
 
 .profileHeaderImageHolder {
-    border-radius: $borderRadiusLarge;
-    max-height: $profileImgSize;
-    cursor: pointer;
-    padding: 8px;
-    border: 6px dotted $nodeBorderBottomColor;
+    @extend .profileHeaderImageBase;
+    border: 4px dotted $nodeBorderBottomColor;
+    height: 150px;
+    padding: 12px;
 }
 
 .floatingControlBar {

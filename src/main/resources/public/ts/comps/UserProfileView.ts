@@ -177,11 +177,6 @@ export class UserProfileView extends AppTab {
         const state: AppState = store.getState();
 
         if (S.util.checkSuccess("Saving Profile", res)) {
-            // let state: AppState = store.getState();
-            // todo-1: to make this work we'd need to have a version of 'refresh' that doesn't set the tab back to main tab,
-            // so for now let's just do nothing.
-            // S.meta64.refresh(state);
-            // this.close();
             S.util.flashMessage("Saved Successfully", "Profile", true);
         }
     }
@@ -228,7 +223,7 @@ export class UserProfileView extends AppTab {
                 onClick
             };
             if (!state.userProfile.readOnly) {
-                att.title = "Click to upload new Profile Image";
+                att.title = "Click to upload Avatar Image";
             }
 
             // Note: we DO have the image width/height set on the node object (node.width, node.hight) but we don't need it for anything currently
@@ -238,7 +233,7 @@ export class UserProfileView extends AppTab {
             if (state.userProfile.readOnly) {
                 return null;
             }
-            return new Div("Click to upload Profile Image", {
+            return new Div("Click to upload Avatar Image", {
                 className: "profileImageHolder",
                 onClick
             });
@@ -280,7 +275,7 @@ export class UserProfileView extends AppTab {
                 onClick
             };
             if (!state.userProfile.readOnly) {
-                att.title = "Click to upload new Header Image";
+                att.title = "Click to upload Header Image";
             }
 
             // Note: we DO have the image width/height set on the node object (node.width, node.hight) but we don't need it for anything currently
@@ -290,7 +285,7 @@ export class UserProfileView extends AppTab {
             if (state.userProfile.readOnly) {
                 return null;
             }
-            return new Div("Click to upload Profile Image", {
+            return new Div("Click to upload Header Image", {
                 className: "profileHeaderImageHolder",
                 onClick
             });
