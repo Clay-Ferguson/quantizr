@@ -62,12 +62,12 @@ export class UserProfileView extends AppTab {
             return;
         }
 
-        let profileImg: CompIntf = this.makeProfileImg(state);
-        let profileHeaderImg: CompIntf = state.userProfile.userName.indexOf("@") === -1 ? this.makeProfileHeaderImg() : null;
+        let profileHeaderImg: CompIntf = this.makeProfileHeaderImg();
+        let profileImg: CompIntf = this.makeProfileImg(state, !!profileHeaderImg);
 
         let children = [
             new Div(null, null, [
-                new Heading(3, "Profile: " + state.userProfile.userName),
+                new Heading(4, (state.userProfile.readOnly ? "Profile: " : "Edit Profile: ") + state.userProfile.userName),
                 profileHeaderImg ? new Div(null, null, [
                     new Div(null, null, [
                         !state.userProfile.readOnly ? new Div(null, null, [
@@ -81,7 +81,7 @@ export class UserProfileView extends AppTab {
 
                 new Div(null, { className: "marginBottom profileBioPanel" }, [
                     state.userProfile.readOnly
-                        ? new Html(S.util.markdown(state.userProfile.userBio) || "This user hasn't entered a bio yet")
+                        ? new Html(S.util.markdown(state.userProfile.userBio) || "")
                         : new TextArea("Bio", {
                             rows: 8
                         },
@@ -181,7 +181,7 @@ export class UserProfileView extends AppTab {
         }
     }
 
-    makeProfileImg(state: AppState): CompIntf {
+    makeProfileImg(state: AppState, hasHeaderImg: boolean): CompIntf {
         let src: string = null;
 
         // if ActivityPub icon exists, we know that's the one to use.
@@ -218,7 +218,8 @@ export class UserProfileView extends AppTab {
 
         if (src) {
             let att: any = {
-                className: state.userProfile.readOnly ? "readOnlyProfileImage" : "profileImage",
+                className: hasHeaderImg ? (state.userProfile.readOnly ? "readOnlyProfileImage" : "profileImage")
+                    : (state.userProfile.readOnly ? "readOnlyProfileImageNoHeader" : "profileImageNoHeader"),
                 src,
                 onClick
             };
@@ -231,10 +232,12 @@ export class UserProfileView extends AppTab {
         }
         else {
             if (state.userProfile.readOnly) {
-                return null;
+                return new Div(null, {
+                    className: hasHeaderImg ? "readOnlyProfileImage" : "readOnlyProfileImageNoHeader"
+                });
             }
             return new Div("Click to upload Avatar Image", {
-                className: "profileImageHolder",
+                className: hasHeaderImg ? "profileImageHolder" : "profileImageHolderNoHeader",
                 onClick
             });
         }
@@ -242,6 +245,11 @@ export class UserProfileView extends AppTab {
 
     makeProfileHeaderImg(): CompIntf {
         const state: AppState = store.getState();
+
+        if (state.userProfile.userName.indexOf("@") !== -1) {
+            return null;
+        }
+
         let headerImageVer = state.userProfile.headerImageVer;
         let src: string = S.render.getProfileHeaderImgUrl(state.userProfile.userId || state.homeNodeId, headerImageVer);
 

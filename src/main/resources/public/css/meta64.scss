@@ -285,6 +285,13 @@ a {
     max-width: 150px;
 }
 
+.profileImageBaseNoHeader {
+    border-radius: $borderRadiusLarge;
+    cursor: pointer;
+    background-color: $modal-content-bg;
+    max-width: 150px;
+}
+
 .profileBioPanel {
     top: -60px;
     position: relative;
@@ -306,6 +313,16 @@ a {
 
 .readOnlyProfileImage {
     @extend .profileImageBase;
+    border: 1px solid $nodeBorderBottomColor;
+}
+
+.profileImageNoHeader {
+    @extend .profileImageBaseNoHeader;
+    border: 4px dotted $nodeBorderBottomColor;
+}
+
+.readOnlyProfileImageNoHeader {
+    @extend .profileImageBaseNoHeader;
     border: 1px solid $nodeBorderBottomColor;
 }
 
@@ -337,10 +354,16 @@ a {
     padding: 12px;
 }
 
+.profileImageHolderNoHeader {
+    @extend .profileImageBaseNoHeader;
+    border: 4px dotted $nodeBorderBottomColor;
+    padding: 12px;
+}
+
 .profileHeaderImageHolder {
     @extend .profileHeaderImageBase;
     border: 4px dotted $nodeBorderBottomColor;
-    height: 150px;
+    min-height: 150px;
     padding: 12px;
 }
 
