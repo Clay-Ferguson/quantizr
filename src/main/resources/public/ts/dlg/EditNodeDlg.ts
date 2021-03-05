@@ -375,8 +375,8 @@ export class EditNodeDlg extends DialogBase {
             new PropValueHolder(this.getState().node, J.NodeProp.IMG_SIZE, "100%")) : null;
 
         // This is the table that contains the custom editable properties inside the collapsable panel at the bottom.
-        let propsTable = null;
-        let mainPropsTable = null;
+        let propsTable: Comp = null;
+        let mainPropsTable: Comp = null;
 
         // if customProps exists then the props are all added into 'editPropsTable' instead of the collapsible panel
         if (!customProps) {
@@ -415,6 +415,7 @@ export class EditNodeDlg extends DialogBase {
             }
         }
 
+        let numPropsShowing: number = 0;
         if (state.node.properties) {
             // This loop creates all the editor input fields for all the properties
             state.node.properties.forEach((prop: J.PropertyInfo) => {
@@ -431,6 +432,7 @@ export class EditNodeDlg extends DialogBase {
                     if (!this.isGuiControlBasedProp(prop)) {
                         let allowSelection = !customProps || !customProps.find(p => p === prop.name);
                         let tableRow = this.makePropEditor(typeHandler, prop, allowSelection, typeHandler ? typeHandler.getEditorRowsForProp(prop.name) : 1);
+                        numPropsShowing++;
                         propsParent.addChild(tableRow);
                     }
                 }
@@ -438,23 +440,17 @@ export class EditNodeDlg extends DialogBase {
         }
 
         let allowPropertyAdd: boolean = typeHandler ? typeHandler.getAllowPropertyAdd() : true;
-
         if (allowPropertyAdd) {
-            let propsButtonBar: ButtonBar = new ButtonBar([
-                new Button("Add Property", this.addProperty),
-                this.deletePropButton = new Button("Delete Property", this.deletePropertyButtonClick)
-            ]);
+            if (numPropsShowing > 0) {
+                let propsButtonBar: ButtonBar = new ButtonBar([
+                    new Button("Add Property", this.addProperty),
+                    this.deletePropButton = new Button("Delete Property", this.deletePropertyButtonClick)
+                ]);
 
-            this.deletePropButton.setEnabled(false);
-            propsParent.addChild(propsButtonBar);
+                this.deletePropButton.setEnabled(false);
+                propsParent.addChild(propsButtonBar);
+            }
         }
-
-        let collapsiblePanel = !customProps ? new CollapsiblePanel(null, null, null, [
-            nodeNameTextField, selectionsBar, propsTable
-        ], false,
-            (state: boolean) => {
-                EditNodeDlg.morePanelExpanded = state;
-            }, EditNodeDlg.morePanelExpanded, "float-right") : null;
 
         let binarySection: LayoutRow = null;
         if (hasAttachment) {
@@ -531,8 +527,55 @@ export class EditNodeDlg extends DialogBase {
             parentDisplay,
             helpPanel]);
 
+        // if this props table would be empty don't display it (set to null)
+        if (!propsTable.childrenExist()) {
+            propsTable = null;
+        }
+
+        let collapsiblePanel = !customProps ? new CollapsiblePanel(null, null, null, [
+            nodeNameTextField, selectionsBar, propsTable
+        ], false,
+            (state: boolean) => {
+                EditNodeDlg.morePanelExpanded = state;
+            }, EditNodeDlg.morePanelExpanded, "float-right") : null;
+
         this.propertyEditFieldContainer.setChildren([mainPropsTable, sharingSpan, binarySection, collapsiblePanel, expandables]);
         return children;
+    }
+
+    countPropsShowing = (): number => {
+        let state = this.getState();
+        let typeHandler: TypeHandlerIntf = S.plugin.getTypeHandler(state.node.type);
+        let customProps: string[] = null;
+        if (typeHandler) {
+            customProps = typeHandler.getCustomProperties();
+            typeHandler.ensureDefaultProperties(state.node);
+            this.editorHelp = typeHandler.getEditorHelp();
+        }
+
+        let numPropsShowing: number = 0;
+        if (state.node.properties) {
+            // This loop creates all the editor input fields for all the properties
+            state.node.properties.forEach((prop: J.PropertyInfo) => {
+                // console.log("prop=" + S.util.prettyPrint(prop));
+
+                if (!this.allowEditAllProps && !S.render.allowPropertyEdit(state.node, prop.name, this.appState)) {
+                    console.log("Hiding property: " + prop.name);
+                    return;
+                }
+
+                if (this.allowEditAllProps || (
+                    !S.render.isReadOnlyProperty(prop.name) || S.edit.showReadOnlyProperties)) {
+
+                    if (!this.isGuiControlBasedProp(prop)) {
+                        let allowSelection = !customProps || !customProps.find(p => p === prop.name);
+                        let tableRow = this.makePropEditor(typeHandler, prop, allowSelection, typeHandler ? typeHandler.getEditorRowsForProp(prop.name) : 1);
+                        numPropsShowing++;
+                    }
+                }
+            });
+        }
+        return numPropsShowing;
     }
 
     makeCheckboxPropValueHandler(propName: string): I.ValueIntf {
@@ -557,6 +600,8 @@ export class EditNodeDlg extends DialogBase {
             typeHandler.ensureDefaultProperties(state.node);
         }
 
+        let allowPropertyAdd: boolean = typeHandler ? typeHandler.getAllowPropertyAdd() : true;
+
         // let allowContentEdit: boolean = typeHandler ? typeHandler.getAllowContentEdit() : true;
 
         // //regardless of value, if this property is present we consider the type locked
@@ -567,6 +612,8 @@ export class EditNodeDlg extends DialogBase {
 
         let typeLocked = !!S.props.getNodePropVal(J.NodeProp.TYPE_LOCK, state.node);
         let datePropExists = S.props.getNodeProp(J.NodeProp.DATE, state.node);
+
+        let numPropsShowing = this.countPropsShowing();
 
         return new ButtonBar([
             new Button("Save", () => {
@@ -581,6 +628,7 @@ export class EditNodeDlg extends DialogBase {
 
             new Button("Type", this.openChangeNodeTypeDlg),
             !customProps ? new Button("Encrypt", this.openEncryptionDlg) : null,
+            allowPropertyAdd && numPropsShowing === 0 ? new Button("Props", this.addProperty) : null,
 
             // show delete button only if we're in a fullscreen viewer (like Calendar view)
             S.meta64.fullscreenViewerActive(this.appState)
