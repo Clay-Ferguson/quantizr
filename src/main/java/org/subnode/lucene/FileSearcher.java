@@ -25,10 +25,9 @@ import org.subnode.util.StreamUtil;
 
 /**
  * Searches files indexed by Lucene (i.e. a Lucene Search). This code assumes
- * that Lucene index already exists and we are going to search in it (not
- * indexing any files, just searching in the index)
+ * that Lucene index already exists.
  * 
- * Take another look at synchornized blocks in this code. I'm troubleshooting
+ * todo-1: Take another look at synchornized blocks in this code. I'm troubleshooting
  * and putting in temporary sync code right now.
  * 
  * todo-1: - need ability to search only specific fields (path, content, date?)
@@ -107,10 +106,4 @@ public class FileSearcher {
 		output.append(msg);
 		output.append("\n");
 	}
-
-	// @PreDestroy
-	// public synchronized void close() {
-	// closeIndexReader();
-	// closeFSDirectory();
-	// }
 }

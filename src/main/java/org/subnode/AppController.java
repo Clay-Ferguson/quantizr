@@ -1254,10 +1254,10 @@ public class AppController implements ErrorController {
 
 			/*
 			 * todo-2: If we are searching a large directory structure here the search will take a long time and
-			 * just show a generic non-updated progress base on the browser. We need a better way to push status
+			 * just show a generic non-updated progress bar on the browser. We need a better way to push status
 			 * back to server and also not make user wait, but be able to close the dlg and move on. Probably we
 			 * need a Lucene Console tab we can just flip over to and then the user is free to look at it or
-			 * not, as they please, but it would be updating in near-realtime using server push.
+			 * not, as they please, but it would be updating in near-realtime using server push, showing indexing progress
 			 */
 			return luceneService.reindex(ms, req.getNodeId(), req.getPath());
 		});

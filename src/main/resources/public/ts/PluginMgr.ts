@@ -52,7 +52,5 @@ export class PluginMgr implements PluginMgrIntf {
 
         // S.plugin.addTypeHandler("fs:file", new FileTypeHandler());
         // S.plugin.addTypeHandler("fs:folder", new FolderTypeHandler());
-
-        // S.meta64.addTypeHandler("fs:lucene", this.luceneIndexTypeHandler);
     }
 }

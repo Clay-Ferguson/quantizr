@@ -267,10 +267,6 @@ export class MenuPanel extends Div {
 
         if (state.isAdminUser) {
             children.push(new Menu("Lucene", [
-                // new MenuItem("Run Test", () => {S.view.runServerCommand("luceneTest")},
-                //     () => { return state.isAdminUser },
-                //     () => { return state.isAdminUser }
-                // ),
                 new MenuItem("Refresh Index", () => S.view.runServerCommand("refreshLuceneIndex", null, null, state))
             ]));
         }
