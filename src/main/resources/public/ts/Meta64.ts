@@ -349,17 +349,6 @@ export class Meta64 implements Meta64Intf {
             state.pendingLocationHash = window.location.hash;
             S.plugin.initPlugins();
 
-            // SystemFolder and File handling stuff is disabled for now (todo-2), but will eventually be brought
-            // back as a plugin similar to rssPlugin, coreTypesPlugin, etc. Also the new way of doing this
-            // rendering and property ordering is what's being done in BashPlugin and CoreTypesPlugin via TypeHandlers so refer
-            // to that when you ever bring back these types.
-            //
-            // this.renderFunctionsByType["meta64:systemfolder"] = systemfolder.renderNode;
-            // this.propOrderingFunctionsByType["meta64:systemfolder"] = systemfolder.propOrdering;
-            //
-            // this.renderFunctionsByType["meta64:filelist"] = systemfolder.renderFileListNode;
-            // this.propOrderingFunctionsByType["meta64:filelist"] = systemfolder.fileListPropOrdering;
-
             (window as any).addEvent = (object: any, type: any, callback: any) => {
                 if (object == null || typeof (object) === "undefined") {
                     return;

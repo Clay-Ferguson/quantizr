@@ -52,7 +52,6 @@ import org.subnode.request.CreateSubNodeRequest;
 import org.subnode.request.DeleteAttachmentRequest;
 import org.subnode.request.DeleteNodesRequest;
 import org.subnode.request.DeletePropertyRequest;
-import org.subnode.request.ExecuteNodeRequest;
 import org.subnode.request.ExportRequest;
 import org.subnode.request.GetConfigRequest;
 import org.subnode.request.GetFriendsRequest;
@@ -96,7 +95,6 @@ import org.subnode.request.UpdateHeadingsRequest;
 import org.subnode.request.UploadFromIPFSRequest;
 import org.subnode.request.UploadFromUrlRequest;
 import org.subnode.response.CloseAccountResponse;
-import org.subnode.response.ExecuteNodeResponse;
 import org.subnode.response.ExportResponse;
 import org.subnode.response.GetConfigResponse;
 import org.subnode.response.GetNodeStatsResponse;
@@ -758,21 +756,6 @@ public class AppController implements ErrorController {
 			}
 
 			return importBookService.insertBook(ms, req);
-		});
-	}
-
-	@RequestMapping(value = API_PATH + "/executeNode", method = RequestMethod.POST)
-	public @ResponseBody Object executeNode(@RequestBody ExecuteNodeRequest req, HttpSession session) {
-		return callProc.run("executeNode", req, session, ms -> {
-			ExecuteNodeResponse res = new ExecuteNodeResponse();
-
-			if (!ThreadLocals.getSessionContext().isAdmin()) {
-				throw ExUtil.wrapEx("admin only function.");
-			}
-
-			// todo-2: disabling pending security audit.
-			// bashService.executeNode(ms, req, res);
-			return res;
 		});
 	}
 

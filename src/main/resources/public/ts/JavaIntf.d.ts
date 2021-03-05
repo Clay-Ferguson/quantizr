@@ -52,10 +52,6 @@ export interface DeletePropertyRequest extends RequestBase {
     propName: string;
 }
 
-export interface ExecuteNodeRequest extends RequestBase {
-    nodeId: string;
-}
-
 export interface ExportRequest extends RequestBase {
     nodeId: string;
     exportExt: string;
@@ -343,11 +339,6 @@ export interface DeleteNodesResponse extends ResponseBase {
 }
 
 export interface DeletePropertyResponse extends ResponseBase {
-}
-
-export interface ExecuteNodeResponse extends ResponseBase {
-    returnCode: number;
-    output: string;
 }
 
 export interface ExportResponse extends ResponseBase {
