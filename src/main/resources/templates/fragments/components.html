@@ -2,26 +2,6 @@
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 
 <body>
-    <div th:fragment="myFragment">
-        <h1>Thymeleaf Fragments sample</h1>
-    </div>
-
-    <div th:fragment="featureInfoL(title,content)" class="col-xs-6 col-md-5 offset-md-1 col-lg-4 offset-md-2 infoBlock">
-        <h2 th:text="${title}"></h2>
-        <p th:text="${content}"></p>
-        <!-- 
-        <p><a class="btn btn-secondary" href="#" role="button">View details &raquo;</a></p>
-        -->
-    </div>
-
-    <div th:fragment="featureInfoR(title,content)" class="col-xs-6 col-md-5 col-lg-4 infoBlock">
-        <h2 th:text="${title}"></h2>
-        <p th:text="${content}"></p>
-        <!-- 
-        <p><a class="btn btn-secondary" href="#" role="button">View details &raquo;</a></p>
-        -->
-    </div>
-
     <style th:fragment="fontLoaderStyle">
         @font-face {
             font-family: "QuantaCustomFont";
@@ -34,7 +14,6 @@
             font-family: "QuantaCustomFont" !important;
         }
     </style>
-
 </body>
 
 </html>

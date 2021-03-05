@@ -1,4 +1,3 @@
-import { BASE_OPTION_DEFAULTS } from "@fullcalendar/react";
 import { ValueIntf } from "./Interfaces";
 import { CompIntf } from "./widget/base/CompIntf";
 

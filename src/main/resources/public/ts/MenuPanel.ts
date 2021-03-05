@@ -1,6 +1,5 @@
 import { useSelector } from "react-redux";
 import { AppState } from "./AppState";
-import { UserProfileView } from "./comps/UserProfileView";
 import { Constants as C } from "./Constants";
 import { ImportCryptoKeyDlg } from "./dlg/ImportCryptoKeyDlg";
 import { ManageEncryptionKeysDlg } from "./dlg/ManageEncryptionKeysDlg";

@@ -1,17 +1,16 @@
 import { useSelector } from "react-redux";
 import { AppState } from "../AppState";
+import { Constants as C } from "../Constants";
 import { PubSub } from "../PubSub";
 import { Singletons } from "../Singletons";
 import { Anchor } from "../widget/Anchor";
 import { AppTab } from "../widget/AppTab";
-import { Comp } from "../widget/base/Comp";
 import { BreadcrumbsPanel } from "../widget/BreadcrumbsPanel";
 import { Div } from "../widget/Div";
 import { Html } from "../widget/Html";
+import { Li } from "../widget/Li";
 import { NodeCompMainList } from "./NodeCompMainList";
 import { NodeCompMainNode } from "./NodeCompMainNode";
-import { Constants as C } from "../Constants";
-import { Li } from "../widget/Li";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {

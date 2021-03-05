@@ -1,5 +1,3 @@
-import * as marked from "marked";
-import { useSelector } from "react-redux";
 import { store } from "../AppRedux";
 import { AppState } from "../AppState";
 import { Constants as C } from "../Constants";

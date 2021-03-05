@@ -989,7 +989,8 @@ public class AppController implements ErrorController {
 			@RequestParam(name = "disp", required = false) String disposition, //
 			HttpSession session) {
 		return callProc.run("filesys", null, session, ms -> {
-			return attachmentService.getFileSystemResourceStream(ms, nodeId, disposition);
+			// return attachmentService.getFileSystemResourceStream(ms, nodeId, disposition);
+			return null;
 		});
 	}
 

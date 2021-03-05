@@ -251,10 +251,6 @@ public class AppProp /* implements EnvironmentAware */ {
 		return env.getProperty("anonUserLandingPageNode");
 	}
 
-	public String getSolrSearchHost() {
-		return env.getProperty("solr.search.host");
-	}
-
 	public String getMailHost() {
 		return env.getProperty("mail.host");
 	}

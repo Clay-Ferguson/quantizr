@@ -11,7 +11,6 @@ NOTE: This Factory is allowed to import anything it wants and the way we allow C
 being a problem is by having the rule that no other modules are allowed to import this Factory module,
 but only the interface of it.
 */
-import * as React from "react";
 import { Attachment } from "./Attachment";
 import { Constants as C } from "./Constants";
 import { Edit } from "./Edit";

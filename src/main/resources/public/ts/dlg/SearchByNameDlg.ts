@@ -1,5 +1,4 @@
 import { AppState } from "../AppState";
-import { CompValueHolder } from "../CompValueHolder";
 import { Constants as C } from "../Constants";
 import { DialogBase } from "../DialogBase";
 import * as J from "../JavaIntf";
@@ -10,7 +9,6 @@ import { CompIntf } from "../widget/base/CompIntf";
 import { Button } from "../widget/Button";
 import { ButtonBar } from "../widget/ButtonBar";
 import { Form } from "../widget/Form";
-import { TextContent } from "../widget/TextContent";
 import { TextField } from "../widget/TextField";
 import { MessageDlg } from "./MessageDlg";
 

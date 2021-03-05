@@ -13,7 +13,6 @@ import { Checkbox } from "../widget/Checkbox";
 import { HorizontalLayout } from "../widget/HorizontalLayout";
 import { Icon } from "../widget/Icon";
 import { IconButton } from "../widget/IconButton";
-import { Img } from "../widget/Img";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {

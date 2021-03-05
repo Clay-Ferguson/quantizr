@@ -49,8 +49,5 @@ export class PluginMgr implements PluginMgrIntf {
         this.addTypeHandler(new NotesNodeTypeHandler());
         this.addTypeHandler(new FriendsListTypeHandler());
         this.addTypeHandler(new FriendTypeHandler());
-
-        // S.plugin.addTypeHandler("fs:file", new FileTypeHandler());
-        // S.plugin.addTypeHandler("fs:folder", new FolderTypeHandler());
     }
 }
