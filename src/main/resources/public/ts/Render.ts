@@ -305,7 +305,7 @@ export class Render implements RenderIntf {
                             s.breadcrumbs = res.breadcrumbs;
                         }
 
-                        s.idToNodeMap = {};
+                        s.idToNodeMap = new Map<string, J.NodeInfo>();
                         if (res) {
                             S.meta64.updateNodeMap(res.node, s);
                         }

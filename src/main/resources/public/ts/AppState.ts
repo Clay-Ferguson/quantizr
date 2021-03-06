@@ -94,8 +94,7 @@ export class AppState {
     /* maps node.id values to NodeInfo.java objects
     Make this use a Map type (typescript)
     */
-    idToNodeMap: { [key: string]: J.NodeInfo } = {};
-    // idToNodeMap = new Map<string, J.NodeInfo>(); //todo-0: map!
+    idToNodeMap: Map<string, J.NodeInfo> = new Map<string, J.NodeInfo>();
 
     isAdminUser: boolean;
     isAnonUser: boolean = true;

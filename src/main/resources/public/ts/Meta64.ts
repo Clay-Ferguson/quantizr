@@ -35,12 +35,12 @@ export class Meta64 implements Meta64Intf {
     /* screen capabilities */
     deviceWidth: number = 0;
     deviceHeight: number = 0;
-    parentIdToFocusNodeMap: { [key: string]: string } = {};
+    parentIdToFocusNodeMap: Map<string, string> = new Map<string, string>();
     curHighlightNodeCompRow: CompIntf = null;
 
     // Function cache: Creating NEW functions (like "let a = () => {...do something}"), is an expensive operation (performance) if done in super
     // high numbers so we have this cache to allow reuse of function definitions.
-    private fc: { [key: string]: () => void } = {};
+    private fc: Map<string, Function> = new Map<string, Function>();
     private fcCount: number = 0;
 
     private static lastKeyDownTime: number = 0;
@@ -77,15 +77,15 @@ export class Meta64 implements Meta64Intf {
     ];
 
     /* Creates/Access a function that does operation 'name' on a node identified by 'id' */
-    getNodeFunc = (func: (id: string) => void, op: string, id: string): () => void => {
+    getNodeFunc = (func: (id: string) => void, op: string, id: string): Function => {
         const k = op + "_" + id;
-        if (!this.fc[k]) {
-            this.fc[k] = function () { func(id); };
+        if (!this.fc.has(k)) {
+            this.fc.set(k, function () { func(id); });
 
             /* we hold the count in a var since calculating manually requires an inefficient iteration */
             this.fcCount++;
         }
-        return this.fc[k];
+        return this.fc.get(k);
     }
 
     sendTestEmail = (): void => {
@@ -158,7 +158,7 @@ export class Meta64 implements Meta64Intf {
         }
 
         S.util.forEachProp(state.selectedNodes, (id, val): boolean => {
-            const node: J.NodeInfo = state.idToNodeMap[id];
+            const node: J.NodeInfo = state.idToNodeMap.get(id);
             if (!node) {
                 console.log("unable to find idToNodeMap for id=" + id);
             } else {
@@ -192,7 +192,7 @@ export class Meta64 implements Meta64Intf {
     getSelNodesArray = (state: AppState): J.NodeInfo[] => {
         const selArray: J.NodeInfo[] = [];
         S.util.forEachProp(state.selectedNodes, (id, val): boolean => {
-            const node = state.idToNodeMap[id];
+            const node = state.idToNodeMap.get(id);
             if (node) {
                 selArray.push(node);
             }
@@ -235,16 +235,16 @@ export class Meta64 implements Meta64Intf {
     getHighlightedNode = (state: AppState = null): J.NodeInfo => {
         state = appState(state);
         if (!state.node) return null;
-        const id: string = S.meta64.parentIdToFocusNodeMap[state.node.id];
+        const id: string = S.meta64.parentIdToFocusNodeMap.get(state.node.id);
         if (id) {
-            return state.idToNodeMap[id];
+            return state.idToNodeMap.get(id);
         }
         return null;
     }
 
     /* Returns true if successful */
     highlightRowById = (id: string, scroll: boolean, state: AppState): boolean => {
-        let node: J.NodeInfo = state.idToNodeMap[id];
+        let node: J.NodeInfo = state.idToNodeMap.get(id);
         let ret = true;
 
         /* If node now known, resort to taking the best, previous node we had */
@@ -279,7 +279,7 @@ export class Meta64 implements Meta64Intf {
             }, 150);
         }
 
-        S.meta64.parentIdToFocusNodeMap[state.node.id] = node.id;
+        S.meta64.parentIdToFocusNodeMap.set(state.node.id, node.id);
 
         if (scroll) {
             S.view.scrollToSelectedNode(state);
@@ -289,7 +289,7 @@ export class Meta64 implements Meta64Intf {
     /* Find node by looking everywhere we possibly can on local storage for it */
     findNodeById = (state: AppState, nodeId: string): J.NodeInfo => {
         // first look in normal tree map for main view.
-        let node: J.NodeInfo = state.idToNodeMap[nodeId];
+        let node: J.NodeInfo = state.idToNodeMap.get(nodeId);
 
         if (!node) {
             node = state.feedResults.find(n => n.id === nodeId);
@@ -309,7 +309,7 @@ export class Meta64 implements Meta64Intf {
     getSingleSelectedNode = (state: AppState): J.NodeInfo => {
         let ret = null;
         S.util.forEachProp(state.selectedNodes, (id, val): boolean => {
-            ret = state.idToNodeMap[id];
+            ret = state.idToNodeMap.get(id);
             return false;
         });
         return ret;
@@ -317,11 +317,11 @@ export class Meta64 implements Meta64Intf {
 
     updateNodeMap = (node: J.NodeInfo, state: AppState): void => {
         if (!node) return;
-        state.idToNodeMap[node.id] = node;
+        state.idToNodeMap.set(node.id, node);
 
         // NOTE: only the getFeed call (Feed tab) will have items with some parents populated.
         if (node.parent) {
-            state.idToNodeMap[node.parent.id] = node.parent;
+            state.idToNodeMap.set(node.parent.id, node.parent);
         }
 
         if (node.children) {
@@ -540,7 +540,7 @@ export class Meta64 implements Meta64Intf {
         // console.log("Maintenance fcCount: "+this.fcCount);
         /* Clean out function referenes after a threshold is reached */
         if (this.fcCount > 500) {
-            this.fc = {};
+            this.fc = new Map<string, Function>();
             this.fcCount = 0;
         }
     }

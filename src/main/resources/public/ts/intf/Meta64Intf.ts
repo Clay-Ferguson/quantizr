@@ -20,8 +20,7 @@ export interface Meta64Intf {
     deviceWidth: number;
     deviceHeight: number;
 
-    // todo-2: convert this to a TypeScript Map<string,string>
-    parentIdToFocusNodeMap: { [key: string]: string };
+    parentIdToFocusNodeMap: Map<string, string>;
     curHighlightNodeCompRow: CompIntf;
 
     draggableId: string;
@@ -38,7 +37,7 @@ export interface Meta64Intf {
     decryptCache: { [key: string]: string };
 
     // function cache accessor
-    getNodeFunc(func: (id: string) => void, name: string, id: string): () => void;
+    getNodeFunc(func: (id: string) => void, name: string, id: string): Function;
 
     setOverlay(showOverlay: boolean): void;
     sendTestEmail(string): void;

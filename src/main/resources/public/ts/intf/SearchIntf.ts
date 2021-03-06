@@ -12,7 +12,7 @@ export interface SearchIntf {
 
     highlightRowNode: J.NodeInfo;
 
-    idToNodeMap: { [key: string]: J.NodeInfo };
+    idToNodeMap : Map<string, J.NodeInfo>;
 
     searchAndReplace(recursive: boolean, nodeId: string, search: string, replace: string, state: AppState): any;
     numSearchResults(res: J.NodeSearchResponse): number;

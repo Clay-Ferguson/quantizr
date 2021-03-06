@@ -306,7 +306,7 @@ export class Edit implements EditIntf {
             id = selNode.id;
         }
 
-        const node: J.NodeInfo = state.idToNodeMap[id];
+        const node: J.NodeInfo = state.idToNodeMap.get(id);
         if (node) {
             S.util.ajax<J.SetNodePositionRequest, J.SetNodePositionResponse>("setNodePosition", {
                 nodeId: node.id,
@@ -322,7 +322,7 @@ export class Edit implements EditIntf {
             id = selNode.id;
         }
 
-        const node: J.NodeInfo = state.idToNodeMap[id];
+        const node: J.NodeInfo = state.idToNodeMap.get(id);
         if (node) {
             S.util.ajax<J.SetNodePositionRequest, J.SetNodePositionResponse>("setNodePosition", {
                 nodeId: node.id,
@@ -336,7 +336,7 @@ export class Edit implements EditIntf {
             const selNode: J.NodeInfo = S.meta64.getHighlightedNode(state);
             id = selNode.id;
         }
-        const node: J.NodeInfo = state.idToNodeMap[id];
+        const node: J.NodeInfo = state.idToNodeMap.get(id);
         if (node) {
             S.util.ajax<J.SetNodePositionRequest, J.SetNodePositionResponse>("setNodePosition", {
                 nodeId: node.id,
@@ -350,7 +350,7 @@ export class Edit implements EditIntf {
             const selNode: J.NodeInfo = S.meta64.getHighlightedNode(state);
             id = selNode.id;
         }
-        const node: J.NodeInfo = state.idToNodeMap[id];
+        const node: J.NodeInfo = state.idToNodeMap.get(id);
         if (node) {
             S.util.ajax<J.SetNodePositionRequest, J.SetNodePositionResponse>("setNodePosition", {
                 nodeId: node.id,
@@ -408,7 +408,7 @@ export class Edit implements EditIntf {
         if (!id) {
             node = S.meta64.getHighlightedNode(state);
         } else {
-            node = state.idToNodeMap[id];
+            node = state.idToNodeMap.get(id);
         }
 
         if (node) {
@@ -447,7 +447,7 @@ export class Edit implements EditIntf {
                 parentNode = state.node;
             }
         } else {
-            parentNode = state.idToNodeMap[id];
+            parentNode = state.idToNodeMap.get(id);
             if (!parentNode) {
                 console.log("Unknown nodeId in createSubNode: " + id);
                 return;
@@ -516,7 +516,7 @@ export class Edit implements EditIntf {
         const firstNodeId: string = selNodesArray[0];
 
         /* todo-1: would be better to check if ANY of the nodes are deleted not just arbitary first one */
-        const nodeCheck: J.NodeInfo = state.idToNodeMap[firstNodeId];
+        const nodeCheck: J.NodeInfo = state.idToNodeMap.get(firstNodeId);
         let confirmMsg = "Delete " + selNodesArray.length + " node(s) ?";
 
         new ConfirmDlg(confirmMsg, "Confirm Delete " + selNodesArray.length,

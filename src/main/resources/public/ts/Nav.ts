@@ -146,7 +146,7 @@ export class Nav implements NavIntf {
         var currentSelNode = S.meta64.getHighlightedNode(state);
         if (currentSelNode) {
             /* get node by node identifier */
-            const node: J.NodeInfo = state.idToNodeMap[currentSelNode.id];
+            const node: J.NodeInfo = state.idToNodeMap.get(currentSelNode.id);
 
             if (node) {
                 // console.log("found highlighted node.id=" + node.id);
@@ -215,7 +215,7 @@ export class Nav implements NavIntf {
 
     cached_openNodeById = (id: string, state: AppState): void => {
         state = appState(state);
-        const node: J.NodeInfo = state.idToNodeMap[id];
+        const node: J.NodeInfo = state.idToNodeMap.get(id);
         S.meta64.highlightNode(node, false, state);
 
         if (!node) {

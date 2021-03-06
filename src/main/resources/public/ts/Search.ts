@@ -31,7 +31,7 @@ export class Search implements SearchIntf {
      */
     highlightRowNode: J.NodeInfo = null;
 
-    idToNodeMap: { [key: string]: J.NodeInfo } = {};
+    idToNodeMap : Map<string, J.NodeInfo> = new Map<string, J.NodeInfo>();
 
     numSearchResults = (res: J.NodeSearchResponse): number => {
         return !!res && //
@@ -133,11 +133,11 @@ export class Search implements SearchIntf {
 
     initSearchNode = (node: J.NodeInfo) => {
         if (!node) return;
-        this.idToNodeMap[node.id] = node;
+        this.idToNodeMap.set(node.id, node);
 
         // NOTE: only the getFeed call (Feed tab) will have items with some parents populated.
         if (node.parent) {
-            this.idToNodeMap[node.parent.id] = node.parent;
+            this.idToNodeMap.set(node.parent.id, node.parent);
         }
     }
 
@@ -209,7 +209,7 @@ export class Search implements SearchIntf {
         // DO NOT DELETE (this works, and may be needed some day)
         // There's really no reason to indicate to user what row is highlighted, so I let't just not clutter the screen for now
         // this.setRowHighlight(false);
-        // this.highlightRowNode = this.idToNodeMap[id];
+        // this.highlightRowNode = this.idToNodeMap.get(id);
         // this.setRowHighlight(true);
     }
 
@@ -217,7 +217,7 @@ export class Search implements SearchIntf {
         /*
          * update highlight node to point to the node clicked on, just to persist it for later
          */
-        this.highlightRowNode = this.idToNodeMap[id];
+        this.highlightRowNode = this.idToNodeMap.get(id);
         if (!this.highlightRowNode) {
             throw new Error("Unable to find uid in search results: " + id);
         }
