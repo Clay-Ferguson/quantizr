@@ -173,7 +173,7 @@ export class Nav implements NavIntf {
             return;
         }
 
-        const node: J.NodeInfo = state.idToNodeMap[nodeId];
+        const node: J.NodeInfo = state.idToNodeMap.get(nodeId);
         if (!node) {
             // console.log("idToNodeMap: "+S.util.prettyPrint(state.idToNodeMap));
             throw new Error("node not found in idToNodeMap: " + nodeId);
