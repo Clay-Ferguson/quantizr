@@ -58,16 +58,13 @@ export class EditNodeDlg extends DialogBase {
     deleteUploadButton: Button;
     deletePropButton: Button;
 
-    // maps the DOM ids of dom elements the property that DOM element is editing.
-    compIdToPropMap: { [key: string]: J.PropertyInfo } = {};
-
     contentEditor: I.TextEditorIntf;
     contentEditorState: ValidatedState<any> = new ValidatedState<any>();
     parentContentEditorState: ValidatedState<any> = new ValidatedState<any>();
     nameState: ValidatedState<any> = new ValidatedState<any>();
 
     // holds a map of states by property names.
-    propStates: { [key: string]: ValidatedState<any> } = {};
+    propStates: Map<string, ValidatedState<any>> = new Map<string, ValidatedState<any>>();
 
     static morePanelExpanded: boolean = false;
 
@@ -139,8 +136,8 @@ export class EditNodeDlg extends DialogBase {
         props that need to be removed */
         if (onlyBinaries) {
             S.props.allBinaryProps.forEach(s => {
-                if (this.propStates[s]) {
-                    delete this.propStates[s];
+                if (this.propStates.get(s)) {
+                    this.propStates.delete(s);
                 }
             });
         }
@@ -183,10 +180,10 @@ export class EditNodeDlg extends DialogBase {
         // console.log("making single prop editor: prop[" + propEntry.property.name + "] val[" + propEntry.property.value
         //     + "] fieldId=" + propEntry.id);
 
-        let propState: ValidatedState<any> = this.propStates[propEntry.name];
+        let propState: ValidatedState<any> = this.propStates.get(propEntry.name);
         if (!propState) {
             propState = new ValidatedState<any>();
-            this.propStates[propEntry.name] = propState;
+            this.propStates.set(propEntry.name, propState);
         }
 
         if (!allowEditAllProps && isReadOnly) {
@@ -848,7 +845,7 @@ export class EditNodeDlg extends DialogBase {
         if (state.node.properties) {
             state.node.properties.forEach((prop: J.PropertyInfo) => {
                 // console.log("Save prop iterator: name=" + prop.name);
-                let propState = this.propStates[prop.name];
+                let propState = this.propStates.get(prop.name);
                 if (propState) {
 
                     // hack to store dates as numeric prop (todo-1: need a systematic way to assign JSON types to properties)
@@ -926,10 +923,10 @@ export class EditNodeDlg extends DialogBase {
         propValStr = S.util.escapeForAttrib(propValStr);
         // console.log("making single prop editor: prop[" + propEntry.name + "] val[" + propEntry.value + "]");
 
-        let propState: ValidatedState<any> = this.propStates[propEntry.name];
+        let propState: ValidatedState<any> = this.propStates.get(propEntry.name);
         if (!propState) {
             propState = new ValidatedState<any>(propEntry.value);
-            this.propStates[propEntry.name] = propState;
+            this.propStates.set(propEntry.name, propState);
         }
 
         // WARNING: propState.setValue() calls will have been done in initStates, and should NOT be set here, because this can run during render callstacks
@@ -962,8 +959,6 @@ export class EditNodeDlg extends DialogBase {
                         return this.getState().selectedProps.has(propEntry.name);
                     }
                 });
-
-                this.compIdToPropMap[checkbox.getId()] = propEntry;
                 formGroup.addChild(checkbox);
             }
             else {
