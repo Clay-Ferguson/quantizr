@@ -7,22 +7,23 @@ intro1: >-
 intro2:
 
 # Tip: This 'menu' prop is seen in TypeScrip JSON as an array of objects
+# links here can be full url, or node names, or "tab:tabName"
 menu:
   siteNav:
     - name: "News Feed"
-      link: "https://quanta.wiki/n/news" 
+      link: ":news" 
     - name: "Fediverse"
-      link: "https://quanta.wiki/app?tab=feed"
+      link: "tab:feedTab"
     - name: "Podcasts"
-      link: "https://quanta.wiki/n/podcasts"
+      link: ":podcasts"
     - name: "separator"
       link: ""
     - name: "Demo Videos"
-      link: "https://quanta.wiki/n/screencast"
+      link: ":screencast"
     - name: "Platform Features"
-      link: "https://quanta.wiki/n/features"
+      link: ":features"
     - name: "Getting Started"
-      link: "https://quanta.wiki/n/getting-started"
+      link: ":getting-started"
     - name: "separator"
       link: ""
 

@@ -320,7 +320,25 @@ export class MenuPanel extends Div {
                     items.push(new MenuItemSeparator());
                 }
                 else {
-                    items.push(new MenuItem(menuItem.name, () => window.open(menuItem.link)));
+                    let link: string = menuItem.link;
+                    let func: Function = null;
+
+                    // allows ability to select a tab
+                    if (link.startsWith("tab:")) {
+                        link = link.substring(4);
+                        debugger;
+                        func = () => S.meta64.selectTab(link);
+                    }
+                    // covers http and https
+                    else if (link.startsWith("http")) {
+                        func = () => window.open(link);
+                    }
+                    // named nodes like ":myName"
+                    else {
+                        func = () => S.nav.openContentNode(link, state);
+                    }
+
+                    items.push(new MenuItem(menuItem.name, func));
                 }
             }
         }
