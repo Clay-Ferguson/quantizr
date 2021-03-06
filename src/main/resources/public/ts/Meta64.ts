@@ -64,7 +64,7 @@ export class Meta64 implements Meta64Intf {
 
     // maps the hash of an encrypted block of text to the unencrypted text, so that we never run the same
     // decryption code twice.
-    decryptCache: { [key: string]: string } = {};
+    decryptCache: Map<string, string> = new Map<string, string>();
 
     userProfileView: UserProfileView = new UserProfileView();
 

@@ -91,9 +91,9 @@ export class NodeCompMarkdown extends Html {
             let cipherHash: string = S.util.hashOfString(cipherText);
 
             // if we have already decrypted this data use the result.
-            if (S.meta64.decryptCache[cipherHash]) {
+            if (S.meta64.decryptCache.get(cipherHash)) {
                 this.mergeState({
-                    content: S.meta64.decryptCache[cipherHash],
+                    content: S.meta64.decryptCache.get(cipherHash),
                     pendingDecrypt: null
                 });
             }

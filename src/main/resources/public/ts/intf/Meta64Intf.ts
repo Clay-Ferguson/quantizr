@@ -34,7 +34,7 @@ export interface Meta64Intf {
     ctrlKey: boolean;
     ctrlKeyTime: number;
     ctrlKeyCheck(): boolean;
-    decryptCache: { [key: string]: string };
+    decryptCache: Map<string, string>;
 
     // function cache accessor
     getNodeFunc(func: (id: string) => void, name: string, id: string): Function;

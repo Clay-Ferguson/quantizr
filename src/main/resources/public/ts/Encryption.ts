@@ -531,9 +531,9 @@ export class Encryption implements EncryptionIntf {
             let cipherHash: string = S.util.hashOfString(skpd.cipherText);
 
             // if we have already decrypted this data return the result.
-            if (S.meta64.decryptCache[cipherHash]) {
+            if (S.meta64.decryptCache.get(cipherHash)) {
                 // console.log("decryption cache hit!");
-                resolve(S.meta64.decryptCache[cipherHash]);
+                resolve(S.meta64.decryptCache.get(cipherHash));
                 return;
             }
 
@@ -557,7 +557,7 @@ export class Encryption implements EncryptionIntf {
                 // console.log("DECRYPTING: cipherText: [" + skpd.cipherText + "]");
                 ret = await this.symDecryptString(symKey, skpd.cipherText);
                 // console.log("            output: [" + ret + "]");
-                S.meta64.decryptCache[cipherHash] = ret;
+                S.meta64.decryptCache.set(cipherHash, ret);
             }
             catch (ex) {
                 // todo-2: this was happening when 'importKey' failed for admin user, but I think admin user may not store keys? Need to just
