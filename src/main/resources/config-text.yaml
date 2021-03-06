@@ -6,6 +6,26 @@ intro1: >-
   Join the Fediverse Revolution!
 intro2:
 
+# Tip: This 'menu' prop is seen in TypeScrip JSON as an array of objects
+menu:
+  siteNav:
+    - name: "News Feed"
+      link: "https://quanta.wiki/n/news" 
+    - name: "Fediverse"
+      link: "https://quanta.wiki/app?tab=feed"
+    - name: "Podcasts"
+      link: "https://quanta.wiki/n/podcasts"
+    - name: "separator"
+      link: ""
+    - name: "Demo Videos"
+      link: "https://quanta.wiki/n/screencast"
+    - name: "Platform Features"
+      link: "https://quanta.wiki/n/features"
+    - name: "Getting Started"
+      link: "https://quanta.wiki/n/getting-started"
+    - name: "separator"
+      link: ""
+
 help:
   nodeStats:
     dialog: >-

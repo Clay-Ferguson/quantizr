@@ -38,7 +38,6 @@ export class MenuPanel extends Div {
     preRender(): void {
         const state: AppState = useSelector((state: AppState) => state);
 
-        // const selNodeCount = S.util.getPropertyCount(state.selectedNodes);
         const hltNode: J.NodeInfo = S.meta64.getHighlightedNode(state);
         const selNodeIsMine = !!hltNode && (hltNode.owner === state.userName || state.userName === "admin");
 
@@ -52,11 +51,12 @@ export class MenuPanel extends Div {
         const canMoveDown = !isPageRootNode && !state.isAnonUser && (allowNodeMove && hltNode && !hltNode.lastChild);
 
         const children = [];
-
         children.push(new Menu("Site Nav", [
+            ...this.siteNavCustomItems(state),
             new MenuItem("Account Node", () => S.nav.navHome(state), !state.isAnonUser),
             new MenuItem("Portal Home", () => S.meta64.loadAnonPageHome(state)),
             new MenuItem("User Guide", () => S.nav.openContentNode(":user-guide", state)),
+            new MenuItemSeparator(), //
             new MenuItem("Logout", () => S.nav.logout(state), !state.isAnonUser)
         ]));
 
@@ -150,7 +150,7 @@ export class MenuPanel extends Div {
 
         children.push(new Menu("Calendar", [
 
-           !state.isAnonUser ? new MenuItem("Show", () => S.render.showCalendar(null, state), !!hltNode) : null, //
+            !state.isAnonUser ? new MenuItem("Show", () => S.render.showCalendar(null, state), !!hltNode) : null, //
 
             new MenuItemSeparator(), //
 
@@ -310,5 +310,20 @@ export class MenuPanel extends Div {
         }
 
         this.setChildren(children);
+    }
+
+    siteNavCustomItems = (state: AppState): Div[] => {
+        let items: Div[] = [];
+        if (S.meta64.config && S.meta64.config.menu && S.meta64.config.menu.siteNav) {
+            for (let menuItem of S.meta64.config.menu.siteNav) {
+                if (menuItem.name === "separator") {
+                    items.push(new MenuItemSeparator());
+                }
+                else {
+                    items.push(new MenuItem(menuItem.name, () => window.open(menuItem.link)));
+                }
+            }
+        }
+        return items;
     }
 }
