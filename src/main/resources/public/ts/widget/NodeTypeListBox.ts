@@ -22,7 +22,7 @@ export class NodeTypeListBox extends ListBox {
         let children = [];
 
         let typeHandlers = S.plugin.getAllTypeHandlers();
-        S.util.forEachProp(typeHandlers, (k, typeHandler: TypeHandlerIntf): boolean => {
+        typeHandlers.forEach((typeHandler: TypeHandlerIntf, k: string): boolean => {
             if (this.appState.isAdminUser || typeHandler.getAllowUserSelect()) {
                 children.push(new NodeTypeListBoxRow(typeHandler, () => {
                     this.updateValFunc(typeHandler.getTypeName());

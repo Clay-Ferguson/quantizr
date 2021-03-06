@@ -97,7 +97,7 @@ export class MenuPanel extends Div {
 
         let createMenuItems = [];
         let typeHandlers = S.plugin.getAllTypeHandlers();
-        S.util.forEachProp(typeHandlers, (k, typeHandler: TypeHandlerIntf): boolean => {
+        typeHandlers.forEach((typeHandler: TypeHandlerIntf, k: string): boolean => {
             if (state.isAdminUser || typeHandler.getAllowUserSelect()) {
                 createMenuItems.push(new MenuItem(typeHandler.getName(), () => S.edit.createNode(hltNode, typeHandler.getTypeName(), state), //
                     !state.isAnonUser && !!hltNode));

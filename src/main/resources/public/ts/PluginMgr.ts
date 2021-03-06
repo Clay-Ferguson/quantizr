@@ -15,21 +15,21 @@ import { TextTypeHandler } from "./plugins/TextTypeHandler";
 
 export class PluginMgr implements PluginMgrIntf {
 
-    private typeHandlers: { [key: string]: TypeHandlerIntf } = {};
+    private typeHandlers: Map<string, TypeHandlerIntf> = new Map<string, TypeHandlerIntf>();
 
     addTypeHandler = (typeHandler: TypeHandlerIntf): void => {
         // console.log("Adding TypeHandler: type=" + typeHandler.getTypeName());
-        if (this.typeHandlers[typeHandler.getTypeName()]) {
+        if (this.typeHandlers.get(typeHandler.getTypeName())) {
             throw new Error("duplicate type handler: " + typeHandler.getTypeName());
         }
-        this.typeHandlers[typeHandler.getTypeName()] = typeHandler;
+        this.typeHandlers.set(typeHandler.getTypeName(), typeHandler);
     }
 
     getTypeHandler = (typeName: string): TypeHandlerIntf => {
-        return this.typeHandlers[typeName];
+        return this.typeHandlers.get(typeName);
     }
 
-    getAllTypeHandlers = (): { [key: string]: TypeHandlerIntf } => {
+    getAllTypeHandlers = (): Map<string, TypeHandlerIntf> => {
         return this.typeHandlers;
     }
 
