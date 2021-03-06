@@ -27,13 +27,13 @@ import org.subnode.util.StreamUtil;
  * Searches files indexed by Lucene (i.e. a Lucene Search). This code assumes
  * that Lucene index already exists.
  * 
- * todo-1: Take another look at synchornized blocks in this code. I'm troubleshooting
+ * todo-2: Take another look at synchornized blocks in this code. I'm troubleshooting
  * and putting in temporary sync code right now.
  * 
- * todo-1: - need ability to search only specific fields (path, content, date?)
+ * todo-2: - need ability to search only specific fields (path, content, date?)
  * - need ability to order either by score or by date (rev chron)
  */
-// todo-1: make this a prototype-scope bean?
+// todo-2: make this a prototype-scope bean?
 @Component
 public class FileSearcher {
 	private static final Logger log = LoggerFactory.getLogger(FileSearcher.class);
@@ -50,7 +50,7 @@ public class FileSearcher {
 		int hitsPerPage = 10;
 
 		/**
-		 * todo-1: Is it more efficient (or even threadsafe?) to hold one or more of
+		 * todo-2: Is it more efficient (or even threadsafe?) to hold one or more of
 		 * these two resources open for multiple searches, and potentially
 		 * simultaneous/threads?
 		 */

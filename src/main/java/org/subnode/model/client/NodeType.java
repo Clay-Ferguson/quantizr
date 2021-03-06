@@ -16,11 +16,9 @@ public enum NodeType {
     FRIEND_LIST("sn:friendList"), //
     FRIEND("sn:friend"), //
     POSTS("sn:posts"), //
-
-    //todo-1: we can create a plugin for this type, but it's not really necessary.
     ACT_PUB_POSTS("ap:posts"), //
 
-    NONE("u"), //same as 'markdown' really
+    NONE("u"), //same as 'markdown' really (untyped, default to markdown)
     PLAIN_TEXT("sn:txt"), //
     FS_FILE("fs:file"), //
     FS_FOLDER("fs:folder"), //

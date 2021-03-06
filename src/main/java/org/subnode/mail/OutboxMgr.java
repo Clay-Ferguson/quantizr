@@ -102,7 +102,7 @@ public class OutboxMgr {
 			if (scList != null) {
 				for (SessionContext sc : scList) {
 					userFeedService.sendServerPushInfo(sc,
-							// todo-1: fill in the two null parameters here if/when you ever bring this method back.
+							// todo-2: fill in the two null parameters here if/when you ever bring this method back.
 							new NotificationMessage("newInboxNode", node.getId().toHexString(), null, null));
 				}
 			}
