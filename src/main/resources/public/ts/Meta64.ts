@@ -153,8 +153,6 @@ export class Meta64 implements Meta64Intf {
 
         if (!state.selectedNodes) {
             console.log("no selected nodes.");
-        } else {
-            console.log("selectedNode count: " + S.util.getPropertyCount(state.selectedNodes));
         }
 
         S.util.forEachProp(state.selectedNodes, (id, val): boolean => {

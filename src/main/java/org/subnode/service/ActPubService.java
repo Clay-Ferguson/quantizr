@@ -1256,7 +1256,7 @@ public class ActPubService {
             toAccountNode = loadForeignUserByActorUrl(session, objAttributedTo);
         }
         SubNode newNode =
-                create.createNode(session, parentNode, null, null, 0L, CreateNodeLocation.FIRST, null, toAccountNode.getId());
+                create.createNode(session, parentNode, null, null, 0L, CreateNodeLocation.FIRST, null, toAccountNode.getId(), true);
 
         // todo-1: need a new node prop type that is just 'html' and tells us to render
         // content as raw html if set, or for now

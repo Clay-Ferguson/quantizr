@@ -150,7 +150,7 @@ public class NodeEditService {
 			parentHashTags = "\n\n" + parentHashTags + "\n";
 		}
 
-		SubNode newNode = create.createNode(session, node, null, req.getTypeName(), 0L, createLoc, req.getProperties(), null);
+		SubNode newNode = create.createNode(session, node, null, req.getTypeName(), 0L, createLoc, req.getProperties(), null, true);
 
 		// '/r/p/' = pending (nodes not yet published, being edited created by users)
 		if (req.isPendingEdit() && !newNode.getPath().startsWith("/r/p/")) {
@@ -224,7 +224,7 @@ public class NodeEditService {
 		properties.add(new PropertyInfo(NodeProp.USER.s(), userToFollow));
 
 		SubNode newNode = create.createNode(session, parentFriendsList, null, NodeType.FRIEND.s(), 0L, CreateNodeLocation.LAST,
-				properties, null);
+				properties, null, true);
 		newNode.setProp(NodeProp.TYPE_LOCK.s(), Boolean.valueOf(true));
 
 		if (followerActorUrl != null) {
@@ -259,7 +259,7 @@ public class NodeEditService {
 			return null;
 		}
 
-		SubNode newNode = create.createNode(session, linksNode, null, NodeType.NONE.s(), 0L, CreateNodeLocation.LAST, null, null);
+		SubNode newNode = create.createNode(session, linksNode, null, NodeType.NONE.s(), 0L, CreateNodeLocation.LAST, null, null, true);
 
 		String title = lcData.startsWith("http") ? Util.extractTitleFromUrl(data) : null;
 		String content = title != null ? "#### " + title + "\n" : "";
@@ -287,7 +287,7 @@ public class NodeEditService {
 		SubNode parentNode = read.getNode(session, parentNodeId);
 
 		SubNode newNode = create.createNode(session, parentNode, null, req.getTypeName(), req.getTargetOrdinal(),
-				CreateNodeLocation.ORDINAL, null, null);
+				CreateNodeLocation.ORDINAL, null, null, true);
 
 		if (req.getInitialValue() != null) {
 			newNode.setContent(req.getInitialValue());
@@ -554,7 +554,7 @@ public class NodeEditService {
 		}
 		String nodeId = req.getNodeId();
 
-		// log.debug("Splitting node: " + nodeId);
+		log.debug("Splitting node: " + nodeId);
 		SubNode node = read.getNode(session, nodeId);
 		SubNode parentNode = read.getParent(session, node);
 
@@ -600,7 +600,7 @@ public class NodeEditService {
 		Date now = Calendar.getInstance().getTime();
 		int idx = 0;
 		for (String part : contentParts) {
-			// log.debug("ContentPart[" + idx + "] " + part);
+			log.debug("ContentPart[" + idx + "] " + part);
 			part = part.trim();
 			if (idx == 0) {
 				node.setContent(part);
@@ -608,7 +608,7 @@ public class NodeEditService {
 				update.save(session, node);
 			} else {
 				SubNode newNode =
-						create.createNode(session, parentForNewNodes, null, firstOrdinal + idx, CreateNodeLocation.ORDINAL);
+						create.createNode(session, parentForNewNodes, null, firstOrdinal + idx, CreateNodeLocation.ORDINAL, false);
 				newNode.setContent(part);
 				update.save(session, newNode);
 			}

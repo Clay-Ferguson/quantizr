@@ -429,7 +429,7 @@ public class MongoRead {
      * digging the information off the web for how to do this appears to be something that may take a
      * few hours so i'm skipping it for now and just doing an inverse sort on ORDER and pulling off the
      * top one and using that for my MAX operation. AFAIK this might even be the most efficient
-     * approach. Who knows. MongoDb is stil the wild wild west of databases.
+     * approach. Who knows.
      */
     public Long getMaxChildOrdinal(MongoSession session, SubNode node) {
         // Do not delete this commented stuff. Can be helpful to get aggregates
@@ -761,7 +761,7 @@ public class MongoRead {
         SubNode node = findTypedNodeUnderPath(session, path, type);
 
         if (node == null) {
-            node = create.createNode(session, userNode, null, type, 0L, CreateNodeLocation.LAST, null, null);
+            node = create.createNode(session, userNode, null, type, 0L, CreateNodeLocation.LAST, null, null, true);
             node.setOwner(userNode.getId());
             node.setContent(nodeName);
             update.save(session, node);

@@ -31,7 +31,7 @@ export class Search implements SearchIntf {
      */
     highlightRowNode: J.NodeInfo = null;
 
-    idToNodeMap : Map<string, J.NodeInfo> = new Map<string, J.NodeInfo>();
+    idToNodeMap: Map<string, J.NodeInfo> = new Map<string, J.NodeInfo>();
 
     numSearchResults = (res: J.NodeSearchResponse): number => {
         return !!res && //

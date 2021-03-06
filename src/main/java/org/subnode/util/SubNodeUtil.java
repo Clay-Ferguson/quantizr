@@ -116,7 +116,7 @@ public class SubNodeUtil {
 				// log.debug("Creating " + nameToken + " node, which didn't exist.");
 
 				/* Note if parent PARAMETER here is null we are adding a root node */
-				parent = create.createNode(session, parent, nameToken, primaryTypeName, 0L, CreateNodeLocation.LAST, null, null);
+				parent = create.createNode(session, parent, nameToken, primaryTypeName, 0L, CreateNodeLocation.LAST, null, null, true);
 
 				if (parent == null) {
 					throw ExUtil.wrapEx("unable to create " + nameToken);
