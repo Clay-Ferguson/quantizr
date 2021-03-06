@@ -110,7 +110,7 @@ export class NodeCompMarkdown extends Html {
         if (!state.pendingDecrypt) return;
         let appState: AppState = store.getState();
 
-        // todo-1: for performance we could create a map of the hash of the encrypted content (key) to the
+        // todo-2: for performance we could create a map of the hash of the encrypted content (key) to the
         // decrypted text (val), and hold that map so that once we decrypt a message we never use encryption again at least
         // until of course browser refresh
         let cipherText = state.pendingDecrypt.substring(J.Constant.ENC_TAG.length);

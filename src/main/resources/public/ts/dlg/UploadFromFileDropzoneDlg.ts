@@ -135,7 +135,7 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
     // https://developer.mozilla.org/en-US/docs/Web/API/Clipboard/read
     // https://web.dev/image-support-for-async-clipboard/
     // Linux Ubuntu note: Shift + Ctrl + PrtSc -> Copy the screenshot of a specific region to the clipboard.
-    // todo-1: I have a feature that pastes from clipboard to a node as text, but it needs to detect images and if image is in
+    // todo-2: I have a feature that pastes from clipboard to a node as text, but it needs to detect images and if image is in
     // clipboard create a node and put that image in it.
     uploadFromClipboard = async () => {
         (navigator as any).clipboard.read().then(async (data) => {

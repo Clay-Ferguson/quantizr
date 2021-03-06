@@ -381,10 +381,10 @@ public class AppController implements ErrorController {
 					// todo-0: I think both pg_welcome and pg_welcome_public are no longer needed or used.
 
 					// load content from a place that will not be a node visible to users
-					nodeRenderService.thymeleafRenderNode(newMap, "pg_welcome");
+					// nodeRenderService.thymeleafRenderNode(newMap, "pg_welcome");
 
 					// load also from another place that will be visible to users.
-					nodeRenderService.thymeleafRenderNode(newMap, "pg_welcome_public");
+					// nodeRenderService.thymeleafRenderNode(newMap, "pg_welcome_public");
 					welcomeMap = newMap;
 				}
 			}

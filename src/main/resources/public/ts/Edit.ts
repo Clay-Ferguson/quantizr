@@ -513,12 +513,7 @@ export class Edit implements EditIntf {
             return;
         }
 
-        const firstNodeId: string = selNodesArray[0];
-
-        /* todo-1: would be better to check if ANY of the nodes are deleted not just arbitary first one */
-        const nodeCheck: J.NodeInfo = state.idToNodeMap.get(firstNodeId);
         let confirmMsg = "Delete " + selNodesArray.length + " node(s) ?";
-
         new ConfirmDlg(confirmMsg, "Confirm Delete " + selNodesArray.length,
             () => {
                 let postDelSelNodeId: string = null;

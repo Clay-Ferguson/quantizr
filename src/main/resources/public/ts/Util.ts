@@ -70,7 +70,7 @@ export class Util implements UtilIntf {
     pgrsDlg: ProgressDlg = null;
 
     // accepts letters, numbers, underscore, dash.
-    // todo-1: enforce this same rule on the server side (Java)
+    // todo-2: enforce this same rule on the server side (Java)
     validUsername = (v: string): boolean => {
         return !!v.match(/^[0-9a-zA-Z\-_]+$/);
     }
@@ -980,11 +980,7 @@ export class Util implements UtilIntf {
     }
 
     /* NOTE: There's also a 'history.replaceState()' which doesn't build onto the history but modifies what it thinks
-    the current location is.
-
-    todo-1: would be nice to have the hash part able to be the node name whenever the selected child node on the page
-    has a 'name' because right now the only time the url will show the naem is when it's the page root.
-    */
+    the current location is. */
     updateHistory = (node: J.NodeInfo, childNode: J.NodeInfo = null, appState: AppState): void => {
         if (!node) {
             node = appState.node;

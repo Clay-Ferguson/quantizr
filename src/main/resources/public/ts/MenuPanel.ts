@@ -167,12 +167,8 @@ export class MenuPanel extends Div {
         children.push(new Menu("Tools", [
             !state.isAnonUser ? new MenuItem("Show Graph", () => S.render.showGraph(null, null, state), !!hltNode) : null, //
 
-            // this is broken, so I'm just disabling it for now, since this is low priority. todo-1
+            // for now, we don't need the 'show properties' and it may never be needed again
             // new MenuItem("Toggle Properties", S.props.propsToggle, () => { return propsToggle }, () => { return !state.isAnonUser }), //
-
-            // I decided with this on the toolbar we don't need it repliated here.
-            // !state.isAnonUser ? new MenuItem("Save clipboard to my NOTES node", () => S.edit.saveClipboardToChildNode("~" + J.NodeType.NOTES)) : null, //
-
             new MenuItemSeparator(), //
 
             new MenuItem("Import", () => S.edit.openImportDlg(state), importFeatureEnabled),

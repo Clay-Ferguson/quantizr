@@ -426,8 +426,7 @@ export class Render implements RenderIntf {
          */
         const layout = S.props.getNodePropVal(J.NodeProp.LAYOUT, node);
 
-        /* Note: for mobile devices, always use vertical layout. TODO-1: we could make this dynamic and use bootstrap to do responsive
-        layout based on screensize, but really just using a vertical layout always on mobile should be fine or even better. */
+        /* Note: for mobile devices, always use vertical layout. */
         if (clientInfo.isMobile || !layout || layout === "v") {
             return new NodeCompVerticalRowLayout(node, level, allowNodeMove, true);
         }
