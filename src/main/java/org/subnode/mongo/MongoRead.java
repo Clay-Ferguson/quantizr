@@ -727,7 +727,8 @@ public class MongoRead {
     }
 
     /*
-     * todo-1: This is very low hanging fruit to make this a feature on the Search menu
+     * todo-2: This is very low hanging fruit to make this a feature on the Search menu. In other words implementing
+     * an "All Named Nodes" search would be trivial with this.
      */
     public Iterable<SubNode> getNamedNodes(MongoSession session, SubNode node) {
         auth.auth(session, node, PrivilegeType.READ);
