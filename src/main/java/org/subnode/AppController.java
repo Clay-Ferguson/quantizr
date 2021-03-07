@@ -481,7 +481,7 @@ public class AppController implements ErrorController {
 				if (cacheBytes != null) {
 					// limiting the stream just becasue for now this is only used in feed
 					// processing, and 5MB is plenty
-					IOUtils.copy(new LimitedInputStreamEx(new ByteArrayInputStream(cacheBytes), 5 * Const.ONE_MB),
+					IOUtils.copy(new LimitedInputStreamEx(new ByteArrayInputStream(cacheBytes), 50 * Const.ONE_MB),
 							response.getOutputStream());
 				}
 				// not in cache then read and update cache

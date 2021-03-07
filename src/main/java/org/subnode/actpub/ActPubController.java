@@ -89,7 +89,7 @@ public class ActPubController {
 		// DO NOT DELETE: If you ever want to make the payload a string just do this...
 		// APObj payload = mapper.readValue(body, new TypeReference<APObj>() {
 		// });
-		log.debug("INBOX incoming payload: " + XString.prettyPrint(payload));
+		// log.debug("INBOX incoming payload: " + XString.prettyPrint(payload));
 		ActPubService.inboxCount++;
 		actPubService.processInboxPost(httpReq, payload);
 		return new ResponseEntity(HttpStatus.OK);
@@ -122,7 +122,7 @@ public class ActPubController {
 			ret = actPubService.generateOutbox(userName);
 		}
 		if (ret != null) {
-			log.debug("Reply with Outbox: " + XString.prettyPrint(ret));
+			// log.debug("Reply with Outbox: " + XString.prettyPrint(ret));
 			return ret;
 		}
 		return new ResponseEntity(HttpStatus.OK);
@@ -145,7 +145,7 @@ public class ActPubController {
 			ret = actPubService.generateFollowers(userName);
 		}
 		if (ret != null) {
-			log.debug("Reply with Followers: " + XString.prettyPrint(ret));
+			// log.debug("Reply with Followers: " + XString.prettyPrint(ret));
 			return ret;
 		}
 		return new ResponseEntity(HttpStatus.OK);
@@ -168,7 +168,7 @@ public class ActPubController {
 			ret = actPubService.generateFollowing(userName);
 		}
 		if (ret != null) {
-			log.debug("Reply with Following: " + XString.prettyPrint(ret));
+			// log.debug("Reply with Following: " + XString.prettyPrint(ret));
 			return ret;
 		}
 		return new ResponseEntity(HttpStatus.OK);

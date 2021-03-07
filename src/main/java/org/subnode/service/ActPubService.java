@@ -1617,7 +1617,7 @@ public class ActPubService {
     }
 
     public APObj generateOutbox(String userName) {
-        log.debug("Generate outbox for userName: " + userName);
+        // log.debug("Generate outbox for userName: " + userName);
         String url = appProp.getProtocolHostAndPort() + ActPubConstants.PATH_OUTBOX + "/" + userName;
         Long totalItems = getOutboxItemCount(userName, "public");
 
