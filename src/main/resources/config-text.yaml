@@ -10,7 +10,7 @@ intro2:
 # links here can be full url, or node names, or "tab:tabName"
 menu:
   siteNav:
-    - name: "News Feed"
+    - name: "News"
       link: ":news" 
     - name: "Fediverse"
       link: "tab:feedTab"
