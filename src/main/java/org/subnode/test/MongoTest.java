@@ -59,6 +59,8 @@ public class MongoTest implements TestIntf {
 			throw new RuntimeEx("Unable to find admin user node.");
 		}
 
+		testPathRegex();
+
 		// Insert a test node
 		// SubNode node = create.createNode(adminSession, "/usrx");
 		// node.setProp("testKey", new SubNodePropVal("testVal"));
@@ -107,6 +109,27 @@ public class MongoTest implements TestIntf {
 
 		log.debug("Mongo Test Ok.");
 		log.debug("*****************************************************************************************");
+	}
+
+	public void testPathRegex() {
+		// Direct Children Test
+		String dc = MongoUtil.regexDirectChildrenOfPath("/abc");
+		verify("/abc/def".matches(dc));
+		verify(!"/abc/def/x".matches(dc));
+		verify(!"/abcx".matches(dc));
+
+		// Recursive Children Test
+		String rc = MongoUtil.regexRecursiveChildrenOfPath("/abc");
+		verify("/abc/def".matches(rc));
+		verify("/abc/def/x".matches(rc));
+		verify("/abc/def/xyz/nop".matches(rc));
+		verify(!"/abcx".matches(rc));
+	}
+
+	public void verify(boolean val) {
+		if (!val) {
+			throw new RuntimeException("Assertion failed.");
+		}
 	}
 
 	public void runBinaryTests(MongoSession session) {

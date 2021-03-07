@@ -81,7 +81,8 @@ services:
         environment:
 
             # Can be a comma-delimited list of TestIntf-derived tests to run
-            # runTests: "ActPubTest"
+            # example: "MongoTest"
+            runTests:
             
             mongoAdminPassword: "${subnodePassword}"
             reCaptcha3SiteKey: "${reCaptcha3SiteKey}"
