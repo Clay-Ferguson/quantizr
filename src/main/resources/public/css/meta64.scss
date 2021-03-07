@@ -428,7 +428,10 @@ entire thing down some times, if it's jutting up against something */
 .inline-checkbox {
     display: inline-block;
     cursor: pointer;
-    min-height: 2em;
+
+    /* Be careful making this smaller than 3em. If you do, then do a full check of EVERYWHERE this is used 
+    because you very like broke something */
+    min-height: 3em;
 }
 
 .inline-radio {
