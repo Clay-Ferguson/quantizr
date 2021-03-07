@@ -377,14 +377,9 @@ public class AppController implements ErrorController {
 			if (welcomeMap == null || PrincipalName.ADMIN.s().equals(ThreadLocals.getSessionContext().getUserName())) {
 				synchronized (welcomeMapLock) {
 					HashMap<String, String> newMap = new HashMap<String, String>();
-
-					// todo-0: I think both pg_welcome and pg_welcome_public are no longer needed or used.
-
 					// load content from a place that will not be a node visible to users
+					// leaving this commented here to show where/how to use it if needed in the future.
 					// nodeRenderService.thymeleafRenderNode(newMap, "pg_welcome");
-
-					// load also from another place that will be visible to users.
-					// nodeRenderService.thymeleafRenderNode(newMap, "pg_welcome_public");
 					welcomeMap = newMap;
 				}
 			}
