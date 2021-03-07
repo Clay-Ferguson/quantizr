@@ -26,7 +26,7 @@ public class NodeInfo {
 	private String content;
 	private Date lastModified;
 
-	// todo-1: make this show something like 1hr ago or 2d ago, etc using DateUtil.formatDurationMillis,
+	// todo-2: make this show something like 1hr ago or 2d ago, etc using DateUtil.formatDurationMillis,
 	// and then let the GUI show that instad of the time, unless hovered over
 	// private String timeAgo;
 

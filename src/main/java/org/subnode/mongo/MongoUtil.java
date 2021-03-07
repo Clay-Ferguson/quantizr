@@ -83,7 +83,7 @@ public class MongoUtil {
 
 	private static SubNode systemRootNode;
 
-	// todo-0: need to look into bulk-ops for doing this saveSession updating
+	// todo-2: need to look into bulk-ops for doing this saveSession updating
 	// tips:
 	// https://stackoverflow.com/questions/26657055/spring-data-mongodb-and-bulk-update
 	// BulkOperations ops = template.bulkOps(BulkMode.UNORDERED, Match.class);
