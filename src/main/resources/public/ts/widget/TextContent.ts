@@ -24,7 +24,8 @@ export class TextContent extends Comp {
     compRender(): ReactNode {
         let state = this.getState();
 
-        // todo-1: research this hack. Not sure I want to keep detecting HTML this way.
+        // todo-2: Not sure I want to keep detecting HTML this way, because we can just use
+        // the HTML class explicity when we need to support HTML
         if (state.text && state.text.indexOf("<") !== -1) {
             // console.log("Dangerously setting html: "+this.jsClassName);
             let _p: any = { id: this.getId(), key: this.getId() };

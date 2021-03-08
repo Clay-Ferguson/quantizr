@@ -561,8 +561,7 @@ export interface ResponseBase {
     success: boolean;
     message: string;
     stackTrace: string;
-    exceptionClass: string;
-    exceptionType: string;
+    errorType: ErrorType;
 }
 
 export interface PropertyInfo {
@@ -638,6 +637,11 @@ export interface PrivilegeInfo {
 
 export const enum Constant {
     ENC_TAG = "<[ENC]>",
+}
+
+export const enum ErrorType {
+    OUT_OF_SPACE = "oos",
+    AUTH = "auth",
 }
 
 export const enum NodeProp {

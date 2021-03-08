@@ -63,7 +63,7 @@ export class Nav implements NavIntf {
     }
 
     upLevelResponse = (res: J.RenderNodeResponse, id: string, scrollToTop: boolean, state: AppState): void => {
-        if (!res || !res.node || res.exceptionType === "auth") {
+        if (!res || !res.node || res.errorType === J.ErrorType.AUTH) {
             dispatch({
                 type: "Action_ShowPageMessage",
                 update: (s: AppState): void => {

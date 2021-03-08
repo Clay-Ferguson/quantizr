@@ -21,6 +21,7 @@ import org.subnode.model.BreadcrumbInfo;
 import org.subnode.model.CalendarItem;
 import org.subnode.model.NodeInfo;
 import org.subnode.model.NodeMetaInfo;
+import org.subnode.model.client.ErrorType;
 import org.subnode.model.client.NodeProp;
 import org.subnode.mongo.MongoAuth;
 import org.subnode.mongo.MongoRead;
@@ -100,7 +101,7 @@ public class NodeRenderService {
 		} catch (NodeAuthFailedException e) {
 			res.setSuccess(false);
 			res.setMessage("Unauthorized.");
-			res.setExceptionType("auth");
+			res.setErrorType(ErrorType.AUTH); 
 			log.error("error", e);
 			return res;
 		}
@@ -185,7 +186,7 @@ public class NodeRenderService {
 					// we decided to to inside this method based on trying not to render a page with no children
 					// showing.
 					if (isActualUplevelRequest) {
-						res.setExceptionType("auth");
+						res.setErrorType(ErrorType.AUTH);
 						res.setSuccess(true);
 						return res;
 					}

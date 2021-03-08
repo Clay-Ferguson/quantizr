@@ -63,9 +63,6 @@ public class SubNodeUtil {
 		return !nonSavableProperties.contains(propertyName);
 	}
 
-	// todo-1: everywhere this is called can we be sure the path is not actually
-	// used as a lookup, but instead the node name?
-	// The new design has path as a non-named hierarchy-only aspect.
 	public SubNode ensureNodeExists(MongoSession session, String parentPath, String pathName, String nodeName,
 			String defaultContent, String primaryTypeName, boolean saveImmediate, SubNodePropertyMap props,
 			ValContainer<Boolean> created) {

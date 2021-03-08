@@ -631,7 +631,7 @@ export class Meta64 implements Meta64Intf {
 
         S.util.ajax<J.RenderNodeRequest, J.RenderNodeResponse>("anonPageLoad", null,
             (res: J.RenderNodeResponse): void => {
-                if (!res.success || res.exceptionType === "auth") {
+                if (!res.success || res.errorType === J.ErrorType.AUTH) {
                     S.util.showMessage("Unable to access the requested page without being logged in. Try loading the URL without parameters, or log in.", "Warning");
                 }
                 S.render.renderPageFromData(res, false, null, true, true, state);

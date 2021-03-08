@@ -1,20 +1,13 @@
 package org.subnode.response.base;
 
+import org.subnode.model.client.ErrorType;
 import org.subnode.util.ThreadLocals;
 
 public class ResponseBase {
 	private boolean success;
 	private String message;
 	private String stackTrace;
-	private String exceptionClass;
-
-	/*
-	 * for now only 'auth' is available here (will make an enum eventually). This value is sent back to
-	 * client to indicate the command didn't have some kind of unexpected failure, but that some special
-	 * case did happen that means the normal return value may be discarded, or not sent back, but the
-	 * call was 'successful'
-	 */
-	private String exceptionType;
+	private ErrorType errorType;
 
 	public ResponseBase() {
 		ThreadLocals.setResponse(this);
@@ -44,19 +37,11 @@ public class ResponseBase {
 		this.stackTrace = stackTrace;
 	}
 
-	public String getExceptionClass() {
-		return exceptionClass;
+	public ErrorType getErrorType() {
+		return errorType;
 	}
 
-	public void setExceptionClass(String exceptionClass) {
-		this.exceptionClass = exceptionClass;
-	}
-
-	public String getExceptionType() {
-		return exceptionType;
-	}
-
-	public void setExceptionType(String exceptionType) {
-		this.exceptionType = exceptionType;
+	public void setErrorType(ErrorType errorType) {
+		this.errorType = errorType;
 	}
 }

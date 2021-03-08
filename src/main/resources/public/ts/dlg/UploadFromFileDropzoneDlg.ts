@@ -14,6 +14,7 @@ import { HorizontalLayout } from "../widget/HorizontalLayout";
 import { IconButton } from "../widget/IconButton";
 import { ConfirmDlg } from "./ConfirmDlg";
 import { MediaRecorderDlg } from "./MediaRecorderDlg";
+import * as J from "../JavaIntf";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
@@ -298,11 +299,9 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
                     console.log("File progress", progress);
                 });
 
-                this.on("success", function (file: File, resp: any, evt: ProgressEvent) {
+                this.on("success", function (file: File, resp: J.ResponseBase, evt: ProgressEvent) {
                     // console.log("onSuccess: dlg.numFiles=" + dlg.numFiles);
-
-                    // todo-1: get rid of the tight coupling to an exception class name here. This was a quick fix/hack
-                    if (!resp.success && resp.exceptionClass && resp.exceptionClass.endsWith(".OutOfSpaceException")) {
+                    if (!resp.success && resp.errorType === J.ErrorType.OUT_OF_SPACE) {
                         if (!dlg.errorShown) {
                             dlg.errorShown = true;
                             dlg.uploadFailed = true;
@@ -393,8 +392,6 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
 
     runButtonEnablement = (): void => {
         let valid = this.filesAreValid();
-
-        // todo-1: why does setEnabled work just fine but setVisible doesn't work?
         this.uploadButton.setEnabled(valid);
     }
 }

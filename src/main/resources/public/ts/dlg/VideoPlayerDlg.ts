@@ -42,7 +42,7 @@ export class VideoPlayerDlg extends DialogBase {
                     // "preload": "auto"
                 }),
                 new ButtonBar([
-                    // todo-1: even if this button appears to work, I need it to explicitly enforce the saving of the time value AND the removal of the VIDEO element from the DOM */
+                    // todo-2: even if this button appears to work, I need it to explicitly enforce the saving of the time value AND the removal of the VIDEO element from the DOM */
                     new Button("Close", this.close)
                 ])
             ])
@@ -58,7 +58,7 @@ export class VideoPlayerDlg extends DialogBase {
     /* When the dialog closes we need to stop and remove the player */
     close = (): void => {
         console.log("VideoPlayerDialog cancel()");
-        // todo-1: need to check over, and document flow of this function as it relates to calling "podcast.destroyPlayer(this);"
+        // todo-2: need to check over, and document flow of this function as it relates to calling "podcast.destroyPlayer(this);"
         this.destroyPlayer();
         this.superClose();
     }

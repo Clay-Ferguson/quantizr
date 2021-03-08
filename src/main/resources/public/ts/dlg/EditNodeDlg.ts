@@ -334,7 +334,6 @@ export class EditNodeDlg extends DialogBase {
 
         let children = [
             new Form(null, [
-                // this.help = new TextContent("Help content."),
                 new Div(null, {
                 }, [
                     this.propertyEditFieldContainer = new Div("", {

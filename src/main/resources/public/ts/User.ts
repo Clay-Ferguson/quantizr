@@ -31,7 +31,7 @@ export class User implements UserIntf {
     closeAccount = (state: AppState): void => {
         new ConfirmDlg("Are you sure you want to close your account?", "Close Account",
             () => {
-                new ConfirmDlg("Your data will be deleted and can never be recovered.<p> Are you sure?", "Last Chance... One more Click",
+                new ConfirmDlg("Your data will be deleted and can never be recovered. Are you sure?", "Last Chance... One more Click",
                     () => {
                         this.deleteAllUserLocalDbEntries();
                         S.util.ajax<J.CloseAccountRequest, J.CloseAccountResponse>("closeAccount", {}, this.closeAccountResponse);

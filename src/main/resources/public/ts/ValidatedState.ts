@@ -1,6 +1,6 @@
 import { State } from "./State";
 
-/* todo-1: Finish making this type safe, and don't use 'any' inside here */
+/* todo-2: Finish making this type safe, and don't use 'any' inside here */
 export class ValidatedState<S> {
     v: State<S> = new State<S>();
     e: State<S> = new State<S>();

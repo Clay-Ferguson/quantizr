@@ -2,6 +2,7 @@ package org.subnode;
 
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
@@ -11,7 +12,9 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.util.WebUtils;
 import org.subnode.config.SessionContext;
 import org.subnode.exception.NotLoggedInException;
+import org.subnode.exception.OutOfSpaceException;
 import org.subnode.model.UserPreferences;
+import org.subnode.model.client.ErrorType;
 import org.subnode.model.client.PrincipalName;
 import org.subnode.mongo.MongoAuth;
 import org.subnode.mongo.MongoSession;
@@ -42,8 +45,9 @@ public class CallProcessor {
 	// private static int mutexCounter = 0;
 
 	/*
-	 * Wraps the processing of any command by using whatever info is on the session and/or the request
-	 * to perform the login if the user is not logged in, and then call the function to be processed
+	 * Wraps the processing of any command by using whatever info is on the session
+	 * and/or the request to perform the login if the user is not logged in, and
+	 * then call the function to be processed
 	 */
 	public Object run(String command, RequestBase req, HttpSession httpSession, MongoRunnableEx runner) {
 		if (AppServer.isShuttingDown()) {
@@ -54,9 +58,9 @@ public class CallProcessor {
 		logRequest(command, req, httpSession);
 
 		/*
-		 * Instantiating this, runs its constructor and ensures our threadlocal at least has respons object
-		 * on it, but most (not all) implenentations of methods end up instantiating their own which
-		 * overwrites this
+		 * Instantiating this, runs its constructor and ensures our threadlocal at least
+		 * has respons object on it, but most (not all) implenentations of methods end
+		 * up instantiating their own which overwrites this
 		 */
 		new ResponseBase();
 
@@ -110,7 +114,7 @@ public class CallProcessor {
 				ResponseBase orb = (ResponseBase) ret;
 
 				orb.setSuccess(false);
-				orb.setExceptionClass(e.getClass().getName());
+				setErrorType(orb, e);
 
 				/* only set a message if one is not already set */
 				if (StringUtils.isEmpty(orb.getMessage())) {
@@ -142,6 +146,12 @@ public class CallProcessor {
 		return ret;
 	}
 
+	private void setErrorType(ResponseBase res, Exception ex) {
+		if (ex instanceof OutOfSpaceException) {
+			res.setErrorType(ErrorType.OUT_OF_SPACE);
+		}
+	}
+
 	/* Creates a logged in session for any method call */
 	private MongoSession processCredentialsAndGetSession(RequestBase req) {
 
@@ -162,10 +172,13 @@ public class CallProcessor {
 				userName = sc.getUserName();
 				password = sc.getPassword();
 			}
-			// Otherwise take the creds off the 'req' if existing, or use 'anon' for both if not.
+			// Otherwise take the creds off the 'req' if existing, or use 'anon' for both if
+			// not.
 			else {
-				userName = req == null || StringUtils.isEmpty(req.getUserName()) ? PrincipalName.ANON.s() : req.getUserName();
-				password = req == null || StringUtils.isEmpty(req.getPassword()) ? PrincipalName.ANON.s() : req.getPassword();
+				userName = req == null || StringUtils.isEmpty(req.getUserName()) ? PrincipalName.ANON.s()
+						: req.getUserName();
+				password = req == null || StringUtils.isEmpty(req.getPassword()) ? PrincipalName.ANON.s()
+						: req.getPassword();
 			}
 		}
 

@@ -648,7 +648,7 @@ export class Edit implements EditIntf {
     }
 
     insertBookWarAndPeace = (state: AppState): void => {
-        new ConfirmDlg("Insert book War and Peace?<p/>Warning: You should have an EMPTY node selected now, to serve as the root node of the book!",
+        new ConfirmDlg("Warning: You should have an EMPTY node selected now, to serve as the root node of the book!",
             "Confirm",
             () => {
                 /* inserting under whatever node user has focused */
