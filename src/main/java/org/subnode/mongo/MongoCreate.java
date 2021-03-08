@@ -37,14 +37,14 @@ public class MongoCreate {
 		return node;
 	}
 
-	public SubNode createNode(MongoSession session, String path, String type, String ownerName) {
-		if (type == null) {
-			type = NodeType.NONE.s();
-		}
-		ObjectId ownerId = read.getOwnerNodeIdFromSession(session);
-		SubNode node = new SubNode(ownerId, path, type, null);
-		return node;
-	}
+	// public SubNode createNode(MongoSession session, String path, String type, String ownerName) {
+	// 	if (type == null) {
+	// 		type = NodeType.NONE.s();
+	// 	}
+	// 	ObjectId ownerId = read.getOwnerNodeIdFromSession(session);
+	// 	SubNode node = new SubNode(ownerId, path, type, null);
+	// 	return node;
+	// }
 
 	public SubNode createNode(MongoSession session, String path, String type) {
 		if (type == null) {

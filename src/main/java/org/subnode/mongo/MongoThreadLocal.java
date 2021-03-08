@@ -115,7 +115,7 @@ public class MongoThreadLocal {
 		 * 'work'
 		 */
 		if (nodeFound != null && nodeFound.hashCode() != node.hashCode()) {
-			log.debug("*************** multiple instances of objectId " + node.getId().toHexString()
+			log.debug("*************** ERROR: multiple instances of objectId " + node.getId().toHexString()
 					+ " are in memory.");
 			return;
 		}
