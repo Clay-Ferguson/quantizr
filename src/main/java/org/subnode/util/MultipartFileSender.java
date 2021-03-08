@@ -147,8 +147,20 @@ public class MultipartFileSender {
             contentType = MimeTypeUtils.probeContentType(filepath);
         }
 
-        if (length == null || fileName == null || lastModified == 0) {
-            log.error("Request missingn some args"); // todo-1: we could do more robust reporting here.
+        if (length == null) {
+            log.error("Request missing length arg"); 
+            response.sendError(HttpServletResponse.SC_NOT_FOUND);
+            return;
+        }
+
+        if (fileName == null) {
+            log.error("Request missing fileName arg"); 
+            response.sendError(HttpServletResponse.SC_NOT_FOUND);
+            return;
+        }
+
+        if (lastModified == 0) {
+            log.error("Request missing lastModified arg"); 
             response.sendError(HttpServletResponse.SC_NOT_FOUND);
             return;
         }

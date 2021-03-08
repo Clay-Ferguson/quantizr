@@ -250,13 +250,6 @@ public class RSSFeedService {
 		writeFeed(feed, writer);
 	}
 
-	/*
-	 * NOTE: todo-1: there is a scenario here where feeds that produce large numbers
-	 * of daily results will simply crowd out the rest of the entries with all
-	 * theirs going to the top pushing all others to the end. Need some new algo
-	 * where we ensure at least X-number of items from each feed is include unless
-	 * they are at least a full day old.
-	 */
 	public void aggregateFeeds(List<String> urls, List<SyndEntry> entries, int page) {
 		log.debug("Generating aggregateFeed.");
 		try {
@@ -264,7 +257,7 @@ public class RSSFeedService {
 
 				// reset this to zero for each feed.
 				int badDateCount = 0;
-				
+
 				SyndFeed inFeed = getFeed(url, true);
 				if (inFeed != null) {
 					for (SyndEntry entry : inFeed.getEntries()) {
@@ -628,10 +621,14 @@ public class RSSFeedService {
 				entry.setLink(metaInfo.getLink() != null ? metaInfo.getLink() : appProp.getProtocolHostAndPort());
 
 				/*
-				 * todo-1: need menu item "Set Create Time", and "Set Modify Time", that prompts
+				 * todo-2: need menu item "Set Create Time", and "Set Modify Time", that prompts
 				 * with the datetime GUI, so publishers have more control over this in the feed,
 				 * or else have an rssTimestamp as an optional property which can be set on any
 				 * node to override this.
+				 * 
+				 * UPDATE: Now that we have 'date' property as a generic feature of nodes
+				 * (calendar icon on edit dialog) we can use that as our publish time here, and
+				 * allow that to be the override for the date on the node.
 				 */
 				entry.setPublishedDate(n.getCreateTime());
 				SyndContent description = new SyndContentImpl();
@@ -640,7 +637,11 @@ public class RSSFeedService {
 				 * todo-1: NOTE: I tried putting some HTML into 'content' as a test and setting
 				 * the mime type, but it doesn't render correctly, so I just need to research
 				 * how to get HTML in RSS descriptions, but this is low priority for now so I'm
-				 * not doing it yet
+				 * not doing it yet.
+				 * 
+				 * todo-1: NOTE: when org.owasp.html.Sanitizers capability was added, I forgot
+				 * to revisit this, so I need to check what I'm doing here and see if we need
+				 * "HTML" now here instead.
 				 */
 				description.setType("text/plain");
 				// description.setType("text/html");

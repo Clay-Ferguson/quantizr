@@ -4,7 +4,7 @@ import javax.annotation.Nullable;
 
 /* right now this is just a marker class, for cleaner code */
 public class RequestBase {
-    //todo-1: the @Nullable capability is new and could be used across lots of existing objects.
+    //todo-2: the @Nullable capability is new and could be used across lots of existing objects.
     @Nullable
     private String userName;
 

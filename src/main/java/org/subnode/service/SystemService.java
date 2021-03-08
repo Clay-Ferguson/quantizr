@@ -63,18 +63,6 @@ public class SystemService {
 	@Autowired
 	private IPFSService ipfsService;
 
-	public String initializeAppContent() {
-		ValContainer<String> ret = new ValContainer<String>();
-
-		// todo-1: needs review. I think this capability may no longer be needed.
-		adminRunner.run(session -> {
-			ret.setVal(exportJsonService.resetNode(session, "public"));
-			ret.setVal(exportJsonService.resetNode(session, "rss"));
-		});
-
-		return ret.getVal();
-	}
-
 	public String rebuildIndexes() {
 		if (!ThreadLocals.getSessionContext().isAdmin()) {
 			throw ExUtil.wrapEx("admin only function.");

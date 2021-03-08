@@ -384,7 +384,7 @@ public class Convert {
 	 * with the normal way of doing a link in markdown. So we are injecting a snippet of markdown (not
 	 * html)
 	 * 
-	 * todo-1: i noticed this method gets called during the 'saveNode' processing and then is called
+	 * todo-1: I noticed this method gets called during the 'saveNode' processing and then is called
 	 * again when the server refreshes the whole page. This is something that is a slight bit of wasted
 	 * processing.
 	 */

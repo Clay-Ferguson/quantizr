@@ -208,7 +208,7 @@ public class NodeMoveService {
 		if (location.equalsIgnoreCase("inside")) {
 			curTargetOrdinal = targetNode.getMaxChildOrdinal() == null ? 0 : targetNode.getMaxChildOrdinal() + 1;
 		}
-		// location==inline (todo-1: rename this to inline-below)
+		// location==inline (todo-2: rename this to inline-below -- or better yet, do an enum)
 		else if (location.equalsIgnoreCase("inline")) {
 			curTargetOrdinal = targetNode.getOrdinal() + 1;
 			create.insertOrdinal(session, parentToPasteInto, curTargetOrdinal, nodeIds.size());

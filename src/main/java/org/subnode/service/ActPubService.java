@@ -530,16 +530,11 @@ public class ActPubService {
             userNode = read.getUserNodeByUserName(session, apUserName);
         }
 
-        SubNode outboxNode = read.getUserNodeByType(session, apUserName, userNode, "### Posts", NodeType.ACT_PUB_POSTS.s());
+        SubNode outboxNode = read.getUserNodeByType(session, apUserName, userNode, "### Posts", NodeType.ACT_PUB_POSTS.s(), Arrays.asList(PrivilegeType.READ.s(), PrivilegeType.WRITE.s()));
         if (outboxNode == null) {
             log.debug("no outbox for user: " + apUserName);
             return;
         }
-
-        // todo-1: this is bad to update the outboxNode here every time. fix this.
-        acl.addPrivilege(session, outboxNode, PrincipalName.PUBLIC.s(),
-                Arrays.asList(PrivilegeType.READ.s(), PrivilegeType.WRITE.s()), null);
-        update.save(session, outboxNode);
 
         /*
          * Query all existing known outbox items we have already saved for this foreign user
@@ -1186,7 +1181,7 @@ public class ActPubService {
             if (actorAccountNode != null) {
                 String userName = actorAccountNode.getStrProp(NodeProp.USER.s());
                 SubNode postsNode =
-                        read.getUserNodeByType(session, userName, actorAccountNode, "### Posts", NodeType.ACT_PUB_POSTS.s());
+                        read.getUserNodeByType(session, userName, actorAccountNode, "### Posts", NodeType.ACT_PUB_POSTS.s(), null);
                 saveNote(session, actorAccountNode, postsNode, obj, false, false);
             }
         }
@@ -1540,7 +1535,7 @@ public class ActPubService {
             }
 
             // get the Friend List of the follower
-            SubNode followerFriendList = read.getUserNodeByType(session, followerUserName, null, null, NodeType.FRIEND_LIST.s());
+            SubNode followerFriendList = read.getUserNodeByType(session, followerUserName, null, null, NodeType.FRIEND_LIST.s(), null);
 
             /*
              * lookup to see if this followerFriendList node already has userToFollow already under it

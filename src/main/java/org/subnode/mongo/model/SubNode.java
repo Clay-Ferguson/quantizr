@@ -279,12 +279,6 @@ public class SubNode {
 		return owner != null ? owner.toHexString() : null;
 	}
 
-	/*
-	 * todo-1: All dates need to be stored as UTC/GMC so that the timezone offset is
-	 * zero, because there's no timezone information stored anywhere, and the only
-	 * place any timezones ever come into play is when displaying the time to a
-	 * user.
-	 */
 	@JsonProperty(FIELD_CREATE_TIME)
 	public Date getCreateTime() {
 		return createTime;
@@ -405,7 +399,7 @@ public class SubNode {
 				return Long.valueOf((Integer) val);
 			}
 
-			// todo-1: When saving from client the values are always sent as strings, and
+			// todo-2: When saving from client the values are always sent as strings, and
 			// this is a workaround until that changes.
 			if (val instanceof String) {
 				if (((String) val).length() == 0) {
@@ -428,10 +422,6 @@ public class SubNode {
 				return null;
 			return (Date) v.getValue();
 		} catch (Exception e) {
-			// todo-1: This is cluttering up the log file, because we still have
-			// "sn:lastModified" which is an obsolete property, and a string or integer
-			// representation also. Need to have a db cleanup to remove all those props.
-			// ExUtil.error(log, "failed to get Date from key: " + key, e);
 			return null;
 		}
 	}

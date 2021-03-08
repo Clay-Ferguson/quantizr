@@ -438,7 +438,7 @@ public class MongoUtil {
 
 		auth.requireAdmin(session);
 		String newUserNodePath = NodeName.ROOT_OF_ALL_USERS + "/?";
-		// todo-1: is user validated here (no invalid characters, etc. and invalid
+		// todo-2: is user validated here (no invalid characters, etc. and invalid
 		// flowpaths tested?)
 
 		userNode = create.createNode(session, newUserNodePath, NodeType.ACCOUNT.s());
@@ -489,8 +489,6 @@ public class MongoUtil {
 					true, null, null);
 
 			adminNode.setProp(NodeProp.USER.s(), PrincipalName.ADMIN.s());
-
-			// todo-1: need to store ONLY hash of the password
 			adminNode.setProp(NodeProp.USER_PREF_EDIT_MODE.s(), false);
 			update.save(session, adminNode);
 
@@ -512,29 +510,11 @@ public class MongoUtil {
 					Arrays.asList(PrivilegeType.READ.s()), null);
 		}
 
-		/*
-		 * todo-1: update docs to say that admin is supposed to do something to
-		 * initialize these two nodes (landing page, and userguide)
-		 */
 		created = new ValContainer<>();
 		SubNode publicHome = apiUtil.ensureNodeExists(session, "/" + NodeName.ROOT + "/" + NodeName.PUBLIC, "home",
 				"home", "Public Home", null, true, null, created);
 
 		log.debug("Public Home Node exists at id: " + publicHome.getId() + " path=" + publicHome.getPath());
-
-		// created = new ValContainer<>();
-		// SubNode userGuide = apiUtil.ensureNodeExists(session, "/" + NodeName.ROOT +
-		// "/" + NodeName.PUBLIC, "userguide",
-		// "User Guide", null, true, null, created);
-		// log.debug("UserGuide Node exists at id: " + userGuide.getId());
-
-		/* Ensure Content folder is created and synced to file system */
-		// SubNodePropertyMap props = new SubNodePropertyMap();
-		// props.put(TYPES.FILE_SYNC_LINK.getName(), new
-		// SubNodePropVal(appProp.publicContentFolder()));
-		// SubNode contentNode = apiUtil.ensureNodeExists(session, "/" + NodeName.ROOT +
-		// "/" + NodeName.PUBLIC, "content",
-		// null, TYPES.FILE_SYNC_ROOT.getName(), true, props, created);
 
 		// // ---------------------------------------------------------
 		// // NOTE: Do not delete this. May need this example in the future. This is

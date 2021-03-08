@@ -10,8 +10,6 @@ public class CreateSubNodeRequest extends RequestBase {
 	private String nodeId;
 
 	private boolean pendingEdit;
-
-	//todo-1: is there a JSON annotaiton to make this optional on TS object
 	private String content; //optional, default content
 	
 	private String newNodeName;

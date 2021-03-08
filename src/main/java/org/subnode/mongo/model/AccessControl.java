@@ -17,7 +17,6 @@ import org.springframework.data.mongodb.core.mapping.Field;
 public class AccessControl {
 	private static final Logger log = LoggerFactory.getLogger(AccessControl.class);
 
-	// todo-1: There's lots of places "prvs" is hardcoded that need to use this variable instead.
 	public static final String FIELD_PRVS = "prvs";
 	@Field(FIELD_PRVS)
 	private String prvs;

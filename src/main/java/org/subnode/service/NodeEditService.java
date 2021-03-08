@@ -54,9 +54,10 @@ import org.subnode.util.ValContainer;
 import org.subnode.util.XString;
 
 /**
- * Service for editing content of nodes. That is, this method updates property values of nodes. As
- * the user is using the application and moving, copy+paste, or editing node content this is the
- * service that performs those operations on the server, directly called from the HTML 'controller'
+ * Service for editing content of nodes. That is, this method updates property
+ * values of nodes. As the user is using the application and moving, copy+paste,
+ * or editing node content this is the service that performs those operations on
+ * the server, directly called from the HTML 'controller'
  */
 @Component
 public class NodeEditService {
@@ -96,8 +97,9 @@ public class NodeEditService {
 	private MongoAuth auth;
 
 	/*
-	 * Creates a new node as a *child* node of the node specified in the request. Should ONLY be called
-	 * by the controller that accepts a node being created by the GUI/user
+	 * Creates a new node as a *child* node of the node specified in the request.
+	 * Should ONLY be called by the controller that accepts a node being created by
+	 * the GUI/user
 	 */
 	public CreateSubNodeResponse createSubNode(MongoSession session, CreateSubNodeRequest req) {
 		CreateSubNodeResponse res = new CreateSubNodeResponse();
@@ -110,19 +112,15 @@ public class NodeEditService {
 		SubNode node = null;
 
 		/*
-		 * If this is a "New Post" from the Feed tab we get here with no ID but we put this in user's
-		 * "My Posts" node
+		 * If this is a "New Post" from the Feed tab we get here with no ID but we put
+		 * this in user's "My Posts" node
 		 */
 		if (nodeId == null) {
-			node = read.getUserNodeByType(session, null, null, "### Public Posts", NodeType.POSTS.s());
+			node = read.getUserNodeByType(session, null, null,
+					"### " + ThreadLocals.getSessionContext().getUserName() + "'s Public Posts", NodeType.POSTS.s(),
+					Arrays.asList(PrivilegeType.READ.s()));
 
 			if (node != null) {
-
-				// todo-1: make this public code only run when node is first created.
-				aclService.addPrivilege(session, node, PrincipalName.PUBLIC.s(), Arrays.asList(PrivilegeType.READ.s()), null);
-				node.setContent("### " + ThreadLocals.getSessionContext().getUserName() + "'s Public Posts");
-				update.save(session, node);
-
 				nodeId = node.getId().toHexString();
 				makePublic = true;
 			}
@@ -131,7 +129,8 @@ public class NodeEditService {
 		/* Node still null, then try other ways of getting it */
 		if (node == null) {
 			if (nodeId.equals("~" + NodeType.NOTES.s())) {
-				node = read.getUserNodeByType(session, session.getUserName(), null, "### Notes", NodeType.NOTES.s());
+				node = read.getUserNodeByType(session, session.getUserName(), null, "### Notes", NodeType.NOTES.s(),
+						null);
 			} else {
 				node = read.getNode(session, nodeId);
 			}
@@ -150,7 +149,8 @@ public class NodeEditService {
 			parentHashTags = "\n\n" + parentHashTags + "\n";
 		}
 
-		SubNode newNode = create.createNode(session, node, null, req.getTypeName(), 0L, createLoc, req.getProperties(), null, true);
+		SubNode newNode = create.createNode(session, node, null, req.getTypeName(), 0L, createLoc, req.getProperties(),
+				null, true);
 
 		// '/r/p/' = pending (nodes not yet published, being edited created by users)
 		if (req.isPendingEdit() && !newNode.getPath().startsWith("/r/p/")) {
@@ -172,16 +172,16 @@ public class NodeEditService {
 		}
 
 		update.save(session, newNode);
-		res.setNewNode(
-				convert.convertToNodeInfo(ThreadLocals.getSessionContext(), session, newNode, true, false, -1, false, false));
+		res.setNewNode(convert.convertToNodeInfo(ThreadLocals.getSessionContext(), session, newNode, true, false, -1,
+				false, false));
 
 		res.setSuccess(true);
 		return res;
 	}
 
 	/*
-	 * Takes a message that may have some hashtags in it and returns a string with all those hashtags in
-	 * it space delimited
+	 * Takes a message that may have some hashtags in it and returns a string with
+	 * all those hashtags in it space delimited
 	 */
 	public String parseHashTags(String message) {
 		if (message == null)
@@ -193,9 +193,9 @@ public class NodeEditService {
 		message = message.replace("\r", " ");
 
 		/*
-		 * Mastodon jams a bunch of html together like this for example: #<span>bot</span> So we replace
-		 * that html with spaces to make the tokenizer work. However I think it also stores tags in
-		 * structured JSON?
+		 * Mastodon jams a bunch of html together like this for example:
+		 * #<span>bot</span> So we replace that html with spaces to make the tokenizer
+		 * work. However I think it also stores tags in structured JSON?
 		 */
 		message = message.replace("#<span>", "#");
 		message = message.replace("<span>", " ");
@@ -206,7 +206,8 @@ public class NodeEditService {
 		List<String> words = XString.tokenize(message, " ", true);
 		if (words != null) {
 			for (String word : words) {
-				// be sure there aren't multiple pound signs other than just the first character.
+				// be sure there aren't multiple pound signs other than just the first
+				// character.
 				if (word.length() > 2 && word.startsWith("#") && StringUtils.countMatches(word, "#") == 1) {
 					if (tags.length() > 0) {
 						tags.append(" ");
@@ -223,8 +224,8 @@ public class NodeEditService {
 		List<PropertyInfo> properties = new LinkedList<PropertyInfo>();
 		properties.add(new PropertyInfo(NodeProp.USER.s(), userToFollow));
 
-		SubNode newNode = create.createNode(session, parentFriendsList, null, NodeType.FRIEND.s(), 0L, CreateNodeLocation.LAST,
-				properties, null, true);
+		SubNode newNode = create.createNode(session, parentFriendsList, null, NodeType.FRIEND.s(), 0L,
+				CreateNodeLocation.LAST, properties, null, true);
 		newNode.setProp(NodeProp.TYPE_LOCK.s(), Boolean.valueOf(true));
 
 		if (followerActorUrl != null) {
@@ -252,14 +253,16 @@ public class NodeEditService {
 			return res;
 		}
 
-		SubNode linksNode = read.getUserNodeByType(session, session.getUserName(), null, "### Notes", NodeType.NOTES.s());
+		SubNode linksNode = read.getUserNodeByType(session, session.getUserName(), null, "### Notes",
+				NodeType.NOTES.s(), null);
 
 		if (linksNode == null) {
 			log.warn("unable to get linksNode");
 			return null;
 		}
 
-		SubNode newNode = create.createNode(session, linksNode, null, NodeType.NONE.s(), 0L, CreateNodeLocation.LAST, null, null, true);
+		SubNode newNode = create.createNode(session, linksNode, null, NodeType.NONE.s(), 0L, CreateNodeLocation.LAST,
+				null, null, true);
 
 		String title = lcData.startsWith("http") ? Util.extractTitleFromUrl(data) : null;
 		String content = title != null ? "#### " + title + "\n" : "";
@@ -273,9 +276,9 @@ public class NodeEditService {
 	}
 
 	/*
-	 * Creates a new node that is a sibling (same parent) of and at the same ordinal position as the
-	 * node specified in the request. Should ONLY be called by the controller that accepts a node being
-	 * created by the GUI/user
+	 * Creates a new node that is a sibling (same parent) of and at the same ordinal
+	 * position as the node specified in the request. Should ONLY be called by the
+	 * controller that accepts a node being created by the GUI/user
 	 */
 	public InsertNodeResponse insertNode(MongoSession session, InsertNodeRequest req) {
 		InsertNodeResponse res = new InsertNodeResponse();
@@ -304,8 +307,8 @@ public class NodeEditService {
 		auth.setDefaultReplyAcl(null, parentNode, newNode);
 
 		update.save(session, newNode);
-		res.setNewNode(
-				convert.convertToNodeInfo(ThreadLocals.getSessionContext(), session, newNode, true, false, -1, false, false));
+		res.setNewNode(convert.convertToNodeInfo(ThreadLocals.getSessionContext(), session, newNode, true, false, -1,
+				false, false));
 
 		// if (req.isUpdateModTime() && !StringUtils.isEmpty(newNode.getContent()) //
 		// // don't evern send notifications when 'admin' is the one doing the editing.
@@ -334,11 +337,11 @@ public class NodeEditService {
 		}
 
 		/*
-		 * todo-1: eventually we need a plugin-type architecture to decouple this kind of type-specific code
-		 * from the general node saving.
+		 * todo-1: eventually we need a plugin-type architecture to decouple this kind
+		 * of type-specific code from the general node saving.
 		 * 
-		 * Here, we are enforcing that only one node under the user's FRIENDS list is allowed for each user.
-		 * No duplicate friend nodes.
+		 * Here, we are enforcing that only one node under the user's FRIENDS list is
+		 * allowed for each user. No duplicate friend nodes.
 		 */
 		if (node.getType().equals(NodeType.FRIEND.s())) {
 			String friendUserName = (String) nodeInfo.getPropVal(NodeProp.USER.s());
@@ -347,13 +350,14 @@ public class NodeEditService {
 				nodeInfo.setPropVal(NodeProp.USER.s(), friendUserName);
 			}
 
-			Iterable<SubNode> friendNodes =
-					read.findSubNodesByProp(session, node.getParentPath(), NodeProp.USER.s(), friendUserName);
+			Iterable<SubNode> friendNodes = read.findSubNodesByProp(session, node.getParentPath(), NodeProp.USER.s(),
+					friendUserName);
 
 			for (SubNode friendNode : friendNodes) {
 				/*
-				 * If we find any node that isn't the one we're editing then it's a duplicate and we just should
-				 * reject any saves. We delete it to fix the problem, and abort this save
+				 * If we find any node that isn't the one we're editing then it's a duplicate
+				 * and we just should reject any saves. We delete it to fix the problem, and
+				 * abort this save
 				 */
 				if (!friendNode.getId().toHexString().equals(nodeId)) {
 					delete.delete(session, node, false);
@@ -369,8 +373,8 @@ public class NodeEditService {
 		}
 
 		/*
-		 * The only purpose of this limit is to stop hackers from using up lots of space, because our only
-		 * current quota is on attachment file size uploads
+		 * The only purpose of this limit is to stop hackers from using up lots of
+		 * space, because our only current quota is on attachment file size uploads
 		 */
 		if (nodeInfo.getContent() != null && nodeInfo.getContent().length() > 64 * 1024) {
 			throw new RuntimeEx("Max text length is 64K");
@@ -379,12 +383,16 @@ public class NodeEditService {
 		node.setContent(nodeInfo.getContent());
 		node.setType(nodeInfo.getType());
 
-		/* if node name is empty or not valid (canot have ":" in the name) set it to null quietly */
+		/*
+		 * if node name is empty or not valid (canot have ":" in the name) set it to
+		 * null quietly
+		 */
 		if (StringUtils.isEmpty(nodeInfo.getName())) {
 			node.setName(null);
 		}
 		// if we're setting node name to a different node name
-		else if (nodeInfo.getName() != null && nodeInfo.getName().length() > 0 && !nodeInfo.getName().equals(node.getName())) {
+		else if (nodeInfo.getName() != null && nodeInfo.getName().length() > 0
+				&& !nodeInfo.getName().equals(node.getName())) {
 
 			// todo-1: do better name validation here.
 			if (nodeInfo.getName().contains(":")) {
@@ -398,8 +406,8 @@ public class NodeEditService {
 			}
 
 			/*
-			 * We don't use unique index on node name, because we want to save storage space on the server, so
-			 * we have to do the uniqueness check ourselves here manually
+			 * We don't use unique index on node name, because we want to save storage space
+			 * on the server, so we have to do the uniqueness check ourselves here manually
 			 */
 			SubNode nodeByName = read.getNodeByName(session, nodeName);
 			if (nodeByName != null) {
@@ -416,9 +424,9 @@ public class NodeEditService {
 					node.deleteProp(property.getName());
 				} else {
 					/*
-					 * save only if server determines the property is savable. Just protection. Client shouldn't be
-					 * trying to save stuff that is illegal to save, but we have to assume the worst behavior from
-					 * client code, for security and robustness.
+					 * save only if server determines the property is savable. Just protection.
+					 * Client shouldn't be trying to save stuff that is illegal to save, but we have
+					 * to assume the worst behavior from client code, for security and robustness.
 					 */
 					if (session.isAdmin() || SubNodeUtil.isSavableProperty(property.getName())) {
 						// log.debug("Property to save: " + property.getName() + "=" +
@@ -426,8 +434,8 @@ public class NodeEditService {
 						node.setProp(property.getName(), property.getValue());
 					} else {
 						/**
-						 * TODO: This case indicates that data was sent unnecessarily. fix! (i.e. make sure this block
-						 * cannot ever be entered)
+						 * TODO: This case indicates that data was sent unnecessarily. fix! (i.e. make
+						 * sure this block cannot ever be entered)
 						 */
 						// log.debug("Ignoring unneeded save attempt on unneeded
 						// prop: " + property.getName());
@@ -447,8 +455,8 @@ public class NodeEditService {
 		}
 
 		/*
-		 * If the node being saved is currently in the pending area /p/ then we publish it now, and move it
-		 * out of pending.
+		 * If the node being saved is currently in the pending area /p/ then we publish
+		 * it now, and move it out of pending.
 		 */
 		if (node.getPath().startsWith("/r/p/")) {
 			node.setPath(node.getPath().replace("/r/p/", "/r/"));
@@ -471,8 +479,8 @@ public class NodeEditService {
 			}
 		}
 
-		NodeInfo newNodeInfo =
-				convert.convertToNodeInfo(ThreadLocals.getSessionContext(), session, node, true, false, -1, false, false);
+		NodeInfo newNodeInfo = convert.convertToNodeInfo(ThreadLocals.getSessionContext(), session, node, true, false,
+				-1, false, false);
 		res.setNode(newNodeInfo);
 
 		// todo-1: eventually we need a plugin-type architecture to decouple this kind
@@ -488,13 +496,14 @@ public class NodeEditService {
 				}
 
 				/*
-				 * when user first adds, this friendNode won't have the userNodeId yet, so add if not yet existing
+				 * when user first adds, this friendNode won't have the userNodeId yet, so add
+				 * if not yet existing
 				 */
 				if (userNodeId == null) {
 
 					/*
-					 * A userName containing "@" is considered a foreign Fediverse user and will trigger a WebFinger
-					 * search of them, and a load/update of their outbox
+					 * A userName containing "@" is considered a foreign Fediverse user and will
+					 * trigger a WebFinger search of them, and a load/update of their outbox
 					 */
 					if (friendUserName.contains("@")) {
 						adminRunner.run(s -> {
@@ -502,7 +511,8 @@ public class NodeEditService {
 								actPubService.loadForeignUserByUserName(s, friendUserName);
 							}
 
-							// The only time we pass true to load the user into the system is when they're being added as a
+							// The only time we pass true to load the user into the system is when they're
+							// being added as a
 							// friend.
 							actPubService.userEncountered(friendUserName, true);
 						});
@@ -526,7 +536,8 @@ public class NodeEditService {
 	}
 
 	/*
-	 * Removes the property specified in the request from the node specified in the request
+	 * Removes the property specified in the request from the node specified in the
+	 * request
 	 */
 	public DeletePropertyResponse deleteProperty(MongoSession session, DeletePropertyRequest req) {
 		DeletePropertyResponse res = new DeletePropertyResponse();
@@ -543,9 +554,10 @@ public class NodeEditService {
 	}
 
 	/*
-	 * When user pastes in a large amount of text and wants to have this text broken out into individual
-	 * nodes they can pass into here and double spaces become splitpoints, and this splitNode method
-	 * will break it all up into individual nodes.
+	 * When user pastes in a large amount of text and wants to have this text broken
+	 * out into individual nodes they can pass into here and double spaces become
+	 * splitpoints, and this splitNode method will break it all up into individual
+	 * nodes.
 	 */
 	public SplitNodeResponse splitNode(MongoSession session, SplitNodeRequest req) {
 		SplitNodeResponse res = new SplitNodeResponse();
@@ -575,16 +587,17 @@ public class NodeEditService {
 		long firstOrdinal = 0;
 
 		/*
-		 * When inserting inline all nodes go in right where the original node is, in order below it as
-		 * siblings
+		 * When inserting inline all nodes go in right where the original node is, in
+		 * order below it as siblings
 		 */
 		if (req.getSplitType().equalsIgnoreCase("inline")) {
 			parentForNewNodes = parentNode;
 			firstOrdinal = node.getOrdinal();
 		}
 		/*
-		 * but for a 'child' insert all new nodes are inserted as children of the original node, starting at
-		 * the top (ordinal), regardless of whether this node already has any children or not.
+		 * but for a 'child' insert all new nodes are inserted as children of the
+		 * original node, starting at the top (ordinal), regardless of whether this node
+		 * already has any children or not.
 		 */
 		else {
 			parentForNewNodes = node;
@@ -607,8 +620,8 @@ public class NodeEditService {
 				node.setModifyTime(now);
 				update.save(session, node);
 			} else {
-				SubNode newNode =
-						create.createNode(session, parentForNewNodes, null, firstOrdinal + idx, CreateNodeLocation.ORDINAL, false);
+				SubNode newNode = create.createNode(session, parentForNewNodes, null, firstOrdinal + idx,
+						CreateNodeLocation.ORDINAL, false);
 				newNode.setContent(part);
 				update.save(session, newNode);
 			}
@@ -655,10 +668,6 @@ public class NodeEditService {
 		}
 
 		if (req.isRecursive()) {
-			/*
-			 * todo-1: It would be more performant to build the "fromUserObjId.equals(toUserObjId)" condition
-			 * into the query itself and let MongoDB to the filtering for us
-			 */
 			for (SubNode n : read.getSubGraph(session, node, null, 0)) {
 				// log.debug("Node: path=" + path + " content=" + n.getContent());
 				if (fromUserNode == null) {
@@ -692,8 +701,8 @@ public class NodeEditService {
 	}
 
 	/*
-	 * This makes ALL the headings of all the sibling nodes match the heading level of the req.nodeId
-	 * passed in.
+	 * This makes ALL the headings of all the sibling nodes match the heading level
+	 * of the req.nodeId passed in.
 	 */
 	public UpdateHeadingsResponse updateHeadings(MongoSession session, UpdateHeadingsRequest req) {
 		UpdateHeadingsResponse res = new UpdateHeadingsResponse();
@@ -718,10 +727,6 @@ public class NodeEditService {
 		return res;
 	}
 
-	/*
-	 * todo-1: update to use subgraph query and then just use the slash-count in the path to determine
-	 * relative tree level here. Relative part being important of course.
-	 */
 	private void updateHeadingsForNode(MongoSession session, SubNode node, int level) {
 		if (node == null)
 			return;
@@ -740,44 +745,44 @@ public class NodeEditService {
 				content = content.substring(spaceIdx + 1);
 
 				/*
-				 * These strings (pound sign headings) could be generated dynamically, but this switch with them
-				 * hardcoded is more performant
+				 * These strings (pound sign headings) could be generated dynamically, but this
+				 * switch with them hardcoded is more performant
 				 */
 				switch (level) {
-					case 0: // this will be the root node (user selected node)
-						break;
-					case 1:
-						if (!nodeContent.startsWith("# ")) {
-							node.setContent("# " + content);
-						}
-						break;
-					case 2:
-						if (!nodeContent.startsWith("## ")) {
-							node.setContent("## " + content);
-						}
-						break;
-					case 3:
-						if (!nodeContent.startsWith("### ")) {
-							node.setContent("### " + content);
-						}
-						break;
-					case 4:
-						if (!nodeContent.startsWith("#### ")) {
-							node.setContent("#### " + content);
-						}
-						break;
-					case 5:
-						if (!nodeContent.startsWith("##### ")) {
-							node.setContent("##### " + content);
-						}
-						break;
-					case 6:
-						if (!nodeContent.startsWith("###### ")) {
-							node.setContent("###### " + content);
-						}
-						break;
-					default:
-						break;
+				case 0: // this will be the root node (user selected node)
+					break;
+				case 1:
+					if (!nodeContent.startsWith("# ")) {
+						node.setContent("# " + content);
+					}
+					break;
+				case 2:
+					if (!nodeContent.startsWith("## ")) {
+						node.setContent("## " + content);
+					}
+					break;
+				case 3:
+					if (!nodeContent.startsWith("### ")) {
+						node.setContent("### " + content);
+					}
+					break;
+				case 4:
+					if (!nodeContent.startsWith("#### ")) {
+						node.setContent("#### " + content);
+					}
+					break;
+				case 5:
+					if (!nodeContent.startsWith("##### ")) {
+						node.setContent("##### " + content);
+					}
+					break;
+				case 6:
+					if (!nodeContent.startsWith("###### ")) {
+						node.setContent("###### " + content);
+					}
+					break;
+				default:
+					break;
 				}
 			}
 		}
@@ -818,7 +823,8 @@ public class NodeEditService {
 
 	private boolean replaceText(MongoSession session, SubNode node, String search, String replace) {
 		String content = node.getContent();
-		if (content==null) return false;
+		if (content == null)
+			return false;
 		if (content.contains(search)) {
 			node.setContent(content.replace(search, replace));
 			return true;

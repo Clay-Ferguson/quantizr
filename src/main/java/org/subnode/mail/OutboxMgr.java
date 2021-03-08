@@ -62,7 +62,7 @@ public class OutboxMgr {
 	public void addInboxNotification(MongoSession session, String recieverUserName, SubNode userNode, SubNode node,
 			String notifyMessage) {
 
-		SubNode userInbox = read.getUserNodeByType(session, null, userNode, "### Inbox", NodeType.INBOX.s());
+		SubNode userInbox = read.getUserNodeByType(session, null, userNode, "### Inbox", NodeType.INBOX.s(), null);
 
 		if (userInbox != null) {
 			// log.debug("userInbox id=" + userInbox.getId().toHexString());

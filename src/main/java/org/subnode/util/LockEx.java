@@ -61,8 +61,7 @@ public class LockEx extends ReentrantLock {
 			}
 		} catch (Exception e) {
 			if (!allowRetries) {
-				throw new RuntimeEx("FAILED to obtain the lock during the allowed timeout. Lock: " + lockName,
-						e);
+				throw new RuntimeEx("FAILED to obtain the lock during the allowed timeout. Lock: " + lockName, e);
 			}
 			success = false;
 		}
@@ -152,7 +151,8 @@ public class LockEx extends ReentrantLock {
 		log.trace(sb.toString());
 	}
 
-	// todo-1: change to ExceptionUtils.getStackTrace(e)
+	// Note: We can's use ExceptionUtils.getStackTrace(e), because we support thread
+	// argument here
 	public static final String getStackTrace(Thread thread) {
 		if (thread == null) {
 			thread = Thread.currentThread();

@@ -67,7 +67,7 @@ public class ExportJsonService {
 	private static final ObjectWriter jsonWriter = objectMapper.writerWithDefaultPrettyPrinter();
 
 	/*
-	 * todo-1: need capability to handle binary files also, but before implementing
+	 * todo-2: need capability to handle binary files also, but before implementing
 	 * that look for any export options on the grid api itself.
 	 * 
 	 * Dumps all nodes that have property "pth" starting with 'pathPrefix', or all
@@ -101,7 +101,6 @@ public class ExportJsonService {
 				os = new BufferedOutputStream(new FileOutputStream(fullFileName));
 				final BufferedOutputStream _os = os;
 				iter.forEach((node) -> {
-
 					String binFileName = node.getStrProp(NodeProp.BIN_FILENAME.s());
 					if (binFileName != null) {
 						if (saveBinaryToFileSystem(binFileName, targetFolder, node)) {
@@ -118,7 +117,7 @@ public class ExportJsonService {
 						_os.write(newLine);
 						numDocs.setVal(numDocs.getVal() + 1);
 					} catch (Exception e) {
-						// todo-1
+						// todo-2
 						e.printStackTrace();
 					}
 				});
@@ -195,6 +194,9 @@ public class ExportJsonService {
 	 * Imports the data from /src/main/resources/nodes/[subFolder] into the db,
 	 * which will update the targetPath node path (like "/r/public"), content on the
 	 * tree.
+	 * 
+	 * NOTE: This code no longer being used, but I want to keep for future reference 
+	 * if we ever need to import JSON into the DB again in some automated way.
 	 */
 	public String resetNode(MongoSession session, String subFolder) {
 		try {

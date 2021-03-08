@@ -1,5 +1,6 @@
 package org.subnode.mongo;
 
+import java.util.Arrays;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
@@ -23,6 +24,7 @@ import org.subnode.model.client.NodeType;
 import org.subnode.model.client.PrincipalName;
 import org.subnode.model.client.PrivilegeType;
 import org.subnode.mongo.model.SubNode;
+import org.subnode.service.AclService;
 import org.subnode.util.ThreadLocals;
 import org.subnode.util.XString;
 
@@ -53,6 +55,9 @@ public class MongoRead {
 
     @Autowired
     private AppProp appProp;
+
+    @Autowired
+    private AclService aclService;
 
     /*
      * todo-0: this is ugly, confusing, and inefficient to be calling saveSession
@@ -255,7 +260,7 @@ public class MongoRead {
             if (!typeName.startsWith("sn:")) {
                 typeName = "sn:" + typeName;
             }
-            ret = getUserNodeByType(session, session.getUserName(), null, null, typeName);
+            ret = getUserNodeByType(session, session.getUserName(), null, null, typeName, null);
         }
         // Node name lookups are done by prefixing the search with a colon (:)
         else if (identifier.startsWith(":")) {
@@ -627,7 +632,7 @@ public class MongoRead {
         Query query = new Query();
 
         // get friends list node
-        SubNode friendsListNode = getUserNodeByType(session, userName, null, null, NodeType.FRIEND_LIST.s());
+        SubNode friendsListNode = getUserNodeByType(session, userName, null, null, NodeType.FRIEND_LIST.s(), null);
         if (friendsListNode == null)
             return null;
 
@@ -767,17 +772,17 @@ public class MongoRead {
      * Accepts either the 'user' or the 'userNode' for the user. It's best to pass
      * userNode if you have it, to avoid a DB query.
      */
-    public SubNode getUserNodeByType(MongoSession session, String user, SubNode userNode, String nodeName,
-            String type) {
+    public SubNode getUserNodeByType(MongoSession session, String userName, SubNode userNode, String nodeName,
+            String type, List<String> defaultPrivs) {
         if (userNode == null) {
-            if (user == null) {
-                user = ThreadLocals.getSessionContext().getUserName();
+            if (userName == null) {
+                userName = ThreadLocals.getSessionContext().getUserName();
             }
-            userNode = getUserNodeByUserName(session, user);
+            userNode = getUserNodeByUserName(session, userName);
         }
 
         if (userNode == null) {
-            log.warn("userNode not found for user name: " + user);
+            log.warn("userNode not found for user name: " + userName);
             return null;
         }
 
@@ -788,6 +793,12 @@ public class MongoRead {
             node = create.createNode(session, userNode, null, type, 0L, CreateNodeLocation.LAST, null, null, true);
             node.setOwner(userNode.getId());
             node.setContent(nodeName);
+
+            if (defaultPrivs != null) {
+                aclService.addPrivilege(session, node, PrincipalName.PUBLIC.s(),
+                        defaultPrivs /* Arrays.asList(PrivilegeType.READ.s()) */, null);
+            }
+
             update.save(session, node);
         }
         return node;

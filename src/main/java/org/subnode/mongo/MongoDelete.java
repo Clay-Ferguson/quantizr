@@ -116,14 +116,6 @@ public class MongoDelete {
 		auth.authRequireOwnerOfNode(session, node);
 		log.debug("Deleting under path: " + node.getPath());
 
-		/*
-		 * we save the session to be sure there's no conflicting between what cached
-		 * changes might be flagged as dirty that might be about to be deleted.
-		 * 
-		 * todo-1: potential optimization: just clear from the cache any nodes that have
-		 * a path starting with 'node.getPath()', and leave the rest in the cache. But
-		 * this will be rare that it has any performance impact.
-		 */
 		update.saveSession(session);
 
 		/*

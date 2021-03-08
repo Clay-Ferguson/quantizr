@@ -230,10 +230,6 @@ public class NodeRenderService {
 		nodeInfo.setChildren(new LinkedList<NodeInfo>());
 
 		/*
-		 * todo-1: a great optimization would be to allow caller to pass in an 'offset hint', based on
-		 * information it already knows about the last offset where scanToNode was found to jump over likely
-		 * unneeded records when searching for the scanToNode node.
-		 *
 		 * If we are scanning to a node we know we need to start from zero offset, or else we use the offset
 		 * passed in. Offset is the number of nodes to IGNORE before we start collecting nodes.
 		 */
@@ -245,7 +241,7 @@ public class NodeRenderService {
 		/*
 		 * todo-1: needed optimization to work well with large numbers of child nodes: If scanToNode is in
 		 * use, we should instead look up the node itself, and then get it's ordinal, and use that as a '>='
-		 * in the query to pull up the list, at least when the node ordering is ordinal. Note, if sort order
+		 * in the query to pull up the list when the node ordering is ordinal. Note, if sort order
 		 * is by a timestamp we'd need a ">=" on the timestamp itself instead. We request ROWS_PER_PAGE+1,
 		 * because that is enough to trigger 'endReached' logic to be set correctly
 		 */
@@ -272,7 +268,7 @@ public class NodeRenderService {
 		boolean endReached = false;
 
 		if (req.isGoToLastPage()) {
-			// todo-1: fix
+			// todo-2: fix
 			throw new RuntimeEx("No ability to go to last page yet in new mongo api.");
 			// offset = (int) nodeIter.getSize() - ROWS_PER_PAGE;
 			// if (offset < 0) {
