@@ -407,7 +407,7 @@ public class MongoUtil {
 	 * direct child, whereas '/abc/def/ghi' is a level deeper and NOT considered a
 	 * direct child of '/abc'
 	 */
-	public static String regexDirectChildrenOfPath(String path) {
+	public String regexDirectChildrenOfPath(String path) {
 		path = XString.stripIfEndsWith(path, "/");
 		return "^" + Pattern.quote(path) + "\\/([^\\/])*$";
 	}
@@ -420,7 +420,7 @@ public class MongoUtil {
 	 * match and ALSO '/abc/def/ghi' which is a level deeper and is also considered
 	 * a match
 	 */
-	public static String regexRecursiveChildrenOfPath(String path) {
+	public String regexRecursiveChildrenOfPath(String path) {
 		path = XString.stripIfEndsWith(path, "/");
 		return "^" + Pattern.quote(path) + "\\/(.+)$";
 	}

@@ -107,7 +107,7 @@ public class MongoThreadLocal {
 
 		/*
 		 * If we are setting this node to dirty, but we already see another copy of the
-		 * same nodeId in memory, this is a problem and will mean which ever node
+		 * same nodeId in memory, this is a problem and will mean whichever node
 		 * happens to be saved 'last' will overwrite, so this *may* result in data loss.
 		 * 
 		 * todo-1: Should we find a way to be sure this never happens? This is basically
@@ -115,8 +115,8 @@ public class MongoThreadLocal {
 		 * 'work'
 		 */
 		if (nodeFound != null && nodeFound.hashCode() != node.hashCode()) {
-			log.debug("*************** oops multiple instance of object:" + node.getId().toHexString()
-					+ " are in memory. Ignoring attempt to set the second one to dirty");
+			log.debug("*************** multiple instances of objectId " + node.getId().toHexString()
+					+ " are in memory.");
 			return;
 		}
 

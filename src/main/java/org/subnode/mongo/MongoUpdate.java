@@ -60,8 +60,7 @@ public class MongoUpdate {
 				}
 
 				/*
-				 * We use 'nodes' list to avoid a concurrent modification excption in the loop below that deletes
-				 * nodes, because each time we delete a node we remove it from the 'dirtyNodes' on the threadlocals
+				 * We use 'nodes' list to avoid a concurrent modification exception in the loop below
 				 */
 				List<SubNode> nodes = new LinkedList<SubNode>();
 

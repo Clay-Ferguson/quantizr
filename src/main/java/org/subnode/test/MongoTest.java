@@ -27,7 +27,7 @@ public class MongoTest implements TestIntf {
 	private static final Logger log = LoggerFactory.getLogger(MongoTest.class);
 
 	@Autowired
-	private MongoUtil util;
+	private MongoUtil mongoUtil;
 
 	@Autowired
 	private MongoCreate create;
@@ -113,13 +113,13 @@ public class MongoTest implements TestIntf {
 
 	public void testPathRegex() {
 		// Direct Children Test
-		String dc = MongoUtil.regexDirectChildrenOfPath("/abc");
+		String dc = mongoUtil.regexDirectChildrenOfPath("/abc");
 		verify("/abc/def".matches(dc));
 		verify(!"/abc/def/x".matches(dc));
 		verify(!"/abcx".matches(dc));
 
 		// Recursive Children Test
-		String rc = MongoUtil.regexRecursiveChildrenOfPath("/abc");
+		String rc = mongoUtil.regexRecursiveChildrenOfPath("/abc");
 		verify("/abc/def".matches(rc));
 		verify("/abc/def/x".matches(rc));
 		verify("/abc/def/xyz/nop".matches(rc));

@@ -93,7 +93,7 @@ public class MongoDelete {
 	 * GRID nodes (binary files), those orphans will get cleaned up later on, but
 	 * not synchronously or in this method.
 	 * 
-	 * todo-2: However, it would be better if we have the 'path' stored in the
+	 * todo-2: However, we could also have the 'path' stored in the
 	 * GridFS metadata so we can use a 'regex' query to delete all the binaries
 	 * (recursively under any node, using that path prefix as the criteria) which is
 	 * exacly like the one below for deleting the nodes themselves.
