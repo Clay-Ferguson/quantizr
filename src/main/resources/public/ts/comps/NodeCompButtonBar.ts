@@ -10,7 +10,7 @@ import { Comp } from "../widget/base/Comp";
 import { Button } from "../widget/Button";
 import { ButtonBar } from "../widget/ButtonBar";
 import { Checkbox } from "../widget/Checkbox";
-import { HorizontalLayout } from "../widget/HorizontalLayout";
+import { Div } from "../widget/Div";
 import { Icon } from "../widget/Icon";
 import { IconButton } from "../widget/IconButton";
 
@@ -20,11 +20,12 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
 });
 
 /* General Widget that doesn't fit any more reusable or specific category other than a plain Div, but inherits capability of Comp class */
-export class NodeCompButtonBar extends HorizontalLayout {
+export class NodeCompButtonBar extends Div {
 
     constructor(public node: J.NodeInfo, public allowNodeMove: boolean, private level: number, private extraButtons: IconButton[]) {
-        super(null, "marginLeft", {
-            id: "NodeCompButtonBar_" + node.id
+        super(null, {
+            id: "NodeCompButtonBar_" + node.id,
+            className: "marginLeft"
         });
     }
 
