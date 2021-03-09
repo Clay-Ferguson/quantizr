@@ -28,7 +28,7 @@ export class EditPrivsTableRow extends ListBoxRow {
 
         aclEntry.privileges.forEach(function (privilege, index) {
             div.addChild(
-                new HorizontalLayout([
+                new Div(null, null, [
                     new Span(privilege.privilegeName),
                     new ButtonBar([
                         new Button("Remove", () => {

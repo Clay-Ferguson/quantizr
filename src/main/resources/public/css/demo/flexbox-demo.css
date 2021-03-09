@@ -1,0 +1,23 @@
+#container {
+    height: 100%;
+    width: 100%;
+    display: flex;
+}
+
+#leftThing {
+    /* width: 25%; */
+    background-color: blue;
+    margin-right: 1em;
+}
+
+#content {
+    /* width: 50%; */
+    background-color: green;
+    margin-right: 1em;
+    width: 1000px;
+}
+
+#rightThing {
+    /* width: 25%; */
+    background-color: yellow;
+}

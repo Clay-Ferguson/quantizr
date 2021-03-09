@@ -838,10 +838,10 @@ input[type="radio"] {
     padding: 4px;
 }
 
+
 .horizontalLayout {
-    //margin-top: 5px;
-    //margin-left: 5px;
-    // display: inline-block; //no don't do this, be carful this affects several things.
+    // flex will layout things all on the same horizontal row
+   display: flex;
 }
 
 @import 'button.scss';

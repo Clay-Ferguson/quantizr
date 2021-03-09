@@ -1,5 +1,8 @@
 import React from "react";
 
+// Example use:
+// http://localhost:8182/demo/tsx-test
+
 function TsxApp() {
     return (
         <div>
