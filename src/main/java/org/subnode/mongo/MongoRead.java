@@ -652,7 +652,7 @@ public class MongoRead {
      * 
      * WARNING. "SubNode.prp" is a COLLECTION and therefore not searchable. Beware.
      * 
-     * timeRangeType: futureOnly, pastOnly, null
+     * timeRangeType: futureOnly, pastOnly, all
      */
     public Iterable<SubNode> searchSubGraph(MongoSession session, SubNode node, String prop, String text,
             String sortField, int limit, boolean fuzzy, boolean caseSensitive, String timeRangeType) {
@@ -720,9 +720,9 @@ public class MongoRead {
                 else if ("pastOnly".equals(timeRangeType)) {
                     query.addCriteria(Criteria.where(sortField).lt(new Date().getTime()));
                 }
-                // if showing all dates the condition here is that the e at least IS a 'date'
+                // if showing all dates the condition here is that there at least IS a 'date'
                 // prop on the node
-                else {
+                else if ("all".equals(timeRangeType)) {
                     query.addCriteria(Criteria.where(sortField).ne(null));
                 }
             }
