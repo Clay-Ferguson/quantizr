@@ -41,10 +41,7 @@ export class UserProfileView extends AppTab {
         }, [
             new Anchor("#userProfileTab", "Profile", {
                 "data-toggle": "tab",
-                className: "nav-link" + (state.activeTab === "userProfileTab" ? " active" : ""),
-                onClick: () => {
-                    S.meta64.selectTab("userProfileTab");
-                }
+                className: "nav-link" + (state.activeTab === "userProfileTab" ? " active" : "")
             })
         ]);
     }

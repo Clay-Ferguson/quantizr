@@ -32,10 +32,7 @@ export class SearchView extends AppTab {
         }, [
             new Anchor("#searchTab", "Search", {
                 "data-toggle": "tab",
-                className: "nav-link" + (state.activeTab === "searchTab" ? " active" : ""),
-                onClick: () => {
-                    S.meta64.selectTab("searchTab");
-                }
+                className: "nav-link" + (state.activeTab === "searchTab" ? " active" : "")
             })
         ]);
     }

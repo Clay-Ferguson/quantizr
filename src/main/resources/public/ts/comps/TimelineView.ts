@@ -32,10 +32,7 @@ export class TimelineView extends AppTab {
         }, [
             new Anchor("#timelineTab", "Timeline", {
                 "data-toggle": "tab",
-                className: "nav-link" + (state.activeTab === "timelineTab" ? " active" : ""),
-                onClick: () => {
-                    S.meta64.selectTab("timelineTab");
-                }
+                className: "nav-link" + (state.activeTab === "timelineTab" ? " active" : "")
             })
         ]);
     }

@@ -33,10 +33,7 @@ export class MainTabComp extends AppTab {
         }, [
             new Anchor("#mainTab", "Main", {
                 "data-toggle": "tab",
-                className: "nav-link" + (state.activeTab === "mainTab" ? " active" : ""),
-                onClick: () => {
-                    S.meta64.selectTab("mainTab");
-                }
+                className: "nav-link" + (state.activeTab === "mainTab" ? " active" : "")
             })
         ]);
     }

@@ -49,10 +49,7 @@ export class FeedView extends AppTab {
         }, [
             new Anchor("#feedTab", "Feed", {
                 "data-toggle": "tab",
-                className: "nav-link" + (state.activeTab === "feedTab" ? " active" : ""),
-                onClick: () => {
-                    S.meta64.selectTab("feedTab");
-                }
+                className: "nav-link" + (state.activeTab === "feedTab" ? " active" : "")
             })
         ]);
     }
