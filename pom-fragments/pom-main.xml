@@ -165,7 +165,7 @@ that's used during builds.
 						<artifactId>frontend-maven-plugin</artifactId>
 						<!-- Use the latest released version:
 				https://repo1.maven.org/maven2/com/github/eirslett/frontend-maven-plugin/ -->
-						<version>1.6</version>
+						<version>1.9.1</version>
 
 						<configuration>
 							<workingDirectory>src/main/resources/public</workingDirectory>
@@ -462,7 +462,7 @@ that's used during builds.
 						<artifactId>frontend-maven-plugin</artifactId>
 						<!-- Use the latest released version:
 				https://repo1.maven.org/maven2/com/github/eirslett/frontend-maven-plugin/ -->
-						<version>1.6</version>
+						<version>1.9.1</version>
 
 						<configuration>
 							<workingDirectory>src/main/resources/public</workingDirectory>
@@ -628,7 +628,7 @@ that's used during builds.
 						<artifactId>frontend-maven-plugin</artifactId>
 						<!-- Use the latest released version:
 				https://repo1.maven.org/maven2/com/github/eirslett/frontend-maven-plugin/ -->
-						<version>1.6</version>
+						<version>1.9.1</version>
 
 						<configuration>
 							<workingDirectory>src/main/resources/public</workingDirectory>
@@ -766,7 +766,7 @@ that's used during builds.
 						<artifactId>frontend-maven-plugin</artifactId>
 						<!-- Use the latest released version:
 						https://repo1.maven.org/maven2/com/github/eirslett/frontend-maven-plugin/ -->
-						<version>1.6</version>
+						<version>1.9.1</version>
 
 						<configuration>
 							<workingDirectory>src/main/resources/public</workingDirectory>
