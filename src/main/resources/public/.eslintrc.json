@@ -20,6 +20,14 @@
         "@typescript-eslint"
     ],
     "rules": {
+        "no-var": "off",
+        "node/handle-callback-err": "off",
+        "multiline-ternary": "off",
+        "no-unreachable-loop": "off",
+        "node/no-callback-literal": "off",
+        "no-empty": "off",
+        // all the above added after upgrading to latest version and I may not keep.
+
         "quotes": ["error", "double", { "avoidEscape": true }],
         "semi": ["error", "always"],
         // "indent": ["error", 4],

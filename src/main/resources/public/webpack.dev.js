@@ -1,4 +1,7 @@
 const webpack = require("webpack");
+
+// for webpack5 destructure like this:
+// const { merge } = require("webpack-merge");
 const merge = require("webpack-merge");
 const common = require("./webpack.common.js");
 

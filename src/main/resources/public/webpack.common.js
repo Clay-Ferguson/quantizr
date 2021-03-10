@@ -29,6 +29,8 @@ module.exports = {
             {
                 test: /\.tsx?$/,
                 loader: "awesome-typescript-loader",
+
+                // NOTE: for webpack 5 I think this should be "options", instead of "query"
                 query: {
                     // Use this to point to your tsconfig.json.
                     configFileName: "./tsconfig." + env + ".json"

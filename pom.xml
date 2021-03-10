@@ -20,6 +20,7 @@ that's used during builds.
 	<parent>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
+		<!-- <version>2.4.3</version> This has a few breaking changes. -->
 		<version>2.2.2.RELEASE</version>
 		<relativePath />
 		<!-- lookup parent from repository -->
