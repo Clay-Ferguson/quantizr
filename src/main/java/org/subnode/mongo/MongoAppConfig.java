@@ -1,8 +1,7 @@
 package org.subnode.mongo;
 
-import org.subnode.config.AppProp;
-import org.subnode.exception.base.RuntimeEx;
-import org.subnode.util.ExUtil;
+import static org.bson.codecs.configuration.CodecRegistries.fromProviders;
+import static org.bson.codecs.configuration.CodecRegistries.fromRegistries;
 
 import javax.annotation.PostConstruct;
 
@@ -11,7 +10,6 @@ import com.mongodb.MongoClientSettings;
 import com.mongodb.MongoCredential;
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoClients;
-
 import com.mongodb.client.MongoDatabase;
 import com.mongodb.client.gridfs.GridFSBucket;
 import com.mongodb.client.gridfs.GridFSBuckets;
@@ -23,16 +21,17 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.data.mongodb.MongoDbFactory;
+import org.springframework.data.mongodb.MongoDatabaseFactory;
 import org.springframework.data.mongodb.config.AbstractMongoClientConfiguration;
 import org.springframework.data.mongodb.core.MongoTemplate;
-import org.springframework.data.mongodb.core.SimpleMongoClientDbFactory;
+import org.springframework.data.mongodb.core.SimpleMongoClientDatabaseFactory;
 import org.springframework.data.mongodb.core.WriteResultChecking;
+import org.springframework.data.mongodb.core.convert.MappingMongoConverter;
 import org.springframework.data.mongodb.gridfs.GridFsTemplate;
 import org.springframework.data.mongodb.repository.config.EnableMongoRepositories;
-
-import static org.bson.codecs.configuration.CodecRegistries.fromProviders;
-import static org.bson.codecs.configuration.CodecRegistries.fromRegistries;
+import org.subnode.config.AppProp;
+import org.subnode.exception.base.RuntimeEx;
+import org.subnode.util.ExUtil;
 
 //Ref: http://mongodb.github.io/mongo-java-driver/3.7/driver/getting-started/quick-start-pojo/
 
@@ -44,7 +43,7 @@ public class MongoAppConfig extends AbstractMongoClientConfiguration {
 	public static final String databaseName = "database";
 	private MongoClient mongoClient;
 	private GridFSBucket gridFsBucket;
-	private SimpleMongoClientDbFactory factory;
+	private SimpleMongoClientDatabaseFactory factory;
 
 	/**
 	 * we have this so we can set it to true and know that MongoDb failed and
@@ -55,13 +54,17 @@ public class MongoAppConfig extends AbstractMongoClientConfiguration {
 	@Autowired
 	private AppProp appProp;
 
+	@Autowired
+	MappingMongoConverter converter;
+
 	@PostConstruct
 	public void postConstruct() {
-		// log.debug("MongoAppConfig.postConstruct: mongoAdminPassword=" + appProp.getMongoAdminPassword());
+		// log.debug("MongoAppConfig.postConstruct: mongoAdminPassword=" +
+		// appProp.getMongoAdminPassword());
 	}
 
 	@Bean
-	public MongoDbFactory mongoDbFactory() {
+	public MongoDatabaseFactory mongoDbFactory() {
 		if (connectionFailed)
 			return null;
 
@@ -69,7 +72,7 @@ public class MongoAppConfig extends AbstractMongoClientConfiguration {
 			try {
 				MongoClient mc = mongoClient();
 				if (mc != null) {
-					factory = new SimpleMongoClientDbFactory(mc, databaseName);
+					factory = new SimpleMongoClientDatabaseFactory(mc, databaseName);
 				} else {
 					return null;
 				}
@@ -88,9 +91,9 @@ public class MongoAppConfig extends AbstractMongoClientConfiguration {
 			return null;
 
 		if (gridFsBucket == null) {
-			MongoDbFactory mdbf = mongoDbFactory();
+			MongoDatabaseFactory mdbf = mongoDbFactory();
 			if (mdbf != null) {
-				MongoDatabase db = mdbf.getDb();
+				MongoDatabase db = mdbf.getMongoDatabase();
 				gridFsBucket = GridFSBuckets.create(db);
 			}
 		}
@@ -152,7 +155,7 @@ public class MongoAppConfig extends AbstractMongoClientConfiguration {
 
 				if (mongoClient != null) {
 
-					if (credential!=null) {
+					if (credential != null) {
 						for (String db : mongoClient.listDatabaseNames()) {
 							log.debug("MONGO DB NAME: " + db);
 						}
@@ -178,7 +181,7 @@ public class MongoAppConfig extends AbstractMongoClientConfiguration {
 	 */
 	@Bean
 	public MongoTemplate mongoTemplate() throws Exception {
-		MongoDbFactory mdbf = mongoDbFactory();
+		MongoDatabaseFactory mdbf = mongoDbFactory();
 		if (mdbf != null) {
 			MongoTemplate mt = new MongoTemplate(mdbf);
 			mt.setWriteResultChecking(WriteResultChecking.EXCEPTION);
@@ -200,9 +203,9 @@ public class MongoAppConfig extends AbstractMongoClientConfiguration {
 
 	@Bean
 	public GridFsTemplate gridFsTemplate() throws Exception {
-		MongoDbFactory mdbf = mongoDbFactory();
+		MongoDatabaseFactory mdbf = mongoDbFactory();
 		if (mdbf != null) {
-			return new GridFsTemplate(mdbf, mappingMongoConverter());
+			return new GridFsTemplate(mdbf, converter);
 		} else {
 			return null;
 		}

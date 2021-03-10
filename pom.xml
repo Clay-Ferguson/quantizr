@@ -20,8 +20,14 @@ that's used during builds.
 	<parent>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
-		<!-- <version>2.4.3</version> This has a few breaking changes. -->
-		<version>2.2.2.RELEASE</version>
+
+		<!--
+			Tip: When upgrading this verison it's a good ideal to blow away
+			the '.m2' hidden folder on your machine (maven cache) and also 
+			enable this line in _build.sh: "mvn dependency:sources", so you get
+			all new source AND remove all the old stuff
+		-->
+		<version>2.4.3</version>
 		<relativePath />
 		<!-- lookup parent from repository -->
 	</parent>
