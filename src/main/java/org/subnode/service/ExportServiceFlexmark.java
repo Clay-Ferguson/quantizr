@@ -206,9 +206,10 @@ public class ExportServiceFlexmark {
 			style = " style='width:" + imgSize + "'";
 		}
 
-		markdown.append("\n<img src='" + appProp.getHostAndPort() + "/mobile/api/bin/" + bin + "?nodeId="
-				+ node.getId().toHexString() + "&token=" + ThreadLocals.getSessionContext().getUserToken() + "' "
-				+ style + "/>\n");
+		String src = appProp.getHostAndPort() + "/mobile/api/bin/" + bin + "?nodeId=" + node.getId().toHexString()
+				+ "&token=" + ThreadLocals.getSessionContext().getUserToken();
+
+		markdown.append("\n<img src='" + src + "' " + style + "/>\n");
 	}
 
 	/**
