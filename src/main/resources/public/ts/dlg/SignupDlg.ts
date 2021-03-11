@@ -11,10 +11,6 @@ import { ButtonBar } from "../widget/ButtonBar";
 import { Form } from "../widget/Form";
 import { TextField } from "../widget/TextField";
 
-// #recaptcha-disabled
-// declare var grecaptcha;
-// declare var reCaptcha3SiteKey;
-
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
     S = ctx;
@@ -100,12 +96,6 @@ export class SignupDlg extends DialogBase {
         if (!this.validate()) {
             return;
         }
-        // #recaptcha-disabled
-        // grecaptcha.ready(() => {
-        //     grecaptcha.execute(reCaptcha3SiteKey, { action: 'submit' }).then((token) => {
-        //         this.signupNow(token);
-        //     });
-        // });
         this.signupNow(null);
     }
 

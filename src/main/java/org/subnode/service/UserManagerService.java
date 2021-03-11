@@ -404,22 +404,7 @@ public class UserManagerService {
 		final String password = req.getPassword().trim();
 		final String email = req.getEmail();
 
-		/*
-		 * Recaptcha was creating some VERY bizarre rendering problems in the browser.
-		 * Apparenty the way it tries to inject itself into the webpage is flawed in
-		 * some way and I really don't want that anyway. Perhaps I can render the
-		 * 'signup' page ONLY with recaptcha enabled, and for every other page in the
-		 * system have it completely removed from any HTML/JS. (todo-2)
-		 */
-		// #recaptcha-disabled
-		// if (!verifyCaptcha(req.getReCaptchaToken())) {
-		// res.setMessage("Sorry, reCaptcha scored too low.");
-		// res.setSuccess(false);
-		// return res;
-		// }
-
 		log.debug("Signup: userName=" + userName + " email=" + email);
-
 		res.setSuccess(true);
 
 		/* throw exceptions of the username or password are not valid */
@@ -453,45 +438,6 @@ public class UserManagerService {
 
 		res.setMessage("success");
 		return res;
-	}
-
-	private boolean verifyCaptcha(String reCaptchaToken) {
-		boolean ret = false;
-		try {
-			String secretKey = appProp.getReCaptcha3SecretKey();
-
-			// if secret key not configured, bypass check.
-			if (StringUtils.isEmpty(secretKey)) {
-				return true;
-			}
-			String url = "https://www.google.com/recaptcha/api/siteverify?secret=" + secretKey + "&response="
-					+ reCaptchaToken;
-
-			HttpHeaders headers = new HttpHeaders();
-			HttpEntity<String> requestEntity = new HttpEntity<>("", headers);
-
-			ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.POST, requestEntity, String.class);
-			// log.debug("RAW RESULT: " + response.getBody());
-
-			Map<String, Object> respMap = mapper.readValue(response.getBody(),
-					new TypeReference<Map<String, Object>>() {
-					});
-			// log.debug(XString.prettyPrint(respMap));
-
-			Boolean success = (Boolean) respMap.get("success");
-			Double score = (Double) respMap.get("score");
-
-			// Google recommends 0.5 as default threshold:
-			// https://developers.google.com/recaptcha/docs/v3
-			if (success.booleanValue() && score.doubleValue() >= 0.5) {
-				// log.debug("Success=" + success + " score=" + score);
-				ret = true;
-			}
-
-		} catch (Exception e) {
-			log.error("Failed in restTemplate.exchange", e);
-		}
-		return ret;
 	}
 
 	/*
