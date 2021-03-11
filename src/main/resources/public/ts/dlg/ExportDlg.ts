@@ -1,4 +1,5 @@
 import { AppState } from "../AppState";
+import { CompValueHolder } from "../CompValueHolder";
 import { Constants as C } from "../Constants";
 import { DialogBase } from "../DialogBase";
 import * as J from "../JavaIntf";
@@ -10,6 +11,9 @@ import { Anchor } from "../widget/Anchor";
 import { CompIntf } from "../widget/base/CompIntf";
 import { Button } from "../widget/Button";
 import { ButtonBar } from "../widget/ButtonBar";
+import { Checkbox } from "../widget/Checkbox";
+import { Div } from "../widget/Div";
+import { Heading } from "../widget/Heading";
 import { RadioButton } from "../widget/RadioButton";
 import { RadioButtonGroup } from "../widget/RadioButtonGroup";
 import { TextField } from "../widget/TextField";
@@ -24,11 +28,13 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
 export class ExportDlg extends DialogBase {
 
     fileNameState: ValidatedState<any> = new ValidatedState<any>();
+    saveToIpfsState: CompValueHolder<boolean> = new CompValueHolder<boolean>(this, "toIpfs");
 
     constructor(state: AppState, private node: NodeInfo) {
         super("Export", null, false, state);
         this.mergeState({
             exportType: "zip"
+            // toIpfs: false <--- set by by 'saveToIpfsState'
         });
         this.fileNameState.setValue(node.name);
     }
@@ -44,6 +50,9 @@ export class ExportDlg extends DialogBase {
                 this.createRadioButton("PDF", "pdf"),
                 this.createRadioButton("HTML", "html")
             ], "radioButtonsBar"),
+            new Div(null, null, [
+                new Checkbox("Save to IPFS", null, this.saveToIpfsState)
+            ]),
             new ButtonBar([
                 new Button("Export", this.exportNodes, null, "btn-primary"),
                 new Button("Close", this.close)
@@ -70,7 +79,8 @@ export class ExportDlg extends DialogBase {
         S.util.ajax<J.ExportRequest, J.ExportResponse>("export", {
             nodeId: this.node.id,
             exportExt: state.exportType,
-            fileName: this.fileNameState.getValue()
+            fileName: this.fileNameState.getValue(),
+            toIpfs: state.toIpfs
         }, (res: J.ExportResponse) => {
             this.exportResponse(res);
         });
@@ -82,7 +92,9 @@ export class ExportDlg extends DialogBase {
         let hostAndPort: string = S.util.getHostAndPort();
         /* the 'v' arg is for cachebusting. Browser won't download same file once cached, but eventually
         the plan is to have the export return the actual md5 of the export for use here */
+
         let downloadLink = hostAndPort + "/file/" + res.fileName + "?disp=attachment&v=" + (new Date().getTime());
+
         if (S.util.checkSuccess("Export", res)) {
             new MessageDlg(
                 "Export successful.<p>Use the download link below now, to get the file.",
@@ -91,7 +103,9 @@ export class ExportDlg extends DialogBase {
                 new VerticalLayout([
                     // new Anchor(hostAndPort + "/file/" + res.fileName + "?disp=inline", "Raw View", { "target": "_blank" }),
                     // new Anchor(hostAndPort + "/view/" + res.fileName, "Formatted View", { "target": "_blank" }),
-                    new Anchor(downloadLink, "Download: " + downloadLink, null)
+                    !res.ipfsCid ? new Anchor(downloadLink, "Download: " + downloadLink, null) : null,
+                    res.ipfsCid ? new Heading(5, "IPFS CID: " + res.ipfsCid) : null,
+                    res.ipfsMime ? new Heading(5, "mime type: " + res.ipfsMime) : null
                 ]), false, 0, this.appState
             ).open();
 

@@ -10,6 +10,8 @@ public class ExportRequest extends RequestBase {
 
 	private String fileName;
 
+	private boolean toIpfs;
+
 	public String getNodeId() {
 		return nodeId;
 	}
@@ -32,5 +34,13 @@ public class ExportRequest extends RequestBase {
 
 	public void setExportExt(String exportExt) {
 		this.exportExt = exportExt;
+	}
+
+	public boolean isToIpfs() {
+		return toIpfs;
+	}
+
+	public void setToIpfs(boolean toIpfs) {
+		this.toIpfs = toIpfs;
 	}
 }

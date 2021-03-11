@@ -56,6 +56,7 @@ export interface ExportRequest extends RequestBase {
     nodeId: string;
     exportExt: string;
     fileName: string;
+    toIpfs: boolean;
 }
 
 export interface FileSearchRequest extends RequestBase {
@@ -342,6 +343,8 @@ export interface DeletePropertyResponse extends ResponseBase {
 }
 
 export interface ExportResponse extends ResponseBase {
+    ipfsCid: string;
+    ipfsMime: string;
     fileName: string;
 }
 

@@ -50,6 +50,7 @@ import org.subnode.response.PublishNodeToIpfsResponse;
 import org.subnode.util.Const;
 import org.subnode.util.ExUtil;
 import org.subnode.util.LimitedInputStreamEx;
+import org.subnode.util.StreamUtil;
 import org.subnode.util.ThreadLocals;
 import org.subnode.util.Util;
 import org.subnode.util.ValContainer;
@@ -84,9 +85,9 @@ public class IPFSService {
     private AppProp appProp;
 
     /**
-     * Looks up node by 'nodeId', and gets the 'ipfs:link' property, which is
-     * used to retrieve the MerkleNode (as JSON), and then pretty prints it and
-     * returns it.
+     * Looks up node by 'nodeId', and gets the 'ipfs:link' property, which is used
+     * to retrieve the MerkleNode (as JSON), and then pretty prints it and returns
+     * it.
      */
     public final String getNodeInfo(MongoSession session, String nodeId) {
         String ret = "";
@@ -270,6 +271,22 @@ public class IPFSService {
         return writeFromStream(session, "/api/v0/dag/put", stream, mimeType, streamSize, cid);
     }
 
+    public MerkleLink addFileFromString(MongoSession session, String text, String mimeType) {
+        // the following other values are supposedly in the return...
+        // {
+        // "Bytes": "<int64>",
+        // "Hash": "<string>",
+        // "Name": "<string>",
+        // "Size": "<string>"
+        // }
+        InputStream stream = IOUtils.toInputStream(text);
+        try {
+            return addFromStream(session, stream, mimeType, null, null);
+        } finally {
+            StreamUtil.close(stream);
+        }
+    }
+
     public MerkleLink addFileFromStream(MongoSession session, String fileName, InputStream stream, String mimeType,
             ValContainer<Integer> streamSize, ValContainer<String> cid) {
         // the following other values are supposedly in the return...
@@ -320,6 +337,7 @@ public class IPFSService {
         return writeFromStream(session, "/api/v0/tar/add", stream, mimeType, streamSize, cid);
     }
 
+    // todo-0: remove mimeType from here (not used)
     public MerkleLink writeFromStream(MongoSession session, String path, InputStream stream, String mimeType,
             ValContainer<Integer> streamSize, ValContainer<String> cid) {
         // log.debug("Writing file: " + path);
@@ -338,10 +356,16 @@ public class IPFSService {
             ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.POST, requestEntity, String.class);
             MediaType contentType = response.getHeaders().getContentType();
 
+            log.debug("writeFromStream Response: " + XString.prettyPrint(response));
+
             if (MediaType.APPLICATION_JSON.equals(contentType)) {
-                ret = XString.jsonMapper.readValue(response.getBody(), MerkleLink.class);
-                if (cid != null) {
-                    cid.setVal(ret.getHash());
+                if (StringUtils.isEmpty(response.getBody())) {
+                    log.debug("no response body");
+                } else {
+                    ret = XString.jsonMapper.readValue(response.getBody(), MerkleLink.class);
+                    if (cid != null) {
+                        cid.setVal(ret.getHash());
+                    }
                 }
             }
 
@@ -365,11 +389,14 @@ public class IPFSService {
             HttpEntity<MultiValueMap<String, Object>> requestEntity = new HttpEntity<>(bodyMap, headers);
 
             //////
-            // todo-1: this kind of way can get the class directly from spring without us having to pare it as json, it just comes right
-            // back in the 'getBody' as the correctly typed json. Do this throughout the code where possible.
-            // ResponseEntity<?> response = restTemplate.exchange(url, HttpMethod.GET, requestEntity, clazz);
+            // todo-1: this kind of way can get the class directly from spring without us
+            ////// having to pare it as json, it just comes right
+            // back in the 'getBody' as the correctly typed json. Do this throughout the
+            ////// code where possible.
+            // ResponseEntity<?> response = restTemplate.exchange(url, HttpMethod.GET,
+            ////// requestEntity, clazz);
             // if (response != null) {
-            //     return response.getBody();
+            // return response.getBody();
             // }
             //////
 

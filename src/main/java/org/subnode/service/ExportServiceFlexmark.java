@@ -18,6 +18,7 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;
 import org.subnode.config.AppProp;
+import org.subnode.model.MerkleLink;
 import org.subnode.model.client.NodeProp;
 import org.subnode.mongo.MongoRead;
 import org.subnode.mongo.MongoSession;
@@ -48,6 +49,9 @@ public class ExportServiceFlexmark {
 	@Autowired
 	private MongoRead read;
 
+	@Autowired
+	private IPFSService ipfsService;
+
 	private MongoSession session;
 
 	private String shortFileName;
@@ -57,6 +61,7 @@ public class ExportServiceFlexmark {
 	private String format;
 
 	private ExportRequest req;
+	private ExportResponse res;
 
 	/*
 	 * Exports the node specified in the req. If the node specified is "/", or the
@@ -72,6 +77,7 @@ public class ExportServiceFlexmark {
 		this.session = session;
 		this.format = format;
 		this.req = req;
+		this.res = res;
 
 		String nodeId = req.getNodeId();
 
@@ -99,6 +105,7 @@ public class ExportServiceFlexmark {
 		String fileName = util.getExportFileName(req.getFileName(), exportNode);
 		shortFileName = fileName + "." + format;
 		fullFileName = appProp.getAdminDataFolder() + File.separator + shortFileName;
+		boolean wroteFile = false;
 
 		FileOutputStream out = null;
 		try {
@@ -123,7 +130,8 @@ public class ExportServiceFlexmark {
 			options.set(Parser.EXTENSIONS, Arrays.asList(TablesExtension.create(), TocExtension.create()));
 			options.set(TocExtension.LEVELS, TocOptions.getLevels(1, 2, 3, 4, 5, 6));
 
-			// This numbering works in the TOC but I haven't figured out how to number the actual headings in the body of the document itself.
+			// This numbering works in the TOC but I haven't figured out how to number the
+			// actual headings in the body of the document itself.
 			// options.set(TocExtension.IS_NUMBERED, true);
 
 			Parser parser = Parser.builder(options).build();
@@ -137,10 +145,21 @@ public class ExportServiceFlexmark {
 			String html = generateHtml(body);
 
 			if ("html".equals(format)) {
-				FileUtils.writeEntireFile(fullFileName, html);
+				if (req.isToIpfs()) {
+					String mime = "text/html";
+					MerkleLink ret = ipfsService.addFileFromString(session, html, mime);
+					if (ret != null) {
+						res.setIpfsCid(ret.getHash());
+						res.setIpfsMime(mime);
+					}
+				} else {
+					FileUtils.writeEntireFile(fullFileName, html);
+					wroteFile = true;
+				}
 			} else if ("pdf".equals(format)) {
 				out = new FileOutputStream(new File(fullFileName));
 				PdfConverterExtension.exportToPdf(out, html, "", options);
+				wroteFile = true;
 			} else {
 				throw new RuntimeException("invalid format.");
 			}
@@ -149,7 +168,9 @@ public class ExportServiceFlexmark {
 			throw ExUtil.wrapEx(ex);
 		} finally {
 			StreamUtil.close(out);
-			(new File(fullFileName)).deleteOnExit();
+			if (wroteFile) {
+				(new File(fullFileName)).deleteOnExit();
+			}
 		}
 	}
 
@@ -186,7 +207,8 @@ public class ExportServiceFlexmark {
 		}
 
 		markdown.append("\n<img src='" + appProp.getHostAndPort() + "/mobile/api/bin/" + bin + "?nodeId="
-				+ node.getId().toHexString() + "&token=" + ThreadLocals.getSessionContext().getUserToken() + "' " + style + "/>\n");
+				+ node.getId().toHexString() + "&token=" + ThreadLocals.getSessionContext().getUserToken() + "' "
+				+ style + "/>\n");
 	}
 
 	/**

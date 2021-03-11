@@ -664,6 +664,10 @@ public class AppController implements ErrorController {
 			ExportResponse res = new ExportResponse();
 
 			if ("pdf".equalsIgnoreCase(req.getExportExt())) {
+				if (req.isToIpfs()) {
+					res.setMessage("Export of PFD to IPFS not yet available.");
+					res.setSuccess(false);
+				}
 				/*
 				 * NOTE: The original implementation of PDF export is in ExportPdfServicePdfBox
 				 * and us the one using PDFBox, but the newest version is the one using
@@ -679,18 +683,34 @@ public class AppController implements ErrorController {
 				svc.export(ms, "html", req, res);
 			} //
 			else if ("md".equalsIgnoreCase(req.getExportExt())) {
+				if (req.isToIpfs()) {
+					res.setMessage("Export of Markdown to IPFS not yet available.");
+					res.setSuccess(false);
+				}
 				ExportTextService svc = (ExportTextService) SpringContextUtil.getBean(ExportTextService.class);
 				svc.export(ms, req, res);
 			} //
 			else if ("zip".equalsIgnoreCase(req.getExportExt())) {
+				if (req.isToIpfs()) {
+					res.setMessage("Export of ZIP to IPFS not yet available.");
+					res.setSuccess(false);
+				}
 				ExportZipService svc = (ExportZipService) SpringContextUtil.getBean(ExportZipService.class);
 				svc.export(ms, req, res);
 			} //
 			else if ("tar".equalsIgnoreCase(req.getExportExt())) {
+				if (req.isToIpfs()) {
+					res.setMessage("Export of TAR to IPFS not yet available.");
+					res.setSuccess(false);
+				}
 				ExportTarService svc = (ExportTarService) SpringContextUtil.getBean(ExportTarService.class);
 				svc.export(ms, req, res);
 			} //
 			else if ("tar.gz".equalsIgnoreCase(req.getExportExt())) {
+				if (req.isToIpfs()) {
+					res.setMessage("Export of TAR.GZ to IPFS not yet available.");
+					res.setSuccess(false);
+				}
 				ExportTarService svc = (ExportTarService) SpringContextUtil.getBean(ExportTarService.class);
 				svc.setUseGZip(true);
 				svc.export(ms, req, res);

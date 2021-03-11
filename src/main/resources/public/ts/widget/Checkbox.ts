@@ -17,6 +17,7 @@ export class Checkbox extends Comp implements I.CheckboxIntf {
     constructor(public label: string = null, _attribs: Object = null, private valueIntf: ValueIntf) {
         super(_attribs);
 
+        // todo-1: I think this is unneeded. we ALWAYS pass in valueIntf right?
         if (!valueIntf) {
             this.valueIntf = new CompValueHolder<string>(this, "val");
         }

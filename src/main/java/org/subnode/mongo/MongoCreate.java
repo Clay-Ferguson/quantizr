@@ -149,8 +149,6 @@ public class MongoCreate {
 		log.debug("insertOrdinal GTE " + ordinal);
 		for (SubNode child : read.getChildrenUnderParentPath(session, node.getPath(), null, null, 0, null, criteria)) {
 			long o = child.getOrdinal() == null ? 0L : child.getOrdinal().longValue();
-
-			log.debug("boosting ordinal " + o);
 			o += rangeSize;
 			child.setOrdinal(o);
 
