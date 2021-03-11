@@ -6,6 +6,7 @@ public class SignupResponse extends ResponseBase {
     private String userError;
     private String passwordError;
     private String emailError;
+    private String captchaError;
 
     public String getUserError() {
         return userError;
@@ -29,5 +30,13 @@ public class SignupResponse extends ResponseBase {
 
     public void setEmailError(String emailError) {
         this.emailError = emailError;
+    }
+
+    public String getCaptchaError() {
+        return captchaError;
+    }
+
+    public void setCaptchaError(String captchaError) {
+        this.captchaError = captchaError;
     }
 }

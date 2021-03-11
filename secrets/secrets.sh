@@ -7,6 +7,3 @@ export testPassword=password
 export subnodePassword=password
 
 export prodKeyStorePassword=
-
-export reCaptcha3SiteKey=
-export reCaptcha3SecretKey=

@@ -56,6 +56,9 @@ public class SessionContext {
 	// this one WILL work with multiple sessions per user
 	public static final HashSet<SessionContext> allSessions = new HashSet<SessionContext>();
 
+	private String captcha;
+	private int captchaFails = 0;
+
 	/*
 	 * If this time is non-null it represents the newest time on the first node of the first page of
 	 * results the last time query query for the first page (page=0) was done. We use this so that in
@@ -243,5 +246,21 @@ public class SessionContext {
 
 	public void setFeedMaxTime(Date feedMaxTime) {
 		this.feedMaxTime = feedMaxTime;
+	}
+
+	public String getCaptcha() {
+		return captcha;
+	}
+
+	public void setCaptcha(String captcha) {
+		this.captcha = captcha;
+	}
+
+	public int getCaptchaFails() {
+		return captchaFails;
+	}
+
+	public void setCaptchaFails(int captchaFails) {
+		this.captchaFails = captchaFails;
 	}
 }

@@ -124,6 +124,7 @@ import org.subnode.service.RSSFeedService;
 import org.subnode.service.SystemService;
 import org.subnode.service.UserFeedService;
 import org.subnode.service.UserManagerService;
+import org.subnode.util.CaptchaMaker;
 import org.subnode.util.Const;
 import org.subnode.util.ExUtil;
 import org.subnode.util.FileUtils;
@@ -1335,6 +1336,15 @@ public class AppController implements ErrorController {
 			SseEmitter pushEmitter = new SseEmitter();
 			ThreadLocals.getSessionContext().setPushEmitter(pushEmitter);
 			return pushEmitter;
+		});
+	}
+
+	@RequestMapping(value = API_PATH + "/captcha", method = RequestMethod.GET, produces = MediaType.IMAGE_PNG_VALUE)
+	public @ResponseBody byte[] captcha(HttpSession session) {
+		return (byte[]) callProc.run("captcha", null, session, ms -> {
+			String captcha = CaptchaMaker.createCaptchaString();
+			ThreadLocals.getSessionContext().setCaptcha(captcha);
+			return CaptchaMaker.makeCaptcha(captcha);
 		});
 	}
 }

@@ -17,11 +17,9 @@ export class Img extends Comp {
 
     compRender(): ReactNode {
         // console.log("Render IMG: id="+this.getId());
-
-        //     this.attribs.style = this.attribs.style || {};
-        //     this.attribs.style.maxWidth = "calc(100% - 12px)";
-        //     this.attribs.style.width = "calc(100% - 12px)";
-
+        // this.attribs.style = this.attribs.style || {};
+        // this.attribs.style.maxWidth = "calc(100% - 12px)";
+        // this.attribs.style.width = "calc(100% - 12px)";
         return this.e("img", this.attribs);
     }
 }

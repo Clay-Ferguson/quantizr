@@ -1488,6 +1488,13 @@ i'm backing out for now
     border: 2px solid $gray-700
 }
 
+.captchaImage {
+    margin-left: 1px;
+    margin-right: $smallGap;
+    border-radius: .6em;
+    border: 2px solid $gray-700
+}
+
 .editBinaryContainer {
     padding-left: $smallGap;
 }

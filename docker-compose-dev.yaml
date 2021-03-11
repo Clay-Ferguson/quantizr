@@ -85,8 +85,6 @@ services:
             runTests:
             
             mongoAdminPassword: "${subnodePassword}"
-            reCaptcha3SiteKey: "${reCaptcha3SiteKey}"
-            reCaptcha3SecretKey: "${reCaptcha3SecretKey}" 
             mongoSecurity: "true"
 
             # NOTE: '>-' removes all newline characters and makes one long string

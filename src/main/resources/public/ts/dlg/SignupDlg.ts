@@ -8,7 +8,10 @@ import { ValidatedState } from "../ValidatedState";
 import { CompIntf } from "../widget/base/CompIntf";
 import { Button } from "../widget/Button";
 import { ButtonBar } from "../widget/ButtonBar";
+import { Div } from "../widget/Div";
 import { Form } from "../widget/Form";
+import { HorizontalLayout } from "../widget/HorizontalLayout";
+import { Img } from "../widget/Img";
 import { TextField } from "../widget/TextField";
 
 let S: Singletons;
@@ -21,6 +24,7 @@ export class SignupDlg extends DialogBase {
     userState: ValidatedState<any> = new ValidatedState<any>();
     passwordState: ValidatedState<any> = new ValidatedState<any>();
     emailState: ValidatedState<any> = new ValidatedState<any>();
+    captchaState: ValidatedState<any> = new ValidatedState<any>();
 
     constructor(state: AppState) {
         super("Create Account", "app-modal-content-medium-width", null, state);
@@ -32,9 +36,20 @@ export class SignupDlg extends DialogBase {
                 new TextField("User Name", false, null, null, false, this.userState),
                 new TextField("Password", true, null, null, false, this.passwordState),
                 new TextField("Email", false, null, null, false, this.emailState),
-                new ButtonBar([
-                    new Button("Create Account", this.signup, null, "btn-primary"),
-                    new Button("Cancel", this.close)
+
+                new HorizontalLayout([
+                    new Img(null, {
+                        src: window.location.origin + "/mobile/api/captcha?cacheBuster=" + this.getId(),
+                        className: "captchaImage"
+                    }),
+                    new Div(null, null, [
+                        new TextField("Captcha", false, null, null, false, this.captchaState),
+
+                        new ButtonBar([
+                            new Button("Create Account", this.signup, null, "btn-primary"),
+                            new Button("Cancel", this.close)
+                        ])
+                    ])
                 ])
             ])
         ];
@@ -53,7 +68,7 @@ export class SignupDlg extends DialogBase {
                 valid = false;
             }
             else if (!S.util.validUsername(this.userState.getValue())) {
-               this.userState.setError("Invalid Username. Only letters numbers dashes and underscores allowed.");
+                this.userState.setError("Invalid Username. Only letters numbers dashes and underscores allowed.");
                 valid = false;
             }
             else {
@@ -89,6 +104,14 @@ export class SignupDlg extends DialogBase {
             }
         }
 
+        if (!this.captchaState.getValue()) {
+            this.captchaState.setError("Cannot be empty.");
+            valid = false;
+        }
+        else {
+            this.captchaState.setError(null);
+        }
+
         return valid;
     }
 
@@ -104,7 +127,7 @@ export class SignupDlg extends DialogBase {
             userName: this.userState.getValue(),
             password: this.passwordState.getValue(),
             email: this.emailState.getValue(),
-            reCaptchaToken
+            captcha: this.captchaState.getValue()
         }, this.signupResponse);
     }
 
@@ -126,6 +149,7 @@ export class SignupDlg extends DialogBase {
             this.userState.setError(res.userError);
             this.passwordState.setError(res.passwordError);
             this.emailState.setError(res.emailError);
+            this.captchaState.setError(res.captchaError);
         }
         return null;
     }

@@ -426,6 +426,24 @@ public class UserManagerService {
 			res.setSuccess(false);
 		}
 
+		if (!automated) {
+			if (!ThreadLocals.getSessionContext().getCaptcha().equals(req.getCaptcha())) {
+				int captchaFails = ThreadLocals.getSessionContext().getCaptchaFails();
+
+				if (captchaFails > 0) {
+					try {
+						// this sleep should stop brute forcing, every failed attempt makes the user
+						// need to wait an additional 2 seconds each time.
+						Thread.sleep(captchaFails * 2000);
+					} catch (Exception e) {
+					}
+				}
+				ThreadLocals.getSessionContext().setCaptchaFails(captchaFails + 1);
+				res.setCaptchaError("Wrong captcha. Try again.");
+				res.setSuccess(false);
+			}
+		}
+
 		if (!res.isSuccess()) {
 			return res;
 		}

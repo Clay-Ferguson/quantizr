@@ -72,17 +72,5 @@ module.exports = {
                 }
             }
         })
-        /* With thymeleaf enabled, we no longer need this, and the index.htm folder is moved into 'templates' also,
-        but lets keep this code commented for future reference. */
-
-        // new HtmlWebpackPlugin({
-        //     template: './html/index.html',
-        //     filename: 'index.html',
-        //     hash: true,
-        //     cachebuster: '' + new Date().getTime(),
-        //     // todo-1: need to pull this from a bash variable, and not have hard-coded here, alghough this is not a 
-        //     // security risk, and is public not secret, and safe to check into Github.
-        //     reCaptcha3SiteKey: "6LeGyK4ZAAAAAPbF4hI0rtRwSveBdDVXnmhOsfff"
-        // }),
     ]
 };

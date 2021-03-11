@@ -6,7 +6,7 @@ public class SignupRequest extends RequestBase {
 	private String userName;
 	private String password;
 	private String email;
-	private String reCaptchaToken;
+	private String captcha;
 
 	public String getUserName() {
 		return userName;
@@ -32,11 +32,11 @@ public class SignupRequest extends RequestBase {
 		this.email = email;
 	}
 
-	public String getReCaptchaToken() {
-		return reCaptchaToken;
+	public String getCaptcha() {
+		return captcha;
 	}
 
-	public void setReCaptchaToken(String reCaptchaToken) {
-		this.reCaptchaToken = reCaptchaToken;
+	public void setCaptcha(String captcha) {
+		this.captcha = captcha;
 	}
 }

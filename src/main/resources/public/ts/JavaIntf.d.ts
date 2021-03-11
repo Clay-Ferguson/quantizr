@@ -266,7 +266,7 @@ export interface SignupRequest extends RequestBase {
     userName: string;
     password: string;
     email: string;
-    reCaptchaToken: string;
+    captcha: string;
 }
 
 export interface SplitNodeRequest extends RequestBase {
@@ -540,6 +540,7 @@ export interface SignupResponse extends ResponseBase {
     userError: string;
     passwordError: string;
     emailError: string;
+    captchaError: string;
 }
 
 export interface SplitNodeResponse extends ResponseBase {
