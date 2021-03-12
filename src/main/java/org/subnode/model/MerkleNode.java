@@ -6,7 +6,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class MerkleNode {
 
-    @JsonIgnore
+    @JsonProperty("Hash")
     private String hash;
 
     @JsonProperty("Links")

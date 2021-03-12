@@ -81,8 +81,8 @@ services:
         environment:
 
             # Can be a comma-delimited list of TestIntf-derived tests to run
-            # example: "MongoTest"
-            runTests:
+            # example: "MongoTest" (others IPFSTest)
+            runTests: 
             
             mongoAdminPassword: "${subnodePassword}"
             mongoSecurity: "true"

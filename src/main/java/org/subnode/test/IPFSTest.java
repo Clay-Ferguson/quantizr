@@ -6,6 +6,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.subnode.model.MerkleLink;
 import org.subnode.model.MerkleNode;
 import org.subnode.mongo.RunAsMongoAdmin;
 import org.subnode.service.IPFSService;
@@ -25,6 +26,28 @@ public class IPFSTest implements TestIntf {
     @Override
     public void test() throws Exception {
         log.debug("IPFSTest.test() running.");
+        testUploadDirectory();
+    }
+
+    private void testUploadDirectory() {
+        adminRunner.run(mongoSession -> {
+            // create the root directory
+            MerkleNode rootDir = ipfs.newObject();
+            log.debug("rootDir: " + XString.prettyPrint(rootDir));
+
+            // create a file to put in the directory.
+            MerkleLink file1 = ipfs.addFileFromString(mongoSession, "Test file one (new)", "fileone.txt", "text/plain", false);
+            log.debug("file1: " + XString.prettyPrint(file1));
+
+            MerkleLink file2 = ipfs.addFileFromString(mongoSession, "Test file two", "filetwo.txt", "text/plain", false);
+            log.debug("file2: " + XString.prettyPrint(file2));
+
+            MerkleNode newRootDir = ipfs.addFileToDagRoot(rootDir.getHash(), "subfolder/fileone.txt", file1.getHash());
+            log.debug("newRoot (first file added): " + XString.prettyPrint(newRootDir));
+        });
+    }
+
+    public void oldTest2() throws Exception {
         // ipfs.getPins();
         adminRunner.run(mongoSession -> {
             ValContainer<String> cid = new ValContainer<String>();
@@ -37,7 +60,7 @@ public class IPFSTest implements TestIntf {
             Map<String, Object> ret = ipfs.ipnsPublish(mongoSession, "ClaysKey", cid.getVal());
             log.debug("ipnsPublishRet: " + XString.prettyPrint(ret));
 
-            String ipnsName = (String)ret.get("Name");
+            String ipnsName = (String) ret.get("Name");
             ret = ipfs.ipnsResolve(mongoSession, ipnsName);
             log.debug("ipnsResolveRet: " + XString.prettyPrint(ret));
 
@@ -55,7 +78,7 @@ public class IPFSTest implements TestIntf {
             ret = ipfs.ipnsPublish(mongoSession, "ClaysKey", cid.getVal());
             log.debug("ipnsPublishRet (second): " + XString.prettyPrint(ret));
 
-            ipnsName = (String)ret.get("Name");
+            ipnsName = (String) ret.get("Name");
             ret = ipfs.ipnsResolve(mongoSession, ipnsName);
             log.debug("ipnsResolveRet (second): " + XString.prettyPrint(ret));
         });

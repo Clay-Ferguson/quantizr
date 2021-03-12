@@ -1028,7 +1028,7 @@ public class AttachmentService {
 			final InputStream stream, final String mimeType) {
 		auth.auth(session, node, PrivilegeType.WRITE);
 		final ValContainer<Integer> streamSize = new ValContainer<Integer>();
-		MerkleLink ret = ipfsService.addFromStream(session, stream, mimeType, streamSize, null);
+		MerkleLink ret = ipfsService.addFromStream(session, stream, null, mimeType, streamSize, null, false);
 		if (ret != null) {
 			node.setProp(NodeProp.IPFS_LINK.s() + binSuffix, ret.getHash());
 			node.setProp(NodeProp.BIN_SIZE.s() + binSuffix, streamSize.getVal());

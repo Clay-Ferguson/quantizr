@@ -3,6 +3,9 @@ package org.subnode.service;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.util.Arrays;
+import java.util.LinkedList;
+import java.util.List;
+
 import com.vladsch.flexmark.ext.tables.TablesExtension;
 import com.vladsch.flexmark.ext.toc.TocExtension;
 import com.vladsch.flexmark.ext.toc.internal.TocOptions;
@@ -19,6 +22,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;
 import org.subnode.config.AppProp;
 import org.subnode.model.MerkleLink;
+import org.subnode.model.MerkleNode;
 import org.subnode.model.client.NodeProp;
 import org.subnode.mongo.MongoRead;
 import org.subnode.mongo.MongoSession;
@@ -50,7 +54,7 @@ public class ExportServiceFlexmark {
 	private MongoRead read;
 
 	@Autowired
-	private IPFSService ipfsService;
+	private IPFSService ipfs;
 
 	private MongoSession session;
 
@@ -62,6 +66,8 @@ public class ExportServiceFlexmark {
 
 	private ExportRequest req;
 	private ExportResponse res;
+
+	private List<ExportIpfsFile> files = new LinkedList<ExportIpfsFile>();
 
 	/*
 	 * Exports the node specified in the req. If the node specified is "/", or the
@@ -146,12 +152,7 @@ public class ExportServiceFlexmark {
 
 			if ("html".equals(format)) {
 				if (req.isToIpfs()) {
-					String mime = "text/html";
-					MerkleLink ret = ipfsService.addFileFromString(session, html, mime);
-					if (ret != null) {
-						res.setIpfsCid(ret.getHash());
-						res.setIpfsMime(mime);
-					}
+					writeIpfsFiles(html);
 				} else {
 					FileUtils.writeEntireFile(fullFileName, html);
 					wroteFile = true;
@@ -171,6 +172,49 @@ public class ExportServiceFlexmark {
 			if (wroteFile) {
 				(new File(fullFileName)).deleteOnExit();
 			}
+		}
+	}
+
+	private void writeIpfsFiles(String html) {
+		String mime = "text/html";
+
+		// generate root folder to hold all the files
+		MerkleNode rootDir = ipfs.newObject();
+		// log.debug("new rootDir: " + XString.prettyPrint(rootDir));
+
+		// add the main html file as index.html
+		MerkleLink index = ipfs.addFileFromString(session, html, "index.html", mime, false);
+		rootDir = ipfs.addFileToDagRoot(rootDir.getHash(), "index.html", index.getHash());
+
+		/*
+		 * Next we add all the 'image' attachments that the HTML can point to (currently
+		 * only supports other IPFS-type uploads (images stored on ipfs already))
+		 * 
+		 * This will make images work inside this DAG HTML file using no path so an
+		 * image file named 'my-image.jpg' will work in an html IMG tag with just
+		 * src='my-image.jpg'. However the trick part is that since Quanta doesn't yet
+		 * have a reverse proxy and a way for 'end users' to directly access it's IPFS
+		 * gateway we embed the actual CID onto the end of the 'src' as a param like
+		 * this: src='my-image.jpg?cid=Qm123456...', so the Quanta server is able to use
+		 * queries like that and grab the correct data to return based on the 'cid='
+		 * arg, where as the rest of the IPFS internet gateways will hopefully ignore
+		 * that unknown parameter.
+		 * 
+		 * todo-0: need logic to only PIN the final value here, and also remember our
+		 * own gateway garbage collects any PINs that are not assigned to a node so we
+		 * currently don't have a way to persistently 'pin' exports, unless we
+		 * automatically create an 'exports' node in the user account, and set it to
+		 * point to the root of every export which I wanted to do anyway, so we're ok in
+		 * that regard.
+		 */
+		for (ExportIpfsFile file : files) {
+			// log.debug("Add file: " + file.getFileName() + " cid=" + file.getCid());
+			rootDir = ipfs.addFileToDagRoot(rootDir.getHash(), file.getFileName(), file.getCid());
+		}
+
+		if (rootDir != null) {
+			res.setIpfsCid(rootDir.getHash());
+			res.setIpfsMime(mime);
 		}
 	}
 
@@ -196,7 +240,8 @@ public class ExportServiceFlexmark {
 
 	private void writeImage(SubNode node) {
 		String bin = node.getStrProp(NodeProp.BIN.s());
-		if (bin == null) {
+		String ipfsLink = node.getStrProp(NodeProp.IPFS_LINK);
+		if (bin == null && ipfsLink == null) {
 			return;
 		}
 
@@ -206,8 +251,39 @@ public class ExportServiceFlexmark {
 			style = " style='width:" + imgSize + "'";
 		}
 
-		String src = appProp.getHostAndPort() + "/mobile/api/bin/" + bin + "?nodeId=" + node.getId().toHexString()
-				+ "&token=" + ThreadLocals.getSessionContext().getUserToken();
+		String src = null;
+
+		if (req.isToIpfs()) {
+			/* todo-0: right here we need to detect if there is a 'bin' and not an 'ipfsLink' and in this 
+			so we can write the attachment out to IPFS, and get it's CID and then use that cid as our ipfsLink right here.
+			This will enable users to simply export a node and be guaranteed all the attachments on it are stored on IPFS */
+
+			String fileName = node.getStrProp(NodeProp.FILENAME);
+
+			/*
+			 * if this is already an IPFS linked thing, assume we're gonna have it's name
+			 * added in the DAG and so reference it in src
+			 */
+			if (ipfsLink != null && fileName != null) {
+				log.debug("Found IPFS file: " + fileName);
+				files.add(new ExportIpfsFile(ipfsLink, fileName));
+
+				/* NOTE: Since Quanta doesn't run a reverse proxy currently and doesn't have it's IPFS gateway open to the internet
+				we have to use this trick if sticking on the cid parameter so that our AppController.getBinary function (which will be 
+				called when the user references the resuorce) can use that instead of the relative path to locate the file. 
+				
+				When normal other IPFS gateways are opening this content they'll reference the actual 'fileName' and it will work
+				because we do DAG-link that file into the root CID DAG entry for this export!
+				*/
+				src = fileName + "?cid=" + ipfsLink;
+			}
+		} else {
+			src = appProp.getHostAndPort() + "/mobile/api/bin/" + bin + "?nodeId=" + node.getId().toHexString()
+					+ "&token=" + ThreadLocals.getSessionContext().getUserToken();
+		}
+
+		if (src == null)
+			return;
 
 		markdown.append("\n<img src='" + src + "' " + style + "/>\n");
 	}

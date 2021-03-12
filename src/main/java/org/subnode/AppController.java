@@ -937,7 +937,14 @@ public class AppController implements ErrorController {
 	 */
 	@RequestMapping(value = API_PATH + "/bin/{binId}", method = RequestMethod.GET)
 	public void getBinary(@PathVariable("binId") String binId, //
-			@RequestParam("nodeId") String nodeId, //
+			@RequestParam(value = "nodeId", required = false) String nodeId, //
+
+			/*
+			 * In the file exports where this is appended, we could have appended just
+			 * nodeId and it would also work but be a bit slower as that would look up the
+			 * node rather than streaming straight out of IPFS.
+			 */
+			@RequestParam(value = "cid", required = false) String ipfsCid, //
 			/*
 			 * The "Export To PDF" feature relies on sending this 'token' as it's form of
 			 * access/auth because it's generated from HTML intermediate file what has all
@@ -958,19 +965,23 @@ public class AppController implements ErrorController {
 			}
 			// Check if this is an 'profileHeader Image' request and if so bypass security
 			else if ("profileHeader".equals(binId)) {
-				adminRunner.run(mongoSession -> {
+				adminRunner.run(ms -> {
 					/*
 					 * Note: the "Header" suffix will be applied to all image-related property names
 					 * to distinguish them from normal 'bin' properties. This way we now to support
 					 * multiple uploads onto any node, in this very limites way.
 					 */
-					attachmentService.getBinary(mongoSession, "Header", null, nodeId, download != null, response);
+					attachmentService.getBinary(ms, "Header", null, nodeId, download != null, response);
 				});
 			}
 			/* Else if not an avatar request then do a securer acccess */
 			else {
 				callProc.run("bin", null, session, ms -> {
-					attachmentService.getBinary(null, "", null, nodeId, download != null, response);
+					if (ipfsCid != null) {
+						ipfsService.streamResponse(response, ms, ipfsCid, null);
+					} else {
+						attachmentService.getBinary(null, "", null, nodeId, download != null, response);
+					}
 					return null;
 				});
 			}
