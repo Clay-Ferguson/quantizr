@@ -10,6 +10,7 @@ import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+import javax.annotation.PostConstruct;
 import javax.servlet.http.HttpServletResponse;
 
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -68,6 +69,15 @@ import org.subnode.util.XString;
 public class IPFSService {
     private static final Logger log = LoggerFactory.getLogger(IPFSService.class);
 
+    private static String API_BASE;
+    private static String API_CAT;
+    private static String API_FILES;
+    private static String API_PIN;
+    private static String API_OBJECT;
+    private static String API_DAG;
+    private static String API_TAR;
+    private static String API_NAME;
+
     /*
      * originally this was 'data-endcoding' (or at least i got that from somewhere),
      * but now their example page seems to show 'encoding' is the name here.
@@ -89,6 +99,18 @@ public class IPFSService {
 
     @Autowired
     private AppProp appProp;
+
+    @PostConstruct
+    public void init() {
+        API_BASE = appProp.getIPFSApiHostAndPort() + "/api/v0";
+        API_CAT = API_BASE + "/cat";
+        API_FILES = API_BASE + "/files";
+        API_PIN = API_BASE + "/pin";
+        API_OBJECT = API_BASE + "/object";
+        API_DAG = API_BASE + "/dag";
+        API_TAR = API_BASE + "/tar";
+        API_NAME = API_BASE + "/name";
+    }
 
     /**
      * Looks up node by 'nodeId', and gets the 'ipfs:link' property, which is used
@@ -125,7 +147,7 @@ public class IPFSService {
     public final String objectCat(String hash) {
         String ret = null;
         try {
-            String url = appProp.getIPFSApiHostAndPort() + "/api/v0/cat?arg=" + hash;
+            String url = API_CAT + "?arg=" + hash;
             ResponseEntity<byte[]> result = restTemplate.getForEntity(new URI(url), byte[].class);
             ret = new String(result.getBody(), "UTF-8");
         } catch (Exception e) {
@@ -135,7 +157,7 @@ public class IPFSService {
     }
 
     public InputStream getStreamForHash(String hash) {
-        String url = appProp.getIPFSApiHostAndPort() + "/api/v0/cat?arg=" + hash;
+        String url = API_CAT + "?arg=" + hash;
         InputStream is = null;
         try {
             is = new URL(url).openStream();
@@ -146,23 +168,23 @@ public class IPFSService {
     }
 
     public final IPFSDir getDir(String path) {
-        String url = appProp.getIPFSApiHostAndPort() + "/api/v0/files/ls?arg=" + path + "&long=true";
+        String url = API_FILES + "/ls?arg=" + path + "&long=true";
         return (IPFSDir) postForJsonReply(url, IPFSDir.class);
     }
 
     public final boolean removePin(String cid) {
-        String url = appProp.getIPFSApiHostAndPort() + "/api/v0/pin/rm?arg=" + cid;
+        String url = API_PIN + "/rm?arg=" + cid;
         return postForJsonReply(url, Object.class) != null;
     }
 
     /* Deletes the file or if a folder deletes it recursively */
     public final boolean deletePath(String path) {
-        String url = appProp.getIPFSApiHostAndPort() + "/api/v0/files/rm?arg=" + path + "&force=true";
+        String url = API_FILES + "/rm?arg=" + path + "&force=true";
         return postForJsonReply(url, Object.class) != null;
     }
 
     public final boolean flushFiles(String path) {
-        String url = appProp.getIPFSApiHostAndPort() + "/api/v0/files/flush?arg=" + path;
+        String url = API_FILES + "/flush?arg=" + path;
         return postForJsonReply(url, Object.class) != null;
     }
 
@@ -170,7 +192,7 @@ public class IPFSService {
     public final LinkedHashMap<String, Object> getPins() {
         LinkedHashMap<String, Object> pins = null;
         try {
-            String url = appProp.getIPFSApiHostAndPort() + "/api/v0/pin/ls?type=recursive";
+            String url = API_PIN + "/ls?type=recursive";
 
             ResponseEntity<String> result = restTemplate.getForEntity(new URI(url), String.class);
             MediaType contentType = result.getHeaders().getContentType();
@@ -198,8 +220,7 @@ public class IPFSService {
     public final MerkleNode getMerkleNode(String hash, String encoding) {
         MerkleNode ret = null;
         try {
-            String url = appProp.getIPFSApiHostAndPort() + "/api/v0/object/get?arg=" + hash + "&" + ENCODING_PARAM_NAME
-                    + "=" + encoding;
+            String url = API_OBJECT + "/get?arg=" + hash + "&" + ENCODING_PARAM_NAME + "=" + encoding;
 
             log.debug("REQ: " + url);
 
@@ -229,8 +250,7 @@ public class IPFSService {
     public final String getAsString(String hash, String encoding) {
         String ret = null;
         try {
-            String url = appProp.getIPFSApiHostAndPort() + "/api/v0/object/get?arg=" + hash + "&" + ENCODING_PARAM_NAME
-                    + "=" + encoding;
+            String url = API_OBJECT + "/get?arg=" + hash + "&" + ENCODING_PARAM_NAME + "=" + encoding;
 
             ResponseEntity<String> result = restTemplate.getForEntity(new URI(url), String.class);
             MediaType contentType = result.getHeaders().getContentType();
@@ -252,7 +272,7 @@ public class IPFSService {
     public final String dagGet(String hash) {
         String ret = null;
         try {
-            String url = appProp.getIPFSApiHostAndPort() + "/api/v0/dag/get?arg=" + hash;
+            String url = API_DAG + "/get?arg=" + hash;
             ResponseEntity<String> result = restTemplate.getForEntity(new URI(url), String.class);
             ret = result.getBody();
             log.debug("RET: " + ret);
@@ -264,12 +284,12 @@ public class IPFSService {
 
     public MerkleLink dagPutFromString(MongoSession session, String val, String mimeType,
             ValContainer<Integer> streamSize, ValContainer<String> cid) {
-        return writeFromStream(session, "/api/v0/dag/put", IOUtils.toInputStream(val), null, mimeType, streamSize, cid);
+        return writeFromStream(session, API_DAG + "/put", IOUtils.toInputStream(val), null, mimeType, streamSize, cid);
     }
 
     public MerkleLink dagPutFromStream(MongoSession session, InputStream stream, String mimeType,
             ValContainer<Integer> streamSize, ValContainer<String> cid) {
-        return writeFromStream(session, "/api/v0/dag/put", stream, null, mimeType, streamSize, cid);
+        return writeFromStream(session, API_DAG + "/put", stream, null, mimeType, streamSize, cid);
     }
 
     public MerkleLink addFileFromString(MongoSession session, String text, String fileName, String mimeType,
@@ -285,13 +305,13 @@ public class IPFSService {
     public MerkleLink addFileFromStream(MongoSession session, String fileName, InputStream stream, String mimeType,
             ValContainer<Integer> streamSize, ValContainer<String> cid) {
         return writeFromStream(session,
-                "/api/v0/files/write?arg=" + fileName + "&create=true&parents=true&truncate=true", stream, null,
+                API_FILES + "/write?arg=" + fileName + "&create=true&parents=true&truncate=true", stream, null,
                 mimeType, streamSize, cid);
     }
 
     public MerkleLink addFromStream(MongoSession session, InputStream stream, String fileName, String mimeType,
             ValContainer<Integer> streamSize, ValContainer<String> cid, boolean wrapInFolder) {
-        String endpoint = "/api/v0/add?stream-channels=true";
+        String endpoint = API_BASE + "/add?stream-channels=true";
         if (wrapInFolder) {
             endpoint += "&wrap-with-directory=true";
         }
@@ -312,7 +332,7 @@ public class IPFSService {
 
     public MerkleLink addTarFromStream(MongoSession session, InputStream stream, String mimeType,
             ValContainer<Integer> streamSize, ValContainer<String> cid) {
-        return writeFromStream(session, "/api/v0/tar/add", stream, null, mimeType, streamSize, cid);
+        return writeFromStream(session, API_TAR + "/add", stream, null, mimeType, streamSize, cid);
     }
 
     // todo-0: remove mimeType from here (not used)
@@ -323,12 +343,11 @@ public class IPFSService {
      * the old need for mime guessing by always baseing off extension on this
      * filename?
      */
-    public MerkleLink writeFromStream(MongoSession session, String path, InputStream stream, String fileName,
+    public MerkleLink writeFromStream(MongoSession session, String endpoint, InputStream stream, String fileName,
             String mimeType, ValContainer<Integer> streamSize, ValContainer<String> cid) {
         // log.debug("Writing file: " + path);
         MerkleLink ret = null;
         try {
-            String url = appProp.getIPFSApiHostAndPort() + path;
             HttpHeaders headers = new HttpHeaders();
 
             MultiValueMap<String, Object> bodyMap = new LinkedMultiValueMap<>();
@@ -338,7 +357,8 @@ public class IPFSService {
             headers.setContentType(MediaType.MULTIPART_FORM_DATA);
             HttpEntity<MultiValueMap<String, Object>> requestEntity = new HttpEntity<>(bodyMap, headers);
 
-            ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.POST, requestEntity, String.class);
+            ResponseEntity<String> response = restTemplate.exchange(endpoint, HttpMethod.POST, requestEntity,
+                    String.class);
             MediaType contentType = response.getHeaders().getContentType();
 
             // log.debug("writeFromStream Raw Response: " + XString.prettyPrint(response));
@@ -383,7 +403,7 @@ public class IPFSService {
     public Map<String, Object> ipnsPublish(MongoSession session, String key, String cid) {
         Map<String, Object> ret = null;
         try {
-            String url = appProp.getIPFSApiHostAndPort() + "/api/v0/name/publish?arg=" + cid + "&=" + key;
+            String url = API_NAME + "/publish?arg=" + cid + "&=" + key;
 
             HttpHeaders headers = new HttpHeaders();
             MultiValueMap<String, Object> bodyMap = new LinkedMultiValueMap<>();
@@ -420,7 +440,7 @@ public class IPFSService {
     public Map<String, Object> ipnsResolve(MongoSession session, String name) {
         Map<String, Object> ret = null;
         try {
-            String url = appProp.getIPFSApiHostAndPort() + "/api/v0/name/resolve?arg=" + name;
+            String url = API_NAME + "/resolve?arg=" + name;
 
             HttpHeaders headers = new HttpHeaders();
             MultiValueMap<String, Object> bodyMap = new LinkedMultiValueMap<>();
@@ -437,7 +457,7 @@ public class IPFSService {
     }
 
     public MerkleNode newObject() {
-        return postToGetMerkleNode("/api/v0/object/new");
+        return postToGetMerkleNode(API_OBJECT + "/new");
     }
 
     /*
@@ -445,20 +465,19 @@ public class IPFSService {
      * new rootCid
      */
     public MerkleNode addFileToDagRoot(String rootCid, String filePath, String fileCid) {
-        return postToGetMerkleNode("/api/v0/object/patch/add-link?arg=" + rootCid + "&arg=" + filePath + "&arg="
+        return postToGetMerkleNode(API_OBJECT + "/patch/add-link?arg=" + rootCid + "&arg=" + filePath + "&arg="
                 + fileCid + "&create=true");
     }
 
     public MerkleNode postToGetMerkleNode(String endpoint) {
         MerkleNode ret = null;
         try {
-            String url = appProp.getIPFSApiHostAndPort() + endpoint;
-
             HttpHeaders headers = new HttpHeaders();
             MultiValueMap<String, Object> bodyMap = new LinkedMultiValueMap<>();
             HttpEntity<MultiValueMap<String, Object>> requestEntity = new HttpEntity<>(bodyMap, headers);
 
-            ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.POST, requestEntity, String.class);
+            ResponseEntity<String> response = restTemplate.exchange(endpoint, HttpMethod.POST, requestEntity,
+                    String.class);
             ret = mapper.readValue(response.getBody(), new TypeReference<MerkleNode>() {
             });
             // log.debug("new Object: " + XString.prettyPrint(ret));
@@ -470,12 +489,12 @@ public class IPFSService {
     }
 
     public IPFSDirStat pathStat(String path) {
-        String url = appProp.getIPFSApiHostAndPort() + "/api/v0/files/stat?arg=" + path;
+        String url = API_FILES + "/stat?arg=" + path;
         return (IPFSDirStat) postForJsonReply(url, IPFSDirStat.class);
     }
 
     public String readFile(String path) {
-        String url = appProp.getIPFSApiHostAndPort() + "/api/v0/files/read?arg=" + path;
+        String url = API_FILES + "/read?arg=" + path;
         return (String) postForJsonReply(url, String.class);
     }
 
