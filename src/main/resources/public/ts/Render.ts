@@ -266,8 +266,21 @@ export class Render implements RenderIntf {
             }
         }
 
+        let ipfsLink = S.props.getNodePropVal(J.NodeProp.IPFS_LINK, node);
+        if (ipfsLink) {
+            children.push(new Heading(5, "IPFS CID"));
+            children.push(new Div(ipfsLink, {
+                className: "anchorBigMarginBottom",
+                title: "Click -> Copy to clipboard",
+                onClick: () => {
+                    S.util.copyToClipboard(ipfsLink);
+                    S.util.flashMessage("Copied to Clipboard: " + ipfsLink, "Clipboard", true);
+                }
+            }));
+        }
+
         const linksDiv = new Div(null, null, children);
-        new MessageDlg(null, "URLs for Node " + node.id, null, linksDiv, false, 0, null).open();
+        new MessageDlg(null, "URLs for Node: " + node.id, null, linksDiv, false, 0, null).open();
     }
 
     allowAction = (typeHandler: TypeHandlerIntf, action: NodeActionType, node: J.NodeInfo, appState: AppState): boolean => {
