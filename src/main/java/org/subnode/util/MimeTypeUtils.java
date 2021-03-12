@@ -21,18 +21,23 @@ public class MimeTypeUtils {
     private static Map<String, String> mimeMap;
     static {
         mimeMap = new HashMap<>();
+        // todo-1: why this tiny list here? If doing this why not many many more?
         mimeMap.put("mp4", "video/mp4");
         mimeMap.put("mp3", "audio/mp3");
         mimeMap.put("flv", "video/flv");
         mimeMap.put("webm", "video/webm");
         mimeMap.put("opus", "audio/webm");
+        mimeMap.put("doc", "application/msword");
+        mimeMap.put("md", "text/markdown");
     }
 
     public static String getMimeType(String extension) {
         if (!extension.isEmpty() && mimeMap.containsKey(extension)) {
             return mimeMap.get(extension);
-        } else {
-            return "application/octet-stream";
+        } 
+        else {
+            // return "application/octet-stream";
+            return MimetypesFileTypeMap.getDefaultFileTypeMap().getContentType("file." + extension);
         }
     }
 
@@ -47,7 +52,7 @@ public class MimeTypeUtils {
             }
         }
 
-        //log.debug("ProbeMime: " + file.toString() + " = " + mimeType);
+        // log.debug("ProbeMime: " + file.toString() + " = " + mimeType);
         return mimeType;
     }
 

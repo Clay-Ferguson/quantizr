@@ -160,8 +160,15 @@ public class ExportServiceFlexmark {
 				}
 			} else if ("pdf".equals(format)) {
 				out = new FileOutputStream(new File(fullFileName));
+
+				/*
+				 * todo-1: we're writing to a physical file here EVEN when all we need it for is
+				 * to put out on IPFS. This can be improved to not need the physica file but do
+				 * it either all as streams or in byte array.
+				 */
 				PdfConverterExtension.exportToPdf(out, html, "", options);
 				wroteFile = true;
+				StreamUtil.close(out);
 
 				if (req.isToIpfs()) {
 					// now write the file we just generated out to IPFS.
@@ -303,12 +310,16 @@ public class ExportServiceFlexmark {
 				 */
 				src = fileName + "?cid=" + ipfsLink;
 			}
-		} 
-		/* NOTE: When exporting to PDF (wither with or without IPFS export option) we have to generate this
-		kind of reference to the image resource, because ultimately the Flexmark code that converts the HTML to the PDF
-		will be calling this image url to extract out the actual image data to embed directly into the PDF file so also
-		in this case it doesn't matter if the PDF is going to be eventually put out on IPFS or simply provided to the 
-		user as a downloadable link. */
+		}
+		/*
+		 * NOTE: When exporting to PDF (wither with or without IPFS export option) we
+		 * have to generate this kind of reference to the image resource, because
+		 * ultimately the Flexmark code that converts the HTML to the PDF will be
+		 * calling this image url to extract out the actual image data to embed directly
+		 * into the PDF file so also in this case it doesn't matter if the PDF is going
+		 * to be eventually put out on IPFS or simply provided to the user as a
+		 * downloadable link.
+		 */
 		else {
 			src = appProp.getHostAndPort() + "/mobile/api/bin/" + bin + "?nodeId=" + node.getId().toHexString()
 					+ "&token=" + ThreadLocals.getSessionContext().getUserToken();

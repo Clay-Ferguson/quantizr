@@ -321,7 +321,6 @@ export class MenuPanel extends Div {
                     // allows ability to select a tab
                     if (link.startsWith("tab:")) {
                         link = link.substring(4);
-                        debugger;
                         func = () => S.meta64.selectTab(link);
                     }
                     // covers http and https

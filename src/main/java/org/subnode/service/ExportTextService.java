@@ -2,6 +2,7 @@ package org.subnode.service;
 
 import java.io.BufferedOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.nio.charset.StandardCharsets;
 
@@ -12,6 +13,7 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;
 import org.subnode.config.AppProp;
+import org.subnode.model.MerkleLink;
 import org.subnode.mongo.MongoRead;
 import org.subnode.mongo.MongoSession;
 import org.subnode.mongo.model.SubNode;
@@ -19,6 +21,7 @@ import org.subnode.request.ExportRequest;
 import org.subnode.response.ExportResponse;
 import org.subnode.util.ExUtil;
 import org.subnode.util.FileUtils;
+import org.subnode.util.StreamUtil;
 import org.subnode.util.SubNodeUtil;
 import org.subnode.util.ThreadLocals;
 
@@ -36,6 +39,9 @@ public class ExportTextService {
 	@Autowired
 	private AppProp appProp;
 
+	@Autowired
+	private IPFSService ipfs;
+
 	private MongoSession session;
 
 	private BufferedOutputStream output = null;
@@ -43,6 +49,7 @@ public class ExportTextService {
 	private String fullFileName;
 	private static final byte[] NL = "\n".getBytes(StandardCharsets.UTF_8);
 	private ExportRequest req;
+	private ExportResponse res;
 
 	/*
 	 * Exports the node specified in the req. If the node specified is "/", or the
@@ -56,6 +63,7 @@ public class ExportTextService {
 	
 		this.session = session;
 		this.req = req;
+		this.res = res;
 		String nodeId = req.getNodeId();
 
 		if (!FileUtils.dirExists(appProp.getAdminDataFolder())) {
@@ -88,10 +96,26 @@ public class ExportTextService {
 			output = new BufferedOutputStream(new FileOutputStream(fullFileName));
 			recurseNode(exportNode, 0);
 			output.flush();
+			StreamUtil.close(output); 
+
+			if (req.isToIpfs()) {
+				// now write the file we just generated out to IPFS.
+				FileInputStream is = null;
+				try {
+					is = new FileInputStream(fullFileName);
+					String mime = "text/markdown";
+					MerkleLink ret = ipfs.addFromStream(session, is, null, mime, null, null, false);
+					res.setIpfsCid(ret.getHash());
+					res.setIpfsMime(mime);
+				} finally {
+					StreamUtil.close(is);
+				}
+			}
+
 		} catch (Exception ex) {
 			throw ExUtil.wrapEx(ex);
 		} finally {
-			// StreamUtil.close(output);
+			StreamUtil.close(output); 
 			(new File(fullFileName)).deleteOnExit();
 		}
 	}

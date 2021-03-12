@@ -13,17 +13,20 @@ import java.net.URLConnection;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Iterator;
-import javax.activation.MimetypesFileTypeMap;
+
 import javax.imageio.ImageIO;
 import javax.imageio.ImageReader;
 import javax.imageio.stream.ImageInputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBObject;
 import com.mongodb.client.gridfs.GridFSBucket;
 import com.mongodb.client.gridfs.GridFSFindIterable;
 import com.mongodb.client.gridfs.model.GridFSFile;
+
+import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.io.input.AutoCloseInputStream;
 import org.apache.commons.lang3.StringUtils;
@@ -299,16 +302,9 @@ public class AttachmentService {
 			mimeType = URLConnection.guessContentTypeFromName(fileName);
 		}
 
-		/*
-		 * Hack/Fix for ms word. Not sure why the URLConnection fails for this, but it's
-		 * new. I need to grab my old mime type map from legacy app and put in this
-		 * project. Clearly the guessContentTypeFromName implementation provided by
-		 * URLConnection has a screw loose.
-		 */
 		if (mimeType == null) {
-			if (fileName.toLowerCase().endsWith(".doc")) {
-				mimeType = "application/msword";
-			}
+			String ext = FilenameUtils.getExtension(fileName);
+			mimeType = MimeTypeUtils.getMimeType(ext);
 		}
 
 		/* fallback to at lest some acceptable mime type */
@@ -783,9 +779,7 @@ public class AttachmentService {
 		// generate the mime from it.
 		if (!mime.contains("/")) {
 			node.setProp(NodeProp.BIN_FILENAME.s(), "file." + mime);
-
-			// Note: I think Tika also has a version of this class which may be better?
-			mime = MimetypesFileTypeMap.getDefaultFileTypeMap().getContentType("file." + mime);
+			mime = MimeTypeUtils.getMimeType(mime);
 		}
 
 		node.setProp(NodeProp.BIN_MIME.s(), mime);
