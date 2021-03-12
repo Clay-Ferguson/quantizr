@@ -104,8 +104,15 @@ export class ExportDlg extends DialogBase {
                     // new Anchor(hostAndPort + "/file/" + res.fileName + "?disp=inline", "Raw View", { "target": "_blank" }),
                     // new Anchor(hostAndPort + "/view/" + res.fileName, "Formatted View", { "target": "_blank" }),
                     !res.ipfsCid ? new Anchor(downloadLink, "Download: " + downloadLink, null) : null,
-                    res.ipfsCid ? new Heading(5, "IPFS CID: " + res.ipfsCid) : null,
-                    res.ipfsMime ? new Heading(5, "mime type: " + res.ipfsMime) : null
+                    res.ipfsCid ? new Div("IPFS CID: " + res.ipfsCid, {
+                        className: "ipfsCidText",
+                        title: "Click -> Copy to clipboard",
+                        onClick: () => {
+                            S.util.copyToClipboard(res.ipfsCid);
+                            S.util.flashMessage("Copied to Clipboard: " + res.ipfsCid, "Clipboard", true);
+                        }
+                    }) : null,
+                    res.ipfsMime ? new Div("mime type: " + res.ipfsMime) : null
                 ]), false, 0, this.appState
             ).open();
 

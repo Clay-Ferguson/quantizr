@@ -668,15 +668,6 @@ public class AppController implements ErrorController {
 			just clicking things like the War and Peace book and trying to export that. */
 
 			if ("pdf".equalsIgnoreCase(req.getExportExt())) {
-				if (req.isToIpfs()) {
-					res.setMessage("Export of PFD to IPFS not yet available.");
-					res.setSuccess(false);
-				}
-				/*
-				 * NOTE: The original implementation of PDF export is in ExportPdfServicePdfBox
-				 * and us the one using PDFBox, but the newest version is the one using
-				 * https://github.com/vsch/flexmark-java, and is the one currently in use
-				 */
 				ExportServiceFlexmark svc = (ExportServiceFlexmark) SpringContextUtil
 						.getBean(ExportServiceFlexmark.class);
 				svc.export(ms, "pdf", req, res);

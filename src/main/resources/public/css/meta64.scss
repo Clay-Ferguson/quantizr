@@ -663,6 +663,10 @@ entire thing down some times, if it's jutting up against something */
     margin-right: 0px;
 }
 
+.ipfsCidText {
+    cursor: pointer;
+}
+
 .ipfs-text {
     margin: $smallGap;
     padding: 5px;

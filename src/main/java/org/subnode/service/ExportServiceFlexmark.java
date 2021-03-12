@@ -1,6 +1,7 @@
 package org.subnode.service;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.util.Arrays;
 import java.util.LinkedList;
@@ -161,6 +162,21 @@ public class ExportServiceFlexmark {
 				out = new FileOutputStream(new File(fullFileName));
 				PdfConverterExtension.exportToPdf(out, html, "", options);
 				wroteFile = true;
+
+				if (req.isToIpfs()) {
+					// now write the file we just generated out to IPFS.
+					FileInputStream is = null;
+					try {
+						is = new FileInputStream(fullFileName);
+						String mime = "application/pdf";
+						MerkleLink ret = ipfs.addFromStream(session, is, null, mime, null, null, false);
+						res.setIpfsCid(ret.getHash());
+						res.setIpfsMime(mime);
+					} finally {
+						StreamUtil.close(is);
+					}
+				}
+
 			} else {
 				throw new RuntimeException("invalid format.");
 			}
@@ -217,7 +233,7 @@ public class ExportServiceFlexmark {
 		}
 
 		if (rootDir != null) {
-			res.setIpfsCid(rootDir.getHash());
+			res.setIpfsCid(rootDir.getHash() + "/index.html");
 			res.setIpfsMime(mime);
 		}
 	}
@@ -257,7 +273,7 @@ public class ExportServiceFlexmark {
 
 		String src = null;
 
-		if (req.isToIpfs()) {
+		if (req.isToIpfs() && "html".equals(format)) {
 			String fileName = node.getStrProp(NodeProp.FILENAME);
 
 			if (bin != null) {
@@ -287,7 +303,13 @@ public class ExportServiceFlexmark {
 				 */
 				src = fileName + "?cid=" + ipfsLink;
 			}
-		} else {
+		} 
+		/* NOTE: When exporting to PDF (wither with or without IPFS export option) we have to generate this
+		kind of reference to the image resource, because ultimately the Flexmark code that converts the HTML to the PDF
+		will be calling this image url to extract out the actual image data to embed directly into the PDF file so also
+		in this case it doesn't matter if the PDF is going to be eventually put out on IPFS or simply provided to the 
+		user as a downloadable link. */
+		else {
 			src = appProp.getHostAndPort() + "/mobile/api/bin/" + bin + "?nodeId=" + node.getId().toHexString()
 					+ "&token=" + ThreadLocals.getSessionContext().getUserToken();
 		}
