@@ -28,7 +28,8 @@ export class SearchView extends AppTab {
     getTabButton(state: AppState): Li {
         return new Li(null, {
             className: "nav-item navItem",
-            style: { display: state.searchResults ? "inline" : "none" }
+            style: { display: state.searchResults ? "inline" : "none" },
+            onClick: this.handleClick
         }, [
             new Anchor("#searchTab", "Search", {
                 "data-toggle": "tab",

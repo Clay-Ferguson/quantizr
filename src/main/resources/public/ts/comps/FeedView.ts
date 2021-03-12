@@ -45,7 +45,8 @@ export class FeedView extends AppTab {
     getTabButton(state: AppState): Li {
         return new Li(null, {
             className: "nav-item navItem",
-            style: { display: "inline" }
+            style: { display: "inline" },
+            onClick: this.handleClick
         }, [
             new Anchor("#feedTab", "Feed", {
                 "data-toggle": "tab",

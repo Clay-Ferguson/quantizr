@@ -37,7 +37,8 @@ export class UserProfileView extends AppTab {
     getTabButton(state: AppState): Li {
         return new Li(null, {
             className: "nav-item navItem",
-            style: { display: state.userProfile ? "inline" : "none" }
+            style: { display: state.userProfile ? "inline" : "none" },
+            onClick: this.handleClick
         }, [
             new Anchor("#userProfileTab", "Profile", {
                 "data-toggle": "tab",

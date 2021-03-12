@@ -28,7 +28,8 @@ export class TimelineView extends AppTab {
     getTabButton(state: AppState): Li {
         return new Li(null, {
             className: "nav-item navItem",
-            style: { display: state.timelineResults ? "inline" : "none" }
+            style: { display: state.timelineResults ? "inline" : "none" },
+            onClick: this.handleClick
         }, [
             new Anchor("#timelineTab", "Timeline", {
                 "data-toggle": "tab",

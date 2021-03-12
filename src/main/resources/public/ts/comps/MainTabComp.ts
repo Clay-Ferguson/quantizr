@@ -29,7 +29,8 @@ export class MainTabComp extends AppTab {
     getTabButton(state: AppState): Li {
         return new Li(null, {
             className: "nav-item navItem",
-            style: { display: "inline" }
+            style: { display: "inline" },
+            onClick: this.handleClick
         }, [
             new Anchor("#mainTab", "Main", {
                 "data-toggle": "tab",
