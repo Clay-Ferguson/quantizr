@@ -153,10 +153,10 @@ export class MenuPanel extends Div {
             !state.isAnonUser ? new MenuItem("Show", () => S.render.showCalendar(null, state), !!hltNode) : null, //
             new MenuItemSeparator(), //
 
-            new MenuItem("Future Dates", () => S.srch.timeline("prp.date.value", state, "futureOnly", "Future calendar dates"), //
+            new MenuItem("Future Dates", () => S.srch.timeline("prp.date.value", state, "futureOnly", "Future calendar dates (Soonest at the top)"), //
                 !state.isAnonUser && !!hltNode), //
 
-            new MenuItem("Past Dates", () => S.srch.timeline("prp.date.value", state, "pastOnly", "Past calendar dates"), //
+            new MenuItem("Past Dates", () => S.srch.timeline("prp.date.value", state, "pastOnly", "Past calendar dates (Newest at the top)"), //
                 !state.isAnonUser && !!hltNode), //
 
             new MenuItem("All Dates", () => S.srch.timeline("prp.date.value", state, "all", "All calendar dates"), //

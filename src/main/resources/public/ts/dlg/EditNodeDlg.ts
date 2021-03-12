@@ -619,7 +619,7 @@ export class EditNodeDlg extends DialogBase {
 
             new Button("Cancel", this.cancelEdit, null, "btn-secondary bigMarginRight"),
 
-            this.uploadButton = (!hasAttachment && allowUpload) ? new Button("Upload", this.upload) : null,
+            this.uploadButton = (!hasAttachment && allowUpload) ? new Button("Attach", this.upload) : null,
             allowShare ? new Button("Share", this.share) : null,
 
             new Button("Type", this.openChangeNodeTypeDlg),
