@@ -205,7 +205,11 @@ public class ExportServiceFlexmark {
 		 * currently don't have a way to persistently 'pin' exports, unless we
 		 * automatically create an 'exports' node in the user account, and set it to
 		 * point to the root of every export which I wanted to do anyway, so we're ok in
-		 * that regard.
+		 * that regard. Also there's the question of how to manage the pinning of any of
+		 * the binary attachments that are first saved to ipfs as part of this export. I
+		 * guess the 'exports node' mentioned above in this paragraph could have an
+		 * array of subnodes under it with one per attachment, so that the user can
+		 * still see them all and be able to delete the entire structure at will.
 		 */
 		for (ExportIpfsFile file : files) {
 			// log.debug("Add file: " + file.getFileName() + " cid=" + file.getCid());
@@ -254,27 +258,33 @@ public class ExportServiceFlexmark {
 		String src = null;
 
 		if (req.isToIpfs()) {
-			/* todo-0: right here we need to detect if there is a 'bin' and not an 'ipfsLink' and in this 
-			so we can write the attachment out to IPFS, and get it's CID and then use that cid as our ipfsLink right here.
-			This will enable users to simply export a node and be guaranteed all the attachments on it are stored on IPFS */
-
 			String fileName = node.getStrProp(NodeProp.FILENAME);
 
+			if (bin != null) {
+				String cid = ipfs.saveNodeAttachmentToIpfs(session, node);
+				// log.debug("Saved NodeID bin to IPFS: got CID=" + cid);
+				files.add(new ExportIpfsFile(cid, cid));
+				src = fileName + "?cid=" + cid;
+			}
 			/*
 			 * if this is already an IPFS linked thing, assume we're gonna have it's name
 			 * added in the DAG and so reference it in src
 			 */
-			if (ipfsLink != null && fileName != null) {
-				log.debug("Found IPFS file: " + fileName);
+			else if (ipfsLink != null && fileName != null) {
+				// log.debug("Found IPFS file: " + fileName);
 				files.add(new ExportIpfsFile(ipfsLink, fileName));
 
-				/* NOTE: Since Quanta doesn't run a reverse proxy currently and doesn't have it's IPFS gateway open to the internet
-				we have to use this trick if sticking on the cid parameter so that our AppController.getBinary function (which will be 
-				called when the user references the resuorce) can use that instead of the relative path to locate the file. 
-				
-				When normal other IPFS gateways are opening this content they'll reference the actual 'fileName' and it will work
-				because we do DAG-link that file into the root CID DAG entry for this export!
-				*/
+				/*
+				 * NOTE: Since Quanta doesn't run a reverse proxy currently and doesn't have
+				 * it's IPFS gateway open to the internet we have to use this trick if sticking
+				 * on the cid parameter so that our AppController.getBinary function (which will
+				 * be called when the user references the resuorce) can use that instead of the
+				 * relative path to locate the file.
+				 * 
+				 * When normal other IPFS gateways are opening this content they'll reference
+				 * the actual 'fileName' and it will work because we do DAG-link that file into
+				 * the root CID DAG entry for this export!
+				 */
 				src = fileName + "?cid=" + ipfsLink;
 			}
 		} else {

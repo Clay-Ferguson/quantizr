@@ -663,6 +663,10 @@ public class AppController implements ErrorController {
 		return callProc.run("export", req, session, ms -> {
 			ExportResponse res = new ExportResponse();
 
+			/* todo-0: need to require that the node being exported is OWNED BY (not just visible to) the person
+			doing the export, because this will potentially consume a lot of their storage quota and we don't want users
+			just clicking things like the War and Peace book and trying to export that. */
+
 			if ("pdf".equalsIgnoreCase(req.getExportExt())) {
 				if (req.isToIpfs()) {
 					res.setMessage("Export of PFD to IPFS not yet available.");

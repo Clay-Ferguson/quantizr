@@ -1062,9 +1062,8 @@ public class AttachmentService {
 		InputStream is = null;
 		String ipfsHash = node.getStrProp(NodeProp.IPFS_LINK.s() + binSuffix);
 		if (ipfsHash != null) {
-			String mimeType = node.getStrProp(NodeProp.BIN_MIME.s() + binSuffix);
-			// log.debug("Getting IPFS Stream: hash=" + ipfsHash + " mime=" + mimeType);
-			is = ipfsService.getStream(session, ipfsHash, mimeType);
+			// log.debug("Getting IPFS Stream: hash=" + ipfsHash);
+			is = ipfsService.getStream(session, ipfsHash);
 		} else {
 			is = getStreamByNode(node, binSuffix);
 		}

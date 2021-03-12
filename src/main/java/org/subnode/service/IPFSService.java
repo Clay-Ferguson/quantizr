@@ -65,6 +65,9 @@ import org.subnode.util.XString;
 
 // IPFS Reference: https://docs.ipfs.io/reference/http/api
 
+/* todo-0: There are several places in here where we're getting back a "String" from a restTemplate.exchange for getting back JSON, and we can
+probably define a POJO and let the converter convert do this for us always instead */
+
 @Component
 public class IPFSService {
     private static final Logger log = LoggerFactory.getLogger(IPFSService.class);
@@ -99,6 +102,9 @@ public class IPFSService {
 
     @Autowired
     private AppProp appProp;
+
+    @Autowired
+    AttachmentService attachmentService;
 
     @PostConstruct
     public void init() {
@@ -138,13 +144,37 @@ public class IPFSService {
         return ret;
     }
 
+    /* Ensures this node's attachment is saved to IPFS and returns the CID of it */
+    public final String saveNodeAttachmentToIpfs(MongoSession session, SubNode node) {
+        String cid = null;
+        String mime = node.getStrProp(NodeProp.BIN_MIME);
+
+        InputStream is = attachmentService.getStreamByNode(node, "");
+        if (is != null) {
+            try {
+                MerkleLink ret = addFromStream(session, is, null, mime, null, null, false);
+                if (ret != null) {
+                    cid = ret.getHash();
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            } finally {
+                StreamUtil.close(is);
+            }
+        } else {
+            log.debug("Unable to get inputstream or oid.");
+        }
+
+        return cid;
+    }
+
     /**
      * Reads the bytes from 'ipfs hash', expecting them to be UTF-8 and returns the
      * string.
      * 
      * NOTE: The hash is allowed to have a subpath here.
      */
-    public final String objectCat(String hash) {
+    public final String catToString(String hash) {
         String ret = null;
         try {
             String url = API_CAT + "?arg=" + hash;
@@ -156,7 +186,7 @@ public class IPFSService {
         return ret;
     }
 
-    public InputStream getStreamForHash(String hash) {
+    public InputStream getInputStream(String hash) {
         String url = API_CAT + "?arg=" + hash;
         InputStream is = null;
         try {
@@ -221,7 +251,6 @@ public class IPFSService {
         MerkleNode ret = null;
         try {
             String url = API_OBJECT + "/get?arg=" + hash + "&" + ENCODING_PARAM_NAME + "=" + encoding;
-
             log.debug("REQ: " + url);
 
             ResponseEntity<String> result = restTemplate.getForEntity(new URI(url), String.class);
@@ -284,12 +313,12 @@ public class IPFSService {
 
     public MerkleLink dagPutFromString(MongoSession session, String val, String mimeType,
             ValContainer<Integer> streamSize, ValContainer<String> cid) {
-        return writeFromStream(session, API_DAG + "/put", IOUtils.toInputStream(val), null, mimeType, streamSize, cid);
+        return writeFromStream(session, API_DAG + "/put", IOUtils.toInputStream(val), null, streamSize, cid);
     }
 
     public MerkleLink dagPutFromStream(MongoSession session, InputStream stream, String mimeType,
             ValContainer<Integer> streamSize, ValContainer<String> cid) {
-        return writeFromStream(session, API_DAG + "/put", stream, null, mimeType, streamSize, cid);
+        return writeFromStream(session, API_DAG + "/put", stream, null, streamSize, cid);
     }
 
     public MerkleLink addFileFromString(MongoSession session, String text, String fileName, String mimeType,
@@ -306,7 +335,7 @@ public class IPFSService {
             ValContainer<Integer> streamSize, ValContainer<String> cid) {
         return writeFromStream(session,
                 API_FILES + "/write?arg=" + fileName + "&create=true&parents=true&truncate=true", stream, null,
-                mimeType, streamSize, cid);
+                streamSize, cid);
     }
 
     public MerkleLink addFromStream(MongoSession session, InputStream stream, String fileName, String mimeType,
@@ -315,14 +344,13 @@ public class IPFSService {
         if (wrapInFolder) {
             endpoint += "&wrap-with-directory=true";
         }
-        return writeFromStream(session, endpoint, stream, fileName, mimeType, streamSize, cid);
+        return writeFromStream(session, endpoint, stream, fileName, streamSize, cid);
     }
 
     public Map<String, Object> addTarFromFile(String fileName) {
         adminRunner.run(mongoSession -> {
             try {
-                addTarFromStream(mongoSession, new BufferedInputStream(new FileInputStream(fileName)), null, null,
-                        null);
+                addTarFromStream(mongoSession, new BufferedInputStream(new FileInputStream(fileName)), null, null);
             } catch (Exception e) {
                 log.error("Failed in restTemplate.exchange", e);
             }
@@ -330,21 +358,20 @@ public class IPFSService {
         return null;
     }
 
-    public MerkleLink addTarFromStream(MongoSession session, InputStream stream, String mimeType,
-            ValContainer<Integer> streamSize, ValContainer<String> cid) {
-        return writeFromStream(session, API_TAR + "/add", stream, null, mimeType, streamSize, cid);
+    public MerkleLink addTarFromStream(MongoSession session, InputStream stream, ValContainer<Integer> streamSize,
+            ValContainer<String> cid) {
+        return writeFromStream(session, API_TAR + "/add", stream, null, streamSize, cid);
     }
 
-    // todo-0: remove mimeType from here (not used)
     // https://medium.com/red6-es/uploading-a-file-with-a-filename-with-spring-resttemplate-8ec5e7dc52ca
     /*
      * todo-0: addition of 'fileName' is very new and very important here. Evaluate
      * everywhere we can pass this in and also check if there are ways we can avoid
-     * the old need for mime guessing by always baseing off extension on this
+     * the old need for mime guessing by always basing off extension on this
      * filename?
      */
     public MerkleLink writeFromStream(MongoSession session, String endpoint, InputStream stream, String fileName,
-            String mimeType, ValContainer<Integer> streamSize, ValContainer<String> cid) {
+            ValContainer<Integer> streamSize, ValContainer<String> cid) {
         // log.debug("Writing file: " + path);
         MerkleLink ret = null;
         try {
@@ -409,18 +436,6 @@ public class IPFSService {
             MultiValueMap<String, Object> bodyMap = new LinkedMultiValueMap<>();
             HttpEntity<MultiValueMap<String, Object>> requestEntity = new HttpEntity<>(bodyMap, headers);
 
-            //////
-            // todo-1: this kind of way can get the class directly from spring without us
-            ////// having to pare it as json, it just comes right
-            // back in the 'getBody' as the correctly typed json. Do this throughout the
-            ////// code where possible.
-            // ResponseEntity<?> response = restTemplate.exchange(url, HttpMethod.GET,
-            ////// requestEntity, clazz);
-            // if (response != null) {
-            // return response.getBody();
-            // }
-            //////
-
             ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.POST, requestEntity, String.class);
             ret = mapper.readValue(response.getBody(), new TypeReference<Map<String, Object>>() {
             });
@@ -465,6 +480,9 @@ public class IPFSService {
      * new rootCid
      */
     public MerkleNode addFileToDagRoot(String rootCid, String filePath, String fileCid) {
+        if (StringUtils.isEmpty(filePath)) {
+            filePath = fileCid;
+        }
         return postToGetMerkleNode(API_OBJECT + "/patch/add-link?arg=" + rootCid + "&arg=" + filePath + "&arg="
                 + fileCid + "&create=true");
     }
@@ -503,11 +521,17 @@ public class IPFSService {
         BufferedOutputStream outStream = null;
 
         try {
+            /*
+             * To set contentType and contentLength here we'd need to read the entire stream
+             * into byte array and get that info, and then use the byte array to stream the
+             * result. For now things seem to work without us holding it all in memory which
+             * is ideal
+             */
             // response.setContentType(mimeTypeProp);
             // response.setContentLength((int) size);
             response.setHeader("Cache-Control", "public, max-age=31536000");
 
-            inStream = new BufferedInputStream(getStream(session, hash, null));
+            inStream = new BufferedInputStream(getStream(session, hash));
             outStream = new BufferedOutputStream(response.getOutputStream());
 
             IOUtils.copy(inStream, outStream);
@@ -520,8 +544,7 @@ public class IPFSService {
         }
     }
 
-    // todo-0: mimeType is not used.
-    public InputStream getStream(MongoSession session, String hash, String mimeType) {
+    public InputStream getStream(MongoSession session, String hash) {
         String sourceUrl = appProp.getIPFSGatewayHostAndPort() + "/ipfs/" + hash;
 
         try {
