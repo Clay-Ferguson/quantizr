@@ -152,11 +152,6 @@ export class View implements ViewIntf {
         }
 
         if (newNode) {
-            /* We do this async just to make the fastest possible response when clicking on a node */
-            // setTimeout(() => {
-            //     S.util.updateHistory(null, newNode, state);
-            // }, 10);
-
             fastDispatch({
                 type: "Action_FastRefresh",
                 updateNew: (s: AppState): AppState => {

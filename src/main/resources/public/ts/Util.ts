@@ -981,7 +981,7 @@ export class Util implements UtilIntf {
 
     /* NOTE: There's also a 'history.replaceState()' which doesn't build onto the history but modifies what it thinks
     the current location is. */
-    updateHistory = (node: J.NodeInfo, childNode: J.NodeInfo = null, appState: AppState): void => {
+    updateHistory = (node: J.NodeInfo, childNodeId: string = null, appState: AppState): void => {
         if (!node) {
             node = appState.node;
         }
@@ -995,29 +995,35 @@ export class Util implements UtilIntf {
             const queryPath = this.getPathPartForNamedNode(node);
             url = window.location.origin + queryPath;
 
-            if (childNode && childNode.id !== node.id) {
-                url += "#" + childNode.id;
+            if (childNodeId && childNodeId !== node.id) {
+                url += "#" + childNodeId;
             }
             state = {
                 nodeId: ":" + node.name,
-                highlightId: (childNode && childNode.id !== node.id) ? childNode.id : null
+                highlightId: (childNodeId && childNodeId !== node.id) ? childNodeId : null
             };
             title = node.name;
         }
         else {
             url = window.location.origin + "/app?id=" + node.id;
-            if (childNode && childNode.id !== node.id) {
-                url += "#" + childNode.id;
+            if (childNodeId && childNodeId !== node.id) {
+                url += "#" + childNodeId;
             }
             state = {
                 nodeId: node.id,
-                highlightId: (childNode && childNode.id !== node.id) ? childNode.id : null
+                highlightId: (childNodeId && childNodeId !== node.id) ? childNodeId : null
             };
             title = node.id;
         }
 
-        // console.log("PUSHSTATE: url: " + url + ", state: " + JSON.stringify(state));
-        history.pushState(state, title, url);
+        if (history.state && state.nodeId === history.state.nodeId) {
+            history.replaceState(state, title, url);
+            // console.log("REPLACED STATE: url: " + url + ", state: " + JSON.stringify(state) + " length=" + history.length);
+        }
+        else {
+            history.pushState(state, title, url);
+            // console.log("PUSHED STATE: url: " + url + ", state: " + JSON.stringify(state) + " length=" + history.length);
+        }
     }
 
     getPathPartForNamedNode = (node: J.NodeInfo): string => {
