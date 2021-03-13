@@ -2,6 +2,7 @@ package org.subnode.util;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URLConnection;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.HashMap;
@@ -34,10 +35,19 @@ public class MimeTypeUtils {
     public static String getMimeType(String extension) {
         if (!extension.isEmpty() && mimeMap.containsKey(extension)) {
             return mimeMap.get(extension);
-        } 
-        else {
-            // return "application/octet-stream";
-            return MimetypesFileTypeMap.getDefaultFileTypeMap().getContentType("file." + extension);
+        } else {
+            String fileName = "file." + extension;
+            String ret = MimetypesFileTypeMap.getDefaultFileTypeMap().getContentType(fileName);
+
+            // If that getContentType didn't find anything specific, try again.
+            if ("application/octet-stream".equals(ret)) {
+                /*
+                 * todo-0: we have direct calls to guessContentTypeFromName, that should all be
+                 * calling this method instead.
+                 */
+                ret = URLConnection.guessContentTypeFromName(fileName);
+            }
+            return ret;
         }
     }
 

@@ -176,7 +176,7 @@ public class ExportServiceFlexmark {
 					try {
 						is = new FileInputStream(fullFileName);
 						String mime = "application/pdf";
-						MerkleLink ret = ipfs.addFromStream(session, is, null, mime, null, null, false);
+						MerkleLink ret = ipfs.addFromStream(session, is, shortFileName, mime, null, null, false);
 						res.setIpfsCid(ret.getHash());
 						res.setIpfsMime(mime);
 					} finally {

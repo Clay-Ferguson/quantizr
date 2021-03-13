@@ -150,11 +150,12 @@ public class IPFSService {
     public final String saveNodeAttachmentToIpfs(MongoSession session, SubNode node) {
         String cid = null;
         String mime = node.getStrProp(NodeProp.BIN_MIME);
+        String fileName = node.getStrProp(NodeProp.FILENAME);
 
         InputStream is = attachmentService.getStreamByNode(node, "");
         if (is != null) {
             try {
-                MerkleLink ret = addFromStream(session, is, null, mime, null, null, false);
+                MerkleLink ret = addFromStream(session, is, fileName, mime, null, null, false);
                 if (ret != null) {
                     cid = ret.getHash();
                 }
