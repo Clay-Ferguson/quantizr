@@ -79,18 +79,14 @@ public class SystemService {
 		// do not delete.
 		// userManagerService.cleanUserAccounts();
 		attachmentService.gridMaintenanceScan();
-
-		try {
-			update.releaseOrphanIPFSPins();
-		} catch (Exception e) {
-			/*
-			 * I noticed this failing in Jan 2021. I think IPFS made and API change we aren't accounting for
-			 * yet. needs research (todo-1)
-			 */
-			// log.error("releaseOrphanIPFSPins failed.", e);
-		}
+		ipfsGarbageCollect();
 
 		String ret = runMongoDbCommand(new Document("compact", "nodes"));
+		return ret;
+	}
+
+	public String ipfsGarbageCollect() {
+		String ret = update.releaseOrphanIPFSPins();
 		return ret;
 	}
 

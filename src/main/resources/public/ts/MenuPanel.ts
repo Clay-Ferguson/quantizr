@@ -266,21 +266,25 @@ export class MenuPanel extends Div {
         }
 
         if (state.isAdminUser) {
-            children.push(new Menu("Admin", [
+            children.push(new Menu("Admin - Utils", [
 
                 // new MenuItem("Backup DB", () => S.view.runServerCommand("BackupDb", "Backup DB Response", null, state)), //
                 new MenuItem("Server Info", () => S.view.runServerCommand("getServerInfo", "Server Info", null, state)), //
                 new MenuItem("Refresh RSS Cache", () => S.view.runServerCommand("refreshRssCache", "Refresh RSS Cache", null, state)), //
                 new MenuItem("Refresh Fediverse", () => S.view.runServerCommand("refreshFediverseUsers", "Refresh Fediverse Users", null, state)), //
                 new MenuItem("Reset Public Node", () => S.view.runServerCommand("initializeAppContent", null, null, state)), //
-                new MenuItem("Insert Book: War and Peace", () => S.edit.insertBookWarAndPeace(state)),
-                new MenuItemSeparator(), //
+                new MenuItem("Insert Book: War and Peace", () => S.edit.insertBookWarAndPeace(state))
+            ]));
 
-                new MenuItem("DB - Validate", () => S.view.runServerCommand("validateDb", "Validate DB Response", null, state)), //
-                new MenuItem("DB - Compact", () => S.view.runServerCommand("compactDb", "Compact DB Response", null, state)), //
-                new MenuItem("DB - Rebuild Indexes", () => S.view.runServerCommand("rebuildIndexes", "Rebuild Indexes Response", null, state)), //
-                new MenuItemSeparator(), //
+            children.push(new Menu("Admin - DB", [
 
+                new MenuItem("Validate", () => S.view.runServerCommand("validateDb", "Validate DB Response", null, state)), //
+                new MenuItem("Compact", () => S.view.runServerCommand("compactDb", "Compact DB Response", null, state)), //
+                new MenuItem("Rebuild Indexes", () => S.view.runServerCommand("rebuildIndexes", "Rebuild Indexes Response", null, state)), //
+                new MenuItem("IPFS - Garbage Collect", () => S.view.runServerCommand("ipfsGarbageCollect", "Clean up unused PINs, and run IPFS maintenance", null, state)) //
+            ]));
+
+            children.push(new Menu("Admin - Test", [
                 new MenuItem("TEST - Send Email", () => S.meta64.sendTestEmail(state)),
                 new MenuItem("TEST - Notification Display", () => S.meta64.showSystemNotification("Test Title", "This is a test message")),
                 new MenuItem("TEST - Encryption", async () => {
@@ -298,8 +302,8 @@ export class MenuPanel extends Div {
 
                     /* WARNING: speechSynthesis seems to crash very often and leave hung processes, eating up CPU, at least
                     on my Ubuntu 18.04, machine, so for now any TTS development is on hold. */
-                    var utterThis = new SpeechSynthesisUtterance("Wow. Browsers now support Text to Speech driven by JavaScript");
-                    tts.speak(utterThis);
+                    var sayThis = new SpeechSynthesisUtterance("Wow. Browsers now support Text to Speech driven by JavaScript");
+                    tts.speak(sayThis);
                 })
             ]));
         }

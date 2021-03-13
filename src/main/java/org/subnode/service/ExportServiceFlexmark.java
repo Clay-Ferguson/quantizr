@@ -223,10 +223,10 @@ public class ExportServiceFlexmark {
 		 * arg, where as the rest of the IPFS internet gateways will hopefully ignore
 		 * that unknown parameter.
 		 * 
-		 * todo-0: need logic to only PIN the final value here, and also remember our
-		 * own gateway garbage collects any PINs that are not assigned to a node so we
-		 * currently don't have a way to persistently 'pin' exports, unless we
-		 * automatically create an 'exports' node in the user account, and set it to
+		 * todo-0: need logic to only PIN the final rootDir value here, and also
+		 * remember our own gateway garbage collects any PINs that are not assigned to a
+		 * node so we currently don't have a way to persistently 'pin' exports, unless
+		 * we automatically create an 'exports' node in the user account, and set it to
 		 * point to the root of every export which I wanted to do anyway, so we're ok in
 		 * that regard. Also there's the question of how to manage the pinning of any of
 		 * the binary attachments that are first saved to ipfs as part of this export. I
@@ -235,6 +235,7 @@ public class ExportServiceFlexmark {
 		 * still see them all and be able to delete the entire structure at will.
 		 */
 		for (ExportIpfsFile file : files) {
+			// todo-0: is there a way to add multiple files to a DAG all at once?
 			// log.debug("Add file: " + file.getFileName() + " cid=" + file.getCid());
 			rootDir = ipfs.addFileToDagRoot(rootDir.getHash(), file.getFileName(), file.getCid());
 		}

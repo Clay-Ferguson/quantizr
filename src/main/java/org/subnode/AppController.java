@@ -1251,6 +1251,10 @@ public class AppController implements ErrorController {
 				res.getMessages().add(new InfoMessage(systemService.validateDb(), null));
 				break;
 
+			case "ipfsGarbageCollect":
+				res.getMessages().add(new InfoMessage(systemService.ipfsGarbageCollect(), null));
+				break;
+
 			case "rebuildIndexes":
 				res.getMessages().add(new InfoMessage(systemService.rebuildIndexes(), null));
 				break;

@@ -6,6 +6,7 @@ import java.io.FileInputStream;
 import java.io.InputStream;
 import java.net.URI;
 import java.net.URL;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -218,22 +219,16 @@ public class IPFSService {
         return postForJsonReply(url, Object.class) != null;
     }
 
-    // todo-1: make this handle a type, not generic map
     public final LinkedHashMap<String, Object> getPins() {
         LinkedHashMap<String, Object> pins = null;
+        HashMap<String, Object> res = null;
         try {
             String url = API_PIN + "/ls?type=recursive";
+            res = (LinkedHashMap) postForJsonReply(url, LinkedHashMap.class);
+            // log.debug("RAW PINS LIST RESULT: " + XString.prettyPrint(res));
 
-            ResponseEntity<String> result = restTemplate.getForEntity(new URI(url), String.class);
-            MediaType contentType = result.getHeaders().getContentType();
-
-            log.debug("RAW PINS LIST RESULT: " + result.getBody());
-
-            if (MediaType.APPLICATION_JSON.equals(contentType)) {
-                Map<String, Object> respMap = mapper.readValue(result.getBody(),
-                        new TypeReference<Map<String, Object>>() {
-                        });
-                pins = (LinkedHashMap<String, Object>) respMap.get("Keys");
+            if (res != null) {
+                pins = (LinkedHashMap) res.get("Keys");
             }
         } catch (Exception e) {
             log.error("Failed to get pins", e);
