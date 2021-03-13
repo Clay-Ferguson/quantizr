@@ -121,15 +121,17 @@ public class SystemService {
 		if (node != null) {
 			String ret = XString.prettyPrint(node);
 
-			IPFSDirStat fullStat = ipfsService.pathStat(node.getPath());
-			if (fullStat != null) {
-				ret += "\n\nIPFS Folder Stats:\n" + XString.prettyPrint(fullStat);
-			}
+			// Well, this appears to be obsolete, and I really don't remember when node paths were
+			// used as IPFS paths? So i'm commenting out for now.
+			// IPFSDirStat fullStat = ipfsService.pathStat(node.getPath());
+			// if (fullStat != null) {
+			// 	ret += "\n\nIPFS Folder Stats:\n" + XString.prettyPrint(fullStat);
+			// }
 
-			IPFSDirStat nodeStat = ipfsService.pathStat(node.getPath() + "/node.json");
-			if (nodeStat != null) {
-				ret += "\n\nIPFS File Stats:\n" + XString.prettyPrint(nodeStat);
-			}
+			// IPFSDirStat nodeStat = ipfsService.pathStat(node.getPath() + "/node.json");
+			// if (nodeStat != null) {
+			// 	ret += "\n\nIPFS File Stats:\n" + XString.prettyPrint(nodeStat);
+			// }
 
 			// NOTE: We used to have a "Show IPFS Info" that displayed what comes from
 			// this...

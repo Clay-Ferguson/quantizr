@@ -210,6 +210,12 @@ public class IPFSService {
         return postForJsonReply(url, Object.class) != null;
     }
 
+    public final boolean pin(String cid) {
+        //log.debug("Pinning: " + cid);
+        String url = API_PIN + "/add?arg=" + cid;
+        return postForJsonReply(url, Object.class) != null;
+    }
+
     /* Deletes the file or if a folder deletes it recursively */
     public final boolean deletePath(String path) {
         String url = API_FILES + "/rm?arg=" + path + "&force=true";

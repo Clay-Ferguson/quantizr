@@ -680,6 +680,7 @@ export const enum NodeProp {
     FILENAME = "sn:fileName",
     NAME = "sn:name",
     IPFS_LINK = "ipfs:link",
+    IPFS_REF = "ipfs:ref",
     JSON_HASH = "ipfs:json",
     SAVE_TO_IPFS = "sn:saveToIpfs",
     IPFS_LINK_NAME = "ipfs:linkName",

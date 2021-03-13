@@ -457,6 +457,7 @@ public class AttachmentService {
 		node.deleteProp(NodeProp.BIN_URL.s() + binSuffix);
 		node.deleteProp(NodeProp.BIN_DATA_URL.s() + binSuffix);
 		node.deleteProp(NodeProp.IPFS_LINK.s() + binSuffix);
+		node.deleteProp(NodeProp.IPFS_REF.s() + binSuffix);
 	}
 
 	/**
@@ -773,6 +774,11 @@ public class AttachmentService {
 
 		auth.auth(session, node, PrivilegeType.WRITE);
 		node.setProp(NodeProp.IPFS_LINK.s(), req.getCid().trim());
+		/*
+		 * todo-0: need to add a "pin" property to the request so a client checkbox can
+		 * specify if we need to pin this or not. Assuming we CAN pin something we didn't yet upload ourselves?
+		 */
+
 		String mime = req.getMime().trim().replace(".", "");
 
 		// If an extension was given (not a mime), then use it to make a filename, and
@@ -1025,6 +1031,8 @@ public class AttachmentService {
 		MerkleLink ret = ipfsService.addFromStream(session, stream, null, mimeType, streamSize, null, false);
 		if (ret != null) {
 			node.setProp(NodeProp.IPFS_LINK.s() + binSuffix, ret.getHash());
+			// NOTE: Lack of the REF property indicated we store internally (pinned file)
+			// node.setProp(NodeProp.IPFS_REF.s() + binSuffix, "0");
 			node.setProp(NodeProp.BIN_SIZE.s() + binSuffix, streamSize.getVal());
 		}
 	}

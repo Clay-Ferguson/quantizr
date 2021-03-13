@@ -30,6 +30,7 @@ import { Form } from "../widget/Form";
 import { FormGroup } from "../widget/FormGroup";
 import { FormInline } from "../widget/FormInline";
 import { Header } from "../widget/Header";
+import { HorizontalLayout } from "../widget/HorizontalLayout";
 import { Icon } from "../widget/Icon";
 import { Label } from "../widget/Label";
 import { LayoutRow } from "../widget/LayoutRow";
@@ -453,9 +454,26 @@ export class EditNodeDlg extends DialogBase {
             let ipfsLink = S.props.getNodePropVal(J.NodeProp.IPFS_LINK, state.node);
             let mime = S.props.getNodePropVal(J.NodeProp.BIN_MIME, state.node);
 
+            let pinCheckbox: Checkbox = null;
+            if (ipfsLink) {
+                pinCheckbox = new Checkbox("IPFS Pinned", { className: "ipfsPinnedCheckbox" }, {
+                    setValue: (checked: boolean): void => {
+                        if (checked) {
+                            this.deleteProperty(J.NodeProp.IPFS_REF);
+                        }
+                        else {
+                            S.props.setNodePropVal(J.NodeProp.IPFS_REF, this.getState().node, "1");
+                        }
+                    },
+                    getValue: (): boolean => {
+                        return S.props.getNodeProp(J.NodeProp.IPFS_REF, state.node) ? false : true;
+                    }
+                });
+            }
+
             // NOTE: col numbers in the children of LayoutRow must add up to 12 (per bootstrap)!
             let topBinRow = new LayoutRow([
-                new Div(null, { className: "col-6" }, [
+                new Div(null, { className: "col-4" }, [
                     new Div((ipfsLink ? "IPFS " : "") + "Attachment", {
                         className: "smallHeading"
                     }),
@@ -463,18 +481,21 @@ export class EditNodeDlg extends DialogBase {
                 ]),
 
                 new Div(null, {
-                    className: "col-6"
+                    className: "col-8"
                 }, [
                     new Div(null, null, [
-                        imgSizeSelection,
-                        new ButtonBar([
-                            this.deleteUploadButton = new Button("Delete", this.deleteUpload, { title: "Delete this Attachment" }),
-                            this.uploadButton = new Button("Replace", this.upload, { title: "Upload a new Attachment" })
+                        new HorizontalLayout([
+                            imgSizeSelection,
+                            pinCheckbox
+                        ])
+                    ]),
+                    new ButtonBar([
+                        this.deleteUploadButton = new Button("Delete", this.deleteUpload, { title: "Delete this Attachment" }),
+                        this.uploadButton = new Button("Replace", this.upload, { title: "Upload a new Attachment" })
 
-                            // todo-1: this is not doing what I want but it unimportant so removing it for now.
-                            // ipfsLink ? new Button("IPFS Link", () => S.render.showNodeUrl(state.node, this.appState), { title: "Show the IPFS URL for the attached file." }) : null
-                        ], null, "float-right marginRight")
-                    ])
+                        // todo-1: this is not doing what I want but it unimportant so removing it for now.
+                        // ipfsLink ? new Button("IPFS Link", () => S.render.showNodeUrl(state.node, this.appState), { title: "Show the IPFS URL for the attached file." }) : null
+                    ], null, "float-right marginRight")
                 ])
             ]);
 
@@ -1088,6 +1109,8 @@ export class EditNodeDlg extends DialogBase {
     }
 
     deleteSelectedProperties = (): void => {
+        /* todo-1: This was a quick and dirty approach, calling the server for each property to delete. Should
+        simply allow the server to accept an array */
         this.getState().selectedProps.forEach(propName => this.deleteProperty(propName), this);
     }
 

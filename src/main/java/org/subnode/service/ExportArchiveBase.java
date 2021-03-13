@@ -323,7 +323,6 @@ public abstract class ExportArchiveBase {
 			}
 			String binFileNameStr = binFileNameProp != null ? binFileNameProp : "binary";
 
-			// final String ipfsLink = node.getStringProp(NodeProp.IPFS_LINK.s());
 			final String mimeType = node.getStrProp(NodeProp.BIN_MIME.s());
 
 			String imgUrl = null;

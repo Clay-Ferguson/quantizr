@@ -3,15 +3,16 @@ package org.subnode.mongo;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.stereotype.Component;
-import org.subnode.model.client.NodeProp;
 import org.subnode.model.client.PrivilegeType;
 import org.subnode.mongo.model.SubNode;
 import org.subnode.service.IPFSService;
+import org.subnode.util.Cast;
 import org.subnode.util.ValContainer;
 
 @Component
@@ -99,17 +100,17 @@ public class MongoUpdate {
 		ValContainer<String> ret = new ValContainer<String>("failed");
 		adminRunner.run(session -> {
 			int pinCount = 0, orphanCount = 0;
-			LinkedHashMap<String, Object> pins = (LinkedHashMap)ipfs.getPins();
+			LinkedHashMap<String, Object> pins = Cast.toLinkedHashMap(ipfs.getPins());
 			if (pins != null) {
 				/* For each CID that is pinned we do a lookup to see if there's a Node that is using that PIN, 
 				and if not we remove the pin */
 				for (String pin : pins.keySet()) {
-					SubNode ipfsNode = read.findSubNodeByProp(session, NodeProp.IPFS_LINK.s(), pin);
+					SubNode ipfsNode = read.findByIPFSPinned(session, pin);
 					if (ipfsNode != null) {
 						pinCount++;
-						// log.debug("Found IPFS CID=" + pin + " on nodeId " + ipfsNode.getId().toHexString());
+						//log.debug("Found IPFS CID=" + pin + " on nodeId " + ipfsNode.getId().toHexString());
 					} else {
-						// log.debug("Removing Orphan IPFS CID=" + pin);
+						//log.debug("Removing Orphan IPFS CID=" + pin);
 						orphanCount++;
 						ipfs.removePin(pin);
 					}

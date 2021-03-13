@@ -965,4 +965,19 @@ public class MongoRead {
         auth.auth(session, ret, PrivilegeType.READ);
         return ret;
     }
+
+    public SubNode findByIPFSPinned(MongoSession session, String cid) {
+        Query query = new Query();
+
+        /* Match the PIN to cid */
+        Criteria criteria = Criteria.where(SubNode.FIELD_PROPERTIES + "." + NodeProp.IPFS_LINK.s() + ".value").is(cid);
+
+        /* And only consider nodes that are NOT REFs (meaning REF prop==null) */
+        criteria = criteria.and(SubNode.FIELD_PROPERTIES + "." + NodeProp.IPFS_REF.s() + ".value").is(null);
+        
+        query.addCriteria(criteria);
+        SubNode ret = getOps(session).findOne(query, SubNode.class);
+        auth.auth(session, ret, PrivilegeType.READ);
+        return ret;
+    }
 }

@@ -96,6 +96,9 @@ public class NodeEditService {
 	@Autowired
 	private MongoAuth auth;
 
+	@Autowired
+	private IPFSService ipfs;
+
 	/*
 	 * Creates a new node as a *child* node of the node specified in the request.
 	 * Should ONLY be called by the controller that accepts a node being created by
@@ -452,6 +455,25 @@ public class NodeEditService {
 		/* if node is currently encrypted */
 		else {
 			res.setAclEntries(auth.getAclEntries(session, node));
+		}
+
+		/*
+		 * If we have an IPFS attachment and there's no IPFS_REF property that means it
+		 * should be pinned. (REF means 'referenced' and external to our server). Note, we dont
+		 * try to aggressively unpin here, because we have a cleanup routine that takes care of
+		 * all orphans automatically. 
+		 * 
+		 * todo-0: It may be better to do the pin remove(s) also aggressively at the TIME the user clicks
+		 * the checkbox in the GUI, which calls immediately into the server when a property is deleted
+		 * because it's easy to do that, and gives the user back their quota space immediately, but this is 
+		 * lower priority.
+		 * 
+		 * todo-0: Run this in an async thread so that save operation is as fast as
+		 * possible.
+		 */
+		String ipfsLink = node.getStrProp(NodeProp.IPFS_LINK);
+		if (ipfsLink != null && node.getStrProp(NodeProp.IPFS_REF.s()) == null) {
+			ipfs.pin(ipfsLink);
 		}
 
 		/*

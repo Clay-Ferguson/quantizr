@@ -14,6 +14,8 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
 
 export class Checkbox extends Comp implements I.CheckboxIntf {
 
+    outterClassName: string;
+
     constructor(public label: string = null, _attribs: Object = null, private valueIntf: ValueIntf) {
         super(_attribs);
 
@@ -23,6 +25,10 @@ export class Checkbox extends Comp implements I.CheckboxIntf {
         }
 
         this.attribs.type = "checkbox";
+
+        // kinda tricky, but any className passed in gets applied on the outter container.
+        this.outterClassName = this.attribs.className || "";
+
         this.attribs.className = "custom-control-input";
 
         this.attribs.onChange = (evt: any) => {
@@ -59,7 +65,7 @@ export class Checkbox extends Comp implements I.CheckboxIntf {
             // there is also a 'custom-control-inline' that could be used instead of 'inline-checkbox' but it adds space to the right
             // NOTE: custom-switch or custom-checkbox will work here with all other things being identical! The custom-switch shows
             // a little slider switch button instead of a box with a check.
-            className: "custom-control custom-checkbox inline-checkbox"
+            className: "custom-control custom-checkbox inline-checkbox " + this.outterClassName
         }, this.e("input", this.attribs),
             // warning without this label element the entire control fails to render, and this is apparently related to bootstrap itself.
             this.e("label", {
