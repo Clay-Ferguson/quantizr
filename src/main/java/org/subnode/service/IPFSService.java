@@ -55,6 +55,7 @@ import org.subnode.request.LoadNodeFromIpfsRequest;
 import org.subnode.request.PublishNodeToIpfsRequest;
 import org.subnode.response.LoadNodeFromIpfsResponse;
 import org.subnode.response.PublishNodeToIpfsResponse;
+import org.subnode.util.Cast;
 import org.subnode.util.Const;
 import org.subnode.util.ExUtil;
 import org.subnode.util.LimitedInputStreamEx;
@@ -224,11 +225,11 @@ public class IPFSService {
         HashMap<String, Object> res = null;
         try {
             String url = API_PIN + "/ls?type=recursive";
-            res = (LinkedHashMap) postForJsonReply(url, LinkedHashMap.class);
+            res = Cast.toLinkedHashMap(postForJsonReply(url, LinkedHashMap.class));
             // log.debug("RAW PINS LIST RESULT: " + XString.prettyPrint(res));
 
             if (res != null) {
-                pins = (LinkedHashMap) res.get("Keys");
+                pins = Cast.toLinkedHashMap(res.get("Keys"));
             }
         } catch (Exception e) {
             log.error("Failed to get pins", e);
