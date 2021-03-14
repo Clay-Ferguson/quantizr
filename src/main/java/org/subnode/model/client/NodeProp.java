@@ -18,12 +18,17 @@ public enum NodeProp {
     ACT_PUB_ACTOR_INBOX("ap:actorInbox", "s"), //
     ACT_PUB_SENSITIVE("ap:nsfw", "s"), //
 
-    /* This is the encrypted symetric key to the node data, that was encrypted using the private key of the owner of the node.
-    When nodes are shared to other users the cleartext copy of this key is encrypted with the public key of the user it's being
-    shared to so that user can use their private key to decrypt this key and gain access to the actual data. */
+    /*
+     * This is the encrypted symetric key to the node data, that was encrypted using
+     * the private key of the owner of the node. When nodes are shared to other
+     * users the cleartext copy of this key is encrypted with the public key of the
+     * user it's being shared to so that user can use their private key to decrypt
+     * this key and gain access to the actual data.
+     */
     ENC_KEY("sn:encKey", "s"),
 
-    // finding this on a node means it can be safely deleted without affecting any local users
+    // finding this on a node means it can be safely deleted without affecting any
+    // local users
     TEMP("tmp", "s"),
 
     /*
@@ -76,7 +81,8 @@ public enum NodeProp {
     SAVE_TO_IPFS("sn:saveToIpfs", "s"), //
     IPFS_LINK_NAME("ipfs:linkName", "s"), //
 
-    // This property indicates that it's data is sourced from IPFS files, and can come from another server
+    // This property indicates that it's data is sourced from IPFS files, and can
+    // come from another server
     IPFS_SOURCE("ipfs:source", "s"), //
 
     FS_LINK("fs:link", "s"), //
@@ -109,13 +115,13 @@ public enum NodeProp {
 
     // This is for bash script names to whow up when browing on the tree
     // todo-1: oops we have THREE properties in there that all mapp to sn:fileName
-    FILE_NAME("sn:fileName", "s"),
+    FILE_NAME("sn:fileName", "s"), //
 
     JSON_FILE_SEARCH_RESULT("sn:json", "s"), //
-    NOWRAP("sn:nowrap", "s"),
+    NOWRAP("sn:nowrap", "s"), //
 
-    BIN_DATA("sn:jcrData", "s"),
-    BIN("bin", "s"),
+    BIN_DATA("sn:jcrData", "s"), //
+    BIN("bin", "s"), //
 
     // Attachments that are not stored locally but by external url use this.
     BIN_URL("sn:extUrl", "s"),
@@ -125,16 +131,20 @@ public enum NodeProp {
     IMG_SIZE("sn:imgSize", "s"), //
     CHILDREN_IMG_SIZES("sn:childrenImgSizes", "s"), //
 
+    // get how many bytes of storage the user currently holds
     BIN_TOTAL("sn:binTot", "s"), //
-    LAST_LOGIN_TIME("sn:lastLogin", "s"), //
-
-    // NOTE: These crypto keys are ONLY used to make ActivityPub work. For the E2E Encryption capabilities of the platform,
-    // those are is unrelated to these keys, and those private keys never leave the browser.
-    CRYPTO_KEY_PUBLIC("sn:cryptoKeyPublic", "s"), //
-    CRYPTO_KEY_PRIVATE("sn:cryptoKeyPrivate", "s"), //
 
     // amount of bytes the user is ALLOWED to save.
     BIN_QUOTA("sn:binQuota", "s"), //
+
+    LAST_LOGIN_TIME("sn:lastLogin", "s"), //
+
+    // NOTE: These crypto keys are ONLY used to make ActivityPub work. For the E2E
+    // Encryption capabilities of the platform,
+    // those are is unrelated to these keys, and those private keys never leave the
+    // browser.
+    CRYPTO_KEY_PUBLIC("sn:cryptoKeyPublic", "s"), //
+    CRYPTO_KEY_PRIVATE("sn:cryptoKeyPrivate", "s"), //
 
     INLINE_CHILDREN("inlineChildren", "s"), //
     PRIORITY("priority", "s"), //
