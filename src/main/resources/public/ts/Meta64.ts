@@ -449,9 +449,16 @@ export class Meta64 implements Meta64Intf {
             S.props.initConstants();
             this.displaySignupMessage();
 
-            /*
-             * $ (window).on("orientationchange", _.orientationHandler);
-             */
+            window.addEventListener("orientationchange", () => {
+                let state = store.getState();
+
+                /* unless the user is possibly editing, let's just force the whole page to rerender when user
+                reorients the screen, because some mobile platforms have a zooming issue. I haven't yet tried to just
+                force React to re-render, so I'm not positive that won't fix the problem. This can suffice for now */
+                if (!state.userPreferences.editMode) {
+                    window.location.reload();
+                }
+            });
 
             window.addEventListener("resize", () => {
                 this.deviceWidth = window.innerWidth;
@@ -613,17 +620,6 @@ export class Meta64 implements Meta64Intf {
             }
         }
     }
-
-    //
-    // /* Don't need this method yet, and haven't tested to see if works */
-    // orientationHandler = function(event): void {
-    //     // if (event.orientation) {
-    //     // if (event.orientation === 'portrait') {
-    //     // } else if (event.orientation === 'landscape') {
-    //     // }
-    //     // }
-    // }
-    //
 
     loadAnonPageHome = (state: AppState): void => {
         console.log("loadAnonPageHome()");

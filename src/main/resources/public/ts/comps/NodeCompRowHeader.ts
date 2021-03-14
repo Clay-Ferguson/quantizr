@@ -40,7 +40,9 @@ export class NodeCompRowHeader extends Div {
         let priorityVal = S.props.getNodePropVal(J.NodeProp.PRIORITY, node);
         let priority = (priorityVal && priorityVal !== "0") ? "P" + priorityVal : "";
 
-        if (node.owner && node.owner !== "?") {
+        // now that we have this stuff visible by default on all nodes, we don't want users to need to
+        // see 'admin' on all admin nodes. too noisy
+        if (node.owner && node.owner !== "?" && node.owner !== "admin") {
             children.push(new Span(node.owner, {
                 className: (node.owner === state.userName) ? "created-by-me" : "created-by-other"
             }));

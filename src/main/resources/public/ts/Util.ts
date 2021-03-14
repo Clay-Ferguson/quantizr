@@ -1,7 +1,13 @@
+import { EventInput } from "@fullcalendar/react";
 import axios, { AxiosPromise, AxiosRequestConfig } from "axios";
+import * as marked from "marked";
+import { dispatch, store } from "./AppRedux";
 import { AppState } from "./AppState";
+import clientInfo from "./ClientInfo";
 import { Constants as C } from "./Constants";
+import { DialogBase } from "./DialogBase";
 import { ConfirmDlg } from "./dlg/ConfirmDlg";
+import { LoadNodeFromIpfsDlg } from "./dlg/LoadNodeFromIpfsDlg";
 import { MessageDlg } from "./dlg/MessageDlg";
 import { ProgressDlg } from "./dlg/ProgressDlg";
 import * as I from "./Interfaces";
@@ -9,11 +15,6 @@ import { UtilIntf } from "./intf/UtilIntf";
 import * as J from "./JavaIntf";
 import { PubSub } from "./PubSub";
 import { Singletons } from "./Singletons";
-import { EventInput } from "@fullcalendar/react";
-import * as marked from "marked";
-import { LoadNodeFromIpfsDlg } from "./dlg/LoadNodeFromIpfsDlg";
-import { store } from "./AppRedux";
-import { DialogBase } from "./DialogBase";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (s: Singletons) => {
@@ -1273,5 +1274,53 @@ export class Util implements UtilIntf {
         }
 
         return names;
+    }
+
+    showBrowserInfo = (): void => {
+        let info = "Browser: " + navigator.userAgent || navigator.vendor || (window as any).opera + "\n  ";
+
+        info += "\n\nType: ";
+        if (clientInfo.isMobileOrTablet) {
+            info += "Mobile or Tablet";
+        }
+        else {
+            info += "Desktop";
+        }
+
+        this.showMessage(info, "Browser Info");
+    }
+
+    switchBrowsingMode = (state: AppState): void => {
+        dispatch({
+            type: "Action_SwitchBrowsingMode",
+            state,
+            update: (s: AppState): void => {
+                s.mobileMode = !s.mobileMode;
+            }
+        });
+    }
+
+    // untested
+    // https://stackoverflow.com/questions/1038727/how-to-get-browser-width-using-javascript-code
+    getBrowserWidth() {
+        return Math.max(
+            document.body.scrollWidth,
+            document.documentElement.scrollWidth,
+            document.body.offsetWidth,
+            document.documentElement.offsetWidth,
+            document.documentElement.clientWidth
+        );
+    }
+
+    // untested
+    // https://stackoverflow.com/questions/1038727/how-to-get-browser-width-using-javascript-code
+    getBrowserHeight() {
+        return Math.max(
+            document.body.scrollHeight,
+            document.documentElement.scrollHeight,
+            document.body.offsetHeight,
+            document.documentElement.offsetHeight,
+            document.documentElement.clientHeight
+        );
     }
 }

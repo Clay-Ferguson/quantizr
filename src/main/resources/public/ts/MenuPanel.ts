@@ -175,7 +175,7 @@ export class MenuPanel extends Div {
 
             new MenuItemSeparator(), //
 
-            new MenuItem("Test Microphone", () => { new MediaRecorderDlg(state, false, false).open(); }, !state.isAnonUser),
+            new MenuItem("Test Microphone", () => { new MediaRecorderDlg(state, false, false).open(); }, !state.isAnonUser), //
             new MenuItem("Test Web Cam", () => { new MediaRecorderDlg(state, true, false).open(); }, !state.isAnonUser)
         ]));
 
@@ -239,7 +239,12 @@ export class MenuPanel extends Div {
             // new MenuItem("Preferences", () => S.edit.editPreferences(state), !state.isAnonUser), // "fa-gear"
 
             new MenuItem("Change Password", () => S.edit.openChangePasswordDlg(state), !state.isAnonUser), //
-            new MenuItem("Manage Account", () => S.edit.openManageAccountDlg(state), !state.isAnonUser) //
+            new MenuItem("Manage Account", () => S.edit.openManageAccountDlg(state), !state.isAnonUser), //
+
+            new MenuItemSeparator(), //
+
+            new MenuItem("Browser Info", () => S.util.showBrowserInfo()), //
+            new MenuItem(state.mobileMode ? "Desktop Browser" : "Mobile Browser", () => S.util.switchBrowsingMode(state)) //
 
             // menuItem("Full Repository Export", "fullRepositoryExport", "
             // S.edit.fullRepositoryExport();") + //

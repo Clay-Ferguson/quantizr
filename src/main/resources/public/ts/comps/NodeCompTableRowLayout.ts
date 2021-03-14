@@ -88,7 +88,7 @@ export class NodeCompTableRowLayout extends Div {
 
                 rowCount++;
                 if (n.children) {
-                    comps.push(S.render.renderChildren(n, this.level + 1, this.allowNodeMove));
+                    comps.push(S.render.renderChildren(n, this.level + 1, this.allowNodeMove, state));
                 }
 
                 let curCol = new Div(null, {

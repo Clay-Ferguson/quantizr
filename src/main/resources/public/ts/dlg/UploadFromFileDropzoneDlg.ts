@@ -222,7 +222,7 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
         let config: Object = {
             action,
             width: "100%",
-            height: clientInfo.isMobile ? "60%" : "100%",
+            height: this.appState.mobileMode ? "60%" : "100%",
             progressBarWidth: "100%",
             url,
             // Prevents Dropzone from uploading dropped files immediately

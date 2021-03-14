@@ -49,7 +49,12 @@ export abstract class DialogBase<S extends BaseCompState = any> extends Div<S> i
         super(null);
         this.appState = appState;
 
-        this.attribs.className = clientInfo.isMobile
+        // new on 3/14/2021 (MessageDlg sending null into here)
+        if (!appState) {
+            this.appState = store.getState();
+        }
+
+        this.attribs.className = this.appState.mobileMode
             ? (this.closeByOutsideClick ? "app-modal-content-almost-fullscreen" : "app-modal-content-fullscreen")
             : (this.overrideClass ? this.overrideClass : "app-modal-content");
     }
@@ -98,7 +103,7 @@ export abstract class DialogBase<S extends BaseCompState = any> extends Div<S> i
                 if (++DialogBase.refCounter === 1) {
                     /* we only hide and reshow the scroll bar and disable scrolling when we're in mobile mode, because that's when
                     full-screen dialogs are in use, which is when we need this. */
-                    if (clientInfo.isMobile) {
+                    if (this.appState.mobileMode) {
                         document.body.style.overflow = "hidden";
                     }
                 }
@@ -144,7 +149,7 @@ export abstract class DialogBase<S extends BaseCompState = any> extends Div<S> i
                 S.util.domElmRemove(DialogBase.BACKDROP_PREFIX + this.getId());
 
                 if (--DialogBase.refCounter <= 0) {
-                    if (clientInfo.isMobile) {
+                    if (this.appState.mobileMode) {
                         document.body.style.overflow = "auto";
                     }
                 }

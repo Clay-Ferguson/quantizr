@@ -26,7 +26,7 @@ export interface RenderIntf {
     allowPropertyEdit(node: J.NodeInfo, propName: string, state: AppState): boolean;
     isReadOnlyProperty(propName: string): boolean;
     allowAction(typeHandler: TypeHandlerIntf, action: NodeActionType, node: J.NodeInfo, appState: AppState): boolean;
-    renderChildren(node: J.NodeInfo, level: number, allowNodeMove: boolean): Comp;
+    renderChildren(node: J.NodeInfo, level: number, allowNodeMove: boolean, state: AppState): Comp;
     getAvatarImgUrl(ownerId: string, avatarVer: string): string;
     getProfileHeaderImgUrl(ownerId: string, avatarVer: string): string;
 }

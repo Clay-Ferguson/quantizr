@@ -400,7 +400,7 @@ export class EditNodeDlg extends DialogBase {
 
         if (allowContentEdit) {
             let hasContentProp = typeHandler && typeHandler.hasCustomProp("content");
-            let rows = clientInfo.isMobile ? "8" : "15";
+            let rows = this.appState.mobileMode ? "8" : "15";
             if (customProps && hasContentProp) {
                 rows = "4";
             }

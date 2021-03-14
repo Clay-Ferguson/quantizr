@@ -1,4 +1,5 @@
 import { useSelector } from "react-redux";
+import { store } from "../AppRedux";
 import { AppState } from "../AppState";
 import clientInfo from "../ClientInfo";
 import { Constants as C } from "../Constants";
@@ -18,8 +19,9 @@ export class TabPanel extends Div {
 
     constructor() {
         super(null);
+        const state: AppState = store.getState();
 
-        if (clientInfo.isMobile) {
+        if (state.mobileMode) {
             this.attribs.className = "col-12";
         }
         else {

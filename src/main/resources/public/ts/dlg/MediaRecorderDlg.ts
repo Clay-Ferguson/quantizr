@@ -133,7 +133,7 @@ export class MediaRecorderDlg extends DialogBase {
         if (this.videoMode) {
             this.videoPlayer = new VideoPlayer({
                 style: {
-                    width: clientInfo.isMobile ? "50%" : "100%",
+                    width: this.appState.mobileMode ? "50%" : "100%",
                     border: "3px solid gray",
                     display: "block",
                     padding: "0px",

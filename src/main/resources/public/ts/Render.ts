@@ -430,7 +430,7 @@ export class Render implements RenderIntf {
         }
     }
 
-    renderChildren = (node: J.NodeInfo, level: number, allowNodeMove: boolean): Comp => {
+    renderChildren = (node: J.NodeInfo, level: number, allowNodeMove: boolean, state: AppState): Comp => {
         if (!node || !node.children) return null;
 
         let allowAvatars = true;
@@ -442,7 +442,7 @@ export class Render implements RenderIntf {
         const layout = S.props.getNodePropVal(J.NodeProp.LAYOUT, node);
 
         /* Note: for mobile devices, always use vertical layout. */
-        if (clientInfo.isMobile || !layout || layout === "v") {
+        if (state.mobileMode || !layout || layout === "v") {
             return new NodeCompVerticalRowLayout(node, level, allowNodeMove, true);
         }
         else if (layout.indexOf("c") === 0) {

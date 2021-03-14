@@ -1,3 +1,5 @@
+import { store } from "../AppRedux";
+import { AppState } from "../AppState";
 import { NodeCompContent } from "../comps/NodeCompContent";
 import { NodeCompTableRowLayout } from "../comps/NodeCompTableRowLayout";
 import { NodeCompVerticalRowLayout } from "../comps/NodeCompVerticalRowLayout";
@@ -6,7 +8,6 @@ import * as J from "../JavaIntf";
 import { PubSub } from "../PubSub";
 import { Singletons } from "../Singletons";
 import { Div } from "./Div";
-import clientInfo from "../ClientInfo";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (s: Singletons) => {
@@ -35,10 +36,11 @@ export class WelcomePanel extends Div {
     }
 
     preRender(): void {
+        const state: AppState = store.getState();
         if (this.getState().welcomeNode) {
             this.setChildren([
                 new NodeCompContent(this.getState().welcomeNode, false, false, null, null, null),
-                !clientInfo.isMobile ? new NodeCompTableRowLayout(this.getState().welcomeNode, 1, "c", false, false)
+                !state.mobileMode ? new NodeCompTableRowLayout(this.getState().welcomeNode, 1, "c", false, false)
                     : new NodeCompVerticalRowLayout(this.getState().welcomeNode, 1, false, false)
             ]);
         }

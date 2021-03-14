@@ -32,7 +32,7 @@ export class NodeCompMainList extends Div {
 
             let orderByProp = S.props.getNodePropVal(J.NodeProp.ORDER_BY, state.node);
             let allowNodeMove: boolean = !orderByProp;
-            children.push(S.render.renderChildren(state.node, 1, allowNodeMove));
+            children.push(S.render.renderChildren(state.node, 1, allowNodeMove, state));
 
             this.addPaginationButtons(children, state.endReached, state);
         }

@@ -59,7 +59,7 @@ export class App extends Div {
         }
 
         let mobileTopBar = null;
-        if (clientInfo.isMobile) {
+        if (state.mobileMode) {
             let menuButton = null;
             menuButton = new IconButton("fa-bars", "Menu", {
                 onClick: e => {
@@ -92,7 +92,7 @@ export class App extends Div {
         let allowEditMode = state.node && !state.isAnonUser;
 
         let floatingControlBar = null;
-        if (!clientInfo.isMobile) {
+        if (!state.mobileMode) {
             let topScrollUpButton = new IconButton("fa-angle-double-up", null, {
                 onClick: e => {
                     window.scrollTo(0, 0);
@@ -140,6 +140,14 @@ export class App extends Div {
             }
         }
 
+        let mainClass = null;
+        if (state.userPreferences.editMode) {
+            mainClass = state.mobileMode ? "container-mobile-edit" : "container-fluid";
+        }
+        else {
+            mainClass = state.mobileMode ? "container-mobile" : "container-fluid";
+        }
+
         this.setChildren([
             mobileTopBar,
 
@@ -147,23 +155,23 @@ export class App extends Div {
             (fullScreenViewer && !state.fullScreenCalendarId) ? new FullScreenControlBar() : null,
 
             fullScreenViewer ? new Div(null, { className: "clearfix" }) : null,
-            // For 'Main' using 'container-fluid instead of 'container' makes the left and right panels
-            // both get sized right with no overlapping.
+            /* For 'Main' using 'container-fluid instead of 'container' makes the left and right panels
+             both get sized right with no overlapping. */
             fullScreenViewer ||
-            (main = new Main({ role: "main", className: clientInfo.isMobile ? "container" : "container-fluid" }, [
+            (main = new Main({ role: "main", className: mainClass }, [
                 new Div(null, {
                     className: "row",
                     role: "banner"
                 }, [
-                    clientInfo.isMobile ? null : new LeftNavPanel(),
+                    state.mobileMode ? null : new LeftNavPanel(),
                     this.tabPanel || (this.tabPanel = new TabPanel()),
-                    clientInfo.isMobile ? null : new RightNavPanel()
+                    state.mobileMode ? null : new RightNavPanel()
                 ])
             ])),
 
             fullScreenViewer ? null : floatingControlBar,
 
-            (clientInfo.isMobile || fullScreenViewer) ? null : new IconButton("fa-angle-double-up", null, {
+            (state.mobileMode || fullScreenViewer) ? null : new IconButton("fa-angle-double-up", null, {
                 onClick: e => {
                     window.scrollTo(0, 0);
                 },

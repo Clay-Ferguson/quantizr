@@ -116,4 +116,6 @@ export interface UtilIntf {
     loadNodeFromIpfs(node: J.NodeInfo): any;
     getSharingNames(node: J.NodeInfo, multiLine: boolean): string;
     insertString(val: string, text: string, position: number): string;
+    showBrowserInfo(): void;
+    switchBrowsingMode(state: AppState): void;
 }

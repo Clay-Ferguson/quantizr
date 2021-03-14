@@ -52,14 +52,21 @@ export class MainTabComp extends AppTab {
             return;
         }
 
-        let showBreadcrumbs = state.breadcrumbs && state.breadcrumbs.length > 0;
+        let renderableCrumbs = 0;
+        if (state.breadcrumbs) {
+            state.breadcrumbs.forEach(bc => {
+                if (bc.id !== state.homeNodeId) {
+                    renderableCrumbs++;
+                }
+            });
+        }
 
         this.setChildren([
             new Div(null, {
                 // This visibility setting makes the main content not visible until final scrolling is complete
                 className: state.rendering ? "compHidden" : "compVisible"
             }, [
-                showBreadcrumbs ? new BreadcrumbsPanel() : null,
+                renderableCrumbs > 1 && !state.mobileMode ? new BreadcrumbsPanel() : null,
                 state.pageMessage ? new Html(state.pageMessage, { className: "alert alert-info float-right" }) : null,
                 state.pageMessage ? new Div(null, { className: "clearfix" }) : null,
                 new NodeCompMainNode(state, null),

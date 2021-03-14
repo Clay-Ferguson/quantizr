@@ -3,11 +3,13 @@ import { NodeInfo } from "./JavaIntf";
 import { EventInput } from "@fullcalendar/react";
 import { DialogBase } from "./DialogBase";
 import { ProfileState } from "./comps/ProfileState";
+import clientInfo from "./ClientInfo";
 
 /* root react Redux state for entire app */
 export class AppState {
     // up until guiReady the main App component will just render "loading..."
     guiReady: boolean = false;
+    mobileMode: boolean = clientInfo.isMobileOrTablet;
 
     dialogStack: DialogBase[] = [];
 
