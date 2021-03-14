@@ -315,24 +315,49 @@ export class RssTypeHandler extends TypeBase {
             headerDivChildren.push(new Div(entry.category));
         }
 
+        let hasAudioEnclosure = entry.enclosure && entry.enclosure.url && entry.enclosure.type &&
+            entry.enclosure.type.indexOf("audio/") !== -1;
+        let playAudioFunc: Function = null;
+
+        if (hasAudioEnclosure) {
+            playAudioFunc = () => {
+                let dlg = new AudioPlayerDlg(feed.title, entry.title, null, entry.enclosure.url, 0, state);
+                dlg.open();
+            };
+        }
+
         let colonIdx = entry.title.indexOf(" :: ");
         if (colonIdx !== -1) {
             headerDivChildren.push(new Heading(5, entry.title.substring(0, colonIdx)));
 
             let title = entry.title.substring(colonIdx + 4);
+            let anchorAttribs: any = {
+                className: "rssAnchor",
+                target: "_blank"
+            };
+
+            // If the entry.link is not given we default a click on it, to just play the audio.
+            if (!entry.link && hasAudioEnclosure) {
+                anchorAttribs.onClick = playAudioFunc;
+            }
+
             headerDivChildren.push(new Div(null, { className: "marginBottom" }, [
-                new Anchor(entry.link, title, {
-                    className: "rssAnchor",
-                    target: "_blank"
-                })
+                new Anchor(entry.link, title, anchorAttribs)
             ]));
         }
         else {
+            let anchorAttribs: any = {
+                className: "rssAnchor marginBottom",
+                target: "_blank"
+            };
+
+            // If the entry.link is not given we default a click on it, to just play the audio.
+            if (!entry.link && hasAudioEnclosure) {
+                anchorAttribs.onClick = playAudioFunc;
+            }
+
             headerDivChildren.push(new Div(null, { className: "marginBottom" }, [
-                new Anchor(entry.link, entry.title, {
-                    className: "rssAnchor marginBottom",
-                    target: "_blank"
-                })
+                new Anchor(entry.link, entry.title, anchorAttribs)
             ]));
         }
 
@@ -345,16 +370,9 @@ export class RssTypeHandler extends TypeBase {
 
         children.push(new Div(null, null, headerDivChildren));
 
-        if (entry.enclosure && entry.enclosure.url && entry.enclosure.type &&
-            entry.enclosure.type.indexOf("audio/") !== -1) {
-
+        if (hasAudioEnclosure) {
             let downloadLink = new Anchor(entry.enclosure.url, "[ Download " + entry.enclosure.type + " ]", { className: "rssDownloadLink" }, null, true);
-
-            let audioButton = new Button("Play Audio", //
-                () => {
-                    let dlg = new AudioPlayerDlg(feed.title, entry.title, null, entry.enclosure.url, 0, state);
-                    dlg.open();
-                });
+            let audioButton = new Button("Play Audio", playAudioFunc);
 
             children.push(new ButtonBar([audioButton, downloadLink], null, "rssMediaButtons"));
         }
