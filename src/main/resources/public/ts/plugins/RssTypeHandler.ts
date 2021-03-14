@@ -149,6 +149,12 @@ export class RssTypeHandler extends TypeBase {
                     });
                 }
                 else {
+                    /* todo-0: i was trying to figure out why on mobile when I click the "More" button to go to
+                     next pages the mobile browser scrolls WAY toward the end instead of keeping
+                     the top scroll position but so far I've been unable to make progess figuring out
+                     what the real problem is, so for now browsing RSS on mobile is jank */
+                    S.view.docElm.scrollTop = 0;
+
                     dispatch({
                         type: "Action_RSSUpdated",
                         state,
@@ -165,6 +171,9 @@ export class RssTypeHandler extends TypeBase {
                                 RssTypeHandler.lastGoodFeed = feed;
                                 RssTypeHandler.lastGoodPage = s.feedPage[feedSrcHash];
                             }
+
+                            // ditto above. fix failed.
+                            S.view.docElm.scrollTop = 0;
                         }
                     });
                 }
@@ -243,15 +252,29 @@ export class RssTypeHandler extends TypeBase {
         itemListContainer.getChildren().push(//
             new ButtonBar([
                 page > 1 ? new IconButton("fa-angle-double-left", null, {
-                    onClick: () => this.setPage(feedSrcHash, state, 1),
+                    onClick: (event) => {
+                        event.stopPropagation();
+                        event.preventDefault();
+                        this.setPage(feedSrcHash, state, 1);
+                    },
                     title: "First Page"
                 }) : null,
                 page > 1 ? new IconButton("fa-angle-left", null, {
-                    onClick: () => this.pageBump(feedSrcHash, state, -1),
+                    onClick: (event) => {
+                        event.stopPropagation();
+                        event.preventDefault();
+                        this.pageBump(feedSrcHash, state, -1);
+                    },
                     title: "Previous Page"
                 }) : null,
+                // todo-0: make sure this isn't triggering the 'node row click' logic because the button might be overlapping
+                // and need a bubble up cancel. ditto for similar buttons
                 new IconButton("fa-angle-right", "More", {
-                    onClick: () => this.pageBump(feedSrcHash, state, 1),
+                    onClick: (event) => {
+                        event.stopPropagation();
+                        event.preventDefault();
+                        this.pageBump(feedSrcHash, state, 1);
+                    },
                     title: "Next Page"
                 })
             ], "text-center marginTop marginBottom"));

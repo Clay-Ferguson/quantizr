@@ -178,9 +178,14 @@ export class View implements ViewIntf {
                 return;
             }
 
-            const elm: HTMLElement = S.nav.getSelectedDomElement(state);
+            let elm: any = S.nav.getSelectedDomElement(state);
             if (elm) {
-                // console.log("scrollIntoView=0");
+                if (elm.firstElementChild) {
+                    // console.log("Got first element: " + elm.firstElementChild);
+                    elm = elm.firstElementChild;
+                }
+
+                // console.log("scrollIntoView element");
                 elm.scrollIntoView(true);
             }
             else {

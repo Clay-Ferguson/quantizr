@@ -121,6 +121,8 @@ export class FeedView extends AppTab {
 
             if (rowCount > 0 && !state.feedEndReached) {
                 children.push(new ButtonBar([
+                    // todo-0: make sure this isn't triggering the 'node row click' logic because the button might be overlapping
+                    // and need a bubble up cancel. ditto for similar buttons
                     new IconButton("fa-angle-right", "More", {
                         onClick: () => S.srch.feed("~" + J.NodeType.FRIEND_LIST, null, ++FeedView.page, FeedView.searchTextState.getValue()),
                         title: "Next Page"

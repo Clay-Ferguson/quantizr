@@ -64,6 +64,8 @@ export class NodeCompMainList extends Div {
         }
 
         if (!endReached) {
+            // todo-0: make sure this isn't triggering the 'node row click' logic because the button might be overlapping
+            // and need a bubble up cancel. ditto for similar buttons
             nextButton = new IconButton("fa-angle-right", "More", {
                 onClick: () => S.view.nextPage(state),
                 title: "Next Page"
