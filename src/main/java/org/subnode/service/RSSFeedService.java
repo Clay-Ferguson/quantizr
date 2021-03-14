@@ -478,6 +478,9 @@ public class RSSFeedService {
 		// Warning these ARE two different characters, even though they look the same.
 		html = html.replace("’", "'");
 		html = html.replace("‘", "'");
+
+		// special kinds of dashes
+		html = html.replace("–", "--");
 		return html;
 	}
 
