@@ -774,11 +774,6 @@ public class AttachmentService {
 
 		auth.auth(session, node, PrivilegeType.WRITE);
 		node.setProp(NodeProp.IPFS_LINK.s(), req.getCid().trim());
-		/*
-		 * todo-0: need to add a "pin" property to the request so a client checkbox can
-		 * specify if we need to pin this or not. Assuming we CAN pin something we didn't yet upload ourselves?
-		 */
-
 		String mime = req.getMime().trim().replace(".", "");
 
 		// If an extension was given (not a mime), then use it to make a filename, and

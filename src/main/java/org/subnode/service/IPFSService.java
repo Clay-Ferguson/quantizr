@@ -44,6 +44,7 @@ import org.subnode.exception.base.RuntimeEx;
 import org.subnode.model.IPFSDir;
 import org.subnode.model.IPFSDirEntry;
 import org.subnode.model.IPFSDirStat;
+import org.subnode.model.IPFSObjectStat;
 import org.subnode.model.MerkleLink;
 import org.subnode.model.MerkleNode;
 import org.subnode.model.client.NodeProp;
@@ -120,32 +121,6 @@ public class IPFSService {
         API_NAME = API_BASE + "/name";
     }
 
-    /**
-     * Looks up node by 'nodeId', and gets the 'ipfs:link' property, which is used
-     * to retrieve the MerkleNode (as JSON), and then pretty prints it and returns
-     * it.
-     */
-    public final String getNodeInfo(MongoSession session, String nodeId) {
-        String ret = "";
-        SubNode node = read.getNode(session, nodeId);
-        if (node != null) {
-            String hash = node.getStrProp(NodeProp.IPFS_LINK);
-            if (StringUtils.isEmpty(hash)) {
-                ret = "Node is missing IPFS link property: " + NodeProp.IPFS_LINK.s();
-            } else {
-                MerkleNode mnode = getMerkleNode(hash, "json");
-                if (mnode != null) {
-                    ret = XString.prettyPrint(mnode);
-                } else {
-                    ret = "Unable to get as MerkleNode.";
-                }
-            }
-        } else {
-            ret = "Unable to get SubNode for id=" + nodeId;
-        }
-        return ret;
-    }
-
     /* Ensures this node's attachment is saved to IPFS and returns the CID of it */
     public final String saveNodeAttachmentToIpfs(MongoSession session, SubNode node) {
         String cid = null;
@@ -205,13 +180,18 @@ public class IPFSService {
         return (IPFSDir) postForJsonReply(url, IPFSDir.class);
     }
 
+    /*
+     * todo-0: Adding and removing PINs should count against this user's storage
+     * quota!
+     */
     public final boolean removePin(String cid) {
+        // log.debug("Remove Pin: " + cid);
         String url = API_PIN + "/rm?arg=" + cid;
         return postForJsonReply(url, Object.class) != null;
     }
 
-    public final boolean pin(String cid) {
-        //log.debug("Pinning: " + cid);
+    public final boolean addPin(String cid) {
+        // log.debug("Add Pin: " + cid);
         String url = API_PIN + "/add?arg=" + cid;
         return postForJsonReply(url, Object.class) != null;
     }
@@ -512,6 +492,14 @@ public class IPFSService {
     public IPFSDirStat pathStat(String path) {
         String url = API_FILES + "/stat?arg=" + path;
         return (IPFSDirStat) postForJsonReply(url, IPFSDirStat.class);
+    }
+
+    public IPFSObjectStat objectStat(String cid, boolean humanReadable) {
+        String url = API_OBJECT + "/stat?arg=" + cid;
+        if (humanReadable) {
+            url += "&human=true";
+        }
+        return (IPFSObjectStat) postForJsonReply(url, IPFSObjectStat.class);
     }
 
     public String readFile(String path) {

@@ -459,21 +459,22 @@ public class NodeEditService {
 
 		/*
 		 * If we have an IPFS attachment and there's no IPFS_REF property that means it
-		 * should be pinned. (REF means 'referenced' and external to our server). Note, we dont
-		 * try to aggressively unpin here, because we have a cleanup routine that takes care of
-		 * all orphans automatically. 
-		 * 
-		 * todo-0: It may be better to do the pin remove(s) also aggressively at the TIME the user clicks
-		 * the checkbox in the GUI, which calls immediately into the server when a property is deleted
-		 * because it's easy to do that, and gives the user back their quota space immediately, but this is 
-		 * lower priority.
+		 * should be pinned. (REF means 'referenced' and external to our server).
 		 * 
 		 * todo-0: Run this in an async thread so that save operation is as fast as
 		 * possible.
 		 */
 		String ipfsLink = node.getStrProp(NodeProp.IPFS_LINK);
-		if (ipfsLink != null && node.getStrProp(NodeProp.IPFS_REF.s()) == null) {
-			ipfs.pin(ipfsLink);
+		if (ipfsLink != null) {
+
+			// if there's no 'ref' property this is not a foreign reference, which means we DO pin this.
+			if (node.getStrProp(NodeProp.IPFS_REF.s()) == null) {
+				ipfs.addPin(ipfsLink);
+			} 
+			// otherwise we don't pin it.
+			else {
+				ipfs.removePin(ipfsLink);
+			}
 		}
 
 		/*
@@ -568,6 +569,7 @@ public class NodeEditService {
 		}
 		String nodeId = req.getNodeId();
 		SubNode node = read.getNode(session, nodeId);
+
 		String propertyName = req.getPropName();
 		node.deleteProp(propertyName);
 		update.save(session, node);

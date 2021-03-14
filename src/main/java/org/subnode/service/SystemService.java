@@ -3,7 +3,9 @@ package org.subnode.service;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.util.Map;
+
 import com.mongodb.client.MongoDatabase;
+
 import org.bson.Document;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -11,7 +13,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.subnode.config.AppFilter;
 import org.subnode.config.AppSessionListener;
-import org.subnode.model.IPFSDirStat;
+import org.subnode.model.IPFSObjectStat;
+import org.subnode.model.client.NodeProp;
 import org.subnode.mongo.MongoAppConfig;
 import org.subnode.mongo.MongoDelete;
 import org.subnode.mongo.MongoRead;
@@ -23,7 +26,6 @@ import org.subnode.mongo.model.SubNode;
 import org.subnode.util.Const;
 import org.subnode.util.ExUtil;
 import org.subnode.util.ThreadLocals;
-import org.subnode.util.ValContainer;
 import org.subnode.util.XString;
 
 /**
@@ -121,21 +123,13 @@ public class SystemService {
 		if (node != null) {
 			String ret = XString.prettyPrint(node);
 
-			// Well, this appears to be obsolete, and I really don't remember when node paths were
-			// used as IPFS paths? So i'm commenting out for now.
-			// IPFSDirStat fullStat = ipfsService.pathStat(node.getPath());
-			// if (fullStat != null) {
-			// 	ret += "\n\nIPFS Folder Stats:\n" + XString.prettyPrint(fullStat);
-			// }
-
-			// IPFSDirStat nodeStat = ipfsService.pathStat(node.getPath() + "/node.json");
-			// if (nodeStat != null) {
-			// 	ret += "\n\nIPFS File Stats:\n" + XString.prettyPrint(nodeStat);
-			// }
-
-			// NOTE: We used to have a "Show IPFS Info" that displayed what comes from
-			// this...
-			// ipfsService.getNodeInfo(MongoSession session, String nodeId) {
+			String ipfsLink = node.getStrProp(NodeProp.IPFS_LINK);
+			if (ipfsLink != null) {
+				IPFSObjectStat fullStat = ipfsService.objectStat(ipfsLink, false);
+				if (fullStat != null) {
+					ret += "\n\nIPFS Object Stats:\n" + XString.prettyPrint(fullStat);
+				}
+			}
 
 			return ret;
 		} else {

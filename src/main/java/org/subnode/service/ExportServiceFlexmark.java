@@ -235,7 +235,7 @@ public class ExportServiceFlexmark {
 		 * still see them all and be able to delete the entire structure at will.
 		 */
 		for (ExportIpfsFile file : files) {
-			// todo-0: is there a way to add multiple files to a DAG all at once?
+			// todo-0: is there a way to add multiple files to a DAG all at once? Post this question on discuss.ipfs.io?
 			// log.debug("Add file: " + file.getFileName() + " cid=" + file.getCid());
 			rootDir = ipfs.addFileToDagRoot(rootDir.getHash(), file.getFileName(), file.getCid());
 		}
