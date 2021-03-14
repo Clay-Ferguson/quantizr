@@ -34,6 +34,10 @@ public class XString {
 	public static String prettyPrint(Object obj) {
 		if (obj == null)
 			return "null";
+		if (obj instanceof String) {
+			return (String)obj;
+		}
+		
 		try {
 			return jsonPrettyWriter.writeValueAsString(obj);
 		} catch (JsonProcessingException e) {

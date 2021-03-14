@@ -91,24 +91,27 @@ public class SystemService {
 		final HashMap<ObjectId, UserStats> statsMap = new HashMap<ObjectId, UserStats>();
 
 		attachmentService.gridMaintenanceScan(statsMap);
-		ipfsGarbageCollect(statsMap);
+		String ret = ipfsGarbageCollect(statsMap);
 
 		adminRunner.run(session -> {
 			userManagerService.writeUserStats(session, statsMap);
 		});
 
-		String ret = runMongoDbCommand(new Document("compact", "nodes"));
+		ret += runMongoDbCommand(new Document("compact", "nodes"));
 		return ret;
 	}
 
 	public String ipfsGarbageCollect(HashMap<ObjectId, UserStats> statsMap) {
-		String ret = update.releaseOrphanIPFSPins(statsMap);
+		String ret = ipfsService.getRepoGC();
+		ret += update.releaseOrphanIPFSPins(statsMap);
 		return ret;
 	}
 
 	public String validateDb() {
 		// https://docs.mongodb.com/manual/reference/command/validate/
 		String ret = runMongoDbCommand(new Document("validate", "nodes").append("full", true));
+		ret += ipfsService.repoVerify();
+		ret += ipfsService.pinVerify();
 		return ret;
 	}
 

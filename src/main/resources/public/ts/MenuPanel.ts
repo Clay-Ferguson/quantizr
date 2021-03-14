@@ -260,12 +260,6 @@ export class MenuPanel extends Div {
         }
 
         if (state.isAdminUser) {
-            children.push(new Menu("Lucene", [
-                new MenuItem("Refresh Index", () => S.view.runServerCommand("refreshLuceneIndex", null, null, state))
-            ]));
-        }
-
-        if (state.isAdminUser) {
             children.push(new Menu("Admin - Utils", [
 
                 // new MenuItem("Backup DB", () => S.view.runServerCommand("BackupDb", "Backup DB Response", null, state)), //
@@ -281,7 +275,7 @@ export class MenuPanel extends Div {
                 new MenuItem("Validate", () => S.view.runServerCommand("validateDb", "Validate DB Response", null, state)), //
                 new MenuItem("Compact", () => S.view.runServerCommand("compactDb", "Compact DB Response", null, state)), //
                 new MenuItem("Rebuild Indexes", () => S.view.runServerCommand("rebuildIndexes", "Rebuild Indexes Response", null, state)), //
-                new MenuItem("IPFS - Garbage Collect", () => S.view.runServerCommand("ipfsGarbageCollect", "Clean up unused PINs, and run IPFS maintenance", null, state)) //
+                new MenuItem("Lucene: Refresh", () => S.view.runServerCommand("refreshLuceneIndex", null, null, state))
             ]));
 
             children.push(new Menu("Admin - Test", [

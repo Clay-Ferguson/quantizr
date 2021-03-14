@@ -129,6 +129,32 @@ public class IPFSService {
         return "\nIPFS Repository Status:\n" + XString.prettyPrint(res) + "\n";
     }
 
+    /*
+     * this appears to be broken due to a bug in IPFS? Haven't reported an error to
+     * them yet. Returns HTTP success (200), but no data. It should be returnin JSON but doesn't, so I have 
+     * hacked the postForJsonReply to always return 'success' in this scenario (200 with no body)
+     */
+    public String repoVerify() {
+        String url = API_REPO + "/verify";
+        LinkedHashMap<String, Object> res = Cast.toLinkedHashMap(postForJsonReply(url, LinkedHashMap.class));
+        return "\nIPFS Repository Verify:\n" + XString.prettyPrint(res) + "\n";
+    }
+
+    public String pinVerify() {
+        String url = API_PIN + "/verify";
+        // LinkedHashMap<String, Object> res =
+        // Cast.toLinkedHashMap(postForJsonReply(url, LinkedHashMap.class));
+        // casting to a string now, because a bug in IPFS is making it not return data, so we get back string "success"
+        String res = (String) postForJsonReply(url, String.class);
+        return "\nIPFS Pin Verify:\n" + XString.prettyPrint(res) + "\n";
+    }
+
+    public String getRepoGC() {
+        String url = API_REPO + "/gc";
+        LinkedHashMap<String, Object> res = Cast.toLinkedHashMap(postForJsonReply(url, LinkedHashMap.class));
+        return "\nIPFS Repository Garbage Collect:\n" + XString.prettyPrint(res) + "\n";
+    }
+
     /* Ensures this node's attachment is saved to IPFS and returns the CID of it */
     public final String saveNodeAttachmentToIpfs(MongoSession session, SubNode node) {
         String cid = null;
@@ -627,13 +653,16 @@ public class IPFSService {
             // MediaType contentType = response.getHeaders().getContentType();
             // Warning: IPFS is inconsistent. Sometimes they return plain/text and sometimes
             // JSON in the contentType, so we just ignore it
-
             if (response.getStatusCode().value() == 200 /* && MediaType.APPLICATION_JSON.equals(contentType) */) {
                 if (clazz == String.class) {
-                    return response.getBody();
+                    return response.getBody() == null ? "success" : response.getBody();
                 } else {
                     // log.debug("postForJsonReply: " + response.getBody());
-                    ret = XString.jsonMapper.readValue(response.getBody(), clazz);
+                    if (response.getBody() == null) {
+                        ret = "success";
+                    } else {
+                        ret = XString.jsonMapper.readValue(response.getBody(), clazz);
+                    }
                 }
             }
 
