@@ -1161,13 +1161,6 @@ public class AttachmentService {
 		});
 	}
 
-	// public AutoCloseInputStream getAutoClosingStream(MongoSession session,
-	// SubNode node, boolean auth,
-	// boolean ipfs) {
-	// return new AutoCloseInputStream(new BufferedInputStream(getStream(session,
-	// node, auth, ipfs)));
-	// }
-
 	/**
 	 * This method makes a single pass over all grid items doing all the daily
 	 * maintenance on each one as necessary to maintain the system health and
@@ -1179,9 +1172,7 @@ public class AttachmentService {
 	 * Also keeps totals by each user account, in a hashmap to be written all out at
 	 * the end to all the nodes.
 	 */
-	public void gridMaintenanceScan() {
-		final HashMap<ObjectId, UserStats> statsMap = new HashMap<ObjectId, UserStats>();
-
+	public void gridMaintenanceScan(HashMap<ObjectId, UserStats> statsMap) {
 		adminRunner.run(session -> {
 			int delCount = 0;
 			final GridFSFindIterable files = gridFsBucket.find();
@@ -1265,7 +1256,6 @@ public class AttachmentService {
 			}
 
 			log.debug(String.valueOf(delCount) + " orphans found and deleted.");
-			userManagerService.writeUserStats(session, statsMap);
 			return null;
 		});
 	}

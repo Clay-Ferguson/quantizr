@@ -1252,7 +1252,7 @@ public class AppController implements ErrorController {
 				break;
 
 			case "ipfsGarbageCollect":
-				res.getMessages().add(new InfoMessage(systemService.ipfsGarbageCollect(), null));
+				res.getMessages().add(new InfoMessage(systemService.ipfsGarbageCollect(null), null));
 				break;
 
 			case "rebuildIndexes":

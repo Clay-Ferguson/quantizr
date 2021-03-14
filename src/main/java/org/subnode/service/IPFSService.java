@@ -182,7 +182,9 @@ public class IPFSService {
 
     /*
      * todo-0: Adding and removing PINs should count against this user's storage
-     * quota!
+     * quota! Also check the ordinary flow path of using upload dialog with the IPFS
+     * checkbox checked way of uploading data directly from an actual stream of a
+     * file, and be sure that is also counting against the user's quota.
      */
     public final boolean removePin(String cid) {
         // log.debug("Remove Pin: " + cid);

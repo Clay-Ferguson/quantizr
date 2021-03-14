@@ -1,14 +1,18 @@
 package org.subnode.mongo;
 
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.stereotype.Component;
+import org.subnode.model.UserStats;
+import org.subnode.model.client.NodeProp;
 import org.subnode.model.client.PrivilegeType;
 import org.subnode.mongo.model.SubNode;
 import org.subnode.service.IPFSService;
@@ -96,21 +100,49 @@ public class MongoUpdate {
 	 * Unpins any IPFS data that is not currently referenced by MongoDb. Cleans up
 	 * orphans.
 	 */
-	public String releaseOrphanIPFSPins() {
+	public String releaseOrphanIPFSPins(HashMap<ObjectId, UserStats> statsMap) {
 		ValContainer<String> ret = new ValContainer<String>("failed");
 		adminRunner.run(session -> {
 			int pinCount = 0, orphanCount = 0;
 			LinkedHashMap<String, Object> pins = Cast.toLinkedHashMap(ipfs.getPins());
 			if (pins != null) {
-				/* For each CID that is pinned we do a lookup to see if there's a Node that is using that PIN, 
-				and if not we remove the pin */
+				/*
+				 * For each CID that is pinned we do a lookup to see if there's a Node that is
+				 * using that PIN, and if not we remove the pin
+				 */
 				for (String pin : pins.keySet()) {
 					SubNode ipfsNode = read.findByIPFSPinned(session, pin);
 					if (ipfsNode != null) {
 						pinCount++;
-						//log.debug("Found IPFS CID=" + pin + " on nodeId " + ipfsNode.getId().toHexString());
+						// log.debug("Found IPFS CID=" + pin + " on nodeId " +
+						// ipfsNode.getId().toHexString());
+
+						if (statsMap != null) {
+							Long binSize = ipfsNode.getIntProp(NodeProp.BIN_SIZE.s());
+							if (binSize == null) {
+								// Note: If binTotal is ever zero here we SHOULD do what's in the comment above
+								// an call objectStat to put correct amount in.
+								binSize = 0L;
+							}
+
+							/*
+							 * Make sure storage space for this IPFS node pin is built into user quota.
+							 * NOTE: We could be more aggressive about 'correctness' here and actually call
+							 * ipfs.objectStat on each CID, to get a more bullet proof total bytes amount,
+							 * but we are safe enough trusting what the node info holds, becasue it should
+							 * be correct.
+							 */
+							UserStats stats = statsMap.get(ipfsNode.getOwner());
+							if (stats == null) {
+								stats = new UserStats();
+								stats.binUsage = binSize;
+								statsMap.put(ipfsNode.getOwner(), stats);
+							} else {
+								stats.binUsage = stats.binUsage.longValue() + binSize;
+							}
+						}
 					} else {
-						//log.debug("Removing Orphan IPFS CID=" + pin);
+						// log.debug("Removing Orphan IPFS CID=" + pin);
 						orphanCount++;
 						ipfs.removePin(pin);
 					}

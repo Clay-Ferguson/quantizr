@@ -2,11 +2,13 @@ package org.subnode.service;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
+import java.util.HashMap;
 import java.util.Map;
 
 import com.mongodb.client.MongoDatabase;
 
 import org.bson.Document;
+import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,6 +16,7 @@ import org.springframework.stereotype.Component;
 import org.subnode.config.AppFilter;
 import org.subnode.config.AppSessionListener;
 import org.subnode.model.IPFSObjectStat;
+import org.subnode.model.UserStats;
 import org.subnode.model.client.NodeProp;
 import org.subnode.mongo.MongoAppConfig;
 import org.subnode.mongo.MongoDelete;
@@ -80,15 +83,26 @@ public class SystemService {
 		delete.deleteNodeOrphans(null);
 		// do not delete.
 		// userManagerService.cleanUserAccounts();
-		attachmentService.gridMaintenanceScan();
-		ipfsGarbageCollect();
+
+		/*
+		 * Create map to hold all user account storage statistics which gets updated by
+		 * the various processing in here and then written out in 'writeUserStats' below
+		 */
+		final HashMap<ObjectId, UserStats> statsMap = new HashMap<ObjectId, UserStats>();
+
+		attachmentService.gridMaintenanceScan(statsMap);
+		ipfsGarbageCollect(statsMap);
+
+		adminRunner.run(session -> {
+			userManagerService.writeUserStats(session, statsMap);
+		});
 
 		String ret = runMongoDbCommand(new Document("compact", "nodes"));
 		return ret;
 	}
 
-	public String ipfsGarbageCollect() {
-		String ret = update.releaseOrphanIPFSPins();
+	public String ipfsGarbageCollect(HashMap<ObjectId, UserStats> statsMap) {
+		String ret = update.releaseOrphanIPFSPins(statsMap);
 		return ret;
 	}
 
