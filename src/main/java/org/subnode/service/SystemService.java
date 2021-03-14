@@ -164,6 +164,7 @@ public class SystemService {
 		sb.append(userManagerService.getUserAccountsReport(null));
 
 		sb.append(ActPubService.getStatsReport());
+		sb.append(ipfsService.getRepoStat());
 
 		// oops this is worthless, because it's inside the docker image, but I'm leaving
 		// in place just in case in the future we do need to run some commands docker

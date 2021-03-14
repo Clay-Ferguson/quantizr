@@ -83,6 +83,7 @@ public class IPFSService {
     private static String API_DAG;
     private static String API_TAR;
     private static String API_NAME;
+    private static String API_REPO;
 
     /*
      * originally this was 'data-endcoding' (or at least i got that from somewhere),
@@ -119,6 +120,13 @@ public class IPFSService {
         API_DAG = API_BASE + "/dag";
         API_TAR = API_BASE + "/tar";
         API_NAME = API_BASE + "/name";
+        API_REPO = API_BASE + "/repo";
+    }
+
+    public String getRepoStat() {
+        String url = API_REPO + "/stat?human=true";
+        LinkedHashMap<String, Object> res = Cast.toLinkedHashMap(postForJsonReply(url, LinkedHashMap.class));
+        return "\nIPFS Repository Status:\n" + XString.prettyPrint(res) + "\n";
     }
 
     /* Ensures this node's attachment is saved to IPFS and returns the CID of it */
