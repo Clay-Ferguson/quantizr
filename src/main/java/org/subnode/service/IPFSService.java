@@ -73,7 +73,7 @@ import org.subnode.util.XString;
 
 // IPFS Reference: https://docs.ipfs.io/reference/http/api
 
-/* todo-0: There are several places in here where we're getting back a "String" from a restTemplate.exchange for getting back JSON, and we can
+/* todo-1: There are several places in here where we're getting back a "String" from a restTemplate.exchange for getting back JSON, and we can
 probably define a POJO and let the converter convert do this for us always instead */
 
 @Component
@@ -227,18 +227,18 @@ public class IPFSService {
         return (IPFSDir) postForJsonReply(url, IPFSDir.class);
     }
 
-    /*
-     * todo-0: Adding and removing PINs should count against this user's storage
-     * quota! Also check the ordinary flow path of using upload dialog with the IPFS
-     * checkbox checked way of uploading data directly from an actual stream of a
-     * file, and be sure that is also counting against the user's quota.
-     */
     public final boolean removePin(String cid) {
         // log.debug("Remove Pin: " + cid);
         String url = API_PIN + "/rm?arg=" + cid;
         return postForJsonReply(url, Object.class) != null;
     }
 
+    /*
+     * todo-0: Make sure when user adds a pin (or does an upload that auto-pinns) by
+     * the checkbox to upload to IPFS, that we immediately deduct from user quota.
+     * User only gets back quota when the pins cleanup runs due to reference
+     * counting limitations (the fact that we DON'T reference count)
+     */
     public final boolean addPin(String cid) {
         // log.debug("Add Pin: " + cid);
         String url = API_PIN + "/add?arg=" + cid;
@@ -397,7 +397,7 @@ public class IPFSService {
 
     // https://medium.com/red6-es/uploading-a-file-with-a-filename-with-spring-resttemplate-8ec5e7dc52ca
     /*
-     * todo-0: addition of 'fileName' is very new and very important here. Evaluate
+     * todo-1: addition of 'fileName' is very new and very important here. Evaluate
      * everywhere we can pass this in and also check if there are ways we can avoid
      * the old need for mime guessing by always basing off extension on this
      * filename?
@@ -525,9 +525,7 @@ public class IPFSService {
      * 
      * todo-0: need to document this (and how user must delete the export node to
      * release their pins) in the User Guide
-     * 
-     * todo-0: currently we don't save non-IPFS exports in this Exports area, but we need to.
-     * 
+     *
      * Note: childerenFiles will be all the files linked into this resource under a
      * common DAG, and we have to add them here, primarily to ensure garbage
      * collector will keep them, but secondly it's a nice-feature for user to be

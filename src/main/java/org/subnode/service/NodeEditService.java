@@ -470,7 +470,7 @@ public class NodeEditService {
 		 * If we have an IPFS attachment and there's no IPFS_REF property that means it
 		 * should be pinned. (REF means 'referenced' and external to our server).
 		 * 
-		 * todo-0: Run this in an async thread so that save operation is as fast as
+		 * todo-0: Run this in an async thread so this save operation is as fast as
 		 * possible.
 		 */
 		String ipfsLink = node.getStrProp(NodeProp.IPFS_LINK);
