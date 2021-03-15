@@ -551,16 +551,18 @@ public class NodeEditService {
 					 * trigger a WebFinger search of them, and a load/update of their outbox
 					 */
 					if (friendUserName.contains("@")) {
-						adminRunner.run(s -> {
-							if (!ThreadLocals.getSessionContext().isAdmin()) {
-								actPubService.loadForeignUserByUserName(s, friendUserName);
-							}
+						asyncExec.run(() -> {
+							adminRunner.run(s -> {
+								if (!ThreadLocals.getSessionContext().isAdmin()) {
+									actPubService.loadForeignUserByUserName(s, friendUserName);
+								}
 
-							/*
-							 * The only time we pass true to load the user into the system is when they're
-							 * being added as a friend.
-							 */
-							actPubService.userEncountered(friendUserName, true);
+								/*
+								 * The only time we pass true to load the user into the system is when they're
+								 * being added as a friend.
+								 */
+								actPubService.userEncountered(friendUserName, true);
+							});
 						});
 					}
 

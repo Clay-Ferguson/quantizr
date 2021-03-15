@@ -50,7 +50,7 @@ public class MongoUtil {
 	private UserManagerService userManagerService;
 
 	@Autowired
-	private RunAsMongoAdmin mongoAdminRunner;
+	private RunAsMongoAdmin adminRunner;
 
 	@Autowired
 	private AppProp appProp;
@@ -110,7 +110,7 @@ public class MongoUtil {
 			return;
 		}
 
-		mongoAdminRunner.run((MongoSession session) -> {
+		adminRunner.run((MongoSession session) -> {
 			for (String accountInfo : testUserAccountsList) {
 				log.debug("Verifying test Account: " + accountInfo);
 

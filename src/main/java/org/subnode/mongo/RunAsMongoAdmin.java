@@ -3,7 +3,6 @@ package org.subnode.mongo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 import org.subnode.util.MongoRunnable;
 
@@ -36,17 +35,4 @@ public class RunAsMongoAdmin {
 			throw ex;
 		}
 	}
-
-	/*
-	 * Warning: It's ok to call other non-annotated methods in the same class, but
-	 * not the other way around. That is, the spring proxy is what gets called by
-	 * other beans and is what has the @Async processing in it. Same exact thing
-	 * with AOP having this same proxy requirement
-	 * 
-	 * oops, this doesn't even startup correctly with spring?? todo-0: come back to this later
-	 */
-	// @Async("threadPoolTaskExecutor")
-	// public void asyncRun(MongoRunnable runner) {
-	// 	run(runner);
-	// }
 }

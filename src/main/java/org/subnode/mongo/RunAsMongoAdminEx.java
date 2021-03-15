@@ -14,7 +14,7 @@ import org.subnode.util.MongoRunnableEx;
  */
 @Component
 public class RunAsMongoAdminEx<T> {
-	private static final Logger log = LoggerFactory.getLogger(RunAsMongoAdmin.class);
+	private static final Logger log = LoggerFactory.getLogger(RunAsMongoAdminEx.class);
 
 	@Autowired
 	private MongoUpdate update;
