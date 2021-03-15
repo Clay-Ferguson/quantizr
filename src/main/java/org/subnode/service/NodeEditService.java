@@ -46,6 +46,7 @@ import org.subnode.response.SearchAndReplaceResponse;
 import org.subnode.response.SplitNodeResponse;
 import org.subnode.response.TransferNodeResponse;
 import org.subnode.response.UpdateHeadingsResponse;
+import org.subnode.util.AsyncExec;
 import org.subnode.util.Convert;
 import org.subnode.util.SubNodeUtil;
 import org.subnode.util.ThreadLocals;
@@ -98,6 +99,9 @@ public class NodeEditService {
 
 	@Autowired
 	private IPFSService ipfs;
+
+	@Autowired
+	private AsyncExec asyncExec;
 
 	/*
 	 * Creates a new node as a *child* node of the node specified in the request.
@@ -323,11 +327,13 @@ public class NodeEditService {
 		return res;
 	}
 
-	public SaveNodeResponse saveNode(MongoSession session, SaveNodeRequest req) {
+	public SaveNodeResponse saveNode(MongoSession _session, SaveNodeRequest req) {
 		SaveNodeResponse res = new SaveNodeResponse();
-		if (session == null) {
-			session = ThreadLocals.getMongoSession();
+		if (_session == null) {
+			_session = ThreadLocals.getMongoSession();
 		}
+		final MongoSession session = _session;
+
 		NodeInfo nodeInfo = req.getNode();
 		String nodeId = nodeInfo.getId();
 
@@ -344,7 +350,10 @@ public class NodeEditService {
 		 * of type-specific code from the general node saving.
 		 * 
 		 * Here, we are enforcing that only one node under the user's FRIENDS list is
-		 * allowed for each user. No duplicate friend nodes.
+		 * allowed for each user. No duplicate friend nodes. This is really ugly and I
+		 * need to research how MongoDB can be made to enforce some kind of constraints.
+		 * This is the only place in the code thus far this got ugly however. (i.e. lack
+		 * of constraints being a bit of a problem)
 		 */
 		if (node.getType().equals(NodeType.FRIEND.s())) {
 			String friendUserName = (String) nodeInfo.getPropVal(NodeProp.USER.s());
@@ -467,14 +476,17 @@ public class NodeEditService {
 		String ipfsLink = node.getStrProp(NodeProp.IPFS_LINK);
 		if (ipfsLink != null) {
 
-			// if there's no 'ref' property this is not a foreign reference, which means we DO pin this.
-			if (node.getStrProp(NodeProp.IPFS_REF.s()) == null) {
-				ipfs.addPin(ipfsLink);
-			} 
-			// otherwise we don't pin it.
-			else {
-				ipfs.removePin(ipfsLink);
-			}
+			asyncExec.run(() -> {
+				// if there's no 'ref' property this is not a foreign reference, which means we
+				// DO pin this.
+				if (node.getStrProp(NodeProp.IPFS_REF.s()) == null) {
+					ipfs.addPin(ipfsLink);
+				}
+				// otherwise we don't pin it.
+				else {
+					ipfs.removePin(ipfsLink);
+				}
+			});
 		}
 
 		/*
@@ -485,22 +497,24 @@ public class NodeEditService {
 			node.setPath(node.getPath().replace("/r/p/", "/r/"));
 		}
 
-		/* Send notification to local server or to remote server when a node is added */
-		if (!StringUtils.isEmpty(node.getContent()) //
-				// don't send notifications when 'admin' is the one doing the editing.
-				&& !PrincipalName.ADMIN.s().equals(ThreadLocals.getSessionContext().getUserName())) {
+		asyncExec.run(() -> {
+			/* Send notification to local server or to remote server when a node is added */
+			if (!StringUtils.isEmpty(node.getContent()) //
+					// don't send notifications when 'admin' is the one doing the editing.
+					&& !PrincipalName.ADMIN.s().equals(ThreadLocals.getSessionContext().getUserName())) {
 
-			SubNode parent = read.getNode(session, node.getParentPath(), false);
+				SubNode parent = read.getNode(session, node.getParentPath(), false);
 
-			if (parent != null) {
-				adminRunner.run(s -> {
-					auth.saveMentionsToNodeACL(s, node);
-					if (actPubService.sendNotificationForNodeEdit(s, parent, node)) {
-						userFeedService.pushNodeUpdateToBrowsers(s, node);
-					}
-				});
+				if (parent != null) {
+					adminRunner.run(s -> {
+						auth.saveMentionsToNodeACL(s, node);
+						if (actPubService.sendNotificationForNodeEdit(s, parent, node)) {
+							userFeedService.pushNodeUpdateToBrowsers(s, node);
+						}
+					});
+				}
 			}
-		}
+		});
 
 		NodeInfo newNodeInfo = convert.convertToNodeInfo(ThreadLocals.getSessionContext(), session, node, true, false,
 				-1, false, false);
@@ -529,14 +543,15 @@ public class NodeEditService {
 					 * trigger a WebFinger search of them, and a load/update of their outbox
 					 */
 					if (friendUserName.contains("@")) {
-						adminRunner.run(s -> {
+						adminRunner.asyncRun(s -> {
 							if (!ThreadLocals.getSessionContext().isAdmin()) {
 								actPubService.loadForeignUserByUserName(s, friendUserName);
 							}
 
-							// The only time we pass true to load the user into the system is when they're
-							// being added as a
-							// friend.
+							/*
+							 * The only time we pass true to load the user into the system is when they're
+							 * being added as a friend.
+							 */
 							actPubService.userEncountered(friendUserName, true);
 						});
 					}

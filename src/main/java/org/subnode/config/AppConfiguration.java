@@ -1,5 +1,7 @@
 package org.subnode.config;
 
+import java.util.concurrent.Executor;
+
 import org.apache.catalina.Context;
 import org.apache.catalina.connector.Connector;
 import org.apache.tomcat.util.descriptor.web.SecurityCollection;
@@ -14,7 +16,9 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Scope;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.scheduling.TaskScheduler;
+import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.concurrent.ConcurrentTaskScheduler;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.servlet.ViewResolver;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
@@ -30,6 +34,7 @@ import org.thymeleaf.templateresolver.ClassLoaderTemplateResolver;
  * FYI, and to remind the other ways of doing things.
  */
 @Configuration
+@EnableAsync
 public class AppConfiguration implements WebMvcConfigurer {
 	private static final Logger log = LoggerFactory.getLogger(AppConfiguration.class);
 
@@ -45,6 +50,19 @@ public class AppConfiguration implements WebMvcConfigurer {
 	public TaskScheduler taskScheduler() {
 		return new ConcurrentTaskScheduler(); // single threaded by default
 	}
+
+	@Bean(name = "threadPoolTaskExecutor")
+    public Executor threadPoolTaskExecutor() {
+        return new ThreadPoolTaskExecutor();
+
+		// ThreadPoolTaskExecutor t = new ThreadPoolTaskExecutor();
+		// t.setCorePoolSize(10);
+		// t.setMaxPoolSize(100);
+		// t.setQueueCapacity(50);
+		// t.setAllowCoreThreadTimeOut(true);
+		// t.setKeepAliveSeconds(120);
+		// return t;
+    }
 
 	/*
 	 * This method is removed because we switched to using the spring.resources.static-locations
