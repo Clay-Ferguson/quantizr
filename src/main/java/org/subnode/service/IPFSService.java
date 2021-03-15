@@ -526,6 +526,8 @@ public class IPFSService {
      * todo-0: need to document this (and how user must delete the export node to
      * release their pins) in the User Guide
      * 
+     * todo-0: currently we don't save non-IPFS exports in this Exports area, but we need to.
+     * 
      * Note: childerenFiles will be all the files linked into this resource under a
      * common DAG, and we have to add them here, primarily to ensure garbage
      * collector will keep them, but secondly it's a nice-feature for user to be
