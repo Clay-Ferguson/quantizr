@@ -233,12 +233,6 @@ public class IPFSService {
         return postForJsonReply(url, Object.class) != null;
     }
 
-    /*
-     * todo-0: Make sure when user adds a pin (or does an upload that auto-pinns) by
-     * the checkbox to upload to IPFS, that we immediately deduct from user quota.
-     * User only gets back quota when the pins cleanup runs due to reference
-     * counting limitations (the fact that we DON'T reference count)
-     */
     public final boolean addPin(String cid) {
         // log.debug("Add Pin: " + cid);
         String url = API_PIN + "/add?arg=" + cid;
@@ -370,6 +364,10 @@ public class IPFSService {
                 streamSize, cid);
     }
 
+    /*
+     * NOTE: Default behavior according to IPFS docs is that without the 'pin'
+     * argument on this call it DOES pin the file
+     */
     public MerkleLink addFromStream(MongoSession session, InputStream stream, String fileName, String mimeType,
             ValContainer<Integer> streamSize, ValContainer<String> cid, boolean wrapInFolder) {
         String endpoint = API_BASE + "/add?stream-channels=true";

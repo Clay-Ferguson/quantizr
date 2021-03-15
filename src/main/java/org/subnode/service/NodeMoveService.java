@@ -158,6 +158,11 @@ public class NodeMoveService {
 
 			// back out the number of bytes it was using
 			if (!session.isAdmin()) {
+				/*
+				 * NOTE: There is no equivalent to this on the IPFS code path for deleting ipfs
+				 * becuase since we don't do reference counting we let the garbage collecion
+				 * cleanup be the only way user quotas are deducted from
+				 */
 				userManagerService.addNodeBytesToUserNodeBytes(node, userNode, -1);
 			}
 
@@ -208,7 +213,8 @@ public class NodeMoveService {
 		if (location.equalsIgnoreCase("inside")) {
 			curTargetOrdinal = targetNode.getMaxChildOrdinal() == null ? 0 : targetNode.getMaxChildOrdinal() + 1;
 		}
-		// location==inline (todo-2: rename this to inline-below -- or better yet, do an enum)
+		// location==inline (todo-2: rename this to inline-below -- or better yet, do an
+		// enum)
 		else if (location.equalsIgnoreCase("inline")) {
 			curTargetOrdinal = targetNode.getOrdinal() + 1;
 			create.insertOrdinal(session, parentToPasteInto, curTargetOrdinal, nodeIds.size());

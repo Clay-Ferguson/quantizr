@@ -192,13 +192,6 @@ public class AttachmentService {
 						throw new OutOfSpaceException();
 					}
 				}
-
-				// do not delete.
-				// NOTE: A future enhancement would be to update total quota here, but then we
-				// need to implement some kind of
-				// rollback in case half the files fail, which would leavel the quota of the
-				// user unfairly lower than it should be.
-				// userManagerService.addBytesToUserNodeBytes(totalSize, null, 1);
 			}
 
 			for (final MultipartFile uploadFile : uploadFiles) {
@@ -383,7 +376,7 @@ public class AttachmentService {
 			try {
 				node.setProp(NodeProp.BIN_SIZE.s() + binSuffix, size);
 				if (toIpfs) {
-					writeStreamToIpfs(session, binSuffix, node, inputStream, mimeType);
+					writeStreamToIpfs(session, binSuffix, node, inputStream, mimeType, userNode);
 				} else {
 					if (storeLocally) {
 						if (fileName != null) {
@@ -410,7 +403,7 @@ public class AttachmentService {
 					}
 					is = new LimitedInputStreamEx(new ByteArrayInputStream(imageBytes), maxFileSize);
 					if (toIpfs) {
-						writeStreamToIpfs(session, binSuffix, node, is, mimeType);
+						writeStreamToIpfs(session, binSuffix, node, is, mimeType, userNode);
 					} else {
 						writeStream(session, binSuffix, node, is, fileName, mimeType, userNode);
 					}
@@ -1020,15 +1013,19 @@ public class AttachmentService {
 	}
 
 	public void writeStreamToIpfs(final MongoSession session, final String binSuffix, final SubNode node,
-			final InputStream stream, final String mimeType) {
+			final InputStream stream, final String mimeType, SubNode userNode) {
 		auth.auth(session, node, PrivilegeType.WRITE);
 		final ValContainer<Integer> streamSize = new ValContainer<Integer>();
+
 		MerkleLink ret = ipfsService.addFromStream(session, stream, null, mimeType, streamSize, null, false);
 		if (ret != null) {
 			node.setProp(NodeProp.IPFS_LINK.s() + binSuffix, ret.getHash());
 			// NOTE: Lack of the REF property indicated we store internally (pinned file)
 			// node.setProp(NodeProp.IPFS_REF.s() + binSuffix, "0");
 			node.setProp(NodeProp.BIN_SIZE.s() + binSuffix, streamSize.getVal());
+
+			/* consume user quota space */
+			userManagerService.addBytesToUserNodeBytes(streamSize.getVal(), userNode, 1);
 		}
 	}
 
@@ -1040,6 +1037,11 @@ public class AttachmentService {
 		}
 
 		if (!session.isAdmin()) {
+			/*
+			 * NOTE: There is no equivalent to this on the IPFS code path for deleting ipfs
+			 * becuase since we don't do reference counting we let the garbage collecion
+			 * cleanup be the only way user quotas are deducted from
+			 */
 			userManagerService.addNodeBytesToUserNodeBytes(node, userNode, -1);
 		}
 

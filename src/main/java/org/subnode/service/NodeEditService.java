@@ -12,6 +12,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.subnode.exception.base.RuntimeEx;
+import org.subnode.model.IPFSObjectStat;
 import org.subnode.model.NodeInfo;
 import org.subnode.model.PropertyInfo;
 import org.subnode.model.client.NodeProp;
@@ -99,6 +100,12 @@ public class NodeEditService {
 
 	@Autowired
 	private IPFSService ipfs;
+
+	@Autowired
+	private UserManagerService userManagerService;
+
+	@Autowired
+	private IPFSService ipfsService;
 
 	@Autowired
 	private AsyncExec asyncExec;
@@ -345,6 +352,9 @@ public class NodeEditService {
 			throw new RuntimeEx("Unable find node to save: nodeId=" + nodeId);
 		}
 
+		/* Remember the initial ipfs link */
+		String initIpfsLink = node.getStrProp(NodeProp.IPFS_LINK);
+
 		/*
 		 * todo-1: eventually we need a plugin-type architecture to decouple this kind
 		 * of type-specific code from the general node saving.
@@ -480,7 +490,23 @@ public class NodeEditService {
 				// if there's no 'ref' property this is not a foreign reference, which means we
 				// DO pin this.
 				if (node.getStrProp(NodeProp.IPFS_REF.s()) == null) {
-					ipfs.addPin(ipfsLink);
+					/*
+					 * Only if this is the first ipfs link ever added, or is a new link, then we
+					 * need to pin and update user quota
+					 */
+					if (initIpfsLink == null || !initIpfsLink.equals(ipfsLink)) {
+						ipfs.addPin(ipfsLink);
+
+						// always get bytes here from IPFS, and update the node prop with that too.
+						IPFSObjectStat stat = ipfsService.objectStat(ipfsLink, false);
+						node.setProp(NodeProp.BIN_SIZE.s(), stat.getCumulativeSize());
+
+						/* And finally update this user's quota for the added storage */
+						SubNode accountNode = read.getUserNodeByUserName(session, null);
+						if (accountNode != null) {
+							userManagerService.addBytesToUserNodeBytes(stat.getCumulativeSize(), accountNode, 1);
+						}
+					}
 				}
 				// otherwise we don't pin it.
 				else {
