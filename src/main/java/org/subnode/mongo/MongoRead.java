@@ -792,6 +792,10 @@ public class MongoRead {
         if (node == null) {
             node = create.createNode(session, userNode, null, type, 0L, CreateNodeLocation.LAST, null, null, true);
             node.setOwner(userNode.getId());
+
+            if (nodeName == null) {
+                nodeName = getDefaultContentForNamedNode(type);
+            }
             node.setContent(nodeName);
 
             if (defaultPrivs != null) {
@@ -802,6 +806,25 @@ public class MongoRead {
             update.save(session, node);
         }
         return node;
+    }
+
+    public String getDefaultContentForNamedNode(String type) {
+        if (type.equals(NodeType.EXPORTS.s())) {
+            return "### Exports";
+        }
+
+        if (type.equals(NodeType.FRIEND_LIST.s())) {
+            return "### Friends List";
+        }
+
+        if (type.equals(NodeType.POSTS.s())) {
+            return "### " + ThreadLocals.getSessionContext().getUserName() + "'s Public Posts";
+        }
+
+        if (type.equals(NodeType.NOTES.s())) {
+            return "### Notes";
+        }
+        return "Node: " + type;
     }
 
     public String convertIfLocalName(String userName) {
@@ -974,7 +997,7 @@ public class MongoRead {
 
         /* And only consider nodes that are NOT REFs (meaning REF prop==null) */
         criteria = criteria.and(SubNode.FIELD_PROPERTIES + "." + NodeProp.IPFS_REF.s() + ".value").is(null);
-        
+
         query.addCriteria(criteria);
         SubNode ret = getOps(session).findOne(query, SubNode.class);
         auth.auth(session, ret, PrivilegeType.READ);

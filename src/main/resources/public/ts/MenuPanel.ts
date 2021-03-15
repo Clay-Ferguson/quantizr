@@ -55,6 +55,8 @@ export class MenuPanel extends Div {
         children.push(new Menu("My Nodes", [
             new MenuItem("Account", () => S.nav.navHome(state), !state.isAnonUser),
             new MenuItem("Notes", () => S.nav.openContentNode("~" + J.NodeType.NOTES, state), !state.isAnonUser),
+            new MenuItem("Friends", () => S.nav.openContentNode("~" + J.NodeType.FRIEND_LIST, state), !state.isAnonUser),
+            new MenuItem("Posted", () => S.nav.openContentNode("~" + J.NodeType.POSTS, state), !state.isAnonUser),
             new MenuItem("Exports", () => S.nav.openContentNode("~" + J.NodeType.EXPORTS, state), !state.isAnonUser)
         ]));
 

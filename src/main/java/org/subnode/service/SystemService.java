@@ -7,6 +7,7 @@ import java.util.Map;
 
 import com.mongodb.client.MongoDatabase;
 
+import org.apache.commons.lang3.StringUtils;
 import org.bson.Document;
 import org.bson.types.ObjectId;
 import org.slf4j.Logger;
@@ -14,6 +15,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.subnode.config.AppFilter;
+import org.subnode.config.AppProp;
 import org.subnode.config.AppSessionListener;
 import org.subnode.model.IPFSObjectStat;
 import org.subnode.model.UserStats;
@@ -67,6 +69,9 @@ public class SystemService {
 
 	@Autowired
 	private IPFSService ipfsService;
+
+	@Autowired
+	private AppProp appProp;
 
 	public String rebuildIndexes() {
 		if (!ThreadLocals.getSessionContext().isAdmin()) {
@@ -167,7 +172,10 @@ public class SystemService {
 		sb.append(userManagerService.getUserAccountsReport(null));
 
 		sb.append(ActPubService.getStatsReport());
-		sb.append(ipfsService.getRepoStat());
+
+		if (!StringUtils.isEmpty(appProp.getIPFSApiHostAndPort())) {
+			sb.append(ipfsService.getRepoStat());
+		}
 
 		// oops this is worthless, because it's inside the docker image, but I'm leaving
 		// in place just in case in the future we do need to run some commands docker

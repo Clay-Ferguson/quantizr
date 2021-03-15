@@ -97,9 +97,9 @@ services:
             # Uncomment for debugging... (don't forget to open ufw firewall for port on server)
             #JAVA_TOOL_OPTIONS: "-agentlib:jdwp=transport=dt_socket,address=0.0.0.0:8000,server=y,suspend=n"
             
-            ipfs.host: "http://ipfs-test"
-            ipfs.apiPort: "5001"
-            ipfs.gatewayPort: "8080"
+            xxxipfs.host: "http://ipfs-test"
+            xxxipfs.apiPort: "5001"
+            xxxipfs.gatewayPort: "8080"
             
         image: quanta-test
         depends_on:

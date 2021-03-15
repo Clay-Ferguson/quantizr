@@ -272,8 +272,6 @@ export class RssTypeHandler extends TypeBase {
                 },
                 title: "Previous Page"
             }) : null,
-            // todo-0: make sure this isn't triggering the 'node row click' logic because the button might be overlapping
-            // and need a bubble up cancel. ditto for similar buttons
             new IconButton("fa-angle-right", "More", {
                 onClick: (event) => {
                     event.stopPropagation();
