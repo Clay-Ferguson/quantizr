@@ -2,11 +2,12 @@
 // https://reactjs.org/docs/hooks-reference.html#usestate
 // #RulesOfHooks: https://fb.me/rules-of-hooks
 
-import { createElement, ReactElement, ReactNode, useEffect, useLayoutEffect, useState } from "react";
+import { createElement, ReactElement, ReactNode, useEffect, useLayoutEffect } from "react";
 import * as ReactDOM from "react-dom";
 import { renderToString } from "react-dom/server";
 import { Provider } from "react-redux";
 import { Constants as C } from "../../Constants";
+import { Log } from "../../Log";
 import { PubSub } from "../../PubSub";
 import { Singletons } from "../../Singletons";
 import { State } from "../../State";
@@ -337,7 +338,7 @@ export abstract class Comp<S extends BaseCompState = any> implements CompIntf {
 
     // Core 'render' function used by react. Never really any need to override this, but it's theoretically possible.
     _render = (): ReactNode => {
-        // console.log("render(): " + this.jsClassName);
+        // Log.log("render(): " + this.jsClassName);
         this.rendered = true;
 
         let ret: ReactNode = null;

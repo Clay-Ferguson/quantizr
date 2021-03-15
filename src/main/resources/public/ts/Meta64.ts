@@ -1,6 +1,7 @@
 import { appState, dispatch, store } from "./AppRedux";
 import { AppState } from "./AppState";
 import { FeedView } from "./comps/FeedView";
+import { LogView } from "./comps/LogView";
 import { MainTabComp } from "./comps/MainTabComp";
 import { SearchView } from "./comps/SearchView";
 import { TimelineView } from "./comps/TimelineView";
@@ -11,6 +12,7 @@ import { ChangePasswordDlg } from "./dlg/ChangePasswordDlg";
 import { MainMenuDlg } from "./dlg/MainMenuDlg";
 import { Meta64Intf } from "./intf/Meta64Intf";
 import * as J from "./JavaIntf";
+import { Log } from "./Log";
 import { PubSub } from "./PubSub";
 import { Singletons } from "./Singletons";
 import { App } from "./widget/App";
@@ -67,13 +69,15 @@ export class Meta64 implements Meta64Intf {
     decryptCache: Map<string, string> = new Map<string, string>();
 
     userProfileView: UserProfileView = new UserProfileView();
+    logView: LogView = new LogView();
 
     tabs: AppTab[] = [
         new MainTabComp(),
         new SearchView(),
         new TimelineView(),
         new FeedView(),
-        this.userProfileView
+        this.userProfileView,
+        this.logView
     ];
 
     /* Creates/Access a function that does operation 'name' on a node identified by 'id' */
@@ -340,7 +344,7 @@ export class Meta64 implements Meta64Intf {
 
     initApp = async (): Promise<void> => {
         return new Promise<void>(async (resolve, reject) => {
-            console.log("initApp()");
+            Log.log("initApp()");
 
             const state: AppState = store.getState();
             state.pendingLocationHash = window.location.hash;
@@ -658,6 +662,10 @@ export class Meta64 implements Meta64Intf {
         state.userName = res.userName;
         state.isAdminUser = res.userName === "admin";
         state.isAnonUser = res.userName === J.PrincipalName.ANON;
+
+        if (state.isAdminUser) {
+            LogView.showLogs = true;
+        }
 
         // bash scripting is an experimental feature, and i'll only enable for admin for now, until i'm
         // sure i'm keeping this feature.
