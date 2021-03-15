@@ -216,26 +216,17 @@ public class ExportServiceFlexmark {
 		 * Next we add all the 'image' attachments that the HTML can point to (currently
 		 * only supports other IPFS-type uploads (images stored on ipfs already))
 		 * 
-		 * This will make images work inside this DAG HTML file using no path so an
-		 * image file named 'my-image.jpg' will work in an html IMG tag with just
-		 * src='my-image.jpg'. However the trick part is that since Quanta doesn't yet
-		 * have a reverse proxy and a way for 'end users' to directly access it's IPFS
-		 * gateway we embed the actual CID onto the end of the 'src' as a param like
-		 * this: src='my-image.jpg?cid=Qm123456...', so the Quanta server is able to use
+		 * This will make images work inside this DAG file using no path so an image
+		 * file named 'my-image.jpg' will work in an html IMG tag with just
+		 * src='my-image.jpg'.
+		 * 
+		 * However the tricky part is that since Quanta doesn't yet have a reverse proxy
+		 * and a way for 'end users' to directly access it's IPFS gateway we embed the
+		 * actual CID onto the end of the 'src' as a param like this:
+		 * src='my-image.jpg?cid=Qm123456...', so the Quanta server is able to use
 		 * queries like that and grab the correct data to return based on the 'cid='
 		 * arg, where as the rest of the IPFS internet gateways will hopefully ignore
 		 * that unknown parameter.
-		 * 
-		 * todo-0: need logic to only PIN the final rootDir value here, and also
-		 * remember our own gateway garbage collects any PINs that are not assigned to a
-		 * node so we currently don't have a way to persistently 'pin' exports, unless
-		 * we automatically create an 'exports' node in the user account, and set it to
-		 * point to the root of every export which I wanted to do anyway, so we're ok in
-		 * that regard. Also there's the question of how to manage the pinning of any of
-		 * the binary attachments that are first saved to ipfs as part of this export. I
-		 * guess the 'exports node' mentioned above in this paragraph could have an
-		 * array of subnodes under it with one per attachment, so that the user can
-		 * still see them all and be able to delete the entire structure at will.
 		 */
 		for (ExportIpfsFile file : files) {
 			// todo-0: is there a way to add multiple files to a DAG all at once? Post this
