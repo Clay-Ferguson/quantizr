@@ -15,6 +15,7 @@ import com.vladsch.flexmark.parser.Parser;
 import com.vladsch.flexmark.pdf.converter.PdfConverterExtension;
 import com.vladsch.flexmark.util.ast.Node;
 import com.vladsch.flexmark.util.data.MutableDataSet;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -177,6 +178,8 @@ public class ExportServiceFlexmark {
 						is = new FileInputStream(fullFileName);
 						String mime = "application/pdf";
 						MerkleLink ret = ipfs.addFromStream(session, is, shortFileName, mime, null, null, false);
+						ipfs.writeIpfsExportNode(session, ret.getHash(), mime, shortFileName, null);
+
 						res.setIpfsCid(ret.getHash());
 						res.setIpfsMime(mime);
 					} finally {
@@ -235,13 +238,17 @@ public class ExportServiceFlexmark {
 		 * still see them all and be able to delete the entire structure at will.
 		 */
 		for (ExportIpfsFile file : files) {
-			// todo-0: is there a way to add multiple files to a DAG all at once? Post this question on discuss.ipfs.io?
+			// todo-0: is there a way to add multiple files to a DAG all at once? Post this
+			// question on discuss.ipfs.io?
 			// log.debug("Add file: " + file.getFileName() + " cid=" + file.getCid());
 			rootDir = ipfs.addFileToDagRoot(rootDir.getHash(), file.getFileName(), file.getCid());
 		}
 
+		String fullCid = rootDir.getHash() + "/index.html";
+		ipfs.writeIpfsExportNode(session, fullCid, mime, "index.html", files);
+
 		if (rootDir != null) {
-			res.setIpfsCid(rootDir.getHash() + "/index.html");
+			res.setIpfsCid(fullCid);
 			res.setIpfsMime(mime);
 		}
 	}
@@ -283,11 +290,12 @@ public class ExportServiceFlexmark {
 
 		if (req.isToIpfs() && "html".equals(format)) {
 			String fileName = node.getStrProp(NodeProp.FILENAME);
+			String mime = node.getStrProp(NodeProp.BIN_MIME);
 
 			if (bin != null) {
 				String cid = ipfs.saveNodeAttachmentToIpfs(session, node);
 				// log.debug("Saved NodeID bin to IPFS: got CID=" + cid);
-				files.add(new ExportIpfsFile(cid, cid));
+				files.add(new ExportIpfsFile(cid, fileName, mime));
 				src = fileName + "?cid=" + cid;
 			}
 			/*
@@ -296,7 +304,7 @@ public class ExportServiceFlexmark {
 			 */
 			else if (ipfsLink != null && fileName != null) {
 				// log.debug("Found IPFS file: " + fileName);
-				files.add(new ExportIpfsFile(ipfsLink, fileName));
+				files.add(new ExportIpfsFile(ipfsLink, fileName, mime));
 
 				/*
 				 * NOTE: Since Quanta doesn't run a reverse proxy currently and doesn't have

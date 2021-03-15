@@ -50,10 +50,16 @@ export class MenuPanel extends Div {
         const canMoveUp = !isPageRootNode && !state.isAnonUser && (allowNodeMove && hltNode && hltNode.logicalOrdinal > 0);
         const canMoveDown = !isPageRootNode && !state.isAnonUser && (allowNodeMove && hltNode && !hltNode.lastChild);
 
+        // todo-0: these first two menu items need to be updated on the User Guide.
         const children = [];
+        children.push(new Menu("My Nodes", [
+            new MenuItem("Account", () => S.nav.navHome(state), !state.isAnonUser),
+            new MenuItem("Notes", () => S.nav.openContentNode("~" + J.NodeType.NOTES, state), !state.isAnonUser),
+            new MenuItem("Exports", () => S.nav.openContentNode("~" + J.NodeType.EXPORTS, state), !state.isAnonUser)
+        ]));
+
         children.push(new Menu("Site Nav", [
             ...this.siteNavCustomItems(state),
-            new MenuItem("Account Node", () => S.nav.navHome(state), !state.isAnonUser),
             new MenuItem("Portal Home", () => S.meta64.loadAnonPageHome(state)),
             new MenuItem("User Guide", () => S.nav.openContentNode(":user-guide", state)),
             new MenuItemSeparator(), //
@@ -172,7 +178,6 @@ export class MenuPanel extends Div {
 
             new MenuItem("Import", () => S.edit.openImportDlg(state), importFeatureEnabled),
             new MenuItem("Export", () => S.edit.openExportDlg(state), exportFeatureEnabled),
-
             new MenuItemSeparator(), //
 
             new MenuItem("Test Microphone", () => { new MediaRecorderDlg(state, false, false).open(); }, !state.isAnonUser), //

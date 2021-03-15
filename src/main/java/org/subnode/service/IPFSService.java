@@ -9,6 +9,7 @@ import java.net.URL;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.annotation.PostConstruct;
@@ -48,8 +49,12 @@ import org.subnode.model.IPFSObjectStat;
 import org.subnode.model.MerkleLink;
 import org.subnode.model.MerkleNode;
 import org.subnode.model.client.NodeProp;
+import org.subnode.model.client.NodeType;
+import org.subnode.mongo.CreateNodeLocation;
+import org.subnode.mongo.MongoCreate;
 import org.subnode.mongo.MongoRead;
 import org.subnode.mongo.MongoSession;
+import org.subnode.mongo.MongoUpdate;
 import org.subnode.mongo.RunAsMongoAdmin;
 import org.subnode.mongo.model.SubNode;
 import org.subnode.request.LoadNodeFromIpfsRequest;
@@ -105,6 +110,12 @@ public class IPFSService {
     private MongoRead read;
 
     @Autowired
+    private MongoCreate create;
+
+    @Autowired
+    private MongoUpdate update;
+
+    @Autowired
     private AppProp appProp;
 
     @Autowired
@@ -131,8 +142,9 @@ public class IPFSService {
 
     /*
      * this appears to be broken due to a bug in IPFS? Haven't reported an error to
-     * them yet. Returns HTTP success (200), but no data. It should be returnin JSON but doesn't, so I have 
-     * hacked the postForJsonReply to always return 'success' in this scenario (200 with no body)
+     * them yet. Returns HTTP success (200), but no data. It should be returnin JSON
+     * but doesn't, so I have hacked the postForJsonReply to always return 'success'
+     * in this scenario (200 with no body)
      */
     public String repoVerify() {
         String url = API_REPO + "/verify";
@@ -144,7 +156,8 @@ public class IPFSService {
         String url = API_PIN + "/verify";
         // LinkedHashMap<String, Object> res =
         // Cast.toLinkedHashMap(postForJsonReply(url, LinkedHashMap.class));
-        // casting to a string now, because a bug in IPFS is making it not return data, so we get back string "success"
+        // casting to a string now, because a bug in IPFS is making it not return data,
+        // so we get back string "success"
         String res = (String) postForJsonReply(url, String.class);
         return "\nIPFS Pin Verify:\n" + XString.prettyPrint(res) + "\n";
     }
@@ -504,6 +517,55 @@ public class IPFSService {
         }
         return postToGetMerkleNode(API_OBJECT + "/patch/add-link?arg=" + rootCid + "&arg=" + filePath + "&arg="
                 + fileCid + "&create=true");
+    }
+
+    /*
+     * Creates a node holding this CID in the current user (SessionContext) account
+     * under their EXPORTS node type.
+     * 
+     * todo-0: need to document this (and how user must delete the export node to
+     * release their pins) in the User Guide
+     * 
+     * Note: childerenFiles will be all the files linked into this resource under a
+     * common DAG, and we have to add them here, primarily to ensure garbage
+     * collector will keep them, but secondly it's a nice-feature for user to be
+     * able to browse them individually.
+     */
+    public void writeIpfsExportNode(MongoSession session, String cid, String mime, String fileName,
+            List<ExportIpfsFile> childrenFiles) {
+        SubNode exportParent = read.getUserNodeByType(session, session.getUserName(), null, "### Exports",
+                NodeType.EXPORTS.s(), null);
+
+        if (exportParent != null) {
+            SubNode node = create.createNode(session, exportParent, null, NodeType.NONE.s(), 0L,
+                    CreateNodeLocation.FIRST, null, null, true);
+
+            node.setOwner(exportParent.getOwner());
+            // use export filename here
+            node.setContent("IPFS Export: " + cid + "\n\nMime: " + mime);
+            node.setProp(NodeProp.IPFS_LINK.s(), cid);
+            node.setProp(NodeProp.BIN_MIME.s(), mime);
+            node.setProp(NodeProp.BIN_FILENAME.s(), fileName);
+            update.save(session, node);
+
+            if (childrenFiles != null) {
+                for (ExportIpfsFile file : childrenFiles) {
+                    SubNode child = create.createNode(session, node, null, NodeType.NONE.s(), 0L,
+                            CreateNodeLocation.LAST, null, null, true);
+
+                    child.setOwner(exportParent.getOwner());
+                    child.setContent("IPFS File: " + file.getFileName() + "\n\nMime: " + file.getMime());
+                    child.setProp(NodeProp.IPFS_LINK.s(), file.getCid());
+                    child.setProp(NodeProp.BIN_MIME.s(), file.getMime());
+                    child.setProp(NodeProp.BIN_FILENAME.s(), file.getFileName());
+                    child.setProp(NodeProp.IMG_SIZE.s(), "200px");
+                    update.save(session, child);
+                }
+            }
+
+            // todo-0: why doesn't this work INSTEAD of 'update.saves' above?
+            // update.saveSession(session);
+        }
     }
 
     public MerkleNode postToGetMerkleNode(String endpoint) {

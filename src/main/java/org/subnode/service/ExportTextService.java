@@ -105,6 +105,7 @@ public class ExportTextService {
 					is = new FileInputStream(fullFileName);
 					String mime = "text/markdown";
 					MerkleLink ret = ipfs.addFromStream(session, is, shortFileName, mime, null, null, false);
+					ipfs.writeIpfsExportNode(session, ret.getHash(), mime, shortFileName, null);
 					res.setIpfsCid(ret.getHash());
 					res.setIpfsMime(mime);
 				} finally {
