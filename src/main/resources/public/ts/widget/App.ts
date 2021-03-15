@@ -4,6 +4,7 @@ import { AppState } from "../AppState";
 import clientInfo from "../ClientInfo";
 import { Constants as C } from "../Constants";
 import * as J from "../JavaIntf";
+import { Log } from "../Log";
 import { PubSub } from "../PubSub";
 import { Singletons } from "../Singletons";
 import { Comp } from "./base/Comp";
@@ -34,6 +35,8 @@ export class App extends Div {
         // Since we only instantiate ONE App ever we don't need an 'unsubscribe' and also
         // our pubsub doesn't even HAVE any unsubscribe function yet.
         PubSub.sub(C.PUBSUB_ClearComponentCache, () => {
+
+            // todo-0: do we still need this?
             this.tabPanel = null;
         });
     }
@@ -95,6 +98,7 @@ export class App extends Div {
         if (!state.mobileMode) {
             let topScrollUpButton = new IconButton("fa-angle-double-up", null, {
                 onClick: e => {
+                    // Log.log("scrollTop by button");
                     window.scrollTo(0, 0);
                 },
                 title: "Scroll to Top"
@@ -173,6 +177,7 @@ export class App extends Div {
 
             (state.mobileMode || fullScreenViewer) ? null : new IconButton("fa-angle-double-up", null, {
                 onClick: e => {
+                    // Log.log("scrollTop by button");
                     window.scrollTo(0, 0);
                 },
                 title: "Scroll to Top"
@@ -184,6 +189,7 @@ export class App extends Div {
             it's previous scroll position */
             if (state.savedScrollPosition !== -1) {
                 let restoreScrollPos = state.savedScrollPosition;
+                // Log.log("Restore ScrollPos (x): " + restoreScrollPos);
                 S.view.docElm.scrollTop = restoreScrollPos;
                 setTimeout(() => {
                     fastDispatch({
@@ -194,7 +200,7 @@ export class App extends Div {
                             return { ...state };
                         }
                     });
-                    // console.log("Restore ScrollPos: " + restoreScrollPos);
+                    // Log.log("Restore ScrollPos (y): " + restoreScrollPos);
                     S.view.docElm.scrollTop = restoreScrollPos;
                 }, 250);
             }
@@ -209,6 +215,7 @@ export class App extends Div {
         }
         else if (fullScreenViewer) {
             fullScreenViewer.domUpdateEvent = () => {
+                // Log.log("Restore ScrollPos fs top");
                 S.view.docElm.scrollTop = 0;
             };
         }

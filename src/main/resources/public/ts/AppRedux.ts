@@ -2,6 +2,7 @@ import { createStore } from "redux";
 import { AppState } from "./AppState";
 import { Constants as C } from "./Constants";
 import { AppAction } from "./Interfaces";
+import { Log } from "./Log";
 import { PubSub } from "./PubSub";
 
 export const initialState = new AppState();
@@ -54,7 +55,7 @@ export const appState = (state?: AppState): AppState => {
 export const dispatch = (action: AppAction) => {
     PubSub.pub(C.PUBSUB_ClearComponentCache);
     store.dispatch(action);
-    // console.log("Dispatch Complete: " + action.type);
+    // Log.log("Dispatch Complete: " + action.type);
 };
 
 /* This is MUCH faster, for when structural changes won't happen (only style changes for example),

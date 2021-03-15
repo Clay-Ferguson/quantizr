@@ -4,6 +4,7 @@ import { Constants as C } from "./Constants";
 import { NodeStatsDlg } from "./dlg/NodeStatsDlg";
 import { ViewIntf } from "./intf/ViewIntf";
 import * as J from "./JavaIntf";
+import { Log } from "./Log";
 import { PubSub } from "./PubSub";
 import { Singletons } from "./Singletons";
 
@@ -173,7 +174,7 @@ export class View implements ViewIntf {
             be what user wants to see */
             const currentSelNode: J.NodeInfo = S.meta64.getHighlightedNode(state);
             if (currentSelNode && state.node.id === currentSelNode.id) {
-                // console.log("setting scrollTop=0 (a)");
+                // Log.log("setting scrollTop=0 (a)");
                 this.docElm.scrollTop = 0;
                 return;
             }
@@ -185,11 +186,11 @@ export class View implements ViewIntf {
                     elm = elm.firstElementChild;
                 }
 
-                // console.log("scrollIntoView element");
+                // Log.log("scrollIntoView element");
                 elm.scrollIntoView(true);
             }
             else {
-                // console.log("setting scrollTop=0 (b)");
+                // Log.log("setting scrollTop=0 (b)");
                 this.docElm.scrollTop = 0;
             }
         };
@@ -217,7 +218,7 @@ export class View implements ViewIntf {
         // });
 
         PubSub.subSingleOnce(C.PUBSUB_mainWindowScroll, () => {
-            // console.log("execute: C.PUBSUB_mainRenderComplete");
+            // Log.log("execute: C.PUBSUB_mainRenderComplete");
             this.docElm.scrollTop = 0;
         });
     }

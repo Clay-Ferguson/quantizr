@@ -5,6 +5,7 @@ import { Constants as C } from "../Constants";
 import { AudioPlayerDlg } from "../dlg/AudioPlayerDlg";
 import { NodeActionType } from "../enums/NodeActionType";
 import * as J from "../JavaIntf";
+import { Log } from "../Log";
 import { PubSub } from "../PubSub";
 import { Singletons } from "../Singletons";
 import { Anchor } from "../widget/Anchor";
@@ -134,6 +135,7 @@ export class RssTypeHandler extends TypeBase {
             }
 
             let url = S.util.getRemoteHost() + "/multiRssFeed?url=" + encodeURIComponent(feedSrc) + "&page=" + page;
+            // Log.log("RSS Query: " + url);
 
             // console.log("Reading RSS: " + url);
             parser.parseURL(url, (err, feed) => {
@@ -149,12 +151,6 @@ export class RssTypeHandler extends TypeBase {
                     });
                 }
                 else {
-                    /* todo-0: i was trying to figure out why on mobile when I click the "More" button to go to
-                     next pages the mobile browser scrolls WAY toward the end instead of keeping
-                     the top scroll position but so far I've been unable to make progess figuring out
-                     what the real problem is, so for now browsing RSS on mobile is jank */
-                    S.view.docElm.scrollTop = 0;
-
                     dispatch({
                         type: "Action_RSSUpdated",
                         state,
@@ -172,8 +168,13 @@ export class RssTypeHandler extends TypeBase {
                                 RssTypeHandler.lastGoodPage = s.feedPage[feedSrcHash];
                             }
 
-                            // ditto above. fix failed.
-                            S.view.docElm.scrollTop = 0;
+                            setTimeout(() => {
+                                // Log.log("docElm.scrollTop (2)");
+                                S.view.docElm.scrollTop = 0;
+                                // finally this is working with 2 second delay here. Not sure
+                                // what controls the min here. I 'think' CPU power may be the controlling factor
+                                // but it might be something else. Leaving as 2secs for now.
+                            }, 2000);
                         }
                     });
                 }
@@ -185,6 +186,14 @@ export class RssTypeHandler extends TypeBase {
     renderItem(feed: any, feedSrc: string, itemListContainer: Comp, state: AppState) {
         let feedOut: Comp[] = [];
         // console.log("FEED: " + S.util.prettyPrint(feed));
+
+        let feedSrcHash = S.util.hashOfString(feedSrc);
+        let page: number = state.feedPage[feedSrcHash];
+        if (!page) {
+            page = 1;
+        }
+
+        itemListContainer.getChildren().push(this.makeNavButtonBar(page, feedSrcHash, state));
 
         /* Main Feed Image */
         if (feed.image) {
@@ -242,42 +251,38 @@ export class RssTypeHandler extends TypeBase {
             itemListContainer.getChildren().push(this.buildFeedItem(feed, item, state));
         }
 
-        let feedSrcHash = S.util.hashOfString(feedSrc);
+        itemListContainer.getChildren().push(this.makeNavButtonBar(page, feedSrcHash, state));
+    }
 
-        let page: number = state.feedPage[feedSrcHash];
-        if (!page) {
-            page = 1;
-        }
-
-        itemListContainer.getChildren().push(//
-            new ButtonBar([
-                page > 1 ? new IconButton("fa-angle-double-left", null, {
-                    onClick: (event) => {
-                        event.stopPropagation();
-                        event.preventDefault();
-                        this.setPage(feedSrcHash, state, 1);
-                    },
-                    title: "First Page"
-                }) : null,
-                page > 1 ? new IconButton("fa-angle-left", null, {
-                    onClick: (event) => {
-                        event.stopPropagation();
-                        event.preventDefault();
-                        this.pageBump(feedSrcHash, state, -1);
-                    },
-                    title: "Previous Page"
-                }) : null,
-                // todo-0: make sure this isn't triggering the 'node row click' logic because the button might be overlapping
-                // and need a bubble up cancel. ditto for similar buttons
-                new IconButton("fa-angle-right", "More", {
-                    onClick: (event) => {
-                        event.stopPropagation();
-                        event.preventDefault();
-                        this.pageBump(feedSrcHash, state, 1);
-                    },
-                    title: "Next Page"
-                })
-            ], "text-center marginTop marginBottom"));
+    makeNavButtonBar = (page: number, feedSrcHash: string, state: AppState): ButtonBar => {
+        return new ButtonBar([
+            page > 1 ? new IconButton("fa-angle-double-left", null, {
+                onClick: (event) => {
+                    event.stopPropagation();
+                    event.preventDefault();
+                    this.setPage(feedSrcHash, state, 1);
+                },
+                title: "First Page"
+            }) : null,
+            page > 1 ? new IconButton("fa-angle-left", null, {
+                onClick: (event) => {
+                    event.stopPropagation();
+                    event.preventDefault();
+                    this.pageBump(feedSrcHash, state, -1);
+                },
+                title: "Previous Page"
+            }) : null,
+            // todo-0: make sure this isn't triggering the 'node row click' logic because the button might be overlapping
+            // and need a bubble up cancel. ditto for similar buttons
+            new IconButton("fa-angle-right", "More", {
+                onClick: (event) => {
+                    event.stopPropagation();
+                    event.preventDefault();
+                    this.pageBump(feedSrcHash, state, 1);
+                },
+                title: "Next Page"
+            })
+        ], "text-center marginTop marginBottom");
     }
 
     /* cleverly does both prev or next paging */
