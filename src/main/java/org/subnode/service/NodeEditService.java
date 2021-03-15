@@ -484,7 +484,15 @@ public class NodeEditService {
 				}
 				// otherwise we don't pin it.
 				else {
-					ipfs.removePin(ipfsLink);
+					/*
+					 * Don't do this removePin. Leave this comment here as a warning of what not to
+					 * do! We can't simply remove the CID from our IPFS database because some node
+					 * stopped using it, because there may be many other users/nodes potentially
+					 * using it, so we let the releaseOrphanIPFSPins be our only way pins ever get
+					 * removed, because that method does a safe and correct delete of all pins that
+					 * are truly no longer in use by anyone
+					 */
+					// ipfs.removePin(ipfsLink);
 				}
 			});
 		}
@@ -543,7 +551,7 @@ public class NodeEditService {
 					 * trigger a WebFinger search of them, and a load/update of their outbox
 					 */
 					if (friendUserName.contains("@")) {
-						adminRunner.asyncRun(s -> {
+						adminRunner.run(s -> {
 							if (!ThreadLocals.getSessionContext().isAdmin()) {
 								actPubService.loadForeignUserByUserName(s, friendUserName);
 							}

@@ -41,10 +41,12 @@ public class RunAsMongoAdmin {
 	 * Warning: It's ok to call other non-annotated methods in the same class, but
 	 * not the other way around. That is, the spring proxy is what gets called by
 	 * other beans and is what has the @Async processing in it. Same exact thing
-	 * with AOP having this smae proxy requirement
+	 * with AOP having this same proxy requirement
+	 * 
+	 * oops, this doesn't even startup correctly with spring?? todo-0: come back to this later
 	 */
-	@Async("threadPoolTaskExecutor")
-	public void asyncRun(MongoRunnable runner) {
-		run(runner);
-	}
+	// @Async("threadPoolTaskExecutor")
+	// public void asyncRun(MongoRunnable runner) {
+	// 	run(runner);
+	// }
 }
