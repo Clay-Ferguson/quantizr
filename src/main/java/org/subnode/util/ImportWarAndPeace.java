@@ -124,7 +124,7 @@ public class ImportWarAndPeace {
 			addParagraph();
 
 			curChapter = create.createNode(session, curBook, NodeType.NONE.s(), 0L, CreateNodeLocation.LAST, true);
-			curChapter.setContent("C" + String.valueOf(globalChapter) + ". " + line);
+			curChapter.setContent(/* "C" + String.valueOf(globalChapter) + ". " +*/ line);
 			update.save(session, curChapter);
 			return true;
 		}
@@ -150,7 +150,7 @@ public class ImportWarAndPeace {
 		// line = XString.injectForQuotations(line);
 
 		SubNode paraNode = create.createNode(session, curChapter, NodeType.NONE.s(), 0L, CreateNodeLocation.LAST, true);
-		paraNode.setContent("VS" + globalVerse + ". " + line);
+		paraNode.setContent(/* "VS" + globalVerse + ". " + */ line);
 		update.save(session, paraNode);
 		paragraph.setLength(0);
 		return true;
@@ -171,7 +171,7 @@ public class ImportWarAndPeace {
 			addParagraph();
 
 			curBook = create.createNode(session, root, NodeType.NONE.s(), 0L, CreateNodeLocation.LAST, true);
-			curBook.setContent("B" + String.valueOf(globalBook) + ". " + line);
+			curBook.setContent(/* "B" + String.valueOf(globalBook) + ". " +*/ line);
 			update.save(session, curBook);
 			return true;
 		}
