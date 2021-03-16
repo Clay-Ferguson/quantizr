@@ -88,7 +88,7 @@ export class Util implements UtilIntf {
             },
             /* This value needs to match the animation delay time in click-effect.scss, and also the entire purpose of this setTimeout
             and delayFunc method is to give the animation time to run before we execute whatever was clicked on */
-            800);
+            400);
         };
     }
 
