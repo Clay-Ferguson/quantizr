@@ -553,8 +553,14 @@ export class Meta64 implements Meta64Intf {
     runClickAnimation = (x: number, y: number) => {
         let d = document.createElement("div");
         d.className = "clickEffect";
-        d.style.left = `${x}px`;
-        d.style.top = `${y}px`;
+
+        /* todo-2: make this 5 and 12 offset user configurable. I'm using a custom moust pointer that draws a yellow
+        circle around my mouse for use with this effect, to record screencast videos, and that icon circle is not centered
+        around the actual mouse click arrow tip location, so we have to use an offset here (only when that Linux OS mouse theme is used)
+        to get our expanding circle in CSS to be perfectly centered with the one in the mouse theme, becasue an off center look
+        is terrible but the 5 and 12 makes it perfect */
+        d.style.left = `${x + 5}px`;
+        d.style.top = `${y + 12}px`;
         document.body.appendChild(d);
         let func = () => {
             d.parentElement.removeChild(d);

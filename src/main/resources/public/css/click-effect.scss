@@ -5,8 +5,8 @@ div.clickEffect {
     border-style: solid;
     border-color: yellowgreen;
     border-radius: 50%;
-    /* Warning: must match the time in meta64.ts#getDelayedFunction */
-    animation: clickEffect 0.4s ease-out;
+    /* Warning: must match the time in util.ts#delayFunc */
+    animation: clickEffect 0.8s ease-out;
 
     /* Note: this is 2000 larger than the starting DialogBase.backdropZIndex, so that it can always be on top of all dialogs 
        but arguably we can to with any super large z-index here to enxure always on top.
