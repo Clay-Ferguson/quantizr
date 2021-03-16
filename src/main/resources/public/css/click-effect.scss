@@ -1,0 +1,34 @@
+/* #mouseEffects (do not delete this tag) */
+
+div.clickEffect {
+    position: fixed;
+    border-style: solid;
+    border-color: yellowgreen;
+    border-radius: 50%;
+    /* Warning: must match the time in meta64.ts#getDelayedFunction */
+    animation: clickEffect 0.4s ease-out;
+
+    /* Note: this is 2000 larger than the starting DialogBase.backdropZIndex, so that it can always be on top of all dialogs 
+       but arguably we can to with any super large z-index here to enxure always on top.
+    */
+    z-index: 16002000;
+    width: 0em; 
+    height: 0em;
+    border-width: 3px;
+}
+
+@keyframes clickEffect {
+    0% {
+        width: 0em; 
+        height: 0em;
+        transform: translate(0em, 0em);
+        width: 3px;
+    }
+
+    100% {
+        width: 5em; 
+        height: 5em;
+        transform: translate(-2.5em, -2.5em);
+        border-width: 3px;
+    }
+}

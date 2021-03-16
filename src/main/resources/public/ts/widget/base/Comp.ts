@@ -215,6 +215,7 @@ export abstract class Comp<S extends BaseCompState = any> implements CompIntf {
             ReactDOM.unmountComponentAtNode(elm);
 
             (this._render as any).displayName = this.jsClassName;
+            this.wrapClickFunc(this.attribs);
             let reactElm = this.e(this._render, this.attribs);
 
             /* If this component has a store then wrap with the Redux Provider to make it all reactive */
@@ -229,17 +230,27 @@ export abstract class Comp<S extends BaseCompState = any> implements CompIntf {
         });
     }
 
+    wrapClickFunc = (obj: any) => {
+        if (!S.meta64.mouseEffect || !obj) return;
+        // console.log("Wrap Click: " + this.jsClassName + " obj: " + S.util.prettyPrint(obj));
+        if (obj.onClick) {
+            obj.onClick = S.util.delayFunc(obj.onClick);
+        }
+    }
+
     buildChildren(): ReactNode[] {
         // console.log("buildChildren: " + this.jsClassName);
         if (this.children == null || this.children.length === 0) return null;
         let reChildren: ReactNode[] = [];
 
+        // todo-0: i just noticed we aren't binding or using arrow function here AND we have 'this' being used? bug?
         this.children.forEach(function (child: Comp) {
             if (child) {
                 let reChild: ReactNode = null;
                 try {
                     // console.log("ChildRender: " + child.jsClassName);
                     (this._render as any).displayName = child.jsClassName;
+                    this.wrapClickFunc(child.attribs);
                     reChild = this.e(child._render, child.attribs);
                 }
                 catch (e) {
@@ -289,6 +300,7 @@ export abstract class Comp<S extends BaseCompState = any> implements CompIntf {
                 children = content ? [content] : null;
             }
 
+            this.wrapClickFunc(props);
             if (children && children.length > 0) {
                 // console.log("Render Tag with children.");
                 return this.e(tag, props, children);

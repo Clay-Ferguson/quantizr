@@ -183,7 +183,9 @@ export class MenuPanel extends Div {
             new MenuItemSeparator(), //
 
             new MenuItem("Test Microphone", () => { new MediaRecorderDlg(state, false, false).open(); }, !state.isAnonUser), //
-            new MenuItem("Test Web Cam", () => { new MediaRecorderDlg(state, true, false).open(); }, !state.isAnonUser)
+            new MenuItem("Test Web Cam", () => { new MediaRecorderDlg(state, true, false).open(); }, !state.isAnonUser), //
+            new MenuItemSeparator(), //
+            new MenuItem("Mouse Effects", () => { S.meta64.toggleMouseEffect(); }, !state.isAnonUser)
         ]));
 
         children.push(new Menu("Node Info", [

@@ -153,8 +153,10 @@ export class NodeCompBinary extends Div {
                 new Span(fileName, {
                     className: "normalText marginRight"
                 }),
-                new Anchor(S.render.getUrlForNodeAttachment(node, true), "[ Download ]"),
-                viewFileLink
+                new Div(null, null, [
+                    new Anchor(S.render.getUrlForNodeAttachment(node, true), "[ Download ]"),
+                    viewFileLink
+                ])
             ])]);
         }
     }

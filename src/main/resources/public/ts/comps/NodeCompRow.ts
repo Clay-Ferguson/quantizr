@@ -83,7 +83,7 @@ export class NodeCompRow extends Div {
 
             if (!isPageRootNode && this.level === 1 && insertAllowed && S.edit.isInsertAllowed(node, state)) {
                 insertInlineButton = new IconButton("fa-plus", null, {
-                    onClick: e => {
+                    onClick: (e) => {
                         S.edit.insertNode(node.id, "u", 0 /* isFirst ? 0 : 1 */, state);
                     },
                     title: "Insert new node" + (this.isTableCell ? " (above this one)" : "")

@@ -8,6 +8,7 @@ import { CompIntf } from "../widget/base/CompIntf";
 export interface Meta64Intf {
 
     config: any;
+    mouseEffect: boolean;
     mainMenu: MainMenuDlg;
     userProfileView: UserProfileView;
     app: CompIntf;
@@ -36,9 +37,12 @@ export interface Meta64Intf {
     ctrlKeyCheck(): boolean;
     decryptCache: Map<string, string>;
 
+    toggleMouseEffect(): void;
+
     // function cache accessor
     getNodeFunc(func: (id: string) => void, name: string, id: string): Function;
 
+    runClickAnimation(x: number, y: number): void;
     setOverlay(showOverlay: boolean): void;
     sendTestEmail(string): void;
     showSystemNotification(title: string, message: string): void;

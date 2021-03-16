@@ -2,7 +2,7 @@ import { AppState } from "../AppState";
 import { DialogBase } from "../DialogBase";
 import { CompIntf } from "../widget/base/CompIntf";
 import { Div } from "../widget/Div";
-import { Progress } from "../widget/Progress";
+import { Spinner } from "../widget/Spinner";
 
 export class ProgressDlg extends DialogBase {
 
@@ -13,9 +13,9 @@ export class ProgressDlg extends DialogBase {
     renderDlg(): CompIntf[] {
         return [
             new Div(null, {
-                className: "progress"
+                className: "progressSpinner"
 
-            }, [new Progress()])
+            }, [new Spinner()])
         ];
     }
 }

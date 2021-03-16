@@ -10,6 +10,7 @@ export interface UtilIntf {
     waitCounter: number;
     pgrsDlg: any;
 
+    delayFunc(func: Function): Function;
     validUsername(inputtxt: string): boolean;
     hashOfString(s: string): string;
     hashOfObject(obj: Object);

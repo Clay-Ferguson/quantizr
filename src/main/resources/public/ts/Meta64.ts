@@ -29,6 +29,7 @@ export class Meta64 implements Meta64Intf {
 
     config: any;
     mainMenu: MainMenuDlg;
+    mouseEffect: boolean = false;
 
     app: CompIntf;
     appInitialized: boolean = false;
@@ -469,6 +470,8 @@ export class Meta64 implements Meta64Intf {
                 this.deviceHeight = window.innerHeight;
             });
 
+            this.initClickEffect();
+
             // todo-2: actually this is a nuisance unless user is actually EDITING a node right now
             // so until i make it able to detect if user is editing i'm removing this.
             // window.onbeforeunload = () => {
@@ -521,6 +524,42 @@ export class Meta64 implements Meta64Intf {
             console.log("initApp complete.");
             resolve();
         });
+    }
+
+    /* #mouseEffects (do not delete tag) */
+    toggleMouseEffect = () => {
+        this.fc = new Map<string, Function>();
+        this.fcCount = 0;
+        this.mouseEffect = !this.mouseEffect;
+    }
+
+    /*
+    The other part of this is contained in click-effects.scss
+    */
+    initClickEffect = () => {
+        let clickEffect = (e) => {
+            if (e.clientX < 10 && e.clientY < 10) {
+                console.log("Jank Coords: " + S.util.prettyPrint(e));
+            }
+
+            // looks like for some events there's not a good mouse position (happened on clicks to drop down cobo boxes),
+            // and is apparently 0, 0, so we just check the sanity of the coordinates here */
+            if (!this.mouseEffect || (e.clientX < 10 && e.clientY < 10)) return;
+            this.runClickAnimation(e.clientX, e.clientY);
+        };
+        document.addEventListener("click", clickEffect);
+    }
+
+    runClickAnimation = (x: number, y: number) => {
+        let d = document.createElement("div");
+        d.className = "clickEffect";
+        d.style.left = `${x}px`;
+        d.style.top = `${y}px`;
+        document.body.appendChild(d);
+        let func = () => {
+            d.parentElement.removeChild(d);
+        };
+        d.addEventListener("animationend", func);
     }
 
     playAudioIfRequested = () => {

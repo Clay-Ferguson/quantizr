@@ -76,6 +76,22 @@ export class Util implements UtilIntf {
         return !!v.match(/^[0-9a-zA-Z\-_]+$/);
     }
 
+    // #mouseEffects (do not delete tag)
+    delayFunc = (func: Function): Function => {
+        if (!func || !S.meta64.mouseEffect) {
+            return func;
+        }
+
+        return () => {
+            setTimeout(() => {
+                func();
+            },
+            /* This value needs to match the animation delay time in click-effect.scss, and also the entire purpose of this setTimeout
+            and delayFunc method is to give the animation time to run before we execute whatever was clicked on */
+            400);
+        };
+    }
+
     formatMemory = (val: number): string => {
         // put these vals in const file KB,MB,GB
         if (val < 1024) {
