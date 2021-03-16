@@ -164,8 +164,7 @@ export class App extends Div {
             fullScreenViewer ||
             (main = new Main({ role: "main", className: mainClass }, [
                 new Div(null, {
-                    className: "row",
-                    role: "banner"
+                    className: "row main-app-row"
                 }, [
                     state.mobileMode ? null : new LeftNavPanel(),
                     this.tabPanel || (this.tabPanel = new TabPanel()),

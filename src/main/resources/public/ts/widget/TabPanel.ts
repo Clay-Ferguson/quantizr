@@ -22,7 +22,7 @@ export class TabPanel extends Div {
         const state: AppState = store.getState();
 
         if (state.mobileMode) {
-            this.attribs.className = "col-12";
+            this.attribs.className = "col-12 tab-panel-mobile";
         }
         else {
             this.attribs.className = "col-" + C.mainPanelCols + " offset-" + C.leftNavPanelCols;
