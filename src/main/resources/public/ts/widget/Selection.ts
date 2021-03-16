@@ -28,7 +28,7 @@ export class Selection extends Comp {
         this.attribs.onChange = (evt: any) => {
             /* Selection change clicks don't have normal eventing we can use for the mouse animation so we just
              run it here an make it look like a click in the middle of the selection component, since this is done for supporting
-             screencast demos this is actually much more clear anyway to display the animation on the actual selection after it's made 
+             screencast demos this is actually much more clear anyway to display the animation on the actual selection after it's made
              */
             const { top, left } = evt.target.getBoundingClientRect();
             S.meta64.runClickAnimation(left + evt.target.offsetWidth / 2, top + evt.target.offsetHeight / 2);
