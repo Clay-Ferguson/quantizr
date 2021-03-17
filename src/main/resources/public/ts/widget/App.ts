@@ -35,8 +35,7 @@ export class App extends Div {
         // Since we only instantiate ONE App ever we don't need an 'unsubscribe' and also
         // our pubsub doesn't even HAVE any unsubscribe function yet.
         PubSub.sub(C.PUBSUB_ClearComponentCache, () => {
-
-            // todo-0: do we still need this?
+            // todo-1: do we still need this?
             this.tabPanel = null;
         });
     }

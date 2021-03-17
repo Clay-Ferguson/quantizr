@@ -6,6 +6,8 @@ export type ReactRenderFunc = (type: any, props: any, children: React.ReactNode[
 export interface CompIntf {
     clazz: string;
     e : Function;
+    attribs: any;
+    jsClassName: string;
 
     getId(): string;
     getElement(): HTMLElement;
@@ -28,4 +30,5 @@ export interface CompIntf {
     childrenExist(): boolean;
     setChildren(comps: CompIntf[]): void;
     getChildren(): CompIntf[];
+    _render(): ReactNode;
 }

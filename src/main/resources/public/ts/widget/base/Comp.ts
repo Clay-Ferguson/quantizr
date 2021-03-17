@@ -243,8 +243,7 @@ export abstract class Comp<S extends BaseCompState = any> implements CompIntf {
         if (this.children == null || this.children.length === 0) return null;
         let reChildren: ReactNode[] = [];
 
-        // todo-0: i just noticed we aren't binding or using arrow function here AND we have 'this' being used? bug?
-        this.children.forEach(function (child: Comp) {
+        this.children.forEach((child: CompIntf) => {
             if (child) {
                 let reChild: ReactNode = null;
                 try {
@@ -264,7 +263,7 @@ export abstract class Comp<S extends BaseCompState = any> implements CompIntf {
                     // console.log("ChildRendered to null: " + child.jsClassName);
                 }
             }
-        }, this);
+        });
         return reChildren;
     }
 
