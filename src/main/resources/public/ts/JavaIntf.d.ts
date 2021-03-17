@@ -133,6 +133,10 @@ export interface InsertNodeRequest extends RequestBase {
     initialValue: string;
 }
 
+export interface JoinNodesRequest extends RequestBase {
+    nodeIds: string[];
+}
+
 export interface LoadNodeFromIpfsRequest extends RequestBase {
     path: string;
 }
@@ -436,6 +440,9 @@ export interface InsertBookResponse extends ResponseBase {
 
 export interface InsertNodeResponse extends ResponseBase {
     newNode: NodeInfo;
+}
+
+export interface JoinNodesResponse extends ResponseBase {
 }
 
 export interface LoadNodeFromIpfsResponse extends ResponseBase {

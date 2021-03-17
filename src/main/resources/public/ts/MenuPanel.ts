@@ -50,15 +50,8 @@ export class MenuPanel extends Div {
         const canMoveUp = !isPageRootNode && !state.isAnonUser && (allowNodeMove && hltNode && hltNode.logicalOrdinal > 0);
         const canMoveDown = !isPageRootNode && !state.isAnonUser && (allowNodeMove && hltNode && !hltNode.lastChild);
 
-        // todo-0: these first two menu items need to be updated on the User Guide.
+        // todo-0: these menu items have changed order and location, so we need to update the User Guide
         const children = [];
-        children.push(new Menu("My Nodes", [
-            new MenuItem("Account", () => S.nav.navHome(state), !state.isAnonUser),
-            new MenuItem("Notes", () => S.nav.openContentNode("~" + J.NodeType.NOTES, state), !state.isAnonUser),
-            new MenuItem("Friends", () => S.nav.openContentNode("~" + J.NodeType.FRIEND_LIST, state), !state.isAnonUser),
-            new MenuItem("Posted", () => S.nav.openContentNode("~" + J.NodeType.POSTS, state), !state.isAnonUser),
-            new MenuItem("Exports", () => S.nav.openContentNode("~" + J.NodeType.EXPORTS, state), !state.isAnonUser)
-        ]));
 
         children.push(new Menu("Site Nav", [
             ...this.siteNavCustomItems(state),
@@ -68,28 +61,36 @@ export class MenuPanel extends Div {
             new MenuItem("Logout", () => S.nav.logout(state), !state.isAnonUser)
         ]));
 
+        children.push(new Menu("My Nodes", [
+            new MenuItem("Account", () => S.nav.navHome(state), !state.isAnonUser),
+            new MenuItem("Notes", () => S.nav.openContentNode("~" + J.NodeType.NOTES, state), !state.isAnonUser),
+            new MenuItem("Friends", () => S.nav.openContentNode("~" + J.NodeType.FRIEND_LIST, state), !state.isAnonUser),
+            new MenuItem("Posted", () => S.nav.openContentNode("~" + J.NodeType.POSTS, state), !state.isAnonUser),
+            new MenuItem("Exports", () => S.nav.openContentNode("~" + J.NodeType.EXPORTS, state), !state.isAnonUser)
+        ]));
+
         children.push(new Menu("Edit", [
+            new MenuItem("Clear Selections", () => S.meta64.clearSelNodes(state), !state.isAnonUser), //
+
             // new MenuItem("Cut", S.edit.cutSelNodes, () => { return !state.isAnonUser && selNodeCount > 0 && selNodeIsMine }), //
             new MenuItem("Undo Cut", () => S.edit.undoCutSelNodes(state), !state.isAnonUser && !!state.nodesToMove), //
 
             // new MenuItem("Select All", S.edit.selectAllNodes, () => { return  !state.isAnonUser }), //
 
-            new MenuItem("Clear Selections", () => S.meta64.clearSelNodes(state), !state.isAnonUser), //
-            new MenuItem("Split Node", () => new SplitNodeDlg(null, state).open(), !state.isAnonUser && selNodeIsMine), //
             new MenuItem("Transfer Node", () => { new TransferNodeDlg(state).open(); }, !state.isAnonUser && selNodeIsMine), //
             new MenuItem("Update Headings", () => { S.edit.updateHeadings(state); }, !state.isAnonUser && selNodeIsMine), //
             new MenuItem("Search and Replace", () => { new SearchAndReplaceDlg(state).open(); }, !state.isAnonUser && selNodeIsMine), //
 
             new MenuItemSeparator(), //
 
-            new MenuItem("Move to Top", () => S.edit.moveNodeToTop(null, state), canMoveUp), //
-            new MenuItem("Move to Bottom", () => S.edit.moveNodeToBottom(null, state), canMoveDown), //
+            new MenuItem("Split Node", () => new SplitNodeDlg(null, state).open(), !state.isAnonUser && selNodeIsMine), //
+            new MenuItem("Join Nodes", () => S.edit.joinNodes(state), !state.isAnonUser && selNodeIsMine), //
 
             new MenuItemSeparator(), //
 
-            new MenuItem("Toggle Edit Mode", () => S.edit.toggleEditMode(state), !state.isAnonUser), //
-            new MenuItem("Toggle Metadata", () => S.edit.toggleShowMetaData(state), !state.isAnonUser), //
-            new MenuItem("Save Clipboard", () => S.edit.saveClipboardToChildNode("~" + J.NodeType.NOTES), !state.isAnonUser), //
+            new MenuItem("Move to Top", () => S.edit.moveNodeToTop(null, state), canMoveUp), //
+            new MenuItem("Move to Bottom", () => S.edit.moveNodeToBottom(null, state), canMoveDown), //
+
             new MenuItemSeparator(), //
 
             new MenuItem("Delete", () => S.edit.deleteSelNodes(null, state), !state.isAnonUser && selNodeIsMine) //
@@ -173,6 +174,7 @@ export class MenuPanel extends Div {
 
         children.push(new Menu("Tools", [
             !state.isAnonUser ? new MenuItem("Show Graph", () => S.render.showGraph(null, null, state), !!hltNode) : null, //
+            new MenuItem("Save Clipboard", () => S.edit.saveClipboardToChildNode("~" + J.NodeType.NOTES), !state.isAnonUser), //
 
             // for now, we don't need the 'show properties' and it may never be needed again
             // new MenuItem("Toggle Properties", S.props.propsToggle, () => { return propsToggle }, () => { return !state.isAnonUser }), //
@@ -242,6 +244,8 @@ export class MenuPanel extends Div {
 
         children.push(new Menu("Account", [
             new MenuItem("Profile", () => S.meta64.userProfileView.open(false, null)), //
+            new MenuItem("Toggle Edit Mode", () => S.edit.toggleEditMode(state), !state.isAnonUser), //
+            new MenuItem("Toggle Metadata", () => S.edit.toggleShowMetaData(state), !state.isAnonUser), //
 
             // For now there is only ONE button on the Perferences dialog that is accessible as a toolbar button already, so
             // until we have at least one more preference the preferences dialog is not needed.

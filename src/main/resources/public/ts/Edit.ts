@@ -73,6 +73,13 @@ export class Edit implements EditIntf {
         }
     }
 
+    private joinNodesResponse = (res: J.JoinNodesResponse, state: AppState): void => {
+        if (S.util.checkSuccess("Join node", res)) {
+            S.meta64.clearSelNodes(state);
+            S.view.refreshTree(state.node.id, false, false, null, false, true, true, state);
+        }
+    }
+
     public initNodeEditResponse = (res: J.InitNodeEditResponse, state: AppState): void => {
         if (S.util.checkSuccess("Editing node", res)) {
             const node: J.NodeInfo = res.nodeInfo;
@@ -483,6 +490,28 @@ export class Edit implements EditIntf {
 
     cached_deleteSelNodes = (nodeId: string) => {
         this.deleteSelNodes(nodeId);
+    }
+
+    joinNodes = (state?: AppState): void => {
+        state = appState(state);
+
+        const selNodesArray = S.meta64.getSelNodeIdsArray(state);
+        if (!selNodesArray || selNodesArray.length === 0) {
+            S.util.showMessage("You have not selected any nodes to join.", "Warning");
+            return;
+        }
+
+        let confirmMsg = "Join " + selNodesArray.length + " node(s) ?";
+        new ConfirmDlg(confirmMsg, "Confirm Join " + selNodesArray.length,
+            () => {
+                S.util.ajax<J.JoinNodesRequest, J.JoinNodesResponse>("joinNodes", {
+                    nodeIds: selNodesArray
+                }, (res: J.JoinNodesResponse) => {
+                    this.joinNodesResponse(res, state);
+                });
+            },
+            null, "btn-danger", "alert alert-danger", state
+        ).open();
     }
 
     /*

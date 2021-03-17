@@ -65,6 +65,7 @@ import org.subnode.request.GraphRequest;
 import org.subnode.request.InitNodeEditRequest;
 import org.subnode.request.InsertBookRequest;
 import org.subnode.request.InsertNodeRequest;
+import org.subnode.request.JoinNodesRequest;
 import org.subnode.request.LoadNodeFromIpfsRequest;
 import org.subnode.request.LoginRequest;
 import org.subnode.request.LogoutRequest;
@@ -809,6 +810,13 @@ public class AppController implements ErrorController {
 	public @ResponseBody Object deleteNodes(@RequestBody DeleteNodesRequest req, HttpSession session) {
 		return callProc.run("deleteNodes", req, session, ms -> {
 			return nodeMoveService.deleteNodes(ms, req);
+		});
+	}
+
+	@RequestMapping(value = API_PATH + "/joinNodes", method = RequestMethod.POST)
+	public @ResponseBody Object joinNodes(@RequestBody JoinNodesRequest req, HttpSession session) {
+		return callProc.run("joinNodes", req, session, ms -> {
+			return nodeMoveService.joinNodes(ms, req);
 		});
 	}
 

@@ -6,6 +6,7 @@ export interface EditIntf {
 
     saveClipboardToChildNode(parentId?: string): void;
     splitNode(node: J.NodeInfo, splitType: string, delimiter: string, state: AppState): void;
+    joinNodes(state?: AppState): void;
     openChangePasswordDlg(state: AppState): void;
     openManageAccountDlg(state: AppState): void;
     editPreferences(state: AppState): void;

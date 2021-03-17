@@ -1,6 +1,5 @@
 package org.subnode.util;
 
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 
 /* Warning do not call this run method from INSIDE this class. Due to the spring proxy 'issue' you can't do that */
@@ -19,7 +18,11 @@ public class AsyncExec {
      * thread contention, by running async queued functions sequentially in that
      * thread.
      */
-    @Async("threadPoolTaskExecutor")
+    
+    // oops: we can't do async thread UNTIL SessionContext and ThreadLocals is taken care of.
+    // import org.springframework.scheduling.annotation.Async;
+    // @Async("threadPoolTaskExecutor")
+
     public void run(Runnable runnable) {
         runnable.run();
     }

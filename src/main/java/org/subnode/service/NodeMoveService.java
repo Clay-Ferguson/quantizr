@@ -1,7 +1,11 @@
 package org.subnode.service;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,10 +19,12 @@ import org.subnode.mongo.MongoSession;
 import org.subnode.mongo.MongoUpdate;
 import org.subnode.mongo.model.SubNode;
 import org.subnode.request.DeleteNodesRequest;
+import org.subnode.request.JoinNodesRequest;
 import org.subnode.request.MoveNodesRequest;
 import org.subnode.request.SelectAllNodesRequest;
 import org.subnode.request.SetNodePositionRequest;
 import org.subnode.response.DeleteNodesResponse;
+import org.subnode.response.JoinNodesResponse;
 import org.subnode.response.MoveNodesResponse;
 import org.subnode.response.SelectAllNodesResponse;
 import org.subnode.response.SetNodePositionResponse;
@@ -139,6 +145,72 @@ public class NodeMoveService {
 	}
 
 	/*
+	 * Note: Browser can send nodes these in any order, in the request, and always
+	 * the lowest ordinal is the one we keep and join to
+	 */
+	public JoinNodesResponse joinNodes(MongoSession session, JoinNodesRequest req) {
+		JoinNodesResponse res = new JoinNodesResponse();
+		if (session == null) {
+			session = ThreadLocals.getMongoSession();
+		}
+
+		// add to list becasue we will sort
+		ArrayList<SubNode> nodes = new ArrayList<SubNode>();
+
+		String parentPath = null;
+		for (String nodeId : req.getNodeIds()) {
+			SubNode node = read.getNode(session, nodeId);
+
+			if (parentPath == null) {
+				parentPath = node.getParentPath();
+			} else if (!parentPath.equals(node.getParentPath())) {
+				res.setMessage("Failed: All nodes must be under the same parent node.");
+				res.setSuccess(false);
+				return res;
+			}
+
+			auth.authRequireOwnerOfNode(session, node);
+			nodes.add(node);
+		}
+
+		Collections.sort(nodes, new Comparator<SubNode>() {
+			@Override
+			public int compare(SubNode s1, SubNode s2) {
+				return (int) (s1.getOrdinal() - s2.getOrdinal());
+			}
+		});
+
+		StringBuilder sb = new StringBuilder();
+		SubNode firstNode = null;
+		int counter = 0;
+
+		for (SubNode n : nodes) {
+			if (firstNode == null) {
+				firstNode = n;
+			}
+			if (counter > 0) {
+				sb.append("\n");
+			}
+
+			if (!StringUtils.isEmpty(n.getContent())) {
+				// trim and add ONE new line, for consistency.
+				sb.append(n.getContent().trim());
+				sb.append("\n");
+			}
+
+			if (counter > 0) {
+				delete.deleteNode(session, n, false);
+			}
+			counter++;
+		}
+
+		firstNode.setContent(sb.toString());
+		update.saveSession(session);
+		res.setSuccess(true);
+		return res;
+	}
+
+	/*
 	 * Deletes the set of nodes specified in the request
 	 */
 	public DeleteNodesResponse deleteNodes(MongoSession session, DeleteNodesRequest req) {
@@ -163,6 +235,12 @@ public class NodeMoveService {
 				 * becuase since we don't do reference counting we let the garbage collecion
 				 * cleanup be the only way user quotas are deducted from
 				 */
+				// todo-0: this can be done in async thread (pass the userName, here because
+				// that thread
+				// won't have it....which reminds me, my Async thread code needs to ALL be
+				// passed a copy of ThreadLocals
+				// and so since I just added @Async support I need to just back it out UNTIL I
+				// solve THAT issue first.
 				userManagerService.addNodeBytesToUserNodeBytes(node, userNode, -1);
 			}
 

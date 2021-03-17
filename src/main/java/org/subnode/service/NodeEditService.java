@@ -638,7 +638,7 @@ public class NodeEditService {
 		}
 		String nodeId = req.getNodeId();
 
-		log.debug("Splitting node: " + nodeId);
+		// log.debug("Splitting node: " + nodeId);
 		SubNode node = read.getNode(session, nodeId);
 		SubNode parentNode = read.getParent(session, node);
 
@@ -685,7 +685,7 @@ public class NodeEditService {
 		Date now = Calendar.getInstance().getTime();
 		int idx = 0;
 		for (String part : contentParts) {
-			log.debug("ContentPart[" + idx + "] " + part);
+			// log.debug("ContentPart[" + idx + "] " + part);
 			part = part.trim();
 			if (idx == 0) {
 				node.setContent(part);

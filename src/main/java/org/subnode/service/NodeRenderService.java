@@ -78,9 +78,10 @@ public class NodeRenderService {
 	 */
 	public RenderNodeResponse renderNode(MongoSession session, RenderNodeRequest req) {
 
-		// todo-0: Add to Admin area of User Guide the fact that you must have a node
-		// named 'welcome-page', and/or else
-		// always make app create one at startup.
+		/*
+		 * todo-0: Add to Admin area of User Guide the fact that you must have a node
+		 * named 'welcome-page', and/or else always make app create one at startup.
+		 */
 		boolean isWelcomePage = req.getNodeId().equals(":welcome-page");
 
 		/*
