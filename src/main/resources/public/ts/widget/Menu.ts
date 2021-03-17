@@ -17,6 +17,7 @@ export class Menu extends Div {
         let state = this.getState();
         this.attribs.style = { display: (state.visible && !state.disabled ? "" : "none") };
         let show = Menu.activeMenu === this.name;
+        // console.log("MENU: " + this.name + " active=" + show);
 
         this.setChildren([
             new Div(this.name, {
@@ -28,9 +29,13 @@ export class Menu extends Div {
                 role: "tab",
                 id: "heading" + this.getId(),
                 onClick: (elm) => {
-                    let expanded = elm.target.getAttribute("aria-expanded") === "true";
-                    Menu.activeMenu = expanded ? this.name : null;
-                    // console.log("Expand or collapse: "+name+" expan="+elm.target.getAttribute("aria-expanded"));
+                    setTimeout(() => {
+                        /* "aria-expanded" attribute won't have been updated yet when this onClick is called, so we have a delay
+                        timer here to wait for it to get updated */
+                        let expanded = elm.target.getAttribute("aria-expanded") === "true";
+                        Menu.activeMenu = expanded ? this.name : null;
+                        // console.log("Expand or collapse: " + this.name + " expan=" + expanded);
+                    }, 500);
                 }
             }),
 
@@ -47,7 +52,7 @@ export class Menu extends Div {
                     new Div(null, {
                         className: "list-group flex-column"
                     },
-                    this.menuItems)
+                        this.menuItems)
                 ])
             ])
         ]);

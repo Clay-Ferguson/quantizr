@@ -204,7 +204,7 @@ export class MenuPanel extends Div {
 
             // Warning: this can put heavy load on server. Maybe make this kinda thing a "paid" feature?
             new MenuItem("Node Stats", () => S.view.getNodeStats(state, false, false), //
-                !state.isAnonUser /* state.isAdminUser */) //
+                !state.isAnonUser && selNodeIsMine) //
 
             // This menu item works, but will have little value to users, because the only difference between this and 'Node Stats', is that
             // the 'trending' stats is defined as the 'Node Stats' for the most recent 500 results in the query. I had a need for this early on
