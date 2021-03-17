@@ -1,5 +1,7 @@
 export class Constants {
 
+    static SITE_NAV_MENU_TEXT = "Site Nav";
+
     // per bootstrap design these must sum to 12;
     static leftNavPanelCols: number = 3;
     static mainPanelCols: number = 6;

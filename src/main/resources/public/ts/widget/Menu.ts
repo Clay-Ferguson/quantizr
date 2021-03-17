@@ -1,11 +1,11 @@
 import { ReactNode } from "react";
+import { Constants as C } from "../Constants";
 import { CompIntf } from "./base/CompIntf";
 import { Div } from "./Div";
 
 export class Menu extends Div {
 
-    // This can auto expand any menu, but I'm setting to null, to disable, becasue I decided I kinda don't like it.
-    static activeMenu: string = null; // "Social";
+    static activeMenu: string = C.SITE_NAV_MENU_TEXT;
 
     constructor(public name: string, public menuItems: CompIntf[]) {
         super(null, {

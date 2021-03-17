@@ -53,12 +53,12 @@ export class MenuPanel extends Div {
         // todo-0: these menu items have changed order and location, so we need to update the User Guide
         const children = [];
 
-        children.push(new Menu("Site Nav", [
+        children.push(new Menu(C.SITE_NAV_MENU_TEXT, [
             ...this.siteNavCustomItems(state),
             new MenuItem("Portal Home", () => S.meta64.loadAnonPageHome(state)),
             new MenuItem("User Guide", () => S.nav.openContentNode(":user-guide", state)),
-            new MenuItemSeparator(), //
-            new MenuItem("Logout", () => S.nav.logout(state), !state.isAnonUser)
+            !state.isAnonUser ? new MenuItemSeparator() : null, //
+            !state.isAnonUser ? new MenuItem("Logout", () => S.nav.logout(state), !state.isAnonUser) : null
         ]));
 
         children.push(new Menu("My Nodes", [
