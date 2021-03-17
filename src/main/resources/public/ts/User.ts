@@ -74,7 +74,7 @@ export class User implements UserIntf {
 
                 /* if we have known state as logged out, then do nothing here */
                 if (loginState === "0") {
-                    console.log("loginState known as logged out.");
+                    // console.log("loginState known as logged out.");
                     this.defaultHandleAnonUser(state);
                     return;
                 }
@@ -89,7 +89,7 @@ export class User implements UserIntf {
                 const callUsr: string = usr || "";
                 const callPwd: string = pwd || "";
 
-                console.log("refreshLogin with name: " + callUsr);
+                // console.log("refreshLogin with name: " + callUsr);
 
                 if (!callUsr) {
                     this.defaultHandleAnonUser(state);

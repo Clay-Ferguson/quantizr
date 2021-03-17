@@ -112,7 +112,7 @@ export class UserProfileView extends AppTab {
             S.util.ajax<J.GetUserProfileRequest, J.GetUserProfileResponse>("getUserProfile", {
                 userId
             }, (res: J.GetUserProfileResponse): void => {
-                console.log("UserProfile Response: " + S.util.prettyPrint(res));
+                // console.log("UserProfile Response: " + S.util.prettyPrint(res));
                 if (res) {
                     this.bioState.setValue(res.userBio);
                     dispatch({

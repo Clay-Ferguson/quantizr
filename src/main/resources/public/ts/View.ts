@@ -81,7 +81,7 @@ export class View implements ViewIntf {
     }
 
     lastPage = (state: AppState): void => {
-        console.log("Running lastPage Query");
+        // console.log("Running lastPage Query");
         // nav.mainOffset += nav.ROWS_PER_PAGE;
         // this.loadPage(true, targetOffset, state);
     }

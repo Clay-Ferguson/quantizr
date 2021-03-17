@@ -157,13 +157,13 @@ export class Meta64 implements Meta64Intf {
         const selArray: string[] = [];
 
         if (!state.selectedNodes) {
-            console.log("no selected nodes.");
+            // console.log("no selected nodes.");
         }
 
         S.util.forEachProp(state.selectedNodes, (id, val): boolean => {
             const node: J.NodeInfo = state.idToNodeMap.get(id);
             if (!node) {
-                console.log("unable to find idToNodeMap for id=" + id);
+                // console.log("unable to find idToNodeMap for id=" + id);
             } else {
                 selArray.push(node.id);
             }
@@ -263,7 +263,7 @@ export class Meta64 implements Meta64Intf {
                 S.view.scrollToTop();
             }
             ret = false;
-            console.log("highlightRowById failed to find id: " + id);
+            // console.log("highlightRowById failed to find id: " + id);
         }
         return ret;
     }
@@ -496,8 +496,6 @@ export class Meta64 implements Meta64Intf {
              * This call checks the server to see if we have a session already, and gets back the login information from
              * the session, and then renders page content, after that.
              */
-
-            // this.pingServer();
             S.user.refreshLogin(store.getState());
 
             S.util.initProgressMonitor();
@@ -538,12 +536,8 @@ export class Meta64 implements Meta64Intf {
     */
     initClickEffect = () => {
         let clickEffect = (e) => {
-            if (e.clientX < 10 && e.clientY < 10) {
-                console.log("Jank Coords: " + S.util.prettyPrint(e));
-            }
-
-            // looks like for some events there's not a good mouse position (happened on clicks to drop down cobo boxes),
-            // and is apparently 0, 0, so we just check the sanity of the coordinates here */
+            /* looks like for some events there's not a good mouse position (happened on clicks to drop down cobo boxes),
+             and is apparently 0, 0, so we just check the sanity of the coordinates here */
             if (!this.mouseEffect || (e.clientX < 10 && e.clientY < 10)) return;
             this.runClickAnimation(e.clientX, e.clientY);
         };
@@ -644,13 +638,6 @@ export class Meta64 implements Meta64Intf {
         // console.log("overlayCounter="+Meta64.overlayCounter);
     }
 
-    pingServer = () => {
-        S.util.ajax<J.PingRequest, J.PingResponse>("ping", {},
-            (res: J.PingResponse) => {
-                console.log("Server Info: " + res.serverInfo);
-            });
-    }
-
     processUrlParams = (state: AppState): void => {
         var passCode = S.util.getParameterByName("passCode");
         if (passCode) {
@@ -671,7 +658,7 @@ export class Meta64 implements Meta64Intf {
     }
 
     loadAnonPageHome = (state: AppState): void => {
-        console.log("loadAnonPageHome()");
+        // console.log("loadAnonPageHome()");
 
         S.util.ajax<J.RenderNodeRequest, J.RenderNodeResponse>("anonPageLoad", null,
             (res: J.RenderNodeResponse): void => {

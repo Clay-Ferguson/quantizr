@@ -296,7 +296,7 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
 
                 // not needed (this does work however)
                 this.on("uploadprogress", function (file, progress) {
-                    console.log("File progress", progress);
+                   // console.log("File progress", progress);
                 });
 
                 this.on("success", function (file: File, resp: J.ResponseBase, evt: ProgressEvent) {

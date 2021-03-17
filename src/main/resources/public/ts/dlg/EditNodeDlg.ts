@@ -156,7 +156,7 @@ export class EditNodeDlg extends DialogBase {
                 }
 
                 if (!this.allowEditAllProps && !S.render.allowPropertyEdit(node, prop.name, this.appState)) {
-                    console.log("Hiding property: " + prop.name);
+                    // ("Hiding property: " + prop.name);
                     return;
                 }
 
@@ -577,7 +577,7 @@ export class EditNodeDlg extends DialogBase {
                 // console.log("prop=" + S.util.prettyPrint(prop));
 
                 if (!this.allowEditAllProps && !S.render.allowPropertyEdit(state.node, prop.name, this.appState)) {
-                    console.log("Hiding property: " + prop.name);
+                    // console.log("Hiding property: " + prop.name);
                     return;
                 }
 

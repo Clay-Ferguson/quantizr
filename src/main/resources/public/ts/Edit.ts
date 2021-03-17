@@ -156,7 +156,7 @@ export class Edit implements EditIntf {
     */
     startEditingNewNode = async (typeName: string, createAtTop: boolean, parentNode: J.NodeInfo, nodeInsertTarget: J.NodeInfo, ordinalOffset: number, state: AppState): Promise<void> => {
         if (!this.isInsertAllowed(parentNode, state)) {
-            console.log("Rejecting request to edit. Not authorized");
+            // console.log("Rejecting request to edit. Not authorized");
             return;
         }
 
@@ -265,7 +265,7 @@ export class Edit implements EditIntf {
                     await S.share.addCipherKeyToNode(node, ac.publicKey, ac.principalNodeId);
                 }
 
-                console.log("Key distribution complete.");
+                // console.log("Key distribution complete.");
             }
             finally {
                 resolve();
@@ -449,7 +449,7 @@ export class Edit implements EditIntf {
         } else {
             parentNode = state.idToNodeMap.get(id);
             if (!parentNode) {
-                console.log("Unknown nodeId in createSubNode: " + id);
+                // console.log("Unknown nodeId in createSubNode: " + id);
                 return;
             }
         }

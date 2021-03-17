@@ -1,6 +1,6 @@
 
 /**
- * This class was for proving to myself how certain aspects of inheritance work in TypeScript
+ * This class was for proving how certain aspects of inheritance work in TypeScript
  * related to Fat Arrow functions, binding, and overriding base class functions. There are only
  * a handful of files with "Demo" in their filename, and those can be removed from this project and
  * the web app will still work fine of course.

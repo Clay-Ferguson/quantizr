@@ -17,7 +17,7 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (s: Singletons) => {
 //
 export class ServerPush implements ServerPushIntf {
     init = (): any => {
-        console.log("ServerPush.init");
+        // console.log("ServerPush.init");
 
         const eventSource = new EventSource(S.util.getRpcPath() + "serverPush");
 
@@ -36,7 +36,7 @@ export class ServerPush implements ServerPushIntf {
         eventSource.addEventListener("feedPush", function (e: any) {
 
             const obj: J.FeedPushInfo = JSON.parse(e.data);
-            console.log("Incomming Push (FeedPushInfo): " + S.util.prettyPrint(obj));
+            // console.log("Incomming Push (FeedPushInfo): " + S.util.prettyPrint(obj));
 
             const nodeInfo: J.NodeInfo = obj.nodeInfo;
             if (nodeInfo) {
@@ -79,7 +79,7 @@ export class ServerPush implements ServerPushIntf {
 
         eventSource.addEventListener("newInboxNode", function (e: any) {
             const obj: J.NotificationMessage = JSON.parse(e.data);
-            console.log("Incomming Push (NotificationMessage): " + S.util.prettyPrint(obj));
+            // console.log("Incomming Push (NotificationMessage): " + S.util.prettyPrint(obj));
             // new InboxNotifyDlg("Your Inbox has updates!", store.getState()).open();
         }, false);
     }

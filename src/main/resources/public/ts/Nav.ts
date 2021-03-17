@@ -235,7 +235,6 @@ export class Nav implements NavIntf {
     }
 
     navPageNodeResponse = (res: J.RenderNodeResponse, state: AppState): void => {
-        console.log("navPageNodeResponse.");
         S.meta64.clearSelNodes(state);
         S.render.renderPageFromData(res, true, null, true, true, state);
         S.meta64.selectTab("mainTab");

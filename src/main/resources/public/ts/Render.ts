@@ -107,7 +107,7 @@ export class Render implements RenderIntf {
             // todo-2: right now we only actually support one file being dragged? Would be nice to support multiples
             for (let i = 0; i < data.length; i++) {
                 const d = data[i];
-                console.log("DROP[" + i + "] kind=" + d.kind + " type=" + d.type);
+                // console.log("DROP[" + i + "] kind=" + d.kind + " type=" + d.type);
 
                 if (d.kind === "string") {
                     d.getAsString((s) => {
