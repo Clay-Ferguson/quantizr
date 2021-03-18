@@ -46,6 +46,7 @@
 .menuCardBody {
     padding: 0px;
     border: 2px solid #444;
+    margin-left: 15px; // todo-0: make this 0 for mobile
 }
 
 .menuCard {
@@ -61,6 +62,7 @@
     border: none;
     border-radius: 0;
     padding: 10px; 
+    margin-left: 15px; // todo-0: make this 0 for mobile
 }
 
 .menuHeading:hover {

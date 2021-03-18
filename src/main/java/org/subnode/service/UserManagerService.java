@@ -270,7 +270,6 @@ public class UserManagerService {
 			if (node != null) {
 				// log.debug("Setting stat.binUsage=" + stat.binUsage);
 				node.setProp(NodeProp.BIN_TOTAL.s(), stat.binUsage);
-				node.setProp(NodeProp.BIN_QUOTA.s(), Const.DEFAULT_USER_QUOTA);
 			} else {
 				log.debug("Node not found by key: " + key);
 			}
