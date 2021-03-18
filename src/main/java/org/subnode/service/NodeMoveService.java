@@ -11,6 +11,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.subnode.exception.base.RuntimeEx;
+import org.subnode.model.client.NodeProp;
 import org.subnode.mongo.MongoAuth;
 import org.subnode.mongo.MongoCreate;
 import org.subnode.mongo.MongoDelete;
@@ -199,7 +200,15 @@ public class NodeMoveService {
 			}
 
 			if (counter > 0) {
-				delete.deleteNode(session, n, false);
+				/* If node has an attachment we don't delete the node, but just set it's content to null */
+				if (n.getStrProp(NodeProp.BIN) != null || n.getStrProp(NodeProp.IPFS_LINK) != null) {
+					n.setContent(null);
+					update.save(session, n);
+				} 
+				/* or else we delete the node */
+				else {
+					delete.deleteNode(session, n, false);
+				}
 			}
 			counter++;
 		}
@@ -234,13 +243,10 @@ public class NodeMoveService {
 				 * NOTE: There is no equivalent to this on the IPFS code path for deleting ipfs
 				 * becuase since we don't do reference counting we let the garbage collecion
 				 * cleanup be the only way user quotas are deducted from
+				 *
+				 * todo-0: this can be done in async thread (be careful about ThreadLocals and
+				 * SessionContext)
 				 */
-				// todo-0: this can be done in async thread (pass the userName, here because
-				// that thread
-				// won't have it....which reminds me, my Async thread code needs to ALL be
-				// passed a copy of ThreadLocals
-				// and so since I just added @Async support I need to just back it out UNTIL I
-				// solve THAT issue first.
 				userManagerService.addNodeBytesToUserNodeBytes(node, userNode, -1);
 			}
 
