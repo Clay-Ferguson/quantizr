@@ -287,7 +287,7 @@ export class Render implements RenderIntf {
         return typeHandler == null || typeHandler.allowAction(action, node, appState);
     }
 
-    renderPageFromData = (res: J.RenderNodeResponse, scrollToTop: boolean, targetNodeId: string, clickTab: boolean = true, allowScroll: boolean = true, state: AppState): void => {
+    renderPageFromData = (res: J.RenderNodeResponse, scrollToTop: boolean, targetNodeId: string, clickTab: boolean = true, allowScroll: boolean = true, initState: AppState): void => {
         if (res && res.noDataResponse) {
             S.util.showMessage(res.noDataResponse, "Note");
             return;
@@ -297,8 +297,10 @@ export class Render implements RenderIntf {
             // console.log("renderPageFromData: " + S.util.prettyPrint(res));
             dispatch({
                 type: "Action_RenderPage",
-                state,
+                state: initState,
                 updateNew: (s: AppState): AppState => {
+                    // console.log("updateNew state in Action_RenderPage");
+
                     // VERY IMPORTANT to return a NEW object so we create it here. If you don't return new object rendering can fail.
                     s = { ...s };
 
@@ -350,6 +352,7 @@ export class Render implements RenderIntf {
 
                             // do this async just for performance
                             setTimeout(() => {
+                                // console.log("updateNew calling updateHistory");
                                 S.util.updateHistory(s.node, targetNodeId, s);
                             }, 10);
                         }
@@ -396,16 +399,20 @@ export class Render implements RenderIntf {
                     }
                     finally {
                         if (s.rendering) {
+                            // console.log("we're rendering so queue window scroll");
                             /* This is a tiny timeout yes, but don't remove this timer. We need it or else this won't work. */
 
                             PubSub.subSingleOnce(C.PUBSUB_postMainWindowScroll, () => {
+                                // console.log("create timeout for reset of rendering flag");
                                 setTimeout(() => {
+                                    // console.log("running timeout for reset of rendering");
                                     dispatch({
                                         type: "Action_settingVisible",
-                                        state,
-                                        update: (s: AppState): void => {
-                                            s.rendering = false;
+                                        state: s,
+                                        update: (_s: AppState): void => {
+                                            _s.rendering = false;
                                             this.allowFadeInId = true;
+                                            // console.log("new state, updating to set rendering=false");
                                         }
                                     });
                                 },

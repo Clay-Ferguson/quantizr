@@ -487,18 +487,8 @@ public class NodeRenderService {
 			session = ThreadLocals.getMongoSession();
 		}
 
-		String id = null;
-		SessionContext sc = ThreadLocals.getSessionContext();
-		if (sc.getUrlId() != null) {
-			id = sc.getUrlId();
-			sc.setUrlId(null);
-			log.debug("anonPageRedirected it's id to load to: " + id);
-		} //
-		else {
-			id = appProp.getUserLandingPageNode();
-		}
-
-		log.debug("Anon Render Node ID: " + id);
+		String id = appProp.getUserLandingPageNode();
+		// log.debug("Anon Render Node ID: " + id);
 		req.setNodeId(id);
 
 		RenderNodeResponse res = renderNode(session, req);
