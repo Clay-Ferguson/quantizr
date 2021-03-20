@@ -55,7 +55,7 @@ export class MenuPanel extends Div {
 
         children.push(new Menu(C.SITE_NAV_MENU_TEXT, [
             ...this.siteNavCustomItems(state),
-            new MenuItem("Portal Home", () => S.meta64.loadAnonPageHome(state)),
+            new MenuItem("Portal Home", () => S.meta64.loadAnonPageHome(null)),
             new MenuItem("User Guide", () => S.nav.openContentNode(":user-guide", state)),
             !state.isAnonUser ? new MenuItemSeparator() : null, //
             !state.isAnonUser ? new MenuItem("Logout", () => S.nav.logout(state), !state.isAnonUser) : null

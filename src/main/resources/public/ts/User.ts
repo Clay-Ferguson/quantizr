@@ -63,7 +63,7 @@ export class User implements UserIntf {
             S.srch.feed("~" + J.NodeType.FRIEND_LIST, null, FeedView.page, null);
         }
         else {
-            S.meta64.loadAnonPageHome(state);
+            S.meta64.loadAnonPageHome(null);
         }
     }
 
@@ -118,7 +118,7 @@ export class User implements UserIntf {
                     },
                         async (error: string) => {
                             await S.user.deleteAllUserLocalDbEntries();
-                            S.meta64.loadAnonPageHome(state);
+                            S.meta64.loadAnonPageHome(null);
                         });
                 }
             }

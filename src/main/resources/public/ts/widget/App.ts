@@ -119,7 +119,7 @@ export class App extends Div {
             }, (state.pageMessage ? "btn-primary" : "btn-secondary") + " floatingControlBarItem", "off") : null;
 
             let homeButton = new IconButton("fa-home", null, {
-                onClick: e => { S.meta64.loadAnonPageHome(state); },
+                onClick: e => { S.meta64.loadAnonPageHome(null); },
                 title: "Portal Home"
             }, (state.pageMessage ? "btn-primary" : "btn-secondary") + " floatingControlBarItem", "off");
 

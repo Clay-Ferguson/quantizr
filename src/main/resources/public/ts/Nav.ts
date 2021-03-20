@@ -184,14 +184,21 @@ export class Nav implements NavIntf {
          */
         S.meta64.highlightNode(node, false, state);
 
-        // There's a wierd event/ording probelm where, without this timer (delay) clicking a checkbox on a node
+        // There's a wierd event/ording problem where, without this timer (delay) clicking a checkbox on a node
         // row won't get it's setter (onChange) called in time, because this refresh blows away too much state. This
-        // is related to the Checkbox.ts class.
+        // is related to the Checkbox.ts class. We really need to just store ALL the statein appState and that will fix this.
+        // I think this may be related to the problem I just found where stale states
+        // can get passed to click methods.
         setTimeout(() => {
             fastDispatch({
                 type: "Action_FastRefresh",
                 updateNew: (s: AppState): AppState => {
-                    return { ...state };
+                    return {
+                        // I had a bug I was unable to repro where clicking a row in the Main tab would switch immediately to timeline tab.
+                        // and since I can't repro yet this is a WAG at an emergency fix that should be safe even if sort of 'wrong'
+                        activeTab: "mainTab",
+                        ...state
+                    };
                 }
             });
         }, 100);
@@ -268,7 +275,7 @@ export class Nav implements NavIntf {
     navHome = (state: AppState): void => {
         console.log("navHome()");
         if (state.isAnonUser) {
-            S.meta64.loadAnonPageHome(state);
+            S.meta64.loadAnonPageHome(null);
         } else {
             // console.log("renderNode (navHome): " + state.homeNodeId);
             S.util.ajax<J.RenderNodeRequest, J.RenderNodeResponse>("renderNode", {
@@ -285,7 +292,7 @@ export class Nav implements NavIntf {
     }
 
     navPublicHome = (state: AppState): void => {
-        S.meta64.loadAnonPageHome(state);
+        S.meta64.loadAnonPageHome(null);
     }
 
     runSearch = (): void => {

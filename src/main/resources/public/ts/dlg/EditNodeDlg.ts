@@ -499,10 +499,13 @@ export class EditNodeDlg extends DialogBase {
                 ])
             ]);
 
-            let bottomBinRow = new Div(null, { className: "marginTop" }, [
-                ipfsLink ? new Div(`CID: ${ipfsLink}`) : null,
-                ipfsLink ? new Div(`Type: ${mime}`) : null
-            ]);
+            let bottomBinRow = null;
+            if (ipfsLink) {
+                bottomBinRow = new Div(null, { className: "marginTop" }, [
+                    ipfsLink ? new Div(`CID: ${ipfsLink}`) : null,
+                    ipfsLink ? new Div(`Type: ${mime}`) : null
+                ]);
+            }
 
             binarySection = new Div(null, { className: "marginLeft binaryEditorSection editBinaryContainer" }, [
                 topBinRow, bottomBinRow

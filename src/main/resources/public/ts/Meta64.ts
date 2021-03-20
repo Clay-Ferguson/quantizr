@@ -1,4 +1,4 @@
-import { appState, dispatch, store } from "./AppRedux";
+import { appState, dispatch, store, useAppState } from "./AppRedux";
 import { AppState } from "./AppState";
 import { FeedView } from "./comps/FeedView";
 import { LogView } from "./comps/LogView";
@@ -274,12 +274,9 @@ export class Meta64 implements Meta64Intf {
         }
 
         if (!state.isAnonUser) {
-            /* for best performance (user experience), do this async */
-            setTimeout(() => {
-                S.localDB.setVal(C.LOCALDB_LAST_PARENT_NODEID, state.node.id);
-                S.localDB.setVal(C.LOCALDB_LAST_CHILD_NODEID, node.id);
-                S.util.updateHistory(state.node, node.id, state);
-            }, 150);
+            S.localDB.setVal(C.LOCALDB_LAST_PARENT_NODEID, state.node.id);
+            S.localDB.setVal(C.LOCALDB_LAST_CHILD_NODEID, node.id);
+            S.util.updateHistory(state.node, node.id, state);
         }
         S.meta64.parentIdToFocusNodeMap.set(state.node.id, node.id);
 
@@ -665,6 +662,7 @@ export class Meta64 implements Meta64Intf {
                 if (!res.success || res.errorType === J.ErrorType.AUTH) {
                     S.util.showMessage("Unable to access the requested page without being logged in. Try loading the URL without parameters, or log in.", "Warning");
                 }
+                state = appState(state);
                 S.render.renderPageFromData(res, false, null, true, true, state);
             },
             (res: any): void => {

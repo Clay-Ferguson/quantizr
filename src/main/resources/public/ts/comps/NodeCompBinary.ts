@@ -113,7 +113,7 @@ export class NodeCompBinary extends Div {
                 }),
                 new Span("", {
                     className: "videoDownloadLink"
-                }, [new Anchor(S.render.getUrlForNodeAttachment(node, true), "[Download Video]")])
+                }, [new Anchor(S.render.getUrlForNodeAttachment(node, true), "[Download]")])
             ], "marginAll")]);
         }
         else if (S.props.hasAudio(node)) {
@@ -123,7 +123,7 @@ export class NodeCompBinary extends Div {
                 }),
                 new Span("", {
                     className: "audioDownloadLink"
-                }, [new Anchor(S.render.getUrlForNodeAttachment(node, true), "[Download Audio]")])
+                }, [new Anchor(S.render.getUrlForNodeAttachment(node, true), "[Download]")])
             ], "marginAll")]);
         }
         /*

@@ -4,6 +4,7 @@ import { Constants as C } from "./Constants";
 import { AppAction } from "./Interfaces";
 import { Log } from "./Log";
 import { PubSub } from "./PubSub";
+import { useSelector } from "react-redux";
 
 export const initialState = new AppState();
 
@@ -50,6 +51,10 @@ export const store = createStore(rootReducer);
 /* For syntactical sugar we allow a state to get passed or not */
 export const appState = (state?: AppState): AppState => {
     return state || store.getState();
+};
+
+export const useAppState = (state?: AppState): AppState => {
+    return state || useSelector((s: AppState) => s);
 };
 
 export const dispatch = (action: AppAction) => {
