@@ -63,7 +63,8 @@ export class NodeCompRow extends Div {
         let id: string = node.id;
 
         if (this.allowHeaders) {
-            this.attribs.onClick = S.meta64.getNodeFunc(S.nav.cached_clickNodeRow, "S.nav.clickNodeRow", node.id);
+            this.attribs.nid = id;
+            this.attribs.onClick = S.nav.clickNodeRow;
         }
 
         let insertInlineButton = null;

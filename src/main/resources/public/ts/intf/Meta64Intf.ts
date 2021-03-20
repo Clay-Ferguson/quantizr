@@ -39,9 +39,6 @@ export interface Meta64Intf {
 
     toggleMouseEffect(): void;
 
-    // function cache accessor
-    getNodeFunc(func: (id: string) => void, name: string, id: string): Function;
-
     runClickAnimation(x: number, y: number): void;
     setOverlay(showOverlay: boolean): void;
     sendTestEmail(string): void;

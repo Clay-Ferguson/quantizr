@@ -112,8 +112,9 @@ export class FriendTypeHandler extends TypeBase {
                 })]),
             new Div(null, null, [
                 new ButtonBar([
-                    new Button("Message", S.meta64.getNodeFunc(S.edit.cached_newSubNode, "S.edit.newSubNode", node.id), {
-                        title: "Send Private Message"
+                    new Button("Message", S.edit.newSubNode, {
+                        title: "Send Private Message",
+                        nid: node.id
                     }),
                     actorUrl ? new Button("Go to User Page", () => {
                         window.open(actorUrl, "_blank");

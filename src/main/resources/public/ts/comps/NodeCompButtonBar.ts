@@ -135,8 +135,8 @@ export class NodeCompButtonBar extends Div {
             (!isInlineChildren || state.userPreferences.editMode)) {
 
             /* convert this button to a className attribute for styles */
-            openButton = new Button("Open", S.meta64.getNodeFunc(S.nav.cached_openNodeById, "S.nav.openNodeById", node.id),
-                { title: "Open Node to access its children." }, "btn-primary");
+            openButton = new Button("Open", S.nav.openNodeById,
+                { title: "Open Node to access its children.", nid: node.id }, "btn-primary");
         }
 
         /*
@@ -178,45 +178,52 @@ export class NodeCompButtonBar extends Div {
             }
 
             if (C.NEW_ON_TOOLBAR && insertAllowed && S.edit.isInsertAllowed(node, state)) {
-                createSubNodeButton = new Button("New", S.meta64.getNodeFunc(S.edit.cached_newSubNode, "S.edit.newSubNode", node.id),
-                    { title: "Create new Node as a child of this node." });
+                createSubNodeButton = new Button("New", S.edit.newSubNode,
+                    { title: "Create new Node as a child of this node.", nid: node.id });
             }
 
             if (C.INS_ON_TOOLBAR) {
-                insertNodeButton = new Button("Ins", S.meta64.getNodeFunc(S.edit.cached_toolbarInsertNode, "S.edit.toolbarInsertNode", node.id),
-                    { title: "Insert new Node at this location." });
+                insertNodeButton = new Button("Ins", S.edit.toolbarInsertNode,
+                    {
+                        title: "Insert new Node at this location.",
+                        nid: node.id
+                    });
             }
 
             let userCanPaste = S.props.isMine(node, state) || state.isAdminUser || node.id === state.homeNodeId;
 
             if (editingAllowed) {
                 if (editableNode) {
-                    editNodeButton = new Button(null, S.meta64.getNodeFunc(S.edit.cached_runEditNode, "S.edit.runEditNode", node.id), {
+                    editNodeButton = new Button(null, S.edit.runEditNode, {
                         iconclass: "fa fa-edit fa-lg",
-                        title: "Edit Node"
+                        title: "Edit Node",
+                        nid: node.id
                     });
                 }
 
                 if (!isPageRootNode && node.type !== J.NodeType.REPO_ROOT && !state.nodesToMove) {
-                    cutNodeButton = new Button(null, S.meta64.getNodeFunc(S.edit.cached_cutSelNodes, "S.edit.cutSelNodes", node.id), {
+                    cutNodeButton = new Button(null, S.edit.cutSelNodes, {
                         iconclass: "fa fa-cut fa-lg",
-                        title: "Cut selected Node(s) to paste elsewhere."
+                        title: "Cut selected Node(s) to paste elsewhere.",
+                        nid: node.id
                     });
                 }
 
                 if (C.MOVE_UPDOWN_ON_TOOLBAR && this.allowNodeMove) {
 
                     if (node.logicalOrdinal > 0) {
-                        moveNodeUpButton = new Button(null, S.meta64.getNodeFunc(S.edit.cached_moveNodeUp, "S.edit.moveNodeUp", node.id), {
+                        moveNodeUpButton = new Button(null, S.edit.moveNodeUp, {
                             iconclass: "fa fa-arrow-up fa-lg",
-                            title: "Move Node up one position (higher)"
+                            title: "Move Node up one position (higher)",
+                            nid: node.id
                         });
                     }
 
                     if (!node.lastChild && state.node.children && state.node.children.length > 1) {
-                        moveNodeDownButton = new Button(null, S.meta64.getNodeFunc(S.edit.cached_moveNodeDown, "S.edit.moveNodeDown", node.id), {
+                        moveNodeDownButton = new Button(null, S.edit.moveNodeDown, {
                             iconclass: "fa fa-arrow-down fa-lg",
-                            title: "Move Node down one position (lower)"
+                            title: "Move Node down one position (lower)",
+                            nid: node.id
                         });
                     }
                 }
@@ -225,17 +232,20 @@ export class NodeCompButtonBar extends Div {
             if (deleteAllowed) {
                 // not user's account node!
                 if (node.id !== state.homeNodeId) {
-                    deleteNodeButton = new Button(null, S.meta64.getNodeFunc(S.edit.cached_deleteSelNodes, "S.edit.deleteSelNodes", node.id), {
+                    deleteNodeButton = new Button(null, S.edit.deleteSelNodes, {
                         iconclass: "fa fa-trash fa-lg",
-                        title: "Delete selected nodes"
+                        title: "Delete selected nodes",
+                        nid: node.id
                     });
                 }
             }
 
             if (!!state.nodesToMove && userCanPaste) {
-                pasteInsideButton = new Button("Paste Inside", S.meta64.getNodeFunc(S.edit.cached_pasteSelNodesInside, "S.edit.pasteSelNodesInside", node.id), null, "btn-secondary pasteButton");
+                pasteInsideButton = new Button("Paste Inside",
+                    S.edit.pasteSelNodesInside, { nid: node.id }, "btn-secondary pasteButton");
                 if (node.id !== state.homeNodeId) {
-                    pasteInlineButton = new Button("Paste Here", S.meta64.getNodeFunc(S.edit.cached_pasteSelNodes_InlineAbove, "S.edit.pasteSelNodes_InlineAbove", node.id), null, "btn-secondary pasteButton");
+                    pasteInlineButton = new Button("Paste Here",
+                        S.edit.pasteSelNodes_InlineAbove, { nid: node.id }, "btn-secondary pasteButton");
                 }
             }
         }

@@ -66,13 +66,13 @@ export class NodeCompBinary extends Div {
             className: this.isEditorEmbed ? "attached-img-in-editor" : "attached-img-in-row",
             style,
             title: "Click image to enlarge/reduce",
-            onClick: () => {
-                this.cached_clickOnImage(node.id);
-            }
+            onClick: this.clickOnImage,
+            nid: node.id
         });
     }
 
-    cached_clickOnImage = (nodeId: string) => {
+    clickOnImage = (evt: Event, id: string) => {
+        id = S.util.allowIdFromEvent(evt, id);
         if (this.isEditorEmbed) return;
         let state = appState();
 
@@ -89,7 +89,7 @@ export class NodeCompBinary extends Div {
                 if (s.fullScreenViewId && this.isFullScreenEmbed) {
                     s.fullScreenImageSize = s.fullScreenImageSize ? "" : "100%";
                 }
-                s.fullScreenViewId = nodeId;
+                s.fullScreenViewId = id;
             }
         });
     }

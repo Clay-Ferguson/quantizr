@@ -226,7 +226,7 @@ export class Edit implements EditIntf {
         if (S.util.checkSuccess("Insert node", res)) {
             S.meta64.updateNodeMap(res.newNode, state);
             S.meta64.highlightNode(res.newNode, true, state);
-            this.cached_runEditNode(res.newNode.id, state);
+            this.runEditNode(null, res.newNode.id, state);
         }
     }
 
@@ -237,7 +237,7 @@ export class Edit implements EditIntf {
             }
             else {
                 S.meta64.updateNodeMap(res.newNode, state);
-                this.cached_runEditNode(res.newNode.id, state);
+                this.runEditNode(null, res.newNode.id, state);
             }
         }
     }
@@ -306,7 +306,8 @@ export class Edit implements EditIntf {
         });
     }
 
-    cached_moveNodeUp = (id: string, state?: AppState): void => {
+    moveNodeUp = (evt: Event, id: string, state?: AppState): void => {
+        id = S.util.allowIdFromEvent(evt, id);
         state = appState(state);
         if (!id) {
             const selNode: J.NodeInfo = S.meta64.getHighlightedNode(state);
@@ -322,7 +323,8 @@ export class Edit implements EditIntf {
         }
     }
 
-    cached_moveNodeDown = (id: string, state: AppState): void => {
+    moveNodeDown = (evt: Event, id: string, state: AppState): void => {
+        id = S.util.allowIdFromEvent(evt, id);
         state = appState(state);
         if (!id) {
             const selNode: J.NodeInfo = S.meta64.getHighlightedNode(state);
@@ -378,7 +380,13 @@ export class Edit implements EditIntf {
         return state.node.children[state.node.children.length - 1];
     }
 
-    cached_runEditNode = (id: any, state?: AppState): void => {
+    /* This can run as an actuall click event function in which only 'evt' is non-null here
+
+    todo-0: All buttons that CAN be used in click events by this kind of technique should be! Speeds up page rendering.
+    */
+    runEditNode = (evt: any, id: any, state?: AppState): void => {
+        id = S.util.allowIdFromEvent(evt, id);
+
         state = appState(state);
         if (!id) {
             let node = S.meta64.getHighlightedNode(state);
@@ -399,7 +407,8 @@ export class Edit implements EditIntf {
         });
     }
 
-    cached_toolbarInsertNode = (id: string): void => {
+    toolbarInsertNode = (evt: Event, id: string): void => {
+        id = S.util.allowIdFromEvent(evt, id);
         this.insertNode(id, null, 0);
     }
 
@@ -423,7 +432,8 @@ export class Edit implements EditIntf {
         }
     }
 
-    cached_newSubNode = (id: string) => {
+    newSubNode = (evt: Event, id: string) => {
+        id = S.util.allowIdFromEvent(evt, id);
         const state = store.getState();
         if (S.meta64.ctrlKeyCheck()) {
             new ConfirmDlg("Paste your clipboard content into a new node?", "Create from Clipboard", //
@@ -488,10 +498,6 @@ export class Edit implements EditIntf {
         ).open();
     }
 
-    cached_deleteSelNodes = (nodeId: string) => {
-        this.deleteSelNodes(nodeId);
-    }
-
     joinNodes = (state?: AppState): void => {
         state = appState(state);
 
@@ -518,12 +524,13 @@ export class Edit implements EditIntf {
      * Deletes the selNodesArray items, and if none are passed then we fall back to using whatever the user
      * has currenly selected (via checkboxes)
      */
-    deleteSelNodes = (nodeId: string, state?: AppState): void => {
+    deleteSelNodes = (evt: Event, id: string, state?: AppState): void => {
+        id = S.util.allowIdFromEvent(evt, id);
         state = appState(state);
 
         // if a nodeId was specified we use it as the selected nodes to delete
-        if (nodeId) {
-            S.nav.setNodeSel(true, nodeId, state);
+        if (id) {
+            S.nav.setNodeSel(true, id, state);
         }
         const selNodesArray = S.meta64.getSelNodeIdsArray(state);
 
@@ -630,10 +637,11 @@ export class Edit implements EditIntf {
         });
     }
 
-    cached_cutSelNodes = (nodeId: string, state?: AppState): void => {
+    cutSelNodes = (evt: Event, id: string, state?: AppState): void => {
+        id = S.util.allowIdFromEvent(evt, id);
         state = appState(state);
 
-        S.nav.setNodeSel(true, nodeId, state);
+        S.nav.setNodeSel(true, id, state);
         const selNodesArray = S.meta64.getSelNodeIdsArray(state);
 
         dispatch({
@@ -646,9 +654,10 @@ export class Edit implements EditIntf {
         state.selectedNodes = {};
     }
 
-    cached_pasteSelNodesInside = (nodeId: string) => {
+    pasteSelNodesInside = (evt: Event, id: string) => {
+        id = S.util.allowIdFromEvent(evt, id);
         const state = appState();
-        this.pasteSelNodes(nodeId, "inside", state);
+        this.pasteSelNodes(id, "inside", state);
     }
 
     // location=inside | inline | inline-above (todo-2: put in java-aware enum)
@@ -668,12 +677,14 @@ export class Edit implements EditIntf {
         });
     }
 
-    cached_pasteSelNodes_InlineAbove = (nodeId: string) => {
-        this.pasteSelNodes(nodeId, "inline-above");
+    pasteSelNodes_InlineAbove = (evt: Event, id: string) => {
+        id = S.util.allowIdFromEvent(evt, id);
+        this.pasteSelNodes(id, "inline-above");
     }
 
-    cached_pasteSelNodes_Inline = (nodeId: string) => {
-        this.pasteSelNodes(nodeId, "inline");
+    pasteSelNodes_Inline = (evt: Event, id: string) => {
+        id = S.util.allowIdFromEvent(evt, id);
+        this.pasteSelNodes(id, "inline");
     }
 
     insertBookWarAndPeace = (state: AppState): void => {

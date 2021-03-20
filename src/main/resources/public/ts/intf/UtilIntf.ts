@@ -10,6 +10,7 @@ export interface UtilIntf {
     waitCounter: number;
     pgrsDlg: any;
 
+    allowIdFromEvent(evt: Event, id: string): string;
     delayFunc(func: Function): Function;
     validUsername(inputtxt: string): boolean;
     hashOfString(s: string): string;

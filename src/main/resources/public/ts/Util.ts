@@ -76,6 +76,30 @@ export class Util implements UtilIntf {
         return !!v.match(/^[0-9a-zA-Z\-_]+$/);
     }
 
+    /* To allow functions to be attached directly to any node, without having to create a NEW function for each use
+    we call this function to grab the ID off the actual HTML element itself. This is the only time and place we ever
+    do this kind of hack, and it's purely for performances and make HTML renders significantly faster by avoiding 100s of
+    function object creates per page render */
+    allowIdFromEvent = (evt: Event, id: string): string => {
+        if (id) return id;
+
+        // get the id from this node or any parent node.
+        if (evt && evt.target) {
+            let target: any = evt.target;
+            while (target) {
+                id = target.getAttribute("nid");
+                if (id) return id;
+                target = target.parentElement;
+            }
+        }
+
+        if (!id) {
+            console.log("Unable to get QID from parameter or html element or any parents.");
+        }
+
+        return id;
+    }
+
     // #mouseEffects (do not delete tag)
     delayFunc = (func: Function): Function => {
         if (!func || !S.meta64.mouseEffect) {
@@ -86,9 +110,9 @@ export class Util implements UtilIntf {
             setTimeout(() => {
                 func();
             },
-            /* This value needs to match the animation delay time in click-effect.scss, and also the entire purpose of this setTimeout
-            and delayFunc method is to give the animation time to run before we execute whatever was clicked on */
-            400);
+                /* This value needs to match the animation delay time in click-effect.scss, and also the entire purpose of this setTimeout
+                and delayFunc method is to give the animation time to run before we execute whatever was clicked on */
+                400);
         };
     }
 

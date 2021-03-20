@@ -45,7 +45,8 @@ export class NodeCompMainNode extends Div {
             S.meta64.fadeStartTime = new Date().getTime();
         }
 
-        this.attribs.onClick = S.meta64.getNodeFunc(S.nav.cached_clickNodeRow, "S.nav.clickNodeRow", node.id);
+        this.attribs.nid = node.id;
+        this.attribs.onClick = S.nav.clickNodeRow;
 
         let header: CompIntf = null;
         if (state.userPreferences.showMetaData) {

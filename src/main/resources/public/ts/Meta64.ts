@@ -41,11 +41,6 @@ export class Meta64 implements Meta64Intf {
     parentIdToFocusNodeMap: Map<string, string> = new Map<string, string>();
     curHighlightNodeCompRow: CompIntf = null;
 
-    // Function cache: Creating NEW functions (like "let a = () => {...do something}"), is an expensive operation (performance) if done in super
-    // high numbers so we have this cache to allow reuse of function definitions.
-    private fc: Map<string, Function> = new Map<string, Function>();
-    private fcCount: number = 0;
-
     private static lastKeyDownTime: number = 0;
 
     /* We want to only be able to drag nodes by clicking on their TYPE ICON, and we accomplish that by using the mouseover/mouseout
@@ -80,18 +75,6 @@ export class Meta64 implements Meta64Intf {
         this.userProfileView,
         this.logView
     ];
-
-    /* Creates/Access a function that does operation 'name' on a node identified by 'id' */
-    getNodeFunc = (func: (id: string) => void, op: string, id: string): Function => {
-        const k = op + "_" + id;
-        if (!this.fc.has(k)) {
-            this.fc.set(k, function () { func(id); });
-
-            /* we hold the count in a var since calculating manually requires an inefficient iteration */
-            this.fcCount++;
-        }
-        return this.fc.get(k);
-    }
 
     sendTestEmail = (): void => {
         S.util.ajax<J.SendTestEmailRequest, J.SendTestEmailResponse>("sendTestEmail", {}, function (res: J.SendTestEmailResponse) {
@@ -499,10 +482,6 @@ export class Meta64 implements Meta64Intf {
             this.processUrlParams(null);
             this.setOverlay(false);
 
-            setTimeout(() => {
-                this.maintenanceCycle();
-            }, 30000);
-
             // Initialize the 'ServerPush' client-side connection
             S.push.init();
 
@@ -523,8 +502,6 @@ export class Meta64 implements Meta64Intf {
 
     /* #mouseEffects (do not delete tag) */
     toggleMouseEffect = () => {
-        this.fc = new Map<string, Function>();
-        this.fcCount = 0;
         this.mouseEffect = !this.mouseEffect;
     }
 
@@ -578,15 +555,6 @@ export class Meta64 implements Meta64Intf {
         }
         Meta64.lastKeyDownTime = now;
         return false;
-    }
-
-    maintenanceCycle = () => {
-        // console.log("Maintenance fcCount: "+this.fcCount);
-        /* Clean out function referenes after a threshold is reached */
-        if (this.fcCount > 500) {
-            this.fc = new Map<string, Function>();
-            this.fcCount = 0;
-        }
     }
 
     /* The overlayCounter allows recursive operations which show/hide the overlay

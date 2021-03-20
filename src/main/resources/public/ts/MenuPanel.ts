@@ -93,7 +93,7 @@ export class MenuPanel extends Div {
 
             new MenuItemSeparator(), //
 
-            new MenuItem("Delete", () => S.edit.deleteSelNodes(null, state), !state.isAnonUser && selNodeIsMine) //
+            new MenuItem("Delete", () => S.edit.deleteSelNodes(null, null, state), !state.isAnonUser && selNodeIsMine) //
 
             // todo-2: disabled during mongo conversion
             // new MenuItem("Set Node A", view.setCompareNodeA, () => { return state.isAdminUser && highlightNode != null }, () => { return state.isAdminUser }), //

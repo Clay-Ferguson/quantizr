@@ -188,8 +188,9 @@ export class Search implements SearchIntf {
 
         const div = new Div(null, {
             className: clazz,
-            onClick: S.meta64.getNodeFunc(this.cached_clickOnSearchResultRow, "S.srch.clickOnSearchResultRow", node.id),
-            id: cssId
+            onClick: this.clickOnSearchResultRow,
+            id: cssId,
+            nid: node.id
         }, [
             new NodeCompRowHeader(node, true, isFeed, jumpButton),
             content,
@@ -203,7 +204,7 @@ export class Search implements SearchIntf {
         }, [parentItem, div]);
     }
 
-    cached_clickOnSearchResultRow = (id: string) => {
+    clickOnSearchResultRow = (evt: Event, id: string) => {
         // this implementation is obsolete (update if we ever need to uncomment this)
 
         // DO NOT DELETE (this works, and may be needed some day)

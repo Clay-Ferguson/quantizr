@@ -78,7 +78,7 @@ export class Nav implements NavIntf {
     navOpenSelectedNode = (state: AppState): void => {
         const currentSelNode: J.NodeInfo = S.meta64.getHighlightedNode(state);
         if (!currentSelNode) return;
-        S.nav.cached_openNodeById(currentSelNode.id, state);
+        S.nav.openNodeById(null, currentSelNode.id, state);
     }
 
     navToPrev = () => {
@@ -164,19 +164,20 @@ export class Nav implements NavIntf {
 
     /* NOTE: Elements that have this as an onClick method must have the nodeId
     on an attribute of the element */
-    cached_clickNodeRow = (nodeId: string, state?: AppState): void => {
+    clickNodeRow = (evt: Event, id: string, state?: AppState): void => {
+        id = S.util.allowIdFromEvent(evt, id);
         state = appState(state);
 
         /* First check if this node is already highlighted and if so just return */
         const hltNode = S.meta64.getHighlightedNode();
-        if (hltNode && hltNode.id === nodeId) {
+        if (hltNode && hltNode.id === id) {
             return;
         }
 
-        const node: J.NodeInfo = state.idToNodeMap.get(nodeId);
+        const node: J.NodeInfo = state.idToNodeMap.get(id);
         if (!node) {
             // console.log("idToNodeMap: "+S.util.prettyPrint(state.idToNodeMap));
-            throw new Error("node not found in idToNodeMap: " + nodeId);
+            throw new Error("node not found in idToNodeMap: " + id);
         }
 
         /*
@@ -220,7 +221,8 @@ export class Nav implements NavIntf {
         });
     }
 
-    cached_openNodeById = (id: string, state: AppState): void => {
+    openNodeById = (evt: Event, id: string, state: AppState): void => {
+        id = S.util.allowIdFromEvent(evt, id);
         state = appState(state);
         const node: J.NodeInfo = state.idToNodeMap.get(id);
         S.meta64.highlightNode(node, false, state);
@@ -297,13 +299,13 @@ export class Nav implements NavIntf {
 
     runSearch = (): void => {
         const state = appState();
-        this.cached_clickNodeRow(state.node.id);
+        this.clickNodeRow(null, state.node.id);
         new SearchContentDlg(state).open();
     }
 
     runTimeline = (): void => {
         const state = appState();
-        this.cached_clickNodeRow(state.node.id);
+        this.clickNodeRow(null, state.node.id);
         S.srch.timeline("mtm", state, null, "Timeline based on Modification Time");
     }
 
