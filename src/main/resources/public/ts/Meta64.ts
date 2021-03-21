@@ -30,6 +30,7 @@ export class Meta64 implements Meta64Intf {
     config: any;
     mainMenu: MainMenuDlg;
     mouseEffect: boolean = false;
+    hiddenRenderingEnabled: boolean = false;
 
     app: CompIntf;
     appInitialized: boolean = false;
@@ -187,7 +188,8 @@ export class Meta64 implements Meta64Intf {
         return selArray;
     }
 
-    clearSelNodes = (state: AppState) => {
+    clearSelNodes = (state: AppState = null) => {
+        state = appState(state);
         dispatch({
             type: "Action_ClearSelections",
             state,

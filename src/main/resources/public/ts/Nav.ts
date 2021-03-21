@@ -30,7 +30,8 @@ export class Nav implements NavIntf {
         new LoginDlg(null, state).open();
     }
 
-    logout = (state: AppState): void => {
+    logout = (state: AppState = null): void => {
+        state = appState(state);
         S.user.logout(true, state);
     }
 
@@ -205,7 +206,8 @@ export class Nav implements NavIntf {
         }, 100);
     }
 
-    openContentNode = (nodePathOrId: string, state: AppState): void => {
+    openContentNode = (nodePathOrId: string, state: AppState = null): void => {
+        state = appState(state);
         // console.log("openContentNode(): " + nodePathOrId);
         S.util.ajax<J.RenderNodeRequest, J.RenderNodeResponse>("renderNode", {
             nodeId: nodePathOrId,
@@ -274,7 +276,8 @@ export class Nav implements NavIntf {
         S.meta64.mainMenu.open();
     }
 
-    navHome = (state: AppState): void => {
+    navHome = (state: AppState = null): void => {
+        state = appState(state);
         console.log("navHome()");
         if (state.isAnonUser) {
             S.meta64.loadAnonPageHome(null);

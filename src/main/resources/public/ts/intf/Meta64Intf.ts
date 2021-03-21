@@ -7,6 +7,7 @@ import { CompIntf } from "../widget/base/CompIntf";
 
 export interface Meta64Intf {
 
+    hiddenRenderingEnabled: boolean;
     config: any;
     mouseEffect: boolean;
     mainMenu: MainMenuDlg;
@@ -38,7 +39,6 @@ export interface Meta64Intf {
     decryptCache: Map<string, string>;
 
     toggleMouseEffect(): void;
-
     runClickAnimation(x: number, y: number): void;
     setOverlay(showOverlay: boolean): void;
     sendTestEmail(string): void;

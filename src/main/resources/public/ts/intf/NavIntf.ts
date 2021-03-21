@@ -10,7 +10,7 @@ export interface NavIntf {
     logout(state: AppState): void;
     signup(state: AppState): void;
     preferences(state: AppState): void;
-    openContentNode(nodePathOrId: string, state: AppState): void;
+    openContentNode(nodePathOrId: string, state?: AppState): void;
     geoLocation(state: AppState): void;
     displayingHome(state: AppState): boolean;
     displayingRepositoryRoot(state: AppState): boolean;

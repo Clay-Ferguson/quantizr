@@ -74,6 +74,7 @@ export class Edit implements EditIntf {
     }
 
     private joinNodesResponse = (res: J.JoinNodesResponse, state: AppState): void => {
+        state = appState(state);
         if (S.util.checkSuccess("Join node", res)) {
             S.meta64.clearSelNodes(state);
             S.view.refreshTree(state.node.id, false, false, null, false, true, true, state);
@@ -340,7 +341,8 @@ export class Edit implements EditIntf {
         }
     }
 
-    moveNodeToTop = (id: string, state: AppState): void => {
+    moveNodeToTop = (id: string = null, state: AppState = null): void => {
+        state = appState(state);
         if (!id) {
             const selNode: J.NodeInfo = S.meta64.getHighlightedNode(state);
             id = selNode.id;
@@ -354,7 +356,8 @@ export class Edit implements EditIntf {
         }
     }
 
-    moveNodeToBottom = (id: string, state: AppState): void => {
+    moveNodeToBottom = (id: string = null, state: AppState = null): void => {
+        state = appState(state);
         if (!id) {
             const selNode: J.NodeInfo = S.meta64.getHighlightedNode(state);
             id = selNode.id;
@@ -524,7 +527,8 @@ export class Edit implements EditIntf {
      * Deletes the selNodesArray items, and if none are passed then we fall back to using whatever the user
      * has currenly selected (via checkboxes)
      */
-    deleteSelNodes = (evt: Event, id: string, state?: AppState): void => {
+    deleteSelNodes = (evt: Event = null, id: string = null, state: AppState = null): void => {
+        state = appState(state);
         id = S.util.allowIdFromEvent(evt, id);
         state = appState(state);
 
@@ -627,7 +631,8 @@ export class Edit implements EditIntf {
         return bestNode;
     }
 
-    undoCutSelNodes = async (state: AppState): Promise<void> => {
+    undoCutSelNodes = async (state: AppState = null): Promise<void> => {
+        state = appState(state);
         dispatch({
             type: "Action_SetNodesToMove",
             state,
@@ -859,6 +864,7 @@ export class Edit implements EditIntf {
     }
 
     updateHeadings = (state: AppState): void => {
+        state = appState(state);
         const node: J.NodeInfo = S.meta64.getHighlightedNode(state);
         if (node) {
             S.util.ajax<J.UpdateHeadingsRequest, J.UpdateHeadingsResponse>("updateHeadings", {

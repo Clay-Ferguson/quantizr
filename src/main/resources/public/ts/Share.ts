@@ -1,3 +1,4 @@
+import { appState } from "./AppRedux";
 import { AppState } from "./AppState";
 import { Constants as C } from "./Constants";
 import { SharingDlg } from "./dlg/SharingDlg";
@@ -37,7 +38,8 @@ export class Share implements ShareIntf {
     }
 
     /* If target is non-null we only return shares to that particlar person (or public) */
-    findSharedNodes = (state: AppState, shareTarget: string): void => {
+    findSharedNodes = (state: AppState = null, shareTarget: string = null): void => {
+        state = appState(state);
         const focusNode: J.NodeInfo = S.meta64.getHighlightedNode(state);
         if (focusNode == null) {
             return;

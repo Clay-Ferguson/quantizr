@@ -352,7 +352,6 @@ export class Render implements RenderIntf {
 
                             // do this async just for performance
                             setTimeout(() => {
-                                // console.log("updateNew calling updateHistory");
                                 S.util.updateHistory(s.node, targetNodeId, s);
                             }, 10);
                         }
@@ -374,7 +373,10 @@ export class Render implements RenderIntf {
                             if (allowScroll) {
                                 // console.log("highlight: pendingLocationHash (allowScroll)");
                                 S.meta64.highlightRowById(s.pendingLocationHash.substring(1), true, s);
-                                s.rendering = true;
+
+                                if (S.meta64.hiddenRenderingEnabled) {
+                                    s.rendering = true;
+                                }
                             }
                             s.pendingLocationHash = null;
                         }
@@ -384,35 +386,37 @@ export class Render implements RenderIntf {
                                 // anything to do here? didn't find node.
                             }
 
-                            s.rendering = true;
+                            if (S.meta64.hiddenRenderingEnabled) {
+                                s.rendering = true;
+                            }
                         } //
                         else if (allowScroll && (scrollToTop || !S.meta64.getHighlightedNode(s))) {
                             // console.log("highlight: scrollTop");
                             S.view.scrollToTop();
-                            s.rendering = true;
+                            if (S.meta64.hiddenRenderingEnabled) {
+                                s.rendering = true;
+                            }
                         } //
                         else if (allowScroll) {
                             // console.log("highlight: scrollToSelected");
                             S.view.scrollToSelectedNode(s);
-                            s.rendering = true;
+                            if (S.meta64.hiddenRenderingEnabled) {
+                                s.rendering = true;
+                            }
                         }
                     }
                     finally {
                         if (s.rendering) {
-                            // console.log("we're rendering so queue window scroll");
                             /* This is a tiny timeout yes, but don't remove this timer. We need it or else this won't work. */
 
                             PubSub.subSingleOnce(C.PUBSUB_postMainWindowScroll, () => {
-                                // console.log("create timeout for reset of rendering flag");
                                 setTimeout(() => {
-                                    // console.log("running timeout for reset of rendering");
                                     dispatch({
                                         type: "Action_settingVisible",
                                         state: s,
                                         update: (_s: AppState): void => {
                                             _s.rendering = false;
                                             this.allowFadeInId = true;
-                                            // console.log("new state, updating to set rendering=false");
                                         }
                                     });
                                 },

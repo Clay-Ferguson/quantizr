@@ -599,6 +599,11 @@ entire thing down some times, if it's jutting up against something */
     max-width: 800px;
 }
 
+.app-modal-content-tiny-width {
+    @extend .app-modal-content;
+    max-width: 350px;
+}
+
 .app-modal-content-narrow-width {
     @extend .app-modal-content;
     max-width: 500px;
