@@ -511,10 +511,28 @@ public class MongoUtil {
 		}
 
 		created = new ValContainer<>();
-		SubNode publicHome = apiUtil.ensureNodeExists(session, "/" + NodeName.ROOT + "/" + NodeName.PUBLIC, "home",
-				"home", "Public Home", null, true, null, created);
+
+		// create home node
+		SubNode publicHome = apiUtil.ensureNodeExists(session, "/" + NodeName.ROOT + "/" + NodeName.PUBLIC,
+				NodeName.HOME, "home", "Public Home", null, true, null, created);
+
+		// make node public
+		aclService.addPrivilege(session, publicHome, PrincipalName.PUBLIC.s(), Arrays.asList(PrivilegeType.READ.s()),
+				null);
 
 		log.debug("Public Home Node exists at id: " + publicHome.getId() + " path=" + publicHome.getPath());
+
+		/*
+		 * create welcome page if not existing. This is the content that displays
+		 * directly below the image in the main landing page. (todo-0: document this in
+		 * User Guide admin session). This node need not be public, because the system
+		 * reads it, and it can be placed somewhere that users are not able to navigate
+		 * directly to it, so we default it to being directly in the server root, which
+		 * is a private node
+		 */
+		SubNode publicWelcome = apiUtil.ensureNodeExists(session, "/" + NodeName.ROOT, NodeName.WELCOME, "welcome-page",
+				"### Welcome Node\n\nDefault landing page content. Admin should edit.", null, true, null, created);
+		log.debug("Welcome Page Node exists at id: " + publicWelcome.getId() + " path=" + publicWelcome.getPath());
 
 		// // ---------------------------------------------------------
 		// // NOTE: Do not delete this. May need this example in the future. This is

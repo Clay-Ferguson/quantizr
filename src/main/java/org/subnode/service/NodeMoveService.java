@@ -244,8 +244,8 @@ public class NodeMoveService {
 				 * becuase since we don't do reference counting we let the garbage collecion
 				 * cleanup be the only way user quotas are deducted from
 				 *
-				 * todo-0: this can be done in async thread (be careful about ThreadLocals and
-				 * SessionContext)
+				 * todo-0: this can be done in async thread (oops, be careful about ThreadLocals and
+				 * SessionContext. Currently I've disabled the @Async annotation until I address the threadlocals issue)
 				 */
 				userManagerService.addNodeBytesToUserNodeBytes(node, userNode, -1);
 			}

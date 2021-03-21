@@ -63,7 +63,9 @@ export class NodeCompRowHeader extends Div {
         /* for admin user shwo id, ordinal, and type right on the row. We have a bug where
         the logicalOrdinal is showing as -1 here, but it's just because it's not being set on the server. */
         if (state.isAdminUser) {
-            children.push(new Span(node.logicalOrdinal + " " + node.type, { className: "marginRight" }));
+            // looks like root node of pages don't have this ordinal set (it's -1 so for now we just hide it in that case)
+            let ordinal = node.logicalOrdinal === -1 ? "" : node.logicalOrdinal;
+            children.push(new Span(ordinal + " " + node.type, { className: "marginRight" }));
         }
 
         children.push(new Icon({

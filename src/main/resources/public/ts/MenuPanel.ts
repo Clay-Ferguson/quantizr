@@ -26,9 +26,10 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (s: Singletons) => {
     S = s;
 });
 
-// todo-0: We don't need to be generating NEW function instances (fat arrows) in here every time
-// because we can just pre-create each function and hold in static vars
-// and each one can query for the state dynamically.
+/* todo-1: We don't need to be generating NEW function instances (fat arrows) in here every time
+ because we can just pre-create each function and hold in static vars
+ and each one can query for the state dynamically. This is all fixed except for the admin ones because those only
+ affect the admin and are lower priority to fix */
 export class MenuPanel extends Div {
 
     constructor(state: AppState) {
@@ -80,8 +81,6 @@ export class MenuPanel extends Div {
     static manageAccount = () => S.edit.openManageAccountDlg(appState(null));
     static browserInfo = () => S.util.showBrowserInfo();
     static mobileToggle = () => S.util.switchBrowsingMode(appState(null));
-
-    // todo-0: finish creating these static methods! Remember this is a big performance benefit not to create functions on every render.
 
     preRender(): void {
         const state: AppState = useSelector((state: AppState) => state);

@@ -37,8 +37,8 @@ export class NodeCompMainList extends Div {
             this.addPaginationButtons(children, state.endReached, state);
         }
 
-        // No longer needed, because we have this on the menu now but check that all the gettingStarted content
-        // is indeed in the User Guide (todo-0)
+        // No longer needed, because we have this on the menu now but check that all the gettingStarted (from yaml) content
+        // is indeed mentioned in the User Guide (todo-0)
         // children.push(new CollapsibleHelpPanel("Getting Started", S.meta64.config.help.gettingStarted,
         //     (state: boolean) => {
         //         NodeCompMainList.helpExpanded = state;

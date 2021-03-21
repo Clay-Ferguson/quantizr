@@ -77,10 +77,9 @@ public class NodeRenderService {
 	 * all the data for that page.
 	 */
 	public RenderNodeResponse renderNode(MongoSession session, RenderNodeRequest req) {
-
 		/*
-		 * todo-0: Add to Admin area of User Guide the fact that you must have a node
-		 * named 'welcome-page', and/or else always make app create one at startup.
+		 * todo-0: Add to Admin area of User Guide the fact that you must edit the auto-created
+		 * welcome-page, because users will land there when they click the 'Portal Home' button.
 		 */
 		boolean isWelcomePage = req.getNodeId().equals(":welcome-page");
 
