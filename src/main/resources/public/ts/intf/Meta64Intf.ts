@@ -14,6 +14,7 @@ export interface Meta64Intf {
     userProfileView: UserProfileView;
     app: CompIntf;
     tabs: AppTab[];
+    noScrollToId: string;
 
     appInitialized: boolean;
 

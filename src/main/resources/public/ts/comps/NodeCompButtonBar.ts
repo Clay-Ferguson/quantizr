@@ -194,7 +194,7 @@ export class NodeCompButtonBar extends Div {
 
             if (editingAllowed) {
                 if (editableNode) {
-                    editNodeButton = new Button(null, S.edit.runEditNode, {
+                    editNodeButton = new Button(null, S.edit.runEditNodeByClick, {
                         iconclass: "fa fa-edit fa-lg",
                         title: "Edit Node",
                         nid: node.id

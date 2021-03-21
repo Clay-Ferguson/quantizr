@@ -173,6 +173,15 @@ export class View implements ViewIntf {
             it is better looking to just scroll to zero index, because that will always
             be what user wants to see */
             const currentSelNode: J.NodeInfo = S.meta64.getHighlightedNode(state);
+
+            /* the scrolling got slightly convoluted, so I invented 'editNodeId' just to be able to detect
+             a case where the user is editing a node and we KNOW we don't need to scroll after editing,
+             so this is where we detect and reset that scenario. */
+            if (currentSelNode && currentSelNode.id === S.meta64.noScrollToId) {
+                S.meta64.noScrollToId = null;
+                return;
+            }
+
             if (currentSelNode && state.node.id === currentSelNode.id) {
                 // Log.log("setting scrollTop=0 (a)");
                 this.docElm.scrollTop = 0;

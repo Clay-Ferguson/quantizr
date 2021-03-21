@@ -31,6 +31,7 @@ export class Meta64 implements Meta64Intf {
     mainMenu: MainMenuDlg;
     mouseEffect: boolean = false;
     hiddenRenderingEnabled: boolean = false;
+    noScrollToId: string = null;
 
     app: CompIntf;
     appInitialized: boolean = false;
