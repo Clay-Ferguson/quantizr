@@ -383,18 +383,18 @@ export class Edit implements EditIntf {
         return state.node.children[state.node.children.length - 1];
     }
 
-    runEditNodeByClick = (evt: Event, id: any, state?: AppState): void => {
+    runEditNodeByClick = (evt: Event, id: string, state?: AppState): void => {
         id = S.util.allowIdFromEvent(evt, id);
 
         // we set noScrollToId just to block the future attempt (one time) to
         // scroll to this, because this is a hint telling us we are ALREAY
         // scrolled to this ID so any scrolling will be unnecessary
         S.meta64.noScrollToId = id;
-        this.runEditNode(id, state);
+        this.runEditNode(null, id, state);
     }
 
     /* This can run as an actuall click event function in which only 'evt' is non-null here */
-    runEditNode = (evt: Event, id: any, state?: AppState): void => {
+    runEditNode = (evt: Event, id: string, state?: AppState): void => {
         id = S.util.allowIdFromEvent(evt, id);
 
         state = appState(state);

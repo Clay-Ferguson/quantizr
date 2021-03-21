@@ -26,8 +26,8 @@ export interface EditIntf {
     moveNodeToBottom(id: string, state: AppState): void;
     getFirstChildNode(state: AppState): any;
     getLastChildNode(state: AppState): any;
-    runEditNodeByClick(evt: Event, id: any, state?: AppState): void;
-    runEditNode(evt: Event, id: any, state?: AppState): void;
+    runEditNodeByClick(evt: Event, id: string, state?: AppState): void;
+    runEditNode(evt: Event, id: string, state?: AppState): void;
     insertNode(id: string, typeName: string, ordinalOffset: number, state?: AppState): void;
     toolbarInsertNode(evt: Event, id: string): void;
     createSubNode(id: any, typeName: string, createAtTop: boolean, parentNode: J.NodeInfo, state: AppState): void;
