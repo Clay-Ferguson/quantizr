@@ -74,12 +74,10 @@ export class NodeCompBinary extends Div {
     clickOnImage = (evt: Event, id: string) => {
         id = S.util.allowIdFromEvent(evt, id);
         if (this.isEditorEmbed) return;
-        let state = appState();
 
         dispatch({
             type: "Action_ClickImage",
-            state,
-            update: (s: AppState): void => {
+            update: (s: AppState): AppState => {
                 /* When we click to enlarge an image we need to save the current scroll position
                 after we close the image. */
                 if (s.savedScrollPosition === -1) {
@@ -90,6 +88,7 @@ export class NodeCompBinary extends Div {
                     s.fullScreenImageSize = s.fullScreenImageSize ? "" : "100%";
                 }
                 s.fullScreenViewId = id;
+                return { ...s };
             }
         });
     }

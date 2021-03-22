@@ -66,6 +66,7 @@ export class Util implements UtilIntf {
 
     rhost: string;
     logAjax: boolean = false;
+    logAjaxShort: boolean = true;
     timeoutMessageShown: boolean = false;
     waitCounter: number = 0;
     pgrsDlg: ProgressDlg = null;
@@ -87,6 +88,7 @@ export class Util implements UtilIntf {
         if (evt && evt.target) {
             let target: any = evt.target;
             while (target) {
+                // console.log("Checking target.id " + target.id + " for nid");
                 id = target.getAttribute("nid");
                 if (id) return id;
                 target = target.parentElement;
@@ -102,13 +104,17 @@ export class Util implements UtilIntf {
 
     // #mouseEffects (do not delete tag)
     delayFunc = (func: Function): Function => {
-        if (!func || !S.meta64.mouseEffect) {
+        let state = store.getState();
+        if (!func || !state.mouseEffect) {
             return func;
         }
 
-        return () => {
-            setTimeout(() => {
-                func();
+        // todo-0: now that I have this capturing 'evt' I think I can switch back
+        // to fat arrows and it should work fine.
+        return function (evt: any) {
+            setTimeout(function () {
+                // func.apply(this, arguments);
+                func(evt);
             },
                 /* This value needs to match the animation delay time in click-effect.scss, and also the entire purpose of this setTimeout
                 and delayFunc method is to give the animation time to run before we execute whatever was clicked on */
@@ -461,6 +467,9 @@ export class Util implements UtilIntf {
         try {
             if (this.logAjax) {
                 console.log("JSON-POST: [" + this.getRpcPath() + postName + "]" + this.prettyPrint(postData));
+            }
+            else if (this.logAjaxShort) {
+                console.log("JSON-POST: [" + this.getRpcPath() + postName + "]");
             }
 
             this._ajaxCounter++;
@@ -1068,7 +1077,7 @@ export class Util implements UtilIntf {
     }
 
     getPathPartForNamedNode = (node: J.NodeInfo): string => {
-        if (!node.name) return null;
+        if (!node || !node.name) return null;
 
         if (node.owner === "admin") {
             return "/n/" + node.name;
@@ -1079,7 +1088,7 @@ export class Util implements UtilIntf {
     }
 
     getPathPartForNamedNodeAttachment = (node: J.NodeInfo): string => {
-        if (!node.name) return null;
+        if (!node || !node.name) return null;
 
         if (node.owner === "admin") {
             return "/f/" + node.name;
@@ -1330,12 +1339,13 @@ export class Util implements UtilIntf {
         this.showMessage(info, "Browser Info");
     }
 
+    // remove unused arg (todo-1)
     switchBrowsingMode = (state: AppState): void => {
         dispatch({
             type: "Action_SwitchBrowsingMode",
-            state,
-            update: (s: AppState): void => {
+            update: (s: AppState): AppState => {
                 s.mobileMode = !s.mobileMode;
+                return { ...s };
             }
         });
     }

@@ -155,6 +155,7 @@ export class Props implements PropsIntf {
     key that goes with the current user (us, logged in user), which should decrypt using our private key.
     */
     getCryptoKey = (node: J.NodeInfo, state: AppState) => {
+        if (!node) return null;
         let cipherKey = null;
 
         /* if we own this node then this cipherKey for it will be ENC_KEY for us */
@@ -179,7 +180,7 @@ export class Props implements PropsIntf {
     }
 
     isMine = (node: J.NodeInfo, state: AppState): boolean => {
-        if (!state.userName || state.userName === J.PrincipalName.ANON) return false;
+        if (!node || !state.userName || state.userName === J.PrincipalName.ANON) return false;
         return state.userName === node.owner;
     }
 

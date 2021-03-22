@@ -160,10 +160,10 @@ export class Render implements RenderIntf {
         }, (res: J.RenderCalendarResponse) => {
             dispatch({
                 type: "Action_ShowCalendar",
-                state,
-                update: (s: AppState): void => {
+                update: (s: AppState): AppState => {
                     s.fullScreenCalendarId = nodeId;
                     s.calendarData = S.util.buildCalendarData(res.items);
+                    return { ...s };
                 }
             });
         });
@@ -287,7 +287,7 @@ export class Render implements RenderIntf {
         return typeHandler == null || typeHandler.allowAction(action, node, appState);
     }
 
-    renderPageFromData = (res: J.RenderNodeResponse, scrollToTop: boolean, targetNodeId: string, clickTab: boolean = true, allowScroll: boolean = true, initState: AppState): void => {
+    renderPageFromData = (res: J.RenderNodeResponse, scrollToTop: boolean, targetNodeId: string, clickTab: boolean = true, allowScroll: boolean = true): void => {
         if (res && res.noDataResponse) {
             S.util.showMessage(res.noDataResponse, "Note");
             return;
@@ -297,12 +297,8 @@ export class Render implements RenderIntf {
             // console.log("renderPageFromData: " + S.util.prettyPrint(res));
             dispatch({
                 type: "Action_RenderPage",
-                state: initState,
-                updateNew: (s: AppState): AppState => {
-                    // console.log("updateNew state in Action_RenderPage");
-
-                    // VERY IMPORTANT to return a NEW object so we create it here. If you don't return new object rendering can fail.
-                    s = { ...s };
+                update: (s: AppState): AppState => {
+                    // console.log("update state in Action_RenderPage");
 
                     if (!s.activeTab || clickTab) {
                         s.activeTab = "mainTab";
@@ -413,10 +409,10 @@ export class Render implements RenderIntf {
                                 setTimeout(() => {
                                     dispatch({
                                         type: "Action_settingVisible",
-                                        state: s,
-                                        update: (_s: AppState): void => {
-                                            _s.rendering = false;
+                                        update: (s: AppState): AppState => {
+                                            s.rendering = false;
                                             this.allowFadeInId = true;
+                                            return { ...s };
                                         }
                                     });
                                 },
@@ -432,7 +428,7 @@ export class Render implements RenderIntf {
                         }
                     }
 
-                    return s;
+                    return { ...s };
                 }
             });
         }
@@ -555,10 +551,10 @@ export class Render implements RenderIntf {
 
         dispatch({
             type: "Action_ShowGraph",
-            state,
-            update: (s: AppState): void => {
+            update: (s: AppState): AppState => {
                 s.fullScreenGraphId = node.id;
                 s.graphSearchText = searchText;
+                return { ...s };
             }
         });
     }

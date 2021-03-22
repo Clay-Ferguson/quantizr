@@ -19,7 +19,7 @@ export interface RenderIntf {
     showNodeUrl(node: J.NodeInfo, state: AppState): void;
     showGraph(node: J.NodeInfo, searchText: string, state: AppState): void;
     showCalendar(nodeId: string, state: AppState): void;
-    renderPageFromData(data: J.RenderNodeResponse, scrollToTop: boolean, targetNodeId: string, clickTab: boolean, allowScroll: boolean, state: AppState): void;
+    renderPageFromData(data: J.RenderNodeResponse, scrollToTop: boolean, targetNodeId: string, clickTab: boolean, allowScroll: boolean): void;
     getUrlForNodeAttachment(node: J.NodeInfo, downloadLink: boolean): string;
     getStreamUrlForNodeAttachment(node: J.NodeInfo): string;
     makeAvatarImage(node: J.NodeInfo, state: AppState): Img;

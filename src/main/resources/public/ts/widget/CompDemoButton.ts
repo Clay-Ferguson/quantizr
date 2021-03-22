@@ -32,9 +32,9 @@ export class CompDemoButton extends Div {
 
                     dispatch({
                         type: "Action_DemoAppIncCounter",
-                        state,
-                        update: (s: AppState): void => {
+                        update: (s: AppState): AppState => {
                             s.compDemoIdActive = cstate.idx;
+                            return { ...s };
                         }
                     });
                 }

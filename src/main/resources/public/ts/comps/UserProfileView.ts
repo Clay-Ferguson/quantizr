@@ -117,8 +117,7 @@ export class UserProfileView extends AppTab {
                     this.bioState.setValue(res.userBio);
                     dispatch({
                         type: "Action_InitUserProfile",
-                        state,
-                        update: (s: AppState): void => {
+                        update: (s: AppState): AppState => {
                             // select this tab
                             s.activeTab = "userProfileTab";
 
@@ -133,6 +132,8 @@ export class UserProfileView extends AppTab {
                                 userBio: res.userBio,
                                 readOnly
                             };
+
+                            return { ...s };
                         }
                     });
                 }
@@ -150,13 +151,12 @@ export class UserProfileView extends AppTab {
     }
 
     close = (): void => {
-        const state: AppState = store.getState();
         dispatch({
             type: "Action_InitUserProfile",
-            state,
-            update: (s: AppState): void => {
+            update: (s: AppState): AppState => {
                 s.activeTab = "mainTab";
                 s.userProfile = null;
+                return { ...s };
             }
         });
     }
@@ -202,10 +202,10 @@ export class UserProfileView extends AppTab {
                     if (res) {
                         dispatch({
                             type: "Action_InitUserProfile",
-                            state,
-                            update: (s: AppState): void => {
+                            update: (s: AppState): AppState => {
                                 s.userProfile.avatarVer = res.avatarVer;
                                 s.userProfile.userNodeId = res.userNodeId;
+                                return { ...s };
                             }
                         });
                     }
@@ -262,10 +262,10 @@ export class UserProfileView extends AppTab {
                     if (res) {
                         dispatch({
                             type: "Action_InitUserProfile",
-                            state,
-                            update: (s: AppState): void => {
+                            update: (s: AppState): AppState => {
                                 s.userProfile.headerImageVer = res.headerImageVer;
                                 s.userProfile.userNodeId = res.userNodeId;
+                                return { ...s };
                             }
                         });
                     }

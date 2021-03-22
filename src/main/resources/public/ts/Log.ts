@@ -5,6 +5,7 @@ export class Log {
     static logView: LogViewIntf = null;
 
     public static error(e: any): any {
+        if (!e) return;
         Log.errorCount++;
         console.error(e.message, e.stack);
     }

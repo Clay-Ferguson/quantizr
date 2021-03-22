@@ -1,3 +1,4 @@
+import { store } from "./AppRedux";
 import { AppState } from "./AppState";
 import { FeedView } from "./comps/FeedView";
 import { Constants as C } from "./Constants";
@@ -57,7 +58,7 @@ export class User implements UserIntf {
         new SignupDlg(state).open();
     }
 
-    defaultHandleAnonUser = (state: AppState) => {
+    defaultHandleAnonUser = () => {
         var tab = S.util.getParameterByName("tab");
         if (tab === "feed") {
             S.srch.feed("~" + J.NodeType.FRIEND_LIST, null, FeedView.page, null);
@@ -75,7 +76,7 @@ export class User implements UserIntf {
                 /* if we have known state as logged out, then do nothing here */
                 if (loginState === "0") {
                     // console.log("loginState known as logged out.");
-                    this.defaultHandleAnonUser(state);
+                    this.defaultHandleAnonUser();
                     return;
                 }
 
@@ -92,7 +93,7 @@ export class User implements UserIntf {
                 // console.log("refreshLogin with name: " + callUsr);
 
                 if (!callUsr) {
-                    this.defaultHandleAnonUser(state);
+                    this.defaultHandleAnonUser();
                 } else {
                     S.util.ajax<J.LoginRequest, J.LoginResponse>("login", {
                         userName: callUsr,
@@ -107,13 +108,14 @@ export class User implements UserIntf {
                         }
 
                         if (usingCredentials) {
+                            // console.log("calling loginResponse()");
                             this.loginResponse(res, callUsr, callPwd, false, state);
                         } else {
                             if (res.success) {
-                                S.meta64.setStateVarsUsingLoginResponse(res, state);
+                                S.meta64.setStateVarsUsingLoginResponse(res);
                             }
 
-                            this.defaultHandleAnonUser(state);
+                            this.defaultHandleAnonUser();
                         }
                     },
                         async (error: string) => {
@@ -191,7 +193,10 @@ export class User implements UserIntf {
                         // console.log("Logged in as: " + usr);
                     }
 
-                    S.meta64.setStateVarsUsingLoginResponse(res, state);
+                    S.meta64.setStateVarsUsingLoginResponse(res);
+
+                    // we just processed a dispatch so we need to get the current state now.
+                    state = store.getState();
 
                     /* set ID to be the page we want to show user right after login */
                     let id: string = null;
@@ -211,6 +216,7 @@ export class User implements UserIntf {
                             id = lastNode;
                             childId = await S.localDB.getVal(C.LOCALDB_LAST_CHILD_NODEID);
                         } else {
+                            // todo-2: note... this path is now untested due to recent refactoring.
                             id = state.homeNodeId;
                         }
                     }

@@ -6,8 +6,8 @@ import { createElement, ReactElement, ReactNode, useEffect, useLayoutEffect } fr
 import * as ReactDOM from "react-dom";
 import { renderToString } from "react-dom/server";
 import { Provider } from "react-redux";
+import { store } from "../../AppRedux";
 import { Constants as C } from "../../Constants";
-import { Log } from "../../Log";
 import { PubSub } from "../../PubSub";
 import { Singletons } from "../../Singletons";
 import { State } from "../../State";
@@ -231,7 +231,8 @@ export abstract class Comp<S extends BaseCompState = any> implements CompIntf {
     }
 
     wrapClickFunc = (obj: any) => {
-        if (!S.meta64.mouseEffect || !obj) return;
+        let state = store.getState();
+        if (!state.mouseEffect || !obj) return;
         // console.log("Wrap Click: " + this.jsClassName + " obj: " + S.util.prettyPrint(obj));
         if (obj.onClick) {
             obj.onClick = S.util.delayFunc(obj.onClick);

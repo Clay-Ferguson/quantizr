@@ -86,8 +86,9 @@ export class FullScreenCalendar extends Main {
                         click: () => {
                             dispatch({
                                 type: "Action_CalendarToggleWeekends",
-                                update: (s: AppState): void => {
+                                update: (s: AppState): AppState => {
                                     s.calendarShowWeekends = !this.state.calendarShowWeekends;
+                                    return { ...s };
                                 }
                             });
                         }

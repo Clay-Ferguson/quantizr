@@ -67,12 +67,13 @@ export class Nav implements NavIntf {
         if (!res || !res.node || res.errorType === J.ErrorType.AUTH) {
             dispatch({
                 type: "Action_ShowPageMessage",
-                update: (s: AppState): void => {
+                update: (s: AppState): AppState => {
                     s.pageMessage = "The node above is not shared.";
+                    return { ...s };
                 }
             });
         } else {
-            S.render.renderPageFromData(res, scrollToTop, id, true, true, state);
+            S.render.renderPageFromData(res, scrollToTop, id, true, true);
         }
     }
 
@@ -186,21 +187,13 @@ export class Nav implements NavIntf {
          */
         S.meta64.highlightNode(node, false, state);
 
-        // There's a wierd event/ording problem where, without this timer (delay) clicking a checkbox on a node
-        // row won't get it's setter (onChange) called in time, because this refresh blows away too much state. This
-        // is related to the Checkbox.ts class. We really need to just store ALL the statein appState and that will fix this.
-        // I think this may be related to the problem I just found where stale states
-        // can get passed to click methods.
+        // todo-1: without this timeout checkboxes on main tab don't work reliably. Need their state stored in global state to fix it
+        // in a good way.
         setTimeout(() => {
             fastDispatch({
                 type: "Action_FastRefresh",
-                updateNew: (s: AppState): AppState => {
-                    return {
-                        // I had a bug I was unable to repro where clicking a row in the Main tab would switch immediately to timeline tab.
-                        // and since I can't repro yet this is a WAG at an emergency fix that should be safe even if sort of 'wrong'
-                        activeTab: "mainTab",
-                        ...state
-                    };
+                update: (s: AppState): AppState => {
+                    return { ...s };
                 }
             });
         }, 100);
@@ -247,7 +240,7 @@ export class Nav implements NavIntf {
 
     navPageNodeResponse = (res: J.RenderNodeResponse, state: AppState): void => {
         S.meta64.clearSelNodes(state);
-        S.render.renderPageFromData(res, true, null, true, true, state);
+        S.render.renderPageFromData(res, true, null, true, true);
         S.meta64.selectTab("mainTab");
     }
 
@@ -315,10 +308,11 @@ export class Nav implements NavIntf {
     closeFullScreenViewer = (appState: AppState): void => {
         dispatch({
             type: "Action_CloseFullScreenViewer",
-            update: (s: AppState): void => {
+            update: (s: AppState): AppState => {
                 s.fullScreenViewId = null;
                 s.fullScreenGraphId = null;
                 s.fullScreenCalendarId = null;
+                return { ...s };
             }
         });
     }
@@ -329,8 +323,9 @@ export class Nav implements NavIntf {
         if (prevNode) {
             dispatch({
                 type: "Action_PrevFullScreenImgViewer",
-                update: (s: AppState): void => {
+                update: (s: AppState): AppState => {
                     s.fullScreenViewId = prevNode.id;
+                    return { ...s };
                 }
             });
         }
@@ -342,8 +337,9 @@ export class Nav implements NavIntf {
         if (nextNode) {
             dispatch({
                 type: "Action_NextFullScreenImgViewer",
-                update: (s: AppState): void => {
+                update: (s: AppState): AppState => {
                     s.fullScreenViewId = nextNode.id;
+                    return { ...s };
                 }
             });
         }

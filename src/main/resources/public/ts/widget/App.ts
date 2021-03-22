@@ -192,10 +192,9 @@ export class App extends Div {
                 setTimeout(() => {
                     fastDispatch({
                         type: "Action_FastRefresh",
-                        updateNew: (s: AppState): AppState => {
-                            state.savedScrollPosition = -1;
-                            // console.log("reset ScrollPos");
-                            return { ...state };
+                        update: (s: AppState): AppState => {
+                            s.savedScrollPosition = -1;
+                            return { ...s };
                         }
                     });
                     // Log.log("Restore ScrollPos (y): " + restoreScrollPos);

@@ -29,7 +29,6 @@ export class Meta64 implements Meta64Intf {
 
     config: any;
     mainMenu: MainMenuDlg;
-    mouseEffect: boolean = false;
     hiddenRenderingEnabled: boolean = false;
     noScrollToId: string = null;
 
@@ -115,13 +114,14 @@ export class Meta64 implements Meta64Intf {
 
         dispatch({
             type: "Action_SelectTab",
-            update: (s: AppState): void => {
+            update: (s: AppState): AppState => {
                 if (tabName === "mainTab" && !s.node) {
                     S.nav.navHome(s);
                 }
                 else {
                     s.activeTab = tabName;
                 }
+                return { ...s };
             }
         });
     }
@@ -193,9 +193,9 @@ export class Meta64 implements Meta64Intf {
         state = appState(state);
         dispatch({
             type: "Action_ClearSelections",
-            state,
-            update: (s: AppState): void => {
+            update: (s: AppState): AppState => {
                 s.selectedNodes = {};
+                return { ...s };
             }
         });
     }
@@ -499,13 +499,32 @@ export class Meta64 implements Meta64Intf {
                 });
 
             console.log("initApp complete.");
+            await this.enableMouseEffect();
             resolve();
+        });
+    }
+
+    enableMouseEffect = async () => {
+        let mouseEffect = await S.localDB.getVal(C.LOCALDB_MOUSE_EFFECT, "allUsers");
+        dispatch({
+            type: "Action_ToggleMouseEffect",
+            update: (s: AppState): AppState => {
+                s.mouseEffect = mouseEffect === "1";
+                return { ...s };
+            }
         });
     }
 
     /* #mouseEffects (do not delete tag) */
     toggleMouseEffect = () => {
-        this.mouseEffect = !this.mouseEffect;
+        dispatch({
+            type: "Action_ToggleMouseEffect",
+            update: (s: AppState): AppState => {
+                s.mouseEffect = !s.mouseEffect;
+                S.localDB.setVal(C.LOCALDB_MOUSE_EFFECT, s.mouseEffect ? "1" : "0", "allUsers");
+                return { ...s };
+            }
+        });
     }
 
     /*
@@ -513,9 +532,10 @@ export class Meta64 implements Meta64Intf {
     */
     initClickEffect = () => {
         let clickEffect = (e) => {
+            let state = store.getState();
             /* looks like for some events there's not a good mouse position (happened on clicks to drop down cobo boxes),
              and is apparently 0, 0, so we just check the sanity of the coordinates here */
-            if (!this.mouseEffect || (e.clientX < 10 && e.clientY < 10)) return;
+            if (!state.mouseEffect || (e.clientX < 10 && e.clientY < 10)) return;
             this.runClickAnimation(e.clientX, e.clientY);
         };
         document.addEventListener("click", clickEffect);
@@ -533,10 +553,18 @@ export class Meta64 implements Meta64Intf {
         d.style.left = `${x + 5}px`;
         d.style.top = `${y + 12}px`;
         document.body.appendChild(d);
-        let func = () => {
+
+        // This proved not to be reliable and was able to leave
+        // dangling orphans not in use, but the timer approach below
+        // should be bulletproof.
+        // let func = () => {
+        //     d.parentElement.removeChild(d);
+        // };
+        // d.addEventListener("animationend", func);
+
+        setTimeout(() => {
             d.parentElement.removeChild(d);
-        };
-        d.addEventListener("animationend", func);
+        }, 400); // this val is in 3 places. put the TS two in a constantas file.
     }
 
     playAudioIfRequested = () => {
@@ -636,7 +664,7 @@ export class Meta64 implements Meta64Intf {
                     S.util.showMessage("Unable to access the requested page without being logged in. Try loading the URL without parameters, or log in.", "Warning");
                 }
                 state = appState(state);
-                S.render.renderPageFromData(res, false, null, true, true, null);
+                S.render.renderPageFromData(res, false, null, true, true);
             },
             (res: any): void => {
                 // console.log("loadAnonPage Home ajax fail");
@@ -657,35 +685,35 @@ export class Meta64 implements Meta64Intf {
         });
     }
 
-    setStateVarsUsingLoginResponse = (res: J.LoginResponse, state: AppState): void => {
-        if (!res || !state) return;
-        if (res.rootNode) {
-            state.homeNodeId = res.rootNode;
-            state.homeNodePath = res.rootNodePath;
-        }
-        state.userName = res.userName;
-        state.isAdminUser = res.userName === "admin";
-        state.isAnonUser = res.userName === J.PrincipalName.ANON;
-
-        if (state.isAdminUser) {
-            LogView.showLogs = true;
-        }
-
-        // bash scripting is an experimental feature, and i'll only enable for admin for now, until i'm
-        // sure i'm keeping this feature.
-        state.allowBashScripting = false;
-
-        state.anonUserLandingPageNode = res.anonUserLandingPageNode;
-        state.allowFileSystemSearch = res.allowFileSystemSearch;
-
-        state.userPreferences = res.userPreferences;
-        var title = !state.isAnonUser ? res.userName : "";
+    setStateVarsUsingLoginResponse = (res: J.LoginResponse): void => {
+        if (!res) return;
 
         dispatch({
             type: "Action_LoginResponse",
-            state,
-            update: (s: AppState): void => {
-                s.title = title;
+            update: (s: AppState): AppState => {
+                if (res.rootNode) {
+                    s.homeNodeId = res.rootNode;
+                    s.homeNodePath = res.rootNodePath;
+                }
+                s.userName = res.userName;
+                s.isAdminUser = res.userName === "admin";
+                s.isAnonUser = res.userName === J.PrincipalName.ANON;
+
+                console.log("LoginResponse userName = " + res.userName);
+
+                if (s.isAdminUser) {
+                    LogView.showLogs = true;
+                }
+
+                // bash scripting is an experimental feature, and i'll only enable for admin for now, until i'm
+                // sure i'm keeping this feature.
+                s.allowBashScripting = false;
+
+                s.anonUserLandingPageNode = res.anonUserLandingPageNode;
+                s.allowFileSystemSearch = res.allowFileSystemSearch;
+                s.userPreferences = res.userPreferences;
+                s.title = !s.isAnonUser ? res.userName : "";
+                return { ...s };
             }
         });
     }

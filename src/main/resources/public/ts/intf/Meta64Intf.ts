@@ -9,7 +9,6 @@ export interface Meta64Intf {
 
     hiddenRenderingEnabled: boolean;
     config: any;
-    mouseEffect: boolean;
     mainMenu: MainMenuDlg;
     userProfileView: UserProfileView;
     app: CompIntf;
@@ -63,7 +62,7 @@ export interface Meta64Intf {
     loadAnonPageHome(state: AppState): void;
     saveUserPreferences(state: AppState): void;
     openSystemFile(fileName: string);
-    setStateVarsUsingLoginResponse(res: J.LoginResponse, state: AppState): void;
+    setStateVarsUsingLoginResponse(res: J.LoginResponse): void;
     updateNodeMap(node: J.NodeInfo, state: AppState): void;
     removeRedundantFeedItems(feedResults: J.NodeInfo[]): J.NodeInfo[];
     getNodeByName(node: J.NodeInfo, name: string, state: AppState): J.NodeInfo;

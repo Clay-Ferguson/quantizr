@@ -52,7 +52,7 @@ export class View implements ViewIntf {
             forceIPFSRefresh,
             singleNode: false
         }, async (res: J.RenderNodeResponse) => {
-            S.render.renderPageFromData(res, false, highlightId, setTab, allowScroll, state);
+            S.render.renderPageFromData(res, false, highlightId, setTab, allowScroll);
         });
     }
 
@@ -97,7 +97,7 @@ export class View implements ViewIntf {
             forceIPFSRefresh: false,
             singleNode: false
         }, async (res: J.RenderNodeResponse) => {
-            S.render.renderPageFromData(res, true, null, true, true, state);
+            S.render.renderPageFromData(res, true, null, true, true);
         });
     }
 
@@ -155,8 +155,8 @@ export class View implements ViewIntf {
         if (newNode) {
             fastDispatch({
                 type: "Action_FastRefresh",
-                updateNew: (s: AppState): AppState => {
-                    return { ...state };
+                update: (s: AppState): AppState => {
+                    return { ...s };
                 }
             });
         }

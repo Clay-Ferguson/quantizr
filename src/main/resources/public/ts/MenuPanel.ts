@@ -225,14 +225,14 @@ export class MenuPanel extends Div {
             new MenuItemSeparator(), //
 
             new MenuItem("Test Microphone", MenuPanel.testMicrophone, !state.isAnonUser), //
-            new MenuItem("Test Web Cam", MenuPanel.testWebCam, !state.isAnonUser) //
+            new MenuItem("Test Web Cam", MenuPanel.testWebCam, !state.isAnonUser), //
 
             /* The mouse effect shows a grapical animation for each mouse click but I decided I don't like the fact
              that I have to impose an intentional performance lag to let the animation show up, so in order to have the
              absolute fastest snappiest response of the app, I'm just not using this mouseEffect for now but let's leave
              the code in place for future reference. */
-            // new MenuItemSeparator(), //
-            // new MenuItem("Mouse Effects", MenuPanel.mouseEffects, !state.isAnonUser)
+            new MenuItemSeparator(), //
+            new MenuItem("Mouse Effects", MenuPanel.mouseEffects, !state.isAnonUser)
         ]));
 
         children.push(new Menu("Node Info", [

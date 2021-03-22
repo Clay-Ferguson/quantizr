@@ -144,17 +144,16 @@ export class RssTypeHandler extends TypeBase {
                     // console.log(err.message || "RSS Feed failed to load.");
                     dispatch({
                         type: "Action_RSSUpdated",
-                        state,
-                        update: (s: AppState): void => {
+                        update: (s: AppState): AppState => {
                             s.feedCache[feedSrcHash] = "failed";
+                            return { ...s };
                         }
                     });
                 }
                 else {
                     dispatch({
                         type: "Action_RSSUpdated",
-                        state,
-                        update: (s: AppState): void => {
+                        update: (s: AppState): AppState => {
                             if (!feed.items || feed.items.length === 0) {
                                 s.feedCache[feedSrcHash] = RssTypeHandler.lastGoodFeed;
                                 s.feedPage[feedSrcHash] = RssTypeHandler.lastGoodPage;
@@ -175,6 +174,8 @@ export class RssTypeHandler extends TypeBase {
                                 // what controls the min here. I 'think' CPU power may be the controlling factor
                                 // but it might be something else. Leaving as 2secs for now.
                             }, 2000);
+
+                            return { ...s };
                         }
                     });
                 }
@@ -296,11 +297,11 @@ export class RssTypeHandler extends TypeBase {
     setPage = (feedSrcHash: string, state: AppState, page: number) => {
         dispatch({
             type: "Action_RSSUpdated",
-            state,
-            update: (s: AppState): void => {
+            update: (s: AppState): AppState => {
                 // deleting will force a requery from the server
                 delete s.feedCache[feedSrcHash];
                 s.feedPage[feedSrcHash] = page;
+                return { ...s };
             }
         });
     }

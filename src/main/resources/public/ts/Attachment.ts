@@ -99,7 +99,8 @@ export class Attachment implements AttachmentIntf {
             // but for now just do a dispatch that forces a refresh from client memory (not server)
             fastDispatch({
                 type: "Action_FastRefresh",
-                updateNew: (s: AppState): AppState => {
+                update: (s: AppState): AppState => {
+                    // todo-0: this state is probably wrong here.
                     return { ...state };
                 }
             });

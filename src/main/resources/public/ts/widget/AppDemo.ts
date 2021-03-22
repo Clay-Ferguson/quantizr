@@ -24,9 +24,9 @@ export class AppDemo extends Div {
                     Comp.renderCounter = 0;
                     dispatch({
                         type: "Action_DemoAppIncCounter",
-                        state,
-                        update: (s: AppState): void => {
+                        update: (s: AppState): AppState => {
                             s.counter++;
+                            return { ...s };
                         }
                     });
                 })

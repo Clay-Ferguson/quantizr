@@ -13,30 +13,14 @@ export const initialState = new AppState();
  */
 export function rootReducer(state: AppState = initialState, /* action: Action<any> */ action: AppAction) {
 
+    if (!state) {
+        console.error("rootReducer called with null state: " + action);
+        return null;
+    }
+
     // console.log("Action: " + action.type);
-
-    /* If this AppAction has 'updateNew' use it to get the new state, but this really is just an opportunity for a BUG where the
-    the updateNew might accidentally NOT create a brand new state object, and if it doesn't then the entire rendering breaks, so really
-    I need to phase this out and always use 'update' instead and not even HAVE an 'updateNew' */
-    if (action.updateNew) {
-        state = action.updateNew(state);
-    }
-    /* If this AppAction has 'update' use it to update existing state */
-    else if (action.update) {
-        action.update(state);
-
-        /* todo-1: this line is a stop-gap because for now our 'sensitivity' for re-renders needs to be ANYTHING in the state
-        can trigger everything to rerender. This line will go away once we have the ability to have the useSelector() calls
-        in each component be smart enough to only retrieve exactly what's needed, which will speed up rendering a lot, and once
-        we have that this line can be removed. This line is forcing react to see we have a whole new state and can trigger
-        re-render of everything in that state
-        */
-        state = { ...state };
-    }
-
-    /* If this action wants us to update it's own copy of a 'state' do that here */
-    if (action.state) {
-        Object.assign(action.state, state);
+    if (action.update) {
+        state = action.update(state);
     }
 
     return state;
@@ -55,6 +39,8 @@ export const useAppState = (state?: AppState): AppState => {
 
 export const dispatch = (action: AppAction) => {
     PubSub.pub(C.PUBSUB_ClearComponentCache);
+
+    // Log.log("Dispatch Running: " + action.type);
     store.dispatch(action);
     // Log.log("Dispatch Complete: " + action.type);
 };

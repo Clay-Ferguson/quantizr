@@ -530,9 +530,10 @@ public class MongoUtil {
 		 * directly to it, so we default it to being directly in the server root, which
 		 * is a private node
 		 */
-		SubNode publicWelcome = apiUtil.ensureNodeExists(session, "/" + NodeName.ROOT, NodeName.WELCOME, "welcome-page",
-				"### Welcome Node\n\nDefault landing page content. Admin should edit.", null, true, null, created);
-		log.debug("Welcome Page Node exists at id: " + publicWelcome.getId() + " path=" + publicWelcome.getPath());
+		// todo-0: oops this works create but DUPLICATES a new node every time, completely breaking the landing page!!!!
+		// SubNode publicWelcome = apiUtil.ensureNodeExists(session, "/" + NodeName.ROOT, NodeName.WELCOME, "welcome-page",
+		// 		"### Welcome Node\n\nDefault landing page content. Admin should edit.", null, true, null, created);
+		// log.debug("Welcome Page Node exists at id: " + publicWelcome.getId() + " path=" + publicWelcome.getPath());
 
 		// // ---------------------------------------------------------
 		// // NOTE: Do not delete this. May need this example in the future. This is

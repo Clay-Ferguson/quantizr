@@ -43,10 +43,11 @@ export class Search implements SearchIntf {
     searchNodesResponse = (res: J.NodeSearchResponse, searchDescription: string, isUserSearch: boolean) => {
         dispatch({
             type: "Action_RenderSearchResults",
-            update: (s: AppState): void => {
+            update: (s: AppState): AppState => {
                 s.searchResults = res.searchResults;
                 s.isUserSearch = isUserSearch;
                 s.searchDescription = searchDescription;
+                return { ...s };
             }
         });
 
@@ -56,9 +57,10 @@ export class Search implements SearchIntf {
     timelineResponse = (res: J.NodeSearchResponse, timelineDescription: string) => {
         dispatch({
             type: "Action_RenderTimelineResults",
-            update: (s: AppState): void => {
+            update: (s: AppState): AppState => {
                 s.timelineResults = res.searchResults;
                 s.timelineDescription = timelineDescription;
+                return { ...s };
             }
         });
         S.meta64.selectTab("timelineTab");
@@ -117,7 +119,7 @@ export class Search implements SearchIntf {
     feedResponse = (res: J.NodeFeedResponse) => {
         dispatch({
             type: "Action_RenderFeedResults",
-            update: (s: AppState): void => {
+            update: (s: AppState): AppState => {
                 // s.feedResults = S.meta64.removeRedundantFeedItems(res.searchResults || []);
                 s.guiReady = true;
                 s.feedResults = res.searchResults;
@@ -125,6 +127,7 @@ export class Search implements SearchIntf {
                 s.feedDirty = false;
                 s.feedLoading = false;
                 s.feedWaitingForUserRefresh = false;
+                return { ...s };
             }
         });
         S.meta64.selectTab("feedTab");

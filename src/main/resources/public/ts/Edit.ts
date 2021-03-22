@@ -104,9 +104,9 @@ export class Edit implements EditIntf {
         if (S.util.checkSuccess("Move nodes", res)) {
             dispatch({
                 type: "Action_SetNodesToMove",
-                state,
-                update: (s: AppState): void => {
+                update: (s: AppState): AppState => {
                     s.nodesToMove = null;
+                    return { ...s };
                 }
             });
 
@@ -122,6 +122,7 @@ export class Edit implements EditIntf {
 
     /* returns true if we are admin or else the owner of the node */
     isEditAllowed = (node: any, state: AppState): boolean => {
+        if (!node) return false;
         let owner: string = node.owner;
 
         // if we don't know who owns this node assume the admin owns it.
@@ -287,9 +288,9 @@ export class Edit implements EditIntf {
 
         dispatch({
             type: "Action_SetUserPreferences",
-            state,
-            update: (s: AppState): void => {
+            update: (s: AppState): AppState => {
                 s.userPreferences = state.userPreferences;
+                return { ...s };
             }
         });
     }
@@ -300,9 +301,9 @@ export class Edit implements EditIntf {
 
         dispatch({
             type: "Action_SetUserPreferences",
-            state,
-            update: (s: AppState): void => {
+            update: (s: AppState): AppState => {
                 s.userPreferences = state.userPreferences;
+                return { ...s };
             }
         });
     }
@@ -537,7 +538,6 @@ export class Edit implements EditIntf {
     deleteSelNodes = (evt: Event = null, id: string = null, state: AppState = null): void => {
         state = appState(state);
         id = S.util.allowIdFromEvent(evt, id);
-        state = appState(state);
 
         // if a nodeId was specified we use it as the selected nodes to delete
         if (id) {
@@ -598,8 +598,10 @@ export class Edit implements EditIntf {
 
         dispatch({
             type: "Action_UpdateCalendarData",
-            update: (s: AppState): void => {
+            update: (s: AppState): AppState => {
                 s.calendarData = appState.calendarData;
+                // todo-0: this state is due to be rechecked/tested after refactoring
+                return { ...s };
             }
         });
     }
@@ -642,9 +644,9 @@ export class Edit implements EditIntf {
         state = appState(state);
         dispatch({
             type: "Action_SetNodesToMove",
-            state,
-            update: (s: AppState): void => {
+            update: (s: AppState): AppState => {
                 s.nodesToMove = null;
+                return { ...s };
             }
         });
     }
@@ -658,12 +660,12 @@ export class Edit implements EditIntf {
 
         dispatch({
             type: "Action_SetNodesToMove",
-            state,
-            update: (s: AppState): void => {
+            update: (s: AppState): AppState => {
                 s.nodesToMove = selNodesArray;
+                s.selectedNodes = {};
+                return { ...s };
             }
         });
-        state.selectedNodes = {};
     }
 
     pasteSelNodesInside = (evt: Event, id: string) => {

@@ -44,7 +44,7 @@ export class ServerPush implements ServerPushIntf {
                 // so need to check and see how to avoid that.
                 dispatch({
                     type: "Action_RenderFeedResults",
-                    update: (s: AppState): void => {
+                    update: (s: AppState): AppState => {
                         s.feedResults = s.feedResults || [];
 
                         /* If we detect the incomming change that is our own creation, we display it, but if it's not our own we
@@ -72,6 +72,7 @@ export class ServerPush implements ServerPushIntf {
                             s.feedDirty = true;
                             S.meta64.showSystemNotification("New Message", nodeInfo.owner + ": " + nodeInfo.content);
                         }
+                        return { ...s };
                     }
                 });
             }

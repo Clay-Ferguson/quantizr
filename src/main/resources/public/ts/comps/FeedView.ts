@@ -147,8 +147,9 @@ export class FeedView extends AppTab {
         FeedView.page = 0;
         dispatch({
             type: "Action_SetFeedFilterType",
-            update: (s: AppState): void => {
+            update: (s: AppState): AppState => {
                 s.feedLoading = true;
+                return { ...s };
             }
         });
 
@@ -163,9 +164,10 @@ export class FeedView extends AppTab {
                 setValue: (checked: boolean): void => {
                     dispatch({
                         type: "Action_SetFeedFilterType",
-                        update: (s: AppState): void => {
+                        update: (s: AppState): AppState => {
                             s.feedWaitingForUserRefresh = !this.realtimeCheckboxes;
                             s.feedFilterFriends = checked;
+                            return { ...s };
                         }
                     });
 
@@ -185,9 +187,10 @@ export class FeedView extends AppTab {
                 setValue: (checked: boolean): void => {
                     dispatch({
                         type: "Action_SetFeedFilterType",
-                        update: (s: AppState): void => {
+                        update: (s: AppState): AppState => {
                             s.feedWaitingForUserRefresh = !this.realtimeCheckboxes;
                             s.feedFilterToMe = checked;
+                            return { ...s };
                         }
                     });
 
@@ -207,9 +210,10 @@ export class FeedView extends AppTab {
                 setValue: (checked: boolean): void => {
                     dispatch({
                         type: "Action_SetFeedFilterType",
-                        update: (s: AppState): void => {
+                        update: (s: AppState): AppState => {
                             s.feedWaitingForUserRefresh = !this.realtimeCheckboxes;
                             s.feedFilterFromMe = checked;
+                            return { ...s };
                         }
                     });
 
@@ -229,9 +233,10 @@ export class FeedView extends AppTab {
                 setValue: (checked: boolean): void => {
                     dispatch({
                         type: "Action_SetFeedFilterType",
-                        update: (s: AppState): void => {
+                        update: (s: AppState): AppState => {
                             s.feedWaitingForUserRefresh = !this.realtimeCheckboxes;
                             s.feedFilterToPublic = checked;
+                            return { ...s };
                         }
                     });
 
@@ -251,9 +256,10 @@ export class FeedView extends AppTab {
                 setValue: (checked: boolean): void => {
                     dispatch({
                         type: "Action_SetFeedFilterType",
-                        update: (s: AppState): void => {
+                        update: (s: AppState): AppState => {
                             s.feedWaitingForUserRefresh = !this.realtimeCheckboxes;
                             s.feedFilterNSFW = checked;
+                            return { ...s };
                         }
                     });
 

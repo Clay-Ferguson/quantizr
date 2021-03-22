@@ -1,4 +1,5 @@
 import { ReactNode } from "react";
+import { store } from "../AppRedux";
 import { Constants as C } from "../Constants";
 import { ValueIntf } from "../Interfaces";
 import { PubSub } from "../PubSub";
@@ -31,7 +32,8 @@ export class Selection extends Comp {
              run it here an make it look like a click in the middle of the selection component, since this is done for supporting
              screencast demos this is actually much more clear anyway to display the animation on the actual selection after it's made
              */
-            if (S.meta64.mouseEffect) {
+            let state = store.getState();
+            if (state.mouseEffect) {
                 const { top, left } = evt.target.getBoundingClientRect();
                 S.meta64.runClickAnimation(left + evt.target.offsetWidth / 2, top + evt.target.offsetHeight / 2);
             }
