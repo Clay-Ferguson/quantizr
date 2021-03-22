@@ -22,25 +22,25 @@ export class SearchByNameDlg extends DialogBase {
     static defaultSearchText: string = "";
 
     searchTextField: TextField;
-    static searchTextState: ValidatedState<any> = new ValidatedState<any>();
+    searchTextState: ValidatedState<any> = new ValidatedState<any>();
 
     constructor(state: AppState) {
         super("Search by Node Name", "app-modal-content-medium-width", false, state);
         this.whenElm((elm: HTMLElement) => {
             this.searchTextField.focus();
         });
-        SearchByNameDlg.searchTextState.setValue(SearchByNameDlg.defaultSearchText);
+        this.searchTextState.setValue(SearchByNameDlg.defaultSearchText);
     }
 
     validate = (): boolean => {
         let valid = true;
 
-        if (!SearchByNameDlg.searchTextState.getValue()) {
-            SearchByNameDlg.searchTextState.setError("Cannot be empty.");
+        if (!this.searchTextState.getValue()) {
+            this.searchTextState.setError("Cannot be empty.");
             valid = false;
         }
         else {
-            SearchByNameDlg.searchTextState.setError(null);
+            this.searchTextState.setError(null);
         }
 
         return valid;
@@ -49,7 +49,7 @@ export class SearchByNameDlg extends DialogBase {
     renderDlg(): CompIntf[] {
         return [
             new Form(null, [
-                this.searchTextField = new TextField("Node Name", false, this.search, null, false, SearchByNameDlg.searchTextState),
+                this.searchTextField = new TextField("Node Name", false, this.search, null, false, this.searchTextState),
                 new ButtonBar([
                     new Button("Search", this.search, null, "btn-primary"),
                     new Button("Close", this.close)
@@ -74,11 +74,11 @@ export class SearchByNameDlg extends DialogBase {
             return;
         }
 
-        SearchByNameDlg.defaultSearchText = SearchByNameDlg.searchTextState.getValue();
+        SearchByNameDlg.defaultSearchText = this.searchTextState.getValue();
 
         S.util.ajax<J.NodeSearchRequest, J.NodeSearchResponse>("nodeSearch", {
             nodeId: node.id,
-            searchText: SearchByNameDlg.searchTextState.getValue(),
+            searchText: this.searchTextState.getValue(),
             sortDir: "",
             sortField: "",
             searchProp: "node.name",
@@ -92,7 +92,7 @@ export class SearchByNameDlg extends DialogBase {
 
     searchNodesResponse = (res: J.NodeSearchResponse) => {
         if (S.srch.numSearchResults(res) > 0) {
-            S.srch.searchNodesResponse(res, "Search for node " + SearchByNameDlg.searchTextState.getValue(), false);
+            S.srch.searchNodesResponse(res, "Search for node " + this.searchTextState.getValue(), false);
             this.close();
         }
         else {

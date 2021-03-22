@@ -1,4 +1,4 @@
-import { appState, dispatch, fastDispatch } from "./AppRedux";
+import { appState, dispatch } from "./AppRedux";
 import { AppState } from "./AppState";
 import { Constants as C } from "./Constants";
 import { LoginDlg } from "./dlg/LoginDlg";
@@ -190,7 +190,7 @@ export class Nav implements NavIntf {
         // todo-1: without this timeout checkboxes on main tab don't work reliably. Need their state stored in global state to fix it
         // in a good way.
         setTimeout(() => {
-            fastDispatch({
+            dispatch({
                 type: "Action_FastRefresh",
                 update: (s: AppState): AppState => {
                     return { ...s };

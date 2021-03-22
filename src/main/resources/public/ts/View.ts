@@ -1,10 +1,9 @@
-import { fastDispatch } from "./AppRedux";
+import { dispatch } from "./AppRedux";
 import { AppState } from "./AppState";
 import { Constants as C } from "./Constants";
 import { NodeStatsDlg } from "./dlg/NodeStatsDlg";
 import { ViewIntf } from "./intf/ViewIntf";
 import * as J from "./JavaIntf";
-import { Log } from "./Log";
 import { PubSub } from "./PubSub";
 import { Singletons } from "./Singletons";
 
@@ -153,7 +152,7 @@ export class View implements ViewIntf {
         }
 
         if (newNode) {
-            fastDispatch({
+            dispatch({
                 type: "Action_FastRefresh",
                 update: (s: AppState): AppState => {
                     return { ...s };

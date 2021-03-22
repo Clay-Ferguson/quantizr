@@ -1,5 +1,5 @@
 import { AxiosPromise } from "axios";
-import { fastDispatch } from "./AppRedux";
+import { dispatch } from "./AppRedux";
 import { AppState } from "./AppState";
 import { Constants as C } from "./Constants";
 import { ConfirmDlg } from "./dlg/ConfirmDlg";
@@ -97,7 +97,7 @@ export class Attachment implements AttachmentIntf {
     deleteAttachmentResponse = (res: J.DeleteAttachmentResponse, id: string, state: AppState): void => {
         if (S.util.checkSuccess("Delete attachment", res)) {
             // but for now just do a dispatch that forces a refresh from client memory (not server)
-            fastDispatch({
+            dispatch({
                 type: "Action_FastRefresh",
                 update: (s: AppState): AppState => {
                     // todo-0: this state is probably wrong here.

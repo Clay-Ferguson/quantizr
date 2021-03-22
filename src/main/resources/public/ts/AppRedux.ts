@@ -38,19 +38,17 @@ export const useAppState = (state?: AppState): AppState => {
 };
 
 export const dispatch = (action: AppAction) => {
-    PubSub.pub(C.PUBSUB_ClearComponentCache);
-
     // Log.log("Dispatch Running: " + action.type);
     store.dispatch(action);
     // Log.log("Dispatch Complete: " + action.type);
 };
 
-/* This is MUCH faster, for when structural changes won't happen (only style changes for example),
-becuase it doesn't reset static objects to null, meaning they get reused, without reconstructing */
-export const fastDispatch = (action: AppAction) => {
-    store.dispatch(action);
-    // console.log("Fast Dispatch Complete: " + action.type);
-};
+// todo-1: refactor dispatch call to look like this.
+// export const dispatch = (actionName: string, update: (state: AppState) => AppState) => {
+//     // Log.log("Dispatch Running: " + action.type);
+//     store.dispatch({ type: actionName, update });
+//     // Log.log("Dispatch Complete: " + action.type);
+// };
 
 /* This listener is temporary until I find a better way to do this code, which needs to always run after any
 render is complete and AFTER the html DOM is updated/final

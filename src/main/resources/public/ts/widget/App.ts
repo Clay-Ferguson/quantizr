@@ -1,10 +1,8 @@
 import { useSelector } from "react-redux";
-import { fastDispatch } from "../AppRedux";
+import { dispatch } from "../AppRedux";
 import { AppState } from "../AppState";
-import clientInfo from "../ClientInfo";
 import { Constants as C } from "../Constants";
 import * as J from "../JavaIntf";
-import { Log } from "../Log";
 import { PubSub } from "../PubSub";
 import { Singletons } from "../Singletons";
 import { Comp } from "./base/Comp";
@@ -27,17 +25,9 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (s: Singletons) => {
 });
 
 export class App extends Div {
-    tabPanel: TabPanel = null;
 
     constructor(attribs: Object = {}) {
         super(null, attribs);
-
-        // Since we only instantiate ONE App ever we don't need an 'unsubscribe' and also
-        // our pubsub doesn't even HAVE any unsubscribe function yet.
-        PubSub.sub(C.PUBSUB_ClearComponentCache, () => {
-            // todo-1: do we still need this?
-            this.tabPanel = null;
-        });
     }
 
     preRender(): void {
@@ -166,7 +156,7 @@ export class App extends Div {
                     className: "row main-app-row"
                 }, [
                     state.mobileMode ? null : new LeftNavPanel(),
-                    this.tabPanel || (this.tabPanel = new TabPanel()),
+                    new TabPanel(),
                     state.mobileMode ? null : new RightNavPanel()
                 ])
             ])),
@@ -190,7 +180,7 @@ export class App extends Div {
                 // Log.log("Restore ScrollPos (x): " + restoreScrollPos);
                 S.view.docElm.scrollTop = restoreScrollPos;
                 setTimeout(() => {
-                    fastDispatch({
+                    dispatch({
                         type: "Action_FastRefresh",
                         update: (s: AppState): AppState => {
                             s.savedScrollPosition = -1;

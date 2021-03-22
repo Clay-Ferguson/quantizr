@@ -20,8 +20,8 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
 
 export class SearchAndReplaceDlg extends DialogBase {
 
-    static searchState: ValidatedState<any> = new ValidatedState<any>();
-    static replaceState: ValidatedState<any> = new ValidatedState<any>();
+    searchState: ValidatedState<any> = new ValidatedState<any>();
+    replaceState: ValidatedState<any> = new ValidatedState<any>();
 
     constructor(state: AppState) {
         super("Search and Replace", "app-modal-content-narrow-width", false, state);
@@ -34,8 +34,8 @@ export class SearchAndReplaceDlg extends DialogBase {
         return [
             new Form(null, [
                 new FormGroup(null, [
-                    new TextField("Search for", null, null, null, false, SearchAndReplaceDlg.searchState),
-                    new TextField("Replace with", null, null, null, false, SearchAndReplaceDlg.replaceState)
+                    new TextField("Search for", null, null, null, false, this.searchState),
+                    new TextField("Replace with", null, null, null, false, this.replaceState)
                 ]),
                 new FormGroup(null, [
                     new Checkbox("Include Sub-Nodes", null, {
@@ -58,20 +58,20 @@ export class SearchAndReplaceDlg extends DialogBase {
     validate = (): boolean => {
         let valid = true;
 
-        if (!SearchAndReplaceDlg.searchState.getValue()) {
-            SearchAndReplaceDlg.searchState.setError("Cannot be empty.");
+        if (!this.searchState.getValue()) {
+            this.searchState.setError("Cannot be empty.");
             valid = false;
         }
         else {
-            SearchAndReplaceDlg.searchState.setError(null);
+            this.searchState.setError(null);
         }
 
-        if (!SearchAndReplaceDlg.replaceState.getValue()) {
-            SearchAndReplaceDlg.replaceState.setError("Cannot be empty.");
+        if (!this.replaceState.getValue()) {
+            this.replaceState.setError("Cannot be empty.");
             valid = false;
         }
         else {
-            SearchAndReplaceDlg.replaceState.setError(null);
+            this.replaceState.setError(null);
         }
 
         return valid;
@@ -88,7 +88,7 @@ export class SearchAndReplaceDlg extends DialogBase {
             return;
         }
 
-        S.srch.searchAndReplace(this.getState().recursive, node.id, SearchAndReplaceDlg.searchState.getValue(), SearchAndReplaceDlg.replaceState.getValue(), this.appState);
+        S.srch.searchAndReplace(this.getState().recursive, node.id, this.searchState.getValue(), this.replaceState.getValue(), this.appState);
         this.close();
     }
 }

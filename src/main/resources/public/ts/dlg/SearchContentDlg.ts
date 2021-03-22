@@ -25,7 +25,7 @@ export class SearchContentDlg extends DialogBase {
     static helpExpanded: boolean = false;
     static defaultSearchText: string = "";
     searchTextField: TextField;
-    static searchTextState: ValidatedState<any> = new ValidatedState<any>();
+    searchTextState: ValidatedState<any> = new ValidatedState<any>();
 
     constructor(state: AppState) {
         super("Search Content", "app-modal-content-medium-width", null, state);
@@ -39,17 +39,17 @@ export class SearchContentDlg extends DialogBase {
             fuzzy: false,
             caseSensitive: false
         });
-        SearchContentDlg.searchTextState.setValue(SearchContentDlg.defaultSearchText);
+        this.searchTextState.setValue(SearchContentDlg.defaultSearchText);
     }
 
     validate = (): boolean => {
         let valid = true;
-        if (!SearchContentDlg.searchTextState.getValue()) {
-            SearchContentDlg.searchTextState.setError("Cannot be empty.");
+        if (!this.searchTextState.getValue()) {
+            this.searchTextState.setError("Cannot be empty.");
             valid = false;
         }
         else {
-            SearchContentDlg.searchTextState.setError(null);
+            this.searchTextState.setError(null);
         }
         return valid;
     }
@@ -57,7 +57,7 @@ export class SearchContentDlg extends DialogBase {
     renderDlg(): CompIntf[] {
         return [
             new Form(null, [
-                this.searchTextField = new TextField("Search", false, this.search, null, false, SearchContentDlg.searchTextState),
+                this.searchTextField = new TextField("Search", false, this.search, null, false, this.searchTextState),
                 new HorizontalLayout([
                     // Allow fuzzy search for admin only. It's cpu intensive.
                     this.appState.isAdminUser ? new Checkbox("Fuzzy Search (slower)", null, {
@@ -106,7 +106,7 @@ export class SearchContentDlg extends DialogBase {
             return;
         }
 
-        SearchContentDlg.defaultSearchText = SearchContentDlg.searchTextState.getValue();
+        SearchContentDlg.defaultSearchText = this.searchTextState.getValue();
 
         this.close();
         S.render.showGraph(null, SearchContentDlg.defaultSearchText, this.appState);
@@ -128,7 +128,7 @@ export class SearchContentDlg extends DialogBase {
             return;
         }
 
-        SearchContentDlg.defaultSearchText = S.srch.searchText = SearchContentDlg.searchTextState.getValue();
+        SearchContentDlg.defaultSearchText = S.srch.searchText = this.searchTextState.getValue();
 
         S.util.ajax<J.NodeSearchRequest, J.NodeSearchResponse>("nodeSearch", {
             nodeId: node.id,
