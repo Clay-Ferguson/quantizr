@@ -40,16 +40,19 @@ export class NodeStatsDlg extends DialogBase {
             });
         }
 
-        let mentionPanel = new Div(null, { className: "wordStatsArea" });
-        if (this.res.topMentions && this.res.topMentions.length > 0) {
-            mentionPanel.addChild(new Heading(4, this.trending ? "Mentions" : "Top Mentions"));
-            this.res.topMentions.forEach((word: string) => {
-                mentionPanel.addChild(new Span(word, {
-                    className: "statsWord",
-                    onClick: () => this.searchWord(word)
-                }));
-            });
-        }
+        // todo-0: I'm disabling this for now, becaus eI saw it show suspicously few results on the Fediverse tab
+        // and I don't have time to troubleshoot this now, so I'd rather hide it than not know if it's correct or not (for now)
+        let mentionPanel = null;
+        // mentionPanel new Div(null, { className: "wordStatsArea" });
+        // if (this.res.topMentions && this.res.topMentions.length > 0) {
+        //     mentionPanel.addChild(new Heading(4, this.trending ? "Mentions" : "Top Mentions"));
+        //     this.res.topMentions.forEach((word: string) => {
+        //         mentionPanel.addChild(new Span(word, {
+        //             className: "statsWord",
+        //             onClick: () => this.searchWord(word)
+        //         }));
+        //     });
+        // }
 
         let wordPanel = new Div(null, { className: "wordStatsArea" });
         if (this.res.topWords && this.res.topWords.length > 0) {
@@ -65,7 +68,7 @@ export class NodeStatsDlg extends DialogBase {
         return [
             this.trending ? null : new TextContent(this.res.stats, null, false),
             tagPanel.childrenExist() ? tagPanel : null,
-            mentionPanel.childrenExist() ? mentionPanel : null,
+            mentionPanel && mentionPanel.childrenExist() ? mentionPanel : null,
             wordPanel.childrenExist() ? wordPanel : null,
 
             new CollapsibleHelpPanel("Help: About Node Stats", S.meta64.config.help.nodeStats.dialog,
@@ -86,7 +89,7 @@ export class NodeStatsDlg extends DialogBase {
 
         if (this.feed) {
             /* put word in quotes to do an exact match */
-            FeedView.searchTextState.setValue("\"" + word + "\"");
+            FeedView.searchTextState.setValue(word);
             FeedView.refresh();
         }
         else {
