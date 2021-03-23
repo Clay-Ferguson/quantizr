@@ -26,7 +26,7 @@ export class AppDemo extends Div {
                         type: "Action_DemoAppIncCounter",
                         update: (s: AppState): AppState => {
                             s.counter++;
-                            return { ...s };
+                            return s;
                         }
                     });
                 })

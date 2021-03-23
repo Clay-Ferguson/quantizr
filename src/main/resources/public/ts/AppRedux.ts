@@ -20,7 +20,11 @@ export function rootReducer(state: AppState = initialState, /* action: Action<an
 
     // console.log("Action: " + action.type);
     if (action.update) {
-        state = action.update(state);
+        // These 'update' function may or may not actually use the 'state' parameter we pass in here, because sometimes
+        // we get the state and then start making updates to it in several different places and in cases like that
+        // calls to this 'update' will use the state on the stack at that time, and not use the 'state' parameter here
+        // because it's own state will be known to be the correct up to date state in those circumstances.
+        state = { ...action.update(state) };
     }
 
     return state;

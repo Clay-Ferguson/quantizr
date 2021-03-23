@@ -133,7 +133,7 @@ export class UserProfileView extends AppTab {
                                 readOnly
                             };
 
-                            return { ...s };
+                            return s;
                         }
                     });
                 }
@@ -156,7 +156,7 @@ export class UserProfileView extends AppTab {
             update: (s: AppState): AppState => {
                 s.activeTab = "mainTab";
                 s.userProfile = null;
-                return { ...s };
+                return s;
             }
         });
     }
@@ -205,7 +205,7 @@ export class UserProfileView extends AppTab {
                             update: (s: AppState): AppState => {
                                 s.userProfile.avatarVer = res.avatarVer;
                                 s.userProfile.userNodeId = res.userNodeId;
-                                return { ...s };
+                                return s;
                             }
                         });
                     }
@@ -265,7 +265,7 @@ export class UserProfileView extends AppTab {
                             update: (s: AppState): AppState => {
                                 s.userProfile.headerImageVer = res.headerImageVer;
                                 s.userProfile.userNodeId = res.userNodeId;
-                                return { ...s };
+                                return s;
                             }
                         });
                     }

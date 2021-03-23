@@ -94,14 +94,14 @@ export class Attachment implements AttachmentIntf {
         });
     }
 
-    deleteAttachmentResponse = (res: J.DeleteAttachmentResponse, id: string, state: AppState): void => {
+    // kState=='keep state' (the state has been changed, keep changes)
+    deleteAttachmentResponse = (res: J.DeleteAttachmentResponse, id: string, kState: AppState): void => {
         if (S.util.checkSuccess("Delete attachment", res)) {
             // but for now just do a dispatch that forces a refresh from client memory (not server)
             dispatch({
                 type: "Action_FastRefresh",
                 update: (s: AppState): AppState => {
-                    // todo-0: this state is probably wrong here.
-                    return { ...state };
+                    return kState;
                 }
             });
         }

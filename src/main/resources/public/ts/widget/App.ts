@@ -184,7 +184,7 @@ export class App extends Div {
                         type: "Action_FastRefresh",
                         update: (s: AppState): AppState => {
                             s.savedScrollPosition = -1;
-                            return { ...s };
+                            return s;
                         }
                     });
                     // Log.log("Restore ScrollPos (y): " + restoreScrollPos);

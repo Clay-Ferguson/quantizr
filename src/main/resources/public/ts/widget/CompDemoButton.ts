@@ -34,7 +34,7 @@ export class CompDemoButton extends Div {
                         type: "Action_DemoAppIncCounter",
                         update: (s: AppState): AppState => {
                             s.compDemoIdActive = cstate.idx;
-                            return { ...s };
+                            return s;
                         }
                     });
                 }

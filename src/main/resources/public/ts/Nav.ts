@@ -69,7 +69,7 @@ export class Nav implements NavIntf {
                 type: "Action_ShowPageMessage",
                 update: (s: AppState): AppState => {
                     s.pageMessage = "The node above is not shared.";
-                    return { ...s };
+                    return s;
                 }
             });
         } else {
@@ -193,7 +193,7 @@ export class Nav implements NavIntf {
             dispatch({
                 type: "Action_FastRefresh",
                 update: (s: AppState): AppState => {
-                    return { ...s };
+                    return s;
                 }
             });
         }, 100);
@@ -230,6 +230,7 @@ export class Nav implements NavIntf {
     }
 
     setNodeSel = (selected: boolean, id: string, state: AppState): void => {
+        if (!id) return;
         state = appState(state);
         if (selected) {
             state.selectedNodes[id] = true;
@@ -312,7 +313,7 @@ export class Nav implements NavIntf {
                 s.fullScreenViewId = null;
                 s.fullScreenGraphId = null;
                 s.fullScreenCalendarId = null;
-                return { ...s };
+                return s;
             }
         });
     }
@@ -325,7 +326,7 @@ export class Nav implements NavIntf {
                 type: "Action_PrevFullScreenImgViewer",
                 update: (s: AppState): AppState => {
                     s.fullScreenViewId = prevNode.id;
-                    return { ...s };
+                    return s;
                 }
             });
         }
@@ -339,7 +340,7 @@ export class Nav implements NavIntf {
                 type: "Action_NextFullScreenImgViewer",
                 update: (s: AppState): AppState => {
                     s.fullScreenViewId = nextNode.id;
-                    return { ...s };
+                    return s;
                 }
             });
         }

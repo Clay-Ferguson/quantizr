@@ -121,7 +121,7 @@ export class Meta64 implements Meta64Intf {
                 else {
                     s.activeTab = tabName;
                 }
-                return { ...s };
+                return s;
             }
         });
     }
@@ -195,7 +195,7 @@ export class Meta64 implements Meta64Intf {
             type: "Action_ClearSelections",
             update: (s: AppState): AppState => {
                 s.selectedNodes = {};
-                return { ...s };
+                return s;
             }
         });
     }
@@ -510,7 +510,7 @@ export class Meta64 implements Meta64Intf {
             type: "Action_ToggleMouseEffect",
             update: (s: AppState): AppState => {
                 s.mouseEffect = mouseEffect === "1";
-                return { ...s };
+                return s;
             }
         });
     }
@@ -522,7 +522,7 @@ export class Meta64 implements Meta64Intf {
             update: (s: AppState): AppState => {
                 s.mouseEffect = !s.mouseEffect;
                 S.localDB.setVal(C.LOCALDB_MOUSE_EFFECT, s.mouseEffect ? "1" : "0", "allUsers");
-                return { ...s };
+                return s;
             }
         });
     }
@@ -713,7 +713,7 @@ export class Meta64 implements Meta64Intf {
                 s.allowFileSystemSearch = res.allowFileSystemSearch;
                 s.userPreferences = res.userPreferences;
                 s.title = !s.isAnonUser ? res.userName : "";
-                return { ...s };
+                return s;
             }
         });
     }

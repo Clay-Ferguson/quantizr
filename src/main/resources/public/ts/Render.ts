@@ -163,7 +163,7 @@ export class Render implements RenderIntf {
                 update: (s: AppState): AppState => {
                     s.fullScreenCalendarId = nodeId;
                     s.calendarData = S.util.buildCalendarData(res.items);
-                    return { ...s };
+                    return s;
                 }
             });
         });
@@ -412,7 +412,7 @@ export class Render implements RenderIntf {
                                         update: (s: AppState): AppState => {
                                             s.rendering = false;
                                             this.allowFadeInId = true;
-                                            return { ...s };
+                                            return s;
                                         }
                                     });
                                 },
@@ -428,7 +428,7 @@ export class Render implements RenderIntf {
                         }
                     }
 
-                    return { ...s };
+                    return s;
                 }
             });
         }
@@ -554,7 +554,7 @@ export class Render implements RenderIntf {
             update: (s: AppState): AppState => {
                 s.fullScreenGraphId = node.id;
                 s.graphSearchText = searchText;
-                return { ...s };
+                return s;
             }
         });
     }

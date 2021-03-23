@@ -146,7 +146,7 @@ export class RssTypeHandler extends TypeBase {
                         type: "Action_RSSUpdated",
                         update: (s: AppState): AppState => {
                             s.feedCache[feedSrcHash] = "failed";
-                            return { ...s };
+                            return s;
                         }
                     });
                 }
@@ -175,7 +175,7 @@ export class RssTypeHandler extends TypeBase {
                                 // but it might be something else. Leaving as 2secs for now.
                             }, 2000);
 
-                            return { ...s };
+                            return s;
                         }
                     });
                 }
@@ -301,7 +301,7 @@ export class RssTypeHandler extends TypeBase {
                 // deleting will force a requery from the server
                 delete s.feedCache[feedSrcHash];
                 s.feedPage[feedSrcHash] = page;
-                return { ...s };
+                return s;
             }
         });
     }

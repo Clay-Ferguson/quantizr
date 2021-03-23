@@ -88,7 +88,7 @@ export class NodeCompBinary extends Div {
                     s.fullScreenImageSize = s.fullScreenImageSize ? "" : "100%";
                 }
                 s.fullScreenViewId = id;
-                return { ...s };
+                return s;
             }
         });
     }

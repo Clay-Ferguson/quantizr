@@ -1345,7 +1345,7 @@ export class Util implements UtilIntf {
             type: "Action_SwitchBrowsingMode",
             update: (s: AppState): AppState => {
                 s.mobileMode = !s.mobileMode;
-                return { ...s };
+                return s;
             }
         });
     }

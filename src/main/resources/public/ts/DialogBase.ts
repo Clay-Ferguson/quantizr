@@ -118,7 +118,7 @@ export abstract class DialogBase<S extends BaseCompState = any> extends Div<S> i
                     type: "Action_OpenDialog",
                     update: (s: AppState): AppState => {
                         s.dialogStack.push(this);
-                        return { ...s };
+                        return s;
                     }
                 });
             }
@@ -169,7 +169,7 @@ export abstract class DialogBase<S extends BaseCompState = any> extends Div<S> i
                     if (index > -1) {
                         s.dialogStack.splice(index, 1);
                     }
-                    return { ...s };
+                    return s;
                 }
             });
         }

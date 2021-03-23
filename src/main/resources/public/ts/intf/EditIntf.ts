@@ -32,10 +32,10 @@ export interface EditIntf {
     toolbarInsertNode(evt: Event, id: string): void;
     createSubNode(id: any, typeName: string, createAtTop: boolean, parentNode: J.NodeInfo, state: AppState): void;
     selectAllNodes(state: AppState) : void;
-    deleteSelNodes(evt: Event, nodeId: string, state?: AppState);
+    deleteSelNodes(evt: Event, nodeId: string);
     getBestPostDeleteSelNode(state: AppState): J.NodeInfo;
-    cutSelNodes(evt: Event, id: string, state?: AppState): void;
-    undoCutSelNodes(state: AppState): void;
+    cutSelNodes(evt: Event, id: string): void;
+    undoCutSelNodes(): void;
     pasteSelNodesInside(evt: Event, id: string);
     pasteSelNodes(nodeId: string, location: string, state?: AppState): void;
     pasteSelNodes_InlineAbove(evt: Event, id: string);

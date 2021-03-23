@@ -149,7 +149,7 @@ export class FeedView extends AppTab {
             type: "Action_SetFeedFilterType",
             update: (s: AppState): AppState => {
                 s.feedLoading = true;
-                return { ...s };
+                return s;
             }
         });
 
@@ -167,7 +167,7 @@ export class FeedView extends AppTab {
                         update: (s: AppState): AppState => {
                             s.feedWaitingForUserRefresh = !this.realtimeCheckboxes;
                             s.feedFilterFriends = checked;
-                            return { ...s };
+                            return s;
                         }
                     });
 
@@ -190,7 +190,7 @@ export class FeedView extends AppTab {
                         update: (s: AppState): AppState => {
                             s.feedWaitingForUserRefresh = !this.realtimeCheckboxes;
                             s.feedFilterToMe = checked;
-                            return { ...s };
+                            return s;
                         }
                     });
 
@@ -213,7 +213,7 @@ export class FeedView extends AppTab {
                         update: (s: AppState): AppState => {
                             s.feedWaitingForUserRefresh = !this.realtimeCheckboxes;
                             s.feedFilterFromMe = checked;
-                            return { ...s };
+                            return s;
                         }
                     });
 
@@ -236,7 +236,7 @@ export class FeedView extends AppTab {
                         update: (s: AppState): AppState => {
                             s.feedWaitingForUserRefresh = !this.realtimeCheckboxes;
                             s.feedFilterToPublic = checked;
-                            return { ...s };
+                            return s;
                         }
                     });
 
@@ -259,7 +259,7 @@ export class FeedView extends AppTab {
                         update: (s: AppState): AppState => {
                             s.feedWaitingForUserRefresh = !this.realtimeCheckboxes;
                             s.feedFilterNSFW = checked;
-                            return { ...s };
+                            return s;
                         }
                     });
 

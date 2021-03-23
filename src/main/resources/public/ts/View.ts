@@ -155,7 +155,7 @@ export class View implements ViewIntf {
             dispatch({
                 type: "Action_FastRefresh",
                 update: (s: AppState): AppState => {
-                    return { ...s };
+                    return s;
                 }
             });
         }

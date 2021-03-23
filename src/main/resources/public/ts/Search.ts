@@ -47,7 +47,7 @@ export class Search implements SearchIntf {
                 s.searchResults = res.searchResults;
                 s.isUserSearch = isUserSearch;
                 s.searchDescription = searchDescription;
-                return { ...s };
+                return s;
             }
         });
 
@@ -60,7 +60,7 @@ export class Search implements SearchIntf {
             update: (s: AppState): AppState => {
                 s.timelineResults = res.searchResults;
                 s.timelineDescription = timelineDescription;
-                return { ...s };
+                return s;
             }
         });
         S.meta64.selectTab("timelineTab");
@@ -127,7 +127,7 @@ export class Search implements SearchIntf {
                 s.feedDirty = false;
                 s.feedLoading = false;
                 s.feedWaitingForUserRefresh = false;
-                return { ...s };
+                return s;
             }
         });
         S.meta64.selectTab("feedTab");

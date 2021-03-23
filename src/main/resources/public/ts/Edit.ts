@@ -64,8 +64,6 @@ export class Edit implements EditIntf {
 
     private deleteNodesResponse = (res: J.DeleteNodesResponse, postDelSelNodeId: string, state: AppState): void => {
         if (S.util.checkSuccess("Delete node", res)) {
-            S.meta64.clearSelNodes(state);
-
             // We only want to pass a nodeId here if we are going to root node.
             const nodeId = postDelSelNodeId === state.homeNodeId ? postDelSelNodeId : null;
 
@@ -106,7 +104,7 @@ export class Edit implements EditIntf {
                 type: "Action_SetNodesToMove",
                 update: (s: AppState): AppState => {
                     s.nodesToMove = null;
-                    return { ...s };
+                    return s;
                 }
             });
 
@@ -290,7 +288,7 @@ export class Edit implements EditIntf {
             type: "Action_SetUserPreferences",
             update: (s: AppState): AppState => {
                 s.userPreferences = state.userPreferences;
-                return { ...s };
+                return s;
             }
         });
     }
@@ -303,7 +301,7 @@ export class Edit implements EditIntf {
             type: "Action_SetUserPreferences",
             update: (s: AppState): AppState => {
                 s.userPreferences = state.userPreferences;
-                return { ...s };
+                return s;
             }
         });
     }
@@ -535,12 +533,15 @@ export class Edit implements EditIntf {
      * Deletes the selNodesArray items, and if none are passed then we fall back to using whatever the user
      * has currenly selected (via checkboxes)
      */
-    deleteSelNodes = (evt: Event = null, id: string = null, state: AppState = null): void => {
-        state = appState(state);
+    deleteSelNodes = (evt: Event = null, id: string = null): void => {
+        let state = store.getState();
         id = S.util.allowIdFromEvent(evt, id);
 
         // if a nodeId was specified we use it as the selected nodes to delete
         if (id) {
+            // note we ARE updating 'state' here but it doesn't matter we can discard state, becasue
+            // all we needed is selNodesArray which we get and as long as selNodesArray is preserved
+            // we can let that change to 'state' get discarded in the next dispatch
             S.nav.setNodeSel(true, id, state);
         }
         const selNodesArray = S.meta64.getSelNodeIdsArray(state);
@@ -599,9 +600,7 @@ export class Edit implements EditIntf {
         dispatch({
             type: "Action_UpdateCalendarData",
             update: (s: AppState): AppState => {
-                s.calendarData = appState.calendarData;
-                // todo-0: this state is due to be rechecked/tested after refactoring
-                return { ...s };
+                return appState;
             }
         });
     }
@@ -640,30 +639,27 @@ export class Edit implements EditIntf {
         return bestNode;
     }
 
-    undoCutSelNodes = async (state: AppState = null): Promise<void> => {
-        state = appState(state);
+    undoCutSelNodes = (): void => {
         dispatch({
             type: "Action_SetNodesToMove",
             update: (s: AppState): AppState => {
                 s.nodesToMove = null;
-                return { ...s };
+                return s;
             }
         });
     }
 
-    cutSelNodes = (evt: Event, id: string, state?: AppState): void => {
-        id = S.util.allowIdFromEvent(evt, id);
-        state = appState(state);
-
-        S.nav.setNodeSel(true, id, state);
-        const selNodesArray = S.meta64.getSelNodeIdsArray(state);
+    cutSelNodes = (evt: Event, id: string): void => {
+        id = S.util.allowIdFromEvent(evt, null);
 
         dispatch({
             type: "Action_SetNodesToMove",
             update: (s: AppState): AppState => {
+                S.nav.setNodeSel(true, id, s);
+                let selNodesArray = S.meta64.getSelNodeIdsArray(s);
                 s.nodesToMove = selNodesArray;
                 s.selectedNodes = {};
-                return { ...s };
+                return s;
             }
         });
     }
