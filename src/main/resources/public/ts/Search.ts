@@ -45,7 +45,7 @@ export class Search implements SearchIntf {
             s.searchResults = res.searchResults;
             s.isUserSearch = isUserSearch;
             s.searchDescription = searchDescription;
-            S.meta64.selectTab("searchTab");
+            S.meta64.selectTabStateOnly("searchTab", s);
             return s;
         });
     }
@@ -54,7 +54,7 @@ export class Search implements SearchIntf {
         dispatch("Action_RenderTimelineResults", (s: AppState): AppState => {
             s.timelineResults = res.searchResults;
             s.timelineDescription = timelineDescription;
-            S.meta64.selectTab("timelineTab");
+            S.meta64.selectTabStateOnly("timelineTab", s);
             return s;
         });
     }
@@ -118,7 +118,7 @@ export class Search implements SearchIntf {
             s.feedDirty = false;
             s.feedLoading = false;
             s.feedWaitingForUserRefresh = false;
-            S.meta64.selectTab("feedTab");
+            S.meta64.selectTabStateOnly("feedTab", s);
             S.view.scrollToTop();
             return s;
         });

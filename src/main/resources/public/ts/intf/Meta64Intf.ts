@@ -44,6 +44,7 @@ export interface Meta64Intf {
     sendTestEmail(string): void;
     showSystemNotification(title: string, message: string): void;
     refresh(state: AppState): void;
+    selectTabStateOnly(tabName: string, state: AppState): void;
     selectTab(pageName: string, clickEvent?: boolean): void;
     getSelNodeUidsArray(state: AppState): string[];
     getSelNodeIdsArray(state: AppState): string[];

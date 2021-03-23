@@ -123,6 +123,21 @@ export class Meta64 implements Meta64Intf {
         });
     }
 
+    /* Does a select tab that's safe within a dispatch (i.e. doesn't itself dispatch) */
+    selectTabStateOnly = (tabName: string, state: AppState): void => {
+        if (tabName === "mainTab" && !state.node) {
+
+            // we need to run immediately but in a timer so it doesn't happen in this call stack and trigger
+            // an error that we did a dispatch in a dispatch.
+            setTimeout(() => {
+                S.nav.navHome(null);
+            }, 1);
+        }
+        else {
+            state.activeTab = tabName;
+        }
+    }
+
     getSelNodeUidsArray = (state: AppState): string[] => {
         const selArray: string[] = [];
         S.util.forEachProp(state.selectedNodes, (id, val): boolean => {
