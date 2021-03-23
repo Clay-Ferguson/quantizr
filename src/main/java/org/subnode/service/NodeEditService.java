@@ -166,9 +166,10 @@ public class NodeEditService {
 		SubNode newNode = create.createNode(session, node, null, req.getTypeName(), 0L, createLoc, req.getProperties(),
 				null, true);
 
+		// todo-0: need at least the p and proabably the r also in variables.
 		// '/r/p/' = pending (nodes not yet published, being edited created by users)
-		if (req.isPendingEdit() && !newNode.getPath().startsWith("/r/p/")) {
-			newNode.setPath(newNode.getPath().replace("/r/", "/r/p/"));
+		if (req.isPendingEdit()) {
+			util.setPendingPath(newNode, true);
 		}
 
 		newNode.setContent(parentHashTags + (req.getContent() != null ? req.getContent() : ""));
@@ -313,8 +314,8 @@ public class NodeEditService {
 		}
 
 		// '/r/p/' = pending (nodes not yet published, being edited created by users)
-		if (req.isPendingEdit() && !newNode.getPath().startsWith("/r/p/")) {
-			newNode.setPath(newNode.getPath().replace("/r/", "/r/p/"));
+		if (req.isPendingEdit()) {
+			util.setPendingPath(newNode, true);
 		}
 
 		// we always copy the access controls from the parent for any new nodes
@@ -524,9 +525,7 @@ public class NodeEditService {
 		 * If the node being saved is currently in the pending area /p/ then we publish
 		 * it now, and move it out of pending.
 		 */
-		if (node.getPath().startsWith("/r/p/")) {
-			node.setPath(node.getPath().replace("/r/p/", "/r/"));
-		}
+		util.setPendingPath(node, false);
 
 		asyncExec.run(() -> {
 			/* Send notification to local server or to remote server when a node is added */

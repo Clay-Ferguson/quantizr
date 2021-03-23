@@ -148,6 +148,21 @@ public class MongoUtil {
 		return testAccountNames.contains(userName);
 	}
 
+	/*
+	 * Make node either start with /r/p/ or ensure that it does NOT start with /r/p
+	 * 
+	 * p=pending, meaning user has not yet saved, and if they cancel the node gets
+	 * orphaned and eventually cleaned up by the system automatically.
+	 */
+	public void setPendingPath(SubNode node, boolean pending) {
+		if (pending && !node.getPath().startsWith("/r/p/")) {
+			node.setPath(node.getPath().replace("/r/", "/r/p/"));
+		}
+		else if (!pending && node.getPath().startsWith("/r/p/")) {
+			node.setPath(node.getPath().replace("/r/p/", "/r/"));
+		}
+	}
+
 	/* Root path will start with '/' and then contain no other slashes */
 	public boolean isRootPath(String path) {
 		return path.startsWith("/") && path.substring(1).indexOf("/") == -1;
@@ -530,10 +545,14 @@ public class MongoUtil {
 		 * directly to it, so we default it to being directly in the server root, which
 		 * is a private node
 		 */
-		// todo-0: oops this works create but DUPLICATES a new node every time, completely breaking the landing page!!!!
-		// SubNode publicWelcome = apiUtil.ensureNodeExists(session, "/" + NodeName.ROOT, NodeName.WELCOME, "welcome-page",
-		// 		"### Welcome Node\n\nDefault landing page content. Admin should edit.", null, true, null, created);
-		// log.debug("Welcome Page Node exists at id: " + publicWelcome.getId() + " path=" + publicWelcome.getPath());
+		// todo-0: oops this works create but DUPLICATES a new node every time,
+		// completely breaking the landing page!!!!
+		// SubNode publicWelcome = apiUtil.ensureNodeExists(session, "/" +
+		// NodeName.ROOT, NodeName.WELCOME, "welcome-page",
+		// "### Welcome Node\n\nDefault landing page content. Admin should edit.", null,
+		// true, null, created);
+		// log.debug("Welcome Page Node exists at id: " + publicWelcome.getId() + "
+		// path=" + publicWelcome.getPath());
 
 		// // ---------------------------------------------------------
 		// // NOTE: Do not delete this. May need this example in the future. This is

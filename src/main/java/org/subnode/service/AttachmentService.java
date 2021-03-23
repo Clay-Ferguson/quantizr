@@ -66,6 +66,7 @@ import org.subnode.mongo.MongoCreate;
 import org.subnode.mongo.MongoRead;
 import org.subnode.mongo.MongoSession;
 import org.subnode.mongo.MongoUpdate;
+import org.subnode.mongo.MongoUtil;
 import org.subnode.mongo.RunAsMongoAdminEx;
 import org.subnode.mongo.model.SubNode;
 import org.subnode.mongo.model.SubNodePropVal;
@@ -108,6 +109,9 @@ public class AttachmentService {
 
 	@Autowired
 	private MongoUpdate update;
+
+	@Autowired
+	private MongoUtil util;
 
 	@Autowired
 	private MongoAuth auth;
@@ -261,6 +265,13 @@ public class AttachmentService {
 				final SubNode newNode = create.createNode(session, node, null, null, null, CreateNodeLocation.LAST,
 						null, null, true);
 				newNode.setContent(fileName);
+
+				/* Note: Since the parent node we're creating under might have a "pending" path (unsaved), which is a path starting
+				withi /r/p/ we have to set this new node to NON pending to change it. It's ok if the user abandons and never saves
+				because this node will get orpaned if it's parent does so we don't need to worry about pending path for this one, 
+				and just can go with non-pending for the correct safe behavior */
+				util.setPendingPath(newNode, false);
+
 				update.save(session, newNode);
 				node = newNode;
 			} catch (final Exception ex) {

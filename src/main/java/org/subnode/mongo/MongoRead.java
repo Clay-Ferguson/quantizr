@@ -311,6 +311,7 @@ public class MongoRead {
         return ret;
     }
 
+    /* WARNING: This always converts a 'pending' path to a non-pending one (/r/p/ v.s. /r/) */
     public SubNode getParent(MongoSession session, SubNode node) {
         String path = node.getPath();
         if ("/".equals(path)) {
