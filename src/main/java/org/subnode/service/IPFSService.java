@@ -164,8 +164,10 @@ public class IPFSService {
 
     public String getRepoGC() {
         String url = API_REPO + "/gc";
-        LinkedHashMap<String, Object> res = Cast.toLinkedHashMap(postForJsonReply(url, LinkedHashMap.class));
-        return "\nIPFS Repository Garbage Collect:\n" + XString.prettyPrint(res) + "\n";
+        // LinkedHashMap<String, Object> res = Cast.toLinkedHashMap(postForJsonReply(url, LinkedHashMap.class));
+        // return "\nIPFS Repository Garbage Collect:\n" + XString.prettyPrint(res) + "\n";
+        String res = (String)postForJsonReply(url, String.class);
+        return "\nIPFS Repository Garbage Collect:\n" + res + "\n";
     }
 
     /* Ensures this node's attachment is saved to IPFS and returns the CID of it */
