@@ -180,12 +180,9 @@ export class App extends Div {
                 // Log.log("Restore ScrollPos (x): " + restoreScrollPos);
                 S.view.docElm.scrollTop = restoreScrollPos;
                 setTimeout(() => {
-                    dispatch({
-                        type: "Action_FastRefresh",
-                        update: (s: AppState): AppState => {
-                            s.savedScrollPosition = -1;
-                            return s;
-                        }
+                    dispatch("Action_FastRefresh", (s: AppState): AppState => {
+                        s.savedScrollPosition = -1;
+                        return s;
                     });
                     // Log.log("Restore ScrollPos (y): " + restoreScrollPos);
                     S.view.docElm.scrollTop = restoreScrollPos;

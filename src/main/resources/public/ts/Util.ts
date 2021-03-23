@@ -1341,12 +1341,9 @@ export class Util implements UtilIntf {
 
     // remove unused arg (todo-1)
     switchBrowsingMode = (state: AppState): void => {
-        dispatch({
-            type: "Action_SwitchBrowsingMode",
-            update: (s: AppState): AppState => {
-                s.mobileMode = !s.mobileMode;
-                return s;
-            }
+        dispatch("Action_SwitchBrowsingMode", (s: AppState): AppState => {
+            s.mobileMode = !s.mobileMode;
+            return s;
         });
     }
 

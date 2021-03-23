@@ -115,26 +115,23 @@ export class UserProfileView extends AppTab {
                 // console.log("UserProfile Response: " + S.util.prettyPrint(res));
                 if (res) {
                     this.bioState.setValue(res.userBio);
-                    dispatch({
-                        type: "Action_InitUserProfile",
-                        update: (s: AppState): AppState => {
-                            // select this tab
-                            s.activeTab = "userProfileTab";
+                    dispatch("Action_InitUserProfile", (s: AppState): AppState => {
+                        // select this tab
+                        s.activeTab = "userProfileTab";
 
-                            s.userProfile = {
-                                userId: res.userNodeId,
-                                userName: res.userName,
-                                avatarVer: res.avatarVer,
-                                headerImageVer: res.headerImageVer,
-                                userNodeId: res.userNodeId,
-                                apIconUrl: res.apIconUrl,
-                                actorUrl: res.actorUrl,
-                                userBio: res.userBio,
-                                readOnly
-                            };
+                        s.userProfile = {
+                            userId: res.userNodeId,
+                            userName: res.userName,
+                            avatarVer: res.avatarVer,
+                            headerImageVer: res.headerImageVer,
+                            userNodeId: res.userNodeId,
+                            apIconUrl: res.apIconUrl,
+                            actorUrl: res.actorUrl,
+                            userBio: res.userBio,
+                            readOnly
+                        };
 
-                            return s;
-                        }
+                        return s;
                     });
                 }
                 resolve();
@@ -151,13 +148,10 @@ export class UserProfileView extends AppTab {
     }
 
     close = (): void => {
-        dispatch({
-            type: "Action_InitUserProfile",
-            update: (s: AppState): AppState => {
-                s.activeTab = "mainTab";
-                s.userProfile = null;
-                return s;
-            }
+        dispatch("Action_InitUserProfile", (s: AppState): AppState => {
+            s.activeTab = "mainTab";
+            s.userProfile = null;
+            return s;
         });
     }
 
@@ -200,13 +194,10 @@ export class UserProfileView extends AppTab {
                     userId: state.userProfile.userId
                 }, (res: J.GetUserProfileResponse): void => {
                     if (res) {
-                        dispatch({
-                            type: "Action_InitUserProfile",
-                            update: (s: AppState): AppState => {
-                                s.userProfile.avatarVer = res.avatarVer;
-                                s.userProfile.userNodeId = res.userNodeId;
-                                return s;
-                            }
+                        dispatch("Action_InitUserProfile", (s: AppState): AppState => {
+                            s.userProfile.avatarVer = res.avatarVer;
+                            s.userProfile.userNodeId = res.userNodeId;
+                            return s;
                         });
                     }
                 });
@@ -260,13 +251,10 @@ export class UserProfileView extends AppTab {
                     userId: state.userProfile.userId
                 }, (res: J.GetUserProfileResponse): void => {
                     if (res) {
-                        dispatch({
-                            type: "Action_InitUserProfile",
-                            update: (s: AppState): AppState => {
-                                s.userProfile.headerImageVer = res.headerImageVer;
-                                s.userProfile.userNodeId = res.userNodeId;
-                                return s;
-                            }
+                        dispatch("Action_InitUserProfile", (s: AppState): AppState => {
+                            s.userProfile.headerImageVer = res.headerImageVer;
+                            s.userProfile.userNodeId = res.userNodeId;
+                            return s;
                         });
                     }
                 });

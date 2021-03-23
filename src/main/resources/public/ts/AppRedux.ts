@@ -41,18 +41,11 @@ export const useAppState = (state?: AppState): AppState => {
     return state || useSelector((s: AppState) => s);
 };
 
-export const dispatch = (action: AppAction) => {
+export const dispatch = (actionName: string, update: (state: AppState) => AppState) => {
     // Log.log("Dispatch Running: " + action.type);
-    store.dispatch(action);
+    store.dispatch({ type: actionName, update });
     // Log.log("Dispatch Complete: " + action.type);
 };
-
-// todo-1: refactor dispatch call to look like this.
-// export const dispatch = (actionName: string, update: (state: AppState) => AppState) => {
-//     // Log.log("Dispatch Running: " + action.type);
-//     store.dispatch({ type: actionName, update });
-//     // Log.log("Dispatch Complete: " + action.type);
-// };
 
 /* This listener is temporary until I find a better way to do this code, which needs to always run after any
 render is complete and AFTER the html DOM is updated/final

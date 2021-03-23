@@ -158,13 +158,10 @@ export class Render implements RenderIntf {
         S.util.ajax<J.RenderCalendarRequest, J.RenderCalendarResponse>("renderCalendar", {
             nodeId
         }, (res: J.RenderCalendarResponse) => {
-            dispatch({
-                type: "Action_ShowCalendar",
-                update: (s: AppState): AppState => {
-                    s.fullScreenCalendarId = nodeId;
-                    s.calendarData = S.util.buildCalendarData(res.items);
-                    return s;
-                }
+            dispatch("Action_ShowCalendar", (s: AppState): AppState => {
+                s.fullScreenCalendarId = nodeId;
+                s.calendarData = S.util.buildCalendarData(res.items);
+                return s;
             });
         });
     }
@@ -295,141 +292,135 @@ export class Render implements RenderIntf {
 
         try {
             // console.log("renderPageFromData: " + S.util.prettyPrint(res));
-            dispatch({
-                type: "Action_RenderPage",
-                update: (s: AppState): AppState => {
-                    // console.log("update state in Action_RenderPage");
+            dispatch("Action_RenderPage", (s: AppState): AppState => {
+                // console.log("update state in Action_RenderPage");
 
-                    if (!s.activeTab || clickTab) {
-                        s.activeTab = "mainTab";
-                    }
-
-                    s.guiReady = true;
-                    s.pageMessage = null;
-
-                    /* Note: This try block is solely to enforce the finally block to happen to guarantee setting s.rendering
-                    back to false, no matter what */
-                    try {
-                        if (res) {
-                            s.node = res.node;
-                            s.endReached = res.endReached;
-                            s.breadcrumbs = res.breadcrumbs;
-                        }
-
-                        s.idToNodeMap = new Map<string, J.NodeInfo>();
-                        if (res) {
-                            S.meta64.updateNodeMap(res.node, s);
-                        }
-
-                        if (targetNodeId) {
-                            // If you access /n/myNodeName we get here with targetNodeId being the name (and not the ID)
-                            // so we have to call getNodeByName() to get the 'id' that goes with that node name.
-                            if (targetNodeId.startsWith(":")) {
-                                targetNodeId = targetNodeId.substring(1);
-                                const foundNode: J.NodeInfo = S.meta64.getNodeByName(res.node, targetNodeId, s);
-                                if (foundNode) {
-                                    targetNodeId = foundNode.id;
-                                }
-                            }
-
-                            S.render.fadeInId = targetNodeId;
-                            s.pendingLocationHash = null;
-                        }
-                        else {
-                            if (!S.render.fadeInId) {
-                                S.render.fadeInId = s.node.id;
-                            }
-                        }
-
-                        s.selectedNodes = {};
-                        if (s.node && !s.isAnonUser) {
-                            S.localDB.setVal(C.LOCALDB_LAST_PARENT_NODEID, s.node.id);
-                            S.localDB.setVal(C.LOCALDB_LAST_CHILD_NODEID, targetNodeId);
-
-                            // do this async just for performance
-                            setTimeout(() => {
-                                S.util.updateHistory(s.node, targetNodeId, s);
-                            }, 10);
-                        }
-
-                        if (this.debug && s.node) {
-                            console.log("RENDER NODE: " + s.node.id);
-                        }
-
-                        if (s.activeTab !== "mainTab") {
-                            allowScroll = false;
-                        }
-
-                        // NOTE: In these blocks we set rendering=true only if we're scrolling so that the user doesn't see
-                        // a jump in position during scroll, but a smooth reveal of the post-scroll location/rendering.
-                        if (s.pendingLocationHash) {
-                            // console.log("highlight: pendingLocationHash");
-                            window.location.hash = s.pendingLocationHash;
-                            // Note: the substring(1) trims the "#" character off.
-                            if (allowScroll) {
-                                // console.log("highlight: pendingLocationHash (allowScroll)");
-                                S.meta64.highlightRowById(s.pendingLocationHash.substring(1), true, s);
-
-                                if (S.meta64.hiddenRenderingEnabled) {
-                                    s.rendering = true;
-                                }
-                            }
-                            s.pendingLocationHash = null;
-                        }
-                        else if (allowScroll && targetNodeId) {
-                            // console.log("highlight: byId");
-                            if (!S.meta64.highlightRowById(targetNodeId, true, s)) {
-                                // anything to do here? didn't find node.
-                            }
-
-                            if (S.meta64.hiddenRenderingEnabled) {
-                                s.rendering = true;
-                            }
-                        } //
-                        else if (allowScroll && (scrollToTop || !S.meta64.getHighlightedNode(s))) {
-                            // console.log("highlight: scrollTop");
-                            S.view.scrollToTop();
-                            if (S.meta64.hiddenRenderingEnabled) {
-                                s.rendering = true;
-                            }
-                        } //
-                        else if (allowScroll) {
-                            // console.log("highlight: scrollToSelected");
-                            S.view.scrollToSelectedNode(s);
-                            if (S.meta64.hiddenRenderingEnabled) {
-                                s.rendering = true;
-                            }
-                        }
-                    }
-                    finally {
-                        if (s.rendering) {
-                            /* This is a tiny timeout yes, but don't remove this timer. We need it or else this won't work. */
-
-                            PubSub.subSingleOnce(C.PUBSUB_postMainWindowScroll, () => {
-                                setTimeout(() => {
-                                    dispatch({
-                                        type: "Action_settingVisible",
-                                        update: (s: AppState): AppState => {
-                                            s.rendering = false;
-                                            this.allowFadeInId = true;
-                                            return s;
-                                        }
-                                    });
-                                },
-                                    /* This delay has to be long enough to be sure scrolling has taken place already
-                                       I'm pretty sure this might work even at 100ms or less on most machines, but I'm leaving room for slower
-                                       browsers, because it's critical that this be long enough, but not long enough to be noticeable.
-                                    */
-                                    300);
-                            });
-                        }
-                        else {
-                            this.allowFadeInId = true;
-                        }
-                    }
-
-                    return s;
+                if (!s.activeTab || clickTab) {
+                    s.activeTab = "mainTab";
                 }
+
+                s.guiReady = true;
+                s.pageMessage = null;
+
+                /* Note: This try block is solely to enforce the finally block to happen to guarantee setting s.rendering
+                back to false, no matter what */
+                try {
+                    if (res) {
+                        s.node = res.node;
+                        s.endReached = res.endReached;
+                        s.breadcrumbs = res.breadcrumbs;
+                    }
+
+                    s.idToNodeMap = new Map<string, J.NodeInfo>();
+                    if (res) {
+                        S.meta64.updateNodeMap(res.node, s);
+                    }
+
+                    if (targetNodeId) {
+                        // If you access /n/myNodeName we get here with targetNodeId being the name (and not the ID)
+                        // so we have to call getNodeByName() to get the 'id' that goes with that node name.
+                        if (targetNodeId.startsWith(":")) {
+                            targetNodeId = targetNodeId.substring(1);
+                            const foundNode: J.NodeInfo = S.meta64.getNodeByName(res.node, targetNodeId, s);
+                            if (foundNode) {
+                                targetNodeId = foundNode.id;
+                            }
+                        }
+
+                        S.render.fadeInId = targetNodeId;
+                        s.pendingLocationHash = null;
+                    }
+                    else {
+                        if (!S.render.fadeInId) {
+                            S.render.fadeInId = s.node.id;
+                        }
+                    }
+
+                    s.selectedNodes = {};
+                    if (s.node && !s.isAnonUser) {
+                        S.localDB.setVal(C.LOCALDB_LAST_PARENT_NODEID, s.node.id);
+                        S.localDB.setVal(C.LOCALDB_LAST_CHILD_NODEID, targetNodeId);
+
+                        // do this async just for performance
+                        setTimeout(() => {
+                            S.util.updateHistory(s.node, targetNodeId, s);
+                        }, 10);
+                    }
+
+                    if (this.debug && s.node) {
+                        console.log("RENDER NODE: " + s.node.id);
+                    }
+
+                    if (s.activeTab !== "mainTab") {
+                        allowScroll = false;
+                    }
+
+                    // NOTE: In these blocks we set rendering=true only if we're scrolling so that the user doesn't see
+                    // a jump in position during scroll, but a smooth reveal of the post-scroll location/rendering.
+                    if (s.pendingLocationHash) {
+                        // console.log("highlight: pendingLocationHash");
+                        window.location.hash = s.pendingLocationHash;
+                        // Note: the substring(1) trims the "#" character off.
+                        if (allowScroll) {
+                            // console.log("highlight: pendingLocationHash (allowScroll)");
+                            S.meta64.highlightRowById(s.pendingLocationHash.substring(1), true, s);
+
+                            if (S.meta64.hiddenRenderingEnabled) {
+                                s.rendering = true;
+                            }
+                        }
+                        s.pendingLocationHash = null;
+                    }
+                    else if (allowScroll && targetNodeId) {
+                        // console.log("highlight: byId");
+                        if (!S.meta64.highlightRowById(targetNodeId, true, s)) {
+                            // anything to do here? didn't find node.
+                        }
+
+                        if (S.meta64.hiddenRenderingEnabled) {
+                            s.rendering = true;
+                        }
+                    } //
+                    else if (allowScroll && (scrollToTop || !S.meta64.getHighlightedNode(s))) {
+                        // console.log("highlight: scrollTop");
+                        S.view.scrollToTop();
+                        if (S.meta64.hiddenRenderingEnabled) {
+                            s.rendering = true;
+                        }
+                    } //
+                    else if (allowScroll) {
+                        // console.log("highlight: scrollToSelected");
+                        S.view.scrollToSelectedNode(s);
+                        if (S.meta64.hiddenRenderingEnabled) {
+                            s.rendering = true;
+                        }
+                    }
+                }
+                finally {
+                    if (s.rendering) {
+                        /* This is a tiny timeout yes, but don't remove this timer. We need it or else this won't work. */
+
+                        PubSub.subSingleOnce(C.PUBSUB_postMainWindowScroll, () => {
+                            setTimeout(() => {
+                                dispatch("Action_settingVisible", (s: AppState): AppState => {
+                                    s.rendering = false;
+                                    this.allowFadeInId = true;
+                                    return s;
+                                });
+                            },
+                                /* This delay has to be long enough to be sure scrolling has taken place already
+                                   I'm pretty sure this might work even at 100ms or less on most machines, but I'm leaving room for slower
+                                   browsers, because it's critical that this be long enough, but not long enough to be noticeable.
+                                */
+                                300);
+                        });
+                    }
+                    else {
+                        this.allowFadeInId = true;
+                    }
+                }
+
+                return s;
             });
         }
         catch (err) {
@@ -549,13 +540,10 @@ export class Render implements RenderIntf {
             node = S.meta64.getHighlightedNode(state);
         }
 
-        dispatch({
-            type: "Action_ShowGraph",
-            update: (s: AppState): AppState => {
-                s.fullScreenGraphId = node.id;
-                s.graphSearchText = searchText;
-                return s;
-            }
+        dispatch("Action_ShowGraph", (s: AppState): AppState => {
+            s.fullScreenGraphId = node.id;
+            s.graphSearchText = searchText;
+            return s;
         });
     }
 }

@@ -148,7 +148,7 @@ public class MongoUpdate {
 					}
 				}
 			}
-			ret.setVal("Pins in use: " + pinCount + "\nOrphan Pins removed: " + orphanCount);
+			ret.setVal("Pins in use: " + pinCount + "\nOrphan Pins removed: " + orphanCount + "\n");
 			log.debug(ret.getVal());
 		});
 		return ret.getVal();

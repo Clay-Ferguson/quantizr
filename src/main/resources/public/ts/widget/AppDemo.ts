@@ -22,12 +22,9 @@ export class AppDemo extends Div {
             new HorizontalLayout([
                 new Button("Inc AppState.counter=" + state.counter + " compDemoIdActive=" + state.compDemoIdActive, () => {
                     Comp.renderCounter = 0;
-                    dispatch({
-                        type: "Action_DemoAppIncCounter",
-                        update: (s: AppState): AppState => {
-                            s.counter++;
-                            return s;
-                        }
+                    dispatch("Action_DemoAppIncCounter", (s: AppState): AppState => {
+                        s.counter++;
+                        return s;
                     });
                 })
             ]),

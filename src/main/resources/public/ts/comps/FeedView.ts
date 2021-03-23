@@ -145,12 +145,9 @@ export class FeedView extends AppTab {
 
     static refresh = () => {
         FeedView.page = 0;
-        dispatch({
-            type: "Action_SetFeedFilterType",
-            update: (s: AppState): AppState => {
-                s.feedLoading = true;
-                return s;
-            }
+        dispatch("Action_SetFeedFilterType", (s: AppState): AppState => {
+            s.feedLoading = true;
+            return s;
         });
 
         S.srch.feed("~" + J.NodeType.FRIEND_LIST, null, FeedView.page, FeedView.searchTextState.getValue());
@@ -162,13 +159,10 @@ export class FeedView extends AppTab {
                 title: "Include Nodes posted by your friends"
             }, {
                 setValue: (checked: boolean): void => {
-                    dispatch({
-                        type: "Action_SetFeedFilterType",
-                        update: (s: AppState): AppState => {
-                            s.feedWaitingForUserRefresh = !this.realtimeCheckboxes;
-                            s.feedFilterFriends = checked;
-                            return s;
-                        }
+                    dispatch("Action_SetFeedFilterType", (s: AppState): AppState => {
+                        s.feedWaitingForUserRefresh = !this.realtimeCheckboxes;
+                        s.feedFilterFriends = checked;
+                        return s;
                     });
 
                     if (this.realtimeCheckboxes) {
@@ -185,13 +179,10 @@ export class FeedView extends AppTab {
                 title: "Include Nodes shares specifically to you"
             }, {
                 setValue: (checked: boolean): void => {
-                    dispatch({
-                        type: "Action_SetFeedFilterType",
-                        update: (s: AppState): AppState => {
-                            s.feedWaitingForUserRefresh = !this.realtimeCheckboxes;
-                            s.feedFilterToMe = checked;
-                            return s;
-                        }
+                    dispatch("Action_SetFeedFilterType", (s: AppState): AppState => {
+                        s.feedWaitingForUserRefresh = !this.realtimeCheckboxes;
+                        s.feedFilterToMe = checked;
+                        return s;
                     });
 
                     if (this.realtimeCheckboxes) {
@@ -208,13 +199,10 @@ export class FeedView extends AppTab {
                 title: "Include Nodes created by you"
             }, {
                 setValue: (checked: boolean): void => {
-                    dispatch({
-                        type: "Action_SetFeedFilterType",
-                        update: (s: AppState): AppState => {
-                            s.feedWaitingForUserRefresh = !this.realtimeCheckboxes;
-                            s.feedFilterFromMe = checked;
-                            return s;
-                        }
+                    dispatch("Action_SetFeedFilterType", (s: AppState): AppState => {
+                        s.feedWaitingForUserRefresh = !this.realtimeCheckboxes;
+                        s.feedFilterFromMe = checked;
+                        return s;
                     });
 
                     if (this.realtimeCheckboxes) {
@@ -231,13 +219,10 @@ export class FeedView extends AppTab {
                 title: "Include Nodes shared to 'Public' (everyone)"
             }, {
                 setValue: (checked: boolean): void => {
-                    dispatch({
-                        type: "Action_SetFeedFilterType",
-                        update: (s: AppState): AppState => {
-                            s.feedWaitingForUserRefresh = !this.realtimeCheckboxes;
-                            s.feedFilterToPublic = checked;
-                            return s;
-                        }
+                    dispatch("Action_SetFeedFilterType", (s: AppState): AppState => {
+                        s.feedWaitingForUserRefresh = !this.realtimeCheckboxes;
+                        s.feedFilterToPublic = checked;
+                        return s;
                     });
 
                     if (this.realtimeCheckboxes) {
@@ -254,13 +239,10 @@ export class FeedView extends AppTab {
                 title: "Include NSFW Content (Allows material flagged as 'Sensitive')"
             }, {
                 setValue: (checked: boolean): void => {
-                    dispatch({
-                        type: "Action_SetFeedFilterType",
-                        update: (s: AppState): AppState => {
-                            s.feedWaitingForUserRefresh = !this.realtimeCheckboxes;
-                            s.feedFilterNSFW = checked;
-                            return s;
-                        }
+                    dispatch("Action_SetFeedFilterType", (s: AppState): AppState => {
+                        s.feedWaitingForUserRefresh = !this.realtimeCheckboxes;
+                        s.feedFilterNSFW = checked;
+                        return s;
                     });
 
                     if (this.realtimeCheckboxes) {

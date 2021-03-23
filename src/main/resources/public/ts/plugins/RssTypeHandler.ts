@@ -142,41 +142,35 @@ export class RssTypeHandler extends TypeBase {
                 if (!feed) {
                     // new MessageDlg(err.message || "RSS Feed failed to load.", "Warning", null, null, false, 0, state).open();
                     // console.log(err.message || "RSS Feed failed to load.");
-                    dispatch({
-                        type: "Action_RSSUpdated",
-                        update: (s: AppState): AppState => {
-                            s.feedCache[feedSrcHash] = "failed";
-                            return s;
-                        }
+                    dispatch("Action_RSSUpdated", (s: AppState): AppState => {
+                        s.feedCache[feedSrcHash] = "failed";
+                        return s;
                     });
                 }
                 else {
-                    dispatch({
-                        type: "Action_RSSUpdated",
-                        update: (s: AppState): AppState => {
-                            if (!feed.items || feed.items.length === 0) {
-                                s.feedCache[feedSrcHash] = RssTypeHandler.lastGoodFeed;
-                                s.feedPage[feedSrcHash] = RssTypeHandler.lastGoodPage;
-                                setTimeout(() => {
-                                    S.util.showMessage("No more RSS items found.", "RSS");
-                                }, 250);
-                            }
-                            else {
-                                s.feedCache[feedSrcHash] = feed;
-                                RssTypeHandler.lastGoodFeed = feed;
-                                RssTypeHandler.lastGoodPage = s.feedPage[feedSrcHash];
-                            }
-
+                    dispatch("Action_RSSUpdated", (s: AppState): AppState => {
+                        if (!feed.items || feed.items.length === 0) {
+                            s.feedCache[feedSrcHash] = RssTypeHandler.lastGoodFeed;
+                            s.feedPage[feedSrcHash] = RssTypeHandler.lastGoodPage;
                             setTimeout(() => {
-                                // Log.log("docElm.scrollTop (2)");
-                                S.view.docElm.scrollTop = 0;
-                                // finally this is working with 2 second delay here. Not sure
-                                // what controls the min here. I 'think' CPU power may be the controlling factor
-                                // but it might be something else. Leaving as 2secs for now.
-                            }, 2000);
-
-                            return s;
+                                S.util.showMessage("No more RSS items found.", "RSS");
+                            }, 250);
                         }
+                        else {
+                            s.feedCache[feedSrcHash] = feed;
+                            RssTypeHandler.lastGoodFeed = feed;
+                            RssTypeHandler.lastGoodPage = s.feedPage[feedSrcHash];
+                        }
+
+                        setTimeout(() => {
+                            // Log.log("docElm.scrollTop (2)");
+                            S.view.docElm.scrollTop = 0;
+                            // finally this is working with 2 second delay here. Not sure
+                            // what controls the min here. I 'think' CPU power may be the controlling factor
+                            // but it might be something else. Leaving as 2secs for now.
+                        }, 2000);
+
+                        return s;
                     });
                 }
             });
@@ -295,14 +289,11 @@ export class RssTypeHandler extends TypeBase {
     }
 
     setPage = (feedSrcHash: string, state: AppState, page: number) => {
-        dispatch({
-            type: "Action_RSSUpdated",
-            update: (s: AppState): AppState => {
-                // deleting will force a requery from the server
-                delete s.feedCache[feedSrcHash];
-                s.feedPage[feedSrcHash] = page;
-                return s;
-            }
+        dispatch("Action_RSSUpdated", (s: AppState): AppState => {
+            // deleting will force a requery from the server
+            delete s.feedCache[feedSrcHash];
+            s.feedPage[feedSrcHash] = page;
+            return s;
         });
     }
 

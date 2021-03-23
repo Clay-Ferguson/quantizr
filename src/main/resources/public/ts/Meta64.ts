@@ -112,17 +112,14 @@ export class Meta64 implements Meta64Intf {
         */
         // if (state.activeTab==tabName) return;
 
-        dispatch({
-            type: "Action_SelectTab",
-            update: (s: AppState): AppState => {
-                if (tabName === "mainTab" && !s.node) {
-                    S.nav.navHome(s);
-                }
-                else {
-                    s.activeTab = tabName;
-                }
-                return s;
+        dispatch("Action_SelectTab", (s: AppState): AppState => {
+            if (tabName === "mainTab" && !s.node) {
+                S.nav.navHome(s);
             }
+            else {
+                s.activeTab = tabName;
+            }
+            return s;
         });
     }
 
@@ -191,12 +188,9 @@ export class Meta64 implements Meta64Intf {
 
     clearSelNodes = (state: AppState = null) => {
         state = appState(state);
-        dispatch({
-            type: "Action_ClearSelections",
-            update: (s: AppState): AppState => {
-                s.selectedNodes = {};
-                return s;
-            }
+        dispatch("Action_ClearSelections", (s: AppState): AppState => {
+            s.selectedNodes = {};
+            return s;
         });
     }
 
@@ -506,24 +500,18 @@ export class Meta64 implements Meta64Intf {
 
     enableMouseEffect = async () => {
         let mouseEffect = await S.localDB.getVal(C.LOCALDB_MOUSE_EFFECT, "allUsers");
-        dispatch({
-            type: "Action_ToggleMouseEffect",
-            update: (s: AppState): AppState => {
-                s.mouseEffect = mouseEffect === "1";
-                return s;
-            }
+        dispatch("Action_ToggleMouseEffect", (s: AppState): AppState => {
+            s.mouseEffect = mouseEffect === "1";
+            return s;
         });
     }
 
     /* #mouseEffects (do not delete tag) */
     toggleMouseEffect = () => {
-        dispatch({
-            type: "Action_ToggleMouseEffect",
-            update: (s: AppState): AppState => {
-                s.mouseEffect = !s.mouseEffect;
-                S.localDB.setVal(C.LOCALDB_MOUSE_EFFECT, s.mouseEffect ? "1" : "0", "allUsers");
-                return s;
-            }
+        dispatch("Action_ToggleMouseEffect", (s: AppState): AppState => {
+            s.mouseEffect = !s.mouseEffect;
+            S.localDB.setVal(C.LOCALDB_MOUSE_EFFECT, s.mouseEffect ? "1" : "0", "allUsers");
+            return s;
         });
     }
 
@@ -688,33 +676,30 @@ export class Meta64 implements Meta64Intf {
     setStateVarsUsingLoginResponse = (res: J.LoginResponse): void => {
         if (!res) return;
 
-        dispatch({
-            type: "Action_LoginResponse",
-            update: (s: AppState): AppState => {
-                if (res.rootNode) {
-                    s.homeNodeId = res.rootNode;
-                    s.homeNodePath = res.rootNodePath;
-                }
-                s.userName = res.userName;
-                s.isAdminUser = res.userName === "admin";
-                s.isAnonUser = res.userName === J.PrincipalName.ANON;
-
-                console.log("LoginResponse userName = " + res.userName);
-
-                if (s.isAdminUser) {
-                    LogView.showLogs = true;
-                }
-
-                // bash scripting is an experimental feature, and i'll only enable for admin for now, until i'm
-                // sure i'm keeping this feature.
-                s.allowBashScripting = false;
-
-                s.anonUserLandingPageNode = res.anonUserLandingPageNode;
-                s.allowFileSystemSearch = res.allowFileSystemSearch;
-                s.userPreferences = res.userPreferences;
-                s.title = !s.isAnonUser ? res.userName : "";
-                return s;
+        dispatch("Action_LoginResponse", (s: AppState): AppState => {
+            if (res.rootNode) {
+                s.homeNodeId = res.rootNode;
+                s.homeNodePath = res.rootNodePath;
             }
+            s.userName = res.userName;
+            s.isAdminUser = res.userName === "admin";
+            s.isAnonUser = res.userName === J.PrincipalName.ANON;
+
+            console.log("LoginResponse userName = " + res.userName);
+
+            if (s.isAdminUser) {
+                LogView.showLogs = true;
+            }
+
+            // bash scripting is an experimental feature, and i'll only enable for admin for now, until i'm
+            // sure i'm keeping this feature.
+            s.allowBashScripting = false;
+
+            s.anonUserLandingPageNode = res.anonUserLandingPageNode;
+            s.allowFileSystemSearch = res.allowFileSystemSearch;
+            s.userPreferences = res.userPreferences;
+            s.title = !s.isAnonUser ? res.userName : "";
+            return s;
         });
     }
 

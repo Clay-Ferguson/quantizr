@@ -100,12 +100,9 @@ export class Edit implements EditIntf {
     /* nodeId is optional and represents what to highlight after the paste if anything */
     private moveNodesResponse = (res: J.MoveNodesResponse, nodeId: string, state: AppState): void => {
         if (S.util.checkSuccess("Move nodes", res)) {
-            dispatch({
-                type: "Action_SetNodesToMove",
-                update: (s: AppState): AppState => {
-                    s.nodesToMove = null;
-                    return s;
-                }
+            dispatch("Action_SetNodesToMove", (s: AppState): AppState => {
+                s.nodesToMove = null;
+                return s;
             });
 
             S.view.refreshTree(null, false, false, nodeId, false, true, true, state);
@@ -284,12 +281,9 @@ export class Edit implements EditIntf {
         state.userPreferences.editMode = !state.userPreferences.editMode;
         S.meta64.saveUserPreferences(state);
 
-        dispatch({
-            type: "Action_SetUserPreferences",
-            update: (s: AppState): AppState => {
-                s.userPreferences = state.userPreferences;
-                return s;
-            }
+        dispatch("Action_SetUserPreferences", (s: AppState): AppState => {
+            s.userPreferences = state.userPreferences;
+            return s;
         });
     }
 
@@ -297,12 +291,9 @@ export class Edit implements EditIntf {
         state.userPreferences.showMetaData = !state.userPreferences.showMetaData;
         S.meta64.saveUserPreferences(state);
 
-        dispatch({
-            type: "Action_SetUserPreferences",
-            update: (s: AppState): AppState => {
-                s.userPreferences = state.userPreferences;
-                return s;
-            }
+        dispatch("Action_SetUserPreferences", (s: AppState): AppState => {
+            s.userPreferences = state.userPreferences;
+            return s;
         });
     }
 
@@ -597,11 +588,8 @@ export class Edit implements EditIntf {
             appState.calendarData = appState.calendarData.filter((item: EventInput) => item.id !== id);
         });
 
-        dispatch({
-            type: "Action_UpdateCalendarData",
-            update: (s: AppState): AppState => {
-                return appState;
-            }
+        dispatch("Action_UpdateCalendarData", (s: AppState): AppState => {
+            return appState;
         });
     }
 
@@ -640,27 +628,21 @@ export class Edit implements EditIntf {
     }
 
     undoCutSelNodes = (): void => {
-        dispatch({
-            type: "Action_SetNodesToMove",
-            update: (s: AppState): AppState => {
-                s.nodesToMove = null;
-                return s;
-            }
+        dispatch("Action_SetNodesToMove", (s: AppState): AppState => {
+            s.nodesToMove = null;
+            return s;
         });
     }
 
     cutSelNodes = (evt: Event, id: string): void => {
         id = S.util.allowIdFromEvent(evt, null);
 
-        dispatch({
-            type: "Action_SetNodesToMove",
-            update: (s: AppState): AppState => {
-                S.nav.setNodeSel(true, id, s);
-                let selNodesArray = S.meta64.getSelNodeIdsArray(s);
-                s.nodesToMove = selNodesArray;
-                s.selectedNodes = {};
-                return s;
-            }
+        dispatch("Action_SetNodesToMove", (s: AppState): AppState => {
+            S.nav.setNodeSel(true, id, s);
+            let selNodesArray = S.meta64.getSelNodeIdsArray(s);
+            s.nodesToMove = selNodesArray;
+            s.selectedNodes = {};
+            return s;
         });
     }
 

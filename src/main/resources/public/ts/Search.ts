@@ -41,29 +41,22 @@ export class Search implements SearchIntf {
     }
 
     searchNodesResponse = (res: J.NodeSearchResponse, searchDescription: string, isUserSearch: boolean) => {
-        dispatch({
-            type: "Action_RenderSearchResults",
-            update: (s: AppState): AppState => {
-                s.searchResults = res.searchResults;
-                s.isUserSearch = isUserSearch;
-                s.searchDescription = searchDescription;
-                return s;
-            }
+        dispatch("Action_RenderSearchResults", (s: AppState): AppState => {
+            s.searchResults = res.searchResults;
+            s.isUserSearch = isUserSearch;
+            s.searchDescription = searchDescription;
+            S.meta64.selectTab("searchTab");
+            return s;
         });
-
-        S.meta64.selectTab("searchTab");
     }
 
     timelineResponse = (res: J.NodeSearchResponse, timelineDescription: string) => {
-        dispatch({
-            type: "Action_RenderTimelineResults",
-            update: (s: AppState): AppState => {
-                s.timelineResults = res.searchResults;
-                s.timelineDescription = timelineDescription;
-                return s;
-            }
+        dispatch("Action_RenderTimelineResults", (s: AppState): AppState => {
+            s.timelineResults = res.searchResults;
+            s.timelineDescription = timelineDescription;
+            S.meta64.selectTab("timelineTab");
+            return s;
         });
-        S.meta64.selectTab("timelineTab");
     }
 
     searchFilesResponse = (res: J.FileSearchResponse, state: AppState) => {
@@ -117,21 +110,18 @@ export class Search implements SearchIntf {
     }
 
     feedResponse = (res: J.NodeFeedResponse) => {
-        dispatch({
-            type: "Action_RenderFeedResults",
-            update: (s: AppState): AppState => {
-                // s.feedResults = S.meta64.removeRedundantFeedItems(res.searchResults || []);
-                s.guiReady = true;
-                s.feedResults = res.searchResults;
-                s.feedEndReached = res.endReached;
-                s.feedDirty = false;
-                s.feedLoading = false;
-                s.feedWaitingForUserRefresh = false;
-                return s;
-            }
+        dispatch("Action_RenderFeedResults", (s: AppState): AppState => {
+            // s.feedResults = S.meta64.removeRedundantFeedItems(res.searchResults || []);
+            s.guiReady = true;
+            s.feedResults = res.searchResults;
+            s.feedEndReached = res.endReached;
+            s.feedDirty = false;
+            s.feedLoading = false;
+            s.feedWaitingForUserRefresh = false;
+            S.meta64.selectTab("feedTab");
+            S.view.scrollToTop();
+            return s;
         });
-        S.meta64.selectTab("feedTab");
-        S.view.scrollToTop();
     }
 
     initSearchNode = (node: J.NodeInfo) => {

@@ -114,12 +114,9 @@ export abstract class DialogBase<S extends BaseCompState = any> extends Div<S> i
                 }
             }
             else {
-                dispatch({
-                    type: "Action_OpenDialog",
-                    update: (s: AppState): AppState => {
-                        s.dialogStack.push(this);
-                        return s;
-                    }
+                dispatch("Action_OpenDialog", (s: AppState): AppState => {
+                    s.dialogStack.push(this);
+                    return s;
                 });
             }
 
@@ -162,15 +159,12 @@ export abstract class DialogBase<S extends BaseCompState = any> extends Div<S> i
             }
         }
         else {
-            dispatch({
-                type: "Action_CloseDialog",
-                update: (s: AppState): AppState => {
-                    const index = s.dialogStack.indexOf(this);
-                    if (index > -1) {
-                        s.dialogStack.splice(index, 1);
-                    }
-                    return s;
+            dispatch("Action_CloseDialog", (s: AppState): AppState => {
+                const index = s.dialogStack.indexOf(this);
+                if (index > -1) {
+                    s.dialogStack.splice(index, 1);
                 }
+                return s;
             });
         }
     }

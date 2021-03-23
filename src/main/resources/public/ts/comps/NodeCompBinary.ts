@@ -75,21 +75,18 @@ export class NodeCompBinary extends Div {
         id = S.util.allowIdFromEvent(evt, id);
         if (this.isEditorEmbed) return;
 
-        dispatch({
-            type: "Action_ClickImage",
-            update: (s: AppState): AppState => {
-                /* When we click to enlarge an image we need to save the current scroll position
-                after we close the image. */
-                if (s.savedScrollPosition === -1) {
-                    s.savedScrollPosition = window.scrollY;
-                    // console.log("Saved ScrollPos: " + s.savedScrollPosition);
-                }
-                if (s.fullScreenViewId && this.isFullScreenEmbed) {
-                    s.fullScreenImageSize = s.fullScreenImageSize ? "" : "100%";
-                }
-                s.fullScreenViewId = id;
-                return s;
+        dispatch("Action_ClickImage", (s: AppState): AppState => {
+            /* When we click to enlarge an image we need to save the current scroll position
+            after we close the image. */
+            if (s.savedScrollPosition === -1) {
+                s.savedScrollPosition = window.scrollY;
+                // console.log("Saved ScrollPos: " + s.savedScrollPosition);
             }
+            if (s.fullScreenViewId && this.isFullScreenEmbed) {
+                s.fullScreenImageSize = s.fullScreenImageSize ? "" : "100%";
+            }
+            s.fullScreenViewId = id;
+            return s;
         });
     }
 

@@ -65,12 +65,9 @@ export class Nav implements NavIntf {
 
     upLevelResponse = (res: J.RenderNodeResponse, id: string, scrollToTop: boolean, state: AppState): void => {
         if (!res || !res.node || res.errorType === J.ErrorType.AUTH) {
-            dispatch({
-                type: "Action_ShowPageMessage",
-                update: (s: AppState): AppState => {
-                    s.pageMessage = "The node above is not shared.";
-                    return s;
-                }
+            dispatch("Action_ShowPageMessage", (s: AppState): AppState => {
+                s.pageMessage = "The node above is not shared.";
+                return s;
             });
         } else {
             S.render.renderPageFromData(res, scrollToTop, id, true, true);
@@ -190,11 +187,8 @@ export class Nav implements NavIntf {
         // todo-1: without this timeout checkboxes on main tab don't work reliably. Need their state stored in global state to fix it
         // in a good way.
         setTimeout(() => {
-            dispatch({
-                type: "Action_FastRefresh",
-                update: (s: AppState): AppState => {
-                    return s;
-                }
+            dispatch("Action_FastRefresh", (s: AppState): AppState => {
+                return s;
             });
         }, 100);
     }
@@ -307,14 +301,11 @@ export class Nav implements NavIntf {
     }
 
     closeFullScreenViewer = (appState: AppState): void => {
-        dispatch({
-            type: "Action_CloseFullScreenViewer",
-            update: (s: AppState): AppState => {
-                s.fullScreenViewId = null;
-                s.fullScreenGraphId = null;
-                s.fullScreenCalendarId = null;
-                return s;
-            }
+        dispatch("Action_CloseFullScreenViewer", (s: AppState): AppState => {
+            s.fullScreenViewId = null;
+            s.fullScreenGraphId = null;
+            s.fullScreenCalendarId = null;
+            return s;
         });
     }
 
@@ -322,12 +313,9 @@ export class Nav implements NavIntf {
         const prevNode: J.NodeInfo = this.getAdjacentNode("prev", appState);
 
         if (prevNode) {
-            dispatch({
-                type: "Action_PrevFullScreenImgViewer",
-                update: (s: AppState): AppState => {
-                    s.fullScreenViewId = prevNode.id;
-                    return s;
-                }
+            dispatch("Action_PrevFullScreenImgViewer", (s: AppState): AppState => {
+                s.fullScreenViewId = prevNode.id;
+                return s;
             });
         }
     }
@@ -336,12 +324,9 @@ export class Nav implements NavIntf {
         const nextNode: J.NodeInfo = this.getAdjacentNode("next", appState);
 
         if (nextNode) {
-            dispatch({
-                type: "Action_NextFullScreenImgViewer",
-                update: (s: AppState): AppState => {
-                    s.fullScreenViewId = nextNode.id;
-                    return s;
-                }
+            dispatch("Action_NextFullScreenImgViewer", (s: AppState): AppState => {
+                s.fullScreenViewId = nextNode.id;
+                return s;
             });
         }
     }

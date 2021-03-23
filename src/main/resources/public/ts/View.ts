@@ -152,11 +152,8 @@ export class View implements ViewIntf {
         }
 
         if (newNode) {
-            dispatch({
-                type: "Action_FastRefresh",
-                update: (s: AppState): AppState => {
-                    return s;
-                }
+            dispatch("Action_FastRefresh", (s: AppState): AppState => {
+                return s;
             });
         }
     }

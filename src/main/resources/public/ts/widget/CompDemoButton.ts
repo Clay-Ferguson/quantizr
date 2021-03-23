@@ -30,12 +30,9 @@ export class CompDemoButton extends Div {
                     // this.setStateEx({ counter: ++cstate.counter, cstate.idx });
                     this.mergeState({ counter: ++cstate.counter });
 
-                    dispatch({
-                        type: "Action_DemoAppIncCounter",
-                        update: (s: AppState): AppState => {
-                            s.compDemoIdActive = cstate.idx;
-                            return s;
-                        }
+                    dispatch("Action_DemoAppIncCounter", (s: AppState): AppState => {
+                        s.compDemoIdActive = cstate.idx;
+                        return s;
                     });
                 }
             })
