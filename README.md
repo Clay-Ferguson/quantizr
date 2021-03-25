@@ -40,9 +40,13 @@ https://quanta.wiki
 
 ## Fun Links to get you started
 
-https://quanta.wiki/n/screencast
+#### [Demo Videos showing Quanta platform in action](https://quanta.wiki/n/screencast)
 
-https://quanta.wiki/app?tab=feed
+#### [A curated Fediverse Feed - Some News Bots, some people](https://quanta.wiki/app?tab=feed)
+
+#### [RSS New Feeds - Curated Aggregate](https://quanta.wiki/n/news)
+
+#### [Podcasts - Curated Aggregate](https://quanta.wiki/n/podcasts)
 
 ## How to Build the App
 
