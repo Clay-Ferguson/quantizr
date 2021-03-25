@@ -1,4 +1,4 @@
-![Quanta Logo](https://quanta.wiki/images/eagle-logo-250px-tr.jpg)
+![Quanta Logo](https://quanta.wiki/branding/logo-250px-tr.jpg)
 
 # Quanta Web Platform
 
