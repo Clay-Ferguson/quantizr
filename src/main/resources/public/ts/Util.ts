@@ -109,8 +109,6 @@ export class Util implements UtilIntf {
             return func;
         }
 
-        // todo-0: now that I have this capturing 'evt' I think I can switch back
-        // to fat arrows and it should work fine.
         return (evt: any) => {
             setTimeout(() => {
                 // func.apply(this, arguments);

@@ -14,8 +14,8 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
 /* General Widget that doesn't fit any more reusable or specific category other than a plain Div, but inherits capability of Comp class */
 export class NodeCompMarkdown extends Html {
 
-    // This flag makes encrypted text always decrypt and display immediately. Setting to true works, but the markdown rendering part is
-    // not working and it shows up without markdown formatting. Will fix later (todo-2)
+    /* todo-0: WARNING: decryption is currently failing as of 03/2021 for shared nodes (people shared to cannot decrypt), and only works for the current user who owns the node.
+    not sure when the bug appeared. */
     private autoDecrypting: boolean = false;
 
     constructor(public node: J.NodeInfo, private appState: AppState) {
@@ -30,10 +30,12 @@ export class NodeCompMarkdown extends Html {
         let att: any = {
         };
 
+        /* If this content is encrypted we set it in 'pendingDecrypt' to decrypt it asynchronously */
         if (content.startsWith(J.Constant.ENC_TAG)) {
             att.content = "[Encrypted]";
             att.pendingDecrypt = content;
         }
+        /* otherwise it's not encrypted and we display the normal way */
         else {
             let val = this.renderRawMarkdown(node);
             val = S.render.injectSubstitutions(node, val);
@@ -110,19 +112,22 @@ export class NodeCompMarkdown extends Html {
         if (!state.pendingDecrypt) return;
         let appState: AppState = store.getState();
 
-        // todo-2: for performance we could create a map of the hash of the encrypted content (key) to the
-        // decrypted text (val), and hold that map so that once we decrypt a message we never use encryption again at least
-        // until of course browser refresh
         let cipherText = state.pendingDecrypt.substring(J.Constant.ENC_TAG.length);
-        // console.log("decrypting CIPHERTEXT: " + cipherText);
+        // console.log("decrypting CIPHERTEXT (in NodeCompMarkdown): " + cipherText);
 
         let cipherKey = S.props.getCryptoKey(this.node, appState);
         if (cipherKey) {
+            // console.log("CIPHERKEY " + cipherKey);
             let clearText: string = await S.encryption.decryptSharableString(null, { cipherKey, cipherText });
 
             if (clearText === null) {
                 clearText = "[Decrypt Failed]";
             }
+
+            // todo-0: verify markdown is preserved and rendered correctly (this code probably will do it)
+            // let val = this.renderRawMarkdown(node);
+            // val = S.render.injectSubstitutions(node, val);
+            // att.content = val;
 
             this.mergeState({
                 content: clearText,

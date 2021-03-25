@@ -538,7 +538,7 @@ export class Encryption implements EncryptionIntf {
             }
 
             try {
-                // console.log("decrypting with cipherKey: " + skpd.cipherKey);
+                // console.log("decrypting [" + skpd.cipherText + "] with cipherKey: " + skpd.cipherKey);
                 if (!privateKey) {
                     privateKey = await this.getPrivateKey();
                 }

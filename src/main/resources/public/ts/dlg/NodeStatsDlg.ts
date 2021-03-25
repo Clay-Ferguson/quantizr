@@ -40,7 +40,7 @@ export class NodeStatsDlg extends DialogBase {
             });
         }
 
-        // todo-0: I'm disabling this for now, becaus eI saw it show suspicously few results on the Fediverse tab
+        // todo-0: I'm disabling this for now, because I saw it show suspicously few results on the Fediverse tab
         // and I don't have time to troubleshoot this now, so I'd rather hide it than not know if it's correct or not (for now)
         let mentionPanel = null;
         // mentionPanel new Div(null, { className: "wordStatsArea" });
