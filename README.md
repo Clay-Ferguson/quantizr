@@ -2,43 +2,21 @@
 
 # Quanta Web Platform
 
-Welcome to the Fediverse! Join the Fediverse!
+### Social Media and Content Mangement/Publishing App
 
-Quanta is a new kind of decentralized and federated social media platform. Connect to the Fediverse with unique and powerful features like wikis, blogging, document collaboration, conversation threads, encrypted secure messaging, video/audio recording & sharing, file sharing, a podcatcher, and much more.
+Join the Fediverse!
 
-Create hierarchically organized content text, documents, images, audio and video that's always editable, shareable on the Fediverse, and saved on IPFS.
+A new kind of decentralized and federated social media and content management platform. Connect to the Fediverse with unique and powerful features like wikis, blogging, document collaboration, conversation threads, encrypted secure messaging, video/audio recording & sharing, file sharing, a podcatcher, and much more.
 
-Quanta is a content publishing/hosting platform where everything exists on a tree-structured database and each user owns a branch on this global tree which can be shared with other users. Each piece of data on the tree is called a "Node", and each node has it's own unique URL, and can markdown text (and/or images and arbitrary file attachments) and can be shared to specific other users or made public. A node can represent anything from a full document to just a paragraph, or even one sentence of content, and it's up to the user to create whatever they want and structure it as they want.
+Create hierarchically organized content that's always editable like a wiki and shared on the Fediverse and/or IPFS. Quanta is a new kind of platform with a new kind of architecture where you always have complete control of your own data.
+
+Designed to allow a more fine-grained hierarchical approach to content management, collaborative documents, wikis, and micro-blogs, Quanta "quantizes" each piece of content as tree nodes. These nodes are the main elements of the app, similar to Facebook Posts or Twitter Tweets. Quanta has a unique and more powerful design, allowing content to be organized into larger structures of information, to create arbitrary data structures representing documents, wikis, web pages, blogs, etc.
 
 ## Live test instance:
 
 https://quanta.wiki
 
-# Tech-Stack Summary
-
-## Back-end (Server Side)
-
-* Java Language
-* Spring Boot Web App
-* Runs in embedded Tomcat
-* REST-like Endpoint using ajax/JSON for all browser calls.
-* MongoDB data storage (via. Mongo for Docker)
-* IPFS File Access (supports uploading files to IPFS)
-* File System Index/Search (via Lucene+Tika)
-* Dockerfile Compose files for deployment
-
-## Browser (Client Side)
-
-* Single Page Application (SPA)
-* TypeScript Language
-* Bootstrap 4 for layout/styling
-* Webpack-generated single bundle JS file
-* ReactJS with Redux 
-* Ace Editor for Content Editing
-* MathJax for rendering Latex math formulas
-* NPM rss-parser Package
-
-## Fun Links to get you started
+## Fun Links (to get you started)
 
 #### [Demo Videos showing Quanta platform in action](https://quanta.wiki/n/screencast)
 
@@ -48,7 +26,11 @@ https://quanta.wiki
 
 #### [Podcasts - Curated Aggregate](https://quanta.wiki/n/podcasts)
 
-## How to Build the App
+## Platform Info
+
+Technical summary: Written in Java/SpringBoot built by Mavan (backend) and TypeScript built by WebPack (front-end), with MongoDB and IPFS data storage, and deployed via docker compose. App itself is HTML (Browser only), and mobile compatable.
+
+https://quanta.wiki/n/platform
 
 https://quanta.wiki/n/technical-notes
 
