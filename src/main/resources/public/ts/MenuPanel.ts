@@ -2,6 +2,7 @@ import { useSelector } from "react-redux";
 import { appState } from "./AppRedux";
 import { AppState } from "./AppState";
 import { Constants as C } from "./Constants";
+import { ConfirmDlg } from "./dlg/ConfirmDlg";
 import { ImportCryptoKeyDlg } from "./dlg/ImportCryptoKeyDlg";
 import { ManageEncryptionKeysDlg } from "./dlg/ManageEncryptionKeysDlg";
 import { MediaRecorderDlg } from "./dlg/MediaRecorderDlg";
@@ -70,7 +71,16 @@ export class MenuPanel extends Div {
     static showUrls = () => S.render.showNodeUrl(null, appState(null));
     static showRawData = () => S.view.runServerCommand("getJson", "Node JSON Data", "The actual data stored on the server for this node...", appState(null));
     static nodeStats = () => S.view.getNodeStats(appState(null), false, false);
-    static showKeys = () => { new ManageEncryptionKeysDlg(appState(null)).open(); };
+
+    static showKeys = () => {
+        new ConfirmDlg("Warning: Be sure you aren't sharing your screen. Security keys will be displayed!!", "Show Encryption Keys",
+            () => {
+                new ManageEncryptionKeysDlg(appState(null)).open();
+            },
+            null, "btn-danger", "alert alert-danger", appState(null)
+        ).open();
+    };
+
     static generateKeys = () => { S.util.generateNewCryptoKeys(appState(null)); };
     static publishKeys = () => { S.encryption.initKeys(false, true); };
     static importKeys = () => { new ImportCryptoKeyDlg(appState(null)).open(); };

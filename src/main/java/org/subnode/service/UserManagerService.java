@@ -510,10 +510,8 @@ public class UserManagerService {
 			} else {
 				log.debug("savePublicKey failed to find userName: " + userName);
 			}
+			res.setMessage("Successfully saved public key.");
 			res.setSuccess(true);
-
-			// don't display a message unless this was a user-initiated save.
-			// res.setMessage("Key Saved");
 		});
 		return res;
 	}

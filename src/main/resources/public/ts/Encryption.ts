@@ -374,7 +374,7 @@ export class Encryption implements EncryptionIntf {
     }
 
     savePublicKeyResponse = (res: J.SavePublicKeyResponse): void => {
-        // alert(res.message);
+        S.util.showMessage(res.message, "Publish Public Key");
     }
 
     /**

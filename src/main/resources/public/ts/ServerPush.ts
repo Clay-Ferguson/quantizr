@@ -68,7 +68,10 @@ export class ServerPush implements ServerPushIntf {
                         in local memory)
                         */
                         s.feedDirty = true;
-                        S.meta64.showSystemNotification("New Message", nodeInfo.owner + ": " + nodeInfo.content);
+                        if (nodeInfo.content && nodeInfo.content.startsWith(J.Constant.ENC_TAG)) {
+                            nodeInfo.content = "[Encrypted]";
+                        }
+                        S.meta64.showSystemNotification("New Message", "From " + nodeInfo.owner + ": " + nodeInfo.content);
                     }
                     return s;
                 });

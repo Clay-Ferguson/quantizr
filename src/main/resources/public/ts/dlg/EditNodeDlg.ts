@@ -899,9 +899,6 @@ export class EditNodeDlg extends DialogBase {
             let content: string;
             if (this.contentEditor) {
                 content = this.contentEditor.getValue();
-
-                // todo-2: an optimization can be done here such that if we just ENCRYPTED the node, we use this.skpd.symKey because that
-                // will already be available
                 let cipherKey = S.props.getCryptoKey(state.node, this.appState);
                 if (cipherKey) {
                     content = await S.encryption.symEncryptStringWithCipherKey(cipherKey, content);
@@ -918,7 +915,6 @@ export class EditNodeDlg extends DialogBase {
                 (state.node as J.NodeInfo).content.indexOf("\n\n\n") !== -1);
 
             this.savePropsToNode();
-
             // console.log("calling saveNode(). PostData=" + S.util.prettyPrint(state.node));
 
             S.util.ajax<J.SaveNodeRequest, J.SaveNodeResponse>("saveNode", {
