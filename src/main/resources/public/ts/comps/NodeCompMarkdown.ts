@@ -96,8 +96,13 @@ export class NodeCompMarkdown extends Html {
 
             // if we have already decrypted this data use the result.
             if (S.meta64.decryptCache.get(cipherHash)) {
+
+                let clearText = S.meta64.decryptCache.get(cipherHash);
+                clearText = this.renderRawMarkdown(this.node, clearText);
+                clearText = S.render.injectSubstitutions(this.node, clearText);
+
                 this.mergeState({
-                    content: S.meta64.decryptCache.get(cipherHash),
+                    content: clearText,
                     pendingDecrypt: null
                 });
             }
