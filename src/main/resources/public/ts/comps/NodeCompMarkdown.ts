@@ -45,8 +45,10 @@ export class NodeCompMarkdown extends Html {
         this.mergeState(att);
     }
 
-    renderRawMarkdown(node: J.NodeInfo): string {
-        let content = node.content || "";
+    /* If content is passed in it will be used. It will only be passed in when the node is encrypted and the text
+    has been decrypted and needs to be rendered, in which case we don't need the node.content, but use the 'content' parameter here */
+    renderRawMarkdown(node: J.NodeInfo, content: string = null): string {
+        content = content || node.content || "";
         let val = "";
 
         if (node.type === J.NodeType.PLAIN_TEXT) {
@@ -124,10 +126,8 @@ export class NodeCompMarkdown extends Html {
                 clearText = "[Decrypt Failed]";
             }
 
-            // todo-0: verify markdown is preserved and rendered correctly (this code probably will do it)
-            // let val = this.renderRawMarkdown(node);
-            // val = S.render.injectSubstitutions(node, val);
-            // att.content = val;
+            clearText = this.renderRawMarkdown(this.node, clearText);
+            clearText = S.render.injectSubstitutions(this.node, clearText);
 
             this.mergeState({
                 content: clearText,
