@@ -66,7 +66,7 @@ export class Util implements UtilIntf {
 
     rhost: string;
     logAjax: boolean = false;
-    logAjaxShort: boolean = true;
+    logAjaxShort: boolean = false;
     timeoutMessageShown: boolean = false;
     waitCounter: number = 0;
     pgrsDlg: ProgressDlg = null;

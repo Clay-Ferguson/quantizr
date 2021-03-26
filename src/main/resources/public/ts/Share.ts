@@ -75,19 +75,20 @@ export class Share implements ShareIntf {
                 const privateKey: CryptoKey = await S.encryption.getPrivateKey();
 
                 // so this is the decrypted symmetric key to the data (the unencrypted copy of the actual AES key to the data)
-                const clearTextKey = await S.encryption.asymDecryptString(privateKey, cipherKey);
-                if (!clearTextKey) {
+                const clearKey = await S.encryption.asymDecryptString(privateKey, cipherKey);
+                if (!clearKey) {
                     throw new Error("Unable to access encryption key.");
                 }
 
-                // console.log("clear text key to re-encrypt: " + clearTextKey);
+                // console.log("clear text key to re-encrypt: " + clearKey + "\nEncrpyting key using this pub key of user: " +
+                //     principalPublicKeyStr);
 
                 // first parse the key and build a usable key from principalPublicKey.
                 const principalSymKeyJsonObj: JsonWebKey = JSON.parse(principalPublicKeyStr);
                 const principalPublicKey = await S.encryption.importKey(principalSymKeyJsonObj, S.encryption.ASYM_IMPORT_ALGO, true, S.encryption.OP_ENC);
 
                 // now re-encrypt this clearTextKey using the public key (of the user being shared to).
-                const userCipherKey = await S.encryption.asymEncryptString(principalPublicKey, clearTextKey);
+                const userCipherKey = await S.encryption.asymEncryptString(principalPublicKey, clearKey);
                 // console.log("userCipherKey=" + userCipherKey);
 
                 /* Now post this encrypted key (decryptable only by principalNodeId's private key) up to the server which will

@@ -139,10 +139,13 @@ public enum NodeProp {
 
     LAST_LOGIN_TIME("sn:lastLogin", "s"), //
 
-    // NOTE: These crypto keys are ONLY used to make ActivityPub work. For the E2E
-    // Encryption capabilities of the platform,
-    // those are is unrelated to these keys, and those private keys never leave the
-    // browser.
+    /*
+     * NOTE: These two crypto keys are ONLY used for ActivityPub.
+     * 
+     * For the E2E Encryption capabilities of the platform, the "sn:publicKey" is the key that's used and
+     * only the public key exists on the server for that E2E encryption. In other words "sn:publicKey" is used to encrypt actual
+     * data and these two defined here are only used as part of the ActivityPub user authentication process.
+     */
     CRYPTO_KEY_PUBLIC("sn:cryptoKeyPublic", "s"), //
     CRYPTO_KEY_PRIVATE("sn:cryptoKeyPrivate", "s"), //
 

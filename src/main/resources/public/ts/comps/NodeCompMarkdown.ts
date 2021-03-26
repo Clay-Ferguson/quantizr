@@ -14,9 +14,9 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
 /* General Widget that doesn't fit any more reusable or specific category other than a plain Div, but inherits capability of Comp class */
 export class NodeCompMarkdown extends Html {
 
-    /* todo-0: WARNING: decryption is currently failing as of 03/2021 for shared nodes (people shared to cannot decrypt), and only works for the current user who owns the node.
-    not sure when the bug appeared. */
-    private autoDecrypting: boolean = false;
+    /* This makes the encrypted text visible without editing the node which is important to have
+    on so nodes shared to you can be seen, because a user can't edit nodes they don't own */
+    private autoDecrypting: boolean = true;
 
     constructor(public node: J.NodeInfo, private appState: AppState) {
         super();

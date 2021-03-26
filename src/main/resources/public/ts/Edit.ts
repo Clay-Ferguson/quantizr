@@ -263,8 +263,7 @@ export class Edit implements EditIntf {
                     return;
                 }
 
-                for (let i = 0; i < aclEntries.length; i++) {
-                    const ac = aclEntries[i];
+                for (let ac of aclEntries) {
                     // console.log("Distribute Key to Principal: " + S.util.prettyPrint(ac));
                     await S.share.addCipherKeyToNode(node, ac.publicKey, ac.principalNodeId);
                 }

@@ -42,9 +42,6 @@ export class Encryption implements EncryptionIntf {
     static FORMAT_JWK: string = "jwk";
     static FORMAT_PEM: string = "pem";
 
-    /* jwk = JSON Format */
-    DEFAULT_KEY_FORMAT = Encryption.FORMAT_JWK;
-
     // asymetric keys (public/private)
     STORE_ASYMKEY = "asymkey";
 
@@ -147,9 +144,9 @@ export class Encryption implements EncryptionIntf {
                     S.util.assert(clearText === unencText, "Symmetric decrypt");
 
                     // test symetric key export/import
-                    const keyDat: JsonWebKey = await crypto.subtle.exportKey(this.DEFAULT_KEY_FORMAT, key) as JsonWebKey;
+                    const keyDat: JsonWebKey = await crypto.subtle.exportKey(Encryption.FORMAT_JWK, key) as JsonWebKey;
 
-                    const key2: CryptoKey = await crypto.subtle.importKey(this.DEFAULT_KEY_FORMAT, keyDat, this.SYM_ALGO /* as AlgorithmIdentifier */, true, this.OP_ENC_DEC as KeyUsage[]);
+                    const key2: CryptoKey = await crypto.subtle.importKey(Encryption.FORMAT_JWK, keyDat, this.SYM_ALGO /* as AlgorithmIdentifier */, true, this.OP_ENC_DEC as KeyUsage[]);
 
                     const encHex2 = await this.symEncryptString(key2, clearText);
                     const unencText2 = await this.symDecryptString(key2, encHex2);
@@ -180,17 +177,17 @@ export class Encryption implements EncryptionIntf {
                     S.util.assert(clearText === unencText, "Asym encryption");
 
                     // Export keys to a string format
-                    const publicKeyStr = await crypto.subtle.exportKey(this.DEFAULT_KEY_FORMAT, obj.val.publicKey);
+                    const publicKeyStr = await crypto.subtle.exportKey(Encryption.FORMAT_JWK, obj.val.publicKey);
                     // console.log("EXPORTED PUBLIC KEY: " + S.util.toJson(publicKeyStr) + "\n");
-                    const privateKeyStr = await crypto.subtle.exportKey(this.DEFAULT_KEY_FORMAT, obj.val.privateKey);
+                    const privateKeyStr = await crypto.subtle.exportKey(Encryption.FORMAT_JWK, obj.val.privateKey);
                     // console.log("EXPORTED PRIVATE KEY: " + S.util.toJson(publicKeyStr) + "\n");
 
-                    const publicKey = await crypto.subtle.importKey(this.DEFAULT_KEY_FORMAT, publicKeyStr, {
+                    const publicKey = await crypto.subtle.importKey(Encryption.FORMAT_JWK, publicKeyStr, {
                         name: this.ASYM_ALGO,
                         hash: this.HASH_ALGO
                     }, true, this.OP_ENC);
 
-                    const privateKey = await crypto.subtle.importKey(this.DEFAULT_KEY_FORMAT, privateKeyStr, {
+                    const privateKey = await crypto.subtle.importKey(Encryption.FORMAT_JWK, privateKeyStr, {
                         name: this.ASYM_ALGO,
                         hash: this.HASH_ALGO
                     }, true, this.OP_DEC);
@@ -220,7 +217,7 @@ export class Encryption implements EncryptionIntf {
     }
 
     importKey = async (key: JsonWebKey, algos: any, extractable: boolean, keyUsages: KeyUsage[]): Promise<CryptoKey> => {
-        return crypto.subtle.importKey(S.encryption.DEFAULT_KEY_FORMAT, key, algos, extractable, keyUsages);
+        return crypto.subtle.importKey(Encryption.FORMAT_JWK, key, algos, extractable, keyUsages);
     }
 
     importKeyPair = async (keyPair: string): Promise<boolean> => {
@@ -229,12 +226,12 @@ export class Encryption implements EncryptionIntf {
             try {
                 const keyPairObj: EncryptionKeyPair = JSON.parse(keyPair);
 
-                const publicKey = await crypto.subtle.importKey(this.DEFAULT_KEY_FORMAT, keyPairObj.publicKey, {
+                const publicKey = await crypto.subtle.importKey(Encryption.FORMAT_JWK, keyPairObj.publicKey, {
                     name: this.ASYM_ALGO,
                     hash: this.HASH_ALGO
                 }, true, this.OP_ENC as KeyUsage[]);
 
-                const privateKey = await crypto.subtle.importKey(this.DEFAULT_KEY_FORMAT, keyPairObj.privateKey, {
+                const privateKey = await crypto.subtle.importKey(Encryption.FORMAT_JWK, keyPairObj.privateKey, {
                     name: this.ASYM_ALGO,
                     hash: this.HASH_ALGO
                 }, true, this.OP_DEC as KeyUsage[]);
@@ -266,6 +263,7 @@ export class Encryption implements EncryptionIntf {
                 reject();
             }
             else {
+                // console.log("getPrivateKey returning: " + S.util.prettyPrint(val.val.privateKey));
                 resolve(val.val.privateKey);
             }
         });
@@ -278,6 +276,7 @@ export class Encryption implements EncryptionIntf {
                 reject();
             }
             else {
+                // console.log("getPublicKey returning: " + S.util.prettyPrint(val.val.publicKey));
                 resolve(val.val.publicKey);
             }
         });
@@ -294,7 +293,7 @@ export class Encryption implements EncryptionIntf {
                 if (val && !forceUpdate) {
                     if (this.logKeys) {
                         const cryptoKey: CryptoKey = val.val;
-                        await crypto.subtle.exportKey(this.DEFAULT_KEY_FORMAT, cryptoKey);
+                        await crypto.subtle.exportKey(Encryption.FORMAT_JWK, cryptoKey);
                         // let symKeyStr = await crypto.subtle.exportKey(this.DEFAULT_KEY_FORMAT, cryptoKey);
                         // console.log("symkey: " + S.util.toJson(symKeyStr));
                     }
@@ -338,7 +337,7 @@ export class Encryption implements EncryptionIntf {
 
                     S.localDB.writeObject({ name: this.STORE_ASYMKEY, val: keyPair });
 
-                    const pubKeyDat = await crypto.subtle.exportKey(this.DEFAULT_KEY_FORMAT, keyPair.publicKey);
+                    const pubKeyDat = await crypto.subtle.exportKey(Encryption.FORMAT_JWK, keyPair.publicKey);
                     pubKeyStr = JSON.stringify(pubKeyDat);
                     console.log("Exporting key string: " + pubKeyStr);
                     republish = true;
@@ -351,7 +350,7 @@ export class Encryption implements EncryptionIntf {
                     }
 
                     if (!pubKeyStr) {
-                        const publicKeyDat = await crypto.subtle.exportKey(this.DEFAULT_KEY_FORMAT, keyPair.publicKey);
+                        const publicKeyDat = await crypto.subtle.exportKey(Encryption.FORMAT_JWK, keyPair.publicKey);
                         pubKeyStr = JSON.stringify(publicKeyDat);
                     }
 
@@ -392,10 +391,10 @@ export class Encryption implements EncryptionIntf {
                 if (obj) {
                     const keyPair: EncryptionKeyPair = obj.val;
 
-                    const pubDat = await crypto.subtle.exportKey(this.DEFAULT_KEY_FORMAT, keyPair.publicKey);
+                    const pubDat = await crypto.subtle.exportKey(Encryption.FORMAT_JWK, keyPair.publicKey);
                     // this.importKey(this.OP_ENCRYPT, "public", this.publicKeyJson);
 
-                    const privDat = await crypto.subtle.exportKey(this.DEFAULT_KEY_FORMAT, keyPair.privateKey);
+                    const privDat = await crypto.subtle.exportKey(Encryption.FORMAT_JWK, keyPair.privateKey);
                     // this.importKey(this.OP_DECRYPT, "private", this.privateKeyJson);
 
                     ret += "Key Pair (JWK Format):\n" + S.util.toJson({ publicKey: pubDat, privateKey: privDat }) + "\n\n";
@@ -409,7 +408,7 @@ export class Encryption implements EncryptionIntf {
                 obj = await S.localDB.readObject(this.STORE_SYMKEY);
                 if (obj) {
                     const key: CryptoKey = obj.val;
-                    const dat = await crypto.subtle.exportKey(this.DEFAULT_KEY_FORMAT, key);
+                    const dat = await crypto.subtle.exportKey(Encryption.FORMAT_JWK, key);
                     const keyStr = S.util.toJson(dat);
                     ret += "Symmetric Key (JWK Format):\n" + keyStr + "\n\n";
                 }
@@ -502,17 +501,23 @@ export class Encryption implements EncryptionIntf {
                 }
 
                 // generate random symmetric key
-                const symKey: CryptoKey = await this.genSymKey();
+                const key: CryptoKey = await this.genSymKey();
+                // console.log("Cleartext Sym Key: " + S.util.prettyPrint(key));
 
-                // get JWK formatted key string
-                const symKeyJwk = await crypto.subtle.exportKey(this.DEFAULT_KEY_FORMAT, symKey);
-                const symKeyStr = S.util.toJson(symKeyJwk);
+                // get JWK formatted key
+                const jwk = await crypto.subtle.exportKey(Encryption.FORMAT_JWK, key);
+
+                // get JSON string of jwk
+                const jwkJson = S.util.toJson(jwk);
+
+                // const pubKeyJson = await crypto.subtle.exportKey(Encryption.FORMAT_JWK, publicKey);
+                // console.log("Initial KEY encrypted with owner publicKey: " + S.util.prettyPrint(pubKeyJson));
 
                 // encrypt the symetric key
-                const cipherKey = await this.asymEncryptString(publicKey, symKeyStr);
+                const cipherKey = await this.asymEncryptString(publicKey, jwkJson);
 
                 // encrypt the data with the symetric key
-                const cipherText = await this.symEncryptString(symKey, data);
+                const cipherText = await this.symEncryptString(key, data);
 
                 ret = { cipherText, cipherKey };
             }
@@ -544,17 +549,19 @@ export class Encryption implements EncryptionIntf {
                 }
 
                 if (!privateKey) {
+                    console.log("unable to get privateKey");
                     reject();
                     return;
                 }
 
+                // const privKeyJson = await crypto.subtle.exportKey(Encryption.FORMAT_JWK, privateKey);
+                // console.log("calling asymDecryptString to get key: userPrivateKey=" + S.util.prettyPrint(privKeyJson));
+
                 // Decrypt the symmetric key using our private key
                 const symKeyJsonStr: string = await this.asymDecryptString(privateKey, skpd.cipherKey);
 
-                // console.log("Decrypted cipherKey to (asym key to actual data): " + symKeyJsonStr);
                 const symKeyJsonObj: JsonWebKey = JSON.parse(symKeyJsonStr);
-                const symKey = await crypto.subtle.importKey(this.DEFAULT_KEY_FORMAT, symKeyJsonObj, this.SYM_ALGO, true, this.OP_ENC_DEC);
-                // console.log("DECRYPTING: cipherText: [" + skpd.cipherText + "]");
+                const symKey = await crypto.subtle.importKey(Encryption.FORMAT_JWK, symKeyJsonObj, this.SYM_ALGO, true, this.OP_ENC_DEC);
                 ret = await this.symDecryptString(symKey, skpd.cipherText);
                 // console.log("            output: [" + ret + "]");
                 S.meta64.decryptCache.set(cipherHash, ret);
@@ -562,7 +569,7 @@ export class Encryption implements EncryptionIntf {
             catch (ex) {
                 // todo-2: this was happening when 'importKey' failed for admin user, but I think admin user may not store keys? Need to just
                 // retest encryption
-                // S.util.logAndReThrow("decryptSharableString failed", ex);
+                S.util.logAndReThrow("decryptSharableString failed", ex);
             }
             finally {
                 resolve(ret);

@@ -188,7 +188,7 @@ export class User implements UserIntf {
 
                         setTimeout(() => {
                             S.encryption.initKeys();
-                        }, 2000);
+                        }, 1);
 
                         // console.log("Logged in as: " + usr);
                     }

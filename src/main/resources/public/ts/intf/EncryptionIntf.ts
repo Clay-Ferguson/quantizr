@@ -1,7 +1,6 @@
 
 export interface EncryptionIntf {
 
-    DEFAULT_KEY_FORMAT: string;
     ASYM_ALGO: string;
     SYM_ALGO: string;
     HASH_ALGO: string;

@@ -460,8 +460,7 @@ public class NodeEditService {
 						 * TODO: This case indicates that data was sent unnecessarily. fix! (i.e. make
 						 * sure this block cannot ever be entered)
 						 */
-						// log.debug("Ignoring unneeded save attempt on unneeded
-						// prop: " + property.getName());
+						log.debug("Ignoring unneeded save attempt on unneeded prop: " + property.getName());
 					}
 				}
 			}

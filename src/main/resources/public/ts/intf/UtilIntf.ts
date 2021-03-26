@@ -46,7 +46,7 @@ export interface UtilIntf {
     daylightSavingsTime: boolean;
 
     getCheckBoxStateById(id: string): boolean;
-    toJson(obj: Object);
+    toJson(obj: Object): string;
 
     getParameterByName(name?: any, url?: any): string;
     initProgressMonitor(): void;

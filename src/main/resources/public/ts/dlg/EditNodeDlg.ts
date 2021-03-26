@@ -69,8 +69,6 @@ export class EditNodeDlg extends DialogBase {
 
     static morePanelExpanded: boolean = false;
 
-    skdp: SymKeyDataPackage;
-
     // if user uploads or deletes an upload we set this, to force refresh when dialog closes even if they don't click save.
     binaryDirty: boolean = false;
 
@@ -816,7 +814,7 @@ export class EditNodeDlg extends DialogBase {
                 return;
             }
 
-            /* only if the encryption setting changed do we need to anything in here */
+            /* only if the encryption setting changed do we need to do anything here */
             if (encrypted !== dlg.encrypted) {
 
                 /* If we're turning off encryption for the node */
@@ -832,9 +830,14 @@ export class EditNodeDlg extends DialogBase {
                     // if we need to encrypt and the content is not currently encrypted.
                     if (!state.node.content.startsWith(J.Constant.ENC_TAG)) {
                         let content = this.contentEditor.getValue();
-                        this.skdp = await S.encryption.encryptSharableString(null, content);
-                        state.node.content = J.Constant.ENC_TAG + this.skdp.cipherText;
-                        S.props.setNodePropVal(J.NodeProp.ENC_KEY, state.node, this.skdp.cipherKey);
+
+                        let skdp: SymKeyDataPackage = await S.encryption.encryptSharableString(null, content);
+                        state.node.content = J.Constant.ENC_TAG + skdp.cipherText;
+
+                        /* Set ENC_KEY to be the encrypted key, which when decrypted can be used to decrypt
+                        the content of the node. This ENC_KEY was encrypted with the public key of the owner of this node,
+                        and so can only be decrypted with their private key. */
+                        S.props.setNodePropVal(J.NodeProp.ENC_KEY, state.node, skdp.cipherKey);
                     }
                 }
 

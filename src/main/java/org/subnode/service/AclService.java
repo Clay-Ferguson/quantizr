@@ -102,7 +102,7 @@ public class AclService {
 	}
 
 	/*
-	 * Adds or updates a new privilege to a node
+	 * Adds or updates a new encryption key to a node
 	 */
 	public SetCipherKeyResponse setCipherKey(MongoSession session, SetCipherKeyRequest req) {
 		SetCipherKeyResponse res = new SetCipherKeyResponse();
