@@ -29,7 +29,8 @@ export class User implements UserIntf {
         window.location.href = window.location.origin;
     }
 
-    closeAccount = (state: AppState): void => {
+    closeAccount = (): void => {
+        let state = store.getState();
         new ConfirmDlg("Are you sure you want to close your account?", "Close Account",
             () => {
                 new ConfirmDlg("Your data will be deleted and can never be recovered. Are you sure?", "Last Chance... One more Click",

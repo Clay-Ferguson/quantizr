@@ -8,6 +8,7 @@ import { CompIntf } from "../widget/base/CompIntf";
 import { Button } from "../widget/Button";
 import { ButtonBar } from "../widget/ButtonBar";
 import { CollapsiblePanel } from "../widget/CollapsiblePanel";
+import { PieChart } from "../widget/PieChart";
 import { TextContent } from "../widget/TextContent";
 
 let S: Singletons;
@@ -18,15 +19,27 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
 export class ManageAccountDlg extends DialogBase {
 
     constructor(state: AppState) {
-        super("Manage Account", null, false, state);
+        super("Manage Account", "app-modal-content-narrow-width", false, state);
     }
 
     renderDlg(): CompIntf[] {
+        let state: any = this.getState();
+
+        let data = null;
+        if (state.binQuota) {
+            let available = state.binQuota - state.binTotal;
+            data = [
+                { label: "Used: " + S.util.formatMemory(state.binTotal), value: state.binTotal, color: "#377eb8" },
+                { label: "Available: " + S.util.formatMemory(available), value: available, color: "#4daf4a" }];
+        }
+
         return [
             new TextContent(this.getState().info, null, true),
+            data ? new PieChart(data) : null,
 
             new CollapsiblePanel(null, null, null, [
-                new Button("Close Account", this.closeAccount)
+                new Button("Close Account", this.closeAccount),
+                new Button("Change Password", this.changePassword)
             ], false, null, false, "float-right"),
 
             new ButtonBar([
@@ -57,14 +70,22 @@ export class ManageAccountDlg extends DialogBase {
                         "Storage Used: " + S.util.formatMemory(res.binTotal) + "\n" +//
                         "Percent Used: " + used;
 
-                    this.mergeState({ info });
+                    this.mergeState({
+                        info,
+                        binQuota: res.binQuota,
+                        binTotal: res.binTotal
+                    });
                     resolve();
                 });
         });
     }
 
-    closeAccount = (state: AppState): void => {
-        S.user.closeAccount(state);
+    closeAccount = (): void => {
+        S.user.closeAccount();
         this.close();
+    }
+
+    changePassword = () => {
+        S.edit.openChangePasswordDlg(this.appState);
     }
 }

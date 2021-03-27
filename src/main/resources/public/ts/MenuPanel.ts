@@ -91,7 +91,6 @@ export class MenuPanel extends Div {
 
     static toggleEditMode = () => S.edit.toggleEditMode(appState(null));
     static toggleMetaData = () => S.edit.toggleShowMetaData(appState(null));
-    static changePassword = () => S.edit.openChangePasswordDlg(appState(null));
     static manageAccount = () => S.edit.openManageAccountDlg(appState(null));
     static browserInfo = () => S.util.showBrowserInfo();
     static mobileToggle = () => S.util.switchBrowsingMode(appState(null));
@@ -299,15 +298,16 @@ export class MenuPanel extends Div {
 
         children.push(new Menu("Account", [
             new MenuItem("Profile", MenuPanel.profile), //
+            new MenuItem("Manage Account", MenuPanel.manageAccount, !state.isAnonUser), //
+
+            new MenuItemSeparator(), //
+
             new MenuItem("Toggle Edit Mode", MenuPanel.toggleEditMode, !state.isAnonUser), //
             new MenuItem("Toggle Metadata", MenuPanel.toggleMetaData, !state.isAnonUser), //
 
             // For now there is only ONE button on the Perferences dialog that is accessible as a toolbar button already, so
             // until we have at least one more preference the preferences dialog is not needed.
             // new MenuItem("Preferences", () => S.edit.editPreferences(state), !state.isAnonUser), // "fa-gear"
-
-            new MenuItem("Change Password", MenuPanel.changePassword, !state.isAnonUser), //
-            new MenuItem("Manage Account", MenuPanel.manageAccount, !state.isAnonUser), //
 
             new MenuItemSeparator(), //
 

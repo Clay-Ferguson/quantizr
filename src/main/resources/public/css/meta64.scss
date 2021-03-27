@@ -131,6 +131,11 @@ $smallBorderSize: 3px;
     // border: 1px solid gray;
 }
 
+.d3PieChart {
+    width: 300px; 
+    height: 300px;
+}
+
 // HTML comming from Mastodon includes this so tolerate if for now.
 .invisible {
     display: none;
