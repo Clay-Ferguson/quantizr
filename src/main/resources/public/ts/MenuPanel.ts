@@ -13,6 +13,7 @@ import { SearchContentDlg } from "./dlg/SearchContentDlg";
 import { SearchUsersDlg } from "./dlg/SearchUsersDlg";
 import { SplitNodeDlg } from "./dlg/SplitNodeDlg";
 import { TransferNodeDlg } from "./dlg/TransferNodeDlg";
+import { UserProfileDlg } from "./dlg/UserProfileDlg";
 import { TypeHandlerIntf } from "./intf/TypeHandlerIntf";
 import * as J from "./JavaIntf";
 import { PubSub } from "./PubSub";
@@ -84,7 +85,10 @@ export class MenuPanel extends Div {
     static generateKeys = () => { S.util.generateNewCryptoKeys(appState(null)); };
     static publishKeys = () => { S.encryption.initKeys(false, true); };
     static importKeys = () => { new ImportCryptoKeyDlg(appState(null)).open(); };
-    static profile = () => S.meta64.userProfileView.open(false, null);
+    static profile = () => {
+        new UserProfileDlg(false, null, appState(null)).open();
+    };
+
     static toggleEditMode = () => S.edit.toggleEditMode(appState(null));
     static toggleMetaData = () => S.edit.toggleShowMetaData(appState(null));
     static changePassword = () => S.edit.openChangePasswordDlg(appState(null));

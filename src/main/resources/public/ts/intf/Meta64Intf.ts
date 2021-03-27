@@ -1,5 +1,4 @@
 import { AppState } from "../AppState";
-import { UserProfileView } from "../comps/UserProfileView";
 import { MainMenuDlg } from "../dlg/MainMenuDlg";
 import * as J from "../JavaIntf";
 import { AppTab } from "../widget/AppTab";
@@ -10,7 +9,6 @@ export interface Meta64Intf {
     hiddenRenderingEnabled: boolean;
     config: any;
     mainMenu: MainMenuDlg;
-    userProfileView: UserProfileView;
     app: CompIntf;
     tabs: AppTab[];
     noScrollToId: string;

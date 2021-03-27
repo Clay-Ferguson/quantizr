@@ -5,7 +5,6 @@ import { LogView } from "./comps/LogView";
 import { MainTabComp } from "./comps/MainTabComp";
 import { SearchView } from "./comps/SearchView";
 import { TimelineView } from "./comps/TimelineView";
-import { UserProfileView } from "./comps/UserProfileView";
 import { Constants as C } from "./Constants";
 import { AudioPlayerDlg } from "./dlg/AudioPlayerDlg";
 import { ChangePasswordDlg } from "./dlg/ChangePasswordDlg";
@@ -65,7 +64,6 @@ export class Meta64 implements Meta64Intf {
     // decryption code twice.
     decryptCache: Map<string, string> = new Map<string, string>();
 
-    userProfileView: UserProfileView = new UserProfileView();
     logView: LogView = new LogView();
 
     tabs: AppTab[] = [
@@ -73,7 +71,6 @@ export class Meta64 implements Meta64Intf {
         new SearchView(),
         new TimelineView(),
         new FeedView(),
-        this.userProfileView,
         this.logView
     ];
 

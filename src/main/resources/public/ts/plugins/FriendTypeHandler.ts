@@ -1,5 +1,6 @@
 import { AppState } from "../AppState";
 import { Constants as C } from "../Constants";
+import { UserProfileDlg } from "../dlg/UserProfileDlg";
 import { NodeActionType } from "../enums/NodeActionType";
 import * as J from "../JavaIntf";
 import { PubSub } from "../PubSub";
@@ -93,8 +94,7 @@ export class FriendTypeHandler extends TypeBase {
                 align: "left", // causes text to flow around
                 src: imgSrc,
                 onClick: (evt: any) => {
-                    // new ProfileDlg(state, true, userNodeId, user).open();
-                    S.meta64.userProfileView.open(true, userNodeId);
+                    new UserProfileDlg(false, userNodeId, state).open();
                 }
             });
         }

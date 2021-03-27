@@ -1,5 +1,6 @@
 import { appState } from "../AppRedux";
 import { Constants as C } from "../Constants";
+import { UserProfileDlg } from "../dlg/UserProfileDlg";
 import * as J from "../JavaIntf";
 import { PubSub } from "../PubSub";
 import { Singletons } from "../Singletons";
@@ -7,7 +8,6 @@ import { Button } from "./Button";
 import { ButtonBar } from "./ButtonBar";
 import { Div } from "./Div";
 import { Heading } from "./Heading";
-import { HorizontalLayout } from "./HorizontalLayout";
 import { Img } from "./Img";
 import { ListBoxRow } from "./ListBoxRow";
 import { Span } from "./Span";
@@ -55,8 +55,7 @@ export class EditPrivsTableRow extends ListBoxRow {
                 className: "friendListImage",
                 src: src,
                 onClick: (evt: any) => {
-                    // new ProfileDlg(state, true, this.aclEntry.principalNodeId, this.aclEntry.principalName).open();
-                    S.meta64.userProfileView.open(true, this.aclEntry.principalNodeId);
+                    new UserProfileDlg(true, this.aclEntry.principalNodeId, appState(null)).open();
                 }
             });
         }

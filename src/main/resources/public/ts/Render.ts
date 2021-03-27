@@ -2,11 +2,11 @@ import * as highlightjs from "highlightjs";
 import * as marked from "marked";
 import { dispatch } from "./AppRedux";
 import { AppState } from "./AppState";
-import clientInfo from "./ClientInfo";
 import { NodeCompTableRowLayout } from "./comps/NodeCompTableRowLayout";
 import { NodeCompVerticalRowLayout } from "./comps/NodeCompVerticalRowLayout";
 import { Constants as C } from "./Constants";
 import { MessageDlg } from "./dlg/MessageDlg";
+import { UserProfileDlg } from "./dlg/UserProfileDlg";
 import { NodeActionType } from "./enums/NodeActionType";
 import { RenderIntf } from "./intf/RenderIntf";
 import { TypeHandlerIntf } from "./intf/TypeHandlerIntf";
@@ -519,8 +519,7 @@ export class Render implements RenderIntf {
             // align: "left", // causes text to flow around
 
             onClick: (evt: any) => {
-                // new ProfileDlg(state, true, node.ownerId, node.owner).open();
-                S.meta64.userProfileView.open(true, node.ownerId);
+                new UserProfileDlg(true, node.ownerId, state).open();
             }
         });
     }
