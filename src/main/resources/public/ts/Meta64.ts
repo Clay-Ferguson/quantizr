@@ -509,8 +509,46 @@ export class Meta64 implements Meta64Intf {
 
             console.log("initApp complete.");
             await this.enableMouseEffect();
+
+            setTimeout(() => {
+                S.encryption.initKeys();
+            }, 1000);
+
             resolve();
         });
+    }
+
+    /* We look at the node, and get the parent path from it, and then if there is a node matching that being displayed
+    in the tree we ensure that the "Open" button is visible. This normally indicates this node has been replied to
+
+    If a reducer is running, just pass the state, because it will be the state we need, but if not we will be doing a
+    getState and then dispatching the change.
+    */
+    showOpenButtonOnNode = (node: J.NodeInfo, state: AppState): void => {
+        if (!node || !state.node || !state.node.children) return;
+        let doDispatch = state == null;
+        if (!state) {
+            state = store.getState();
+        }
+        let path = node.path;
+        let slashIdx: number = path.lastIndexOf("/");
+        if (slashIdx === -1) return;
+        let parentPath = path.substring(0, slashIdx);
+
+        /* scan all children being displayed and of one of them is the target parent set the hasChildren
+        on it so it'll display the "open" button */
+        for (let node of state.node.children) {
+            if (node.path === parentPath) {
+                node.hasChildren = true;
+                if (doDispatch) {
+                    dispatch("Action_NodeChanges", (s: AppState): AppState => {
+                        return state;
+                    });
+                }
+                // break out of loop, we're done here.
+                break;
+            }
+        }
     }
 
     enableMouseEffect = async () => {

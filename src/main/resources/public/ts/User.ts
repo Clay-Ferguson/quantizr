@@ -185,11 +185,6 @@ export class User implements UserIntf {
 
                         S.meta64.userName = usr;
                         S.meta64.password = pwd;
-
-                        setTimeout(() => {
-                            S.encryption.initKeys();
-                        }, 1);
-
                         // console.log("Logged in as: " + usr);
                     }
 

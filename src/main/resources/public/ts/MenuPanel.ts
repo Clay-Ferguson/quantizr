@@ -348,7 +348,7 @@ export class MenuPanel extends Div {
             ]));
 
             children.push(new Menu("Admin - Test", [
-                new MenuItem("TEST - Send Email", () => S.meta64.sendTestEmail(state)),
+                new MenuItem("TEST - Send Email", () => S.meta64.sendTestEmail()),
                 new MenuItem("TEST - Notification Display", () => S.meta64.showSystemNotification("Test Title", "This is a test message")),
                 new MenuItem("TEST - Encryption", async () => {
                     await S.encryption.test();

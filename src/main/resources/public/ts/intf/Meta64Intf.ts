@@ -38,10 +38,11 @@ export interface Meta64Intf {
     ctrlKeyCheck(): boolean;
     decryptCache: Map<string, string>;
 
+    showOpenButtonOnNode(node: J.NodeInfo, state: AppState): void;
     toggleMouseEffect(): void;
     runClickAnimation(x: number, y: number): void;
     setOverlay(showOverlay: boolean): void;
-    sendTestEmail(string): void;
+    sendTestEmail(): void;
     showSystemNotification(title: string, message: string): void;
     refresh(state: AppState): void;
     selectTabStateOnly(tabName: string, state: AppState): void;
@@ -54,7 +55,7 @@ export interface Meta64Intf {
     selectAllNodes(nodeIds: string[]);
     updateNodeInfo(node: J.NodeInfo);
     getHighlightedNode(state?: AppState): J.NodeInfo;
-    highlightRowById(id, scroll, state: AppState): boolean;
+    highlightRowById(id: string, scroll: boolean, state: AppState): boolean;
     highlightNode(node: J.NodeInfo, scroll: boolean, state: AppState): void;
     getSingleSelectedNode(state: AppState): J.NodeInfo;
     initApp(): Promise<void>;

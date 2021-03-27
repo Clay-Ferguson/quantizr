@@ -71,6 +71,11 @@ export class ServerPush implements ServerPushIntf {
                         if (nodeInfo.content && nodeInfo.content.startsWith(J.Constant.ENC_TAG)) {
                             nodeInfo.content = "[Encrypted]";
                         }
+
+                        /* if the reciept of this server push makes us have new knowledge that one of our nodes
+                        that didn't have children before now has children then update the state to have 'hasChildren'
+                        on this node so the 'open' button will appear */
+                        S.meta64.showOpenButtonOnNode(nodeInfo, s);
                         S.meta64.showSystemNotification("New Message", "From " + nodeInfo.owner + ": " + nodeInfo.content);
                     }
                     return s;
