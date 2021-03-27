@@ -184,6 +184,11 @@ public class NodeEditService {
 		} else {
 			// we always determine the access controls from the parent for any new nodes
 			auth.setDefaultReplyAcl(null, node, newNode);
+
+			String cipherKey = node.getStrProp(NodeProp.ENC_KEY.s());
+			if (cipherKey != null) {
+				res.setEncrypt(true);
+			}
 		}
 
 		update.save(session, newNode);

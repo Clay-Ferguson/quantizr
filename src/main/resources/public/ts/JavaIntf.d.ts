@@ -335,6 +335,7 @@ export interface CloseAccountResponse extends ResponseBase {
 
 export interface CreateSubNodeResponse extends ResponseBase {
     newNode: NodeInfo;
+    encrypt: boolean;
 }
 
 export interface DeleteAttachmentResponse extends ResponseBase {

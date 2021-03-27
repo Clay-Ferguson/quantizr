@@ -1,5 +1,4 @@
 import { AppState } from "../AppState";
-import clientInfo from "../ClientInfo";
 import { NodeCompBinary } from "../comps/NodeCompBinary";
 import { Constants as C } from "../Constants";
 import { DialogBase } from "../DialogBase";
@@ -78,7 +77,7 @@ export class EditNodeDlg extends DialogBase {
 
     allowEditAllProps: boolean = false;
 
-    constructor(node: J.NodeInfo, public parentNode: J.NodeInfo, state: AppState) {
+    constructor(node: J.NodeInfo, public parentNode: J.NodeInfo, private encrypt: boolean, state: AppState) {
         super("Edit", "app-modal-content", false, state);
         this.mergeState({
             node,
@@ -89,6 +88,14 @@ export class EditNodeDlg extends DialogBase {
         this.allowEditAllProps = this.appState.isAdminUser;
         this.initStates();
         this.initialProps = S.util.arrayClone(node.properties);
+
+        /* This 'encrypt' will trigger this node to be encrypted whenever we're replying to
+        an encrypted node. (i.e. the parent of this node is encrypted) */
+        if (encrypt) {
+            setTimeout(() => {
+                this.openEncryptionDlg(false);
+            }, 1000);
+        }
     }
 
     initStates = (): void => {
@@ -645,7 +652,7 @@ export class EditNodeDlg extends DialogBase {
             allowShare ? new Button("Share", this.share) : null,
 
             new Button("Type", this.openChangeNodeTypeDlg),
-            !customProps ? new Button("Encrypt", this.openEncryptionDlg) : null,
+            !customProps ? new Button("Encrypt", () => { this.openEncryptionDlg(true); }) : null,
             allowPropertyAdd && numPropsShowing === 0 ? new Button("Props", this.addProperty) : null,
 
             // show delete button only if we're in a fullscreen viewer (like Calendar view)
@@ -800,25 +807,31 @@ export class EditNodeDlg extends DialogBase {
         });
     }
 
-    openEncryptionDlg = (): void => {
+    /* todo-1: rename this method because it doesn't always actually run the dialog */
+    openEncryptionDlg = (runDlg: boolean): void => {
         let state = this.getState();
         (async () => {
             let encrypted: boolean = S.props.isEncrypted(state.node);
-            let dlg = new EncryptionDlg(encrypted, this.appState);
+            let encryptNow = true;
 
-            /* awaits until dialog is closed */
-            await dlg.open();
+            if (runDlg) {
+                let dlg = new EncryptionDlg(encrypted, this.appState);
 
-            if (dlg.encrypted && S.props.isPublic(state.node)) {
+                /* awaits until dialog is closed */
+                await dlg.open();
+                encryptNow = dlg.encrypted;
+            }
+
+            if (encryptNow && S.props.isPublic(state.node)) {
                 S.util.showMessage("Cannot encrypt a node that is shared to public. Remove public share first.", "Warning");
                 return;
             }
 
             /* only if the encryption setting changed do we need to do anything here */
-            if (encrypted !== dlg.encrypted) {
+            if (encrypted !== encryptNow) {
 
                 /* If we're turning off encryption for the node */
-                if (!dlg.encrypted) {
+                if (!encryptNow) {
                     /* Take what's in the editor and put
                     that into this.node.content, because it's the correct and only place the correct updated text is guaranteed to be
                     in the case where the user made some changes before disabling encryption. */
