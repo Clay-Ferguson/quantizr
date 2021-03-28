@@ -37,15 +37,6 @@ public class MongoCreate {
 		return node;
 	}
 
-	// public SubNode createNode(MongoSession session, String path, String type, String ownerName) {
-	// 	if (type == null) {
-	// 		type = NodeType.NONE.s();
-	// 	}
-	// 	ObjectId ownerId = read.getOwnerNodeIdFromSession(session);
-	// 	SubNode node = new SubNode(ownerId, path, type, null);
-	// 	return node;
-	// }
-
 	public SubNode createNode(MongoSession session, String path, String type) {
 		if (type == null) {
 			type = NodeType.NONE.s();
@@ -98,8 +89,11 @@ public class MongoCreate {
 			ordinal = 0L;
 		} else {
 			if (updateParentOrdinals) {
+				if (ordinal == null) {
+					ordinal = 0L;
+				}
 				ordinal = prepOrdinalForLocation(session, location, parent, ordinal);
-			} 
+			}
 		}
 
 		SubNode node = new SubNode(ownerId, path, type, ordinal);
