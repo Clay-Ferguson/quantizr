@@ -34,6 +34,10 @@ https://quanta.wiki/n/platform
 
 https://quanta.wiki/n/technical-notes
 
+## About the Developer
+
+[Clay Ferguson](https://quanta.wiki/u/WClayFerguson/contact)
+
 ## Search Tags
 
 Social Media Platform, Decentralized, Fediverse, IPFS, ActivityPub, Web3.0, Mastodon/Pleroma, IPFS, MongoDB, docker compose, Java, TypesScript, ReactJS, HTML+SCSS, SpringBoot, Podcasting, RSS, Encrpytion, E2E Encryption, Secure Messaging, Blogging Platform, Wikis, Corporate Collaboration, Full-Text search, Lucene
