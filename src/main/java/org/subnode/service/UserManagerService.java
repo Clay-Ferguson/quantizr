@@ -510,7 +510,10 @@ public class UserManagerService {
 			} else {
 				log.debug("savePublicKey failed to find userName: " + userName);
 			}
-			res.setMessage("Successfully saved public key.");
+			// oops this is coming up when I don't want to see it, when the user logs in,
+			// so we need to be sure to somehow only show the message when the user has CLICKED
+			// the actual publish keys menu
+			// res.setMessage("Successfully saved public key.");
 			res.setSuccess(true);
 		});
 		return res;
