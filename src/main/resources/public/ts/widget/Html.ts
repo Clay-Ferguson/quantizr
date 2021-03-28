@@ -50,7 +50,10 @@ export class Html extends Comp {
         return this.e("div", this.attribs);
     }
 
-    /* We do two things in here: 1) update formula rendering, and 2) change all "a" tags inside this div to have a target=_blank */
+    /* We do two things in here:
+    1) update formula rendering, and
+    2) change all "a" tags inside this div to have a target=_blank
+    */
     domPreUpdateEvent = (): void => {
         this.whenElm((elm) => {
             if (MathJax && MathJax.typeset) {
@@ -58,6 +61,19 @@ export class Html extends Comp {
                 MathJax.typeset([elm]);
 
                 S.util.forEachElmBySel("#" + this.getId() + " a", (el, i) => {
+                    let href = el.getAttribute("href");
+
+                    if (href && href.indexOf) {
+                        /* This code makes it where it where links to our own app that point to
+                        specific named locations on the tree will NOT open in separate browser tab but
+                        will open in the current browser tab as is the default without the 'target='
+                        attribute on an anchor tag. Note we could be a bit more 'correct' here to include
+                        window.location.origin + window.location.pathname in the string to search for */
+                        if (href.indexOf("/app?id=:") !== -1 ||
+                            href.indexOf("/app?id=~") !== -1) {
+                            return;
+                        }
+                    }
                     el.setAttribute("target", "_blank");
                 });
             }

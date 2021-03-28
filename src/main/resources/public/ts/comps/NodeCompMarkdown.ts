@@ -38,7 +38,6 @@ export class NodeCompMarkdown extends Html {
         /* otherwise it's not encrypted and we display the normal way */
         else {
             let val = this.renderRawMarkdown(node);
-            val = S.render.injectSubstitutions(node, val);
             att.content = val;
         }
 
@@ -82,7 +81,8 @@ export class NodeCompMarkdown extends Html {
             //     content = content.replace(S.srch.searchText, "**_" + S.srch.searchText + "_**");
             // }
 
-            val = S.util.markdown(content);
+            val = S.render.injectSubstitutions(node, content);
+            val = S.util.markdown(val);
         }
         return val;
     }
@@ -99,7 +99,6 @@ export class NodeCompMarkdown extends Html {
 
                 let clearText = S.meta64.decryptCache.get(cipherHash);
                 clearText = this.renderRawMarkdown(this.node, clearText);
-                clearText = S.render.injectSubstitutions(this.node, clearText);
 
                 this.mergeState({
                     content: clearText,
@@ -132,7 +131,6 @@ export class NodeCompMarkdown extends Html {
             }
 
             clearText = this.renderRawMarkdown(this.node, clearText);
-            clearText = S.render.injectSubstitutions(this.node, clearText);
 
             this.mergeState({
                 content: clearText,

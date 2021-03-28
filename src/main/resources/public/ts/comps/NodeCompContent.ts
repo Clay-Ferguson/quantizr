@@ -103,7 +103,6 @@ export class NodeCompContent extends Div {
         }
     }
 
-    /* We do two things in here: 1) update formula rendering, and 2) change all "a" tags inside this div to have a target=_blank */
     domPreUpdateEvent = (): void => {
         if (this.domPreUpdateFunc) {
             this.whenElm((elm) => {

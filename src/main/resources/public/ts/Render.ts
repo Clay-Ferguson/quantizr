@@ -38,6 +38,17 @@ export class Render implements RenderIntf {
     injectSubstitutions = (node: J.NodeInfo, val: string): string => {
         val = S.util.replaceAll(val, "{{locationOrigin}}", window.location.origin);
 
+        /* These allow us to enter into the markdown things like this:
+        [My Link Test]({{url}}?id=:my-test-name)
+        [My Other Link Test]({{byName}}my-test-name)
+        to be able to have a link to a node of a specific name
+
+        However, this also works and may be the more 'clear' way:
+        [Link Test App](/app?id=:my-test-name)
+        */
+        val = S.util.replaceAll(val, "{{byName}}", window.location.origin + window.location.pathname + "?id=:");
+        val = S.util.replaceAll(val, "{{url}}", window.location.origin + window.location.pathname);
+
         if (val.indexOf("{{paypal-button}}") !== -1) {
             val = S.util.replaceAll(val, "{{paypal-button}}", C.PAY_PAL_BUTTON);
         }

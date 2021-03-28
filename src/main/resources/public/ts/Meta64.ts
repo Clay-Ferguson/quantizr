@@ -459,6 +459,11 @@ export class Meta64 implements Meta64Intf {
                 this.deviceHeight = window.innerHeight;
             });
 
+            // This works, but is not needed.
+            // window.addEventListener("hashchange", function () {
+            //     console.log("The hash has changed: hash=" + location.hash);
+            // }, false);
+
             this.initClickEffect();
 
             // todo-2: actually this is a nuisance unless user is actually EDITING a node right now
