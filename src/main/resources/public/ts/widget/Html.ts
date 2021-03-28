@@ -63,14 +63,15 @@ export class Html extends Comp {
                 S.util.forEachElmBySel("#" + this.getId() + " a", (el, i) => {
                     let href = el.getAttribute("href");
 
-                    if (href && href.indexOf) {
+                    // Detect this is a link to this instance we are being served from...
+                    if (href && href.indexOf && (href.indexOf("/") === 0 || href.indexOf(window.location.origin) !== -1)) {
                         /* This code makes it where it where links to our own app that point to
                         specific named locations on the tree will NOT open in separate browser tab but
                         will open in the current browser tab as is the default without the 'target='
-                        attribute on an anchor tag. Note we could be a bit more 'correct' here to include
-                        window.location.origin + window.location.pathname in the string to search for */
+                        attribute on an anchor tag. */
                         if (href.indexOf("/app?id=:") !== -1 ||
-                            href.indexOf("/app?id=~") !== -1) {
+                            href.indexOf("/app?id=~") !== -1 ||
+                            href.indexOf("/app?tab=") !== -1) {
                             return;
                         }
                     }

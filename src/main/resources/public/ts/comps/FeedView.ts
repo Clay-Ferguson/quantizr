@@ -34,6 +34,7 @@ export class FeedView extends AppTab {
     realtimeCheckboxes: boolean = false;
 
     static page: number = 0;
+    static refreshCounter: number = 0;
     static helpExpanded: boolean = false;
 
     constructor() {
@@ -99,11 +100,16 @@ export class FeedView extends AppTab {
         ]);
         children.push(searchDiv);
 
-        if (state.feedLoading) {
+        if (FeedView.refreshCounter === 0 || state.feedLoading) {
             children.push(new Heading(4, "Loading feed..."));
+
+            // if user has never done a refresh at all yet, do the first one for them automatically.
+            if (FeedView.refreshCounter === 0 && state.activeTab === "feedTab") {
+                setTimeout(FeedView.refresh, 100);
+            }
         }
         else if (state.feedWaitingForUserRefresh) {
-            children.push(new Div("Make selections, then 'Refresh'"));
+            children.push(new Heading(4, "Make selections, then 'Refresh'"));
         }
         else if (!state.feedResults || state.feedResults.length === 0) {
             children.push(new Div("Nothing to display."));
@@ -145,6 +151,7 @@ export class FeedView extends AppTab {
 
     static refresh = () => {
         FeedView.page = 0;
+        FeedView.refreshCounter++;
         dispatch("Action_SetFeedFilterType", (s: AppState): AppState => {
             s.feedLoading = true;
             return s;

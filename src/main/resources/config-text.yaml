@@ -8,7 +8,9 @@ intro2:
 
 # Tip: This 'menu' prop is seen in TypeScript JSON as an array of objects
 # links here can be full url, or node names, or "tab:tabName"
-menu:
+# Renamed to -xxx to disable, because I decided to embed these links
+# right onto the main platform landing page node instead, and don't need them here.
+menu-xxx:
   siteNav:
     - name: "News"
       link: ":news" 
