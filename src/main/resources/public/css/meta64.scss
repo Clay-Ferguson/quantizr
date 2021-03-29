@@ -1448,7 +1448,10 @@ i'm backing out for now
 .rss-feed-image {
     border-radius: $borderRadiusMedium;
     border: 1px solid $nodeBorderBottomColor;
-    max-width: 25%;
+
+    /* Warning: this 40% is also enforced in the JS code, by post-processing the HTML but before render in react,
+    search for this class name in "RssTypeHandler" */
+    max-width: 40%;
     margin-bottom: 12px;
     margin-right: 12px;
 }

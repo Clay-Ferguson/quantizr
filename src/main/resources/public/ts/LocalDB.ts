@@ -69,37 +69,29 @@ export class LocalDB implements LocalDBIntf {
     }
 
     // gets the value stored under the key (like a simple map/keystore)
-    getVal = (key: string, userName: string = null): Promise<any> => {
-        return new Promise<any>(async (resolve, reject) => {
-            let obj: any = null;
-            try {
-                const keyPrefix = this.getKeyPrefix(userName);
-                obj = await this.readObject(keyPrefix + key);
-                // console.log("LocalDB[" + LocalDB.DB_NAME + "] getVal name=" + keyPrefix + key + " val=" + (!!obj ? obj.val : null));
-            }
-            finally {
-                resolve(obj ? obj.val : null);
-            }
-        });
+    getVal = async (key: string, userName: string = null): Promise<any> => {
+        let obj: any = null;
+        try {
+            const keyPrefix = this.getKeyPrefix(userName);
+            obj = await this.readObject(keyPrefix + key);
+            // console.log("LocalDB[" + LocalDB.DB_NAME + "] getVal name=" + keyPrefix + key + " val=" + (!!obj ? obj.val : null));
+        }
+        catch {
+            // ignore this exception
+        }
+        return obj ? obj.val : null;
     }
 
     // stores the value under this key  (like a simple map/keystore)
-    setVal = (key: string, val: any, userName: string = null): Promise<void> => {
-        return new Promise<void>(async (resolve, reject) => {
-            try {
-                const keyPrefix = this.getKeyPrefix(userName);
-                // console.log("LocalDB[" + LocalDB.DB_NAME + "] setVal name=" + keyPrefix + key + " val=" + val);
-                await this.writeObject({ name: keyPrefix + key, val });
-            }
-            finally {
-                resolve();
-            }
-        });
+    setVal = async (key: string, val: any, userName: string = null): Promise<void> => {
+        const keyPrefix = this.getKeyPrefix(userName);
+        // console.log("LocalDB[" + LocalDB.DB_NAME + "] setVal name=" + keyPrefix + key + " val=" + val);
+        await this.writeObject({ name: keyPrefix + key, val });
     }
 
     /* Saves an object under the specified name, assuming the object itself has a 'name' property.
      Basically emulating a simple "map" with string key. */
-    writeObject = (val: Object): Promise<void> => {
+    writeObject = async (val: Object): Promise<void> => {
         return new Promise<void>(async (resolve, reject) => {
             this.runTrans(LocalDB.ACCESS_READWRITE,
                 (store: IDBObjectStore) => {

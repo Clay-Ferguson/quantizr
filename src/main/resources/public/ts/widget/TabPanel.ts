@@ -25,7 +25,13 @@ export class TabPanel extends Div {
             this.attribs.className = "col-12 tab-panel-mobile";
         }
         else {
-            this.attribs.className = "col-" + C.mainPanelCols + " offset-" + C.leftNavPanelCols;
+            // See also: RightNavPanel.ts which has the inverse/balance of these numbers of columns.
+            this.attribs.className = //
+                "col-" + (C.mainPanelCols + 2) + //
+                " col-md-" + (C.mainPanelCols + 1) +//
+                " col-lg-" + C.mainPanelCols + //
+                // " col-xl-" + C.mainPanelCols + // not needed. 'lg' covers the 'xl' case
+                " offset-" + C.leftNavPanelCols;
         }
     }
 

@@ -14,7 +14,13 @@ export class RightNavPanel extends Div {
 
     constructor() {
         super();
-        this.attribs.className = "col-" + C.rightNavPanelCols + " offset-" + (C.leftNavPanelCols + C.mainPanelCols) + " rightNavPanel position-fixed";
+        // See also: TabPanel.ts which has the inverse/balance of these numbers of columns.
+        this.attribs.className = //
+            "col-" + (C.rightNavPanelCols - 2) + //
+            " col-md-" + (C.rightNavPanelCols - 1) + //
+            " col-lg-" + C.rightNavPanelCols + //
+            // " col-xl-" + C.rightNavPanelCols + // not needed. 'lg' covers the 'xl' case
+            " offset-" + (C.leftNavPanelCols + C.mainPanelCols) + " rightNavPanel position-fixed";
     }
 
     preRender(): void {

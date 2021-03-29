@@ -93,6 +93,7 @@ export class RssTypeHandler extends TypeBase {
         let parser = new RssParser({
             customFields: {
                 item: [
+                    ["media:group", "mediaGroup"],
                     ["media:thumbnail", "mediaThumbnail"],
                     ["category", "category"],
                     ["itunes:image", "itunesImage"],
@@ -125,8 +126,8 @@ export class RssTypeHandler extends TypeBase {
         else {
             state.feedCache[feedSrcHash] = "loading";
 
-            itemListContainer.addChild(new Div("Loading RSS Feed..."));
-            itemListContainer.addChild(new Div("(For large feeds this can take a few seconds)"));
+            itemListContainer.addChild(new Heading(3, "Loading RSS Feed..."));
+            itemListContainer.addChild(new Div("For large feeds this can take a few seconds..."));
 
             let page: number = state.feedPage[feedSrcHash];
             if (!page) {
@@ -301,17 +302,19 @@ export class RssTypeHandler extends TypeBase {
         let children: Comp[] = [];
         let headerDivChildren = [];
 
+        // console.log("ENTRY: " + S.util.prettyPrint(entry));
+
+        if (entry.mediaGroup && entry.mediaGroup["media:thumbnail"]) {
+            entry.mediaThumbnail = entry.mediaGroup["media:thumbnail"];
+            // todo-0: if this is an array we should display all.
+            if (entry.mediaThumbnail instanceof Array) {
+                entry.mediaThumbnail = entry.mediaThumbnail[0];
+            }
+        }
+
         if (entry.mediaThumbnail && entry.mediaThumbnail.$) {
             // console.log("mediaThumbnail: " + entry.mediaThumbnail.$.url);
             let style: any = {};
-
-            if (entry.mediaThumbnail.$.width) {
-                style.width = entry.mediaThumbnail.$.width + "px";
-            }
-
-            if (entry.mediaThumbnail.$.height) {
-                style.height = entry.mediaThumbnail.$.height + "px";
-            }
 
             headerDivChildren.push(new Img(null, {
                 style,
@@ -397,6 +400,8 @@ export class RssTypeHandler extends TypeBase {
 
         children.push(new Div(null, { className: "clearBoth" }));
 
+        let mediaDescription = entry.mediaGroup ? entry.mediaGroup["media:description"] : null;
+
         let textContent = null;
         if (entry.content) {
             textContent = entry.content;
@@ -406,6 +411,9 @@ export class RssTypeHandler extends TypeBase {
         }
         else if (entry.contentSnippet) {
             textContent = entry.contentSnippet;
+        }
+        else if (mediaDescription) {
+            textContent = mediaDescription;
         }
 
         if (textContent) {
@@ -475,7 +483,7 @@ export class RssTypeHandler extends TypeBase {
             el.removeAttribute("height");
         });
         S.util.forEachElmBySel("#" + parent.getId() + " .rss-feed-image", (el, i) => {
-            el.style.maxWidth = "25%";
+            el.style.maxWidth = "40%";
         });
     }
 }

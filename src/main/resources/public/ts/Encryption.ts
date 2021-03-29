@@ -238,7 +238,7 @@ export class Encryption implements EncryptionIntf {
 
                 if (publicKey && privateKey) {
                     const newKeyPair: EncryptionKeyPair = new EncryptionKeyPair(publicKey, privateKey);
-                    S.localDB.writeObject({ name: this.STORE_ASYMKEY, val: newKeyPair });
+                    await S.localDB.writeObject({ name: this.STORE_ASYMKEY, val: newKeyPair });
                 }
                 ret = true;
             }
@@ -300,7 +300,7 @@ export class Encryption implements EncryptionIntf {
                 }
                 else {
                     const key: CryptoKey = await this.genSymKey();
-                    S.localDB.writeObject({ name: this.STORE_SYMKEY, val: key });
+                    await S.localDB.writeObject({ name: this.STORE_SYMKEY, val: key });
                 }
             }
             finally {
@@ -335,7 +335,7 @@ export class Encryption implements EncryptionIntf {
                         hash: { name: this.HASH_ALGO } //
                     }, true, this.OP_ENC_DEC);
 
-                    S.localDB.writeObject({ name: this.STORE_ASYMKEY, val: keyPair });
+                    await S.localDB.writeObject({ name: this.STORE_ASYMKEY, val: keyPair });
 
                     const pubKeyDat = await crypto.subtle.exportKey(Encryption.FORMAT_JWK, keyPair.publicKey);
                     pubKeyStr = JSON.stringify(pubKeyDat);
