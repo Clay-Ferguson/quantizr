@@ -25,6 +25,7 @@ import org.subnode.mongo.MongoAuth;
 import org.subnode.mongo.MongoRead;
 import org.subnode.mongo.MongoSession;
 import org.subnode.mongo.MongoUtil;
+import org.subnode.mongo.model.AccessControl;
 import org.subnode.mongo.model.SubNode;
 import org.subnode.request.GetNodeStatsRequest;
 import org.subnode.request.GetSharedNodesRequest;
@@ -207,12 +208,31 @@ public class NodeSearchService {
 		for (SubNode node : auth.searchSubGraphByAcl(session, searchRoot.getPath(), searchRoot.getOwner(),
 				Sort.by(Sort.Direction.DESC, SubNode.FIELD_MODIFY_TIME), MAX_NODES)) {
 
+			if (node.getAc() == null || node.getAc().size() == 0)
+				continue;
+
 			/*
 			 * If we're only looking for shares to a specific person (or public) then check
 			 * here
 			 */
-			if (req.getShareTarget() != null && !node.safeGetAc().containsKey(req.getShareTarget())) {
-				continue;
+			if (req.getShareTarget() != null) {
+
+				if (!node.safeGetAc().containsKey(req.getShareTarget())) {
+					continue;
+				}
+
+				// if specifically searching for rd or wr... &&&
+				if (req.getAccessOption() != null) {
+					AccessControl ac = node.safeGetAc().get(req.getShareTarget());
+					//log.debug("NodeId: " + node.getId().toHexString() + " req=" + req.getAccessOption() + " privs="
+					//		+ ac.getPrvs());
+					if (req.getAccessOption().contains("rd") && (!ac.getPrvs().contains("rd") || ac.getPrvs().contains("wr"))) {
+						continue;
+					}
+					if (req.getAccessOption().contains("wr") && !ac.getPrvs().contains("wr")) {
+						continue;
+					}
+				}
 			}
 
 			NodeInfo info = convert.convertToNodeInfo(ThreadLocals.getSessionContext(), session, node, true, false,

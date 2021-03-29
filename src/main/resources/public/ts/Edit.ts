@@ -66,7 +66,6 @@ export class Edit implements EditIntf {
         if (S.util.checkSuccess("Delete node", res)) {
             // We only want to pass a nodeId here if we are going to root node.
             const nodeId = postDelSelNodeId === state.homeNodeId ? postDelSelNodeId : null;
-
             S.view.refreshTree(nodeId, false, false, postDelSelNodeId, false, true, true, state);
         }
     }
@@ -565,12 +564,11 @@ export class Edit implements EditIntf {
                     nodeIds: selNodesArray,
                     childrenOnly: false
                 }, (res: J.DeleteNodesResponse) => {
-
                     this.removeNodesFromCalendarData(selNodesArray, state);
 
                     if (!postDelSelNodeId && !S.nav.displayingRepositoryRoot(state)) {
-                        // we get here if user has deleted the last child (all chidren) of the parent of the current page
-                        S.nav.navUpLevel();
+                        // we get here if user has deleted the last child (all children) of the parent of the current page
+                        S.nav.navUpLevel(true);
                     } else {
                         this.deleteNodesResponse(res, postDelSelNodeId, state);
                     }

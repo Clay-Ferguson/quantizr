@@ -1310,7 +1310,7 @@ export class Util implements UtilIntf {
         if (!node || !node.ac) return null;
         let delimiter = multiLine ? "\n" : ", ";
 
-        let names = S.props.isPublic(node) ? "public" : "";
+        let names = S.props.isPublic(node) ? ("public [" + this.getPublicPrivilegesDisplay(node) + "]") : "";
         for (let ac of node.ac) {
             if (ac.principalName !== "public") {
                 if (names) {
@@ -1321,6 +1321,24 @@ export class Util implements UtilIntf {
         }
 
         return names;
+    }
+
+    getPublicPrivilegesDisplay = (node: J.NodeInfo): string => {
+        if (!node || !node.ac) return "";
+        let val = "";
+        for (let ac of node.ac) {
+            if (ac.principalName === "public") {
+                // console.log("AC: " + S.util.prettyPrint(ac));
+                for (let p of ac.privileges) {
+                    if (val) {
+                        val += ",";
+                    }
+                    val += p.privilegeName;
+                }
+                break;
+            }
+        }
+        return val;
     }
 
     showBrowserInfo = (): void => {

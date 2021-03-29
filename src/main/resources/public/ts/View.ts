@@ -114,7 +114,7 @@ export class View implements ViewIntf {
                 S.meta64.highlightNode(state.node.children[0], true, state);
             }
             else if (dir === "up") {
-                S.nav.navUpLevel();
+                S.nav.navUpLevel(false);
             }
         }
         else if (state.node.children && state.node.children.length > 0) {

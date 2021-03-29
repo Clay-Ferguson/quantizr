@@ -51,7 +51,9 @@ export class MenuPanel extends Div {
     static searchAndReplace = () => { new SearchAndReplaceDlg(appState(null)).open(); };
     static splitNode = () => { new SplitNodeDlg(null, appState(null)).open(); }
     static joinNodes = () => { S.edit.joinNodes(); }
-    static showPublicShares = () => { S.share.findSharedNodes(null, "public"); }
+    static showPublicWritableShares = () => { S.share.findSharedNodes(null, "public", "wr"); }
+    static showPublicReadonlyShares = () => { S.share.findSharedNodes(null, "public", "rd"); }
+    static showAllShares = () => { S.share.findSharedNodes(null, null, null); }
     static searchByContent = () => { new SearchContentDlg(appState(null)).open(); };
     static searchByName = () => { new SearchByNameDlg(appState(null)).open(); }
     static searchById = () => { new SearchByIDDlg(appState(null)).open(); };
@@ -180,10 +182,13 @@ export class MenuPanel extends Div {
             // new MenuItem("Edit Node Sharing", () => S.share.editNodeSharing(state), //
             //     !state.isAnonUser && !!highlightNode && selNodeIsMine), //
 
-            new MenuItem("Show All Shares", S.share.findSharedNodes, //
+            new MenuItem("Show All Shares", MenuPanel.showAllShares, //
                 !state.isAnonUser && !!hltNode),
 
-            new MenuItem("Show Public Shares", MenuPanel.showPublicShares, //
+            new MenuItem("Show Public Readonly", MenuPanel.showPublicReadonlyShares, //
+                !state.isAnonUser && !!hltNode),
+
+            new MenuItem("Show Public Appendable", MenuPanel.showPublicWritableShares, //
                 !state.isAnonUser && !!hltNode)
         ]));
 

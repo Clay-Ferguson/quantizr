@@ -279,7 +279,7 @@ export class NodeCompButtonBar extends Div {
                         /* For onclick functions I need a new approach for some (not all) where I can get by
                         with using a function that accepts no arguments but does the trick of retrieving the single ID parameter
                         directly off the DOM */
-                        onClick: S.nav.navUpLevel,
+                        onClick: S.nav.navUpLevelClick,
                         title: "Go to Parent Node"
                     }, "btn-primary");
                 }

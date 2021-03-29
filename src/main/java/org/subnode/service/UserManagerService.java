@@ -287,7 +287,10 @@ public class UserManagerService {
 	 */
 	public void addNodeBytesToUserNodeBytes(SubNode node, SubNode userNode, int sign) {
 		if (node == null) {
-			throw new RuntimeEx("node was null.");
+			// todo-0: need to investigate this. I did a public shared node from one user and had a conversation thread under it
+			// and got this thrown upon deleting the root of that. For now ignoring a null node here.
+			return;
+			// throw new RuntimeEx("node was null.");
 		}
 
 		// get the size of the attachment on this node

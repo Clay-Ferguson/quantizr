@@ -112,7 +112,11 @@ export class Nav implements NavIntf {
             });
     }
 
-    navUpLevel = (event: any = null): void => {
+    navUpLevelClick = (): void => {
+        this.navUpLevel(false);
+    }
+
+    navUpLevel = (processingDelete: boolean): void => {
         const state = appState();
         if (!state.node) return null;
 
@@ -134,8 +138,14 @@ export class Nav implements NavIntf {
         },
             // success callback
             (res: J.RenderNodeResponse) => {
-                this.upLevelResponse(res, state.node.id, false, state);
-            });
+                if (processingDelete) {
+                    S.meta64.refresh(state);
+                }
+                else {
+                    this.upLevelResponse(res, state.node.id, false, state);
+                }
+            }
+        );
     }
 
     /*

@@ -10,6 +10,8 @@ public class GetSharedNodesRequest extends RequestBase {
 	/* can be 'public' to find keys in ACL or else null to find all non-null acls */
 	private String shareTarget;
 
+	private String accessOption; //for public can be rd, rw, or null (all)
+
 	public String getNodeId() {
 		return nodeId;
 	}
@@ -24,5 +26,13 @@ public class GetSharedNodesRequest extends RequestBase {
 
 	public void setShareTarget(String shareTarget) {
 		this.shareTarget = shareTarget;
+	}
+
+	public String getAccessOption() {
+		return accessOption;
+	}
+
+	public void setAccessOption(String accessOption) {
+		this.accessOption = accessOption;
 	}
 }

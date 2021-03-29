@@ -30,6 +30,7 @@ export class NodeCompRowHeader extends Div {
         let children = [];
         // console.log("NodeCompHeaderRow: " + S.util.prettyPrint(node));
         let avatarImg: Img = null;
+        // console.log("node.id=" + node.id + " allowAvatar=" + this.allowAvatars);
         if (this.allowAvatars && node.owner !== J.PrincipalName.ADMIN) {
             avatarImg = S.render.makeAvatarImage(node, state);
             if (avatarImg) {

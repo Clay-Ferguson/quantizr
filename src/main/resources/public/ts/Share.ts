@@ -38,18 +38,27 @@ export class Share implements ShareIntf {
     }
 
     /* If target is non-null we only return shares to that particlar person (or public) */
-    findSharedNodes = (state: AppState = null, shareTarget: string = null): void => {
+    findSharedNodes = (state: AppState = null, shareTarget: string = null, accessOption: string = null): void => {
         state = appState(state);
         const focusNode: J.NodeInfo = S.meta64.getHighlightedNode(state);
         if (focusNode == null) {
             return;
         }
 
+        let type = "all";
+        if (accessOption === "rd") {
+            type = "read-only";
+        }
+        else if (accessOption === "wr") {
+            type = "appendable";
+        }
+
         S.util.ajax<J.GetSharedNodesRequest, J.GetSharedNodesResponse>("getSharedNodes", {
             nodeId: focusNode.id,
-            shareTarget
+            shareTarget,
+            accessOption
         }, (res) => {
-            S.srch.searchNodesResponse(res, "Showing shared nodes under subgraph under node ID " + focusNode.id, false);
+            S.srch.searchNodesResponse(res, "Showing " + type + " shared nodes under subgraph under node ID " + focusNode.id, false);
         });
     }
 

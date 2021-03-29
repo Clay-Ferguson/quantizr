@@ -16,7 +16,8 @@ export interface NavIntf {
     displayingRepositoryRoot(state: AppState): boolean;
     parentVisibleToUser(state: AppState): boolean;
     upLevelResponse(res: J.RenderNodeResponse, id: string, scrollToTop: boolean, state: AppState): void;
-    navUpLevel(event?: any): void;
+    navUpLevelClick(): void;
+    navUpLevel(processingDelete: boolean): void;
     navOpenSelectedNode(state: AppState): void;
     getSelectedDomElement(state: AppState): HTMLElement;
     clickNodeRow(evt: Event, id: string, state?: AppState): void;

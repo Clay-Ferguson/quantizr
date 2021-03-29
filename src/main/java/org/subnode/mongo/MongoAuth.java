@@ -231,6 +231,7 @@ public class MongoAuth {
 			return;
 		if (session.isAdmin())
 			return; // admin can do anything. skip auth
+
 		auth(session, node, Arrays.asList(privs));
 	}
 
@@ -305,18 +306,20 @@ public class MongoAuth {
 				continue;
 
 			String fullPathStr = fullPath.toString();
+			log.trace("Checking fullPath: " + fullPathStr);
 
 			/*
-			 * NOTE: This nodesByPath caching is the key to good performance in doing our hierarchical
-			 * authorization lookups.
+			 * NOTE: This nodesByPath caching is the key to good performance in doing our
+			 * hierarchical authorization lookups.
 			 * 
-			 * get node from cache if possible. Note: This cache does have the slight imperfection that it
-			 * assumes once it reads a node for the purposes of checking auth (acl) then within the context of
-			 * the same transaction it can always use that same node again meaning the security context on the
-			 * node can't have changed DURING the request. This is fine because we never update security on a
-			 * node and then expect ourselves to find different security on the node all within the context of the same
-			 * HTTP request. Because the only user who
-			 * can update the security is the owner anyway.
+			 * get node from cache if possible. Note: This cache does have the slight
+			 * imperfection that it assumes once it reads a node for the purposes of
+			 * checking auth (acl) then within the context of the same transaction it can
+			 * always use that same node again meaning the security context on the node
+			 * can't have changed DURING the request. This is fine because we never update
+			 * security on a node and then expect ourselves to find different security on
+			 * the node all within the context of the same HTTP request. Because the only
+			 * user who can update the security is the owner anyway.
 			 */
 			SubNode tryNode = MongoThreadLocal.getNodesByPath().get(fullPathStr);
 
@@ -352,15 +355,19 @@ public class MongoAuth {
 	 * only be pulling 'public' acl to check, and this is by design.
 	 */
 	public boolean nodeAuth(SubNode node, String sessionUserNodeId, List<PrivilegeType> privs) {
+		log.trace("nodeAuth: nodeId: " + node.getId().toHexString());
 		HashMap<String, AccessControl> acl = node.getAc();
-		if (acl == null)
+		if (acl == null) {
+			log.trace("no acls. returning.");
 			return false;
+		}
 		String allPrivs = "";
 
 		AccessControl ac = (sessionUserNodeId == null ? null : acl.get(sessionUserNodeId));
 		String privsForUserId = ac != null ? ac.getPrvs() : null;
 		if (privsForUserId != null) {
 			allPrivs += privsForUserId;
+			log.trace("Privs for this user: " + privsForUserId);
 		}
 
 		/*
@@ -374,12 +381,15 @@ public class MongoAuth {
 				allPrivs += ",";
 			}
 			allPrivs += privsForPublic;
+			log.trace("Public Privs: " + privsForPublic);
 		}
 
 		if (allPrivs.length() > 0) {
 			for (PrivilegeType priv : privs) {
+				log.trace("Checking for priv: " + priv.name);
 				if (allPrivs.indexOf(priv.name) == -1) {
 					/* if any priv is missing we fail the auth */
+					log.trace("priv missing. failing auth.");
 					return false;
 				}
 			}
