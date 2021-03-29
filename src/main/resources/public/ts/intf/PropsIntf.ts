@@ -22,6 +22,7 @@ export interface PropsIntf {
     isEncrypted(node: J.NodeInfo): boolean;
     isShared(node: J.NodeInfo): boolean;
     isPublic(node: J.NodeInfo): boolean;
+    isPublicWritable(node: J.NodeInfo): boolean;
     isMine(node: J.NodeInfo, state: AppState): boolean;
     hasBinary(node: J.NodeInfo): boolean;
     hasImage(node: J.NodeInfo): boolean;

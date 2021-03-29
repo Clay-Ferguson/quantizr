@@ -132,6 +132,8 @@ export class Edit implements EditIntf {
         if (state.homeNodeId === node.id) {
             return true;
         }
+        if (S.props.isPublicWritable(node)) return true;
+
         let owner: string = node.owner;
 
         // if we don't know who owns this node assume the admin owns it.

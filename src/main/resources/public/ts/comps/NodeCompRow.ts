@@ -83,6 +83,8 @@ export class NodeCompRow extends Div {
             let isPageRootNode = state.node && this.node.id === state.node.id;
 
             if (!isPageRootNode && this.level === 1 && insertAllowed && S.edit.isInsertAllowed(node, state)) {
+
+                // todo-0: this button should have same enabelement as "new" button, on the page root ???
                 insertInlineButton = new IconButton("fa-plus", null, {
                     onClick: (e) => {
                         S.edit.insertNode(node.id, "u", 0 /* isFirst ? 0 : 1 */, state);

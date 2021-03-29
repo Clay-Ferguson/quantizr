@@ -179,6 +179,15 @@ export class Props implements PropsIntf {
         return node && node.ac && !!node.ac.find(ace => ace.principalNodeId === "public");
     }
 
+    isPublicWritable = (node: J.NodeInfo): boolean => {
+        return node && node.ac && !!node.ac.find(ace => ace.principalNodeId === "public" && this.hasPrivilege(ace, "wr"));
+    }
+
+    hasPrivilege = (ace: J.AccessControlInfo, priv: string): boolean => {
+        if (!ace.privileges) return false;
+        return !!ace.privileges.find(p => p.privilegeName === priv);
+    }
+
     isMine = (node: J.NodeInfo, state: AppState): boolean => {
         if (!node || !state.userName || state.userName === J.PrincipalName.ANON) return false;
         return state.userName === node.owner;

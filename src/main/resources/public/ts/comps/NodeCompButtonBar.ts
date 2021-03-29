@@ -173,15 +173,20 @@ export class NodeCompButtonBar extends Div {
             if (state.homeNodeId !== node.id) {
                 if (typeHandler) {
                     insertAllowed = state.isAdminUser || typeHandler.allowAction(NodeActionType.insert, node, state);
+                    // console.log("Node " + node.id + " TypeHandler insert Allowed: " + insertAllowed);
                 }
             }
 
-            if (C.NEW_ON_TOOLBAR && insertAllowed && S.edit.isInsertAllowed(node, state)) {
+            let editInsertAllowed = S.edit.isInsertAllowed(node, state);
+            // console.log("Node " + node.id + " Edit insert Allowed: " + editInsertAllowed);
+
+            if (C.NEW_ON_TOOLBAR && insertAllowed && editInsertAllowed) {
                 createSubNodeButton = new Button("New", S.edit.newSubNode,
                     { title: "Create new Node as a child of this node.", nid: node.id });
             }
 
             if (C.INS_ON_TOOLBAR) {
+                // todo-0: this button should have same enabelement as "new" button, on the page root ???
                 insertNodeButton = new Button("Ins", S.edit.toolbarInsertNode,
                     {
                         title: "Insert new Node at this location.",
