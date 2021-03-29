@@ -13,6 +13,7 @@ import { Checkbox } from "../widget/Checkbox";
 import { Div } from "../widget/Div";
 import { Icon } from "../widget/Icon";
 import { IconButton } from "../widget/IconButton";
+import { Span } from "../widget/Span";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
@@ -44,14 +45,12 @@ export class NodeCompButtonBar extends Div {
         let selButton: Checkbox;
         let createSubNodeButton: Button;
         let editNodeButton: Button;
-        let cutNodeButton: Button;
-        let moveNodeUpButton: Button;
-        let moveNodeDownButton: Button;
         let insertNodeButton: Button;
-        let replyButton: Button;
-        let deleteNodeButton: Button;
-        let pasteInsideButton: Button;
-        let pasteInlineButton: Button;
+        let cutNodeButton: Icon;
+        let moveNodeUpButton: Icon;
+        let moveNodeDownButton: Icon;
+        let deleteNodeButton: Icon;
+        let pasteButtons: Span;
 
         let isPageRootNode = state.node && this.node.id === state.node.id;
 
@@ -202,28 +201,31 @@ export class NodeCompButtonBar extends Div {
                 }
 
                 if (!isPageRootNode && node.type !== J.NodeType.REPO_ROOT && !state.nodesToMove) {
-                    cutNodeButton = new Button(null, S.edit.cutSelNodes, {
-                        iconclass: "fa fa-cut fa-lg",
+                    cutNodeButton = new Icon({
+                        className: "fa fa-cut fa-lg buttonBarIcon",
                         title: "Cut selected Node(s) to paste elsewhere.",
-                        nid: node.id
+                        nid: node.id,
+                        onClick: S.edit.cutSelNodes
                     });
                 }
 
                 if (C.MOVE_UPDOWN_ON_TOOLBAR && this.allowNodeMove) {
 
                     if (node.logicalOrdinal > 0) {
-                        moveNodeUpButton = new Button(null, S.edit.moveNodeUp, {
-                            iconclass: "fa fa-arrow-up fa-lg",
+                        moveNodeUpButton = new Icon({
+                            className: "fa fa-arrow-up fa-lg buttonBarIcon",
                             title: "Move Node up one position (higher)",
-                            nid: node.id
+                            nid: node.id,
+                            onClick: S.edit.moveNodeUp
                         });
                     }
 
                     if (!node.lastChild && state.node.children && state.node.children.length > 1) {
-                        moveNodeDownButton = new Button(null, S.edit.moveNodeDown, {
-                            iconclass: "fa fa-arrow-down fa-lg",
+                        moveNodeDownButton = new Icon({
+                            className: "fa fa-arrow-down fa-lg buttonBarIcon",
                             title: "Move Node down one position (lower)",
-                            nid: node.id
+                            nid: node.id,
+                            onClick: S.edit.moveNodeDown
                         });
                     }
                 }
@@ -232,26 +234,28 @@ export class NodeCompButtonBar extends Div {
             if (deleteAllowed) {
                 // not user's account node!
                 if (node.id !== state.homeNodeId) {
-                    deleteNodeButton = new Button(null, S.edit.deleteSelNodes, {
-                        iconclass: "fa fa-trash fa-lg",
+                    deleteNodeButton = new Icon({
+                        className: "fa fa-trash fa-lg buttonBarIcon",
                         title: "Delete selected nodes",
-                        nid: node.id
+                        nid: node.id,
+                        onClick: S.edit.deleteSelNodes
                     });
                 }
             }
 
             if (!!state.nodesToMove && userCanPaste) {
-                pasteInsideButton = new Button("Paste Inside",
-                    S.edit.pasteSelNodesInside, { nid: node.id }, "btn-secondary pasteButton");
-                if (node.id !== state.homeNodeId) {
-                    pasteInlineButton = new Button("Paste Here",
-                        S.edit.pasteSelNodes_InlineAbove, { nid: node.id }, "btn-secondary pasteButton");
-                }
+                pasteButtons = new Span(null, { className: "float-right" }, [
+                    new Button("Paste Inside",
+                        S.edit.pasteSelNodesInside, { nid: node.id }, "btn-secondary pasteButton"),
+
+                    node.id !== state.homeNodeId
+                        ? new Button("Paste Here", S.edit.pasteSelNodes_InlineAbove, { nid: node.id }, "btn-secondary pasteButton") : null
+                ]);
             }
         }
 
         let btnArray: Comp[] = [openButton, insertNodeButton, createSubNodeButton, editNodeButton, moveNodeUpButton, //
-            moveNodeDownButton, cutNodeButton, replyButton, deleteNodeButton, pasteInsideButton, pasteInlineButton];
+            moveNodeDownButton, cutNodeButton, deleteNodeButton, pasteButtons];
 
         if (this.extraButtons) {
             btnArray = btnArray.concat(this.extraButtons);
