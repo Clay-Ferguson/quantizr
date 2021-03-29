@@ -50,7 +50,7 @@ export class AppState {
     feedFilterToPublic: boolean = true;
 
     // must be true to allow NSFW materials.
-    feedFilterNSFW: boolean = false;
+    feedFilterNSFW: boolean = true;
 
     // when true indicates the Feed will show "Refresh when ready..." and not display data
     // until user has set their checkboxes and clicks "Refresh Feed" button.
@@ -126,6 +126,7 @@ export class AppState {
 
     // Rss feeds (cached by a hash of the feedSrc property text as the key)
     feedCache = {};
+    rssHeadlinesOnly: boolean = true;
 
     // Similar to feedCache but holds the current 'page' the user is on (1, 2, 3,...) based on the user
     // being able to click 'more...' button to page thru a feed.

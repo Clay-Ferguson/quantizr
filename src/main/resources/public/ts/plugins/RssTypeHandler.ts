@@ -5,7 +5,6 @@ import { Constants as C } from "../Constants";
 import { AudioPlayerDlg } from "../dlg/AudioPlayerDlg";
 import { NodeActionType } from "../enums/NodeActionType";
 import * as J from "../JavaIntf";
-import { Log } from "../Log";
 import { PubSub } from "../PubSub";
 import { Singletons } from "../Singletons";
 import { Anchor } from "../widget/Anchor";
@@ -13,6 +12,7 @@ import { Comp } from "../widget/base/Comp";
 import { CompIntf } from "../widget/base/CompIntf";
 import { Button } from "../widget/Button";
 import { ButtonBar } from "../widget/ButtonBar";
+import { Checkbox } from "../widget/Checkbox";
 import { Div } from "../widget/Div";
 import { Heading } from "../widget/Heading";
 import { Html } from "../widget/Html";
@@ -126,7 +126,7 @@ export class RssTypeHandler extends TypeBase {
         else {
             state.feedCache[feedSrcHash] = "loading";
 
-            itemListContainer.addChild(new Heading(3, "Loading RSS Feed..."));
+            itemListContainer.addChild(new Heading(4, "Loading RSS Feed..."));
             itemListContainer.addChild(new Div("For large feeds this can take a few seconds..."));
 
             let page: number = state.feedPage[feedSrcHash];
@@ -188,6 +188,20 @@ export class RssTypeHandler extends TypeBase {
         if (!page) {
             page = 1;
         }
+
+        itemListContainer.getChildren().push(new Checkbox("Headlines Only", {
+            className: "float-right"
+        }, {
+            setValue: (checked: boolean): void => {
+                dispatch("Action_SetHealinesFlag", (s: AppState): AppState => {
+                    s.rssHeadlinesOnly = checked;
+                    return s;
+                });
+            },
+            getValue: (): boolean => {
+                return state.rssHeadlinesOnly;
+            }
+        }));
 
         itemListContainer.getChildren().push(this.makeNavButtonBar(page, feedSrcHash, state));
 
@@ -400,24 +414,26 @@ export class RssTypeHandler extends TypeBase {
 
         children.push(new Div(null, { className: "clearBoth" }));
 
-        let mediaDescription = entry.mediaGroup ? entry.mediaGroup["media:description"] : null;
+        if (!state.rssHeadlinesOnly) {
+            let mediaDescription = entry.mediaGroup ? entry.mediaGroup["media:description"] : null;
 
-        let textContent = null;
-        if (entry.content) {
-            textContent = entry.content;
-        }
-        else if (entry["content:encoded"]) {
-            textContent = entry["content:encoded"];
-        }
-        else if (entry.contentSnippet) {
-            textContent = entry.contentSnippet;
-        }
-        else if (mediaDescription) {
-            textContent = mediaDescription;
-        }
+            let textContent = null;
+            if (entry.content) {
+                textContent = entry.content;
+            }
+            else if (entry["content:encoded"]) {
+                textContent = entry["content:encoded"];
+            }
+            else if (entry.contentSnippet) {
+                textContent = entry.contentSnippet;
+            }
+            else if (mediaDescription) {
+                textContent = mediaDescription;
+            }
 
-        if (textContent) {
-            children.push(new Html(textContent));
+            if (textContent) {
+                children.push(new Html(textContent));
+            }
         }
 
         let dateStr = entry.pubDate;
