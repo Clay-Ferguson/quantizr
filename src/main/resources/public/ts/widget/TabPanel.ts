@@ -27,10 +27,10 @@ export class TabPanel extends Div {
         else {
             // See also: RightNavPanel.ts which has the inverse/balance of these numbers of columns.
             this.attribs.className = //
-                "col-" + (C.mainPanelCols + 2) + //
-                " col-md-" + (C.mainPanelCols + 1) +//
-                " col-lg-" + C.mainPanelCols + //
-                // " col-xl-" + C.mainPanelCols + // not needed. 'lg' covers the 'xl' case
+                "col-" + (C.mainPanelCols + 3) + //
+                " col-md-" + (C.mainPanelCols + 2) +//
+                " col-lg-" + (C.mainPanelCols + 1) + //
+                " col-xl-" + C.mainPanelCols + //
                 " offset-" + C.leftNavPanelCols;
         }
     }
