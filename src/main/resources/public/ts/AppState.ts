@@ -46,8 +46,8 @@ export class AppState {
     feedFilterToMe: boolean = false;
     feedFilterFromMe: boolean = false;
 
-    // Note: don't default this to 'false' because then Anonymous users don't have a way to change it.
     feedFilterToPublic: boolean = true;
+    feedFilterLocalServer: boolean = false;
 
     // must be true to allow NSFW materials.
     feedFilterNSFW: boolean = true;

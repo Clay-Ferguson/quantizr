@@ -103,6 +103,7 @@ export class Search implements SearchIntf {
             toMe: appState.feedFilterToMe,
             fromMe: appState.feedFilterFromMe,
             toPublic: appState.feedFilterToPublic,
+            localOnly: appState.feedFilterLocalServer,
             fromFriends: appState.feedFilterFriends,
             nsfw: appState.feedFilterNSFW,
             searchText

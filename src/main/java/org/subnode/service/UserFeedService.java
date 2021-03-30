@@ -238,6 +238,11 @@ public class UserFeedService {
 
 		criteria.orOperator((Criteria[]) orCriteria.toArray(new Criteria[orCriteria.size()]));
 
+		// use attributedTo proptery to determine whether a node is 'local' (posted by this server) or not.
+		if (req.getLocalOnly()) {
+			criteria = criteria.and(SubNode.FIELD_PROPERTIES + "." + NodeProp.ACT_PUB_OBJ_ATTRIBUTED_TO.s()).is(null);
+		}
+
 		if (!StringUtils.isEmpty(req.getSearchText())) {
 			TextCriteria textCriteria = TextCriteria.forDefaultLanguage();
 			textCriteria.matching(req.getSearchText());

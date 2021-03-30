@@ -163,7 +163,7 @@ export class FeedView extends AppTab {
     makeFilterButtonsBar = (state: AppState): Span => {
         return new Span(null, { className: "checkboxBar" }, [
             state.isAnonUser ? null : new Checkbox("Friends", {
-                title: "Include Nodes posted by your friends"
+                title: "Include nodes posted by your friends"
             }, {
                 setValue: (checked: boolean): void => {
                     dispatch("Action_SetFeedFilterType", (s: AppState): AppState => {
@@ -183,7 +183,7 @@ export class FeedView extends AppTab {
             }),
 
             state.isAnonUser ? null : new Checkbox("To Me", {
-                title: "Include Nodes shares specifically to you"
+                title: "Include nodes shares specifically to you (by name)"
             }, {
                 setValue: (checked: boolean): void => {
                     dispatch("Action_SetFeedFilterType", (s: AppState): AppState => {
@@ -203,7 +203,7 @@ export class FeedView extends AppTab {
             }),
 
             state.isAnonUser ? null : new Checkbox("From Me", {
-                title: "Include Nodes created by you"
+                title: "Include nodes created by you"
             }, {
                 setValue: (checked: boolean): void => {
                     dispatch("Action_SetFeedFilterType", (s: AppState): AppState => {
@@ -222,8 +222,8 @@ export class FeedView extends AppTab {
                 }
             }),
 
-            state.isAnonUser ? null : new Checkbox("Fediverse", {
-                title: "Include Nodes shared to 'Public' (everyone)"
+            new Checkbox("Public", {
+                title: "Include nodes shared to 'public' (everyone)"
             }, {
                 setValue: (checked: boolean): void => {
                     dispatch("Action_SetFeedFilterType", (s: AppState): AppState => {
@@ -239,6 +239,26 @@ export class FeedView extends AppTab {
                 },
                 getValue: (): boolean => {
                     return store.getState().feedFilterToPublic;
+                }
+            }),
+
+            new Checkbox("Local", {
+                title: "Include only nodes from accounts on this server."
+            }, {
+                setValue: (checked: boolean): void => {
+                    dispatch("Action_SetFeedFilterType", (s: AppState): AppState => {
+                        s.feedWaitingForUserRefresh = !this.realtimeCheckboxes;
+                        s.feedFilterLocalServer = checked;
+                        return s;
+                    });
+
+                    if (this.realtimeCheckboxes) {
+                        FeedView.page = 0;
+                        S.srch.feed("~" + J.NodeType.FRIEND_LIST, null, FeedView.page, FeedView.searchTextState.getValue());
+                    }
+                },
+                getValue: (): boolean => {
+                    return store.getState().feedFilterLocalServer;
                 }
             }),
 

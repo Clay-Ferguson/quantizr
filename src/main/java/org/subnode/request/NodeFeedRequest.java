@@ -15,6 +15,7 @@ public class NodeFeedRequest extends RequestBase {
 	private Boolean fromMe;
 	private Boolean fromFriends;
 	private Boolean toPublic;
+	private Boolean localOnly;
 	private Boolean nsfw;
 
 	private String searchText;
@@ -89,5 +90,13 @@ public class NodeFeedRequest extends RequestBase {
 
 	public void setSearchText(String searchText) {
 		this.searchText = searchText;
+	}
+
+	public Boolean getLocalOnly() {
+		return localOnly;
+	}
+
+	public void setLocalOnly(Boolean localOnly) {
+		this.localOnly = localOnly;
 	}
 }
