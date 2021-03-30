@@ -50,7 +50,11 @@ export class NodeCompContent extends Div {
                 typeHandler = S.plugin.getTypeHandler(J.NodeType.NONE);
             }
 
-            if (node.content && node.content.indexOf("{{imgUrl}}") !== -1) {
+            if (node.content && ( //
+                node.content.indexOf("{{imgUrl}}") !== -1 ||
+                node.content.indexOf("{{img}}") !== -1 ||
+                node.content.indexOf("{{imgUpperLeft}}") !== -1 ||
+                node.content.indexOf("{{imgUpperRight}}") !== -1)) {
                 embeddedImg = true;
             }
             this.domPreUpdateFunc = typeHandler.getDomPreUpdateFunction;

@@ -221,7 +221,7 @@ public class NodeSearchService {
 					continue;
 				}
 
-				// if specifically searching for rd or wr... &&&
+				// if specifically searching for rd or wr
 				if (req.getAccessOption() != null) {
 					AccessControl ac = node.safeGetAc().get(req.getShareTarget());
 					//log.debug("NodeId: " + node.getId().toHexString() + " req=" + req.getAccessOption() + " privs="

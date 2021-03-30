@@ -59,10 +59,12 @@ export class User implements UserIntf {
         new SignupDlg(state).open();
     }
 
-    defaultHandleAnonUser = () => {
+    defaultHandleAnonUser = (state: AppState) => {
         var tab = S.util.getParameterByName("tab");
         if (tab === "feed") {
-            S.srch.feed("~" + J.NodeType.FRIEND_LIST, null, FeedView.page, null);
+            setTimeout(() => {
+                S.meta64.selectTab("feedTab");
+            }, 10);
         }
         else {
             S.meta64.loadAnonPageHome(null);
@@ -77,7 +79,7 @@ export class User implements UserIntf {
                 /* if we have known state as logged out, then do nothing here */
                 if (loginState === "0") {
                     // console.log("loginState known as logged out.");
-                    this.defaultHandleAnonUser();
+                    this.defaultHandleAnonUser(state);
                     return;
                 }
 
@@ -94,7 +96,7 @@ export class User implements UserIntf {
                 // console.log("refreshLogin with name: " + callUsr);
 
                 if (!callUsr) {
-                    this.defaultHandleAnonUser();
+                    this.defaultHandleAnonUser(state);
                 } else {
                     S.util.ajax<J.LoginRequest, J.LoginResponse>("login", {
                         userName: callUsr,
@@ -116,7 +118,7 @@ export class User implements UserIntf {
                                 S.meta64.setStateVarsUsingLoginResponse(res);
                             }
 
-                            this.defaultHandleAnonUser();
+                            this.defaultHandleAnonUser(state);
                         }
                     },
                         async (error: string) => {
@@ -220,7 +222,9 @@ export class User implements UserIntf {
                     // console.log("login is refreshingTree with ID=" + id);
                     var tab = S.util.getParameterByName("tab");
                     if (tab === "feed") {
-                        S.srch.feed("~" + J.NodeType.FRIEND_LIST, null, FeedView.page, null);
+                        setTimeout(() => {
+                            S.meta64.selectTab("feedTab");
+                        }, 10);
                     }
                     else {
                         S.view.refreshTree(id, true, renderLeafIfParent, childId, false, true, true, state);

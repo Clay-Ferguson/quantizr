@@ -114,6 +114,7 @@ export class Meta64 implements Meta64Intf {
                 S.nav.navHome(s);
             }
             else {
+                s.guiReady = true;
                 s.activeTab = tabName;
             }
             return s;

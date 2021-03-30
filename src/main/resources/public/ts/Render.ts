@@ -49,8 +49,27 @@ export class Render implements RenderIntf {
         val = S.util.replaceAll(val, "{{byName}}", window.location.origin + window.location.pathname + "?id=:");
         val = S.util.replaceAll(val, "{{url}}", window.location.origin + window.location.pathname);
 
+        // todo-0: document these image options in the User Guide
+        let upperLeftImg = "<img class=\"img-upper-left\" width=\"{{imgSize}}\" src=\"{{imgUrl}}\"><div class=\"clearfix\"/>";
+        val = S.util.replaceAll(val, "{{imgUpperLeft}}", upperLeftImg);
+
+        let upperRightImg = "<img class=\"img-upper-right\" width=\"{{imgSize}}\" src=\"{{imgUrl}}\"><div class=\"clearfix\"/>";
+        val = S.util.replaceAll(val, "{{imgUpperRight}}", upperRightImg);
+
+        let imgInline = "<img class=\"img-block\" width=\"{{imgSize}}\" src=\"{{imgUrl}}\">";
+        val = S.util.replaceAll(val, "{{img}}", imgInline);
+
         if (val.indexOf("{{paypal-button}}") !== -1) {
             val = S.util.replaceAll(val, "{{paypal-button}}", C.PAY_PAL_BUTTON);
+        }
+
+        let imgSize = S.props.getNodePropVal(J.NodeProp.IMG_SIZE, node);
+        // actual size prop is saved as "0"
+        if (imgSize && imgSize !== "0") {
+            val = S.util.replaceAll(val, "{{imgSize}}", imgSize);
+        }
+        else {
+            val = S.util.replaceAll(val, "{{imgSize}}", "");
         }
 
         /* Allow the <img> tag to be supported inside the markdown for any node and let {{imgUrl}}, be able to be used in

@@ -593,6 +593,10 @@ public class NodeRenderService {
 				}
 
 				String content = node.getContent();
+				content = content.replace("{{imgUpperRight}}", "");
+				content = content.replace("{{imgUpperLeft}}", "");
+				content = content.replace("{{img}}", "");
+				
 				if (StringUtils.isEmpty(content)) {
 					if (!StringUtils.isEmpty(node.getName())) {
 						content = node.getName();
