@@ -82,8 +82,9 @@ help:
       Friends &rarr; Includes your Friends <br>
       To Me &rarr; Includes nodes shared to you by name <br>
       From Me &rarr; Includes nodes you created <br>
-      Fediverse &rarr; Includes nodes that are shared to everyone (public sharing) <br>
-      NSFW &rarr; Includes nodes flagged as 'sensitive' or potentially offensive or NSFW
+      Public &rarr; Includes nodes that are shared to everyone (public sharing) <br>
+      Local &rarr; Includes nodes only from users who have an account on this server <br>
+      NSFW &rarr; Includes nodes flagged as 'sensitive' or potentially offensive or `Not safe for work`
 
   gettingStarted: >-
     <h3>Getting Started</h3>
@@ -129,14 +130,10 @@ help:
   editor:
     dialog: >
       <h4>Node Editing Tips</h4>
-      To left or right justify images attached to the node use the following markdown:
+      To display the node's attached image at a specific location in the content (rather than below the content, which is the default) you
+      can embed `{{img}}` anywhere in the text, to mark where you want the image to appear.
       <p>
-      <pre>&lt;img class="img-upper-left" width="100px" src="{{imgUrl}}"&gt;
-
-      &lt;div class="clearfix"/&gt;
-      </pre>
-
-      Class can be 'img-upper-left' or 'img-upper-right'
-      <p>
+      To make your attached image appear at upper left corner of the node with text wrapped around it, make your first line of 
+      content text be {{imgUpperLeft}}. Similarly, to make your image at upper right of the node enter `{{imgUpperRight}}` as the first line.
 
 

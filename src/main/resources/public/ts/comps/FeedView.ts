@@ -18,6 +18,7 @@ import { Heading } from "../widget/Heading";
 import { IconButton } from "../widget/IconButton";
 import { Li } from "../widget/Li";
 import { Span } from "../widget/Span";
+import { TextContent } from "../widget/TextContent";
 import { TextField } from "../widget/TextField";
 
 let S: Singletons;
@@ -113,6 +114,7 @@ export class FeedView extends AppTab {
         }
         else if (!state.feedResults || state.feedResults.length === 0) {
             children.push(new Div("Nothing to display."));
+            children.push(new TextContent("Tip: Select 'Public' checkbox only, to see the entire Fediverse --or-- 'Public+Local' to see just public posts made by local users."));
         }
         else {
             let i = 0;
@@ -249,6 +251,12 @@ export class FeedView extends AppTab {
                     dispatch("Action_SetFeedFilterType", (s: AppState): AppState => {
                         s.feedWaitingForUserRefresh = !this.realtimeCheckboxes;
                         s.feedFilterLocalServer = checked;
+
+                        /* to help keep users probably get what they want, set 'public' also to true as the default
+                         any time someone clicks 'Local' because that's the likely use case */
+                        if (checked) {
+                            s.feedFilterToPublic = true;
+                        }
                         return s;
                     });
 
