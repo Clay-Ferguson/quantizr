@@ -1451,9 +1451,9 @@ i'm backing out for now
 
     /* Warning: this 40% is also enforced in the JS code, by post-processing the HTML but before render in react,
     search for this class name in "RssTypeHandler" */
-    max-width: 40%;
+    // max-width: 40%;
     margin-bottom: 12px;
-    margin-right: 12px;
+   //  margin-right: 12px;
 }
 
 .rss-feed-item {

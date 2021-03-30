@@ -94,6 +94,7 @@ export class RssTypeHandler extends TypeBase {
             customFields: {
                 item: [
                     ["media:group", "mediaGroup"],
+                    ["media:content", "mediaContent"],
                     ["media:thumbnail", "mediaThumbnail"],
                     ["category", "category"],
                     ["itunes:image", "itunesImage"],
@@ -210,15 +211,15 @@ export class RssTypeHandler extends TypeBase {
             feedOut.push(new Img(null, {
                 className: "rss-feed-image",
                 src: feed.image.url,
-                title: feed.image.title,
-                align: "left" // causes text to flow around
+                title: feed.image.title
+                // align: "left" // causes text to flow around
             }));
         }
         else if (feed.itunes && feed.itunes.image) {
             feedOut.push(new Img(null, {
                 className: "rss-feed-image",
-                src: feed.itunes.image,
-                align: "left" // causes text to flow around
+                src: feed.itunes.image
+                // align: "left" // causes text to flow around
             }));
         }
 
@@ -326,26 +327,6 @@ export class RssTypeHandler extends TypeBase {
             }
         }
 
-        if (entry.mediaThumbnail && entry.mediaThumbnail.$) {
-            // console.log("mediaThumbnail: " + entry.mediaThumbnail.$.url);
-            let style: any = {};
-
-            headerDivChildren.push(new Img(null, {
-                style,
-                className: "rss-feed-image",
-                src: entry.mediaThumbnail.$.url,
-                align: "left" // causes text to flow around
-            }));
-        }
-        else if (entry.itunesImage && entry.itunesImage.$) {
-            // console.log("mediaThumbnail: " + entry.itunesImage.$.href);
-            headerDivChildren.push(new Img(null, {
-                className: "rss-feed-image",
-                src: entry.itunesImage.$.href,
-                align: "left" // causes text to flow around
-            }));
-        }
-
         if (entry.category) {
             headerDivChildren.push(new Div(entry.category));
         }
@@ -414,7 +395,48 @@ export class RssTypeHandler extends TypeBase {
 
         children.push(new Div(null, { className: "clearBoth" }));
 
+        // IMAGES
+        if (entry.mediaThumbnail && entry.mediaThumbnail.$) {
+            // console.log("mediaThumbnail: " + entry.mediaThumbnail.$.url);
+            let style: any = {};
+
+            children.push(new Img(null, {
+                style,
+                className: "rss-feed-image",
+                src: entry.mediaThumbnail.$.url,
+                // align: "left" // causes text to flow around
+            }));
+        }
+        else if (entry.itunesImage && entry.itunesImage.$) {
+            // console.log("mediaThumbnail: " + entry.itunesImage.$.href);
+            children.push(new Img(null, {
+                className: "rss-feed-image",
+                src: entry.itunesImage.$.href,
+                // align: "left" // causes text to flow around
+            }));
+        }
+
+        if (entry.enclosure && entry.enclosure.url && entry.enclosure.type &&
+            entry.enclosure.type.indexOf("image/") !== -1) {
+            children.push(new Img(null, {
+                className: "rss-feed-image",
+                src: entry.enclosure.url
+            }));
+        }
+
+        /* if mediaContent is present with url and either the type is missing or the type is specified as image, then
+        assume image */
+        if (entry.mediaContent && entry.mediaContent.$ && entry.mediaContent.$.url &&
+            (!entry.mediaContent.$.type || entry.mediaContent.$.type.indexOf("image/") !== -1)) {
+            // console.log("mediaContentImage=" + entry.mediaContent.$.url);
+            children.push(new Img(null, {
+                className: "rss-feed-image",
+                src: entry.mediaContent.$.url
+            }));
+        }
+
         if (!state.rssHeadlinesOnly) {
+
             let mediaDescription = entry.mediaGroup ? entry.mediaGroup["media:description"] : null;
 
             let textContent = null;
@@ -485,6 +507,13 @@ export class RssTypeHandler extends TypeBase {
                 el.style.display = "none";
                 return;
             }
+
+            el.removeAttribute("align");
+
+            // use 'block' here to stop any text from being crammed down the right side of the page 
+            // where there might not be enough space.
+            el.style.display = "block";
+
             urlSet.add(src);
 
             // console.log("IMG SRC: " + (el as any).src);
@@ -498,8 +527,9 @@ export class RssTypeHandler extends TypeBase {
             delete el.style.width;
             el.removeAttribute("height");
         });
-        S.util.forEachElmBySel("#" + parent.getId() + " .rss-feed-image", (el, i) => {
-            el.style.maxWidth = "40%";
-        });
+
+        // S.util.forEachElmBySel("#" + parent.getId() + " .rss-feed-image", (el, i) => {
+        //     el.style.maxWidth = "40%";
+        // });
     }
 }
