@@ -403,7 +403,7 @@ export class RssTypeHandler extends TypeBase {
             children.push(new Img(null, {
                 style,
                 className: "rss-feed-image",
-                src: entry.mediaThumbnail.$.url,
+                src: entry.mediaThumbnail.$.url
                 // align: "left" // causes text to flow around
             }));
         }
@@ -411,7 +411,7 @@ export class RssTypeHandler extends TypeBase {
             // console.log("mediaThumbnail: " + entry.itunesImage.$.href);
             children.push(new Img(null, {
                 className: "rss-feed-image",
-                src: entry.itunesImage.$.href,
+                src: entry.itunesImage.$.href
                 // align: "left" // causes text to flow around
             }));
         }
@@ -510,7 +510,7 @@ export class RssTypeHandler extends TypeBase {
 
             el.removeAttribute("align");
 
-            // use 'block' here to stop any text from being crammed down the right side of the page 
+            // use 'block' here to stop any text from being crammed down the right side of the page
             // where there might not be enough space.
             el.style.display = "block";
 
