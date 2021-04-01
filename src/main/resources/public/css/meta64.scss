@@ -124,6 +124,8 @@ $smallBorderSize: 3px;
     border: 2px solid $nodeBorderBottomColor;
     padding: $smallGap;
     margin-bottom: $smallGap;
+    max-height: 200px;
+    overflow-y: auto;
 }
 
 .d3Graph {

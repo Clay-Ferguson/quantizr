@@ -32,12 +32,7 @@ menu-xxx:
 help:
   nodeStats:
     dialog: >-
-      This is a statistical word analysis for the subgraph under the selected node (i.e. the node you had selected
-      when you clicked the menu item).
-      <p>
-      The analysis considers all the words in the content and identifies the most requently used words, tags, and mentions, 
-      and also uses the statistical relevance of words to calculate a relevancy "score" for each sentence 
-      to present the top 10 most statistically relevant sentences in the text.
+      This is a statistical word analysis the most frequently used words in the text. Click any one to search for it.
 
   type:
     calculator:
