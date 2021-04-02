@@ -10,7 +10,7 @@ intro2:
 # links here can be full url, or node names, or "tab:tabName"
 # Renamed to -xxx to disable, because I decided to embed these links
 # right onto the main platform landing page node instead, and don't need them here.
-menu-xxx:
+menu:
   siteNav:
     - name: "News"
       link: ":news" 
@@ -18,14 +18,14 @@ menu-xxx:
       link: "tab:feedTab"
     - name: "Podcasts"
       link: ":podcasts"
-    - name: "separator"
-      link: ""
-    - name: "Demo Videos"
-      link: ":screencast"
-    - name: "Platform Features"
-      link: ":features"
-    - name: "Getting Started"
-      link: ":getting-started"
+    # - name: "separator"
+    #   link: ""
+    # - name: "Demo Videos"
+    #   link: ":screencast"
+    # - name: "Platform Features"
+    #   link: ":features"
+    # - name: "Getting Started"
+    #   link: ":getting-started"
     - name: "separator"
       link: ""
 

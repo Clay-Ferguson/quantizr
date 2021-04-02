@@ -78,8 +78,9 @@ public class NodeRenderService {
 	 */
 	public RenderNodeResponse renderNode(MongoSession session, RenderNodeRequest req) {
 		/*
-		 * todo-0: Add to Admin area of User Guide the fact that you must edit the auto-created
-		 * welcome-page, because users will land there when they click the 'Portal Home' button.
+		 * todo-0: Add to Admin area of User Guide the fact that you must edit the
+		 * auto-created welcome-page, because users will land there when they click the
+		 * 'Portal Home' button.
 		 */
 		boolean isWelcomePage = req.getNodeId().equals(":welcome-page");
 
@@ -223,6 +224,9 @@ public class NodeRenderService {
 		if (isWelcomePage) {
 			NodeRenderService.welcomePage = res;
 		}
+
+		// todo-0: this was a quick fix. (may no be permanent solution)
+		ThreadLocals.getSessionContext().setUrlId(null);
 
 		return res;
 	}
@@ -488,6 +492,16 @@ public class NodeRenderService {
 
 		String id = appProp.getUserLandingPageNode();
 		// log.debug("Anon Render Node ID: " + id);
+
+		if (ThreadLocals.getSessionContext().getUrlId() != null) {
+			// why was this line missing? On 4/1/2021, I noticed urls like /n/my-node-name
+			// had stopped working, and this seems like the fix,
+			// but I'm definitely missing something becasue the named nodes feature for
+			// non-logged in users definitely WAS working until recently.
+			id = ThreadLocals.getSessionContext().getUrlId();
+			ThreadLocals.getSessionContext().setUrlId(null);
+		}
+
 		req.setNodeId(id);
 
 		RenderNodeResponse res = renderNode(session, req);
@@ -596,7 +610,7 @@ public class NodeRenderService {
 				content = content.replace("{{imgUpperRight}}", "");
 				content = content.replace("{{imgUpperLeft}}", "");
 				content = content.replace("{{img}}", "");
-				
+
 				if (StringUtils.isEmpty(content)) {
 					if (!StringUtils.isEmpty(node.getName())) {
 						content = node.getName();
