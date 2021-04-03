@@ -99,7 +99,7 @@ $smallBorderSize: 3px;
 }
   
 .fullScreenToolbar {
-    z-index: 2147483647;
+    z-index: 2147483501;
     position: fixed;
     top: 0;
     right: 0;
@@ -495,7 +495,7 @@ entire thing down some times, if it's jutting up against something */
 }
 
 .overlay {
-    z-index: 2147483647;
+    z-index: 2147483500;
     background-color: rgba(1, 1, 1, 0.1);
     bottom: 0;
     left: 0;
@@ -1657,7 +1657,6 @@ i'm backing out for now
 @import 'breadcrumbs.scss';
 @import 'media-queries.scss';
 
-
 //We use the default player except we have our own big play and pause buttons.
 
 audio::-webkit-media-controls-mute-button {
@@ -1684,4 +1683,12 @@ audio::-webkit-media-controls-play-button {
 
 .monospace {
     font-family: Courier New,Courier,Lucida Sans Typewriter,Lucida Typewriter,monospace;
+}
+
+.dateTimeDisplay {
+    border-radius: $borderRadiusMedium;
+    border: 3px solid $nodeBorderBottomColor;
+    padding: 6px;
+    display: inline-block;
+    margin-left: $smallGap;
 }

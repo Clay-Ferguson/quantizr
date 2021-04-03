@@ -49,7 +49,6 @@ export class Render implements RenderIntf {
         val = S.util.replaceAll(val, "{{byName}}", window.location.origin + window.location.pathname + "?id=:");
         val = S.util.replaceAll(val, "{{url}}", window.location.origin + window.location.pathname);
 
-        // todo-0: document these image options in the User Guide
         let upperLeftImg = "<img class=\"img-upper-left\" width=\"{{imgSize}}\" src=\"{{imgUrl}}\"><div class=\"clearfix\"/>";
         val = S.util.replaceAll(val, "{{imgUpperLeft}}", upperLeftImg);
 

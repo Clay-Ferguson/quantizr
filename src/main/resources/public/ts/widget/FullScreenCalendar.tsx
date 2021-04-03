@@ -37,7 +37,7 @@ export class FullScreenCalendar extends Main {
         }
 
         return this.e("div", {
-            className: "marginTop"
+            className: "marginAll"
         },
             this.e(FullCalendar, {
                 plugins: [dayGridPlugin, timeGridPlugin, interactionPlugin],

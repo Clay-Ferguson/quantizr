@@ -28,7 +28,7 @@ export class FullScreenControlBar extends Div {
     getButtons = (state: AppState): Comp[] => {
         let buttons = [];
 
-        if (state.fullScreenViewId) {
+        if (state.fullScreenViewId && state.activeTab === "mainTab") {
             if (S.nav.getAdjacentNode("prev", state)) {
                 buttons.push(
                     new IconButton("fa-angle-left fa-lg", "", {
@@ -46,6 +46,7 @@ export class FullScreenControlBar extends Div {
             }
         }
 
+        console.log("cvbtn***** !!"); // todo-0: temporary troubleshooting.
         buttons.push(
             new IconButton("fa-window-close fa-lg", "Close", {
                 onClick: e => { S.nav.closeFullScreenViewer(state); },

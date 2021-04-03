@@ -66,6 +66,9 @@ public class NodeRenderService {
 	@Autowired
 	private MongoAuth auth;
 
+	@Autowired
+	private NodeRenderService render;
+
 	/* Note: this MUST match nav.ROWS_PER_PAGE variable in TypeScript */
 	private static int ROWS_PER_PAGE = 25;
 
@@ -574,8 +577,8 @@ public class NodeRenderService {
 			}
 
 			String content = n.getContent();
-			content = XString.truncateAfterFirst(content, "\n");
-			content = XString.truncateAfterFirst(content, "\r");
+			content = render.getFirstLineAbbreviation(content);
+
 			item.setTitle(content);
 			item.setId(n.getId().toHexString());
 			item.setStart(n.getIntProp(NodeProp.DATE.s()));
@@ -607,9 +610,6 @@ public class NodeRenderService {
 				}
 
 				String content = node.getContent();
-				content = content.replace("{{imgUpperRight}}", "");
-				content = content.replace("{{imgUpperLeft}}", "");
-				content = content.replace("{{img}}", "");
 
 				if (StringUtils.isEmpty(content)) {
 					if (!StringUtils.isEmpty(node.getName())) {
@@ -620,16 +620,7 @@ public class NodeRenderService {
 				} else if (content.startsWith("<[ENC]>")) {
 					content = "[encrypted]";
 				} else {
-					content = content.trim();
-					content = XString.truncateAfterFirst(content, "\n");
-					content = XString.truncateAfterFirst(content, "\r");
-					while (content.startsWith("#")) {
-						content = content.substring(1);
-					}
-
-					if (content.length() > 25) {
-						content = content.substring(0, 25) + "...";
-					}
+					content = getFirstLineAbbreviation(content);
 				}
 
 				bci.setName(content);
@@ -647,5 +638,25 @@ public class NodeRenderService {
 			 * as is by ignoring this exception
 			 */
 		}
+	}
+
+	public String getFirstLineAbbreviation(String content) {
+		if (content==null) return null;
+		content = content.trim();
+
+		content = content.replace("{{imgUpperRight}}", "");
+		content = content.replace("{{imgUpperLeft}}", "");
+		content = content.replace("{{img}}", "");	
+
+		content = XString.truncateAfterFirst(content, "\n");
+		content = XString.truncateAfterFirst(content, "\r");
+		while (content.startsWith("#")) {
+			content = content.substring(1);
+		}
+
+		if (content.length() > 25) {
+			content = content.substring(0, 25) + "...";
+		}
+		return content;
 	}
 }

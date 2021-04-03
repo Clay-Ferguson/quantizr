@@ -77,11 +77,16 @@ export class NodeCompBinary extends Div {
 
         dispatch("Action_ClickImage", (s: AppState): AppState => {
             /* When we click to enlarge an image we need to save the current scroll position
-            after we close the image. */
+            after we close the image.
+
+            todo-0: need more generalized solution to restoring scroll position based on what tab is active, and also
+            sort of treating the fullScreen viewer as a tab also, at least for the purpose of scroll management
+            */
             if (s.savedScrollPosition === -1) {
                 s.savedScrollPosition = window.scrollY;
                 // console.log("Saved ScrollPos: " + s.savedScrollPosition);
             }
+
             if (s.fullScreenViewId && this.isFullScreenEmbed) {
                 s.fullScreenImageSize = s.fullScreenImageSize ? "" : "100%";
             }

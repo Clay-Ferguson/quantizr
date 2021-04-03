@@ -100,9 +100,9 @@ export class NodeCompContent extends Div {
                 }
             }
 
-            children.push(new Heading(5, displayName + ": " + S.util.formatDate(dateVal) + //
+            children.push(new Div(displayName + ": " + S.util.formatDate(dateVal) + //
                 " - " + S.util.getDayOfWeek(dateVal) + diffStr, {
-                className: "marginLeft marginTop"
+                className: "dateTimeDisplay"
             }));
         }
     }

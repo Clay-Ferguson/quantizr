@@ -321,7 +321,7 @@ export class RssTypeHandler extends TypeBase {
 
         if (entry.mediaGroup && entry.mediaGroup["media:thumbnail"]) {
             entry.mediaThumbnail = entry.mediaGroup["media:thumbnail"];
-            // todo-0: if this is an array we should display all.
+            // 1: if this is an array we should display all?
             if (entry.mediaThumbnail instanceof Array) {
                 entry.mediaThumbnail = entry.mediaThumbnail[0];
             }

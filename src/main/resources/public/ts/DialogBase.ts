@@ -24,7 +24,7 @@ export abstract class DialogBase<S extends BaseCompState = any> extends Div<S> i
     // when the final one closes out do we go back to enabling scrolling on body again.
     static refCounter = 0;
     static BACKDROP_PREFIX = "backdrop-";
-    static backdropZIndex: number = 16000000;
+    static backdropZIndex: number = 16000000; // z-index
     resolve: Function;
 
     backdrop: HTMLElement;
