@@ -18,23 +18,16 @@ export class Share implements ShareIntf {
      * Handles 'Sharing' button on a specific node, from button bar above node display in edit mode
      */
     editNodeSharing = async (state: AppState, node: J.NodeInfo): Promise<void> => {
-        return new Promise<void>(async (resolve, reject) => {
-            try {
-                if (!node) {
-                    node = S.meta64.getHighlightedNode(state);
-                }
+        if (!node) {
+            node = S.meta64.getHighlightedNode(state);
+        }
 
-                if (!node) {
-                    S.util.showMessage("No node is selected.", "Warning");
-                    return;
-                }
-                let dlg: SharingDlg = new SharingDlg(node, state);
-                await dlg.open();
-            }
-            finally {
-                resolve();
-            }
-        });
+        if (!node) {
+            S.util.showMessage("No node is selected.", "Warning");
+            return;
+        }
+        let dlg: SharingDlg = new SharingDlg(node, state);
+        await dlg.open();
     }
 
     /* If target is non-null we only return shares to that particlar person (or public) */
@@ -68,50 +61,42 @@ export class Share implements ShareIntf {
     can use their private key to decrypt the key to the data, to view the node.
     */
     addCipherKeyToNode = async (node: J.NodeInfo, principalPublicKeyStr: string, principalNodeId: string): Promise<void> => {
-        return new Promise<void>(async (resolve, reject) => {
-            try {
-                if (principalNodeId === "public") {
-                    console.warn("public node has encryption turned on. This is a bug.");
-                    return;
-                }
-                // console.log("PrincipalPublicKeyStr:" + principalPublicKeyStr + " principalNodeId:" + principalNodeId);
+        if (principalNodeId === "public") {
+            console.warn("public node has encryption turned on. This is a bug.");
+            return;
+        }
+        // console.log("PrincipalPublicKeyStr:" + principalPublicKeyStr + " principalNodeId:" + principalNodeId);
 
-                // get the asym-encrypted sym Key to this node (decryptable by owner of node only, which is us)
-                const cipherKey = S.props.getNodePropVal(J.NodeProp.ENC_KEY, node);
-                // console.log("cipherKey on ENC_KEY: "+cipherKey);
+        // get the asym-encrypted sym Key to this node (decryptable by owner of node only, which is us)
+        const cipherKey = S.props.getNodePropVal(J.NodeProp.ENC_KEY, node);
+        // console.log("cipherKey on ENC_KEY: "+cipherKey);
 
-                // get this broswer's private key from browser storage
-                const privateKey: CryptoKey = await S.encryption.getPrivateKey();
+        // get this broswer's private key from browser storage
+        const privateKey: CryptoKey = await S.encryption.getPrivateKey();
 
-                // so this is the decrypted symmetric key to the data (the unencrypted copy of the actual AES key to the data)
-                const clearKey = await S.encryption.asymDecryptString(privateKey, cipherKey);
-                if (!clearKey) {
-                    throw new Error("Unable to access encryption key.");
-                }
+        // so this is the decrypted symmetric key to the data (the unencrypted copy of the actual AES key to the data)
+        const clearKey = await S.encryption.asymDecryptString(privateKey, cipherKey);
+        if (!clearKey) {
+            throw new Error("Unable to access encryption key.");
+        }
 
-                // console.log("clear text key to re-encrypt: " + clearKey + "\nEncrpyting key using this pub key of user: " +
-                //     principalPublicKeyStr);
+        // console.log("clear text key to re-encrypt: " + clearKey + "\nEncrpyting key using this pub key of user: " +
+        //     principalPublicKeyStr);
 
-                // first parse the key and build a usable key from principalPublicKey.
-                const principalSymKeyJsonObj: JsonWebKey = JSON.parse(principalPublicKeyStr);
-                const principalPublicKey = await S.encryption.importKey(principalSymKeyJsonObj, S.encryption.ASYM_IMPORT_ALGO, true, S.encryption.OP_ENC);
+        // first parse the key and build a usable key from principalPublicKey.
+        const principalSymKeyJsonObj: JsonWebKey = JSON.parse(principalPublicKeyStr);
+        const principalPublicKey = await S.encryption.importKey(principalSymKeyJsonObj, S.encryption.ASYM_IMPORT_ALGO, true, S.encryption.OP_ENC);
 
-                // now re-encrypt this clearTextKey using the public key (of the user being shared to).
-                const userCipherKey = await S.encryption.asymEncryptString(principalPublicKey, clearKey);
-                // console.log("userCipherKey=" + userCipherKey);
+        // now re-encrypt this clearTextKey using the public key (of the user being shared to).
+        const userCipherKey = await S.encryption.asymEncryptString(principalPublicKey, clearKey);
+        // console.log("userCipherKey=" + userCipherKey);
 
-                /* Now post this encrypted key (decryptable only by principalNodeId's private key) up to the server which will
-                then store this key alongside the ACL (access control list) for the sharing entry for this user */
-                await S.util.ajax<J.SetCipherKeyRequest, J.SetCipherKeyResponse>("setCipherKey", {
-                    nodeId: node.id,
-                    principalNodeId,
-                    cipherKey: userCipherKey
-                });
-            }
-            finally {
-                // console.log("Added cipher key: " + userCipherKey + " for principalNodeId: " + principalNodeId);
-                resolve();
-            }
+        /* Now post this encrypted key (decryptable only by principalNodeId's private key) up to the server which will
+        then store this key alongside the ACL (access control list) for the sharing entry for this user */
+        await S.util.ajax<J.SetCipherKeyRequest, J.SetCipherKeyResponse>("setCipherKey", {
+            nodeId: node.id,
+            principalNodeId,
+            cipherKey: userCipherKey
         });
     }
 }

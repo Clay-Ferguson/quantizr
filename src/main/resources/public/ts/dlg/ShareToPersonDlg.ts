@@ -86,18 +86,12 @@ export class ShareToPersonDlg extends DialogBase {
     }
 
     reload = async (res: J.AddPrivilegeResponse): Promise<void> => {
-        return new Promise<void>(async (resolve, reject) => {
-            try {
-                if (S.util.checkSuccess("Share Node with Person", res)) {
-                    this.close();
-                    if (res.principalPublicKey) {
-                        await S.share.addCipherKeyToNode(this.node, res.principalPublicKey, res.principalNodeId);
-                    }
-                    this.sharedNodeFunc(res);
-                }
-            } finally {
-                resolve();
+        if (S.util.checkSuccess("Share Node with Person", res)) {
+            this.close();
+            if (res.principalPublicKey) {
+                await S.share.addCipherKeyToNode(this.node, res.principalPublicKey, res.principalNodeId);
             }
-        });
+            this.sharedNodeFunc(res);
+        }
     }
 }

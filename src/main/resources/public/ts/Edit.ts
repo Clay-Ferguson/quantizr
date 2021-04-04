@@ -241,40 +241,25 @@ export class Edit implements EditIntf {
     }
 
     saveNodeResponse = async (node: J.NodeInfo, res: J.SaveNodeResponse, allowScroll: boolean, state: AppState): Promise<void> => {
-        return new Promise<void>(async (resolve, reject) => {
-            if (S.util.checkSuccess("Save node", res)) {
-                try {
-                    await this.distributeKeys(node, res.aclEntries);
-                    S.view.refreshTree(null, false, false, node.id, false, allowScroll, false, state);
-                    if (state.fullScreenCalendarId) {
-                        S.render.showCalendar(state.fullScreenCalendarId, state);
-                    }
-                }
-                finally {
-                    resolve();
-                }
+        if (S.util.checkSuccess("Save node", res)) {
+            await this.distributeKeys(node, res.aclEntries);
+            S.view.refreshTree(null, false, false, node.id, false, allowScroll, false, state);
+            if (state.fullScreenCalendarId) {
+                S.render.showCalendar(state.fullScreenCalendarId, state);
             }
-        });
+        }
     }
 
     distributeKeys = async (node: J.NodeInfo, aclEntries: J.AccessControlInfo[]): Promise<void> => {
-        return new Promise<void>(async (resolve, reject) => {
-            try {
-                if (!aclEntries || !S.props.isEncrypted(node)) {
-                    return;
-                }
+        if (!aclEntries || !S.props.isEncrypted(node)) {
+            return;
+        }
 
-                for (let ac of aclEntries) {
-                    // console.log("Distribute Key to Principal: " + S.util.prettyPrint(ac));
-                    await S.share.addCipherKeyToNode(node, ac.publicKey, ac.principalNodeId);
-                }
-
-                // console.log("Key distribution complete.");
-            }
-            finally {
-                resolve();
-            }
-        });
+        for (let ac of aclEntries) {
+            // console.log("Distribute Key to Principal: " + S.util.prettyPrint(ac));
+            await S.share.addCipherKeyToNode(node, ac.publicKey, ac.principalNodeId);
+        }
+        // console.log("Key distribution complete.");
     }
 
     toggleEditMode = async (state: AppState): Promise<void> => {

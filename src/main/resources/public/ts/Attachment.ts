@@ -66,32 +66,27 @@ export class Attachment implements AttachmentIntf {
         dlg.open();
     }
 
-    deleteAttachment = (node: J.NodeInfo, state: AppState): Promise<boolean> => {
-        return new Promise<boolean>(async (resolve, reject) => {
-            let deleted = false;
-            try {
-                node = node || S.meta64.getHighlightedNode(state);
-                let delPromise: AxiosPromise<any> = null;
-                if (node) {
-                    const dlg = new ConfirmDlg("Delete the Attachment on the Node?", "Confirm", //
-                        () => {
-                            delPromise = S.util.ajax<J.DeleteAttachmentRequest, J.DeleteAttachmentResponse>("deleteAttachment", {
-                                nodeId: node.id
-                            }, (res: J.DeleteAttachmentResponse): void => {
-                                this.deleteAttachmentResponse(res, node.id, state);
-                                deleted = true;
-                            });
-                        }, null, null, null, state
-                    );
-                    await dlg.open();
-                    if (delPromise) {
-                        await delPromise;
-                    }
-                }
-            } finally {
-                resolve(deleted);
+    deleteAttachment = async (node: J.NodeInfo, state: AppState): Promise<boolean> => {
+        let deleted = false;
+        node = node || S.meta64.getHighlightedNode(state);
+        let delPromise: AxiosPromise<any> = null;
+        if (node) {
+            const dlg = new ConfirmDlg("Delete the Attachment on the Node?", "Confirm", //
+                () => {
+                    delPromise = S.util.ajax<J.DeleteAttachmentRequest, J.DeleteAttachmentResponse>("deleteAttachment", {
+                        nodeId: node.id
+                    }, (res: J.DeleteAttachmentResponse): void => {
+                        this.deleteAttachmentResponse(res, node.id, state);
+                        deleted = true;
+                    });
+                }, null, null, null, state
+            );
+            await dlg.open();
+            if (delPromise) {
+                await delPromise;
             }
-        });
+        }
+        return deleted;
     }
 
     // kState=='keep state' (the state has been changed, keep changes)

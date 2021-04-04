@@ -787,24 +787,18 @@ export class EditNodeDlg extends DialogBase {
     }
 
     deleteUpload = async (): Promise<void> => {
-        return new Promise<void>(async (resolve, reject) => {
-            try {
-                let state = this.getState();
+        let state = this.getState();
 
-                /* Note: This doesn't resolve until either user clicks no on confirmation dialog or else has clicked yes and the delete
-                call has fully completed. */
-                let deleted: boolean = await S.attachment.deleteAttachment(state.node, this.appState);
+        /* Note: This doesn't resolve until either user clicks no on confirmation dialog or else has clicked yes and the delete
+        call has fully completed. */
+        let deleted: boolean = await S.attachment.deleteAttachment(state.node, this.appState);
 
-                if (deleted) {
-                    S.attachment.removeBinaryProperties(state.node);
-                    this.initPropStates(state.node, true);
-                    this.mergeState({ node: state.node });
-                    this.binaryDirty = true;
-                }
-            } finally {
-                resolve();
-            }
-        });
+        if (deleted) {
+            S.attachment.removeBinaryProperties(state.node);
+            this.initPropStates(state.node, true);
+            this.mergeState({ node: state.node });
+            this.binaryDirty = true;
+        }
     }
 
     /* todo-1: rename this method because it doesn't always actually run the dialog */
@@ -907,41 +901,37 @@ export class EditNodeDlg extends DialogBase {
 
     saveNode = async (): Promise<void> => {
         let state = this.getState();
-        return new Promise<void>(async (resolve, reject) => {
 
-            let content: string;
-            if (this.contentEditor) {
-                content = this.contentEditor.getValue();
-                let cipherKey = S.props.getCryptoKey(state.node, this.appState);
-                if (cipherKey) {
-                    content = await S.encryption.symEncryptStringWithCipherKey(cipherKey, content);
-                    content = J.Constant.ENC_TAG + content;
-                }
+        let content: string;
+        if (this.contentEditor) {
+            content = this.contentEditor.getValue();
+            let cipherKey = S.props.getCryptoKey(state.node, this.appState);
+            if (cipherKey) {
+                content = await S.encryption.symEncryptStringWithCipherKey(cipherKey, content);
+                content = J.Constant.ENC_TAG + content;
             }
-            if (content) {
-                content = content.trim();
+        }
+        if (content) {
+            content = content.trim();
+        }
+        state.node.content = content;
+        state.node.name = this.nameState.getValue();
+
+        let askToSplit = state.node.content && ((state.node as J.NodeInfo).content.indexOf("{split}") !== -1 ||
+            (state.node as J.NodeInfo).content.indexOf("\n\n\n") !== -1);
+
+        this.savePropsToNode();
+        // console.log("calling saveNode(). PostData=" + S.util.prettyPrint(state.node));
+
+        S.util.ajax<J.SaveNodeRequest, J.SaveNodeResponse>("saveNode", {
+            node: state.node
+        }, (res) => {
+            S.render.fadeInId = state.node.id;
+            S.edit.saveNodeResponse(state.node, res, true, this.appState);
+
+            if (askToSplit) {
+                new SplitNodeDlg(state.node, this.appState).open();
             }
-            state.node.content = content;
-            state.node.name = this.nameState.getValue();
-
-            let askToSplit = state.node.content && ((state.node as J.NodeInfo).content.indexOf("{split}") !== -1 ||
-                (state.node as J.NodeInfo).content.indexOf("\n\n\n") !== -1);
-
-            this.savePropsToNode();
-            // console.log("calling saveNode(). PostData=" + S.util.prettyPrint(state.node));
-
-            S.util.ajax<J.SaveNodeRequest, J.SaveNodeResponse>("saveNode", {
-                node: state.node
-            }, (res) => {
-                S.render.fadeInId = state.node.id;
-                S.edit.saveNodeResponse(state.node, res, true, this.appState);
-
-                if (askToSplit) {
-                    new SplitNodeDlg(state.node, this.appState).open();
-                }
-            });
-
-            resolve();
         });
     }
 

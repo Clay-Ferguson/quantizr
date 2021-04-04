@@ -186,20 +186,15 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
     }
 
     upload = async (): Promise<boolean> => {
-        return new Promise<boolean>(async (resolve, reject) => {
-            try {
-                if (this.filesAreValid()) {
-                    const files = this.dropzone.getAcceptedFiles();
+        if (this.filesAreValid()) {
+            const files = this.dropzone.getAcceptedFiles();
 
-                    if (files) {
-                        this.numFiles = files.length;
-                        this.dropzone.processQueue();
-                    }
-                }
-            } finally {
-                resolve(true);
+            if (files) {
+                this.numFiles = files.length;
+                this.dropzone.processQueue();
             }
-        });
+        }
+        return true;
     }
 
     configureDropZone = (): void => {
@@ -296,7 +291,7 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
 
                 // not needed (this does work however)
                 this.on("uploadprogress", function (file, progress) {
-                   // console.log("File progress", progress);
+                    // console.log("File progress", progress);
                 });
 
                 this.on("success", function (file: File, resp: J.ResponseBase, evt: ProgressEvent) {
