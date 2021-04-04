@@ -315,6 +315,7 @@ export class Nav implements NavIntf {
             s.fullScreenViewId = null;
             s.fullScreenGraphId = null;
             s.fullScreenCalendarId = null;
+            S.meta64.tabChanging(null, s.activeTab, s);
             return s;
         });
     }
@@ -325,6 +326,7 @@ export class Nav implements NavIntf {
         if (prevNode) {
             dispatch("Action_PrevFullScreenImgViewer", (s: AppState): AppState => {
                 s.fullScreenViewId = prevNode.id;
+                S.meta64.tabChanging(s.activeTab, null, s);
                 return s;
             });
         }
@@ -336,6 +338,7 @@ export class Nav implements NavIntf {
         if (nextNode) {
             dispatch("Action_NextFullScreenImgViewer", (s: AppState): AppState => {
                 s.fullScreenViewId = nextNode.id;
+                S.meta64.tabChanging(s.activeTab, null, s);
                 return s;
             });
         }

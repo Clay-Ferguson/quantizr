@@ -33,8 +33,10 @@ export class NodeCompVerticalRowLayout extends Div {
         to ber correct before the second loop stats. */
         for (let i = 0; i < this.node.children.length; i++) {
             let n: J.NodeInfo = this.node.children[i];
-            if (!(state.nodesToMove && state.nodesToMove.find(id => id === n.id))) {
-                countToDisplay++;
+            if (n) {
+                if (!(state.nodesToMove && state.nodesToMove.find(id => id === n.id))) {
+                    countToDisplay++;
+                }
             }
         }
 
@@ -44,27 +46,29 @@ export class NodeCompVerticalRowLayout extends Div {
         let lastNode: J.NodeInfo = null;
         for (let i = 0; i < this.node.children.length; i++) {
             let n: J.NodeInfo = this.node.children[i];
-            if (!(state.nodesToMove && state.nodesToMove.find(id => id === n.id))) {
+            if (n) {
+                if (!(state.nodesToMove && state.nodesToMove.find(id => id === n.id))) {
 
-                if (this.debug && n) {
-                    console.log("RENDER ROW[" + i + "]: node.id=" + n.id);
-                }
+                    if (this.debug && n) {
+                        console.log("RENDER ROW[" + i + "]: node.id=" + n.id);
+                    }
 
-                let childrenImgSizes = S.props.getNodePropVal(J.NodeProp.CHILDREN_IMG_SIZES, this.node);
-                let typeHandler: TypeHandlerIntf = S.plugin.getTypeHandler(n.type);
+                    let childrenImgSizes = S.props.getNodePropVal(J.NodeProp.CHILDREN_IMG_SIZES, this.node);
+                    let typeHandler: TypeHandlerIntf = S.plugin.getTypeHandler(n.type);
 
-                // special case where we aren't in edit mode, and we run across a markdown type with blank content, then don't render it.
-                if (typeHandler && typeHandler.getTypeName() === J.NodeType.NONE && !n.content && !state.userPreferences.editMode && !S.props.hasBinary(n)) {
-                }
-                else {
-                    lastNode = n;
-                    let row: Comp = new NodeCompRow(n, i, childCount, rowCount + 1, this.level, false, this.allowNodeMove, childrenImgSizes, this.allowHeaders, state);
-                    comps.push(row);
-                }
+                    // special case where we aren't in edit mode, and we run across a markdown type with blank content, then don't render it.
+                    if (typeHandler && typeHandler.getTypeName() === J.NodeType.NONE && !n.content && !state.userPreferences.editMode && !S.props.hasBinary(n)) {
+                    }
+                    else {
+                        lastNode = n;
+                        let row: Comp = new NodeCompRow(n, i, childCount, rowCount + 1, this.level, false, this.allowNodeMove, childrenImgSizes, this.allowHeaders, state);
+                        comps.push(row);
+                    }
 
-                rowCount++;
-                if (n.children) {
-                    comps.push(S.render.renderChildren(n, this.level + 1, this.allowNodeMove, state));
+                    rowCount++;
+                    if (n.children) {
+                        comps.push(S.render.renderChildren(n, this.level + 1, this.allowNodeMove, state));
+                    }
                 }
             }
         }
@@ -80,15 +84,19 @@ export class NodeCompVerticalRowLayout extends Div {
                 // todo-0: this button should have same enabelement as "new" button, on the page root
                 let btn = new IconButton("fa-plus", null, {
                     onClick: e => {
-                        S.edit.insertNode(lastNode.id, "u", 1 /* isFirst ? 0 : 1 */, state);
+                        if (lastNode) {
+                            S.edit.insertNode(lastNode.id, "u", 1 /* isFirst ? 0 : 1 */, state);
+                        }
                     },
                     title: "Insert new node"
                 }, "btn-secondary marginLeft marginTop");
                 comps.push(btn);
 
-                let userCanPaste = (S.props.isMine(lastNode, state) || state.isAdminUser) && lastNode.id !== state.homeNodeId;
-                if (!!state.nodesToMove && userCanPaste) {
-                    comps.push(new Button("Paste Here", S.edit.pasteSelNodes_Inline, { nid: lastNode.id }, "btn-secondary pasteButton"));
+                if (lastNode) {
+                    let userCanPaste = (S.props.isMine(lastNode, state) || state.isAdminUser) && lastNode.id !== state.homeNodeId;
+                    if (!!state.nodesToMove && userCanPaste) {
+                        comps.push(new Button("Paste Here", S.edit.pasteSelNodes_Inline, { nid: lastNode.id }, "btn-secondary pasteButton"));
+                    }
                 }
             }
         }

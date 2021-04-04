@@ -64,6 +64,8 @@ export class Meta64 implements Meta64Intf {
     // decryption code twice.
     decryptCache: Map<string, string> = new Map<string, string>();
 
+    scrollPosByTabName: Map<string, number> = new Map<string, number>();
+
     logView: LogView = new LogView();
 
     tabs: AppTab[] = [
@@ -115,6 +117,7 @@ export class Meta64 implements Meta64Intf {
             }
             else {
                 s.guiReady = true;
+                this.tabChanging(s.activeTab, tabName, s);
                 s.activeTab = tabName;
             }
             return s;
@@ -132,6 +135,7 @@ export class Meta64 implements Meta64Intf {
             }, 1);
         }
         else {
+            this.tabChanging(state.activeTab, tabName, state);
             state.activeTab = tabName;
         }
     }
@@ -519,6 +523,35 @@ export class Meta64 implements Meta64Intf {
 
             resolve();
         });
+    }
+
+    /* This function manages persisting the scroll position when switching
+    from one tab to another, to automatically restore the scroll position that was
+    last scroll position on any given tab */
+    tabChanging = (prevTab: string, newTab: string, state: AppState): void => {
+
+        // The full screen viewer is the oddball case, where we just remember the current tab position and return
+        if (prevTab && this.fullscreenViewerActive(state)) {
+            this.scrollPosByTabName.set(prevTab, window.scrollY);
+            return;
+        }
+
+        // console.log("Changing from tab: " + prevTab + " to " + newTab);
+        if (newTab) {
+            if (this.scrollPosByTabName.has(newTab)) {
+                let newPos = this.scrollPosByTabName.get(newTab);
+
+                PubSub.subSingleOnce(C.PUBSUB_mainWindowScroll, () => {
+                    // console.log("Restoring tab " + newTab + " to " + newPos);
+                    window.scrollTo(0, newPos);
+                });
+            }
+        }
+
+        if (prevTab) {
+            // console.log("Prev tab: " + prevTab + " set to " + window.scrollY);
+            this.scrollPosByTabName.set(prevTab, window.scrollY);
+        }
     }
 
     /* We look at the node, and get the parent path from it, and then if there is a node matching that being displayed

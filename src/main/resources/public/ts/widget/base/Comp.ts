@@ -26,11 +26,7 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
 export abstract class Comp<S extends BaseCompState = any> implements CompIntf {
     static renderCounter: number = 0;
     public rendered: boolean = false;
-
-    // leaving this true right now, to troubleshoot a problem happening only on PROD where
-    // the fullscreen image viewer close button is missing but I can't reproduce yet at will
-    // todo-0
-    public debug: boolean = true;
+    public debug: boolean = false;
 
     public debugState: boolean = false;
     private static guid: number = 0;

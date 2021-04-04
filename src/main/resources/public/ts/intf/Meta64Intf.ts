@@ -36,6 +36,7 @@ export interface Meta64Intf {
     ctrlKeyCheck(): boolean;
     decryptCache: Map<string, string>;
 
+    tabChanging(prevTab: string, newTab: string, state: AppState): void;
     showOpenButtonOnNode(node: J.NodeInfo, state: AppState): void;
     toggleMouseEffect(): void;
     runClickAnimation(x: number, y: number): void;

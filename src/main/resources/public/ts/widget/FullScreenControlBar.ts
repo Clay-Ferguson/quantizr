@@ -46,7 +46,6 @@ export class FullScreenControlBar extends Div {
             }
         }
 
-        console.log("cvbtn***** !!"); // todo-0: temporary troubleshooting.
         buttons.push(
             new IconButton("fa-window-close fa-lg", "Close", {
                 onClick: e => { S.nav.closeFullScreenViewer(state); },

@@ -173,29 +173,12 @@ export class App extends Div {
         ]);
 
         if (main) {
-            /* This will run if for example the user closed a fullscreen viewer and we need to pop the main window back to
-            it's previous scroll position */
-            if (state.savedScrollPosition !== -1) {
-                let restoreScrollPos = state.savedScrollPosition;
-                // Log.log("Restore ScrollPos (x): " + restoreScrollPos);
-                S.view.docElm.scrollTop = restoreScrollPos;
-                setTimeout(() => {
-                    dispatch("Action_FastRefresh", (s: AppState): AppState => {
-                        s.savedScrollPosition = -1;
-                        return s;
-                    });
-                    // Log.log("Restore ScrollPos (y): " + restoreScrollPos);
-                    S.view.docElm.scrollTop = restoreScrollPos;
-                }, 250);
-            }
-            else {
-                /* This is where we send an event that lets code hook into the render cycle to process whatever needs
-                to be done AFTER the main render is complete, like doing scrolling for example */
-                main.domUpdateEvent = () => {
-                    PubSub.pub(C.PUBSUB_mainWindowScroll);
-                    PubSub.pub(C.PUBSUB_postMainWindowScroll);
-                };
-            }
+            /* This is where we send an event that lets code hook into the render cycle to process whatever needs
+            to be done AFTER the main render is complete, like doing scrolling for example */
+            main.domUpdateEvent = () => {
+                PubSub.pub(C.PUBSUB_mainWindowScroll);
+                PubSub.pub(C.PUBSUB_postMainWindowScroll);
+            };
         }
         else if (fullScreenViewer) {
             fullScreenViewer.domUpdateEvent = () => {
