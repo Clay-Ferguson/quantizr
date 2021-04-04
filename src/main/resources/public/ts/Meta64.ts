@@ -536,6 +536,11 @@ export class Meta64 implements Meta64Intf {
             return;
         }
 
+        /* Don't run any code here if we aren't actually changing tabs */
+        if (prevTab && newTab && prevTab === newTab) {
+            return;
+        }
+
         // console.log("Changing from tab: " + prevTab + " to " + newTab);
         if (newTab) {
             if (this.scrollPosByTabName.has(newTab)) {
