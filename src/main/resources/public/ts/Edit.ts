@@ -78,7 +78,7 @@ export class Edit implements EditIntf {
         }
     }
 
-    public initNodeEditResponse = (res: J.InitNodeEditResponse, encrypt: boolean, state: AppState): void => {
+    public initNodeEditResponse = (res: J.InitNodeEditResponse, encrypt: boolean, showJumpButton: boolean, state: AppState): void => {
         if (S.util.checkSuccess("Editing node", res)) {
             const node: J.NodeInfo = res.nodeInfo;
 
@@ -88,7 +88,7 @@ export class Edit implements EditIntf {
                  * Server will have sent us back the raw text content, that should be markdown instead of any HTML, so
                  * that we can display this and save.
                  */
-                const dlg = new EditNodeDlg(res.nodeInfo, res.parentInfo, encrypt, state);
+                const dlg = new EditNodeDlg(res.nodeInfo, res.parentInfo, encrypt, showJumpButton, state);
                 dlg.open();
             } else {
                 S.util.showMessage("Editing not allowed on node.", "Warning");
@@ -224,7 +224,7 @@ export class Edit implements EditIntf {
         if (S.util.checkSuccess("Insert node", res)) {
             S.meta64.updateNodeMap(res.newNode, state);
             S.meta64.highlightNode(res.newNode, true, state);
-            this.runEditNode(null, res.newNode.id, false, state);
+            this.runEditNode(null, res.newNode.id, false, false, state);
         }
     }
 
@@ -235,7 +235,7 @@ export class Edit implements EditIntf {
             }
             else {
                 S.meta64.updateNodeMap(res.newNode, state);
-                this.runEditNode(null, res.newNode.id, res.encrypt, state);
+                this.runEditNode(null, res.newNode.id, res.encrypt, false, state);
             }
         }
     }
@@ -365,11 +365,11 @@ export class Edit implements EditIntf {
         // scroll to this, because this is a hint telling us we are ALREAY
         // scrolled to this ID so any scrolling will be unnecessary
         S.meta64.noScrollToId = id;
-        this.runEditNode(null, id, false, state);
+        this.runEditNode(null, id, false, false, state);
     }
 
     /* This can run as an actuall click event function in which only 'evt' is non-null here */
-    runEditNode = (evt: Event, id: string, encrypt: boolean, state?: AppState): void => {
+    runEditNode = (evt: Event, id: string, encrypt: boolean, showJumpButton: boolean, state?: AppState): void => {
         id = S.util.allowIdFromEvent(evt, id);
 
         state = appState(state);
@@ -388,7 +388,7 @@ export class Edit implements EditIntf {
         S.util.ajax<J.InitNodeEditRequest, J.InitNodeEditResponse>("initNodeEdit", {
             nodeId: id
         }, (res) => {
-            this.initNodeEditResponse(res, encrypt, state);
+            this.initNodeEditResponse(res, encrypt, showJumpButton, state);
         });
     }
 

@@ -470,8 +470,8 @@ export class Render implements RenderIntf {
          */
         const layout = S.props.getNodePropVal(J.NodeProp.LAYOUT, node);
 
-        /* Note: for mobile devices, always use vertical layout. */
-        if (state.mobileMode || !layout || layout === "v") {
+        /* Note: for edit mode, or on mobile devices, always use vertical layout. */
+        if (state.userPreferences.editMode || state.mobileMode || !layout || layout === "v") {
             return new NodeCompVerticalRowLayout(node, level, allowNodeMove, true);
         }
         else if (layout.indexOf("c") === 0) {

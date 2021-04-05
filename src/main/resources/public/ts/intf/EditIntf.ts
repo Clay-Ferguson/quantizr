@@ -27,7 +27,7 @@ export interface EditIntf {
     getFirstChildNode(state: AppState): any;
     getLastChildNode(state: AppState): any;
     runEditNodeByClick(evt: Event, id: string, state?: AppState): void;
-    runEditNode(evt: Event, id: string, encrypt: boolean, state?: AppState): void;
+    runEditNode(evt: Event, id: string, encrypt: boolean, showJumpButton: boolean, state?: AppState): void;
     insertNode(id: string, typeName: string, ordinalOffset: number, state?: AppState): void;
     toolbarInsertNode(evt: Event, id: string): void;
     createSubNode(id: any, typeName: string, createAtTop: boolean, parentNode: J.NodeInfo, state: AppState): void;
@@ -47,6 +47,6 @@ export interface EditIntf {
     createNode(node: J.NodeInfo, typeName: string, state: AppState): void;
     addCalendarEntry(initDate: number, state: AppState): void;
     moveNodeByDrop(targetNodeId: string, sourceNodeId: string, isFirts: boolean): void;
-    initNodeEditResponse(res: J.InitNodeEditResponse, encrypt: boolean, state: AppState): void;
+    initNodeEditResponse(res: J.InitNodeEditResponse, encrypt: boolean, showJumpButton: boolean, state: AppState): void;
     updateHeadings(state: AppState): void;
 }

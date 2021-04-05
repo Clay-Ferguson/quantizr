@@ -77,7 +77,7 @@ export class EditNodeDlg extends DialogBase {
 
     allowEditAllProps: boolean = false;
 
-    constructor(node: J.NodeInfo, public parentNode: J.NodeInfo, private encrypt: boolean, state: AppState) {
+    constructor(node: J.NodeInfo, public parentNode: J.NodeInfo, private encrypt: boolean, private showJumpButton: boolean, state: AppState) {
         super("Edit", "app-modal-content", false, state);
         this.mergeState({
             node,
@@ -289,7 +289,24 @@ export class EditNodeDlg extends DialogBase {
             }));
         }
 
+        if (this.showJumpButton) {
+            if (!span) span = new Span();
+            span.addChild(new Icon({
+                title: "Jump to Node",
+                className: "fa fa-arrow-right fa-lg jumpButton",
+                onClick: () => {
+                    this.cancelEdit();
+                    S.nav.closeFullScreenViewer(this.appState);
+                    this.jumpToNode(state.node.id, this.appState);
+                }
+            }));
+        }
+
         return span;
+    }
+
+    jumpToNode = (id: string, state: AppState) => {
+        S.view.refreshTree(id, true, true, id, false, true, true, state);
     }
 
     getTitleText(): string {
