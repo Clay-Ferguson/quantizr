@@ -84,7 +84,7 @@ export class FeedView extends AppTab {
                     FeedView.refresh();
                 })
             ])
-        ], null, "float-right marginBottom");
+        ], null, "float-right marginBottom marginTop");
 
         children.push(this.makeFilterButtonsBar(state));
         children.push(refreshFeedButtonBar);

@@ -187,6 +187,10 @@ public class UserFeedService {
 			criteria = criteria.and(SubNode.FIELD_PROPERTIES + "." + NodeProp.ACT_PUB_SENSITIVE + ".value").is(null);
 		}
 
+		// Users can manually add a property named "unpublish" to have a "public" node that nonetheles doesn't show up
+		// in any feeds, but in the future maybe we will make this a checkbox on the editor.
+		criteria = criteria.and(SubNode.FIELD_PROPERTIES + "." + NodeProp.UNPUBLISHED + ".value").is(null);
+
 		// reset feedMaxTime if we're getting first page of results
 		if (req.getPage() == 0) {
 			sc.setFeedMaxTime(null);
