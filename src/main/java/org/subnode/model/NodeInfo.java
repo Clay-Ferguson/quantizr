@@ -173,7 +173,7 @@ public class NodeInfo {
 	public List<NodeInfo> safeGetChildren() {
 		if (children != null)
 			return children;
-		return children = new LinkedList<NodeInfo>();
+		return children = new LinkedList<>();
 	}
 
 	public List<NodeInfo> getChildren() {
@@ -203,7 +203,7 @@ public class NodeInfo {
 	public List<PropertyInfo> safeGetProperties() {
 		if (properties != null)
 			return properties;
-		return properties = new LinkedList<PropertyInfo>();
+		return properties = new LinkedList<>();
 	}
 
 	public List<PropertyInfo> getProperties() {
@@ -345,7 +345,7 @@ public class NodeInfo {
 	public List<PropertyInfo> safeGetClientProps() {
 		if (clientProps != null)
 			return clientProps;
-		return clientProps = new LinkedList<PropertyInfo>();
+		return clientProps = new LinkedList<>();
 	}
 
 	public List<PropertyInfo> getClientProps() {

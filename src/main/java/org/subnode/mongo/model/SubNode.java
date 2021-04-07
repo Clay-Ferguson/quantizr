@@ -309,7 +309,7 @@ public class SubNode {
 	@JsonIgnore
 	public HashMap<String, AccessControl> safeGetAc() {
 		if (ac == null) {
-			ac = new HashMap<String, AccessControl>();
+			ac = new HashMap<>();
 		}
 		return ac;
 	}

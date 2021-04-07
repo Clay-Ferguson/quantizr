@@ -197,7 +197,7 @@ public class AclService {
 
 		/* initialize acl to a map if it's null */
 		if (acl == null) {
-			acl = new HashMap<String, AccessControl>();
+			acl = new HashMap<>();
 		}
 
 		/*
@@ -318,7 +318,7 @@ public class AclService {
 	}
 
 	public List<String> getOwnerNames(MongoSession session, SubNode node) {
-		Set<String> ownerSet = new HashSet<String>();
+		Set<String> ownerSet = new HashSet<>();
 		/*
 		 * We walk up the tree util we get to the root, or find ownership on node, or any of it's parents
 		 */
@@ -347,13 +347,13 @@ public class AclService {
 			}
 		}
 
-		List<String> ownerList = new LinkedList<String>(ownerSet);
+		List<String> ownerList = new LinkedList<>(ownerSet);
 		Collections.sort(ownerList);
 		return ownerList;
 	}
 
 	public static List<MongoPrincipal> getNodePrincipals(MongoSession session, SubNode node) {
-		List<MongoPrincipal> principals = new LinkedList<MongoPrincipal>();
+		List<MongoPrincipal> principals = new LinkedList<>();
 		MongoPrincipal principal = new MongoPrincipal();
 		principal.setUserNodeId(node.getId());
 		principal.setAccessLevel("w");

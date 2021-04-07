@@ -50,7 +50,7 @@ public class IPFSTest implements TestIntf {
     public void oldTest2() throws Exception {
         // ipfs.getPins();
         adminRunner.run(mongoSession -> {
-            ValContainer<String> cid = new ValContainer<String>();
+            ValContainer<String> cid = new ValContainer<>();
             ipfs.dagPutFromString(mongoSession, "{\"data\": \"MY FIRST DAG PUT\"}", null, null, cid);
             log.debug("Cid=" + cid.getVal());
 

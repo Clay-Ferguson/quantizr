@@ -28,7 +28,7 @@ import org.subnode.util.XString;
 @Component
 public class AppFilter extends GenericFilterBean {
 	private static final Logger log = LoggerFactory.getLogger(AppFilter.class);
-	private static final HashMap<String, Integer> uniqueIpHits = new HashMap<String, Integer>();
+	private static final HashMap<String, Integer> uniqueIpHits = new HashMap<>();
 	private static int reqId = 0;
 	private static boolean logRequests = false;
 	private static boolean logResponses = false;
@@ -47,7 +47,7 @@ public class AppFilter extends GenericFilterBean {
 	 * simultenaously this is every helpful for debugging
 	 */
 	private static boolean singleThreadDebugging = false;
-	private static final HashMap<String, Object> locksByIp = new HashMap<String, Object>();
+	private static final HashMap<String, Object> locksByIp = new HashMap<>();
 
 	@Override
 	public void doFilter(ServletRequest req, ServletResponse res, FilterChain chain) throws IOException, ServletException {

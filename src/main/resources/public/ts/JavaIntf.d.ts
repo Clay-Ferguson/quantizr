@@ -670,7 +670,7 @@ export const enum NodeProp {
     ACT_PUB_ACTOR_URL = "ap:actorUrl",
     ACT_PUB_ACTOR_INBOX = "ap:actorInbox",
     ACT_PUB_SENSITIVE = "ap:nsfw",
-    UNPUBLISHED = "unpublish",
+    UNPUBLISHED = "unpublished",
     ENC_KEY = "sn:encKey",
     TEMP = "tmp",
     RSS_FEED_SRC = "sn:rssFeedSrc",

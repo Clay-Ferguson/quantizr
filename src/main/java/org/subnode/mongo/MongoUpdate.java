@@ -69,7 +69,7 @@ public class MongoUpdate {
 				 * We use 'nodes' list to avoid a concurrent modification exception in the loop
 				 * below
 				 */
-				List<SubNode> nodes = new LinkedList<SubNode>();
+				List<SubNode> nodes = new LinkedList<>();
 
 				/*
 				 * check that we are allowed to write all, before we start writing any
@@ -101,7 +101,7 @@ public class MongoUpdate {
 	 * orphans.
 	 */
 	public String releaseOrphanIPFSPins(HashMap<ObjectId, UserStats> statsMap) {
-		ValContainer<String> ret = new ValContainer<String>("failed");
+		ValContainer<String> ret = new ValContainer<>("failed");
 		adminRunner.run(session -> {
 			int pinCount = 0, orphanCount = 0;
 			LinkedHashMap<String, Object> pins = Cast.toLinkedHashMap(ipfs.getPins());

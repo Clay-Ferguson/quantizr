@@ -280,7 +280,7 @@ public class Convert {
 
 			/* lazy create props */
 			if (props == null) {
-				props = new LinkedList<PropertyInfo>();
+				props = new LinkedList<>();
 			}
 
 			PropertyInfo propInfo = convertToPropertyInfo(sessionContext, node, propName, p, htmlOnly, initNodeEdit);
@@ -307,7 +307,7 @@ public class Convert {
 
 			/* lazy create list */
 			if (ret == null) {
-				ret = new LinkedList<AccessControlInfo>();
+				ret = new LinkedList<>();
 			}
 
 			AccessControlInfo acInfo = convertToAccessControlInfo(sessionContext, node, principalId, acval);

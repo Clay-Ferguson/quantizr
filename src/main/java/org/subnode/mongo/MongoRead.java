@@ -326,7 +326,7 @@ public class MongoRead {
         if (!iter.iterator().hasNext()) {
             return null;
         }
-        List<SubNode> list = new LinkedList<SubNode>();
+        List<SubNode> list = new LinkedList<>();
         iter.forEach(list::add);
         return list;
     }
@@ -359,7 +359,7 @@ public class MongoRead {
         query.addCriteria(criteria);
 
         Iterable<SubNode> iter = ops.find(query, SubNode.class);
-        List<String> nodeIds = new LinkedList<String>();
+        List<String> nodeIds = new LinkedList<>();
         for (SubNode n : iter) {
             nodeIds.add(n.getId().toHexString());
         }

@@ -46,8 +46,8 @@ public class ActPubFactory {
 		ret.put("sensitive", false);
 		ret.put("content", content);
 
-		LinkedList<String> toList = new LinkedList<String>();
-		LinkedList<String> ccList = new LinkedList<String>();
+		LinkedList<String> toList = new LinkedList<>();
+		LinkedList<String> ccList = new LinkedList<>();
 
 		APList tagList = new APList();
 		for (String userName : toUserNames) {
@@ -132,7 +132,7 @@ public class ActPubFactory {
 				.vals(toActors) //
 				.val(ActPubConstants.CONTEXT_STREAMS + "#Public"));
 
-		// LinkedList<String> ccArray = new LinkedList<String>();
+		// LinkedList<String> ccArray = new LinkedList<>();
 		// ccArray.add("https://www.w3.org/ns/activitystreams#Public");
 		// ret.put("cc", ccArray);
 		return ret;

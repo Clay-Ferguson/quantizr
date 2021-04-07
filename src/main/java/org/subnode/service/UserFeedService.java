@@ -76,14 +76,14 @@ public class UserFeedService {
 		}
 
 		// put user names in a hash set for faster performance
-		HashSet<String> usersSharedToSet = new HashSet<String>();
+		HashSet<String> usersSharedToSet = new HashSet<>();
 		usersSharedToSet.addAll(usersSharedTo);
 
 		/*
 		 * Get a local list of 'allSessions' so we can release the lock on the SessionContent varible
 		 * immediately
 		 */
-		List<SessionContext> allSessions = new LinkedList<SessionContext>();
+		List<SessionContext> allSessions = new LinkedList<>();
 		synchronized (SessionContext.allSessions) {
 			allSessions.addAll(SessionContext.allSessions);
 		}
@@ -153,7 +153,7 @@ public class UserFeedService {
 		int counter = 0;
 
 		/* Finds nodes that have shares to any of the people listed in sharedToAny */
-		List<String> sharedToAny = new LinkedList<String>();
+		List<String> sharedToAny = new LinkedList<>();
 
 		if (req.getToPublic()) {
 			sharedToAny.add("public");
@@ -171,7 +171,7 @@ public class UserFeedService {
 				sharedToAny.add(searchRoot.getOwner().toHexString());
 			}
 		}
-		List<NodeInfo> searchResults = new LinkedList<NodeInfo>();
+		List<NodeInfo> searchResults = new LinkedList<>();
 		res.setSearchResults(searchResults);
 		String pathToSearch = NodeName.ROOT_OF_ALL_USERS;
 
@@ -200,7 +200,7 @@ public class UserFeedService {
 			criteria = criteria.and(SubNode.FIELD_MODIFY_TIME).lt(sc.getFeedMaxTime());
 		}
 
-		List<Criteria> orCriteria = new LinkedList<Criteria>();
+		List<Criteria> orCriteria = new LinkedList<>();
 
 		if (req.getFromMe()) {
 			if (searchRoot == null) {

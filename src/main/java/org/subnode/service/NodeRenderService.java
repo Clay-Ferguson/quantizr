@@ -363,7 +363,7 @@ public class NodeRenderService {
 				else {
 					/* lazily create sliding window */
 					if (slidingWindow == null) {
-						slidingWindow = new LinkedList<SubNode>();
+						slidingWindow = new LinkedList<>();
 					}
 
 					/* update sliding window */
@@ -564,7 +564,7 @@ public class NodeRenderService {
 			return res;
 		}
 
-		LinkedList<CalendarItem> items = new LinkedList<CalendarItem>();
+		LinkedList<CalendarItem> items = new LinkedList<>();
 		res.setItems(items);
 
 		for (SubNode n : read.getCalendar(session, node)) {
@@ -642,11 +642,11 @@ public class NodeRenderService {
 
 	public String getFirstLineAbbreviation(String content) {
 		if (content==null) return null;
-		content = content.trim();
 
 		content = content.replace("{{imgUpperRight}}", "");
 		content = content.replace("{{imgUpperLeft}}", "");
 		content = content.replace("{{img}}", "");	
+		content = content.trim();
 
 		content = XString.truncateAfterFirst(content, "\n");
 		content = XString.truncateAfterFirst(content, "\r");

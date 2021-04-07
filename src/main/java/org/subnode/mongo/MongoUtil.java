@@ -58,7 +58,7 @@ public class MongoUtil {
 	@Autowired
 	private MongoRead read;
 
-	private static HashSet<String> testAccountNames = new HashSet<String>();
+	private static HashSet<String> testAccountNames = new HashSet<>();
 
 	@Autowired
 	private MongoAppConfig mac;
@@ -261,7 +261,7 @@ public class MongoUtil {
 			return false;
 		}
 
-		ValContainer<Boolean> keysRemoved = new ValContainer<Boolean>(false);
+		ValContainer<Boolean> keysRemoved = new ValContainer<>(false);
 		aclMap.forEach((String key, AccessControl ac) -> {
 			if (ac.getKey() != null) {
 				ac.setKey(null);

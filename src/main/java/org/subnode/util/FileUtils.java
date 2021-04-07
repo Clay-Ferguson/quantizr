@@ -34,14 +34,14 @@ public class FileUtils {
 	 * Creates the set of file extensions that we allow user to
 	 * edit
 	 */
-	private static HashSet<String> editableExtensions = new HashSet<String>();
+	private static HashSet<String> editableExtensions = new HashSet<>();
 	static {
 		editableExtensions.add("md");
 		editableExtensions.add("txt");
 		editableExtensions.add("sh");
 	}
 
-	private static HashSet<String> imageExtensions = new HashSet<String>();
+	private static HashSet<String> imageExtensions = new HashSet<>();
 	static {
 		imageExtensions.add("jpg");
 		imageExtensions.add("png");

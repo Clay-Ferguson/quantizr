@@ -44,7 +44,7 @@ public class DateUtil {
 	private static final SimpleDateFormat dateFormatFileNameCompat = new SimpleDateFormat(DATE_FORMAT_FILENAME_COMPAT,
 			DateUtil.DATE_FORMAT_LOCALE);
 
-	private static final HashMap<String, String> zoneMap = new HashMap<String, String>();
+	private static final HashMap<String, String> zoneMap = new HashMap<>();
 
 	/*
 	 * Date APIs have deprecated the use of short abbreviations for timezones, but

@@ -89,7 +89,7 @@ public class FileIndexer {
 	private int filesSkipped = 0;
 
 	private boolean initialized = false;
-	private HashSet<?> suffixSet = new HashSet<String>();
+	private HashSet<String> suffixSet = new HashSet<>();
 
 	private enum CompressionType {
 		NONE, GZIP, XZIP

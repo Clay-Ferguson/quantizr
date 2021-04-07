@@ -50,8 +50,8 @@ public class SyncFromIpfsService {
 
 	MongoSession session;
 
-	HashSet<String> allNodePaths = new HashSet<String>();
-	HashSet<String> allFilePaths = new HashSet<String>();
+	HashSet<String> allNodePaths = new HashSet<>();
+	HashSet<String> allFilePaths = new HashSet<>();
 
 	int totalNodes = 0;
 	int orphansRemoved = 0;

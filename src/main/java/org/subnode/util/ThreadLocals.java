@@ -17,11 +17,11 @@ import org.subnode.response.base.ResponseBase;
  * Web Request.
  */
 public class ThreadLocals {
-	private static final ThreadLocal<HttpServletResponse> servletResponse = new ThreadLocal<HttpServletResponse>();
-	private static final ThreadLocal<HttpSession> httpSession = new ThreadLocal<HttpSession>();
-	private static final ThreadLocal<SessionContext> sessionContext = new ThreadLocal<SessionContext>();
-	private static final ThreadLocal<MongoSession> mongoSession = new ThreadLocal<MongoSession>();
-	private static final ThreadLocal<ResponseBase> oakResponse = new ThreadLocal<ResponseBase>();
+	private static final ThreadLocal<HttpServletResponse> servletResponse = new ThreadLocal<>();
+	private static final ThreadLocal<HttpSession> httpSession = new ThreadLocal<>();
+	private static final ThreadLocal<SessionContext> sessionContext = new ThreadLocal<>();
+	private static final ThreadLocal<MongoSession> mongoSession = new ThreadLocal<>();
+	private static final ThreadLocal<ResponseBase> oakResponse = new ThreadLocal<>();
 
 	public static void removeAll() {
 		httpSession.remove();

@@ -46,7 +46,7 @@ public class SubNodeUtil {
 	/*
 	 * These are properties we should never allow the client to send back as part of a save operation.
 	 */
-	private static HashSet<String> nonSavableProperties = new HashSet<String>();
+	private static HashSet<String> nonSavableProperties = new HashSet<>();
 
 	static {
 		nonSavableProperties.add(NodeProp.BIN.s());

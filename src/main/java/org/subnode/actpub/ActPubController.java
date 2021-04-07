@@ -87,7 +87,7 @@ public class ActPubController {
 			@PathVariable(value = "userName", required = false) String userName, //
 			HttpServletRequest httpReq) {
 		// DO NOT DELETE: If you ever want to make the payload a string just do this...
-		// APObj payload = mapper.readValue(body, new TypeReference<APObj>() {
+		// APObj payload = mapper.readValue(body, new TypeReference<>() {
 		// });
 		// log.debug("INBOX incoming payload: " + XString.prettyPrint(payload));
 		ActPubService.inboxCount++;

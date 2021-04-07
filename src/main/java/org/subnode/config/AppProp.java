@@ -61,7 +61,7 @@ public class AppProp /* implements EnvironmentAware */ {
 			}
 
 			if (configMap == null) {
-				configMap = new HashMap<String, Object>();
+				configMap = new HashMap<>();
 			}
 			return configMap;
 		}
@@ -89,7 +89,7 @@ public class AppProp /* implements EnvironmentAware */ {
 				});
 
 				if (map == null) {
-					map = new HashMap<String, Object>();
+					map = new HashMap<>();
 				}
 
 			} catch (Exception e) {
@@ -115,7 +115,7 @@ public class AppProp /* implements EnvironmentAware */ {
 				}
 
 				if (map == null) {
-					map = new HashMap<String, Object>();
+					map = new HashMap<>();
 				}
 			} catch (Exception e) {
 				ExUtil.error(log, "failed to load help-text.yaml", e);

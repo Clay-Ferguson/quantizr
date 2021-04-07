@@ -88,23 +88,23 @@ public class RSSFeedService {
 	/*
 	 * Cache of all feeds.
 	 */
-	private static final ConcurrentHashMap<String, SyndFeed> feedCache = new ConcurrentHashMap<String, SyndFeed>();
+	private static final ConcurrentHashMap<String, SyndFeed> feedCache = new ConcurrentHashMap<>();
 
 	/*
 	 * keep track of which feeds failed so we don't try them again until another
 	 * 30-min cycle
 	 */
-	private static final HashSet<String> failedFeeds = new HashSet<String>();
+	private static final HashSet<String> failedFeeds = new HashSet<>();
 
 	/*
 	 * Cache of all aggregates
 	 */
-	private static final ConcurrentHashMap<String, SyndFeed> aggregateCache = new ConcurrentHashMap<String, SyndFeed>();
+	private static final ConcurrentHashMap<String, SyndFeed> aggregateCache = new ConcurrentHashMap<>();
 
 	/*
 	 * Cache of all calls to proxyGet
 	 */
-	public static final ConcurrentHashMap<String, byte[]> proxyCache = new ConcurrentHashMap<String, byte[]>();
+	public static final ConcurrentHashMap<String, byte[]> proxyCache = new ConcurrentHashMap<>();
 
 	private static int runCount = 0;
 
@@ -156,7 +156,7 @@ public class RSSFeedService {
 			int count = 0, fails = 0;
 
 			if (failedFeeds.size() > 0) {
-				List<String> failedFeedsList = new LinkedList<String>(failedFeeds);
+				List<String> failedFeedsList = new LinkedList<>(failedFeeds);
 				failedFeeds.clear();
 
 				for (String url : failedFeedsList) {
@@ -218,9 +218,9 @@ public class RSSFeedService {
 			feed.setAuthor("");
 			feed.setLink("");
 
-			List<SyndEntry> entries = new LinkedList<SyndEntry>();
+			List<SyndEntry> entries = new LinkedList<>();
 			feed.setEntries(entries);
-			List<String> urls = new LinkedList<String>();
+			List<String> urls = new LinkedList<>();
 
 			final Iterable<SubNode> iter = read.getSubGraph(mongoSession, node, null, 0);
 			final List<SubNode> children = read.iterateToList(iter);
@@ -305,7 +305,7 @@ public class RSSFeedService {
 			 * into 'pageEntires' and then stuff pageEntries back into 'entries' to send out
 			 * of this method
 			 */
-			List<SyndEntry> pageEntries = new LinkedList<SyndEntry>();
+			List<SyndEntry> pageEntries = new LinkedList<>();
 			int pageNo = page - 1;
 			int startIdx = pageNo * MAX_FEED_ITEMS;
 			int idx = 0;
@@ -502,7 +502,7 @@ public class RSSFeedService {
 	}
 
 	public void revChronSortEntries(List<SyndEntry> entries) {
-		Collections.sort(entries, new Comparator<SyndEntry>() {
+		Collections.sort(entries, new Comparator<>() {
 			@Override
 			public int compare(SyndEntry s1, SyndEntry s2) {
 				return s2.getPublishedDate().compareTo(s1.getPublishedDate());
@@ -533,7 +533,7 @@ public class RSSFeedService {
 			feed.setDescription("");
 			feed.setAuthor("");
 			feed.setLink("");
-			List<SyndEntry> entries = new LinkedList<SyndEntry>();
+			List<SyndEntry> entries = new LinkedList<>();
 			feed.setEntries(entries);
 			aggregateFeeds(urlList, entries, page);
 			// log.debug("Sending back " + entries.size() + " entries.");
@@ -567,7 +567,7 @@ public class RSSFeedService {
 		feed.setAuthor(cachedFeed.getAuthor());
 		feed.setLink(cachedFeed.getLink());
 
-		List<SyndEntry> entries = new LinkedList<SyndEntry>();
+		List<SyndEntry> entries = new LinkedList<>();
 		feed.setEntries(entries);
 
 		// make page zero-offset before using.

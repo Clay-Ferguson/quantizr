@@ -136,28 +136,28 @@ public class ActPubService {
      * completed
      */
     public static final ConcurrentHashMap<String, Boolean> userNamesPendingMessageRefresh =
-            new ConcurrentHashMap<String, Boolean>();
+            new ConcurrentHashMap<>();
 
     /* Cache Actor objects by URL in memory only for now */
-    public static final ConcurrentHashMap<String, APObj> actorCacheByUrl = new ConcurrentHashMap<String, APObj>();
+    public static final ConcurrentHashMap<String, APObj> actorCacheByUrl = new ConcurrentHashMap<>();
 
     /* Cache Actor objects by UserName in memory only for now */
-    private static final ConcurrentHashMap<String, APObj> actorCacheByUserName = new ConcurrentHashMap<String, APObj>();
+    private static final ConcurrentHashMap<String, APObj> actorCacheByUserName = new ConcurrentHashMap<>();
 
     /* Cache WebFinger objects by UserName in memory only for now */
-    private static final ConcurrentHashMap<String, APObj> webFingerCacheByUserName = new ConcurrentHashMap<String, APObj>();
+    private static final ConcurrentHashMap<String, APObj> webFingerCacheByUserName = new ConcurrentHashMap<>();
 
     /* Cache of user account node Ids by actor url */
-    private static final ConcurrentHashMap<String, String> acctIdByActorUrl = new ConcurrentHashMap<String, String>();
+    private static final ConcurrentHashMap<String, String> acctIdByActorUrl = new ConcurrentHashMap<>();
 
     /* Account Node by actor Url */
-    private static final ConcurrentHashMap<String, SubNode> accountNodesByActorUrl = new ConcurrentHashMap<String, SubNode>();
+    private static final ConcurrentHashMap<String, SubNode> accountNodesByActorUrl = new ConcurrentHashMap<>();
 
     /* Account Node by User Name */
-    private static final ConcurrentHashMap<String, SubNode> accountNodesByUserName = new ConcurrentHashMap<String, SubNode>();
+    private static final ConcurrentHashMap<String, SubNode> accountNodesByUserName = new ConcurrentHashMap<>();
 
     /* Account Node by node ID */
-    private static final ConcurrentHashMap<String, SubNode> accountNodesById = new ConcurrentHashMap<String, SubNode>();
+    private static final ConcurrentHashMap<String, SubNode> accountNodesById = new ConcurrentHashMap<>();
 
     /*
      * RestTemplate is thread-safe and reusable, and has no state, so we need only one final static
@@ -206,7 +206,7 @@ public class ActPubService {
      */
     public boolean sendNotificationForNodeEdit(MongoSession session, SubNode parent, SubNode node) {
         try {
-            List<String> toUserNames = new LinkedList<String>();
+            List<String> toUserNames = new LinkedList<>();
 
             boolean privateMessage = true;
             /*
@@ -273,7 +273,7 @@ public class ActPubService {
     /* Builds the unique set of hosts from a list of userNames (not used currently) */
     public HashSet<String> getHostsFromUserNames(List<String> userNames) {
         String host = appProp.getMetaHost();
-        HashSet<String> hosts = new HashSet<String>();
+        HashSet<String> hosts = new HashSet<>();
 
         for (String toUserName : userNames) {
 
@@ -552,7 +552,7 @@ public class ActPubService {
          * Generate a list of known AP IDs so we can ignore them and load only the unknown ones from the
          * foreign server
          */
-        HashSet<String> apIdSet = new HashSet<String>();
+        HashSet<String> apIdSet = new HashSet<>();
         for (SubNode n : outboxItems) {
             String apId = n.getStrProp(NodeProp.ACT_PUB_ID.s());
             if (apId != null) {
@@ -560,7 +560,7 @@ public class ActPubService {
             }
         }
 
-        ValContainer<Integer> count = new ValContainer<Integer>(0);
+        ValContainer<Integer> count = new ValContainer<>(0);
         final SubNode _userNode = userNode;
 
         iterateOrderedCollection(outbox, Integer.MAX_VALUE, obj -> {
@@ -626,7 +626,7 @@ public class ActPubService {
          * We user apIdSet to avoid processing any dupliates, because the AP spec calls on us to do this and
          * doesn't guarantee it's own dedupliation
          */
-        HashSet<String> apIdSet = new HashSet<String>();
+        HashSet<String> apIdSet = new HashSet<>();
 
         /*
          * The collection object itself is allowed to have orderedItems, which if present we process, in
@@ -1637,7 +1637,7 @@ public class ActPubService {
             long count = 0;
             SubNode userNode = read.getUserNodeByUserName(null, userName);
             if (userNode != null) {
-                List<String> sharedToList = new LinkedList<String>();
+                List<String> sharedToList = new LinkedList<>();
                 sharedToList.add(sharedTo);
                 count = auth.countSubGraphByAclUser(mongoSession, null, sharedToList, userNode.getOwner());
             }
@@ -1700,7 +1700,7 @@ public class ActPubService {
     }
 
     public List<String> getFollowers(String userName, String minId) {
-        final List<String> followers = new LinkedList<String>();
+        final List<String> followers = new LinkedList<>();
 
         adminRunner.run(session -> {
             Iterable<SubNode> iter = read.findFollowersOfUser(session, userName);
@@ -1716,7 +1716,7 @@ public class ActPubService {
     }
 
     public List<String> getFollowing(String userName, String minId) {
-        final List<String> following = new LinkedList<String>();
+        final List<String> following = new LinkedList<>();
 
         adminRunner.run(session -> {
             Iterable<SubNode> iter = read.findFollowingOfUser(session, userName);
@@ -1896,7 +1896,7 @@ public class ActPubService {
             MultiValueMap<String, Object> bodyMap = new LinkedMultiValueMap<>();
             HttpEntity<MultiValueMap<String, Object>> requestEntity = new HttpEntity<>(bodyMap, headers);
             ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.GET, requestEntity, String.class);
-            ret = mapper.readValue(response.getBody(), new TypeReference<APObj>() {
+            ret = mapper.readValue(response.getBody(), new TypeReference<>() {
             });
             // log.debug("REQ: " + url + "\nRES: " + XString.prettyPrint(ret));
         } catch (Exception e) {

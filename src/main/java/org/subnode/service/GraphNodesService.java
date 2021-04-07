@@ -28,7 +28,7 @@ public class GraphNodesService {
 	private MongoRead read;
 
 	public GraphResponse graphNodes(MongoSession session, GraphRequest req) {
-		HashMap<String, GraphNode> mapByPath = new HashMap<String, GraphNode>();
+		HashMap<String, GraphNode> mapByPath = new HashMap<>();
 		GraphResponse res = new GraphResponse();
 		if (session == null) {
 			session = ThreadLocals.getMongoSession();

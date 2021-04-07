@@ -85,8 +85,8 @@ public class ExportJsonService {
 			/* This is not a typo, this path will be like ".../fileName/fileName.json" */
 			String fullFileName = targetFolder + File.separator + fileName + ".json";
 
-			ValContainer<Integer> numDocs = new ValContainer<Integer>(0);
-			ValContainer<Integer> numBins = new ValContainer<Integer>(0);
+			ValContainer<Integer> numDocs = new ValContainer<>(0);
+			ValContainer<Integer> numBins = new ValContainer<>(0);
 
 			byte[] newLine = "\n,\n".getBytes(StandardCharsets.UTF_8);
 

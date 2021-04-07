@@ -65,7 +65,7 @@ public class MongoAuth {
 	private static final MongoSession adminSession = MongoSession.createFromUser(PrincipalName.ADMIN.s());
 	private static final MongoSession anonSession = MongoSession.createFromUser(PrincipalName.ANON.s());
 
-	public static final HashMap<String, String> userNamesByAccountId = new HashMap<String, String>();
+	public static final HashMap<String, String> userNamesByAccountId = new HashMap<>();
 
 	public MongoSession getAdminSession() {
 		return adminSession;
@@ -145,7 +145,7 @@ public class MongoAuth {
 				if (name != null) {
 					// lazy create the list
 					if (userNames == null) {
-						userNames = new LinkedList<String>();
+						userNames = new LinkedList<>();
 					}
 					userNames.add(name);
 				}
@@ -174,7 +174,7 @@ public class MongoAuth {
 
 		HashMap<String, AccessControl> ac = parent.getAc();
 		if (ac == null) {
-			ac = new HashMap<String, AccessControl>();
+			ac = new HashMap<>();
 		} else {
 			ac = (HashMap<String, AccessControl>) ac.clone();
 			ac.remove(child.getOwner().toHexString());
@@ -409,7 +409,7 @@ public class MongoAuth {
 		 * I'd like this to not be created unless needed but that pesky lambda below
 		 * needs a 'final' thing to work with.
 		 */
-		List<AccessControlInfo> ret = new LinkedList<AccessControlInfo>();
+		List<AccessControlInfo> ret = new LinkedList<>();
 
 		aclMap.forEach((k, v) -> {
 			AccessControlInfo acei = createAccessControlInfo(session, k, v.getPrvs());
@@ -498,7 +498,7 @@ public class MongoAuth {
 		Criteria criteria = Criteria.where(SubNode.FIELD_PATH).regex(util.regexRecursiveChildrenOfPath(pathToSearch));
 
 		if (sharedToAny != null && sharedToAny.size() > 0) {
-			List<Criteria> orCriteria = new LinkedList<Criteria>();
+			List<Criteria> orCriteria = new LinkedList<>();
 			for (String share : sharedToAny) {
 				orCriteria.add(Criteria.where(SubNode.FIELD_AC + "." + share).ne(null));
 			}
@@ -635,7 +635,7 @@ public class MongoAuth {
 	}
 
 	public HashSet<String> parseMentions(String message) {
-		HashSet<String> userNames = new HashSet<String>();
+		HashSet<String> userNames = new HashSet<>();
 
 		// prepare so that newlines are compatable with out tokenizing
 		message = message.replace("\n", " ");

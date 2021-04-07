@@ -54,7 +54,7 @@ public class SessionContext {
 	private SseEmitter pushEmitter;
 
 	// this one WILL work with multiple sessions per user
-	public static final HashSet<SessionContext> allSessions = new HashSet<SessionContext>();
+	public static final HashSet<SessionContext> allSessions = new HashSet<>();
 
 	private String captcha;
 	private int captchaFails = 0;

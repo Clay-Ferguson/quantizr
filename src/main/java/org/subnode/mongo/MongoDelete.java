@@ -154,7 +154,7 @@ public class MongoDelete {
 		// long nodeCount = read.getNodeCount(null);
 		// log.debug("initial Node Count: " + nodeCount);
 
-		HashSet<String> pathHashSet = new HashSet<String>();
+		HashSet<String> pathHashSet = new HashSet<>();
 		if (session == null) {
 			session = auth.getAdminSession();
 		}

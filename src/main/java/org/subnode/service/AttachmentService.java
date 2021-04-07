@@ -1026,7 +1026,7 @@ public class AttachmentService {
 	public void writeStreamToIpfs(final MongoSession session, final String binSuffix, final SubNode node,
 			final InputStream stream, final String mimeType, SubNode userNode) {
 		auth.auth(session, node, PrivilegeType.WRITE);
-		final ValContainer<Integer> streamSize = new ValContainer<Integer>();
+		final ValContainer<Integer> streamSize = new ValContainer<>();
 
 		MerkleLink ret = ipfsService.addFromStream(session, stream, null, mimeType, streamSize, null, false);
 		if (ret != null) {

@@ -45,7 +45,7 @@ public class AccessControlInfo {
 
 	public void addPrivilege(PrivilegeInfo priv) {
 		if (privileges == null) {
-			privileges = new LinkedList<PrivilegeInfo>();
+			privileges = new LinkedList<>();
 		}
 		privileges.add(priv);
 	}

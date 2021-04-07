@@ -94,7 +94,7 @@ public class NodeSearchService {
 			throw new RuntimeException("Search text required.");
 		}
 
-		List<NodeInfo> searchResults = new LinkedList<NodeInfo>();
+		List<NodeInfo> searchResults = new LinkedList<>();
 		res.setSearchResults(searchResults);
 		int counter = 0;
 
@@ -185,7 +185,7 @@ public class NodeSearchService {
 		}
 		int MAX_NODES = 100;
 
-		List<NodeInfo> searchResults = new LinkedList<NodeInfo>();
+		List<NodeInfo> searchResults = new LinkedList<>();
 		res.setSearchResults(searchResults);
 		int counter = 0;
 
@@ -279,9 +279,9 @@ public class NodeSearchService {
 			}
 		}
 
-		HashMap<String, WordStats> wordMap = new HashMap<String, WordStats>();
-		HashMap<String, WordStats> tagMap = new HashMap<String, WordStats>();
-		HashMap<String, WordStats> mentionMap = new HashMap<String, WordStats>();
+		HashMap<String, WordStats> wordMap = new HashMap<>();
+		HashMap<String, WordStats> tagMap = new HashMap<>();
+		HashMap<String, WordStats> mentionMap = new HashMap<>();
 
 		long nodeCount = 0;
 		long totalWords = 0;
@@ -293,7 +293,7 @@ public class NodeSearchService {
 		 */
 		if (req.isFeed()) {
 			/* Finds nodes that have shares to any of the people listed in sharedToAny */
-			List<String> sharedToAny = new LinkedList<String>();
+			List<String> sharedToAny = new LinkedList<>();
 			sharedToAny.add("public");
 
 			String pathToSearch = NodeName.ROOT_OF_ALL_USERS;
@@ -402,25 +402,25 @@ public class NodeSearchService {
 			}
 			nodeCount++;
 		}
-		List<WordStats> wordList = new ArrayList<WordStats>(wordMap.values());
-		List<WordStats> tagList = new ArrayList<WordStats>(tagMap.values());
-		List<WordStats> mentionList = new ArrayList<WordStats>(mentionMap.values());
+		List<WordStats> wordList = new ArrayList<>(wordMap.values());
+		List<WordStats> tagList = new ArrayList<>(tagMap.values());
+		List<WordStats> mentionList = new ArrayList<>(mentionMap.values());
 
-		Collections.sort(wordList, new Comparator<WordStats>() {
+		Collections.sort(wordList, new Comparator<>() {
 			@Override
 			public int compare(WordStats s1, WordStats s2) {
 				return (int) (s2.count - s1.count);
 			}
 		});
 
-		Collections.sort(tagList, new Comparator<WordStats>() {
+		Collections.sort(tagList, new Comparator<>() {
 			@Override
 			public int compare(WordStats s1, WordStats s2) {
 				return (int) (s2.count - s1.count);
 			}
 		});
 
-		Collections.sort(mentionList, new Comparator<WordStats>() {
+		Collections.sort(mentionList, new Comparator<>() {
 			@Override
 			public int compare(WordStats s1, WordStats s2) {
 				return (int) (s2.count - s1.count);
@@ -433,7 +433,7 @@ public class NodeSearchService {
 		sb.append("Unique Words: " + wordList.size());
 		res.setStats(sb.toString());
 
-		ArrayList<String> topWords = new ArrayList<String>();
+		ArrayList<String> topWords = new ArrayList<>();
 		res.setTopWords(topWords);
 		for (WordStats ws : wordList) {
 			topWords.add(ws.word); // + "," + ws.count);
@@ -441,7 +441,7 @@ public class NodeSearchService {
 				break;
 		}
 
-		ArrayList<String> topTags = new ArrayList<String>();
+		ArrayList<String> topTags = new ArrayList<>();
 		res.setTopTags(topTags);
 		for (WordStats ws : tagList) {
 			topTags.add(ws.word); // + "," + ws.count);
@@ -449,7 +449,7 @@ public class NodeSearchService {
 				break;
 		}
 
-		ArrayList<String> topMentions = new ArrayList<String>();
+		ArrayList<String> topMentions = new ArrayList<>();
 		res.setTopMentions(topMentions);
 		for (WordStats ws : mentionList) {
 			topMentions.add(ws.word); // + "," + ws.count);

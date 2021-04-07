@@ -270,7 +270,7 @@ public class AppController implements ErrorController {
 		if (thymeleafAttribs != null)
 			return;
 
-		thymeleafAttribs = new HashMap<String, String>();
+		thymeleafAttribs = new HashMap<>();
 
 		thymeleafAttribs.put("brandingAppName", appProp.getConfigText("brandingAppName"));
 		thymeleafAttribs.put("brandingMetaContent", appProp.getConfigText("brandingMetaContent"));
@@ -390,7 +390,7 @@ public class AppController implements ErrorController {
 			 */
 			if (welcomeMap == null || PrincipalName.ADMIN.s().equals(ThreadLocals.getSessionContext().getUserName())) {
 				synchronized (welcomeMapLock) {
-					HashMap<String, String> newMap = new HashMap<String, String>();
+					HashMap<String, String> newMap = new HashMap<>();
 					// load content from a place that will not be a node visible to users
 					// leaving this commented here to show where/how to use it if needed in the
 					// future.
@@ -426,7 +426,7 @@ public class AppController implements ErrorController {
 		// if (welcomeMap == null ||
 		// PrincipalName.ADMIN.s().equals(sessionContext.getUserName())) {
 		// synchronized (welcomeMapLock) {
-		// HashMap<String, String> newMap = new HashMap<String, String>();
+		// HashMap<String, String> newMap = new HashMap<>();
 		// welcomePagePresent = nodeRenderService.thymeleafRenderNode(newMap,
 		// "pg_welcome");
 		// welcomeMap = newMap;
@@ -1241,7 +1241,7 @@ public class AppController implements ErrorController {
 	public @ResponseBody Object getServerInfo(@RequestBody GetServerInfoRequest req, HttpSession session) {
 		return callProc.run("getServerInfo", req, session, ms -> {
 			GetServerInfoResponse res = new GetServerInfoResponse();
-			res.setMessages(new LinkedList<InfoMessage>());
+			res.setMessages(new LinkedList<>());
 
 			if (req.getCommand().equalsIgnoreCase("getJson")) {
 				// allow this one if user owns node.

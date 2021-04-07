@@ -126,7 +126,7 @@ public class UserManagerService {
 	private static final ObjectMapper mapper = new ObjectMapper();
 
 	/* Private keys of each user by user name as key */
-	public static final ConcurrentHashMap<String, String> privateKeysByUserName = new ConcurrentHashMap<String, String>();
+	public static final ConcurrentHashMap<String, String> privateKeysByUserName = new ConcurrentHashMap<>();
 
 	/*
 	 * Login mechanism is a bit tricky because the CallProcessor detects the
@@ -347,7 +347,7 @@ public class UserManagerService {
 	 */
 	public String processSignupCode(final String signupCode) {
 		log.debug("User is trying signupCode: " + signupCode);
-		final ValContainer<String> valContainer = new ValContainer<String>(null);
+		final ValContainer<String> valContainer = new ValContainer<>(null);
 		adminRunner.run(session -> {
 			// signupCode is just the new account node id? I guess that's secure, if user
 			// has this value it's the only user
@@ -860,7 +860,7 @@ public class UserManagerService {
 		GetFriendsResponse res = new GetFriendsResponse();
 
 		List<SubNode> friendNodes = getFriendsList(session);
-		List<FriendInfo> friends = new LinkedList<FriendInfo>();
+		List<FriendInfo> friends = new LinkedList<>();
 
 		for (SubNode friendNode : friendNodes) {
 			String userName = friendNode.getStrProp(NodeProp.USER.s());
@@ -888,7 +888,7 @@ public class UserManagerService {
 			session = ThreadLocals.getMongoSession();
 		}
 
-		List<SubNode> friends = new LinkedList<SubNode>();
+		List<SubNode> friends = new LinkedList<>();
 
 		SubNode userNode = read.getUserNodeByUserName(session, null);
 		if (userNode == null)

@@ -87,7 +87,7 @@ public class XString {
 		StringTokenizer t = new StringTokenizer(val, delimiter, false);
 		while (t.hasMoreTokens()) {
 			if (list == null) {
-				list = new LinkedList<String>();
+				list = new LinkedList<>();
 			}
 			list.add(trim ? t.nextToken().trim() : t.nextToken());
 		}
@@ -99,7 +99,7 @@ public class XString {
 		StringTokenizer t = new StringTokenizer(val, delimiter, false);
 		while (t.hasMoreTokens()) {
 			if (list == null) {
-				list = new HashSet<String>();
+				list = new HashSet<>();
 			}
 			list.add(trim ? t.nextToken().trim() : t.nextToken());
 		}

@@ -69,7 +69,7 @@ public class ExportServiceFlexmark {
 	private ExportRequest req;
 	private ExportResponse res;
 
-	private List<ExportIpfsFile> files = new LinkedList<ExportIpfsFile>();
+	private List<ExportIpfsFile> files = new LinkedList<>();
 
 	/*
 	 * Exports the node specified in the req. If the node specified is "/", or the

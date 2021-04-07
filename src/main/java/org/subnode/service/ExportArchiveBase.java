@@ -71,7 +71,7 @@ public abstract class ExportArchiveBase {
 	 * It's possible that nodes recursively contained under a given node can have same name, so we have
 	 * to detect that and number them, so we use this hashset to detect existing filenames.
 	 */
-	private final HashSet<String> fileNameSet = new HashSet<String>();
+	private final HashSet<String> fileNameSet = new HashSet<>();
 
 	@Autowired
 	private AppProp appProp;
@@ -100,7 +100,7 @@ public abstract class ExportArchiveBase {
 			writeRootFiles();
 			rootPathParent = node.getParentPath();
 			auth.authRequireOwnerOfNode(session, node);
-			final ArrayList<SubNode> nodeStack = new ArrayList<SubNode>();
+			final ArrayList<SubNode> nodeStack = new ArrayList<>();
 			nodeStack.add(node);
 			recurseNode("../", "", node, nodeStack, 0, null, null);
 			res.setFileName(shortFileName);
@@ -184,7 +184,7 @@ public abstract class ExportArchiveBase {
 		}
 
 		/* process the current node */
-		final ValContainer<String> fileName = new ValContainer<String>();
+		final ValContainer<String> fileName = new ValContainer<>();
 
 		final Iterable<SubNode> iter =
 				read.getChildren(session, node, Sort.by(Sort.Direction.ASC, SubNode.FIELD_ORDINAL), null, 0);

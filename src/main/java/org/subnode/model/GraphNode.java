@@ -33,11 +33,11 @@ public class GraphNode {
             return;
 
         if (children == null) {
-            children = new LinkedList<GraphNode>();
+            children = new LinkedList<>();
         }
         children.add(child);
         if (childIds == null) {
-            childIds = new HashSet<String>();
+            childIds = new HashSet<>();
         }
         childIds.add(child.getId());
     }

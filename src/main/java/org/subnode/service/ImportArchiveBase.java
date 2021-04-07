@@ -60,7 +60,7 @@ public abstract class ImportArchiveBase {
 	public String targetPath;
 	public MongoSession session;
 	public SubNode importRootNode;
-	public HashMap<String, String> oldIdToNewIdMap = new HashMap<String, String>();
+	public HashMap<String, String> oldIdToNewIdMap = new HashMap<>();
 
 	public void processFile(ArchiveEntry entry, InputStream zis, ObjectId ownerId) {
 		String name = entry.getName();
