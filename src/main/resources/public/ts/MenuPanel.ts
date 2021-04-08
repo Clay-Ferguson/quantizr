@@ -302,7 +302,7 @@ export class MenuPanel extends Div {
         // let fileSystemMenu = makeTopLevelMenu("FileSys", fileSystemMenuItems);
 
         children.push(new Menu("Account", [
-            new MenuItem("Profile", MenuPanel.profile), //
+            new MenuItem("Profile", MenuPanel.profile, !state.isAnonUser), //
             new MenuItem("Manage Account", MenuPanel.manageAccount, !state.isAnonUser), //
 
             new MenuItemSeparator(), //
@@ -317,7 +317,7 @@ export class MenuPanel extends Div {
             new MenuItemSeparator(), //
 
             new MenuItem("Browser Info", MenuPanel.browserInfo), //
-            new MenuItem(state.mobileMode ? "Desktop Browser" : "Mobile Browser", MenuPanel.mobileToggle) //
+            new MenuItem(state.mobileMode ? "Desktop App" : "Mobile App", MenuPanel.mobileToggle) //
 
             // menuItem("Full Repository Export", "fullRepositoryExport", "
             // S.edit.fullRepositoryExport();") + //
