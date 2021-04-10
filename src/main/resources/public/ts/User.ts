@@ -103,14 +103,16 @@ export class User implements UserIntf {
                 dst: S.util.daylightSavingsTime
             }, async (res: J.LoginResponse) => {
 
-                // console.log("config: " + S.util.prettyPrint(res.config));
+                // console.log("config: " + S.util.prettyPrint(res));
                 if (res && !res.success) {
                     await S.user.deleteAllUserLocalDbEntries();
                 }
 
                 if (usingCredentials) {
                     // console.log("calling loginResponse()");
-                    this.loginResponse(res, callUsr, callPwd, false, state);
+                    // Note: If user entered wrong case-sentitivity string on login dialog they can still login
+                    // but this res.userName however will have the correct name (case-sensitive) here now.
+                    this.loginResponse(res, res.userName, callPwd, false, state);
                 } else {
                     if (res.success) {
                         S.meta64.setStateVarsUsingLoginResponse(res);

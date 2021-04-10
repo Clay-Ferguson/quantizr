@@ -208,7 +208,10 @@ public class UserManagerService {
 		if (res != null) {
 			res.setRootNode(id);
 			res.setRootNodePath(userNode.getPath());
-			res.setUserName(userName);
+			
+			// be sure to get userName off node so case sensitivity is exact.
+			res.setUserName(userNode.getStrProp(NodeProp.USER));
+
 			res.setAllowFileSystemSearch(appProp.isAllowFileSystemSearch());
 			res.setUserPreferences(userPreferences);
 		}

@@ -1,6 +1,5 @@
 package org.subnode.response;
 
-import java.util.HashMap;
 import org.subnode.model.UserPreferences;
 import org.subnode.response.base.ResponseBase;
 
