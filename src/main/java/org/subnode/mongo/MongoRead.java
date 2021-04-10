@@ -294,7 +294,10 @@ public class MongoRead {
         return ret;
     }
 
-    /* WARNING: This always converts a 'pending' path to a non-pending one (/r/p/ v.s. /r/) */
+    /*
+     * WARNING: This always converts a 'pending' path to a non-pending one (/r/p/
+     * v.s. /r/)
+     */
     public SubNode getParent(MongoSession session, SubNode node) {
         String path = node.getPath();
         if ("/".equals(path)) {
@@ -838,8 +841,10 @@ public class MongoRead {
         // Other wise for ordinary users root is based off their username
         Query query = new Query();
         Criteria criteria = Criteria.where(//
-                SubNode.FIELD_PATH).regex(util.regexDirectChildrenOfPath(NodeName.ROOT_OF_ALL_USERS))//
-                .and(SubNode.FIELD_PROPERTIES + "." + NodeProp.USER + ".value").is(user);
+                SubNode.FIELD_PATH).regex(util.regexDirectChildrenOfPath(NodeName.ROOT_OF_ALL_USERS)) //
+                //.and(SubNode.FIELD_PROPERTIES + "." + NodeProp.USER + ".value").is(user);
+                // case-insensitive lookup of username:
+                .and(SubNode.FIELD_PROPERTIES + "." + NodeProp.USER + ".value").regex("^" +user+ "$","i");
 
         query.addCriteria(criteria);
 

@@ -166,8 +166,6 @@ public class NodeEditService {
 		SubNode newNode = create.createNode(session, node, null, req.getTypeName(), 0L, createLoc, req.getProperties(),
 				null, true);
 
-		// todo-0: need at least the p and proabably the r also in variables.
-		// '/r/p/' = pending (nodes not yet published, being edited created by users)
 		if (req.isPendingEdit()) {
 			util.setPendingPath(newNode, true);
 		}

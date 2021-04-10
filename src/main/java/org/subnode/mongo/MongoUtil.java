@@ -153,6 +153,9 @@ public class MongoUtil {
 	 * 
 	 * p=pending, meaning user has not yet saved, and if they cancel the node gets
 	 * orphaned and eventually cleaned up by the system automatically.
+	 * 
+	 * todo-0: need at least the p and proabably the r also in variables.
+	 * '/r/p/' = pending (nodes not yet published, being edited created by users)
 	 */
 	public void setPendingPath(SubNode node, boolean pending) {
 		if (pending && !node.getPath().startsWith("/r/p/")) {
@@ -545,7 +548,7 @@ public class MongoUtil {
 		 * directly to it, so we default it to being directly in the server root, which
 		 * is a private node
 		 */
-		// todo-0: oops this works create but DUPLICATES a new node every time,
+		// todo-0: oops this works but DUPLICATES a new node every time,
 		// completely breaking the landing page!!!!
 		// SubNode publicWelcome = apiUtil.ensureNodeExists(session, "/" +
 		// NodeName.ROOT, NodeName.WELCOME, "welcome-page",

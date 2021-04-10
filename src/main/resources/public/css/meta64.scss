@@ -255,6 +255,11 @@ a {
 
 .app-body {
     font-family: $fontFamily !important;
+    
+    // WARNING: this completely broke rendering. wow. Left hand side menu
+    // gets truncated on the left.
+    // font-size: 1.2rem;
+    
     padding-bottom: 1rem;
     overflow-y: scroll;
 }
