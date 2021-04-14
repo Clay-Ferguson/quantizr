@@ -82,7 +82,9 @@ export class Edit implements EditIntf {
         if (S.util.checkSuccess("Editing node", res)) {
             const node: J.NodeInfo = res.nodeInfo;
 
-            const editingAllowed = state.userPreferences.editMode && this.isEditAllowed(node, state);
+            /* NOTE: Removing 'editMode' check here is new 4/14/21, and without was stopping editing from calendar view which we 
+            do need even when edit mode is technically off */
+            const editingAllowed = /* state.userPreferences.editMode && */ this.isEditAllowed(node, state);
             if (editingAllowed) {
                 /*
                  * Server will have sent us back the raw text content, that should be markdown instead of any HTML, so
