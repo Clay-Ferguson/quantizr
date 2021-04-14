@@ -82,7 +82,7 @@ export class Edit implements EditIntf {
         if (S.util.checkSuccess("Editing node", res)) {
             const node: J.NodeInfo = res.nodeInfo;
 
-            /* NOTE: Removing 'editMode' check here is new 4/14/21, and without was stopping editing from calendar view which we 
+            /* NOTE: Removing 'editMode' check here is new 4/14/21, and without was stopping editing from calendar view which we
             do need even when edit mode is technically off */
             const editingAllowed = /* state.userPreferences.editMode && */ this.isEditAllowed(node, state);
             if (editingAllowed) {
