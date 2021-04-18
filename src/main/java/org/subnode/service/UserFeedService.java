@@ -112,39 +112,35 @@ public class UserFeedService {
 		if (userSession == null)
 			return;
 
-		synchronized (sseMvcExecutor) {
-			sseMvcExecutor.execute(() -> {
-				SseEmitter pushEmitter = userSession.getPushEmitter();
-				if (pushEmitter == null)
-					return;
-					
-				try {
-					SseEventBuilder event = SseEmitter.event() //
-							.data(info) //
-							.id(String.valueOf(info.hashCode()))//
-							.name(info.getType());
+		sseMvcExecutor.execute(() -> {
+			SseEmitter pushEmitter = userSession.getPushEmitter();
+			if (pushEmitter == null)
+				return;
 
-					pushEmitter.send(event);
+			try {
+				SseEventBuilder event = SseEmitter.event() //
+						.data(info) //
+						.id(String.valueOf(info.hashCode()))//
+						.name(info.getType());
 
-					/*
-					 * DO NOT DELETE. This way of sending also works, and I was originally doing it this way and picking
-					 * up in eventSource.onmessage = e => {} on the browser, but I decided to use the builder instead
-					 * and let the 'name' in the builder route different objects to different event listeners on the
-					 * client. Not really sure if either approach has major advantages over the other.
-					 * 
-					 * pushEmitter.send(info, MediaType.APPLICATION_JSON);
-					 */
-				} catch (Exception ex) {
-					pushEmitter.completeWithError(ex);
-				}
-			});
-		}
+				pushEmitter.send(event);
+
+				/*
+				 * DO NOT DELETE. This way of sending also works, and I was originally doing it this way and picking
+				 * up in eventSource.onmessage = e => {} on the browser, but I decided to use the builder instead
+				 * and let the 'name' in the builder route different objects to different event listeners on the
+				 * client. Not really sure if either approach has major advantages over the other.
+				 * 
+				 * pushEmitter.send(info, MediaType.APPLICATION_JSON);
+				 */
+			} catch (Exception ex) {
+				pushEmitter.completeWithError(ex);
+			}
+		});
 	}
 
 	public static void shutdown() {
-		synchronized (sseMvcExecutor) {
-			sseMvcExecutor.shutdown();
-		}
+		sseMvcExecutor.shutdown();
 	}
 
 	/*
