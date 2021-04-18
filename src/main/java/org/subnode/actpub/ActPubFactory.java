@@ -18,6 +18,9 @@ public class ActPubFactory {
 	@Autowired
 	public ActPubService actPubService;
 
+	@Autowired
+	public ActPubUtil apUtil;
+
 	private static final Logger log = LoggerFactory.getLogger(ActPubFactory.class);
 
 	public APObj newCreateMessageForNote(List<String> toUserNames, String fromActor, String inReplyTo, String content,
@@ -51,8 +54,8 @@ public class ActPubFactory {
 
 		APList tagList = new APList();
 		for (String userName : toUserNames) {
-			APObj webFinger = actPubService.getWebFinger(userName);
-			String actorUrl = actPubService.getActorUrlFromWebFingerObj(webFinger);
+			APObj webFinger = apUtil.getWebFinger(userName);
+			String actorUrl = apUtil.getActorUrlFromWebFingerObj(webFinger);
 
 			/*
 			 * For public messages Mastodon puts the "Public" target in 'to' and the mentioned users in 'cc', so
@@ -77,7 +80,7 @@ public class ActPubFactory {
 			 * public posts should always cc the followers of the person doing the post (the actor pointed to by
 			 * attributedTo)
 			 */
-			APObj actor = ActPubService.actorCacheByUrl.get(attributedTo);
+			APObj actor = ActPubUtil.actorCacheByUrl.get(attributedTo);
 			if (actor != null) {
 				ccList.add(AP.str(actor, "followers"));
 			}

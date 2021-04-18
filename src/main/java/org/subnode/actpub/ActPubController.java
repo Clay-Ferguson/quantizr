@@ -17,7 +17,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.subnode.config.AppProp;
 import org.subnode.service.ActPubService;
-import org.subnode.util.XString;
 
 @Controller
 @CrossOrigin
@@ -25,7 +24,10 @@ public class ActPubController {
 	private static final Logger log = LoggerFactory.getLogger(ActPubController.class);
 
 	@Autowired
-	private ActPubService actPubService;
+	private ActPubService apService;
+
+	@Autowired
+	private ActPubUtil apUtil;
 
 	@Autowired
 	private AppProp appProp;
@@ -38,7 +40,7 @@ public class ActPubController {
 			produces = ActPubConstants.CONTENT_TYPE_JSON_JRD)
 	public @ResponseBody Object webFinger(//
 			@RequestParam(value = "resource", required = true) String resource) {
-		Object ret = actPubService.generateWebFinger(resource);
+		Object ret = apUtil.generateWebFinger(resource);
 		if (ret != null)
 			return ret;
 		return new ResponseEntity(HttpStatus.NOT_FOUND);
@@ -69,7 +71,7 @@ public class ActPubController {
 			produces = ActPubConstants.CONTENT_TYPE_JSON_ACTIVITY)
 	public @ResponseBody Object actor(//
 			@PathVariable(value = "userName", required = true) String userName) {
-		Object ret = actPubService.generateActor(userName);
+		Object ret = apService.generateActor(userName);
 		if (ret != null)
 			return ret;
 		return new ResponseEntity(HttpStatus.NOT_FOUND);
@@ -91,7 +93,7 @@ public class ActPubController {
 		// });
 		// log.debug("INBOX incoming payload: " + XString.prettyPrint(payload));
 		ActPubService.inboxCount++;
-		actPubService.processInboxPost(httpReq, payload);
+		apService.processInboxPost(httpReq, payload);
 		return new ResponseEntity(HttpStatus.OK);
 	}
 
@@ -107,7 +109,7 @@ public class ActPubController {
 			@RequestParam(value = "page", required = false) String page) {
 		Object ret = null;
 		if ("true".equals(page)) {
-			ret = actPubService.generateOutboxPage(userName, minId);
+			ret = apService.generateOutboxPage(userName, minId);
 		} else {
 			/*
 			 * Mastodon calls this method, but never calls back in (to generateOutboxPage above) for any pages.
@@ -119,7 +121,7 @@ public class ActPubController {
 			 * the outbox, mastodon still shows "0 toots", even though it just queried my inbox and there ARE
 			 * toots and we DID return the correct number of them.
 			 */
-			ret = actPubService.generateOutbox(userName);
+			ret = apService.generateOutbox(userName);
 		}
 		if (ret != null) {
 			// log.debug("Reply with Outbox: " + XString.prettyPrint(ret));
@@ -140,9 +142,9 @@ public class ActPubController {
 			@RequestParam(value = "page", required = false) String page) {
 		Object ret = null;
 		if ("true".equals(page)) {
-			ret = actPubService.generateFollowersPage(userName, minId);
+			ret = apService.generateFollowersPage(userName, minId);
 		} else {
-			ret = actPubService.generateFollowers(userName);
+			ret = apService.generateFollowers(userName);
 		}
 		if (ret != null) {
 			// log.debug("Reply with Followers: " + XString.prettyPrint(ret));
@@ -163,9 +165,9 @@ public class ActPubController {
 			@RequestParam(value = "page", required = false) String page) {
 		Object ret = null;
 		if ("true".equals(page)) {
-			ret = actPubService.generateFollowingPage(userName, minId);
+			ret = apService.generateFollowingPage(userName, minId);
 		} else {
-			ret = actPubService.generateFollowing(userName);
+			ret = apService.generateFollowing(userName);
 		}
 		if (ret != null) {
 			// log.debug("Reply with Following: " + XString.prettyPrint(ret));

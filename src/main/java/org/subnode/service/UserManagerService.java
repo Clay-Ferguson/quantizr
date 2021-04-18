@@ -7,22 +7,14 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import java.util.Random;
 import java.util.concurrent.ConcurrentHashMap;
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.lang3.StringUtils;
 import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
-import org.springframework.web.client.RestTemplate;
 import org.subnode.config.AppProp;
 import org.subnode.config.NodeName;
 import org.subnode.config.SessionContext;
@@ -69,7 +61,6 @@ import org.subnode.response.SignupResponse;
 import org.subnode.util.Const;
 import org.subnode.util.ExUtil;
 import org.subnode.util.ThreadLocals;
-import org.subnode.util.Util;
 import org.subnode.util.ValContainer;
 import org.subnode.util.Validator;
 import org.subnode.util.XString;
@@ -116,14 +107,6 @@ public class UserManagerService {
 
 	@Autowired
 	private NodeEditService edit;
-
-	/*
-	 * RestTempalte is thread-safe and reusable, and has no state, so we need only
-	 * one final static instance ever
-	 */
-	private static final RestTemplate restTemplate = new RestTemplate(Util.getClientHttpRequestFactory());
-
-	private static final ObjectMapper mapper = new ObjectMapper();
 
 	/* Private keys of each user by user name as key */
 	public static final ConcurrentHashMap<String, String> privateKeysByUserName = new ConcurrentHashMap<>();
