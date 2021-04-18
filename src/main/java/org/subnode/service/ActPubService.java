@@ -1070,8 +1070,10 @@ public class ActPubService {
             /* Protocol says we need to send this acceptance back */
             Runnable runnable = () -> {
                 try {
-                    //todo-0: what's this sleep doing ?
-                    Thread.sleep(500);
+                    // todo-0: what's this sleep doing? I'm pretty sure I just wanted to give the caller (i.e. some
+                    // remote Fedi instance) a chance to get a return code back for this call before posting 
+                    // back to it
+                    Thread.sleep(2000);
 
                     // Must send either Accept or Reject. Currently we auto-accept all.
                     APObj acceptFollow = new APObj() //
@@ -1091,6 +1093,7 @@ public class ActPubService {
                 } catch (Exception e) {
                 }
             };
+            // todo-0: Let's use the Executor for this. Also check entire app for other "new Thread() calls"
             Thread thread = new Thread(runnable);
             thread.start();
             return null;

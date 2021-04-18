@@ -33,6 +33,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Component;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
@@ -47,6 +48,7 @@ import org.subnode.util.ThreadLocals;
 import org.subnode.util.Util;
 import org.subnode.util.XString;
 
+@Component
 public class ActPubUtil {
     private static final Logger log = LoggerFactory.getLogger(ActPubUtil.class);
 
@@ -58,9 +60,6 @@ public class ActPubUtil {
 
     @Autowired
     private AppProp appProp;
-
-    @Autowired
-    private ActPubService apService;
 
     @Autowired
     private MongoRead read;
@@ -182,6 +181,8 @@ public class ActPubUtil {
 
     /*
      * Note: 'actor' here is the actor URL of the local (non-federated) user doing the post
+     * 
+     * WARNING: If privateKey is passed as 'null' you MUST be calling this from HTTP request thread.
      */
     public void securePost(MongoSession session, String privateKey, String toInbox, String actor, APObj message) {
         try {

@@ -41,6 +41,8 @@ public class AppConfiguration implements WebMvcConfigurer {
 	@Autowired
 	private AppProp appProp;
 
+	private static ThreadPoolTaskExecutor executor;
+
 	/*
 	 * To avoid error message during startup
 	 * "No qualifying bean of type 'org.springframework.scheduling.TaskScheduler' available" we have to
@@ -51,18 +53,26 @@ public class AppConfiguration implements WebMvcConfigurer {
 		return new ConcurrentTaskScheduler(); // single threaded by default
 	}
 
+	/* This method is not perfectly thread-safe but Spring initializes this during context initialization only so it's ok */
 	@Bean(name = "threadPoolTaskExecutor")
-    public Executor threadPoolTaskExecutor() {
-        return new ThreadPoolTaskExecutor();
+	public ThreadPoolTaskExecutor threadPoolTaskExecutor() {
+		if (executor != null) {
+			return executor;
+		}
 
-		// ThreadPoolTaskExecutor t = new ThreadPoolTaskExecutor();
-		// t.setCorePoolSize(10);
-		// t.setMaxPoolSize(100);
-		// t.setQueueCapacity(50);
+		executor = new ThreadPoolTaskExecutor();
+		executor.setCorePoolSize(25);
+		executor.setMaxPoolSize(50);
 		// t.setAllowCoreThreadTimeOut(true);
 		// t.setKeepAliveSeconds(120);
-		// return t;
-    }
+		return executor;
+	}
+
+	public static void shutdown() {
+		if (executor != null) {
+			executor.shutdown();
+		}
+	}
 
 	/*
 	 * This method is removed because we switched to using the spring.resources.static-locations
@@ -152,7 +162,6 @@ public class AppConfiguration implements WebMvcConfigurer {
 	@Scope("singleton")
 	public RestTemplate restTemplate() {
 		HttpComponentsClientHttpRequestFactory httpRequestFactory = new HttpComponentsClientHttpRequestFactory();
-		// int timeout = ???
 		// httpRequestFactory.setConnectionRequestTimeout(timeout);
 		// httpRequestFactory.setConnectTimeout(timeout);
 		// httpRequestFactory.setReadTimeout(timeout);

@@ -3,13 +3,13 @@ package org.subnode.service;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+import java.util.concurrent.Executor;
 import org.apache.commons.lang3.StringUtils;
 import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
@@ -39,8 +39,6 @@ import org.subnode.util.ThreadLocals;
 public class UserFeedService {
 	private static final Logger log = LoggerFactory.getLogger(UserFeedService.class);
 
-	private static final ExecutorService sseMvcExecutor = Executors.newFixedThreadPool(20);
-
 	static final int MAX_FEED_ITEMS = 50;
 
 	@Autowired
@@ -60,6 +58,10 @@ public class UserFeedService {
 
 	@Autowired
 	private MongoTemplate ops;
+
+	@Autowired
+	@Qualifier("threadPoolTaskExecutor")
+	private Executor executor;
 
 	/* Notify all users being shared to on this node */
 	public void pushNodeUpdateToBrowsers(MongoSession session, SubNode node) {
@@ -112,7 +114,7 @@ public class UserFeedService {
 		if (userSession == null)
 			return;
 
-		sseMvcExecutor.execute(() -> {
+		executor.execute(() -> {
 			SseEmitter pushEmitter = userSession.getPushEmitter();
 			if (pushEmitter == null)
 				return;
@@ -137,10 +139,6 @@ public class UserFeedService {
 				pushEmitter.completeWithError(ex);
 			}
 		});
-	}
-
-	public static void shutdown() {
-		sseMvcExecutor.shutdown();
 	}
 
 	/*
