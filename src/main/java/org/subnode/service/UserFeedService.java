@@ -35,13 +35,11 @@ import org.subnode.response.ServerPushInfo;
 import org.subnode.util.Convert;
 import org.subnode.util.ThreadLocals;
 
-/**
- * Service methods for maintaining 'in-memory' lists of the most recent UserFeed posts of all users,
- * to allow extremely fast construction of any person's consolidated feed.
- */
 @Component
 public class UserFeedService {
 	private static final Logger log = LoggerFactory.getLogger(UserFeedService.class);
+
+	private static final ExecutorService sseMvcExecutor = Executors.newFixedThreadPool(20);
 
 	static final int MAX_FEED_ITEMS = 50;
 
@@ -111,31 +109,41 @@ public class UserFeedService {
 
 	public void sendServerPushInfo(SessionContext userSession, ServerPushInfo info) {
 		// If user is currently logged in we have a session here.
-		if (userSession != null) {
-			SseEmitter pushEmitter = userSession.getPushEmitter();
-			if (pushEmitter != null) {
-				ExecutorService sseMvcExecutor = Executors.newSingleThreadExecutor();
-				sseMvcExecutor.execute(() -> {
-					try {
-						SseEventBuilder event = SseEmitter.event() //
-								.data(info) //
-								.id(String.valueOf(info.hashCode()))//
-								.name(info.getType());
-						pushEmitter.send(event);
+		if (userSession == null)
+			return;
 
-						/*
-						 * DO NOT DELETE. This way of sending also works, and I was originally doing it this way and picking
-						 * up in eventSource.onmessage = e => {} on the browser, but I decided to use the builder instead
-						 * and let the 'name' in the builder route different objects to different event listeners on the
-						 * client. Not really sure if either approach has major advantages over the other.
-						 * 
-						 * pushEmitter.send(info, MediaType.APPLICATION_JSON);
-						 */
-					} catch (Exception ex) {
-						pushEmitter.completeWithError(ex);
-					}
-				});
-			}
+		synchronized (sseMvcExecutor) {
+			sseMvcExecutor.execute(() -> {
+				SseEmitter pushEmitter = userSession.getPushEmitter();
+				if (pushEmitter == null)
+					return;
+					
+				try {
+					SseEventBuilder event = SseEmitter.event() //
+							.data(info) //
+							.id(String.valueOf(info.hashCode()))//
+							.name(info.getType());
+
+					pushEmitter.send(event);
+
+					/*
+					 * DO NOT DELETE. This way of sending also works, and I was originally doing it this way and picking
+					 * up in eventSource.onmessage = e => {} on the browser, but I decided to use the builder instead
+					 * and let the 'name' in the builder route different objects to different event listeners on the
+					 * client. Not really sure if either approach has major advantages over the other.
+					 * 
+					 * pushEmitter.send(info, MediaType.APPLICATION_JSON);
+					 */
+				} catch (Exception ex) {
+					pushEmitter.completeWithError(ex);
+				}
+			});
+		}
+	}
+
+	public static void shutdown() {
+		synchronized (sseMvcExecutor) {
+			sseMvcExecutor.shutdown();
 		}
 	}
 
@@ -187,8 +195,10 @@ public class UserFeedService {
 			criteria = criteria.and(SubNode.FIELD_PROPERTIES + "." + NodeProp.ACT_PUB_SENSITIVE + ".value").is(null);
 		}
 
-		// Users can manually add a property named "unpublish" to have a "public" node that nonetheles doesn't show up
-		// in any feeds, but in the future maybe we will make this a checkbox on the editor.
+		/*
+		 * Users can manually add a property named "unpublish" to have a "public" node that nonetheles
+		 * doesn't show up in any feeds, but in the future maybe we will make this a checkbox on the editor.
+		 */
 		criteria = criteria.and(SubNode.FIELD_PROPERTIES + "." + NodeProp.UNPUBLISHED + ".value").is(null);
 
 		// reset feedMaxTime if we're getting first page of results
@@ -271,9 +281,11 @@ public class UserFeedService {
 			lastNode = node;
 		}
 
-		/* This is the correct logic since we only have a 'more' button and no 'back' button so that as the user clicks
-		more button we go further back in time and always update feedMaxTime here to ensure we don't encounter
-		records we've already seen */
+		/*
+		 * This is the correct logic since we only have a 'more' button and no 'back' button so that as the
+		 * user clicks more button we go further back in time and always update feedMaxTime here to ensure
+		 * we don't encounter records we've already seen
+		 */
 		if (lastNode != null) {
 			sc.setFeedMaxTime(lastNode.getModifyTime());
 		}

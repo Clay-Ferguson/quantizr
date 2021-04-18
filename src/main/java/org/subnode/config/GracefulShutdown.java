@@ -5,6 +5,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.boot.web.embedded.tomcat.TomcatConnectorCustomizer;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextClosedEvent;
+import org.subnode.service.UserFeedService;
 import java.util.concurrent.Executor;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
@@ -37,6 +38,8 @@ public class GracefulShutdown implements TomcatConnectorCustomizer, ApplicationL
                 Thread.currentThread().interrupt();
             }
         }
+
+        UserFeedService.shutdown();
         log.debug("GracefulShudown: complete");
     }
 }
