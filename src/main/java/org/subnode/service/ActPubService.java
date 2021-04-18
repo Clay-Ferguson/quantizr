@@ -3,7 +3,6 @@ package org.subnode.service;
 import java.security.PublicKey;
 import java.util.Arrays;
 import java.util.Date;
-import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
@@ -14,7 +13,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.data.domain.Sort;
 import org.springframework.http.MediaType;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
@@ -24,7 +22,8 @@ import org.subnode.actpub.APList;
 import org.subnode.actpub.APObj;
 import org.subnode.actpub.ActPubConstants;
 import org.subnode.actpub.ActPubFactory;
-import org.subnode.actpub.ActPubObserver;
+import org.subnode.actpub.ActPubFollowing;
+import org.subnode.actpub.ActPubOutbox;
 import org.subnode.actpub.ActPubUtil;
 import org.subnode.config.AppProp;
 import org.subnode.config.NodeName;
@@ -47,7 +46,6 @@ import org.subnode.util.DateUtil;
 import org.subnode.util.EnglishDictionary;
 import org.subnode.util.SubNodeUtil;
 import org.subnode.util.ThreadLocals;
-import org.subnode.util.ValContainer;
 import org.subnode.util.XString;
 
 @Component
@@ -77,9 +75,6 @@ public class ActPubService {
     private MongoCreate create;
 
     @Autowired
-    private MongoDelete delete;
-
-    @Autowired
     private ActPubFactory apFactory;
 
     @Autowired
@@ -104,13 +99,13 @@ public class ActPubService {
     private SubNodeUtil subNodeUtil;
 
     @Autowired
-    private NodeEditService edit;
-
-    @Autowired
-    private MongoAuth auth;
-
-    @Autowired
     private ActPubUtil apUtil;
+
+    @Autowired
+    private ActPubFollowing apFollowing;
+
+    @Autowired
+    private ActPubOutbox apOutbox;
 
     @Autowired
 	@Qualifier("threadPoolTaskExecutor")
@@ -361,299 +356,6 @@ public class ActPubService {
     }
 
     /*
-     * Caller can pass in userNode if it's already available, but if not just pass null and the
-     * apUserName will be used to look up the userNode.
-     */
-    public void refreshOutboxFromForeignServer(MongoSession session, Object actor, SubNode userNode, String apUserName) {
-
-        if (userNode == null) {
-            userNode = read.getUserNodeByUserName(session, apUserName);
-        }
-
-        SubNode outboxNode = read.getUserNodeByType(session, apUserName, userNode, "### Posts", NodeType.ACT_PUB_POSTS.s(), Arrays.asList(PrivilegeType.READ.s(), PrivilegeType.WRITE.s()));
-        if (outboxNode == null) {
-            log.debug("no outbox for user: " + apUserName);
-            return;
-        }
-
-        /*
-         * Query all existing known outbox items we have already saved for this foreign user
-         */
-        Iterable<SubNode> outboxItems = read.getSubGraph(session, outboxNode, null, 0);
-
-        String outboxUrl = AP.str(actor, "outbox");
-        Object outbox = getOutbox(outboxUrl);
-        if (outbox == null) {
-            log.debug("Unable to get outbox for AP user: " + apUserName);
-            return;
-        }
-
-        /*
-         * Generate a list of known AP IDs so we can ignore them and load only the unknown ones from the
-         * foreign server
-         */
-        HashSet<String> apIdSet = new HashSet<>();
-        for (SubNode n : outboxItems) {
-            String apId = n.getStrProp(NodeProp.ACT_PUB_ID.s());
-            if (apId != null) {
-                apIdSet.add(apId);
-            }
-        }
-
-        ValContainer<Integer> count = new ValContainer<>(0);
-        final SubNode _userNode = userNode;
-
-        iterateOrderedCollection(outbox, Integer.MAX_VALUE, obj -> {
-            try {
-                // if (obj != null) {
-                // log.debug("saveNote: OBJ=" + XString.prettyPrint(obj));
-                // }
-
-                String apId = AP.str(obj, "id");
-                if (!apIdSet.contains(apId)) {
-                    Object object = AP.obj(obj, "object");
-
-                    if (object != null) {
-                        if (object instanceof String) {
-                            // todo-1: handle boosts.
-                            //
-                            // log.debug("Not Handled: Object was a string: " + object + " in outbox item: "
-                            // + XString.prettyPrint(obj));
-                            // Example of what needs to be handled here is when 'obj' contains a 'boost' (retweet)
-                            // {
-                            // "id" : "https://dobbs.town/users/onan/statuses/105613730170001141/activity",
-                            // "type" : "Announce",
-                            // "actor" : "https://dobbs.town/users/onan",
-                            // "published" : "2021-01-25T01:20:30Z",
-                            // "to" : [ "https://www.w3.org/ns/activitystreams#Public" ],
-                            // "cc" : [ "https://mastodon.sdf.org/users/stunder", "https://dobbs.town/users/onan/followers" ],
-                            // "object" : "https://mastodon.sdf.org/users/stunder/statuses/105612925260202844"
-                            // }
-                        } //
-                        else if ("Note".equals(AP.str(object, "type"))) {
-                            try {
-                                newPostsInCycle++;
-                                saveNote(session, _userNode, outboxNode, object, true, true);
-                                count.setVal(count.getVal() + 1);
-                            } catch (Exception e) {
-                                // log and ignore.
-                                log.error("error in saveNode()", e);
-                            }
-                        } else {
-                            log.debug("Object type not supported: " + XString.prettyPrint(obj));
-                        }
-                    }
-                }
-            } catch (Exception e) {
-                log.error("Failes processing collection item.", e);
-            }
-            return (count.getVal() < MAX_MESSAGES);
-        });
-    }
-
-    public void iterateOrderedCollection(Object collectionObj, int maxCount, ActPubObserver observer) {
-        /*
-         * To reduce load for our purposes we can limit to just getting 2 pages of results to update a user,
-         * and really just one page would be ideal if not for the fact that some servers return an empty
-         * first page and put the results in the 'last' page
-         */
-        int maxPageQueries = 2;
-        int pageQueries = 0;
-
-        // log.debug("interateOrderedCollection(): " + XString.prettyPrint(collectionObj));
-        int count = 0;
-        /*
-         * We user apIdSet to avoid processing any dupliates, because the AP spec calls on us to do this and
-         * doesn't guarantee it's own dedupliation
-         */
-        HashSet<String> apIdSet = new HashSet<>();
-
-        /*
-         * The collection object itself is allowed to have orderedItems, which if present we process, in
-         * addition to the paging, although normally when the collection has the items it means it won't
-         * have any paging
-         */
-        List<?> orderedItems = AP.list(collectionObj, "orderedItems");
-        if (orderedItems != null) {
-            /*
-             * Commonly this will just be an array strings (like in a 'followers' collection on Mastodon)
-             */
-            for (Object apObj : orderedItems) {
-                if (!observer.item(apObj)) {
-                    return;
-                }
-                if (++count >= maxCount)
-                    return;
-            }
-        }
-
-        /*
-         * Warning: There are times when even with only two items in the outbox Mastodon might send back an
-         * empty array in the "first" page and the two items in teh "last" page, which makes no sense, but
-         * it just means we have to read and deduplicate all the items from all pages to be sure we don't
-         * end up with a empty array even when there ARE some
-         */
-        String firstPageUrl = AP.str(collectionObj, "first");
-        if (firstPageUrl != null) {
-            // log.debug("First Page Url: " + firstPageUrl);
-            if (++pageQueries > maxPageQueries)
-                return;
-            Object ocPage = getOrderedCollectionPage(firstPageUrl);
-
-            while (ocPage != null) {
-                orderedItems = AP.list(ocPage, "orderedItems");
-                for (Object apObj : orderedItems) {
-
-                    // if apObj is an object (map)
-                    if (AP.hasProps(apObj)) {
-                        String apId = AP.str(apObj, "id");
-                        // if no apId that's fine, just process item.
-                        if (apId == null) {
-                            if (!observer.item(apObj))
-                                return;
-                        }
-                        // if no apId that's fine, just process item.
-                        else if (!apIdSet.contains(apId)) {
-                            // log.debug("Iterate Collection Item: " + apId);
-                            if (!observer.item(apObj))
-                                return;
-                            apIdSet.add(apId);
-                        }
-                    }
-                    // otherwise apObj is probably a 'String' but whatever it is we call 'item' on
-                    // it.
-                    else {
-                        if (!observer.item(apObj))
-                            return;
-                    }
-                    if (++count >= maxCount)
-                        return;
-                }
-
-                String nextPage = AP.str(ocPage, "next");
-                if (nextPage != null) {
-                    if (++pageQueries > maxPageQueries)
-                        return;
-                    ocPage = getOrderedCollectionPage(nextPage);
-                } else {
-                    break;
-                }
-            }
-        }
-
-        String lastPageUrl = AP.str(collectionObj, "last");
-        if (lastPageUrl != null) {
-            // log.debug("Last Page Url: " + lastPageUrl);
-            if (++pageQueries > maxPageQueries)
-                return;
-            Object ocPage = getOrderedCollectionPage(lastPageUrl);
-
-            if (ocPage != null) {
-                orderedItems = AP.list(ocPage, "orderedItems");
-
-                for (Object apObj : orderedItems) {
-                    // if apObj is an object (map)
-                    if (AP.hasProps(apObj)) {
-                        String apId = AP.str(apObj, "id");
-                        // if no apId that's fine, just process item.
-                        if (apId == null) {
-                            if (!observer.item(apObj))
-                                return;
-                        }
-                        // else process it with apId
-                        else if (!apIdSet.contains(apId)) {
-                            // log.debug("Iterate Collection Item: " + apId);
-                            if (!observer.item(apObj))
-                                return;
-                            apIdSet.add(apId);
-                        }
-                    }
-                    // otherwise apObj is probably a 'String' but whatever it is we call 'item' on
-                    // it.
-                    else {
-                        if (!observer.item(apObj))
-                            return;
-                    }
-                    if (++count >= maxCount)
-                        return;
-                }
-            }
-        }
-    }
-
-    public APObj getOutbox(String url) {
-        if (url == null)
-            return null;
-        APObj outbox = apUtil.getJson(url, new MediaType("application", "ld+json"));
-        outboxQueryCount++;
-        cycleOutboxQueryCount++;
-        // log.debug("Outbox: " + XString.prettyPrint(outbox));
-        return outbox;
-    }
-
-    public APObj getOrderedCollectionPage(String url) {
-        if (url == null)
-            return null;
-        APObj page = apUtil.getJson(url, new MediaType("application", "activity+json"));
-        // log.debug("OrderedCollectionPage: " + XString.prettyPrint(outboxPage));
-        return page;
-    }
-
-    /*
-     * outbound message to follow/unfollow users on remote servers
-     * 
-     * apUserName is full user name like alice@quantizr.com
-     */
-    public void setFollowing(String apUserName, boolean following) {
-        try {
-            // admin doesn't follow/unfollow
-            if (ThreadLocals.getSessionContext().isAdmin()) {
-                return;
-            }
-
-            APObj webFingerOfUserBeingFollowed = apUtil.getWebFinger(apUserName);
-            String actorUrlOfUserBeingFollowed = apUtil.getActorUrlFromWebFingerObj(webFingerOfUserBeingFollowed);
-
-            adminRunner.run(session -> {
-                String sessionActorUrl = apUtil.makeActorUrlForUserName(ThreadLocals.getSessionContext().getUserName());
-                APObj followAction = new APObj();
-
-                // send follow action
-                if (following) {
-                    followAction //
-                            .put("@context", ActPubConstants.CONTEXT_STREAMS) //
-                            .put("id", appProp.getProtocolHostAndPort() + "/follow/" + String.valueOf(new Date().getTime())) //
-                            .put("type", "Follow") //
-                            .put("actor", sessionActorUrl) //
-                            .put("object", actorUrlOfUserBeingFollowed);
-                }
-                // send unfollow action
-                else {
-                    followAction //
-                            .put("@context", ActPubConstants.CONTEXT_STREAMS) //
-                            .put("id", appProp.getProtocolHostAndPort() + "/unfollow/" + String.valueOf(new Date().getTime())) //
-                            .put("type", "Undo") //
-                            .put("actor", sessionActorUrl) //
-                            .put("object", new APObj() //
-                                    .put("id",
-                                            appProp.getProtocolHostAndPort() + "/unfollow-obj/"
-                                                    + String.valueOf(new Date().getTime())) //
-                                    .put("type", "Follow") //
-                                    .put("actor", sessionActorUrl) //
-                                    .put("object", actorUrlOfUserBeingFollowed));
-                }
-
-                APObj toActor = apUtil.getActorByUrl(actorUrlOfUserBeingFollowed);
-                String toInbox = AP.str(toActor, "inbox");
-                apUtil.securePost(session, null, toInbox, sessionActorUrl, followAction);
-                return null;
-            });
-        } catch (Exception e) {
-            log.debug("Set following Failed.");
-        }
-    }
-
-    /*
      * Processes incoming INBOX requests for (Follow, Undo Follow), to be called by foreign servers to
      * follow a user on this server
      */
@@ -666,7 +368,7 @@ public class ActPubService {
         }
         // Process Follow Action
         else if ("Follow".equals(type)) {
-            return processFollowAction(payload, false);
+            return apFollowing.processFollowAction(payload, false);
         }
         // Process Undo Action (Unfollow, etc)
         else if ("Undo".equals(type)) {
@@ -683,7 +385,7 @@ public class ActPubService {
     public APObj processUndoAction(Object payload) {
         Object object = AP.obj(payload, "object");
         if (object != null && "Follow".equals(AP.str(object, "type"))) {
-            return processFollowAction(object, true);
+            return apFollowing.processFollowAction(object, true);
         }
         return null;
     }
@@ -934,7 +636,7 @@ public class ActPubService {
             if (allow) {
                 APObj followersObj = apUtil.getJson(url, new MediaType("application", "activity+json"));
                 if (followersObj != null) {
-                    iterateOrderedCollection(followersObj, MAX_FOLLOWERS, obj -> {
+                    apUtil.iterateOrderedCollection(followersObj, MAX_FOLLOWERS, obj -> {
                         /*
                          * Mastodon seems to have the followers items as strings, which are the actor urls of the followers.
                          */
@@ -1011,257 +713,6 @@ public class ActPubService {
                 break;
             }
         }
-    }
-
-    /*
-     * Process inbound 'Follow' actions (comming from foreign servers). This results in the follower an
-     * account node in our local DB created if not already existing, and then a FRIEND node under his
-     * FRIENDS_LIST created to represent the person he's following, if not already existing.
-     * 
-     * If 'unFollow' is true we actually do an unfollow instead of a follow.
-     */
-    public APObj processFollowAction(Object followAction, boolean unFollow) {
-
-        return (APObj) adminRunner.run(session -> {
-            // Actor URL of actor doing the following
-            String followerActorUrl = AP.str(followAction, "actor");
-            if (followerActorUrl == null) {
-                log.debug("no 'actor' found on follows action request posted object");
-                return null;
-            }
-
-            APObj followerActorObj = apUtil.getActorByUrl(followerActorUrl);
-
-            // log.debug("getLongUserNameFromActorUrl: " + actorUrl + "\n" +
-            // XString.prettyPrint(actor));
-            String followerUserName = apUtil.getLongUserNameFromActor(followerActorObj);
-            SubNode followerAccountNode = loadForeignUserByUserName(session, followerUserName);
-            userEncountered(followerUserName, false);
-
-            // Actor being followed (local to our server)
-            String actorBeingFollowedUrl = AP.str(followAction, "object");
-            if (actorBeingFollowedUrl == null) {
-                log.debug("no 'object' found on follows action request posted object");
-                return null;
-            }
-
-            String userToFollow = apUtil.getLocalUserNameFromActorUrl(actorBeingFollowedUrl);
-            if (userToFollow == null) {
-                log.debug("unable to get a user name from actor url: " + actorBeingFollowedUrl);
-                return null;
-            }
-
-            // get the Friend List of the follower
-            SubNode followerFriendList = read.getUserNodeByType(session, followerUserName, null, null, NodeType.FRIEND_LIST.s(), null);
-
-            /*
-             * lookup to see if this followerFriendList node already has userToFollow already under it
-             */
-            SubNode friendNode = read.findFriendOfUser(session, followerFriendList, userToFollow);
-            if (friendNode == null) {
-                if (!unFollow) {
-                    friendNode = edit.createFriendNode(session, followerFriendList, userToFollow, followerActorUrl);
-                    // userFeedService.sendServerPushInfo(localUserName,
-                    // new NotificationMessage("apReply", null, contentHtml, toUserName));
-                }
-            } else {
-                // if this is an unfollow delete the friend node
-                if (unFollow) {
-                    delete.deleteNode(session, friendNode, false);
-                }
-            }
-
-            String privateKey = apUtil.getPrivateKey(session, userToFollow);
-
-            /* Protocol says we need to send this acceptance back */
-            Runnable runnable = () -> {
-                try {
-                    // todo-0: what's this sleep doing? I'm pretty sure I just wanted to give the caller (i.e. some
-                    // remote Fedi instance) a chance to get a return code back for this call before posting 
-                    // back to it
-                    Thread.sleep(2000);
-
-                    // Must send either Accept or Reject. Currently we auto-accept all.
-                    APObj acceptFollow = new APObj() //
-                            .put("@context", ActPubConstants.CONTEXT_STREAMS) //
-                            .put("summary", "Accepted " + (unFollow ? "unfollow" : "follow") + " request") //
-                            .put("type", "Accept") //
-                            .put("actor", actorBeingFollowedUrl) //
-                            .put("object", new APObj() //
-                                    .put("type", unFollow ? "Undo" : "Follow") //
-                                    .put("actor", followerActorUrl) //
-                                    .put("object", actorBeingFollowedUrl)); //
-
-                    String followerInbox = AP.str(followerActorObj, "inbox");
-
-                    // log.debug("Sending Accept of Follow Request to inbox " + followerInbox);
-                    apUtil.securePost(session, privateKey, followerInbox, actorBeingFollowedUrl, acceptFollow);
-                } catch (Exception e) {
-                }
-            };
-            executor.execute(runnable);
-            return null;
-        });
-    }
-
-    public APObj generateFollowers(String userName) {
-        String url = appProp.getProtocolHostAndPort() + ActPubConstants.PATH_FOLLOWERS + "/" + userName;
-        Long totalItems = getFollowersCount(userName);
-
-        return new APObj() //
-                .put("@context", ActPubConstants.CONTEXT_STREAMS) //
-                .put("id", url) //
-                .put("type", "OrderedCollection") //
-                .put("totalItems", totalItems) //
-                .put("first", url + "?page=true") //
-                .put("last", url + "?min_id=0&page=true");
-    }
-
-    public APObj generateFollowing(String userName) {
-        String url = appProp.getProtocolHostAndPort() + ActPubConstants.PATH_FOLLOWING + "/" + userName;
-        Long totalItems = getFollowingCount(userName);
-
-        return new APObj() //
-                .put("@context", ActPubConstants.CONTEXT_STREAMS) //
-                .put("id", url) //
-                .put("type", "OrderedCollection") //
-                .put("totalItems", totalItems) //
-                .put("first", url + "?page=true") //
-                .put("last", url + "?min_id=0&page=true");
-    }
-
-    public APObj generateOutbox(String userName) {
-        // log.debug("Generate outbox for userName: " + userName);
-        String url = appProp.getProtocolHostAndPort() + ActPubConstants.PATH_OUTBOX + "/" + userName;
-        Long totalItems = getOutboxItemCount(userName, "public");
-
-        return new APObj() //
-                .put("@context", ActPubConstants.CONTEXT_STREAMS) //
-                .put("id", url) //
-                .put("type", "OrderedCollection") //
-                .put("totalItems", totalItems) //
-                .put("first", url + "?page=true") //
-                .put("last", url + "?min_id=0&page=true");
-    }
-
-    /*
-     * userName represents the person whose outbox is being QUERIED, and the identity of the user DOING
-     * the querying will come from the http header:
-     * 
-     * todo-1: For now we just query the PUBLIC shares from the outbox, and verify that public query
-     * works before we try to figure out how to do private auth comming from specific user(s)
-     */
-    public Long getOutboxItemCount(final String userName, String sharedTo) {
-        Long totalItems = (Long) adminRunner.run(mongoSession -> {
-            long count = 0;
-            SubNode userNode = read.getUserNodeByUserName(null, userName);
-            if (userNode != null) {
-                List<String> sharedToList = new LinkedList<>();
-                sharedToList.add(sharedTo);
-                count = auth.countSubGraphByAclUser(mongoSession, null, sharedToList, userNode.getOwner());
-            }
-            return Long.valueOf(count);
-        });
-        return totalItems;
-    }
-
-    /*
-     * if minId=="0" that means "last page", and if minId==null it means first page
-     */
-    public APObj generateOutboxPage(String userName, String minId) {
-        APList items = getOutboxItems(userName, "public", minId);
-
-        // this is a self-reference url (id)
-        String url = appProp.getProtocolHostAndPort() + ActPubConstants.PATH_OUTBOX + "/" + userName + "?min_id=" + minId
-                + "&page=true";
-
-        return new APObj() //
-                .put("@context", ActPubConstants.CONTEXT_STREAMS) //
-                .put("partOf", appProp.getProtocolHostAndPort() + ActPubConstants.PATH_OUTBOX + "/" + userName) //
-                .put("id", url) //
-                .put("type", "OrderedCollectionPage") //
-                .put("orderedItems", items) //
-                .put("totalItems", items.size());
-    }
-
-    public APObj generateFollowersPage(String userName, String minId) {
-        List<String> followers = getFollowers(userName, minId);
-
-        // this is a self-reference url (id)
-        String url = appProp.getProtocolHostAndPort() + ActPubConstants.PATH_FOLLOWERS + "/" + userName + "?page=true";
-        if (minId != null) {
-            url += "&min_id=" + minId;
-        }
-        return new APObj() //
-                .put("@context", ActPubConstants.CONTEXT_STREAMS) //
-                .put("id", url) //
-                .put("type", "OrderedCollectionPage") //
-                .put("orderedItems", followers) //
-                .put("partOf", appProp.getProtocolHostAndPort() + ActPubConstants.PATH_FOLLOWERS + "/" + userName)//
-                .put("totalItems", followers.size());
-    }
-
-    public APObj generateFollowingPage(String userName, String minId) {
-        List<String> following = getFollowing(userName, minId);
-
-        // this is a self-reference url (id)
-        String url = appProp.getProtocolHostAndPort() + ActPubConstants.PATH_FOLLOWING + "/" + userName + "?page=true";
-        if (minId != null) {
-            url += "&min_id=" + minId;
-        }
-        return new APObj() //
-                .put("@context", ActPubConstants.CONTEXT_STREAMS) //
-                .put("id", url) //
-                .put("type", "OrderedCollectionPage") //
-                .put("orderedItems", following) //
-                .put("partOf", appProp.getProtocolHostAndPort() + ActPubConstants.PATH_FOLLOWING + "/" + userName)//
-                .put("totalItems", following.size());
-    }
-
-    public List<String> getFollowers(String userName, String minId) {
-        final List<String> followers = new LinkedList<>();
-
-        adminRunner.run(session -> {
-            Iterable<SubNode> iter = read.findFollowersOfUser(session, userName);
-
-            for (SubNode n : iter) {
-                // log.debug("Follower found: " + XString.prettyPrint(n));
-                followers.add(n.getStrProp(NodeProp.ACT_PUB_ACTOR_URL));
-            }
-            return null;
-        });
-
-        return followers;
-    }
-
-    public List<String> getFollowing(String userName, String minId) {
-        final List<String> following = new LinkedList<>();
-
-        adminRunner.run(session -> {
-            Iterable<SubNode> iter = read.findFollowingOfUser(session, userName);
-
-            for (SubNode n : iter) {
-                // log.debug("Follower found: " + XString.prettyPrint(n));
-                following.add(n.getStrProp(NodeProp.ACT_PUB_ACTOR_URL));
-            }
-            return null;
-        });
-
-        return following;
-    }
-
-    public Long getFollowersCount(String userName) {
-        return (Long) adminRunner.run(session -> {
-            Long count = read.countFollowersOfUser(session, userName);
-            return count;
-        });
-    }
-
-    public Long getFollowingCount(String userName) {
-        return (Long) adminRunner.run(session -> {
-            Long count = read.countFollowingOfUser(session, userName);
-            return count;
-        });
     }
 
     /*
@@ -1348,81 +799,6 @@ public class ActPubService {
     }
 
     /*
-     * todo-1: Security isn't implemented on this call yet, but the only caller to this is passing
-     * "public" as 'sharedTo' so we are safe to implement this outbox currently as only able to send
-     * back public info.
-     */
-    public APList getOutboxItems(String userName, String sharedTo, String minId) {
-        String host = appProp.getProtocolHostAndPort();
-        APList retItems = null;
-        String nodeIdBase = host + "/app?id=";
-
-        try {
-            SubNode userNode = read.getUserNodeByUserName(null, userName);
-            if (userNode == null) {
-                return null;
-            }
-
-            retItems = (APList) adminRunner.run(mongoSession -> {
-                APList items = new APList();
-                int MAX_PER_PAGE = 25;
-                boolean collecting = false;
-
-                if (minId == null) {
-                    collecting = true;
-                }
-
-                List<String> sharedToList = new LinkedList<String>();
-                sharedToList.add(sharedTo);
-
-                for (SubNode child : auth.searchSubGraphByAclUser(mongoSession, null, sharedToList,
-                        Sort.by(Sort.Direction.DESC, SubNode.FIELD_MODIFY_TIME), MAX_PER_PAGE, userNode.getOwner())) {
-
-                    if (items.size() >= MAX_PER_PAGE) {
-                        // ocPage.setPrev(outboxBase + "?page=" + String.valueOf(pgNo - 1));
-                        // ocPage.setNext(outboxBase + "?page=" + String.valueOf(pgNo + 1));
-                        break;
-                    }
-
-                    if (collecting) {
-                        String hexId = child.getId().toHexString();
-                        String published = DateUtil.isoStringFromDate(child.getModifyTime());
-                        String actor = apUtil.makeActorUrlForUserName(userName);
-
-                        items.add(new APObj() //
-                                .put("id", nodeIdBase + hexId + "&create=t") //
-                                .put("type", "Create") //
-                                .put("actor", actor) //
-                                .put("published", published) //
-                                .put("to", new APList().val(ActPubConstants.CONTEXT_STREAMS + "#Public")) //
-                                // .put("cc", ...) //
-                                .put("object", new APObj() //
-                                        .put("id", nodeIdBase + hexId) //
-                                        .put("type", "Note") //
-                                        .put("summary", null) //
-                                        .put("replyTo", null) //
-                                        .put("published", published) //
-                                        .put("url", nodeIdBase + hexId) //
-                                        .put("attributedTo", actor) //
-                                        .put("to", new APList().val(ActPubConstants.CONTEXT_STREAMS + "#Public")) //
-                                        // .put("cc", ...) //
-                                        .put("sensitive", false) //
-                                        .put("content", child.getContent())//
-                        ));
-                    }
-                }
-
-                return items;
-            });
-
-        } catch (Exception e) {
-            log.error("failed generating outbox page: ", e);
-            throw new RuntimeException(e);
-        }
-        return retItems;
-    }
-
-    /*
      * Every node getting deleted will call into here (via a hook in MongoEventListener), so we can do
      * whatever we need to in this hook, which for now is just used to manage unfollowing a Friend if a
      * friend is deleted, but later will also entail (todo-1) deleting nodes that were posted to foreign
@@ -1436,7 +812,7 @@ public class ActPubService {
                 if (friendUserName != null) {
                     // if a foreign user, update thru ActivityPub
                     if (friendUserName.contains("@")) {
-                        setFollowing(friendUserName, false);
+                        apFollowing.setFollowing(friendUserName, false);
                     }
                 }
             }
@@ -1514,7 +890,7 @@ public class ActPubService {
                         String actorUrl = userNode.getStrProp(NodeProp.ACT_PUB_ACTOR_URL.s());
                         APObj actor = apUtil.getActorByUrl(actorUrl);
                         if (actor != null) {
-                            refreshOutboxFromForeignServer(session, actor, userNode, _apUserName);
+                            apOutbox.refreshOutboxFromForeignServer(session, actor, userNode, _apUserName);
                         } else {
                             log.debug("Unable to get cached actor from url: " + actorUrl);
                         }

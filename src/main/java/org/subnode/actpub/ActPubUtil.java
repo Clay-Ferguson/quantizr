@@ -601,4 +601,134 @@ public class ActPubUtil {
         UserManagerService.privateKeysByUserName.put(userName, privateKey);
         return privateKey;
     }
+
+    public void iterateOrderedCollection(Object collectionObj, int maxCount, ActPubObserver observer) {
+        /*
+         * To reduce load for our purposes we can limit to just getting 2 pages of results to update a user,
+         * and really just one page would be ideal if not for the fact that some servers return an empty
+         * first page and put the results in the 'last' page
+         */
+        int maxPageQueries = 2;
+        int pageQueries = 0;
+
+        // log.debug("interateOrderedCollection(): " + XString.prettyPrint(collectionObj));
+        int count = 0;
+        /*
+         * We user apIdSet to avoid processing any dupliates, because the AP spec calls on us to do this and
+         * doesn't guarantee it's own dedupliation
+         */
+        HashSet<String> apIdSet = new HashSet<>();
+
+        /*
+         * The collection object itself is allowed to have orderedItems, which if present we process, in
+         * addition to the paging, although normally when the collection has the items it means it won't
+         * have any paging
+         */
+        List<?> orderedItems = AP.list(collectionObj, "orderedItems");
+        if (orderedItems != null) {
+            /*
+             * Commonly this will just be an array strings (like in a 'followers' collection on Mastodon)
+             */
+            for (Object apObj : orderedItems) {
+                if (!observer.item(apObj)) {
+                    return;
+                }
+                if (++count >= maxCount)
+                    return;
+            }
+        }
+
+        /*
+         * Warning: There are times when even with only two items in the outbox Mastodon might send back an
+         * empty array in the "first" page and the two items in teh "last" page, which makes no sense, but
+         * it just means we have to read and deduplicate all the items from all pages to be sure we don't
+         * end up with a empty array even when there ARE some
+         */
+        String firstPageUrl = AP.str(collectionObj, "first");
+        if (firstPageUrl != null) {
+            // log.debug("First Page Url: " + firstPageUrl);
+            if (++pageQueries > maxPageQueries)
+                return;
+            Object ocPage = firstPageUrl == null ? null : getJson(firstPageUrl, new MediaType("application", "activity+json"));
+
+            while (ocPage != null) {
+                orderedItems = AP.list(ocPage, "orderedItems");
+                for (Object apObj : orderedItems) {
+
+                    // if apObj is an object (map)
+                    if (AP.hasProps(apObj)) {
+                        String apId = AP.str(apObj, "id");
+                        // if no apId that's fine, just process item.
+                        if (apId == null) {
+                            if (!observer.item(apObj))
+                                return;
+                        }
+                        // if no apId that's fine, just process item.
+                        else if (!apIdSet.contains(apId)) {
+                            // log.debug("Iterate Collection Item: " + apId);
+                            if (!observer.item(apObj))
+                                return;
+                            apIdSet.add(apId);
+                        }
+                    }
+                    // otherwise apObj is probably a 'String' but whatever it is we call 'item' on
+                    // it.
+                    else {
+                        if (!observer.item(apObj))
+                            return;
+                    }
+                    if (++count >= maxCount)
+                        return;
+                }
+
+                String nextPage = AP.str(ocPage, "next");
+                if (nextPage != null) {
+                    if (++pageQueries > maxPageQueries)
+                        return;
+                    ocPage = nextPage == null ? null : getJson(nextPage, new MediaType("application", "activity+json"));
+                } else {
+                    break;
+                }
+            }
+        }
+
+        String lastPageUrl = AP.str(collectionObj, "last");
+        if (lastPageUrl != null) {
+            // log.debug("Last Page Url: " + lastPageUrl);
+            if (++pageQueries > maxPageQueries)
+                return;
+            Object ocPage = lastPageUrl == null ? null : getJson(lastPageUrl, new MediaType("application", "activity+json"));
+
+            if (ocPage != null) {
+                orderedItems = AP.list(ocPage, "orderedItems");
+
+                for (Object apObj : orderedItems) {
+                    // if apObj is an object (map)
+                    if (AP.hasProps(apObj)) {
+                        String apId = AP.str(apObj, "id");
+                        // if no apId that's fine, just process item.
+                        if (apId == null) {
+                            if (!observer.item(apObj))
+                                return;
+                        }
+                        // else process it with apId
+                        else if (!apIdSet.contains(apId)) {
+                            // log.debug("Iterate Collection Item: " + apId);
+                            if (!observer.item(apObj))
+                                return;
+                            apIdSet.add(apId);
+                        }
+                    }
+                    // otherwise apObj is probably a 'String' but whatever it is we call 'item' on
+                    // it.
+                    else {
+                        if (!observer.item(apObj))
+                            return;
+                    }
+                    if (++count >= maxCount)
+                        return;
+                }
+            }
+        }
+    }
 }
