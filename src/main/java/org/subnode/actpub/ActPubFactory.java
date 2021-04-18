@@ -16,7 +16,7 @@ import org.subnode.service.ActPubService;
 @CrossOrigin
 public class ActPubFactory {
 	@Autowired
-	public ActPubService actPubService;
+	public ActPubService apService;
 
 	@Autowired
 	public ActPubUtil apUtil;

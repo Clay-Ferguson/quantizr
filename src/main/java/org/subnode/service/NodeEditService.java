@@ -11,6 +11,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.subnode.actpub.ActPubFollowing;
 import org.subnode.exception.base.RuntimeEx;
 import org.subnode.model.IPFSObjectStat;
 import org.subnode.model.NodeInfo;
@@ -90,7 +91,10 @@ public class NodeEditService {
 	private RunAsMongoAdmin adminRunner;
 
 	@Autowired
-	private ActPubService actPubService;
+	private ActPubService apService;
+
+	@Autowired
+	private ActPubFollowing apFollowing;
 
 	@Autowired
 	private AclService aclService;
@@ -540,7 +544,7 @@ public class NodeEditService {
 				if (parent != null) {
 					adminRunner.run(s -> {
 						auth.saveMentionsToNodeACL(s, node);
-						if (actPubService.sendNotificationForNodeEdit(s, parent, node)) {
+						if (apService.sendNotificationForNodeEdit(s, parent, node)) {
 							userFeedService.pushNodeUpdateToBrowsers(s, node);
 						}
 					});
@@ -561,7 +565,7 @@ public class NodeEditService {
 			if (friendUserName != null) {
 				// if a foreign user, update thru ActivityPub.
 				if (friendUserName.contains("@") && !ThreadLocals.getSessionContext().isAdmin()) {
-					actPubService.setFollowing(friendUserName, true);
+					apFollowing.setFollowing(friendUserName, true);
 				}
 
 				/*
@@ -578,14 +582,14 @@ public class NodeEditService {
 						asyncExec.run(() -> {
 							adminRunner.run(s -> {
 								if (!ThreadLocals.getSessionContext().isAdmin()) {
-									actPubService.loadForeignUserByUserName(s, friendUserName);
+									apService.loadForeignUserByUserName(s, friendUserName);
 								}
 
 								/*
 								 * The only time we pass true to load the user into the system is when they're
 								 * being added as a friend.
 								 */
-								actPubService.userEncountered(friendUserName, true);
+								apService.userEncountered(friendUserName, true);
 							});
 						});
 					}

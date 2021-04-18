@@ -27,6 +27,12 @@ public class ActPubController {
 	private ActPubService apService;
 
 	@Autowired
+	private ActPubOutbox apOutbox;
+
+	@Autowired
+	private ActPubFollowing apFollowing;
+
+	@Autowired
 	private ActPubUtil apUtil;
 
 	@Autowired
@@ -109,7 +115,7 @@ public class ActPubController {
 			@RequestParam(value = "page", required = false) String page) {
 		Object ret = null;
 		if ("true".equals(page)) {
-			ret = apService.generateOutboxPage(userName, minId);
+			ret = apOutbox.generateOutboxPage(userName, minId);
 		} else {
 			/*
 			 * Mastodon calls this method, but never calls back in (to generateOutboxPage above) for any pages.
@@ -121,7 +127,7 @@ public class ActPubController {
 			 * the outbox, mastodon still shows "0 toots", even though it just queried my inbox and there ARE
 			 * toots and we DID return the correct number of them.
 			 */
-			ret = apService.generateOutbox(userName);
+			ret = apOutbox.generateOutbox(userName);
 		}
 		if (ret != null) {
 			// log.debug("Reply with Outbox: " + XString.prettyPrint(ret));
@@ -142,9 +148,9 @@ public class ActPubController {
 			@RequestParam(value = "page", required = false) String page) {
 		Object ret = null;
 		if ("true".equals(page)) {
-			ret = apService.generateFollowersPage(userName, minId);
+			ret = apFollowing.generateFollowersPage(userName, minId);
 		} else {
-			ret = apService.generateFollowers(userName);
+			ret = apFollowing.generateFollowers(userName);
 		}
 		if (ret != null) {
 			// log.debug("Reply with Followers: " + XString.prettyPrint(ret));
@@ -165,9 +171,9 @@ public class ActPubController {
 			@RequestParam(value = "page", required = false) String page) {
 		Object ret = null;
 		if ("true".equals(page)) {
-			ret = apService.generateFollowingPage(userName, minId);
+			ret = apFollowing.generateFollowingPage(userName, minId);
 		} else {
-			ret = apService.generateFollowing(userName);
+			ret = apFollowing.generateFollowing(userName);
 		}
 		if (ret != null) {
 			// log.debug("Reply with Following: " + XString.prettyPrint(ret));
