@@ -7,11 +7,13 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.Executor;
 import javax.servlet.http.HttpServletRequest;
 import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.MediaType;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -109,6 +111,10 @@ public class ActPubService {
 
     @Autowired
     private ActPubUtil apUtil;
+
+    @Autowired
+	@Qualifier("threadPoolTaskExecutor")
+	private Executor executor;
 
     /*
      * Holds users for which messages need refreshing (false value) but sets value to 'true' once
@@ -1093,9 +1099,7 @@ public class ActPubService {
                 } catch (Exception e) {
                 }
             };
-            // todo-0: Let's use the Executor for this. Also check entire app for other "new Thread() calls"
-            Thread thread = new Thread(runnable);
-            thread.start();
+            executor.execute(runnable);
             return null;
         });
     }
