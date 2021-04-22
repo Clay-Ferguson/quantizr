@@ -174,14 +174,7 @@ public class NodeMoveService {
 			nodes.add(node);
 		}
 
-		// todo-0: do this kind of sort everywhere (lambda)
-		// nodes.sort((s1, s2) -> (int) (s1.getOrdinal() - s2.getOrdinal()));
-		Collections.sort(nodes, new Comparator<SubNode>() {
-			@Override
-			public int compare(SubNode s1, SubNode s2) {
-				return (int) (s1.getOrdinal() - s2.getOrdinal());
-			}
-		});
+		nodes.sort((s1, s2) -> (int) (s1.getOrdinal() - s2.getOrdinal()));
 
 		StringBuilder sb = new StringBuilder();
 		SubNode firstNode = null;

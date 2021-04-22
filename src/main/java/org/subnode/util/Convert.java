@@ -1,6 +1,5 @@
 package org.subnode.util;
 
-import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -51,17 +50,15 @@ public class Convert {
 	@Autowired
 	private RunAsMongoAdminEx adminRunner;
 
-	public static final PropertyInfoComparator propertyInfoComparator = new PropertyInfoComparator();
-
 	private static final Logger log = LoggerFactory.getLogger(Convert.class);
 
 	/*
-	 * Generates a NodeInfo object, which is the primary data type that is also used
-	 * on the browser/client to encapsulate the data for a given node which is used
-	 * by the browser to render the node
+	 * Generates a NodeInfo object, which is the primary data type that is also used on the
+	 * browser/client to encapsulate the data for a given node which is used by the browser to render
+	 * the node
 	 */
-	public NodeInfo convertToNodeInfo(SessionContext sessionContext, MongoSession session, SubNode node,
-			boolean htmlOnly, boolean initNodeEdit, long ordinal, boolean allowInlineChildren, boolean lastChild) {
+	public NodeInfo convertToNodeInfo(SessionContext sessionContext, MongoSession session, SubNode node, boolean htmlOnly,
+			boolean initNodeEdit, long ordinal, boolean allowInlineChildren, boolean lastChild) {
 
 		ImageSize imageSize = null;
 		String dataUrl = null;
@@ -94,9 +91,9 @@ public class Convert {
 		String avatarVer = null;
 
 		/*
-		 * todo-2: this is a spot that can be optimized. We should be able to send just
-		 * the userNodeId back to client, and the client should be able to deal with
-		 * that (i think). depends on how much ownership info we need to show user.
+		 * todo-2: this is a spot that can be optimized. We should be able to send just the userNodeId back
+		 * to client, and the client should be able to deal with that (i think). depends on how much
+		 * ownership info we need to show user.
 		 */
 		String nameProp = null;
 		SubNode userNode = read.getNode(session, node.getOwner(), false);
@@ -114,10 +111,10 @@ public class Convert {
 			avatarVer = userNode.getStrProp(NodeProp.BIN.s());
 
 			/*
-			 * todo-1: right here, get user profile off 'userNode', and put it into a map
-			 * that will be sent back to client packaged in this response, so that tooltip
-			 * on the browser can display it, and the browser will simply contain this same
-			 * 'map' that maps userIds to profile text, for good performance.
+			 * todo-1: right here, get user profile off 'userNode', and put it into a map that will be sent back
+			 * to client packaged in this response, so that tooltip on the browser can display it, and the
+			 * browser will simply contain this same 'map' that maps userIds to profile text, for good
+			 * performance.
 			 */
 		}
 
@@ -130,9 +127,8 @@ public class Convert {
 		// "+XString.prettyPrint(node));
 
 		/*
-		 * If the node is not owned by the person doing the browsing we need to extract
-		 * the key from ACL and put in cipherKey, so send back so the user can decrypt
-		 * the node.
+		 * If the node is not owned by the person doing the browsing we need to extract the key from ACL and
+		 * put in cipherKey, so send back so the user can decrypt the node.
 		 */
 		String cipherKey = null;
 		if (!ownerId.equals(sessionContext.getRootId()) && node.getAc() != null) {
@@ -147,19 +143,18 @@ public class Convert {
 
 		String apAvatar = userNode != null ? userNode.getStrProp(NodeProp.ACT_PUB_USER_ICON_URL) : null;
 
-		NodeInfo nodeInfo = new NodeInfo(node.jsonId(), node.getPath(), node.getName(), node.getContent(), owner,
-				ownerId, node.getOrdinal(), //
-				node.getModifyTime(), propList, acList, hasChildren, //
-				imageSize != null ? imageSize.getWidth() : 0, //
-				imageSize != null ? imageSize.getHeight() : 0, //
-				node.getType(), ordinal, lastChild, cipherKey, dataUrl, avatarVer, apAvatar);
+		NodeInfo nodeInfo =
+				new NodeInfo(node.jsonId(), node.getPath(), node.getName(), node.getContent(), owner, ownerId, node.getOrdinal(), //
+						node.getModifyTime(), propList, acList, hasChildren, //
+						imageSize != null ? imageSize.getWidth() : 0, //
+						imageSize != null ? imageSize.getHeight() : 0, //
+						node.getType(), ordinal, lastChild, cipherKey, dataUrl, avatarVer, apAvatar);
 
 		/*
-		 * Special case for "Friend" type nodes, to get enough information for the
-		 * browser to be able to render the avatar and the bio of the person. Eventually
-		 * we need to remove this kind of type-specific tight-coupling from here and
-		 * make some kind of plugin (like client has) for hooking into this kind of
-		 * type-specific logic
+		 * Special case for "Friend" type nodes, to get enough information for the browser to be able to
+		 * render the avatar and the bio of the person. Eventually we need to remove this kind of
+		 * type-specific tight-coupling from here and make some kind of plugin (like client has) for hooking
+		 * into this kind of type-specific logic
 		 */
 		if (node.getType().equals(NodeType.FRIEND.s())) {
 
@@ -171,17 +166,16 @@ public class Convert {
 			String friendAccountId = node.getStrProp(NodeProp.USER_NODE_ID);
 
 			/*
-			 * NOTE: Right when the Friend node is first created, before a person has been
-			 * selected, this WILL be null, and is normal
+			 * NOTE: Right when the Friend node is first created, before a person has been selected, this WILL
+			 * be null, and is normal
 			 */
 			if (friendAccountId != null) {
 				SubNode friendAccountNode = read.getNode(session, friendAccountId, false);
 
 				/*
-				 * to load up a friend node for the browser to display, we have to populate
-				 * these "Client Props", on the node object which are not properties of the node
-				 * itself but values we generate right here on demand. The "Client Props" is a
-				 * completely different set than the actual node properties
+				 * to load up a friend node for the browser to display, we have to populate these "Client Props", on
+				 * the node object which are not properties of the node itself but values we generate right here on
+				 * demand. The "Client Props" is a completely different set than the actual node properties
 				 */
 				if (friendAccountNode != null) {
 
@@ -202,15 +196,13 @@ public class Convert {
 					}
 
 					/*
-					 * Note: for ActivityPub foreign users we have xxx property on their account
-					 * node that points to the live URL of their account avatar as it was found in
-					 * their Actor object
+					 * Note: for ActivityPub foreign users we have xxx property on their account node that points to the
+					 * live URL of their account avatar as it was found in their Actor object
 					 */
 					else {
 						String userIconUrl = friendAccountNode.getStrProp(NodeProp.ACT_PUB_USER_ICON_URL.s());
 						if (userIconUrl != null) {
-							nodeInfo.safeGetClientProps()
-									.add(new PropertyInfo(NodeProp.ACT_PUB_USER_ICON_URL.s(), userIconUrl));
+							nodeInfo.safeGetClientProps().add(new PropertyInfo(NodeProp.ACT_PUB_USER_ICON_URL.s(), userIconUrl));
 						}
 					}
 				}
@@ -220,8 +212,8 @@ public class Convert {
 		if (allowInlineChildren) {
 			boolean hasInlineChildren = node.getBooleanProp(NodeProp.INLINE_CHILDREN.s());
 			if (hasInlineChildren) {
-				Iterable<SubNode> nodeIter = read.getChildren(session, node,
-						Sort.by(Sort.Direction.ASC, SubNode.FIELD_ORDINAL), 100, 0);
+				Iterable<SubNode> nodeIter =
+						read.getChildren(session, node, Sort.by(Sort.Direction.ASC, SubNode.FIELD_ORDINAL), 100, 0);
 				Iterator<SubNode> iterator = nodeIter.iterator();
 				long inlineOrdinal = 0;
 				while (true) {
@@ -290,7 +282,7 @@ public class Convert {
 		}
 
 		if (props != null) {
-			Collections.sort(props, propertyInfoComparator);
+			props.sort((a, b) -> a.getName().compareTo(b.getName()));
 		}
 		return props;
 	}
@@ -314,9 +306,6 @@ public class Convert {
 			ret.add(acInfo);
 		}
 
-		// if (props != null) {
-		// Collections.sort(props, propertyInfoComparator);
-		// }
 		return ret;
 	}
 
@@ -352,11 +341,10 @@ public class Convert {
 		return acInfo;
 	}
 
-	public PropertyInfo convertToPropertyInfo(SessionContext sessionContext, SubNode node, String propName,
-			SubNodePropVal prop, boolean htmlOnly, boolean initNodeEdit) {
+	public PropertyInfo convertToPropertyInfo(SessionContext sessionContext, SubNode node, String propName, SubNodePropVal prop,
+			boolean htmlOnly, boolean initNodeEdit) {
 		try {
-			String value = "content".equals(propName)
-					? formatValue(sessionContext, prop.getValue(), false, initNodeEdit)
+			String value = "content".equals(propName) ? formatValue(sessionContext, prop.getValue(), false, initNodeEdit)
 					: prop.getValue().toString();
 			/* log.trace(String.format("prop[%s]=%s", prop.getName(), value)); */
 
@@ -374,8 +362,7 @@ public class Convert {
 		return val;
 	}
 
-	public String formatValue(SessionContext sessionContext, Object value, boolean convertToHtml,
-			boolean initNodeEdit) {
+	public String formatValue(SessionContext sessionContext, Object value, boolean convertToHtml, boolean initNodeEdit) {
 		try {
 			if (value instanceof Date) {
 				return sessionContext.formatTimeForUserTimezone((Date) value);
@@ -383,8 +370,8 @@ public class Convert {
 				String ret = value.toString();
 
 				/*
-				 * If we are doing an initNodeEdit we don't do this, because we want the text to
-				 * render to the user exactly as they had typed it and not with links converted.
+				 * If we are doing an initNodeEdit we don't do this, because we want the text to render to the user
+				 * exactly as they had typed it and not with links converted.
 				 */
 				if (!initNodeEdit) {
 					ret = convertLinksToMarkdown(ret);
@@ -398,13 +385,13 @@ public class Convert {
 	}
 
 	/**
-	 * Searches in 'val' anywhere there is a line that begins with http:// (or
-	 * https), and replaces that with the normal way of doing a link in markdown. So
-	 * we are injecting a snippet of markdown (not html)
+	 * Searches in 'val' anywhere there is a line that begins with http:// (or https), and replaces that
+	 * with the normal way of doing a link in markdown. So we are injecting a snippet of markdown (not
+	 * html)
 	 * 
-	 * todo-1: I noticed this method gets called during the 'saveNode' processing
-	 * and then is called again when the server refreshes the whole page. This is
-	 * something that is a slight bit of wasted processing.
+	 * todo-1: I noticed this method gets called during the 'saveNode' processing and then is called
+	 * again when the server refreshes the whole page. This is something that is a slight bit of wasted
+	 * processing.
 	 */
 	public static String convertLinksToMarkdown(String val) {
 		while (true) {

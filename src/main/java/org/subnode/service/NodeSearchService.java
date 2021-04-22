@@ -406,26 +406,9 @@ public class NodeSearchService {
 		List<WordStats> tagList = new ArrayList<>(tagMap.values());
 		List<WordStats> mentionList = new ArrayList<>(mentionMap.values());
 
-		Collections.sort(wordList, new Comparator<>() {
-			@Override
-			public int compare(WordStats s1, WordStats s2) {
-				return (int) (s2.count - s1.count);
-			}
-		});
-
-		Collections.sort(tagList, new Comparator<>() {
-			@Override
-			public int compare(WordStats s1, WordStats s2) {
-				return (int) (s2.count - s1.count);
-			}
-		});
-
-		Collections.sort(mentionList, new Comparator<>() {
-			@Override
-			public int compare(WordStats s1, WordStats s2) {
-				return (int) (s2.count - s1.count);
-			}
-		});
+		wordList.sort((s1, s2) -> (int) (s2.count - s1.count));
+		tagList.sort((s1, s2) -> (int) (s2.count - s1.count));
+		mentionList.sort((s1, s2) -> (int) (s2.count - s1.count));
 
 		StringBuilder sb = new StringBuilder();
 		sb.append("Node count: " + nodeCount + ", ");

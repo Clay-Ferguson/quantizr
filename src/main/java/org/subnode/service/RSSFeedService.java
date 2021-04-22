@@ -298,7 +298,7 @@ public class RSSFeedService {
 					}
 				}
 			}
-			revChronSortEntries(entries);
+			entries.sort((s1,s2) -> s2.getPublishedDate().compareTo(s1.getPublishedDate()));
 
 			/*
 			 * Now from the complete 'entries' list we extract out just the page we need
@@ -499,15 +499,6 @@ public class RSSFeedService {
 			}
 		}
 		return policy.sanitize(html);
-	}
-
-	public void revChronSortEntries(List<SyndEntry> entries) {
-		Collections.sort(entries, new Comparator<>() {
-			@Override
-			public int compare(SyndEntry s1, SyndEntry s2) {
-				return s2.getPublishedDate().compareTo(s1.getPublishedDate());
-			}
-		});
 	}
 
 	/*
