@@ -104,13 +104,15 @@ export class NodeCompRowHeader extends Div {
             }));
         }
         else if (S.props.isShared(node)) {
+            let sharingNames = S.util.getSharingNames(node, true);
+
             floatUpperRightDiv.addChild(new Icon({
                 style: {
                     marginLeft: "12px",
                     verticalAlign: "middle"
                 },
                 className: "fa fa-envelope fa-lg",
-                title: "Node is Shared"
+                title: "Shared to:\n\n" + sharingNames
             }));
         }
 
@@ -128,10 +130,6 @@ export class NodeCompRowHeader extends Div {
             children.push(floatUpperRightDiv);
         }
 
-        let sharingNames = S.util.getSharingNames(node, false);
-        if (sharingNames) {
-            children.push(new Span(` (to: ${sharingNames})`));
-        }
         this.setChildren(children);
     }
 }

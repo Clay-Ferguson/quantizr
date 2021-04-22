@@ -374,7 +374,8 @@ export class Encryption implements EncryptionIntf {
     }
 
     savePublicKeyResponse = (res: J.SavePublicKeyResponse): void => {
-        S.util.showMessage(res.message, "Publish Public Key");
+        // todo-0: this comes up even with anonymous login. oops. That's just confusing to users.
+        // S.util.showMessage(res.message, "Publish Public Key");
     }
 
     /**

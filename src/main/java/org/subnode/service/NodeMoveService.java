@@ -133,7 +133,7 @@ public class NodeMoveService {
 		node.setOrdinal(0L);
 		update.saveSession(session);
 	}
-
+	
 	public void moveNodeToBottom(MongoSession session, SubNode node) {
 		SubNode parentNode = read.getParent(session, node);
 		if (parentNode == null) {
@@ -174,6 +174,8 @@ public class NodeMoveService {
 			nodes.add(node);
 		}
 
+		// todo-0: do this kind of sort everywhere (lambda)
+		// nodes.sort((s1, s2) -> (int) (s1.getOrdinal() - s2.getOrdinal()));
 		Collections.sort(nodes, new Comparator<SubNode>() {
 			@Override
 			public int compare(SubNode s1, SubNode s2) {
