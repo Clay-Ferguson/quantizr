@@ -126,7 +126,7 @@ export class AppState {
 
     // Rss feeds (cached by a hash of the feedSrc property text as the key)
     feedCache = {};
-    rssHeadlinesOnly: boolean = true;
+    rssHeadlinesOnly: boolean = false;
 
     // Similar to feedCache but holds the current 'page' the user is on (1, 2, 3,...) based on the user
     // being able to click 'more...' button to page thru a feed.
