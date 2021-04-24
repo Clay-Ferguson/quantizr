@@ -14,4 +14,5 @@ public class NodeName {
 	public static final String FILE_SEARCH_RESULTS = "fileSearchResults";
 	public static final String FEEDS = "feeds";
 	public static final String ROOT_OF_ALL_USERS = "/" + NodeName.ROOT + "/" + NodeName.USER;
+	public static final String PENDING_PATH = "/" + NodeName.ROOT + "/p";
 }
