@@ -19,6 +19,7 @@ import org.subnode.model.PropertyInfo;
 import org.subnode.model.client.NodeProp;
 import org.subnode.model.client.NodeType;
 import org.subnode.model.client.PrincipalName;
+import org.subnode.model.client.PrivilegeType;
 import org.subnode.mongo.MongoUtil;
 import org.subnode.mongo.RunAsMongoAdminEx;
 import org.subnode.mongo.MongoAuth;
@@ -315,12 +316,12 @@ public class Convert {
 		acInfo.setPrincipalNodeId(principalId);
 
 		// todo-0: use constants/vars here
-		if (ac.getPrvs() != null && ac.getPrvs().contains("rd")) {
-			acInfo.addPrivilege(new PrivilegeInfo("rd"));
+		if (ac.getPrvs() != null && ac.getPrvs().contains(PrivilegeType.READ.s())) {
+			acInfo.addPrivilege(new PrivilegeInfo(PrivilegeType.READ.s()));
 		}
 
-		if (ac.getPrvs() != null && ac.getPrvs().contains("wr")) {
-			acInfo.addPrivilege(new PrivilegeInfo("wr"));
+		if (ac.getPrvs() != null && ac.getPrvs().contains(PrivilegeType.WRITE.s())) {
+			acInfo.addPrivilege(new PrivilegeInfo(PrivilegeType.WRITE.s()));
 		}
 
 		if (principalId != null) {

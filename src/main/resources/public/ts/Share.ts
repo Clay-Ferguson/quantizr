@@ -39,10 +39,10 @@ export class Share implements ShareIntf {
         }
 
         let type = "all";
-        if (accessOption === "rd") {
+        if (accessOption === J.PrivilegeType.READ) {
             type = "read-only";
         }
-        else if (accessOption === "wr") {
+        else if (accessOption === J.PrivilegeType.WRITE) {
             type = "appendable";
         }
 

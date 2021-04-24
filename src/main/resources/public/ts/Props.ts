@@ -180,7 +180,7 @@ export class Props implements PropsIntf {
     }
 
     isPublicWritable = (node: J.NodeInfo): boolean => {
-        return node && node.ac && !!node.ac.find(ace => ace.principalNodeId === "public" && this.hasPrivilege(ace, "wr"));
+        return node && node.ac && !!node.ac.find(ace => ace.principalNodeId === "public" && this.hasPrivilege(ace, J.PrivilegeType.WRITE));
     }
 
     hasPrivilege = (ace: J.AccessControlInfo, priv: string): boolean => {

@@ -21,6 +21,7 @@ import org.subnode.config.NodeName;
 import org.subnode.model.NodeInfo;
 import org.subnode.model.client.NodeProp;
 import org.subnode.model.client.NodeType;
+import org.subnode.model.client.PrivilegeType;
 import org.subnode.mongo.MongoAuth;
 import org.subnode.mongo.MongoRead;
 import org.subnode.mongo.MongoSession;
@@ -38,15 +39,13 @@ import org.subnode.util.EnglishDictionary;
 import org.subnode.util.ThreadLocals;
 
 /**
- * Service for searching the repository. This searching is currently very basic,
- * and just grabs the first 100 results. Despite it being basic right now, it is
- * however EXTREMELY high performance and leverages the full and best search
- * performance that can be gotten out of Lucene, which beats any other
- * technology in the world in it's power.
+ * Service for searching the repository. This searching is currently very basic, and just grabs the
+ * first 100 results. Despite it being basic right now, it is however EXTREMELY high performance and
+ * leverages the full and best search performance that can be gotten out of Lucene, which beats any
+ * other technology in the world in it's power.
  * 
- * NOTE: the Query class DOES have a 'skip' and 'limit' which I can take
- * advantage of in all my searching but I'm not fully doing so yet I don't
- * believe.
+ * NOTE: the Query class DOES have a 'skip' and 'limit' which I can take advantage of in all my
+ * searching but I'm not fully doing so yet I don't believe.
  */
 @Component
 public class NodeSearchService {
@@ -133,24 +132,24 @@ public class NodeSearchService {
 				Criteria moreCriteria = null;
 				// searching only Foreign users
 				if ("foreign".equals(req.getUserSearchType())) {
-					moreCriteria = Criteria
-							.where(SubNode.FIELD_PROPERTIES + "." + NodeProp.ACT_PUB_ACTOR_URL.s() + ".value").ne(null);
+					moreCriteria =
+							Criteria.where(SubNode.FIELD_PROPERTIES + "." + NodeProp.ACT_PUB_ACTOR_URL.s() + ".value").ne(null);
 				}
 				// searching only Local users
 				else if ("local".equals(req.getUserSearchType())) {
-					moreCriteria = Criteria
-							.where(SubNode.FIELD_PROPERTIES + "." + NodeProp.ACT_PUB_ACTOR_URL.s() + ".value").is(null);
+					moreCriteria =
+							Criteria.where(SubNode.FIELD_PROPERTIES + "." + NodeProp.ACT_PUB_ACTOR_URL.s() + ".value").is(null);
 				}
 
-				final Iterable<SubNode> accountNodes = read.getChildrenUnderParentPath(session,
-						NodeName.ROOT_OF_ALL_USERS, null, null, 0, textCriteria, moreCriteria);
+				final Iterable<SubNode> accountNodes = read.getChildrenUnderParentPath(session, NodeName.ROOT_OF_ALL_USERS, null,
+						null, 0, textCriteria, moreCriteria);
 				/*
-				 * scan all userAccountNodes, and set a zero amount for those not found (which
-				 * will be the correct amount).
+				 * scan all userAccountNodes, and set a zero amount for those not found (which will be the correct
+				 * amount).
 				 */
 				for (final SubNode node : accountNodes) {
-					NodeInfo info = convert.convertToNodeInfo(ThreadLocals.getSessionContext(), session, node, true,
-							false, counter + 1, false, false);
+					NodeInfo info = convert.convertToNodeInfo(ThreadLocals.getSessionContext(), session, node, true, false,
+							counter + 1, false, false);
 					searchResults.add(info);
 					if (counter++ > MAX_NODES) {
 						break;
@@ -160,12 +159,11 @@ public class NodeSearchService {
 			// else we're doing a normal subgraph search for the text
 			else {
 				SubNode searchRoot = read.getNode(session, req.getNodeId());
-				for (SubNode node : read.searchSubGraph(session, searchRoot, req.getSearchProp(), searchText,
-						req.getSortField(), MAX_NODES, req.getFuzzy(), req.getCaseSensitive(),
-						req.getTimeRangeType())) {
+				for (SubNode node : read.searchSubGraph(session, searchRoot, req.getSearchProp(), searchText, req.getSortField(),
+						MAX_NODES, req.getFuzzy(), req.getCaseSensitive(), req.getTimeRangeType())) {
 
-					NodeInfo info = convert.convertToNodeInfo(ThreadLocals.getSessionContext(), session, node, true,
-							false, counter + 1, false, false);
+					NodeInfo info = convert.convertToNodeInfo(ThreadLocals.getSessionContext(), session, node, true, false,
+							counter + 1, false, false);
 					searchResults.add(info);
 					if (counter++ > MAX_NODES) {
 						break;
@@ -202,8 +200,8 @@ public class NodeSearchService {
 		 * 
 		 * 1) All my shared nodes under my account,
 		 * 
-		 * 2) all my shared nodes globally, and the globally is done simply by passing
-		 * null for the path here
+		 * 2) all my shared nodes globally, and the globally is done simply by passing null for the path
+		 * here
 		 */
 		for (SubNode node : auth.searchSubGraphByAcl(session, searchRoot.getPath(), searchRoot.getOwner(),
 				Sort.by(Sort.Direction.DESC, SubNode.FIELD_MODIFY_TIME), MAX_NODES)) {
@@ -212,8 +210,7 @@ public class NodeSearchService {
 				continue;
 
 			/*
-			 * If we're only looking for shares to a specific person (or public) then check
-			 * here
+			 * If we're only looking for shares to a specific person (or public) then check here
 			 */
 			if (req.getShareTarget() != null) {
 
@@ -224,19 +221,22 @@ public class NodeSearchService {
 				// if specifically searching for rd or wr
 				if (req.getAccessOption() != null) {
 					AccessControl ac = node.safeGetAc().get(req.getShareTarget());
-					//log.debug("NodeId: " + node.getId().toHexString() + " req=" + req.getAccessOption() + " privs="
-					//		+ ac.getPrvs());
-					if (req.getAccessOption().contains("rd") && (!ac.getPrvs().contains("rd") || ac.getPrvs().contains("wr"))) {
+					// log.debug("NodeId: " + node.getId().toHexString() + " req=" + req.getAccessOption() + " privs="
+					// + ac.getPrvs());
+					if (req.getAccessOption().contains(PrivilegeType.READ.s()) && //
+							(!ac.getPrvs().contains(PrivilegeType.READ.s()) || //
+									ac.getPrvs().contains(PrivilegeType.WRITE.s()))) {
 						continue;
 					}
-					if (req.getAccessOption().contains("wr") && !ac.getPrvs().contains("wr")) {
+					if (req.getAccessOption().contains(PrivilegeType.WRITE.s())
+							&& !ac.getPrvs().contains(PrivilegeType.WRITE.s())) {
 						continue;
 					}
 				}
 			}
 
-			NodeInfo info = convert.convertToNodeInfo(ThreadLocals.getSessionContext(), session, node, true, false,
-					counter + 1, false, false);
+			NodeInfo info = convert.convertToNodeInfo(ThreadLocals.getSessionContext(), session, node, true, false, counter + 1,
+					false, false);
 			searchResults.add(info);
 			if (counter++ > MAX_NODES) {
 				break;
@@ -265,8 +265,8 @@ public class NodeSearchService {
 	public void getNodeStats(GetNodeStatsRequest req, GetNodeStatsResponse res) {
 
 		/*
-		 * If this is the 'feed' being queried, then get the data from trendingFeedInfo
-		 * (the cache), or else cache it
+		 * If this is the 'feed' being queried, then get the data from trendingFeedInfo (the cache), or else
+		 * cache it
 		 */
 		synchronized (NodeSearchService.trendingFeedInfoLock) {
 			if (req.isFeed() && NodeSearchService.trendingFeedInfo != null) {
@@ -288,8 +288,8 @@ public class NodeSearchService {
 		Iterable<SubNode> iter = null;
 
 		/*
-		 * NOTE: This query is similar to the one in UserFeedService.java, but simpler
-		 * since we don't handle a bunch of options but just the public feed query
+		 * NOTE: This query is similar to the one in UserFeedService.java, but simpler since we don't handle
+		 * a bunch of options but just the public feed query
 		 */
 		if (req.isFeed()) {
 			/* Finds nodes that have shares to any of the people listed in sharedToAny */
@@ -299,8 +299,7 @@ public class NodeSearchService {
 			String pathToSearch = NodeName.ROOT_OF_ALL_USERS;
 
 			Query query = new Query();
-			Criteria criteria = Criteria.where(SubNode.FIELD_PATH)
-					.regex(util.regexRecursiveChildrenOfPath(pathToSearch)) //
+			Criteria criteria = Criteria.where(SubNode.FIELD_PATH).regex(util.regexRecursiveChildrenOfPath(pathToSearch)) //
 
 					// This pattern is what is required when you have multiple conditions added to a
 					// single field.
@@ -324,8 +323,8 @@ public class NodeSearchService {
 			iter = ops.find(query, SubNode.class);
 		}
 		/*
-		 * Otherwise this is not a Feed Tab query but just an arbitrary node stats
-		 * request, like a user running a stats request under the 'Node Info' main menu
+		 * Otherwise this is not a Feed Tab query but just an arbitrary node stats request, like a user
+		 * running a stats request under the 'Node Info' main menu
 		 */
 		else {
 			MongoSession session = ThreadLocals.getMongoSession();
@@ -443,8 +442,7 @@ public class NodeSearchService {
 		res.setSuccess(true);
 
 		/*
-		 * If this is a feed query cache it. Only will refresh every 30mins based on
-		 * a @Schedule event
+		 * If this is a feed query cache it. Only will refresh every 30mins based on a @Schedule event
 		 */
 		if (req.isFeed()) {
 			synchronized (NodeSearchService.trendingFeedInfoLock) {
