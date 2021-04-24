@@ -103,7 +103,6 @@ export class EditNodeDlg extends DialogBase {
 
         /* Init main content text on node */
         let value = state.node.content || "";
-        value = S.util.escapeForAttrib(value);
         if (!value.startsWith(J.Constant.ENC_TAG)) {
             this.contentEditorState.setValue(value);
         }
@@ -113,7 +112,6 @@ export class EditNodeDlg extends DialogBase {
 
         /* Init parent node text */
         let parentValue = (this.parentNode ? this.parentNode.content : null) || "";
-        parentValue = S.util.escapeForAttrib(parentValue);
         if (!parentValue.startsWith(J.Constant.ENC_TAG)) {
             this.parentContentEditorState.setValue(parentValue);
         }
@@ -182,7 +180,6 @@ export class EditNodeDlg extends DialogBase {
         let isReadOnly = S.render.isReadOnlyProperty(propEntry.name);
         let propVal = propEntry.value;
         let propValStr = propVal || "";
-        propValStr = S.util.escapeForAttrib(propValStr);
         // console.log("making single prop editor: prop[" + propEntry.property.name + "] val[" + propEntry.property.value
         //     + "] fieldId=" + propEntry.id);
 
@@ -962,7 +959,6 @@ export class EditNodeDlg extends DialogBase {
 
         let label = typeHandler ? typeHandler.getEditLabelForProp(propEntry.name) : propEntry.name;
         let propValStr = propVal || "";
-        propValStr = S.util.escapeForAttrib(propValStr);
         // console.log("making single prop editor: prop[" + propEntry.name + "] val[" + propEntry.value + "]");
 
         let propState: ValidatedState<any> = this.propStates.get(propEntry.name);
@@ -1046,8 +1042,6 @@ export class EditNodeDlg extends DialogBase {
 
         // if this is the first pass thru here (not a re-render) then allow focus() to get called
         let allowFocus = !this.contentEditor;
-
-        value = S.util.escapeForAttrib(value);
         // console.log("making field editor for val[" + value + "]");
 
         if (C.ENABLE_ACE_EDITOR) {
