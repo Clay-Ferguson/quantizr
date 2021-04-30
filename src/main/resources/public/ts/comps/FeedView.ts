@@ -244,31 +244,34 @@ export class FeedView extends AppTab {
                 }
             }),
 
-            new Checkbox("Local", {
-                title: "Include only nodes from accounts on this server."
-            }, {
-                setValue: (checked: boolean): void => {
-                    dispatch("Action_SetFeedFilterType", (s: AppState): AppState => {
-                        s.feedWaitingForUserRefresh = !this.realtimeCheckboxes;
-                        s.feedFilterLocalServer = checked;
+            // todo-2: This works fine but let's disable until we have more local users,
+            // and eventually we want this to be come kind of admin-configurable option that 
+            // controls wether this checkbox exists or not.
+            // new Checkbox("Local", {
+            //     title: "Include only nodes from accounts on this server."
+            // }, {
+            //     setValue: (checked: boolean): void => {
+            //         dispatch("Action_SetFeedFilterType", (s: AppState): AppState => {
+            //             s.feedWaitingForUserRefresh = !this.realtimeCheckboxes;
+            //             s.feedFilterLocalServer = checked;
 
-                        /* to help keep users probably get what they want, set 'public' also to true as the default
-                         any time someone clicks 'Local' because that's the likely use case */
-                        if (checked) {
-                            s.feedFilterToPublic = true;
-                        }
-                        return s;
-                    });
+            //             /* to help keep users probably get what they want, set 'public' also to true as the default
+            //              any time someone clicks 'Local' because that's the likely use case */
+            //             if (checked) {
+            //                 s.feedFilterToPublic = true;
+            //             }
+            //             return s;
+            //         });
 
-                    if (this.realtimeCheckboxes) {
-                        FeedView.page = 0;
-                        S.srch.feed("~" + J.NodeType.FRIEND_LIST, null, FeedView.page, FeedView.searchTextState.getValue());
-                    }
-                },
-                getValue: (): boolean => {
-                    return store.getState().feedFilterLocalServer;
-                }
-            }),
+            //         if (this.realtimeCheckboxes) {
+            //             FeedView.page = 0;
+            //             S.srch.feed("~" + J.NodeType.FRIEND_LIST, null, FeedView.page, FeedView.searchTextState.getValue());
+            //         }
+            //     },
+            //     getValue: (): boolean => {
+            //         return store.getState().feedFilterLocalServer;
+            //     }
+            // }),
 
             new Checkbox("NSFW", {
                 title: "Include NSFW Content (Allows material flagged as 'Sensitive')"
