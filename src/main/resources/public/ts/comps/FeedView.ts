@@ -245,7 +245,7 @@ export class FeedView extends AppTab {
             }),
 
             // todo-2: This works fine but let's disable until we have more local users,
-            // and eventually we want this to be come kind of admin-configurable option that 
+            // and eventually we want this to be come kind of admin-configurable option that
             // controls wether this checkbox exists or not.
             // new Checkbox("Local", {
             //     title: "Include only nodes from accounts on this server."

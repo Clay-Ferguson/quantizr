@@ -157,7 +157,7 @@ public class UserManagerService {
 		log.debug("Processing Login: urlId=" + (sc.getUrlId() != null ? sc.getUrlId() : "null"));
 
 		if (sc.getUrlId() != null) {
-			log.debug("setHomeNodeOverride (from session urlId): " + sc.getUrlId());
+			// log.debug("setHomeNodeOverride (from session urlId): " + sc.getUrlId());
 			res.setHomeNodeOverride(sc.getUrlId());
 		}
 

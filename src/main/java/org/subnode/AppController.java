@@ -513,7 +513,7 @@ public class AppController implements ErrorController {
 			HttpServletResponse response, //
 			HttpSession session) {
 		callProc.run("multiRssFeed", null, session, ms -> {
-			log.debug("Processing multiRssFeed: url=" + url);
+			// log.debug("Processing multiRssFeed: url=" + url);
 			try {
 				int page = 1;
 				if (pageStr != null) {

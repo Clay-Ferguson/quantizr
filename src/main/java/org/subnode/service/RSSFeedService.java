@@ -171,7 +171,7 @@ public class RSSFeedService {
 			}
 
 			for (String url : feedCache.keySet()) {
-				log.debug("Refreshing feed: " + url);
+				// log.debug("Refreshing feed: " + url);
 				SyndFeed feed = getFeed(url, false);
 				if (feed != null) {
 					count++;
@@ -298,7 +298,7 @@ public class RSSFeedService {
 					}
 				}
 			}
-			entries.sort((s1,s2) -> s2.getPublishedDate().compareTo(s1.getPublishedDate()));
+			entries.sort((s1, s2) -> s2.getPublishedDate().compareTo(s1.getPublishedDate()));
 
 			/*
 			 * Now from the complete 'entries' list we extract out just the page we need
@@ -326,7 +326,7 @@ public class RSSFeedService {
 	}
 
 	public SyndFeed getFeed(String url, boolean fromCache) {
-		log.debug("getFeed: " + url);
+		// log.debug("getFeed: " + url);
 
 		/*
 		 * if this feed failed don't try it again. Whenever we DO force the system to
@@ -350,7 +350,7 @@ public class RSSFeedService {
 			}
 
 			int timeout = 60; // seconds
-			log.debug("Reading RSS stream");
+			// log.debug("Reading RSS stream");
 
 			if (USE_URL_READER) {
 				/*
@@ -437,8 +437,15 @@ public class RSSFeedService {
 			 * Leave feedCache with any existing mapping it has when it fails. Worst case
 			 * here is a stale cache remains in place rather than getting forgotten just
 			 * because it's currently unavailable
+			 *
+			 * This error can happen a lot since feeds out on the wild are so chaotic so we
+			 * won't bother to clutter our logs with a stack trace here, and just log the message.
+			 * 
+			 * todo-1: Actually it would be better to put this entire string being logged here into a
+			 * hashset to just keep a unique list, and not even log it here, but make it part of the
+			 * 'systemInfo' available under the admin menu for checking server status info.
 			 */
-			ExUtil.error(log, "Error reading feed: " + url, e);
+			log.debug("Error reading feed: " + url + " -> " + e.getMessage());
 			failedFeeds.add(url);
 			return null;
 		} finally {
@@ -693,18 +700,18 @@ public class RSSFeedService {
 				sb.append(c);
 			} else {
 				switch (c) {
-				case '—':
-					sb.append("-");
-					break;
-				case '”':
-					sb.append("\"");
-					break;
-				case '’':
-					sb.append("'");
-					break;
-				default:
-					sb.append(" ");
-					break;
+					case '—':
+						sb.append("-");
+						break;
+					case '”':
+						sb.append("\"");
+						break;
+					case '’':
+						sb.append("'");
+						break;
+					default:
+						sb.append(" ");
+						break;
 				}
 			}
 		}

@@ -65,8 +65,8 @@ public class ActPubUtil {
     private MongoRead read;
 
     /*
-     * RestTemplate is thread-safe and reusable, and has no state, so we need only one final static
-     * instance ever
+     * RestTemplate is thread-safe and reusable, and has no state, so we need only
+     * one final static instance ever
      */
     private static final RestTemplate restTemplate = new RestTemplate(Util.getClientHttpRequestFactory());
     private static final ObjectMapper mapper = new ObjectMapper();
@@ -106,7 +106,9 @@ public class ActPubUtil {
         return appProp.getProtocolHostAndPort() + ActPubConstants.ACTOR_PATH + "/" + userName;
     }
 
-    /* Builds the unique set of hosts from a list of userNames (not used currently) */
+    /*
+     * Builds the unique set of hosts from a list of userNames (not used currently)
+     */
     public HashSet<String> getHostsFromUserNames(List<String> userNames) {
         String host = appProp.getMetaHost();
         HashSet<String> hosts = new HashSet<>();
@@ -142,8 +144,9 @@ public class ActPubUtil {
     }
 
     /*
-     * Searches thru the 'links' array property on webFinger and returns the links array object that has
-     * a 'rel' property that matches the value in the rel param string
+     * Searches thru the 'links' array property on webFinger and returns the links
+     * array object that has a 'rel' property that matches the value in the rel
+     * param string
      */
     public Object getLinkByRel(Object webFinger, String rel) {
         List<?> linksList = AP.list(webFinger, "links");
@@ -170,19 +173,28 @@ public class ActPubUtil {
             MultiValueMap<String, Object> bodyMap = new LinkedMultiValueMap<>();
             HttpEntity<MultiValueMap<String, Object>> requestEntity = new HttpEntity<>(bodyMap, headers);
             ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.GET, requestEntity, String.class);
-            ret = mapper.readValue(response.getBody(), new TypeReference<>() {});
+            ret = mapper.readValue(response.getBody(), new TypeReference<>() {
+            });
             // log.debug("REQ: " + url + "\nRES: " + XString.prettyPrint(ret));
         } catch (Exception e) {
-            log.error("failed getting json: " + url, e);
+            /*
+             * todo-1: Actually it would be better to put this entire string being logged
+             * here into a hashset to just keep a unique list, and not even log it here, but
+             * make it part of the 'systemInfo' available under the admin menu for checking
+             * server status info.
+             */
+            log.debug("failed getting json: " + url + " -> " + e.getMessage());
             throw new RuntimeException(e);
         }
         return ret;
     }
 
     /*
-     * Note: 'actor' here is the actor URL of the local (non-federated) user doing the post
+     * Note: 'actor' here is the actor URL of the local (non-federated) user doing
+     * the post
      * 
-     * WARNING: If privateKey is passed as 'null' you MUST be calling this from HTTP request thread.
+     * WARNING: If privateKey is passed as 'null' you MUST be calling this from HTTP
+     * request thread.
      */
     public void securePost(MongoSession session, String privateKey, String toInbox, String actor, APObj message) {
         try {
@@ -211,15 +223,15 @@ public class ActPubUtil {
             dateFormat.setTimeZone(TimeZone.getTimeZone("GMT"));
             String date = dateFormat.format(new Date());
 
-            String digestHeader =
-                    "SHA-256=" + Base64.getEncoder().encodeToString(MessageDigest.getInstance("SHA-256").digest(bodyBytes));
+            String digestHeader = "SHA-256="
+                    + Base64.getEncoder().encodeToString(MessageDigest.getInstance("SHA-256").digest(bodyBytes));
 
             URL url = new URL(toInbox);
             String host = url.getHost();
             String path = url.getPath();
 
-            String strToSign =
-                    "(request-target): post " + path + "\nhost: " + host + "\ndate: " + date + "\ndigest: " + digestHeader;
+            String strToSign = "(request-target): post " + path + "\nhost: " + host + "\ndate: " + date + "\ndigest: "
+                    + digestHeader;
 
             Signature sig = Signature.getInstance("SHA256withRSA");
             sig.initSign(privKey);
@@ -238,8 +250,8 @@ public class ActPubUtil {
     }
 
     /*
-     * Effeciently gets the Actor by using a cache to ensure we never get the same Actor twice until the
-     * app restarts at least
+     * Effeciently gets the Actor by using a cache to ensure we never get the same
+     * Actor twice until the app restarts at least
      */
     public APObj getActorByUrl(String url) {
         if (url == null)
@@ -326,7 +338,8 @@ public class ActPubUtil {
 
             HttpEntity<byte[]> requestEntity = new HttpEntity<>(bodyBytes, headers);
             ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.POST, requestEntity, String.class);
-            // log.debug("Post to " + url + " RESULT: " + response.getStatusCode() + " response=" +
+            // log.debug("Post to " + url + " RESULT: " + response.getStatusCode() + "
+            // response=" +
             // response.getBody());
         } catch (Exception e) {
             log.error("postJson failed: " + url, e);
@@ -373,7 +386,8 @@ public class ActPubUtil {
         }
 
         /*
-         * Detect if this actorUrl points to our local server, and get the long name the easy way if so
+         * Detect if this actorUrl points to our local server, and get the long name the
+         * easy way if so
          */
         if (isLocalActorUrl(actorUrl)) {
             String shortUserName = getLocalUserNameFromActorUrl(actorUrl);
@@ -408,8 +422,9 @@ public class ActPubUtil {
     }
 
     /*
-     * we know our own actor layout is this: https://ourserver.com/ap/u/userName, so this method just
-     * strips the user name by taking what's after the rightmost slash
+     * we know our own actor layout is this: https://ourserver.com/ap/u/userName, so
+     * this method just strips the user name by taking what's after the rightmost
+     * slash
      */
     public String getLocalUserNameFromActorUrl(String actorUrl) {
         if (!isLocalActorUrl(actorUrl)) {
@@ -483,10 +498,11 @@ public class ActPubUtil {
         validateRequestTime(date);
 
         /*
-         * NOTE: keyId will be the actor url with "#main-key" appended to it, and if we wanted to verify
-         * that only incomming messages from users we 'know' are allowed, we could do that, but for now we
-         * simply verify that they are who they claim to be using the signature check below, and that is all
-         * we want. (i.e. unknown users can post in)
+         * NOTE: keyId will be the actor url with "#main-key" appended to it, and if we
+         * wanted to verify that only incomming messages from users we 'know' are
+         * allowed, we could do that, but for now we simply verify that they are who
+         * they claim to be using the signature check below, and that is all we want.
+         * (i.e. unknown users can post in)
          */
 
         byte[] signableBytes = getHeaderSignatureBytes(httpReq, headers);
@@ -604,30 +620,33 @@ public class ActPubUtil {
 
     public void iterateOrderedCollection(Object collectionObj, int maxCount, ActPubObserver observer) {
         /*
-         * To reduce load for our purposes we can limit to just getting 2 pages of results to update a user,
-         * and really just one page would be ideal if not for the fact that some servers return an empty
-         * first page and put the results in the 'last' page
+         * To reduce load for our purposes we can limit to just getting 2 pages of
+         * results to update a user, and really just one page would be ideal if not for
+         * the fact that some servers return an empty first page and put the results in
+         * the 'last' page
          */
         int maxPageQueries = 2;
         int pageQueries = 0;
 
-        // log.debug("interateOrderedCollection(): " + XString.prettyPrint(collectionObj));
+        // log.debug("interateOrderedCollection(): " +
+        // XString.prettyPrint(collectionObj));
         int count = 0;
         /*
-         * We user apIdSet to avoid processing any dupliates, because the AP spec calls on us to do this and
-         * doesn't guarantee it's own dedupliation
+         * We user apIdSet to avoid processing any dupliates, because the AP spec calls
+         * on us to do this and doesn't guarantee it's own dedupliation
          */
         HashSet<String> apIdSet = new HashSet<>();
 
         /*
-         * The collection object itself is allowed to have orderedItems, which if present we process, in
-         * addition to the paging, although normally when the collection has the items it means it won't
-         * have any paging
+         * The collection object itself is allowed to have orderedItems, which if
+         * present we process, in addition to the paging, although normally when the
+         * collection has the items it means it won't have any paging
          */
         List<?> orderedItems = AP.list(collectionObj, "orderedItems");
         if (orderedItems != null) {
             /*
-             * Commonly this will just be an array strings (like in a 'followers' collection on Mastodon)
+             * Commonly this will just be an array strings (like in a 'followers' collection
+             * on Mastodon)
              */
             for (Object apObj : orderedItems) {
                 if (!observer.item(apObj)) {
@@ -639,17 +658,19 @@ public class ActPubUtil {
         }
 
         /*
-         * Warning: There are times when even with only two items in the outbox Mastodon might send back an
-         * empty array in the "first" page and the two items in teh "last" page, which makes no sense, but
-         * it just means we have to read and deduplicate all the items from all pages to be sure we don't
-         * end up with a empty array even when there ARE some
+         * Warning: There are times when even with only two items in the outbox Mastodon
+         * might send back an empty array in the "first" page and the two items in teh
+         * "last" page, which makes no sense, but it just means we have to read and
+         * deduplicate all the items from all pages to be sure we don't end up with a
+         * empty array even when there ARE some
          */
         String firstPageUrl = AP.str(collectionObj, "first");
         if (firstPageUrl != null) {
             // log.debug("First Page Url: " + firstPageUrl);
             if (++pageQueries > maxPageQueries)
                 return;
-            Object ocPage = firstPageUrl == null ? null : getJson(firstPageUrl, new MediaType("application", "activity+json"));
+            Object ocPage = firstPageUrl == null ? null
+                    : getJson(firstPageUrl, new MediaType("application", "activity+json"));
 
             while (ocPage != null) {
                 orderedItems = AP.list(ocPage, "orderedItems");
@@ -697,7 +718,8 @@ public class ActPubUtil {
             // log.debug("Last Page Url: " + lastPageUrl);
             if (++pageQueries > maxPageQueries)
                 return;
-            Object ocPage = lastPageUrl == null ? null : getJson(lastPageUrl, new MediaType("application", "activity+json"));
+            Object ocPage = lastPageUrl == null ? null
+                    : getJson(lastPageUrl, new MediaType("application", "activity+json"));
 
             if (ocPage != null) {
                 orderedItems = AP.list(ocPage, "orderedItems");

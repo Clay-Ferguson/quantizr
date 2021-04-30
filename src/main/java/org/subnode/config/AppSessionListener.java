@@ -36,14 +36,14 @@ public class AppSessionListener implements HttpSessionListener {
 		session.setAttribute(WebUtils.SESSION_MUTEX_ATTRIBUTE,
 				new LockEx("SESSION-LockEx:" + session.getId(), true, 180000, 1));
 		sessionCounter++;
-		log.debug("Session/Lock Created");
+		// log.debug("Session/Lock Created");
 	}
 
 	@Override
 	public void sessionDestroyed(HttpSessionEvent se) {
 		se.getSession().removeAttribute(WebUtils.SESSION_MUTEX_ATTRIBUTE);
 		sessionCounter--;
-		log.debug("Session Destroyed: "+se.getSession().getId());
+		// log.debug("Session Destroyed: "+se.getSession().getId());
 	}
 
 	public static int getSessionCounter() {
