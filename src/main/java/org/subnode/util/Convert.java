@@ -315,7 +315,6 @@ public class Convert {
 		AccessControlInfo acInfo = new AccessControlInfo();
 		acInfo.setPrincipalNodeId(principalId);
 
-		// todo-0: use constants/vars here
 		if (ac.getPrvs() != null && ac.getPrvs().contains(PrivilegeType.READ.s())) {
 			acInfo.addPrivilege(new PrivilegeInfo(PrivilegeType.READ.s()));
 		}

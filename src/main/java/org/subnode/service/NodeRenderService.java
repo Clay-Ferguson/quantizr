@@ -80,11 +80,6 @@ public class NodeRenderService {
 	 * all the data for that page.
 	 */
 	public RenderNodeResponse renderNode(MongoSession session, RenderNodeRequest req) {
-		/*
-		 * todo-0: Add to Admin area of User Guide the fact that you must edit the
-		 * auto-created welcome-page, because users will land there when they click the
-		 * 'Portal Home' button.
-		 */
 		boolean isWelcomePage = req.getNodeId().equals(":welcome-page");
 
 		/*
@@ -228,7 +223,7 @@ public class NodeRenderService {
 			NodeRenderService.welcomePage = res;
 		}
 
-		// todo-0: this was a quick fix. (may no be permanent solution)
+		// todo-1: this was a quick fix, and this urlId handling is also a slight bit awkward and maybe needs to be reworked.
 		ThreadLocals.getSessionContext().setUrlId(null);
 
 		return res;

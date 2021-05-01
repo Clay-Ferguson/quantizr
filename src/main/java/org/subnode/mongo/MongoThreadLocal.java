@@ -21,7 +21,7 @@ public class MongoThreadLocal {
 	 * ACID commit, but a helpful way to not have to worry about doing SAVES on
 	 * every object that is touched during the processing of a thread/request. This
 	 * is because we can use a pattern that wraps the 'api.sessionSave()' in a
-	 * finally block somewhere and use that to make sure all updates to any node are
+	 * finally block that wraps all calls and use that to make sure all updates to any node are
 	 * saved.
 	 * 
 	 * todo-1: consider repurposing dirtyNodes to only *catch* bugs by making it
@@ -53,8 +53,7 @@ public class MongoThreadLocal {
 	 * NOTE: It's not an ineffecincy to always create the map any time it's
 	 * accessed, even though it could have been left empty because this is a
 	 * thread-local storage and so this map is reused over and over by all different
-	 * requests and different users, so we only ever create one per thread anyway,
-	 * and the thread pool is mainly fixed in size and small.
+	 * requests and different users, so we only ever create one per thread
 	 */
 	public static HashMap<ObjectId, SubNode> getDirtyNodes() {
 		if (dirtyNodes.get() == null) {

@@ -42,8 +42,8 @@ public class MimeTypeUtils {
             // If that getContentType didn't find anything specific, try again.
             if ("application/octet-stream".equals(ret)) {
                 /*
-                 * todo-0: we have direct calls to guessContentTypeFromName, that should all be
-                 * calling this method instead.
+                 * todo-1: we have some direct calls to guessContentTypeFromName, that should
+                 * perhaps all be calling this method (getMimeType) instead.
                  */
                 ret = URLConnection.guessContentTypeFromName(fileName);
             }

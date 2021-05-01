@@ -270,7 +270,7 @@ public class UserManagerService {
 	public void addNodeBytesToUserNodeBytes(SubNode node, SubNode userNode, int sign) {
 		if (node == null) {
 			/*
-			 * todo-0: need to investigate this. I did a public shared node from one user and had a conversation
+			 * todo-1: need to investigate this. I did a public shared node from one user and had a conversation
 			 * thread under it and got this thrown upon deleting the root of that. For now ignoring a null node
 			 * here.
 			 */
