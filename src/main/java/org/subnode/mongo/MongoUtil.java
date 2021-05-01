@@ -517,7 +517,7 @@ public class MongoUtil {
 
 	public void createPublicNodes(MongoSession session) {
 		log.debug("creating Public Nodes");
-		ValContainer<Boolean> created = new ValContainer<>();
+		ValContainer<Boolean> created = new ValContainer<>(Boolean.FALSE);
 		SubNode publicNode = apiUtil.ensureNodeExists(session, "/" + NodeName.ROOT, NodeName.PUBLIC, null, "Public",
 				null, true, null, created);
 
@@ -526,7 +526,7 @@ public class MongoUtil {
 					Arrays.asList(PrivilegeType.READ.s()), null);
 		}
 
-		created = new ValContainer<>();
+		created = new ValContainer<>(Boolean.FALSE);
 
 		// create home node
 		SubNode publicHome = apiUtil.ensureNodeExists(session, "/" + NodeName.ROOT + "/" + NodeName.PUBLIC,
@@ -539,14 +539,22 @@ public class MongoUtil {
 		log.debug("Public Home Node exists at id: " + publicHome.getId() + " path=" + publicHome.getPath());
 
 		/*
-		 * create welcome page if not existing. This is the main landing page. (todo-0:
+		 * create welcome page if not existing. This is the main landing page. (todo-1:
 		 * document this in User Guide admin session). This node need not be public,
 		 * because the system reads it, and it can be placed somewhere that users are
 		 * not able to navigate directly to it, so we default it to being directly in
 		 * the server root, which is a private node
 		 */
+		created = new ValContainer<>(Boolean.FALSE);
 		SubNode publicWelcome = apiUtil.ensureNodeExists(session, "/" + NodeName.ROOT, NodeName.WELCOME, "welcome-page",
-				"### Welcome Node\n\nDefault landing page content. Admin should edit.", null, true, null, created);
+				"### Welcome Node\n\nDefault landing page content. Admin should edit this node, named 'welcome-page'",
+				null, true, null, created);
+
+		if (created.getVal()) {
+			aclService.addPrivilege(session, publicWelcome, PrincipalName.PUBLIC.s(),
+					Arrays.asList(PrivilegeType.READ.s()), null);
+		}
+
 		log.debug("Welcome Page Node exists at id: " + publicWelcome.getId() + " path=" + publicWelcome.getPath());
 
 		// // ---------------------------------------------------------
