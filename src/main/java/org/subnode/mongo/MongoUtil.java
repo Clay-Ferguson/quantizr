@@ -96,13 +96,14 @@ public class MongoUtil {
 	//
 
 	/*
-	 * We create these users just so there's an easy way to start doing multi-user testing (sharing
-	 * nodes from user to user, etc) without first having to manually register users.
+	 * We create these users just so there's an easy way to start doing multi-user
+	 * testing (sharing nodes from user to user, etc) without first having to
+	 * manually register users.
 	 */
 	public void createTestAccounts() {
 		/*
-		 * The testUserAccounts is a comma delimited list of user accounts where each user account is a
-		 * colon-delimited list like username:password:email.
+		 * The testUserAccounts is a comma delimited list of user accounts where each
+		 * user account is a colon-delimited list like username:password:email.
 		 */
 		final List<String> testUserAccountsList = XString.tokenize(appProp.getTestUserAccounts(), ",", true);
 		if (testUserAccountsList == null) {
@@ -135,8 +136,8 @@ public class MongoUtil {
 				}
 
 				/*
-				 * keep track of these names, because some API methods need to know if a given account is a test
-				 * account
+				 * keep track of these names, because some API methods need to know if a given
+				 * account is a test account
 				 */
 				testAccountNames.add(userName);
 			}
@@ -150,8 +151,8 @@ public class MongoUtil {
 	/*
 	 * Make node either start with /r/p/ or ensure that it does NOT start with /r/p
 	 * 
-	 * p=pending, meaning user has not yet saved, and if they cancel the node gets orphaned and
-	 * eventually cleaned up by the system automatically.
+	 * p=pending, meaning user has not yet saved, and if they cancel the node gets
+	 * orphaned and eventually cleaned up by the system automatically.
 	 */
 	public void setPendingPath(SubNode node, boolean pending) {
 		String pendingPath = NodeName.PENDING_PATH + "/";
@@ -182,8 +183,9 @@ public class MongoUtil {
 	}
 
 	/*
-	 * This was early code, and it not even practical in a large database. Leaving this code in place as
-	 * an example of how to call databae directly without spring.
+	 * This was early code, and it not even practical in a large database. Leaving
+	 * this code in place as an example of how to call databae directly without
+	 * spring.
 	 */
 	public String getNodeReport_obsolete() {
 		int numDocs = 0;
@@ -203,25 +205,25 @@ public class MongoUtil {
 		}
 
 		/*
-		 * todo-2: I have a 'formatMemory' written in javascript, and need to do same here or see if there's
-		 * an apachie string function for it.
+		 * todo-2: I have a 'formatMemory' written in javascript, and need to do same
+		 * here or see if there's an apachie string function for it.
 		 */
 		float kb = totalJsonBytes / 1024f;
 		return "Node Count: " + numDocs + "<br>Total JSON Size: " + kb + " KB<br>";
 	}
 
 	/*
-	 * Whenever we do something like reindex in a new way, we might need to reprocess every object, to
-	 * generate any kind of auto-generated fields that need to be there before indexes build we call
-	 * this.
+	 * Whenever we do something like reindex in a new way, we might need to
+	 * reprocess every object, to generate any kind of auto-generated fields that
+	 * need to be there before indexes build we call this.
 	 * 
-	 * For example when the path hash was introduced (i.e. SubNode.FIELD_PATH_HASH) we ran this to
-	 * create all the path hashes so that a unique index could be built, because the uniqueness test
-	 * would fail until we generated all the proper data, which required a modification on every node in
-	 * the entire DB.
+	 * For example when the path hash was introduced (i.e. SubNode.FIELD_PATH_HASH)
+	 * we ran this to create all the path hashes so that a unique index could be
+	 * built, because the uniqueness test would fail until we generated all the
+	 * proper data, which required a modification on every node in the entire DB.
 	 * 
-	 * Note that MongoEventListener#onBeforeSave does execute even if all we are doing is reading nodes
-	 * and then resaving them.
+	 * Note that MongoEventListener#onBeforeSave does execute even if all we are
+	 * doing is reading nodes and then resaving them.
 	 */
 	// ********* DO NOT DELETE *********
 	// (this is needed from time to time)
@@ -309,8 +311,9 @@ public class MongoUtil {
 		createUniqueIndex(session, SubNode.class, SubNode.FIELD_PATH_HASH);
 
 		/*
-		 * NOTE: Every non-admin owned noded must have only names that are prefixed with "UserName--" of the
-		 * user. That is, prefixed by their username followed by two dashes
+		 * NOTE: Every non-admin owned noded must have only names that are prefixed with
+		 * "UserName--" of the user. That is, prefixed by their username followed by two
+		 * dashes
 		 */
 		createIndex(session, SubNode.class, SubNode.FIELD_NAME);
 
@@ -370,10 +373,10 @@ public class MongoUtil {
 	/*
 	 * DO NOT DELETE.
 	 * 
-	 * I tried to create just ONE full text index, and i get exceptions, and even if i try to build a
-	 * text index on a specific property I also get exceptions, so currently i am having to resort to
-	 * using only the createTextIndexes() below which does the 'onAllFields' option which DOES work for
-	 * some readonly
+	 * I tried to create just ONE full text index, and i get exceptions, and even if
+	 * i try to build a text index on a specific property I also get exceptions, so
+	 * currently i am having to resort to using only the createTextIndexes() below
+	 * which does the 'onAllFields' option which DOES work for some readonly
 	 */
 	// public void createUniqueTextIndex(MongoSession session, Class<?> clazz,
 	// String property) {
@@ -414,10 +417,12 @@ public class MongoUtil {
 	}
 
 	/*
-	 * Matches all children at a path which are at exactly one level deeper into the tree than path.
+	 * Matches all children at a path which are at exactly one level deeper into the
+	 * tree than path.
 	 * 
-	 * In other words path '/abc/def' is a child of '/abc/' and is considered a direct child, whereas
-	 * '/abc/def/ghi' is a level deeper and NOT considered a direct child of '/abc'
+	 * In other words path '/abc/def' is a child of '/abc/' and is considered a
+	 * direct child, whereas '/abc/def/ghi' is a level deeper and NOT considered a
+	 * direct child of '/abc'
 	 */
 	public String regexDirectChildrenOfPath(String path) {
 		path = XString.stripIfEndsWith(path, "/");
@@ -425,11 +430,12 @@ public class MongoUtil {
 	}
 
 	/*
-	 * Matches all children under path regardless of tree depth. In other words, this matches the entire
-	 * subgraph under path.
+	 * Matches all children under path regardless of tree depth. In other words,
+	 * this matches the entire subgraph under path.
 	 * 
-	 * In other words path '/abc/def' is a child of '/abc/' and is considered a match and ALSO
-	 * '/abc/def/ghi' which is a level deeper and is also considered a match
+	 * In other words path '/abc/def' is a child of '/abc/' and is considered a
+	 * match and ALSO '/abc/def/ghi' which is a level deeper and is also considered
+	 * a match
 	 */
 	public String regexRecursiveChildrenOfPath(String path) {
 		path = XString.stripIfEndsWith(path, "/");
@@ -476,74 +482,72 @@ public class MongoUtil {
 	}
 
 	public SubNode getSystemRootNode() {
+		if (systemRootNode == null) {
+			systemRootNode = read.getNode(auth.getAdminSession(), "/r");
+		}
 		return systemRootNode;
 	}
 
-	public void initSystemRootNode() {
-		systemRootNode = read.getNode(auth.getAdminSession(), "/r");
-	}
-
 	/*
-	 * Initialize admin user account credentials into repository if not yet done. This should only get
-	 * triggered the first time the repository is created, the first time the app is started.
+	 * Initialize admin user account credentials into repository if not yet done.
+	 * This should only get triggered the first time the repository is created, the
+	 * first time the app is started.
 	 * 
-	 * The admin node is also the repository root node, so it owns all other nodes, by the definition of
-	 * they way security is inheritive.
+	 * The admin node is also the repository root node, so it owns all other nodes,
+	 * by the definition of they way security is inheritive.
 	 */
 	public void createAdminUser(MongoSession session) {
 		String adminUser = appProp.getMongoAdminUserName();
 
 		SubNode adminNode = read.getUserNodeByUserName(auth.getAdminSession(), adminUser);
 		if (adminNode == null) {
-			adminNode =
-					apiUtil.ensureNodeExists(session, "/", NodeName.ROOT, null, "Root", NodeType.REPO_ROOT.s(), true, null, null);
+			adminNode = apiUtil.ensureNodeExists(session, "/", NodeName.ROOT, null, "Root", NodeType.REPO_ROOT.s(),
+					true, null, null);
 
 			adminNode.setProp(NodeProp.USER.s(), PrincipalName.ADMIN.s());
 			adminNode.setProp(NodeProp.USER_PREF_EDIT_MODE.s(), false);
 			update.save(session, adminNode);
 
-			apiUtil.ensureNodeExists(session, "/" + NodeName.ROOT, NodeName.USER, null, "Users", null, true, null, null);
+			apiUtil.ensureNodeExists(session, "/" + NodeName.ROOT, NodeName.USER, null, "Users", null, true, null,
+					null);
 		}
 
 		createPublicNodes(session);
 	}
 
 	public void createPublicNodes(MongoSession session) {
-		log.debug("creating PublicNodes");
+		log.debug("creating Public Nodes");
 		ValContainer<Boolean> created = new ValContainer<>();
-		SubNode publicNode = apiUtil.ensureNodeExists(session, "/" + NodeName.ROOT, NodeName.PUBLIC, null, "Public", null, true,
-				null, created);
+		SubNode publicNode = apiUtil.ensureNodeExists(session, "/" + NodeName.ROOT, NodeName.PUBLIC, null, "Public",
+				null, true, null, created);
 
 		if (created.getVal()) {
-			aclService.addPrivilege(session, publicNode, PrincipalName.PUBLIC.s(), Arrays.asList(PrivilegeType.READ.s()), null);
+			aclService.addPrivilege(session, publicNode, PrincipalName.PUBLIC.s(),
+					Arrays.asList(PrivilegeType.READ.s()), null);
 		}
 
 		created = new ValContainer<>();
 
 		// create home node
-		SubNode publicHome = apiUtil.ensureNodeExists(session, "/" + NodeName.ROOT + "/" + NodeName.PUBLIC, NodeName.HOME, "home",
-				"Public Home", null, true, null, created);
+		SubNode publicHome = apiUtil.ensureNodeExists(session, "/" + NodeName.ROOT + "/" + NodeName.PUBLIC,
+				NodeName.HOME, "home", "Public Home", null, true, null, created);
 
 		// make node public
-		aclService.addPrivilege(session, publicHome, PrincipalName.PUBLIC.s(), Arrays.asList(PrivilegeType.READ.s()), null);
+		aclService.addPrivilege(session, publicHome, PrincipalName.PUBLIC.s(), Arrays.asList(PrivilegeType.READ.s()),
+				null);
 
 		log.debug("Public Home Node exists at id: " + publicHome.getId() + " path=" + publicHome.getPath());
 
 		/*
-		 * create welcome page if not existing. This is the content that displays directly below the image
-		 * in the main landing page. (todo-0: document this in User Guide admin session). This node need not
-		 * be public, because the system reads it, and it can be placed somewhere that users are not able to
-		 * navigate directly to it, so we default it to being directly in the server root, which is a
-		 * private node
+		 * create welcome page if not existing. This is the main landing page. (todo-0:
+		 * document this in User Guide admin session). This node need not be public,
+		 * because the system reads it, and it can be placed somewhere that users are
+		 * not able to navigate directly to it, so we default it to being directly in
+		 * the server root, which is a private node
 		 */
-		// todo-0: oops this works but DUPLICATES a new node every time,
-		// completely breaking the landing page!!!!
-		// SubNode publicWelcome = apiUtil.ensureNodeExists(session, "/" +
-		// NodeName.ROOT, NodeName.WELCOME, "welcome-page",
-		// "### Welcome Node\n\nDefault landing page content. Admin should edit.", null,
-		// true, null, created);
-		// log.debug("Welcome Page Node exists at id: " + publicWelcome.getId() + "
-		// path=" + publicWelcome.getPath());
+		SubNode publicWelcome = apiUtil.ensureNodeExists(session, "/" + NodeName.ROOT, NodeName.WELCOME, "welcome-page",
+				"### Welcome Node\n\nDefault landing page content. Admin should edit.", null, true, null, created);
+		log.debug("Welcome Page Node exists at id: " + publicWelcome.getId() + " path=" + publicWelcome.getPath());
 
 		// // ---------------------------------------------------------
 		// // NOTE: Do not delete this. May need this example in the future. This is

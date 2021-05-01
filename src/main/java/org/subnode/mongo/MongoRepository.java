@@ -115,8 +115,6 @@ public class MongoRepository {
 
 			actPub.refreshForeignUsers();
 
-			util.initSystemRootNode();
-
 			if (appProp.getReSaveAll()) {
 				util.reSaveAll(adminSession);
 			}
