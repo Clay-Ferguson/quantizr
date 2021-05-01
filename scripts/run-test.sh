@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# Warning: The filename 'run-test.sh' is admittedly confusing. This script does NOT run tests. 
+# It runs the app itself in 'test' environment.
+
 if [ -f ./vscode-cwd.sh ]; then
   source ./vscode-cwd.sh
 fi

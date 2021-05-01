@@ -52,14 +52,14 @@ public class MongoTest implements TestIntf {
 		log.debug("*****************************************************************************************");
 		log.debug("MongoTest Running!");
 
-		MongoSession adminSession = auth.getAdminSession();
+		// MongoSession adminSession = auth.getAdminSession();
 
-		SubNode adminNode = read.getUserNodeByUserName(adminSession, PrincipalName.ADMIN.s());
-		if (adminNode == null) {
-			throw new RuntimeEx("Unable to find admin user node.");
-		}
+		// SubNode adminNode = read.getUserNodeByUserName(adminSession, PrincipalName.ADMIN.s());
+		// if (adminNode == null) {
+		// 	throw new RuntimeEx("Unable to find admin user node.");
+		// }
 
-		testPathRegex();
+		// testPathRegex();
 
 		// Insert a test node
 		// SubNode node = create.createNode(adminSession, "/usrx");

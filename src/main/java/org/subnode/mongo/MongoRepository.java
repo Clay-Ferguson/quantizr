@@ -101,10 +101,6 @@ public class MongoRepository {
 
 			MongoSession adminSession = auth.getAdminSession();
 
-			// if (appProp.getMongoTest()) {
-			// mongoTest.wipeDb(adminSession);
-			// }
-
 			if (appProp.getForceIndexRebuild()) {
 				util.dropAllIndexes(adminSession);
 			}
