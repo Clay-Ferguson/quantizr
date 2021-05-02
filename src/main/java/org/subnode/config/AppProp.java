@@ -198,10 +198,6 @@ public class AppProp /* implements EnvironmentAware */ {
 		return Integer.parseInt(env.getProperty("mongodb.port"));
 	}
 
-	public String getMongoDbName() {
-		return env.getProperty("mongodb.name");
-	}
-
 	public String getAdminDataFolder() {
 		return getPathProperty("adminDataFolder");
 	}
