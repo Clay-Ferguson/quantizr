@@ -306,7 +306,7 @@ public class MongoRead {
         String parentPath = XString.truncateAfterLast(path, "/");
 
         String pendingPath = NodeName.PENDING_PATH + "/";
-		String rootPath = "/" + NodeName.ROOT + "/";
+        String rootPath = "/" + NodeName.ROOT + "/";
         /*
          * If node is in pending area take the pending part out of the path to get the
          * real parent
@@ -782,8 +782,7 @@ public class MongoRead {
             node.setContent(nodeName);
 
             if (defaultPrivs != null) {
-                aclService.addPrivilege(session, node, PrincipalName.PUBLIC.s(),
-                        defaultPrivs /* Arrays.asList(PrivilegeType.READ.s()) */, null);
+                aclService.addPrivilege(session, node, PrincipalName.PUBLIC.s(), defaultPrivs, null);
             }
 
             update.save(session, node);
@@ -844,9 +843,9 @@ public class MongoRead {
         Query query = new Query();
         Criteria criteria = Criteria.where(//
                 SubNode.FIELD_PATH).regex(util.regexDirectChildrenOfPath(NodeName.ROOT_OF_ALL_USERS)) //
-                //.and(SubNode.FIELD_PROPERTIES + "." + NodeProp.USER + ".value").is(user);
+                // .and(SubNode.FIELD_PROPERTIES + "." + NodeProp.USER + ".value").is(user);
                 // case-insensitive lookup of username:
-                .and(SubNode.FIELD_PROPERTIES + "." + NodeProp.USER + ".value").regex("^" +user+ "$","i");
+                .and(SubNode.FIELD_PROPERTIES + "." + NodeProp.USER + ".value").regex("^" + user + "$", "i");
 
         query.addCriteria(criteria);
 

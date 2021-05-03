@@ -109,14 +109,25 @@ public class OutboxMgr {
 		}
 	}
 
-	public void sendEmailNotification(MongoSession session, String userName, SubNode userNode, SubNode node) {
-		String email = userNode.getStrProp(NodeProp.EMAIL.s());
-		log.debug("sending email to: " + email + " because his node was appended under.");
+	/**
+	 * Sends an email notification to the user associated with 'toUserNode' (a person's account root node), telling them
+	 * that 'fromUserName' has shared a node with them, and including a link to the shared node in the email.
+	 * 
+	 * @param session
+	 * @param fromUserName
+	 * @param toUserNode
+	 * @param node
+	 */
+	public void sendEmailNotification(MongoSession session, String fromUserName, SubNode toUserNode, SubNode node) {
+		String email = toUserNode.getStrProp(NodeProp.EMAIL.s());
+		String toUserName = toUserNode.getStrProp(NodeProp.USER.s());
+		// log.debug("sending node notification email to: " + email);
 
-		String content = String.format("User '%s' replied to you.<p>\n\n" + //
-				"%s/app?id=%s", userName, appProp.getHostAndPort(), node.getId().toHexString());
+		String nodeUrl = apiUtil.getFriendlyNodeUrl(session, node);
+		String content = String.format("Quanta user '%s' shared a node to your '%s' account.<p>\n\n" + //
+				"%s", fromUserName, toUserName, nodeUrl);
 
-		queueMailUsingAdminSession(session, email, "New SubNode Notification", content);
+		queueMailUsingAdminSession(session, email, "A Quanta Node was shared to you!", content);
 	}
 
 	public void queueEmail(final String recipients, final String subject, final String content) {

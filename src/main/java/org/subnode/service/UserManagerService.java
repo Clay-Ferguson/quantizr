@@ -66,8 +66,8 @@ import org.subnode.util.Validator;
 import org.subnode.util.XString;
 
 /**
- * Service methods for processing user management functions. Login, logout, signup, user
- * preferences, and settings persisted per-user
+ * Service methods for processing user management functions. Login, logout,
+ * signup, user preferences, and settings persisted per-user
  */
 @Component
 public class UserManagerService {
@@ -112,10 +112,11 @@ public class UserManagerService {
 	public static final ConcurrentHashMap<String, String> privateKeysByUserName = new ConcurrentHashMap<>();
 
 	/*
-	 * Login mechanism is a bit tricky because the CallProcessor detects the LoginRequest and performs
-	 * authentication BEFORE this 'login' method even gets called, so by the time we are in this method
-	 * we can safely assume the userName and password resulted in a successful login, so this method
-	 * really just is used to process some other higher level events after the login.
+	 * Login mechanism is a bit tricky because the CallProcessor detects the
+	 * LoginRequest and performs authentication BEFORE this 'login' method even gets
+	 * called, so by the time we are in this method we can safely assume the
+	 * userName and password resulted in a successful login, so this method really
+	 * just is used to process some other higher level events after the login.
 	 */
 	public LoginResponse postLogin(MongoSession session, RequestBase req) {
 		LoginResponse res = new LoginResponse();
@@ -134,16 +135,16 @@ public class UserManagerService {
 		}
 
 		/*
-		 * We have to get timezone information from the user's browser, so that all times on all nodes
-		 * always show up in their precise local time!
+		 * We have to get timezone information from the user's browser, so that all
+		 * times on all nodes always show up in their precise local time!
 		 */
 		sc.init(req);
 
 		if (session == null) {
 			log.debug("session==null, using anonymous user");
 			/*
-			 * Note: This is not an error condition, this happens whenever the page loads for the first time and
-			 * the user has no session yet,
+			 * Note: This is not an error condition, this happens whenever the page loads
+			 * for the first time and the user has no session yet,
 			 */
 			res.setUserName(PrincipalName.ANON.s());
 			res.setMessage("not logged in.");
@@ -169,7 +170,8 @@ public class UserManagerService {
 	}
 
 	/*
-	 * userNode should be passed if you have it already, but can be null of you don't
+	 * userNode should be passed if you have it already, but can be null of you
+	 * don't
 	 */
 	public void processLogin(MongoSession session, LoginResponse res, String userName, SubNode userNode) {
 		if (userNode == null) {
@@ -245,8 +247,8 @@ public class UserManagerService {
 
 	/**
 	 * @param session
-	 * @param userStats Holds a map of User Root Node (account node) IDs as key mapped to the UserStats
-	 *        for that user.
+	 * @param userStats Holds a map of User Root Node (account node) IDs as key
+	 *                  mapped to the UserStats for that user.
 	 */
 	public void writeUserStats(final MongoSession session, HashMap<ObjectId, UserStats> userStats) {
 		userStats.forEach((final ObjectId key, final UserStats stat) -> {
@@ -261,18 +263,20 @@ public class UserManagerService {
 	}
 
 	/**
-	 * increments the userNode usasage bytes by adding the bytes the attachment uses on 'node'
+	 * increments the userNode usasage bytes by adding the bytes the attachment uses
+	 * on 'node'
 	 * 
 	 * @param node
 	 * @param userNode
-	 * @param sign Controls if this is a subtract or an add (should be always 1 or -1)
+	 * @param sign     Controls if this is a subtract or an add (should be always 1
+	 *                 or -1)
 	 */
 	public void addNodeBytesToUserNodeBytes(SubNode node, SubNode userNode, int sign) {
 		if (node == null) {
 			/*
-			 * todo-1: need to investigate this. I did a public shared node from one user and had a conversation
-			 * thread under it and got this thrown upon deleting the root of that. For now ignoring a null node
-			 * here.
+			 * todo-1: need to investigate this. I did a public shared node from one user
+			 * and had a conversation thread under it and got this thrown upon deleting the
+			 * root of that. For now ignoring a null node here.
 			 */
 			return;
 			// throw new RuntimeEx("node was null.");
@@ -292,8 +296,8 @@ public class UserManagerService {
 	}
 
 	/*
-	 * We have 'sign' so we can use this method to either deduct from or add to the user's total usage
-	 * amount
+	 * We have 'sign' so we can use this method to either deduct from or add to the
+	 * user's total usage amount
 	 */
 	public void addBytesToUserNodeBytes(long binSize, SubNode userNode, int sign) {
 		if (userNode == null) {
@@ -322,12 +326,13 @@ public class UserManagerService {
 	}
 
 	/*
-	 * Processes last step of signup, which is validation of registration code. This means user has
-	 * clicked the link they were sent during the signup email verification, and they are sending in a
-	 * signupCode that will turn on their account and actually create their account.
+	 * Processes last step of signup, which is validation of registration code. This
+	 * means user has clicked the link they were sent during the signup email
+	 * verification, and they are sending in a signupCode that will turn on their
+	 * account and actually create their account.
 	 * 
-	 * We return whatever a message would be to the user that just says if the signupCode was accepted
-	 * or not and it's displayed on welcome.html only.
+	 * We return whatever a message would be to the user that just says if the
+	 * signupCode was accepted or not and it's displayed on welcome.html only.
 	 */
 	public String processSignupCode(final String signupCode) {
 		log.debug("User is trying signupCode: " + signupCode);
@@ -378,9 +383,9 @@ public class UserManagerService {
 	}
 
 	/*
-	 * Processes a signup request from a user. We create the user root node in a pending state, and like
-	 * all other user accounts all information specific to that user that we currently know is held in
-	 * that node (i.e. preferences)
+	 * Processes a signup request from a user. We create the user root node in a
+	 * pending state, and like all other user accounts all information specific to
+	 * that user that we currently know is held in that node (i.e. preferences)
 	 */
 	public SignupResponse signup(SignupRequest req, boolean automated) {
 		MongoSession session = auth.getAdminSession();
@@ -445,8 +450,8 @@ public class UserManagerService {
 	}
 
 	/*
-	 * Adds user to the list of pending accounts and they will stay in pending status until their
-	 * signupCode has been used to validate their email address.
+	 * Adds user to the list of pending accounts and they will stay in pending
+	 * status until their signupCode has been used to validate their email address.
 	 */
 	public void initiateSignup(MongoSession session, String userName, String password, String email) {
 
@@ -458,15 +463,16 @@ public class UserManagerService {
 		SubNode newUserNode = util.createUser(session, userName, email, password, false);
 
 		/*
-		 * It's easiest to use the actua new UserNode ID as the 'signup code' to send to the user, because
-		 * it's random and tied to this user by definition
+		 * It's easiest to use the actua new UserNode ID as the 'signup code' to send to
+		 * the user, because it's random and tied to this user by definition
 		 */
 		String signupCode = newUserNode.getId().toHexString();
 		String signupLink = appProp.getHttpProtocol() + "://" + appProp.getMetaHost() + "?signupCode=" + signupCode;
 		String content = null;
 
 		/*
-		 * We print this out so we can use it in DEV mode when no email support may be configured
+		 * We print this out so we can use it in DEV mode when no email support may be
+		 * configured
 		 */
 		log.debug("Signup URL: " + signupLink);
 
@@ -497,7 +503,8 @@ public class UserManagerService {
 				log.debug("savePublicKey failed to find userName: " + userName);
 			}
 			// oops this is coming up when I don't want to see it, when the user logs in,
-			// so we need to be sure to somehow only show the message when the user has CLICKED
+			// so we need to be sure to somehow only show the message when the user has
+			// CLICKED
 			// the actual publish keys menu
 			// res.setMessage("Successfully saved public key.");
 			res.setSuccess(true);
@@ -553,9 +560,10 @@ public class UserManagerService {
 			prefsNode.setProp(NodeProp.USER_PREF_SHOW_METADATA.s(), showMetaData);
 
 			/*
-			 * Also update session-scope object, because server-side functions that need preference information
-			 * will get it from there instead of loading it from repository. The only time we load user
-			 * preferences from repository is during login when we can't get it from anywhere else at that time.
+			 * Also update session-scope object, because server-side functions that need
+			 * preference information will get it from there instead of loading it from
+			 * repository. The only time we load user preferences from repository is during
+			 * login when we can't get it from anywhere else at that time.
 			 */
 			userPreferences.setEditMode(editMode);
 			userPreferences.setShowMetaData(showMetaData);
@@ -598,8 +606,8 @@ public class UserManagerService {
 	}
 
 	/*
-	 * Adds 'req.userName' as a friend by creating a FRIEND node under the current user's FRIENDS_LIST
-	 * if the user wasn't already a friend
+	 * Adds 'req.userName' as a friend by creating a FRIEND node under the current
+	 * user's FRIENDS_LIST if the user wasn't already a friend
 	 */
 	public AddFriendResponse addFriend(MongoSession session, final AddFriendRequest req) {
 		AddFriendResponse res = new AddFriendResponse();
@@ -610,10 +618,12 @@ public class UserManagerService {
 		}
 
 		// get the Friend List of the follower
-		SubNode followerFriendList = read.getUserNodeByType(session, userName, null, null, NodeType.FRIEND_LIST.s(), null);
+		SubNode followerFriendList = read.getUserNodeByType(session, userName, null, null, NodeType.FRIEND_LIST.s(),
+				null);
 
 		/*
-		 * lookup to see if this followerFriendList node already has userToFollow already under it
+		 * lookup to see if this followerFriendList node already has userToFollow
+		 * already under it
 		 */
 		SubNode friendNode = read.findFriendOfUser(session, followerFriendList, req.getUserName());
 		if (friendNode == null) {
@@ -702,7 +712,8 @@ public class UserManagerService {
 		String passCode = req.getPassCode();
 		if (passCode != null) {
 			/*
-			 * We can run this block as admin, because the codePart below is secret and is checked for a match
+			 * We can run this block as admin, because the codePart below is secret and is
+			 * checked for a match
 			 */
 			adminRunner.run(mongoSession -> {
 
@@ -763,7 +774,8 @@ public class UserManagerService {
 
 	public boolean isNormalUserName(String userName) {
 		userName = userName.trim();
-		return !userName.equalsIgnoreCase(PrincipalName.ADMIN.s()) && !userName.equalsIgnoreCase(PrincipalName.ANON.s());
+		return !userName.equalsIgnoreCase(PrincipalName.ADMIN.s())
+				&& !userName.equalsIgnoreCase(PrincipalName.ANON.s());
 	}
 
 	public ResetPasswordResponse resetPassword(final ResetPasswordRequest req) {
@@ -790,9 +802,10 @@ public class UserManagerService {
 			/*
 			 * IMPORTANT!
 			 *
-			 * verify that the email address provides IS A MATCH to the email address for this user! Important
-			 * step here because without this check anyone would be able to completely hijack anyone else's
-			 * account simply by issuing a password change to that account!
+			 * verify that the email address provides IS A MATCH to the email address for
+			 * this user! Important step here because without this check anyone would be
+			 * able to completely hijack anyone else's account simply by issuing a password
+			 * change to that account!
 			 */
 			String nodeEmail = ownerNode.getStrProp(NodeProp.EMAIL.s());
 			if (nodeEmail == null || !nodeEmail.equals(email)) {
@@ -802,13 +815,14 @@ public class UserManagerService {
 			}
 
 			/*
-			 * if we make it to here the user and email are both correct, and we can initiate the password
-			 * reset. We pick some random time between 1 and 2 days from now into the future to serve as the
-			 * unguessable auth code AND the expire time for it. Later we can create a deamon processor that
-			 * cleans up expired authCodes, but for now we just need to HAVE the auth code.
+			 * if we make it to here the user and email are both correct, and we can
+			 * initiate the password reset. We pick some random time between 1 and 2 days
+			 * from now into the future to serve as the unguessable auth code AND the expire
+			 * time for it. Later we can create a deamon processor that cleans up expired
+			 * authCodes, but for now we just need to HAVE the auth code.
 			 *
-			 * User will be emailed this code and we will perform reset when we see it, and the user has entered
-			 * new password we can use.
+			 * User will be emailed this code and we will perform reset when we see it, and
+			 * the user has entered new password we can use.
 			 */
 			int oneDayMillis = 60 * 60 * 1000;
 			long authCode = new Date().getTime() + oneDayMillis + rand.nextInt(oneDayMillis);
@@ -836,25 +850,28 @@ public class UserManagerService {
 		GetFriendsResponse res = new GetFriendsResponse();
 
 		List<SubNode> friendNodes = getFriendsList(session);
-		List<FriendInfo> friends = new LinkedList<>();
 
-		for (SubNode friendNode : friendNodes) {
-			String userName = friendNode.getStrProp(NodeProp.USER.s());
-			if (userName != null) {
-				FriendInfo fi = new FriendInfo();
-				fi.setUserName(userName);
-				String userNodeId = friendNode.getStrProp(NodeProp.USER_NODE_ID);
+		if (friendNodes != null) {
+			List<FriendInfo> friends = new LinkedList<>();
+			
+			for (SubNode friendNode : friendNodes) {
+				String userName = friendNode.getStrProp(NodeProp.USER.s());
+				if (userName != null) {
+					FriendInfo fi = new FriendInfo();
+					fi.setUserName(userName);
+					String userNodeId = friendNode.getStrProp(NodeProp.USER_NODE_ID);
 
-				SubNode friendAccountNode = read.getNode(session, userNodeId, false);
-				if (friendAccountNode != null) {
-					fi.setAvatarVer(friendAccountNode.getStrProp(NodeProp.BIN));
+					SubNode friendAccountNode = read.getNode(session, userNodeId, false);
+					if (friendAccountNode != null) {
+						fi.setAvatarVer(friendAccountNode.getStrProp(NodeProp.BIN));
+					}
+					fi.setUserNodeId(userNodeId);
+					friends.add(fi);
 				}
-				fi.setUserNodeId(userNodeId);
-				friends.add(fi);
 			}
-		}
 
-		res.setFriends(friends);
+			res.setFriends(friends);
+		}
 		res.setSuccess(true);
 		return res;
 	}
@@ -881,8 +898,8 @@ public class UserManagerService {
 	}
 
 	/*
-	 * For all foreign servers we remove posts that are older than a certain number of days just to keep
-	 * our DB from growing too large.
+	 * For all foreign servers we remove posts that are older than a certain number
+	 * of days just to keep our DB from growing too large.
 	 */
 	public void cleanUserAccounts() {
 		// not currently used.
@@ -890,8 +907,8 @@ public class UserManagerService {
 			return;
 
 		adminRunner.run(session -> {
-			final Iterable<SubNode> accountNodes =
-					read.getChildrenUnderParentPath(session, NodeName.ROOT_OF_ALL_USERS, null, null, 0, null, null);
+			final Iterable<SubNode> accountNodes = read.getChildrenUnderParentPath(session, NodeName.ROOT_OF_ALL_USERS,
+					null, null, 0, null, null);
 
 			for (final SubNode accountNode : accountNodes) {
 				String userName = accountNode.getStrProp(NodeProp.USER);
@@ -922,8 +939,8 @@ public class UserManagerService {
 		int foreignUserCount = 0;
 
 		StringBuilder sb = new StringBuilder();
-		final Iterable<SubNode> accountNodes =
-				read.getChildrenUnderParentPath(session, NodeName.ROOT_OF_ALL_USERS, null, null, 0, null, null);
+		final Iterable<SubNode> accountNodes = read.getChildrenUnderParentPath(session, NodeName.ROOT_OF_ALL_USERS,
+				null, null, 0, null, null);
 
 		for (final SubNode accountNode : accountNodes) {
 			String userName = accountNode.getStrProp(NodeProp.USER);

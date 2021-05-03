@@ -8,6 +8,7 @@ import { Singletons } from "../Singletons";
 import { CompIntf } from "../widget/base/CompIntf";
 import { Button } from "../widget/Button";
 import { ButtonBar } from "../widget/ButtonBar";
+import { Div } from "../widget/Div";
 import { Form } from "../widget/Form";
 import { FriendsTable } from "../widget/FriendsTable";
 
@@ -43,12 +44,15 @@ export class FriendsDlg extends DialogBase {
 
     renderDlg(): CompIntf[] {
         return [
+            // I hacked this to make it just tell the user they have no friends and
+            // show juse the close button but we could do something much better here.
             new Form(null, [
-                new FriendsTable(this.getState().friends, this.selectionValueIntf),
+                !this.getState().friends ? new Div("You haven't yet added any friends yet!")
+                    : new FriendsTable(this.getState().friends, this.selectionValueIntf),
                 new ButtonBar([
-                    new Button("Choose", () => {
+                    this.getState().friends ? new Button("Choose", () => {
                         this.close();
-                    }, null, "btn-primary"),
+                    }, null, "btn-primary") : null,
                     new Button("Close", this.close)
                 ])
             ])

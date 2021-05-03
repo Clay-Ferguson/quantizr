@@ -57,6 +57,9 @@ public class ActPubController {
 	 * so they are breaking the spec and we tolerate it by redirecting
 	 * 
 	 * simple redirect from /ap/user/[userName] to /u/[userName]/home
+	 * 
+	 * todo-0: is this documented in the user guide about user being able to have a node named 'home'
+	 * and what it means if they do?
 	 */
 	@RequestMapping(value = "/ap/user/{userName}", method = RequestMethod.GET)
 	public void mastodonGetUser(//

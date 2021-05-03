@@ -13,6 +13,7 @@ import org.subnode.AppController;
 import org.subnode.config.AppProp;
 import org.subnode.model.NodeMetaInfo;
 import org.subnode.model.client.NodeProp;
+import org.subnode.model.client.PrincipalName;
 import org.subnode.mongo.CreateNodeLocation;
 import org.subnode.mongo.MongoCreate;
 import org.subnode.mongo.MongoRead;
@@ -63,6 +64,26 @@ public class SubNodeUtil {
 	 */
 	public static boolean isSavableProperty(String propertyName) {
 		return !nonSavableProperties.contains(propertyName);
+	}
+
+	public String getFriendlyNodeUrl(MongoSession session, SubNode node) {
+		// if node doesn't thave a name, make ID-based url
+		if (StringUtils.isEmpty(node.getName())) {
+			return String.format("%s/app?id=%s", appProp.getHostAndPort(), node.getId().toHexString());
+		}
+		// else format this node name based on whether the node is admin owned or not.
+		else {
+			String owner = read.getNodeOwner(session, node);
+
+			// if admin owns node
+			if (owner.equalsIgnoreCase(PrincipalName.ADMIN.s())) {
+				return String.format("%s/n/%s", appProp.getHostAndPort(), node.getName());
+			}
+			// if non-admin owns node
+			else {
+				return String.format("%s/u/%s/%s", appProp.getHostAndPort(), owner, node.getName());
+			}
+		}
 	}
 
 	public SubNode ensureNodeExists(MongoSession session, String parentPath, String pathName, String nodeName,
