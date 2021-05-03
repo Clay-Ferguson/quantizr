@@ -32,7 +32,12 @@ export class FeedView extends AppTab {
     static searchTextState: ValidatedState<any> = new ValidatedState<any>();
 
     // I don't like this OR how much CPU load it takes, so I'm flagging it off for now
-    realtimeCheckboxes: boolean = false;
+    static realtimeCheckboxes: boolean = false;
+
+    /* Controle wether the view automatically refreshes before letting the user choose what options (checkboxes) they want.
+    I'm disabling because I don't like this. If I'm wanting to find just "To me" for example then I have to wait for it
+    to first query stuff I don't care about first. So I'd just rather click the "Refresh" button myself each time. */
+    static automaticInitialRefresh: boolean = false;
 
     static page: number = 0;
     static refreshCounter: number = 0;
@@ -101,20 +106,25 @@ export class FeedView extends AppTab {
         ]);
         children.push(searchDiv);
 
-        if (FeedView.refreshCounter === 0 || state.feedLoading) {
+        if (state.feedLoading) {
             children.push(new Heading(4, "Loading feed..."));
+        }
 
+        if (FeedView.refreshCounter === 0) {
             // if user has never done a refresh at all yet, do the first one for them automatically.
-            if (FeedView.refreshCounter === 0 && state.activeTab === "feedTab") {
+            if (FeedView.automaticInitialRefresh && state.activeTab === "feedTab") {
                 setTimeout(FeedView.refresh, 100);
+            }
+            else {
+                children.push(new Heading(4, "Refresh when ready."));
             }
         }
         else if (state.feedWaitingForUserRefresh) {
-            children.push(new Heading(4, "Make selections, then 'Refresh'"));
+            children.push(new Heading(4, "Refresh when ready."));
         }
         else if (!state.feedResults || state.feedResults.length === 0) {
             children.push(new Div("Nothing to display."));
-            children.push(new TextContent("Tip: Select 'Public' checkbox only, to see the entire Fediverse --or-- 'Public+Local' to see just public posts made by local users."));
+            children.push(new TextContent("Tip: Select 'Public' checkbox, to see the entire Fediverse (all public posts)."));
         }
         else {
             let i = 0;
@@ -169,12 +179,12 @@ export class FeedView extends AppTab {
             }, {
                 setValue: (checked: boolean): void => {
                     dispatch("Action_SetFeedFilterType", (s: AppState): AppState => {
-                        s.feedWaitingForUserRefresh = !this.realtimeCheckboxes;
+                        s.feedWaitingForUserRefresh = !FeedView.realtimeCheckboxes;
                         s.feedFilterFriends = checked;
                         return s;
                     });
 
-                    if (this.realtimeCheckboxes) {
+                    if (FeedView.realtimeCheckboxes) {
                         FeedView.page = 0;
                         S.srch.feed("~" + J.NodeType.FRIEND_LIST, null, FeedView.page, FeedView.searchTextState.getValue());
                     }
@@ -189,12 +199,12 @@ export class FeedView extends AppTab {
             }, {
                 setValue: (checked: boolean): void => {
                     dispatch("Action_SetFeedFilterType", (s: AppState): AppState => {
-                        s.feedWaitingForUserRefresh = !this.realtimeCheckboxes;
+                        s.feedWaitingForUserRefresh = !FeedView.realtimeCheckboxes;
                         s.feedFilterToMe = checked;
                         return s;
                     });
 
-                    if (this.realtimeCheckboxes) {
+                    if (FeedView.realtimeCheckboxes) {
                         FeedView.page = 0;
                         S.srch.feed("~" + J.NodeType.FRIEND_LIST, null, FeedView.page, FeedView.searchTextState.getValue());
                     }
@@ -209,12 +219,12 @@ export class FeedView extends AppTab {
             }, {
                 setValue: (checked: boolean): void => {
                     dispatch("Action_SetFeedFilterType", (s: AppState): AppState => {
-                        s.feedWaitingForUserRefresh = !this.realtimeCheckboxes;
+                        s.feedWaitingForUserRefresh = !FeedView.realtimeCheckboxes;
                         s.feedFilterFromMe = checked;
                         return s;
                     });
 
-                    if (this.realtimeCheckboxes) {
+                    if (FeedView.realtimeCheckboxes) {
                         FeedView.page = 0;
                         S.srch.feed("~" + J.NodeType.FRIEND_LIST, null, FeedView.page, FeedView.searchTextState.getValue());
                     }
@@ -229,12 +239,12 @@ export class FeedView extends AppTab {
             }, {
                 setValue: (checked: boolean): void => {
                     dispatch("Action_SetFeedFilterType", (s: AppState): AppState => {
-                        s.feedWaitingForUserRefresh = !this.realtimeCheckboxes;
+                        s.feedWaitingForUserRefresh = !FeedView.realtimeCheckboxes;
                         s.feedFilterToPublic = checked;
                         return s;
                     });
 
-                    if (this.realtimeCheckboxes) {
+                    if (FeedView.realtimeCheckboxes) {
                         FeedView.page = 0;
                         S.srch.feed("~" + J.NodeType.FRIEND_LIST, null, FeedView.page, FeedView.searchTextState.getValue());
                     }
@@ -244,46 +254,45 @@ export class FeedView extends AppTab {
                 }
             }),
 
-            // todo-2: This works fine but let's disable until we have more local users,
-            // and eventually we want this to be come kind of admin-configurable option that
-            // controls wether this checkbox exists or not.
-            // new Checkbox("Local", {
-            //     title: "Include only nodes from accounts on this server."
-            // }, {
-            //     setValue: (checked: boolean): void => {
-            //         dispatch("Action_SetFeedFilterType", (s: AppState): AppState => {
-            //             s.feedWaitingForUserRefresh = !this.realtimeCheckboxes;
-            //             s.feedFilterLocalServer = checked;
+            /* todo-2: Let's disable (unless 'admin' user) until we have more local users, because it's
+            too uninteresting/empty for now */
+            state.isAdminUser ? new Checkbox("Local", {
+                title: "Include only nodes from accounts on this server."
+            }, {
+                setValue: (checked: boolean): void => {
+                    dispatch("Action_SetFeedFilterType", (s: AppState): AppState => {
+                        s.feedWaitingForUserRefresh = !FeedView.realtimeCheckboxes;
+                        s.feedFilterLocalServer = checked;
 
-            //             /* to help keep users probably get what they want, set 'public' also to true as the default
-            //              any time someone clicks 'Local' because that's the likely use case */
-            //             if (checked) {
-            //                 s.feedFilterToPublic = true;
-            //             }
-            //             return s;
-            //         });
+                        /* to help keep users probably get what they want, set 'public' also to true as the default
+                         any time someone clicks 'Local' because that's the likely use case */
+                        if (checked) {
+                            s.feedFilterToPublic = true;
+                        }
+                        return s;
+                    });
 
-            //         if (this.realtimeCheckboxes) {
-            //             FeedView.page = 0;
-            //             S.srch.feed("~" + J.NodeType.FRIEND_LIST, null, FeedView.page, FeedView.searchTextState.getValue());
-            //         }
-            //     },
-            //     getValue: (): boolean => {
-            //         return store.getState().feedFilterLocalServer;
-            //     }
-            // }),
+                    if (FeedView.realtimeCheckboxes) {
+                        FeedView.page = 0;
+                        S.srch.feed("~" + J.NodeType.FRIEND_LIST, null, FeedView.page, FeedView.searchTextState.getValue());
+                    }
+                },
+                getValue: (): boolean => {
+                    return store.getState().feedFilterLocalServer;
+                }
+            }) : null,
 
             new Checkbox("NSFW", {
                 title: "Include NSFW Content (Allows material flagged as 'Sensitive')"
             }, {
                 setValue: (checked: boolean): void => {
                     dispatch("Action_SetFeedFilterType", (s: AppState): AppState => {
-                        s.feedWaitingForUserRefresh = !this.realtimeCheckboxes;
+                        s.feedWaitingForUserRefresh = !FeedView.realtimeCheckboxes;
                         s.feedFilterNSFW = checked;
                         return s;
                     });
 
-                    if (this.realtimeCheckboxes) {
+                    if (FeedView.realtimeCheckboxes) {
                         FeedView.page = 0;
                         S.srch.feed("~" + J.NodeType.FRIEND_LIST, null, FeedView.page, FeedView.searchTextState.getValue());
                     }
