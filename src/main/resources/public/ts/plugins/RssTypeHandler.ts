@@ -360,7 +360,7 @@ export class RssTypeHandler extends TypeBase {
             /* If we are rendering a multiple RSS feed thing here then the title will have two parts here
                 that the server will have created using the "::" delimiter so we can use the left side of the
                 delimted string to extract a designation of which feed this item is from since they will all be
-                mixed and interwoven together from multiple sources based on the timestamp ordering (rev chron) 
+                mixed and interwoven together from multiple sources based on the timestamp ordering (rev chron)
                 */
             let colonIdx = entry.title.indexOf(" :: ");
             if (colonIdx !== -1) {
