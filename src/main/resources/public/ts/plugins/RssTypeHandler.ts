@@ -357,49 +357,56 @@ export class RssTypeHandler extends TypeBase {
         }
 
         if (entry.title) {
-            entry.title = S.util.unencodeHtml(entry.title);
-        }
+            /* If we are rendering a multiple RSS feed thing here then the title will have two parts here
+                that the server will have created using the "::" delimiter so we can use the left side of the
+                delimted string to extract a designation of which feed this item is from since they will all be
+                mixed and interwoven together from multiple sources based on the timestamp ordering (rev chron) 
+                */
+            let colonIdx = entry.title.indexOf(" :: ");
+            if (colonIdx !== -1) {
+                let headerAttribs: any = {
+                    dangerouslySetInnerHTML: { __html: entry.title.substring(0, colonIdx) }
+                };
+                headerDivChildren.push(new Heading(5, null, headerAttribs));
 
-        let colonIdx = entry.title.indexOf(" :: ");
-        if (colonIdx !== -1) {
-            headerDivChildren.push(new Heading(5, entry.title.substring(0, colonIdx)));
+                let title = entry.title.substring(colonIdx + 4);
+                let anchorAttribs: any = {
+                    className: "rssAnchor",
+                    target: "_blank",
+                    dangerouslySetInnerHTML: { __html: title }
+                };
 
-            let title = entry.title.substring(colonIdx + 4);
-            let anchorAttribs: any = {
-                className: "rssAnchor",
-                target: "_blank"
-            };
+                // If the entry.link is not given we default a click on it, to just play the audio.
+                if (!entry.link && hasAudioEnclosure) {
+                    anchorAttribs.onClick = playAudioFunc;
+                }
 
-            // If the entry.link is not given we default a click on it, to just play the audio.
-            if (!entry.link && hasAudioEnclosure) {
-                anchorAttribs.onClick = playAudioFunc;
+                headerDivChildren.push(new Div(null, { className: "marginBottom" }, [
+                    new Anchor(entry.link, null, anchorAttribs)
+                ]));
             }
+            else {
+                let anchorAttribs: any = {
+                    className: "rssAnchor marginBottom",
+                    target: "_blank",
+                    dangerouslySetInnerHTML: { __html: entry.title }
+                };
 
-            headerDivChildren.push(new Div(null, { className: "marginBottom" }, [
-                new Anchor(entry.link, title, anchorAttribs)
-            ]));
-        }
-        else {
-            let anchorAttribs: any = {
-                className: "rssAnchor marginBottom",
-                target: "_blank"
-            };
+                // If the entry.link is not given we default a click on it, to just play the audio.
+                if (!entry.link && hasAudioEnclosure) {
+                    anchorAttribs.onClick = playAudioFunc;
+                }
 
-            // If the entry.link is not given we default a click on it, to just play the audio.
-            if (!entry.link && hasAudioEnclosure) {
-                anchorAttribs.onClick = playAudioFunc;
+                headerDivChildren.push(new Div(null, { className: "marginBottom" }, [
+                    new Anchor(entry.link, null, anchorAttribs)
+                ]));
             }
-
-            headerDivChildren.push(new Div(null, { className: "marginBottom" }, [
-                new Anchor(entry.link, entry.title, anchorAttribs)
-            ]));
         }
 
         if (entry.itunesSubtitle && entry.itunesSubtitle !== entry.title) {
-            // ignore jank subtitles
-            if (entry.itunesSubtitle.indexOf("&amp;") === -1 && entry.itunesSubtitle.indexOf("&quot;") === -1) {
-                headerDivChildren.push(new Div(entry.itunesSubtitle));
-            }
+            headerDivChildren.push(new Div(null, {
+                dangerouslySetInnerHTML: { __html: entry.itunesSubtitle }
+            }));
         }
 
         children.push(new Div(null, null, headerDivChildren));
@@ -454,7 +461,6 @@ export class RssTypeHandler extends TypeBase {
         }
 
         if (!state.rssHeadlinesOnly) {
-
             let mediaDescription = entry.mediaGroup ? entry.mediaGroup["media:description"] : null;
 
             let textContent = null;

@@ -224,28 +224,6 @@ export class Util implements UtilIntf {
         return s.replace(/([.*+?^=!:${}()|\[\]\/\\])/g, "\\$1");
     }
 
-    /* Yes there are better ways to do this, that require creating DOM entries and using
-    DOM-based javascript, but for now I'm going with a faster solution, albeit only supporting
-    a specific enumerated set. todo-1: do something better here */
-    unencodeHtml = (s: string): string => {
-        if (!this.contains(s, "&")) {
-            return s;
-        }
-        let ret = s;
-        ret = this.replaceAll(ret, "&amp;", "&");
-        ret = this.replaceAll(ret, "&gt;", ">");
-        ret = this.replaceAll(ret, "&lt;", "<");
-        ret = this.replaceAll(ret, "&quot;", '"');
-        ret = this.replaceAll(ret, "&apos;", "'");
-        ret = this.replaceAll(ret, "&#38;", "&");
-        ret = this.replaceAll(ret, "&#39;", "'");
-        ret = this.replaceAll(ret, "&#038;", "&");
-        ret = this.replaceAll(ret, "&#039;", "'");
-        ret = this.replaceAll(ret, "&#8217;", "'");
-        ret = this.replaceAll(ret, "&#8216;", "'");
-        return ret;
-    }
-
     /* this supposedly came from mustache codebase */
     escapeHtml = (str: string): string => {
         if (!str) return str;

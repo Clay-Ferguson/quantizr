@@ -51,7 +51,7 @@ export class Html extends Comp {
     }
 
     /* We do two things in here:
-    1) update formula rendering, and
+    1) update formula rendering (MathJax), and
     2) change all "a" tags inside this div to have a target=_blank
     */
     domPreUpdateEvent = (): void => {

@@ -21,6 +21,11 @@ export class Anchor extends Comp {
     }
 
     compRender(): ReactNode {
-        return this.e("a", this.attribs, this.buildChildren() || this.content || this.url);
+        if (this.attribs.dangerouslySetInnerHTML) {
+            return this.e("a", this.attribs);
+        }
+        else {
+            return this.e("a", this.attribs, this.buildChildren() || this.content || this.url);
+        }
     }
 }

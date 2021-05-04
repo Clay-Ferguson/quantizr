@@ -109,8 +109,7 @@ export class FeedView extends AppTab {
         if (state.feedLoading) {
             children.push(new Heading(4, "Loading feed..."));
         }
-
-        if (FeedView.refreshCounter === 0) {
+        else if (FeedView.refreshCounter === 0) {
             // if user has never done a refresh at all yet, do the first one for them automatically.
             if (FeedView.automaticInitialRefresh && state.activeTab === "feedTab") {
                 setTimeout(FeedView.refresh, 100);

@@ -23,7 +23,6 @@ export interface UtilIntf {
     buf2hex(arr: Uint8Array): string;
     hex2buf(str: string): Uint8Array;
     escapeRegExp(s: string): string;
-    unencodeHtml(s: string): string;
     escapeHtml(str: string): string;
     replaceAll(s: string, find: string, replace: string): string;
     contains(s: string, str: string): boolean;
