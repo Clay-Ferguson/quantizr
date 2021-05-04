@@ -36,6 +36,7 @@ import { LayoutRow } from "../widget/LayoutRow";
 import { Selection } from "../widget/Selection";
 import { Span } from "../widget/Span";
 import { TextArea } from "../widget/TextArea";
+import { TextContent } from "../widget/TextContent";
 import { TextField } from "../widget/TextField";
 import { ChangeNodeTypeDlg } from "./ChangeNodeTypeDlg";
 import { ConfirmDlg } from "./ConfirmDlg";
@@ -48,13 +49,20 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
     S = ctx;
 });
 
+declare var webkitSpeechRecognition;
+declare var SpeechRecognition;
+
 export class EditNodeDlg extends DialogBase {
+    static recognition = null;
+    speechActive: boolean = false;
+
     static parentDisplayExpanded: boolean = false;
     static helpExpanded: boolean = false;
     editorHelp: string = null;
     header: Header;
     propertyEditFieldContainer: Div;
     uploadButton: Button;
+    speechButton: Button;
     deleteUploadButton: Button;
     deletePropButton: Button;
 
@@ -353,6 +361,11 @@ export class EditNodeDlg extends DialogBase {
         // let allowShare = true;
 
         let children = [
+            /* note: this isn't working yet because we don't update the whole dialog state
+             so I need to make this TextContent work similar to the button so i can always add it and set state
+             as needed, but the TextContent needs to be smart enough to completely HIDE itself whenever
+             the text in it would be blank. */
+            this.speechActive ? new TextContent("Translating your speech to text, at edit cursor location.") : null,
             new Form(null, [
                 new Div(null, {
                 }, [
@@ -658,9 +671,14 @@ export class EditNodeDlg extends DialogBase {
             new Button("Save", () => {
                 this.saveNode();
                 this.close();
-            }, null, "btn-primary"),
+            }, { title: "Save this node and close editor." }, "btn-primary"),
 
             new Button("Cancel", this.cancelEdit, null, "btn-secondary bigMarginRight"),
+
+            this.speechButton = new Button(this.speechActive ? "Listening..." : "Speech", this.speechRecognition,
+                {
+                    title: "Toggle on/off Speech Recognition to input text"
+                }),
 
             this.uploadButton = (!hasAttachment && allowUpload) ? new Button("Attach", this.upload) : null,
             allowShare ? new Button("Share", this.share) : null,
@@ -1128,6 +1146,78 @@ export class EditNodeDlg extends DialogBase {
         /* todo-1: This was a quick and dirty approach, calling the server for each property to delete. Should
         simply allow the server to accept an array */
         this.getState().selectedProps.forEach(propName => this.deleteProperty(propName), this);
+    }
+
+    speechRecognition = (): void => {
+        if (!EditNodeDlg.recognition) {
+            if (typeof SpeechRecognition === "function") {
+                EditNodeDlg.recognition = new SpeechRecognition();
+            }
+            else if (webkitSpeechRecognition) {
+                // todo-1: fix linter rule to make this cleaner (the first letter upper case is the issue here)
+                let WebkitSpeechRecognition = webkitSpeechRecognition;
+                EditNodeDlg.recognition = new WebkitSpeechRecognition();
+            }
+        }
+
+        if (!EditNodeDlg.recognition) {
+            // todo-0: use MessageDlg not alert.
+            alert("Speech recognition not available in your browser.");
+            return;
+        }
+
+        // This runs when the speech recognition service starts
+        EditNodeDlg.recognition.onstart = () => {
+            // console.log("speech onStart.");
+        };
+
+        EditNodeDlg.recognition.onend = () => {
+            // console.log("speech onEnd.");
+            if (this.speechActive) {
+                setTimeout(() => {
+                    EditNodeDlg.recognition.start();
+                    // try this with 250 instead of 500
+                }, 500);
+            }
+        };
+
+        EditNodeDlg.recognition.onspeechend = () => {
+            // console.log("speech onSpeechEnd.");
+            // EditNodeDlg.recognition.stop();
+        };
+
+        // This runs when the speech recognition service returns result
+        EditNodeDlg.recognition.onresult = (event) => {
+            let transcript = event.results[0][0].transcript;
+            let confidence = event.results[0][0].confidence;
+
+            if (this.contentEditor && transcript) {
+                // Capitalize and put period at end. This may be annoying in the long run but for now i "think"
+                // I will like it? Time will tell.
+                if (transcript.trim().length > 0) {
+                    transcript = transcript.charAt(0).toUpperCase() + transcript.slice(1);
+                    this.contentEditor.insertTextAtCursor(transcript + ". ");
+                }
+                else {
+                    this.contentEditor.insertTextAtCursor(transcript);
+                }
+            }
+            // console.log("recognized: " + transcript);
+        };
+
+        // start recognition
+        if (this.speechActive) {
+            EditNodeDlg.recognition.stop();
+        }
+        else {
+            EditNodeDlg.recognition.start();
+        }
+        this.speechActive = this.speechActive ? false : true;
+        this.speechButton.setText(this.speechActive ? "Listening..." : "Speech");
+
+        if (this.contentEditor) {
+            this.contentEditor.focus();
+        }
     }
 
     cancelEdit = (): void => {
