@@ -327,7 +327,7 @@ export class RssTypeHandler extends TypeBase {
             }
         }
 
-        /* todo-0: Sometimes entry.category can be an Object (not a String) here which will
+        /* todo-1: Sometimes entry.category can be an Object (not a String) here which will
         make React fail badly and render the entire page blank,
         blowing up the hole app, so we need probably validate EVERY
         property on entry with 'instanceof' like we're doing here to protect
