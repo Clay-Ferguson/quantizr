@@ -45,8 +45,10 @@
 
 .menuCardBody {
     padding: 0px;
-    border: 2px solid #444;
+    border-radius: 0 0 $borderRadiusMedium $borderRadiusMedium;
+    border: 6px solid #444;
     margin-left: 15px; // todo-0: make this 0 for mobile
+    padding: 6px;
 }
 
 .menuCard {
@@ -60,19 +62,19 @@
     //background-color: $list-group-bg;
     background-color: transparent;
     border: none;
-    border-radius: 0;
+    border-radius: $borderRadiusMedium $borderRadiusMedium 0 0;
     padding: 10px; 
     margin-left: 15px; // todo-0: make this 0 for mobile
 }
 
 .menuHeading:hover {
     background-color: $menuItemHoverBackgroundColor;
-    border-radius: 0;
+    border-radius: $borderRadiusMedium;
 }
 
 .menuHeading[aria-expanded=true] {
     background-color: $secondary;
-    border-radius: 0;
+    border-radius: $borderRadiusMedium $borderRadiusMedium 0 0;
 }
 
 .mainMenuItemEnabled:hover {
