@@ -1,3 +1,4 @@
+import { SpeechRecogIntf } from "./intf/ SpeechRecogIntf";
 import { AttachmentIntf } from "./intf/AttachmentIntf";
 import { EditIntf } from "./intf/EditIntf";
 import { EncryptionIntf } from "./intf/EncryptionIntf";
@@ -32,4 +33,5 @@ export interface Singletons {
     user: UserIntf;
     view: ViewIntf;
     localDB: LocalDBIntf;
+    speech: SpeechRecogIntf;
 }

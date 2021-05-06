@@ -15,6 +15,7 @@ import { Attachment } from "./Attachment";
 import { Constants as C } from "./Constants";
 import { Edit } from "./Edit";
 import { Encryption } from "./Encryption";
+import { SpeechRecog } from "./SpeechRecog";
 import { LocalDB } from "./LocalDB";
 import { Meta64 } from "./Meta64";
 import { Nav } from "./Nav";
@@ -53,7 +54,8 @@ export class Factory {
             share: new Share(),
             user: new User(),
             view: new View(),
-            localDB: new LocalDB()
+            localDB: new LocalDB(),
+            speech: new SpeechRecog()
         };
 
         PubSub.pub(C.PUBSUB_SingletonsReady, this.S);
