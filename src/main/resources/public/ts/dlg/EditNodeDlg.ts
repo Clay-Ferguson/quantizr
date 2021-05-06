@@ -670,17 +670,17 @@ export class EditNodeDlg extends DialogBase {
 
             new Button("Cancel", this.cancelEdit, null, "btn-secondary bigMarginRight"),
 
-            this.speechButton = new Button(S.speech.speechActive ? "Listening..." : "Speech", this.speechRecognition,
-                {
-                    title: "Toggle on/off Speech Recognition to input text"
-                }),
-
             this.uploadButton = (!hasAttachment && allowUpload) ? new Button("Attach", this.upload) : null,
             allowShare ? new Button("Share", this.share) : null,
 
             new Button("Type", this.openChangeNodeTypeDlg),
             !customProps ? new Button("Encrypt", () => { this.openEncryptionDlg(true); }) : null,
             allowPropertyAdd && numPropsShowing === 0 ? new Button("Props", this.addProperty) : null,
+
+            this.speechButton = new Button(S.speech.speechActive ? "Listening..." : "Speech", this.speechRecognition,
+                {
+                    title: "Toggle on/off Speech Recognition to input text"
+                }),
 
             // show delete button only if we're in a fullscreen viewer (like Calendar view)
             S.meta64.fullscreenViewerActive(this.appState)
