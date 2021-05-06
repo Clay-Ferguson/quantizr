@@ -48,6 +48,7 @@ export class PrefsDlg extends DialogBase {
             userPreferences: {
                 editMode: this.appState.userPreferences.editMode,
                 showMetaData: this.appState.userPreferences.showMetaData,
+                rssHeadlinesOnly: this.appState.userPreferences.rssHeadlinesOnly,
                 maxUploadFileSize: -1
             }
         }, this.savePreferencesResponse);

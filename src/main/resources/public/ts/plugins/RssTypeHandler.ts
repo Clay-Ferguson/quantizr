@@ -195,12 +195,12 @@ export class RssTypeHandler extends TypeBase {
         }, {
             setValue: (checked: boolean): void => {
                 dispatch("Action_SetHealinesFlag", (s: AppState): AppState => {
-                    s.rssHeadlinesOnly = checked;
+                    S.edit.setRssHeadlinesOnly(s, checked);
                     return s;
                 });
             },
             getValue: (): boolean => {
-                return state.rssHeadlinesOnly;
+                return state.userPreferences.rssHeadlinesOnly;
             }
         }));
 
@@ -460,7 +460,7 @@ export class RssTypeHandler extends TypeBase {
             }));
         }
 
-        if (!state.rssHeadlinesOnly) {
+        if (!state.userPreferences.rssHeadlinesOnly) {
             let mediaDescription = entry.mediaGroup ? entry.mediaGroup["media:description"] : null;
 
             let textContent = null;

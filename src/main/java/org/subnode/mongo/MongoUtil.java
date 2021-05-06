@@ -466,7 +466,7 @@ public class MongoUtil {
 		userNode.setProp(NodeProp.EMAIL.s(), email);
 		userNode.setProp(NodeProp.PWD_HASH.s(), getHashOfPassword(password));
 		userNode.setProp(NodeProp.USER_PREF_EDIT_MODE.s(), false);
-		userNode.setProp(NodeProp.USER_PREF_EDIT_MODE.s(), false);
+		userNode.setProp(NodeProp.USER_PREF_RSS_HEADINGS_ONLY.s(), true);
 		userNode.setProp(NodeProp.BIN_TOTAL.s(), 0);
 		userNode.setProp(NodeProp.LAST_LOGIN_TIME.s(), 0);
 		userNode.setProp(NodeProp.BIN_QUOTA.s(), Const.DEFAULT_USER_QUOTA);
@@ -506,6 +506,7 @@ public class MongoUtil {
 
 			adminNode.setProp(NodeProp.USER.s(), PrincipalName.ADMIN.s());
 			adminNode.setProp(NodeProp.USER_PREF_EDIT_MODE.s(), false);
+			adminNode.setProp(NodeProp.USER_PREF_RSS_HEADINGS_ONLY.s(), true);
 			update.save(session, adminNode);
 
 			apiUtil.ensureNodeExists(session, "/" + NodeName.ROOT, NodeName.USER, null, "Users", null, true, null,

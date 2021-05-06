@@ -488,6 +488,7 @@ public class UserManagerService {
 
 	public void setDefaultUserPreferences(SubNode prefsNode) {
 		prefsNode.setProp(NodeProp.USER_PREF_EDIT_MODE.s(), false);
+		prefsNode.setProp(NodeProp.USER_PREF_RSS_HEADINGS_ONLY.s(), true);
 	}
 
 	public SavePublicKeyResponse savePublicKey(final SavePublicKeyRequest req) {
@@ -558,6 +559,9 @@ public class UserManagerService {
 
 			boolean showMetaData = reqUserPrefs.isShowMetaData();
 			prefsNode.setProp(NodeProp.USER_PREF_SHOW_METADATA.s(), showMetaData);
+
+			boolean rssHeadingsOnly = reqUserPrefs.isRssHeadlinesOnly();
+			prefsNode.setProp(NodeProp.USER_PREF_RSS_HEADINGS_ONLY.s(), rssHeadingsOnly);
 
 			/*
 			 * Also update session-scope object, because server-side functions that need
@@ -686,6 +690,7 @@ public class UserManagerService {
 			}
 			userPrefs.setEditMode(prefsNode.getBooleanProp(NodeProp.USER_PREF_EDIT_MODE.s()));
 			userPrefs.setShowMetaData(prefsNode.getBooleanProp(NodeProp.USER_PREF_SHOW_METADATA.s()));
+			userPrefs.setRssHeadlinesOnly(prefsNode.getBooleanProp(NodeProp.USER_PREF_RSS_HEADINGS_ONLY.s()));
 
 			long maxFileSize = prefsNode.getIntProp(NodeProp.BIN_QUOTA.s());
 			if (maxFileSize == 0) {

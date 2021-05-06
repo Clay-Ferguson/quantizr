@@ -8,6 +8,15 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 public class UserPreferences {
 	private boolean editMode;
 	private boolean showMetaData;
+	private boolean rssHeadlinesOnly;
+
+	public boolean isRssHeadlinesOnly() {
+		return rssHeadlinesOnly;
+	}
+
+	public void setRssHeadlinesOnly(boolean rssHeadlinesOnly) {
+		this.rssHeadlinesOnly = rssHeadlinesOnly;
+	}
 
 	@JsonProperty(required = false)
 	private long maxUploadFileSize;

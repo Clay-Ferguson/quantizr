@@ -43,6 +43,7 @@ public enum NodeProp {
     USER_PREF_EDIT_MODE("sn:editMode", "s"), //
     USER_PREF_SHOW_METADATA("sn:showMetaData", "s"), //
     USER_PREF_PASSWORD_RESET_AUTHCODE("sn:pwdResetAuth", "s"), //
+    USER_PREF_RSS_HEADINGS_ONLY("sn:rssHeadingsOnly", "s"), //
     SIGNUP_PENDING("sn:signupPending", "s"), //
 
     EMAIL_CONTENT("sn:content", "s"), //

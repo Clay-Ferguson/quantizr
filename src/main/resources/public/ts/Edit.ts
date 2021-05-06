@@ -264,10 +264,21 @@ export class Edit implements EditIntf {
         // console.log("Key distribution complete.");
     }
 
+    setRssHeadlinesOnly = async (state: AppState, val: boolean): Promise<void> => {
+        state.userPreferences.rssHeadlinesOnly = val;
+
+        // todo-0: this block of code can go in a function...
+        S.meta64.saveUserPreferences(state);
+        dispatch("Action_SetUserPreferences", (s: AppState): AppState => {
+            s.userPreferences = state.userPreferences;
+            return s;
+        });
+    }
+
     toggleEditMode = async (state: AppState): Promise<void> => {
         state.userPreferences.editMode = !state.userPreferences.editMode;
-        S.meta64.saveUserPreferences(state);
 
+        S.meta64.saveUserPreferences(state);
         dispatch("Action_SetUserPreferences", (s: AppState): AppState => {
             s.userPreferences = state.userPreferences;
             return s;
@@ -276,8 +287,8 @@ export class Edit implements EditIntf {
 
     toggleShowMetaData = async (state: AppState): Promise<void> => {
         state.userPreferences.showMetaData = !state.userPreferences.showMetaData;
-        S.meta64.saveUserPreferences(state);
 
+        S.meta64.saveUserPreferences(state);
         dispatch("Action_SetUserPreferences", (s: AppState): AppState => {
             s.userPreferences = state.userPreferences;
             return s;

@@ -613,6 +613,7 @@ export interface NodeInfo {
 export interface UserPreferences {
     editMode: boolean;
     showMetaData: boolean;
+    rssHeadlinesOnly: boolean;
     maxUploadFileSize: number;
 }
 
@@ -678,6 +679,7 @@ export const enum NodeProp {
     USER_PREF_EDIT_MODE = "sn:editMode",
     USER_PREF_SHOW_METADATA = "sn:showMetaData",
     USER_PREF_PASSWORD_RESET_AUTHCODE = "sn:pwdResetAuth",
+    USER_PREF_RSS_HEADINGS_ONLY = "sn:rssHeadingsOnly",
     SIGNUP_PENDING = "sn:signupPending",
     EMAIL_CONTENT = "sn:content",
     EMAIL_RECIP = "sn:recip",
