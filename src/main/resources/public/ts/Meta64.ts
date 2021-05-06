@@ -759,6 +759,10 @@ export class Meta64 implements Meta64Intf {
         S.util.ajax<J.SaveUserPreferencesRequest, J.SaveUserPreferencesResponse>("saveUserPreferences", {
             userPreferences: state.userPreferences
         });
+        dispatch("Action_SetUserPreferences", (s: AppState): AppState => {
+            s.userPreferences = state.userPreferences;
+            return s;
+        });
     }
 
     openSystemFile = (fileName: string) => {
