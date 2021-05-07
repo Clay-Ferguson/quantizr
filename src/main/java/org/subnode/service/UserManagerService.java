@@ -15,6 +15,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.subnode.actpub.ActPubService;
 import org.subnode.config.AppProp;
 import org.subnode.config.NodeName;
 import org.subnode.config.SessionContext;
@@ -931,7 +932,7 @@ public class UserManagerService {
 				}
 			}
 
-			ActPubService.userNamesPendingMessageRefresh.clear();
+			ActPubService.usersPendingRefresh.clear();
 		});
 	}
 

@@ -21,7 +21,6 @@ import org.subnode.mongo.MongoRead;
 import org.subnode.mongo.MongoSession;
 import org.subnode.mongo.RunAsMongoAdminEx;
 import org.subnode.mongo.model.SubNode;
-import org.subnode.service.ActPubService;
 import org.subnode.util.DateUtil;
 import org.subnode.util.ValContainer;
 import org.subnode.util.XString;

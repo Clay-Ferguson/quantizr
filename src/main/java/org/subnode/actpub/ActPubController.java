@@ -16,7 +16,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.subnode.config.AppProp;
-import org.subnode.service.ActPubService;
 
 @Controller
 @CrossOrigin
@@ -59,7 +58,8 @@ public class ActPubController {
 	 * simple redirect from /ap/user/[userName] to /u/[userName]/home
 	 * 
 	 * todo-0: is this documented in the user guide about user being able to have a node named 'home'
-	 * and what it means if they do?
+	 * and what it means if they do? Also need to ensure this ALWAYS works especially in the AP scenarios
+	 * and when user has done nothing themselves to create a 'home' node.
 	 */
 	@RequestMapping(value = "/ap/user/{userName}", method = RequestMethod.GET)
 	public void mastodonGetUser(//

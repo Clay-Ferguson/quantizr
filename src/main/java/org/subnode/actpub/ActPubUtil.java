@@ -42,7 +42,6 @@ import org.subnode.model.client.NodeProp;
 import org.subnode.mongo.MongoRead;
 import org.subnode.mongo.MongoSession;
 import org.subnode.mongo.model.SubNode;
-import org.subnode.service.ActPubService;
 import org.subnode.service.UserManagerService;
 import org.subnode.util.ThreadLocals;
 import org.subnode.util.Util;

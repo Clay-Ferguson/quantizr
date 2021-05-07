@@ -6,8 +6,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.subnode.AppServer;
+import org.subnode.actpub.ActPubService;
 import org.subnode.config.AppProp;
-import org.subnode.service.ActPubService;
 
 @Component
 public class MongoRepository {

@@ -1,4 +1,4 @@
-package org.subnode.service;
+package org.subnode.actpub;
 
 import java.security.PublicKey;
 import java.util.Arrays;
@@ -17,14 +17,6 @@ import org.springframework.http.MediaType;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.subnode.AppController;
-import org.subnode.actpub.AP;
-import org.subnode.actpub.APList;
-import org.subnode.actpub.APObj;
-import org.subnode.actpub.ActPubConstants;
-import org.subnode.actpub.ActPubFactory;
-import org.subnode.actpub.ActPubFollowing;
-import org.subnode.actpub.ActPubOutbox;
-import org.subnode.actpub.ActPubUtil;
 import org.subnode.config.AppProp;
 import org.subnode.config.NodeName;
 import org.subnode.model.client.NodeProp;
@@ -40,6 +32,10 @@ import org.subnode.mongo.MongoUtil;
 import org.subnode.mongo.RunAsMongoAdminEx;
 import org.subnode.mongo.model.AccessControl;
 import org.subnode.mongo.model.SubNode;
+import org.subnode.service.AclService;
+import org.subnode.service.AttachmentService;
+import org.subnode.service.NodeSearchService;
+import org.subnode.service.UserFeedService;
 import org.subnode.util.DateUtil;
 import org.subnode.util.EnglishDictionary;
 import org.subnode.util.SubNodeUtil;
@@ -106,15 +102,14 @@ public class ActPubService {
     private ActPubOutbox apOutbox;
 
     @Autowired
-	@Qualifier("threadPoolTaskExecutor")
-	private Executor executor;
+    @Qualifier("threadPoolTaskExecutor")
+    private Executor executor;
 
     /*
      * Holds users for which messages need refreshing (false value) but sets value to 'true' once
      * completed
      */
-    public static final ConcurrentHashMap<String, Boolean> userNamesPendingMessageRefresh =
-            new ConcurrentHashMap<>();
+    public static final ConcurrentHashMap<String, Boolean> usersPendingRefresh = new ConcurrentHashMap<>();
 
     /* Cache Actor objects by UserName in memory only for now */
     public static final ConcurrentHashMap<String, APObj> actorCacheByUserName = new ConcurrentHashMap<>();
@@ -459,8 +454,8 @@ public class ActPubService {
             SubNode actorAccountNode = loadForeignUserByActorUrl(session, actorUrl);
             if (actorAccountNode != null) {
                 String userName = actorAccountNode.getStrProp(NodeProp.USER.s());
-                SubNode postsNode =
-                        read.getUserNodeByType(session, userName, actorAccountNode, "### Posts", NodeType.ACT_PUB_POSTS.s(), null);
+                SubNode postsNode = read.getUserNodeByType(session, userName, actorAccountNode, "### Posts",
+                        NodeType.ACT_PUB_POSTS.s(), null);
                 saveNote(session, actorAccountNode, postsNode, obj, false, false);
             }
         }
@@ -529,8 +524,8 @@ public class ActPubService {
         if (toAccountNode == null) {
             toAccountNode = loadForeignUserByActorUrl(session, objAttributedTo);
         }
-        SubNode newNode =
-                create.createNode(session, parentNode, null, null, 0L, CreateNodeLocation.FIRST, null, toAccountNode.getId(), true);
+        SubNode newNode = create.createNode(session, parentNode, null, null, 0L, CreateNodeLocation.FIRST, null,
+                toAccountNode.getId(), true);
 
         // todo-1: need a new node prop type that is just 'html' and tells us to render
         // content as raw html if set, or for now
@@ -831,7 +826,7 @@ public class ActPubService {
     public void queueUserForRefresh(String apUserName, boolean force) {
 
         // if not on production we don't run ActivityPub stuff. (todo-1: need to make it optional)
-        if (!appProp.getProfileName().equals("prod")) {
+        if (!appProp.isActPubEnabled()) {
             return;
         }
 
@@ -840,12 +835,12 @@ public class ActPubService {
 
         if (!force) {
             // if already added, don't add again.
-            if (userNamesPendingMessageRefresh.contains(apUserName))
+            if (usersPendingRefresh.contains(apUserName))
                 return;
         }
 
         // add as 'false' meaning the refresh is not yet done
-        userNamesPendingMessageRefresh.put(apUserName, false);
+        usersPendingRefresh.put(apUserName, false);
     }
 
     /* every 30 minutes ping all the outboxes */
@@ -854,10 +849,13 @@ public class ActPubService {
         refreshForeignUsers();
     }
 
+    /**
+     * Returns number of userNamesPendingMessageRefresh that map to 'false' values
+     */
     public static int queuedUserCount() {
         int count = 0;
-        for (String apUserName : userNamesPendingMessageRefresh.keySet()) {
-            Boolean done = userNamesPendingMessageRefresh.get(apUserName);
+        for (String apUserName : usersPendingRefresh.keySet()) {
+            Boolean done = usersPendingRefresh.get(apUserName);
             if (!done) {
                 count++;
             }
@@ -868,31 +866,33 @@ public class ActPubService {
     /* Run every few seconds */
     @Scheduled(fixedDelay = 3 * 1000)
     public void messageRefresh() {
-        if (!appProp.getProfileName().equals("prod"))
+        if (!appProp.isActPubEnabled())
             return;
 
         try {
-            for (String apUserName : userNamesPendingMessageRefresh.keySet()) {
-                Boolean done = userNamesPendingMessageRefresh.get(apUserName);
+            for (String apUserName : usersPendingRefresh.keySet()) {
+                Boolean done = usersPendingRefresh.get(apUserName);
                 if (done)
                     continue;
 
                 // flag as done.
-                userNamesPendingMessageRefresh.put(apUserName, true);
+                usersPendingRefresh.put(apUserName, true);
 
                 final String _apUserName = apUserName;
                 adminRunner.run(session -> {
                     // log.debug("Reload user outbox: " + _apUserName);
                     SubNode userNode = loadForeignUserByUserName(session, _apUserName);
-                    if (userNode != null) {
-                        String actorUrl = userNode.getStrProp(NodeProp.ACT_PUB_ACTOR_URL.s());
-                        APObj actor = apUtil.getActorByUrl(actorUrl);
-                        if (actor != null) {
-                            apOutbox.refreshOutboxFromForeignServer(session, actor, userNode, _apUserName);
-                        } else {
-                            log.debug("Unable to get cached actor from url: " + actorUrl);
-                        }
+                    if (userNode == null)
+                        return null;
+
+                    String actorUrl = userNode.getStrProp(NodeProp.ACT_PUB_ACTOR_URL.s());
+                    APObj actor = apUtil.getActorByUrl(actorUrl);
+                    if (actor != null) {
+                        apOutbox.refreshOutboxFromForeignServer(session, actor, userNode, _apUserName);
+                    } else {
+                        log.debug("Unable to get cached actor from url: " + actorUrl);
                     }
+
                     return null;
                 });
             }
@@ -903,7 +903,7 @@ public class ActPubService {
     }
 
     public void refreshForeignUsers() {
-        if (!appProp.getProfileName().equals("prod"))
+        if (!appProp.isActPubEnabled())
             return;
 
         lastRefreshForeignUsersCycleTime = DateUtil.getFormattedDate(new Date().getTime());

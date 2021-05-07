@@ -16,7 +16,6 @@ import org.subnode.mongo.MongoDelete;
 import org.subnode.mongo.MongoRead;
 import org.subnode.mongo.RunAsMongoAdminEx;
 import org.subnode.mongo.model.SubNode;
-import org.subnode.service.ActPubService;
 import org.subnode.service.NodeEditService;
 import org.subnode.util.ThreadLocals;
 

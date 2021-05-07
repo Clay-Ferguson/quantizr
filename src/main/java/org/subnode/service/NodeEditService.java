@@ -12,6 +12,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.subnode.actpub.ActPubFollowing;
+import org.subnode.actpub.ActPubService;
 import org.subnode.exception.base.RuntimeEx;
 import org.subnode.model.IPFSObjectStat;
 import org.subnode.model.NodeInfo;

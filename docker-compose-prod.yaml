@@ -98,6 +98,7 @@ services:
             reSaveAll: "false"
             allowFileSystemSearch: "false" 
             forceIndexRebuild: "false"
+            actPubEnabled: "true"
             spring.http.multipart.max-file-size: "200MB" 
             spring.http.multipart.max-request-size: "200MB" 
             spring.servlet.multipart.max-file-size: "200MB"

@@ -14,6 +14,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.subnode.actpub.ActPubService;
 import org.subnode.config.AppFilter;
 import org.subnode.config.AppProp;
 import org.subnode.config.AppSessionListener;

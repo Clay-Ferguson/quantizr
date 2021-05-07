@@ -12,11 +12,11 @@ import org.springframework.data.mongodb.core.mapping.event.AfterLoadEvent;
 import org.springframework.data.mongodb.core.mapping.event.AfterSaveEvent;
 import org.springframework.data.mongodb.core.mapping.event.BeforeDeleteEvent;
 import org.springframework.data.mongodb.core.mapping.event.BeforeSaveEvent;
+import org.subnode.actpub.ActPubService;
 import org.subnode.config.NodeName;
 import org.subnode.exception.base.RuntimeEx;
 import org.subnode.model.client.NodeProp;
 import org.subnode.mongo.model.SubNode;
-import org.subnode.service.ActPubService;
 import org.subnode.util.XString;
 
 public class MongoEventListener extends AbstractMongoEventListener<SubNode> {

@@ -178,6 +178,10 @@ public class AppProp /* implements EnvironmentAware */ {
 		return env.getProperty("profileName");
 	}
 
+	public boolean isActPubEnabled() {
+		return "true".equals(env.getProperty("actPubEnabled"));
+	}
+
 	public String getRssAggregatePreCacheNodeId() {
 		return env.getProperty("rssAggregatePreCacheNodeId");
 	}
