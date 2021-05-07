@@ -16,28 +16,14 @@ public class MongoThreadLocal {
 	private static int MAX_CACHE_SIZE = 100;
 
 	/*
-	 * This is where we can accumulate the set of nodes that will all be updated
-	 * after processing is done using the api.sessionSave() call. This is not an
-	 * ACID commit, but a helpful way to not have to worry about doing SAVES on
-	 * every object that is touched during the processing of a thread/request. This
-	 * is because we can use a pattern that wraps the 'api.sessionSave()' in a
-	 * finally block that wraps all calls and use that to make sure all updates to any node are
-	 * saved.
-	 * 
-	 * todo-1: consider repurposing dirtyNodes to only *catch* bugs by making it
-	 * print which nodes were modified but never saved, and call this in the web
-	 * filter on the way out of each request, and then change the code style back to
-	 * where it only writes WHEN 'save' is called on each node.
-	 * 
-	 * and also, we can use this map to detect WHEN some query is done that reads a
-	 * node in a query such that the node read is actually in the 'dirtyNodes' map
-	 * (of same session) meaning there will then be TWO copies of the node in memory
-	 * and could be a problem because whichever one is saved last will 'win'
-	 * (overwrite the other)
+	 * This is where we can accumulate the set of nodes that will all be updated after processing is
+	 * done using the api.sessionSave() call. This is a way to not have to worry about doing SAVES on
+	 * every object that is touched during the processing of a thread/request.
 	 */
 	private static final ThreadLocal<HashMap<ObjectId, SubNode>> dirtyNodes = new ThreadLocal<HashMap<ObjectId, SubNode>>();
 
-	private static final ThreadLocal<LinkedHashMap<String, SubNode>> nodesByPath = new ThreadLocal<LinkedHashMap<String, SubNode>>();
+	private static final ThreadLocal<LinkedHashMap<String, SubNode>> nodesByPath =
+			new ThreadLocal<LinkedHashMap<String, SubNode>>();
 
 	public static void removeAll() {
 		// log.debug("Clear Dirty Nodes.");
@@ -49,12 +35,6 @@ public class MongoThreadLocal {
 		getDirtyNodes().clear();
 	}
 
-	/*
-	 * NOTE: It's not an ineffecincy to always create the map any time it's
-	 * accessed, even though it could have been left empty because this is a
-	 * thread-local storage and so this map is reused over and over by all different
-	 * requests and different users, so we only ever create one per thread
-	 */
 	public static HashMap<ObjectId, SubNode> getDirtyNodes() {
 		if (dirtyNodes.get() == null) {
 			dirtyNodes.set(new HashMap<ObjectId, SubNode>());
@@ -94,8 +74,8 @@ public class MongoThreadLocal {
 	}
 
 	/*
-	 * Sets 'node' to dirty thus guaranteeing any changes made to it, even if made
-	 * later on in the request, are guaranteed to be written out
+	 * Sets 'node' to dirty thus guaranteeing any changes made to it, even if made later on in the
+	 * request, are guaranteed to be written out
 	 */
 	public static void dirty(SubNode node) {
 		if (node.getId() == null) {
@@ -105,17 +85,15 @@ public class MongoThreadLocal {
 		SubNode nodeFound = getDirtyNodes().get(node.getId());
 
 		/*
-		 * If we are setting this node to dirty, but we already see another copy of the
-		 * same nodeId in memory, this is a problem and will mean whichever node
-		 * happens to be saved 'last' will overwrite, so this *may* result in data loss.
+		 * If we are setting this node to dirty, but we already see another copy of the same nodeId in
+		 * memory, this is a problem and will mean whichever node happens to be saved 'last' will overwrite,
+		 * so this *may* result in data loss.
 		 * 
-		 * todo-1: Should we find a way to be sure this never happens? This is basically
-		 * another way of saying with non-ACID databases transactions don't really
-		 * 'work'
+		 * todo-1: Should we find a way to be sure this never happens? This is basically another way of
+		 * saying with non-ACID databases transactions don't really 'work'
 		 */
 		if (nodeFound != null && nodeFound.hashCode() != node.hashCode()) {
-			log.debug("*************** ERROR: multiple instances of objectId " + node.getId().toHexString()
-					+ " are in memory.");
+			log.debug("*************** ERROR: multiple instances of objectId " + node.getId().toHexString() + " are in memory.");
 			return;
 		}
 

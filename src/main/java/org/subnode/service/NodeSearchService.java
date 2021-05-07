@@ -320,7 +320,7 @@ public class NodeSearchService {
 			query.with(Sort.by(Sort.Direction.DESC, SubNode.FIELD_MODIFY_TIME));
 			query.limit(TRENDING_LIMIT);
 
-			iter = ops.find(query, SubNode.class);
+			iter = util.find(query);
 		}
 		/*
 		 * Otherwise this is not a Feed Tab query but just an arbitrary node stats request, like a user

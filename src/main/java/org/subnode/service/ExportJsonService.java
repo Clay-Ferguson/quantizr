@@ -94,7 +94,7 @@ public class ExportJsonService {
 			Criteria criteria = Criteria.where(SubNode.FIELD_PATH).regex(util.regexRecursiveChildrenOfPath(pathPrefix));
 			query.addCriteria(criteria);
 
-			Iterable<SubNode> iter = ops.find(query, SubNode.class);
+			Iterable<SubNode> iter = util.find(query);
 
 			BufferedOutputStream os = null;
 			try {

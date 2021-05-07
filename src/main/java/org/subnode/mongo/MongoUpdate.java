@@ -158,7 +158,7 @@ public class MongoUpdate {
 		// not currently used
 		// Query query = new Query();
 		// query.addCriteria(Criteria.where(SubNode.FIELD_TYPE).is("u"));
-		// Iterable<SubNode> iter = ops.find(query, SubNode.class);
+		// Iterable<SubNode> iter = util.find(query);
 		// for (SubNode n : iter) {
 		// }
 	}

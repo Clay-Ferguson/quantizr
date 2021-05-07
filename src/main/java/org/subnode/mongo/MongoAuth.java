@@ -468,7 +468,7 @@ public class MongoAuth {
 		}
 
 		query.limit(limit);
-		return ops.find(query, SubNode.class);
+		return util.find(query);
 	}
 
 	/*
@@ -528,7 +528,7 @@ public class MongoAuth {
 			query.with(sort);
 		}
 		query.limit(limit);
-		return ops.find(query, SubNode.class);
+		return util.find(query);
 	}
 
 	/* Finds nodes that have any sharing on them at all */

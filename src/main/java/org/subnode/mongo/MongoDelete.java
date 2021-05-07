@@ -162,7 +162,7 @@ public class MongoDelete {
 		Query query = new Query();
 
 		/* Scan every node in the database and store it's path hash in the set */
-		Iterable<SubNode> nodes = ops.find(query, SubNode.class);
+		Iterable<SubNode> nodes = util.find(query);
 		for (SubNode node : nodes) {
 			/*
 			 * Theoretically the node.getPathHash() should already contain this hash, but to
@@ -187,7 +187,7 @@ public class MongoDelete {
 			 * Now scan every node again and any PARENT not in the set means that parent
 			 * doesn't exist and so the node is an orphan and can be deleted.
 			 */
-			nodes = ops.find(query, SubNode.class);
+			nodes = util.find(query);
 			int deleteCount = 0;
 			for (SubNode node : nodes) {
 				// ignore the root node and any of it's children.

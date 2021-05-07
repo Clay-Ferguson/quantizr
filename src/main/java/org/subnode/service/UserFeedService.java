@@ -266,7 +266,7 @@ public class UserFeedService {
 			query.skip(MAX_FEED_ITEMS * req.getPage());
 		}
 
-		Iterable<SubNode> iter = ops.find(query, SubNode.class);
+		Iterable<SubNode> iter = util.find(query);
 		SubNode lastNode = null;
 
 		for (SubNode node : iter) {
