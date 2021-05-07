@@ -74,6 +74,9 @@ public class SystemService {
 	@Autowired
 	private AppProp appProp;
 
+	@Autowired
+	private ActPubService apService;
+
 	public String rebuildIndexes() {
 		if (!ThreadLocals.getSessionContext().isAdmin()) {
 			throw ExUtil.wrapEx("admin only function.");
@@ -172,7 +175,7 @@ public class SystemService {
 		sb.append("Attachment Count: " + attachmentService.getGridItemCount() + "\n");
 		sb.append(userManagerService.getUserAccountsReport(null));
 
-		sb.append(ActPubService.getStatsReport());
+		sb.append(apService.getStatsReport());
 
 		if (!StringUtils.isEmpty(appProp.getIPFSApiHostAndPort())) {
 			sb.append(ipfsService.getRepoStat());

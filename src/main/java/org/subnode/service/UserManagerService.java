@@ -15,7 +15,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import org.subnode.actpub.ActPubService;
+import org.subnode.actpub.ActPubCache;
 import org.subnode.config.AppProp;
 import org.subnode.config.NodeName;
 import org.subnode.config.SessionContext;
@@ -108,6 +108,9 @@ public class UserManagerService {
 
 	@Autowired
 	private NodeEditService edit;
+
+	@Autowired
+	private ActPubCache apCache;
 
 	/* Private keys of each user by user name as key */
 	public static final ConcurrentHashMap<String, String> privateKeysByUserName = new ConcurrentHashMap<>();
@@ -932,7 +935,7 @@ public class UserManagerService {
 				}
 			}
 
-			ActPubService.usersPendingRefresh.clear();
+			apCache.usersPendingRefresh.clear();
 		});
 	}
 

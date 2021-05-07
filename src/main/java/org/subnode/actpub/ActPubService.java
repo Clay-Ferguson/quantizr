@@ -5,7 +5,6 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executor;
 import javax.servlet.http.HttpServletRequest;
 import org.bson.types.ObjectId;
@@ -72,6 +71,9 @@ public class ActPubService {
     private ActPubFactory apFactory;
 
     @Autowired
+    private ActPubCache apCache;
+
+    @Autowired
     private EnglishDictionary englishDictionary;
 
     @Autowired
@@ -106,27 +108,6 @@ public class ActPubService {
     private Executor executor;
 
     /*
-     * Holds users for which messages need refreshing (false value) but sets value to 'true' once
-     * completed
-     */
-    public static final ConcurrentHashMap<String, Boolean> usersPendingRefresh = new ConcurrentHashMap<>();
-
-    /* Cache Actor objects by UserName in memory only for now */
-    public static final ConcurrentHashMap<String, APObj> actorCacheByUserName = new ConcurrentHashMap<>();
-
-    /* Cache of user account node Ids by actor url */
-    private static final ConcurrentHashMap<String, String> acctIdByActorUrl = new ConcurrentHashMap<>();
-
-    /* Account Node by actor Url */
-    private static final ConcurrentHashMap<String, SubNode> accountNodesByActorUrl = new ConcurrentHashMap<>();
-
-    /* Account Node by User Name */
-    private static final ConcurrentHashMap<String, SubNode> accountNodesByUserName = new ConcurrentHashMap<>();
-
-    /* Account Node by node ID */
-    private static final ConcurrentHashMap<String, SubNode> accountNodesById = new ConcurrentHashMap<>();
-
-    /*
      * When 'node' has been created under 'parent' (by the sessionContext user) this will send a
      * notification to foreign servers.
      */
@@ -146,9 +127,9 @@ public class ActPubService {
                         privateMessage = false;
                     } else {
                         // k will be a nodeId of an account node here.
-                        SubNode accountNode = accountNodesById.get(k);
+                        SubNode accountNode = apCache.accountNodesById.get(k);
                         if (accountNode == null) {
-                            accountNodesById.put(k, accountNode = read.getNode(session, k));
+                            apCache.accountNodesById.put(k, accountNode = read.getNode(session, k));
                         }
 
                         if (accountNode != null) {
@@ -244,7 +225,7 @@ public class ActPubService {
      */
     public SubNode loadForeignUserByUserName(MongoSession session, String apUserName) {
         // return from cache if we already have the value cached
-        SubNode acctNode = accountNodesByUserName.get(apUserName);
+        SubNode acctNode = apCache.accountNodesByUserName.get(apUserName);
         if (acctNode != null) {
             return acctNode;
         }
@@ -255,12 +236,12 @@ public class ActPubService {
         }
 
         /* First try to use the actor from cache, if we have it cached */
-        Object actor = actorCacheByUserName.get(apUserName);
+        Object actor = apCache.actorCacheByUserName.get(apUserName);
 
         // if we have actor object skip the step of getting it and import using it.
         if (actor != null) {
             acctNode = importActor(session, actor);
-            accountNodesByUserName.put(apUserName, acctNode);
+            apCache.accountNodesByUserName.put(apUserName, acctNode);
             return acctNode;
         }
 
@@ -270,7 +251,7 @@ public class ActPubService {
         String actorUrl = apUtil.getActorUrlFromWebFingerObj(webFinger);
         if (actorUrl != null) {
             acctNode = loadForeignUserByActorUrl(session, actorUrl);
-            accountNodesByUserName.put(apUserName, acctNode);
+            apCache.accountNodesByUserName.put(apUserName, acctNode);
             return acctNode;
         }
         return null;
@@ -278,7 +259,7 @@ public class ActPubService {
 
     public SubNode loadForeignUserByActorUrl(MongoSession session, String actorUrl) {
         /* return node from cache if already cached */
-        SubNode acctNode = accountNodesByActorUrl.get(actorUrl);
+        SubNode acctNode = apCache.accountNodesByActorUrl.get(actorUrl);
         if (acctNode != null) {
             return acctNode;
         }
@@ -287,7 +268,7 @@ public class ActPubService {
 
         // if webfinger was successful, ensure the user is imported into our system.
         if (actor != null) {
-            accountNodesByActorUrl.put(actorUrl, acctNode = importActor(session, actor));
+            apCache.accountNodesByActorUrl.put(actorUrl, acctNode = importActor(session, actor));
         }
         return acctNode;
     }
@@ -344,7 +325,7 @@ public class ActPubService {
 
         /* cache the account node id for this user by the actor url */
         String selfRefId = AP.str(actor, "id"); // actor url of 'actor' object, is the same as the 'id'
-        acctIdByActorUrl.put(selfRefId, userNode.getId().toHexString());
+        apCache.acctIdByActorUrl.put(selfRefId, userNode.getId().toHexString());
         return userNode;
     }
 
@@ -658,7 +639,7 @@ public class ActPubService {
         }
 
         /* try to get account id from cache first */
-        String acctId = acctIdByActorUrl.get(actorUrl);
+        String acctId = apCache.acctIdByActorUrl.get(actorUrl);
 
         /*
          * if acctId not found in cache load foreign user (will cause it to also get cached)
@@ -835,12 +816,12 @@ public class ActPubService {
 
         if (!force) {
             // if already added, don't add again.
-            if (usersPendingRefresh.contains(apUserName))
+            if (apCache.usersPendingRefresh.contains(apUserName))
                 return;
         }
 
         // add as 'false' meaning the refresh is not yet done
-        usersPendingRefresh.put(apUserName, false);
+        apCache.usersPendingRefresh.put(apUserName, false);
     }
 
     /* every 30 minutes ping all the outboxes */
@@ -852,10 +833,10 @@ public class ActPubService {
     /**
      * Returns number of userNamesPendingMessageRefresh that map to 'false' values
      */
-    public static int queuedUserCount() {
+    public int queuedUserCount() {
         int count = 0;
-        for (String apUserName : usersPendingRefresh.keySet()) {
-            Boolean done = usersPendingRefresh.get(apUserName);
+        for (String apUserName : apCache.usersPendingRefresh.keySet()) {
+            Boolean done = apCache.usersPendingRefresh.get(apUserName);
             if (!done) {
                 count++;
             }
@@ -870,13 +851,13 @@ public class ActPubService {
             return;
 
         try {
-            for (String apUserName : usersPendingRefresh.keySet()) {
-                Boolean done = usersPendingRefresh.get(apUserName);
+            for (String apUserName : apCache.usersPendingRefresh.keySet()) {
+                Boolean done = apCache.usersPendingRefresh.get(apUserName);
                 if (done)
                     continue;
 
                 // flag as done.
-                usersPendingRefresh.put(apUserName, true);
+                apCache.usersPendingRefresh.put(apUserName, true);
 
                 final String _apUserName = apUserName;
                 adminRunner.run(session -> {
@@ -934,7 +915,7 @@ public class ActPubService {
         });
     }
 
-    public static String getStatsReport() {
+    public String getStatsReport() {
         StringBuilder sb = new StringBuilder();
         sb.append("\nActivityPub Stats:\n");
         sb.append("Users Currently Queued (for refresh): " + queuedUserCount() + "\n");

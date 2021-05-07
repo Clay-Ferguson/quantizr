@@ -20,6 +20,9 @@ public class ActPubFactory {
 	@Autowired
 	public ActPubUtil apUtil;
 
+	@Autowired
+	public ActPubCache apCache;
+
 	private static final Logger log = LoggerFactory.getLogger(ActPubFactory.class);
 
 	public APObj newCreateMessageForNote(List<String> toUserNames, String fromActor, String inReplyTo, String content,
@@ -79,7 +82,7 @@ public class ActPubFactory {
 			 * public posts should always cc the followers of the person doing the post (the actor pointed to by
 			 * attributedTo)
 			 */
-			APObj actor = ActPubUtil.actorCacheByUrl.get(attributedTo);
+			APObj actor = apCache.actorCacheByUrl.get(attributedTo);
 			if (actor != null) {
 				ccList.add(AP.str(actor, "followers"));
 			}
