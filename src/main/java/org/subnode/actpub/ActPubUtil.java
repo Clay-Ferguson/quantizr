@@ -251,7 +251,7 @@ public class ActPubUtil {
         if (url == null)
             return null;
 
-        APObj actor = apCache.actorCacheByUrl.get(url);
+        APObj actor = apCache.actorsByUrl.get(url);
         if (actor != null) {
             return actor;
         }
@@ -267,9 +267,9 @@ public class ActPubUtil {
         if (actor == null)
             return;
 
-        apCache.actorCacheByUrl.put(url, actor);
+        apCache.actorsByUrl.put(url, actor);
         String userName = getLongUserNameFromActor(actor);
-        apCache.actorCacheByUserName.put(userName, actor);
+        apCache.actorsByUserName.put(userName, actor);
     }
 
     /*

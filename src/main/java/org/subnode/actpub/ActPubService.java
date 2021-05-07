@@ -127,9 +127,9 @@ public class ActPubService {
                         privateMessage = false;
                     } else {
                         // k will be a nodeId of an account node here.
-                        SubNode accountNode = apCache.accountNodesById.get(k);
+                        SubNode accountNode = apCache.acctNodesById.get(k);
                         if (accountNode == null) {
-                            apCache.accountNodesById.put(k, accountNode = read.getNode(session, k));
+                            apCache.acctNodesById.put(k, accountNode = read.getNode(session, k));
                         }
 
                         if (accountNode != null) {
@@ -225,7 +225,7 @@ public class ActPubService {
      */
     public SubNode loadForeignUserByUserName(MongoSession session, String apUserName) {
         // return from cache if we already have the value cached
-        SubNode acctNode = apCache.accountNodesByUserName.get(apUserName);
+        SubNode acctNode = apCache.acctNodesByUserName.get(apUserName);
         if (acctNode != null) {
             return acctNode;
         }
@@ -236,12 +236,12 @@ public class ActPubService {
         }
 
         /* First try to use the actor from cache, if we have it cached */
-        Object actor = apCache.actorCacheByUserName.get(apUserName);
+        Object actor = apCache.actorsByUserName.get(apUserName);
 
         // if we have actor object skip the step of getting it and import using it.
         if (actor != null) {
             acctNode = importActor(session, actor);
-            apCache.accountNodesByUserName.put(apUserName, acctNode);
+            apCache.acctNodesByUserName.put(apUserName, acctNode);
             return acctNode;
         }
 
@@ -251,7 +251,7 @@ public class ActPubService {
         String actorUrl = apUtil.getActorUrlFromWebFingerObj(webFinger);
         if (actorUrl != null) {
             acctNode = loadForeignUserByActorUrl(session, actorUrl);
-            apCache.accountNodesByUserName.put(apUserName, acctNode);
+            apCache.acctNodesByUserName.put(apUserName, acctNode);
             return acctNode;
         }
         return null;
@@ -259,7 +259,7 @@ public class ActPubService {
 
     public SubNode loadForeignUserByActorUrl(MongoSession session, String actorUrl) {
         /* return node from cache if already cached */
-        SubNode acctNode = apCache.accountNodesByActorUrl.get(actorUrl);
+        SubNode acctNode = apCache.acctNodesByActorUrl.get(actorUrl);
         if (acctNode != null) {
             return acctNode;
         }
@@ -268,7 +268,7 @@ public class ActPubService {
 
         // if webfinger was successful, ensure the user is imported into our system.
         if (actor != null) {
-            apCache.accountNodesByActorUrl.put(actorUrl, acctNode = importActor(session, actor));
+            apCache.acctNodesByActorUrl.put(actorUrl, acctNode = importActor(session, actor));
         }
         return acctNode;
     }

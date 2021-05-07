@@ -82,7 +82,7 @@ public class ActPubFactory {
 			 * public posts should always cc the followers of the person doing the post (the actor pointed to by
 			 * attributedTo)
 			 */
-			APObj actor = apCache.actorCacheByUrl.get(attributedTo);
+			APObj actor = apCache.actorsByUrl.get(attributedTo);
 			if (actor != null) {
 				ccList.add(AP.str(actor, "followers"));
 			}

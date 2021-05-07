@@ -13,20 +13,20 @@ public class ActPubCache {
     public final ConcurrentHashMap<String, Boolean> usersPendingRefresh = new ConcurrentHashMap<>();
 
     /* Cache Actor objects by UserName in memory only for now */
-    public final ConcurrentHashMap<String, APObj> actorCacheByUserName = new ConcurrentHashMap<>();
+    public final ConcurrentHashMap<String, APObj> actorsByUserName = new ConcurrentHashMap<>();
 
     /* Cache Actor objects by URL in memory only for now */
-    public final ConcurrentHashMap<String, APObj> actorCacheByUrl = new ConcurrentHashMap<>();
+    public final ConcurrentHashMap<String, APObj> actorsByUrl = new ConcurrentHashMap<>();
 
     /* Cache of user account node Ids by actor url */
     public final ConcurrentHashMap<String, String> acctIdByActorUrl = new ConcurrentHashMap<>();
 
     /* Account Node by actor Url */
-    public final ConcurrentHashMap<String, SubNode> accountNodesByActorUrl = new ConcurrentHashMap<>();
+    public final ConcurrentHashMap<String, SubNode> acctNodesByActorUrl = new ConcurrentHashMap<>();
 
     /* Account Node by User Name */
-    public final ConcurrentHashMap<String, SubNode> accountNodesByUserName = new ConcurrentHashMap<>();
+    public final ConcurrentHashMap<String, SubNode> acctNodesByUserName = new ConcurrentHashMap<>();
 
     /* Account Node by node ID */
-    public final ConcurrentHashMap<String, SubNode> accountNodesById = new ConcurrentHashMap<>();
+    public final ConcurrentHashMap<String, SubNode> acctNodesById = new ConcurrentHashMap<>();
 }
