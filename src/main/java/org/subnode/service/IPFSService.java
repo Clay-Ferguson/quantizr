@@ -562,9 +562,6 @@ public class IPFSService {
                     update.save(session, child);
                 }
             }
-
-            // todo-0: why doesn't this work INSTEAD of 'update.saves' above?
-            // update.saveSession(session);
         }
     }
 

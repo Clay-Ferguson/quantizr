@@ -46,7 +46,9 @@
 .menuCardBody {
     padding: 0px;
     border-radius: 0 0 $borderRadiusMedium $borderRadiusMedium;
-    border: 6px solid #444;
+    border-left: 6px solid #444;
+    border-right: 6px solid #444;
+    border-bottom: 6px solid #444;
     margin-left: 15px; // todo-0: make this 0 for mobile
     padding: 6px;
 }
