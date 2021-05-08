@@ -51,7 +51,7 @@ public class ActPubOutbox {
 	@Qualifier("threadPoolTaskExecutor")
 	private Executor executor;
 
-        /*
+    /**
      * Caller can pass in userNode if it's already available, but if not just pass null and the
      * apUserName will be used to look up the userNode.
      */
@@ -207,7 +207,7 @@ public class ActPubOutbox {
                 .put("totalItems", items.size());
     }
 
-        /*
+    /*
      * todo-1: Security isn't implemented on this call yet, but the only caller to this is passing
      * "public" as 'sharedTo' so we are safe to implement this outbox currently as only able to send
      * back public info.

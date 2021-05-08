@@ -46,7 +46,6 @@ public class AP {
             }
         }
         throw new RuntimeException("unhandled type on bool(): " + (obj != null ? obj.getClass().getName() : "null"));
-
     }
 
     public static Date date(Object obj, String prop) {

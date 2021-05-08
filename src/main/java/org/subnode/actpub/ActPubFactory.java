@@ -25,6 +25,9 @@ public class ActPubFactory {
 
 	private static final Logger log = LoggerFactory.getLogger(ActPubFactory.class);
 
+	/**
+	 * Creates a new 'note' message
+	 */
 	public APObj newCreateMessageForNote(List<String> toUserNames, String fromActor, String inReplyTo, String content,
 			String noteUrl, boolean privateMessage, APList attachments) {
 		ZonedDateTime now = ZonedDateTime.now(ZoneOffset.UTC);
@@ -34,6 +37,9 @@ public class ActPubFactory {
 				toUserNames, noteUrl, now);
 	}
 
+	/**
+	 * Creates a new 'note' object
+	 */
 	public APObj newNoteObject(List<String> toUserNames, String attributedTo, String inReplyTo, String content, String noteUrl,
 			ZonedDateTime now, boolean privateMessage, APList attachments) {
 		APObj ret = new APObj();
@@ -107,7 +113,7 @@ public class ActPubFactory {
 				.put("language", "en") //
 
 				/*
-				 * todo-1: I put this here very early on during mastodon testing. Need to see if we can get rid of
+				 * todo-0: I put this here very early on during mastodon testing. Need to see if we can get rid of
 				 * this, and still be 'compatible' with Mastodon.
 				 */
 				.put("toot", "http://joinmastodon.org/ns#");

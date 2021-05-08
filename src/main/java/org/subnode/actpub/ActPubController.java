@@ -37,10 +37,9 @@ public class ActPubController {
 	@Autowired
 	private AppProp appProp;
 
-	// =====================================
-	// WEBFINGER & ACTOR
-	// =====================================
-
+	/**
+	 * WebFinger GET
+	 */
 	@RequestMapping(value = ActPubConstants.PATH_WEBFINGER, method = RequestMethod.GET,
 			produces = ActPubConstants.CONTENT_TYPE_JSON_JRD)
 	public @ResponseBody Object webFinger(//
@@ -51,15 +50,17 @@ public class ActPubController {
 		return new ResponseEntity(HttpStatus.NOT_FOUND);
 	}
 
-	/*
+	/**
+	 * Actor GET (redirect for Mastodon)
+	 *
 	 * Mastodon insists on using this format for the URL which is NOT what we have in our Actor object
 	 * so they are breaking the spec and we tolerate it by redirecting
 	 * 
 	 * simple redirect from /ap/user/[userName] to /u/[userName]/home
 	 * 
 	 * todo-0: is this documented in the user guide about user being able to have a node named 'home'
-	 * and what it means if they do? Also need to ensure this ALWAYS works especially in the AP scenarios
-	 * and when user has done nothing themselves to create a 'home' node.
+	 * and what it means if they do? Also need to ensure this ALWAYS works especially in the AP
+	 * scenarios and when user has done nothing themselves to create a 'home' node.
 	 */
 	@RequestMapping(value = "/ap/user/{userName}", method = RequestMethod.GET)
 	public void mastodonGetUser(//
@@ -75,7 +76,9 @@ public class ActPubController {
 		}
 	}
 
-	/* This is the ActivityPub 'Actor' URL */
+	/**
+	 * Actor GET
+	 */
 	@RequestMapping(value = ActPubConstants.ACTOR_PATH + "/{userName}", method = RequestMethod.GET,
 			produces = ActPubConstants.CONTENT_TYPE_JSON_ACTIVITY)
 	public @ResponseBody Object actor(//
@@ -86,11 +89,11 @@ public class ActPubController {
 		return new ResponseEntity(HttpStatus.NOT_FOUND);
 	}
 
-	// =====================================
-	// INBOX
-	// =====================================
-
-	/* If no userName specified it's the system 'sharedInbox' */
+	/**
+	 * Inbox POST
+	 * 
+	 * If no userName specified it's the system 'sharedInbox'
+	 */
 	@RequestMapping(value = ActPubConstants.PATH_INBOX + "/{userName}", method = RequestMethod.POST,
 			produces = ActPubConstants.CONTENT_TYPE_JSON_LD)
 	public @ResponseBody Object inboxPost(//
@@ -106,10 +109,9 @@ public class ActPubController {
 		return new ResponseEntity(HttpStatus.OK);
 	}
 
-	// =====================================
-	// OUTBOX
-	// =====================================
-
+	/**
+	 * Outbox GET
+	 */
 	@RequestMapping(value = ActPubConstants.PATH_OUTBOX + "/{userName}", method = RequestMethod.GET,
 			produces = ActPubConstants.CONTENT_TYPE_JSON_ACTIVITY)
 	public @ResponseBody Object outbox(//
@@ -139,10 +141,9 @@ public class ActPubController {
 		return new ResponseEntity(HttpStatus.OK);
 	}
 
-	// =====================================
-	// FOLLOWERS
-	// =====================================
-
+	/**
+	 * Followers GET
+	 */
 	@RequestMapping(value = ActPubConstants.PATH_FOLLOWERS + "/{userName}", method = RequestMethod.GET,
 			produces = ActPubConstants.CONTENT_TYPE_JSON_ACTIVITY)
 	public @ResponseBody Object getFollowers(//
@@ -160,12 +161,11 @@ public class ActPubController {
 			return ret;
 		}
 		return new ResponseEntity(HttpStatus.OK);
-	}
+	}	
 
-	// =====================================
-	// FOLLOWING
-	// =====================================
-
+	/**
+	 * Following GET
+	 */
 	@RequestMapping(value = ActPubConstants.PATH_FOLLOWING + "/{userName}", method = RequestMethod.GET,
 			produces = ActPubConstants.CONTENT_TYPE_JSON_ACTIVITY)
 	public @ResponseBody Object getFollowing(//

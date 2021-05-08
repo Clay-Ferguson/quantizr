@@ -8,20 +8,30 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Component;
 import org.subnode.config.AppProp;
+import org.subnode.config.NodeName;
 import org.subnode.model.client.NodeProp;
 import org.subnode.model.client.NodeType;
 import org.subnode.mongo.MongoDelete;
 import org.subnode.mongo.MongoRead;
+import org.subnode.mongo.MongoSession;
+import org.subnode.mongo.MongoUtil;
 import org.subnode.mongo.RunAsMongoAdminEx;
 import org.subnode.mongo.model.SubNode;
 import org.subnode.service.NodeEditService;
 import org.subnode.util.ThreadLocals;
 
+
 @Component
 public class ActPubFollowing {
     private static final Logger log = LoggerFactory.getLogger(ActPubFollowing.class);
+
+    @Autowired
+    private MongoTemplate ops;
 
     @Autowired
     private ActPubUtil apUtil;
@@ -45,11 +55,14 @@ public class ActPubFollowing {
     private MongoDelete delete;
 
     @Autowired
+    private MongoUtil util;
+
+    @Autowired
 	@Qualifier("threadPoolTaskExecutor")
 	private Executor executor;
 
-    /*
-     * outbound message to follow/unfollow users on remote servers
+    /** 
+     * Outbound message to foreign servers to follow/unfollow users 
      * 
      * apUserName is full user name like alice@quantizr.com
      */
@@ -102,7 +115,7 @@ public class ActPubFollowing {
         }
     }
 
-        /*
+    /** 
      * Process inbound 'Follow' actions (comming from foreign servers). This results in the follower an
      * account node in our local DB created if not already existing, and then a FRIEND node under his
      * FRIENDS_LIST created to represent the person he's following, if not already existing.
@@ -193,6 +206,9 @@ public class ActPubFollowing {
         });
     }
 
+    /**
+     * Generates outbound followers data 
+     */
     public APObj generateFollowers(String userName) {
         String url = appProp.getProtocolHostAndPort() + ActPubConstants.PATH_FOLLOWERS + "/" + userName;
         Long totalItems = getFollowersCount(userName);
@@ -206,6 +222,9 @@ public class ActPubFollowing {
                 .put("last", url + "?min_id=0&page=true");
     }
 
+    /**
+     * Generates outbound following data 
+     */
     public APObj generateFollowing(String userName) {
         String url = appProp.getProtocolHostAndPort() + ActPubConstants.PATH_FOLLOWING + "/" + userName;
         Long totalItems = getFollowingCount(userName);
@@ -219,6 +238,9 @@ public class ActPubFollowing {
                 .put("last", url + "?min_id=0&page=true");
     }
 
+    /**
+     * Generates one page of results for the outbound 'following' request
+     */
     public APObj generateFollowingPage(String userName, String minId) {
         List<String> following = getFollowing(userName, minId);
 
@@ -236,11 +258,14 @@ public class ActPubFollowing {
                 .put("totalItems", following.size());
     }
 
+    /**
+     * Returns a list of all the 'actor urls' for all the users that are following user 'userName'
+     */
     public List<String> getFollowers(String userName, String minId) {
         final List<String> followers = new LinkedList<>();
 
         adminRunner.run(session -> {
-            Iterable<SubNode> iter = read.findFollowersOfUser(session, userName);
+            Iterable<SubNode> iter = findFollowersOfUser(session, userName);
 
             for (SubNode n : iter) {
                 // log.debug("Follower found: " + XString.prettyPrint(n));
@@ -252,11 +277,14 @@ public class ActPubFollowing {
         return followers;
     }
 
+    /**
+     * Returns a list of all the 'actor urls' for all the users that 'userName' is following
+     */
     public List<String> getFollowing(String userName, String minId) {
         final List<String> following = new LinkedList<>();
 
         adminRunner.run(session -> {
-            Iterable<SubNode> iter = read.findFollowingOfUser(session, userName);
+            Iterable<SubNode> iter = findFollowingOfUser(session, userName);
 
             for (SubNode n : iter) {
                 // log.debug("Follower found: " + XString.prettyPrint(n));
@@ -270,14 +298,14 @@ public class ActPubFollowing {
 
     public Long getFollowersCount(String userName) {
         return (Long) adminRunner.run(session -> {
-            Long count = read.countFollowersOfUser(session, userName);
+            Long count = countFollowersOfUser(session, userName);
             return count;
         });
     }
 
     public Long getFollowingCount(String userName) {
         return (Long) adminRunner.run(session -> {
-            Long count = read.countFollowingOfUser(session, userName);
+            Long count = countFollowingOfUser(session, userName);
             return count;
         });
     }
@@ -298,4 +326,73 @@ public class ActPubFollowing {
                 .put("partOf", appProp.getProtocolHostAndPort() + ActPubConstants.PATH_FOLLOWERS + "/" + userName)//
                 .put("totalItems", followers.size());
     }
+
+    // =========================================================================
+    // Followers Query
+    // =========================================================================
+
+    public Iterable<SubNode> findFollowersOfUser(MongoSession session, String userName) {
+        Query query = followersOfUser_query(session, userName);
+        if (query == null)
+            return null;
+        return util.find(query);
+    }
+
+    public long countFollowersOfUser(MongoSession session, String userName) {
+        Query query = followersOfUser_query(session, userName);
+        if (query == null)
+            return 0L;
+        return ops.count(query, SubNode.class);
+    }
+
+    public Query followersOfUser_query(MongoSession session, String userName) {
+        Query query = new Query();
+
+        Criteria criteria = Criteria.where(SubNode.FIELD_PATH)
+                .regex(util.regexRecursiveChildrenOfPath(NodeName.ROOT_OF_ALL_USERS)) //
+                .and(SubNode.FIELD_PROPERTIES + "." + NodeProp.USER.s()).is(userName) //
+                .and(SubNode.FIELD_TYPE).is(NodeType.FRIEND.s());
+
+        query.addCriteria(criteria);
+        return query;
+    }
+
+    // =========================================================================
+    // Following Query
+    // =========================================================================
+
+    /* Returns FRIEND nodes for every user 'userName' is following */
+    public Iterable<SubNode> findFollowingOfUser(MongoSession session, String userName) {
+        Query query = findFollowingOfUser_query(session, userName);
+        if (query == null)
+            return null;
+
+        return util.find(query);
+    }
+
+    public long countFollowingOfUser(MongoSession session, String userName) {
+        Query query = findFollowingOfUser_query(session, userName);
+        if (query == null)
+            return 0;
+
+        return ops.count(query, SubNode.class);
+    }
+
+    private Query findFollowingOfUser_query(MongoSession session, String userName) {
+        Query query = new Query();
+
+        // get friends list node
+        SubNode friendsListNode = read.getUserNodeByType(session, userName, null, null, NodeType.FRIEND_LIST.s(), null);
+        if (friendsListNode == null)
+            return null;
+
+        // query all the friends under
+        Criteria criteria = Criteria.where(SubNode.FIELD_PATH) //
+                .regex(util.regexRecursiveChildrenOfPath(friendsListNode.getPath())) //
+                .and(SubNode.FIELD_TYPE).is(NodeType.FRIEND.s());
+
+        query.addCriteria(criteria);
+        return query;
+    }
+
 }

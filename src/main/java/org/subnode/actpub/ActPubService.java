@@ -830,20 +830,6 @@ public class ActPubService {
         refreshForeignUsers();
     }
 
-    /**
-     * Returns number of userNamesPendingMessageRefresh that map to 'false' values
-     */
-    public int queuedUserCount() {
-        int count = 0;
-        for (String apUserName : apCache.usersPendingRefresh.keySet()) {
-            Boolean done = apCache.usersPendingRefresh.get(apUserName);
-            if (!done) {
-                count++;
-            }
-        }
-        return count;
-    }
-
     /* Run every few seconds */
     @Scheduled(fixedDelay = 3 * 1000)
     public void messageRefresh() {
@@ -918,7 +904,7 @@ public class ActPubService {
     public String getStatsReport() {
         StringBuilder sb = new StringBuilder();
         sb.append("\nActivityPub Stats:\n");
-        sb.append("Users Currently Queued (for refresh): " + queuedUserCount() + "\n");
+        sb.append("Users Currently Queued (for refresh): " + apCache.queuedUserCount() + "\n");
         sb.append("Refresh Foreign Users Cycles: " + refreshForeignUsersCycles + "\n");
         sb.append("Last Foreign Users Refresh Time: " + lastRefreshForeignUsersCycleTime + "\n");
         sb.append("Number of Users Queued at last Cycle: " + refreshForeignUsersQueuedCount + "\n");

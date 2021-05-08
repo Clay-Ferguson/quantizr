@@ -257,19 +257,10 @@ public class ActPubUtil {
         }
 
         actor = getJson(url, new MediaType("application", "ld+json"));
-        cacheActor(url, actor);
+        apCache.cacheActor(url, actor);
 
         // log.debug("Actor: " + XString.prettyPrint(actor));
         return actor;
-    }
-
-    public void cacheActor(String url, APObj actor) {
-        if (actor == null)
-            return;
-
-        apCache.actorsByUrl.put(url, actor);
-        String userName = getLongUserNameFromActor(actor);
-        apCache.actorsByUserName.put(userName, actor);
     }
 
     /*
