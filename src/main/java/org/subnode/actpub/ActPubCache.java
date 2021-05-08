@@ -1,15 +1,11 @@
 package org.subnode.actpub;
 
 import java.util.concurrent.ConcurrentHashMap;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.subnode.mongo.model.SubNode;
 
 @Component
 public class ActPubCache {
-    @Autowired
-    private ActPubUtil apUtil;
-
     /*
      * Holds users for which messages need refreshing (false value) but sets value to 'true' once
      * completed
@@ -34,18 +30,8 @@ public class ActPubCache {
     /* Account Node by node ID */
     public final ConcurrentHashMap<String, SubNode> acctNodesById = new ConcurrentHashMap<>();
 
-    /**
-     * Add actor to the two actor caches.
-     */
-    public void cacheActor(String url, APObj actor) {
-        if (actor == null)
-            return;
-
-        String userName = apUtil.getLongUserNameFromActor(actor);
-
-        actorsByUrl.put(url, actor);
-        actorsByUserName.put(userName, actor);
-    }
+    /* Cache WebFinger objects by UserName in memory only for now */
+    public final ConcurrentHashMap<String, APObj> webFingerCacheByUserName = new ConcurrentHashMap<>();
 
     /**
      * Returns number of userNamesPendingMessageRefresh that map to 'false' values

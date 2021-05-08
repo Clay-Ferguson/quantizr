@@ -51,9 +51,6 @@ import org.subnode.util.XString;
 public class ActPubUtil {
     private static final Logger log = LoggerFactory.getLogger(ActPubUtil.class);
 
-    /* Cache WebFinger objects by UserName in memory only for now */
-    private static final ConcurrentHashMap<String, APObj> webFingerCacheByUserName = new ConcurrentHashMap<>();
-
     @Autowired
     private AppProp appProp;
 
@@ -245,19 +242,27 @@ public class ActPubUtil {
 
     /*
      * Effeciently gets the Actor by using a cache to ensure we never get the same Actor twice until the
-     * app restarts at least
+     * app restarts at least, o
      */
     public APObj getActorByUrl(String url) {
         if (url == null)
             return null;
 
+        // first try to return from cache.
         APObj actor = apCache.actorsByUrl.get(url);
         if (actor != null) {
             return actor;
         }
 
+        // if not in cache we need to load the actor from the web
         actor = getJson(url, new MediaType("application", "ld+json"));
-        apCache.cacheActor(url, actor);
+
+        if (actor != null) {
+            String userName = getLongUserNameFromActor(actor);
+
+            apCache.actorsByUrl.put(url, actor);
+            apCache.actorsByUserName.put(userName, actor);
+        }
 
         // log.debug("Actor: " + XString.prettyPrint(actor));
         return actor;
@@ -277,7 +282,7 @@ public class ActPubUtil {
         String host = "https://" + getHostFromUserName(resource);
 
         // return from cache if we have this cached
-        APObj finger = webFingerCacheByUserName.get(resource);
+        APObj finger = apCache.webFingerCacheByUserName.get(resource);
         if (finger != null) {
             return finger;
         }
@@ -287,7 +292,7 @@ public class ActPubUtil {
 
         if (finger != null) {
             // log.debug("Caching WebFinger: " + XString.prettyPrint(finger));
-            webFingerCacheByUserName.put(resource, finger);
+            apCache.webFingerCacheByUserName.put(resource, finger);
         }
         return finger;
     }

@@ -137,7 +137,7 @@ public class ActPubFollowing {
             // log.debug("getLongUserNameFromActorUrl: " + actorUrl + "\n" +
             // XString.prettyPrint(actor));
             String followerUserName = apUtil.getLongUserNameFromActor(followerActorObj);
-            SubNode followerAccountNode = apService.loadForeignUserByUserName(session, followerUserName);
+            SubNode followerAccountNode = apService.getAcctNodeByUserName(session, followerUserName);
             apService.userEncountered(followerUserName, false);
 
             // Actor being followed (local to our server)

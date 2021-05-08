@@ -583,7 +583,7 @@ public class NodeEditService {
 						asyncExec.run(() -> {
 							adminRunner.run(s -> {
 								if (!ThreadLocals.getSessionContext().isAdmin()) {
-									apService.loadForeignUserByUserName(s, friendUserName);
+									apService.getAcctNodeByUserName(s, friendUserName);
 								}
 
 								/*

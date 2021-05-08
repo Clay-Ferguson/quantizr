@@ -127,13 +127,15 @@ public class ActPubService {
                         privateMessage = false;
                     } else {
                         // k will be a nodeId of an account node here.
-                        SubNode accountNode = apCache.acctNodesById.get(k);
-                        if (accountNode == null) {
-                            apCache.acctNodesById.put(k, accountNode = read.getNode(session, k));
+                        SubNode accntNode = apCache.acctNodesById.get(k);
+
+                        if (accntNode == null) {
+                            accntNode = read.getNode(session, k);
+                            apCache.acctNodesById.put(k, accntNode);
                         }
 
-                        if (accountNode != null) {
-                            String userName = accountNode.getStrProp(NodeProp.USER.s());
+                        if (accntNode != null) {
+                            String userName = accntNode.getStrProp(NodeProp.USER.s());
                             toUserNames.add(userName);
                         }
                     }
@@ -181,8 +183,7 @@ public class ActPubService {
         String fromActor = null;
 
         /*
-         * Per spec (and per Mastodon reverse engineering, we post the same message to all the inboxes that
-         * need to see it
+         * Post the same message to all the inboxes that need to see it
          */
         for (String toUserName : toUserNames) {
             // Ignore userNames that are not foreign server names
@@ -218,57 +219,74 @@ public class ActPubService {
         }
     }
 
-    /*
-     * Reads in a user from the Fediverse with a name like: someuser@fosstodon.org
-     * 
-     * Returns account node of the user
+    /**
+     * Gets the local account SubNode representing foreign user apUserName (like
+     * someuser@fosstodon.org), by first checking the 'acctNodesByUserName' cache, or else by reading in
+     * the user from the Fediverse, and updating the cache.
      */
-    public SubNode loadForeignUserByUserName(MongoSession session, String apUserName) {
+    public SubNode getAcctNodeByUserName(MongoSession session, String apUserName) {
+        if (!apUserName.contains("@")) {
+            log.debug("Invalid foreign user name: " + apUserName);
+            return null;
+        }
+
         // return from cache if we already have the value cached
         SubNode acctNode = apCache.acctNodesByUserName.get(apUserName);
         if (acctNode != null) {
             return acctNode;
         }
 
-        if (!apUserName.contains("@")) {
-            log.debug("Invalid foreign user name: " + apUserName);
-            return null;
-        }
-
-        /* First try to use the actor from cache, if we have it cached */
-        Object actor = apCache.actorsByUserName.get(apUserName);
+        /* First try to get a cached APObj */
+        APObj actor = apCache.actorsByUserName.get(apUserName);
 
         // if we have actor object skip the step of getting it and import using it.
         if (actor != null) {
             acctNode = importActor(session, actor);
-            apCache.acctNodesByUserName.put(apUserName, acctNode);
-            return acctNode;
         }
 
-        log.debug("Load foreign user: " + apUserName);
-        APObj webFinger = apUtil.getWebFinger(apUserName);
+        /*
+         * if we were unable to get the acctNode, then we need to read it from scratch meaning starting at
+         * the very beginning which is to get webFinger first and load from there
+         */
+        if (acctNode == null) {
+            log.debug("Load foreign user: " + apUserName);
+            APObj webFinger = apUtil.getWebFinger(apUserName);
 
-        String actorUrl = apUtil.getActorUrlFromWebFingerObj(webFinger);
-        if (actorUrl != null) {
-            acctNode = loadForeignUserByActorUrl(session, actorUrl);
-            apCache.acctNodesByUserName.put(apUserName, acctNode);
-            return acctNode;
+            String actorUrl = apUtil.getActorUrlFromWebFingerObj(webFinger);
+            if (actorUrl != null) {
+                acctNode = getAcctNodeByActorUrl(session, actorUrl);
+            }
         }
-        return null;
+
+        // if we got the SubNode, cache it before returning it.
+        if (acctNode != null) {
+            // Any time we have an account node being cached we should cache it by it's ID too right away.
+            apCache.acctNodesById.put(acctNode.getId().toHexString(), acctNode);
+            apCache.acctNodesByUserName.put(apUserName, acctNode);
+        }
+        return acctNode;
     }
 
-    public SubNode loadForeignUserByActorUrl(MongoSession session, String actorUrl) {
+    /**
+     * Gets foreign account SubNode using actorUrl, using the cached copy of found.
+     */
+    public SubNode getAcctNodeByActorUrl(MongoSession session, String actorUrl) {
         /* return node from cache if already cached */
         SubNode acctNode = apCache.acctNodesByActorUrl.get(actorUrl);
         if (acctNode != null) {
             return acctNode;
         }
 
-        Object actor = apUtil.getActorByUrl(actorUrl);
+        APObj actor = apUtil.getActorByUrl(actorUrl);
 
         // if webfinger was successful, ensure the user is imported into our system.
         if (actor != null) {
-            apCache.acctNodesByActorUrl.put(actorUrl, acctNode = importActor(session, actor));
+            acctNode = importActor(session, actor);
+            if (acctNode != null) {
+                // Any time we have an account node being cached we should cache it by it's ID too right away.
+                apCache.acctNodesById.put(acctNode.getId().toHexString(), acctNode);
+                apCache.acctNodesByActorUrl.put(actorUrl, acctNode);
+            }
         }
         return acctNode;
     }
@@ -324,8 +342,8 @@ public class ActPubService {
         }
 
         /* cache the account node id for this user by the actor url */
-        String selfRefId = AP.str(actor, "id"); // actor url of 'actor' object, is the same as the 'id'
-        apCache.acctIdByActorUrl.put(selfRefId, userNode.getId().toHexString());
+        String selfRef = AP.str(actor, "id"); // actor url of 'actor' object, is the same as the 'id'
+        apCache.acctIdByActorUrl.put(selfRef, userNode.getId().toHexString());
         return userNode;
     }
 
@@ -432,7 +450,7 @@ public class ActPubService {
          * node will show up in those people's FEEDs
          */
         else {
-            SubNode actorAccountNode = loadForeignUserByActorUrl(session, actorUrl);
+            SubNode actorAccountNode = getAcctNodeByActorUrl(session, actorUrl);
             if (actorAccountNode != null) {
                 String userName = actorAccountNode.getStrProp(NodeProp.USER.s());
                 SubNode postsNode = read.getUserNodeByType(session, userName, actorAccountNode, "### Posts",
@@ -503,7 +521,7 @@ public class ActPubService {
 
         // foreign account will own this node, this may be passed if it's known or null can be passed in.
         if (toAccountNode == null) {
-            toAccountNode = loadForeignUserByActorUrl(session, objAttributedTo);
+            toAccountNode = getAcctNodeByActorUrl(session, objAttributedTo);
         }
         SubNode newNode = create.createNode(session, parentNode, null, null, 0L, CreateNodeLocation.FIRST, null,
                 toAccountNode.getId(), true);
@@ -814,10 +832,9 @@ public class ActPubService {
         if (apUserName == null || !apUserName.contains("@") || apUserName.toLowerCase().endsWith("@" + appProp.getMetaHost()))
             return;
 
-        if (!force) {
-            // if already added, don't add again.
-            if (apCache.usersPendingRefresh.contains(apUserName))
-                return;
+        // unless force is true, don't add this apUserName to pending list
+        if (!force && apCache.usersPendingRefresh.contains(apUserName)) {
+            return;
         }
 
         // add as 'false' meaning the refresh is not yet done
@@ -848,7 +865,7 @@ public class ActPubService {
                 final String _apUserName = apUserName;
                 adminRunner.run(session -> {
                     // log.debug("Reload user outbox: " + _apUserName);
-                    SubNode userNode = loadForeignUserByUserName(session, _apUserName);
+                    SubNode userNode = getAcctNodeByUserName(session, _apUserName);
                     if (userNode == null)
                         return null;
 
