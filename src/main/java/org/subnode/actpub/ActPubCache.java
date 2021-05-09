@@ -32,18 +32,4 @@ public class ActPubCache {
 
     /* Cache WebFinger objects by UserName in memory only for now */
     public final ConcurrentHashMap<String, APObj> webFingerCacheByUserName = new ConcurrentHashMap<>();
-
-    /**
-     * Returns number of userNamesPendingMessageRefresh that map to 'false' values
-     */
-    public int queuedUserCount() {
-        int count = 0;
-        for (String apUserName : usersPendingRefresh.keySet()) {
-            Boolean done = usersPendingRefresh.get(apUserName);
-            if (!done) {
-                count++;
-            }
-        }
-        return count;
-    }
 }
