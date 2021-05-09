@@ -115,7 +115,7 @@ public class ActPubController {
 			@RequestParam(value = "min_id", required = false) String minId,
 			@RequestParam(value = "page", required = false) String page) {
 		APObj ret = null;
-		if ("true".equals(page)) {
+		if (ActPubConstants.STR_TRUE.equals(page)) {
 			ret = apOutbox.generateOutboxPage(userName, minId);
 		} else {
 			/*
@@ -149,7 +149,7 @@ public class ActPubController {
 			@RequestParam(value = "min_id", required = false) String minId,
 			@RequestParam(value = "page", required = false) String page) {
 		APObj ret = null;
-		if ("true".equals(page)) {
+		if (ActPubConstants.STR_TRUE.equals(page)) {
 			ret = apFollowing.generateFollowersPage(userName, minId);
 		} else {
 			ret = apFollowing.generateFollowers(userName);
@@ -171,7 +171,7 @@ public class ActPubController {
 			@RequestParam(value = "min_id", required = false) String minId,
 			@RequestParam(value = "page", required = false) String page) {
 		APObj ret = null;
-		if ("true".equals(page)) {
+		if (ActPubConstants.STR_TRUE.equals(page)) {
 			ret = apFollowing.generateFollowingPage(userName, minId);
 		} else {
 			ret = apFollowing.generateFollowing(userName);

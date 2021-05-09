@@ -31,7 +31,7 @@ public class ActPubFactory {
 	public APObj newCreateMessageForNote(List<String> toUserNames, String fromActor, String inReplyTo, String content,
 			String noteUrl, boolean privateMessage, APList attachments) {
 		ZonedDateTime now = ZonedDateTime.now(ZoneOffset.UTC);
-		log.debug("sending note from actor[" + fromActor + "] inReplyTo[" + inReplyTo);
+		// log.debug("sending note from actor[" + fromActor + "] inReplyTo[" + inReplyTo);
 		return newCreateMessage(
 				newNoteObject(toUserNames, fromActor, inReplyTo, content, noteUrl, now, privateMessage, attachments), fromActor,
 				toUserNames, noteUrl, now);

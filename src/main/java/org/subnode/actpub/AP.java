@@ -37,7 +37,7 @@ public class AP {
             if (val == null) {
                 return null;
             } else if (val instanceof String) {
-                return ((String) val).equalsIgnoreCase("true");
+                return ((String) val).equalsIgnoreCase(ActPubConstants.STR_TRUE);
             } else if (val instanceof Boolean) {
                 return ((Boolean) val).booleanValue();
             } else {

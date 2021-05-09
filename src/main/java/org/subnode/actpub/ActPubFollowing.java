@@ -25,7 +25,6 @@ import org.subnode.mongo.model.SubNode;
 import org.subnode.service.NodeEditService;
 import org.subnode.util.ThreadLocals;
 
-
 @Component
 public class ActPubFollowing {
     private static final Logger log = LoggerFactory.getLogger(ActPubFollowing.class);
@@ -98,6 +97,7 @@ public class ActPubFollowing {
                             .put("actor", sessionActorUrl) //
                             .put("object", new APObj() //
                                     .put("id",
+                                            //todo-0: check this. Shouldn't this be /follow/ instead of /unfollow-pbj/ ?
                                             appProp.getProtocolHostAndPort() + "/unfollow-obj/"
                                                     + String.valueOf(new Date().getTime())) //
                                     .put("type", "Follow") //

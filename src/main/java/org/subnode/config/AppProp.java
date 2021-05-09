@@ -15,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Component;
+import org.subnode.actpub.ActPubConstants;
 import org.subnode.util.ExUtil;
 import org.subnode.util.StreamUtil;
 import org.subnode.util.XString;
@@ -179,7 +180,7 @@ public class AppProp /* implements EnvironmentAware */ {
 	}
 
 	public boolean isActPubEnabled() {
-		return "true".equals(env.getProperty("actPubEnabled"));
+		return ActPubConstants.STR_TRUE.equals(env.getProperty("actPubEnabled"));
 	}
 
 	public String getRssAggregatePreCacheNodeId() {
@@ -219,16 +220,16 @@ public class AppProp /* implements EnvironmentAware */ {
 	}
 
 	public boolean getForceIndexRebuild() {
-		return "true".equals(env.getProperty("forceIndexRebuild"));
+		return ActPubConstants.STR_TRUE.equals(env.getProperty("forceIndexRebuild"));
 	}
 
 	public boolean getReSaveAll() {
-		return "true".equals(env.getProperty("reSaveAll"));
+		return ActPubConstants.STR_TRUE.equals(env.getProperty("reSaveAll"));
 	}
 
 	/* Should be set to true if mongo security is turned on requiring credentials */
 	public boolean getMongoSecurity() {
-		return "true".equals(env.getProperty("mongoSecurity"));
+		return ActPubConstants.STR_TRUE.equals(env.getProperty("mongoSecurity"));
 	}
 
 	public String getMongoAdminPassword() {
