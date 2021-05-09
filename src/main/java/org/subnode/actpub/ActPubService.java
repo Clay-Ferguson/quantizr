@@ -628,7 +628,7 @@ public class ActPubService {
             boolean allow = false;
             if (allow) {
                 // todo-0: Everywhere we create a MediaType, replace it with a pre-created one on Constants
-                APObj followersObj = apUtil.getJson(url, new MediaType("application", "activity+json"));
+                APObj followersObj = apUtil.getJson(url, ActPubConstants.MT_APP_ACTJSON);
                 if (followersObj != null) {
                     apUtil.iterateOrderedCollection(followersObj, MAX_FOLLOWERS, obj -> {
                         /*

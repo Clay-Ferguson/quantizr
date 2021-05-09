@@ -250,7 +250,7 @@ public class ActPubUtil {
         }
 
         // if not in cache we need to load the actor from the web
-        actor = getJson(url, new MediaType("application", "ld+json"));
+        actor = getJson(url, ActPubConstants.MT_APP_LDJSON);
 
         if (actor != null) {
             String userName = getLongUserNameFromActor(actor);
@@ -282,7 +282,7 @@ public class ActPubUtil {
         }
 
         String url = host + ActPubConstants.PATH_WEBFINGER + "?resource=acct:" + resource;
-        finger = getJson(url, new MediaType("application", "jrd+json"));
+        finger = getJson(url, ActPubConstants.MT_APP_JRDJSON);
 
         if (finger != null) {
             // log.debug("Caching WebFinger: " + XString.prettyPrint(finger));
@@ -295,7 +295,7 @@ public class ActPubUtil {
             byte[] bodyBytes) {
         APObj ret = null;
         try {
-            // MediaType type = new MediaType("application", "ld+json"); //;
+            // MediaType type = ActPubConstants.MT_APP_LDJSON; //;
             // profile=\"https://www.w3.org/ns/activitystreams\"");
             HttpHeaders headers = new HttpHeaders();
             // List<MediaType> acceptableMediaTypes = new LinkedList<MediaType>();
@@ -647,7 +647,7 @@ public class ActPubUtil {
             // log.debug("First Page Url: " + firstPageUrl);
             if (++pageQueries > maxPageQueries)
                 return;
-            Object ocPage = firstPageUrl == null ? null : getJson(firstPageUrl, new MediaType("application", "activity+json"));
+            Object ocPage = firstPageUrl == null ? null : getJson(firstPageUrl, ActPubConstants.MT_APP_ACTJSON);
 
             while (ocPage != null) {
                 orderedItems = AP.list(ocPage, "orderedItems");
@@ -683,7 +683,7 @@ public class ActPubUtil {
                 if (nextPage != null) {
                     if (++pageQueries > maxPageQueries)
                         return;
-                    ocPage = nextPage == null ? null : getJson(nextPage, new MediaType("application", "activity+json"));
+                    ocPage = nextPage == null ? null : getJson(nextPage, ActPubConstants.MT_APP_ACTJSON);
                 } else {
                     break;
                 }
@@ -695,7 +695,7 @@ public class ActPubUtil {
             // log.debug("Last Page Url: " + lastPageUrl);
             if (++pageQueries > maxPageQueries)
                 return;
-            Object ocPage = lastPageUrl == null ? null : getJson(lastPageUrl, new MediaType("application", "activity+json"));
+            Object ocPage = lastPageUrl == null ? null : getJson(lastPageUrl, ActPubConstants.MT_APP_ACTJSON);
 
             if (ocPage != null) {
                 orderedItems = AP.list(ocPage, "orderedItems");
