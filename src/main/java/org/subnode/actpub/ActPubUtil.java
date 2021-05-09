@@ -19,7 +19,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 import java.util.TimeZone;
-import java.util.concurrent.ConcurrentHashMap;
 import javax.servlet.http.HttpServletRequest;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DeserializationFeature;
@@ -218,22 +217,18 @@ public class ActPubUtil {
                     "SHA-256=" + Base64.getEncoder().encodeToString(MessageDigest.getInstance("SHA-256").digest(bodyBytes));
 
             URL url = new URL(toInbox);
-            String host = url.getHost();
-            String path = url.getPath();
-
             String strToSign =
-                    "(request-target): post " + path + "\nhost: " + host + "\ndate: " + date + "\ndigest: " + digestHeader;
+                    "(request-target): post " + url.getPath() + "\nhost: " + url.getHost() + "\ndate: " + date + "\ndigest: " + digestHeader;
 
             Signature sig = Signature.getInstance("SHA256withRSA");
             sig.initSign(privKey);
             sig.update(strToSign.getBytes(StandardCharsets.UTF_8));
             byte[] signature = sig.sign();
 
-            String keyID = actor + "#main-key";
-            String headerSig = "keyId=\"" + keyID + "\",headers=\"(request-target) host date digest\",signature=\""
+            String headerSig = "keyId=\"" + actor + "#main-key" + "\",headers=\"(request-target) host date digest\",signature=\""
                     + Base64.getEncoder().encodeToString(signature) + "\"";
 
-            postJson(toInbox, host, date, headerSig, digestHeader, bodyBytes);
+            postJson(toInbox, url.getHost(), date, headerSig, digestHeader, bodyBytes);
         } catch (Exception e) {
             log.error("secure http post failed", e);
             throw new RuntimeException(e);
@@ -259,7 +254,6 @@ public class ActPubUtil {
 
         if (actor != null) {
             String userName = getLongUserNameFromActor(actor);
-
             apCache.actorsByUrl.put(url, actor);
             apCache.actorsByUserName.put(userName, actor);
         }

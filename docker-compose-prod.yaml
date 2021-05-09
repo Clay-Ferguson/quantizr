@@ -27,9 +27,6 @@ services:
             # From go-ipfs github developer: 
             #    Enabling the "lowpower" profile should help. That will disable background data reproviding, set really 
             #    low connection manager limits, and put your node into dhtclient mode.
-            # NOTE: When I tested copying MFS files from remote server to local machine it worked
-            #       but beware this rounting var was commented out during that test. Never verified if it's required
-            #       and also during the MFS testing I had port 4001 exposed in these configs
             routing: "dhtclient" 
             IPFS_PROFILE: "server"
             IPFS_PATH: "/data/ipfs"

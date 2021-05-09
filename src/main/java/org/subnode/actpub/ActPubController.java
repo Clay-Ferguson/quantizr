@@ -47,7 +47,7 @@ public class ActPubController {
 		Object ret = apUtil.generateWebFinger(resource);
 		if (ret != null)
 			return ret;
-		return new ResponseEntity(HttpStatus.NOT_FOUND);
+		return new ResponseEntity<String>(HttpStatus.NOT_FOUND);
 	}
 
 	/**
@@ -66,14 +66,10 @@ public class ActPubController {
 	public void mastodonGetUser(//
 			@PathVariable(value = "userName", required = true) String userName, //
 			HttpServletRequest req, //
-			HttpServletResponse response) {
+			HttpServletResponse response) throws Exception {
 		String url = appProp.getProtocolHostAndPort() + "/u/" + userName + "/home";
-		try {
-			log.debug("Redirecting to: " + url);
-			response.sendRedirect(url);
-		} catch (Exception e) {
-			log.error("mastodonGetUser failed", e);
-		}
+		// log.debug("Redirecting to: " + url);
+		response.sendRedirect(url);
 	}
 
 	/**
@@ -86,7 +82,7 @@ public class ActPubController {
 		Object ret = apService.generateActor(userName);
 		if (ret != null)
 			return ret;
-		return new ResponseEntity(HttpStatus.NOT_FOUND);
+		return new ResponseEntity<String>(HttpStatus.NOT_FOUND);
 	}
 
 	/**
@@ -106,7 +102,7 @@ public class ActPubController {
 		// log.debug("INBOX incoming payload: " + XString.prettyPrint(payload));
 		ActPubService.inboxCount++;
 		apService.processInboxPost(httpReq, payload);
-		return new ResponseEntity(HttpStatus.OK);
+		return new ResponseEntity<String>(HttpStatus.OK);
 	}
 
 	/**
@@ -118,7 +114,7 @@ public class ActPubController {
 			@PathVariable(value = "userName", required = true) String userName,
 			@RequestParam(value = "min_id", required = false) String minId,
 			@RequestParam(value = "page", required = false) String page) {
-		Object ret = null;
+		APObj ret = null;
 		if ("true".equals(page)) {
 			ret = apOutbox.generateOutboxPage(userName, minId);
 		} else {
@@ -136,9 +132,11 @@ public class ActPubController {
 		}
 		if (ret != null) {
 			// log.debug("Reply with Outbox: " + XString.prettyPrint(ret));
+			// todo-0: verify this is returning OK in addition to the data, and also look for all other
+			// places we have a similar scenario in this and all other controllers.
 			return ret;
 		}
-		return new ResponseEntity(HttpStatus.OK);
+		return new ResponseEntity<String>(HttpStatus.OK);
 	}
 
 	/**
@@ -150,7 +148,7 @@ public class ActPubController {
 			@PathVariable(value = "userName", required = false) String userName,
 			@RequestParam(value = "min_id", required = false) String minId,
 			@RequestParam(value = "page", required = false) String page) {
-		Object ret = null;
+		APObj ret = null;
 		if ("true".equals(page)) {
 			ret = apFollowing.generateFollowersPage(userName, minId);
 		} else {
@@ -160,8 +158,8 @@ public class ActPubController {
 			// log.debug("Reply with Followers: " + XString.prettyPrint(ret));
 			return ret;
 		}
-		return new ResponseEntity(HttpStatus.OK);
-	}	
+		return new ResponseEntity<String>(HttpStatus.OK);
+	}
 
 	/**
 	 * Following GET
@@ -172,7 +170,7 @@ public class ActPubController {
 			@PathVariable(value = "userName", required = false) String userName,
 			@RequestParam(value = "min_id", required = false) String minId,
 			@RequestParam(value = "page", required = false) String page) {
-		Object ret = null;
+		APObj ret = null;
 		if ("true".equals(page)) {
 			ret = apFollowing.generateFollowingPage(userName, minId);
 		} else {
@@ -182,6 +180,6 @@ public class ActPubController {
 			// log.debug("Reply with Following: " + XString.prettyPrint(ret));
 			return ret;
 		}
-		return new ResponseEntity(HttpStatus.OK);
+		return new ResponseEntity<String>(HttpStatus.OK);
 	}
 }

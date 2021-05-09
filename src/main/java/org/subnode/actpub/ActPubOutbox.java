@@ -56,7 +56,6 @@ public class ActPubOutbox {
      * apUserName will be used to look up the userNode.
      */
     public void refreshOutboxFromForeignServer(MongoSession session, Object actor, SubNode userNode, String apUserName) {
-
         if (userNode == null) {
             userNode = read.getUserNodeByUserName(session, apUserName);
         }
@@ -74,7 +73,7 @@ public class ActPubOutbox {
         Iterable<SubNode> outboxItems = read.getSubGraph(session, outboxNode, null, 0);
 
         String outboxUrl = AP.str(actor, "outbox");
-        Object outbox = getOutbox(outboxUrl);
+        APObj outbox = getOutbox(outboxUrl);
         if (outbox == null) {
             log.debug("Unable to get outbox for AP user: " + apUserName);
             return;

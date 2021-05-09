@@ -204,7 +204,7 @@ public class ActPubService {
             }
 
             String toActorUrl = apUtil.getActorUrlFromWebFingerObj(webFinger);
-            Object toActorObj = apUtil.getActorByUrl(toActorUrl);
+            APObj toActorObj = apUtil.getActorByUrl(toActorUrl);
             String inbox = AP.str(toActorObj, "inbox");
 
             /* lazy create fromActor here */
@@ -355,15 +355,15 @@ public class ActPubService {
         String type = AP.str(payload, "type");
 
         // Process Create Action
-        if ("Create".equals(type)) {
+        if ("Create".equalsIgnoreCase(type)) {
             return processCreateAction(httpReq, payload);
         }
         // Process Follow Action
-        else if ("Follow".equals(type)) {
+        else if ("Follow".equalsIgnoreCase(type)) {
             return apFollowing.processFollowAction(payload, false);
         }
         // Process Undo Action (Unfollow, etc)
-        else if ("Undo".equals(type)) {
+        else if ("Undo".equalsIgnoreCase(type)) {
             return processUndoAction(payload);
         }
         // else report unhandled
@@ -376,7 +376,7 @@ public class ActPubService {
     /* Process inbound undo actions (comming from foreign servers) */
     public APObj processUndoAction(Object payload) {
         Object object = AP.obj(payload, "object");
-        if (object != null && "Follow".equals(AP.str(object, "type"))) {
+        if (object != null && "Follow".equalsIgnoreCase(AP.str(object, "type"))) {
             return apFollowing.processFollowAction(object, true);
         }
         return null;
@@ -401,7 +401,7 @@ public class ActPubService {
             apUtil.verifySignature(httpReq, pubKey);
 
             Object object = AP.obj(payload, "object");
-            if (object != null && "Note".equals(AP.str(object, "type"))) {
+            if (object != null && "Note".equalsIgnoreCase(AP.str(object, "type"))) {
                 return processCreateNote(session, actorUrl, actorObj, object);
             } else {
                 log.debug("Unhandled Create action (object type not supported): " + XString.prettyPrint(payload));
@@ -514,6 +514,7 @@ public class ActPubService {
                     log.debug("Ignored Foreign: " + XString.prettyPrint(obj));
                     return;
                 } else {
+                    // this was an arbitrary meaningless value used to detect/test for correct program flow.
                     lang = "en-ck3";
                 }
             }
@@ -626,6 +627,7 @@ public class ActPubService {
              */
             boolean allow = false;
             if (allow) {
+                // todo-0: Everywhere we create a MediaType, replace it with a pre-created one on Constants
                 APObj followersObj = apUtil.getJson(url, new MediaType("application", "activity+json"));
                 if (followersObj != null) {
                     apUtil.iterateOrderedCollection(followersObj, MAX_FOLLOWERS, obj -> {
@@ -670,7 +672,7 @@ public class ActPubService {
                 acctNode = read.getUserNodeByUserName(session, longUserName);
             } else {
                 /*
-                 * todo-1: this is contributing to our unwanted CRAWLER effect (FediCrawler!) chain reaction. The
+                 * todo-1: this is contributing to our [currently] unwanted CRAWLER effect (FediCrawler!) chain reaction. The
                  * rule here should be either don't load foreign users whose outboxes you don't plan to load or else
                  * have some property on the node that designates if we need to read the actual outbox or if you DO
                  * want to add a user and not load their outbox.
@@ -690,7 +692,6 @@ public class ActPubService {
 
     private void addAttachmentIfExists(MongoSession session, SubNode node, Object obj) {
         List<?> attachments = AP.list(obj, "attachment");
-
         if (attachments == null)
             return;
 
@@ -727,7 +728,6 @@ public class ActPubService {
                         + userNode.getId().toHexString() + "&v=" + avatarVer;
 
                 APObj actor = new APObj();
-
                 actor.put("@context", new APList() //
                         .val(ActPubConstants.CONTEXT_STREAMS) //
                         .val(ActPubConstants.CONTEXT_SECURITY));
