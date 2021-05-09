@@ -47,8 +47,8 @@ public class ActPubOutbox {
     private MongoAuth auth;
 
     @Autowired
-	@Qualifier("threadPoolTaskExecutor")
-	private Executor executor;
+    @Qualifier("threadPoolTaskExecutor")
+    private Executor executor;
 
     /**
      * Caller can pass in userNode if it's already available, but if not just pass null and the
@@ -59,8 +59,8 @@ public class ActPubOutbox {
             userNode = read.getUserNodeByUserName(session, apUserName);
         }
 
-        SubNode outboxNode = read.getUserNodeByType(session, apUserName, userNode, "### Posts", NodeType.ACT_PUB_POSTS.s(), 
-        Arrays.asList(PrivilegeType.READ.s(), PrivilegeType.WRITE.s()));
+        SubNode outboxNode = read.getUserNodeByType(session, apUserName, userNode, "### Posts", NodeType.ACT_PUB_POSTS.s(),
+                Arrays.asList(PrivilegeType.READ.s(), PrivilegeType.WRITE.s()));
         if (outboxNode == null) {
             log.debug("no outbox for user: " + apUserName);
             return;
@@ -151,18 +151,17 @@ public class ActPubOutbox {
         return outbox;
     }
 
-    public APObj generateOutbox(String userName) {
+    public APOOrderedCollection generateOutbox(String userName) {
         // log.debug("Generate outbox for userName: " + userName);
         String url = appProp.getProtocolHostAndPort() + ActPubConstants.PATH_OUTBOX + "/" + userName;
         Long totalItems = getOutboxItemCount(userName, "public");
 
-        return new APObj() //
-                .put("@context", ActPubConstants.CONTEXT_STREAMS) //
-                .put("id", url) //
-                .put("type", "OrderedCollection") //
+        APOOrderedCollection ret = new APOOrderedCollection();
+        ret.put("id", url) //
                 .put("totalItems", totalItems) //
                 .put("first", url + "?page=true") //
                 .put("last", url + "?min_id=0&page=true");
+        return ret;
     }
 
     /*
@@ -189,20 +188,19 @@ public class ActPubOutbox {
     /*
      * if minId=="0" that means "last page", and if minId==null it means first page
      */
-    public APObj generateOutboxPage(String userName, String minId) {
+    public APOOrderedCollectionPage generateOutboxPage(String userName, String minId) {
         APList items = getOutboxItems(userName, "public", minId);
 
         // this is a self-reference url (id)
         String url = appProp.getProtocolHostAndPort() + ActPubConstants.PATH_OUTBOX + "/" + userName + "?min_id=" + minId
                 + "&page=true";
 
-        return new APObj() //
-                .put("@context", ActPubConstants.CONTEXT_STREAMS) //
-                .put("partOf", appProp.getProtocolHostAndPort() + ActPubConstants.PATH_OUTBOX + "/" + userName) //
+        APOOrderedCollectionPage ret = new APOOrderedCollectionPage();
+        ret.put("partOf", appProp.getProtocolHostAndPort() + ActPubConstants.PATH_OUTBOX + "/" + userName) //
                 .put("id", url) //
-                .put("type", "OrderedCollectionPage") //
                 .put("orderedItems", items) //
                 .put("totalItems", items.size());
+        return ret;
     }
 
     /*
@@ -247,6 +245,8 @@ public class ActPubOutbox {
                         String published = DateUtil.isoStringFromDate(child.getModifyTime());
                         String actor = apUtil.makeActorUrlForUserName(userName);
 
+                        //todo-0: note that neither this create object, nor the node object has the CONTEXT_STREAMS
+                        //in a @context property...be careful when implementing APOCrate and APONode because of this.
                         items.add(new APObj() //
                                 .put("id", nodeIdBase + hexId + "&create=t") //
                                 .put("type", "Create") //

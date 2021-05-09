@@ -57,11 +57,11 @@ public class ActPubFollowing {
     private MongoUtil util;
 
     @Autowired
-	@Qualifier("threadPoolTaskExecutor")
-	private Executor executor;
+    @Qualifier("threadPoolTaskExecutor")
+    private Executor executor;
 
-    /** 
-     * Outbound message to foreign servers to follow/unfollow users 
+    /**
+     * Outbound message to foreign servers to follow/unfollow users
      * 
      * apUserName is full user name like alice@quantizr.com
      */
@@ -77,27 +77,27 @@ public class ActPubFollowing {
 
             adminRunner.run(session -> {
                 String sessionActorUrl = apUtil.makeActorUrlForUserName(ThreadLocals.getSessionContext().getUserName());
-                APObj followAction = new APObj();
+                APObj followAction = null;
 
                 // send follow action
                 if (following) {
+                    followAction = new APOFollow();
                     followAction //
-                            .put("@context", ActPubConstants.CONTEXT_STREAMS) //
                             .put("id", appProp.getProtocolHostAndPort() + "/follow/" + String.valueOf(new Date().getTime())) //
-                            .put("type", "Follow") //
                             .put("actor", sessionActorUrl) //
                             .put("object", actorUrlOfUserBeingFollowed);
                 }
                 // send unfollow action
                 else {
+                    followAction = new APOUndo();
                     followAction //
-                            .put("@context", ActPubConstants.CONTEXT_STREAMS) //
                             .put("id", appProp.getProtocolHostAndPort() + "/unfollow/" + String.valueOf(new Date().getTime())) //
-                            .put("type", "Undo") //
                             .put("actor", sessionActorUrl) //
                             .put("object", new APObj() //
+                                    // todo-0: need to verify this undo object should have the @context property before adding it.
+                                    // and only way will be to test against Mastodon again.
                                     .put("id",
-                                            //todo-0: check this. Shouldn't this be /follow/ instead of /unfollow-pbj/ ?
+                                            // todo-0: check this. Shouldn't this be /follow/ instead of /unfollow-pbj/ ?
                                             appProp.getProtocolHostAndPort() + "/unfollow-obj/"
                                                     + String.valueOf(new Date().getTime())) //
                                     .put("type", "Follow") //
@@ -115,7 +115,7 @@ public class ActPubFollowing {
         }
     }
 
-    /** 
+    /**
      * Process inbound 'Follow' actions (comming from foreign servers). This results in the follower an
      * account node in our local DB created if not already existing, and then a FRIEND node under his
      * FRIENDS_LIST created to represent the person he's following, if not already existing.
@@ -154,7 +154,8 @@ public class ActPubFollowing {
             }
 
             // get the Friend List of the follower
-            SubNode followerFriendList = read.getUserNodeByType(session, followerUserName, null, null, NodeType.FRIEND_LIST.s(), null);
+            SubNode followerFriendList =
+                    read.getUserNodeByType(session, followerUserName, null, null, NodeType.FRIEND_LIST.s(), null);
 
             /*
              * lookup to see if this followerFriendList node already has userToFollow already under it
@@ -179,16 +180,16 @@ public class ActPubFollowing {
             Runnable runnable = () -> {
                 try {
                     // todo-1: what's this sleep doing? I'm pretty sure I just wanted to give the caller (i.e. the
-                    // remote Fedi instance) a chance to get a return code back for this call before posting 
+                    // remote Fedi instance) a chance to get a return code back for this call before posting
                     // back to it
                     Thread.sleep(2000);
 
                     // Must send either Accept or Reject. Currently we auto-accept all.
-                    APObj acceptFollow = new APObj() //
-                            .put("@context", ActPubConstants.CONTEXT_STREAMS) //
-                            .put("summary", "Accepted " + (unFollow ? "unfollow" : "follow") + " request") //
-                            .put("type", "Accept") //
+                    APOAccept acceptFollow = new APOAccept();
+                    acceptFollow.put("summary", "Accepted " + (unFollow ? "unfollow" : "follow") + " request") //
                             .put("actor", actorBeingFollowedUrl) //
+                            // todo-0: need to verify this undo object should have the @context property before adding it.
+                            // and only way will be to test against Mastodon again.
                             .put("object", new APObj() //
                                     .put("type", unFollow ? "Undo" : "Follow") //
                                     .put("actor", followerActorUrl) //
@@ -207,41 +208,39 @@ public class ActPubFollowing {
     }
 
     /**
-     * Generates outbound followers data 
+     * Generates outbound followers data
      */
-    public APObj generateFollowers(String userName) {
+    public APOOrderedCollection generateFollowers(String userName) {
         String url = appProp.getProtocolHostAndPort() + ActPubConstants.PATH_FOLLOWERS + "/" + userName;
         Long totalItems = getFollowersCount(userName);
 
-        return new APObj() //
-                .put("@context", ActPubConstants.CONTEXT_STREAMS) //
-                .put("id", url) //
-                .put("type", "OrderedCollection") //
+        APOOrderedCollection ret = new APOOrderedCollection();
+        ret.put("id", url) //
                 .put("totalItems", totalItems) //
                 .put("first", url + "?page=true") //
                 .put("last", url + "?min_id=0&page=true");
+        return ret;
     }
 
     /**
-     * Generates outbound following data 
+     * Generates outbound following data
      */
-    public APObj generateFollowing(String userName) {
+    public APOOrderedCollection generateFollowing(String userName) {
         String url = appProp.getProtocolHostAndPort() + ActPubConstants.PATH_FOLLOWING + "/" + userName;
         Long totalItems = getFollowingCount(userName);
 
-        return new APObj() //
-                .put("@context", ActPubConstants.CONTEXT_STREAMS) //
-                .put("id", url) //
-                .put("type", "OrderedCollection") //
+        APOOrderedCollection ret = new APOOrderedCollection();
+        ret.put("id", url) //
                 .put("totalItems", totalItems) //
                 .put("first", url + "?page=true") //
                 .put("last", url + "?min_id=0&page=true");
+        return ret;
     }
 
     /**
      * Generates one page of results for the outbound 'following' request
      */
-    public APObj generateFollowingPage(String userName, String minId) {
+    public APOOrderedCollectionPage generateFollowingPage(String userName, String minId) {
         List<String> following = getFollowing(userName, minId);
 
         // this is a self-reference url (id)
@@ -249,13 +248,12 @@ public class ActPubFollowing {
         if (minId != null) {
             url += "&min_id=" + minId;
         }
-        return new APObj() //
-                .put("@context", ActPubConstants.CONTEXT_STREAMS) //
-                .put("id", url) //
-                .put("type", "OrderedCollectionPage") //
+        APOOrderedCollectionPage ret = new APOOrderedCollectionPage();
+        ret.put("id", url) //
                 .put("orderedItems", following) //
                 .put("partOf", appProp.getProtocolHostAndPort() + ActPubConstants.PATH_FOLLOWING + "/" + userName)//
                 .put("totalItems", following.size());
+        return ret;
     }
 
     /**
@@ -310,7 +308,7 @@ public class ActPubFollowing {
         });
     }
 
-    public APObj generateFollowersPage(String userName, String minId) {
+    public APOOrderedCollectionPage generateFollowersPage(String userName, String minId) {
         List<String> followers = getFollowers(userName, minId);
 
         // this is a self-reference url (id)
@@ -318,13 +316,12 @@ public class ActPubFollowing {
         if (minId != null) {
             url += "&min_id=" + minId;
         }
-        return new APObj() //
-                .put("@context", ActPubConstants.CONTEXT_STREAMS) //
-                .put("id", url) //
-                .put("type", "OrderedCollectionPage") //
+        APOOrderedCollectionPage ret = new APOOrderedCollectionPage();
+        ret.put("id", url) //
                 .put("orderedItems", followers) //
                 .put("partOf", appProp.getProtocolHostAndPort() + ActPubConstants.PATH_FOLLOWERS + "/" + userName)//
                 .put("totalItems", followers.size());
+        return ret;
     }
 
     // =========================================================================
@@ -348,10 +345,10 @@ public class ActPubFollowing {
     public Query followersOfUser_query(MongoSession session, String userName) {
         Query query = new Query();
 
-        Criteria criteria = Criteria.where(SubNode.FIELD_PATH)
-                .regex(util.regexRecursiveChildrenOfPath(NodeName.ROOT_OF_ALL_USERS)) //
-                .and(SubNode.FIELD_PROPERTIES + "." + NodeProp.USER.s()).is(userName) //
-                .and(SubNode.FIELD_TYPE).is(NodeType.FRIEND.s());
+        Criteria criteria =
+                Criteria.where(SubNode.FIELD_PATH).regex(util.regexRecursiveChildrenOfPath(NodeName.ROOT_OF_ALL_USERS)) //
+                        .and(SubNode.FIELD_PROPERTIES + "." + NodeProp.USER.s()).is(userName) //
+                        .and(SubNode.FIELD_TYPE).is(NodeType.FRIEND.s());
 
         query.addCriteria(criteria);
         return query;

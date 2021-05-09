@@ -9,10 +9,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.CrossOrigin;
 
 @Controller
-@CrossOrigin
 public class ActPubFactory {
 	@Autowired
 	public ActPubService apService;
@@ -40,16 +38,11 @@ public class ActPubFactory {
 	/**
 	 * Creates a new 'note' object
 	 */
-	public APObj newNoteObject(List<String> toUserNames, String attributedTo, String inReplyTo, String content, String noteUrl,
+	public APONote newNoteObject(List<String> toUserNames, String attributedTo, String inReplyTo, String content, String noteUrl,
 			ZonedDateTime now, boolean privateMessage, APList attachments) {
-		APObj ret = new APObj();
-
-		ret.put("@context", new APList() //
-				.val(ActPubConstants.CONTEXT_STREAMS) //
-				.val(newContextObj()));
+		APONote ret = new APONote();
 
 		ret.put("id", noteUrl);
-		ret.put("type", "Note");
 		ret.put("published", now.format(DateTimeFormatter.ISO_INSTANT));
 		ret.put("attributedTo", attributedTo);
 		ret.put("summary", null);
@@ -74,8 +67,7 @@ public class ActPubFactory {
 			} else {
 				ccList.add(actorUrl);
 			}
-			tagList.val(new APObj() //
-					.put("type", "Mention") //
+			tagList.val(new APOMention() //
 					.put("href", actorUrl) //
 					.put("name", "@" + userName)); // prepend character to make it like '@user@server.com'
 		}
@@ -104,37 +96,16 @@ public class ActPubFactory {
 		return ret;
 	}
 
-	public APObj newContextObj() {
-		return new APObj() //
-				/*
-				 * todo-1: How does this language relate to the other format inside the @context object where we
-				 * have '@language' inside and object stored on the '@context' object ?
-				 */
-				.put("language", "en") //
-
-				/*
-				 * todo-0: I put this here very early on during mastodon testing. Need to see if we can get rid of
-				 * this, and still be 'compatible' with Mastodon.
-				 */
-				.put("toot", "http://joinmastodon.org/ns#");
-	}
-
 	/*
 	 * Need to check if this works using the 'to and cc' arrays that are the same as the ones built
 	 * above (in newNoteObject() function)
 	 */
-	public APObj newCreateMessage(APObj object, String fromActor, List<String> toActors, String noteUrl, ZonedDateTime now) {
+	public APOCreate newCreateMessage(APObj object, String fromActor, List<String> toActors, String noteUrl, ZonedDateTime now) {
 		String idTime = String.valueOf(now.toInstant().toEpochMilli());
-
-		APObj ret = new APObj();
-
-		ret.put("@context", new APList() //
-				.val(ActPubConstants.CONTEXT_STREAMS) //
-				.val(newContextObj()));
+		APOCreate ret = new APOCreate();
 
 		// this 'id' was an early WAG, and needs a fresh look now that AP code is more complete.
 		ret.put("id", noteUrl + "&apCreateTime=" + idTime);
-		ret.put("type", "Create");
 		ret.put("actor", fromActor);
 		ret.put("published", now.format(DateTimeFormatter.ISO_INSTANT));
 		ret.put("object", object);
