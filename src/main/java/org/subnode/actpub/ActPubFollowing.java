@@ -12,6 +12,14 @@ import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Component;
+import org.subnode.actpub.model.AP;
+import org.subnode.actpub.model.APOAccept;
+import org.subnode.actpub.model.APOFollow;
+import org.subnode.actpub.model.APOOrderedCollection;
+import org.subnode.actpub.model.APOOrderedCollectionPage;
+import org.subnode.actpub.model.APOUndo;
+import org.subnode.actpub.model.APObj;
+import org.subnode.actpub.model.APType;
 import org.subnode.config.AppProp;
 import org.subnode.config.NodeName;
 import org.subnode.model.client.NodeProp;
@@ -57,6 +65,9 @@ public class ActPubFollowing {
     private MongoUtil util;
 
     @Autowired
+    private ActPubCrypto apCrypto;
+
+    @Autowired
     @Qualifier("threadPoolTaskExecutor")
     private Executor executor;
 
@@ -77,37 +88,28 @@ public class ActPubFollowing {
 
             adminRunner.run(session -> {
                 String sessionActorUrl = apUtil.makeActorUrlForUserName(ThreadLocals.getSessionContext().getUserName());
-                APObj followAction = null;
+                APOFollow followAction = new APOFollow();
+                followAction //
+                        .put(AP.id, appProp.getProtocolHostAndPort() + "/follow/" + String.valueOf(new Date().getTime())) //
+                        .put(AP.actor, sessionActorUrl) //
+                        .put(AP.object, actorUrlOfUserBeingFollowed);
+                APObj action = null;
 
                 // send follow action
                 if (following) {
-                    followAction = new APOFollow();
-                    followAction //
-                            .put(AP.id, appProp.getProtocolHostAndPort() + "/follow/" + String.valueOf(new Date().getTime())) //
-                            .put(AP.actor, sessionActorUrl) //
-                            .put(AP.object, actorUrlOfUserBeingFollowed);
+                    action = followAction;
                 }
                 // send unfollow action
                 else {
-                    followAction = new APOUndo();
-                    followAction //
-                            .put(AP.id, appProp.getProtocolHostAndPort() + "/unfollow/" + String.valueOf(new Date().getTime())) //
+                    action = new APOUndo();
+                    action.put(AP.id, appProp.getProtocolHostAndPort() + "/unfollow/" + String.valueOf(new Date().getTime())) //
                             .put(AP.actor, sessionActorUrl) //
-                            .put(AP.object, new APObj() //
-                                    // todo-0: need to verify this undo object should have the @context property before adding it.
-                                    // and only way will be to test against Mastodon again.
-                                    .put(AP.id,
-                                            // todo-0: check this. Shouldn't this be /follow/ instead of /unfollow-pbj/ ?
-                                            appProp.getProtocolHostAndPort() + "/unfollow-obj/"
-                                                    + String.valueOf(new Date().getTime())) //
-                                    .put(AP.type, APType.Follow) //
-                                    .put(AP.actor, sessionActorUrl) //
-                                    .put(AP.object, actorUrlOfUserBeingFollowed));
+                            .put(AP.object, followAction);
                 }
 
                 APObj toActor = apUtil.getActorByUrl(actorUrlOfUserBeingFollowed);
                 String toInbox = AP.str(toActor, AP.inbox);
-                apUtil.securePost(session, null, toInbox, sessionActorUrl, followAction);
+                apUtil.securePost(session, null, toInbox, sessionActorUrl, action);
                 return null;
             });
         } catch (Exception e) {
@@ -174,7 +176,7 @@ public class ActPubFollowing {
                 }
             }
 
-            String privateKey = apUtil.getPrivateKey(session, userToFollow);
+            String privateKey = apCrypto.getPrivateKey(session, userToFollow);
 
             /* Protocol says we need to send this acceptance back */
             Runnable runnable = () -> {

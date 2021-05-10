@@ -9,6 +9,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.subnode.actpub.model.AP;
+import org.subnode.actpub.model.APList;
+import org.subnode.actpub.model.APOCreate;
+import org.subnode.actpub.model.APOMention;
+import org.subnode.actpub.model.APONote;
+import org.subnode.actpub.model.APObj;
 
 @Controller
 public class ActPubFactory {

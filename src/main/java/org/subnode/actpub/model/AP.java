@@ -1,15 +1,15 @@
-package org.subnode.actpub;
+package org.subnode.actpub.model;
 
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
-
+import org.subnode.actpub.APConst;
 import org.subnode.util.DateUtil;
 
 /**
  * Because the ActivityPup spec has lots of places where the object types are completely variable,
- * there's no way to use perfect type safety on all objects, so instead we use this purely generic
- * approach to traverse the incomming JSON trees of content
+ * there's no way to use perfect type safety on all objects, so instead of having a POJO for the the various
+ * types of objects we use the accessor methods and properties in this object.
  */
 public class AP {
     public static final String id = "id";

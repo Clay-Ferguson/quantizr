@@ -595,13 +595,13 @@ public class NodeEditService {
 						});
 					}
 
-					ValContainer<SubNode> _userNode = new ValContainer<SubNode>();
+					ValContainer<SubNode> userNode = new ValContainer<SubNode>();
 					adminRunner.run(s -> {
-						_userNode.setVal(read.getUserNodeByUserName(s, friendUserName));
+						userNode.setVal(read.getUserNodeByUserName(s, friendUserName));
 					});
 
-					if (_userNode.getVal() != null) {
-						userNodeId = _userNode.getVal().getId().toHexString();
+					if (userNode.getVal() != null) {
+						userNodeId = userNode.getVal().getId().toHexString();
 						node.setProp(NodeProp.USER_NODE_ID.s(), userNodeId);
 					}
 				}

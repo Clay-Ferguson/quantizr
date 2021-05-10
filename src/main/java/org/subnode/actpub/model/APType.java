@@ -1,4 +1,4 @@
-package org.subnode.actpub;
+package org.subnode.actpub.model;
 
 public class APType {
     public static final String Create = "Create";

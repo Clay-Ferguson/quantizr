@@ -15,6 +15,10 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.subnode.AppController;
+import org.subnode.actpub.model.AP;
+import org.subnode.actpub.model.APList;
+import org.subnode.actpub.model.APObj;
+import org.subnode.actpub.model.APType;
 import org.subnode.config.AppProp;
 import org.subnode.config.NodeName;
 import org.subnode.model.client.NodeProp;
@@ -101,6 +105,9 @@ public class ActPubService {
 
     @Autowired
     private ActPubOutbox apOutbox;
+
+    @Autowired
+    private ActPubCrypto apCrypto;
 
     @Autowired
     @Qualifier("threadPoolTaskExecutor")
@@ -400,8 +407,8 @@ public class ActPubService {
                 return null;
             }
 
-            PublicKey pubKey = apUtil.getPublicKeyFromActor(actorObj);
-            apUtil.verifySignature(httpReq, pubKey);
+            PublicKey pubKey = apCrypto.getPublicKeyFromActor(actorObj);
+            apCrypto.verifySignature(httpReq, pubKey);
 
             Object object = AP.obj(payload, AP.object);
             if (object != null && APType.Note.equalsIgnoreCase(AP.str(object, AP.type))) {
@@ -857,25 +864,24 @@ public class ActPubService {
             return;
 
         try {
-            for (String apUserName : apCache.usersPendingRefresh.keySet()) {
-                Boolean done = apCache.usersPendingRefresh.get(apUserName);
+            for (final String userName : apCache.usersPendingRefresh.keySet()) {
+                Boolean done = apCache.usersPendingRefresh.get(userName);
                 if (done)
                     continue;
 
                 // flag as done.
-                apCache.usersPendingRefresh.put(apUserName, true);
+                apCache.usersPendingRefresh.put(userName, true);
 
-                final String _apUserName = apUserName;
                 adminRunner.run(session -> {
                     // log.debug("Reload user outbox: " + _apUserName);
-                    SubNode userNode = getAcctNodeByUserName(session, _apUserName);
+                    SubNode userNode = getAcctNodeByUserName(session, userName);
                     if (userNode == null)
                         return null;
 
                     String actorUrl = userNode.getStrProp(NodeProp.ACT_PUB_ACTOR_URL.s());
                     APObj actor = apUtil.getActorByUrl(actorUrl);
                     if (actor != null) {
-                        apOutbox.refreshOutboxFromForeignServer(session, actor, userNode, _apUserName);
+                        apOutbox.refreshOutboxFromForeignServer(session, actor, userNode, userName);
                     } else {
                         log.debug("Unable to get cached actor from url: " + actorUrl);
                     }

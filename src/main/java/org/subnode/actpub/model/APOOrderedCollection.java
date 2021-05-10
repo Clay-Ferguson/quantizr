@@ -1,4 +1,6 @@
-package org.subnode.actpub;
+package org.subnode.actpub.model;
+
+import org.subnode.actpub.APConst;
 
 /**
  * OrderedCollection object.

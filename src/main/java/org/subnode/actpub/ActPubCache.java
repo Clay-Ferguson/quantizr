@@ -2,6 +2,7 @@ package org.subnode.actpub;
 
 import java.util.concurrent.ConcurrentHashMap;
 import org.springframework.stereotype.Component;
+import org.subnode.actpub.model.APObj;
 import org.subnode.mongo.model.SubNode;
 
 @Component

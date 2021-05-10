@@ -1,4 +1,4 @@
-package org.subnode.actpub;
+package org.subnode.actpub.model;
 
 import java.util.LinkedList;
 import java.util.List;
