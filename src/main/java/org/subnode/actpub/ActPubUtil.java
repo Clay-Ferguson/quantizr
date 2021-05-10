@@ -98,7 +98,7 @@ public class ActPubUtil {
     }
 
     public String makeActorUrlForUserName(String userName) {
-        return appProp.getProtocolHostAndPort() + ActPubConstants.ACTOR_PATH + "/" + userName;
+        return appProp.getProtocolHostAndPort() + APConst.ACTOR_PATH + "/" + userName;
     }
 
     /*
@@ -250,7 +250,7 @@ public class ActPubUtil {
         }
 
         // if not in cache we need to load the actor from the web
-        actor = getJson(url, ActPubConstants.MT_APP_LDJSON);
+        actor = getJson(url, APConst.MT_APP_LDJSON);
 
         if (actor != null) {
             String userName = getLongUserNameFromActor(actor);
@@ -281,8 +281,8 @@ public class ActPubUtil {
             return finger;
         }
 
-        String url = host + ActPubConstants.PATH_WEBFINGER + "?resource=acct:" + resource;
-        finger = getJson(url, ActPubConstants.MT_APP_JRDJSON);
+        String url = host + APConst.PATH_WEBFINGER + "?resource=acct:" + resource;
+        finger = getJson(url, APConst.MT_APP_JRDJSON);
 
         if (finger != null) {
             // log.debug("Caching WebFinger: " + XString.prettyPrint(finger));
@@ -401,7 +401,7 @@ public class ActPubUtil {
     }
 
     public boolean isLocalActorUrl(String actorUrl) {
-        return actorUrl.startsWith(appProp.getProtocolHostAndPort() + ActPubConstants.ACTOR_PATH + "/");
+        return actorUrl.startsWith(appProp.getProtocolHostAndPort() + APConst.ACTOR_PATH + "/");
     }
 
     /*
@@ -647,7 +647,7 @@ public class ActPubUtil {
             // log.debug("First Page Url: " + firstPageUrl);
             if (++pageQueries > maxPageQueries)
                 return;
-            Object ocPage = firstPageUrl == null ? null : getJson(firstPageUrl, ActPubConstants.MT_APP_ACTJSON);
+            Object ocPage = firstPageUrl == null ? null : getJson(firstPageUrl, APConst.MT_APP_ACTJSON);
 
             while (ocPage != null) {
                 orderedItems = AP.list(ocPage, "orderedItems");
@@ -683,7 +683,7 @@ public class ActPubUtil {
                 if (nextPage != null) {
                     if (++pageQueries > maxPageQueries)
                         return;
-                    ocPage = nextPage == null ? null : getJson(nextPage, ActPubConstants.MT_APP_ACTJSON);
+                    ocPage = nextPage == null ? null : getJson(nextPage, APConst.MT_APP_ACTJSON);
                 } else {
                     break;
                 }
@@ -695,7 +695,7 @@ public class ActPubUtil {
             // log.debug("Last Page Url: " + lastPageUrl);
             if (++pageQueries > maxPageQueries)
                 return;
-            Object ocPage = lastPageUrl == null ? null : getJson(lastPageUrl, ActPubConstants.MT_APP_ACTJSON);
+            Object ocPage = lastPageUrl == null ? null : getJson(lastPageUrl, APConst.MT_APP_ACTJSON);
 
             if (ocPage != null) {
                 orderedItems = AP.list(ocPage, "orderedItems");

@@ -2,7 +2,7 @@ package org.subnode.actpub;
 
 import org.springframework.http.MediaType;
 
-public class ActPubConstants {
+public class APConst {
     public static final String PATH_WEBFINGER = "/.well-known/webfinger";
     public static final String PATH_INBOX = "/ap/inbox";
     public static final String PATH_OUTBOX = "/ap/outbox";

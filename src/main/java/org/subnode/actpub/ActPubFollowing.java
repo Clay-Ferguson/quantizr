@@ -211,7 +211,7 @@ public class ActPubFollowing {
      * Generates outbound followers data
      */
     public APOOrderedCollection generateFollowers(String userName) {
-        String url = appProp.getProtocolHostAndPort() + ActPubConstants.PATH_FOLLOWERS + "/" + userName;
+        String url = appProp.getProtocolHostAndPort() + APConst.PATH_FOLLOWERS + "/" + userName;
         Long totalItems = getFollowersCount(userName);
 
         APOOrderedCollection ret = new APOOrderedCollection();
@@ -226,7 +226,7 @@ public class ActPubFollowing {
      * Generates outbound following data
      */
     public APOOrderedCollection generateFollowing(String userName) {
-        String url = appProp.getProtocolHostAndPort() + ActPubConstants.PATH_FOLLOWING + "/" + userName;
+        String url = appProp.getProtocolHostAndPort() + APConst.PATH_FOLLOWING + "/" + userName;
         Long totalItems = getFollowingCount(userName);
 
         APOOrderedCollection ret = new APOOrderedCollection();
@@ -244,14 +244,14 @@ public class ActPubFollowing {
         List<String> following = getFollowing(userName, minId);
 
         // this is a self-reference url (id)
-        String url = appProp.getProtocolHostAndPort() + ActPubConstants.PATH_FOLLOWING + "/" + userName + "?page=true";
+        String url = appProp.getProtocolHostAndPort() + APConst.PATH_FOLLOWING + "/" + userName + "?page=true";
         if (minId != null) {
             url += "&min_id=" + minId;
         }
         APOOrderedCollectionPage ret = new APOOrderedCollectionPage();
         ret.put("id", url) //
                 .put("orderedItems", following) //
-                .put("partOf", appProp.getProtocolHostAndPort() + ActPubConstants.PATH_FOLLOWING + "/" + userName)//
+                .put("partOf", appProp.getProtocolHostAndPort() + APConst.PATH_FOLLOWING + "/" + userName)//
                 .put("totalItems", following.size());
         return ret;
     }
@@ -312,14 +312,14 @@ public class ActPubFollowing {
         List<String> followers = getFollowers(userName, minId);
 
         // this is a self-reference url (id)
-        String url = appProp.getProtocolHostAndPort() + ActPubConstants.PATH_FOLLOWERS + "/" + userName + "?page=true";
+        String url = appProp.getProtocolHostAndPort() + APConst.PATH_FOLLOWERS + "/" + userName + "?page=true";
         if (minId != null) {
             url += "&min_id=" + minId;
         }
         APOOrderedCollectionPage ret = new APOOrderedCollectionPage();
         ret.put("id", url) //
                 .put("orderedItems", followers) //
-                .put("partOf", appProp.getProtocolHostAndPort() + ActPubConstants.PATH_FOLLOWERS + "/" + userName)//
+                .put("partOf", appProp.getProtocolHostAndPort() + APConst.PATH_FOLLOWERS + "/" + userName)//
                 .put("totalItems", followers.size());
         return ret;
     }

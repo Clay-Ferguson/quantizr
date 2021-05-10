@@ -301,7 +301,7 @@ public class ActPubService {
             log.debug("Can't import a user that's not from a foreign server.");
             return null;
         }
-        log.debug("importing Actor: " + apUserName);
+        // log.debug("importing Actor: " + apUserName);
 
         // Try to get the userNode for this actor
         SubNode userNode = read.getUserNodeByUserName(session, apUserName);
@@ -627,7 +627,7 @@ public class ActPubService {
             boolean allow = false;
             if (allow) {
                 // todo-0: Everywhere we create a MediaType, replace it with a pre-created one on Constants
-                APObj followersObj = apUtil.getJson(url, ActPubConstants.MT_APP_ACTJSON);
+                APObj followersObj = apUtil.getJson(url, APConst.MT_APP_ACTJSON);
                 if (followersObj != null) {
                     apUtil.iterateOrderedCollection(followersObj, MAX_FOLLOWERS, obj -> {
                         /*
@@ -728,8 +728,8 @@ public class ActPubService {
 
                 APObj actor = new APObj();
                 actor.put("@context", new APList() //
-                        .val(ActPubConstants.CONTEXT_STREAMS) //
-                        .val(ActPubConstants.CONTEXT_SECURITY));
+                        .val(APConst.CONTEXT_STREAMS) //
+                        .val(APConst.CONTEXT_SECURITY));
 
                 /*
                  * Note: this is a self-reference, and must be identical to the URL that returns this object
@@ -759,10 +759,10 @@ public class ActPubService {
                 }
 
                 actor.put("summary", userNode.getStrProp(NodeProp.USER_BIO.s()));
-                actor.put("inbox", host + ActPubConstants.PATH_INBOX + "/" + userName); //
-                actor.put("outbox", host + ActPubConstants.PATH_OUTBOX + "/" + userName); //
-                actor.put("followers", host + ActPubConstants.PATH_FOLLOWERS + "/" + userName);
-                actor.put("following", host + ActPubConstants.PATH_FOLLOWING + "/" + userName);
+                actor.put("inbox", host + APConst.PATH_INBOX + "/" + userName); //
+                actor.put("outbox", host + APConst.PATH_OUTBOX + "/" + userName); //
+                actor.put("followers", host + APConst.PATH_FOLLOWERS + "/" + userName);
+                actor.put("following", host + APConst.PATH_FOLLOWING + "/" + userName);
 
                 /*
                  * Note: Mastodon requests the wrong url when it needs this but we compansate with a redirect to tis
@@ -770,7 +770,7 @@ public class ActPubService {
                  */
                 actor.put("url", host + "/u/" + userName + "/home");
 
-                actor.put("endpoints", new APObj().put("sharedInbox", host + ActPubConstants.PATH_INBOX));
+                actor.put("endpoints", new APObj().put("sharedInbox", host + APConst.PATH_INBOX));
 
                 actor.put("publicKey", new APObj() //
                         .put("id", AP.str(actor, "id") + "#main-key") //

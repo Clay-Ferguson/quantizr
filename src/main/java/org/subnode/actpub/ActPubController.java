@@ -40,8 +40,8 @@ public class ActPubController {
 	/**
 	 * WebFinger GET
 	 */
-	@RequestMapping(value = ActPubConstants.PATH_WEBFINGER, method = RequestMethod.GET,
-			produces = ActPubConstants.CONTENT_TYPE_JSON_JRD)
+	@RequestMapping(value = APConst.PATH_WEBFINGER, method = RequestMethod.GET,
+			produces = APConst.CONTENT_TYPE_JSON_JRD)
 	public @ResponseBody Object webFinger(//
 			@RequestParam(value = "resource", required = true) String resource) {
 		Object ret = apUtil.generateWebFinger(resource);
@@ -75,8 +75,8 @@ public class ActPubController {
 	/**
 	 * Actor GET
 	 */
-	@RequestMapping(value = ActPubConstants.ACTOR_PATH + "/{userName}", method = RequestMethod.GET,
-			produces = ActPubConstants.CONTENT_TYPE_JSON_ACTIVITY)
+	@RequestMapping(value = APConst.ACTOR_PATH + "/{userName}", method = RequestMethod.GET,
+			produces = APConst.CONTENT_TYPE_JSON_ACTIVITY)
 	public @ResponseBody Object actor(//
 			@PathVariable(value = "userName", required = true) String userName) {
 		Object ret = apService.generateActor(userName);
@@ -90,8 +90,8 @@ public class ActPubController {
 	 * 
 	 * If no userName specified it's the system 'sharedInbox'
 	 */
-	@RequestMapping(value = ActPubConstants.PATH_INBOX + "/{userName}", method = RequestMethod.POST,
-			produces = ActPubConstants.CONTENT_TYPE_JSON_LD)
+	@RequestMapping(value = APConst.PATH_INBOX + "/{userName}", method = RequestMethod.POST,
+			produces = APConst.CONTENT_TYPE_JSON_LD)
 	public @ResponseBody Object inboxPost(//
 			@RequestBody APObj payload, //
 			@PathVariable(value = "userName", required = false) String userName, //
@@ -108,14 +108,14 @@ public class ActPubController {
 	/**
 	 * Outbox GET
 	 */
-	@RequestMapping(value = ActPubConstants.PATH_OUTBOX + "/{userName}", method = RequestMethod.GET,
-			produces = ActPubConstants.CONTENT_TYPE_JSON_ACTIVITY)
+	@RequestMapping(value = APConst.PATH_OUTBOX + "/{userName}", method = RequestMethod.GET,
+			produces = APConst.CONTENT_TYPE_JSON_ACTIVITY)
 	public @ResponseBody Object outbox(//
 			@PathVariable(value = "userName", required = true) String userName,
 			@RequestParam(value = "min_id", required = false) String minId,
 			@RequestParam(value = "page", required = false) String page) {
 		APObj ret = null;
-		if (ActPubConstants.STR_TRUE.equals(page)) {
+		if (APConst.STR_TRUE.equals(page)) {
 			ret = apOutbox.generateOutboxPage(userName, minId);
 		} else {
 			/*
@@ -142,14 +142,14 @@ public class ActPubController {
 	/**
 	 * Followers GET
 	 */
-	@RequestMapping(value = ActPubConstants.PATH_FOLLOWERS + "/{userName}", method = RequestMethod.GET,
-			produces = ActPubConstants.CONTENT_TYPE_JSON_ACTIVITY)
+	@RequestMapping(value = APConst.PATH_FOLLOWERS + "/{userName}", method = RequestMethod.GET,
+			produces = APConst.CONTENT_TYPE_JSON_ACTIVITY)
 	public @ResponseBody Object getFollowers(//
 			@PathVariable(value = "userName", required = false) String userName,
 			@RequestParam(value = "min_id", required = false) String minId,
 			@RequestParam(value = "page", required = false) String page) {
 		APObj ret = null;
-		if (ActPubConstants.STR_TRUE.equals(page)) {
+		if (APConst.STR_TRUE.equals(page)) {
 			ret = apFollowing.generateFollowersPage(userName, minId);
 		} else {
 			ret = apFollowing.generateFollowers(userName);
@@ -164,14 +164,14 @@ public class ActPubController {
 	/**
 	 * Following GET
 	 */
-	@RequestMapping(value = ActPubConstants.PATH_FOLLOWING + "/{userName}", method = RequestMethod.GET,
-			produces = ActPubConstants.CONTENT_TYPE_JSON_ACTIVITY)
+	@RequestMapping(value = APConst.PATH_FOLLOWING + "/{userName}", method = RequestMethod.GET,
+			produces = APConst.CONTENT_TYPE_JSON_ACTIVITY)
 	public @ResponseBody Object getFollowing(//
 			@PathVariable(value = "userName", required = false) String userName,
 			@RequestParam(value = "min_id", required = false) String minId,
 			@RequestParam(value = "page", required = false) String page) {
 		APObj ret = null;
-		if (ActPubConstants.STR_TRUE.equals(page)) {
+		if (APConst.STR_TRUE.equals(page)) {
 			ret = apFollowing.generateFollowingPage(userName, minId);
 		} else {
 			ret = apFollowing.generateFollowing(userName);

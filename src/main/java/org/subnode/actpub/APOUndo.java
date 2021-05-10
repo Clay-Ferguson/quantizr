@@ -5,7 +5,7 @@ package org.subnode.actpub;
  */
 public class APOUndo extends APObj {
     public APOUndo() {
-        put("@context", ActPubConstants.CONTEXT_STREAMS);
+        put("@context", APConst.CONTEXT_STREAMS);
         put("type", "Undo");
     }
 }

@@ -144,7 +144,7 @@ public class ActPubOutbox {
     public APObj getOutbox(String url) {
         if (url == null)
             return null;
-        APObj outbox = apUtil.getJson(url, ActPubConstants.MT_APP_LDJSON);
+        APObj outbox = apUtil.getJson(url, APConst.MT_APP_LDJSON);
         ActPubService.outboxQueryCount++;
         ActPubService.cycleOutboxQueryCount++;
         // log.debug("Outbox: " + XString.prettyPrint(outbox));
@@ -153,7 +153,7 @@ public class ActPubOutbox {
 
     public APOOrderedCollection generateOutbox(String userName) {
         // log.debug("Generate outbox for userName: " + userName);
-        String url = appProp.getProtocolHostAndPort() + ActPubConstants.PATH_OUTBOX + "/" + userName;
+        String url = appProp.getProtocolHostAndPort() + APConst.PATH_OUTBOX + "/" + userName;
         Long totalItems = getOutboxItemCount(userName, "public");
 
         APOOrderedCollection ret = new APOOrderedCollection();
@@ -192,11 +192,11 @@ public class ActPubOutbox {
         APList items = getOutboxItems(userName, "public", minId);
 
         // this is a self-reference url (id)
-        String url = appProp.getProtocolHostAndPort() + ActPubConstants.PATH_OUTBOX + "/" + userName + "?min_id=" + minId
+        String url = appProp.getProtocolHostAndPort() + APConst.PATH_OUTBOX + "/" + userName + "?min_id=" + minId
                 + "&page=true";
 
         APOOrderedCollectionPage ret = new APOOrderedCollectionPage();
-        ret.put("partOf", appProp.getProtocolHostAndPort() + ActPubConstants.PATH_OUTBOX + "/" + userName) //
+        ret.put("partOf", appProp.getProtocolHostAndPort() + APConst.PATH_OUTBOX + "/" + userName) //
                 .put("id", url) //
                 .put("orderedItems", items) //
                 .put("totalItems", items.size());
@@ -252,7 +252,7 @@ public class ActPubOutbox {
                                 .put("type", "Create") //
                                 .put("actor", actor) //
                                 .put("published", published) //
-                                .put("to", new APList().val(ActPubConstants.CONTEXT_STREAMS + "#Public")) //
+                                .put("to", new APList().val(APConst.CONTEXT_STREAMS + "#Public")) //
                                 // .put("cc", ...) //
                                 .put("object", new APObj() //
                                         .put("id", nodeIdBase + hexId) //
@@ -262,7 +262,7 @@ public class ActPubOutbox {
                                         .put("published", published) //
                                         .put("url", nodeIdBase + hexId) //
                                         .put("attributedTo", actor) //
-                                        .put("to", new APList().val(ActPubConstants.CONTEXT_STREAMS + "#Public")) //
+                                        .put("to", new APList().val(APConst.CONTEXT_STREAMS + "#Public")) //
                                         // .put("cc", ...) //
                                         .put("sensitive", false) //
                                         .put("content", child.getContent())//
