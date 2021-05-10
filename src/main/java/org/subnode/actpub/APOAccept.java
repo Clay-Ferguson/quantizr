@@ -5,7 +5,7 @@ package org.subnode.actpub;
  */
 public class APOAccept extends APObj {
     public APOAccept() {
-        put("@context", APConst.CONTEXT_STREAMS);
-        put("type", "Accept");
+        put(AP.context, APConst.CONTEXT_STREAMS);
+        put(AP.type, APType.Accept);
     }
 }

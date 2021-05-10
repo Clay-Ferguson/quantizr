@@ -5,9 +5,9 @@ package org.subnode.actpub;
  */
 public class APONote extends APObj {
     public APONote() {
-        put("@context", new APList() //
+        put(AP.context, new APList() //
                 .val(APConst.CONTEXT_STREAMS) //
                 .val(newContextObj()));
-        put("type", "Note");
+        put(AP.type, APType.Note);
     }
 }

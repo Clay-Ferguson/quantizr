@@ -133,7 +133,7 @@ public class ActPubUtil {
 
         String actorUrl = null;
         if (self != null) {
-            actorUrl = AP.str(self, "href");
+            actorUrl = AP.str(self, AP.href);
         }
         return actorUrl;
     }
@@ -143,13 +143,13 @@ public class ActPubUtil {
      * a 'rel' property that matches the value in the rel param string
      */
     public Object getLinkByRel(Object webFinger, String rel) {
-        List<?> linksList = AP.list(webFinger, "links");
+        List<?> linksList = AP.list(webFinger, AP.links);
 
         if (linksList == null)
             return null;
 
         for (Object link : linksList) {
-            if (rel.equals(AP.str(link, "rel"))) {
+            if (rel.equals(AP.str(link, AP.rel))) {
                 return link;
             }
         }
@@ -345,12 +345,12 @@ public class ActPubUtil {
                     SubNode userNode = read.getUserNodeByUserName(null, username);
                     if (userNode != null) {
                         APObj webFinger = new APObj() //
-                                .put("subject", "acct:" + username + "@" + appProp.getMetaHost()) //
-                                .put("links", new APList() //
+                                .put(AP.subject, "acct:" + username + "@" + appProp.getMetaHost()) //
+                                .put(AP.links, new APList() //
                                         .val(new APObj() //
-                                                .put("rel", "self") //
-                                                .put("type", "application/activity+json") //
-                                                .put("href", makeActorUrlForUserName(username))));
+                                                .put(AP.rel, "self") //
+                                                .put(AP.type, "application/activity+json") //
+                                                .put(AP.href, makeActorUrlForUserName(username))));
 
                         // log.debug("Reply with WebFinger: " + XString.prettyPrint(webFinger));
                         return webFinger;
@@ -388,8 +388,8 @@ public class ActPubUtil {
     }
 
     public String getLongUserNameFromActor(Object actor) {
-        String shortUserName = AP.str(actor, "preferredUsername"); // short name like 'alice'
-        String inbox = AP.str(actor, "inbox");
+        String shortUserName = AP.str(actor, AP.preferredUsername); // short name like 'alice'
+        String inbox = AP.str(actor, AP.inbox);
         try {
             URL url = new URL(inbox);
             String host = url.getHost();
@@ -536,11 +536,11 @@ public class ActPubUtil {
 
     public PublicKey getPublicKeyFromActor(Object actorObj) {
         PublicKey pubKey = null;
-        Object pubKeyObj = AP.obj(actorObj, "publicKey");
+        Object pubKeyObj = AP.obj(actorObj, AP.publicKey);
         if (pubKeyObj == null)
             return null;
 
-        String pkeyEncoded = AP.str(pubKeyObj, "publicKeyPem");
+        String pkeyEncoded = AP.str(pubKeyObj, AP.publicKeyPem);
         if (pkeyEncoded == null)
             return null;
 
@@ -622,7 +622,7 @@ public class ActPubUtil {
          * addition to the paging, although normally when the collection has the items it means it won't
          * have any paging
          */
-        List<?> orderedItems = AP.list(collectionObj, "orderedItems");
+        List<?> orderedItems = AP.list(collectionObj, AP.orderedItems);
         if (orderedItems != null) {
             /*
              * Commonly this will just be an array strings (like in a 'followers' collection on Mastodon)
@@ -642,7 +642,7 @@ public class ActPubUtil {
          * it just means we have to read and deduplicate all the items from all pages to be sure we don't
          * end up with a empty array even when there ARE some
          */
-        String firstPageUrl = AP.str(collectionObj, "first");
+        String firstPageUrl = AP.str(collectionObj, AP.first);
         if (firstPageUrl != null) {
             // log.debug("First Page Url: " + firstPageUrl);
             if (++pageQueries > maxPageQueries)
@@ -650,12 +650,12 @@ public class ActPubUtil {
             Object ocPage = firstPageUrl == null ? null : getJson(firstPageUrl, APConst.MT_APP_ACTJSON);
 
             while (ocPage != null) {
-                orderedItems = AP.list(ocPage, "orderedItems");
+                orderedItems = AP.list(ocPage, AP.orderedItems);
                 for (Object apObj : orderedItems) {
 
                     // if apObj is an object (map)
                     if (AP.hasProps(apObj)) {
-                        String apId = AP.str(apObj, "id");
+                        String apId = AP.str(apObj, AP.id);
                         // if no apId that's fine, just process item.
                         if (apId == null) {
                             if (!observer.item(apObj))
@@ -679,7 +679,7 @@ public class ActPubUtil {
                         return;
                 }
 
-                String nextPage = AP.str(ocPage, "next");
+                String nextPage = AP.str(ocPage, AP.next);
                 if (nextPage != null) {
                     if (++pageQueries > maxPageQueries)
                         return;
@@ -690,7 +690,7 @@ public class ActPubUtil {
             }
         }
 
-        String lastPageUrl = AP.str(collectionObj, "last");
+        String lastPageUrl = AP.str(collectionObj, AP.last);
         if (lastPageUrl != null) {
             // log.debug("Last Page Url: " + lastPageUrl);
             if (++pageQueries > maxPageQueries)
@@ -698,12 +698,12 @@ public class ActPubUtil {
             Object ocPage = lastPageUrl == null ? null : getJson(lastPageUrl, APConst.MT_APP_ACTJSON);
 
             if (ocPage != null) {
-                orderedItems = AP.list(ocPage, "orderedItems");
+                orderedItems = AP.list(ocPage, AP.orderedItems);
 
                 for (Object apObj : orderedItems) {
                     // if apObj is an object (map)
                     if (AP.hasProps(apObj)) {
-                        String apId = AP.str(apObj, "id");
+                        String apId = AP.str(apObj, AP.id);
                         // if no apId that's fine, just process item.
                         if (apId == null) {
                             if (!observer.item(apObj))

@@ -71,7 +71,7 @@ public class ActPubOutbox {
          */
         Iterable<SubNode> outboxItems = read.getSubGraph(session, outboxNode, null, 0);
 
-        String outboxUrl = AP.str(actor, "outbox");
+        String outboxUrl = AP.str(actor, AP.outbox);
         APObj outbox = getOutbox(outboxUrl);
         if (outbox == null) {
             log.debug("Unable to get outbox for AP user: " + apUserName);
@@ -99,9 +99,9 @@ public class ActPubOutbox {
                 // log.debug("saveNote: OBJ=" + XString.prettyPrint(obj));
                 // }
 
-                String apId = AP.str(obj, "id");
+                String apId = AP.str(obj, AP.id);
                 if (!apIdSet.contains(apId)) {
-                    Object object = AP.obj(obj, "object");
+                    Object object = AP.obj(obj, AP.object);
 
                     if (object != null) {
                         if (object instanceof String) {
@@ -112,15 +112,15 @@ public class ActPubOutbox {
                             // Example of what needs to be handled here is when 'obj' contains a 'boost' (retweet)
                             // {
                             // "id" : "https://dobbs.town/users/onan/statuses/105613730170001141/activity",
-                            // "type" : "Announce",
-                            // "actor" : "https://dobbs.town/users/onan",
-                            // "published" : "2021-01-25T01:20:30Z",
-                            // "to" : [ "https://www.w3.org/ns/activitystreams#Public" ],
+                            // AP.type : "Announce",
+                            // AP.actor : "https://dobbs.town/users/onan",
+                            // AP.published : "2021-01-25T01:20:30Z",
+                            // AP.to : [ "https://www.w3.org/ns/activitystreams#Public" ],
                             // "cc" : [ "https://mastodon.sdf.org/users/stunder", "https://dobbs.town/users/onan/followers" ],
-                            // "object" : "https://mastodon.sdf.org/users/stunder/statuses/105612925260202844"
+                            // AP.object : "https://mastodon.sdf.org/users/stunder/statuses/105612925260202844"
                             // }
                         } //
-                        else if ("Note".equals(AP.str(object, "type"))) {
+                        else if (APType.Note.equals(AP.str(object, AP.type))) {
                             try {
                                 ActPubService.newPostsInCycle++;
                                 apService.saveNote(session, _userNode, outboxNode, object, true, true);
@@ -157,10 +157,10 @@ public class ActPubOutbox {
         Long totalItems = getOutboxItemCount(userName, "public");
 
         APOOrderedCollection ret = new APOOrderedCollection();
-        ret.put("id", url) //
-                .put("totalItems", totalItems) //
-                .put("first", url + "?page=true") //
-                .put("last", url + "?min_id=0&page=true");
+        ret.put(AP.id, url) //
+                .put(AP.totalItems, totalItems) //
+                .put(AP.first, url + "?page=true") //
+                .put(AP.last, url + "?min_id=0&page=true");
         return ret;
     }
 
@@ -196,10 +196,10 @@ public class ActPubOutbox {
                 + "&page=true";
 
         APOOrderedCollectionPage ret = new APOOrderedCollectionPage();
-        ret.put("partOf", appProp.getProtocolHostAndPort() + APConst.PATH_OUTBOX + "/" + userName) //
-                .put("id", url) //
-                .put("orderedItems", items) //
-                .put("totalItems", items.size());
+        ret.put(AP.partOf, appProp.getProtocolHostAndPort() + APConst.PATH_OUTBOX + "/" + userName) //
+                .put(AP.id, url) //
+                .put(AP.orderedItems, items) //
+                .put(AP.totalItems, items.size());
         return ret;
     }
 
@@ -248,24 +248,24 @@ public class ActPubOutbox {
                         //todo-0: note that neither this create object, nor the node object has the CONTEXT_STREAMS
                         //in a @context property...be careful when implementing APOCrate and APONode because of this.
                         items.add(new APObj() //
-                                .put("id", nodeIdBase + hexId + "&create=t") //
-                                .put("type", "Create") //
-                                .put("actor", actor) //
-                                .put("published", published) //
-                                .put("to", new APList().val(APConst.CONTEXT_STREAMS + "#Public")) //
+                                .put(AP.id, nodeIdBase + hexId + "&create=t") //
+                                .put(AP.type, APType.Create) //
+                                .put(AP.actor, actor) //
+                                .put(AP.published, published) //
+                                .put(AP.to, new APList().val(APConst.CONTEXT_STREAMS + "#Public")) //
                                 // .put("cc", ...) //
-                                .put("object", new APObj() //
-                                        .put("id", nodeIdBase + hexId) //
-                                        .put("type", "Note") //
-                                        .put("summary", null) //
-                                        .put("replyTo", null) //
-                                        .put("published", published) //
-                                        .put("url", nodeIdBase + hexId) //
-                                        .put("attributedTo", actor) //
-                                        .put("to", new APList().val(APConst.CONTEXT_STREAMS + "#Public")) //
+                                .put(AP.object, new APObj() //
+                                        .put(AP.id, nodeIdBase + hexId) //
+                                        .put(AP.type, APType.Note) //
+                                        .put(AP.summary, null) //
+                                        .put(AP.replyTo, null) //
+                                        .put(AP.published, published) //
+                                        .put(AP.url, nodeIdBase + hexId) //
+                                        .put(AP.attributedTo, actor) //
+                                        .put(AP.to, new APList().val(APConst.CONTEXT_STREAMS + "#Public")) //
                                         // .put("cc", ...) //
-                                        .put("sensitive", false) //
-                                        .put("content", child.getContent())//
+                                        .put(AP.sensitive, false) //
+                                        .put(AP.content, child.getContent())//
                         ));
                     }
                 }

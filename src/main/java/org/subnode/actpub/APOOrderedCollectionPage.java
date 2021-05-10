@@ -5,7 +5,7 @@ package org.subnode.actpub;
  */
 public class APOOrderedCollectionPage extends APObj {
     public APOOrderedCollectionPage() {
-        put("@context", APConst.CONTEXT_STREAMS);
-        put("type", "OrderedCollectionPage");
+        put(AP.context, APConst.CONTEXT_STREAMS);
+        put(AP.type, APType.OrderedCollectionPage);
     }
 }

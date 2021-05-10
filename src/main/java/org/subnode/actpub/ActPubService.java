@@ -159,16 +159,15 @@ public class ActPubService {
 
     public APList createAttachmentsList(SubNode node) {
         APList attachments = null;
-
         String bin = node.getStrProp(NodeProp.BIN);
         String mime = node.getStrProp(NodeProp.BIN_MIME);
 
         if (bin != null && mime != null) {
             attachments = new APList().val(//
                     new APObj() //
-                            .put("type", "Document") //
-                            .put("mediaType", mime) //
-                            .put("url", appProp.getProtocolHostAndPort() + "/f/id/" + node.getId().toHexString()));
+                            .put(AP.type, APType.Document) //
+                            .put(AP.mediaType, mime) //
+                            .put(AP.url, appProp.getProtocolHostAndPort() + "/f/id/" + node.getId().toHexString()));
         }
 
         return attachments;
@@ -204,7 +203,7 @@ public class ActPubService {
 
             String toActorUrl = apUtil.getActorUrlFromWebFingerObj(webFinger);
             APObj toActorObj = apUtil.getActorByUrl(toActorUrl);
-            String inbox = AP.str(toActorObj, "inbox");
+            String inbox = AP.str(toActorObj, AP.inbox);
 
             /* lazy create fromActor here */
             if (fromActor == null) {
@@ -314,9 +313,9 @@ public class ActPubService {
         }
 
         boolean changed = false;
-        Object icon = AP.obj(actor, "icon");
+        Object icon = AP.obj(actor, AP.icon);
         if (icon != null) {
-            String iconUrl = AP.str(icon, "url");
+            String iconUrl = AP.str(icon, AP.url);
             if (iconUrl != null) {
                 String curIconUrl = userNode.getStrProp(NodeProp.ACT_PUB_USER_ICON_URL.s());
                 if (!iconUrl.equals(curIconUrl)) {
@@ -327,13 +326,13 @@ public class ActPubService {
             }
         }
 
-        if (userNode.setProp(NodeProp.USER_BIO.s(), AP.str(actor, "summary")))
+        if (userNode.setProp(NodeProp.USER_BIO.s(), AP.str(actor, AP.summary)))
             changed = true;
-        if (userNode.setProp(NodeProp.ACT_PUB_ACTOR_ID.s(), AP.str(actor, "id")))
+        if (userNode.setProp(NodeProp.ACT_PUB_ACTOR_ID.s(), AP.str(actor, AP.id)))
             changed = true;
-        if (userNode.setProp(NodeProp.ACT_PUB_ACTOR_INBOX.s(), AP.str(actor, "inbox")))
+        if (userNode.setProp(NodeProp.ACT_PUB_ACTOR_INBOX.s(), AP.str(actor, AP.inbox)))
             changed = true;
-        if (userNode.setProp(NodeProp.ACT_PUB_ACTOR_URL.s(), AP.str(actor, "url")))
+        if (userNode.setProp(NodeProp.ACT_PUB_ACTOR_URL.s(), AP.str(actor, AP.url)))
             changed = true;
 
         if (changed) {
@@ -341,7 +340,7 @@ public class ActPubService {
         }
 
         /* cache the account node id for this user by the actor url */
-        String selfRef = AP.str(actor, "id"); // actor url of 'actor' object, is the same as the 'id'
+        String selfRef = AP.str(actor, AP.id); // actor url of 'actor' object, is the same as the 'id'
         apCache.acctIdByActorUrl.put(selfRef, userNode.getId().toHexString());
         return userNode;
     }
@@ -351,18 +350,20 @@ public class ActPubService {
      * follow a user on this server
      */
     public APObj processInboxPost(HttpServletRequest httpReq, Object payload) {
-        String type = AP.str(payload, "type");
+        String type = AP.str(payload, AP.type);
+
+        // switch statement here? (todo-0)
 
         // Process Create Action
-        if ("Create".equalsIgnoreCase(type)) {
+        if (APType.Create.equalsIgnoreCase(type)) {
             return processCreateAction(httpReq, payload);
         }
         // Process Follow Action
-        else if ("Follow".equalsIgnoreCase(type)) {
+        else if (APType.Follow.equalsIgnoreCase(type)) {
             return apFollowing.processFollowAction(payload, false);
         }
         // Process Undo Action (Unfollow, etc)
-        else if ("Undo".equalsIgnoreCase(type)) {
+        else if (APType.Undo.equalsIgnoreCase(type)) {
             return processUndoAction(payload);
         }
         // else report unhandled
@@ -374,8 +375,8 @@ public class ActPubService {
 
     /* Process inbound undo actions (comming from foreign servers) */
     public APObj processUndoAction(Object payload) {
-        Object object = AP.obj(payload, "object");
-        if (object != null && "Follow".equalsIgnoreCase(AP.str(object, "type"))) {
+        Object object = AP.obj(payload, AP.object);
+        if (object != null && APType.Follow.equalsIgnoreCase(AP.str(object, AP.type))) {
             return apFollowing.processFollowAction(object, true);
         }
         return null;
@@ -384,7 +385,7 @@ public class ActPubService {
     public APObj processCreateAction(HttpServletRequest httpReq, Object payload) {
         APObj _ret = (APObj) adminRunner.run(session -> {
 
-            String actorUrl = AP.str(payload, "actor");
+            String actorUrl = AP.str(payload, AP.actor);
             if (actorUrl == null) {
                 log.debug("no 'actor' found on create action request posted object");
                 return null;
@@ -399,8 +400,8 @@ public class ActPubService {
             PublicKey pubKey = apUtil.getPublicKeyFromActor(actorObj);
             apUtil.verifySignature(httpReq, pubKey);
 
-            Object object = AP.obj(payload, "object");
-            if (object != null && "Note".equalsIgnoreCase(AP.str(object, "type"))) {
+            Object object = AP.obj(payload, AP.object);
+            if (object != null && APType.Note.equalsIgnoreCase(AP.str(object, AP.type))) {
                 return processCreateNote(session, actorUrl, actorObj, object);
             } else {
                 log.debug("Unhandled Create action (object type not supported): " + XString.prettyPrint(payload));
@@ -419,7 +420,7 @@ public class ActPubService {
          * then insert the reply under that, instead of the default without this id which is to put in
          * 'inbox'
          */
-        String inReplyTo = AP.str(obj, "inReplyTo");
+        String inReplyTo = AP.str(obj, AP.inReplyTo);
 
         /* This will say null unless inReplyTo is used to get an id to lookup */
         SubNode nodeBeingRepliedTo = null;
@@ -474,7 +475,7 @@ public class ActPubService {
      */
     public void saveNote(MongoSession session, SubNode toAccountNode, SubNode parentNode, Object obj, boolean forcePublic,
             boolean temp) {
-        String id = AP.str(obj, "id");
+        String id = AP.str(obj, AP.id);
 
         /*
          * First look to see if there is a target node already existing for this so we don't add a duplicate
@@ -485,17 +486,17 @@ public class ActPubService {
             return;
         }
 
-        Date published = AP.date(obj, "published");
-        String inReplyTo = AP.str(obj, "inReplyTo");
-        String contentHtml = AP.str(obj, "content");
-        String objUrl = AP.str(obj, "url");
-        String objAttributedTo = AP.str(obj, "attributedTo");
-        String objType = AP.str(obj, "type");
-        Boolean sensitive = AP.bool(obj, "sensitive");
+        Date published = AP.date(obj, AP.published);
+        String inReplyTo = AP.str(obj, AP.inReplyTo);
+        String contentHtml = AP.str(obj, AP.content);
+        String objUrl = AP.str(obj, AP.url);
+        String objAttributedTo = AP.str(obj, AP.attributedTo);
+        String objType = AP.str(obj, AP.type);
+        Boolean sensitive = AP.bool(obj, AP.sensitive);
 
         // Ignore non-english for now (later we can make this a user-defined language selection)
         String lang = "0";
-        Object context = AP.obj(obj, "@context");
+        Object context = AP.obj(obj, AP.context);
         if (context != null) {
             String language = AP.str(context, "@language");
             if (language != null) {
@@ -550,8 +551,8 @@ public class ActPubService {
         // part of troubleshooting the non-english language detection
         // newNode.setProp("lang", lang);
 
-        shareToAllObjectRecipients(session, newNode, obj, "to");
-        shareToAllObjectRecipients(session, newNode, obj, "cc");
+        shareToAllObjectRecipients(session, newNode, obj, AP.to);
+        shareToAllObjectRecipients(session, newNode, obj, AP.cc);
 
         if (forcePublic) {
             acl.addPrivilege(session, newNode, PrincipalName.PUBLIC.s(),
@@ -690,13 +691,13 @@ public class ActPubService {
     }
 
     private void addAttachmentIfExists(MongoSession session, SubNode node, Object obj) {
-        List<?> attachments = AP.list(obj, "attachment");
+        List<?> attachments = AP.list(obj, AP.attachment);
         if (attachments == null)
             return;
 
         for (Object att : attachments) {
-            String mediaType = AP.str(att, "mediaType");
-            String url = AP.str(att, "url");
+            String mediaType = AP.str(att, AP.mediaType);
+            String url = AP.str(att, AP.url);
 
             if (mediaType != null && url != null) {
                 attachmentService.readFromUrl(session, url, node.getId().toHexString(), mediaType, -1, false);
@@ -727,22 +728,22 @@ public class ActPubService {
                         + userNode.getId().toHexString() + "&v=" + avatarVer;
 
                 APObj actor = new APObj();
-                actor.put("@context", new APList() //
+                actor.put(AP.context, new APList() //
                         .val(APConst.CONTEXT_STREAMS) //
                         .val(APConst.CONTEXT_SECURITY));
 
                 /*
                  * Note: this is a self-reference, and must be identical to the URL that returns this object
                  */
-                actor.put("id", apUtil.makeActorUrlForUserName(userName));
-                actor.put("type", "Person");
-                actor.put("preferredUsername", userName);
-                actor.put("name", userName); // this should be ordinary name (first last)
+                actor.put(AP.id, apUtil.makeActorUrlForUserName(userName));
+                actor.put(AP.type, APType.Person);
+                actor.put(AP.preferredUsername, userName);
+                actor.put(AP.name, userName); // this should be ordinary name (first last)
 
-                actor.put("icon", new APObj() //
-                        .put("type", "Image") //
-                        .put("mediaType", avatarMime) //
-                        .put("url", avatarUrl));
+                actor.put(AP.icon, new APObj() //
+                        .put(AP.type, APType.Image) //
+                        .put(AP.mediaType, avatarMime) //
+                        .put(AP.url, avatarUrl));
 
                 String headerImageMime = userNode.getStrProp(NodeProp.BIN_MIME.s() + "Header");
                 if (headerImageMime != null) {
@@ -751,33 +752,33 @@ public class ActPubService {
                         String headerImageUrl = appProp.getProtocolHostAndPort() + AppController.API_PATH + "/bin/profileHeader"
                                 + "?nodeId=" + userNode.getId().toHexString() + "&v=" + headerImageVer;
 
-                        actor.put("image", new APObj() //
-                                .put("type", "Image") //
-                                .put("mediaType", headerImageMime) //
-                                .put("url", headerImageUrl));
+                        actor.put(AP.image, new APObj() //
+                                .put(AP.type, APType.Image) //
+                                .put(AP.mediaType, headerImageMime) //
+                                .put(AP.url, headerImageUrl));
                     }
                 }
 
-                actor.put("summary", userNode.getStrProp(NodeProp.USER_BIO.s()));
-                actor.put("inbox", host + APConst.PATH_INBOX + "/" + userName); //
-                actor.put("outbox", host + APConst.PATH_OUTBOX + "/" + userName); //
-                actor.put("followers", host + APConst.PATH_FOLLOWERS + "/" + userName);
-                actor.put("following", host + APConst.PATH_FOLLOWING + "/" + userName);
+                actor.put(AP.summary, userNode.getStrProp(NodeProp.USER_BIO.s()));
+                actor.put(AP.inbox, host + APConst.PATH_INBOX + "/" + userName); //
+                actor.put(AP.outbox, host + APConst.PATH_OUTBOX + "/" + userName); //
+                actor.put(AP.followers, host + APConst.PATH_FOLLOWERS + "/" + userName);
+                actor.put(AP.following, host + APConst.PATH_FOLLOWING + "/" + userName);
 
                 /*
                  * Note: Mastodon requests the wrong url when it needs this but we compansate with a redirect to tis
                  * in our ActPubController. We tolerate Mastodon breaking spec here.
                  */
-                actor.put("url", host + "/u/" + userName + "/home");
+                actor.put(AP.url, host + "/u/" + userName + "/home");
 
-                actor.put("endpoints", new APObj().put("sharedInbox", host + APConst.PATH_INBOX));
+                actor.put(AP.endpoints, new APObj().put(AP.sharedInbox, host + APConst.PATH_INBOX));
 
-                actor.put("publicKey", new APObj() //
-                        .put("id", AP.str(actor, "id") + "#main-key") //
-                        .put("owner", AP.str(actor, "id")) //
-                        .put("publicKeyPem", "-----BEGIN PUBLIC KEY-----\n" + publicKey + "\n-----END PUBLIC KEY-----\n"));
+                actor.put(AP.publicKey, new APObj() //
+                        .put(AP.id, AP.str(actor, AP.id) + "#main-key") //
+                        .put(AP.owner, AP.str(actor, AP.id)) //
+                        .put(AP.publicKeyPem, "-----BEGIN PUBLIC KEY-----\n" + publicKey + "\n-----END PUBLIC KEY-----\n"));
 
-                actor.put("supportsFriendRequests", true);
+                actor.put(AP.supportsFriendRequests, true);
 
                 // log.debug("Reply with Actor: " + XString.prettyPrint(actor));
                 return actor;

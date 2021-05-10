@@ -5,9 +5,9 @@ package org.subnode.actpub;
  */
 public class APOCreate extends APObj {
     public APOCreate() {
-        put("@context", new APList() //
+        put(AP.context, new APList() //
                 .val(APConst.CONTEXT_STREAMS) //
                 .val(newContextObj()));
-        put("type", "Create");
+        put(AP.type, APType.Create);
     }
 }

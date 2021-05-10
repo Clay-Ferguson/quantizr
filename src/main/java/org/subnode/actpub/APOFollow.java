@@ -5,7 +5,7 @@ package org.subnode.actpub;
  */
 public class APOFollow extends APObj {
     public APOFollow() {
-        put("@context", APConst.CONTEXT_STREAMS);
-        put("type", "Follow");
+        put(AP.context, APConst.CONTEXT_STREAMS);
+        put(AP.type, APType.Follow);
     }
 }

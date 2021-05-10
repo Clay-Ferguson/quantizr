@@ -83,30 +83,30 @@ public class ActPubFollowing {
                 if (following) {
                     followAction = new APOFollow();
                     followAction //
-                            .put("id", appProp.getProtocolHostAndPort() + "/follow/" + String.valueOf(new Date().getTime())) //
-                            .put("actor", sessionActorUrl) //
-                            .put("object", actorUrlOfUserBeingFollowed);
+                            .put(AP.id, appProp.getProtocolHostAndPort() + "/follow/" + String.valueOf(new Date().getTime())) //
+                            .put(AP.actor, sessionActorUrl) //
+                            .put(AP.object, actorUrlOfUserBeingFollowed);
                 }
                 // send unfollow action
                 else {
                     followAction = new APOUndo();
                     followAction //
-                            .put("id", appProp.getProtocolHostAndPort() + "/unfollow/" + String.valueOf(new Date().getTime())) //
-                            .put("actor", sessionActorUrl) //
-                            .put("object", new APObj() //
+                            .put(AP.id, appProp.getProtocolHostAndPort() + "/unfollow/" + String.valueOf(new Date().getTime())) //
+                            .put(AP.actor, sessionActorUrl) //
+                            .put(AP.object, new APObj() //
                                     // todo-0: need to verify this undo object should have the @context property before adding it.
                                     // and only way will be to test against Mastodon again.
-                                    .put("id",
+                                    .put(AP.id,
                                             // todo-0: check this. Shouldn't this be /follow/ instead of /unfollow-pbj/ ?
                                             appProp.getProtocolHostAndPort() + "/unfollow-obj/"
                                                     + String.valueOf(new Date().getTime())) //
-                                    .put("type", "Follow") //
-                                    .put("actor", sessionActorUrl) //
-                                    .put("object", actorUrlOfUserBeingFollowed));
+                                    .put(AP.type, APType.Follow) //
+                                    .put(AP.actor, sessionActorUrl) //
+                                    .put(AP.object, actorUrlOfUserBeingFollowed));
                 }
 
                 APObj toActor = apUtil.getActorByUrl(actorUrlOfUserBeingFollowed);
-                String toInbox = AP.str(toActor, "inbox");
+                String toInbox = AP.str(toActor, AP.inbox);
                 apUtil.securePost(session, null, toInbox, sessionActorUrl, followAction);
                 return null;
             });
@@ -126,7 +126,7 @@ public class ActPubFollowing {
 
         return (APObj) adminRunner.run(session -> {
             // Actor URL of actor doing the following
-            String followerActorUrl = AP.str(followAction, "actor");
+            String followerActorUrl = AP.str(followAction, AP.actor);
             if (followerActorUrl == null) {
                 log.debug("no 'actor' found on follows action request posted object");
                 return null;
@@ -141,7 +141,7 @@ public class ActPubFollowing {
             apService.userEncountered(followerUserName, false);
 
             // Actor being followed (local to our server)
-            String actorBeingFollowedUrl = AP.str(followAction, "object");
+            String actorBeingFollowedUrl = AP.str(followAction, AP.object);
             if (actorBeingFollowedUrl == null) {
                 log.debug("no 'object' found on follows action request posted object");
                 return null;
@@ -186,16 +186,16 @@ public class ActPubFollowing {
 
                     // Must send either Accept or Reject. Currently we auto-accept all.
                     APOAccept acceptFollow = new APOAccept();
-                    acceptFollow.put("summary", "Accepted " + (unFollow ? "unfollow" : "follow") + " request") //
-                            .put("actor", actorBeingFollowedUrl) //
+                    acceptFollow.put(AP.summary, "Accepted " + (unFollow ? "unfollow" : "follow") + " request") //
+                            .put(AP.actor, actorBeingFollowedUrl) //
                             // todo-0: need to verify this undo object should have the @context property before adding it.
                             // and only way will be to test against Mastodon again.
-                            .put("object", new APObj() //
-                                    .put("type", unFollow ? "Undo" : "Follow") //
-                                    .put("actor", followerActorUrl) //
-                                    .put("object", actorBeingFollowedUrl)); //
+                            .put(AP.object, new APObj() //
+                                    .put(AP.type, unFollow ? APType.Undo : APType.Follow) //
+                                    .put(AP.actor, followerActorUrl) //
+                                    .put(AP.object, actorBeingFollowedUrl)); //
 
-                    String followerInbox = AP.str(followerActorObj, "inbox");
+                    String followerInbox = AP.str(followerActorObj, AP.inbox);
 
                     // log.debug("Sending Accept of Follow Request to inbox " + followerInbox);
                     apUtil.securePost(session, privateKey, followerInbox, actorBeingFollowedUrl, acceptFollow);
@@ -215,10 +215,10 @@ public class ActPubFollowing {
         Long totalItems = getFollowersCount(userName);
 
         APOOrderedCollection ret = new APOOrderedCollection();
-        ret.put("id", url) //
-                .put("totalItems", totalItems) //
-                .put("first", url + "?page=true") //
-                .put("last", url + "?min_id=0&page=true");
+        ret.put(AP.id, url) //
+                .put(AP.totalItems, totalItems) //
+                .put(AP.first, url + "?page=true") //
+                .put(AP.last, url + "?min_id=0&page=true");
         return ret;
     }
 
@@ -230,10 +230,10 @@ public class ActPubFollowing {
         Long totalItems = getFollowingCount(userName);
 
         APOOrderedCollection ret = new APOOrderedCollection();
-        ret.put("id", url) //
-                .put("totalItems", totalItems) //
-                .put("first", url + "?page=true") //
-                .put("last", url + "?min_id=0&page=true");
+        ret.put(AP.id, url) //
+                .put(AP.totalItems, totalItems) //
+                .put(AP.first, url + "?page=true") //
+                .put(AP.last, url + "?min_id=0&page=true");
         return ret;
     }
 
@@ -249,10 +249,10 @@ public class ActPubFollowing {
             url += "&min_id=" + minId;
         }
         APOOrderedCollectionPage ret = new APOOrderedCollectionPage();
-        ret.put("id", url) //
-                .put("orderedItems", following) //
-                .put("partOf", appProp.getProtocolHostAndPort() + APConst.PATH_FOLLOWING + "/" + userName)//
-                .put("totalItems", following.size());
+        ret.put(AP.id, url) //
+                .put(AP.orderedItems, following) //
+                .put(AP.partOf, appProp.getProtocolHostAndPort() + APConst.PATH_FOLLOWING + "/" + userName)//
+                .put(AP.totalItems, following.size());
         return ret;
     }
 
@@ -317,10 +317,10 @@ public class ActPubFollowing {
             url += "&min_id=" + minId;
         }
         APOOrderedCollectionPage ret = new APOOrderedCollectionPage();
-        ret.put("id", url) //
-                .put("orderedItems", followers) //
-                .put("partOf", appProp.getProtocolHostAndPort() + APConst.PATH_FOLLOWERS + "/" + userName)//
-                .put("totalItems", followers.size());
+        ret.put(AP.id, url) //
+                .put(AP.orderedItems, followers) //
+                .put(AP.partOf, appProp.getProtocolHostAndPort() + APConst.PATH_FOLLOWERS + "/" + userName)//
+                .put(AP.totalItems, followers.size());
         return ret;
     }
 

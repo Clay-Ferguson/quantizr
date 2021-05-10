@@ -5,6 +5,6 @@ package org.subnode.actpub;
  */
 public class APOMention extends APObj {
     public APOMention() {
-        put("type", "Mention");
+        put(AP.type, APType.Mention);
     }
 }

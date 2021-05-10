@@ -42,13 +42,13 @@ public class ActPubFactory {
 			ZonedDateTime now, boolean privateMessage, APList attachments) {
 		APONote ret = new APONote();
 
-		ret.put("id", noteUrl);
-		ret.put("published", now.format(DateTimeFormatter.ISO_INSTANT));
-		ret.put("attributedTo", attributedTo);
-		ret.put("summary", null);
-		ret.put("url", noteUrl);
-		ret.put("sensitive", false);
-		ret.put("content", content);
+		ret.put(AP.id, noteUrl);
+		ret.put(AP.published, now.format(DateTimeFormatter.ISO_INSTANT));
+		ret.put(AP.attributedTo, attributedTo);
+		ret.put(AP.summary, null);
+		ret.put(AP.url, noteUrl);
+		ret.put(AP.sensitive, false);
+		ret.put(AP.content, content);
 
 		LinkedList<String> toList = new LinkedList<>();
 		LinkedList<String> ccList = new LinkedList<>();
@@ -68,10 +68,10 @@ public class ActPubFactory {
 				ccList.add(actorUrl);
 			}
 			tagList.val(new APOMention() //
-					.put("href", actorUrl) //
-					.put("name", "@" + userName)); // prepend character to make it like '@user@server.com'
+					.put(AP.href, actorUrl) //
+					.put(AP.name, "@" + userName)); // prepend character to make it like '@user@server.com'
 		}
-		ret.put("tag", tagList);
+		ret.put(AP.tag, tagList);
 
 		if (!privateMessage) {
 			toList.add(APConst.CONTEXT_STREAMS + "#Public");
@@ -82,17 +82,17 @@ public class ActPubFactory {
 			 */
 			APObj actor = apCache.actorsByUrl.get(attributedTo);
 			if (actor != null) {
-				ccList.add(AP.str(actor, "followers"));
+				ccList.add(AP.str(actor, AP.followers));
 			}
 		}
 
-		ret.put("to", toList);
+		ret.put(AP.to, toList);
 
 		if (ccList.size() > 0) {
-			ret.put("cc", ccList);
+			ret.put(AP.cc, ccList);
 		}
 
-		ret.put("attachment", attachments);
+		ret.put(AP.attachment, attachments);
 		return ret;
 	}
 
@@ -105,12 +105,12 @@ public class ActPubFactory {
 		APOCreate ret = new APOCreate();
 
 		// this 'id' was an early WAG, and needs a fresh look now that AP code is more complete.
-		ret.put("id", noteUrl + "&apCreateTime=" + idTime);
-		ret.put("actor", fromActor);
-		ret.put("published", now.format(DateTimeFormatter.ISO_INSTANT));
-		ret.put("object", object);
+		ret.put(AP.id, noteUrl + "&apCreateTime=" + idTime);
+		ret.put(AP.actor, fromActor);
+		ret.put(AP.published, now.format(DateTimeFormatter.ISO_INSTANT));
+		ret.put(AP.object, object);
 
-		ret.put("to", new APList() //
+		ret.put(AP.to, new APList() //
 				.vals(toActors) //
 				.val(APConst.CONTEXT_STREAMS + "#Public"));
 

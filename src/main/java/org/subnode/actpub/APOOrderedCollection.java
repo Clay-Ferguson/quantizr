@@ -5,7 +5,7 @@ package org.subnode.actpub;
  */
 public class APOOrderedCollection extends APObj {
     public APOOrderedCollection() {
-        put("@context", APConst.CONTEXT_STREAMS);
-        put("type", "OrderedCollection");
+        put(AP.context, APConst.CONTEXT_STREAMS);
+        put(AP.type, APType.OrderedCollection);
     }
 }
