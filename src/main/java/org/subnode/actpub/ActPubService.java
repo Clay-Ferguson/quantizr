@@ -351,24 +351,27 @@ public class ActPubService {
      */
     public APObj processInboxPost(HttpServletRequest httpReq, Object payload) {
         String type = AP.str(payload, AP.type);
+        if (type == null)
+            return null;
+        type = type.trim();
 
-        // switch statement here? (todo-0)
+        switch (type) {
+            // Process Create Action
+            case APType.Create:
+                return processCreateAction(httpReq, payload);
+                
+            // Process Follow Action
+            case APType.Follow:
+                return apFollowing.processFollowAction(payload, false);
 
-        // Process Create Action
-        if (APType.Create.equalsIgnoreCase(type)) {
-            return processCreateAction(httpReq, payload);
-        }
-        // Process Follow Action
-        else if (APType.Follow.equalsIgnoreCase(type)) {
-            return apFollowing.processFollowAction(payload, false);
-        }
-        // Process Undo Action (Unfollow, etc)
-        else if (APType.Undo.equalsIgnoreCase(type)) {
-            return processUndoAction(payload);
-        }
-        // else report unhandled
-        else {
-            log.debug("inbox (post) REST not handled:" + XString.prettyPrint(payload));
+            // Process Undo Action (Unfollow, etc)
+            case APType.Undo:
+                return processUndoAction(payload);
+
+            // else report unhandled type
+            default:
+                log.debug("Unsupported type:" + XString.prettyPrint(payload));
+                break;
         }
         return null;
     }
@@ -383,7 +386,7 @@ public class ActPubService {
     }
 
     public APObj processCreateAction(HttpServletRequest httpReq, Object payload) {
-        APObj _ret = (APObj) adminRunner.run(session -> {
+        APObj ret = (APObj) adminRunner.run(session -> {
 
             String actorUrl = AP.str(payload, AP.actor);
             if (actorUrl == null) {
@@ -408,7 +411,7 @@ public class ActPubService {
             }
             return null;
         });
-        return _ret;
+        return ret;
     }
 
     /* obj is the 'Note' object */
@@ -672,10 +675,10 @@ public class ActPubService {
                 acctNode = read.getUserNodeByUserName(session, longUserName);
             } else {
                 /*
-                 * todo-1: this is contributing to our [currently] unwanted CRAWLER effect (FediCrawler!) chain reaction. The
-                 * rule here should be either don't load foreign users whose outboxes you don't plan to load or else
-                 * have some property on the node that designates if we need to read the actual outbox or if you DO
-                 * want to add a user and not load their outbox.
+                 * todo-1: this is contributing to our [currently] unwanted CRAWLER effect (FediCrawler!) chain
+                 * reaction. The rule here should be either don't load foreign users whose outboxes you don't plan
+                 * to load or else have some property on the node that designates if we need to read the actual
+                 * outbox or if you DO want to add a user and not load their outbox.
                  */
                 // acctNode = loadForeignUserByActorUrl(session, actorUrl);
             }
@@ -886,7 +889,7 @@ public class ActPubService {
         }
     }
 
-     /**
+    /**
      * Returns number of userNamesPendingMessageRefresh that map to 'false' values
      */
     public int queuedUserCount() {
