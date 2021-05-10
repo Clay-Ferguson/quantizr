@@ -25,7 +25,6 @@ public class RunAsMongoAdmin {
 
 	public void run(MongoRunnable runner) {
 		MongoSession session = null;
-
 		try {
 			session = auth.getAdminSession();
 			runner.run(session);

@@ -172,7 +172,7 @@ public class ActPubOutbox {
      * works before we try to figure out how to do private auth comming from specific user(s)
      */
     public Long getOutboxItemCount(final String userName, String sharedTo) {
-        Long totalItems = (Long) adminRunner.run(mongoSession -> {
+        Long totalItems = adminRunner.run(mongoSession -> {
             long count = 0;
             SubNode userNode = read.getUserNodeByUserName(null, userName);
             if (userNode != null) {

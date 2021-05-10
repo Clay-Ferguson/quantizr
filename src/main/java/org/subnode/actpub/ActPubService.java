@@ -386,7 +386,7 @@ public class ActPubService {
     }
 
     public APObj processCreateAction(HttpServletRequest httpReq, Object payload) {
-        APObj ret = (APObj) adminRunner.run(session -> {
+        APObj ret = adminRunner.run(session -> {
 
             String actorUrl = AP.str(payload, AP.actor);
             if (actorUrl == null) {

@@ -1155,7 +1155,7 @@ public class AttachmentService {
 	}
 
 	public int getGridItemCount() {
-		return (Integer) adminRunner.run(session -> {
+		return adminRunner.run(session -> {
 			int count = 0;
 			final GridFSFindIterable files = gridFsBucket.find();
 

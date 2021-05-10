@@ -49,7 +49,7 @@ public class CallProcessor {
 	 * and/or the request to perform the login if the user is not logged in, and
 	 * then call the function to be processed
 	 */
-	public Object run(String command, RequestBase req, HttpSession httpSession, MongoRunnableEx runner) {
+	public Object run(String command, RequestBase req, HttpSession httpSession, MongoRunnableEx<Object> runner) {
 		if (AppServer.isShuttingDown()) {
 			throw ExUtil.wrapEx("Server not available.");
 		}

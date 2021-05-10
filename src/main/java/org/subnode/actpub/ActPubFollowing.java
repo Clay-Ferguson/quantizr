@@ -124,7 +124,7 @@ public class ActPubFollowing {
      */
     public APObj processFollowAction(Object followAction, boolean unFollow) {
 
-        return (APObj) adminRunner.run(session -> {
+        return adminRunner.<APObj>run(session -> {
             // Actor URL of actor doing the following
             String followerActorUrl = AP.str(followAction, AP.actor);
             if (followerActorUrl == null) {

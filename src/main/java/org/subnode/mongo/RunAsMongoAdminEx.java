@@ -13,7 +13,7 @@ import org.subnode.util.MongoRunnableEx;
  * Lambda (i.e. 'Functional Interface')
  */
 @Component
-public class RunAsMongoAdminEx<T> {
+public class RunAsMongoAdminEx {
 	private static final Logger log = LoggerFactory.getLogger(RunAsMongoAdminEx.class);
 
 	@Autowired
@@ -22,9 +22,9 @@ public class RunAsMongoAdminEx<T> {
 	@Autowired
 	private MongoAuth auth;
 
-	public T run(MongoRunnableEx runner) {
+	public <T> T run(MongoRunnableEx<T> runner) {
 		MongoSession session = null;
-		Object ret = null;
+		T ret = null;
 		try {
 			session = auth.getAdminSession();
 			ret = runner.run(session);
@@ -34,6 +34,6 @@ public class RunAsMongoAdminEx<T> {
 			log.error("error", ex);
 			throw ex;
 		}
-		return (T)ret;
+		return ret;
 	}
 }
