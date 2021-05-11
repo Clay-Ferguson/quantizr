@@ -42,6 +42,7 @@ import { ChangeNodeTypeDlg } from "./ChangeNodeTypeDlg";
 import { ConfirmDlg } from "./ConfirmDlg";
 import { EditPropertyDlg } from "./EditPropertyDlg";
 import { EncryptionDlg } from "./EncryptionDlg";
+import { FriendsDlg } from "./FriendsDlg";
 import { UploadFromFileDropzoneDlg } from "./UploadFromFileDropzoneDlg";
 
 let S: Singletons;
@@ -690,15 +691,22 @@ export class EditNodeDlg extends DialogBase {
                 }) : null,
 
             new Icon({
-                className: "fa fa-clock-o fa-lg insertTimeIcon",
+                className: "fa fa-clock-o fa-lg editorButtonIcon",
                 title: "Insert current time at editor cursor.",
                 onClick: this.insertTime
             }),
+
             !datePropExists ? new Icon({
-                className: "fa fa-calendar fa-lg insertTimeIcon",
+                className: "fa fa-calendar fa-lg editorButtonIcon",
                 title: "Insert Date property on node",
                 onClick: this.addDateProperty
-            }) : null
+            }) : null,
+
+            new Icon({
+                className: "fa fa-user fa-lg editorButtonIcon",
+                title: "Insert username/mention at editor cursor.",
+                onClick: this.insertMention
+            })
         ]);
     }
 
@@ -735,6 +743,16 @@ export class EditNodeDlg extends DialogBase {
     insertTime = (): void => {
         if (this.contentEditor) {
             this.contentEditor.insertTextAtCursor("[" + S.util.formatDate(new Date()) + "]");
+        }
+    }
+
+    insertMention = async (): Promise<void> => {
+        if (this.contentEditor) {
+            let friendsDlg: FriendsDlg = new FriendsDlg(this.appState);
+            await friendsDlg.open();
+            if (friendsDlg.getState().selectedName) {
+                this.contentEditor.insertTextAtCursor(" @" + friendsDlg.getState().selectedName + " ");
+            }
         }
     }
 
