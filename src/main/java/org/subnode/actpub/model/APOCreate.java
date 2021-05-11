@@ -7,10 +7,10 @@ import org.subnode.actpub.APConst;
  */
 public class APOCreate extends APObj {
     public APOCreate() {
-        put(AP.context, new APList() //
+        put(APProp.context, new APList() //
                 .val(APConst.CONTEXT_STREAMS) //
                 .val(new APOLanguage()));
-        put(AP.type, APType.Create);
+        put(APProp.type, APType.Create);
     }
 
     @Override

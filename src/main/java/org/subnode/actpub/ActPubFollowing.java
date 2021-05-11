@@ -19,6 +19,7 @@ import org.subnode.actpub.model.APOOrderedCollection;
 import org.subnode.actpub.model.APOOrderedCollectionPage;
 import org.subnode.actpub.model.APOUndo;
 import org.subnode.actpub.model.APObj;
+import org.subnode.actpub.model.APProp;
 import org.subnode.actpub.model.APType;
 import org.subnode.config.AppProp;
 import org.subnode.config.NodeName;
@@ -89,9 +90,9 @@ public class ActPubFollowing {
             adminRunner.run(session -> {
                 String sessionActorUrl = apUtil.makeActorUrlForUserName(ThreadLocals.getSessionContext().getUserName());
                 APOFollow followAction = new APOFollow()
-                        .put(AP.id, appProp.getProtocolHostAndPort() + "/follow/" + String.valueOf(new Date().getTime())) //
-                        .put(AP.actor, sessionActorUrl) //
-                        .put(AP.object, actorUrlOfUserBeingFollowed);
+                        .put(APProp.id, appProp.getProtocolHostAndPort() + "/follow/" + String.valueOf(new Date().getTime())) //
+                        .put(APProp.actor, sessionActorUrl) //
+                        .put(APProp.object, actorUrlOfUserBeingFollowed);
                 APObj action = null;
 
                 // send follow action
@@ -101,13 +102,13 @@ public class ActPubFollowing {
                 // send unfollow action
                 else {
                     action = new APOUndo()//
-                            .put(AP.id, appProp.getProtocolHostAndPort() + "/unfollow/" + String.valueOf(new Date().getTime())) //
-                            .put(AP.actor, sessionActorUrl) //
-                            .put(AP.object, followAction);
+                            .put(APProp.id, appProp.getProtocolHostAndPort() + "/unfollow/" + String.valueOf(new Date().getTime())) //
+                            .put(APProp.actor, sessionActorUrl) //
+                            .put(APProp.object, followAction);
                 }
 
                 APObj toActor = apUtil.getActorByUrl(actorUrlOfUserBeingFollowed);
-                String toInbox = AP.str(toActor, AP.inbox);
+                String toInbox = AP.str(toActor, APProp.inbox);
                 apUtil.securePost(session, null, toInbox, sessionActorUrl, action);
                 return null;
             });
@@ -127,7 +128,7 @@ public class ActPubFollowing {
 
         adminRunner.<APObj>run(session -> {
             // Actor URL of actor doing the following
-            String followerActorUrl = AP.str(followAction, AP.actor);
+            String followerActorUrl = AP.str(followAction, APProp.actor);
             if (followerActorUrl == null) {
                 log.debug("no 'actor' found on follows action request posted object");
                 return null;
@@ -142,7 +143,7 @@ public class ActPubFollowing {
             apService.userEncountered(followerUserName, false);
 
             // Actor being followed (local to our server)
-            String actorBeingFollowedUrl = AP.str(followAction, AP.object);
+            String actorBeingFollowedUrl = AP.str(followAction, APProp.object);
             if (actorBeingFollowedUrl == null) {
                 log.debug("no 'object' found on follows action request posted object");
                 return null;
@@ -187,16 +188,16 @@ public class ActPubFollowing {
 
                     // Must send either Accept or Reject. Currently we auto-accept all.
                     APOAccept acceptFollow = new APOAccept() //
-                            .put(AP.summary, "Accepted " + (unFollow ? "unfollow" : "follow") + " request") //
-                            .put(AP.actor, actorBeingFollowedUrl) //
+                            .put(APProp.summary, "Accepted " + (unFollow ? "unfollow" : "follow") + " request") //
+                            .put(APProp.actor, actorBeingFollowedUrl) //
                             // todo-0: need to verify this undo object should have the @context property before adding it.
                             // and only way will be to test against Mastodon again.
-                            .put(AP.object, new APObj() //
-                                    .put(AP.type, unFollow ? APType.Undo : APType.Follow) //
-                                    .put(AP.actor, followerActorUrl) //
-                                    .put(AP.object, actorBeingFollowedUrl)); //
+                            .put(APProp.object, new APObj() //
+                                    .put(APProp.type, unFollow ? APType.Undo : APType.Follow) //
+                                    .put(APProp.actor, followerActorUrl) //
+                                    .put(APProp.object, actorBeingFollowedUrl)); //
 
-                    String followerInbox = AP.str(followerActorObj, AP.inbox);
+                    String followerInbox = AP.str(followerActorObj, APProp.inbox);
 
                     // log.debug("Sending Accept of Follow Request to inbox " + followerInbox);
                     apUtil.securePost(session, privateKey, followerInbox, actorBeingFollowedUrl, acceptFollow);
@@ -216,10 +217,10 @@ public class ActPubFollowing {
         Long totalItems = getFollowersCount(userName);
 
         APOOrderedCollection ret = new APOOrderedCollection() //
-                .put(AP.id, url) //
-                .put(AP.totalItems, totalItems) //
-                .put(AP.first, url + "?page=true") //
-                .put(AP.last, url + "?min_id=0&page=true");
+                .put(APProp.id, url) //
+                .put(APProp.totalItems, totalItems) //
+                .put(APProp.first, url + "?page=true") //
+                .put(APProp.last, url + "?min_id=0&page=true");
         return ret;
     }
 
@@ -231,10 +232,10 @@ public class ActPubFollowing {
         Long totalItems = getFollowingCount(userName);
 
         APOOrderedCollection ret = new APOOrderedCollection() //
-                .put(AP.id, url) //
-                .put(AP.totalItems, totalItems) //
-                .put(AP.first, url + "?page=true") //
-                .put(AP.last, url + "?min_id=0&page=true");
+                .put(APProp.id, url) //
+                .put(APProp.totalItems, totalItems) //
+                .put(APProp.first, url + "?page=true") //
+                .put(APProp.last, url + "?min_id=0&page=true");
         return ret;
     }
 
@@ -250,10 +251,10 @@ public class ActPubFollowing {
             url += "&min_id=" + minId;
         }
         APOOrderedCollectionPage ret = new APOOrderedCollectionPage() //
-                .put(AP.id, url) //
-                .put(AP.orderedItems, following) //
-                .put(AP.partOf, appProp.getProtocolHostAndPort() + APConst.PATH_FOLLOWING + "/" + userName)//
-                .put(AP.totalItems, following.size());
+                .put(APProp.id, url) //
+                .put(APProp.orderedItems, following) //
+                .put(APProp.partOf, appProp.getProtocolHostAndPort() + APConst.PATH_FOLLOWING + "/" + userName)//
+                .put(APProp.totalItems, following.size());
         return ret;
     }
 
@@ -318,10 +319,10 @@ public class ActPubFollowing {
             url += "&min_id=" + minId;
         }
         APOOrderedCollectionPage ret = new APOOrderedCollectionPage() //
-                .put(AP.id, url) //
-                .put(AP.orderedItems, followers) //
-                .put(AP.partOf, appProp.getProtocolHostAndPort() + APConst.PATH_FOLLOWERS + "/" + userName)//
-                .put(AP.totalItems, followers.size());
+                .put(APProp.id, url) //
+                .put(APProp.orderedItems, followers) //
+                .put(APProp.partOf, appProp.getProtocolHostAndPort() + APConst.PATH_FOLLOWERS + "/" + userName)//
+                .put(APProp.totalItems, followers.size());
         return ret;
     }
 

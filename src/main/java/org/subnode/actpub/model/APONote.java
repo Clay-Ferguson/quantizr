@@ -7,10 +7,10 @@ import org.subnode.actpub.APConst;
  */
 public class APONote extends APObj {
     public APONote() {
-        put(AP.context, new APList() //
+        put(APProp.context, new APList() //
                 .val(APConst.CONTEXT_STREAMS) //
                 .val(new APOLanguage()));
-        put(AP.type, APType.Note);
+        put(APProp.type, APType.Note);
     }
 
     @Override

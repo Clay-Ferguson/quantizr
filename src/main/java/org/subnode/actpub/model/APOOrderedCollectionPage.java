@@ -7,8 +7,8 @@ import org.subnode.actpub.APConst;
  */
 public class APOOrderedCollectionPage extends APObj {
     public APOOrderedCollectionPage() {
-        put(AP.context, APConst.CONTEXT_STREAMS);
-        put(AP.type, APType.OrderedCollectionPage);
+        put(APProp.context, APConst.CONTEXT_STREAMS);
+        put(APProp.type, APType.OrderedCollectionPage);
     }
 
     @Override

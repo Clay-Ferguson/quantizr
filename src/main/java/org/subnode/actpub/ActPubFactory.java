@@ -15,6 +15,7 @@ import org.subnode.actpub.model.APOCreate;
 import org.subnode.actpub.model.APOMention;
 import org.subnode.actpub.model.APONote;
 import org.subnode.actpub.model.APObj;
+import org.subnode.actpub.model.APProp;
 
 @Controller
 public class ActPubFactory {
@@ -47,13 +48,13 @@ public class ActPubFactory {
 	public APONote newNoteObject(List<String> toUserNames, String attributedTo, String inReplyTo, String content, String noteUrl,
 			ZonedDateTime now, boolean privateMessage, APList attachments) {
 		APONote ret = new APONote() //
-				.put(AP.id, noteUrl) //
-				.put(AP.published, now.format(DateTimeFormatter.ISO_INSTANT)) //
-				.put(AP.attributedTo, attributedTo) //
-				.put(AP.summary, null) //
-				.put(AP.url, noteUrl) //
-				.put(AP.sensitive, false) //
-				.put(AP.content, content);
+				.put(APProp.id, noteUrl) //
+				.put(APProp.published, now.format(DateTimeFormatter.ISO_INSTANT)) //
+				.put(APProp.attributedTo, attributedTo) //
+				.put(APProp.summary, null) //
+				.put(APProp.url, noteUrl) //
+				.put(APProp.sensitive, false) //
+				.put(APProp.content, content);
 
 		LinkedList<String> toList = new LinkedList<>();
 		LinkedList<String> ccList = new LinkedList<>();
@@ -81,15 +82,15 @@ public class ActPubFactory {
 
 				// prepend character to make it like '@user@server.com'
 				tagList.val(new APOMention() //
-						.put(AP.href, actorUrl) //
-						.put(AP.name, "@" + userName));
+						.put(APProp.href, actorUrl) //
+						.put(APProp.name, "@" + userName));
 			}
 			// log and continue if any loop (user) fails here.
 			catch (Exception e) {
 				log.debug("failed adding user to message: " + userName + " -> " + e.getMessage());
 			}
 		}
-		ret.put(AP.tag, tagList);
+		ret.put(APProp.tag, tagList);
 
 		if (!privateMessage) {
 			toList.add(APConst.CONTEXT_STREAMS + "#Public");
@@ -100,17 +101,17 @@ public class ActPubFactory {
 			 */
 			APObj actor = apCache.actorsByUrl.get(attributedTo);
 			if (actor != null) {
-				ccList.add(AP.str(actor, AP.followers));
+				ccList.add(AP.str(actor, APProp.followers));
 			}
 		}
 
-		ret.put(AP.to, toList);
+		ret.put(APProp.to, toList);
 
 		if (ccList.size() > 0) {
-			ret.put(AP.cc, ccList);
+			ret.put(APProp.cc, ccList);
 		}
 
-		ret.put(AP.attachment, attachments);
+		ret.put(APProp.attachment, attachments);
 		return ret;
 	}
 
@@ -122,11 +123,11 @@ public class ActPubFactory {
 		String idTime = String.valueOf(now.toInstant().toEpochMilli());
 		APOCreate ret = new APOCreate() //
 				// this 'id' was an early WAG, and needs a fresh look now that AP code is more complete.
-				.put(AP.id, noteUrl + "&apCreateTime=" + idTime) //
-				.put(AP.actor, fromActor) //
-				.put(AP.published, now.format(DateTimeFormatter.ISO_INSTANT)) //
-				.put(AP.object, object) //
-				.put(AP.to, new APList() //
+				.put(APProp.id, noteUrl + "&apCreateTime=" + idTime) //
+				.put(APProp.actor, fromActor) //
+				.put(APProp.published, now.format(DateTimeFormatter.ISO_INSTANT)) //
+				.put(APProp.object, object) //
+				.put(APProp.to, new APList() //
 						.vals(toActors) //
 						.val(APConst.CONTEXT_STREAMS + "#Public"));
 

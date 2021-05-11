@@ -7,8 +7,8 @@ import org.subnode.actpub.APConst;
  */
 public class APOUndo extends APObj {
     public APOUndo() {
-        put(AP.context, APConst.CONTEXT_STREAMS);
-        put(AP.type, APType.Undo);
+        put(APProp.context, APConst.CONTEXT_STREAMS);
+        put(APProp.type, APType.Undo);
     }
 
     @Override

@@ -16,6 +16,7 @@ import org.subnode.actpub.model.APList;
 import org.subnode.actpub.model.APOOrderedCollection;
 import org.subnode.actpub.model.APOOrderedCollectionPage;
 import org.subnode.actpub.model.APObj;
+import org.subnode.actpub.model.APProp;
 import org.subnode.actpub.model.APType;
 import org.subnode.config.AppProp;
 import org.subnode.model.client.NodeProp;
@@ -78,7 +79,7 @@ public class ActPubOutbox {
          */
         Iterable<SubNode> outboxItems = read.getSubGraph(session, outboxNode, null, 0);
 
-        String outboxUrl = AP.str(actor, AP.outbox);
+        String outboxUrl = AP.str(actor, APProp.outbox);
         APObj outbox = getOutbox(outboxUrl);
         if (outbox == null) {
             log.debug("Unable to get outbox for AP user: " + apUserName);
@@ -106,9 +107,9 @@ public class ActPubOutbox {
                 // log.debug("saveNote: OBJ=" + XString.prettyPrint(obj));
                 // }
 
-                String apId = AP.str(obj, AP.id);
+                String apId = AP.str(obj, APProp.id);
                 if (!apIdSet.contains(apId)) {
-                    Object object = AP.obj(obj, AP.object);
+                    Object object = AP.obj(obj, APProp.object);
 
                     if (object != null) {
                         if (object instanceof String) {
@@ -164,10 +165,10 @@ public class ActPubOutbox {
         Long totalItems = getOutboxItemCount(userName, PrincipalName.PUBLIC.s());
 
         APOOrderedCollection ret = new APOOrderedCollection();
-        ret.put(AP.id, url) //
-                .put(AP.totalItems, totalItems) //
-                .put(AP.first, url + "?page=true") //
-                .put(AP.last, url + "?min_id=0&page=true");
+        ret.put(APProp.id, url) //
+                .put(APProp.totalItems, totalItems) //
+                .put(APProp.first, url + "?page=true") //
+                .put(APProp.last, url + "?min_id=0&page=true");
         return ret;
     }
 
@@ -203,10 +204,10 @@ public class ActPubOutbox {
                 + "&page=true";
 
         APOOrderedCollectionPage ret = new APOOrderedCollectionPage();
-        ret.put(AP.partOf, appProp.getProtocolHostAndPort() + APConst.PATH_OUTBOX + "/" + userName) //
-                .put(AP.id, url) //
-                .put(AP.orderedItems, items) //
-                .put(AP.totalItems, items.size());
+        ret.put(APProp.partOf, appProp.getProtocolHostAndPort() + APConst.PATH_OUTBOX + "/" + userName) //
+                .put(APProp.id, url) //
+                .put(APProp.orderedItems, items) //
+                .put(APProp.totalItems, items.size());
         return ret;
     }
 
@@ -255,24 +256,24 @@ public class ActPubOutbox {
                         //todo-0: note that neither this create object, nor the node object has the CONTEXT_STREAMS
                         //in a @context property...be careful when implementing APOCrate and APONode because of this.
                         items.add(new APObj() //
-                                .put(AP.id, nodeIdBase + hexId + "&create=t") //
-                                .put(AP.type, APType.Create) //
-                                .put(AP.actor, actor) //
-                                .put(AP.published, published) //
-                                .put(AP.to, new APList().val(APConst.CONTEXT_STREAMS + "#Public")) //
+                                .put(APProp.id, nodeIdBase + hexId + "&create=t") //
+                                .put(APProp.type, APType.Create) //
+                                .put(APProp.actor, actor) //
+                                .put(APProp.published, published) //
+                                .put(APProp.to, new APList().val(APConst.CONTEXT_STREAMS + "#Public")) //
                                 // .put("cc", ...) //
-                                .put(AP.object, new APObj() //
-                                        .put(AP.id, nodeIdBase + hexId) //
-                                        .put(AP.type, APType.Note) //
-                                        .put(AP.summary, null) //
-                                        .put(AP.replyTo, null) //
-                                        .put(AP.published, published) //
-                                        .put(AP.url, nodeIdBase + hexId) //
-                                        .put(AP.attributedTo, actor) //
-                                        .put(AP.to, new APList().val(APConst.CONTEXT_STREAMS + "#Public")) //
+                                .put(APProp.object, new APObj() //
+                                        .put(APProp.id, nodeIdBase + hexId) //
+                                        .put(APProp.type, APType.Note) //
+                                        .put(APProp.summary, null) //
+                                        .put(APProp.replyTo, null) //
+                                        .put(APProp.published, published) //
+                                        .put(APProp.url, nodeIdBase + hexId) //
+                                        .put(APProp.attributedTo, actor) //
+                                        .put(APProp.to, new APList().val(APConst.CONTEXT_STREAMS + "#Public")) //
                                         // .put("cc", ...) //
-                                        .put(AP.sensitive, false) //
-                                        .put(AP.content, child.getContent())//
+                                        .put(APProp.sensitive, false) //
+                                        .put(APProp.content, child.getContent())//
                         ));
                     }
                 }

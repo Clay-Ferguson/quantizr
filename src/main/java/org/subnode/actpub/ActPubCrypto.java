@@ -14,6 +14,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.subnode.actpub.model.AP;
+import org.subnode.actpub.model.APProp;
 import org.subnode.config.AppProp;
 import org.subnode.model.client.NodeProp;
 import org.subnode.mongo.MongoRead;
@@ -144,11 +145,11 @@ public class ActPubCrypto {
 
     public PublicKey getPublicKeyFromActor(Object actorObj) {
         PublicKey pubKey = null;
-        Object pubKeyObj = AP.obj(actorObj, AP.publicKey);
+        Object pubKeyObj = AP.obj(actorObj, APProp.publicKey);
         if (pubKeyObj == null)
             return null;
 
-        String pkeyEncoded = AP.str(pubKeyObj, AP.publicKeyPem);
+        String pkeyEncoded = AP.str(pubKeyObj, APProp.publicKeyPem);
         if (pkeyEncoded == null)
             return null;
 
