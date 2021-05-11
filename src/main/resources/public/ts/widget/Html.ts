@@ -4,6 +4,7 @@ import { PubSub } from "../PubSub";
 import { Singletons } from "../Singletons";
 import { Comp } from "./base/Comp";
 import { CompIntf } from "./base/CompIntf";
+import { toArray } from "react-emoji-render";
 
 // https://github.com/mathjax/MathJax-demos-web
 // https://github.com/mathjax/MathJax-node
@@ -29,6 +30,21 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
 
 declare var MathJax;
 
+// see: https://www.npmjs.com/package/react-emoji-render
+const parseEmojis = value => {
+    const emojisArray = toArray(value);
+
+    // toArray outputs React elements for emojis and strings for other
+    const newValue = emojisArray.reduce((previous: any, current: any) => {
+        if (typeof current === "string") {
+            return previous + current;
+        }
+        return previous + current.props.children;
+    }, "");
+
+    return newValue;
+};
+
 export class Html extends Comp {
 
     constructor(content: string = "", attribs: Object = {}, initialChildren: CompIntf[] = null) {
@@ -46,7 +62,7 @@ export class Html extends Comp {
             console.error("dangerouslySetInnerHTML component had children. This is a bug: id=" + this.getId() + " constructor.name=" + this.constructor.name);
         }
 
-        this.attribs.dangerouslySetInnerHTML = { __html: this.getState().content };
+        this.attribs.dangerouslySetInnerHTML = { __html: parseEmojis(this.getState().content) };
         return this.e("div", this.attribs);
     }
 
