@@ -743,23 +743,23 @@ public class ActPubService {
                 String avatarUrl = appProp.getProtocolHostAndPort() + AppController.API_PATH + "/bin/avatar" + "?nodeId="
                         + userNode.getId().toHexString() + "&v=" + avatarVer;
 
-                APObj actor = new APObj();
-                actor.put(APProp.context, new APList() //
-                        .val(APConst.CONTEXT_STREAMS) //
-                        .val(APConst.CONTEXT_SECURITY));
+                APObj actor = new APObj() //
+                        .put(APProp.context, new APList() //
+                                .val(APConst.CONTEXT_STREAMS) //
+                                .val(APConst.CONTEXT_SECURITY))
 
-                /*
-                 * Note: this is a self-reference, and must be identical to the URL that returns this object
-                 */
-                actor.put(APProp.id, apUtil.makeActorUrlForUserName(userName));
-                actor.put(APProp.type, APType.Person);
-                actor.put(APProp.preferredUsername, userName);
-                actor.put(APProp.name, userName); // this should be ordinary name (first last)
+                        /*
+                         * Note: this is a self-reference, and must be identical to the URL that returns this object
+                         */
+                        .put(APProp.id, apUtil.makeActorUrlForUserName(userName)) //
+                        .put(APProp.type, APType.Person) //
+                        .put(APProp.preferredUsername, userName) //
+                        .put(APProp.name, userName) // this should be ordinary name (first last)
 
-                actor.put(APProp.icon, new APObj() //
-                        .put(APProp.type, APType.Image) //
-                        .put(APProp.mediaType, avatarMime) //
-                        .put(APProp.url, avatarUrl));
+                        .put(APProp.icon, new APObj() //
+                                .put(APProp.type, APType.Image) //
+                                .put(APProp.mediaType, avatarMime) //
+                                .put(APProp.url, avatarUrl));
 
                 String headerImageMime = userNode.getStrProp(NodeProp.BIN_MIME.s() + "Header");
                 if (headerImageMime != null) {
@@ -775,26 +775,27 @@ public class ActPubService {
                     }
                 }
 
-                actor.put(APProp.summary, userNode.getStrProp(NodeProp.USER_BIO.s()));
-                actor.put(APProp.inbox, host + APConst.PATH_INBOX + "/" + userName); //
-                actor.put(APProp.outbox, host + APConst.PATH_OUTBOX + "/" + userName); //
-                actor.put(APProp.followers, host + APConst.PATH_FOLLOWERS + "/" + userName);
-                actor.put(APProp.following, host + APConst.PATH_FOLLOWING + "/" + userName);
+                actor.put(APProp.summary, userNode.getStrProp(NodeProp.USER_BIO.s())) //
+                        .put(APProp.inbox, host + APConst.PATH_INBOX + "/" + userName) //
+                        .put(APProp.outbox, host + APConst.PATH_OUTBOX + "/" + userName) //
+                        .put(APProp.followers, host + APConst.PATH_FOLLOWERS + "/" + userName) //
+                        .put(APProp.following, host + APConst.PATH_FOLLOWING + "/" + userName) //
 
-                /*
-                 * Note: Mastodon requests the wrong url when it needs this but we compansate with a redirect to tis
-                 * in our ActPubController. We tolerate Mastodon breaking spec here.
-                 */
-                actor.put(APProp.url, host + "/u/" + userName + "/home");
+                        /*
+                         * Note: Mastodon requests the wrong url when it needs this but we compansate with a redirect to tis
+                         * in our ActPubController. We tolerate Mastodon breaking spec here.
+                         */
+                        .put(APProp.url, host + "/u/" + userName + "/home") //
 
-                actor.put(APProp.endpoints, new APObj().put(APProp.sharedInbox, host + APConst.PATH_INBOX));
+                        .put(APProp.endpoints, new APObj().put(APProp.sharedInbox, host + APConst.PATH_INBOX)) //
 
-                actor.put(APProp.publicKey, new APObj() //
-                        .put(APProp.id, AP.str(actor, APProp.id) + "#main-key") //
-                        .put(APProp.owner, AP.str(actor, APProp.id)) //
-                        .put(APProp.publicKeyPem, "-----BEGIN PUBLIC KEY-----\n" + publicKey + "\n-----END PUBLIC KEY-----\n"));
+                        .put(APProp.publicKey, new APObj() //
+                                .put(APProp.id, AP.str(actor, APProp.id) + "#main-key") //
+                                .put(APProp.owner, AP.str(actor, APProp.id)) //
+                                .put(APProp.publicKeyPem,
+                                        "-----BEGIN PUBLIC KEY-----\n" + publicKey + "\n-----END PUBLIC KEY-----\n")) //
 
-                actor.put(APProp.supportsFriendRequests, true);
+                        .put(APProp.supportsFriendRequests, true);
 
                 // log.debug("Reply with Actor: " + XString.prettyPrint(actor));
                 return actor;

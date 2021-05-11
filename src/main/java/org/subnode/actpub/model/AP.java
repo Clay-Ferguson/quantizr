@@ -12,7 +12,6 @@ import org.subnode.util.DateUtil;
  * various types of objects we use the accessor methods and properties in this object.
  */
 public class AP {
-   
     public static boolean hasProps(Object obj) {
         return obj instanceof Map<?, ?>;
     }

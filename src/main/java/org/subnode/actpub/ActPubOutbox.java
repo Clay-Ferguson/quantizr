@@ -164,8 +164,8 @@ public class ActPubOutbox {
         String url = appProp.getProtocolHostAndPort() + APConst.PATH_OUTBOX + "/" + userName;
         Long totalItems = getOutboxItemCount(userName, PrincipalName.PUBLIC.s());
 
-        APOOrderedCollection ret = new APOOrderedCollection();
-        ret.put(APProp.id, url) //
+        APOOrderedCollection ret = new APOOrderedCollection() //
+                .put(APProp.id, url) //
                 .put(APProp.totalItems, totalItems) //
                 .put(APProp.first, url + "?page=true") //
                 .put(APProp.last, url + "?min_id=0&page=true");
@@ -200,11 +200,10 @@ public class ActPubOutbox {
         APList items = getOutboxItems(userName, PrincipalName.PUBLIC.s(), minId);
 
         // this is a self-reference url (id)
-        String url = appProp.getProtocolHostAndPort() + APConst.PATH_OUTBOX + "/" + userName + "?min_id=" + minId
-                + "&page=true";
+        String url = appProp.getProtocolHostAndPort() + APConst.PATH_OUTBOX + "/" + userName + "?min_id=" + minId + "&page=true";
 
-        APOOrderedCollectionPage ret = new APOOrderedCollectionPage();
-        ret.put(APProp.partOf, appProp.getProtocolHostAndPort() + APConst.PATH_OUTBOX + "/" + userName) //
+        APOOrderedCollectionPage ret = new APOOrderedCollectionPage() //
+                .put(APProp.partOf, appProp.getProtocolHostAndPort() + APConst.PATH_OUTBOX + "/" + userName) //
                 .put(APProp.id, url) //
                 .put(APProp.orderedItems, items) //
                 .put(APProp.totalItems, items.size());
@@ -253,15 +252,14 @@ public class ActPubOutbox {
                         String published = DateUtil.isoStringFromDate(child.getModifyTime());
                         String actor = apUtil.makeActorUrlForUserName(userName);
 
-                        //todo-0: note that neither this create object, nor the node object has the CONTEXT_STREAMS
-                        //in a @context property...be careful when implementing APOCrate and APONode because of this.
+                        // todo-0: note that neither this create object, nor the node object has the CONTEXT_STREAMS
+                        // in a @context property...be careful when implementing APOCrate and APONode because of this.
                         items.add(new APObj() //
                                 .put(APProp.id, nodeIdBase + hexId + "&create=t") //
                                 .put(APProp.type, APType.Create) //
                                 .put(APProp.actor, actor) //
                                 .put(APProp.published, published) //
-                                .put(APProp.to, new APList().val(APConst.CONTEXT_STREAMS + "#Public")) //
-                                // .put("cc", ...) //
+                                .put(APProp.to, new APList().val(APConst.CONTEXT_STREAMS_PUBLIC)) //
                                 .put(APProp.object, new APObj() //
                                         .put(APProp.id, nodeIdBase + hexId) //
                                         .put(APProp.type, APType.Note) //
@@ -270,8 +268,7 @@ public class ActPubOutbox {
                                         .put(APProp.published, published) //
                                         .put(APProp.url, nodeIdBase + hexId) //
                                         .put(APProp.attributedTo, actor) //
-                                        .put(APProp.to, new APList().val(APConst.CONTEXT_STREAMS + "#Public")) //
-                                        // .put("cc", ...) //
+                                        .put(APProp.to, new APList().val(APConst.CONTEXT_STREAMS_PUBLIC)) //
                                         .put(APProp.sensitive, false) //
                                         .put(APProp.content, child.getContent())//
                         ));

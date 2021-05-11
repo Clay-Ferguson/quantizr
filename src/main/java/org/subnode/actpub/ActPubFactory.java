@@ -93,7 +93,7 @@ public class ActPubFactory {
 		ret.put(APProp.tag, tagList);
 
 		if (!privateMessage) {
-			toList.add(APConst.CONTEXT_STREAMS + "#Public");
+			toList.add(APConst.CONTEXT_STREAMS_PUBLIC);
 
 			/*
 			 * public posts should always cc the followers of the person doing the post (the actor pointed to by
@@ -129,7 +129,7 @@ public class ActPubFactory {
 				.put(APProp.object, object) //
 				.put(APProp.to, new APList() //
 						.vals(toActors) //
-						.val(APConst.CONTEXT_STREAMS + "#Public"));
+						.val(APConst.CONTEXT_STREAMS_PUBLIC));
 
 		// LinkedList<String> ccArray = new LinkedList<>();
 		// ccArray.add("https://www.w3.org/ns/activitystreams#Public");

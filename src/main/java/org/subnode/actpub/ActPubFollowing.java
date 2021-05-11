@@ -393,5 +393,4 @@ public class ActPubFollowing {
         query.addCriteria(criteria);
         return query;
     }
-
 }

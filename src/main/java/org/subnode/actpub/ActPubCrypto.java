@@ -15,7 +15,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.subnode.actpub.model.AP;
 import org.subnode.actpub.model.APProp;
-import org.subnode.config.AppProp;
 import org.subnode.model.client.NodeProp;
 import org.subnode.mongo.MongoRead;
 import org.subnode.mongo.MongoSession;
@@ -29,13 +28,7 @@ public class ActPubCrypto {
     private static final Logger log = LoggerFactory.getLogger(ActPubCrypto.class);
 
     @Autowired
-    private AppProp appProp;
-
-    @Autowired
     private MongoRead read;
-
-    @Autowired
-    private ActPubCache apCache;
 
     @Autowired
     private ActPubUtil apUtil;

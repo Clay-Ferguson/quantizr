@@ -4,6 +4,7 @@ public class APProp {
     public static final String id = "id";
     public static final String context = "@context";
     public static final String type = "type";
+    public static final String language = "language";
     public static final String object = "object";
     public static final String actor = "actor";
     public static final String published = "published";
