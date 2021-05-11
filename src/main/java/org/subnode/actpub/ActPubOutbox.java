@@ -20,6 +20,7 @@ import org.subnode.actpub.model.APType;
 import org.subnode.config.AppProp;
 import org.subnode.model.client.NodeProp;
 import org.subnode.model.client.NodeType;
+import org.subnode.model.client.PrincipalName;
 import org.subnode.model.client.PrivilegeType;
 import org.subnode.mongo.MongoAuth;
 import org.subnode.mongo.MongoRead;
@@ -160,7 +161,7 @@ public class ActPubOutbox {
     public APOOrderedCollection generateOutbox(String userName) {
         // log.debug("Generate outbox for userName: " + userName);
         String url = appProp.getProtocolHostAndPort() + APConst.PATH_OUTBOX + "/" + userName;
-        Long totalItems = getOutboxItemCount(userName, "public");
+        Long totalItems = getOutboxItemCount(userName, PrincipalName.PUBLIC.s());
 
         APOOrderedCollection ret = new APOOrderedCollection();
         ret.put(AP.id, url) //
@@ -195,7 +196,7 @@ public class ActPubOutbox {
      * if minId=="0" that means "last page", and if minId==null it means first page
      */
     public APOOrderedCollectionPage generateOutboxPage(String userName, String minId) {
-        APList items = getOutboxItems(userName, "public", minId);
+        APList items = getOutboxItems(userName, PrincipalName.PUBLIC.s(), minId);
 
         // this is a self-reference url (id)
         String url = appProp.getProtocolHostAndPort() + APConst.PATH_OUTBOX + "/" + userName + "?min_id=" + minId

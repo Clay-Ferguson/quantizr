@@ -80,7 +80,9 @@ public class ActPubFactory {
 				}
 
 				// prepend character to make it like '@user@server.com'
-				tagList.val(new APOMention(actorUrl, "@" + userName));
+				tagList.val(new APOMention() //
+						.put(AP.href, actorUrl) //
+						.put(AP.name, "@" + userName));
 			}
 			// log and continue if any loop (user) fails here.
 			catch (Exception e) {

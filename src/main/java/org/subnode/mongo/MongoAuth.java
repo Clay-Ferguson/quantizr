@@ -93,8 +93,8 @@ public class MongoAuth {
 	public String getUserNameFromAccountNodeId(MongoSession session, String accountId) {
 
 		// special case of a public share
-		if ("public".equals(accountId)) {
-			return "public";
+		if (PrincipalName.PUBLIC.s().equals(accountId)) {
+			return PrincipalName.PUBLIC.s();
 		}
 
 		// if the userName is cached get it from the cache.

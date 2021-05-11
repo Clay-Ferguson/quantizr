@@ -129,7 +129,7 @@ public class ActPubService {
              */
             if (node.getAc() != null) {
                 for (String k : node.getAc().keySet()) {
-                    if ("public".equals(k)) {
+                    if (PrincipalName.PUBLIC.s().equals(k)) {
                         privateMessage = false;
                     } else {
                         // k will be a nodeId of an account node here.
@@ -398,7 +398,7 @@ public class ActPubService {
     }
 
     public void processCreateAction(HttpServletRequest httpReq, Object payload) {
-        adminRunner.run(session -> {
+        adminRunner.<Object>run(session -> {
 
             String actorUrl = AP.str(payload, AP.actor);
             if (actorUrl == null) {
@@ -416,19 +416,22 @@ public class ActPubService {
             apCrypto.verifySignature(httpReq, pubKey);
 
             Object object = AP.obj(payload, AP.object);
-            if (AP.isType(object, APType.Note)) {
-                return processCreateNote(session, actorUrl, actorObj, object);
-            } else {
-                log.debug("Unhandled Create action (object type not supported): " + XString.prettyPrint(payload));
+
+            switch (AP.str(object, AP.type)) {
+                case APType.Note:
+                    processCreateNote(session, actorUrl, actorObj, object);
+                    break;
+
+                default:
+                    log.debug("Unhandled Create action (object type not supported): " + XString.prettyPrint(payload));
+                    break;
             }
             return null;
         });
     }
 
     /* obj is the 'Note' object */
-    public APObj processCreateNote(MongoSession session, String actorUrl, Object actorObj, Object obj) {
-        APObj ret = new APObj();
-
+    public void processCreateNote(MongoSession session, String actorUrl, Object actorObj, Object obj) {
         /*
          * If this is a 'reply' post then parse the ID out of this, and if we can find that node by that id
          * then insert the reply under that, instead of the default without this id which is to put in
@@ -472,7 +475,6 @@ public class ActPubService {
                 saveNote(session, actorAccountNode, postsNode, obj, false, false);
             }
         }
-        return ret;
     }
 
     /*
@@ -615,7 +617,7 @@ public class ActPubService {
         // log.debug("shareToUsersForUrl: " + url);
 
         if (url.endsWith("#Public")) {
-            node.safeGetAc().put("public", new AccessControl(null, PrivilegeType.READ.s()));
+            node.safeGetAc().put(PrincipalName.PUBLIC.s(), new AccessControl(null, PrivilegeType.READ.s()));
             return;
         }
 
@@ -641,7 +643,6 @@ public class ActPubService {
              */
             boolean allow = false;
             if (allow) {
-                // todo-0: Everywhere we create a MediaType, replace it with a pre-created one on Constants
                 APObj followersObj = apUtil.getJson(url, APConst.MT_APP_ACTJSON);
                 if (followersObj != null) {
                     apUtil.iterateOrderedCollection(followersObj, MAX_FOLLOWERS, obj -> {
@@ -668,7 +669,7 @@ public class ActPubService {
          * Yes we tolerate for this to execute with the 'public' designation in place of an actorUrl here
          */
         if (actorUrl.endsWith("#Public")) {
-            node.safeGetAc().put("public", new AccessControl(null, PrivilegeType.READ.s()));
+            node.safeGetAc().put(PrincipalName.PUBLIC.s(), new AccessControl(null, PrivilegeType.READ.s()));
             return;
         }
 

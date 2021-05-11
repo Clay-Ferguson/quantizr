@@ -23,6 +23,7 @@ import org.subnode.config.SessionContext;
 import org.subnode.model.NodeInfo;
 import org.subnode.model.client.NodeProp;
 import org.subnode.model.client.NodeType;
+import org.subnode.model.client.PrincipalName;
 import org.subnode.mongo.MongoAuth;
 import org.subnode.mongo.MongoRead;
 import org.subnode.mongo.MongoSession;
@@ -158,7 +159,7 @@ public class UserFeedService {
 		List<String> sharedToAny = new LinkedList<>();
 
 		if (req.getToPublic()) {
-			sharedToAny.add("public");
+			sharedToAny.add(PrincipalName.PUBLIC.s());
 		}
 
 		SubNode searchRoot = null;

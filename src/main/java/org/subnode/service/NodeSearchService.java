@@ -21,6 +21,7 @@ import org.subnode.config.NodeName;
 import org.subnode.model.NodeInfo;
 import org.subnode.model.client.NodeProp;
 import org.subnode.model.client.NodeType;
+import org.subnode.model.client.PrincipalName;
 import org.subnode.model.client.PrivilegeType;
 import org.subnode.mongo.MongoAuth;
 import org.subnode.mongo.MongoRead;
@@ -294,7 +295,7 @@ public class NodeSearchService {
 		if (req.isFeed()) {
 			/* Finds nodes that have shares to any of the people listed in sharedToAny */
 			List<String> sharedToAny = new LinkedList<>();
-			sharedToAny.add("public");
+			sharedToAny.add(PrincipalName.PUBLIC.s());
 
 			String pathToSearch = NodeName.ROOT_OF_ALL_USERS;
 
