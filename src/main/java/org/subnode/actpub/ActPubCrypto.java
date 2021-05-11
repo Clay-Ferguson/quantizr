@@ -13,6 +13,7 @@ import javax.servlet.http.HttpServletRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 import org.subnode.actpub.model.AP;
 import org.subnode.actpub.model.APProp;
 import org.subnode.model.client.NodeProp;
@@ -23,6 +24,7 @@ import org.subnode.service.UserManagerService;
 import org.subnode.util.ThreadLocals;
 import org.subnode.util.XString;
 
+@Component
 public class ActPubCrypto {
 
     private static final Logger log = LoggerFactory.getLogger(ActPubCrypto.class);
