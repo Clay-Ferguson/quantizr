@@ -20,7 +20,6 @@ import org.subnode.actpub.model.APOOrderedCollectionPage;
 import org.subnode.actpub.model.APOUndo;
 import org.subnode.actpub.model.APObj;
 import org.subnode.actpub.model.APProp;
-import org.subnode.actpub.model.APType;
 import org.subnode.config.AppProp;
 import org.subnode.config.NodeName;
 import org.subnode.model.client.NodeProp;
@@ -102,7 +101,8 @@ public class ActPubFollowing {
                 // send unfollow action
                 else {
                     action = new APOUndo()//
-                            .put(APProp.id, appProp.getProtocolHostAndPort() + "/unfollow/" + String.valueOf(new Date().getTime())) //
+                            .put(APProp.id,
+                                    appProp.getProtocolHostAndPort() + "/unfollow/" + String.valueOf(new Date().getTime())) //
                             .put(APProp.actor, sessionActorUrl) //
                             .put(APProp.object, followAction);
                 }
@@ -134,11 +134,11 @@ public class ActPubFollowing {
                 return null;
             }
 
-            APObj followerActorObj = apUtil.getActorByUrl(followerActorUrl);
+            APObj followerActor = apUtil.getActorByUrl(followerActorUrl);
 
             // log.debug("getLongUserNameFromActorUrl: " + actorUrl + "\n" +
             // XString.prettyPrint(actor));
-            String followerUserName = apUtil.getLongUserNameFromActor(followerActorObj);
+            String followerUserName = apUtil.getLongUserNameFromActor(followerActor);
             SubNode followerAccountNode = apService.getAcctNodeByUserName(session, followerUserName);
             apService.userEncountered(followerUserName, false);
 
@@ -187,20 +187,19 @@ public class ActPubFollowing {
                     Thread.sleep(2000);
 
                     // Must send either Accept or Reject. Currently we auto-accept all.
-                    APOAccept acceptFollow = new APOAccept() //
+                    APObj acceptPayload = unFollow ? new APOUndo() : new APOFollow();
+                    acceptPayload.put(APProp.actor, followerActorUrl) //
+                            .put(APProp.object, actorBeingFollowedUrl);
+
+                    APOAccept accept = new APOAccept() //
                             .put(APProp.summary, "Accepted " + (unFollow ? "unfollow" : "follow") + " request") //
                             .put(APProp.actor, actorBeingFollowedUrl) //
-                            // todo-0: need to verify this undo object should have the @context property before adding it.
-                            // and only way will be to test against Mastodon again.
-                            .put(APProp.object, new APObj() //
-                                    .put(APProp.type, unFollow ? APType.Undo : APType.Follow) //
-                                    .put(APProp.actor, followerActorUrl) //
-                                    .put(APProp.object, actorBeingFollowedUrl)); //
+                            .put(APProp.object, acceptPayload); //
 
-                    String followerInbox = AP.str(followerActorObj, APProp.inbox);
+                    String followerInbox = AP.str(followerActor, APProp.inbox);
 
                     // log.debug("Sending Accept of Follow Request to inbox " + followerInbox);
-                    apUtil.securePost(session, privateKey, followerInbox, actorBeingFollowedUrl, acceptFollow);
+                    apUtil.securePost(session, privateKey, followerInbox, actorBeingFollowedUrl, accept);
                 } catch (Exception e) {
                 }
             };

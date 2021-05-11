@@ -13,6 +13,8 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;
 import org.subnode.actpub.model.AP;
 import org.subnode.actpub.model.APList;
+import org.subnode.actpub.model.APOCreate;
+import org.subnode.actpub.model.APONote;
 import org.subnode.actpub.model.APOOrderedCollection;
 import org.subnode.actpub.model.APOOrderedCollectionPage;
 import org.subnode.actpub.model.APObj;
@@ -252,17 +254,13 @@ public class ActPubOutbox {
                         String published = DateUtil.isoStringFromDate(child.getModifyTime());
                         String actor = apUtil.makeActorUrlForUserName(userName);
 
-                        // todo-0: note that neither this create object, nor the node object has the CONTEXT_STREAMS
-                        // in a @context property...be careful when implementing APOCrate and APONode because of this.
-                        items.add(new APObj() //
+                        items.add(new APOCreate() //
                                 .put(APProp.id, nodeIdBase + hexId + "&create=t") //
-                                .put(APProp.type, APType.Create) //
                                 .put(APProp.actor, actor) //
                                 .put(APProp.published, published) //
                                 .put(APProp.to, new APList().val(APConst.CONTEXT_STREAMS_PUBLIC)) //
-                                .put(APProp.object, new APObj() //
+                                .put(APProp.object, new APONote() //
                                         .put(APProp.id, nodeIdBase + hexId) //
-                                        .put(APProp.type, APType.Note) //
                                         .put(APProp.summary, null) //
                                         .put(APProp.replyTo, null) //
                                         .put(APProp.published, published) //
