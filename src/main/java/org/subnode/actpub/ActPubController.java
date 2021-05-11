@@ -116,7 +116,7 @@ public class ActPubController {
 			@RequestParam(value = "min_id", required = false) String minId,
 			@RequestParam(value = "page", required = false) String page) {
 		APObj ret = null;
-		if (APConst.STR_TRUE.equals(page)) {
+		if (APConst.TRUE.equals(page)) {
 			ret = apOutbox.generateOutboxPage(userName, minId);
 		} else {
 			/*
@@ -133,8 +133,6 @@ public class ActPubController {
 		}
 		if (ret != null) {
 			// log.debug("Reply with Outbox: " + XString.prettyPrint(ret));
-			// todo-1: verify this is returning OK in addition to the data, and also look for all other
-			// places we have a similar scenario in this and all other controllers.
 			return ret;
 		}
 		return new ResponseEntity<String>(HttpStatus.OK);
@@ -150,7 +148,7 @@ public class ActPubController {
 			@RequestParam(value = "min_id", required = false) String minId,
 			@RequestParam(value = "page", required = false) String page) {
 		APObj ret = null;
-		if (APConst.STR_TRUE.equals(page)) {
+		if (APConst.TRUE.equals(page)) {
 			ret = apFollowing.generateFollowersPage(userName, minId);
 		} else {
 			ret = apFollowing.generateFollowers(userName);
@@ -172,7 +170,7 @@ public class ActPubController {
 			@RequestParam(value = "min_id", required = false) String minId,
 			@RequestParam(value = "page", required = false) String page) {
 		APObj ret = null;
-		if (APConst.STR_TRUE.equals(page)) {
+		if (APConst.TRUE.equals(page)) {
 			ret = apFollowing.generateFollowingPage(userName, minId);
 		} else {
 			ret = apFollowing.generateFollowing(userName);

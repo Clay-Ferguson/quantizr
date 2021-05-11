@@ -180,7 +180,7 @@ public class AppProp /* implements EnvironmentAware */ {
 	}
 
 	public boolean isActPubEnabled() {
-		return APConst.STR_TRUE.equals(env.getProperty("actPubEnabled"));
+		return APConst.TRUE.equals(env.getProperty("actPubEnabled"));
 	}
 
 	public String getRssAggregatePreCacheNodeId() {
@@ -220,16 +220,16 @@ public class AppProp /* implements EnvironmentAware */ {
 	}
 
 	public boolean getForceIndexRebuild() {
-		return APConst.STR_TRUE.equals(env.getProperty("forceIndexRebuild"));
+		return APConst.TRUE.equals(env.getProperty("forceIndexRebuild"));
 	}
 
 	public boolean getReSaveAll() {
-		return APConst.STR_TRUE.equals(env.getProperty("reSaveAll"));
+		return APConst.TRUE.equals(env.getProperty("reSaveAll"));
 	}
 
 	/* Should be set to true if mongo security is turned on requiring credentials */
 	public boolean getMongoSecurity() {
-		return APConst.STR_TRUE.equals(env.getProperty("mongoSecurity"));
+		return APConst.TRUE.equals(env.getProperty("mongoSecurity"));
 	}
 
 	public String getMongoAdminPassword() {

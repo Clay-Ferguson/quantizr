@@ -22,5 +22,5 @@ public class APConst {
     public static final MediaType MT_APP_LDJSON = new MediaType("application", "ld+json");
     public static final MediaType MT_APP_JRDJSON = new MediaType("application", "jrd+json");
 
-    public static final String STR_TRUE = "true";
+    public static final String TRUE = "true";
 }
