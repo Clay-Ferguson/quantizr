@@ -10,4 +10,10 @@ public class APOUndo extends APObj {
         put(AP.context, APConst.CONTEXT_STREAMS);
         put(AP.type, APType.Undo);
     }
+
+    @Override
+    public APOUndo put(String key, Object val) {
+        super.put(key,val);
+        return this;
+    }
 }

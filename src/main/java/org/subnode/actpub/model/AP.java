@@ -8,8 +8,8 @@ import org.subnode.util.DateUtil;
 
 /**
  * Because the ActivityPup spec has lots of places where the object types are completely variable,
- * there's no way to use perfect type safety on all objects, so instead of having a POJO for the the various
- * types of objects we use the accessor methods and properties in this object.
+ * there's no way to use perfect type safety on all objects, so instead of having a POJO for the the
+ * various types of objects we use the accessor methods and properties in this object.
  */
 public class AP {
     public static final String id = "id";
@@ -57,6 +57,12 @@ public class AP {
 
     public static boolean hasProps(Object obj) {
         return obj instanceof Map<?, ?>;
+    }
+
+    public static boolean isType(Object obj, String type) {
+        if (obj == null)
+            return false;
+        return type.equalsIgnoreCase(str(obj, AP.type));
     }
 
     public static String str(Object obj, String prop) {

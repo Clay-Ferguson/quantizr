@@ -356,44 +356,49 @@ public class ActPubService {
      * Processes incoming INBOX requests for (Follow, Undo Follow), to be called by foreign servers to
      * follow a user on this server
      */
-    public APObj processInboxPost(HttpServletRequest httpReq, Object payload) {
+    public void processInboxPost(HttpServletRequest httpReq, Object payload) {
         String type = AP.str(payload, AP.type);
         if (type == null)
-            return null;
+            return;
         type = type.trim();
 
         switch (type) {
-            // Process Create Action
             case APType.Create:
-                return processCreateAction(httpReq, payload);
-                
-            // Process Follow Action
+                processCreateAction(httpReq, payload);
+                break;
+
             case APType.Follow:
-                return apFollowing.processFollowAction(payload, false);
+                apFollowing.processFollowAction(payload, false);
+                break;
 
-            // Process Undo Action (Unfollow, etc)
             case APType.Undo:
-                return processUndoAction(payload);
+                processUndoAction(payload);
+                break;
 
-            // else report unhandled type
             default:
                 log.debug("Unsupported type:" + XString.prettyPrint(payload));
                 break;
         }
-        return null;
     }
 
-    /* Process inbound undo actions (comming from foreign servers) */
-    public APObj processUndoAction(Object payload) {
-        Object object = AP.obj(payload, AP.object);
-        if (object != null && APType.Follow.equalsIgnoreCase(AP.str(object, AP.type))) {
-            return apFollowing.processFollowAction(object, true);
+    /* Process inbound undo actions (coming from foreign servers) */
+    public void processUndoAction(Object payload) {
+        Object obj = AP.obj(payload, AP.object);
+        String type = AP.str(obj, AP.type);
+
+        switch (type) {
+            case APType.Follow:
+                apFollowing.processFollowAction(obj, true);
+                break;
+
+            default:
+                log.debug("Unsupported payload object type:" + XString.prettyPrint(obj));
+                break;
         }
-        return null;
     }
 
-    public APObj processCreateAction(HttpServletRequest httpReq, Object payload) {
-        APObj ret = adminRunner.run(session -> {
+    public void processCreateAction(HttpServletRequest httpReq, Object payload) {
+        adminRunner.run(session -> {
 
             String actorUrl = AP.str(payload, AP.actor);
             if (actorUrl == null) {
@@ -411,14 +416,13 @@ public class ActPubService {
             apCrypto.verifySignature(httpReq, pubKey);
 
             Object object = AP.obj(payload, AP.object);
-            if (object != null && APType.Note.equalsIgnoreCase(AP.str(object, AP.type))) {
+            if (AP.isType(object, APType.Note)) {
                 return processCreateNote(session, actorUrl, actorObj, object);
             } else {
                 log.debug("Unhandled Create action (object type not supported): " + XString.prettyPrint(payload));
             }
             return null;
         });
-        return ret;
     }
 
     /* obj is the 'Note' object */

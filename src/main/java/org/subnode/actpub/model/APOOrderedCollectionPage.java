@@ -10,4 +10,10 @@ public class APOOrderedCollectionPage extends APObj {
         put(AP.context, APConst.CONTEXT_STREAMS);
         put(AP.type, APType.OrderedCollectionPage);
     }
+
+    @Override
+    public APOOrderedCollectionPage put(String key, Object val) {
+        super.put(key,val);
+        return this;
+    }
 }

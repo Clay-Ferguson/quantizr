@@ -126,7 +126,7 @@ public class ActPubOutbox {
                             // AP.object : "https://mastodon.sdf.org/users/stunder/statuses/105612925260202844"
                             // }
                         } //
-                        else if (APType.Note.equals(AP.str(object, AP.type))) {
+                        else if (AP.isType(object, APType.Note)) {
                             try {
                                 ActPubService.newPostsInCycle++;
                                 apService.saveNote(session, _userNode, outboxNode, object, true, true);

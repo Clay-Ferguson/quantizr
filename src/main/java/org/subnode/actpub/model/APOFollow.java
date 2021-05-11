@@ -10,4 +10,10 @@ public class APOFollow extends APObj {
         put(AP.context, APConst.CONTEXT_STREAMS);
         put(AP.type, APType.Follow);
     }
+
+    @Override
+    public APOFollow put(String key, Object val) {
+        super.put(key,val);
+        return this;
+    }
 }

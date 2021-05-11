@@ -10,4 +10,10 @@ public class APOOrderedCollection extends APObj {
         put(AP.context, APConst.CONTEXT_STREAMS);
         put(AP.type, APType.OrderedCollection);
     }
+
+    @Override
+    public APOOrderedCollection put(String key, Object val) {
+        super.put(key,val);
+        return this;
+    }
 }

@@ -46,36 +46,46 @@ public class ActPubFactory {
 	 */
 	public APONote newNoteObject(List<String> toUserNames, String attributedTo, String inReplyTo, String content, String noteUrl,
 			ZonedDateTime now, boolean privateMessage, APList attachments) {
-		APONote ret = new APONote();
-
-		ret.put(AP.id, noteUrl);
-		ret.put(AP.published, now.format(DateTimeFormatter.ISO_INSTANT));
-		ret.put(AP.attributedTo, attributedTo);
-		ret.put(AP.summary, null);
-		ret.put(AP.url, noteUrl);
-		ret.put(AP.sensitive, false);
-		ret.put(AP.content, content);
+		APONote ret = new APONote() //
+				.put(AP.id, noteUrl) //
+				.put(AP.published, now.format(DateTimeFormatter.ISO_INSTANT)) //
+				.put(AP.attributedTo, attributedTo) //
+				.put(AP.summary, null) //
+				.put(AP.url, noteUrl) //
+				.put(AP.sensitive, false) //
+				.put(AP.content, content);
 
 		LinkedList<String> toList = new LinkedList<>();
 		LinkedList<String> ccList = new LinkedList<>();
 
 		APList tagList = new APList();
 		for (String userName : toUserNames) {
-			APObj webFinger = apUtil.getWebFinger(userName);
-			String actorUrl = apUtil.getActorUrlFromWebFingerObj(webFinger);
+			try {
+				APObj webFinger = apUtil.getWebFinger(userName);
+				if (webFinger == null)
+					continue;
 
-			/*
-			 * For public messages Mastodon puts the "Public" target in 'to' and the mentioned users in 'cc', so
-			 * we do that same thing
-			 */
-			if (privateMessage) {
-				toList.add(actorUrl);
-			} else {
-				ccList.add(actorUrl);
+				String actorUrl = apUtil.getActorUrlFromWebFingerObj(webFinger);
+				if (actorUrl == null)
+					continue;
+
+				/*
+				 * For public messages Mastodon puts the "Public" target in 'to' and the mentioned users in 'cc', so
+				 * we do that same thing
+				 */
+				if (privateMessage) {
+					toList.add(actorUrl);
+				} else {
+					ccList.add(actorUrl);
+				}
+
+				// prepend character to make it like '@user@server.com'
+				tagList.val(new APOMention(actorUrl, "@" + userName));
 			}
-			tagList.val(new APOMention() //
-					.put(AP.href, actorUrl) //
-					.put(AP.name, "@" + userName)); // prepend character to make it like '@user@server.com'
+			// log and continue if any loop (user) fails here.
+			catch (Exception e) {
+				log.debug("failed adding user to message: " + userName + " -> " + e.getMessage());
+			}
 		}
 		ret.put(AP.tag, tagList);
 
@@ -108,17 +118,15 @@ public class ActPubFactory {
 	 */
 	public APOCreate newCreateMessage(APObj object, String fromActor, List<String> toActors, String noteUrl, ZonedDateTime now) {
 		String idTime = String.valueOf(now.toInstant().toEpochMilli());
-		APOCreate ret = new APOCreate();
-
-		// this 'id' was an early WAG, and needs a fresh look now that AP code is more complete.
-		ret.put(AP.id, noteUrl + "&apCreateTime=" + idTime);
-		ret.put(AP.actor, fromActor);
-		ret.put(AP.published, now.format(DateTimeFormatter.ISO_INSTANT));
-		ret.put(AP.object, object);
-
-		ret.put(AP.to, new APList() //
-				.vals(toActors) //
-				.val(APConst.CONTEXT_STREAMS + "#Public"));
+		APOCreate ret = new APOCreate() //
+				// this 'id' was an early WAG, and needs a fresh look now that AP code is more complete.
+				.put(AP.id, noteUrl + "&apCreateTime=" + idTime) //
+				.put(AP.actor, fromActor) //
+				.put(AP.published, now.format(DateTimeFormatter.ISO_INSTANT)) //
+				.put(AP.object, object) //
+				.put(AP.to, new APList() //
+						.vals(toActors) //
+						.val(APConst.CONTEXT_STREAMS + "#Public"));
 
 		// LinkedList<String> ccArray = new LinkedList<>();
 		// ccArray.add("https://www.w3.org/ns/activitystreams#Public");
