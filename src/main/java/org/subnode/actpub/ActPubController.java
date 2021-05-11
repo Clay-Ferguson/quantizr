@@ -59,7 +59,7 @@ public class ActPubController {
 	 * 
 	 * simple redirect from /ap/user/[userName] to /u/[userName]/home
 	 * 
-	 * todo-0: is this documented in the user guide about user being able to have a node named 'home'
+	 * todo-1: is this documented in the user guide about user being able to have a node named 'home'
 	 * and what it means if they do? Also need to ensure this ALWAYS works especially in the AP
 	 * scenarios and when user has done nothing themselves to create a 'home' node.
 	 */
@@ -133,7 +133,7 @@ public class ActPubController {
 		}
 		if (ret != null) {
 			// log.debug("Reply with Outbox: " + XString.prettyPrint(ret));
-			// todo-0: verify this is returning OK in addition to the data, and also look for all other
+			// todo-1: verify this is returning OK in addition to the data, and also look for all other
 			// places we have a similar scenario in this and all other controllers.
 			return ret;
 		}

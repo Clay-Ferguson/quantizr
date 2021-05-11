@@ -523,7 +523,7 @@ public class IPFSService {
      * Creates a node holding this CID in the current user (SessionContext) account
      * under their EXPORTS node type.
      * 
-     * todo-0: need to document this (and how user must delete the export node to
+     * todo-1: need to document this (and how user must delete the export node to
      * release their pins) in the User Guide
      *
      * Note: childerenFiles will be all the files linked into this resource under a
