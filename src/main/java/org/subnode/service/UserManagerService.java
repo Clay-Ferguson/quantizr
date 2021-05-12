@@ -27,6 +27,7 @@ import org.subnode.model.UserStats;
 import org.subnode.model.client.NodeProp;
 import org.subnode.model.client.NodeType;
 import org.subnode.model.client.PrincipalName;
+import org.subnode.model.client.UserProfile;
 import org.subnode.mongo.MongoAuth;
 import org.subnode.mongo.MongoDelete;
 import org.subnode.mongo.MongoRead;
@@ -667,13 +668,15 @@ public class UserManagerService {
 			}
 
 			if (userNode != null) {
-				res.setUserName(userNode.getStrProp(NodeProp.USER.s()));
-				res.setUserBio(userNode.getStrProp(NodeProp.USER_BIO.s()));
-				res.setAvatarVer(userNode.getStrProp(NodeProp.BIN.s()));
-				res.setHeaderImageVer(userNode.getStrProp(NodeProp.BIN.s() + "Header"));
-				res.setUserNodeId(userNode.getId().toHexString());
-				res.setApIconUrl(userNode.getStrProp(NodeProp.ACT_PUB_USER_ICON_URL));
-				res.setActorUrl(userNode.getStrProp(NodeProp.ACT_PUB_ACTOR_URL));
+				UserProfile userProfile = new UserProfile();
+				res.setUserProfile(userProfile);
+				userProfile.setUserName(userNode.getStrProp(NodeProp.USER.s()));
+				userProfile.setUserBio(userNode.getStrProp(NodeProp.USER_BIO.s()));
+				userProfile.setAvatarVer(userNode.getStrProp(NodeProp.BIN.s()));
+				userProfile.setHeaderImageVer(userNode.getStrProp(NodeProp.BIN.s() + "Header"));
+				userProfile.setUserNodeId(userNode.getId().toHexString());
+				userProfile.setApIconUrl(userNode.getStrProp(NodeProp.ACT_PUB_USER_ICON_URL));
+				userProfile.setActorUrl(userNode.getStrProp(NodeProp.ACT_PUB_ACTOR_URL));
 				res.setSuccess(true);
 			}
 		});

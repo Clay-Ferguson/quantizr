@@ -23,17 +23,17 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
 export class UserProfileDlg extends DialogBase {
     bioState: ValidatedState<any> = new ValidatedState<any>();
 
-    /* If no userId is specified this dialog defaults to the current logged in user, or else will be
+    /* If no userNodeId is specified this dialog defaults to the current logged in user, or else will be
     some other user, and this dialog should be readOnly */
-    constructor(private readOnly: boolean, private userId: string, state: AppState) {
+    constructor(private readOnly: boolean, private userNodeId: string, state: AppState) {
         super("User Profile", "app-modal-content", false, state);
-        this.mergeState({ userProfile: null });
+        this.mergeState({ userProfile: null, readOnly: false });
     }
 
     getTitleText(): string {
         const state: any = this.getState();
         if (!state.userProfile) return "";
-        return (state.userProfile.readOnly ? "Profile: " : "Edit Profile: ") + state.userProfile.userName;
+        return (state.readOnly ? "Profile: " : "Edit Profile: ") + state.userProfile.userName;
     }
 
     renderDlg(): CompIntf[] {
@@ -49,7 +49,7 @@ export class UserProfileDlg extends DialogBase {
             new Div(null, null, [
                 profileHeaderImg ? new Div(null, null, [
                     new Div(null, null, [
-                        !state.userProfile.readOnly ? new Div(null, null, [
+                        !state.readOnly ? new Div(null, null, [
                             new Label("Header & Avatar Images")
                         ]) : null,
                         profileHeaderImg
@@ -59,7 +59,7 @@ export class UserProfileDlg extends DialogBase {
                 profileImg,
 
                 new Div(null, { className: "marginBottom " + (profileHeaderImg ? "profileBioPanel" : "profileBioPanelNoHeader") }, [
-                    state.userProfile.readOnly
+                    state.readOnly
                         ? new Html(S.util.markdown(state.userProfile.userBio) || "")
                         : new TextArea("Bio", {
                             rows: 8
@@ -68,9 +68,9 @@ export class UserProfileDlg extends DialogBase {
                 ]),
 
                 new ButtonBar([
-                    state.userProfile.readOnly ? null : new Button("Save", this.save, null, "btn-primary"),
+                    state.readOnly ? null : new Button("Save", this.save, null, "btn-primary"),
                     new Button("Close", this.close, null),
-                    state.userProfile.readOnly && state.userProfile.userName !== this.appState.userName ? new Button("Add as Friend", this.addFriend) : null,
+                    state.readOnly && state.userProfile.userName !== this.appState.userName ? new Button("Add as Friend", this.addFriend) : null,
                     state.userProfile.actorUrl ? new Button("Go to User Page", () => {
                         window.open(state.userProfile.actorUrl, "_blank");
                     }) : null
@@ -81,26 +81,17 @@ export class UserProfileDlg extends DialogBase {
         return children;
     }
 
-    reload(readOnly: boolean, userId: string): Promise<void> {
+    reload(readOnly: boolean, userNodeId: string): Promise<void> {
         return new Promise<void>((resolve, reject) => {
             S.util.ajax<J.GetUserProfileRequest, J.GetUserProfileResponse>("getUserProfile", {
-                userId
+                userId: userNodeId
             }, (res: J.GetUserProfileResponse): void => {
                 // console.log("UserProfile Response: " + S.util.prettyPrint(res));
                 if (res) {
-                    this.bioState.setValue(res.userBio);
+                    this.bioState.setValue(res.userProfile.userBio);
                     this.mergeState({
-                        userProfile: {
-                            userId: res.userNodeId,
-                            userName: res.userName,
-                            avatarVer: res.avatarVer,
-                            headerImageVer: res.headerImageVer,
-                            userNodeId: res.userNodeId,
-                            apIconUrl: res.apIconUrl,
-                            actorUrl: res.actorUrl,
-                            userBio: res.userBio,
-                            readOnly
-                        }
+                        userProfile: res.userProfile,
+                        readOnly
                     });
                 }
                 resolve();
@@ -139,7 +130,7 @@ export class UserProfileDlg extends DialogBase {
         }
         else {
             let avatarVer = state.userProfile.avatarVer;
-            src = S.render.getAvatarImgUrl(state.userProfile.userId || this.appState.homeNodeId, avatarVer);
+            src = S.render.getAvatarImgUrl(state.userProfile.userNodeId || this.appState.homeNodeId, avatarVer);
         }
 
         let onClick = (evt) => {
@@ -148,11 +139,11 @@ export class UserProfileDlg extends DialogBase {
             let dlg = new UploadFromFileDropzoneDlg(state.userProfile.userNodeId, "", false, null, false, false, this.appState, () => {
 
                 S.util.ajax<J.GetUserProfileRequest, J.GetUserProfileResponse>("getUserProfile", {
-                    userId: state.userProfile.userId
+                    userId: state.userProfile.userNodeId
                 }, (res: J.GetUserProfileResponse): void => {
                     if (res) {
-                        state.userProfile.avatarVer = res.avatarVer;
-                        state.userProfile.userNodeId = res.userNodeId;
+                        state.userProfile.avatarVer = res.userProfile.avatarVer;
+                        state.userProfile.userNodeId = res.userProfile.userNodeId;
                         this.mergeState({
                             userProfile: state.userProfile
                         });
@@ -197,7 +188,7 @@ export class UserProfileDlg extends DialogBase {
         }
 
         let headerImageVer = state.userProfile.headerImageVer;
-        let src: string = S.render.getProfileHeaderImgUrl(state.userProfile.userId || this.appState.homeNodeId, headerImageVer);
+        let src: string = S.render.getProfileHeaderImgUrl(state.userProfile.userNodeId || this.appState.homeNodeId, headerImageVer);
 
         let onClick = (evt) => {
             if (state.userProfile.readOnly) return;
@@ -205,11 +196,11 @@ export class UserProfileDlg extends DialogBase {
             let dlg = new UploadFromFileDropzoneDlg(state.userProfile.userNodeId, "Header", false, null, false, false, this.appState, () => {
 
                 S.util.ajax<J.GetUserProfileRequest, J.GetUserProfileResponse>("getUserProfile", {
-                    userId: state.userProfile.userId
+                    userId: state.userProfile.userNodeId
                 }, (res: J.GetUserProfileResponse): void => {
                     if (res) {
-                        state.userProfile.headerImageVer = res.headerImageVer;
-                        state.userProfile.userNodeId = res.userNodeId;
+                        state.userProfile.headerImageVer = res.userProfile.headerImageVer;
+                        state.userProfile.userNodeId = res.userProfile.userNodeId;
                         this.mergeState({
                             userProfile: state.userProfile
                         });
@@ -247,7 +238,7 @@ export class UserProfileDlg extends DialogBase {
         return new Promise<void>((resolve, reject) => {
             S.util.ajax<J.GetUserAccountInfoRequest, J.GetUserAccountInfoResponse>("getUserAccountInfo", null,
                 async (res: J.GetUserAccountInfoResponse) => {
-                    await this.reload(this.readOnly, this.userId);
+                    await this.reload(this.readOnly, this.userNodeId);
                     resolve();
                 });
         });

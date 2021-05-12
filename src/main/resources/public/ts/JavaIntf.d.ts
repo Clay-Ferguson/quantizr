@@ -1,6 +1,16 @@
 /* tslint:disable */
 /* eslint-disable */
 
+export interface UserProfile {
+    userName: string;
+    userBio: string;
+    avatarVer: string;
+    headerImageVer: string;
+    userNodeId: string;
+    apIconUrl: string;
+    actorUrl: string;
+}
+
 export interface AddFriendRequest extends RequestBase {
     userName: string;
 }
@@ -411,13 +421,7 @@ export interface GetUserAccountInfoResponse extends ResponseBase {
 }
 
 export interface GetUserProfileResponse extends ResponseBase {
-    userName: string;
-    userBio: string;
-    avatarVer: string;
-    headerImageVer: string;
-    userNodeId: string;
-    apIconUrl: string;
-    actorUrl: string;
+    userProfile: UserProfile;
 }
 
 export interface GraphResponse extends ResponseBase {
