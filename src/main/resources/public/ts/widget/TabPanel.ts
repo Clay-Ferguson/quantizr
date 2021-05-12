@@ -1,7 +1,6 @@
 import { useSelector } from "react-redux";
 import { store } from "../AppRedux";
 import { AppState } from "../AppState";
-import clientInfo from "../ClientInfo";
 import { Constants as C } from "../Constants";
 import { DialogBase } from "../DialogBase";
 import { PubSub } from "../PubSub";
@@ -27,10 +26,17 @@ export class TabPanel extends Div {
         else {
             // See also: RightNavPanel.ts which has the inverse/balance of these numbers of columns.
             this.attribs.className = //
-                "col-" + (C.mainPanelCols + 3) + //
-                " col-md-" + (C.mainPanelCols + 2) +//
-                " col-lg-" + (C.mainPanelCols + 1) + //
-                " col-xl-" + C.mainPanelCols + //
+                // =======================================
+                // see: other places these tags exist
+                // for #NON_DYNAMIC_COLS
+                "col-" + (C.mainPanelCols) + //
+                // #DYNAMIC_COLS
+                // "col-" + (C.mainPanelCols + 3) + //
+                // " col-md-" + (C.mainPanelCols + 2) +//
+                // " col-lg-" + (C.mainPanelCols + 1) + //
+                // " col-xl-" + C.mainPanelCols + //
+                // =======================================
+
                 " offset-" + C.leftNavPanelCols;
         }
     }
@@ -45,12 +51,14 @@ export class TabPanel extends Div {
         let children: CompIntf[] = dialog ? [dialog] : S.meta64.tabs;
 
         let tabContent = new Div(null, {
-            className: "row tab-content",
+            className: "row " + (state.mobileMode ? "tab-content-mobile" : "tab-content"),
             role: "main"
         }, children);
 
+        let tabButtons = !dialog && state.mobileMode;
+
         this.setChildren([
-            dialog ? null : new TabPanelButtons(), tabContent
+            tabButtons ? new TabPanelButtons(false) : null, tabContent
         ]);
     }
 }

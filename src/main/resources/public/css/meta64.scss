@@ -88,7 +88,7 @@ $smallBorderSize: 3px;
 }
 
 .feedSearchField {
-    width: 30em;
+    width: 20em;
     display: inline-block;
     margin-right: 5px;
 }
@@ -316,6 +316,13 @@ a {
     max-width: 150px;
 }
 
+.profileImageBaseNoHeaderSmall {
+    border-radius: $borderRadiusLarge;
+    cursor: pointer;
+    background-color: $modal-content-bg;
+    max-width: 75px;
+}
+
 .profileBioPanel {
     top: -40px;
     position: relative;
@@ -350,6 +357,11 @@ a {
 
 .readOnlyProfileImageNoHeader {
     @extend .profileImageBaseNoHeader;
+    border: 1px solid $nodeBorderBottomColor;
+}
+
+.profileImageRHS {
+    @extend .profileImageBaseNoHeaderSmall;
     border: 1px solid $nodeBorderBottomColor;
 }
 
@@ -398,7 +410,6 @@ a {
     position: fixed;
     top: 0;
     right: 0;
-    margin: 10px;
 }
 
 .floatingControlBarItem {
@@ -692,11 +703,14 @@ entire thing down some times, if it's jutting up against something */
 .tab-buttons-container {
     // margin-top: 8px;
     margin-bottom: 8px;
-    margin-left: 12px; //todo-0: make this zero on mobile
 }
 
 .rightNavPanel {
     padding: 15px; 
+}
+
+.rightNavPanelInner {
+    margin-left: 15px;
 }
 
 .my-tab-pane {
@@ -704,7 +718,12 @@ entire thing down some times, if it's jutting up against something */
 }
 
 .tab-content {
-    margin-left: 12px; //todo-0: make this zero on mobile
+    margin-left: 0px; 
+    margin-right: 0px;
+    margin-top: 8px;
+}
+
+.tab-content-mobile {
     margin-right: 0px;
 }
 
@@ -1197,7 +1216,7 @@ input[type="radio"] {
 .plusButtonFloatRight {
     position: absolute;
     top: -1.1rem;
-    right: -3.2rem;
+    right: -3rem;
 }
 
 @keyframes fadeToHidden {

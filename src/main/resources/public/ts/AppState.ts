@@ -100,6 +100,8 @@ export class AppState {
         maxUploadFileSize: 0
     };
 
+    userProfile: J.UserProfile = null;
+
     selectedNodes: any = {};
 
     /* maps node.id values to NodeInfo.java objects

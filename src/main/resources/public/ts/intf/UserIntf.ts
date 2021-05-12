@@ -11,4 +11,5 @@ export interface UserIntf {
     deleteAllUserLocalDbEntries(): any;
     loginResponse(res: J.LoginResponse, usr: string, pwd: string, usingLocalDb: boolean, state: AppState): any;
     transferNode(recursive: boolean, nodeId: string, fromUser: string, toUser: string, state: AppState): void;
+    queryUserProfile(userId: string): Promise<void>;
 }

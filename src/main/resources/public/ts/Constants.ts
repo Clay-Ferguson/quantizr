@@ -4,8 +4,16 @@ export class Constants {
 
     // per bootstrap design these must sum to 12;
     static leftNavPanelCols: number = 3;
-    static mainPanelCols: number = 5;
-    static rightNavPanelCols: number = 4;
+
+    // =======================================
+    // see: other places these tags exist
+    // for #DYNAMIC_COLS
+    // static mainPanelCols: number = 5;
+    // static rightNavPanelCols: number = 4;
+    // for #NON_DYNAMIC_COLS
+    static mainPanelCols: number = 6;
+    static rightNavPanelCols: number = 3;
+    // ========================================
 
     static readonly ONE_MB = 1048576; // 1024 * 1024;
     static readonly MAX_UPLOAD_MB = 20;

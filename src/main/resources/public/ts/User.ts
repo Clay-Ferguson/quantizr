@@ -1,6 +1,5 @@
-import { store } from "./AppRedux";
+import { dispatch, store } from "./AppRedux";
 import { AppState } from "./AppState";
-import { FeedView } from "./comps/FeedView";
 import { Constants as C } from "./Constants";
 import { ConfirmDlg } from "./dlg/ConfirmDlg";
 import { SignupDlg } from "./dlg/SignupDlg";
@@ -174,7 +173,9 @@ export class User implements UserIntf {
 
                 S.meta64.userName = usr;
                 S.meta64.password = pwd;
-                // console.log("Logged in as: " + usr);
+                // console.log("Logged in as: " + usr + " rootNode: " + res.rootNode);
+
+                this.queryUserProfile(res.rootNode);
             }
 
             S.meta64.setStateVarsUsingLoginResponse(res);
@@ -238,6 +239,23 @@ export class User implements UserIntf {
         }, (res: J.TransferNodeResponse) => {
             S.view.refreshTree(null, false, false, null, false, true, true, state);
             S.util.showMessage(res.message, "Success");
+        });
+    }
+
+    queryUserProfile = (userId: string): Promise<void> => {
+        return new Promise<void>((resolve, reject) => {
+            S.util.ajax<J.GetUserProfileRequest, J.GetUserProfileResponse>("getUserProfile", {
+                userId
+            }, (res: J.GetUserProfileResponse): void => {
+                // console.log("queryUserProfile Response: " + S.util.prettyPrint(res));
+                if (res) {
+                    dispatch("Action_SetUserProfile", (s: AppState): AppState => {
+                        s.userProfile = res.userProfile;
+                        return s;
+                    });
+                }
+                resolve();
+            });
         });
     }
 }

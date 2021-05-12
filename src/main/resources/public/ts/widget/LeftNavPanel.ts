@@ -5,7 +5,6 @@ import { MenuPanel } from "../MenuPanel";
 import { PubSub } from "../PubSub";
 import { Singletons } from "../Singletons";
 import { Div } from "./Div";
-import { IconButton } from "./IconButton";
 import { Img } from "./Img";
 import { Span } from "./Span";
 
@@ -41,7 +40,7 @@ export class LeftNavPanel extends Div {
 
                 new Span(g_brandingAppName, { className: "logo-text" })
             ]),
-            new Div(state.title),
+            state.mobileMode ? new Div(state.title) : null,
             loginButton,
 
             new Div(null, {
