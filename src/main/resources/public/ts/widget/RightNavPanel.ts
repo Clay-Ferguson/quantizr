@@ -6,6 +6,7 @@ import { PubSub } from "../PubSub";
 import { Singletons } from "../Singletons";
 import { CompIntf } from "./base/CompIntf";
 import { Div } from "./Div";
+import { Heading } from "./Heading";
 import { Img } from "./Img";
 import { TabPanelButtons } from "./TabPanelButtons";
 
@@ -43,7 +44,7 @@ export class RightNavPanel extends Div {
             new Div(null, { className: "float-left" }, [
                 new Div(null, { className: "rightNavPanelInner" }, [
                     this.makeAvatarDiv(state),
-                    new Div(state.title)]),
+                    new Heading(5, state.title, { className: "microMarginTop marginBottom" })]),
                 new TabPanelButtons(true)
             ])
         ]);
