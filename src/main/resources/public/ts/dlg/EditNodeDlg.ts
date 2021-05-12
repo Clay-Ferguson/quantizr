@@ -43,6 +43,7 @@ import { ConfirmDlg } from "./ConfirmDlg";
 import { EditPropertyDlg } from "./EditPropertyDlg";
 import { EncryptionDlg } from "./EncryptionDlg";
 import { FriendsDlg } from "./FriendsDlg";
+import { EmojiPickerDlg } from "./EmojiPickerDlg";
 import { UploadFromFileDropzoneDlg } from "./UploadFromFileDropzoneDlg";
 
 let S: Singletons;
@@ -692,20 +693,26 @@ export class EditNodeDlg extends DialogBase {
 
             new Icon({
                 className: "fa fa-clock-o fa-lg editorButtonIcon",
-                title: "Insert current time at editor cursor.",
+                title: "Insert current time at cursor",
                 onClick: this.insertTime
             }),
 
             !datePropExists ? new Icon({
                 className: "fa fa-calendar fa-lg editorButtonIcon",
-                title: "Insert Date property on node",
+                title: "Add 'date' property to node (makes Calendar entry)",
                 onClick: this.addDateProperty
             }) : null,
 
             new Icon({
                 className: "fa fa-user fa-lg editorButtonIcon",
-                title: "Insert username/mention at editor cursor.",
+                title: "Insert username/mention at cursor",
                 onClick: this.insertMention
+            }),
+
+            new Icon({
+                className: "fa fa-smile-o fa-lg editorButtonIcon",
+                title: "Insert emoji at cursor",
+                onClick: this.insertEmoji
             })
         ]);
     }
@@ -748,10 +755,20 @@ export class EditNodeDlg extends DialogBase {
 
     insertMention = async (): Promise<void> => {
         if (this.contentEditor) {
-            let friendsDlg: FriendsDlg = new FriendsDlg(this.appState);
-            await friendsDlg.open();
-            if (friendsDlg.getState().selectedName) {
-                this.contentEditor.insertTextAtCursor(" @" + friendsDlg.getState().selectedName + " ");
+            let dlg: FriendsDlg = new FriendsDlg(this.appState);
+            await dlg.open();
+            if (dlg.getState().selectedName) {
+                this.contentEditor.insertTextAtCursor(" @" + dlg.getState().selectedName + " ");
+            }
+        }
+    }
+
+    insertEmoji = async (): Promise<void> => {
+        if (this.contentEditor) {
+            let dlg: EmojiPickerDlg = new EmojiPickerDlg(this.appState);
+            await dlg.open();
+            if (dlg.getState().selectedEmoji) {
+                this.contentEditor.insertTextAtCursor(dlg.getState().selectedEmoji);
             }
         }
     }

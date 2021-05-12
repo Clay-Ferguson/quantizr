@@ -18,6 +18,7 @@
     "axios": "^0.21.1",
     "bootstrap": "^4.5.2",
     "d3": "^6.2.0",
+    "emoji-picker-react": "^3.4.4",
     "highlightjs": "^9.16.2",
     "jquery": "^3.5.1",
     "marked": "^1.1.1",

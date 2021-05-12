@@ -286,7 +286,7 @@ export abstract class Comp<S extends BaseCompState = any> implements CompIntf {
     }
 
     /* Renders this node to a specific tag, including support for non-React children anywhere in the subgraph */
-    tagRender(tag: string, content: string, props: any) {
+    tagRender(tag: any, content: string, props: any) {
         // console.log("Comp.tagRender: " + this.jsClassName + " id=" + props.id);
         this.updateVisAndEnablement();
 

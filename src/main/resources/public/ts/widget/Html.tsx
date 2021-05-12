@@ -1,4 +1,4 @@
-import { ReactNode } from "react";
+import React from "react";
 import { Constants as C } from "../Constants";
 import { PubSub } from "../PubSub";
 import { Singletons } from "../Singletons";
@@ -31,17 +31,27 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
 declare var MathJax;
 
 // see: https://www.npmjs.com/package/react-emoji-render
+// https://codesandbox.io/s/xjpy58llxq
+
 const parseEmojis = value => {
     const emojisArray = toArray(value);
-
-    // toArray outputs React elements for emojis and strings for other
     const newValue = emojisArray.reduce((previous: any, current: any) => {
         if (typeof current === "string") {
             return previous + current;
         }
         return previous + current.props.children;
     }, "");
+    return newValue;
+};
 
+const parseEmojisAndHtml = value => {
+    const emojisArray = toArray(value);
+    const newValue = emojisArray.map((node: any) => {
+        if (typeof node === "string") {
+            return <span dangerouslySetInnerHTML={{ __html: node }} />;
+        }
+        return node.props.children;
+    });
     return newValue;
 };
 
@@ -57,13 +67,18 @@ export class Html extends Comp {
         this.mergeState({ content });
     }
 
-    compRender(): ReactNode {
+    compRender(): React.ReactNode {
         if (this.getChildren() && this.getChildren().length > 0) {
             console.error("dangerouslySetInnerHTML component had children. This is a bug: id=" + this.getId() + " constructor.name=" + this.constructor.name);
         }
 
+        // ************* DO NOT DELETE. Method 1 and 2 both work, except #2 would need to be updated to
+        // enable the attribs!
+        // METHOD 1:
         this.attribs.dangerouslySetInnerHTML = { __html: parseEmojis(this.getState().content) };
         return this.e("div", this.attribs);
+        // METHOD 2:
+        // return <div>{parseEmojisAndHtml(this.getState().content)}</div>;
     }
 
     /* We do two things in here:
