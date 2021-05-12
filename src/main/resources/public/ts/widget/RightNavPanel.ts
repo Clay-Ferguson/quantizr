@@ -43,11 +43,33 @@ export class RightNavPanel extends Div {
         this.setChildren([
             new Div(null, { className: "float-left" }, [
                 new Div(null, { className: "rightNavPanelInner" }, [
+                    state.title ? new Heading(6, "@" + state.title, { className: "rhsUserName" }) : null,
+                    this.makeHeaderDiv(state),
                     this.makeAvatarDiv(state),
-                    new Heading(5, state.title, { className: "microMarginTop marginBottom" })]),
-                new TabPanelButtons(true)
+                    new TabPanelButtons(true, "rhsMenu")
+                ])
             ])
         ]);
+    }
+
+    makeHeaderDiv = (state: AppState): CompIntf => {
+        if (!state.userProfile) return null;
+
+        let src = S.render.getProfileHeaderImgUrl(state.userProfile.userNodeId || state.homeNodeId, state.userProfile.headerImageVer);
+
+        if (src) {
+            // Note: we DO have the image width/height set on the node object (node.width, node.hight) but we don't need it for anything currently
+            return new Img("header-img-rhs", {
+                className: "headerImageRHS",
+                src,
+                onClick: () => {
+                    new UserProfileDlg(false, null, state).open();
+                }
+            });
+        }
+        else {
+            return null;
+        }
     }
 
     makeAvatarDiv = (state: AppState): CompIntf => {
@@ -60,8 +82,7 @@ export class RightNavPanel extends Div {
             src = state.userProfile.apIconUrl;
         }
         else {
-            let avatarVer = state.userProfile.avatarVer;
-            src = S.render.getAvatarImgUrl(state.userProfile.userNodeId || state.homeNodeId, avatarVer);
+            src = S.render.getAvatarImgUrl(state.userProfile.userNodeId || state.homeNodeId, state.userProfile.avatarVer);
         }
 
         if (src) {

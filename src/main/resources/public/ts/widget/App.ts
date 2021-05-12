@@ -11,6 +11,7 @@ import { FullScreenCalendar } from "./FullScreenCalendar";
 import { FullScreenControlBar } from "./FullScreenControlBar";
 import { FullScreenGraphViewer } from "./FullScreenGraphViewer";
 import { FullScreenImgViewer } from "./FullScreenImgViewer";
+import { Heading } from "./Heading";
 import { IconButton } from "./IconButton";
 import { Img } from "./Img";
 import { LeftNavPanel } from "./LeftNavPanel";
@@ -76,7 +77,7 @@ export class App extends Div {
                 onClick: () => { window.location.href = window.location.origin; }
             });
 
-            let title = new Span(state.title);
+            let title = state.title ? new Heading(6, "@" + state.title) : null;
             mobileTopBar = new Div(null, null, [menuButton, logo, signupButton, loginButton, title]);
         }
 

@@ -14,7 +14,7 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (s: Singletons) => {
 
 export class TabPanelButtons extends Div {
 
-    constructor(private verticalButtons: boolean) {
+    constructor(private verticalButtons: boolean, public moreClasses: string = "") {
         super(null);
     }
 
@@ -24,7 +24,7 @@ export class TabPanelButtons extends Div {
             className: "tab-buttons-container"
         }, [
             new Ul(null, {
-                className: "nav nav-tabs " + (this.verticalButtons ? "flex-column" : ""),
+                className: "nav nav-tabs " + (this.verticalButtons ? "flex-column" : "") + " " + this.moreClasses,
                 id: "navTabs"
             }, this.buildTabButtons(state))]
         );

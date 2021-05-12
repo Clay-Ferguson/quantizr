@@ -340,6 +340,14 @@ a {
     object-fit: cover;
 }
 
+.headerImageRHS {
+    border-radius: $borderRadiusLarge;
+    cursor: pointer;
+    width: 100%;
+    object-fit: cover;
+    border: 1px solid $nodeBorderBottomColor;
+}
+
 .profileImage {
     @extend .profileImageBase;
     border: 4px dotted $nodeBorderBottomColor;
@@ -362,7 +370,24 @@ a {
 
 .profileImageRHS {
     @extend .profileImageBaseNoHeaderSmall;
+    top: -40px;
+    left: 30px;
+    position: relative;
     border: 1px solid $nodeBorderBottomColor;
+}
+
+// this should be roughly half the profileImageRHS vertical offset.
+.rhsMenu {
+    // when we need more vertical space on the right (some day) we can do back to doing this adjustement.
+    // top: -20px;
+    // position: relative;
+    width: 80%;
+}
+
+.rhsUserName {
+    // top: -40px;
+    // left: 30px;
+    // position: relative;
 }
 
 .profileHeaderImage {
@@ -712,6 +737,7 @@ entire thing down some times, if it's jutting up against something */
 
 .rightNavPanelInner {
     // margin-left: 15px;
+    margin-right: 70px;
 }
 
 .my-tab-pane {
