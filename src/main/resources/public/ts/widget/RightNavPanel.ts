@@ -1,6 +1,7 @@
 import { store } from "../AppRedux";
 import { AppState } from "../AppState";
 import { Constants as C } from "../Constants";
+import { UserProfileDlg } from "../dlg/UserProfileDlg";
 import { PubSub } from "../PubSub";
 import { Singletons } from "../Singletons";
 import { CompIntf } from "./base/CompIntf";
@@ -63,14 +64,14 @@ export class RightNavPanel extends Div {
         }
 
         if (src) {
-            let att: any = {
-                className: "profileImageRHS",
-                src
-                // onClick
-            };
-
             // Note: we DO have the image width/height set on the node object (node.width, node.hight) but we don't need it for anything currently
-            return new Img("profile-img-rhs", att);
+            return new Img("profile-img-rhs", {
+                className: "profileImageRHS",
+                src,
+                onClick: () => {
+                    new UserProfileDlg(false, null, state).open();
+                }
+            });
         }
         else {
             return null;

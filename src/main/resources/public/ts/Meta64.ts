@@ -515,6 +515,12 @@ export class Meta64 implements Meta64Intf {
                 });
 
             console.log("initApp complete.");
+
+            var element = document.getElementById("appEnterButton");
+            if (element) {
+                element.style.display = "block";
+            }
+
             await this.enableMouseEffect();
 
             setTimeout(() => {
