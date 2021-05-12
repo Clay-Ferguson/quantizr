@@ -21,12 +21,18 @@ export class FriendsDlg extends DialogBase {
 
     selectionValueIntf: ValueIntf;
 
-    constructor(state: AppState) {
+    constructor(state: AppState, private instantSelect: boolean) {
         super("Friends", "app-modal-content-medium-width", null, state);
 
         this.selectionValueIntf = {
             setValue: (val: string): void => {
                 this.mergeState({ selectedName: val });
+                if (this.instantSelect) {
+                    // this timeout IS required for correct state management, but is also ideal
+                    // so user has a chance to see their selection get highlighted.
+                    setTimeout(
+                        this.close, 500);
+                }
             },
 
             getValue: (): string => {
@@ -50,7 +56,7 @@ export class FriendsDlg extends DialogBase {
                 !this.getState().friends ? new Div("You haven't yet added any friends yet!")
                     : new FriendsTable(this.getState().friends, this.selectionValueIntf),
                 new ButtonBar([
-                    this.getState().friends ? new Button("Choose", () => {
+                    (this.getState().friends && !this.instantSelect) ? new Button("Choose", () => {
                         this.close();
                     }, null, "btn-primary") : null,
                     new Button("Close", this.close)

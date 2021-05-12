@@ -2,6 +2,31 @@
 Media Queries below are per Bootstap 4 standard */
 
 /* Small devices (tiny, 320px and up) */
+@media (min-width: 320px) {
+    .menuContainer {
+        min-width: 4em;
+        width: 4em;
+        font-size: 120%;
+    }
+
+    .modal-lg {
+        width: 300px;
+        height: 400px;
+    }
+
+    .container {
+        max-width: 285px;
+    }
+
+    .container-mobile {
+        width: 100%;
+    }
+
+    .container-mobile-edit {
+        width: 100%;
+        padding-right: 35px;
+    }
+}
 
 /* Small devices (portrait phones?, 576px and up) */
 @media (min-width: 576px) {
@@ -26,7 +51,7 @@ Media Queries below are per Bootstap 4 standard */
 
     .container-mobile-edit {
         width: 100%;
-        padding-right: 70px;
+        padding-right: 35px;
     }
 }
 
@@ -53,7 +78,7 @@ Media Queries below are per Bootstap 4 standard */
 
     .container-mobile-edit {
         width: 100%;
-        padding-right: 70px;
+        padding-right: 35px;
     }
 }
 
@@ -80,7 +105,7 @@ Media Queries below are per Bootstap 4 standard */
 
     .container-mobile-edit {
         width: 100%;
-        padding-right: 70px;
+        padding-right: 35px;
     }
 }
 
@@ -108,7 +133,7 @@ Media Queries below are per Bootstap 4 standard */
 
     .container-mobile-edit {
         width: 100%;
-        padding-right: 70px;
+        padding-right: 35px;
     }
 }
 
@@ -135,6 +160,6 @@ Media Queries below are per Bootstap 4 standard */
 
     .container-mobile-edit {
         width: 100%;
-        padding-right: 70px;
+        padding-right: 35px;
     }
 }

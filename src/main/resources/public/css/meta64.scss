@@ -706,11 +706,12 @@ entire thing down some times, if it's jutting up against something */
 }
 
 .rightNavPanel {
-    padding: 15px; 
+    padding-top: 15px; 
+    padding-left: 20px; 
 }
 
 .rightNavPanelInner {
-    margin-left: 15px;
+    // margin-left: 15px;
 }
 
 .my-tab-pane {
