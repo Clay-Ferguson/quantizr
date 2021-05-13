@@ -94,7 +94,7 @@ export class FriendTypeHandler extends TypeBase {
                 align: "left", // causes text to flow around
                 src: imgSrc,
                 onClick: (evt: any) => {
-                    new UserProfileDlg(false, userNodeId, state).open();
+                    new UserProfileDlg(userNodeId, state).open();
                 }
             });
         }

@@ -55,7 +55,7 @@ export class EditPrivsTableRow extends ListBoxRow {
                 className: "friendListImage",
                 src: src,
                 onClick: (evt: any) => {
-                    new UserProfileDlg(true, this.aclEntry.principalNodeId, appState(null)).open();
+                    new UserProfileDlg(this.aclEntry.principalNodeId, appState(null)).open();
                 }
             });
         }

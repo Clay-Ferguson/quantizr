@@ -550,7 +550,7 @@ export class Render implements RenderIntf {
             // align: "left", // causes text to flow around
 
             onClick: (evt: any) => {
-                new UserProfileDlg(true, node.ownerId, state).open();
+                new UserProfileDlg(node.ownerId, state).open();
             }
         });
     }

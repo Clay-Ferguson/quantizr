@@ -88,7 +88,7 @@ export class MenuPanel extends Div {
     static publishKeys = () => { S.encryption.initKeys(false, true); };
     static importKeys = () => { new ImportCryptoKeyDlg(appState(null)).open(); };
     static profile = () => {
-        new UserProfileDlg(false, null, appState(null)).open();
+        new UserProfileDlg(null, appState(null)).open();
     };
 
     static toggleEditMode = () => S.edit.toggleEditMode(appState(null));

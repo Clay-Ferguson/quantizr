@@ -40,12 +40,15 @@ export class RightNavPanel extends Div {
         // mobile mode doesn't render the RHS at all.
         if (state.mobileMode) return;
 
+        let headerImg = this.makeHeaderDiv(state);
+        let avatarImg = this.makeAvatarDiv(state, !!headerImg);
+
         this.setChildren([
             new Div(null, { className: "float-left" }, [
                 new Div(null, { className: "rightNavPanelInner" }, [
                     state.title ? new Heading(6, "@" + state.title, { className: "rhsUserName" }) : null,
-                    this.makeHeaderDiv(state),
-                    this.makeAvatarDiv(state),
+                    headerImg,
+                    avatarImg,
                     new TabPanelButtons(true, "rhsMenu")
                 ])
             ])
@@ -63,7 +66,7 @@ export class RightNavPanel extends Div {
                 className: "headerImageRHS",
                 src,
                 onClick: () => {
-                    new UserProfileDlg(false, null, state).open();
+                    new UserProfileDlg(null, state).open();
                 }
             });
         }
@@ -72,7 +75,7 @@ export class RightNavPanel extends Div {
         }
     }
 
-    makeAvatarDiv = (state: AppState): CompIntf => {
+    makeAvatarDiv = (state: AppState, offset: boolean): CompIntf => {
         let src: string = null;
 
         if (!state.userProfile) return null;
@@ -88,10 +91,10 @@ export class RightNavPanel extends Div {
         if (src) {
             // Note: we DO have the image width/height set on the node object (node.width, node.hight) but we don't need it for anything currently
             return new Img("profile-img-rhs", {
-                className: "profileImageRHS",
+                className: offset ? "profileImageRHS" : "profileImageRHSNoOffset",
                 src,
                 onClick: () => {
-                    new UserProfileDlg(false, null, state).open();
+                    new UserProfileDlg(null, state).open();
                 }
             });
         }

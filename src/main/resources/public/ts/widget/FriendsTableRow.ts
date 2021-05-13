@@ -33,7 +33,7 @@ export class FriendsTableRow extends ListBoxRow {
                 className: "friendListImage",
                 src: src,
                 onClick: (evt: any) => {
-                    new UserProfileDlg(true, this.friend.userNodeId, appState(null)).open();
+                    new UserProfileDlg(this.friend.userNodeId, appState(null)).open();
                 }
             });
         }

@@ -346,6 +346,7 @@ a {
     width: 100%;
     object-fit: cover;
     border: 1px solid $nodeBorderBottomColor;
+    min-height: 60px;
 }
 
 .profileImage {
@@ -374,6 +375,13 @@ a {
     left: 30px;
     position: relative;
     border: 1px solid $nodeBorderBottomColor;
+}
+
+.profileImageRHSNoOffset {
+    @extend .profileImageBaseNoHeaderSmall;
+    position: relative;
+    border: 1px solid $nodeBorderBottomColor;
+    margin-bottom: 20px;
 }
 
 // this should be roughly half the profileImageRHS vertical offset.
