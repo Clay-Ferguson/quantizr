@@ -11,6 +11,7 @@ export class EmojiPicker<S extends BaseCompState = any> extends Comp<S> {
         super();
         this.attribs.pickerStyle = { width: "100%", marginBottom: "16px" };
         this.attribs.onEmojiClick = (event: any, emojiObject: any) => {
+            console.log("emoji: & #x" + emojiObject.unified + ";");
             this.selectionValueIntf.setValue(emojiObject.emoji);
         };
     }

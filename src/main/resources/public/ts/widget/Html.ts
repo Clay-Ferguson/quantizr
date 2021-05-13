@@ -4,7 +4,6 @@ import { PubSub } from "../PubSub";
 import { Singletons } from "../Singletons";
 import { Comp } from "./base/Comp";
 import { CompIntf } from "./base/CompIntf";
-import { toArray } from "react-emoji-render";
 
 // https://github.com/mathjax/MathJax-demos-web
 // https://github.com/mathjax/MathJax-node
@@ -33,27 +32,18 @@ declare var MathJax;
 // see: https://www.npmjs.com/package/react-emoji-render
 // https://codesandbox.io/s/xjpy58llxq
 
-const parseEmojis = value => {
-    const emojisArray = toArray(value);
-    const newValue = emojisArray.reduce((previous: any, current: any) => {
-        if (typeof current === "string") {
-            return previous + current;
-        }
-        return previous + current.props.children;
-    }, "");
-    return newValue;
-};
-
-const parseEmojisAndHtml = value => {
-    const emojisArray = toArray(value);
-    const newValue = emojisArray.map((node: any) => {
-        if (typeof node === "string") {
-            return <span dangerouslySetInnerHTML={{ __html: node }} />;
-        }
-        return node.props.children;
-    });
-    return newValue;
-};
+// ************ DO NOT DELETE
+//
+// const parseEmojisAndHtml = value => {
+//     const emojisArray = toArray(value);
+//     const newValue = emojisArray.map((node: any) => {
+//         if (typeof node === "string") {
+//             return <span dangerouslySetInnerHTML={{ __html: node }} />;
+//         }
+//         return node.props.children;
+//     });
+//     return newValue;
+// };
 
 export class Html extends Comp {
 
@@ -75,9 +65,9 @@ export class Html extends Comp {
         // ************* DO NOT DELETE. Method 1 and 2 both work, except #2 would need to be updated to
         // enable the attribs!
         // METHOD 1:
-        this.attribs.dangerouslySetInnerHTML = { __html: parseEmojis(this.getState().content) };
+        this.attribs.dangerouslySetInnerHTML = { __html: S.render.parseEmojis(this.getState().content) };
         return this.e("div", this.attribs);
-        // METHOD 2:
+        // METHOD 2: (note: You'll need to rename this file to '.tsx' extention to use JSX here)
         // return <div>{parseEmojisAndHtml(this.getState().content)}</div>;
     }
 

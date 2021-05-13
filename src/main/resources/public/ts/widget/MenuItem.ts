@@ -12,7 +12,7 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
 
 export class MenuItem extends Div {
 
-    constructor(public name: string, public clickFunc: Function, enabled: boolean = true) {
+    constructor(public name: string, public clickFunc: Function, enabled: boolean = true, private stateFunc: Function = null) {
         super(name);
         this.onClick = this.onClick.bind(this);
         this.setEnabled(enabled);
@@ -24,7 +24,10 @@ export class MenuItem extends Div {
         let enablement = state.enabled ? {} : { disabled: "disabled" };
         let enablementClass = state.enabled ? "mainMenuItemEnabled" : "disabled mainMenuItemDisabled";
 
-        return this.tagRender("div", state.content, {
+        let prefix = this.stateFunc && this.stateFunc() ? (S.render.CHAR_CHECKMARK + " ") : "";
+
+        return this.tagRender("div", null /* state.content (if doing 'dangerously' set below, don't need this) */, {
+            dangerouslySetInnerHTML: { __html: S.render.parseEmojis(prefix + state.content) },
             ...this.attribs,
             ...enablement,
             ...{

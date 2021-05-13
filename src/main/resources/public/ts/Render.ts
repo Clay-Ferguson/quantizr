@@ -1,5 +1,6 @@
 import * as highlightjs from "highlightjs";
 import * as marked from "marked";
+import { toArray } from "react-emoji-render";
 import { dispatch } from "./AppRedux";
 import { AppState } from "./AppState";
 import { NodeCompTableRowLayout } from "./comps/NodeCompTableRowLayout";
@@ -27,6 +28,8 @@ export class Render implements RenderIntf {
 
     private debug: boolean = false;
     private markedRenderer = null;
+
+    CHAR_CHECKMARK = "&#10004;";
 
     // After adding the breadcrumb query it's a real challenge to get this fading to work right, so for now
     // I'm disabling it entirely with this flag.
@@ -577,4 +580,15 @@ export class Render implements RenderIntf {
             return s;
         });
     }
+
+    parseEmojis = (value: any): any => {
+        const emojisArray = toArray(value);
+        const newValue = emojisArray.reduce((previous: any, current: any) => {
+            if (typeof current === "string") {
+                return previous + current;
+            }
+            return previous + current.props.children;
+        }, "");
+        return newValue;
+    };
 }

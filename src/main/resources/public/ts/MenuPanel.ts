@@ -250,7 +250,7 @@ export class MenuPanel extends Div {
              absolute fastest snappiest response of the app, I'm just not using this mouseEffect for now but let's leave
              the code in place for future reference. */
             new MenuItemSeparator(), //
-            new MenuItem("Mouse Effects", MenuPanel.mouseEffects, !state.isAnonUser)
+            new MenuItem("Mouse Effects", MenuPanel.mouseEffects, !state.isAnonUser && !state.mobileMode, () => state.mouseEffect)
         ]));
 
         children.push(new Menu("Node Info", [
@@ -303,12 +303,12 @@ export class MenuPanel extends Div {
 
         children.push(new Menu("Account", [
             new MenuItem("Profile", MenuPanel.profile, !state.isAnonUser), //
-            new MenuItem("Manage Account", MenuPanel.manageAccount, !state.isAnonUser), //
+            new MenuItem("Manage Account", MenuPanel.manageAccount, !state.isAnonUser && !state.isAdminUser), //
 
             new MenuItemSeparator(), //
 
-            new MenuItem("Toggle Edit Mode", MenuPanel.toggleEditMode, !state.isAnonUser), //
-            new MenuItem("Toggle Metadata", MenuPanel.toggleMetaData, !state.isAnonUser), //
+            new MenuItem("Edit Mode", MenuPanel.toggleEditMode, !state.isAnonUser, () => state.userPreferences.editMode), //
+            new MenuItem("Metadata", MenuPanel.toggleMetaData, !state.isAnonUser, () => state.userPreferences.showMetaData), //
 
             // For now there is only ONE button on the Perferences dialog that is accessible as a toolbar button already, so
             // until we have at least one more preference the preferences dialog is not needed.

@@ -13,6 +13,8 @@ export interface RenderIntf {
     // retrofit to be sure fading is only done AFTER the breadcrumb query update is done.
     allowFadeInId: boolean;
 
+    CHAR_CHECKMARK: string;
+
     setNodeDropHandler(attribs: any, node: J.NodeInfo, isFirst: boolean, state: AppState): void;
     initMarkdown(): void;
     injectSubstitutions(node: J.NodeInfo, content: string): string;
@@ -29,4 +31,5 @@ export interface RenderIntf {
     renderChildren(node: J.NodeInfo, level: number, allowNodeMove: boolean, state: AppState): Comp;
     getAvatarImgUrl(ownerId: string, avatarVer: string): string;
     getProfileHeaderImgUrl(ownerId: string, avatarVer: string): string;
+    parseEmojis(value: any): any;
 }
