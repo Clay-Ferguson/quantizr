@@ -54,9 +54,9 @@ export class UserProfileDlg extends DialogBase {
             new Div(null, null, [
                 profileHeaderImg ? new Div(null, null, [
                     new Div(null, null, [
-                        !this.readOnly ? new Div(null, null, [
-                            new Label("Header & Avatar Images")
-                        ]) : null,
+                        // !this.readOnly ? new Div(null, null, [
+                        //     new Label("Header & Avatar Images")
+                        // ]) : null,
                         profileHeaderImg
                     ])
                 ]) : null,
@@ -66,7 +66,7 @@ export class UserProfileDlg extends DialogBase {
                 new Div(null, { className: "marginBottom " + (profileHeaderImg ? "profileBioPanel" : "profileBioPanelNoHeader") }, [
                     this.readOnly
                         ? new Html(S.util.markdown(state.userProfile.userBio) || "")
-                        : new TextArea("Bio", {
+                        : new TextArea("About Me", {
                             rows: 8
                         },
                             this.bioState)

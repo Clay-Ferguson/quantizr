@@ -377,7 +377,7 @@ a {
 
 .profileImageRHS {
     @extend .profileImageBaseNoHeaderSmall;
-    top: -40px;
+    top: -30px;
     left: 30px;
     position: relative;
     border: 1px solid $nodeBorderBottomColor;
@@ -430,12 +430,14 @@ a {
     @extend .profileImageBase;
     border: 4px dotted $nodeBorderBottomColor;
     padding: 12px;
+    min-height: 150px;
 }
 
 .profileImageHolderNoHeader {
     @extend .profileImageBaseNoHeader;
     border: 4px dotted $nodeBorderBottomColor;
     padding: 12px;
+    min-height: 150px;
 }
 
 .profileHeaderImageHolder {

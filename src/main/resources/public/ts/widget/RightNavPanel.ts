@@ -1,14 +1,14 @@
-import { store } from "../AppRedux";
+import { appState, store } from "../AppRedux";
 import { AppState } from "../AppState";
 import { Constants as C } from "../Constants";
 import { UserProfileDlg } from "../dlg/UserProfileDlg";
 import { PubSub } from "../PubSub";
 import { Singletons } from "../Singletons";
 import { CompIntf } from "./base/CompIntf";
+import { Button } from "./Button";
 import { Div } from "./Div";
 import { Heading } from "./Heading";
 import { Img } from "./Img";
-import { Span } from "./Span";
 import { TabPanelButtons } from "./TabPanelButtons";
 
 let S: Singletons;
@@ -43,6 +43,10 @@ export class RightNavPanel extends Div {
 
         let headerImg = this.makeHeaderDiv(state);
         let avatarImg = this.makeAvatarDiv(state, !!headerImg);
+        let profileButton = !state.isAnonUser && !headerImg && !avatarImg
+            ? new Button("Edit Profile", () => {
+                new UserProfileDlg(null, appState(null)).open();
+            }, null, "btn-secondary marginBottom") : null;
 
         this.setChildren([
             new Div(null, { className: "float-left" }, [
@@ -52,6 +56,7 @@ export class RightNavPanel extends Div {
                         onClick: e => { S.nav.login(state); }
                     }) : null,
                     state.title && !state.isAnonUser ? new Heading(6, "@" + state.title, { className: "rhsUserName" }) : null,
+                    profileButton,
                     headerImg,
                     avatarImg,
                     new TabPanelButtons(true, "rhsMenu")
@@ -66,14 +71,20 @@ export class RightNavPanel extends Div {
         let src = S.render.getProfileHeaderImgUrl(state.userProfile.userNodeId || state.homeNodeId, state.userProfile.headerImageVer);
 
         if (src) {
-            // Note: we DO have the image width/height set on the node object (node.width, node.hight) but we don't need it for anything currently
-            return new Img("header-img-rhs", {
+            let attr: any = {
                 className: "headerImageRHS",
-                src,
-                onClick: () => {
+                src
+            };
+
+            if (!state.isAnonUser) {
+                attr.onClick = () => {
                     new UserProfileDlg(null, state).open();
-                }
-            });
+                };
+                attr.title = "Click to edit your Profile Info";
+            }
+
+            // Note: we DO have the image width/height set on the node object (node.width, node.hight) but we don't need it for anything currently
+            return new Img("header-img-rhs", attr);
         }
         else {
             return null;
@@ -94,14 +105,20 @@ export class RightNavPanel extends Div {
         }
 
         if (src) {
-            // Note: we DO have the image width/height set on the node object (node.width, node.hight) but we don't need it for anything currently
-            return new Img("profile-img-rhs", {
+            let attr: any = {
                 className: offset ? "profileImageRHS" : "profileImageRHSNoOffset",
-                src,
-                onClick: () => {
+                src
+            };
+
+            if (!state.isAnonUser) {
+                attr.onClick = () => {
                     new UserProfileDlg(null, state).open();
-                }
-            });
+                };
+                attr.title = "Click to edit your Profile Info";
+            }
+
+            // Note: we DO have the image width/height set on the node object (node.width, node.hight) but we don't need it for anything currently
+            return new Img("profile-img-rhs", attr);
         }
         else {
             return null;
