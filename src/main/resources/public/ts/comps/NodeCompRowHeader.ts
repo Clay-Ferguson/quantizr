@@ -1,4 +1,5 @@
 import { useSelector } from "react-redux";
+import { appState } from "../AppRedux";
 import { AppState } from "../AppState";
 import { Constants as C } from "../Constants";
 import * as J from "../JavaIntf";
@@ -9,6 +10,10 @@ import { Icon } from "../widget/Icon";
 import { IconButton } from "../widget/IconButton";
 import { Img } from "../widget/Img";
 import { Span } from "../widget/Span";
+
+// todo-1: need to switch to the more efficient way of using nid attribute
+// on elements (search for "nid:" in code), to avoid creating new functions
+// every time this component renders (and same for entire app!)
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
@@ -71,12 +76,8 @@ export class NodeCompRowHeader extends Div {
 
         children.push(new Icon({
             className: "fa fa-link fa-lg",
-            title: "Copy ID-based URL into clipboard",
-            onClick: () => {
-                let url = window.location.origin + "/app?id=" + node.id;
-                S.util.copyToClipboard(url);
-                S.util.flashMessage("Copied to Clipboard: " + url, "Clipboard", true);
-            }
+            title: "Show URLs for this node",
+            onClick: () => S.render.showNodeUrl(node, state)
         }));
 
         if (priority) {
