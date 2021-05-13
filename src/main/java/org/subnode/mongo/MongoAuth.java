@@ -248,7 +248,7 @@ public class MongoAuth {
 	public void auth(MongoSession session, SubNode node, List<PrivilegeType> priv) {
 
 		/* Special case if this node is named 'home' it is readable by anyone */
-		if (node != null && "home".equals(node.getName()) && priv.size() == 1 && priv.get(0).name().equals("READ")) {
+		if (node != null && NodeName.HOME.equals(node.getName()) && priv.size() == 1 && priv.get(0).name().equals("READ")) {
 			return;
 		}
 

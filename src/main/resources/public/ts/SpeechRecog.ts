@@ -29,8 +29,7 @@ export class SpeechRecog implements SpeechRecogIntf {
         }
 
         if (!this.recognition) {
-            // todo-0: use MessageDlg not alert.
-            alert("Speech recognition not available in your browser.");
+            S.util.showMessage("Speech recognition not available in your browser.", "Warning");
             return;
         }
 
