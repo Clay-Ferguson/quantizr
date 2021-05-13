@@ -1320,7 +1320,10 @@ public class AppController implements ErrorController {
 			synchronized (MailSender.getLock()) {
 				try {
 					mailSender.init();
-					mailSender.sendMail("wclayf@gmail.com", null, "<h1>Hello! Time=" + timeString + "</h1>This is the test email requested from the Quanta admin menu.", "Test Subject");
+					mailSender.sendMail("wclayf@gmail.com", null,
+							"<h1>Hello! Time=" + timeString + "</h1>This is the test email requested from the "
+									+ appProp.getConfigText("brandingAppName") + " admin menu.",
+							"Test Subject");
 				} finally {
 					mailSender.close();
 				}

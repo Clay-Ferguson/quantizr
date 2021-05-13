@@ -58,7 +58,10 @@ public class OutboxMgr {
 	@Autowired
 	private UserFeedService userFeedService;
 
-	/* Currently unused. Let's leave this capability here and not delete this code, but it's no longer being used. */
+	/*
+	 * Currently unused. Let's leave this capability here and not delete this code, but it's no longer
+	 * being used.
+	 */
 	public void addInboxNotification(MongoSession session, String recieverUserName, SubNode userNode, SubNode node,
 			String notifyMessage) {
 
@@ -110,8 +113,9 @@ public class OutboxMgr {
 	}
 
 	/**
-	 * Sends an email notification to the user associated with 'toUserNode' (a person's account root node), telling them
-	 * that 'fromUserName' has shared a node with them, and including a link to the shared node in the email.
+	 * Sends an email notification to the user associated with 'toUserNode' (a person's account root
+	 * node), telling them that 'fromUserName' has shared a node with them, and including a link to the
+	 * shared node in the email.
 	 * 
 	 * @param session
 	 * @param fromUserName
@@ -124,10 +128,12 @@ public class OutboxMgr {
 		// log.debug("sending node notification email to: " + email);
 
 		String nodeUrl = apiUtil.getFriendlyNodeUrl(session, node);
-		String content = String.format("Quanta user '%s' shared a node to your '%s' account.<p>\n\n" + //
-				"%s", fromUserName, toUserName, nodeUrl);
+		String content =
+				String.format(appProp.getConfigText("brandingAppName") + " user '%s' shared a node to your '%s' account.<p>\n\n" + //
+						"%s", fromUserName, toUserName, nodeUrl);
 
-		queueMailUsingAdminSession(session, email, "A Quanta Node was shared to you!", content);
+		queueMailUsingAdminSession(session, email, "A " + appProp.getConfigText("brandingAppName") + " Node was shared to you!",
+				content);
 	}
 
 	public void queueEmail(final String recipients, final String subject, final String content) {

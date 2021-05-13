@@ -116,11 +116,9 @@ export class MenuPanel extends Div {
         const children = [];
 
         children.push(new Menu(C.SITE_NAV_MENU_TEXT, [
-            ...this.siteNavCustomItems(state),
             new MenuItem("Portal Home", S.meta64.loadAnonPageHome),
             new MenuItem("User Guide", MenuPanel.openUserGuide),
-            !state.isAnonUser ? new MenuItemSeparator() : null, //
-            !state.isAnonUser ? new MenuItem("Logout", S.nav.logout, !state.isAnonUser) : null
+            ...this.siteNavCustomItems(state)
         ]));
 
         children.push(new Menu("My Nodes", [
@@ -304,6 +302,7 @@ export class MenuPanel extends Div {
         children.push(new Menu("Account", [
             new MenuItem("Profile", MenuPanel.profile, !state.isAnonUser), //
             new MenuItem("Manage Account", MenuPanel.manageAccount, !state.isAnonUser && !state.isAdminUser), //
+            !state.isAnonUser ? new MenuItem("Logout", S.nav.logout, !state.isAnonUser) : null,
 
             new MenuItemSeparator(), //
 

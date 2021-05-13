@@ -6,12 +6,14 @@ intro1: >-
   Join the Fediverse Revolution!
 intro2:
 
-# Tip: This 'menu' prop is seen in TypeScript JSON as an array of objects
-# links here can be full url, or node names, or "tab:tabName"
-# Renamed to -xxx to disable, because I decided to embed these links
-# right onto the main platform landing page node instead, and don't need them here.
+# Tip: This 'menu' property is seen in TypeScript JSON as an array of objects in 
+# variable 'S.meta64.config'
+#
+# Links here can be full url, or node names, or "tab:tabName"
 menu:
   siteNav:
+    - name: "separator"
+      link: ""
     - name: "News"
       link: ":news" 
     - name: "Fediverse"
@@ -26,8 +28,6 @@ menu:
     #   link: ":features"
     # - name: "Getting Started"
     #   link: ":getting-started"
-    - name: "separator"
-      link: ""
 
 help:
   nodeStats:
