@@ -11,6 +11,8 @@ import * as J from "./JavaIntf";
 import { PubSub } from "./PubSub";
 import { Singletons } from "./Singletons";
 import { Anchor } from "./widget/Anchor";
+import { Button } from "./widget/Button";
+import { ButtonBar } from "./widget/ButtonBar";
 import { Heading } from "./widget/Heading";
 import { VerticalLayout } from "./widget/VerticalLayout";
 
@@ -252,14 +254,21 @@ export class Nav implements NavIntf {
     geoLocation = (state: AppState): void => {
         if (navigator.geolocation) {
             navigator.geolocation.getCurrentPosition((location) => {
-                new MessageDlg("Message", "Title", null,
+                // todo-0: make this string a configurable property template
+                let googleUrl = "https://www.google.com/maps/search/?api=1&query=" + location.coords.latitude + "," + location.coords.longitude;
+
+                new MessageDlg("Your current location...", "GEO Location", null,
                     new VerticalLayout([
-                        new Heading(3, "Lat:" + location.coords.latitude),
-                        new Heading(3, "Lon:" + location.coords.longitude),
-                        new Heading(4, "+/- " + location.coords.accuracy),
-                        new Anchor("https://www.google.com/maps/search/?api=1&query=" + location.coords.latitude + "," + location.coords.longitude,
-                            "Show Your Google Maps Location",
-                            { target: "_blank" })
+                        new Heading(3, "Lat/Lon: " + location.coords.latitude + "," + location.coords.longitude),
+                        new Heading(5, "Accuracy: +/- " + location.coords.accuracy + " meters (" + (location.coords.accuracy * 0.000621371).toFixed(1) + " miles)"),
+                        new ButtonBar([
+                            new Button("Show on Google Maps", () => {
+                                window.open(googleUrl, "_blank");
+                            }),
+                            new Button("Copy Google Link to Clipboard", () => {
+                                S.util.copyToClipboard(googleUrl);
+                                S.util.flashMessage("Copied to Clipboard: " + googleUrl, "Clipboard", true);
+                            })])
                     ]), false, 0, state
                 ).open();
             });
