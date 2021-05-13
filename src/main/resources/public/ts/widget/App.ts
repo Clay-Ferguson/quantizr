@@ -77,7 +77,7 @@ export class App extends Div {
                 onClick: () => { window.location.href = window.location.origin; }
             });
 
-            let title = state.title ? new Heading(6, "@" + state.title) : null;
+            let title = state.title ? new Span("@" + state.title) : null;
             mobileTopBar = new Div(null, null, [menuButton, logo, signupButton, loginButton, title]);
         }
 

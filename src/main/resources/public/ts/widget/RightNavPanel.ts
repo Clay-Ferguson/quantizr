@@ -8,6 +8,7 @@ import { CompIntf } from "./base/CompIntf";
 import { Div } from "./Div";
 import { Heading } from "./Heading";
 import { Img } from "./Img";
+import { Span } from "./Span";
 import { TabPanelButtons } from "./TabPanelButtons";
 
 let S: Singletons;
@@ -46,7 +47,11 @@ export class RightNavPanel extends Div {
         this.setChildren([
             new Div(null, { className: "float-left" }, [
                 new Div(null, { className: "rightNavPanelInner" }, [
-                    state.title ? new Heading(6, "@" + state.title, { className: "rhsUserName" }) : null,
+                    state.isAnonUser ? new Div("Login / Signup", {
+                        className: "signupLinkText",
+                        onClick: e => { S.nav.login(state); }
+                    }) : null,
+                    state.title && !state.isAnonUser ? new Heading(6, "@" + state.title, { className: "rhsUserName" }) : null,
                     headerImg,
                     avatarImg,
                     new TabPanelButtons(true, "rhsMenu")

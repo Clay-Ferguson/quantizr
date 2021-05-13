@@ -94,12 +94,18 @@ $smallBorderSize: 3px;
 }
 
 .signupLinkText {
+    cursor: pointer;
+    font-size: 125%;
+    margin-bottom: 16px;
+}
+
+.signupLinkTextMobile {
     display: inline-block;
     margin-top: 16px;
     cursor: pointer;
     font-size: 125%;
 }
-  
+
 .fullScreenToolbar {
     z-index: 2147483501;
     position: fixed;

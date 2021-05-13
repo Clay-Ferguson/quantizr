@@ -26,11 +26,6 @@ export class LeftNavPanel extends Div {
     preRender(): void {
         let state: AppState = useSelector((state: AppState) => state);
 
-        let loginButton = state.isAnonUser ? new Span("Login / Signup", {
-            className: "signupLinkText",
-            onClick: e => { S.nav.login(state); }
-        }) : null;
-
         this.setChildren([
             new Div(null, null, [
                 new Img(this.getId() + "_logo", {
@@ -42,7 +37,6 @@ export class LeftNavPanel extends Div {
                 new Span(g_brandingAppName, { className: "logo-text" })
             ]),
             (state.mobileMode && state.title) ? new Heading(6, "@" + state.title) : null,
-            loginButton,
 
             new Div(null, {
                 className: "float-right menuContainer"
