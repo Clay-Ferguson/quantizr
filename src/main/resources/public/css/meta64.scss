@@ -312,7 +312,7 @@ a {
 .profileImageBase {
     border-radius: $borderRadiusLarge;
     cursor: pointer;
-    top: -90px;
+    top: -50px;
     left: 35px;
     position: relative;
     background-color: $modal-content-bg;
@@ -330,7 +330,7 @@ a {
     border-radius: $borderRadiusLarge;
     cursor: pointer;
     background-color: $modal-content-bg;
-    max-width: 75px;
+    max-width: 120px;
 }
 
 .profileBioPanel {
@@ -381,10 +381,10 @@ a {
 
 .profileImageRHS {
     @extend .profileImageBaseNoHeaderSmall;
-    top: -30px;
+    top: -45px;
     left: 30px;
     position: relative;
-    border: 1px solid $nodeBorderBottomColor;
+    border: 5px solid $body-bg; 
 }
 
 .profileImageRHSNoOffset {

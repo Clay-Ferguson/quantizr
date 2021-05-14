@@ -1368,6 +1368,6 @@ export class Util implements UtilIntf {
     }
 
     isLocalUserName = (userName: string): boolean => {
-        return userName && userName.indexOf("@") !== -1;
+        return userName && userName.indexOf("@") === -1;
     }
 }
