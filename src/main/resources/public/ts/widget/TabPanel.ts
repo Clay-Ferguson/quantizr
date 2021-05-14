@@ -51,7 +51,7 @@ export class TabPanel extends Div {
         let children: CompIntf[] = dialog ? [dialog] : S.meta64.tabs;
 
         let tabContent = new Div(null, {
-            className: "row " + (state.mobileMode ? "tab-content-mobile" : "tab-content"),
+            className: "row tab-content",
             role: "main"
         }, children);
 
