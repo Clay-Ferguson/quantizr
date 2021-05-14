@@ -118,4 +118,5 @@ export interface UtilIntf {
     insertString(val: string, text: string, position: number): string;
     showBrowserInfo(): void;
     switchBrowsingMode(state: AppState): void;
+    isLocalUserName(userName: string): boolean;
 }

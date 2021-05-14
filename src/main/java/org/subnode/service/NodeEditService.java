@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.subnode.actpub.ActPubFollowing;
 import org.subnode.actpub.ActPubService;
+import org.subnode.config.NodeName;
 import org.subnode.exception.base.RuntimeEx;
 import org.subnode.model.IPFSObjectStat;
 import org.subnode.model.NodeInfo;
@@ -137,7 +138,7 @@ public class NodeEditService {
 		if (nodeId == null) {
 			node = read.getUserNodeByType(session, null, null,
 					"### " + ThreadLocals.getSessionContext().getUserName() + "'s Public Posts", NodeType.POSTS.s(),
-					Arrays.asList(PrivilegeType.READ.s()));
+					Arrays.asList(PrivilegeType.READ.s()), NodeName.POSTS);
 
 			if (node != null) {
 				nodeId = node.getId().toHexString();
@@ -149,7 +150,7 @@ public class NodeEditService {
 		if (node == null) {
 			if (nodeId.equals("~" + NodeType.NOTES.s())) {
 				node = read.getUserNodeByType(session, session.getUserName(), null, "### Notes", NodeType.NOTES.s(),
-						null);
+						null, null);
 			} else {
 				node = read.getNode(session, nodeId);
 			}
@@ -277,7 +278,7 @@ public class NodeEditService {
 		}
 
 		SubNode linksNode = read.getUserNodeByType(session, session.getUserName(), null, "### Notes",
-				NodeType.NOTES.s(), null);
+				NodeType.NOTES.s(), null, null);
 
 		if (linksNode == null) {
 			log.warn("unable to get linksNode");

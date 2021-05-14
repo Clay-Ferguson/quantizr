@@ -472,7 +472,7 @@ public class ActPubService {
             if (actorAccountNode != null) {
                 String userName = actorAccountNode.getStrProp(NodeProp.USER.s());
                 SubNode postsNode = read.getUserNodeByType(session, userName, actorAccountNode, "### Posts",
-                        NodeType.ACT_PUB_POSTS.s(), null);
+                        NodeType.ACT_PUB_POSTS.s(), null, NodeName.POSTS);
                 saveNote(session, actorAccountNode, postsNode, obj, false, false);
             }
         }

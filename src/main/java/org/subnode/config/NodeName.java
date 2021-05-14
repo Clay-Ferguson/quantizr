@@ -11,6 +11,9 @@ public class NodeName {
 	public static final String LINKS = "links";	
 	public static final String PUBLIC = "public";
 	public static final String HOME = "home";
+	public static final String INBOX = "inbox";
+	public static final String FRIENDS = "friends";
+	public static final String POSTS = "posts";
 	public static final String WELCOME = "welcome";
 	public static final String FEEDS = "feeds";
 	public static final String ROOT_OF_ALL_USERS = "/" + NodeName.ROOT + "/" + NodeName.USER;

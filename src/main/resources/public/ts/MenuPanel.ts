@@ -46,6 +46,7 @@ export class MenuPanel extends Div {
     static openNotesNode = () => S.nav.openContentNode("~" + J.NodeType.NOTES);
     static openFriendsNode = () => S.nav.openContentNode("~" + J.NodeType.FRIEND_LIST);
     static openPostsNode = () => S.nav.openContentNode("~" + J.NodeType.POSTS);
+    static openHomeNode = () => S.nav.openContentNode(":" + appState(null).userName + ":home");
     static openExportsNode = () => S.nav.openContentNode("~" + J.NodeType.EXPORTS);
     static transferNode = () => { new TransferNodeDlg(appState(null)).open(); };
     static searchAndReplace = () => { new SearchAndReplaceDlg(appState(null)).open(); };
@@ -122,9 +123,11 @@ export class MenuPanel extends Div {
 
         children.push(new Menu("My Nodes", [
             new MenuItem("Account", S.nav.navHome, !state.isAnonUser),
-            new MenuItem("Notes", MenuPanel.openNotesNode, !state.isAnonUser),
+            new MenuItem("Home", MenuPanel.openHomeNode, !state.isAnonUser),
+            new MenuItem("Posts", MenuPanel.openPostsNode, !state.isAnonUser),
             new MenuItem("Friends", MenuPanel.openFriendsNode, !state.isAnonUser),
-            new MenuItem("Posted", MenuPanel.openPostsNode, !state.isAnonUser),
+            new MenuItemSeparator(), //
+            new MenuItem("Notes", MenuPanel.openNotesNode, !state.isAnonUser),
             new MenuItem("Exports", MenuPanel.openExportsNode, !state.isAnonUser)
         ]));
 

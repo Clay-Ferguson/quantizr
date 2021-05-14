@@ -21,6 +21,7 @@ import org.subnode.actpub.model.APObj;
 import org.subnode.actpub.model.APProp;
 import org.subnode.actpub.model.APType;
 import org.subnode.config.AppProp;
+import org.subnode.config.NodeName;
 import org.subnode.model.client.NodeProp;
 import org.subnode.model.client.NodeType;
 import org.subnode.model.client.PrincipalName;
@@ -70,7 +71,7 @@ public class ActPubOutbox {
         }
 
         SubNode outboxNode = read.getUserNodeByType(session, apUserName, userNode, "### Posts", NodeType.ACT_PUB_POSTS.s(),
-                Arrays.asList(PrivilegeType.READ.s(), PrivilegeType.WRITE.s()));
+                Arrays.asList(PrivilegeType.READ.s(), PrivilegeType.WRITE.s()), NodeName.POSTS);
         if (outboxNode == null) {
             log.debug("no outbox for user: " + apUserName);
             return;

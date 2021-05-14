@@ -121,7 +121,7 @@ public class UserManagerService {
 	private ActPubCache apCache;
 
 	@Autowired
-    private AclService acl;
+	private AclService acl;
 
 	/* Private keys of each user by user name as key */
 	public static final ConcurrentHashMap<String, String> privateKeysByUserName = new ConcurrentHashMap<>();
@@ -180,20 +180,34 @@ public class UserManagerService {
 			res.setUserPreferences(getDefaultUserPreferences());
 		}
 
-		ensureUserHomeNodeExists(session, userName);
+		// ensure if "sn:posts" node type does exist that it's also named 'posts'
+		// todo-0: need to move this logic into some better place than this login processing!
+		// this is a retrofit (data repair) here, and not the standard flow.
+		SubNode postsNode = read.getUserNodeByType(session, userName, null, "### Posts", NodeType.POSTS.s(), Arrays.asList(PrivilegeType.READ.s()), NodeName.POSTS);
+		if (postsNode != null && !NodeName.POSTS.equals(postsNode.getName())) {
+			postsNode.setName(NodeName.POSTS); 
+			acl.addPrivilege(session, postsNode, PrincipalName.PUBLIC.s(), Arrays.asList(PrivilegeType.READ.s()), null);
+			update.save(session, postsNode);
+		}
+
+		ensureUserHomeNodeExists(session, userName, "### " + userName
+				+ "'s Public Node &#x1f389;\n\nEdit the content and children of this node. It represents you to the outside world.",
+				NodeType.NONE.s(), NodeName.HOME);
 
 		return res;
 	}
 
-	public void ensureUserHomeNodeExists(MongoSession session, String userName) {
+	public void ensureUserHomeNodeExists(MongoSession session, String userName, String content, String type, String name) {
 		SubNode userNode = read.getUserNodeByUserName(session, userName);
 		if (userNode != null) {
-			SubNode userHomeNode = read.getNodeByName(session, userName + ":" + NodeName.HOME);
+			SubNode userHomeNode = read.getNodeByName(session, userName + ":" + name);
 			if (userHomeNode == null) {
-				SubNode node = create.createNode(session, userNode, null, NodeType.NONE.s(), 0L, CreateNodeLocation.LAST, null, null, true);
+				SubNode node = create.createNode(session, userNode, null, type, 0L, CreateNodeLocation.LAST, null, null, true);
 				node.setOwner(userNode.getId());
-				node.setName(NodeName.HOME);
-				node.setContent("### " +userName + "'s Public Node &#x1f389;\n\nEdit the content and children of this node. It represents you to the outside world.");
+				if (name != null) {
+					node.setName(name);
+				}
+				node.setContent(content);
 				acl.addPrivilege(session, node, PrincipalName.PUBLIC.s(), Arrays.asList(PrivilegeType.READ.s()), null);
 				update.save(session, node);
 			}
@@ -647,7 +661,7 @@ public class UserManagerService {
 		}
 
 		// get the Friend List of the follower
-		SubNode followerFriendList = read.getUserNodeByType(session, userName, null, null, NodeType.FRIEND_LIST.s(), null);
+		SubNode followerFriendList = read.getUserNodeByType(session, userName, null, null, NodeType.FRIEND_LIST.s(), null, NodeName.FRIENDS);
 
 		/*
 		 * lookup to see if this followerFriendList node already has userToFollow already under it

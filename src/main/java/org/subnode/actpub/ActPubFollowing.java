@@ -157,7 +157,7 @@ public class ActPubFollowing {
 
             // get the Friend List of the follower
             SubNode followerFriendList =
-                    read.getUserNodeByType(session, followerUserName, null, null, NodeType.FRIEND_LIST.s(), null);
+                    read.getUserNodeByType(session, followerUserName, null, null, NodeType.FRIEND_LIST.s(), null, NodeName.FRIENDS);
 
             /*
              * lookup to see if this followerFriendList node already has userToFollow already under it
@@ -380,7 +380,7 @@ public class ActPubFollowing {
         Query query = new Query();
 
         // get friends list node
-        SubNode friendsListNode = read.getUserNodeByType(session, userName, null, null, NodeType.FRIEND_LIST.s(), null);
+        SubNode friendsListNode = read.getUserNodeByType(session, userName, null, null, NodeType.FRIEND_LIST.s(), null, NodeName.FRIENDS);
         if (friendsListNode == null)
             return null;
 

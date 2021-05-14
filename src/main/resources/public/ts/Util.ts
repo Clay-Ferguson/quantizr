@@ -1366,4 +1366,8 @@ export class Util implements UtilIntf {
             document.documentElement.clientHeight
         );
     }
+
+    isLocalUserName = (userName: string): boolean => {
+        return userName && userName.indexOf("@") !== -1;
+    }
 }

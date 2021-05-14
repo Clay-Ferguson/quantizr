@@ -534,7 +534,7 @@ public class IPFSService {
     public void writeIpfsExportNode(MongoSession session, String cid, String mime, String fileName,
             List<ExportIpfsFile> childrenFiles) {
         SubNode exportParent = read.getUserNodeByType(session, session.getUserName(), null, "### Exports",
-                NodeType.EXPORTS.s(), null);
+                NodeType.EXPORTS.s(), null, null);
 
         if (exportParent != null) {
             SubNode node = create.createNode(session, exportParent, null, NodeType.NONE.s(), 0L,
