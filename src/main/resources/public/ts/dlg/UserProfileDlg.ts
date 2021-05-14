@@ -5,6 +5,7 @@ import * as J from "../JavaIntf";
 import { PubSub } from "../PubSub";
 import { Singletons } from "../Singletons";
 import { ValidatedState } from "../ValidatedState";
+import { Anchor } from "../widget/Anchor";
 import { CompIntf } from "../widget/base/CompIntf";
 import { Button } from "../widget/Button";
 import { ButtonBar } from "../widget/ButtonBar";
@@ -71,12 +72,14 @@ export class UserProfileDlg extends DialogBase {
                             this.bioState)
                 ]),
 
+                new Anchor(null, "Logout", { className: "float-right", onClick: S.nav.logout }),
+
                 new ButtonBar([
                     this.readOnly ? null : new Button("Save", this.save, null, "btn-primary"),
                     this.readOnly ? null : new Button("Manage Account", () => S.edit.openManageAccountDlg(state)), //
 
-                    localUser && state.userProfile.homeNodeId ? new Button(this.readOnly ? "User Home Node" : "My Home Node", () => this.openUserHomePage(state, "home")) : null, //
-                    localUser ? new Button(this.readOnly ? "User Posts" : "My Posts", () => this.openUserHomePage(state, "posts")) : null, //
+                    localUser && state.userProfile.homeNodeId ? new Button("Home Node", () => this.openUserHomePage(state, "home")) : null, //
+                    localUser ? new Button("Posts", () => this.openUserHomePage(state, "posts")) : null, //
 
                     this.readOnly && state.userProfile.userName !== this.appState.userName ? new Button("Add as Friend", this.addFriend) : null,
                     state.userProfile.actorUrl ? new Button("Go to User Page", () => {
