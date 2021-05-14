@@ -256,9 +256,13 @@ a {
 }
 
 .logo-text {
-    font-size: 1.5rem;
-    font-weight: 400;
+    cursor: pointer;
+    font-size: 1.9rem;
+    font-weight: 600;
     margin-left: 10px;
+    margin-right: 15px;
+    vertical-align: middle;
+    color: green;
 }
 
 .app-body {
@@ -395,7 +399,7 @@ a {
     // when we need more vertical space on the right (some day) we can do back to doing this adjustement.
     // top: -20px;
     // position: relative;
-    width: 80%;
+    width: 40%;
 }
 
 .rhsUserName {
@@ -449,8 +453,8 @@ a {
 
 .floatingControlBar {
     position: fixed;
-    top: 0;
-    right: 0;
+    top: 2px;
+    right: 2px;
 }
 
 .floatingControlBarItem {
@@ -752,8 +756,8 @@ entire thing down some times, if it's jutting up against something */
 }
 
 .rightNavPanelInner {
-    // margin-left: 15px;
-    margin-right: 70px;
+    margin-right: 15px;
+    min-width: 15em;
 }
 
 .my-tab-pane {
@@ -1596,12 +1600,12 @@ i'm backing out for now
 
 .iconToggleOn {
     @extend .iconToggle;
-    border-bottom: 5px solid white;
+    border: 3px solid white;
 }
 
 .iconToggleOff {
     @extend .iconToggle;
-    //border-bottom: 4px solid transparent;
+    border: 3px solid transparent;
 }
 
 .selectLabel {

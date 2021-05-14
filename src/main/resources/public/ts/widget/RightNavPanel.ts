@@ -2,12 +2,14 @@ import { appState, store } from "../AppRedux";
 import { AppState } from "../AppState";
 import { Constants as C } from "../Constants";
 import { UserProfileDlg } from "../dlg/UserProfileDlg";
+import * as J from "../JavaIntf";
 import { PubSub } from "../PubSub";
 import { Singletons } from "../Singletons";
 import { CompIntf } from "./base/CompIntf";
 import { Button } from "./Button";
+import { ButtonBar } from "./ButtonBar";
 import { Div } from "./Div";
-import { Heading } from "./Heading";
+import { IconButton } from "./IconButton";
 import { Img } from "./Img";
 import { TabPanelButtons } from "./TabPanelButtons";
 
@@ -55,14 +57,47 @@ export class RightNavPanel extends Div {
                         className: "signupLinkText",
                         onClick: e => { S.nav.login(state); }
                     }) : null,
-                    state.title && !state.isAnonUser ? new Heading(6, "@" + state.title, { className: "rhsUserName" }) : null,
+                    state.title && !state.isAnonUser ? new Button("@" + state.title, e => { S.nav.navHome(state); },
+                        { title: "Go to your Account Root Node" }, "btn-secondary marginBottom marginRight") : null,
                     profileButton,
                     headerImg,
                     avatarImg,
+                    this.makeButtonsBar(state),
                     new TabPanelButtons(true, "rhsMenu")
                 ])
             ])
         ]);
+    }
+
+    makeButtonsBar = (state: AppState): CompIntf => {
+        let allowEditMode = state.node && !state.isAnonUser;
+        let fullScreenViewer = S.meta64.fullscreenViewerActive(state);
+
+        let editButton = (allowEditMode && !fullScreenViewer) ? new IconButton("fa-pencil", null, {
+            onClick: e => { S.edit.toggleEditMode(state); },
+            title: "Turn edit mode " + (state.userPreferences.editMode ? "off" : "on")
+        }, "btn-secondary", state.userPreferences.editMode ? "on" : "off") : null;
+
+        let prefsButton = !fullScreenViewer ? new IconButton("fa-certificate", null, {
+            onClick: e => { S.edit.toggleShowMetaData(state); },
+            title: state.userPreferences.showMetaData ? "Hide Avatars and Metadata" : "Show Avatars and Metadata"
+        }, "btn-secondary", state.userPreferences.showMetaData ? "on" : "off") : null;
+
+        let clipboardPasteButton = !state.isAnonUser ? new IconButton("fa-clipboard", null, {
+            onClick: e => {
+                S.edit.saveClipboardToChildNode("~" + J.NodeType.NOTES);
+            },
+            title: "Save clipboard text to my NOTES node"
+        }, "btn-secondary", "off") : null;
+
+        let addNoteButton = !state.isAnonUser ? new IconButton("fa-sticky-note", null, {
+            onClick: e => {
+                S.edit.addNode("~" + J.NodeType.NOTES, null, state);
+            },
+            title: "Save new note to my NOTES node"
+        }, "btn-secondary", "off") : null;
+
+        return new Div(null, { className: "marginBottom" }, [new ButtonBar([editButton, prefsButton, clipboardPasteButton, addNoteButton])]);
     }
 
     makeHeaderDiv = (state: AppState): CompIntf => {

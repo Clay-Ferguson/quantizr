@@ -55,7 +55,7 @@ export class FeedView extends AppTab {
             style: { display: "inline" },
             onClick: this.handleClick
         }, [
-            new Anchor("#feedTab", "Feed", {
+            new Anchor("#feedTab", "Fediverse", {
                 "data-toggle": "tab",
                 className: "nav-link" + (state.activeTab === "feedTab" ? " active" : "")
             })

@@ -11,8 +11,8 @@ export class Constants {
     // static mainPanelCols: number = 5;
     // static rightNavPanelCols: number = 4;
     // for #NON_DYNAMIC_COLS
-    static mainPanelCols: number = 6;
-    static rightNavPanelCols: number = 3;
+    static mainPanelCols: number = 5;
+    static rightNavPanelCols: number = 4;
     // ========================================
 
     static readonly ONE_MB = 1048576; // 1024 * 1024;

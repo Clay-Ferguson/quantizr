@@ -5,7 +5,6 @@ import { MenuPanel } from "../MenuPanel";
 import { PubSub } from "../PubSub";
 import { Singletons } from "../Singletons";
 import { Div } from "./Div";
-import { Heading } from "./Heading";
 import { Img } from "./Img";
 import { Span } from "./Span";
 
@@ -34,9 +33,12 @@ export class LeftNavPanel extends Div {
                     onClick: () => { window.location.href = window.location.origin; }
                 }),
 
-                new Span(g_brandingAppName, { className: "logo-text" })
+                new Span(g_brandingAppName, {
+                    className: "logo-text",
+                    onClick: e => { S.meta64.loadAnonPageHome(null); },
+                    title: "Go to Portal Home Node"
+                })
             ]),
-            (state.mobileMode && state.title) ? new Heading(6, "@" + state.title) : null,
 
             new Div(null, {
                 className: "float-right menuContainer"

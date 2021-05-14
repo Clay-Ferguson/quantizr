@@ -1,17 +1,15 @@
 import { useSelector } from "react-redux";
-import { dispatch } from "../AppRedux";
 import { AppState } from "../AppState";
 import { Constants as C } from "../Constants";
-import * as J from "../JavaIntf";
 import { PubSub } from "../PubSub";
 import { Singletons } from "../Singletons";
 import { Comp } from "./base/Comp";
+import { Button } from "./Button";
 import { Div } from "./Div";
 import { FullScreenCalendar } from "./FullScreenCalendar";
 import { FullScreenControlBar } from "./FullScreenControlBar";
 import { FullScreenGraphViewer } from "./FullScreenGraphViewer";
 import { FullScreenImgViewer } from "./FullScreenImgViewer";
-import { Heading } from "./Heading";
 import { IconButton } from "./IconButton";
 import { Img } from "./Img";
 import { LeftNavPanel } from "./LeftNavPanel";
@@ -24,6 +22,8 @@ let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (s: Singletons) => {
     S = s;
 });
+
+declare var g_brandingAppName;
 
 export class App extends Div {
 
@@ -74,11 +74,18 @@ export class App extends Div {
             let logo = new Img(this.getId() + "_logo", {
                 className: "marginRight smallLogoButton",
                 src: "/branding/logo-50px-tr.jpg",
-                onClick: () => { window.location.href = window.location.origin; }
+                onClick: () => { window.location.href = window.location.origin; },
+                title: "Main application Landing Page"
             });
 
-            let title = state.title ? new Span("@" + state.title) : null;
-            mobileTopBar = new Div(null, null, [menuButton, logo, signupButton, loginButton, title]);
+            let appName = new Span(g_brandingAppName, {
+                className: "logo-text",
+                onClick: e => { S.meta64.loadAnonPageHome(null); },
+                title: "Go to Portal Home Node"
+            });
+
+            let title = state.title ? new Button("@" + state.title, e => { S.nav.navHome(state); }) : null;
+            mobileTopBar = new Div(null, null, [menuButton, logo, appName, signupButton, loginButton, title]);
         }
 
         let main: Main = null;
@@ -88,50 +95,12 @@ export class App extends Div {
         if (!state.mobileMode) {
             let topScrollUpButton = new IconButton("fa-angle-double-up", null, {
                 onClick: e => {
-                    // Log.log("scrollTop by button");
                     window.scrollTo(0, 0);
                 },
                 title: "Scroll to Top"
             }, "btn-secondary floatingControlBarItem", "off");
 
-            let editButton = (allowEditMode && !fullScreenViewer) ? new IconButton("fa-pencil", null, {
-                onClick: e => { S.edit.toggleEditMode(state); },
-                title: "Turn edit mode " + (state.userPreferences.editMode ? "off" : "on")
-            }, "btn-secondary floatingControlBarItem", state.userPreferences.editMode ? "on" : "off") : null;
-
-            let prefsButton = !fullScreenViewer ? new IconButton("fa-certificate", null, {
-                onClick: e => { S.edit.toggleShowMetaData(state); },
-                title: state.userPreferences.showMetaData ? "Hide Avatars and Metadata" : "Show Avatars and Metadata"
-            }, "btn-secondary floatingControlBarItem", state.userPreferences.showMetaData ? "on" : "off") : null;
-
-            let rootButton = !state.isAnonUser ? new IconButton("fa-database", null, {
-                onClick: e => { S.nav.navHome(state); },
-                title: "Account Node"
-            }, (state.pageMessage ? "btn-primary" : "btn-secondary") + " floatingControlBarItem", "off") : null;
-
-            let homeButton = new IconButton("fa-home", null, {
-                onClick: e => { S.meta64.loadAnonPageHome(null); },
-                title: "Portal Home"
-            }, (state.pageMessage ? "btn-primary" : "btn-secondary") + " floatingControlBarItem", "off");
-
-            let clipboardPasteButton = !state.isAnonUser ? new IconButton("fa-clipboard", null, {
-                onClick: e => {
-                    S.edit.saveClipboardToChildNode("~" + J.NodeType.NOTES);
-                },
-                title: "Save clipboard text to my NOTES node"
-            }, "btn-secondary floatingControlBarItem", "off") : null;
-
-            let addNoteButton = !state.isAnonUser ? new IconButton("fa-sticky-note", null, {
-                onClick: e => {
-                    S.edit.addNode("~" + J.NodeType.NOTES, null, state);
-                },
-                title: "Save new note to my NOTES node"
-            }, "btn-secondary floatingControlBarItem", "off") : null;
-
-            // these are the buttons at the upper right of the page.
-            if (topScrollUpButton || rootButton || homeButton || prefsButton || editButton) {
-                floatingControlBar = new Div(null, { className: "floatingControlBar" }, [topScrollUpButton, rootButton, homeButton, addNoteButton, clipboardPasteButton, prefsButton, editButton]);
-            }
+            floatingControlBar = new Div(null, { className: "floatingControlBar" }, [topScrollUpButton]);
         }
 
         let mainClass = null;
