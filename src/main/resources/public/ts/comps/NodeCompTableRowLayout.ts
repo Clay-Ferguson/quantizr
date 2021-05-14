@@ -124,7 +124,11 @@ export class NodeCompTableRowLayout extends Div {
                 // todo-0: this button should have same enabelement as "new" button, on the page root
                 let btn = new IconButton("fa-plus", null, {
                     onClick: e => {
-                        S.edit.insertNode(lastNode.id, "u", 1 /* isFirst ? 0 : 1 */, state);
+                        if (lastNode) {
+                            S.edit.insertNode(lastNode.id, "u", 1 /* isFirst ? 0 : 1 */, state);
+                        } else {
+                            S.edit.newSubNode(null, state.node.id);
+                        }
                     },
                     title: "Insert new node"
                 }, "btn-secondary marginLeft marginTop");

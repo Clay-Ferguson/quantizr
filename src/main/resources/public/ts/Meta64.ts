@@ -506,7 +506,7 @@ export class Meta64 implements Meta64Intf {
 
             this.playAudioIfRequested();
 
-            S.util.ajax<J.GetConfigRequest, J.GetConfigResponse>("getConfig", {
+            await S.util.ajax<J.GetConfigRequest, J.GetConfigResponse>("getConfig", {
             },
                 (res: J.GetConfigResponse): void => {
                     if (res.config) {
@@ -516,12 +516,16 @@ export class Meta64 implements Meta64Intf {
 
             console.log("initApp complete.");
 
-            var element = document.getElementById("appEnterButton");
-            if (element) {
-                element.style.display = "block";
-            }
+            this.enableMouseEffect();
 
-            await this.enableMouseEffect();
+            setTimeout(() => {
+                // sometimes the "Enter" button click is initially ignored (and must be clicked twice) and this is a
+                // hack to (maybe?) fix that until I have time to research it more.
+                var element = document.getElementById("appEnterButton");
+                if (element) {
+                    element.style.display = "block";
+                }
+            }, 750);
 
             setTimeout(() => {
                 S.encryption.initKeys();
