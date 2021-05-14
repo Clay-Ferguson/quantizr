@@ -3,6 +3,7 @@
 
 export interface UserProfile {
     userName: string;
+    homeNodeId: string;
     userBio: string;
     avatarVer: string;
     headerImageVer: string;

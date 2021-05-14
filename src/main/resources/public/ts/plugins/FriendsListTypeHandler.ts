@@ -44,7 +44,7 @@ export class FriendsListTypeHandler extends TypeBase {
             }),
             new ButtonBar([
                 new Button("Add Friend", () => S.edit.createNode(node, J.NodeType.FRIEND, state), {
-                    title: "Add a new friend to this list of friends."
+                    title: "Add a new Friend (i.e. Follow someone)"
                 })
             ], null, "float-right marginBottom"),
             new Div(null, { className: "clearfix" }),

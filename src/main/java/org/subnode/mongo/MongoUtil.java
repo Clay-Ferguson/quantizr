@@ -565,7 +565,7 @@ public class MongoUtil {
 
 		created = new ValContainer<>(Boolean.FALSE);
 
-		// create home node.
+		// create home node (admin owned node named 'home').
 		SubNode publicHome = apiUtil.ensureNodeExists(session, "/" + NodeName.ROOT + "/" + NodeName.PUBLIC, NodeName.HOME, NodeName.HOME,
 				"Public Home", null, true, null, created);
 

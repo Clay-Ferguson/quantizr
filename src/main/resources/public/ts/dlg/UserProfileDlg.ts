@@ -49,14 +49,12 @@ export class UserProfileDlg extends DialogBase {
 
         let profileHeaderImg: CompIntf = this.makeProfileHeaderImg();
         let profileImg: CompIntf = this.makeProfileImg(!!profileHeaderImg);
+        let url = window.location.origin + "/u/" + state.userProfile.userName + "/home";
 
         let children = [
             new Div(null, null, [
                 profileHeaderImg ? new Div(null, null, [
                     new Div(null, null, [
-                        // !this.readOnly ? new Div(null, null, [
-                        //     new Label("Header & Avatar Images")
-                        // ]) : null,
                         profileHeaderImg
                     ])
                 ]) : null,
@@ -74,16 +72,37 @@ export class UserProfileDlg extends DialogBase {
 
                 new ButtonBar([
                     this.readOnly ? null : new Button("Save", this.save, null, "btn-primary"),
-                    new Button("Close", this.close, null),
+                    this.readOnly ? null : new Button("Manage Account", () => S.edit.openManageAccountDlg(state)), //
+                    state.userProfile.homeNodeId ? new Button(this.readOnly ? "User Home Page" : "My Home Page", () => this.openUserHomePage(state)) : null, //
                     this.readOnly && state.userProfile.userName !== this.appState.userName ? new Button("Add as Friend", this.addFriend) : null,
                     state.userProfile.actorUrl ? new Button("Go to User Page", () => {
                         window.open(state.userProfile.actorUrl, "_blank");
-                    }) : null
-                ], null, "marginTop")
+                    }) : null,
+                    new Button("Close", this.close, null)
+                ], null /*, "marginTop" */)
             ])
         ];
 
         return children;
+    }
+
+    openUserHomePage = (state: any) => {
+        /* If this is not our account we open in separate browser tab */
+        if (this.readOnly) {
+            /* This is the ID-based url (leave this here as FYI), but we use the more user-friendly one
+             instead which ends with '/home'.
+
+             let url = window.location.origin + "/app?id=" + state.userProfile.homeNodeId;
+             */
+            let url = window.location.origin + "/u/" + state.userProfile.userName + "/home";
+            window.open(url, "_blank");
+        }
+        /* Else this is our node so we close the dialog and then navitage to the home node */
+        else {
+            this.close();
+            // todo-0: HOME variable in Java needs to be usable here.
+            setTimeout(() => S.nav.openContentNode(":" + this.appState.userName + ":home"), 250);
+        }
     }
 
     reload(userNodeId: string): Promise<void> {
@@ -91,7 +110,7 @@ export class UserProfileDlg extends DialogBase {
             S.util.ajax<J.GetUserProfileRequest, J.GetUserProfileResponse>("getUserProfile", {
                 userId: userNodeId
             }, (res: J.GetUserProfileResponse): void => {
-                // console.log("UserProfile Response: " + S.util.prettyPrint(res));
+                console.log("UserProfile Response: " + S.util.prettyPrint(res));
                 if (res) {
                     this.bioState.setValue(res.userProfile.userBio);
                     this.mergeState({

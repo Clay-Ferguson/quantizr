@@ -87,14 +87,14 @@ export class RightNavPanel extends Div {
             onClick: e => {
                 S.edit.saveClipboardToChildNode("~" + J.NodeType.NOTES);
             },
-            title: "Save clipboard text to my NOTES node"
+            title: "Save clipboard (under Notes node)"
         }, "btn-secondary", "off") : null;
 
         let addNoteButton = !state.isAnonUser ? new IconButton("fa-sticky-note", null, {
             onClick: e => {
                 S.edit.addNode("~" + J.NodeType.NOTES, null, state);
             },
-            title: "Save new note to my NOTES node"
+            title: "Create new Note (under Notes node)"
         }, "btn-secondary", "off") : null;
 
         return new Div(null, { className: "marginBottom" }, [new ButtonBar([editButton, prefsButton, clipboardPasteButton, addNoteButton])]);

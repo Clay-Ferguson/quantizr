@@ -2,6 +2,9 @@ package org.subnode.model.client;
 
 public class UserProfile {
     private String userName;
+	//if a node exists named '[userName]:home', then the id of that node is stored here.
+	private String homeNodeId;
+
 	private String userBio;
 
 	// version (which is now just the GRID ID) needed to retrieve profile image (account node binary attachment)
@@ -72,5 +75,13 @@ public class UserProfile {
 
 	public void setActorUrl(String actorUrl) {
 		this.actorUrl = actorUrl;
+	}
+
+	public String getHomeNodeId() {
+		return homeNodeId;
+	}
+
+	public void setHomeNodeId(String homeNodeId) {
+		this.homeNodeId = homeNodeId;
 	}
 }

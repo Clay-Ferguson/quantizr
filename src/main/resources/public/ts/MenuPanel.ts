@@ -93,7 +93,6 @@ export class MenuPanel extends Div {
 
     static toggleEditMode = () => S.edit.toggleEditMode(appState(null));
     static toggleMetaData = () => S.edit.toggleShowMetaData(appState(null));
-    static manageAccount = () => S.edit.openManageAccountDlg(appState(null));
     static browserInfo = () => S.util.showBrowserInfo();
     static mobileToggle = () => S.util.switchBrowsingMode(appState(null));
 
@@ -256,7 +255,7 @@ export class MenuPanel extends Div {
         children.push(new Menu("Node Info", [
 
             // I decided with this on the toolbar we don't need it repliated here.
-            // !state.isAnonUser ? new MenuItem("Save clipboard to my NOTES node", () => S.edit.saveClipboardToChildNode("~" + J.NodeType.NOTES)) : null, //
+            // !state.isAnonUser ? new MenuItem("Save clipboard (under Notes node)", () => S.edit.saveClipboardToChildNode("~" + J.NodeType.NOTES)) : null, //
 
             new MenuItem("Show URLs", MenuPanel.showUrls, !!hltNode), //
             new MenuItem("Show Raw Data", MenuPanel.showRawData, !state.isAnonUser && selNodeIsMine), //
@@ -303,7 +302,6 @@ export class MenuPanel extends Div {
 
         children.push(new Menu("Account", [
             new MenuItem("Profile", MenuPanel.profile, !state.isAnonUser), //
-            new MenuItem("Manage Account", MenuPanel.manageAccount, !state.isAnonUser && !state.isAdminUser), //
             !state.isAnonUser ? new MenuItem("Logout", S.nav.logout, !state.isAnonUser) : null,
 
             new MenuItemSeparator(), //

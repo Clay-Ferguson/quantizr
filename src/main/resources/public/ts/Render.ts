@@ -549,7 +549,7 @@ export class Render implements RenderIntf {
         return new Img(key, {
             src,
             className: "avatarImage",
-            title: "User: " + node.owner + "\n\nClick for Bio",
+            title: "User: " + node.owner + "\n\nShow Profile",
             // align: "left", // causes text to flow around
 
             onClick: (evt: any) => {
