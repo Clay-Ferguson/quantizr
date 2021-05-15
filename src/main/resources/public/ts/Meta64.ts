@@ -515,17 +515,7 @@ export class Meta64 implements Meta64Intf {
                 });
 
             console.log("initApp complete.");
-
             this.enableMouseEffect();
-
-            setTimeout(() => {
-                // sometimes the "Enter" button click is initially ignored (and must be clicked twice) and this is a
-                // hack to (maybe?) fix that until I have time to research it more.
-                var element = document.getElementById("appEnterButton");
-                if (element) {
-                    element.style.display = "block";
-                }
-            }, 750);
 
             setTimeout(() => {
                 S.encryption.initKeys();

@@ -30,7 +30,6 @@ import { Singletons } from "./Singletons";
 import { User } from "./User";
 import { Util } from "./Util";
 import { View } from "./View";
-
 export class Factory {
     S: Singletons;
 

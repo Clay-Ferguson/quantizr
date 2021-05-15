@@ -32,7 +32,7 @@ export class WelcomePanel extends Div {
             }, (res) => {
                 this.mergeState({ welcomeNode: res.node });
             });
-        }, 250);
+        }, 20);
     }
 
     preRender(): void {

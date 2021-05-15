@@ -21,6 +21,8 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (s: Singletons) => {
     S = s;
 });
 
+declare var __page;
+
 let currencyFormatter = new Intl.NumberFormat("en-US", {
     style: "currency",
     currency: "USD"
@@ -388,6 +390,10 @@ export class Util implements UtilIntf {
     }
 
     progressInterval = (state: AppState): void => {
+        /* welcome.html page doesn't do the overlay (mouse blocking) or progress message when it's
+         querying server like the APP would do (index.html) */
+        if (__page !== "index") return;
+
         const isWaiting = this.isAjaxWaiting();
         if (isWaiting) {
             this.waitCounter++;

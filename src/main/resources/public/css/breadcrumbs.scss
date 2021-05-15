@@ -4,9 +4,9 @@
 
 .breadcrumbItem {
     cursor: pointer;
-    border: 1px solid gray;
-    border-radius: 4px;
-    padding: 4px;
+    border: 2px solid gray;
+    border-radius: 7px;
+    padding: 5px;
     margin-right: 8px;
     margin-bottom: 4px;
     white-space: nowrap;
@@ -14,5 +14,5 @@
 }
 
 .breadcrumbItem:hover {
-    border: 1px solid green;
+    border: 2px solid green;
 }

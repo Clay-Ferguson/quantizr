@@ -27,7 +27,6 @@
 
     <title th:text="${brandingAppName}"></title>
     <link rel="stylesheet" th:href="'/css/meta64.css?v='+${MAIN_CSS_HASH}" />
-    <link rel="preload" href="/fonts/Roboto/Roboto-Light.ttf" as="font" crossorigin="anonymous" />
 </head>
 
 <body class="welcome-body customScrollbar">
@@ -51,7 +50,7 @@
                         <p class="text-center" th:text="${intro1}"></p>
                         <p class="text-center" th:text="${intro2}"></p>
 
-                        <p id="appEnterButton" class="text-center my-hidden"><a class="btn btn-outline-danger btn-lg" href="/app" role="button"><span
+                        <p class="text-center"><a class="btn btn-outline-danger btn-lg" href="/app" role="button"><span
                                     class="appEnterButton">Enter</span></a></p>
 
                     </div>
@@ -124,8 +123,6 @@
             document.write("<br>Try a modern browser like Chrome, Firefox, or Edge.")
         }
     </script>
-
-    <div id="overlayDiv" class="overlay"></div>
 
     <script th:inline="none">
         /*<![CDATA[*/
