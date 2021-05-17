@@ -1,4 +1,9 @@
 #!/bin/bash
+# This script is for recompiling just the Java files, and then restarting the test servers,
+# as fast as possible without doing a full build. Note that our dev project is setup to read
+# java class files directly from disk, so we don't even need to really do an actual build, and
+# we can get away with just compiling the new classes, and then restarting docker!
+# This makes for a very rapid development cycle (edit->test->edit->test, etc.)
 
 if [ -f ./vscode-cwd.sh ]; then
   source ./vscode-cwd.sh
@@ -8,6 +13,9 @@ clear
 # show commands as they are run.
 # set -x
 
+# ==========
+# Server #1
+# ==========
 source ./setenv--localhost-dev1.sh
 sudo rm -rf ${QUANTA_BASE}/log/*
 
@@ -23,24 +31,24 @@ mvn --offline compiler:compile -DskipTests=true -Pjava-compile
 docker restart quanta-dev1
 verifySuccess "Docker Restart quanta-dev1"
 
+# ==========
+# Server #2
+# ==========
 cd ${SCRIPTS}
 source ./setenv--localhost-dev2.sh
 # NOTE: This QUANTA_BASE will be different from the one we ran above. This is server #2
 sudo rm -rf ${QUANTA_BASE}/log/*
 cd $PRJROOT
 
-echo "Wait for server 1 to start..."
-sleep 30
-
 # read -p "About to start second instance. Connect debugger now if you need to... (press any key)"
 
 docker restart quanta-dev2
 verifySuccess "Docker Restart quanta-dev2"
 
-echo "Wait for server 2 to start..."
+echo "wait for servers to start..."
 sleep 30
 
-# cd ${SCRIPTS}
-# . ./activity-pub-check.sh
+cd ${SCRIPTS}
+. ./activity-pub-check.sh
 
 

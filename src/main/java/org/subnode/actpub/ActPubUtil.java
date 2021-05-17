@@ -30,6 +30,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
+import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestTemplate;
 import org.subnode.actpub.model.AP;
 import org.subnode.actpub.model.APList;
@@ -39,7 +40,6 @@ import org.subnode.config.AppProp;
 import org.subnode.mongo.MongoRead;
 import org.subnode.mongo.MongoSession;
 import org.subnode.mongo.model.SubNode;
-import org.subnode.util.ThreadLocals;
 import org.subnode.util.Util;
 import org.subnode.util.XString;
 
@@ -157,22 +157,48 @@ public class ActPubUtil {
     }
 
     public APObj getJson(String url, MediaType mediaType) {
+
+        // todo-0: temporary hacks for localhost peer-to-peer testing
+        if (url.startsWith("https://q1:")) {
+            url = url.replaceAll("https://q1:", "http://q1:");
+        }
+        if (url.startsWith("https://q2:")) {
+            url = url.replaceAll("https://q2:", "http://q2:");
+        }
+
         // log.debug("getJson: " + url);
         APObj ret = null;
         try {
-            HttpHeaders headers = new HttpHeaders();
+            int retries = 0;
+            while (true) {
+                try {
+                    HttpHeaders headers = new HttpHeaders();
 
-            if (mediaType != null) {
-                List<MediaType> acceptableMediaTypes = new LinkedList<MediaType>();
-                acceptableMediaTypes.add(mediaType);
-                headers.setAccept(acceptableMediaTypes);
+                    if (mediaType != null) {
+                        List<MediaType> acceptableMediaTypes = new LinkedList<MediaType>();
+                        acceptableMediaTypes.add(mediaType);
+                        headers.setAccept(acceptableMediaTypes);
+                    }
+
+                    MultiValueMap<String, Object> bodyMap = new LinkedMultiValueMap<>();
+                    HttpEntity<MultiValueMap<String, Object>> requestEntity = new HttpEntity<>(bodyMap, headers);
+                    ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.GET, requestEntity, String.class);
+                    ret = mapper.readValue(response.getBody(), new TypeReference<>() {});
+                    // log.debug("REQ: " + url + "\nRES: " + XString.prettyPrint(ret));
+                    break;
+                }
+                /*
+                 * in case we are in a multi-peer setup some other peers may not be started so we tolerate that
+                 * scenario by sleeping and looping for 10 retries.
+                 */
+                catch (ResourceAccessException re) {
+                    log.debug("Waiting for url: " + url);
+                    if (++retries >= 24) {
+                        throw new RuntimeException("gave up waiting for " + url);
+                    }
+                    Thread.sleep(10000);
+                }
             }
-
-            MultiValueMap<String, Object> bodyMap = new LinkedMultiValueMap<>();
-            HttpEntity<MultiValueMap<String, Object>> requestEntity = new HttpEntity<>(bodyMap, headers);
-            ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.GET, requestEntity, String.class);
-            ret = mapper.readValue(response.getBody(), new TypeReference<>() {});
-            // log.debug("REQ: " + url + "\nRES: " + XString.prettyPrint(ret));
         } catch (Exception e) {
             /*
              * todo-1: Actually it would be better to put this entire string being logged here into a hashset to
@@ -284,11 +310,11 @@ public class ActPubUtil {
      */
     public APObj getWebFinger(String resource) {
         // first try https, and if it fails try http instead
-        try {
-            return getWebFingerSec(resource, true);
-        } catch (Exception e) {
-            return getWebFingerSec(resource, false);
-        }
+        // try {
+        return getWebFingerSec(resource, true);
+        // } catch (Exception e) {
+        // return getWebFingerSec(resource, false);
+        // }
     }
 
     /**
@@ -435,7 +461,7 @@ public class ActPubUtil {
             // see: https://quanta.wiki/n/localhost-fediverse-testing
             // This will be fixed soon!
             if (host.equals("q1")) {
-                host += ":8182";
+                host += ":8184";
             }
             if (host.equals("q2")) {
                 host += ":8183";

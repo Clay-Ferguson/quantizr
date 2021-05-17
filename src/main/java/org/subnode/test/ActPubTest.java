@@ -26,19 +26,20 @@ public class ActPubTest implements TestIntf {
 
     @Override
     public void test() throws Exception {
-        try {
-            log.debug("Running ActPubTest: Host " + appProp.getHostAndPort());
-            if (appProp.getHostAndPort().contains("//q2:")) {
-                testConnection("q1:8182");
-            }
-        } finally {
-        }
+        // try {
+        //     log.debug("Running ActPubTest: Host " + appProp.getHostAndPort());
+        //     if (appProp.getHostAndPort().contains("//q2:")) {
+        //         testConnection("q1:8184");
+        //     }
+        // } finally {
+        // }
     }
 
     /**
      * Do basic validation that we can connect to targetHost
      */
     private void testConnection(String targetHostAndPort) throws Exception {
+        log.debug("Testing Connection to: " + targetHostAndPort);
         /* ----- GET WEBFINGER ----- */
 
         String targetUser = "bob";

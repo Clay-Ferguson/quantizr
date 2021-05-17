@@ -7,7 +7,7 @@ fi
 
 ###############################################################################
 # This script is for normal localhost development. After running this script 
-# you should have an instance running at http://localhost:8182, for testing/debugging
+# you should have an instance running at http://localhost:8184, for testing/debugging
 #
 # In this deploy no docker TAR image containing the deployment is ever
 # generated, because everything's run 'in place' rather than generating a 

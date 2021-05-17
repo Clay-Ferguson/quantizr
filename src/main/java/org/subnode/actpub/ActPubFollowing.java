@@ -140,6 +140,7 @@ public class ActPubFollowing {
             Runnable runnable = () -> {
                 try {
                     APObj followerActor = apUtil.getActorByUrl(followerActorUrl);
+                    String followerActorHtmlUrl = AP.str(followerActor, APProp.url);
 
                     // log.debug("getLongUserNameFromActorUrl: " + actorUrl + "\n" +
                     // XString.prettyPrint(actor));
@@ -170,7 +171,7 @@ public class ActPubFollowing {
                     SubNode friendNode = read.findFriendOfUser(session, followerFriendList, userToFollow);
                     if (friendNode == null) {
                         if (!unFollow) {
-                            friendNode = edit.createFriendNode(session, followerFriendList, userToFollow, followerActorUrl);
+                            friendNode = edit.createFriendNode(session, followerFriendList, userToFollow, followerActorUrl, followerActorHtmlUrl);
                             // userFeedService.sendServerPushInfo(localUserName,
                             // new NotificationMessage("apReply", null, contentHtml, toUserName));
                         }
@@ -271,7 +272,7 @@ public class ActPubFollowing {
 
             for (SubNode n : iter) {
                 // log.debug("Follower found: " + XString.prettyPrint(n));
-                followers.add(n.getStrProp(NodeProp.ACT_PUB_ACTOR_URL));
+                followers.add(n.getStrProp(NodeProp.ACT_PUB_ACTOR_ID)); 
             }
             return null;
         });
@@ -290,7 +291,7 @@ public class ActPubFollowing {
 
             for (SubNode n : iter) {
                 // log.debug("Follower found: " + XString.prettyPrint(n));
-                following.add(n.getStrProp(NodeProp.ACT_PUB_ACTOR_URL));
+                following.add(n.getStrProp(NodeProp.ACT_PUB_ACTOR_ID));
             }
             return null;
         });

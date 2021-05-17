@@ -155,7 +155,8 @@ public class ActPubOutbox {
     public APObj getOutbox(String url) {
         if (url == null)
             return null;
-        APObj outbox = apUtil.getJson(url, APConst.MT_APP_LDJSON);
+
+        APObj outbox = apUtil.getJson(url, APConst.MT_APP_ACTJSON);
         ActPubService.outboxQueryCount++;
         ActPubService.cycleOutboxQueryCount++;
         // log.debug("Outbox: " + XString.prettyPrint(outbox));

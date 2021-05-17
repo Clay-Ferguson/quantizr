@@ -1,10 +1,14 @@
 package org.subnode.actpub.model;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.subnode.actpub.APConst;
 import org.subnode.util.DateUtil;
+import org.subnode.util.XString;
 
 /**
  * Because the ActivityPup spec has lots of places where the object types are completely variable,
@@ -12,6 +16,8 @@ import org.subnode.util.DateUtil;
  * various types of objects we use the accessor methods and properties in this object.
  */
 public class AP {
+    private static final Logger log = LoggerFactory.getLogger(AP.class);
+
     public static boolean hasProps(Object obj) {
         return obj instanceof Map<?, ?>;
     }
@@ -29,12 +35,20 @@ public class AP {
                 return null;
             } else if (val instanceof String) {
                 return (String) val;
+            } else if (val instanceof ArrayList) {
+                log.error("Attempted to read prop " + prop + " from the following object as a string but it was an array: "
+                        + XString.prettyPrint(obj));
+                return null;
             } else {
-                throw new RuntimeException(
-                        "unhandled type on str() return val: " + (val != null ? val.getClass().getName() : "null"));
+                log.error("unhandled type on str() return val: "
+                        + (val != null ? val.getClass().getName() : "null\n\non object:" + XString.prettyPrint(obj)));
+                return null;
             }
+        } else {
+            return null;
         }
-        throw new RuntimeException("unhandled type on str(): " + (obj != null ? obj.getClass().getName() : "null"));
+        // throw new RuntimeException("unhandled type on str(): " + (obj != null ? obj.getClass().getName()
+        // : "null"));
     }
 
     public static Boolean bool(Object obj, String prop) {

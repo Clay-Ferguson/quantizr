@@ -1,4 +1,4 @@
-# Deploys an instance at http://localhost:8182
+# Deploys an instance at http://localhost:8184
 # see: https://quanta.wiki/n/localhost-fediverse-testing
 
 version: '3.7'
@@ -8,10 +8,10 @@ services:
     # # Networked service-to-service communication use the CONTAINER_PORT in [host]:[container] pairs below.
 
     # Theoretically it should have been possible to let mongo run internally on 27017 (it's default) and then expose it
-    # to the outside as 27016, but I never could get that to work, so I'm just setting it up to run at 27016 both
+    # to the outside as 27019, but I never could get that to work, so I'm just setting it up to run at 27019 both
     # internaly and externally
     #
-    # NOTE: Minimal requirements for the mongod.conf is to have the port set as 27016, and the data db set
+    # NOTE: Minimal requirements for the mongod.conf is to have the port set as 27019, and the data db set
     mongo-dev1: 
         container_name: mongo-dev1 
         # WARNING: volumes will not handle '~' character for home folder. Do not use.
@@ -23,7 +23,7 @@ services:
         command: mongod --config /etc/mongod.conf
         #entrypoint: ["mongod","--config","/etc/mongod.conf"]
         ports:
-            - '27016:27016'
+            - '27019:27019'
         env_file: 
             - '../secrets/mongo.env'
         
@@ -70,7 +70,7 @@ services:
             dockerfile: ./dockerfile-dev
         container_name: quanta-dev1
         expose:
-            - '8182'
+            - '8184'
             - '8000'
         volumes:
             - '${QUANTA_BASE}/tmp:/tmp'
@@ -84,7 +84,7 @@ services:
             - $PWD:/app
         ports:
             # '[host]:[container]'
-            - '8182:8182'
+            - '8184:8184'
             - '8000:8000'
 
         extra_hosts:
@@ -118,9 +118,9 @@ services:
             # mongodb.host: "mongo-dev" 
             mongodb.host: "localhost" 
 
-            mongodb.port: "27016" 
+            mongodb.port: "27019" 
             profileName: "dev" 
-            server.port: "8182"
+            server.port: "8184"
             httpProtocol: "http" 
             # q1 and q2 are pointed to '127.0.0.1' in /etc/hosts file. 
             metaHost: "q1" 
@@ -142,7 +142,7 @@ services:
             ipfs.host: "http://ipfs-dev"
             ipfs.apiPort: "5001"
             ipfs.gatewayPort: "8080"
-            # This is the node name for a feed like this: http://localhost:8182/multiRss?id=:podcast-set to cause that feed to precache
+            # This is the node name for a feed like this: http://localhost:8184/multiRss?id=:podcast-set to cause that feed to precache
             rssAggregatePreCacheNodeId_XX: ":podcast-set"
         image: quanta-dev1
         depends_on:

@@ -671,7 +671,10 @@ public class UserManagerService {
 			// todo-2: for local users following fediverse this value needs to be here?
 			String followerActorUrl = null;
 
-			friendNode = edit.createFriendNode(session, followerFriendList, req.getUserName(), followerActorUrl);
+			// we can definitely put a value here if needed, eventually, even if a non-AP one like  '/u/userName/home'
+			String followerActorHtmlUrl = null;
+
+			friendNode = edit.createFriendNode(session, followerFriendList, req.getUserName(), followerActorUrl, followerActorHtmlUrl);
 			if (friendNode != null) {
 				res.setMessage("Added new Friend: " + req.getUserName());
 			} else {

@@ -244,7 +244,7 @@ public class NodeEditService {
 	}
 
 	public SubNode createFriendNode(MongoSession session, SubNode parentFriendsList, String userToFollow,
-			String followerActorUrl) {
+			String followerActorUrl, String followerActorHtmlUrl) {
 		List<PropertyInfo> properties = new LinkedList<PropertyInfo>();
 		properties.add(new PropertyInfo(NodeProp.USER.s(), userToFollow));
 
@@ -253,7 +253,11 @@ public class NodeEditService {
 		newNode.setProp(NodeProp.TYPE_LOCK.s(), Boolean.valueOf(true));
 
 		if (followerActorUrl != null) {
-			newNode.setProp(NodeProp.ACT_PUB_ACTOR_URL.s(), followerActorUrl);
+			newNode.setProp(NodeProp.ACT_PUB_ACTOR_ID.s(), followerActorUrl);
+		}
+
+		if (followerActorHtmlUrl != null) {
+			newNode.setProp(NodeProp.ACT_PUB_ACTOR_URL.s(), followerActorHtmlUrl);
 		}
 
 		update.save(session, newNode);

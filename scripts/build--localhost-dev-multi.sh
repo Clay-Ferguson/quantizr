@@ -8,16 +8,25 @@
 #
 # 
 
+
+echo "========================================"
+echo "Starting Server #1 Instance Build+Deploy"
+echo "========================================"
+
+#save stating folder
 cwd=$(pwd)
+
 if [ -f ./vscode-cwd.sh ]; then
   source ./vscode-cwd.sh
 fi
 . ./build--localhost-dev1.sh
 
-cd $cwd
-echo "===================================="
-echo "Starting Second Instance Deploy."
-echo "===================================="
+#restore starting folder
+cd $cwd 
+
+echo "========================================"
+echo "Starting Server #2 Instance Deploy"
+echo "========================================"
 
 # read -p "About to start second instance. Connect debugger now if you need to... (press any key)"
 

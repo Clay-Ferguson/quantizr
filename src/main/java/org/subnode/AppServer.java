@@ -15,15 +15,15 @@ import org.springframework.context.event.EventListener;
 import org.springframework.scheduling.annotation.EnableScheduling;
 
 /**
- * Standard SpringBoot entry point. Starts up entire application, which will run
- * an instance of Tomcat embedded and open the port specified in the properties
- * file and start serving up requests.
+ * Standard SpringBoot entry point. Starts up entire application, which will run an instance of
+ * Tomcat embedded and open the port specified in the properties file and start serving up requests.
  */
 @SpringBootApplication
 @EnableScheduling
 @ServletComponentScan
-// NOTE: You can either use an ErrorController (which what we are doing) or else you can use the 
-// actual hosting server's fallback error page by adding this annotation, but only do one or the other.
+// NOTE: You can either use an ErrorController (which what we are doing) or else you can use the
+// actual hosting server's fallback error page by adding this annotation, but only do one or the
+// other.
 // @EnableAutoConfiguration(exclude = {ErrorMvcAutoConfiguration.class})
 public class AppServer {
 	private static final Logger log = LoggerFactory.getLogger(AppServer.class);
@@ -39,9 +39,8 @@ public class AppServer {
 		log.debug("\nAppServer Starting\n--------------------------------------------------------------------------------------");
 		log.trace("main() trace log test.");
 		/*
-		 * If we are running AppServer then enableScheduling, otherwise we may be
-		 * running some command line service such as BackupUtil, in which case deamons
-		 * need to be deactivated.
+		 * If we are running AppServer then enableScheduling, otherwise we may be running some command line
+		 * service such as BackupUtil, in which case deamons need to be deactivated.
 		 */
 		enableScheduling = true;
 		SpringApplication.run(AppServer.class, args);

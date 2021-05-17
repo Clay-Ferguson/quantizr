@@ -112,7 +112,7 @@ public class ActPubService {
     private ActPubCrypto apCrypto;
 
     @Autowired
-	private UserManagerService userManagerService;
+    private UserManagerService userManagerService;
 
     @Autowired
     @Qualifier("threadPoolTaskExecutor")
@@ -341,10 +341,15 @@ public class ActPubService {
 
         if (userNode.setProp(NodeProp.USER_BIO.s(), AP.str(actor, APProp.summary)))
             changed = true;
+
+        // this is the URL of the Actor JSON object
         if (userNode.setProp(NodeProp.ACT_PUB_ACTOR_ID.s(), AP.str(actor, APProp.id)))
             changed = true;
+
         if (userNode.setProp(NodeProp.ACT_PUB_ACTOR_INBOX.s(), AP.str(actor, APProp.inbox)))
             changed = true;
+
+        // this is the URL of the HTML of the actor.
         if (userNode.setProp(NodeProp.ACT_PUB_ACTOR_URL.s(), AP.str(actor, APProp.url)))
             changed = true;
 
@@ -785,8 +790,8 @@ public class ActPubService {
                         .put(APProp.following, host + APConst.PATH_FOLLOWING + "/" + userName) //
 
                         /*
-                         * Note: Mastodon requests the wrong url when it needs this but we compansate with a redirect to tis
-                         * in our ActPubController. We tolerate Mastodon breaking spec here.
+                         * Note: Mastodon requests the wrong url when it needs this but we compansate with a redirect to
+                         * this in our ActPubController. We tolerate Mastodon breaking spec here.
                          */
                         .put(APProp.url, host + "/u/" + userName + "/home") //
 
@@ -889,7 +894,7 @@ public class ActPubService {
                     if (userNode == null)
                         return null;
 
-                    String actorUrl = userNode.getStrProp(NodeProp.ACT_PUB_ACTOR_URL.s());
+                    String actorUrl = userNode.getStrProp(NodeProp.ACT_PUB_ACTOR_ID.s());
                     APObj actor = apUtil.getActorByUrl(actorUrl);
                     if (actor != null) {
                         apOutbox.refreshOutboxFromForeignServer(session, actor, userNode, userName);
