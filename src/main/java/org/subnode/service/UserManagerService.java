@@ -180,15 +180,9 @@ public class UserManagerService {
 			res.setUserPreferences(getDefaultUserPreferences());
 		}
 
-		// ensure if "sn:posts" node type does exist that it's also named 'posts'
-		// todo-0: need to move this logic into some better place than this login processing!
-		// this is a retrofit (data repair) here, and not the standard flow.
-		SubNode postsNode = read.getUserNodeByType(session, userName, null, "### Posts", NodeType.POSTS.s(), Arrays.asList(PrivilegeType.READ.s()), NodeName.POSTS);
-		if (postsNode != null && !NodeName.POSTS.equals(postsNode.getName())) {
-			postsNode.setName(NodeName.POSTS); 
-			acl.addPrivilege(session, postsNode, PrincipalName.PUBLIC.s(), Arrays.asList(PrivilegeType.READ.s()), null);
-			update.save(session, postsNode);
-		}
+		// ensure we've pre-created this node.
+		SubNode postsNode = read.getUserNodeByType(session, userName, null, "### Posts", NodeType.POSTS.s(),
+				Arrays.asList(PrivilegeType.READ.s()), NodeName.POSTS);
 
 		ensureUserHomeNodeExists(session, userName, "### " + userName
 				+ "'s Public Node &#x1f389;\n\nEdit the content and children of this node. It represents you to the outside world.",
@@ -661,7 +655,8 @@ public class UserManagerService {
 		}
 
 		// get the Friend List of the follower
-		SubNode followerFriendList = read.getUserNodeByType(session, userName, null, null, NodeType.FRIEND_LIST.s(), null, NodeName.FRIENDS);
+		SubNode followerFriendList =
+				read.getUserNodeByType(session, userName, null, null, NodeType.FRIEND_LIST.s(), null, NodeName.FRIENDS);
 
 		/*
 		 * lookup to see if this followerFriendList node already has userToFollow already under it
@@ -671,10 +666,12 @@ public class UserManagerService {
 			// todo-2: for local users following fediverse this value needs to be here?
 			String followerActorUrl = null;
 
-			// we can definitely put a value here if needed, eventually, even if a non-AP one like  '/u/userName/home'
+			// we can definitely put a value here if needed, eventually, even if a non-AP one like
+			// '/u/userName/home'
 			String followerActorHtmlUrl = null;
 
-			friendNode = edit.createFriendNode(session, followerFriendList, req.getUserName(), followerActorUrl, followerActorHtmlUrl);
+			friendNode =
+					edit.createFriendNode(session, followerFriendList, req.getUserName(), followerActorUrl, followerActorHtmlUrl);
 			if (friendNode != null) {
 				res.setMessage("Added new Friend: " + req.getUserName());
 			} else {

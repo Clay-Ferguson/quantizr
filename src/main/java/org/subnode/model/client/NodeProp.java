@@ -14,7 +14,7 @@ public enum NodeProp {
     ACT_PUB_OBJ_ATTRIBUTED_TO("ap:objAttributedTo", "s"), //
     ACT_PUB_USER_ICON_URL("ap:userIcon", "s"), //
 
-    // points to URL of actor object (todo-0: check that spec REQUIRES this. I'm pretty sure it's defined as a 'self ref')
+    // points to URL of actor object
     ACT_PUB_ACTOR_ID("ap:actorId", "s"), //
 
     //this is the url of the HTML for the user (for browsing directly to)

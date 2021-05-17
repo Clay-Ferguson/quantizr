@@ -1,5 +1,6 @@
 package org.subnode.mongo;
 
+import java.util.Arrays;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
@@ -49,6 +50,7 @@ public class MongoRead {
     @Autowired
     private AppProp appProp;
 
+    // todo-1: rename to 'acl' everywhere like this.
     @Autowired
     private AclService aclService;
 
@@ -676,6 +678,9 @@ public class MongoRead {
     /*
      * Accepts either the 'user' or the 'userNode' for the user. It's best to pass userNode if you have
      * it, to avoid a DB query.
+     * 
+     * todo-0: For each different 'type' call to this method we just need a dedicated method that takes no arguments
+     * in order to wap it so that the parameter sets aren't scattered/repeated in the code
      */
     public SubNode getUserNodeByType(MongoSession session, String userName, SubNode userNode, String content, String type,
             List<String> defaultPrivs, String defaultName) {
@@ -713,6 +718,17 @@ public class MongoRead {
 
             update.save(session, node);
         }
+
+        /*
+         * todo-1: fix this? Ensure if "sn:posts" node type does exist that it's also named 'posts' this is
+         * a retrofit (data repair) here, and not the standard flow.
+         */
+        if (node != null && NodeType.POSTS.s().equals(type) && !NodeName.POSTS.equals(node.getName())) {
+            node.setName(NodeName.POSTS);
+            aclService.addPrivilege(session, node, PrincipalName.PUBLIC.s(), Arrays.asList(PrivilegeType.READ.s()), null);
+            update.save(session, node);
+        }
+
         return node;
     }
 

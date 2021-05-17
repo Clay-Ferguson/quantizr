@@ -58,6 +58,9 @@ public class OutboxMgr {
 	@Autowired
 	private UserFeedService userFeedService;
 
+	private static SubNode outboxNode = null;
+	private static final Object outboxLock = new Object();
+
 	/*
 	 * Currently unused. Let's leave this capability here and not delete this code, but it's no longer
 	 * being used.
@@ -169,11 +172,21 @@ public class OutboxMgr {
 	 * Get node that contains all preferences for this user, as properties on it.
 	 */
 	public SubNode getSystemOutbox(MongoSession session) {
-		// todo-0: need to cache this node to that once we have it we don't query for it again.
-		// todo-0: put "outbox" in a variable
-		apiUtil.ensureNodeExists(session, "/" + NodeName.ROOT, "outbox", null, "Outbox", null, true, null, null);
+		if (OutboxMgr.outboxNode != null) {
+			return OutboxMgr.outboxNode;
+		}
 
-		return apiUtil.ensureNodeExists(session, "/" + NodeName.ROOT, "outbox/" + NodeName.SYSTEM, null, "System Messages", null,
-				true, null, null);
+		synchronized (outboxLock) {
+			// yep it's correct threading to check the node value again once inside the lock
+			if (OutboxMgr.outboxNode != null) {
+				return OutboxMgr.outboxNode;
+			}
+
+			apiUtil.ensureNodeExists(session, "/" + NodeName.ROOT, NodeName.OUTBOX, null, "Outbox", null, true, null, null);
+
+			OutboxMgr.outboxNode = apiUtil.ensureNodeExists(session, "/" + NodeName.ROOT, NodeName.OUTBOX + "/" + NodeName.SYSTEM,
+					null, "System Messages", null, true, null, null);
+			return OutboxMgr.outboxNode;
+		}
 	}
 }

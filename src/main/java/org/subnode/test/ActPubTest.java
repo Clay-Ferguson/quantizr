@@ -26,13 +26,13 @@ public class ActPubTest implements TestIntf {
 
     @Override
     public void test() throws Exception {
-        // try {
-        //     log.debug("Running ActPubTest: Host " + appProp.getHostAndPort());
-        //     if (appProp.getHostAndPort().contains("//q2:")) {
-        //         testConnection("q1:8184");
-        //     }
-        // } finally {
-        // }
+        try {
+            log.debug("Running ActPubTest: Host " + appProp.getHostAndPort());
+            if (appProp.getHostAndPort().contains("//q2:")) {
+                testConnection("q1:8184");
+            }
+        } finally {
+        }
     }
 
     /**
