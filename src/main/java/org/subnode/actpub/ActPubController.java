@@ -2,6 +2,9 @@ package org.subnode.actpub;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,11 +41,19 @@ public class ActPubController {
 	@Autowired
 	private AppProp appProp;
 
+	private static final ObjectMapper mapper = new ObjectMapper();
+
+	// NOTE: This didn't allow unknown properties as expected but putting the
+	// following in the JSON classes did:
+	// @JsonIgnoreProperties(ignoreUnknown = true)
+	{
+		mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+	}
+
 	/**
 	 * WebFinger GET
 	 */
-	@RequestMapping(value = APConst.PATH_WEBFINGER, method = RequestMethod.GET,
-			produces = APConst.CONTENT_TYPE_JSON_JRD)
+	@RequestMapping(value = APConst.PATH_WEBFINGER, method = RequestMethod.GET, produces = APConst.CONTENT_TYPE_JSON_JRD)
 	public @ResponseBody Object webFinger(//
 			@RequestParam(value = "resource", required = true) String resource) {
 		Object ret = apUtil.generateWebFinger(resource);
@@ -94,16 +105,18 @@ public class ActPubController {
 	@RequestMapping(value = APConst.PATH_INBOX + "/{userName}", method = RequestMethod.POST,
 			produces = APConst.CONTENT_TYPE_JSON_LD)
 	public @ResponseBody Object inboxPost(//
-			@RequestBody APObj payload, //
+			@RequestBody String body, //
 			@PathVariable(value = "userName", required = false) String userName, //
 			HttpServletRequest httpReq) {
-		// DO NOT DELETE: If you ever want to make the payload a string just do this...
-		// APObj payload = mapper.readValue(body, new TypeReference<>() {
-		// });
-		// log.debug("INBOX incoming payload: " + XString.prettyPrint(payload));
-		ActPubService.inboxCount++;
-		apService.processInboxPost(httpReq, payload);
-		return new ResponseEntity<String>(HttpStatus.OK);
+		try {
+			APObj payload = mapper.readValue(body, new TypeReference<>() {});
+			// log.debug("INBOX incoming payload: " + XString.prettyPrint(payload));
+			ActPubService.inboxCount++;
+			apService.processInboxPost(httpReq, payload);
+			return new ResponseEntity<String>(HttpStatus.OK);
+		} catch (Exception e) {
+			return new ResponseEntity<String>(HttpStatus.BAD_REQUEST);
+		}
 	}
 
 	/**

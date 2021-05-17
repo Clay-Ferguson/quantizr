@@ -39,6 +39,7 @@ import org.subnode.service.AclService;
 import org.subnode.service.AttachmentService;
 import org.subnode.service.NodeSearchService;
 import org.subnode.service.UserFeedService;
+import org.subnode.service.UserManagerService;
 import org.subnode.util.DateUtil;
 import org.subnode.util.EnglishDictionary;
 import org.subnode.util.SubNodeUtil;
@@ -109,6 +110,9 @@ public class ActPubService {
 
     @Autowired
     private ActPubCrypto apCrypto;
+
+    @Autowired
+	private UserManagerService userManagerService;
 
     @Autowired
     @Qualifier("threadPoolTaskExecutor")
@@ -221,7 +225,8 @@ public class ActPubService {
             APObj message = apFactory.newCreateMessageForNote(toUserNames, fromActor, inReplyTo, content, noteUrl, privateMessage,
                     attachments);
 
-            apUtil.securePost(session, null, inbox, fromActor, message);
+            String userDoingPost = ThreadLocals.getSessionContext().getUserName();
+            apUtil.securePost(userDoingPost, session, null, inbox, fromActor, message, null);
         }
     }
 
@@ -733,10 +738,8 @@ public class ActPubService {
         try {
             SubNode userNode = read.getUserNodeByUserName(null, userName);
             if (userNode != null) {
+                userManagerService.ensureValidCryptoKeys(userNode);
                 String publicKey = userNode.getStrProp(NodeProp.CRYPTO_KEY_PUBLIC.s());
-                if (publicKey == null) {
-                    throw new RuntimeException("User has no crypto keys. This means they have never logged in?");
-                }
 
                 String avatarMime = userNode.getStrProp(NodeProp.BIN_MIME.s());
                 String avatarVer = userNode.getStrProp(NodeProp.BIN.s());
@@ -821,7 +824,8 @@ public class ActPubService {
                 if (friendUserName != null) {
                     // if a foreign user, update thru ActivityPub
                     if (friendUserName.contains("@")) {
-                        apFollowing.setFollowing(friendUserName, false);
+                        String followerUser = ThreadLocals.getSessionContext().getUserName();
+                        apFollowing.setFollowing(followerUser, friendUserName, false);
                     }
                 }
             }
@@ -876,11 +880,11 @@ public class ActPubService {
                 if (done)
                     continue;
 
-                // flag as done.
+                // flag as done (even if it fails we still want it flagged as done. no retries will be done).
                 apCache.usersPendingRefresh.put(userName, true);
 
                 adminRunner.run(session -> {
-                    // log.debug("Reload user outbox: " + _apUserName);
+                    // log.debug("Reload user outbox: " + userName);
                     SubNode userNode = getAcctNodeByUserName(session, userName);
                     if (userNode == null)
                         return null;

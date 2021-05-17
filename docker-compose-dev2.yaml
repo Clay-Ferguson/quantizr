@@ -1,0 +1,143 @@
+# Deploys an instance at http://localhost:8183
+# see: https://quanta.wiki/n/localhost-fediverse-testing
+
+version: '3.7'
+services:
+
+    mongo-dev2: 
+        container_name: mongo-dev2 
+        # WARNING: volumes will not handle '~' character for home folder. Do not use.
+        volumes:
+            - '${MONGO_BASE}/mongodb-data-dev:/data/db'
+            - '${MONGO_BASE}/mongo-dumps-dev:/mongo-dumps'
+            - '${MONGO_BASE}/mongo-scripts-dev:/mongo-scripts'
+            - '../secrets/mongod--localhost-dev2.conf:/etc/mongod.conf'
+        command: mongod --config /etc/mongod.conf
+        #entrypoint: ["mongod","--config","/etc/mongod.conf"]
+        ports:
+            - '27018:27018'
+        env_file: 
+            - '../secrets/mongo.env'
+
+        network_mode: host
+        # networks:
+        #    - qnet-dev
+
+        # Always specify version of mongo. When it upgrades automatically there can be database issues that need to be resolved
+        # and we don't want that happening unexpectedly
+        image: mongo:4.0
+
+    # https://hub.docker.com/r/ipfs/go-ipfs/
+    ipfs-dev2: 
+        container_name: ipfs-dev2 
+        environment:
+            # IPFS_PROFILE options (lowpower | server)
+            routing: "dhtclient" 
+            IPFS_PROFILE: "lowpower" 
+            IPFS_PATH: "/data/ipfs"
+            # LIBP2P_FORCE_PNET: 1
+        # expose:
+        #    - '4001'
+        #     - '8081'
+        #    - '5001'
+        # WARNING: volumes will not handle '~' character for home folder. Do not use.
+        volumes:
+            - '${ipfs_staging}:/export'
+            - '${ipfs_data}:/data/ipfs'
+        # ports:
+            # - "4001:4001"
+            # - "127.0.0.1:8081:8080"
+            # - "5001:5001"
+        
+        network_mode: host
+        # networks:
+        #     - qnet-dev
+        
+        image: ipfs/go-ipfs:v0.7.0
+
+    # NOTE: This is visible as https://quanta-dev2 from the other machine
+    quanta-dev2:
+        build: 
+            context: .
+            dockerfile: ./dockerfile-dev
+        container_name: quanta-dev2
+        expose:
+            - '8183'
+            - '8001'
+        volumes:
+            - '${QUANTA_BASE}/tmp:/tmp'
+            - '${QUANTA_BASE}/log:/log'
+            - '${QUANTA_BASE}/config:/config'
+            - '${QUANTA_BASE}/lucene:/subnode-lucene'
+            - '${PRJROOT}/src/main/resources/public:/dev-resource-base'
+            - '${PRJROOT}/target/classes:/loader-path'
+
+            # This maps '/app' to be the current folder where you run docker from (where the yaml file is normally)
+            - $PWD:/app
+        ports:
+            # '[host]:[container]'
+            - '8183:8183'
+            - '8001:8001'
+
+        extra_hosts:
+            - "q1:127.0.0.1"
+            - "q2:127.0.0.1"
+
+        network_mode: host
+        # networks:
+        #     - qnet-dev
+
+        environment:
+
+            # Can be a comma-delimited list of TestIntf-derived tests to run
+            # examples are "MongoTest,IPFSTest"
+            runTests: ActPubTest
+            
+            mongoAdminPassword: "${subnodePassword}"
+            mongoSecurity: "true"
+
+            # NOTE: '>-' removes all newline characters and makes one long string
+            # Using '|' there instead would preserve the newlines after read in
+            # The '-' after either of those removes any trailing newline
+            testUserAccounts: >- 
+                adam:${testPassword}:${devEmail},
+                bob:${testPassword}:${devEmail},
+                cory:${testPassword}:${devEmail},
+                dan:${testPassword}:${devEmail}
+
+            spring.config.location: "classpath:/application.properties" 
+            
+            # mongodb.host: "mongo-dev2" 
+            mongodb.host: "localhost" 
+
+            mongodb.port: "27018" 
+            profileName: "dev" 
+            server.port: "8183" 
+            httpProtocol: "http" 
+             # q1 and q2 are pointed to '127.0.0.1' in /etc/hosts file.
+            metaHost: "q2" 
+            reSaveAll: "false"
+            forceIndexRebuild: "false"
+            allowFileSystemSearch: "false"
+            actPubEnabled: "true" 
+            spring.http.multipart.max-file-size: "200MB" 
+            spring.http.multipart.max-request-size: "200MB" 
+            spring.servlet.multipart.max-file-size: "200MB"
+            spring.servlet.multipart.max-request-size: "200MB"
+            adminDataFolder: "/tmp" 
+            mail.port: ""
+            mail.user: "postmaster@quantizr.com" 
+            mail.password: "${emailPassword}" 
+            mail.host: "smtp.mailgun.org" 
+            mail.from: "admin@quanta.wiki"
+            JAVA_TOOL_OPTIONS: "-agentlib:jdwp=transport=dt_socket,address=0.0.0.0:8001,server=y,suspend=n"
+            ipfs.host: "http://ipfs-dev"
+            ipfs.apiPort: "5001"
+            ipfs.gatewayPort: "8080"
+            # This is the node name for a feed like this: http://localhost:8182/multiRss?id=:podcast-set to cause that feed to precache
+            rssAggregatePreCacheNodeId_XX: ":podcast-set"
+        image: quanta-dev2
+        depends_on:
+            - mongo-dev2
+            - ipfs-dev2
+

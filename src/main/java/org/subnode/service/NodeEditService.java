@@ -567,7 +567,8 @@ public class NodeEditService {
 			if (friendUserName != null) {
 				// if a foreign user, update thru ActivityPub.
 				if (friendUserName.contains("@") && !ThreadLocals.getSessionContext().isAdmin()) {
-					apFollowing.setFollowing(friendUserName, true);
+					String followerUser = ThreadLocals.getSessionContext().getUserName();
+					apFollowing.setFollowing(followerUser, friendUserName, true);
 				}
 
 				/*

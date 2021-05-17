@@ -52,8 +52,8 @@ public class ActPubCrypto {
         /* get private key of this user so we can sign the outbound message */
         privateKey = userNode.getStrProp(NodeProp.CRYPTO_KEY_PRIVATE);
         if (privateKey == null) {
-            log.debug("Unable to update federated users. Our local user didn't have a private key on his userNode: "
-                    + ThreadLocals.getSessionContext().getUserName());
+            log.debug("Unable to update federated users. User didn't have a private key on his userNode: "
+                    + userName);
             return null;
         }
 

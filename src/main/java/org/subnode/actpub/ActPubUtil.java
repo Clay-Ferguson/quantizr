@@ -157,12 +157,16 @@ public class ActPubUtil {
     }
 
     public APObj getJson(String url, MediaType mediaType) {
+        // log.debug("getJson: " + url);
         APObj ret = null;
         try {
             HttpHeaders headers = new HttpHeaders();
-            List<MediaType> acceptableMediaTypes = new LinkedList<MediaType>();
-            acceptableMediaTypes.add(mediaType);
-            headers.setAccept(acceptableMediaTypes);
+
+            if (mediaType != null) {
+                List<MediaType> acceptableMediaTypes = new LinkedList<MediaType>();
+                acceptableMediaTypes.add(mediaType);
+                headers.setAccept(acceptableMediaTypes);
+            }
 
             MultiValueMap<String, Object> bodyMap = new LinkedMultiValueMap<>();
             HttpEntity<MultiValueMap<String, Object>> requestEntity = new HttpEntity<>(bodyMap, headers);
@@ -186,16 +190,22 @@ public class ActPubUtil {
      * 
      * WARNING: If privateKey is passed as 'null' you MUST be calling this from HTTP request thread.
      */
-    public void securePost(MongoSession session, String privateKey, String toInbox, String actor, APObj message) {
+    public void securePost(String userDoingPost, MongoSession session, String privateKey, String toInbox, String actor,
+            APObj message, MediaType acceptType) {
         try {
+            // log.debug("Secure post to " + toInbox);
             /* if private key not sent then get it using the session */
             if (privateKey == null) {
-                privateKey = apCrypto.getPrivateKey(session, ThreadLocals.getSessionContext().getUserName());
+                privateKey = apCrypto.getPrivateKey(session, userDoingPost);
+            }
+
+            if (privateKey == null) {
+                throw new RuntimeException("Unable to get provate key for user sending message.");
             }
 
             String body = XString.prettyPrint(message);
             byte[] bodyBytes = body.getBytes(StandardCharsets.UTF_8);
-            // log.debug("Posting to inbox " + toInbox + ":\n" + body);
+            // log.debug("Posting Object:\n" + body);
 
             byte[] privKeyBytes = Base64.getDecoder().decode(privateKey);
             KeyFactory kf = KeyFactory.getInstance("RSA");
@@ -217,8 +227,9 @@ public class ActPubUtil {
                     "SHA-256=" + Base64.getEncoder().encodeToString(MessageDigest.getInstance("SHA-256").digest(bodyBytes));
 
             URL url = new URL(toInbox);
-            String strToSign =
-                    "(request-target): post " + url.getPath() + "\nhost: " + url.getHost() + "\ndate: " + date + "\ndigest: " + digestHeader;
+            // log.debug("secure post to host: " + url.getHost());
+            String strToSign = "(request-target): post " + url.getPath() + "\nhost: " + url.getHost() + "\ndate: " + date
+                    + "\ndigest: " + digestHeader;
 
             Signature sig = Signature.getInstance("SHA256withRSA");
             sig.initSign(privKey);
@@ -228,7 +239,7 @@ public class ActPubUtil {
             String headerSig = "keyId=\"" + actor + "#main-key" + "\",headers=\"(request-target) host date digest\",signature=\""
                     + Base64.getEncoder().encodeToString(signature) + "\"";
 
-            postJson(toInbox, url.getHost(), date, headerSig, digestHeader, bodyBytes);
+            postJson(toInbox, url.getHost(), date, headerSig, digestHeader, body, acceptType);
         } catch (Exception e) {
             log.error("secure http post failed", e);
             throw new RuntimeException(e);
@@ -249,8 +260,7 @@ public class ActPubUtil {
             return actor;
         }
 
-        // if not in cache we need to load the actor from the web
-        actor = getJson(url, APConst.MT_APP_LDJSON);
+        actor = getJson(url, APConst.MT_APP_ACTJSON);
 
         if (actor != null) {
             String userName = getLongUserNameFromActor(actor);
@@ -263,17 +273,32 @@ public class ActPubUtil {
     }
 
     /*
-     * https://server.org/.well-known/webfinger?resource=acct:someuser@server.org'
+     * https://server.org/.well-known/webfinger?resource=acct:someuser@server.org
      * 
      * Get WebFinger from foreign server
      * 
      * resource example: someuser@server.org
+     * 
+     * todo-0: we could detect if the host has a port designated and in that case don't try the secure
+     * version. just insecure one (http)
      */
     public APObj getWebFinger(String resource) {
+        // first try https, and if it fails try http instead
+        try {
+            return getWebFingerSec(resource, true);
+        } catch (Exception e) {
+            return getWebFingerSec(resource, false);
+        }
+    }
+
+    /**
+     * Sec suffix means 'security' option (https vs http)
+     */
+    public APObj getWebFingerSec(String resource, boolean secure) {
         if (resource.startsWith("@")) {
             resource = resource.substring(1);
         }
-        String host = "https://" + getHostFromUserName(resource);
+        String host = (secure ? "https://" : "http://") + getHostFromUserName(resource);
 
         // return from cache if we have this cached
         APObj finger = apCache.webFingerCacheByUserName.get(resource);
@@ -291,18 +316,21 @@ public class ActPubUtil {
         return finger;
     }
 
-    public APObj postJson(String url, String headerHost, String headerDate, String headerSig, String digestHeader,
-            byte[] bodyBytes) {
+    public APObj postJson(String url, String headerHost, String headerDate, String headerSig, String digestHeader, String body,
+            MediaType acceptType) {
         APObj ret = null;
         try {
-            // MediaType type = ActPubConstants.MT_APP_LDJSON; //;
-            // profile=\"https://www.w3.org/ns/activitystreams\"");
+            // log.debug("postJson to: " + url);
+
             HttpHeaders headers = new HttpHeaders();
-            // List<MediaType> acceptableMediaTypes = new LinkedList<MediaType>();
-            // acceptableMediaTypes.add(type);
-            // headers.setAccept(acceptableMediaTypes);
-            // headers.add("Accept", "application/ld+json;
-            // profile=\"https://www.w3.org/ns/activitystreams\"");
+            if (acceptType != null) {
+                List<MediaType> acceptableMediaTypes = new LinkedList<MediaType>();
+                acceptableMediaTypes.add(acceptType);
+                headers.setAccept(acceptableMediaTypes);
+
+                // todo-0: remove this one.
+                headers.add("Accept", acceptType.toString());
+            }
 
             if (headerHost != null) {
                 headers.add("Host", headerHost);
@@ -320,11 +348,10 @@ public class ActPubUtil {
                 headers.add("Digest", digestHeader);
             }
 
-            HttpEntity<byte[]> requestEntity = new HttpEntity<>(bodyBytes, headers);
+            // HttpEntity<byte[]> requestEntity = new HttpEntity<>(bodyBytes, headers);
+            HttpEntity<String> requestEntity = new HttpEntity<>(body, headers);
             ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.POST, requestEntity, String.class);
-            // log.debug("Post to " + url + " RESULT: " + response.getStatusCode() + "
-            // response=" +
-            // response.getBody());
+            log.debug("POST TO: " + url + " RESULT: " + response.getStatusCode() + " response=" + response.getBody());
         } catch (Exception e) {
             log.error("postJson failed: " + url, e);
             throw new RuntimeException(e);
@@ -338,22 +365,32 @@ public class ActPubUtil {
     public APObj generateWebFinger(String resource) {
         try {
             if (StringUtils.isNotEmpty(resource) && resource.startsWith("acct:")) {
+                // split into username and host parts
                 String[] parts = resource.substring(5).split("@", 2);
-                if (parts.length == 2 && parts[1].equals(appProp.getMetaHost())) {
-                    String username = parts[0];
 
-                    SubNode userNode = read.getUserNodeByUserName(null, username);
-                    if (userNode != null) {
-                        APObj webFinger = new APObj() //
-                                .put(APProp.subject, "acct:" + username + "@" + appProp.getMetaHost()) //
-                                .put(APProp.links, new APList() //
-                                        .val(new APObj() //
-                                                .put(APProp.rel, "self") //
-                                                .put(APProp.type, "application/activity+json") //
-                                                .put(APProp.href, makeActorUrlForUserName(username))));
+                if (parts.length == 2) {
+                    String fullHost = parts[1];
 
-                        // log.debug("Reply with WebFinger: " + XString.prettyPrint(webFinger));
-                        return webFinger;
+                    // strip the port number off if exists
+                    String host = XString.truncateAfterFirst(fullHost, ":");
+
+                    if (host.equals(appProp.getMetaHost())) {
+                        String username = parts[0];
+
+                        SubNode userNode = read.getUserNodeByUserName(null, username);
+                        if (userNode != null) {
+                            APObj webFinger = new APObj() //
+                                    .put(APProp.subject, "acct:" + username + "@" + fullHost) //
+                                    .put(APProp.links, new APList() //
+                                            .val(new APObj() //
+                                                    .put(APProp.rel, "self") //
+                                                    // todo-0: get this mime type from variable
+                                                    .put(APProp.type, "application/activity+json") //
+                                                    .put(APProp.href, makeActorUrlForUserName(username))));
+
+                            // log.debug("Reply with WebFinger: " + XString.prettyPrint(webFinger));
+                            return webFinger;
+                        }
                     }
                 }
             }
@@ -393,6 +430,17 @@ public class ActPubUtil {
         try {
             URL url = new URL(inbox);
             String host = url.getHost();
+
+            // todo-0: temporary port hacks for local multi-server testing
+            // see: https://quanta.wiki/n/localhost-fediverse-testing
+            // This will be fixed soon!
+            if (host.equals("q1")) {
+                host += ":8182";
+            }
+            if (host.equals("q2")) {
+                host += ":8183";
+            }
+
             return shortUserName + "@" + host;
         } catch (Exception e) {
             log.error("failed building toUserName", e);

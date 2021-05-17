@@ -24,6 +24,7 @@ import org.subnode.config.AppProp;
 import org.subnode.config.NodeName;
 import org.subnode.model.client.NodeProp;
 import org.subnode.model.client.NodeType;
+import org.subnode.model.client.PrincipalName;
 import org.subnode.mongo.MongoDelete;
 import org.subnode.mongo.MongoRead;
 import org.subnode.mongo.MongoSession;
@@ -76,10 +77,11 @@ public class ActPubFollowing {
      * 
      * apUserName is full user name like alice@quantizr.com
      */
-    public void setFollowing(String apUserName, boolean following) {
+    public void setFollowing(String followerUserName, String apUserName, boolean following) {
         try {
+            // log.debug("Local Follower User: " + followerUserName + " setFollowing: " + apUserName + " following=" + following);
             // admin doesn't follow/unfollow
-            if (ThreadLocals.getSessionContext().isAdmin()) {
+            if (PrincipalName.ADMIN.s().equalsIgnoreCase(followerUserName)) {
                 return;
             }
 
@@ -87,7 +89,7 @@ public class ActPubFollowing {
             String actorUrlOfUserBeingFollowed = apUtil.getActorUrlFromWebFingerObj(webFingerOfUserBeingFollowed);
 
             adminRunner.run(session -> {
-                String sessionActorUrl = apUtil.makeActorUrlForUserName(ThreadLocals.getSessionContext().getUserName());
+                String sessionActorUrl = apUtil.makeActorUrlForUserName(followerUserName);
                 APOFollow followAction = new APOFollow()
                         .put(APProp.id, appProp.getProtocolHostAndPort() + "/follow/" + String.valueOf(new Date().getTime())) //
                         .put(APProp.actor, sessionActorUrl) //
@@ -109,7 +111,8 @@ public class ActPubFollowing {
 
                 APObj toActor = apUtil.getActorByUrl(actorUrlOfUserBeingFollowed);
                 String toInbox = AP.str(toActor, APProp.inbox);
-                apUtil.securePost(session, null, toInbox, sessionActorUrl, action);
+
+                apUtil.securePost(followerUserName, session, null, toInbox, sessionActorUrl, action, null); 
                 return null;
             });
         } catch (Exception e) {
@@ -125,7 +128,6 @@ public class ActPubFollowing {
      * If 'unFollow' is true we actually do an unfollow instead of a follow.
      */
     public void processFollowAction(Object followAction, boolean unFollow) {
-
         adminRunner.<APObj>run(session -> {
             // Actor URL of actor doing the following
             String followerActorUrl = AP.str(followAction, APProp.actor);
@@ -134,53 +136,53 @@ public class ActPubFollowing {
                 return null;
             }
 
-            APObj followerActor = apUtil.getActorByUrl(followerActorUrl);
-
-            // log.debug("getLongUserNameFromActorUrl: " + actorUrl + "\n" +
-            // XString.prettyPrint(actor));
-            String followerUserName = apUtil.getLongUserNameFromActor(followerActor);
-            SubNode followerAccountNode = apService.getAcctNodeByUserName(session, followerUserName);
-            apService.userEncountered(followerUserName, false);
-
-            // Actor being followed (local to our server)
-            String actorBeingFollowedUrl = AP.str(followAction, APProp.object);
-            if (actorBeingFollowedUrl == null) {
-                log.debug("no 'object' found on follows action request posted object");
-                return null;
-            }
-
-            String userToFollow = apUtil.getLocalUserNameFromActorUrl(actorBeingFollowedUrl);
-            if (userToFollow == null) {
-                log.debug("unable to get a user name from actor url: " + actorBeingFollowedUrl);
-                return null;
-            }
-
-            // get the Friend List of the follower
-            SubNode followerFriendList =
-                    read.getUserNodeByType(session, followerUserName, null, null, NodeType.FRIEND_LIST.s(), null, NodeName.FRIENDS);
-
-            /*
-             * lookup to see if this followerFriendList node already has userToFollow already under it
-             */
-            SubNode friendNode = read.findFriendOfUser(session, followerFriendList, userToFollow);
-            if (friendNode == null) {
-                if (!unFollow) {
-                    friendNode = edit.createFriendNode(session, followerFriendList, userToFollow, followerActorUrl);
-                    // userFeedService.sendServerPushInfo(localUserName,
-                    // new NotificationMessage("apReply", null, contentHtml, toUserName));
-                }
-            } else {
-                // if this is an unfollow delete the friend node
-                if (unFollow) {
-                    delete.deleteNode(session, friendNode, false);
-                }
-            }
-
-            String privateKey = apCrypto.getPrivateKey(session, userToFollow);
-
             /* Protocol says we need to send this acceptance back */
             Runnable runnable = () -> {
                 try {
+                    APObj followerActor = apUtil.getActorByUrl(followerActorUrl);
+
+                    // log.debug("getLongUserNameFromActorUrl: " + actorUrl + "\n" +
+                    // XString.prettyPrint(actor));
+                    String followerUserName = apUtil.getLongUserNameFromActor(followerActor);
+                    SubNode followerAccountNode = apService.getAcctNodeByUserName(session, followerUserName);
+                    apService.userEncountered(followerUserName, false);
+
+                    // Actor being followed (local to our server)
+                    String actorBeingFollowedUrl = AP.str(followAction, APProp.object);
+                    if (actorBeingFollowedUrl == null) {
+                        log.debug("no 'object' found on follows action request posted object");
+                        return;
+                    }
+
+                    String userToFollow = apUtil.getLocalUserNameFromActorUrl(actorBeingFollowedUrl);
+                    if (userToFollow == null) {
+                        log.debug("unable to get a user name from actor url: " + actorBeingFollowedUrl);
+                        return;
+                    }
+
+                    // get the Friend List of the follower
+                    SubNode followerFriendList = read.getUserNodeByType(session, followerUserName, null, null,
+                            NodeType.FRIEND_LIST.s(), null, NodeName.FRIENDS);
+
+                    /*
+                     * lookup to see if this followerFriendList node already has userToFollow already under it
+                     */
+                    SubNode friendNode = read.findFriendOfUser(session, followerFriendList, userToFollow);
+                    if (friendNode == null) {
+                        if (!unFollow) {
+                            friendNode = edit.createFriendNode(session, followerFriendList, userToFollow, followerActorUrl);
+                            // userFeedService.sendServerPushInfo(localUserName,
+                            // new NotificationMessage("apReply", null, contentHtml, toUserName));
+                        }
+                    } else {
+                        // if this is an unfollow delete the friend node
+                        if (unFollow) {
+                            delete.deleteNode(session, friendNode, false);
+                        }
+                    }
+
+                    String privateKey = apCrypto.getPrivateKey(session, userToFollow);
+
                     // todo-1: what's this sleep doing? I'm pretty sure I just wanted to give the caller (i.e. the
                     // remote Fedi instance) a chance to get a return code back for this call before posting
                     // back to it
@@ -199,7 +201,8 @@ public class ActPubFollowing {
                     String followerInbox = AP.str(followerActor, APProp.inbox);
 
                     // log.debug("Sending Accept of Follow Request to inbox " + followerInbox);
-                    apUtil.securePost(session, privateKey, followerInbox, actorBeingFollowedUrl, accept);
+                    String userDoingPost = ThreadLocals.getSessionContext().getUserName();
+                    apUtil.securePost(userDoingPost, session, privateKey, followerInbox, actorBeingFollowedUrl, accept, null);
                 } catch (Exception e) {
                 }
             };
@@ -380,7 +383,8 @@ public class ActPubFollowing {
         Query query = new Query();
 
         // get friends list node
-        SubNode friendsListNode = read.getUserNodeByType(session, userName, null, null, NodeType.FRIEND_LIST.s(), null, NodeName.FRIENDS);
+        SubNode friendsListNode =
+                read.getUserNodeByType(session, userName, null, null, NodeType.FRIEND_LIST.s(), null, NodeName.FRIENDS);
         if (friendsListNode == null)
             return null;
 

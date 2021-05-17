@@ -65,7 +65,8 @@ public class OutboxMgr {
 	public void addInboxNotification(MongoSession session, String recieverUserName, SubNode userNode, SubNode node,
 			String notifyMessage) {
 
-		SubNode userInbox = read.getUserNodeByType(session, null, userNode, "### Inbox", NodeType.INBOX.s(), null, NodeName.INBOX);
+		SubNode userInbox =
+				read.getUserNodeByType(session, null, userNode, "### Inbox", NodeType.INBOX.s(), null, NodeName.INBOX);
 
 		if (userInbox != null) {
 			// log.debug("userInbox id=" + userInbox.getId().toHexString());
@@ -168,7 +169,11 @@ public class OutboxMgr {
 	 * Get node that contains all preferences for this user, as properties on it.
 	 */
 	public SubNode getSystemOutbox(MongoSession session) {
-		return apiUtil.ensureNodeExists(session, "/" + NodeName.ROOT + "/outbox/", NodeName.SYSTEM, null, "System Messages", null,
+		// todo-0: need to cache this node to that once we have it we don't query for it again.
+		// todo-0: put "outbox" in a variable
+		apiUtil.ensureNodeExists(session, "/" + NodeName.ROOT, "outbox", null, "Outbox", null, true, null, null);
+
+		return apiUtil.ensureNodeExists(session, "/" + NodeName.ROOT, "outbox/" + NodeName.SYSTEM, null, "System Messages", null,
 				true, null, null);
 	}
 }
