@@ -309,7 +309,10 @@ public class ActPubService {
         String apUserName = apUtil.getLongUserNameFromActor(actor);
 
         apUserName = apUserName.trim();
-        if (apUserName.endsWith("@" + appProp.getMetaHost().toLowerCase())) {
+
+        // This checks for both the non-port and has-port versions of the host (host may or may not have port)
+        if (apUserName.endsWith("@" + appProp.getMetaHost().toLowerCase())
+                || apUserName.contains("@" + appProp.getMetaHost().toLowerCase() + ":")) {
             log.debug("Can't import a user that's not from a foreign server.");
             return null;
         }

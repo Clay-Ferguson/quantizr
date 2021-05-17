@@ -157,15 +157,6 @@ public class ActPubUtil {
     }
 
     public APObj getJson(String url, MediaType mediaType) {
-
-        // todo-0: temporary hacks for localhost peer-to-peer testing
-        if (url.startsWith("https://q1:")) {
-            url = url.replaceAll("https://q1:", "http://q1:");
-        }
-        if (url.startsWith("https://q2:")) {
-            url = url.replaceAll("https://q2:", "http://q2:");
-        }
-
         // log.debug("getJson: " + url);
         APObj ret = null;
         try {
@@ -303,18 +294,25 @@ public class ActPubUtil {
      * 
      * Get WebFinger from foreign server
      * 
-     * resource example: someuser@server.org
+     * 'resource' examples:
      * 
-     * todo-0: we could detect if the host has a port designated and in that case don't try the secure
-     * version. just insecure one (http)
+     * someuser@server.org (normal Fediverse, no port)
+     * 
+     * someuser@ip:port (special testing mode, insecure)
      */
     public APObj getWebFinger(String resource) {
-        // first try https, and if it fails try http instead
-        // try {
-        return getWebFingerSec(resource, true);
-        // } catch (Exception e) {
-        // return getWebFingerSec(resource, false);
-        // }
+        // For non-secure domains, they're required to have a port in their name,
+        // so this is users like bob@q1:8184 (for example), and that port is expected
+        // also to NOT be https 443 port.
+        if (resource.contains(":")) {
+            return getWebFingerSec(resource, false);
+        }
+
+        try {
+            return getWebFingerSec(resource, true);
+        } catch (Exception e) {
+            return getWebFingerSec(resource, false);
+        }
     }
 
     /**
@@ -353,9 +351,6 @@ public class ActPubUtil {
                 List<MediaType> acceptableMediaTypes = new LinkedList<MediaType>();
                 acceptableMediaTypes.add(acceptType);
                 headers.setAccept(acceptableMediaTypes);
-
-                // todo-0: remove this one.
-                headers.add("Accept", acceptType.toString());
             }
 
             if (headerHost != null) {
@@ -410,8 +405,7 @@ public class ActPubUtil {
                                     .put(APProp.links, new APList() //
                                             .val(new APObj() //
                                                     .put(APProp.rel, "self") //
-                                                    // todo-0: get this mime type from variable
-                                                    .put(APProp.type, "application/activity+json") //
+                                                    .put(APProp.type, APConst.CONTENT_TYPE_JSON_ACTIVITY_SHORT) //
                                                     .put(APProp.href, makeActorUrlForUserName(username))));
 
                             // log.debug("Reply with WebFinger: " + XString.prettyPrint(webFinger));
@@ -450,6 +444,10 @@ public class ActPubUtil {
         return getLongUserNameFromActor(actor);
     }
 
+    /**
+     * Uses the 'preferredUsername' in the 'actor' object to build the long name of the user like
+     * preferredUserName@host.com
+     */
     public String getLongUserNameFromActor(Object actor) {
         String shortUserName = AP.str(actor, APProp.preferredUsername); // short name like 'alice'
         String inbox = AP.str(actor, APProp.inbox);
@@ -457,16 +455,18 @@ public class ActPubUtil {
             URL url = new URL(inbox);
             String host = url.getHost();
 
-            // todo-0: temporary port hacks for local multi-server testing
-            // see: https://quanta.wiki/n/localhost-fediverse-testing
-            // This will be fixed soon!
-            if (host.equals("q1")) {
-                host += ":8184";
-            }
-            if (host.equals("q2")) {
-                host += ":8183";
+            //get port number (normally not set and thus '-1')
+            int port = url.getPort();
+
+            /*
+             * Be sure the port name is on the long name of non-standard ports. This is hacking the protocol to
+             * support our localhost peer-to-peer scenario (servers q1, q2, etc)
+             */
+            if (port != -1 && port != 80 && port != 443) {
+                host += ":" + String.valueOf(port);
             }
 
+            //log.debug("long user name: " + shortUserName + "@" + host);
             return shortUserName + "@" + host;
         } catch (Exception e) {
             log.error("failed building toUserName", e);
