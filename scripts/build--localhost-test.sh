@@ -7,19 +7,6 @@ if [ -f ./vscode-cwd.sh ]; then
   source ./vscode-cwd.sh
 fi
 
-###############################################################################
-# 
-# This script builds a deployable quanta-test.tar, which is able to be 
-# deployed stand-alone somewhere at localhost, normally for testing, or just
-# for using Quanta as a personal/local productivity tool. It's configured
-# to run at http://locahost:8181
-#
-# WARNING: This overwrites any of it's own files in ${PRJROOT}, as you can see
-# in all the copy commands below. After you run this script you should be able
-# to go run ${PRJROOT}/run-test.sh and bring up the app.
-#
-###############################################################################
-
 clear
 # show commands as they are run.
 # set -x
@@ -48,7 +35,7 @@ mkdir -p ${DEPLOY_TARGET}/dumps
 mkdir -p ${DEPLOY_TARGET}/config
 
 # copy our secrets (passwords, etc) to deploy location
-cp ${SECRETS}/secrets.sh                  ${DEPLOY_TARGET}/dumps
+cp ${SECRETS}/secrets.sh    ${DEPLOY_TARGET}/dumps
 
 # copy the database backup scripts to deploy location
 cp ${SCRIPTS}/backup--localhost-test.sh   ${DEPLOY_TARGET}
@@ -66,31 +53,23 @@ cd ${DEPLOY_TARGET}
 . ${SCRIPTS}/stop-test.sh
 
 # ensure logs is cleaned up
-sudo rm -rf ${DEPLOY_TARGET}/log/*
+rm -rf ${DEPLOY_TARGET}/log/*
 
 # ensure the IPFS folders exist
 mkdir -p ${ipfs_data}
 mkdir -p ${ipfs_staging}
 
 # Wipe previous deployment to ensure it can't be used again.
-rm -rf ${DEPLOY_TARGET}/quanta-test.tar
+rm -rf ${DEPLOY_TARGET}/org.subnode-0.0.1-SNAPSHOT.jar
 
 # build the project (comile source)
 cd ${PRJROOT}
 . ${SCRIPTS}/_build.sh
 
-# IMPORTANT: Use this to troubeshoot the variable substitutions in the yaml file
-# docker-compose -f ${docker_compose_yaml} config 
-# read -p "Config look ok?"
-# I was seeing docker fail to deploy new code EVEN after I'm sure i built new code, and ended up finding
-# this stackoverflow saying how to work around this (i.e. first 'build' then 'up') 
-# https://stackoverflow.com/questions/35231362/dockerfile-and-docker-compose-not-updating-with-new-instructions
-docker-compose -f ${docker_compose_yaml} build --no-cache
-verifySuccess "Docker Compose: build"
+cp ${PRJROOT}/target/org.subnode-0.0.1-SNAPSHOT.jar ${DEPLOY_TARGET}
 
-# move deployment binary into target location
-docker save -o ${DEPLOY_TARGET}/quanta-test.tar quanta-test
-verifySuccess "Docker Save"
+cd ${PRJROOT}
+dockerBuildUp quanta-test
 
 read -p "Build Complete. press a key"
 

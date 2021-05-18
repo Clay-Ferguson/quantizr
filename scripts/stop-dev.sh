@@ -8,9 +8,8 @@ fi
 
 source ./setenv--localhost-dev.sh
 
-cd ${PRJROOT}
-docker-compose -f ${docker_compose_yaml} down --remove-orphans
-verifySuccess "Docker Compose: down"
+ cd ${DEPLOY_TARGET}
+dockerDown
 
 # docker ps
 sleep 3

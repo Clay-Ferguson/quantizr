@@ -28,8 +28,7 @@ ${SCRIPTS}/run-linter.sh
 verifySuccess "Linter"
 
 cd ${PRJROOT}
-docker-compose -f ${docker_compose_yaml} down --remove-orphans
-verifySuccess "Docker Compose: down"
+dockerDown
 
 # Generate 'pom.xml' dynamically from file parts
 cd ${PRJROOT}/pom-fragments

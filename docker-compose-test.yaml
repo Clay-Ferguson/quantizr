@@ -12,7 +12,7 @@ services:
         ports:
             - "27017:27017"
         env_file:
-            - "../secrets/mongo.env"
+            - "${SECRETS}/mongo.env"
         networks:
             - net-test
         # Always specify version of mongo. When it upgrades automatically there can be database issues that need to be resolved

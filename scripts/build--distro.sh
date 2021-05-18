@@ -27,7 +27,6 @@ cp ${PRJROOT}/docker-compose-distro.yaml  ${DEPLOY_TARGET}
 cp ${PRJROOT}/dockerfile-distro           ${DEPLOY_TARGET}
 
 # copy scripts needed to start/stop to deploy target
-# todo-0: edit ALL scripts so that filename isn't repeated on target
 cp ${SCRIPTS}/run-distro.sh         ${DEPLOY_TARGET}
 cp ${SCRIPTS}/stop-distro.sh        ${DEPLOY_TARGET}
 cp ${SCRIPTS}/define-functions.sh   ${DEPLOY_TARGET}
@@ -72,7 +71,6 @@ mkdir -p ${ipfs_data}
 mkdir -p ${ipfs_staging}
 
 # Wipe previous deployment to ensure it can't be used again.
-# rm -rf ${DEPLOY_TARGET}/quanta-distro.tar
 rm -rf ${DEPLOY_TARGET}/org.subnode-0.0.1-SNAPSHOT.jar
 
 # build the project (comile source)

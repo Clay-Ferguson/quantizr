@@ -36,8 +36,8 @@ public class AppServer {
 
 	/* Java Main entry point for the application */
 	public static void main(String[] args) {
-		log.debug("\nAppServer Starting\n--------------------------------------------------------------------------------------");
-		log.trace("main() trace log test.");
+		// WARNING: looks like logging is not enabled yet at this point (can't log here)
+
 		/*
 		 * If we are running AppServer then enableScheduling, otherwise we may be running some command line
 		 * service such as BackupUtil, in which case deamons need to be deactivated.
@@ -52,6 +52,7 @@ public class AppServer {
 	public void handleContextRefresh(ContextRefreshedEvent event) {
 		log.info("ContextRefreshedEvent.");
 		log.debug("PROFILE: " + appProp.getProfileName());
+		log.trace("test trace message.");
 	}
 
 	@EventListener

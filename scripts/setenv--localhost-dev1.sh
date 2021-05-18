@@ -1,7 +1,7 @@
 #!/bin/bash
 # see: https://quanta.wiki/n/localhost-fediverse-testing
 
-# Configures build variables for secondary instance in
+# Configures build variables for first instance in
 # a federated development enviroment.
 
 source ./define-functions.sh
