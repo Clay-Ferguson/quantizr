@@ -59,9 +59,9 @@ cp ${SCRIPTS}/restore--localhost-test.sh  ${DEPLOY_TARGET}/restore--localhost-te
 cp ${SCRIPTS}/_restore--localhost-test.sh ${DEPLOY_TARGET}/dumps/_restore--localhost-test.sh
 
 # copy our banding folder to deploy target
-rsync -aAX --delete --force --progress --stats "./branding/" "${DEPLOY_TARGET}/branding/"
+rsync -aAX --delete --force --progress --stats "${PRJROOT}/branding/" "${DEPLOY_TARGET}/branding/"
 
-# stop te server if running
+# stop the server if running
 cd ${DEPLOY_TARGET}
 . ${SCRIPTS}/stop-test.sh
 

@@ -1,0 +1,99 @@
+# Docker Compose file for a basic Quanta Distro
+# (for now IPFS is omitted (todo-0: make it optional))
+
+version: '3.7'
+services:
+
+    mongo-distro: 
+        container_name: mongo-distro 
+        # WARNING: volumes will not handle '~' character for home folder. Do not use.
+        volumes:
+            - "${DEPLOY_TARGET}/data:/data/db"
+            - "${DEPLOY_TARGET}/dumps:/mongo-dumps"
+            - "${DEPLOY_TARGET}/mongod.conf:/etc/mongod.conf"
+        command: mongod --config /etc/mongod.conf
+        ports:
+            - "27020:27020"
+        env_file:
+            - "${DEPLOY_TARGET}/mongo.env"
+        networks:
+            - net-distro
+        # Always specify version of mongo. When it upgrades automatically there can be database issues that need to be resolved
+        # and we don't want that happening unexpectedly
+        image: mongo:4.0
+
+    quanta-distro:
+        build: 
+            context: .
+            dockerfile: dockerfile-distro
+        container_name: quanta-distro
+        expose:
+            - "8185"
+            # Uncomment for debugging...
+            #- '8000'
+        # WARNING: volumes will not handle '~' character for home folder. Do not use.
+        volumes:
+            - "${DEPLOY_TARGET}/tmp:/tmp"
+            - "${DEPLOY_TARGET}/log:/log"
+            - '${DEPLOY_TARGET}/config:/config'
+
+             # This maps '/app' to be the current folder where you run docker from (where the yaml file is normally)
+            - $PWD:/app
+        ports:
+            - "8185:8185"
+            # Uncomment for debugging...
+            #- '8000:8000'
+        networks:
+            - net-distro
+        environment:
+            mongoAdminPassword: "${subnodePassword}"
+            mongoSecurity: "true"
+
+            # NOTE: '>-' removes all newline characters and makes one long string
+            testUserAccounts: >- 
+                adam:${testPassword}:${devEmail},
+                bob:${testPassword}:${devEmail},
+                cory:${testPassword}:${devEmail},
+                dan:${testPassword}:${devEmail}
+
+            spring.config.location: "classpath:/application.properties" 
+            mongodb.host: "mongo-distro" 
+            mongodb.port: "27020"
+            profileName: "prod" 
+            server.port: "8185" 
+            httpProtocol: "http" 
+            metaHost: "localhost" 
+            reSaveAll: "false"
+            forceIndexRebuild: "false"
+            allowFileSystemSearch: "false" 
+            actPubEnabled: "false"
+            spring.http.multipart.max-file-size: "200MB" 
+            spring.http.multipart.max-request-size: "200MB" 
+            spring.servlet.multipart.max-file-size: "200MB"
+            spring.servlet.multipart.max-request-size: "200MB"
+            adminDataFolder: "/tmp" 
+
+            # Uncomment for debugging... (don't forget to open ufw firewall for port on server)
+            #JAVA_TOOL_OPTIONS: "-agentlib:jdwp=transport=dt_socket,address=0.0.0.0:8000,server=y,suspend=n"
+            
+            xxxipfs.host: "http://ipfs-test"
+            xxxipfs.apiPort: "5001"
+            xxxipfs.gatewayPort: "8080"
+            
+        image: quanta-distro
+        depends_on:
+            - mongo-distro
+            # - ipfs-distro
+
+# https://docs.docker.com/compose/networking/
+networks:
+  net-distro:
+    driver: bridge
+    external: false
+    name: net-distro
+
+# To force compose to use an externally pre-created network outside this compose file you can do this
+# networks:
+#   default:
+#     external:
+#       name: my-pre-existing-network

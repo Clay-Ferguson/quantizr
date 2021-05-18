@@ -1,5 +1,7 @@
 #!/bin/bash
 
+# The production builder for generating deployment files to put on https://quanta.wiki
+
 ###############################################################################
 # This script builds a deployable quanta-prod.tar, which is able to be 
 # deployed stand-alone at https://quanta.wiki. This is the production builder

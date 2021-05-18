@@ -42,7 +42,7 @@
                             th:if="${not #strings.isEmpty(signupResponse)}" th:text="${signupResponse}"></h4>
 
                         <img class="mainLogoImg" src="branding/logo-250px-tr.jpg"></img>
-                        <h1 class="text-center">Quanta</h1>
+                        <h1 class="text-center" th:text="${brandingAppName}"></h1>
                         <h3 class="text-center" th:text="${introSubtitle}"></h3>
 
                         <p>&nbsp</p>

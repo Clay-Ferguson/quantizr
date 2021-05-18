@@ -1,5 +1,7 @@
 #!/bin/bash
 
+# Script for doing a dev build for localhost testing of a single instance (no ActivityPub support)
+
 if [ -f ./vscode-cwd.sh ]; then
   source ./vscode-cwd.sh
 fi
