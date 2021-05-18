@@ -11,13 +11,13 @@ services:
             - '${MONGO_BASE}/mongodb-data-dev:/data/db'
             - '${MONGO_BASE}/mongo-dumps-dev:/mongo-dumps'
             - '${MONGO_BASE}/mongo-scripts-dev:/mongo-scripts'
-            - '../secrets/mongod--localhost-dev2.conf:/etc/mongod.conf'
+            - '${SECRETS}/mongod--localhost-dev2.conf:/etc/mongod.conf'
         command: mongod --config /etc/mongod.conf
         #entrypoint: ["mongod","--config","/etc/mongod.conf"]
         ports:
             - '27018:27018'
         env_file: 
-            - '../secrets/mongo.env'
+            - '${SECRETS}/mongo.env'
 
         network_mode: host
         # networks:

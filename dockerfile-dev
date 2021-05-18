@@ -1,12 +1,6 @@
 FROM openjdk:11-jre
 LABEL maintainer="wclayf@gmail.com"
 
-# RUN mkdir -p /subnode-tmp
-# RUN echo "SubNode temp folder" > /subnode-tmp/readme.md
-
-# RUN mkdir -p /subnode-log
-# RUN echo "SubNode log folder" > /subnode-log/readme.md
-
 RUN mkdir -p /dev-resource-base
 RUN echo "SubNode resources" > /dev-resource-base/readme.md
 

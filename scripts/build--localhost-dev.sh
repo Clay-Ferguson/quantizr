@@ -1,5 +1,4 @@
 #!/bin/bash
-
 # Script for doing a dev build for localhost testing of a single instance (no ActivityPub support)
 
 if [ -f ./vscode-cwd.sh ]; then
@@ -21,14 +20,14 @@ clear
 
 source ./setenv--localhost-dev.sh
 
-sudo chown 999:999 ${SECRETS}/mongod--localhost-dev.conf
+# sudo chown 999:999 ${SECRETS}/mongod--localhost-dev.conf
 
-sudo mkdir -p ${QUANTA_BASE}/log
-sudo mkdir -p ${QUANTA_BASE}/tmp
-sudo mkdir -p ${QUANTA_BASE}/config
-sudo mkdir -p ${QUANTA_BASE}/lucene
+mkdir -p ${QUANTA_BASE}/log
+mkdir -p ${QUANTA_BASE}/tmp
+mkdir -p ${QUANTA_BASE}/config
+mkdir -p ${QUANTA_BASE}/lucene
 
-sudo rm -f ${QUANTA_BASE}/log/*
+rm -f ${QUANTA_BASE}/log/*
 mkdir -p ${ipfs_data}
 mkdir -p ${ipfs_staging}
 
@@ -38,27 +37,19 @@ cd ${PRJROOT}
 # IMPORTANT: Use this to troubeshoot the variable substitutions in the yaml file
 # docker-compose -f ${docker_compose_yaml} config 
 # read -p "Config look ok?"
+
 # I was seeing docker fail to deploy new code EVEN after I'm sure i built new code, and ended up finding
 # this stackoverflow saying how to work around this (i.e. first 'build' then 'up') 
 # https://stackoverflow.com/questions/35231362/dockerfile-and-docker-compose-not-updating-with-new-instructions
+cd ${PRJROOT}
 docker-compose -f ${docker_compose_yaml} build --no-cache
 verifySuccess "Docker Compose: build"
-
-# This first docker call starts up the network and MongoDB
-# We run mongo using a separate compose, just because we want it fully decoupled
-# for preparation and testing getting ready for running the APP in a load balancer
-cd ${PRJROOT}
-
-# Not used: mongo is setup inside the docker-compose-dev.yaml for now
-# docker-compose -f ${docker_compose_mongo_yaml} up -d mongo-dev
-# verifySuccess "Docker Compose (Mongo): up"
-# dockerCheck "mongo-dev"
 
 docker-compose -f ${docker_compose_yaml} up -d quanta-dev
 verifySuccess "Docker Compose (Quanta-dev): up"
 
 # sleep 10
-# echp "Sleeping 10 seconds before checking logs"
+# echo "Sleeping 10 seconds before checking logs"
 # docker-compose -f ${docker_compose_yaml} logs ipfs-dev
 # verifySuccess "Docker Compose: logs"
 

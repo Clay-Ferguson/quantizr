@@ -18,14 +18,14 @@ source ./setenv--localhost-dev2.sh
 
 sudo mkdir -p ${MONGO_BASE}
 
-sudo chown 999:999 ${SECRETS}/mongod-dev2.conf
+# sudo chown 999:999 ${SECRETS}/mongod-dev2.conf
 
-sudo mkdir -p ${QUANTA_BASE}/log
-sudo mkdir -p ${QUANTA_BASE}/tmp
-sudo mkdir -p ${QUANTA_BASE}/config
-sudo mkdir -p ${QUANTA_BASE}/lucene
+mkdir -p ${QUANTA_BASE}/log
+mkdir -p ${QUANTA_BASE}/tmp
+mkdir -p ${QUANTA_BASE}/config
+mkdir -p ${QUANTA_BASE}/lucene
 
-sudo rm -f ${QUANTA_BASE}/log/*
+rm -f ${QUANTA_BASE}/log/*
 mkdir -p ${ipfs_data}
 mkdir -p ${ipfs_staging}
 
@@ -35,7 +35,6 @@ cd ${PRJROOT}
 docker-compose -f ${docker_compose_yaml} build --no-cache
 verifySuccess "Docker Compose: build"
 
-cd ${PRJROOT}
 docker-compose -f ${docker_compose_yaml} up -d quanta-dev2
 verifySuccess "Docker Compose quanta-dev2: up"
 
