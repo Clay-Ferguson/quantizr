@@ -16,7 +16,7 @@ fi
 
 clear
 # show commands as they are run.
-set -x
+# set -x
 
 source ./setenv--distro.sh
 
@@ -65,23 +65,20 @@ cd ${DEPLOY_TARGET}
 . ${SCRIPTS}/stop-distro.sh
 
 # ensure logs is cleaned up
-sudo rm -rf ${DEPLOY_TARGET}/log/*
+rm -rf ${DEPLOY_TARGET}/log/*
 
 # ensure the IPFS folders exist
 mkdir -p ${ipfs_data}
 mkdir -p ${ipfs_staging}
 
 # Wipe previous deployment to ensure it can't be used again.
-rm -rf ${DEPLOY_TARGET}/quanta-distro.tar
+# rm -rf ${DEPLOY_TARGET}/quanta-distro.tar
+rm -rf ${DEPLOY_TARGET}/org.subnode-0.0.1-SNAPSHOT.jar
 
 # build the project (comile source)
 cd ${PRJROOT}
 . ${SCRIPTS}/_build.sh
 
-# move deployment binary into target location
-# todo-0: will this need to be done as part of the run-distro.sh if user hasn't already done it?
-docker save -o ${DEPLOY_TARGET}/quanta-distro.tar quanta-distro
-verifySuccess "Docker Save"
+cp ${PRJROOT}/target/org.subnode-0.0.1-SNAPSHOT.jar ${DEPLOY_TARGET}
 
 read -p "Build Complete. press a key"
-

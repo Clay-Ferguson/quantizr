@@ -5,7 +5,8 @@ source ./setenv--distro.sh
 docker-compose -f ${docker_compose_yaml} down --remove-orphans
 verifySuccess "Docker Compose: down"
 
-sudo chown 999:999 ./mongod.conf
+# I don't remember why I had originally done this chown but I'm glad it no longer appears to be needed.
+# sudo chown 999:999 ./mongod.conf
 
 # sudo docker ps
 # read -p "Verify no instances up. Press any key."
@@ -13,12 +14,12 @@ sudo chown 999:999 ./mongod.conf
 echo "removing logs"
 rm -rf ./log/*
 
-docker load -i ./quanta-distro.tar
-verifySuccess "Docker Load quanta-distro.tar"
-
 # IMPORTANT: Use this to troubeshoot the variable substitutions in the yaml file
 # docker-compose -f ${docker_compose_yaml} config
 # read -p "Config look ok?"
+
+docker-compose -f ${docker_compose_yaml} build --no-cache
+verifySuccess "Docker Compose: build"
 
 docker-compose -f ${docker_compose_yaml} up -d quanta-distro
 verifySuccess "Docker Compose: up"
@@ -33,4 +34,3 @@ dockerCheck "quanta-distro"
 echo ===========================
 echo Quantizr Distro Started OK!
 echo ===========================
-

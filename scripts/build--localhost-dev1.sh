@@ -34,6 +34,15 @@ mkdir -p ${ipfs_staging}
 cd ${PRJROOT}
 . ${SCRIPTS}/_build.sh
 
+# IMPORTANT: Use this to troubeshoot the variable substitutions in the yaml file
+# docker-compose -f ${docker_compose_yaml} config 
+# read -p "Config look ok?"
+# I was seeing docker fail to deploy new code EVEN after I'm sure i built new code, and ended up finding
+# this stackoverflow saying how to work around this (i.e. first 'build' then 'up') 
+# https://stackoverflow.com/questions/35231362/dockerfile-and-docker-compose-not-updating-with-new-instructions
+docker-compose -f ${docker_compose_yaml} build --no-cache
+verifySuccess "Docker Compose: build"
+
 # This first docker call starts up the network and MongoDB
 # We run mongo using a separate compose, just because we want it fully decoupled
 # for preparation and testing getting ready for running the APP in a load balancer

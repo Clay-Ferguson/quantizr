@@ -75,13 +75,3 @@ verifySuccess "Maven Build"
 #
 #   "--forceIndexRebuild=true" \
 ################################################################################################
-
-# IMPORTANT: Use this to troubeshoot the variable substitutions in the yaml file
-# docker-compose -f ${docker_compose_yaml} config 
-# read -p "Config look ok?"
-
-# I was seeing docker fail to deploy new code EVEN after I'm sure i built new code, and ended up findingn
-# this stackoverflow saying how to work around this (i.e. first 'build' then 'up') 
-# https://stackoverflow.com/questions/35231362/dockerfile-and-docker-compose-not-updating-with-new-instructions
-docker-compose -f ${docker_compose_yaml} build --no-cache
-verifySuccess "Docker Compose: build"
