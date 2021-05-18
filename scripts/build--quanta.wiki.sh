@@ -22,7 +22,7 @@ source ./setenv--quanta.wiki.sh
 rm -rf ${PROD_DEPLOYER_BASE}/${quanta_domain}/quanta-prod.tar
 
 cd ${PRJROOT}
-cp ${docker_compose_yaml} ${PROD_DEPLOYER_BASE}/${quanta_domain}/${docker_compose_yaml}
+cp ${docker_compose_yaml} ${PROD_DEPLOYER_BASE}/${quanta_domain}
 
 cd ${PRJROOT}
 . ${SCRIPTS}/_build.sh

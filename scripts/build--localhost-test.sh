@@ -29,14 +29,14 @@ source ./setenv--localhost-test.sh
 mkdir -p ${DEPLOY_TARGET}
 
 # copy docker files to deploy target
-cp ${PRJROOT}/docker-compose-test.yaml    ${DEPLOY_TARGET}/docker-compose-test.yaml
-cp ${PRJROOT}/dockerfile-test             ${DEPLOY_TARGET}/dockerfile-test
+cp ${PRJROOT}/docker-compose-test.yaml    ${DEPLOY_TARGET}
+cp ${PRJROOT}/dockerfile-test             ${DEPLOY_TARGET}
 
 # copy scripts needed to start/stop to deploy target
-cp ${SCRIPTS}/run-test.sh                 ${DEPLOY_TARGET}/run-test.sh
-cp ${SCRIPTS}/stop-test.sh                ${DEPLOY_TARGET}/stop-test.sh
-cp ${SCRIPTS}/define-functions.sh         ${DEPLOY_TARGET}/define-functions.sh
-cp ${SCRIPTS}/setenv--localhost-test.sh   ${DEPLOY_TARGET}/setenv--localhost-test.sh
+cp ${SCRIPTS}/run-test.sh                 ${DEPLOY_TARGET}
+cp ${SCRIPTS}/stop-test.sh                ${DEPLOY_TARGET}
+cp ${SCRIPTS}/define-functions.sh         ${DEPLOY_TARGET}
+cp ${SCRIPTS}/setenv--localhost-test.sh   ${DEPLOY_TARGET}
 
 # this is a special file we alter the owner of in the run script.
 cp ${SCRIPTS}/mongod--localhost-test.conf ${DEPLOY_TARGET}/mongod.conf
@@ -48,15 +48,15 @@ mkdir -p ${DEPLOY_TARGET}/dumps
 mkdir -p ${DEPLOY_TARGET}/config
 
 # copy our secrets (passwords, etc) to deploy location
-cp ${SECRETS}/secrets.sh                  ${DEPLOY_TARGET}/dumps/secrets.sh
+cp ${SECRETS}/secrets.sh                  ${DEPLOY_TARGET}/dumps
 
 # copy the database backup scripts to deploy location
-cp ${SCRIPTS}/backup--localhost-test.sh   ${DEPLOY_TARGET}/backup--localhost-test.sh
-cp ${SCRIPTS}/_backup--localhost-test.sh  ${DEPLOY_TARGET}/dumps/_backup--localhost-test.sh
+cp ${SCRIPTS}/backup--localhost-test.sh   ${DEPLOY_TARGET}
+cp ${SCRIPTS}/_backup--localhost-test.sh  ${DEPLOY_TARGET}/dumps
 
 # copy the database restore scripts to deploy target
-cp ${SCRIPTS}/restore--localhost-test.sh  ${DEPLOY_TARGET}/restore--localhost-test.sh
-cp ${SCRIPTS}/_restore--localhost-test.sh ${DEPLOY_TARGET}/dumps/_restore--localhost-test.sh
+cp ${SCRIPTS}/restore--localhost-test.sh  ${DEPLOY_TARGET}
+cp ${SCRIPTS}/_restore--localhost-test.sh ${DEPLOY_TARGET}/dumps
 
 # copy our banding folder to deploy target
 rsync -aAX --delete --force --progress --stats "${PRJROOT}/branding/" "${DEPLOY_TARGET}/branding/"
