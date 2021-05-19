@@ -22,8 +22,9 @@ source ./setenv--distro.sh
 
 # sanity check since we do "rm -rf" in here
 if [ -z "$DEPLOY_TARGET" ]; then exit; fi
-rm -rf ${DEPLOY_TARGET}/*
+sudo rm -rf ${DEPLOY_TARGET}/*
 verifySuccess "Cleaned deploy target"
+
 mkdir -p ${DEPLOY_TARGET}
 
 # copy docker files to deploy target
@@ -34,6 +35,7 @@ cp ${SCRIPTS}/run-distro.sh                 ${DEPLOY_TARGET}
 cp ${SCRIPTS}/stop-distro.sh                ${DEPLOY_TARGET}
 cp ${SCRIPTS}/define-functions.sh           ${DEPLOY_TARGET}
 cp ${SCRIPTS}/setenv--distro-runner.sh      ${DEPLOY_TARGET}
+cp ${PRJROOT}/distro/README.sh              ${DEPLOY_TARGET}
 
 # this is a special file we alter the owner of in the run script.
 cp ${SCRIPTS}/mongod--distro.conf           ${DEPLOY_TARGET}/mongod.conf
