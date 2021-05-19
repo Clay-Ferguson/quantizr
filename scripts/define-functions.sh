@@ -24,39 +24,31 @@ dockerBuildUp () {
     # I was seeing docker fail to deploy new code EVEN after I'm sure i built new code, and ended up finding
     # this stackoverflow saying how to work around this (i.e. first 'build' then 'up') 
     # https://stackoverflow.com/questions/35231362/dockerfile-and-docker-compose-not-updating-with-new-instructions
-    echo "dockerBuildUp $1"
+    echo "dockerBuildUp"
 
     docker-compose -f ${docker_compose_yaml} build --no-cache
     verifySuccess "Docker Compose: build"
 
-    docker-compose -f ${docker_compose_yaml} up -d $1
-    verifySuccess "Docker Compose ($1): up"
+    docker-compose -f ${docker_compose_yaml} up -d
+    verifySuccess "Docker Compose: up"
 
     # sleep 10
     # echo "Sleeping 10 seconds before checking logs"
     # docker-compose -f ${docker_compose_yaml} logs $1
     # verifySuccess "Docker Compose: logs"
-
-    dockerCheck "$1"
 }
 export -f dockerBuildUp
 
-dockerUp() {
-    echo "dockerUp $1 in ${docker_compose_yaml}"
-    docker-compose -f ${docker_compose_yaml} up -d $1
-    verifySuccess "Docker Compose ($1): up"
-    dockerCheck "$1"
-}
-export -f dockerUp
-
 dockerDown () {
-    echo "dockerDown ${docker_compose_yaml}"
+    echo "dockerDown ${docker_compose_yaml} serivce $1"
 
     # NOTE: with remove-orphans it takes down not just what's in our YAML but 
     # also every other docker thing running on the machine!
     # docker-compose -f ${docker_compose_yaml} down --remove-orphans
-    docker-compose -f ${docker_compose_yaml} down
-    verifySuccess "Docker Compose: down"
+    # docker-compose -f ${docker_compose_yaml} stop $1
+    docker-compose -f ${docker_compose_yaml} rm -f -s $1
+    # docker ps
+    # read -p "service $1 should be missing in above"
 }
 export -f dockerDown
 

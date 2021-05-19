@@ -3,9 +3,10 @@ LABEL maintainer="wclayf@gmail.com"
 
 WORKDIR /subnode
 
-EXPOSE 8181
+EXPOSE 80
+EXPOSE 443
 
-ADD target/org.subnode-0.0.1-SNAPSHOT.jar /subnode/subnode.jar
+ADD ./org.subnode-0.0.1-SNAPSHOT.jar /subnode/subnode.jar
 RUN sh -c 'touch /subnode/subnode.jar' 
 
 ENTRYPOINT ["java", "-Djava.security.egd=file:/dev/./urandom", "-jar", "/subnode/subnode.jar"]

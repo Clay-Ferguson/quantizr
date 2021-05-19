@@ -16,10 +16,13 @@ clear
 
 source ./setenv--localhost-dev1.sh
 
-# sudo chown 999:999 ${SECRETS}/mongod--localhost-dev1.conf
-
 makeDirs
-rm -f ${QUANTA_BASE}/log/*
+rm -rf ${QUANTA_BASE}/log/*
+
+cd ${PRJROOT}
+dockerDown quanta-dev1
+dockerDown mongo-dev1
+# dockerDown ipfs-dev1
 
 cd ${PRJROOT}
 . ${SCRIPTS}/_build.sh
@@ -28,7 +31,11 @@ cd ${PRJROOT}
 # docker-compose -f ${docker_compose_yaml} config 
 # read -p "Config look ok?"
 cd ${PRJROOT}
-dockerBuildUp quanta-dev1
+dockerBuildUp
+
+dockerCheck quanta-dev1
+dockerCheck mongo-dev1
+# dockerCheck ipfs-dev1
 
 # echo "quanta-dev IP"
 # docker inspect -f '{{range.NetworkSettings.Networks}}{{.IPAddress}}{{end}}' quanta-dev1

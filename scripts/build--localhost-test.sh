@@ -48,28 +48,19 @@ cp ${SCRIPTS}/_restore--localhost-test.sh ${DEPLOY_TARGET}/dumps
 # copy our banding folder to deploy target
 rsync -aAX --delete --force --progress --stats "${PRJROOT}/branding/" "${DEPLOY_TARGET}/branding/"
 
-# stop the server if running
-cd ${DEPLOY_TARGET}
-. ${SCRIPTS}/stop-test.sh
-
-# ensure logs is cleaned up
-rm -rf ${DEPLOY_TARGET}/log/*
-
 # ensure the IPFS folders exist
 mkdir -p ${ipfs_data}
 mkdir -p ${ipfs_staging}
 
-# Wipe previous deployment to ensure it can't be used again.
-rm -rf ${DEPLOY_TARGET}/org.subnode-0.0.1-SNAPSHOT.jar
+# Wipe previous deployment jars to ensure it can't be used again.
+rm -f  ${DEPLOY_TARGET}/org.subnode-0.0.1-SNAPSHOT.jar
+rm -f ${PRJROOT}/target/org.subnode-0.0.1-SNAPSHOT.jar
 
 # build the project (comile source)
 cd ${PRJROOT}
 . ${SCRIPTS}/_build.sh
 
 cp ${PRJROOT}/target/org.subnode-0.0.1-SNAPSHOT.jar ${DEPLOY_TARGET}
-
-cd ${PRJROOT}
-dockerBuildUp quanta-test
 
 read -p "Build Complete. press a key"
 

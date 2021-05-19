@@ -1,10 +1,9 @@
 #!/bin/bash
 
-if [ -f ./vscode-cwd.sh ]; then
-  source ./vscode-cwd.sh
-fi
+cd /home/clay/ferguson/subnode-run
 
 source ./setenv--localhost-test.sh
 
- cd ${DEPLOY_TARGET}
-dockerDown
+cd ${DEPLOY_TARGET}
+dockerDown quanta-test
+dockerDown mongo-test

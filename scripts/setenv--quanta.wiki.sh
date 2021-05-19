@@ -16,6 +16,7 @@ export DATA_FOLDER=/home/clay/quanta-data
 # IMPORTANT: ***** You must set this to 'true' to regenerate the Java->TypeScript interfaces.
 export CLEAN=true
 
+# todo-1: to be consistent could rename this to DEPLOY_TARGET
 export PROD_DEPLOYER_BASE=/home/clay/ferguson/scripts/linode
 
 export docker_compose_yaml=docker-compose-prod.yaml

@@ -10,6 +10,8 @@ then
     exit
 fi
 
+echo "Running _build.sh for $quanta_domain"
+
 # Wipe some existing stuff to ensure it gets rebuilt
 if [ "$CLEAN" == "true" ]; then
     rm -rf ${PRJROOT}/target/*
@@ -25,10 +27,6 @@ npm config set ignore-scripts true
 
 cd ${PRJROOT}
 ${SCRIPTS}/run-linter.sh
-verifySuccess "Linter"
-
-cd ${PRJROOT}
-dockerDown
 
 # Generate 'pom.xml' dynamically from file parts
 cd ${PRJROOT}/pom-fragments

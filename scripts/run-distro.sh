@@ -2,13 +2,7 @@
 
 source ./setenv--distro.sh
 
-dockerDown
-
-# I don't remember why I had originally done this chown but I'm glad it no longer appears to be needed.
-# sudo chown 999:999 ./mongod.conf
-
-# sudo docker ps
-# read -p "Verify no instances up. Press any key."
+./stop-distro.sh
 
 echo "removing logs"
 rm -rf ./log/*
@@ -17,8 +11,11 @@ rm -rf ./log/*
 # docker-compose -f ${docker_compose_yaml} config
 # read -p "Config look ok?"
 
-dockerBuildUp quanta-distro
+dockerBuildUp
+
+dockerCheck quanta-distro
+dockerCheck mongo-distro
 
 echo ===========================
-echo Quantizr Distro Started OK!
+echo Quanta Distro Started OK!
 echo ===========================

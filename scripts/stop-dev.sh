@@ -9,7 +9,8 @@ fi
 source ./setenv--localhost-dev.sh
 
  cd ${DEPLOY_TARGET}
-dockerDown
+dockerDown quanta-dev
+dockerDown mongo-dev
 
 # docker ps
 sleep 3

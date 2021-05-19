@@ -36,32 +36,32 @@ services:
         image: mongo:4.0
 
     # https://hub.docker.com/r/ipfs/go-ipfs/
-    ipfs-dev1: 
-        container_name: ipfs-dev1 
-        environment:
-            # IPFS_PROFILE options (lowpower | server)
-            routing: "dhtclient" 
-            IPFS_PROFILE: "lowpower" 
-            IPFS_PATH: "/data/ipfs"
-            # LIBP2P_FORCE_PNET: 1
-        # expose:
-        #    - '4001'
-        #     - '8081'
-        #    - '5001'
-        # WARNING: volumes will not handle '~' character for home folder. Do not use.
-        volumes:
-            - '${ipfs_staging}:/export'
-            - '${ipfs_data}:/data/ipfs'
-        # ports:
-            # - "4001:4001"
-            # - "127.0.0.1:8081:8080"
-            # - "5001:5001"
+    # ipfs-dev1: 
+    #     container_name: ipfs-dev1 
+    #     environment:
+    #         # IPFS_PROFILE options (lowpower | server)
+    #         routing: "dhtclient" 
+    #         IPFS_PROFILE: "lowpower" 
+    #         IPFS_PATH: "/data/ipfs"
+    #         # LIBP2P_FORCE_PNET: 1
+    #     # expose:
+    #     #    - '4001'
+    #     #     - '8081'
+    #     #    - '5001'
+    #     # WARNING: volumes will not handle '~' character for home folder. Do not use.
+    #     volumes:
+    #         - '${ipfs_staging}:/export'
+    #         - '${ipfs_data}:/data/ipfs'
+    #     # ports:
+    #         # - "4001:4001"
+    #         # - "127.0.0.1:8081:8080"
+    #         # - "5001:5001"
 
-        network_mode: host
-        # networks:
-        #     - qnet-dev
+    #     network_mode: host
+    #     # networks:
+    #     #     - qnet-dev
 
-        image: ipfs/go-ipfs:v0.7.0
+    #     image: ipfs/go-ipfs:v0.7.0
 
     # NOTE: This is visible as https://quanta-dev from the other machine
     quanta-dev1:
@@ -71,7 +71,7 @@ services:
         container_name: quanta-dev1
         expose:
             - '8184'
-            - '8000'
+            # - '8000'
         volumes:
             - '${QUANTA_BASE}/tmp:/tmp'
             - '${QUANTA_BASE}/log:/log'
@@ -85,7 +85,7 @@ services:
         ports:
             # '[host]:[container]'
             - '8184:8184'
-            - '8000:8000'
+            # - '8000:8000'
 
         extra_hosts:
             - "q1:127.0.0.1"
@@ -138,7 +138,7 @@ services:
             mail.password: "${emailPassword}" 
             mail.host: "smtp.mailgun.org" 
             mail.from: "admin@quanta.wiki"
-            JAVA_TOOL_OPTIONS: "-agentlib:jdwp=transport=dt_socket,address=0.0.0.0:8000,server=y,suspend=n"
+            # JAVA_TOOL_OPTIONS: "-agentlib:jdwp=transport=dt_socket,address=0.0.0.0:8000,server=y,suspend=n"
             ipfs.host: "http://ipfs-dev"
             ipfs.apiPort: "5001"
             ipfs.gatewayPort: "8080"
@@ -147,6 +147,6 @@ services:
         image: quanta-dev1
         depends_on:
             - mongo-dev1
-            - ipfs-dev1
+            #- ipfs-dev1
 
 

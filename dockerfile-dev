@@ -13,9 +13,11 @@ WORKDIR /subnode
 # but there's never any one app instance that needs BOTH these ports open.
 EXPOSE 8182
 EXPOSE 8183
+EXPOSE 8184
 
 EXPOSE 8000
 
+# This 'target' path assumes we're running docker from the source project root 
 ADD target/org.subnode-0.0.1-SNAPSHOT.jar /subnode/subnode.jar
 RUN sh -c 'touch /subnode/subnode.jar' 
 # VOLUME ["/subnode-tmp", "/subnode-log"]

@@ -10,15 +10,17 @@ fi
 # you should have an instance running at http://localhost:8182, for testing/debugging
 ###############################################################################
 
-clear
 # show commands as they are run.
 # set -x
 source ./setenv--localhost-dev.sh
 
-# sudo chown 999:999 ${SECRETS}/mongod--localhost-dev.conf
-
 makeDirs
-rm -f ${QUANTA_BASE}/log/*
+rm -rf ${QUANTA_BASE}/log/*
+
+cd ${PRJROOT}
+dockerDown quanta-dev
+dockerDown mongo-dev
+dockerDown ipfs-dev
 
 cd ${PRJROOT}
 . ${SCRIPTS}/_build.sh
@@ -28,6 +30,10 @@ cd ${PRJROOT}
 # read -p "Config look ok?"
 
 cd ${PRJROOT}
-dockerBuildUp quanta-dev
+dockerBuildUp
+
+dockerCheck quanta-dev
+dockerCheck mongo-dev
+dockerCheck ipfs-dev
 
 # read -p "Build and Start Complete. press a key"

@@ -2,4 +2,5 @@
 
 source ./setenv--distro.sh
 
-dockerDown
+dockerDown quanta-distro
+dockerDown mongo-distro

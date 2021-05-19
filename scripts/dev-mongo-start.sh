@@ -14,6 +14,6 @@ source ./setenv--localhost-dev.sh
 
 # sudo chown 999:999 ${SECRETS}/mongod--localhost-dev.conf
 
-dockerBuildUp mongo-dev
+dockerBuildUp
 
 read -p "Mongo start complete. press a key"

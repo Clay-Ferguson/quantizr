@@ -6,7 +6,6 @@
 # NOTE: This is the same kind of build as 'build--localhost-dev.sh' but this one starts 
 # two separate instances of the app, for testing Fediverse functionality
 #
-# 
 
 echo "========================================"
 echo "Starting Server #1 Instance Build+Deploy"

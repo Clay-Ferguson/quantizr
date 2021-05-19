@@ -59,19 +59,13 @@ cp ${PRJROOT}/src/main/resources/config-text-distro.yaml    ${DEPLOY_TARGET}/con
 # copy our banding folder to deploy target
 rsync -aAX --delete --force --progress --stats "${PRJROOT}/branding/" "${DEPLOY_TARGET}/branding/"
 
-# stop the server if running
-cd ${DEPLOY_TARGET}
-. ${SCRIPTS}/stop-distro.sh
-
-# ensure logs is cleaned up
-rm -rf ${DEPLOY_TARGET}/log/*
-
 # ensure the IPFS folders exist
 mkdir -p ${ipfs_data}
 mkdir -p ${ipfs_staging}
 
 # Wipe previous deployment to ensure it can't be used again.
-rm -rf ${DEPLOY_TARGET}/org.subnode-0.0.1-SNAPSHOT.jar
+rm -f  ${DEPLOY_TARGET}/org.subnode-0.0.1-SNAPSHOT.jar
+rm -f ${PRJROOT}/target/org.subnode-0.0.1-SNAPSHOT.jar
 
 # build the project (comile source)
 cd ${PRJROOT}

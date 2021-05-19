@@ -13,8 +13,8 @@ source ./setenv--localhost-dev.sh
 # sudo chown 999:999 ${SECRETS}/mongod--localhost-dev.conf
 
 makeDirs
-rm -f ${QUANTA_BASE}/log/*
+rm -rf ${QUANTA_BASE}/log/*
 
-dockerBuildUp quanta-dev
+dockerBuildUp
 
 # read -p "Build and Start Complete. press a key"
