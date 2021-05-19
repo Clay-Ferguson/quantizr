@@ -20,6 +20,10 @@ clear
 
 source ./setenv--distro.sh
 
+# sanity check since we do "rm -rf" in here
+if [ -z "$DEPLOY_TARGET" ]; then exit; fi
+
+rm -rf ${DEPLOY_TARGET}/*
 mkdir -p ${DEPLOY_TARGET}
 
 # copy docker files to deploy target
@@ -72,5 +76,9 @@ cd ${PRJROOT}
 . ${SCRIPTS}/_build.sh
 
 cp ${PRJROOT}/target/org.subnode-0.0.1-SNAPSHOT.jar ${DEPLOY_TARGET}
+
+TARGET_PARENT="$(dirname "${DEPLOY_TARGET}")"
+cd ${TARGET_PARENT}
+tar cvzf quanta.tar.gz quanta-distro
 
 read -p "Build Complete. press a key"
