@@ -23,11 +23,11 @@ source ./setenv--distro.sh
 # sanity check since we do "rm -rf" in here
 if [ -z "$DEPLOY_TARGET" ]; then exit; fi
 rm -rf ${DEPLOY_TARGET}/*
+verifySuccess "Cleaned deploy target"
 mkdir -p ${DEPLOY_TARGET}
 
 # copy docker files to deploy target
 cp ${PRJROOT}/docker-compose-distro.yaml    ${DEPLOY_TARGET}
-cp ${PRJROOT}/dockerfile-distro             ${DEPLOY_TARGET}
 
 # copy scripts needed to start/stop to deploy target
 cp ${SCRIPTS}/run-distro.sh                 ${DEPLOY_TARGET}
@@ -41,7 +41,6 @@ cp ${SCRIPTS}/mongod--distro.conf           ${DEPLOY_TARGET}/mongod.conf
 # Note: this 'dumps' folder is mapped onto a volume in 'docker-compose-distro.yaml' and the 'backup-local.sh'
 #       script should only be run from 'inside' the docker container, which is what 'mongodb-backup.sh' actually does.
 mkdir -p ${DEPLOY_TARGET}/dumps
-
 mkdir -p ${DEPLOY_TARGET}/config
 
 # copy our secrets (passwords, etc) to deploy location
@@ -76,11 +75,13 @@ cd ${PRJROOT}
 
 TARGET_PARENT="$(dirname "${DEPLOY_TARGET}")"
 cd ${TARGET_PARENT}
-tar cvzf quanta.tar.gz quanta-distro
+tar cvzf ${PRJROOT}/distro/quanta${QUANTA_VER}.tar.gz quanta-distro
 
-echo "***** IMPORTANT ****** "
-echo "REMINDER: Run docker-publish-distro.sh to actually publish the distro."
-echo "You can test locally first with ${DEPLOY_TARGET}/run-distro.sh before publishing"
-echo "********************** "
-
-read -p "Build Complete: ${TARGET_PARENT}/quanta.tar.gz"
+echo
+echo "==================== IMPORTANT ======================================="
+echo "Run docker-publish-distro.sh to actually publish the distro."
+echo "You can test locally (before publishing) by running:"
+echo "${DEPLOY_TARGET}/run-distro.sh"
+echo "======================================================================"
+echo 
+echo "Build Complete: ${PRJROOT}/distro/quanta${QUANTA_VER}.tar.gz"

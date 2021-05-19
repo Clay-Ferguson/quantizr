@@ -1,6 +1,7 @@
 #!/bin/bash
 
 source ./define-functions.sh
+source ./define-functions-dev.sh
 
 export PRJROOT=/home/clay/ferguson/Quantizr
 export SCRIPTS=${PRJROOT}/scripts
