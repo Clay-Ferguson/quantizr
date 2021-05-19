@@ -23,9 +23,9 @@ services:
         image: mongo:4.0
 
     quanta-distro:
-        build: 
-            context: .
-            dockerfile: dockerfile-distro
+        # build: 
+        #     context: .
+        #     dockerfile: dockerfile-distro
         container_name: quanta-distro
         expose:
             - "8185"
@@ -79,8 +79,9 @@ services:
             xxxipfs.host: "http://ipfs-test"
             xxxipfs.apiPort: "5001"
             xxxipfs.gatewayPort: "8080"
-            
-        image: quanta-distro
+        
+        # Image is from public docker hub repository
+        image: subnode/repo:quanta${QUANTA_VER}
         depends_on:
             - mongo-distro
             # - ipfs-distro

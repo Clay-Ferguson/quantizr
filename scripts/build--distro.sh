@@ -22,22 +22,21 @@ source ./setenv--distro.sh
 
 # sanity check since we do "rm -rf" in here
 if [ -z "$DEPLOY_TARGET" ]; then exit; fi
-
 rm -rf ${DEPLOY_TARGET}/*
 mkdir -p ${DEPLOY_TARGET}
 
 # copy docker files to deploy target
-cp ${PRJROOT}/docker-compose-distro.yaml  ${DEPLOY_TARGET}
-cp ${PRJROOT}/dockerfile-distro           ${DEPLOY_TARGET}
+cp ${PRJROOT}/docker-compose-distro.yaml    ${DEPLOY_TARGET}
+cp ${PRJROOT}/dockerfile-distro             ${DEPLOY_TARGET}
 
 # copy scripts needed to start/stop to deploy target
-cp ${SCRIPTS}/run-distro.sh         ${DEPLOY_TARGET}
-cp ${SCRIPTS}/stop-distro.sh        ${DEPLOY_TARGET}
-cp ${SCRIPTS}/define-functions.sh   ${DEPLOY_TARGET}
-cp ${SCRIPTS}/setenv--distro.sh     ${DEPLOY_TARGET}
+cp ${SCRIPTS}/run-distro.sh                 ${DEPLOY_TARGET}
+cp ${SCRIPTS}/stop-distro.sh                ${DEPLOY_TARGET}
+cp ${SCRIPTS}/define-functions.sh           ${DEPLOY_TARGET}
+cp ${SCRIPTS}/setenv--distro-runner.sh      ${DEPLOY_TARGET}
 
 # this is a special file we alter the owner of in the run script.
-cp ${SCRIPTS}/mongod--distro.conf   ${DEPLOY_TARGET}/mongod.conf
+cp ${SCRIPTS}/mongod--distro.conf           ${DEPLOY_TARGET}/mongod.conf
 
 # Note: this 'dumps' folder is mapped onto a volume in 'docker-compose-distro.yaml' and the 'backup-local.sh'
 #       script should only be run from 'inside' the docker container, which is what 'mongodb-backup.sh' actually does.
@@ -50,6 +49,7 @@ mkdir -p ${DEPLOY_TARGET}/config
 cp ${PRJROOT}/secrets/secrets.sh    ${DEPLOY_TARGET}
 cp ${PRJROOT}/secrets/mongo.env     ${DEPLOY_TARGET}
 
+# Default app configs
 cp ${PRJROOT}/src/main/resources/config-text-distro.yaml    ${DEPLOY_TARGET}/config
 
 # copy the database backup scripts to deploy location
@@ -67,18 +67,20 @@ rsync -aAX --delete --force --progress --stats "${PRJROOT}/branding/" "${DEPLOY_
 mkdir -p ${ipfs_data}
 mkdir -p ${ipfs_staging}
 
-# Wipe previous deployment to ensure it can't be used again.
-rm -f  ${DEPLOY_TARGET}/org.subnode-0.0.1-SNAPSHOT.jar
+# Wipe previous springboot fat jar to ensure it can't be used again.
 rm -f ${PRJROOT}/target/org.subnode-0.0.1-SNAPSHOT.jar
 
 # build the project (comile source)
 cd ${PRJROOT}
 . ${SCRIPTS}/_build.sh
 
-cp ${PRJROOT}/target/org.subnode-0.0.1-SNAPSHOT.jar ${DEPLOY_TARGET}
-
 TARGET_PARENT="$(dirname "${DEPLOY_TARGET}")"
 cd ${TARGET_PARENT}
 tar cvzf quanta.tar.gz quanta-distro
 
-read -p "Build Complete. press a key"
+echo "***** IMPORTANT ****** "
+echo "REMINDER: Run docker-publish-distro.sh to actually publish the distro."
+echo "You can test locally first with ${DEPLOY_TARGET}/run-distro.sh before publishing"
+echo "********************** "
+
+read -p "Build Complete: ${TARGET_PARENT}/quanta.tar.gz"

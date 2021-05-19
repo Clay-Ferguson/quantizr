@@ -1,3 +1,6 @@
+# WE include all of JRE which is huge but in the future we can do something like this:
+# https://stackoverflow.com/questions/53669151/java-11-application-as-lightweight-docker-image
+
 FROM openjdk:11-jre
 LABEL maintainer="wclayf@gmail.com"
 
@@ -8,5 +11,6 @@ EXPOSE 8185
 ADD ./org.subnode-0.0.1-SNAPSHOT.jar /subnode/subnode.jar
 RUN sh -c 'touch /subnode/subnode.jar' 
 
+# todo-0: let users pass in their own memory arguments here!
 ENTRYPOINT ["java", "-Djava.security.egd=file:/dev/./urandom", "-jar", "/subnode/subnode.jar"]
 CMD ["-Xms512m", "-Xmx2500m"]

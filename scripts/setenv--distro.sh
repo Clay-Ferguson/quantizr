@@ -22,3 +22,5 @@ mkdir -p ${DEPLOY_TARGET}
 
 export ipfs_data=${DEPLOY_TARGET}/ipfs
 export ipfs_staging=${DEPLOY_TARGET}/ipfs/staging
+
+export QUANTA_VER=1.0.1
