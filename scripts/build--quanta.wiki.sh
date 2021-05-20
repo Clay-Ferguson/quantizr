@@ -18,18 +18,13 @@ set -x
 
 source ./setenv--quanta.wiki.sh
 
-# Wipe some existing stuff to ensure with certainty it gets rebuilt
-
-# FULL_TAR_BEGIN
-# rm -rf ${PROD_DEPLOYER_BASE}/${quanta_domain}/quanta-prod.tar
-# FULL_TAR_END
-
 cd ${PRJROOT}
 cp ${docker_compose_yaml}       ${PROD_DEPLOYER_BASE}/${quanta_domain}
 cp ${PRJROOT}/dockerfile-prod   ${PROD_DEPLOYER_BASE}/${quanta_domain}
 
-# Wipe previous deployment to ensure it can't be used again.
+# Wipe previous jars to ensure it can't be used again.
 rm -f ${PROD_DEPLOYER_BASE}/${quanta_domain}/org.subnode-0.0.1-SNAPSHOT.jar
+rm -f ${PRJROOT}/target/org.subnode-0.0.1-SNAPSHOT.jar
 
 cd ${PRJROOT}
 . ${SCRIPTS}/_build.sh
@@ -43,22 +38,6 @@ verifySuccess "Copied jar"
 # I was seeing docker fail to deploy new code EVEN after I'm sure i built new code, and ended up finding
 # this stackoverflow saying how to work around this (i.e. first 'build' then 'up') 
 # https://stackoverflow.com/questions/35231362/dockerfile-and-docker-compose-not-updating-with-new-instructions
-
-# #PROD
-# FULL_TAR_BEGIN
-# docker-compose -f ${docker_compose_yaml} build --no-cache
-# verifySuccess "Docker Compose: build"
-# FULL_TAR_END
-
-# save the docker image into a TAR file so that we can send it up to the remote Linode server
-# which can then on the remote server be loaded into registry for user on that host using the following command:
-#     docker load -i <path to image tar file>
-#
-# FULL_TAR_BEGIN
-# docker save -o ${PROD_DEPLOYER_BASE}/${quanta_domain}/quanta-prod.tar quanta-prod
-# verifySuccess "Docker Save"
-# read -p "Build Successful. press a key"
-# FULL_TAR_END
 
 cd ${PROD_DEPLOYER_BASE}/management/${quanta_domain}
 ./deploy.sh
