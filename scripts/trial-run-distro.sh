@@ -13,4 +13,4 @@ fi
 source ./setenv--distro.sh
 
 cd ${DEPLOY_TARGET}
-sudo ./run-distro.sh
+./run-distro.sh

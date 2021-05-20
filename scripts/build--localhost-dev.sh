@@ -7,7 +7,7 @@ fi
 
 ###############################################################################
 # This script is for normal localhost development. After running this script 
-# you should have an instance running at http://localhost:8182, for testing/debugging
+# you should have an instance running at http://localhost:port, for testing/debugging
 ###############################################################################
 
 # show commands as they are run.

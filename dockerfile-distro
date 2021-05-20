@@ -4,13 +4,24 @@
 FROM openjdk:11-jre
 LABEL maintainer="wclayf@gmail.com"
 
-WORKDIR /subnode
+# Note: Args cannot be set during final runtime!
+ARG PORT
+ARG PORT_DEBUG
+ARG JAR_FILE
 
-EXPOSE 8185
+# todo-0: I haven't proven yet that these values ARE being activated at runtime rather than image
+# build time, but according to the memory dialog in the app these ENV vars are NOT able to
+# be overridden by what's in the docker compose yaml. Need to figure this out.
+ENV XMS 500m
+ENV XMX 2500m
 
-ADD ./org.subnode-0.0.1-SNAPSHOT.jar /subnode/subnode.jar
-RUN sh -c 'touch /subnode/subnode.jar' 
+WORKDIR /quanta
 
-# todo-0: let users pass in their own memory arguments here!
-ENTRYPOINT ["java", "-Djava.security.egd=file:/dev/./urandom", "-jar", "/subnode/subnode.jar"]
-CMD ["-Xms512m", "-Xmx2500m"]
+EXPOSE ${PORT}
+EXPOSE ${PORT_DEBUG}
+
+COPY ${JAR_FILE} /quanta/app.jar
+RUN sh -c 'touch /quanta/app.jar' 
+
+ENTRYPOINT ["java", "-Djava.security.egd=file:/dev/./urandom", "-jar", "/quanta/app.jar"]
+CMD ["-Xms${XMS}", "-Xmx${XMX}"]

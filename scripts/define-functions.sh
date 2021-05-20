@@ -20,14 +20,29 @@ dockerCheck () {
 }
 export -f dockerCheck
 
-dockerBuildUp () {
+dockerBuild () {
     # I was seeing docker fail to deploy new code EVEN after I'm sure i built new code, and ended up finding
     # this stackoverflow saying how to work around this (i.e. first 'build' then 'up') 
     # https://stackoverflow.com/questions/35231362/dockerfile-and-docker-compose-not-updating-with-new-instructions
-    echo "dockerBuildUp"
+    echo "dockerBuild"
 
-    docker-compose -f ${docker_compose_yaml} build --no-cache
+    docker-compose -f ${docker_compose_yaml} build --no-cache \
+        --build-arg PORT="${PORT}" \
+        --build-arg PORT_DEBUG="${PORT_DEBUG}" \
+        --build-arg PORT_SEC="${PORT_SEC}" \
+        --build-arg XMS="${XMS}" \
+        --build-arg XMX="${XMX}" \
+        --build-arg JAR_FILE="${JAR_FILE}"
+        
     verifySuccess "Docker Compose: build"
+}
+export -f dockerBuild
+
+dockerUp () {
+    # I was seeing docker fail to deploy new code EVEN after I'm sure i built new code, and ended up finding
+    # this stackoverflow saying how to work around this (i.e. first 'build' then 'up') 
+    # https://stackoverflow.com/questions/35231362/dockerfile-and-docker-compose-not-updating-with-new-instructions
+    echo "dockerUp"
 
     docker-compose -f ${docker_compose_yaml} up -d
     verifySuccess "Docker Compose: up"
@@ -36,6 +51,12 @@ dockerBuildUp () {
     # echo "Sleeping 10 seconds before checking logs"
     # docker-compose -f ${docker_compose_yaml} logs $1
     # verifySuccess "Docker Compose: logs"
+}
+export -f dockerUp
+
+dockerBuildUp () {
+    dockerBuild
+    dockerUp
 }
 export -f dockerBuildUp
 

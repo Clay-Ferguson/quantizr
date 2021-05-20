@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # ===================================================================
-# Starts the Quanta server at: http://localhost:8185
+# Starts the Quanta server at: http://localhost:${PORT}
 # The only prerequisite for the machine is: docker & docker-compose
 # Docker References: https://docs.docker.com/compose/install/
 # ===================================================================
@@ -23,8 +23,10 @@ dockerBuildUp
 dockerCheck quanta-distro
 dockerCheck mongo-distro
 
+# docker-compose -f ${docker_compose_yaml} logs --tail="all" quanta-distro
+
 echo ================================================
 echo Quanta Distro Started OK!
-echo http://localhost:8185
+echo http://localhost:${PORT}
 echo ================================================
 read -p "Press any key."

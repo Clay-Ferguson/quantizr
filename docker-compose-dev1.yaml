@@ -1,4 +1,4 @@
-# Deploys an instance at http://localhost:8184
+# Deploys an instance at http://localhost:${PORT}
 # see: https://quanta.wiki/n/localhost-fediverse-testing
 
 version: '3.7'
@@ -70,8 +70,8 @@ services:
             dockerfile: ./dockerfile-dev
         container_name: quanta-dev1
         expose:
-            - '8184'
-            # - '8000'
+            - '${PORT}'
+            # - '${PORT_DEBUG}'
         volumes:
             - '${QUANTA_BASE}/tmp:/tmp'
             - '${QUANTA_BASE}/log:/log'
@@ -84,8 +84,8 @@ services:
             - $PWD:/app
         ports:
             # '[host]:[container]'
-            - '8184:8184'
-            # - '8000:8000'
+            - '${PORT}:${PORT}'
+            # - '${PORT_DEBUG}:${PORT_DEBUG}'
 
         extra_hosts:
             - "q1:127.0.0.1"
@@ -120,7 +120,7 @@ services:
 
             mongodb.port: "27019" 
             profileName: "dev" 
-            server.port: "8184"
+            server.port: "${PORT}"
             httpProtocol: "http" 
             # q1 and q2 are pointed to '127.0.0.1' in /etc/hosts file. 
             metaHost: "q1" 
@@ -138,11 +138,11 @@ services:
             mail.password: "${emailPassword}" 
             mail.host: "smtp.mailgun.org" 
             mail.from: "admin@quanta.wiki"
-            # JAVA_TOOL_OPTIONS: "-agentlib:jdwp=transport=dt_socket,address=0.0.0.0:8000,server=y,suspend=n"
+            # JAVA_TOOL_OPTIONS: "-agentlib:jdwp=transport=dt_socket,address=0.0.0.0:${PORT_DEBUG},server=y,suspend=n"
             ipfs.host: "http://ipfs-dev"
             ipfs.apiPort: "5001"
             ipfs.gatewayPort: "8080"
-            # This is the node name for a feed like this: http://localhost:8184/multiRss?id=:podcast-set to cause that feed to precache
+            # This is the node name for a feed like this: http://localhost:${PORT}/multiRss?id=:podcast-set to cause that feed to precache
             rssAggregatePreCacheNodeId_XX: ":podcast-set"
         image: quanta-dev1
         depends_on:

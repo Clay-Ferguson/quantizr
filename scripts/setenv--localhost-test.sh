@@ -20,3 +20,10 @@ export mvn_profile=prod
 export DEPLOY_TARGET=/home/clay/ferguson/subnode-run
 export ipfs_data=${DEPLOY_TARGET}/ipfs
 export ipfs_staging=${DEPLOY_TARGET}/ipfs/staging
+
+# Note: define-functions.sh is where we pass the ARGS into dockerfile
+export JAR_FILE=./org.subnode-0.0.1-SNAPSHOT.jar
+export PORT=8181
+export PORT_DEBUG=8000
+export XMS=512m
+export XMX=2500m

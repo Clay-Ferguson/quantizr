@@ -1,26 +1,26 @@
 FROM openjdk:11-jre
 LABEL maintainer="wclayf@gmail.com"
 
+ARG JAR_FILE
+ARG PORT
+ARG PORT_DEBUG
+ARG XMS
+ARG XMX
+
 RUN mkdir -p /dev-resource-base
 RUN echo "SubNode resources" > /dev-resource-base/readme.md
 
 RUN mkdir -p /loader-path
 RUN echo "SubNode classes" > /loader-path/readme.md
 
-WORKDIR /subnode
+WORKDIR /quanta
 
-# Instead of having a second dockerfile just for opening port 8182 vs 8183 let's just open both always,
-# but there's never any one app instance that needs BOTH these ports open.
-EXPOSE 8182
-EXPOSE 8183
-EXPOSE 8184
-
-EXPOSE 8000
+EXPOSE ${PORT}
+EXPOSE ${PORT_DEBUG}
 
 # This 'target' path assumes we're running docker from the source project root 
-ADD target/org.subnode-0.0.1-SNAPSHOT.jar /subnode/subnode.jar
-RUN sh -c 'touch /subnode/subnode.jar' 
-# VOLUME ["/subnode-tmp", "/subnode-log"]
+COPY ${JAR_FILE} /quanta/app.jar
+RUN sh -c 'touch /quanta/app.jar' 
 
-ENTRYPOINT ["java", "-Dloader.path=/loader-path", "-Djava.security.egd=file:/dev/./urandom", "-jar", "/subnode/subnode.jar"]
-CMD ["-Xms512m", "-Xmx2500m"]
+ENTRYPOINT ["java", "-Dloader.path=/loader-path", "-Djava.security.egd=file:/dev/./urandom", "-jar", "/quanta/app.jar"]
+CMD ["-Xms${XMS}", "-Xmx${XMX}"]

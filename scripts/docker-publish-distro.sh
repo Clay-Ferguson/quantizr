@@ -6,8 +6,8 @@ fi
 
 source ./setenv--distro.sh
 
-# to create image
-docker build -f ${DEPLOY_TARGET}/dockerfile-distro -t subnode/repo:quanta${QUANTA_VER} ${DEPLOY_TARGET}
+# cd ${DEPLOY_TARGET}
+# docker build -f ${DEPLOY_TARGET}/dockerfile-distro -t subnode/repo:quanta${QUANTA_VER} ${DEPLOY_TARGET}
 
 # now it will show up here
 # docker images
@@ -23,4 +23,4 @@ docker login
 # now push it up to public docker repo!
 docker push subnode/repo:quanta${QUANTA_VER}
 
-read -p "Docker push complete. press a key."
+read -p "Docker push complete: subnode/repo:quanta${QUANTA_VER} press a key."

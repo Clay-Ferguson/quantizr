@@ -1,12 +1,18 @@
 FROM openjdk:11-jre
 LABEL maintainer="wclayf@gmail.com"
 
-WORKDIR /subnode
+ARG JAR_FILE
+ARG PORT
+ARG PORT_DEBUG
+ARG XMS
+ARG XMX
 
-EXPOSE 8181
+WORKDIR /quanta
 
-COPY ./org.subnode-0.0.1-SNAPSHOT.jar /subnode/app.jar
-RUN sh -c 'touch /subnode/app.jar' 
+EXPOSE ${PORT}
 
-ENTRYPOINT ["java", "-Djava.security.egd=file:/dev/./urandom", "-jar", "/subnode/app.jar"]
-CMD ["-Xms512m", "-Xmx2500m"]
+COPY ${JAR_FILE} /quanta/app.jar
+RUN sh -c 'touch /quanta/app.jar' 
+
+ENTRYPOINT ["java", "-Djava.security.egd=file:/dev/./urandom", "-jar", "/quanta/app.jar"]
+CMD ["-Xms${XMS}", "-Xmx${XMX}"]

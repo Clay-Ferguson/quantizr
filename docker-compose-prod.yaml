@@ -51,8 +51,8 @@ services:
             dockerfile: dockerfile-prod
         container_name: quanta-prod
         expose:
-            - '443'
-            - '80'
+            - '${PORT_SEC}'
+            - '${PORT}'
             
             # Uncomment for debugging...
             # - '8000'
@@ -67,8 +67,8 @@ services:
              # This maps '/app' to be the current folder where you run docker from (where the yaml file is normally)
             - $PWD:/app
         ports:
-            - '443:443'
-            - '80:80'
+            - '${PORT_SEC}:${PORT_SEC}'
+            - '${PORT}:${PORT}'
 
             # Uncomment for debugging...
             # - '8000:8000'
@@ -89,7 +89,7 @@ services:
             mongodb.host: "mongo-prod" 
             mongodb.port: "27017"
             profileName: "prod" 
-            server.port: "443" 
+            server.port: "${PORT_SEC}" 
             httpProtocol: "https" 
             metaHost: "${quanta_domain}" 
             reSaveAll: "false"
@@ -122,7 +122,7 @@ services:
             mail.host: "smtp.mailgun.org" 
             mail.from: "admin@quanta.wiki"
 
-            # This is the node name for a feed like this: http://localhost:8182/multiRss?id=:podcast-set to cause that feed to precache
+            # This is the node name for a feed like this: http://localhost/multiRss?id=:podcast-set to cause that feed to precache
             rssAggregatePreCacheNodeId: ":idw"
 
         image: quanta-prod

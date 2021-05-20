@@ -22,3 +22,11 @@ export PROD_DEPLOYER_BASE=/home/clay/ferguson/scripts/linode
 export docker_compose_yaml=docker-compose-prod.yaml
 
 export mvn_profile=prod
+
+# Note: define-functions.sh is where we pass the ARGS into dockerfile
+export JAR_FILE=./org.subnode-0.0.1-SNAPSHOT.jar
+export PORT=80
+export PORT_SEC=443
+export PORT_DEBUG=8000
+export XMS=3000m
+export XMX=6000m

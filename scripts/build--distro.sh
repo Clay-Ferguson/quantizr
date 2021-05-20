@@ -27,8 +27,9 @@ verifySuccess "Cleaned deploy target"
 
 mkdir -p ${DEPLOY_TARGET}
 
-# copy docker files to deploy target
-cp ${PRJROOT}/docker-compose-distro.yaml    ${DEPLOY_TARGET}
+# copy over the build-specific yaml (only in place temporarily)
+cp ${PRJROOT}/docker-compose-distro-build.yaml ${DEPLOY_TARGET}/docker-compose-distro.yaml
+cp ${PRJROOT}/dockerfile-distro ${DEPLOY_TARGET}
 
 # copy scripts needed to start/stop to deploy target
 cp ${SCRIPTS}/run-distro.sh                 ${DEPLOY_TARGET}
@@ -75,9 +76,29 @@ rm -f ${PRJROOT}/target/org.subnode-0.0.1-SNAPSHOT.jar
 cd ${PRJROOT}
 . ${SCRIPTS}/_build.sh
 
+# Create Image
+#
+# Since we create the image we can also now go run the app directly from ${DEPLOY_TARGET} on this machine 
+# if we wanted to and since the image is local it won't be pulling from Public Docker Repo, but as 
+# stated in the note below once we do publish to the repo then the TAR file we just created in this script
+# will work on all machines anywhere across the web.
+cp ${PRJROOT}/target/org.subnode-0.0.1-SNAPSHOT.jar ${DEPLOY_TARGET}
+verifySuccess "JAR copied to build distro"
+
+# This builds the image locally, and saves it into local docker repository, so that 'docker-compose up',
+# is all that's required.
+cd ${DEPLOY_TARGET}
+dockerBuild
+
+# Now fix up the DEPLOY_TARGET and for end users, and zip it
+cp ${PRJROOT}/docker-compose-distro.yaml ${DEPLOY_TARGET}
+rm -f ${DEPLOY_TARGET}/dockerfile-distro
+rm -f ${DEPLOY_TARGET}/org.subnode-0.0.1-SNAPSHOT.jar
+
 TARGET_PARENT="$(dirname "${DEPLOY_TARGET}")"
 cd ${TARGET_PARENT}
 tar cvzf ${PRJROOT}/distro/quanta${QUANTA_VER}.tar.gz quanta-distro
+verifySuccess "TAR created"
 
 echo
 echo "==================== IMPORTANT ======================================="

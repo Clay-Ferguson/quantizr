@@ -23,12 +23,13 @@ services:
         image: mongo:4.0
 
     quanta-distro:
-        # build: 
-        #     context: .
-        #     dockerfile: dockerfile-distro
+        # Tip: If you run 'docker-compose build' with this 'build' yaml property here, then as long as the
+        # dockerfile-distro and the springboot JAR are in the current folder it will succeed and update 
+        # your docker images to contain the image: subnode/repo:quanta${QUANTA_VER}, rather than attempting to
+        # download the image from the docker repository.
         container_name: quanta-distro
         expose:
-            - "8185"
+            - "${PORT}"
             # Uncomment for debugging...
             #- '8000'
         # WARNING: volumes will not handle '~' character for home folder. Do not use.
@@ -40,12 +41,14 @@ services:
              # This maps '/app' to be the current folder where you run docker from (where the yaml file is normally)
             - $PWD:/app
         ports:
-            - "8185:8185"
+            - "${PORT}:${PORT}"
             # Uncomment for debugging...
             #- '8000:8000'
         networks:
             - net-distro
         environment:
+            XMS: "${XMS}"
+            XMX: "${XMX}"
             mongoAdminPassword: "${subnodePassword}"
             mongoSecurity: "true"
 
@@ -60,7 +63,7 @@ services:
             mongodb.host: "mongo-distro" 
             mongodb.port: "27020"
             profileName: "prod" 
-            server.port: "8185" 
+            server.port: "${PORT}" 
             httpProtocol: "http" 
             metaHost: "localhost" 
             reSaveAll: "false"
@@ -80,7 +83,6 @@ services:
             xxxipfs.apiPort: "5001"
             xxxipfs.gatewayPort: "8080"
         
-        # Image is from public docker hub repository
         image: subnode/repo:quanta${QUANTA_VER}
         depends_on:
             - mongo-distro
