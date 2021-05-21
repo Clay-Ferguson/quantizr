@@ -8,6 +8,18 @@ The only prerequisite is that you need to have `docker-compose` installed first.
 
 NOTE: You should edit the password in `mongo.env` and `secrets.sh`, before your first run, and that password will become your `admin` user password which you can use to login as the `admin` user. This same password will be securing your MongoDB instance and will also be the admin password for the Web App.
 
+### Linux Commands 
+```sh
+# Download distro from github
+wget --no-check-certificate --content-disposition \
+     https://github.com/Clay-Ferguson/quantizr/tree/master/distro/quanta1.0.3.tar.gz
+
+# Unzip to create quanta-distro folder, and run from there
+tar vxf quanta1.0.3.tar.gz
+cd quanta-distro
+./run-distro
+```
+
 ****
 
 **Welcome to the Fediverse!**

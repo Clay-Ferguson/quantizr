@@ -85,7 +85,9 @@ rm -f ${DEPLOY_TARGET}/org.subnode-0.0.1-SNAPSHOT.jar
 
 TARGET_PARENT="$(dirname "${DEPLOY_TARGET}")"
 cd ${TARGET_PARENT}
-tar cvzf ${PRJROOT}/distro/quanta${QUANTA_VER}.tar.gz quanta-distro
+
+tar -zcvf ${PRJROOT}/distro/quanta${QUANTA_VER}.tar.gz quanta-distro
+#NOTE: Extraction command will be: `tar vxf quanta1.0.3.tar.gz`
 verifySuccess "TAR created"
 
 echo
