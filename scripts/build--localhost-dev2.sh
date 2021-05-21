@@ -10,10 +10,6 @@
 # appended to make them unique for the 'second' server, and the port numbers in these
 # configs will be different, but everything else will be about the same.
 
-if [ -f ./vscode-cwd.sh ]; then
-  source ./vscode-cwd.sh
-fi
-
 source ./setenv--localhost-dev2.sh
 
 sudo mkdir -p ${MONGO_BASE}

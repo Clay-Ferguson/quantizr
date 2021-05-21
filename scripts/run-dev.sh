@@ -1,9 +1,5 @@
 #!/bin/bash
 
-if [ -f ./vscode-cwd.sh ]; then
-  source ./vscode-cwd.sh
-fi
-
 clear
 # show commands as they are run.
 # set -x

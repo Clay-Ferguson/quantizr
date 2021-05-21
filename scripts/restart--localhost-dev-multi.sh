@@ -5,10 +5,6 @@
 # we can get away with just compiling the new classes, and then restarting docker!
 # This makes for a very rapid development cycle (edit->test->edit->test, etc.)
 
-if [ -f ./vscode-cwd.sh ]; then
-  source ./vscode-cwd.sh
-fi
-
 clear
 # show commands as they are run.
 # set -x

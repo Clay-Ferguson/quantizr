@@ -14,9 +14,6 @@ echo "========================================"
 #save stating folder
 cwd=$(pwd)
 
-if [ -f ./vscode-cwd.sh ]; then
-  source ./vscode-cwd.sh
-fi
 . ./build--localhost-dev1.sh
 
 #restore starting folder
@@ -28,9 +25,6 @@ echo "========================================"
 
 # read -p "About to start second instance. Connect debugger now if you need to... (press any key)"
 
-if [ -f ./vscode-cwd.sh ]; then
-  source ./vscode-cwd.sh
-fi
 . ./build--localhost-dev2.sh
 
 # read -p "Build and Multi-Start Complete. press a key"

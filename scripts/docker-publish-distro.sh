@@ -1,9 +1,5 @@
 #!/bin/bash
 
-if [ -f ./vscode-cwd.sh ]; then
-  source ./vscode-cwd.sh
-fi
-
 source ./setenv--distro.sh
 
 # cd ${DEPLOY_TARGET}

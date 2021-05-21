@@ -1,10 +1,6 @@
 #!/bin/bash
 # see: https://quanta.wiki/n/localhost-fediverse-testing
 
-if [ -f ./vscode-cwd.sh ]; then
-  source ./vscode-cwd.sh
-fi
-
 ###############################################################################
 # This script is for normal localhost development. After running this script 
 # you should have an instance running at http://localhost:8184, for testing/debugging
