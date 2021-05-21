@@ -17,7 +17,7 @@ wget --no-check-certificate --content-disposition \
 # Unzip to create quanta-distro folder, and run from there
 tar vxf quanta1.0.3.tar.gz
 cd quanta-distro
-./run-distro
+./run-distro.sh
 ```
 
 ****
