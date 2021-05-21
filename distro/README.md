@@ -8,8 +8,15 @@ The only prerequisite is that you need to have `docker-compose` installed first.
 
 NOTE: You should edit the password in `mongo.env` and `secrets.sh`, before your first run, and that password will become your `admin` user password which you can use to login as the `admin` user. This same password will be securing your MongoDB instance and will also be the admin password for the Web App.
 
-### Linux Commands 
+
+### Linux Commands
+
+It's probably easier to use the GUI to download the Quanta distro tar and extract it, but here are the commands for the terminal just in case it helps:
+
 ```sh
+# To install docker (in case you don't have it already)
+sudo apt install docker-compose
+
 # Download distro from github
 wget --no-check-certificate --content-disposition \
      https://github.com/Clay-Ferguson/quantizr/tree/master/distro/quanta1.0.3.tar.gz
@@ -17,8 +24,18 @@ wget --no-check-certificate --content-disposition \
 # Unzip to create quanta-distro folder, and run from there
 tar vxf quanta1.0.3.tar.gz
 cd quanta-distro
-./run-distro.sh
+
+# Make sure scripts are executable 
+# (todo-0: Is this always necessary?)
+find . -name "*.sh" -execdir chmod u+x {} +
+
+# Run Quanta WebApp (at port 8185)
+sudo ./run-distro.sh
 ```
+
+The following tip is for less-technical users, but most people will be running from a Linode instance or similar and so it won't apply:
+
+TIP: For the most secure environment run this in a VirtualBox instance and then open port 8185 by selecting `Settings -> Network -> Advanced -> Port Forwarding` and then adding a TCP Protocol entry that maps Host port 8185 to Guest Port 8185. Then you can browse the app from your host machine. Of course to make the app visible to the rest of the internet you'd need to open this port on your Router also.
 
 ****
 
