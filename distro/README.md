@@ -11,15 +11,17 @@ NOTE: You should edit the password in `mongo.env` and `secrets.sh`, before your 
 
 ### Linux Commands
 
-It's probably easier to use the GUI to download the Quanta distro tar and extract it, but here are the commands for the terminal just in case it helps:
-
 ```sh
 # To install docker (in case you don't have it already)
 sudo apt install docker-compose
 
 # Download distro from github
-wget --no-check-certificate --content-disposition \
-     https://github.com/Clay-Ferguson/quantizr/tree/master/distro/quanta1.0.3.tar.gz
+# (Note: The url here is obtained by right-click on 'view raw' in the github)
+curl -o quanta1.0.3.tar.gz \
+     -LJO https://github.com/Clay-Ferguson/quantizr/blob/master/distro/quanta1.0.3.tar.gz?raw=true
+
+# Look at this output to be sure you got the TAR (not an HTML)
+file quanta1.0.3.tar.gz
 
 # Unzip to create quanta-distro folder, and run from there
 tar vxf quanta1.0.3.tar.gz
