@@ -28,8 +28,6 @@ services:
             - '${SECRETS}/mongo.env'
         
         network_mode: host
-        # networks:
-        #    - qnet-dev
 
         # Always specify version of mongo. When it upgrades automatically there can be database issues that need to be resolved
         # and we don't want that happening unexpectedly
@@ -58,8 +56,6 @@ services:
     #         # - "5001:5001"
 
     #     network_mode: host
-    #     # networks:
-    #     #     - qnet-dev
 
     #     image: ipfs/go-ipfs:v0.7.0
 
@@ -92,8 +88,6 @@ services:
             - "q2:127.0.0.1"
 
         network_mode: host 
-        # networks:
-        #     - qnet-dev
 
         environment:
 

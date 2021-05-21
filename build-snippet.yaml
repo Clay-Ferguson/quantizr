@@ -1,0 +1,6 @@
+        
+        # This snippet is auto-inserted by scripts into larger yaml. Don't modify the indentation!
+        build: 
+            context: .
+            dockerfile: dockerfile-distro
+            

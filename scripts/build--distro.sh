@@ -27,8 +27,11 @@ verifySuccess "Cleaned deploy target"
 
 mkdir -p ${DEPLOY_TARGET}
 
-# copy over the build-specific yaml (only in place temporarily)
-cp ${PRJROOT}/docker-compose-distro-build.yaml ${DEPLOY_TARGET}/docker-compose-distro.yaml
+cd ${PRJROOT}
+cp ${PRJROOT}/docker-compose-distro.yaml ${DEPLOY_TARGET}
+# Tip: This replaces the "#build-snippet" tag in the yaml with the content of file build-snippet.yaml
+sed -i -e "/#build-snippet/rbuild-snippet.yaml" ${DEPLOY_TARGET}/docker-compose-distro.yaml
+
 cp ${PRJROOT}/dockerfile-distro ${DEPLOY_TARGET}
 
 # copy scripts needed to start/stop to deploy target
