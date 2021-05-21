@@ -54,14 +54,6 @@ cp ${PRJROOT}/secrets/mongo.env     ${DEPLOY_TARGET}
 # Default app configs
 cp ${PRJROOT}/src/main/resources/config-text-distro.yaml    ${DEPLOY_TARGET}/config
 
-# copy the database backup scripts to deploy location
-# cp ${SCRIPTS}/backup--localhost-test.sh   ${DEPLOY_TARGET}/backup--localhost-test.sh
-# cp ${SCRIPTS}/_backup--localhost-test.sh  ${DEPLOY_TARGET}/dumps/_backup--localhost-test.sh
-
-# # copy the database restore scripts to deploy target
-# cp ${SCRIPTS}/restore--localhost-test.sh  ${DEPLOY_TARGET}/restore--localhost-test.sh
-# cp ${SCRIPTS}/_restore--localhost-test.sh ${DEPLOY_TARGET}/dumps/_restore--localhost-test.sh
-
 # copy our banding folder to deploy target
 rsync -aAX --delete --force --progress --stats "${PRJROOT}/branding/" "${DEPLOY_TARGET}/branding/"
 
