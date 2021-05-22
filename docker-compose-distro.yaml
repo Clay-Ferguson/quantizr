@@ -70,7 +70,7 @@ services:
             profileName: "prod" 
             server.port: "${PORT}" 
             httpProtocol: "http" 
-            metaHost: "localhost" 
+            metaHost: "${quanta_domain}" 
             reSaveAll: "false"
             forceIndexRebuild: "false"
             allowFileSystemSearch: "false" 

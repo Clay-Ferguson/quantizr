@@ -8,15 +8,25 @@ The only prerequisite is that you need to have `docker-compose` installed first.
 
 NOTE: You should edit the password in `mongo.env` and `secrets.sh`, before your first run, and that password will become your `admin` user password which you can use to login as the `admin` user. This same password will be securing your MongoDB instance and will also be the admin password for the Web App.
 
+### IMPORTANT: 
+
+Be sure to update this line in setenv--distro.sh to have your own domain/ip:
+    
+    export quanta_domain=localhost
+
 
 ### Linux Commands
 
 ```sh
 # To install docker (in case you don't have it already)
+# This command will install a recent enough docker-compose on # Ubuntu 20.04, but if you're on some other Linux 
+# version you'll need to install support for docker-compose yaml version 3.7 
+sudo apt install docker
 sudo apt install docker-compose
 
 # Download distro from github
-# (Note: The url here is obtained by right-click on 'view raw' in the github)
+# (Note: The url here is obtained by right-click on 'view raw' in the github, and so you could also get this
+# file using by browsing to github for it if you want)
 curl -o quanta1.0.3.tar.gz \
      -LJO https://github.com/Clay-Ferguson/quantizr/blob/master/distro/quanta1.0.3.tar.gz?raw=true
 
