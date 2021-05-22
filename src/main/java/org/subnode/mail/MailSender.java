@@ -13,7 +13,7 @@ import javax.mail.internet.MimeMessage;
 import org.subnode.config.AppProp;
 import org.subnode.util.ExUtil;
 import com.sun.mail.smtp.SMTPTransport;
-
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,6 +43,7 @@ public class MailSender implements TransportListener {
 	 * should be called after mail is sent
 	 */
 	public void init() {
+		if (!mailEnabled()) return;
 		log.trace("MailSender.init()");
 
 		String mailHost = appProp.getMailHost();
@@ -78,11 +79,16 @@ public class MailSender implements TransportListener {
 		}
 	}
 
+	public boolean mailEnabled() {
+		return !StringUtils.isEmpty(appProp.getMailPassword());
+	}
+
 	public static Object getLock() {
 		return lock;
 	}
 
 	public void close() {
+		if (!mailEnabled()) return;
 		if (transport != null) {
 			try {
 				log.trace("closing transport");
@@ -96,6 +102,8 @@ public class MailSender implements TransportListener {
 	}
 
 	public void sendMail(String sendToAddress, String fromAddress, String content, String subjectLine) {
+		if (!mailEnabled()) return;
+		
 		if (fromAddress == null) {
 			fromAddress = appProp.getMailFrom();
 		}

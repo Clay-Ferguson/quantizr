@@ -4,7 +4,10 @@
 # to an email server, but won't be required if you're running your peer as a single
 # user instance, or just doing localhost p2p testing/development.
 export emailPassword=
-export devEmail=
+
+# Warning: To be able to create our test accounts we need this email prop defined even
+# even if it's a dummy string
+export devEmail=somebody@someserver.com
 
 # admin password: login to web app with "admin/password" credentials. Note also that
 # this matches the password in mongo.env, and so the two are synced.

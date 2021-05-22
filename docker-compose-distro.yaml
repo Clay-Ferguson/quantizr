@@ -28,10 +28,6 @@ services:
         # "build-snippet" (with hash tag) is a replacement tag used by scripts.
         #build-snippet
 
-        # Tip: If you run 'docker-compose build' with this 'build' yaml property here, then as long as the
-        # dockerfile-distro and the springboot JAR are in the current folder it will succeed and update 
-        # your docker images to contain the image: subnode/repo:quanta${QUANTA_VER}, rather than attempting to
-        # download the image from the docker repository.
         container_name: quanta-distro
         expose:
             - "${PORT}"
