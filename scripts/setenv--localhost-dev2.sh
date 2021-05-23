@@ -27,7 +27,7 @@ export JAR_FILE=target/org.subnode-0.0.1-SNAPSHOT.jar
 export PORT=8183
 export PORT_DEBUG=8001
 export XMS=512m
-export XMX=2500m
+export XMX=2g
 
 export MONGO_BASE=/home/clay/mongo2
 export QUANTA_BASE=/home/clay/quanta-localhost-dev2

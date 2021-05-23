@@ -17,6 +17,7 @@ source ./setenv--quanta.wiki.sh
 cd ${PRJROOT}
 cp ${docker_compose_yaml}       ${PROD_DEPLOYER_BASE}/${quanta_domain}
 cp ${PRJROOT}/dockerfile-prod   ${PROD_DEPLOYER_BASE}/${quanta_domain}
+cp ${PRJROOT}/entrypoint.sh     ${PROD_DEPLOYER_BASE}/${quanta_domain}
 
 # Wipe previous jars to ensure it can't be used again.
 rm -f ${PROD_DEPLOYER_BASE}/${quanta_domain}/org.subnode-0.0.1-SNAPSHOT.jar

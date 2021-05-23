@@ -3,6 +3,7 @@ package org.subnode.service;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import com.mongodb.client.MongoDatabase;
@@ -33,6 +34,8 @@ import org.subnode.util.Const;
 import org.subnode.util.ExUtil;
 import org.subnode.util.ThreadLocals;
 import org.subnode.util.XString;
+import java.lang.management.ManagementFactory;
+import java.lang.management.RuntimeMXBean;
 
 /**
  * Service methods for System related functions. Admin functions.
@@ -94,8 +97,8 @@ public class SystemService {
 		// userManagerService.cleanUserAccounts();
 
 		/*
-		 * Create map to hold all user account storage statistics which gets updated by
-		 * the various processing in here and then written out in 'writeUserStats' below
+		 * Create map to hold all user account storage statistics which gets updated by the various
+		 * processing in here and then written out in 'writeUserStats' below
 		 */
 		final HashMap<ObjectId, UserStats> statsMap = new HashMap<ObjectId, UserStats>();
 
@@ -179,6 +182,13 @@ public class SystemService {
 
 		if (!StringUtils.isEmpty(appProp.getIPFSApiHostAndPort())) {
 			sb.append(ipfsService.getRepoStat());
+		}
+
+		RuntimeMXBean runtimeMxBean = ManagementFactory.getRuntimeMXBean();
+		List<String> arguments = runtimeMxBean.getInputArguments();
+		sb.append("\nJava VM args:\n");
+		for (String arg : arguments) {
+			sb.append(arg + "\n");
 		}
 
 		// oops this is worthless, because it's inside the docker image, but I'm leaving

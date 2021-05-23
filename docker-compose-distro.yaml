@@ -1,5 +1,5 @@
 # Docker Compose file for a basic Quanta Distro
-# (for now IPFS is omitted (todo-0: make it optional))
+# (for now IPFS is omitted)
 
 version: '3.7'
 services:

@@ -26,6 +26,7 @@ cp ${PRJROOT}/docker-compose-distro.yaml ${DEPLOY_TARGET}
 sed -i -e "/#build-snippet/rbuild-snippet.yaml" ${DEPLOY_TARGET}/docker-compose-distro.yaml
 
 cp ${PRJROOT}/dockerfile-distro ${DEPLOY_TARGET}
+cp ${PRJROOT}/entrypoint.sh ${DEPLOY_TARGET}
 
 # copy scripts needed to start/stop to deploy target
 cp ${SCRIPTS}/run-distro.sh                 ${DEPLOY_TARGET}

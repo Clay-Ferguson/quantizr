@@ -28,5 +28,5 @@ export JAR_FILE=./org.subnode-0.0.1-SNAPSHOT.jar
 export PORT=80
 export PORT_SEC=443
 export PORT_DEBUG=8000
-export XMS=3000m
-export XMX=6000m
+export XMS=1g
+export XMX=6g

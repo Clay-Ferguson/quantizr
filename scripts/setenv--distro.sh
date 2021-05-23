@@ -29,5 +29,5 @@ export QUANTA_VER=1.0.3
 export JAR_FILE=./org.subnode-0.0.1-SNAPSHOT.jar
 export PORT=8185
 export PORT_DEBUG=8000
-export XMS=1000m
-export XMX=2500m
+export XMS=513m
+export XMX=3g

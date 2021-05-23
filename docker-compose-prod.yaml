@@ -75,6 +75,9 @@ services:
         networks:
             - net-prod
         environment:
+            XMS: "${XMS}"
+            XMX: "${XMX}"
+            
             mongoAdminPassword: "${subnodePassword}"
             mongoSecurity: "true"
 

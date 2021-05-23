@@ -8,12 +8,8 @@ LABEL maintainer="wclayf@gmail.com"
 ARG PORT
 ARG PORT_DEBUG
 ARG JAR_FILE
-
-# todo-0: I haven't proven yet that these values ARE being activated at runtime rather than image
-# build time, but according to the memory dialog in the app these ENV vars are NOT able to
-# be overridden by what's in the docker compose yaml. Need to figure this out.
-ENV XMS 500m
-ENV XMX 2500m
+ARG XMS
+ARG XMX
 
 WORKDIR /quanta
 
@@ -23,5 +19,9 @@ EXPOSE ${PORT_DEBUG}
 COPY ${JAR_FILE} /quanta/app.jar
 RUN sh -c 'touch /quanta/app.jar' 
 
-ENTRYPOINT ["java", "-Djava.security.egd=file:/dev/./urandom", "-jar", "/quanta/app.jar"]
-CMD ["-Xms${XMS}", "-Xmx${XMX}"]
+COPY ./entrypoint.sh /quanta/entrypoint.sh
+RUN ["chmod", "+x", "/quanta/entrypoint.sh"]
+ENTRYPOINT ["/bin/bash", "-c", "/quanta/entrypoint.sh"]
+
+# This works too but it's more flexible to just put the commands in 'entrypoint.sh'
+# ENTRYPOINT ["/bin/bash", "-c", "java -Xms${XMS} -Xmx${XMX} -Dloader.path=/loader-path -Djava.security.egd=file:/dev/./urandom -jar /quanta/app.jar"]

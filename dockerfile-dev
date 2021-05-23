@@ -18,9 +18,12 @@ WORKDIR /quanta
 EXPOSE ${PORT}
 EXPOSE ${PORT_DEBUG}
 
-# This 'target' path assumes we're running docker from the source project root 
 COPY ${JAR_FILE} /quanta/app.jar
 RUN sh -c 'touch /quanta/app.jar' 
 
-ENTRYPOINT ["java", "-Dloader.path=/loader-path", "-Djava.security.egd=file:/dev/./urandom", "-jar", "/quanta/app.jar"]
-CMD ["-Xms${XMS}", "-Xmx${XMX}"]
+COPY ./entrypoint.sh /quanta/entrypoint.sh
+RUN ["chmod", "+x", "/quanta/entrypoint.sh"]
+ENTRYPOINT ["/bin/bash", "-c", "/quanta/entrypoint.sh"]
+
+# This works too but it's more flexible to just put the commands in 'entrypoint.sh'
+# ENTRYPOINT ["/bin/bash", "-c", "java -Xms${XMS} -Xmx${XMX} -Dloader.path=/loader-path -Djava.security.egd=file:/dev/./urandom -jar /quanta/app.jar"]
