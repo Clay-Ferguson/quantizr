@@ -30,16 +30,9 @@ sudo apt install docker-compose
 curl -o quanta1.0.3.tar.gz \
      -LJO https://github.com/Clay-Ferguson/quantizr/blob/master/distro/quanta1.0.3.tar.gz?raw=true
 
-# Look at this output to be sure you got the TAR (not an HTML)
-file quanta1.0.3.tar.gz
-
 # Unzip to create quanta-distro folder, and run from there
 tar vxf quanta1.0.3.tar.gz
 cd quanta-distro
-
-# Make sure scripts are executable 
-# (todo-0: Is this always necessary?)
-find . -name "*.sh" -execdir chmod u+x {} +
 
 # Run Quanta WebApp (at port 8185)
 sudo ./run-distro.sh
