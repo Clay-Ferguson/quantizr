@@ -63,7 +63,7 @@ services:
     quanta-dev1:
         build: 
             context: .
-            dockerfile: ./dockerfile-dev
+            dockerfile: ./dockerfile
         container_name: quanta-dev1
         expose:
             - '${PORT}'

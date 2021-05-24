@@ -1,17 +1,21 @@
+# WE include all of JRE which is huge but in the future we can do something like this:
+# https://stackoverflow.com/questions/53669151/java-11-application-as-lightweight-docker-image
+
 FROM openjdk:11-jre
 LABEL maintainer="wclayf@gmail.com"
 
-ARG JAR_FILE
+# Note: Args cannot be set during final runtime!
 ARG PORT
 ARG PORT_DEBUG
+ARG JAR_FILE
 ARG XMS
 ARG XMX
 
 RUN mkdir -p /dev-resource-base
-RUN echo "SubNode resources" > /dev-resource-base/readme.md
+RUN echo "dummy" > /dev-resource-base/dummy.txt
 
 RUN mkdir -p /loader-path
-RUN echo "SubNode classes" > /loader-path/readme.md
+RUN echo "dummy" > /loader-path/dummy.txt
 
 WORKDIR /quanta
 

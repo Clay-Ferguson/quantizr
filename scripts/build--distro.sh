@@ -25,7 +25,7 @@ cp ${PRJROOT}/docker-compose-distro.yaml ${DEPLOY_TARGET}
 # Tip: This replaces the "#build-snippet" tag in the yaml with the content of file build-snippet.yaml
 sed -i -e "/#build-snippet/rbuild-snippet.yaml" ${DEPLOY_TARGET}/docker-compose-distro.yaml
 
-cp ${PRJROOT}/dockerfile-distro ${DEPLOY_TARGET}
+cp ${PRJROOT}/dockerfile ${DEPLOY_TARGET}
 cp ${PRJROOT}/entrypoint.sh ${DEPLOY_TARGET}
 
 # copy scripts needed to start/stop to deploy target
@@ -81,7 +81,7 @@ dockerBuild
 
 # Now fix up the DEPLOY_TARGET and for end users, and zip it
 cp ${PRJROOT}/docker-compose-distro.yaml ${DEPLOY_TARGET}
-rm -f ${DEPLOY_TARGET}/dockerfile-distro
+rm -f ${DEPLOY_TARGET}/dockerfile
 rm -f ${DEPLOY_TARGET}/org.subnode-0.0.1-SNAPSHOT.jar
 
 TARGET_PARENT="$(dirname "${DEPLOY_TARGET}")"

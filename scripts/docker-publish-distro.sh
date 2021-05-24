@@ -3,7 +3,7 @@
 source ./setenv--distro.sh
 
 # cd ${DEPLOY_TARGET}
-# docker build -f ${DEPLOY_TARGET}/dockerfile-distro -t subnode/repo:quanta${QUANTA_VER} ${DEPLOY_TARGET}
+# docker build -f ${DEPLOY_TARGET}/dockerfile -t subnode/repo:quanta${QUANTA_VER} ${DEPLOY_TARGET}
 
 # now it will show up here
 # docker images
