@@ -33,32 +33,6 @@ services:
         # and we don't want that happening unexpectedly
         image: mongo:4.0
 
-    # https://hub.docker.com/r/ipfs/go-ipfs/
-    # ipfs-dev1: 
-    #     container_name: ipfs-dev1 
-    #     environment:
-    #         # IPFS_PROFILE options (lowpower | server)
-    #         routing: "dhtclient" 
-    #         IPFS_PROFILE: "lowpower" 
-    #         IPFS_PATH: "/data/ipfs"
-    #         # LIBP2P_FORCE_PNET: 1
-    #     # expose:
-    #     #    - '4001'
-    #     #     - '8081'
-    #     #    - '5001'
-    #     # WARNING: volumes will not handle '~' character for home folder. Do not use.
-    #     volumes:
-    #         - '${ipfs_staging}:/export'
-    #         - '${ipfs_data}:/data/ipfs'
-    #     # ports:
-    #         # - "4001:4001"
-    #         # - "127.0.0.1:8081:8080"
-    #         # - "5001:5001"
-
-    #     network_mode: host
-
-    #     image: ipfs/go-ipfs:v0.7.0
-
     # NOTE: This is visible as https://quanta-dev from the other machine
     quanta-dev1:
         build: 
@@ -142,6 +116,3 @@ services:
         image: quanta-dev1
         depends_on:
             - mongo-dev1
-            #- ipfs-dev1
-
-
