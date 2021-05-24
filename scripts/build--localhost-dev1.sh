@@ -12,6 +12,8 @@ clear
 
 source ./setenv--localhost-dev1.sh
 
+./gen-mongod-conf-file.sh ${SECRETS}/mongod--localhost-dev1.conf
+
 makeDirs
 rm -rf ${QUANTA_BASE}/log/*
 

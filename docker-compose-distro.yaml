@@ -13,7 +13,7 @@ services:
             - "${DEPLOY_TARGET}/mongod.conf:/etc/mongod.conf"
         command: mongod --config /etc/mongod.conf
         ports:
-            - "27020:27020"
+            - "${MONGO_PORT}:${MONGO_PORT}"
         env_file:
             - "${DEPLOY_TARGET}/mongo.env"
         networks:
@@ -24,9 +24,16 @@ services:
 
     quanta-distro:
         
-        # ***** DO NOT DELETE ****
+        # ******** DO NOT DELETE *******
         # "build-snippet" (with hash tag) is a replacement tag used by scripts.
+        
         #build-snippet
+
+        # NOTE: To redeploy a new fat-jar, you can simply drop the JAR into the folder, and then uncomment
+        # theis "build:" section to activate the docker file and regenerate from it.
+        # build: 
+        #    context: .
+        #    dockerfile: dockerfile
 
         container_name: quanta-distro
         expose:
@@ -61,8 +68,8 @@ services:
                 dan:${testPassword}:${devEmail}
 
             spring.config.location: "classpath:/application.properties" 
-            mongodb.host: "mongo-distro" 
-            mongodb.port: "27020"
+            mongodb.host: "${MONGO_HOST}" 
+            mongodb.port: "${MONGO_PORT}" 
             profileName: "prod" 
             server.port: "${PORT}" 
             httpProtocol: "http" 
@@ -96,8 +103,3 @@ networks:
     external: false
     name: net-distro
 
-# To force compose to use an externally pre-created network outside this compose file you can do this
-# networks:
-#   default:
-#     external:
-#       name: my-pre-existing-network

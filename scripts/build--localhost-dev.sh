@@ -9,6 +9,8 @@
 # set -x
 source ./setenv--localhost-dev.sh
 
+./gen-mongod-conf-file.sh ${SECRETS}/mongod--localhost-dev.conf
+
 makeDirs
 rm -rf ${QUANTA_BASE}/log/*
 

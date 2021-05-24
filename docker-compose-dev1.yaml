@@ -23,7 +23,7 @@ services:
         command: mongod --config /etc/mongod.conf
         #entrypoint: ["mongod","--config","/etc/mongod.conf"]
         ports:
-            - '27019:27019'
+            - '${MONGO_PORT}:${MONGO_PORT}'
         env_file: 
             - '${SECRETS}/mongo.env'
         
@@ -84,10 +84,9 @@ services:
 
             spring.config.location: "classpath:/application.properties" 
             
-            # mongodb.host: "mongo-dev" 
-            mongodb.host: "localhost" 
-
-            mongodb.port: "27019" 
+            mongodb.host: "${MONGO_HOST}" 
+            mongodb.port: "${MONGO_PORT}" 
+            
             profileName: "dev" 
             server.port: "${PORT}"
             httpProtocol: "http" 

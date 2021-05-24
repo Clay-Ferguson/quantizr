@@ -12,6 +12,8 @@
 
 source ./setenv--localhost-dev2.sh
 
+./gen-mongod-conf-file.sh ${SECRETS}/mongod--localhost-dev2.conf
+
 sudo mkdir -p ${MONGO_BASE}
 
 makeDirs

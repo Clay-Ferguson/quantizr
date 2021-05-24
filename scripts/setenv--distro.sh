@@ -23,7 +23,7 @@ mkdir -p ${DEPLOY_TARGET}
 export ipfs_data=${DEPLOY_TARGET}/ipfs
 export ipfs_staging=${DEPLOY_TARGET}/ipfs/staging
 
-export QUANTA_VER=1.0.3
+export QUANTA_VER=1.0.4
 
 # Note: define-functions.sh is where we pass the ARGS into dockerfile
 export JAR_FILE=./org.subnode-0.0.1-SNAPSHOT.jar
@@ -31,3 +31,6 @@ export PORT=8185
 export PORT_DEBUG=8000
 export XMS=513m
 export XMX=3g
+
+export MONGO_HOST=mongo-distro
+export MONGO_PORT=27020

@@ -25,6 +25,8 @@ cp ${PRJROOT}/docker-compose-distro.yaml ${DEPLOY_TARGET}
 # Tip: This replaces the "#build-snippet" tag in the yaml with the content of file build-snippet.yaml
 sed -i -e "/#build-snippet/rbuild-snippet.yaml" ${DEPLOY_TARGET}/docker-compose-distro.yaml
 
+${SCRIPTS}/gen-mongod-conf-file.sh ${DEPLOY_TARGET}/mongod.conf
+
 cp ${PRJROOT}/dockerfile ${DEPLOY_TARGET}
 cp ${PRJROOT}/entrypoint.sh ${DEPLOY_TARGET}
 
@@ -34,9 +36,6 @@ cp ${SCRIPTS}/stop-distro.sh                ${DEPLOY_TARGET}
 cp ${SCRIPTS}/define-functions.sh           ${DEPLOY_TARGET}
 cp ${SCRIPTS}/setenv--distro-runner.sh      ${DEPLOY_TARGET}
 cp ${PRJROOT}/distro/README.sh              ${DEPLOY_TARGET}
-
-# this is a special file we alter the owner of in the run script.
-cp ${SCRIPTS}/mongod--distro.conf           ${DEPLOY_TARGET}/mongod.conf
 
 # Note: this 'dumps' folder is mapped onto a volume in 'docker-compose-distro.yaml' and the 'backup-local.sh'
 #       script should only be run from 'inside' the docker container, which is what 'mongodb-backup.sh' actually does.

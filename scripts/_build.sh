@@ -51,24 +51,3 @@ else
     mvn --offline package -DskipTests=true -P${mvn_profile} 
 fi
 verifySuccess "Maven Build"
-
-################################################################################################
-# NOTE: The 'dev-resource-base' in the run command below sets up a property (resourceBaseFolder)
-# which allows Spring to load resources directly from the specified folder in a way that it overrides
-# the built in resources deployed into docker. This allows us to then edit LESS, HTML, or TS files
-# and then simply by running the maven command: "mvn generate-resources -DskipTests -Pwebpack"
-# which you can find in (.vscode/tasks.json), it allows is to then see those chagnes LIVE in the deployed
-# web app without doing a full build/redeploy. 
-#
-#   Use these additional options to enable HTTPS.
-#   -p 443:443 \
-#   "--server.port=443" \
-# 	"--security.require-ssl=true" \
-# 	"--server.ssl.key-store=classpath:keystore.p12" \
-# 	"--server.ssl.key-store-password=????" \
-# 	"--server.ssl.keyStoreType=PKCS12" \
-# 	"--server.ssl.keyAlias=tomcat" \
-# 	"--httpProtocol=https" \
-#
-#   "--forceIndexRebuild=true" \
-################################################################################################
