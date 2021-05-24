@@ -30,8 +30,7 @@ $custom-control-indicator-size: 1.75rem;
 @import "bootswatch.scss";
 
 // Removed custom fonts, because I need emojis to look good
-// 'QuantaCustomFont'
-$fontFamily: 'Roboto','Verdana','Helvetica','Arial','sans-serif';
+$fontFamily: 'QuantaCustomFont', 'Roboto','Verdana','Helvetica','Arial','sans-serif';
 
 //This does work (border around focused edit fields) but we don't need it.
 // .form-control:focus {
@@ -266,7 +265,7 @@ a {
 }
 
 .app-body {
-    // font-family: $fontFamily !important;
+    font-family: $fontFamily !important;
     
     // WARNING: this completely broke rendering. wow. Left hand side menu
     // gets truncated on the left.
@@ -277,7 +276,7 @@ a {
 }
 
 .welcome-body {
-    // font-family: $fontFamily !important;
+    font-family: $fontFamily !important;
     font-size: 1.4rem;
     font-weight: 300;
     line-height: 1.5;

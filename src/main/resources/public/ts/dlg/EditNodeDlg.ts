@@ -707,13 +707,15 @@ export class EditNodeDlg extends DialogBase {
                 className: "fa fa-user fa-lg editorButtonIcon",
                 title: "Insert username/mention at cursor",
                 onClick: this.insertMention
-            }),
-
-            new Icon({
-                className: "fa fa-smile-o fa-lg editorButtonIcon",
-                title: "Insert emoji at cursor",
-                onClick: this.insertEmoji
             })
+
+            // I'm disabling emoji picker becasue we don't have a good enough font. Fonts that look good all have black&white
+            // emojis and all fonts with color emojis have various rendering issues and compatibility issues.
+            // new Icon({
+            //     className: "fa fa-smile-o fa-lg editorButtonIcon",
+            //     title: "Insert emoji at cursor",
+            //     onClick: this.insertEmoji
+            // })
         ]);
     }
 
