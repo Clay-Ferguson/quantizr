@@ -1,7 +1,11 @@
 #!/bin/bash
-# Purpose: Generator for mongo conf files
+# Purpose: Generator for mongo conf files. This lets us generate a specific
+# file by writing out what is basically 'template' text below, because the
+# variables in the template do get substituted during the 'cat' operation.
 
 OUT_FILE=$1
+
+# gets the filename of the currently executing bash script.
 THIS_FILE=`basename "$0"`
 
 echo "Generating ${OUT_FILE}"

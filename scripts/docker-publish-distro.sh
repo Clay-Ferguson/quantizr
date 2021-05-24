@@ -2,13 +2,6 @@
 
 source ./setenv--distro.sh
 
-# cd ${DEPLOY_TARGET}
-# docker build -f ${DEPLOY_TARGET}/dockerfile -t subnode/repo:quanta${QUANTA_VER} ${DEPLOY_TARGET}
-
-# now it will show up here
-# docker images
-# to remove one: 'docker rmi IMAGE_ID'
-
 # to publish, first login (signup here if needed: https://hub.docker.com)
 docker login
 

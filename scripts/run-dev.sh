@@ -6,8 +6,6 @@ clear
 
 source ./setenv--localhost-dev.sh
 
-# sudo chown 999:999 ${SECRETS}/mongod--localhost-dev.conf
-
 makeDirs
 rm -rf ${QUANTA_BASE}/log/*
 

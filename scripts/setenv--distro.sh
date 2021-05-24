@@ -1,4 +1,6 @@
 #!/bin/bash
+# This is the version of the 'setenv' file that's used to build the distro. The file named
+# 'setenv--distro-runner.sh' is the environment setter for the runtime/deployment.
 
 source ./define-functions.sh
 

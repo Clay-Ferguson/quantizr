@@ -13,7 +13,8 @@ source ./setenv--distro-runner.sh
 echo "removing logs"
 rm -rf ./log/*
 
-# IMPORTANT: Use this to troubeshoot the variable substitutions in the yaml file
+# Uncomment this to troubeshoot the variable substitutions in the yaml file, and will
+# display a copy of the yaml file after all environment variables have been substituted/evaluated
 # docker-compose -f ${docker_compose_yaml} config
 # read -p "Config look ok?"
 
