@@ -1,9 +1,8 @@
 #!/bin/bash
+# NOTE: This script is not run directly but run thru the docker command that runs scripts on docker images.
 
 echo "You should hand-enter the variables used in the command below."
 exit
-
-# NOTE: This is not run directly but run thru the docker command that runs scripts on docker images.
 
 #The BEST way to export something that can be reimported easy to recreate the actual DB again.
 mongodump --username=root --password=${subnodePassword} --authenticationDatabase=admin \
