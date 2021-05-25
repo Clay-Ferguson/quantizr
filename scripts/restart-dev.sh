@@ -16,7 +16,7 @@ cd $PRJROOT
 mvn --offline compiler:compile -DskipTests=true -Pjava-compile
 
 sudo rm -rf ${QUANTA_BASE}/log/*
-docker-compose restart quanta-dev
+docker-compose -f ${docker_compose_yaml} restart quanta-dev
 
 # This is another way, but slower. Not needed.
 # dockerDown quanta-dev

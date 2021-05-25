@@ -6,7 +6,7 @@ source ./setenv-distro-runner.sh
 
 #The BEST way to export something that can be reimported easy to recreate the actual DB again.
 mongodump --username=root --password=${subnodePassword} --authenticationDatabase=admin \
-    --host=mongo-distro --port=${MONGO_PORT} --gzip --archive="/dumps/dump-"`eval date +%Y-%m-%d-%s`".gz" --verbose
+    --host=${MONGO_HOST} --port=${MONGO_PORT} --gzip --archive="/dumps/dump-"`eval date +%Y-%m-%d-%s`".gz" --verbose
 
 #https://docs.mongodb.com/manual/reference/program/mongoexport
 #The best way to export human-readable text of the entire DB

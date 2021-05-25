@@ -1,7 +1,5 @@
 #!/bin/bash
 
-source ./setenv-dev.sh
-
 cd ${PRJROOT}/src/main/resources/public
 
 # ./node_modules/.bin/eslint --debug ./**/*.ts 
