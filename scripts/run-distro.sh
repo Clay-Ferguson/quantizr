@@ -10,6 +10,11 @@
 # in this file from 'dockerUp' to 'dockerBuildUp'
 # ===================================================================
 
+# force current dir to be this script
+script_file=$(realpath $0)
+script_folder="$(dirname "${script_file}")"
+cd ${script_folder}
+
 source ./setenv-distro-runner.sh
 
 ./stop-distro.sh

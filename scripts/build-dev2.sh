@@ -10,6 +10,11 @@
 # appended to make them unique for the 'second' server, and the port numbers in these
 # configs will be different, but everything else will be about the same.
 
+# force current dir to be this script
+script_file=$(realpath $0)
+script_folder="$(dirname "${script_file}")"
+cd ${script_folder}
+
 source ./setenv-dev2.sh
 
 sudo mkdir -p ${MONGO_BASE}

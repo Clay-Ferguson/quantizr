@@ -7,6 +7,11 @@
 # two separate instances of the app, for testing Fediverse functionality
 #
 
+# force current dir to be this script
+script_file=$(realpath $0)
+script_folder="$(dirname "${script_file}")"
+cd ${script_folder}
+
 echo "========================================"
 echo "Starting Server #1 Instance Build+Deploy"
 echo "========================================"
