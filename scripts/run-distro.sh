@@ -6,7 +6,7 @@
 # Docker References: https://docs.docker.com/compose/install/
 # ===================================================================
 
-source ./setenv--distro-runner.sh
+source ./setenv-distro-runner.sh
 
 ./stop-distro.sh
 

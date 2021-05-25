@@ -1,7 +1,7 @@
 #!/bin/bash
 # see: https://quanta.wiki/n/localhost-fediverse-testing
 
-# Only run this from build--localhost-build-multi.sh
+# Only run this from build-build-multi.sh
 # (i.e. do not run this script directly yourself)
 #
 # This script assumes 'build-localhost-dev1.sh' has just been run
@@ -10,7 +10,7 @@
 # appended to make them unique for the 'second' server, and the port numbers in these
 # configs will be different, but everything else will be about the same.
 
-source ./setenv--localhost-dev2.sh
+source ./setenv-dev2.sh
 
 sudo mkdir -p ${MONGO_BASE}
 

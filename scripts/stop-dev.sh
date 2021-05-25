@@ -1,7 +1,7 @@
 #!/bin/bash
 # set -x
 
-source ./setenv--localhost-dev.sh
+source ./setenv-dev.sh
 
  cd ${DEPLOY_TARGET}
 dockerDown quanta-dev

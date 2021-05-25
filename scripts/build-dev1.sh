@@ -10,7 +10,7 @@ clear
 # show commands as they are run.
 # set -x
 
-source ./setenv--localhost-dev1.sh
+source ./setenv-dev1.sh
 
 makeDirs
 rm -rf ${QUANTA_BASE}/log/*

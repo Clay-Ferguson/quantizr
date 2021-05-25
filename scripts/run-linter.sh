@@ -1,6 +1,6 @@
 #!/bin/bash
 
-source ./setenv--localhost-dev.sh
+source ./setenv-dev.sh
 
 cd ${PRJROOT}/src/main/resources/public
 

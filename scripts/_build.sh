@@ -6,7 +6,7 @@
 
 if [ -z "$quanta_domain" ]
 then
-    read -p "\$quanta_domain is empty. Don't run this batch file directly. It's run from a 'build--*.sh' file"
+    read -p "\$quanta_domain is empty. Don't run this batch file directly. It's run from a 'build-*.sh' file"
     exit
 fi
 

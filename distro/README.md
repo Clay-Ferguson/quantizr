@@ -10,7 +10,7 @@ NOTE: You should edit the password in `secrets.sh`, before your first run, and t
 
 ### IMPORTANT: 
 
-Be sure to update this line in setenv--distro.sh to have your own domain/ip:
+Be sure to update this line in setenv-distro.sh to have your own domain/ip:
     
     export quanta_domain=localhost
 

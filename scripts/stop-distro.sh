@@ -1,6 +1,6 @@
 #!/bin/bash
 
-source ./setenv--distro-runner.sh
+source ./setenv-distro-runner.sh
 
 dockerDown quanta-distro
 dockerDown mongo-distro

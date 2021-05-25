@@ -3,7 +3,7 @@
 
 # Builder for Multi-Instance (Federated) Development
 #
-# NOTE: This is the same kind of build as 'build--localhost-dev.sh' but this one starts 
+# NOTE: This is the same kind of build as 'build-dev.sh' but this one starts 
 # two separate instances of the app, for testing Fediverse functionality
 #
 
@@ -14,7 +14,7 @@ echo "========================================"
 #save stating folder
 cwd=$(pwd)
 
-. ./build--localhost-dev1.sh
+. ./build-dev1.sh
 
 #restore starting folder
 cd $cwd 
@@ -25,7 +25,7 @@ echo "========================================"
 
 # read -p "About to start second instance. Connect debugger now if you need to... (press any key)"
 
-. ./build--localhost-dev2.sh
+. ./build-dev2.sh
 
 # read -p "Build and Multi-Start Complete. press a key"
 

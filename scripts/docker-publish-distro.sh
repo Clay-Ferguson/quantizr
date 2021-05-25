@@ -1,6 +1,6 @@
 #!/bin/bash
 
-source ./setenv--distro.sh
+source ./setenv-distro.sh
 
 # to publish, first login (signup here if needed: https://hub.docker.com)
 docker login

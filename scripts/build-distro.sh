@@ -12,7 +12,7 @@ clear
 # show commands as they are run.
 # set -x
 
-source ./setenv--distro.sh
+source ./setenv-distro.sh
 
 # sanity check since we do "rm -rf" in here
 if [ -z "$DEPLOY_TARGET" ]; then exit; fi
@@ -34,7 +34,7 @@ cp ${SCRIPTS}/gen-mongod-conf-file.sh       ${DEPLOY_TARGET}
 cp ${SCRIPTS}/run-distro.sh                 ${DEPLOY_TARGET}
 cp ${SCRIPTS}/stop-distro.sh                ${DEPLOY_TARGET}
 cp ${SCRIPTS}/define-functions.sh           ${DEPLOY_TARGET}
-cp ${SCRIPTS}/setenv--distro-runner.sh      ${DEPLOY_TARGET}
+cp ${SCRIPTS}/setenv-distro-runner.sh      ${DEPLOY_TARGET}
 cp ${PRJROOT}/distro/README.sh              ${DEPLOY_TARGET}
 
 # Note: this 'dumps' folder is mapped onto a volume in 'docker-compose-distro.yaml' and the 'backup-local.sh'

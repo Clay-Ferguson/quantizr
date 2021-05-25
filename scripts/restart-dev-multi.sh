@@ -12,7 +12,7 @@ clear
 # ==========
 # Server #1
 # ==========
-source ./setenv--localhost-dev1.sh
+source ./setenv-dev1.sh
 sudo rm -rf ${QUANTA_BASE}/log/*
 
 # go back to folder with this script in it. sort of 'home' for this script
@@ -31,7 +31,7 @@ verifySuccess "Docker Restart quanta-dev1"
 # Server #2
 # ==========
 cd ${SCRIPTS}
-source ./setenv--localhost-dev2.sh
+source ./setenv-dev2.sh
 # NOTE: This QUANTA_BASE will be different from the one we ran above. This is server #2
 sudo rm -rf ${QUANTA_BASE}/log/*
 cd $PRJROOT
