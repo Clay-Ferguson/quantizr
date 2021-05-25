@@ -22,20 +22,17 @@ verifySuccess "Cleaned deploy target"
 mkdir -p ${DEPLOY_TARGET}
 
 cd ${PRJROOT}
-cp ${PRJROOT}/docker-compose-distro.yaml ${DEPLOY_TARGET}
-# Tip: This replaces the "#build-snippet" tag in the yaml with the content of file build-snippet.yaml
-sed -i -e "/#build-snippet/rbuild-snippet.yaml" ${DEPLOY_TARGET}/docker-compose-distro.yaml
-
+cp ${PRJROOT}/docker-compose-distro.yaml    ${DEPLOY_TARGET}
 cp ${PRJROOT}/dockerfile                    ${DEPLOY_TARGET}
 cp ${PRJROOT}/entrypoint.sh                 ${DEPLOY_TARGET}
+cp ${PRJROOT}/distro/README.sh              ${DEPLOY_TARGET}
 
 # copy scripts needed to start/stop to deploy target
 cp ${SCRIPTS}/gen-mongod-conf-file.sh       ${DEPLOY_TARGET}
 cp ${SCRIPTS}/run-distro.sh                 ${DEPLOY_TARGET}
 cp ${SCRIPTS}/stop-distro.sh                ${DEPLOY_TARGET}
 cp ${SCRIPTS}/define-functions.sh           ${DEPLOY_TARGET}
-cp ${SCRIPTS}/setenv-distro-runner.sh      ${DEPLOY_TARGET}
-cp ${PRJROOT}/distro/README.sh              ${DEPLOY_TARGET}
+cp ${SCRIPTS}/setenv-distro-runner.sh       ${DEPLOY_TARGET}
 
 # Note: this 'dumps' folder is mapped onto a volume in 'docker-compose-distro.yaml' and the 'backup-local.sh'
 #       script should only be run from 'inside' the docker container, which is what 'mongodb-backup.sh' actually does.

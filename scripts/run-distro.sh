@@ -4,6 +4,10 @@
 # Starts the Quanta server at: http://${quanta_domain}:${PORT}
 # The only prerequisite for the machine is: docker & docker-compose
 # Docker References: https://docs.docker.com/compose/install/
+#
+# To deploy a completely new release you can just put a new springboot
+# fat jar right in this folder, and then change the line below 
+# in this file from 'dockerUp' to 'dockerBuildUp'
 # ===================================================================
 
 source ./setenv-distro-runner.sh
@@ -21,7 +25,7 @@ rm -rf ./log/*
 ./gen-mongod-conf-file.sh 
 
 docker-compose -version
-dockerBuildUp
+dockerUp
 
 dockerCheck quanta-distro
 dockerCheck mongo-distro

@@ -25,16 +25,10 @@ services:
 
     quanta-distro:
         
-        # ******** DO NOT DELETE *******
-        # "build-snippet" (with hash tag) is a replacement tag used by scripts.
-        
-        #build-snippet
-
-        # NOTE: To redeploy a new fat-jar, you can simply drop the JAR into the folder, and then uncomment
-        # theis "build:" section to activate the docker file and regenerate from it.
-        # build: 
-        #    context: .
-        #    dockerfile: dockerfile
+        # When we're not doing a docker build this build section will sit here harmlessly not being used.
+        build: 
+           context: .
+           dockerfile: dockerfile
 
         container_name: quanta-distro
         expose:
