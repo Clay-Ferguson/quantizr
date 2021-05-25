@@ -1,5 +1,3 @@
 #!/bin/bash
-
-docker exec -it mongo-prod /dumps/_restore.sh
-
+docker exec -it mongo-distro /dumps/_restore.sh
 read -p "mongorestore complete!  Press any key"

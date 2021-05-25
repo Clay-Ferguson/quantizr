@@ -87,14 +87,8 @@ rm -f ${DEPLOY_TARGET}/dockerfile
 rm -f ${DEPLOY_TARGET}/org.subnode-0.0.1-SNAPSHOT.jar
 
 # Copy over the Backup/Restore scripts
-# todo-1: we could organize the folder sharing a bit better and let mongodb
-# have folder volumes mapped such that we don't have to copy as many files
-# over into '/dumps' (specifically the files we dupliate from the distro dir)
 cp ${SCRIPTS}/tools/_backup.sh          ${DEPLOY_TARGET}/dumps
 cp ${SCRIPTS}/tools/_restore.sh         ${DEPLOY_TARGET}/dumps
-cp ${SCRIPTS}/setenv-distro-runner.sh   ${DEPLOY_TARGET}/dumps
-cp ${SCRIPTS}/define-functions.sh       ${DEPLOY_TARGET}/dumps
-cp ${PRJROOT}/secrets/secrets.sh        ${DEPLOY_TARGET}/dumps
 cp ${SCRIPTS}/tools/backup.sh           ${DEPLOY_TARGET}
 cp ${SCRIPTS}/tools/restore.sh          ${DEPLOY_TARGET}
 

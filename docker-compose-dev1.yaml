@@ -17,7 +17,6 @@ services:
         # WARNING: volumes will not handle '~' character for home folder. Do not use.
         volumes:
             - '${MONGO_BASE}/mongodb-data-dev:/data/db'
-            - '${MONGO_BASE}/mongo-dumps-dev:/mongo-dumps'
             - '${MONGO_BASE}/mongo-scripts-dev:/mongo-scripts'
             - '${MONGOD_CONF}:/etc/mongod.conf'
         command: mongod --config /etc/mongod.conf

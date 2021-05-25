@@ -1,5 +1,3 @@
 #!/bin/bash
-
-docker exec mongo-prod /dumps/_backup.sh
-
+docker exec mongo-distro /dumps/_backup.sh
 read -p "All done."
