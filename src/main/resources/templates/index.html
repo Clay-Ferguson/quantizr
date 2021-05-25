@@ -63,6 +63,21 @@
         /* Thymeleaf vars */
         var g_brandingAppName = [[${brandingAppName}]];
 
+        function areCookiesEnabled() {
+            try {
+                document.cookie = 'cookietest=1';
+                var cookiesEnabled = document.cookie.indexOf('cookietest=') !== -1;
+                document.cookie = 'cookietest=1; expires=Thu, 01-Jan-1970 00:00:01 GMT';
+                return cookiesEnabled;
+            } catch (e) {
+                return false;
+            }
+        }
+
+        if (!areCookiesEnabled()) {
+            alert('This app requires cookies to be enabled.');
+        }
+
         function oldIEdetection() {
             var ua = window.navigator.userAgent;
             var msie = ua.indexOf('MSIE ');
