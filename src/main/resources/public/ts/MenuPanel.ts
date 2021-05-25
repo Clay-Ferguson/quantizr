@@ -76,6 +76,46 @@ export class MenuPanel extends Div {
     static showRawData = () => S.view.runServerCommand("getJson", "Node JSON Data", "The actual data stored on the server for this node...", appState(null));
     static nodeStats = () => S.view.getNodeStats(appState(null), false, false);
 
+    static messagesToFromMe = () => {
+        S.nav.messages({
+            feedFilterFriends: false,
+            feedFilterToMe: true,
+            feedFilterFromMe: true,
+            feedFilterToPublic: false,
+            feedFilterLocalServer: false
+        });
+    }
+
+    static messagesFromFriends = () => {
+        S.nav.messages({
+            feedFilterFriends: true,
+            feedFilterToMe: false,
+            feedFilterFromMe: false,
+            feedFilterToPublic: false,
+            feedFilterLocalServer: false
+        });
+    }
+
+    static messagesLocal = () => {
+        S.nav.messages({
+            feedFilterFriends: false,
+            feedFilterToMe: false,
+            feedFilterFromMe: false,
+            feedFilterToPublic: false,
+            feedFilterLocalServer: true
+        });
+    }
+
+    static messagesFediverse = () => {
+        S.nav.messages({
+            feedFilterFriends: false,
+            feedFilterToMe: false,
+            feedFilterFromMe: false,
+            feedFilterToPublic: true,
+            feedFilterLocalServer: false
+        });
+    }
+
     static showKeys = () => {
         new ConfirmDlg("Warning: Be sure you aren't sharing your screen. Security keys will be displayed!!", "Show Encryption Keys",
             () => {
@@ -119,6 +159,13 @@ export class MenuPanel extends Div {
             new MenuItem("Portal Home", S.meta64.loadAnonPageHome),
             new MenuItem("User Guide", MenuPanel.openUserGuide),
             ...this.siteNavCustomItems(state)
+        ]));
+
+        children.push(new Menu("Messages", [
+            new MenuItem("To/From Me", MenuPanel.messagesToFromMe, !state.isAnonUser),
+            new MenuItem("From Friends", MenuPanel.messagesFromFriends, !state.isAnonUser),
+            new MenuItem("Local Users", MenuPanel.messagesLocal, !state.isAnonUser),
+            new MenuItem("All Fediverse", MenuPanel.messagesFediverse, !state.isAnonUser)
         ]));
 
         children.push(new Menu("My Nodes", [

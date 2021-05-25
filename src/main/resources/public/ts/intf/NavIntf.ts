@@ -37,4 +37,5 @@ export interface NavIntf {
     prevFullScreenImgViewer(appState: AppState): void;
     nextFullScreenImgViewer(appState: AppState): void;
     getAdjacentNode(dir: string, state: AppState): J.NodeInfo;
+    messages(props: Object): void;
 }

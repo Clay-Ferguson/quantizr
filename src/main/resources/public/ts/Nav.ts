@@ -1,5 +1,6 @@
 import { appState, dispatch } from "./AppRedux";
 import { AppState } from "./AppState";
+import { FeedView } from "./comps/FeedView";
 import { Constants as C } from "./Constants";
 import { LoginDlg } from "./dlg/LoginDlg";
 import { MainMenuDlg } from "./dlg/MainMenuDlg";
@@ -10,7 +11,6 @@ import { NavIntf } from "./intf/NavIntf";
 import * as J from "./JavaIntf";
 import { PubSub } from "./PubSub";
 import { Singletons } from "./Singletons";
-import { Anchor } from "./widget/Anchor";
 import { Button } from "./widget/Button";
 import { ButtonBar } from "./widget/ButtonBar";
 import { Heading } from "./widget/Heading";
@@ -394,5 +394,16 @@ export class Nav implements NavIntf {
         }
 
         return newNode;
+    }
+
+    messages = (props: Object): void => {
+        dispatch("Action_SelectTab", (s: AppState): AppState => {
+            s.guiReady = true;
+            S.meta64.tabChanging(s.activeTab, "feedTab", s);
+            s.activeTab = "feedTab";
+            s = { ...s, ...props };
+            return s;
+        });
+        setTimeout(FeedView.refresh, 250);
     }
 }
