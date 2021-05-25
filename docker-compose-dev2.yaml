@@ -16,9 +16,9 @@ services:
         #entrypoint: ["mongod","--config","/etc/mongod.conf"]
         ports:
             - '${MONGO_PORT}:${MONGO_PORT}'
-        env_file: 
-            - '${SECRETS}/mongo.env'
-
+        environment:
+            MONGO_INITDB_ROOT_USERNAME: root
+            MONGO_INITDB_ROOT_PASSWORD: ${subnodePassword}
         network_mode: host
 
         # Always specify version of mongo. When it upgrades automatically there can be database issues that need to be resolved

@@ -6,7 +6,7 @@ To run a Quanta instance from the Docker Public Repository you can simply unzip 
 
 The only prerequisite is that you need to have `docker-compose` installed first.
 
-NOTE: You should edit the password in `mongo.env` and `secrets.sh`, before your first run, and that password will become your `admin` user password which you can use to login as the `admin` user. This same password will be securing your MongoDB instance and will also be the admin password for the Web App.
+NOTE: You should edit the password in `secrets.sh`, before your first run, and that password will become your `admin` user password which you can use to login as the `admin` user. This same password will be securing your MongoDB instance and will also be the admin password for the Web App.
 
 ### IMPORTANT: 
 

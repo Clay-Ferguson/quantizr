@@ -10,10 +10,10 @@ export emailPassword=
 export devEmail=somebody@someserver.com
 
 # admin password: login to web app with "admin/password" credentials. Note also that
-# this matches the password in mongo.env, and so the two are synced.
-export testPassword=password
+# this password is used in the yaml as the root password for MongoDB.
+export subnodePassword=password
 
 # This is the password that will be used by the auto-generated test accounts you'll see 
 # in the docker yaml for accounts adam, bob, cory, etc.
-export subnodePassword=password
+export testPassword=password
 

@@ -45,7 +45,6 @@ mkdir -p ${DEPLOY_TARGET}/config
 # copy our secrets (passwords, etc) to deploy location
 # cp ${PRJROOT}/secrets/secrets.sh                  ${DEPLOY_TARGET}/dumps/secrets.sh
 cp ${PRJROOT}/secrets/secrets.sh    ${DEPLOY_TARGET}
-cp ${PRJROOT}/secrets/mongo.env     ${DEPLOY_TARGET}
 
 # Default app configs
 cp ${PRJROOT}/src/main/resources/config-text-distro.yaml    ${DEPLOY_TARGET}/config

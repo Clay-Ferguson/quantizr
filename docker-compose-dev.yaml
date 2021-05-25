@@ -21,8 +21,13 @@ services:
         #entrypoint: ["mongod","--config","/etc/mongod.conf"]
         ports:
             - '${MONGO_PORT}:${MONGO_PORT}'
-        env_file: 
-            - '${SECRETS}/mongo.env'
+
+        # NOTE: Leave this as an example of how to read env from a file.    
+        # env_file: 
+        #     - '${SECRETS}/mongo.env'
+        environment:
+            MONGO_INITDB_ROOT_USERNAME: root
+            MONGO_INITDB_ROOT_PASSWORD: ${subnodePassword}
         networks:
            - net-dev
         # Always specify version of mongo. When it upgrades automatically there can be database issues that need to be resolved
