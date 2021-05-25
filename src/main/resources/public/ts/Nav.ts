@@ -254,7 +254,7 @@ export class Nav implements NavIntf {
     geoLocation = (state: AppState): void => {
         if (navigator.geolocation) {
             navigator.geolocation.getCurrentPosition((location) => {
-                // todo-0: make this string a configurable property template
+                // todo-1: make this string a configurable property template
                 let googleUrl = "https://www.google.com/maps/search/?api=1&query=" + location.coords.latitude + "," + location.coords.longitude;
 
                 new MessageDlg("Your current location...", "GEO Location", null,

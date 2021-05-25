@@ -4,7 +4,7 @@ package org.subnode.config;
  * Node "path names" for special system nodes. Note: Most nodes are identified only by the record
  * ID being in the path name but a small set have these names.
  * 
- * todo-0: some of these are used for 'node.name' on nodes, and some of them are used as a path part 
+ * todo-1: some of these are used for 'node.name' on nodes, and some of them are used as a path part 
  * in one path on the 'node.pth' property. Need to do an audit of all of this and make it consistent,
  * and crate a class called NodePathName to hold the path ones.
  */

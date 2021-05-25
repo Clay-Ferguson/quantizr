@@ -143,8 +143,8 @@ export class SearchUsersDlg extends DialogBase {
         S.util.ajax<J.NodeSearchRequest, J.NodeSearchResponse>("nodeSearch", {
             nodeId: node.id,
             searchText: SearchUsersDlg.defaultSearchText,
-            sortDir: "",
-            sortField: "",
+            sortDir: "DESC",
+            sortField: "mtm",
             searchProp: "",
             fuzzy: this.getState().fuzzy,
             caseSensitive: this.getState().caseSensitive,

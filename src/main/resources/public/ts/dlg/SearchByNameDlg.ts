@@ -79,8 +79,8 @@ export class SearchByNameDlg extends DialogBase {
         S.util.ajax<J.NodeSearchRequest, J.NodeSearchResponse>("nodeSearch", {
             nodeId: node.id,
             searchText: this.searchTextState.getValue(),
-            sortDir: "",
-            sortField: "",
+            sortDir: "DESC",
+            sortField: "mtm",
             searchProp: "node.name",
             fuzzy: false,
             caseSensitive: false,

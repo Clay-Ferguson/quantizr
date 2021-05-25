@@ -1,5 +1,7 @@
 package org.subnode.mongo;
 
+import java.util.Calendar;
+import java.util.Date;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.bson.Document;
 import org.bson.types.ObjectId;
@@ -94,6 +96,14 @@ public class MongoEventListener extends AbstractMongoEventListener<SubNode> {
 			read.checkParentExists(null, node);
 		}
 
+		/* Update modify time but ONLY if already set. A null modify time has a 
+		meaning (node not yet complet editing) so we preserve a null as a null */
+		if (node.getModifyTime() != null) {
+			Date now = Calendar.getInstance().getTime();
+			dbObj.put(SubNode.FIELD_MODIFY_TIME, now);
+			node.setModifyTime(now);
+		}
+
 		/*
 		 * New nodes can be given a path where they will allow the ID to play the role of the leaf 'name'
 		 * part of the path
@@ -135,11 +145,13 @@ public class MongoEventListener extends AbstractMongoEventListener<SubNode> {
 		removeDefaultProps(node);
 
 		if (node.getAc() != null) {
-			/* we need to ensure that we never save an empty Acl, but null instead, because some parts of the code
-			assume that if the AC is non-null then there ARE some shares on the node.
-
-			This 'fix' only started being necessary I think once I added the safeGetAc, and that check ends up causing
-			the AC to contain an empty object sometimes */
+			/*
+			 * we need to ensure that we never save an empty Acl, but null instead, because some parts of the
+			 * code assume that if the AC is non-null then there ARE some shares on the node.
+			 * 
+			 * This 'fix' only started being necessary I think once I added the safeGetAc, and that check ends
+			 * up causing the AC to contain an empty object sometimes
+			 */
 			if (node.getAc().size() == 0) {
 				node.setAc(null);
 				dbObj.put(SubNode.FIELD_AC, null);
