@@ -18,6 +18,8 @@ rm -rf ./log/*
 # docker-compose -f ${docker_compose_yaml} config
 # read -p "Config look ok?"
 
+./gen-mongod-conf-file.sh 
+
 docker-compose -version
 dockerBuildUp
 

@@ -8,9 +8,9 @@ services:
         container_name: mongo-distro 
         # WARNING: volumes will not handle '~' character for home folder. Do not use.
         volumes:
-            - "${DEPLOY_TARGET}/data:/data/db"
+            - "${MONGO_DATA}:/data/db"
             - "${DEPLOY_TARGET}/dumps:/mongo-dumps"
-            - "${DEPLOY_TARGET}/mongod.conf:/etc/mongod.conf"
+            - "${MONGOD_CONF}:/etc/mongod.conf"
         command: mongod --config /etc/mongod.conf
         ports:
             - "${MONGO_PORT}:${MONGO_PORT}"

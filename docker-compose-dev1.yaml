@@ -19,7 +19,7 @@ services:
             - '${MONGO_BASE}/mongodb-data-dev:/data/db'
             - '${MONGO_BASE}/mongo-dumps-dev:/mongo-dumps'
             - '${MONGO_BASE}/mongo-scripts-dev:/mongo-scripts'
-            - '${SECRETS}/mongod--localhost-dev1.conf:/etc/mongod.conf'
+            - '${MONGOD_CONF}:/etc/mongod.conf'
         command: mongod --config /etc/mongod.conf
         #entrypoint: ["mongod","--config","/etc/mongod.conf"]
         ports:

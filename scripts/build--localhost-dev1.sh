@@ -12,8 +12,6 @@ clear
 
 source ./setenv--localhost-dev1.sh
 
-./gen-mongod-conf-file.sh ${SECRETS}/mongod--localhost-dev1.conf
-
 makeDirs
 rm -rf ${QUANTA_BASE}/log/*
 
@@ -24,6 +22,8 @@ dockerDown mongo-dev1
 
 cd ${PRJROOT}
 . ${SCRIPTS}/_build.sh
+
+${SCRIPTS}/gen-mongod-conf-file.sh 
 
 # IMPORTANT: Use this to troubeshoot the variable substitutions in the yaml file
 # docker-compose -f ${docker_compose_yaml} config 

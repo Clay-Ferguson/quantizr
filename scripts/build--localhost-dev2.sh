@@ -12,8 +12,6 @@
 
 source ./setenv--localhost-dev2.sh
 
-./gen-mongod-conf-file.sh ${SECRETS}/mongod--localhost-dev2.conf
-
 sudo mkdir -p ${MONGO_BASE}
 
 makeDirs
@@ -22,6 +20,8 @@ rm -rf ${QUANTA_BASE}/log/*
 cd ${PRJROOT}
 dockerDown quanta-dev2
 dockerDown mongo-dev2
+
+${SCRIPTS}/gen-mongod-conf-file.sh
 
 cd ${PRJROOT}
 dockerBuildUp

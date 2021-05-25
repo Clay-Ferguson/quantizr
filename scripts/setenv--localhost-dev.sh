@@ -33,6 +33,7 @@ export XMX=4g
 
 export MONGO_HOST=mongo-dev
 export MONGO_PORT=27016
+export MONGOD_CONF=${SECRETS}/mongod-dev.conf
 
 export MONGO_BASE=/home/clay/ferguson
 export QUANTA_BASE=/home/clay/quanta-localhost-dev

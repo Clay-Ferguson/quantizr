@@ -26,12 +26,11 @@ cp ${PRJROOT}/docker-compose-distro.yaml ${DEPLOY_TARGET}
 # Tip: This replaces the "#build-snippet" tag in the yaml with the content of file build-snippet.yaml
 sed -i -e "/#build-snippet/rbuild-snippet.yaml" ${DEPLOY_TARGET}/docker-compose-distro.yaml
 
-${SCRIPTS}/gen-mongod-conf-file.sh ${DEPLOY_TARGET}/mongod.conf
-
-cp ${PRJROOT}/dockerfile ${DEPLOY_TARGET}
-cp ${PRJROOT}/entrypoint.sh ${DEPLOY_TARGET}
+cp ${PRJROOT}/dockerfile                    ${DEPLOY_TARGET}
+cp ${PRJROOT}/entrypoint.sh                 ${DEPLOY_TARGET}
 
 # copy scripts needed to start/stop to deploy target
+cp ${SCRIPTS}/gen-mongod-conf-file.sh       ${DEPLOY_TARGET}
 cp ${SCRIPTS}/run-distro.sh                 ${DEPLOY_TARGET}
 cp ${SCRIPTS}/stop-distro.sh                ${DEPLOY_TARGET}
 cp ${SCRIPTS}/define-functions.sh           ${DEPLOY_TARGET}
@@ -73,6 +72,8 @@ cd ${PRJROOT}
 # will work on all machines anywhere across the web.
 cp ${PRJROOT}/target/org.subnode-0.0.1-SNAPSHOT.jar ${DEPLOY_TARGET}
 verifySuccess "JAR copied to build distro"
+
+ ${SCRIPTS}/gen-mongod-conf-file.sh 
 
 # This builds the image locally, and saves it into local docker repository, so that 'docker-compose up',
 # is all that's required.

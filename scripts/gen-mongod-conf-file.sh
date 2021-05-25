@@ -3,7 +3,7 @@
 # file by writing out what is basically 'template' text below, because the
 # variables in the template do get substituted during the 'cat' operation.
 
-OUT_FILE=$1
+OUT_FILE=${MONGOD_CONF}
 
 # gets the filename of the currently executing bash script.
 THIS_FILE=`basename "$0"`

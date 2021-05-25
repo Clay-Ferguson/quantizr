@@ -9,8 +9,6 @@
 # set -x
 source ./setenv--localhost-dev.sh
 
-./gen-mongod-conf-file.sh ${SECRETS}/mongod--localhost-dev.conf
-
 makeDirs
 rm -rf ${QUANTA_BASE}/log/*
 
@@ -25,6 +23,8 @@ cd ${PRJROOT}
 # IMPORTANT: Use this to troubeshoot the variable substitutions in the yaml file
 # docker-compose -f ${docker_compose_yaml} config 
 # read -p "Config look ok?"
+
+${SCRIPTS}/gen-mongod-conf-file.sh
 
 cd ${PRJROOT}
 dockerBuildUp

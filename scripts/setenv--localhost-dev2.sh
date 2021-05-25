@@ -31,6 +31,7 @@ export XMX=2g
 
 export MONGO_HOST=localhost
 export MONGO_PORT=27018
+export MONGOD_CONF=${SECRETS}/mongod-dev2.conf
 
 export MONGO_BASE=/home/clay/mongo2
 export QUANTA_BASE=/home/clay/quanta-localhost-dev2

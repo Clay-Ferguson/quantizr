@@ -34,5 +34,7 @@ export PORT_DEBUG=8000
 export XMS=513m
 export XMX=3g
 
+export MONGO_DATA=${DEPLOY_TARGET}/data
 export MONGO_HOST=mongo-distro
 export MONGO_PORT=27020
+export MONGOD_CONF=${DEPLOY_TARGET}/mongod.conf
