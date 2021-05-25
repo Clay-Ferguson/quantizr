@@ -59,7 +59,6 @@ export class EditNodeDlg extends DialogBase {
     header: Header;
     propertyEditFieldContainer: Div;
     uploadButton: Button;
-    speechButton: Button;
     deleteUploadButton: Button;
     deletePropButton: Button;
 
@@ -358,11 +357,7 @@ export class EditNodeDlg extends DialogBase {
         // let allowShare = true;
 
         let children = [
-            /* note: this isn't working yet because we don't update the whole dialog state
-             so I need to make this TextContent work similar to the button so i can always add it and set state
-             as needed, but the TextContent needs to be smart enough to completely HIDE itself whenever
-             the text in it would be blank. */
-            S.speech.speechActive ? new TextContent("Translating your speech to text, at edit cursor location.") : null,
+            S.speech.speechActive ? new TextContent("Speech-to-Text active. Mic listening...", "alert alert-primary") : null,
             new Form(null, [
                 new Div(null, {
                 }, [
@@ -582,6 +577,11 @@ export class EditNodeDlg extends DialogBase {
         }
 
         let collapsiblePanel = !customProps ? new CollapsiblePanel(null, null, null, [
+            new Div(null, { className: "marginBottom" }, [
+                new Button("Type", this.openChangeNodeTypeDlg),
+                !customProps ? new Button("Encrypt", () => { this.openEncryptionDlg(true); }) : null,
+                allowPropertyAdd && numPropsShowing === 0 ? new Button("Props", this.addProperty) : null
+            ]),
             nodeNameTextField, selectionsBar, propsTable
         ], false,
             (state: boolean) => {
@@ -675,14 +675,11 @@ export class EditNodeDlg extends DialogBase {
             this.uploadButton = (!hasAttachment && allowUpload) ? new Button("Attach", this.upload) : null,
             allowShare ? new Button("Share", this.share) : null,
 
-            new Button("Type", this.openChangeNodeTypeDlg),
-            !customProps ? new Button("Encrypt", () => { this.openEncryptionDlg(true); }) : null,
-            allowPropertyAdd && numPropsShowing === 0 ? new Button("Props", this.addProperty) : null,
-
-            this.speechButton = new Button(S.speech.speechActive ? "Listening..." : "Speech", this.speechRecognition,
-                {
-                    title: "Toggle on/off Speech Recognition to input text"
-                }),
+            new Icon({
+                className: "fa " + (S.speech.speechActive ? "fa-microphone-slash" : "fa-microphone") + " fa-lg editorButtonIcon",
+                title: "Toggle on/off Speech Recognition to input text",
+                onClick: this.speechRecognition
+            }),
 
             // show delete button only if we're in a fullscreen viewer (like Calendar view)
             S.meta64.fullscreenViewerActive(this.appState)
@@ -1196,11 +1193,14 @@ export class EditNodeDlg extends DialogBase {
         });
 
         S.speech.toggleActive();
-        this.speechButton.setText(S.speech.speechActive ? "Listening..." : "Speech");
 
-        if (this.contentEditor) {
-            this.contentEditor.focus();
-        }
+        this.mergeState({ state: this.getState() });
+
+        setTimeout(() => {
+            if (this.contentEditor) {
+                this.contentEditor.focus();
+            }
+        }, 250);
     }
 
     cancelEdit = (): void => {
