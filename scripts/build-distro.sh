@@ -83,7 +83,6 @@ dockerBuild
 
 # Now fix up the DEPLOY_TARGET and for end users, and zip it
 cp ${PRJROOT}/docker-compose-distro.yaml ${DEPLOY_TARGET}
-rm -f ${DEPLOY_TARGET}/dockerfile
 rm -f ${DEPLOY_TARGET}/org.subnode-0.0.1-SNAPSHOT.jar
 
 # Copy over the Backup/Restore scripts
