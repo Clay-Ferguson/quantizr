@@ -420,7 +420,7 @@ public class NodeSearchService {
 		res.setTopWords(topWords);
 		for (WordStats ws : wordList) {
 			topWords.add(ws.word); // + "," + ws.count);
-			if (topWords.size() >= 200)
+			if (topWords.size() >= 100)
 				break;
 		}
 
@@ -428,7 +428,7 @@ public class NodeSearchService {
 		res.setTopTags(topTags);
 		for (WordStats ws : tagList) {
 			topTags.add(ws.word); // + "," + ws.count);
-			if (topTags.size() >= 200)
+			if (topTags.size() >= 100)
 				break;
 		}
 
@@ -436,7 +436,7 @@ public class NodeSearchService {
 		res.setTopMentions(topMentions);
 		for (WordStats ws : mentionList) {
 			topMentions.add(ws.word); // + "," + ws.count);
-			if (topMentions.size() >= 200)
+			if (topMentions.size() >= 100)
 				break;
 		}
 

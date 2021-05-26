@@ -119,4 +119,5 @@ export interface UtilIntf {
     showBrowserInfo(): void;
     switchBrowsingMode(state: AppState): void;
     isLocalUserName(userName: string): boolean;
+    getPropFromDom(evt: Event, prop: string): string;
 }

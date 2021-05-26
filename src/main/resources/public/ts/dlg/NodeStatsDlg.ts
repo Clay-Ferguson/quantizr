@@ -25,7 +25,7 @@ export class NodeStatsDlg extends DialogBase {
     static helpExpanded: boolean;
 
     constructor(private res: J.GetNodeStatsResponse, public trending: boolean, public feed: boolean, state: AppState) {
-        super(trending ? "Trending Now" : "Node Statistics", null, false, state);
+        super(trending ? "Trending Now (Top 100)" : "Node Statistics (Top 100)", null, false, state);
     }
 
     renderDlg = (): CompIntf[] => {
@@ -35,24 +35,23 @@ export class NodeStatsDlg extends DialogBase {
             this.res.topTags.forEach((word: string) => {
                 tagPanel.addChild(new Span(word, {
                     className: "statsWord",
-                    onClick: () => this.searchWord(word)
+                    word,
+                    onClick: this.searchWord
                 }));
             });
         }
 
-        // todo-0: I'm disabling this for now, because I saw it show suspicously few results on the Fediverse tab
-        // and I don't have time to troubleshoot this now, so I'd rather hide it than not know if it's correct or not (for now)
-        let mentionPanel = null;
-        // mentionPanel new Div(null, { className: "wordStatsArea" });
-        // if (this.res.topMentions && this.res.topMentions.length > 0) {
-        //     mentionPanel.addChild(new Heading(4, this.trending ? "Mentions" : "Top Mentions"));
-        //     this.res.topMentions.forEach((word: string) => {
-        //         mentionPanel.addChild(new Span(word, {
-        //             className: "statsWord",
-        //             onClick: () => this.searchWord(word)
-        //         }));
-        //     });
-        // }
+        let mentionPanel = new Div(null, { className: "wordStatsArea" });
+        if (this.res.topMentions && this.res.topMentions.length > 0) {
+            mentionPanel.addChild(new Heading(4, this.trending ? "Mentions" : "Top Mentions"));
+            this.res.topMentions.forEach((word: string) => {
+                mentionPanel.addChild(new Span(word, {
+                    className: "statsWord",
+                    word,
+                    onClick: this.searchWord
+                }));
+            });
+        }
 
         let wordPanel = new Div(null, { className: "wordStatsArea" });
         if (this.res.topWords && this.res.topWords.length > 0) {
@@ -60,7 +59,8 @@ export class NodeStatsDlg extends DialogBase {
             this.res.topWords.forEach((word: string) => {
                 wordPanel.addChild(new Span(word, {
                     className: "statsWord",
-                    onClick: () => this.searchWord(word)
+                    word,
+                    onClick: this.searchWord
                 }));
             });
         }
@@ -84,8 +84,11 @@ export class NodeStatsDlg extends DialogBase {
         ];
     }
 
-    searchWord = (word: string) => {
+    searchWord = (evt: Event) => {
         this.close();
+
+        let word = S.util.getPropFromDom(evt, "word");
+        if (!word) return;
 
         if (this.feed) {
             /* put word in quotes to do an exact match */

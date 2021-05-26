@@ -111,7 +111,6 @@ export class UserProfileDlg extends DialogBase {
         /* Else this is our node so we close the dialog and then navitage to the home node */
         else {
             this.close();
-            // todo-0: HOME variable in Java needs to be usable here.
             setTimeout(() => S.nav.openContentNode(":" + this.appState.userName + ":" + nodeName), 250);
         }
     }

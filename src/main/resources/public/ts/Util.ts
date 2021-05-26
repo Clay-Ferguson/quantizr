@@ -85,23 +85,28 @@ export class Util implements UtilIntf {
     function object creates per page render */
     allowIdFromEvent = (evt: Event, id: string): string => {
         if (id) return id;
+        return this.getPropFromDom(evt, "nid");
+    }
+
+    getPropFromDom = (evt: Event, prop: string): string => {
+        let val = null;
 
         // get the id from this node or any parent node.
         if (evt && evt.target) {
             let target: any = evt.target;
             while (target) {
                 // console.log("Checking target.id " + target.id + " for nid");
-                id = target.getAttribute("nid");
-                if (id) return id;
+                val = target.getAttribute(prop);
+                if (val) return val;
                 target = target.parentElement;
             }
         }
 
-        if (!id) {
-            console.log("Unable to get QID from parameter or html element or any parents.");
+        if (!val) {
+            console.log("Unable to get prop " + prop + " from parameter or html element or any parents.");
         }
 
-        return id;
+        return val;
     }
 
     // #mouseEffects (do not delete tag)

@@ -32,7 +32,7 @@ menu:
 help:
   nodeStats:
     dialog: >-
-      This is a statistical word analysis the most frequently used words in the text. Click any one to search for it.
+      This is a word frequency analysis of the top hashtags, mentions, and words in the text. Click one to search it.
 
   type:
     calculator:
