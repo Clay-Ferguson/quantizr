@@ -198,6 +198,7 @@ public class NodeMoveService {
 				/* If node has an attachment we don't delete the node, but just set it's content to null */
 				if (n.getStrProp(NodeProp.BIN) != null || n.getStrProp(NodeProp.IPFS_LINK) != null) {
 					n.setContent(null);
+					n.touch();
 					update.save(session, n);
 				} 
 				/* or else we delete the node */
@@ -209,6 +210,7 @@ public class NodeMoveService {
 		}
 
 		firstNode.setContent(sb.toString());
+		firstNode.touch();
 		update.saveSession(session);
 		res.setSuccess(true);
 		return res;

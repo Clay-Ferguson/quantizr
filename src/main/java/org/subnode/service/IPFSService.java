@@ -543,6 +543,7 @@ public class IPFSService {
             node.setOwner(exportParent.getOwner());
             // use export filename here
             node.setContent("IPFS Export: " + cid + "\n\nMime: " + mime);
+            node.touch();
             node.setProp(NodeProp.IPFS_LINK.s(), cid);
             node.setProp(NodeProp.BIN_MIME.s(), mime);
             node.setProp(NodeProp.BIN_FILENAME.s(), fileName);
@@ -555,6 +556,7 @@ public class IPFSService {
 
                     child.setOwner(exportParent.getOwner());
                     child.setContent("IPFS File: " + file.getFileName() + "\n\nMime: " + file.getMime());
+                    child.touch();
                     child.setProp(NodeProp.IPFS_LINK.s(), file.getCid());
                     child.setProp(NodeProp.BIN_MIME.s(), file.getMime());
                     child.setProp(NodeProp.BIN_FILENAME.s(), file.getFileName());

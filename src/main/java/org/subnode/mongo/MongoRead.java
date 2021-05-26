@@ -707,6 +707,7 @@ public class MongoRead {
                 content = getDefaultContentForNamedNode(type);
             }
             node.setContent(content);
+            node.touch();
 
             if (defaultName != null) {
                 node.setName(defaultName);

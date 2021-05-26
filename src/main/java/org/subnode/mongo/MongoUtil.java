@@ -511,6 +511,7 @@ public class MongoUtil {
 		userNode.setProp(NodeProp.BIN_QUOTA.s(), Const.DEFAULT_USER_QUOTA);
 
 		userNode.setContent("### Account: " + user);
+		userNode.touch();
 
 		if (!automated) {
 			userNode.setProp(NodeProp.SIGNUP_PENDING.s(), true);

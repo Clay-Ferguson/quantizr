@@ -157,6 +157,7 @@ public class SubNodeUtil {
 
 				if (defaultContent == null) {
 					parent.setContent("");
+					parent.touch();
 				}
 				update.save(session, parent);
 			}
@@ -169,6 +170,7 @@ public class SubNodeUtil {
 
 		if (defaultContent != null) {
 			parent.setContent(defaultContent);
+			parent.touch();
 		}
 
 		if (props != null) {

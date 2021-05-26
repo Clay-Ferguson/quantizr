@@ -96,10 +96,21 @@ public class MongoEventListener extends AbstractMongoEventListener<SubNode> {
 			read.checkParentExists(null, node);
 		}
 
-		/* Update modify time but ONLY if already set. A null modify time has a 
-		meaning (node not yet complet editing) so we preserve a null as a null */
-		if (node.getModifyTime() != null) {
-			Date now = Calendar.getInstance().getTime();
+		Date now = null;
+
+		/* If no create/mod time has been set, then set it */
+		if (node.getCreateTime() == null) {
+			if (now == null) {
+				now = Calendar.getInstance().getTime();
+			}
+			dbObj.put(SubNode.FIELD_CREATE_TIME, now);
+			node.setCreateTime(now);
+		}
+
+		if (node.getModifyTime() == null) {
+			if (now == null) {
+				now = Calendar.getInstance().getTime();
+			}
 			dbObj.put(SubNode.FIELD_MODIFY_TIME, now);
 			node.setModifyTime(now);
 		}

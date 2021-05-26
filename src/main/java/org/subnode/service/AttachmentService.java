@@ -265,6 +265,7 @@ public class AttachmentService {
 				final SubNode newNode = create.createNode(session, node, null, null, null, CreateNodeLocation.LAST,
 						null, null, true);
 				newNode.setContent(fileName);
+				newNode.touch();
 
 				/* Note: Since the parent node we're creating under might have a "pending" path (unsaved), which is a path starting
 				withi /r/p/ we have to set this new node to NON pending to change it. It's ok if the user abandons and never saves

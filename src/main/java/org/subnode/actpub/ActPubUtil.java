@@ -183,11 +183,15 @@ public class ActPubUtil {
                  * scenario by sleeping and looping for 10 retries.
                  */
                 catch (ResourceAccessException re) {
-                    log.debug("Waiting for url: " + url);
-                    if (++retries >= 24) {
-                        throw new RuntimeException("gave up waiting for " + url);
-                    }
-                    Thread.sleep(10000);
+
+                    // todo-0: I had this for localhost only p2p testing, but in prod we want to nomrally give up
+                    // immediately for unreachables, so need to make this an optional param.
+                    throw re;
+                    // log.debug("Waiting for url: " + url);
+                    // if (++retries >= 24) {
+                    //     throw new RuntimeException("gave up waiting for " + url);
+                    // }
+                    // Thread.sleep(10000);
                 }
             }
         } catch (Exception e) {

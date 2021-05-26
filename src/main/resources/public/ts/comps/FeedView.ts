@@ -64,6 +64,13 @@ export class FeedView extends AppTab {
 
     preRender(): void {
         let state: AppState = useSelector((state: AppState) => state);
+
+        // To do emergency disable of the feed, this works.
+        // if (!state.isAdminUser) {
+        //     this.setChildren([new Div("temporarily unavailable.")]);
+        //     return;
+        // }
+
         this.attribs.className = "tab-pane fade my-tab-pane";
         if (state.activeTab === this.getId()) {
             this.attribs.className += " show active";

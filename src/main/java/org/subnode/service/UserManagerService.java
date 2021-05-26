@@ -202,6 +202,7 @@ public class UserManagerService {
 					node.setName(name);
 				}
 				node.setContent(content);
+				node.touch();
 				acl.addPrivilege(session, node, PrincipalName.PUBLIC.s(), Arrays.asList(PrivilegeType.READ.s()), null);
 				update.save(session, node);
 			}

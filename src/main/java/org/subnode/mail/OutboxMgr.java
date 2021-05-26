@@ -97,6 +97,7 @@ public class OutboxMgr {
 
 				notifyNode.setOwner(userInbox.getOwner());
 				notifyNode.setContent(content);
+				notifyNode.touch();
 				notifyNode.setProp(NodeProp.TARGET_ID.s(), node.getId().toHexString());
 				update.save(session, notifyNode);
 			}

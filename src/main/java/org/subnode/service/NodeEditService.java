@@ -177,6 +177,7 @@ public class NodeEditService {
 		}
 
 		newNode.setContent(parentHashTags + (req.getContent() != null ? req.getContent() : ""));
+		newNode.touch();
 
 		if (req.isTypeLock()) {
 			newNode.setProp(NodeProp.TYPE_LOCK.s(), Boolean.valueOf(true));
@@ -296,6 +297,7 @@ public class NodeEditService {
 		String content = title != null ? "#### " + title + "\n" : "";
 		content += data;
 		newNode.setContent(content);
+		newNode.touch();
 
 		update.save(session, newNode);
 
@@ -325,6 +327,7 @@ public class NodeEditService {
 		} else {
 			newNode.setContent("");
 		}
+		newNode.touch();
 
 		// '/r/p/' = pending (nodes not yet published, being edited created by users)
 		if (req.isPendingEdit()) {
@@ -417,6 +420,7 @@ public class NodeEditService {
 		}
 
 		node.setContent(nodeInfo.getContent());
+		node.touch();
 		node.setType(nodeInfo.getType());
 
 		/*
@@ -694,19 +698,19 @@ public class NodeEditService {
 			update.save(session, parentForNewNodes);
 		}
 
-		Date now = Calendar.getInstance().getTime();
 		int idx = 0;
 		for (String part : contentParts) {
 			// log.debug("ContentPart[" + idx + "] " + part);
 			part = part.trim();
 			if (idx == 0) {
 				node.setContent(part);
-				node.setModifyTime(now);
+				node.touch();
 				update.save(session, node);
 			} else {
 				SubNode newNode = create.createNode(session, parentForNewNodes, null, firstOrdinal + idx,
 						CreateNodeLocation.ORDINAL, false);
 				newNode.setContent(part);
+				newNode.touch();
 				update.save(session, newNode);
 			}
 			idx++;
@@ -911,6 +915,7 @@ public class NodeEditService {
 			return false;
 		if (content.contains(search)) {
 			node.setContent(content.replace(search, replace));
+			node.touch();
 			return true;
 		}
 		return false;
