@@ -399,6 +399,7 @@ export class MenuPanel extends Div {
 
             children.push(new Menu("Admin - DB", [
 
+                new MenuItem("ActPub Maintenance", () => S.view.runServerCommand("actPubMaintenance", "ActPub Maintenance Response", null, state)), //
                 new MenuItem("Validate", () => S.view.runServerCommand("validateDb", "Validate DB Response", null, state)), //
                 new MenuItem("Compact", () => S.view.runServerCommand("compactDb", "Compact DB Response", null, state)), //
                 new MenuItem("Rebuild Indexes", () => S.view.runServerCommand("rebuildIndexes", "Rebuild Indexes Response", null, state)), //

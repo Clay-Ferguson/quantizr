@@ -28,6 +28,7 @@ import org.subnode.model.client.PrincipalName;
 import org.subnode.model.client.PrivilegeType;
 import org.subnode.mongo.CreateNodeLocation;
 import org.subnode.mongo.MongoCreate;
+import org.subnode.mongo.MongoDelete;
 import org.subnode.mongo.MongoRead;
 import org.subnode.mongo.MongoSession;
 import org.subnode.mongo.MongoUpdate;
@@ -65,6 +66,9 @@ public class ActPubService {
 
     @Autowired
     private MongoRead read;
+
+    @Autowired
+    private MongoDelete delete;
 
     @Autowired
     private MongoUpdate update;
@@ -310,7 +314,8 @@ public class ActPubService {
 
         apUserName = apUserName.trim();
 
-        // This checks for both the non-port and has-port versions of the host (host may or may not have port)
+        // This checks for both the non-port and has-port versions of the host (host may or may not have
+        // port)
         if (apUserName.endsWith("@" + appProp.getMetaHost().toLowerCase())
                 || apUserName.contains("@" + appProp.getMetaHost().toLowerCase() + ":")) {
             log.debug("Can't import a user that's not from a foreign server.");
@@ -957,6 +962,29 @@ public class ActPubService {
             }
 
             return null;
+        });
+    }
+
+    public String maintainForeignUsers() {
+        if (!appProp.isActPubEnabled())
+            return "ActivityPub not enabled";
+
+        return adminRunner.run(session -> {
+            long totalDelCount = 0;
+            Iterable<SubNode> accountNodes =
+                    read.findTypedNodesUnderPath(session, NodeName.ROOT_OF_ALL_USERS, NodeType.ACCOUNT.s());
+
+            for (SubNode node : accountNodes) {
+                String userName = node.getStrProp(NodeProp.USER.s());
+                if (userName == null || !userName.contains("@"))
+                    continue;
+
+                long delCount = delete.deleteOldActPubPosts(node, session);
+                totalDelCount += delCount;
+                log.debug("Foreign User: " + userName + ". Deleted " + delCount);
+            }
+
+            return "Deleted " + String.valueOf(totalDelCount) + " old posts.";
         });
     }
 
