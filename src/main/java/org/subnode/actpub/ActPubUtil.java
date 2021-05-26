@@ -157,10 +157,20 @@ public class ActPubUtil {
     }
 
     public APObj getJson(String url, MediaType mediaType) {
+        return getJson(url, mediaType, 0);
+    }
+
+    /**
+     * 
+     * @param url
+     * @param mediaType
+     * @param waitSeconds Number of seconds to wait for server to come online before giving up
+     * @return
+     */
+    public APObj getJson(String url, MediaType mediaType, int waitSeconds) {
         // log.debug("getJson: " + url);
         APObj ret = null;
         try {
-            int retries = 0;
             while (true) {
                 try {
                     HttpHeaders headers = new HttpHeaders();
@@ -183,15 +193,13 @@ public class ActPubUtil {
                  * scenario by sleeping and looping for 10 retries.
                  */
                 catch (ResourceAccessException re) {
-
-                    // todo-0: I had this for localhost only p2p testing, but in prod we want to nomrally give up
-                    // immediately for unreachables, so need to make this an optional param.
-                    throw re;
-                    // log.debug("Waiting for url: " + url);
-                    // if (++retries >= 24) {
-                    //     throw new RuntimeException("gave up waiting for " + url);
-                    // }
-                    // Thread.sleep(10000);
+                    if (waitSeconds-- > 0) {
+                        log.debug("Waiting for url: " + url);
+                        Thread.sleep(1000);
+                    }
+                    else {
+                        throw re;
+                    }
                 }
             }
         } catch (Exception e) {

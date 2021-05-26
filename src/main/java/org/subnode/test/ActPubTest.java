@@ -54,7 +54,7 @@ public class ActPubTest implements TestIntf {
 
         /* ----- GET ACTOR ----- */
         String actorUrl = apUtil.getActorUrlFromWebFingerObj(webFinger);
-        APObj actorObj = apUtil.getJson(actorUrl, APConst.MT_APP_ACTJSON);
+        APObj actorObj = apUtil.getJson(actorUrl, APConst.MT_APP_ACTJSON, 10);
         if (actorObj == null) {
             throw new Exception("Unable to get actor: " + actorUrl);
         }
