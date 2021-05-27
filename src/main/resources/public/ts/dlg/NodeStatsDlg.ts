@@ -25,7 +25,7 @@ export class NodeStatsDlg extends DialogBase {
     static helpExpanded: boolean;
 
     constructor(private res: J.GetNodeStatsResponse, public trending: boolean, public feed: boolean, state: AppState) {
-        super(trending ? "Trending Now (Top 100)" : "Node Statistics (Top 100)", null, false, state);
+        super(trending ? "Trending (Top 100s)" : "Node Stats (Top 100s)", null, false, state);
     }
 
     renderDlg = (): CompIntf[] => {
