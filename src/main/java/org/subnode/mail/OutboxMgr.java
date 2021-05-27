@@ -58,6 +58,9 @@ public class OutboxMgr {
 	@Autowired
 	private UserFeedService userFeedService;
 
+	@Autowired
+	private NotificationDaemon notificationDaemon;
+
 	private static SubNode outboxNode = null;
 	private static final Object outboxLock = new Object();
 
@@ -157,6 +160,8 @@ public class OutboxMgr {
 		outboundEmailNode.setProp(NodeProp.EMAIL_RECIP.s(), recipients);
 
 		update.save(session, outboundEmailNode);
+
+		notificationDaemon.setOutboxDirty();
 	}
 
 	/*

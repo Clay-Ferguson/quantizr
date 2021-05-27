@@ -20,11 +20,10 @@ import org.subnode.mongo.model.SubNode;
 /**
  * Deamon for sending emails periodically.
  * 
- * We need this daemon so that we can do email sending without blocking any of
- * the requests that require emails to be sent. That is, when some service
- * method requires an email to be sent it doesn't send the request or even spawn
- * a thread to send the request. It simply queues up in persistent storage he
- * emails ready to be send and sends them out all in a single mail session all
+ * We need this daemon so that we can do email sending without blocking any of the requests that
+ * require emails to be sent. That is, when some service method requires an email to be sent it
+ * doesn't send the request or even spawn a thread to send the request. It simply queues up in
+ * persistent storage he emails ready to be send and sends them out all in a single mail session all
  * at once. This is the most efficient way for lots of obvious reasons.
  */
 @Component
@@ -49,11 +48,13 @@ public class NotificationDaemon {
 
 	private int runCounter = 0;
 
+	public static final int INTERVAL_SECONDS = 10;
+	private int runCountdown = INTERVAL_SECONDS;
+
 	/*
-	 * Note: Spring does correctly protect against concurrent runs. It will always
-	 * wait until the last run of this function is completed before running again.
-	 * So we can always assume only one thread/deamon of this class is running at at
-	 * time, because this is a singleton class.
+	 * Note: Spring does correctly protect against concurrent runs. It will always wait until the last
+	 * run of this function is completed before running again. So we can always assume only one
+	 * thread/deamon of this class is running at at time, because this is a singleton class.
 	 * 
 	 * see also: @EnableScheduling (in this project)
 	 * 
@@ -61,7 +62,7 @@ public class NotificationDaemon {
 	 * 
 	 * Runs immediately at startup, and then every 10 seconds
 	 */
-	@Scheduled(fixedDelay = 10 * 1000)
+	@Scheduled(fixedDelay = 1000)
 	public void run() {
 		if (AppServer.isShuttingDown() || !AppServer.isEnableScheduling()) {
 			log.debug("ignoring NotificationDeamon schedule cycle");
@@ -78,13 +79,22 @@ public class NotificationDaemon {
 			return;
 		}
 
-		adminRunner.run((MongoSession session) -> {
-			List<SubNode> mailNodes = outboxMgr.getMailNodes(session);
-			if (mailNodes != null) {
-				log.debug("Found " + String.valueOf(mailNodes.size()) + " mailNodes to send.");
-				sendAllMail(session, mailNodes);
-			}
-		});
+		if (--runCountdown <= 0) {
+			runCountdown = INTERVAL_SECONDS;
+
+			adminRunner.run((MongoSession session) -> {
+				List<SubNode> mailNodes = outboxMgr.getMailNodes(session);
+				if (mailNodes != null) {
+					log.debug("Found " + String.valueOf(mailNodes.size()) + " mailNodes to send.");
+					sendAllMail(session, mailNodes);
+				}
+			});
+		}
+	}
+
+	/* Triggers the next cycle to not wait, but process immediately */
+	public void setOutboxDirty() {
+		runCountdown = 0;
 	}
 
 	private void sendAllMail(MongoSession session, List<SubNode> nodes) {
@@ -105,14 +115,12 @@ public class NotificationDaemon {
 						String subject = node.getStrProp(NodeProp.EMAIL_SUBJECT.s());
 						String content = node.getStrProp(NodeProp.EMAIL_CONTENT.s());
 
-						if (!StringUtils.isEmpty(email) && !StringUtils.isEmpty(subject)
-								&& !StringUtils.isEmpty(content)) {
+						if (!StringUtils.isEmpty(email) && !StringUtils.isEmpty(subject) && !StringUtils.isEmpty(content)) {
 
 							log.debug("Found mail to send to: " + email);
 							mailSender.sendMail(email, null, content, subject);
 							delete.delete(session, node, false);
-						}
-						else {
+						} else {
 							log.debug("not sending email. Missing some properties. email or subject or content");
 						}
 					}
