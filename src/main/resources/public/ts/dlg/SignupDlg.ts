@@ -19,6 +19,8 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
     S = ctx;
 });
 
+declare var g_brandingAppName;
+
 export class SignupDlg extends DialogBase {
 
     userState: ValidatedState<any> = new ValidatedState<any>();
@@ -137,7 +139,7 @@ export class SignupDlg extends DialogBase {
             this.close();
 
             await S.util.showMessage(
-                "User Information Accepted.<p/><p/>Check your email for verification link.", "Note"
+                "Check your email for verification link.", "Welcome to " + g_brandingAppName + "!"
             );
 
             window.location.href = window.location.origin;

@@ -185,7 +185,8 @@ public class UserManagerService {
 				Arrays.asList(PrivilegeType.READ.s()), NodeName.POSTS);
 
 		ensureUserHomeNodeExists(session, userName, "### " + userName
-				+ "'s Public Node &#x1f389;\n\nEdit the content and children of this node. It represents you to the outside world.",
+				+ "'s Public Node &#x1f389;\n\nEdit the content and children of this node. It represents you to the outside world.\n\n"+
+				"Go here for a Quick Start guide: https://quanta.wiki/n/quick-start",
 				NodeType.NONE.s(), NodeName.HOME);
 
 		return res;
@@ -513,8 +514,8 @@ public class UserManagerService {
 
 		String brandingAppName = appProp.getConfigText("brandingAppName");
 
-		content = "Welcome to " + brandingAppName + ":" + userName + //
-				"<p>\nClick this link to complete signup: <br>\n" + signupLink;
+		content = "Welcome to " + brandingAppName + ", " + userName + "!" + //
+				"<p>\nUse this link to complete the signup: <br>\n" + signupLink;
 
 		if (!StringUtils.isEmpty(appProp.getMailHost())) {
 			outboxMgr.queueEmail(email, brandingAppName + " - Account Signup", content);
