@@ -10,6 +10,7 @@ import { CompIntf } from "../widget/base/CompIntf";
 import { Button } from "../widget/Button";
 import { ButtonBar } from "../widget/ButtonBar";
 import { Div } from "../widget/Div";
+import { Heading } from "../widget/Heading";
 import { Html } from "../widget/Html";
 import { Img } from "../widget/Img";
 import { Label } from "../widget/Label";
@@ -41,7 +42,7 @@ export class UserProfileDlg extends DialogBase {
     getTitleText(): string {
         const state: any = this.getState();
         if (!state.userProfile) return "";
-        return (this.readOnly ? "Profile: " : "Edit Profile: ") + state.userProfile.userName;
+        return this.readOnly ? "Profile" : "Edit Profile";
     }
 
     renderDlg(): CompIntf[] {
@@ -55,6 +56,10 @@ export class UserProfileDlg extends DialogBase {
         let url = window.location.origin + "/u/" + state.userProfile.userName + "/home";
         let localUser = S.util.isLocalUserName(state.userProfile.userName);
 
+        let displayName = state.userProfile.displayName
+            ? state.userProfile.displayName + " (@" + state.userProfile.userName + ")"
+            : ("@" + state.userProfile.userName);
+
         let children = [
             new Div(null, null, [
                 profileHeaderImg ? new Div(null, null, [
@@ -67,7 +72,7 @@ export class UserProfileDlg extends DialogBase {
 
                 new Div(null, { className: "marginBottom " + (profileHeaderImg ? "profileBioPanel" : "profileBioPanelNoHeader") }, [
                     this.readOnly
-                        ? new Html(state.userProfile.displayName || "")
+                        ? new Heading(3, displayName || "")
                         : new TextField("Display Name", false, null, "displayNameTextField", false, this.displayNameState),
 
                     this.readOnly
