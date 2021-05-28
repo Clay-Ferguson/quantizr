@@ -1384,16 +1384,11 @@ input[type="radio"] {
 
 .editing-border {
     // border-bottom: 3px dotted $nodeBorderBottomColor;
-    border-bottom: 1px dotted lightslategray;
+    border-bottom: 2px dotted lightslategray;
 }
 
 .non-editing-border {
-    border-bottom: 1px dotted lightslategray;
-}
-
-.editing-border {
-    // border-bottom: 3px dotted $nodeBorderBottomColor;
-    border-bottom: 1px dotted lightslategray;
+    border-bottom: 2px dotted lightslategray;
 }
 
 /*
