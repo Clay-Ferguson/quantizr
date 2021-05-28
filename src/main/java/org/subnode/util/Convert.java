@@ -198,6 +198,11 @@ public class Convert {
 						nodeInfo.safeGetClientProps().add(new PropertyInfo("avatarVer", friendAvatarVer));
 					}
 
+					String friendDisplayName = friendAccountNode.getStrProp(NodeProp.DISPLAY_NAME.s());
+					if (friendDisplayName != null) {
+						nodeInfo.safeGetClientProps().add(new PropertyInfo(NodeProp.DISPLAY_NAME.s(), friendDisplayName));
+					}
+
 					/*
 					 * Note: for ActivityPub foreign users we have xxx property on their account node that points to the
 					 * live URL of their account avatar as it was found in their Actor object

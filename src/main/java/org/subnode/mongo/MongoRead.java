@@ -538,6 +538,8 @@ public class MongoRead {
          * This regex finds all that START WITH path, have some characters after path, before the end of the
          * string. Without the trailing (.+)$ we would be including the node itself in addition to all its
          * children.
+         * 
+         * todo-1: Look for places we could be passing COMPILED regex object into all calls like this, and not the string!
          */
         Criteria criteria = Criteria.where(SubNode.FIELD_PATH).regex(util.regexRecursiveChildrenOfPath(node.getPath()));
         query.addCriteria(criteria);

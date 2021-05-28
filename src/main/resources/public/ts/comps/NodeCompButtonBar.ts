@@ -39,6 +39,8 @@ export class NodeCompButtonBar extends Div {
         }
 
         let typeIcon: Icon;
+        let typeNameSpan: Span;
+        let typeSpan: Span;
         let encIcon: Icon;
         let sharedIcon: Icon;
         let openButton: Button;
@@ -56,14 +58,25 @@ export class NodeCompButtonBar extends Div {
 
         let typeHandler: TypeHandlerIntf = S.plugin.getTypeHandler(node.type);
         if (typeHandler) {
-            let iconClass = typeHandler.getIconClass();
-            if (iconClass) {
-                typeIcon = new Icon({
-                    className: iconClass + " rowIcon",
-                    title: "Node Type: " + typeHandler.getName(),
-                    onMouseOver: () => { S.meta64.draggableId = node.id; },
-                    onMouseOut: () => { S.meta64.draggableId = null; }
-                });
+            let typeName = typeHandler.getName();
+            if (typeName !== "Markdown") {
+                let iconClass = typeHandler.getIconClass();
+                if (iconClass) {
+                    typeIcon = new Icon({
+                        className: iconClass + " rowTypeIcon",
+                        title: "Node Type: " + typeHandler.getName(),
+                        onMouseOver: () => { S.meta64.draggableId = node.id; },
+                        onMouseOut: () => { S.meta64.draggableId = null; }
+                    });
+                }
+            }
+
+            if (typeName && typeName !== "Markdown") {
+                typeNameSpan = new Span(typeName, !typeIcon ? { className: "marginLeft" } : null);
+            }
+
+            if (typeIcon || typeNameSpan) {
+                typeSpan = new Span(null, { className: "typeIconAndName" }, [typeIcon, typeNameSpan]);
             }
         }
 
@@ -135,7 +148,7 @@ export class NodeCompButtonBar extends Div {
 
             /* convert this button to a className attribute for styles */
             openButton = new Button("Open", S.nav.openNodeById,
-                { title: "Open Node to access its children.", nid: node.id }, "btn-primary");
+                { title: "Open Node to access its children.", nid: node.id }, "btn-primary marginRight");
         }
 
         /*
@@ -259,7 +272,7 @@ export class NodeCompButtonBar extends Div {
             }
         }
 
-        let btnArray: Comp[] = [openButton, insertNodeButton, createSubNodeButton, editNodeButton, moveNodeUpButton, //
+        let btnArray: Comp[] = [/* openButton, */insertNodeButton, createSubNodeButton, editNodeButton, moveNodeUpButton, //
             moveNodeDownButton, cutNodeButton, deleteNodeButton, pasteButtons];
 
         if (this.extraButtons) {
@@ -325,6 +338,6 @@ export class NodeCompButtonBar extends Div {
             buttonBar = null;
         }
 
-        this.setChildren([selButton, typeIcon, encIcon, sharedIcon, buttonBar, navButtonBar]);
+        this.setChildren([selButton, openButton, typeSpan, encIcon, sharedIcon, buttonBar, navButtonBar]);
     }
 }

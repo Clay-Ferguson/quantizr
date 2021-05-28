@@ -1021,6 +1021,12 @@ input[type="radio"] {
     cursor: pointer;
 }
 
+.rowTypeIcon {
+    margin-right: 6px;
+    vertical-align: middle;
+    cursor: pointer;
+}
+
 .passwordEyeIcon {
     cursor: pointer;
     margin-left: 10px;
@@ -1228,9 +1234,10 @@ input[type="radio"] {
 }
 
 .created-by {
-    padding: 4px;
+    padding: 6px;
     margin-right: 10px;
     margin-left: 10px;
+    border-radius: 6px;
 }
 
 .created-by-me {
@@ -1308,9 +1315,10 @@ input[type="radio"] {
 }
 
 .nodeName {
-    padding: 4px;
+    padding: 6px;
     margin-right: 10px;
     cursor: pointer;
+    border-radius: 6px;
 }
 
 .content-narrow {
@@ -1642,6 +1650,12 @@ i'm backing out for now
     font-size: 1.2rem;
     font-weight: 500;
     line-height: 1.2;
+}
+
+.typeIconAndName {
+    border: 2px solid gray;
+    border-radius: 6px;
+    padding: 6px;
 }
 
 .friendListText {

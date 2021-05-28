@@ -87,6 +87,7 @@ export class FriendTypeHandler extends TypeBase {
         }
 
         let actorUrl = S.props.getClientPropVal(J.NodeProp.ACT_PUB_ACTOR_URL, node);
+        let displayName = S.props.getClientPropVal(J.NodeProp.DISPLAY_NAME, node);
 
         if (imgSrc) {
             img = new Img(null, {
@@ -105,7 +106,10 @@ export class FriendTypeHandler extends TypeBase {
             img,
             new Div(null, null, [
                 // todo-0: need to somehow make the server send us the displayName to show here.
-                new Heading(4, "User: " + (user || ""), {
+                new Heading(4, displayName || "", {
+                    className: "marginAll"
+                }),
+                new Heading(4, user ? ("@" + user) : "", {
                     className: "marginAll"
                 }),
                 new Html(userBio, {
