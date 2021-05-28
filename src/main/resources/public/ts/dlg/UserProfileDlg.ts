@@ -14,6 +14,7 @@ import { Html } from "../widget/Html";
 import { Img } from "../widget/Img";
 import { Label } from "../widget/Label";
 import { TextArea } from "../widget/TextArea";
+import { TextField } from "../widget/TextField";
 import { UploadFromFileDropzoneDlg } from "./UploadFromFileDropzoneDlg";
 
 let S: Singletons;
@@ -24,6 +25,7 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
 export class UserProfileDlg extends DialogBase {
     readOnly: boolean;
     bioState: ValidatedState<any> = new ValidatedState<any>();
+    displayNameState: ValidatedState<any> = new ValidatedState<any>();
 
     /* If no userNodeId is specified this dialog defaults to the current logged in user, or else will be
     some other user, and this dialog should be readOnly */
@@ -64,6 +66,10 @@ export class UserProfileDlg extends DialogBase {
                 profileImg,
 
                 new Div(null, { className: "marginBottom " + (profileHeaderImg ? "profileBioPanel" : "profileBioPanelNoHeader") }, [
+                    this.readOnly
+                        ? new Html(state.userProfile.displayName || "")
+                        : new TextField("Display Name", false, null, "displayNameTextField", false, this.displayNameState),
+
                     this.readOnly
                         ? new Html(S.util.markdown(state.userProfile.userBio) || "")
                         : new TextArea("About Me", {
@@ -123,6 +129,7 @@ export class UserProfileDlg extends DialogBase {
                 console.log("UserProfile Response: " + S.util.prettyPrint(res));
                 if (res) {
                     this.bioState.setValue(res.userProfile.userBio);
+                    this.displayNameState.setValue(res.userProfile.displayName);
                     this.mergeState({
                         userProfile: res.userProfile
                     });
@@ -135,7 +142,8 @@ export class UserProfileDlg extends DialogBase {
     save = (): void => {
         S.util.ajax<J.SaveUserProfileRequest, J.SaveUserProfileResponse>("saveUserProfile", {
             userName: null,
-            userBio: this.bioState.getValue()
+            userBio: this.bioState.getValue(),
+            displayName: this.displayNameState.getValue()
         }, this.saveResponse);
     }
 

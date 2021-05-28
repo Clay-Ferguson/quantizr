@@ -98,6 +98,7 @@ public class Convert {
 		 */
 		String nameProp = null;
 		SubNode userNode = read.getNode(session, node.getOwner(), false);
+		String displayName = null;
 
 		if (userNode == null) {
 			// todo-1: looks like import corrupts the 'owner' (needs research), but the code
@@ -110,6 +111,7 @@ public class Convert {
 		} else {
 			nameProp = userNode.getStrProp(NodeProp.USER.s());
 			avatarVer = userNode.getStrProp(NodeProp.BIN.s());
+			displayName = userNode.getStrProp(NodeProp.DISPLAY_NAME.s());
 
 			/*
 			 * todo-1: right here, get user profile off 'userNode', and put it into a map that will be sent back
@@ -145,7 +147,7 @@ public class Convert {
 		String apAvatar = userNode != null ? userNode.getStrProp(NodeProp.ACT_PUB_USER_ICON_URL) : null;
 
 		NodeInfo nodeInfo =
-				new NodeInfo(node.jsonId(), node.getPath(), node.getName(), node.getContent(), owner, ownerId, node.getOrdinal(), //
+				new NodeInfo(node.jsonId(), node.getPath(), node.getName(), node.getContent(), displayName, owner, ownerId, node.getOrdinal(), //
 						node.getModifyTime(), propList, acList, hasChildren, //
 						imageSize != null ? imageSize.getWidth() : 0, //
 						imageSize != null ? imageSize.getHeight() : 0, //
@@ -326,6 +328,7 @@ public class Convert {
 		if (principalId != null) {
 			adminRunner.run(s -> {
 				acInfo.setPrincipalName(auth.getUserNameFromAccountNodeId(s, principalId));
+				acInfo.setDisplayName(auth.getDisplayNameFromAccountNodeId(s, principalId));
 
 				// currently don't ever need this info for displaying rows, so don't waste the
 				// CPU cycles to get it.

@@ -72,6 +72,10 @@ $smallBorderSize: 3px;
 //     }
 // }
 
+.displayNameTextField {
+    max-width: 60%;
+}
+
 .main-app-row {
     margin-left: 0px !important;
     margin-right: 0px !important;
@@ -1647,11 +1651,11 @@ i'm backing out for now
 }
 
 .friendListImage {
-    max-width: 48px;
-    max-height: 80px;
+    max-width: 60px;
+    max-height: 60px;
     cursor: pointer;
     border: 1px solid gray;
-    border-radius: 4px;
+    border-radius: 5px;
 }
 
 .dialogContentArea {

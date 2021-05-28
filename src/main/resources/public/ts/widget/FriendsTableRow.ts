@@ -38,12 +38,16 @@ export class FriendsTableRow extends ListBoxRow {
             });
         }
 
+        let friendDisplay = this.friend.displayName
+            ? this.friend.displayName + " (@" + this.friend.userName + ")"
+            : ("@" + this.friend.userName);
+
         this.setChildren([
             new Div(null, {
                 className: (this.isSelected ? " selectedListItem" : " unselectedListItem")
             }, [
                 img,
-                new Span(this.friend.userName, { className: "friendListText" })
+                new Span(friendDisplay, { className: "friendListText" })
             ])
         ]);
     }

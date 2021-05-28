@@ -2,6 +2,7 @@
 /* eslint-disable */
 
 export interface UserProfile {
+    displayName: string;
     userName: string;
     homeNodeId: string;
     userBio: string;
@@ -253,6 +254,7 @@ export interface SaveUserPreferencesRequest extends RequestBase {
 export interface SaveUserProfileRequest extends RequestBase {
     userName: string;
     userBio: string;
+    displayName: string;
 }
 
 export interface SearchAndReplaceRequest extends RequestBase {
@@ -379,6 +381,7 @@ export interface FileSystemReindexResponse extends ResponseBase {
 }
 
 export interface FriendInfo {
+    displayName: string;
     userName: string;
     avatarVer: string;
     userNodeId: string;
@@ -608,6 +611,7 @@ export interface NodeInfo {
     parent: NodeInfo;
     children: NodeInfo[];
     imgId: string;
+    displayName: string;
     owner: string;
     ownerId: string;
     dataUrl: string;
@@ -623,6 +627,7 @@ export interface UserPreferences {
 }
 
 export interface AccessControlInfo {
+    displayName: string;
     principalName: string;
     principalNodeId: string;
     avatarVer: string;
@@ -691,6 +696,7 @@ export const enum NodeProp {
     EMAIL_SUBJECT = "sn:subject",
     TARGET_ID = "sn:target_id",
     USER = "sn:user",
+    DISPLAY_NAME = "sn:displayName",
     USER_BIO = "sn:userBio",
     PWD_HASH = "sn:pwdHash",
     FILE_SYNC_LINK = "fs:link",

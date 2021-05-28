@@ -76,6 +76,7 @@ public class NodeInfo {
 	private List<NodeInfo> children;
 
 	private String imgId;
+	private String displayName;
 	private String owner;
 	private String ownerId;
 
@@ -86,7 +87,7 @@ public class NodeInfo {
 	public NodeInfo() {
 	}
 
-	public NodeInfo(String id, String path, String name, String content, String owner, String ownerId, Long ordinal,
+	public NodeInfo(String id, String path, String name, String content, String displayName, String owner, String ownerId, Long ordinal,
 			Date lastModified, List<PropertyInfo> properties, List<AccessControlInfo> ac, boolean hasChildren,
 			int width, int height, String type, long logicalOrdinal, boolean lastChild, String cipherKey,
 			String dataUrl, String avatarVer, String apAvatar) {
@@ -95,6 +96,7 @@ public class NodeInfo {
 		this.name = name;
 		this.content = content;
 		this.lastModified = lastModified;
+		this.displayName = displayName;
 		this.owner = owner;
 		this.ownerId = ownerId;
 		this.ordinal = ordinal;
@@ -354,5 +356,13 @@ public class NodeInfo {
 
 	public void setClientProps(List<PropertyInfo> clientProps) {
 		this.clientProps = clientProps;
+	}
+
+	public String getDisplayName() {
+		return displayName;
+	}
+
+	public void setDisplayName(String displayName) {
+		this.displayName = displayName;
 	}
 }

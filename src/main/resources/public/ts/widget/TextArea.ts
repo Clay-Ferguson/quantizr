@@ -21,7 +21,7 @@ export class TextArea extends Span implements I.TextEditorIntf {
     constructor(private label: string, attribs: any, private valState: ValidatedState<any>, customClass: string = null) {
         // do not pass valState into base class, we want it to have state separately
         super(null);
-        this.attribs.style = { fontFamily: "monospace" };
+        // this.attribs.style = { fontFamily: "monospace" };
 
         if (attribs) {
             Object.assign(this.textareaAttribs, attribs);

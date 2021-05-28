@@ -60,12 +60,16 @@ export class EditPrivsTableRow extends ListBoxRow {
             });
         }
 
+        let displayName = this.aclEntry.displayName
+            ? this.aclEntry.displayName + " (@" + this.aclEntry.principalName + ")"
+            : ("@" + this.aclEntry.principalName);
+
         this.setChildren([
             new Div(null, { className: "marginAll" }, [
                 img,
                 this.aclEntry.principalName === "public"
                     ? new Heading(3, "Public")
-                    : new Span(this.aclEntry.principalName, { className: img ? "marginLeft" : "" }),
+                    : new Span(displayName, { className: img ? "marginLeft" : "" }),
                 this.aclEntry.principalName === "public"
                     ? new Span("Visible to everyone.")
                     : null,

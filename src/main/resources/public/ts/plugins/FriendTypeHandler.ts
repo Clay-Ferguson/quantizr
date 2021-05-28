@@ -104,6 +104,7 @@ export class FriendTypeHandler extends TypeBase {
         }, [
             img,
             new Div(null, null, [
+                // todo-0: need to somehow make the server send us the displayName to show here.
                 new Heading(4, "User: " + (user || ""), {
                     className: "marginAll"
                 }),

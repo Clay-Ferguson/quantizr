@@ -1,7 +1,9 @@
 package org.subnode.model.client;
 
 public class UserProfile {
-    private String userName;
+	private String displayName;
+
+	private String userName;
 	//if a node exists named '[userName]:home', then the id of that node is stored here.
 	private String homeNodeId;
 
@@ -83,5 +85,13 @@ public class UserProfile {
 
 	public void setHomeNodeId(String homeNodeId) {
 		this.homeNodeId = homeNodeId;
+	}
+
+	public String getDisplayName() {
+		return displayName;
+	}
+
+	public void setDisplayName(String displayName) {
+		this.displayName = displayName;
 	}
 }

@@ -67,6 +67,7 @@ public enum NodeProp {
      * these nodes.
      */
     USER("sn:user", "s"), //
+    DISPLAY_NAME("sn:displayName", "s"), //
     USER_BIO("sn:userBio", "s"), //
     PWD_HASH("sn:pwdHash", "s"), //
 

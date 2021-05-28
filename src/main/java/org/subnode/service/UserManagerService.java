@@ -185,9 +185,8 @@ public class UserManagerService {
 				Arrays.asList(PrivilegeType.READ.s()), NodeName.POSTS);
 
 		ensureUserHomeNodeExists(session, userName, "### " + userName
-				+ "'s Public Node &#x1f389;\n\nEdit the content and children of this node. It represents you to the outside world.\n\n"+
-				"Go here for a Quick Start guide: https://quanta.wiki/n/quick-start",
-				NodeType.NONE.s(), NodeName.HOME);
+				+ "'s Public Node &#x1f389;\n\nEdit the content and children of this node. It represents you to the outside world.\n\n"
+				+ "Go here for a Quick Start guide: https://quanta.wiki/n/quick-start", NodeType.NONE.s(), NodeName.HOME);
 
 		return res;
 	}
@@ -636,6 +635,7 @@ public class UserManagerService {
 			if (!failed) {
 				// userNode.setProp(NodeProp.USER.s(), req.getUserName());
 				userNode.setProp(NodeProp.USER_BIO.s(), req.getUserBio());
+				userNode.setProp(NodeProp.DISPLAY_NAME.s(), req.getDisplayName());
 				// sessionContext.setUserName(req.getUserName());
 				update.save(session, userNode);
 				res.setSuccess(true);
@@ -705,10 +705,12 @@ public class UserManagerService {
 				UserProfile userProfile = new UserProfile();
 
 				String nodeUserName = userNode.getStrProp(NodeProp.USER.s());
+				String displayName = userNode.getStrProp(NodeProp.DISPLAY_NAME.s());
 				SubNode userHomeNode = read.getNodeByName(session, nodeUserName + ":" + NodeName.HOME);
 
 				res.setUserProfile(userProfile);
 				userProfile.setUserName(nodeUserName);
+				userProfile.setDisplayName(displayName);
 
 				if (userHomeNode != null) {
 					userProfile.setHomeNodeId(userHomeNode.getId().toHexString());
@@ -910,6 +912,12 @@ public class UserManagerService {
 				if (userName != null) {
 					FriendInfo fi = new FriendInfo();
 					fi.setUserName(userName);
+
+					SubNode userNode = read.getUserNodeByUserName(null, userName);
+					if (userNode != null) {
+						fi.setDisplayName(userNode.getStrProp(NodeProp.DISPLAY_NAME.s()));
+					}
+
 					String userNodeId = friendNode.getStrProp(NodeProp.USER_NODE_ID);
 
 					SubNode friendAccountNode = read.getNode(session, userNodeId, false);

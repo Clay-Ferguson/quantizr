@@ -65,7 +65,8 @@ public class MongoAuth {
 	private static final MongoSession adminSession = MongoSession.createFromUser(PrincipalName.ADMIN.s());
 	private static final MongoSession anonSession = MongoSession.createFromUser(PrincipalName.ANON.s());
 
-	public static final HashMap<String, String> userNamesByAccountId = new HashMap<>();
+	private static final HashMap<String, String> userNamesByAccountId = new HashMap<>();
+	private static final HashMap<String, String> displayNamesByAccountId = new HashMap<>();
 
 	public MongoSession getAdminSession() {
 		return adminSession;
@@ -89,6 +90,37 @@ public class MongoAuth {
 			}
 		}
 	}
+
+	/* todo-1: need to unify getDisplayNameFrom... and getUserNameFrom... below (next two functions) */
+	public String getDisplayNameFromAccountNodeId(MongoSession session, String accountId) {
+
+		// special case of a public share
+		if (PrincipalName.PUBLIC.s().equals(accountId)) {
+			return PrincipalName.PUBLIC.s();
+		}
+
+		// if the userName is cached get it from the cache.
+		synchronized (displayNamesByAccountId) {
+			String displayName = displayNamesByAccountId.get(accountId);
+			if (displayName != null) {
+				return displayName;
+			}
+		}
+
+		// if userName not found in cache we read the node to get the userName from it.
+		SubNode accountNode = read.getNode(session, accountId);
+		if (accountNode != null) {
+			synchronized (displayNamesByAccountId) {
+				// get the userName from the node, then put it in 'info' and cache it also.
+				String displayName = accountNode.getStrProp(NodeProp.DISPLAY_NAME);
+
+				displayNamesByAccountId.put(accountId, displayName);
+				return displayName;
+			}
+		}
+		return null;
+	}
+
 
 	public String getUserNameFromAccountNodeId(MongoSession session, String accountId) {
 
@@ -422,6 +454,7 @@ public class MongoAuth {
 	}
 
 	public AccessControlInfo createAccessControlInfo(MongoSession session, String principalId, String authType) {
+		String displayName = null;
 		String principalName = null;
 		String publicKey = null;
 		String avatarVer = null;
@@ -437,11 +470,12 @@ public class MongoAuth {
 				return null;
 			}
 			principalName = principalNode.getStrProp(NodeProp.USER.s());
+			displayName = principalNode.getStrProp(NodeProp.DISPLAY_NAME.s());
 			publicKey = principalNode.getStrProp(NodeProp.USER_PREF_PUBLIC_KEY.s());
 			avatarVer = principalNode.getStrProp(NodeProp.BIN);
 		}
 
-		AccessControlInfo info = new AccessControlInfo(principalName, principalId, publicKey, avatarVer);
+		AccessControlInfo info = new AccessControlInfo(displayName, principalName, principalId, publicKey, avatarVer);
 		info.addPrivilege(new PrivilegeInfo(authType));
 		return info;
 	}

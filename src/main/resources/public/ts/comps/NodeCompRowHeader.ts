@@ -49,7 +49,8 @@ export class NodeCompRowHeader extends Div {
         // now that we have this stuff visible by default on all nodes, we don't want users to need to
         // see 'admin' on all admin nodes. too noisy
         if (node.owner && node.owner !== "?" && node.owner !== "admin") {
-            children.push(new Span(node.owner, {
+            let displayName = node.displayName || ("@" + node.owner);
+            children.push(new Span(displayName, {
                 className: (node.owner === state.userName) ? "created-by-me" : "created-by-other"
             }));
         }
