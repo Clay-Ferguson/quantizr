@@ -59,7 +59,7 @@ export abstract class DialogBase<S extends BaseCompState = any> extends Div<S> i
         }
         else {
             this.attribs.className = this.appState.mobileMode
-                ? (this.closeByOutsideClick ? "app-modal-content-almost-fullscreen" : "app-modal-content-fullscreen")
+                ? (this.closeByOutsideClick ? "app-modal-main-menu" : "app-modal-content-fullscreen")
                 : (this.overrideClass ? this.overrideClass : "app-modal-content");
         }
     }

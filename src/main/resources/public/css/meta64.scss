@@ -709,10 +709,8 @@ entire thing down some times, if it's jutting up against something */
     overflow: auto;
 }
 
-// We hav this narrower width version so that the main menu can use it because to close that without selecting an option
-// the user needs space to click in outside the menu which closes the menu.
-// todo-0: note this now ONLY applies to main menu itself, so update variable names and designs accordingly.
-.app-modal-content-almost-fullscreen {
+/* Max-width of 18em allows most of the page to the right to be clicked on to dismiss the menu */
+.app-modal-main-menu {
     border: 2px solid $modal-content-border-color;
     background-color: $modal-content-bg;
     padding: $smallGap;
@@ -1433,6 +1431,7 @@ i'm backing out for now
     // padding: 6px;
     // border-radius: $borderRadiusMedium;
     display: table-cell;
+    padding-top: 5px;
 }
 
 .node-table-row .top-right-image {

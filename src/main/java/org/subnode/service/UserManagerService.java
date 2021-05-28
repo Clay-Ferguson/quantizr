@@ -729,7 +729,9 @@ public class UserManagerService {
 	}
 
 	public UserPreferences getDefaultUserPreferences() {
-		return new UserPreferences();
+		UserPreferences userPrefs = new UserPreferences();
+		userPrefs.setShowMetaData(true);
+		return userPrefs;
 	}
 
 	public UserPreferences getUserPreferences(String userName, SubNode _prefsNode) {

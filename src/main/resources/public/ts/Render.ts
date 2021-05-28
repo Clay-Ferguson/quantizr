@@ -343,6 +343,16 @@ export class Render implements RenderIntf {
                         s.node = res.node;
                         s.endReached = res.endReached;
                         s.breadcrumbs = res.breadcrumbs;
+
+                        /* todo-1: A hack to make anyone comming to the lobby have their metata option turned on */
+                        if (s.node.name === "lounge") {
+                            s.userPreferences.showMetaData = true;
+
+                            /* if a logged in user turn on their edit mode too */
+                            if (!s.isAnonUser) {
+                                s.userPreferences.editMode = true;
+                            }
+                        }
                     }
 
                     s.idToNodeMap = new Map<string, J.NodeInfo>();
