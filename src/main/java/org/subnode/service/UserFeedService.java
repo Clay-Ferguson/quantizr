@@ -236,17 +236,16 @@ public class UserFeedService {
 			sharedToAny.add(PrincipalName.PUBLIC.s());
 		}
 
-		// todo-0: rename this var to 'userAccountNode'
-		SubNode searchRoot = null;
+		SubNode userAccountNode = null;
 
 		// includes shares TO me.
 		if (req.getToMe()) {
-			if (searchRoot == null) {
-				searchRoot = read.getNode(session, sc.getRootId());
+			if (userAccountNode == null) {
+				userAccountNode = read.getNode(session, sc.getRootId());
 			}
 
-			if (searchRoot != null) {
-				sharedToAny.add(searchRoot.getOwner().toHexString());
+			if (userAccountNode != null) {
+				sharedToAny.add(userAccountNode.getOwner().toHexString());
 			}
 		}
 		List<NodeInfo> searchResults = new LinkedList<>();
@@ -283,14 +282,14 @@ public class UserFeedService {
 		List<Criteria> orCriteria = new LinkedList<>();
 
 		if (req.getFromMe()) {
-			if (searchRoot == null) {
-				searchRoot = read.getNode(session, sc.getRootId());
+			if (userAccountNode == null) {
+				userAccountNode = read.getNode(session, sc.getRootId());
 			}
 
-			if (searchRoot != null) {
+			if (userAccountNode != null) {
 				orCriteria.add(
 						// where node is owned by us.
-						Criteria.where(SubNode.FIELD_OWNER).is(searchRoot.getOwner()) //
+						Criteria.where(SubNode.FIELD_OWNER).is(userAccountNode.getOwner()) //
 								// and the node has any sharing on it.
 								.and(SubNode.FIELD_AC).ne(null));
 			}
