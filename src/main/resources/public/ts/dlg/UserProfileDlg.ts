@@ -131,7 +131,7 @@ export class UserProfileDlg extends DialogBase {
             S.util.ajax<J.GetUserProfileRequest, J.GetUserProfileResponse>("getUserProfile", {
                 userId: userNodeId
             }, (res: J.GetUserProfileResponse): void => {
-                console.log("UserProfile Response: " + S.util.prettyPrint(res));
+                // console.log("UserProfile Response: " + S.util.prettyPrint(res));
                 if (res) {
                     this.bioState.setValue(res.userProfile.userBio);
                     this.displayNameState.setValue(res.userProfile.displayName);

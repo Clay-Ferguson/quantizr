@@ -1018,4 +1018,13 @@ public class UserManagerService {
 		sb.append("Foreign User Count: " + foreignUserCount + "\n");
 		return sb.toString();
 	}
+
+	public void updateLastActiveTime(SessionContext sc) {
+		MongoSession session = auth.getAdminSession();
+		SubNode userNode = read.getUserNodeByUserName(session, sc.getUserName());
+		if (userNode != null) {
+			userNode.setProp(NodeProp.LAST_ACTIVE_TIME.s(), sc.getLastActiveTime());
+			update.save(session, userNode);
+		}
+	}
 }
