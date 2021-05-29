@@ -22,7 +22,7 @@ public class NodeSearchRequest extends RequestBase {
 
 	private boolean caseSensitive;
 
-	//special definition name for pre-defined searches like "AllUserSharedNodes", or "AllPublicNodes"
+	//special definition name which gives the server a hint about what kind of search this is
 	private String searchDefinition;
 
 	private String userSearchType;

@@ -481,6 +481,10 @@ export interface LuceneSearchResponse extends ResponseBase {
 export interface MoveNodesResponse extends ResponseBase {
 }
 
+export interface NodeEditedPushInfo extends ServerPushInfo {
+    nodeInfo: NodeInfo;
+}
+
 export interface NodeFeedResponse extends ResponseBase {
     endReached: boolean;
     searchResults: NodeInfo[];

@@ -88,7 +88,7 @@ export class Search implements SearchIntf {
             searchProp: null,
             fuzzy: false,
             caseSensitive: false,
-            searchDefinition: "",
+            searchDefinition: "timeline",
             userSearchType: null,
             timeRangeType
         }, (res) => { this.timelineResponse(res, timelineDescription); });

@@ -9,6 +9,7 @@ import { AppTab } from "../widget/AppTab";
 import { Comp } from "../widget/base/Comp";
 import { Div } from "../widget/Div";
 import { Li } from "../widget/Li";
+import { Span } from "../widget/Span";
 import { TextContent } from "../widget/TextContent";
 
 let S: Singletons;
@@ -61,7 +62,12 @@ export class TimelineView extends AppTab {
         let children: Comp[] = [];
 
         if (state.timelineDescription) {
-            children.push(new TextContent(state.timelineDescription));
+            children.push(new Span(null, null, [
+                new TextContent(state.timelineDescription)
+                // todo-1: add something like this eventually ?
+                // new Anchor(null, "Refresh", { className: "float-right", onClick: S.search.timelineRefresh }),
+                // new Div(null, { className: "clearfix" })
+            ]));
         }
 
         let i = 0;

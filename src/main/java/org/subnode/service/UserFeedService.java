@@ -31,6 +31,7 @@ import org.subnode.mongo.MongoUtil;
 import org.subnode.mongo.model.SubNode;
 import org.subnode.request.NodeFeedRequest;
 import org.subnode.response.FeedPushInfo;
+import org.subnode.response.NodeEditedPushInfo;
 import org.subnode.response.NodeFeedResponse;
 import org.subnode.response.ServerPushInfo;
 import org.subnode.util.Convert;
@@ -91,14 +92,13 @@ public class UserFeedService {
 
 		/* Scan all sessions and push message to the ones that need to see it */
 		for (SessionContext sc : allSessions) {
+			/* Anonymous sessions won't have userName and can be ignored */
+			if (sc.getUserName() == null)
+				continue;
 
 			/* build our push message payload */
 			NodeInfo nodeInfo = convert.convertToNodeInfo(sc, session, node, true, false, 1, false, false);
 			FeedPushInfo pushInfo = new FeedPushInfo(nodeInfo);
-
-			/* Anonymous sessions won't have userName and can be ignored */
-			if (sc.getUserName() == null)
-				continue;
 
 			/*
 			 * push if the sc user is in the shared set or this session is OURs,
@@ -107,6 +107,37 @@ public class UserFeedService {
 				// push notification message to browser
 				sendServerPushInfo(sc, pushInfo);
 			}
+		}
+	}
+
+	/* Notify all browser timelines if they have new info */
+	public void pushTimelineUpdateToBrowsers(MongoSession session, NodeInfo nodeInfo) {
+
+		/*
+		 * Get a local list of 'allSessions' so we can release the lock on the SessionContent varible
+		 * immediately
+		 */
+		List<SessionContext> allSessions = new LinkedList<>();
+		synchronized (SessionContext.allSessions) {
+			allSessions.addAll(SessionContext.allSessions);
+		}
+
+		/* Scan all sessions and push message to the ones that need to see it */
+		for (SessionContext sc : allSessions) {
+			/* Anonymous sessions can be ignored */
+			if (sc.getUserName() == null)
+				continue;
+
+			/*
+			 * Nodes whose path starts with "timeline path", are subnodes of (or descendants of) the timeline
+			 * node and therefore will be sent to their respecitve browsers
+			 */
+			if (sc.getTimelinePath() == null || !nodeInfo.getPath().startsWith(sc.getTimelinePath())) {
+				continue;
+			}
+
+			NodeEditedPushInfo pushInfo = new NodeEditedPushInfo(nodeInfo);
+			sendServerPushInfo(sc, pushInfo);
 		}
 	}
 

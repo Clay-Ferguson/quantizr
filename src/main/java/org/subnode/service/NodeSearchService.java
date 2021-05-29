@@ -160,6 +160,11 @@ public class NodeSearchService {
 			// else we're doing a normal subgraph search for the text
 			else {
 				SubNode searchRoot = read.getNode(session, req.getNodeId());
+
+				if ("timeline".equals(req.getSearchDefinition())) {
+					ThreadLocals.getSessionContext().setTimelinePath(searchRoot.getPath());
+				}
+
 				for (SubNode node : read.searchSubGraph(session, searchRoot, req.getSearchProp(), searchText, req.getSortField(),
 						MAX_NODES, req.getFuzzy(), req.getCaseSensitive(), req.getTimeRangeType())) {
 

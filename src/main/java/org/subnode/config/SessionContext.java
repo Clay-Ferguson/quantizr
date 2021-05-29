@@ -32,6 +32,12 @@ public class SessionContext {
 	/* Identification of user's account root node */
 	private String rootId;
 
+	/* When the user does a "Timeline" search we store the path of the node the timeline was done on
+	so that with a simple substring search, we can detect any time a new node is added that would've appeared
+	in the timeline and then do a server push to browsers of any new nodes, thereby creating a realtime
+	view of the timeline, making it become like a "chat room" */
+	private String timelinePath;
+
 	private String userName;
 	private String password;
 	private String timezone;
@@ -262,5 +268,13 @@ public class SessionContext {
 
 	public void setCaptchaFails(int captchaFails) {
 		this.captchaFails = captchaFails;
+	}
+
+	public String getTimelinePath() {
+		return timelinePath;
+	}
+
+	public void setTimelinePath(String timelinePath) {
+		this.timelinePath = timelinePath;
 	}
 }

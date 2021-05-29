@@ -29,6 +29,7 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
 /* General Widget that doesn't fit any more reusable or specific category other than a plain Div, but inherits capability of Comp class */
 export class FeedView extends AppTab {
 
+    static enabled: boolean = true;
     static searchTextState: ValidatedState<any> = new ValidatedState<any>();
 
     // I don't like this OR how much CPU load it takes, so I'm flagging it off for now
@@ -65,11 +66,10 @@ export class FeedView extends AppTab {
     preRender(): void {
         let state: AppState = useSelector((state: AppState) => state);
 
-        // To do emergency disable of the feed, this works.
-        // if (!state.isAdminUser) {
-        //     this.setChildren([new Div("temporarily unavailable.")]);
-        //     return;
-        // }
+        if (!FeedView.enabled && !state.isAdminUser) {
+            this.setChildren([new Div("temporarily unavailable.")]);
+            return;
+        }
 
         this.attribs.className = "tab-pane fade my-tab-pane";
         if (state.activeTab === this.getId()) {
