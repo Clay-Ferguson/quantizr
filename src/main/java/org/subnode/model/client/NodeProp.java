@@ -147,6 +147,7 @@ public enum NodeProp {
     BIN_QUOTA("sn:binQuota", "s"), //
 
     LAST_LOGIN_TIME("sn:lastLogin", "s"), //
+    LAST_ACTIVE_TIME("sn:lastActive", "s"), //
 
     /*
      * NOTE: These two crypto keys are ONLY used for ActivityPub.

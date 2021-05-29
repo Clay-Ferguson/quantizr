@@ -36,6 +36,9 @@ export interface ChangePasswordRequest extends RequestBase {
     passCode: string;
 }
 
+export interface CheckMessagesRequest extends RequestBase {
+}
+
 export interface CloseAccountRequest extends RequestBase {
 }
 
@@ -343,6 +346,10 @@ export interface BrowseFolderResponse {
 
 export interface ChangePasswordResponse extends ResponseBase {
     user: string;
+}
+
+export interface CheckMessagesResponse extends ResponseBase {
+    numNew: number;
 }
 
 export interface CloseAccountResponse extends ResponseBase {
@@ -735,6 +742,7 @@ export const enum NodeProp {
     BIN_TOTAL = "sn:binTot",
     BIN_QUOTA = "sn:binQuota",
     LAST_LOGIN_TIME = "sn:lastLogin",
+    LAST_ACTIVE_TIME = "sn:lastActive",
     CRYPTO_KEY_PUBLIC = "sn:cryptoKeyPublic",
     CRYPTO_KEY_PRIVATE = "sn:cryptoKeyPrivate",
     INLINE_CHILDREN = "inlineChildren",

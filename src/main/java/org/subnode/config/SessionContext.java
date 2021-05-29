@@ -10,13 +10,20 @@ import java.util.TimeZone;
 import javax.annotation.PreDestroy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.context.annotation.ScopedProxyMode;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 import org.subnode.model.UserPreferences;
+import org.subnode.model.client.NodeProp;
 import org.subnode.model.client.PrincipalName;
+import org.subnode.mongo.MongoAuth;
+import org.subnode.mongo.MongoRead;
+import org.subnode.mongo.MongoSession;
+import org.subnode.mongo.MongoUpdate;
 import org.subnode.mongo.MongoUtil;
+import org.subnode.mongo.model.SubNode;
 import org.subnode.request.base.RequestBase;
 import org.subnode.util.DateUtil;
 
@@ -28,6 +35,15 @@ import org.subnode.util.DateUtil;
 @Scope(value = "session", proxyMode = ScopedProxyMode.TARGET_CLASS)
 public class SessionContext {
 	private static final Logger log = LoggerFactory.getLogger(SessionContext.class);
+
+	@Autowired
+	private MongoAuth auth;
+
+	@Autowired
+	private MongoRead read;
+
+	@Autowired
+	private MongoUpdate update;
 
 	/* Identification of user's account root node */
 	private String rootId;
@@ -45,6 +61,7 @@ public class SessionContext {
 
 	// variable not currently being used (due to refactoring)
 	private long lastLoginTime;
+	private long lastActiveTime;
 
 	private UserPreferences userPreferences;
 
@@ -128,6 +145,18 @@ public class SessionContext {
 		log.trace(String.format("Destroying Session object hashCode[%d] of user %s", hashCode(), userName));
 
 		synchronized (allSessions) {
+
+			/* Set lastActiveTime for user 
+			
+			todo-0: move this block of code into a function in Users service*/
+			MongoSession session = auth.getAdminSession();
+			SubNode userNode = read.getUserNodeByUserName(session, userName);
+			if (userNode != null) {
+				//Date now = Calendar.getInstance().getTime();
+				userNode.setProp(NodeProp.LAST_ACTIVE_TIME.s(), getLastActiveTime());
+				update.save(session, userNode);
+			}
+
 			allSessions.remove(this);
 		}
 	}
@@ -236,6 +265,14 @@ public class SessionContext {
 
 	public void setLastLoginTime(long lastLoginTime) {
 		this.lastLoginTime = lastLoginTime;
+	}
+
+	public long getLastActiveTime() {
+		return lastActiveTime;
+	}
+
+	public void setLastActiveTime(long lastActiveTime) {
+		this.lastActiveTime = lastActiveTime;
 	}
 
 	public SseEmitter getPushEmitter() {

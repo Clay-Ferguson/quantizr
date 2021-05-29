@@ -1,5 +1,6 @@
 package org.subnode;
 
+import java.util.Date;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
@@ -156,6 +157,8 @@ public class CallProcessor {
 	private MongoSession processCredentialsAndGetSession(RequestBase req) {
 
 		SessionContext sc = ThreadLocals.getSessionContext();
+		Date now = new Date();
+		sc.setLastActiveTime(now.getTime());
 		String userName = null;
 		String password = null;
 

@@ -46,6 +46,7 @@ import org.subnode.request.AddFriendRequest;
 import org.subnode.request.AddPrivilegeRequest;
 import org.subnode.request.AppDropRequest;
 import org.subnode.request.ChangePasswordRequest;
+import org.subnode.request.CheckMessagesRequest;
 import org.subnode.request.CloseAccountRequest;
 import org.subnode.request.CreateSubNodeRequest;
 import org.subnode.request.DeleteAttachmentRequest;
@@ -1149,6 +1150,13 @@ public class AppController implements ErrorController {
 	public @ResponseBody Object nodeFeed(@RequestBody NodeFeedRequest req, HttpSession session) {
 		return callProc.run("nodeFeed", req, session, ms -> {
 			return userFeedService.generateFeed(ms, req);
+		});
+	}
+
+	@RequestMapping(value = API_PATH + "/checkMessages", method = RequestMethod.POST)
+	public @ResponseBody Object checkMessages(@RequestBody CheckMessagesRequest req, HttpSession session) {
+		return callProc.run("checkMessages", req, session, ms -> {
+			return userFeedService.checkMessages(ms, req);
 		});
 	}
 

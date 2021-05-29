@@ -113,6 +113,12 @@ export class Search implements SearchIntf {
     feedResponse = (res: J.NodeFeedResponse) => {
         dispatch("Action_RenderFeedResults", (s: AppState): AppState => {
             // s.feedResults = S.meta64.removeRedundantFeedItems(res.searchResults || []);
+
+            // once user requests their stuff, turn off the new messages count indicator.
+            if (s.feedFilterToMe) {
+                s.newMessageCount = 0;
+            }
+
             s.guiReady = true;
             s.feedResults = res.searchResults;
             s.feedEndReached = res.endReached;

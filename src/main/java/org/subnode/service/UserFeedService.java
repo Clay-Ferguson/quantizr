@@ -1,5 +1,6 @@
 package org.subnode.service;
 
+import java.util.Date;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -29,7 +30,9 @@ import org.subnode.mongo.MongoRead;
 import org.subnode.mongo.MongoSession;
 import org.subnode.mongo.MongoUtil;
 import org.subnode.mongo.model.SubNode;
+import org.subnode.request.CheckMessagesRequest;
 import org.subnode.request.NodeFeedRequest;
+import org.subnode.response.CheckMessagesResponse;
 import org.subnode.response.FeedPushInfo;
 import org.subnode.response.NodeEditedPushInfo;
 import org.subnode.response.NodeFeedResponse;
@@ -173,6 +176,46 @@ public class UserFeedService {
 		});
 	}
 
+	public CheckMessagesResponse checkMessages(MongoSession session, CheckMessagesRequest req) {
+
+		SessionContext sc = ThreadLocals.getSessionContext();
+		CheckMessagesResponse res = new CheckMessagesResponse();
+
+		if (sc.isAnonUser()) return res;
+
+		if (session == null) {
+			session = ThreadLocals.getMongoSession();
+		}
+
+		String pathToSearch = NodeName.ROOT_OF_ALL_USERS;
+
+		Query query = new Query();
+		Criteria criteria = Criteria.where(SubNode.FIELD_PATH).regex(util.regexRecursiveChildrenOfPath(pathToSearch)) //
+
+				// This pattern is what is required when you have multiple conditions added to a single field.
+				.andOperator(Criteria.where(SubNode.FIELD_TYPE).ne(NodeType.FRIEND.s()), //
+						Criteria.where(SubNode.FIELD_TYPE).ne(NodeType.POSTS.s()), //
+						Criteria.where(SubNode.FIELD_TYPE).ne(NodeType.ACT_PUB_POSTS.s()));
+
+		SubNode searchRoot = read.getNode(session, sc.getRootId());
+
+		Long lastActiveLong = searchRoot.getIntProp(NodeProp.LAST_ACTIVE_TIME.s());
+		if (lastActiveLong == 0) {
+			return res;
+		}
+
+		/* new nodes since last active time */
+		criteria = criteria.and(SubNode.FIELD_MODIFY_TIME).gt(new Date(lastActiveLong));
+		String myId = searchRoot.getOwner().toHexString();
+		criteria = criteria.and(SubNode.FIELD_AC + "." + myId).ne(null);
+
+		query.addCriteria(criteria);
+
+		long count = ops.count(query, SubNode.class);
+		res.setNumNew((int) count);
+		return res;
+	}
+
 	/*
 	 * Generated content of the "Feed" for a user.
 	 */
@@ -193,6 +236,7 @@ public class UserFeedService {
 			sharedToAny.add(PrincipalName.PUBLIC.s());
 		}
 
+		// todo-0: rename this var to 'userAccountNode'
 		SubNode searchRoot = null;
 
 		// includes shares TO me.

@@ -101,7 +101,7 @@ export class MenuPanel extends Div {
             feedFilterFriends: false,
             feedFilterToMe: false,
             feedFilterFromMe: false,
-            feedFilterToPublic: false,
+            feedFilterToPublic: true,
             feedFilterLocalServer: true
         });
     }
@@ -161,8 +161,11 @@ export class MenuPanel extends Div {
             ...this.siteNavCustomItems(state)
         ]));
 
-        children.push(new Menu("Messages", [
-            new MenuItem("To/From Me", MenuPanel.messagesToFromMe, !state.isAnonUser),
+        let messagesSuffix = state.newMessageCount > 0
+            ? " (" + state.newMessageCount + " new)" : "";
+
+        children.push(new Menu("Messages" + messagesSuffix, [
+            new MenuItem("To/From Me" + messagesSuffix, MenuPanel.messagesToFromMe, !state.isAnonUser),
             new MenuItem("From Friends", MenuPanel.messagesFromFriends, !state.isAnonUser),
             new MenuItem("Local Users", MenuPanel.messagesLocal, !state.isAnonUser),
             new MenuItem("All Fediverse", MenuPanel.messagesFediverse, !state.isAnonUser)

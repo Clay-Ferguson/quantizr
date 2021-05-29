@@ -176,6 +176,7 @@ export class User implements UserIntf {
                 // console.log("Logged in as: " + usr + " rootNode: " + res.rootNode);
 
                 this.queryUserProfile(res.rootNode);
+                this.checkMessages();
             }
 
             S.meta64.setStateVarsUsingLoginResponse(res);
@@ -239,6 +240,22 @@ export class User implements UserIntf {
         }, (res: J.TransferNodeResponse) => {
             S.view.refreshTree(null, false, false, null, false, true, true, state);
             S.util.showMessage(res.message, "Success");
+        });
+    }
+
+    checkMessages = (): Promise<void> => {
+        return new Promise<void>((resolve, reject) => {
+            S.util.ajax<J.CheckMessagesRequest, J.CheckMessagesResponse>("checkMessages", {
+            }, (res: J.CheckMessagesResponse): void => {
+                // console.log("Response: " + S.util.prettyPrint(res));
+                if (res) {
+                    dispatch("Action_SetNewMessageCount", (s: AppState): AppState => {
+                        s.newMessageCount = res.numNew;
+                        return s;
+                    });
+                }
+                resolve();
+            });
         });
     }
 

@@ -25,6 +25,9 @@ export class LeftNavPanel extends Div {
     preRender(): void {
         let state: AppState = useSelector((state: AppState) => state);
 
+        let messagesSuffix = state.newMessageCount > 0
+            ? " (" + state.newMessageCount + ")" : "";
+
         this.setChildren([
             new Div(null, null, [
                 new Img(this.getId() + "_logo", {
@@ -32,8 +35,7 @@ export class LeftNavPanel extends Div {
                     src: "/branding/logo-50px-tr.jpg",
                     onClick: () => { window.location.href = window.location.origin; }
                 }),
-
-                new Span(g_brandingAppName, {
+                new Span(g_brandingAppName + messagesSuffix, {
                     className: "logo-text",
                     onClick: e => { S.meta64.loadAnonPageHome(null); },
                     title: "Go to Portal Home Node"

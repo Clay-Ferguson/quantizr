@@ -124,7 +124,7 @@ export class NodeCompRowHeader extends Div {
 
         NOTE: todo-0: This logic will be the key to how we can make
         bookmarks work. If bookmarks simply have the TARGET_ID then that basically
-        can make them functional as bookmarks, because TARGET_ID is essentially all it 
+        can make them functional as bookmarks, because TARGET_ID is essentially all it
         takes to be a functional bookmark to the id.
         */
         if (this.isMainTree) {

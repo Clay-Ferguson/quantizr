@@ -101,6 +101,7 @@ export class AppState {
     };
 
     userProfile: J.UserProfile = null;
+    newMessageCount: number = 0;
 
     selectedNodes: any = {};
 

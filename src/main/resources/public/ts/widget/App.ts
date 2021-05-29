@@ -78,7 +78,10 @@ export class App extends Div {
                 title: "Main application Landing Page"
             });
 
-            let appName = new Span(g_brandingAppName, {
+            let messagesSuffix = state.newMessageCount > 0
+                ? " (" + state.newMessageCount + ")" : "";
+
+            let appName = new Span(g_brandingAppName + messagesSuffix, {
                 className: "logo-text",
                 onClick: e => { S.meta64.loadAnonPageHome(null); },
                 title: "Go to Portal Home Node"
