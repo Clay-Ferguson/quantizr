@@ -64,60 +64,65 @@ public class OutboxMgr {
 	private static SubNode outboxNode = null;
 	private static final Object outboxLock = new Object();
 
-	/*
-	 * Currently unused. Let's leave this capability here and not delete this code, but it's no longer
-	 * being used.
+	/**
+	 * Adds a node into the user's "Inbox" as an indicator to them that the 'node' added needs their
+	 * attention, for some reason or that someone has shared this node with them.
+	 * 
+	 * @param session
+	 * @param recieverUserName
+	 * @param userNode
+	 * @param node
+	 * @param notifyMessage
 	 */
-	public void addInboxNotification(MongoSession session, String recieverUserName, SubNode userNode, SubNode node,
-			String notifyMessage) {
+	public void addInboxNotification(String recieverUserName, SubNode userNode, SubNode node, String notifyMessage) {
 
-		SubNode userInbox =
-				read.getUserNodeByType(session, null, userNode, "### Inbox", NodeType.INBOX.s(), null, NodeName.INBOX);
+		adminRunner.run(session -> {
+			SubNode userInbox =
+					read.getUserNodeByType(session, null, userNode, "### Inbox", NodeType.INBOX.s(), null, NodeName.INBOX);
 
-		if (userInbox != null) {
-			// log.debug("userInbox id=" + userInbox.getId().toHexString());
+			if (userInbox != null) {
+				// log.debug("userInbox id=" + userInbox.getId().toHexString());
 
-			/*
-			 * First look to see if there is a target node already existing in this persons inbox that points to
-			 * the node in question
-			 */
-			SubNode notifyNode =
-					read.findSubNodeByProp(session, userInbox.getPath(), NodeProp.TARGET_ID.s(), node.getId().toHexString());
+				/*
+				 * First look to see if there is a target node already existing in this persons inbox that points to
+				 * the node in question
+				 */
+				SubNode notifyNode =
+						read.findSubNodeByProp(session, userInbox.getPath(), NodeProp.TARGET_ID.s(), node.getId().toHexString());
 
-			/*
-			 * If there's no notification for this node already in the user's inbox then add one
-			 */
-			if (notifyNode == null) {
-				notifyNode = create.createNode(session, userInbox, null, NodeType.INBOX_ENTRY.s(), 0L, CreateNodeLocation.FIRST,
-						null, null, true);
+				/*
+				 * If there's no notification for this node already in the user's inbox then add one
+				 */
+				if (notifyNode == null) {
+					notifyNode = create.createNode(session, userInbox, null, NodeType.INBOX_ENTRY.s(), 0L,
+							CreateNodeLocation.FIRST, null, null, true);
 
-				// trim to 280 like twitter.
-				String shortContent = XString.trimToMaxLen(node.getContent(), 280) + "...";
+					// trim to 280 like twitter.
+					String shortContent = XString.trimToMaxLen(node.getContent(), 280) + "...";
+					String content =
+							String.format("#### New from: %s\n%s", ThreadLocals.getSessionContext().getUserName(), shortContent);
 
-				String content = String.format("#### **%s** " + notifyMessage + "\n\n%s/app?id=%s\n\n%s",
-						ThreadLocals.getSessionContext().getUserName(), appProp.getHostAndPort(), node.getId().toHexString(),
-						shortContent);
+					notifyNode.setOwner(userInbox.getOwner());
+					notifyNode.setContent(content);
+					notifyNode.touch();
+					notifyNode.setProp(NodeProp.TARGET_ID.s(), node.getId().toHexString());
+					update.save(session, notifyNode);
+				}
 
-				notifyNode.setOwner(userInbox.getOwner());
-				notifyNode.setContent(content);
-				notifyNode.touch();
-				notifyNode.setProp(NodeProp.TARGET_ID.s(), node.getId().toHexString());
-				update.save(session, notifyNode);
-			}
-
-			/*
-			 * Send push notification so the user sees live there's a new share comming in or being re-added
-			 * even.
-			 */
-			List<SessionContext> scList = SessionContext.getSessionsByUserName(recieverUserName);
-			if (scList != null) {
-				for (SessionContext sc : scList) {
-					userFeedService.sendServerPushInfo(sc,
-							// todo-2: fill in the two null parameters here if/when you ever bring this method back.
-							new NotificationMessage("newInboxNode", node.getId().toHexString(), null, null));
+				/*
+				 * Send push notification so the user sees live there's a new share comming in or being re-added
+				 * even.
+				 */
+				List<SessionContext> scList = SessionContext.getSessionsByUserName(recieverUserName);
+				if (scList != null) {
+					for (SessionContext sc : scList) {
+						userFeedService.sendServerPushInfo(sc,
+								// todo-2: fill in the two null parameters here if/when you ever bring this method back.
+								new NotificationMessage("newInboxNode", node.getId().toHexString(), "New node shared to you.", ThreadLocals.getSessionContext().getUserName()));
+					}
 				}
 			}
-		}
+		});
 	}
 
 	/**
@@ -150,7 +155,7 @@ public class OutboxMgr {
 		});
 	}
 
-	public void queueMailUsingAdminSession(MongoSession session, final String recipients, final String subject,
+	private void queueMailUsingAdminSession(MongoSession session, final String recipients, final String subject,
 			final String content) {
 		SubNode outboxNode = getSystemOutbox(session);
 		SubNode outboundEmailNode = create.createNode(session, outboxNode.getPath() + "/?", NodeType.NONE.s());

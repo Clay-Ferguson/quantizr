@@ -186,7 +186,7 @@ export class Search implements SearchIntf {
             id: cssId,
             nid: node.id
         }, [
-            new NodeCompRowHeader(node, true, isFeed, jumpButton),
+            new NodeCompRowHeader(node, true, false, isFeed, jumpButton),
             content,
             new NodeCompRowFooter(node, isFeed)
         ]);

@@ -35,8 +35,8 @@ import org.subnode.util.ThreadLocals;
 import org.subnode.util.XString;
 
 /**
- * Service methods for (ACL): processing security, privileges, and Access
- * Control List information on nodes.
+ * Service methods for (ACL): processing security, privileges, and Access Control List information
+ * on nodes.
  */
 @Component
 public class AclService {
@@ -97,6 +97,7 @@ public class AclService {
 		}
 
 		String nodeId = req.getNodeId();
+		req.setPrincipal(XString.stripIfStartsWith(req.getPrincipal(), "@"));
 		SubNode node = read.getNode(session, nodeId);
 		auth.authRequireOwnerOfNode(session, node);
 
@@ -144,8 +145,8 @@ public class AclService {
 	}
 
 	/**
-	 * Adds the privileges to the node sharing this node to principal, which will be either a userName or 'public'
-	 * (when the node is being shared to public)
+	 * Adds the privileges to the node sharing this node to principal, which will be either a userName
+	 * or 'public' (when the node is being shared to public)
 	 * 
 	 * @param session
 	 * @param node
@@ -175,8 +176,7 @@ public class AclService {
 			mapKey = PrincipalName.PUBLIC.s();
 		}
 		/*
-		 * otherwise we're sharing to a person so we now get their userNodeId to use as
-		 * map key
+		 * otherwise we're sharing to a person so we now get their userNodeId to use as map key
 		 */
 		else {
 			principalNode = read.getUserNodeByUserName(auth.getAdminSession(), principal);
@@ -190,10 +190,9 @@ public class AclService {
 			mapKey = principalNode.getId().toHexString();
 
 			/*
-			 * If this node is encrypted we get the public key of the user being shared with
-			 * to send back to the client, which will then use it to encrypt the symmetric
-			 * key to the data, and then send back up to the server to store in this sharing
-			 * entry
+			 * If this node is encrypted we get the public key of the user being shared with to send back to the
+			 * client, which will then use it to encrypt the symmetric key to the data, and then send back up to
+			 * the server to store in this sharing entry
 			 */
 			if (cipherKey != null) {
 				String principalPubKey = principalNode.getStrProp(NodeProp.USER_PREF_PUBLIC_KEY.s());
@@ -221,8 +220,7 @@ public class AclService {
 		}
 
 		/*
-		 * Get access control entry from map, but if one is not found, we can just
-		 * create one.
+		 * Get access control entry from map, but if one is not found, we can just create one.
 		 */
 		AccessControl ac = acl.get(mapKey);
 		if (ac == null) {
@@ -260,7 +258,18 @@ public class AclService {
 				String fromUserName = fromUserNode.getStrProp(NodeProp.USER);
 
 				SubNode toOwnerNode = read.getUserNodeByUserName(auth.getAdminSession(), principal);
-				outboxMgr.sendEmailNotification(auth.getAdminSession(), fromUserName, toOwnerNode, node);
+
+				/*
+				 * todo-1: Although I am disabling these for now both of these lines of code do work perfectly: we
+				 * can send an email notification here about node edits (first line), and the line below that works
+				 * fine and adds a node to the user's inbox that links to this newly shared node.
+				 * 
+				 * I just want to think more about when exactly to trigger these notifictions. For example I may
+				 * make these two buttons on the editor users must click called "Email Notification to Shares", and
+				 * "Send to Inboxes of Shares"
+				 */
+				// outboxMgr.sendEmailNotification(auth.getAdminSession(), fromUserName, toOwnerNode, node);
+				// outboxMgr.addInboxNotification(principal, toOwnerNode, node, "New node shared to you.");
 			}
 		}
 
@@ -277,8 +286,7 @@ public class AclService {
 		AccessControl ac = acl.get(principalNodeId);
 		String privs = ac.getPrvs();
 		if (privs == null) {
-			log.debug("ACL didn't contain principalNodeId " + principalNodeId + "\nACL DUMP: "
-					+ XString.prettyPrint(acl));
+			log.debug("ACL didn't contain principalNodeId " + principalNodeId + "\nACL DUMP: " + XString.prettyPrint(acl));
 			return;
 		}
 		StringTokenizer t = new StringTokenizer(privs, ",", false);
@@ -286,8 +294,7 @@ public class AclService {
 		boolean removed = false;
 
 		/*
-		 * build the new comma-delimited privs list by adding all that aren't in the
-		 * 'setToRemove
+		 * build the new comma-delimited privs list by adding all that aren't in the 'setToRemove
 		 */
 		while (t.hasMoreTokens()) {
 			String tok = t.nextToken().trim();
@@ -303,8 +310,8 @@ public class AclService {
 
 		if (removed) {
 			/*
-			 * If there are no privileges left for this principal, then remove the principal
-			 * entry completely from the ACL. We don't store empty ones.
+			 * If there are no privileges left for this principal, then remove the principal entry completely
+			 * from the ACL. We don't store empty ones.
 			 */
 			if (newPrivs.equals("")) {
 				acl.remove(principalNodeId);
@@ -314,8 +321,8 @@ public class AclService {
 			}
 
 			/*
-			 * if there are now no acls at all left set the ACL to null, so it is completely
-			 * removed from the node
+			 * if there are now no acls at all left set the ACL to null, so it is completely removed from the
+			 * node
 			 */
 			if (acl.isEmpty()) {
 				node.setAc(null);
@@ -328,8 +335,7 @@ public class AclService {
 	}
 
 	/*
-	 * Removes the privilege specified in the request from the node specified in the
-	 * request
+	 * Removes the privilege specified in the request from the node specified in the request
 	 */
 	public RemovePrivilegeResponse removePrivilege(MongoSession session, RemovePrivilegeRequest req) {
 		RemovePrivilegeResponse res = new RemovePrivilegeResponse();
@@ -352,8 +358,7 @@ public class AclService {
 	public List<String> getOwnerNames(MongoSession session, SubNode node) {
 		Set<String> ownerSet = new HashSet<>();
 		/*
-		 * We walk up the tree util we get to the root, or find ownership on node, or
-		 * any of it's parents
+		 * We walk up the tree util we get to the root, or find ownership on node, or any of it's parents
 		 */
 
 		int sanityCheck = 0;
@@ -362,10 +367,9 @@ public class AclService {
 			for (MongoPrincipal p : principals) {
 
 				/*
-				 * todo-3: this is a spot that can be optimized. We should be able to send just
-				 * the userNodeId back to client, and the client should be able to deal with
-				 * that (i think). depends on how much ownership info we need to show user.
-				 * ownerSet.add(p.getUserNodeId());
+				 * todo-3: this is a spot that can be optimized. We should be able to send just the userNodeId back
+				 * to client, and the client should be able to deal with that (i think). depends on how much
+				 * ownership info we need to show user. ownerSet.add(p.getUserNodeId());
 				 */
 				SubNode userNode = read.getNode(session, p.getUserNodeId());
 				String userName = userNode.getStrProp(NodeProp.USER.s());

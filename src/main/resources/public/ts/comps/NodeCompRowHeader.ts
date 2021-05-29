@@ -23,7 +23,7 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
 /* General Widget that doesn't fit any more reusable or specific category other than a plain Div, but inherits capability of Comp class */
 export class NodeCompRowHeader extends Div {
 
-    constructor(private node: J.NodeInfo, private allowAvatars: boolean, private isFeed: boolean = false, private jumpButton: boolean = false) {
+    constructor(private node: J.NodeInfo, private allowAvatars: boolean, private isMainTree: boolean, private isFeed: boolean = false, private jumpButton: boolean = false) {
         super(null, {
             className: "header-text"
         });
@@ -118,7 +118,30 @@ export class NodeCompRowHeader extends Div {
             }));
         }
 
-        if (this.jumpButton) {
+        let jumpButtonAdded = false;
+        /* If we're not on a search result display (or timeline) and there's a TARGET_ID on the node
+        then we need to show the jump button point to it.
+
+        NOTE: todo-0: This logic will be the key to how we can make
+        bookmarks work. If bookmarks simply have the TARGET_ID then that basically
+        can make them functional as bookmarks, because TARGET_ID is essentially all it 
+        takes to be a functional bookmark to the id.
+        */
+        if (this.isMainTree) {
+            const targetId = S.props.getNodePropVal(J.NodeProp.TARGET_ID, this.node);
+            if (targetId) {
+                jumpButtonAdded = true;
+                floatUpperRightDiv.addChild(new Span(null, { className: "marginLeft" }, [
+                    new IconButton("fa-arrow-right", null, {
+                        className: "marginLeft",
+                        onClick: () => S.view.refreshTree(targetId, true, true, targetId, false, true, true, state),
+                        title: "Jump to the Node"
+                    })
+                ]));
+            }
+        }
+
+        if (this.jumpButton && !jumpButtonAdded) {
             floatUpperRightDiv.addChild(new Span(null, { className: "marginLeft" }, [
                 new IconButton("fa-arrow-right", null, {
                     className: "marginLeft",

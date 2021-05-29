@@ -1303,7 +1303,12 @@ export class Util implements UtilIntf {
 
         let names = S.props.isPublic(node) ? ("public [" + this.getPublicPrivilegesDisplay(node) + "]") : "";
         for (let ac of node.ac) {
-            if (ac.principalName !== "public") {
+
+            if (!ac.principalName) {
+                console.log("missing principalName on acl: " + S.util.prettyPrint(ac));
+            }
+
+            if (ac.principalName && ac.principalName !== "public") {
                 if (names) {
                     names += delimiter;
                 }

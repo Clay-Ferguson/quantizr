@@ -13,7 +13,7 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
 
 export class InboxEntryTypeHandler extends TypeBase {
     constructor() {
-        super(J.NodeType.INBOX_ENTRY, "Inbox Entry", "fa-envelope", false);
+        super(J.NodeType.INBOX_ENTRY, "Notification", "fa-envelope", false);
     }
 
     allowAction(action: NodeActionType, node: J.NodeInfo, appState: AppState): boolean {

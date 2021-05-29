@@ -564,7 +564,7 @@ public class NodeEditService {
 				convert.convertToNodeInfo(ThreadLocals.getSessionContext(), session, node, true, false, -1, false, false);
 		res.setNode(newNodeInfo);
 
-		// todo-0: for now we only push nodes if public, up to browsers rather than doing a specific check 
+		// todo-1: for now we only push nodes if public, up to browsers rather than doing a specific check 
 		// to send only to users who should see it.
 		if (AclService.isPublic(session, node)) {
 			userFeedService.pushTimelineUpdateToBrowsers(session, newNodeInfo);

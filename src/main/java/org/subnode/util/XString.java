@@ -35,9 +35,9 @@ public class XString {
 		if (obj == null)
 			return "null";
 		if (obj instanceof String) {
-			return (String)obj;
+			return (String) obj;
 		}
-		
+
 		try {
 			return jsonPrettyWriter.writeValueAsString(obj);
 		} catch (JsonProcessingException e) {
@@ -106,8 +106,10 @@ public class XString {
 		return list;
 	}
 
-	/* Returns the heading level assuming 'val' contains text that starts with something like "# My Heading", or "## My Heading", by
-	returning the number of hash marks in the heading */
+	/*
+	 * Returns the heading level assuming 'val' contains text that starts with something like
+	 * "# My Heading", or "## My Heading", by returning the number of hash marks in the heading
+	 */
 	public static int getHeadingLevel(String val) {
 		if (!val.startsWith("#")) {
 			return 0;
@@ -166,6 +168,8 @@ public class XString {
 	}
 
 	public static String stripIfStartsWith(String val, String prefix) {
+		if (val == null)
+			return val;
 		if (val.startsWith(prefix)) {
 			val = val.substring(prefix.length());
 		}
