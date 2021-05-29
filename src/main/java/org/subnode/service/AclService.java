@@ -253,24 +253,22 @@ public class AclService {
 			node.setAc(acl);
 			update.save(session, node);
 
-			if (!principal.equalsIgnoreCase(PrincipalName.PUBLIC.s())) {
-				SubNode fromUserNode = read.getNode(session, node.getOwner());
-				String fromUserName = fromUserNode.getStrProp(NodeProp.USER);
-
-				SubNode toOwnerNode = read.getUserNodeByUserName(auth.getAdminSession(), principal);
-
-				/*
-				 * todo-1: Although I am disabling these for now both of these lines of code do work perfectly: we
-				 * can send an email notification here about node edits (first line), and the line below that works
-				 * fine and adds a node to the user's inbox that links to this newly shared node.
-				 * 
-				 * I just want to think more about when exactly to trigger these notifictions. For example I may
-				 * make these two buttons on the editor users must click called "Email Notification to Shares", and
-				 * "Send to Inboxes of Shares"
-				 */
-				// outboxMgr.sendEmailNotification(auth.getAdminSession(), fromUserName, toOwnerNode, node);
-				// outboxMgr.addInboxNotification(principal, toOwnerNode, node, "New node shared to you.");
-			}
+			// if (!principal.equalsIgnoreCase(PrincipalName.PUBLIC.s())) {
+			// 	SubNode fromUserNode = read.getNode(session, node.getOwner());
+			// 	String fromUserName = fromUserNode.getStrProp(NodeProp.USER);
+			// 	SubNode toOwnerNode = read.getUserNodeByUserName(auth.getAdminSession(), principal);
+			// 	/*
+			// 	 * todo-1: Although I am disabling these for now both of these lines of code do work perfectly: we
+			// 	 * can send an email notification here about node edits (first line), and the line below that works
+			// 	 * fine and adds a node to the user's inbox that links to this newly shared node.
+			// 	 * 
+			// 	 * I just want to think more about when exactly to trigger these notifictions. For example I may
+			// 	 * make these two buttons on the editor users must click called "Email Notification to Shares", and
+			// 	 * "Send to Inboxes of Shares"
+			// 	 */
+			// 	// outboxMgr.sendEmailNotification(auth.getAdminSession(), fromUserName, toOwnerNode, node);
+			// 	// outboxMgr.addInboxNotification(principal, toOwnerNode, node, "New node shared to you.");
+			// }
 		}
 
 		return true;

@@ -86,6 +86,11 @@ export class LoginDlg extends DialogBase {
         }
 
         let usr = this.userState.getValue();
+
+        /* The word admin is not a secret so let's make it easy for the admin to login using only his password */
+        if (usr === "a") {
+            usr = "admin";
+        }
         let pwd = this.pwdState.getValue();
 
         if (usr && pwd) {

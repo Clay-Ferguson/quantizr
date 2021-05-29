@@ -52,7 +52,7 @@ export class RightNavPanel extends Div {
 
         this.setChildren([
             new Div(null, { className: "float-left" }, [
-                new Div(null, { className: state.userPreferences.editMode ? "rightNavPanelInnerEditMode" : "rightNavPanelInner" }, [
+                new Div(null, { className: "rightNavPanelInner" }, [
                     state.isAnonUser ? new Div("Login / Signup", {
                         className: "signupLinkText",
                         onClick: e => { S.nav.login(state); }
