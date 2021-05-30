@@ -56,7 +56,7 @@ export class AppState {
     // until user has set their checkboxes and clicks "Refresh Feed" button.
     feedWaitingForUserRefresh: boolean = true;
 
-    // todo-0: need to rename 'title', actually holds userName
+    // todo-1: need to rename 'title', actually holds userName
     title: string = "";
     displayName: string = "";
 

@@ -93,7 +93,13 @@ export class NodeStatsDlg extends DialogBase {
         if (this.feed) {
             /* put word in quotes to do an exact match */
             FeedView.searchTextState.setValue(word);
-            FeedView.refresh();
+            S.nav.messages({
+                feedFilterFriends: false,
+                feedFilterToMe: false,
+                feedFilterFromMe: false,
+                feedFilterToPublic: true,
+                feedFilterLocalServer: false
+            });
         }
         else {
             SearchContentDlg.defaultSearchText = word;
