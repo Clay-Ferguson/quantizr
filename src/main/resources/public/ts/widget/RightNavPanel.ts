@@ -50,6 +50,8 @@ export class RightNavPanel extends Div {
                 new UserProfileDlg(null, appState(null)).open();
             }, null, "btn-secondary marginBottom") : null;
 
+        let displayName = state.displayName ? state.displayName : state.title;
+
         this.setChildren([
             new Div(null, { className: "float-left" }, [
                 new Div(null, { className: "rightNavPanelInner" }, [
@@ -57,7 +59,7 @@ export class RightNavPanel extends Div {
                         className: "signupLinkText",
                         onClick: e => { S.nav.login(state); }
                     }) : null,
-                    state.title && !state.isAnonUser ? new Button("@" + state.title, e => { S.nav.navHome(state); },
+                    displayName && !state.isAnonUser ? new Button(displayName, e => { S.nav.navHome(state); },
                         { title: "Go to your Account Root Node" }, "btn-secondary marginBottom marginRight") : null,
                     profileButton,
                     headerImg,

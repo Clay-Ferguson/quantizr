@@ -797,6 +797,7 @@ export class Meta64 implements Meta64Intf {
             s.allowFileSystemSearch = res.allowFileSystemSearch;
             s.userPreferences = res.userPreferences;
             s.title = !s.isAnonUser ? res.userName : "";
+            s.displayName = !s.isAnonUser ? res.displayName : "";
             return s;
         });
     }

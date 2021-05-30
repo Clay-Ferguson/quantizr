@@ -336,14 +336,6 @@ a {
     max-width: 120px;
 }
 
-.profileBioPanel {
-    top: -40px;
-    position: relative;
-}
-
-.profileBioPanelNoHeader {
-}
-
 .profileHeaderImageBase {
     border-radius: $borderRadiusLarge;
     cursor: pointer;
@@ -351,6 +343,14 @@ a {
     height: 200px;
     max-height: $profileImgSize;
     object-fit: cover;
+}
+
+.timelineContentHeading {
+    border-radius: $borderRadiusLarge;
+    font-size: 120%;
+    padding: 10px;
+    margin-bottom: 10px;
+    margin-top: 10px;
 }
 
 .headerImageRHS {
@@ -364,22 +364,22 @@ a {
 
 .profileImage {
     @extend .profileImageBase;
-    border: 4px dotted $nodeBorderBottomColor;
+    border: 5px dotted $nodeBorderBottomColor;
 }
 
 .readOnlyProfileImage {
     @extend .profileImageBase;
-    border: 1px solid $nodeBorderBottomColor;
+    border: 5px solid $modal-content-bg;
 }
 
 .profileImageNoHeader {
     @extend .profileImageBaseNoHeader;
-    border: 4px dotted $nodeBorderBottomColor;
+    border: 5px dotted $nodeBorderBottomColor;
 }
 
 .readOnlyProfileImageNoHeader {
     @extend .profileImageBaseNoHeader;
-    border: 1px solid $nodeBorderBottomColor;
+    border: 5px solid $modal-content-bg;
 }
 
 .profileImageRHS {
@@ -575,6 +575,10 @@ entire thing down some times, if it's jutting up against something */
 .app-modal-title {
     margin-bottom: $smallGap;
     font-size: 150%;
+}
+
+.logoutLink {
+    font-size: 125%;
 }
 
 .rssLinkIcon {

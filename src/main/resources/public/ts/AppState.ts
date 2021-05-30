@@ -56,7 +56,9 @@ export class AppState {
     // until user has set their checkboxes and clicks "Refresh Feed" button.
     feedWaitingForUserRefresh: boolean = true;
 
+    // todo-0: need to rename 'title', actually holds userName
     title: string = "";
+    displayName: string = "";
 
     node: J.NodeInfo;
     endReached: boolean;
@@ -67,6 +69,7 @@ export class AppState {
 
     timelineResults: NodeInfo[];
     timelineDescription: string;
+    timelineNode: J.NodeInfo;
     feedResults: NodeInfo[];
     feedEndReached: boolean = false;
 

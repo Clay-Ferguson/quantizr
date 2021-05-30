@@ -1,3 +1,4 @@
+import { dispatch } from "../AppRedux";
 import { AppState } from "../AppState";
 import { Constants as C } from "../Constants";
 import { DialogBase } from "../DialogBase";
@@ -70,20 +71,20 @@ export class UserProfileDlg extends DialogBase {
 
                 profileImg,
 
-                new Div(null, { className: "marginBottom " + (profileHeaderImg ? "profileBioPanel" : "profileBioPanelNoHeader") }, [
+                new Div(null, { className: "marginBottom" }, [
                     this.readOnly
-                        ? new Heading(3, displayName || "")
+                        ? new Heading(4, displayName || "")
                         : new TextField("Display Name", false, null, "displayNameTextField", false, this.displayNameState),
 
                     this.readOnly
                         ? new Html(S.util.markdown(state.userProfile.userBio) || "")
                         : new TextArea("About Me", {
-                            rows: 8
+                            rows: 5
                         },
                             this.bioState)
                 ]),
 
-                new Anchor(null, "Logout", { className: "float-right", onClick: S.nav.logout }),
+                new Anchor(null, "Logout", { className: "float-right logoutLink", onClick: S.nav.logout }),
 
                 new ButtonBar([
                     this.readOnly ? null : new Button("Save", this.save, null, "btn-primary"),
@@ -172,6 +173,10 @@ export class UserProfileDlg extends DialogBase {
 
     saveResponse = (res: J.SaveUserPreferencesResponse): void => {
         this.close();
+        dispatch("Action_SaveUserPerferences", (s: AppState): AppState => {
+            s.displayName = this.displayNameState.getValue();
+            return s;
+        });
     }
 
     makeProfileImg(hasHeaderImg: boolean): CompIntf {

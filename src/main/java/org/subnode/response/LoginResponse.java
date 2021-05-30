@@ -12,6 +12,7 @@ public class LoginResponse extends ResponseBase {
 
 	/* will be username or 'anonymous' if server rejected login */
 	private String userName;
+	private String displayName;
 
 	private String anonUserLandingPageNode;
 
@@ -32,6 +33,14 @@ public class LoginResponse extends ResponseBase {
 
 	public void setUserName(String userName) {
 		this.userName = userName;
+	}
+
+	public String getDisplayName() {
+		return displayName;
+	}
+
+	public void setDisplayName(String displayName) {
+		this.displayName = displayName;
 	}
 
 	public String getRootNode() {

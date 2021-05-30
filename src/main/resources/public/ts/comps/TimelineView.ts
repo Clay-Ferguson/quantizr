@@ -8,8 +8,8 @@ import { Anchor } from "../widget/Anchor";
 import { AppTab } from "../widget/AppTab";
 import { Comp } from "../widget/base/Comp";
 import { Div } from "../widget/Div";
+import { IconButton } from "../widget/IconButton";
 import { Li } from "../widget/Li";
-import { Span } from "../widget/Span";
 import { TextContent } from "../widget/TextContent";
 
 let S: Singletons;
@@ -62,11 +62,19 @@ export class TimelineView extends AppTab {
         let children: Comp[] = [];
 
         if (state.timelineDescription) {
-            children.push(new Span(null, null, [
-                new TextContent(state.timelineDescription)
-                // todo-1: add something like this eventually ?
-                // new Anchor(null, "Refresh", { className: "float-right", onClick: S.search.timelineRefresh }),
-                // new Div(null, { className: "clearfix" })
+            let timelineText = state.timelineNode.content;
+            let idx = timelineText.indexOf("\n");
+            if (idx !== -1) {
+                timelineText = timelineText.substring(0, idx);
+            }
+            children.push(new Div(null, null, [
+                new IconButton("fa-arrow-left", null, {
+                    onClick: () => S.view.refreshTree(state.timelineNode.id, true, true, state.timelineNode.id, false, true, true, state),
+                    title: "Back to Node"
+                }),
+                new TextContent(timelineText, "timelineContentHeading alert alert-secondary"),
+                new Div("Timeline: " + state.timelineDescription)
+                // todo-0: need similar thing for search results
             ]));
         }
 

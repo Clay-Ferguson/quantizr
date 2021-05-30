@@ -50,10 +50,11 @@ export class Search implements SearchIntf {
         });
     }
 
-    timelineResponse = (res: J.NodeSearchResponse, timelineDescription: string) => {
+    timelineResponse = (res: J.NodeSearchResponse, timelineDescription: string, timelineNode: J.NodeInfo) => {
         dispatch("Action_RenderTimelineResults", (s: AppState): AppState => {
             s.timelineResults = res.searchResults;
             s.timelineDescription = timelineDescription;
+            s.timelineNode = timelineNode;
             S.meta64.selectTabStateOnly("timelineTab", s);
             return s;
         });
@@ -91,7 +92,7 @@ export class Search implements SearchIntf {
             searchDefinition: "timeline",
             userSearchType: null,
             timeRangeType
-        }, (res) => { this.timelineResponse(res, timelineDescription); });
+        }, (res) => { this.timelineResponse(res, timelineDescription, node); });
     }
 
     feed = (nodeId: string, feedUserName: string, page: number, searchText: string) => {

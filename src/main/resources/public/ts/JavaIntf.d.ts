@@ -470,6 +470,7 @@ export interface LoginResponse extends ResponseBase {
     rootNode: string;
     rootNodePath: string;
     userName: string;
+    displayName: string;
     anonUserLandingPageNode: string;
     homeNodeOverride: string;
     userPreferences: UserPreferences;

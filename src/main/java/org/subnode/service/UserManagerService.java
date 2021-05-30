@@ -233,6 +233,7 @@ public class UserManagerService {
 
 			// be sure to get userName off node so case sensitivity is exact.
 			res.setUserName(userNode.getStrProp(NodeProp.USER));
+			res.setDisplayName(userNode.getStrProp(NodeProp.DISPLAY_NAME));
 
 			res.setAllowFileSystemSearch(appProp.isAllowFileSystemSearch());
 			res.setUserPreferences(userPreferences);
