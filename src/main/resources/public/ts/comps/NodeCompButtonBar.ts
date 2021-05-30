@@ -320,9 +320,9 @@ export class NodeCompButtonBar extends Div {
                         title: "Search underneath Node"
                     });
 
-                    timelineButton = new IconButton("fa-clock-o", null, {
+                    timelineButton = new IconButton("fa-clock-o", "Timeline", {
                         onClick: S.nav.runTimeline,
-                        title: "View Timeline underneath Node (by Mod Time)"
+                        title: "View Timeline (by Mod Time)"
                     });
                 }
             }

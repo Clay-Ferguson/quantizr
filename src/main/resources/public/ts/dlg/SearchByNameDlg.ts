@@ -87,12 +87,12 @@ export class SearchByNameDlg extends DialogBase {
             searchDefinition: "",
             userSearchType: null,
             timeRangeType: null
-        }, this.searchNodesResponse);
+        }, (res) => this.searchNodesResponse(res, node));
     }
 
-    searchNodesResponse = (res: J.NodeSearchResponse) => {
+    searchNodesResponse = (res: J.NodeSearchResponse, node: J.NodeInfo) => {
         if (S.srch.numSearchResults(res) > 0) {
-            S.srch.searchNodesResponse(res, "Search for node " + this.searchTextState.getValue(), false);
+            S.srch.searchNodesResponse(res, "Search for node " + this.searchTextState.getValue(), false, node);
             this.close();
         }
         else {

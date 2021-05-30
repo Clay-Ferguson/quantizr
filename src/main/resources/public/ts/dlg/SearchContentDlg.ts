@@ -141,12 +141,12 @@ export class SearchContentDlg extends DialogBase {
             userSearchType: null,
             searchDefinition: "",
             timeRangeType: null
-        }, this.searchNodesResponse);
+        }, (res) => this.searchNodesResponse(res, node));
     }
 
-    searchNodesResponse = (res: J.NodeSearchResponse) => {
+    searchNodesResponse = (res: J.NodeSearchResponse, node: J.NodeInfo) => {
         if (S.srch.numSearchResults(res) > 0) {
-            S.srch.searchNodesResponse(res, "Search results for: " + SearchContentDlg.defaultSearchText, false);
+            S.srch.searchNodesResponse(res, SearchContentDlg.defaultSearchText, false, node);
             this.close();
         }
         else {

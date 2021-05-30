@@ -345,12 +345,17 @@ a {
     object-fit: cover;
 }
 
-.timelineContentHeading {
+.resultsContentHeading {
     border-radius: $borderRadiusLarge;
     font-size: 120%;
     padding: 10px;
     margin-bottom: 10px;
     margin-top: 10px;
+}
+
+.resultsTitle {
+    margin-left: 15px;
+    display: inline;
 }
 
 .headerImageRHS {

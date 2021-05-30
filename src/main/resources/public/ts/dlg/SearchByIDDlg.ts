@@ -87,12 +87,12 @@ export class SearchByIDDlg extends DialogBase {
             searchDefinition: "",
             userSearchType: null,
             timeRangeType: null
-        }, this.searchNodesResponse);
+        }, (res) => this.searchNodesResponse(res, node));
     }
 
-    searchNodesResponse = (res: J.NodeSearchResponse) => {
+    searchNodesResponse = (res: J.NodeSearchResponse, node: J.NodeInfo) => {
         if (S.srch.numSearchResults(res) > 0) {
-            S.srch.searchNodesResponse(res, "Showing search for ID " + SearchByIDDlg.defaultSearchText, false);
+            S.srch.searchNodesResponse(res, "Showing search for ID " + SearchByIDDlg.defaultSearchText, false, node);
             this.close();
         }
         else {

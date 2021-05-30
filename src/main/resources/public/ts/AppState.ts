@@ -65,11 +65,14 @@ export class AppState {
 
     searchResults: NodeInfo[];
     searchDescription: string;
+    searchNode: J.NodeInfo;
+
     isUserSearch: boolean = false;
 
     timelineResults: NodeInfo[];
     timelineDescription: string;
     timelineNode: J.NodeInfo;
+
     feedResults: NodeInfo[];
     feedEndReached: boolean = false;
 

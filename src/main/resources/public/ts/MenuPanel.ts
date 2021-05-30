@@ -59,8 +59,8 @@ export class MenuPanel extends Div {
     static searchByName = () => { new SearchByNameDlg(appState(null)).open(); }
     static searchById = () => { new SearchByIDDlg(appState(null)).open(); };
     static findUsers = () => { new SearchUsersDlg(appState(null)).open(); };
-    static timelineByCreated = () => S.srch.timeline("ctm", appState(null), null, "Rev-chron: Create Time");
-    static timelineByModified = () => S.srch.timeline("mtm", appState(null), null, "Rev-chron: Mod. Time");
+    static timelineByCreated = () => S.srch.timeline("ctm", appState(null), null, "Rev-chron by Create Time");
+    static timelineByModified = () => S.srch.timeline("mtm", appState(null), null, "Rev-chron by Modify Time");
     static showCalendar = () => { S.render.showCalendar(null, appState(null)); }
     static calendarFutureDates = () => S.srch.timeline("prp.date.value", appState(null), "futureOnly", "Future calendar dates (Soonest at the top)");
     static calendarPastDates = () => S.srch.timeline("prp.date.value", appState(null), "pastOnly", "Past calendar dates (Newest at the top)");

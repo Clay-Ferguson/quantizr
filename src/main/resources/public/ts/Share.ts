@@ -51,7 +51,7 @@ export class Share implements ShareIntf {
             shareTarget,
             accessOption
         }, (res) => {
-            S.srch.searchNodesResponse(res, "Showing " + type + " shared nodes under subgraph under node ID " + focusNode.id, false);
+            S.srch.searchNodesResponse(res, "Showing " + type + " shared nodes under subgraph under node ID " + focusNode.id, false, focusNode);
         });
     }
 

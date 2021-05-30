@@ -8,8 +8,10 @@ import { Anchor } from "../widget/Anchor";
 import { AppTab } from "../widget/AppTab";
 import { Comp } from "../widget/base/Comp";
 import { Div } from "../widget/Div";
+import { Heading } from "../widget/Heading";
 import { IconButton } from "../widget/IconButton";
 import { Li } from "../widget/Li";
+import { Span } from "../widget/Span";
 import { TextContent } from "../widget/TextContent";
 
 let S: Singletons;
@@ -61,20 +63,22 @@ export class TimelineView extends AppTab {
         let rowCount = 0;
         let children: Comp[] = [];
 
-        if (state.timelineDescription) {
+        if (state.timelineDescription && state.timelineNode) {
             let timelineText = state.timelineNode.content;
             let idx = timelineText.indexOf("\n");
             if (idx !== -1) {
                 timelineText = timelineText.substring(0, idx);
             }
             children.push(new Div(null, null, [
-                new IconButton("fa-arrow-left", null, {
-                    onClick: () => S.view.refreshTree(state.timelineNode.id, true, true, state.timelineNode.id, false, true, true, state),
-                    title: "Back to Node"
-                }),
-                new TextContent(timelineText, "timelineContentHeading alert alert-secondary"),
-                new Div("Timeline: " + state.timelineDescription)
-                // todo-0: need similar thing for search results
+                new Div(null, null, [
+                    new IconButton("fa-arrow-left", null, {
+                        onClick: () => S.view.refreshTree(state.timelineNode.id, true, true, state.timelineNode.id, false, true, true, state),
+                        title: "Back to Node"
+                    }),
+                    new Heading(4, "Timeline", { className: "resultsTitle" })
+                ]),
+                new TextContent(timelineText, "resultsContentHeading alert alert-secondary"),
+                new Div(state.timelineDescription)
             ]));
         }
 

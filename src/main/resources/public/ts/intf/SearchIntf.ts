@@ -16,7 +16,7 @@ export interface SearchIntf {
 
     searchAndReplace(recursive: boolean, nodeId: string, search: string, replace: string, state: AppState): any;
     numSearchResults(res: J.NodeSearchResponse): number;
-    searchNodesResponse(res: J.NodeSearchResponse, searchDescription: string, isUserSearch: boolean): any;
+    searchNodesResponse(res: J.NodeSearchResponse, searchDescription: string, isUserSearch: boolean, searchNode: J.NodeInfo): any;
     timelineResponse(res: J.NodeSearchResponse, timelineDescription: string, timelineNode: J.NodeInfo): any;
     searchFilesResponse(res: J.FileSearchResponse, state: AppState): any;
     timeline(prop: string, state: AppState, timeRangeType: string, timelineDescription: string): any;

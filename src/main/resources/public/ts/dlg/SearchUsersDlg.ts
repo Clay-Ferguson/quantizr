@@ -151,13 +151,13 @@ export class SearchUsersDlg extends DialogBase {
             userSearchType: this.getState().userSearchType,
             searchDefinition: "",
             timeRangeType: null
-        }, this.searchNodesResponse);
+        }, (res) => this.searchNodesResponse(res, node));
     }
 
-    searchNodesResponse = (res: J.NodeSearchResponse) => {
+    searchNodesResponse = (res: J.NodeSearchResponse, node: J.NodeInfo) => {
         if (S.srch.numSearchResults(res) > 0) {
             let desc = "Search of Users for: " + SearchUsersDlg.defaultSearchText;
-            S.srch.searchNodesResponse(res, desc, true);
+            S.srch.searchNodesResponse(res, desc, true, node);
             this.close();
         }
         else {

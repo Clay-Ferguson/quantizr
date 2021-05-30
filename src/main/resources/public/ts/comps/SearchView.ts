@@ -8,6 +8,8 @@ import { Anchor } from "../widget/Anchor";
 import { AppTab } from "../widget/AppTab";
 import { Comp } from "../widget/base/Comp";
 import { Div } from "../widget/Div";
+import { Heading } from "../widget/Heading";
+import { IconButton } from "../widget/IconButton";
 import { Li } from "../widget/Li";
 import { TextContent } from "../widget/TextContent";
 
@@ -63,8 +65,23 @@ export class SearchView extends AppTab {
         let rowCount = 0;
         let children: Comp[] = [];
 
-        if (state.searchDescription) {
-            children.push(new TextContent(state.searchDescription));
+        if (state.searchDescription && state.searchNode) {
+            let searchText = state.searchNode.content;
+            let idx = searchText.indexOf("\n");
+            if (idx !== -1) {
+                searchText = searchText.substring(0, idx);
+            }
+            children.push(new Div(null, null, [
+                new Div(null, null, [
+                    new IconButton("fa-arrow-left", null, {
+                        onClick: () => S.view.refreshTree(state.searchNode.id, true, true, state.searchNode.id, false, true, true, state),
+                        title: "Back to Node"
+                    }),
+                    new Heading(4, "Search", { className: "resultsTitle" })
+                ]),
+                new TextContent(searchText, "resultsContentHeading alert alert-secondary"),
+                new Div("Searched " + state.searchDescription)
+            ]));
         }
 
         let i = 0;
