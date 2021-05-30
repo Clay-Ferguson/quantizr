@@ -73,7 +73,7 @@ export class SearchView extends AppTab {
             }
             children.push(new Div(null, null, [
                 new Div(null, null, [
-                    new IconButton("fa-arrow-left", null, {
+                    new IconButton("fa-arrow-left", "Back", {
                         onClick: () => S.view.refreshTree(state.searchNode.id, true, true, state.searchNode.id, false, true, true, state),
                         title: "Back to Node"
                     }),

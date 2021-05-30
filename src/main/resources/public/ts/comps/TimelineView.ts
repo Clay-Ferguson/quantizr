@@ -71,7 +71,7 @@ export class TimelineView extends AppTab {
             }
             children.push(new Div(null, null, [
                 new Div(null, null, [
-                    new IconButton("fa-arrow-left", null, {
+                    new IconButton("fa-arrow-left", "Back", {
                         onClick: () => S.view.refreshTree(state.timelineNode.id, true, true, state.timelineNode.id, false, true, true, state),
                         title: "Back to Node"
                     }),
