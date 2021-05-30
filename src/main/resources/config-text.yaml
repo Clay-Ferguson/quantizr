@@ -18,10 +18,11 @@ menu:
       link: ":lounge" 
     - name: "News"
       link: ":news" 
-    # - name: "Fediverse"
-    #   link: "tab:feedTab"
     - name: "Podcasts"
       link: ":podcasts"
+    - name: "Fediverse"
+      link: "tab:feedTab"
+      
     # - name: "separator"
     #   link: ""
     # - name: "Demo Videos"

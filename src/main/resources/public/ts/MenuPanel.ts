@@ -167,8 +167,8 @@ export class MenuPanel extends Div {
         children.push(new Menu("Messages" + messagesSuffix, [
             new MenuItem("To/From Me" + messagesSuffix, MenuPanel.messagesToFromMe, !state.isAnonUser),
             new MenuItem("From Friends", MenuPanel.messagesFromFriends, !state.isAnonUser),
-            new MenuItem("Local Users", MenuPanel.messagesLocal, !state.isAnonUser),
-            new MenuItem("All Fediverse", MenuPanel.messagesFediverse, !state.isAnonUser)
+            new MenuItem("Local Users", MenuPanel.messagesLocal, !state.isAnonUser)
+            // new MenuItem("All Fediverse", MenuPanel.messagesFediverse, !state.isAnonUser)
         ]));
 
         children.push(new Menu("My Nodes", [
@@ -449,8 +449,15 @@ export class MenuPanel extends Div {
 
                     // allows ability to select a tab
                     if (link.startsWith("tab:")) {
-                        link = link.substring(4);
-                        func = () => S.meta64.selectTab(link);
+                        let tab = link.substring(4);
+
+                        /* special case for feed tab */
+                        if (tab === "feedTab") {
+                            func = MenuPanel.messagesFediverse;
+                        }
+                        else {
+                            func = () => S.meta64.selectTab(tab);
+                        }
                     }
                     // covers http and https
                     else if (link.startsWith("http")) {
