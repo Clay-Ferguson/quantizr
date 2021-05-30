@@ -82,7 +82,7 @@ export class NodeCompVerticalRowLayout extends Div {
             if (this.level <= 1) {
 
                 // todo-0: this button should have same enabelement as "new" button, on the page root
-                let btn = new IconButton("fa-plus", "New Node", {
+                let btn = new IconButton("fa-plus", null, {
                     onClick: e => {
                         if (lastNode) {
                             S.edit.insertNode(lastNode.id, "u", 1 /* isFirst ? 0 : 1 */, state);

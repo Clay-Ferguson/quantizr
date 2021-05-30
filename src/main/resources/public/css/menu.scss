@@ -40,12 +40,11 @@
     @if $highlightActiveMenuItems {
         border-left: 5px solid $nodeBorderBottomColor; 
     } 
-    padding: 5px;
+    padding: 6px;
 }
 
 .menuCardBody {
     padding: 0px;
-    border-radius: 0 0 $borderRadiusMedium $borderRadiusMedium;
     border-left: 6px solid #444;
     border-right: 6px solid #444;
     border-bottom: 6px solid #444;
@@ -54,7 +53,6 @@
 
 .menuCard {
     border: none;
-    border-radius: 0;
     background-color: transparent;
     margin: 4px;
 }
@@ -64,18 +62,16 @@
     //background-color: $list-group-bg;
     background-color: transparent;
     border: none;
-    border-radius: $borderRadiusMedium $borderRadiusMedium 0 0;
+    border-radius: 0px !important;
     padding: 10px; 
 }
 
 .menuHeading:hover {
     background-color: $menuItemHoverBackgroundColor;
-    border-radius: $borderRadiusMedium;
 }
 
 .menuHeading[aria-expanded=true] {
     background-color: $secondary;
-    border-radius: $borderRadiusMedium $borderRadiusMedium 0 0;
 }
 
 .mainMenuItemEnabled:hover {
