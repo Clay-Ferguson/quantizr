@@ -466,10 +466,12 @@ export class EditNodeDlg extends DialogBase {
                 let propsButtonBar: ButtonBar = new ButtonBar([
                     new Button("Add Property", this.addProperty),
                     this.deletePropButton = new Button("Delete Property", this.deletePropertyButtonClick)
-                ]);
+                ], null, "float-right");
 
                 this.deletePropButton.setEnabled(false);
-                propsParent.addChild(propsButtonBar);
+
+                // adds the button bar to the top of the list of children.
+                propsParent.getChildren().unshift(propsButtonBar);
             }
         }
 
@@ -617,8 +619,6 @@ export class EditNodeDlg extends DialogBase {
                     !S.render.isReadOnlyProperty(prop.name) || S.edit.showReadOnlyProperties)) {
 
                     if (!this.isGuiControlBasedProp(prop)) {
-                        let allowSelection = !customProps || !customProps.find(p => p === prop.name);
-                        let tableRow = this.makePropEditor(typeHandler, prop, allowSelection, typeHandler ? typeHandler.getEditorRowsForProp(prop.name) : 1);
                         numPropsShowing++;
                     }
                 }
@@ -1000,10 +1000,8 @@ export class EditNodeDlg extends DialogBase {
         let isReadOnly = S.render.isReadOnlyProperty(propEntry.name);
 
         let formGroup = new FormGroup();
-        let propVal = propEntry.value;
 
         let label = typeHandler ? typeHandler.getEditLabelForProp(propEntry.name) : propEntry.name;
-        let propValStr = propVal || "";
         // console.log("making single prop editor: prop[" + propEntry.name + "] val[" + propEntry.value + "]");
 
         let propState: ValidatedState<any> = this.propStates.get(propEntry.name);
@@ -1027,7 +1025,7 @@ export class EditNodeDlg extends DialogBase {
         }
         else {
             if (allowCheckbox) {
-                let checkbox: Checkbox = new Checkbox(label, { className: "checkboxContainerHeight" }, {
+                let checkbox: Checkbox = new Checkbox(label, null, {
                     setValue: (checked: boolean): void => {
                         let state = this.getState();
                         if (checked) {
@@ -1041,7 +1039,7 @@ export class EditNodeDlg extends DialogBase {
                     getValue: (): boolean => {
                         return this.getState().selectedProps.has(propEntry.name);
                     }
-                });
+                }, true);
                 formGroup.addChild(checkbox);
             }
             else {

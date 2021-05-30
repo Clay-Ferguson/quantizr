@@ -512,6 +512,12 @@ entire thing down some times, if it's jutting up against something */
     min-height: 3em;
 }
 
+.inline-checkbox-compact {
+    display: inline-block;
+    cursor: pointer;
+    min-height: 2em;
+}
+
 .inline-radio {
     display: inline-block;
     cursor: pointer;
@@ -524,7 +530,9 @@ entire thing down some times, if it's jutting up against something */
 .edit-props-table {
     margin-top: 5px;
     margin-bottom: 5px;
-    padding: $smallGap;
+    padding-top: $smallGap;
+    padding-left: $smallGap;
+    padding-right: $smallGap;
 }
 
 .fixedFont {
@@ -1745,5 +1753,5 @@ audio::-webkit-media-controls-play-button {
     border: 3px solid $nodeBorderBottomColor;
     padding: 6px;
     display: inline-block;
-    margin-left: $smallGap;
+    margin-left: 10px;
 }
