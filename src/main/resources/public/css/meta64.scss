@@ -5,9 +5,7 @@ $profileImgSize: 200px;
 $rootNodeBorder: true;
 $highlightActiveMenuItems: false;
 
-$border-radius: .3rem;
-$borderRadiusLarge: 1em;
-$borderRadiusMedium: .6em;
+$border-radius: 5px;
 
 $input-bg: $gray-700;
 $input-color: white;
@@ -224,6 +222,7 @@ a {
     background-color: rgba(0, 0, 0, .7);
     //opacity: 0.7;
     border: 2px solid cadetblue;
+    border-radius: $border-radius;
 }
 
 .infoBlock {
@@ -307,6 +306,7 @@ a {
     cursor: pointer;
     margin-bottom: $tinyGap;
     border: 1px solid gray;
+    border-radius: $border-radius;
 }
 
 .profileImageBase {
@@ -316,18 +316,21 @@ a {
     position: relative;
     background-color: $modal-content-bg;
     max-width: 150px;
+    border-radius: $border-radius;
 }
 
 .profileImageBaseNoHeader {
     cursor: pointer;
     background-color: $modal-content-bg;
     max-width: 150px;
+    border-radius: $border-radius;
 }
 
 .profileImageBaseNoHeaderSmall {
     cursor: pointer;
     background-color: $modal-content-bg;
     max-width: 120px;
+    border-radius: $border-radius;
 }
 
 .profileHeaderImageBase {
@@ -336,6 +339,7 @@ a {
     height: 200px;
     max-height: $profileImgSize;
     object-fit: cover;
+    border-radius: $border-radius;
 }
 
 .resultsContentHeading {
@@ -343,6 +347,7 @@ a {
     padding: 10px;
     margin-bottom: 10px;
     margin-top: 10px;
+    border-radius: $border-radius;
 }
 
 .resultsTitle {
@@ -356,6 +361,7 @@ a {
     object-fit: cover;
     border: 1px solid $nodeBorderBottomColor;
     min-height: 60px;
+    border-radius: $border-radius;
 }
 
 .profileImage {
@@ -422,6 +428,7 @@ a {
     cursor: pointer;
     border: 2px solid $nodeBorderBottomColor;
     margin: 0 10px 10px 10px;
+    border-radius: $border-radius;
 }
 
 .userBio {
@@ -525,6 +532,7 @@ entire thing down some times, if it's jutting up against something */
 
 .form-group-border {
     border: 1px solid $gray-600;
+    border-radius: $border-radius;
 }
 
 .edit-props-table {
@@ -619,12 +627,14 @@ entire thing down some times, if it's jutting up against something */
     margin: 8px;
     display: inline-block;
     cursor: pointer;
+    border-radius: $border-radius;
 }
 
 .rssChapterPanel {
     border: 2px solid $nodeBorderBottomColor;
     margin-top: 12px;
     padding: 13px;
+    border-radius: $border-radius;
 }
 
 .rssAnchor {
@@ -663,6 +673,7 @@ entire thing down some times, if it's jutting up against something */
     margin-right: $smallGap auto;
     padding: $smallGap;
     width: 100%;
+    border-radius: $border-radius;
 }
 
 .app-modal-content {
@@ -672,6 +683,7 @@ entire thing down some times, if it's jutting up against something */
     padding: $smallGap;
     width: 75%;
     max-width: 800px;
+    border-radius: $border-radius;
 }
 
 .app-modal-content-tiny-width {
@@ -899,6 +911,7 @@ input[type="radio"] {
     margin-bottom: 12px;
     display: block;
     border: 1px solid $gray-700;
+    border-radius: $border-radius;
 }
 
 .img-upper-left {
@@ -907,6 +920,7 @@ input[type="radio"] {
     float: left !important;
     border: 1px solid $gray-700;
     vertical-align: top;
+    border-radius: $border-radius;
 }
 
 .img-upper-right {
@@ -939,6 +953,7 @@ input[type="radio"] {
     cursor: pointer;
     padding: 8px;
     border: 1px solid olivedrab;
+    border-radius: $border-radius;
 }
 
 .microMarginTop {
@@ -1097,12 +1112,14 @@ input[type="radio"] {
     margin-bottom: $smallGap;
     border: 1px solid $gray-700;
     vertical-align: top;
+    border-radius: $border-radius;
 }
 
 .attached-img-in-editor {
     cursor: pointer;
     border: 1px solid $gray-700;
     vertical-align: top;
+    border-radius: $border-radius;
 }
 
 .meta64-input {
@@ -1186,6 +1203,7 @@ input[type="radio"] {
     padding-right: 8px;
     padding-top: 8px;
     margin-bottom: 8px;
+    border-radius: $border-radius;
 }
 
 .vertical-layout-row {
@@ -1225,6 +1243,7 @@ input[type="radio"] {
     padding: 6px;
     margin-right: 10px;
     margin-left: 10px;
+    border-radius: $border-radius;
 }
 
 .created-by-me {
@@ -1305,6 +1324,7 @@ input[type="radio"] {
     padding: 6px;
     margin-right: 10px;
     cursor: pointer;
+    border-radius: $border-radius;
 }
 
 .content-narrow {
@@ -1531,6 +1551,7 @@ i'm backing out for now
     // max-width: 40%;
     margin-bottom: 12px;
    //  margin-right: 12px;
+   border-radius: $border-radius;
 }
 
 .rss-feed-item {
@@ -1609,13 +1630,15 @@ i'm backing out for now
 .binaryEditorSection {
     margin-left: 2px;
     margin-right: 2px;
-    border: 2px solid $gray-700
+    border: 2px solid $gray-700;
+    border-radius: $border-radius;
 }
 
 .captchaImage {
     margin-left: 1px;
     margin-right: $smallGap;
-    border: 2px solid $gray-700
+    border: 2px solid $gray-700;
+    border-radius: $border-radius;
 }
 
 .editBinaryContainer {
@@ -1633,6 +1656,7 @@ i'm backing out for now
 .typeIconAndName {
     border: 2px solid gray;
     padding: 6px;
+    border-radius: $border-radius;
 }
 
 .friendListText {
@@ -1646,6 +1670,7 @@ i'm backing out for now
     max-height: 60px;
     cursor: pointer;
     border: 1px solid gray;
+    border-radius: $border-radius;
 }
 
 .dialogContentArea {
@@ -1663,6 +1688,7 @@ i'm backing out for now
     line-height: 1;
     padding: 4px;
     margin-left: 5px;
+    border-radius: $border-radius;
 }
 
 .priorityTag1 {
@@ -1688,31 +1714,6 @@ i'm backing out for now
 .priorityTag5 {
     @extend .priorityTag;
     border: 5px solid blueviolet;
-}
-
-.quickEditTextArea {
-    width: 100%;
-    //background-color: transparent;
-    //color: white;
-}
-
-.quickEditSpan {
-    width: 100%;
-}
-
-.quickEditFormArea {
-    background-color: $modal-content-bg;
-    //border: 2px solid $modal-content-border-color;
-    margin: $smallGap;
-    //margin-top: $smallGap;
-    //margin-bottom: $smallGap;
-}
-
-.inlineEditFormArea {
-    background-color: $modal-content-bg;
-    //border: 2px solid $modal-content-border-color;
-    //padding: $smallGap;
-    margin-left: $smallGap;
 }
 
 .durationTypeInput {
@@ -1743,6 +1744,7 @@ audio::-webkit-media-controls-play-button {
     display: inline-block;
     padding: 12px;
     border: 6px solid lightGray;
+    border-radius: $border-radius;
 }
 
 .monospace {
@@ -1754,4 +1756,5 @@ audio::-webkit-media-controls-play-button {
     padding: 6px;
     display: inline-block;
     margin-left: 10px;
+    border-radius: $border-radius;
 }

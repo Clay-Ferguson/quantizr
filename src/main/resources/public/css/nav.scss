@@ -5,20 +5,21 @@
 .nav-tabs {
     border: none;
     font-size: 120%;
+    border-radius: $border-radius;
 }
 
 .nav-tabs>.nav-item>.nav-link {
     border: $mediumBorderSize solid transparent; 
     cursor: pointer;
     font-weight: bold;
-    border-radius: 0px !important; 
+    border-radius: $border-radius;
 }
 
 .nav-tabs>.nav-item>.nav-link:hover {
     border: $mediumBorderSize solid transparent; 
     cursor: pointer;
     font-weight: bold;
-    border-radius: 0px !important; 
+    border-radius: $border-radius;
 }
 
 .nav-tabs>.nav-item>.nav-link.active,
@@ -27,5 +28,5 @@
     border: $mediumBorderSize solid $nodeBorderBottomColor; 
     cursor: pointer;
     font-weight: bold;
-    border-radius: 0px !important; 
+    border-radius: $border-radius;
 }

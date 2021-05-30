@@ -10,8 +10,10 @@
     margin-bottom: 4px;
     white-space: nowrap;
     display: inline-block;
+    border-radius: $border-radius;
 }
 
 .breadcrumbItem:hover {
     border: 3px solid green;
+    border-radius: $border-radius;
 }
