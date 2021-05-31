@@ -11,6 +11,7 @@ import { Div } from "../widget/Div";
 import { Heading } from "../widget/Heading";
 import { IconButton } from "../widget/IconButton";
 import { Li } from "../widget/Li";
+import { Span } from "../widget/Span";
 import { TextContent } from "../widget/TextContent";
 
 let S: Singletons;
@@ -73,14 +74,16 @@ export class SearchView extends AppTab {
             }
             children.push(new Div(null, null, [
                 new Div(null, null, [
-                    new IconButton("fa-arrow-left", "Back", {
-                        onClick: () => S.view.refreshTree(state.searchNode.id, true, true, state.searchNode.id, false, true, true, state),
-                        title: "Back to Node"
-                    }),
-                    new Heading(4, "Search", { className: "resultsTitle" })
+                    new Heading(4, "Search", { className: "resultsTitle" }),
+                    new Span(null, { className: "float-right" }, [
+                        new IconButton("fa-arrow-left", "Back", {
+                            onClick: () => S.view.refreshTree(state.searchNode.id, true, true, state.searchNode.id, false, true, true, state),
+                            title: "Back to Node"
+                        })
+                    ])
                 ]),
                 new TextContent(searchText, "resultsContentHeading alert alert-secondary"),
-                new Div("Searched " + state.searchDescription)
+                new Div("Searched -> " + state.searchDescription)
             ]));
         }
 

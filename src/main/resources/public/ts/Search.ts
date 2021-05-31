@@ -174,18 +174,13 @@ export class Search implements SearchIntf {
             S.meta64.fadeStartTime = new Date().getTime();
         }
 
-        if (isFeed) {
-            if (isParent) {
-                clazz += " inactive-feed-row-parent";
-            }
-            else {
-                if (parentItem) {
-                    clazz += " inactive-feed-row";
-                }
-            }
+        if (isParent) {
+            clazz += " inactive-feed-row-parent";
         }
         else {
-            clazz += " inactive-row";
+            if (parentItem) {
+                clazz += " inactive-feed-row";
+            }
         }
 
         const div = new Div(null, {

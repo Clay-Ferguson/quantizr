@@ -71,11 +71,13 @@ export class TimelineView extends AppTab {
             }
             children.push(new Div(null, null, [
                 new Div(null, null, [
-                    new IconButton("fa-arrow-left", "Back", {
-                        onClick: () => S.view.refreshTree(state.timelineNode.id, true, true, state.timelineNode.id, false, true, true, state),
-                        title: "Back to Node"
-                    }),
-                    new Heading(4, "Timeline", { className: "resultsTitle" })
+                    new Heading(4, "Timeline", { className: "resultsTitle" }),
+                    new Span(null, { className: "float-right" }, [
+                        new IconButton("fa-arrow-left", "Back", {
+                            onClick: () => S.view.refreshTree(state.timelineNode.id, true, true, state.timelineNode.id, false, true, true, state),
+                            title: "Back to Node"
+                        })
+                    ])
                 ]),
                 new TextContent(timelineText, "resultsContentHeading alert alert-secondary"),
                 new Div(state.timelineDescription)

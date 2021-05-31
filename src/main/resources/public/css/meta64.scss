@@ -58,6 +58,7 @@ $lightenRowFactor: 5;
 
 $fatBorderSize: 8px;
 $mediumBorderSize: 6px;
+$highlightBorderSize: 10px;
 $smallBorderSize: 3px;
 
 // @keyframes animatedBackground {
@@ -351,7 +352,7 @@ a {
 }
 
 .resultsTitle {
-    margin-left: 15px;
+    margin-left: 10px;
     display: inline;
 }
 
@@ -1194,7 +1195,8 @@ input[type="radio"] {
     outline: none;
 
     @if $rootNodeBorder {
-        border: 10px solid $nodeBorderBottomColor; 
+        border-bottom: $highlightBorderSize solid $nodeBorderBottomColor; 
+        border-left: $highlightBorderSize solid $nodeBorderBottomColor; 
     } 
     @else {
         border-left: $fatBorderSize solid $nodeBorderBottomColor; 
@@ -1203,7 +1205,6 @@ input[type="radio"] {
     padding-right: 8px;
     padding-top: 8px;
     margin-bottom: 8px;
-    border-radius: $border-radius;
 }
 
 .vertical-layout-row {
@@ -1375,17 +1376,17 @@ input[type="radio"] {
 
 .node-table-row {
     position: relative;
-    padding-right: 1em;
+    padding-right: 10px;
     outline: none;
-    padding-top: 8px;
+    padding-top: 10px;
     padding-bottom: 8px;
 }
 
 .feed-node-table-row {
     position: relative;
-    padding-right: 1em;
+    padding-right: 10px;
     outline: none;
-    padding-top: 8px;
+    padding-top: 10px;
     padding-bottom: 8px;
     // no padding on bottom because reply button bar has enough space
 }
@@ -1443,7 +1444,7 @@ i'm backing out for now
 }
 
 .active-row {
-    border-left: $fatBorderSize solid $primary;
+    border-left: $highlightBorderSize solid $primary;
 }
 
 .active-row:hover {
@@ -1453,12 +1454,12 @@ i'm backing out for now
 }
 
 .inactive-row {
-    border-left: $fatBorderSize solid transparent;
+    border-left: $highlightBorderSize solid transparent;
 }
 
 .inactive-feed-row {
     border-left: 2px solid $nodeBorderBottomColor;
-    margin-left: 25px;
+    // margin-left: 25px;
 }
 
 .inactive-feed-row-parent {
@@ -1471,7 +1472,8 @@ i'm backing out for now
 
 .active-row-main {
     @if $rootNodeBorder {
-        border: $mediumBorderSize solid $primary;
+        border-bottom: $highlightBorderSize solid $primary;
+        border-left: $highlightBorderSize solid $primary;
     } 
     @else {
         border-left: $mediumBorderSize solid $primary; 
@@ -1484,7 +1486,8 @@ i'm backing out for now
 
 .inactive-row-main {
     @if $rootNodeBorder {
-        border: $mediumBorderSize solid $nodeBorderBottomColor; 
+        border-bottom: $highlightBorderSize solid $nodeBorderBottomColor; 
+        border-left: $highlightBorderSize solid $nodeBorderBottomColor; 
     }
     @else {
         border-left: $mediumBorderSize solid $nodeBorderBottomColor; 
