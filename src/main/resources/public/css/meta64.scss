@@ -1405,13 +1405,8 @@ input[type="radio"] {
     // no padding on bottom because reply button bar has enough space
 }
 
-.editing-border {
-    // border-bottom: 3px dotted $nodeBorderBottomColor;
-    border-bottom: 2px dotted lightslategray;
-}
-
-.non-editing-border {
-    border-bottom: 2px dotted lightslategray;
+.row-border {
+    border-bottom: 2px solid $nodeBorderBottomColor;
 }
 
 /*
@@ -1435,7 +1430,6 @@ i'm backing out for now
     outline: none;
     height: 100%;
     width: 100%;
-    padding-top: 10px;
     padding-right: 12px;
 }
 
@@ -1447,7 +1441,7 @@ i'm backing out for now
     border: 2px solid $nodeBorderBottomColor;
 
     display: table-cell;
-    padding-top: 5px;
+    padding-top: 6px;
     
     border-radius: 6px;
 }

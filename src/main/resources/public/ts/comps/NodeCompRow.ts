@@ -109,12 +109,7 @@ export class NodeCompRow extends Div {
         else if (layout && layout.indexOf("c") === 0 && (!!S.props.getNodePropVal(J.NodeProp.INLINE_CHILDREN, this.node) || this.node.id === state.node.id)) {
         }
         else {
-            if (state.userPreferences.editMode) {
-                layoutClass += " editing-border";
-            }
-            else {
-                layoutClass += " non-editing-border";
-            }
+            layoutClass += " row-border";
         }
 
         let indentLevel = this.isTableCell ? 0 : this.level;

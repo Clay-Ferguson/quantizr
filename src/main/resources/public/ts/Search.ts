@@ -160,13 +160,6 @@ export class Search implements SearchIntf {
         const content = new NodeCompContent(node, true, true, prefix, true, null);
 
         let clazz = isFeed ? "feed-node-table-row" : "node-table-row";
-        // if (state.userPreferences.editMode) {
-        //    clazz += " editing-border";
-        // }
-        // else {
-        // clazz += " non-editing-border"
-        // }
-
         if (S.render.enableRowFading && S.render.fadeInId === node.id && S.render.allowFadeInId) {
             S.render.fadeInId = null;
             S.render.allowFadeInId = false;
