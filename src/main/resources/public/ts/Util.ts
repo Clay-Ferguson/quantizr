@@ -1018,6 +1018,20 @@ export class Util implements UtilIntf {
         return (date.getMonth() + 1) + "/" + date.getDate() + "/" + date.getFullYear();
     }
 
+    getShortContent = (content: string): string => {
+        if (!content) return content;
+        let idx = content.indexOf("\n");
+        if (idx !== -1) {
+            content = content.substring(0, idx);
+        }
+
+        if (content.length > 140) content = content.substring(0, 140) + "...";
+        while (content.startsWith("#")) {
+            content = content.substring(1);
+        }
+        return content.trim();
+    }
+
     /* NOTE: There's also a 'history.replaceState()' which doesn't build onto the history but modifies what it thinks
     the current location is. */
     updateHistory = (node: J.NodeInfo, childNodeId: string = null, appState: AppState): void => {

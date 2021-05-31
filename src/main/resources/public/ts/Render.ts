@@ -210,6 +210,9 @@ export class Render implements RenderIntf {
 
         const children = [];
 
+        /* we need this holder object because we don't have the dialog until it's created */
+        const dlgHolder: any = {};
+
         let byIdUrl = window.location.origin + "/app?id=" + node.id;
         children.push(new Heading(5, "By ID"));
         children.push(new Div(byIdUrl, {
@@ -217,7 +220,21 @@ export class Render implements RenderIntf {
             title: "Click -> Copy to clipboard",
             onClick: () => {
                 S.util.copyToClipboard(byIdUrl);
-                S.util.flashMessage("Copied to Clipboard: " + byIdUrl, "Clipboard", true);
+                S.util.flashMessage("Copied link to Clipboard", "Clipboard", true);
+                dlgHolder.dlg.close();
+            }
+        }));
+
+        let content = S.util.getShortContent(node.content);
+        let markdownIdUrl = "[" + content + "](/app?id=" + node.id + ")";
+        children.push(new Heading(5, "Markdown Link"));
+        children.push(new Div(markdownIdUrl, {
+            className: "anchorBigMarginBottom",
+            title: "Click -> Copy to clipboard",
+            onClick: () => {
+                S.util.copyToClipboard(markdownIdUrl);
+                S.util.flashMessage("Copied link to Clipboard", "Clipboard", true);
+                dlgHolder.dlg.close();
             }
         }));
 
@@ -229,7 +246,8 @@ export class Render implements RenderIntf {
                 title: "Click -> Copy to clipboard",
                 onClick: () => {
                     S.util.copyToClipboard(byNameUrl);
-                    S.util.flashMessage("Copied to Clipboard: " + byNameUrl, "Clipboard", true);
+                    S.util.flashMessage("Copied link to Clipboard", "Clipboard", true);
+                    dlgHolder.dlg.close();
                 }
             }));
         }
@@ -241,7 +259,8 @@ export class Render implements RenderIntf {
             title: "Click -> Copy to clipboard",
             onClick: () => {
                 S.util.copyToClipboard(rssFeed);
-                S.util.flashMessage("Copied to Clipboard: " + rssFeed, "Clipboard", true);
+                S.util.flashMessage("Copied link to Clipboard", "Clipboard", true);
+                dlgHolder.dlg.close();
             }
         }));
 
@@ -254,7 +273,8 @@ export class Render implements RenderIntf {
                 title: "Click -> Copy to clipboard",
                 onClick: () => {
                     S.util.copyToClipboard(attByIdUrl);
-                    S.util.flashMessage("Copied to Clipboard: " + attByIdUrl, "Clipboard", true);
+                    S.util.flashMessage("Copied link to Clipboard", "Clipboard", true);
+                    dlgHolder.dlg.close();
                 }
             }));
 
@@ -265,7 +285,8 @@ export class Render implements RenderIntf {
                 title: "Click -> Copy to clipboard",
                 onClick: () => {
                     S.util.copyToClipboard(downloadttByIdUrl);
-                    S.util.flashMessage("Copied to Clipboard: " + downloadttByIdUrl, "Clipboard", true);
+                    S.util.flashMessage("Copied link to Clipboard", "Clipboard", true);
+                    dlgHolder.dlg.close();
                 }
             }));
         }
@@ -279,7 +300,8 @@ export class Render implements RenderIntf {
                     title: "Click -> Copy to clipboard",
                     onClick: () => {
                         S.util.copyToClipboard(attByNameUrl);
-                        S.util.flashMessage("Copied to Clipboard: " + attByNameUrl, "Clipboard", true);
+                        S.util.flashMessage("Copied link to Clipboard", "Clipboard", true);
+                        dlgHolder.dlg.close();
                     }
                 }));
 
@@ -290,7 +312,8 @@ export class Render implements RenderIntf {
                     title: "Click -> Copy to clipboard",
                     onClick: () => {
                         S.util.copyToClipboard(downloadAttByNameUrl);
-                        S.util.flashMessage("Copied to Clipboard: " + downloadAttByNameUrl, "Clipboard", true);
+                        S.util.flashMessage("Copied link to Clipboard", "Clipboard", true);
+                        dlgHolder.dlg.close();
                     }
                 }));
             }
@@ -304,13 +327,14 @@ export class Render implements RenderIntf {
                 title: "Click -> Copy to clipboard",
                 onClick: () => {
                     S.util.copyToClipboard(ipfsLink);
-                    S.util.flashMessage("Copied to Clipboard: " + ipfsLink, "Clipboard", true);
+                    S.util.flashMessage("Copied link to Clipboard", "Clipboard", true);
+                    dlgHolder.dlg.close();
                 }
             }));
         }
 
-        const linksDiv = new Div(null, null, children);
-        new MessageDlg(null, "URLs for Node: " + node.id, null, linksDiv, false, 0, null).open();
+        dlgHolder.dlg = new MessageDlg(null, "URLs for Node: " + node.id, null, new Div(null, null, children), false, 0, null);
+        dlgHolder.dlg.open();
     }
 
     allowAction = (typeHandler: TypeHandlerIntf, action: NodeActionType, node: J.NodeInfo, appState: AppState): boolean => {

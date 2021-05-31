@@ -67,11 +67,7 @@ export class SearchView extends AppTab {
         let children: Comp[] = [];
 
         if (state.searchDescription && state.searchNode) {
-            let searchText = state.searchNode.content;
-            let idx = searchText.indexOf("\n");
-            if (idx !== -1) {
-                searchText = searchText.substring(0, idx);
-            }
+            let searchText = S.util.getShortContent(state.searchNode.content);
             children.push(new Div(null, null, [
                 new Div(null, null, [
                     new Heading(4, "Search", { className: "resultsTitle" }),

@@ -64,11 +64,7 @@ export class TimelineView extends AppTab {
         let children: Comp[] = [];
 
         if (state.timelineDescription && state.timelineNode) {
-            let timelineText = state.timelineNode.content;
-            let idx = timelineText.indexOf("\n");
-            if (idx !== -1) {
-                timelineText = timelineText.substring(0, idx);
-            }
+            let timelineText = S.util.getShortContent(state.timelineNode.content);
             children.push(new Div(null, null, [
                 new Div(null, null, [
                     new Heading(4, "Timeline", { className: "resultsTitle" }),
