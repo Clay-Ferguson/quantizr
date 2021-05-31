@@ -14,8 +14,6 @@ menu:
   siteNav:
     - name: "separator"
       link: ""
-    - name: "The Lounge"
-      link: ":lounge" 
     - name: "News"
       link: ":news" 
     - name: "Podcasts"

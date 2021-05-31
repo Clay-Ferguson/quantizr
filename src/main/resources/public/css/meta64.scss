@@ -1412,16 +1412,17 @@ i'm backing out for now
     display: table;
     width: 100%;
     table-layout: fixed;
-    // This is needed with round borders but is a huge waste of space
-    border-collapse: collapse;
-    border-spacing: 10px;
+    // remove border-collapse for round borders
+    // border-collapse: collapse;
+    border-spacing: 16px;
 }
 
 .node-grid-item {
-    padding-right: 1.5em;
     outline: none;
     height: 100%;
     width: 100%;
+    padding-top: 10px;
+    padding-right: 12px;
 }
 
 .node-grid-row {
@@ -1429,12 +1430,12 @@ i'm backing out for now
 }
 
 .node-grid-cell {
-    border: 1px dotted $nodeBorderBottomColor;
+    border: 2px solid $nodeBorderBottomColor;
 
-    // rounded border cells looks cluttered and is a waste of space
-    // padding: 6px;
     display: table-cell;
     padding-top: 5px;
+    
+    border-radius: 6px;
 }
 
 .node-table-row .top-right-image {
