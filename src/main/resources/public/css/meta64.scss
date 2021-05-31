@@ -1700,7 +1700,7 @@ i'm backing out for now
     line-height: 1;
     padding: 4px;
     margin-left: 5px;
-    border-radius: $border-radius;
+    border-radius: 100px;
 }
 
 .priorityTag1 {
@@ -1715,17 +1715,17 @@ i'm backing out for now
 
 .priorityTag3 {
     @extend .priorityTag;
-    border: 5px solid yellow;
+    border: 5px solid brown;
 }
 
 .priorityTag4 {
     @extend .priorityTag;
-    border: 5px solid green;
+    border: 5px solid blue;
 }
 
 .priorityTag5 {
     @extend .priorityTag;
-    border: 5px solid blueviolet;
+    border: 5px solid green;
 }
 
 .durationTypeInput {
