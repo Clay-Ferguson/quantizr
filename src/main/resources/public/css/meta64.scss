@@ -267,6 +267,14 @@ a {
     color: green;
 }
 
+.logo-text-small {
+    cursor: pointer;
+    padding: 3px;
+    color: green;
+    border: 3px solid green;
+    border-radius: $border-radius;
+}
+
 .app-body {
     font-family: $fontFamily !important;
     
@@ -312,18 +320,24 @@ a {
 
 .profileImageBase {
     cursor: pointer;
+    top: -55px;
+    left: 30px;
+    position: relative;
+    background-color: $modal-content-bg;
+    max-width: 120px;
+    border-radius: $border-radius;
+}
+
+.profileUserDescription {
     top: -50px;
     left: 35px;
     position: relative;
-    background-color: $modal-content-bg;
-    max-width: 150px;
-    border-radius: $border-radius;
 }
 
 .profileImageBaseNoHeader {
     cursor: pointer;
     background-color: $modal-content-bg;
-    max-width: 150px;
+    max-width: 120px;
     border-radius: $border-radius;
 }
 
@@ -425,7 +439,7 @@ a {
 }
 
 .friendImage {
-    width: 150px;
+    max-width: 120px;
     cursor: pointer;
     border: 2px solid $nodeBorderBottomColor;
     margin: 0 10px 10px 10px;
@@ -440,20 +454,20 @@ a {
     @extend .profileImageBase;
     border: 4px dotted $nodeBorderBottomColor;
     padding: 12px;
-    min-height: 150px;
+    min-height: 120px;
 }
 
 .profileImageHolderNoHeader {
     @extend .profileImageBaseNoHeader;
     border: 4px dotted $nodeBorderBottomColor;
     padding: 12px;
-    min-height: 150px;
+    min-height: 120px;
 }
 
 .profileHeaderImageHolder {
     @extend .profileHeaderImageBase;
     border: 4px dotted $nodeBorderBottomColor;
-    min-height: 150px;
+    min-height: 120px;
     padding: 12px;
 }
 

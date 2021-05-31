@@ -25,8 +25,9 @@ export class LeftNavPanel extends Div {
     preRender(): void {
         let state: AppState = useSelector((state: AppState) => state);
 
-        let messagesSuffix = state.newMessageCount > 0
-            ? " (" + state.newMessageCount + ")" : "";
+        let s = state.newMessageCount > 1 ? "s" : "";
+        let messages = state.newMessageCount > 0
+            ? (state.newMessageCount + " message" + s) : "";
 
         this.setChildren([
             new Div(null, null, [
@@ -35,11 +36,18 @@ export class LeftNavPanel extends Div {
                     src: "/branding/logo-50px-tr.jpg",
                     onClick: () => { window.location.href = window.location.origin; }
                 }),
-                new Span(g_brandingAppName + messagesSuffix, {
+                new Span(g_brandingAppName, {
                     className: "logo-text",
                     onClick: e => { S.meta64.loadAnonPageHome(null); },
                     title: "Go to Portal Home Node"
-                })
+                }),
+                // todo-1: need to add a similar message over to the 'logo-text' that's active for mobile
+                // which is in a different class.
+                messages ? new Span(messages, {
+                    className: "logo-text-small float-right",
+                    onClick: e => { S.meta64.showMyNewMessages(); },
+                    title: "Show new messages"
+                }) : null
             ]),
 
             new Div(null, {

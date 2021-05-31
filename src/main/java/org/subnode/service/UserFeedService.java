@@ -28,6 +28,7 @@ import org.subnode.model.client.PrincipalName;
 import org.subnode.mongo.MongoAuth;
 import org.subnode.mongo.MongoRead;
 import org.subnode.mongo.MongoSession;
+import org.subnode.mongo.MongoUpdate;
 import org.subnode.mongo.MongoUtil;
 import org.subnode.mongo.model.SubNode;
 import org.subnode.request.CheckMessagesRequest;
@@ -48,6 +49,9 @@ public class UserFeedService {
 
 	@Autowired
 	private MongoRead read;
+
+	@Autowired
+	private MongoUpdate update;
 
 	@Autowired
 	private Convert convert;
@@ -246,6 +250,12 @@ public class UserFeedService {
 
 			if (userAccountNode != null) {
 				sharedToAny.add(userAccountNode.getOwner().toHexString());
+
+				/* setting last active time to this current time, will stop the GUI from showing the user
+				an indication that they have new messages, because we know they're querying messages NOW, so this
+				is a way to reset */
+				userAccountNode.setProp(NodeProp.LAST_ACTIVE_TIME.s(), sc.getLastActiveTime());
+				update.save(session, userAccountNode);
 			}
 		}
 		List<NodeInfo> searchResults = new LinkedList<>();

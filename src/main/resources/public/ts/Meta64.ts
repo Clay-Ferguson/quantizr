@@ -825,4 +825,14 @@ export class Meta64 implements Meta64Intf {
     ctrlKeyCheck = (): boolean => {
         return this.ctrlKey && (new Date().getTime() - this.ctrlKeyTime) < 2500;
     }
+
+    showMyNewMessages = (): void => {
+        S.nav.messages({
+            feedFilterFriends: false,
+            feedFilterToMe: true,
+            feedFilterFromMe: true,
+            feedFilterToPublic: false,
+            feedFilterLocalServer: false
+        });
+    }
 }

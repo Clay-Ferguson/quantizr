@@ -134,7 +134,10 @@ public class SessionContext {
 		log.trace(String.format("Destroying Session object hashCode[%d] of user %s", hashCode(), userName));
 
 		synchronized (allSessions) {
-			userManagerService.updateLastActiveTime(this);
+			// This "lastActiveTime", should really be called "last message checked time", becaues that's the purpose
+			// it serves, so I think setting this here is undesirable, but we should only reset when the
+			// user is really checking their messages (like in UserFeedService), where this logic was moved to.
+			// userManagerService.updateLastActiveTime(this);
 			allSessions.remove(this);
 		}
 	}
