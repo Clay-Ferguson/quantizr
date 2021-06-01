@@ -1777,3 +1777,14 @@ audio::-webkit-media-controls-play-button {
     margin-left: 10px;
     border-radius: $border-radius;
 }
+
+.sharingNamesDisp {
+    margin-left: 6px;
+    padding: 4px;
+    border: 2px solid $nodeBorderBottomColor;
+    border-radius: $border-radius;
+}
+
+.sharingNamesDispPublic {
+    margin-left: 6px;
+}
