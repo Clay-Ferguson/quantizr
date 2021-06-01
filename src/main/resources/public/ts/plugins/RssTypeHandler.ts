@@ -254,7 +254,7 @@ export class RssTypeHandler extends TypeBase {
             feedOut.push(new Div(feed.creator));
         }
 
-        let feedOutDiv = new Div(null, null, feedOut);
+        let feedOutDiv = new Div(null, { className: "marginBottom" }, feedOut);
         itemListContainer.getChildren().push(feedOutDiv);
 
         for (let item of feed.items) {

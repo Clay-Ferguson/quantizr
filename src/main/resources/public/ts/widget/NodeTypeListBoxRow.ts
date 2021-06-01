@@ -16,8 +16,7 @@ export class NodeTypeListBoxRow extends ListBoxRow {
         let iconClass = this.typeHandler.getIconClass();
         if (iconClass) {
             icon = new Icon({
-                style: { marginRight: "12px", verticalAlign: "middle" },
-                className: iconClass
+                className: iconClass + " typeListIcon"
             });
         }
 

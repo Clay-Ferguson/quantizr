@@ -1288,6 +1288,12 @@ input[type="radio"] {
     cursor: pointer;
 }
 
+.typeListIcon {
+    margin-right: 12px;
+    margin-top: 4px;
+    vertical-align: "middle";
+}
+
 /* This positioning puts the plus buttion right outside the row to the right between rows
    so it's intuitive where the insert goes 
    
@@ -1560,19 +1566,18 @@ i'm backing out for now
 
     /* Warning: this 40% is also enforced in the JS code, by post-processing the HTML but before render in react,
     search for this class name in "RssTypeHandler" */
-    // max-width: 40%;
     margin-bottom: 12px;
-   //  margin-right: 12px;
-   border-radius: $border-radius;
+   
+    border-radius: $border-radius;
 }
 
 .rss-feed-item {
-    border-top: 6px solid $nodeBorderBottomColor;
+    border-top: 2px solid $nodeBorderBottomColor;
     padding: 12px;
 }
 
 .rss-feed-item:last-child {
-    border-bottom: 6px solid $nodeBorderBottomColor;
+    border-bottom: 2px solid $nodeBorderBottomColor;
 }
 
 .rss-feed-listing {
@@ -1603,14 +1608,12 @@ i'm backing out for now
 }
 
 .userFeedItem {
-    // border-radius: $borderRadiusMedium;
     border-top: 2px solid $nodeBorderBottomColor;
     border-right: 2px solid $nodeBorderBottomColor;
     border-left: 2px solid $nodeBorderBottomColor;
 }
 
 .userFeedItemLast {
-    // border-radius: $borderRadiusMedium;
     border: 2px solid $nodeBorderBottomColor;
     margin-bottom: 10px;
 }
