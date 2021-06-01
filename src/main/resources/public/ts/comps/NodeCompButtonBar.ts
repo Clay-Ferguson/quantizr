@@ -274,8 +274,9 @@ export class NodeCompButtonBar extends Div {
             }
         }
 
-        let btnArray: Comp[] = [/* openButton, */insertNodeButton, createSubNodeButton, editNodeButton, moveNodeUpButton, //
-            moveNodeDownButton, cutNodeButton, deleteNodeButton, pasteButtons];
+        let btnArray: Comp[] = [insertNodeButton, createSubNodeButton, editNodeButton,
+            new Span(null, { className: "float-right" }, [moveNodeUpButton, //
+                moveNodeDownButton, cutNodeButton, deleteNodeButton, pasteButtons])];
 
         if (this.extraButtons) {
             btnArray = btnArray.concat(this.extraButtons);

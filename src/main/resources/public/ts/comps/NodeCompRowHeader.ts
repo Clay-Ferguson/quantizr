@@ -102,20 +102,34 @@ export class NodeCompRowHeader extends Div {
                     verticalAlign: "middle"
                 },
                 className: "fa fa-globe fa-lg",
-                title: "Node is Public (Shared to everyone)"
+                title: "Node is Public\n(Shared to everyone)"
             }));
         }
         else if (S.props.isShared(node)) {
-            let sharingNames = S.util.getSharingNames(node, true);
+            let allSharingNames = S.util.getSharingNames(node, true);
+            let sharingNames = allSharingNames;
+            let isPublic = sharingNames.toLowerCase().indexOf("public") !== -1;
 
-            floatUpperRightDiv.addChild(new Icon({
-                style: {
-                    marginLeft: "12px",
-                    verticalAlign: "middle"
-                },
-                className: "fa fa-envelope fa-lg",
-                title: "Shared to:\n\n" + sharingNames
-            }));
+            let nlIdx = sharingNames.indexOf("\n");
+            if (nlIdx !== -1) {
+                sharingNames = sharingNames.substring(nlIdx) + "+";
+            }
+            floatUpperRightDiv.addChild(
+                new Span(null, {
+                    className: isPublic ? "sharingNamesDispPublic" : "sharingNamesDisp",
+                    title: "Shared to:\n\n" + allSharingNames
+                }, [
+
+                    // shos sharing names only if not public
+                    !isPublic ? new Span(sharingNames) : null,
+                    new Icon({
+                        style: {
+                            marginLeft: "12px",
+                            verticalAlign: "middle"
+                        },
+                        className: "fa fa-envelope fa-lg"
+                    })
+                ]));
         }
 
         let jumpButtonAdded = false;
