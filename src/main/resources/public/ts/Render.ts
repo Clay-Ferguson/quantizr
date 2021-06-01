@@ -214,126 +214,126 @@ export class Render implements RenderIntf {
         const dlgHolder: any = {};
 
         let byIdUrl = window.location.origin + "/app?id=" + node.id;
-        children.push(new Heading(5, "By ID"));
-        children.push(new Div(byIdUrl, {
-            className: "anchorBigMarginBottom",
-            title: "Click -> Copy to clipboard",
-            onClick: () => {
-                S.util.copyToClipboard(byIdUrl);
-                S.util.flashMessage("Copied link to Clipboard", "Clipboard", true);
-                dlgHolder.dlg.close();
-            }
-        }));
-
-        let content = S.util.getShortContent(node.content);
-        let markdownIdUrl = "[" + content + "](/app?id=" + node.id + ")";
-        children.push(new Heading(5, "Markdown Link"));
-        children.push(new Div(markdownIdUrl, {
-            className: "anchorBigMarginBottom",
-            title: "Click -> Copy to clipboard",
-            onClick: () => {
-                S.util.copyToClipboard(markdownIdUrl);
-                S.util.flashMessage("Copied link to Clipboard", "Clipboard", true);
-                dlgHolder.dlg.close();
-            }
-        }));
-
-        if (node.name) {
-            let byNameUrl = window.location.origin + S.util.getPathPartForNamedNode(node);
-            children.push(new Heading(5, "By Name"));
-            children.push(new Div(byNameUrl, {
+        children.push(new Heading(5, "By ID"), //
+            new Div(byIdUrl, {
                 className: "anchorBigMarginBottom",
                 title: "Click -> Copy to clipboard",
                 onClick: () => {
-                    S.util.copyToClipboard(byNameUrl);
+                    S.util.copyToClipboard(byIdUrl);
                     S.util.flashMessage("Copied link to Clipboard", "Clipboard", true);
                     dlgHolder.dlg.close();
                 }
             }));
+
+        let content = S.util.getShortContent(node.content);
+        let markdownIdUrl = "[" + content + "](/app?id=" + node.id + ")";
+        children.push(new Heading(5, "Markdown Link"), //
+            new Div(markdownIdUrl, {
+                className: "anchorBigMarginBottom",
+                title: "Click -> Copy to clipboard",
+                onClick: () => {
+                    S.util.copyToClipboard(markdownIdUrl);
+                    S.util.flashMessage("Copied link to Clipboard", "Clipboard", true);
+                    dlgHolder.dlg.close();
+                }
+            }));
+
+        if (node.name) {
+            let byNameUrl = window.location.origin + S.util.getPathPartForNamedNode(node);
+            children.push(new Heading(5, "By Name"), //
+                new Div(byNameUrl, {
+                    className: "anchorBigMarginBottom",
+                    title: "Click -> Copy to clipboard",
+                    onClick: () => {
+                        S.util.copyToClipboard(byNameUrl);
+                        S.util.flashMessage("Copied link to Clipboard", "Clipboard", true);
+                        dlgHolder.dlg.close();
+                    }
+                }));
         }
 
         let rssFeed = window.location.origin + "/rss?id=" + node.id;
-        children.push(new Heading(5, "Node RSS Feed"));
-        children.push(new Div(rssFeed, {
-            className: "anchorBigMarginBottom",
-            title: "Click -> Copy to clipboard",
-            onClick: () => {
-                S.util.copyToClipboard(rssFeed);
-                S.util.flashMessage("Copied link to Clipboard", "Clipboard", true);
-                dlgHolder.dlg.close();
-            }
-        }));
+        children.push(new Heading(5, "Node RSS Feed"), //
+            new Div(rssFeed, {
+                className: "anchorBigMarginBottom",
+                title: "Click -> Copy to clipboard",
+                onClick: () => {
+                    S.util.copyToClipboard(rssFeed);
+                    S.util.flashMessage("Copied link to Clipboard", "Clipboard", true);
+                    dlgHolder.dlg.close();
+                }
+            }));
 
         let bin = S.props.getNodePropVal(J.NodeProp.BIN, node);
         if (bin) {
             let attByIdUrl = window.location.origin + "/f/id/" + node.id;
-            children.push(new Heading(5, "View Attachment By Id"));
-            children.push(new Div(attByIdUrl, {
-                className: "anchorBigMarginBottom",
-                title: "Click -> Copy to clipboard",
-                onClick: () => {
-                    S.util.copyToClipboard(attByIdUrl);
-                    S.util.flashMessage("Copied link to Clipboard", "Clipboard", true);
-                    dlgHolder.dlg.close();
-                }
-            }));
+            children.push(new Heading(5, "View Attachment By Id"), //
+                new Div(attByIdUrl, {
+                    className: "anchorBigMarginBottom",
+                    title: "Click -> Copy to clipboard",
+                    onClick: () => {
+                        S.util.copyToClipboard(attByIdUrl);
+                        S.util.flashMessage("Copied link to Clipboard", "Clipboard", true);
+                        dlgHolder.dlg.close();
+                    }
+                }));
 
             let downloadttByIdUrl = attByIdUrl + "?download=y";
-            children.push(new Heading(5, "Download Attachment By Id"));
-            children.push(new Div(downloadttByIdUrl, {
-                className: "anchorBigMarginBottom",
-                title: "Click -> Copy to clipboard",
-                onClick: () => {
-                    S.util.copyToClipboard(downloadttByIdUrl);
-                    S.util.flashMessage("Copied link to Clipboard", "Clipboard", true);
-                    dlgHolder.dlg.close();
-                }
-            }));
+            children.push(new Heading(5, "Download Attachment By Id"), //
+                new Div(downloadttByIdUrl, {
+                    className: "anchorBigMarginBottom",
+                    title: "Click -> Copy to clipboard",
+                    onClick: () => {
+                        S.util.copyToClipboard(downloadttByIdUrl);
+                        S.util.flashMessage("Copied link to Clipboard", "Clipboard", true);
+                        dlgHolder.dlg.close();
+                    }
+                }));
         }
 
         if (node.name) {
             if (bin) {
                 let attByNameUrl = window.location.origin + S.util.getPathPartForNamedNodeAttachment(node);
-                children.push(new Heading(5, "View Attachment By Name"));
-                children.push(new Div(attByNameUrl, {
-                    className: "anchorBigMarginBottom",
-                    title: "Click -> Copy to clipboard",
-                    onClick: () => {
-                        S.util.copyToClipboard(attByNameUrl);
-                        S.util.flashMessage("Copied link to Clipboard", "Clipboard", true);
-                        dlgHolder.dlg.close();
-                    }
-                }));
+                children.push(new Heading(5, "View Attachment By Name"), //
+                    new Div(attByNameUrl, {
+                        className: "anchorBigMarginBottom",
+                        title: "Click -> Copy to clipboard",
+                        onClick: () => {
+                            S.util.copyToClipboard(attByNameUrl);
+                            S.util.flashMessage("Copied link to Clipboard", "Clipboard", true);
+                            dlgHolder.dlg.close();
+                        }
+                    }));
 
                 let downloadAttByNameUrl = attByNameUrl + "?download=y";
-                children.push(new Heading(5, "Download Attachment By Name"));
-                children.push(new Div(downloadAttByNameUrl, {
-                    className: "anchorBigMarginBottom",
-                    title: "Click -> Copy to clipboard",
-                    onClick: () => {
-                        S.util.copyToClipboard(downloadAttByNameUrl);
-                        S.util.flashMessage("Copied link to Clipboard", "Clipboard", true);
-                        dlgHolder.dlg.close();
-                    }
-                }));
+                children.push(new Heading(5, "Download Attachment By Name"), //
+                    new Div(downloadAttByNameUrl, {
+                        className: "anchorBigMarginBottom",
+                        title: "Click -> Copy to clipboard",
+                        onClick: () => {
+                            S.util.copyToClipboard(downloadAttByNameUrl);
+                            S.util.flashMessage("Copied link to Clipboard", "Clipboard", true);
+                            dlgHolder.dlg.close();
+                        }
+                    }));
             }
         }
 
         let ipfsLink = S.props.getNodePropVal(J.NodeProp.IPFS_LINK, node);
         if (ipfsLink) {
-            children.push(new Heading(5, "IPFS CID"));
-            children.push(new Div(ipfsLink, {
-                className: "anchorBigMarginBottom",
-                title: "Click -> Copy to clipboard",
-                onClick: () => {
-                    S.util.copyToClipboard(ipfsLink);
-                    S.util.flashMessage("Copied link to Clipboard", "Clipboard", true);
-                    dlgHolder.dlg.close();
-                }
-            }));
+            children.push(new Heading(5, "IPFS CID"), //
+                new Div(ipfsLink, {
+                    className: "anchorBigMarginBottom",
+                    title: "Click -> Copy to clipboard",
+                    onClick: () => {
+                        S.util.copyToClipboard(ipfsLink);
+                        S.util.flashMessage("Copied link to Clipboard", "Clipboard", true);
+                        dlgHolder.dlg.close();
+                    }
+                }));
         }
 
-        dlgHolder.dlg = new MessageDlg(null, "URLs for Node: " + node.id, null, new Div(null, null, children), false, 0, null);
+        dlgHolder.dlg = new MessageDlg(null, "URLs for Node", null, new Div(null, null, children), false, 0, null);
         dlgHolder.dlg.open();
     }
 
