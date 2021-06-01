@@ -55,28 +55,30 @@ export class NodeCompButtonBar extends Div {
         let pasteButtons: Span;
 
         let isPageRootNode = state.node && this.node.id === state.node.id;
-
         let typeHandler: TypeHandlerIntf = S.plugin.getTypeHandler(node.type);
-        if (typeHandler) {
-            let typeName = typeHandler.getName();
-            if (typeName !== "Markdown") {
+
+        if (state.userPreferences.editMode) {
+            if (typeHandler) {
+                let typeName = typeHandler.getName();
                 let iconClass = typeHandler.getIconClass();
                 if (iconClass) {
                     typeIcon = new Icon({
-                        className: iconClass + " rowTypeIcon",
+                        className: iconClass + " rowTypeIcon"
+                    });
+                }
+
+                if (typeName && typeName !== "Markdown") {
+                    typeNameSpan = new Span(typeName, { className: "rowTypeName" });
+                }
+
+                if (typeIcon || typeNameSpan) {
+                    typeSpan = new Span(null, {
+                        className: "typeIconAndName",
                         title: "Node Type: " + typeHandler.getName(),
                         onMouseOver: () => { S.meta64.draggableId = node.id; },
                         onMouseOut: () => { S.meta64.draggableId = null; }
-                    });
+                    }, [typeIcon, typeNameSpan]);
                 }
-            }
-
-            if (typeName && typeName !== "Markdown") {
-                typeNameSpan = new Span(typeName, !typeIcon ? { className: "marginLeft" } : null);
-            }
-
-            if (typeIcon || typeNameSpan) {
-                typeSpan = new Span(null, { className: "typeIconAndName" }, [typeIcon, typeNameSpan]);
             }
         }
 

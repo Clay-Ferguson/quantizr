@@ -796,7 +796,7 @@ entire thing down some times, if it's jutting up against something */
 }
 
 .tab-content {
-    margin-left: 0px; 
+    margin-left: 5px; 
     margin-right: 0px;
     margin-top: 8px;
 }
@@ -1043,9 +1043,12 @@ input[type="radio"] {
 }
 
 .rowTypeIcon {
-    margin-right: 6px;
     vertical-align: middle;
-    cursor: pointer;
+}
+
+.rowTypeName {
+    vertical-align: middle;
+    margin-left: 6px;
 }
 
 .passwordEyeIcon {
@@ -1672,6 +1675,7 @@ i'm backing out for now
     border: 2px solid gray;
     padding: 6px;
     border-radius: $border-radius;
+    cursor: pointer;
 }
 
 .friendListText {
