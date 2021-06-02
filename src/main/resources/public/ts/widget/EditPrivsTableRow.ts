@@ -24,7 +24,7 @@ export class EditPrivsTableRow extends ListBoxRow {
     }
 
     renderAclPrivileges(aclEntry: J.AccessControlInfo): Div {
-        let div = new Div();
+        let div = new Div(null, { className: "float-right marginBottom" });
 
         aclEntry.privileges.forEach(function (privilege, index) {
             div.addChild(
@@ -34,7 +34,7 @@ export class EditPrivsTableRow extends ListBoxRow {
                         new Button("Remove", () => {
                             this.removePrivilege(aclEntry.principalNodeId, privilege.privilegeName);
                         })
-                    ], null, "float-right marginBottom")
+                    ], "marginLeft")
                 ])
             );
         }, this);
@@ -48,7 +48,6 @@ export class EditPrivsTableRow extends ListBoxRow {
             src = S.render.getAvatarImgUrl(this.aclEntry.principalNodeId, this.aclEntry.avatarVer);
         }
         let img: Img = null;
-        let state = appState(null);
 
         if (src) {
             img = new Img(null, {
@@ -68,7 +67,7 @@ export class EditPrivsTableRow extends ListBoxRow {
             new Div(null, { className: "marginAll" }, [
                 img,
                 this.aclEntry.principalName === "public"
-                    ? new Heading(3, "Public")
+                    ? new Heading(4, "Public")
                     : new Span(displayName, { className: img ? "marginLeft" : "" }),
                 this.aclEntry.principalName === "public"
                     ? new Span("Visible to everyone.")
