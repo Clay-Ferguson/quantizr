@@ -38,11 +38,13 @@ export class ServerPush implements ServerPushIntf {
 
             if (nodeInfo) {
                 dispatch("Action_RenderTimelineResults", (s: AppState): AppState => {
-                    // remove this nodeInfo if it's already in the results.
-                    s.timelineResults = s.timelineResults.filter((ni: J.NodeInfo) => ni.id !== nodeInfo.id);
+                    if (s.timelineResults) {
+                        // remove this nodeInfo if it's already in the results.
+                        s.timelineResults = s.timelineResults.filter((ni: J.NodeInfo) => ni.id !== nodeInfo.id);
 
-                    // now add to the top of the list.
-                    s.timelineResults.unshift(nodeInfo);
+                        // now add to the top of the list.
+                        s.timelineResults.unshift(nodeInfo);
+                    }
                     return s;
                 });
             }

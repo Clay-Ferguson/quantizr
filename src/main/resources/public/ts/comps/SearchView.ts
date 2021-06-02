@@ -69,7 +69,7 @@ export class SearchView extends AppTab {
         if (state.searchDescription && state.searchNode) {
             let searchText = S.util.getShortContent(state.searchNode.content);
             children.push(new Div(null, null, [
-                new Div(null, null, [
+                new Div(null, { className: "marginBottom" }, [
                     new Heading(4, "Search", { className: "resultsTitle" }),
                     new Span(null, { className: "float-right" }, [
                         new IconButton("fa-arrow-left", "Back", {

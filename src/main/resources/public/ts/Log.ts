@@ -7,7 +7,12 @@ export class Log {
     public static error(e: any): any {
         if (!e) return;
         Log.errorCount++;
-        console.error(e.message, e.stack);
+        if (typeof e === "string") {
+            console.error(e);
+        }
+        else {
+            console.error(e.message, e.stack);
+        }
     }
 
     public static log(msg: any): any {
@@ -23,6 +28,6 @@ Note: This will not get called in the main thread of JavaScript that runs during
 but will get called during normal operation when thing are happening as a result of actual user events
 */
 window.onerror = function (message, url, line, col, e) {
-    Log.error(e.stack);
+    Log.error(e);
     return true;
 };

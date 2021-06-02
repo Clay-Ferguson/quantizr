@@ -228,6 +228,7 @@ export class Util implements UtilIntf {
     }
 
     escapeRegExp = (s: string): string => {
+        if (!s) return s;
         return s.replace(/([.*+?^=!:${}()|\[\]\/\\])/g, "\\$1");
     }
 
@@ -374,6 +375,7 @@ export class Util implements UtilIntf {
      * http://stackoverflow.com/questions/901115/how-can-i-get-query-string-values-in-javascript
      */
     getParameterByName = (name?: any, url?: any): string => {
+        if (!name) return null;
         if (!url) {
             url = window.location.href;
         }

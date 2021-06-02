@@ -66,7 +66,7 @@ export class TimelineView extends AppTab {
         if (state.timelineDescription && state.timelineNode) {
             let timelineText = S.util.getShortContent(state.timelineNode.content);
             children.push(new Div(null, null, [
-                new Div(null, null, [
+                new Div(null, { className: "marginBottom" }, [
                     new Heading(4, "Timeline", { className: "resultsTitle" }),
                     new Span(null, { className: "float-right" }, [
                         new IconButton("fa-arrow-left", "Back", {

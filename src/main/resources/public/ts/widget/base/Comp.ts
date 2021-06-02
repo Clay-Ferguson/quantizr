@@ -125,7 +125,10 @@ export abstract class Comp<S extends BaseCompState = any> implements CompIntf {
             return;
         }
 
-        // console.log("queueing a whenElm function on " + this.jsClassName);
+        if (this.debug) {
+            console.log("queueing whenElm function on " + this.jsClassName);
+        }
+
         // queue up the 'func' to be called once the domAddEvent gets executed.
         if (!this.domAddFuncs) {
             this.domAddFuncs = [func];
@@ -403,7 +406,7 @@ export abstract class Comp<S extends BaseCompState = any> implements CompIntf {
 
             Comp.renderCounter++;
             if (this.debug) {
-                console.log("calling compRender: " + this.jsClassName + " counter=" + Comp.renderCounter); // + " PROPS=" + S.util.prettyPrint(props));
+                console.log("render: " + this.jsClassName + " counter=" + Comp.renderCounter + " ID=" + this.getId());
             }
 
             ret = this.compRender();
@@ -426,7 +429,10 @@ export abstract class Comp<S extends BaseCompState = any> implements CompIntf {
         if (this.domAddFuncs) {
             let elm: HTMLElement = this.getElement();
             if (!elm) {
-                console.error("elm not found in domAddEvent: " + this.jsClassName);
+                // I'm getting this happening during rendering a timeline (somehow also dependent on WHAT kind of rows
+                // are IN the timeline), but I'm not convinced yet it's a bug, rather than
+                // just a component that's now gone, and somehow gets here despite being gone.
+                // console.error("elm not found in domAddEvent: " + this.jsClassName);
                 return;
             }
             else {
