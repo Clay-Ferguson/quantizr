@@ -6,15 +6,14 @@ import { Singletons } from "../Singletons";
 import { CompIntf } from "../widget/base/CompIntf";
 import { Button } from "../widget/Button";
 import { ButtonBar } from "../widget/ButtonBar";
+import { Div } from "../widget/Div";
 import { Form } from "../widget/Form";
 import { Heading } from "../widget/Heading";
+import { Selection } from "../widget/Selection";
 import { VideoPlayer } from "../widget/VideoPlayer";
 import { AudioPlayerDlg } from "./AudioPlayerDlg";
-import { VideoPlayerDlg } from "./VideoPlayerDlg";
-import { Selection } from "../widget/Selection";
-import { Div } from "../widget/Div";
-import clientInfo from "../ClientInfo";
 import { ConfirmDlg } from "./ConfirmDlg";
+import { VideoPlayerDlg } from "./VideoPlayerDlg";
 
 // https://developers.google.com/web/fundamentals/media/recording-audio
 
@@ -24,38 +23,6 @@ let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (s: Singletons) => {
     S = s;
 });
-
-// check with: MediaRecorder.isTypeSupported('video/webm;codecs=vp8');
-//
-// From StackOverflow.com
-// video/webm
-// video/webm;codecs=vp8
-// video/webm;codecs=vp9
-// video/webm;codecs=vp8.0
-// video/webm;codecs=vp9.0
-// video/webm;codecs=h264
-// video/webm;codecs=H264
-// video/webm;codecs=avc1
-// video/webm;codecs=vp8,opus
-// video/WEBM;codecs=VP8,OPUS
-// video/webm;codecs=vp9,opus
-// video/webm;codecs=vp8,vp9,opus
-// video/webm;codecs=h264,opus
-// video/webm;codecs=h264,vp9,opus
-// audio/webm
-// audio/webm;codecs=opus
-//
-// https://developer.mozilla.org/en-US/docs/Web/Media/Formats/codecs_parameter
-//
-// audio/mpeg
-// audio/ogg
-// audio/mp4
-// audio/webm
-//
-// video/ogg
-// video/mp4
-// video/webm
-
 export class MediaRecorderDlg extends DialogBase {
     stream: any;
     chunks = [];
@@ -84,45 +51,71 @@ export class MediaRecorderDlg extends DialogBase {
 
     preLoad(): Promise<void> {
         return new Promise<void>(async (resolve, reject) => {
-            await this.scanDevices();
-            await this.resetStream();
-            resolve();
+            try {
+                await this.scanDevices();
+                await this.resetStream();
+            }
+            catch (e) {
+                console.log("Can't access recording devices, or user refused.");
+                // just close this dialog if we can't access recording devices.
+                this.abort();
+            }
+            finally {
+                resolve();
+            }
         });
     }
 
     scanDevices = async (): Promise<void> => {
         return new Promise<void>(async (resolve, reject) => {
-            let audioInputOptions = [];
-            let videoInputOptions = [];
-            let audioInput = null;
-            let videoInput = null;
+            try {
+                let audioInputOptions = [];
+                let videoInputOptions = [];
+                let audioInput = null;
+                let videoInput = null;
 
-            let devices: MediaDeviceInfo[] = await navigator.mediaDevices.enumerateDevices();
+                let devices: MediaDeviceInfo[] = await navigator.mediaDevices.enumerateDevices();
 
-            devices.forEach((device: MediaDeviceInfo) => {
-                if (device.kind === "audioinput") {
-                    // take the first one here
-                    if (!audioInput) {
-                        audioInput = device.deviceId;
+                devices.forEach((device: MediaDeviceInfo) => {
+                    if (device.kind === "audioinput") {
+                        // take the first one here
+                        if (!audioInput) {
+                            audioInput = device.deviceId;
+                        }
+
+                        // add to data for dropdown
+                        audioInputOptions.push({ key: device.deviceId, val: device.label });
                     }
+                    else if (device.kind === "videoinput") {
 
-                    // add to data for dropdown
-                    audioInputOptions.push({ key: device.deviceId, val: device.label });
-                }
-                else if (device.kind === "videoinput") {
+                        // take the first one here
+                        if (!videoInput) {
+                            videoInput = device.deviceId;
+                        }
 
-                    // take the first one here
-                    if (!videoInput) {
-                        videoInput = device.deviceId;
+                        // add to data for dropdown
+                        videoInputOptions.push({ key: device.deviceId, val: device.label });
                     }
+                });
 
-                    // add to data for dropdown
-                    videoInputOptions.push({ key: device.deviceId, val: device.label });
+                this.mergeState({ audioInput, videoInput, audioInputOptions, videoInputOptions });
+
+                /* if videoMode and we don't have at least one audio and video input then abort */
+                if (this.videoMode) {
+                    if (audioInputOptions.length === 0 && videoInputOptions.length === 0) {
+                        this.abort();
+                    }
                 }
-            });
-
-            this.mergeState({ audioInput, videoInput, audioInputOptions, videoInputOptions });
-            resolve();
+                /* if audio mode and we don't have at least one audio input then abort */
+                else {
+                    if (audioInputOptions.length === 0) {
+                        this.abort();
+                    }
+                }
+            }
+            finally {
+                resolve();
+            }
         });
     }
 
@@ -207,26 +200,35 @@ export class MediaRecorderDlg extends DialogBase {
 
     resetStream = async () => {
         return new Promise<void>(async (resolve, reject) => {
-            this.stop();
+            try {
+                this.stop();
 
-            // stop() doesn't always nullify 'recorder' but we do it here. Any time stream is changing
-            // we force it to recreate the recorder object.
-            this.recorder = null;
+                // stop() doesn't always nullify 'recorder' but we do it here. Any time stream is changing
+                // we force it to recreate the recorder object.
+                this.recorder = null;
 
-            let state = this.getState();
-            let constraints: any = { audio: { deviceId: state.audioInput } };
-            if (this.videoMode) {
-                constraints.video = { deviceId: state.videoInput };
+                let state = this.getState();
+                let constraints: any = { audio: { deviceId: state.audioInput } };
+                if (this.videoMode) {
+                    constraints.video = { deviceId: state.videoInput };
+                }
+
+                this.closeStream();
+                this.stream = await navigator.mediaDevices.getUserMedia(constraints);
+                if (!this.stream) {
+                    this.abort();
+                }
+
+                if (this.videoMode) {
+                    this.displayStream();
+                }
             }
-
-            this.closeStream();
-            this.stream = await navigator.mediaDevices.getUserMedia(constraints);
-
-            if (this.videoMode) {
-                this.displayStream();
+            catch (e) {
+                this.abort();
             }
-
-            resolve();
+            finally {
+                resolve();
+            }
         });
     }
 
@@ -265,8 +267,8 @@ export class MediaRecorderDlg extends DialogBase {
 
     displayStream = () => {
         if (this.videoPlayer && this.stream) {
-            this.videoPlayer.whenElm((elm: HTMLVideoElement): void => {
-                elm.srcObject = this.stream;
+            this.videoPlayer.whenElm((elm: HTMLElement): void => {
+                (elm as HTMLVideoElement).srcObject = this.stream;
             });
         }
     }

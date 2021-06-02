@@ -86,7 +86,7 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
                                 this.upload();
                             }
                         },
-                        title: "Record Audio to Attachment"
+                        title: "Record Audio as Attachment"
                     }, "btn-secondary"),
 
                     this.importMode || !this.allowRecording ? null : new IconButton("fa-video-camera", /* From WebCam */ null, {
@@ -99,7 +99,7 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
                                 this.upload();
                             }
                         },
-                        title: "Record Video to Attachment"
+                        title: "Record Video as Attachment"
                     }, "btn-secondary"),
 
                     new Button("Close", this.close)

@@ -26,6 +26,7 @@ export abstract class DialogBase<S extends BaseCompState = any> extends Div<S> i
     static BACKDROP_PREFIX = "backdrop-";
     static backdropZIndex: number = 16000000; // z-index
     resolve: Function;
+    aborted: boolean = false;
 
     backdrop: HTMLElement;
 
@@ -137,6 +138,14 @@ export abstract class DialogBase<S extends BaseCompState = any> extends Div<S> i
         // console.log("Rendering with provider");
         const provider = this.e(Provider, { store }, reactElm);
         ReactDOM.render(provider, this.backdrop);
+    }
+
+    public abort = (): void => {
+        if (this.aborted) return;
+        this.aborted = true;
+        setTimeout(() => {
+            this.close();
+        }, 100);
     }
 
     public close = () => {
