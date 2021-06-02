@@ -59,10 +59,13 @@ export class User implements UserIntf {
     }
 
     defaultHandleAnonUser = (state: AppState) => {
-        var tab = S.util.getParameterByName("tab");
-        if (tab === "feed") {
+        // todo-1: new logic: always send anon users to fediverse view.
+        // but we need to make this an admin-configurable behavior.
+        // var tab = S.util.getParameterByName("tab");
+        // if (tab === "feed") {
+        if (window.location.href.endsWith("/app")) {
             setTimeout(() => {
-                S.meta64.selectTab("feedTab");
+                S.meta64.showPublicFediverse();
             }, 10);
         }
         else {
@@ -72,7 +75,6 @@ export class User implements UserIntf {
 
     refreshLogin = async (state: AppState): Promise<void> => {
         const loginState: string = await S.localDB.getVal(C.LOCALDB_LOGIN_STATE);
-
         /* if we have known state as logged out, then do nothing here */
         if (loginState === "0") {
             // console.log("loginState known as logged out.");
@@ -191,6 +193,7 @@ export class User implements UserIntf {
 
             if (res.homeNodeOverride) {
                 id = res.homeNodeOverride;
+                // console.log("homeNodeOverride=" + id);
                 if (id.startsWith("~")) {
                     renderLeafIfParent = false;
                 }
@@ -207,12 +210,16 @@ export class User implements UserIntf {
                 }
             }
 
-            // console.log("login is refreshingTree with ID=" + id);
-            var tab = S.util.getParameterByName("tab");
-            if (tab === "feed") {
+            // console.log("Window: " + window.location.href);
+            if (window.location.href.endsWith("/app") && usr === J.PrincipalName.ANON) {
+                // console.log("login is refreshingTree with ID=" + id);
+                // var tab = S.util.getParameterByName("tab");
+                // if (tab === "feed") {
                 setTimeout(() => {
-                    S.meta64.selectTab("feedTab");
+                    // todo-1: new logic, always send anon users to fediverse view
+                    S.meta64.showPublicFediverse();
                 }, 10);
+                // }
             }
             else {
                 S.view.refreshTree(id, true, renderLeafIfParent, childId, false, true, true, state);

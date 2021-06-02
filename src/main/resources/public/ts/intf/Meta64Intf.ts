@@ -70,4 +70,5 @@ export interface Meta64Intf {
     findNodeById(state: AppState, nodeId: string): J.NodeInfo;
     fullscreenViewerActive(state: AppState): boolean;
     showMyNewMessages(): void;
+    showPublicFediverse(): void;
 }

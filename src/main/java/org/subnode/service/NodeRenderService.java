@@ -41,11 +41,10 @@ import org.subnode.util.ThreadLocals;
 import org.subnode.util.XString;
 
 /**
- * Service for rendering the content of a page. The actual page is not rendered
- * on the server side. What we are really doing here is generating a list of
- * POJOS that get converted to JSON and sent to the client. But regardless of
- * format this is the primary service for pulling content up for rendering the
- * pages on the client as the user browses around on the tree.
+ * Service for rendering the content of a page. The actual page is not rendered on the server side.
+ * What we are really doing here is generating a list of POJOS that get converted to JSON and sent
+ * to the client. But regardless of format this is the primary service for pulling content up for
+ * rendering the pages on the client as the user browses around on the tree.
  */
 @Component
 public class NodeRenderService {
@@ -75,16 +74,15 @@ public class NodeRenderService {
 	private static RenderNodeResponse welcomePage;
 
 	/*
-	 * This is the call that gets all the data to show on a page. Whenever user is
-	 * browsing to a new page, this method gets called once per page and retrieves
-	 * all the data for that page.
+	 * This is the call that gets all the data to show on a page. Whenever user is browsing to a new
+	 * page, this method gets called once per page and retrieves all the data for that page.
 	 */
 	public RenderNodeResponse renderNode(MongoSession session, RenderNodeRequest req) {
 		boolean isWelcomePage = req.getNodeId().equals(":welcome-page");
 
 		/*
-		 * Return cached version of welcome page if generated, but not for admin because
-		 * admin should be able to make edits and then those edits update the cache
+		 * Return cached version of welcome page if generated, but not for admin because admin should be
+		 * able to make edits and then those edits update the cache
 		 */
 		if (isWelcomePage && welcomePage != null && !session.isAdmin()) {
 			return welcomePage;
@@ -135,18 +133,17 @@ public class NodeRenderService {
 
 		/* If only the single node was requested return that */
 		if (req.isSingleNode()) {
-			NodeInfo nodeInfo = convert.convertToNodeInfo(ThreadLocals.getSessionContext(), session, node, true, false,
-					-1, false, false);
+			NodeInfo nodeInfo =
+					convert.convertToNodeInfo(ThreadLocals.getSessionContext(), session, node, true, false, -1, false, false);
 			res.setNode(nodeInfo);
 			res.setSuccess(true);
 			return res;
 		}
 
 		/*
-		 * If scanToNode is non-null it means we are trying to get a subset of the
-		 * children that contains scanToNode as one child, because that's the child we
-		 * want to highlight and scroll to on the front end when the query returns, and
-		 * the page root node will of course be the parent of scanToNode
+		 * If scanToNode is non-null it means we are trying to get a subset of the children that contains
+		 * scanToNode as one child, because that's the child we want to highlight and scroll to on the front
+		 * end when the query returns, and the page root node will of course be the parent of scanToNode
 		 */
 		SubNode scanToNode = null;
 
@@ -155,9 +152,8 @@ public class NodeRenderService {
 		}
 
 		/*
-		 * the 'siblingOffset' is for jumping forward or backward thru at the same level
-		 * of the tree without having to first 'uplevel' and then click on the prev or
-		 * next node.
+		 * the 'siblingOffset' is for jumping forward or backward thru at the same level of the tree without
+		 * having to first 'uplevel' and then click on the prev or next node.
 		 */
 		if (req.getSiblingOffset() != 0) {
 			SubNode parent = read.getParent(session, node);
@@ -223,14 +219,15 @@ public class NodeRenderService {
 			NodeRenderService.welcomePage = res;
 		}
 
-		// todo-1: this was a quick fix, and this urlId handling is also a slight bit awkward and maybe needs to be reworked.
+		// todo-1: this was a quick fix, and this urlId handling is also a slight bit awkward and maybe
+		// needs to be reworked.
 		ThreadLocals.getSessionContext().setUrlId(null);
 
 		return res;
 	}
 
-	private NodeInfo processRenderNode(MongoSession session, RenderNodeRequest req, RenderNodeResponse res,
-			final SubNode node, SubNode scanToNode, long logicalOrdinal, int level, int limit) {
+	private NodeInfo processRenderNode(MongoSession session, RenderNodeRequest req, RenderNodeResponse res, final SubNode node,
+			SubNode scanToNode, long logicalOrdinal, int level, int limit) {
 
 		NodeInfo nodeInfo = convert.convertToNodeInfo(ThreadLocals.getSessionContext(), session, node, true, false,
 				logicalOrdinal, level > 0, false);
@@ -242,9 +239,8 @@ public class NodeRenderService {
 		nodeInfo.setChildren(new LinkedList<NodeInfo>());
 
 		/*
-		 * If we are scanning to a node we know we need to start from zero offset, or
-		 * else we use the offset passed in. Offset is the number of nodes to IGNORE
-		 * before we start collecting nodes.
+		 * If we are scanning to a node we know we need to start from zero offset, or else we use the offset
+		 * passed in. Offset is the number of nodes to IGNORE before we start collecting nodes.
 		 */
 		int offset = scanToNode != null ? 0 : req.getOffset();
 		if (offset < 0) {
@@ -252,12 +248,11 @@ public class NodeRenderService {
 		}
 
 		/*
-		 * todo-1: needed optimization to work well with large numbers of child nodes:
-		 * If scanToNode is in use, we should instead look up the node itself, and then
-		 * get it's ordinal, and use that as a '>=' in the query to pull up the list
-		 * when the node ordering is ordinal. Note, if sort order is by a timestamp we'd
-		 * need a ">=" on the timestamp itself instead. We request ROWS_PER_PAGE+1,
-		 * because that is enough to trigger 'endReached' logic to be set correctly
+		 * todo-1: needed optimization to work well with large numbers of child nodes: If scanToNode is in
+		 * use, we should instead look up the node itself, and then get it's ordinal, and use that as a '>='
+		 * in the query to pull up the list when the node ordering is ordinal. Note, if sort order is by a
+		 * timestamp we'd need a ">=" on the timestamp itself instead. We request ROWS_PER_PAGE+1, because
+		 * that is enough to trigger 'endReached' logic to be set correctly
 		 */
 		int queryLimit = scanToNode != null ? 1000 : offset + limit + 2;
 
@@ -299,8 +294,7 @@ public class NodeRenderService {
 		NodeInfo ninfo = null;
 
 		/*
-		 * Main loop to keep reading nodes from the database until we have enough to
-		 * render the page
+		 * Main loop to keep reading nodes from the database until we have enough to render the page
 		 */
 		while (true) {
 			if (!iterator.hasNext()) {
@@ -316,8 +310,8 @@ public class NodeRenderService {
 			/* are we still just scanning for our target node */
 			if (scanToNode != null) {
 				/*
-				 * If this is the node we are scanning for turn off scan mode, and add up to
-				 * ROWS_PER_PAGE-1 of any sliding window nodes above it.
+				 * If this is the node we are scanning for turn off scan mode, and add up to ROWS_PER_PAGE-1 of any
+				 * sliding window nodes above it.
 				 */
 				if (n.getPath().equals(scanToNode.getPath())) {
 					scanToNode = null;
@@ -333,12 +327,11 @@ public class NodeRenderService {
 								nodeInfo.getChildren().add(0, ninfo);
 
 								/*
-								 * If we have enough records we're done. Note having ">= ROWS_PER_PAGE/2" for
-								 * example would also work and would bring back the target node as close to the
-								 * center of the results sent back to the brower as possible, but what we do
-								 * instead is just set to ROWS_PER_PAGE which maximizes performance by iterating
-								 * the smallese number of results in order to get a page that contains what we
-								 * need (namely the target node as indiated by scanToNode item)
+								 * If we have enough records we're done. Note having ">= ROWS_PER_PAGE/2" for example would also
+								 * work and would bring back the target node as close to the center of the results sent back to
+								 * the brower as possible, but what we do instead is just set to ROWS_PER_PAGE which maximizes
+								 * performance by iterating the smallese number of results in order to get a page that contains
+								 * what we need (namely the target node as indiated by scanToNode item)
 								 */
 								if (nodeInfo.getChildren().size() >= limit - 1) {
 									break;
@@ -352,8 +345,8 @@ public class NodeRenderService {
 					}
 				}
 				/*
-				 * else, we can continue while loop after we incremented 'idx'. Nothing else to
-				 * do on this iteration/node
+				 * else, we can continue while loop after we incremented 'idx'. Nothing else to do on this
+				 * iteration/node
 				 */
 				else {
 					/* lazily create sliding window */
@@ -386,9 +379,8 @@ public class NodeRenderService {
 		}
 
 		/*
-		 * if we accumulated less than ROWS_PER_PAGE, then try to scan back up the
-		 * sliding window to build up the ROW_PER_PAGE by looking at nodes that we
-		 * encountered before we reached the end.
+		 * if we accumulated less than ROWS_PER_PAGE, then try to scan back up the sliding window to build
+		 * up the ROW_PER_PAGE by looking at nodes that we encountered before we reached the end.
 		 */
 		if (slidingWindow != null && nodeInfo.getChildren().size() < limit) {
 			int count = slidingWindow.size();
@@ -423,9 +415,8 @@ public class NodeRenderService {
 	}
 
 	/*
-	 * parses something like "priority asc" into a Sort object, assuming the field
-	 * is in the property array of the node, rather than the name of an actual
-	 * SubNode object member property.
+	 * parses something like "priority asc" into a Sort object, assuming the field is in the property
+	 * array of the node, rather than the name of an actual SubNode object member property.
 	 */
 	private Sort parseOrderByToSort(String orderBy) {
 		Sort sort = null;
@@ -436,8 +427,7 @@ public class NodeRenderService {
 			orderBy = orderBy.substring(0, spaceIdx);
 		}
 
-		sort = Sort.by(dir.equals("asc") ? Sort.Direction.ASC : Sort.Direction.DESC,
-				SubNode.FIELD_PROPERTIES + "." + orderBy);
+		sort = Sort.by(dir.equals("asc") ? Sort.Direction.ASC : Sort.Direction.DESC, SubNode.FIELD_PROPERTIES + "." + orderBy);
 
 		if (orderBy.equals("priority")) {
 			sort = sort.and(Sort.by(Sort.Direction.DESC, SubNode.FIELD_MODIFY_TIME));
@@ -463,25 +453,25 @@ public class NodeRenderService {
 
 		try {
 			SubNode parentNode = read.getParent(session, node);
-			NodeInfo parentInfo = convert.convertToNodeInfo(ThreadLocals.getSessionContext(), session, parentNode,
-					false, true, -1, false, false);
+			NodeInfo parentInfo = convert.convertToNodeInfo(ThreadLocals.getSessionContext(), session, parentNode, false, true,
+					-1, false, false);
 			res.setParentInfo(parentInfo);
 		} catch (Exception e) {
 			ExUtil.error(log, "unable to load parent", e);
 			// ignore this
 		}
 
-		NodeInfo nodeInfo = convert.convertToNodeInfo(ThreadLocals.getSessionContext(), session, node, false, true, -1,
-				false, false);
+		NodeInfo nodeInfo =
+				convert.convertToNodeInfo(ThreadLocals.getSessionContext(), session, node, false, true, -1, false, false);
 		res.setNodeInfo(nodeInfo);
 		res.setSuccess(true);
 		return res;
 	}
 
 	/*
-	 * There is a system defined way for admins to specify what node should be
-	 * displayed in the browser when a non-logged in user (i.e. anonymouse user) is
-	 * browsing the site, and this method retrieves that page data.
+	 * There is a system defined way for admins to specify what node should be displayed in the browser
+	 * when a non-logged in user (i.e. anonymouse user) is browsing the site, and this method retrieves
+	 * that page data.
 	 */
 	public RenderNodeResponse anonPageLoad(MongoSession session, RenderNodeRequest req) {
 		if (session == null) {
@@ -492,14 +482,11 @@ public class NodeRenderService {
 		// log.debug("Anon Render Node ID: " + id);
 
 		if (ThreadLocals.getSessionContext().getUrlId() != null) {
-			// why was this line missing? On 4/1/2021, I noticed urls like /n/my-node-name
-			// had stopped working, and this seems like the fix,
-			// but I'm definitely missing something becasue the named nodes feature for
-			// non-logged in users definitely WAS working until recently.
 			id = ThreadLocals.getSessionContext().getUrlId();
 			ThreadLocals.getSessionContext().setUrlId(null);
 		}
 
+		// log.debug("anonPageLoad id=" + id);
 		req.setNodeId(id);
 
 		RenderNodeResponse res = renderNode(session, req);
@@ -507,11 +494,10 @@ public class NodeRenderService {
 	}
 
 	/*
-	 * Reads all subnodes under name 'nodeName' (currently assumed to be an
-	 * admin-owned node and shared to public), and populates them into model,
-	 * recursively building a tree structure as flat property names in 'model' where
-	 * each property is the 'content' of the node, and the key is the 'name' of the
-	 * node
+	 * Reads all subnodes under name 'nodeName' (currently assumed to be an admin-owned node and shared
+	 * to public), and populates them into model, recursively building a tree structure as flat property
+	 * names in 'model' where each property is the 'content' of the node, and the key is the 'name' of
+	 * the node
 	 * 
 	 * Returns true if there was a node at 'nodeName' and false otherwise.
 	 */
@@ -627,20 +613,20 @@ public class NodeRenderService {
 			}
 		} catch (Exception e) {
 			/*
-			 * this is normal for users to wind up here because looking up the tree always
-			 * ends at a place they can't access, and whatever paths we accumulated until
-			 * this access error is what we do want to return so we just return everything
-			 * as is by ignoring this exception
+			 * this is normal for users to wind up here because looking up the tree always ends at a place they
+			 * can't access, and whatever paths we accumulated until this access error is what we do want to
+			 * return so we just return everything as is by ignoring this exception
 			 */
 		}
 	}
 
 	public String getFirstLineAbbreviation(String content) {
-		if (content==null) return null;
+		if (content == null)
+			return null;
 
 		content = content.replace("{{imgUpperRight}}", "");
 		content = content.replace("{{imgUpperLeft}}", "");
-		content = content.replace("{{img}}", "");	
+		content = content.replace("{{img}}", "");
 		content = content.trim();
 
 		content = XString.truncateAfterFirst(content, "\n");

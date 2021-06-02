@@ -14,10 +14,6 @@ menu:
   siteNav:
     - name: "separator"
       link: ""
-    - name: "News"
-      link: ":news" 
-    - name: "Podcasts"
-      link: ":podcasts"
     - name: "Fediverse"
       link: "tab:feedTab"
       
