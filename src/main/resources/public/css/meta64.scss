@@ -328,12 +328,6 @@ a {
     border-radius: $border-radius;
 }
 
-.profileUserDescription {
-    top: -50px;
-    left: 35px;
-    position: relative;
-}
-
 .profileImageBaseNoHeader {
     cursor: pointer;
     background-color: $modal-content-bg;
@@ -1208,6 +1202,11 @@ input[type="radio"] {
     cursor: pointer;
 }
 
+.nodeCompButtonBar {
+    border-top: 1px dotted $nodeBorderBottomColor;
+    padding-top: 5px;
+}
+
 .mainNodeContentStyle {
     outline: none;
 
@@ -1287,7 +1286,7 @@ input[type="radio"] {
 .header-text {
     font-size: small;
     margin-left: 10px;
-    margin-bottom: 8px;
+    // margin-bottom: 8px;
     cursor: pointer;
 }
 
@@ -1604,7 +1603,8 @@ i'm backing out for now
 }
 
 .rowFooterIcon {
-    margin-right: 12px;
+    margin-top: .5em;
+    margin-right: 6px;
     margin-bottom: 12px;  
     vertical-align: middle;
     cursor: pointer;

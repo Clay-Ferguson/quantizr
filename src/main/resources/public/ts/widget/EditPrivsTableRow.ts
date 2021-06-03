@@ -29,7 +29,7 @@ export class EditPrivsTableRow extends ListBoxRow {
         aclEntry.privileges.forEach(function (privilege, index) {
             div.addChild(
                 new Div(null, null, [
-                    new Span(privilege.privilegeName),
+                    // new Span(privilege.privilegeName), don't need this it's just "rd/wr"
                     new ButtonBar([
                         new Button("Remove", () => {
                             this.removePrivilege(aclEntry.principalNodeId, privilege.privilegeName);
@@ -42,7 +42,7 @@ export class EditPrivsTableRow extends ListBoxRow {
     }
 
     preRender(): void {
-        // console.log("aclEntry: " + S.util.prettyPrint(aclEntry));
+        // console.log("aclEntry: " + S.util.prettyPrint(this.aclEntry));
         let src: string = null;
         if (this.aclEntry.avatarVer) {
             src = S.render.getAvatarImgUrl(this.aclEntry.principalNodeId, this.aclEntry.avatarVer);
@@ -63,14 +63,26 @@ export class EditPrivsTableRow extends ListBoxRow {
             ? this.aclEntry.displayName + " (@" + this.aclEntry.principalName + ")"
             : ("@" + this.aclEntry.principalName);
 
+        let isPublic = this.aclEntry.principalName === "public";
+        let publicWritable = S.props.hasPrivilege(this.aclEntry, J.PrivilegeType.WRITE);
+        let descript = "";
+        if (isPublic) {
+            if (publicWritable) {
+                descript = "Visible to everyone. Anyone can reply.";
+            }
+            else {
+                descript = "Visible to everyone. No replies allowed.";
+            }
+        }
+
         this.setChildren([
             new Div(null, { className: "marginAll" }, [
                 img,
-                this.aclEntry.principalName === "public"
+                isPublic
                     ? new Heading(4, "Public")
                     : new Span(displayName, { className: img ? "marginLeft" : "" }),
-                this.aclEntry.principalName === "public"
-                    ? new Span("Visible to everyone.")
+                descript
+                    ? new Span(descript)
                     : null,
                 this.renderAclPrivileges(this.aclEntry)
             ])

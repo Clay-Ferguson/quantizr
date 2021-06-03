@@ -100,12 +100,16 @@ export class FriendTypeHandler extends TypeBase {
             });
         }
 
+        let disp = displayName
+            ? displayName + " (@" + user + ")"
+            : ("@" + user);
+
         return new Div(null, {
             // className: "marginLeft"
         }, [
             img,
             new Div(null, null, [
-                new Heading(4, (displayName || "") + (user ? (" (@" + user + ")") : ""), {
+                new Heading(4, disp, {
                     className: "marginAll"
                 }),
                 new Html(userBio, {
@@ -121,11 +125,15 @@ export class FriendTypeHandler extends TypeBase {
                         window.open(actorUrl, "_blank");
                     }) : null
                 ], null, "float-right marginBottom"),
-                new Div(null, { className: "clearfix" })]),
-            new CollapsibleHelpPanel("Help", S.meta64.config.help.type.friend.render,
-                (state: boolean) => {
-                    FriendTypeHandler.helpExpanded = state;
-                }, FriendTypeHandler.helpExpanded)
+                new Div(null, { className: "clearfix" })])
+
+            // todo-0: oops this opens up help on EVERY friend node on the page! don't do that,
+            // plus it's just ugly how it consumes so much screen space, maybe just say this
+            // text inside the help of the "Friends List" itself.
+            // new CollapsibleHelpPanel("Help", S.meta64.config.help.type.friend.render,
+            //     (state: boolean) => {
+            //         FriendTypeHandler.helpExpanded = state;
+            //     }, FriendTypeHandler.helpExpanded)
         ]);
     }
 }

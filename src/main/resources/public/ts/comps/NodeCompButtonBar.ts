@@ -23,10 +23,10 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
 /* General Widget that doesn't fit any more reusable or specific category other than a plain Div, but inherits capability of Comp class */
 export class NodeCompButtonBar extends Div {
 
-    constructor(public node: J.NodeInfo, public allowNodeMove: boolean, private level: number, private extraButtons: IconButton[]) {
+    constructor(public node: J.NodeInfo, public allowNodeMove: boolean, private level: number, private extraButtons: IconButton[], private extraClass: string) {
         super(null, {
             id: "NodeCompButtonBar_" + node.id,
-            className: "marginLeft"
+            className: "marginLeft " + extraClass
         });
     }
 

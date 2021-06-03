@@ -23,6 +23,9 @@ export interface PropsIntf {
     isShared(node: J.NodeInfo): boolean;
     isPublic(node: J.NodeInfo): boolean;
     isPublicWritable(node: J.NodeInfo): boolean;
+    isPublicReadOnly(node: J.NodeInfo): boolean;
+    getAcCount(node: J.NodeInfo): number;
+    hasPrivilege(ace: J.AccessControlInfo, priv: string): boolean;
     isMine(node: J.NodeInfo, state: AppState): boolean;
     hasBinary(node: J.NodeInfo): boolean;
     hasImage(node: J.NodeInfo): boolean;

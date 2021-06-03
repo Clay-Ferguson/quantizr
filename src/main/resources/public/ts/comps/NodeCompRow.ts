@@ -96,7 +96,8 @@ export class NodeCompRow extends Div {
 
         let buttonBar: Comp = null;
         if (this.allowHeaders && NodeCompRow.showButtonBar && !state.inlineEditId) {
-            buttonBar = new NodeCompButtonBar(node, this.allowNodeMove, this.level, this.isTableCell ? [insertInlineButton] : null);
+            let extraClass = state.userPreferences.showMetaData && state.userPreferences.editMode ? "nodeCompButtonBar" : null;
+            buttonBar = new NodeCompButtonBar(node, this.allowNodeMove, this.level, this.isTableCell ? [insertInlineButton] : null, extraClass);
         }
 
         let layoutClass = this.isTableCell ? "node-grid-item" : "node-table-row";

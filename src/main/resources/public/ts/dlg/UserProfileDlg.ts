@@ -71,7 +71,7 @@ export class UserProfileDlg extends DialogBase {
 
                 profileImg,
 
-                new Div(null, { className: this.readOnly ? "profileUserDescription" : "marginBottom" }, [
+                new Div(null, { className: "marginBottom" }, [
                     this.readOnly
                         ? new Heading(4, displayName || "")
                         : new TextField("Display Name", false, null, "displayNameTextField", false, this.displayNameState),

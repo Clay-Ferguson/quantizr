@@ -36,8 +36,8 @@ export class SharingDlg extends DialogBase {
                 new EditPrivsTable(this.getState().nodePrivsInfo, this.removePrivilege),
                 new ButtonBar([
                     new Button("Add Person", this.shareToPersonDlg, null, "btn-primary"),
-                    new Button("Public", () => { this.shareNodeToPublic(true); }, null, "btn-secondary"),
-                    new Button("Public (Read-only)", () => { this.shareNodeToPublic(false); }, null, "btn-secondary"),
+                    new Button("Public (Replies allowed)", () => { this.shareNodeToPublic(true); }, null, "btn-secondary"),
+                    new Button("Public (No replies)", () => { this.shareNodeToPublic(false); }, null, "btn-secondary"),
                     new Button("Close", () => {
                         this.close();
                         if (this.dirty) {

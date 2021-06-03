@@ -53,9 +53,10 @@ export class NodeCompMainNode extends Div {
             header = new NodeCompRowHeader(node, true, true, false, false);
         }
 
+        let extraClass = state.userPreferences.showMetaData && state.userPreferences.editMode ? "nodeCompButtonBar" : null;
         this.setChildren([
             header,
-            !state.inlineEditId ? new NodeCompButtonBar(node, false, 1, null) : null,
+            !state.inlineEditId ? new NodeCompButtonBar(node, false, 1, null, extraClass) : null,
             new Div(null, {
                 className: "clearfix",
                 id: "button_bar_clearfix_" + node.id
