@@ -45,6 +45,7 @@ export class MenuPanel extends Div {
     static openUserGuide = () => S.nav.openContentNode(":user-guide");
     static openNotesNode = () => S.nav.openContentNode("~" + J.NodeType.NOTES);
     static openFriendsNode = () => S.nav.openContentNode("~" + J.NodeType.FRIEND_LIST);
+    static openRSSFeedsNode = () => S.nav.openContentNode("~" + J.NodeType.RSS_FEEDS);
     static openPostsNode = () => S.nav.openContentNode("~" + J.NodeType.POSTS);
     static openHomeNode = () => S.nav.openContentNode(":" + appState(null).userName + ":home");
     static openExportsNode = () => S.nav.openContentNode("~" + J.NodeType.EXPORTS);
@@ -177,6 +178,7 @@ export class MenuPanel extends Div {
             new MenuItem("Posts", MenuPanel.openPostsNode, !state.isAnonUser),
             new MenuItem("Friends", MenuPanel.openFriendsNode, !state.isAnonUser),
             new MenuItemSeparator(), //
+            new MenuItem("RSS Feeds", MenuPanel.openRSSFeedsNode, !state.isAnonUser),
             new MenuItem("Notes", MenuPanel.openNotesNode, !state.isAnonUser),
             new MenuItem("Exports", MenuPanel.openExportsNode, !state.isAnonUser)
         ]));

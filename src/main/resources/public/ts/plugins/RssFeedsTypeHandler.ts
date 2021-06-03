@@ -7,7 +7,6 @@ import { Singletons } from "../Singletons";
 import { Comp } from "../widget/base/Comp";
 import { Button } from "../widget/Button";
 import { ButtonBar } from "../widget/ButtonBar";
-import { CollapsibleHelpPanel } from "../widget/CollapsibleHelpPanel";
 import { Div } from "../widget/Div";
 import { Heading } from "../widget/Heading";
 import { TypeBase } from "./base/TypeBase";
@@ -17,11 +16,11 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
     S = ctx;
 });
 
-export class FriendsListTypeHandler extends TypeBase {
+export class RssFeedsTypeHandler extends TypeBase {
     static helpExpanded: boolean;
 
     constructor() {
-        super(J.NodeType.FRIEND_LIST, "Friends List", "fa-users", false);
+        super(J.NodeType.RSS_FEEDS, "RSS Feeds", "fa-rss", false);
     }
 
     allowAction(action: NodeActionType, node: J.NodeInfo, appState: AppState): boolean {
@@ -30,19 +29,21 @@ export class FriendsListTypeHandler extends TypeBase {
 
     render(node: J.NodeInfo, rowStyling: boolean, state: AppState): Comp {
         return new Div(null, null, [
-            new Heading(4, "Friends List", {
+            new Heading(4, "RSS Feed Subscriptions", {
                 className: "marginAll"
             }),
             new ButtonBar([
-                new Button("Add Friend", () => S.edit.createNode(node, J.NodeType.FRIEND, state), {
-                    title: "Add a new Friend (i.e. Follow someone)"
+                new Button("Add RSS Feed", () => S.edit.createNode(node, J.NodeType.RSS_FEED, state), {
+                    title: "Add a new RSS Feed Subscription"
                 })
             ], null, "float-right marginBottom"),
-            new Div(null, { className: "clearfix" }),
-            new CollapsibleHelpPanel("Help", S.meta64.config.help.type.friendsList.render,
-                (state: boolean) => {
-                    FriendsListTypeHandler.helpExpanded = state;
-                }, FriendsListTypeHandler.helpExpanded)
+            new Div(null, { className: "clearfix" })
+
+            // todo-0: add help for this...
+            // new CollapsibleHelpPanel("Help", S.meta64.config.help.type.friendsList.render,
+            //     (state: boolean) => {
+            //         RssFeedsTypeHandler.helpExpanded = state;
+            //     }, RssFeedsTypeHandler.helpExpanded)
         ]);
     }
 }

@@ -161,6 +161,22 @@ public class NodeEditService {
 			return res;
 		}
 
+		/*
+		 * need a more pluggable approach to special cases like this. For RSS Feeds we want a containment
+		 * node so that the feed doesn't get rendered until the user expands so we have to have an extra
+		 * node in here. We can add a dialog later to let the user pass a string in here
+		 * instead of cramming in "Edito me!", but I think this is perfectly fine as is.
+		 */
+		if (NodeType.RSS_FEED.s().equals(req.getTypeName())) {
+			// is the last parameter of false good here? (todo-0)
+			SubNode holderNode = create.createNode(session, node, null, NodeType.NONE.s(), 0L, CreateNodeLocation.FIRST,
+					req.getProperties(), null, false);
+			holderNode.setContent("#### Edit me!");
+			holderNode.touch();
+			update.save(session, holderNode);
+			node = holderNode;
+		}
+
 		CreateNodeLocation createLoc = req.isCreateAtTop() ? CreateNodeLocation.FIRST : CreateNodeLocation.LAST;
 
 		String parentHashTags = parseHashTags(node.getContent());
@@ -564,7 +580,7 @@ public class NodeEditService {
 				convert.convertToNodeInfo(ThreadLocals.getSessionContext(), session, node, true, false, -1, false, false);
 		res.setNode(newNodeInfo);
 
-		// todo-1: for now we only push nodes if public, up to browsers rather than doing a specific check 
+		// todo-1: for now we only push nodes if public, up to browsers rather than doing a specific check
 		// to send only to users who should see it.
 		if (AclService.isPublic(session, node)) {
 			userFeedService.pushTimelineUpdateToBrowsers(session, newNodeInfo);

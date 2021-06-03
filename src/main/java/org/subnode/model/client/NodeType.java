@@ -14,6 +14,7 @@ public enum NodeType {
     CALCULATOR("sn:calculator"),//
     
     RSS_FEED("sn:rssfeed"), //
+    RSS_FEEDS("sn:rssfeeds"), //
     FRIEND_LIST("sn:friendList"), //
     FRIEND("sn:friend"), //
     POSTS("sn:posts"), //
