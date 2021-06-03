@@ -10,6 +10,7 @@ import { ButtonBar } from "../widget/ButtonBar";
 import { CollapsibleHelpPanel } from "../widget/CollapsibleHelpPanel";
 import { EditPrivsTable } from "../widget/EditPrivsTable";
 import { Form } from "../widget/Form";
+import { FriendsDlg } from "./FriendsDlg";
 import { ShareToPersonDlg } from "./ShareToPersonDlg";
 
 let S: Singletons;
@@ -35,9 +36,16 @@ export class SharingDlg extends DialogBase {
                     }, SharingDlg.helpExpanded),
                 new EditPrivsTable(this.getState().nodePrivsInfo, this.removePrivilege),
                 new ButtonBar([
-                    new Button("Add Person", this.shareToPersonDlg, null, "btn-primary"),
-                    new Button("Public (Replies allowed)", () => { this.shareNodeToPublic(true); }, null, "btn-secondary"),
-                    new Button("Public (No replies)", () => { this.shareNodeToPublic(false); }, null, "btn-secondary"),
+                    new Button("Add Username", this.shareToPersonDlg, null, "btn-primary"),
+                    new Button("Add Friend", async () => {
+                        let friendsDlg: FriendsDlg = new FriendsDlg(this.appState, true);
+                        await friendsDlg.open();
+                        if (friendsDlg.getState().selectedName) {
+                            this.shareImmediate(friendsDlg.getState().selectedName);
+                        }
+                    }, null, "btn-primary"),
+                    new Button("Make Public", () => { this.shareNodeToPublic(true); }, null, "btn-secondary"),
+                    new Button("Make Public (No replies)", () => { this.shareNodeToPublic(false); }, null, "btn-secondary"),
                     new Button("Close", () => {
                         this.close();
                         if (this.dirty) {
@@ -47,6 +55,14 @@ export class SharingDlg extends DialogBase {
                 ])
             ])
         ];
+    }
+
+    shareImmediate = (userName: string) => {
+        S.util.ajax<J.AddPrivilegeRequest, J.AddPrivilegeResponse>("addPrivilege", {
+            nodeId: this.node.id,
+            principal: userName,
+            privileges: [J.PrivilegeType.READ, J.PrivilegeType.WRITE]
+        }, this.reload);
     }
 
     preLoad(): Promise<void> {

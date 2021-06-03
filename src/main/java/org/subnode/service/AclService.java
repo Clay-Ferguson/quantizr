@@ -168,12 +168,14 @@ public class AclService {
 		String mapKey = null;
 
 		SubNode principalNode = null;
+		boolean isPublic = false;
 		/* If we are sharing to public, then that's the map key */
 		if (principal.equalsIgnoreCase(PrincipalName.PUBLIC.s())) {
 			if (cipherKey != null) {
 				throw new RuntimeEx("Cannot make an encrypted node public.");
 			}
 			mapKey = PrincipalName.PUBLIC.s();
+			isPublic = true;
 		}
 		/*
 		 * otherwise we're sharing to a person so we now get their userNodeId to use as map key
@@ -214,8 +216,8 @@ public class AclService {
 
 		HashMap<String, AccessControl> acl = node.getAc();
 
-		/* initialize acl to a map if it's null */
-		if (acl == null) {
+		/* initialize acl to a map if it's null, or if we're sharing to public */
+		if (acl == null || isPublic) {
 			acl = new HashMap<>();
 		}
 

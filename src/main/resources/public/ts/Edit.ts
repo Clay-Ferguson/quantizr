@@ -134,7 +134,10 @@ export class Edit implements EditIntf {
         if (state.homeNodeId === node.id) {
             return true;
         }
-        if (S.props.isPublicWritable(node)) return true;
+
+        if (S.props.isPublicWritable(node)) {
+            return true;
+        }
 
         let owner: string = node.owner;
 
@@ -152,6 +155,17 @@ export class Edit implements EditIntf {
         // however we CAN check if this node is an "admin" node and at least disallow any inserts under admin-owned nodess
         if (state.isAdminUser) return true;
         if (state.isAnonUser) return false;
+
+        /* if we own the node we can edit it! */
+        if (state.userName === node.owner) {
+            // console.log("node owned by me: " + node.owner);
+            return true;
+        }
+
+        if (S.props.isPublicReadOnly(node)) {
+            return false;
+        }
+
         // console.log("isInsertAllowed: node.owner="+node.owner+" nodeI="+node.id);
         return node.owner !== "admin";
     }

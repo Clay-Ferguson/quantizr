@@ -54,14 +54,6 @@ export class ShareToPersonDlg extends DialogBase {
                 new TextField("User to share with", false, this.shareNodeToPerson, null, false, this.userNameState),
                 new ButtonBar([
                     new Button("Share", this.shareNodeToPerson, null, "btn-primary"),
-                    new Button("Choose Friend", async () => {
-                        let friendsDlg: FriendsDlg = new FriendsDlg(this.appState, true);
-                        await friendsDlg.open();
-                        if (friendsDlg.getState().selectedName) {
-                            this.close();
-                            this.shareImmediate(friendsDlg.getState().selectedName);
-                        }
-                    }, null, "btn-primary"),
 
                     new Button("Close", this.close)
                 ])

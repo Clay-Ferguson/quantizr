@@ -1286,8 +1286,8 @@ input[type="radio"] {
 .header-text {
     font-size: small;
     margin-left: 10px;
-    // margin-bottom: 8px;
     cursor: pointer;
+    min-height: 2em;
 }
 
 .typeListIcon {

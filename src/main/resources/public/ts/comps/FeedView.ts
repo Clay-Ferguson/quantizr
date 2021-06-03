@@ -260,9 +260,7 @@ export class FeedView extends AppTab {
                 }
             }),
 
-            /* todo-2: Let's disable (unless 'admin' user) until we have more local users, because it's
-            too uninteresting/empty for now */
-            state.isAdminUser ? new Checkbox("Local", {
+            new Checkbox("Local", {
                 title: "Include only nodes from accounts on this server."
             }, {
                 setValue: (checked: boolean): void => {
@@ -286,7 +284,7 @@ export class FeedView extends AppTab {
                 getValue: (): boolean => {
                     return store.getState().feedFilterLocalServer;
                 }
-            }) : null,
+            }),
 
             new Checkbox("NSFW", {
                 title: "Include NSFW Content (Allows material flagged as 'Sensitive')"

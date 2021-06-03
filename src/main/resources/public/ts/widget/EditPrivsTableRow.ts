@@ -71,7 +71,7 @@ export class EditPrivsTableRow extends ListBoxRow {
                 descript = "Visible to everyone. Anyone can reply.";
             }
             else {
-                descript = "Visible to everyone. No replies allowed.";
+                descript = "Visible to everyone. (NO REPLIES ALLOWED)";
             }
         }
 
