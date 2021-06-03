@@ -105,10 +105,7 @@ export class FriendTypeHandler extends TypeBase {
         }, [
             img,
             new Div(null, null, [
-                new Heading(4, displayName || "", {
-                    className: "marginAll"
-                }),
-                new Heading(4, user ? ("@" + user) : "", {
+                new Heading(4, (displayName || "") + (user ? (" (@" + user + ")") : ""), {
                     className: "marginAll"
                 }),
                 new Html(userBio, {

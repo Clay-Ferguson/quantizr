@@ -643,9 +643,7 @@ export class EditNodeDlg extends DialogBase {
         let hasAttachment: boolean = S.props.hasBinary(state.node);
 
         let typeHandler: TypeHandlerIntf = S.plugin.getTypeHandler(state.node.type);
-        let customProps: string[] = null;
         if (typeHandler) {
-            customProps = typeHandler.getCustomProperties();
             typeHandler.ensureDefaultProperties(state.node);
         }
 
@@ -663,6 +661,7 @@ export class EditNodeDlg extends DialogBase {
         let datePropExists = S.props.getNodeProp(J.NodeProp.DATE, state.node);
 
         let numPropsShowing = this.countPropsShowing();
+        let advancedButtons: boolean = !!this.contentEditor;
 
         return new ButtonBar([
             new Button("Save", () => {
@@ -675,11 +674,11 @@ export class EditNodeDlg extends DialogBase {
             this.uploadButton = (!hasAttachment && allowUpload) ? new Button("Attach", this.upload) : null,
             allowShare ? new Button("Share", this.share) : null,
 
-            new Icon({
+            advancedButtons ? new Icon({
                 className: "fa " + (S.speech.speechActive ? "fa-microphone-slash" : "fa-microphone") + " fa-lg editorButtonIcon",
                 title: "Toggle on/off Speech Recognition to input text",
                 onClick: this.speechRecognition
-            }),
+            }) : null,
 
             // show delete button only if we're in a fullscreen viewer (like Calendar view)
             S.meta64.fullscreenViewerActive(this.appState)
@@ -688,29 +687,29 @@ export class EditNodeDlg extends DialogBase {
                     this.close();
                 }) : null,
 
-            new Icon({
+            advancedButtons ? new Icon({
                 className: "fa fa-clock-o fa-lg editorButtonIcon",
                 title: "Insert current time at cursor",
                 onClick: this.insertTime
-            }),
+            }) : null,
 
-            !datePropExists ? new Icon({
+            advancedButtons && !datePropExists ? new Icon({
                 className: "fa fa-calendar fa-lg editorButtonIcon",
                 title: "Add 'date' property to node (makes Calendar entry)",
                 onClick: this.addDateProperty
             }) : null,
 
-            new Icon({
+            advancedButtons ? new Icon({
                 className: "fa fa-user fa-lg editorButtonIcon",
                 title: "Insert username/mention at cursor",
                 onClick: this.insertMention
-            }),
+            }) : null,
 
-            new Icon({
+            advancedButtons ? new Icon({
                 className: "fa fa-smile-o fa-lg editorButtonIcon",
                 title: "Insert emoji at cursor",
                 onClick: this.insertEmoji
-            })
+            }) : null
         ]);
     }
 
