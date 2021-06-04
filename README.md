@@ -16,27 +16,6 @@ Designed to allow a more fine-grained hierarchical approach to content managemen
 
 https://quanta.wiki
 
-## Fun Links (to get you started)
-
-#### [Demo Videos showing Quanta platform in action](https://quanta.wiki/n/screencast)
-
-#### [A curated Fediverse Feed - Some News Bots, some people](https://quanta.wiki/app?tab=feed)
-
-#### [RSS New Feeds - Curated Aggregate](https://quanta.wiki/n/news)
-
-#### [Podcasts - Curated Aggregate](https://quanta.wiki/n/podcasts)
-
-## Platform Info
-
-Technical summary: Written in Java/SpringBoot built by Mavan (backend) and TypeScript built by WebPack (front-end), with MongoDB and IPFS data storage, and deployed via docker compose. App itself is HTML (Browser only), and mobile compatable.
-
-https://quanta.wiki/n/platform
-
-https://quanta.wiki/n/technical-notes
-
-## About the Developer
-
-[Clay Ferguson](https://quanta.wiki/u/WClayFerguson/contact)
 
 ## Search Tags
 
