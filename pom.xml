@@ -163,7 +163,7 @@ of the spring configs for security are also perfected.
 <dependency>
     <groupId>org.apache.httpcomponents</groupId>
     <artifactId>httpclient</artifactId>
-    <version>4.5.9</version>
+    <version>4.5.13</version>
 </dependency>
 
 <dependency>
@@ -583,7 +583,7 @@ of the spring configs for security are also perfected.
 <dependency>
     <groupId>org.apache.httpcomponents</groupId>
     <artifactId>httpclient</artifactId>
-    <version>4.5.9</version>
+    <version>4.5.13</version>
 </dependency>
 
 <dependency>
@@ -843,7 +843,7 @@ of the spring configs for security are also perfected.
 <dependency>
     <groupId>org.apache.httpcomponents</groupId>
     <artifactId>httpclient</artifactId>
-    <version>4.5.9</version>
+    <version>4.5.13</version>
 </dependency>
 
 <dependency>
@@ -1279,7 +1279,7 @@ of the spring configs for security are also perfected.
 <dependency>
     <groupId>org.apache.httpcomponents</groupId>
     <artifactId>httpclient</artifactId>
-    <version>4.5.9</version>
+    <version>4.5.13</version>
 </dependency>
 
 <dependency>
