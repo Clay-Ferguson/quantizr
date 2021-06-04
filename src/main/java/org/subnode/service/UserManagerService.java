@@ -556,7 +556,7 @@ public class UserManagerService {
 		adminRunner.run(session -> {
 			SubNode userNode = read.getUserNodeByUserName(session, userName);
 			if (userNode == null) {
-				res.setMessage("unknown user.");
+				res.setMessage("unknown user: "+userName);
 				res.setSuccess(false);
 			}
 
@@ -722,6 +722,7 @@ public class UserManagerService {
 				userProfile.setHeaderImageVer(userNode.getStrProp(NodeProp.BIN.s() + "Header"));
 				userProfile.setUserNodeId(userNode.getId().toHexString());
 				userProfile.setApIconUrl(userNode.getStrProp(NodeProp.ACT_PUB_USER_ICON_URL));
+				userProfile.setApImageUrl(userNode.getStrProp(NodeProp.ACT_PUB_USER_IMAGE_URL));
 				userProfile.setActorUrl(userNode.getStrProp(NodeProp.ACT_PUB_ACTOR_URL));
 				res.setSuccess(true);
 			}

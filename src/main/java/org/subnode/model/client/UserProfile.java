@@ -20,6 +20,9 @@ public class UserProfile {
 	/* for foreign users this will point to their user avatar image */
 	private String apIconUrl;
 
+	/* for foreign users this will point to their user image (i.e. header image) */
+	private String apImageUrl;
+
 	/* for foreign users this will be their actor url */
 	private String actorUrl;
     
@@ -69,6 +72,14 @@ public class UserProfile {
 
 	public void setApIconUrl(String apIconUrl) {
 		this.apIconUrl = apIconUrl;
+	}
+
+	public String getApImageUrl() {
+		return apImageUrl;
+	}
+
+	public void setApImageUrl(String apImageUrl) {
+		this.apImageUrl = apImageUrl;
 	}
 
 	public String getActorUrl() {

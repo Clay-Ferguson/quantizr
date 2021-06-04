@@ -10,6 +10,7 @@ export interface UserProfile {
     headerImageVer: string;
     userNodeId: string;
     apIconUrl: string;
+    apImageUrl: string;
     actorUrl: string;
 }
 
@@ -629,6 +630,7 @@ export interface NodeInfo {
     dataUrl: string;
     avatarVer: string;
     apAvatar: string;
+    apImage: string;
 }
 
 export interface UserPreferences {
@@ -689,6 +691,7 @@ export const enum NodeProp {
     ACT_PUB_OBJ_URL = "ap:objUrl",
     ACT_PUB_OBJ_ATTRIBUTED_TO = "ap:objAttributedTo",
     ACT_PUB_USER_ICON_URL = "ap:userIcon",
+    ACT_PUB_USER_IMAGE_URL = "ap:userImage",
     ACT_PUB_ACTOR_ID = "ap:actorId",
     ACT_PUB_ACTOR_URL = "ap:actorUrl",
     ACT_PUB_ACTOR_INBOX = "ap:actorInbox",

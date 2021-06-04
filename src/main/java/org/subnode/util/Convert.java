@@ -145,13 +145,14 @@ public class Convert {
 		}
 
 		String apAvatar = userNode != null ? userNode.getStrProp(NodeProp.ACT_PUB_USER_ICON_URL) : null;
+		String apImage = userNode != null ? userNode.getStrProp(NodeProp.ACT_PUB_USER_IMAGE_URL) : null;
 
-		NodeInfo nodeInfo =
-				new NodeInfo(node.jsonId(), node.getPath(), node.getName(), node.getContent(), displayName, owner, ownerId, node.getOrdinal(), //
-						node.getModifyTime(), propList, acList, hasChildren, //
-						imageSize != null ? imageSize.getWidth() : 0, //
-						imageSize != null ? imageSize.getHeight() : 0, //
-						node.getType(), ordinal, lastChild, cipherKey, dataUrl, avatarVer, apAvatar);
+		NodeInfo nodeInfo = new NodeInfo(node.jsonId(), node.getPath(), node.getName(), node.getContent(), displayName, owner,
+				ownerId, node.getOrdinal(), //
+				node.getModifyTime(), propList, acList, hasChildren, //
+				imageSize != null ? imageSize.getWidth() : 0, //
+				imageSize != null ? imageSize.getHeight() : 0, //
+				node.getType(), ordinal, lastChild, cipherKey, dataUrl, avatarVer, apAvatar, apImage);
 
 		/*
 		 * Special case for "Friend" type nodes, to get enough information for the browser to be able to
@@ -167,6 +168,7 @@ public class Convert {
 			}
 
 			String friendAccountId = node.getStrProp(NodeProp.USER_NODE_ID);
+			// log.debug("friendAccountId=" + friendAccountId + " on nodeId=" + node.getId().toHexString());
 
 			/*
 			 * NOTE: Right when the Friend node is first created, before a person has been selected, this WILL
@@ -181,7 +183,6 @@ public class Convert {
 				 * demand. The "Client Props" is a completely different set than the actual node properties
 				 */
 				if (friendAccountNode != null) {
-
 					/* NOTE: This will be the bio for both ActivityPub users and local users */
 					String userBio = friendAccountNode.getStrProp(NodeProp.USER_BIO.s());
 					if (userBio != null) {
@@ -204,15 +205,17 @@ public class Convert {
 					}
 
 					/*
-					 * Note: for ActivityPub foreign users we have xxx property on their account node that points to the
-					 * live URL of their account avatar as it was found in their Actor object
+					 * Note: for ActivityPub foreign users we have this property on their account node that points to
+					 * the live URL of their account avatar as it was found in their Actor object
 					 */
-					else {
-						String userIconUrl = friendAccountNode.getStrProp(NodeProp.ACT_PUB_USER_ICON_URL.s());
-						if (userIconUrl != null) {
-							nodeInfo.safeGetClientProps().add(new PropertyInfo(NodeProp.ACT_PUB_USER_ICON_URL.s(), userIconUrl));
-						}
+
+					String userIconUrl = friendAccountNode.getStrProp(NodeProp.ACT_PUB_USER_ICON_URL.s());
+					if (userIconUrl != null) {
+						nodeInfo.safeGetClientProps().add(new PropertyInfo(NodeProp.ACT_PUB_USER_ICON_URL.s(), userIconUrl));
 					}
+
+					// todo-1: for now the client isn't rendering the header image so there's no ACT_PUB_USER_IMAGE_URL
+					// right here which is how we can do that at some point in the future maybe.
 				}
 			}
 		}

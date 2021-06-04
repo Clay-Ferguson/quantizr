@@ -1,5 +1,6 @@
 package org.subnode.actpub.model;
 
+// NOTE: some of these (like 'name') are used in multiple different contexts (object types)
 public class APProp {
     public static final String id = "id";
     public static final String context = "@context";

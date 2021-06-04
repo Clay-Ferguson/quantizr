@@ -165,7 +165,7 @@ public class NodeEditService {
 		 * need a more pluggable approach to special cases like this. For RSS Feeds we want a containment
 		 * node so that the feed doesn't get rendered until the user expands so we have to have an extra
 		 * node in here. We can add a dialog later to let the user pass a string in here
-		 * instead of cramming in "Edito me!", but I think this is perfectly fine as is.
+		 * instead of cramming in "Edit me!", but I think this is perfectly fine as is.
 		 */
 		if (NodeType.RSS_FEED.s().equals(req.getTypeName())) {
 			// is the last parameter of false good here? (todo-0)

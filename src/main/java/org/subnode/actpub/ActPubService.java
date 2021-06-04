@@ -347,7 +347,23 @@ public class ActPubService {
             }
         }
 
+        Object image = AP.obj(actor, APProp.image);
+        if (image != null) {
+            String imageUrl = AP.str(image, APProp.url);
+            if (imageUrl != null) {
+                String curImageUrl = userNode.getStrProp(NodeProp.ACT_PUB_USER_IMAGE_URL.s());
+                if (!imageUrl.equals(curImageUrl)) {
+                    if (userNode.setProp(NodeProp.ACT_PUB_USER_IMAGE_URL.s(), imageUrl)) {
+                        changed = true;
+                    }
+                }
+            }
+        }
+
         if (userNode.setProp(NodeProp.USER_BIO.s(), AP.str(actor, APProp.summary)))
+            changed = true;
+
+        if (userNode.setProp(NodeProp.DISPLAY_NAME.s(), AP.str(actor, APProp.name)))
             changed = true;
 
         // this is the URL of the Actor JSON object
@@ -752,8 +768,9 @@ public class ActPubService {
             SubNode userNode = read.getUserNodeByUserName(null, userName);
             if (userNode != null) {
                 userManagerService.ensureValidCryptoKeys(userNode);
-                String publicKey = userNode.getStrProp(NodeProp.CRYPTO_KEY_PUBLIC.s());
 
+                String publicKey = userNode.getStrProp(NodeProp.CRYPTO_KEY_PUBLIC.s());
+                String displayName = userNode.getStrProp(NodeProp.DISPLAY_NAME.s());
                 String avatarMime = userNode.getStrProp(NodeProp.BIN_MIME.s());
                 String avatarVer = userNode.getStrProp(NodeProp.BIN.s());
                 String avatarUrl = appProp.getProtocolHostAndPort() + AppController.API_PATH + "/bin/avatar" + "?nodeId="
@@ -770,7 +787,7 @@ public class ActPubService {
                         .put(APProp.id, apUtil.makeActorUrlForUserName(userName)) //
                         .put(APProp.type, APType.Person) //
                         .put(APProp.preferredUsername, userName) //
-                        .put(APProp.name, userName) // this should be ordinary name (first last)
+                        .put(APProp.name, displayName) //
 
                         .put(APProp.icon, new APObj() //
                                 .put(APProp.type, APType.Image) //

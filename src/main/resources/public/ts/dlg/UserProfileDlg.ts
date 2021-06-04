@@ -57,10 +57,6 @@ export class UserProfileDlg extends DialogBase {
         let url = window.location.origin + "/u/" + state.userProfile.userName + "/home";
         let localUser = S.util.isLocalUserName(state.userProfile.userName);
 
-        let displayName = state.userProfile.displayName
-            ? state.userProfile.displayName + " (@" + state.userProfile.userName + ")"
-            : ("@" + state.userProfile.userName);
-
         let children = [
             new Div(null, null, [
                 profileHeaderImg ? new Div(null, null, [
@@ -73,8 +69,10 @@ export class UserProfileDlg extends DialogBase {
 
                 new Div(null, { className: "marginBottom" }, [
                     this.readOnly
-                        ? new Heading(4, displayName || "")
+                        ? new Heading(4, state.userProfile.displayName || "")
                         : new TextField("Display Name", false, null, "displayNameTextField", false, this.displayNameState),
+
+                    new Heading(5, "@" + state.userProfile.userName),
 
                     this.readOnly
                         ? new Html(S.util.markdown(state.userProfile.userBio) || "")
@@ -84,7 +82,7 @@ export class UserProfileDlg extends DialogBase {
                             this.bioState)
                 ]),
 
-                new Anchor(null, "Logout", { className: "float-right logoutLink", onClick: S.nav.logout }),
+                this.readOnly ? null : new Anchor(null, "Logout", { className: "float-right logoutLink", onClick: S.nav.logout }),
 
                 new ButtonBar([
                     this.readOnly ? null : new Button("Save", this.save, null, "btn-primary"),
@@ -240,14 +238,16 @@ export class UserProfileDlg extends DialogBase {
     }
 
     makeProfileHeaderImg(): CompIntf {
+        let src: string = null;
         const state: any = this.getState();
 
-        if (state.userProfile.userName.indexOf("@") !== -1) {
-            return null;
+        if (state.userProfile.apImageUrl) {
+            src = state.userProfile.apImageUrl;
         }
-
-        let headerImageVer = state.userProfile.headerImageVer;
-        let src: string = S.render.getProfileHeaderImgUrl(state.userProfile.userNodeId || this.appState.homeNodeId, headerImageVer);
+        else {
+            let headerImageVer = state.userProfile.headerImageVer;
+            src = S.render.getProfileHeaderImgUrl(state.userProfile.userNodeId || this.appState.homeNodeId, headerImageVer);
+        }
 
         let onClick = (evt) => {
             if (this.readOnly) return;

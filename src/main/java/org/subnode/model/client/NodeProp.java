@@ -13,6 +13,7 @@ public enum NodeProp {
     ACT_PUB_OBJ_URL("ap:objUrl", "s"), //
     ACT_PUB_OBJ_ATTRIBUTED_TO("ap:objAttributedTo", "s"), //
     ACT_PUB_USER_ICON_URL("ap:userIcon", "s"), //
+    ACT_PUB_USER_IMAGE_URL("ap:userImage", "s"), //
 
     // points to URL of actor object
     ACT_PUB_ACTOR_ID("ap:actorId", "s"), //

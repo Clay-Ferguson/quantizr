@@ -50,6 +50,12 @@ export class ManageAccountDlg extends DialogBase {
 
     preLoad(): Promise<void> {
         return new Promise<void>((resolve, reject) => {
+            // todo-0: everywhere we do a resolve inside a success handler we need to handle the case
+            // where the server throws an error and this success function never executes!
+            // Example is right here clicking on a username and ending up with thsi case on the server:
+            //   res.setMessage("unknown user: "+userName);
+            //   res.setSuccess(false);
+            // which then HANGS the gui permanenly when the promise never resolves.
             S.util.ajax<J.GetUserAccountInfoRequest, J.GetUserAccountInfoResponse>("getUserAccountInfo", null,
                 (res: J.GetUserAccountInfoResponse) => {
                     let used = "";

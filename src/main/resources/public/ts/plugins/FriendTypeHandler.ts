@@ -71,19 +71,20 @@ export class FriendTypeHandler extends TypeBase {
     render(node: J.NodeInfo, rowStyling: boolean, state: AppState): Comp {
         let user: string = S.props.getNodePropVal(J.NodeProp.USER, node);
 
-        let avatarVer: string = S.props.getClientPropVal("avatarVer", node);
         let userBio: string = S.props.getClientPropVal(J.NodeProp.USER_BIO, node);
         let userNodeId: string = S.props.getNodePropVal(J.NodeProp.USER_NODE_ID, node);
 
         let img: Img = null;
-        let imgSrc: string = null;
-        if (avatarVer) {
-            imgSrc = S.render.getAvatarImgUrl(userNodeId, avatarVer);
-        }
 
-        // finally resort to looking for avatar url as a client property which will be how it's found for Foreign Federated users.
+        /* First try to get the icon as an ActPub one */
+        let imgSrc = S.props.getClientPropVal(J.NodeProp.ACT_PUB_USER_ICON_URL, node);
+
+        /* If not ActivityPub try as local user */
         if (!imgSrc) {
-            imgSrc = S.props.getClientPropVal(J.NodeProp.ACT_PUB_USER_ICON_URL, node);
+            let avatarVer: string = S.props.getClientPropVal("avatarVer", node);
+            if (avatarVer) {
+                imgSrc = S.render.getAvatarImgUrl(userNodeId, avatarVer);
+            }
         }
 
         let actorUrl = S.props.getClientPropVal(J.NodeProp.ACT_PUB_ACTOR_URL, node);
