@@ -1,6 +1,7 @@
 import { useSelector } from "react-redux";
 import { AppState } from "../AppState";
 import { Constants as C } from "../Constants";
+import { UserProfileDlg } from "../dlg/UserProfileDlg";
 import { NodeActionType } from "../enums/NodeActionType";
 import { TypeHandlerIntf } from "../intf/TypeHandlerIntf";
 import * as J from "../JavaIntf";
@@ -52,7 +53,11 @@ export class NodeCompRowHeader extends Div {
         if (node.owner && node.owner !== "?" && node.owner !== "admin") {
             let displayName = node.displayName || ("@" + node.owner);
             children.push(new Span(displayName, {
-                className: (node.owner === state.userName) ? "created-by-me" : "created-by-other"
+                className: (node.owner === state.userName) ? "created-by-me" : "created-by-other",
+                title: "Show Profile",
+                onClick: (evt: any) => {
+                    new UserProfileDlg(node.ownerId, state).open();
+                }
             }));
         }
 
