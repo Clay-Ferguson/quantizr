@@ -426,7 +426,7 @@ public class NodeRenderService {
 			orderBy = orderBy.substring(0, spaceIdx);
 		}
 
-		// todo-0: is this a bug? should there be a ".value" after order by?
+		// todo-1: is this a bug? should there be a ".value" after order by?
 		sort = Sort.by(dir.equals("asc") ? Sort.Direction.ASC : Sort.Direction.DESC, SubNode.FIELD_PROPERTIES + "." + orderBy);
 
 		if (orderBy.equals("priority")) {

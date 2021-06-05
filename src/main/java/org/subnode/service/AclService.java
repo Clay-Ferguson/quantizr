@@ -155,7 +155,6 @@ public class AclService {
 	 * @param res
 	 * @return
 	 */
-	// todo-0: bug. Toggling back and forth between public+readonly and public-write doesn't work.
 	public boolean addPrivilege(MongoSession session, SubNode node, String principal, List<String> privileges,
 			AddPrivilegeResponse res) {
 

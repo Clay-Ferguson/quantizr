@@ -168,7 +168,6 @@ public class NodeEditService {
 		 * in "Edit me!", but I think this is perfectly fine as is.
 		 */
 		if (NodeType.RSS_FEED.s().equals(req.getTypeName())) {
-			// is the last parameter of false good here? (todo-0)
 			SubNode holderNode = create.createNode(session, node, null, NodeType.NONE.s(), 0L, CreateNodeLocation.FIRST,
 					req.getProperties(), null, false);
 			holderNode.setContent("#### Edit me!");

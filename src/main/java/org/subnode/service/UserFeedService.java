@@ -387,7 +387,7 @@ public class UserFeedService {
 		return res;
 	}
 
-	/* todo-0: need to cache this in the session */
+	/* todo-1: need to cache this in the session */
 	public List<ObjectId> getBlockedUserIds() {
 		List<SubNode> nodeList = userManagerService.getSpecialNodesList(null, NodeType.BLOCKED_USERS.s());
 		if (nodeList == null)
