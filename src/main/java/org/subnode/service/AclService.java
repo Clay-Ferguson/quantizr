@@ -155,11 +155,11 @@ public class AclService {
 	 * @param res
 	 * @return
 	 */
-	//todo-0: bug. Toggling back and forth between public+readonly and public-write doesn't work.
+	// todo-0: bug. Toggling back and forth between public+readonly and public-write doesn't work.
 	public boolean addPrivilege(MongoSession session, SubNode node, String principal, List<String> privileges,
 			AddPrivilegeResponse res) {
 
-		// log.debug("addPrivilege to node: " + node.getId().toHexString() + " principal=" + principal);
+		log.debug("addPrivilege to node: " + node.getId().toHexString() + " principal=" + principal);
 
 		if (principal == null)
 			return false;
@@ -231,7 +231,11 @@ public class AclService {
 		}
 
 		String prvs = ac.getPrvs();
-		if (prvs == null) {
+		/*
+		 * to set from 'rd' to 'rd,rw' back and forth then it's better to set prvs to an empty string here
+		 * any time we detect this is 'public' priv being set.
+		 */
+		if (prvs == null || isPublic) {
 			prvs = "";
 		}
 
@@ -257,20 +261,22 @@ public class AclService {
 			update.save(session, node);
 
 			// if (!principal.equalsIgnoreCase(PrincipalName.PUBLIC.s())) {
-			// 	SubNode fromUserNode = read.getNode(session, node.getOwner());
-			// 	String fromUserName = fromUserNode.getStrProp(NodeProp.USER);
-			// 	SubNode toOwnerNode = read.getUserNodeByUserName(auth.getAdminSession(), principal);
-			// 	/*
-			// 	 * todo-1: Although I am disabling these for now both of these lines of code do work perfectly: we
-			// 	 * can send an email notification here about node edits (first line), and the line below that works
-			// 	 * fine and adds a node to the user's inbox that links to this newly shared node.
-			// 	 * 
-			// 	 * I just want to think more about when exactly to trigger these notifictions. For example I may
-			// 	 * make these two buttons on the editor users must click called "Email Notification to Shares", and
-			// 	 * "Send to Inboxes of Shares"
-			// 	 */
-			// 	// outboxMgr.sendEmailNotification(auth.getAdminSession(), fromUserName, toOwnerNode, node);
-			// 	// outboxMgr.addInboxNotification(principal, toOwnerNode, node, "New node shared to you.");
+			// SubNode fromUserNode = read.getNode(session, node.getOwner());
+			// String fromUserName = fromUserNode.getStrProp(NodeProp.USER);
+			// SubNode toOwnerNode = read.getUserNodeByUserName(auth.getAdminSession(), principal);
+			// /*
+			// * todo-1: Although I am disabling these for now both of these lines of code do work perfectly: we
+			// * can send an email notification here about node edits (first line), and the line below that
+			// works
+			// * fine and adds a node to the user's inbox that links to this newly shared node.
+			// *
+			// * I just want to think more about when exactly to trigger these notifictions. For example I may
+			// * make these two buttons on the editor users must click called "Email Notification to Shares",
+			// and
+			// * "Send to Inboxes of Shares"
+			// */
+			// // outboxMgr.sendEmailNotification(auth.getAdminSession(), fromUserName, toOwnerNode, node);
+			// // outboxMgr.addInboxNotification(principal, toOwnerNode, node, "New node shared to you.");
 			// }
 		}
 
