@@ -19,6 +19,7 @@ import org.subnode.mongo.MongoCreate;
 import org.subnode.mongo.MongoRead;
 import org.subnode.mongo.MongoSession;
 import org.subnode.mongo.MongoUpdate;
+import org.subnode.mongo.MongoUtil;
 import org.subnode.mongo.model.SubNode;
 import org.subnode.mongo.model.SubNodePropertyMap;
 
@@ -264,11 +265,17 @@ public class SubNodeUtil {
 			ret.setDescription(description);
 		}
 
-		String link = getAttachmentUrl(node);
-		if (link == null) {
-			link = appProp.getHostAndPort() + "/branding/logo-200px-tr.jpg";
+		String url = getAttachmentUrl(node);
+		String mime = node.getStrProp(NodeProp.BIN_MIME.s());
+
+		if (url == null) {
+			url = appProp.getHostAndPort() + "/branding/logo-200px-tr.jpg";
+			mime = "image/jpeg";
 		}
-		ret.setLink(link);
+
+		ret.setAttachmentUrl(url);
+		ret.setAttachmentMime(mime);
+
 		ret.setUrl(appProp.getHostAndPort() + "/app?id=" + node.getId().toHexString());
 		return ret;
 	}
@@ -280,7 +287,14 @@ public class SubNodeUtil {
 		if (bin != null) {
 			return appProp.getHostAndPort() + AppController.API_PATH + "/bin/" + bin + "?nodeId=" + node.getId().toHexString();
 		}
-		return null;
+
+		/* as last resort try to get any extrnally linked binary image */
+		if (bin == null) {
+			bin = node.getStrProp(NodeProp.BIN_URL);
+		}
+
+		// todo-0: will this fail to find "data:" type inline image data?
+		return bin;
 	}
 
 	public String getIdBasedUrl(SubNode node) {

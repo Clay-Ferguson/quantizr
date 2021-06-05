@@ -530,7 +530,12 @@ public class NodeRenderService {
 		NodeMetaInfo metaInfo = subNodeUtil.getNodeMetaInfo(node);
 		model.addAttribute("ogTitle", metaInfo.getTitle());
 		model.addAttribute("ogDescription", metaInfo.getDescription());
-		model.addAttribute("ogImage", metaInfo.getLink());
+
+		String mime = metaInfo.getAttachmentMime();
+		if (mime != null && mime.startsWith("image/")) {
+			model.addAttribute("ogImage", metaInfo.getAttachmentUrl());
+		}
+
 		model.addAttribute("ogUrl", metaInfo.getUrl());
 	}
 

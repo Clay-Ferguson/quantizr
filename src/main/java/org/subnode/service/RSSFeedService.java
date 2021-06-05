@@ -613,13 +613,13 @@ public class RSSFeedService {
 
 				// Currently the link will be an attachment URL, but need to research how ROME
 				// handles attachments.
-				if (metaInfo.getLink() == null) {
-					metaInfo.setLink(metaInfo.getUrl());
+				if (metaInfo.getAttachmentUrl() == null) {
+					metaInfo.setAttachmentUrl(metaInfo.getUrl());
 				}
 				SyndEntry entry = new SyndEntryImpl();
 
 				entry.setTitle(metaInfo.getTitle() != null ? metaInfo.getTitle() : "ID: " + n.getId().toHexString());
-				entry.setLink(metaInfo.getLink() != null ? metaInfo.getLink() : appProp.getProtocolHostAndPort());
+				entry.setLink(metaInfo.getAttachmentUrl() != null ? metaInfo.getAttachmentUrl() : appProp.getProtocolHostAndPort());
 
 				/*
 				 * todo-2: need menu item "Set Create Time", and "Set Modify Time", that prompts
