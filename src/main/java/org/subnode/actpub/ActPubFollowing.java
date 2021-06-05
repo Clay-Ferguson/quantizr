@@ -79,7 +79,8 @@ public class ActPubFollowing {
      */
     public void setFollowing(String followerUserName, String apUserName, boolean following) {
         try {
-            // log.debug("Local Follower User: " + followerUserName + " setFollowing: " + apUserName + " following=" + following);
+            // log.debug("Local Follower User: " + followerUserName + " setFollowing: " + apUserName + "
+            // following=" + following);
             // admin doesn't follow/unfollow
             if (PrincipalName.ADMIN.s().equalsIgnoreCase(followerUserName)) {
                 return;
@@ -111,8 +112,7 @@ public class ActPubFollowing {
 
                 APObj toActor = apUtil.getActorByUrl(actorUrlOfUserBeingFollowed);
                 String toInbox = AP.str(toActor, APProp.inbox);
-
-                apUtil.securePost(followerUserName, session, null, toInbox, sessionActorUrl, action, null); 
+                apUtil.securePost(followerUserName, session, null, toInbox, sessionActorUrl, action, null);
                 return null;
             });
         } catch (Exception e) {
@@ -168,10 +168,12 @@ public class ActPubFollowing {
                     /*
                      * lookup to see if this followerFriendList node already has userToFollow already under it
                      */
-                    SubNode friendNode = read.findNodeByUserAndType(session, followerFriendList, userToFollow, NodeType.FRIEND.s());
+                    SubNode friendNode =
+                            read.findNodeByUserAndType(session, followerFriendList, userToFollow, NodeType.FRIEND.s());
                     if (friendNode == null) {
                         if (!unFollow) {
-                            friendNode = edit.createFriendNode(session, followerFriendList, userToFollow, followerActorUrl, followerActorHtmlUrl);
+                            friendNode = edit.createFriendNode(session, followerFriendList, userToFollow, followerActorUrl,
+                                    followerActorHtmlUrl);
                             // userFeedService.sendServerPushInfo(localUserName,
                             // new NotificationMessage("apReply", null, contentHtml, toUserName));
                         }
@@ -272,7 +274,7 @@ public class ActPubFollowing {
 
             for (SubNode n : iter) {
                 // log.debug("Follower found: " + XString.prettyPrint(n));
-                followers.add(n.getStrProp(NodeProp.ACT_PUB_ACTOR_ID)); 
+                followers.add(n.getStrProp(NodeProp.ACT_PUB_ACTOR_ID));
             }
             return null;
         });
@@ -352,7 +354,7 @@ public class ActPubFollowing {
 
         Criteria criteria =
                 Criteria.where(SubNode.FIELD_PATH).regex(util.regexRecursiveChildrenOfPath(NodeName.ROOT_OF_ALL_USERS)) //
-                        .and(SubNode.FIELD_PROPERTIES + "." + NodeProp.USER.s()).is(userName) //
+                        .and(SubNode.FIELD_PROPERTIES + "." + NodeProp.USER.s() + ".value").is(userName) //
                         .and(SubNode.FIELD_TYPE).is(NodeType.FRIEND.s());
 
         query.addCriteria(criteria);

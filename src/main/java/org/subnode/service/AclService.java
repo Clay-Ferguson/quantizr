@@ -155,6 +155,7 @@ public class AclService {
 	 * @param res
 	 * @return
 	 */
+	//todo-0: bug. Toggling back and forth between public+readonly and public-write doesn't work.
 	public boolean addPrivilege(MongoSession session, SubNode node, String principal, List<String> privileges,
 			AddPrivilegeResponse res) {
 
@@ -217,7 +218,7 @@ public class AclService {
 		HashMap<String, AccessControl> acl = node.getAc();
 
 		/* initialize acl to a map if it's null, or if we're sharing to public */
-		if (acl == null || isPublic) {
+		if (acl == null) {
 			acl = new HashMap<>();
 		}
 

@@ -341,7 +341,8 @@ public class UserFeedService {
 
 		// use attributedTo proptery to determine whether a node is 'local' (posted by this server) or not.
 		if (req.getLocalOnly()) {
-			criteria = criteria.and(SubNode.FIELD_PROPERTIES + "." + NodeProp.ACT_PUB_OBJ_ATTRIBUTED_TO.s()).is(null);
+			// note: the ".value" part is recently added, but actually since this is a compare to null should not be needed.
+			criteria = criteria.and(SubNode.FIELD_PROPERTIES + "." + NodeProp.ACT_PUB_OBJ_ATTRIBUTED_TO.s() + ".value").is(null);
 		}
 
 		if (!StringUtils.isEmpty(req.getSearchText())) {

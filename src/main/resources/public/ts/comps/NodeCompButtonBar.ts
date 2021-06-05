@@ -68,7 +68,9 @@ export class NodeCompButtonBar extends Div {
                 }
 
                 if (typeName && typeName !== "Markdown") {
-                    typeNameSpan = new Span(typeName, { className: "rowTypeName" });
+                    // todo-0: (make a decision here, this can be simplified.)
+                    // this is too redundant. commenting to be sure i like without.
+                    // typeNameSpan = new Span(typeName, { className: "rowTypeName" });
                 }
 
                 if (typeIcon || typeNameSpan) {

@@ -17,6 +17,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.subnode.actpub.ActPubCache;
+import org.subnode.actpub.ActPubFollowing;
 import org.subnode.config.AppProp;
 import org.subnode.config.NodeName;
 import org.subnode.config.SessionContext;
@@ -121,6 +122,9 @@ public class UserManagerService {
 
 	@Autowired
 	private ActPubCache apCache;
+
+	@Autowired
+	private ActPubFollowing apFollowing;
 
 	@Autowired
 	private AclService acl;
@@ -767,6 +771,13 @@ public class UserManagerService {
 				userProfile.setApIconUrl(userNode.getStrProp(NodeProp.ACT_PUB_USER_ICON_URL));
 				userProfile.setApImageUrl(userNode.getStrProp(NodeProp.ACT_PUB_USER_IMAGE_URL));
 				userProfile.setActorUrl(userNode.getStrProp(NodeProp.ACT_PUB_ACTOR_URL));
+
+				Long followerCount = apFollowing.countFollowersOfUser(session, userName);
+				userProfile.setFollowerCount(followerCount.intValue());
+
+				Long followingCount = apFollowing.countFollowingOfUser(session, userName);
+				userProfile.setFollowingCount(followingCount.intValue());
+
 				res.setSuccess(true);
 			}
 		});

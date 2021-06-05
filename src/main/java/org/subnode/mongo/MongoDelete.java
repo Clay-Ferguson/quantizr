@@ -58,8 +58,8 @@ public class MongoDelete {
 	}
 
 	/**
-	 * Deletes old activity pub posts, just to save space on our server. This destroys perfectly good data
-	 * so we need to make it an admin option (todo-1)
+	 * Deletes old activity pub posts, just to save space on our server. This destroys perfectly good
+	 * data so we need to make it an admin option (todo-1)
 	 */
 	public long deleteOldActPubPosts(SubNode parent, MongoSession session) {
 		Query query = new Query();
@@ -68,15 +68,14 @@ public class MongoDelete {
 		LocalDate ldt = LocalDate.now().minusDays(30);
 		Date date = Date.from(ldt.atStartOfDay(ZoneId.systemDefault()).toInstant());
 
-		Criteria criteria = Criteria.where(SubNode.FIELD_PATH)
-				.regex(util.regexRecursiveChildrenOfPath(parent.getPath())) //
-				.and(SubNode.FIELD_PROPERTIES + "." + NodeProp.ACT_PUB_ID+ ".value").ne(null) //
-				.and(SubNode.FIELD_MODIFY_TIME).lt(date); 
+		Criteria criteria = Criteria.where(SubNode.FIELD_PATH).regex(util.regexRecursiveChildrenOfPath(parent.getPath())) //
+				.and(SubNode.FIELD_PROPERTIES + "." + NodeProp.ACT_PUB_ID + ".value").ne(null) //
+				.and(SubNode.FIELD_MODIFY_TIME).lt(date);
 
 		query.addCriteria(criteria);
 		DeleteResult res = ops.remove(query, SubNode.class);
 		return res.getDeletedCount();
-    }
+	}
 
 	/* This is a way to cleanup old records, but it's needed yet */
 	public void cleanupOldTempNodesForUser(MongoSession session, SubNode userNode) {

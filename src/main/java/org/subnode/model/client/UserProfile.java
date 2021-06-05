@@ -25,7 +25,10 @@ public class UserProfile {
 
 	/* for foreign users this will be their actor url */
 	private String actorUrl;
-    
+
+	private int followerCount;
+	private int followingCount;
+
 	public String getUserName() {
 		return userName;
 	}
@@ -104,5 +107,21 @@ public class UserProfile {
 
 	public void setDisplayName(String displayName) {
 		this.displayName = displayName;
+	}
+
+	public int getFollowerCount() {
+		return followerCount;
+	}
+
+	public void setFollowerCount(int followerCount) {
+		this.followerCount = followerCount;
+	}
+
+	public int getFollowingCount() {
+		return followingCount;
+	}
+
+	public void setFollowingCount(int followingCount) {
+		this.followingCount = followingCount;
 	}
 }

@@ -12,6 +12,8 @@ export interface UserProfile {
     apIconUrl: string;
     apImageUrl: string;
     actorUrl: string;
+    followerCount: number;
+    followingCount: number;
 }
 
 export interface AddFriendRequest extends RequestBase {
