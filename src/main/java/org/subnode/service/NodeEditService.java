@@ -164,8 +164,8 @@ public class NodeEditService {
 		/*
 		 * need a more pluggable approach to special cases like this. For RSS Feeds we want a containment
 		 * node so that the feed doesn't get rendered until the user expands so we have to have an extra
-		 * node in here. We can add a dialog later to let the user pass a string in here
-		 * instead of cramming in "Edit me!", but I think this is perfectly fine as is.
+		 * node in here. We can add a dialog later to let the user pass a string in here instead of cramming
+		 * in "Edit me!", but I think this is perfectly fine as is.
 		 */
 		if (NodeType.RSS_FEED.s().equals(req.getTypeName())) {
 			// is the last parameter of false good here? (todo-0)
@@ -589,56 +589,60 @@ public class NodeEditService {
 		// todo-1: eventually we need a plugin-type architecture to decouple this kind
 		// of type-specific code from the general node saving.
 		if (node.getType().equals(NodeType.FRIEND.s())) {
-			String userNodeId = node.getStrProp(NodeProp.USER_NODE_ID.s());
-
-			final String friendUserName = node.getStrProp(NodeProp.USER.s());
-			if (friendUserName != null) {
-				// if a foreign user, update thru ActivityPub.
-				if (friendUserName.contains("@") && !ThreadLocals.getSessionContext().isAdmin()) {
-					String followerUser = ThreadLocals.getSessionContext().getUserName();
-					apFollowing.setFollowing(followerUser, friendUserName, true);
-				}
-
-				/*
-				 * when user first adds, this friendNode won't have the userNodeId yet, so add if not yet existing
-				 */
-				if (userNodeId == null) {
-
-					/*
-					 * A userName containing "@" is considered a foreign Fediverse user and will trigger a WebFinger
-					 * search of them, and a load/update of their outbox
-					 */
-					if (friendUserName.contains("@")) {
-						asyncExec.run(() -> {
-							adminRunner.run(s -> {
-								if (!ThreadLocals.getSessionContext().isAdmin()) {
-									apService.getAcctNodeByUserName(s, friendUserName);
-								}
-
-								/*
-								 * The only time we pass true to load the user into the system is when they're being added as a
-								 * friend.
-								 */
-								apService.userEncountered(friendUserName, true);
-							});
-						});
-					}
-
-					ValContainer<SubNode> userNode = new ValContainer<SubNode>();
-					adminRunner.run(s -> {
-						userNode.setVal(read.getUserNodeByUserName(s, friendUserName));
-					});
-
-					if (userNode.getVal() != null) {
-						userNodeId = userNode.getVal().getId().toHexString();
-						node.setProp(NodeProp.USER_NODE_ID.s(), userNodeId);
-					}
-				}
-			}
+			updateSavedFriendNode(node);
 		}
 
 		res.setSuccess(true);
 		return res;
+	}
+
+	public void updateSavedFriendNode(SubNode node) {
+		String userNodeId = node.getStrProp(NodeProp.USER_NODE_ID.s());
+
+		final String friendUserName = node.getStrProp(NodeProp.USER.s());
+		if (friendUserName != null) {
+			// if a foreign user, update thru ActivityPub.
+			if (friendUserName.contains("@") && !ThreadLocals.getSessionContext().isAdmin()) {
+				String followerUser = ThreadLocals.getSessionContext().getUserName();
+				apFollowing.setFollowing(followerUser, friendUserName, true);
+			}
+
+			/*
+			 * when user first adds, this friendNode won't have the userNodeId yet, so add if not yet existing
+			 */
+			if (userNodeId == null) {
+
+				/*
+				 * A userName containing "@" is considered a foreign Fediverse user and will trigger a WebFinger
+				 * search of them, and a load/update of their outbox
+				 */
+				if (friendUserName.contains("@")) {
+					asyncExec.run(() -> {
+						adminRunner.run(s -> {
+							if (!ThreadLocals.getSessionContext().isAdmin()) {
+								apService.getAcctNodeByUserName(s, friendUserName);
+							}
+
+							/*
+							 * The only time we pass true to load the user into the system is when they're being added as a
+							 * friend.
+							 */
+							apService.userEncountered(friendUserName, true);
+						});
+					});
+				}
+
+				ValContainer<SubNode> userNode = new ValContainer<SubNode>();
+				adminRunner.run(s -> {
+					userNode.setVal(read.getUserNodeByUserName(s, friendUserName));
+				});
+
+				if (userNode.getVal() != null) {
+					userNodeId = userNode.getVal().getId().toHexString();
+					node.setProp(NodeProp.USER_NODE_ID.s(), userNodeId);
+				}
+			}
+		}
 	}
 
 	/*

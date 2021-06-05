@@ -744,6 +744,10 @@ public class MongoRead {
             return "### Friends List";
         }
 
+        if (type.equals(NodeType.BLOCKED_USERS.s())) {
+            return "### Blocked Users";
+        }
+
         if (type.equals(NodeType.POSTS.s())) {
             return "### " + ThreadLocals.getSessionContext().getUserName() + "'s Public Posts";
         }
@@ -800,16 +804,16 @@ public class MongoRead {
     }
 
     /*
-     * Finds and returns the FRIEND node matching userName under the friendsListNode, or null if not
+     * Finds and returns the first node matching userName and type under the 'node', or null if not
      * existing
      */
-    public SubNode findFriendOfUser(MongoSession session, SubNode friendsListNode, String userName) {
+    public SubNode findNodeByUserAndType(MongoSession session, SubNode node, String userName, String type) {
 
         // Other wise for ordinary users root is based off their username
         Query query = new Query();
         Criteria criteria = Criteria.where(//
-                SubNode.FIELD_PATH).regex(util.regexDirectChildrenOfPath(friendsListNode.getPath()))//
-                .and(SubNode.FIELD_TYPE).is(NodeType.FRIEND.s()) //
+                SubNode.FIELD_PATH).regex(util.regexDirectChildrenOfPath(node.getPath()))//
+                .and(SubNode.FIELD_TYPE).is(type) 
                 .and(SubNode.FIELD_PROPERTIES + "." + NodeProp.USER + ".value").is(userName);
 
         query.addCriteria(criteria);

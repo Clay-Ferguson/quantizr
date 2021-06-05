@@ -45,6 +45,7 @@ import org.subnode.mongo.model.SubNode;
 import org.subnode.request.AddFriendRequest;
 import org.subnode.request.AddPrivilegeRequest;
 import org.subnode.request.AppDropRequest;
+import org.subnode.request.BlockUserRequest;
 import org.subnode.request.ChangePasswordRequest;
 import org.subnode.request.CheckMessagesRequest;
 import org.subnode.request.CloseAccountRequest;
@@ -1192,6 +1193,13 @@ public class AppController implements ErrorController {
 	public @ResponseBody Object addFriend(@RequestBody AddFriendRequest req, HttpSession session) {
 		return callProc.run("addFriend", req, session, ms -> {
 			return userManagerService.addFriend(ms, req);
+		});
+	}
+
+	@RequestMapping(value = API_PATH + "/blockUser", method = RequestMethod.POST)
+	public @ResponseBody Object blockUser(@RequestBody BlockUserRequest req, HttpSession session) {
+		return callProc.run("blockUser", req, session, ms -> {
+			return userManagerService.blockUser(ms, req);
 		});
 	}
 

@@ -24,7 +24,7 @@ export class FriendTypeHandler extends TypeBase {
     static helpExpanded: boolean;
 
     constructor() {
-        super(J.NodeType.FRIEND, "Friend", "fa-user", false);
+        super(J.NodeType.FRIEND, "User", "fa-user", false);
     }
 
     getEditorHelp(): string {

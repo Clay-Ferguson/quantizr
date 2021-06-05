@@ -123,7 +123,7 @@ public class ActPubFollowing {
     /**
      * Process inbound 'Follow' actions (comming from foreign servers). This results in the follower an
      * account node in our local DB created if not already existing, and then a FRIEND node under his
-     * FRIENDS_LIST created to represent the person he's following, if not already existing.
+     * FRIEND_LIST created to represent the person he's following, if not already existing.
      * 
      * If 'unFollow' is true we actually do an unfollow instead of a follow.
      */
@@ -168,7 +168,7 @@ public class ActPubFollowing {
                     /*
                      * lookup to see if this followerFriendList node already has userToFollow already under it
                      */
-                    SubNode friendNode = read.findFriendOfUser(session, followerFriendList, userToFollow);
+                    SubNode friendNode = read.findNodeByUserAndType(session, followerFriendList, userToFollow, NodeType.FRIEND.s());
                     if (friendNode == null) {
                         if (!unFollow) {
                             friendNode = edit.createFriendNode(session, followerFriendList, userToFollow, followerActorUrl, followerActorHtmlUrl);

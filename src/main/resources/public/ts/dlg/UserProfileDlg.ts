@@ -92,6 +92,7 @@ export class UserProfileDlg extends DialogBase {
                     localUser ? new Button("Posts", () => this.openUserHomePage(state, "posts")) : null, //
 
                     this.readOnly && state.userProfile.userName !== this.appState.userName ? new Button("Add as Friend", this.addFriend) : null,
+                    this.readOnly && state.userProfile.userName !== this.appState.userName ? new Button("Block User", this.blockUser) : null,
                     state.userProfile.actorUrl ? new Button("Go to User Page", () => {
                         window.open(state.userProfile.actorUrl, "_blank");
                     }) : null,
@@ -158,6 +159,15 @@ export class UserProfileDlg extends DialogBase {
             userName: state.userProfile.userName
         }, (res: J.AddFriendResponse) => {
             S.util.showMessage(res.message, "New Friend");
+        });
+    }
+
+    blockUser = (): void => {
+        const state: any = this.getState();
+        S.util.ajax<J.BlockUserRequest, J.BlockUserResponse>("blockUser", {
+            userName: state.userProfile.userName
+        }, (res: J.AddFriendResponse) => {
+            S.util.showMessage(res.message, "Block User");
         });
     }
 

@@ -110,7 +110,6 @@ public class NodeRenderService {
 
 		if (node == null) {
 			log.debug("nodeId not found: " + targetId + " sending user to :public instead");
-
 			try {
 				node = read.getNode(session, appProp.getUserLandingPageNode());
 

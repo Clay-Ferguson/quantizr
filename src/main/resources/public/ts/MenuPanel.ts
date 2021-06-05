@@ -45,6 +45,7 @@ export class MenuPanel extends Div {
     static openUserGuide = () => S.nav.openContentNode(":user-guide");
     static openNotesNode = () => S.nav.openContentNode("~" + J.NodeType.NOTES);
     static openFriendsNode = () => S.nav.openContentNode("~" + J.NodeType.FRIEND_LIST);
+    static openBlockedUsersNode = () => S.nav.openContentNode("~" + J.NodeType.BLOCKED_USERS);
     static openRSSFeedsNode = () => S.nav.openContentNode("~" + J.NodeType.RSS_FEEDS);
     static openPostsNode = () => S.nav.openContentNode("~" + J.NodeType.POSTS);
     static openHomeNode = () => S.nav.openContentNode(":" + appState(null).userName + ":home");
@@ -168,19 +169,25 @@ export class MenuPanel extends Div {
         children.push(new Menu("Messages" + messagesSuffix, [
             new MenuItem("To/From Me" + messagesSuffix, MenuPanel.messagesToFromMe, !state.isAnonUser),
             new MenuItem("From Friends", MenuPanel.messagesFromFriends, !state.isAnonUser),
-            new MenuItem("Local Users", MenuPanel.messagesLocal, !state.isAnonUser)
-            // new MenuItem("All Fediverse", MenuPanel.messagesFediverse, !state.isAnonUser)
+            new MenuItem("Local Users", MenuPanel.messagesLocal, !state.isAnonUser),
+            new MenuItem("All Fediverse", MenuPanel.messagesFediverse, !state.isAnonUser),
+            new MenuItemSeparator(), //
+            new MenuItem("My Posts", MenuPanel.openPostsNode, !state.isAnonUser)
         ]));
 
         children.push(new Menu("My Nodes", [
             new MenuItem("Account", S.nav.navHome, !state.isAnonUser),
             new MenuItem("Home", MenuPanel.openHomeNode, !state.isAnonUser),
-            new MenuItem("Posts", MenuPanel.openPostsNode, !state.isAnonUser),
-            new MenuItem("Friends", MenuPanel.openFriendsNode, !state.isAnonUser),
             new MenuItemSeparator(), //
             new MenuItem("RSS Feeds", MenuPanel.openRSSFeedsNode, !state.isAnonUser),
             new MenuItem("Notes", MenuPanel.openNotesNode, !state.isAnonUser),
             new MenuItem("Exports", MenuPanel.openExportsNode, !state.isAnonUser)
+        ]));
+
+        children.push(new Menu("Users", [
+            new MenuItem("Find Users", MenuPanel.findUsers, !state.isAnonUser), //
+            new MenuItem("My Friends", MenuPanel.openFriendsNode, !state.isAnonUser),
+            new MenuItem("Blocked Users", MenuPanel.openBlockedUsersNode, !state.isAnonUser)
         ]));
 
         children.push(new Menu("Edit", [
@@ -237,7 +244,7 @@ export class MenuPanel extends Div {
             new MenuItem("Show All Shares", MenuPanel.showAllShares, //
                 !state.isAnonUser && !!hltNode),
 
-            new MenuItem("Show Public Readonly", MenuPanel.showPublicReadonlyShares, //
+            new MenuItem("Show Public Read-only", MenuPanel.showPublicReadonlyShares, //
                 !state.isAnonUser && !!hltNode),
 
             new MenuItem("Show Public Appendable", MenuPanel.showPublicWritableShares, //
@@ -253,19 +260,13 @@ export class MenuPanel extends Div {
                 !state.isAnonUser && !!hltNode), //
 
             new MenuItem("By ID", MenuPanel.searchById, //
-                !state.isAnonUser && !!hltNode), //
-
-            new MenuItemSeparator(), //
-
-            new MenuItem("Find Users", MenuPanel.findUsers, //
-                !state.isAnonUser) //
+                !state.isAnonUser && !!hltNode) //
 
             // new MenuItem("Files", nav.searchFiles, () => { return  !state.isAnonUser && S.meta64.allowFileSystemSearch },
             //    () => { return  !state.isAnonUser && S.meta64.allowFileSystemSearch })
         ]));
 
         children.push(new Menu("Timeline", [
-
             new MenuItem("Created", MenuPanel.timelineByCreated, //
                 !state.isAnonUser && !!hltNode), //
 
@@ -274,16 +275,15 @@ export class MenuPanel extends Div {
         ]));
 
         children.push(new Menu("Calendar", [
-
-            !state.isAnonUser ? new MenuItem("Show", MenuPanel.showCalendar, !!hltNode) : null, new MenuItemSeparator(), //
-
+            new MenuItem("Show", MenuPanel.showCalendar, !state.isAnonUser && !!hltNode),
+            new MenuItemSeparator(), //
             new MenuItem("Future Dates", MenuPanel.calendarFutureDates, !state.isAnonUser && !!hltNode), //
             new MenuItem("Past Dates", MenuPanel.calendarPastDates, !state.isAnonUser && !!hltNode), //
             new MenuItem("All Dates", MenuPanel.calendarAllDates, !state.isAnonUser && !!hltNode) //
         ]));
 
         children.push(new Menu("Tools", [
-            !state.isAnonUser ? new MenuItem("Show Graph", MenuPanel.toolsShowGraph, !!hltNode) : null, //
+            new MenuItem("Show Graph", MenuPanel.toolsShowGraph, !state.isAnonUser && !!hltNode), //
             new MenuItem("Save Clipboard", MenuPanel.toolsShowClipboard, !state.isAnonUser), //
 
             // for now, we don't need the 'show properties' and it may never be needed again

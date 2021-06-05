@@ -41,6 +41,7 @@ import org.subnode.mongo.MongoUtil;
 import org.subnode.mongo.RunAsMongoAdmin;
 import org.subnode.mongo.model.SubNode;
 import org.subnode.request.AddFriendRequest;
+import org.subnode.request.BlockUserRequest;
 import org.subnode.request.ChangePasswordRequest;
 import org.subnode.request.CloseAccountRequest;
 import org.subnode.request.GetUserAccountInfoRequest;
@@ -51,6 +52,7 @@ import org.subnode.request.SaveUserPreferencesRequest;
 import org.subnode.request.SaveUserProfileRequest;
 import org.subnode.request.SignupRequest;
 import org.subnode.request.base.RequestBase;
+import org.subnode.response.BlockUserResponse;
 import org.subnode.response.AddFriendResponse;
 import org.subnode.response.ChangePasswordResponse;
 import org.subnode.response.CloseAccountResponse;
@@ -556,7 +558,7 @@ public class UserManagerService {
 		adminRunner.run(session -> {
 			SubNode userNode = read.getUserNodeByUserName(session, userName);
 			if (userNode == null) {
-				res.setMessage("unknown user: "+userName);
+				res.setMessage("unknown user: " + userName);
 				res.setSuccess(false);
 			}
 
@@ -645,6 +647,47 @@ public class UserManagerService {
 		return res;
 	}
 
+	public BlockUserResponse blockUser(MongoSession session, final BlockUserRequest req) {
+		BlockUserResponse res = new BlockUserResponse();
+		final String userName = ThreadLocals.getSessionContext().getUserName();
+
+		if (session == null) {
+			session = ThreadLocals.getMongoSession();
+		}
+
+		// get the node that holds all blocked users
+		SubNode blockedUsersList =
+				read.getUserNodeByType(session, userName, null, null, NodeType.BLOCKED_USERS.s(), null, NodeName.BLOCKED_USERS);
+
+		/*
+		 * lookup to see if this will be a duplicate
+		 */
+		SubNode userNode = read.findNodeByUserAndType(session, blockedUsersList, req.getUserName(), NodeType.FRIEND.s());
+		if (userNode == null) {
+			String followerActorUrl = null;
+			String followerActorHtmlUrl = null;
+
+			userNode =
+					edit.createFriendNode(session, blockedUsersList, req.getUserName(), followerActorUrl, followerActorHtmlUrl);
+			if (userNode != null) {
+				res.setMessage("Blocked user " + req.getUserName()
+						+ ". To manage blocks, go to `Menu -> Users -> Blocked Users`");
+			} else {
+				res.setMessage("Unable to block user: " + req.getUserName());
+			}
+
+			edit.updateSavedFriendNode(userNode);
+
+			res.setSuccess(true);
+		} else {
+			// todo-0: for this AND the friend request, we need to of course make it where the user can never
+			// get here or click a button if this is redundant.
+			res.setMessage("You already blocked " + req.getUserName());
+			res.setSuccess(true);
+		}
+		return res;
+	}
+
 	/*
 	 * Adds 'req.userName' as a friend by creating a FRIEND node under the current user's FRIENDS_LIST
 	 * if the user wasn't already a friend
@@ -664,7 +707,7 @@ public class UserManagerService {
 		/*
 		 * lookup to see if this followerFriendList node already has userToFollow already under it
 		 */
-		SubNode friendNode = read.findFriendOfUser(session, followerFriendList, req.getUserName());
+		SubNode friendNode = read.findNodeByUserAndType(session, followerFriendList, req.getUserName(), NodeType.FRIEND.s());
 		if (friendNode == null) {
 			// todo-2: for local users following fediverse this value needs to be here?
 			String followerActorUrl = null;
@@ -906,7 +949,7 @@ public class UserManagerService {
 	public GetFriendsResponse getFriends(MongoSession session) {
 		GetFriendsResponse res = new GetFriendsResponse();
 
-		List<SubNode> friendNodes = getFriendsList(session);
+		List<SubNode> friendNodes = getSpecialNodesList(session, NodeType.FRIEND_LIST.s());
 
 		if (friendNodes != null) {
 			List<FriendInfo> friends = new LinkedList<>();
@@ -939,25 +982,27 @@ public class UserManagerService {
 		return res;
 	}
 
-	public List<SubNode> getFriendsList(MongoSession session) {
+	/**
+	 * Looks in the user's account under their 'underType' type node and returns all the children.
+	 */
+	public List<SubNode> getSpecialNodesList(MongoSession session, String underType) {
 		if (session == null) {
 			session = ThreadLocals.getMongoSession();
 		}
 
-		List<SubNode> friends = new LinkedList<>();
-
+		List<SubNode> nodeList = new LinkedList<>();
 		SubNode userNode = read.getUserNodeByUserName(session, null);
 		if (userNode == null)
 			return null;
 
-		SubNode friendsNode = read.findTypedNodeUnderPath(session, userNode.getPath(), NodeType.FRIEND_LIST.s());
-		if (friendsNode == null)
+		SubNode parentNode = read.findTypedNodeUnderPath(session, userNode.getPath(), underType);
+		if (parentNode == null)
 			return null;
 
-		for (SubNode friendNode : read.getChildren(session, friendsNode, null, null, 0)) {
-			friends.add(friendNode);
+		for (SubNode friendNode : read.getChildren(session, parentNode, null, null, 0)) {
+			nodeList.add(friendNode);
 		}
-		return friends;
+		return nodeList;
 	}
 
 	/*

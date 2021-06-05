@@ -3,6 +3,7 @@ import { TypeHandlerIntf } from "./intf/TypeHandlerIntf";
 import { AccountTypeHandler } from "./plugins/AccountTypeHandler";
 import { CalcTypeHandler } from "./plugins/CalcTypeHandler";
 import { FriendsListTypeHandler } from "./plugins/FriendsListTypeHandler";
+import { BlockedUsersTypeHandler } from "./plugins/BlockedUsersTypeHandler";
 import { FriendTypeHandler } from "./plugins/FriendTypeHandler";
 import { InboxEntryTypeHandler } from "./plugins/InboxEntryTypeHandler";
 import { InboxNodeTypeHandler } from "./plugins/InboxNodeTypeHandler";
@@ -50,6 +51,7 @@ export class PluginMgr implements PluginMgrIntf {
         this.addTypeHandler(new InboxEntryTypeHandler());
         this.addTypeHandler(new NotesNodeTypeHandler());
         this.addTypeHandler(new FriendsListTypeHandler());
+        this.addTypeHandler(new BlockedUsersTypeHandler());
         this.addTypeHandler(new FriendTypeHandler());
     }
 }

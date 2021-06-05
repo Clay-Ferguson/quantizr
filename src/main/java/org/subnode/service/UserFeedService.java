@@ -185,7 +185,8 @@ public class UserFeedService {
 		SessionContext sc = ThreadLocals.getSessionContext();
 		CheckMessagesResponse res = new CheckMessagesResponse();
 
-		if (sc.isAnonUser()) return res;
+		if (sc.isAnonUser())
+			return res;
 
 		if (session == null) {
 			session = ThreadLocals.getMongoSession();
@@ -251,9 +252,11 @@ public class UserFeedService {
 			if (userAccountNode != null) {
 				sharedToAny.add(userAccountNode.getOwner().toHexString());
 
-				/* setting last active time to this current time, will stop the GUI from showing the user
-				an indication that they have new messages, because we know they're querying messages NOW, so this
-				is a way to reset */
+				/*
+				 * setting last active time to this current time, will stop the GUI from showing the user an
+				 * indication that they have new messages, because we know they're querying messages NOW, so this is
+				 * a way to reset
+				 */
 				userAccountNode.setProp(NodeProp.LAST_ACTIVE_TIME.s(), sc.getLastActiveTime());
 				update.save(session, userAccountNode);
 			}
@@ -279,6 +282,11 @@ public class UserFeedService {
 		 * doesn't show up in any feeds, but in the future maybe we will make this a checkbox on the editor.
 		 */
 		criteria = criteria.and(SubNode.FIELD_PROPERTIES + "." + NodeProp.UNPUBLISHED + ".value").is(null);
+
+		List<ObjectId> blockedUserIds = getBlockedUserIds();
+		if (blockedUserIds != null && blockedUserIds.size() > 0) {
+			criteria = criteria.and(SubNode.FIELD_OWNER).nin(blockedUserIds);
+		}
 
 		// reset feedMaxTime if we're getting first page of results
 		if (req.getPage() == 0) {
@@ -306,7 +314,7 @@ public class UserFeedService {
 		}
 
 		if (req.getFromFriends()) {
-			List<SubNode> friendNodes = userManagerService.getFriendsList(session);
+			List<SubNode> friendNodes = userManagerService.getSpecialNodesList(session, NodeType.FRIEND_LIST.s());
 			if (friendNodes != null) {
 				for (SubNode friendNode : friendNodes) {
 
@@ -376,5 +384,18 @@ public class UserFeedService {
 		res.setSuccess(true);
 		log.debug("search results count: " + counter);
 		return res;
+	}
+
+	/* todo-0: need to cache this in the session */
+	public List<ObjectId> getBlockedUserIds() {
+		List<SubNode> nodeList = userManagerService.getSpecialNodesList(null, NodeType.BLOCKED_USERS.s());
+		if (nodeList == null)
+			return null;
+		List<ObjectId> objList = new LinkedList<ObjectId>();
+		for (SubNode node : nodeList) {
+			String userNodeId = node.getStrProp(NodeProp.USER_NODE_ID.s());
+			objList.add(new ObjectId(userNodeId));
+		}
+		return objList;
 	}
 }

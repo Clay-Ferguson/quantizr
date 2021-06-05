@@ -28,6 +28,10 @@ export interface AppDropRequest extends RequestBase {
     data: string;
 }
 
+export interface BlockUserRequest extends RequestBase {
+    userName: string;
+}
+
 export interface BrowseFolderRequest extends RequestBase {
     nodeId: string;
 }
@@ -339,6 +343,9 @@ export interface AddPrivilegeResponse extends ResponseBase {
 }
 
 export interface AppDropResponse extends ResponseBase {
+}
+
+export interface BlockUserResponse extends ResponseBase {
 }
 
 export interface BrowseFolderResponse {
@@ -769,6 +776,7 @@ export const enum NodeType {
     RSS_FEED = "sn:rssfeed",
     RSS_FEEDS = "sn:rssfeeds",
     FRIEND_LIST = "sn:friendList",
+    BLOCKED_USERS = "sn:blockedUsers",
     FRIEND = "sn:friend",
     POSTS = "sn:posts",
     ACT_PUB_POSTS = "ap:posts",

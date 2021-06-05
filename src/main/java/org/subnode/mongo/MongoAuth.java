@@ -359,7 +359,7 @@ public class MongoAuth {
 			if (tryNode == null) {
 				tryNode = read.getNode(session, fullPathStr, false);
 				if (tryNode == null) {
-					throw new RuntimeEx("Tree corrupt! path not found: " + fullPathStr);
+					throw new RuntimeEx("Path not found (probable orphan node, not yet cleaned up): " + fullPathStr);
 				}
 
 				// put in the cache

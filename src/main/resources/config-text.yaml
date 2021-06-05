@@ -12,10 +12,11 @@ intro2:
 # Links here can be full url, or node names, or "tab:tabName"
 menu:
   siteNav:
-    - name: "separator"
-      link: ""
-    - name: "Fediverse"
-      link: "tab:feedTab"
+    # welp. This list went back to nothing, for now.
+    # - name: "separator"
+    #   link: ""
+    # - name: "Fediverse"
+    #   link: "tab:feedTab"
       
     # - name: "separator"
     #   link: ""
