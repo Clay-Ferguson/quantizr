@@ -1038,6 +1038,10 @@ input[type="radio"] {
 
 .rowTypeIcon {
     vertical-align: middle;
+    border: 2px solid gray;
+    padding: 6px;
+    border-radius: $border-radius;
+    cursor: pointer;
 }
 
 .rowTypeName {
@@ -1669,13 +1673,6 @@ i'm backing out for now
     font-size: 1.2rem;
     font-weight: 500;
     line-height: 1.2;
-}
-
-.typeIconAndName {
-    border: 2px solid gray;
-    padding: 6px;
-    border-radius: $border-radius;
-    cursor: pointer;
 }
 
 .friendListText {

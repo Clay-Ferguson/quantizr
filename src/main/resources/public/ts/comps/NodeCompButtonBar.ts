@@ -39,8 +39,6 @@ export class NodeCompButtonBar extends Div {
         }
 
         let typeIcon: Icon;
-        let typeNameSpan: Span;
-        let typeSpan: Span;
         let encIcon: Icon;
         let sharedIcon: Icon;
         let openButton: Button;
@@ -59,27 +57,14 @@ export class NodeCompButtonBar extends Div {
 
         if (state.userPreferences.editMode) {
             if (typeHandler) {
-                let typeName = typeHandler.getName();
                 let iconClass = typeHandler.getIconClass();
                 if (iconClass) {
                     typeIcon = new Icon({
-                        className: iconClass + " rowTypeIcon"
-                    });
-                }
-
-                if (typeName && typeName !== "Markdown") {
-                    // todo-0: (make a decision here, this can be simplified.)
-                    // this is too redundant. commenting to be sure i like without.
-                    // typeNameSpan = new Span(typeName, { className: "rowTypeName" });
-                }
-
-                if (typeIcon || typeNameSpan) {
-                    typeSpan = new Span(null, {
-                        className: "typeIconAndName",
+                        className: iconClass + " rowTypeIcon",
                         title: "Node Type: " + typeHandler.getName(),
                         onMouseOver: () => { S.meta64.draggableId = node.id; },
                         onMouseOut: () => { S.meta64.draggableId = null; }
-                    }, [typeIcon, typeNameSpan]);
+                    });
                 }
             }
         }
@@ -340,6 +325,6 @@ export class NodeCompButtonBar extends Div {
             buttonBar = null;
         }
 
-        this.setChildren([selButton, openButton, typeSpan, encIcon, sharedIcon, buttonBar, navButtonBar]);
+        this.setChildren([selButton, openButton, typeIcon, encIcon, sharedIcon, buttonBar, navButtonBar]);
     }
 }
