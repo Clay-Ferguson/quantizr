@@ -72,8 +72,10 @@ export class Meta64 implements Meta64Intf {
         new MainTabComp(),
         new SearchView(),
         new TimelineView(),
-        new FeedView(),
-        this.logView
+        new FeedView()
+
+        // LogView not currently used (was basically an experiment)
+        // this.logView
     ];
 
     sendTestEmail = (): void => {

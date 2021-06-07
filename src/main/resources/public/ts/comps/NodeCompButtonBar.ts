@@ -318,17 +318,15 @@ export class NodeCompButtonBar extends Div {
                     });
                 }
 
-                if (!state.isAnonUser) {
-                    searchButton = new IconButton("fa-search", null, {
-                        onClick: S.nav.runSearch,
-                        title: "Search underneath Node"
-                    });
+                searchButton = new IconButton("fa-search", null, {
+                    onClick: S.nav.runSearch,
+                    title: "Search underneath Node"
+                });
 
-                    timelineButton = new IconButton("fa-clock-o", null, {
-                        onClick: S.nav.runTimeline,
-                        title: "View Timeline (by Mod Time)"
-                    });
-                }
+                timelineButton = new IconButton("fa-clock-o", null, {
+                    onClick: S.nav.runTimeline,
+                    title: "View Timeline (by Mod Time)"
+                });
             }
 
             navButtonBar = new ButtonBar([searchButton, timelineButton, upLevelButton, prevButton, nextButton],

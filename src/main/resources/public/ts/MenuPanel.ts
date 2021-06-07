@@ -253,25 +253,19 @@ export class MenuPanel extends Div {
 
         children.push(new Menu("Search", [
 
-            new MenuItem("By Content", MenuPanel.searchByContent, //
-                !state.isAnonUser && !!hltNode), //
+            new MenuItem("By Content", MenuPanel.searchByContent, !!hltNode), //
 
-            new MenuItem("By Node Name", MenuPanel.searchByName, //
-                !state.isAnonUser && !!hltNode), //
+            new MenuItem("By Node Name", MenuPanel.searchByName, !!hltNode), //
 
-            new MenuItem("By Node ID", MenuPanel.searchById, //
-                !state.isAnonUser && !!hltNode) //
+            new MenuItem("By Node ID", MenuPanel.searchById, !!hltNode) //
 
             // new MenuItem("Files", nav.searchFiles, () => { return  !state.isAnonUser && S.meta64.allowFileSystemSearch },
             //    () => { return  !state.isAnonUser && S.meta64.allowFileSystemSearch })
         ]));
 
         children.push(new Menu("Timeline", [
-            new MenuItem("Created", MenuPanel.timelineByCreated, //
-                !state.isAnonUser && !!hltNode), //
-
-            new MenuItem("Modified", MenuPanel.timelineByModified, //
-                !state.isAnonUser && !!hltNode) //
+            new MenuItem("Created", MenuPanel.timelineByCreated, !!hltNode), //
+            new MenuItem("Modified", MenuPanel.timelineByModified, !!hltNode) //
         ]));
 
         children.push(new Menu("Calendar", [
