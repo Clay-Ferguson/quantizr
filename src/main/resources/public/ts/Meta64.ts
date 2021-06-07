@@ -292,11 +292,11 @@ export class Meta64 implements Meta64Intf {
         }
 
         if (!node) {
-            node = state.timelineResults.find(n => n.id === nodeId);
+            node = state.timelineInfo.results.find(n => n.id === nodeId);
         }
 
         if (!node) {
-            node = state.searchResults.find(n => n.id === nodeId);
+            node = state.searchInfo.results.find(n => n.id === nodeId);
         }
         return node;
     }

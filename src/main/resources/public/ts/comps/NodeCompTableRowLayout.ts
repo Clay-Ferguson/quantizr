@@ -121,7 +121,7 @@ export class NodeCompTableRowLayout extends Div {
 
             if (this.level <= 1) {
 
-                // todo-0: this button should have same enablement as "new" button, on the page root
+                // todo-1: this button should have same enablement as "new" button, on the page root
                 let btn = new IconButton("fa-plus", null, {
                     onClick: e => {
                         if (lastNode) {

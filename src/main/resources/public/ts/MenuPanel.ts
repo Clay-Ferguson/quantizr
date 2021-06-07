@@ -61,12 +61,12 @@ export class MenuPanel extends Div {
     static searchByName = () => { new SearchByNameDlg(appState(null)).open(); }
     static searchById = () => { new SearchByIDDlg(appState(null)).open(); };
     static findUsers = () => { new SearchUsersDlg(appState(null)).open(); };
-    static timelineByCreated = () => S.srch.timeline("ctm", appState(null), null, "Rev-chron by Create Time");
-    static timelineByModified = () => S.srch.timeline("mtm", appState(null), null, "Rev-chron by Modify Time");
+    static timelineByCreated = () => S.srch.timeline(null, "ctm", appState(null), null, "Rev-chron by Create Time", 0);
+    static timelineByModified = () => S.srch.timeline(null, "mtm", appState(null), null, "Rev-chron by Modify Time", 0);
     static showCalendar = () => { S.render.showCalendar(null, appState(null)); }
-    static calendarFutureDates = () => S.srch.timeline("prp.date.value", appState(null), "futureOnly", "Future calendar dates (Soonest at the top)");
-    static calendarPastDates = () => S.srch.timeline("prp.date.value", appState(null), "pastOnly", "Past calendar dates (Newest at the top)");
-    static calendarAllDates = () => S.srch.timeline("prp.date.value", appState(null), "all", "All calendar dates");
+    static calendarFutureDates = () => S.srch.timeline(null, "prp.date.value", appState(null), "futureOnly", "Future calendar dates (Soonest at the top)", 0);
+    static calendarPastDates = () => S.srch.timeline(null, "prp.date.value", appState(null), "pastOnly", "Past calendar dates (Newest at the top)", 0);
+    static calendarAllDates = () => S.srch.timeline(null, "prp.date.value", appState(null), "all", "All calendar dates", 0);
     static toolsShowGraph = () => S.render.showGraph(null, null, appState(null));
     static toolsShowClipboard = () => S.edit.saveClipboardToChildNode("~" + J.NodeType.NOTES);
     static import = () => S.edit.openImportDlg(appState(null));
@@ -256,10 +256,10 @@ export class MenuPanel extends Div {
             new MenuItem("By Content", MenuPanel.searchByContent, //
                 !state.isAnonUser && !!hltNode), //
 
-            new MenuItem("By Name", MenuPanel.searchByName, //
+            new MenuItem("By Node Name", MenuPanel.searchByName, //
                 !state.isAnonUser && !!hltNode), //
 
-            new MenuItem("By ID", MenuPanel.searchById, //
+            new MenuItem("By Node ID", MenuPanel.searchById, //
                 !state.isAnonUser && !!hltNode) //
 
             // new MenuItem("Files", nav.searchFiles, () => { return  !state.isAnonUser && S.meta64.allowFileSystemSearch },

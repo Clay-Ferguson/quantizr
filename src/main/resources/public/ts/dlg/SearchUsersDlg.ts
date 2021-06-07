@@ -1,7 +1,6 @@
 import { AppState } from "../AppState";
 import { Constants as C } from "../Constants";
 import { DialogBase } from "../DialogBase";
-import * as J from "../JavaIntf";
 import { PubSub } from "../PubSub";
 import { Singletons } from "../Singletons";
 import { ValidatedState } from "../ValidatedState";
@@ -15,7 +14,6 @@ import { HorizontalLayout } from "../widget/HorizontalLayout";
 import { RadioButton } from "../widget/RadioButton";
 import { RadioButtonGroup } from "../widget/RadioButtonGroup";
 import { TextField } from "../widget/TextField";
-import { MessageDlg } from "./MessageDlg";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
@@ -30,7 +28,6 @@ export class SearchUsersDlg extends DialogBase {
 
     constructor(state: AppState) {
         super("Search Users", "app-modal-content-medium-width", null, state);
-        S.srch.searchText = null;
 
         this.whenElm((elm: HTMLElement) => {
             this.searchTextField.focus();
@@ -140,30 +137,11 @@ export class SearchUsersDlg extends DialogBase {
             return;
         }
 
-        SearchUsersDlg.defaultSearchText = S.srch.searchText = this.searchTextState.getValue();
+        SearchUsersDlg.defaultSearchText = this.searchTextState.getValue();
 
-        S.util.ajax<J.NodeSearchRequest, J.NodeSearchResponse>("nodeSearch", {
-            nodeId: node.id,
-            searchText: SearchUsersDlg.defaultSearchText,
-            sortDir: "DESC",
-            sortField: "mtm",
-            searchProp: "",
-            fuzzy: this.getState().fuzzy,
-            caseSensitive: this.getState().caseSensitive,
-            userSearchType: this.getState().userSearchType,
-            searchDefinition: "",
-            timeRangeType: null
-        }, (res) => this.searchNodesResponse(res, node));
-    }
-
-    searchNodesResponse = (res: J.NodeSearchResponse, node: J.NodeInfo) => {
-        if (S.srch.numSearchResults(res) > 0) {
-            let desc = "Search of Users for: " + SearchUsersDlg.defaultSearchText;
-            S.srch.searchNodesResponse(res, desc, true, node);
-            this.close();
-        }
-        else {
-            new MessageDlg("No search results found.", "Search", null, null, false, 0, this.appState).open();
-        }
+        let desc = "User " + SearchUsersDlg.defaultSearchText;
+        S.srch.search(node, "", SearchUsersDlg.defaultSearchText, this.appState, this.getState().userSearchType, desc,
+            this.getState().fuzzy,
+            this.getState().caseSensitive, 0, this.close);
     }
 }

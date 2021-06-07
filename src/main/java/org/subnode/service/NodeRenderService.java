@@ -33,6 +33,7 @@ import org.subnode.request.RenderNodeRequest;
 import org.subnode.response.InitNodeEditResponse;
 import org.subnode.response.RenderCalendarResponse;
 import org.subnode.response.RenderNodeResponse;
+import org.subnode.util.Const;
 import org.subnode.util.Convert;
 import org.subnode.util.DateUtil;
 import org.subnode.util.ExUtil;
@@ -67,9 +68,6 @@ public class NodeRenderService {
 
 	@Autowired
 	private NodeRenderService render;
-
-	/* Note: this MUST match nav.ROWS_PER_PAGE variable in TypeScript */
-	private static int ROWS_PER_PAGE = 25;
 
 	private static RenderNodeResponse welcomePage;
 
@@ -201,11 +199,11 @@ public class NodeRenderService {
 			isWelcomePage = true;
 		}
 
-		int limit = ROWS_PER_PAGE;
+		int limit = Const.ROWS_PER_PAGE;
 		if (node != null) {
 			// add pageSize hack to docs and admin part of user guide.
 			Long pageSize = node.getIntProp("pageSize");
-			if (pageSize != null && pageSize.intValue() > ROWS_PER_PAGE) {
+			if (pageSize != null && pageSize.intValue() > Const.ROWS_PER_PAGE) {
 				limit = pageSize.intValue();
 			}
 		}

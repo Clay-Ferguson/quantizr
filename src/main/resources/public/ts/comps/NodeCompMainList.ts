@@ -77,7 +77,7 @@ export class NodeCompMainList extends Div {
         }
 
         if (firstButton || prevButton || nextButton) {
-            children.push(new ButtonBar([firstButton, prevButton, nextButton], "text-center marginTop marginBottom"));
+            children.push(new ButtonBar([firstButton, prevButton, nextButton], "text-center"));
             children.push(new Div(null, { className: "clearfix" }));
         }
     }

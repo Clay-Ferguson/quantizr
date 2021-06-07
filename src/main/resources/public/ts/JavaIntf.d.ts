@@ -115,6 +115,7 @@ export interface GetServerInfoRequest extends RequestBase {
 }
 
 export interface GetSharedNodesRequest extends RequestBase {
+    page: number;
     nodeId: string;
     shareTarget: string;
     accessOption: string;
@@ -200,6 +201,7 @@ export interface NodeFeedRequest extends RequestBase {
 }
 
 export interface NodeSearchRequest extends RequestBase {
+    page: number;
     sortDir: string;
     sortField: string;
     nodeId: string;

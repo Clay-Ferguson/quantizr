@@ -76,27 +76,8 @@ export class SearchByIDDlg extends DialogBase {
 
         SearchByIDDlg.defaultSearchText = this.searchTextState.getValue();
 
-        S.util.ajax<J.NodeSearchRequest, J.NodeSearchResponse>("nodeSearch", {
-            nodeId: node.id,
-            searchText: SearchByIDDlg.defaultSearchText,
-            sortDir: "DESC",
-            sortField: "mtm",
-            searchProp: "node.id",
-            fuzzy: false,
-            caseSensitive: false,
-            searchDefinition: "",
-            userSearchType: null,
-            timeRangeType: null
-        }, (res) => this.searchNodesResponse(res, node));
-    }
-
-    searchNodesResponse = (res: J.NodeSearchResponse, node: J.NodeInfo) => {
-        if (S.srch.numSearchResults(res) > 0) {
-            S.srch.searchNodesResponse(res, "Showing search for ID " + SearchByIDDlg.defaultSearchText, false, node);
-            this.close();
-        }
-        else {
-            new MessageDlg("No search results found.", "Search", null, null, false, 0, this.appState).open();
-        }
+        let desc = "For ID: " + SearchByIDDlg.defaultSearchText;
+        S.srch.search(node, "node.id", SearchByIDDlg.defaultSearchText, this.appState, null, desc, false,
+            false, 0, this.close);
     }
 }

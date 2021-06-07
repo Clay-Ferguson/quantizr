@@ -152,8 +152,8 @@ public class MongoAuth {
 	}
 
 	/*
-	 * Returns a list of all user names that are shared to on this node, including
-	 * "public" if any are public.
+	 * Returns a list of all user names that are shared to on this node, including "public" if any are
+	 * public.
 	 */
 	public List<String> getUsersSharedTo(MongoSession session, SubNode node) {
 		List<String> userNames = null;
@@ -187,11 +187,10 @@ public class MongoAuth {
 	}
 
 	/*
-	 * When a child is created under a parent we want to default the sharing on the
-	 * child so that there's an explicit share to the parent which is redundant in
-	 * terms of sharing auth, but is necessary and desiret for User Feeds and social
-	 * media queries to work. Also we be sure to remove any share to 'child' user
-	 * that may be in the parent Acl, because that would represent 'child' not
+	 * When a child is created under a parent we want to default the sharing on the child so that
+	 * there's an explicit share to the parent which is redundant in terms of sharing auth, but is
+	 * necessary and desiret for User Feeds and social media queries to work. Also we be sure to remove
+	 * any share to 'child' user that may be in the parent Acl, because that would represent 'child' not
 	 * sharing to himselv which is never done.
 	 * 
 	 * session should be null, or else an existing admin session.
@@ -213,8 +212,8 @@ public class MongoAuth {
 		}
 
 		/*
-		 * Special case of replying to (appending under) a FRIEND-type node is always to
-		 * make this a private message to the user that friend node represents
+		 * Special case of replying to (appending under) a FRIEND-type node is always to make this a private
+		 * message to the user that friend node represents
 		 */
 		if (parent.getType().equals(NodeType.FRIEND.s())) {
 			// get user prop from node
@@ -268,9 +267,9 @@ public class MongoAuth {
 	}
 
 	/*
-	 * The way know a node is an account node is that it is its id matches its'
-	 * owner. Self owned node. This is because the very definition of the 'owner' on
-	 * any given node is the ID of the user's root node of the user who owns it
+	 * The way know a node is an account node is that it is its id matches its' owner. Self owned node.
+	 * This is because the very definition of the 'owner' on any given node is the ID of the user's root
+	 * node of the user who owns it
 	 */
 	public boolean isAnAccountNode(MongoSession session, SubNode node) {
 		return node.getId().toHexString().equals(node.getOwner().toHexString());
@@ -341,17 +340,15 @@ public class MongoAuth {
 			log.trace("Checking fullPath: " + fullPathStr);
 
 			/*
-			 * NOTE: This nodesByPath caching is the key to good performance in doing our
-			 * hierarchical authorization lookups.
+			 * NOTE: This nodesByPath caching is the key to good performance in doing our hierarchical
+			 * authorization lookups.
 			 * 
-			 * get node from cache if possible. Note: This cache does have the slight
-			 * imperfection that it assumes once it reads a node for the purposes of
-			 * checking auth (acl) then within the context of the same transaction it can
-			 * always use that same node again meaning the security context on the node
-			 * can't have changed DURING the request. This is fine because we never update
-			 * security on a node and then expect ourselves to find different security on
-			 * the node all within the context of the same HTTP request. Because the only
-			 * user who can update the security is the owner anyway.
+			 * get node from cache if possible. Note: This cache does have the slight imperfection that it
+			 * assumes once it reads a node for the purposes of checking auth (acl) then within the context of
+			 * the same transaction it can always use that same node again meaning the security context on the
+			 * node can't have changed DURING the request. This is fine because we never update security on a
+			 * node and then expect ourselves to find different security on the node all within the context of
+			 * the same HTTP request. Because the only user who can update the security is the owner anyway.
 			 */
 			SubNode tryNode = MongoThreadLocal.getNodesByPath().get(fullPathStr);
 
@@ -382,9 +379,9 @@ public class MongoAuth {
 	}
 
 	/*
-	 * NOTE: It is the normal flow that we expect sessionUserNodeId to be null for
-	 * any anonymous requests and this is fine because we are basically going to
-	 * only be pulling 'public' acl to check, and this is by design.
+	 * NOTE: It is the normal flow that we expect sessionUserNodeId to be null for any anonymous
+	 * requests and this is fine because we are basically going to only be pulling 'public' acl to
+	 * check, and this is by design.
 	 */
 	public boolean nodeAuth(SubNode node, String sessionUserNodeId, List<PrivilegeType> privs) {
 		log.trace("nodeAuth: nodeId: " + node.getId().toHexString());
@@ -403,8 +400,8 @@ public class MongoAuth {
 		}
 
 		/*
-		 * We always add on any privileges assigned to the PUBLIC when checking privs
-		 * for this user, becasue the auth equivalent is really the union of this set.
+		 * We always add on any privileges assigned to the PUBLIC when checking privs for this user, becasue
+		 * the auth equivalent is really the union of this set.
 		 */
 		AccessControl acPublic = acl.get(PrincipalName.PUBLIC.s());
 		String privsForPublic = acPublic != null ? acPublic.getPrvs() : null;
@@ -438,8 +435,8 @@ public class MongoAuth {
 		}
 
 		/*
-		 * I'd like this to not be created unless needed but that pesky lambda below
-		 * needs a 'final' thing to work with.
+		 * I'd like this to not be created unless needed but that pesky lambda below needs a 'final' thing
+		 * to work with.
 		 */
 		List<AccessControlInfo> ret = new LinkedList<>();
 
@@ -485,12 +482,12 @@ public class MongoAuth {
 	// ========================================================================
 
 	/*
-	 * Finds all subnodes that have a share targeting the sharedToAny (account node
-	 * IDs of a person being shared with), regardless of the type of share 'rd,rw'.
-	 * To find public shares pass 'public' in sharedTo instead
+	 * Finds all subnodes that have a share targeting the sharedToAny (account node IDs of a person
+	 * being shared with), regardless of the type of share 'rd,rw'. To find public shares pass 'public'
+	 * in sharedTo instead
 	 */
-	public Iterable<SubNode> searchSubGraphByAclUser(MongoSession session, String pathToSearch,
-			List<String> sharedToAny, Sort sort, int limit, ObjectId ownerIdMatch) {
+	public Iterable<SubNode> searchSubGraphByAclUser(MongoSession session, String pathToSearch, List<String> sharedToAny,
+			Sort sort, int limit, ObjectId ownerIdMatch) {
 
 		update.saveSession(session);
 		Query query = subGraphByAclUser_query(session, pathToSearch, sharedToAny, ownerIdMatch);
@@ -506,9 +503,9 @@ public class MongoAuth {
 	}
 
 	/*
-	 * counts all subnodes that have a share targeting the sharedTo (account node ID
-	 * of a person being shared with), regardless of the type of share 'rd,rw'. To
-	 * find public shares pass 'public' in sharedTo instead
+	 * counts all subnodes that have a share targeting the sharedTo (account node ID of a person being
+	 * shared with), regardless of the type of share 'rd,rw'. To find public shares pass 'public' in
+	 * sharedTo instead
 	 */
 	public long countSubGraphByAclUser(MongoSession session, String pathToSearch, List<String> sharedToAny,
 			ObjectId ownerIdMatch) {
@@ -553,7 +550,7 @@ public class MongoAuth {
 	// ========================================================================
 
 	/* Finds nodes that have any sharing on them at all */
-	public Iterable<SubNode> searchSubGraphByAcl(MongoSession session, String pathToSearch, ObjectId ownerIdMatch,
+	public Iterable<SubNode> searchSubGraphByAcl(MongoSession session, int skip, String pathToSearch, ObjectId ownerIdMatch,
 			Sort sort, int limit) {
 		update.saveSession(session);
 		Query query = subGraphByAcl_query(session, pathToSearch, ownerIdMatch);
@@ -561,6 +558,11 @@ public class MongoAuth {
 		if (sort != null) {
 			query.with(sort);
 		}
+
+		if (skip > 0) {
+			query.skip(skip);
+		}
+
 		query.limit(limit);
 		return util.find(query);
 	}
@@ -580,9 +582,9 @@ public class MongoAuth {
 		}
 
 		/*
-		 * This regex finds all that START WITH path, have some characters after path,
-		 * before the end of the string. Without the trailing (.+)$ we would be
-		 * including the node itself in addition to all its children.
+		 * This regex finds all that START WITH path, have some characters after path, before the end of the
+		 * string. Without the trailing (.+)$ we would be including the node itself in addition to all its
+		 * children.
 		 */
 		Criteria criteria = Criteria.where(SubNode.FIELD_PATH).regex(util.regexRecursiveChildrenOfPath(pathToSearch)) //
 				.and(SubNode.FIELD_AC).ne(null);
@@ -606,8 +608,8 @@ public class MongoAuth {
 		/*
 		 * Anonymous
 		 * 
-		 * If username is null or anonymous, we assume anonymous is acceptable and
-		 * return anonymous session or else we check the credentials.
+		 * If username is null or anonymous, we assume anonymous is acceptable and return anonymous session
+		 * or else we check the credentials.
 		 */
 		if (PrincipalName.ANON.s().equals(userName)) {
 			session = MongoSession.createFromUser(PrincipalName.ANON.s());
@@ -653,9 +655,8 @@ public class MongoAuth {
 		if (success) {
 			SessionContext sc = ThreadLocals.getSessionContext();
 			/*
-			 * if we get here then userName and password are guaranteed valid, and this
-			 * should be the only place in our code where we set userName or password on any
-			 * sessionContext object
+			 * if we get here then userName and password are guaranteed valid, and this should be the only place
+			 * in our code where we set userName or password on any sessionContext object
 			 */
 			sc.setUserName(userName);
 			sc.setPassword(password);
@@ -694,10 +695,9 @@ public class MongoAuth {
 	}
 
 	/*
-	 * Parses all mentions (like '@bob@server.com') in the node content text and
-	 * adds them (if not existing) to the node sharing on the node, which ensures
-	 * the person mentioned has visibility of this node and that it will also appear
-	 * in their FEED listing
+	 * Parses all mentions (like '@bob@server.com') in the node content text and adds them (if not
+	 * existing) to the node sharing on the node, which ensures the person mentioned has visibility of
+	 * this node and that it will also appear in their FEED listing
 	 */
 	public HashSet<String> saveMentionsToNodeACL(MongoSession session, SubNode node) {
 		HashSet<String> mentionsSet = parseMentions(node.getContent());
@@ -710,15 +710,14 @@ public class MongoAuth {
 			SubNode acctNode = read.getUserNodeByUserName(session, userName);
 
 			/*
-			 * If this is a foreign 'mention' user name that is not imported into our
-			 * system, we auto-import that user now
+			 * If this is a foreign 'mention' user name that is not imported into our system, we auto-import
+			 * that user now
 			 */
 			if (StringUtils.countMatches(userName, "@") == 1) {
 				/*
-				 * todo-2: WARNING: this sets off a chain reaction of fediverse crawling!!
-				 * Unless/until you invent some way to stop that (or decide you WANT a
-				 * FediCrawler) then keep this commented out. Don't delete this code until you
-				 * think this thru more.
+				 * todo-2: WARNING: this sets off a chain reaction of fediverse crawling!! Unless/until you invent
+				 * some way to stop that (or decide you WANT a FediCrawler) then keep this commented out. Don't
+				 * delete this code until you think this thru more.
 				 */
 				// if (acctNode == null) {
 				// acctNode = actPub.loadForeignUserByUserName(session, userName);
@@ -730,8 +729,8 @@ public class MongoAuth {
 				String acctNodeId = acctNode.getId().toHexString();
 				if (ac == null || !ac.containsKey(acctNodeId)) {
 					/*
-					 * Lazy create 'ac' so that the net result of this method is never to assign non
-					 * null when it could be left null
+					 * Lazy create 'ac' so that the net result of this method is never to assign non null when it could
+					 * be left null
 					 */
 					if (ac == null) {
 						ac = new HashMap<String, AccessControl>();

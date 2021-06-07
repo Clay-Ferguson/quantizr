@@ -158,9 +158,7 @@ public class AclService {
 	public boolean addPrivilege(MongoSession session, SubNode node, String principal, List<String> privileges,
 			AddPrivilegeResponse res) {
 
-		log.debug("addPrivilege to node: " + node.getId().toHexString() + " principal=" + principal);
-
-		if (principal == null)
+		if (principal == null || node == null)
 			return false;
 		principal = principal.trim();
 

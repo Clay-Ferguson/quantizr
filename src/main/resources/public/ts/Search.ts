@@ -4,6 +4,7 @@ import { NodeCompContent } from "./comps/NodeCompContent";
 import { NodeCompRowFooter } from "./comps/NodeCompRowFooter";
 import { NodeCompRowHeader } from "./comps/NodeCompRowHeader";
 import { Constants as C } from "./Constants";
+import { MessageDlg } from "./dlg/MessageDlg";
 import { SearchIntf } from "./intf/SearchIntf";
 import * as J from "./JavaIntf";
 import { PubSub } from "./PubSub";
@@ -20,12 +21,6 @@ export class Search implements SearchIntf {
 
     _UID_ROWID_PREFIX: string = "srch_row_";
 
-    searchNodes: any = null;
-    searchText: string = null;
-
-    searchOffset = 0;
-    timelineOffset = 0;
-
     /*
      * Will be the last row clicked on (NodeInfo.java object) and having the red highlight bar
      */
@@ -33,31 +28,110 @@ export class Search implements SearchIntf {
 
     idToNodeMap: Map<string, J.NodeInfo> = new Map<string, J.NodeInfo>();
 
-    numSearchResults = (res: J.NodeSearchResponse): number => {
-        return !!res && //
-            !!res.searchResults && //
-            !!res.searchResults.length //
-            ? res.searchResults.length : 0;
+    numSearchResults = (results: J.NodeInfo[]): number => {
+        return results ? results.length : 0;
     }
 
-    searchNodesResponse = (res: J.NodeSearchResponse, searchDescription: string, isUserSearch: boolean, searchNode: J.NodeInfo) => {
-        dispatch("Action_RenderSearchResults", (s: AppState): AppState => {
-            s.searchResults = res.searchResults;
-            s.isUserSearch = isUserSearch;
-            s.searchDescription = searchDescription;
-            s.searchNode = searchNode;
-            S.meta64.selectTabStateOnly("searchTab", s);
-            return s;
+    searchPageChange = (state: AppState, pageDelta: number): void => {
+        switch (state.searchInfo.searchType) {
+            case "normalSearch":
+                this.search(state.searchInfo.node,
+                    state.searchInfo.prop,
+                    state.searchInfo.searchText,
+                    state,
+                    state.searchInfo.userSearchType,
+                    state.searchInfo.description,
+                    state.searchInfo.fuzzy,
+                    state.searchInfo.caseSensitive,
+                    pageDelta === 0 ? 0 : state.searchInfo.page + pageDelta,
+                    null);
+                break;
+
+            case "findSharedNodes":
+                this.findSharedNodes(state.searchInfo.node,
+                    pageDelta === 0 ? 0 : state.searchInfo.page + pageDelta,
+                    state.searchInfo.shareNodesType,
+                    state.searchInfo.shareTarget,
+                    state.searchInfo.accessOption,
+                    state);
+                break;
+
+            default: break;
+        }
+    }
+
+    findSharedNodes = (node: J.NodeInfo, page: number, type: string, shareTarget: string, accessOption: string, state: AppState): void => {
+        S.util.ajax<J.GetSharedNodesRequest, J.GetSharedNodesResponse>("getSharedNodes", {
+            page,
+            nodeId: node.id,
+            shareTarget,
+            accessOption
+        }, (res) => {
+            if (this.numSearchResults(res.searchResults) > 0) {
+                dispatch("Action_RenderSearchResults", (s: AppState): AppState => {
+                    s.searchInfo.searchType = "findSharedNodes";
+                    s.searchInfo.results = res.searchResults;
+                    s.searchInfo.page = page;
+                    s.searchInfo.description = "Showing " + type + " shared nodes";
+                    s.searchInfo.node = node;
+                    s.searchInfo.shareTarget = shareTarget;
+                    s.searchInfo.accessOption = accessOption;
+                    s.searchInfo.endReached = !res.searchResults || res.searchResults.length < S.nav.ROWS_PER_PAGE;
+                    S.meta64.selectTabStateOnly("searchTab", s);
+                    return s;
+                });
+            }
+            else {
+                new MessageDlg("No search results found for " + type + " shared nodes", "Search", null, null, false, 0, state).open();
+            }
         });
     }
 
-    timelineResponse = (res: J.NodeSearchResponse, timelineDescription: string, timelineNode: J.NodeInfo) => {
-        dispatch("Action_RenderTimelineResults", (s: AppState): AppState => {
-            s.timelineResults = res.searchResults;
-            s.timelineDescription = timelineDescription;
-            s.timelineNode = timelineNode;
-            S.meta64.selectTabStateOnly("timelineTab", s);
-            return s;
+    search = (node: J.NodeInfo, prop: string, searchText: string, state: AppState, userSearchType: string, description: string, fuzzy: boolean, caseSensitive: boolean, page: number, successCallback: Function): void => {
+        if (!node) {
+            node = S.meta64.getHighlightedNode(state);
+        }
+
+        S.util.ajax<J.NodeSearchRequest, J.NodeSearchResponse>("nodeSearch", {
+            page,
+            nodeId: node.id,
+            searchText,
+            sortDir: "DESC",
+            sortField: "mtm",
+            searchProp: prop,
+            fuzzy,
+            caseSensitive,
+            userSearchType,
+            searchDefinition: "",
+            timeRangeType: null
+        }, (res) => {
+            if (this.numSearchResults(res.searchResults) > 0) {
+                if (successCallback) {
+                    successCallback();
+                }
+
+                dispatch("Action_RenderSearchResults", (s: AppState): AppState => {
+                    s.searchInfo.searchType = "normalSearch";
+                    s.searchInfo.results = res.searchResults;
+                    s.searchInfo.page = page;
+                    s.searchInfo.userSearchType = userSearchType;
+                    s.searchInfo.description = description;
+                    s.searchInfo.node = node;
+                    s.searchInfo.searchText = searchText;
+                    s.searchInfo.fuzzy = fuzzy;
+                    s.searchInfo.caseSensitive = caseSensitive;
+                    s.searchInfo.prop = prop;
+                    s.searchInfo.endReached = !res.searchResults || res.searchResults.length < S.nav.ROWS_PER_PAGE;
+
+                    S.meta64.selectTabStateOnly("searchTab", s);
+                    return s;
+                });
+            }
+            else {
+                if (successCallback) {
+                    new MessageDlg("No search results found.", "Search", null, null, false, 0, state).open();
+                }
+            }
         });
     }
 
@@ -74,15 +148,25 @@ export class Search implements SearchIntf {
         }, (res) => { S.nav.navPageNodeResponse(res, state); });
     }
 
+    timelinePageChange = (state: AppState, pageDelta: number) => {
+        this.timeline(state.timelineInfo.node, state.timelineInfo.prop, state, state.timelineInfo.timeRangeType,
+            state.timelineInfo.description,
+            pageDelta === 0 ? 0 : state.timelineInfo.page + pageDelta);
+    }
+
     /* prop = mtm (modification time) | ctm (create time) */
-    timeline = (prop: string, state: AppState, timeRangeType: string, timelineDescription: string) => {
-        const node = S.meta64.getHighlightedNode(state);
+    timeline = (node: J.NodeInfo, prop: string, state: AppState, timeRangeType: string, timelineDescription: string, page: number) => {
+        if (!node) {
+            node = S.meta64.getHighlightedNode(state);
+        }
+
         if (!node) {
             S.util.showMessage("No node is selected to 'timeline' under.", "Warning");
             return;
         }
 
         S.util.ajax<J.NodeSearchRequest, J.NodeSearchResponse>("nodeSearch", {
+            page,
             nodeId: node.id,
             searchText: "",
             sortDir: "DESC",
@@ -93,7 +177,20 @@ export class Search implements SearchIntf {
             searchDefinition: "timeline",
             userSearchType: null,
             timeRangeType
-        }, (res) => { this.timelineResponse(res, timelineDescription, node); });
+        }, (res) => {
+            dispatch("Action_RenderTimelineResults", (s: AppState): AppState => {
+                s.timelineInfo.results = res.searchResults;
+                s.timelineInfo.description = timelineDescription;
+                s.timelineInfo.prop = prop;
+                s.timelineInfo.timeRangeType = timeRangeType;
+                s.timelineInfo.node = node;
+                s.timelineInfo.endReached = !res.searchResults || res.searchResults.length < S.nav.ROWS_PER_PAGE;
+                s.timelineInfo.page = page;
+
+                S.meta64.selectTabStateOnly("timelineTab", s);
+                return s;
+            });
+        });
     }
 
     feed = (nodeId: string, feedUserName: string, page: number, searchText: string) => {

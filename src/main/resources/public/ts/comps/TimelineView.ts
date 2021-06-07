@@ -7,6 +7,7 @@ import { Singletons } from "../Singletons";
 import { Anchor } from "../widget/Anchor";
 import { AppTab } from "../widget/AppTab";
 import { Comp } from "../widget/base/Comp";
+import { ButtonBar } from "../widget/ButtonBar";
 import { Div } from "../widget/Div";
 import { Heading } from "../widget/Heading";
 import { IconButton } from "../widget/IconButton";
@@ -31,7 +32,7 @@ export class TimelineView extends AppTab {
     getTabButton(state: AppState): Li {
         return new Li(null, {
             className: "nav-item navItem",
-            style: { display: state.timelineResults ? "inline" : "none" },
+            style: { display: state.timelineInfo.results ? "inline" : "none" },
             onClick: this.handleClick
         }, [
             new Anchor("#timelineTab", "Timeline", {
@@ -43,7 +44,7 @@ export class TimelineView extends AppTab {
 
     preRender(): void {
         let state: AppState = useSelector((state: AppState) => state);
-        let results = state.timelineResults;
+        let results = state.timelineInfo.results;
 
         this.attribs.className = "tab-pane fade my-tab-pane";
         if (state.activeTab === this.getId()) {
@@ -63,22 +64,24 @@ export class TimelineView extends AppTab {
         let rowCount = 0;
         let children: Comp[] = [];
 
-        if (state.timelineDescription && state.timelineNode) {
-            let timelineText = S.util.getShortContent(state.timelineNode.content);
+        if (state.timelineInfo.description && state.timelineInfo.node) {
+            let timelineText = S.util.getShortContent(state.timelineInfo.node.content);
             children.push(new Div(null, null, [
                 new Div(null, { className: "marginBottom" }, [
                     new Heading(4, "Timeline", { className: "resultsTitle" }),
                     new Span(null, { className: "float-right" }, [
                         new IconButton("fa-arrow-left", "Back", {
-                            onClick: () => S.view.refreshTree(state.timelineNode.id, true, true, state.timelineNode.id, false, true, true, state),
+                            onClick: () => S.view.refreshTree(state.timelineInfo.node.id, true, true, state.timelineInfo.node.id, false, true, true, state),
                             title: "Back to Node"
                         })
                     ])
                 ]),
                 new TextContent(timelineText, "resultsContentHeading alert alert-secondary"),
-                new Div(state.timelineDescription)
+                new Div(state.timelineInfo.description)
             ]));
         }
+
+        this.addPaginationBar(state, children);
 
         let i = 0;
         results.forEach((node: J.NodeInfo) => {
@@ -89,6 +92,34 @@ export class TimelineView extends AppTab {
             rowCount++;
         });
 
+        this.addPaginationBar(state, children);
         this.setChildren(children);
+    }
+
+    addPaginationBar = (state: AppState, children: Comp[]): void => {
+
+        // this shows the page number. not needed. used for debugging.
+        // children.push(new Div("" + state.timelinePage + " endReached=" + state.timelineEndReached));
+
+        children.push(new ButtonBar([
+            state.timelineInfo.page > 1 ? new IconButton("fa-angle-double-left", null, {
+                onClick: () => {
+                    S.srch.timelinePageChange(state, 0);
+                },
+                title: "First Page"
+            }) : null,
+            state.timelineInfo.page > 0 ? new IconButton("fa-angle-left", null, {
+                onClick: () => {
+                    S.srch.timelinePageChange(state, -1);
+                },
+                title: "Previous Page"
+            }) : null,
+            !state.timelineInfo.endReached ? new IconButton("fa-angle-right", "More", {
+                onClick: (event) => {
+                    S.srch.timelinePageChange(state, 1);
+                },
+                title: "Next Page"
+            }) : null
+        ], "text-center marginBottom"));
     }
 }

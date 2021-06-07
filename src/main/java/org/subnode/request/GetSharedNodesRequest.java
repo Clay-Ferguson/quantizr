@@ -4,6 +4,8 @@ import org.subnode.request.base.RequestBase;
 
 public class GetSharedNodesRequest extends RequestBase {
 
+	private int page;
+
 	/* can be node id or path. server interprets correctly no matter which */
 	private String nodeId;
 
@@ -11,6 +13,14 @@ public class GetSharedNodesRequest extends RequestBase {
 	private String shareTarget;
 
 	private String accessOption; //for public can be rd, rw, or null (all)
+
+	public int getPage() {
+		return page;
+	}
+
+	public void setPage(int page) {
+		this.page = page;
+	}
 
 	public String getNodeId() {
 		return nodeId;

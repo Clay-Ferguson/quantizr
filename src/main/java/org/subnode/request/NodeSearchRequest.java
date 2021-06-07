@@ -4,6 +4,9 @@ import org.subnode.request.base.RequestBase;
 
 public class NodeSearchRequest extends RequestBase {
 
+	/* Zero offset page number. First page is zero */
+	private int page;
+
 	/* ascending=asc, descending=desc */
 	private String sortDir;
 
@@ -17,12 +20,13 @@ public class NodeSearchRequest extends RequestBase {
 
 	private String searchProp;
 
-	//fuzzy means you can get substring searches, where the substring is not on the FIRST characters of a term
+	// fuzzy means you can get substring searches, where the substring is not on the FIRST characters of
+	// a term
 	private boolean fuzzy;
 
 	private boolean caseSensitive;
 
-	//special definition name which gives the server a hint about what kind of search this is
+	// special definition name which gives the server a hint about what kind of search this is
 	private String searchDefinition;
 
 	private String userSearchType;
@@ -107,5 +111,13 @@ public class NodeSearchRequest extends RequestBase {
 
 	public void setTimeRangeType(String timeRangeType) {
 		this.timeRangeType = timeRangeType;
+	}
+
+	public int getPage() {
+		return page;
+	}
+
+	public void setPage(int page) {
+		this.page = page;
 	}
 }

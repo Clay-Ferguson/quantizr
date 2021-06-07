@@ -1021,34 +1021,36 @@ public class UserManagerService {
 	/*
 	 * For all foreign servers we remove posts that are older than a certain number of days just to keep
 	 * our DB from growing too large.
+	 * 
+	 * todo-0: Is this a dupliate of "ActPub Maintenance" menu option logic?
 	 */
 	public void cleanUserAccounts() {
 		// not currently used.
 		if (true)
 			return;
 
-		adminRunner.run(session -> {
-			final Iterable<SubNode> accountNodes =
-					read.getChildrenUnderParentPath(session, NodeName.ROOT_OF_ALL_USERS, null, null, 0, null, null);
+		// adminRunner.run(session -> {
+		// 	final Iterable<SubNode> accountNodes =
+		// 			read.getChildrenUnderParentPath(session, NodeName.ROOT_OF_ALL_USERS, null, null, 0, null, null);
 
-			for (final SubNode accountNode : accountNodes) {
-				String userName = accountNode.getStrProp(NodeProp.USER);
+		// 	for (final SubNode accountNode : accountNodes) {
+		// 		String userName = accountNode.getStrProp(NodeProp.USER);
 
-				// if account is a 'foreign server' one, then clean it up
-				if (userName != null) {
-					log.debug("userName: " + userName);
+		// 		// if account is a 'foreign server' one, then clean it up
+		// 		if (userName != null) {
+		// 			log.debug("userName: " + userName);
 
-					if (userName.contains("@")) {
-						log.debug("Foreign Accnt Kill: " + userName);
-						delete.delete(accountNode);
+		// 			if (userName.contains("@")) {
+		// 				log.debug("Foreign Accnt Kill: " + userName);
+		// 				delete.delete(accountNode);
 
-						// delete.cleanupOldTempNodesForUser(session, accountNode);
-					}
-				}
-			}
+		// 				// delete.cleanupOldTempNodesForUser(session, accountNode);
+		// 			}
+		// 		}
+		// 	}
 
-			apCache.usersPendingRefresh.clear();
-		});
+		// 	apCache.usersPendingRefresh.clear();
+		// });
 	}
 
 	public String getUserAccountsReport(MongoSession session) {

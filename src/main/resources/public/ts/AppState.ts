@@ -1,9 +1,9 @@
+import { EventInput } from "@fullcalendar/react";
+import clientInfo from "./ClientInfo";
+import { DialogBase } from "./DialogBase";
 import * as J from "./JavaIntf";
 import { NodeInfo } from "./JavaIntf";
-import { EventInput } from "@fullcalendar/react";
-import { DialogBase } from "./DialogBase";
-import { ProfileState } from "./comps/ProfileState";
-import clientInfo from "./ClientInfo";
+import { ResultSetInfo } from "./ResultSetInfo";
 
 /* root react Redux state for entire app */
 export class AppState {
@@ -63,15 +63,8 @@ export class AppState {
     node: J.NodeInfo;
     endReached: boolean;
 
-    searchResults: NodeInfo[];
-    searchDescription: string;
-    searchNode: J.NodeInfo;
-
-    isUserSearch: boolean = false;
-
-    timelineResults: NodeInfo[];
-    timelineDescription: string;
-    timelineNode: J.NodeInfo;
+    searchInfo: ResultSetInfo = new ResultSetInfo();
+    timelineInfo: ResultSetInfo = new ResultSetInfo();
 
     feedResults: NodeInfo[];
     feedEndReached: boolean = false;

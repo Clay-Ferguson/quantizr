@@ -46,13 +46,7 @@ export class Share implements ShareIntf {
             type = "appendable";
         }
 
-        S.util.ajax<J.GetSharedNodesRequest, J.GetSharedNodesResponse>("getSharedNodes", {
-            nodeId: focusNode.id,
-            shareTarget,
-            accessOption
-        }, (res) => {
-            S.srch.searchNodesResponse(res, "Showing " + type + " shared nodes under subgraph under node ID " + focusNode.id, false, focusNode);
-        });
+        S.srch.findSharedNodes(focusNode, 0, type, shareTarget, accessOption, state);
     }
 
     /* Whenever we share an encrypted node to a another user, this is the final operation we run which

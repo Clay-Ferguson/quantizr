@@ -35,6 +35,7 @@ import org.subnode.request.NodeSearchRequest;
 import org.subnode.response.GetNodeStatsResponse;
 import org.subnode.response.GetSharedNodesResponse;
 import org.subnode.response.NodeSearchResponse;
+import org.subnode.util.Const;
 import org.subnode.util.Convert;
 import org.subnode.util.EnglishDictionary;
 import org.subnode.util.ThreadLocals;
@@ -77,14 +78,13 @@ public class NodeSearchService {
 	// Warning: Do not add '#' or '@', those are special (see below)
 	static final String WORD_DELIMS = " \n\r\t,-;:\"'`()*{}[]<>=\\/.!?&“";
 
-	static final int TRENDING_LIMIT = 500;
+	static final int TRENDING_LIMIT = 1000;
 
 	public NodeSearchResponse search(MongoSession session, NodeSearchRequest req) {
 		NodeSearchResponse res = new NodeSearchResponse();
 		if (session == null) {
 			session = ThreadLocals.getMongoSession();
 		}
-		int MAX_NODES = 100;
 
 		String searchText = req.getSearchText();
 		if (StringUtils.isEmpty(searchText) && //
@@ -143,7 +143,7 @@ public class NodeSearchService {
 				}
 
 				final Iterable<SubNode> accountNodes = read.getChildrenUnderParentPath(session, NodeName.ROOT_OF_ALL_USERS, null,
-						null, 0, textCriteria, moreCriteria);
+						Const.ROWS_PER_PAGE, Const.ROWS_PER_PAGE * req.getPage(), textCriteria, moreCriteria);
 				/*
 				 * scan all userAccountNodes, and set a zero amount for those not found (which will be the correct
 				 * amount).
@@ -152,9 +152,6 @@ public class NodeSearchService {
 					NodeInfo info = convert.convertToNodeInfo(ThreadLocals.getSessionContext(), session, node, true, false,
 							counter + 1, false, false);
 					searchResults.add(info);
-					if (counter++ > MAX_NODES) {
-						break;
-					}
 				}
 			}
 			// else we're doing a normal subgraph search for the text
@@ -166,14 +163,11 @@ public class NodeSearchService {
 				}
 
 				for (SubNode node : read.searchSubGraph(session, searchRoot, req.getSearchProp(), searchText, req.getSortField(),
-						MAX_NODES, req.getFuzzy(), req.getCaseSensitive(), req.getTimeRangeType())) {
+						Const.ROWS_PER_PAGE, Const.ROWS_PER_PAGE * req.getPage(), req.getFuzzy(), req.getCaseSensitive(), req.getTimeRangeType())) {
 
 					NodeInfo info = convert.convertToNodeInfo(ThreadLocals.getSessionContext(), session, node, true, false,
 							counter + 1, false, false);
 					searchResults.add(info);
-					if (counter++ > MAX_NODES) {
-						break;
-					}
 				}
 			}
 		}
@@ -187,7 +181,6 @@ public class NodeSearchService {
 		if (session == null) {
 			session = ThreadLocals.getMongoSession();
 		}
-		int MAX_NODES = 100;
 
 		List<NodeInfo> searchResults = new LinkedList<>();
 		res.setSearchResults(searchResults);
@@ -209,8 +202,8 @@ public class NodeSearchService {
 		 * 2) all my shared nodes globally, and the globally is done simply by passing null for the path
 		 * here
 		 */
-		for (SubNode node : auth.searchSubGraphByAcl(session, searchRoot.getPath(), searchRoot.getOwner(),
-				Sort.by(Sort.Direction.DESC, SubNode.FIELD_MODIFY_TIME), MAX_NODES)) {
+		for (SubNode node : auth.searchSubGraphByAcl(session, req.getPage() * Const.ROWS_PER_PAGE, searchRoot.getPath(), searchRoot.getOwner(),
+				Sort.by(Sort.Direction.DESC, SubNode.FIELD_MODIFY_TIME), Const.ROWS_PER_PAGE)) {
 
 			if (node.getAc() == null || node.getAc().size() == 0)
 				continue;
@@ -244,9 +237,6 @@ public class NodeSearchService {
 			NodeInfo info = convert.convertToNodeInfo(ThreadLocals.getSessionContext(), session, node, true, false, counter + 1,
 					false, false);
 			searchResults.add(info);
-			if (counter++ > MAX_NODES) {
-				break;
-			}
 		}
 
 		res.setSuccess(true);

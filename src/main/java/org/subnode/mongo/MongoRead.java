@@ -565,7 +565,7 @@ public class MongoRead {
      * timeRangeType: futureOnly, pastOnly, all
      */
     public Iterable<SubNode> searchSubGraph(MongoSession session, SubNode node, String prop, String text, String sortField,
-            int limit, boolean fuzzy, boolean caseSensitive, String timeRangeType) {
+            int limit, int skip, boolean fuzzy, boolean caseSensitive, String timeRangeType) {
         auth.auth(session, node, PrivilegeType.READ);
 
         Query query = new Query();
@@ -573,6 +573,11 @@ public class MongoRead {
         if (limit > 0) {
             query.limit(limit);
         }
+
+        if (skip > 0) {
+            query.skip(skip);
+        }
+        
         /*
          * This regex finds all that START WITH path, have some characters after path, before the end of the
          * string. Without the trailing (.+)$ we would be including the node itself in addition to all its

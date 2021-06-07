@@ -1,7 +1,6 @@
 import { AppState } from "../AppState";
 import { Constants as C } from "../Constants";
 import { DialogBase } from "../DialogBase";
-import * as J from "../JavaIntf";
 import { PubSub } from "../PubSub";
 import { Singletons } from "../Singletons";
 import { ValidatedState } from "../ValidatedState";
@@ -13,7 +12,6 @@ import { CollapsibleHelpPanel } from "../widget/CollapsibleHelpPanel";
 import { Form } from "../widget/Form";
 import { HorizontalLayout } from "../widget/HorizontalLayout";
 import { TextField } from "../widget/TextField";
-import { MessageDlg } from "./MessageDlg";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
@@ -29,7 +27,6 @@ export class SearchContentDlg extends DialogBase {
 
     constructor(state: AppState) {
         super("Search Content", "app-modal-content-medium-width", null, state);
-        S.srch.searchText = null;
 
         this.whenElm((elm: HTMLElement) => {
             this.searchTextField.focus();
@@ -128,29 +125,10 @@ export class SearchContentDlg extends DialogBase {
             return;
         }
 
-        SearchContentDlg.defaultSearchText = S.srch.searchText = this.searchTextState.getValue();
+        SearchContentDlg.defaultSearchText = this.searchTextState.getValue();
 
-        S.util.ajax<J.NodeSearchRequest, J.NodeSearchResponse>("nodeSearch", {
-            nodeId: node.id,
-            searchText: SearchContentDlg.defaultSearchText,
-            sortDir: "DESC",
-            sortField: "mtm",
-            searchProp: "",
-            fuzzy: this.getState().fuzzy,
-            caseSensitive: this.getState().caseSensitive,
-            userSearchType: null,
-            searchDefinition: "",
-            timeRangeType: null
-        }, (res) => this.searchNodesResponse(res, node));
-    }
-
-    searchNodesResponse = (res: J.NodeSearchResponse, node: J.NodeInfo) => {
-        if (S.srch.numSearchResults(res) > 0) {
-            S.srch.searchNodesResponse(res, SearchContentDlg.defaultSearchText, false, node);
-            this.close();
-        }
-        else {
-            new MessageDlg("No search results found.", "Search", null, null, false, 0, this.appState).open();
-        }
+        let desc = "Content: " + SearchContentDlg.defaultSearchText;
+        S.srch.search(node, null, SearchContentDlg.defaultSearchText, this.appState, null, desc, this.getState().fuzzy,
+            this.getState().caseSensitive, 0, this.close);
     }
 }

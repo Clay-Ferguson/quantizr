@@ -4,22 +4,17 @@ import * as J from "../JavaIntf";
 export interface SearchIntf {
     _UID_ROWID_PREFIX: string;
 
-    searchNodes: any;
-    searchText: string;
-
-    searchOffset: number;
-    timelineOffset: number;
-
     highlightRowNode: J.NodeInfo;
-
     idToNodeMap : Map<string, J.NodeInfo>;
 
+    findSharedNodes(node: J.NodeInfo, page: number, type: string, shareTarget: string, accessOption: string, state: AppState): void;
     searchAndReplace(recursive: boolean, nodeId: string, search: string, replace: string, state: AppState): any;
-    numSearchResults(res: J.NodeSearchResponse): number;
-    searchNodesResponse(res: J.NodeSearchResponse, searchDescription: string, isUserSearch: boolean, searchNode: J.NodeInfo): any;
-    timelineResponse(res: J.NodeSearchResponse, timelineDescription: string, timelineNode: J.NodeInfo): any;
+    numSearchResults(results: J.NodeInfo[]): number;
+    searchPageChange(state: AppState, pageDelta: number): void;
+    search(node: J.NodeInfo, prop: string, searchText: string, state: AppState, userSearchType: string, description: string, fuzzy: boolean, caseSensitive: boolean, page: number, successCallback: Function): void;
     searchFilesResponse(res: J.FileSearchResponse, state: AppState): any;
-    timeline(prop: string, state: AppState, timeRangeType: string, timelineDescription: string): any;
+    timelinePageChange(state: AppState, pageDelta: number): void;
+    timeline(node: J.NodeInfo, prop: string, state: AppState, timeRangeType: string, timelineDescription: string, page: number): any;
     initSearchNode(node: J.NodeInfo): any;
     renderSearchResultAsListItem(node: J.NodeInfo, index: number, count: number, rowCount: number, prefix: string, isFeed: boolean, isParent: boolean, allowAvatars: boolean, jumpButton: boolean, state: AppState): any;
     clickOnSearchResultRow(evt: Event, id : string): any;
