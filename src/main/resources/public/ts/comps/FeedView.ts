@@ -32,9 +32,6 @@ export class FeedView extends AppTab {
     static enabled: boolean = true;
     static searchTextState: ValidatedState<any> = new ValidatedState<any>();
 
-    // I don't like this OR how much CPU load it takes, so I'm flagging it off for now
-    static realtimeCheckboxes: boolean = false;
-
     /* Controle wether the view automatically refreshes before letting the user choose what options (checkboxes) they want.
     I'm disabling because I don't like this. If I'm wanting to find just "To me" for example then I have to wait for it
     to first query stuff I don't care about first. So I'd just rather click the "Refresh" button myself each time. */
@@ -184,15 +181,10 @@ export class FeedView extends AppTab {
             }, {
                 setValue: (checked: boolean): void => {
                     dispatch("Action_SetFeedFilterType", (s: AppState): AppState => {
-                        s.feedWaitingForUserRefresh = !FeedView.realtimeCheckboxes;
+                        s.feedWaitingForUserRefresh = true;
                         s.feedFilterFriends = checked;
                         return s;
                     });
-
-                    if (FeedView.realtimeCheckboxes) {
-                        FeedView.page = 0;
-                        S.srch.feed("~" + J.NodeType.FRIEND_LIST, null, FeedView.page, FeedView.searchTextState.getValue());
-                    }
                 },
                 getValue: (): boolean => {
                     return store.getState().feedFilterFriends;
@@ -204,15 +196,10 @@ export class FeedView extends AppTab {
             }, {
                 setValue: (checked: boolean): void => {
                     dispatch("Action_SetFeedFilterType", (s: AppState): AppState => {
-                        s.feedWaitingForUserRefresh = !FeedView.realtimeCheckboxes;
+                        s.feedWaitingForUserRefresh = true;
                         s.feedFilterToMe = checked;
                         return s;
                     });
-
-                    if (FeedView.realtimeCheckboxes) {
-                        FeedView.page = 0;
-                        S.srch.feed("~" + J.NodeType.FRIEND_LIST, null, FeedView.page, FeedView.searchTextState.getValue());
-                    }
                 },
                 getValue: (): boolean => {
                     return store.getState().feedFilterToMe;
@@ -224,15 +211,10 @@ export class FeedView extends AppTab {
             }, {
                 setValue: (checked: boolean): void => {
                     dispatch("Action_SetFeedFilterType", (s: AppState): AppState => {
-                        s.feedWaitingForUserRefresh = !FeedView.realtimeCheckboxes;
+                        s.feedWaitingForUserRefresh = true;
                         s.feedFilterFromMe = checked;
                         return s;
                     });
-
-                    if (FeedView.realtimeCheckboxes) {
-                        FeedView.page = 0;
-                        S.srch.feed("~" + J.NodeType.FRIEND_LIST, null, FeedView.page, FeedView.searchTextState.getValue());
-                    }
                 },
                 getValue: (): boolean => {
                     return store.getState().feedFilterFromMe;
@@ -244,15 +226,10 @@ export class FeedView extends AppTab {
             }, {
                 setValue: (checked: boolean): void => {
                     dispatch("Action_SetFeedFilterType", (s: AppState): AppState => {
-                        s.feedWaitingForUserRefresh = !FeedView.realtimeCheckboxes;
+                        s.feedWaitingForUserRefresh = true;
                         s.feedFilterToPublic = checked;
                         return s;
                     });
-
-                    if (FeedView.realtimeCheckboxes) {
-                        FeedView.page = 0;
-                        S.srch.feed("~" + J.NodeType.FRIEND_LIST, null, FeedView.page, FeedView.searchTextState.getValue());
-                    }
                 },
                 getValue: (): boolean => {
                     return store.getState().feedFilterToPublic;
@@ -264,7 +241,7 @@ export class FeedView extends AppTab {
             }, {
                 setValue: (checked: boolean): void => {
                     dispatch("Action_SetFeedFilterType", (s: AppState): AppState => {
-                        s.feedWaitingForUserRefresh = !FeedView.realtimeCheckboxes;
+                        s.feedWaitingForUserRefresh = true;
                         s.feedFilterLocalServer = checked;
 
                         /* to help keep users probably get what they want, set 'public' also to true as the default
@@ -274,11 +251,6 @@ export class FeedView extends AppTab {
                         }
                         return s;
                     });
-
-                    if (FeedView.realtimeCheckboxes) {
-                        FeedView.page = 0;
-                        S.srch.feed("~" + J.NodeType.FRIEND_LIST, null, FeedView.page, FeedView.searchTextState.getValue());
-                    }
                 },
                 getValue: (): boolean => {
                     return store.getState().feedFilterLocalServer;
@@ -290,15 +262,10 @@ export class FeedView extends AppTab {
             }, {
                 setValue: (checked: boolean): void => {
                     dispatch("Action_SetFeedFilterType", (s: AppState): AppState => {
-                        s.feedWaitingForUserRefresh = !FeedView.realtimeCheckboxes;
+                        s.feedWaitingForUserRefresh = true;
                         s.feedFilterNSFW = checked;
                         return s;
                     });
-
-                    if (FeedView.realtimeCheckboxes) {
-                        FeedView.page = 0;
-                        S.srch.feed("~" + J.NodeType.FRIEND_LIST, null, FeedView.page, FeedView.searchTextState.getValue());
-                    }
                 },
                 getValue: (): boolean => {
                     return store.getState().feedFilterNSFW;

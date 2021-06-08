@@ -275,7 +275,6 @@ export class Search implements SearchIntf {
 
         const div = new Div(null, {
             className: clazz,
-            onClick: this.clickOnSearchResultRow,
             id: cssId,
             nid: node.id
         }, [
@@ -289,16 +288,6 @@ export class Search implements SearchIntf {
         return new Div(null, {
             className: isParent ? "userFeedItemParent" : itemClass
         }, [parentItem, div]);
-    }
-
-    clickOnSearchResultRow = (evt: Event, id: string) => {
-        // this implementation is obsolete (update if we ever need to uncomment this)
-
-        // DO NOT DELETE (this works, and may be needed some day)
-        // There's really no reason to indicate to user what row is highlighted, so I let't just not clutter the screen for now
-        // this.setRowHighlight(false);
-        // this.highlightRowNode = this.idToNodeMap.get(id);
-        // this.setRowHighlight(true);
     }
 
     clickSearchNode = (id: string, state: AppState) => {

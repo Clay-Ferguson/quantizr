@@ -105,21 +105,15 @@ export class SearchView extends AppTab {
 
         children.push(new ButtonBar([
             state.searchInfo.page > 1 ? new IconButton("fa-angle-double-left", null, {
-                onClick: () => {
-                    S.srch.searchPageChange(state, 0);
-                },
+                onClick: () => S.srch.searchPageChange(state, 0),
                 title: "First Page"
             }) : null,
             state.searchInfo.page > 0 ? new IconButton("fa-angle-left", null, {
-                onClick: () => {
-                    S.srch.searchPageChange(state, -1);
-                },
+                onClick: () => S.srch.searchPageChange(state, -1),
                 title: "Previous Page"
             }) : null,
             !state.searchInfo.endReached ? new IconButton("fa-angle-right", "More", {
-                onClick: (event) => {
-                    S.srch.searchPageChange(state, 1);
-                },
+                onClick: () => S.srch.searchPageChange(state, 1),
                 title: "Next Page"
             }) : null
         ], "text-center marginBottom"));

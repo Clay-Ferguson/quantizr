@@ -62,7 +62,7 @@ export class RightNavPanel extends Div {
                     displayName && !state.isAnonUser ? new IconButton("fa-database", displayName, {
                         title: "Go to your Account Root Node",
                         onClick: e => { S.nav.navHome(state); }
-                    }, "btn-secondary marginBottom") : null,
+                    }, "btn-secondary marginBottom marginRight") : null,
                     profileButton,
                     headerImg,
                     avatarImg,

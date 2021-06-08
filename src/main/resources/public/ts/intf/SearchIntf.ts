@@ -17,7 +17,6 @@ export interface SearchIntf {
     timeline(node: J.NodeInfo, prop: string, state: AppState, timeRangeType: string, timelineDescription: string, page: number): any;
     initSearchNode(node: J.NodeInfo): any;
     renderSearchResultAsListItem(node: J.NodeInfo, index: number, count: number, rowCount: number, prefix: string, isFeed: boolean, isParent: boolean, allowAvatars: boolean, jumpButton: boolean, state: AppState): any;
-    clickOnSearchResultRow(evt: Event, id : string): any;
     clickSearchNode(id: string, state: AppState): any;
     feed(nodeId: string, feedUserName: string, page: number, searchText: string): any;
 }
