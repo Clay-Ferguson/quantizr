@@ -143,7 +143,7 @@ export class UserProfileDlg extends DialogBase {
                     });
                 }
                 resolve();
-            });
+            }, () => resolve());
         });
     }
 
@@ -312,7 +312,7 @@ export class UserProfileDlg extends DialogBase {
                 async (res: J.GetUserAccountInfoResponse) => {
                     await this.reload(this.userNodeId);
                     resolve();
-                });
+                }, () => resolve());
         });
     }
 }

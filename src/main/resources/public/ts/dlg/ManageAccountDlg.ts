@@ -82,7 +82,7 @@ export class ManageAccountDlg extends DialogBase {
                         binTotal: res.binTotal
                     });
                     resolve();
-                });
+                }, () => resolve());
         });
     }
 

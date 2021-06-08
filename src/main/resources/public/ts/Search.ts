@@ -145,7 +145,7 @@ export class Search implements SearchIntf {
             goToLastPage: false,
             forceIPFSRefresh: false,
             singleNode: false
-        }, (res) => { S.nav.navPageNodeResponse(res, state); });
+        }, (res) => S.nav.navPageNodeResponse(res, state));
     }
 
     timelinePageChange = (state: AppState, pageDelta: number) => {

@@ -262,7 +262,7 @@ export class User implements UserIntf {
                     });
                 }
                 resolve();
-            });
+            }, () => resolve());
         });
     }
 
@@ -279,7 +279,7 @@ export class User implements UserIntf {
                     });
                 }
                 resolve();
-            });
+            }, () => resolve());
         });
     }
 }

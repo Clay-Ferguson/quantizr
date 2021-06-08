@@ -836,8 +836,7 @@ export class EditNodeDlg extends DialogBase {
                     finally {
                         resolve();
                     }
-                });
-
+                }, () => resolve());
         });
     }
 
