@@ -130,6 +130,7 @@ export class RssTypeHandler extends TypeBase {
             itemListContainer.addChild(new Heading(4, "Loading RSS Feed..."));
             itemListContainer.addChild(new Div("For large feeds this can take a few seconds..."));
 
+            /* warning: paging here is not zero offset. First page is number 1 */
             let page: number = state.feedPage[feedSrcHash];
             if (!page) {
                 page = 1;
@@ -267,7 +268,7 @@ export class RssTypeHandler extends TypeBase {
 
     makeNavButtonBar = (page: number, feedSrcHash: string, state: AppState): ButtonBar => {
         return new ButtonBar([
-            page > 1 ? new IconButton("fa-angle-double-left", null, {
+            page > 2 ? new IconButton("fa-angle-double-left", null, {
                 onClick: (event) => {
                     event.stopPropagation();
                     event.preventDefault();

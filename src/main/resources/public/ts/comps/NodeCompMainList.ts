@@ -53,12 +53,14 @@ export class NodeCompMainList extends Div {
         let nextButton: Comp;
         let firstChild: J.NodeInfo = S.edit.getFirstChildNode(state);
 
-        if (firstChild && firstChild.logicalOrdinal > 0) {
+        if (firstChild && firstChild.logicalOrdinal > 1) {
             firstButton = new IconButton("fa-angle-double-left", null, {
                 onClick: () => S.view.firstPage(state),
                 title: "First Page"
             });
+        }
 
+        if (firstChild && firstChild.logicalOrdinal > 0) {
             prevButton = new IconButton("fa-angle-left", null, {
                 onClick: () => S.view.prevPage(state),
                 title: "Previous Page"
