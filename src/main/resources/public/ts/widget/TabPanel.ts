@@ -48,7 +48,7 @@ export class TabPanel extends Div {
             dialog = state.dialogStack[state.dialogStack.length - 1];
         }
 
-        let children: CompIntf[] = dialog ? [dialog] : S.meta64.tabs;
+        let children: CompIntf[] = dialog ? [dialog] : this.buildTabs(state);
 
         let tabContent = new Div(null, {
             className: "row tab-content",
@@ -60,5 +60,13 @@ export class TabPanel extends Div {
         this.setChildren([
             tabButtons ? new TabPanelButtons(false) : null, tabContent
         ]);
+    }
+
+    buildTabs = (state: AppState): CompIntf[] => {
+        let tabs: CompIntf[] = [];
+        for (let tab of state.tabData) {
+            tabs.push(tab.constructView(tab));
+        }
+        return tabs;
     }
 }

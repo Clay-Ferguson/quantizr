@@ -33,19 +33,6 @@ export class LogView extends AppTab implements LogViewIntf {
         }
     }
 
-    getTabButton(state: AppState): Li {
-        return new Li(null, {
-            className: "nav-item navItem",
-            style: { display: LogView.showLogs ? "inline" : "none" },
-            onClick: this.handleClick
-        }, [
-            new Anchor("#logTab", "Logs", {
-                "data-toggle": "tab",
-                className: "nav-link" + (state.activeTab === "logTab" ? " active" : "")
-            })
-        ]);
-    }
-
     preRender(): void {
         const state: AppState = store.getState();
 

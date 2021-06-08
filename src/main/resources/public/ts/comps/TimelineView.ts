@@ -29,19 +29,6 @@ export class TimelineView extends AppTab {
         });
     }
 
-    getTabButton(state: AppState): Li {
-        return new Li(null, {
-            className: "nav-item navItem",
-            style: { display: state.timelineInfo.results ? "inline" : "none" },
-            onClick: this.handleClick
-        }, [
-            new Anchor("#timelineTab", "Timeline", {
-                "data-toggle": "tab",
-                className: "nav-link" + (state.activeTab === "timelineTab" ? " active" : "")
-            })
-        ]);
-    }
-
     preRender(): void {
         let state: AppState = useSelector((state: AppState) => state);
         let results = state.timelineInfo.results;

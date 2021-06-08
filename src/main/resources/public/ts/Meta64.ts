@@ -1,4 +1,4 @@
-import { appState, dispatch, store, useAppState } from "./AppRedux";
+import { appState, dispatch, store } from "./AppRedux";
 import { AppState } from "./AppState";
 import { FeedView } from "./comps/FeedView";
 import { LogView } from "./comps/LogView";
@@ -10,12 +10,12 @@ import { AudioPlayerDlg } from "./dlg/AudioPlayerDlg";
 import { ChangePasswordDlg } from "./dlg/ChangePasswordDlg";
 import { MainMenuDlg } from "./dlg/MainMenuDlg";
 import { Meta64Intf } from "./intf/Meta64Intf";
+import { TabDataIntf } from "./intf/TabDataIntf";
 import * as J from "./JavaIntf";
 import { Log } from "./Log";
 import { PubSub } from "./PubSub";
 import { Singletons } from "./Singletons";
 import { App } from "./widget/App";
-import { AppTab } from "./widget/AppTab";
 import { CompIntf } from "./widget/base/CompIntf";
 import { WelcomePanel } from "./widget/WelcomePanel";
 
@@ -67,16 +67,6 @@ export class Meta64 implements Meta64Intf {
     scrollPosByTabName: Map<string, number> = new Map<string, number>();
 
     logView: LogView = new LogView();
-
-    tabs: AppTab[] = [
-        new MainTabComp(),
-        new SearchView(),
-        new TimelineView(),
-        new FeedView()
-
-        // LogView not currently used (was basically an experiment)
-        // this.logView
-    ];
 
     sendTestEmail = (): void => {
         S.util.ajax<J.SendTestEmailRequest, J.SendTestEmailResponse>("sendTestEmail", {}, function (res: J.SendTestEmailResponse) {
@@ -342,6 +332,36 @@ export class Meta64 implements Meta64Intf {
     initApp = async (): Promise<void> => {
         return new Promise<void>(async (resolve, reject) => {
             Log.log("initApp()");
+
+            dispatch("Action_initTabs", (s: AppState): AppState => {
+                s.tabData = [
+                    {
+                        name: "Main",
+                        id: "mainTab",
+                        isVisible: () => true,
+                        constructView: (data: TabDataIntf) => new MainTabComp()
+                    },
+                    {
+                        name: "Search",
+                        id: "searchTab",
+                        isVisible: () => s.searchInfo.results && s.searchInfo.results.length > 0,
+                        constructView: (data: TabDataIntf) => new SearchView()
+                    },
+                    {
+                        name: "Timeline",
+                        id: "timelineTab",
+                        isVisible: () => s.timelineInfo.results && s.timelineInfo.results.length > 0,
+                        constructView: (data: TabDataIntf) => new TimelineView()
+                    },
+                    {
+                        name: "Fediverse",
+                        id: "feedTab",
+                        isVisible: () => true,
+                        constructView: (data: TabDataIntf) => new FeedView()
+                    }
+                ];
+                return s;
+            });
 
             const state: AppState = store.getState();
             state.pendingLocationHash = window.location.hash;

@@ -47,19 +47,6 @@ export class FeedView extends AppTab {
         });
     }
 
-    getTabButton(state: AppState): Li {
-        return new Li(null, {
-            className: "nav-item navItem",
-            style: { display: "inline" },
-            onClick: this.handleClick
-        }, [
-            new Anchor("#feedTab", "Fediverse", {
-                "data-toggle": "tab",
-                className: "nav-link" + (state.activeTab === "feedTab" ? " active" : "")
-            })
-        ]);
-    }
-
     preRender(): void {
         let state: AppState = useSelector((state: AppState) => state);
 

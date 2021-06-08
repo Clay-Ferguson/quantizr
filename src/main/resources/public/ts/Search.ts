@@ -25,7 +25,6 @@ export class Search implements SearchIntf {
      * Will be the last row clicked on (NodeInfo.java object) and having the red highlight bar
      */
     highlightRowNode: J.NodeInfo = null;
-
     idToNodeMap: Map<string, J.NodeInfo> = new Map<string, J.NodeInfo>();
 
     numSearchResults = (results: J.NodeInfo[]): number => {

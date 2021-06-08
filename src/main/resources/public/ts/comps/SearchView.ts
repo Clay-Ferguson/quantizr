@@ -29,19 +29,6 @@ export class SearchView extends AppTab {
         });
     }
 
-    getTabButton(state: AppState): Li {
-        return new Li(null, {
-            className: "nav-item navItem",
-            style: { display: state.searchInfo.results ? "inline" : "none" },
-            onClick: this.handleClick
-        }, [
-            new Anchor("#searchTab", "Search", {
-                "data-toggle": "tab",
-                className: "nav-link" + (state.activeTab === "searchTab" ? " active" : "")
-            })
-        ]);
-    }
-
     preRender(): void {
         let state: AppState = useSelector((state: AppState) => state);
         let results = state.searchInfo.results;

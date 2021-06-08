@@ -1,6 +1,7 @@
 import { EventInput } from "@fullcalendar/react";
 import clientInfo from "./ClientInfo";
 import { DialogBase } from "./DialogBase";
+import { TabDataIntf } from "./intf/TabDataIntf";
 import * as J from "./JavaIntf";
 import { NodeInfo } from "./JavaIntf";
 import { ResultSetInfo } from "./ResultSetInfo";
@@ -73,6 +74,9 @@ export class AppState {
     nodesToMove: string[];
 
     activeTab: string = null;
+
+    /* data for each tab */
+    tabData: TabDataIntf[] = [];
 
     // When the user clicks an image, we switch to a fullscreen viewer for that image, at max size of the display, and any time
     // this nodeId is non-null we are displaying that FullScreenView comp, which occupies everything below the toolbar.

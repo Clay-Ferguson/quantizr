@@ -1,8 +1,10 @@
 import { useSelector } from "react-redux";
 import { AppState } from "../AppState";
 import { Constants as C } from "../Constants";
+import { TabDataIntf } from "../intf/TabDataIntf";
 import { PubSub } from "../PubSub";
 import { Singletons } from "../Singletons";
+import { Anchor } from "./Anchor";
 import { Div } from "./Div";
 import { Li } from "./Li";
 import { Ul } from "./Ul";
@@ -36,9 +38,26 @@ export class TabPanelButtons extends Div {
 
     buildTabButtons = (state: AppState): Li[] => {
         let items: Li[] = [];
-        for (const tab of S.meta64.tabs) {
-            items.push(tab.getTabButton(state));
+        for (let tab of state.tabData) {
+            items.push(this.getTabButton(state, tab));
         }
         return items;
+    }
+
+    getTabButton(state: AppState, data: TabDataIntf): Li {
+        return new Li(null, {
+            className: "nav-item navItem",
+            style: { display: data.isVisible() ? "inline" : "none" },
+            onClick: (event) => {
+                event.stopPropagation();
+                event.preventDefault();
+                S.meta64.selectTab(data.id);
+            }
+        }, [
+            new Anchor("#" + data.id, data.name, {
+                "data-toggle": "tab",
+                className: "nav-link" + (state.activeTab === data.id ? " active" : "")
+            })
+        ]);
     }
 }

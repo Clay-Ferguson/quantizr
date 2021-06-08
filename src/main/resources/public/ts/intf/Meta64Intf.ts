@@ -10,13 +10,9 @@ export interface Meta64Intf {
     config: any;
     mainMenu: MainMenuDlg;
     app: CompIntf;
-    tabs: AppTab[];
     noScrollToId: string;
-
     appInitialized: boolean;
-
     curUrlPath: string;
-
     deviceWidth: number;
     deviceHeight: number;
 
