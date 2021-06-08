@@ -12,7 +12,6 @@ export class ResultSetInfo {
     public caseSensitive: boolean;
     public searchText: string;
     public userSearchType: string;
-    public searchType: string;
 
     public shareNodesType: string;
     public shareTarget: string;

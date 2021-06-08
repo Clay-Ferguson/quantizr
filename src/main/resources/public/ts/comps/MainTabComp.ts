@@ -1,14 +1,13 @@
 import { useSelector } from "react-redux";
 import { AppState } from "../AppState";
 import { Constants as C } from "../Constants";
+import { TabDataIntf } from "../intf/TabDataIntf";
 import { PubSub } from "../PubSub";
 import { Singletons } from "../Singletons";
-import { Anchor } from "../widget/Anchor";
 import { AppTab } from "../widget/AppTab";
 import { BreadcrumbsPanel } from "../widget/BreadcrumbsPanel";
 import { Div } from "../widget/Div";
 import { Html } from "../widget/Html";
-import { Li } from "../widget/Li";
 import { NodeCompMainList } from "./NodeCompMainList";
 import { NodeCompMainNode } from "./NodeCompMainNode";
 
@@ -20,12 +19,9 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
 /* General Widget that doesn't fit any more reusable or specific category other than a plain Div, but inherits capability of Comp class */
 export class MainTabComp extends AppTab {
 
-    constructor() {
-        super({
-            id: "mainTab"
-        });
+    constructor(data: TabDataIntf) {
+        super(data);
     }
-
 
     preRender(): void {
         let state: AppState = useSelector((state: AppState) => state);

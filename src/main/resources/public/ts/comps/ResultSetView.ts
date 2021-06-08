@@ -1,17 +1,16 @@
 import { useSelector } from "react-redux";
 import { AppState } from "../AppState";
 import { Constants as C } from "../Constants";
+import { TabDataIntf } from "../intf/TabDataIntf";
 import * as J from "../JavaIntf";
 import { PubSub } from "../PubSub";
 import { Singletons } from "../Singletons";
-import { Anchor } from "../widget/Anchor";
 import { AppTab } from "../widget/AppTab";
 import { Comp } from "../widget/base/Comp";
 import { ButtonBar } from "../widget/ButtonBar";
 import { Div } from "../widget/Div";
 import { Heading } from "../widget/Heading";
 import { IconButton } from "../widget/IconButton";
-import { Li } from "../widget/Li";
 import { Span } from "../widget/Span";
 import { TextContent } from "../widget/TextContent";
 
@@ -21,17 +20,15 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
 });
 
 /* General Widget that doesn't fit any more reusable or specific category other than a plain Div, but inherits capability of Comp class */
-export class SearchView extends AppTab {
+export abstract class ResultSetView extends AppTab {
 
-    constructor() {
-        super({
-            id: "searchTab"
-        });
+    constructor(data: TabDataIntf) {
+        super(data);
     }
 
     preRender(): void {
         let state: AppState = useSelector((state: AppState) => state);
-        let results = state.searchInfo.results;
+        let results = this.data && this.data.rsInfo.results;
         this.attribs.className = "tab-pane fade my-tab-pane";
 
         if (state.activeTab === this.getId()) {
@@ -54,32 +51,32 @@ export class SearchView extends AppTab {
         let rowCount = 0;
         let children: Comp[] = [];
 
-        if (state.searchInfo.description && state.searchInfo.node) {
-            let searchText = S.util.getShortContent(state.searchInfo.node.content);
+        if (this.data.rsInfo.description && this.data.rsInfo.node) {
+            let searchText = S.util.getShortContent(this.data.rsInfo.node.content);
             children.push(new Div(null, null, [
                 new Div(null, { className: "marginBottom" }, [
                     new Heading(4, "Search", { className: "resultsTitle" }),
                     new Span(null, { className: "float-right" }, [
                         new IconButton("fa-arrow-left", "Back", {
-                            onClick: () => S.view.refreshTree(state.searchInfo.node.id, true, true, state.searchInfo.node.id, false, true, true, state),
+                            onClick: () => S.view.refreshTree(this.data.rsInfo.node.id, true, true, this.data.rsInfo.node.id, false, true, true, state),
                             title: "Back to Node"
                         })
                     ])
                 ]),
                 new TextContent(searchText, "resultsContentHeading alert alert-secondary"),
-                new Div("Searched -> " + state.searchInfo.description)
+                new Div(this.data.rsInfo.description)
             ]));
         }
 
         // this shows the page number. not needed. used for debugging.
-        // children.push(new Div("" + state.searchInfo.page + " endReached=" + state.searchInfo.endReached));
+        // children.push(new Div("" + data.rsInfo.page + " endReached=" + data.rsInfo.endReached));
         this.addPaginationBar(state, children);
 
         let i = 0;
-        let jumpButton = state.isAdminUser || !state.searchInfo.userSearchType;
-        results.forEach(function (node: J.NodeInfo) {
+        let jumpButton = state.isAdminUser || !this.data.rsInfo.userSearchType;
+        results.forEach((node: J.NodeInfo) => {
             S.srch.initSearchNode(node);
-            children.push(S.srch.renderSearchResultAsListItem(node, i, childCount, rowCount, "srch", false, false, true, jumpButton, state));
+            children.push(S.srch.renderSearchResultAsListItem(node, i, childCount, rowCount, this.data.id, false, false, true, jumpButton, state));
             i++;
             rowCount++;
         });
@@ -89,20 +86,21 @@ export class SearchView extends AppTab {
     }
 
     addPaginationBar = (state: AppState, children: Comp[]): void => {
-
         children.push(new ButtonBar([
-            state.searchInfo.page > 1 ? new IconButton("fa-angle-double-left", null, {
-                onClick: () => S.srch.searchPageChange(state, 0),
+            this.data.rsInfo.page > 1 ? new IconButton("fa-angle-double-left", null, {
+                onClick: () => this.pageChange(0),
                 title: "First Page"
             }) : null,
-            state.searchInfo.page > 0 ? new IconButton("fa-angle-left", null, {
-                onClick: () => S.srch.searchPageChange(state, -1),
+            this.data.rsInfo.page > 0 ? new IconButton("fa-angle-left", null, {
+                onClick: () => this.pageChange(-1),
                 title: "Previous Page"
             }) : null,
-            !state.searchInfo.endReached ? new IconButton("fa-angle-right", "More", {
-                onClick: () => S.srch.searchPageChange(state, 1),
+            !this.data.rsInfo.endReached ? new IconButton("fa-angle-right", "More", {
+                onClick: () => this.pageChange(1),
                 title: "Next Page"
             }) : null
         ], "text-center marginBottom"));
     }
+
+    abstract pageChange(delta: number): void;
 }

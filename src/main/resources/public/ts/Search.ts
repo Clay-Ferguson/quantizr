@@ -18,7 +18,6 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (s: Singletons) => {
 });
 
 export class Search implements SearchIntf {
-
     _UID_ROWID_PREFIX: string = "srch_row_";
 
     /*
@@ -27,38 +26,6 @@ export class Search implements SearchIntf {
     highlightRowNode: J.NodeInfo = null;
     idToNodeMap: Map<string, J.NodeInfo> = new Map<string, J.NodeInfo>();
 
-    numSearchResults = (results: J.NodeInfo[]): number => {
-        return results ? results.length : 0;
-    }
-
-    searchPageChange = (state: AppState, pageDelta: number): void => {
-        switch (state.searchInfo.searchType) {
-            case "normalSearch":
-                this.search(state.searchInfo.node,
-                    state.searchInfo.prop,
-                    state.searchInfo.searchText,
-                    state,
-                    state.searchInfo.userSearchType,
-                    state.searchInfo.description,
-                    state.searchInfo.fuzzy,
-                    state.searchInfo.caseSensitive,
-                    pageDelta === 0 ? 0 : state.searchInfo.page + pageDelta,
-                    null);
-                break;
-
-            case "findSharedNodes":
-                this.findSharedNodes(state.searchInfo.node,
-                    pageDelta === 0 ? 0 : state.searchInfo.page + pageDelta,
-                    state.searchInfo.shareNodesType,
-                    state.searchInfo.shareTarget,
-                    state.searchInfo.accessOption,
-                    state);
-                break;
-
-            default: break;
-        }
-    }
-
     findSharedNodes = (node: J.NodeInfo, page: number, type: string, shareTarget: string, accessOption: string, state: AppState): void => {
         S.util.ajax<J.GetSharedNodesRequest, J.GetSharedNodesResponse>("getSharedNodes", {
             page,
@@ -66,17 +33,21 @@ export class Search implements SearchIntf {
             shareTarget,
             accessOption
         }, (res) => {
-            if (this.numSearchResults(res.searchResults) > 0) {
+            if (res.searchResults && res.searchResults.length > 0) {
                 dispatch("Action_RenderSearchResults", (s: AppState): AppState => {
-                    s.searchInfo.searchType = "findSharedNodes";
-                    s.searchInfo.results = res.searchResults;
-                    s.searchInfo.page = page;
-                    s.searchInfo.description = "Showing " + type + " shared nodes";
-                    s.searchInfo.node = node;
-                    s.searchInfo.shareTarget = shareTarget;
-                    s.searchInfo.accessOption = accessOption;
-                    s.searchInfo.endReached = !res.searchResults || res.searchResults.length < S.nav.ROWS_PER_PAGE;
-                    S.meta64.selectTabStateOnly("searchTab", s);
+
+                    let data = state.tabData.find(d => d.id === "sharedNodesResultSetView");
+                    if (!data) return;
+
+                    data.rsInfo.results = res.searchResults;
+                    data.rsInfo.page = page;
+                    data.rsInfo.description = "Showing " + type + " shared nodes";
+                    data.rsInfo.node = node;
+                    data.rsInfo.shareTarget = shareTarget;
+                    data.rsInfo.accessOption = accessOption;
+                    data.rsInfo.endReached = !res.searchResults || res.searchResults.length < S.nav.ROWS_PER_PAGE;
+
+                    S.meta64.selectTabStateOnly(data.id, s);
                     return s;
                 });
             }
@@ -104,25 +75,28 @@ export class Search implements SearchIntf {
             searchDefinition: "",
             timeRangeType: null
         }, (res) => {
-            if (this.numSearchResults(res.searchResults) > 0) {
+            if (res.searchResults && res.searchResults.length > 0) {
                 if (successCallback) {
                     successCallback();
                 }
 
                 dispatch("Action_RenderSearchResults", (s: AppState): AppState => {
-                    s.searchInfo.searchType = "normalSearch";
-                    s.searchInfo.results = res.searchResults;
-                    s.searchInfo.page = page;
-                    s.searchInfo.userSearchType = userSearchType;
-                    s.searchInfo.description = description;
-                    s.searchInfo.node = node;
-                    s.searchInfo.searchText = searchText;
-                    s.searchInfo.fuzzy = fuzzy;
-                    s.searchInfo.caseSensitive = caseSensitive;
-                    s.searchInfo.prop = prop;
-                    s.searchInfo.endReached = !res.searchResults || res.searchResults.length < S.nav.ROWS_PER_PAGE;
 
-                    S.meta64.selectTabStateOnly("searchTab", s);
+                    let data = state.tabData.find(d => d.id === "resultSetView");
+                    if (!data) return;
+
+                    data.rsInfo.results = res.searchResults;
+                    data.rsInfo.page = page;
+                    data.rsInfo.userSearchType = userSearchType;
+                    data.rsInfo.description = description;
+                    data.rsInfo.node = node;
+                    data.rsInfo.searchText = searchText;
+                    data.rsInfo.fuzzy = fuzzy;
+                    data.rsInfo.caseSensitive = caseSensitive;
+                    data.rsInfo.prop = prop;
+                    data.rsInfo.endReached = !res.searchResults || res.searchResults.length < S.nav.ROWS_PER_PAGE;
+
+                    S.meta64.selectTabStateOnly(data.id, s);
                     return s;
                 });
             }
@@ -147,14 +121,12 @@ export class Search implements SearchIntf {
         }, (res) => S.nav.navPageNodeResponse(res, state));
     }
 
-    timelinePageChange = (state: AppState, pageDelta: number) => {
-        this.timeline(state.timelineInfo.node, state.timelineInfo.prop, state, state.timelineInfo.timeRangeType,
-            state.timelineInfo.description,
-            pageDelta === 0 ? 0 : state.timelineInfo.page + pageDelta);
-    }
-
     /* prop = mtm (modification time) | ctm (create time) */
     timeline = (node: J.NodeInfo, prop: string, state: AppState, timeRangeType: string, timelineDescription: string, page: number) => {
+
+        /* this code AND other similar code needs a way to lockin the node, here so it can't change during pagination
+        including when the page==0 because user is just jumping to beginning. Need a specific param for saying
+        it's ok to reset node or not */
         if (!node) {
             node = S.meta64.getHighlightedNode(state);
         }
@@ -178,15 +150,19 @@ export class Search implements SearchIntf {
             timeRangeType
         }, (res) => {
             dispatch("Action_RenderTimelineResults", (s: AppState): AppState => {
-                s.timelineInfo.results = res.searchResults;
-                s.timelineInfo.description = timelineDescription;
-                s.timelineInfo.prop = prop;
-                s.timelineInfo.timeRangeType = timeRangeType;
-                s.timelineInfo.node = node;
-                s.timelineInfo.endReached = !res.searchResults || res.searchResults.length < S.nav.ROWS_PER_PAGE;
-                s.timelineInfo.page = page;
 
-                S.meta64.selectTabStateOnly("timelineTab", s);
+                let data = state.tabData.find(d => d.id === "timelineResultSetView");
+                if (!data) return;
+
+                data.rsInfo.results = res.searchResults;
+                data.rsInfo.description = timelineDescription;
+                data.rsInfo.prop = prop;
+                data.rsInfo.timeRangeType = timeRangeType;
+                data.rsInfo.node = node;
+                data.rsInfo.endReached = !res.searchResults || res.searchResults.length < S.nav.ROWS_PER_PAGE;
+                data.rsInfo.page = page;
+
+                S.meta64.selectTabStateOnly(data.id, s);
                 return s;
             });
         });

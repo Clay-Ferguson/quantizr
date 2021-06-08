@@ -2,11 +2,11 @@ import { useSelector } from "react-redux";
 import { dispatch, store } from "../AppRedux";
 import { AppState } from "../AppState";
 import { Constants as C } from "../Constants";
+import { TabDataIntf } from "../intf/TabDataIntf";
 import * as J from "../JavaIntf";
 import { PubSub } from "../PubSub";
 import { Singletons } from "../Singletons";
 import { ValidatedState } from "../ValidatedState";
-import { Anchor } from "../widget/Anchor";
 import { AppTab } from "../widget/AppTab";
 import { Comp } from "../widget/base/Comp";
 import { Button } from "../widget/Button";
@@ -16,7 +16,6 @@ import { CollapsibleHelpPanel } from "../widget/CollapsibleHelpPanel";
 import { Div } from "../widget/Div";
 import { Heading } from "../widget/Heading";
 import { IconButton } from "../widget/IconButton";
-import { Li } from "../widget/Li";
 import { Span } from "../widget/Span";
 import { TextContent } from "../widget/TextContent";
 import { TextField } from "../widget/TextField";
@@ -41,10 +40,8 @@ export class FeedView extends AppTab {
     static refreshCounter: number = 0;
     static helpExpanded: boolean = false;
 
-    constructor() {
-        super({
-            id: "feedTab"
-        });
+    constructor(data: TabDataIntf) {
+        super(data);
     }
 
     preRender(): void {

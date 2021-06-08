@@ -4,7 +4,6 @@ import { DialogBase } from "./DialogBase";
 import { TabDataIntf } from "./intf/TabDataIntf";
 import * as J from "./JavaIntf";
 import { NodeInfo } from "./JavaIntf";
-import { ResultSetInfo } from "./ResultSetInfo";
 
 /* root react Redux state for entire app */
 export class AppState {
@@ -63,9 +62,6 @@ export class AppState {
 
     node: J.NodeInfo;
     endReached: boolean;
-
-    searchInfo: ResultSetInfo = new ResultSetInfo();
-    timelineInfo: ResultSetInfo = new ResultSetInfo();
 
     feedResults: NodeInfo[];
     feedEndReached: boolean = false;

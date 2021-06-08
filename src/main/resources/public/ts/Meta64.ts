@@ -3,8 +3,9 @@ import { AppState } from "./AppState";
 import { FeedView } from "./comps/FeedView";
 import { LogView } from "./comps/LogView";
 import { MainTabComp } from "./comps/MainTabComp";
-import { SearchView } from "./comps/SearchView";
-import { TimelineView } from "./comps/TimelineView";
+import { SearchResultSetView } from "./comps/SearchResultSetView";
+import { SharedNodesResultSetView } from "./comps/SharedNodesResultSetView";
+import { TimelineResultSetView } from "./comps/TimelineResultSetView";
 import { Constants as C } from "./Constants";
 import { AudioPlayerDlg } from "./dlg/AudioPlayerDlg";
 import { ChangePasswordDlg } from "./dlg/ChangePasswordDlg";
@@ -14,6 +15,7 @@ import { TabDataIntf } from "./intf/TabDataIntf";
 import * as J from "./JavaIntf";
 import { Log } from "./Log";
 import { PubSub } from "./PubSub";
+import { ResultSetInfo } from "./ResultSetInfo";
 import { Singletons } from "./Singletons";
 import { App } from "./widget/App";
 import { CompIntf } from "./widget/base/CompIntf";
@@ -66,7 +68,8 @@ export class Meta64 implements Meta64Intf {
 
     scrollPosByTabName: Map<string, number> = new Map<string, number>();
 
-    logView: LogView = new LogView();
+    // not currently used.
+    // logView: LogView = new LogView();
 
     sendTestEmail = (): void => {
         S.util.ajax<J.SendTestEmailRequest, J.SendTestEmailResponse>("sendTestEmail", {}, function (res: J.SendTestEmailResponse) {
@@ -274,7 +277,11 @@ export class Meta64 implements Meta64Intf {
         }
     }
 
-    /* Find node by looking everywhere we possibly can on local storage for it */
+    /* todo-0: This code has a bad smell to it, upon second look months later, check that this is good, and wasn't a
+    short-term technical debt.
+
+    Find node by looking everywhere we possibly can on local storage for it
+    */
     findNodeById = (state: AppState, nodeId: string): J.NodeInfo => {
         // first look in normal tree map for main view.
         let node: J.NodeInfo = state.idToNodeMap.get(nodeId);
@@ -284,11 +291,12 @@ export class Meta64 implements Meta64Intf {
         }
 
         if (!node) {
-            node = state.timelineInfo.results.find(n => n.id === nodeId);
-        }
-
-        if (!node) {
-            node = state.searchInfo.results.find(n => n.id === nodeId);
+            for (let data of state.tabData) {
+                if (data.rsInfo && data.rsInfo.results) {
+                    node = data.rsInfo.results.find(n => n.id === nodeId);
+                    if (node) break;
+                }
+            }
         }
         return node;
     }
@@ -339,25 +347,36 @@ export class Meta64 implements Meta64Intf {
                         name: "Main",
                         id: "mainTab",
                         isVisible: () => true,
-                        constructView: (data: TabDataIntf) => new MainTabComp()
+                        constructView: (data: TabDataIntf) => new MainTabComp(data),
+                        rsInfo: null
                     },
                     {
                         name: "Search",
-                        id: "searchTab",
-                        isVisible: () => s.searchInfo.results && s.searchInfo.results.length > 0,
-                        constructView: (data: TabDataIntf) => new SearchView()
+                        id: "resultSetView",
+                        isVisible: () => this.resultSetHasData("resultSetView"),
+                        constructView: (data: TabDataIntf) => new SearchResultSetView(data),
+                        rsInfo: new ResultSetInfo()
+                    },
+                    {
+                        name: "Shared Nodes",
+                        id: "sharedNodesResultSetView",
+                        isVisible: () => this.resultSetHasData("sharedNodesResultSetView"),
+                        constructView: (data: TabDataIntf) => new SharedNodesResultSetView(data),
+                        rsInfo: new ResultSetInfo()
                     },
                     {
                         name: "Timeline",
-                        id: "timelineTab",
-                        isVisible: () => s.timelineInfo.results && s.timelineInfo.results.length > 0,
-                        constructView: (data: TabDataIntf) => new TimelineView()
+                        id: "timelineResultSetView",
+                        isVisible: () => this.resultSetHasData("timelineResultSetView"),
+                        constructView: (data: TabDataIntf) => new TimelineResultSetView(data),
+                        rsInfo: new ResultSetInfo()
                     },
                     {
                         name: "Fediverse",
                         id: "feedTab",
                         isVisible: () => true,
-                        constructView: (data: TabDataIntf) => new FeedView()
+                        constructView: (data: TabDataIntf) => new FeedView(data),
+                        rsInfo: null
                     }
                 ];
                 return s;
@@ -545,6 +564,12 @@ export class Meta64 implements Meta64Intf {
 
             resolve();
         });
+    }
+
+    resultSetHasData = (id: string) => {
+        let state: AppState = store.getState();
+        let data = state.tabData.find(d => d.id === id);
+        return data && data.rsInfo && data.rsInfo.results && data.rsInfo.results.length > 0;
     }
 
     /* This function manages persisting the scroll position when switching

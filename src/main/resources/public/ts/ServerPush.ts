@@ -38,12 +38,15 @@ export class ServerPush implements ServerPushIntf {
 
             if (nodeInfo) {
                 dispatch("Action_RenderTimelineResults", (s: AppState): AppState => {
-                    if (s.timelineInfo.results) {
+                    let data = s.tabData.find(d => d.id === "timelineResultSetView");
+                    if (!data) return;
+
+                    if (data.rsInfo.results) {
                         // remove this nodeInfo if it's already in the results.
-                        s.timelineInfo.results = s.timelineInfo.results.filter((ni: J.NodeInfo) => ni.id !== nodeInfo.id);
+                        data.rsInfo.results = data.rsInfo.results.filter((ni: J.NodeInfo) => ni.id !== nodeInfo.id);
 
                         // now add to the top of the list.
-                        s.timelineInfo.results.unshift(nodeInfo);
+                        data.rsInfo.results.unshift(nodeInfo);
                     }
                     return s;
                 });

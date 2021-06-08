@@ -2,13 +2,12 @@ import { store } from "../AppRedux";
 import { AppState } from "../AppState";
 import { Constants as C } from "../Constants";
 import { LogViewIntf } from "../intf/LogViewIntf";
+import { TabDataIntf } from "../intf/TabDataIntf";
 import { Log } from "../Log";
 import { PubSub } from "../PubSub";
 import { Singletons } from "../Singletons";
-import { Anchor } from "../widget/Anchor";
 import { AppTab } from "../widget/AppTab";
 import { Html } from "../widget/Html";
-import { Li } from "../widget/Li";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
@@ -19,10 +18,8 @@ export class LogView extends AppTab implements LogViewIntf {
     static logs: string = "";
     static showLogs: boolean = false;
 
-    constructor() {
-        super({
-            id: "logTab"
-        });
+    constructor(data: TabDataIntf) {
+        super(data);
         Log.logView = this;
     }
 
