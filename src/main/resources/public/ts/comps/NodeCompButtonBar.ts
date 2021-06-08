@@ -124,8 +124,7 @@ export class NodeCompButtonBar extends Div {
 
         let isInlineChildren = !!S.props.getNodePropVal(J.NodeProp.INLINE_CHILDREN, node);
 
-        /* Construct Open Button.
-
+        /*
         We always enable for fs:folder, to that by clicking to open a folder that will cause the server to re-check and see if there are
         truly any files in there or not because we really cannot possibly know until we look. The only way to make this Open button
         ONLY show when there ARE truly children fore sure would be to force a check of the file system for every folder type that is ever rendered
@@ -146,7 +145,6 @@ export class NodeCompButtonBar extends Div {
          * intelligence to when to show these buttons or not.
          */
         if (state.userPreferences.editMode) {
-
             let checkboxForEdit = editingAllowed && (state.isAdminUser || S.render.allowAction(typeHandler, NodeActionType.editNode, node, state));
             let checkboxForDelete = state.isAdminUser || deleteAllowed;
 
@@ -175,12 +173,9 @@ export class NodeCompButtonBar extends Div {
             if (state.homeNodeId !== node.id) {
                 if (typeHandler) {
                     insertAllowed = state.isAdminUser || typeHandler.allowAction(NodeActionType.insert, node, state);
-                    // console.log("Node " + node.id + " TypeHandler insert Allowed: " + insertAllowed);
                 }
             }
-
             let editInsertAllowed = S.edit.isInsertAllowed(node, state);
-            // console.log("Node " + node.id + " Edit insert Allowed: " + editInsertAllowed);
 
             if (C.NEW_ON_TOOLBAR && insertAllowed && editInsertAllowed) {
                 createSubNodeButton = new Button("New", S.edit.newSubNode,
@@ -272,7 +267,6 @@ export class NodeCompButtonBar extends Div {
         let navButtonBar = null;
 
         if (isPageRootNode) {
-
             let upLevelButton: IconButton;
             let prevButton: IconButton;
             let nextButton: IconButton;
@@ -280,7 +274,6 @@ export class NodeCompButtonBar extends Div {
             let timelineButton: IconButton;
 
             if (state.node && this.node.id === state.node.id) {
-
                 if (S.nav.parentVisibleToUser(state)) {
                     upLevelButton = new IconButton("fa-chevron-circle-up", "Up", {
                         /* For onclick functions I need a new approach for some (not all) where I can get by

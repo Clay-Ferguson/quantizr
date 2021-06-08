@@ -103,21 +103,15 @@ export class TimelineView extends AppTab {
 
         children.push(new ButtonBar([
             state.timelineInfo.page > 1 ? new IconButton("fa-angle-double-left", null, {
-                onClick: () => {
-                    S.srch.timelinePageChange(state, 0);
-                },
+                onClick: () => S.srch.timelinePageChange(state, 0),
                 title: "First Page"
             }) : null,
             state.timelineInfo.page > 0 ? new IconButton("fa-angle-left", null, {
-                onClick: () => {
-                    S.srch.timelinePageChange(state, -1);
-                },
+                onClick: () => S.srch.timelinePageChange(state, -1),
                 title: "Previous Page"
             }) : null,
             !state.timelineInfo.endReached ? new IconButton("fa-angle-right", "More", {
-                onClick: (event) => {
-                    S.srch.timelinePageChange(state, 1);
-                },
+                onClick: (event) => S.srch.timelinePageChange(state, 1),
                 title: "Next Page"
             }) : null
         ], "text-center marginBottom"));

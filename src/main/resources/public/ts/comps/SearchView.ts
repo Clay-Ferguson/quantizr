@@ -45,8 +45,8 @@ export class SearchView extends AppTab {
     preRender(): void {
         let state: AppState = useSelector((state: AppState) => state);
         let results = state.searchInfo.results;
-
         this.attribs.className = "tab-pane fade my-tab-pane";
+
         if (state.activeTab === this.getId()) {
             this.attribs.className += " show active";
         }

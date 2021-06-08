@@ -48,22 +48,10 @@ export class NodeCompTableRowLayout extends Div {
             maxCols = 6;
         }
         let cellWidth = 100 / maxCols;
-
-        let countToDisplay = 0;
-
-        // we have to make a pass over children before main loop below, because we need the countToDisplay
-        // to ber correct before the second loop stats.
-        for (let i = 0; i < this.node.children.length; i++) {
-            let n: J.NodeInfo = this.node.children[i];
-            if (!(state.nodesToMove && state.nodesToMove.find(id => id === n.id))) {
-                countToDisplay++;
-            }
-        }
-
         let allowInsert = S.edit.isInsertAllowed(this.node, state);
-
         let curCols = 0;
         let lastNode: J.NodeInfo = null;
+
         for (let i = 0; i < this.node.children.length; i++) {
             let comps: Comp[] = [];
             let n: J.NodeInfo = this.node.children[i];
@@ -102,7 +90,7 @@ export class NodeCompTableRowLayout extends Div {
 
                 if (++curCols === maxCols) {
                     children.push(curRow);
-                    curRow = new Div(null, { style: { display: "table-row" } });
+                    curRow = new Div(null, { className: "tableRow" });
                     curCols = 0;
                 }
             }
@@ -120,7 +108,6 @@ export class NodeCompTableRowLayout extends Div {
             }
 
             if (this.level <= 1) {
-
                 // todo-1: this button should have same enablement as "new" button, on the page root
                 let btn = new IconButton("fa-plus", null, {
                     onClick: e => {

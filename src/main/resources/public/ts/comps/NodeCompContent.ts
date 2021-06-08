@@ -7,7 +7,6 @@ import { PubSub } from "../PubSub";
 import { Singletons } from "../Singletons";
 import { CompIntf } from "../widget/base/CompIntf";
 import { Div } from "../widget/Div";
-import { Heading } from "../widget/Heading";
 import { NodeCompBinary } from "./NodeCompBinary";
 
 let S: Singletons;
@@ -37,7 +36,6 @@ export class NodeCompContent extends Div {
 
         let children: CompIntf[] = [];
         let typeHandler: TypeHandlerIntf = S.plugin.getTypeHandler(node.type);
-
         let embeddedImg = false;
 
         if (state.showProperties) {
@@ -45,7 +43,8 @@ export class NodeCompContent extends Div {
             if (propTable) {
                 children.push(propTable);
             }
-        } else {
+        }
+        else {
             if (!typeHandler) {
                 typeHandler = S.plugin.getTypeHandler(J.NodeType.NONE);
             }

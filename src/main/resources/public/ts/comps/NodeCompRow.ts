@@ -115,7 +115,6 @@ export class NodeCompRow extends Div {
 
         let indentLevel = this.isTableCell ? 0 : this.level;
         let style = indentLevel > 0 ? { marginLeft: "" + ((indentLevel - 1) * 30) + "px" } : null;
-
         let focusNode: J.NodeInfo = S.meta64.getHighlightedNode(state);
         let selected: boolean = (focusNode && focusNode.id === id);
         this.attribs.className = (layoutClass || "") + (selected ? " active-row" : " inactive-row");

@@ -37,8 +37,7 @@ export class NodeCompMarkdown extends Html {
         }
         /* otherwise it's not encrypted and we display the normal way */
         else {
-            let val = this.renderRawMarkdown(node);
-            att.content = val;
+            att.content = this.renderRawMarkdown(node);
         }
 
         this.mergeState(att);
@@ -117,7 +116,6 @@ export class NodeCompMarkdown extends Html {
         let state = this.getState();
         if (!state.pendingDecrypt) return;
         let appState: AppState = store.getState();
-
         let cipherText = state.pendingDecrypt.substring(J.Constant.ENC_TAG.length);
         // console.log("decrypting CIPHERTEXT (in NodeCompMarkdown): " + cipherText);
 

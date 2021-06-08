@@ -24,7 +24,6 @@ export class NodeCompRowFooter extends Div {
     preRender(): void {
         let state: AppState = useSelector((state: AppState) => state);
         let children = [];
-
         let publicReadOnly = S.props.isPublicReadOnly(this.node);
         let acCount = S.props.getAcCount(this.node);
 

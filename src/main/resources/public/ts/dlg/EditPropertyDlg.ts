@@ -50,7 +50,6 @@ export class EditPropertyDlg extends DialogBase {
         else {
             this.nameState.setError(null);
         }
-
         return valid;
     }
 
@@ -58,7 +57,6 @@ export class EditPropertyDlg extends DialogBase {
         if (!this.validate()) {
             return;
         }
-
         let name = this.nameState.getValue();
 
         /* verify first that this property doesn't already exist */
@@ -66,7 +64,6 @@ export class EditPropertyDlg extends DialogBase {
             S.util.showMessage("Property already exists: " + name, "Warning");
             return;
         }
-
         this.close();
     }
 }

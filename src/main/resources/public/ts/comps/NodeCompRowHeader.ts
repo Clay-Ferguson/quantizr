@@ -35,9 +35,8 @@ export class NodeCompRowHeader extends Div {
         let state: AppState = useSelector((state: AppState) => state);
         let node = this.node;
         let children = [];
-        // console.log("NodeCompHeaderRow: " + S.util.prettyPrint(node));
         let avatarImg: Img = null;
-        // console.log("node.id=" + node.id + " allowAvatar=" + this.allowAvatars);
+
         if (this.allowAvatars && node.owner !== J.PrincipalName.ADMIN) {
             avatarImg = S.render.makeAvatarImage(node, state);
             if (avatarImg) {
@@ -103,11 +102,7 @@ export class NodeCompRowHeader extends Div {
 
         if (S.props.isPublic(node)) {
             floatUpperRightDiv.addChild(new Icon({
-                style: {
-                    marginLeft: "12px",
-                    verticalAlign: "middle"
-                },
-                className: "fa fa-globe fa-lg",
+                className: "fa fa-globe fa-lg iconMarginLeft",
                 title: "Node is Public\n(Shared to everyone)"
             }));
         }
@@ -129,17 +124,12 @@ export class NodeCompRowHeader extends Div {
                     // shos sharing names only if not public
                     !isPublic ? new Span(sharingNames) : null,
                     new Icon({
-                        style: {
-                            marginLeft: "12px",
-                            verticalAlign: "middle"
-                        },
-                        className: "fa fa-envelope fa-lg"
+                        className: "fa fa-envelope fa-lg iconMarginLeft"
                     })
                 ]));
         }
 
         let typeHandler: TypeHandlerIntf = S.plugin.getTypeHandler(node.type);
-
         let editingAllowed = S.edit.isEditAllowed(node, state);
         let deleteAllowed = false;
         let editableNode = true;

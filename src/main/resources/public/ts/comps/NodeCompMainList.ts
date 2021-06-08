@@ -6,7 +6,6 @@ import { PubSub } from "../PubSub";
 import { Singletons } from "../Singletons";
 import { Comp } from "../widget/base/Comp";
 import { ButtonBar } from "../widget/ButtonBar";
-import { CollapsibleHelpPanel } from "../widget/CollapsibleHelpPanel";
 import { Div } from "../widget/Div";
 import { IconButton } from "../widget/IconButton";
 

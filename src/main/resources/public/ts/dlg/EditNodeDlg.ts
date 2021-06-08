@@ -274,8 +274,7 @@ export class EditNodeDlg extends DialogBase {
                 if (!span) span = new Span();
                 span.addChild(new Icon({
                     title: `Node is a '${typeHandler.getName()}' type.`,
-                    style: { marginRight: "12px", verticalAlign: "middle" },
-                    className: iconClass
+                    className: iconClass + " iconMarginRight"
                 }));
             }
         }
@@ -285,8 +284,7 @@ export class EditNodeDlg extends DialogBase {
             if (!span) span = new Span();
             span.addChild(new Icon({
                 title: "Node has a 'Date' property.",
-                style: { marginRight: "12px", verticalAlign: "middle" },
-                className: "fa fa-calendar fa-lg"
+                className: "fa fa-calendar fa-lg iconMarginRight"
             }));
         }
 
@@ -330,8 +328,7 @@ export class EditNodeDlg extends DialogBase {
 
         if (S.props.isEncrypted(state.node)) {
             comps.push(new Icon({
-                style: { marginLeft: "12px", verticalAlign: "middle" },
-                className: "fa fa-lock fa-lg"
+                className: "fa fa-lock fa-lg iconMarginLeft"
             }));
         }
 

@@ -44,7 +44,6 @@ export class NodeCompBinary extends Div {
             imgSize = (this.imgSizeOverride && this.imgSizeOverride !== "n") ? this.imgSizeOverride : S.props.getNodePropVal(J.NodeProp.IMG_SIZE, node);
         }
         let style: any = {};
-        // console.log("id: " + node.id + " imgSize=" + imgSize);
 
         if (!imgSize || imgSize === "0") {
             style.maxWidth = "";
@@ -143,8 +142,7 @@ export class NodeCompBinary extends Div {
                 title: `File Size:${fileSize} Type:${fileType}`
             }, [
                 new Icon({
-                    style: { marginRight: "12px", verticalAlign: "middle" },
-                    className: "fa fa-file fa-lg"
+                    className: "fa fa-file fa-lg iconMarginRight"
                 }),
                 new Span(fileName, {
                     className: "normalText marginRight"

@@ -63,7 +63,6 @@ export class LoginDlg extends DialogBase {
         else {
             this.pwdState.setError(null);
         }
-
         return valid;
     }
 
@@ -84,7 +83,6 @@ export class LoginDlg extends DialogBase {
         if (!this.validate()) {
             return;
         }
-
         let usr = this.userState.getValue();
 
         /* The word admin is not a secret so let's make it easy for the admin to login using only his password */

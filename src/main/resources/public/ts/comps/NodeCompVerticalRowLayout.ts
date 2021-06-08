@@ -27,23 +27,10 @@ export class NodeCompVerticalRowLayout extends Div {
         let state: AppState = useSelector((state: AppState) => state);
         let childCount: number = this.node.children.length;
         let comps: Comp[] = [];
-        let countToDisplay = 0;
-
-        /* we have to make a pass over children before main loop below, because we need the countToDisplay
-        to ber correct before the second loop stats. */
-        for (let i = 0; i < this.node.children.length; i++) {
-            let n: J.NodeInfo = this.node.children[i];
-            if (n) {
-                if (!(state.nodesToMove && state.nodesToMove.find(id => id === n.id))) {
-                    countToDisplay++;
-                }
-            }
-        }
-
         let allowInsert = S.edit.isInsertAllowed(this.node, state);
-
         let rowCount: number = 0;
         let lastNode: J.NodeInfo = null;
+
         for (let i = 0; i < this.node.children.length; i++) {
             let n: J.NodeInfo = this.node.children[i];
             if (n) {
@@ -80,7 +67,6 @@ export class NodeCompVerticalRowLayout extends Div {
             }
 
             if (this.level <= 1) {
-
                 // todo-1: this button should have same enabelement as "new" button, on the page root
                 let btn = new IconButton("fa-plus", null, {
                     onClick: e => {

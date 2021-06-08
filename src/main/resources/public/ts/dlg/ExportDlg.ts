@@ -13,7 +13,6 @@ import { Button } from "../widget/Button";
 import { ButtonBar } from "../widget/ButtonBar";
 import { Checkbox } from "../widget/Checkbox";
 import { Div } from "../widget/Div";
-import { Heading } from "../widget/Heading";
 import { RadioButton } from "../widget/RadioButton";
 import { RadioButtonGroup } from "../widget/RadioButtonGroup";
 import { TextField } from "../widget/TextField";
@@ -34,7 +33,7 @@ export class ExportDlg extends DialogBase {
         super("Export", null, false, state);
         this.mergeState({
             exportType: "zip"
-            // toIpfs: false <--- set by by 'saveToIpfsState'
+            // toIpfs: false <--- set by 'saveToIpfsState'
         });
         this.fileNameState.setValue(node.name);
     }
