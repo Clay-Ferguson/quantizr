@@ -68,26 +68,28 @@ export class UserProfileDlg extends DialogBase {
                 profileImg,
 
                 new Div(null, { className: "marginBottom" }, [
-                    new Div(null, { className: "float-right" }, [
-                        new Span(state.userProfile.followerCount + " followers", {
-                            onClick: () => {
-                                if (state.userProfile.followerCount) {
-                                    this.close();
-                                    S.srch.showFollowers(0);
-                                }
-                            },
-                            className: "followCount"
-                        }),
-                        new Span(state.userProfile.followingCount + " following", {
-                            onClick: () => {
-                                if (!this.readOnly && state.userProfile.followingCount) {
-                                    this.close();
-                                    S.nav.openContentNode("~" + J.NodeType.FRIEND_LIST);
-                                }
-                            },
-                            className: "followCount"
-                        })
-                    ]),
+
+                    // not yet returning correct numbers/results (todo-0)
+                    // new Div(null, { className: "float-right" }, [
+                    //     new Span(state.userProfile.followerCount + " followers", {
+                    //         onClick: () => {
+                    //             if (state.userProfile.followerCount) {
+                    //                 this.close();
+                    //                 S.srch.showFollowers(0);
+                    //             }
+                    //         },
+                    //         className: "followCount"
+                    //     }),
+                    //     new Span(state.userProfile.followingCount + " following", {
+                    //         onClick: () => {
+                    //             if (!this.readOnly && state.userProfile.followingCount) {
+                    //                 this.close();
+                    //                 S.nav.openContentNode("~" + J.NodeType.FRIEND_LIST);
+                    //             }
+                    //         },
+                    //         className: "followCount"
+                    //     })
+                    // ]),
 
                     this.readOnly
                         ? new Heading(4, state.userProfile.displayName || "")
