@@ -34,7 +34,9 @@ import org.subnode.mongo.MongoUtil;
 import org.subnode.mongo.RunAsMongoAdminEx;
 import org.subnode.mongo.model.SubNode;
 import org.subnode.request.GetFollowersRequest;
+import org.subnode.request.GetFollowingRequest;
 import org.subnode.response.GetFollowersResponse;
+import org.subnode.response.GetFollowingResponse;
 import org.subnode.service.NodeEditService;
 import org.subnode.util.Const;
 import org.subnode.util.Convert;
@@ -363,6 +365,34 @@ public class ActPubFollowing {
 
         MongoSession adminSession = auth.getAdminSession();
         Query query = followersOfUser_query(adminSession, req.getTargetUserName());
+        if (query == null)
+            return null;
+
+        query.limit(Const.ROWS_PER_PAGE);
+        query.skip(Const.ROWS_PER_PAGE * req.getPage());
+
+        Iterable<SubNode> iterable = util.find(query);
+        List<NodeInfo> searchResults = new LinkedList<NodeInfo>();
+        int counter = 0;
+
+        for (SubNode node : iterable) {
+            NodeInfo info = convert.convertToNodeInfo(ThreadLocals.getSessionContext(), adminSession, node, true, false, counter + 1,
+                    false, false);
+            searchResults.add(info);
+        }
+
+        res.setSearchResults(searchResults);
+        return res;
+    }
+
+    public GetFollowingResponse getFollowing(MongoSession session, GetFollowingRequest req) {
+        GetFollowingResponse res = new GetFollowingResponse();
+        if (session == null) {
+            session = ThreadLocals.getMongoSession();
+        }
+
+        MongoSession adminSession = auth.getAdminSession();
+        Query query = findFollowingOfUser_query(adminSession, req.getTargetUserName());
         if (query == null)
             return null;
 

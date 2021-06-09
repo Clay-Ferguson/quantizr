@@ -99,6 +99,11 @@ export interface GetFollowersRequest extends RequestBase {
     targetUserName: string;
 }
 
+export interface GetFollowingRequest extends RequestBase {
+    page: number;
+    targetUserName: string;
+}
+
 export interface GetFriendsRequest extends RequestBase {
 }
 
@@ -416,6 +421,10 @@ export interface GetConfigResponse extends ResponseBase {
 }
 
 export interface GetFollowersResponse extends ResponseBase {
+    searchResults: NodeInfo[];
+}
+
+export interface GetFollowingResponse extends ResponseBase {
     searchResults: NodeInfo[];
 }
 

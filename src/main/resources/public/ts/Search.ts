@@ -240,6 +240,8 @@ export class Search implements SearchIntf {
                     data.rsInfo.caseSensitive = false;
                     data.rsInfo.prop = null;
                     data.rsInfo.endReached = !res.searchResults || res.searchResults.length < S.nav.ROWS_PER_PAGE;
+
+                    // well be showing who the followers of userName are
                     data.rsInfo.showingFollowersOfUser = userName;
                     S.meta64.selectTabStateOnly(data.id, s);
                     return s;
@@ -251,17 +253,58 @@ export class Search implements SearchIntf {
         });
     }
 
+    showFollowing = (page: number, userName: string): void => {
+        let state: AppState = store.getState();
+        if (state.isAnonUser || state.isAdminUser) return;
+
+        if (!userName) {
+            userName = state.userName;
+        }
+
+        S.util.ajax<J.GetFollowingRequest, J.GetFollowingResponse>("getFollowing", {
+            page,
+            targetUserName: userName
+        }, (res) => {
+            if (res.searchResults && res.searchResults.length > 0) {
+                dispatch("Action_RenderSearchResults", (s: AppState): AppState => {
+                    let data = s.tabData.find(d => d.id === "followingResultSetView");
+                    if (!data) return;
+
+                    data.rsInfo.results = res.searchResults;
+                    data.rsInfo.page = page;
+                    data.rsInfo.userSearchType = "following";
+                    data.rsInfo.description = null;
+                    data.rsInfo.node = null;
+                    data.rsInfo.searchText = null;
+                    data.rsInfo.fuzzy = false;
+                    data.rsInfo.caseSensitive = false;
+                    data.rsInfo.prop = null;
+                    data.rsInfo.endReached = !res.searchResults || res.searchResults.length < S.nav.ROWS_PER_PAGE;
+
+                    // we'll be showig who userName is following here.
+                    data.rsInfo.showingFollowingOfUser = userName;
+                    S.meta64.selectTabStateOnly(data.id, s);
+                    return s;
+                });
+            }
+            else {
+                new MessageDlg("No search results found.", "Following", null, null, false, 0, state).open();
+            }
+        });
+    }
+
     /*
      * Renders a single line of search results on the search results page.
      */
-    renderSearchResultAsListItem = (node: J.NodeInfo, index: number, count: number, rowCount: number, prefix: string, isFeed: boolean, isParent: boolean, allowAvatars: boolean, jumpButton: boolean, state: AppState): Comp => {
+    renderSearchResultAsListItem = (node: J.NodeInfo, index: number, count: number, rowCount: number, prefix: string,
+        isFeed: boolean, isParent: boolean, allowAvatars: boolean, jumpButton: boolean, allowHeader: boolean, allowFooter: boolean, state: AppState): Comp => {
         if (!node) return;
 
         /* If there's a parent on this node it's a 'feed' item and this parent is what the user was replyig to so we display it just above the
         item we are rendering */
         let parentItem: Comp = null;
         if (node.parent) {
-            parentItem = this.renderSearchResultAsListItem(node.parent, index, count, rowCount, prefix, isFeed, true, allowAvatars, jumpButton, state);
+            parentItem = this.renderSearchResultAsListItem(node.parent, index, count, rowCount, prefix, isFeed, true, allowAvatars, jumpButton, allowHeader, allowFooter, state);
         }
 
         const cssId = this._UID_ROWID_PREFIX + node.id;
@@ -289,12 +332,12 @@ export class Search implements SearchIntf {
             id: cssId,
             nid: node.id
         }, [
-            new NodeCompRowHeader(node, true, false, isFeed, jumpButton),
+            allowHeader ? new NodeCompRowHeader(node, true, false, isFeed, jumpButton) : null,
             content,
-            new NodeCompRowFooter(node, isFeed)
+            allowFooter ? new NodeCompRowFooter(node, isFeed) : null
         ]);
 
-        let itemClass = (index === count - 1) ? "userFeedItemLast" : "userFeedItem";
+        let itemClass = "userFeedItem"; // (index === count - 1) ? "userFeedItemLast" : "userFeedItem";
 
         return new Div(null, {
             className: isParent ? "userFeedItemParent" : itemClass

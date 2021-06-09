@@ -22,6 +22,9 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
 /* General Widget that doesn't fit any more reusable or specific category other than a plain Div, but inherits capability of Comp class */
 export abstract class ResultSetView extends AppTab {
 
+    allowHeader: boolean = true;
+    allowFooter: boolean = true;
+
     constructor(data: TabDataIntf) {
         super(data);
     }
@@ -29,6 +32,7 @@ export abstract class ResultSetView extends AppTab {
     preRender(): void {
         let state: AppState = useSelector((state: AppState) => state);
         let results = this.data && this.data.rsInfo.results;
+        if (!results) return;
         this.attribs.className = "tab-pane fade my-tab-pane";
 
         if (state.activeTab === this.getId()) {
@@ -86,7 +90,7 @@ export abstract class ResultSetView extends AppTab {
 
     /* overridable (don't use arrow function) */
     renderItem(node: J.NodeInfo, i: number, childCount: number, rowCount: number, jumpButton: boolean, state: AppState): CompIntf {
-        return S.srch.renderSearchResultAsListItem(node, i, childCount, rowCount, this.data.id, false, false, true, jumpButton, state);
+        return S.srch.renderSearchResultAsListItem(node, i, childCount, rowCount, this.data.id, false, false, true, jumpButton, this.allowHeader, this.allowFooter, state);
     }
 
     addPaginationBar = (state: AppState, children: CompIntf[]): void => {

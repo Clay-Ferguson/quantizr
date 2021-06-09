@@ -1618,16 +1618,12 @@ i'm backing out for now
 }
 
 .userFeedItem {
-    border-top: 2px solid $nodeBorderBottomColor;
-    border-right: 2px solid $nodeBorderBottomColor;
-    border-left: 2px solid $nodeBorderBottomColor;
-}
-
-.userFeedItemLast {
+    margin-top: 10px;
+    margin-right: 10px;
     border: 2px solid $nodeBorderBottomColor;
     margin-bottom: 10px;
+    padding: 10px;
 }
-
 
 .userFeedParent {
     border: 2px solid $nodeBorderBottomColor;

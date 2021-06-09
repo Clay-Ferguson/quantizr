@@ -7,10 +7,7 @@ import * as J from "../JavaIntf";
 import { PubSub } from "../PubSub";
 import { Singletons } from "../Singletons";
 import { CompIntf } from "../widget/base/CompIntf";
-import { Div } from "../widget/Div";
 import { Heading } from "../widget/Heading";
-import { Img } from "../widget/Img";
-import { Span } from "../widget/Span";
 import { ResultSetView } from "./ResultSetView";
 
 let S: Singletons;
@@ -31,50 +28,26 @@ export class FollowersResultSetView extends ResultSetView {
     }
 
     renderHeading(): CompIntf {
-        return new Heading(4, "Followers of @" + this.data.rsInfo.showingFollowersOfUser, { className: "resultsTitle" });
+        return new Heading(4, "Followers (@" + this.data.rsInfo.showingFollowersOfUser + ")", { className: "resultsTitle" });
     }
 
     /* Renders the info for the OWNER of 'node', and not the content of the actual node, becasue the content will basically
-    all be the same here which will be the user being followed, and is not needed to be displayed */
-    renderItem(node: J.NodeInfo, i: number, childCount: number, rowCount: number, jumpButton: boolean, state: AppState): CompIntf {
+    all be the same here which will be the user being followed, and is not needed to be displayed.
 
-        // todo-0: detect if this is a foreign user and don't render them. WE don't support that yet.
+    This node needs to share as much implementation for item rendering as possible with what's done in the, FriendTypeHandler
+    Probably need a static method on FriendTypeHandler itself which can do everything based on input parameters only.
+    */
+    renderItem(node: J.NodeInfo, i: number, childCount: number, rowCount: number, jumpButton: boolean, state: AppState): CompIntf {
         if (node.owner.indexOf("@") !== -1) {
             return null;
         }
 
-        let ret = new Div(null, {
-            onClick: (evt: any) => {
+        let userNodeId: string = S.props.getNodePropVal(J.NodeProp.USER_NODE_ID, node);
+        let imgSrc = node.avatarVer ? S.render.getAvatarImgUrl(node.ownerId, node.avatarVer) : null;
+
+        return S.render.renderUser(state, node.id, node.owner, null, userNodeId, imgSrc, null,
+            node.displayName, "userFeedItem", false, (evt: any) => {
                 new UserProfileDlg(node.ownerId, state).open();
-            }
-        });
-
-        let src: string = null;
-        if (node.avatarVer) {
-            src = S.render.getAvatarImgUrl(node.ownerId, node.avatarVer);
-        }
-        let img: Img = null;
-
-        if (src) {
-            img = new Img(null, {
-                className: "friendListImage",
-                src: src
             });
-        }
-
-        let friendDisplay = node.displayName
-            ? node.displayName + " (@" + node.owner + ")"
-            : ("@" + node.owner);
-
-        ret.setChildren([
-            new Div(null, {
-                className: "unselectedListItem"
-            }, [
-                img,
-                new Span(friendDisplay, { className: "friendListText" })
-            ])
-        ]);
-
-        return ret;
     }
 }

@@ -70,13 +70,10 @@ export class FriendTypeHandler extends TypeBase {
 
     render(node: J.NodeInfo, rowStyling: boolean, state: AppState): Comp {
         let user: string = S.props.getNodePropVal(J.NodeProp.USER, node);
-
         let userBio: string = S.props.getClientPropVal(J.NodeProp.USER_BIO, node);
         let userNodeId: string = S.props.getNodePropVal(J.NodeProp.USER_NODE_ID, node);
-
-        let img: Img = null;
-
-        /* First try to get the icon as an ActPub one */
+        let actorUrl = S.props.getClientPropVal(J.NodeProp.ACT_PUB_ACTOR_URL, node);
+        let displayName = S.props.getClientPropVal(J.NodeProp.DISPLAY_NAME, node);
         let imgSrc = S.props.getClientPropVal(J.NodeProp.ACT_PUB_USER_ICON_URL, node);
 
         /* If not ActivityPub try as local user */
@@ -87,54 +84,9 @@ export class FriendTypeHandler extends TypeBase {
             }
         }
 
-        let actorUrl = S.props.getClientPropVal(J.NodeProp.ACT_PUB_ACTOR_URL, node);
-        let displayName = S.props.getClientPropVal(J.NodeProp.DISPLAY_NAME, node);
-
-        if (imgSrc) {
-            img = new Img(null, {
-                className: "friendImage",
-                align: "left", // causes text to flow around
-                src: imgSrc,
-                onClick: (evt: any) => {
-                    new UserProfileDlg(userNodeId, state).open();
-                }
+        return S.render.renderUser(state, node.id, user, userBio, userNodeId, imgSrc, actorUrl,
+            displayName, null, true, (evt: any) => {
+                new UserProfileDlg(userNodeId, state).open();
             });
-        }
-
-        let disp = displayName
-            ? displayName + " (@" + user + ")"
-            : ("@" + user);
-
-        return new Div(null, {
-            // className: "marginLeft"
-        }, [
-            img,
-            new Div(null, null, [
-                new Heading(4, disp, {
-                    className: "marginAll"
-                }),
-                new Html(userBio, {
-                    className: "userBio"
-                })]),
-            new Div(null, null, [
-                new ButtonBar([
-                    new Button("Message", S.edit.newSubNode, {
-                        title: "Send Private Message",
-                        nid: node.id
-                    }),
-                    actorUrl ? new Button("Go to User Page", () => {
-                        window.open(actorUrl, "_blank");
-                    }) : null
-                ], null, "float-right marginBottom"),
-                new Div(null, { className: "clearfix" })])
-
-            // todo-0: oops this opens up help on EVERY friend node on the page! don't do that,
-            // plus it's just ugly how it consumes so much screen space, maybe just say this
-            // text inside the help of the "Friends List" itself.
-            // new CollapsibleHelpPanel("Help", S.meta64.config.help.type.friend.render,
-            //     (state: boolean) => {
-            //         FriendTypeHandler.helpExpanded = state;
-            //     }, FriendTypeHandler.helpExpanded)
-        ]);
     }
 }

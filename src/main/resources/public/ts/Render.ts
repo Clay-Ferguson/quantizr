@@ -15,8 +15,11 @@ import * as J from "./JavaIntf";
 import { PubSub } from "./PubSub";
 import { Singletons } from "./Singletons";
 import { Comp } from "./widget/base/Comp";
+import { Button } from "./widget/Button";
+import { ButtonBar } from "./widget/ButtonBar";
 import { Div } from "./widget/Div";
 import { Heading } from "./widget/Heading";
+import { Html } from "./widget/Html";
 import { Img } from "./widget/Img";
 
 let S: Singletons;
@@ -616,13 +619,70 @@ export class Render implements RenderIntf {
     }
 
     parseEmojis = (value: any): any => {
+        if (!value) return value;
         const emojisArray = toArray(value);
+        if (!emojisArray) return value;
         const newValue = emojisArray.reduce((previous: any, current: any) => {
             if (typeof current === "string") {
                 return previous + current;
             }
-            return previous + current.props.children;
+            if (current && current.props) {
+                return previous + current.props.children;
+            }
+            else {
+                return previous;
+            }
         }, "");
         return newValue;
     };
+
+    renderUser(state: AppState, nodeId: string, user: string, userBio: string, userNodeId: string, imgSrc: string, actorUrl: string,
+        displayName: string, className: string, showMessageButton: boolean, onClick: Function): Comp {
+
+        let img: Img = null;
+        if (imgSrc) {
+            img = new Img(null, {
+                className: "friendImage",
+                align: "left", // causes text to flow around
+                src: imgSrc,
+                onClick
+            });
+        }
+
+        let disp = displayName ? displayName + " (@" + user + ")" : ("@" + user);
+        let attribs: any = {};
+        if (className) attribs.className = className;
+
+        return new Div(null, attribs, [
+            img,
+            new Div(null, null, [
+                new Heading(4, disp, {
+                    className: "marginAll"
+                }),
+                new Html(userBio, {
+                    className: "userBio"
+                })]),
+            new Div(null, null, [
+                new ButtonBar([
+                    // todo-0: need to make ALL calls be able to do a newSubNode here without so we don't need
+                    // the showMessagesButton flag.
+                    showMessageButton ? new Button("Message", S.edit.newSubNode, {
+                        title: "Send Private Message",
+                        nid: nodeId
+                    }) : null,
+                    actorUrl ? new Button("Go to User Page", () => {
+                        window.open(actorUrl, "_blank");
+                    }) : null
+                ], null, "float-right marginBottom"),
+                new Div(null, { className: "clearfix" })])
+
+            // todo-1: oops this opens up help on EVERY friend node on the page! don't do that,
+            // plus it's just ugly how it consumes so much screen space, maybe just say this
+            // text inside the help of the "Friends List" itself.
+            // new CollapsibleHelpPanel("Help", S.meta64.config.help.type.friend.render,
+            //     (state: boolean) => {
+            //         FriendTypeHandler.helpExpanded = state;
+            //     }, FriendTypeHandler.helpExpanded)
+        ]);
+    }
 }

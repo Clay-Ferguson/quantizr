@@ -32,4 +32,6 @@ export interface RenderIntf {
     getAvatarImgUrl(ownerId: string, avatarVer: string): string;
     getProfileHeaderImgUrl(ownerId: string, avatarVer: string): string;
     parseEmojis(value: any): any;
+    renderUser(state: AppState, nodeId: string, user: string, userBio: string, userNodeId: string, imgSrc: string, actorUrl: string,
+        displayName: string, className: string, showMessageButton: boolean, onClick: Function): Comp;
 }

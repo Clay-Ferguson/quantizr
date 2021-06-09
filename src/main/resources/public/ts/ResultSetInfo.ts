@@ -19,4 +19,5 @@ export class ResultSetInfo {
     public accessOption: string;
 
     public showingFollowersOfUser: string;
+    public showingFollowingOfUser: string;
 }

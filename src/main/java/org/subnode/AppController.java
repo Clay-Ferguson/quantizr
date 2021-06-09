@@ -57,6 +57,7 @@ import org.subnode.request.DeletePropertyRequest;
 import org.subnode.request.ExportRequest;
 import org.subnode.request.GetConfigRequest;
 import org.subnode.request.GetFollowersRequest;
+import org.subnode.request.GetFollowingRequest;
 import org.subnode.request.GetFriendsRequest;
 import org.subnode.request.GetNodePrivilegesRequest;
 import org.subnode.request.GetNodeStatsRequest;
@@ -1153,6 +1154,18 @@ public class AppController implements ErrorController {
 	public @ResponseBody Object getFollowers(@RequestBody GetFollowersRequest req, HttpSession session) {
 		return callProc.run("getFollowers", req, session, ms -> {
 			return apFollowing.getFollowers(ms, req);
+		});
+	}
+
+	/*
+	 * This function is similar to getFriends, but since getFriends is for a picker dialog we
+	 * can consider it to be the odd man out which will eventually need to support paging (currently
+	 * doesn't) and go ahead and duplicate that functionality here in a way analogous to getFollowers
+	 */
+	@RequestMapping(value = API_PATH + "/getFollowing", method = RequestMethod.POST)
+	public @ResponseBody Object getFollowing(@RequestBody GetFollowingRequest req, HttpSession session) {
+		return callProc.run("getFollowing", req, session, ms -> {
+			return apFollowing.getFollowing(ms, req);
 		});
 	}
 

@@ -68,30 +68,31 @@ export class UserProfileDlg extends DialogBase {
                 profileImg,
 
                 new Div(null, { className: "marginBottom" }, [
+                    new Div(null, { className: "float-right" }, [
+                        (localUser && state.userProfile.followerCount > 0) ? new Span(state.userProfile.followerCount + " followers", {
+                            onClick: () => {
+                                if (state.userProfile.followerCount) {
+                                    this.close();
+                                    S.srch.showFollowers(0, state.userProfile.userName);
+                                }
+                            },
+                            className: "followCount"
+                        }) : null,
 
-                    (state.userProfile.followerCount || state.userProfile.followingCount)
-                        ? new Div(null, { className: "float-right" }, [
-                            new Span(state.userProfile.followerCount + " followers", {
-                                onClick: () => {
-                                    if (state.userProfile.followerCount) {
-                                        this.close();
-                                        S.srch.showFollowers(0, state.userProfile.userName);
-                                    }
-                                },
-                                className: "followCount"
-                            })
+                        (localUser && state.userProfile.followingCount > 0) ? new Span(state.userProfile.followingCount + " following", {
+                            onClick: () => {
+                                if (state.userProfile.followingCount) {
+                                    this.close();
+                                    S.srch.showFollowing(0, state.userProfile.userName);
 
-                            // todo-0: implement
-                            // new Span(state.userProfile.followingCount + " following", {
-                            //     onClick: () => {
-                            //         if (!this.readOnly && state.userProfile.followingCount) {
-                            //             this.close();
-                            //             S.nav.openContentNode("~" + J.NodeType.FRIEND_LIST);
-                            //         }
-                            //     },
-                            //     className: "followCount"
-                            // })
-                        ]) : null,
+                                    // It would be 'inconsistent' to just jump to the FRIEND_LIST? if this user is looking
+                                    // at their own user profile dialog? There's also even the Friend Picker dialog too!
+                                    // S.nav.openContentNode("~" + J.NodeType.FRIEND_LIST);
+                                }
+                            },
+                            className: "followCount"
+                        }) : null
+                    ]),
 
                     this.readOnly
                         ? new Heading(4, state.userProfile.displayName || "")

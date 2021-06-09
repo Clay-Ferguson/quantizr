@@ -2,6 +2,7 @@ import { appState, dispatch, store } from "./AppRedux";
 import { AppState } from "./AppState";
 import { FeedView } from "./comps/FeedView";
 import { FollowersResultSetView } from "./comps/FollowersResultSetView";
+import { FollowingResultSetView } from "./comps/FollowingResultSetView";
 import { LogView } from "./comps/LogView";
 import { MainTabComp } from "./comps/MainTabComp";
 import { SearchResultSetView } from "./comps/SearchResultSetView";
@@ -377,6 +378,13 @@ export class Meta64 implements Meta64Intf {
                         id: "followersResultSetView",
                         isVisible: () => this.resultSetHasData("followersResultSetView"),
                         constructView: (data: TabDataIntf) => new FollowersResultSetView(data),
+                        rsInfo: new ResultSetInfo()
+                    },
+                    {
+                        name: "Following",
+                        id: "followingResultSetView",
+                        isVisible: () => this.resultSetHasData("followingResultSetView"),
+                        constructView: (data: TabDataIntf) => new FollowingResultSetView(data),
                         rsInfo: new ResultSetInfo()
                     },
                     {
