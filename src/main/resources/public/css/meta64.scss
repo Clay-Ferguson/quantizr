@@ -72,7 +72,7 @@ $smallBorderSize: 3px;
 // }
 
 .displayNameTextField {
-    max-width: 60%;
+    max-width: 50%;
 }
 
 .main-app-row {
@@ -955,6 +955,10 @@ input[type="radio"] {
     margin-bottom: $bigGap; 
 }
 
+.bigMarginTop {
+    margin-top: $bigGap; 
+}
+
 .anchorBigMarginBottom {
     display: inline-block;
     margin-bottom: $smallGap; 
@@ -1797,4 +1801,13 @@ audio::-webkit-media-controls-play-button {
 
 .tableRow {
     display: table-row;
+}
+
+.followCount {
+    font-size: 120%;
+    margin-left: 15px;
+    padding: 8px;
+    border: 2px solid $nodeBorderBottomColor;
+    border-radius: 100px;
+    cursor: pointer;
 }

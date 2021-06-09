@@ -15,6 +15,7 @@ import { Heading } from "../widget/Heading";
 import { Html } from "../widget/Html";
 import { Img } from "../widget/Img";
 import { Label } from "../widget/Label";
+import { Span } from "../widget/Span";
 import { TextArea } from "../widget/TextArea";
 import { TextField } from "../widget/TextField";
 import { UploadFromFileDropzoneDlg } from "./UploadFromFileDropzoneDlg";
@@ -43,7 +44,7 @@ export class UserProfileDlg extends DialogBase {
     getTitleText(): string {
         const state: any = this.getState();
         if (!state.userProfile) return "";
-        return this.readOnly ? "Profile" : "Edit Profile";
+        return (this.readOnly ? "Profile: " : "Edit Profile: ") + "@" + state.userProfile.userName;
     }
 
     renderDlg(): CompIntf[] {
@@ -54,9 +55,7 @@ export class UserProfileDlg extends DialogBase {
 
         let profileHeaderImg: CompIntf = this.makeProfileHeaderImg();
         let profileImg: CompIntf = this.makeProfileImg(!!profileHeaderImg);
-        let url = window.location.origin + "/u/" + state.userProfile.userName + "/home";
         let localUser = S.util.isLocalUserName(state.userProfile.userName);
-        let followersAndFollowing = state.userProfile.followerCount + " followers / " + state.userProfile.followingCount + " following";
 
         let children = [
             new Div(null, null, [
@@ -69,11 +68,30 @@ export class UserProfileDlg extends DialogBase {
                 profileImg,
 
                 new Div(null, { className: "marginBottom" }, [
+                    new Div(null, { className: "float-right" }, [
+                        new Span(state.userProfile.followerCount + " followers", {
+                            onClick: () => {
+                                if (state.userProfile.followerCount) {
+                                    this.close();
+                                    S.srch.showFollowers(0);
+                                }
+                            },
+                            className: "followCount"
+                        }),
+                        new Span(state.userProfile.followingCount + " following", {
+                            onClick: () => {
+                                if (!this.readOnly && state.userProfile.followingCount) {
+                                    this.close();
+                                    S.nav.openContentNode("~" + J.NodeType.FRIEND_LIST);
+                                }
+                            },
+                            className: "followCount"
+                        })
+                    ]),
+
                     this.readOnly
                         ? new Heading(4, state.userProfile.displayName || "")
                         : new TextField("Display Name", false, null, "displayNameTextField", false, this.displayNameState),
-
-                    new Heading(5, "@" + state.userProfile.userName),
 
                     this.readOnly
                         ? new Html(S.util.markdown(state.userProfile.userBio) || "")
@@ -83,8 +101,6 @@ export class UserProfileDlg extends DialogBase {
                             this.bioState)
                 ]),
 
-                // todo-0: format this better, and add links to open a view for each (in addition to adding that to Users menu)
-                new Heading(5, followersAndFollowing),
                 this.readOnly ? null : new Anchor(null, "Logout", { className: "float-right logoutLink", onClick: S.nav.logout }),
 
                 new ButtonBar([
