@@ -44,22 +44,20 @@ export abstract class ResultSetView extends AppTab {
         let rowCount = 0;
         let children: Comp[] = [];
 
-        if (this.data.rsInfo.description) {
-            let searchText = this.data.rsInfo.node ? S.util.getShortContent(this.data.rsInfo.node.content) : null;
-            children.push(new Div(null, null, [
-                new Div(null, { className: "marginBottom" }, [
-                    new Heading(4, this.data.name, { className: "resultsTitle" }),
-                    this.data.rsInfo.node ? new Span(null, { className: "float-right" }, [
-                        new IconButton("fa-arrow-left", "Back", {
-                            onClick: () => S.view.refreshTree(this.data.rsInfo.node.id, true, true, this.data.rsInfo.node.id, false, true, true, state),
-                            title: "Back to Node"
-                        })
-                    ]) : null
-                ]),
-                searchText ? new TextContent(searchText, "resultsContentHeading alert alert-secondary") : null,
-                new Div(this.data.rsInfo.description)
-            ]));
-        }
+        let searchText = this.data.rsInfo.node ? S.util.getShortContent(this.data.rsInfo.node.content) : null;
+        children.push(new Div(null, null, [
+            new Div(null, { className: "marginBottom" }, [
+                new Heading(4, this.data.name, { className: "resultsTitle" }),
+                this.data.rsInfo.node ? new Span(null, { className: "float-right" }, [
+                    new IconButton("fa-arrow-left", "Back", {
+                        onClick: () => S.view.refreshTree(this.data.rsInfo.node.id, true, true, this.data.rsInfo.node.id, false, true, true, state),
+                        title: "Back to Node"
+                    })
+                ]) : null
+            ]),
+            searchText ? new TextContent(searchText, "resultsContentHeading alert alert-secondary") : null,
+            this.data.rsInfo.description ? new Div(this.data.rsInfo.description) : null
+        ]));
 
         // this shows the page number. not needed. used for debugging.
         // children.push(new Div("" + data.rsInfo.page + " endReached=" + data.rsInfo.endReached));
