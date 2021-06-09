@@ -16,5 +16,5 @@ export interface SearchIntf {
     renderSearchResultAsListItem(node: J.NodeInfo, index: number, count: number, rowCount: number, prefix: string, isFeed: boolean, isParent: boolean, allowAvatars: boolean, jumpButton: boolean, state: AppState): any;
     clickSearchNode(id: string, state: AppState): any;
     feed(nodeId: string, feedUserName: string, page: number, searchText: string): any;
-    showFollowers(page: number): void;
+    showFollowers(page: number, userName: string): void;
 }

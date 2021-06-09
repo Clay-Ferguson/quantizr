@@ -184,9 +184,6 @@ public class AppController implements ErrorController {
 	private CallProcessor callProc;
 
 	@Autowired
-	private MongoUtil mongoUtil;
-
-	@Autowired
 	private MongoRead read;
 
 	@Autowired

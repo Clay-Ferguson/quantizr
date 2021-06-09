@@ -6,7 +6,7 @@ import * as J from "../JavaIntf";
 import { PubSub } from "../PubSub";
 import { Singletons } from "../Singletons";
 import { AppTab } from "../widget/AppTab";
-import { Comp } from "../widget/base/Comp";
+import { CompIntf } from "../widget/base/CompIntf";
 import { ButtonBar } from "../widget/ButtonBar";
 import { Div } from "../widget/Div";
 import { Heading } from "../widget/Heading";
@@ -42,12 +42,12 @@ export abstract class ResultSetView extends AppTab {
          * client side for various reasons.
          */
         let rowCount = 0;
-        let children: Comp[] = [];
+        let children: CompIntf[] = [];
 
         let searchText = this.data.rsInfo.node ? S.util.getShortContent(this.data.rsInfo.node.content) : null;
         children.push(new Div(null, null, [
             new Div(null, { className: "marginBottom" }, [
-                new Heading(4, this.data.name, { className: "resultsTitle" }),
+                this.renderHeading(),
                 this.data.rsInfo.node ? new Span(null, { className: "float-right" }, [
                     new IconButton("fa-arrow-left", "Back", {
                         onClick: () => S.view.refreshTree(this.data.rsInfo.node.id, true, true, this.data.rsInfo.node.id, false, true, true, state),
@@ -67,7 +67,10 @@ export abstract class ResultSetView extends AppTab {
         let jumpButton = state.isAdminUser || !this.data.rsInfo.userSearchType;
         results.forEach((node: J.NodeInfo) => {
             S.srch.initSearchNode(node);
-            children.push(S.srch.renderSearchResultAsListItem(node, i, childCount, rowCount, this.data.id, false, false, true, jumpButton, state));
+            let c = this.renderItem(node, i, childCount, rowCount, jumpButton, state);
+            if (c) {
+                children.push(c);
+            }
             i++;
             rowCount++;
         });
@@ -76,7 +79,17 @@ export abstract class ResultSetView extends AppTab {
         this.setChildren(children);
     }
 
-    addPaginationBar = (state: AppState, children: Comp[]): void => {
+    /* overridable (don't use arrow function) */
+    renderHeading(): CompIntf {
+        return new Heading(4, this.data.name, { className: "resultsTitle" });
+    }
+
+    /* overridable (don't use arrow function) */
+    renderItem(node: J.NodeInfo, i: number, childCount: number, rowCount: number, jumpButton: boolean, state: AppState): CompIntf {
+        return S.srch.renderSearchResultAsListItem(node, i, childCount, rowCount, this.data.id, false, false, true, jumpButton, state);
+    }
+
+    addPaginationBar = (state: AppState, children: CompIntf[]): void => {
         children.push(new ButtonBar([
             this.data.rsInfo.page > 1 ? new IconButton("fa-angle-double-left", null, {
                 onClick: () => this.pageChange(0),

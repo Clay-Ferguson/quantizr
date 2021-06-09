@@ -213,10 +213,17 @@ export class Search implements SearchIntf {
         }
     }
 
-    showFollowers = (page: number): void => {
-        let state = store.getState();
+    showFollowers = (page: number, userName: string): void => {
+        let state: AppState = store.getState();
+        if (state.isAnonUser || state.isAdminUser) return;
+
+        if (!userName) {
+            userName = state.userName;
+        }
+
         S.util.ajax<J.GetFollowersRequest, J.GetFollowersResponse>("getFollowers", {
-            page
+            page,
+            targetUserName: userName
         }, (res) => {
             if (res.searchResults && res.searchResults.length > 0) {
                 dispatch("Action_RenderSearchResults", (s: AppState): AppState => {
@@ -233,7 +240,7 @@ export class Search implements SearchIntf {
                     data.rsInfo.caseSensitive = false;
                     data.rsInfo.prop = null;
                     data.rsInfo.endReached = !res.searchResults || res.searchResults.length < S.nav.ROWS_PER_PAGE;
-
+                    data.rsInfo.showingFollowersOfUser = userName;
                     S.meta64.selectTabStateOnly(data.id, s);
                     return s;
                 });

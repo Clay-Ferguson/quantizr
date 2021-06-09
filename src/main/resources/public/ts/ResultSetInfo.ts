@@ -1,5 +1,6 @@
 import * as J from "./JavaIntf";
 
+/* This class is way too 'multi-purpose'. Needs some polymorphism instead (todo-0) */
 export class ResultSetInfo {
     public results: J.NodeInfo[];
     public description: string;
@@ -16,4 +17,6 @@ export class ResultSetInfo {
     public shareNodesType: string;
     public shareTarget: string;
     public accessOption: string;
+
+    public showingFollowersOfUser: string;
 }

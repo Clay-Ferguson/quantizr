@@ -96,6 +96,7 @@ export interface GetConfigRequest extends RequestBase {
 
 export interface GetFollowersRequest extends RequestBase {
     page: number;
+    targetUserName: string;
 }
 
 export interface GetFriendsRequest extends RequestBase {

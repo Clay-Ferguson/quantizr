@@ -61,6 +61,7 @@ export class MenuPanel extends Div {
     static searchByName = () => { new SearchByNameDlg(appState(null)).open(); }
     static searchById = () => { new SearchByIDDlg(appState(null)).open(); };
     static findUsers = () => { new SearchUsersDlg(appState(null)).open(); };
+    static showFollowers = () => { S.srch.showFollowers(0, null); };
     static timelineByCreated = () => S.srch.timeline(null, "ctm", appState(null), null, "Rev-chron by Create Time", 0);
     static timelineByModified = () => S.srch.timeline(null, "mtm", appState(null), null, "Rev-chron by Modify Time", 0);
     static showCalendar = () => { S.render.showCalendar(null, appState(null)); }
@@ -189,7 +190,7 @@ export class MenuPanel extends Div {
             new MenuItem("Friends", MenuPanel.openFriendsNode, !state.isAnonUser),
 
             // not yet returning correct numbers/results (todo-0)
-            // new MenuItem("Followers", S.srch.showFollowers, !state.isAnonUser),
+            new MenuItem("Followers", MenuPanel.showFollowers, !state.isAnonUser),
 
             new MenuItem("Blocked Users", MenuPanel.openBlockedUsersNode, !state.isAnonUser)
         ]));

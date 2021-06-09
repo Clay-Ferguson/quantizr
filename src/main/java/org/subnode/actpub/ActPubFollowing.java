@@ -26,6 +26,7 @@ import org.subnode.model.NodeInfo;
 import org.subnode.model.client.NodeProp;
 import org.subnode.model.client.NodeType;
 import org.subnode.model.client.PrincipalName;
+import org.subnode.mongo.MongoAuth;
 import org.subnode.mongo.MongoDelete;
 import org.subnode.mongo.MongoRead;
 import org.subnode.mongo.MongoSession;
@@ -75,6 +76,9 @@ public class ActPubFollowing {
 
     @Autowired
 	private Convert convert;
+
+    @Autowired
+    private MongoAuth auth;
 
     @Autowired
     @Qualifier("threadPoolTaskExecutor")
@@ -350,14 +354,15 @@ public class ActPubFollowing {
         return util.find(query);
     }
 
+    // todo-0: review how do functions like this recieves the admin session?
     public GetFollowersResponse getFollowers(MongoSession session, GetFollowersRequest req) {
         GetFollowersResponse res = new GetFollowersResponse();
         if (session == null) {
             session = ThreadLocals.getMongoSession();
         }
 
-        String userName = ThreadLocals.getSessionContext().getUserName();
-        Query query = followersOfUser_query(session, userName);
+        MongoSession adminSession = auth.getAdminSession();
+        Query query = followersOfUser_query(adminSession, req.getTargetUserName());
         if (query == null)
             return null;
 
@@ -369,7 +374,7 @@ public class ActPubFollowing {
         int counter = 0;
 
         for (SubNode node : iterable) {
-            NodeInfo info = convert.convertToNodeInfo(ThreadLocals.getSessionContext(), session, node, true, false, counter + 1,
+            NodeInfo info = convert.convertToNodeInfo(ThreadLocals.getSessionContext(), adminSession, node, true, false, counter + 1,
                     false, false);
             searchResults.add(info);
         }

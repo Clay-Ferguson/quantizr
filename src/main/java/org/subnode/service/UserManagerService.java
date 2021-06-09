@@ -674,8 +674,8 @@ public class UserManagerService {
 			userNode =
 					edit.createFriendNode(session, blockedUsersList, req.getUserName(), followerActorUrl, followerActorHtmlUrl);
 			if (userNode != null) {
-				res.setMessage("Blocked user " + req.getUserName()
-						+ ". To manage blocks, go to `Menu -> Users -> Blocked Users`");
+				res.setMessage(
+						"Blocked user " + req.getUserName() + ". To manage blocks, go to `Menu -> Users -> Blocked Users`");
 			} else {
 				res.setMessage("Unable to block user: " + req.getUserName());
 			}
@@ -740,13 +740,13 @@ public class UserManagerService {
 
 	public GetUserProfileResponse getUserProfile(final GetUserProfileRequest req) {
 		GetUserProfileResponse res = new GetUserProfileResponse();
-		final String userName = ThreadLocals.getSessionContext().getUserName();
+		final String sessionUserName = ThreadLocals.getSessionContext().getUserName();
 
 		adminRunner.run(session -> {
 			SubNode userNode = null;
 
 			if (req.getUserId() == null) {
-				userNode = read.getUserNodeByUserName(session, userName);
+				userNode = read.getUserNodeByUserName(session, sessionUserName);
 			} else {
 				userNode = read.getNode(session, req.getUserId(), false);
 			}
@@ -774,11 +774,17 @@ public class UserManagerService {
 				userProfile.setApImageUrl(userNode.getStrProp(NodeProp.ACT_PUB_USER_IMAGE_URL));
 				userProfile.setActorUrl(userNode.getStrProp(NodeProp.ACT_PUB_ACTOR_URL));
 
-				Long followerCount = apFollowing.countFollowersOfUser(session, userName);
-				userProfile.setFollowerCount(followerCount.intValue());
+				/*
+				 * Only for local users to we attemp to generate followers and following, but theoretically we can
+				 * use the ActPub API to query for this for foreign users also.
+				 */
+				if (nodeUserName.indexOf("@") == -1) {
+					Long followerCount = apFollowing.countFollowersOfUser(session, nodeUserName);
+					userProfile.setFollowerCount(followerCount.intValue());
 
-				Long followingCount = apFollowing.countFollowingOfUser(session, userName);
-				userProfile.setFollowingCount(followingCount.intValue());
+					Long followingCount = apFollowing.countFollowingOfUser(session, nodeUserName);
+					userProfile.setFollowingCount(followingCount.intValue());
+				}
 
 				res.setSuccess(true);
 			}
@@ -1030,26 +1036,26 @@ public class UserManagerService {
 			return;
 
 		// adminRunner.run(session -> {
-		// 	final Iterable<SubNode> accountNodes =
-		// 			read.getChildrenUnderParentPath(session, NodeName.ROOT_OF_ALL_USERS, null, null, 0, null, null);
+		// final Iterable<SubNode> accountNodes =
+		// read.getChildrenUnderParentPath(session, NodeName.ROOT_OF_ALL_USERS, null, null, 0, null, null);
 
-		// 	for (final SubNode accountNode : accountNodes) {
-		// 		String userName = accountNode.getStrProp(NodeProp.USER);
+		// for (final SubNode accountNode : accountNodes) {
+		// String userName = accountNode.getStrProp(NodeProp.USER);
 
-		// 		// if account is a 'foreign server' one, then clean it up
-		// 		if (userName != null) {
-		// 			log.debug("userName: " + userName);
+		// // if account is a 'foreign server' one, then clean it up
+		// if (userName != null) {
+		// log.debug("userName: " + userName);
 
-		// 			if (userName.contains("@")) {
-		// 				log.debug("Foreign Accnt Kill: " + userName);
-		// 				delete.delete(accountNode);
+		// if (userName.contains("@")) {
+		// log.debug("Foreign Accnt Kill: " + userName);
+		// delete.delete(accountNode);
 
-		// 				// delete.cleanupOldTempNodesForUser(session, accountNode);
-		// 			}
-		// 		}
-		// 	}
+		// // delete.cleanupOldTempNodesForUser(session, accountNode);
+		// }
+		// }
+		// }
 
-		// 	apCache.usersPendingRefresh.clear();
+		// apCache.usersPendingRefresh.clear();
 		// });
 	}
 
