@@ -83,7 +83,7 @@ export class UserProfileDlg extends DialogBase {
                             this.bioState)
                 ]),
 
-                // todo-0: format this better.
+                // todo-0: format this better, and add links to open a view for each (in addition to adding that to Users menu)
                 new Heading(5, followersAndFollowing),
                 this.readOnly ? null : new Anchor(null, "Logout", { className: "float-right logoutLink", onClick: S.nav.logout }),
 

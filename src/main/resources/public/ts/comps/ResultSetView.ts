@@ -35,13 +35,6 @@ export abstract class ResultSetView extends AppTab {
             this.attribs.className += " show active";
         }
 
-        if (!results || results.length === 0) {
-            this.setChildren([new Div("No Search Displaying", {
-                id: "searchResultsPanel"
-            })]);
-            return;
-        }
-
         let childCount = results.length;
 
         /*
@@ -51,19 +44,19 @@ export abstract class ResultSetView extends AppTab {
         let rowCount = 0;
         let children: Comp[] = [];
 
-        if (this.data.rsInfo.description && this.data.rsInfo.node) {
-            let searchText = S.util.getShortContent(this.data.rsInfo.node.content);
+        if (this.data.rsInfo.description) {
+            let searchText = this.data.rsInfo.node ? S.util.getShortContent(this.data.rsInfo.node.content) : null;
             children.push(new Div(null, null, [
                 new Div(null, { className: "marginBottom" }, [
-                    new Heading(4, "Search", { className: "resultsTitle" }),
-                    new Span(null, { className: "float-right" }, [
+                    new Heading(4, this.data.name, { className: "resultsTitle" }),
+                    this.data.rsInfo.node ? new Span(null, { className: "float-right" }, [
                         new IconButton("fa-arrow-left", "Back", {
                             onClick: () => S.view.refreshTree(this.data.rsInfo.node.id, true, true, this.data.rsInfo.node.id, false, true, true, state),
                             title: "Back to Node"
                         })
-                    ])
+                    ]) : null
                 ]),
-                new TextContent(searchText, "resultsContentHeading alert alert-secondary"),
+                searchText ? new TextContent(searchText, "resultsContentHeading alert alert-secondary") : null,
                 new Div(this.data.rsInfo.description)
             ]));
         }

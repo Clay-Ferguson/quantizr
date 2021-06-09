@@ -30,6 +30,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
+import org.subnode.actpub.ActPubFollowing;
 import org.subnode.actpub.ActPubService;
 import org.subnode.config.AppProp;
 import org.subnode.config.SessionContext;
@@ -55,6 +56,7 @@ import org.subnode.request.DeleteNodesRequest;
 import org.subnode.request.DeletePropertyRequest;
 import org.subnode.request.ExportRequest;
 import org.subnode.request.GetConfigRequest;
+import org.subnode.request.GetFollowersRequest;
 import org.subnode.request.GetFriendsRequest;
 import org.subnode.request.GetNodePrivilegesRequest;
 import org.subnode.request.GetNodeStatsRequest;
@@ -240,6 +242,9 @@ public class AppController implements ErrorController {
 
 	@Autowired
 	private AppProp appProp;
+
+	@Autowired
+	private ActPubFollowing apFollowing;
 
 	private static final String ERROR_MAPPING = "/error";
 
@@ -1144,6 +1149,13 @@ public class AppController implements ErrorController {
 	public @ResponseBody Object nodeSearch(@RequestBody NodeSearchRequest req, HttpSession session) {
 		return callProc.run("nodeSearch", req, session, ms -> {
 			return nodeSearchService.search(ms, req);
+		});
+	}
+
+	@RequestMapping(value = API_PATH + "/getFollowers", method = RequestMethod.POST)
+	public @ResponseBody Object getFollowers(@RequestBody GetFollowersRequest req, HttpSession session) {
+		return callProc.run("getFollowers", req, session, ms -> {
+			return apFollowing.getFollowers(ms, req);
 		});
 	}
 

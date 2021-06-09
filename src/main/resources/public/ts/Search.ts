@@ -36,7 +36,7 @@ export class Search implements SearchIntf {
             if (res.searchResults && res.searchResults.length > 0) {
                 dispatch("Action_RenderSearchResults", (s: AppState): AppState => {
 
-                    let data = state.tabData.find(d => d.id === "sharedNodesResultSetView");
+                    let data = s.tabData.find(d => d.id === "sharedNodesResultSetView");
                     if (!data) return;
 
                     data.rsInfo.results = res.searchResults;
@@ -82,7 +82,7 @@ export class Search implements SearchIntf {
 
                 dispatch("Action_RenderSearchResults", (s: AppState): AppState => {
 
-                    let data = state.tabData.find(d => d.id === "resultSetView");
+                    let data = s.tabData.find(d => d.id === "resultSetView");
                     if (!data) return;
 
                     data.rsInfo.results = res.searchResults;
@@ -101,9 +101,7 @@ export class Search implements SearchIntf {
                 });
             }
             else {
-                if (successCallback) {
-                    new MessageDlg("No search results found.", "Search", null, null, false, 0, state).open();
-                }
+                new MessageDlg("No search results found.", "Search", null, null, false, 0, state).open();
             }
         });
     }
@@ -151,7 +149,7 @@ export class Search implements SearchIntf {
         }, (res) => {
             dispatch("Action_RenderTimelineResults", (s: AppState): AppState => {
 
-                let data = state.tabData.find(d => d.id === "timelineResultSetView");
+                let data = s.tabData.find(d => d.id === "timelineResultSetView");
                 if (!data) return;
 
                 data.rsInfo.results = res.searchResults;
@@ -213,6 +211,37 @@ export class Search implements SearchIntf {
         if (node.parent) {
             this.idToNodeMap.set(node.parent.id, node.parent);
         }
+    }
+
+    showFollowers = (page: number): void => {
+        let state = store.getState();
+        S.util.ajax<J.GetFollowersRequest, J.GetFollowersResponse>("getFollowers", {
+            page
+        }, (res) => {
+            if (res.searchResults && res.searchResults.length > 0) {
+                dispatch("Action_RenderSearchResults", (s: AppState): AppState => {
+                    let data = s.tabData.find(d => d.id === "followersResultSetView");
+                    if (!data) return;
+
+                    data.rsInfo.results = res.searchResults;
+                    data.rsInfo.page = page;
+                    data.rsInfo.userSearchType = "followers";
+                    data.rsInfo.description = null;
+                    data.rsInfo.node = null;
+                    data.rsInfo.searchText = null;
+                    data.rsInfo.fuzzy = false;
+                    data.rsInfo.caseSensitive = false;
+                    data.rsInfo.prop = null;
+                    data.rsInfo.endReached = !res.searchResults || res.searchResults.length < S.nav.ROWS_PER_PAGE;
+
+                    S.meta64.selectTabStateOnly(data.id, s);
+                    return s;
+                });
+            }
+            else {
+                new MessageDlg("No search results found.", "Followers", null, null, false, 0, state).open();
+            }
+        });
     }
 
     /*

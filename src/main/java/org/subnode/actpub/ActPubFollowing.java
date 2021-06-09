@@ -22,6 +22,7 @@ import org.subnode.actpub.model.APObj;
 import org.subnode.actpub.model.APProp;
 import org.subnode.config.AppProp;
 import org.subnode.config.NodeName;
+import org.subnode.model.NodeInfo;
 import org.subnode.model.client.NodeProp;
 import org.subnode.model.client.NodeType;
 import org.subnode.model.client.PrincipalName;
@@ -31,7 +32,11 @@ import org.subnode.mongo.MongoSession;
 import org.subnode.mongo.MongoUtil;
 import org.subnode.mongo.RunAsMongoAdminEx;
 import org.subnode.mongo.model.SubNode;
+import org.subnode.request.GetFollowersRequest;
+import org.subnode.response.GetFollowersResponse;
 import org.subnode.service.NodeEditService;
+import org.subnode.util.Const;
+import org.subnode.util.Convert;
 import org.subnode.util.ThreadLocals;
 
 @Component
@@ -67,6 +72,9 @@ public class ActPubFollowing {
 
     @Autowired
     private ActPubCrypto apCrypto;
+
+    @Autowired
+	private Convert convert;
 
     @Autowired
     @Qualifier("threadPoolTaskExecutor")
@@ -340,6 +348,34 @@ public class ActPubFollowing {
         if (query == null)
             return null;
         return util.find(query);
+    }
+
+    public GetFollowersResponse getFollowers(MongoSession session, GetFollowersRequest req) {
+        GetFollowersResponse res = new GetFollowersResponse();
+        if (session == null) {
+            session = ThreadLocals.getMongoSession();
+        }
+
+        String userName = ThreadLocals.getSessionContext().getUserName();
+        Query query = followersOfUser_query(session, userName);
+        if (query == null)
+            return null;
+
+        query.limit(Const.ROWS_PER_PAGE);
+        query.skip(Const.ROWS_PER_PAGE * req.getPage());
+
+        Iterable<SubNode> iterable = util.find(query);
+        List<NodeInfo> searchResults = new LinkedList<NodeInfo>();
+        int counter = 0;
+
+        for (SubNode node : iterable) {
+            NodeInfo info = convert.convertToNodeInfo(ThreadLocals.getSessionContext(), session, node, true, false, counter + 1,
+                    false, false);
+            searchResults.add(info);
+        }
+
+        res.setSearchResults(searchResults);
+        return res;
     }
 
     public long countFollowersOfUser(MongoSession session, String userName) {

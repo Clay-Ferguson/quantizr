@@ -94,6 +94,10 @@ export interface FileSystemReindexRequest extends RequestBase {
 export interface GetConfigRequest extends RequestBase {
 }
 
+export interface GetFollowersRequest extends RequestBase {
+    page: number;
+}
+
 export interface GetFriendsRequest extends RequestBase {
 }
 
@@ -408,6 +412,10 @@ export interface FriendInfo {
 
 export interface GetConfigResponse extends ResponseBase {
     config: { [index: string]: any };
+}
+
+export interface GetFollowersResponse extends ResponseBase {
+    searchResults: NodeInfo[];
 }
 
 export interface GetFriendsResponse extends ResponseBase {
