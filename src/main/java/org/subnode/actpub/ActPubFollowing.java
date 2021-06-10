@@ -356,7 +356,7 @@ public class ActPubFollowing {
         return util.find(query);
     }
 
-    // todo-0: review how do functions like this recieves the admin session?
+    // todo-1: review how do functions like this recieves the admin session?
     public GetFollowersResponse getFollowers(MongoSession session, GetFollowersRequest req) {
         GetFollowersResponse res = new GetFollowersResponse();
         if (session == null) {

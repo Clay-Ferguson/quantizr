@@ -1,7 +1,5 @@
 import * as J from "./JavaIntf";
 
-/* This class is way too 'multi-purpose'. Needs some polymorphism instead (todo-0, work in progress)
-*/
 export class ResultSetInfo {
     public results: J.NodeInfo[];
     public description: string;

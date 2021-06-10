@@ -239,7 +239,7 @@ export class Search implements SearchIntf {
 
                     info.results = res.searchResults;
                     info.page = page;
-                    info.userSearchType = "followers";
+                    info.userSearchType = null;
                     info.description = null;
                     info.node = null;
                     info.searchText = null;
@@ -279,7 +279,7 @@ export class Search implements SearchIntf {
 
                     info.results = res.searchResults;
                     info.page = page;
-                    info.userSearchType = "following"; // where is this used (todo-0) ?
+                    info.userSearchType = null;
                     info.description = null;
                     info.node = null;
                     info.searchText = null;
