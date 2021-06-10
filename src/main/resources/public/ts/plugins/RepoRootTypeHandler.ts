@@ -15,11 +15,9 @@ export class RepoRootTypeHandler extends TypeBase {
         return true;
     }
 
-    render(node: J.NodeInfo, rowStyling: boolean, state: AppState): Comp {
+    render(node: J.NodeInfo, rowStyling: boolean, isTreeView: boolean, state: AppState): Comp {
         return new HorizontalLayout([
-            new Heading(4, "Root", {
-                className: "marginAll"
-            })
-        ]);
+            new Heading(4, "Root")
+        ], "marginAll");
     }
 }

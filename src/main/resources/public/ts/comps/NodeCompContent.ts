@@ -19,7 +19,13 @@ export class NodeCompContent extends Div {
 
     domPreUpdateFunc: Function;
 
-    constructor(public node: J.NodeInfo, public rowStyling: boolean, public showHeader: boolean, public idPrefix?: string, public isFeed?: boolean, public imgSizeOverride?: string) {
+    constructor(public node: J.NodeInfo,
+        public rowStyling: boolean,
+        public showHeader: boolean,
+        public idPrefix?: string,
+        public isFeed?: boolean,
+        public imgSizeOverride?: string,
+        public isTreeView?: boolean) {
         super(null, {
             id: (idPrefix ? idPrefix : "c") + node.id
         });
@@ -57,7 +63,7 @@ export class NodeCompContent extends Div {
                 embeddedImg = true;
             }
             this.domPreUpdateFunc = typeHandler.getDomPreUpdateFunction;
-            children.push(typeHandler.render(node, this.rowStyling, state));
+            children.push(typeHandler.render(node, this.rowStyling, this.isTreeView, state));
         }
 
         /* if node owner matches node id this is someone's account root node, so what we're doing here is not

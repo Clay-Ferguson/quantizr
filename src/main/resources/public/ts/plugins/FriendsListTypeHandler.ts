@@ -28,7 +28,7 @@ export class FriendsListTypeHandler extends TypeBase {
         return false;
     }
 
-    render(node: J.NodeInfo, rowStyling: boolean, state: AppState): Comp {
+    render(node: J.NodeInfo, rowStyling: boolean, isTreeView: boolean, state: AppState): Comp {
         return new Div(null, null, [
             new Heading(4, "Friends List", {
                 className: "marginAll"

@@ -38,19 +38,20 @@ export class InboxNodeTypeHandler extends TypeBase {
         return false;
     }
 
-    render(node: J.NodeInfo, rowStyling: boolean, state: AppState): Comp {
+    render(node: J.NodeInfo, rowStyling: boolean, isTreeView: boolean, state: AppState): Comp {
 
         // let user: string = S.props.getNodePropVal(J.NodeProp.USER, node);
         return new HorizontalLayout([
-            new Heading(4, "Inbox", {
-                className: "marginAll"
-            }),
+            new Heading(4, "Inbox"),
+
+            // todo-0: based on redesign of HorizontalLayout we probably want tis button bar at TOP
+            // and then remove the clearfix
             new ButtonBar([
                 new Button("Clear Inbox", () => {
                     S.edit.clearInbox(state);
                 })
             ], null, "float-right marginBottom"),
             new Div(null, { className: "clearfix" })
-        ]);
+        ], "marginAll");
     }
 }

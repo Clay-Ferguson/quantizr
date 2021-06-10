@@ -83,7 +83,7 @@ export class TypeBase implements TypeHandlerIntf {
         return true;
     }
 
-    render(node: J.NodeInfo, rowStyling: boolean, state: AppState): Comp {
+    render(node: J.NodeInfo, rowStyling: boolean, isTreeView: boolean, state: AppState): Comp {
 
         let prop: J.PropertyInfo = S.props.getNodeProp(J.NodeProp.ORDER_BY, node);
 

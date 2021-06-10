@@ -68,7 +68,7 @@ export class FriendTypeHandler extends TypeBase {
         this.ensureStringPropExists(node, J.NodeProp.USER);
     }
 
-    render(node: J.NodeInfo, rowStyling: boolean, state: AppState): Comp {
+    render(node: J.NodeInfo, rowStyling: boolean, isTreeView: boolean, state: AppState): Comp {
         let user: string = S.props.getNodePropVal(J.NodeProp.USER, node);
         let userBio: string = S.props.getClientPropVal(J.NodeProp.USER_BIO, node);
         let userNodeId: string = S.props.getNodePropVal(J.NodeProp.USER_NODE_ID, node);
@@ -84,8 +84,9 @@ export class FriendTypeHandler extends TypeBase {
             }
         }
 
+        // Note: we pass showMessageButton as true when isTreeView is true only.
         return S.render.renderUser(state, node.id, user, userBio, userNodeId, imgSrc, actorUrl,
-            displayName, null, true, (evt: any) => {
+            displayName, null, isTreeView, (evt: any) => {
                 new UserProfileDlg(userNodeId, state).open();
             });
     }

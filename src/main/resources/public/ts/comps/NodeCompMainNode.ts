@@ -61,7 +61,7 @@ export class NodeCompMainNode extends Div {
                 className: "clearfix",
                 id: "button_bar_clearfix_" + node.id
             }),
-            new NodeCompContent(node, false, true, null, null, this.imgSizeOverride),
+            new NodeCompContent(node, false, true, null, null, this.imgSizeOverride, true),
             new NodeCompRowFooter(node, false)
         ]);
     }

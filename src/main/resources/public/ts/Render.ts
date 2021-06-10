@@ -19,6 +19,7 @@ import { Button } from "./widget/Button";
 import { ButtonBar } from "./widget/ButtonBar";
 import { Div } from "./widget/Div";
 import { Heading } from "./widget/Heading";
+import { HorizontalLayout } from "./widget/HorizontalLayout";
 import { Html } from "./widget/Html";
 import { Img } from "./widget/Img";
 
@@ -643,7 +644,6 @@ export class Render implements RenderIntf {
         if (imgSrc) {
             img = new Img(null, {
                 className: "friendImage",
-                align: "left", // causes text to flow around
                 src: imgSrc,
                 onClick
             });
@@ -654,35 +654,30 @@ export class Render implements RenderIntf {
         if (className) attribs.className = className;
 
         return new Div(null, attribs, [
-            img,
-            new Div(null, null, [
-                new Heading(4, disp, {
-                    className: "marginAll"
-                }),
-                new Html(userBio, {
-                    className: "userBio"
-                })]),
-            new Div(null, null, [
-                new ButtonBar([
-                    // todo-0: need to make ALL calls be able to do a newSubNode here without so we don't need
-                    // the showMessagesButton flag.
-                    showMessageButton ? new Button("Message", S.edit.newSubNode, {
-                        title: "Send Private Message",
-                        nid: nodeId
-                    }) : null,
-                    actorUrl ? new Button("Go to User Page", () => {
-                        window.open(actorUrl, "_blank");
-                    }) : null
-                ], null, "float-right marginBottom"),
-                new Div(null, { className: "clearfix" })])
+            new ButtonBar([
+                // todo-0: need to make ALL calls be able to do a newSubNode here without so we don't need
+                // the showMessagesButton flag.
+                showMessageButton ? new Button("Message", S.edit.newSubNode, {
+                    title: "Send Private Message",
+                    nid: nodeId
+                }) : null,
+                actorUrl ? new Button("Go to User Page", () => {
+                    window.open(actorUrl, "_blank");
+                }) : null
+            ], null, "float-right marginBottom"),
 
-            // todo-1: oops this opens up help on EVERY friend node on the page! don't do that,
-            // plus it's just ugly how it consumes so much screen space, maybe just say this
-            // text inside the help of the "Friends List" itself.
-            // new CollapsibleHelpPanel("Help", S.meta64.config.help.type.friend.render,
-            //     (state: boolean) => {
-            //         FriendTypeHandler.helpExpanded = state;
-            //     }, FriendTypeHandler.helpExpanded)
+            new HorizontalLayout([
+                img,
+                new Div(null, null, [
+                    new Div(null, null, [
+                        new Heading(4, disp, {
+                            className: "marginAll"
+                        }),
+                        new Html(userBio, {
+                            className: "userBio"
+                        })])
+                ])
+            ])
         ]);
     }
 }

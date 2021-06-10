@@ -80,7 +80,7 @@ export class RssTypeHandler extends TypeBase {
         this.ensureStringPropExists(node, J.NodeProp.RSS_FEED_SRC);
     }
 
-    render(node: J.NodeInfo, rowStyling: boolean, state: AppState): Comp {
+    render(node: J.NodeInfo, rowStyling: boolean, isTreeView: boolean, state: AppState): Comp {
 
         let feedSrc: string = S.props.getNodePropVal(J.NodeProp.RSS_FEED_SRC, node);
         if (!feedSrc) {

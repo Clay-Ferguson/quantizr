@@ -987,12 +987,10 @@ input[type="radio"] {
     padding: 4px;
 }
 
-
 .horizontalLayout {
     // flex will layout things all on the same horizontal row
    display: flex;
 }
-
 @import 'button.scss';
 
 .basicButton {
@@ -1806,4 +1804,17 @@ audio::-webkit-media-controls-play-button {
     border: 2px solid $nodeBorderBottomColor;
     border-radius: 100px;
     cursor: pointer;
+}
+
+.displayTable {
+    display: table;
+}
+
+.displayRow {
+    display: table-row;
+}
+
+.displayCell {
+    display: table-cell;
+    vertical-align: top;
 }

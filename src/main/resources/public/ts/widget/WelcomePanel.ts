@@ -39,7 +39,7 @@ export class WelcomePanel extends Div {
         const state: AppState = store.getState();
         if (this.getState().welcomeNode) {
             this.setChildren([
-                new NodeCompContent(this.getState().welcomeNode, false, false, null, null, null),
+                new NodeCompContent(this.getState().welcomeNode, false, false, null, null, null, true),
                 !state.mobileMode ? new NodeCompTableRowLayout(this.getState().welcomeNode, 1, "c", false, false)
                     : new NodeCompVerticalRowLayout(this.getState().welcomeNode, 1, false, false)
             ]);

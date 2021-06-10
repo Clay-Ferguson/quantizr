@@ -25,11 +25,9 @@ export class AccountTypeHandler extends TypeBase {
         return true;
     }
 
-    render(node: J.NodeInfo, rowStyling: boolean, state: AppState): Comp {
+    render(node: J.NodeInfo, rowStyling: boolean, isTreeView: boolean, state: AppState): Comp {
         return new HorizontalLayout([
-            new Heading(4, "User: " + node.owner, {
-                className: "marginAll"
-            })
-        ]);
+            new Heading(4, "User: " + node.owner)
+        ], "marginAll");
     }
 }

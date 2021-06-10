@@ -1,5 +1,5 @@
 import { TypeHandlerIntf } from "../intf/TypeHandlerIntf";
-import { HorizontalLayout } from "./HorizontalLayout";
+import { FlexLayout } from "./FlexLayout";
 import { Icon } from "./Icon";
 import { ListBoxRow } from "./ListBoxRow";
 import { Span } from "./Span";
@@ -21,7 +21,7 @@ export class NodeTypeListBoxRow extends ListBoxRow {
         }
 
         this.setChildren([
-            new HorizontalLayout([
+            new FlexLayout([
                 icon,
                 new Span(this.typeHandler.getName())
             ], this.isSelected ? "selectedListItem" : "unselectedListItem")

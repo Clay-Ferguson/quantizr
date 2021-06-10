@@ -8,7 +8,7 @@ import { CompIntf } from "../widget/base/CompIntf";
 export interface TypeHandlerIntf {
     getTypeName(): string;
     getName(): string;
-    render(node: J.NodeInfo, rowStyling: boolean, state: AppState): Comp;
+    render(node: J.NodeInfo, rowStyling: boolean, isTreeView: boolean, state: AppState): Comp;
     getIconClass(): string;
     allowAction(action : NodeActionType, node: J.NodeInfo, appState: AppState): boolean;
     allowPropertyEdit(typeName: string, state: AppState): boolean;

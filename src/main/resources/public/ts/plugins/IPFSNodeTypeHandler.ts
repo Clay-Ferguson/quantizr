@@ -27,7 +27,7 @@ export class IPFSNodeTypeHandler extends TypeBase {
         return false;
     }
 
-    render(node: J.NodeInfo, rowStyling: boolean, state: AppState): Comp {
+    render(node: J.NodeInfo, rowStyling: boolean, isTreeView: boolean, state: AppState): Comp {
         let ret: Comp[] = [];
 
         let name = node.content;
