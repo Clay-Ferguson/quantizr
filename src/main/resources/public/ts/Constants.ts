@@ -1,5 +1,13 @@
 export class Constants {
 
+    static TAB_MAIN: string = "mainTab";
+    static TAB_SEARCH: string = "resultSetView";
+    static TAB_SHARES: string = "sharedNodesResultSetView";
+    static TAB_TIMELINE: string = "timelineResultSetView";
+    static TAB_FOLLOWERS: string = "followersResultSetView";
+    static TAB_FOLLOWING: string = "followingResultSetView";
+    static TAB_FEED: string = "feedTab";
+
     static SITE_NAV_MENU_TEXT = "Site Nav";
 
     // per bootstrap design these must sum to 12;

@@ -38,7 +38,7 @@ export class ServerPush implements ServerPushIntf {
 
             if (nodeInfo) {
                 dispatch("Action_RenderTimelineResults", (s: AppState): AppState => {
-                    let data = s.tabData.find(d => d.id === "timelineResultSetView");
+                    let data = s.tabData.find(d => d.id === C.TAB_TIMELINE);
                     if (!data) return;
 
                     if (data.rsInfo.results) {

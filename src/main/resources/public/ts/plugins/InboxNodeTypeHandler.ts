@@ -44,7 +44,7 @@ export class InboxNodeTypeHandler extends TypeBase {
         return new HorizontalLayout([
             new Heading(4, "Inbox"),
 
-            // todo-0: based on redesign of HorizontalLayout we probably want tis button bar at TOP
+            // todo-1: based on redesign of HorizontalLayout we probably want this button bar at TOP
             // and then remove the clearfix
             new ButtonBar([
                 new Button("Clear Inbox", () => {

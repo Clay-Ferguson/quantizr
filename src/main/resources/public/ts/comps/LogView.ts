@@ -53,7 +53,7 @@ export class LogView extends AppTab implements LogViewIntf {
         //     type: "Action_InitUserProfile",
         //     state,
         //     update: (s: AppState): void => {
-        //         s.activeTab = "mainTab";
+        //         s.activeTab = C.TAB_MAIN;
         //         s.userProfile = null;
         //     }
         // });

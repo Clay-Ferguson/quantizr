@@ -188,10 +188,7 @@ export class MenuPanel extends Div {
         children.push(new Menu("Users", [
             new MenuItem("Find Users", MenuPanel.findUsers, !state.isAnonUser), //
             new MenuItem("Friends", MenuPanel.openFriendsNode, !state.isAnonUser),
-
-            // not yet returning correct numbers/results (todo-0)
             new MenuItem("Followers", MenuPanel.showFollowers, !state.isAnonUser),
-
             new MenuItem("Blocked Users", MenuPanel.openBlockedUsersNode, !state.isAnonUser)
         ]));
 
@@ -453,7 +450,7 @@ export class MenuPanel extends Div {
                         let tab = link.substring(4);
 
                         /* special case for feed tab */
-                        if (tab === "feedTab") {
+                        if (tab === C.TAB_FEED) {
                             func = MenuPanel.messagesFediverse;
                         }
                         else {

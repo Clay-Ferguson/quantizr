@@ -39,7 +39,7 @@ export class RssFeedsTypeHandler extends TypeBase {
             ], null, "float-right marginBottom"),
             new Div(null, { className: "clearfix" })
 
-            // todo-0: add help for this...
+            // todo-1: add help for this...
             // new CollapsibleHelpPanel("Help", S.meta64.config.help.type.friendsList.render,
             //     (state: boolean) => {
             //         RssFeedsTypeHandler.helpExpanded = state;

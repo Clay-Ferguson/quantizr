@@ -248,7 +248,7 @@ export class Nav implements NavIntf {
     navPageNodeResponse = (res: J.RenderNodeResponse, state: AppState): void => {
         S.meta64.clearSelNodes(state);
         S.render.renderPageFromData(res, true, null, true, true);
-        S.meta64.selectTab("mainTab");
+        S.meta64.selectTab(C.TAB_MAIN);
     }
 
     geoLocation = (state: AppState): void => {
@@ -399,8 +399,8 @@ export class Nav implements NavIntf {
     messages = (props: Object): void => {
         dispatch("Action_SelectTab", (s: AppState): AppState => {
             s.guiReady = true;
-            S.meta64.tabChanging(s.activeTab, "feedTab", s);
-            s.activeTab = "feedTab";
+            S.meta64.tabChanging(s.activeTab, C.TAB_FEED, s);
+            s.activeTab = C.TAB_FEED;
             s = { ...s, ...props };
             return s;
         });

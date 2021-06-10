@@ -109,7 +109,7 @@ export class Meta64 implements Meta64Intf {
         // if (state.activeTab==tabName) return;
 
         dispatch("Action_SelectTab", (s: AppState): AppState => {
-            if (tabName === "mainTab" && !s.node) {
+            if (tabName === C.TAB_MAIN && !s.node) {
                 S.nav.navHome(s);
             }
             else {
@@ -123,7 +123,7 @@ export class Meta64 implements Meta64Intf {
 
     /* Does a select tab that's safe within a dispatch (i.e. doesn't itself dispatch) */
     selectTabStateOnly = (tabName: string, state: AppState): void => {
-        if (tabName === "mainTab" && !state.node) {
+        if (tabName === C.TAB_MAIN && !state.node) {
 
             // we need to run immediately but in a timer so it doesn't happen in this call stack and trigger
             // an error that we did a dispatch in a dispatch.
@@ -347,49 +347,49 @@ export class Meta64 implements Meta64Intf {
                 s.tabData = [
                     {
                         name: "Main",
-                        id: "mainTab",
+                        id: C.TAB_MAIN,
                         isVisible: () => true,
                         constructView: (data: TabDataIntf) => new MainTabComp(data),
                         rsInfo: null
                     },
                     {
                         name: "Search",
-                        id: "resultSetView",
-                        isVisible: () => this.resultSetHasData("resultSetView"),
+                        id: C.TAB_SEARCH,
+                        isVisible: () => this.resultSetHasData(C.TAB_SEARCH),
                         constructView: (data: TabDataIntf) => new SearchResultSetView(data),
                         rsInfo: new ResultSetInfo()
                     },
                     {
                         name: "Shared Nodes",
-                        id: "sharedNodesResultSetView",
-                        isVisible: () => this.resultSetHasData("sharedNodesResultSetView"),
+                        id: C.TAB_SHARES,
+                        isVisible: () => this.resultSetHasData(C.TAB_SHARES),
                         constructView: (data: TabDataIntf) => new SharedNodesResultSetView(data),
                         rsInfo: new ResultSetInfo()
                     },
                     {
                         name: "Timeline",
-                        id: "timelineResultSetView",
-                        isVisible: () => this.resultSetHasData("timelineResultSetView"),
+                        id: C.TAB_TIMELINE,
+                        isVisible: () => this.resultSetHasData(C.TAB_TIMELINE),
                         constructView: (data: TabDataIntf) => new TimelineResultSetView(data),
                         rsInfo: new ResultSetInfo()
                     },
                     {
                         name: "Followers",
-                        id: "followersResultSetView",
-                        isVisible: () => this.resultSetHasData("followersResultSetView"),
+                        id: C.TAB_FOLLOWERS,
+                        isVisible: () => this.resultSetHasData(C.TAB_FOLLOWERS),
                         constructView: (data: TabDataIntf) => new FollowersResultSetView(data),
                         rsInfo: new ResultSetInfo()
                     },
                     {
                         name: "Following",
-                        id: "followingResultSetView",
-                        isVisible: () => this.resultSetHasData("followingResultSetView"),
+                        id: C.TAB_FOLLOWING,
+                        isVisible: () => this.resultSetHasData(C.TAB_FOLLOWING),
                         constructView: (data: TabDataIntf) => new FollowingResultSetView(data),
                         rsInfo: new ResultSetInfo()
                     },
                     {
                         name: "Fediverse",
-                        id: "feedTab",
+                        id: C.TAB_FEED,
                         isVisible: () => true,
                         constructView: (data: TabDataIntf) => new FeedView(data),
                         rsInfo: null
@@ -428,7 +428,7 @@ export class Meta64 implements Meta64Intf {
 
                 if (event.state && event.state.nodeId) {
                     S.view.refreshTree(event.state.nodeId, true, true, event.state.highlightId, false, true, true, store.getState());
-                    this.selectTab("mainTab");
+                    this.selectTab(C.TAB_MAIN);
                 }
             };
 

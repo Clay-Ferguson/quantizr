@@ -36,7 +36,7 @@ export class Search implements SearchIntf {
             if (res.searchResults && res.searchResults.length > 0) {
                 dispatch("Action_RenderSearchResults", (s: AppState): AppState => {
 
-                    let data = s.tabData.find(d => d.id === "sharedNodesResultSetView");
+                    let data = s.tabData.find(d => d.id === C.TAB_SHARES);
                     if (!data) return;
 
                     data.rsInfo.results = res.searchResults;
@@ -82,7 +82,7 @@ export class Search implements SearchIntf {
 
                 dispatch("Action_RenderSearchResults", (s: AppState): AppState => {
 
-                    let data = s.tabData.find(d => d.id === "resultSetView");
+                    let data = s.tabData.find(d => d.id === C.TAB_SEARCH);
                     if (!data) return;
 
                     data.rsInfo.results = res.searchResults;
@@ -149,7 +149,7 @@ export class Search implements SearchIntf {
         }, (res) => {
             dispatch("Action_RenderTimelineResults", (s: AppState): AppState => {
 
-                let data = s.tabData.find(d => d.id === "timelineResultSetView");
+                let data = s.tabData.find(d => d.id === C.TAB_TIMELINE);
                 if (!data) return;
 
                 data.rsInfo.results = res.searchResults;
@@ -197,7 +197,7 @@ export class Search implements SearchIntf {
             s.feedDirty = false;
             s.feedLoading = false;
             s.feedWaitingForUserRefresh = false;
-            S.meta64.selectTabStateOnly("feedTab", s);
+            S.meta64.selectTabStateOnly(C.TAB_FEED, s);
             S.view.scrollToTop();
             return s;
         });
@@ -227,7 +227,7 @@ export class Search implements SearchIntf {
         }, (res) => {
             if (res.searchResults && res.searchResults.length > 0) {
                 dispatch("Action_RenderSearchResults", (s: AppState): AppState => {
-                    let data = s.tabData.find(d => d.id === "followersResultSetView");
+                    let data = s.tabData.find(d => d.id === C.TAB_FOLLOWERS);
                     if (!data) return;
 
                     data.rsInfo.results = res.searchResults;
@@ -267,12 +267,12 @@ export class Search implements SearchIntf {
         }, (res) => {
             if (res.searchResults && res.searchResults.length > 0) {
                 dispatch("Action_RenderSearchResults", (s: AppState): AppState => {
-                    let data = s.tabData.find(d => d.id === "followingResultSetView");
+                    let data = s.tabData.find(d => d.id === C.TAB_FOLLOWING);
                     if (!data) return;
 
                     data.rsInfo.results = res.searchResults;
                     data.rsInfo.page = page;
-                    data.rsInfo.userSearchType = "following";
+                    data.rsInfo.userSearchType = "following"; // where is this used (todo-0) ?
                     data.rsInfo.description = null;
                     data.rsInfo.node = null;
                     data.rsInfo.searchText = null;

@@ -357,8 +357,8 @@ export class Render implements RenderIntf {
                 // console.log("update state in Action_RenderPage");
 
                 if (!s.activeTab || clickTab) {
-                    S.meta64.tabChanging(s.activeTab, "mainTab", s);
-                    s.activeTab = "mainTab";
+                    S.meta64.tabChanging(s.activeTab, C.TAB_MAIN, s);
+                    s.activeTab = C.TAB_MAIN;
                 }
 
                 s.guiReady = true;
@@ -423,7 +423,7 @@ export class Render implements RenderIntf {
                         console.log("RENDER NODE: " + s.node.id);
                     }
 
-                    if (s.activeTab !== "mainTab") {
+                    if (s.activeTab !== C.TAB_MAIN) {
                         allowScroll = false;
                     }
 

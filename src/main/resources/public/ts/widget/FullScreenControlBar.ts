@@ -28,7 +28,7 @@ export class FullScreenControlBar extends Div {
     getButtons = (state: AppState): Comp[] => {
         let buttons = [];
 
-        if (state.fullScreenViewId && state.activeTab === "mainTab") {
+        if (state.fullScreenViewId && state.activeTab === C.TAB_MAIN) {
             if (S.nav.getAdjacentNode("prev", state)) {
                 buttons.push(
                     new IconButton("fa-angle-left fa-lg", "", {
