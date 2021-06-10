@@ -1,7 +1,7 @@
-import { store } from "../AppRedux";
 import { AppState } from "../AppState";
 import { Constants as C } from "../Constants";
 import { UserProfileDlg } from "../dlg/UserProfileDlg";
+import { FollowersRSInfo } from "../FollowersRSInfo";
 import { TabDataIntf } from "../intf/TabDataIntf";
 import * as J from "../JavaIntf";
 import { PubSub } from "../PubSub";
@@ -15,20 +15,20 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
     S = ctx;
 });
 
-export class FollowersResultSetView extends ResultSetView {
+export class FollowersResultSetView<I extends FollowersRSInfo> extends ResultSetView {
 
     constructor(data: TabDataIntf) {
         super(data);
     }
 
     pageChange(delta: number): void {
-        let state: AppState = store.getState();
-        S.srch.showFollowers(delta === 0 ? 0 : this.data.rsInfo.page + delta,
-            this.data.rsInfo.showingFollowersOfUser);
+        let info = this.data.rsInfo as FollowersRSInfo;
+        S.srch.showFollowers(delta === 0 ? 0 : info.page + delta, info.showingFollowersOfUser);
     }
 
     renderHeading(): CompIntf {
-        return new Heading(4, "Followers (@" + this.data.rsInfo.showingFollowersOfUser + ")", { className: "resultsTitle" });
+        let info = this.data.rsInfo as FollowersRSInfo;
+        return new Heading(4, "Followers (@" + info.showingFollowersOfUser + ")", { className: "resultsTitle" });
     }
 
     /* Renders the info for the OWNER of 'node', and not the content of the actual node, becasue the content will basically

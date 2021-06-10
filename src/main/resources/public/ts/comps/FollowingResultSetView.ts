@@ -1,6 +1,5 @@
-import { store } from "../AppRedux";
-import { AppState } from "../AppState";
 import { Constants as C } from "../Constants";
+import { FollowingRSInfo } from "../FollowingRSInfo";
 import { TabDataIntf } from "../intf/TabDataIntf";
 import { PubSub } from "../PubSub";
 import { Singletons } from "../Singletons";
@@ -13,7 +12,7 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
     S = ctx;
 });
 
-export class FollowingResultSetView extends ResultSetView {
+export class FollowingResultSetView<I extends FollowingRSInfo> extends ResultSetView {
 
     constructor(data: TabDataIntf) {
         super(data);
@@ -22,12 +21,12 @@ export class FollowingResultSetView extends ResultSetView {
     }
 
     pageChange(delta: number): void {
-        let state: AppState = store.getState();
-        S.srch.showFollowing(delta === 0 ? 0 : this.data.rsInfo.page + delta,
-            this.data.rsInfo.showingFollowingOfUser);
+        let info = this.data.rsInfo as FollowingRSInfo;
+        S.srch.showFollowing(delta === 0 ? 0 : info.page + delta, info.showingFollowingOfUser);
     }
 
     renderHeading(): CompIntf {
-        return new Heading(4, "Following (@" + this.data.rsInfo.showingFollowingOfUser + ")", { className: "resultsTitle" });
+        let info = this.data.rsInfo as FollowingRSInfo;
+        return new Heading(4, "Following (@" + info.showingFollowingOfUser + ")", { className: "resultsTitle" });
     }
 }

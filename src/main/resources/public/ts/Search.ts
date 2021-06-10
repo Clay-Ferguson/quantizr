@@ -5,10 +5,14 @@ import { NodeCompRowFooter } from "./comps/NodeCompRowFooter";
 import { NodeCompRowHeader } from "./comps/NodeCompRowHeader";
 import { Constants as C } from "./Constants";
 import { MessageDlg } from "./dlg/MessageDlg";
+import { FollowersRSInfo } from "./FollowersRSInfo";
+import { FollowingRSInfo } from "./FollowingRSInfo";
 import { SearchIntf } from "./intf/SearchIntf";
 import * as J from "./JavaIntf";
 import { PubSub } from "./PubSub";
+import { SharesRSInfo } from "./SharesRSInfo";
 import { Singletons } from "./Singletons";
+import { TimelineRSInfo } from "./TimelineRSInfo";
 import { Comp } from "./widget/base/Comp";
 import { Div } from "./widget/Div";
 
@@ -38,14 +42,15 @@ export class Search implements SearchIntf {
 
                     let data = s.tabData.find(d => d.id === C.TAB_SHARES);
                     if (!data) return;
+                    let info = data.rsInfo as SharesRSInfo;
 
-                    data.rsInfo.results = res.searchResults;
-                    data.rsInfo.page = page;
-                    data.rsInfo.description = "Showing " + type + " shared nodes";
-                    data.rsInfo.node = node;
-                    data.rsInfo.shareTarget = shareTarget;
-                    data.rsInfo.accessOption = accessOption;
-                    data.rsInfo.endReached = !res.searchResults || res.searchResults.length < S.nav.ROWS_PER_PAGE;
+                    info.results = res.searchResults;
+                    info.page = page;
+                    info.description = "Showing " + type + " shared nodes";
+                    info.node = node;
+                    info.shareTarget = shareTarget;
+                    info.accessOption = accessOption;
+                    info.endReached = !res.searchResults || res.searchResults.length < S.nav.ROWS_PER_PAGE;
 
                     S.meta64.selectTabStateOnly(data.id, s);
                     return s;
@@ -151,14 +156,15 @@ export class Search implements SearchIntf {
 
                 let data = s.tabData.find(d => d.id === C.TAB_TIMELINE);
                 if (!data) return;
+                let info = data.rsInfo as TimelineRSInfo;
 
-                data.rsInfo.results = res.searchResults;
-                data.rsInfo.description = timelineDescription;
-                data.rsInfo.prop = prop;
-                data.rsInfo.timeRangeType = timeRangeType;
-                data.rsInfo.node = node;
-                data.rsInfo.endReached = !res.searchResults || res.searchResults.length < S.nav.ROWS_PER_PAGE;
-                data.rsInfo.page = page;
+                info.results = res.searchResults;
+                info.description = timelineDescription;
+                info.prop = prop;
+                info.timeRangeType = timeRangeType;
+                info.node = node;
+                info.endReached = !res.searchResults || res.searchResults.length < S.nav.ROWS_PER_PAGE;
+                info.page = page;
 
                 S.meta64.selectTabStateOnly(data.id, s);
                 return s;
@@ -229,20 +235,20 @@ export class Search implements SearchIntf {
                 dispatch("Action_RenderSearchResults", (s: AppState): AppState => {
                     let data = s.tabData.find(d => d.id === C.TAB_FOLLOWERS);
                     if (!data) return;
+                    let info = data.rsInfo as FollowersRSInfo;
 
-                    data.rsInfo.results = res.searchResults;
-                    data.rsInfo.page = page;
-                    data.rsInfo.userSearchType = "followers";
-                    data.rsInfo.description = null;
-                    data.rsInfo.node = null;
-                    data.rsInfo.searchText = null;
-                    data.rsInfo.fuzzy = false;
-                    data.rsInfo.caseSensitive = false;
-                    data.rsInfo.prop = null;
-                    data.rsInfo.endReached = !res.searchResults || res.searchResults.length < S.nav.ROWS_PER_PAGE;
+                    info.results = res.searchResults;
+                    info.page = page;
+                    info.userSearchType = "followers";
+                    info.description = null;
+                    info.node = null;
+                    info.searchText = null;
+                    info.fuzzy = false;
+                    info.caseSensitive = false;
+                    info.prop = null;
+                    info.endReached = !res.searchResults || res.searchResults.length < S.nav.ROWS_PER_PAGE;
+                    info.showingFollowersOfUser = userName;
 
-                    // well be showing who the followers of userName are
-                    data.rsInfo.showingFollowersOfUser = userName;
                     S.meta64.selectTabStateOnly(data.id, s);
                     return s;
                 });
@@ -269,20 +275,20 @@ export class Search implements SearchIntf {
                 dispatch("Action_RenderSearchResults", (s: AppState): AppState => {
                     let data = s.tabData.find(d => d.id === C.TAB_FOLLOWING);
                     if (!data) return;
+                    let info = data.rsInfo as FollowingRSInfo;
 
-                    data.rsInfo.results = res.searchResults;
-                    data.rsInfo.page = page;
-                    data.rsInfo.userSearchType = "following"; // where is this used (todo-0) ?
-                    data.rsInfo.description = null;
-                    data.rsInfo.node = null;
-                    data.rsInfo.searchText = null;
-                    data.rsInfo.fuzzy = false;
-                    data.rsInfo.caseSensitive = false;
-                    data.rsInfo.prop = null;
-                    data.rsInfo.endReached = !res.searchResults || res.searchResults.length < S.nav.ROWS_PER_PAGE;
+                    info.results = res.searchResults;
+                    info.page = page;
+                    info.userSearchType = "following"; // where is this used (todo-0) ?
+                    info.description = null;
+                    info.node = null;
+                    info.searchText = null;
+                    info.fuzzy = false;
+                    info.caseSensitive = false;
+                    info.prop = null;
+                    info.endReached = !res.searchResults || res.searchResults.length < S.nav.ROWS_PER_PAGE;
+                    info.showingFollowingOfUser = userName;
 
-                    // we'll be showig who userName is following here.
-                    data.rsInfo.showingFollowingOfUser = userName;
                     S.meta64.selectTabStateOnly(data.id, s);
                     return s;
                 });

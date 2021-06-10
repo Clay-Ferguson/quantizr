@@ -1,6 +1,7 @@
 import * as J from "./JavaIntf";
 
-/* This class is way too 'multi-purpose'. Needs some polymorphism instead (todo-0) */
+/* This class is way too 'multi-purpose'. Needs some polymorphism instead (todo-0, work in progress)
+*/
 export class ResultSetInfo {
     public results: J.NodeInfo[];
     public description: string;
@@ -13,11 +14,4 @@ export class ResultSetInfo {
     public caseSensitive: boolean;
     public searchText: string;
     public userSearchType: string;
-
-    public shareNodesType: string;
-    public shareTarget: string;
-    public accessOption: string;
-
-    public showingFollowersOfUser: string;
-    public showingFollowingOfUser: string;
 }

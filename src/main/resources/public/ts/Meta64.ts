@@ -12,13 +12,17 @@ import { Constants as C } from "./Constants";
 import { AudioPlayerDlg } from "./dlg/AudioPlayerDlg";
 import { ChangePasswordDlg } from "./dlg/ChangePasswordDlg";
 import { MainMenuDlg } from "./dlg/MainMenuDlg";
+import { FollowersRSInfo } from "./FollowersRSInfo";
+import { FollowingRSInfo } from "./FollowingRSInfo";
 import { Meta64Intf } from "./intf/Meta64Intf";
 import { TabDataIntf } from "./intf/TabDataIntf";
 import * as J from "./JavaIntf";
 import { Log } from "./Log";
 import { PubSub } from "./PubSub";
 import { ResultSetInfo } from "./ResultSetInfo";
+import { SharesRSInfo } from "./SharesRSInfo";
 import { Singletons } from "./Singletons";
+import { TimelineRSInfo } from "./TimelineRSInfo";
 import { App } from "./widget/App";
 import { CompIntf } from "./widget/base/CompIntf";
 import { WelcomePanel } from "./widget/WelcomePanel";
@@ -363,29 +367,29 @@ export class Meta64 implements Meta64Intf {
                         name: "Shared Nodes",
                         id: C.TAB_SHARES,
                         isVisible: () => this.resultSetHasData(C.TAB_SHARES),
-                        constructView: (data: TabDataIntf) => new SharedNodesResultSetView(data),
-                        rsInfo: new ResultSetInfo()
+                        constructView: (data: TabDataIntf) => new SharedNodesResultSetView<SharesRSInfo>(data),
+                        rsInfo: new SharesRSInfo()
                     },
                     {
                         name: "Timeline",
                         id: C.TAB_TIMELINE,
                         isVisible: () => this.resultSetHasData(C.TAB_TIMELINE),
-                        constructView: (data: TabDataIntf) => new TimelineResultSetView(data),
-                        rsInfo: new ResultSetInfo()
+                        constructView: (data: TabDataIntf) => new TimelineResultSetView<TimelineRSInfo>(data),
+                        rsInfo: new TimelineRSInfo()
                     },
                     {
                         name: "Followers",
                         id: C.TAB_FOLLOWERS,
                         isVisible: () => this.resultSetHasData(C.TAB_FOLLOWERS),
-                        constructView: (data: TabDataIntf) => new FollowersResultSetView(data),
-                        rsInfo: new ResultSetInfo()
+                        constructView: (data: TabDataIntf) => new FollowersResultSetView<FollowersRSInfo>(data),
+                        rsInfo: new FollowersRSInfo()
                     },
                     {
                         name: "Following",
                         id: C.TAB_FOLLOWING,
                         isVisible: () => this.resultSetHasData(C.TAB_FOLLOWING),
-                        constructView: (data: TabDataIntf) => new FollowingResultSetView(data),
-                        rsInfo: new ResultSetInfo()
+                        constructView: (data: TabDataIntf) => new FollowingResultSetView<FollowingRSInfo>(data),
+                        rsInfo: new FollowingRSInfo()
                     },
                     {
                         name: "Fediverse",
