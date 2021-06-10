@@ -11,23 +11,14 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
 });
 
 /*
-PUBLIC KEY ENCRYPTION
+SYMMETRIC ENCRYPTION and PUBLIC KEY ENCRYPTION
 ---------------------
-This class is for proof-of-concept work related to doing Public Key Encryption in the browser using the
-WebCryptoAPI, for a "Secure Messaging" feature of Quana. Currently the way this test/develop is run is by using
-'encryption.test()'
-
 We will be using LocalDB.ts implementation to store the keys in the browser, but we will also support
 allowing the user to cut-n-paste they Key JSON, so that if something goes wrong with the
 browser storage the user will not loose their keys because they will be able
 to reimport the JSON key text back in at any time, or install the keys in a different browser.
 
 At no point in time does the users' Private Key ever leave their own browser storage.
-
-SYMMETRIC ENCRYPTION
---------------------
-Code complete except for we have a hardcoded password instead of prompting user for the password. This feature
-will be complete once we prompt user for password.
 
 TIP: (Not currenty used)
 Original way I had for creating a hashe-based key from a password:
