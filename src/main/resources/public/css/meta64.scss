@@ -431,11 +431,19 @@ a {
     border: 1px solid $nodeBorderBottomColor;
 }
 
-.friendImage {
+/* it's a bit ugly that we have to style the icon differently based on if it's on a list view or the main tree */
+.listFriendImage {
     max-width: 120px;
     cursor: pointer;
     border: 2px solid $nodeBorderBottomColor;
-    margin: 0 10px 10px 10px;
+    border-radius: $border-radius;
+}
+
+.treeFriendImage {
+    max-width: 120px;
+    cursor: pointer;
+    border: 2px solid $nodeBorderBottomColor;
+    margin: 0 10px 0px 10px;
     border-radius: $border-radius;
 }
 
@@ -1407,6 +1415,11 @@ input[type="radio"] {
     outline: none;
     padding-top: 10px;
     padding-bottom: 8px;
+}
+
+.results-node-table-row {
+    position: relative;
+    outline: none;
 }
 
 .feed-node-table-row {

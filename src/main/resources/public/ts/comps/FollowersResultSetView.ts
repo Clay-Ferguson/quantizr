@@ -44,9 +44,10 @@ export class FollowersResultSetView<I extends FollowersRSInfo> extends ResultSet
 
         let userNodeId: string = S.props.getNodePropVal(J.NodeProp.USER_NODE_ID, node);
         let imgSrc = node.avatarVer ? S.render.getAvatarImgUrl(node.ownerId, node.avatarVer) : null;
+        let userBio: string = S.props.getNodePropVal(J.NodeProp.USER_BIO, node);
 
-        return S.render.renderUser(state, node.id, node.owner, null, userNodeId, imgSrc, null,
-            node.displayName, "userFeedItem", false, (evt: any) => {
+        return S.render.renderUser(state, node.id, node.owner, userBio, userNodeId, imgSrc, null,
+            node.displayName, "userFeedItem", "listFriendImage", false, (evt: any) => {
                 new UserProfileDlg(node.ownerId, state).open();
             });
     }

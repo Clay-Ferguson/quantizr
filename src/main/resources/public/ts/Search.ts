@@ -316,7 +316,7 @@ export class Search implements SearchIntf {
         const cssId = this._UID_ROWID_PREFIX + node.id;
         const content = new NodeCompContent(node, true, true, prefix, true, null, false);
 
-        let clazz = isFeed ? "feed-node-table-row" : "node-table-row";
+        let clazz = isFeed ? "feed-node-table-row" : "results-node-table-row";
         if (S.render.enableRowFading && S.render.fadeInId === node.id && S.render.allowFadeInId) {
             S.render.fadeInId = null;
             S.render.allowFadeInId = false;

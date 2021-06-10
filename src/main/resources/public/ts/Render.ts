@@ -638,16 +638,14 @@ export class Render implements RenderIntf {
     };
 
     renderUser(state: AppState, nodeId: string, user: string, userBio: string, userNodeId: string, imgSrc: string, actorUrl: string,
-        displayName: string, className: string, showMessageButton: boolean, onClick: Function): Comp {
+        displayName: string, className: string, iconClass: string, showMessageButton: boolean, onClick: Function): Comp {
 
-        let img: Img = null;
-        if (imgSrc) {
-            img = new Img(null, {
-                className: "friendImage",
+        let img: Img = imgSrc
+            ? new Img(null, {
+                className: iconClass,
                 src: imgSrc,
                 onClick
-            });
-        }
+            }) : null;
 
         let disp = displayName ? displayName + " (@" + user + ")" : ("@" + user);
         let attribs: any = {};
