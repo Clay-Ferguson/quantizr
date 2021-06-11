@@ -21,20 +21,8 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
 export class RightNavPanel extends Div {
 
     constructor() {
-        super();
-        // See also: TabPanel.ts which has the inverse/balance of these numbers of columns.
-        this.attribs.className = //
-            // =======================================
-            // see: other places these tags exist
-            // for #NON_DYNAMIC_COLS
-            "col-" + (C.rightNavPanelCols) + //
-            // for #DYNAMIC_COLS
-            // "col-" + (C.rightNavPanelCols - 3) + //
-            // " col-md-" + (C.rightNavPanelCols - 2) + //
-            // " col-lg-" + (C.rightNavPanelCols - 1) + //
-            // " col-xl-" + C.rightNavPanelCols + //
-            // =======================================
-            " offset-" + (C.leftNavPanelCols + C.mainPanelCols) + " rightNavPanel position-fixed";
+        super(null, { id: "rightNavPanelId" });
+        this.attribs.className = "col-" + (C.rightNavPanelCols) + " rightNavPanel customScrollbar";
     }
 
     preRender(): void {

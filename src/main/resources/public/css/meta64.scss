@@ -13,6 +13,7 @@ $input-color-placeholder: #999;
 
 $scrollTrack: $gray-900;
 $scrollThumb: $gray-700;
+$scrollBarWidth: 20px;
 
 //rgb(21,32,43); twitter background
 $body-bg: darken(rgb(32, 34, 36), 7%);
@@ -75,9 +76,24 @@ $smallBorderSize: 3px;
     max-width: 50%;
 }
 
-.main-app-row {
+$mobileHeaderHeight: 3.5em;
+
+.mainAppRow {
     margin-left: 0px !important;
     margin-right: 0px !important;
+    height: 100vh;
+}
+
+.mainAppRowTop {
+    margin-left: 0px !important;
+    margin-right: 0px !important;
+    height: $mobileHeaderHeight;
+}
+
+.mainAppRowBottom {
+    margin-left: 0px !important;
+    margin-right: 0px !important;
+    height: calc(100vh-$mobileHeaderHeight);
 }
 
 .tab-panel-mobile {
@@ -277,13 +293,10 @@ a {
 
 .app-body {
     font-family: $fontFamily !important;
-    
-    // WARNING: this completely broke rendering. wow. Left hand side menu
-    // gets truncated on the left.
-    // font-size: 1.2rem;
-    
-    padding-bottom: 1rem;
-    overflow-y: scroll;
+
+    // is this the right way to fill the body perfectly with bootstap (todo-0)
+    width: 100%;
+    height: 100%;
 }
 
 .welcome-body {
@@ -470,17 +483,6 @@ a {
     border: 4px dotted $nodeBorderBottomColor;
     min-height: 120px;
     padding: 12px;
-}
-
-.floatingControlBar {
-    position: fixed;
-    top: 2px;
-    right: 2px;
-}
-
-.floatingControlBarItem {
-    display: block;
-    width: 100%;
 }
 
 /* This is how the search terms get highlighted by wrapping them like this in 
@@ -765,13 +767,36 @@ entire thing down some times, if it's jutting up against something */
     background-color: $modal-content-bg;
 }
 
-.leftNavPanel {
-    overflow-y: auto;
-    
-    max-height: 100%;
+.mainContainer {
+    padding: 0px;
+}
+
+.tabPanel {
     height: 100%;
-    
-    padding: 10px;
+    overflow-y: scroll;
+    padding-bottom: 20px;
+}
+
+.tabPanelEditMode {
+    height: 100%;
+    overflow-y: scroll;
+    padding-right: 50px;
+    padding-bottom: 20px;
+}
+
+.rightNavPanel {
+    padding-top: 15px; 
+    padding-left: 0px; 
+    height: 100%;
+    overflow-y: scroll;
+    padding-bottom: 20px;
+}
+
+.leftNavPanel {
+    height: 100%;
+    overflow-y: scroll;
+    padding-top: 12px;
+    padding-bottom: 20px;
 }
 
 @import 'scrollbar.scss';
@@ -779,11 +804,6 @@ entire thing down some times, if it's jutting up against something */
 .tab-buttons-container {
     // margin-top: 8px;
     margin-bottom: 8px;
-}
-
-.rightNavPanel {
-    padding-top: 15px; 
-    padding-left: 0px; 
 }
 
 .rightNavPanelInner {
@@ -1129,6 +1149,10 @@ input[type="radio"] {
     
     width: 100%; 
     border: 1px dotted green;
+}
+
+.full-screen-img {
+    cursor: pointer;
 }
 
 .attached-img-in-row {

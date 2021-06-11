@@ -60,9 +60,17 @@ export class NodeCompBinary extends Div {
             style.width = `calc(${imgSize} - 12px)`;
         }
 
+        let className = null;
+        if (this.isFullScreenEmbed) {
+            className = "full-screen-img";
+        }
+        else {
+            className = this.isEditorEmbed ? "attached-img-in-editor" : "attached-img-in-row";
+        }
+
         return new Img(node.id, {
             src,
-            className: this.isEditorEmbed ? "attached-img-in-editor" : "attached-img-in-row",
+            className,
             style,
             title: "Click image to enlarge/reduce",
             onClick: this.clickOnImage,

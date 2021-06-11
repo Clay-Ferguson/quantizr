@@ -72,6 +72,8 @@ export class Meta64 implements Meta64Intf {
     // decryption code twice.
     decryptCache: Map<string, string> = new Map<string, string>();
 
+    /* For each tab, we keep track of it's scroll position, so that when switching to different tabs we
+    can reset each tab back to it's 'current' scroll position */
     scrollPosByTabName: Map<string, number> = new Map<string, number>();
 
     // not currently used.
@@ -597,7 +599,8 @@ export class Meta64 implements Meta64Intf {
     last scroll position on any given tab */
     tabChanging = (prevTab: string, newTab: string, state: AppState): void => {
 
-        // The full screen viewer is the oddball case, where we just remember the current tab position and return
+        // The full screen viewer is the oddball case, where we just remember the current tab position and return, note also
+        // that the full screen viewer is scrolling in the 'window' not the tab panel
         if (prevTab && this.fullscreenViewerActive(state)) {
             this.scrollPosByTabName.set(prevTab, window.scrollY);
             return;
@@ -615,14 +618,17 @@ export class Meta64 implements Meta64Intf {
 
                 PubSub.subSingleOnce(C.PUBSUB_mainWindowScroll, () => {
                     // console.log("Restoring tab " + newTab + " to " + newPos);
-                    window.scrollTo(0, newPos);
+                    S.view.scrollTo(newPos);
                 });
             }
         }
 
         if (prevTab) {
-            // console.log("Prev tab: " + prevTab + " set to " + window.scrollY);
-            this.scrollPosByTabName.set(prevTab, window.scrollY);
+            let elm: HTMLElement = document.getElementById("tabPanelId");
+            if (elm) {
+                // console.log("Prev tab: " + prevTab + " set to " + elm.scrollTop);
+                this.scrollPosByTabName.set(prevTab, elm.scrollTop);
+            }
         }
     }
 
@@ -910,5 +916,16 @@ export class Meta64 implements Meta64Intf {
             feedFilterToPublic: true,
             feedFilterLocalServer: false
         });
+    }
+
+    /* Because react doesn't persist scroll position upon rendering we have this hook which allows us
+    the opportunity to save whatever scroll positions we care to persist, so we can use domPreUpdateEvent on
+    whatever components we want to fix the scroll position in time for rendering */
+    preDispatch = (): void => {
+        let elm: HTMLElement = document.getElementById("tabPanelId");
+        if (elm) {
+            // console.log("Prev tab: " + C.TAB_MAIN + " set to " + elm.scrollTop + " before dispatch.");
+            this.scrollPosByTabName.set(C.TAB_MAIN, elm.scrollTop);
+        }
     }
 }

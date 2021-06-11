@@ -158,6 +158,25 @@ export class View implements ViewIntf {
         }
     }
 
+    /* todo-0: put these element IDs in constants file */
+    scrollAllTop = () => {
+        S.util.getElm("leftNavPanelId", (elm: HTMLElement) => {
+            elm.scrollTop = 0;
+        });
+        S.util.getElm("tabPanelId", (elm: HTMLElement) => {
+            elm.scrollTop = 0;
+        });
+        S.util.getElm("rightNavPanelId", (elm: HTMLElement) => {
+            elm.scrollTop = 0;
+        });
+    }
+
+    scrollTo = (offset: number) => {
+        S.util.getElm("tabPanelId", (elm: HTMLElement) => {
+            elm.scrollTop = offset;
+        });
+    }
+
     scrollToSelectedNode = (state: AppState): void => {
         // S.meta64.setOverlay(true);
 
@@ -179,8 +198,7 @@ export class View implements ViewIntf {
             }
 
             if (currentSelNode && state.node.id === currentSelNode.id) {
-                // Log.log("setting scrollTop=0 (a)");
-                this.docElm.scrollTop = 0;
+                S.view.scrollAllTop();
                 return;
             }
 
@@ -190,13 +208,10 @@ export class View implements ViewIntf {
                     // console.log("Got first element: " + elm.firstElementChild);
                     elm = elm.firstElementChild;
                 }
-
-                // Log.log("scrollIntoView element");
                 elm.scrollIntoView(true);
             }
             else {
-                // Log.log("setting scrollTop=0 (b)");
-                this.docElm.scrollTop = 0;
+                S.view.scrollAllTop();
             }
         };
         //     } finally {
@@ -213,18 +228,8 @@ export class View implements ViewIntf {
     }
 
     scrollToTop = async (): Promise<void> => {
-        // NOTE: LEAVE THIS timer code here until the new pubsub-based scrolling timing is well proven
-        // return new Promise<void>((resolve, reject) => {
-        //     setTimeout(() => {
-        //         console.log("scrollTop()");
-        //         this.docElm.scrollTop = 0;
-        //         resolve();
-        //     }, 100);
-        // });
-
         PubSub.subSingleOnce(C.PUBSUB_mainWindowScroll, () => {
-            // Log.log("execute: C.PUBSUB_mainRenderComplete");
-            this.docElm.scrollTop = 0;
+            S.view.scrollAllTop();
         });
     }
 

@@ -166,8 +166,7 @@ export class RssTypeHandler extends TypeBase {
                         }
 
                         setTimeout(() => {
-                            // Log.log("docElm.scrollTop (2)");
-                            S.view.docElm.scrollTop = 0;
+                            S.view.scrollAllTop();
                             // finally this is working with 2 second delay here. Not sure
                             // what controls the min here. I 'think' CPU power may be the controlling factor
                             // but it might be something else. Leaving as 2secs for now.

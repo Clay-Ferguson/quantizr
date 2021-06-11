@@ -1,12 +1,17 @@
+import { useSelector } from "react-redux";
 import { createStore } from "redux";
 import { AppState } from "./AppState";
 import { Constants as C } from "./Constants";
 import { AppAction } from "./Interfaces";
-import { Log } from "./Log";
 import { PubSub } from "./PubSub";
-import { useSelector } from "react-redux";
+import { Singletons } from "./Singletons";
 
 export const initialState = new AppState();
+
+let S: Singletons;
+PubSub.sub(C.PUBSUB_SingletonsReady, (s: Singletons) => {
+    S = s;
+});
 
 /**
  * Takes a state as input, does the action on it, and returns the resulting new state.
@@ -42,6 +47,7 @@ export const useAppState = (state?: AppState): AppState => {
 };
 
 export const dispatch = (actionName: string, update: (state: AppState) => AppState) => {
+    S.meta64.preDispatch();
     // Log.log("Dispatch Running: " + action.type);
     store.dispatch({ type: actionName, update });
     // Log.log("Dispatch Complete: " + action.type);

@@ -18,8 +18,8 @@ declare var g_brandingAppName;
 export class LeftNavPanel extends Div {
 
     constructor() {
-        super();
-        this.attribs.className = "col-" + C.leftNavPanelCols + " leftNavPanel position-fixed customScrollbar";
+        super(null, { id: "leftNavPanelId" });
+        this.attribs.className = "col-" + C.leftNavPanelCols + " leftNavPanel customScrollbar";
     }
 
     preRender(): void {

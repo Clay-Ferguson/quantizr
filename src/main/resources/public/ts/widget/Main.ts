@@ -1,15 +1,18 @@
 import { ReactNode } from "react";
+import { BaseCompState } from "./base/BaseCompState";
 import { Comp } from "./base/Comp";
 import { CompIntf } from "./base/CompIntf";
 
-export class Main extends Comp {
+/* General Widget that doesn't fit any more reusable or specific category other than a plain Div, but inherits capability of Comp class */
+export class Main<S extends BaseCompState = any> extends Comp<S> {
 
-    constructor(attribs: Object = {}, children: CompIntf[] = null) {
+    constructor(content: string = "", attribs: Object = {}, public initialChildren: CompIntf[] = null) {
         super(attribs);
-        this.setChildren(children);
+        this.setChildren(this.initialChildren);
+        this.mergeState({ content } as any);
     }
 
     compRender(): ReactNode {
-        return this.tagRender("main", null, this.attribs);
+        return this.tagRender("main", (this.getState() as any).content, this.attribs);
     }
 }

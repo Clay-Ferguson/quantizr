@@ -19,6 +19,8 @@ export interface Meta64Intf {
     parentIdToFocusNodeMap: Map<string, string>;
     curHighlightNodeCompRow: CompIntf;
 
+    scrollPosByTabName: Map<string, number>;
+
     draggableId: string;
     fadeStartTime: number;
 
@@ -67,4 +69,5 @@ export interface Meta64Intf {
     fullscreenViewerActive(state: AppState): boolean;
     showMyNewMessages(): void;
     showPublicFediverse(): void;
+    preDispatch(): void;
 }

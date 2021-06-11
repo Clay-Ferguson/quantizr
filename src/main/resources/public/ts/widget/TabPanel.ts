@@ -17,27 +17,16 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (s: Singletons) => {
 export class TabPanel extends Div {
 
     constructor() {
-        super(null);
+        super(null, { id: "tabPanelId" });
         const state: AppState = store.getState();
 
         if (state.mobileMode) {
             this.attribs.className = "col-12 tab-panel-mobile";
         }
         else {
-            // See also: RightNavPanel.ts which has the inverse/balance of these numbers of columns.
-            this.attribs.className = //
-                // =======================================
-                // see: other places these tags exist
-                // for #NON_DYNAMIC_COLS
-                "col-" + (C.mainPanelCols) + //
-                // #DYNAMIC_COLS
-                // "col-" + (C.mainPanelCols + 3) + //
-                // " col-md-" + (C.mainPanelCols + 2) +//
-                // " col-lg-" + (C.mainPanelCols + 1) + //
-                // " col-xl-" + C.mainPanelCols + //
-                // =======================================
-
-                " offset-" + C.leftNavPanelCols;
+            this.attribs.className = "col-" + C.mainPanelCols + " " +
+                (state.userPreferences.editMode ? "tabPanelEditMode" : "tabPanel") +
+                " customScrollbar";
         }
     }
 
@@ -58,7 +47,8 @@ export class TabPanel extends Div {
         let tabButtons = !dialog && state.mobileMode;
 
         this.setChildren([
-            tabButtons ? new TabPanelButtons(false) : null, tabContent
+            tabButtons ? new TabPanelButtons(false) : null,
+            tabContent
         ]);
     }
 
@@ -68,5 +58,16 @@ export class TabPanel extends Div {
             tabs.push(tab.constructView(tab));
         }
         return tabs;
+    }
+
+    domPreUpdateEvent = (): void => {
+        this.whenElm((elm) => {
+            // preDispatch() call should have already loaded this scroll position.
+            if (S.meta64.scrollPosByTabName.has(C.TAB_MAIN)) {
+                let newPos = S.meta64.scrollPosByTabName.get(C.TAB_MAIN);
+                // console.log("Restoring tab " + C.TAB_MAIN + " to " + newPos + " in domPreUpdateEvent");
+                elm.scrollTop = newPos;
+            }
+        });
     }
 }

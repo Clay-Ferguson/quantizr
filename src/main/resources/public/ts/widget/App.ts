@@ -3,7 +3,7 @@ import { AppState } from "../AppState";
 import { Constants as C } from "../Constants";
 import { PubSub } from "../PubSub";
 import { Singletons } from "../Singletons";
-import { Comp } from "./base/Comp";
+import { CompIntf } from "./base/CompIntf";
 import { Button } from "./Button";
 import { Div } from "./Div";
 import { FullScreenCalendar } from "./FullScreenCalendar";
@@ -25,10 +25,10 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (s: Singletons) => {
 
 declare var g_brandingAppName;
 
-export class App extends Div {
+export class App extends Main {
 
-    constructor(attribs: Object = {}) {
-        super(null, attribs);
+    constructor() {
+        super(null, { role: "main" });
     }
 
     preRender(): void {
@@ -39,19 +39,98 @@ export class App extends Div {
             return;
         }
 
-        let fullScreenViewer: Comp = null;
+        let fullScreenViewer = this.getFullScreenViewer(state);
+        let mobileTopBar = this.getTopMobileBar(state);
 
+        let mainClass = null;
+        if (state.userPreferences.editMode) {
+            mainClass = state.mobileMode ? "container-mobile-edit" : "container-fluid";
+        }
+        else {
+            mainClass = state.mobileMode ? "container-mobile" : "container-fluid";
+        }
+
+        this.attribs.className = mainClass + " mainContainer";
+
+        if (fullScreenViewer) {
+            this.setChildren([
+                !state.fullScreenCalendarId ? new FullScreenControlBar() : null,
+                new Div(null, { className: "clearfix" }),
+                fullScreenViewer
+            ]);
+        }
+        else {
+            if (state.mobileMode) {
+                this.setChildren([
+                    new Div(null, {
+                        className: "row mainAppRowTop"
+                    }, [
+                        mobileTopBar
+                    ]),
+                    new Div(null, {
+                        className: "row mainAppRowBottom"
+                    }, [
+                        new TabPanel()
+                    ])
+                ]);
+            }
+            else {
+                this.setChildren([
+                    new Div(null, {
+                        className: "row mainAppRow"
+                    }, [
+                        new LeftNavPanel(),
+                        new TabPanel(),
+                        new RightNavPanel()
+                    ]),
+
+                    new IconButton("fa-angle-double-up", null, {
+                        onClick: e => {
+                            S.view.scrollAllTop();
+                        },
+                        title: "Scroll to Top"
+                    }, "btn-secondary scrollTopButtonUpperRight", "off"),
+
+                    new IconButton("fa-angle-double-up", null, {
+                        onClick: e => {
+                            S.view.scrollAllTop();
+                        },
+                        title: "Scroll to Top"
+                    }, "btn-secondary scrollTopButtonLowerRight", "off")
+                ]);
+            }
+        }
+    }
+
+    /* This is where we send an event that lets code hook into the render cycle to process whatever needs
+        to be done AFTER the main render is complete, like doing scrolling for example */
+    domUpdateEvent = () => {
+        PubSub.pub(C.PUBSUB_mainWindowScroll);
+        PubSub.pub(C.PUBSUB_postMainWindowScroll);
+    };
+
+    getFullScreenViewer = (state: AppState): CompIntf => {
+        let comp: CompIntf = null;
         if (state.fullScreenViewId) {
-            fullScreenViewer = new FullScreenImgViewer();
+            comp = new FullScreenImgViewer();
         }
         else if (state.fullScreenGraphId) {
-            fullScreenViewer = new FullScreenGraphViewer(state);
+            comp = new FullScreenGraphViewer(state);
         }
         else if (state.fullScreenCalendarId) {
-            fullScreenViewer = new FullScreenCalendar();
+            comp = new FullScreenCalendar();
         }
 
-        let mobileTopBar = null;
+        if (comp) {
+            comp.domUpdateEvent = () => {
+                S.view.docElm.scrollTop = 0;
+            };
+        }
+        return comp;
+    }
+
+    getTopMobileBar = (state: AppState): CompIntf => {
+        let comp: CompIntf = null;
         if (state.mobileMode) {
             let menuButton = null;
             menuButton = new IconButton("fa-bars", "Menu", {
@@ -88,76 +167,8 @@ export class App extends Div {
             });
 
             let title = state.title ? new Button("@" + state.title, e => { S.nav.navHome(state); }) : null;
-            mobileTopBar = new Div(null, null, [menuButton, logo, appName, signupButton, loginButton, title]);
+            comp = new Div(null, null, [menuButton, logo, appName, signupButton, loginButton, title]);
         }
-
-        let main: Main = null;
-        let allowEditMode = state.node && !state.isAnonUser;
-
-        let floatingControlBar = null;
-        if (!state.mobileMode) {
-            let topScrollUpButton = new IconButton("fa-angle-double-up", null, {
-                onClick: e => {
-                    window.scrollTo(0, 0);
-                },
-                title: "Scroll to Top"
-            }, "btn-secondary floatingControlBarItem", "off");
-
-            floatingControlBar = new Div(null, { className: "floatingControlBar" }, [topScrollUpButton]);
-        }
-
-        let mainClass = null;
-        if (state.userPreferences.editMode) {
-            mainClass = state.mobileMode ? "container-mobile-edit" : "container-fluid";
-        }
-        else {
-            mainClass = state.mobileMode ? "container-mobile" : "container-fluid";
-        }
-
-        this.setChildren([
-            mobileTopBar,
-
-            // calendar has close button itself, and doesn't need any control bar showing.
-            (fullScreenViewer && !state.fullScreenCalendarId) ? new FullScreenControlBar() : null,
-
-            fullScreenViewer ? new Div(null, { className: "clearfix" }) : null,
-            /* For 'Main' using 'container-fluid instead of 'container' makes the left and right panels
-             both get sized right with no overlapping. */
-            fullScreenViewer ||
-            (main = new Main({ role: "main", className: mainClass }, [
-                new Div(null, {
-                    className: "row main-app-row"
-                }, [
-                    state.mobileMode ? null : new LeftNavPanel(),
-                    new TabPanel(),
-                    state.mobileMode ? null : new RightNavPanel()
-                ])
-            ])),
-
-            fullScreenViewer ? null : floatingControlBar,
-
-            (state.mobileMode || fullScreenViewer) ? null : new IconButton("fa-angle-double-up", null, {
-                onClick: e => {
-                    // Log.log("scrollTop by button");
-                    window.scrollTo(0, 0);
-                },
-                title: "Scroll to Top"
-            }, "btn-secondary scrollTopButton", "off")
-        ]);
-
-        if (main) {
-            /* This is where we send an event that lets code hook into the render cycle to process whatever needs
-            to be done AFTER the main render is complete, like doing scrolling for example */
-            main.domUpdateEvent = () => {
-                PubSub.pub(C.PUBSUB_mainWindowScroll);
-                PubSub.pub(C.PUBSUB_postMainWindowScroll);
-            };
-        }
-        else if (fullScreenViewer) {
-            fullScreenViewer.domUpdateEvent = () => {
-                // Log.log("Restore ScrollPos fs top");
-                S.view.docElm.scrollTop = 0;
-            };
-        }
+        return comp;
     }
 }

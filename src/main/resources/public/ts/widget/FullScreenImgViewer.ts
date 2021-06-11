@@ -24,7 +24,6 @@ export class FullScreenImgViewer extends Main {
         }
 
         let isAnAccountNode = node && node.ownerId && node.id === node.ownerId;
-
         let children = [];
 
         if (node && S.props.hasBinary(node) && !isAnAccountNode) {

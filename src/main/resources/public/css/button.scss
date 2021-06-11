@@ -50,10 +50,16 @@
     margin: 1em;
 }
 
-.scrollTopButton {
+.scrollTopButtonUpperRight {
+    position: fixed;
+    top: 2px;
+    right: $scrollBarWidth;
+}
+
+.scrollTopButtonLowerRight {
     position: fixed;
     bottom: 2px;
-    right: 2px;
+    right: $scrollBarWidth;
 }
 
 .buttonBarIcon {
