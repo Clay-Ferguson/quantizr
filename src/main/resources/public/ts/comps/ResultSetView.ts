@@ -85,7 +85,7 @@ export abstract class ResultSetView extends AppTab {
 
     /* overridable (don't use arrow function) */
     renderHeading(): CompIntf {
-        return new Heading(4, this.data.name, { className: "resultsTitle" });
+        return new Heading(3, this.data.name, { className: "resultsTitle" });
     }
 
     /* overridable (don't use arrow function) */

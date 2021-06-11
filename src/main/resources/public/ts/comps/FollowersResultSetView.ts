@@ -28,7 +28,7 @@ export class FollowersResultSetView<I extends FollowersRSInfo> extends ResultSet
 
     renderHeading(): CompIntf {
         let info = this.data.rsInfo as FollowersRSInfo;
-        return new Heading(4, "Followers (@" + info.showingFollowersOfUser + ")", { className: "resultsTitle" });
+        return new Heading(3, "Followers (@" + info.showingFollowersOfUser + ")", { className: "resultsTitle" });
     }
 
     /* Renders the info for the OWNER of 'node', and not the content of the actual node, becasue the content will basically

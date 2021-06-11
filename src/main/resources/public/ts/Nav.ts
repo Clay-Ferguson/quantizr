@@ -327,8 +327,6 @@ export class Nav implements NavIntf {
             s.fullScreenViewId = null;
             s.fullScreenGraphId = null;
             s.fullScreenCalendarId = null;
-
-            // todo-0: need to search all singletons for places like this where "this" should replace "S.meta64"
             S.meta64.tabChanging(null, s.activeTab, s);
             return s;
         });

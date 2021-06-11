@@ -53,7 +53,6 @@ export class TrendingView extends AppTab {
             });
     }
 
-    /* This code is [almost] duplicated in NodeStatsDlg for now (todo-0) */
     preRender(): void {
         let state: AppState = useSelector((state: AppState) => state);
 
@@ -107,8 +106,8 @@ export class TrendingView extends AppTab {
         }
 
         this.setChildren([
-            new Heading(3, "Trending", { className: "trendingTitle" }),
-            new Div("Click any word below...", { className: "marginBottom" }),
+            new Heading(3, "Trending: Top 100s", { className: "trendingTitle" }),
+            new Div("Words listed in order of frequency. Click one to search...", { className: "marginBottom" }),
 
             // this should be correct data but we don't need it here.
             // new TextContent(res.stats, null, false),
