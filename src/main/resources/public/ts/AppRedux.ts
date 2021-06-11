@@ -47,7 +47,6 @@ export const useAppState = (state?: AppState): AppState => {
 };
 
 export const dispatch = (actionName: string, update: (state: AppState) => AppState) => {
-    S.meta64.preDispatch();
     // Log.log("Dispatch Running: " + action.type);
     store.dispatch({ type: actionName, update });
     // Log.log("Dispatch Complete: " + action.type);

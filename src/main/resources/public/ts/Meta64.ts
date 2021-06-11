@@ -921,7 +921,7 @@ export class Meta64 implements Meta64Intf {
     /* Because react doesn't persist scroll position upon rendering we have this hook which allows us
     the opportunity to save whatever scroll positions we care to persist, so we can use domPreUpdateEvent on
     whatever components we want to fix the scroll position in time for rendering */
-    preDispatch = (): void => {
+    saveScrollPosition = (): void => {
         let elm: HTMLElement = document.getElementById("tabPanelId");
         if (elm) {
             // console.log("Prev tab: " + C.TAB_MAIN + " set to " + elm.scrollTop + " before dispatch.");

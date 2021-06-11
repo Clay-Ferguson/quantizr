@@ -199,6 +199,7 @@ export class Nav implements NavIntf {
         // todo-1: without this timeout checkboxes on main tab don't work reliably. Need their state stored in global state to fix it
         // in a good way.
         setTimeout(() => {
+            S.meta64.saveScrollPosition();
             dispatch("Action_FastRefresh", (s: AppState): AppState => {
                 return s;
             });
@@ -284,6 +285,8 @@ export class Nav implements NavIntf {
     }
 
     navHome = (state: AppState = null): void => {
+        S.meta64.scrollPosByTabName.set(C.TAB_MAIN, 0);
+
         state = appState(state);
         console.log("navHome()");
         if (state.isAnonUser) {

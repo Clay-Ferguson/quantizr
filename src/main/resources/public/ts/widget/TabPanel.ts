@@ -62,7 +62,7 @@ export class TabPanel extends Div {
 
     domPreUpdateEvent = (): void => {
         this.whenElm((elm) => {
-            // preDispatch() call should have already loaded this scroll position.
+            // saveScrollPosition() call should have already loaded this scroll position.
             if (S.meta64.scrollPosByTabName.has(C.TAB_MAIN)) {
                 let newPos = S.meta64.scrollPosByTabName.get(C.TAB_MAIN);
                 // console.log("Restoring tab " + C.TAB_MAIN + " to " + newPos + " in domPreUpdateEvent");

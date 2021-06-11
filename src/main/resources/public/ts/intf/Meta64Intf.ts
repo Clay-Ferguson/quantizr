@@ -69,5 +69,5 @@ export interface Meta64Intf {
     fullscreenViewerActive(state: AppState): boolean;
     showMyNewMessages(): void;
     showPublicFediverse(): void;
-    preDispatch(): void;
+    saveScrollPosition(): void;
 }
