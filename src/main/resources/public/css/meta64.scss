@@ -99,6 +99,8 @@ $mobileHeaderHeight: 3.5em;
 .tab-panel-mobile {
     margin-left: 0px !important;
     margin-right: 0px !important;
+    padding-left: 0px !important;
+    padding-right: 15px !important;
 }
 
 .feedClearButton {
@@ -775,6 +777,7 @@ entire thing down some times, if it's jutting up against something */
     height: 100%;
     overflow-y: scroll;
     padding-bottom: 20px;
+    padding-left: 10px;
 }
 
 .tabPanelEditMode {
@@ -782,6 +785,7 @@ entire thing down some times, if it's jutting up against something */
     overflow-y: scroll;
     padding-right: 50px;
     padding-bottom: 20px;
+    padding-left: 10px;
 }
 
 .rightNavPanel {
@@ -809,7 +813,7 @@ entire thing down some times, if it's jutting up against something */
 .rightNavPanelInner {
     margin-right: 20px;
     min-width: 15em;
-    margin-left: 20px;
+    margin-left: 10px;
 }
 
 .my-tab-pane {
