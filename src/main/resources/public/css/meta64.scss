@@ -5,7 +5,7 @@ $profileImgSize: 200px;
 $rootNodeBorder: true;
 $highlightActiveMenuItems: false;
 
-$border-radius: 5px;
+$border-radius: 6px;
 
 $input-bg: $gray-700;
 $input-color: white;
@@ -154,6 +154,14 @@ $mobileHeaderHeight: 3.5em;
     margin-bottom: $smallGap;
     max-height: 200px;
     overflow-y: auto;
+    border-radius: $border-radius;
+}
+
+.trendingWordStatsArea {
+    border: 2px solid $nodeBorderBottomColor;
+    padding: $smallGap;
+    margin-bottom: $smallGap;
+    border-radius: $border-radius;
 }
 
 .d3Graph {
@@ -376,6 +384,10 @@ a {
 
 .resultsTitle {
     display: inline;
+}
+
+.trendingTitle {
+    margin-bottom: 15px;
 }
 
 .headerImageRHS {

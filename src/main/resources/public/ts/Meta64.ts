@@ -8,6 +8,7 @@ import { MainTabComp } from "./comps/MainTabComp";
 import { SearchResultSetView } from "./comps/SearchResultSetView";
 import { SharedNodesResultSetView } from "./comps/SharedNodesResultSetView";
 import { TimelineResultSetView } from "./comps/TimelineResultSetView";
+import { TrendingView } from "./comps/TrendingView";
 import { Constants as C } from "./Constants";
 import { AudioPlayerDlg } from "./dlg/AudioPlayerDlg";
 import { ChangePasswordDlg } from "./dlg/ChangePasswordDlg";
@@ -23,6 +24,7 @@ import { ResultSetInfo } from "./ResultSetInfo";
 import { SharesRSInfo } from "./SharesRSInfo";
 import { Singletons } from "./Singletons";
 import { TimelineRSInfo } from "./TimelineRSInfo";
+import { TrendingRSInfo } from "./TrendingRSInfo";
 import { App } from "./widget/App";
 import { CompIntf } from "./widget/base/CompIntf";
 import { WelcomePanel } from "./widget/WelcomePanel";
@@ -399,6 +401,13 @@ export class Meta64 implements Meta64Intf {
                         isVisible: () => true,
                         constructView: (data: TabDataIntf) => new FeedView(data),
                         rsInfo: null
+                    },
+                    {
+                        name: "Trending",
+                        id: C.TAB_TRENDING,
+                        isVisible: () => true,
+                        constructView: (data: TabDataIntf) => new TrendingView(data),
+                        rsInfo: new TrendingRSInfo()
                     }
                 ];
                 return s;
@@ -622,6 +631,8 @@ export class Meta64 implements Meta64Intf {
                 });
             }
         }
+
+        PubSub.pub(C.PUBSUB_tabChanging, newTab);
 
         if (prevTab) {
             let elm: HTMLElement = document.getElementById("tabPanelId");

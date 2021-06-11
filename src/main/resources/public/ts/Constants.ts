@@ -7,6 +7,7 @@ export class Constants {
     static TAB_FOLLOWERS: string = "followersResultSetView";
     static TAB_FOLLOWING: string = "followingResultSetView";
     static TAB_FEED: string = "feedTab";
+    static TAB_TRENDING: string = "trendingTab";
 
     static SITE_NAV_MENU_TEXT = "Site Nav";
 
@@ -34,6 +35,7 @@ export class Constants {
     static readonly PUBSUB_SingletonsReady = "PUBSUB_SingletonsReady";
     static readonly PUBSUB_mainWindowScroll = "PUBSUB_mainWindowScroll";
     static readonly PUBSUB_postMainWindowScroll = "PUBSUB_postMainWindowScroll";
+    static readonly PUBSUB_tabChanging = "PUBSUB_tabChanging";
 
     static readonly LOCALDB_LOGIN_USR: string = "loginUsr";
     static readonly LOCALDB_LOGIN_PWD: string = "loginPwd";
