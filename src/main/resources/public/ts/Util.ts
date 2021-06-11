@@ -1022,6 +1022,12 @@ export class Util implements UtilIntf {
 
     getShortContent = (content: string): string => {
         if (!content) return content;
+
+        content = S.util.replaceAll(content, "{{imgUpperRight}}", "");
+        content = S.util.replaceAll(content, "{{imgUpperLeft}}", "");
+        content = S.util.replaceAll(content, "{{img}}", "");
+        content = content.trim();
+
         let idx = content.indexOf("\n");
         if (idx !== -1) {
             content = content.substring(0, idx);
