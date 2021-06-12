@@ -31,10 +31,10 @@ export class FeedView extends AppTab {
     static enabled: boolean = true;
     static searchTextState: ValidatedState<any> = new ValidatedState<any>();
 
-    /* Controle wether the view automatically refreshes before letting the user choose what options (checkboxes) they want.
+    /* Controls wether the view automatically refreshes before letting the user choose what options (checkboxes) they want.
     I'm disabling because I don't like this. If I'm wanting to find just "To me" for example then I have to wait for it
     to first query stuff I don't care about first. So I'd just rather click the "Refresh" button myself each time. */
-    static automaticInitialRefresh: boolean = false;
+    static automaticInitialRefresh: boolean = true;
 
     static page: number = 0;
     static refreshCounter: number = 0;

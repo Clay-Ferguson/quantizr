@@ -71,7 +71,7 @@ export class TrendingView extends AppTab {
 
         let tagPanel = new Div(null, { className: "trendingWordStatsArea" });
         if (res.topTags && res.topTags.length > 0) {
-            tagPanel.addChild(new Heading(4, "Hashtags"));
+            tagPanel.addChild(new Heading(4, "Hashtags", { className: "trendingSectionTitle" }));
             res.topTags.forEach((word: string) => {
                 tagPanel.addChild(new Span(word, {
                     className: "statsWord",
@@ -83,7 +83,7 @@ export class TrendingView extends AppTab {
 
         let mentionPanel = new Div(null, { className: "trendingWordStatsArea" });
         if (res.topMentions && res.topMentions.length > 0) {
-            mentionPanel.addChild(new Heading(4, "Mentions"));
+            mentionPanel.addChild(new Heading(4, "Mentions", { className: "trendingSectionTitle" }));
             res.topMentions.forEach((word: string) => {
                 mentionPanel.addChild(new Span(word, {
                     className: "statsWord",
@@ -95,7 +95,7 @@ export class TrendingView extends AppTab {
 
         let wordPanel = new Div(null, { className: "trendingWordStatsArea" });
         if (res.topWords && res.topWords.length > 0) {
-            wordPanel.addChild(new Heading(4, "Words"));
+            wordPanel.addChild(new Heading(4, "Words", { className: "trendingSectionTitle" }));
             res.topWords.forEach((word: string) => {
                 wordPanel.addChild(new Span(word, {
                     className: "statsWord",
