@@ -289,10 +289,8 @@ public class NodeSearchService {
 			List<String> sharedToAny = new LinkedList<>();
 			sharedToAny.add(PrincipalName.PUBLIC.s());
 
-			String pathToSearch = NodeName.ROOT_OF_ALL_USERS;
-
 			Query query = new Query();
-			Criteria criteria = Criteria.where(SubNode.FIELD_PATH).regex(util.regexRecursiveChildrenOfPath(pathToSearch)) //
+			Criteria criteria = Criteria.where(SubNode.FIELD_PATH).regex(util.regexRecursiveChildrenOfPath(NodeName.ROOT_OF_ALL_USERS)) //
 
 					// This pattern is what is required when you have multiple conditions added to a
 					// single field.

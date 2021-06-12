@@ -4,12 +4,13 @@ public class UserProfile {
 	private String displayName;
 
 	private String userName;
-	//if a node exists named '[userName]:home', then the id of that node is stored here.
+	// if a node exists named '[userName]:home', then the id of that node is stored here.
 	private String homeNodeId;
 
 	private String userBio;
 
-	// version (which is now just the GRID ID) needed to retrieve profile image (account node binary attachment)
+	// version (which is now just the GRID ID) needed to retrieve profile image (account node binary
+	// attachment)
 	// Moving out of here into getUserProfile
 	private String avatarVer;
 
@@ -28,6 +29,12 @@ public class UserProfile {
 
 	private int followerCount;
 	private int followingCount;
+
+	/*
+	 * Indicators to the person querying this info about whether they follow or blocked this user
+	 */
+	private boolean following;
+	private boolean blocked;
 
 	public String getUserName() {
 		return userName;
@@ -123,5 +130,21 @@ public class UserProfile {
 
 	public void setFollowingCount(int followingCount) {
 		this.followingCount = followingCount;
+	}
+
+	public boolean isFollowing() {
+		return following;
+	}
+
+	public void setFollowing(boolean following) {
+		this.following = following;
+	}
+
+	public boolean isBlocked() {
+		return blocked;
+	}
+
+	public void setBlocked(boolean blocked) {
+		this.blocked = blocked;
 	}
 }

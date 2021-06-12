@@ -1851,6 +1851,28 @@ audio::-webkit-media-controls-play-button {
     display: table-row;
 }
 
+.followingText {
+    font-size: 120%;
+    font-weight: bold;
+    margin-left: 15px;
+    padding: 8px;
+    border: 2px solid $nodeBorderBottomColor;
+    background-color: green;
+    border-radius: 100px;
+    cursor: pointer;
+}
+
+.blockingText {
+    font-size: 120%;
+    font-weight: bold;
+    margin-left: 15px;
+    padding: 8px;
+    border: 2px solid $nodeBorderBottomColor;
+    background-color: orangered;
+    border-radius: 100px;
+    cursor: pointer;
+}
+
 .followCount {
     font-size: 120%;
     margin-left: 15px;

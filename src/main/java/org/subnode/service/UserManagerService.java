@@ -660,19 +660,19 @@ public class UserManagerService {
 		}
 
 		// get the node that holds all blocked users
-		SubNode blockedUsersList =
+		SubNode blockedList =
 				read.getUserNodeByType(session, userName, null, null, NodeType.BLOCKED_USERS.s(), null, NodeName.BLOCKED_USERS);
 
 		/*
 		 * lookup to see if this will be a duplicate
 		 */
-		SubNode userNode = read.findNodeByUserAndType(session, blockedUsersList, req.getUserName(), NodeType.FRIEND.s());
+		SubNode userNode = read.findNodeByUserAndType(session, blockedList, req.getUserName(), NodeType.FRIEND.s());
 		if (userNode == null) {
 			String followerActorUrl = null;
 			String followerActorHtmlUrl = null;
 
 			userNode =
-					edit.createFriendNode(session, blockedUsersList, req.getUserName(), followerActorUrl, followerActorHtmlUrl);
+					edit.createFriendNode(session, blockedList, req.getUserName(), followerActorUrl, followerActorHtmlUrl);
 			if (userNode != null) {
 				res.setMessage(
 						"Blocked user " + req.getUserName() + ". To manage blocks, go to `Menu -> Users -> Blocked Users`");
@@ -778,7 +778,7 @@ public class UserManagerService {
 				userProfile.setActorUrl(userNode.getStrProp(NodeProp.ACT_PUB_ACTOR_URL));
 
 				/*
-				 * Only for local users to we attemp to generate followers and following, but theoretically we can
+				 * Only for local users do we attemp to generate followers and following, but theoretically we can
 				 * use the ActPub API to query for this for foreign users also.
 				 */
 				if (nodeUserName.indexOf("@") == -1) {
@@ -787,12 +787,34 @@ public class UserManagerService {
 
 					Long followingCount = apFollowing.countFollowingOfUser(session, nodeUserName);
 					userProfile.setFollowingCount(followingCount.intValue());
+
+					boolean blocked = userIsBlockedByMe(session, nodeUserName);
+					userProfile.setBlocked(blocked);
+
+					boolean following = userIsFollowedByMe(session, nodeUserName);
+					userProfile.setFollowing(following);
 				}
 
 				res.setSuccess(true);
 			}
 		});
 		return res;
+	}
+
+	public boolean userIsFollowedByMe(MongoSession session, String maybeFollowedUser) {
+		final String userName = ThreadLocals.getSessionContext().getUserName();
+		SubNode friendsList =
+				read.getUserNodeByType(session, userName, null, null, NodeType.FRIEND_LIST.s(), null, NodeName.BLOCKED_USERS);
+		SubNode userNode = read.findNodeByUserAndType(session, friendsList, maybeFollowedUser, NodeType.FRIEND.s());
+		return userNode != null;
+	}
+
+	public boolean userIsBlockedByMe(MongoSession session, String maybeBlockedUser) {
+		final String userName = ThreadLocals.getSessionContext().getUserName();
+		SubNode blockedList =
+				read.getUserNodeByType(session, userName, null, null, NodeType.BLOCKED_USERS.s(), null, NodeName.BLOCKED_USERS);
+		SubNode userNode = read.findNodeByUserAndType(session, blockedList, maybeBlockedUser, NodeType.FRIEND.s());
+		return userNode != null;
 	}
 
 	public UserPreferences getDefaultUserPreferences() {

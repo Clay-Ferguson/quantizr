@@ -14,6 +14,8 @@ export interface UserProfile {
     actorUrl: string;
     followerCount: number;
     followingCount: number;
+    following: boolean;
+    blocked: boolean;
 }
 
 export interface AddFriendRequest extends RequestBase {

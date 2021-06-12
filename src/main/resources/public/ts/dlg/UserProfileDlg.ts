@@ -66,9 +66,12 @@ export class UserProfileDlg extends DialogBase {
                 ]) : null,
 
                 profileImg,
-
+                // todo-1: currently there's no 'unblock' user has to go do that in their blocked users node.
                 new Div(null, { className: "marginBottom" }, [
                     new Div(null, { className: "float-right" }, [
+                        state.userProfile.blocked ? new Span("BLOCKED", { className: "blockingText" }) : null,
+                        state.userProfile.following ? new Span("You Follow", { className: "followingText" }) : null,
+
                         (localUser && state.userProfile.followerCount > 0) ? new Span(state.userProfile.followerCount + " followers", {
                             onClick: () => {
                                 if (state.userProfile.followerCount) {
@@ -115,8 +118,8 @@ export class UserProfileDlg extends DialogBase {
                     localUser && state.userProfile.homeNodeId ? new Button("Home Node", () => this.openUserHomePage(state, "home")) : null, //
                     localUser ? new Button("Posts", () => this.openUserHomePage(state, "posts")) : null, //
 
-                    this.readOnly && state.userProfile.userName !== this.appState.userName ? new Button("Add as Friend", this.addFriend) : null,
-                    this.readOnly && state.userProfile.userName !== this.appState.userName ? new Button("Block User", this.blockUser) : null,
+                    !state.userProfile.following && this.readOnly && state.userProfile.userName !== this.appState.userName ? new Button("Add as Friend", this.addFriend) : null,
+                    !state.userProfile.blocked && this.readOnly && state.userProfile.userName !== this.appState.userName ? new Button("Block User", this.blockUser) : null,
                     state.userProfile.actorUrl ? new Button("Go to User Page", () => {
                         window.open(state.userProfile.actorUrl, "_blank");
                     }) : null,
@@ -155,7 +158,7 @@ export class UserProfileDlg extends DialogBase {
             S.util.ajax<J.GetUserProfileRequest, J.GetUserProfileResponse>("getUserProfile", {
                 userId: userNodeId
             }, (res: J.GetUserProfileResponse): void => {
-                // console.log("UserProfile Response: " + S.util.prettyPrint(res));
+                console.log("UserProfile Response: " + S.util.prettyPrint(res));
                 if (res) {
                     this.bioState.setValue(res.userProfile.userBio);
                     this.displayNameState.setValue(res.userProfile.displayName);
@@ -191,7 +194,7 @@ export class UserProfileDlg extends DialogBase {
         S.util.ajax<J.BlockUserRequest, J.BlockUserResponse>("blockUser", {
             userName: state.userProfile.userName
         }, (res: J.AddFriendResponse) => {
-            S.util.showMessage(res.message, "Block User");
+            S.util.showMessage(res.message, "Blocked " + state.userProfile.userName);
         });
     }
 
