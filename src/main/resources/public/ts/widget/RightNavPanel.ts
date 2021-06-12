@@ -52,7 +52,7 @@ export class RightNavPanel extends Div {
 
                     new Div(null, { className: "marginBottom" }, [
                         new ButtonBar([
-                            state.mainPanelCols > 4 ? new IconButton("fa-caret-left", null, {
+                            !state.isAnonUser && state.mainPanelCols > 4 ? new IconButton("fa-caret-left", null, {
                                 className: "widthAdjustLink",
                                 onClick: () => {
                                     dispatch("Action_widthAdjust", (s: AppState): AppState => {
@@ -61,7 +61,7 @@ export class RightNavPanel extends Div {
                                     });
                                 }
                             }) : null,
-                            state.mainPanelCols < 6 ? new IconButton("fa-caret-right", null, {
+                            !state.isAnonUser && state.mainPanelCols < 6 ? new IconButton("fa-caret-right", null, {
                                 className: "widthAdjustLink",
                                 onClick: () => {
                                     dispatch("Action_widthAdjust", (s: AppState): AppState => {

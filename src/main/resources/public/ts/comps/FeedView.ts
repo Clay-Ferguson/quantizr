@@ -66,9 +66,6 @@ export class FeedView extends AppTab {
 
         let refreshFeedButtonBar = new ButtonBar([
             state.isAnonUser ? null : new Button("New Post", () => S.edit.addNode(null, null, state), { title: "Post something awesome on the Fediverse!" }, "btn-primary"),
-            new Button("Trending", () => {
-                S.view.getNodeStats(state, true, true);
-            }),
             new Span(null, {
                 className: ((state.feedDirty || state.feedWaitingForUserRefresh) ? "feedDirtyButton" : "feedNotDirtyButton")
             }, [
