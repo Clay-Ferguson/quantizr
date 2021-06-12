@@ -922,12 +922,13 @@ public class ActPubService {
         if (apUserName == null || !apUserName.contains("@") || apUserName.toLowerCase().endsWith("@" + appProp.getMetaHost()))
             return;
 
+        saveFediverseName(apUserName);
+
         // unless force is true, don't add this apUserName to pending list
         if (!force && apCache.usersPendingRefresh.contains(apUserName)) {
             return;
         }
 
-        saveFediverseName(apUserName);
         // add as 'false' meaning the refresh is not yet done
         apCache.usersPendingRefresh.put(apUserName, false);
     }
@@ -1069,6 +1070,7 @@ public class ActPubService {
     public String getStatsReport() {
         StringBuilder sb = new StringBuilder();
         sb.append("\nActivityPub Stats:\n");
+        sb.append("Cached Usernames: " + apCache.allUserNames.size() + "\n");
         sb.append("Users Currently Queued (for refresh): " + queuedUserCount() + "\n");
         sb.append("Refresh Foreign Users Cycles: " + refreshForeignUsersCycles + "\n");
         sb.append("Last Foreign Users Refresh Time: " + lastRefreshForeignUsersCycleTime + "\n");

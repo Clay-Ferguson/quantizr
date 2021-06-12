@@ -29,6 +29,14 @@ export class FriendsListTypeHandler extends TypeBase {
     }
 
     render(node: J.NodeInfo, rowStyling: boolean, isTreeView: boolean, state: AppState): Comp {
+
+        /* this is a slightly ugly coupling, between GUI and State, but it's also simple enough to
+         not be a problem. */
+        if (S.meta64.addFriendPending) {
+            S.meta64.addFriendPending = false;
+            setTimeout(() => S.edit.createNode(node, J.NodeType.FRIEND, state), 500);
+        }
+
         return new Div(null, null, [
             new Heading(4, "Friends List", {
                 className: "marginAll"

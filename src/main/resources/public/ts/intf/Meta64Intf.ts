@@ -15,6 +15,7 @@ export interface Meta64Intf {
     curUrlPath: string;
     deviceWidth: number;
     deviceHeight: number;
+    addFriendPending: boolean;
 
     parentIdToFocusNodeMap: Map<string, string>;
     curHighlightNodeCompRow: CompIntf;

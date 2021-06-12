@@ -44,7 +44,16 @@ export class MenuPanel extends Div {
 
     static openUserGuide = () => S.nav.openContentNode(":user-guide");
     static openNotesNode = () => S.nav.openContentNode("~" + J.NodeType.NOTES);
-    static openFriendsNode = () => S.nav.openContentNode("~" + J.NodeType.FRIEND_LIST);
+
+    static openFriendsNode = () => {
+        S.nav.openContentNode("~" + J.NodeType.FRIEND_LIST);
+    };
+
+    static addFriend = () => {
+        S.meta64.addFriendPending = true;
+        S.nav.openContentNode("~" + J.NodeType.FRIEND_LIST);
+    };
+
     static openBlockedUsersNode = () => S.nav.openContentNode("~" + J.NodeType.BLOCKED_USERS);
     static openRSSFeedsNode = () => S.nav.openContentNode("~" + J.NodeType.RSS_FEEDS);
     static openPostsNode = () => S.nav.openContentNode("~" + J.NodeType.POSTS);
@@ -187,6 +196,7 @@ export class MenuPanel extends Div {
         children.push(new Menu("Users", [
             new MenuItem("Find Users", MenuPanel.findUsers, !state.isAnonUser), //
             new MenuItem("Friends", MenuPanel.openFriendsNode, !state.isAnonUser),
+            new MenuItem("Add Friend", MenuPanel.addFriend, !state.isAnonUser),
             new MenuItem("Followers", MenuPanel.showFollowers, !state.isAnonUser),
             new MenuItem("Blocked Users", MenuPanel.openBlockedUsersNode, !state.isAnonUser)
         ]));
