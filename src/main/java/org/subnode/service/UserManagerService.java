@@ -671,8 +671,7 @@ public class UserManagerService {
 			String followerActorUrl = null;
 			String followerActorHtmlUrl = null;
 
-			userNode =
-					edit.createFriendNode(session, blockedList, req.getUserName(), followerActorUrl, followerActorHtmlUrl);
+			userNode = edit.createFriendNode(session, blockedList, req.getUserName(), followerActorUrl, followerActorHtmlUrl);
 			if (userNode != null) {
 				res.setMessage(
 						"Blocked user " + req.getUserName() + ". To manage blocks, go to `Menu -> Users -> Blocked Users`");
@@ -686,10 +685,9 @@ public class UserManagerService {
 		} else {
 			/*
 			 * todo-0: for this AND the friend request (similar places), we need to make it where the user can
-			 * never get here or click a button if this is redundant.
-			 * 
-			 * todo-0: also we don't yet have in the GUI the indication of "Follows You" and "[You're] Following" when
-			 * someone views a user, which is part of what's needed for this.
+			 * never get here or click a button if this is redundant. also we don't yet have in the GUI the
+			 * indication of "Follows You" and "[You're] Following" when someone views a user, which is part of
+			 * what's needed for this.
 			 */
 			res.setMessage("You already blocked " + req.getUserName());
 			res.setSuccess(true);
@@ -1053,7 +1051,7 @@ public class UserManagerService {
 	 * For all foreign servers we remove posts that are older than a certain number of days just to keep
 	 * our DB from growing too large.
 	 * 
-	 * todo-0: Is this a dupliate of "ActPub Maintenance" menu option logic?
+	 * todo-1: Is this a dupliate of "ActPub Maintenance" menu option logic?
 	 */
 	public void cleanUserAccounts() {
 		// not currently used.
