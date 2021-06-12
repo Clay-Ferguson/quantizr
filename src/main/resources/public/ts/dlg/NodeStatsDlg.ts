@@ -20,7 +20,6 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (s: Singletons) => {
     S = s;
 });
 
-/* todo-0: need to use only Tab now, not this dialog */
 export class NodeStatsDlg extends DialogBase {
 
     static helpExpanded: boolean;

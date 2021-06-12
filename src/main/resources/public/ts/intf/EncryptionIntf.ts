@@ -14,7 +14,7 @@ export interface EncryptionIntf {
     vector: Uint8Array;
 
     test(): Promise<string>;
-    initKeys(forceUpdate?:boolean, republish?: boolean): any;
+    initKeys(forceUpdate?:boolean, republish?: boolean, showConfirm?: boolean): any;
     exportKeys(): Promise<string>;
 
     asymEncryptString(key: CryptoKey, data: string): Promise<string>;

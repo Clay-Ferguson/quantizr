@@ -287,11 +287,7 @@ export class Meta64 implements Meta64Intf {
         }
     }
 
-    /* todo-0: This code has a bad smell to it, upon second look months later, check that this is good, and wasn't a
-    short-term technical debt.
-
-    Find node by looking everywhere we possibly can on local storage for it
-    */
+    /* Find node by looking everywhere we possibly can on local storage for it */
     findNodeById = (state: AppState, nodeId: string): J.NodeInfo => {
         // first look in normal tree map for main view.
         let node: J.NodeInfo = state.idToNodeMap.get(nodeId);

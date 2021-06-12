@@ -158,7 +158,6 @@ export class View implements ViewIntf {
         }
     }
 
-    /* todo-0: put these element IDs in constants file */
     scrollAllTop = () => {
         S.util.getElm(C.ID_LHS, (elm: HTMLElement) => {
             elm.scrollTop = 0;

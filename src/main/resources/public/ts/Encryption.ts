@@ -242,8 +242,8 @@ export class Encryption implements EncryptionIntf {
         });
     }
 
-    initKeys = async (forceUpdate: boolean = false, republish: boolean = false) => {
-        await this.initAsymetricKeys(forceUpdate, republish);
+    initKeys = async (forceUpdate: boolean = false, republish: boolean = false, showConfirm: boolean = false) => {
+        await this.initAsymetricKeys(forceUpdate, republish, showConfirm);
         await this.initSymetricKey(forceUpdate);
     }
 
@@ -301,7 +301,7 @@ export class Encryption implements EncryptionIntf {
     }
 
     /* Note: a 'forceUpdate' always triggers the 'republish' */
-    initAsymetricKeys = async (forceUpdate: boolean = false, republish: boolean = false): Promise<void> => {
+    initAsymetricKeys = async (forceUpdate: boolean = false, republish: boolean = false, showConfirm: boolean = false): Promise<void> => {
 
         return new Promise<void>(async (resolve, reject) => {
             try {
@@ -347,7 +347,11 @@ export class Encryption implements EncryptionIntf {
 
                     S.util.ajax<J.SavePublicKeyRequest, J.SavePublicKeyResponse>("savePublicKey", {
                         keyJson: pubKeyStr
-                    }, this.savePublicKeyResponse);
+                    }, (res: J.SavePublicKeyResponse): void => {
+                        if (showConfirm) {
+                            S.util.showMessage(res.message, "Published Public Key");
+                        }
+                    });
                 }
             }
             finally {
@@ -362,11 +366,6 @@ export class Encryption implements EncryptionIntf {
             length: 256
         }, true, this.OP_ENC_DEC);
         return key;
-    }
-
-    savePublicKeyResponse = (res: J.SavePublicKeyResponse): void => {
-        // todo-0: this comes up even with anonymous login. oops. That's just confusing to users.
-        // S.util.showMessage(res.message, "Publish Public Key");
     }
 
     /**

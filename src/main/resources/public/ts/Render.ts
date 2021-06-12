@@ -653,7 +653,7 @@ export class Render implements RenderIntf {
 
         return new Div(null, attribs, [
             new ButtonBar([
-                // todo-0: need to make ALL calls be able to do a newSubNode here without so we don't need
+                // todo-1: need to make ALL calls be able to do a newSubNode here without so we don't need
                 // the showMessagesButton flag.
                 showMessageButton ? new Button("Message", S.edit.newSubNode, {
                     title: "Send Private Message",

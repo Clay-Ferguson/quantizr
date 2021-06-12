@@ -129,7 +129,7 @@ export class MenuPanel extends Div {
     };
 
     static generateKeys = () => { S.util.generateNewCryptoKeys(appState(null)); };
-    static publishKeys = () => { S.encryption.initKeys(false, true); };
+    static publishKeys = () => { S.encryption.initKeys(false, true, true); };
     static importKeys = () => { new ImportCryptoKeyDlg(appState(null)).open(); };
     static profile = () => {
         new UserProfileDlg(null, appState(null)).open();
