@@ -246,9 +246,9 @@ public class ActPubService {
     }
 
     /**
-     * Gets the account SubNode representing foreign user apUserName (like
-     * someuser@fosstodon.org), by first checking the 'acctNodesByUserName' cache, or else by reading in
-     * the user from the Fediverse, and updating the cache.
+     * Gets the account SubNode representing foreign user apUserName (like someuser@fosstodon.org), by
+     * first checking the 'acctNodesByUserName' cache, or else by reading in the user from the
+     * Fediverse, and updating the cache.
      */
     public SubNode getAcctNodeByUserName(MongoSession session, String apUserName) {
         if (!apUserName.contains("@")) {
@@ -603,7 +603,7 @@ public class ActPubService {
         // todo-1: I haven't yet tested that mentions are parsable in any Mastodon text using this method
         // but we at least know other instances of Quanta will have these extractable this way.
         HashSet<String> mentionsSet = auth.parseMentions(contentHtml);
-        for (String mentionName: mentionsSet) {
+        for (String mentionName : mentionsSet) {
             saveFediverseName(mentionName);
         }
 
@@ -946,55 +946,69 @@ public class ActPubService {
             return;
 
         try {
-            // todo-0: move this loop out into a function (ditto below)
-            for (final String name : apCache.allUserNames.keySet()) {
-                Boolean done = apCache.allUserNames.get(name);
-                if (done)
-                    continue;
-
-                apCache.allUserNames.put(name, true);
-
-                FediverseName fName = new FediverseName();
-                fName.setName(name);
-                fName.setCreateTime(Calendar.getInstance().getTime());
-                
-                // I'm not sure if it's faster to try to save adn let the unique index block duplicates, or if it's faster
-                // to check for dups before calling save here.
-                try {
-                    ops.save(fName);
-                } catch (Exception e) {
-                    // this will happen for every duplidate. so A LOT!
-                }
-            }
-
-            for (final String userName : apCache.usersPendingRefresh.keySet()) {
-                Boolean done = apCache.usersPendingRefresh.get(userName);
-                if (done)
-                    continue;
-
-                // flag as done (even if it fails we still want it flagged as done. no retries will be done).
-                apCache.usersPendingRefresh.put(userName, true);
-
-                adminRunner.run(session -> {
-                    // log.debug("Reload user outbox: " + userName);
-                    SubNode userNode = getAcctNodeByUserName(session, userName);
-                    if (userNode == null)
-                        return null;
-
-                    String actorUrl = userNode.getStrProp(NodeProp.ACT_PUB_ACTOR_ID.s());
-                    APObj actor = apUtil.getActorByUrl(actorUrl);
-                    if (actor != null) {
-                        apOutbox.refreshOutboxFromForeignServer(session, actor, userNode, userName);
-                    } else {
-                        log.debug("Unable to get cached actor from url: " + actorUrl);
-                    }
-
-                    return null;
-                });
-            }
+            saveUserNames();
         } catch (Exception e) {
             // log and ignore.
-            log.error("messageRefreshFailed", e);
+            log.error("saveUserNames", e);
+        }
+
+        try {
+            refreshOutboxes();
+        } catch (Exception e) {
+            // log and ignore.
+            log.error("refresh outboxes", e);
+        }
+    }
+
+    private void refreshOutboxes() {
+        for (final String userName : apCache.usersPendingRefresh.keySet()) {
+            Boolean done = apCache.usersPendingRefresh.get(userName);
+            if (done)
+                continue;
+
+            // flag as done (even if it fails we still want it flagged as done. no retries will be done).
+            apCache.usersPendingRefresh.put(userName, true);
+
+            adminRunner.run(session -> {
+                // log.debug("Reload user outbox: " + userName);
+                SubNode userNode = getAcctNodeByUserName(session, userName);
+                if (userNode == null)
+                    return null;
+
+                String actorUrl = userNode.getStrProp(NodeProp.ACT_PUB_ACTOR_ID.s());
+                APObj actor = apUtil.getActorByUrl(actorUrl);
+                if (actor != null) {
+                    apOutbox.refreshOutboxFromForeignServer(session, actor, userNode, userName);
+                } else {
+                    log.debug("Unable to get cached actor from url: " + actorUrl);
+                }
+
+                return null;
+            });
+        }
+    }
+
+    private void saveUserNames() {
+        for (final String name : apCache.allUserNames.keySet()) {
+            Boolean done = apCache.allUserNames.get(name);
+            if (done)
+                continue;
+
+            apCache.allUserNames.put(name, true);
+
+            FediverseName fName = new FediverseName();
+            fName.setName(name);
+            fName.setCreateTime(Calendar.getInstance().getTime());
+
+            /*
+             * I'm not sure if it's faster to try to save and let the unique index block duplicates, or if it's
+             * faster to check for dups before calling save here.
+             */
+            try {
+                ops.save(fName);
+            } catch (Exception e) {
+                // this will happen for every duplidate. so A LOT!
+            }
         }
     }
 

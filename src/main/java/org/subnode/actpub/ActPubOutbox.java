@@ -134,8 +134,6 @@ public class ActPubOutbox {
                         else if (AP.isType(object, APType.Note)) {
                             try {
                                 ActPubService.newPostsInCycle++;
-
-                                // todo-0: Let's do our own parse of note text to extract out usernames (mentions)
                                 apService.saveNote(session, _userNode, outboxNode, object, true, true);
                                 count.setVal(count.getVal() + 1);
                             } catch (Exception e) {
