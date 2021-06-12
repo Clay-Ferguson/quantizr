@@ -688,7 +688,7 @@ public class UserManagerService {
 			 * todo-0: for this AND the friend request (similar places), we need to make it where the user can
 			 * never get here or click a button if this is redundant.
 			 * 
-			 * todo-0: also we don't yet have in the GUI the indication of "Follows You" and "Following" when
+			 * todo-0: also we don't yet have in the GUI the indication of "Follows You" and "[You're] Following" when
 			 * someone views a user, which is part of what's needed for this.
 			 */
 			res.setMessage("You already blocked " + req.getUserName());

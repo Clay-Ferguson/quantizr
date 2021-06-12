@@ -40,7 +40,6 @@ import org.subnode.mail.MailSender;
 import org.subnode.model.client.NodeProp;
 import org.subnode.model.client.PrincipalName;
 import org.subnode.mongo.MongoRead;
-import org.subnode.mongo.MongoUtil;
 import org.subnode.mongo.RunAsMongoAdmin;
 import org.subnode.mongo.model.SubNode;
 import org.subnode.request.AddFriendRequest;
@@ -434,6 +433,11 @@ public class AppController implements ErrorController {
 	@GetMapping(value = {"/sp/{systemPage}"}, produces = MediaType.TEXT_HTML_VALUE)
 	public @ResponseBody String systemPage(@PathVariable(value = "systemPage", required = false) String systemPage) {
 		return "<html><body>My Full Page: " + systemPage + "</body></html>";
+	}
+
+	@GetMapping(value = {"/fediverse-users"}, produces = MediaType.TEXT_HTML_VALUE)
+	public @ResponseBody String fediverseUsers() {
+		return "<html><body><pre>" + actPub.dumpFediverseUsers() + "</pre></body></html>";
 	}
 
 	@GetMapping(value = {"/multiRss"}, produces = MediaType.APPLICATION_RSS_XML_VALUE)
@@ -1158,8 +1162,8 @@ public class AppController implements ErrorController {
 	}
 
 	/*
-	 * This function is similar to getFriends, but since getFriends is for a picker dialog we
-	 * can consider it to be the odd man out which will eventually need to support paging (currently
+	 * This function is similar to getFriends, but since getFriends is for a picker dialog we can
+	 * consider it to be the odd man out which will eventually need to support paging (currently
 	 * doesn't) and go ahead and duplicate that functionality here in a way analogous to getFollowers
 	 */
 	@RequestMapping(value = API_PATH + "/getFollowing", method = RequestMethod.POST)

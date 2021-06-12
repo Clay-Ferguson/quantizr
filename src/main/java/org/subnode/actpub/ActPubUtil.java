@@ -59,6 +59,9 @@ public class ActPubUtil {
     @Autowired
     private ActPubCache apCache;
 
+    @Autowired
+    private ActPubService apService;
+
     /*
      * RestTemplate is thread-safe and reusable, and has no state, so we need only one final static
      * instance ever
@@ -103,6 +106,8 @@ public class ActPubUtil {
 
     /*
      * Builds the unique set of hosts from a list of userNames (not used currently)
+     * 
+     * Looks like this isn't being used.
      */
     public HashSet<String> getHostsFromUserNames(List<String> userNames) {
         String host = appProp.getMetaHost();
@@ -283,6 +288,8 @@ public class ActPubUtil {
         if (url == null)
             return null;
 
+        apService.saveFediverseName(url);
+
         // first try to return from cache.
         APObj actor = apCache.actorsByUrl.get(url);
         if (actor != null) {
@@ -313,6 +320,8 @@ public class ActPubUtil {
      * someuser@ip:port (special testing mode, insecure)
      */
     public APObj getWebFinger(String resource) {
+        apService.saveFediverseName(resource);
+
         // For non-secure domains, they're required to have a port in their name,
         // so this is users like bob@q1:8184 (for example), and that port is expected
         // also to NOT be https 443 port.

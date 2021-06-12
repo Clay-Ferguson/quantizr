@@ -183,7 +183,7 @@ export class NodeCompButtonBar extends Div {
             }
 
             if (C.INS_ON_TOOLBAR) {
-                // todo-0: this button should have same enablement as "new" button, on the page root ???
+                // todo-1: this button should have same enablement as "new" button, on the page root ???
                 insertNodeButton = new Button("Ins", S.edit.toolbarInsertNode, {
                     title: "Insert new Node at this location.",
                     nid: node.id

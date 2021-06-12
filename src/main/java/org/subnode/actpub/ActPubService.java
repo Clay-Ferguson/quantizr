@@ -2,7 +2,9 @@ package org.subnode.actpub;
 
 import java.security.PublicKey;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.Executor;
@@ -12,6 +14,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.subnode.AppController;
@@ -27,6 +30,7 @@ import org.subnode.model.client.NodeType;
 import org.subnode.model.client.PrincipalName;
 import org.subnode.model.client.PrivilegeType;
 import org.subnode.mongo.CreateNodeLocation;
+import org.subnode.mongo.MongoAuth;
 import org.subnode.mongo.MongoCreate;
 import org.subnode.mongo.MongoDelete;
 import org.subnode.mongo.MongoRead;
@@ -35,6 +39,7 @@ import org.subnode.mongo.MongoUpdate;
 import org.subnode.mongo.MongoUtil;
 import org.subnode.mongo.RunAsMongoAdminEx;
 import org.subnode.mongo.model.AccessControl;
+import org.subnode.mongo.model.FediverseName;
 import org.subnode.mongo.model.SubNode;
 import org.subnode.service.AclService;
 import org.subnode.service.AttachmentService;
@@ -89,6 +94,9 @@ public class ActPubService {
     private RunAsMongoAdminEx adminRunner;
 
     @Autowired
+    private MongoAuth auth;
+
+    @Autowired
     private UserFeedService userFeedService;
 
     @Autowired
@@ -117,6 +125,9 @@ public class ActPubService {
 
     @Autowired
     private UserManagerService userManagerService;
+
+    @Autowired
+    private MongoTemplate ops;
 
     @Autowired
     @Qualifier("threadPoolTaskExecutor")
@@ -235,7 +246,7 @@ public class ActPubService {
     }
 
     /**
-     * Gets the local account SubNode representing foreign user apUserName (like
+     * Gets the account SubNode representing foreign user apUserName (like
      * someuser@fosstodon.org), by first checking the 'acctNodesByUserName' cache, or else by reading in
      * the user from the Fediverse, and updating the cache.
      */
@@ -244,6 +255,7 @@ public class ActPubService {
             log.debug("Invalid foreign user name: " + apUserName);
             return null;
         }
+        saveFediverseName(apUserName);
 
         // return from cache if we already have the value cached
         SubNode acctNode = apCache.acctNodesByUserName.get(apUserName);
@@ -286,6 +298,8 @@ public class ActPubService {
      * Gets foreign account SubNode using actorUrl, using the cached copy of found.
      */
     public SubNode getAcctNodeByActorUrl(MongoSession session, String actorUrl) {
+        saveFediverseName(actorUrl);
+
         /* return node from cache if already cached */
         SubNode acctNode = apCache.acctNodesByActorUrl.get(actorUrl);
         if (acctNode != null) {
@@ -322,6 +336,8 @@ public class ActPubService {
             return null;
         }
         // log.debug("importing Actor: " + apUserName);
+
+        saveFediverseName(apUserName);
 
         // Try to get the userNode for this actor
         SubNode userNode = read.getUserNodeByUserName(session, apUserName);
@@ -583,6 +599,14 @@ public class ActPubService {
         // we could be clever and just detect if it DOES have tags and does NOT have
         // '```'
         newNode.setContent(contentHtml);
+
+        // todo-1: I haven't yet tested that mentions are parsable in any Mastodon text using this method
+        // but we at least know other instances of Quanta will have these extractable this way.
+        HashSet<String> mentionsSet = auth.parseMentions(contentHtml);
+        for (String mentionName: mentionsSet) {
+            saveFediverseName(mentionName);
+        }
+
         newNode.setModifyTime(published);
 
         if (sensitive != null && sensitive.booleanValue()) {
@@ -708,6 +732,8 @@ public class ActPubService {
             return;
         }
 
+        saveFediverseName(actorUrl);
+
         /* try to get account id from cache first */
         String acctId = apCache.acctIdByActorUrl.get(actorUrl);
 
@@ -722,12 +748,13 @@ public class ActPubService {
                 acctNode = read.getUserNodeByUserName(session, longUserName);
             } else {
                 /*
-                 * todo-1: this is contributing to our [currently] unwanted CRAWLER effect (FediCrawler!) chain
-                 * reaction. The rule here should be either don't load foreign users whose outboxes you don't plan
-                 * to load or else have some property on the node that designates if we need to read the actual
-                 * outbox or if you DO want to add a user and not load their outbox.
+                 * todo-1: this is contributing to our [currently] unwanted FEDIVERSE CRAWLER effect chain reaction.
+                 * The rule here should be either don't load foreign users whose outboxes you don't plan to load or
+                 * else have some property on the node that designates if we need to read the actual outbox or if
+                 * you DO want to add a user and not load their outbox.
                  */
                 // acctNode = loadForeignUserByActorUrl(session, actorUrl);
+                saveFediverseName(actorUrl);
             }
 
             if (acctNode != null) {
@@ -868,8 +895,20 @@ public class ActPubService {
      * it's easy to set off a chain reaction where more users keep comming in like a FediCrawler
      */
     public void userEncountered(String apUserName, boolean force) {
+        saveFediverseName(apUserName);
+
         if (force) {
             queueUserForRefresh(apUserName, force);
+        }
+    }
+
+    /*
+     * For now name can be an actual username or an actor URL. I just want to see how rapidly this
+     * explodes in order to decide what to do next.
+     */
+    public void saveFediverseName(String name) {
+        if (!apCache.allUserNames.contains(name)) {
+            apCache.allUserNames.put(name, false);
         }
     }
 
@@ -888,6 +927,7 @@ public class ActPubService {
             return;
         }
 
+        saveFediverseName(apUserName);
         // add as 'false' meaning the refresh is not yet done
         apCache.usersPendingRefresh.put(apUserName, false);
     }
@@ -905,6 +945,27 @@ public class ActPubService {
             return;
 
         try {
+            // todo-0: move this loop out into a function (ditto below)
+            for (final String name : apCache.allUserNames.keySet()) {
+                Boolean done = apCache.allUserNames.get(name);
+                if (done)
+                    continue;
+
+                apCache.allUserNames.put(name, true);
+
+                FediverseName fName = new FediverseName();
+                fName.setName(name);
+                fName.setCreateTime(Calendar.getInstance().getTime());
+                
+                // I'm not sure if it's faster to try to save adn let the unique index block duplicates, or if it's faster
+                // to check for dups before calling save here.
+                try {
+                    ops.save(fName);
+                } catch (Exception e) {
+                    // this will happen for every duplidate. so A LOT!
+                }
+            }
+
             for (final String userName : apCache.usersPendingRefresh.keySet()) {
                 Boolean done = apCache.usersPendingRefresh.get(userName);
                 if (done)
@@ -1017,5 +1078,17 @@ public class ActPubService {
         sb.append("New Incomming Posts last cycle: " + newPostsInCycle + "\n");
         sb.append("Inbox Post count: " + inboxCount + "\n");
         return sb.toString();
+    }
+
+    public String dumpFediverseUsers() {
+        StringBuilder sb = new StringBuilder();
+        Iterable<FediverseName> recs = ops.findAll(FediverseName.class);
+        int count = 0;
+        for (FediverseName fName : recs) {
+            sb.append(fName.getName());
+            sb.append("\n");
+            count++;
+        }
+        return "Fediverse Users: " + String.valueOf(count) + "\n\n" + sb.toString();
     }
 }

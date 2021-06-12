@@ -13,6 +13,8 @@ public class ActPubCache {
      */
     public final ConcurrentHashMap<String, Boolean> usersPendingRefresh = new ConcurrentHashMap<>();
 
+    public final ConcurrentHashMap<String, Boolean> allUserNames = new ConcurrentHashMap<>();
+
     /* Cache Actor objects by UserName in memory only for now */
     public final ConcurrentHashMap<String, APObj> actorsByUserName = new ConcurrentHashMap<>();
 

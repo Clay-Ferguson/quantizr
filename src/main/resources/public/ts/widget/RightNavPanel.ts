@@ -62,7 +62,7 @@ export class RightNavPanel extends Div {
                                     });
                                 }
                             }) : null,
-                            !state.isAnonUser && state.mainPanelCols < 6 ? new IconButton("fa-caret-right", null, {
+                            !state.isAnonUser && state.mainPanelCols < 7 ? new IconButton("fa-caret-right", null, {
                                 className: "widthAdjustLink",
                                 title: "Wider view",
                                 onClick: () => {

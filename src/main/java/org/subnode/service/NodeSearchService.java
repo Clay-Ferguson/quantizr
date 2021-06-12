@@ -76,7 +76,7 @@ public class NodeSearchService {
 	// Warning: Do not add '#' or '@', those are special (see below)
 	static final String WORD_DELIMS = " \n\r\t,-;:\"'`()*{}[]<>=\\/.!?&“";
 
-	static final int TRENDING_LIMIT = 1000;
+	static final int TRENDING_LIMIT = 10000;
 
 	public NodeSearchResponse search(MongoSession session, NodeSearchRequest req) {
 		NodeSearchResponse res = new NodeSearchResponse();
@@ -243,8 +243,7 @@ public class NodeSearchService {
 	}
 
 	// replace #<span> with " #". This is a quick and dirty way to fix the way
-	// Mastodon mangles hashes
-	// in the text.
+	// Mastodon mangles hashes in the text.
 	public String fixMastodonMangles(String content) {
 		if (content == null)
 			return null;

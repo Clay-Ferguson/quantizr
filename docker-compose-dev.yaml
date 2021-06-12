@@ -87,7 +87,7 @@ services:
             XMX: "${XMX}"
             
             # Can be a comma-delimited list of TestIntf-derived tests to run
-            # examples are "MongoTest,IPFSTest"
+            # examples are "MongoTest,MongoFediverseNamesTest,IPFSTest"
             runTests: 
             
             mongoAdminPassword: "${subnodePassword}"

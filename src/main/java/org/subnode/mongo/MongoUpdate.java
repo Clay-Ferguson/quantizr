@@ -38,6 +38,10 @@ public class MongoUpdate {
 	@Autowired
 	private MongoAuth auth;
 
+	public void saveObj(Object obj) {
+		ops.save(obj);
+	}
+
 	public void save(MongoSession session, SubNode node) {
 		save(session, node, true);
 	}

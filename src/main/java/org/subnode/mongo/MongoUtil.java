@@ -30,6 +30,7 @@ import org.subnode.model.client.NodeType;
 import org.subnode.model.client.PrincipalName;
 import org.subnode.model.client.PrivilegeType;
 import org.subnode.mongo.model.AccessControl;
+import org.subnode.mongo.model.FediverseName;
 import org.subnode.mongo.model.SubNode;
 import org.subnode.request.SignupRequest;
 import org.subnode.service.AclService;
@@ -350,6 +351,8 @@ public class MongoUtil {
 			log.debug("no field name index found. ok. this is fine.");
 		}
 		log.debug("creating all indexes.");
+
+		ops.indexOps(FediverseName.class).ensureIndex(new Index().on(FediverseName.FIELD_NAME, Direction.ASC).unique());
 
 		createUniqueIndex(session, SubNode.class, SubNode.FIELD_PATH_HASH);
 
