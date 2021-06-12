@@ -1,6 +1,6 @@
-import { appState, store } from "../AppRedux";
+import { appState, dispatch, store } from "../AppRedux";
 import { AppState } from "../AppState";
-import { Constants as C } from "../Constants";
+import { Constants as C, Constants } from "../Constants";
 import { UserProfileDlg } from "../dlg/UserProfileDlg";
 import * as J from "../JavaIntf";
 import { PubSub } from "../PubSub";
@@ -22,7 +22,9 @@ export class RightNavPanel extends Div {
 
     constructor() {
         super(null, { id: C.ID_RHS });
-        this.attribs.className = "col-" + (C.rightNavPanelCols) + " rightNavPanel customScrollbar";
+        let state: AppState = store.getState();
+        let cols = 12 - Constants.leftNavPanelCols - state.mainPanelCols;
+        this.attribs.className = "col-" + cols + " rightNavPanel customScrollbar";
     }
 
     preRender(): void {
@@ -47,10 +49,33 @@ export class RightNavPanel extends Div {
                         className: "signupLinkText",
                         onClick: e => { S.nav.login(state); }
                     }) : null,
-                    displayName && !state.isAnonUser ? new IconButton("fa-database", displayName, {
-                        title: "Go to your Account Root Node",
-                        onClick: e => { S.nav.navHome(state); }
-                    }, "btn-secondary marginBottom marginRight") : null,
+
+                    new Div(null, { className: "marginBottom" }, [
+                        new ButtonBar([
+                            state.mainPanelCols > 4 ? new IconButton("fa-caret-left", null, {
+                                className: "widthAdjustLink",
+                                onClick: () => {
+                                    dispatch("Action_widthAdjust", (s: AppState): AppState => {
+                                        s.mainPanelCols--;
+                                        return s;
+                                    });
+                                }
+                            }) : null,
+                            state.mainPanelCols < 6 ? new IconButton("fa-caret-right", null, {
+                                className: "widthAdjustLink",
+                                onClick: () => {
+                                    dispatch("Action_widthAdjust", (s: AppState): AppState => {
+                                        s.mainPanelCols++;
+                                        return s;
+                                    });
+                                }
+                            }) : null,
+                            displayName && !state.isAnonUser ? new IconButton("fa-database", displayName, {
+                                title: "Go to your Account Root Node",
+                                onClick: e => { S.nav.navHome(state); }
+                            }, "btn-secondary") : null])
+                    ]),
+
                     profileButton,
                     headerImg,
                     avatarImg,

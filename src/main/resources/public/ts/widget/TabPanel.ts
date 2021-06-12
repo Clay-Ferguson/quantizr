@@ -24,7 +24,8 @@ export class TabPanel extends Div {
             this.attribs.className = "col-12 tab-panel-mobile";
         }
         else {
-            this.attribs.className = "col-" + C.mainPanelCols + " " +
+            let state: AppState = store.getState();
+            this.attribs.className = "col-" + state.mainPanelCols + " " +
                 (state.userPreferences.editMode ? "tabPanelEditMode" : "tabPanel") +
                 " customScrollbar";
         }
