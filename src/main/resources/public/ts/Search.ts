@@ -343,7 +343,8 @@ export class Search implements SearchIntf {
             allowFooter ? new NodeCompRowFooter(node, isFeed) : null
         ]);
 
-        let itemClass = "userFeedItem"; // (index === count - 1) ? "userFeedItemLast" : "userFeedItem";
+        /* yeah, it's slightly awkward to choose a style based on isFeed here */
+        let itemClass = isFeed ? "userFeedItemCompact" : "userFeedItem"; // (index === count - 1) ? "userFeedItemLast" : "userFeedItem";
 
         return new Div(null, {
             className: isParent ? "userFeedItemParent" : itemClass

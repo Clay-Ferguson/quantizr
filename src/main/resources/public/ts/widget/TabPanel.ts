@@ -26,7 +26,7 @@ export class TabPanel extends Div {
         else {
             let state: AppState = store.getState();
             this.attribs.className = "col-" + state.mainPanelCols + " " +
-                (state.userPreferences.editMode ? "tabPanelEditMode" : "tabPanel") +
+                (state.userPreferences.editMode && state.activeTab === C.TAB_MAIN ? "tabPanelEditMode" : "tabPanel") +
                 " customScrollbar";
         }
     }

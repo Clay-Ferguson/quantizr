@@ -279,8 +279,10 @@ a {
 }
 
 .smallLogoButton {
-    border: 1px solid gray;
+    border: 2px solid lightgray;
     cursor: pointer;
+    border-radius: 4px;
+    padding: 5px;
 }
 
 .logo-text {
@@ -1670,11 +1672,17 @@ i'm backing out for now
 
 .userFeedItem {
     margin-top: 10px;
-    margin-right: 10px;
     border: 2px solid $nodeBorderBottomColor;
     border-radius: $border-radius;
     margin-bottom: 10px;
     padding: 10px;
+}
+
+.userFeedItemCompact {
+    margin-top: 10px;
+    border: 2px solid $nodeBorderBottomColor;
+    border-radius: $border-radius;
+    margin-bottom: 10px;
 }
 
 .userFeedParent {
