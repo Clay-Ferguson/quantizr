@@ -1,5 +1,5 @@
 import { AppState } from "../AppState";
-import { FeedView } from "../comps/FeedView";
+import { FeedView } from "../tabs/FeedView";
 import { Constants as C } from "../Constants";
 import { DialogBase } from "../DialogBase";
 import * as J from "../JavaIntf";

@@ -1,6 +1,6 @@
 import { appState, dispatch } from "./AppRedux";
 import { AppState } from "./AppState";
-import { FeedView } from "./comps/FeedView";
+import { FeedView } from "./tabs/FeedView";
 import { Constants as C } from "./Constants";
 import { LoginDlg } from "./dlg/LoginDlg";
 import { MainMenuDlg } from "./dlg/MainMenuDlg";

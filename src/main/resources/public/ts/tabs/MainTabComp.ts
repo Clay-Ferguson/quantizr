@@ -8,8 +8,8 @@ import { AppTab } from "../widget/AppTab";
 import { BreadcrumbsPanel } from "../widget/BreadcrumbsPanel";
 import { Div } from "../widget/Div";
 import { Html } from "../widget/Html";
-import { NodeCompMainList } from "./NodeCompMainList";
-import { NodeCompMainNode } from "./NodeCompMainNode";
+import { NodeCompMainList } from "../comps/NodeCompMainList";
+import { NodeCompMainNode } from "../comps/NodeCompMainNode";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
