@@ -351,68 +351,7 @@ export class Meta64 implements Meta64Intf {
         return new Promise<void>(async (resolve, reject) => {
             Log.log("initApp()");
 
-            dispatch("Action_initTabs", (s: AppState): AppState => {
-                s.tabData = [
-                    {
-                        name: "Main",
-                        id: C.TAB_MAIN,
-                        isVisible: () => true,
-                        constructView: (data: TabDataIntf) => new MainTabComp(data),
-                        rsInfo: null
-                    },
-                    {
-                        name: "Search",
-                        id: C.TAB_SEARCH,
-                        isVisible: () => this.resultSetHasData(C.TAB_SEARCH),
-                        constructView: (data: TabDataIntf) => new SearchResultSetView(data),
-                        rsInfo: new ResultSetInfo()
-                    },
-                    {
-                        name: "Shared Nodes",
-                        id: C.TAB_SHARES,
-                        isVisible: () => this.resultSetHasData(C.TAB_SHARES),
-                        constructView: (data: TabDataIntf) => new SharedNodesResultSetView<SharesRSInfo>(data),
-                        rsInfo: new SharesRSInfo()
-                    },
-                    {
-                        name: "Timeline",
-                        id: C.TAB_TIMELINE,
-                        isVisible: () => this.resultSetHasData(C.TAB_TIMELINE),
-                        constructView: (data: TabDataIntf) => new TimelineResultSetView<TimelineRSInfo>(data),
-                        rsInfo: new TimelineRSInfo()
-                    },
-                    {
-                        name: "Followers",
-                        id: C.TAB_FOLLOWERS,
-                        isVisible: () => this.resultSetHasData(C.TAB_FOLLOWERS),
-                        constructView: (data: TabDataIntf) => new FollowersResultSetView<FollowersRSInfo>(data),
-                        rsInfo: new FollowersRSInfo()
-                    },
-                    {
-                        name: "Following",
-                        id: C.TAB_FOLLOWING,
-                        isVisible: () => this.resultSetHasData(C.TAB_FOLLOWING),
-                        constructView: (data: TabDataIntf) => new FollowingResultSetView<FollowingRSInfo>(data),
-                        rsInfo: new FollowingRSInfo()
-                    },
-                    {
-                        name: "Fediverse",
-                        id: C.TAB_FEED,
-                        isVisible: () => true,
-                        constructView: (data: TabDataIntf) => new FeedView(data),
-                        rsInfo: null
-                    },
-                    {
-                        name: "Trending",
-                        id: C.TAB_TRENDING,
-                        isVisible: () => true,
-                        constructView: (data: TabDataIntf) => new TrendingView(data),
-                        rsInfo: new TrendingRSInfo()
-                    }
-                ];
-                return s;
-            });
-
+            this.createAppTabs();
             const state: AppState = store.getState();
             state.pendingLocationHash = window.location.hash;
             S.plugin.initPlugins();
@@ -597,6 +536,70 @@ export class Meta64 implements Meta64Intf {
         });
     }
 
+    createAppTabs = (): void => {
+        dispatch("Action_initTabs", (s: AppState): AppState => {
+            s.tabData = [
+                {
+                    name: "Main",
+                    id: C.TAB_MAIN,
+                    isVisible: () => true,
+                    constructView: (data: TabDataIntf) => new MainTabComp(data),
+                    rsInfo: null
+                },
+                {
+                    name: "Search",
+                    id: C.TAB_SEARCH,
+                    isVisible: () => this.resultSetHasData(C.TAB_SEARCH),
+                    constructView: (data: TabDataIntf) => new SearchResultSetView(data),
+                    rsInfo: new ResultSetInfo()
+                },
+                {
+                    name: "Shared Nodes",
+                    id: C.TAB_SHARES,
+                    isVisible: () => this.resultSetHasData(C.TAB_SHARES),
+                    constructView: (data: TabDataIntf) => new SharedNodesResultSetView<SharesRSInfo>(data),
+                    rsInfo: new SharesRSInfo()
+                },
+                {
+                    name: "Timeline",
+                    id: C.TAB_TIMELINE,
+                    isVisible: () => this.resultSetHasData(C.TAB_TIMELINE),
+                    constructView: (data: TabDataIntf) => new TimelineResultSetView<TimelineRSInfo>(data),
+                    rsInfo: new TimelineRSInfo()
+                },
+                {
+                    name: "Followers",
+                    id: C.TAB_FOLLOWERS,
+                    isVisible: () => this.resultSetHasData(C.TAB_FOLLOWERS),
+                    constructView: (data: TabDataIntf) => new FollowersResultSetView<FollowersRSInfo>(data),
+                    rsInfo: new FollowersRSInfo()
+                },
+                {
+                    name: "Following",
+                    id: C.TAB_FOLLOWING,
+                    isVisible: () => this.resultSetHasData(C.TAB_FOLLOWING),
+                    constructView: (data: TabDataIntf) => new FollowingResultSetView<FollowingRSInfo>(data),
+                    rsInfo: new FollowingRSInfo()
+                },
+                {
+                    name: "Fediverse",
+                    id: C.TAB_FEED,
+                    isVisible: () => true,
+                    constructView: (data: TabDataIntf) => new FeedView(data),
+                    rsInfo: null
+                },
+                {
+                    name: "Trending",
+                    id: C.TAB_TRENDING,
+                    isVisible: () => true,
+                    constructView: (data: TabDataIntf) => new TrendingView(data),
+                    rsInfo: new TrendingRSInfo()
+                }
+            ];
+            return s;
+        });
+    }
+
     resultSetHasData = (id: string) => {
         let state: AppState = store.getState();
         let data = state.tabData.find(d => d.id === id);
@@ -635,7 +638,7 @@ export class Meta64 implements Meta64Intf {
         PubSub.pub(C.PUBSUB_tabChanging, newTab);
 
         if (prevTab) {
-            let elm: HTMLElement = document.getElementById("tabPanelId");
+            let elm: HTMLElement = document.getElementById(C.ID_TAB);
             if (elm) {
                 // console.log("Prev tab: " + prevTab + " set to " + elm.scrollTop);
                 this.scrollPosByTabName.set(prevTab, elm.scrollTop);
@@ -933,7 +936,7 @@ export class Meta64 implements Meta64Intf {
     the opportunity to save whatever scroll positions we care to persist, so we can use domPreUpdateEvent on
     whatever components we want to fix the scroll position in time for rendering */
     saveScrollPosition = (): void => {
-        let elm: HTMLElement = document.getElementById("tabPanelId");
+        let elm: HTMLElement = document.getElementById(C.ID_TAB);
         if (elm) {
             // console.log("Prev tab: " + C.TAB_MAIN + " set to " + elm.scrollTop + " before dispatch.");
             this.scrollPosByTabName.set(C.TAB_MAIN, elm.scrollTop);

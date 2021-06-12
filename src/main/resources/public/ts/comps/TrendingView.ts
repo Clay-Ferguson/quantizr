@@ -27,7 +27,7 @@ export class TrendingView extends AppTab {
 
         PubSub.subSingleOnce(C.PUBSUB_tabChanging, (tabName: string) => {
             // console.log("Tab Changing recieved in TrendingView: " + tabName);
-            if (tabName === C.TAB_TRENDING) {
+            if (tabName === this.data.id) {
 
                 // only ever do this once, just to save CPU load on server.
                 if (this.loaded) return;
@@ -45,7 +45,7 @@ export class TrendingView extends AppTab {
         },
             (res: J.GetNodeStatsResponse) => {
                 dispatch("Action_RenderSearchResults", (s: AppState): AppState => {
-                    let data = s.tabData.find(d => d.id === C.TAB_TRENDING);
+                    let data = s.tabData.find(d => d.id === this.data.id);
                     if (!data) return;
                     (data.rsInfo as TrendingRSInfo).res = res;
                     return s;
@@ -61,7 +61,7 @@ export class TrendingView extends AppTab {
             this.attribs.className += " show active";
         }
 
-        let data = state.tabData.find(d => d.id === C.TAB_TRENDING);
+        let data = state.tabData.find(d => d.id === this.data.id);
         let res = data ? (data.rsInfo as TrendingRSInfo).res : null;
 
         if (!res) {

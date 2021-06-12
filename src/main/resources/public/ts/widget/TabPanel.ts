@@ -17,7 +17,7 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (s: Singletons) => {
 export class TabPanel extends Div {
 
     constructor() {
-        super(null, { id: "tabPanelId" });
+        super(null, { id: C.ID_TAB });
         const state: AppState = store.getState();
 
         if (state.mobileMode) {

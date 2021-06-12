@@ -160,19 +160,19 @@ export class View implements ViewIntf {
 
     /* todo-0: put these element IDs in constants file */
     scrollAllTop = () => {
-        S.util.getElm("leftNavPanelId", (elm: HTMLElement) => {
+        S.util.getElm(C.ID_LHS, (elm: HTMLElement) => {
             elm.scrollTop = 0;
         });
-        S.util.getElm("tabPanelId", (elm: HTMLElement) => {
+        S.util.getElm(C.ID_TAB, (elm: HTMLElement) => {
             elm.scrollTop = 0;
         });
-        S.util.getElm("rightNavPanelId", (elm: HTMLElement) => {
+        S.util.getElm(C.ID_RHS, (elm: HTMLElement) => {
             elm.scrollTop = 0;
         });
     }
 
     scrollTo = (offset: number) => {
-        S.util.getElm("tabPanelId", (elm: HTMLElement) => {
+        S.util.getElm(C.ID_TAB, (elm: HTMLElement) => {
             elm.scrollTop = offset;
         });
     }

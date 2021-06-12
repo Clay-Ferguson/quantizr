@@ -21,7 +21,7 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
 export class RightNavPanel extends Div {
 
     constructor() {
-        super(null, { id: "rightNavPanelId" });
+        super(null, { id: C.ID_RHS });
         this.attribs.className = "col-" + (C.rightNavPanelCols) + " rightNavPanel customScrollbar";
     }
 

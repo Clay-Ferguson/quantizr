@@ -1,5 +1,9 @@
 export class Constants {
 
+    static ID_LHS = "leftNavPanelId";
+    static ID_TAB = "tabPanelId";
+    static ID_RHS = "rightNavPanelId";
+
     static TAB_MAIN: string = "mainTab";
     static TAB_SEARCH: string = "resultSetView";
     static TAB_SHARES: string = "sharedNodesResultSetView";
