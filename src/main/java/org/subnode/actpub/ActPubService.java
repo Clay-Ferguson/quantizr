@@ -64,6 +64,7 @@ public class ActPubService {
     public static int refreshForeignUsersQueuedCount = 0;
     public static String lastRefreshForeignUsersCycleTime = "n/a";
     public static int inboxCount = 0;
+    public static boolean refreshInProgress = false;
     private static final Logger log = LoggerFactory.getLogger(ActPubService.class);
 
     @Autowired
@@ -969,10 +970,14 @@ public class ActPubService {
         }
 
         try {
+            refreshInProgress = true;
             refreshUsers();
         } catch (Exception e) {
             // log and ignore.
             log.error("refresh outboxes", e);
+        }
+        finally {
+            refreshInProgress = false;
         }
     }
 
@@ -982,6 +987,12 @@ public class ActPubService {
                 Boolean done = apCache.usersPendingRefresh.get(userName);
                 if (done)
                     continue;
+
+                /*
+                 * This is killing performance of the app so let's throttle it way back. Not sure if it's Disk or
+                 * network I/O that's the problem but either way let's not read these so fast
+                 */
+                Thread.sleep(1000);
 
                 // flag as done (even if it fails we still want it flagged as done. no retries will be done).
                 apCache.usersPendingRefresh.put(userName, true);
@@ -1111,6 +1122,7 @@ public class ActPubService {
     public String getStatsReport() {
         StringBuilder sb = new StringBuilder();
         sb.append("\nActivityPub Stats:\n");
+        sb.append("Refresh in progress: " + (refreshInProgress ? "true" : "false"));
         sb.append("Cached Usernames: " + apCache.allUserNames.size() + "\n");
         sb.append("Users Currently Queued (for refresh): " + queuedUserCount() + "\n");
         sb.append("Refresh Foreign Users Cycles: " + refreshForeignUsersCycles + "\n");

@@ -72,7 +72,7 @@ export class UserProfileDlg extends DialogBase {
                         state.userProfile.blocked ? new Span("BLOCKED", { className: "blockingText" }) : null,
                         state.userProfile.following ? new Span("You Follow", { className: "followingText" }) : null,
 
-                        (localUser && state.userProfile.followerCount > 0) ? new Span(state.userProfile.followerCount + " followers", {
+                        state.userProfile.followerCount > 0 ? new Span(state.userProfile.followerCount + " followers", {
                             onClick: () => {
                                 if (state.userProfile.followerCount) {
                                     this.close();
@@ -82,7 +82,7 @@ export class UserProfileDlg extends DialogBase {
                             className: "followCount"
                         }) : null,
 
-                        (localUser && state.userProfile.followingCount > 0) ? new Span(state.userProfile.followingCount + " following", {
+                        state.userProfile.followingCount > 0 ? new Span(state.userProfile.followingCount + " following", {
                             onClick: () => {
                                 if (state.userProfile.followingCount) {
                                     this.close();

@@ -439,9 +439,9 @@ public class AppController implements ErrorController {
 		return "<html><body>My Full Page: " + systemPage + "</body></html>";
 	}
 
-	@GetMapping(value = {"/fediverse-users"}, produces = MediaType.TEXT_HTML_VALUE)
+	@GetMapping(value = {"/fediverse-users"}, produces = MediaType.TEXT_PLAIN_VALUE)
 	public @ResponseBody String fediverseUsers() {
-		return "<html><body><pre>" + actPub.dumpFediverseUsers() + "</pre></body></html>";
+		return actPub.dumpFediverseUsers();
 	}
 
 	@GetMapping(value = {"/multiRss"}, produces = MediaType.APPLICATION_RSS_XML_VALUE)
