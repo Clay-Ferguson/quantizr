@@ -358,7 +358,7 @@ export class Render implements RenderIntf {
 
                 if (!s.activeTab || clickTab) {
                     S.meta64.tabChanging(s.activeTab, C.TAB_MAIN, s);
-                    s.activeTab = C.TAB_MAIN;
+                    s.activeTab = S.meta64.activeTab = C.TAB_MAIN;
                 }
 
                 s.guiReady = true;

@@ -199,7 +199,6 @@ export class Nav implements NavIntf {
         // todo-1: without this timeout checkboxes on main tab don't work reliably. Need their state stored in global state to fix it
         // in a good way.
         setTimeout(() => {
-            S.meta64.saveScrollPosition();
             dispatch("Action_FastRefresh", (s: AppState): AppState => {
                 return s;
             });
@@ -403,7 +402,7 @@ export class Nav implements NavIntf {
         dispatch("Action_SelectTab", (s: AppState): AppState => {
             s.guiReady = true;
             S.meta64.tabChanging(s.activeTab, C.TAB_FEED, s);
-            s.activeTab = C.TAB_FEED;
+            s.activeTab = S.meta64.activeTab = C.TAB_FEED;
             s = { ...s, ...props };
             return s;
         });

@@ -62,13 +62,22 @@ export class TabPanel extends Div {
     }
 
     domPreUpdateEvent = (): void => {
-        this.whenElm((elm) => {
-            // saveScrollPosition() call should have already loaded this scroll position.
-            if (S.meta64.scrollPosByTabName.has(C.TAB_MAIN)) {
-                let newPos = S.meta64.scrollPosByTabName.get(C.TAB_MAIN);
-                // console.log("Restoring tab " + C.TAB_MAIN + " to " + newPos + " in domPreUpdateEvent");
+        this.whenElm((elm: HTMLElement) => {
+
+            /* We set the scroll position back to whatever it should be for the currently active tab */
+            if (S.meta64.scrollPosByTabName.has(S.meta64.activeTab)) {
+                let newPos = S.meta64.scrollPosByTabName.get(S.meta64.activeTab);
+                // console.log("Restoring tab " + S.meta64.activeTab + " to " + newPos + " in domPreUpdateEvent");
                 elm.scrollTop = newPos;
             }
+
+            /* Listen to scroll position change, and update the active tab value in realtime.
+            (this can't get added multiple times can it? (todo-0))
+            */
+            elm.addEventListener("scroll", () => {
+                // console.log("Scroll pos: " + elm.scrollTop);
+                S.meta64.scrollPosByTabName.set(S.meta64.activeTab, elm.scrollTop);
+            }, { passive: true });
         });
     }
 }

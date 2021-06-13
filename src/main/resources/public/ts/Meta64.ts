@@ -41,6 +41,7 @@ export class Meta64 implements Meta64Intf {
     hiddenRenderingEnabled: boolean = false;
     noScrollToId: string = null;
     addFriendPending: boolean = false;
+    activeTab: string;
 
     app: CompIntf;
     appInitialized: boolean = false;
@@ -124,7 +125,7 @@ export class Meta64 implements Meta64Intf {
             else {
                 s.guiReady = true;
                 this.tabChanging(s.activeTab, tabName, s);
-                s.activeTab = tabName;
+                s.activeTab = S.meta64.activeTab = tabName;
             }
             return s;
         });
@@ -142,7 +143,7 @@ export class Meta64 implements Meta64Intf {
         }
         else {
             this.tabChanging(state.activeTab, tabName, state);
-            state.activeTab = tabName;
+            state.activeTab = S.meta64.activeTab = tabName;
         }
     }
 
@@ -633,14 +634,6 @@ export class Meta64 implements Meta64Intf {
         }
 
         PubSub.pub(C.PUBSUB_tabChanging, newTab);
-
-        if (prevTab) {
-            let elm: HTMLElement = document.getElementById(C.ID_TAB);
-            if (elm) {
-                // console.log("Prev tab: " + prevTab + " set to " + elm.scrollTop);
-                this.scrollPosByTabName.set(prevTab, elm.scrollTop);
-            }
-        }
     }
 
     /* We look at the node, and get the parent path from it, and then if there is a node matching that being displayed
@@ -927,16 +920,5 @@ export class Meta64 implements Meta64Intf {
             feedFilterToPublic: true,
             feedFilterLocalServer: false
         });
-    }
-
-    /* Because react doesn't persist scroll position upon rendering we have this hook which allows us
-    the opportunity to save whatever scroll positions we care to persist, so we can use domPreUpdateEvent on
-    whatever components we want to fix the scroll position in time for rendering */
-    saveScrollPosition = (): void => {
-        let elm: HTMLElement = document.getElementById(C.ID_TAB);
-        if (elm) {
-            // console.log("Prev tab: " + C.TAB_MAIN + " set to " + elm.scrollTop + " before dispatch.");
-            this.scrollPosByTabName.set(C.TAB_MAIN, elm.scrollTop);
-        }
     }
 }

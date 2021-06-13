@@ -159,6 +159,7 @@ export class View implements ViewIntf {
     }
 
     scrollAllTop = () => {
+        // console.log("scrollAllTop");
         S.util.getElm(C.ID_LHS, (elm: HTMLElement) => {
             elm.scrollTop = 0;
         });
@@ -171,6 +172,7 @@ export class View implements ViewIntf {
     }
 
     scrollTo = (offset: number) => {
+        // console.log("scrollTo: " + offset);
         S.util.getElm(C.ID_TAB, (elm: HTMLElement) => {
             elm.scrollTop = offset;
         });

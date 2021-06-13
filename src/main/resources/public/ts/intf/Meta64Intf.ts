@@ -16,6 +16,7 @@ export interface Meta64Intf {
     deviceWidth: number;
     deviceHeight: number;
     addFriendPending: boolean;
+    activeTab: string;
 
     parentIdToFocusNodeMap: Map<string, string>;
     curHighlightNodeCompRow: CompIntf;
@@ -70,5 +71,4 @@ export interface Meta64Intf {
     fullscreenViewerActive(state: AppState): boolean;
     showMyNewMessages(): void;
     showPublicFediverse(): void;
-    saveScrollPosition(): void;
 }
