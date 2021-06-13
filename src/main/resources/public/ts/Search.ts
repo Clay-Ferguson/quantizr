@@ -40,6 +40,7 @@ export class Search implements SearchIntf {
             if (res.searchResults && res.searchResults.length > 0) {
                 dispatch("Action_RenderSearchResults", (s: AppState): AppState => {
 
+                    S.meta64.tabScrollTop(C.TAB_SHARES);
                     let data = s.tabData.find(d => d.id === C.TAB_SHARES);
                     if (!data) return;
                     let info = data.rsInfo as SharesRSInfo;
@@ -87,6 +88,7 @@ export class Search implements SearchIntf {
 
                 dispatch("Action_RenderSearchResults", (s: AppState): AppState => {
 
+                    S.meta64.tabScrollTop(C.TAB_SEARCH);
                     let data = s.tabData.find(d => d.id === C.TAB_SEARCH);
                     if (!data) return;
 
@@ -154,6 +156,7 @@ export class Search implements SearchIntf {
         }, (res) => {
             dispatch("Action_RenderTimelineResults", (s: AppState): AppState => {
 
+                S.meta64.tabScrollTop(C.TAB_TIMELINE);
                 let data = s.tabData.find(d => d.id === C.TAB_TIMELINE);
                 if (!data) return;
                 let info = data.rsInfo as TimelineRSInfo;
@@ -187,6 +190,7 @@ export class Search implements SearchIntf {
             searchText
         }, (res: J.NodeFeedResponse) => {
             dispatch("Action_RenderFeedResults", (s: AppState): AppState => {
+                S.meta64.tabScrollTop(C.TAB_FEED);
                 // s.feedResults = S.meta64.removeRedundantFeedItems(res.searchResults || []);
 
                 // once user requests their stuff, turn off the new messages count indicator.
@@ -235,6 +239,7 @@ export class Search implements SearchIntf {
         }, (res) => {
             if (res.searchResults && res.searchResults.length > 0) {
                 dispatch("Action_RenderSearchResults", (s: AppState): AppState => {
+                    S.meta64.tabScrollTop(C.TAB_FOLLOWERS);
                     let data = s.tabData.find(d => d.id === C.TAB_FOLLOWERS);
                     if (!data) return;
                     let info = data.rsInfo as FollowersRSInfo;
@@ -275,6 +280,7 @@ export class Search implements SearchIntf {
         }, (res) => {
             if (res.searchResults && res.searchResults.length > 0) {
                 dispatch("Action_RenderSearchResults", (s: AppState): AppState => {
+                    S.meta64.tabScrollTop(C.TAB_FOLLOWING);
                     let data = s.tabData.find(d => d.id === C.TAB_FOLLOWING);
                     if (!data) return;
                     let info = data.rsInfo as FollowingRSInfo;

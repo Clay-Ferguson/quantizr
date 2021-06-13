@@ -604,6 +604,10 @@ export class Meta64 implements Meta64Intf {
         return data && data.rsInfo && data.rsInfo.results && data.rsInfo.results.length > 0;
     }
 
+    tabScrollTop = (tabName: string) => {
+        S.meta64.scrollPosByTabName.set(tabName || S.meta64.activeTab, 0);
+    }
+
     /* This function manages persisting the scroll position when switching
     from one tab to another, to automatically restore the scroll position that was
     last scroll position on any given tab */

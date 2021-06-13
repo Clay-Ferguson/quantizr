@@ -120,5 +120,5 @@ export interface UtilIntf {
     switchBrowsingMode(state: AppState): void;
     isLocalUserName(userName: string): boolean;
     getPropFromDom(evt: Event, prop: string): string;
-    getShortContent(content: string): string;
+    getShortContent(node: J.NodeInfo): string;
 }

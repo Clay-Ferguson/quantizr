@@ -64,7 +64,10 @@ export class TabPanel extends Div {
     domPreUpdateEvent = (): void => {
         this.whenElm((elm: HTMLElement) => {
 
-            /* We set the scroll position back to whatever it should be for the currently active tab */
+            /* We set the scroll position back to whatever it should be for the currently active tab
+
+            todo-1: we have some scroll setting happening in the tab change event too (do we need both this and that?)
+            */
             if (S.meta64.scrollPosByTabName.has(S.meta64.activeTab)) {
                 let newPos = S.meta64.scrollPosByTabName.get(S.meta64.activeTab);
                 // console.log("Restoring tab " + S.meta64.activeTab + " to " + newPos + " in domPreUpdateEvent");

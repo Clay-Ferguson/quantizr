@@ -71,4 +71,5 @@ export interface Meta64Intf {
     fullscreenViewerActive(state: AppState): boolean;
     showMyNewMessages(): void;
     showPublicFediverse(): void;
+    tabScrollTop(tabName?: string): void;
 }

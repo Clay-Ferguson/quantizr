@@ -1020,8 +1020,16 @@ export class Util implements UtilIntf {
         return (date.getMonth() + 1) + "/" + date.getDate() + "/" + date.getFullYear();
     }
 
-    getShortContent = (content: string): string => {
-        if (!content) return content;
+    getShortContent = (node: J.NodeInfo): string => {
+        let content = node.content;
+        if (!content) {
+            if (node.name) {
+                content = "Node Name: " + node.name;
+            }
+            else {
+                return content;
+            }
+        }
 
         content = S.util.replaceAll(content, "{{imgUpperRight}}", "");
         content = S.util.replaceAll(content, "{{imgUpperLeft}}", "");
