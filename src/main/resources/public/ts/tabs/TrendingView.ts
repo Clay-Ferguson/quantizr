@@ -107,7 +107,7 @@ export class TrendingView extends AppTab {
 
         this.setChildren([
             new Heading(3, "Trending: Top 100s", { className: "trendingTitle" }),
-            new Div("Statistics for most recent 10,000 posts. Words listed by frequency. Click one to search...", { className: "marginBottom" }),
+            new Div("Words listed by frequency of use. Click one to search...", { className: "marginBottom" }),
 
             // this should be correct data but we don't need it here.
             // new TextContent(res.stats, null, false),

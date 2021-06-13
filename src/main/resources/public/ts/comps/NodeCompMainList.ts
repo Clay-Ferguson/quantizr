@@ -27,13 +27,13 @@ export class NodeCompMainList extends Div {
 
         let children: Comp[] = [];
         if (state.node && state.node.children) {
-            this.addPaginationButtons(children, state.endReached, state);
+            this.addPaginationButtons(children, state.endReached, "", state);
 
             let orderByProp = S.props.getNodePropVal(J.NodeProp.ORDER_BY, state.node);
             let allowNodeMove: boolean = !orderByProp;
             children.push(S.render.renderChildren(state.node, 1, allowNodeMove, state));
 
-            this.addPaginationButtons(children, state.endReached, state);
+            this.addPaginationButtons(children, state.endReached, "marginTop", state);
         }
 
         // No longer needed, because we have this on the menu now but check that all the gettingStarted (from yaml) content
@@ -46,7 +46,7 @@ export class NodeCompMainList extends Div {
         this.setChildren(children);
     }
 
-    addPaginationButtons = (children: Comp[], endReached: boolean, state: AppState) => {
+    addPaginationButtons = (children: Comp[], endReached: boolean, moreClasses: string, state: AppState) => {
         let firstButton: Comp;
         let prevButton: Comp;
         let nextButton: Comp;
@@ -78,7 +78,7 @@ export class NodeCompMainList extends Div {
         }
 
         if (firstButton || prevButton || nextButton) {
-            children.push(new ButtonBar([firstButton, prevButton, nextButton], "text-center"));
+            children.push(new ButtonBar([firstButton, prevButton, nextButton], "text-center " + moreClasses));
             children.push(new Div(null, { className: "clearfix" }));
         }
     }

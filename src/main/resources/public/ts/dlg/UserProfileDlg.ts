@@ -76,7 +76,12 @@ export class UserProfileDlg extends DialogBase {
                             onClick: () => {
                                 if (state.userProfile.followerCount) {
                                     this.close();
-                                    S.srch.showFollowers(0, state.userProfile.userName);
+                                    if (localUser) {
+                                        S.srch.showFollowers(0, state.userProfile.userName);
+                                    }
+                                    else {
+                                        this.openUserHomePage(state, "home");
+                                    }
                                 }
                             },
                             className: "followCount"
@@ -86,7 +91,12 @@ export class UserProfileDlg extends DialogBase {
                             onClick: () => {
                                 if (state.userProfile.followingCount) {
                                     this.close();
-                                    S.srch.showFollowing(0, state.userProfile.userName);
+                                    if (localUser) {
+                                        S.srch.showFollowing(0, state.userProfile.userName);
+                                    }
+                                    else {
+                                        this.openUserHomePage(state, "home");
+                                    }
 
                                     // It would be 'inconsistent' to just jump to the FRIEND_LIST? if this user is looking
                                     // at their own user profile dialog? There's also even the Friend Picker dialog too!

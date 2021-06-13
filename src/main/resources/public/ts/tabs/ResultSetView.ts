@@ -107,7 +107,7 @@ export abstract class ResultSetView extends AppTab {
                 onClick: () => this.pageChange(1),
                 title: "Next Page"
             }) : null
-        ], "text-center marginBottom"));
+        ], "text-center marginBottom marginTop"));
     }
 
     abstract pageChange(delta: number): void;
