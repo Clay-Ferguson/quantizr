@@ -140,7 +140,7 @@ public class MongoCreate {
 
 		auth.auth(session, node, PrivilegeType.READ);
 		Criteria criteria = Criteria.where(SubNode.FIELD_ORDINAL).gte(ordinal);
-		log.debug("insertOrdinal GTE " + ordinal);
+		// log.debug("insertOrdinal GTE " + ordinal);
 		for (SubNode child : read.getChildrenUnderParentPath(session, node.getPath(), null, null, 0, null, criteria)) {
 			long o = child.getOrdinal() == null ? 0L : child.getOrdinal().longValue();
 			o += rangeSize;

@@ -17,6 +17,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.subnode.actpub.ActPubCache;
+import org.subnode.actpub.ActPubFollower;
 import org.subnode.actpub.ActPubFollowing;
 import org.subnode.config.AppProp;
 import org.subnode.config.NodeName;
@@ -125,6 +126,9 @@ public class UserManagerService {
 
 	@Autowired
 	private ActPubFollowing apFollowing;
+
+	@Autowired
+	private ActPubFollower apFollower;
 
 	@Autowired
 	private AclService acl;
@@ -767,32 +771,34 @@ public class UserManagerService {
 					userProfile.setHomeNodeId(userHomeNode.getId().toHexString());
 				}
 
+				String actorUrl = userNode.getStrProp(NodeProp.ACT_PUB_ACTOR_URL);
+
 				userProfile.setUserBio(userNode.getStrProp(NodeProp.USER_BIO.s()));
 				userProfile.setAvatarVer(userNode.getStrProp(NodeProp.BIN.s()));
 				userProfile.setHeaderImageVer(userNode.getStrProp(NodeProp.BIN.s() + "Header"));
 				userProfile.setUserNodeId(userNode.getId().toHexString());
 				userProfile.setApIconUrl(userNode.getStrProp(NodeProp.ACT_PUB_USER_ICON_URL));
 				userProfile.setApImageUrl(userNode.getStrProp(NodeProp.ACT_PUB_USER_IMAGE_URL));
-				userProfile.setActorUrl(userNode.getStrProp(NodeProp.ACT_PUB_ACTOR_URL));
+				userProfile.setActorUrl(actorUrl);
+
+				Long followerCount = apFollower.countFollowersOfUser(session, nodeUserName, actorUrl);
+				userProfile.setFollowerCount(followerCount.intValue());
+
+				Long followingCount = apFollowing.countFollowingOfUser(session, nodeUserName, actorUrl);
+				userProfile.setFollowingCount(followingCount.intValue());
 
 				/*
 				 * Only for local users do we attemp to generate followers and following, but theoretically we can
 				 * use the ActPub API to query for this for foreign users also.
 				 */
 				if (nodeUserName.indexOf("@") == -1) {
-					Long followerCount = apFollowing.countFollowersOfUser(session, nodeUserName);
-					userProfile.setFollowerCount(followerCount.intValue());
-
-					Long followingCount = apFollowing.countFollowingOfUser(session, nodeUserName);
-					userProfile.setFollowingCount(followingCount.intValue());
-
 					boolean blocked = userIsBlockedByMe(session, nodeUserName);
 					userProfile.setBlocked(blocked);
 
 					boolean following = userIsFollowedByMe(session, nodeUserName);
 					userProfile.setFollowing(following);
 				}
-
+		
 				res.setSuccess(true);
 			}
 		});

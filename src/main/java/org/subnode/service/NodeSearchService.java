@@ -251,7 +251,7 @@ public class NodeSearchService {
 		content = content.replace("#<span>", " #");
 		content = content.replace("\\u003c", " ");
 		content = content.replace("\\u003e", " ");
-		log.debug("unmangled content: " + content);
+		// log.debug("unmangled content: " + content);
 		return content;
 	}
 

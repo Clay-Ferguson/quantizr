@@ -36,6 +36,9 @@ public class ActPubController {
 	private ActPubFollowing apFollowing;
 
 	@Autowired
+	private ActPubFollower apFollower;
+
+	@Autowired
 	private ActPubUtil apUtil;
 
 	@Autowired
@@ -164,9 +167,9 @@ public class ActPubController {
 			@RequestParam(value = "page", required = false) String page) {
 		APObj ret = null;
 		if (APConst.TRUE.equals(page)) {
-			ret = apFollowing.generateFollowersPage(userName, minId);
+			ret = apFollower.generateFollowersPage(userName, minId);
 		} else {
-			ret = apFollowing.generateFollowers(userName);
+			ret = apFollower.generateFollowers(userName);
 		}
 		if (ret != null) {
 			// log.debug("Reply with Followers: " + XString.prettyPrint(ret));

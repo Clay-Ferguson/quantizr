@@ -68,6 +68,25 @@ public class AP {
         throw new RuntimeException("unhandled type on bool(): " + (obj != null ? obj.getClass().getName() : "null"));
     }
 
+    public static Integer integer(Object obj, String prop) {
+        if (obj instanceof Map<?, ?>) {
+            Object val = ((Map<?, ?>) obj).get(prop);
+            if (val == null) {
+                return null;
+            } else if (val instanceof Integer) {
+                return ((Integer) val).intValue();
+            } else if (val instanceof Long) {
+                return ((Long) val).intValue();
+            }else if (val instanceof String) {
+                return Integer.valueOf((String) val);
+            } else {
+                throw new RuntimeException(
+                        "unhandled type on integer() return val: " + (val != null ? val.getClass().getName() : "null"));
+            }
+        }
+        throw new RuntimeException("unhandled type on integer(): " + (obj != null ? obj.getClass().getName() : "null"));
+    }
+
     public static Date date(Object obj, String prop) {
         if (obj instanceof Map<?, ?>) {
             Object val = ((Map<?, ?>) obj).get(prop);

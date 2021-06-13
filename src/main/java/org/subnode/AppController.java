@@ -30,6 +30,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
+import org.subnode.actpub.ActPubFollower;
 import org.subnode.actpub.ActPubFollowing;
 import org.subnode.actpub.ActPubService;
 import org.subnode.config.AppProp;
@@ -242,6 +243,9 @@ public class AppController implements ErrorController {
 
 	@Autowired
 	private ActPubFollowing apFollowing;
+
+	@Autowired
+	private ActPubFollower apFollower;
 
 	private static final String ERROR_MAPPING = "/error";
 
@@ -1157,7 +1161,7 @@ public class AppController implements ErrorController {
 	@RequestMapping(value = API_PATH + "/getFollowers", method = RequestMethod.POST)
 	public @ResponseBody Object getFollowers(@RequestBody GetFollowersRequest req, HttpSession session) {
 		return callProc.run("getFollowers", req, session, ms -> {
-			return apFollowing.getFollowers(ms, req);
+			return apFollower.getFollowers(ms, req);
 		});
 	}
 

@@ -118,6 +118,9 @@ public class ActPubService {
     private ActPubFollowing apFollowing;
 
     @Autowired
+    private ActPubFollower apFollower;
+
+    @Autowired
     private ActPubOutbox apOutbox;
 
     @Autowired
@@ -704,6 +707,7 @@ public class ActPubService {
             if (allow) {
                 APObj followersObj = apUtil.getJson(url, APConst.MT_APP_ACTJSON);
                 if (followersObj != null) {
+                    // note/warning: the ActPubFollower.java class also has code to read followers.
                     apUtil.iterateOrderedCollection(followersObj, MAX_FOLLOWERS, obj -> {
                         /*
                          * Mastodon seems to have the followers items as strings, which are the actor urls of the followers.
@@ -905,11 +909,23 @@ public class ActPubService {
     /*
      * For now name can be an actual username or an actor URL. I just want to see how rapidly this
      * explodes in order to decide what to do next.
+     * 
+     * Returns true if the name was added, or false if already existed
      */
-    public void saveFediverseName(String name) {
+    public boolean saveFediverseName(String name) {
+        if (name == null)
+            return false;
+        name = name.trim();
+
+        // lazy job of detecting garbage names
+        if (name.indexOf("\n") != -1 || name.indexOf("\r") != -1 || name.indexOf("\t") != -1)
+            return false;
+
         if (!apCache.allUserNames.contains(name)) {
             apCache.allUserNames.put(name, false);
+            return true;
         }
+        return false;
     }
 
     public void queueUserForRefresh(String apUserName, boolean force) {
@@ -941,7 +957,7 @@ public class ActPubService {
 
     /* Run every few seconds */
     @Scheduled(fixedDelay = 3 * 1000)
-    public void messageRefresh() {
+    public void userRefresh() {
         if (!appProp.isActPubEnabled())
             return;
 
@@ -953,38 +969,49 @@ public class ActPubService {
         }
 
         try {
-            refreshOutboxes();
+            refreshUsers();
         } catch (Exception e) {
             // log and ignore.
             log.error("refresh outboxes", e);
         }
     }
 
-    private void refreshOutboxes() {
+    private void refreshUsers() {
         for (final String userName : apCache.usersPendingRefresh.keySet()) {
-            Boolean done = apCache.usersPendingRefresh.get(userName);
-            if (done)
-                continue;
+            try {
+                Boolean done = apCache.usersPendingRefresh.get(userName);
+                if (done)
+                    continue;
 
-            // flag as done (even if it fails we still want it flagged as done. no retries will be done).
-            apCache.usersPendingRefresh.put(userName, true);
+                // flag as done (even if it fails we still want it flagged as done. no retries will be done).
+                apCache.usersPendingRefresh.put(userName, true);
 
-            adminRunner.run(session -> {
-                // log.debug("Reload user outbox: " + userName);
-                SubNode userNode = getAcctNodeByUserName(session, userName);
-                if (userNode == null)
+                adminRunner.run(session -> {
+                    // log.debug("Reload user outbox: " + userName);
+                    SubNode userNode = getAcctNodeByUserName(session, userName);
+                    if (userNode == null)
+                        return null;
+
+                    String actorUrl = userNode.getStrProp(NodeProp.ACT_PUB_ACTOR_ID.s());
+                    APObj actor = apUtil.getActorByUrl(actorUrl);
+                    if (actor != null) {
+                        apOutbox.loadForeignOutbox(session, actor, userNode, userName);
+
+                        /*
+                         * I was going to load followerCounts into userNode, but I decided to just query them live when
+                         * needed on the UserPreferences dialog
+                         */
+                        int followerCount = apFollower.loadRemoteFollowers(session, actor);
+                        int followingCount = apFollowing.loadRemoteFollowing(session, actor);
+                    } else {
+                        log.debug("Unable to get cached actor from url: " + actorUrl);
+                    }
+
                     return null;
-
-                String actorUrl = userNode.getStrProp(NodeProp.ACT_PUB_ACTOR_ID.s());
-                APObj actor = apUtil.getActorByUrl(actorUrl);
-                if (actor != null) {
-                    apOutbox.refreshOutboxFromForeignServer(session, actor, userNode, userName);
-                } else {
-                    log.debug("Unable to get cached actor from url: " + actorUrl);
-                }
-
-                return null;
-            });
+                });
+            } catch (Exception e) {
+                log.debug("Unable to load user: " + userName);
+            }
         }
     }
 

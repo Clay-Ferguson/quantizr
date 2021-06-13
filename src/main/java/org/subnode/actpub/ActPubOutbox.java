@@ -65,91 +65,95 @@ public class ActPubOutbox {
      * Caller can pass in userNode if it's already available, but if not just pass null and the
      * apUserName will be used to look up the userNode.
      */
-    public void refreshOutboxFromForeignServer(MongoSession session, Object actor, SubNode userNode, String apUserName) {
-        if (userNode == null) {
-            userNode = read.getUserNodeByUserName(session, apUserName);
-        }
-
-        SubNode outboxNode = read.getUserNodeByType(session, apUserName, userNode, "### Posts", NodeType.ACT_PUB_POSTS.s(),
-                Arrays.asList(PrivilegeType.READ.s(), PrivilegeType.WRITE.s()), NodeName.POSTS);
-        if (outboxNode == null) {
-            log.debug("no outbox for user: " + apUserName);
-            return;
-        }
-
-        /*
-         * Query all existing known outbox items we have already saved for this foreign user
-         */
-        Iterable<SubNode> outboxItems = read.getSubGraph(session, outboxNode, null, 0);
-
-        String outboxUrl = AP.str(actor, APProp.outbox);
-        APObj outbox = getOutbox(outboxUrl);
-        if (outbox == null) {
-            log.debug("Unable to get outbox for AP user: " + apUserName);
-            return;
-        }
-
-        /*
-         * Generate a list of known AP IDs so we can ignore them and load only the unknown ones from the
-         * foreign server
-         */
-        HashSet<String> apIdSet = new HashSet<>();
-        for (SubNode n : outboxItems) {
-            String apId = n.getStrProp(NodeProp.ACT_PUB_ID.s());
-            if (apId != null) {
-                apIdSet.add(apId);
+    public void loadForeignOutbox(MongoSession session, Object actor, SubNode userNode, String apUserName) {
+        try {
+            if (userNode == null) {
+                userNode = read.getUserNodeByUserName(session, apUserName);
             }
-        }
 
-        ValContainer<Integer> count = new ValContainer<>(0);
-        final SubNode _userNode = userNode;
+            SubNode outboxNode = read.getUserNodeByType(session, apUserName, userNode, "### Posts", NodeType.ACT_PUB_POSTS.s(),
+                    Arrays.asList(PrivilegeType.READ.s(), PrivilegeType.WRITE.s()), NodeName.POSTS);
+            if (outboxNode == null) {
+                log.debug("no outbox for user: " + apUserName);
+                return;
+            }
 
-        apUtil.iterateOrderedCollection(outbox, Integer.MAX_VALUE, obj -> {
-            try {
-                // if (obj != null) {
-                // log.debug("saveNote: OBJ=" + XString.prettyPrint(obj));
-                // }
+            /*
+             * Query all existing known outbox items we have already saved for this foreign user
+             */
+            Iterable<SubNode> outboxItems = read.getSubGraph(session, outboxNode, null, 0);
 
-                String apId = AP.str(obj, APProp.id);
-                if (!apIdSet.contains(apId)) {
-                    Object object = AP.obj(obj, APProp.object);
+            String outboxUrl = AP.str(actor, APProp.outbox);
+            APObj outbox = getOutbox(outboxUrl);
+            if (outbox == null) {
+                log.debug("Unable to get outbox for AP user: " + apUserName);
+                return;
+            }
 
-                    if (object != null) {
-                        if (object instanceof String) {
-                            // todo-1: handle boosts.
-                            //
-                            // log.debug("Not Handled: Object was a string: " + object + " in outbox item: "
-                            // + XString.prettyPrint(obj));
-                            // Example of what needs to be handled here is when 'obj' contains a 'boost' (retweet)
-                            // {
-                            // "id" : "https://dobbs.town/users/onan/statuses/105613730170001141/activity",
-                            // AP.type : "Announce",
-                            // AP.actor : "https://dobbs.town/users/onan",
-                            // AP.published : "2021-01-25T01:20:30Z",
-                            // AP.to : [ "https://www.w3.org/ns/activitystreams#Public" ],
-                            // "cc" : [ "https://mastodon.sdf.org/users/stunder", "https://dobbs.town/users/onan/followers" ],
-                            // AP.object : "https://mastodon.sdf.org/users/stunder/statuses/105612925260202844"
-                            // }
-                        } //
-                        else if (AP.isType(object, APType.Note)) {
-                            try {
-                                ActPubService.newPostsInCycle++;
-                                apService.saveNote(session, _userNode, outboxNode, object, true, true);
-                                count.setVal(count.getVal() + 1);
-                            } catch (Exception e) {
-                                // log and ignore.
-                                log.error("error in saveNode()", e);
+            /*
+             * Generate a list of known AP IDs so we can ignore them and load only the unknown ones from the
+             * foreign server
+             */
+            HashSet<String> apIdSet = new HashSet<>();
+            for (SubNode n : outboxItems) {
+                String apId = n.getStrProp(NodeProp.ACT_PUB_ID.s());
+                if (apId != null) {
+                    apIdSet.add(apId);
+                }
+            }
+
+            ValContainer<Integer> count = new ValContainer<>(0);
+            final SubNode _userNode = userNode;
+
+            apUtil.iterateOrderedCollection(outbox, Integer.MAX_VALUE, obj -> {
+                try {
+                    // if (obj != null) {
+                    // log.debug("saveNote: OBJ=" + XString.prettyPrint(obj));
+                    // }
+
+                    String apId = AP.str(obj, APProp.id);
+                    if (!apIdSet.contains(apId)) {
+                        Object object = AP.obj(obj, APProp.object);
+
+                        if (object != null) {
+                            if (object instanceof String) {
+                                // todo-1: handle boosts.
+                                //
+                                // log.debug("Not Handled: Object was a string: " + object + " in outbox item: "
+                                // + XString.prettyPrint(obj));
+                                // Example of what needs to be handled here is when 'obj' contains a 'boost' (retweet)
+                                // {
+                                // "id" : "https://dobbs.town/users/onan/statuses/105613730170001141/activity",
+                                // AP.type : "Announce",
+                                // AP.actor : "https://dobbs.town/users/onan",
+                                // AP.published : "2021-01-25T01:20:30Z",
+                                // AP.to : [ "https://www.w3.org/ns/activitystreams#Public" ],
+                                // "cc" : [ "https://mastodon.sdf.org/users/stunder", "https://dobbs.town/users/onan/followers" ],
+                                // AP.object : "https://mastodon.sdf.org/users/stunder/statuses/105612925260202844"
+                                // }
+                            } //
+                            else if (AP.isType(object, APType.Note)) {
+                                try {
+                                    ActPubService.newPostsInCycle++;
+                                    apService.saveNote(session, _userNode, outboxNode, object, true, true);
+                                    count.setVal(count.getVal() + 1);
+                                } catch (Exception e) {
+                                    // log and ignore.
+                                    log.error("error in saveNode()", e);
+                                }
+                            } else {
+                                log.debug("Object type not supported: " + XString.prettyPrint(obj));
                             }
-                        } else {
-                            log.debug("Object type not supported: " + XString.prettyPrint(obj));
                         }
                     }
+                } catch (Exception e) {
+                    log.error("Failes processing collection item.", e);
                 }
-            } catch (Exception e) {
-                log.error("Failes processing collection item.", e);
-            }
-            return (count.getVal() < ActPubService.MAX_MESSAGES);
-        });
+                return (count.getVal() < ActPubService.MAX_MESSAGES);
+            });
+        } catch (Exception e) {
+            log.error("Error reading outbox of: " + apUserName, e);
+        }
     }
 
     public APObj getOutbox(String url) {
