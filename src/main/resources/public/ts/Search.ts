@@ -172,7 +172,7 @@ export class Search implements SearchIntf {
         });
     }
 
-    feed = (nodeId: string, feedUserName: string, page: number, searchText: string) => {
+    feed = (nodeId: string, feedUserName: string, page: number, searchText: string, forceMetadataOn: boolean) => {
         let appState = store.getState();
         S.util.ajax<J.NodeFeedRequest, J.NodeFeedResponse>("nodeFeed", {
             page,
@@ -185,27 +185,29 @@ export class Search implements SearchIntf {
             fromFriends: appState.feedFilterFriends,
             nsfw: appState.feedFilterNSFW,
             searchText
-        }, this.feedResponse);
-    }
+        }, (res: J.NodeFeedResponse) => {
+            dispatch("Action_RenderFeedResults", (s: AppState): AppState => {
+                // s.feedResults = S.meta64.removeRedundantFeedItems(res.searchResults || []);
 
-    feedResponse = (res: J.NodeFeedResponse) => {
-        dispatch("Action_RenderFeedResults", (s: AppState): AppState => {
-            // s.feedResults = S.meta64.removeRedundantFeedItems(res.searchResults || []);
+                // once user requests their stuff, turn off the new messages count indicator.
+                if (s.feedFilterToMe) {
+                    s.newMessageCount = 0;
+                }
 
-            // once user requests their stuff, turn off the new messages count indicator.
-            if (s.feedFilterToMe) {
-                s.newMessageCount = 0;
-            }
+                s.guiReady = true;
 
-            s.guiReady = true;
-            s.feedResults = res.searchResults;
-            s.feedEndReached = res.endReached;
-            s.feedDirty = false;
-            s.feedLoading = false;
-            s.feedWaitingForUserRefresh = false;
-            S.meta64.selectTabStateOnly(C.TAB_FEED, s);
-            S.view.scrollToTop();
-            return s;
+                if (forceMetadataOn) {
+                    s.userPreferences.showMetaData = true;
+                }
+                s.feedResults = res.searchResults;
+                s.feedEndReached = res.endReached;
+                s.feedDirty = false;
+                s.feedLoading = false;
+                s.feedWaitingForUserRefresh = false;
+                S.meta64.selectTabStateOnly(C.TAB_FEED, s);
+                S.view.scrollToTop();
+                return s;
+            });
         });
     }
 

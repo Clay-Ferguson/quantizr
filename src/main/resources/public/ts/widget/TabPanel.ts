@@ -72,7 +72,8 @@ export class TabPanel extends Div {
             }
 
             /* Listen to scroll position change, and update the active tab value in realtime.
-            (this can't get added multiple times can it? (todo-0))
+            (this can't get added multiple times can it? I need to verify. If it DOES duplicate listeners
+            it will still have only a slight performance degradation. todo-1
             */
             elm.addEventListener("scroll", () => {
                 // console.log("Scroll pos: " + elm.scrollTop);

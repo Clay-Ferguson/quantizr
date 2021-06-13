@@ -381,6 +381,11 @@ export class Render implements RenderIntf {
                                 s.userPreferences.editMode = true;
                             }
                         }
+
+                        /* Another slight hack to make viewing 'posts' node turn on metaData */
+                        if (s.node.type === J.NodeType.POSTS) {
+                            s.userPreferences.showMetaData = true;
+                        }
                     }
 
                     s.idToNodeMap = new Map<string, J.NodeInfo>();
@@ -643,8 +648,7 @@ export class Render implements RenderIntf {
         let img: Img = imgSrc
             ? new Img(null, {
                 className: iconClass,
-                src: imgSrc,
-                onClick
+                src: imgSrc
             }) : null;
 
         let disp = displayName ? displayName + " (@" + user + ")" : ("@" + user);
@@ -675,7 +679,9 @@ export class Render implements RenderIntf {
                             className: "userBio"
                         })])
                 ])
-            ])
+            ], "userInfo", {
+                onClick
+            })
         ]);
     }
 }

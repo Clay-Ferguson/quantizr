@@ -67,7 +67,7 @@ export class FeedView extends AppTab {
         let refreshFeedButtonBar = new ButtonBar([
             state.isAnonUser ? null : new Button("New Post", () => S.edit.addNode(null, null, state), { title: "Post something awesome on the Fediverse!" }, "btn-primary"),
             new Span(null, {
-                className: ((state.feedDirty || state.feedWaitingForUserRefresh) ? "feedDirtyButton" : "feedNotDirtyButton")
+                className: (((state.feedDirty || state.feedWaitingForUserRefresh) && !state.feedLoading) ? "feedDirtyButton" : "feedNotDirtyButton")
             }, [
                 new Button("Refresh" + (state.feedDirty ? " (New Posts)" : ""), () => {
                     FeedView.refresh();
@@ -126,7 +126,7 @@ export class FeedView extends AppTab {
                         onClick: (event) => {
                             event.stopPropagation();
                             event.preventDefault();
-                            S.srch.feed("~" + J.NodeType.FRIEND_LIST, null, ++FeedView.page, FeedView.searchTextState.getValue());
+                            S.srch.feed("~" + J.NodeType.FRIEND_LIST, null, ++FeedView.page, FeedView.searchTextState.getValue(), true);
                         },
                         title: "Next Page"
                     })], "text-center marginTop marginBottom"));
@@ -152,7 +152,7 @@ export class FeedView extends AppTab {
             return s;
         });
 
-        S.srch.feed("~" + J.NodeType.FRIEND_LIST, null, FeedView.page, FeedView.searchTextState.getValue());
+        S.srch.feed("~" + J.NodeType.FRIEND_LIST, null, FeedView.page, FeedView.searchTextState.getValue(), false);
     }
 
     makeFilterButtonsBar = (state: AppState): Span => {

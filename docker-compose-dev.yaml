@@ -100,7 +100,8 @@ services:
                 adam:${testPassword}:${devEmail},
                 bob:${testPassword}:${devEmail},
                 cory:${testPassword}:${devEmail},
-                dan:${testPassword}:${devEmail}
+                dan:${testPassword}:${devEmail},
+                eric:${testPassword}:${devEmail}
 
             spring.config.location: "classpath:/application.properties" 
             mongodb.host: "${MONGO_HOST}" 

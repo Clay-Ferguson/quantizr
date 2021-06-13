@@ -27,6 +27,6 @@ export class FollowingResultSetView<I extends FollowingRSInfo> extends ResultSet
 
     renderHeading(): CompIntf {
         let info = this.data.rsInfo as FollowingRSInfo;
-        return new Heading(3, "@" + info.showingFollowingOfUser + " is Following...", { className: "resultsTitle" });
+        return new Heading(4, "@" + info.showingFollowingOfUser + " is Following...", { className: "resultsTitle" });
     }
 }
