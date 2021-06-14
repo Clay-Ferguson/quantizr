@@ -64,13 +64,17 @@ export class Search implements SearchIntf {
     }
 
     search = (node: J.NodeInfo, prop: string, searchText: string, state: AppState, userSearchType: string, description: string, fuzzy: boolean, caseSensitive: boolean, page: number, successCallback: Function): void => {
-        if (!node) {
+        /* Note that for 'userSearchType' we do want node to be null, because we're not searching under a node but
+        will be searching under the admin owned "All Users" node instead */
+        if (!node && !userSearchType) {
             node = S.meta64.getHighlightedNode(state);
         }
 
         S.util.ajax<J.NodeSearchRequest, J.NodeSearchResponse>("nodeSearch", {
             page,
-            nodeId: node.id,
+
+            // for userSearchTypes this node can be null
+            nodeId: node ? node.id : null,
             searchText,
             sortDir: "DESC",
             sortField: "mtm",

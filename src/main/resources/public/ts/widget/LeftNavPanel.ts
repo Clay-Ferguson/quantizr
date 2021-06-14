@@ -18,7 +18,7 @@ declare var g_brandingAppName;
 export class LeftNavPanel extends Div {
 
     constructor() {
-        super(null, { id: C.ID_LHS });
+        super(null, { id: C.ID_LHS, tabIndex: "-1" });
         this.attribs.className = "col-" + C.leftNavPanelCols + " leftNavPanel customScrollbar";
     }
 

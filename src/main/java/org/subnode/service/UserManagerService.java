@@ -791,14 +791,14 @@ public class UserManagerService {
 				 * Only for local users do we attemp to generate followers and following, but theoretically we can
 				 * use the ActPub API to query for this for foreign users also.
 				 */
-				if (nodeUserName.indexOf("@") == -1) {
-					boolean blocked = userIsBlockedByMe(session, nodeUserName);
-					userProfile.setBlocked(blocked);
+				boolean blocked = userIsBlockedByMe(session, nodeUserName);
+				userProfile.setBlocked(blocked);
 
-					boolean following = userIsFollowedByMe(session, nodeUserName);
-					userProfile.setFollowing(following);
-				}
-		
+				boolean following = userIsFollowedByMe(session, nodeUserName);
+				userProfile.setFollowing(following);
+
+				// todo-0: add ability to know "follows you" state (for display on UserProfileDlg)
+
 				res.setSuccess(true);
 			}
 		});

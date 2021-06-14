@@ -130,17 +130,10 @@ export class SearchUsersDlg extends DialogBase {
             return;
         }
 
-        // until we have better validation
-        let node = S.meta64.getHighlightedNode(this.appState);
-        if (!node) {
-            S.util.showMessage("No node is selected to search under.", "Warning");
-            return;
-        }
-
         SearchUsersDlg.defaultSearchText = this.searchTextState.getValue();
 
         let desc = "User " + SearchUsersDlg.defaultSearchText;
-        S.srch.search(node, "", SearchUsersDlg.defaultSearchText, this.appState, this.getState().userSearchType, desc,
+        S.srch.search(null, "", SearchUsersDlg.defaultSearchText, this.appState, this.getState().userSearchType, desc,
             this.getState().fuzzy,
             this.getState().caseSensitive, 0, this.close);
     }

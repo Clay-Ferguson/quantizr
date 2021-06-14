@@ -25,6 +25,7 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
  */
 export abstract class Comp<S extends BaseCompState = any> implements CompIntf {
     static renderCounter: number = 0;
+    static focusElmId: string = null;
     public rendered: boolean = false;
     public debug: boolean = false;
 
@@ -235,6 +236,21 @@ export abstract class Comp<S extends BaseCompState = any> implements CompIntf {
     }
 
     wrapClickFunc = (obj: any) => {
+
+        // Whenever we have a mouse click function which triggers a React Re-render cycle
+        // react doesn't have the ability to maintain focus correctly, so we have this crutch
+        // to help accomplish that. It's debatable whether this is a 'hack' or good code.
+        if (obj && obj.onClick) {
+            let func = obj.onClick;
+
+            // wrap the click function to maintain focus element.
+            obj.onClick = (arg: any) => {
+                Comp.focusElmId = obj.id;
+                // console.log("Click (wrapped): " + this.jsClassName + " obj: " + S.util.prettyPrint(obj));
+                func(arg);
+            };
+        }
+
         let state = store.getState();
         if (!state.mouseEffect || !obj) return;
         // console.log("Wrap Click: " + this.jsClassName + " obj: " + S.util.prettyPrint(obj));
@@ -425,6 +441,15 @@ export abstract class Comp<S extends BaseCompState = any> implements CompIntf {
     _domAddEvent: () => void = null;
     domAddEvent(): void {
         // console.log("domAddEvent: " + this.jsClassName);
+
+        /* In order for a React Render to not loose focus (sometimes) we keep track of the last thing that
+        was clicked, and restore focus back to that whenever components are rendered. Without this code you can't even
+        do a click on a node row, and then start scrolling with keyboard,...it would take TWO clicks to force focus that
+        will allow scrolling using keyboard. */
+        if (this.attribs.onClick && this.attribs.id === Comp.focusElmId) {
+            // console.log("clicked element should have focus");
+            S.util.focusElmById(Comp.focusElmId);
+        }
 
         if (this.domAddFuncs) {
             let elm: HTMLElement = this.getElement();
