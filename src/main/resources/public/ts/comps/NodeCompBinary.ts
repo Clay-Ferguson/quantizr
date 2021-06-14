@@ -89,10 +89,6 @@ export class NodeCompBinary extends Div {
                 alreadyFullScreen = true;
             }
             s.fullScreenViewId = id;
-
-            if (!alreadyFullScreen) {
-                S.meta64.tabChanging(s.activeTab, null, s);
-            }
             return s;
         });
     }

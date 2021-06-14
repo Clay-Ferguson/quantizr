@@ -197,7 +197,6 @@ export class Render implements RenderIntf {
             dispatch("Action_ShowCalendar", (s: AppState): AppState => {
                 s.fullScreenCalendarId = nodeId;
                 s.calendarData = S.util.buildCalendarData(res.items);
-                S.meta64.tabChanging(s.activeTab, null, s);
                 return s;
             });
         });
@@ -620,7 +619,6 @@ export class Render implements RenderIntf {
         dispatch("Action_ShowGraph", (s: AppState): AppState => {
             s.fullScreenGraphId = node.id;
             s.graphSearchText = searchText;
-            S.meta64.tabChanging(s.activeTab, null, s);
             return s;
         });
     }

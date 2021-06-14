@@ -634,13 +634,6 @@ export class Meta64 implements Meta64Intf {
     last scroll position on any given tab */
     tabChanging = (prevTab: string, newTab: string, state: AppState): void => {
 
-        // The full screen viewer is the oddball case, where we just remember the current tab position and return, note also
-        // that the full screen viewer is scrolling in the 'window' not the tab panel
-        if (prevTab && this.fullscreenViewerActive(state)) {
-            this.scrollPosByTabName.set(prevTab, window.scrollY);
-            return;
-        }
-
         /* Don't run any code here if we aren't actually changing tabs */
         if (prevTab && newTab && prevTab === newTab) {
             return;
