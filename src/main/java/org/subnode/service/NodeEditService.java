@@ -402,6 +402,8 @@ public class NodeEditService {
 				nodeInfo.setPropVal(NodeProp.USER.s(), friendUserName);
 			}
 
+			// todo-0: this was an ugly quick and dirty way to reject dupliate friend adds. Need to accomplish
+			// this with some kind of genuine unique constraint.
 			Iterable<SubNode> friendNodes =
 					read.findSubNodesByProp(session, node.getParentPath(), NodeProp.USER.s(), friendUserName);
 
@@ -595,6 +597,8 @@ public class NodeEditService {
 		return res;
 	}
 
+	/* Whenever a friend node is saved, we send the "following" request to the foreign ActivityPub server
+	*/
 	public void updateSavedFriendNode(SubNode node) {
 		String userNodeId = node.getStrProp(NodeProp.USER_NODE_ID.s());
 
@@ -610,7 +614,6 @@ public class NodeEditService {
 			 * when user first adds, this friendNode won't have the userNodeId yet, so add if not yet existing
 			 */
 			if (userNodeId == null) {
-
 				/*
 				 * A userName containing "@" is considered a foreign Fediverse user and will trigger a WebFinger
 				 * search of them, and a load/update of their outbox

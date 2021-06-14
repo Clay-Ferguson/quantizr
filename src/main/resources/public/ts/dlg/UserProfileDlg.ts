@@ -80,7 +80,7 @@ export class UserProfileDlg extends DialogBase {
                                         S.srch.showFollowers(0, state.userProfile.userName);
                                     }
                                     else {
-                                        this.openUserHomePage(state, "home");
+                                        window.open(state.userProfile.actorUrl, "_blank");
                                     }
                                 }
                             },
@@ -95,7 +95,7 @@ export class UserProfileDlg extends DialogBase {
                                         S.srch.showFollowing(0, state.userProfile.userName);
                                     }
                                     else {
-                                        this.openUserHomePage(state, "home");
+                                        window.open(state.userProfile.actorUrl, "_blank");
                                     }
 
                                     // It would be 'inconsistent' to just jump to the FRIEND_LIST? if this user is looking
