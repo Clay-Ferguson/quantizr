@@ -2,6 +2,7 @@ import { AppState } from "../AppState";
 
 export interface ViewIntf {
     docElm: any;
+    jumpToId(id: string): void;
     refreshTree(nodeId: string, zeroOffset: boolean, renderParentIfLeaf: boolean, highlightId: string, forceIPFSRefresh: boolean, allowScroll: boolean, setTab: boolean, state: AppState): void;
     firstPage(state: AppState): void;
     prevPage(state: AppState): void;

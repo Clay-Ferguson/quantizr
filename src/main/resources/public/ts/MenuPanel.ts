@@ -55,6 +55,7 @@ export class MenuPanel extends Div {
     };
 
     static openBookmarksNode = () => {
+        // todo-0: flip on edit mode here?
         S.nav.openContentNode("~" + J.NodeType.BOOKMARK_LIST);
     };
 
@@ -179,6 +180,25 @@ export class MenuPanel extends Div {
         let messagesSuffix = state.newMessageCount > 0
             ? " (" + state.newMessageCount + " new)" : "";
 
+        if (!state.isAnonUser) {
+            let bookmarkItems = [];
+            if (state.bookmarks) {
+                state.bookmarks.forEach((bookmark: J.Bookmark): boolean => {
+                    // todo-1: would be nice to have a float-right edit icon that jumps to the bookmark node
+                    // itself for editing or deleting...
+                    bookmarkItems.push(new MenuItem(bookmark.name, () => S.view.jumpToId(bookmark.id)));
+                    return true;
+                });
+            }
+
+            if (bookmarkItems.length > 0) {
+                bookmarkItems.push(new MenuItemSeparator());
+            }
+
+            bookmarkItems.push(new MenuItem("Manage", MenuPanel.openBookmarksNode, !state.isAnonUser));
+            children.push(new Menu("Bookmarks", bookmarkItems));
+        }
+
         children.push(new Menu("Messages" + messagesSuffix, [
             new MenuItem("To/From Me" + messagesSuffix, MenuPanel.messagesToFromMe, !state.isAnonUser),
             new MenuItem("From Friends", MenuPanel.messagesFromFriends, !state.isAnonUser),
@@ -192,7 +212,6 @@ export class MenuPanel extends Div {
             new MenuItem("Account", S.nav.navHome, !state.isAnonUser),
             new MenuItem("Home", MenuPanel.openHomeNode, !state.isAnonUser),
             new MenuItemSeparator(), //
-            new MenuItem("Bookmarks", MenuPanel.openBookmarksNode, !state.isAnonUser),
             new MenuItem("RSS Feeds", MenuPanel.openRSSFeedsNode, !state.isAnonUser),
             new MenuItem("Notes", MenuPanel.openNotesNode, !state.isAnonUser),
             new MenuItem("Exports", MenuPanel.openExportsNode, !state.isAnonUser)
@@ -415,7 +434,6 @@ export class MenuPanel extends Div {
             ]));
 
             children.push(new Menu("Admin - DB", [
-
                 new MenuItem("ActPub Maintenance", () => S.view.runServerCommand("actPubMaintenance", "ActPub Maintenance Response", null, state)), //
                 new MenuItem("Crawl Fediverse", () => S.view.runServerCommand("crawlUsers", "ActPub Crawl Response", null, state)), //
                 new MenuItem("Validate", () => S.view.runServerCommand("validateDb", "Validate DB Response", null, state)), //

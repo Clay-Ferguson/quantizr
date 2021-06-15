@@ -72,4 +72,5 @@ export interface Meta64Intf {
     showMyNewMessages(): void;
     showPublicFediverse(): void;
     tabScrollTop(tabName?: string): void;
+    loadBookmarks(): void;
 }

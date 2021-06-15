@@ -119,7 +119,6 @@ public class UserFeedService {
 
 	/* Notify all browser timelines if they have new info */
 	public void pushTimelineUpdateToBrowsers(MongoSession session, NodeInfo nodeInfo) {
-
 		/*
 		 * Get a local list of 'allSessions' so we can release the lock on the SessionContent varible
 		 * immediately

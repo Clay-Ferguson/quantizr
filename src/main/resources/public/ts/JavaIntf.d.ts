@@ -1,6 +1,11 @@
 /* tslint:disable */
 /* eslint-disable */
 
+export interface Bookmark {
+    name: string;
+    id: string;
+}
+
 export interface UserProfile {
     displayName: string;
     userName: string;
@@ -91,6 +96,9 @@ export interface FileSearchRequest extends RequestBase {
 
 export interface FileSystemReindexRequest extends RequestBase {
     nodeId: string;
+}
+
+export interface GetBookmarksRequest extends RequestBase {
 }
 
 export interface GetConfigRequest extends RequestBase {
@@ -416,6 +424,10 @@ export interface FriendInfo {
     userName: string;
     avatarVer: string;
     userNodeId: string;
+}
+
+export interface GetBookmarksResponse extends ResponseBase {
+    bookmarks: Bookmark[];
 }
 
 export interface GetConfigResponse extends ResponseBase {

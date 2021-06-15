@@ -135,4 +135,6 @@ export class AppState {
     feedPage = {};
 
     mainPanelCols: number = 5;
+
+    bookmarks: J.Bookmark[];
 }

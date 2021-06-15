@@ -86,11 +86,14 @@ export class NodeCompRowHeader extends Div {
             onClick: () => S.render.showNodeUrl(node, state)
         }));
 
-        children.push(new Icon({
-            className: "fa fa-bookmark fa-lg",
-            title: "Bookmark this Node",
-            onClick: () => S.edit.addBookmark(node, state)
-        }));
+        // Allow bookmarking any kind of node other than bookmark nodes.
+        if (node.type !== J.NodeType.BOOKMARK && node.type !== J.NodeType.BOOKMARK_LIST) {
+            children.push(new Icon({
+                className: "fa fa-bookmark fa-lg",
+                title: "Bookmark this Node",
+                onClick: () => S.edit.addBookmark(node, state)
+            }));
+        }
 
         if (priority) {
             children.push(new Span(priority, {

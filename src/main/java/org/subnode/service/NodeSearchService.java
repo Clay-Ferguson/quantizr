@@ -17,6 +17,7 @@ import org.springframework.data.mongodb.core.query.TextCriteria;
 import org.springframework.stereotype.Component;
 import org.subnode.config.NodeName;
 import org.subnode.model.NodeInfo;
+import org.subnode.model.client.Bookmark;
 import org.subnode.model.client.NodeProp;
 import org.subnode.model.client.NodeType;
 import org.subnode.model.client.PrincipalName;
@@ -27,9 +28,11 @@ import org.subnode.mongo.MongoSession;
 import org.subnode.mongo.MongoUtil;
 import org.subnode.mongo.model.AccessControl;
 import org.subnode.mongo.model.SubNode;
+import org.subnode.request.GetBookmarksRequest;
 import org.subnode.request.GetNodeStatsRequest;
 import org.subnode.request.GetSharedNodesRequest;
 import org.subnode.request.NodeSearchRequest;
+import org.subnode.response.GetBookmarksResponse;
 import org.subnode.response.GetNodeStatsResponse;
 import org.subnode.response.GetSharedNodesResponse;
 import org.subnode.response.NodeSearchResponse;
@@ -68,6 +71,9 @@ public class NodeSearchService {
 
 	@Autowired
 	private MongoUtil util;
+
+	@Autowired
+	private UserManagerService userManagerService;
 
 	public static Object trendingFeedInfoLock = new Object();
 	public static GetNodeStatsResponse trendingFeedInfo;
@@ -161,7 +167,8 @@ public class NodeSearchService {
 				}
 
 				for (SubNode node : read.searchSubGraph(session, searchRoot, req.getSearchProp(), searchText, req.getSortField(),
-						Const.ROWS_PER_PAGE, Const.ROWS_PER_PAGE * req.getPage(), req.getFuzzy(), req.getCaseSensitive(), req.getTimeRangeType())) {
+						Const.ROWS_PER_PAGE, Const.ROWS_PER_PAGE * req.getPage(), req.getFuzzy(), req.getCaseSensitive(),
+						req.getTimeRangeType())) {
 
 					NodeInfo info = convert.convertToNodeInfo(ThreadLocals.getSessionContext(), session, node, true, false,
 							counter + 1, false, false);
@@ -200,8 +207,8 @@ public class NodeSearchService {
 		 * 2) all my shared nodes globally, and the globally is done simply by passing null for the path
 		 * here
 		 */
-		for (SubNode node : auth.searchSubGraphByAcl(session, req.getPage() * Const.ROWS_PER_PAGE, searchRoot.getPath(), searchRoot.getOwner(),
-				Sort.by(Sort.Direction.DESC, SubNode.FIELD_MODIFY_TIME), Const.ROWS_PER_PAGE)) {
+		for (SubNode node : auth.searchSubGraphByAcl(session, req.getPage() * Const.ROWS_PER_PAGE, searchRoot.getPath(),
+				searchRoot.getOwner(), Sort.by(Sort.Direction.DESC, SubNode.FIELD_MODIFY_TIME), Const.ROWS_PER_PAGE)) {
 
 			if (node.getAc() == null || node.getAc().size() == 0)
 				continue;
@@ -251,8 +258,25 @@ public class NodeSearchService {
 		content = content.replace("#<span>", " #");
 		content = content.replace("\\u003c", " ");
 		content = content.replace("\\u003e", " ");
-		// log.debug("unmangled content: " + content);
 		return content;
+	}
+
+	public void getBookmarks(MongoSession session, GetBookmarksRequest req, GetBookmarksResponse res) {
+		List<Bookmark> bookmarks = new LinkedList<Bookmark>();
+
+		List<SubNode> bookmarksNode = userManagerService.getSpecialNodesList(session, NodeType.BOOKMARK_LIST.s());
+		if (bookmarksNode != null) {
+			for (SubNode bmNode : bookmarksNode) {
+				String targetId = bmNode.getStrProp(NodeProp.TARGET_ID);
+				Bookmark bm = new Bookmark();
+				bm.setName(bmNode.getContent());
+				bm.setId(targetId);
+				bookmarks.add(bm);
+			}
+		}
+
+		res.setSuccess(true);
+		res.setBookmarks(bookmarks);
 	}
 
 	public void getNodeStats(GetNodeStatsRequest req, GetNodeStatsResponse res) {
@@ -290,13 +314,14 @@ public class NodeSearchService {
 			sharedToAny.add(PrincipalName.PUBLIC.s());
 
 			Query query = new Query();
-			Criteria criteria = Criteria.where(SubNode.FIELD_PATH).regex(util.regexRecursiveChildrenOfPath(NodeName.ROOT_OF_ALL_USERS)) //
+			Criteria criteria =
+					Criteria.where(SubNode.FIELD_PATH).regex(util.regexRecursiveChildrenOfPath(NodeName.ROOT_OF_ALL_USERS)) //
 
-					// This pattern is what is required when you have multiple conditions added to a
-					// single field.
-					.andOperator(Criteria.where(SubNode.FIELD_TYPE).ne(NodeType.FRIEND.s()), //
-							Criteria.where(SubNode.FIELD_TYPE).ne(NodeType.POSTS.s()), //
-							Criteria.where(SubNode.FIELD_TYPE).ne(NodeType.ACT_PUB_POSTS.s()));
+							// This pattern is what is required when you have multiple conditions added to a
+							// single field.
+							.andOperator(Criteria.where(SubNode.FIELD_TYPE).ne(NodeType.FRIEND.s()), //
+									Criteria.where(SubNode.FIELD_TYPE).ne(NodeType.POSTS.s()), //
+									Criteria.where(SubNode.FIELD_TYPE).ne(NodeType.ACT_PUB_POSTS.s()));
 
 			List<Criteria> orCriteria = new LinkedList<Criteria>();
 

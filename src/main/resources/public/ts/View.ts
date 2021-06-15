@@ -1,4 +1,4 @@
-import { dispatch } from "./AppRedux";
+import { dispatch, store } from "./AppRedux";
 import { AppState } from "./AppState";
 import { Constants as C } from "./Constants";
 import { NodeStatsDlg } from "./dlg/NodeStatsDlg";
@@ -19,6 +19,12 @@ declare var PROFILE;
 export class View implements ViewIntf {
 
     docElm: any = (document.documentElement || document.body.parentNode || document.body);
+
+    // todo-0: there are a few places this method should be used which aren't yet.
+    jumpToId = (id: string): void => {
+        let state = store.getState();
+        S.view.refreshTree(id, true, true, id, false, true, true, state);
+    }
 
     /*
      * newId is optional and if specified makes the page scroll to and highlight that node upon re-rendering.

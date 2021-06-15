@@ -55,6 +55,7 @@ import org.subnode.request.DeleteAttachmentRequest;
 import org.subnode.request.DeleteNodesRequest;
 import org.subnode.request.DeletePropertyRequest;
 import org.subnode.request.ExportRequest;
+import org.subnode.request.GetBookmarksRequest;
 import org.subnode.request.GetConfigRequest;
 import org.subnode.request.GetFollowersRequest;
 import org.subnode.request.GetFollowingRequest;
@@ -101,6 +102,7 @@ import org.subnode.request.UploadFromIPFSRequest;
 import org.subnode.request.UploadFromUrlRequest;
 import org.subnode.response.CloseAccountResponse;
 import org.subnode.response.ExportResponse;
+import org.subnode.response.GetBookmarksResponse;
 import org.subnode.response.GetConfigResponse;
 import org.subnode.response.GetNodeStatsResponse;
 import org.subnode.response.GetServerInfoResponse;
@@ -1245,6 +1247,15 @@ public class AppController implements ErrorController {
 		GetConfigResponse res = new GetConfigResponse();
 		res.setConfig(appProp.getConfig());
 		return res;
+	}
+
+	@RequestMapping(value = API_PATH + "/getBookmarks", method = RequestMethod.POST)
+	public @ResponseBody Object getBookmarks(@RequestBody GetBookmarksRequest req, HttpSession session) {
+		return callProc.run("getBookmarks", req, session, ms -> {
+			GetBookmarksResponse res = new GetBookmarksResponse();
+			nodeSearchService.getBookmarks(ms, req, res);
+			return res;
+		});
 	}
 
 	@RequestMapping(value = API_PATH + "/getNodeStats", method = RequestMethod.POST)

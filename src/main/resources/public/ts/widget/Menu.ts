@@ -1,8 +1,14 @@
 import { ReactNode } from "react";
 import { Constants as C } from "../Constants";
+import { PubSub } from "../PubSub";
+import { Singletons } from "../Singletons";
 import { CompIntf } from "./base/CompIntf";
 import { Div } from "./Div";
 
+let S: Singletons;
+PubSub.sub(C.PUBSUB_SingletonsReady, (s: Singletons) => {
+    S = s;
+});
 export class Menu extends Div {
 
     static activeMenu: string = C.SITE_NAV_MENU_TEXT;
@@ -35,6 +41,12 @@ export class Menu extends Div {
                         let expanded = document.getElementById("heading" + this.getId()).getAttribute("aria-expanded") === "true";
                         Menu.activeMenu = expanded ? this.name : null;
                         // console.log("Expand or collapse: " + this.name + " expan=" + expanded);
+
+                        // todo-0: proof of concept temporary hack, verifying this works before doing 'correctly'.
+                        // This works well and will be sent in as an "onClickCallback" member variable, soon.
+                        if (this.name === "Bookmarks") {
+                            S.meta64.loadBookmarks();
+                        }
                     }, 500);
                 }
             }),
