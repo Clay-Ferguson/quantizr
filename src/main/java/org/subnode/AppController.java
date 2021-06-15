@@ -1271,6 +1271,10 @@ public class AppController implements ErrorController {
 
 			log.debug("Command: " + req.getCommand());
 			switch (req.getCommand()) {
+				case "crawlUsers":
+					res.getMessages().add(new InfoMessage(actPub.crawlNewUsers(), null));
+					break;
+
 				case "actPubMaintenance":
 					res.getMessages().add(new InfoMessage(actPub.maintainForeignUsers(), null));
 					break;

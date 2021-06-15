@@ -1096,45 +1096,51 @@ public class ActPubService {
     }
 
     /* This is just to pull in arbitary new users so our Fediverse feed is populated */
-    public void crawlSomeNewUsers(MongoSession session) {
-        // log.debug("crawlSomeNewUsers...");
+    public String crawlNewUsers() {
+        if (!appProp.isActPubEnabled())
+            return "ActivityPub not enabled";
 
-        Iterable<SubNode> accountNodes = read.findTypedNodesUnderPath(session, NodeName.ROOT_OF_ALL_USERS, NodeType.ACCOUNT.s());
-        HashSet<String> knownUsers = new HashSet<String>();
-        for (SubNode node : accountNodes) {
-            String userName = node.getStrProp(NodeProp.USER.s());
-            if (userName == null)
-                continue;
-            knownUsers.add(userName);
-        }
+        return adminRunner.run(session -> {
 
-        Iterable<FediverseName> recs = ops.findAll(FediverseName.class);
-        int numLoaded = 0;
-        for (FediverseName fName : recs) {
-            try {
-                String userName = fName.getName();
-                // log.debug("loading user: " + userName);
-
-                // yes this userName may be an actor url, and if so we convert it to an actual username.
-                if (userName.startsWith("https://")) {
-                    userName = apUtil.getLongUserNameFromActorUrl(userName);
-                    // log.debug("Converted to: " + userName);
-                }
-
-                if (knownUsers.contains(userName))
+            Iterable<SubNode> accountNodes =
+                    read.findTypedNodesUnderPath(session, NodeName.ROOT_OF_ALL_USERS, NodeType.ACCOUNT.s());
+            HashSet<String> knownUsers = new HashSet<String>();
+            for (SubNode node : accountNodes) {
+                String userName = node.getStrProp(NodeProp.USER.s());
+                if (userName == null)
                     continue;
-
-                queueUserForRefresh(userName, true);
-                apCache.allUserNames.remove(userName);
-                ops.remove(fName);
-
-                if (++numLoaded > 250) {
-                    break;
-                }
-            } catch (Exception e) {
-                log.error("queueing FediverseName failed.", e);
+                knownUsers.add(userName);
             }
-        }
+
+            Iterable<FediverseName> recs = ops.findAll(FediverseName.class);
+            int numLoaded = 0;
+            for (FediverseName fName : recs) {
+                try {
+                    String userName = fName.getName();
+                    // log.debug("loading user: " + userName);
+
+                    // yes this userName may be an actor url, and if so we convert it to an actual username.
+                    if (userName.startsWith("https://")) {
+                        userName = apUtil.getLongUserNameFromActorUrl(userName);
+                        // log.debug("Converted to: " + userName);
+                    }
+
+                    if (knownUsers.contains(userName))
+                        continue;
+
+                    queueUserForRefresh(userName, true);
+                    apCache.allUserNames.remove(userName);
+                    ops.remove(fName);
+
+                    if (++numLoaded > 250) {
+                        break;
+                    }
+                } catch (Exception e) {
+                    log.error("queueing FediverseName failed.", e);
+                }
+            }
+            return "Queued some new users to crawl.";
+        });
     }
 
     public String maintainForeignUsers() {
@@ -1142,12 +1148,6 @@ public class ActPubService {
             return "ActivityPub not enabled";
 
         return adminRunner.run(session -> {
-            /*
-             * todo-0: This is temporary: We use this hook to pull in 50 new users at a time, to see how it
-             * goes...
-             */
-            crawlSomeNewUsers(session);
-
             long totalDelCount = 0;
             Iterable<SubNode> accountNodes =
                     read.findTypedNodesUnderPath(session, NodeName.ROOT_OF_ALL_USERS, NodeType.ACCOUNT.s());
