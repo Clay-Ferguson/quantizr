@@ -239,7 +239,8 @@ export class MenuPanel extends Div {
         let typeHandlers = S.plugin.getAllTypeHandlers();
         typeHandlers.forEach((typeHandler: TypeHandlerIntf, k: string): boolean => {
             if (state.isAdminUser || typeHandler.getAllowUserSelect()) {
-                createMenuItems.push(new MenuItem(typeHandler.getName(), () => S.edit.createNode(hltNode, typeHandler.getTypeName(), state), //
+                // todo-0: is 'false' pending flag good here? Check if abandon/canceled edits persist on tree
+                createMenuItems.push(new MenuItem(typeHandler.getName(), () => S.edit.createNode(hltNode, typeHandler.getTypeName(), false, state), //
                     !state.isAnonUser && !!hltNode));
             }
             return true;

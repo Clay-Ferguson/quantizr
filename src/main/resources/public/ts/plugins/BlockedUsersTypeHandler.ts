@@ -31,7 +31,7 @@ export class BlockedUsersTypeHandler extends TypeBase {
                 className: "marginAll"
             })
             // new ButtonBar([
-            //     new Button("Add Friend", () => S.edit.createNode(node, J.NodeType.FRIEND, state), {
+            //     new Button("Add Friend", () => S.edit.createNode(node, J.NodeType.FRIEND, false/true?, state), {
             //         title: "Add a new Friend (i.e. Follow someone)"
             //     })
             // ], null, "float-right marginBottom"),

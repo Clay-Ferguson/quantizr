@@ -787,11 +787,11 @@ export class Edit implements EditIntf {
         });
     }
 
-    createNode = (node: J.NodeInfo, typeName: string, state: AppState) => {
+    createNode = (node: J.NodeInfo, typeName: string, pendingEdit: boolean, state: AppState) => {
         state = appState(state);
 
         S.util.ajax<J.CreateSubNodeRequest, J.CreateSubNodeResponse>("createSubNode", {
-            pendingEdit: false,
+            pendingEdit,
             nodeId: node.id,
             newNodeName: "",
             typeName,

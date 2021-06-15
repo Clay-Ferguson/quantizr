@@ -402,6 +402,10 @@ public class NodeEditService {
 				nodeInfo.setPropVal(NodeProp.USER.s(), friendUserName);
 			}
 
+			if (ThreadLocals.getSessionContext().getUserName().equals(friendUserName)) {
+				throw new RuntimeEx("You can't have a Friend that is yourself.");
+			}
+
 			// todo-0: this was an ugly quick and dirty way to reject dupliate friend adds. Need to accomplish
 			// this with some kind of genuine unique constraint.
 			Iterable<SubNode> friendNodes =
