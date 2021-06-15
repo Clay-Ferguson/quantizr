@@ -31,7 +31,6 @@ import org.subnode.response.GetFollowersResponse;
 import org.subnode.util.Const;
 import org.subnode.util.Convert;
 import org.subnode.util.ThreadLocals;
-import org.subnode.util.XString;
 
 @Component
 public class ActPubFollower {

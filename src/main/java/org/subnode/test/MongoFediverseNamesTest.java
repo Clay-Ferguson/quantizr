@@ -11,14 +11,8 @@ import org.springframework.data.mongodb.core.index.Index;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Component;
-import org.subnode.mongo.MongoAuth;
-import org.subnode.mongo.MongoCreate;
-import org.subnode.mongo.MongoDelete;
-import org.subnode.mongo.MongoRead;
 import org.subnode.mongo.MongoUpdate;
-import org.subnode.mongo.MongoUtil;
 import org.subnode.mongo.model.FediverseName;
-import org.subnode.service.AttachmentService;
 
 @Component("MongoFediverseNamesTest")
 public class MongoFediverseNamesTest implements TestIntf {

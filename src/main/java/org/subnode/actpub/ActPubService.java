@@ -950,8 +950,8 @@ public class ActPubService {
         apCache.usersPendingRefresh.put(apUserName, false);
     }
 
-    /* every 30 minutes ping all the outboxes */
-    @Scheduled(fixedDelay = 30 * DateUtil.MINUTE_MILLIS)
+    /* every 90 minutes ping all the outboxes */
+    @Scheduled(fixedDelay = 90 * DateUtil.MINUTE_MILLIS)
     public void bigRefresh() {
         refreshForeignUsers();
     }
@@ -975,8 +975,7 @@ public class ActPubService {
         } catch (Exception e) {
             // log and ignore.
             log.error("refresh outboxes", e);
-        }
-        finally {
+        } finally {
             refreshInProgress = false;
         }
     }
@@ -1096,11 +1095,59 @@ public class ActPubService {
         });
     }
 
+    /* This is just to pull in arbitary new users so our Fediverse feed is populated */
+    public void crawlSomeNewUsers(MongoSession session) {
+        // log.debug("crawlSomeNewUsers...");
+
+        Iterable<SubNode> accountNodes = read.findTypedNodesUnderPath(session, NodeName.ROOT_OF_ALL_USERS, NodeType.ACCOUNT.s());
+        HashSet<String> knownUsers = new HashSet<String>();
+        for (SubNode node : accountNodes) {
+            String userName = node.getStrProp(NodeProp.USER.s());
+            if (userName == null)
+                continue;
+            knownUsers.add(userName);
+        }
+
+        Iterable<FediverseName> recs = ops.findAll(FediverseName.class);
+        int numLoaded = 0;
+        for (FediverseName fName : recs) {
+            try {
+                String userName = fName.getName();
+                // log.debug("loading user: " + userName);
+
+                // yes this userName may be an actor url, and if so we convert it to an actual username.
+                if (userName.startsWith("https://")) {
+                    userName = apUtil.getLongUserNameFromActorUrl(userName);
+                    // log.debug("Converted to: " + userName);
+                }
+
+                if (knownUsers.contains(userName))
+                    continue;
+
+                queueUserForRefresh(userName, true);
+                apCache.allUserNames.remove(userName);
+                ops.remove(fName);
+
+                if (++numLoaded > 250) {
+                    break;
+                }
+            } catch (Exception e) {
+                log.error("queueing FediverseName failed.", e);
+            }
+        }
+    }
+
     public String maintainForeignUsers() {
         if (!appProp.isActPubEnabled())
             return "ActivityPub not enabled";
 
         return adminRunner.run(session -> {
+            /*
+             * todo-0: This is temporary: We use this hook to pull in 50 new users at a time, to see how it
+             * goes...
+             */
+            crawlSomeNewUsers(session);
+
             long totalDelCount = 0;
             Iterable<SubNode> accountNodes =
                     read.findTypedNodesUnderPath(session, NodeName.ROOT_OF_ALL_USERS, NodeType.ACCOUNT.s());
@@ -1122,7 +1169,7 @@ public class ActPubService {
     public String getStatsReport() {
         StringBuilder sb = new StringBuilder();
         sb.append("\nActivityPub Stats:\n");
-        sb.append("Refresh in progress: " + (refreshInProgress ? "true" : "false"));
+        sb.append("Refresh in progress: " + (refreshInProgress ? "true" : "false") + "\n");
         sb.append("Cached Usernames: " + apCache.allUserNames.size() + "\n");
         sb.append("Users Currently Queued (for refresh): " + queuedUserCount() + "\n");
         sb.append("Refresh Foreign Users Cycles: " + refreshForeignUsersCycles + "\n");
