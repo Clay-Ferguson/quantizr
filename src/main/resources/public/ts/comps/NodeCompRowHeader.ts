@@ -81,9 +81,15 @@ export class NodeCompRowHeader extends Div {
         }
 
         children.push(new Icon({
-            className: "fa fa-link fa-lg",
+            className: "fa fa-link fa-lg marginRight",
             title: "Show URLs for this node",
             onClick: () => S.render.showNodeUrl(node, state)
+        }));
+
+        children.push(new Icon({
+            className: "fa fa-bookmark fa-lg",
+            title: "Bookmark this Node",
+            onClick: () => S.edit.addBookmark(node, state)
         }));
 
         if (priority) {

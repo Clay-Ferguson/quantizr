@@ -795,6 +795,8 @@ export const enum NodeType {
     INBOX = "sn:inbox",
     INBOX_ENTRY = "sn:inboxEntry",
     NOTES = "sn:notes",
+    BOOKMARK = "sn:bookmark",
+    BOOKMARK_LIST = "sn:bookmarkList",
     EXPORTS = "sn:exports",
     CALCULATOR = "sn:calculator",
     RSS_FEED = "sn:rssfeed",

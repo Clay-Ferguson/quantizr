@@ -14,6 +14,8 @@ import { RepoRootTypeHandler } from "./plugins/RepoRootTypeHandler";
 import { RssFeedsTypeHandler } from "./plugins/RssFeedsTypeHandler";
 import { RssTypeHandler } from "./plugins/RssTypeHandler";
 import { TextTypeHandler } from "./plugins/TextTypeHandler";
+import { BookmarkTypeHandler } from "./plugins/BookmarkTypeHandler";
+import { BookmarkListTypeHandler } from "./plugins/BookmarkListTypeHandler";
 
 export class PluginMgr implements PluginMgrIntf {
 
@@ -50,6 +52,8 @@ export class PluginMgr implements PluginMgrIntf {
         this.addTypeHandler(new InboxNodeTypeHandler());
         this.addTypeHandler(new InboxEntryTypeHandler());
         this.addTypeHandler(new NotesNodeTypeHandler());
+        this.addTypeHandler(new BookmarkTypeHandler());
+        this.addTypeHandler(new BookmarkListTypeHandler());
         this.addTypeHandler(new FriendsListTypeHandler());
         this.addTypeHandler(new BlockedUsersTypeHandler());
         this.addTypeHandler(new FriendTypeHandler());

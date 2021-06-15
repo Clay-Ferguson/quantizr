@@ -50,4 +50,5 @@ export interface EditIntf {
     moveNodeByDrop(targetNodeId: string, sourceNodeId: string, isFirts: boolean): void;
     initNodeEditResponse(res: J.InitNodeEditResponse, encrypt: boolean, showJumpButton: boolean, state: AppState): void;
     updateHeadings(state: AppState): void;
+    addBookmark(node: J.NodeInfo, state: AppState): void;
 }

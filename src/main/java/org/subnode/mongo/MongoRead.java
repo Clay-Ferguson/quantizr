@@ -760,6 +760,11 @@ public class MongoRead {
         if (type.equals(NodeType.NOTES.s())) {
             return "### Notes";
         }
+
+        if (type.equals(NodeType.BOOKMARK_LIST.s())) {
+            return "### Bookmarks";
+        }
+
         return "Node: " + type;
     }
 

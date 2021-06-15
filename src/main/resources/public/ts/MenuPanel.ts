@@ -54,6 +54,10 @@ export class MenuPanel extends Div {
         S.nav.openContentNode("~" + J.NodeType.FRIEND_LIST);
     };
 
+    static openBookmarksNode = () => {
+        S.nav.openContentNode("~" + J.NodeType.BOOKMARK_LIST);
+    };
+
     static openBlockedUsersNode = () => S.nav.openContentNode("~" + J.NodeType.BLOCKED_USERS);
     static openRSSFeedsNode = () => S.nav.openContentNode("~" + J.NodeType.RSS_FEEDS);
     static openPostsNode = () => S.nav.openContentNode("~" + J.NodeType.POSTS);
@@ -188,6 +192,7 @@ export class MenuPanel extends Div {
             new MenuItem("Account", S.nav.navHome, !state.isAnonUser),
             new MenuItem("Home", MenuPanel.openHomeNode, !state.isAnonUser),
             new MenuItemSeparator(), //
+            new MenuItem("Bookmarks", MenuPanel.openBookmarksNode, !state.isAnonUser),
             new MenuItem("RSS Feeds", MenuPanel.openRSSFeedsNode, !state.isAnonUser),
             new MenuItem("Notes", MenuPanel.openNotesNode, !state.isAnonUser),
             new MenuItem("Exports", MenuPanel.openExportsNode, !state.isAnonUser)

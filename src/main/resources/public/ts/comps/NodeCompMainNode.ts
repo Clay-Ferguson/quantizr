@@ -6,6 +6,7 @@ import { PubSub } from "../PubSub";
 import { Singletons } from "../Singletons";
 import { CompIntf } from "../widget/base/CompIntf";
 import { Div } from "../widget/Div";
+import { IconButton } from "../widget/IconButton";
 import { NodeCompButtonBar } from "./NodeCompButtonBar";
 import { NodeCompContent } from "./NodeCompContent";
 import { NodeCompRowFooter } from "./NodeCompRowFooter";
@@ -50,8 +51,18 @@ export class NodeCompMainNode extends Div {
         this.attribs.onClick = S.nav.clickNodeRow;
 
         let header: CompIntf = null;
+        let jumpButton: CompIntf = null;
         if (state.userPreferences.showMetaData) {
             header = new NodeCompRowHeader(node, true, true, false, false);
+        }
+        else {
+            const targetId = S.props.getNodePropVal(J.NodeProp.TARGET_ID, node);
+            if (targetId) {
+                jumpButton = new IconButton("fa-arrow-right", null, {
+                    onClick: () => S.view.refreshTree(targetId, true, true, targetId, false, true, true, state),
+                    title: "Jump to the Node"
+                }, "float-right");
+            }
         }
 
         let extraClass = state.userPreferences.showMetaData && state.userPreferences.editMode ? "nodeCompButtonBar" : null;
@@ -62,6 +73,7 @@ export class NodeCompMainNode extends Div {
                 className: "clearfix",
                 id: "button_bar_clearfix_" + node.id
             }),
+            jumpButton,
             new NodeCompContent(node, false, true, null, null, this.imgSizeOverride, true),
             new NodeCompRowFooter(node, false)
         ]);

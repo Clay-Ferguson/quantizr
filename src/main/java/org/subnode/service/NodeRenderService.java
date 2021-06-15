@@ -4,7 +4,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
-
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,7 +13,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.ui.Model;
 import org.subnode.config.AppProp;
 import org.subnode.config.NodeName;
-import org.subnode.config.SessionContext;
 import org.subnode.exception.NodeAuthFailedException;
 import org.subnode.exception.base.RuntimeEx;
 import org.subnode.model.BreadcrumbInfo;
@@ -641,6 +639,6 @@ public class NodeRenderService {
 		if (content.length() > 25) {
 			content = content.substring(0, 25) + "...";
 		}
-		return content;
+		return content.trim();
 	}
 }

@@ -762,6 +762,10 @@ export class Edit implements EditIntf {
         }
     }
 
+    addBookmark = (node: J.NodeInfo, state: AppState): void => {
+        this.createNode(node, J.NodeType.BOOKMARK, true, state);
+    }
+
     /* If node is non-null that means this is a reply to that 'node' but if node is 'null' that means
     this user just probably clicked "New Post" on their Feed Tab and so we will let the server create some node
     like "My Posts" in the root of the user's account to host this new 'reply' by creating the new node under that */

@@ -130,8 +130,18 @@ export class NodeCompRow extends Div {
         this.attribs.style = style;
 
         let header: CompIntf = null;
+        let jumpButton: CompIntf = null;
         if (this.allowHeaders && state.userPreferences.showMetaData) {
             header = new NodeCompRowHeader(node, true, true, false, false);
+        }
+        else {
+            const targetId = S.props.getNodePropVal(J.NodeProp.TARGET_ID, node);
+            if (targetId) {
+                jumpButton = new IconButton("fa-arrow-right", null, {
+                        onClick: () => S.view.refreshTree(targetId, true, true, targetId, false, true, true, state),
+                        title: "Jump to the Node"
+                    }, "float-right");
+            }
         }
 
         // if editMode is on, an this isn't the page root node
@@ -147,6 +157,7 @@ export class NodeCompRow extends Div {
                 className: "clearfix",
                 id: "button_bar_clearfix_" + node.id
             }) : null,
+            jumpButton,
             new NodeCompContent(node, true, true, null, null, this.imgSizeOverride, true),
             this.allowHeaders ? new NodeCompRowFooter(node, false) : null
         ]);

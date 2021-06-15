@@ -117,6 +117,9 @@ public class NodeEditService {
 	@Autowired
 	private AppProp appProp;
 
+	@Autowired
+	private NodeRenderService render;
+
 	/*
 	 * Creates a new node as a *child* node of the node specified in the request. Should ONLY be called
 	 * by the controller that accepts a node being created by the GUI/user
@@ -161,6 +164,12 @@ public class NodeEditService {
 			return res;
 		}
 
+		if (NodeType.BOOKMARK.s().equals(req.getTypeName())) {
+			SubNode nodeToBookmark = node;
+			node = read.getUserNodeByType(session, session.getUserName(), null, "### Bookmarks", NodeType.BOOKMARK_LIST.s(), null,
+					null);
+			req.setContent(render.getFirstLineAbbreviation(nodeToBookmark.getContent()));
+		} else
 		/*
 		 * need a more pluggable approach to special cases like this. For RSS Feeds we want a containment
 		 * node so that the feed doesn't get rendered until the user expands so we have to have an extra
@@ -192,6 +201,10 @@ public class NodeEditService {
 
 		newNode.setContent(parentHashTags + (req.getContent() != null ? req.getContent() : ""));
 		newNode.touch();
+
+		if (NodeType.BOOKMARK.s().equals(req.getTypeName())) {
+			newNode.setProp(NodeProp.TARGET_ID.s(), req.getNodeId());
+		}
 
 		if (req.isTypeLock()) {
 			newNode.setProp(NodeProp.TYPE_LOCK.s(), Boolean.valueOf(true));
@@ -312,7 +325,6 @@ public class NodeEditService {
 		content += data;
 		newNode.setContent(content);
 		newNode.touch();
-
 		update.save(session, newNode);
 
 		res.setMessage("Drop Accepted: Created link to: " + data);
@@ -601,8 +613,10 @@ public class NodeEditService {
 		return res;
 	}
 
-	/* Whenever a friend node is saved, we send the "following" request to the foreign ActivityPub server
-	*/
+	/*
+	 * Whenever a friend node is saved, we send the "following" request to the foreign ActivityPub
+	 * server
+	 */
 	public void updateSavedFriendNode(SubNode node) {
 		String userNodeId = node.getStrProp(NodeProp.USER_NODE_ID.s());
 
