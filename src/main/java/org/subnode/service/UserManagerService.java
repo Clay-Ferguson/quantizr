@@ -15,6 +15,7 @@ import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;
 import org.subnode.actpub.ActPubCache;
 import org.subnode.actpub.ActPubFollower;
@@ -54,8 +55,8 @@ import org.subnode.request.SaveUserPreferencesRequest;
 import org.subnode.request.SaveUserProfileRequest;
 import org.subnode.request.SignupRequest;
 import org.subnode.request.base.RequestBase;
-import org.subnode.response.BlockUserResponse;
 import org.subnode.response.AddFriendResponse;
+import org.subnode.response.BlockUserResponse;
 import org.subnode.response.ChangePasswordResponse;
 import org.subnode.response.CloseAccountResponse;
 import org.subnode.response.FriendInfo;
@@ -1047,7 +1048,7 @@ public class UserManagerService {
 		if (parentNode == null)
 			return null;
 
-		for (SubNode friendNode : read.getChildren(session, parentNode, null, null, 0)) {
+		for (SubNode friendNode : read.getChildren(session, parentNode, Sort.by(Sort.Direction.ASC, SubNode.FIELD_ORDINAL), null, 0)) {
 			nodeList.add(friendNode);
 		}
 		return nodeList;

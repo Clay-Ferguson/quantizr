@@ -169,7 +169,8 @@ public class NodeEditService {
 			node = read.getUserNodeByType(session, session.getUserName(), null, "### Bookmarks", NodeType.BOOKMARK_LIST.s(), null,
 					null);
 			req.setContent(render.getFirstLineAbbreviation(nodeToBookmark.getContent()));
-		} else
+		} 
+		else
 		/*
 		 * need a more pluggable approach to special cases like this. For RSS Feeds we want a containment
 		 * node so that the feed doesn't get rendered until the user expands so we have to have an extra

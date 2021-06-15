@@ -195,7 +195,7 @@ export class MenuPanel extends Div {
                 bookmarkItems.push(new MenuItemSeparator());
             }
 
-            bookmarkItems.push(new MenuItem("Manage", MenuPanel.openBookmarksNode, !state.isAnonUser));
+            bookmarkItems.push(new MenuItem("Manage...", MenuPanel.openBookmarksNode, !state.isAnonUser));
             children.push(new Menu("Bookmarks", bookmarkItems));
         }
 
