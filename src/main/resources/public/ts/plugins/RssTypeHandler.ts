@@ -138,7 +138,6 @@ export class RssTypeHandler extends TypeBase {
             }
 
             let url = S.util.getRemoteHost() + "/multiRssFeed?url=" + encodeURIComponent(feedSrc) + "&page=" + page;
-            // Log.log("RSS Query: " + url);
 
             // console.log("Reading RSS: " + url);
             parser.parseURL(url, (err, feed) => {
@@ -152,6 +151,7 @@ export class RssTypeHandler extends TypeBase {
                 }
                 else {
                     dispatch("Action_RSSUpdated", (s: AppState): AppState => {
+                        S.meta64.tabScrollTop(C.TAB_MAIN);
                         if (!feed.items || feed.items.length === 0) {
                             s.feedCache[feedSrcHash] = RssTypeHandler.lastGoodFeed;
                             s.feedPage[feedSrcHash] = RssTypeHandler.lastGoodPage;
@@ -164,14 +164,6 @@ export class RssTypeHandler extends TypeBase {
                             RssTypeHandler.lastGoodFeed = feed;
                             RssTypeHandler.lastGoodPage = s.feedPage[feedSrcHash];
                         }
-
-                        setTimeout(() => {
-                            S.view.scrollAllTop();
-                            // finally this is working with 2 second delay here. Not sure
-                            // what controls the min here. I 'think' CPU power may be the controlling factor
-                            // but it might be something else. Leaving as 2secs for now.
-                        }, 2000);
-
                         return s;
                     });
                 }
