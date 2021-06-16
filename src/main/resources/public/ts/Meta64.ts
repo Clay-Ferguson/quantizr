@@ -859,6 +859,13 @@ export class Meta64 implements Meta64Intf {
         );
     }
 
+    setUserPreferences = (state: AppState, flag: boolean) => {
+        if (flag !== state.userPreferences.editMode) {
+            state.userPreferences.editMode = flag;
+            S.meta64.saveUserPreferences(state);
+        }
+    }
+
     saveUserPreferences = (state: AppState): void => {
         S.util.ajax<J.SaveUserPreferencesRequest, J.SaveUserPreferencesResponse>("saveUserPreferences", {
             userPreferences: state.userPreferences

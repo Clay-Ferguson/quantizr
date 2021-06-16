@@ -2,7 +2,9 @@ import { ReactNode } from "react";
 import { Constants as C } from "../Constants";
 import { PubSub } from "../PubSub";
 import { Singletons } from "../Singletons";
+import { CompIntf } from "./base/CompIntf";
 import { Div } from "./Div";
+import { Span } from "./Span";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
@@ -11,7 +13,8 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
 
 export class MenuItem extends Div {
 
-    constructor(public name: string, public clickFunc: Function, enabled: boolean = true, private stateFunc: Function = null) {
+    constructor(public name: string, public clickFunc: Function, enabled: boolean = true, private stateFunc: Function = null,
+        private floatRightComp: CompIntf = null) {
         super(name);
         this.onClick = this.onClick.bind(this);
         this.setEnabled(enabled);
@@ -24,9 +27,14 @@ export class MenuItem extends Div {
         let enablementClass = state.enabled ? "mainMenuItemEnabled" : "disabled mainMenuItemDisabled";
 
         let prefix = this.stateFunc && this.stateFunc() ? (S.render.CHAR_CHECKMARK + " ") : "";
+        this.setChildren([
+            new Span(null, {
+                dangerouslySetInnerHTML: { __html: S.render.parseEmojis(prefix + state.content) }
+            }),
+            this.floatRightComp
+        ]);
 
-        return this.tagRender("div", null /* state.content (if doing 'dangerously' set below, don't need this) */, {
-            dangerouslySetInnerHTML: { __html: S.render.parseEmojis(prefix + state.content) },
+        return this.tagRender("div", null, {
             ...this.attribs,
             ...enablement,
             ...{

@@ -61,6 +61,7 @@ export interface Meta64Intf {
     processUrlParams(state: AppState): void;
     displaySignupMessage(): void
     loadAnonPageHome(state: AppState): void;
+    setUserPreferences(state: AppState, flag: boolean): void;
     saveUserPreferences(state: AppState): void;
     openSystemFile(fileName: string);
     setStateVarsUsingLoginResponse(res: J.LoginResponse): void;

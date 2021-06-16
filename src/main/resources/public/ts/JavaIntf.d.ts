@@ -4,6 +4,7 @@
 export interface Bookmark {
     name: string;
     id: string;
+    selfId: string;
 }
 
 export interface UserProfile {

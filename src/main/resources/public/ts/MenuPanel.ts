@@ -1,5 +1,5 @@
 import { useSelector } from "react-redux";
-import { appState } from "./AppRedux";
+import { appState, store } from "./AppRedux";
 import { AppState } from "./AppState";
 import { Constants as C } from "./Constants";
 import { ConfirmDlg } from "./dlg/ConfirmDlg";
@@ -19,6 +19,7 @@ import * as J from "./JavaIntf";
 import { PubSub } from "./PubSub";
 import { Singletons } from "./Singletons";
 import { Div } from "./widget/Div";
+import { Icon } from "./widget/Icon";
 import { Menu } from "./widget/Menu";
 import { MenuItem } from "./widget/MenuItem";
 import { MenuItemSeparator } from "./widget/MenuItemSeparator";
@@ -55,7 +56,8 @@ export class MenuPanel extends Div {
     };
 
     static openBookmarksNode = () => {
-        // todo-0: flip on edit mode here?
+        let state = store.getState();
+        S.meta64.setUserPreferences(state, true);
         S.nav.openContentNode("~" + J.NodeType.BOOKMARK_LIST);
     };
 
@@ -177,16 +179,31 @@ export class MenuPanel extends Div {
             ...this.siteNavCustomItems(state)
         ]));
 
-        let messagesSuffix = state.newMessageCount > 0
-            ? " (" + state.newMessageCount + " new)" : "";
+        children.push(new Menu("My Nodes", [
+            new MenuItem("Account", S.nav.navHome, !state.isAnonUser),
+            new MenuItem("Home", MenuPanel.openHomeNode, !state.isAnonUser),
+            new MenuItemSeparator(), //
+            new MenuItem("RSS Feeds", MenuPanel.openRSSFeedsNode, !state.isAnonUser),
+            new MenuItem("Notes", MenuPanel.openNotesNode, !state.isAnonUser),
+            new MenuItem("Exports", MenuPanel.openExportsNode, !state.isAnonUser)
+        ]));
 
         if (!state.isAnonUser) {
             let bookmarkItems = [];
             if (state.bookmarks) {
                 state.bookmarks.forEach((bookmark: J.Bookmark): boolean => {
-                    // todo-1: would be nice to have a float-right edit icon that jumps to the bookmark node
-                    // itself for editing or deleting...
-                    bookmarkItems.push(new MenuItem(bookmark.name, () => S.view.jumpToId(bookmark.id)));
+                    bookmarkItems.push(new MenuItem(bookmark.name, () => S.view.jumpToId(bookmark.id), true, null,
+                        new Icon({
+                            className: "fa fa-edit fa-lg float-right menuIcon",
+                            title: "Edit this bookmark",
+                            onClick: (event: any) => {
+                                event.stopPropagation();
+                                event.preventDefault();
+                                S.meta64.setUserPreferences(state, true);
+                                S.view.jumpToId(bookmark.selfId);
+                            }
+                        })
+                    ));
                     return true;
                 });
             }
@@ -199,6 +216,9 @@ export class MenuPanel extends Div {
             children.push(new Menu("Bookmarks", bookmarkItems));
         }
 
+        let messagesSuffix = state.newMessageCount > 0
+            ? " (" + state.newMessageCount + " new)" : "";
+
         children.push(new Menu("Messages" + messagesSuffix, [
             new MenuItem("To/From Me" + messagesSuffix, MenuPanel.messagesToFromMe, !state.isAnonUser),
             new MenuItem("From Friends", MenuPanel.messagesFromFriends, !state.isAnonUser),
@@ -206,15 +226,6 @@ export class MenuPanel extends Div {
             new MenuItem("All Fediverse", MenuPanel.messagesFediverse, !state.isAnonUser),
             new MenuItemSeparator(), //
             new MenuItem("My Posts", MenuPanel.openPostsNode, !state.isAnonUser)
-        ]));
-
-        children.push(new Menu("My Nodes", [
-            new MenuItem("Account", S.nav.navHome, !state.isAnonUser),
-            new MenuItem("Home", MenuPanel.openHomeNode, !state.isAnonUser),
-            new MenuItemSeparator(), //
-            new MenuItem("RSS Feeds", MenuPanel.openRSSFeedsNode, !state.isAnonUser),
-            new MenuItem("Notes", MenuPanel.openNotesNode, !state.isAnonUser),
-            new MenuItem("Exports", MenuPanel.openExportsNode, !state.isAnonUser)
         ]));
 
         children.push(new Menu("Users", [

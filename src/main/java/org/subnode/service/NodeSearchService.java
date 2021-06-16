@@ -271,6 +271,7 @@ public class NodeSearchService {
 				Bookmark bm = new Bookmark();
 				bm.setName(bmNode.getContent());
 				bm.setId(targetId);
+				bm.setSelfId(bmNode.getId().toHexString());
 				bookmarks.add(bm);
 			}
 		}
