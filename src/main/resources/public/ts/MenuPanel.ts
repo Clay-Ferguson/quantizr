@@ -192,8 +192,8 @@ export class MenuPanel extends Div {
             let bookmarkItems = [];
             if (state.bookmarks) {
                 state.bookmarks.forEach((bookmark: J.Bookmark): boolean => {
-                    bookmarkItems.push(new MenuItem(bookmark.name, () => S.view.jumpToId(bookmark.id), true, null,
-                        new Icon({
+                    bookmarkItems.push(new MenuItem(bookmark.name, () => S.view.jumpToId(bookmark.id || bookmark.selfId), true, null,
+                    bookmark.id ? new Icon({
                             className: "fa fa-edit fa-lg float-right menuIcon",
                             title: "Edit this bookmark",
                             onClick: (event: any) => {
@@ -202,7 +202,7 @@ export class MenuPanel extends Div {
                                 S.meta64.setUserPreferences(state, true);
                                 S.view.jumpToId(bookmark.selfId);
                             }
-                        })
+                        }) : null
                     ));
                     return true;
                 });
@@ -275,7 +275,7 @@ export class MenuPanel extends Div {
         typeHandlers.forEach((typeHandler: TypeHandlerIntf, k: string): boolean => {
             if (state.isAdminUser || typeHandler.getAllowUserSelect()) {
                 // todo-0: is 'false' pending flag good here? Check if abandon/canceled edits persist on tree
-                createMenuItems.push(new MenuItem(typeHandler.getName(), () => S.edit.createNode(hltNode, typeHandler.getTypeName(), false, state), //
+                createMenuItems.push(new MenuItem(typeHandler.getName(), () => S.edit.createNode(hltNode, typeHandler.getTypeName(), false, null, null, state), //
                     !state.isAnonUser && !!hltNode));
             }
             return true;

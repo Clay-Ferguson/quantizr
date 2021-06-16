@@ -75,6 +75,9 @@ public class NodeSearchService {
 	@Autowired
 	private UserManagerService userManagerService;
 
+	@Autowired
+	private NodeRenderService render;
+
 	public static Object trendingFeedInfoLock = new Object();
 	public static GetNodeStatsResponse trendingFeedInfo;
 
@@ -269,7 +272,8 @@ public class NodeSearchService {
 			for (SubNode bmNode : bookmarksNode) {
 				String targetId = bmNode.getStrProp(NodeProp.TARGET_ID);
 				Bookmark bm = new Bookmark();
-				bm.setName(bmNode.getContent());
+				String shortContent = render.getFirstLineAbbreviation(bmNode.getContent(), 100);
+				bm.setName(shortContent);
 				bm.setId(targetId);
 				bm.setSelfId(bmNode.getId().toHexString());
 				bookmarks.add(bm);

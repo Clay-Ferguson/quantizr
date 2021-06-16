@@ -348,6 +348,8 @@ export class RssTypeHandler extends TypeBase {
             };
         }
 
+        let shortTitle = null;
+        let feedTitle = null;
         if (entry.title) {
             /* If we are rendering a multiple RSS feed thing here then the title will have two parts here
                 that the server will have created using the "::" delimiter so we can use the left side of the
@@ -356,16 +358,17 @@ export class RssTypeHandler extends TypeBase {
                 */
             let colonIdx = entry.title.indexOf(" :: ");
             if (colonIdx !== -1) {
+                feedTitle = entry.title.substring(0, colonIdx);
                 let headerAttribs: any = {
-                    dangerouslySetInnerHTML: { __html: entry.title.substring(0, colonIdx) }
+                    dangerouslySetInnerHTML: { __html: feedTitle }
                 };
                 headerDivChildren.push(new Heading(5, null, headerAttribs));
 
-                let title = entry.title.substring(colonIdx + 4);
+                shortTitle = entry.title.substring(colonIdx + 4);
                 let anchorAttribs: any = {
                     className: "rssAnchor",
                     target: "_blank",
-                    dangerouslySetInnerHTML: { __html: title }
+                    dangerouslySetInnerHTML: { __html: shortTitle }
                 };
 
                 // If the entry.link is not given we default a click on it, to just play the audio.
@@ -378,6 +381,8 @@ export class RssTypeHandler extends TypeBase {
                 ]));
             }
             else {
+                shortTitle = entry.title;
+
                 let anchorAttribs: any = {
                     className: "rssAnchor marginBottom",
                     target: "_blank",
@@ -499,10 +504,23 @@ export class RssTypeHandler extends TypeBase {
             }
         }) : null;
 
+        let bookmarkIcon = new Icon({
+            className: "fa fa-bookmark fa-lg rssLinkIcon",
+            title: "Bookmark this RSS entry",
+            onClick: () => {
+                let content = "#### " + shortTitle + "\n";
+                if (feedTitle) {
+                    content += "\nFeed: " + feedTitle + "\n";
+                }
+                content += "\n" + entry.link;
+                S.edit.addRSSBookmark(content, state);
+            }
+        });
+
         let footerSpan = new Span(dateStr, { className: "marginRight" });
 
         children.push(new Div(null, { className: "float-right" }, [
-            footerSpan, postIcon, linkIcon
+            footerSpan, postIcon, linkIcon, bookmarkIcon
         ]));
         children.push(new Div(null, { className: "clearfix" }));
 

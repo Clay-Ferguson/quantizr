@@ -763,7 +763,11 @@ export class Edit implements EditIntf {
     }
 
     addBookmark = (node: J.NodeInfo, state: AppState): void => {
-        this.createNode(node, J.NodeType.BOOKMARK, true, state);
+        this.createNode(node, J.NodeType.BOOKMARK, true, null, null, state);
+    }
+
+    addRSSBookmark = (content: any, state: AppState): void => {
+        this.createNode(null, J.NodeType.BOOKMARK, true, "rssBookmark", content, state);
     }
 
     /* If node is non-null that means this is a reply to that 'node' but if node is 'null' that means
@@ -791,18 +795,19 @@ export class Edit implements EditIntf {
         });
     }
 
-    createNode = (node: J.NodeInfo, typeName: string, pendingEdit: boolean, state: AppState) => {
+    createNode = (node: J.NodeInfo, typeName: string, pendingEdit: boolean, payloadType: string, content: string, state: AppState) => {
         state = appState(state);
 
         S.util.ajax<J.CreateSubNodeRequest, J.CreateSubNodeResponse>("createSubNode", {
             pendingEdit,
-            nodeId: node.id,
+            nodeId: node ? node.id : null,
             newNodeName: "",
             typeName,
             createAtTop: true,
-            content: null,
+            content,
             typeLock: true,
-            properties: null
+            properties: null,
+            payloadType
         }, async (res) => {
             // auto-enable edit mode
             if (!state.userPreferences.editMode) {

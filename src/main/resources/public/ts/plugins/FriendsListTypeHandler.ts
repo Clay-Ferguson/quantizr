@@ -34,7 +34,7 @@ export class FriendsListTypeHandler extends TypeBase {
          not be a problem. */
         if (S.meta64.addFriendPending) {
             S.meta64.addFriendPending = false;
-            setTimeout(() => S.edit.createNode(node, J.NodeType.FRIEND, true, state), 500);
+            setTimeout(() => S.edit.createNode(node, J.NodeType.FRIEND, true, null, null, state), 500);
         }
 
         return new Div(null, null, [
@@ -42,7 +42,7 @@ export class FriendsListTypeHandler extends TypeBase {
                 className: "marginAll"
             }),
             new ButtonBar([
-                new Button("Add Friend", () => S.edit.createNode(node, J.NodeType.FRIEND, true, state), {
+                new Button("Add Friend", () => S.edit.createNode(node, J.NodeType.FRIEND, true, null, null, state), {
                     title: "Add a new Friend (i.e. Follow someone)"
                 })
             ], null, "float-right marginBottom"),

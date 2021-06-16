@@ -559,7 +559,7 @@ public class NodeRenderService {
 			}
 
 			String content = n.getContent();
-			content = render.getFirstLineAbbreviation(content);
+			content = render.getFirstLineAbbreviation(content, 25);
 
 			item.setTitle(content);
 			item.setId(n.getId().toHexString());
@@ -602,7 +602,7 @@ public class NodeRenderService {
 				} else if (content.startsWith("<[ENC]>")) {
 					content = "[encrypted]";
 				} else {
-					content = getFirstLineAbbreviation(content);
+					content = getFirstLineAbbreviation(content, 25);
 				}
 
 				bci.setName(content);
@@ -621,7 +621,7 @@ public class NodeRenderService {
 		}
 	}
 
-	public String getFirstLineAbbreviation(String content) {
+	public String getFirstLineAbbreviation(String content, int maxLen) {
 		if (content == null)
 			return null;
 
@@ -636,8 +636,8 @@ public class NodeRenderService {
 			content = content.substring(1);
 		}
 
-		if (content.length() > 25) {
-			content = content.substring(0, 25) + "...";
+		if (content.length() > maxLen) {
+			content = content.substring(0, maxLen) + "...";
 		}
 		return content.trim();
 	}

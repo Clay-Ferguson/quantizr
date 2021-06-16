@@ -66,6 +66,7 @@ export interface CreateSubNodeRequest extends RequestBase {
     createAtTop: boolean;
     typeLock: boolean;
     properties: PropertyInfo[];
+    payloadType?: string;
 }
 
 export interface DeleteAttachmentRequest extends RequestBase {

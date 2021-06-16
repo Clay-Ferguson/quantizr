@@ -45,10 +45,11 @@ export interface EditIntf {
     clearInbox(state: AppState): void;
     newSubNode(evt: Event, id: string);
     addNode(nodeId: string, content: string, state: AppState): void;
-    createNode(node: J.NodeInfo, typeName: string, pendingEdit: boolean, state: AppState): void;
+    createNode(node: J.NodeInfo, typeName: string, pendingEdit: boolean, payloadType: string, content: string, state: AppState): void;
     addCalendarEntry(initDate: number, state: AppState): void;
     moveNodeByDrop(targetNodeId: string, sourceNodeId: string, isFirts: boolean): void;
     initNodeEditResponse(res: J.InitNodeEditResponse, encrypt: boolean, showJumpButton: boolean, state: AppState): void;
     updateHeadings(state: AppState): void;
+    addRSSBookmark(content: string, state: AppState): void;
     addBookmark(node: J.NodeInfo, state: AppState): void;
 }

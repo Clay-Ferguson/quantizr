@@ -1,17 +1,17 @@
 package org.subnode.request;
 
 import java.util.List;
-
+import javax.annotation.Nullable;
 import org.subnode.model.PropertyInfo;
 import org.subnode.request.base.RequestBase;
 
 public class CreateSubNodeRequest extends RequestBase {
-	
+
 	private String nodeId;
 
 	private boolean pendingEdit;
-	private String content; //optional, default content
-	
+	private String content; // optional, default content
+
 	private String newNodeName;
 	private String typeName;
 	private boolean createAtTop;
@@ -19,8 +19,12 @@ public class CreateSubNodeRequest extends RequestBase {
 	/* Adds TYPE_LOCK property which prevents user from being able to change the type on the node */
 	private boolean typeLock;
 
-	//default properties to add, or null if none
+	// default properties to add, or null if none
 	private List<PropertyInfo> properties;
+
+	/* special purpose values for when creating special types of nodes */
+	@Nullable
+	private String payloadType;
 
 	public String getNodeId() {
 		return nodeId;
@@ -84,5 +88,13 @@ public class CreateSubNodeRequest extends RequestBase {
 
 	public void setPendingEdit(boolean pendingEdit) {
 		this.pendingEdit = pendingEdit;
+	}
+
+	public String getPayloadType() {
+		return payloadType;
+	}
+
+	public void setPayloadType(String payloadType) {
+		this.payloadType = payloadType;
 	}
 }

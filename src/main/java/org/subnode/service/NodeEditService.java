@@ -130,6 +130,7 @@ public class NodeEditService {
 			session = ThreadLocals.getMongoSession();
 		}
 
+		boolean rssBookmark = "rssBookmark".equals(req.getPayloadType());
 		String nodeId = req.getNodeId();
 		boolean makePublic = false;
 		SubNode node = null;
@@ -138,7 +139,7 @@ public class NodeEditService {
 		 * If this is a "New Post" from the Feed tab we get here with no ID but we put this in user's
 		 * "My Posts" node
 		 */
-		if (nodeId == null) {
+		if (nodeId == null && !rssBookmark) {
 			node = read.getUserNodeByType(session, null, null,
 					"### " + ThreadLocals.getSessionContext().getUserName() + "'s Public Posts", NodeType.POSTS.s(),
 					Arrays.asList(PrivilegeType.READ.s()), NodeName.POSTS);
@@ -150,7 +151,7 @@ public class NodeEditService {
 		}
 
 		/* Node still null, then try other ways of getting it */
-		if (node == null) {
+		if (node == null && !rssBookmark) {
 			if (nodeId.equals("~" + NodeType.NOTES.s())) {
 				node = read.getUserNodeByType(session, session.getUserName(), null, "### Notes", NodeType.NOTES.s(), null, null);
 			} else {
@@ -158,19 +159,18 @@ public class NodeEditService {
 			}
 		}
 
-		if (node == null) {
-			res.setMessage("unable to locate parent for insert");
-			res.setSuccess(false);
-			return res;
-		}
-
 		if (NodeType.BOOKMARK.s().equals(req.getTypeName())) {
+			
+			//Note: if rssBookmark node will null here. that's fine.
 			SubNode nodeToBookmark = node;
+
 			node = read.getUserNodeByType(session, session.getUserName(), null, "### Bookmarks", NodeType.BOOKMARK_LIST.s(), null,
 					null);
-			req.setContent(render.getFirstLineAbbreviation(nodeToBookmark.getContent()));
-		} 
-		else
+
+			if (!rssBookmark) {
+				req.setContent(render.getFirstLineAbbreviation(nodeToBookmark.getContent(), 100));
+			}
+		} else
 		/*
 		 * need a more pluggable approach to special cases like this. For RSS Feeds we want a containment
 		 * node so that the feed doesn't get rendered until the user expands so we have to have an extra
@@ -184,6 +184,12 @@ public class NodeEditService {
 			holderNode.touch();
 			update.save(session, holderNode);
 			node = holderNode;
+		}
+
+		if (node == null) {
+			res.setMessage("unable to locate parent for insert");
+			res.setSuccess(false);
+			return res;
 		}
 
 		CreateNodeLocation createLoc = req.isCreateAtTop() ? CreateNodeLocation.FIRST : CreateNodeLocation.LAST;

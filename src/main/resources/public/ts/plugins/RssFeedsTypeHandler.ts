@@ -34,7 +34,7 @@ export class RssFeedsTypeHandler extends TypeBase {
             }),
             new ButtonBar([
                 // todo-0: is 'false' pending flag good here? Check if abandon/canceled edits persist on tree
-                new Button("Add RSS Feed", () => S.edit.createNode(node, J.NodeType.RSS_FEED, false, state), {
+                new Button("Add RSS Feed", () => S.edit.createNode(node, J.NodeType.RSS_FEED, false, null, null, state), {
                     title: "Add a new RSS Feed Subscription"
                 })
             ], null, "float-right marginBottom"),
