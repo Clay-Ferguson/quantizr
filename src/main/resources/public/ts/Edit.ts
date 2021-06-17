@@ -308,11 +308,17 @@ export class Edit implements EditIntf {
     toggleEditMode = async (state: AppState): Promise<void> => {
         state.userPreferences.editMode = !state.userPreferences.editMode;
         S.meta64.saveUserPreferences(state);
+
+        /* scrolling is required because nodes will have scrolled out of view by the page just now updating */
+        S.view.scrollToSelectedNode(state);
     }
 
     toggleShowMetaData = async (state: AppState): Promise<void> => {
         state.userPreferences.showMetaData = !state.userPreferences.showMetaData;
         S.meta64.saveUserPreferences(state);
+
+         /* scrolling is required because nodes will have scrolled out of view by the page just now updating */
+        S.view.scrollToSelectedNode(state);
     }
 
     moveNodeUp = (evt: Event, id: string, state?: AppState): void => {
