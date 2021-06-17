@@ -26,8 +26,6 @@ export interface UtilIntf {
     escapeHtml(str: string): string;
     replaceAll(s: string, find: string, replace: string): string;
     contains(s: string, str: string): boolean;
-    startsWith(s: string, str: string): boolean;
-    endsWith(s: string, str: string): boolean;
     chopAtLastChar(str: string, char: string): string;
     stripIfStartsWith(s: string, str: string): string;
     stripIfEndsWith(s: string, str: string): string;

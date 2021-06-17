@@ -378,7 +378,7 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
     hasAnyZipFiles = (): boolean => {
         let ret: boolean = false;
         for (let file of this.fileList) {
-            if (file.name && S.util.endsWith(file.name.toLowerCase(), ".zip")) {
+            if (file.name && file.name.toLowerCase().endsWith(".zip")) {
                 return true;
             }
         }

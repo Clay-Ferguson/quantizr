@@ -246,18 +246,10 @@ export class Util implements UtilIntf {
         return s.replace(new RegExp(this.escapeRegExp(find), "g"), replace);
     }
 
+    // todo-0: get rid of this. JS does it.
     contains = (s: string, str: string): boolean => {
         if (!s) return false;
         return s.indexOf(str) !== -1;
-    }
-
-    startsWith = (s: string, str: string): boolean => {
-        if (!s) return false;
-        return s.indexOf(str) === 0;
-    }
-
-    endsWith = (s: string, str: string): boolean => {
-        return s.indexOf(str, s.length - str.length) !== -1;
     }
 
     chopAtLastChar = (str: string, char: string): string => {
@@ -271,14 +263,15 @@ export class Util implements UtilIntf {
     }
 
     stripIfStartsWith = (s: string, str: string): string => {
-        if (this.startsWith(s, str)) {
+        if (s.startsWith(str)) {
             return s.substring(str.length);
         }
         return s;
     }
 
+    /* chops 'str' off 's' if exists */
     stripIfEndsWith = (s: string, str: string): string => {
-        if (this.endsWith(s, str)) {
+        if (s.endsWith(str)) {
             return s.substring(0, s.length - str.length);
         }
         return s;
@@ -685,7 +678,7 @@ export class Util implements UtilIntf {
     }
 
     elementExists = (id: string): boolean => {
-        if (this.startsWith(id, "#")) {
+        if (id.startsWith("#")) {
             id = id.substring(1);
         }
 
@@ -789,7 +782,7 @@ export class Util implements UtilIntf {
     */
     domElm = (id: string): HTMLElement => {
 
-        if (this.startsWith(id, "#")) {
+        if (id.startsWith("#")) {
             console.log("whenElm removed obsolete preceding # from ID " + id);
             id = id.substring(1);
         }
@@ -1456,8 +1449,16 @@ export class Util implements UtilIntf {
 
     getUrlsFromText = (text: string): string[] => {
         if (!text) return null;
-        text = this.replaceAll(text, "(http://", "");
-        text = this.replaceAll(text, "(https://", "");
+
+        // this crap is really ugly. I need to just write code to scan byte by byte
+        // to do an algorithm to pull out urls. This regex way is garbage.
+        // and yes I know these 'replaceAll' calls CAN be doen with regex, but this whole
+        // thing will be rewritten soon. todo-0
+        text = this.replaceAll(text, "(", " ");
+        text = this.replaceAll(text, ")", " ");
+        text = this.replaceAll(text, "\"", " ");
+        text = this.replaceAll(text, "'", " ");
+
         let urlRegex = /(https?:\/\/[^\s]+)/g;
         return text.match(urlRegex);
     }
