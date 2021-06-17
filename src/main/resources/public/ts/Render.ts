@@ -366,7 +366,10 @@ export class Render implements RenderIntf {
         try {
             // console.log("renderPageFromData: " + S.util.prettyPrint(res));
             dispatch("Action_RenderPage", (s: AppState): AppState => {
-                S.meta64.tabScrollTop(C.TAB_MAIN);
+
+                // if (allowScroll) {
+                //     S.meta64.tabScrollTop(C.TAB_MAIN);
+                // }
                 // console.log("update state in Action_RenderPage");
 
                 if (!s.activeTab || clickTab) {

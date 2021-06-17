@@ -254,6 +254,7 @@ export class Meta64 implements Meta64Intf {
 
     /* Returns true if successful */
     highlightRowById = (id: string, scroll: boolean, state: AppState): boolean => {
+        // console.log("highlightRowById: " + id);
         let node: J.NodeInfo = state.idToNodeMap.get(id);
         let ret = true;
 
@@ -276,6 +277,7 @@ export class Meta64 implements Meta64Intf {
     }
 
     highlightNode = (node: J.NodeInfo, scroll: boolean, state: AppState): void => {
+        // console.log("highlghtNode");
         if (!node || !state.node) {
             return;
         }
@@ -319,6 +321,24 @@ export class Meta64 implements Meta64Intf {
             ret = state.idToNodeMap.get(id);
             return false;
         });
+        return ret;
+    }
+
+    /* Returns true if this node is able to have an effect on the tree, such that if it changed
+    we would need to re-render the tree. For root top level call node==state.node */
+    nodeIdIsVisible = (node: J.NodeInfo, nodeId: string, parentPath: string, state: AppState): boolean => {
+        if (!nodeId || !node) return false;
+        if (node.id === nodeId || node.path === parentPath) return true;
+
+        let ret = false;
+        if (node.children) {
+            // for now we do ONE level, and this would fail for
+            node.children.forEach((n: any) => {
+                if (this.nodeIdIsVisible(n, nodeId, parentPath, state)) {
+                    ret = true;
+                }
+            }, this);
+        }
         return ret;
     }
 

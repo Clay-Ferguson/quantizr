@@ -75,4 +75,5 @@ export interface Meta64Intf {
     showPublicFediverse(): void;
     tabScrollTop(tabName?: string): void;
     loadBookmarks(): void;
+    nodeIdIsVisible(node: J.NodeInfo, nodeId: string, parentPath: string, state: AppState): boolean;
 }

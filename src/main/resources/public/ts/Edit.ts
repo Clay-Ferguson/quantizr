@@ -259,7 +259,29 @@ export class Edit implements EditIntf {
     saveNodeResponse = async (node: J.NodeInfo, res: J.SaveNodeResponse, allowScroll: boolean, state: AppState): Promise<void> => {
         if (S.util.checkSuccess("Save node", res)) {
             await this.distributeKeys(node, res.aclEntries);
-            S.view.refreshTree(null, false, false, node.id, false, allowScroll, false, state);
+
+            // It's possible to end up editing a node that's not even on the page, or a child of a node on the page,
+            // and so before refreshing the screen we check for that edge case.
+            // console.log("saveNodeResponse: " + S.util.prettyPrint(node));
+
+            // could move this 'getParentPath' into a utility function. we have it at least two places (todo-0)
+            let slashIdx: number = node.path.lastIndexOf("/");
+            if (slashIdx === -1) return;
+            let parentPath = node.path.substring(0, slashIdx);
+
+            // I had expected the save to have already move into the non-pending folder by now,
+            // but i haven't investigated yet, this must be right.
+            if (parentPath.startsWith("/r/p")) {
+                parentPath = S.util.replaceAll(parentPath, "/r/p", "/r");
+            }
+
+            if (S.meta64.nodeIdIsVisible(state.node, node.id, parentPath, state)) {
+                S.view.refreshTree(null, false, false, node.id, false, allowScroll, false, state);
+            }
+            else {
+                console.log("Bypassing rerender. nodeId " + node.id + " will have no affect on the tree appearance.");
+            }
+
             if (state.fullScreenCalendarId) {
                 S.render.showCalendar(state.fullScreenCalendarId, state);
             }

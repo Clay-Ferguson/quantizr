@@ -23,7 +23,7 @@ export class View implements ViewIntf {
     // todo-0: there are a few places this method should be used which aren't yet.
     jumpToId = (id: string): void => {
         let state = store.getState();
-        S.view.refreshTree(id, true, true, id, false, true, true, state);
+        this.refreshTree(id, true, true, id, false, true, true, state);
     }
 
     /*
@@ -215,6 +215,7 @@ export class View implements ViewIntf {
                     // console.log("Got first element: " + elm.firstElementChild);
                     elm = elm.firstElementChild;
                 }
+                // console.log("scrollIntoView");
                 elm.scrollIntoView(true);
             }
             else {

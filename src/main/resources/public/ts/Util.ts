@@ -1431,10 +1431,18 @@ export class Util implements UtilIntf {
                     }
                     response.text()
                         .then(html => {
-                            ogs({ html })
-                                .then((data) => {
-                                    callback(!data || data.error ? null : data.result);
-                                });
+                            try {
+                                ogs({ html })
+                                    .then((data: any) => {
+                                        callback(!data || data.error ? null : data.result);
+                                    })
+                                    .catch((err: any) => {
+                                        callback(null);
+                                    });
+                            }
+                            catch (e) {
+                                callback(null);
+                            }
                         });
                 })
                 .catch(err => {
