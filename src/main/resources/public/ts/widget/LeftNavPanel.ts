@@ -51,7 +51,7 @@ export class LeftNavPanel extends Div {
             ]),
 
             new Div(null, {
-                className: "float-right menuContainer"
+                className: "menuContainer"
             }, [
                 new MenuPanel(state)
             ])

@@ -47,7 +47,7 @@ export const useAppState = (state?: AppState): AppState => {
 };
 
 export const dispatch = (actionName: string, update: (state: AppState) => AppState) => {
-    // Log.log("Dispatch Running: " + action.type);
+    // console.log("Dispatch Running: " + actionName);
     store.dispatch({ type: actionName, update });
     // Log.log("Dispatch Complete: " + action.type);
 };

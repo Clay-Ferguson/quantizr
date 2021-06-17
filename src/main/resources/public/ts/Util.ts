@@ -1421,52 +1421,52 @@ export class Util implements UtilIntf {
     /* Queries the url for 'Open Graph' data and sendes it back using the callback */
     loadOpenGraph = (urlRemote: string, callback: Function): void => {
         // query thru proxyGet because of CORS.
-        let url = S.util.getRemoteHost() + "/proxyGet?url=" + encodeURIComponent(urlRemote);
-        fetch(url)
-            .then(response => {
-                response.text()
-                    .then((html) => {
-                        ogs({ html })
-                            .then((data) => {
-                                const { error, result } = data;
-                                callback(error ? null : result);
-                            });
-                    });
-            })
-            .catch(err => {
-                callback(null);
-            });
+        try {
+            let url = S.util.getRemoteHost() + "/proxyGet?url=" + encodeURIComponent(urlRemote);
+            fetch(url)
+                .then(response => {
+                    if (!response) {
+                        callback(null);
+                        return;
+                    }
+                    response.text()
+                        .then(html => {
+                            ogs({ html })
+                                .then((data) => {
+                                    callback(!data || data.error ? null : data.result);
+                                });
+                        });
+                })
+                .catch(err => {
+                    callback(null);
+                });
+        }
+        catch (e) {
+            // ignore
+        }
     }
 
-    // todo-0: be sure this also can detect urls inside parenthesis and with any kind of terminal \n \r \t
     getUrlsFromText = (text: string): string[] => {
         if (!text) return null;
+        text = this.replaceAll(text, "(http://", "");
+        text = this.replaceAll(text, "(https://", "");
         let urlRegex = /(https?:\/\/[^\s]+)/g;
-        let ret = [];
-
-        // Is there a better way to collect matches than using 'replace' ?
-        text.replace(urlRegex, function (url) {
-            // console.log("URL FOUND: " + url);
-            ret.push(url);
-            return url;
-        });
-        return ret;
+        return text.match(urlRegex);
     }
 
     addOpenGraphUrls = (urls: string[]): void => {
         if (!urls || urls.length === 0) return;
         urls.forEach(url => {
             if (!S.meta64.openGraphData.has(url)) {
-                console.log("Queueing OG: " + url);
+                // console.log("Queueing OG: " + url);
                 S.meta64.openGraphData.set(url, null);
 
                 this.loadOpenGraph(url, (ogData: any) => {
+                    // console.log("loadOpenGraph callback.");
                     // if the url failed to load, we get here with ogData==null and that's correct.
                     S.meta64.openGraphData.set(url, ogData);
                     if (ogData) {
-                        dispatch("Action_OGUpdated", (s: AppState): AppState => {
-                            return s;
-                        });
+                        S.render.autoRender = true;
                     }
                 });
             }

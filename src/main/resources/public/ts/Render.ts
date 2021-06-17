@@ -30,10 +30,21 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (s: Singletons) => {
     S = s;
 });
 
+// this allows us to throttle rendering, mainly that's triggered by OpenGraph results streaming in.
+setInterval(() => {
+    if (S && S.render.autoRender) {
+        S.render.autoRender = false;
+        dispatch("Action_autoRender", (s: AppState): AppState => {
+            return s;
+        });
+    }
+}, 1200);
+
 export class Render implements RenderIntf {
 
     private debug: boolean = false;
     private markedRenderer = null;
+    autoRender = false;
 
     CHAR_CHECKMARK = "&#10004;";
 
@@ -610,13 +621,18 @@ export class Render implements RenderIntf {
         let desc = o.ogDecsciption || o.twitterDescription;
         let image = o.ogImage || o.twitterImage;
 
+        // todo-1: need to detect when there's an image width specified (image.width?) that is
+        // less than what is in openGraphImage, and then use that with
+
         return new Div(null, { className: "openGraphPanel" }, [
             o.ogUrl ? new Anchor(o.ogUrl, title, {
                 target: "_blank",
                 className: "openGraphTitle"
-            }) : title,
+            }) : new Div(title, {
+                className: "openGraphTitle"
+            }),
             new Div(desc),
-            image ? new Img(null, {
+            image && image.url ? new Img(null, {
                 className: "openGraphImage",
                 src: image.url
             }) : null

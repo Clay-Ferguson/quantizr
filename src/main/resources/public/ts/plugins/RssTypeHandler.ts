@@ -508,12 +508,14 @@ export class RssTypeHandler extends TypeBase {
             className: "fa fa-bookmark fa-lg rssLinkIcon",
             title: "Bookmark this RSS entry",
             onClick: () => {
-                let content = "#### " + shortTitle + "\n";
-                if (feedTitle) {
-                    content += "\nFeed: " + feedTitle + "\n";
-                }
-                content += "\n" + entry.link;
-                S.edit.addRSSBookmark(content, state);
+                // Now that we have "Open Graph" we don't
+                // need the content. User can still enter it at will.
+                // let content = "#### " + shortTitle + "\n";
+                // if (feedTitle) {
+                //     content += "\nFeed: " + feedTitle + "\n";
+                // }
+                // content += "\n" + entry.link;
+                S.edit.addRSSBookmark(entry.link, state);
             }
         });
 
