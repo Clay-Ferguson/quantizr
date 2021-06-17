@@ -87,7 +87,12 @@ export class NodeCompMarkdown extends Html {
             val = S.util.markdown(val);
 
             /* parse tags, to build OpenGraph */
-            this.parseAnchorTags(val);
+            let state: AppState = store.getState();
+
+            // allow any node to have NO_OPEN_GRAPH set on it for special cases where we want OG disabled for all children.
+            if (!(state.node && S.props.getNodePropVal(J.NodeProp.NO_OPEN_GRAPH, state.node))) {
+                this.parseAnchorTags(val);
+            }
         }
         return val;
     }

@@ -164,6 +164,7 @@ public enum NodeProp {
     PRIORITY("priority", "s"), //
     LAYOUT("layout", "s"), //
     ORDER_BY("orderBy", "s"),
+    NO_OPEN_GRAPH("noOpenGraph", "s"), //
 
     TYPE_LOCK("sn:typLoc", "s"), //
     DATE("date", "s"), //
