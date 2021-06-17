@@ -18,6 +18,9 @@ export class NodeCompMarkdown extends Html {
     on so nodes shared to you can be seen, because a user can't edit nodes they don't own */
     private autoDecrypting: boolean = true;
 
+    // When the rendered content contains urls we will load the "Open Graph" data and display it below the content.
+    urls: string[];
+
     constructor(public node: J.NodeInfo, private appState: AppState) {
         super();
 
@@ -71,6 +74,8 @@ export class NodeCompMarkdown extends Html {
         }
         else {
             S.render.initMarkdown();
+            this.urls = S.util.getUrlsFromText(content);
+            S.util.addOpenGraphUrls(this.urls);
 
             // todo-2: put some more thought into this...
             // turning this off because when it appears in a url, blows up the link. Need to find some better way.

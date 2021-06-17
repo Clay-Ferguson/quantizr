@@ -1922,3 +1922,22 @@ audio::-webkit-media-controls-play-button {
     cursor: pointer;
     padding: 10px;
 }
+
+.openGraphPanel {
+    margin-left: 12px;
+    border: 1px solid $nodeBorderBottomColor;
+    padding: 10px;
+    margin-top: $smallGap;
+    border-radius: $border-radius;
+}
+
+.openGraphImage {
+    border: 1px solid $nodeBorderBottomColor;
+    border-radius: $border-radius;
+    width: 250px;
+    margin-top: 8px;
+}
+
+.openGraphTitle {
+    font-size: 120%;
+}

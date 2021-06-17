@@ -121,4 +121,7 @@ export interface UtilIntf {
     isLocalUserName(userName: string): boolean;
     getPropFromDom(evt: Event, prop: string): string;
     getShortContent(node: J.NodeInfo): string;
+    loadOpenGraph(urlRemote: string, callback: Function): void;
+    getUrlsFromText(text: string): string[];
+    addOpenGraphUrls(urls: string[]): void;
 }

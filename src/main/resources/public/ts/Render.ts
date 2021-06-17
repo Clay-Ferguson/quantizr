@@ -14,7 +14,9 @@ import { TypeHandlerIntf } from "./intf/TypeHandlerIntf";
 import * as J from "./JavaIntf";
 import { PubSub } from "./PubSub";
 import { Singletons } from "./Singletons";
+import { Anchor } from "./widget/Anchor";
 import { Comp } from "./widget/base/Comp";
+import { CompIntf } from "./widget/base/CompIntf";
 import { Button } from "./widget/Button";
 import { ButtonBar } from "./widget/ButtonBar";
 import { Div } from "./widget/Div";
@@ -599,6 +601,26 @@ export class Render implements RenderIntf {
                 new UserProfileDlg(node.ownerId, state).open();
             }
         });
+    }
+
+    renderOpenGraph = (o: any): CompIntf => {
+        if (!o) return null;
+
+        let title = o.ogTitle || o.twitterTitle;
+        let desc = o.ogDecsciption || o.twitterDescription;
+        let image = o.ogImage || o.twitterImage;
+
+        return new Div(null, { className: "openGraphPanel" }, [
+            o.ogUrl ? new Anchor(o.ogUrl, title, {
+                target: "_blank",
+                className: "openGraphTitle"
+            }) : title,
+            new Div(desc),
+            image ? new Img(null, {
+                className: "openGraphImage",
+                src: image.url
+            }) : null
+        ]);
     }
 
     /* Returns true if the logged in user and the type of node allow the property to be edited by the user */

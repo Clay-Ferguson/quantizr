@@ -8,6 +8,7 @@ import { PubSub } from "../../PubSub";
 import { Singletons } from "../../Singletons";
 import { Comp } from "../../widget/base/Comp";
 import { CompIntf } from "../../widget/base/CompIntf";
+import { Div } from "../../widget/Div";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
@@ -104,7 +105,25 @@ export class TypeBase implements TypeHandlerIntf {
         //         ], null, "marginLeft marginBottom")
         //     ]);
         // }
-        return new NodeCompMarkdown(node, state);
+        let comp = new NodeCompMarkdown(node, state);
+
+        /* if we notice we have URLs, then render them if available, but note they render asynchronously
+        so this code will actually execute everytime a new OpenGraph result comes in and triggeres a state
+        dispatch which causes a new render
+        */
+        if (comp.urls) {
+            let children: CompIntf[] = [comp];
+            comp.urls.forEach((url: string) => {
+                let ogData = S.meta64.openGraphData.get(url);
+                if (ogData) {
+                    children.push(S.render.renderOpenGraph(ogData));
+                }
+            });
+            return new Div(null, null, children);
+        }
+        else {
+            return comp;
+        }
     }
 
     orderProps(node: J.NodeInfo, _props: J.PropertyInfo[]): J.PropertyInfo[] {

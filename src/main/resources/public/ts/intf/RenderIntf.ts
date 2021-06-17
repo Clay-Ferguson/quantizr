@@ -3,6 +3,7 @@ import { AppState } from "../AppState";
 import { NodeActionType } from "../enums/NodeActionType";
 import * as J from "../JavaIntf";
 import { Comp } from "../widget/base/Comp";
+import { CompIntf } from "../widget/base/CompIntf";
 import { Img } from "../widget/Img";
 import { TypeHandlerIntf } from "./TypeHandlerIntf";
 
@@ -34,4 +35,5 @@ export interface RenderIntf {
     parseEmojis(value: any): any;
     renderUser(state: AppState, nodeId: string, user: string, userBio: string, userNodeId: string, imgSrc: string, actorUrl: string,
         displayName: string, className: string, iconClass: string, showMessageButton: boolean, onClick: Function): Comp;
+    renderOpenGraph(ogData: any): CompIntf;
 }

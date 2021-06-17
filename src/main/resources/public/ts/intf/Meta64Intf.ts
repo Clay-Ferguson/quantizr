@@ -35,6 +35,7 @@ export interface Meta64Intf {
     ctrlKeyTime: number;
     ctrlKeyCheck(): boolean;
     decryptCache: Map<string, string>;
+    openGraphData: Map<string, any>;
 
     tabChanging(prevTab: string, newTab: string, state: AppState): void;
     showOpenButtonOnNode(node: J.NodeInfo, state: AppState): void;

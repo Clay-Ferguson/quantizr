@@ -83,6 +83,9 @@ export class Meta64 implements Meta64Intf {
     // not currently used.
     // logView: LogView = new LogView();
 
+    /* Map of all URLs and the openGraph object retrieved for it */
+    openGraphData: Map<string, any> = new Map<string, any>();
+
     sendTestEmail = (): void => {
         S.util.ajax<J.SendTestEmailRequest, J.SendTestEmailResponse>("sendTestEmail", {}, function (res: J.SendTestEmailResponse) {
             S.util.showMessage("Send Test Email Initiated.", "Note");
@@ -549,6 +552,10 @@ export class Meta64 implements Meta64Intf {
 
             setTimeout(() => {
                 S.encryption.initKeys();
+
+                // it's unnecessary to preload these, but there'll be slightly less lag in the Bookmark menu
+                // the first time it's opened if we have it already loaded.
+                this.loadBookmarks();
             }, 1000);
 
             resolve();
