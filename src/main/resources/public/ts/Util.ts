@@ -1447,24 +1447,6 @@ export class Util implements UtilIntf {
         }
     }
 
-    getUrlsFromText = (text: string): string[] => {
-        if (!text) return null;
-
-        // this crap is really ugly. I need to just write code to scan byte by byte
-        // to do an algorithm to pull out urls. This regex way is garbage.
-        // and yes I know these 'replaceAll' calls CAN be doen with regex, but this whole
-        // thing will be rewritten soon. todo-0
-
-        // this works but then I found out HTTP from Mastodon is FULL of too many urls!
-        text = this.replaceAll(text, "(", " ");
-        text = this.replaceAll(text, ")", " ");
-        // text = this.replaceAll(text, "\"", " ");
-        // text = this.replaceAll(text, "'", " ");
-
-        let urlRegex = /(https?:\/\/[^\s]+)/g;
-        return text.match(urlRegex);
-    }
-
     addOpenGraphUrls = (urls: string[]): void => {
         if (!urls || urls.length === 0) return;
         urls.forEach(url => {
@@ -1473,7 +1455,7 @@ export class Util implements UtilIntf {
                 S.meta64.openGraphData.set(url, null);
 
                 this.loadOpenGraph(url, (ogData: any) => {
-                    // console.log("loadOpenGraph callback.");
+                    // console.log("loadOpenGraph callback: " + S.util.prettyPrint(ogData));
                     // if the url failed to load, we get here with ogData==null and that's correct.
                     S.meta64.openGraphData.set(url, ogData);
                     if (ogData) {

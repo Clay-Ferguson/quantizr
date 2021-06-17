@@ -74,8 +74,6 @@ export class NodeCompMarkdown extends Html {
         }
         else {
             S.render.initMarkdown();
-            this.urls = S.util.getUrlsFromText(content);
-            S.util.addOpenGraphUrls(this.urls);
 
             // todo-2: put some more thought into this...
             // turning this off because when it appears in a url, blows up the link. Need to find some better way.
@@ -87,8 +85,34 @@ export class NodeCompMarkdown extends Html {
 
             val = S.render.injectSubstitutions(node, content);
             val = S.util.markdown(val);
+
+            /* parse tags, to build OpenGraph */
+            this.parseAnchorTags(val);
         }
         return val;
+    }
+
+    parseAnchorTags = (val: string): void => {
+        if (val.indexOf("<") === -1 ||
+            val.indexOf(">") === -1) return;
+
+        this.urls = [];
+        let elm = document.createElement("html");
+        elm.innerHTML = val;
+        // console.log("Parsing: " + val);
+        elm.querySelectorAll("a").forEach((e: any) => {
+            // console.log("e href=" + e.href);
+            /* Mastodon has HTML content that uses hrefs for each mention or hashtag, so in order to avoid
+            trying to process those for OpenGraph we detect using the 'mention' and 'hashtag' classes */
+            if (e.classList.contains("mention") ||
+                e.classList.contains("hashtag")) return;
+
+            this.urls.push(e.href);
+        });
+
+        if (this.urls.length > 0) {
+            S.util.addOpenGraphUrls(this.urls);
+        }
     }
 
     preRender(): void {
