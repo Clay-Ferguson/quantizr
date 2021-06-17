@@ -116,7 +116,7 @@ export class TypeBase implements TypeHandlerIntf {
             comp.urls.forEach((url: string) => {
                 let ogData = S.meta64.openGraphData.get(url);
                 if (ogData) {
-                    children.push(S.render.renderOpenGraph(ogData));
+                    children.push(S.render.renderOpenGraph(ogData, url));
                 }
             });
             return new Div(null, null, children);
