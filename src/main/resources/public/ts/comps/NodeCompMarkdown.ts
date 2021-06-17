@@ -91,28 +91,33 @@ export class NodeCompMarkdown extends Html {
 
             // allow any node to have NO_OPEN_GRAPH set on it for special cases where we want OG disabled for all children.
             if (!(state.node && S.props.getNodePropVal(J.NodeProp.NO_OPEN_GRAPH, state.node))) {
-                this.parseAnchorTags(val);
+                this.parseAnchorTags(val, content);
             }
         }
         return val;
     }
 
-    parseAnchorTags = (val: string): void => {
+    parseAnchorTags = (val: string, content: string): void => {
         if (val.indexOf("<") === -1 ||
             val.indexOf(">") === -1) return;
 
         this.urls = [];
         let elm = document.createElement("html");
         elm.innerHTML = val;
-        // console.log("Parsing: " + val);
         elm.querySelectorAll("a").forEach((e: any) => {
-            // console.log("e href=" + e.href);
+            if (!e.href) return;
+            let href = e.href.trim();
+            href = S.util.stripIfEndsWith(href, "/");
+
             /* Mastodon has HTML content that uses hrefs for each mention or hashtag, so in order to avoid
             trying to process those for OpenGraph we detect using the 'mention' and 'hashtag' classes */
             if (e.classList.contains("mention") ||
                 e.classList.contains("hashtag")) return;
 
-            this.urls.push(e.href);
+            // Detect if this link is part of a Markdown Named link and if so then we don't generate the OpenGraph for that either
+            if (content.indexOf("(" + href + ")") !== -1) return;
+
+            this.urls.push(href);
         });
 
         if (this.urls.length > 0) {
