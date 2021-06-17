@@ -1454,10 +1454,12 @@ export class Util implements UtilIntf {
         // to do an algorithm to pull out urls. This regex way is garbage.
         // and yes I know these 'replaceAll' calls CAN be doen with regex, but this whole
         // thing will be rewritten soon. todo-0
+
+        // this works but then I found out HTTP from Mastodon is FULL of too many urls!
         text = this.replaceAll(text, "(", " ");
         text = this.replaceAll(text, ")", " ");
-        text = this.replaceAll(text, "\"", " ");
-        text = this.replaceAll(text, "'", " ");
+        // text = this.replaceAll(text, "\"", " ");
+        // text = this.replaceAll(text, "'", " ");
 
         let urlRegex = /(https?:\/\/[^\s]+)/g;
         return text.match(urlRegex);

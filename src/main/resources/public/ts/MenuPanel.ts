@@ -179,15 +179,6 @@ export class MenuPanel extends Div {
             ...this.siteNavCustomItems(state)
         ]));
 
-        children.push(new Menu("My Nodes", [
-            new MenuItem("Account", S.nav.navHome, !state.isAnonUser),
-            new MenuItem("Home", MenuPanel.openHomeNode, !state.isAnonUser),
-            new MenuItemSeparator(), //
-            new MenuItem("RSS Feeds", MenuPanel.openRSSFeedsNode, !state.isAnonUser),
-            new MenuItem("Notes", MenuPanel.openNotesNode, !state.isAnonUser),
-            new MenuItem("Exports", MenuPanel.openExportsNode, !state.isAnonUser)
-        ]));
-
         if (!state.isAnonUser) {
             let bookmarkItems = [];
             if (state.bookmarks) {
@@ -215,6 +206,15 @@ export class MenuPanel extends Div {
             bookmarkItems.push(new MenuItem("Manage...", MenuPanel.openBookmarksNode, !state.isAnonUser));
             children.push(new Menu("Bookmarks", bookmarkItems));
         }
+
+        children.push(new Menu("My Nodes", [
+            new MenuItem("Account", S.nav.navHome, !state.isAnonUser),
+            new MenuItem("Home", MenuPanel.openHomeNode, !state.isAnonUser),
+            new MenuItemSeparator(), //
+            new MenuItem("RSS Feeds", MenuPanel.openRSSFeedsNode, !state.isAnonUser),
+            new MenuItem("Notes", MenuPanel.openNotesNode, !state.isAnonUser),
+            new MenuItem("Exports", MenuPanel.openExportsNode, !state.isAnonUser)
+        ]));
 
         let messagesSuffix = state.newMessageCount > 0
             ? " (" + state.newMessageCount + " new)" : "";
