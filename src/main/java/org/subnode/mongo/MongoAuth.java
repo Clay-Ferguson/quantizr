@@ -417,7 +417,7 @@ public class MongoAuth {
 			if (tryNode == null) {
 				throw new RuntimeEx("Path not found (probable orphan node, not yet cleaned up): " + fullPathStr);
 			}
-			// let's make it where any time getNode succeeds it caches it.
+			// I decided to move this inside 'getNode', and just aggressively cache every node that's read in.
 			// cacheNode(tryNode);
 
 			// if this session user is the owner of this node, then they have full power
