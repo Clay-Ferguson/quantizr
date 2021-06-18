@@ -3,14 +3,12 @@ package org.subnode.mongo.model;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
-
 import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
-
 import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,6 +20,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
 import org.subnode.model.client.NodeProp;
 import org.subnode.model.client.NodeType;
+import org.subnode.mongo.MongoAuth;
 import org.subnode.mongo.MongoThreadLocal;
 import org.subnode.util.ExUtil;
 import org.subnode.util.XString;
@@ -61,7 +60,6 @@ import org.subnode.util.XString;
 		SubNode.FIELD_MODIFY_TIME, SubNode.FIELD_AC, SubNode.FIELD_PROPERTIES})
 public class SubNode {
 	public static final String FIELD_ID = "_id";
-
 	private static final Logger log = LoggerFactory.getLogger(SubNode.class);
 
 	@Id
@@ -170,7 +168,17 @@ public class SubNode {
 		} else {
 			MongoThreadLocal.dirty(this);
 		}
+
+		// if this node was in the cache under different ID, remove that one.
+		if (MongoAuth.inst != null && this.id != null) {
+			MongoAuth.inst.uncacheNode(this.id.toHexString());
+		}
 		this.id = id;
+
+		// cache by current id
+		if (MongoAuth.inst != null && this.id != null) {
+			MongoAuth.inst.cacheNode(this.id.toHexString(), this);
+		}
 	}
 
 	@JsonGetter(FIELD_ID)
@@ -215,7 +223,17 @@ public class SubNode {
 		if (!path.equals(this.path)) {
 			this.pathHash = null;
 		}
+
+		// remove the old path if cached by it
+		if (MongoAuth.inst != null) {
+			MongoAuth.inst.uncacheNode(this.path);
+		}
 		this.path = path;
+
+		// update cache by path
+		if (MongoAuth.inst != null) {
+			MongoAuth.inst.cacheNode(this.path, this);
+		}
 	}
 
 	@JsonProperty(FIELD_PATH_HASH)

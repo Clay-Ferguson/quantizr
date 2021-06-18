@@ -3,10 +3,12 @@ package org.subnode.mongo;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.StringTokenizer;
-
+import javax.annotation.PostConstruct;
 import org.apache.commons.lang3.StringUtils;
 import org.bson.types.ObjectId;
 import org.slf4j.Logger;
@@ -41,6 +43,19 @@ import org.subnode.util.XString;
 public class MongoAuth {
 	private static final Logger log = LoggerFactory.getLogger(MongoAuth.class);
 
+	// in order for non-spring beans (namely just SubNode.java) to access this we cheat by using this
+	// static.
+	public static MongoAuth inst;
+
+	private static int MAX_CACHE_SIZE = 500;
+	// The cache key in this can be either a node path or node id.
+	public final LinkedHashMap<String, SubNode> cachedNodes =
+			new LinkedHashMap<String, SubNode>(MAX_CACHE_SIZE + 1, .75F, false) {
+				protected boolean removeEldestEntry(Map.Entry<String, SubNode> eldest) {
+					return size() > MAX_CACHE_SIZE;
+				}
+			};
+
 	@Autowired
 	private MongoTemplate ops;
 
@@ -68,12 +83,64 @@ public class MongoAuth {
 	private static final HashMap<String, String> userNamesByAccountId = new HashMap<>();
 	private static final HashMap<String, String> displayNamesByAccountId = new HashMap<>();
 
+	@PostConstruct
+	public void postConstruct() {
+		inst = this;
+		log.debug("Initialized MongoAuth inst");
+	}
+
 	public MongoSession getAdminSession() {
 		return adminSession;
 	}
 
 	public MongoSession getAnonSession() {
 		return anonSession;
+	}
+
+	public void cacheNode(SubNode node) {
+		if (node.getPath() != null || node.getId() != null) {
+			synchronized (cachedNodes) {
+				if (node.getPath() != null) {
+					cachedNodes.put(node.getPath(), node);
+				}
+
+				if (node.getId() != null) {
+					cachedNodes.put(node.getId().toHexString(), node);
+				}
+			}
+		}
+	}
+
+	public void cacheNode(String key, SubNode node) {
+		if (key != null) {
+			synchronized (cachedNodes) {
+				cachedNodes.put(key, node);
+			}
+		}
+	}
+
+	public void uncacheNode(SubNode node) {
+		if (node == null)
+			return;
+		uncacheNode(node.getPath());
+
+		if (node.getId() != null) {
+			uncacheNode(node.getId().toHexString());
+		}
+	}
+
+	public void uncacheNode(String key) {
+		if (key != null) {
+			synchronized (cachedNodes) {
+				cachedNodes.remove(key);
+			}
+		}
+	}
+
+	public SubNode getCachedNode(String key) {
+		synchronized (cachedNodes) {
+			return cachedNodes.get(key);
+		}
 	}
 
 	public void populateUserNamesInAcl(MongoSession session, SubNode node) {
@@ -346,29 +413,12 @@ public class MongoAuth {
 			String fullPathStr = fullPath.toString();
 			log.trace("Checking fullPath: " + fullPathStr);
 
-			/*
-			 * NOTE: This nodesByPath caching is the key to good performance in doing our hierarchical
-			 * authorization lookups.
-			 * 
-			 * Get node from cache if possible. Note: This cache does have the slight imperfection that it
-			 * assumes once it reads a node for the purposes of checking auth (acl) then within the context of
-			 * the same transaction it can always use that same node again meaning the security context on the
-			 * node can't have changed DURING the request. This is fine because we never update security on a
-			 * node and then expect ourselves to find different security on the node all within the context of
-			 * the same HTTP request. Because the only user who can update the security is the owner anyway.
-			 */
-			SubNode tryNode = MongoThreadLocal.getNodesByPath().get(fullPathStr);
-
-			// if node not found in cache resort to querying for it
+			SubNode tryNode = read.getNode(session, fullPathStr, false);
 			if (tryNode == null) {
-				tryNode = read.getNode(session, fullPathStr, false);
-				if (tryNode == null) {
-					throw new RuntimeEx("Path not found (probable orphan node, not yet cleaned up): " + fullPathStr);
-				}
-
-				// put in the cache
-				MongoThreadLocal.getNodesByPath().put(fullPathStr, tryNode);
+				throw new RuntimeEx("Path not found (probable orphan node, not yet cleaned up): " + fullPathStr);
 			}
+			// let's make it where any time getNode succeeds it caches it.
+			// cacheNode(tryNode);
 
 			// if this session user is the owner of this node, then they have full power
 			if (!session.isAnon() && session.getUserNode().getId().equals(tryNode.getOwner())) {
@@ -382,7 +432,6 @@ public class MongoAuth {
 				break;
 			}
 		}
-
 		return ret;
 	}
 
@@ -757,5 +806,4 @@ public class MongoAuth {
 		}
 		return mentionsSet;
 	}
-
 }

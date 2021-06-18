@@ -203,7 +203,7 @@ public class MongoRead {
         SubNode ret = util.findOne(query);
 
         if (ret != null) {
-            log.debug("Node found: id=" + ret.getId().toHexString());
+            // log.debug("Node found: id=" + ret.getId().toHexString());
         }
 
         if (allowAuth) {
@@ -252,19 +252,36 @@ public class MongoRead {
         }
         // If search doesn't start with a slash then it's a nodeId and not a path
         else if (!identifier.startsWith("/")) {
-            ret = getNode(session, new ObjectId(identifier), allowAuth);
-        } else {
+            ret = auth.getCachedNode(identifier);
+            if (ret == null) {
+                ret = getNode(session, new ObjectId(identifier), allowAuth);
+            } else {
+                // log.debug("Cache hit: id=" + identifier);
+            }
+        }
+        // otherwise this is a path lookup
+        else {
             // log.debug("getNode identifier is path. doing path find.");
             identifier = XString.stripIfEndsWith(identifier, "/");
-            Query query = new Query();
-            query.addCriteria(Criteria.where(SubNode.FIELD_PATH).is(identifier));
 
-            ret = util.findOne(query);
+            ret = auth.getCachedNode(identifier);
+            if (ret == null) {
+                Query query = new Query();
+                query.addCriteria(Criteria.where(SubNode.FIELD_PATH).is(identifier));
+
+                ret = util.findOne(query);
+            } else {
+                // log.debug("Cache Hit: path=" + identifier);
+            }
             // if (ret == null) {
             // log.debug("nope. path not found.");
             // } else {
             // log.debug("Path found: " + identifier);
             // }
+        }
+
+        if (ret != null) {
+            auth.cacheNode(ret);
         }
 
         if (allowAuth) {
@@ -539,7 +556,8 @@ public class MongoRead {
          * string. Without the trailing (.+)$ we would be including the node itself in addition to all its
          * children.
          * 
-         * todo-1: Look for places we could be passing COMPILED regex object into all calls like this, and not the string!
+         * todo-1: Look for places we could be passing COMPILED regex object into all calls like this, and
+         * not the string!
          */
         Criteria criteria = Criteria.where(SubNode.FIELD_PATH).regex(util.regexRecursiveChildrenOfPath(node.getPath()));
         query.addCriteria(criteria);
@@ -577,7 +595,7 @@ public class MongoRead {
         if (skip > 0) {
             query.skip(skip);
         }
-        
+
         /*
          * This regex finds all that START WITH path, have some characters after path, before the end of the
          * string. Without the trailing (.+)$ we would be including the node itself in addition to all its
@@ -823,8 +841,7 @@ public class MongoRead {
         Query query = new Query();
         Criteria criteria = Criteria.where(//
                 SubNode.FIELD_PATH).regex(util.regexDirectChildrenOfPath(node.getPath()))//
-                .and(SubNode.FIELD_TYPE).is(type) 
-                .and(SubNode.FIELD_PROPERTIES + "." + NodeProp.USER + ".value").is(userName);
+                .and(SubNode.FIELD_TYPE).is(type).and(SubNode.FIELD_PROPERTIES + "." + NodeProp.USER + ".value").is(userName);
 
         query.addCriteria(criteria);
         SubNode ret = util.findOne(query);

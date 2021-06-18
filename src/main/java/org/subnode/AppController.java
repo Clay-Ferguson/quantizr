@@ -354,7 +354,7 @@ public class AppController implements ErrorController {
 						log.debug("Node did not exist.");
 						ThreadLocals.getSessionContext().setUrlId(null);
 					} else {
-						log.debug("Node exists.");
+						// log.debug("Node exists.");
 					}
 				});
 			} else {

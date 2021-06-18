@@ -61,14 +61,6 @@ public class MongoEventListener extends AbstractMongoEventListener<SubNode> {
 	public void onBeforeSave(BeforeSaveEvent<SubNode> event) {
 		SubNode node = event.getSource();
 		// log.debug("MDB save: " + node.getPath() + " thread: " + Thread.currentThread().getName());
-		MongoSession session = ThreadLocals.getMongoSession();
-		if (session != null) {
-			// log.debug("authing.");
-			// Must have write privileges to this node or one of it's parents.
-			auth.auth(session, node, PrivilegeType.WRITE);
-		} else {
-			// log.debug("thread has no mongo session");
-		}
 
 		Document dbObj = event.getDocument();
 		ObjectId id = node.getId();
@@ -144,6 +136,14 @@ public class MongoEventListener extends AbstractMongoEventListener<SubNode> {
 			dbObj.put(SubNode.FIELD_PATH, path);
 			node.setPath(path);
 		}
+
+		writeAuth(node);
+
+		/*
+		 * I think this is redundant because we update the cache whenever the nodeId or Path change. Leaving
+		 * this here just as a reminder that it's not a bug that we don't update the cache here.
+		 */
+		// auth.cacheNode(node);
 
 		String pathHash = DigestUtils.sha256Hex(node.getPath());
 		// log.debug("CHECK PathHash=" + pathHash);
@@ -240,18 +240,19 @@ public class MongoEventListener extends AbstractMongoEventListener<SubNode> {
 				SubNode node = ops.findById(id, SubNode.class);
 				if (node != null) {
 					// log.debug("MDB del: " + node.getPath());
-
-					MongoSession session = ThreadLocals.getMongoSession();
-					if (session != null) {
-						// log.debug("authing.");
-						// Must have write privileges to this node or one of it's parents.
-						auth.auth(session, node, PrivilegeType.WRITE);
-					} else {
-						// log.debug("thread has no mongo session");
-					}
+					writeAuth(node);
 				}
+				auth.uncacheNode(node);
 				actPub.deleteNodeNotify((ObjectId) id);
 			}
+		}
+	}
+
+	public void writeAuth(SubNode node) {
+		MongoSession session = ThreadLocals.getMongoSession();
+		if (session != null) {
+			// Must have write privileges to this node or one of it's parents.
+			auth.auth(session, node, PrivilegeType.WRITE);
 		}
 	}
 }

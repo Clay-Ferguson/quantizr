@@ -623,6 +623,9 @@ export class Render implements RenderIntf {
         let desc = o.ogDecsciption || o.twitterDescription;
         let image = o.ogImage || o.twitterImage;
 
+        /* If neither a description nor image exists, this will not be interesting enough so don't render */
+        if (!desc && !image) return null;
+
         if (!o.ogUrl) {
             o.ogUrl = url;
         }

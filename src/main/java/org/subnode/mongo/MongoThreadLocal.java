@@ -1,19 +1,13 @@
 package org.subnode.mongo;
 
 import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.Map;
-
+import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import org.bson.types.ObjectId;
 import org.subnode.mongo.model.SubNode;
 
 public class MongoThreadLocal {
 	private static final Logger log = LoggerFactory.getLogger(MongoThreadLocal.class);
-
-	private static int MAX_CACHE_SIZE = 100;
 
 	/*
 	 * This is where we can accumulate the set of nodes that will all be updated after processing is
@@ -22,13 +16,9 @@ public class MongoThreadLocal {
 	 */
 	private static final ThreadLocal<HashMap<ObjectId, SubNode>> dirtyNodes = new ThreadLocal<HashMap<ObjectId, SubNode>>();
 
-	private static final ThreadLocal<LinkedHashMap<String, SubNode>> nodesByPath =
-			new ThreadLocal<LinkedHashMap<String, SubNode>>();
-
 	public static void removeAll() {
 		// log.debug("Clear Dirty Nodes.");
 		getDirtyNodes().clear();
-		getNodesByPath().clear();
 	}
 
 	public static void clearDirtyNodes() {
@@ -44,21 +34,6 @@ public class MongoThreadLocal {
 
 	public static boolean hasDirtyNodes() {
 		return getDirtyNodes().size() > 0;
-	}
-
-	public static LinkedHashMap<String, SubNode> getNodesByPath() {
-		if (nodesByPath.get() == null) {
-			nodesByPath.set(new LinkedHashMap<String, SubNode>(MAX_CACHE_SIZE + 1, .75F, false) {
-				protected boolean removeEldestEntry(Map.Entry<String, SubNode> eldest) {
-					return size() > MAX_CACHE_SIZE;
-				}
-			});
-		}
-		return nodesByPath.get();
-	}
-
-	public static boolean hasNodesByPath() {
-		return getNodesByPath().size() > 0;
 	}
 
 	public static void dumpDirtyNodes() {
