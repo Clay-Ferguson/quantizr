@@ -91,9 +91,7 @@ export class NodeCompMarkdown extends Html {
 
             // allow any node to have NO_OPEN_GRAPH set on it for special cases where we want OG disabled for all children.
             if (!(state.node && S.props.getNodePropVal(J.NodeProp.NO_OPEN_GRAPH, state.node))) {
-                // this is going to have to go on hold. I mis-judged how MANY urls i have in areas where i DO NOT
-                // want open graph.
-                // this.parseAnchorTags(val, content);
+                this.parseAnchorTags(val, content);
             }
         }
         return val;
@@ -118,6 +116,7 @@ export class NodeCompMarkdown extends Html {
 
             // Detect if this link is part of a Markdown Named link and if so then we don't generate the OpenGraph for that either
             if (content.indexOf("(" + href + ")") !== -1) return;
+            if (content.indexOf("* " + href) !== -1) return;
 
             this.urls.push(href);
         });
