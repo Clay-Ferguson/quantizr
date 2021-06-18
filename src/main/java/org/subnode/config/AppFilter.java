@@ -17,6 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.GenericFilterBean;
+import org.subnode.model.IPInfo;
 import org.subnode.mongo.MongoThreadLocal;
 import org.subnode.util.ThreadLocals;
 import org.subnode.util.Util;
@@ -33,6 +34,9 @@ public class AppFilter extends GenericFilterBean {
 	private static boolean logRequests = false;
 	private static boolean logResponses = false;
 
+	// forces transactions to be at least this number of milliseconds apart.
+	private static int THROTTLE_INTERVAL = 3000;
+
 	@Autowired
 	private SessionContext sessionContext;
 
@@ -47,7 +51,7 @@ public class AppFilter extends GenericFilterBean {
 	 * simultenaously this is every helpful for debugging
 	 */
 	private static boolean singleThreadDebugging = false;
-	private static final HashMap<String, Object> locksByIp = new HashMap<>();
+	private static final HashMap<String, IPInfo> ipInfo = new HashMap<>();
 
 	@Override
 	public void doFilter(ServletRequest req, ServletResponse res, FilterChain chain) throws IOException, ServletException {
@@ -55,8 +59,9 @@ public class AppFilter extends GenericFilterBean {
 			int thisReqId = ++reqId;
 			String ip = null;
 
+			HttpServletRequest httpReq = null;
 			if (req instanceof HttpServletRequest) {
-				HttpServletRequest httpReq = (HttpServletRequest) req;
+				httpReq = (HttpServletRequest) req;
 				HttpServletResponse httpRes = (HttpServletResponse) res;
 				ip = getClientIpAddr(httpReq);
 
@@ -97,6 +102,15 @@ public class AppFilter extends GenericFilterBean {
 			}
 
 			try {
+				IPInfo info = null;
+				synchronized (ipInfo) {
+					info = ipInfo.get(ip);
+					if (info == null) {
+						ipInfo.put(ip, info = new IPInfo());
+					}
+				}
+				throttleRequest(httpReq, info);
+
 				/*
 				 * singleThreadDebugging creates one lock per IP so that each machine calling our server gets single
 				 * threaded, but other servers can call in parallel
@@ -106,13 +120,7 @@ public class AppFilter extends GenericFilterBean {
 						ip = "unknown";
 					}
 
-					Object lock = locksByIp.get(ip);
-					if (lock == null) {
-						lock = new Object();
-						locksByIp.put(ip, lock);
-					}
-
-					synchronized (lock) {
+					synchronized (info.getLock()) {
 						chain.doFilter(req, res);
 					}
 				} else {
@@ -129,11 +137,34 @@ public class AppFilter extends GenericFilterBean {
 				log.error("Request Failed", ex);
 				throw ex;
 			}
-		}
-		finally {
+		} finally {
 			/* Set thread back to clean slate, for it's next cycle time in threadpool */
 			ThreadLocals.removeAll();
 			MongoThreadLocal.removeAll();
+		}
+	}
+
+	private void throttleRequest(HttpServletRequest httpReq, IPInfo info) {
+		if (httpReq == null)
+			return;
+
+		long curTime = System.currentTimeMillis();
+		if (info.getLastRequestTime() == 0) {
+			info.setLastRequestTime(curTime);
+			return;
+		}
+
+		// log.debug("check:" + httpReq.getRequestURI());
+		if (httpReq.getRequestURI().contains("/mobile/api/")) {
+			long wait = THROTTLE_INTERVAL - (curTime - info.getLastRequestTime());
+			if (wait > 0) {
+				log.debug("throt: " + httpReq.getRequestURI() + " " + String.valueOf(wait));
+				try {
+					Thread.sleep(wait);
+				} catch (Exception e) {
+				}
+			}
+			info.setLastRequestTime(System.currentTimeMillis());
 		}
 	}
 

@@ -516,7 +516,7 @@ public class AppController implements ErrorController {
 					// });
 				}
 			} catch (Exception e) {
-				throw new RuntimeException("internal server error");
+				// throw new RuntimeException("internal server error");
 			}
 			return null;
 		});
