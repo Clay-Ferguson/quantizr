@@ -38,7 +38,7 @@ setInterval(() => {
             return s;
         });
     }
-}, 1200);
+}, 3000);
 
 export class Render implements RenderIntf {
 

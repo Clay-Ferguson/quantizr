@@ -34,7 +34,8 @@ public class AppFilter extends GenericFilterBean {
 	private static boolean logRequests = false;
 	private static boolean logResponses = false;
 
-	// forces transactions to be at least this number of milliseconds apart.
+	// forces transactions to be at least this number of milliseconds apart. 
+	// todo-0: this needs to be a configurable parameter
 	private static int THROTTLE_INTERVAL = 3000;
 
 	@Autowired
@@ -154,14 +155,22 @@ public class AppFilter extends GenericFilterBean {
 			return;
 		}
 
-		// log.debug("check:" + httpReq.getRequestURI());
 		if (httpReq.getRequestURI().contains("/mobile/api/")) {
-			long wait = THROTTLE_INTERVAL - (curTime - info.getLastRequestTime());
-			if (wait > 0) {
-				log.debug("throt: " + httpReq.getRequestURI() + " " + String.valueOf(wait));
-				try {
-					Thread.sleep(wait);
-				} catch (Exception e) {
+			// log.debug("check:" + httpReq.getRequestURI());
+			if (httpReq.getRequestURI().endsWith("/checkMessages") || //
+					httpReq.getRequestURI().endsWith("/getUserProfile") || //
+					httpReq.getRequestURI().endsWith("/getConfig") || //
+					httpReq.getRequestURI().endsWith("/getBookmarks") ||
+					httpReq.getRequestURI().endsWith("/login")) {
+				// these have priority
+			} else {
+				long wait = THROTTLE_INTERVAL - (curTime - info.getLastRequestTime());
+				if (wait > 0) {
+					log.debug("throt: " + httpReq.getRequestURI() + " " + String.valueOf(wait));
+					try {
+						Thread.sleep(wait);
+					} catch (Exception e) {
+					}
 				}
 			}
 			info.setLastRequestTime(System.currentTimeMillis());
