@@ -5,6 +5,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.subnode.config.SpringContextUtil;
+import org.subnode.model.client.PrivilegeType;
+import org.subnode.mongo.MongoAuth;
 import org.subnode.mongo.MongoRead;
 import org.subnode.mongo.MongoSession;
 import org.subnode.mongo.MongoUpdate;
@@ -31,6 +33,9 @@ public class ImportBookService {
 	@Autowired
 	private MongoUpdate update;
 
+	@Autowired
+	private MongoAuth auth;
+
 	public InsertBookResponse insertBook(MongoSession session, InsertBookRequest req) {
 		InsertBookResponse res = new InsertBookResponse();
 		if (session == null) {
@@ -42,6 +47,7 @@ public class ImportBookService {
 
 		String nodeId = req.getNodeId();
 		SubNode node = read.getNode(session, nodeId);
+		auth.auth(session, node, PrivilegeType.WRITE);
 		log.debug("Insert Root: " + XString.prettyPrint(node));
 
 		/*

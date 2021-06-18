@@ -1,10 +1,7 @@
 package org.subnode.service;
 
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
-
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -12,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.subnode.exception.base.RuntimeEx;
 import org.subnode.model.client.NodeProp;
+import org.subnode.model.client.PrivilegeType;
 import org.subnode.mongo.MongoAuth;
 import org.subnode.mongo.MongoCreate;
 import org.subnode.mongo.MongoDelete;
@@ -76,6 +74,7 @@ public class NodeMoveService {
 		String nodeId = req.getNodeId();
 
 		SubNode node = read.getNode(session, nodeId);
+		auth.authRequireOwnerOfNode(session, node);
 		if (node == null) {
 			throw new RuntimeEx("Node not found: " + nodeId);
 		}
@@ -233,6 +232,7 @@ public class NodeMoveService {
 		for (String nodeId : req.getNodeIds()) {
 			// lookup the node we're going to delete
 			SubNode node = read.getNode(session, nodeId);
+			auth.auth(session, node, PrivilegeType.WRITE);
 
 			// back out the number of bytes it was using
 			if (!session.isAdmin()) {

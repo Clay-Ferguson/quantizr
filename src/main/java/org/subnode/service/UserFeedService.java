@@ -340,7 +340,8 @@ public class UserFeedService {
 
 		// use attributedTo proptery to determine whether a node is 'local' (posted by this server) or not.
 		if (req.getLocalOnly()) {
-			// note: the ".value" part is recently added, but actually since this is a compare to null should not be needed.
+			// note: the ".value" part is recently added, but actually since this is a compare to null should
+			// not be needed.
 			criteria = criteria.and(SubNode.FIELD_PROPERTIES + "." + NodeProp.ACT_PUB_OBJ_ATTRIBUTED_TO.s() + ".value").is(null);
 		}
 
@@ -363,9 +364,12 @@ public class UserFeedService {
 		SubNode lastNode = null;
 
 		for (SubNode node : iter) {
-			NodeInfo info = convert.convertToNodeInfo(sc, session, node, true, false, counter + 1, false, false);
-			searchResults.add(info);
-			lastNode = node;
+			try {
+				NodeInfo info = convert.convertToNodeInfo(sc, session, node, true, false, counter + 1, false, false);
+				searchResults.add(info);
+				lastNode = node;
+			} catch (Exception e) {
+			}
 		}
 
 		/*

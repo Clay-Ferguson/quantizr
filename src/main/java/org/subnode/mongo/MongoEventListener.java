@@ -8,6 +8,7 @@ import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.mapping.event.AbstractMongoEventListener;
 import org.springframework.data.mongodb.core.mapping.event.AfterConvertEvent;
 import org.springframework.data.mongodb.core.mapping.event.AfterLoadEvent;
@@ -18,7 +19,9 @@ import org.subnode.actpub.ActPubService;
 import org.subnode.config.NodeName;
 import org.subnode.exception.base.RuntimeEx;
 import org.subnode.model.client.NodeProp;
+import org.subnode.model.client.PrivilegeType;
 import org.subnode.mongo.model.SubNode;
+import org.subnode.util.ThreadLocals;
 import org.subnode.util.XString;
 
 public class MongoEventListener extends AbstractMongoEventListener<SubNode> {
@@ -26,7 +29,13 @@ public class MongoEventListener extends AbstractMongoEventListener<SubNode> {
 	private static final Logger log = LoggerFactory.getLogger(MongoEventListener.class);
 
 	@Autowired
+	private MongoTemplate ops;
+
+	@Autowired
 	private MongoRead read;
+
+	@Autowired
+	private MongoAuth auth;
 
 	@Autowired
 	private ActPubService actPub;
@@ -51,7 +60,15 @@ public class MongoEventListener extends AbstractMongoEventListener<SubNode> {
 	@Override
 	public void onBeforeSave(BeforeSaveEvent<SubNode> event) {
 		SubNode node = event.getSource();
-		// log.debug("MONGO SAVE EVENT: "+XString.prettyPrint(node));
+		// log.debug("MDB save: " + node.getPath() + " thread: " + Thread.currentThread().getName());
+		MongoSession session = ThreadLocals.getMongoSession();
+		if (session != null) {
+			// log.debug("authing.");
+			// Must have write privileges to this node or one of it's parents.
+			auth.auth(session, node, PrivilegeType.WRITE);
+		} else {
+			// log.debug("thread has no mongo session");
+		}
 
 		Document dbObj = event.getDocument();
 		ObjectId id = node.getId();
@@ -216,10 +233,24 @@ public class MongoEventListener extends AbstractMongoEventListener<SubNode> {
 	@Override
 	public void onBeforeDelete(BeforeDeleteEvent<SubNode> event) {
 		Document doc = event.getDocument();
+
 		if (doc != null) {
-			Object val = doc.get("_id");
-			if (val instanceof ObjectId) {
-				actPub.deleteNodeNotify((ObjectId) val);
+			Object id = doc.get("_id");
+			if (id instanceof ObjectId) {
+				SubNode node = ops.findById(id, SubNode.class);
+				if (node != null) {
+					// log.debug("MDB del: " + node.getPath());
+
+					MongoSession session = ThreadLocals.getMongoSession();
+					if (session != null) {
+						// log.debug("authing.");
+						// Must have write privileges to this node or one of it's parents.
+						auth.auth(session, node, PrivilegeType.WRITE);
+					} else {
+						// log.debug("thread has no mongo session");
+					}
+				}
+				actPub.deleteNodeNotify((ObjectId) id);
 			}
 		}
 	}

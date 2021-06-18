@@ -442,6 +442,7 @@ public class AttachmentService {
 
 		final String nodeId = req.getNodeId();
 		final SubNode node = read.getNode(session, nodeId);
+		auth.auth(session, node, PrivilegeType.WRITE);
 		deleteBinary(session, "", node, null);
 		deleteAllBinaryProperties(node, "");
 		update.saveSession(session);

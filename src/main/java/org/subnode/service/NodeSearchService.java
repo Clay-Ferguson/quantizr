@@ -156,9 +156,13 @@ public class NodeSearchService {
 				 * amount).
 				 */
 				for (final SubNode node : accountNodes) {
-					NodeInfo info = convert.convertToNodeInfo(ThreadLocals.getSessionContext(), session, node, true, false,
-							counter + 1, false, false);
-					searchResults.add(info);
+					try {
+						auth.auth(session, node, PrivilegeType.READ);
+						NodeInfo info = convert.convertToNodeInfo(ThreadLocals.getSessionContext(), session, node, true, false,
+								counter + 1, false, false);
+						searchResults.add(info);
+					} catch (Exception e) {
+					}
 				}
 			}
 			// else we're doing a normal subgraph search for the text
@@ -172,10 +176,13 @@ public class NodeSearchService {
 				for (SubNode node : read.searchSubGraph(session, searchRoot, req.getSearchProp(), searchText, req.getSortField(),
 						Const.ROWS_PER_PAGE, Const.ROWS_PER_PAGE * req.getPage(), req.getFuzzy(), req.getCaseSensitive(),
 						req.getTimeRangeType())) {
-
-					NodeInfo info = convert.convertToNodeInfo(ThreadLocals.getSessionContext(), session, node, true, false,
-							counter + 1, false, false);
-					searchResults.add(info);
+					try {
+						auth.auth(session, node, PrivilegeType.READ);
+						NodeInfo info = convert.convertToNodeInfo(ThreadLocals.getSessionContext(), session, node, true, false,
+								counter + 1, false, false);
+						searchResults.add(info);
+					} catch (Exception e) {
+					}
 				}
 			}
 		}

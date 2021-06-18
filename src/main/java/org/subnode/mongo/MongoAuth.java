@@ -121,7 +121,6 @@ public class MongoAuth {
 		return null;
 	}
 
-
 	public String getUserNameFromAccountNodeId(MongoSession session, String accountId) {
 
 		// special case of a public share
@@ -260,8 +259,10 @@ public class MongoAuth {
 	public void auth(MongoSession session, SubNode node, PrivilegeType... privs) {
 		if (node == null)
 			return;
-		if (session.isAdmin())
+		if (session.isAdmin()) {
+			// log.debug("you are admin. auth success.");
 			return; // admin can do anything. skip auth
+		}
 
 		auth(session, node, Arrays.asList(privs));
 	}
@@ -277,6 +278,7 @@ public class MongoAuth {
 
 	/* Returns true if this user on this session has privType access to 'node' */
 	public void auth(MongoSession session, SubNode node, List<PrivilegeType> priv) {
+		// log.debug("auth " + node.getPath() + " for " + session.getUserName());
 
 		/* Special case if this node is named 'home' it is readable by anyone */
 		if (node != null && NodeName.HOME.equals(node.getName()) && priv.size() == 1 && priv.get(0).name().equals("READ")) {
@@ -289,18 +291,20 @@ public class MongoAuth {
 
 		// admin has full power over all nodes
 		if (node == null || session.isAdmin()) {
-			log.trace("auth granted. you're admin.");
+			// log.debug("auth granted. you're admin.");
 			return;
 		}
 
 		if (node.getOwner() == null) {
-			log.trace("auth fails. node had no owner: " + node.getPath());
+			// log.debug("auth fail. node had no owner: " + node.getPath());
 			throw new RuntimeEx("node had no owner: " + node.getPath());
 		}
 
 		// if this session user is the owner of this node, then they have full power
+		// todo-0: make sure nodeOwner can't be altered by client. Node must be looked up.
+		// todo-0: check all places where 'setOwner' is called.
 		if (!session.isAnon() && session.getUserNode().getId().equals(node.getOwner())) {
-			log.trace("allow bc user owns node. accountId: " + node.getOwner().toHexString());
+			// log.debug("allow bc user owns node. accountId: " + node.getOwner().toHexString());
 			return;
 		}
 
@@ -316,12 +320,14 @@ public class MongoAuth {
 
 	/*
 	 * NOTE: this should ONLY ever be called from 'auth()' method of this class
+	 * 
+	 * todo-0: check all calls to "setPath". Nothing client can do should be able to alter a path.
 	 */
 	private boolean ancestorAuth(MongoSession session, SubNode node, List<PrivilegeType> privs) {
 
 		/* get the non-null sessionUserNodeId if not anonymous user */
 		String sessionUserNodeId = session.isAnon() ? null : session.getUserNode().getId().toHexString();
-		log.trace("ancestorAuth: path=" + node.getPath());
+		// log.debug("ancestorAuth: path=" + node.getPath());
 
 		StringBuilder fullPath = new StringBuilder();
 		StringTokenizer t = new StringTokenizer(node.getPath(), "/", false);
@@ -331,6 +337,7 @@ public class MongoAuth {
 			fullPath.append("/");
 			fullPath.append(pathPart);
 
+			// todo-0: why skipping these two?
 			if (pathPart.equals("/" + NodeName.ROOT))
 				continue;
 			if (pathPart.equals(NodeName.ROOT_OF_ALL_USERS))
@@ -343,7 +350,7 @@ public class MongoAuth {
 			 * NOTE: This nodesByPath caching is the key to good performance in doing our hierarchical
 			 * authorization lookups.
 			 * 
-			 * get node from cache if possible. Note: This cache does have the slight imperfection that it
+			 * Get node from cache if possible. Note: This cache does have the slight imperfection that it
 			 * assumes once it reads a node for the purposes of checking auth (acl) then within the context of
 			 * the same transaction it can always use that same node again meaning the security context on the
 			 * node can't have changed DURING the request. This is fine because we never update security on a
@@ -365,6 +372,7 @@ public class MongoAuth {
 
 			// if this session user is the owner of this node, then they have full power
 			if (!session.isAnon() && session.getUserNode().getId().equals(tryNode.getOwner())) {
+				// log.debug("user owns node. auth ok.");
 				ret = true;
 				break;
 			}
@@ -384,10 +392,10 @@ public class MongoAuth {
 	 * check, and this is by design.
 	 */
 	public boolean nodeAuth(SubNode node, String sessionUserNodeId, List<PrivilegeType> privs) {
-		log.trace("nodeAuth: nodeId: " + node.getId().toHexString());
+		// log.debug("nodeAuth: nodeId: " + node.getId().toHexString());
 		HashMap<String, AccessControl> acl = node.getAc();
 		if (acl == null) {
-			log.trace("no acls. returning.");
+			// log.debug("no acls.");
 			return false;
 		}
 		String allPrivs = "";
@@ -396,7 +404,7 @@ public class MongoAuth {
 		String privsForUserId = ac != null ? ac.getPrvs() : null;
 		if (privsForUserId != null) {
 			allPrivs += privsForUserId;
-			log.trace("Privs for this user: " + privsForUserId);
+			// log.debug("Privs for this user: " + privsForUserId);
 		}
 
 		/*
@@ -410,15 +418,15 @@ public class MongoAuth {
 				allPrivs += ",";
 			}
 			allPrivs += privsForPublic;
-			log.trace("Public Privs: " + privsForPublic);
+			// log.debug("Public Privs: " + privsForPublic);
 		}
 
 		if (allPrivs.length() > 0) {
 			for (PrivilegeType priv : privs) {
-				log.trace("Checking for priv: " + priv.name);
+				// log.debug("Checking for priv: " + priv.name);
 				if (allPrivs.indexOf(priv.name) == -1) {
 					/* if any priv is missing we fail the auth */
-					log.trace("priv missing. failing auth.");
+					// log.debug("priv missing. failing auth.");
 					return false;
 				}
 			}

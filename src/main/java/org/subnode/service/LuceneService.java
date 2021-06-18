@@ -57,10 +57,11 @@ public class LuceneService {
 	public LuceneSearchResponse search(MongoSession session, String nodeId, String searchText) {
 		LuceneSearchResponse res = new LuceneSearchResponse();
 		String ret = null;
-		SubNode node = read.getNode(session, nodeId, true);
-		if (node != null) {
-			ret = searcher.search(nodeId, searchText);
-		}
+		// disabled for now.
+		// SubNode node = read.getNode(session, nodeId, true);
+		// if (node != null) {
+		// 	ret = searcher.search(nodeId, searchText);
+		// }
 
 		res.setSuccess(true);
 		res.setMessage(ret);

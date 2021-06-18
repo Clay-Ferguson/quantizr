@@ -91,7 +91,9 @@ export class NodeCompMarkdown extends Html {
 
             // allow any node to have NO_OPEN_GRAPH set on it for special cases where we want OG disabled for all children.
             if (!(state.node && S.props.getNodePropVal(J.NodeProp.NO_OPEN_GRAPH, state.node))) {
-                this.parseAnchorTags(val, content);
+                // this is going to have to go on hold. I mis-judged how MANY urls i have in areas where i DO NOT
+                // want open graph.
+                // this.parseAnchorTags(val, content);
             }
         }
         return val;

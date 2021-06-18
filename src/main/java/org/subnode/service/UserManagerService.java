@@ -852,6 +852,8 @@ public class UserManagerService {
 
 	/*
 	 * Runs when user is doing the 'change password' or 'reset password'
+	 * 
+	 * todo-0: this code is ugly. fix it.
 	 */
 	public ChangePasswordResponse changePassword(MongoSession session, final ChangePasswordRequest req) {
 		ChangePasswordResponse res = new ChangePasswordResponse();

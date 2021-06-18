@@ -21,6 +21,7 @@ import org.subnode.model.NodeInfo;
 import org.subnode.model.NodeMetaInfo;
 import org.subnode.model.client.ErrorType;
 import org.subnode.model.client.NodeProp;
+import org.subnode.model.client.PrivilegeType;
 import org.subnode.mongo.MongoAuth;
 import org.subnode.mongo.MongoRead;
 import org.subnode.mongo.MongoSession;
@@ -440,6 +441,7 @@ public class NodeRenderService {
 
 		String nodeId = req.getNodeId();
 		SubNode node = read.getNode(session, nodeId);
+		auth.auth(session, node, PrivilegeType.WRITE);
 
 		if (node == null) {
 			res.setMessage("Node not found.");

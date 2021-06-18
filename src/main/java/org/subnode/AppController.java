@@ -468,7 +468,8 @@ public class AppController implements ErrorController {
 		callProc.run("rss", null, session, ms -> {
 			adminRunner.run(mongoSession -> {
 				try {
-					rssFeedService.getRssFeed(mongoSession, nodeId, response.getWriter());
+					// pending audit (todo-0)
+					// rssFeedService.getRssFeed(mongoSession, nodeId, response.getWriter());
 				} catch (Exception e) {
 					throw new RuntimeException("internal server error");
 				}

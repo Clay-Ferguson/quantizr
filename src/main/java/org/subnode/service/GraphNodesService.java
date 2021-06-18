@@ -9,6 +9,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.subnode.model.GraphNode;
+import org.subnode.model.client.PrivilegeType;
+import org.subnode.mongo.MongoAuth;
 import org.subnode.mongo.MongoRead;
 import org.subnode.mongo.MongoSession;
 import org.subnode.mongo.model.SubNode;
@@ -26,6 +28,9 @@ public class GraphNodesService {
 
 	@Autowired
 	private MongoRead read;
+
+	@Autowired
+	private MongoAuth auth;
 
 	public GraphResponse graphNodes(MongoSession session, GraphRequest req) {
 		HashMap<String, GraphNode> mapByPath = new HashMap<>();
@@ -54,8 +59,13 @@ public class GraphNodesService {
 			}
 
 			for (SubNode n : results) {
-				GraphNode gn = new GraphNode(n.getId().toHexString(), getNodeName(n), n.getPath(), StringUtils.countMatches(n.getPath(), "/")-rootLevel, searching);
-				mapByPath.put(gn.getPath(), gn);
+				try {
+					auth.auth(session, node, PrivilegeType.READ);
+					GraphNode gn = new GraphNode(n.getId().toHexString(), getNodeName(n), n.getPath(),
+							StringUtils.countMatches(n.getPath(), "/") - rootLevel, searching);
+					mapByPath.put(gn.getPath(), gn);
+				} catch (Exception e) {
+				}
 			}
 
 			processNodes(rootPath, rootLevel, mapByPath);
@@ -142,7 +152,8 @@ public class GraphNodesService {
 			// We only need guid on this name, to ensure D3 works, but the actual name on these
 			// is queries for during mouseover because otherwise it could be a large number
 			// of queries to populate them here now, when that's not needed.
-			parent = new GraphNode(parentPath, String.valueOf(guid++), parentPath,  StringUtils.countMatches(parentPath, "/")-rootLevel, false);
+			parent = new GraphNode(parentPath, String.valueOf(guid++), parentPath,
+					StringUtils.countMatches(parentPath, "/") - rootLevel, false);
 			mapByPath.put(parentPath, parent);
 
 			// keep creating parents until we know we made it to common root.

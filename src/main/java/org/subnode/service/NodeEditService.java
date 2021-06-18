@@ -192,6 +192,8 @@ public class NodeEditService {
 			return res;
 		}
 
+		auth.auth(session, node, PrivilegeType.WRITE);
+
 		CreateNodeLocation createLoc = req.isCreateAtTop() ? CreateNodeLocation.FIRST : CreateNodeLocation.LAST;
 
 		String parentHashTags = parseHashTags(node.getContent());
@@ -351,6 +353,7 @@ public class NodeEditService {
 		String parentNodeId = req.getParentId();
 		log.debug("Inserting under parent: " + parentNodeId);
 		SubNode parentNode = read.getNode(session, parentNodeId);
+		auth.auth(session, parentNode, PrivilegeType.WRITE);
 
 		SubNode newNode = create.createNode(session, parentNode, null, req.getTypeName(), req.getTargetOrdinal(),
 				CreateNodeLocation.ORDINAL, null, null, true);
@@ -386,6 +389,9 @@ public class NodeEditService {
 
 	public SaveNodeResponse saveNode(MongoSession _session, SaveNodeRequest req) {
 		SaveNodeResponse res = new SaveNodeResponse();
+
+		// log.debug("Controller saveNode: " + Thread.currentThread().getName());
+
 		if (_session == null) {
 			_session = ThreadLocals.getMongoSession();
 		}
@@ -682,6 +688,7 @@ public class NodeEditService {
 		}
 		String nodeId = req.getNodeId();
 		SubNode node = read.getNode(session, nodeId);
+		auth.auth(session, node, PrivilegeType.WRITE);
 
 		String propertyName = req.getPropName();
 		node.deleteProp(propertyName);
