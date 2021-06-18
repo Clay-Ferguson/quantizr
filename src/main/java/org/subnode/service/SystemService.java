@@ -171,8 +171,8 @@ public class SystemService {
 		Runtime runtime = Runtime.getRuntime();
 		runtime.gc();
 		long freeMem = runtime.freeMemory() / Const.ONE_MB;
-		sb.append(String.format("Server Free Memory: %dMB\n", freeMem));
-		sb.append(String.format("Session Count: %d\n", AppSessionListener.getSessionCounter()));
+		sb.append(String.format("Server Free Mem: %dMB\n", freeMem));
+		sb.append(String.format("Sessions: %d\n", AppSessionListener.getSessionCounter()));
 		sb.append(getIpReport());
 		sb.append("Node Count: " + read.getNodeCount(null) + "\n");
 		sb.append("Attachment Count: " + attachmentService.getGridItemCount() + "\n");
