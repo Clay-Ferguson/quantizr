@@ -24,13 +24,7 @@ export class OpenGraphPanel extends Div {
         this.mergeState({ og });
     }
 
-    onAddEvent = (): void => {
-        // the current ref needs to be passed in from the base as an arg here (todo-0)
-        if (!this.attribs.ref || !this.attribs.ref.current) {
-            return;
-        }
-        let elm = this.attribs.ref.current;
-
+    onAddEvent = (elm: HTMLElement): void => {
         let og = S.meta64.openGraphData.get(this.url);
         if (!og) {
             // todo-1: An optimization would also be WHILE scrolling turn off the observersions (disconnect()), and

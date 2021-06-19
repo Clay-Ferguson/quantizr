@@ -385,7 +385,9 @@ export abstract class Comp<S extends BaseCompState = any> implements CompIntf {
             this.attribs.ref = useRef(null);
 
             if (this.domPreUpdateEvent) {
-                useLayoutEffect(this.domPreUpdateEvent);
+                useLayoutEffect(() => {
+                    this.domPreUpdateEvent(this.attribs.ref.current);
+                });
 
                 // this works too...
                 // useLayoutEffect(() => this.domPreUpdateEvent(), []);
@@ -433,8 +435,9 @@ export abstract class Comp<S extends BaseCompState = any> implements CompIntf {
     _domAddEvent: () => void = null;
     domAddEvent(): void {
         if ((this as any).onAddEvent) {
-            (this as any).onAddEvent();
+            (this as any).onAddEvent(this.attribs.ref.current);
         }
+
         // console.log("domAddEvent: " + this.jsClassName);
 
         /* In order for a React Render to not loose focus (sometimes) we keep track of the last thing that

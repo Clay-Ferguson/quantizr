@@ -431,7 +431,7 @@ public class NodeEditService {
 				throw new RuntimeEx("You can't have a Friend that is yourself.");
 			}
 
-			// todo-0: this was an ugly quick and dirty way to reject dupliate friend adds. Need to accomplish
+			// todo-0: this was an ugly quick and dirty way to reject duplicate friend adds. Need to accomplish
 			// this with some kind of genuine unique constraint.
 			Iterable<SubNode> friendNodes =
 					read.findSubNodesByProp(session, node.getParentPath(), NodeProp.USER.s(), friendUserName);

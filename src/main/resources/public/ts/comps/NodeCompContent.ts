@@ -112,11 +112,11 @@ export class NodeCompContent extends Div {
         }
     }
 
-    domPreUpdateEvent = (): void => {
+    domPreUpdateEvent = (elm: HTMLElement): void => {
         if (this.domPreUpdateFunc) {
-            this.whenElm((elm) => {
+            // this.whenElm((elm) => {
                 this.domPreUpdateFunc(this);
-            });
+            // });
         }
     }
 }

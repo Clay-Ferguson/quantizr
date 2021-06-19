@@ -689,7 +689,7 @@ public class UserManagerService {
 			res.setSuccess(true);
 		} else {
 			/*
-			 * todo-0: for this AND the friend request (similar places), we need to make it where the user can
+			 * todo-1: for this AND the friend request (similar places), we need to make it where the user can
 			 * never get here or click a button if this is redundant. also we don't yet have in the GUI the
 			 * indication of "Follows You" and "[You're] Following" when someone views a user, which is part of
 			 * what's needed for this.

@@ -22,7 +22,7 @@ export class NodeCompMarkdown extends Html {
     urls: string[];
 
     constructor(public node: J.NodeInfo, private appState: AppState) {
-        // todo-0: need better deterministic repeatable key here.
+        // todo-0: need better key here?
         super(null, { key: node.id });
 
         // Set the content display to wider if there is a code block. This makes the non-code text also wrap at a wider

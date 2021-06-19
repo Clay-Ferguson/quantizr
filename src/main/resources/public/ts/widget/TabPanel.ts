@@ -58,23 +58,20 @@ export class TabPanel extends Div {
         return tabs;
     }
 
-    onAddEvent = (): void => {
-        if (!this.attribs.ref || !this.attribs.ref.current) {
-            return;
-        }
-        let elm = this.attribs.ref.current;
-
-        /* We set the scroll position back to whatever it should be for the currently active tab
-
-       todo-1: we have some scroll setting happening in the tab change event too (do we need both this and that?)
-       */
-        // todo-0: create a scrollNow() function for this little block of code (it's repeated twice)
+    reScroll = (elm: HTMLElement): void => {
+        /* Set the scroll position back to whatever it should be for the currently active tab.
+         todo-1: we have some scroll setting happening in the tab change event too
+         (do we need both this and that?) */
         if (S.meta64.scrollPosByTabName.has(S.meta64.activeTab)) {
             let newPos = S.meta64.scrollPosByTabName.get(S.meta64.activeTab);
             // #DEBUG-SCROLLING
             // console.log("scroll " + S.meta64.activeTab + " to " + newPos + " in onAddEvent");
             elm.scrollTop = newPos;
         }
+    }
+
+    onAddEvent = (elm: HTMLElement): void => {
+        this.reScroll(elm);
 
         elm.addEventListener("scroll", () => {
             // console.log("Scroll pos: " + elm.scrollTop);
@@ -83,22 +80,7 @@ export class TabPanel extends Div {
         }, { passive: true });
     }
 
-    domPreUpdateEvent = (): void => {
-        if (!this.attribs.ref || !this.attribs.ref.current) {
-            // console.log("(onAddEvent) no ref current");
-            return;
-        }
-        let elm = this.attribs.ref.current;
-
-        /* We set the scroll position back to whatever it should be for the currently active tab
-
-       todo-1: we have some scroll setting happening in the tab change event too (do we need both this and that?)
-       */
-        if (S.meta64.scrollPosByTabName.has(S.meta64.activeTab)) {
-            let newPos = S.meta64.scrollPosByTabName.get(S.meta64.activeTab);
-            // #DEBUG-SCROLLING
-            // console.log("scroll " + S.meta64.activeTab + " to " + newPos + " in onAddEvent");
-            elm.scrollTop = newPos;
-        }
+    domPreUpdateEvent = (elm: HTMLElement): void => {
+        this.reScroll(elm);
     }
 }
