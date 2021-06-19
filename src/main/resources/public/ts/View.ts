@@ -165,6 +165,7 @@ export class View implements ViewIntf {
     }
 
     scrollAllTop = () => {
+        // #DEBUG-SCROLLING
         // console.log("scrollAllTop");
         S.util.getElm(C.ID_LHS, (elm: HTMLElement) => {
             elm.scrollTop = 0;
@@ -178,6 +179,7 @@ export class View implements ViewIntf {
     }
 
     scrollTo = (offset: number) => {
+        // #DEBUG-SCROLLING
         // console.log("scrollTo: " + offset);
         S.util.getElm(C.ID_TAB, (elm: HTMLElement) => {
             elm.scrollTop = offset;
@@ -215,6 +217,8 @@ export class View implements ViewIntf {
                     // console.log("Got first element: " + elm.firstElementChild);
                     elm = elm.firstElementChild;
                 }
+
+                // #DEBUG-SCROLLING
                 // console.log("scrollIntoView");
                 elm.scrollIntoView(true);
             }

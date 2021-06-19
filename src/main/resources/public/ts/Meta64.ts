@@ -42,6 +42,7 @@ export class Meta64 implements Meta64Intf {
     noScrollToId: string = null;
     addFriendPending: boolean = false;
     activeTab: string;
+    lastScrollTime: number = 0;
 
     app: CompIntf;
     appInitialized: boolean = false;

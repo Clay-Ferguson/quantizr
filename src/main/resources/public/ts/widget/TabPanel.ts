@@ -61,27 +61,32 @@ export class TabPanel extends Div {
         return tabs;
     }
 
-    domPreUpdateEvent = (): void => {
-        this.whenElm((elm: HTMLElement) => {
+    onAddEvent = (): void => {
+        if (!this.attribs.ref || !this.attribs.ref.current) {
+            // console.log("(onAddEvent) no ref current");
+            return;
+        }
 
-            /* We set the scroll position back to whatever it should be for the currently active tab
+        /* We set the scroll position back to whatever it should be for the currently active tab
 
-            todo-1: we have some scroll setting happening in the tab change event too (do we need both this and that?)
-            */
-            if (S.meta64.scrollPosByTabName.has(S.meta64.activeTab)) {
-                let newPos = S.meta64.scrollPosByTabName.get(S.meta64.activeTab);
-                // console.log("Restoring tab " + S.meta64.activeTab + " to " + newPos + " in domPreUpdateEvent");
-                elm.scrollTop = newPos;
-            }
+       todo-1: we have some scroll setting happening in the tab change event too (do we need both this and that?)
+       */
+        if (S.meta64.scrollPosByTabName.has(S.meta64.activeTab)) {
+            let newPos = S.meta64.scrollPosByTabName.get(S.meta64.activeTab);
+            // #DEBUG-SCROLLING
+            // console.log("scroll " + S.meta64.activeTab + " to " + newPos + " in onAddEvent");
+            this.attribs.ref.current.scrollTop = newPos;
+        }
 
-            /* Listen to scroll position change, and update the active tab value in realtime.
-            (this can't get added multiple times can it? I need to verify. If it DOES duplicate listeners
-            it will still have only a slight performance degradation. todo-1
-            */
-            elm.addEventListener("scroll", () => {
-                // console.log("Scroll pos: " + elm.scrollTop);
-                S.meta64.scrollPosByTabName.set(S.meta64.activeTab, elm.scrollTop);
-            }, { passive: true });
-        });
+        /* Listen to scroll position change, and update the active tab value in realtime.
+        (this can't get added multiple times can it? I need to verify. If it DOES duplicate listeners
+        it will still have only a slight performance degradation. todo-1
+        */
+        this.attribs.ref.current.addEventListener("scroll", () => {
+            // console.log("Scroll pos: " + this.attribs.ref.current.scrollTop);
+            S.meta64.lastScrollTime = new Date().getTime();
+            S.meta64.scrollPosByTabName.set(S.meta64.activeTab, this.attribs.ref.current.scrollTop);
+        }, { passive: true });
+
     }
 }

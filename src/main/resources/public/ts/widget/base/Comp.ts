@@ -2,7 +2,7 @@
 // https://reactjs.org/docs/hooks-reference.html#usestate
 // #RulesOfHooks: https://fb.me/rules-of-hooks
 
-import { createElement, ReactElement, ReactNode, useEffect, useLayoutEffect } from "react";
+import { createElement, ReactElement, ReactNode, useEffect, useLayoutEffect, useRef } from "react";
 import * as ReactDOM from "react-dom";
 import { renderToString } from "react-dom/server";
 import { Provider } from "react-redux";
@@ -33,15 +33,6 @@ export abstract class Comp<S extends BaseCompState = any> implements CompIntf {
     private static guid: number = 0;
 
     e: Function = createElement;
-
-    /*
-    DO NOT DELETE:
-    This is one way that should work, but isn't being used because we're using
-    the domAddEvent method let us know when the element is visible, which should be just
-    as efficient, and isn't using any timers. The way this should work is any
-    constructor can set 'referenced' to true to trigger 'ref' to get set during render. */
-    // public referenced: boolean;
-    // private ref: any;
 
     attribs: any;
 
@@ -377,13 +368,6 @@ export abstract class Comp<S extends BaseCompState = any> implements CompIntf {
         try {
             this.s.useState();
 
-            // DO NOT DELETE
-            // if (this.referenced) {
-            //     // console.log("Element is referenced: " + this.jsClassName);
-            //     // NOTE: ref.current will get set to the actual DOM element once available.
-            //     this.ref = useRef(null);
-            // }
-
             if (!this._domAddEvent) {
                 this._domAddEvent = this.domAddEvent.bind(this);
             }
@@ -395,8 +379,13 @@ export abstract class Comp<S extends BaseCompState = any> implements CompIntf {
                 useEffect(this.domUpdateEvent);
             }
 
+            this.attribs.ref = useRef(null);
+
             if (this.domPreUpdateEvent) {
                 useLayoutEffect(this.domPreUpdateEvent);
+
+                // this works too...
+                // useLayoutEffect(() => this.domPreUpdateEvent(), []);
             }
 
             /*
@@ -440,6 +429,9 @@ export abstract class Comp<S extends BaseCompState = any> implements CompIntf {
 
     _domAddEvent: () => void = null;
     domAddEvent(): void {
+        if ((this as any).onAddEvent) {
+            (this as any).onAddEvent();
+        }
         // console.log("domAddEvent: " + this.jsClassName);
 
         /* In order for a React Render to not loose focus (sometimes) we keep track of the last thing that

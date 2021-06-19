@@ -122,7 +122,14 @@ export class NodeCompMarkdown extends Html {
         });
 
         if (this.urls.length > 0) {
-            S.util.addOpenGraphUrls(this.urls);
+            this.whenElm((e: HTMLElement) => {
+                let observer = new IntersectionObserver((entries) => {
+                    if (entries[0].isIntersecting) {
+                        S.util.addOpenGraphUrls(this.urls);
+                    }
+                }, { threshold: [0] });
+                observer.observe(e);
+            });
         }
     }
 

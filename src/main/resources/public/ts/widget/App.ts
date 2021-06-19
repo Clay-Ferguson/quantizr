@@ -123,6 +123,7 @@ export class App extends Main {
 
         if (comp) {
             comp.domUpdateEvent = () => {
+                // #DEBUG-SCROLLING
                 S.view.docElm.scrollTop = 0;
             };
         }

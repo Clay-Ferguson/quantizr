@@ -17,6 +17,7 @@ export interface Meta64Intf {
     deviceHeight: number;
     addFriendPending: boolean;
     activeTab: string;
+    lastScrollTime: number;
 
     parentIdToFocusNodeMap: Map<string, string>;
     curHighlightNodeCompRow: CompIntf;
