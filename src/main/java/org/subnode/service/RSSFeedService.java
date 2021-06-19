@@ -6,11 +6,11 @@ import java.io.Reader;
 import java.io.Writer;
 import java.net.URL;
 import java.net.URLConnection;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import com.rometools.rome.feed.synd.SyndContent;
 import com.rometools.rome.feed.synd.SyndContentImpl;
@@ -101,10 +101,15 @@ public class RSSFeedService {
 	 */
 	private static final ConcurrentHashMap<String, SyndFeed> aggregateCache = new ConcurrentHashMap<>();
 
-	/*
-	 * Cache of all calls to proxyGet
-	 */
-	public static final ConcurrentHashMap<String, byte[]> proxyCache = new ConcurrentHashMap<>();
+	/* todo-0: need a timer thread that clears this out ever 5 minutes */
+	private static int MAX_CACHE_SIZE = 500;
+	public static final LinkedHashMap<String, byte[]> proxyCache =
+			new LinkedHashMap<String, byte[]>(MAX_CACHE_SIZE + 1, .75F, false) {
+				protected boolean removeEldestEntry(Map.Entry<String, byte[]> eldest) {
+					return size() > MAX_CACHE_SIZE;
+				}
+			};
+
 
 	private static int runCount = 0;
 

@@ -120,5 +120,4 @@ export interface UtilIntf {
     getPropFromDom(evt: Event, prop: string): string;
     getShortContent(node: J.NodeInfo): string;
     loadOpenGraph(urlRemote: string, callback: Function): void;
-    addOpenGraphUrls(urls: string[]): void;
 }

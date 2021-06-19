@@ -22,7 +22,8 @@ export class NodeCompMarkdown extends Html {
     urls: string[];
 
     constructor(public node: J.NodeInfo, private appState: AppState) {
-        super();
+        // todo-0: need better deterministic repeatable key here.
+        super(null, { key: node.id });
 
         // Set the content display to wider if there is a code block. This makes the non-code text also wrap at a wider
         // width but we have to tolerate that for now, becasue there's not a cleaner 'easy' solution.
@@ -88,13 +89,7 @@ export class NodeCompMarkdown extends Html {
 
             /* parse tags, to build OpenGraph */
             let state: AppState = store.getState();
-
-            // allow any node to have NO_OPEN_GRAPH set on it for special cases where we want OG disabled for all children.
-            // if (!(state.node && S.props.getNodePropVal(J.NodeProp.NO_OPEN_GRAPH, state.node))) {
-            //     This works, but stil flickers and looses focus too much even though I got the
-            //     scrolling disaster fixed.
-            //     this.parseAnchorTags(val, content);
-            // }
+            this.parseAnchorTags(val, content);
         }
         return val;
     }
@@ -122,18 +117,6 @@ export class NodeCompMarkdown extends Html {
 
             this.urls.push(href);
         });
-
-        if (this.urls.length > 0) {
-            this.whenElm((e: HTMLElement) => {
-                let observer = new IntersectionObserver((entries) => {
-                    if (entries[0].isIntersecting) {
-                        S.util.addOpenGraphUrls(this.urls);
-                    }
-                }, { threshold: [0] });
-                observer.observe(e);
-                // S.util.addOpenGraphUrls(this.urls);
-            });
-        }
     }
 
     preRender(): void {

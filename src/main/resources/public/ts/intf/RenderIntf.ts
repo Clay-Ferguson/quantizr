@@ -36,5 +36,4 @@ export interface RenderIntf {
     parseEmojis(value: any): any;
     renderUser(state: AppState, nodeId: string, user: string, userBio: string, userNodeId: string, imgSrc: string, actorUrl: string,
         displayName: string, className: string, iconClass: string, showMessageButton: boolean, onClick: Function): Comp;
-    renderOpenGraph(ogData: any, urlParam: string): CompIntf;
 }

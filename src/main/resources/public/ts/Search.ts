@@ -213,7 +213,12 @@ export class Search implements SearchIntf {
                 s.feedLoading = false;
                 s.feedWaitingForUserRefresh = false;
                 S.meta64.selectTabStateOnly(C.TAB_FEED, s);
-                S.view.scrollToTop();
+
+                // for some reason mobile only isn't scrolling to top so this is a quick hack (todo-0)
+                setTimeout(() => {
+                    S.view.scrollToTop();
+                }, 1700);
+
                 return s;
             });
         });

@@ -21,6 +21,8 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.subnode.actpub.model.APObj;
 import org.subnode.config.AppProp;
 
+// @CrossOrigin --> Access-Control-Allow-Credentials
+
 @Controller
 @CrossOrigin
 public class ActPubController {

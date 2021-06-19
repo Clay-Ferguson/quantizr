@@ -19,7 +19,7 @@ export class NodeCompMainList extends Div {
     static helpExpanded: boolean = false;
 
     constructor() {
-        super(null);
+        super(null, { key: "nodeCompMaiList" });
     }
 
     preRender(): void {

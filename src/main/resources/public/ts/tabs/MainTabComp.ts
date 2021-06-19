@@ -21,6 +21,7 @@ export class MainTabComp extends AppTab {
 
     constructor(data: TabDataIntf) {
         super(data);
+        this.attribs.key = "mainTabCompKey";
     }
 
     preRender(): void {

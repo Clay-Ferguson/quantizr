@@ -1,10 +1,8 @@
-import { AppState } from "../AppState";
 import { Constants as C } from "../Constants";
 import { TabDataIntf } from "../intf/TabDataIntf";
 import { PubSub } from "../PubSub";
 import { Singletons } from "../Singletons";
 import { Div } from "./Div";
-import { Li } from "./Li";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {

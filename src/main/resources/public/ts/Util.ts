@@ -1415,6 +1415,7 @@ export class Util implements UtilIntf {
     loadOpenGraph = (urlRemote: string, callback: Function): void => {
         // query thru proxyGet because of CORS.
         try {
+            // console.log("Getting OG: " + urlRemote);
             let url = S.util.getRemoteHost() + "/proxyGet?url=" + encodeURIComponent(urlRemote);
             fetch(url)
                 .then(response => {
@@ -1445,27 +1446,5 @@ export class Util implements UtilIntf {
         catch (e) {
             // ignore
         }
-    }
-
-    addOpenGraphUrls = (urls: string[]): void => {
-        if (!urls || urls.length === 0) return;
-        urls.forEach(url => {
-            if (!S.meta64.openGraphData.has(url)) {
-                // console.log("Queueing OG: " + url);
-                S.meta64.openGraphData.set(url, null);
-
-                this.loadOpenGraph(url, (ogData: any) => {
-                    // console.log("loadOpenGraph callback: " + S.util.prettyPrint(ogData));
-                    // if the url failed to load, we get here with ogData==null and that's correct.
-                    S.meta64.openGraphData.set(url, ogData);
-                    if (ogData) {
-                        // S.render.autoRender = true;
-                        dispatch("Action_autoRender", (s: AppState): AppState => {
-                            return s;
-                        });
-                    }
-                });
-            }
-        });
     }
 }

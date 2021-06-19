@@ -158,7 +158,6 @@ import org.subnode.util.Util;
  * in certain layers (abstraction related and for loose-coupling).
  */
 @Controller
-@CrossOrigin
 public class AppController implements ErrorController {
 	private static final Logger log = LoggerFactory.getLogger(AppController.class);
 
@@ -491,7 +490,10 @@ public class AppController implements ErrorController {
 		callProc.run("proxyGet", null, session, ms -> {
 			try {
 				// try to get proxy info from cache.
-				byte[] cacheBytes = RSSFeedService.proxyCache.get(url);
+				byte[] cacheBytes = null;
+				synchronized (RSSFeedService.proxyCache) {
+					cacheBytes = RSSFeedService.proxyCache.get(url);
+				}
 
 				if (cacheBytes != null) {
 					// limiting the stream just becasue for now this is only used in feed
@@ -503,9 +505,13 @@ public class AppController implements ErrorController {
 				else {
 					ResponseEntity<byte[]> resp = restTemplate.getForEntity(new URI(url), byte[].class);
 					response.setStatus(HttpStatus.OK.value());
-					RSSFeedService.proxyCache.put(url, resp.getBody());
 
-					IOUtils.copy(new ByteArrayInputStream(resp.getBody()), response.getOutputStream());
+					byte[] body = resp.getBody();
+					synchronized (RSSFeedService.proxyCache) {
+						RSSFeedService.proxyCache.put(url, body);
+					}
+
+					IOUtils.copy(new ByteArrayInputStream(body), response.getOutputStream());
 
 					// DO NOT DELETE (good example)
 					// restTemplate.execute(url, HttpMethod.GET, (ClientHttpRequest requestCallback)

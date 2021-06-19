@@ -518,7 +518,6 @@ export class Render implements RenderIntf {
                         this.allowFadeInId = true;
                     }
                 }
-
                 return s;
             });
         }
@@ -621,40 +620,6 @@ export class Render implements RenderIntf {
                 new UserProfileDlg(node.ownerId, state).open();
             }
         });
-    }
-
-    renderOpenGraph = (o: any, url: string): CompIntf => {
-        if (!o) return null;
-        let title = o.ogTitle || o.twitterTitle;
-        let desc = o.ogDecsciption || o.twitterDescription;
-        let image = o.ogImage || o.twitterImage;
-
-        /* If neither a description nor image exists, this will not be interesting enough so don't render */
-        if (!desc && !image) return null;
-
-        if (!o.ogUrl) {
-            o.ogUrl = url;
-        }
-
-        // todo-1: need to detect when there's an image width specified (image.width?) that is
-        // less than what is in openGraphImage, and then use that with
-
-        return new Div(null, {
-            className: "openGraphPanel",
-            title: url
-        }, [
-            o.ogUrl ? new Anchor(o.ogUrl, title, {
-                target: "_blank",
-                className: "openGraphTitle"
-            }) : new Div(title, {
-                className: "openGraphTitle"
-            }),
-            new Div(desc),
-            image && image.url ? new Img(null, {
-                className: "openGraphImage",
-                src: image.url
-            }) : null
-        ]);
     }
 
     /* Returns true if the logged in user and the type of node allow the property to be edited by the user */

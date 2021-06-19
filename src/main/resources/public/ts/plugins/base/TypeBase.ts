@@ -1,5 +1,6 @@
 import { AppState } from "../../AppState";
 import { NodeCompMarkdown } from "../../comps/NodeCompMarkdown";
+import { OpenGraphPanel } from "../../comps/OpenGraphPanel";
 import { Constants as C } from "../../Constants";
 import { NodeActionType } from "../../enums/NodeActionType";
 import { TypeHandlerIntf } from "../../intf/TypeHandlerIntf";
@@ -105,19 +106,17 @@ export class TypeBase implements TypeHandlerIntf {
         //         ], null, "marginLeft marginBottom")
         //     ]);
         // }
-        let comp = new NodeCompMarkdown(node, state);
+        let comp: NodeCompMarkdown = new NodeCompMarkdown(node, state);
 
         /* if we notice we have URLs, then render them if available, but note they render asynchronously
         so this code will actually execute everytime a new OpenGraph result comes in and triggeres a state
         dispatch which causes a new render
         */
+        // This OpenGraph logic should maybe be just built into the Markdown component itself?
         if (comp.urls) {
             let children: CompIntf[] = [comp];
             comp.urls.forEach((url: string) => {
-                let ogData = S.meta64.openGraphData.get(url);
-                if (ogData) {
-                    children.push(S.render.renderOpenGraph(ogData, url));
-                }
+                children.push(new OpenGraphPanel("og_" + comp.getId(), url));
             });
             return new Div(null, null, children);
         }
