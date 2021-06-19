@@ -313,7 +313,6 @@ a {
 .binary-link {
     margin-left: $smallGap;
     margin-bottom: $smallGap;
-    font-weight: bold; 
 }
 
 .normalText {
@@ -924,16 +923,13 @@ input[type="radio"] {
     margin-bottom: 16px;    
 }
 
-.audioDownloadLink {
+.downloadLink {
     margin-left: $smallGap;
     margin-top: $smallGap;
     white-space: nowrap;
-}
-
-.videoDownloadLink {
-    margin-left: $smallGap;
-    margin-top: $smallGap;
-    white-space: nowrap;
+    padding: 6px;
+    border: 2px solid $gray-700;
+    border-radius: $border-radius;
 }
 
 .marginLeftIfNotFirst {

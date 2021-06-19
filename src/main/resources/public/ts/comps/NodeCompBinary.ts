@@ -1,5 +1,5 @@
 import { useSelector } from "react-redux";
-import { appState, dispatch } from "../AppRedux";
+import { dispatch } from "../AppRedux";
 import { AppState } from "../AppState";
 import { Constants as C } from "../Constants";
 import { AudioPlayerDlg } from "../dlg/AudioPlayerDlg";
@@ -8,10 +8,10 @@ import * as J from "../JavaIntf";
 import { PubSub } from "../PubSub";
 import { Singletons } from "../Singletons";
 import { Anchor } from "../widget/Anchor";
-import { Button } from "../widget/Button";
 import { ButtonBar } from "../widget/ButtonBar";
 import { Div } from "../widget/Div";
 import { Icon } from "../widget/Icon";
+import { IconButton } from "../widget/IconButton";
 import { Img } from "../widget/Img";
 import { Span } from "../widget/Span";
 
@@ -107,22 +107,26 @@ export class NodeCompBinary extends Div {
         }
         else if (S.props.hasVideo(node)) {
             this.setChildren([new ButtonBar([
-                new Button("Play Video", () => {
-                    new VideoPlayerDlg(S.render.getStreamUrlForNodeAttachment(node), null, state).open();
+                new IconButton("fa-play", "Play Video", {
+                    onClick: () => {
+                        new VideoPlayerDlg(S.render.getStreamUrlForNodeAttachment(node), null, state).open();
+                    }
                 }),
                 new Span("", {
-                    className: "videoDownloadLink"
-                }, [new Anchor(S.render.getUrlForNodeAttachment(node, true), "[Download]")])
+                    className: "downloadLink"
+                }, [new Anchor(S.render.getUrlForNodeAttachment(node, true), "Download", { target: "_blank" })])
             ], "marginAll")]);
         }
         else if (S.props.hasAudio(node)) {
             this.setChildren([new ButtonBar([
-                new Button("Play Audio", () => {
-                    new AudioPlayerDlg(null, null, null, S.render.getStreamUrlForNodeAttachment(node), 0, state).open();
+                new IconButton("fa-play", "Play Audio", {
+                    onClick: () => {
+                        new AudioPlayerDlg(null, null, null, S.render.getStreamUrlForNodeAttachment(node), 0, state).open();
+                    }
                 }),
                 new Span("", {
-                    className: "audioDownloadLink"
-                }, [new Anchor(S.render.getUrlForNodeAttachment(node, true), "[Download]")])
+                    className: "downloadLink"
+                }, [new Anchor(S.render.getUrlForNodeAttachment(node, true), "Download", { target: "_blank" })])
             ], "marginAll")]);
         }
         /*
@@ -135,9 +139,9 @@ export class NodeCompBinary extends Div {
 
             let viewFileLink: Anchor = null;
             if (fileType === "application/pdf" || fileType.startsWith("text/")) {
-                viewFileLink = new Anchor(S.render.getUrlForNodeAttachment(node, false), "[ View ]", {
+                viewFileLink = new Anchor(S.render.getUrlForNodeAttachment(node, false), "View", {
                     target: "_blank",
-                    className: "marginLeft"
+                    className: "marginLeft downloadLink"
                 });
             }
 
@@ -151,8 +155,8 @@ export class NodeCompBinary extends Div {
                 new Span(fileName, {
                     className: "normalText marginRight"
                 }),
-                new Div(null, null, [
-                    new Anchor(S.render.getUrlForNodeAttachment(node, true), "[ Download ]"),
+                new Div(null, { className: "marginTop" }, [
+                    new Anchor(S.render.getUrlForNodeAttachment(node, true), "Download", { className: "downloadLink" }),
                     viewFileLink
                 ])
             ])]);

@@ -1,11 +1,13 @@
 package org.subnode.util;
 
+import java.net.URLConnection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -78,6 +80,17 @@ public class Convert {
 					if (!dataUrl.startsWith("data:")) {
 						dataUrl = null;
 					}
+				}
+			}
+		}
+
+		// ensure we have the best mimeType we can if not set in the data.
+		if (StringUtils.isEmpty(mimeType)) {
+			String binUrl = node.getStrProp(NodeProp.BIN_URL.s());
+			if (!StringUtils.isEmpty(binUrl)) {
+				mimeType = URLConnection.guessContentTypeFromName(binUrl);
+				if (!StringUtils.isEmpty(mimeType)) {
+					node.setProp(NodeProp.BIN_MIME.s(), mimeType);
 				}
 			}
 		}

@@ -33,20 +33,24 @@ export class OpenGraphPanel extends Div {
 
         let og = S.meta64.openGraphData.get(this.url);
         if (!og) {
-            let observer = new IntersectionObserver((entries) => {
-                if (entries[0].isIntersecting) {
-                    let og = S.meta64.openGraphData.get(this.url);
-                    if (!og) {
-                        this.mergeState({ loading: true });
-                        S.util.loadOpenGraph(this.url, (og: any) => {
-                            S.meta64.openGraphData.set(this.url, og || {});
-                            this.mergeState({ loading: false, og });
-                        });
+            // todo-1: An optimization would also be WHILE scrolling turn off the observersions (disconnect()), and
+            // then reenable after scroll position has been static a second or so.
+            // NOTE: It's possible to use ONE IntersectionObserver even globally in app but since
+            // we have local state being updated, this will have to do.
+            let observer = new IntersectionObserver(entries => {
+                entries.forEach((entry: any) => {
+                    if (entry.isIntersecting) {
+                        let og = S.meta64.openGraphData.get(this.url);
+                        if (!og) {
+                            this.mergeState({ loading: true });
+                            S.util.loadOpenGraph(this.url, (og: any) => {
+                                S.meta64.openGraphData.set(this.url, og || {});
+                                this.mergeState({ loading: false, og });
+                            });
+                        }
                     }
-                }
-            },
-            // todo-0: threshold may be better as non-zero ?
-            { threshold: [0] });
+                });
+            });
             observer.observe(elm);
         }
     }

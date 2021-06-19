@@ -798,6 +798,7 @@ export const enum NodeProp {
     PRIORITY = "priority",
     LAYOUT = "layout",
     ORDER_BY = "orderBy",
+    NO_OPEN_GRAPH = "noOpenGraph",
     TYPE_LOCK = "sn:typLoc",
     DATE = "date",
     DURATION = "duration",
