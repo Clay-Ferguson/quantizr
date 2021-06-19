@@ -57,7 +57,7 @@ export class TabPanel extends Div {
         return tabs;
     }
 
-    onAddEvent = (): void => {
+    domPreUpdateEvent = (): void => {
         if (!this.attribs.ref || !this.attribs.ref.current) {
             // console.log("(onAddEvent) no ref current");
             return;

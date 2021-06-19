@@ -503,14 +503,9 @@ export class Meta64 implements Meta64Intf {
             this.displaySignupMessage();
 
             window.addEventListener("orientationchange", () => {
-                let state = store.getState();
-
-                /* unless the user is possibly editing, let's just force the whole page to rerender when user
-                reorients the screen, because some mobile platforms have a zooming issue. I haven't yet tried to just
-                force React to re-render, so I'm not positive that won't fix the problem. This can suffice for now */
-                if (!state.userPreferences.editMode) {
-                    window.location.reload();
-                }
+                dispatch("Action_orientationChange", (s: AppState): AppState => {
+                    return s;
+                });
             });
 
             window.addEventListener("resize", () => {
