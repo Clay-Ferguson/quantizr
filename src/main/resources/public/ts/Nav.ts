@@ -38,6 +38,7 @@ export class Nav implements NavIntf {
     }
 
     signup = (state: AppState): void => {
+        state = appState(state);
         S.user.openSignupPg(state);
     }
 

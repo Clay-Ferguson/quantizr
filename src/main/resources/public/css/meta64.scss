@@ -84,18 +84,6 @@ $mobileHeaderHeight: 3.5em;
     height: 100vh;
 }
 
-.mainAppRowTop {
-    margin: 10px !important;
-    height: $mobileHeaderHeight;
-}
-
-.mainAppRowBottom {
-    margin-top: 0px !important;
-    margin-left: 10px !important;
-    margin-right: 10px !important;
-    height: calc(100vh-$mobileHeaderHeight);
-}
-
 .tab-panel-mobile {
     margin-left: 0px !important;
     margin-right: 0px !important;

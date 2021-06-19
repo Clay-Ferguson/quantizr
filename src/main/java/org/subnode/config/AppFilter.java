@@ -36,7 +36,7 @@ public class AppFilter extends GenericFilterBean {
 
 	// forces transactions to be at least this number of milliseconds apart. 
 	// todo-0: this needs to be a configurable parameter
-	private static int THROTTLE_INTERVAL = 3000;
+	private static int THROTTLE_INTERVAL = 2000;
 
 	@Autowired
 	private SessionContext sessionContext;

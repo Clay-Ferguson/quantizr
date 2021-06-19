@@ -90,9 +90,11 @@ export class NodeCompMarkdown extends Html {
             let state: AppState = store.getState();
 
             // allow any node to have NO_OPEN_GRAPH set on it for special cases where we want OG disabled for all children.
-            if (!(state.node && S.props.getNodePropVal(J.NodeProp.NO_OPEN_GRAPH, state.node))) {
-                this.parseAnchorTags(val, content);
-            }
+            // if (!(state.node && S.props.getNodePropVal(J.NodeProp.NO_OPEN_GRAPH, state.node))) {
+            //     This works, but stil flickers and looses focus too much even though I got the
+            //     scrolling disaster fixed.
+            //     this.parseAnchorTags(val, content);
+            // }
         }
         return val;
     }
@@ -129,6 +131,7 @@ export class NodeCompMarkdown extends Html {
                     }
                 }, { threshold: [0] });
                 observer.observe(e);
+                // S.util.addOpenGraphUrls(this.urls);
             });
         }
     }

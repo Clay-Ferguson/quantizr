@@ -1459,7 +1459,10 @@ export class Util implements UtilIntf {
                     // if the url failed to load, we get here with ogData==null and that's correct.
                     S.meta64.openGraphData.set(url, ogData);
                     if (ogData) {
-                        S.render.autoRender = true;
+                        // S.render.autoRender = true;
+                        dispatch("Action_autoRender", (s: AppState): AppState => {
+                            return s;
+                        });
                     }
                 });
             }

@@ -63,13 +63,9 @@ export class App extends Main {
             if (state.mobileMode) {
                 this.setChildren([
                     new Div(null, {
-                        className: "row mainAppRowTop"
+                        className: "row mainAppRow"
                     }, [
-                        mobileTopBar
-                    ]),
-                    new Div(null, {
-                        className: "row mainAppRowBottom"
-                    }, [
+                        mobileTopBar,
                         new TabPanel()
                     ])
                 ]);
@@ -134,7 +130,7 @@ export class App extends Main {
         let comp: CompIntf = null;
         if (state.mobileMode) {
             let menuButton = null;
-            menuButton = new IconButton("fa-bars", "Menu", {
+            menuButton = new IconButton("fa-bars", "", {
                 onClick: e => {
                     S.nav.showMainMenu(state);
                 },
@@ -143,11 +139,7 @@ export class App extends Main {
                 // title: "Show Main Menu"
             }, "btn-secondary marginRight", "off");
 
-            let signupButton = state.isAnonUser ? new IconButton("fa-user-plus", "Signup", {
-                onClick: e => { S.nav.signup(state); }
-            }, "btn-primary marginRight", "off") : null;
-
-            let loginButton = state.isAnonUser ? new IconButton("fa-sign-in", "Login", {
+            let loginButton = state.isAnonUser ? new IconButton("fa-sign-in", "", {
                 onClick: e => { S.nav.login(state); }
             }, "btn-primary marginRight", "off") : null;
 
@@ -161,14 +153,14 @@ export class App extends Main {
             let messagesSuffix = state.newMessageCount > 0
                 ? " (" + state.newMessageCount + ")" : "";
 
-            let appName = new Span(g_brandingAppName + messagesSuffix, {
-                className: "logo-text",
-                onClick: e => { S.meta64.loadAnonPageHome(null); },
-                title: "Go to Portal Home Node"
-            });
+            // let appName = new Span(g_brandingAppName + messagesSuffix, {
+            //     className: "logo-text",
+            //     onClick: e => { S.meta64.loadAnonPageHome(null); },
+            //     title: "Go to Portal Home Node"
+            // });
 
             let title = state.title ? new Button("@" + state.title, e => { S.nav.navHome(state); }) : null;
-            comp = new Div(null, null, [menuButton, logo, appName, signupButton, loginButton, title]);
+            comp = new Div(null, null, [menuButton, logo, loginButton, title]);
         }
         return comp;
     }

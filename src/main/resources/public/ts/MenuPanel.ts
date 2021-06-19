@@ -14,6 +14,7 @@ import { SearchUsersDlg } from "./dlg/SearchUsersDlg";
 import { SplitNodeDlg } from "./dlg/SplitNodeDlg";
 import { TransferNodeDlg } from "./dlg/TransferNodeDlg";
 import { UserProfileDlg } from "./dlg/UserProfileDlg";
+import { TabDataIntf } from "./intf/TabDataIntf";
 import { TypeHandlerIntf } from "./intf/TypeHandlerIntf";
 import * as J from "./JavaIntf";
 import { PubSub } from "./PubSub";
@@ -173,6 +174,10 @@ export class MenuPanel extends Div {
 
         const children = [];
 
+        if (state.mobileMode) {
+            children.push(new Menu("Tabs", this.getTabMenuItems(state)));
+        }
+
         children.push(new Menu(C.SITE_NAV_MENU_TEXT, [
             new MenuItem("Portal Home", S.meta64.loadAnonPageHome),
             new MenuItem("User Guide", MenuPanel.openUserGuide),
@@ -184,7 +189,7 @@ export class MenuPanel extends Div {
             if (state.bookmarks) {
                 state.bookmarks.forEach((bookmark: J.Bookmark): boolean => {
                     bookmarkItems.push(new MenuItem(bookmark.name, () => S.view.jumpToId(bookmark.id || bookmark.selfId), true, null,
-                    bookmark.id ? new Icon({
+                        bookmark.id ? new Icon({
                             className: "fa fa-edit fa-lg float-right menuIcon",
                             title: "Edit this bookmark",
                             onClick: (event: any) => {
@@ -399,7 +404,7 @@ export class MenuPanel extends Div {
         children.push(new Menu("Account", [
             new MenuItem("Profile", MenuPanel.profile, !state.isAnonUser), //
             !state.isAnonUser ? new MenuItem("Logout", S.nav.logout, !state.isAnonUser) : null,
-
+            state.isAnonUser ? new MenuItem("Signup", S.nav.signup, state.isAnonUser) : null,
             new MenuItemSeparator(), //
 
             new MenuItem("Edit Mode", MenuPanel.toggleEditMode, !state.isAnonUser, () => state.userPreferences.editMode), //
@@ -517,5 +522,21 @@ export class MenuPanel extends Div {
             }
         }
         return items;
+    }
+
+    getTabMenuItems = (state: AppState): MenuItem[] => {
+        let items: MenuItem[] = [];
+        for (let tab of state.tabData) {
+            if (tab.isVisible()) {
+                items.push(this.getTabMenuItem(state, tab));
+            }
+        }
+        return items;
+    }
+
+    getTabMenuItem(state: AppState, data: TabDataIntf): MenuItem {
+        return new MenuItem(data.name, (event) => {
+            S.meta64.selectTab(data.id);
+        }, true, () => state.activeTab === data.id);
     }
 }

@@ -7,7 +7,6 @@ import { PubSub } from "../PubSub";
 import { Singletons } from "../Singletons";
 import { CompIntf } from "./base/CompIntf";
 import { Div } from "./Div";
-import { TabPanelButtons } from "./TabPanelButtons";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (s: Singletons) => {
@@ -45,10 +44,7 @@ export class TabPanel extends Div {
             role: "main"
         }, children);
 
-        let tabButtons = !dialog && state.mobileMode;
-
         this.setChildren([
-            tabButtons ? new TabPanelButtons(false) : null,
             tabContent
         ]);
     }
@@ -87,6 +83,5 @@ export class TabPanel extends Div {
             S.meta64.lastScrollTime = new Date().getTime();
             S.meta64.scrollPosByTabName.set(S.meta64.activeTab, this.attribs.ref.current.scrollTop);
         }, { passive: true });
-
     }
 }

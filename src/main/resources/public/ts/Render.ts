@@ -32,16 +32,17 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (s: Singletons) => {
 
 // this allows us to throttle rendering, mainly that's triggered by OpenGraph results streaming in.
 setInterval(() => {
-    let nowTime = new Date().getTime();
-
     // when it's time to render also wait to be sure user has stopped scrolling for over a second!
     // This algorithm is perfect!
     // console.log("delta: " + (nowTime - S.meta64.lastScrollTime));
-    if (S && S.render.autoRender && (nowTime - S.meta64.lastScrollTime) > 1200) {
-        S.render.autoRender = false;
-        dispatch("Action_autoRender", (s: AppState): AppState => {
-            return s;
-        });
+    if (S && S.render.autoRender) {
+        let nowTime = new Date().getTime();
+        if (nowTime - S.meta64.lastScrollTime > 1200) {
+            S.render.autoRender = false;
+            dispatch("Action_autoRender", (s: AppState): AppState => {
+                return s;
+            });
+        }
     }
 }, 750);
 
