@@ -131,6 +131,7 @@ public class MongoRead {
         return ret;
     }
 
+    /* Throws an exception of the parent of 'node' does not exist */
     public void checkParentExists(MongoSession session, SubNode node) {
         boolean isRootPath = util.isRootPath(node.getPath());
         if (node.isDisableParentCheck() || isRootPath)
@@ -140,7 +141,18 @@ public class MongoRead {
         if (parentPath == null || parentPath.equals("") || parentPath.equals("/"))
             return;
 
+        // todo-0: verify this is correct.
+        if (parentPath.startsWith("/r/p/")) {
+            parentPath = parentPath.replace("/r/p/", "/r/");
+        }
+
+        SubNode parentNode = getNode(session, parentPath, false);
+        if (parentNode != null)
+            return;
+
         // log.debug("Verifying parent path exists: " + parentPath);
+        // todo-0: look for places where we lookup by path OR id, and be sure they all go thru
+        // getNode() first, to ensure we can use cache if it's cached.
         Query query = new Query();
         query.addCriteria(Criteria.where(SubNode.FIELD_PATH).is(parentPath));
 
@@ -240,6 +252,7 @@ public class MongoRead {
         SubNode ret = null;
 
         if (identifier.startsWith("~")) {
+            // todo-0: can't we be caching in this code path too?
             String typeName = identifier.substring(1);
             if (!typeName.startsWith("sn:")) {
                 typeName = "sn:" + typeName;
@@ -248,6 +261,7 @@ public class MongoRead {
         }
         // Node name lookups are done by prefixing the search with a colon (:)
         else if (identifier.startsWith(":")) {
+            // todo-0: can't we be caching in this code path too?
             ret = getNodeByName(session, identifier.substring(1), allowAuth);
         }
         // If search doesn't start with a slash then it's a nodeId and not a path
@@ -312,10 +326,14 @@ public class MongoRead {
         return ret;
     }
 
+    public SubNode getParent(MongoSession session, SubNode node) {
+        return getParent(session, node, true);
+    }
+
     /*
      * WARNING: This always converts a 'pending' path to a non-pending one (/r/p/ v.s. /r/)
      */
-    public SubNode getParent(MongoSession session, SubNode node) {
+    public SubNode getParent(MongoSession session, SubNode node, boolean allowAuth) {
         String path = node.getPath();
         if ("/".equals(path)) {
             return null;
@@ -329,11 +347,22 @@ public class MongoRead {
          */
         parentPath = parentPath.replace(pendingPath, rootPath);
 
-        Query query = new Query();
-        query.addCriteria(Criteria.where(SubNode.FIELD_PATH).is(parentPath));
+        SubNode ret = getNode(session, parentPath);
+        if (ret == null) {
+            Query query = new Query();
+            // find all places we search on id or path and make them cache-aware (todo-0)
+            query.addCriteria(Criteria.where(SubNode.FIELD_PATH).is(parentPath));
 
-        SubNode ret = util.findOne(query);
-        auth.auth(session, ret, PrivilegeType.READ);
+            ret = util.findOne(query);
+            if (ret != null) {
+                auth.cacheNode(ret);
+            }
+        }
+
+        if (ret != null && allowAuth) {
+            auth.auth(session, ret, PrivilegeType.READ);
+        }
+
         return ret;
     }
 
@@ -505,7 +534,7 @@ public class MongoRead {
         auth.auth(session, node, PrivilegeType.READ);
 
         if (node.getOrdinal() == null) {
-            throw new RuntimeEx("can't get node above node with null ordinal.");
+            node.setOrdinal(0L);
         }
 
         // todo-2: research if there's a way to query for just one, rather than simply
@@ -526,7 +555,7 @@ public class MongoRead {
     public SubNode getSiblingBelow(MongoSession session, SubNode node) {
         auth.auth(session, node, PrivilegeType.READ);
         if (node.getOrdinal() == null) {
-            throw new RuntimeEx("can't get node above node with null ordinal.");
+            node.setOrdinal(0L);
         }
 
         // todo-2: research if there's a way to query for just one, rather than simply

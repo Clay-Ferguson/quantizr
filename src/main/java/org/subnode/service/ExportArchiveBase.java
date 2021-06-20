@@ -99,7 +99,7 @@ public abstract class ExportArchiveBase {
 			openOutputStream(fullFileName);
 			writeRootFiles();
 			rootPathParent = node.getParentPath();
-			auth.authRequireOwnerOfNode(session, node);
+			auth.ownerAuth(session, node);
 			final ArrayList<SubNode> nodeStack = new ArrayList<>();
 			nodeStack.add(node);
 			recurseNode("../", "", node, nodeStack, 0, null, null);

@@ -27,6 +27,7 @@ import org.subnode.util.XString;
 public class MongoEventListener extends AbstractMongoEventListener<SubNode> {
 
 	private static final Logger log = LoggerFactory.getLogger(MongoEventListener.class);
+	private static final boolean verbose = false;
 
 	@Autowired
 	private MongoTemplate ops;
@@ -48,7 +49,7 @@ public class MongoEventListener extends AbstractMongoEventListener<SubNode> {
 	 * until the full node graph has been imported), and so I'm creating this hack to globally disable
 	 * the check during the import only.
 	 */
-	public static boolean parentCheckEnabled = false;
+	public static boolean parentCheckEnabled = true;
 
 	/**
 	 * What we are doing in this method is assigning the ObjectId ourselves, because our path must
@@ -60,10 +61,11 @@ public class MongoEventListener extends AbstractMongoEventListener<SubNode> {
 	@Override
 	public void onBeforeSave(BeforeSaveEvent<SubNode> event) {
 		SubNode node = event.getSource();
-		// log.debug("MDB save: " + node.getPath() + " thread: " + Thread.currentThread().getName());
+		log.trace("MDB save: " + node.getPath() + " thread: " + Thread.currentThread().getName());
 
 		Document dbObj = event.getDocument();
 		ObjectId id = node.getId();
+		boolean isNew = false;
 
 		/*
 		 * Note: There's a special case in MongoApi#createUser where the new User root node ID is assigned
@@ -72,6 +74,7 @@ public class MongoEventListener extends AbstractMongoEventListener<SubNode> {
 		if (id == null) {
 			id = new ObjectId();
 			node.setId(id);
+			isNew = true;
 			// log.debug("New Node ID generated: " + id);
 		}
 		dbObj.put(SubNode.FIELD_ID, id);
@@ -89,9 +92,12 @@ public class MongoEventListener extends AbstractMongoEventListener<SubNode> {
 
 		/* if no owner is assigned... */
 		if (node.getOwner() == null) {
-
-			/* if we are saving the root node, we make it be the owner of itself */
-			if (node.getPath().equals("/" + NodeName.ROOT)) {
+			/*
+			 * if we are saving the root node, we make it be the owner of itself. This is also the admin owner,
+			 * and we only allow this to run during initialiation when the server may be creating the database,
+			 * and is not yet processing user requests
+			 */
+			if (node.getPath().equals("/" + NodeName.ROOT) && !MongoRepository.fullInit) {
 				dbObj.put(SubNode.FIELD_OWNER, id);
 				node.setOwner(id);
 			}
@@ -137,13 +143,7 @@ public class MongoEventListener extends AbstractMongoEventListener<SubNode> {
 			node.setPath(path);
 		}
 
-		writeAuth(node);
-
-		/*
-		 * I think this is redundant because we update the cache whenever the nodeId or Path change. Leaving
-		 * this here just as a reminder that it's not a bug that we don't update the cache here.
-		 */
-		// auth.cacheNode(node);
+		saveAuth(node, isNew);
 
 		String pathHash = DigestUtils.sha256Hex(node.getPath());
 		// log.debug("CHECK PathHash=" + pathHash);
@@ -214,7 +214,10 @@ public class MongoEventListener extends AbstractMongoEventListener<SubNode> {
 
 	@Override
 	public void onAfterSave(AfterSaveEvent<SubNode> event) {
-		// SubNode node = event.getSource();
+		SubNode node = event.getSource();
+		if (node != null) {
+			auth.cacheNode(node);
+		}
 	}
 
 	@Override
@@ -239,8 +242,8 @@ public class MongoEventListener extends AbstractMongoEventListener<SubNode> {
 			if (id instanceof ObjectId) {
 				SubNode node = ops.findById(id, SubNode.class);
 				if (node != null) {
-					// log.debug("MDB del: " + node.getPath());
-					writeAuth(node);
+					log.trace("MDB del: " + node.getPath());
+					auth.ownerAuth(node);
 				}
 				auth.uncacheNode(node);
 				actPub.deleteNodeNotify((ObjectId) id);
@@ -248,11 +251,30 @@ public class MongoEventListener extends AbstractMongoEventListener<SubNode> {
 		}
 	}
 
-	public void writeAuth(SubNode node) {
+	/* To save a node you must own the node and have WRITE access to it's parent */
+	public void saveAuth(SubNode node, boolean isNew) {
+		// during server init no auth is required.
+		if (!MongoRepository.fullInit) {
+			return;
+		}
+		if (verbose) log.trace("saveAuth in MongoListener");
+
 		MongoSession session = ThreadLocals.getMongoSession();
 		if (session != null) {
+			if (session.isAdmin())
+				return;
+
 			// Must have write privileges to this node or one of it's parents.
-			auth.auth(session, node, PrivilegeType.WRITE);
+			auth.ownerAuth(node);
+
+			// only if this is creating a new node do we need to chech that the parent will allow it
+			if (isNew) {
+				SubNode parent = read.getParent(session, node);
+				if (parent == null)
+					throw new RuntimeException("unable to get node parent: " + node.getParentPath());
+				
+				auth.auth(session, parent, PrivilegeType.WRITE);
+			}
 		}
 	}
 }

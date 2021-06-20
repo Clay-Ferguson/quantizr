@@ -402,7 +402,7 @@ public class NodeEditService {
 
 		// log.debug("saveNode. nodeId=" + XString.prettyPrint(nodeInfo));
 		SubNode node = read.getNode(session, nodeId);
-		auth.authRequireOwnerOfNode(session, node);
+		auth.ownerAuth(session, node);
 
 		if (node == null) {
 			throw new RuntimeEx("Unable find node to save: nodeId=" + nodeId);
@@ -713,7 +713,7 @@ public class NodeEditService {
 		SubNode node = read.getNode(session, nodeId);
 		SubNode parentNode = read.getParent(session, node);
 
-		auth.authRequireOwnerOfNode(session, node);
+		auth.ownerAuth(session, node);
 		String content = node.getContent();
 		boolean containsDelim = content.contains(req.getDelimiter());
 
@@ -784,7 +784,7 @@ public class NodeEditService {
 
 		log.debug("Transfer node: " + nodeId);
 		SubNode node = read.getNode(session, nodeId);
-		auth.authRequireOwnerOfNode(session, node);
+		auth.ownerAuth(session, node);
 
 		SubNode toUserNode = read.getUserNodeByUserName(auth.getAdminSession(), req.getToUser());
 		if (toUserNode == null) {
@@ -940,7 +940,7 @@ public class NodeEditService {
 
 		// log.debug("searchingAndReplace node: " + nodeId);
 		SubNode node = read.getNode(session, nodeId);
-		auth.authRequireOwnerOfNode(session, node);
+		auth.ownerAuth(session, node);
 
 		if (replaceText(session, node, req.getSearch(), req.getReplace())) {
 			replacements++;

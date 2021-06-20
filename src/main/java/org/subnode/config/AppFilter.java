@@ -18,6 +18,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.GenericFilterBean;
 import org.subnode.model.IPInfo;
+import org.subnode.mongo.MongoRepository;
 import org.subnode.mongo.MongoThreadLocal;
 import org.subnode.util.ThreadLocals;
 import org.subnode.util.Util;
@@ -62,6 +63,10 @@ public class AppFilter extends GenericFilterBean {
 
 	@Override
 	public void doFilter(ServletRequest req, ServletResponse res, FilterChain chain) throws IOException, ServletException {
+		if (!MongoRepository.fullInit) {
+			throw new RuntimeException("Server temporarily offline.");
+		}
+
 		try {
 			int thisReqId = ++reqId;
 			String ip = null;

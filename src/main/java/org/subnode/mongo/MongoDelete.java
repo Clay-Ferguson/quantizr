@@ -126,7 +126,7 @@ public class MongoDelete {
 	 * method if you want to increase performance of deletes at the cost of some additional memory.
 	 */
 	public void delete(MongoSession session, SubNode node, boolean childrenOnly) {
-		auth.authRequireOwnerOfNode(session, node);
+		auth.ownerAuth(session, node);
 		log.debug("Deleting under path: " + node.getPath());
 
 		update.saveSession(session);

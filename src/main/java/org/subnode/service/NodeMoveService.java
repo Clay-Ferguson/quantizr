@@ -74,7 +74,7 @@ public class NodeMoveService {
 		String nodeId = req.getNodeId();
 
 		SubNode node = read.getNode(session, nodeId);
-		auth.authRequireOwnerOfNode(session, node);
+		auth.ownerAuth(session, node);
 		if (node == null) {
 			throw new RuntimeEx("Node not found: " + nodeId);
 		}
@@ -169,7 +169,7 @@ public class NodeMoveService {
 				return res;
 			}
 
-			auth.authRequireOwnerOfNode(session, node);
+			auth.ownerAuth(session, node);
 			nodes.add(node);
 		}
 
@@ -282,7 +282,7 @@ public class NodeMoveService {
 		SubNode parentToPasteInto = location.equalsIgnoreCase("inside") ? targetNode
 				: read.getParent(session, targetNode);
 
-		auth.authRequireOwnerOfNode(session, parentToPasteInto);
+		auth.ownerAuth(session, parentToPasteInto);
 		String parentPath = parentToPasteInto.getPath();
 		// log.debug("targetPath: " + targetPath);
 		Long curTargetOrdinal = null;
@@ -307,7 +307,7 @@ public class NodeMoveService {
 			// log.debug("Moving ID: " + nodeId);
 
 			SubNode node = read.getNode(session, nodeId);
-			auth.authRequireOwnerOfNode(session, node);
+			auth.ownerAuth(session, node);
 			SubNode nodeParent = read.getParent(session, node);
 
 			/*

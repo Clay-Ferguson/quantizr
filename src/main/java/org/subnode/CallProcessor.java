@@ -154,7 +154,7 @@ public class CallProcessor {
 	}
 
 	/* Creates a logged in session for any method call */
-	private MongoSession processCredentialsAndGetSession(RequestBase req) {
+	public MongoSession processCredentialsAndGetSession(RequestBase req) {
 
 		SessionContext sc = ThreadLocals.getSessionContext();
 		Date now = new Date();

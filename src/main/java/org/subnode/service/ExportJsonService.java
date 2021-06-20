@@ -200,7 +200,9 @@ public class ExportJsonService {
 	 */
 	public String resetNode(MongoSession session, String subFolder) {
 		try {
-			MongoEventListener.parentCheckEnabled = false;
+			// todo-0: disabling this. Need a different solution (maybe just an in-ram check ?)
+			// MongoEventListener.parentCheckEnabled = false;
+
 			String resourceName = "classpath:/nodes/" + subFolder + "/" + subFolder + ".json";
 			Resource resource = SpringContextUtil.getApplicationContext().getResource(resourceName);
 			InputStream is = resource.getInputStream();
@@ -232,7 +234,9 @@ public class ExportJsonService {
 					}
 				}
 			} finally {
-				MongoEventListener.parentCheckEnabled = true;
+				// see note above.
+				// MongoEventListener.parentCheckEnabled = true;
+				
 				StreamUtil.close(in);
 			}
 			log.debug("import successful.");

@@ -156,29 +156,15 @@ public class SubNode {
 		return id;
 	}
 
+	/* Auth: Anyone can write the id as there's no pre-existing id */
 	@JsonProperty(FIELD_ID)
 	public void setId(ObjectId id) {
-		/*
-		 * If we are setting this 'id' to null we need to remove it from the dirty cache, because if not we
-		 * end up tracking the wrong objects and can have a corruption when old/wrong data gets written out
-		 * during the final dirty-nodes save
-		 */
-		if (id == null && this.id != null) {
-			MongoThreadLocal.clean(this);
-		} else {
-			MongoThreadLocal.dirty(this);
+
+		if (this.id != null && !this.id.equals(id)) {
+			throw new RuntimeException("Node IDs are immutable.");
 		}
 
-		// if this node was in the cache under different ID, remove that one.
-		if (MongoAuth.inst != null && this.id != null) {
-			MongoAuth.inst.uncacheNode(this.id.toHexString());
-		}
 		this.id = id;
-
-		// cache by current id
-		if (MongoAuth.inst != null && this.id != null) {
-			MongoAuth.inst.cacheNode(this.id.toHexString(), this);
-		}
 	}
 
 	@JsonGetter(FIELD_ID)
@@ -212,8 +198,17 @@ public class SubNode {
 		return XString.parseAfterLast(getPath(), "/");
 	}
 
+	/*
+	 * Auth: As long as the current user owns this node they can set it's path to any path, but only
+	 * when the save is done is the final validation done
+	 */
 	@JsonProperty(FIELD_PATH)
 	public void setPath(String path) {
+		// todo-0: look for other places where we can ignore a redundant setter call.
+		if (path != null && this.path != null && path.equals(this.path))
+			return;
+
+		MongoAuth.inst.ownerAuth(this);
 		MongoThreadLocal.dirty(this);
 
 		/*
@@ -230,10 +225,8 @@ public class SubNode {
 		}
 		this.path = path;
 
-		// update cache by path
-		if (MongoAuth.inst != null) {
-			MongoAuth.inst.cacheNode(this.path, this);
-		}
+		// NOTE: We CANNOT update the cache here, because all the validation for a node
+		// is done and MongoEventListener, so this node is currently "untrusted" with it's new path.
 	}
 
 	@JsonProperty(FIELD_PATH_HASH)

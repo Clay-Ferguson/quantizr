@@ -7,7 +7,6 @@ import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.StringTokenizer;
 import javax.annotation.PostConstruct;
 import org.apache.commons.lang3.StringUtils;
 import org.bson.types.ObjectId;
@@ -42,6 +41,7 @@ import org.subnode.util.XString;
 @Component
 public class MongoAuth {
 	private static final Logger log = LoggerFactory.getLogger(MongoAuth.class);
+	private static final boolean verbose = false;
 
 	// in order for non-spring beans (namely just SubNode.java) to access this we cheat by using this
 	// static.
@@ -49,7 +49,12 @@ public class MongoAuth {
 
 	private static int MAX_CACHE_SIZE = 500;
 	// The cache key in this can be either a node path or node id.
-	public final LinkedHashMap<String, SubNode> cachedNodes =
+	/*
+	 * todo-0: need to update to take into account dirty reads. Can we use the MongoEventListener to
+	 * detect EVERY case of a node being read in, and then simply overwrite the cache with the new node
+	 * content. Until there's a solid design we can turn off the cache.
+	 */
+	private final LinkedHashMap<String, SubNode> cachedNodes =
 			new LinkedHashMap<String, SubNode>(MAX_CACHE_SIZE + 1, .75F, false) {
 				protected boolean removeEldestEntry(Map.Entry<String, SubNode> eldest) {
 					return size() > MAX_CACHE_SIZE;
@@ -98,6 +103,10 @@ public class MongoAuth {
 	}
 
 	public void cacheNode(SubNode node) {
+		// todo-0: disabled pending new caching policy
+		if (true)
+			return;
+
 		if (node.getPath() != null || node.getId() != null) {
 			synchronized (cachedNodes) {
 				if (node.getPath() != null) {
@@ -112,6 +121,10 @@ public class MongoAuth {
 	}
 
 	public void cacheNode(String key, SubNode node) {
+		// todo-0: disabled pending new caching policy
+		if (true)
+			return;
+
 		if (key != null) {
 			synchronized (cachedNodes) {
 				cachedNodes.put(key, node);
@@ -309,12 +322,21 @@ public class MongoAuth {
 				!userName.equalsIgnoreCase(PrincipalName.ANON.s());
 	}
 
-	public void authRequireOwnerOfNode(MongoSession session, SubNode node) {
+	public void ownerAuth(MongoSession session, SubNode node) {
 		if (node == null) {
 			throw new RuntimeEx("Auth Failed. Node did not exist.");
 		}
-		if (!session.isAdmin() && !session.getUserNode().getId().equals(node.getOwner())) {
-			throw new RuntimeEx("Auth Failed. Node ownership required.");
+
+		if (session.isAdmin()) {
+			return;
+		}
+
+		if (session.getUserNode() == null) {
+			throw new RuntimeException("session has no userNode: " + XString.prettyPrint(session));
+		}
+
+		if (!session.getUserNode().getId().equals(node.getOwner())) {
+			throw new NodeAuthFailedException();
 		}
 	}
 
@@ -323,11 +345,24 @@ public class MongoAuth {
 			throw new RuntimeEx("auth fail");
 	}
 
-	public void auth(MongoSession session, SubNode node, PrivilegeType... privs) {
-		if (node == null)
+	public void ownerAuth(SubNode node) {
+		// for now, of there's no session we do nothing here.
+		if (ThreadLocals.getMongoSession() == null)
 			return;
+		ownerAuth(ThreadLocals.getMongoSession(), node);
+	}
+
+	public void auth(MongoSession session, SubNode node, PrivilegeType... privs) {
+		// during server init no auth is required.
+		if (node == null || !MongoRepository.fullInit) {
+			return;
+		}
+		if (verbose)
+			log.trace("auth: " + node.getPath());
+
 		if (session.isAdmin()) {
-			// log.debug("you are admin. auth success.");
+			if (verbose)
+				log.trace("you are admin. auth success.");
 			return; // admin can do anything. skip auth
 		}
 
@@ -345,7 +380,20 @@ public class MongoAuth {
 
 	/* Returns true if this user on this session has privType access to 'node' */
 	public void auth(MongoSession session, SubNode node, List<PrivilegeType> priv) {
-		// log.debug("auth " + node.getPath() + " for " + session.getUserName());
+		// during server init no auth is required.
+		if (node == null || !MongoRepository.fullInit) {
+			return;
+		}
+
+		// admin has full power over all nodes
+		if (session.isAdmin()) {
+			if (verbose)
+				log.trace("auth granted. you're admin.");
+			return;
+		}
+
+		if (verbose)
+			log.trace("auth path " + node.getPath() + " for " + session.getUserName());
 
 		/* Special case if this node is named 'home' it is readable by anyone */
 		if (node != null && NodeName.HOME.equals(node.getName()) && priv.size() == 1 && priv.get(0).name().equals("READ")) {
@@ -356,22 +404,14 @@ public class MongoAuth {
 			throw new RuntimeEx("privileges not specified.");
 		}
 
-		// admin has full power over all nodes
-		if (node == null || session.isAdmin()) {
-			// log.debug("auth granted. you're admin.");
-			return;
-		}
-
 		if (node.getOwner() == null) {
-			// log.debug("auth fail. node had no owner: " + node.getPath());
 			throw new RuntimeEx("node had no owner: " + node.getPath());
 		}
 
 		// if this session user is the owner of this node, then they have full power
-		// todo-0: make sure nodeOwner can't be altered by client. Node must be looked up.
-		// todo-0: check all places where 'setOwner' is called.
-		if (!session.isAnon() && session.getUserNode().getId().equals(node.getOwner())) {
-			// log.debug("allow bc user owns node. accountId: " + node.getOwner().toHexString());
+		if (session.getUserNode().getId().equals(node.getOwner())) {
+			if (verbose)
+				log.trace("allow: user " + session.getUserName() + " owns node. accountId: " + node.getOwner().toHexString());
 			return;
 		}
 
@@ -386,54 +426,39 @@ public class MongoAuth {
 	}
 
 	/*
-	 * NOTE: this should ONLY ever be called from 'auth()' method of this class
-	 * 
-	 * todo-0: check all calls to "setPath". Nothing client can do should be able to alter a path,
-	 * and any paths that come from the client need to be checked.
+	 * Returns true if the user in 'session' has 'priv' access to node.
 	 */
 	private boolean ancestorAuth(MongoSession session, SubNode node, List<PrivilegeType> privs) {
+		if (session.isAdmin())
+			return true;
+		if (verbose)
+			log.trace("ancestorAuth: path=" + node.getPath());
 
 		/* get the non-null sessionUserNodeId if not anonymous user */
 		String sessionUserNodeId = session.isAnon() ? null : session.getUserNode().getId().toHexString();
-		// log.debug("ancestorAuth: path=" + node.getPath());
 
-		StringBuilder fullPath = new StringBuilder();
-		StringTokenizer t = new StringTokenizer(node.getPath(), "/", false);
-		boolean ret = false;
-		while (t.hasMoreTokens()) {
-			String pathPart = t.nextToken().trim();
-			fullPath.append("/");
-			fullPath.append(pathPart);
-
-			// todo-0: why skipping these two?
-			if (pathPart.equals("/" + NodeName.ROOT))
-				continue;
-			if (pathPart.equals(NodeName.ROOT_OF_ALL_USERS))
-				continue;
-
-			String fullPathStr = fullPath.toString();
-			log.trace("Checking fullPath: " + fullPathStr);
-
-			SubNode tryNode = read.getNode(session, fullPathStr, false);
-			if (tryNode == null) {
-				throw new RuntimeEx("Path not found (probable orphan node, not yet cleaned up): " + fullPathStr);
-			}
-			// I decided to move this inside 'getNode', and just aggressively cache every node that's read in.
-			// cacheNode(tryNode);
-
+		// scan up the tree until we find a node that allows access
+		while (node != null) {
 			// if this session user is the owner of this node, then they have full power
-			if (!session.isAnon() && session.getUserNode().getId().equals(tryNode.getOwner())) {
-				// log.debug("user owns node. auth ok.");
-				ret = true;
-				break;
+			if (session.getUserNode().getId().equals(node.getOwner())) {
+				if (verbose)
+					log.trace("auth success. node is owned.");
+				return true;
 			}
 
-			if (nodeAuth(tryNode, sessionUserNodeId, privs)) {
-				ret = true;
-				break;
+			if (nodeAuth(node, sessionUserNodeId, privs)) {
+				if (verbose)
+					log.trace("nodeAuth success");
+				return true;
+			}
+
+			node = read.getParent(session, node, false);
+			if (node != null) {
+				if (verbose)
+					log.trace("parent path=" + node.getPath());
 			}
 		}
-		return ret;
+		return false;
 	}
 
 	/*
@@ -658,6 +683,10 @@ public class MongoAuth {
 	// ========================================================================
 
 	public MongoSession processCredentials(String userName, String password, RequestBase req) {
+		if (userName == null || password == null) {
+			throw new RuntimeException("no credentials.");
+		}
+
 		// log.debug("Mongo API: user=" + userName);
 		MongoSession session = null;
 		SubNode userNode = null;
@@ -712,16 +741,18 @@ public class MongoAuth {
 
 		if (success) {
 			SessionContext sc = ThreadLocals.getSessionContext();
-			/*
-			 * if we get here then userName and password are guaranteed valid, and this should be the only place
-			 * in our code where we set userName or password on any sessionContext object
-			 */
-			sc.setUserName(userName);
-			sc.setPassword(password);
+			if (sc != null) {
+				/*
+				 * if we get here then userName and password are guaranteed valid, and this should be the only place
+				 * in our code where we set userName or password on any sessionContext object
+				 */
+				sc.setUserName(userName);
+				sc.setPassword(password);
 
-			if (req instanceof LoginRequest) {
-				sc.init(req);
-				userManagerService.processLogin(session, null, req.getUserName(), userNode);
+				if (req instanceof LoginRequest) {
+					sc.init(req);
+					userManagerService.processLogin(session, null, req.getUserName(), userNode);
+				}
 			}
 		}
 		return session;

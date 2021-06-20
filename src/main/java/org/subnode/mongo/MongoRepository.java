@@ -83,6 +83,9 @@ public class MongoRepository {
 		if (initialized)
 			return;
 
+		// todo-0: look for all places admin is being used, and check
+		MongoSession adminSession = auth.getAdminSession();
+
 		synchronized (lock) {
 			if (initialized)
 				return;
@@ -99,8 +102,6 @@ public class MongoRepository {
 			 */
 			initialized = true;
 
-			MongoSession adminSession = auth.getAdminSession();
-
 			if (appProp.getForceIndexRebuild()) {
 				util.dropAllIndexes(adminSession);
 			}
@@ -109,19 +110,18 @@ public class MongoRepository {
 			util.createAdminUser(adminSession);
 			repoUtil.createTestAccounts();
 
-			actPub.refreshForeignUsers();
-
 			if (appProp.getReSaveAll()) {
 				util.reSaveAll(adminSession);
 			}
-
-			delete.removeAbandonedNodes(adminSession);
 
 			// update.runRepairs();
 
 			log.debug("MongoRepository fully initialized.");
 			fullInit = true;
 		}
+
+		delete.removeAbandonedNodes(adminSession);
+		actPub.refreshForeignUsers();
 	}
 
 	public void close() {

@@ -56,7 +56,7 @@ public class SyncToIpfsService {
 
 		boolean success = false;
 		try {
-			auth.authRequireOwnerOfNode(session, node);
+			auth.ownerAuth(session, node);
 			Iterable<SubNode> results = read.getSubGraph(session, node, null, 0);
 
 			processNode(node);

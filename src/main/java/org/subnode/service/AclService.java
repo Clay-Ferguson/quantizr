@@ -99,7 +99,7 @@ public class AclService {
 		String nodeId = req.getNodeId();
 		req.setPrincipal(XString.stripIfStartsWith(req.getPrincipal(), "@"));
 		SubNode node = read.getNode(session, nodeId);
-		auth.authRequireOwnerOfNode(session, node);
+		auth.ownerAuth(session, node);
 
 		boolean success = addPrivilege(session, node, req.getPrincipal(), req.getPrivileges(), res);
 		res.setSuccess(success);
@@ -117,7 +117,7 @@ public class AclService {
 
 		String nodeId = req.getNodeId();
 		SubNode node = read.getNode(session, nodeId);
-		auth.authRequireOwnerOfNode(session, node);
+		auth.ownerAuth(session, node);
 
 		String cipherKey = node.getStrProp(NodeProp.ENC_KEY.s());
 		if (cipherKey == null) {
@@ -349,7 +349,7 @@ public class AclService {
 
 		String nodeId = req.getNodeId();
 		SubNode node = read.getNode(session, nodeId);
-		auth.authRequireOwnerOfNode(session, node);
+		auth.ownerAuth(session, node);
 
 		String principalNodeId = req.getPrincipalNodeId();
 		String privilege = req.getPrivilege();

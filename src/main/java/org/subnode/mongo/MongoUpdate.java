@@ -17,6 +17,7 @@ import org.subnode.model.client.PrivilegeType;
 import org.subnode.mongo.model.SubNode;
 import org.subnode.service.IPFSService;
 import org.subnode.util.Cast;
+import org.subnode.util.ThreadLocals;
 import org.subnode.util.ValContainer;
 
 @Component
@@ -48,14 +49,32 @@ public class MongoUpdate {
 
 	public void save(MongoSession session, SubNode node, boolean allowAuth) {
 		if (allowAuth) {
-			auth.auth(session, node, PrivilegeType.WRITE);
+			auth.ownerAuth(session, node);
 		}
 		// log.debug("MongoApi.save: DATA: " + XString.prettyPrint(node));
-		ops.save(node);
+
+		// if not doing allowAuth, we need to be sure the thread has admin session
+		// so the MongoEventListener can allow all access.
+		if (!allowAuth) {
+			MongoSession tlsSave = ThreadLocals.getMongoSession();
+			try {
+				ThreadLocals.setMongoSession(auth.getAdminSession());
+				ops.save(node);
+			}
+			finally {
+				ThreadLocals.setMongoSession(tlsSave);
+			}
+		} else {
+			ops.save(node);
+		}
 		MongoThreadLocal.clean(node);
 	}
 
 	public void saveSession(MongoSession session) {
+		saveSession(session, false);
+	}
+
+	public void saveSession(MongoSession session, boolean asAdmin) {
 		if (session == null || session.saving || !MongoThreadLocal.hasDirtyNodes())
 			return;
 
@@ -70,8 +89,7 @@ public class MongoUpdate {
 				}
 
 				/*
-				 * We use 'nodes' list to avoid a concurrent modification exception in the loop
-				 * below
+				 * We use 'nodes' list to avoid a concurrent modification exception in the loop below
 				 */
 				List<SubNode> nodes = new LinkedList<>();
 
@@ -79,7 +97,9 @@ public class MongoUpdate {
 				 * check that we are allowed to write all, before we start writing any
 				 */
 				for (SubNode node : MongoThreadLocal.getDirtyNodes().values()) {
-					auth.auth(session, node, PrivilegeType.WRITE);
+					if (!asAdmin) {
+						auth.auth(session, node, PrivilegeType.WRITE);
+					}
 					nodes.add(node);
 				}
 
@@ -90,8 +110,8 @@ public class MongoUpdate {
 				}
 
 				/*
-				 * This theoretically should never find any dirty nodes, because we just saved
-				 * them all but we definitely still want this line of code here
+				 * This theoretically should never find any dirty nodes, because we just saved them all but we
+				 * definitely still want this line of code here
 				 */
 				MongoThreadLocal.clearDirtyNodes();
 			}
@@ -101,8 +121,7 @@ public class MongoUpdate {
 	}
 
 	/*
-	 * Unpins any IPFS data that is not currently referenced by MongoDb. Cleans up
-	 * orphans.
+	 * Unpins any IPFS data that is not currently referenced by MongoDb. Cleans up orphans.
 	 */
 	public String releaseOrphanIPFSPins(HashMap<ObjectId, UserStats> statsMap) {
 		ValContainer<String> ret = new ValContainer<>("failed");
@@ -111,8 +130,8 @@ public class MongoUpdate {
 			LinkedHashMap<String, Object> pins = Cast.toLinkedHashMap(ipfs.getPins());
 			if (pins != null) {
 				/*
-				 * For each CID that is pinned we do a lookup to see if there's a Node that is
-				 * using that PIN, and if not we remove the pin
+				 * For each CID that is pinned we do a lookup to see if there's a Node that is using that PIN, and
+				 * if not we remove the pin
 				 */
 				for (String pin : pins.keySet()) {
 					SubNode ipfsNode = read.findByIPFSPinned(session, pin);
@@ -130,11 +149,10 @@ public class MongoUpdate {
 							}
 
 							/*
-							 * Make sure storage space for this IPFS node pin is built into user quota.
-							 * NOTE: We could be more aggressive about 'correctness' here and actually call
-							 * ipfs.objectStat on each CID, to get a more bullet proof total bytes amount,
-							 * but we are safe enough trusting what the node info holds, becasue it should
-							 * be correct.
+							 * Make sure storage space for this IPFS node pin is built into user quota. NOTE: We could be more
+							 * aggressive about 'correctness' here and actually call ipfs.objectStat on each CID, to get a more
+							 * bullet proof total bytes amount, but we are safe enough trusting what the node info holds,
+							 * becasue it should be correct.
 							 */
 							UserStats stats = statsMap.get(ipfsNode.getOwner());
 							if (stats == null) {

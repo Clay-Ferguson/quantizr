@@ -588,12 +588,7 @@ public class RSSFeedService {
 	}
 
 	public void getRssFeed(MongoSession mongoSession, String nodeId, Writer writer) {
-		SubNode node = null;
-		try {
-			node = read.getNode(mongoSession, nodeId);
-		} catch (NodeAuthFailedException e) {
-			return;
-		}
+		SubNode node = read.getNode(mongoSession, nodeId);
 
 		SyndFeed feed = new SyndFeedImpl();
 		feed.setEncoding("UTF-8");

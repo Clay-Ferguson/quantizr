@@ -236,6 +236,10 @@ public class AppProp /* implements EnvironmentAware */ {
 		return env.getProperty("mongoAdminPassword");
 	}
 
+	public String getTestPassword() {
+		return env.getProperty("testPassword");
+	}
+
 	public String getUserLandingPageNode() {
 		return env.getProperty("anonUserLandingPageNode");
 	}
