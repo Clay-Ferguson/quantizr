@@ -478,7 +478,9 @@ public class ActPubService {
                     break;
 
                 default:
-                    log.debug("Unhandled Create action (object type not supported): " + XString.prettyPrint(payload));
+                    // this captures videos? and other things (todo-0: add more support)
+                    // log.debug("Unhandled Create action (object type not supported): " +
+                    // XString.prettyPrint(payload));
                     break;
             }
             return null;

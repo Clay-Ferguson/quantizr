@@ -504,7 +504,7 @@ export class RssTypeHandler extends TypeBase {
             }
         }) : null;
 
-        let bookmarkIcon = new Icon({
+        let bookmarkIcon = !state.isAnonUser ? new Icon({
             className: "fa fa-bookmark fa-lg rssLinkIcon",
             title: "Bookmark this RSS entry",
             onClick: () => {
@@ -517,7 +517,7 @@ export class RssTypeHandler extends TypeBase {
                 // content += "\n" + entry.link;
                 S.edit.addRSSBookmark(entry.link, state);
             }
-        });
+        }) : null;
 
         let footerSpan = new Span(dateStr, { className: "marginRight" });
 

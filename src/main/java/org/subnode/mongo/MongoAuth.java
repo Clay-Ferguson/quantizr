@@ -409,7 +409,7 @@ public class MongoAuth {
 		}
 
 		// if this session user is the owner of this node, then they have full power
-		if (session.getUserNode().getId().equals(node.getOwner())) {
+		if (session.getUserNode() != null && session.getUserNode().getId().equals(node.getOwner())) {
 			if (verbose)
 				log.trace("allow: user " + session.getUserName() + " owns node. accountId: " + node.getOwner().toHexString());
 			return;
@@ -435,12 +435,13 @@ public class MongoAuth {
 			log.trace("ancestorAuth: path=" + node.getPath());
 
 		/* get the non-null sessionUserNodeId if not anonymous user */
-		String sessionUserNodeId = session.isAnon() ? null : session.getUserNode().getId().toHexString();
+		String sessionUserNodeId = session.getUserNode() != null ? session.getUserNode().getId().toHexString() : null;
+		ObjectId sessId = session.getUserNode() != null ? session.getUserNode().getId() : null;
 
 		// scan up the tree until we find a node that allows access
 		while (node != null) {
 			// if this session user is the owner of this node, then they have full power
-			if (session.getUserNode().getId().equals(node.getOwner())) {
+			if (sessId != null && sessId.equals(node.getOwner())) {
 				if (verbose)
 					log.trace("auth success. node is owned.");
 				return true;
