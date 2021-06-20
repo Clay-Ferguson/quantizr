@@ -571,12 +571,17 @@ public class UserManagerService {
 				res.setSuccess(false);
 			}
 
-			Long binQuota = userNode.getIntProp(NodeProp.BIN_QUOTA.s());
-			Long binTotal = userNode.getIntProp(NodeProp.BIN_TOTAL.s());
+			try {
+				// foreign users won't have these.
+				Long binQuota = userNode.getIntProp(NodeProp.BIN_QUOTA.s());
+				Long binTotal = userNode.getIntProp(NodeProp.BIN_TOTAL.s());
 
-			// I really need to convert these props to Integers not Strings
-			res.setBinQuota(binQuota == null ? -1 : binQuota.intValue());
-			res.setBinTotal(binTotal == null ? -1 : binTotal.intValue());
+				// I really need to convert these props to Integers not Strings
+				res.setBinQuota(binQuota == null ? -1 : binQuota.intValue());
+				res.setBinTotal(binTotal == null ? -1 : binTotal.intValue());
+			} catch (Exception e) {
+			}
+
 			res.setSuccess(true);
 		});
 		return res;
@@ -875,7 +880,7 @@ public class UserManagerService {
 				}
 				userNode.setVal(read.getNode(mongoSession, userNodeId));
 
-				if (userNode.getVal()==null) {
+				if (userNode.getVal() == null) {
 					throw ExUtil.wrapEx("Invald password reset code.");
 				}
 
@@ -901,7 +906,7 @@ public class UserManagerService {
 		} else {
 			userNode.setVal(read.getUserNodeByUserName(session, session.getUserName()));
 
-			if (userNode.getVal()==null) {
+			if (userNode.getVal() == null) {
 				throw ExUtil.wrapEx("changePassword cannot find user.");
 			}
 
@@ -1047,7 +1052,8 @@ public class UserManagerService {
 		if (parentNode == null)
 			return null;
 
-		for (SubNode friendNode : read.getChildren(session, parentNode, Sort.by(Sort.Direction.ASC, SubNode.FIELD_ORDINAL), null, 0)) {
+		for (SubNode friendNode : read.getChildren(session, parentNode, Sort.by(Sort.Direction.ASC, SubNode.FIELD_ORDINAL), null,
+				0)) {
 			nodeList.add(friendNode);
 		}
 		return nodeList;

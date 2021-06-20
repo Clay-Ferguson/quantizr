@@ -83,7 +83,6 @@ public class MongoRepository {
 		if (initialized)
 			return;
 
-		// todo-0: look for all places admin is being used, and check
 		MongoSession adminSession = auth.getAdminSession();
 
 		synchronized (lock) {

@@ -8,17 +8,7 @@ public enum PrivilegeType {
 
 	todo-0: check all code and make sure this isn't used where 'owner requirement' is meant.
 	*/
-	WRITE("wr"), //
-
-	// todo-0: this one is no longer being used ?
-	ADD_CHILDREN("ac"), //
-
-	/*
-	 * Can read and and delete children under this node and any nodes in the
-	 * subgraph
-	 */
-	// todo-0: this one is no longer being used ?
-	REMOVE_CHILDREN("rc");
+	WRITE("wr"); //
 
 	public final String name;
 

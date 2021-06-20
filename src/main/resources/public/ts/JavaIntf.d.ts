@@ -838,6 +838,4 @@ export const enum PrincipalName {
 export const enum PrivilegeType {
     READ = "rd",
     WRITE = "wr",
-    ADD_CHILDREN = "ac",
-    REMOVE_CHILDREN = "rc",
 }

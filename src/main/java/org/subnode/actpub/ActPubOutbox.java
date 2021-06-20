@@ -142,7 +142,7 @@ public class ActPubOutbox {
                                     log.error("error in saveNode()", e);
                                 }
                             } else {
-                                // this captures videos? and other things (todo-0: add more support)
+                                // this captures videos? and other things (todo-1: add more support)
                                 // log.debug("Object type not supported: " + XString.prettyPrint(obj));
                             }
                         }

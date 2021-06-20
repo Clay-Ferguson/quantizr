@@ -141,7 +141,7 @@ public class MongoRead {
         if (parentPath == null || parentPath.equals("") || parentPath.equals("/"))
             return;
 
-        // todo-0: verify this is correct.
+        // todo-1: use constants here, or even make a function to do this too.
         if (parentPath.startsWith("/r/p/")) {
             parentPath = parentPath.replace("/r/p/", "/r/");
         }

@@ -27,9 +27,19 @@ public class Util {
 		}
 	}
 
+	public static boolean equalObjs(Object o1, Object o2) {
+		if (o1 == null && o2 == null)
+			return true;
+		if (o1 != null && o2 == null)
+			return false;
+		if (o2 != null && o1 == null)
+			return false;
+		return o1.equals(o2);
+	}
+
 	/*
-	 * If addParam is non null it's expected to be something like "param=val" and
-	 * will get added to any existing query string
+	 * If addParam is non null it's expected to be something like "param=val" and will get added to any
+	 * existing query string
 	 */
 	public static String getFullURL(HttpServletRequest request, String addParam) {
 		String url = request.getRequestURL().toString();
