@@ -138,7 +138,7 @@ export class NodeCompRow extends Div {
             const targetId = S.props.getNodePropVal(J.NodeProp.TARGET_ID, node);
             if (targetId) {
                 jumpButton = new IconButton("fa-arrow-right", null, {
-                        onClick: () => S.view.refreshTree(targetId, true, true, targetId, false, true, true, state),
+                        onClick: () => S.view.jumpToId(targetId),
                         title: "Jump to the Node"
                     }, "float-right");
             }

@@ -101,7 +101,6 @@ public class RSSFeedService {
 	 */
 	private static final ConcurrentHashMap<String, SyndFeed> aggregateCache = new ConcurrentHashMap<>();
 
-	/* todo-0: need a timer thread that clears this out ever 5 minutes */
 	private static int MAX_CACHE_SIZE = 500;
 	public static final LinkedHashMap<String, byte[]> proxyCache =
 			new LinkedHashMap<String, byte[]>(MAX_CACHE_SIZE + 1, .75F, false) {

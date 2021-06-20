@@ -22,8 +22,7 @@ export class NodeCompMarkdown extends Html {
     urls: string[];
 
     constructor(public node: J.NodeInfo, private appState: AppState) {
-        // todo-0: need better key here?
-        super(null, { key: node.id });
+        super(null, { key: "ncmkd_" + node.id });
 
         // Set the content display to wider if there is a code block. This makes the non-code text also wrap at a wider
         // width but we have to tolerate that for now, becasue there's not a cleaner 'easy' solution.

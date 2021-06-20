@@ -2,7 +2,7 @@ package org.subnode.config;
 
 import java.io.IOException;
 import java.util.HashMap;
-
+import javax.annotation.PostConstruct;
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
@@ -34,12 +34,11 @@ public class AppFilter extends GenericFilterBean {
 	private static boolean logRequests = false;
 	private static boolean logResponses = false;
 
-	// forces transactions to be at least this number of milliseconds apart. 
-	// todo-0: this needs to be a configurable parameter
-	private static int THROTTLE_INTERVAL = 2000;
-
 	@Autowired
 	private SessionContext sessionContext;
+
+	@Autowired
+	private AppProp appProp;
 
 	/*
 	 * if non-zero this is used to put a millisecond delay (determined by its value) onto every request
@@ -47,12 +46,19 @@ public class AppFilter extends GenericFilterBean {
 	 */
 	private static int simulateSlowServer = 0;
 
+	private static int THROTTLE_INTERVAL = 2000;
+
 	/*
 	 * For debugging we can turn this flag on and disable the server from processing multiple requests
 	 * simultenaously this is every helpful for debugging
 	 */
 	private static boolean singleThreadDebugging = false;
 	private static final HashMap<String, IPInfo> ipInfo = new HashMap<>();
+
+	@PostConstruct
+	public void postConstruct() {
+		THROTTLE_INTERVAL = appProp.getThrottleTime();
+	}
 
 	@Override
 	public void doFilter(ServletRequest req, ServletResponse res, FilterChain chain) throws IOException, ServletException {

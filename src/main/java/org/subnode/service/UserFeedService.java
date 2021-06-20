@@ -45,7 +45,7 @@ import org.subnode.util.ThreadLocals;
 public class UserFeedService {
 	private static final Logger log = LoggerFactory.getLogger(UserFeedService.class);
 
-	static final int MAX_FEED_ITEMS = 25;
+	static final int MAX_FEED_ITEMS = 50;
 
 	@Autowired
 	private MongoRead read;

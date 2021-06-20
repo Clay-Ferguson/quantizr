@@ -34,4 +34,5 @@ export interface PropsIntf {
     getCryptoKey(node: J.NodeInfo, state: AppState): string;
     transferBinaryProps(srcNode: J.NodeInfo, dstNode: J.NodeInfo): void;
     getInputClassForType(typeName: string): string;
+    getParentPath(node: J.NodeInfo): string;
 }

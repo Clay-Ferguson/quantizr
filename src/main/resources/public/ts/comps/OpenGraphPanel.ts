@@ -27,16 +27,20 @@ export class OpenGraphPanel extends Div {
     onAddEvent = (elm: HTMLElement): void => {
         let og = S.meta64.openGraphData.get(this.url);
         if (!og) {
-            // todo-1: An optimization would also be WHILE scrolling turn off the observersions (disconnect()), and
-            // then reenable after scroll position has been static a second or so.
-            // NOTE: It's possible to use ONE IntersectionObserver even globally in app but since
-            // we have local state being updated, this will have to do.
             let observer = new IntersectionObserver(entries => {
                 entries.forEach((entry: any) => {
                     if (entry.isIntersecting) {
                         let og = S.meta64.openGraphData.get(this.url);
                         if (!og) {
-                            this.mergeState({ loading: true });
+
+                            // wait 2 seconds before showing the loading indicator.
+                            setTimeout(() => {
+                                let og = S.meta64.openGraphData.get(this.url);
+                                if (!og) {
+                                    this.mergeState({ loading: true });
+                                }
+                            }, 2000);
+
                             S.util.loadOpenGraph(this.url, (og: any) => {
                                 S.meta64.openGraphData.set(this.url, og || {});
                                 this.mergeState({ loading: false, og });
@@ -45,7 +49,7 @@ export class OpenGraphPanel extends Div {
                     }
                 });
             });
-            observer.observe(elm);
+            observer.observe(elm.parentElement);
         }
     }
 
@@ -61,7 +65,7 @@ export class OpenGraphPanel extends Div {
         }
         let o: any = state.og;
         if (!o) {
-            this.setChildren([]);
+            this.setChildren(null);
             return;
         };
         let title = o.ogTitle || o.twitterTitle;
@@ -70,7 +74,7 @@ export class OpenGraphPanel extends Div {
 
         /* If neither a description nor image exists, this will not be interesting enough so don't render */
         if (!desc && !image) {
-            this.setChildren([]);
+            this.setChildren(null);
             return null;
         }
 

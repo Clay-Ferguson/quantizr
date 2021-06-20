@@ -323,4 +323,10 @@ export class Props implements PropsIntf {
         }
         return null;
     }
+
+    getParentPath = (node: J.NodeInfo): string => {
+        let slashIdx: number = node.path.lastIndexOf("/");
+        if (slashIdx === -1) return null;
+        return node.path.substring(0, slashIdx);
+    }
 }

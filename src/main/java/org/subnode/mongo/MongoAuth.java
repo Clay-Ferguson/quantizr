@@ -388,7 +388,8 @@ public class MongoAuth {
 	/*
 	 * NOTE: this should ONLY ever be called from 'auth()' method of this class
 	 * 
-	 * todo-0: check all calls to "setPath". Nothing client can do should be able to alter a path.
+	 * todo-0: check all calls to "setPath". Nothing client can do should be able to alter a path,
+	 * and any paths that come from the client need to be checked.
 	 */
 	private boolean ancestorAuth(MongoSession session, SubNode node, List<PrivilegeType> privs) {
 

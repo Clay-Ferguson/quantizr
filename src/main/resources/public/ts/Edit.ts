@@ -264,10 +264,8 @@ export class Edit implements EditIntf {
             // and so before refreshing the screen we check for that edge case.
             // console.log("saveNodeResponse: " + S.util.prettyPrint(node));
 
-            // could move this 'getParentPath' into a utility function. we have it at least two places (todo-0)
-            let slashIdx: number = node.path.lastIndexOf("/");
-            if (slashIdx === -1) return;
-            let parentPath = node.path.substring(0, slashIdx);
+            let parentPath = S.props.getParentPath(node);
+            if (!parentPath) return;
 
             // I had expected the save to have already move into the non-pending folder by now,
             // but i haven't investigated yet, this must be right.

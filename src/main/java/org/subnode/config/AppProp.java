@@ -240,6 +240,10 @@ public class AppProp /* implements EnvironmentAware */ {
 		return env.getProperty("anonUserLandingPageNode");
 	}
 
+	public int getThrottleTime() {
+		return Integer.parseInt(env.getProperty("throttleTime"));
+	}
+
 	public String getMailHost() {
 		return env.getProperty("mail.host");
 	}

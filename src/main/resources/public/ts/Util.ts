@@ -246,12 +246,6 @@ export class Util implements UtilIntf {
         return s.replace(new RegExp(this.escapeRegExp(find), "g"), replace);
     }
 
-    // todo-0: get rid of this. JS does it.
-    contains = (s: string, str: string): boolean => {
-        if (!s) return false;
-        return s.indexOf(str) !== -1;
-    }
-
     chopAtLastChar = (str: string, char: string): string => {
         const idx = str.lastIndexOf(char);
         if (idx !== -1) {
@@ -682,7 +676,7 @@ export class Util implements UtilIntf {
             id = id.substring(1);
         }
 
-        if (this.contains(id, "#")) {
+        if (id.includes("#")) {
             console.log("Invalid # in domElm");
             return null;
         }
@@ -787,7 +781,7 @@ export class Util implements UtilIntf {
             id = id.substring(1);
         }
 
-        if (this.contains(id, "#")) {
+        if (id.includes("#")) {
             console.log("Invalid # in domElm");
             return null;
         }

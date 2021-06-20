@@ -20,7 +20,6 @@ export class View implements ViewIntf {
 
     docElm: any = (document.documentElement || document.body.parentNode || document.body);
 
-    // todo-0: there are a few places this method should be used which aren't yet.
     jumpToId = (id: string): void => {
         let state = store.getState();
         this.refreshTree(id, true, true, id, false, true, true, state);

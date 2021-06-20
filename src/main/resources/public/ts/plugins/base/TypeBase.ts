@@ -115,8 +115,12 @@ export class TypeBase implements TypeHandlerIntf {
         // This OpenGraph logic should maybe be just built into the Markdown component itself?
         if (comp.urls) {
             let children: CompIntf[] = [comp];
+            let count = 0;
             comp.urls.forEach((url: string) => {
-                children.push(new OpenGraphPanel("og_" + comp.getId(), url));
+                // allow max of 10 urls.
+                if (count++ < 10) {
+                    children.push(new OpenGraphPanel("og" + count + "_" + comp.getId(), url));
+                }
             });
             return new Div(null, null, children);
         }

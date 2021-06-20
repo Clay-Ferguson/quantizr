@@ -296,16 +296,12 @@ export class EditNodeDlg extends DialogBase {
                 onClick: () => {
                     this.cancelEdit();
                     S.nav.closeFullScreenViewer(this.appState);
-                    this.jumpToNode(state.node.id, this.appState);
+                    S.view.jumpToId(state.node.id);
                 }
             }));
         }
 
         return span;
-    }
-
-    jumpToNode = (id: string, state: AppState) => {
-        S.view.refreshTree(id, true, true, id, false, true, true, state);
     }
 
     getTitleText(): string {

@@ -207,7 +207,7 @@ export class NodeCompRowHeader extends Div {
                 floatUpperRightDiv.addChild(new Span(null, { className: "marginLeft" }, [
                     new IconButton("fa-arrow-right", null, {
                         className: "marginLeft",
-                        onClick: () => S.view.refreshTree(targetId, true, true, targetId, false, true, true, state),
+                        onClick: () => S.view.jumpToId(targetId),
                         title: "Jump to the Node"
                     })
                 ]));

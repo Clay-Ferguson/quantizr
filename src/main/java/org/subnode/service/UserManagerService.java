@@ -798,8 +798,7 @@ public class UserManagerService {
 				boolean following = userIsFollowedByMe(session, nodeUserName);
 				userProfile.setFollowing(following);
 
-				// todo-0: add ability to know "follows you" state (for display on UserProfileDlg)
-
+				// todo-1: add ability to know "follows you" state (for display on UserProfileDlg)
 				res.setSuccess(true);
 			}
 		});
@@ -852,8 +851,6 @@ public class UserManagerService {
 
 	/*
 	 * Runs when user is doing the 'change password' or 'reset password'
-	 * 
-	 * todo-0: this code is ugly. fix it.
 	 */
 	public ChangePasswordResponse changePassword(MongoSession session, final ChangePasswordRequest req) {
 		ChangePasswordResponse res = new ChangePasswordResponse();
@@ -861,8 +858,8 @@ public class UserManagerService {
 			session = ThreadLocals.getMongoSession();
 		}
 
-		SubNode userNode[] = new SubNode[1];
-		String userName[] = new String[1];
+		ValContainer<SubNode> userNode = new ValContainer<>();
+		ValContainer<String> userName = new ValContainer<>();
 
 		String passCode = req.getPassCode();
 		if (passCode != null) {
@@ -876,51 +873,51 @@ public class UserManagerService {
 				if (userNodeId == null) {
 					throw new RuntimeEx("Unable to find userNodeId: " + userNodeId);
 				}
-				userNode[0] = read.getNode(mongoSession, userNodeId);
+				userNode.setVal(read.getNode(mongoSession, userNodeId));
 
-				if (userNode[0] == null) {
+				if (userNode.getVal()==null) {
 					throw ExUtil.wrapEx("Invald password reset code.");
 				}
 
 				String codePart = XString.parseAfterLast(passCode, "-");
 
-				String nodeCodePart = userNode[0].getStrProp(NodeProp.USER_PREF_PASSWORD_RESET_AUTHCODE.s());
+				String nodeCodePart = userNode.getVal().getStrProp(NodeProp.USER_PREF_PASSWORD_RESET_AUTHCODE.s());
 				if (!codePart.equals(nodeCodePart)) {
 					throw ExUtil.wrapEx("Invald password reset code.");
 				}
 
 				String password = req.getNewPassword();
-				userName[0] = userNode[0].getStrProp(NodeProp.USER.s());
+				userName.setVal(userNode.getVal().getStrProp(NodeProp.USER.s()));
 
-				if (PrincipalName.ADMIN.s().equals(userName[0])) {
+				if (PrincipalName.ADMIN.s().equals(userName.getVal())) {
 					throw new RuntimeEx("changePassword should not be called fror admin user.");
 				}
 
-				userNode[0].setProp(NodeProp.PWD_HASH.s(), util.getHashOfPassword(password));
-				userNode[0].deleteProp(NodeProp.USER_PREF_PASSWORD_RESET_AUTHCODE.s());
+				userNode.getVal().setProp(NodeProp.PWD_HASH.s(), util.getHashOfPassword(password));
+				userNode.getVal().deleteProp(NodeProp.USER_PREF_PASSWORD_RESET_AUTHCODE.s());
 
 				// note: the adminRunner.run saves the session so we don't do that here.
 			});
 		} else {
-			userNode[0] = read.getUserNodeByUserName(session, session.getUserName());
+			userNode.setVal(read.getUserNodeByUserName(session, session.getUserName()));
 
-			if (userNode[0] == null) {
+			if (userNode.getVal()==null) {
 				throw ExUtil.wrapEx("changePassword cannot find user.");
 			}
 
-			if (PrincipalName.ADMIN.s().equals(userName[0])) {
+			if (PrincipalName.ADMIN.s().equals(userName.getVal())) {
 				throw new RuntimeEx("changePassword should not be called fror admin user.");
 			}
 
 			String password = req.getNewPassword();
-			userName[0] = userNode[0].getStrProp(NodeProp.USER.s());
-			userNode[0].setProp(NodeProp.PWD_HASH.s(), util.getHashOfPassword(password));
-			userNode[0].deleteProp(NodeProp.USER_PREF_PASSWORD_RESET_AUTHCODE.s());
+			userName.setVal(userNode.getVal().getStrProp(NodeProp.USER.s()));
+			userNode.getVal().setProp(NodeProp.PWD_HASH.s(), util.getHashOfPassword(password));
+			userNode.getVal().deleteProp(NodeProp.USER_PREF_PASSWORD_RESET_AUTHCODE.s());
 
-			update.save(session, userNode[0]);
+			update.save(session, userNode.getVal());
 		}
 
-		res.setUser(userName[0]);
+		res.setUser(userName.getVal());
 		ThreadLocals.getSessionContext().setPassword(req.getNewPassword());
 		res.setSuccess(true);
 		return res;

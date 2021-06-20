@@ -377,7 +377,7 @@ export class Search implements SearchIntf {
             throw new Error("Unable to find uid in search results: " + id);
         }
 
-        S.view.refreshTree(this.highlightRowNode.id, true, true, this.highlightRowNode.id, false, true, true, state);
+        S.view.jumpToId(this.highlightRowNode.id);
     }
 
     searchAndReplace = (recursive: boolean, nodeId: string, search: string, replace: string, state: AppState): void => {

@@ -54,7 +54,7 @@ export abstract class ResultSetView extends AppTab {
                 this.renderHeading(),
                 this.data.rsInfo.node ? new Span(null, { className: "float-right" }, [
                     new IconButton("fa-arrow-left", "Back", {
-                        onClick: () => S.view.refreshTree(this.data.rsInfo.node.id, true, true, this.data.rsInfo.node.id, false, true, true, state),
+                        onClick: () => S.view.jumpToId(this.data.rsInfo.node.id),
                         title: "Back to Node"
                     })
                 ]) : null
