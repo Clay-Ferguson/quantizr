@@ -1,18 +1,21 @@
 .menuPanel {
-    background-color: transparent;
-    min-width: 7em;
+    min-width: 10em;
+    margin-top: 10px;
+    width: 100%;
+    font-size: 120%;
+}
+
+.menuPanelMobile {
+    min-width: 10em;
+    margin-top: 10px;
+    width: 100%;
+    font-size: 140%;
 }
 
 .menuIcon {
     vertical-align: middle;
     cursor: pointer;
     margin-top: 5px;
-}
-
-.menuContainer {
-    margin-top: 10px;
-    width: 100%;
-    font-size: 120%;
 }
 
 .menuItemSeparator {

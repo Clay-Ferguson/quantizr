@@ -3,8 +3,10 @@ import { store } from "../AppRedux";
 import { AppState } from "../AppState";
 import { Constants as C } from "../Constants";
 import { DialogBase } from "../DialogBase";
+import { Log } from "../Log";
 import { PubSub } from "../PubSub";
 import { Singletons } from "../Singletons";
+import { State } from "../State";
 import { CompIntf } from "./base/CompIntf";
 import { Div } from "./Div";
 
@@ -15,17 +17,17 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (s: Singletons) => {
 
 export class TabPanel extends Div {
 
-    constructor() {
+    constructor(private customTopComp: CompIntf = null) {
         super(null, { id: C.ID_TAB, tabIndex: "-1" });
         const state: AppState = store.getState();
 
         if (state.mobileMode) {
-            this.attribs.className = "col-12 tab-panel-mobile";
+            this.attribs.className = "col-12 tabPanelMobile customScrollbar";
         }
         else {
             let state: AppState = store.getState();
-            this.attribs.className = "col-" + state.mainPanelCols + " " +
-                (state.userPreferences.editMode && state.activeTab === C.TAB_MAIN ? "tabPanelEditMode" : "tabPanel") +
+            this.attribs.className = "col-" + state.mainPanelCols +
+                (state.userPreferences.editMode && state.activeTab === C.TAB_MAIN ? " tabPanelEditMode" : " tabPanel") +
                 " customScrollbar";
         }
     }
@@ -46,6 +48,7 @@ export class TabPanel extends Div {
         }, children);
 
         this.setChildren([
+            this.customTopComp,
             tabContent
         ]);
     }
@@ -74,7 +77,7 @@ export class TabPanel extends Div {
         this.reScroll(elm);
 
         elm.addEventListener("scroll", () => {
-            // console.log("Scroll pos: " + elm.scrollTop);
+            // console.log("Scroll pos: " + S.meta64.activeTab + ": " + elm.scrollTop);
             S.meta64.lastScrollTime = new Date().getTime();
             S.meta64.scrollPosByTabName.set(S.meta64.activeTab, elm.scrollTop);
         }, { passive: true });

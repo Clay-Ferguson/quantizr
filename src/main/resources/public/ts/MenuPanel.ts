@@ -40,7 +40,7 @@ export class MenuPanel extends Div {
         super(null, {
             id: "accordion",
             role: "tablist",
-            className: "menuPanel"
+            className: state.mobileMode ? "menuPanelMobile" : "menuPanel"
         });
     }
 
@@ -196,6 +196,11 @@ export class MenuPanel extends Div {
                                 event.stopPropagation();
                                 event.preventDefault();
                                 S.meta64.setUserPreferences(state, true);
+
+                                // we have to do this Menu close manually here since this is not a MenuItem wrapped function.
+                                if (S.meta64.mainMenu) {
+                                    S.meta64.mainMenu.close();
+                                }
                                 S.view.jumpToId(bookmark.selfId);
                             }
                         }) : null

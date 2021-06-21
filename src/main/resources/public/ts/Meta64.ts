@@ -81,9 +81,6 @@ export class Meta64 implements Meta64Intf {
     can reset each tab back to it's 'current' scroll position */
     scrollPosByTabName: Map<string, number> = new Map<string, number>();
 
-    // not currently used.
-    // logView: LogView = new LogView();
-
     /* Map of all URLs and the openGraph object retrieved for it */
     openGraphData: Map<string, any> = new Map<string, any>();
 
@@ -647,6 +644,17 @@ export class Meta64 implements Meta64Intf {
                     isVisible: () => true,
                     constructView: (data: TabDataIntf) => new TrendingView(data),
                     rsInfo: new TrendingRSInfo()
+                },
+                {
+                    name: "Log",
+                    id: C.TAB_LOG,
+                    isVisible: () => {
+                        // this function needs to get the state itself.
+                        let state = store.getState();
+                        return state.isAdminUser;
+                    },
+                    constructView: (data: TabDataIntf) => new LogView(data),
+                    rsInfo: null
                 }
             ];
             return s;
@@ -918,10 +926,6 @@ export class Meta64 implements Meta64Intf {
             s.isAnonUser = res.userName === J.PrincipalName.ANON;
 
             console.log("LoginResponse userName = " + res.userName);
-
-            if (s.isAdminUser) {
-                LogView.showLogs = true;
-            }
 
             // bash scripting is an experimental feature, and i'll only enable for admin for now, until i'm
             // sure i'm keeping this feature.

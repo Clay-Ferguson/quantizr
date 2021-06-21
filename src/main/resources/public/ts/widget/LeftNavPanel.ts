@@ -49,12 +49,7 @@ export class LeftNavPanel extends Div {
                     title: "Show new messages"
                 }) : null
             ]),
-
-            new Div(null, {
-                className: "menuContainer"
-            }, [
-                new MenuPanel(state)
-            ])
+            new MenuPanel(state)
         ]);
     }
 

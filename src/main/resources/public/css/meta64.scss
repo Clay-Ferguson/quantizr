@@ -84,7 +84,9 @@ $mobileHeaderHeight: 3.5em;
     height: 100vh;
 }
 
-.tab-panel-mobile {
+.tabPanelMobile {
+    height: 100%;
+    overflow-y: scroll;
     margin-left: 0px !important;
     margin-right: 0px !important;
     padding-left: 0px !important;
@@ -374,6 +376,10 @@ a {
 }
 
 .trendingTitle {
+    margin-bottom: 10px;
+}
+
+.logViewTitle {
     margin-bottom: 10px;
 }
 

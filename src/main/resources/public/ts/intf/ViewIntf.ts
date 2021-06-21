@@ -14,5 +14,5 @@ export interface ViewIntf {
     runServerCommand(command: string, dlgTitle: string, dlgDescription: string, state: AppState): any;
     getNodeStats(state: AppState, trending: boolean, feed: boolean): any;
     scrollTo(offset: number): void;
-    scrollAllTop(): void;
+    scrollAllTop(state: AppState): void;
 }

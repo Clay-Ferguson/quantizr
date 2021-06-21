@@ -41,16 +41,7 @@ export class App extends Main {
 
         let fullScreenViewer = this.getFullScreenViewer(state);
         let mobileTopBar = this.getTopMobileBar(state);
-
-        let mainClass = null;
-        if (state.userPreferences.editMode) {
-            mainClass = state.mobileMode ? "container-mobile-edit" : "container-fluid";
-        }
-        else {
-            mainClass = state.mobileMode ? "container-mobile" : "container-fluid";
-        }
-
-        this.attribs.className = mainClass + " mainContainer";
+        this.attribs.className = "container-fluid mainContainer";
 
         if (fullScreenViewer) {
             this.setChildren([
@@ -65,8 +56,7 @@ export class App extends Main {
                     new Div(null, {
                         className: "row mainAppRow"
                     }, [
-                        mobileTopBar,
-                        new TabPanel()
+                        new TabPanel(mobileTopBar)
                     ])
                 ]);
             }
@@ -82,14 +72,14 @@ export class App extends Main {
 
                     new IconButton("fa-angle-double-up", null, {
                         onClick: e => {
-                            S.view.scrollAllTop();
+                            S.view.scrollAllTop(state);
                         },
                         title: "Scroll to Top"
                     }, "btn-secondary scrollTopButtonUpperRight", "off"),
 
                     new IconButton("fa-angle-double-up", null, {
                         onClick: e => {
-                            S.view.scrollAllTop();
+                            S.view.scrollAllTop(state);
                         },
                         title: "Scroll to Top"
                     }, "btn-secondary scrollTopButtonLowerRight", "off")
@@ -130,7 +120,7 @@ export class App extends Main {
         let comp: CompIntf = null;
         if (state.mobileMode) {
             let menuButton = null;
-            menuButton = new IconButton("fa-bars", "", {
+            menuButton = new IconButton("fa-bars", "Menu", {
                 onClick: e => {
                     S.nav.showMainMenu(state);
                 },

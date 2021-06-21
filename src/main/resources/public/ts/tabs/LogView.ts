@@ -7,6 +7,7 @@ import { Log } from "../Log";
 import { PubSub } from "../PubSub";
 import { Singletons } from "../Singletons";
 import { AppTab } from "../widget/AppTab";
+import { Heading } from "../widget/Heading";
 import { Html } from "../widget/Html";
 
 let S: Singletons;
@@ -16,18 +17,25 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
 
 export class LogView extends AppTab implements LogViewIntf {
     static logs: string = "";
-    static showLogs: boolean = false;
 
     constructor(data: TabDataIntf) {
         super(data);
         Log.logView = this;
+
+        // For some reason I can't get the console.log override to work.
+        // (function() {
+        //     let oldLog = console.log;
+        //     console.log = function (msg) {
+        //         LogView.logs += msg;
+        //         LogView.logs += "\n";
+        //         oldLog.apply(console, arguments);
+        //     };
+        // })();
     }
 
     log = (msg: string): any => {
-        if (LogView.showLogs) {
-            LogView.logs += msg;
-            LogView.logs += "\n";
-        }
+        LogView.logs += msg;
+        LogView.logs += "\n";
     }
 
     preRender(): void {
@@ -39,6 +47,7 @@ export class LogView extends AppTab implements LogViewIntf {
         }
 
         this.setChildren([
+            new Heading(3, "Log", { className: "logView" }),
             new Html("<pre>" + LogView.logs + "</pre>")
         ]);
     }

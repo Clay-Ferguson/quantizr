@@ -84,11 +84,13 @@ export class FeedView extends AppTab {
                 FeedView.helpExpanded = state;
             }, FeedView.helpExpanded);
 
-        let searchDiv = new ButtonBar([
-            new Span(null, { className: "feedSearchField" }, [new TextField("Search", false, null, null, false, FeedView.searchTextState)]),
-            new Button("Clear", () => { this.clearSearch(); }, { className: "feedClearButton" })
-        ]);
-        children.push(searchDiv);
+        // if this is mobile don't even show search field unless it's currently in use (like from a trending click)
+        if (!state.mobileMode || FeedView.searchTextState.getValue()) {
+            children.push(new ButtonBar([
+                new Span(null, { className: "feedSearchField" }, [new TextField("Search", false, null, null, false, FeedView.searchTextState)]),
+                new Button("Clear", () => { this.clearSearch(); }, { className: "feedClearButton" })
+            ]));
+        }
 
         if (state.feedLoading) {
             children.push(new Heading(4, "Loading feed..."));

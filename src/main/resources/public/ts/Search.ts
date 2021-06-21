@@ -9,6 +9,7 @@ import { FollowersRSInfo } from "./FollowersRSInfo";
 import { FollowingRSInfo } from "./FollowingRSInfo";
 import { SearchIntf } from "./intf/SearchIntf";
 import * as J from "./JavaIntf";
+import { Log } from "./Log";
 import { PubSub } from "./PubSub";
 import { SharesRSInfo } from "./SharesRSInfo";
 import { Singletons } from "./Singletons";
@@ -214,10 +215,12 @@ export class Search implements SearchIntf {
                 s.feedWaitingForUserRefresh = false;
                 S.meta64.selectTabStateOnly(C.TAB_FEED, s);
 
+                S.view.scrollAllTop(s);
                 // for some reason mobile only isn't scrolling to top so this is a quick hack (todo-0)
+                // I'm pretty sure this is FIXED! but and we no longer need this timer...but will leave it temorarily
                 setTimeout(() => {
-                    S.view.scrollToTop();
-                }, 1700);
+                    S.view.scrollAllTop(s);
+                }, 1000);
 
                 return s;
             });

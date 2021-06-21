@@ -163,18 +163,24 @@ export class View implements ViewIntf {
         }
     }
 
-    scrollAllTop = () => {
+    scrollAllTop = (state: AppState) => {
         // #DEBUG-SCROLLING
         // console.log("scrollAllTop");
-        S.util.getElm(C.ID_LHS, (elm: HTMLElement) => {
-            elm.scrollTop = 0;
-        });
+        if (!state.mobileMode) {
+            S.util.getElm(C.ID_LHS, (elm: HTMLElement) => {
+                elm.scrollTop = 0;
+            });
+        }
+
         S.util.getElm(C.ID_TAB, (elm: HTMLElement) => {
             elm.scrollTop = 0;
         });
-        S.util.getElm(C.ID_RHS, (elm: HTMLElement) => {
-            elm.scrollTop = 0;
-        });
+
+        if (!state.mobileMode) {
+            S.util.getElm(C.ID_RHS, (elm: HTMLElement) => {
+                elm.scrollTop = 0;
+            });
+        }
     }
 
     scrollTo = (offset: number) => {
@@ -206,7 +212,7 @@ export class View implements ViewIntf {
             }
 
             if (currentSelNode && state.node.id === currentSelNode.id) {
-                S.view.scrollAllTop();
+                this.scrollAllTop(state);
                 return;
             }
 
@@ -222,7 +228,7 @@ export class View implements ViewIntf {
                 elm.scrollIntoView(true);
             }
             else {
-                S.view.scrollAllTop();
+                this.scrollAllTop(state);
             }
         };
         //     } finally {
@@ -240,7 +246,8 @@ export class View implements ViewIntf {
 
     scrollToTop = async (): Promise<void> => {
         PubSub.subSingleOnce(C.PUBSUB_mainWindowScroll, () => {
-            S.view.scrollAllTop();
+            let state = store.getState();
+            this.scrollAllTop(state);
         });
     }
 

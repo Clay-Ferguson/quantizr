@@ -11,15 +11,6 @@ Media Queries below are per Bootstap 4 standard */
     .container {
         max-width: 285px;
     }
-
-    .container-mobile {
-        width: 100%;
-    }
-
-    .container-mobile-edit {
-        width: 100%;
-        padding-right: 35px;
-    }
 }
 
 /* Small devices (portrait phones?, 576px and up) */
@@ -32,15 +23,6 @@ Media Queries below are per Bootstap 4 standard */
 
     .container {
         max-width: 500px;
-    }
-
-    .container-mobile {
-        width: 100%;
-    }
-
-    .container-mobile-edit {
-        width: 100%;
-        padding-right: 35px;
     }
 }
 
@@ -55,15 +37,6 @@ Media Queries below are per Bootstap 4 standard */
     .container {
         max-width: 700px;
     }
-
-    .container-mobile {
-        width: 100%;
-    }
-
-    .container-mobile-edit {
-        width: 100%;
-        padding-right: 35px;
-    }
 }
 
 /* Large devices (desktops, 992px and up) */
@@ -76,15 +49,6 @@ Media Queries below are per Bootstap 4 standard */
 
     .container {
         max-width: 800px;
-    }
-
-    .container-mobile {
-        width: 100%;
-    }
-
-    .container-mobile-edit {
-        width: 100%;
-        padding-right: 35px;
     }
 }
 
@@ -100,15 +64,6 @@ Media Queries below are per Bootstap 4 standard */
     .container {
         max-width: 1000px;
     }
-
-    .container-mobile {
-        width: 100%;
-    }
-
-    .container-mobile-edit {
-        width: 100%;
-        padding-right: 35px;
-    }
 }
 
 //this size is non-standard and larger than anything bootstrap considers.
@@ -121,14 +76,5 @@ Media Queries below are per Bootstap 4 standard */
 
     .container {
         max-width: 1400px;
-    }
-
-    .container-mobile {
-        width: 100%;
-    }
-
-    .container-mobile-edit {
-        width: 100%;
-        padding-right: 35px;
     }
 }
