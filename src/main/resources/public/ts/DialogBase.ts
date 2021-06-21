@@ -77,7 +77,7 @@ export abstract class DialogBase<S extends BaseCompState = any> extends Div<S> i
                 this.backdrop.setAttribute("id", DialogBase.BACKDROP_PREFIX + this.getId());
 
                 // WARNING: Don't use 'className' here, this is pure javascript, and not React!
-                this.backdrop.setAttribute("class", "app-modal customScrollbar");
+                this.backdrop.setAttribute("class", "app-modal " + (this.appState.mobileMode ? "normalScrollbar" : "customScrollbar"));
                 this.backdrop.setAttribute("style", "z-index: " + (++DialogBase.backdropZIndex));
                 document.body.appendChild(this.backdrop);
 

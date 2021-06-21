@@ -13,6 +13,7 @@ import { Button } from "../widget/Button";
 import { ButtonBar } from "../widget/ButtonBar";
 import { Checkbox } from "../widget/Checkbox";
 import { CollapsibleHelpPanel } from "../widget/CollapsibleHelpPanel";
+import { CollapsiblePanel } from "../widget/CollapsiblePanel";
 import { Div } from "../widget/Div";
 import { Heading } from "../widget/Heading";
 import { IconButton } from "../widget/IconButton";
@@ -29,6 +30,9 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
 export class FeedView extends AppTab {
 
     static enabled: boolean = true;
+
+    // need to initially set to expanded=true for 'desktop' mode only.
+    static filterExpanded: boolean = false;
     static searchTextState: ValidatedState<any> = new ValidatedState<any>();
 
     /* Controls wether the view automatically refreshes before letting the user choose what options (checkboxes) they want.
@@ -73,10 +77,16 @@ export class FeedView extends AppTab {
                     FeedView.refresh();
                 })
             ])
-        ], null, "float-right marginBottom marginTop");
+        ], null, "float-right");
 
-        children.push(this.makeFilterButtonsBar(state));
         children.push(refreshFeedButtonBar);
+        children.push(new CollapsiblePanel("Filter", "Filter", null, [
+            this.makeFilterButtonsBar(state)
+        ], false,
+            (state: boolean) => {
+                FeedView.filterExpanded = state;
+            }, FeedView.filterExpanded, "", "", "span"));
+
         children.push(new Div(null, { className: "clearfix" }));
 
         let helpPanel = new CollapsibleHelpPanel("Help", S.meta64.config.help.fediverse.feed,
@@ -89,7 +99,7 @@ export class FeedView extends AppTab {
             children.push(new ButtonBar([
                 new Span(null, { className: "feedSearchField" }, [new TextField("Search", false, null, null, false, FeedView.searchTextState)]),
                 new Button("Clear", () => { this.clearSearch(); }, { className: "feedClearButton" })
-            ]));
+            ], "marginTop"));
         }
 
         if (state.feedLoading) {

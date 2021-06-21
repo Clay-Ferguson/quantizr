@@ -33,7 +33,7 @@ export class NodeCompMainList extends Div {
             let allowNodeMove: boolean = !orderByProp;
             children.push(S.render.renderChildren(state.node, 1, allowNodeMove, state));
 
-            this.addPaginationButtons(children, state.endReached, "marginTop", state);
+            this.addPaginationButtons(children, state.endReached, "marginTop marginBottom", state);
         }
 
         // No longer needed, because we have this on the menu now but check that all the gettingStarted (from yaml) content
