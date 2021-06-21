@@ -1,4 +1,5 @@
 import { useSelector } from "react-redux";
+import { store } from "../AppRedux";
 import { AppState } from "../AppState";
 import { Constants as C } from "../Constants";
 import { MenuPanel } from "../MenuPanel";
@@ -19,7 +20,9 @@ export class LeftNavPanel extends Div {
 
     constructor() {
         super(null, { id: C.ID_LHS, tabIndex: "-1" });
-        this.attribs.className = "col-" + C.leftNavPanelCols + " leftNavPanel customScrollbar";
+        let state: AppState = store.getState();
+        let delta = state.mainPanelCols === 4 ? 1 : 0;
+        this.attribs.className = "col-" + (C.leftNavPanelCols + delta) + " leftNavPanel customScrollbar";
     }
 
     preRender(): void {

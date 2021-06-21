@@ -33,10 +33,10 @@
 
     <main role="main">
 
-        <div class="container-fluid myjumbotron h-100">
+        <div class="container-fluid welcomeBackground h-100">
             <div class="row align-items-center h-100">
                 <div class="col-xs-12 col-sm-12 col-md-10 col-lg-8 col-xl-6 mx-auto">
-                    <div class="jumbotron transparentBg">
+                    <div class="jumbotron transparentBg myJumbotron">
 
                         <h4 class="alert alert-info justify-content-center"
                             th:if="${not #strings.isEmpty(signupResponse)}" th:text="${signupResponse}"></h4>
@@ -65,11 +65,6 @@
                                         alt='Donate with PayPal button' />
                                 </a>
                             </p>
-                
-                            <a href="https://github.com/Clay-Ferguson/quantizr">
-                                <p>Open Source: GitHub</p>
-                                <img src="/branding/GitHub-Mark-Light-32px.png"></img>
-                            </a>
                         </div>
                     </div>
 
@@ -87,6 +82,15 @@
           
         </div>
     </main>
+
+    <footer class="container">
+        <div class="col-6 mx-auto text-center myFooterText marginTop">
+            <a href="https://github.com/Clay-Ferguson/quantizr">
+                <p>Open Source: GitHub</p>
+                <img src="/branding/GitHub-Mark-Light-32px.png"></img>
+            </a>
+        </div>
+    </footer>
 
     <script th:inline="javascript">
         var __page = "welcome";

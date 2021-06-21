@@ -99,7 +99,6 @@ export class ServerPush implements ServerPushIntf {
 
         eventSource.addEventListener("newInboxNode", function (e: any) {
             const obj: J.NotificationMessage = JSON.parse(e.data);
-            // alert("Your inbox has updates.");
             // console.log("Incomming Push (NotificationMessage): " + S.util.prettyPrint(obj));
             // new InboxNotifyDlg("Your Inbox has updates!", store.getState()).open();
         }, false);

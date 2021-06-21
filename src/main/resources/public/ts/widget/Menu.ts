@@ -38,7 +38,8 @@ export class Menu extends Div {
                     setTimeout(() => {
                         /* "aria-expanded" attribute won't have been updated yet when this onClick is called, so we have a delay
                         timer here to wait for it to get updated */
-                        let expanded = document.getElementById("heading" + this.getId()).getAttribute("aria-expanded") === "true";
+                        let headingElm = document.getElementById("heading" + this.getId());
+                        let expanded = headingElm && headingElm.getAttribute("aria-expanded") === "true";
                         Menu.activeMenu = expanded ? this.name : null;
                         // console.log("Expand or collapse: " + this.name + " expan=" + expanded);
 

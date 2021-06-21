@@ -72,6 +72,11 @@ $smallBorderSize: 3px;
 //     }
 // }
 
+.myJumbotron {
+    padding: 2em;
+    margin: 2em;
+}
+
 .displayNameTextField {
     max-width: 50%;
 }
@@ -200,7 +205,7 @@ a {
     //font-size: 110%;
 }
 
-.myjumbotron {
+.welcomeBackground {
     background-size: 100% auto;
     background-image: url(/branding/PIA09561_large.jpg);
 
@@ -676,7 +681,8 @@ entire thing down some times, if it's jutting up against something */
 
 .app-modal-title-close-icon {
     cursor: pointer;
-    font-size: 200%;
+    margin-top: -5px;
+    font-size: 270%;
 
     //this icon vertical centering doesn't work, but it's acceptable looking.
     vertical-align: middle;
@@ -712,7 +718,7 @@ entire thing down some times, if it's jutting up against something */
     background-color: $modal-content-bg;
     border: 2px solid $modal-content-border-color;
     margin: $smallGap auto;
-    padding: $smallGap;
+    padding: 16px;
     width: 75%;
     max-width: 800px;
     border-radius: $border-radius;
@@ -1657,7 +1663,7 @@ i'm backing out for now
   
 .fadeInRowBkgClz {
     animation-name: fadeInRowBkg;
-    animation-duration: 2.5s;
+    animation-duration: 3.5s;
 }
 
 .rowFooterIcon {

@@ -49,6 +49,7 @@ export class MainTabComp extends AppTab {
         this.setChildren([
             new Div(null, {
                 // This visibility setting makes the main content not visible until final scrolling is complete
+                // I'm not sure this rendering animation is still needed, or even noticeable. todo-2
                 className: state.rendering ? "compHidden" : "compVisible"
             }, [
                 renderableCrumbs > 1 && !state.mobileMode ? new BreadcrumbsPanel() : null,
