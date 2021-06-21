@@ -226,6 +226,7 @@ export class NodeCompRowHeader extends Div {
 
         if (floatUpperRightDiv.childrenExist()) {
             children.push(floatUpperRightDiv);
+            children.push(new Div(null, { className: "clearfix" }));
         }
 
         this.setChildren(children);
