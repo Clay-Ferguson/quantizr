@@ -162,7 +162,7 @@ public class AttachmentService {
 				throw ExUtil.wrapEx("Node not found.");
 			}
 
-			auth.auth(session, node, PrivilegeType.WRITE);
+			auth.ownerAuth(node);
 
 			final int maxFileSize = session.getMaxUploadSize();
 			int imageCount = 0;
@@ -249,12 +249,11 @@ public class AttachmentService {
 			node = read.getNode(session, nodeId);
 		}
 
-		auth.auth(session, node, PrivilegeType.WRITE);
-
 		/*
 		 * Multiple file uploads always attach children for each file uploaded
 		 */
 		if (addAsChild) {
+			auth.auth(session, node, PrivilegeType.WRITE);
 			try {
 				final SubNode newNode =
 						create.createNode(session, node, null, null, null, CreateNodeLocation.LAST, null, null, true);
@@ -275,6 +274,9 @@ public class AttachmentService {
 			} catch (final Exception ex) {
 				throw ExUtil.wrapEx(ex);
 			}
+		}
+		else {
+			auth.ownerAuth(node);
 		}
 
 		/* mimeType can be passed as null if it's not yet determined */
@@ -437,7 +439,7 @@ public class AttachmentService {
 
 		final String nodeId = req.getNodeId();
 		final SubNode node = read.getNode(session, nodeId);
-		auth.auth(session, node, PrivilegeType.WRITE);
+		auth.ownerAuth(node);
 		deleteBinary(session, "", node, null);
 		deleteAllBinaryProperties(node, "");
 		update.saveSession(session);
@@ -765,7 +767,7 @@ public class AttachmentService {
 			throw new RuntimeException("node not found: id=" + req.getNodeId());
 		}
 
-		auth.auth(session, node, PrivilegeType.WRITE);
+		auth.ownerAuth(node);
 		node.setProp(NodeProp.IPFS_LINK.s(), req.getCid().trim());
 		String mime = req.getMime().trim().replace(".", "");
 
@@ -830,7 +832,7 @@ public class AttachmentService {
 
 		if (!storeLocally) {
 			SubNode node = read.getNode(session, nodeId);
-			auth.auth(session, node, PrivilegeType.WRITE);
+			auth.ownerAuth(node);
 
 			String mimeType = URLConnection.guessContentTypeFromName(sourceUrl);
 			if (StringUtils.isEmpty(mimeType) && mimeHint != null) {
@@ -984,7 +986,7 @@ public class AttachmentService {
 	public void writeStream(final MongoSession session, final String binSuffix, final SubNode node,
 			final LimitedInputStreamEx stream, final String fileName, final String mimeType, SubNode userNode) {
 
-		auth.auth(session, node, PrivilegeType.WRITE);
+		auth.ownerAuth(node);
 		final DBObject metaData = new BasicDBObject();
 		metaData.put("nodeId" + binSuffix, node.getId());
 
@@ -1029,7 +1031,7 @@ public class AttachmentService {
 
 	public void writeStreamToIpfs(final MongoSession session, final String binSuffix, final SubNode node,
 			final InputStream stream, final String mimeType, SubNode userNode) {
-		auth.auth(session, node, PrivilegeType.WRITE);
+		auth.ownerAuth(node);
 		final ValContainer<Integer> streamSize = new ValContainer<>();
 
 		MerkleLink ret = ipfsService.addFromStream(session, stream, null, mimeType, streamSize, null, false);
@@ -1045,7 +1047,7 @@ public class AttachmentService {
 	}
 
 	public void deleteBinary(final MongoSession session, final String binSuffix, final SubNode node, SubNode userNode) {
-		auth.auth(session, node, PrivilegeType.WRITE);
+		auth.ownerAuth(node);
 		final String id = node.getStrProp(NodeProp.BIN.s() + binSuffix);
 		if (id == null) {
 			return;

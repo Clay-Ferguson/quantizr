@@ -48,11 +48,10 @@ public class MongoAuth {
 	public static MongoAuth inst;
 
 	private static int MAX_CACHE_SIZE = 500;
-	// The cache key in this can be either a node path or node id.
 	/*
-	 * todo-0: need to update to take into account dirty reads. Can we use the MongoEventListener to
-	 * detect EVERY case of a node being read in, and then simply overwrite the cache with the new node
-	 * content. Until there's a solid design we can turn off the cache.
+	 * The cache key in this can be either a node path or node id. We cache nodes aggressively whenever
+	 * a node is loaded, but we only refer to this cache for doing auth logic. The reason is that for
+	 * authorization purposes won't need worry about keeping the cache up to date for writes.
 	 */
 	private final LinkedHashMap<String, SubNode> cachedNodes =
 			new LinkedHashMap<String, SubNode>(MAX_CACHE_SIZE + 1, .75F, false) {
@@ -103,10 +102,6 @@ public class MongoAuth {
 	}
 
 	public void cacheNode(SubNode node) {
-		// todo-0: disabled pending new caching policy
-		if (true)
-			return;
-
 		if (node.getPath() != null || node.getId() != null) {
 			synchronized (cachedNodes) {
 				if (node.getPath() != null) {
@@ -121,10 +116,6 @@ public class MongoAuth {
 	}
 
 	public void cacheNode(String key, SubNode node) {
-		// todo-0: disabled pending new caching policy
-		if (true)
-			return;
-
 		if (key != null) {
 			synchronized (cachedNodes) {
 				cachedNodes.put(key, node);
@@ -151,8 +142,15 @@ public class MongoAuth {
 	}
 
 	public SubNode getCachedNode(String key) {
+		if (StringUtils.isEmpty(key)) return null;
 		synchronized (cachedNodes) {
 			return cachedNodes.get(key);
+		}
+	}
+
+	public void clearNodeCache() {
+		synchronized (cachedNodes) {
+			cachedNodes.clear();
 		}
 	}
 
@@ -352,6 +350,8 @@ public class MongoAuth {
 		ownerAuth(ThreadLocals.getMongoSession(), node);
 	}
 
+	/* todo-0: need to document this much better, regarding scenarios and kinds of updating on this node
+	and relative to the parent (i.e. WRITE means ability to add children, not WRITE node) */
 	public void auth(MongoSession session, SubNode node, PrivilegeType... privs) {
 		// during server init no auth is required.
 		if (node == null || !MongoRepository.fullInit) {
@@ -453,7 +453,16 @@ public class MongoAuth {
 				return true;
 			}
 
-			node = read.getParent(session, node, false);
+			SubNode parentNode = getCachedNode(node.getParentPath());
+
+			// if we got the node from the cache use it
+			if (parentNode != null) {
+				node = parentNode;
+			} 
+			// node not on cache then load it from db
+			else {
+				node = read.getParent(session, node, false);
+			}
 			if (node != null) {
 				if (verbose)
 					log.trace("parent path=" + node.getPath());

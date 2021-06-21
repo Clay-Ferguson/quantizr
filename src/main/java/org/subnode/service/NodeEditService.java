@@ -688,7 +688,7 @@ public class NodeEditService {
 		}
 		String nodeId = req.getNodeId();
 		SubNode node = read.getNode(session, nodeId);
-		auth.auth(session, node, PrivilegeType.WRITE);
+		auth.ownerAuth(node);
 
 		String propertyName = req.getPropName();
 		node.deleteProp(propertyName);

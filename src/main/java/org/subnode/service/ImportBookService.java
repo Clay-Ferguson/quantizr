@@ -47,7 +47,7 @@ public class ImportBookService {
 
 		String nodeId = req.getNodeId();
 		SubNode node = read.getNode(session, nodeId);
-		auth.auth(session, node, PrivilegeType.WRITE);
+		auth.ownerAuth(node);
 		log.debug("Insert Root: " + XString.prettyPrint(node));
 
 		/*

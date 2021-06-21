@@ -23,6 +23,7 @@ import org.subnode.model.IPFSObjectStat;
 import org.subnode.model.UserStats;
 import org.subnode.model.client.NodeProp;
 import org.subnode.mongo.MongoAppConfig;
+import org.subnode.mongo.MongoAuth;
 import org.subnode.mongo.MongoDelete;
 import org.subnode.mongo.MongoRead;
 import org.subnode.mongo.MongoSession;
@@ -80,7 +81,11 @@ public class SystemService {
 	@Autowired
 	private ActPubService apService;
 
+	@Autowired
+	private MongoAuth auth;
+
 	public String rebuildIndexes() {
+		auth.clearNodeCache();
 		if (!ThreadLocals.getSessionContext().isAdmin()) {
 			throw ExUtil.wrapEx("admin only function.");
 		}
@@ -92,6 +97,7 @@ public class SystemService {
 	}
 
 	public String compactDb() {
+		auth.clearNodeCache();
 		delete.deleteNodeOrphans(null);
 		// do not delete.
 		// userManagerService.cleanUserAccounts();
@@ -120,6 +126,7 @@ public class SystemService {
 	}
 
 	public String validateDb() {
+		auth.clearNodeCache();
 		// https://docs.mongodb.com/manual/reference/command/validate/
 		String ret = runMongoDbCommand(new Document("validate", "nodes").append("full", true));
 		ret += ipfsService.repoVerify();

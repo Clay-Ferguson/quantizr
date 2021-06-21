@@ -63,6 +63,53 @@ public class MongoTest implements TestIntf {
 		log.debug("*****************************************************************************************");
 		log.debug("MongoTest Running!");
 
+		authTest();
+
+		// // Verify we can lookup the node we just inserted, by ObjectId
+		// SubNode nodeFoundById = read.getNode(adminSession, node.getId());
+		// if (nodeFoundById == null) {
+		// throw new RuntimeEx("Unable to find node by id.");
+		// }
+
+		// // Verify a lookup by hex string
+		// SubNode nodeFoundByStrId = read.getNode(adminSession,
+		// node.getId().toHexString());
+		// if (nodeFoundByStrId == null) {
+		// throw new RuntimeEx("Unable to find node by id: " +
+		// node.getId().toHexString());
+		// }
+
+		// // Set a property on the node and save the node
+		// node.setProp("testKeyA", new SubNodePropVal("tesetValA"));
+		// update.save(adminSession, node);
+		// log.debug("updated first node.");
+
+		// String newGuyName = "newguy";
+		// SubNode stuffOwnerNode = util.createUser(adminSession, newGuyName, "",
+		// "passy", true);
+		// MongoSession session = MongoSession.createFromNode(stuffOwnerNode);
+
+		// // ----------Verify an attempt to write a duplicate 'path' fails
+		// boolean uniqueViolationCaught = false;
+		// try {
+		// SubNode dupNode = create.createNode(adminSession, "/usrx");
+		// update.save(adminSession, dupNode);
+		// }
+		// catch (Exception e) {
+		// uniqueViolationCaught = true;
+		// }
+
+		// if (!uniqueViolationCaught) {
+		// throw new RuntimeEx("Failed to catch unique constraint violation.");
+		// }
+
+		// runBinaryTests(adminSession);
+
+		log.debug("Mongo Test Ok.");
+		log.debug("*****************************************************************************************");
+	}
+
+	public void authTest() {
 		MongoSession adminSession = auth.getAdminSession();
 
 		SubNode adminNode = read.getUserNodeByUserName(adminSession, PrincipalName.ADMIN.s());
@@ -70,10 +117,13 @@ public class MongoTest implements TestIntf {
 			throw new RuntimeEx("Unable to find admin user node.");
 		}
 
-		// testPathRegex();
+		// root for all testing
+		SubNode testingRoot = create.createNode(adminSession, "/r/?");
+		testingRoot.setContent("Root for Testing");
+		update.save(adminSession, testingRoot);
 
 		// Insert a test node
-		SubNode adminsNode = create.createNode(adminSession, "/r/?");
+		SubNode adminsNode = create.createNode(adminSession, testingRoot.getPath() + "/?");
 		adminsNode.setContent("admin's test node " + System.currentTimeMillis());
 		update.save(adminSession, adminsNode);
 		ObjectId insertedId = adminsNode.getId();
@@ -84,7 +134,8 @@ public class MongoTest implements TestIntf {
 
 		// adam tries to set the path on adminsNode
 		try {
-			adminsNode.setPath(adminsNode.getPath());
+			adminsNode.setPath(adminsNode.getPath() + "abc");
+			update.save(adamSession, adminsNode);
 			throw new RuntimeException("failed to block path alter.");
 		} catch (NodeAuthFailedException e) {
 			log.debug("Successful path alter blocked.");
@@ -101,7 +152,7 @@ public class MongoTest implements TestIntf {
 		// adam attempts and fails to create a node in a protected area
 		try {
 			log.debug("Insecure root insert test.");
-			SubNode adamsNode = create.createNode(adamSession, "/r/?");
+			SubNode adamsNode = create.createNode(adamSession, testingRoot.getPath() + "/?");
 			adamsNode.setContent("adam's test node " + System.currentTimeMillis());
 			update.save(adminSession, adamsNode);
 			throw new RuntimeException("allowed node in secure area");
@@ -150,53 +201,6 @@ public class MongoTest implements TestIntf {
 		} catch (NodeAuthFailedException e) {
 			log.debug("Successfully blocked save by wrong user.");
 		}
-
-		// ==========================================================================================
-		// ==========================================================================================
-		// adam tries to set his node to same path as the admin one.
-
-		// // Verify we can lookup the node we just inserted, by ObjectId
-		// SubNode nodeFoundById = read.getNode(adminSession, node.getId());
-		// if (nodeFoundById == null) {
-		// throw new RuntimeEx("Unable to find node by id.");
-		// }
-
-		// // Verify a lookup by hex string
-		// SubNode nodeFoundByStrId = read.getNode(adminSession,
-		// node.getId().toHexString());
-		// if (nodeFoundByStrId == null) {
-		// throw new RuntimeEx("Unable to find node by id: " +
-		// node.getId().toHexString());
-		// }
-
-		// // Set a property on the node and save the node
-		// node.setProp("testKeyA", new SubNodePropVal("tesetValA"));
-		// update.save(adminSession, node);
-		// log.debug("updated first node.");
-
-		// String newGuyName = "newguy";
-		// SubNode stuffOwnerNode = util.createUser(adminSession, newGuyName, "",
-		// "passy", true);
-		// MongoSession session = MongoSession.createFromNode(stuffOwnerNode);
-
-		// // ----------Verify an attempt to write a duplicate 'path' fails
-		// boolean uniqueViolationCaught = false;
-		// try {
-		// SubNode dupNode = create.createNode(adminSession, "/usrx");
-		// update.save(adminSession, dupNode);
-		// }
-		// catch (Exception e) {
-		// uniqueViolationCaught = true;
-		// }
-
-		// if (!uniqueViolationCaught) {
-		// throw new RuntimeEx("Failed to catch unique constraint violation.");
-		// }
-
-		// runBinaryTests(adminSession);
-
-		log.debug("Mongo Test Ok.");
-		log.debug("*****************************************************************************************");
 	}
 
 	public void testPathRegex() {

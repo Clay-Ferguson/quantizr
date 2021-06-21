@@ -151,8 +151,6 @@ public class MongoRead {
             return;
 
         // log.debug("Verifying parent path exists: " + parentPath);
-        // todo-0: look for places where we lookup by path OR id, and be sure they all go thru
-        // getNode() first, to ensure we can use cache if it's cached.
         Query query = new Query();
         query.addCriteria(Criteria.where(SubNode.FIELD_PATH).is(parentPath));
 
@@ -252,46 +250,33 @@ public class MongoRead {
         SubNode ret = null;
 
         if (identifier.startsWith("~")) {
-            // todo-0: can't we be caching in this code path too?
             String typeName = identifier.substring(1);
             if (!typeName.startsWith("sn:")) {
                 typeName = "sn:" + typeName;
             }
             ret = getUserNodeByType(session, session.getUserName(), null, null, typeName, null, null);
+            if (ret != null) {
+                auth.cacheNode(identifier, ret);
+            }
         }
         // Node name lookups are done by prefixing the search with a colon (:)
         else if (identifier.startsWith(":")) {
-            // todo-0: can't we be caching in this code path too?
             ret = getNodeByName(session, identifier.substring(1), allowAuth);
+            if (ret != null) {
+                auth.cacheNode(identifier, ret);
+            }
         }
         // If search doesn't start with a slash then it's a nodeId and not a path
         else if (!identifier.startsWith("/")) {
-            ret = auth.getCachedNode(identifier);
-            if (ret == null) {
-                ret = getNode(session, new ObjectId(identifier), allowAuth);
-            } else {
-                // log.debug("Cache hit: id=" + identifier);
-            }
+            ret = getNode(session, new ObjectId(identifier), allowAuth);
         }
         // otherwise this is a path lookup
         else {
             // log.debug("getNode identifier is path. doing path find.");
             identifier = XString.stripIfEndsWith(identifier, "/");
-
-            ret = auth.getCachedNode(identifier);
-            if (ret == null) {
-                Query query = new Query();
-                query.addCriteria(Criteria.where(SubNode.FIELD_PATH).is(identifier));
-
-                ret = util.findOne(query);
-            } else {
-                // log.debug("Cache Hit: path=" + identifier);
-            }
-            // if (ret == null) {
-            // log.debug("nope. path not found.");
-            // } else {
-            // log.debug("Path found: " + identifier);
-            // }
+            Query query = new Query();
+            query.addCriteria(Criteria.where(SubNode.FIELD_PATH).is(identifier));
+            ret = util.findOne(query);
         }
 
         if (ret != null) {
@@ -307,7 +292,6 @@ public class MongoRead {
     public boolean nodeExists(MongoSession session, ObjectId id) {
         Query query = new Query();
         query.addCriteria(Criteria.where(SubNode.FIELD_ID).is(id));
-
         return ops.exists(query, SubNode.class);
     }
 
@@ -339,9 +323,12 @@ public class MongoRead {
             return null;
         }
         String parentPath = XString.truncateAfterLast(path, "/");
+        if (StringUtils.isEmpty(parentPath))
+            return null;
 
         String pendingPath = NodeName.PENDING_PATH + "/";
         String rootPath = "/" + NodeName.ROOT + "/";
+
         /*
          * If node is in pending area take the pending part out of the path to get the real parent
          */
@@ -350,9 +337,7 @@ public class MongoRead {
         SubNode ret = getNode(session, parentPath);
         if (ret == null) {
             Query query = new Query();
-            // find all places we search on id or path and make them cache-aware (todo-0)
             query.addCriteria(Criteria.where(SubNode.FIELD_PATH).is(parentPath));
-
             ret = util.findOne(query);
             if (ret != null) {
                 auth.cacheNode(ret);

@@ -116,6 +116,9 @@ public class MongoUtil {
 	 */
 	public SubNode findOne(Query query) {
 		SubNode node = ops.findOne(query, SubNode.class);
+		if (node != null) {
+			auth.cacheNode(node);
+		}
 		return nodeOrDirtyNode(node);
 	}
 
@@ -125,6 +128,9 @@ public class MongoUtil {
 	 */
 	public SubNode findById(ObjectId objId) {
 		SubNode node = ops.findById(objId, SubNode.class);
+		if (node != null) {
+			auth.cacheNode(node);
+		}
 		return nodeOrDirtyNode(node);
 	}
 
@@ -570,8 +576,8 @@ public class MongoUtil {
 		created = new ValContainer<>(Boolean.FALSE);
 
 		// create home node (admin owned node named 'home').
-		SubNode publicHome = apiUtil.ensureNodeExists(session, "/" + NodeName.ROOT + "/" + NodeName.PUBLIC, NodeName.HOME, NodeName.HOME,
-				"Public Home", null, true, null, created);
+		SubNode publicHome = apiUtil.ensureNodeExists(session, "/" + NodeName.ROOT + "/" + NodeName.PUBLIC, NodeName.HOME,
+				NodeName.HOME, "Public Home", null, true, null, created);
 
 		// make node public
 		aclService.addPrivilege(session, publicHome, PrincipalName.PUBLIC.s(), Arrays.asList(PrivilegeType.READ.s()), null);

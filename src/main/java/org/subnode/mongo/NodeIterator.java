@@ -8,7 +8,9 @@ import org.slf4j.LoggerFactory;
 /**
  * Wraps iterators we get from queries so that one by one we can detect any nodes that are already
  * being operated on in memory and make sure we point to THOSE in memory nodes, to avoid types of
- * dirty writes
+ * dirty writes.
+ * 
+ * todo-0: need to review all this (thread locals dirtyNodes stuff)
  */
 class NodeIterator implements Iterator<SubNode> {
     private static final Logger log = LoggerFactory.getLogger(NodeIterator.class);
@@ -23,6 +25,7 @@ class NodeIterator implements Iterator<SubNode> {
     public SubNode next() {
         SubNode node = iter.next();
         if (node != null) {
+            MongoAuth.inst.cacheNode(node);
             SubNode dirty = MongoThreadLocal.getDirtyNodes().get(node.getId());
             if (dirty != null) {
                 // log.debug("ITER-WRAPPER: Got a dirty one: " + dirty.getId().toHexString());
