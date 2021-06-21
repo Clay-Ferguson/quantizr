@@ -25,6 +25,7 @@ import org.subnode.model.client.PrivilegeType;
 import org.subnode.mongo.MongoAuth;
 import org.subnode.mongo.MongoRead;
 import org.subnode.mongo.MongoSession;
+import org.subnode.mongo.MongoThreadLocal;
 import org.subnode.mongo.MongoUtil;
 import org.subnode.mongo.model.AccessControl;
 import org.subnode.mongo.model.SubNode;
@@ -88,6 +89,9 @@ public class NodeSearchService {
 	static final int TRENDING_LIMIT = 10000;
 
 	public NodeSearchResponse search(MongoSession session, NodeSearchRequest req) {
+		// ensure this call can't write any data.
+		MongoThreadLocal.setWritesDisabled(true);
+
 		NodeSearchResponse res = new NodeSearchResponse();
 		if (session == null) {
 			session = ThreadLocals.getMongoSession();
@@ -127,7 +131,11 @@ public class NodeSearchService {
 		}
 		// othwerwise we're searching all node properties
 		else {
-			/* If we're searching just for users do this. */
+			/* 
+			USER Search
+
+			If we're searching just for users do this. 
+			*/
 			if (!StringUtils.isEmpty(req.getUserSearchType())) {
 
 				TextCriteria textCriteria = null;
@@ -157,7 +165,7 @@ public class NodeSearchService {
 				 */
 				for (final SubNode node : accountNodes) {
 					try {
-						auth.auth(session, node, PrivilegeType.READ);
+						node.clearProperties();
 						NodeInfo info = convert.convertToNodeInfo(ThreadLocals.getSessionContext(), session, node, true, false,
 								counter + 1, false, false);
 						searchResults.add(info);

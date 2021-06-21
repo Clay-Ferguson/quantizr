@@ -142,7 +142,8 @@ public class MongoAuth {
 	}
 
 	public SubNode getCachedNode(String key) {
-		if (StringUtils.isEmpty(key)) return null;
+		if (StringUtils.isEmpty(key))
+			return null;
 		synchronized (cachedNodes) {
 			return cachedNodes.get(key);
 		}
@@ -350,8 +351,10 @@ public class MongoAuth {
 		ownerAuth(ThreadLocals.getMongoSession(), node);
 	}
 
-	/* todo-0: need to document this much better, regarding scenarios and kinds of updating on this node
-	and relative to the parent (i.e. WRITE means ability to add children, not WRITE node) */
+	/*
+	 * todo-0: need to document this much better, regarding scenarios and kinds of updating on this node
+	 * and relative to the parent (i.e. WRITE means ability to add children, not WRITE node)
+	 */
 	public void auth(MongoSession session, SubNode node, PrivilegeType... privs) {
 		// during server init no auth is required.
 		if (node == null || !MongoRepository.fullInit) {
@@ -458,7 +461,7 @@ public class MongoAuth {
 			// if we got the node from the cache use it
 			if (parentNode != null) {
 				node = parentNode;
-			} 
+			}
 			// node not on cache then load it from db
 			else {
 				node = read.getParent(session, node, false);

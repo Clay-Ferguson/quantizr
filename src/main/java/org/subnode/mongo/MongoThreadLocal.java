@@ -15,10 +15,21 @@ public class MongoThreadLocal {
 	 * every object that is touched during the processing of a thread/request.
 	 */
 	private static final ThreadLocal<HashMap<ObjectId, SubNode>> dirtyNodes = new ThreadLocal<HashMap<ObjectId, SubNode>>();
+	private static final ThreadLocal<Boolean> writesDisabled = new ThreadLocal<Boolean>();
 
 	public static void removeAll() {
 		// log.debug("Clear Dirty Nodes.");
 		getDirtyNodes().clear();
+		setWritesDisabled(false);
+	}
+
+	public static void setWritesDisabled(Boolean val) {
+		writesDisabled.set(val);
+	}
+
+	public static Boolean getWritesDisabled() {
+		if (writesDisabled.get()==null) return false;
+		return writesDisabled.get();
 	}
 
 	public static void clearDirtyNodes() {

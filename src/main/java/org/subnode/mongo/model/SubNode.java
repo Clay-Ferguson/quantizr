@@ -160,11 +160,9 @@ public class SubNode {
 	/* Auth: Anyone can write the id as there's no pre-existing id */
 	@JsonProperty(FIELD_ID)
 	public void setId(ObjectId id) {
-
 		if (this.id != null && !this.id.equals(id)) {
 			throw new RuntimeException("Node IDs are immutable.");
 		}
-
 		this.id = id;
 	}
 
@@ -205,7 +203,8 @@ public class SubNode {
 	 */
 	@JsonProperty(FIELD_PATH)
 	public void setPath(String path) {
-		if (Util.equalObjs(path, this.path)) return;
+		if (Util.equalObjs(path, this.path))
+			return;
 
 		MongoAuth.inst.ownerAuth(this);
 		MongoThreadLocal.dirty(this);
@@ -230,7 +229,8 @@ public class SubNode {
 
 	@JsonProperty(FIELD_PATH_HASH)
 	public void setPathHash(String pathHash) {
-		if (Util.equalObjs(pathHash, this.pathHash)) return;
+		if (Util.equalObjs(pathHash, this.pathHash))
+			return;
 		MongoThreadLocal.dirty(this);
 		this.pathHash = pathHash;
 	}
@@ -242,7 +242,8 @@ public class SubNode {
 
 	@JsonProperty(FIELD_ORDINAL)
 	public void setOrdinal(Long ordinal) {
-		if (Util.equalObjs(ordinal, this.ordinal)) return;
+		if (Util.equalObjs(ordinal, this.ordinal))
+			return;
 		MongoThreadLocal.dirty(this);
 		this.ordinal = ordinal;
 	}
@@ -259,7 +260,8 @@ public class SubNode {
 	 */
 	@JsonProperty(FIELD_MAX_CHILD_ORDINAL)
 	public void setMaxChildOrdinal(Long maxChildOrdinal) {
-		if (Util.equalObjs(maxChildOrdinal, this.maxChildOrdinal)) return;
+		if (Util.equalObjs(maxChildOrdinal, this.maxChildOrdinal))
+			return;
 		/*
 		 * todo-2: what about logic that says if this node IS already persisted, and we are not actually
 		 * changing the value here, we can bypass setting this 'dirty' flag? I probably have this
@@ -277,7 +279,8 @@ public class SubNode {
 
 	@JsonProperty(FIELD_OWNER)
 	public void setOwner(ObjectId owner) {
-		if (Util.equalObjs(owner, this.owner)) return;
+		if (Util.equalObjs(owner, this.owner))
+			return;
 		MongoThreadLocal.dirty(this);
 		this.owner = owner;
 	}
@@ -330,6 +333,12 @@ public class SubNode {
 	public void setAc(HashMap<String, AccessControl> ac) {
 		MongoThreadLocal.dirty(this);
 		this.ac = ac;
+	}
+
+	public void clearProperties() {
+		if (properties != null) {
+			properties.clear();
+		}
 	}
 
 	@JsonProperty(FIELD_PROPERTIES)
@@ -498,7 +507,8 @@ public class SubNode {
 
 	@JsonProperty(FIELD_TYPE)
 	public void setType(String type) {
-		if (Util.equalObjs(type, this.type)) return;
+		if (Util.equalObjs(type, this.type))
+			return;
 		MongoThreadLocal.dirty(this);
 		this.type = type;
 	}
@@ -510,7 +520,8 @@ public class SubNode {
 
 	@JsonProperty(FIELD_NAME)
 	public void setName(String name) {
-		if (Util.equalObjs(name, this.name)) return;
+		if (Util.equalObjs(name, this.name))
+			return;
 		MongoThreadLocal.dirty(this);
 		this.name = name;
 	}
@@ -522,7 +533,8 @@ public class SubNode {
 
 	@JsonProperty(FIELD_CONTENT)
 	public void setContent(String content) {
-		if (Util.equalObjs(content, this.content)) return;
+		if (Util.equalObjs(content, this.content))
+			return;
 		MongoThreadLocal.dirty(this);
 		this.content = content;
 	}
