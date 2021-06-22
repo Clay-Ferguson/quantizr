@@ -216,11 +216,9 @@ export class Search implements SearchIntf {
                 S.meta64.selectTabStateOnly(C.TAB_FEED, s);
 
                 S.view.scrollAllTop(s);
-                // for some reason mobile only isn't scrolling to top so this is a quick hack (todo-0)
-                // I'm pretty sure this is FIXED! but and we no longer need this timer...but will leave it temorarily
-                setTimeout(() => {
-                    S.view.scrollAllTop(s);
-                }, 1000);
+                // setTimeout(() => {
+                //     S.view.scrollAllTop(s);
+                // }, 1000);
 
                 return s;
             });
