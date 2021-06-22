@@ -234,18 +234,20 @@ public class ActPubService {
 
             String toActorUrl = apUtil.getActorUrlFromWebFingerObj(webFinger);
             APObj toActorObj = apUtil.getActorByUrl(toActorUrl);
-            String inbox = AP.str(toActorObj, APProp.inbox);
+            if (toActorObj != null) {
+                String inbox = AP.str(toActorObj, APProp.inbox);
 
-            /* lazy create fromActor here */
-            if (fromActor == null) {
-                fromActor = apUtil.makeActorUrlForUserName(fromUser);
+                /* lazy create fromActor here */
+                if (fromActor == null) {
+                    fromActor = apUtil.makeActorUrlForUserName(fromUser);
+                }
+
+                APObj message = apFactory.newCreateMessageForNote(toUserNames, fromActor, inReplyTo, content, noteUrl,
+                        privateMessage, attachments);
+
+                String userDoingPost = ThreadLocals.getSessionContext().getUserName();
+                apUtil.securePost(userDoingPost, session, null, inbox, fromActor, message, null);
             }
-
-            APObj message = apFactory.newCreateMessageForNote(toUserNames, fromActor, inReplyTo, content, noteUrl, privateMessage,
-                    attachments);
-
-            String userDoingPost = ThreadLocals.getSessionContext().getUserName();
-            apUtil.securePost(userDoingPost, session, null, inbox, fromActor, message, null);
         }
     }
 

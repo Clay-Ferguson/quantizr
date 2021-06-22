@@ -123,8 +123,10 @@ public class ActPubFollowing {
                 }
 
                 APObj toActor = apUtil.getActorByUrl(actorUrlOfUserBeingFollowed);
-                String toInbox = AP.str(toActor, APProp.inbox);
-                apUtil.securePost(followerUserName, session, null, toInbox, sessionActorUrl, action, null);
+                if (toActor != null) {
+                    String toInbox = AP.str(toActor, APProp.inbox);
+                    apUtil.securePost(followerUserName, session, null, toInbox, sessionActorUrl, action, null);
+                }
                 return null;
             });
         } catch (Exception e) {
@@ -152,6 +154,9 @@ public class ActPubFollowing {
             Runnable runnable = () -> {
                 try {
                     APObj followerActor = apUtil.getActorByUrl(followerActorUrl);
+                    if (followerActor == null) {
+                        return;
+                    }
                     String followerActorHtmlUrl = AP.str(followerActor, APProp.url);
 
                     // log.debug("getLongUserNameFromActorUrl: " + actorUrl + "\n" +
@@ -284,7 +289,7 @@ public class ActPubFollowing {
                     // for now just add the url for future crawling. todo-1: later we can do something more meaningful
                     // with each actor url.
                     if (apService.saveFediverseName(followingActorUrl)) {
-                        // log.debug("following: " + followingActorUrl); 
+                        // log.debug("following: " + followingActorUrl);
                     }
                 } else {
                     log.debug("Unexpected following item class: " + obj.getClass().getName());

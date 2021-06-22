@@ -102,25 +102,29 @@ public class MongoAuth {
 	}
 
 	public void cacheNode(SubNode node) {
-		if (node.getPath() != null || node.getId() != null) {
-			synchronized (cachedNodes) {
-				if (node.getPath() != null) {
-					cachedNodes.put(node.getPath(), node);
-				}
+		// I keep finding issues with caching so for now it's disabled
+		// and hopefully MongoDb does better caching anyway.
+		// if (node.getPath() != null || node.getId() != null) {
+		// 	synchronized (cachedNodes) {
+		// 		if (node.getPath() != null) {
+		// 			cachedNodes.put(node.getPath(), node);
+		// 		}
 
-				if (node.getId() != null) {
-					cachedNodes.put(node.getId().toHexString(), node);
-				}
-			}
-		}
+		// 		if (node.getId() != null) {
+		// 			cachedNodes.put(node.getId().toHexString(), node);
+		// 		}
+		// 	}
+		// }
 	}
 
 	public void cacheNode(String key, SubNode node) {
-		if (key != null) {
-			synchronized (cachedNodes) {
-				cachedNodes.put(key, node);
-			}
-		}
+		// I keep finding issues with caching so for now it's disabled
+		// and hopefully MongoDb does better caching anyway.
+		// if (key != null) {
+		// 	synchronized (cachedNodes) {
+		// 		cachedNodes.put(key, node);
+		// 	}
+		// }
 	}
 
 	public void uncacheNode(SubNode node) {

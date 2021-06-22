@@ -595,9 +595,6 @@ public class NodeEditService {
 					adminRunner.run(s -> {
 						auth.saveMentionsToNodeACL(s, node);
 
-						if (!appProp.isActPubEnabled()) {
-							return;
-						}
 						if (apService.sendNotificationForNodeEdit(s, parent, node)) {
 							userFeedService.pushNodeUpdateToBrowsers(s, node);
 						}

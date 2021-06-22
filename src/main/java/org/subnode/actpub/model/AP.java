@@ -55,7 +55,7 @@ public class AP {
         if (obj instanceof Map<?, ?>) {
             Object val = ((Map<?, ?>) obj).get(prop);
             if (val == null) {
-                return null;
+                return false;
             } else if (val instanceof String) {
                 return ((String) val).equalsIgnoreCase(APConst.TRUE);
             } else if (val instanceof Boolean) {
@@ -72,7 +72,7 @@ public class AP {
         if (obj instanceof Map<?, ?>) {
             Object val = ((Map<?, ?>) obj).get(prop);
             if (val == null) {
-                return null;
+                return 0;
             } else if (val instanceof Integer) {
                 return ((Integer) val).intValue();
             } else if (val instanceof Long) {

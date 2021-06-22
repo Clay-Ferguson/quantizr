@@ -256,14 +256,16 @@ public class MongoRead {
             }
             ret = getUserNodeByType(session, session.getUserName(), null, null, typeName, null, null);
             if (ret != null) {
-                auth.cacheNode(identifier, ret);
+                // WRONG IDENTIFIER to cache (todo-0)
+                // auth.cacheNode(identifier, ret);
             }
         }
         // Node name lookups are done by prefixing the search with a colon (:)
         else if (identifier.startsWith(":")) {
             ret = getNodeByName(session, identifier.substring(1), allowAuth);
             if (ret != null) {
-                auth.cacheNode(identifier, ret);
+                // WRONG IDENTIFIER to cache (todo-0)
+                // auth.cacheNode(identifier, ret);
             }
         }
         // If search doesn't start with a slash then it's a nodeId and not a path

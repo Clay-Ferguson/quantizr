@@ -201,8 +201,7 @@ public class ActPubUtil {
                     if (waitSeconds-- > 0) {
                         log.debug("Waiting for url: " + url);
                         Thread.sleep(1000);
-                    }
-                    else {
+                    } else {
                         throw re;
                     }
                 }
@@ -296,12 +295,16 @@ public class ActPubUtil {
             return actor;
         }
 
-        actor = getJson(url, APConst.MT_APP_ACTJSON);
+        try {
+            actor = getJson(url, APConst.MT_APP_ACTJSON);
 
-        if (actor != null) {
-            String userName = getLongUserNameFromActor(actor);
-            apCache.actorsByUrl.put(url, actor);
-            apCache.actorsByUserName.put(userName, actor);
+            if (actor != null) {
+                String userName = getLongUserNameFromActor(actor);
+                apCache.actorsByUrl.put(url, actor);
+                apCache.actorsByUserName.put(userName, actor);
+            }
+        } catch (Exception e) {
+            // todo-0: eating this for now.
         }
 
         // log.debug("Actor: " + XString.prettyPrint(actor));
@@ -476,7 +479,7 @@ public class ActPubUtil {
             URL url = new URL(inbox);
             String host = url.getHost();
 
-            //get port number (normally not set and thus '-1')
+            // get port number (normally not set and thus '-1')
             int port = url.getPort();
 
             /*
@@ -487,7 +490,7 @@ public class ActPubUtil {
                 host += ":" + String.valueOf(port);
             }
 
-            //log.debug("long user name: " + shortUserName + "@" + host);
+            // log.debug("long user name: " + shortUserName + "@" + host);
             return shortUserName + "@" + host;
         } catch (Exception e) {
             log.error("failed building toUserName", e);
@@ -541,6 +544,8 @@ public class ActPubUtil {
     }
 
     public void iterateOrderedCollection(Object collectionObj, int maxCount, ActPubObserver observer) {
+        if (collectionObj == null)
+            return;
         /*
          * To reduce load for our purposes we can limit to just getting 2 pages of results to update a user,
          * and really just one page would be ideal if not for the fact that some servers return an empty
