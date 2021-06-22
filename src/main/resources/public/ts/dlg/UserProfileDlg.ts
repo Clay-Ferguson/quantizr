@@ -163,7 +163,7 @@ export class UserProfileDlg extends DialogBase {
         }
     }
 
-    reload(userNodeId: string): Promise<void> {
+    reload = (userNodeId: string): Promise<void> => {
         return new Promise<void>((resolve, reject) => {
             S.util.ajax<J.GetUserProfileRequest, J.GetUserProfileResponse>("getUserProfile", {
                 userId: userNodeId
