@@ -137,4 +137,9 @@ export class AppState {
     mainPanelCols: number = 5;
 
     bookmarks: J.Bookmark[];
+
+    editNode: J.NodeInfo;
+    editParent: J.NodeInfo;
+    editShowJumpButton: boolean;
+    editEncrypt: boolean;
 }

@@ -14,6 +14,7 @@ import { PubSub } from "./PubSub";
 import { ResultSetInfo } from "./ResultSetInfo";
 import { SharesRSInfo } from "./SharesRSInfo";
 import { Singletons } from "./Singletons";
+import { State } from "./State";
 import { FeedView } from "./tabs/FeedView";
 import { FollowersResultSetView } from "./tabs/FollowersResultSetView";
 import { FollowingResultSetView } from "./tabs/FollowingResultSetView";
@@ -43,6 +44,9 @@ export class Meta64 implements Meta64Intf {
     addFriendPending: boolean = false;
     activeTab: string;
     lastScrollTime: number = 0;
+
+    newNodeTargetId: string;
+    newNodeTargetOffset: number;
 
     app: CompIntf;
     appInitialized: boolean = false;
@@ -354,6 +358,14 @@ export class Meta64 implements Meta64Intf {
                 this.updateNodeMap(n, state);
             }, this);
         }
+    }
+
+    /* Returns the node if it's currently displaying on the page. For now we don't have ability */
+    getDisplayingNode = (state: AppState, nodeId: string): J.NodeInfo => {
+        if (!state.node) return null;
+        if (state.node.id === nodeId) return state.node;
+        if (!state.node.children) return null;
+        return state.node.children.find(node => node.id === nodeId);
     }
 
     getNodeByName = (node: J.NodeInfo, name: string, state: AppState): J.NodeInfo => {

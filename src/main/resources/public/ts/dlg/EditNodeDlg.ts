@@ -45,6 +45,8 @@ import { EncryptionDlg } from "./EncryptionDlg";
 import { FriendsDlg } from "./FriendsDlg";
 import { EmojiPickerDlg } from "./EmojiPickerDlg";
 import { UploadFromFileDropzoneDlg } from "./UploadFromFileDropzoneDlg";
+import { dispatch } from "../AppRedux";
+import { DialogMode } from "../enums/DialogMode";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
@@ -81,14 +83,17 @@ export class EditNodeDlg extends DialogBase {
 
     allowEditAllProps: boolean = false;
 
-    constructor(node: J.NodeInfo, public parentNode: J.NodeInfo, private encrypt: boolean, private showJumpButton: boolean, state: AppState) {
-        super("Edit", "app-modal-content", false, state);
+    constructor(node: J.NodeInfo, public parentNode: J.NodeInfo, private encrypt: boolean, private showJumpButton: boolean, state: AppState, mode: DialogMode = null) {
+        super("Edit", mode === DialogMode.EMBED ? "app-embed-content" : "app-modal-content", false, state, mode);
+
+        this.onClose = this.onClose.bind(this);
+
         this.mergeState({
             node,
-
             // selected props is used as a set of all 'selected' (via checkbox) property names
             selectedProps: new Set<string>()
         });
+
         this.allowEditAllProps = this.appState.isAdminUser;
         this.initStates();
         this.initialProps = S.util.arrayClone(node.properties);
@@ -544,7 +549,7 @@ export class EditNodeDlg extends DialogBase {
 
         let parentDisplay = null;
         if (this.parentNode) {
-            let parentContentEditor = new TextArea(null, { rows: "5" }, this.parentContentEditorState);
+            let parentContentEditor = new TextArea(null, { rows: "5" }, this.parentContentEditorState, "textarea-min-4");
             let parentVal = this.parentNode.content || "";
             if (!parentVal.startsWith(J.Constant.ENC_TAG)) {
                 let wrap: boolean = S.props.getNodePropVal(J.NodeProp.NOWRAP, this.parentNode) !== "1";
@@ -706,6 +711,22 @@ export class EditNodeDlg extends DialogBase {
         ]);
     }
 
+    // todo-0: eventually we can do a close() call here and get rid of onClose once we have the
+    // close pattern working for 'binding()'/arrow function.
+    onClose(): void {
+        if (this.mode === DialogMode.EMBED) {
+            dispatch("Action_endEditing", (s: AppState): AppState => {
+                s.editNode = null;
+                s.editParent = null;
+                S.meta64.newNodeTargetId = null;
+                S.meta64.newNodeTargetOffset = -1;
+                s.editShowJumpButton = false;
+                s.editEncrypt = false;
+                return s;
+            });
+        }
+    }
+
     isGuiControlBasedProp = (prop: J.PropertyInfo): boolean => {
         return !!S.props.controlBasedPropertyList.has(prop.name);
     }
@@ -847,6 +868,14 @@ export class EditNodeDlg extends DialogBase {
             S.attachment.removeBinaryProperties(state.node);
             this.initPropStates(state.node, true);
             this.mergeState({ node: state.node });
+
+            if (this.mode === DialogMode.EMBED) {
+                dispatch("Action_editNodeUpdated", (s: AppState): AppState => {
+                    s.editNode = state.node;
+                    return s;
+                });
+            }
+
             this.binaryDirty = true;
         }
     }
@@ -1047,7 +1076,7 @@ export class EditNodeDlg extends DialogBase {
                 else {
                     valEditor = new TextArea(null, {
                         rows: "" + rows
-                    }, propState);
+                    }, propState, "textarea-min-4");
                 }
             }
             else {
@@ -1115,7 +1144,7 @@ export class EditNodeDlg extends DialogBase {
             });
         }
         else {
-            this.contentEditor = new TextArea(null, { rows }, this.contentEditorState);
+            this.contentEditor = new TextArea(null, { rows }, this.contentEditorState, "textarea-min-15");
 
             let wrap: boolean = S.props.getNodePropVal(J.NodeProp.NOWRAP, this.appState.node) !== "1";
             this.contentEditor.setWordWrap(wrap);

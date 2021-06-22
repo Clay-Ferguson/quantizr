@@ -19,6 +19,9 @@ export interface Meta64Intf {
     activeTab: string;
     lastScrollTime: number;
 
+    newNodeTargetId: string;
+    newNodeTargetOffset: number;
+
     parentIdToFocusNodeMap: Map<string, string>;
     curHighlightNodeCompRow: CompIntf;
 
@@ -77,4 +80,5 @@ export interface Meta64Intf {
     tabScrollTop(tabName?: string): void;
     loadBookmarks(): void;
     nodeIdIsVisible(node: J.NodeInfo, nodeId: string, parentPath: string, state: AppState): boolean;
+    getDisplayingNode(state: AppState, nodeId: string): J.NodeInfo;
 }

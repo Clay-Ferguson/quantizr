@@ -1,3 +1,4 @@
+import { EventInput } from "@fullcalendar/react";
 import { appState, dispatch, store } from "./AppRedux";
 import { AppState } from "./AppState";
 import { Constants as C } from "./Constants";
@@ -12,7 +13,6 @@ import { EditIntf } from "./intf/EditIntf";
 import * as J from "./JavaIntf";
 import { PubSub } from "./PubSub";
 import { Singletons } from "./Singletons";
-import { EventInput } from "@fullcalendar/react";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (s: Singletons) => {
@@ -90,8 +90,23 @@ export class Edit implements EditIntf {
                  * Server will have sent us back the raw text content, that should be markdown instead of any HTML, so
                  * that we can display this and save.
                  */
-                const dlg = new EditNodeDlg(res.nodeInfo, res.parentInfo, encrypt, showJumpButton, state);
-                dlg.open();
+                if (state.mobileMode ||
+                    // node will not found on tree.
+                    (!S.meta64.getDisplayingNode(state, res.nodeInfo.id) &&
+                        !S.meta64.getDisplayingNode(state, S.meta64.newNodeTargetId)) ||
+                    // not currently viewing tree
+                    S.meta64.activeTab !== C.TAB_MAIN) {
+                    const dlg = new EditNodeDlg(res.nodeInfo, res.parentInfo, encrypt, showJumpButton, state);
+                    dlg.open();
+                } else {
+                    dispatch("Action_startEditing", (s: AppState): AppState => {
+                        s.editNode = res.nodeInfo;
+                        s.editParent = res.parentInfo;
+                        s.editShowJumpButton = showJumpButton;
+                        s.editEncrypt = encrypt;
+                        return s;
+                    });
+                }
             } else {
                 S.util.showMessage("Editing not allowed on node.", "Warning");
             }
@@ -315,7 +330,7 @@ export class Edit implements EditIntf {
         state.userPreferences.showMetaData = !state.userPreferences.showMetaData;
         S.meta64.saveUserPreferences(state);
 
-         /* scrolling is required because nodes will have scrolled out of view by the page just now updating */
+        /* scrolling is required because nodes will have scrolled out of view by the page just now updating */
         S.view.scrollToSelectedNode(state);
     }
 
@@ -450,6 +465,8 @@ export class Edit implements EditIntf {
         }
 
         if (node) {
+            S.meta64.newNodeTargetId = id;
+            S.meta64.newNodeTargetOffset = ordinalOffset;
             this.startEditingNewNode(typeName, false, state.node, node, ordinalOffset, state);
         }
     }

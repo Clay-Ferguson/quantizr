@@ -1,6 +1,8 @@
 import { useSelector } from "react-redux";
 import { AppState } from "../AppState";
 import { Constants as C } from "../Constants";
+import { EditNodeDlg } from "../dlg/EditNodeDlg";
+import { DialogMode } from "../enums/DialogMode";
 import { TypeHandlerIntf } from "../intf/TypeHandlerIntf";
 import * as J from "../JavaIntf";
 import { PubSub } from "../PubSub";
@@ -36,25 +38,39 @@ export class NodeCompVerticalRowLayout extends Div {
             if (n) {
                 if (!(state.nodesToMove && state.nodesToMove.find(id => id === n.id))) {
 
-                    if (this.debug && n) {
-                        console.log("RENDER ROW[" + i + "]: node.id=" + n.id);
+                    // if (n) {
+                    //     console.log("RENDER ROW[" + i + "]: node.id=" + n.id + " targetNodeId=" + S.meta64.newNodeTargetId);
+                    // }
+
+                    if (state.editNode != null && S.meta64.newNodeTargetId === n.id && S.meta64.newNodeTargetOffset === 0) {
+                        comps.push(new EditNodeDlg(state.editNode, state.editParent, state.editEncrypt, state.editShowJumpButton, state, DialogMode.EMBED));
                     }
 
-                    let childrenImgSizes = S.props.getNodePropVal(J.NodeProp.CHILDREN_IMG_SIZES, this.node);
-                    let typeHandler: TypeHandlerIntf = S.plugin.getTypeHandler(n.type);
-
-                    // special case where we aren't in edit mode, and we run across a markdown type with blank content, then don't render it.
-                    if (typeHandler && typeHandler.getTypeName() === J.NodeType.NONE && !n.content && !state.userPreferences.editMode && !S.props.hasBinary(n)) {
+                    if (state.editNode != null && n.id === state.editNode.id) {
+                        comps.push(new EditNodeDlg(state.editNode, state.editParent, state.editEncrypt, state.editShowJumpButton, state, DialogMode.EMBED));
                     }
                     else {
-                        lastNode = n;
-                        let row: Comp = new NodeCompRow(n, i, childCount, rowCount + 1, this.level, false, this.allowNodeMove, childrenImgSizes, this.allowHeaders, state);
-                        comps.push(row);
+
+                        let childrenImgSizes = S.props.getNodePropVal(J.NodeProp.CHILDREN_IMG_SIZES, this.node);
+                        let typeHandler: TypeHandlerIntf = S.plugin.getTypeHandler(n.type);
+
+                        // special case where we aren't in edit mode, and we run across a markdown type with blank content, then don't render it.
+                        if (typeHandler && typeHandler.getTypeName() === J.NodeType.NONE && !n.content && !state.userPreferences.editMode && !S.props.hasBinary(n)) {
+                        }
+                        else {
+                            lastNode = n;
+                            let row: Comp = new NodeCompRow(n, i, childCount, rowCount + 1, this.level, false, this.allowNodeMove, childrenImgSizes, this.allowHeaders, state);
+                            comps.push(row);
+                        }
+
+                        rowCount++;
+                        if (n.children) {
+                            comps.push(S.render.renderChildren(n, this.level + 1, this.allowNodeMove, state));
+                        }
                     }
 
-                    rowCount++;
-                    if (n.children) {
-                        comps.push(S.render.renderChildren(n, this.level + 1, this.allowNodeMove, state));
+                    if (state.editNode != null && S.meta64.newNodeTargetId === n.id && S.meta64.newNodeTargetOffset === 1) {
+                        comps.push(new EditNodeDlg(state.editNode, state.editParent, state.editEncrypt, state.editShowJumpButton, state, DialogMode.EMBED));
                     }
                 }
             }

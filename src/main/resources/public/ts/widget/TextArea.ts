@@ -18,7 +18,7 @@ export class TextArea extends Span implements I.TextEditorIntf {
     input: TextareaTag;
     textareaAttribs: any = {};
 
-    constructor(private label: string, attribs: any, private valState: ValidatedState<any>, customClass: string = null) {
+    constructor(private label: string, attribs: any, private valState: ValidatedState<any>, moreClasses: string = "") {
         // do not pass valState into base class, we want it to have state separately
         super(null);
         // this.attribs.style = { fontFamily: "monospace" };
@@ -27,7 +27,7 @@ export class TextArea extends Span implements I.TextEditorIntf {
             Object.assign(this.textareaAttribs, attribs);
         }
         Object.assign(this.textareaAttribs, {
-            className: customClass || "form-control pre-textarea"
+            className: "form-control pre-textarea " + moreClasses
         });
 
         if (!this.textareaAttribs.rows) {

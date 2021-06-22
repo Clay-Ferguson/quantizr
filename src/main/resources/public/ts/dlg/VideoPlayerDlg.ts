@@ -1,5 +1,6 @@
 import { AppState } from "../AppState";
 import { DialogBase } from "../DialogBase";
+import { DialogMode } from "../enums/DialogMode";
 import { CompIntf } from "../widget/base/CompIntf";
 import { Div } from "../widget/Div";
 import { Form } from "../widget/Form";
@@ -14,7 +15,7 @@ export class VideoPlayerDlg extends DialogBase {
     videoPlayer: VideoPlayer;
 
     constructor(private sourceUrl: string, private mediaTitle: string, state: AppState) {
-        super(mediaTitle || "Video", null, false, state, true, true);
+        super(mediaTitle || "Video", null, false, state, DialogMode.FULLSCREEN);
     }
 
     renderDlg(): CompIntf[] {

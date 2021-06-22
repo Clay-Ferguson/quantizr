@@ -1,6 +1,8 @@
 import { useSelector } from "react-redux";
 import { AppState } from "../AppState";
 import { Constants as C } from "../Constants";
+import { EditNodeDlg } from "../dlg/EditNodeDlg";
+import { DialogMode } from "../enums/DialogMode";
 import * as J from "../JavaIntf";
 import { PubSub } from "../PubSub";
 import { Singletons } from "../Singletons";
@@ -36,46 +38,51 @@ export class NodeCompMainNode extends Div {
             return;
         }
 
-        let focusNode: J.NodeInfo = S.meta64.getHighlightedNode(state);
-        let selected: boolean = (focusNode && focusNode.id === node.id);
-        this.attribs.className = "mainNodeContentStyle " + (selected ? "active-row-main" : "inactive-row-main");
-
-        if (S.render.enableRowFading && S.render.fadeInId === node.id && S.render.allowFadeInId) {
-            S.render.fadeInId = null;
-            S.render.allowFadeInId = false;
-            this.attribs.className += " fadeInRowBkgClz";
-            S.meta64.fadeStartTime = new Date().getTime();
-        }
-
-        this.attribs.nid = node.id;
-        this.attribs.onClick = S.nav.clickNodeRow;
-
-        let header: CompIntf = null;
-        let jumpButton: CompIntf = null;
-        if (state.userPreferences.showMetaData) {
-            header = new NodeCompRowHeader(node, true, true, false, false);
+        if (state.editNode != null && node.id === state.editNode.id) {
+            this.setChildren([new EditNodeDlg(state.editNode, state.editParent, state.editEncrypt, state.editShowJumpButton, state, DialogMode.EMBED)]);
         }
         else {
-            const targetId = S.props.getNodePropVal(J.NodeProp.TARGET_ID, node);
-            if (targetId) {
-                jumpButton = new IconButton("fa-arrow-right", null, {
-                    onClick: () => S.view.jumpToId(targetId),
-                    title: "Jump to the Node"
-                }, "float-right");
-            }
-        }
+            let focusNode: J.NodeInfo = S.meta64.getHighlightedNode(state);
+            let selected: boolean = (focusNode && focusNode.id === node.id);
+            this.attribs.className = "mainNodeContentStyle " + (selected ? "active-row-main" : "inactive-row-main");
 
-        let extraClass = state.userPreferences.showMetaData && state.userPreferences.editMode ? "nodeCompButtonBar" : null;
-        this.setChildren([
-            header,
-            !state.inlineEditId ? new NodeCompButtonBar(node, false, 1, null, extraClass) : null,
-            new Div(null, {
-                className: "clearfix",
-                id: "button_bar_clearfix_" + node.id
-            }),
-            jumpButton,
-            new NodeCompContent(node, false, true, null, null, this.imgSizeOverride, true),
-            new NodeCompRowFooter(node, false)
-        ]);
+            if (S.render.enableRowFading && S.render.fadeInId === node.id && S.render.allowFadeInId) {
+                S.render.fadeInId = null;
+                S.render.allowFadeInId = false;
+                this.attribs.className += " fadeInRowBkgClz";
+                S.meta64.fadeStartTime = new Date().getTime();
+            }
+
+            this.attribs.nid = node.id;
+            this.attribs.onClick = S.nav.clickNodeRow;
+
+            let header: CompIntf = null;
+            let jumpButton: CompIntf = null;
+            if (state.userPreferences.showMetaData) {
+                header = new NodeCompRowHeader(node, true, true, false, false);
+            }
+            else {
+                const targetId = S.props.getNodePropVal(J.NodeProp.TARGET_ID, node);
+                if (targetId) {
+                    jumpButton = new IconButton("fa-arrow-right", null, {
+                        onClick: () => S.view.jumpToId(targetId),
+                        title: "Jump to the Node"
+                    }, "float-right");
+                }
+            }
+
+            let extraClass = state.userPreferences.showMetaData && state.userPreferences.editMode ? "nodeCompButtonBar" : null;
+            this.setChildren([
+                header,
+                !state.inlineEditId ? new NodeCompButtonBar(node, false, 1, null, extraClass) : null,
+                new Div(null, {
+                    className: "clearfix",
+                    id: "button_bar_clearfix_" + node.id
+                }),
+                jumpButton,
+                new NodeCompContent(node, false, true, null, null, this.imgSizeOverride, true),
+                new NodeCompRowFooter(node, false)
+            ]);
+        }
     }
 }

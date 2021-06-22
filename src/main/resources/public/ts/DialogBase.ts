@@ -1,9 +1,10 @@
 import * as ReactDOM from "react-dom";
 import { Provider } from "react-redux";
+import { dispatch, store } from "./AppRedux";
 import { AppState } from "./AppState";
-import clientInfo from "./ClientInfo";
 import { Constants as C } from "./Constants";
 import { DialogBaseImpl } from "./DialogBaseImpl";
+import { DialogMode } from "./enums/DialogMode";
 import { PubSub } from "./PubSub";
 import { Singletons } from "./Singletons";
 import { BaseCompState } from "./widget/base/BaseCompState";
@@ -11,7 +12,6 @@ import { Comp } from "./widget/base/Comp";
 import { CompIntf } from "./widget/base/CompIntf";
 import { Div } from "./widget/Div";
 import { Span } from "./widget/Span";
-import { appState, dispatch, store } from "./AppRedux";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (s: Singletons) => {
@@ -25,7 +25,10 @@ export abstract class DialogBase<S extends BaseCompState = any> extends Div<S> i
     static refCounter = 0;
     static BACKDROP_PREFIX = "backdrop-";
     static backdropZIndex: number = 16000000; // z-index
+
+    // NOTE: resolve function says null for EMBED mode.
     resolve: Function;
+
     aborted: boolean = false;
 
     backdrop: HTMLElement;
@@ -35,8 +38,9 @@ export abstract class DialogBase<S extends BaseCompState = any> extends Div<S> i
     */
     appState: AppState;
 
-    /* this is a slight hack so we can ignore 'close()' calls that are bogus */
+    /* this is a slight hack so we can ignore 'close()' calls that are bogus, and doesn't apply to the EMBED mode */
     opened: boolean = false;
+    loaded: boolean = false;
 
     /* I added this capability to make the internals of the dialog scroll, but didn't like it ultimately */
     internalScrolling: boolean = false;
@@ -46,7 +50,7 @@ export abstract class DialogBase<S extends BaseCompState = any> extends Div<S> i
     which is to store the browser scroll position in the dialog, so it can be restored back after editing is complete, and the
     experimental overrideClass used for testing was "embedded-dlg"
     */
-    constructor(public title: string, private overrideClass: string, private closeByOutsideClick: boolean, appState: AppState, private popup: boolean = true, forceFullscreen: boolean = false) {
+    constructor(public title: string, private overrideClass: string, private closeByOutsideClick: boolean, appState: AppState, public mode: DialogMode = null) {
         super(null);
         this.appState = appState;
 
@@ -55,7 +59,15 @@ export abstract class DialogBase<S extends BaseCompState = any> extends Div<S> i
             this.appState = store.getState();
         }
 
-        if (forceFullscreen) {
+        // if no mode is given assume it based on whether mobile or not, or if this is mobile then also force fullscreen.
+        if (!this.mode || this.appState.mobileMode) {
+            this.mode = this.appState.mobileMode ? DialogMode.FULLSCREEN : DialogMode.POPUP;
+        }
+
+        if (this.mode === DialogMode.EMBED) {
+            this.attribs.className = this.overrideClass;
+        }
+        else if (this.mode === DialogMode.FULLSCREEN) {
             this.attribs.className = "app-modal-content-fullscreen";
         }
         else {
@@ -68,10 +80,13 @@ export abstract class DialogBase<S extends BaseCompState = any> extends Div<S> i
     /* To open any dialog all we do is construct the object and call open(). Returns a promise that resolves when the dialog is
     closed. */
     open = (display: string = null): Promise<DialogBase> => {
+        if (this.mode === DialogMode.EMBED) {
+            return;
+        }
         this.opened = true;
         return new Promise<DialogBase>(async (resolve, reject) => {
 
-            if (this.popup) {
+            if (this.mode === DialogMode.POPUP) {
                 // Create dialog container and attach to document.body.
                 this.backdrop = document.createElement("div");
                 this.backdrop.setAttribute("id", DialogBase.BACKDROP_PREFIX + this.getId());
@@ -102,7 +117,7 @@ export abstract class DialogBase<S extends BaseCompState = any> extends Div<S> i
                 await queryServerPromise;
             }
 
-            if (this.popup) {
+            if (this.mode === DialogMode.POPUP) {
                 // this renders the dlgComp onto the screen (on the backdrop elm)
                 this.domRender();
 
@@ -125,7 +140,7 @@ export abstract class DialogBase<S extends BaseCompState = any> extends Div<S> i
         });
     }
 
-    /* NOTE: preLoad is always forced to complete BEFORE any dialog GUI is allowed to render in case we need to
+    /* NOTE: preLoad is always forced to complete BEFORE any dialog GUI is allowed to render (excepet in EMBED mode) in case we need to
     get information from the server before displaying the dialog. This is optional. Many dialogs of course don't need to get data
     from the server before displaying */
     preLoad(): Promise<void> {
@@ -148,12 +163,23 @@ export abstract class DialogBase<S extends BaseCompState = any> extends Div<S> i
         }, 100);
     }
 
+    // todo-0: need to cleanup all places in Comp where
+    // we have some awkwardness about 'overriding' functions
+    // (or needing to) that are defined using arrow operator
+    onClose(): void {
+    }
+
     public close = () => {
+        this.onClose();
+        if (this.mode === DialogMode.EMBED) {
+            return;
+        }
+
         if (!this.opened) return;
         this.opened = false;
         this.resolve(this);
 
-        if (this.popup) {
+        if (this.mode === DialogMode.POPUP) {
             if (this.getElement()) {
                 this.preUnmount();
                 ReactDOM.unmountComponentAtNode(this.backdrop);
@@ -204,7 +230,6 @@ export abstract class DialogBase<S extends BaseCompState = any> extends Div<S> i
         let timesIcon: Comp;
         // Dialog Header with close button (x) right justified on it.
         const children: CompIntf[] = [];
-
         const titleIconComp: CompIntf = this.getTitleIconComp();
         const titleText: string = this.getTitleText();
         const extraHeaderComps = this.getExtraTitleBarComps();
