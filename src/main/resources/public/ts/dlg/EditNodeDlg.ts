@@ -55,6 +55,8 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
 
 export class EditNodeDlg extends DialogBase {
 
+    static embedInstance: EditNodeDlg;
+
     static helpExpanded: boolean = false;
     editorHelp: string = null;
     header: Header;
@@ -83,6 +85,13 @@ export class EditNodeDlg extends DialogBase {
 
     constructor(node: J.NodeInfo, private encrypt: boolean, private showJumpButton: boolean, state: AppState, mode: DialogMode = null) {
         super("Edit", mode === DialogMode.EMBED ? "app-embed-content" : "app-modal-content", false, state, mode);
+
+        if (mode === DialogMode.EMBED) {
+            if (EditNodeDlg.embedInstance) {
+                // todo-0: print message here (in timer) that asks user about aborting previous instance.
+            }
+            EditNodeDlg.embedInstance = this;
+        }
 
         this.onClose = this.onClose.bind(this);
 
@@ -681,9 +690,11 @@ export class EditNodeDlg extends DialogBase {
     }
 
     // todo-0: eventually we can do a close() call here and get rid of onClose once we have the
-    // close pattern working for 'binding()'/arrow function.
+    // close pattern working for 'binding()'/arrow function, and is overridable with ability to call super.close()
+    // form the overridden function.
     onClose(): void {
         if (this.mode === DialogMode.EMBED) {
+            EditNodeDlg.embedInstance = null;
             dispatch("Action_endEditing", (s: AppState): AppState => {
                 s.editNode = null;
                 S.meta64.newNodeTargetId = null;
