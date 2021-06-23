@@ -39,7 +39,7 @@ export class NodeCompMainNode extends Div {
         }
 
         if (state.editNode != null && node.id === state.editNode.id) {
-            this.setChildren([new EditNodeDlg(state.editNode, state.editParent, state.editEncrypt, state.editShowJumpButton, state, DialogMode.EMBED)]);
+            this.setChildren([new EditNodeDlg(state.editNode, state.editEncrypt, state.editShowJumpButton, state, DialogMode.EMBED)]);
         }
         else {
             let focusNode: J.NodeInfo = S.meta64.getHighlightedNode(state);

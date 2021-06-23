@@ -96,12 +96,11 @@ export class Edit implements EditIntf {
                         !S.meta64.getDisplayingNode(state, S.meta64.newNodeTargetId)) ||
                     // not currently viewing tree
                     S.meta64.activeTab !== C.TAB_MAIN) {
-                    const dlg = new EditNodeDlg(res.nodeInfo, res.parentInfo, encrypt, showJumpButton, state);
+                    const dlg = new EditNodeDlg(res.nodeInfo, encrypt, showJumpButton, state);
                     dlg.open();
                 } else {
                     dispatch("Action_startEditing", (s: AppState): AppState => {
                         s.editNode = res.nodeInfo;
-                        s.editParent = res.parentInfo;
                         s.editShowJumpButton = showJumpButton;
                         s.editEncrypt = encrypt;
                         return s;

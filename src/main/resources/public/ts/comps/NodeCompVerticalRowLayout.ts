@@ -43,11 +43,11 @@ export class NodeCompVerticalRowLayout extends Div {
                     // }
 
                     if (state.editNode != null && S.meta64.newNodeTargetId === n.id && S.meta64.newNodeTargetOffset === 0) {
-                        comps.push(new EditNodeDlg(state.editNode, state.editParent, state.editEncrypt, state.editShowJumpButton, state, DialogMode.EMBED));
+                        comps.push(new EditNodeDlg(state.editNode, state.editEncrypt, state.editShowJumpButton, state, DialogMode.EMBED));
                     }
 
                     if (state.editNode != null && n.id === state.editNode.id) {
-                        comps.push(new EditNodeDlg(state.editNode, state.editParent, state.editEncrypt, state.editShowJumpButton, state, DialogMode.EMBED));
+                        comps.push(new EditNodeDlg(state.editNode, state.editEncrypt, state.editShowJumpButton, state, DialogMode.EMBED));
                     }
                     else {
 
@@ -70,7 +70,7 @@ export class NodeCompVerticalRowLayout extends Div {
                     }
 
                     if (state.editNode != null && S.meta64.newNodeTargetId === n.id && S.meta64.newNodeTargetOffset === 1) {
-                        comps.push(new EditNodeDlg(state.editNode, state.editParent, state.editEncrypt, state.editShowJumpButton, state, DialogMode.EMBED));
+                        comps.push(new EditNodeDlg(state.editNode, state.editEncrypt, state.editShowJumpButton, state, DialogMode.EMBED));
                     }
                 }
             }

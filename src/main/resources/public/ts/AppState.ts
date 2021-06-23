@@ -139,7 +139,6 @@ export class AppState {
     bookmarks: J.Bookmark[];
 
     editNode: J.NodeInfo;
-    editParent: J.NodeInfo;
     editShowJumpButton: boolean;
     editEncrypt: boolean;
 }

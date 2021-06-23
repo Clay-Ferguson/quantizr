@@ -449,16 +449,6 @@ public class NodeRenderService {
 			return res;
 		}
 
-		try {
-			SubNode parentNode = read.getParent(session, node);
-			NodeInfo parentInfo = convert.convertToNodeInfo(ThreadLocals.getSessionContext(), session, parentNode, false, true,
-					-1, false, false);
-			res.setParentInfo(parentInfo);
-		} catch (Exception e) {
-			ExUtil.error(log, "unable to load parent", e);
-			// ignore this
-		}
-
 		NodeInfo nodeInfo =
 				convert.convertToNodeInfo(ThreadLocals.getSessionContext(), session, node, false, true, -1, false, false);
 		res.setNodeInfo(nodeInfo);

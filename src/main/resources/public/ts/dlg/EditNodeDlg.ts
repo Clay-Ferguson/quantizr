@@ -55,7 +55,6 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
 
 export class EditNodeDlg extends DialogBase {
 
-    static parentDisplayExpanded: boolean = false;
     static helpExpanded: boolean = false;
     editorHelp: string = null;
     header: Header;
@@ -66,7 +65,6 @@ export class EditNodeDlg extends DialogBase {
 
     contentEditor: I.TextEditorIntf;
     contentEditorState: ValidatedState<any> = new ValidatedState<any>();
-    parentContentEditorState: ValidatedState<any> = new ValidatedState<any>();
     nameState: ValidatedState<any> = new ValidatedState<any>();
 
     // holds a map of states by property names.
@@ -83,7 +81,7 @@ export class EditNodeDlg extends DialogBase {
 
     allowEditAllProps: boolean = false;
 
-    constructor(node: J.NodeInfo, public parentNode: J.NodeInfo, private encrypt: boolean, private showJumpButton: boolean, state: AppState, mode: DialogMode = null) {
+    constructor(node: J.NodeInfo, private encrypt: boolean, private showJumpButton: boolean, state: AppState, mode: DialogMode = null) {
         super("Edit", mode === DialogMode.EMBED ? "app-embed-content" : "app-modal-content", false, state, mode);
 
         this.onClose = this.onClose.bind(this);
@@ -119,18 +117,8 @@ export class EditNodeDlg extends DialogBase {
             this.contentEditorState.setValue("");
         }
 
-        /* Init parent node text */
-        let parentValue = (this.parentNode ? this.parentNode.content : null) || "";
-        if (!parentValue.startsWith(J.Constant.ENC_TAG)) {
-            this.parentContentEditorState.setValue(parentValue);
-        }
-        else {
-            this.parentContentEditorState.setValue("");
-        }
-
         /* Initialize node name state */
         this.nameState.setValue(state.node.name);
-
         this.initPropStates(state.node, false);
     }
 
@@ -547,37 +535,13 @@ export class EditNodeDlg extends DialogBase {
                 EditNodeDlg.helpExpanded = state;
             }, EditNodeDlg.helpExpanded, "span") : null;
 
-        let parentDisplay = null;
-        if (this.parentNode) {
-            let parentContentEditor = new TextArea(null, { rows: "5" }, this.parentContentEditorState, "textarea-min-4");
-            let parentVal = this.parentNode.content || "";
-            if (!parentVal.startsWith(J.Constant.ENC_TAG)) {
-                let wrap: boolean = S.props.getNodePropVal(J.NodeProp.NOWRAP, this.parentNode) !== "1";
-                parentContentEditor.setWordWrap(wrap);
-
-                let whoTo = this.parentNode.owner === this.appState.userName ? "your own" : (this.parentNode.owner + "'s");
-
-                parentDisplay = new CollapsiblePanel("Show Parent Content", "Hide Parent Content", null, [
-                    new Div("Creating under " + whoTo + " node", { className: "marginTop" }),
-                    parentContentEditor
-                ], false,
-                    (state: boolean) => {
-                        EditNodeDlg.parentDisplayExpanded = state;
-                    }, EditNodeDlg.parentDisplayExpanded, "", "", "span");
-            }
-        }
-
-        let expandables = new Div(null, { className: "marginBottom" }, [
-            parentDisplay,
-            helpPanel]);
-
         // if this props table would be empty don't display it (set to null)
         if (propsTable && !propsTable.childrenExist()) {
             propsTable = null;
         }
 
         let collapsiblePanel = !customProps ? new CollapsiblePanel(null, null, null, [
-            new Div(null, { className: "marginBottom" }, [
+            new Div(null, { className: "marginBottom marginRight" }, [
                 new Button("Type", this.openChangeNodeTypeDlg),
                 !customProps ? new Button("Encrypt", () => { this.openEncryptionDlg(true); }) : null,
                 allowPropertyAdd && numPropsShowing === 0 ? new Button("Props", this.addProperty) : null
@@ -586,9 +550,14 @@ export class EditNodeDlg extends DialogBase {
         ], false,
             (state: boolean) => {
                 EditNodeDlg.morePanelExpanded = state;
-            }, EditNodeDlg.morePanelExpanded, "float-right") : null;
+            }, EditNodeDlg.morePanelExpanded, "marginRight", "marginTop", "span") : null;
 
-        this.propertyEditFieldContainer.setChildren([mainPropsTable, sharingSpan, binarySection, collapsiblePanel, expandables]);
+        let rightFloatButtons = new Div(null, { className: "marginBottom" }, [
+            collapsiblePanel, helpPanel
+        ]);
+
+        this.propertyEditFieldContainer.setChildren([mainPropsTable, sharingSpan, binarySection, rightFloatButtons,
+            new Div(null, { className: "clearfix" })]);
         return children;
     }
 
@@ -717,7 +686,6 @@ export class EditNodeDlg extends DialogBase {
         if (this.mode === DialogMode.EMBED) {
             dispatch("Action_endEditing", (s: AppState): AppState => {
                 s.editNode = null;
-                s.editParent = null;
                 S.meta64.newNodeTargetId = null;
                 S.meta64.newNodeTargetOffset = -1;
                 s.editShowJumpButton = false;
