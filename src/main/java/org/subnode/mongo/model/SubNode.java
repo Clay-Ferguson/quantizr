@@ -217,10 +217,6 @@ public class SubNode {
 			this.pathHash = null;
 		}
 
-		// remove the old path if cached by it
-		if (MongoAuth.inst != null) {
-			MongoAuth.inst.uncacheNode(this.path);
-		}
 		this.path = path;
 
 		// NOTE: We CANNOT update the cache here, because all the validation for a node

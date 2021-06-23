@@ -1,6 +1,9 @@
 package org.subnode.mongo;
 
 import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import org.apache.commons.lang3.StringUtils;
 import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,11 +18,16 @@ public class MongoThreadLocal {
 	 * every object that is touched during the processing of a thread/request.
 	 */
 	private static final ThreadLocal<HashMap<ObjectId, SubNode>> dirtyNodes = new ThreadLocal<HashMap<ObjectId, SubNode>>();
+	private static final ThreadLocal<LinkedHashMap<String, SubNode>> cachedNodes =
+			new ThreadLocal<LinkedHashMap<String, SubNode>>();
 	private static final ThreadLocal<Boolean> writesDisabled = new ThreadLocal<Boolean>();
+
+	private static int MAX_CACHE_SIZE = 50;
 
 	public static void removeAll() {
 		// log.debug("Clear Dirty Nodes.");
 		getDirtyNodes().clear();
+		getCachedNodes().clear();
 		setWritesDisabled(false);
 	}
 
@@ -28,7 +36,8 @@ public class MongoThreadLocal {
 	}
 
 	public static Boolean getWritesDisabled() {
-		if (writesDisabled.get()==null) return false;
+		if (writesDisabled.get() == null)
+			return false;
 		return writesDisabled.get();
 	}
 
@@ -36,11 +45,27 @@ public class MongoThreadLocal {
 		getDirtyNodes().clear();
 	}
 
+	public static void clearCachedNodes() {
+		getCachedNodes().clear();
+	}
+
 	public static HashMap<ObjectId, SubNode> getDirtyNodes() {
 		if (dirtyNodes.get() == null) {
 			dirtyNodes.set(new HashMap<ObjectId, SubNode>());
 		}
 		return dirtyNodes.get();
+	}
+
+	private static LinkedHashMap<String, SubNode> getCachedNodes() {
+		if (cachedNodes.get() == null) {
+			LinkedHashMap<String, SubNode> cn = new LinkedHashMap<String, SubNode>(MAX_CACHE_SIZE + 1, .75F, false) {
+				protected boolean removeEldestEntry(Map.Entry<String, SubNode> eldest) {
+					return size() > MAX_CACHE_SIZE;
+				}
+			};
+			cachedNodes.set(cn);
+		}
+		return cachedNodes.get();
 	}
 
 	public static boolean hasDirtyNodes() {
@@ -94,5 +119,23 @@ public class MongoThreadLocal {
 		// if (getDirtyNodes().containsKey(node.getId())) {
 		getDirtyNodes().remove(node.getId());
 		// }
+	}
+
+	public static void cacheNode(SubNode node) {
+		if (node == null)
+			return;
+
+		if (node.getPath() != null) {
+			getCachedNodes().put(node.getPath(), node);
+		}
+		if (node.getId() != null) {
+			getCachedNodes().put(node.getId().toHexString(), node);
+		}
+	}
+
+	public static SubNode getCachedNode(String key) {
+		if (StringUtils.isEmpty(key))
+			return null;
+		return getCachedNodes().get(key);
 	}
 }

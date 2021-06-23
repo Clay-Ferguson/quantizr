@@ -70,6 +70,7 @@ import org.subnode.response.SaveUserPreferencesResponse;
 import org.subnode.response.SaveUserProfileResponse;
 import org.subnode.response.SignupResponse;
 import org.subnode.util.Const;
+import org.subnode.util.DateUtil;
 import org.subnode.util.ExUtil;
 import org.subnode.util.ThreadLocals;
 import org.subnode.util.ValContainer;
@@ -163,7 +164,8 @@ public class UserManagerService {
 		 * We have to get timezone information from the user's browser, so that all times on all nodes
 		 * always show up in their precise local time!
 		 */
-		sc.init(req);
+		sc.setTimezone(DateUtil.getTimezoneFromOffset(req.getTzOffset()));
+		sc.setTimeZoneAbbrev(DateUtil.getUSTimezone(-req.getTzOffset() / 60, req.getDst()));
 
 		if (session == null) {
 			log.debug("session==null, using anonymous user");
@@ -224,6 +226,7 @@ public class UserManagerService {
 	 * userNode should be passed if you have it already, but can be null of you don't
 	 */
 	public void processLogin(MongoSession session, LoginResponse res, String userName, SubNode userNode) {
+		// log.debug("processLogin: " + userName);
 		if (userNode == null) {
 			userNode = read.getUserNodeByUserName(session, userName);
 		}
@@ -233,7 +236,11 @@ public class UserManagerService {
 
 		SessionContext sc = ThreadLocals.getSessionContext();
 		String id = userNode.getId().toHexString();
+		if (id == null) {
+			throw new RuntimeException("userNode id is null for user: " + userName);
+		}
 		sc.setRootId(id);
+		sc.setLoggedIn(true);
 
 		UserPreferences userPreferences = getUserPreferences(userName, userNode);
 		sc.setUserPreferences(userPreferences);

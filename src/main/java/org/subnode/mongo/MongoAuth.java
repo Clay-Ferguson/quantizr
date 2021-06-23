@@ -35,6 +35,7 @@ import org.subnode.mongo.model.SubNode;
 import org.subnode.request.LoginRequest;
 import org.subnode.request.base.RequestBase;
 import org.subnode.service.UserManagerService;
+import org.subnode.util.DateUtil;
 import org.subnode.util.ThreadLocals;
 import org.subnode.util.XString;
 
@@ -46,19 +47,6 @@ public class MongoAuth {
 	// in order for non-spring beans (namely just SubNode.java) to access this we cheat by using this
 	// static.
 	public static MongoAuth inst;
-
-	private static int MAX_CACHE_SIZE = 500;
-	/*
-	 * The cache key in this can be either a node path or node id. We cache nodes aggressively whenever
-	 * a node is loaded, but we only refer to this cache for doing auth logic. The reason is that for
-	 * authorization purposes won't need worry about keeping the cache up to date for writes.
-	 */
-	private final LinkedHashMap<String, SubNode> cachedNodes =
-			new LinkedHashMap<String, SubNode>(MAX_CACHE_SIZE + 1, .75F, false) {
-				protected boolean removeEldestEntry(Map.Entry<String, SubNode> eldest) {
-					return size() > MAX_CACHE_SIZE;
-				}
-			};
 
 	@Autowired
 	private MongoTemplate ops;
@@ -99,64 +87,6 @@ public class MongoAuth {
 
 	public MongoSession getAnonSession() {
 		return anonSession;
-	}
-
-	public void cacheNode(SubNode node) {
-		// I keep finding issues with caching so for now it's disabled
-		// and hopefully MongoDb does better caching anyway.
-		// if (node.getPath() != null || node.getId() != null) {
-		// 	synchronized (cachedNodes) {
-		// 		if (node.getPath() != null) {
-		// 			cachedNodes.put(node.getPath(), node);
-		// 		}
-
-		// 		if (node.getId() != null) {
-		// 			cachedNodes.put(node.getId().toHexString(), node);
-		// 		}
-		// 	}
-		// }
-	}
-
-	public void cacheNode(String key, SubNode node) {
-		// I keep finding issues with caching so for now it's disabled
-		// and hopefully MongoDb does better caching anyway.
-		// if (key != null) {
-		// 	synchronized (cachedNodes) {
-		// 		cachedNodes.put(key, node);
-		// 	}
-		// }
-	}
-
-	public void uncacheNode(SubNode node) {
-		if (node == null)
-			return;
-		uncacheNode(node.getPath());
-
-		if (node.getId() != null) {
-			uncacheNode(node.getId().toHexString());
-		}
-	}
-
-	public void uncacheNode(String key) {
-		if (key != null) {
-			synchronized (cachedNodes) {
-				cachedNodes.remove(key);
-			}
-		}
-	}
-
-	public SubNode getCachedNode(String key) {
-		if (StringUtils.isEmpty(key))
-			return null;
-		synchronized (cachedNodes) {
-			return cachedNodes.get(key);
-		}
-	}
-
-	public void clearNodeCache() {
-		synchronized (cachedNodes) {
-			cachedNodes.clear();
-		}
 	}
 
 	public void populateUserNamesInAcl(MongoSession session, SubNode node) {
@@ -456,16 +386,7 @@ public class MongoAuth {
 				return true;
 			}
 
-			SubNode parentNode = getCachedNode(node.getParentPath());
-
-			// if we got the node from the cache use it
-			if (parentNode != null) {
-				node = parentNode;
-			}
-			// node not on cache then load it from db
-			else {
-				node = read.getParent(session, node, false);
-			}
+			node = read.getParent(session, node, false);
 			if (node != null) {
 				if (verbose)
 					log.trace("parent path=" + node.getPath());
@@ -704,6 +625,7 @@ public class MongoAuth {
 		MongoSession session = null;
 		SubNode userNode = null;
 		boolean success = false;
+		boolean authenticated = false;
 
 		/*
 		 * Anonymous
@@ -718,6 +640,7 @@ public class MongoAuth {
 		/* Admin Login */
 		else if (PrincipalName.ADMIN.s().equals(userName)) {
 			if (password.equals(appProp.getMongoAdminPassword())) {
+				authenticated = true;
 				session = MongoSession.createFromUser(PrincipalName.ANON.s());
 				session.setUserName(userName);
 				userNode = read.getUserNodeByUserName(getAdminSession(), userName);
@@ -728,18 +651,24 @@ public class MongoAuth {
 		}
 		/* User Login */
 		else {
+			// default session to anonymous user.
 			session = MongoSession.createFromUser(PrincipalName.ANON.s());
+
+			// try to lookup the actual user's node
 			userNode = read.getUserNodeByUserName(getAdminSession(), userName);
 
+			// we found user's node.
 			if (userNode != null) {
 				/**
 				 * We can log in as any user we want if we have the admin password.
 				 */
 				if (password.equals(appProp.getMongoAdminPassword())) {
+					authenticated = true;
 					success = true;
 				}
 				// else it's an ordinary user so we check the password against their user node
 				else if (userNode.getStrProp(NodeProp.PWD_HASH.s()).equals(util.getHashOfPassword(password))) {
+					authenticated = true;
 					success = true;
 				}
 			}
@@ -762,8 +691,9 @@ public class MongoAuth {
 				sc.setUserName(userName);
 				sc.setPassword(password);
 
-				if (req instanceof LoginRequest) {
-					sc.init(req);
+				if ((authenticated && !sc.isLoggedIn()) || req instanceof LoginRequest) {
+					sc.setTimezone(DateUtil.getTimezoneFromOffset(req.getTzOffset()));
+					sc.setTimeZoneAbbrev(DateUtil.getUSTimezone(-req.getTzOffset() / 60, req.getDst()));
 					userManagerService.processLogin(session, null, req.getUserName(), userNode);
 				}
 			}

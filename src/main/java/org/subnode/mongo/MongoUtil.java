@@ -116,9 +116,6 @@ public class MongoUtil {
 	 */
 	public SubNode findOne(Query query) {
 		SubNode node = ops.findOne(query, SubNode.class);
-		if (node != null) {
-			auth.cacheNode(node);
-		}
 		return nodeOrDirtyNode(node);
 	}
 
@@ -127,9 +124,12 @@ public class MongoUtil {
 	 * object
 	 */
 	public SubNode findById(ObjectId objId) {
-		SubNode node = ops.findById(objId, SubNode.class);
-		if (node != null) {
-			auth.cacheNode(node);
+		if (objId == null)
+			return null;
+	
+		SubNode node = MongoThreadLocal.getCachedNode(objId.toHexString());
+		if (node == null) {
+			node = ops.findById(objId, SubNode.class);
 		}
 		return nodeOrDirtyNode(node);
 	}

@@ -25,7 +25,6 @@ class NodeIterator implements Iterator<SubNode> {
     public SubNode next() {
         SubNode node = iter.next();
         if (node != null) {
-            MongoAuth.inst.cacheNode(node);
             SubNode dirty = MongoThreadLocal.getDirtyNodes().get(node.getId());
             if (dirty != null) {
                 // log.debug("ITER-WRAPPER: Got a dirty one: " + dirty.getId().toHexString());

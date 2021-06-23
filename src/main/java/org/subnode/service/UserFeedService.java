@@ -224,7 +224,6 @@ public class UserFeedService {
 	 * Generated content of the "Feed" for a user.
 	 */
 	public NodeFeedResponse generateFeed(MongoSession session, NodeFeedRequest req) {
-
 		SessionContext sc = ThreadLocals.getSessionContext();
 		NodeFeedResponse res = new NodeFeedResponse();
 		if (session == null) {
@@ -386,7 +385,7 @@ public class UserFeedService {
 		}
 
 		res.setSuccess(true);
-		log.debug("search results count: " + counter);
+		// log.debug("search results count: " + counter);
 		return res;
 	}
 

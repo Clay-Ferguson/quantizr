@@ -28,6 +28,8 @@ import org.subnode.service.AclService;
 import org.subnode.util.ThreadLocals;
 import org.subnode.util.XString;
 
+/* There are many more opportunities in this class to use the MongoThreadLocal.nodeCache to store
+information in the thread for use during context of one call */
 @Component
 public class MongoRead {
     private static final Logger log = LoggerFactory.getLogger(MongoRead.class);
@@ -57,6 +59,7 @@ public class MongoRead {
     /**
      * Gets account name from the root node associated with whoever owns 'node'
      */
+    // todo-0: can cache this node as key "OWNEROF-nodeId"
     public String getNodeOwner(MongoSession session, SubNode node) {
         if (node.getOwner() == null) {
             throw new RuntimeEx("Node has null owner: " + XString.prettyPrint(node));
@@ -131,7 +134,7 @@ public class MongoRead {
         return ret;
     }
 
-    /* Throws an exception of the parent of 'node' does not exist */
+    /* Throws an exception if the parent of 'node' does not exist */
     public void checkParentExists(MongoSession session, SubNode node) {
         boolean isRootPath = util.isRootPath(node.getPath());
         if (node.isDisableParentCheck() || isRootPath)
@@ -219,11 +222,12 @@ public class MongoRead {
         if (allowAuth) {
             auth.auth(session, ret, PrivilegeType.READ);
         }
+
         return ret;
     }
 
-    public SubNode getNode(MongoSession session, String path) {
-        return getNode(session, path, true);
+    public SubNode getNode(MongoSession session, String identifier) {
+        return getNode(session, identifier, true);
     }
 
     /**
@@ -255,18 +259,10 @@ public class MongoRead {
                 typeName = "sn:" + typeName;
             }
             ret = getUserNodeByType(session, session.getUserName(), null, null, typeName, null, null);
-            if (ret != null) {
-                // WRONG IDENTIFIER to cache (todo-0)
-                // auth.cacheNode(identifier, ret);
-            }
         }
         // Node name lookups are done by prefixing the search with a colon (:)
         else if (identifier.startsWith(":")) {
             ret = getNodeByName(session, identifier.substring(1), allowAuth);
-            if (ret != null) {
-                // WRONG IDENTIFIER to cache (todo-0)
-                // auth.cacheNode(identifier, ret);
-            }
         }
         // If search doesn't start with a slash then it's a nodeId and not a path
         else if (!identifier.startsWith("/")) {
@@ -274,19 +270,22 @@ public class MongoRead {
         }
         // otherwise this is a path lookup
         else {
-            // log.debug("getNode identifier is path. doing path find.");
-            identifier = XString.stripIfEndsWith(identifier, "/");
-            Query query = new Query();
-            query.addCriteria(Criteria.where(SubNode.FIELD_PATH).is(identifier));
-            ret = util.findOne(query);
-        }
-
-        if (ret != null) {
-            auth.cacheNode(ret);
+            ret = findNodeByPath(identifier);
         }
 
         if (allowAuth) {
             auth.auth(session, ret, PrivilegeType.READ);
+        }
+        return ret;
+    }
+
+    public SubNode findNodeByPath(String path) {
+        path = XString.stripIfEndsWith(path, "/");
+        SubNode ret = MongoThreadLocal.getCachedNode(path);
+        if (ret == null) {
+            Query query = new Query();
+            query.addCriteria(Criteria.where(SubNode.FIELD_PATH).is(path));
+            ret = util.findOne(query);
         }
         return ret;
     }
@@ -302,11 +301,8 @@ public class MongoRead {
     }
 
     public SubNode getNode(MongoSession session, ObjectId objId, boolean allowAuth) {
-        if (objId == null)
-            return null;
-
         SubNode ret = util.findById(objId);
-        if (allowAuth) {
+        if (ret != null && allowAuth) {
             auth.auth(session, ret, PrivilegeType.READ);
         }
         return ret;
@@ -337,15 +333,6 @@ public class MongoRead {
         parentPath = parentPath.replace(pendingPath, rootPath);
 
         SubNode ret = getNode(session, parentPath);
-        if (ret == null) {
-            Query query = new Query();
-            query.addCriteria(Criteria.where(SubNode.FIELD_PATH).is(parentPath));
-            ret = util.findOne(query);
-            if (ret != null) {
-                auth.cacheNode(ret);
-            }
-        }
-
         if (ret != null && allowAuth) {
             auth.auth(session, ret, PrivilegeType.READ);
         }
@@ -812,6 +799,7 @@ public class MongoRead {
         return userName.substring(0, atIdx);
     }
 
+    // todo-0: can cache this by "USERNODE-user"
     public SubNode getUserNodeByUserName(MongoSession session, String user) {
         if (user == null) {
             user = ThreadLocals.getSessionContext().getUserName();

@@ -51,9 +51,6 @@ public class MongoSession {
 	}
 
 	public SubNode getUserNode() {
-		if (isAnon()) {
-			log.debug("Attempted to get UserNode on anonymous session. This is almost always a bug/unintentional");
-		}
 		return userNode;
 	}
 

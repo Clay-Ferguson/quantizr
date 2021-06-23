@@ -10,7 +10,6 @@ import java.util.TimeZone;
 import javax.annotation.PreDestroy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.context.annotation.ScopedProxyMode;
 import org.springframework.stereotype.Component;
@@ -18,8 +17,6 @@ import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 import org.subnode.model.UserPreferences;
 import org.subnode.model.client.PrincipalName;
 import org.subnode.mongo.MongoUtil;
-import org.subnode.request.base.RequestBase;
-import org.subnode.service.UserManagerService;
 import org.subnode.util.DateUtil;
 
 /**
@@ -31,11 +28,18 @@ import org.subnode.util.DateUtil;
 public class SessionContext {
 	private static final Logger log = LoggerFactory.getLogger(SessionContext.class);
 
-	@Autowired
-	private UserManagerService userManagerService;
-
-	/* Identification of user's account root node */
+	/* Identification of user's account root node. */
 	private String rootId;
+
+	private boolean loggedIn;
+
+	public boolean isLoggedIn() {
+		return loggedIn;
+	}
+
+	public void setLoggedIn(boolean loggedIn) {
+		this.loggedIn = loggedIn;
+	}
 
 	/* When the user does a "Timeline" search we store the path of the node the timeline was done on
 	so that with a simple substring search, we can detect any time a new node is added that would've appeared
@@ -89,11 +93,6 @@ public class SessionContext {
 		synchronized (allSessions) {
 			allSessions.add(this);
 		}
-	}
-
-	public void init(RequestBase req) {
-		setTimezone(DateUtil.getTimezoneFromOffset(req.getTzOffset()));
-		setTimeZoneAbbrev(DateUtil.getUSTimezone(-req.getTzOffset() / 60, req.getDst()));
 	}
 
 	public static boolean validToken(String token) {

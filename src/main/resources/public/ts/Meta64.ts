@@ -577,10 +577,6 @@ export class Meta64 implements Meta64Intf {
 
             setTimeout(() => {
                 S.encryption.initKeys();
-
-                // it's unnecessary to preload these, but there'll be slightly less lag in the Bookmark menu
-                // the first time it's opened if we have it already loaded.
-                this.loadBookmarks();
             }, 1000);
 
             resolve();

@@ -263,7 +263,7 @@ public class NodeSearchService {
 		}
 
 		res.setSuccess(true);
-		log.debug("search results count: " + counter);
+		// log.debug("search results count: " + counter);
 		return res;
 	}
 

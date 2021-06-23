@@ -85,7 +85,6 @@ public class SystemService {
 	private MongoAuth auth;
 
 	public String rebuildIndexes() {
-		auth.clearNodeCache();
 		if (!ThreadLocals.getSessionContext().isAdmin()) {
 			throw ExUtil.wrapEx("admin only function.");
 		}
@@ -97,7 +96,6 @@ public class SystemService {
 	}
 
 	public String compactDb() {
-		auth.clearNodeCache();
 		delete.deleteNodeOrphans(null);
 		// do not delete.
 		// userManagerService.cleanUserAccounts();
@@ -126,7 +124,6 @@ public class SystemService {
 	}
 
 	public String validateDb() {
-		auth.clearNodeCache();
 		// https://docs.mongodb.com/manual/reference/command/validate/
 		String ret = runMongoDbCommand(new Document("validate", "nodes").append("full", true));
 		ret += ipfsService.repoVerify();

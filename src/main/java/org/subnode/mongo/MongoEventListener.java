@@ -216,7 +216,7 @@ public class MongoEventListener extends AbstractMongoEventListener<SubNode> {
 	public void onAfterSave(AfterSaveEvent<SubNode> event) {
 		SubNode node = event.getSource();
 		if (node != null) {
-			auth.cacheNode(node);
+			MongoThreadLocal.cacheNode(node);
 		}
 	}
 
@@ -231,6 +231,8 @@ public class MongoEventListener extends AbstractMongoEventListener<SubNode> {
 	public void onAfterConvert(AfterConvertEvent<SubNode> event) {
 		// Document dbObj = event.getDocument();
 		// ObjectId id = dbObj.getObjectId(SubNode.FIELD_ID);
+		// log.debug("onAfterConvert: " + event.getSource().getId().toHexString());
+		MongoThreadLocal.cacheNode(event.getSource());
 	}
 
 	@Override
@@ -245,7 +247,8 @@ public class MongoEventListener extends AbstractMongoEventListener<SubNode> {
 					log.trace("MDB del: " + node.getPath());
 					auth.ownerAuth(node);
 				}
-				auth.uncacheNode(node);
+				// because nodes can be orphaned, we clear the entire cache any time any nodes are deleted
+				MongoThreadLocal.clearCachedNodes();
 				actPub.deleteNodeNotify((ObjectId) id);
 			}
 		}
@@ -257,7 +260,8 @@ public class MongoEventListener extends AbstractMongoEventListener<SubNode> {
 		if (!MongoRepository.fullInit) {
 			return;
 		}
-		if (verbose) log.trace("saveAuth in MongoListener");
+		if (verbose)
+			log.trace("saveAuth in MongoListener");
 
 		MongoSession session = ThreadLocals.getMongoSession();
 		if (session != null) {
@@ -272,7 +276,7 @@ public class MongoEventListener extends AbstractMongoEventListener<SubNode> {
 				SubNode parent = read.getParent(session, node);
 				if (parent == null)
 					throw new RuntimeException("unable to get node parent: " + node.getParentPath());
-				
+
 				auth.auth(session, parent, PrivilegeType.WRITE);
 			}
 		}
