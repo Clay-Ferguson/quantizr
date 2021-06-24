@@ -58,6 +58,8 @@ export abstract class Comp<S extends BaseCompState = any> implements CompIntf {
     constructor(attribs?: any, private s?: State<S>) {
         this.domAddEvent = this.domAddEvent.bind(this);
         this.domRemoveEvent = this.domRemoveEvent.bind(this);
+        this.domUpdateEvent = this.domUpdateEvent.bind(this);
+        this.domPreUpdateEvent = this.domPreUpdateEvent.bind(this);
 
         if (!s) {
             this.s = new State<S>();
@@ -373,22 +375,14 @@ export abstract class Comp<S extends BaseCompState = any> implements CompIntf {
         try {
             this.s.useState();
             useEffect(this.domAddEvent, []);
-
-            // This hook should work fine but just isn't needed yet.
-            if (this.domUpdateEvent) {
-                useEffect(this.domUpdateEvent);
-            }
+            useEffect(this.domUpdateEvent);
 
             this.attribs.ref = useRef(null);
 
-            if (this.domPreUpdateEvent) {
-                useLayoutEffect(() => {
-                    this.domPreUpdateEvent(this.attribs.ref.current);
-                });
-
-                // this works too...
-                // useLayoutEffect(() => this.domPreUpdateEvent(), []);
-            }
+            // todo-0: I think this function wrapper is unneeded, has no effect.
+            useLayoutEffect(this.domPreUpdateEvent);
+            // this works too...
+            // useLayoutEffect(() => this.domPreUpdateEvent(), []);
 
             /*
             This 'useEffect' call makes react call 'domRemoveEvent' once the dom element is removed from the acutal DOM.
@@ -421,9 +415,11 @@ export abstract class Comp<S extends BaseCompState = any> implements CompIntf {
         return ret;
     }
 
-    // todo-0: places like this need to be using standard inheritance.
-    domUpdateEvent = null;
-    domPreUpdateEvent = null;
+    public domPreUpdateEvent(): void {
+    }
+
+    public domUpdateEvent(): void {
+    }
 
     public domRemoveEvent(): void {
     }

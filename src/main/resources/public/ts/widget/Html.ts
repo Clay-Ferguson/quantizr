@@ -49,6 +49,7 @@ export class Html extends Comp {
 
     constructor(content: string = "", attribs: Object = {}, initialChildren: CompIntf[] = null) {
         super(attribs);
+        this.domPreUpdateEvent = this.domPreUpdateEvent.bind(this);
         this.setChildren(initialChildren);
         this.setText(content);
     }
@@ -75,7 +76,11 @@ export class Html extends Comp {
     1) update formula rendering (MathJax), and
     2) change all "a" tags inside this div to have a target=_blank
     */
-    domPreUpdateEvent = (): void => {
+    domPreUpdateEvent(): void {
+        let elm = this.attribs.ref.current;
+
+        // todo-0: find similar calls like this to whenElm that now
+        // can rely on 'elm' that from 'ref'
         this.whenElm((elm) => {
             if (MathJax && MathJax.typeset) {
                 // note: MathJax.typesetPromise(), also exists
@@ -100,5 +105,6 @@ export class Html extends Comp {
                 });
             }
         });
+        super.domPreUpdateEvent();
     }
 }

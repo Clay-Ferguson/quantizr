@@ -14,13 +14,15 @@ export class PieChart extends Div {
 
     constructor(private data: any[]) {
         super();
+        this.domPreUpdateEvent = this.domPreUpdateEvent.bind(this);
     }
 
     preRender(): void {
         this.setChildren([new Svg(null, { className: "d3PieChart" })]);
     }
 
-    domPreUpdateEvent = (): void => {
+    domPreUpdateEvent(): void {
+        // let elm = this.attribs.ref.current;
         // console.log("domPreUpdateEvent: " + S.util.prettyPrint(this.data));
         let state = this.getState();
 
@@ -71,5 +73,7 @@ export class PieChart extends Div {
             .text((d, i) => {
                 return this.data[i].label;
             });
+
+        super.domPreUpdateEvent();
     }
 }

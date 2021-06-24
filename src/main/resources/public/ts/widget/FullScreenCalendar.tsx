@@ -27,6 +27,11 @@ export class FullScreenCalendar extends Main {
 
     state: AppState;
 
+    constructor() {
+        super();
+        this.domUpdateEvent = this.domUpdateEvent.bind(this);
+    }
+
     _render = (): ReactNode => {
         this.state = useSelector((state: AppState) => state);
         let nodeId = this.state.fullScreenCalendarId;
@@ -106,6 +111,12 @@ export class FullScreenCalendar extends Main {
 
     handleEventClick = (clickInfo: EventClickArg) => {
         S.edit.runEditNode(null, clickInfo.event.id, false, true, this.state);
+    }
+
+    domUpdateEvent(): void {
+        // #DEBUG-SCROLLING
+        S.view.docElm.scrollTop = 0;
+        super.domUpdateEvent();
     }
 }
 

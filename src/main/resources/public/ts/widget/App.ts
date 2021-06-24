@@ -91,9 +91,10 @@ export class App extends Main {
 
     /* This is where we send an event that lets code hook into the render cycle to process whatever needs
         to be done AFTER the main render is complete, like doing scrolling for example */
-    domUpdateEvent = () => {
+    domUpdateEvent(): void {
         PubSub.pub(C.PUBSUB_mainWindowScroll);
         PubSub.pub(C.PUBSUB_postMainWindowScroll);
+        super.domUpdateEvent();
     };
 
     getFullScreenViewer = (state: AppState): CompIntf => {
@@ -108,12 +109,6 @@ export class App extends Main {
             comp = new FullScreenCalendar();
         }
 
-        if (comp) {
-            comp.domUpdateEvent = () => {
-                // #DEBUG-SCROLLING
-                S.view.docElm.scrollTop = 0;
-            };
-        }
         return comp;
     }
 

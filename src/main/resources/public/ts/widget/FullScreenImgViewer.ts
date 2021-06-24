@@ -14,6 +14,11 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
 
 export class FullScreenImgViewer extends Main {
 
+    constructor() {
+        super();
+        this.domUpdateEvent = this.domUpdateEvent.bind(this);
+    }
+
     preRender(): void {
         let state: AppState = useSelector((state: AppState) => state);
         let nodeId = state.fullScreenViewId;
@@ -32,5 +37,11 @@ export class FullScreenImgViewer extends Main {
         }
 
         this.setChildren(children);
+    }
+
+    domUpdateEvent(): void {
+        // #DEBUG-SCROLLING
+        S.view.docElm.scrollTop = 0;
+        super.domUpdateEvent();
     }
 }

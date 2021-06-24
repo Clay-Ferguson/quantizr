@@ -29,6 +29,7 @@ export class NodeCompContent extends Div {
         super(null, {
             id: (idPrefix ? idPrefix : "n") + node.id
         });
+        this.domPreUpdateEvent = this.domPreUpdateEvent.bind(this);
     }
 
     preRender(): void {
@@ -112,11 +113,15 @@ export class NodeCompContent extends Div {
         }
     }
 
-    domPreUpdateEvent = (elm: HTMLElement): void => {
+    domPreUpdateEvent(): void {
+        let elm = this.attribs.ref.current;
+
+        // todo-0: is domPreUpdateFunc still needed ? we have 'elm' here now.
         if (this.domPreUpdateFunc) {
             // this.whenElm((elm) => {
                 this.domPreUpdateFunc(this);
             // });
         }
+        super.domPreUpdateEvent();
     }
 }

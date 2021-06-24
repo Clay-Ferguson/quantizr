@@ -20,6 +20,7 @@ export class TabPanel extends Div {
 constructor(private customTopComp: CompIntf = null) {
         super(null, { id: C.ID_TAB, tabIndex: "-1" });
         this.domAddEvent = this.domAddEvent.bind(this);
+        this.domPreUpdateEvent = this.domPreUpdateEvent.bind(this);
         const state: AppState = store.getState();
 
         if (state.mobileMode) {
@@ -87,7 +88,9 @@ constructor(private customTopComp: CompIntf = null) {
         super.domAddEvent();
     }
 
-    domPreUpdateEvent = (elm: HTMLElement): void => {
+    domPreUpdateEvent(): void {
+        let elm = this.attribs.ref.current;
         this.reScroll(elm);
+        super.domPreUpdateEvent();
     }
 }
