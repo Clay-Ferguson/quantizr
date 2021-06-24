@@ -331,9 +331,17 @@ public class SubNode {
 		this.ac = ac;
 	}
 
-	public void clearProperties() {
+	public void clearSecretProperties() {
+		/*
+		 * todo-0: need a better way to be sure none of these can ever end up on the client, so there needs to be
+		 * come kind of outbound filtering that all data goes thru on the way to the client.
+		 */
 		if (properties != null) {
-			properties.clear();
+			properties.remove(NodeProp.CRYPTO_KEY_PRIVATE.s());
+			properties.remove(NodeProp.EMAIL.s());
+			properties.remove(NodeProp.CODE.s());
+			properties.remove(NodeProp.ENC_KEY.s());
+			properties.remove(NodeProp.PWD_HASH.s());
 		}
 	}
 

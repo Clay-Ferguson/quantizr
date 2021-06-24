@@ -165,7 +165,7 @@ public class NodeSearchService {
 				 */
 				for (final SubNode node : accountNodes) {
 					try {
-						node.clearProperties();
+						node.clearSecretProperties();
 						NodeInfo info = convert.convertToNodeInfo(ThreadLocals.getSessionContext(), session, node, true, false,
 								counter + 1, false, false);
 						searchResults.add(info);

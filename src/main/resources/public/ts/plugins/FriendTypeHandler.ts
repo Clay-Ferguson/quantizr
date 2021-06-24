@@ -6,13 +6,6 @@ import * as J from "../JavaIntf";
 import { PubSub } from "../PubSub";
 import { Singletons } from "../Singletons";
 import { Comp } from "../widget/base/Comp";
-import { Button } from "../widget/Button";
-import { ButtonBar } from "../widget/ButtonBar";
-import { CollapsibleHelpPanel } from "../widget/CollapsibleHelpPanel";
-import { Div } from "../widget/Div";
-import { Heading } from "../widget/Heading";
-import { Html } from "../widget/Html";
-import { Img } from "../widget/Img";
 import { TypeBase } from "./base/TypeBase";
 
 let S: Singletons;
