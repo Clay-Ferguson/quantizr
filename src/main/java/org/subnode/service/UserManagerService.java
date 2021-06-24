@@ -800,15 +800,17 @@ public class UserManagerService {
 				Long followingCount = apFollowing.countFollowingOfUser(session, nodeUserName, actorUrl);
 				userProfile.setFollowingCount(followingCount.intValue());
 
-				/*
-				 * Only for local users do we attemp to generate followers and following, but theoretically we can
-				 * use the ActPub API to query for this for foreign users also.
-				 */
-				boolean blocked = userIsBlockedByMe(session, nodeUserName);
-				userProfile.setBlocked(blocked);
+				if (!ThreadLocals.getSessionContext().isAnonUser()) {
+					/*
+					 * Only for local users do we attemp to generate followers and following, but theoretically we can
+					 * use the ActPub API to query for this for foreign users also.
+					 */
+					boolean blocked = userIsBlockedByMe(session, nodeUserName);
+					userProfile.setBlocked(blocked);
 
-				boolean following = userIsFollowedByMe(session, nodeUserName);
-				userProfile.setFollowing(following);
+					boolean following = userIsFollowedByMe(session, nodeUserName);
+					userProfile.setFollowing(following);
+				}
 
 				// todo-1: add ability to know "follows you" state (for display on UserProfileDlg)
 				res.setSuccess(true);

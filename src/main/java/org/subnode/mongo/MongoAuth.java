@@ -78,7 +78,6 @@ public class MongoAuth {
 	@PostConstruct
 	public void postConstruct() {
 		inst = this;
-		log.debug("Initialized MongoAuth inst");
 	}
 
 	public MongoSession getAdminSession() {

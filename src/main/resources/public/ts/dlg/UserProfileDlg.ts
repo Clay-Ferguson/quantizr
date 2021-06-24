@@ -211,7 +211,7 @@ export class UserProfileDlg extends DialogBase {
     }
 
     close(): void {
-        this.close();
+        super.close();
         if (!this.readOnly) {
             S.user.queryUserProfile(this.userNodeId);
         }

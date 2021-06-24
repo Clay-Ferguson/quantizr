@@ -28,8 +28,10 @@ import org.subnode.service.AclService;
 import org.subnode.util.ThreadLocals;
 import org.subnode.util.XString;
 
-/* There are many more opportunities in this class to use the MongoThreadLocal.nodeCache to store
-information in the thread for use during context of one call */
+/*
+ * There are many more opportunities in this class to use the MongoThreadLocal.nodeCache to store
+ * information in the thread for use during context of one call
+ */
 @Component
 public class MongoRead {
     private static final Logger log = LoggerFactory.getLogger(MongoRead.class);
@@ -141,12 +143,18 @@ public class MongoRead {
             return;
 
         String parentPath = getParentPath(node);
-        if (parentPath == null || parentPath.equals("") || parentPath.equals("/"))
+        if (parentPath == null || parentPath.equals("") || parentPath.equals("/") || parentPath.equals("/r")
+                || parentPath.equals("/r/p") || parentPath.equals("/r/p/"))
             return;
 
         // todo-1: use constants here, or even make a function to do this too.
         if (parentPath.startsWith("/r/p/")) {
             parentPath = parentPath.replace("/r/p/", "/r/");
+        }
+
+        // no need to check root.
+        if (parentPath.equals("/r") || parentPath.equals("/r/")) {
+            return;
         }
 
         SubNode parentNode = getNode(session, parentPath, false);
@@ -800,7 +808,8 @@ public class MongoRead {
     }
 
     // todo-0: can cache this by "USERNODE-user"
-    // todo-0: look for all places in this class where we can be looking up something with a custom cache key.
+    // todo-0: look for all places in this class where we can be looking up something with a custom
+    // cache key.
     public SubNode getUserNodeByUserName(MongoSession session, String user) {
         if (user == null) {
             user = ThreadLocals.getSessionContext().getUserName();

@@ -49,7 +49,7 @@ export class VideoPlayerDlg extends DialogBase {
         // console.log("VideoPlayerDialog cancel()");
         // todo-2: need to check over, and document flow of this function as it relates to calling "podcast.destroyPlayer(this);"
         this.destroyPlayer();
-        this.close();
+        super.close();
     }
 
     destroyPlayer = (): void => {
