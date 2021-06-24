@@ -165,7 +165,7 @@ export class NodeCompRowHeader extends Div {
         /* Note: if this is on the main tree then we don't show the edit button here because it'll be
         showing up in a different place. We show here only for timeline, or search results views */
         if (!this.isMainTree && state.userPreferences.editMode) {
-            if (editingAllowed && editableNode) {
+            if (editingAllowed && editableNode && !state.editNode) {
                 floatUpperRightDiv.addChild(new Span(null, { className: "marginLeft" }, [
                     new IconButton("fa-edit", null, {
                         className: "marginLeft",

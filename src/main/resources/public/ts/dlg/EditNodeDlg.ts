@@ -88,7 +88,9 @@ export class EditNodeDlg extends DialogBase {
 
         if (mode === DialogMode.EMBED) {
             if (EditNodeDlg.embedInstance) {
-                // todo-0: print message here (in timer) that asks user about aborting previous instance.
+                /* we get here if user starts editing another node and abandons the one currently being edited.
+                 for now we just let this happen, but we could have asked the user if they MEANT to do that.
+                 */
             }
             EditNodeDlg.embedInstance = this;
         }

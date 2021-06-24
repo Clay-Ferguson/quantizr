@@ -63,7 +63,7 @@ export abstract class Comp<S extends BaseCompState = any> implements CompIntf {
         this.children = [];
 
         /* If an ID was specifically provided, then use it, or else generate one */
-        let id = this.attribs.id || ("c" + Comp.nextGuid());
+        let id = this.attribs.id || ("c" + Comp.nextGuid().toString(16));
         this.clazz = this.constructor.name;
         this.setId(id);
     }

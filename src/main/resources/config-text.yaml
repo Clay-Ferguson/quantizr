@@ -75,6 +75,7 @@ help:
       Public &rarr; Includes nodes that are shared to everyone (public sharing) <br>
       Local &rarr; Includes nodes only from users who have an account on this server <br>
       NSFW &rarr; Includes nodes flagged as 'sensitive' or potentially offensive or `Not safe for work`
+      </p>
 
   gettingStarted: >-
     <h3>Getting Started</h3>
@@ -118,12 +119,24 @@ help:
       </ul>
 
   editor:
-    dialog: >
-      <h4>Node Editing Tips</h4>
-      To display the node's attached image at a specific location in the content (rather than below the content, which is the default) you
-      can embed `{{img}}` anywhere in the text, to mark where you want the image to appear.
+    dialog: >-
+      <h3>Node Editing Tips</h3>
+      <h4>Images</h4>
       <p>
-      To make your attached image appear at upper left corner of the node with text wrapped around it, make your first line of 
-      content text be {{imgUpperLeft}}. Similarly, to make your image at upper right of the node enter `{{imgUpperRight}}` as the first line.
-
+        To display the node's attached image at a specific location in the content (rather than below the content, which is the default) you
+        can embed `{{img}}` anywhere in the text, to mark where you want the image to appear.
+      </p>
+      <p>
+        To make your attached image appear at upper left corner of the node with text wrapped around it, make your first line of 
+        content text be {{imgUpperLeft}}. Similarly, to make your image at upper right of the node enter `{{imgUpperRight}}` as the first line.
+      </p>
+      <h4>URL Previews</h4>
+      <p>
+      To disable preview rendering for URLs either prefix them with an asterisk or surround in parenthesis like the following:
+      <pre>
+      * https://somewhere.com
+      --or--
+      (https://somewhere.com)
+      </pre>
+      </p>
 

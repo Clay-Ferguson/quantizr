@@ -31,7 +31,6 @@ export class CollapsiblePanel extends Comp {
         let collapseClass = this.getState().expanded ? "expand" : "collapse";
 
         return this.e(this.elementName, {
-            style: { marginTop: "10px", marginBottom: "10px" },
             key: "panel_" + this.getId()
         },
             // This span is the expande/collapse button itself

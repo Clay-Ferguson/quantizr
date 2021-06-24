@@ -62,6 +62,11 @@ export class MenuPanel extends Div {
         S.nav.openContentNode("~" + J.NodeType.BOOKMARK_LIST);
     };
 
+    static continueEditing = () => {
+        let state = store.getState();
+        S.view.jumpToId(state.editNode.id);
+    };
+
     static openBlockedUsersNode = () => S.nav.openContentNode("~" + J.NodeType.BLOCKED_USERS);
     static openRSSFeedsNode = () => S.nav.openContentNode("~" + J.NodeType.RSS_FEEDS);
     static openPostsNode = () => S.nav.openContentNode("~" + J.NodeType.POSTS);
@@ -247,6 +252,7 @@ export class MenuPanel extends Div {
         ]));
 
         children.push(new Menu("Edit", [
+            state.editNode ? new MenuItem("Continue editing...", MenuPanel.continueEditing, !state.isAnonUser) : null, //
             new MenuItem("Clear Selections", S.meta64.clearSelNodes, !state.isAnonUser), //
 
             // new MenuItem("Cut", S.edit.cutSelNodes, () => { return !state.isAnonUser && selNodeCount > 0 && selNodeIsMine }), //

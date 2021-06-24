@@ -179,6 +179,7 @@ export class User implements UserIntf {
 
                 this.queryUserProfile(res.rootNode);
                 this.checkMessages();
+                S.meta64.loadBookmarks();
             }
 
             S.meta64.setStateVarsUsingLoginResponse(res);

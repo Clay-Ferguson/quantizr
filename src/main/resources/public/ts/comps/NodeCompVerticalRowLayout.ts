@@ -84,18 +84,19 @@ export class NodeCompVerticalRowLayout extends Div {
 
             if (this.level <= 1) {
                 // todo-1: this button should have same enabelement as "new" button, on the page root
-                let btn = new IconButton("fa-plus", null, {
-                    onClick: e => {
-                        if (lastNode) {
-                            S.edit.insertNode(lastNode.id, "u", 1 /* isFirst ? 0 : 1 */, state);
-                        }
-                        else {
-                            S.edit.newSubNode(null, state.node.id);
-                        }
-                    },
-                    title: "Insert new node"
-                }, "btn-secondary marginLeft marginTop");
-                comps.push(btn);
+                if (!state.editNode) {
+                    comps.push(new IconButton("fa-plus", null, {
+                        onClick: e => {
+                            if (lastNode) {
+                                S.edit.insertNode(lastNode.id, "u", 1 /* isFirst ? 0 : 1 */, state);
+                            }
+                            else {
+                                S.edit.newSubNode(null, state.node.id);
+                            }
+                        },
+                        title: "Insert new node"
+                    }, "btn-secondary marginLeft marginTop"));
+                }
 
                 if (lastNode) {
                     let userCanPaste = (S.props.isMine(lastNode, state) || state.isAdminUser) && lastNode.id !== state.homeNodeId;

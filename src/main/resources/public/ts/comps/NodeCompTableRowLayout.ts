@@ -109,17 +109,18 @@ export class NodeCompTableRowLayout extends Div {
 
             if (this.level <= 1) {
                 // todo-1: this button should have same enablement as "new" button, on the page root
-                let btn = new IconButton("fa-plus", null, {
-                    onClick: e => {
-                        if (lastNode) {
-                            S.edit.insertNode(lastNode.id, "u", 1 /* isFirst ? 0 : 1 */, state);
-                        } else {
-                            S.edit.newSubNode(null, state.node.id);
-                        }
-                    },
-                    title: "Insert new node"
-                }, "btn-secondary marginLeft marginTop");
-                children.push(btn);
+                if (!state.editNode) {
+                    children.push(new IconButton("fa-plus", null, {
+                        onClick: e => {
+                            if (lastNode) {
+                                S.edit.insertNode(lastNode.id, "u", 1 /* isFirst ? 0 : 1 */, state);
+                            } else {
+                                S.edit.newSubNode(null, state.node.id);
+                            }
+                        },
+                        title: "Insert new node"
+                    }, "btn-secondary marginLeft marginTop"));
+                }
 
                 let userCanPaste = (S.props.isMine(lastNode, state) || state.isAdminUser) && lastNode.id !== state.homeNodeId;
                 if (!!state.nodesToMove && userCanPaste) {

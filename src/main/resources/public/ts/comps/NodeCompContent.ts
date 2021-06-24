@@ -27,7 +27,7 @@ export class NodeCompContent extends Div {
         public imgSizeOverride?: string,
         public isTreeView?: boolean) {
         super(null, {
-            id: (idPrefix ? idPrefix : "c") + node.id
+            id: (idPrefix ? idPrefix : "n") + node.id
         });
     }
 
