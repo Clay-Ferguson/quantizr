@@ -21,6 +21,7 @@ import { Icon } from "../widget/Icon";
 import { IconButton } from "../widget/IconButton";
 import { Img } from "../widget/Img";
 import { Span } from "../widget/Span";
+import { Spinner } from "../widget/Spinner";
 import { TextContent } from "../widget/TextContent";
 import { TypeBase } from "./base/TypeBase";
 
@@ -115,10 +116,12 @@ export class RssTypeHandler extends TypeBase {
             });
         }
         else if (state.feedCache[feedSrcHash] === "loading") {
-            // todo-2: I tried to put "new Progress()" as a child but it doesn't render. never tried to troubleshoot.
-            return new Div("Loading Feeds...", {
-                className: "marginAll"
-            });
+            return new Div(null, null, [
+                new Heading(4, "Loading Feeds..."),
+                new Div(null, {
+                    className: "progressSpinner"
+                }, [new Spinner()])
+            ]);
         }
         /* if the feedCache doesn't contain either "failed" or "loading" then treat it like data and render it */
         else if (state.feedCache[feedSrcHash]) {

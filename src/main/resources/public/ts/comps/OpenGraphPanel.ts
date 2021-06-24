@@ -60,9 +60,12 @@ export class OpenGraphPanel extends Div {
         let state = this.getState();
         if (state.loading) {
             this.setChildren([
-                new Div(null, {
-                    className: "progressSpinner"
-                }, [new Spinner()])
+                // This spinner works fine, but I decided after using it, it's a better user experience to just not
+                // even indicate to the user that a link is attempting to have it's OpenGraph displayed. Just let it popup
+                // if ready, but if not the user sees a nice clean page regardlessl.
+                // new Div(null, {
+                //     className: "progressSpinner"
+                // }, [new Spinner()])
             ]);
             return;
         }

@@ -19,6 +19,7 @@ import { Div } from "../widget/Div";
 import { Heading } from "../widget/Heading";
 import { IconButton } from "../widget/IconButton";
 import { Span } from "../widget/Span";
+import { Spinner } from "../widget/Spinner";
 import { TextContent } from "../widget/TextContent";
 import { TextField } from "../widget/TextField";
 
@@ -104,7 +105,12 @@ export class FeedView extends AppTab {
         }
 
         if (state.feedLoading) {
-            children.push(new Heading(4, "Loading feed..."));
+            children.push(new Div(null, null, [
+                new Heading(4, "Loading Feed..."),
+                new Div(null, {
+                    className: "progressSpinner"
+                }, [new Spinner()])
+            ]));
         }
         else if (FeedView.refreshCounter === 0) {
             // if user has never done a refresh at all yet, do the first one for them automatically.

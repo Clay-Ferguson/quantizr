@@ -11,12 +11,13 @@ import { FullScreenCalendar } from "./FullScreenCalendar";
 import { FullScreenControlBar } from "./FullScreenControlBar";
 import { FullScreenGraphViewer } from "./FullScreenGraphViewer";
 import { FullScreenImgViewer } from "./FullScreenImgViewer";
+import { Heading } from "./Heading";
 import { IconButton } from "./IconButton";
 import { Img } from "./Img";
 import { LeftNavPanel } from "./LeftNavPanel";
 import { Main } from "./Main";
 import { RightNavPanel } from "./RightNavPanel";
-import { Span } from "./Span";
+import { Spinner } from "./Spinner";
 import { TabPanel } from "./TabPanel";
 
 let S: Singletons;
@@ -36,7 +37,12 @@ export class App extends Main {
         const state: AppState = useSelector((state: AppState) => state);
 
         if (!state.guiReady) {
-            this.setChildren([new Div("Loading...")]);
+            this.setChildren([
+                new Heading(4, "Loading App..."),
+                new Div(null, {
+                    className: "progressSpinner"
+                }, [new Spinner()])
+            ]);
             return;
         }
 
