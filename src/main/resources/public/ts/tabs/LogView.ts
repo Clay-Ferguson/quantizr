@@ -56,15 +56,15 @@ export class LogView extends AppTab implements LogViewIntf {
     open = (readOnly: boolean, userId: string): any => {
     }
 
-    close = (): void => {
-        // const state: AppState = store.getState();
-        // dispatch({
-        //     type: "Action_InitUserProfile",
-        //     state,
-        //     update: (s: AppState): void => {
-        //         s.activeTab = C.TAB_MAIN;
-        //         s.userProfile = null;
-        //     }
-        // });
-    }
+    // close(): void {
+    //     // const state: AppState = store.getState();
+    //     // dispatch({
+    //     //     type: "Action_InitUserProfile",
+    //     //     state,
+    //     //     update: (s: AppState): void => {
+    //     //         s.activeTab = C.TAB_MAIN;
+    //     //         s.userProfile = null;
+    //     //     }
+    //     // });
+    // }
 }

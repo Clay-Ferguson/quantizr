@@ -19,6 +19,7 @@ export class TabPanel extends Div {
 
 constructor(private customTopComp: CompIntf = null) {
         super(null, { id: C.ID_TAB, tabIndex: "-1" });
+        this.domAddEvent = this.domAddEvent.bind(this);
         const state: AppState = store.getState();
 
         if (state.mobileMode) {
@@ -73,7 +74,8 @@ constructor(private customTopComp: CompIntf = null) {
         }
     }
 
-    onAddEvent = (elm: HTMLElement): void => {
+    domAddEvent(): void {
+        let elm = this.attribs.ref.current;
         this.reScroll(elm);
 
         elm.addEventListener("scroll", () => {
@@ -81,6 +83,8 @@ constructor(private customTopComp: CompIntf = null) {
             S.meta64.lastScrollTime = new Date().getTime();
             S.meta64.scrollPosByTabName.set(S.meta64.activeTab, elm.scrollTop);
         }, { passive: true });
+
+        super.domAddEvent();
     }
 
     domPreUpdateEvent = (elm: HTMLElement): void => {

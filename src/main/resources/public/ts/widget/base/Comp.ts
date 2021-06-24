@@ -56,6 +56,9 @@ export abstract class Comp<S extends BaseCompState = any> implements CompIntf {
      * whatever reason we want to disable react rendering, and fall back on render-to-text approach
      */
     constructor(attribs?: any, private s?: State<S>) {
+        this.domAddEvent = this.domAddEvent.bind(this);
+        this.domRemoveEvent = this.domRemoveEvent.bind(this);
+
         if (!s) {
             this.s = new State<S>();
         }
@@ -230,7 +233,6 @@ export abstract class Comp<S extends BaseCompState = any> implements CompIntf {
     }
 
     wrapClickFunc = (obj: any) => {
-
         // Whenever we have a mouse click function which triggers a React Re-render cycle
         // react doesn't have the ability to maintain focus correctly, so we have this crutch
         // to help accomplish that. It's debatable whether this is a 'hack' or good code.
@@ -370,12 +372,7 @@ export abstract class Comp<S extends BaseCompState = any> implements CompIntf {
         let ret: ReactNode = null;
         try {
             this.s.useState();
-
-            if (!this._domAddEvent) {
-                this._domAddEvent = this.domAddEvent.bind(this);
-            }
-
-            useEffect(this._domAddEvent, []);
+            useEffect(this.domAddEvent, []);
 
             // This hook should work fine but just isn't needed yet.
             if (this.domUpdateEvent) {
@@ -398,11 +395,7 @@ export abstract class Comp<S extends BaseCompState = any> implements CompIntf {
             (NOTE: Remember this won't run for DialogBase because it's done using pure DOM Javascript, which is the same reason
             whenElmEx has to still exist right now)
             */
-            if (this.domRemoveEvent) {
-                useEffect(() => {
-                    return this.domRemoveEvent;
-                }, []);
-            }
+            useEffect(() => this.domRemoveEvent, []);
 
             this.updateVisAndEnablement();
 
@@ -428,16 +421,14 @@ export abstract class Comp<S extends BaseCompState = any> implements CompIntf {
         return ret;
     }
 
-    domRemoveEvent = null;
+    // todo-0: places like this need to be using standard inheritance.
     domUpdateEvent = null;
     domPreUpdateEvent = null;
 
-    _domAddEvent: () => void = null;
-    domAddEvent(): void {
-        if ((this as any).onAddEvent) {
-            (this as any).onAddEvent(this.attribs.ref.current);
-        }
+    public domRemoveEvent(): void {
+    }
 
+    public domAddEvent(): void {
         // console.log("domAddEvent: " + this.jsClassName);
 
         /* In order for a React Render to not loose focus (sometimes) we keep track of the last thing that

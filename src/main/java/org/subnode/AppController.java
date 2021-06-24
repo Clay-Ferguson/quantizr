@@ -480,6 +480,7 @@ public class AppController implements ErrorController {
 	 * directly from arbitrary servers
 	 * 
 	 * todo-2: need a 'useCache' url param option
+	 * Need something in the HEADER (auth token) to allow this to work. Disable otherwise (todo-0)
 	 */
 	@GetMapping(value = {"/proxyGet"})
 	public void proxyGet(@RequestParam(value = "url", required = true) String url, //

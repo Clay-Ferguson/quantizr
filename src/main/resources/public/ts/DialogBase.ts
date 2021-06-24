@@ -52,6 +52,8 @@ export abstract class DialogBase<S extends BaseCompState = any> extends Div<S> i
     */
     constructor(public title: string, private overrideClass: string, private closeByOutsideClick: boolean, appState: AppState, public mode: DialogMode = null) {
         super(null);
+        this.close = this.close.bind(this);
+
         this.appState = appState;
 
         // new on 3/14/2021 (MessageDlg sending null into here)
@@ -163,14 +165,7 @@ export abstract class DialogBase<S extends BaseCompState = any> extends Div<S> i
         }, 100);
     }
 
-    // todo-0: need to cleanup all places in Comp where
-    // we have some awkwardness about 'overriding' functions
-    // (or needing to) that are defined using arrow operator
-    onClose(): void {
-    }
-
-    public close = () => {
-        this.onClose();
+    public close(): void {
         if (this.mode === DialogMode.EMBED) {
             return;
         }

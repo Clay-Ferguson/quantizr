@@ -19,12 +19,14 @@ export class OpenGraphPanel extends Div {
             title: url,
             key
         });
+        this.domAddEvent = this.domAddEvent.bind(this);
 
         let og = S.meta64.openGraphData.get(url);
         this.mergeState({ og });
     }
 
-    onAddEvent = (elm: HTMLElement): void => {
+    domAddEvent(): void {
+        let elm = this.attribs.ref.current;
         let og = S.meta64.openGraphData.get(this.url);
         if (!og) {
             let observer = new IntersectionObserver(entries => {
@@ -51,6 +53,7 @@ export class OpenGraphPanel extends Div {
             });
             observer.observe(elm.parentElement);
         }
+        super.domAddEvent();
     }
 
     preRender(): void {

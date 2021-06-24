@@ -20,6 +20,7 @@ export class LeftNavPanel extends Div {
 
     constructor() {
         super(null, { id: C.ID_LHS, tabIndex: "-1" });
+        this.domAddEvent = this.domAddEvent.bind(this);
         let state: AppState = store.getState();
         let delta = state.mainPanelCols === 4 ? 1 : 0;
         this.attribs.className = "col-" + (C.leftNavPanelCols + delta) + " leftNavPanel customScrollbar";
@@ -108,6 +109,7 @@ export class LeftNavPanel extends Div {
     //             // }
     //         }
     //     });
+    //     super.domAddEvent();
     // }
 
 }

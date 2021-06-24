@@ -24,6 +24,8 @@ export class FullScreenGraphViewer extends Main {
 
     constructor(appState: AppState) {
         super();
+        this.domRemoveEvent = this.domRemoveEvent.bind(this);
+
         this.nodeId = appState.fullScreenGraphId;
         let node: J.NodeInfo = S.meta64.findNodeById(appState, this.nodeId);
 
@@ -290,7 +292,7 @@ export class FullScreenGraphViewer extends Main {
             .style("top", (y - 50) + "px");
     }
 
-    domRemoveEvent = () => {
+    domRemoveEvent(): void {
         this.stopSim();
     }
 

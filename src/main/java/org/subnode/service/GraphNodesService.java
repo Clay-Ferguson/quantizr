@@ -103,7 +103,6 @@ public class GraphNodesService {
 	}
 
 	private void processNodes(String rootPath, int rootLevel, HashMap<String, GraphNode> mapByPath) {
-
 		// get a collection to hold keys so we don't get concurrent modification
 		// exception when updating the map.
 		List<String> keys = new LinkedList<String>();
@@ -138,7 +137,6 @@ public class GraphNodesService {
 	}
 
 	public void ensureEnoughParents(String rootPath, int rootLevel, String path, HashMap<String, GraphNode> mapByPath) {
-
 		if (path == null || path.length() < 3)
 			return;
 

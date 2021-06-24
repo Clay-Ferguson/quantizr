@@ -171,8 +171,9 @@ public class AppFilter extends GenericFilterBean {
 			if (httpReq.getRequestURI().endsWith("/checkMessages") || //
 					httpReq.getRequestURI().endsWith("/getUserProfile") || //
 					httpReq.getRequestURI().endsWith("/getConfig") || //
-					httpReq.getRequestURI().endsWith("/getBookmarks") ||
-					httpReq.getRequestURI().endsWith("/login")) {
+					httpReq.getRequestURI().endsWith("/getBookmarks") || //
+					httpReq.getRequestURI().endsWith("/login") || //
+					httpReq.getRequestURI().endsWith("/proxyGet")) {
 				// these have priority
 			} else {
 				long wait = THROTTLE_INTERVAL - (curTime - info.getLastRequestTime());
