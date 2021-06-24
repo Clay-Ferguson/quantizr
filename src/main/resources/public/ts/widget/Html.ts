@@ -62,12 +62,16 @@ export class Html extends Comp {
         if (this.getChildren() && this.getChildren().length > 0) {
             console.error("dangerouslySetInnerHTML component had children. This is a bug: id=" + this.getId() + " constructor.name=" + this.constructor.name);
         }
+        this.attribs.dangerouslySetInnerHTML = { __html: this.getState().content };
+        return this.e("div", this.attribs);
 
         // ************* DO NOT DELETE. Method 1 and 2 both work, except #2 would need to be updated to
-        // enable the attribs!
+        // enable the attribs! These are the two older ways of parsing emojis. For now we're just letting
+        // the font itself do all the work, and don't need this.
         // METHOD 1:
-        this.attribs.dangerouslySetInnerHTML = { __html: S.render.parseEmojis(this.getState().content) };
-        return this.e("div", this.attribs);
+        // this.attribs.dangerouslySetInnerHTML = { __html: S.render.parseEmojis(this.getState().content) };
+        // return this.e("div", this.attribs);
+        //
         // METHOD 2: (note: You'll need to rename this file to '.tsx' extention to use JSX here)
         // return <div>{parseEmojisAndHtml(this.getState().content)}</div>;
     }
@@ -81,30 +85,29 @@ export class Html extends Comp {
 
         // todo-0: find similar calls like this to whenElm that now
         // can rely on 'elm' that from 'ref'
-        this.whenElm((elm) => {
-            if (MathJax && MathJax.typeset) {
-                // note: MathJax.typesetPromise(), also exists
-                MathJax.typeset([elm]);
+        if (MathJax && MathJax.typeset) {
+            // note: MathJax.typesetPromise(), also exists
+            MathJax.typeset([elm]);
 
-                S.util.forEachElmBySel("#" + this.getId() + " a", (el, i) => {
-                    let href = el.getAttribute("href");
+            S.util.forEachElmBySel("#" + this.getId() + " a", (el, i) => {
+                let href = el.getAttribute("href");
 
-                    // Detect this is a link to this instance we are being served from...
-                    if (href && href.indexOf && (href.indexOf("/") === 0 || href.indexOf(window.location.origin) !== -1)) {
-                        /* This code makes it where it where links to our own app that point to
-                        specific named locations on the tree will NOT open in separate browser tab but
-                        will open in the current browser tab as is the default without the 'target='
-                        attribute on an anchor tag. */
-                        if (href.indexOf("/app?id=:") !== -1 ||
-                            href.indexOf("/app?id=~") !== -1 ||
-                            href.indexOf("/app?tab=") !== -1) {
-                            return;
-                        }
+                // Detect this is a link to this instance we are being served from...
+                if (href && href.indexOf && (href.indexOf("/") === 0 || href.indexOf(window.location.origin) !== -1)) {
+                    /* This code makes it where it where links to our own app that point to
+                    specific named locations on the tree will NOT open in separate browser tab but
+                    will open in the current browser tab as is the default without the 'target='
+                    attribute on an anchor tag. */
+                    if (href.indexOf("/app?id=:") !== -1 ||
+                        href.indexOf("/app?id=~") !== -1 ||
+                        href.indexOf("/app?tab=") !== -1) {
+                        return;
                     }
-                    el.setAttribute("target", "_blank");
-                });
-            }
-        });
+                }
+                el.setAttribute("target", "_blank");
+            });
+        }
+
         super.domPreUpdateEvent();
     }
 }

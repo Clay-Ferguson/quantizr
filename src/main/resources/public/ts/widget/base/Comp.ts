@@ -374,21 +374,13 @@ export abstract class Comp<S extends BaseCompState = any> implements CompIntf {
         let ret: ReactNode = null;
         try {
             this.s.useState();
-            useEffect(this.domAddEvent, []);
-            useEffect(this.domUpdateEvent);
-
             this.attribs.ref = useRef(null);
 
-            // todo-0: I think this function wrapper is unneeded, has no effect.
+            useEffect(this.domAddEvent, []);
+            useEffect(this.domUpdateEvent);
             useLayoutEffect(this.domPreUpdateEvent);
             // this works too...
             // useLayoutEffect(() => this.domPreUpdateEvent(), []);
-
-            /*
-            This 'useEffect' call makes react call 'domRemoveEvent' once the dom element is removed from the acutal DOM.
-            (NOTE: Remember this won't run for DialogBase because it's done using pure DOM Javascript, which is the same reason
-            whenElmEx has to still exist right now)
-            */
             useEffect(() => this.domRemoveEvent, []);
 
             this.updateVisAndEnablement();
@@ -436,6 +428,8 @@ export abstract class Comp<S extends BaseCompState = any> implements CompIntf {
             S.util.focusElmById(Comp.focusElmId);
         }
 
+        // todo-0: look into completely removing the need for 'domAddFuncs' stuff now that we have a 'ref'
+        // that we can use to get the element from in a callback function on any component.
         if (this.domAddFuncs) {
             let elm: HTMLElement = this.getElement();
             if (!elm) {

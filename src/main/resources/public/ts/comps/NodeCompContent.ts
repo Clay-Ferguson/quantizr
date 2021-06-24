@@ -115,12 +115,8 @@ export class NodeCompContent extends Div {
 
     domPreUpdateEvent(): void {
         let elm = this.attribs.ref.current;
-
-        // todo-0: is domPreUpdateFunc still needed ? we have 'elm' here now.
         if (this.domPreUpdateFunc) {
-            // this.whenElm((elm) => {
-                this.domPreUpdateFunc(this);
-            // });
+            this.domPreUpdateFunc(this);
         }
         super.domPreUpdateEvent();
     }
