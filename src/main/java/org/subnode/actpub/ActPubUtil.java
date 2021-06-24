@@ -304,7 +304,7 @@ public class ActPubUtil {
                 apCache.actorsByUserName.put(userName, actor);
             }
         } catch (Exception e) {
-            // todo-0: eating this for now.
+            // todo-1: eating this for now.
         }
 
         // log.debug("Actor: " + XString.prettyPrint(actor));

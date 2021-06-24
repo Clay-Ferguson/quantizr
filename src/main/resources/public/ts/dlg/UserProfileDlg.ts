@@ -10,6 +10,7 @@ import { Anchor } from "../widget/Anchor";
 import { CompIntf } from "../widget/base/CompIntf";
 import { Button } from "../widget/Button";
 import { ButtonBar } from "../widget/ButtonBar";
+import { Clearfix } from "../widget/Clearfix";
 import { Div } from "../widget/Div";
 import { Heading } from "../widget/Heading";
 import { Html } from "../widget/Html";
@@ -106,6 +107,7 @@ export class UserProfileDlg extends DialogBase {
                             className: "followCount"
                         }) : null
                     ]),
+                    new Clearfix(),
 
                     this.readOnly
                         ? new Heading(4, state.userProfile.displayName || "")

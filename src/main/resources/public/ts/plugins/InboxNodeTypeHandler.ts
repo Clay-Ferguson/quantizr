@@ -7,6 +7,7 @@ import { Singletons } from "../Singletons";
 import { Comp } from "../widget/base/Comp";
 import { Button } from "../widget/Button";
 import { ButtonBar } from "../widget/ButtonBar";
+import { Clearfix } from "../widget/Clearfix";
 import { Div } from "../widget/Div";
 import { Heading } from "../widget/Heading";
 import { HorizontalLayout } from "../widget/HorizontalLayout";
@@ -51,7 +52,7 @@ export class InboxNodeTypeHandler extends TypeBase {
                     S.edit.clearInbox(state);
                 })
             ], null, "float-right marginBottom"),
-            new Div(null, { className: "clearfix" })
+            new Clearfix()
         ], "marginAll");
     }
 }

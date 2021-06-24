@@ -5,6 +5,7 @@ import { PubSub } from "../PubSub";
 import { Singletons } from "../Singletons";
 import { CompIntf } from "./base/CompIntf";
 import { Button } from "./Button";
+import { Clearfix } from "./Clearfix";
 import { Div } from "./Div";
 import { FullScreenCalendar } from "./FullScreenCalendar";
 import { FullScreenControlBar } from "./FullScreenControlBar";
@@ -46,7 +47,7 @@ export class App extends Main {
         if (fullScreenViewer) {
             this.setChildren([
                 !state.fullScreenCalendarId ? new FullScreenControlBar() : null,
-                new Div(null, { className: "clearfix" }),
+                new Clearfix(),
                 fullScreenViewer
             ]);
         }

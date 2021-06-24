@@ -7,6 +7,7 @@ import { TypeHandlerIntf } from "../intf/TypeHandlerIntf";
 import * as J from "../JavaIntf";
 import { PubSub } from "../PubSub";
 import { Singletons } from "../Singletons";
+import { Clearfix } from "../widget/Clearfix";
 import { Div } from "../widget/Div";
 import { Icon } from "../widget/Icon";
 import { IconButton } from "../widget/IconButton";
@@ -226,7 +227,7 @@ export class NodeCompRowHeader extends Div {
 
         if (floatUpperRightDiv.childrenExist()) {
             children.push(floatUpperRightDiv);
-            children.push(new Div(null, { className: "clearfix" }));
+            children.push(new Clearfix());
         }
 
         this.setChildren(children);

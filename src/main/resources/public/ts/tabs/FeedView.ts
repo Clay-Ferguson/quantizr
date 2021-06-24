@@ -12,6 +12,7 @@ import { Comp } from "../widget/base/Comp";
 import { Button } from "../widget/Button";
 import { ButtonBar } from "../widget/ButtonBar";
 import { Checkbox } from "../widget/Checkbox";
+import { Clearfix } from "../widget/Clearfix";
 import { CollapsibleHelpPanel } from "../widget/CollapsibleHelpPanel";
 import { CollapsiblePanel } from "../widget/CollapsiblePanel";
 import { Div } from "../widget/Div";
@@ -87,7 +88,7 @@ export class FeedView extends AppTab {
                 FeedView.filterExpanded = state;
             }, FeedView.filterExpanded, "", "", "span"));
 
-        children.push(new Div(null, { className: "clearfix" }));
+        children.push(new Clearfix());
 
         let helpPanel = new CollapsibleHelpPanel("Help", S.meta64.config.help.fediverse.feed,
             (state: boolean) => {

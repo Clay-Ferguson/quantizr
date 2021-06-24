@@ -7,6 +7,7 @@ import * as J from "../JavaIntf";
 import { PubSub } from "../PubSub";
 import { Singletons } from "../Singletons";
 import { CompIntf } from "../widget/base/CompIntf";
+import { Clearfix } from "../widget/Clearfix";
 import { Div } from "../widget/Div";
 import { IconButton } from "../widget/IconButton";
 import { NodeCompButtonBar } from "./NodeCompButtonBar";
@@ -75,10 +76,7 @@ export class NodeCompMainNode extends Div {
             this.setChildren([
                 header,
                 !state.inlineEditId ? new NodeCompButtonBar(node, false, 1, null, extraClass) : null,
-                new Div(null, {
-                    className: "clearfix",
-                    id: "button_bar_clearfix_" + node.id
-                }),
+                new Clearfix("bbcf_" + node.id),
                 jumpButton,
                 new NodeCompContent(node, false, true, null, null, this.imgSizeOverride, true),
                 new NodeCompRowFooter(node, false)

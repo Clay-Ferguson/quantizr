@@ -10,7 +10,8 @@ import org.slf4j.LoggerFactory;
  * being operated on in memory and make sure we point to THOSE in memory nodes, to avoid types of
  * dirty writes.
  * 
- * todo-0: need to review all this (thread locals dirtyNodes stuff)
+ * todo-0: need to review all this (thread locals dirtyNodes stuff), and also see if there's a cleaner way to build it
+ * directly into the MongoEventListener class
  */
 class NodeIterator implements Iterator<SubNode> {
     private static final Logger log = LoggerFactory.getLogger(NodeIterator.class);

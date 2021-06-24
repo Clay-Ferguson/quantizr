@@ -7,6 +7,7 @@ import { Singletons } from "../Singletons";
 import { Comp } from "../widget/base/Comp";
 import { Button } from "../widget/Button";
 import { ButtonBar } from "../widget/ButtonBar";
+import { Clearfix } from "../widget/Clearfix";
 import { Div } from "../widget/Div";
 import { Heading } from "../widget/Heading";
 import { TypeBase } from "./base/TypeBase";
@@ -37,7 +38,7 @@ export class RssFeedsTypeHandler extends TypeBase {
                     title: "Add a new RSS Feed Subscription"
                 })
             ], null, "float-right marginBottom"),
-            new Div(null, { className: "clearfix" })
+            new Clearfix()
 
             // todo-1: add help for this...
             // new CollapsibleHelpPanel("Help", S.meta64.config.help.type.friendsList.render,

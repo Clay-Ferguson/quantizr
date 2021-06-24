@@ -35,7 +35,7 @@ export class BlockedUsersTypeHandler extends TypeBase {
             //         title: "Add a new Friend (i.e. Follow someone)"
             //     })
             // ], null, "float-right marginBottom"),
-            // new Div(null, { className: "clearfix" }),
+            // new Clearfix(),
             // new CollapsibleHelpPanel("Help", S.meta64.config.help.type.friendsList.render,
             //     (state: boolean) => {
             //         FriendsListTypeHandler.helpExpanded = state;

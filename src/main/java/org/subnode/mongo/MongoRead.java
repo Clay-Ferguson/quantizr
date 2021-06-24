@@ -800,6 +800,7 @@ public class MongoRead {
     }
 
     // todo-0: can cache this by "USERNODE-user"
+    // todo-0: look for all places in this class where we can be looking up something with a custom cache key.
     public SubNode getUserNodeByUserName(MongoSession session, String user) {
         if (user == null) {
             user = ThreadLocals.getSessionContext().getUserName();

@@ -47,6 +47,7 @@ import { EmojiPickerDlg } from "./EmojiPickerDlg";
 import { UploadFromFileDropzoneDlg } from "./UploadFromFileDropzoneDlg";
 import { dispatch } from "../AppRedux";
 import { DialogMode } from "../enums/DialogMode";
+import { Clearfix } from "../widget/Clearfix";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
@@ -568,7 +569,7 @@ export class EditNodeDlg extends DialogBase {
         ]);
 
         this.propertyEditFieldContainer.setChildren([mainPropsTable, sharingSpan, binarySection, rightFloatButtons,
-            new Div(null, { className: "clearfix" })]);
+            new Clearfix()]);
         return children;
     }
 

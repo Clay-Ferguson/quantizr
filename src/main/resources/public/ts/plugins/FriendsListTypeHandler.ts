@@ -7,6 +7,7 @@ import { Singletons } from "../Singletons";
 import { Comp } from "../widget/base/Comp";
 import { Button } from "../widget/Button";
 import { ButtonBar } from "../widget/ButtonBar";
+import { Clearfix } from "../widget/Clearfix";
 import { CollapsibleHelpPanel } from "../widget/CollapsibleHelpPanel";
 import { Div } from "../widget/Div";
 import { Heading } from "../widget/Heading";
@@ -46,7 +47,7 @@ export class FriendsListTypeHandler extends TypeBase {
                     title: "Add a new Friend (i.e. Follow someone)"
                 })
             ], null, "float-right marginBottom"),
-            new Div(null, { className: "clearfix" }),
+            new Clearfix(),
             new CollapsibleHelpPanel("Help", S.meta64.config.help.type.friendsList.render,
                 (state: boolean) => {
                     FriendsListTypeHandler.helpExpanded = state;

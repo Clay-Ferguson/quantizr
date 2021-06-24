@@ -13,6 +13,7 @@ import { CompIntf } from "../widget/base/CompIntf";
 import { Button } from "../widget/Button";
 import { ButtonBar } from "../widget/ButtonBar";
 import { Checkbox } from "../widget/Checkbox";
+import { Clearfix } from "../widget/Clearfix";
 import { Div } from "../widget/Div";
 import { Heading } from "../widget/Heading";
 import { Html } from "../widget/Html";
@@ -524,7 +525,7 @@ export class RssTypeHandler extends TypeBase {
         children.push(new Div(null, { className: "float-right" }, [
             footerSpan, postIcon, linkIcon, bookmarkIcon
         ]));
-        children.push(new Div(null, { className: "clearfix" }));
+        children.push(new Clearfix());
 
         return new Div(null, { className: "rss-feed-item" }, children);
     }

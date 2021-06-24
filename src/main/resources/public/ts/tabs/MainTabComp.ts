@@ -10,6 +10,7 @@ import { Div } from "../widget/Div";
 import { Html } from "../widget/Html";
 import { NodeCompMainList } from "../comps/NodeCompMainList";
 import { NodeCompMainNode } from "../comps/NodeCompMainNode";
+import { Clearfix } from "../widget/Clearfix";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
@@ -54,7 +55,7 @@ export class MainTabComp extends AppTab {
             }, [
                 renderableCrumbs > 1 && !state.mobileMode ? new BreadcrumbsPanel() : null,
                 state.pageMessage ? new Html(state.pageMessage, { className: "alert alert-info float-right" }) : null,
-                state.pageMessage ? new Div(null, { className: "clearfix" }) : null,
+                state.pageMessage ? new Clearfix() : null,
                 new NodeCompMainNode(state, null),
                 new NodeCompMainList()
             ])

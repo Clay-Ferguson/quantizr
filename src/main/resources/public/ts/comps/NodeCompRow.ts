@@ -8,6 +8,7 @@ import { PubSub } from "../PubSub";
 import { Singletons } from "../Singletons";
 import { Comp } from "../widget/base/Comp";
 import { CompIntf } from "../widget/base/CompIntf";
+import { Clearfix } from "../widget/Clearfix";
 import { Div } from "../widget/Div";
 import { IconButton } from "../widget/IconButton";
 import { NodeCompButtonBar } from "./NodeCompButtonBar";
@@ -153,10 +154,7 @@ export class NodeCompRow extends Div {
             this.isTableCell ? null : insertInlineButton,
             header,
             buttonBar,
-            buttonBar ? new Div(null, {
-                className: "clearfix",
-                id: "button_bar_clearfix_" + node.id
-            }) : null,
+            buttonBar ? new Clearfix("button_bar_clearfix_" + node.id) : null,
             jumpButton,
             new NodeCompContent(node, true, true, null, null, this.imgSizeOverride, true),
             this.allowHeaders ? new NodeCompRowFooter(node, false) : null

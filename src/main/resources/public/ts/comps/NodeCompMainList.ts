@@ -6,6 +6,7 @@ import { PubSub } from "../PubSub";
 import { Singletons } from "../Singletons";
 import { Comp } from "../widget/base/Comp";
 import { ButtonBar } from "../widget/ButtonBar";
+import { Clearfix } from "../widget/Clearfix";
 import { Div } from "../widget/Div";
 import { IconButton } from "../widget/IconButton";
 
@@ -79,7 +80,7 @@ export class NodeCompMainList extends Div {
 
         if (firstButton || prevButton || nextButton) {
             children.push(new ButtonBar([firstButton, prevButton, nextButton], "text-center " + moreClasses));
-            children.push(new Div(null, { className: "clearfix" }));
+            children.push(new Clearfix());
         }
     }
 }

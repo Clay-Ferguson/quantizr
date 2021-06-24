@@ -432,7 +432,9 @@ public class NodeEditService {
 			}
 
 			// todo-0: this was an ugly quick and dirty way to reject duplicate friend adds. Need to accomplish
-			// this with some kind of genuine unique constraint.
+			// this with some kind of genuine unique constraint. Worst case scenario we can just have a single collection
+			// and then put a constraint on it, because lots of stuff will exist as a unique list like this, including
+			// the UserName? cache we already have (queued crawled users)
 			Iterable<SubNode> friendNodes =
 					read.findSubNodesByProp(session, node.getParentPath(), NodeProp.USER.s(), friendUserName);
 
