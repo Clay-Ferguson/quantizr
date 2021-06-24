@@ -652,18 +652,20 @@ export class Meta64 implements Meta64Intf {
                     isVisible: () => true,
                     constructView: (data: TabDataIntf) => new TrendingView(data),
                     rsInfo: new TrendingRSInfo()
-                },
-                {
-                    name: "Log",
-                    id: C.TAB_LOG,
-                    isVisible: () => {
-                        // this function needs to get the state itself.
-                        let state = store.getState();
-                        return state.isAdminUser;
-                    },
-                    constructView: (data: TabDataIntf) => new LogView(data),
-                    rsInfo: null
                 }
+
+                // this is throwing a react error, but I'm not need to fix it yet.
+                // {
+                //     name: "Log",
+                //     id: C.TAB_LOG,
+                //     isVisible: () => {
+                //         // this function needs to get the state itself.
+                //         let state = store.getState();
+                //         return state.isAdminUser;
+                //     },
+                //     constructView: (data: TabDataIntf) => new LogView(data),
+                //     rsInfo: null
+                // }
             ];
             return s;
         });
