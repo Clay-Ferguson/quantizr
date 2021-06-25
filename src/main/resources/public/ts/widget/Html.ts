@@ -81,9 +81,6 @@ export class Html extends Comp {
     */
     domPreUpdateEvent(): void {
         let elm = this.attribs.ref.current;
-
-        // todo-0: find similar calls like this to whenElm that now
-        // can rely on 'elm' that from 'ref'
         if (MathJax && MathJax.typeset) {
             // note: MathJax.typesetPromise(), also exists
             MathJax.typeset([elm]);

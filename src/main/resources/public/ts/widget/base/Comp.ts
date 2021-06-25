@@ -43,7 +43,7 @@ export abstract class Comp<S extends BaseCompState = any> implements CompIntf {
     jsClassName: string;
     clazz: string;
 
-    // holds queue of functions to be ran once this component is rendered.
+    // holds queue of functions to be ran once this component exists in the DOM.
     domAddFuncs: ((elm: HTMLElement) => void)[];
 
     renderRawHtml: boolean = false;
@@ -92,13 +92,14 @@ export abstract class Comp<S extends BaseCompState = any> implements CompIntf {
     /* Warning: Under lots of circumstances it's better to call util.getElm rather than getElement() because getElement returns
     null unless the element is already created and rendered onto the DOM */
     getElement(): HTMLElement {
+        return <HTMLElement>this.attribs.ref;
         // DO NOT DELETE
         // if (this.ref && this.ref.current) {
         //     // console.log("***** got element from ref! " + this.jsClassName);
         //     return this.ref.current;
         // }
         // console.log("*** getting element from old-school dom call.");
-        return <HTMLElement>document.getElementById(this.getId());
+        // return <HTMLElement>document.getElementById(this.getId());
     }
 
     // This is the original implementation of whenElm which uses a timer to wait for the element to come into existence

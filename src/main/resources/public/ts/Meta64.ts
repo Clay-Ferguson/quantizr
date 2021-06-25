@@ -39,7 +39,7 @@ export class Meta64 implements Meta64Intf {
 
     config: any;
     mainMenu: MainMenuDlg;
-    hiddenRenderingEnabled: boolean = false;
+    hiddenRenderingEnabled: boolean = true;
     noScrollToId: string = null;
     addFriendPending: boolean = false;
     activeTab: string;

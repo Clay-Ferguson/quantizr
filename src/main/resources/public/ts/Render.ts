@@ -394,16 +394,6 @@ export class Render implements RenderIntf {
                         s.endReached = res.endReached;
                         s.breadcrumbs = res.breadcrumbs;
 
-                        /* todo-1: A hack to make anyone comming to the lobby have their metata option turned on */
-                        if (s.node.name === "lounge") {
-                            s.userPreferences.showMetaData = true;
-
-                            /* if a logged in user turn on their edit mode too */
-                            if (!s.isAnonUser) {
-                                s.userPreferences.editMode = true;
-                            }
-                        }
-
                         /* Another slight hack to make viewing 'posts' node turn on metaData */
                         if (s.node.type === J.NodeType.POSTS) {
                             s.userPreferences.showMetaData = true;
