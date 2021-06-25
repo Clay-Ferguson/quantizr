@@ -36,7 +36,9 @@ export abstract class Comp<S extends BaseCompState = any> implements CompIntf {
 
     attribs: any;
 
-    /* Note: NULL elements are allowed in this array and simply don't render anything, and are required to be tolerated and ignored */
+    /* Note: NULL elements are allowed in this array and simply don't render anything, and are required to be tolerated and ignored 
+    WARNING: TypeScript is NOT enforcing that children be private here.
+    */
     private children: CompIntf[];
 
     logEnablementLogic: boolean = true;
@@ -65,6 +67,13 @@ export abstract class Comp<S extends BaseCompState = any> implements CompIntf {
             this.s = new State<S>();
         }
         this.attribs = attribs || {};
+
+        // todo-0
+        // need to carefully find ALL references to this and make them
+        // to thru accessor so we lazy create this array, but be careful
+        // because setting the member 'private' to see where it's used
+        // DID NOT WORK. TypeScript compiler is failing to enforce the 'private' accessor
+        this.children = [];
 
         /* If an ID was specifically provided, then use it, or else generate one */
         let id = this.attribs.id || ("c" + Comp.nextGuid().toString(16));

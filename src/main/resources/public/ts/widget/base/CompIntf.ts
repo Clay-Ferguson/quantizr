@@ -1,5 +1,4 @@
 import { ReactNode } from "react";
-import { AppState } from "../../AppState";
 
 export type ReactRenderFunc = (type: any, props: any, children: React.ReactNode[]) => React.ReactNode;
 
