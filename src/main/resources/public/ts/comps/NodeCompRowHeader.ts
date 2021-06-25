@@ -225,7 +225,7 @@ export class NodeCompRowHeader extends Div {
             ]));
         }
 
-        if (floatUpperRightDiv.childrenExist()) {
+        if (floatUpperRightDiv.hasChildren()) {
             children.push(floatUpperRightDiv);
             children.push(new Clearfix());
         }

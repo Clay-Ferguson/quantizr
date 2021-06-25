@@ -27,9 +27,10 @@ export interface CompIntf {
     compRender(): ReactNode;
     forceRender(): void;
     addChild(comp: CompIntf): void;
-    childrenExist(): boolean;
+    hasChildren(): boolean;
     setChildren(comps: CompIntf[]): void;
     getChildren(): CompIntf[];
+    safeGetChildren(): CompIntf[];
     _render(): ReactNode;
     domUpdateEvent: Function;
 }

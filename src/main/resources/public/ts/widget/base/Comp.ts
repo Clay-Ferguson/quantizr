@@ -65,7 +65,6 @@ export abstract class Comp<S extends BaseCompState = any> implements CompIntf {
             this.s = new State<S>();
         }
         this.attribs = attribs || {};
-        this.children = [];
 
         /* If an ID was specifically provided, then use it, or else generate one */
         let id = this.attribs.id || ("c" + Comp.nextGuid().toString(16));
@@ -80,12 +79,6 @@ export abstract class Comp<S extends BaseCompState = any> implements CompIntf {
             this.attribs.key = id;
         }
         this.jsClassName = this.constructor.name + "_" + id;
-    }
-
-    /* Returns true if there are any non-null children */
-    childrenExist(): boolean {
-        if (this.children == null || this.children.length === 0) return false;
-        return this.children.some(child => !!child);
     }
 
     static nextGuid(): number {
@@ -159,26 +152,41 @@ export abstract class Comp<S extends BaseCompState = any> implements CompIntf {
     addChild(comp: CompIntf): void {
         if (!comp) return;
         if (!this.children) {
-            this.children = [];
+            this.children = [comp];
         }
-        this.children.push(comp);
+        else {
+            this.children.push(comp);
+        }
     }
 
     addChildren(comps: Comp[]): void {
+        if (comps == null || comps.length === 0) return;
         if (!this.children) {
-            this.children = [];
+            this.children = [...comps];
         }
-        this.children.push.apply(this.children, comps);
+        else {
+            this.children.push.apply(this.children, comps);
+        }
+    }
+
+    /* Returns true if there are any non-null children */
+    hasChildren(): boolean {
+        if (this.children == null || this.children.length === 0) return false;
+        return this.children.some(child => !!child);
     }
 
     setChildren(comps: CompIntf[]) {
-        this.children = comps || [];
+        this.children = comps;
     }
 
-    getChildren(): CompIntf[] {
+    safeGetChildren(): CompIntf[] {
         if (!this.children) {
             this.children = [];
         }
+        return this.children;
+    }
+
+    getChildren(): CompIntf[] {
         return this.children;
     }
 
@@ -188,7 +196,6 @@ export abstract class Comp<S extends BaseCompState = any> implements CompIntf {
 
     renderHtmlElm(elm: ReactElement): string {
         return renderToString(elm);
-        // return renderToStaticMarkup(elm);
     }
 
     reactRenderHtmlInDiv(): string {
@@ -215,7 +222,7 @@ export abstract class Comp<S extends BaseCompState = any> implements CompIntf {
         //     throw new Error("Attempted to treat non-react component as react: " + this.constructor.name);
         // }
         S.util.getElm(id, (elm: HTMLElement) => {
-            // See #RulesOfHooks in this file, for the reason we blowaway the existing element to force a rebuild.
+            // See #RulesOfHooks in this file, for the reason we blow away the existing element to force a rebuild.
             ReactDOM.unmountComponentAtNode(elm);
 
             (this._render as any).displayName = this.jsClassName;
@@ -235,9 +242,9 @@ export abstract class Comp<S extends BaseCompState = any> implements CompIntf {
     }
 
     wrapClickFunc = (obj: any) => {
-        // Whenever we have a mouse click function which triggers a React Re-render cycle
-        // react doesn't have the ability to maintain focus correctly, so we have this crutch
-        // to help accomplish that. It's debatable whether this is a 'hack' or good code.
+        /* Whenever we have a mouse click function which triggers a React Re-render cycle
+         react doesn't have the ability to maintain focus correctly, so we have this crutch
+         to help accomplish that. It's debatable whether this is a 'hack' or good code. */
         if (obj && obj.onClick) {
             let func = obj.onClick;
 
@@ -389,7 +396,7 @@ export abstract class Comp<S extends BaseCompState = any> implements CompIntf {
             which hooks get called at each render cycle, so if we bypass the preRender because we wont' be using
             the children it generates, react will still throw an error becasue the calls to those hooks will not have been made.
 
-            DO NOT DELETE THE COMMENTNED IF BELOW (it serves as warning of what NOT to do.)
+            DO NOT DELETE THE COMMENTED IF BELOW (it serves as warning of what NOT to do.)
             */
             this.preRender();
 
@@ -403,7 +410,6 @@ export abstract class Comp<S extends BaseCompState = any> implements CompIntf {
         catch (e) {
             console.error("Failed to render child (in render method)" + this.jsClassName + " attribs.key=" + this.attribs.key + "\nError: " + e);
         }
-
         return ret;
     }
 

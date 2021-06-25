@@ -22,7 +22,6 @@ export class PieChart extends Div {
     }
 
     domPreUpdateEvent(): void {
-        // let elm = this.attribs.ref.current;
         // console.log("domPreUpdateEvent: " + S.util.prettyPrint(this.data));
         let state = this.getState();
 

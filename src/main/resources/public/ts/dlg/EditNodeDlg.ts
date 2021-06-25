@@ -57,7 +57,6 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
 export class EditNodeDlg extends DialogBase {
 
     static embedInstance: EditNodeDlg;
-
     static helpExpanded: boolean = false;
     editorHelp: string = null;
     header: Header;
@@ -65,7 +64,6 @@ export class EditNodeDlg extends DialogBase {
     uploadButton: Button;
     deleteUploadButton: Button;
     deletePropButton: Button;
-
     contentEditor: I.TextEditorIntf;
     contentEditorState: ValidatedState<any> = new ValidatedState<any>();
     nameState: ValidatedState<any> = new ValidatedState<any>();
@@ -303,7 +301,6 @@ export class EditNodeDlg extends DialogBase {
                 }
             }));
         }
-
         return span;
     }
 
@@ -330,7 +327,6 @@ export class EditNodeDlg extends DialogBase {
                 className: "fa fa-lock fa-lg iconMarginLeft"
             }));
         }
-
         return comps;
     }
 
@@ -467,7 +463,7 @@ export class EditNodeDlg extends DialogBase {
                 this.deletePropButton.setEnabled(false);
 
                 // adds the button bar to the top of the list of children.
-                propsParent.getChildren().unshift(propsButtonBar);
+                propsParent.safeGetChildren().unshift(propsButtonBar);
             }
         }
 
@@ -546,7 +542,7 @@ export class EditNodeDlg extends DialogBase {
             }, EditNodeDlg.helpExpanded, "span") : null;
 
         // if this props table would be empty don't display it (set to null)
-        if (propsTable && !propsTable.childrenExist()) {
+        if (propsTable && !propsTable.hasChildren()) {
             propsTable = null;
         }
 
@@ -996,9 +992,7 @@ export class EditNodeDlg extends DialogBase {
         let tableRow = new EditPropsTableRow();
         let allowEditAllProps: boolean = this.appState.isAdminUser;
         let isReadOnly = S.render.isReadOnlyProperty(propEntry.name);
-
         let formGroup = new FormGroup();
-
         let label = typeHandler ? typeHandler.getEditLabelForProp(propEntry.name) : propEntry.name;
         // console.log("making single prop editor: prop[" + propEntry.name + "] val[" + propEntry.value + "]");
 
@@ -1071,7 +1065,6 @@ export class EditNodeDlg extends DialogBase {
 
             formGroup.addChild(valEditor as any as Comp);
         }
-
         tableRow.addChildren([formGroup]);
         return tableRow;
     }
@@ -1152,7 +1145,6 @@ export class EditNodeDlg extends DialogBase {
                 this.contentEditor.focus();
             }
         }
-
         formGroup.addChild(this.contentEditor as any as Comp);
         return formGroup;
     }
@@ -1187,7 +1179,6 @@ export class EditNodeDlg extends DialogBase {
         });
 
         S.speech.toggleActive();
-
         this.mergeState({ state: this.getState() });
 
         setTimeout(() => {

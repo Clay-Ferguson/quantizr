@@ -309,12 +309,12 @@ export class NodeCompButtonBar extends Div {
 
             navButtonBar = new ButtonBar([searchButton, timelineButton, upLevelButton, prevButton, nextButton],
                 null, "float-right marginBottom");
-            if (!navButtonBar.childrenExist()) {
+            if (!navButtonBar.hasChildren()) {
                 navButtonBar = null;
             }
         }
 
-        if (buttonBar && !buttonBar.childrenExist()) {
+        if (buttonBar && !buttonBar.hasChildren()) {
             buttonBar = null;
         }
 

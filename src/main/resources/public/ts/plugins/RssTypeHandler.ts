@@ -186,7 +186,7 @@ export class RssTypeHandler extends TypeBase {
             page = 1;
         }
 
-        itemListContainer.getChildren().push(new Checkbox("Headlines Only", {
+        itemListContainer.safeGetChildren().push(new Checkbox("Headlines Only", {
             className: "float-right"
         }, {
             setValue: (checked: boolean): void => {
@@ -200,7 +200,7 @@ export class RssTypeHandler extends TypeBase {
             }
         }));
 
-        itemListContainer.getChildren().push(this.makeNavButtonBar(page, feedSrcHash, state));
+        itemListContainer.safeGetChildren().push(this.makeNavButtonBar(page, feedSrcHash, state));
 
         /* Main Feed Image */
         if (feed.image) {
@@ -251,14 +251,14 @@ export class RssTypeHandler extends TypeBase {
         }
 
         let feedOutDiv = new Div(null, { className: "marginBottom" }, feedOut);
-        itemListContainer.getChildren().push(feedOutDiv);
+        itemListContainer.safeGetChildren().push(feedOutDiv);
 
         for (let item of feed.items) {
             // console.log("FEED ITEM: " + S.util.prettyPrint(item));
-            itemListContainer.getChildren().push(this.buildFeedItem(feed, item, state));
+            itemListContainer.safeGetChildren().push(this.buildFeedItem(feed, item, state));
         }
 
-        itemListContainer.getChildren().push(this.makeNavButtonBar(page, feedSrcHash, state));
+        itemListContainer.safeGetChildren().push(this.makeNavButtonBar(page, feedSrcHash, state));
     }
 
     makeNavButtonBar = (page: number, feedSrcHash: string, state: AppState): ButtonBar => {

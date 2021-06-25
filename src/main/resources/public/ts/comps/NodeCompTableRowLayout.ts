@@ -86,7 +86,8 @@ export class NodeCompTableRowLayout extends Div {
                         maxWidth: cellWidth + "%"
                     }
                 }, comps);
-                curRow.getChildren().push(curCol);
+
+                curRow.safeGetChildren().push(curCol);
 
                 if (++curCols === maxCols) {
                     children.push(curRow);

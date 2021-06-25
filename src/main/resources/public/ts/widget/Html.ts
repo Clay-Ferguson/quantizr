@@ -46,7 +46,6 @@ declare var MathJax;
 // };
 
 export class Html extends Comp {
-
     constructor(content: string = "", attribs: Object = {}, initialChildren: CompIntf[] = null) {
         super(attribs);
         this.domPreUpdateEvent = this.domPreUpdateEvent.bind(this);
@@ -59,7 +58,7 @@ export class Html extends Comp {
     }
 
     compRender(): React.ReactNode {
-        if (this.getChildren() && this.getChildren().length > 0) {
+        if (this.hasChildren()) {
             console.error("dangerouslySetInnerHTML component had children. This is a bug: id=" + this.getId() + " constructor.name=" + this.constructor.name);
         }
         this.attribs.dangerouslySetInnerHTML = { __html: this.getState().content };
@@ -107,7 +106,6 @@ export class Html extends Comp {
                 el.setAttribute("target", "_blank");
             });
         }
-
         super.domPreUpdateEvent();
     }
 }

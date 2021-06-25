@@ -112,9 +112,9 @@ export class TrendingView extends AppTab {
             // this should be correct data but we don't need it here.
             // new TextContent(res.stats, null, false),
 
-            tagPanel.childrenExist() ? tagPanel : null,
-            mentionPanel && mentionPanel.childrenExist() ? mentionPanel : null,
-            wordPanel.childrenExist() ? wordPanel : null
+            tagPanel.hasChildren() ? tagPanel : null,
+            mentionPanel && mentionPanel.hasChildren() ? mentionPanel : null,
+            wordPanel.hasChildren() ? wordPanel : null
         ]);
     }
 

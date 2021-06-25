@@ -67,9 +67,9 @@ export class NodeStatsDlg extends DialogBase {
 
         return [
             this.trending ? null : new TextContent(this.res.stats, null, false),
-            tagPanel.childrenExist() ? tagPanel : null,
-            mentionPanel && mentionPanel.childrenExist() ? mentionPanel : null,
-            wordPanel.childrenExist() ? wordPanel : null,
+            tagPanel.hasChildren() ? tagPanel : null,
+            mentionPanel && mentionPanel.hasChildren() ? mentionPanel : null,
+            wordPanel.hasChildren() ? wordPanel : null,
 
             new CollapsibleHelpPanel("Help: About Node Stats", S.meta64.config.help.nodeStats.dialog,
                 (state: boolean) => {
