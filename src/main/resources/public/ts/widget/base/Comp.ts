@@ -36,7 +36,7 @@ export abstract class Comp<S extends BaseCompState = any> implements CompIntf {
 
     attribs: any;
 
-    /* Note: NULL elements are allowed in this array and simply don't render anything, and are required to be tolerated and ignored 
+    /* Note: NULL elements are allowed in this array and simply don't render anything, and are required to be tolerated and ignored
     WARNING: TypeScript is NOT enforcing that children be private here.
     */
     private children: CompIntf[];
