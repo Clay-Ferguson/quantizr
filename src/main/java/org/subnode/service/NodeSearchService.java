@@ -131,11 +131,11 @@ public class NodeSearchService {
 		}
 		// othwerwise we're searching all node properties
 		else {
-			/* 
-			USER Search
-
-			If we're searching just for users do this. 
-			*/
+			/*
+			 * USER Search
+			 * 
+			 * If we're searching just for users do this.
+			 */
 			if (!StringUtils.isEmpty(req.getUserSearchType())) {
 
 				TextCriteria textCriteria = null;
