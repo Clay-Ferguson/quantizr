@@ -10,14 +10,16 @@ import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
-
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.GenericFilterBean;
 import org.subnode.model.IPInfo;
+import org.subnode.model.client.PrincipalName;
 import org.subnode.mongo.MongoRepository;
 import org.subnode.mongo.MongoThreadLocal;
 import org.subnode.util.ThreadLocals;
@@ -28,6 +30,7 @@ import org.subnode.util.XString;
  * This is Web Filter to measure basic application statistics (number of users, etc)
  */
 @Component
+@Order(2)
 public class AppFilter extends GenericFilterBean {
 	private static final Logger log = LoggerFactory.getLogger(AppFilter.class);
 	private static final HashMap<String, Integer> uniqueIpHits = new HashMap<>();
@@ -36,7 +39,7 @@ public class AppFilter extends GenericFilterBean {
 	private static boolean logResponses = false;
 
 	@Autowired
-	private SessionContext sessionContext;
+	private SessionContext sc;
 
 	@Autowired
 	private AppProp appProp;
@@ -74,6 +77,32 @@ public class AppFilter extends GenericFilterBean {
 			HttpServletRequest httpReq = null;
 			if (req instanceof HttpServletRequest) {
 				httpReq = (HttpServletRequest) req;
+				String bearer = httpReq.getHeader("Bearer");
+
+				// if auth token is privided and doesn't exist that's a timeout session so send user
+				// back to welcome page. Should also blow away all browser memory. New browser page load.
+				if (!StringUtils.isEmpty(bearer) && !SessionContext.validToken(bearer, null)) {
+					//just ignore an invalid token like it was not there.
+					log.debug("Ignoring obsolete bearer token.");
+					bearer = null;
+					sc.setUserName(PrincipalName.ANON.s());
+
+					// this redirect would only apply to an HTML page request, but we have a lot of REST/ajax where
+					// this redirect would not make sense.
+					// log.debug("Bad or timed out token. Redirecting to land page.");
+					// ((HttpServletResponse)res).sendRedirect("/app");
+					// return;
+				}
+
+				// if no bearer is given, and no userName is set, then set to ANON
+				if (bearer == null && sc.getUserName() == null) {
+					sc.setUserName(PrincipalName.ANON.s());
+				}
+
+				if (isSecurePath(httpReq.getRequestURI())) {
+					checkApiSecurity(bearer, httpReq);
+				}
+
 				HttpServletResponse httpRes = (HttpServletResponse) res;
 				ip = getClientIpAddr(httpReq);
 
@@ -89,7 +118,7 @@ public class AppFilter extends GenericFilterBean {
 					session = httpReq.getSession(true);
 				}
 				ThreadLocals.setHttpSession(session);
-				ThreadLocals.setSessionContext(sessionContext);
+				ThreadLocals.setSessionContext(sc);
 				String queryString = httpReq.getQueryString();
 
 				if (simulateSlowServer > 0 && httpReq.getRequestURI().contains("/mobile/api/")) {
@@ -268,5 +297,38 @@ public class AppFilter extends GenericFilterBean {
 
 	public static HashMap<String, Integer> getUniqueIpHits() {
 		return uniqueIpHits;
+	}
+
+	/*
+	 * Secure path check requires a non-anonymous user to be on this session and also already
+	 * authenticated
+	 */
+	private void checkApiSecurity(String bearer, HttpServletRequest req) {
+		// otherwise require secure header
+		if (bearer == null) {
+			throw new RuntimeException("Auth failed. no bearer token.");
+		}
+
+		if (!SessionContext.validToken(bearer, sc.getUserName())) {
+			throw new RuntimeException("Auth failed. Invalid bearer token: " + bearer);
+		} else {
+			// log.debug("Bearer accepted: " + bearer);
+		}
+	}
+
+	private boolean isSecurePath(String path) {
+		if (path.contains("/mobile/api/login") || //
+				path.contains("/mobile/api/changePassword") || //
+				path.contains("/mobile/api/getConfig") || //
+				path.contains("/mobile/api/serverPush") || //
+				path.contains("/mobile/api/renderNode") || //
+				path.contains("/mobile/api/bin") || //
+				path.contains("/mobile/api/getUserProfile") || //
+				path.contains("/mobile/api/nodeFeed") || //
+				path.contains("/mobile/api/getUserAccountInfo") || //
+				path.contains("/mobile/api/anonPageLoad")) {
+			return false;
+		}
+		return path.contains("/mobile/api/");
 	}
 }

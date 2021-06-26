@@ -98,6 +98,7 @@ export class LoginDlg extends DialogBase {
                 tzOffset: new Date().getTimezoneOffset(),
                 dst: S.util.daylightSavingsTime
             }, (res: J.LoginResponse) => {
+                S.meta64.authToken = res.authToken;
                 S.user.loginResponse(res, usr, pwd, true, this.appState);
                 this.close();
             });

@@ -32,7 +32,7 @@ export interface Meta64Intf {
 
     /* doesn't need to be in state */
     userName: string;
-    password: string;
+    authToken: string;
 
     // realtime state always holds true if CTRL key is down
     ctrlKey: boolean;
@@ -81,4 +81,5 @@ export interface Meta64Intf {
     loadBookmarks(): void;
     nodeIdIsVisible(node: J.NodeInfo, nodeId: string, parentPath: string, state: AppState): boolean;
     getDisplayingNode(state: AppState, nodeId: string): J.NodeInfo;
+    clearLastNodeIds(): void;
 }

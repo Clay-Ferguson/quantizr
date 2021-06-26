@@ -46,6 +46,7 @@ export class View implements ViewIntf {
             offset = firstChild ? firstChild.logicalOrdinal : 0;
         }
 
+        // console.log("refreshTree: nodeId=" + nodeId);
         S.util.ajax<J.RenderNodeRequest, J.RenderNodeResponse>("renderNode", {
             nodeId,
             upLevel: false,
@@ -57,7 +58,11 @@ export class View implements ViewIntf {
             singleNode: false
         }, async (res: J.RenderNodeResponse) => {
             S.render.renderPageFromData(res, false, highlightId, setTab, allowScroll);
-        });
+        }, // fail callback
+            (res: string) => {
+                S.meta64.clearLastNodeIds();
+                S.nav.navHome(state);
+            });
     }
 
     firstPage = (state: AppState): void => {
@@ -91,6 +96,7 @@ export class View implements ViewIntf {
     }
 
     private loadPage = (goToLastPage: boolean, offset: number, state: AppState): void => {
+        // console.log("loadPage nodeId=" + state.node.id);
         S.util.ajax<J.RenderNodeRequest, J.RenderNodeResponse>("renderNode", {
             nodeId: state.node.id,
             upLevel: false,
@@ -102,7 +108,12 @@ export class View implements ViewIntf {
             singleNode: false
         }, async (res: J.RenderNodeResponse) => {
             S.render.renderPageFromData(res, true, null, true, true);
-        });
+        },
+            // fail callback
+            (res: string) => {
+                S.meta64.clearLastNodeIds();
+                S.nav.navHome(state);
+            });
     }
 
     // todo-2: need to add logic to detect if this is root node on the page, and if so, we consider the first child the target

@@ -1,37 +1,26 @@
 package org.subnode.mongo;
 
-import org.subnode.model.client.NodeProp;
-import org.subnode.model.client.PrincipalName;
-import org.subnode.mongo.model.SubNode;
-import org.subnode.util.Const;
+import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.subnode.model.client.PrincipalName;
 
-/* We should make this object accessible from thread-local, so we can eliminate the 100s of places in the code
-where we pass this value from function to function endlessly */
 public class MongoSession {
-	private static final Logger log = LoggerFactory.getLogger(SubNode.class);
+	private static final Logger log = LoggerFactory.getLogger(MongoSession.class);
 
 	private String userName;
-	private SubNode userNode;
+	private ObjectId userNodeId;
 
 	// tiny bit of a hack to detect and avoid recursion in the saveSession
 	// Since it's very simple and reliable I'm going with this.
 	public boolean saving = false;
 
-	private MongoSession() {
+	public MongoSession() {
+		userName = PrincipalName.ANON.s();
 	}
 
-	public static MongoSession createFromUser(String user) {
-		MongoSession session = new MongoSession();
-		session.setUserName(user);
-		return session;
-	}
-
-	public static MongoSession createFromNode(SubNode userNode) {
-		MongoSession session = new MongoSession();
-		session.setUserNode(userNode);
-		return session;
+	public MongoSession(String userName) {
+		this.userName = userName;
 	}
 
 	public boolean isAdmin() {
@@ -39,7 +28,7 @@ public class MongoSession {
 	}
 
 	public boolean isAnon() {
-		return PrincipalName.ANON.s().equals(userName);
+		return userName == null || PrincipalName.ANON.s().equals(userName);
 	}
 
 	public String getUserName() {
@@ -50,26 +39,11 @@ public class MongoSession {
 		this.userName = userName;
 	}
 
-	public SubNode getUserNode() {
-		return userNode;
+	public ObjectId getUserNodeId() {
+		return userNodeId;
 	}
 
-	public int getMaxUploadSize() {
-		if (userNode == null) {
-			return Const.DEFAULT_USER_QUOTA;
-		}
-		if (isAdmin()) {
-			return Integer.MAX_VALUE;
-		}
-		
-		long ret = userNode.getIntProp(NodeProp.BIN_QUOTA.s());
-		if (ret == 0) {
-			return Const.DEFAULT_USER_QUOTA;
-		}
-		return (int)ret;
-	}
-
-	public void setUserNode(SubNode userNode) {
-		this.userNode = userNode;
+	public void setUserNodeId(ObjectId userNodeId) {
+		this.userNodeId = userNodeId;
 	}
 }

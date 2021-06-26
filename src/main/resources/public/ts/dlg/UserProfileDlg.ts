@@ -171,7 +171,7 @@ export class UserProfileDlg extends DialogBase {
                 userId: userNodeId
             }, (res: J.GetUserProfileResponse): void => {
                 // console.log("UserProfile Response: " + S.util.prettyPrint(res));
-                if (res) {
+                if (res && res.userProfile) {
                     this.bioState.setValue(res.userProfile.userBio);
                     this.displayNameState.setValue(res.userProfile.displayName);
                     this.mergeState({
@@ -246,7 +246,7 @@ export class UserProfileDlg extends DialogBase {
                 S.util.ajax<J.GetUserProfileRequest, J.GetUserProfileResponse>("getUserProfile", {
                     userId: state.userProfile.userNodeId
                 }, (res: J.GetUserProfileResponse): void => {
-                    if (res) {
+                    if (res && res.userProfile) {
                         state.userProfile.avatarVer = res.userProfile.avatarVer;
                         state.userProfile.userNodeId = res.userProfile.userNodeId;
                         this.mergeState({
@@ -305,7 +305,7 @@ export class UserProfileDlg extends DialogBase {
                 S.util.ajax<J.GetUserProfileRequest, J.GetUserProfileResponse>("getUserProfile", {
                     userId: state.userProfile.userNodeId
                 }, (res: J.GetUserProfileResponse): void => {
-                    if (res) {
+                    if (res && res.userProfile) {
                         state.userProfile.headerImageVer = res.userProfile.headerImageVer;
                         state.userProfile.userNodeId = res.userProfile.userNodeId;
                         this.mergeState({

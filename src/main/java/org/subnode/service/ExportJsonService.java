@@ -7,28 +7,24 @@ import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
-
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
-
 import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.core.io.Resource;
-import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Component;
 import org.subnode.config.AppProp;
 import org.subnode.config.SpringContextUtil;
 import org.subnode.model.client.NodeProp;
-import org.subnode.mongo.MongoUtil;
-import org.subnode.mongo.MongoEventListener;
 import org.subnode.mongo.MongoSession;
 import org.subnode.mongo.MongoUpdate;
+import org.subnode.mongo.MongoUtil;
 import org.subnode.mongo.model.SubNode;
 import org.subnode.util.ExUtil;
 import org.subnode.util.FileUtils;
@@ -45,9 +41,6 @@ public class ExportJsonService {
 	private static final Logger log = LoggerFactory.getLogger(ExportJsonService.class);
 
 	@Autowired
-	private MongoTemplate ops;
-
-	@Autowired
 	private MongoUtil util;
 
 	@Autowired
@@ -58,6 +51,9 @@ public class ExportJsonService {
 
 	@Autowired
 	private AttachmentService attachmentService;
+
+	@Autowired
+	private UserManagerService userManagerService;
 
 	/* This object is Threadsafe so this is the correct usage 'static final' */
 	private static final ObjectMapper objectMapper = new ObjectMapper();
@@ -148,7 +144,7 @@ public class ExportJsonService {
 				String resourceName = "classpath:/nodes/" + subFolder + "/" + oid.toHexString() + "-" + binFileName;
 				Resource resource = SpringContextUtil.getApplicationContext().getResource(resourceName);
 				is = resource.getInputStream();
-				lis = new LimitedInputStreamEx(is, session.getMaxUploadSize());
+				lis = new LimitedInputStreamEx(is, userManagerService.getMaxUploadSize(session));
 				attachmentService.writeStream(session, "", node, lis, binFileName, binMime, null);
 				update.save(session, node);
 

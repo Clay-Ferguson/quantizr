@@ -111,6 +111,7 @@ export class Nav implements NavIntf {
             },
             // fail callback
             (res: string) => {
+                S.meta64.clearLastNodeIds();
                 this.navHome(state);
             });
     }
@@ -147,6 +148,11 @@ export class Nav implements NavIntf {
                 else {
                     this.upLevelResponse(res, state.node.id, false, state);
                 }
+            },
+            // fail callback
+            (res: string) => {
+                S.meta64.clearLastNodeIds();
+                this.navHome(state);
             }
         );
     }
@@ -220,7 +226,12 @@ export class Nav implements NavIntf {
             singleNode: false
         }, (res) => {
             this.navPageNodeResponse(res, state);
-        });
+        },
+            // fail callback
+            (res: string) => {
+                S.meta64.clearLastNodeIds();
+                this.navHome(state);
+            });
     }
 
     openNodeById = (evt: Event, id: string, state: AppState): void => {
@@ -288,7 +299,7 @@ export class Nav implements NavIntf {
         S.meta64.scrollPosByTabName.set(C.TAB_MAIN, 0);
 
         state = appState(state);
-        console.log("navHome()");
+        // console.log("navHome()");
         if (state.isAnonUser) {
             S.meta64.loadAnonPageHome(null);
         } else {
@@ -302,7 +313,14 @@ export class Nav implements NavIntf {
                 goToLastPage: false,
                 forceIPFSRefresh: false,
                 singleNode: false
-            }, (res) => { this.navPageNodeResponse(res, state); });
+            }, (res) => { this.navPageNodeResponse(res, state); },
+                // fail callback
+                (res: string) => {
+                    S.meta64.clearLastNodeIds();
+
+                    // NOPE! This would be recursive!
+                    // this.navHome(state);
+                });
         }
     }
 

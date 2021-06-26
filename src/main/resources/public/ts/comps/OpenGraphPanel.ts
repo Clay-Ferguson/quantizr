@@ -26,7 +26,7 @@ export class OpenGraphPanel extends Div {
     }
 
     domAddEvent(): void {
-        let elm = this.attribs.ref.current;
+        let elm: HTMLElement = this.attribs.ref.current;
         let og = S.meta64.openGraphData.get(this.url);
         if (!og) {
             let observer = new IntersectionObserver(entries => {
@@ -37,6 +37,8 @@ export class OpenGraphPanel extends Div {
 
                             // wait 2 seconds before showing the loading indicator.
                             setTimeout(() => {
+                                if (!elm.isConnected) return;
+
                                 let og = S.meta64.openGraphData.get(this.url);
                                 if (!og) {
                                     this.mergeState({ loading: true });
@@ -44,6 +46,8 @@ export class OpenGraphPanel extends Div {
                             }, 2000);
 
                             S.util.loadOpenGraph(this.url, (og: any) => {
+                                if (!elm.isConnected) return;
+
                                 S.meta64.openGraphData.set(this.url, og || {});
                                 this.mergeState({ loading: false, og });
                             });

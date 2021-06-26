@@ -10,20 +10,18 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Component;
-import org.subnode.CallProcessor;
-import org.subnode.config.AppProp;
 import org.subnode.exception.NodeAuthFailedException;
 import org.subnode.exception.base.RuntimeEx;
 import org.subnode.model.client.PrincipalName;
 import org.subnode.mongo.MongoAuth;
 import org.subnode.mongo.MongoCreate;
-import org.subnode.mongo.MongoDelete;
 import org.subnode.mongo.MongoRead;
 import org.subnode.mongo.MongoSession;
 import org.subnode.mongo.MongoUpdate;
 import org.subnode.mongo.MongoUtil;
 import org.subnode.mongo.model.SubNode;
 import org.subnode.service.AttachmentService;
+import org.subnode.service.UserManagerService;
 import org.subnode.util.LimitedInputStreamEx;
 import org.subnode.util.ThreadLocals;
 
@@ -44,19 +42,13 @@ public class MongoTest implements TestIntf {
 	private MongoUpdate update;
 
 	@Autowired
-	private MongoDelete delete;
-
-	@Autowired
 	private MongoAuth auth;
 
 	@Autowired
 	private AttachmentService attachmentService;
 
 	@Autowired
-	private AppProp appProp;
-
-	@Autowired
-	private CallProcessor callProc;
+	private UserManagerService userManagerService;
 
 	@Override
 	public void test() throws Exception {
@@ -230,7 +222,7 @@ public class MongoTest implements TestIntf {
 		try {
 			SubNode node = create.createNode(session, "/binaries");
 			update.save(session, node);
-			int maxFileSize = session.getMaxUploadSize();
+			int maxFileSize = userManagerService.getMaxUploadSize(session);
 			attachmentService.writeStream(session, "", node,
 					new LimitedInputStreamEx(new FileInputStream("/home/clay/test-image.png"), maxFileSize), null, "image/png",
 					null);
@@ -247,8 +239,10 @@ public class MongoTest implements TestIntf {
 	}
 
 	private MongoSession loginUser(String userName) {
-		MongoSession session = auth.processCredentials(userName, appProp.getTestPassword(), null);
-		ThreadLocals.setMongoSession(session);
-		return session;
+		// code is obsolete now.
+		// MongoSession session = auth.processCredentials(userName, appProp.getTestPassword(), null);
+		// ThreadLocals.setMongoSession(session);
+		// return session;
+		return null;
 	}
 }

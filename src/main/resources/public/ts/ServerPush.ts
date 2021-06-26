@@ -1,7 +1,7 @@
 import { dispatch, store } from "./AppRedux";
 import { AppState } from "./AppState";
 import { Constants as C } from "./Constants";
-import { InboxNotifyDlg } from "./dlg/InboxNotifyDlg";
+import { MessageDlg } from "./dlg/MessageDlg";
 import { ServerPushIntf } from "./intf/ServerPushIntf";
 import * as J from "./JavaIntf";
 import { PubSub } from "./PubSub";
@@ -31,6 +31,25 @@ export class ServerPush implements ServerPushIntf {
         eventSource.onerror = (e: any) => {
             // console.log("ServerPush.onerror:" + e);
         };
+
+        eventSource.addEventListener("sessionTimeout", function (e: any) {
+            if (!S.meta64.authToken) return;
+            S.meta64.authToken = null;
+            S.meta64.userName = null;
+
+            // this might work ok, but for now, let's just force a page repload
+            let state = store.getState();
+            // S.nav.login(state);
+            // window.location.href = window.location.origin + "/app";
+
+            let dlg = new MessageDlg("Session timed out.", "Note",
+                () => {
+                    // todo-1: need to look for places we should do this instead of the location.href in order to preserve url
+                    history.go(0);
+                }, null, false, 0, state
+            );
+            dlg.open();
+        });
 
         eventSource.addEventListener("nodeEdited", function (e: any) {
             const obj: J.FeedPushInfo = JSON.parse(e.data);

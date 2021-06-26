@@ -332,11 +332,6 @@ public class SubNode {
 	}
 
 	public void clearSecretProperties() {
-		/*
-		 * todo-0: need a better way to be sure none of these can ever end up on the client, so there needs to be
-		 * come kind of outbound filtering that all data goes thru on the way to the client, and the crypto key should 
-		 * be encrypted by the server using an encryption key we can pass in specifically for this purpose
-		 */
 		if (properties != null) {
 			properties.remove(NodeProp.CRYPTO_KEY_PRIVATE.s());
 			properties.remove(NodeProp.EMAIL.s());

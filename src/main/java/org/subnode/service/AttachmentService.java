@@ -164,7 +164,7 @@ public class AttachmentService {
 
 			auth.ownerAuth(node);
 
-			final int maxFileSize = session.getMaxUploadSize();
+			final int maxFileSize = userManagerService.getMaxUploadSize(session);
 			int imageCount = 0;
 
 			/*
@@ -329,7 +329,7 @@ public class AttachmentService {
 		byte[] imageBytes = null;
 		InputStream isTemp = null;
 
-		final int maxFileSize = session.getMaxUploadSize();
+		final int maxFileSize = userManagerService.getMaxUploadSize(session);
 
 		/*
 		 * Clear out any pre-existing binary properties
@@ -805,7 +805,7 @@ public class AttachmentService {
 	public void readFromDataUrl(MongoSession session, final String sourceUrl, final String nodeId, final String mimeHint,
 			int maxFileSize) {
 		if (maxFileSize <= 0) {
-			maxFileSize = session.getMaxUploadSize();
+			maxFileSize = userManagerService.getMaxUploadSize(session);
 		}
 
 		if (session == null) {
@@ -848,7 +848,7 @@ public class AttachmentService {
 		}
 
 		if (maxFileSize <= 0) {
-			maxFileSize = session.getMaxUploadSize();
+			maxFileSize = userManagerService.getMaxUploadSize(session);
 		}
 
 		if (session == null) {

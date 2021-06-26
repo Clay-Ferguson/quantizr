@@ -10,13 +10,17 @@ import java.util.TimeZone;
 import javax.annotation.PreDestroy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.context.annotation.ScopedProxyMode;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 import org.subnode.model.UserPreferences;
 import org.subnode.model.client.PrincipalName;
+import org.subnode.mongo.MongoSession;
 import org.subnode.mongo.MongoUtil;
+import org.subnode.response.SessionTimeoutPushInfo;
+import org.subnode.service.UserFeedService;
 import org.subnode.util.DateUtil;
 
 /**
@@ -26,29 +30,35 @@ import org.subnode.util.DateUtil;
 @Component
 @Scope(value = "session", proxyMode = ScopedProxyMode.TARGET_CLASS)
 public class SessionContext {
+	// DO NOT DELETE (keep for future ref)
+	// implements InitializingBean, DisposableBean {
 	private static final Logger log = LoggerFactory.getLogger(SessionContext.class);
+
+	@Autowired
+	private UserFeedService userFeedService;
 
 	/* Identification of user's account root node. */
 	private String rootId;
 
-	private boolean loggedIn;
-
-	public boolean isLoggedIn() {
-		return loggedIn;
-	}
-
-	public void setLoggedIn(boolean loggedIn) {
-		this.loggedIn = loggedIn;
-	}
-
-	/* When the user does a "Timeline" search we store the path of the node the timeline was done on
-	so that with a simple substring search, we can detect any time a new node is added that would've appeared
-	in the timeline and then do a server push to browsers of any new nodes, thereby creating a realtime
-	view of the timeline, making it become like a "chat room" */
+	/*
+	 * When the user does a "Timeline" search we store the path of the node the timeline was done on so
+	 * that with a simple substring search, we can detect any time a new node is added that would've
+	 * appeared in the timeline and then do a server push to browsers of any new nodes, thereby creating
+	 * a realtime view of the timeline, making it become like a "chat room"
+	 */
 	private String timelinePath;
 
-	private String userName;
-	private String password;
+	private String userName = PrincipalName.ANON.s();
+	private MongoSession mongoSession = new MongoSession();
+
+	public MongoSession getMongoSession() {
+		return mongoSession;
+	}
+
+	public void setMongoSession(MongoSession mongoSession) {
+		this.mongoSession = mongoSession;
+	}
+
 	private String timezone;
 	private String timeZoneAbbrev;
 
@@ -86,7 +96,7 @@ public class SessionContext {
 	private Date feedMaxTime;
 
 	private static final Random rand = new Random();
-	private String userToken = String.valueOf(rand.nextInt());
+	private String userToken;
 
 	public SessionContext() {
 		log.trace(String.format("Creating Session object hashCode[%d]", hashCode()));
@@ -95,13 +105,40 @@ public class SessionContext {
 		}
 	}
 
-	public static boolean validToken(String token) {
+	/* This is called only upon successful login of a non-anon user */
+	public void setAuthenticated(String userName) {
+		if (userName.equals(PrincipalName.ANON.s())) {
+			throw new RuntimeException("invalid call to setAuthenticated for anon.");
+		}
+
+		if (userToken == null) {
+			userToken = String.valueOf(Math.abs(rand.nextLong()));
+		}
+		log.debug("sessionContext authenticated hashCode=" + String.valueOf(hashCode()) + " user: " + userName + " to userToken "
+				+ userToken);
+		this.userName = userName;
+	}
+
+	public boolean isAuthenticated() {
+		return userToken != null;
+	}
+
+	/*
+	 * We rely on the secrecy and unguessability of the token here, but eventually this will become JWT
+	 * and perhaps use Spring Security
+	 */
+	public static boolean validToken(String token, String userName) {
 		if (token == null)
 			return false;
 
 		for (SessionContext sc : allSessions) {
 			if (token.equals(sc.getUserToken())) {
-				return true;
+				if (userName != null) {
+					// need to add IP check here too, but IP can be spoofed?
+					return userName.equals(sc.getUserName());
+				} else {
+					return true;
+				}
 			}
 		}
 		return false;
@@ -131,9 +168,11 @@ public class SessionContext {
 	@PreDestroy
 	public void preDestroy() {
 		log.trace(String.format("Destroying Session object hashCode[%d] of user %s", hashCode(), userName));
+		userFeedService.sendServerPushInfo(this, new SessionTimeoutPushInfo());
 
 		synchronized (allSessions) {
-			// This "lastActiveTime", should really be called "last message checked time", becaues that's the purpose
+			// This "lastActiveTime", should really be called "last message checked time", becaues that's the
+			// purpose
 			// it serves, so I think setting this here is undesirable, but we should only reset when the
 			// user is really checking their messages (like in UserFeedService), where this logic was moved to.
 			// userManagerService.updateLastActiveTime(this);
@@ -189,14 +228,6 @@ public class SessionContext {
 
 	public void setUserName(String userName) {
 		this.userName = userName;
-	}
-
-	public String getPassword() {
-		return password;
-	}
-
-	public void setPassword(String password) {
-		this.password = password;
 	}
 
 	public String getUrlId() {
@@ -294,4 +325,16 @@ public class SessionContext {
 	public void setTimelinePath(String timelinePath) {
 		this.timelinePath = timelinePath;
 	}
+
+	// DO NOT DELETE: Keep for future reference
+	// // from DisposableBean interface
+	// @Override
+	// public void destroy() throws Exception {
+	// //log.debug("SessionContext destroy hashCode=" + String.valueOf(hashCode()) + ": userName=" +
+	// this.userName);
+	// }
+
+	// // From InitializingBean interface
+	// @Override
+	// public void afterPropertiesSet() throws Exception {}
 }

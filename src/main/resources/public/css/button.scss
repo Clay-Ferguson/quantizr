@@ -1,5 +1,9 @@
 /* Warning: setting any kind of left margin won't work becasue the btn-group? style of bootstrap overrides it in button groups */
 
+.myNavTab {
+    white-space: nowrap;
+}
+
 .btn {
     border-radius: 0 !important;
     border: 1px solid slategrey;

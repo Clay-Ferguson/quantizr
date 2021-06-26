@@ -3,10 +3,8 @@ package org.subnode.mongo;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import javax.annotation.PostConstruct;
 import org.apache.commons.lang3.StringUtils;
 import org.bson.types.ObjectId;
@@ -19,9 +17,7 @@ import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Component;
 import org.subnode.actpub.ActPubService;
-import org.subnode.config.AppProp;
 import org.subnode.config.NodeName;
-import org.subnode.config.SessionContext;
 import org.subnode.exception.NodeAuthFailedException;
 import org.subnode.exception.base.RuntimeEx;
 import org.subnode.model.AccessControlInfo;
@@ -32,10 +28,6 @@ import org.subnode.model.client.PrincipalName;
 import org.subnode.model.client.PrivilegeType;
 import org.subnode.mongo.model.AccessControl;
 import org.subnode.mongo.model.SubNode;
-import org.subnode.request.LoginRequest;
-import org.subnode.request.base.RequestBase;
-import org.subnode.service.UserManagerService;
-import org.subnode.util.DateUtil;
 import org.subnode.util.ThreadLocals;
 import org.subnode.util.XString;
 
@@ -52,9 +44,6 @@ public class MongoAuth {
 	private MongoTemplate ops;
 
 	@Autowired
-	private AppProp appProp;
-
-	@Autowired
 	private MongoRead read;
 
 	@Autowired
@@ -66,11 +55,8 @@ public class MongoAuth {
 	@Autowired
 	private ActPubService actPub;
 
-	@Autowired
-	private UserManagerService userManagerService;
-
-	private static final MongoSession adminSession = MongoSession.createFromUser(PrincipalName.ADMIN.s());
-	private static final MongoSession anonSession = MongoSession.createFromUser(PrincipalName.ANON.s());
+	private static final MongoSession adminSession = new MongoSession(PrincipalName.ADMIN.s());
+	private static final MongoSession anonSession = new MongoSession(PrincipalName.ANON.s());
 
 	private static final HashMap<String, String> userNamesByAccountId = new HashMap<>();
 	private static final HashMap<String, String> displayNamesByAccountId = new HashMap<>();
@@ -263,11 +249,11 @@ public class MongoAuth {
 			return;
 		}
 
-		if (session.getUserNode() == null) {
+		if (session.getUserNodeId() == null) {
 			throw new RuntimeException("session has no userNode: " + XString.prettyPrint(session));
 		}
 
-		if (!session.getUserNode().getId().equals(node.getOwner())) {
+		if (!session.getUserNodeId().equals(node.getOwner())) {
 			throw new NodeAuthFailedException();
 		}
 	}
@@ -341,7 +327,7 @@ public class MongoAuth {
 		}
 
 		// if this session user is the owner of this node, then they have full power
-		if (session.getUserNode() != null && session.getUserNode().getId().equals(node.getOwner())) {
+		if (session.getUserNodeId() != null && session.getUserNodeId().equals(node.getOwner())) {
 			if (verbose)
 				log.trace("allow: user " + session.getUserName() + " owns node. accountId: " + node.getOwner().toHexString());
 			return;
@@ -367,8 +353,8 @@ public class MongoAuth {
 			log.trace("ancestorAuth: path=" + node.getPath());
 
 		/* get the non-null sessionUserNodeId if not anonymous user */
-		String sessionUserNodeId = session.getUserNode() != null ? session.getUserNode().getId().toHexString() : null;
-		ObjectId sessId = session.getUserNode() != null ? session.getUserNode().getId() : null;
+		String sessionUserNodeId = session.getUserNodeId() != null ? session.getUserNodeId().toHexString() : null;
+		ObjectId sessId = session.getUserNodeId() != null ? session.getUserNodeId() : null;
 
 		// scan up the tree until we find a node that allows access
 		while (node != null) {
@@ -611,93 +597,6 @@ public class MongoAuth {
 
 		query.addCriteria(criteria);
 		return query;
-	}
-
-	// ========================================================================
-
-	public MongoSession processCredentials(String userName, String password, RequestBase req) {
-		if (userName == null || password == null) {
-			throw new RuntimeException("no credentials.");
-		}
-
-		// log.debug("Mongo API: user=" + userName);
-		MongoSession session = null;
-		SubNode userNode = null;
-		boolean success = false;
-		boolean authenticated = false;
-
-		/*
-		 * Anonymous
-		 * 
-		 * If username is null or anonymous, we assume anonymous is acceptable and return anonymous session
-		 * or else we check the credentials.
-		 */
-		if (PrincipalName.ANON.s().equals(userName)) {
-			session = MongoSession.createFromUser(PrincipalName.ANON.s());
-			success = true;
-		}
-		/* Admin Login */
-		else if (PrincipalName.ADMIN.s().equals(userName)) {
-			if (password.equals(appProp.getMongoAdminPassword())) {
-				authenticated = true;
-				session = MongoSession.createFromUser(PrincipalName.ANON.s());
-				session.setUserName(userName);
-				userNode = read.getUserNodeByUserName(getAdminSession(), userName);
-				session.setUserNode(userNode);
-				success = true;
-			} else
-				throw new RuntimeEx("Login failed.");
-		}
-		/* User Login */
-		else {
-			// default session to anonymous user.
-			session = MongoSession.createFromUser(PrincipalName.ANON.s());
-
-			// try to lookup the actual user's node
-			userNode = read.getUserNodeByUserName(getAdminSession(), userName);
-
-			// we found user's node.
-			if (userNode != null) {
-				/**
-				 * We can log in as any user we want if we have the admin password.
-				 */
-				if (password.equals(appProp.getMongoAdminPassword())) {
-					authenticated = true;
-					success = true;
-				}
-				// else it's an ordinary user so we check the password against their user node
-				else if (userNode.getStrProp(NodeProp.PWD_HASH.s()).equals(util.getHashOfPassword(password))) {
-					authenticated = true;
-					success = true;
-				}
-			}
-
-			if (success) {
-				session.setUserName(userName);
-				session.setUserNode(userNode);
-			} else {
-				throw new RuntimeEx("Login failed.");
-			}
-		}
-
-		if (success) {
-			SessionContext sc = ThreadLocals.getSessionContext();
-			if (sc != null) {
-				/*
-				 * if we get here then userName and password are guaranteed valid, and this should be the only place
-				 * in our code where we set userName or password on any sessionContext object
-				 */
-				sc.setUserName(userName);
-				sc.setPassword(password);
-
-				if ((authenticated && !sc.isLoggedIn()) || req instanceof LoginRequest) {
-					sc.setTimezone(DateUtil.getTimezoneFromOffset(req.getTzOffset()));
-					sc.setTimeZoneAbbrev(DateUtil.getUSTimezone(-req.getTzOffset() / 60, req.getDst()));
-					userManagerService.processLogin(session, null, req.getUserName(), userNode);
-				}
-			}
-		}
-		return session;
 	}
 
 	public HashSet<String> parseMentions(String message) {

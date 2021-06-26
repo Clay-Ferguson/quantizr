@@ -121,6 +121,11 @@ public class MongoThreadLocal {
 		// }
 	}
 
+	public static void cacheNode(String key, SubNode node) {
+		getCachedNodes().put(key, node);
+		cacheNode(node);
+	}
+
 	public static void cacheNode(SubNode node) {
 		if (node == null)
 			return;

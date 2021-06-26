@@ -436,10 +436,6 @@ export class Util implements UtilIntf {
         callback?: (response: ResponseType) => void, //
         failCallback?: (info: string) => void): AxiosPromise<any> => {
         postData = postData || {} as RequestType;
-        postData.userName = postData.userName || S.meta64.userName;
-        postData.password = postData.password || S.meta64.password;
-        postData.tzOffset = postData.tzOffset || new Date().getTimezoneOffset();
-        postData.dst = postData.dst || this.daylightSavingsTime;
 
         let axiosRequest;
 
@@ -451,14 +447,23 @@ export class Util implements UtilIntf {
                 console.log("JSON-POST: [" + this.getRpcPath() + postName + "]");
             }
 
-            this._ajaxCounter++;
-            S.meta64.setOverlay(true);
-            axiosRequest = axios.post(this.getRpcPath() + postName, postData, <AxiosRequestConfig>{
+            let config: AxiosRequestConfig = {
                 // Without this withCredentials axios (at least for CORS requests) doesn't send enough info to allow the server
                 // to recognize the same "session", and makes the server malfunction becasue it thinks each request is a
                 // new session and fails the login security.
                 withCredentials: true
-            });
+            };
+
+            // if we have an authToken put it in the header.
+            if (S.meta64.authToken) {
+                config.headers = {
+                    Bearer: S.meta64.authToken
+                };
+            }
+
+            this._ajaxCounter++;
+            S.meta64.setOverlay(true);
+            axiosRequest = axios.post(this.getRpcPath() + postName, postData, config);
         } catch (ex) {
             this.logAndReThrow("Failed starting request: " + postName, ex);
         }

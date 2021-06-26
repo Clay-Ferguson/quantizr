@@ -31,8 +31,7 @@ public class MongoCreate {
 	}
 
 	public SubNode createNode(MongoSession session, String path) {
-		ObjectId ownerId = read.getOwnerNodeIdFromSession(session);
-		SubNode node = new SubNode(ownerId, path, NodeType.NONE.s(), null);
+		SubNode node = new SubNode(session.getUserNodeId(), path, NodeType.NONE.s(), null);
 		return node;
 	}
 
@@ -40,8 +39,7 @@ public class MongoCreate {
 		if (type == null) {
 			type = NodeType.NONE.s();
 		}
-		ObjectId ownerId = read.getOwnerNodeIdFromSession(session);
-		SubNode node = new SubNode(ownerId, path, type, null);
+		SubNode node = new SubNode(session.getUserNodeId(), path, type, null);
 		return node;
 	}
 
@@ -80,7 +78,7 @@ public class MongoCreate {
 		String path = (parent == null ? "" : parent.getPath()) + "/" + relPath;
 
 		if (ownerId == null) {
-			ownerId = read.getOwnerNodeIdFromSession(session);
+			ownerId = session.getUserNodeId();
 		}
 
 		// for now not worried about ordinals for root nodes.

@@ -8,6 +8,7 @@ public class LoginResponse extends ResponseBase {
 	// Node Id of user account logged in.
 	private String rootNode;
 
+	private String authToken;
 	private String rootNodePath;
 
 	/* will be username or 'anonymous' if server rejected login */
@@ -89,5 +90,13 @@ public class LoginResponse extends ResponseBase {
 
 	public void setAllowFileSystemSearch(boolean allowFileSystemSearch) {
 		this.allowFileSystemSearch = allowFileSystemSearch;
+	}
+
+	public String getAuthToken() {
+		return authToken;
+	}
+
+	public void setAuthToken(String authToken) {
+		this.authToken = authToken;
 	}
 }

@@ -74,6 +74,8 @@ export class User implements UserIntf {
     }
 
     refreshLogin = async (state: AppState): Promise<void> => {
+        // console.log("refreshLogin.");
+
         const loginState: string = await S.localDB.getVal(C.LOCALDB_LOGIN_STATE);
         /* if we have known state as logged out, then do nothing here */
         if (loginState === "0") {
@@ -103,8 +105,9 @@ export class User implements UserIntf {
                 tzOffset: new Date().getTimezoneOffset(),
                 dst: S.util.daylightSavingsTime
             }, async (res: J.LoginResponse) => {
+                S.meta64.authToken = res.authToken;
 
-                // console.log("config: " + S.util.prettyPrint(res));
+                // console.log("login: " + S.util.prettyPrint(res));
                 if (res && !res.success) {
                     await S.user.deleteAllUserLocalDbEntries();
                 }
@@ -174,8 +177,7 @@ export class User implements UserIntf {
                 await S.localDB.setVal(C.LOCALDB_LOGIN_STATE, "1", "anon");
 
                 S.meta64.userName = usr;
-                S.meta64.password = pwd;
-                // console.log("Logged in as: " + usr + " rootNode: " + res.rootNode);
+                // console.log("Logged in as: " + usr + " rootNode: " + res.rootNode + " authToken: " + res.authToken);
 
                 this.queryUserProfile(res.rootNode);
                 this.checkMessages();
@@ -204,10 +206,12 @@ export class User implements UserIntf {
 
                 if (lastNode) {
                     id = lastNode;
+                    // console.log("Node selected from local storage: id=" + id);
                     childId = await S.localDB.getVal(C.LOCALDB_LAST_CHILD_NODEID);
                 } else {
                     // todo-2: note... this path is now untested due to recent refactoring.
                     id = state.homeNodeId;
+                    // console.log("Node selected from homeNodeId: id=" + id);
                 }
             }
 
@@ -223,6 +227,7 @@ export class User implements UserIntf {
                 // }
             }
             else {
+                // console.log("loginResponse final refresh id chosen: " + id);
                 S.view.refreshTree(id, true, renderLeafIfParent, childId, false, true, true, state);
             }
         } else {
@@ -273,7 +278,7 @@ export class User implements UserIntf {
                 userId
             }, (res: J.GetUserProfileResponse): void => {
                 // console.log("queryUserProfile Response: " + S.util.prettyPrint(res));
-                if (res) {
+                if (res && res.userProfile) {
                     dispatch("Action_SetUserProfile", (s: AppState): AppState => {
                         s.userProfile = res.userProfile;
                         return s;

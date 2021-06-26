@@ -188,6 +188,10 @@ export interface LoadNodeFromIpfsRequest extends RequestBase {
 }
 
 export interface LoginRequest extends RequestBase {
+    userName: string;
+    password: string;
+    tzOffset?: number;
+    dst?: boolean;
 }
 
 export interface LogoutRequest extends RequestBase {
@@ -354,10 +358,6 @@ export interface UploadFromUrlRequest extends RequestBase {
 }
 
 export interface RequestBase {
-    userName?: string;
-    password?: string;
-    tzOffset?: number;
-    dst?: boolean;
 }
 
 export interface AddFriendResponse extends ResponseBase {
@@ -513,6 +513,7 @@ export interface LoadNodeFromIpfsResponse extends ResponseBase {
 
 export interface LoginResponse extends ResponseBase {
     rootNode: string;
+    authToken: string;
     rootNodePath: string;
     userName: string;
     displayName: string;
@@ -606,6 +607,9 @@ export interface SendTestEmailResponse extends ResponseBase {
 
 export interface ServerPushInfo {
     type: string;
+}
+
+export interface SessionTimeoutPushInfo extends ServerPushInfo {
 }
 
 export interface SetCipherKeyResponse extends ResponseBase {

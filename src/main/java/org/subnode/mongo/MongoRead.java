@@ -70,34 +70,6 @@ public class MongoRead {
         return userNode.getStrProp(NodeProp.USER.s());
     }
 
-    public ObjectId getOwnerNodeIdFromSession(MongoSession session) {
-        ObjectId ownerId = null;
-
-        if (session.getUserNode() != null) {
-            ownerId = session.getUserNode().getOwner();
-        } else {
-            SubNode ownerNode = getUserNodeByUserName(auth.getAdminSession(), session.getUserName());
-            if (ownerNode == null) {
-                /*
-                 * slight mod to help bootstrapping when the admin doesn't initially have an ownernode until created
-                 */
-                if (!session.isAdmin()) {
-                    throw new RuntimeEx("No user node found for user: " + session.getUserName());
-                } else
-                    return null;
-            } else {
-                ownerId = ownerNode.getOwner();
-            }
-        }
-
-        if (ownerId == null) {
-            throw new RuntimeEx("Unable to get ownerId from the session.");
-        }
-
-        // if we return null, it indicates the owner is Admin.
-        return ownerId;
-    }
-
     public String getParentPath(SubNode node) {
         return XString.truncateAfterLast(node.getPath(), "/");
     }
@@ -807,10 +779,14 @@ public class MongoRead {
         return userName.substring(0, atIdx);
     }
 
-    // todo-0: can cache this by "USERNODE-user"
-    // todo-0: look for all places in this class where we can be looking up something with a custom
+    // todo-0: look for all other places in this class where we can be looking up something with a custom
     // cache key.
     public SubNode getUserNodeByUserName(MongoSession session, String user) {
+        String cacheKey = "USRNODE-" + user;
+        SubNode ret = MongoThreadLocal.getCachedNode(cacheKey);
+        if (ret != null) {
+            return ret;
+        }
         if (user == null) {
             user = ThreadLocals.getSessionContext().getUserName();
         }
@@ -840,8 +816,11 @@ public class MongoRead {
 
         query.addCriteria(criteria);
 
-        SubNode ret = util.findOne(query);
+        ret = util.findOne(query);
         auth.auth(session, ret, PrivilegeType.READ);
+        if (ret != null) {
+            MongoThreadLocal.cacheNode(cacheKey, ret);
+        }
         return ret;
     }
 

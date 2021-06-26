@@ -480,7 +480,6 @@ public class AppController implements ErrorController {
 	 * directly from arbitrary servers
 	 * 
 	 * todo-2: need a 'useCache' url param option
-	 * Need something in the HEADER (auth token) to allow this to work. Disable otherwise (todo-0)
 	 */
 	@GetMapping(value = {"/proxyGet"})
 	public void proxyGet(@RequestParam(value = "url", required = true) String url, //
@@ -563,7 +562,7 @@ public class AppController implements ErrorController {
 	@RequestMapping(value = API_PATH + "/login", method = RequestMethod.POST)
 	public @ResponseBody Object login(@RequestBody LoginRequest req, HttpSession session) {
 		return callProc.run("login", req, session, ms -> {
-			return userManagerService.postLogin(null, req);
+			return userManagerService.login(req);
 		});
 	}
 
@@ -1002,7 +1001,7 @@ public class AppController implements ErrorController {
 				});
 			}
 		} else {
-			if (SessionContext.validToken(token)) {
+			if (SessionContext.validToken(token, null)) {
 				adminRunner.run(mongoSession -> {
 					attachmentService.getBinary(mongoSession, "", null, nodeId, download != null, response);
 				});
@@ -1426,7 +1425,7 @@ public class AppController implements ErrorController {
 	// reference: https://www.baeldung.com/spring-server-sent-events
 	@GetMapping(API_PATH + "/serverPush")
 	public SseEmitter serverPush(HttpSession session) {
-		return (SseEmitter) callProc.run("serverPush", null, session, ms -> {
+		return (SseEmitter)callProc.run("serverPush", null, session, ms -> {
 			SseEmitter pushEmitter = new SseEmitter();
 			ThreadLocals.getSessionContext().setPushEmitter(pushEmitter);
 			return pushEmitter;

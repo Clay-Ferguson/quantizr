@@ -14,11 +14,9 @@ import { PubSub } from "./PubSub";
 import { ResultSetInfo } from "./ResultSetInfo";
 import { SharesRSInfo } from "./SharesRSInfo";
 import { Singletons } from "./Singletons";
-import { State } from "./State";
 import { FeedView } from "./tabs/FeedView";
 import { FollowersResultSetView } from "./tabs/FollowersResultSetView";
 import { FollowingResultSetView } from "./tabs/FollowingResultSetView";
-import { LogView } from "./tabs/LogView";
 import { MainTabComp } from "./tabs/MainTabComp";
 import { SearchResultSetView } from "./tabs/SearchResultSetView";
 import { SharedNodesResultSetView } from "./tabs/SharedNodesResultSetView";
@@ -72,7 +70,7 @@ export class Meta64 implements Meta64Intf {
     /* We save userName+password in these vars to pass in every request
     so that we can log back in again silently after any session timeout */
     userName: string;
-    password: string;
+    authToken: string;
 
     ctrlKey: boolean;
     ctrlKeyTime: number;
@@ -314,6 +312,11 @@ export class Meta64 implements Meta64Intf {
             }
         }
         return node;
+    }
+
+    clearLastNodeIds = (): void => {
+        S.localDB.setVal(C.LOCALDB_LAST_PARENT_NODEID, null);
+        S.localDB.setVal(C.LOCALDB_LAST_CHILD_NODEID, null);
     }
 
     /* WARNING: This is NOT the highlighted node. This is whatever node has the CHECKBOX selection */

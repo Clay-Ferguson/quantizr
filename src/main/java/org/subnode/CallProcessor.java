@@ -3,7 +3,6 @@ package org.subnode;
 import java.util.Date;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
-
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
@@ -14,17 +13,10 @@ import org.springframework.web.util.WebUtils;
 import org.subnode.config.SessionContext;
 import org.subnode.exception.NotLoggedInException;
 import org.subnode.exception.OutOfSpaceException;
-import org.subnode.model.UserPreferences;
 import org.subnode.model.client.ErrorType;
-import org.subnode.model.client.PrincipalName;
-import org.subnode.mongo.MongoAuth;
-import org.subnode.mongo.MongoSession;
 import org.subnode.mongo.MongoUpdate;
-import org.subnode.request.ChangePasswordRequest;
-import org.subnode.request.LoginRequest;
 import org.subnode.request.LogoutRequest;
 import org.subnode.request.base.RequestBase;
-import org.subnode.response.LoginResponse;
 import org.subnode.response.base.ResponseBase;
 import org.subnode.util.ExUtil;
 import org.subnode.util.LockEx;
@@ -37,18 +29,17 @@ public class CallProcessor {
 	private static final Logger log = LoggerFactory.getLogger(CallProcessor.class);
 
 	@Autowired
-	private MongoUpdate update;
+	private SessionContext sessionContext;
 
 	@Autowired
-	private MongoAuth auth;
+	private MongoUpdate update;
 
 	private static final boolean logRequests = true;
 	// private static int mutexCounter = 0;
 
 	/*
-	 * Wraps the processing of any command by using whatever info is on the session
-	 * and/or the request to perform the login if the user is not logged in, and
-	 * then call the function to be processed
+	 * Wraps the processing of any command by using whatever info is on the session and/or the request
+	 * to perform the login if the user is not logged in, and then call the function to be processed
 	 */
 	public Object run(String command, RequestBase req, HttpSession httpSession, MongoRunnableEx<Object> runner) {
 		if (AppServer.isShuttingDown()) {
@@ -59,14 +50,13 @@ public class CallProcessor {
 		logRequest(command, req, httpSession);
 
 		/*
-		 * Instantiating this, runs its constructor and ensures our threadlocal at least
-		 * has respons object on it, but most (not all) implenentations of methods end
-		 * up instantiating their own which overwrites this
+		 * Instantiating this, runs its constructor and ensures our threadlocal at least has response object
+		 * on it, but most (not all) implenentations of methods end up instantiating their own which
+		 * overwrites this
 		 */
 		new ResponseBase();
 
 		Object ret = null;
-		MongoSession mongoSession = null;
 		LockEx mutex = (LockEx) WebUtils.getSessionMutex(ThreadLocals.getHttpSession());
 		if (mutex == null) {
 			log.error("Session mutex lock is null.");
@@ -83,18 +73,12 @@ public class CallProcessor {
 			} else {
 				// mutexCounter++;
 				// log.debug("Enter: mutexCounter: "+String.valueOf(mutexCounter));
+				Date now = new Date();
+				sessionContext.setLastActiveTime(now.getTime());
+				ThreadLocals.setMongoSession(sessionContext.getMongoSession());
 
-				mongoSession = processCredentialsAndGetSession(req);
-				ThreadLocals.setMongoSession(mongoSession);
-
-				if (mongoSession == null || mongoSession.getUserName() == null) {
-					if (!(req instanceof ChangePasswordRequest)) {
-						throw new NotLoggedInException();
-					}
-				}
-
-				ret = runner.run(mongoSession);
-				update.saveSession(mongoSession);
+				ret = runner.run(ThreadLocals.getMongoSession());
+				update.saveSession(ThreadLocals.getMongoSession());
 			}
 
 		} catch (NotLoggedInException e1) {
@@ -150,51 +134,6 @@ public class CallProcessor {
 	private void setErrorType(ResponseBase res, Exception ex) {
 		if (ex instanceof OutOfSpaceException) {
 			res.setErrorType(ErrorType.OUT_OF_SPACE);
-		}
-	}
-
-	/* Creates a logged in session for any method call */
-	public MongoSession processCredentialsAndGetSession(RequestBase req) {
-
-		SessionContext sc = ThreadLocals.getSessionContext();
-		Date now = new Date();
-		sc.setLastActiveTime(now.getTime());
-		String userName = null;
-		String password = null;
-
-		LoginResponse res = null;
-		if (req instanceof LoginRequest) {
-			res = new LoginResponse();
-			res.setUserPreferences(new UserPreferences());
-
-			userName = req.getUserName();
-			password = req.getPassword();
-		} else {
-			// If the session already contains user and pwd use those creds
-			if (sc.getUserName() != null && sc.getPassword() != null) {
-				userName = sc.getUserName();
-				password = sc.getPassword();
-			}
-			// Otherwise take the creds off the 'req' if existing, or use 'anon' for both if
-			// not.
-			else {
-				userName = req == null || StringUtils.isEmpty(req.getUserName()) ? PrincipalName.ANON.s()
-						: req.getUserName();
-				password = req == null || StringUtils.isEmpty(req.getPassword()) ? PrincipalName.ANON.s()
-						: req.getPassword();
-			}
-		}
-
-		try {
-			/* in this auth.login we check credentials and throw exception if invalid */
-			MongoSession session = auth.processCredentials(userName, password, req);
-			return session;
-		} catch (Exception e) {
-			if (res != null) {
-				res.setSuccess(false);
-				res.setMessage("Unauthorized.");
-			}
-			throw ExUtil.wrapEx(e);
 		}
 	}
 

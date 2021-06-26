@@ -128,7 +128,11 @@ export class Search implements SearchIntf {
             goToLastPage: false,
             forceIPFSRefresh: false,
             singleNode: false
-        }, (res) => S.nav.navPageNodeResponse(res, state));
+        }, (res) => S.nav.navPageNodeResponse(res, state), // fail callback
+        (res: string) => {
+            S.meta64.clearLastNodeIds();
+            S.nav.navHome(state);
+        });
     }
 
     /* prop = mtm (modification time) | ctm (create time) */

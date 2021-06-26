@@ -444,8 +444,6 @@ export abstract class Comp<S extends BaseCompState = any> implements CompIntf {
             S.util.focusElmById(Comp.focusElmId);
         }
 
-        // todo-0: look into completely removing the need for 'domAddFuncs' stuff now that we have a 'ref'
-        // that we can use to get the element from in a callback function on any component.
         if (this.domAddFuncs) {
             let elm: HTMLElement = this.getElement();
             if (!elm) {

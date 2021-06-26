@@ -121,6 +121,9 @@ public class IPFSService {
     @Autowired
     AttachmentService attachmentService;
 
+    @Autowired
+	private UserManagerService userManagerService;
+
     @PostConstruct
     public void init() {
         API_BASE = appProp.getIPFSApiHostAndPort() + "/api/v0";
@@ -410,7 +413,7 @@ public class IPFSService {
             HttpHeaders headers = new HttpHeaders();
 
             MultiValueMap<String, Object> bodyMap = new LinkedMultiValueMap<>();
-            LimitedInputStreamEx lis = new LimitedInputStreamEx(stream, session.getMaxUploadSize());
+            LimitedInputStreamEx lis = new LimitedInputStreamEx(stream, userManagerService.getMaxUploadSize(session));
             bodyMap.add("file", makeFileEntity(lis, fileName));
 
             headers.setContentType(MediaType.MULTIPART_FORM_DATA);
