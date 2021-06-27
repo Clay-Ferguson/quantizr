@@ -5,6 +5,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.subnode.util.MongoRunnableEx;
+import org.subnode.util.ThreadLocals;
 
 /**
  * Helper class to run some processing workload as the admin user. Simplifies by encapsulating the
@@ -23,16 +24,21 @@ public class AdminRun {
 	private MongoAuth auth;
 
 	public <T> T run(MongoRunnableEx<T> runner) {
-		MongoSession session = null;
+		MongoSession ms = null;
+		MongoSession savedMs = null;
 		T ret = null;
 		try {
-			session = auth.asAdminThread();
-			ret = runner.run(session);
-			update.saveSession(session);
+			savedMs = MongoThreadLocal.getMongoSession();
+			MongoThreadLocal.setMongoSession(ms = auth.getAdminSession());
+			ret = runner.run(ms);
+			update.saveSession(ms);
 		}
 		catch (Exception ex) {
 			log.error("error", ex);
 			throw ex;
+		}
+		finally {
+			MongoThreadLocal.setMongoSession(savedMs);
 		}
 		return ret;
 	}

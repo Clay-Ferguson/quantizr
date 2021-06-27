@@ -6,7 +6,6 @@ import java.io.FileOutputStream;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
-
 import com.vladsch.flexmark.ext.tables.TablesExtension;
 import com.vladsch.flexmark.ext.toc.TocExtension;
 import com.vladsch.flexmark.ext.toc.internal.TocOptions;
@@ -15,7 +14,6 @@ import com.vladsch.flexmark.parser.Parser;
 import com.vladsch.flexmark.pdf.converter.PdfConverterExtension;
 import com.vladsch.flexmark.util.ast.Node;
 import com.vladsch.flexmark.util.data.MutableDataSet;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,6 +26,7 @@ import org.subnode.model.MerkleNode;
 import org.subnode.model.client.NodeProp;
 import org.subnode.mongo.MongoRead;
 import org.subnode.mongo.MongoSession;
+import org.subnode.mongo.MongoThreadLocal;
 import org.subnode.mongo.model.SubNode;
 import org.subnode.request.ExportRequest;
 import org.subnode.response.ExportResponse;
@@ -79,9 +78,7 @@ public class ExportServiceFlexmark {
 	 * Format can be 'html' or 'pdf'
 	 */
 	public void export(MongoSession session, String format, ExportRequest req, ExportResponse res) {
-		if (session == null) {
-			session = ThreadLocals.getMongoSession();
-		}
+		session = MongoThreadLocal.ensure(session);
 		this.session = session;
 		this.format = format;
 		this.req = req;

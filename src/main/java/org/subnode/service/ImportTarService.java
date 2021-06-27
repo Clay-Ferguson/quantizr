@@ -37,9 +37,9 @@ public class ImportTarService extends ImportArchiveBase {
 		}
 		used = true;
 
-		final SubNode userNode = read.getUserNodeByUserName(auth.getAdminSession(), sessionContext.getUserName());
+		final SubNode userNode = read.getUserNodeByUserName(auth.getAdminSession(), sc.getUserName());
 		if (userNode == null) {
-			throw new RuntimeEx("UserNode not found: " + sessionContext.getUserName());
+			throw new RuntimeEx("UserNode not found: " + sc.getUserName());
 		}
 
 		try {

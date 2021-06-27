@@ -71,9 +71,9 @@ public class ImportZipService extends ImportArchiveBase {
 		}
 		used = true;
 
-		SubNode userNode = read.getUserNodeByUserName(auth.getAdminSession(), sessionContext.getUserName());
+		SubNode userNode = read.getUserNodeByUserName(auth.getAdminSession(), sc.getUserName());
 		if (userNode == null) {
-			throw new RuntimeEx("UserNode not found: " + sessionContext.getUserName());
+			throw new RuntimeEx("UserNode not found: " + sc.getUserName());
 		}
 
 		LimitedInputStreamEx is = null;
@@ -82,7 +82,7 @@ public class ImportZipService extends ImportArchiveBase {
 			this.session = session;
 
 			// todo-1: replace with the true amount of storage this user has remaining. Admin is unlimited. 
-			int maxSize = sessionContext.isAdmin() ? Integer.MAX_VALUE : Const.DEFAULT_USER_QUOTA;
+			int maxSize = sc.isAdmin() ? Integer.MAX_VALUE : Const.DEFAULT_USER_QUOTA;
 			is = new LimitedInputStreamEx(inputStream, maxSize);
 			zis = new ZipArchiveInputStream(is);
 			

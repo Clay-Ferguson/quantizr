@@ -64,13 +64,13 @@ public class ActPubOutbox {
      * Caller can pass in userNode if it's already available, but if not just pass null and the
      * apUserName will be used to look up the userNode.
      */
-    public void loadForeignOutbox(MongoSession session, Object actor, SubNode userNode, String apUserName) {
+    public void loadForeignOutbox(MongoSession ms, Object actor, SubNode userNode, String apUserName) {
         try {
             if (userNode == null) {
-                userNode = read.getUserNodeByUserName(session, apUserName);
+                userNode = read.getUserNodeByUserName(ms, apUserName);
             }
 
-            SubNode outboxNode = read.getUserNodeByType(session, apUserName, userNode, "### Posts", NodeType.ACT_PUB_POSTS.s(),
+            SubNode outboxNode = read.getUserNodeByType(ms, apUserName, userNode, "### Posts", NodeType.ACT_PUB_POSTS.s(),
                     Arrays.asList(PrivilegeType.READ.s(), PrivilegeType.WRITE.s()), NodeName.POSTS);
             if (outboxNode == null) {
                 log.debug("no outbox for user: " + apUserName);
@@ -80,7 +80,7 @@ public class ActPubOutbox {
             /*
              * Query all existing known outbox items we have already saved for this foreign user
              */
-            Iterable<SubNode> outboxItems = read.getSubGraph(session, outboxNode, null, 0);
+            Iterable<SubNode> outboxItems = read.getSubGraph(ms, outboxNode, null, 0);
 
             String outboxUrl = AP.str(actor, APProp.outbox);
             APObj outbox = getOutbox(outboxUrl);
@@ -134,7 +134,7 @@ public class ActPubOutbox {
                             else if (AP.isType(object, APType.Note)) {
                                 try {
                                     ActPubService.newPostsInCycle++;
-                                    apService.saveNote(session, _userNode, outboxNode, object, true, true);
+                                    apService.saveNote(ms, _userNode, outboxNode, object, true, true);
                                     count.setVal(count.getVal() + 1);
                                 } catch (Exception e) {
                                     // log and ignore.

@@ -146,7 +146,7 @@ public class MongoEventListener extends AbstractMongoEventListener<SubNode> {
 			node.setPath(path);
 		}
 
-		saveAuth(node, isNew);
+		saveAuthByThread(node, isNew);
 
 		String pathHash = DigestUtils.sha256Hex(node.getPath());
 		// log.debug("CHECK PathHash=" + pathHash);
@@ -254,7 +254,7 @@ public class MongoEventListener extends AbstractMongoEventListener<SubNode> {
 				SubNode node = ops.findById(id, SubNode.class);
 				if (node != null) {
 					log.trace("MDB del: " + node.getPath());
-					auth.ownerAuth(node);
+					auth.ownerAuthByThread(node);
 				}
 				// because nodes can be orphaned, we clear the entire cache any time any nodes are deleted
 				MongoThreadLocal.clearCachedNodes();
@@ -264,7 +264,7 @@ public class MongoEventListener extends AbstractMongoEventListener<SubNode> {
 	}
 
 	/* To save a node you must own the node and have WRITE access to it's parent */
-	public void saveAuth(SubNode node, boolean isNew) {
+	public void saveAuthByThread(SubNode node, boolean isNew) {
 		// during server init no auth is required.
 		if (!MongoRepository.fullInit) {
 			return;
@@ -272,21 +272,21 @@ public class MongoEventListener extends AbstractMongoEventListener<SubNode> {
 		if (verbose)
 			log.trace("saveAuth in MongoListener");
 
-		MongoSession session = ThreadLocals.getMongoSession();
-		if (session != null) {
-			if (session.isAdmin())
+		MongoSession ms = MongoThreadLocal.getMongoSession();
+		if (ms != null) {
+			if (ms.isAdmin())
 				return;
 
 			// Must have write privileges to this node or one of it's parents.
-			auth.ownerAuth(node);
+			auth.ownerAuthByThread(node);
 
 			// only if this is creating a new node do we need to chech that the parent will allow it
 			if (isNew) {
-				SubNode parent = read.getParent(session, node);
+				SubNode parent = read.getParent(ms, node);
 				if (parent == null)
 					throw new RuntimeException("unable to get node parent: " + node.getParentPath());
 
-				auth.auth(session, parent, PrivilegeType.WRITE);
+				auth.auth(ms, parent, PrivilegeType.WRITE);
 			}
 		}
 	}

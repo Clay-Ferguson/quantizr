@@ -60,7 +60,7 @@ public class Convert {
 	 * browser/client to encapsulate the data for a given node which is used by the browser to render
 	 * the node
 	 */
-	public NodeInfo convertToNodeInfo(SessionContext sessionContext, MongoSession session, SubNode node, boolean htmlOnly,
+	public NodeInfo convertToNodeInfo(SessionContext sc, MongoSession session, SubNode node, boolean htmlOnly,
 			boolean initNodeEdit, long ordinal, boolean allowInlineChildren, boolean lastChild) {
 
 		/* If session user shouldn't be able to see secrets on this node remove them */
@@ -105,8 +105,8 @@ public class Convert {
 		boolean hasChildren = read.hasChildren(session, node);
 		// log.trace("hasNodes=" + hasChildren + " node: "+node.getId().toHexString());
 
-		List<PropertyInfo> propList = buildPropertyInfoList(sessionContext, node, htmlOnly, initNodeEdit);
-		List<AccessControlInfo> acList = buildAccessControlList(sessionContext, node);
+		List<PropertyInfo> propList = buildPropertyInfoList(sc, node, htmlOnly, initNodeEdit);
+		List<AccessControlInfo> acList = buildAccessControlList(sc, node);
 
 		if (node.getOwner() == null) {
 			throw new RuntimeException("node has no owner: " + node.getId().toHexString());
@@ -148,7 +148,7 @@ public class Convert {
 		String owner = userNode == null ? PrincipalName.ADMIN.s() : nameProp;
 
 		log.trace("RENDER ID=" + node.getId().toHexString() + " rootId=" + ownerId + " session.rootId="
-				+ sessionContext.getRootId() + " node.content=" + node.getContent() + " owner=" + owner);
+				+ sc.getRootId() + " node.content=" + node.getContent() + " owner=" + owner);
 
 		// log.debug("RENDER nodeId: " + node.getId().toHexString()+" -- json:
 		// "+XString.prettyPrint(node));
@@ -158,8 +158,8 @@ public class Convert {
 		 * put in cipherKey, so send back so the user can decrypt the node.
 		 */
 		String cipherKey = null;
-		if (!ownerId.equals(sessionContext.getRootId()) && node.getAc() != null) {
-			AccessControl ac = node.getAc().get(sessionContext.getRootId());
+		if (!ownerId.equals(sc.getRootId()) && node.getAc() != null) {
+			AccessControl ac = node.getAc().get(sc.getRootId());
 			if (ac != null) {
 				cipherKey = ac.getKey();
 				if (cipherKey != null) {
@@ -266,7 +266,7 @@ public class Convert {
 					// the 'inlineChildren' capability
 					boolean multiLevel = true;
 
-					nodeInfo.safeGetChildren().add(convertToNodeInfo(sessionContext, session, n, htmlOnly, initNodeEdit,
+					nodeInfo.safeGetChildren().add(convertToNodeInfo(sc, session, n, htmlOnly, initNodeEdit,
 							inlineOrdinal++, multiLevel, lastChild));
 				}
 			}
@@ -295,7 +295,7 @@ public class Convert {
 		return imageSize;
 	}
 
-	public List<PropertyInfo> buildPropertyInfoList(SessionContext sessionContext, SubNode node, //
+	public List<PropertyInfo> buildPropertyInfoList(SessionContext sc, SubNode node, //
 			boolean htmlOnly, boolean initNodeEdit) {
 
 		List<PropertyInfo> props = null;
@@ -310,7 +310,7 @@ public class Convert {
 				props = new LinkedList<>();
 			}
 
-			PropertyInfo propInfo = convertToPropertyInfo(sessionContext, node, propName, p, htmlOnly, initNodeEdit);
+			PropertyInfo propInfo = convertToPropertyInfo(sc, node, propName, p, htmlOnly, initNodeEdit);
 			// log.debug(" PROP Name: " + propName + " val=" + p.getValue().toString());
 
 			props.add(propInfo);
@@ -322,7 +322,7 @@ public class Convert {
 		return props;
 	}
 
-	public List<AccessControlInfo> buildAccessControlList(SessionContext sessionContext, SubNode node) {
+	public List<AccessControlInfo> buildAccessControlList(SessionContext sc, SubNode node) {
 		List<AccessControlInfo> ret = null;
 		HashMap<String, AccessControl> ac = node.getAc();
 		if (ac == null)
@@ -337,7 +337,7 @@ public class Convert {
 				ret = new LinkedList<>();
 			}
 
-			AccessControlInfo acInfo = convertToAccessControlInfo(sessionContext, node, principalId, acval);
+			AccessControlInfo acInfo = convertToAccessControlInfo(sc, node, principalId, acval);
 			ret.add(acInfo);
 		}
 
@@ -376,10 +376,10 @@ public class Convert {
 		return acInfo;
 	}
 
-	public PropertyInfo convertToPropertyInfo(SessionContext sessionContext, SubNode node, String propName, SubNodePropVal prop,
+	public PropertyInfo convertToPropertyInfo(SessionContext sc, SubNode node, String propName, SubNodePropVal prop,
 			boolean htmlOnly, boolean initNodeEdit) {
 		try {
-			String value = "content".equals(propName) ? formatValue(sessionContext, prop.getValue(), false, initNodeEdit)
+			String value = "content".equals(propName) ? formatValue(sc, prop.getValue(), false, initNodeEdit)
 					: prop.getValue().toString();
 			/* log.trace(String.format("prop[%s]=%s", prop.getName(), value)); */
 
@@ -397,10 +397,10 @@ public class Convert {
 		return val;
 	}
 
-	public String formatValue(SessionContext sessionContext, Object value, boolean convertToHtml, boolean initNodeEdit) {
+	public String formatValue(SessionContext sc, Object value, boolean convertToHtml, boolean initNodeEdit) {
 		try {
 			if (value instanceof Date) {
-				return sessionContext.formatTimeForUserTimezone((Date) value);
+				return sc.formatTimeForUserTimezone((Date) value);
 			} else {
 				String ret = value.toString();
 

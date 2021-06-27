@@ -85,11 +85,11 @@ public class NotificationDaemon {
 				if (--runCountdown <= 0) {
 					runCountdown = INTERVAL_SECONDS;
 
-					arun.run((MongoSession session) -> {
-						List<SubNode> mailNodes = outboxMgr.getMailNodes(session);
+					arun.run((MongoSession ms) -> {
+						List<SubNode> mailNodes = outboxMgr.getMailNodes(ms);
 						if (mailNodes != null) {
 							log.debug("Found " + String.valueOf(mailNodes.size()) + " mailNodes to send.");
-							sendAllMail(session, mailNodes);
+							sendAllMail(ms, mailNodes);
 						} 
 						return null;
 					});
@@ -105,7 +105,7 @@ public class NotificationDaemon {
 		runCountdown = 0;
 	}
 
-	private void sendAllMail(MongoSession session, List<SubNode> nodes) {
+	private void sendAllMail(MongoSession ms, List<SubNode> nodes) {
 		synchronized (MailSender.getLock()) {
 			log.debug("MailSender lock obtained.");
 
@@ -126,7 +126,7 @@ public class NotificationDaemon {
 						if (!StringUtils.isEmpty(email) && !StringUtils.isEmpty(subject) && !StringUtils.isEmpty(content)) {
 
 							log.debug("Found mail to send to: " + email);
-							if (delete.delete(session, node, false) > 0) {
+							if (delete.delete(ms, node, false) > 0) {
 								// only send mail if we were able to delete the node, because other wise something is wrong
 								// without ability to delete and so we'd go into a loop sending this item multiple times.
 								mailSender.sendMail(email, null, content, subject);

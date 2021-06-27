@@ -30,6 +30,7 @@ import org.subnode.mongo.MongoAuth;
 import org.subnode.mongo.MongoDelete;
 import org.subnode.mongo.MongoRead;
 import org.subnode.mongo.MongoSession;
+import org.subnode.mongo.MongoThreadLocal;
 import org.subnode.mongo.MongoUtil;
 import org.subnode.mongo.AdminRun;
 import org.subnode.mongo.model.SubNode;
@@ -266,7 +267,7 @@ public class ActPubFollowing {
     }
 
     /* Calls saveFediverseName for each person who is a 'follower' of actor */
-    public int loadRemoteFollowing(MongoSession session, APObj actor) {
+    public int loadRemoteFollowing(MongoSession ms, APObj actor) {
 
         String followingUrl = (String) AP.str(actor, APProp.following);
         APObj followings = getFollowing(followingUrl);
@@ -344,11 +345,9 @@ public class ActPubFollowing {
         });
     }
 
-    public GetFollowingResponse getFollowing(MongoSession session, GetFollowingRequest req) {
+    public GetFollowingResponse getFollowing(MongoSession ms, GetFollowingRequest req) {
         GetFollowingResponse res = new GetFollowingResponse();
-        if (session == null) {
-            session = ThreadLocals.getMongoSession();
-        }
+        ms = MongoThreadLocal.ensure(ms);
 
         MongoSession adminSession = auth.getAdminSession();
         Query query = findFollowingOfUser_query(adminSession, req.getTargetUserName());
@@ -373,18 +372,18 @@ public class ActPubFollowing {
     }
 
     /* Returns FRIEND nodes for every user 'userName' is following */
-    public Iterable<SubNode> findFollowingOfUser(MongoSession session, String userName) {
-        Query query = findFollowingOfUser_query(session, userName);
+    public Iterable<SubNode> findFollowingOfUser(MongoSession ms, String userName) {
+        Query query = findFollowingOfUser_query(ms, userName);
         if (query == null)
             return null;
 
         return util.find(query);
     }
 
-    public long countFollowingOfUser(MongoSession session, String userName, String actorUrl) {
+    public long countFollowingOfUser(MongoSession ms, String userName, String actorUrl) {
         // if local user
         if (userName.indexOf("@") == -1) {
-            return countFollowingOfLocalUser(session, userName);
+            return countFollowingOfLocalUser(ms, userName);
         }
         // if foreign user
         else {
@@ -405,20 +404,20 @@ public class ActPubFollowing {
         }
     }
 
-    public long countFollowingOfLocalUser(MongoSession session, String userName) {
-        Query query = findFollowingOfUser_query(session, userName);
+    public long countFollowingOfLocalUser(MongoSession ms, String userName) {
+        Query query = findFollowingOfUser_query(ms, userName);
         if (query == null)
             return 0;
 
         return ops.count(query, SubNode.class);
     }
 
-    private Query findFollowingOfUser_query(MongoSession session, String userName) {
+    private Query findFollowingOfUser_query(MongoSession ms, String userName) {
         Query query = new Query();
 
         // get friends list node
         SubNode friendsListNode =
-                read.getUserNodeByType(session, userName, null, null, NodeType.FRIEND_LIST.s(), null, NodeName.FRIENDS);
+                read.getUserNodeByType(ms, userName, null, null, NodeType.FRIEND_LIST.s(), null, NodeName.FRIENDS);
         if (friendsListNode == null)
             return null;
 

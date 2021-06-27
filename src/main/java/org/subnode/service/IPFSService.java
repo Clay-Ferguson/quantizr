@@ -659,25 +659,25 @@ public class IPFSService {
         }
     }
 
-    public PublishNodeToIpfsResponse publishNodeToIpfs(MongoSession mongoSession, PublishNodeToIpfsRequest req) {
+    public PublishNodeToIpfsResponse publishNodeToIpfs(MongoSession ms, PublishNodeToIpfsRequest req) {
         if (!ThreadLocals.getSessionContext().isAdmin()) {
             throw ExUtil.wrapEx("admin only function.");
         }
 
         PublishNodeToIpfsResponse res = new PublishNodeToIpfsResponse();
         SyncToIpfsService svc = (SyncToIpfsService) SpringContextUtil.getBean(SyncToIpfsService.class);
-        svc.writeIpfsFiles(mongoSession, req, res);
+        svc.writeIpfsFiles(ms, req, res);
         return res;
     }
 
-    public LoadNodeFromIpfsResponse loadNodeFromIpfs(MongoSession mongoSession, LoadNodeFromIpfsRequest req) {
+    public LoadNodeFromIpfsResponse loadNodeFromIpfs(MongoSession ms, LoadNodeFromIpfsRequest req) {
         if (!ThreadLocals.getSessionContext().isAdmin()) {
             throw ExUtil.wrapEx("admin only function.");
         }
 
         LoadNodeFromIpfsResponse res = new LoadNodeFromIpfsResponse();
         SyncFromIpfsService svc = (SyncFromIpfsService) SpringContextUtil.getBean(SyncFromIpfsService.class);
-        svc.writeNodes(mongoSession, req, res);
+        svc.writeNodes(ms, req, res);
         return res;
     }
 

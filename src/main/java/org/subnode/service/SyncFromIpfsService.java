@@ -12,13 +12,13 @@ import org.subnode.model.IPFSDir;
 import org.subnode.model.IPFSDirEntry;
 import org.subnode.mongo.MongoRead;
 import org.subnode.mongo.MongoSession;
+import org.subnode.mongo.MongoThreadLocal;
 import org.subnode.mongo.MongoUpdate;
 import org.subnode.mongo.model.SubNode;
 import org.subnode.mongo.model.SubNodeIdentity;
 import org.subnode.request.LoadNodeFromIpfsRequest;
 import org.subnode.response.LoadNodeFromIpfsResponse;
 import org.subnode.util.ExUtil;
-import org.subnode.util.ThreadLocals;
 import org.subnode.util.XString;
 
 /*
@@ -68,9 +68,7 @@ public class SyncFromIpfsService {
 	 * (orphans meaning those nodes didn't exist in the ipfs files)
 	 */
 	public void writeNodes(MongoSession session, LoadNodeFromIpfsRequest req, final LoadNodeFromIpfsResponse res) {
-		if (session == null) {
-			session = ThreadLocals.getMongoSession();
-		}
+		session = MongoThreadLocal.ensure(session);
 		this.session = session;
 
 		try {

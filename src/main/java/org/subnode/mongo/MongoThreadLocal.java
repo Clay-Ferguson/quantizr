@@ -12,6 +12,8 @@ import org.subnode.mongo.model.SubNode;
 public class MongoThreadLocal {
 	private static final Logger log = LoggerFactory.getLogger(MongoThreadLocal.class);
 
+	private static final ThreadLocal<MongoSession> session = new ThreadLocal<>();
+
 	/*
 	 * This is where we can accumulate the set of nodes that will all be updated after processing is
 	 * done using the api.sessionSave() call. This is a way to not have to worry about doing SAVES on
@@ -29,6 +31,7 @@ public class MongoThreadLocal {
 		getDirtyNodes().clear();
 		getCachedNodes().clear();
 		setWritesDisabled(false);
+		session.remove();
 	}
 
 	public static void setWritesDisabled(Boolean val) {
@@ -142,5 +145,17 @@ public class MongoThreadLocal {
 		if (StringUtils.isEmpty(key))
 			return null;
 		return getCachedNodes().get(key);
+	}
+
+	public static void setMongoSession(MongoSession ms) {
+		session.set(ms);
+	}
+
+	public static MongoSession ensure(MongoSession ms) {
+		return ms != null ? ms : session.get();
+	}
+
+	public static MongoSession getMongoSession() {
+		return session.get();
 	}
 }

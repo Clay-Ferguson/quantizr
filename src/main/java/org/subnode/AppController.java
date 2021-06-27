@@ -1275,7 +1275,7 @@ public class AppController implements ErrorController {
 	public @ResponseBody Object getNodeStats(@RequestBody GetNodeStatsRequest req, HttpSession session) {
 		return callProc.run("getNodeStats", req, session, ms -> {
 			GetNodeStatsResponse res = new GetNodeStatsResponse();
-			nodeSearchService.getNodeStats(req, res);
+			nodeSearchService.getNodeStats(ms, req, res);
 			return res;
 		});
 	}

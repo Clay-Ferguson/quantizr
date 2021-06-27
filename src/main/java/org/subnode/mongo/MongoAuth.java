@@ -66,7 +66,6 @@ public class MongoAuth {
 		inst = this;
 	}
 
-	// todo-0: look for places where the asAdminThread version should be used.
 	public MongoSession getAdminSession() {
 		if (adminSession.getUserNodeId() == null) {
 			adminSession.setUserNodeId(read.getDbRoot().getId());
@@ -74,35 +73,27 @@ public class MongoAuth {
 		return adminSession;
 	}
 
-	public MongoSession asAdminThread() {
-		if (adminSession.getUserNodeId() == null) {
-			adminSession.setUserNodeId(read.getDbRoot().getId());
-		}
-		ThreadLocals.setMongoSession(adminSession);
-		return adminSession;
-	}
-
 	public MongoSession getAnonSession() {
 		return anonSession;
 	}
 
-	public void populateUserNamesInAcl(MongoSession session, SubNode node) {
+	public void populateUserNamesInAcl(MongoSession ms, SubNode node) {
 		// iterate all acls on the node
-		List<AccessControlInfo> acList = getAclEntries(session, node);
+		List<AccessControlInfo> acList = getAclEntries(ms, node);
 		if (acList != null) {
 			for (AccessControlInfo info : acList) {
 
 				// get user account node for this sharing entry
 				String userNodeId = info.getPrincipalNodeId();
 				if (userNodeId != null) {
-					info.setPrincipalName(getUserNameFromAccountNodeId(session, userNodeId));
+					info.setPrincipalName(getUserNameFromAccountNodeId(ms, userNodeId));
 				}
 			}
 		}
 	}
 
 	/* todo-1: need to unify getDisplayNameFrom... and getUserNameFrom... below (next two functions) */
-	public String getDisplayNameFromAccountNodeId(MongoSession session, String accountId) {
+	public String getDisplayNameFromAccountNodeId(MongoSession ms, String accountId) {
 
 		// special case of a public share
 		if (PrincipalName.PUBLIC.s().equals(accountId)) {
@@ -118,7 +109,7 @@ public class MongoAuth {
 		}
 
 		// if userName not found in cache we read the node to get the userName from it.
-		SubNode accountNode = read.getNode(session, accountId);
+		SubNode accountNode = read.getNode(ms, accountId);
 		if (accountNode != null) {
 			synchronized (displayNamesByAccountId) {
 				// get the userName from the node, then put it in 'info' and cache it also.
@@ -131,7 +122,7 @@ public class MongoAuth {
 		return null;
 	}
 
-	public String getUserNameFromAccountNodeId(MongoSession session, String accountId) {
+	public String getUserNameFromAccountNodeId(MongoSession ms, String accountId) {
 
 		// special case of a public share
 		if (PrincipalName.PUBLIC.s().equals(accountId)) {
@@ -147,7 +138,7 @@ public class MongoAuth {
 		}
 
 		// if userName not found in cache we read the node to get the userName from it.
-		SubNode accountNode = read.getNode(session, accountId);
+		SubNode accountNode = read.getNode(ms, accountId);
 		if (accountNode != null) {
 			synchronized (userNamesByAccountId) {
 				// get the userName from the node, then put it in 'info' and cache it also.
@@ -275,8 +266,8 @@ public class MongoAuth {
 			throw new RuntimeEx("auth fail");
 	}
 
-	public void ownerAuth(SubNode node) {
-		ownerAuth(ThreadLocals.getMongoSession(), node);
+	public void ownerAuthByThread(SubNode node) {
+		ownerAuth(MongoThreadLocal.getMongoSession(), node);
 	}
 
 	public void auth(MongoSession session, SubNode node, PrivilegeType... privs) {

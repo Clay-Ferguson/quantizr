@@ -5,10 +5,10 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.subnode.config.SpringContextUtil;
-import org.subnode.model.client.PrivilegeType;
 import org.subnode.mongo.MongoAuth;
 import org.subnode.mongo.MongoRead;
 import org.subnode.mongo.MongoSession;
+import org.subnode.mongo.MongoThreadLocal;
 import org.subnode.mongo.MongoUpdate;
 import org.subnode.mongo.model.SubNode;
 import org.subnode.request.InsertBookRequest;
@@ -38,16 +38,14 @@ public class ImportBookService {
 
 	public InsertBookResponse insertBook(MongoSession session, InsertBookRequest req) {
 		InsertBookResponse res = new InsertBookResponse();
-		if (session == null) {
-			session = ThreadLocals.getMongoSession();
-		}
+		session = MongoThreadLocal.ensure(session);
 		if (!ThreadLocals.getSessionContext().isAdmin() && !ThreadLocals.getSessionContext().isTestAccount()) {
 			throw ExUtil.wrapEx("insertBook is an admin-only feature.");
 		}
 
 		String nodeId = req.getNodeId();
 		SubNode node = read.getNode(session, nodeId);
-		auth.ownerAuth(node);
+		auth.ownerAuthByThread(node);
 		log.debug("Insert Root: " + XString.prettyPrint(node));
 
 		/*

@@ -62,17 +62,19 @@ public class MongoRead {
 
     @PostConstruct
     public void postConstruct() {
-        dbRoot = getNode(auth.getAdminSession(), "/" + NodeName.ROOT);
+        dbRoot = findNodeByPath("/" + NodeName.ROOT);
     }
 
     public SubNode getDbRoot() {
+        if (dbRoot == null) {
+            throw new RuntimeException("Accessed dbRoot before spring init.");
+        }
         return dbRoot;
     }
 
     /**
      * Gets account name from the root node associated with whoever owns 'node'
      */
-    // todo-0: can cache this node as key "OWNEROF-nodeId"
     public String getNodeOwner(MongoSession session, SubNode node) {
         if (node.getOwner() == null) {
             throw new RuntimeEx("Node has null owner: " + XString.prettyPrint(node));
@@ -790,9 +792,10 @@ public class MongoRead {
         return userName.substring(0, atIdx);
     }
 
-    // todo-0: look for all other places in this class where we can be looking up something with a
-    // custom
-    // cache key.
+    /*
+     * todo-0: look for all other places in this class where we can be looking up something with a
+     * custom cache key.
+     */
     public SubNode getUserNodeByUserName(MongoSession session, String user) {
         String cacheKey = "USRNODE-" + user;
         SubNode ret = MongoThreadLocal.getCachedNode(cacheKey);

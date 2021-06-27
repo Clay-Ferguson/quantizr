@@ -18,6 +18,7 @@ import org.subnode.model.client.PrincipalName;
 import org.subnode.mongo.MongoAuth;
 import org.subnode.mongo.MongoRead;
 import org.subnode.mongo.MongoSession;
+import org.subnode.mongo.MongoThreadLocal;
 import org.subnode.mongo.MongoUpdate;
 import org.subnode.mongo.model.AccessControl;
 import org.subnode.mongo.model.MongoPrincipal;
@@ -31,7 +32,6 @@ import org.subnode.response.GetNodePrivilegesResponse;
 import org.subnode.response.RemovePrivilegeResponse;
 import org.subnode.response.SetCipherKeyResponse;
 import org.subnode.util.ExUtil;
-import org.subnode.util.ThreadLocals;
 import org.subnode.util.XString;
 
 /**
@@ -62,9 +62,7 @@ public class AclService {
 	 */
 	public GetNodePrivilegesResponse getNodePrivileges(MongoSession session, GetNodePrivilegesRequest req) {
 		GetNodePrivilegesResponse res = new GetNodePrivilegesResponse();
-		if (session == null) {
-			session = ThreadLocals.getMongoSession();
-		}
+		session = MongoThreadLocal.ensure(session);
 
 		String nodeId = req.getNodeId();
 		SubNode node = read.getNode(session, nodeId);
@@ -92,9 +90,7 @@ public class AclService {
 	 */
 	public AddPrivilegeResponse addPrivilege(MongoSession session, AddPrivilegeRequest req) {
 		AddPrivilegeResponse res = new AddPrivilegeResponse();
-		if (session == null) {
-			session = ThreadLocals.getMongoSession();
-		}
+		session = MongoThreadLocal.ensure(session);
 
 		String nodeId = req.getNodeId();
 		req.setPrincipal(XString.stripIfStartsWith(req.getPrincipal(), "@"));
@@ -111,9 +107,7 @@ public class AclService {
 	 */
 	public SetCipherKeyResponse setCipherKey(MongoSession session, SetCipherKeyRequest req) {
 		SetCipherKeyResponse res = new SetCipherKeyResponse();
-		if (session == null) {
-			session = ThreadLocals.getMongoSession();
-		}
+		session = MongoThreadLocal.ensure(session);
 
 		String nodeId = req.getNodeId();
 		SubNode node = read.getNode(session, nodeId);
@@ -343,9 +337,7 @@ public class AclService {
 	 */
 	public RemovePrivilegeResponse removePrivilege(MongoSession session, RemovePrivilegeRequest req) {
 		RemovePrivilegeResponse res = new RemovePrivilegeResponse();
-		if (session == null) {
-			session = ThreadLocals.getMongoSession();
-		}
+		session = MongoThreadLocal.ensure(session);
 
 		String nodeId = req.getNodeId();
 		SubNode node = read.getNode(session, nodeId);

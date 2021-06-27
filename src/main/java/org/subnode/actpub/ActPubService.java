@@ -141,7 +141,7 @@ public class ActPubService {
      * When 'node' has been created under 'parent' (by the sessionContext user) this will send a
      * notification to foreign servers.
      */
-    public boolean sendNotificationForNodeEdit(MongoSession session, SubNode parent, SubNode node) {
+    public boolean sendNotificationForNodeEdit(MongoSession ms, SubNode parent, SubNode node) {
         try {
             List<String> toUserNames = new LinkedList<>();
 
@@ -160,7 +160,7 @@ public class ActPubService {
                         SubNode accntNode = apCache.acctNodesById.get(k);
 
                         if (accntNode == null) {
-                            accntNode = read.getNode(session, k);
+                            accntNode = read.getNode(ms, k);
                             apCache.acctNodesById.put(k, accntNode);
                         }
 
@@ -178,7 +178,7 @@ public class ActPubService {
             String inReplyTo = parent.getStrProp(NodeProp.ACT_PUB_OBJ_URL);
             APList attachments = createAttachmentsList(node);
 
-            sendNote(session, toUserNames, ThreadLocals.getSessionContext().getUserName(), inReplyTo, node.getContent(),
+            sendNote(ms, toUserNames, ThreadLocals.getSessionContext().getUserName(), inReplyTo, node.getContent(),
                     attachments, subNodeUtil.getIdBasedUrl(node), privateMessage);
         } //
         catch (Exception e) {
@@ -205,7 +205,7 @@ public class ActPubService {
     }
 
     /* Sends note outbound to other servers */
-    public void sendNote(MongoSession session, List<String> toUserNames, String fromUser, String inReplyTo, String content,
+    public void sendNote(MongoSession ms, List<String> toUserNames, String fromUser, String inReplyTo, String content,
             APList attachments, String noteUrl, boolean privateMessage) {
 
         String host = appProp.getMetaHost();
@@ -246,7 +246,7 @@ public class ActPubService {
                         privateMessage, attachments);
 
                 String userDoingPost = ThreadLocals.getSessionContext().getUserName();
-                apUtil.securePost(userDoingPost, session, null, inbox, fromActor, message, null);
+                apUtil.securePost(userDoingPost, ms, null, inbox, fromActor, message, null);
             }
         }
     }
@@ -256,7 +256,7 @@ public class ActPubService {
      * first checking the 'acctNodesByUserName' cache, or else by reading in the user from the
      * Fediverse, and updating the cache.
      */
-    public SubNode getAcctNodeByUserName(MongoSession session, String apUserName) {
+    public SubNode getAcctNodeByUserName(MongoSession ms, String apUserName) {
         if (!apUserName.contains("@")) {
             log.debug("Invalid foreign user name: " + apUserName);
             return null;
@@ -274,7 +274,7 @@ public class ActPubService {
 
         // if we have actor object skip the step of getting it and import using it.
         if (actor != null) {
-            acctNode = importActor(session, actor);
+            acctNode = importActor(ms, actor);
         }
 
         /*
@@ -287,7 +287,7 @@ public class ActPubService {
 
             String actorUrl = apUtil.getActorUrlFromWebFingerObj(webFinger);
             if (actorUrl != null) {
-                acctNode = getAcctNodeByActorUrl(session, actorUrl);
+                acctNode = getAcctNodeByActorUrl(ms, actorUrl);
             }
         }
 
@@ -303,7 +303,7 @@ public class ActPubService {
     /**
      * Gets foreign account SubNode using actorUrl, using the cached copy of found.
      */
-    public SubNode getAcctNodeByActorUrl(MongoSession session, String actorUrl) {
+    public SubNode getAcctNodeByActorUrl(MongoSession ms, String actorUrl) {
         saveFediverseName(actorUrl);
 
         /* return node from cache if already cached */
@@ -316,7 +316,7 @@ public class ActPubService {
 
         // if webfinger was successful, ensure the user is imported into our system.
         if (actor != null) {
-            acctNode = importActor(session, actor);
+            acctNode = importActor(ms, actor);
             if (acctNode != null) {
                 // Any time we have an account node being cached we should cache it by it's ID too right away.
                 apCache.acctNodesById.put(acctNode.getId().toHexString(), acctNode);
@@ -329,7 +329,7 @@ public class ActPubService {
     /*
      * Returns account node of the user, creating one if not already existing
      */
-    public SubNode importActor(MongoSession session, Object actor) {
+    public SubNode importActor(MongoSession ms, Object actor) {
         String apUserName = apUtil.getLongUserNameFromActor(actor);
 
         apUserName = apUserName.trim();
@@ -346,13 +346,13 @@ public class ActPubService {
         saveFediverseName(apUserName);
 
         // Try to get the userNode for this actor
-        SubNode userNode = read.getUserNodeByUserName(session, apUserName);
+        SubNode userNode = read.getUserNodeByUserName(ms, apUserName);
 
         /*
          * If we don't have this user in our system, create them.
          */
         if (userNode == null) {
-            userNode = util.createUser(session, apUserName, null, null, true);
+            userNode = util.createUser(ms, apUserName, null, null, true);
         }
 
         boolean changed = false;
@@ -400,7 +400,7 @@ public class ActPubService {
             changed = true;
 
         if (changed) {
-            update.save(session, userNode, false);
+            update.save(ms, userNode, false);
         }
 
         /* cache the account node id for this user by the actor url */
@@ -490,7 +490,7 @@ public class ActPubService {
     }
 
     /* obj is the 'Note' object */
-    public void processCreateNote(MongoSession session, String actorUrl, Object actorObj, Object obj) {
+    public void processCreateNote(MongoSession ms, String actorUrl, Object actorObj, Object obj) {
         /*
          * If this is a 'reply' post then parse the ID out of this, and if we can find that node by that id
          * then insert the reply under that, instead of the default without this id which is to put in
@@ -510,7 +510,7 @@ public class ActPubService {
             String replyToId = null;
             if (lastIdx != -1) {
                 replyToId = inReplyTo.substring(lastIdx + 1);
-                nodeBeingRepliedTo = read.getNode(session, replyToId, false);
+                nodeBeingRepliedTo = read.getNode(ms, replyToId, false);
             }
         }
 
@@ -518,7 +518,7 @@ public class ActPubService {
          * If a foreign user is replying to a specific node, we put the reply under that node
          */
         if (nodeBeingRepliedTo != null) {
-            saveNote(session, null, nodeBeingRepliedTo, obj, false, false);
+            saveNote(ms, null, nodeBeingRepliedTo, obj, false, false);
         }
         /*
          * Otherwise the node is not a reply so we put it under POSTS node inside the foreign account node
@@ -526,12 +526,12 @@ public class ActPubService {
          * node will show up in those people's FEEDs
          */
         else {
-            SubNode actorAccountNode = getAcctNodeByActorUrl(session, actorUrl);
+            SubNode actorAccountNode = getAcctNodeByActorUrl(ms, actorUrl);
             if (actorAccountNode != null) {
                 String userName = actorAccountNode.getStrProp(NodeProp.USER.s());
-                SubNode postsNode = read.getUserNodeByType(session, userName, actorAccountNode, "### Posts",
+                SubNode postsNode = read.getUserNodeByType(ms, userName, actorAccountNode, "### Posts",
                         NodeType.ACT_PUB_POSTS.s(), Arrays.asList(PrivilegeType.READ.s()), NodeName.POSTS);
-                saveNote(session, actorAccountNode, postsNode, obj, false, false);
+                saveNote(ms, actorAccountNode, postsNode, obj, false, false);
             }
         }
     }
@@ -548,14 +548,14 @@ public class ActPubService {
      * to a local user so the node should be considered 'temporary' and can be deleted after a week or
      * so to clean the Db.
      */
-    public void saveNote(MongoSession session, SubNode toAccountNode, SubNode parentNode, Object obj, boolean forcePublic,
+    public void saveNote(MongoSession ms, SubNode toAccountNode, SubNode parentNode, Object obj, boolean forcePublic,
             boolean temp) {
         String id = AP.str(obj, APProp.id);
 
         /*
          * First look to see if there is a target node already existing for this so we don't add a duplicate
          */
-        SubNode dupNode = read.findSubNodeByProp(session, parentNode.getPath(), NodeProp.ACT_PUB_ID.s(), id);
+        SubNode dupNode = read.findSubNodeByProp(ms, parentNode.getPath(), NodeProp.ACT_PUB_ID.s(), id);
         if (dupNode != null) {
             // log.debug("duplicate ActivityPub post ignored: " + id);
             return;
@@ -597,9 +597,9 @@ public class ActPubService {
 
         // foreign account will own this node, this may be passed if it's known or null can be passed in.
         if (toAccountNode == null) {
-            toAccountNode = getAcctNodeByActorUrl(session, objAttributedTo);
+            toAccountNode = getAcctNodeByActorUrl(ms, objAttributedTo);
         }
-        SubNode newNode = create.createNode(session, parentNode, null, null, 0L, CreateNodeLocation.FIRST, null,
+        SubNode newNode = create.createNode(ms, parentNode, null, null, 0L, CreateNodeLocation.FIRST, null,
                 toAccountNode.getId(), true);
 
         // todo-1: need a new node prop type that is just 'html' and tells us to render
@@ -634,21 +634,21 @@ public class ActPubService {
         // part of troubleshooting the non-english language detection
         // newNode.setProp("lang", lang);
 
-        shareToAllObjectRecipients(session, newNode, obj, APProp.to);
-        shareToAllObjectRecipients(session, newNode, obj, APProp.cc);
+        shareToAllObjectRecipients(ms, newNode, obj, APProp.to);
+        shareToAllObjectRecipients(ms, newNode, obj, APProp.cc);
 
         if (forcePublic) {
-            acl.addPrivilege(session, newNode, PrincipalName.PUBLIC.s(),
+            acl.addPrivilege(ms, newNode, PrincipalName.PUBLIC.s(),
                     Arrays.asList(PrivilegeType.READ.s(), PrivilegeType.WRITE.s()), null);
         }
 
         // log.debug("saveNote: OBJ=" + XString.prettyPrint(obj));
 
-        update.save(session, newNode);
-        addAttachmentIfExists(session, newNode, obj);
+        update.save(ms, newNode);
+        addAttachmentIfExists(ms, newNode, obj);
 
         try {
-            userFeedService.pushNodeUpdateToBrowsers(session, newNode);
+            userFeedService.pushNodeUpdateToBrowsers(ms, newNode);
         } catch (Exception e) {
             log.error("pushNodeUpdateToBrowsers failed (ignoring error)", e);
         }
@@ -659,7 +659,7 @@ public class ActPubService {
      * 
      * The node save is expected to be done external to this function after this function runs.
      */
-    private void shareToAllObjectRecipients(MongoSession session, SubNode node, Object obj, String propName) {
+    private void shareToAllObjectRecipients(MongoSession ms, SubNode node, Object obj, String propName) {
         List<?> list = AP.list(obj, propName);
         if (list != null) {
             /* Build up all the access controls */
@@ -668,7 +668,7 @@ public class ActPubService {
                     String shareToUrl = (String) to;
 
                     /* The spec allows either a 'followers' URL here or an 'actor' URL here */
-                    shareToUsersForUrl(session, node, shareToUrl);
+                    shareToUsersForUrl(ms, node, shareToUrl);
                 } else {
                     log.debug("to list entry not supported: " + to.getClass().getName());
                 }
@@ -680,7 +680,7 @@ public class ActPubService {
      * Reads the object from 'url' to determine if it's a 'followers' URL or an 'actor' URL, and then
      * shares the node to either all the followers or the specific actor
      */
-    private void shareToUsersForUrl(MongoSession session, SubNode node, String url) {
+    private void shareToUsersForUrl(MongoSession ms, SubNode node, String url) {
         // log.debug("shareToUsersForUrl: " + url);
 
         if (url.endsWith("#Public")) {
@@ -693,7 +693,7 @@ public class ActPubService {
          * try that first
          */
         if (!url.contains("/followers")) {
-            shareNodeToActorByUrl(session, node, url);
+            shareNodeToActorByUrl(ms, node, url);
         }
         /*
          * else assume this is a 'followers' url. Sharing normally will include a 'followers' and run this
@@ -719,7 +719,7 @@ public class ActPubService {
                          */
                         if (obj instanceof String) {
                             String followerActorUrl = (String) obj;
-                            shareNodeToActorByUrl(session, node, followerActorUrl);
+                            shareNodeToActorByUrl(ms, node, followerActorUrl);
                         }
                         return true;
                     });
@@ -732,7 +732,7 @@ public class ActPubService {
      * Shares this node to the designated user using their actorUrl and is expected to work even if the
      * actorUrl points to a local user
      */
-    private void shareNodeToActorByUrl(MongoSession session, SubNode node, String actorUrl) {
+    private void shareNodeToActorByUrl(MongoSession ms, SubNode node, String actorUrl) {
         /*
          * Yes we tolerate for this to execute with the 'public' designation in place of an actorUrl here
          */
@@ -754,7 +754,7 @@ public class ActPubService {
 
             if (apUtil.isLocalActorUrl(actorUrl)) {
                 String longUserName = apUtil.getLongUserNameFromActorUrl(actorUrl);
-                acctNode = read.getUserNodeByUserName(session, longUserName);
+                acctNode = read.getUserNodeByUserName(ms, longUserName);
             } else {
                 /*
                  * todo-1: this is contributing to our [currently] unwanted FEDIVERSE CRAWLER effect chain reaction.
@@ -776,7 +776,7 @@ public class ActPubService {
         }
     }
 
-    private void addAttachmentIfExists(MongoSession session, SubNode node, Object obj) {
+    private void addAttachmentIfExists(MongoSession ms, SubNode node, Object obj) {
         List<?> attachments = AP.list(obj, APProp.attachment);
         if (attachments == null)
             return;
@@ -786,7 +786,7 @@ public class ActPubService {
             String url = AP.str(att, APProp.url);
 
             if (mediaType != null && url != null) {
-                attachmentService.readFromUrl(session, url, node.getId().toHexString(), mediaType, -1, false);
+                attachmentService.readFromUrl(ms, url, node.getId().toHexString(), mediaType, -1, false);
 
                 // for now we only support one attachment so break out after uploading one.
                 break;

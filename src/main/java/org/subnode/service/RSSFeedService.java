@@ -201,14 +201,14 @@ public class RSSFeedService {
 	 * 
 	 * NOTE: pagination isn't supported yet in this. See "1" arg below, which means first page
 	 */
-	public void multiRss(MongoSession mongoSession, final String nodeId, Writer writer) {
+	public void multiRss(MongoSession ms, final String nodeId, Writer writer) {
 		SyndFeed feed = aggregateCache.get(nodeId);
 
 		// if we didn't find in the cache built the feed
 		if (feed == null) {
 			SubNode node = null;
 			try {
-				node = read.getNode(mongoSession, nodeId);
+				node = read.getNode(ms, nodeId);
 				if (node == null) {
 					return;
 				}
@@ -228,7 +228,7 @@ public class RSSFeedService {
 			feed.setEntries(entries);
 			List<String> urls = new LinkedList<>();
 
-			final Iterable<SubNode> iter = read.getSubGraph(mongoSession, node, null, 0);
+			final Iterable<SubNode> iter = read.getSubGraph(ms, node, null, 0);
 			final List<SubNode> children = read.iterateToList(iter);
 
 			// Scan to collect all the urls.
@@ -580,8 +580,8 @@ public class RSSFeedService {
 		}
 	}
 
-	public void getRssFeed(MongoSession mongoSession, String nodeId, Writer writer) {
-		SubNode node = read.getNode(mongoSession, nodeId);
+	public void getRssFeed(MongoSession ms, String nodeId, Writer writer) {
+		SubNode node = read.getNode(ms, nodeId);
 
 		SyndFeed feed = new SyndFeedImpl();
 		feed.setEncoding("UTF-8");
@@ -596,7 +596,7 @@ public class RSSFeedService {
 		feed.setEntries(entries);
 
 		final Iterable<SubNode> iter =
-				read.getChildren(mongoSession, node, Sort.by(Sort.Direction.ASC, SubNode.FIELD_ORDINAL), null, 0);
+				read.getChildren(ms, node, Sort.by(Sort.Direction.ASC, SubNode.FIELD_ORDINAL), null, 0);
 		final List<SubNode> children = read.iterateToList(iter);
 
 		if (children != null) {

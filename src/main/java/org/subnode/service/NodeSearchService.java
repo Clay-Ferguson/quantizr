@@ -93,9 +93,7 @@ public class NodeSearchService {
 		MongoThreadLocal.setWritesDisabled(true);
 
 		NodeSearchResponse res = new NodeSearchResponse();
-		if (session == null) {
-			session = ThreadLocals.getMongoSession();
-		}
+		session = MongoThreadLocal.ensure(session);
 
 		String searchText = req.getSearchText();
 		if (StringUtils.isEmpty(searchText) && //
@@ -200,9 +198,7 @@ public class NodeSearchService {
 
 	public GetSharedNodesResponse getSharedNodes(MongoSession session, GetSharedNodesRequest req) {
 		GetSharedNodesResponse res = new GetSharedNodesResponse();
-		if (session == null) {
-			session = ThreadLocals.getMongoSession();
-		}
+		session = MongoThreadLocal.ensure(session);
 
 		List<NodeInfo> searchResults = new LinkedList<>();
 		res.setSearchResults(searchResults);
@@ -298,7 +294,7 @@ public class NodeSearchService {
 		res.setBookmarks(bookmarks);
 	}
 
-	public void getNodeStats(GetNodeStatsRequest req, GetNodeStatsResponse res) {
+	public void getNodeStats(MongoSession session, GetNodeStatsRequest req, GetNodeStatsResponse res) {
 
 		/*
 		 * If this is the 'feed' being queried, then get the data from trendingFeedInfo (the cache), or else
@@ -362,7 +358,7 @@ public class NodeSearchService {
 		 * running a stats request under the 'Node Info' main menu
 		 */
 		else {
-			MongoSession session = ThreadLocals.getMongoSession();
+			session = MongoThreadLocal.ensure(session);
 			SubNode searchRoot = read.getNode(session, req.getNodeId());
 
 			Sort sort = null;

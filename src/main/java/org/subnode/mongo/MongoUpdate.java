@@ -40,7 +40,8 @@ public class MongoUpdate {
 	private MongoAuth auth;
 
 	public void saveObj(Object obj) {
-		if (MongoThreadLocal.getWritesDisabled()) return;
+		if (MongoThreadLocal.getWritesDisabled())
+			return;
 		ops.save(obj);
 	}
 
@@ -49,7 +50,8 @@ public class MongoUpdate {
 	}
 
 	public void save(MongoSession session, SubNode node, boolean allowAuth) {
-		if (MongoThreadLocal.getWritesDisabled()) return;
+		if (MongoThreadLocal.getWritesDisabled())
+			return;
 		if (allowAuth) {
 			auth.ownerAuth(session, node);
 		}
@@ -58,14 +60,10 @@ public class MongoUpdate {
 		// if not doing allowAuth, we need to be sure the thread has admin session
 		// so the MongoEventListener can allow all access.
 		if (!allowAuth) {
-			MongoSession tlsSave = ThreadLocals.getMongoSession();
-			try {
-				ThreadLocals.setMongoSession(auth.getAdminSession());
+			arun.run(ms -> {
 				ops.save(node);
-			}
-			finally {
-				ThreadLocals.setMongoSession(tlsSave);
-			}
+				return null;
+			});
 		} else {
 			ops.save(node);
 		}

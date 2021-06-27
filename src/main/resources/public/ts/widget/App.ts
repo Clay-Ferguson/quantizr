@@ -38,7 +38,6 @@ export class App extends Main {
 
         if (!state.guiReady) {
             this.setChildren([
-                new Heading(4, "Loading App..."),
                 new Div(null, {
                     className: "progressSpinner"
                 }, [new Spinner()])

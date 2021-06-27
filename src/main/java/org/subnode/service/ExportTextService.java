@@ -5,7 +5,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.nio.charset.StandardCharsets;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,6 +15,7 @@ import org.subnode.config.AppProp;
 import org.subnode.model.MerkleLink;
 import org.subnode.mongo.MongoRead;
 import org.subnode.mongo.MongoSession;
+import org.subnode.mongo.MongoThreadLocal;
 import org.subnode.mongo.model.SubNode;
 import org.subnode.request.ExportRequest;
 import org.subnode.response.ExportResponse;
@@ -23,7 +23,6 @@ import org.subnode.util.ExUtil;
 import org.subnode.util.FileUtils;
 import org.subnode.util.StreamUtil;
 import org.subnode.util.SubNodeUtil;
-import org.subnode.util.ThreadLocals;
 
 @Component
 @Scope("prototype")
@@ -57,10 +56,7 @@ public class ExportTextService {
 	 * timestamped one.
 	 */
 	public void export(MongoSession session, ExportRequest req, ExportResponse res) {
-		if (session == null) {
-			session = ThreadLocals.getMongoSession();
-		}
-	
+		session = MongoThreadLocal.ensure(session);
 		this.session = session;
 		this.req = req;
 		this.res = res;

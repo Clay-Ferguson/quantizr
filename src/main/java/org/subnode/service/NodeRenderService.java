@@ -12,7 +12,6 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;
 import org.springframework.ui.Model;
 import org.subnode.config.AppProp;
-import org.subnode.config.NodeName;
 import org.subnode.exception.NodeAuthFailedException;
 import org.subnode.exception.base.RuntimeEx;
 import org.subnode.model.BreadcrumbInfo;
@@ -25,6 +24,7 @@ import org.subnode.model.client.PrivilegeType;
 import org.subnode.mongo.MongoAuth;
 import org.subnode.mongo.MongoRead;
 import org.subnode.mongo.MongoSession;
+import org.subnode.mongo.MongoThreadLocal;
 import org.subnode.mongo.model.SubNode;
 import org.subnode.request.InitNodeEditRequest;
 import org.subnode.request.RenderCalendarRequest;
@@ -35,7 +35,6 @@ import org.subnode.response.RenderNodeResponse;
 import org.subnode.util.Const;
 import org.subnode.util.Convert;
 import org.subnode.util.DateUtil;
-import org.subnode.util.ExUtil;
 import org.subnode.util.SubNodeUtil;
 import org.subnode.util.ThreadLocals;
 import org.subnode.util.XString;
@@ -86,9 +85,7 @@ public class NodeRenderService {
 		}
 
 		RenderNodeResponse res = new RenderNodeResponse();
-		if (session == null) {
-			session = ThreadLocals.getMongoSession();
-		}
+		session = MongoThreadLocal.ensure(session);
 
 		String targetId = req.getNodeId();
 		boolean isActualUplevelRequest = req.isUpLevel();
@@ -427,9 +424,7 @@ public class NodeRenderService {
 
 	public InitNodeEditResponse initNodeEdit(MongoSession session, InitNodeEditRequest req) {
 		InitNodeEditResponse res = new InitNodeEditResponse();
-		if (session == null) {
-			session = ThreadLocals.getMongoSession();
-		}
+		session = MongoThreadLocal.ensure(session);
 
 		String nodeId = req.getNodeId();
 		SubNode node = read.getNode(session, nodeId);
@@ -454,9 +449,7 @@ public class NodeRenderService {
 	 * that page data.
 	 */
 	public RenderNodeResponse anonPageLoad(MongoSession session, RenderNodeRequest req) {
-		if (session == null) {
-			session = ThreadLocals.getMongoSession();
-		}
+		session = MongoThreadLocal.ensure(session);
 
 		String id = appProp.getUserLandingPageNode();
 		// log.debug("Anon Render Node ID: " + id);
@@ -521,9 +514,7 @@ public class NodeRenderService {
 
 	public RenderCalendarResponse renderCalendar(MongoSession session, RenderCalendarRequest req) {
 		RenderCalendarResponse res = new RenderCalendarResponse();
-		if (session == null) {
-			session = ThreadLocals.getMongoSession();
-		}
+		session = MongoThreadLocal.ensure(session);
 
 		SubNode node = read.getNode(session, req.getNodeId());
 		if (node == null) {
@@ -556,9 +547,7 @@ public class NodeRenderService {
 	}
 
 	public void getBreadcrumbs(MongoSession session, SubNode node, LinkedList<BreadcrumbInfo> list) {
-		if (session == null) {
-			session = ThreadLocals.getMongoSession();
-		}
+		session = MongoThreadLocal.ensure(session);
 
 		try {
 			if (node != null) {

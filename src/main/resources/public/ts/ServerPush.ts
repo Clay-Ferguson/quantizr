@@ -51,7 +51,7 @@ export class ServerPush implements ServerPushIntf {
             // S.nav.login(state);
             // window.location.href = window.location.origin + "/app";
 
-            let dlg = new MessageDlg("Session timed out.", "Note",
+            let dlg = new MessageDlg("Session timed out.", "Quanta",
                 () => {
                     // todo-1: need to look for places we should do this instead of the location.href in order to preserve url
                     history.go(0);

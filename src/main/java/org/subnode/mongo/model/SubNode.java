@@ -206,7 +206,7 @@ public class SubNode {
 		if (Util.equalObjs(path, this.path))
 			return;
 
-		MongoAuth.inst.ownerAuth(this);
+		MongoAuth.inst.ownerAuthByThread(this);
 		MongoThreadLocal.dirty(this);
 
 		/*

@@ -14,6 +14,8 @@ import org.subnode.config.SessionContext;
 import org.subnode.exception.NotLoggedInException;
 import org.subnode.exception.OutOfSpaceException;
 import org.subnode.model.client.ErrorType;
+import org.subnode.mongo.MongoSession;
+import org.subnode.mongo.MongoThreadLocal;
 import org.subnode.mongo.MongoUpdate;
 import org.subnode.request.LogoutRequest;
 import org.subnode.request.base.RequestBase;
@@ -29,7 +31,7 @@ public class CallProcessor {
 	private static final Logger log = LoggerFactory.getLogger(CallProcessor.class);
 
 	@Autowired
-	private SessionContext sessionContext;
+	private SessionContext sc;
 
 	@Autowired
 	private MongoUpdate update;
@@ -74,11 +76,11 @@ public class CallProcessor {
 				// mutexCounter++;
 				// log.debug("Enter: mutexCounter: "+String.valueOf(mutexCounter));
 				Date now = new Date();
-				sessionContext.setLastActiveTime(now.getTime());
-				ThreadLocals.setMongoSession(sessionContext.getMongoSession());
-
-				ret = runner.run(ThreadLocals.getMongoSession());
-				update.saveSession(ThreadLocals.getMongoSession());
+				sc.setLastActiveTime(now.getTime());
+				MongoSession ms = sc.getMongoSession();
+				MongoThreadLocal.setMongoSession(ms);
+				ret = runner.run(ms);
+				update.saveSession(ms);
 			}
 
 		} catch (NotLoggedInException e1) {
@@ -123,7 +125,7 @@ public class CallProcessor {
 			// log.debug("Exit: mutexCounter: "+String.valueOf(mutexCounter));
 
 			/* cleanup this thread, servers reuse threads */
-			ThreadLocals.setMongoSession(null);
+			MongoThreadLocal.setMongoSession(null);
 			ThreadLocals.setResponse(null);
 		}
 

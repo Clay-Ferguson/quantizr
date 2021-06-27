@@ -21,7 +21,6 @@ import org.subnode.mongo.MongoRead;
 import org.subnode.mongo.MongoSession;
 import org.subnode.mongo.model.SubNode;
 import org.subnode.service.UserManagerService;
-import org.subnode.util.ThreadLocals;
 import org.subnode.util.XString;
 
 @Component
@@ -32,11 +31,8 @@ public class ActPubCrypto {
     @Autowired
     private MongoRead read;
 
-    @Autowired
-    private ActPubUtil apUtil;
-
     /* Gets private RSA key from current user session */
-    public String getPrivateKey(MongoSession session, String userName) {
+    public String getPrivateKey(MongoSession ms, String userName) {
         /* First try to return the key from the cache */
         String privateKey = UserManagerService.privateKeysByUserName.get(userName);
         if (privateKey != null) {
@@ -44,7 +40,7 @@ public class ActPubCrypto {
         }
 
         /* get the userNode for the current user who edited a node */
-        SubNode userNode = read.getUserNodeByUserName(session, userName);
+        SubNode userNode = read.getUserNodeByUserName(ms, userName);
         if (userNode == null) {
             return null;
         }
@@ -52,8 +48,7 @@ public class ActPubCrypto {
         /* get private key of this user so we can sign the outbound message */
         privateKey = userNode.getStrProp(NodeProp.CRYPTO_KEY_PRIVATE);
         if (privateKey == null) {
-            log.debug("Unable to update federated users. User didn't have a private key on his userNode: "
-                    + userName);
+            log.debug("Unable to update federated users. User didn't have a private key on his userNode: " + userName);
             return null;
         }
 
@@ -112,8 +107,9 @@ public class ActPubCrypto {
             throw new RuntimeException("date is not in signed headers");
         if (!headers.contains("host"))
             throw new RuntimeException("host is not in signed headers");
-        
-        // todo-1: on localhost peer-to-peer testing I discovered a bug here, so I'm disabling this time check for now.
+
+        // todo-1: on localhost peer-to-peer testing I discovered a bug here, so I'm disabling this time
+        // check for now.
         // String date = httpReq.getHeader("date");
         // apUtil.validateRequestTime(date);
 

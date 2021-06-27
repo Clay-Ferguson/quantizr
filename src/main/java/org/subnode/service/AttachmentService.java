@@ -13,19 +13,16 @@ import java.net.URLConnection;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Iterator;
-
 import javax.imageio.ImageIO;
 import javax.imageio.ImageReader;
 import javax.imageio.stream.ImageInputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBObject;
 import com.mongodb.client.gridfs.GridFSBucket;
 import com.mongodb.client.gridfs.GridFSFindIterable;
 import com.mongodb.client.gridfs.model.GridFSFile;
-
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.io.input.AutoCloseInputStream;
@@ -60,14 +57,15 @@ import org.subnode.model.MerkleLink;
 import org.subnode.model.UserStats;
 import org.subnode.model.client.NodeProp;
 import org.subnode.model.client.PrivilegeType;
+import org.subnode.mongo.AdminRun;
 import org.subnode.mongo.CreateNodeLocation;
 import org.subnode.mongo.MongoAuth;
 import org.subnode.mongo.MongoCreate;
 import org.subnode.mongo.MongoRead;
 import org.subnode.mongo.MongoSession;
+import org.subnode.mongo.MongoThreadLocal;
 import org.subnode.mongo.MongoUpdate;
 import org.subnode.mongo.MongoUtil;
-import org.subnode.mongo.AdminRun;
 import org.subnode.mongo.model.SubNode;
 import org.subnode.mongo.model.SubNodePropVal;
 import org.subnode.request.DeleteAttachmentRequest;
@@ -84,7 +82,6 @@ import org.subnode.util.LimitedInputStreamEx;
 import org.subnode.util.MimeTypeUtils;
 import org.subnode.util.MultipartFileSender;
 import org.subnode.util.StreamUtil;
-import org.subnode.util.ThreadLocals;
 import org.subnode.util.Util;
 import org.subnode.util.ValContainer;
 
@@ -143,9 +140,7 @@ public class AttachmentService {
 		}
 
 		try {
-			if (session == null) {
-				session = ThreadLocals.getMongoSession();
-			}
+			session = MongoThreadLocal.ensure(session);
 
 			/*
 			 * OLD LOGIC: Uploading a single file attaches to the current node, but uploading multiple files
@@ -162,7 +157,7 @@ public class AttachmentService {
 				throw ExUtil.wrapEx("Node not found.");
 			}
 
-			auth.ownerAuth(node);
+			auth.ownerAuthByThread(node);
 
 			final int maxFileSize = userManagerService.getMaxUploadSize(session);
 			int imageCount = 0;
@@ -276,7 +271,7 @@ public class AttachmentService {
 			}
 		}
 		else {
-			auth.ownerAuth(node);
+			auth.ownerAuthByThread(node);
 		}
 
 		/* mimeType can be passed as null if it's not yet determined */
@@ -433,13 +428,11 @@ public class AttachmentService {
 	 */
 	public DeleteAttachmentResponse deleteAttachment(MongoSession session, final DeleteAttachmentRequest req) {
 		final DeleteAttachmentResponse res = new DeleteAttachmentResponse();
-		if (session == null) {
-			session = ThreadLocals.getMongoSession();
-		}
+		session = MongoThreadLocal.ensure(session);
 
 		final String nodeId = req.getNodeId();
 		final SubNode node = read.getNode(session, nodeId);
-		auth.ownerAuth(node);
+		auth.ownerAuthByThread(node);
 		deleteBinary(session, "", node, null);
 		deleteAllBinaryProperties(node, "");
 		update.saveSession(session);
@@ -488,9 +481,7 @@ public class AttachmentService {
 		BufferedOutputStream outStream = null;
 
 		try {
-			if (session == null) {
-				session = ThreadLocals.getMongoSession();
-			}
+			session = MongoThreadLocal.ensure(session);
 
 			if (node == null) {
 				node = read.getNode(session, nodeId, false);
@@ -706,9 +697,7 @@ public class AttachmentService {
 		BufferedInputStream inStream = null;
 
 		try {
-			if (session == null) {
-				session = ThreadLocals.getMongoSession();
-			}
+			session = MongoThreadLocal.ensure(session);
 
 			final SubNode node = read.getNode(session, nodeId, false);
 			auth.auth(session, node, PrivilegeType.READ);
@@ -767,7 +756,7 @@ public class AttachmentService {
 			throw new RuntimeException("node not found: id=" + req.getNodeId());
 		}
 
-		auth.ownerAuth(node);
+		auth.ownerAuthByThread(node);
 		node.setProp(NodeProp.IPFS_LINK.s(), req.getCid().trim());
 		String mime = req.getMime().trim().replace(".", "");
 
@@ -808,9 +797,7 @@ public class AttachmentService {
 			maxFileSize = userManagerService.getMaxUploadSize(session);
 		}
 
-		if (session == null) {
-			session = ThreadLocals.getMongoSession();
-		}
+		session = MongoThreadLocal.ensure(session);
 
 		final String mimeType = Util.getMimeFromDataUrl(sourceUrl);
 
@@ -832,7 +819,7 @@ public class AttachmentService {
 
 		if (!storeLocally) {
 			SubNode node = read.getNode(session, nodeId);
-			auth.ownerAuth(node);
+			auth.ownerAuthByThread(node);
 
 			String mimeType = URLConnection.guessContentTypeFromName(sourceUrl);
 			if (StringUtils.isEmpty(mimeType) && mimeHint != null) {
@@ -851,9 +838,7 @@ public class AttachmentService {
 			maxFileSize = userManagerService.getMaxUploadSize(session);
 		}
 
-		if (session == null) {
-			session = ThreadLocals.getMongoSession();
-		}
+		session = MongoThreadLocal.ensure(session);
 
 		LimitedInputStreamEx limitedIs = null;
 
@@ -986,7 +971,7 @@ public class AttachmentService {
 	public void writeStream(final MongoSession session, final String binSuffix, final SubNode node,
 			final LimitedInputStreamEx stream, final String fileName, final String mimeType, SubNode userNode) {
 
-		auth.ownerAuth(node);
+		auth.ownerAuthByThread(node);
 		final DBObject metaData = new BasicDBObject();
 		metaData.put("nodeId" + binSuffix, node.getId());
 
@@ -1031,7 +1016,7 @@ public class AttachmentService {
 
 	public void writeStreamToIpfs(final MongoSession session, final String binSuffix, final SubNode node,
 			final InputStream stream, final String mimeType, SubNode userNode) {
-		auth.ownerAuth(node);
+		auth.ownerAuthByThread(node);
 		final ValContainer<Integer> streamSize = new ValContainer<>();
 
 		MerkleLink ret = ipfsService.addFromStream(session, stream, null, mimeType, streamSize, null, false);
@@ -1047,7 +1032,7 @@ public class AttachmentService {
 	}
 
 	public void deleteBinary(final MongoSession session, final String binSuffix, final SubNode node, SubNode userNode) {
-		auth.ownerAuth(node);
+		auth.ownerAuthByThread(node);
 		final String id = node.getStrProp(NodeProp.BIN.s() + binSuffix);
 		if (id == null) {
 			return;

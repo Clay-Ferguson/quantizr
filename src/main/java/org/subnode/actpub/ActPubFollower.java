@@ -21,10 +21,11 @@ import org.subnode.config.NodeName;
 import org.subnode.model.NodeInfo;
 import org.subnode.model.client.NodeProp;
 import org.subnode.model.client.NodeType;
+import org.subnode.mongo.AdminRun;
 import org.subnode.mongo.MongoAuth;
 import org.subnode.mongo.MongoSession;
+import org.subnode.mongo.MongoThreadLocal;
 import org.subnode.mongo.MongoUtil;
-import org.subnode.mongo.AdminRun;
 import org.subnode.mongo.model.SubNode;
 import org.subnode.request.GetFollowersRequest;
 import org.subnode.response.GetFollowersResponse;
@@ -80,7 +81,7 @@ public class ActPubFollower {
     }
 
     /* Calls saveFediverseName for each person who is a 'follower' of actor */
-    public int loadRemoteFollowers(MongoSession session, APObj actor) {
+    public int loadRemoteFollowers(MongoSession ms, APObj actor) {
 
         String followersUrl = (String) AP.str(actor, APProp.followers);
         APObj followers = getFollowers(followersUrl);
@@ -174,19 +175,17 @@ public class ActPubFollower {
         return ret;
     }
 
-    public Iterable<SubNode> findFollowersOfUser(MongoSession session, String userName) {
-        Query query = followersOfUser_query(session, userName);
+    public Iterable<SubNode> findFollowersOfUser(MongoSession ms, String userName) {
+        Query query = followersOfUser_query(ms, userName);
         if (query == null)
             return null;
         return util.find(query);
     }
 
     // todo-1: review how do functions like this recieves the admin session?
-    public GetFollowersResponse getFollowers(MongoSession session, GetFollowersRequest req) {
+    public GetFollowersResponse getFollowers(MongoSession ms, GetFollowersRequest req) {
         GetFollowersResponse res = new GetFollowersResponse();
-        if (session == null) {
-            session = ThreadLocals.getMongoSession();
-        }
+        ms = MongoThreadLocal.ensure(ms);
 
         MongoSession adminSession = auth.getAdminSession();
         Query query = followersOfUser_query(adminSession, req.getTargetUserName());
@@ -210,10 +209,10 @@ public class ActPubFollower {
         return res;
     }
 
-    public long countFollowersOfUser(MongoSession session, String userName, String actorUrl) {
+    public long countFollowersOfUser(MongoSession ms, String userName, String actorUrl) {
         // if local user
         if (userName.indexOf("@") == -1) {
-            return countFollowersOfLocalUser(session, userName);
+            return countFollowersOfLocalUser(ms, userName);
         }
         // if foreign user
         else {
@@ -234,14 +233,14 @@ public class ActPubFollower {
         }
     }
 
-    public long countFollowersOfLocalUser(MongoSession session, String userName) {
-        Query query = followersOfUser_query(session, userName);
+    public long countFollowersOfLocalUser(MongoSession ms, String userName) {
+        Query query = followersOfUser_query(ms, userName);
         if (query == null)
             return 0L;
         return ops.count(query, SubNode.class);
     }
 
-    public Query followersOfUser_query(MongoSession session, String userName) {
+    public Query followersOfUser_query(MongoSession ms, String userName) {
         Query query = new Query();
 
         Criteria criteria =

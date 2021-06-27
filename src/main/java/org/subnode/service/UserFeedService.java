@@ -28,6 +28,7 @@ import org.subnode.model.client.PrincipalName;
 import org.subnode.mongo.MongoAuth;
 import org.subnode.mongo.MongoRead;
 import org.subnode.mongo.MongoSession;
+import org.subnode.mongo.MongoThreadLocal;
 import org.subnode.mongo.MongoUpdate;
 import org.subnode.mongo.MongoUtil;
 import org.subnode.mongo.model.SubNode;
@@ -187,9 +188,7 @@ public class UserFeedService {
 		if (sc.isAnonUser())
 			return res;
 
-		if (session == null) {
-			session = ThreadLocals.getMongoSession();
-		}
+		session = MongoThreadLocal.ensure(session);
 
 		String pathToSearch = NodeName.ROOT_OF_ALL_USERS;
 
@@ -226,9 +225,7 @@ public class UserFeedService {
 	public NodeFeedResponse generateFeed(MongoSession session, NodeFeedRequest req) {
 		SessionContext sc = ThreadLocals.getSessionContext();
 		NodeFeedResponse res = new NodeFeedResponse();
-		if (session == null) {
-			session = ThreadLocals.getMongoSession();
-		}
+		session = MongoThreadLocal.ensure(session);
 
 		int counter = 0;
 

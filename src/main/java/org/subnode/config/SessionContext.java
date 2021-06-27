@@ -49,15 +49,7 @@ public class SessionContext {
 	private String timelinePath;
 
 	private String userName = PrincipalName.ANON.s();
-	private MongoSession mongoSession = new MongoSession();
-
-	public MongoSession getMongoSession() {
-		return mongoSession;
-	}
-
-	public void setMongoSession(MongoSession mongoSession) {
-		this.mongoSession = mongoSession;
-	}
+	private MongoSession ms = new MongoSession();
 
 	private String timezone;
 	private String timeZoneAbbrev;
@@ -178,6 +170,10 @@ public class SessionContext {
 			// userManagerService.updateLastActiveTime(this);
 			allSessions.remove(this);
 		}
+
+		ms = null;
+		userName = null;
+		pushEmitter = null;
 	}
 
 	public boolean isAdmin() {
@@ -324,6 +320,14 @@ public class SessionContext {
 
 	public void setTimelinePath(String timelinePath) {
 		this.timelinePath = timelinePath;
+	}
+
+	public MongoSession getMongoSession() {
+		return ms;
+	}
+
+	public void setMongoSession(MongoSession ms) {
+		this.ms = ms;
 	}
 
 	// DO NOT DELETE: Keep for future reference

@@ -32,15 +32,16 @@ import org.subnode.model.client.NodeType;
 import org.subnode.model.client.PrincipalName;
 import org.subnode.model.client.PrivilegeType;
 import org.subnode.model.client.UserProfile;
+import org.subnode.mongo.AdminRun;
 import org.subnode.mongo.CreateNodeLocation;
 import org.subnode.mongo.MongoAuth;
 import org.subnode.mongo.MongoCreate;
 import org.subnode.mongo.MongoDelete;
 import org.subnode.mongo.MongoRead;
 import org.subnode.mongo.MongoSession;
+import org.subnode.mongo.MongoThreadLocal;
 import org.subnode.mongo.MongoUpdate;
 import org.subnode.mongo.MongoUtil;
-import org.subnode.mongo.AdminRun;
 import org.subnode.mongo.model.SubNode;
 import org.subnode.request.AddFriendRequest;
 import org.subnode.request.BlockUserRequest;
@@ -133,7 +134,7 @@ public class UserManagerService {
 
 	// todo-0: rename to 'sc' in entire app
 	@Autowired
-	private SessionContext sessionContext;
+	private SessionContext sc;
 
 	/* Private keys of each user by user name as key */
 	public static final ConcurrentHashMap<String, String> privateKeysByUserName = new ConcurrentHashMap<>();
@@ -153,7 +154,7 @@ public class UserManagerService {
 		/* Admin Login */
 		else if (PrincipalName.ADMIN.s().equals(req.getUserName())) {
 			if (req.getPassword().equals(appProp.getMongoAdminPassword())) {
-				sessionContext.setAuthenticated(req.getUserName());
+				sc.setAuthenticated(req.getUserName());
 			} else
 				throw new RuntimeEx("Login failed. Wrong admin password.");
 		}
@@ -168,11 +169,11 @@ public class UserManagerService {
 				 * We can log in as any user we want if we have the admin password.
 				 */
 				if (req.getPassword().equals(appProp.getMongoAdminPassword())) {
-					sessionContext.setAuthenticated(req.getUserName());
+					sc.setAuthenticated(req.getUserName());
 				}
 				// else it's an ordinary user so we check the password against their user node
 				else if (userNode.getStrProp(NodeProp.PWD_HASH.s()).equals(util.getHashOfPassword(req.getPassword()))) {
-					sessionContext.setAuthenticated(req.getUserName());
+					sc.setAuthenticated(req.getUserName());
 				} else {
 					throw new RuntimeEx("Login failed. Wrong password for user: " + req.getUserName());
 				}
@@ -185,42 +186,42 @@ public class UserManagerService {
 		 * We have to get timezone information from the user's browser, so that all times on all nodes
 		 * always show up in their precise local time!
 		 */
-		sessionContext.setTimezone(DateUtil.getTimezoneFromOffset(req.getTzOffset()));
-		sessionContext.setTimeZoneAbbrev(DateUtil.getUSTimezone(-req.getTzOffset() / 60, req.getDst()));
+		sc.setTimezone(DateUtil.getTimezoneFromOffset(req.getTzOffset()));
+		sc.setTimeZoneAbbrev(DateUtil.getUSTimezone(-req.getTzOffset() / 60, req.getDst()));
 
 		res.setAnonUserLandingPageNode(appProp.getUserLandingPageNode());
-		log.debug("Processing Login: urlId=" + (sessionContext.getUrlId() != null ? sessionContext.getUrlId() : "null"));
+		log.debug("Processing Login: urlId=" + (sc.getUrlId() != null ? sc.getUrlId() : "null"));
 
-		if (sessionContext.getUrlId() != null) {
+		if (sc.getUrlId() != null) {
 			// log.debug("setHomeNodeOverride (from session urlId): " + sc.getUrlId());
-			res.setHomeNodeOverride(sessionContext.getUrlId());
+			res.setHomeNodeOverride(sc.getUrlId());
 		}
 
-		if (sessionContext.isAuthenticated()) {
-			MongoSession session = new MongoSession(sessionContext.getUserName());
-			SubNode userNode = read.getUserNodeByUserName(auth.getAdminSession(), sessionContext.getUserName());
+		if (sc.isAuthenticated()) {
+			MongoSession session = new MongoSession(sc.getUserName());
+			SubNode userNode = read.getUserNodeByUserName(auth.getAdminSession(), sc.getUserName());
 			if (userNode == null) {
-				throw new RuntimeException("UserNode not found for userName " + sessionContext.getUserName());
+				throw new RuntimeException("UserNode not found for userName " + sc.getUserName());
 			}
 			session.setUserNodeId(userNode.getId());
-			sessionContext.setMongoSession(session);
-			ThreadLocals.setMongoSession(session);
+			sc.setMongoSession(session);
+			MongoThreadLocal.setMongoSession(session);
 
-			processLogin(session, res, sessionContext.getUserName());
-			log.debug("login: user=" + sessionContext.getUserName());
+			processLogin(session, res, sc.getUserName());
+			log.debug("login: user=" + sc.getUserName());
 
 			// ensure we've pre-created this node.
-			SubNode postsNode = read.getUserNodeByType(session, sessionContext.getUserName(), null, "### Posts",
+			SubNode postsNode = read.getUserNodeByType(session, sc.getUserName(), null, "### Posts",
 					NodeType.POSTS.s(), Arrays.asList(PrivilegeType.READ.s()), NodeName.POSTS);
 
-			ensureUserHomeNodeExists(session, sessionContext.getUserName(), "### " + sessionContext.getUserName()
+			ensureUserHomeNodeExists(session, sc.getUserName(), "### " + sc.getUserName()
 					+ "'s Public Node &#x1f389;\n\nEdit the content and children of this node. It represents you to the outside world.\n\n"
 					+ "Go here for a Quick Start guide: * https://quanta.wiki/n/quick-start", NodeType.NONE.s(), NodeName.HOME);
 		} else {
 			res.setUserPreferences(getDefaultUserPreferences());
 		}
 
-		res.setUserName(sessionContext.getUserName());
+		res.setUserName(sc.getUserName());
 		// note, this is a valid path even for 'anon' user.
 		res.setMessage("login ok.");
 		res.setSuccess(true);
@@ -258,10 +259,10 @@ public class UserManagerService {
 		if (id == null) {
 			throw new RuntimeException("userNode id is null for user: " + userName);
 		}
-		sessionContext.setRootId(id);
+		sc.setRootId(id);
 
 		UserPreferences userPreferences = getUserPreferences(userName, userNode);
-		sessionContext.setUserPreferences(userPreferences);
+		sc.setUserPreferences(userPreferences);
 
 		res.setRootNode(id);
 		res.setRootNodePath(userNode.getPath());
@@ -272,10 +273,10 @@ public class UserManagerService {
 
 		res.setAllowFileSystemSearch(appProp.isAllowFileSystemSearch());
 		res.setUserPreferences(userPreferences);
-		res.setAuthToken(sessionContext.getUserToken());
+		res.setAuthToken(sc.getUserToken());
 
 		Date now = new Date();
-		sessionContext.setLastLoginTime(now.getTime());
+		sc.setLastLoginTime(now.getTime());
 		userNode.setProp(NodeProp.LAST_LOGIN_TIME.s(), now.getTime());
 
 		ensureValidCryptoKeys(userNode);
@@ -409,30 +410,31 @@ public class UserManagerService {
 	 */
 	public String processSignupCode(final String signupCode) {
 		log.debug("User is trying signupCode: " + signupCode);
-		MongoSession session = auth.asAdminThread();
+		return arun.run(session -> {
 
-		// signupCode is just the new account node id? I guess that's secure, if user
-		// has this value it's the only user
-		// who could possibly know this unguessable value.
-		SubNode node = read.getNode(session, signupCode);
+			// signupCode is just the new account node id? I guess that's secure, if user
+			// has this value it's the only user
+			// who could possibly know this unguessable value.
+			SubNode node = read.getNode(session, signupCode);
 
-		if (node != null) {
-			if (!node.getBooleanProp(NodeProp.SIGNUP_PENDING.s())) {
-				return "Signup Complete. You may login now.";
-			} else {
-				String userName = node.getStrProp(NodeProp.USER.s());
-
-				if (PrincipalName.ADMIN.s().equalsIgnoreCase(userName)) {
-					return "processSignupCode should not be called for admin user.";
+			if (node != null) {
+				if (!node.getBooleanProp(NodeProp.SIGNUP_PENDING.s())) {
+					return "Signup Complete. You may login now.";
 				} else {
-					node.deleteProp(NodeProp.SIGNUP_PENDING.s());
-					update.save(session, node);
-					return "Signup Successful. You may login now.";
+					String userName = node.getStrProp(NodeProp.USER.s());
+
+					if (PrincipalName.ADMIN.s().equalsIgnoreCase(userName)) {
+						return "processSignupCode should not be called for admin user.";
+					} else {
+						node.deleteProp(NodeProp.SIGNUP_PENDING.s());
+						update.save(session, node);
+						return "Signup Successful. You may login now.";
+					}
 				}
+			} else {
+				return "Signup Code is invalid.";
 			}
-		} else {
-			return "Signup Code is invalid.";
-		}
+		});
 	}
 
 	public void initNewUser(MongoSession session, String userName, String password, String email, boolean automated) {
@@ -457,62 +459,64 @@ public class UserManagerService {
 	 * that node (i.e. preferences)
 	 */
 	public SignupResponse signup(SignupRequest req, boolean automated) {
-		MongoSession session = auth.asAdminThread();
 		SignupResponse res = new SignupResponse();
+		arun.run(session -> {
 
-		final String userName = req.getUserName().trim();
-		final String password = req.getPassword().trim();
-		final String email = req.getEmail();
+			final String userName = req.getUserName().trim();
+			final String password = req.getPassword().trim();
+			final String email = req.getEmail();
 
-		log.debug("Signup: userName=" + userName + " email=" + email);
-		res.setSuccess(true);
+			log.debug("Signup: userName=" + userName + " email=" + email);
+			res.setSuccess(true);
 
-		/* throw exceptions of the username or password are not valid */
-		String userError = validator.checkUserName(userName);
-		if (userError != null) {
-			res.setUserError(userError);
-			res.setSuccess(false);
-		}
-
-		String passwordError = validator.checkPassword(password);
-		if (passwordError != null) {
-			res.setPasswordError(passwordError);
-			res.setSuccess(false);
-		}
-
-		String emailError = validator.checkEmail(email);
-		if (emailError != null) {
-			res.setEmailError(emailError);
-			res.setSuccess(false);
-		}
-
-		if (!automated) {
-			if (!ThreadLocals.getSessionContext().getCaptcha().equals(req.getCaptcha())) {
-				int captchaFails = ThreadLocals.getSessionContext().getCaptchaFails();
-
-				if (captchaFails > 0) {
-					try {
-						// this sleep should stop brute forcing, every failed attempt makes the user
-						// need to wait an additional 2 seconds each time.
-						Thread.sleep(captchaFails * 2000);
-					} catch (Exception e) {
-					}
-				}
-				ThreadLocals.getSessionContext().setCaptchaFails(captchaFails + 1);
-				res.setCaptchaError("Wrong captcha. Try again.");
+			/* throw exceptions of the username or password are not valid */
+			String userError = validator.checkUserName(userName);
+			if (userError != null) {
+				res.setUserError(userError);
 				res.setSuccess(false);
 			}
-		}
 
-		if (!res.isSuccess()) {
-			return res;
-		}
+			String passwordError = validator.checkPassword(password);
+			if (passwordError != null) {
+				res.setPasswordError(passwordError);
+				res.setSuccess(false);
+			}
 
-		if (!automated) {
-			initiateSignup(session, userName, password, email);
-		} else {
-			initNewUser(session, userName, password, email, automated);
-		}
+			String emailError = validator.checkEmail(email);
+			if (emailError != null) {
+				res.setEmailError(emailError);
+				res.setSuccess(false);
+			}
+
+			if (!automated) {
+				if (!ThreadLocals.getSessionContext().getCaptcha().equals(req.getCaptcha())) {
+					int captchaFails = ThreadLocals.getSessionContext().getCaptchaFails();
+
+					if (captchaFails > 0) {
+						try {
+							// this sleep should stop brute forcing, every failed attempt makes the user
+							// need to wait an additional 2 seconds each time.
+							Thread.sleep(captchaFails * 2000);
+						} catch (Exception e) {
+						}
+					}
+					ThreadLocals.getSessionContext().setCaptchaFails(captchaFails + 1);
+					res.setCaptchaError("Wrong captcha. Try again.");
+					res.setSuccess(false);
+				}
+			}
+
+			if (!res.isSuccess()) {
+				return res;
+			}
+
+			if (!automated) {
+				initiateSignup(session, userName, password, email);
+			} else {
+				initNewUser(session, userName, password, email, automated);
+			}
+			return null;
+		});
 
 		res.setMessage("success");
 		return res;
@@ -689,10 +693,7 @@ public class UserManagerService {
 	public BlockUserResponse blockUser(MongoSession session, final BlockUserRequest req) {
 		BlockUserResponse res = new BlockUserResponse();
 		final String userName = ThreadLocals.getSessionContext().getUserName();
-
-		if (session == null) {
-			session = ThreadLocals.getMongoSession();
-		}
+		session = MongoThreadLocal.ensure(session);
 
 		// get the node that holds all blocked users
 		SubNode blockedList =
@@ -737,10 +738,7 @@ public class UserManagerService {
 	public AddFriendResponse addFriend(MongoSession session, final AddFriendRequest req) {
 		AddFriendResponse res = new AddFriendResponse();
 		final String userName = ThreadLocals.getSessionContext().getUserName();
-
-		if (session == null) {
-			session = ThreadLocals.getMongoSession();
-		}
+		session = MongoThreadLocal.ensure(session);
 
 		// get the Friend List of the follower
 		SubNode followerFriendList =
@@ -888,9 +886,7 @@ public class UserManagerService {
 	 */
 	public ChangePasswordResponse changePassword(MongoSession session, final ChangePasswordRequest req) {
 		ChangePasswordResponse res = new ChangePasswordResponse();
-		if (session == null) {
-			session = ThreadLocals.getMongoSession();
-		}
+		session = MongoThreadLocal.ensure(session);
 
 		ValContainer<SubNode> userNode = new ValContainer<>();
 		ValContainer<String> userName = new ValContainer<>();
@@ -1069,10 +1065,7 @@ public class UserManagerService {
 	 * Looks in the user's account under their 'underType' type node and returns all the children.
 	 */
 	public List<SubNode> getSpecialNodesList(MongoSession session, String underType) {
-		if (session == null) {
-			session = ThreadLocals.getMongoSession();
-		}
-
+		session = MongoThreadLocal.ensure(session);
 		List<SubNode> nodeList = new LinkedList<>();
 		SubNode userNode = read.getUserNodeByUserName(session, null);
 		if (userNode == null)
@@ -1125,10 +1118,7 @@ public class UserManagerService {
 	}
 
 	public String getUserAccountsReport(MongoSession session) {
-		if (session == null) {
-			session = ThreadLocals.getMongoSession();
-		}
-
+		session = MongoThreadLocal.ensure(session);
 		int localUserCount = 0;
 		int foreignUserCount = 0;
 
@@ -1169,7 +1159,7 @@ public class UserManagerService {
 			return Integer.MAX_VALUE;
 		}
 
-		SubNode userNode = read.getUserNodeByUserName(auth.getAdminSession(), sessionContext.getUserName());
+		SubNode userNode = read.getUserNodeByUserName(auth.getAdminSession(), sc.getUserName());
 		long ret = userNode.getIntProp(NodeProp.BIN_QUOTA.s());
 		if (ret == 0) {
 			return Const.DEFAULT_USER_QUOTA;

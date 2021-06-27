@@ -132,22 +132,22 @@ public class OutboxMgr {
 	 * node), telling them that 'fromUserName' has shared a node with them, and including a link to the
 	 * shared node in the email.
 	 * 
-	 * @param session
+	 * @param ms
 	 * @param fromUserName
 	 * @param toUserNode
 	 * @param node
 	 */
-	public void sendEmailNotification(MongoSession session, String fromUserName, SubNode toUserNode, SubNode node) {
+	public void sendEmailNotification(MongoSession ms, String fromUserName, SubNode toUserNode, SubNode node) {
 		String email = toUserNode.getStrProp(NodeProp.EMAIL.s());
 		String toUserName = toUserNode.getStrProp(NodeProp.USER.s());
 		// log.debug("sending node notification email to: " + email);
 
-		String nodeUrl = apiUtil.getFriendlyNodeUrl(session, node);
+		String nodeUrl = apiUtil.getFriendlyNodeUrl(ms, node);
 		String content =
 				String.format(appProp.getConfigText("brandingAppName") + " user '%s' shared a node to your '%s' account.<p>\n\n" + //
 						"%s", fromUserName, toUserName, nodeUrl);
 
-		queueMailUsingAdminSession(session, email, "A " + appProp.getConfigText("brandingAppName") + " Node was shared to you!",
+		queueMailUsingAdminSession(ms, email, "A " + appProp.getConfigText("brandingAppName") + " Node was shared to you!",
 				content);
 	}
 
@@ -158,18 +158,18 @@ public class OutboxMgr {
 		});
 	}
 
-	private void queueMailUsingAdminSession(MongoSession session, final String recipients, final String subject,
+	private void queueMailUsingAdminSession(MongoSession ms, final String recipients, final String subject,
 			final String content) {
 
-		SubNode outboxNode = getSystemOutbox(session);
-		SubNode outboundEmailNode = create.createNode(session, outboxNode.getPath() + "/?", NodeType.NONE.s());
+		SubNode outboxNode = getSystemOutbox(ms);
+		SubNode outboundEmailNode = create.createNode(ms, outboxNode.getPath() + "/?", NodeType.NONE.s());
 
-		outboundEmailNode.setOwner(session.getUserNodeId());
+		outboundEmailNode.setOwner(ms.getUserNodeId());
 		outboundEmailNode.setProp(NodeProp.EMAIL_CONTENT.s(), content);
 		outboundEmailNode.setProp(NodeProp.EMAIL_SUBJECT.s(), subject);
 		outboundEmailNode.setProp(NodeProp.EMAIL_RECIP.s(), recipients);
 
-		update.save(session, outboundEmailNode);
+		update.save(ms, outboundEmailNode);
 
 		notificationDaemon.setOutboxDirty();
 	}
@@ -177,15 +177,15 @@ public class OutboxMgr {
 	/*
 	 * Loads only up to mailBatchSize emails at a time
 	 */
-	public List<SubNode> getMailNodes(MongoSession session) {
-		SubNode outboxNode = getSystemOutbox(session);
+	public List<SubNode> getMailNodes(MongoSession ms) {
+		SubNode outboxNode = getSystemOutbox(ms);
 		// log.debug("outbox id: " + outboxNode.getId().toHexString());
 
 		int mailBatchSizeInt = Integer.parseInt(mailBatchSize);
-		return read.getChildrenAsList(session, outboxNode, false, mailBatchSizeInt);
+		return read.getChildrenAsList(ms, outboxNode, false, mailBatchSizeInt);
 	}
 
-	public SubNode getSystemOutbox(MongoSession session) {
+	public SubNode getSystemOutbox(MongoSession ms) {
 		if (OutboxMgr.outboxNode != null) {
 			return OutboxMgr.outboxNode;
 		}
@@ -196,9 +196,9 @@ public class OutboxMgr {
 				return OutboxMgr.outboxNode;
 			}
 
-			apiUtil.ensureNodeExists(session, "/" + NodeName.ROOT, NodeName.OUTBOX, null, "Outbox", null, true, null, null);
+			apiUtil.ensureNodeExists(ms, "/" + NodeName.ROOT, NodeName.OUTBOX, null, "Outbox", null, true, null, null);
 
-			OutboxMgr.outboxNode = apiUtil.ensureNodeExists(session, "/" + NodeName.ROOT, NodeName.OUTBOX + "/" + NodeName.SYSTEM,
+			OutboxMgr.outboxNode = apiUtil.ensureNodeExists(ms, "/" + NodeName.ROOT, NodeName.OUTBOX + "/" + NodeName.SYSTEM,
 					null, "System Messages", null, true, null, null);
 			return OutboxMgr.outboxNode;
 		}

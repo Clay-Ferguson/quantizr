@@ -17,13 +17,13 @@ import org.subnode.mongo.MongoAuth;
 import org.subnode.mongo.MongoCreate;
 import org.subnode.mongo.MongoRead;
 import org.subnode.mongo.MongoSession;
+import org.subnode.mongo.MongoThreadLocal;
 import org.subnode.mongo.MongoUpdate;
 import org.subnode.mongo.MongoUtil;
 import org.subnode.mongo.model.SubNode;
 import org.subnode.service.AttachmentService;
 import org.subnode.service.UserManagerService;
 import org.subnode.util.LimitedInputStreamEx;
-import org.subnode.util.ThreadLocals;
 
 @Component("MongoTest")
 public class MongoTest implements TestIntf {
@@ -177,7 +177,7 @@ public class MongoTest implements TestIntf {
 		// admin tries to save a duplicated path
 		adamsNode.setPath(adminsNode.getPath());
 		try {
-			ThreadLocals.setMongoSession(adminSession);
+			MongoThreadLocal.setMongoSession(adminSession);
 			update.save(adminSession, adamsNode);
 			throw new RuntimeException("failed to detect keydup.");
 		} catch (DuplicateKeyException e) {
@@ -187,7 +187,7 @@ public class MongoTest implements TestIntf {
 		// adam tries and fails to save adminsNode
 		try {
 			log.debug("Attempting save by wrong user.");
-			ThreadLocals.setMongoSession(adamSession);
+			MongoThreadLocal.setMongoSession(adamSession);
 			update.save(adamSession, adminsNode);
 			throw new RuntimeException("failed to block.");
 		} catch (NodeAuthFailedException e) {
@@ -241,7 +241,7 @@ public class MongoTest implements TestIntf {
 	private MongoSession loginUser(String userName) {
 		// code is obsolete now.
 		// MongoSession session = auth.processCredentials(userName, appProp.getTestPassword(), null);
-		// ThreadLocals.setMongoSession(session);
+		// MongoThreadLocal.setMongoSession(session);
 		// return session;
 		return null;
 	}

@@ -224,13 +224,13 @@ public class ActPubUtil {
      * 
      * WARNING: If privateKey is passed as 'null' you MUST be calling this from HTTP request thread.
      */
-    public void securePost(String userDoingPost, MongoSession session, String privateKey, String toInbox, String actor,
+    public void securePost(String userDoingPost, MongoSession ms, String privateKey, String toInbox, String actor,
             APObj message, MediaType acceptType) {
         try {
             // log.debug("Secure post to " + toInbox);
             /* if private key not sent then get it using the session */
             if (privateKey == null) {
-                privateKey = apCrypto.getPrivateKey(session, userDoingPost);
+                privateKey = apCrypto.getPrivateKey(ms, userDoingPost);
             }
 
             if (privateKey == null) {
