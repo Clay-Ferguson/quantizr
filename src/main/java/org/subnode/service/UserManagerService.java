@@ -210,8 +210,8 @@ public class UserManagerService {
 			log.debug("login: user=" + sc.getUserName());
 
 			// ensure we've pre-created this node.
-			SubNode postsNode = read.getUserNodeByType(session, sc.getUserName(), null, "### Posts",
-					NodeType.POSTS.s(), Arrays.asList(PrivilegeType.READ.s()), NodeName.POSTS);
+			SubNode postsNode = read.getUserNodeByType(session, sc.getUserName(), null, "### Posts", NodeType.POSTS.s(),
+					Arrays.asList(PrivilegeType.READ.s()), NodeName.POSTS);
 
 			ensureUserHomeNodeExists(session, sc.getUserName(), "### " + sc.getUserName()
 					+ "'s Public Node &#x1f389;\n\nEdit the content and children of this node. It represents you to the outside world.\n\n"
@@ -755,9 +755,20 @@ public class UserManagerService {
 			// '/u/userName/home'
 			String followerActorHtmlUrl = null;
 
-			friendNode =
-					edit.createFriendNode(session, followerFriendList, req.getUserName(), followerActorUrl, followerActorHtmlUrl);
+			friendNode = edit.createFriendNode(session, followerFriendList, req.getUserName(), //
+					followerActorUrl, followerActorHtmlUrl);
+					
 			if (friendNode != null) {
+				ValContainer<SubNode> userNode = new ValContainer<SubNode>();
+				arun.run(s -> {
+					userNode.setVal(read.getUserNodeByUserName(s, req.getUserName()));
+					return null;
+				});
+
+				if (userNode.getVal() != null) {
+					friendNode.setProp(NodeProp.USER_NODE_ID.s(), userNode.getVal().getId().toHexString());
+				}
+
 				res.setMessage("Added new Friend: " + req.getUserName());
 			} else {
 				res.setMessage("Unable to add Friend: " + req.getUserName());

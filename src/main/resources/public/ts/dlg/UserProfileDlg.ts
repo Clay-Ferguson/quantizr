@@ -193,7 +193,6 @@ export class UserProfileDlg extends DialogBase {
 
     addFriend = (): void => {
         const state: any = this.getState();
-
         S.util.ajax<J.AddFriendRequest, J.AddFriendResponse>("addFriend", {
             userName: state.userProfile.userName
         }, (res: J.AddFriendResponse) => {

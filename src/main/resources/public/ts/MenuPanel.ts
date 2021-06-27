@@ -243,11 +243,11 @@ export class MenuPanel extends Div {
             new MenuItem("My Posts", MenuPanel.openPostsNode, !state.isAnonUser)
         ]));
 
-        children.push(new Menu("Users", [
-            new MenuItem("Find Users", MenuPanel.findUsers, !state.isAnonUser), //
-            new MenuItem("Friends", MenuPanel.openFriendsNode, !state.isAnonUser),
+        children.push(new Menu("Friends", [
+            new MenuItem("My Friends", MenuPanel.openFriendsNode, !state.isAnonUser),
             new MenuItem("Add Friend", MenuPanel.addFriend, !state.isAnonUser),
             new MenuItem("Followers", MenuPanel.showFollowers, !state.isAnonUser),
+            new MenuItem("Find Users", MenuPanel.findUsers, !state.isAnonUser), //
             new MenuItem("Blocked Users", MenuPanel.openBlockedUsersNode, !state.isAnonUser)
         ]));
 
