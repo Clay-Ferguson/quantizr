@@ -52,7 +52,7 @@ public class MongoUtil {
 	private UserManagerService userManagerService;
 
 	@Autowired
-	private RunAsMongoAdmin adminRunner;
+	private AdminRun arun;
 
 	@Autowired
 	private AppProp appProp;
@@ -161,7 +161,7 @@ public class MongoUtil {
 			return;
 		}
 
-		adminRunner.run((MongoSession session) -> {
+		arun.run((MongoSession session) -> {
 			for (String accountInfo : testUserAccountsList) {
 				log.debug("Verifying test Account: " + accountInfo);
 
@@ -192,6 +192,7 @@ public class MongoUtil {
 				 */
 				testAccountNames.add(userName);
 			}
+			return null;
 		});
 	}
 

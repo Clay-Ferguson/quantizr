@@ -37,7 +37,7 @@ import org.subnode.mongo.MongoRead;
 import org.subnode.mongo.MongoSession;
 import org.subnode.mongo.MongoUpdate;
 import org.subnode.mongo.MongoUtil;
-import org.subnode.mongo.RunAsMongoAdminEx;
+import org.subnode.mongo.AdminRun;
 import org.subnode.mongo.model.AccessControl;
 import org.subnode.mongo.model.FediverseName;
 import org.subnode.mongo.model.SubNode;
@@ -92,7 +92,7 @@ public class ActPubService {
     private EnglishDictionary englishDictionary;
 
     @Autowired
-    private RunAsMongoAdminEx adminRunner;
+    private AdminRun arun;
 
     @Autowired
     private MongoAuth auth;
@@ -455,7 +455,7 @@ public class ActPubService {
     }
 
     public void processCreateAction(HttpServletRequest httpReq, Object payload) {
-        adminRunner.<Object>run(session -> {
+        arun.<Object>run(session -> {
 
             String actorUrl = AP.str(payload, APProp.actor);
             if (actorUrl == null) {
@@ -883,7 +883,7 @@ public class ActPubService {
      * servers by posting an 'undo' action to the foreign servers
      */
     public void deleteNodeNotify(ObjectId nodeId) {
-        adminRunner.run(session -> {
+        arun.run(session -> {
             SubNode node = read.getNode(session, nodeId);
             if (node != null && node.getType().equals(NodeType.FRIEND.s())) {
                 String friendUserName = node.getStrProp(NodeProp.USER.s());
@@ -1008,7 +1008,7 @@ public class ActPubService {
                 // flag as done (even if it fails we still want it flagged as done. no retries will be done).
                 apCache.usersPendingRefresh.put(userName, true);
 
-                adminRunner.run(session -> {
+                arun.run(session -> {
                     // log.debug("Reload user outbox: " + userName);
                     SubNode userNode = getAcctNodeByUserName(session, userName);
                     if (userNode == null)
@@ -1038,7 +1038,9 @@ public class ActPubService {
     }
 
     private void saveUserNames() {
-        for (final String name : apCache.allUserNames.keySet()) {
+        List<String> names = new LinkedList<>(apCache.allUserNames.keySet());
+        
+        for (final String name : names) {
             Boolean done = apCache.allUserNames.get(name);
             if (done)
                 continue;
@@ -1056,7 +1058,7 @@ public class ActPubService {
             try {
                 ops.save(fName);
             } catch (Exception e) {
-                // this will happen for every duplidate. so A LOT!
+                // this will happen for every duplicate. so A LOT!
             }
         }
     }
@@ -1085,7 +1087,7 @@ public class ActPubService {
         cycleOutboxQueryCount = 0;
         newPostsInCycle = 0;
 
-        adminRunner.run(session -> {
+        arun.run(session -> {
             Iterable<SubNode> accountNodes =
                     read.findTypedNodesUnderPath(session, NodeName.ROOT_OF_ALL_USERS, NodeType.ACCOUNT.s());
 
@@ -1112,7 +1114,7 @@ public class ActPubService {
         if (!appProp.isActPubEnabled())
             return "ActivityPub not enabled";
 
-        return adminRunner.run(session -> {
+        return arun.run(session -> {
 
             Iterable<SubNode> accountNodes =
                     read.findTypedNodesUnderPath(session, NodeName.ROOT_OF_ALL_USERS, NodeType.ACCOUNT.s());
@@ -1126,10 +1128,11 @@ public class ActPubService {
 
             Iterable<FediverseName> recs = ops.findAll(FediverseName.class);
             int numLoaded = 0;
+            List<FediverseName> toDelete = new LinkedList<>();
             for (FediverseName fName : recs) {
                 try {
                     String userName = fName.getName();
-                    // log.debug("loading user: " + userName);
+                    log.debug("crawled user: " + userName);
 
                     // yes this userName may be an actor url, and if so we convert it to an actual username.
                     if (userName.startsWith("https://")) {
@@ -1142,7 +1145,6 @@ public class ActPubService {
 
                     queueUserForRefresh(userName, true);
                     apCache.allUserNames.remove(userName);
-                    ops.remove(fName);
 
                     if (++numLoaded > 250) {
                         break;
@@ -1151,6 +1153,11 @@ public class ActPubService {
                     log.error("queueing FediverseName failed.", e);
                 }
             }
+
+            for (FediverseName fName: toDelete) {
+                ops.remove(fName);
+            }
+
             return "Queued some new users to crawl.";
         });
     }
@@ -1159,7 +1166,7 @@ public class ActPubService {
         if (!appProp.isActPubEnabled())
             return "ActivityPub not enabled";
 
-        return adminRunner.run(session -> {
+        return arun.run(session -> {
             long totalDelCount = 0;
             Iterable<SubNode> accountNodes =
                     read.findTypedNodesUnderPath(session, NodeName.ROOT_OF_ALL_USERS, NodeType.ACCOUNT.s());

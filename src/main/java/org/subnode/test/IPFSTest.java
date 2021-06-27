@@ -8,7 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.subnode.model.MerkleLink;
 import org.subnode.model.MerkleNode;
-import org.subnode.mongo.RunAsMongoAdmin;
+import org.subnode.mongo.AdminRun;
 import org.subnode.service.IPFSService;
 import org.subnode.util.ValContainer;
 import org.subnode.util.XString;
@@ -21,7 +21,7 @@ public class IPFSTest implements TestIntf {
     private IPFSService ipfs;
 
     @Autowired
-    private RunAsMongoAdmin adminRunner;
+    private AdminRun arun;
 
     @Override
     public void test() throws Exception {
@@ -30,7 +30,7 @@ public class IPFSTest implements TestIntf {
     }
 
     private void testUploadDirectory() {
-        adminRunner.run(mongoSession -> {
+        arun.run(mongoSession -> {
             // create the root directory
             MerkleNode rootDir = ipfs.newObject();
             log.debug("rootDir: " + XString.prettyPrint(rootDir));
@@ -44,12 +44,13 @@ public class IPFSTest implements TestIntf {
 
             MerkleNode newRootDir = ipfs.addFileToDagRoot(rootDir.getHash(), "subfolder/fileone.txt", file1.getHash());
             log.debug("newRoot (first file added): " + XString.prettyPrint(newRootDir));
+            return null;
         });
     }
 
     public void oldTest2() throws Exception {
         // ipfs.getPins();
-        adminRunner.run(mongoSession -> {
+        arun.run(mongoSession -> {
             ValContainer<String> cid = new ValContainer<>();
             ipfs.dagPutFromString(mongoSession, "{\"data\": \"MY FIRST DAG PUT\"}", null, null, cid);
             log.debug("Cid=" + cid.getVal());
@@ -81,6 +82,7 @@ public class IPFSTest implements TestIntf {
             ipnsName = (String) ret.get("Name");
             ret = ipfs.ipnsResolve(mongoSession, ipnsName);
             log.debug("ipnsResolveRet (second): " + XString.prettyPrint(ret));
+            return null;
         });
     }
 

@@ -29,7 +29,7 @@ import org.subnode.mongo.MongoRead;
 import org.subnode.mongo.MongoSession;
 import org.subnode.mongo.MongoUpdate;
 import org.subnode.mongo.MongoUtil;
-import org.subnode.mongo.RunAsMongoAdmin;
+import org.subnode.mongo.AdminRun;
 import org.subnode.mongo.model.SubNode;
 import org.subnode.request.AppDropRequest;
 import org.subnode.request.CreateSubNodeRequest;
@@ -88,7 +88,7 @@ public class NodeEditService {
 	private UserFeedService userFeedService;
 
 	@Autowired
-	private RunAsMongoAdmin adminRunner;
+	private AdminRun arun;
 
 	@Autowired
 	private ActPubService apService;
@@ -594,12 +594,13 @@ public class NodeEditService {
 				SubNode parent = read.getNode(session, node.getParentPath(), false);
 
 				if (parent != null) {
-					adminRunner.run(s -> {
+					arun.run(s -> {
 						auth.saveMentionsToNodeACL(s, node);
 
 						if (apService.sendNotificationForNodeEdit(s, parent, node)) {
 							userFeedService.pushNodeUpdateToBrowsers(s, node);
 						}
+						return null;
 					});
 				}
 			}
@@ -650,7 +651,7 @@ public class NodeEditService {
 				 */
 				if (friendUserName.contains("@")) {
 					asyncExec.run(() -> {
-						adminRunner.run(s -> {
+						arun.run(s -> {
 							if (!ThreadLocals.getSessionContext().isAdmin()) {
 								apService.getAcctNodeByUserName(s, friendUserName);
 							}
@@ -660,13 +661,15 @@ public class NodeEditService {
 							 * friend.
 							 */
 							apService.userEncountered(friendUserName, true);
+							return null;
 						});
 					});
 				}
 
 				ValContainer<SubNode> userNode = new ValContainer<SubNode>();
-				adminRunner.run(s -> {
+				arun.run(s -> {
 					userNode.setVal(read.getUserNodeByUserName(s, friendUserName));
+					return null;
 				});
 
 				if (userNode.getVal() != null) {

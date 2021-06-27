@@ -34,7 +34,7 @@ public class MongoUpdate {
 	private IPFSService ipfs;
 
 	@Autowired
-	private RunAsMongoAdmin adminRunner;
+	private AdminRun arun;
 
 	@Autowired
 	private MongoAuth auth;
@@ -127,7 +127,7 @@ public class MongoUpdate {
 	 */
 	public String releaseOrphanIPFSPins(HashMap<ObjectId, UserStats> statsMap) {
 		ValContainer<String> ret = new ValContainer<>("failed");
-		adminRunner.run(session -> {
+		arun.run(session -> {
 			int pinCount = 0, orphanCount = 0;
 			LinkedHashMap<String, Object> pins = Cast.toLinkedHashMap(ipfs.getPins());
 			if (pins != null) {
@@ -174,6 +174,7 @@ public class MongoUpdate {
 			}
 			ret.setVal("Pins in use: " + pinCount + "\nOrphan Pins removed: " + orphanCount + "\n");
 			log.debug(ret.getVal());
+			return null;
 		});
 		return ret.getVal();
 	}

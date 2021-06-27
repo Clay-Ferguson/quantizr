@@ -47,7 +47,7 @@ import org.subnode.model.NodeMetaInfo;
 import org.subnode.model.client.NodeProp;
 import org.subnode.mongo.MongoRead;
 import org.subnode.mongo.MongoSession;
-import org.subnode.mongo.RunAsMongoAdmin;
+import org.subnode.mongo.AdminRun;
 import org.subnode.mongo.model.SubNode;
 import org.subnode.util.Const;
 import org.subnode.util.ExUtil;
@@ -72,7 +72,7 @@ public class RSSFeedService {
 	private AppProp appProp;
 
 	@Autowired
-	private RunAsMongoAdmin adminRunner;
+	private AdminRun arun;
 
 	private static boolean refreshingCache = false;
 
@@ -146,9 +146,10 @@ public class RSSFeedService {
 		if (StringUtils.isEmpty(rssNodeId))
 			return;
 
-		adminRunner.run(mongoSession -> {
+		arun.run(mongoSession -> {
 			log.debug("startupPreCache: node=" + rssNodeId);
 			multiRss(mongoSession, rssNodeId, null);
+			return null;
 		});
 	}
 

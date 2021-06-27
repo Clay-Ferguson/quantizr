@@ -31,7 +31,7 @@ import org.subnode.mongo.MongoDelete;
 import org.subnode.mongo.MongoRead;
 import org.subnode.mongo.MongoSession;
 import org.subnode.mongo.MongoUtil;
-import org.subnode.mongo.RunAsMongoAdminEx;
+import org.subnode.mongo.AdminRun;
 import org.subnode.mongo.model.SubNode;
 import org.subnode.request.GetFollowingRequest;
 import org.subnode.response.GetFollowingResponse;
@@ -51,7 +51,7 @@ public class ActPubFollowing {
     private ActPubUtil apUtil;
 
     @Autowired
-    private RunAsMongoAdminEx adminRunner;
+    private AdminRun arun;
 
     @Autowired
     private AppProp appProp;
@@ -101,7 +101,7 @@ public class ActPubFollowing {
             APObj webFingerOfUserBeingFollowed = apUtil.getWebFinger(apUserName);
             String actorUrlOfUserBeingFollowed = apUtil.getActorUrlFromWebFingerObj(webFingerOfUserBeingFollowed);
 
-            adminRunner.run(session -> {
+            arun.run(session -> {
                 String sessionActorUrl = apUtil.makeActorUrlForUserName(followerUserName);
                 APOFollow followAction = new APOFollow()
                         .put(APProp.id, appProp.getProtocolHostAndPort() + "/follow/" + String.valueOf(new Date().getTime())) //
@@ -142,7 +142,7 @@ public class ActPubFollowing {
      * If 'unFollow' is true we actually do an unfollow instead of a follow.
      */
     public void processFollowAction(Object followAction, boolean unFollow) {
-        adminRunner.<APObj>run(session -> {
+        arun.<APObj>run(session -> {
             // Actor URL of actor doing the following
             String followerActorUrl = AP.str(followAction, APProp.actor);
             if (followerActorUrl == null) {
@@ -324,7 +324,7 @@ public class ActPubFollowing {
     public List<String> getFollowing(String userName, String minId) {
         final List<String> following = new LinkedList<>();
 
-        adminRunner.run(session -> {
+        arun.run(session -> {
             Iterable<SubNode> iter = findFollowingOfUser(session, userName);
 
             for (SubNode n : iter) {
@@ -338,7 +338,7 @@ public class ActPubFollowing {
     }
 
     public Long getFollowingCount(String userName) {
-        return (Long) adminRunner.run(session -> {
+        return (Long) arun.run(session -> {
             Long count = countFollowingOfUser(session, userName, null);
             return count;
         });

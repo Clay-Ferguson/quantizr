@@ -4,7 +4,7 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
-
+import javax.annotation.PostConstruct;
 import org.apache.commons.lang3.StringUtils;
 import org.bson.types.ObjectId;
 import org.slf4j.Logger;
@@ -57,6 +57,17 @@ public class MongoRead {
     // todo-1: rename to 'acl' everywhere like this.
     @Autowired
     private AclService aclService;
+
+    private SubNode dbRoot;
+
+    @PostConstruct
+    public void postConstruct() {
+        dbRoot = getNode(auth.getAdminSession(), "/" + NodeName.ROOT);
+    }
+
+    public SubNode getDbRoot() {
+        return dbRoot;
+    }
 
     /**
      * Gets account name from the root node associated with whoever owns 'node'
@@ -779,7 +790,8 @@ public class MongoRead {
         return userName.substring(0, atIdx);
     }
 
-    // todo-0: look for all other places in this class where we can be looking up something with a custom
+    // todo-0: look for all other places in this class where we can be looking up something with a
+    // custom
     // cache key.
     public SubNode getUserNodeByUserName(MongoSession session, String user) {
         String cacheKey = "USRNODE-" + user;
@@ -803,7 +815,7 @@ public class MongoRead {
         // For the ADMIN user their root node is considered to be the entire root of the
         // whole DB
         if (PrincipalName.ADMIN.s().equalsIgnoreCase(user)) {
-            return getNode(session, "/" + NodeName.ROOT);
+            return dbRoot;
         }
 
         // Other wise for ordinary users root is based off their username

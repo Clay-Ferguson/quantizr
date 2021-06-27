@@ -24,7 +24,7 @@ import org.subnode.model.client.NodeType;
 import org.subnode.mongo.MongoAuth;
 import org.subnode.mongo.MongoSession;
 import org.subnode.mongo.MongoUtil;
-import org.subnode.mongo.RunAsMongoAdminEx;
+import org.subnode.mongo.AdminRun;
 import org.subnode.mongo.model.SubNode;
 import org.subnode.request.GetFollowersRequest;
 import org.subnode.response.GetFollowersResponse;
@@ -40,7 +40,7 @@ public class ActPubFollower {
     private MongoTemplate ops;
 
     @Autowired
-    private RunAsMongoAdminEx adminRunner;
+    private AdminRun arun;
 
     @Autowired
     private AppProp appProp;
@@ -138,7 +138,7 @@ public class ActPubFollower {
     public List<String> getFollowers(String userName, String minId) {
         final List<String> followers = new LinkedList<>();
 
-        adminRunner.run(session -> {
+        arun.run(session -> {
             Iterable<SubNode> iter = findFollowersOfUser(session, userName);
 
             for (SubNode n : iter) {
@@ -152,7 +152,7 @@ public class ActPubFollower {
     }
 
     public Long getFollowersCount(String userName) {
-        return (Long) adminRunner.run(session -> {
+        return (Long) arun.run(session -> {
             Long count = countFollowersOfUser(session, userName, null);
             return count;
         });

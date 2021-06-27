@@ -13,8 +13,8 @@ import org.subnode.util.MongoRunnableEx;
  * Lambda (i.e. 'Functional Interface')
  */
 @Component
-public class RunAsMongoAdminEx {
-	private static final Logger log = LoggerFactory.getLogger(RunAsMongoAdminEx.class);
+public class AdminRun {
+	private static final Logger log = LoggerFactory.getLogger(AdminRun.class);
 
 	@Autowired
 	private MongoUpdate update;

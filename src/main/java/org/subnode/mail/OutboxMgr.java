@@ -15,7 +15,7 @@ import org.subnode.mongo.MongoCreate;
 import org.subnode.mongo.MongoRead;
 import org.subnode.mongo.MongoSession;
 import org.subnode.mongo.MongoUpdate;
-import org.subnode.mongo.RunAsMongoAdmin;
+import org.subnode.mongo.AdminRun;
 import org.subnode.mongo.model.SubNode;
 import org.subnode.response.NotificationMessage;
 import org.subnode.service.UserFeedService;
@@ -45,7 +45,7 @@ public class OutboxMgr {
 	private MongoUpdate update;
 
 	@Autowired
-	private RunAsMongoAdmin adminRunner;
+	private AdminRun arun;
 
 	@Autowired
 	private AppProp appProp;
@@ -76,7 +76,7 @@ public class OutboxMgr {
 	 */
 	public void addInboxNotification(String recieverUserName, SubNode userNode, SubNode node, String notifyMessage) {
 
-		adminRunner.run(session -> {
+		arun.run(session -> {
 			SubNode userInbox =
 					read.getUserNodeByType(session, null, userNode, "### Inbox", NodeType.INBOX.s(), null, NodeName.INBOX);
 
@@ -123,6 +123,7 @@ public class OutboxMgr {
 					}
 				}
 			}
+			return null;
 		});
 	}
 
@@ -151,8 +152,9 @@ public class OutboxMgr {
 	}
 
 	public void queueEmail(final String recipients, final String subject, final String content) {
-		adminRunner.run(session -> {
+		arun.run(session -> {
 			queueMailUsingAdminSession(session, recipients, subject, content);
+			return null;
 		});
 	}
 

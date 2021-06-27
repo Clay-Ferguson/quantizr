@@ -23,7 +23,7 @@ import org.subnode.model.client.NodeType;
 import org.subnode.model.client.PrincipalName;
 import org.subnode.model.client.PrivilegeType;
 import org.subnode.mongo.MongoUtil;
-import org.subnode.mongo.RunAsMongoAdminEx;
+import org.subnode.mongo.AdminRun;
 import org.subnode.mongo.MongoAuth;
 import org.subnode.mongo.MongoRead;
 import org.subnode.mongo.MongoSession;
@@ -51,7 +51,7 @@ public class Convert {
 	private AttachmentService attachmentService;
 
 	@Autowired
-	private RunAsMongoAdminEx adminRunner;
+	private AdminRun arun;
 
 	private static final Logger log = LoggerFactory.getLogger(Convert.class);
 
@@ -358,7 +358,7 @@ public class Convert {
 		}
 
 		if (principalId != null) {
-			adminRunner.run(s -> {
+			arun.run(s -> {
 				acInfo.setPrincipalName(auth.getUserNameFromAccountNodeId(s, principalId));
 				acInfo.setDisplayName(auth.getDisplayNameFromAccountNodeId(s, principalId));
 

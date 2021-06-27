@@ -67,7 +67,7 @@ import org.subnode.mongo.MongoRead;
 import org.subnode.mongo.MongoSession;
 import org.subnode.mongo.MongoUpdate;
 import org.subnode.mongo.MongoUtil;
-import org.subnode.mongo.RunAsMongoAdminEx;
+import org.subnode.mongo.AdminRun;
 import org.subnode.mongo.model.SubNode;
 import org.subnode.mongo.model.SubNodePropVal;
 import org.subnode.request.DeleteAttachmentRequest;
@@ -131,7 +131,7 @@ public class AttachmentService {
 	private IPFSService ipfsService;
 
 	@Autowired
-	private RunAsMongoAdminEx adminRunner;
+	private AdminRun arun;
 
 	/*
 	 * Upload from User's computer. Standard HTML form-based uploading of a file from user machine
@@ -1158,7 +1158,7 @@ public class AttachmentService {
 	}
 
 	public int getGridItemCount() {
-		return adminRunner.run(session -> {
+		return arun.run(session -> {
 			int count = 0;
 			final GridFSFindIterable files = gridFsBucket.find();
 
@@ -1187,7 +1187,7 @@ public class AttachmentService {
 	 * nodes.
 	 */
 	public void gridMaintenanceScan(HashMap<ObjectId, UserStats> statsMap) {
-		adminRunner.run(session -> {
+		arun.run(session -> {
 			int delCount = 0;
 			final GridFSFindIterable files = gridFsBucket.find();
 

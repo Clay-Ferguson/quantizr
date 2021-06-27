@@ -55,7 +55,7 @@ import org.subnode.mongo.MongoCreate;
 import org.subnode.mongo.MongoRead;
 import org.subnode.mongo.MongoSession;
 import org.subnode.mongo.MongoUpdate;
-import org.subnode.mongo.RunAsMongoAdmin;
+import org.subnode.mongo.AdminRun;
 import org.subnode.mongo.model.SubNode;
 import org.subnode.request.LoadNodeFromIpfsRequest;
 import org.subnode.request.PublishNodeToIpfsRequest;
@@ -104,7 +104,7 @@ public class IPFSService {
     private static final ObjectMapper mapper = new ObjectMapper();
 
     @Autowired
-    private RunAsMongoAdmin adminRunner;
+    private AdminRun arun;
 
     @Autowired
     private MongoRead read;
@@ -383,12 +383,13 @@ public class IPFSService {
     }
 
     public Map<String, Object> addTarFromFile(String fileName) {
-        adminRunner.run(mongoSession -> {
+        arun.run(mongoSession -> {
             try {
                 addTarFromStream(mongoSession, new BufferedInputStream(new FileInputStream(fileName)), null, null);
             } catch (Exception e) {
                 log.error("Failed in restTemplate.exchange", e);
             }
+            return null;
         });
         return null;
     }

@@ -40,7 +40,7 @@ import org.subnode.mail.MailSender;
 import org.subnode.model.client.NodeProp;
 import org.subnode.model.client.PrincipalName;
 import org.subnode.mongo.MongoRead;
-import org.subnode.mongo.RunAsMongoAdmin;
+import org.subnode.mongo.AdminRun;
 import org.subnode.mongo.model.SubNode;
 import org.subnode.request.AddFriendRequest;
 import org.subnode.request.AddPrivilegeRequest;
@@ -179,7 +179,7 @@ public class AppController implements ErrorController {
 	private FileUtils fileUtils;
 
 	@Autowired
-	private RunAsMongoAdmin adminRunner;
+	private AdminRun arun;
 
 	@Autowired
 	private CallProcessor callProc;
@@ -343,7 +343,7 @@ public class AppController implements ErrorController {
 				ThreadLocals.getSessionContext().setUrlId(id);
 				// log.debug("ID specified on url=" + id);
 				String _id = id;
-				adminRunner.run(mongoSession -> {
+				arun.run(mongoSession -> {
 					// we don't check ownership of node at this time, but merely check sanity of
 					// whether this ID is even existing or not.
 					SubNode node = read.getNode(mongoSession, _id);
@@ -354,6 +354,7 @@ public class AppController implements ErrorController {
 					} else {
 						// log.debug("Node exists.");
 					}
+					return null;
 				});
 			} else {
 				ThreadLocals.getSessionContext().setUrlId(null);
@@ -447,12 +448,13 @@ public class AppController implements ErrorController {
 	@GetMapping(value = {"/multiRss"}, produces = MediaType.APPLICATION_RSS_XML_VALUE)
 	public void multiRss(@RequestParam(value = "id", required = true) String nodeId, //
 			HttpServletResponse response) {
-		adminRunner.run(mongoSession -> {
+		arun.run(mongoSession -> {
 			try {
 				rssFeedService.multiRss(mongoSession, nodeId, response.getWriter());
 			} catch (Exception e) {
 				throw new RuntimeException("internal server error");
 			}
+			return null;
 		});
 	}
 
@@ -464,12 +466,13 @@ public class AppController implements ErrorController {
 			HttpServletResponse response, //
 			HttpSession session) {
 		callProc.run("rss", null, session, ms -> {
-			adminRunner.run(mongoSession -> {
+			arun.run(mongoSession -> {
 				try {
 					rssFeedService.getRssFeed(mongoSession, nodeId, response.getWriter());
 				} catch (Exception e) {
 					throw new RuntimeException("internal server error");
 				}
+				return null;
 			});
 			return null;
 		});
@@ -673,7 +676,7 @@ public class AppController implements ErrorController {
 			 * export, because this will potentially consume a lot of their storage quota and we don't want
 			 * users just clicking things like the War and Peace book and trying to export that.
 			 */
-			adminRunner.run(mongoSession -> {
+			arun.run(mongoSession -> {
 				// we don't check ownership of node at this time, but merely check sanity of
 				// whether this ID is even existing or not.
 				SubNode node = read.getNode(mongoSession, req.getNodeId());
@@ -683,6 +686,7 @@ public class AppController implements ErrorController {
 				if (!node.getOwner().toHexString().equals(ThreadLocals.getSessionContext().getRootId())) {
 					throw new RuntimeException("You can only export nodes you own");
 				}
+				return null;
 			});
 
 			if ("pdf".equalsIgnoreCase(req.getExportExt())) {
@@ -902,7 +906,7 @@ public class AppController implements ErrorController {
 
 			if (id != null) {
 				String _id = id;
-				adminRunner.run(mongoSession -> {
+				arun.run(mongoSession -> {
 					// we don't check ownership of node at this time, but merely check sanity of
 					// whether this ID is even existing or not.
 					SubNode node = read.getNode(mongoSession, _id);
@@ -936,6 +940,7 @@ public class AppController implements ErrorController {
 					} else {
 						attachmentService.getBinary(mongoSession, "", node, null, download != null, response);
 					}
+					return null;
 				});
 			}
 		} catch (Exception e) {
@@ -974,19 +979,21 @@ public class AppController implements ErrorController {
 		if (token == null) {
 			// Check if this is an 'avatar' request and if so bypass security
 			if ("avatar".equals(binId)) {
-				adminRunner.run(mongoSession -> {
+				arun.run(mongoSession -> {
 					attachmentService.getBinary(mongoSession, "", null, nodeId, download != null, response);
+					return null;
 				});
 			}
 			// Check if this is an 'profileHeader Image' request and if so bypass security
 			else if ("profileHeader".equals(binId)) {
-				adminRunner.run(ms -> {
+				arun.run(ms -> {
 					/*
 					 * Note: the "Header" suffix will be applied to all image-related property names to distinguish them
 					 * from normal 'bin' properties. This way we now to support multiple uploads onto any node, in this
 					 * very limites way.
 					 */
 					attachmentService.getBinary(ms, "Header", null, nodeId, download != null, response);
+					return null;
 				});
 			}
 			/* Else if not an avatar request then do a securer acccess */
@@ -1002,8 +1009,9 @@ public class AppController implements ErrorController {
 			}
 		} else {
 			if (SessionContext.validToken(token, null)) {
-				adminRunner.run(mongoSession -> {
+				arun.run(mongoSession -> {
 					attachmentService.getBinary(mongoSession, "", null, nodeId, download != null, response);
+					return null;
 				});
 			}
 		}

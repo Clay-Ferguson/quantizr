@@ -40,7 +40,7 @@ import org.subnode.mongo.MongoRead;
 import org.subnode.mongo.MongoSession;
 import org.subnode.mongo.MongoUpdate;
 import org.subnode.mongo.MongoUtil;
-import org.subnode.mongo.RunAsMongoAdmin;
+import org.subnode.mongo.AdminRun;
 import org.subnode.mongo.model.SubNode;
 import org.subnode.request.AddFriendRequest;
 import org.subnode.request.BlockUserRequest;
@@ -111,7 +111,7 @@ public class UserManagerService {
 	private OutboxMgr outboxMgr;
 
 	@Autowired
-	private RunAsMongoAdmin adminRunner;
+	private AdminRun arun;
 
 	@Autowired
 	private AclService acu;
@@ -309,13 +309,14 @@ public class UserManagerService {
 	public CloseAccountResponse closeAccount(CloseAccountRequest req) {
 		CloseAccountResponse res = new CloseAccountResponse();
 		log.debug("Closing Account: " + ThreadLocals.getSessionContext().getUserName());
-		adminRunner.run(session -> {
+		arun.run(session -> {
 			String userName = ThreadLocals.getSessionContext().getUserName();
 
 			SubNode ownerNode = read.getUserNodeByUserName(session, userName);
 			if (ownerNode != null) {
 				delete.delete(session, ownerNode, false);
 			}
+			return null;
 		});
 		return res;
 	}
@@ -443,8 +444,9 @@ public class UserManagerService {
 
 	public List<String> getOwnerNames(SubNode node) {
 		final ValContainer<List<String>> ret = new ValContainer<List<String>>();
-		adminRunner.run(session -> {
+		arun.run(session -> {
 			ret.setVal(acu.getOwnerNames(session, node));
+			return null;
 		});
 		return ret.getVal();
 	}
@@ -561,7 +563,7 @@ public class UserManagerService {
 		SavePublicKeyResponse res = new SavePublicKeyResponse();
 		final String userName = ThreadLocals.getSessionContext().getUserName();
 
-		adminRunner.run(session -> {
+		arun.run(session -> {
 			SubNode userNode = read.getUserNodeByUserName(session, userName);
 
 			if (userNode != null) {
@@ -575,6 +577,7 @@ public class UserManagerService {
 			// the actual publish keys menu
 			// res.setMessage("Successfully saved public key.");
 			res.setSuccess(true);
+			return null;
 		});
 		return res;
 	}
@@ -583,7 +586,7 @@ public class UserManagerService {
 		GetUserAccountInfoResponse res = new GetUserAccountInfoResponse();
 		final String userName = ThreadLocals.getSessionContext().getUserName();
 
-		adminRunner.run(session -> {
+		arun.run(session -> {
 			SubNode userNode = read.getUserNodeByUserName(session, userName);
 			if (userNode == null) {
 				res.setMessage("unknown user: " + userName);
@@ -602,6 +605,7 @@ public class UserManagerService {
 			}
 
 			res.setSuccess(true);
+			return null;
 		});
 		return res;
 	}
@@ -617,7 +621,7 @@ public class UserManagerService {
 
 		final String userName = ThreadLocals.getSessionContext().getUserName();
 
-		adminRunner.run(session -> {
+		arun.run(session -> {
 			SubNode prefsNode = read.getUserNodeByUserName(session, userName);
 
 			UserPreferences reqUserPrefs = req.getUserPreferences();
@@ -643,6 +647,7 @@ public class UserManagerService {
 			userPreferences.setShowMetaData(showMetaData);
 
 			res.setSuccess(true);
+			return null;
 		});
 		return res;
 	}
@@ -651,7 +656,7 @@ public class UserManagerService {
 		SaveUserProfileResponse res = new SaveUserProfileResponse();
 		final String userName = ThreadLocals.getSessionContext().getUserName();
 
-		adminRunner.run(session -> {
+		arun.run(session -> {
 			boolean failed = false;
 			SubNode userNode = read.getUserNodeByUserName(session, userName);
 
@@ -676,6 +681,7 @@ public class UserManagerService {
 				update.save(session, userNode);
 				res.setSuccess(true);
 			}
+			return null;
 		});
 		return res;
 	}
@@ -772,7 +778,7 @@ public class UserManagerService {
 		GetUserProfileResponse res = new GetUserProfileResponse();
 		final String sessionUserName = ThreadLocals.getSessionContext().getUserName();
 
-		adminRunner.run(session -> {
+		arun.run(session -> {
 			SubNode userNode = null;
 
 			if (req.getUserId() == null) {
@@ -827,6 +833,7 @@ public class UserManagerService {
 				// todo-1: add ability to know "follows you" state (for display on UserProfileDlg)
 				res.setSuccess(true);
 			}
+			return null;
 		});
 		return res;
 	}
@@ -856,7 +863,7 @@ public class UserManagerService {
 	public UserPreferences getUserPreferences(String userName, SubNode _prefsNode) {
 		final UserPreferences userPrefs = new UserPreferences();
 
-		adminRunner.run(session -> {
+		arun.run(session -> {
 			SubNode prefsNode = _prefsNode;
 			if (prefsNode == null) {
 				prefsNode = read.getUserNodeByUserName(session, userName);
@@ -870,6 +877,7 @@ public class UserManagerService {
 				maxFileSize = Const.DEFAULT_USER_QUOTA;
 			}
 			userPrefs.setMaxUploadFileSize(maxFileSize);
+			return null;
 		});
 
 		return userPrefs;
@@ -892,7 +900,7 @@ public class UserManagerService {
 			/*
 			 * We can run this block as admin, because the codePart below is secret and is checked for a match
 			 */
-			adminRunner.run(mongoSession -> {
+			arun.run(mongoSession -> {
 
 				String userNodeId = XString.truncateAfterFirst(passCode, "-");
 
@@ -923,6 +931,7 @@ public class UserManagerService {
 				userNode.getVal().deleteProp(NodeProp.USER_PREF_PASSWORD_RESET_AUTHCODE.s());
 
 				// note: the adminRunner.run saves the session so we don't do that here.
+				return null;
 			});
 		} else {
 			userNode.setVal(read.getUserNodeByUserName(session, session.getUserName()));
@@ -955,7 +964,7 @@ public class UserManagerService {
 
 	public ResetPasswordResponse resetPassword(final ResetPasswordRequest req) {
 		ResetPasswordResponse res = new ResetPasswordResponse();
-		adminRunner.run(session -> {
+		arun.run(session -> {
 
 			String user = req.getUser();
 			String email = req.getEmail();
@@ -964,14 +973,14 @@ public class UserManagerService {
 			if (!isNormalUserName(user)) {
 				res.setMessage("User name is illegal.");
 				res.setSuccess(false);
-				return;
+				return null;
 			}
 
 			SubNode ownerNode = read.getUserNodeByUserName(session, user);
 			if (ownerNode == null) {
 				res.setMessage("User does not exist.");
 				res.setSuccess(false);
-				return;
+				return null;
 			}
 
 			/*
@@ -985,7 +994,7 @@ public class UserManagerService {
 			if (nodeEmail == null || !nodeEmail.equals(email)) {
 				res.setMessage("Wrong user name and/or email.");
 				res.setSuccess(false);
-				return;
+				return null;
 			}
 
 			/*
@@ -1015,6 +1024,7 @@ public class UserManagerService {
 
 			res.setMessage("A password reset link has been sent to your email. Check your email in a minute or so.");
 			res.setSuccess(true);
+			return null;
 		});
 		return res;
 	}

@@ -161,7 +161,6 @@ public class ActPubUtil {
         return null;
     }
 
-    // todo-0: we're now returning null instead of throwing exceptions in here so verify it's ok everywhere.
     public APObj getJson(String url, MediaType mediaType) {
         return getJson(url, mediaType, 0);
     }

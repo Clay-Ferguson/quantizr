@@ -29,11 +29,10 @@ import org.subnode.model.client.PrivilegeType;
 import org.subnode.mongo.MongoAuth;
 import org.subnode.mongo.MongoRead;
 import org.subnode.mongo.MongoSession;
-import org.subnode.mongo.RunAsMongoAdminEx;
+import org.subnode.mongo.AdminRun;
 import org.subnode.mongo.model.SubNode;
 import org.subnode.util.DateUtil;
 import org.subnode.util.ValContainer;
-import org.subnode.util.XString;
 
 @Component
 public class ActPubOutbox {
@@ -43,7 +42,7 @@ public class ActPubOutbox {
     private ActPubUtil apUtil;
 
     @Autowired
-    private RunAsMongoAdminEx adminRunner;
+    private AdminRun arun;
 
     @Autowired
     private AppProp appProp;
@@ -189,7 +188,7 @@ public class ActPubOutbox {
      * works before we try to figure out how to do private auth comming from specific user(s)
      */
     public Long getOutboxItemCount(final String userName, String sharedTo) {
-        Long totalItems = adminRunner.run(mongoSession -> {
+        Long totalItems = arun.run(mongoSession -> {
             long count = 0;
             SubNode userNode = read.getUserNodeByUserName(null, userName);
             if (userNode != null) {
@@ -235,7 +234,7 @@ public class ActPubOutbox {
                 return null;
             }
 
-            retItems = (APList) adminRunner.run(mongoSession -> {
+            retItems = (APList) arun.run(mongoSession -> {
                 APList items = new APList();
                 int MAX_PER_PAGE = 25;
                 boolean collecting = false;

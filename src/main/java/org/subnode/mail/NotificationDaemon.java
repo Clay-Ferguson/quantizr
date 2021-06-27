@@ -1,7 +1,6 @@
 package org.subnode.mail;
 
 import java.util.List;
-
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,7 +13,7 @@ import org.subnode.config.AppProp;
 import org.subnode.model.client.NodeProp;
 import org.subnode.mongo.MongoDelete;
 import org.subnode.mongo.MongoSession;
-import org.subnode.mongo.RunAsMongoAdmin;
+import org.subnode.mongo.AdminRun;
 import org.subnode.mongo.model.SubNode;
 
 /**
@@ -38,7 +37,7 @@ public class NotificationDaemon {
 	private AppProp appProp;
 
 	@Autowired
-	private RunAsMongoAdmin adminRunner;
+	private AdminRun arun;
 
 	@Autowired
 	private OutboxMgr outboxMgr;
@@ -86,16 +85,17 @@ public class NotificationDaemon {
 				if (--runCountdown <= 0) {
 					runCountdown = INTERVAL_SECONDS;
 
-					adminRunner.run((MongoSession session) -> {
+					arun.run((MongoSession session) -> {
 						List<SubNode> mailNodes = outboxMgr.getMailNodes(session);
 						if (mailNodes != null) {
 							log.debug("Found " + String.valueOf(mailNodes.size()) + " mailNodes to send.");
 							sendAllMail(session, mailNodes);
 						} 
+						return null;
 					});
 				}
 			} catch (Exception e) {
-				// todo-0: ??
+				log.error("notification deamo cycle fail", e);
 			}
 		}
 	}

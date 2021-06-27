@@ -29,7 +29,7 @@ import org.subnode.mongo.MongoRead;
 import org.subnode.mongo.MongoSession;
 import org.subnode.mongo.MongoUpdate;
 import org.subnode.mongo.MongoUtil;
-import org.subnode.mongo.RunAsMongoAdmin;
+import org.subnode.mongo.AdminRun;
 import org.subnode.mongo.model.SubNode;
 import org.subnode.util.Const;
 import org.subnode.util.ExUtil;
@@ -61,10 +61,7 @@ public class SystemService {
 	private MongoUtil mongoUtil;
 
 	@Autowired
-	private RunAsMongoAdmin adminRunner;
-
-	@Autowired
-	private ExportJsonService exportJsonService;
+	private AdminRun arun;
 
 	@Autowired
 	private AttachmentService attachmentService;
@@ -81,16 +78,14 @@ public class SystemService {
 	@Autowired
 	private ActPubService apService;
 
-	@Autowired
-	private MongoAuth auth;
-
 	public String rebuildIndexes() {
 		if (!ThreadLocals.getSessionContext().isAdmin()) {
 			throw ExUtil.wrapEx("admin only function.");
 		}
 
-		adminRunner.run(mongoSession -> {
+		arun.run(mongoSession -> {
 			mongoUtil.rebuildIndexes(mongoSession);
+			return null;
 		});
 		return "success.";
 	}
@@ -109,8 +104,9 @@ public class SystemService {
 		attachmentService.gridMaintenanceScan(statsMap);
 		String ret = ipfsGarbageCollect(statsMap);
 
-		adminRunner.run(session -> {
+		arun.run(session -> {
 			userManagerService.writeUserStats(session, statsMap);
+			return null;
 		});
 
 		ret += runMongoDbCommand(new Document("compact", "nodes"));
