@@ -26,7 +26,7 @@ public class RunAsMongoAdminEx {
 		MongoSession session = null;
 		T ret = null;
 		try {
-			session = auth.getAdminSession();
+			session = auth.asAdminThread();
 			ret = runner.run(session);
 			update.saveSession(session);
 		}

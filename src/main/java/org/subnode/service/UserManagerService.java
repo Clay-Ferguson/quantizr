@@ -173,8 +173,7 @@ public class UserManagerService {
 				// else it's an ordinary user so we check the password against their user node
 				else if (userNode.getStrProp(NodeProp.PWD_HASH.s()).equals(util.getHashOfPassword(req.getPassword()))) {
 					sessionContext.setAuthenticated(req.getUserName());
-				}
-				else {
+				} else {
 					throw new RuntimeEx("Login failed. Wrong password for user: " + req.getUserName());
 				}
 			} else {
@@ -216,7 +215,7 @@ public class UserManagerService {
 
 			ensureUserHomeNodeExists(session, sessionContext.getUserName(), "### " + sessionContext.getUserName()
 					+ "'s Public Node &#x1f389;\n\nEdit the content and children of this node. It represents you to the outside world.\n\n"
-					+ "Go here for a Quick Start guide: https://quanta.wiki/n/quick-start", NodeType.NONE.s(), NodeName.HOME);
+					+ "Go here for a Quick Start guide: * https://quanta.wiki/n/quick-start", NodeType.NONE.s(), NodeName.HOME);
 		} else {
 			res.setUserPreferences(getDefaultUserPreferences());
 		}
@@ -409,35 +408,30 @@ public class UserManagerService {
 	 */
 	public String processSignupCode(final String signupCode) {
 		log.debug("User is trying signupCode: " + signupCode);
-		final ValContainer<String> valContainer = new ValContainer<>(null);
-		adminRunner.run(session -> {
-			// signupCode is just the new account node id? I guess that's secure, if user
-			// has this value it's the only user
-			// who could possibly know this unguessable value.
-			SubNode node = read.getNode(session, signupCode);
+		MongoSession session = auth.asAdminThread();
 
-			if (node != null) {
-				if (!node.getBooleanProp(NodeProp.SIGNUP_PENDING.s())) {
-					valContainer.setVal("Signup Complete. You may login now.");
-					return;
-				}
+		// signupCode is just the new account node id? I guess that's secure, if user
+		// has this value it's the only user
+		// who could possibly know this unguessable value.
+		SubNode node = read.getNode(session, signupCode);
 
+		if (node != null) {
+			if (!node.getBooleanProp(NodeProp.SIGNUP_PENDING.s())) {
+				return "Signup Complete. You may login now.";
+			} else {
 				String userName = node.getStrProp(NodeProp.USER.s());
 
 				if (PrincipalName.ADMIN.s().equalsIgnoreCase(userName)) {
-					valContainer.setVal("processSignupCode should not be called for admin user.");
-					return;
+					return "processSignupCode should not be called for admin user.";
+				} else {
+					node.deleteProp(NodeProp.SIGNUP_PENDING.s());
+					update.save(session, node);
+					return "Signup Successful. You may login now.";
 				}
-
-				node.deleteProp(NodeProp.SIGNUP_PENDING.s());
-				update.save(session, node);
-
-				valContainer.setVal("Signup Successful. You may login now.");
-			} else {
-				valContainer.setVal("Signup Code is invalid.");
 			}
-		});
-		return valContainer.getVal();
+		} else {
+			return "Signup Code is invalid.";
+		}
 	}
 
 	public void initNewUser(MongoSession session, String userName, String password, String email, boolean automated) {
@@ -461,7 +455,7 @@ public class UserManagerService {
 	 * that node (i.e. preferences)
 	 */
 	public SignupResponse signup(SignupRequest req, boolean automated) {
-		MongoSession session = auth.getAdminSession();
+		MongoSession session = auth.asAdminThread();
 		SignupResponse res = new SignupResponse();
 
 		final String userName = req.getUserName().trim();

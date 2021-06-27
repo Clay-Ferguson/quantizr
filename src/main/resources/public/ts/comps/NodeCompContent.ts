@@ -114,7 +114,7 @@ export class NodeCompContent extends Div {
     }
 
     domPreUpdateEvent(): void {
-        let elm = this.attribs.ref.current;
+        let elm = this.getRef();
         if (this.domPreUpdateFunc) {
             this.domPreUpdateFunc(this);
         }

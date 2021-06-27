@@ -287,12 +287,7 @@ export class Edit implements EditIntf {
                 parentPath = S.util.replaceAll(parentPath, "/r/p", "/r");
             }
 
-            if (S.meta64.nodeIdIsVisible(state.node, node.id, parentPath, state)) {
-                S.view.refreshTree(null, false, false, node.id, false, allowScroll, false, state);
-            }
-            else {
-                console.log("Bypassing rerender. nodeId " + node.id + " will have no affect on the tree appearance.");
-            }
+            S.view.refreshTree(null, false, false, node.id, false, allowScroll, false, state);
 
             if (state.fullScreenCalendarId) {
                 S.render.showCalendar(state.fullScreenCalendarId, state);

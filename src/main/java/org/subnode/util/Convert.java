@@ -63,10 +63,6 @@ public class Convert {
 	public NodeInfo convertToNodeInfo(SessionContext sessionContext, MongoSession session, SubNode node, boolean htmlOnly,
 			boolean initNodeEdit, long ordinal, boolean allowInlineChildren, boolean lastChild) {
 
-		if (node.getOwner() == null) {
-			throw new RuntimeException("node has no owner: id=" + node.getId().toHexString());
-		}
-
 		/* If session user shouldn't be able to see secrets on this node remove them */
 		if (session.isAnon() || (session.getUserNodeId() != null && !session.getUserNodeId().equals(node.getOwner()))) {
 			if (!session.isAdmin()) {
@@ -112,6 +108,10 @@ public class Convert {
 		List<PropertyInfo> propList = buildPropertyInfoList(sessionContext, node, htmlOnly, initNodeEdit);
 		List<AccessControlInfo> acList = buildAccessControlList(sessionContext, node);
 
+		if (node.getOwner() == null) {
+			throw new RuntimeException("node has no owner: " + node.getId().toHexString());
+		}
+		
 		String ownerId = node.getOwner().toHexString();
 		String avatarVer = null;
 

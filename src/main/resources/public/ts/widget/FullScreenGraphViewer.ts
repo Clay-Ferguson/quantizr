@@ -48,7 +48,7 @@ export class FullScreenGraphViewer extends Main {
     }
 
     domPreUpdateEvent(): void {
-        let elm = this.attribs.ref.current;
+        let elm = this.getRef();
         let state = this.getState();
         if (!state.data) return;
 

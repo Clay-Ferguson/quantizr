@@ -161,6 +161,7 @@ public class ActPubUtil {
         return null;
     }
 
+    // todo-0: we're now returning null instead of throwing exceptions in here so verify it's ok everywhere.
     public APObj getJson(String url, MediaType mediaType) {
         return getJson(url, mediaType, 0);
     }
@@ -213,7 +214,8 @@ public class ActPubUtil {
              * under the admin menu for checking server status info.
              */
             log.debug("failed getting json: " + url + " -> " + e.getMessage());
-            throw new RuntimeException(e);
+            // throw new RuntimeException(e);
+            return null;
         }
         return ret;
     }

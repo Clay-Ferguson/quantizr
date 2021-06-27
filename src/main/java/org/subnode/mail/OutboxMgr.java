@@ -118,7 +118,8 @@ public class OutboxMgr {
 					for (SessionContext sc : scList) {
 						userFeedService.sendServerPushInfo(sc,
 								// todo-2: fill in the two null parameters here if/when you ever bring this method back.
-								new NotificationMessage("newInboxNode", node.getId().toHexString(), "New node shared to you.", ThreadLocals.getSessionContext().getUserName()));
+								new NotificationMessage("newInboxNode", node.getId().toHexString(), "New node shared to you.",
+										ThreadLocals.getSessionContext().getUserName()));
 					}
 				}
 			}
@@ -157,9 +158,11 @@ public class OutboxMgr {
 
 	private void queueMailUsingAdminSession(MongoSession session, final String recipients, final String subject,
 			final String content) {
+
 		SubNode outboxNode = getSystemOutbox(session);
 		SubNode outboundEmailNode = create.createNode(session, outboxNode.getPath() + "/?", NodeType.NONE.s());
 
+		outboundEmailNode.setOwner(session.getUserNodeId());
 		outboundEmailNode.setProp(NodeProp.EMAIL_CONTENT.s(), content);
 		outboundEmailNode.setProp(NodeProp.EMAIL_SUBJECT.s(), subject);
 		outboundEmailNode.setProp(NodeProp.EMAIL_RECIP.s(), recipients);
@@ -174,14 +177,12 @@ public class OutboxMgr {
 	 */
 	public List<SubNode> getMailNodes(MongoSession session) {
 		SubNode outboxNode = getSystemOutbox(session);
+		// log.debug("outbox id: " + outboxNode.getId().toHexString());
 
 		int mailBatchSizeInt = Integer.parseInt(mailBatchSize);
 		return read.getChildrenAsList(session, outboxNode, false, mailBatchSizeInt);
 	}
 
-	/*
-	 * Get node that contains all preferences for this user, as properties on it.
-	 */
 	public SubNode getSystemOutbox(MongoSession session) {
 		if (OutboxMgr.outboxNode != null) {
 			return OutboxMgr.outboxNode;

@@ -66,7 +66,24 @@ public class MongoAuth {
 		inst = this;
 	}
 
+	// todo-0: look for places where the asAdminThread version should be used.
 	public MongoSession getAdminSession() {
+		if (adminSession.getUserNodeId() == null) {
+			// todo-0: this code is an ugly hack. fix. not even threadsafe now.
+			// also this root node should be able to stay cached forever.
+			SubNode node = read.getNode(adminSession, "/" + NodeName.ROOT, false);
+			adminSession.setUserNodeId(node.getId());
+		}
+		return adminSession;
+	}
+
+	public MongoSession asAdminThread() {
+		if (adminSession.getUserNodeId() == null) {
+			// todo-0: this code is an ugly hack. fix. not even threadsafe now.
+			SubNode node = read.getNode(adminSession, "/" + NodeName.ROOT, false);
+			adminSession.setUserNodeId(node.getId());
+		}
+		ThreadLocals.setMongoSession(adminSession);
 		return adminSession;
 	}
 
@@ -264,9 +281,6 @@ public class MongoAuth {
 	}
 
 	public void ownerAuth(SubNode node) {
-		// for now, of there's no session we do nothing here.
-		if (ThreadLocals.getMongoSession() == null)
-			return;
 		ownerAuth(ThreadLocals.getMongoSession(), node);
 	}
 

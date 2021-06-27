@@ -26,7 +26,9 @@ public class RunAsMongoAdmin {
 	public void run(MongoRunnable runner) {
 		MongoSession session = null;
 		try {
-			session = auth.getAdminSession();
+			// altering the SESSION is a big change. Need look at all the places this affects. todo-0
+			// also beware there's a couple of classes LIKE this one
+			session = auth.asAdminThread();
 			runner.run(session);
 			update.saveSession(session);
 		} catch (Exception ex) {

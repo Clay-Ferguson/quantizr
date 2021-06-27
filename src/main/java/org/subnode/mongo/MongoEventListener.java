@@ -100,10 +100,13 @@ public class MongoEventListener extends AbstractMongoEventListener<SubNode> {
 			if (node.getPath().equals("/" + NodeName.ROOT) && !MongoRepository.fullInit) {
 				dbObj.put(SubNode.FIELD_OWNER, id);
 				node.setOwner(id);
-			}
-			/* otherwise we have a problem, because we require an owner always */
-			else {
-				throw new RuntimeEx("Attempted to save node with no owner: " + XString.prettyPrint(node));
+			} else {
+				if (auth.getAdminSession() != null) {
+					ObjectId ownerId = auth.getAdminSession().getUserNodeId();
+					dbObj.put(SubNode.FIELD_OWNER, ownerId);
+					node.setOwner(ownerId);
+					log.debug("Assigning admin as owner of node that had no owner (on save): " + id);
+				}
 			}
 		}
 
@@ -229,10 +232,16 @@ public class MongoEventListener extends AbstractMongoEventListener<SubNode> {
 
 	@Override
 	public void onAfterConvert(AfterConvertEvent<SubNode> event) {
-		// Document dbObj = event.getDocument();
-		// ObjectId id = dbObj.getObjectId(SubNode.FIELD_ID);
-		// log.debug("onAfterConvert: " + event.getSource().getId().toHexString());
-		MongoThreadLocal.cacheNode(event.getSource());
+		SubNode node = event.getSource();
+		if (node.getOwner() == null) {
+			if (auth.getAdminSession() != null) {
+				ObjectId ownerId = auth.getAdminSession().getUserNodeId();
+				node.setOwner(ownerId);
+				log.debug("Assigning admin as owner of node that had no owner (on load): " + node.getId().toHexString());
+			}
+		}
+
+		MongoThreadLocal.cacheNode(node);
 	}
 
 	@Override

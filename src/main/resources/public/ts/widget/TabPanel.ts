@@ -76,7 +76,7 @@ constructor(private customTopComp: CompIntf = null) {
     }
 
     domAddEvent(): void {
-        let elm = this.attribs.ref.current;
+        let elm = this.getRef();
         this.reScroll(elm);
 
         elm.addEventListener("scroll", () => {
@@ -89,7 +89,7 @@ constructor(private customTopComp: CompIntf = null) {
     }
 
     domPreUpdateEvent(): void {
-        let elm = this.attribs.ref.current;
+        let elm = this.getRef();
         this.reScroll(elm);
         super.domPreUpdateEvent();
     }

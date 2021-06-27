@@ -51,6 +51,8 @@ public class NotificationDaemon {
 	public static final int INTERVAL_SECONDS = 10;
 	private int runCountdown = INTERVAL_SECONDS;
 
+	static Object runLock = new Object();
+
 	/*
 	 * Note: Spring does correctly protect against concurrent runs. It will always wait until the last
 	 * run of this function is completed before running again. So we can always assume only one
@@ -64,31 +66,37 @@ public class NotificationDaemon {
 	 */
 	@Scheduled(fixedDelay = 1000)
 	public void run() {
-		if (AppServer.isShuttingDown() || !AppServer.isEnableScheduling()) {
-			log.debug("ignoring NotificationDeamon schedule cycle");
-			return;
-		}
-
-		runCounter++;
-
-		/* fail fast if no mail host is configured. */
-		if (StringUtils.isEmpty(appProp.getMailHost())) {
-			if (runCounter < 3) {
-				log.debug("NotificationDaemon is disabled, because no mail server is configured.");
-			}
-			return;
-		}
-
-		if (--runCountdown <= 0) {
-			runCountdown = INTERVAL_SECONDS;
-
-			adminRunner.run((MongoSession session) -> {
-				List<SubNode> mailNodes = outboxMgr.getMailNodes(session);
-				if (mailNodes != null) {
-					log.debug("Found " + String.valueOf(mailNodes.size()) + " mailNodes to send.");
-					sendAllMail(session, mailNodes);
+		synchronized (runLock) {
+			try {
+				if (AppServer.isShuttingDown() || !AppServer.isEnableScheduling()) {
+					log.debug("ignoring NotificationDeamon schedule cycle");
+					return;
 				}
-			});
+
+				runCounter++;
+
+				/* fail fast if no mail host is configured. */
+				if (StringUtils.isEmpty(appProp.getMailHost())) {
+					if (runCounter < 3) {
+						log.debug("NotificationDaemon is disabled, because no mail server is configured.");
+					}
+					return;
+				}
+
+				if (--runCountdown <= 0) {
+					runCountdown = INTERVAL_SECONDS;
+
+					adminRunner.run((MongoSession session) -> {
+						List<SubNode> mailNodes = outboxMgr.getMailNodes(session);
+						if (mailNodes != null) {
+							log.debug("Found " + String.valueOf(mailNodes.size()) + " mailNodes to send.");
+							sendAllMail(session, mailNodes);
+						} 
+					});
+				}
+			} catch (Exception e) {
+				// todo-0: ??
+			}
 		}
 	}
 
@@ -118,8 +126,13 @@ public class NotificationDaemon {
 						if (!StringUtils.isEmpty(email) && !StringUtils.isEmpty(subject) && !StringUtils.isEmpty(content)) {
 
 							log.debug("Found mail to send to: " + email);
-							mailSender.sendMail(email, null, content, subject);
-							delete.delete(session, node, false);
+							if (delete.delete(session, node, false) > 0) {
+								// only send mail if we were able to delete the node, because other wise something is wrong
+								// without ability to delete and so we'd go into a loop sending this item multiple times.
+								mailSender.sendMail(email, null, content, subject);
+							} else {
+								log.debug("Unable to delete queued mail node: " + node.getId().toHexString());
+							}
 						} else {
 							log.debug("not sending email. Missing some properties. email or subject or content");
 						}

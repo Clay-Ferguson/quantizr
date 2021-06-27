@@ -125,7 +125,7 @@ public class MongoDelete {
 	 * Said more simply: Replace 'regexRecursiveChildrenOfPath' with 'regexDirectChildrenOfPath' in this
 	 * method if you want to increase performance of deletes at the cost of some additional memory.
 	 */
-	public void delete(MongoSession session, SubNode node, boolean childrenOnly) {
+	public long delete(MongoSession session, SubNode node, boolean childrenOnly) {
 		auth.ownerAuth(session, node);
 		log.debug("Deleting under path: " + node.getPath());
 
@@ -141,6 +141,7 @@ public class MongoDelete {
 
 		DeleteResult res = ops.remove(query, SubNode.class);
 		log.debug("Num of SubGraph deleted: " + res.getDeletedCount());
+		long totalDelCount = res.getDeletedCount();
 
 		/*
 		 * Yes we DO have to remove the node itself separate from the remove of all it's subgraph, because
@@ -149,8 +150,10 @@ public class MongoDelete {
 		 * example. so we must have our recursive delete identify deleting "/ab" as starting with "/ab/"
 		 */
 		if (!childrenOnly) {
-			ops.remove(node);
+			DeleteResult d2 = ops.remove(node);
+			totalDelCount += d2.getDeletedCount();
 		}
+		return totalDelCount;
 	}
 
 	public void delete(SubNode node) {

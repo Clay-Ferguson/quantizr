@@ -1,7 +1,7 @@
 import { AppState } from "../AppState";
-import clientInfo from "../ClientInfo";
 import { Constants as C, Constants } from "../Constants";
 import { DialogBase } from "../DialogBase";
+import * as J from "../JavaIntf";
 import { PubSub } from "../PubSub";
 import { Singletons } from "../Singletons";
 import { CompIntf } from "../widget/base/CompIntf";
@@ -14,7 +14,6 @@ import { HorizontalLayout } from "../widget/HorizontalLayout";
 import { IconButton } from "../widget/IconButton";
 import { ConfirmDlg } from "./ConfirmDlg";
 import { MediaRecorderDlg } from "./MediaRecorderDlg";
-import * as J from "../JavaIntf";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
@@ -220,6 +219,9 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
             height: this.appState.mobileMode ? "60%" : "100%",
             progressBarWidth: "100%",
             url,
+            headers: {
+                Bearer: S.meta64.authToken
+            },
             // Prevents Dropzone from uploading dropped files immediately
             autoProcessQueue: false,
             paramName: "files",

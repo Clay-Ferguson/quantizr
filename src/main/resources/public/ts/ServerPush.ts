@@ -15,24 +15,33 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (s: Singletons) => {
 // reference: https://www.baeldung.com/spring-server-sent-events
 // See also: AppController.java#serverPush
 export class ServerPush implements ServerPushIntf {
+    eventSource: EventSource;
+
+    close = (): any => {
+        if (this.eventSource) {
+            this.eventSource.close();
+            this.eventSource = null;
+        }
+    }
+
     init = (): any => {
         // console.log("ServerPush.init");
 
-        const eventSource = new EventSource(S.util.getRpcPath() + "serverPush");
+        this.eventSource = new EventSource(S.util.getRpcPath() + "serverPush");
 
         // DO NOT DELETE.
         // eventSource.onmessage = e => {
         // };
 
-        eventSource.onopen = (e: any) => {
+        this.eventSource.onopen = (e: any) => {
             // onsole.log("ServerPush.onopen" + e);
         };
 
-        eventSource.onerror = (e: any) => {
+        this.eventSource.onerror = (e: any) => {
             // console.log("ServerPush.onerror:" + e);
         };
 
-        eventSource.addEventListener("sessionTimeout", function (e: any) {
+        this.eventSource.addEventListener("sessionTimeout", function (e: any) {
             if (!S.meta64.authToken) return;
             S.meta64.authToken = null;
             S.meta64.userName = null;
@@ -51,7 +60,7 @@ export class ServerPush implements ServerPushIntf {
             dlg.open();
         });
 
-        eventSource.addEventListener("nodeEdited", function (e: any) {
+        this.eventSource.addEventListener("nodeEdited", function (e: any) {
             const obj: J.FeedPushInfo = JSON.parse(e.data);
             const nodeInfo: J.NodeInfo = obj.nodeInfo;
 
@@ -72,7 +81,7 @@ export class ServerPush implements ServerPushIntf {
             }
         });
 
-        eventSource.addEventListener("feedPush", function (e: any) {
+        this.eventSource.addEventListener("feedPush", function (e: any) {
 
             const obj: J.FeedPushInfo = JSON.parse(e.data);
             // console.log("Incomming Push (FeedPushInfo): " + S.util.prettyPrint(obj));
@@ -116,7 +125,7 @@ export class ServerPush implements ServerPushIntf {
             }
         }, false);
 
-        eventSource.addEventListener("newInboxNode", function (e: any) {
+        this.eventSource.addEventListener("newInboxNode", function (e: any) {
             const obj: J.NotificationMessage = JSON.parse(e.data);
             // console.log("Incomming Push (NotificationMessage): " + S.util.prettyPrint(obj));
             // new InboxNotifyDlg("Your Inbox has updates!", store.getState()).open();

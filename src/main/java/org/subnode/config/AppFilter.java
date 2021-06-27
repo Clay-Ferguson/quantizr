@@ -82,7 +82,7 @@ public class AppFilter extends GenericFilterBean {
 				// if auth token is privided and doesn't exist that's a timeout session so send user
 				// back to welcome page. Should also blow away all browser memory. New browser page load.
 				if (!StringUtils.isEmpty(bearer) && !SessionContext.validToken(bearer, null)) {
-					//just ignore an invalid token like it was not there.
+					// just ignore an invalid token like it was not there.
 					log.debug("Ignoring obsolete bearer token.");
 					bearer = null;
 					sc.setUserName(PrincipalName.ANON.s());
@@ -306,11 +306,11 @@ public class AppFilter extends GenericFilterBean {
 	private void checkApiSecurity(String bearer, HttpServletRequest req) {
 		// otherwise require secure header
 		if (bearer == null) {
-			throw new RuntimeException("Auth failed. no bearer token.");
+			throw new RuntimeException("Auth failed. no bearer token: " + req.getRequestURI());
 		}
 
 		if (!SessionContext.validToken(bearer, sc.getUserName())) {
-			throw new RuntimeException("Auth failed. Invalid bearer token: " + bearer);
+			throw new RuntimeException("Auth failed. Invalid bearer token: " + bearer + " " + req.getRequestURI());
 		} else {
 			// log.debug("Bearer accepted: " + bearer);
 		}
@@ -318,13 +318,23 @@ public class AppFilter extends GenericFilterBean {
 
 	private boolean isSecurePath(String path) {
 		if (path.contains("/mobile/api/login") || //
+				path.contains("/mobile/api/signup") || //
+				path.contains("/mobile/api/savePublicKey") || //
 				path.contains("/mobile/api/changePassword") || //
 				path.contains("/mobile/api/getConfig") || //
 				path.contains("/mobile/api/serverPush") || //
 				path.contains("/mobile/api/renderNode") || //
 				path.contains("/mobile/api/bin") || //
+				path.contains("/mobile/api/captcha") || //
 				path.contains("/mobile/api/getUserProfile") || //
 				path.contains("/mobile/api/nodeFeed") || //
+				path.contains("/mobile/api/getFollowers") || //
+				path.contains("/mobile/api/getFollowing") || //
+				path.contains("/mobile/api/nodeSearch") || //
+				path.contains("/mobile/api/graphNodes") || //
+				path.contains("/mobile/api/resetPassword") || //
+				path.contains("/mobile/api/stream") || //
+				path.contains("/mobile/api/getNodeStats") || //
 				path.contains("/mobile/api/getUserAccountInfo") || //
 				path.contains("/mobile/api/anonPageLoad")) {
 			return false;

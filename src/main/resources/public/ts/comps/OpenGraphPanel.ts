@@ -26,7 +26,7 @@ export class OpenGraphPanel extends Div {
     }
 
     domAddEvent(): void {
-        let elm: HTMLElement = this.attribs.ref.current;
+        let elm: HTMLElement = this.getRef();
         let og = S.meta64.openGraphData.get(this.url);
         if (!og) {
             let observer = new IntersectionObserver(entries => {

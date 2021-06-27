@@ -180,7 +180,7 @@ public class NodeEditService {
 		if (NodeType.RSS_FEED.s().equals(req.getTypeName())) {
 			SubNode holderNode = create.createNode(session, node, null, NodeType.NONE.s(), 0L, CreateNodeLocation.FIRST,
 					req.getProperties(), null, false);
-			holderNode.setContent("#### Edit me!");
+			holderNode.setContent("#### Edit this. Add your RSS title!");
 			holderNode.touch();
 			update.save(session, holderNode);
 			node = holderNode;

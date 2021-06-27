@@ -44,14 +44,16 @@ export class PrefsDlg extends DialogBase {
     }
 
     savePreferences = (): void => {
-        S.util.ajax<J.SaveUserPreferencesRequest, J.SaveUserPreferencesResponse>("saveUserPreferences", {
-            userPreferences: {
-                editMode: this.appState.userPreferences.editMode,
-                showMetaData: this.appState.userPreferences.showMetaData,
-                rssHeadlinesOnly: this.appState.userPreferences.rssHeadlinesOnly,
-                maxUploadFileSize: -1
-            }
-        }, this.savePreferencesResponse);
+        if (!this.appState.isAnonUser) {
+            S.util.ajax<J.SaveUserPreferencesRequest, J.SaveUserPreferencesResponse>("saveUserPreferences", {
+                userPreferences: {
+                    editMode: this.appState.userPreferences.editMode,
+                    showMetaData: this.appState.userPreferences.showMetaData,
+                    rssHeadlinesOnly: this.appState.userPreferences.rssHeadlinesOnly,
+                    maxUploadFileSize: -1
+                }
+            }, this.savePreferencesResponse);
+        }
         this.close();
     }
 

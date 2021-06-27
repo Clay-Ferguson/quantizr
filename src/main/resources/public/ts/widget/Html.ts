@@ -80,7 +80,7 @@ export class Html extends Comp {
     2) change all "a" tags inside this div to have a target=_blank
     */
     domPreUpdateEvent(): void {
-        let elm = this.attribs.ref.current;
+        let elm = this.getRef();
         if (MathJax && MathJax.typeset) {
             // note: MathJax.typesetPromise(), also exists
             MathJax.typeset([elm]);

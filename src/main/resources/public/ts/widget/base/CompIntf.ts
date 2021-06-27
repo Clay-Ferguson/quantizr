@@ -30,6 +30,7 @@ export interface CompIntf {
     setChildren(comps: CompIntf[]): void;
     getChildren(): CompIntf[];
     safeGetChildren(): CompIntf[];
+    getRef(): HTMLElement;
     _render(): ReactNode;
     domUpdateEvent: Function;
 }

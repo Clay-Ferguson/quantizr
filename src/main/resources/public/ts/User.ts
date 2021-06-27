@@ -137,6 +137,10 @@ export class User implements UserIntf {
             return;
         }
 
+        S.push.close();
+        // without this we'll get a notification popup when the server sends a notication of the disconnect.
+        S.meta64.authToken = null;
+
         /* Remove warning dialog to ask user about leaving the page */
         window.onbeforeunload = null;
 
@@ -146,7 +150,8 @@ export class User implements UserIntf {
             await S.localDB.setVal(C.LOCALDB_LOGIN_STATE, "0", "anon");
         }
 
-        S.util.ajax<J.LogoutRequest, J.LogoutResponse>("logout", {}, this.logoutResponse);
+        S.util.ajax<J.LogoutRequest, J.LogoutResponse>("logout", {}, this.logoutResponse,
+            () => { this.logoutResponse(null); });
     }
 
     deleteAllUserLocalDbEntries = (): Promise<any> => {

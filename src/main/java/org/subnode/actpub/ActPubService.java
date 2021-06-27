@@ -954,33 +954,41 @@ public class ActPubService {
         apCache.usersPendingRefresh.put(apUserName, false);
     }
 
+    static Object bigRefreshLock = new Object();
+
     /* every 90 minutes ping all the outboxes */
     @Scheduled(fixedDelay = 90 * DateUtil.MINUTE_MILLIS)
     public void bigRefresh() {
-        refreshForeignUsers();
+        synchronized (bigRefreshLock) {
+            refreshForeignUsers();
+        }
     }
 
+    static Object userRefreshLock = new Object();
+    
     /* Run every few seconds */
     @Scheduled(fixedDelay = 3 * 1000)
     public void userRefresh() {
-        if (!appProp.isActPubEnabled())
-            return;
+        synchronized (userRefreshLock) {
+            if (!appProp.isActPubEnabled())
+                return;
 
-        try {
-            saveUserNames();
-        } catch (Exception e) {
-            // log and ignore.
-            log.error("saveUserNames", e);
-        }
+            try {
+                saveUserNames();
+            } catch (Exception e) {
+                // log and ignore.
+                log.error("saveUserNames", e);
+            }
 
-        try {
-            refreshInProgress = true;
-            refreshUsers();
-        } catch (Exception e) {
-            // log and ignore.
-            log.error("refresh outboxes", e);
-        } finally {
-            refreshInProgress = false;
+            try {
+                refreshInProgress = true;
+                refreshUsers();
+            } catch (Exception e) {
+                // log and ignore.
+                log.error("refresh outboxes", e);
+            } finally {
+                refreshInProgress = false;
+            }
         }
     }
 

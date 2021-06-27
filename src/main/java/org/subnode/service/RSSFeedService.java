@@ -91,8 +91,7 @@ public class RSSFeedService {
 	private static final ConcurrentHashMap<String, SyndFeed> feedCache = new ConcurrentHashMap<>();
 
 	/*
-	 * keep track of which feeds failed so we don't try them again until another
-	 * 30-min cycle
+	 * keep track of which feeds failed so we don't try them again until another 30-min cycle
 	 */
 	private static final HashSet<String> failedFeeds = new HashSet<>();
 
@@ -117,26 +116,29 @@ public class RSSFeedService {
 
 	private static final int MAX_FEEDS_PER_AGGREGATE = 40;
 
+	static Object runLock = new Object();
+
 	/*
-	 * Runs immediately at startup, and then every 30 minutes, to refresh the
-	 * feedCache.
+	 * Runs immediately at startup, and then every 30 minutes, to refresh the feedCache.
 	 */
 	@Scheduled(fixedDelay = 30 * 60 * 1000)
 	public void run() {
-		runCount++;
-		if (runCount == 1) {
-			startupPreCache();
-		}
+		synchronized (runLock) {
+			runCount++;
+			if (runCount == 1) {
+				startupPreCache();
+			}
 
-		if (AppServer.isShuttingDown() || !AppServer.isEnableScheduling()) {
-			log.debug("ignoring RSSFeedService schedule cycle");
-			return;
-		}
+			if (AppServer.isShuttingDown() || !AppServer.isEnableScheduling()) {
+				log.debug("ignoring RSSFeedService schedule cycle");
+				return;
+			}
 
-		log.debug("RSSFeedService.refreshFeedCache");
-		refreshFeedCache();
-		aggregateCache.clear();
-		proxyCache.clear();
+			log.debug("RSSFeedService.refreshFeedCache");
+			refreshFeedCache();
+			aggregateCache.clear();
+			proxyCache.clear();
+		}
 	}
 
 	public void startupPreCache() {
@@ -190,14 +192,13 @@ public class RSSFeedService {
 	}
 
 	/*
-	 * Streams back an RSS feed that is an aggregate feed of all the children under
-	 * nodeId (recursively!) that have an RSS_FEED_SRC property
+	 * Streams back an RSS feed that is an aggregate feed of all the children under nodeId
+	 * (recursively!) that have an RSS_FEED_SRC property
 	 * 
-	 * If writer is null it means we are just running without writing to a server
-	 * like only to prewarm the cache during app startup called from startupPreCache
+	 * If writer is null it means we are just running without writing to a server like only to prewarm
+	 * the cache during app startup called from startupPreCache
 	 * 
-	 * NOTE: pagination isn't supported yet in this. See "1" arg below, which means
-	 * first page
+	 * NOTE: pagination isn't supported yet in this. See "1" arg below, which means first page
 	 */
 	public void multiRss(MongoSession mongoSession, final String nodeId, Writer writer) {
 		SyndFeed feed = aggregateCache.get(nodeId);
@@ -267,8 +268,8 @@ public class RSSFeedService {
 					for (SyndEntry entry : inFeed.getEntries()) {
 
 						/*
-						 * if no PublishedDate exists on the 'entry' itself try to get a reasonable data
-						 * from some other sane property on the feed.
+						 * if no PublishedDate exists on the 'entry' itself try to get a reasonable data from some other
+						 * sane property on the feed.
 						 */
 						if (entry.getPublishedDate() == null) {
 							if (entry.getUpdatedDate() != null) {
@@ -276,10 +277,9 @@ public class RSSFeedService {
 
 							} else if (inFeed.getPublishedDate() != null) {
 								/*
-								 * If we have to take the feed update time from the feed itself because of lack
-								 * of dates in feed entries the only allow a max of 3 of these to exist so that
-								 * no malformed feeds can flood the top of our GUI presentation with more than 3
-								 * items
+								 * If we have to take the feed update time from the feed itself because of lack of dates in feed
+								 * entries the only allow a max of 3 of these to exist so that no malformed feeds can flood the
+								 * top of our GUI presentation with more than 3 items
 								 */
 								if (badDateCount < 3) {
 									entry.setPublishedDate(inFeed.getPublishedDate());
@@ -291,10 +291,9 @@ public class RSSFeedService {
 						if (entry.getPublishedDate() != null) {
 							SyndEntry entryClone = (SyndEntry) entry.clone();
 							/*
-							 * We use this slight hack/technique to allow our client to be able to parse the
-							 * titles out of the feeds for displaying them in a nicer way, while being
-							 * unobtrusive enough that any podcast app could display it and it looks fine as
-							 * it also.
+							 * We use this slight hack/technique to allow our client to be able to parse the titles out of the
+							 * feeds for displaying them in a nicer way, while being unobtrusive enough that any podcast app
+							 * could display it and it looks fine as it also.
 							 */
 							entryClone.setTitle(inFeed.getTitle() + " :: " + entryClone.getTitle());
 							entries.add(entryClone);
@@ -305,9 +304,8 @@ public class RSSFeedService {
 			entries.sort((s1, s2) -> s2.getPublishedDate().compareTo(s1.getPublishedDate()));
 
 			/*
-			 * Now from the complete 'entries' list we extract out just the page we need
-			 * into 'pageEntires' and then stuff pageEntries back into 'entries' to send out
-			 * of this method
+			 * Now from the complete 'entries' list we extract out just the page we need into 'pageEntires' and
+			 * then stuff pageEntries back into 'entries' to send out of this method
 			 */
 			List<SyndEntry> pageEntries = new LinkedList<>();
 			int pageNo = page - 1;
@@ -333,9 +331,9 @@ public class RSSFeedService {
 		// log.debug("getFeed: " + url);
 
 		/*
-		 * if this feed failed don't try it again. Whenever we DO force the system to
-		 * try a feed again that's done by wiping failedFeeds clean but this 'getFeed'
-		 * method should just bail out if the feed has failed
+		 * if this feed failed don't try it again. Whenever we DO force the system to try a feed again
+		 * that's done by wiping failedFeeds clean but this 'getFeed' method should just bail out if the
+		 * feed has failed
 		 */
 		if (fromCache && failedFeeds.contains(url)) {
 			return null;
@@ -358,8 +356,7 @@ public class RSSFeedService {
 
 			if (USE_URL_READER) {
 				/*
-				 * This is not a memory leak that we don't close the connection. This is
-				 * correct. No need to close
+				 * This is not a memory leak that we don't close the connection. This is correct. No need to close
 				 */
 				URLConnection conn = new URL(url).openConnection();
 
@@ -372,18 +369,16 @@ public class RSSFeedService {
 			}
 
 			/*
-			 * I was experimenting this this way of getting a reader as a last attempt to
-			 * get a specific problematic URL to work, that keeps causing a timeout when I
-			 * try to read from it thru the server side, even though the same url works fine
-			 * when entered into my browser url, so one trick that has worked in the past
-			 * was to masquerade as a browser using the 'user agent'. So this code DOES
-			 * work, but never did solve the problem with that one specific URL that simply
-			 * refuses to send data to the Quanta server.
+			 * I was experimenting this this way of getting a reader as a last attempt to get a specific
+			 * problematic URL to work, that keeps causing a timeout when I try to read from it thru the server
+			 * side, even though the same url works fine when entered into my browser url, so one trick that has
+			 * worked in the past was to masquerade as a browser using the 'user agent'. So this code DOES work,
+			 * but never did solve the problem with that one specific URL that simply refuses to send data to
+			 * the Quanta server.
 			 * 
-			 * UPDATE: I'm leaving the long explanation above, but once I tried the code
-			 * inside USE_SPRING_READER=true, block suddenly all the RSS feeds no longer
-			 * have any timeout issues. My best theory for why is that my restTemplate is
-			 * doing something special that fixes these issues.
+			 * UPDATE: I'm leaving the long explanation above, but once I tried the code inside
+			 * USE_SPRING_READER=true, block suddenly all the RSS feeds no longer have any timeout issues. My
+			 * best theory for why is that my restTemplate is doing something special that fixes these issues.
 			 */
 			if (USE_HTTP_READER) {
 				RequestConfig config = RequestConfig.custom() //
@@ -410,8 +405,7 @@ public class RSSFeedService {
 				inFeed = restTemplate.execute(url, HttpMethod.GET, null, response -> {
 					SyndFeedInput input = new SyndFeedInput();
 					try {
-						return input
-								.build(new XmlReader(new LimitedInputStreamEx(response.getBody(), 100 * Const.ONE_MB)));
+						return input.build(new XmlReader(new LimitedInputStreamEx(response.getBody(), 100 * Const.ONE_MB)));
 					} catch (FeedException e) {
 						throw new IOException("Could not parse response", e);
 					}
@@ -438,16 +432,15 @@ public class RSSFeedService {
 			return inFeed;
 		} catch (Exception e) {
 			/*
-			 * Leave feedCache with any existing mapping it has when it fails. Worst case
-			 * here is a stale cache remains in place rather than getting forgotten just
-			 * because it's currently unavailable
+			 * Leave feedCache with any existing mapping it has when it fails. Worst case here is a stale cache
+			 * remains in place rather than getting forgotten just because it's currently unavailable
 			 *
-			 * This error can happen a lot since feeds out on the wild are so chaotic so we
-			 * won't bother to clutter our logs with a stack trace here, and just log the message.
+			 * This error can happen a lot since feeds out on the wild are so chaotic so we won't bother to
+			 * clutter our logs with a stack trace here, and just log the message.
 			 * 
-			 * todo-1: Actually it would be better to put this entire string being logged here into a
-			 * hashset to just keep a unique list, and not even log it here, but make it part of the
-			 * 'systemInfo' available under the admin menu for checking server status info.
+			 * todo-1: Actually it would be better to put this entire string being logged here into a hashset to
+			 * just keep a unique list, and not even log it here, but make it part of the 'systemInfo' available
+			 * under the admin menu for checking server status info.
 			 */
 			log.debug("Error reading feed: " + url + " -> " + e.getMessage());
 			failedFeeds.add(url);
@@ -513,8 +506,8 @@ public class RSSFeedService {
 	}
 
 	/*
-	 * Takes a newline delimited list of rss feed urls, and returns the feed for
-	 * them as an aggregate while also updating our caching
+	 * Takes a newline delimited list of rss feed urls, and returns the feed for them as an aggregate
+	 * while also updating our caching
 	 * 
 	 * Page will be 1 offset (1, 2, 3, ...)
 	 */
@@ -557,8 +550,7 @@ public class RSSFeedService {
 	}
 
 	/*
-	 * Makes feed be a cloned copy of cachedFeed but with only the specific 'page'
-	 * of results extracted
+	 * Makes feed be a cloned copy of cachedFeed but with only the specific 'page' of results extracted
 	 */
 	private void cloneFeedForPage(SyndFeed feed, SyndFeed cachedFeed, int page) {
 
@@ -602,8 +594,8 @@ public class RSSFeedService {
 		List<SyndEntry> entries = new LinkedList<SyndEntry>();
 		feed.setEntries(entries);
 
-		final Iterable<SubNode> iter = read.getChildren(mongoSession, node,
-				Sort.by(Sort.Direction.ASC, SubNode.FIELD_ORDINAL), null, 0);
+		final Iterable<SubNode> iter =
+				read.getChildren(mongoSession, node, Sort.by(Sort.Direction.ASC, SubNode.FIELD_ORDINAL), null, 0);
 		final List<SubNode> children = read.iterateToList(iter);
 
 		if (children != null) {
@@ -618,30 +610,28 @@ public class RSSFeedService {
 				SyndEntry entry = new SyndEntryImpl();
 
 				entry.setTitle(metaInfo.getTitle() != null ? metaInfo.getTitle() : "ID: " + n.getId().toHexString());
-				entry.setLink(metaInfo.getAttachmentUrl() != null ? metaInfo.getAttachmentUrl() : appProp.getProtocolHostAndPort());
+				entry.setLink(
+						metaInfo.getAttachmentUrl() != null ? metaInfo.getAttachmentUrl() : appProp.getProtocolHostAndPort());
 
 				/*
-				 * todo-2: need menu item "Set Create Time", and "Set Modify Time", that prompts
-				 * with the datetime GUI, so publishers have more control over this in the feed,
-				 * or else have an rssTimestamp as an optional property which can be set on any
-				 * node to override this.
+				 * todo-2: need menu item "Set Create Time", and "Set Modify Time", that prompts with the datetime
+				 * GUI, so publishers have more control over this in the feed, or else have an rssTimestamp as an
+				 * optional property which can be set on any node to override this.
 				 * 
-				 * UPDATE: Now that we have 'date' property as a generic feature of nodes
-				 * (calendar icon on edit dialog) we can use that as our publish time here, and
-				 * allow that to be the override for the date on the node.
+				 * UPDATE: Now that we have 'date' property as a generic feature of nodes (calendar icon on edit
+				 * dialog) we can use that as our publish time here, and allow that to be the override for the date
+				 * on the node.
 				 */
 				entry.setPublishedDate(n.getCreateTime());
 				SyndContent description = new SyndContentImpl();
 
 				/*
-				 * todo-1: NOTE: I tried putting some HTML into 'content' as a test and setting
-				 * the mime type, but it doesn't render correctly, so I just need to research
-				 * how to get HTML in RSS descriptions, but this is low priority for now so I'm
-				 * not doing it yet.
+				 * todo-1: NOTE: I tried putting some HTML into 'content' as a test and setting the mime type, but
+				 * it doesn't render correctly, so I just need to research how to get HTML in RSS descriptions, but
+				 * this is low priority for now so I'm not doing it yet.
 				 * 
-				 * todo-1: NOTE: when org.owasp.html.Sanitizers capability was added, I forgot
-				 * to revisit this, so I need to check what I'm doing here and see if we need
-				 * "HTML" now here instead.
+				 * todo-1: NOTE: when org.owasp.html.Sanitizers capability was added, I forgot to revisit this, so I
+				 * need to check what I'm doing here and see if we need "HTML" now here instead.
 				 */
 				description.setType("text/plain");
 				// description.setType("text/html");
@@ -688,8 +678,7 @@ public class RSSFeedService {
 	}
 
 	/*
-	 * Lots of feeds have characters that won't display nicely in HTML so we fix
-	 * that here
+	 * Lots of feeds have characters that won't display nicely in HTML so we fix that here
 	 */
 	private String convertStreamChars(String s) {
 		StringBuilder sb = new StringBuilder();
