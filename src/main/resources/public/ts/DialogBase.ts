@@ -175,7 +175,7 @@ export abstract class DialogBase<S extends BaseCompState = any> extends Div<S> i
         this.resolve(this);
 
         if (this.mode === DialogMode.POPUP) {
-            if (this.getElement()) {
+            if (this.getRef()) {
                 this.preUnmount();
                 ReactDOM.unmountComponentAtNode(this.backdrop);
                 S.util.domElmRemove(this.getId());

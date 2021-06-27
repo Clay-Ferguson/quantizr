@@ -132,7 +132,6 @@ public class UserManagerService {
 	@Autowired
 	private AclService acl;
 
-	// todo-0: rename to 'sc' in entire app
 	@Autowired
 	private SessionContext sc;
 

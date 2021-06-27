@@ -12,7 +12,7 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
 export class VideoPlayer extends Comp {
 
     getVideoElement(): HTMLVideoElement {
-        return <HTMLVideoElement> this.getElement();
+        return <HTMLVideoElement> this.getRef();
     }
 
     compRender(): ReactNode {

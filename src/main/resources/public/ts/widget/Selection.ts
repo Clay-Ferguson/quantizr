@@ -15,16 +15,16 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
 export class Selection extends Comp {
 
     constructor(attribs: any, private label: string = null, public selectionOptions: Object[] = null, moreClasses: string, private outterClasses: string, private valueIntf: ValueIntf) {
-        super(attribs || {});
+        super(attribs);
         // w-25 = width 25%
         // https://hackerthemes.com/bootstrap-cheatsheet/#m-1
         this.attribs.className = "custom-select " + moreClasses;
 
-        selectionOptions.forEach(function (row: any) {
+        selectionOptions.forEach((row: any) => {
             // NOTE: for default selection we do it this way rather than the 'elm.selectedIndex' which is used to
             // to set selected item after rendered.
-            this.children.push(new SelectionOption(row.key, row.val));
-        }, this);
+            this.addChild(new SelectionOption(row.key, row.val));
+        });
 
         this.attribs.onChange = (evt: any) => {
             /*

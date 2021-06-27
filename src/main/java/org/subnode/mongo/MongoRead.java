@@ -569,8 +569,6 @@ public class MongoRead {
         return util.find(query);
     }
 
-    // =========================================================================
-
     /**
      * prop is optional and if non-null means we should search only that one field.
      * 
@@ -655,10 +653,8 @@ public class MongoRead {
                     query.addCriteria(Criteria.where(sortField).ne(null));
                 }
             }
-
             query.with(Sort.by(revChron ? Sort.Direction.DESC : Sort.Direction.ASC, sortField));
         }
-
         return util.find(query);
     }
 
@@ -750,7 +746,6 @@ public class MongoRead {
             aclService.addPrivilege(session, node, PrincipalName.PUBLIC.s(), Arrays.asList(PrivilegeType.READ.s()), null);
             update.save(session, node);
         }
-
         return node;
     }
 
@@ -792,10 +787,6 @@ public class MongoRead {
         return userName.substring(0, atIdx);
     }
 
-    /*
-     * todo-0: look for all other places in this class where we can be looking up something with a
-     * custom cache key.
-     */
     public SubNode getUserNodeByUserName(MongoSession session, String user) {
         String cacheKey = "USRNODE-" + user;
         SubNode ret = MongoThreadLocal.getCachedNode(cacheKey);

@@ -69,13 +69,6 @@ export abstract class Comp<S extends BaseCompState = any> implements CompIntf {
         }
         this.attribs = attribs || {};
 
-        // todo-0
-        // need to carefully find ALL references to this and make them
-        // to thru accessor so we lazy create this array, but be careful
-        // because setting the member 'private' to see where it's used
-        // DID NOT WORK. TypeScript compiler is failing to enforce the 'private' accessor
-        this.children = [];
-
         /* If an ID was specifically provided, then use it, or else generate one */
         let id = this.attribs.id || ("c" + Comp.nextGuid().toString(16));
         this.clazz = this.constructor.name;
@@ -83,6 +76,9 @@ export abstract class Comp<S extends BaseCompState = any> implements CompIntf {
     }
 
     public getRef = (): HTMLElement => {
+        // This would theoretically also always work... (but is slower)
+        // return <HTMLElement>document.getElementById(this.getId());
+
         if (!this.ref) {
             console.log("ref not set in id: " + this.getId());
             return null;
@@ -110,20 +106,6 @@ export abstract class Comp<S extends BaseCompState = any> implements CompIntf {
         return this.attribs.id;
     }
 
-    /* Warning: Under lots of circumstances it's better to call util.getElm rather than getElement() because getElement returns
-    null unless the element is already created and rendered onto the DOM */
-    // todo-0: this method is a duplicate of getRef
-    getElement(): HTMLElement {
-        return <HTMLElement>this.ref;
-        // DO NOT DELETE
-        // if (this.ref && this.ref.current) {
-        //     // console.log("***** got element from ref! " + this.jsClassName);
-        //     return this.ref.current;
-        // }
-        // console.log("*** getting element from old-school dom call.");
-        // return <HTMLElement>document.getElementById(this.getId());
-    }
-
     // This is the original implementation of whenElm which uses a timer to wait for the element to come into existence
     // and is only used in one odd place where we manually attach Dialogs to the DOM (see DialogBase.ts)
     whenElmEx(func: (elm: HTMLElement) => void) {
@@ -134,7 +116,7 @@ export abstract class Comp<S extends BaseCompState = any> implements CompIntf {
     whenElm(func: (elm: HTMLElement) => void) {
         // console.log("whenElm running for " + this.jsClassName);
 
-        let elm = this.getElement();
+        let elm = this.getRef();
         if (elm) {
             // console.log("Looked for and FOUND on DOM: " + this.jsClassName);
             func(elm);
@@ -463,7 +445,7 @@ export abstract class Comp<S extends BaseCompState = any> implements CompIntf {
         }
 
         if (this.domAddFuncs) {
-            let elm: HTMLElement = this.getElement();
+            let elm: HTMLElement = this.getRef();
             if (!elm) {
                 // I'm getting this happening during rendering a timeline (somehow also dependent on WHAT kind of rows
                 // are IN the timeline), but I'm not convinced yet it's a bug, rather than

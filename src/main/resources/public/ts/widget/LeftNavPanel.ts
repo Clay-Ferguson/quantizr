@@ -59,7 +59,7 @@ export class LeftNavPanel extends Div {
 
     // This was originally on the toolbar at top of page but if we bring this back it will be here (probably)
     // domAddEvent(): void {
-    //     let elm: HTMLElement = this.getElement();
+    //     let elm: HTMLElement = this.getRef();
 
     //     elm.addEventListener("dragenter", (event) => {
     //         // console.log('DRAGENTER: ' + S.util.prettyPrint(event));
