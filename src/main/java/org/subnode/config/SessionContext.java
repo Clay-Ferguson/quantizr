@@ -22,6 +22,7 @@ import org.subnode.mongo.MongoUtil;
 import org.subnode.response.SessionTimeoutPushInfo;
 import org.subnode.service.UserFeedService;
 import org.subnode.util.DateUtil;
+import org.subnode.util.Util;
 
 /**
  * The ScopedProxyMode.TARGET_CLASS annotation allows this session bean to be available on
@@ -60,7 +61,10 @@ public class SessionContext {
 
 	private UserPreferences userPreferences;
 
-	/* Note: this object is Session-specific to the timezone will be per user */
+	/* Note: this object is Session-specific to the timezone will be per user 
+	// todo-0: all these SimpleDateFormat objects are bugs. This is not threasafe. Need a getter for each 
+	// which creates.
+	*/
 	private SimpleDateFormat dateFormat;
 
 	/* Initial id param parsed from first URL request */
@@ -104,7 +108,7 @@ public class SessionContext {
 		}
 
 		if (userToken == null) {
-			userToken = String.valueOf(Math.abs(rand.nextLong()));
+			userToken = Util.genStrongToken();
 		}
 		log.debug("sessionContext authenticated hashCode=" + String.valueOf(hashCode()) + " user: " + userName + " to userToken "
 				+ userToken);

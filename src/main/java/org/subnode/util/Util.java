@@ -1,10 +1,14 @@
 package org.subnode.util;
 
 import java.io.InputStream;
+import java.security.MessageDigest;
+import java.text.SimpleDateFormat;
+import java.util.Base64;
+import java.util.Date;
+import java.util.Locale;
+import java.util.Random;
 import java.util.Scanner;
-
 import javax.servlet.http.HttpServletRequest;
-
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
@@ -18,12 +22,26 @@ import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 
 public class Util {
 	private static final Logger log = LoggerFactory.getLogger(Util.class);
+	private static final Random rand = new Random();
 
 	public static void sleep(long millis) {
 		try {
 			Thread.sleep(millis);
 		} catch (InterruptedException e) {
 			e.printStackTrace();
+		}
+	}
+
+	/* Generates a very strong unguessable token. We could also use JWT here, but for our architecture
+	the only requirement is unique and unguessable. */
+	public static String genStrongToken() {
+		// Warning: SimpleDateFormat is not threadsafe. Always create here.
+		SimpleDateFormat dateFormat = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss z", Locale.US);
+		String str = dateFormat.format(new Date()) + "-" + String.valueOf(Math.abs(rand.nextLong()));
+		try {
+			return Base64.getEncoder().encodeToString(MessageDigest.getInstance("SHA-256").digest(str.getBytes()));
+		} catch (Exception e) {
+			throw new RuntimeException("SHA-256 failed");
 		}
 	}
 

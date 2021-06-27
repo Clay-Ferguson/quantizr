@@ -76,6 +76,8 @@ import org.apache.lucene.document.LongPoint;
 // org.apache.commons.compress.compressors.zstandard.ZstdCompressorInputStream;
 @Component
 public class FileIndexer {
+	// todo-0: all these SimpleDateFormat objects are bugs. This is not threasafe. Need a getter for each 
+	// which creates.
 	private final static SimpleDateFormat DATE_FORMATTER = new SimpleDateFormat("MM/dd/yyyy HH:mm:ss");
 	private static final Logger log = LoggerFactory.getLogger(FileIndexer.class);
 

@@ -253,6 +253,7 @@ public class ActPubUtil {
             // X509EncodedKeySpec keySpecX509 = new X509EncodedKeySpec(publicKeyBytes);
             // PUblicKey pubKey = (RSAPublicKey) kf.generatePublic(keySpecX509);
 
+            // WARNING: dateFormat is NOT threasafe. Always create one here.
             SimpleDateFormat dateFormat = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss z", Locale.US);
             dateFormat.setTimeZone(TimeZone.getTimeZone("GMT"));
             String date = dateFormat.format(new Date());

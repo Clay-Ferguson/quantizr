@@ -34,6 +34,8 @@ public class DateUtil {
 	/** Used to format date values */
 	public static final Locale DATE_FORMAT_LOCALE = Locale.US;
 
+	// todo-0: all these SimpleDateFormat objects are bugs. This is not threasafe. Need a getter for each 
+	// which creates.
 	private final static SimpleDateFormat DATE_FORMATTER = new SimpleDateFormat("MM/dd/yyyy HH:mm:ss");
 
 	/* Note: this object is Session-specific to the timezone will be per user */
