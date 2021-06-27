@@ -60,14 +60,10 @@ public class MongoRead {
 
     private SubNode dbRoot;
 
-    @PostConstruct
-    public void postConstruct() {
-        dbRoot = findNodeByPath("/" + NodeName.ROOT);
-    }
-
+    // we call this during app init so we don't need to have thread safety here the rest of the time.
     public SubNode getDbRoot() {
         if (dbRoot == null) {
-            throw new RuntimeException("Accessed dbRoot before spring init.");
+            dbRoot = findNodeByPath("/" + NodeName.ROOT);
         }
         return dbRoot;
     }
@@ -809,7 +805,7 @@ public class MongoRead {
         // For the ADMIN user their root node is considered to be the entire root of the
         // whole DB
         if (PrincipalName.ADMIN.s().equalsIgnoreCase(user)) {
-            return dbRoot;
+            return getDbRoot();
         }
 
         // Other wise for ordinary users root is based off their username

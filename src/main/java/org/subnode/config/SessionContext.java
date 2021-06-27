@@ -61,12 +61,6 @@ public class SessionContext {
 
 	private UserPreferences userPreferences;
 
-	/* Note: this object is Session-specific to the timezone will be per user 
-	// todo-0: all these SimpleDateFormat objects are bugs. This is not threasafe. Need a getter for each 
-	// which creates.
-	*/
-	private SimpleDateFormat dateFormat;
-
 	/* Initial id param parsed from first URL request */
 	private String urlId;
 
@@ -198,22 +192,22 @@ public class SessionContext {
 
 		/* If we have a short timezone abbreviation display timezone with it */
 		if (getTimeZoneAbbrev() != null) {
-			if (dateFormat == null) {
-				dateFormat = new SimpleDateFormat(DateUtil.DATE_FORMAT_NO_TIMEZONE, DateUtil.DATE_FORMAT_LOCALE);
-				if (getTimezone() != null) {
-					dateFormat.setTimeZone(TimeZone.getTimeZone(getTimezone()));
-				}
+
+			SimpleDateFormat dateFormat = new SimpleDateFormat(DateUtil.DATE_FORMAT_NO_TIMEZONE, DateUtil.DATE_FORMAT_LOCALE);
+			if (getTimezone() != null) {
+				dateFormat.setTimeZone(TimeZone.getTimeZone(getTimezone()));
 			}
+
 			return dateFormat.format(date) + " " + getTimeZoneAbbrev();
 		}
 		/* else display timezone in standard GMT format */
 		else {
-			if (dateFormat == null) {
-				dateFormat = new SimpleDateFormat(DateUtil.DATE_FORMAT_WITH_TIMEZONE, DateUtil.DATE_FORMAT_LOCALE);
-				if (getTimezone() != null) {
-					dateFormat.setTimeZone(TimeZone.getTimeZone(getTimezone()));
-				}
+
+			SimpleDateFormat dateFormat = new SimpleDateFormat(DateUtil.DATE_FORMAT_WITH_TIMEZONE, DateUtil.DATE_FORMAT_LOCALE);
+			if (getTimezone() != null) {
+				dateFormat.setTimeZone(TimeZone.getTimeZone(getTimezone()));
 			}
+
 			return dateFormat.format(date);
 		}
 	}

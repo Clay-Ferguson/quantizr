@@ -20,6 +20,9 @@ public class MongoRepository {
 	private MongoAppConfig mac;
 
 	@Autowired
+	private MongoRead read;
+
+	@Autowired
 	private AppProp appProp;
 
 	@Autowired
@@ -100,6 +103,9 @@ public class MongoRepository {
 			 * this method because of calls to getRepository() always doing an init.
 			 */
 			initialized = true;
+
+			// ensure the root variable is set.
+			read.getDbRoot();
 
 			if (appProp.getForceIndexRebuild()) {
 				util.dropAllIndexes(adminSession);

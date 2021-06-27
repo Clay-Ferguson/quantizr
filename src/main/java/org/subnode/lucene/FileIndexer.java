@@ -44,6 +44,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.subnode.config.AppProp;
+import org.subnode.util.DateUtil;
 import org.subnode.util.ExUtil;
 import org.subnode.util.StreamUtil;
 import org.subnode.util.XString;
@@ -76,9 +77,6 @@ import org.apache.lucene.document.LongPoint;
 // org.apache.commons.compress.compressors.zstandard.ZstdCompressorInputStream;
 @Component
 public class FileIndexer {
-	// todo-0: all these SimpleDateFormat objects are bugs. This is not threasafe. Need a getter for each 
-	// which creates.
-	private final static SimpleDateFormat DATE_FORMATTER = new SimpleDateFormat("MM/dd/yyyy HH:mm:ss");
 	private static final Logger log = LoggerFactory.getLogger(FileIndexer.class);
 
 	@Autowired
@@ -663,11 +661,12 @@ public class FileIndexer {
 	 * Get date attributes
 	 */
 	public static String getAttrVal(final BasicFileAttributes attr, final FileProperties prop) {
+		SimpleDateFormat format = new SimpleDateFormat(DateUtil.DATE_FORMAT);
 		switch (prop) {
 		case MODIFIED:
-			return DATE_FORMATTER.format((attr.lastModifiedTime().toMillis()));
+			return format.format((attr.lastModifiedTime().toMillis()));
 		case CREATED:
-			return DATE_FORMATTER.format((attr.creationTime().toMillis()));
+			return format.format((attr.creationTime().toMillis()));
 		default:
 			throw new IllegalArgumentException(prop.toString() + "is not supported.");
 		}

@@ -30,30 +30,17 @@ public class DateUtil {
 	public static final String DATE_FORMAT_NO_TIMEZONE = "yyyy/MM/dd hh:mm:ss a";
 	public static final String DATE_FORMAT_NO_TIME = "yyyy/MM/dd";
 	public static final String DATE_FORMAT_FILENAME_COMPAT = "yyMMddhhmmss";
+	public final static String DATE_FORMAT = "MM/dd/yyyy HH:mm:ss";
 
 	/** Used to format date values */
 	public static final Locale DATE_FORMAT_LOCALE = Locale.US;
-
-	// todo-0: all these SimpleDateFormat objects are bugs. This is not threasafe. Need a getter for each 
-	// which creates.
-	private final static SimpleDateFormat DATE_FORMATTER = new SimpleDateFormat("MM/dd/yyyy HH:mm:ss");
-
-	/* Note: this object is Session-specific to the timezone will be per user */
-	private static final SimpleDateFormat dateFormat = new SimpleDateFormat(DATE_FORMAT_NO_TIMEZONE,
-			DateUtil.DATE_FORMAT_LOCALE);
-	private static final SimpleDateFormat dateFormatNoTime = new SimpleDateFormat(DATE_FORMAT_NO_TIME,
-			DateUtil.DATE_FORMAT_LOCALE);
-	private static final SimpleDateFormat dateFormatFileNameCompat = new SimpleDateFormat(DATE_FORMAT_FILENAME_COMPAT,
-			DateUtil.DATE_FORMAT_LOCALE);
-
 	private static final HashMap<String, String> zoneMap = new HashMap<>();
 
 	/*
-	 * Date APIs have deprecated the use of short abbreviations for timezones, but
-	 * we preferr to still have them shown for at least United States timezones, so
-	 * we have to implement our own way of detecting the proper one and also
-	 * consider proper Daylight Savings Time value, which is of course coming from
-	 * the browser.
+	 * Date APIs have deprecated the use of short abbreviations for timezones, but we preferr to still
+	 * have them shown for at least United States timezones, so we have to implement our own way of
+	 * detecting the proper one and also consider proper Daylight Savings Time value, which is of course
+	 * coming from the browser.
 	 */
 	static {
 		zoneMap.put("-4S", "AST"); // ATLANTIC STANDARD TIME UTC - 4
@@ -65,6 +52,19 @@ public class DateUtil {
 		zoneMap.put("-6D", "MDT"); // MOUNTAIN DAYLIGHT TIME UTC - 6
 		zoneMap.put("-8S", "PST"); // PACIFIC STANDARD TIME UTC - 8
 		zoneMap.put("-7D", "PDT"); // PACIFIC DAYLIGHT TIME UTC - 7
+	}
+
+	/* Note: this object is Session-specific to the timezone will be per user */
+	public static SimpleDateFormat getDateFormat() {
+		return new SimpleDateFormat(DATE_FORMAT_NO_TIMEZONE, DateUtil.DATE_FORMAT_LOCALE);
+	}
+
+	public static SimpleDateFormat getDateFormatNoTime() {
+		return new SimpleDateFormat(DATE_FORMAT_NO_TIME, DateUtil.DATE_FORMAT_LOCALE);
+	}
+
+	public static SimpleDateFormat getDateFormatFileNameCompat() {
+		return new SimpleDateFormat(DATE_FORMAT_FILENAME_COMPAT, DateUtil.DATE_FORMAT_LOCALE);
 	}
 
 	/* Need to consider these. Will properly display as GMT-NNN */
@@ -82,11 +82,12 @@ public class DateUtil {
 	}
 
 	public static String getFormattedDate(long time) {
-		return DATE_FORMATTER.format(time);
+		SimpleDateFormat format = new SimpleDateFormat(DATE_FORMAT);
+		return format.format(time);
 	}
 
 	public static String getFileNameCompatDate() {
-		return dateFormatFileNameCompat.format(new Date());
+		return getDateFormatFileNameCompat().format(new Date());
 	}
 
 	/* This is not the most elegant solution but appears to work */
@@ -131,13 +132,13 @@ public class DateUtil {
 	public static Date parse(String time) {
 		try {
 			time = time.replace("-", "/");
-			return dateFormat.parse(time);
+			return getDateFormat().parse(time);
 		} catch (ParseException e) {
 			/* if date parse fails, try without the time */
 			if (time.length() > 10) {
 				time = time.substring(0, 10);
 				try {
-					return dateFormatNoTime.parse(time);
+					return getDateFormatNoTime().parse(time);
 				} catch (ParseException e1) {
 					throw new RuntimeEx(e);
 				}
@@ -147,9 +148,8 @@ public class DateUtil {
 	}
 
 	/*
-	 * Formats this duration into a string that describes the time about the way a
-	 * human would say it. For example if it was a number of days ago you don't
-	 * include minutes and seconds etc.
+	 * Formats this duration into a string that describes the time about the way a human would say it.
+	 * For example if it was a number of days ago you don't include minutes and seconds etc.
 	 */
 	public static String formatDurationMillis(long different) {
 		StringBuilder sb = new StringBuilder();

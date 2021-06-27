@@ -4,7 +4,6 @@ import { Singletons } from "../Singletons";
 import { Anchor } from "../widget/Anchor";
 import { Div } from "../widget/Div";
 import { Img } from "../widget/Img";
-import { Spinner } from "../widget/Spinner";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
@@ -34,22 +33,24 @@ export class OpenGraphPanel extends Div {
                     if (entry.isIntersecting) {
                         let og = S.meta64.openGraphData.get(this.url);
                         if (!og) {
-
                             // wait 2 seconds before showing the loading indicator.
-                            setTimeout(() => {
-                                if (!elm.isConnected) return;
+                            // setTimeout(() => {
+                            //     if (!elm.isConnected) return;
 
-                                let og = S.meta64.openGraphData.get(this.url);
-                                if (!og) {
-                                    this.mergeState({ loading: true });
-                                }
-                            }, 2000);
+                            //     let og = S.meta64.openGraphData.get(this.url);
+                            //     if (!og) {
+                            //         this.mergeState({ loading: true });
+                            //     }
+                            // }, 2000);
 
                             S.util.loadOpenGraph(this.url, (og: any) => {
                                 if (!elm.isConnected) return;
 
                                 S.meta64.openGraphData.set(this.url, og || {});
                                 this.mergeState({ loading: false, og });
+                                // todo-1: we could maintain a global list of OpenGraphPanel objects, which
+                                // resets at each render, but can be consulted to see what's the NEXT one
+                                // in line below this currently instersecting one and load it too in advance.
                             });
                         }
                     }
@@ -62,17 +63,17 @@ export class OpenGraphPanel extends Div {
 
     preRender(): void {
         let state = this.getState();
-        if (state.loading) {
-            this.setChildren([
-                // This spinner works fine, but I decided after using it, it's a better user experience to just not
-                // even indicate to the user that a link is attempting to have it's OpenGraph displayed. Just let it popup
-                // if ready, but if not the user sees a nice clean page regardlessl.
-                // new Div(null, {
-                //     className: "progressSpinner"
-                // }, [new Spinner()])
-            ]);
-            return;
-        }
+        // if (state.loading) {
+        //     this.setChildren([
+        //         // This spinner works fine, but I decided after using it, it's a better user experience to just not
+        //         // even indicate to the user that a link is attempting to have it's OpenGraph displayed. Just let it popup
+        //         // if ready, but if not the user sees a nice clean page regardlessl.
+        //         // new Div(null, {
+        //         //     className: "progressSpinner"
+        //         // }, [new Spinner()])
+        //     ]);
+        //     return;
+        // }
         let o: any = state.og;
         if (!o) {
             this.setChildren(null);
