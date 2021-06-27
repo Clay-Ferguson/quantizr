@@ -519,7 +519,7 @@ export class RssTypeHandler extends TypeBase {
                 //     content += "\nFeed: " + feedTitle + "\n";
                 // }
                 // content += "\n" + entry.link;
-                S.edit.addRSSBookmark(entry.link, state);
+                S.edit.addLinkBookmark(entry.link, state);
             }
         }) : null;
 

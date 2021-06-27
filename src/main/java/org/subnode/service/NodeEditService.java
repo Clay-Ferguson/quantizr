@@ -129,7 +129,7 @@ public class NodeEditService {
 		CreateSubNodeResponse res = new CreateSubNodeResponse();
 		session = MongoThreadLocal.ensure(session);
 
-		boolean rssBookmark = "rssBookmark".equals(req.getPayloadType());
+		boolean linkBookmark = "linkBookmark".equals(req.getPayloadType());
 		String nodeId = req.getNodeId();
 		boolean makePublic = false;
 		SubNode node = null;
@@ -138,7 +138,7 @@ public class NodeEditService {
 		 * If this is a "New Post" from the Feed tab we get here with no ID but we put this in user's
 		 * "My Posts" node
 		 */
-		if (nodeId == null && !rssBookmark) {
+		if (nodeId == null && !linkBookmark) {
 			node = read.getUserNodeByType(session, null, null,
 					"### " + ThreadLocals.getSessionContext().getUserName() + "'s Public Posts", NodeType.POSTS.s(),
 					Arrays.asList(PrivilegeType.READ.s()), NodeName.POSTS);
@@ -150,7 +150,7 @@ public class NodeEditService {
 		}
 
 		/* Node still null, then try other ways of getting it */
-		if (node == null && !rssBookmark) {
+		if (node == null && !linkBookmark) {
 			if (nodeId.equals("~" + NodeType.NOTES.s())) {
 				node = read.getUserNodeByType(session, session.getUserName(), null, "### Notes", NodeType.NOTES.s(), null, null);
 			} else {
@@ -160,13 +160,13 @@ public class NodeEditService {
 
 		if (NodeType.BOOKMARK.s().equals(req.getTypeName())) {
 			
-			//Note: if rssBookmark node will null here. that's fine.
+			//Note: if linkBookmark node will null here. that's fine.
 			SubNode nodeToBookmark = node;
 
 			node = read.getUserNodeByType(session, session.getUserName(), null, "### Bookmarks", NodeType.BOOKMARK_LIST.s(), null,
 					null);
 
-			if (!rssBookmark) {
+			if (!linkBookmark) {
 				req.setContent(render.getFirstLineAbbreviation(nodeToBookmark.getContent(), 100));
 			}
 		} else

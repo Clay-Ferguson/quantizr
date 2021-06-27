@@ -803,8 +803,9 @@ export class Edit implements EditIntf {
         this.createNode(node, J.NodeType.BOOKMARK, true, null, null, state);
     }
 
-    addRSSBookmark = (content: any, state: AppState): void => {
-        this.createNode(null, J.NodeType.BOOKMARK, true, "rssBookmark", content, state);
+    addLinkBookmark = (content: any, state: AppState): void => {
+        state = appState(state);
+        this.createNode(null, J.NodeType.BOOKMARK, true, "linkBookmark", content, state);
     }
 
     /* If node is non-null that means this is a reply to that 'node' but if node is 'null' that means

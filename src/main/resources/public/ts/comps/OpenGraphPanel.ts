@@ -1,8 +1,11 @@
+import { store } from "../AppRedux";
 import { Constants as C } from "../Constants";
 import { PubSub } from "../PubSub";
 import { Singletons } from "../Singletons";
 import { Anchor } from "../widget/Anchor";
 import { Div } from "../widget/Div";
+import { HorizontalLayout } from "../widget/HorizontalLayout";
+import { Icon } from "../widget/Icon";
 import { Img } from "../widget/Img";
 
 let S: Singletons;
@@ -93,6 +96,14 @@ export class OpenGraphPanel extends Div {
             o.ogUrl = this.url;
         }
 
+        let bookmarkIcon = o.ogUrl && !state.isAnonUser ? new Icon({
+            className: "fa fa-bookmark fa-lg rssLinkIcon float-right",
+            title: "Bookmark this RSS entry",
+            onClick: () => {
+                S.edit.addLinkBookmark(o.ogUrl, null);
+            }
+        }) : null;
+
         // todo-1: need to detect when there's an image width specified (image.width?) that is
         // less than what is in openGraphImage, and then use that with
         this.attribs.className = "openGraphPanel";
@@ -103,11 +114,18 @@ export class OpenGraphPanel extends Div {
             }) : new Div(title, {
                 className: "openGraphTitle"
             }),
-            new Div(desc),
-            image && image.url ? new Img(null, {
-                className: "openGraphImage",
-                src: image.url
-            }) : null
+            new HorizontalLayout([
+                new Div(null, { className: "openGraphLhs" }, [
+                    image && image.url ? new Img(null, {
+                        className: "openGraphImage",
+                        src: image.url
+                    }) : null
+                ]),
+                new Div(null, { className: "openGraphRhs" }, [
+                    new Div(desc),
+                    bookmarkIcon
+                ])
+            ])
         ]);
     }
 }

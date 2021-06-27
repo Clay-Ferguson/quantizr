@@ -1944,12 +1944,24 @@ audio::-webkit-media-controls-play-button {
 .openGraphImage {
     border: 1px solid $nodeBorderBottomColor;
     border-radius: $border-radius;
-    width: 250px;
+    width: 100%;
     margin-top: 8px;
 }
 
+.openGraphLhs {
+    margin: 8px;
+    width: 30%;
+}
+
+.openGraphRhs {
+    margin: 8px;
+    width: 70%;
+    padding-left: 12px;
+    padding-top: 10px;
+}
+
 .openGraphTitle {
-    font-size: 140%;
+    font-size: 130%;
     margin-bottom: 8px;
 }
 
