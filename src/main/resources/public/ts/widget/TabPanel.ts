@@ -3,10 +3,8 @@ import { store } from "../AppRedux";
 import { AppState } from "../AppState";
 import { Constants as C } from "../Constants";
 import { DialogBase } from "../DialogBase";
-import { Log } from "../Log";
 import { PubSub } from "../PubSub";
 import { Singletons } from "../Singletons";
-import { State } from "../State";
 import { CompIntf } from "./base/CompIntf";
 import { Div } from "./Div";
 
@@ -17,14 +15,14 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (s: Singletons) => {
 
 export class TabPanel extends Div {
 
-constructor(private customTopComp: CompIntf = null) {
+    constructor(private customTopComp: CompIntf = null) {
         super(null, { id: C.ID_TAB, tabIndex: "-1" });
         this.domAddEvent = this.domAddEvent.bind(this);
         this.domPreUpdateEvent = this.domPreUpdateEvent.bind(this);
         const state: AppState = store.getState();
 
         if (state.mobileMode) {
-            this.attribs.className = "col-12 tabPanelMobile normalScrollbar";
+            this.attribs.className = "col-12 " + (state.userPreferences.editMode ? "tabPanelMobileEditMode" : "tabPanelMobile") + " normalScrollbar";
         }
         else {
             let state: AppState = store.getState();

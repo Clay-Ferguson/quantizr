@@ -50,7 +50,7 @@ export abstract class DialogBase<S extends BaseCompState = any> extends Div<S> i
     which is to store the browser scroll position in the dialog, so it can be restored back after editing is complete, and the
     experimental overrideClass used for testing was "embedded-dlg"
     */
-    constructor(public title: string, private overrideClass: string, private closeByOutsideClick: boolean, appState: AppState, public mode: DialogMode = null) {
+    constructor(public title: string, private overrideClass: string, private closeByOutsideClick: boolean, appState: AppState, public mode: DialogMode = null, public forceMode: boolean = false) {
         super(null);
         this.close = this.close.bind(this);
 
@@ -62,7 +62,7 @@ export abstract class DialogBase<S extends BaseCompState = any> extends Div<S> i
         }
 
         // if no mode is given assume it based on whether mobile or not, or if this is mobile then also force fullscreen.
-        if (!this.mode || this.appState.mobileMode) {
+        if (!forceMode && (!this.mode || this.appState.mobileMode)) {
             this.mode = this.appState.mobileMode ? DialogMode.FULLSCREEN : DialogMode.POPUP;
         }
 
@@ -87,7 +87,6 @@ export abstract class DialogBase<S extends BaseCompState = any> extends Div<S> i
         }
         this.opened = true;
         return new Promise<DialogBase>(async (resolve, reject) => {
-
             if (this.mode === DialogMode.POPUP) {
                 // Create dialog container and attach to document.body.
                 this.backdrop = document.createElement("div");
