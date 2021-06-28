@@ -248,7 +248,7 @@ public class AttachmentService {
 		 * Multiple file uploads always attach children for each file uploaded
 		 */
 		if (addAsChild) {
-			auth.auth(session, node, PrivilegeType.WRITE);
+			auth.ownerAuth(session, node);
 			try {
 				final SubNode newNode =
 						create.createNode(session, node, null, null, null, CreateNodeLocation.LAST, null, null, true);

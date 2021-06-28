@@ -15,11 +15,12 @@ public class MongoThreadLocal {
 	private static final ThreadLocal<MongoSession> session = new ThreadLocal<>();
 
 	/*
-	 * This is where we can accumulate the set of nodes that will all be updated after processing is
+	 * dirtyNodes is where we accumulate the set of nodes that will all be updated after processing is
 	 * done using the api.sessionSave() call. This is a way to not have to worry about doing SAVES on
 	 * every object that is touched during the processing of a thread/request.
 	 */
 	private static final ThreadLocal<HashMap<ObjectId, SubNode>> dirtyNodes = new ThreadLocal<HashMap<ObjectId, SubNode>>();
+
 	private static final ThreadLocal<LinkedHashMap<String, SubNode>> cachedNodes =
 			new ThreadLocal<LinkedHashMap<String, SubNode>>();
 	private static final ThreadLocal<Boolean> writesDisabled = new ThreadLocal<Boolean>();
@@ -27,7 +28,6 @@ public class MongoThreadLocal {
 	private static int MAX_CACHE_SIZE = 50;
 
 	public static void removeAll() {
-		// log.debug("Clear Dirty Nodes.");
 		getDirtyNodes().clear();
 		getCachedNodes().clear();
 		setWritesDisabled(false);
@@ -107,7 +107,7 @@ public class MongoThreadLocal {
 		 * saying with non-ACID databases transactions don't really 'work'
 		 */
 		if (nodeFound != null && nodeFound.hashCode() != node.hashCode()) {
-			log.debug("*************** ERROR: multiple instances of objectId " + node.getId().toHexString() + " are in memory.");
+			log.debug("*************** WARNING: multiple instances of objectId " + node.getId().toHexString() + " are in memory.");
 			return;
 		}
 
@@ -117,11 +117,7 @@ public class MongoThreadLocal {
 	/* Opposite of dirty */
 	public static void clean(SubNode node) {
 		// log.debug("Removing from Dirty: " + node.getId().toHexString());
-
-		// commenting this 'if' we don't care if the remove is doing something or now.
-		// if (getDirtyNodes().containsKey(node.getId())) {
 		getDirtyNodes().remove(node.getId());
-		// }
 	}
 
 	public static void cacheNode(String key, SubNode node) {

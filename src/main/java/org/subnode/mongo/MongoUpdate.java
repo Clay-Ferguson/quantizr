@@ -89,7 +89,7 @@ public class MongoUpdate {
 				}
 
 				/*
-				 * We use 'nodes' list to avoid a concurrent modification exception in the loop below
+				 * We use 'nodes' list to avoid a concurrent modification 
 				 */
 				List<SubNode> nodes = new LinkedList<>();
 
@@ -98,7 +98,7 @@ public class MongoUpdate {
 				 */
 				for (SubNode node : MongoThreadLocal.getDirtyNodes().values()) {
 					if (!asAdmin) {
-						auth.auth(session, node, PrivilegeType.WRITE);
+						auth.ownerAuth(session, node);
 					}
 					nodes.add(node);
 				}

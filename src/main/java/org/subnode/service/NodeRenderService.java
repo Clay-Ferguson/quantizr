@@ -418,7 +418,6 @@ public class NodeRenderService {
 		if (orderBy.equals("priority")) {
 			sort = sort.and(Sort.by(Sort.Direction.DESC, SubNode.FIELD_MODIFY_TIME));
 		}
-
 		return sort;
 	}
 
@@ -428,7 +427,7 @@ public class NodeRenderService {
 
 		String nodeId = req.getNodeId();
 		SubNode node = read.getNode(session, nodeId);
-		auth.auth(session, node, PrivilegeType.WRITE);
+		auth.ownerAuth(session, node);
 
 		if (node == null) {
 			res.setMessage("Node not found.");
