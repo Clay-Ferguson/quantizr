@@ -81,6 +81,7 @@ export class Html extends Comp {
     */
     domPreUpdateEvent(): void {
         let elm = this.getRef();
+        if (!elm) return;
         if (MathJax && MathJax.typeset) {
             // note: MathJax.typesetPromise(), also exists
             MathJax.typeset([elm]);

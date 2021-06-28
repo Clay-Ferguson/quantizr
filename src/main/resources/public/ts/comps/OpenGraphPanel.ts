@@ -1,4 +1,3 @@
-import { store } from "../AppRedux";
 import { Constants as C } from "../Constants";
 import { PubSub } from "../PubSub";
 import { Singletons } from "../Singletons";
@@ -29,6 +28,7 @@ export class OpenGraphPanel extends Div {
 
     domAddEvent(): void {
         let elm: HTMLElement = this.getRef();
+        if (!elm || !elm.isConnected) return;
         let og = S.meta64.openGraphData.get(this.url);
         if (!og) {
             let observer = new IntersectionObserver(entries => {
@@ -36,6 +36,9 @@ export class OpenGraphPanel extends Div {
                     if (entry.isIntersecting) {
                         let og = S.meta64.openGraphData.get(this.url);
                         if (!og) {
+                            // set a value so we know we can't re-enter into here again.
+                            S.meta64.openGraphData.set(this.url, {});
+
                             // wait 2 seconds before showing the loading indicator.
                             // setTimeout(() => {
                             //     if (!elm.isConnected) return;
@@ -47,21 +50,46 @@ export class OpenGraphPanel extends Div {
                             // }, 2000);
 
                             S.util.loadOpenGraph(this.url, (og: any) => {
-                                if (!elm.isConnected) return;
-
                                 S.meta64.openGraphData.set(this.url, og || {});
+                                if (!elm.isConnected) return;
                                 this.mergeState({ loading: false, og });
-                                // todo-1: we could maintain a global list of OpenGraphPanel objects, which
-                                // resets at each render, but can be consulted to see what's the NEXT one
-                                // in line below this currently instersecting one and load it too in advance.
                             });
                         }
+                        this.loadNext();
                     }
                 });
             });
             observer.observe(elm.parentElement);
         }
         super.domAddEvent();
+    }
+
+    /* This loads the next upcomming OpenGraph assuming the user is scrolling down */
+    loadNext = (): void => {
+        let found = false;
+        let count = 0;
+        S.meta64.openGraphComps.forEach(o => {
+            if (found) {
+                /* I think it's counterproductive for smooth scrolling to preload more than one */
+                if (count++ < 1) {
+                    let og = S.meta64.openGraphData.get(o.url);
+                    if (!og) {
+                        // set a value so we know we can't re-enter into here again.
+                        S.meta64.openGraphData.set(o.url, {});
+
+                        // console.log("nextup: " + o.url);
+                        S.util.loadOpenGraph(o.url, (og: any) => {
+                            S.meta64.openGraphData.set(o.url, og || {});
+                            if (!o.getRef()) return;
+                            o.mergeState({ loading: false, og });
+                        });
+                    }
+                }
+            }
+            else if (o.getId() === this.getId()) {
+                found = true;
+            }
+        });
     }
 
     preRender(): void {

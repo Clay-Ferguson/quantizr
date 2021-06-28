@@ -1,5 +1,6 @@
 import { appState, dispatch, store } from "./AppRedux";
 import { AppState } from "./AppState";
+import { OpenGraphPanel } from "./comps/OpenGraphPanel";
 import { Constants as C } from "./Constants";
 import { AudioPlayerDlg } from "./dlg/AudioPlayerDlg";
 import { ChangePasswordDlg } from "./dlg/ChangePasswordDlg";
@@ -85,6 +86,11 @@ export class Meta64 implements Meta64Intf {
 
     /* Map of all URLs and the openGraph object retrieved for it */
     openGraphData: Map<string, any> = new Map<string, any>();
+
+    /* Map of all OpenGraphPanels in top to bottom rendered order. Each instance of an OpenGraphPanel
+    needs to soemhow associate to an array like this that's TAB_SPECIFIC (todo-0), and for now we
+    just let this apply to the Feed tab */
+    openGraphComps: OpenGraphPanel[] = [];
 
     sendTestEmail = (): void => {
         S.util.ajax<J.SendTestEmailRequest, J.SendTestEmailResponse>("sendTestEmail", {}, function (res: J.SendTestEmailResponse) {

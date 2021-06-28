@@ -1,7 +1,7 @@
 import { AppState } from "../AppState";
+import { OpenGraphPanel } from "../comps/OpenGraphPanel";
 import { MainMenuDlg } from "../dlg/MainMenuDlg";
 import * as J from "../JavaIntf";
-import { AppTab } from "../widget/AppTab";
 import { CompIntf } from "../widget/base/CompIntf";
 
 export interface Meta64Intf {
@@ -40,6 +40,7 @@ export interface Meta64Intf {
     ctrlKeyCheck(): boolean;
     decryptCache: Map<string, string>;
     openGraphData: Map<string, any>;
+    openGraphComps: OpenGraphPanel[];
 
     tabChanging(prevTab: string, newTab: string, state: AppState): void;
     showOpenButtonOnNode(node: J.NodeInfo, state: AppState): void;
