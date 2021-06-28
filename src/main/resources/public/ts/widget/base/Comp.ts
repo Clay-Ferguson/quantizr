@@ -49,7 +49,7 @@ export abstract class Comp<S extends BaseCompState = any> implements CompIntf {
     domAddFuncs: ((elm: HTMLElement) => void)[];
 
     renderRawHtml: boolean = false;
-    ref: HTMLElement;
+    // ref: HTMLElement;
 
     /**
      * 'react' should be true only if this component and all its decendants are true React components that are rendered and
@@ -76,17 +76,17 @@ export abstract class Comp<S extends BaseCompState = any> implements CompIntf {
     }
 
     public getRef = (): HTMLElement => {
-        // This would theoretically also always work... (but is slower)
-        // return <HTMLElement>document.getElementById(this.getId());
+        let elm: HTMLElement = document.getElementById(this.getId());
+        return (elm && elm.isConnected) ? elm : null;
 
-        if (!this.ref) {
-            console.log("ref not set in id: " + this.getId());
-            return null;
-        }
-        if (!this.ref.isConnected) {
-            console.log("warning: ref for dom id was not connected: " + this.getId());
-        }
-        return this.ref;
+        // if (!this.ref) {
+        //     // console.log("ref not set in id: " + this.getId() + " " + this.jsClassName);
+        //     return null;
+        // }
+        // if (!this.ref.isConnected) {
+        //     console.log("warning: ref for dom id was not connected: " + this.getId());
+        // }
+        // return this.ref;
     }
 
     private setId(id: string) {
@@ -388,10 +388,9 @@ export abstract class Comp<S extends BaseCompState = any> implements CompIntf {
             this.s.useState();
 
             // With 'useRef()' we sometimes get error:
-            // Function components cannot be given refs. Attempts to access this ref will fail. Did you mean to use React.forwardRef()
-            // but setting the 'ref' attribute as a function works (fingers crossed)
+            // Function components cannot be given refs. Attempts to access this ref will fail. Did you mean to use React.forwardRef(
             // this.attribs.ref = useRef(null);
-            this.attribs.ref = ref => this.ref = ref;
+            // this.attribs.ref = ref => this.ref = ref;
 
             useEffect(this.domAddEvent, []);
             useEffect(this.domUpdateEvent);
