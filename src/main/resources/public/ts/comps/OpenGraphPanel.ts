@@ -125,17 +125,20 @@ export class OpenGraphPanel extends Div {
         }
 
         let bookmarkIcon = o.ogUrl && !state.isAnonUser ? new Icon({
-            className: "fa fa-bookmark fa-lg rssLinkIcon float-right",
+            className: "fa fa-bookmark fa-lg ogBookmarkIcon float-right",
             title: "Bookmark this RSS entry",
             onClick: () => {
                 S.edit.addLinkBookmark(o.ogUrl, null);
             }
         }) : null;
 
-        // todo-1: need to detect when there's an image width specified (image.width?) that is
-        // less than what is in openGraphImage, and then use that with
+        if (desc?.length > 1000) {
+            desc = desc.substring(0, 1000) + "...";
+        }
+
         this.attribs.className = "openGraphPanel";
         this.setChildren([
+            bookmarkIcon,
             o.ogUrl ? new Anchor(o.ogUrl, title, {
                 target: "_blank",
                 className: "openGraphTitle"
@@ -144,14 +147,13 @@ export class OpenGraphPanel extends Div {
             }),
             new HorizontalLayout([
                 new Div(null, { className: "openGraphLhs" }, [
-                    image && image.url ? new Img(null, {
+                    image?.url ? new Img(null, {
                         className: "openGraphImage",
                         src: image.url
                     }) : null
                 ]),
                 new Div(null, { className: "openGraphRhs" }, [
-                    new Div(desc),
-                    bookmarkIcon
+                    new Div(desc)
                 ])
             ])
         ]);

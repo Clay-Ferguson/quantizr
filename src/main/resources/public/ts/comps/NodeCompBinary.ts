@@ -65,7 +65,7 @@ export class NodeCompBinary extends Div {
             className = "full-screen-img";
         }
         else {
-            className = this.isEditorEmbed ? "attached-img-in-editor" : "attached-img-in-row";
+            className = this.isEditorEmbed ? "img-in-editor" : "img-in-row";
         }
 
         return new Img(node.id, {
@@ -83,10 +83,8 @@ export class NodeCompBinary extends Div {
         if (this.isEditorEmbed) return;
 
         dispatch("Action_ClickImage", (s: AppState): AppState => {
-            let alreadyFullScreen = false;
             if (s.fullScreenViewId && this.isFullScreenEmbed) {
                 s.fullScreenImageSize = s.fullScreenImageSize ? "" : "100%";
-                alreadyFullScreen = true;
             }
             s.fullScreenViewId = id;
             return s;
