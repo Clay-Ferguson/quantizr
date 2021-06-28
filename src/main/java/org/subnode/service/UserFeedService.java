@@ -39,6 +39,7 @@ import org.subnode.response.FeedPushInfo;
 import org.subnode.response.NodeEditedPushInfo;
 import org.subnode.response.NodeFeedResponse;
 import org.subnode.response.ServerPushInfo;
+import org.subnode.response.SessionTimeoutPushInfo;
 import org.subnode.util.Convert;
 import org.subnode.util.ThreadLocals;
 
@@ -148,13 +149,13 @@ public class UserFeedService {
 		}
 	}
 
-	public void sendServerPushInfo(SessionContext userSession, ServerPushInfo info) {
+	public void sendServerPushInfo(SessionContext sc, ServerPushInfo info) {
 		// If user is currently logged in we have a session here.
-		if (userSession == null)
+		if (sc == null)
 			return;
 
 		executor.execute(() -> {
-			SseEmitter pushEmitter = userSession.getPushEmitter();
+			SseEmitter pushEmitter = sc.getPushEmitter();
 			if (pushEmitter == null)
 				return;
 
@@ -176,12 +177,19 @@ public class UserFeedService {
 				 */
 			} catch (Exception ex) {
 				pushEmitter.completeWithError(ex);
+			} finally {
+				// todo-1: this can be done in a slightly cleaner way (more decoiupled)
+				if (info instanceof SessionTimeoutPushInfo) {
+					sc.setMongoSession(null);
+					sc.setRootId(null);
+					sc.setUserName(null);
+					sc.setPushEmitter(null);
+				}
 			}
 		});
 	}
 
 	public CheckMessagesResponse checkMessages(MongoSession session, CheckMessagesRequest req) {
-
 		SessionContext sc = ThreadLocals.getSessionContext();
 		CheckMessagesResponse res = new CheckMessagesResponse();
 

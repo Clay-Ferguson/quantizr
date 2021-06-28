@@ -141,10 +141,7 @@ import org.subnode.util.Util;
  * Primary Spring MVC controller. All application logic from the browser connects directly to this
  * controller which is the only controller. Importantly the main SPA page is retrieved thru this
  * controller, and the binary attachments are also served up thru this interface.
- * 
- * Note, it's critical to understand the OakSession AOP code or else this class will be confusing
- * regarding how the OAK transactions are managed and how logging in is done.
- * 
+ *
  * This class has no documentation on the methods because it's a wrapper around the service methods
  * which is where the documentation can be found for each operation in here. It's a better
  * architecture to have all the AOP for any given aspect be in one particular layer, because of how
@@ -170,10 +167,13 @@ public class AppController implements ErrorController {
 	private static HashMap<String, String> thymeleafAttribs = null;
 
 	/*
-	 * RestTempalte is thread-safe and reusable, and has no state, so we need only one final static
+	 * RestTemplate is thread-safe and reusable, and has no state, so we need only one final static
 	 * instance ever
 	 */
 	private static final RestTemplate restTemplate = new RestTemplate(Util.getClientHttpRequestFactory());
+
+	@Autowired
+	private SessionContext sc;
 
 	@Autowired
 	private FileUtils fileUtils;
@@ -1434,9 +1434,7 @@ public class AppController implements ErrorController {
 	@GetMapping(API_PATH + "/serverPush")
 	public SseEmitter serverPush(HttpSession session) {
 		return (SseEmitter)callProc.run("serverPush", null, session, ms -> {
-			SseEmitter pushEmitter = new SseEmitter();
-			ThreadLocals.getSessionContext().setPushEmitter(pushEmitter);
-			return pushEmitter;
+			return sc.getPushEmitter();
 		});
 	}
 

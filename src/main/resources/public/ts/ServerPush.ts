@@ -42,6 +42,7 @@ export class ServerPush implements ServerPushIntf {
         };
 
         this.eventSource.addEventListener("sessionTimeout", function (e: any) {
+            // console.log("event: sessionTimeout.");
             if (!S.meta64.authToken) return;
             S.meta64.authToken = null;
             S.meta64.userName = null;

@@ -728,6 +728,7 @@ export const enum Constant {
 
 export const enum ErrorType {
     OUT_OF_SPACE = "oos",
+    TIMEOUT = "timeout",
     AUTH = "auth",
 }
 

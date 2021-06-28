@@ -67,7 +67,7 @@ public class SessionContext {
 	public int counter;
 
 	/* Emitter for sending push notifications to the client */
-	private SseEmitter pushEmitter;
+	private SseEmitter pushEmitter = new SseEmitter();
 
 	// this one WILL work with multiple sessions per user
 	public static final HashSet<SessionContext> allSessions = new HashSet<>();
@@ -84,8 +84,7 @@ public class SessionContext {
 	 * even on page 2 they may be seeing some records they had already seen on page 1
 	 */
 	private Date feedMaxTime;
-
-	private static final Random rand = new Random();
+	
 	private String userToken;
 
 	public SessionContext() {
@@ -134,6 +133,14 @@ public class SessionContext {
 		return false;
 	}
 
+	public static boolean serverPushTest(UserFeedService svc) {
+		// for (SessionContext sc : allSessions) {
+		// 	log.debug("ServerPush Test: sessionUserName=" + sc.getUserName());
+		// 	svc.sendServerPushInfo(sc, new SessionTimeoutPushInfo());
+		// }
+		return false;
+	}
+
 	public String getUserToken() {
 		return userToken;
 	}
@@ -168,10 +175,6 @@ public class SessionContext {
 			// userManagerService.updateLastActiveTime(this);
 			allSessions.remove(this);
 		}
-
-		ms = null;
-		userName = null;
-		pushEmitter = null;
 	}
 
 	public boolean isAdmin() {

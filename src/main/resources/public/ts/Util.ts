@@ -511,6 +511,8 @@ export class Util implements UtilIntf {
                                 this.showMessage(response.data.message, "Message");
                             }
 
+                            // if (response.data.errorType === J.ErrorType.TIMEOUT) {
+                            // }
                             return;
                         }
                         // WARNING: this looks like the right place for a return but does NOT work. Be careful.

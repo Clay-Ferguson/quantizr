@@ -3,6 +3,10 @@ package org.subnode.model.client;
 public enum ErrorType {
 	/* Can read the node and entire subgraph of nodes it contains */
 	OUT_OF_SPACE("oos"), //
+
+	// not used yet.
+	TIMEOUT("timeout"), //
+	
 	AUTH("auth"); //
 
 	public final String name;
