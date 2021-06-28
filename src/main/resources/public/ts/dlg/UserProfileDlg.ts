@@ -124,14 +124,14 @@ export class UserProfileDlg extends DialogBase {
                 this.readOnly ? null : new Anchor(null, "Logout", { className: "float-right logoutLink", onClick: S.nav.logout }),
 
                 new ButtonBar([
-                    this.readOnly ? null : new Button("Save", this.save, null, "btn-primary"),
-                    this.readOnly ? null : new Button("Manage Account", () => S.edit.openManageAccountDlg(state)), //
+                    this.appState.isAnonUser || this.readOnly ? null : new Button("Save", this.save, null, "btn-primary"),
+                    this.appState.isAnonUser || this.readOnly ? null : new Button("Manage Account", () => S.edit.openManageAccountDlg(state)), //
 
                     localUser && state.userProfile.homeNodeId ? new Button("Home Node", () => this.openUserHomePage(state, "home")) : null, //
                     localUser ? new Button("Posts", () => this.openUserHomePage(state, "posts")) : null, //
 
-                    !state.userProfile.following && this.readOnly && state.userProfile.userName !== this.appState.userName ? new Button("Add as Friend", this.addFriend) : null,
-                    !state.userProfile.blocked && this.readOnly && state.userProfile.userName !== this.appState.userName ? new Button("Block User", this.blockUser) : null,
+                    !this.appState.isAnonUser && !state.userProfile.following && this.readOnly && state.userProfile.userName !== this.appState.userName ? new Button("Add as Friend", this.addFriend) : null,
+                    !this.appState.isAnonUser && !state.userProfile.blocked && this.readOnly && state.userProfile.userName !== this.appState.userName ? new Button("Block User", this.blockUser) : null,
                     state.userProfile.actorUrl ? new Button("Go to User Page", () => {
                         window.open(state.userProfile.actorUrl, "_blank");
                     }) : null,
