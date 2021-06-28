@@ -10,6 +10,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Component;
+import org.subnode.config.AppProp;
 import org.subnode.exception.NodeAuthFailedException;
 import org.subnode.exception.base.RuntimeEx;
 import org.subnode.model.client.PrincipalName;
@@ -43,6 +44,9 @@ public class MongoTest implements TestIntf {
 
 	@Autowired
 	private MongoAuth auth;
+
+	@Autowired
+	private AppProp appProp;
 
 	@Autowired
 	private AttachmentService attachmentService;
@@ -102,7 +106,7 @@ public class MongoTest implements TestIntf {
 	}
 
 	public void authTest() {
-		MongoSession adminSession = auth.getAdminSession();
+		MongoSession adminSession = asUser(PrincipalName.ADMIN.s());
 
 		SubNode adminNode = read.getUserNodeByUserName(adminSession, PrincipalName.ADMIN.s());
 		if (adminNode == null) {
@@ -122,7 +126,7 @@ public class MongoTest implements TestIntf {
 		log.debug("admin inserted a node: " + insertedId.toString());
 
 		// login as adam
-		MongoSession adamSession = loginUser("adam");
+		MongoSession adamSession = asUser("adam");
 
 		// adam tries to set the path on adminsNode
 		try {
@@ -175,6 +179,7 @@ public class MongoTest implements TestIntf {
 		}
 
 		// admin tries to save a duplicated path
+		asSession(adminSession);
 		adamsNode.setPath(adminsNode.getPath());
 		try {
 			MongoThreadLocal.setMongoSession(adminSession);
@@ -185,6 +190,7 @@ public class MongoTest implements TestIntf {
 		}
 
 		// adam tries and fails to save adminsNode
+		asSession(adamSession);
 		try {
 			log.debug("Attempting save by wrong user.");
 			MongoThreadLocal.setMongoSession(adamSession);
@@ -238,11 +244,19 @@ public class MongoTest implements TestIntf {
 		}
 	}
 
-	private MongoSession loginUser(String userName) {
-		// code is obsolete now.
-		// MongoSession session = auth.processCredentials(userName, appProp.getTestPassword(), null);
-		// MongoThreadLocal.setMongoSession(session);
-		// return session;
-		return null;
+	private MongoSession asUser(String userName) {
+		MongoSession session = new MongoSession(userName);
+
+		SubNode userNode = read.getUserNodeByUserName(auth.getAdminSession(), userName);
+		if (userNode == null) {
+			throw new RuntimeException("UserNode not found for userName " + userName);
+		}
+		session.setUserNodeId(userNode.getId());
+		asSession(session);
+		return session;
+	}
+
+	private void asSession(MongoSession session) {
+		MongoThreadLocal.setMongoSession(session);
 	}
 }
