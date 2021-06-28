@@ -28,7 +28,6 @@ import org.subnode.model.client.PrincipalName;
 import org.subnode.model.client.PrivilegeType;
 import org.subnode.mongo.model.AccessControl;
 import org.subnode.mongo.model.SubNode;
-import org.subnode.util.ThreadLocals;
 import org.subnode.util.XString;
 
 @Component
