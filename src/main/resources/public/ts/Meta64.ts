@@ -72,6 +72,7 @@ export class Meta64 implements Meta64Intf {
     so that we can log back in again silently after any session timeout */
     userName: string;
     authToken: string;
+    loggingOut: boolean;
 
     ctrlKey: boolean;
     ctrlKeyTime: number;

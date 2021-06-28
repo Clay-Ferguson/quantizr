@@ -76,6 +76,8 @@ public class AppFilter extends GenericFilterBean {
 
 			HttpServletRequest httpReq = null;
 			if (req instanceof HttpServletRequest) {
+				//log.debug("***** SC: User: " + sc.getUserName());
+
 				httpReq = (HttpServletRequest) req;
 				String bearer = httpReq.getHeader("Bearer");
 

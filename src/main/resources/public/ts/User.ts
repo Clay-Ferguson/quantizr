@@ -15,11 +15,6 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (s: Singletons) => {
 
 export class User implements UserIntf {
 
-    private logoutResponse = (res: J.LogoutResponse): void => {
-        /* reloads browser with the query parameters stripped off the path */
-        window.location.href = window.location.origin; // + "/app";
-    }
-
     closeAccountResponse = (res: J.CloseAccountResponse): void => {
         /* Remove warning dialog to ask user about leaving the page */
         window.onbeforeunload = null;
@@ -137,10 +132,6 @@ export class User implements UserIntf {
             return;
         }
 
-        S.push.close();
-        // without this we'll get a notification popup when the server sends a notication of the disconnect.
-        S.meta64.authToken = null;
-
         /* Remove warning dialog to ask user about leaving the page */
         window.onbeforeunload = null;
 
@@ -150,8 +141,15 @@ export class User implements UserIntf {
             await S.localDB.setVal(C.LOCALDB_LOGIN_STATE, "0", "anon");
         }
 
-        S.util.ajax<J.LogoutRequest, J.LogoutResponse>("logout", {}, this.logoutResponse,
-            () => { this.logoutResponse(null); });
+        S.meta64.loggingOut = true;
+        S.util.ajax<J.LogoutRequest, J.LogoutResponse>("logout", {}, this.logoutResponse, this.logoutResponse);
+    }
+
+    logoutResponse = (): void => {
+        S.push.close();
+        S.meta64.authToken = null;
+        S.meta64.userName = null;
+        window.location.href = window.location.origin; // + "/app";
     }
 
     deleteAllUserLocalDbEntries = (): Promise<any> => {

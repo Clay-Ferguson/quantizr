@@ -33,6 +33,7 @@ export interface Meta64Intf {
     /* doesn't need to be in state */
     userName: string;
     authToken: string;
+    loggingOut: boolean;
 
     // realtime state always holds true if CTRL key is down
     ctrlKey: boolean;
