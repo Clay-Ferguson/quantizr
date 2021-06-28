@@ -37,11 +37,7 @@ export class App extends Main {
         const state: AppState = useSelector((state: AppState) => state);
 
         if (!state.guiReady) {
-            this.setChildren([
-                new Div(null, {
-                    className: "progressSpinner"
-                }, [new Spinner()])
-            ]);
+            this.setChildren(null);
             return;
         }
 
