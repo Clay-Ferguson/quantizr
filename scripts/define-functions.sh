@@ -44,6 +44,15 @@ dockerUp () {
     # https://stackoverflow.com/questions/35231362/dockerfile-and-docker-compose-not-updating-with-new-instructions
     echo "dockerUp"
 
+    if [ -z "$docker_compose_yaml_mongo" ]; then
+        echo "mongo runs embedded."
+    else
+        if [ "$RESTART_MONGO" == "true" ]; then
+            docker-compose -f ${docker_compose_yaml_mongo} up -d
+            verifySuccess "MongoDB Compose: up"
+        fi
+    fi
+
     docker-compose -f ${docker_compose_yaml} up -d
     verifySuccess "Docker Compose: up"
 

@@ -17,9 +17,13 @@ source ./setenv-dev.sh
 makeDirs
 rm -rf ${QUANTA_BASE}/log/*
 
+# Take all the services offline
 cd ${PRJROOT}
 dockerDown quanta-dev
-dockerDown mongo-dev
+
+if [ "$RESTART_MONGO" == "true" ]; then
+    dockerDown mongo-dev
+fi
 dockerDown ipfs-dev
 
 cd ${PRJROOT}
