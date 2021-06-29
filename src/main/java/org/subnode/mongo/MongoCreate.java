@@ -25,8 +25,11 @@ public class MongoCreate {
 	@Autowired
 	private MongoAuth auth;
 
-	public SubNode createNode(MongoSession session, SubNode parent, String type, Long ordinal,
-			CreateNodeLocation location, boolean updateParentOrdinals) {
+	@Autowired
+	private AdminRun arun;
+
+	public SubNode createNode(MongoSession session, SubNode parent, String type, Long ordinal, CreateNodeLocation location,
+			boolean updateParentOrdinals) {
 		return createNode(session, parent, null, type, ordinal, location, null, null, updateParentOrdinals);
 	}
 
@@ -53,20 +56,17 @@ public class MongoCreate {
 	}
 
 	/*
-	 * Creates a node, but does NOT persist it. If parent==null it assumes it's
-	 * adding a root node. This is required, because all the nodes at the root level
-	 * have no parent. That is, there is no ROOT node. Only nodes considered to be
-	 * on the root.
+	 * Creates a node, but does NOT persist it. If parent==null it assumes it's adding a root node. This
+	 * is required, because all the nodes at the root level have no parent. That is, there is no ROOT
+	 * node. Only nodes considered to be on the root.
 	 * 
 	 * relPath can be null if no path is known
 	 */
 	public SubNode createNode(MongoSession session, SubNode parent, String relPath, String type, Long ordinal,
-			CreateNodeLocation location, List<PropertyInfo> properties, ObjectId ownerId,
-			boolean updateParentOrdinals) {
+			CreateNodeLocation location, List<PropertyInfo> properties, ObjectId ownerId, boolean updateParentOrdinals) {
 		if (relPath == null) {
 			/*
-			 * Adding a node ending in '?' will trigger for the system to generate a leaf
-			 * node automatically.
+			 * Adding a node ending in '?' will trigger for the system to generate a leaf node automatically.
 			 */
 			relPath = "?";
 		}
@@ -89,7 +89,12 @@ public class MongoCreate {
 				if (ordinal == null) {
 					ordinal = 0L;
 				}
-				ordinal = prepOrdinalForLocation(session, location, parent, ordinal);
+
+				Long _ordinal = ordinal;
+				// this updates the parent so we run as admin.
+				ordinal = (Long) arun.run(ms -> {
+					return prepOrdinalForLocation(ms, location, parent, _ordinal);
+				});
 			}
 		}
 
@@ -104,22 +109,21 @@ public class MongoCreate {
 		return node;
 	}
 
-	private Long prepOrdinalForLocation(MongoSession session, CreateNodeLocation location, SubNode parent,
-			Long ordinal) {
+	private Long prepOrdinalForLocation(MongoSession session, CreateNodeLocation location, SubNode parent, Long ordinal) {
 		switch (location) {
-		case FIRST:
-			ordinal = 0L;
-			insertOrdinal(session, parent, 0L, 1L);
-			break;
-		case LAST:
-			ordinal = read.getMaxChildOrdinal(session, parent) + 1;
-			parent.setMaxChildOrdinal(ordinal);
-			break;
-		case ORDINAL:
-			insertOrdinal(session, parent, ordinal, 1L);
-			break;
-		default:
-			throw new RuntimeException("Unknown ordinal");
+			case FIRST:
+				ordinal = 0L;
+				insertOrdinal(session, parent, 0L, 1L);
+				break;
+			case LAST:
+				ordinal = read.getMaxChildOrdinal(session, parent) + 1;
+				parent.setMaxChildOrdinal(ordinal);
+				break;
+			case ORDINAL:
+				insertOrdinal(session, parent, ordinal, 1L);
+				break;
+			default:
+				throw new RuntimeException("Unknown ordinal");
 		}
 
 		update.saveSession(session);
@@ -127,10 +131,9 @@ public class MongoCreate {
 	}
 
 	/*
-	 * Shifts all child ordinals down (increments them by rangeSize), that are >=
-	 * 'ordinal' to make a slot for the new ordinal positions for some new nodes to
-	 * be inserted into this newly available range of unused sequential ordinal
-	 * values (range of 'ordinal+1' thru 'ordinal+1+rangeSize')
+	 * Shifts all child ordinals down (increments them by rangeSize), that are >= 'ordinal' to make a
+	 * slot for the new ordinal positions for some new nodes to be inserted into this newly available
+	 * range of unused sequential ordinal values (range of 'ordinal+1' thru 'ordinal+1+rangeSize')
 	 */
 	public void insertOrdinal(MongoSession session, SubNode node, long ordinal, long rangeSize) {
 		long maxOrdinal = 0;
@@ -149,8 +152,8 @@ public class MongoCreate {
 		}
 
 		/*
-		 * even in the boundary case where there were no existing children, it's ok to
-		 * set this node value to zero here
+		 * even in the boundary case where there were no existing children, it's ok to set this node value
+		 * to zero here
 		 */
 		node.setMaxChildOrdinal(maxOrdinal);
 	}
