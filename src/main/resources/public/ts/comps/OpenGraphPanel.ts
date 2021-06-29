@@ -132,8 +132,8 @@ export class OpenGraphPanel extends Div {
             }
         }) : null;
 
-        if (desc?.length > 1000) {
-            desc = desc.substring(0, 1000) + "...";
+        if (desc?.length > 800) {
+            desc = desc.substring(0, 800) + "...";
         }
 
         this.attribs.className = "openGraphPanel";
