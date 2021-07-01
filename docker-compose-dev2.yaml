@@ -80,6 +80,7 @@ services:
             mongodb.port: "${MONGO_PORT}" 
 
             profileName: "dev" 
+            instanceId: "dev2"
             server.port: "${PORT}" 
             httpProtocol: "http" 
              # q1 and q2 are pointed to '127.0.0.1' in /etc/hosts file.

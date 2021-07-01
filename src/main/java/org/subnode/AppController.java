@@ -273,6 +273,7 @@ public class AppController implements ErrorController {
 
 		thymeleafAttribs = new HashMap<>();
 
+		thymeleafAttribs.put("instanceId", appProp.getInstanceId());
 		thymeleafAttribs.put("brandingAppName", appProp.getConfigText("brandingAppName"));
 		thymeleafAttribs.put("brandingMetaContent", appProp.getConfigText("brandingMetaContent"));
 		thymeleafAttribs.put("hostUrl", appProp.getProtocolHostAndPort());

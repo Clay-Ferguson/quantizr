@@ -179,6 +179,10 @@ public class AppProp /* implements EnvironmentAware */ {
 		return env.getProperty("profileName");
 	}
 
+	public String getInstanceId() {
+		return env.getProperty("instanceId");
+	}
+
 	public boolean isActPubEnabled() {
 		return APConst.TRUE.equals(env.getProperty("actPubEnabled"));
 	}

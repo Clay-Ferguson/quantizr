@@ -4,7 +4,8 @@
 # Builder for Multi-Instance (Federated) Development
 #
 # NOTE: This is the same kind of build as 'build-dev.sh' but this one starts 
-# two separate instances of the app, for testing Fediverse functionality
+# two separate instances of the app, for testing Fediverse functionality, or for
+# testing load-balancer functionality
 #
 
 # force current dir to be this script

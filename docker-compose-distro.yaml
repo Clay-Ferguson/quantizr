@@ -66,6 +66,7 @@ services:
             mongodb.host: "${MONGO_HOST}" 
             mongodb.port: "${MONGO_PORT}" 
             profileName: "prod" 
+            instanceId: "prod"
             server.port: "${PORT}" 
             httpProtocol: "http" 
             metaHost: "${quanta_domain}" 
