@@ -8,7 +8,7 @@ cd ${script_folder}
 
 source ./setenv-dev.sh
 
- cd ${DEPLOY_TARGET}
+cd ${PRJROOT}
 dockerDown quanta-dev
 dockerDown mongo-dev
 
