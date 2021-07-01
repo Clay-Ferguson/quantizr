@@ -548,7 +548,7 @@ public class MongoUtil {
 	public void createAdminUser(MongoSession session) {
 		String adminUser = appProp.getMongoAdminUserName();
 
-		SubNode adminNode = read.getUserNodeByUserName(auth.getAdminSession(), adminUser);
+		SubNode adminNode = read.getUserNodeByUserName(session, adminUser);
 		if (adminNode == null) {
 			adminNode =
 					apiUtil.ensureNodeExists(session, "/", NodeName.ROOT, null, "Root", NodeType.REPO_ROOT.s(), true, null, null);

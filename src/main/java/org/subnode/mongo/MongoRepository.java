@@ -8,6 +8,7 @@ import org.springframework.stereotype.Component;
 import org.subnode.AppServer;
 import org.subnode.actpub.ActPubService;
 import org.subnode.config.AppProp;
+import org.subnode.model.client.PrincipalName;
 
 @Component
 public class MongoRepository {
@@ -86,7 +87,8 @@ public class MongoRepository {
 		if (initialized)
 			return;
 
-		MongoSession adminSession = auth.getAdminSession();
+		MongoSession adminSession = new MongoSession(PrincipalName.ADMIN.s());
+		MongoThreadLocal.setMongoSession(adminSession);
 
 		synchronized (lock) {
 			if (initialized)
