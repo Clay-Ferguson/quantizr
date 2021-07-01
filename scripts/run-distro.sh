@@ -3,11 +3,17 @@
 # ===================================================================
 # Starts the Quanta server at: http://${quanta_domain}:${PORT}
 # The only prerequisite for the machine is: docker & docker-compose
+#
 # Docker References: https://docs.docker.com/compose/install/
 #
 # To deploy a completely new release you can just put a new springboot
 # fat jar right in this folder, and then change the line below 
-# in this file from 'dockerUp' to 'dockerBuildUp'
+# in this file from 'dockerUp' to 'dockerBuildUp'. In other words, all the 
+# scripting exists in these files to be able to either run the executables 
+# from the fat JAR if it's in this folder and you call dockerBuildUp, or else
+# if you leave this script file as the default and run 'dockerUp' then the script
+# will either pull the docker image from the public repository or else use the
+# one it finds locally if it does fine it. 
 # ===================================================================
 
 # force current dir to be this script
@@ -30,7 +36,12 @@ rm -rf ./log/*
 ./gen-mongod-conf-file.sh 
 
 docker-compose -version
-dockerUp
+if [ -f "${JAR_FILE}" ]; then
+    echo "Installing JAR file: ${JAR_FILE}"
+    dockerBuildUp
+else
+    dockerUp
+fi
 
 dockerCheck quanta-distro
 dockerCheck mongo-distro
@@ -42,3 +53,7 @@ echo Quanta Distro Started OK!
 echo http://${quanta_domain}:${PORT}
 echo ================================================
 read -p "Press any key."
+
+if [ -f "${JAR_FILE}" ]; then
+    mv ${JAR_FILE} ${JAR_FILE}.bak
+fi

@@ -1,5 +1,7 @@
 # Quanta Distro
 
+NOTE: The tar file in this folder was created by running build-distro.sh. Extracting this tar file is the minimal (simplest) way to run an instance of Quanta. The setenv-distro.sh file is where most of the configuration parameters are. One such parameter is the DEPLOY_TARGET env variable, which controls where the content of this tar file will go before beign zipped. This folder will be a place where you can also run Quanta from, since it's already there and unzipped.
+
 ### How to run a Quanta instance
 
 To run a Quanta instance from the Docker Public Repository you can simply unzip the `quanta-1.0.1.tar.gz` onto a linux machine, and then start the app with `run-distro.sh`. This will create a minimal installation running at `http://localhost:8185`, and will be persisting all data into a MongoDB in the `\data` subfolder inside your distro folder. To stop the app run `stop-distro.sh`. To specify a different port or database location edit the `setenv-distro.sh` environment setters. If you want to customize the branding you can replace or edit the content in the `config` and/or `branding` folders.

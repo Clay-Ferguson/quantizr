@@ -76,6 +76,10 @@ dockerDown () {
     # also every other docker thing running on the machine!
     # docker-compose -f ${docker_compose_yaml} down --remove-orphans
     # docker-compose -f ${docker_compose_yaml} stop $1
+    #
+    # NOTE: If you get errors that your network is still in use do this:
+    #     docker network disconnect -f net-distro quanta-distro
+    #     docker network disconnect -f net-distro quanta-distro
     docker-compose -f ${docker_compose_yaml} rm -f -s $1
     # docker ps
     # read -p "service $1 should be missing in above"
