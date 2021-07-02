@@ -17,11 +17,9 @@ import org.springframework.data.mongodb.core.mapping.event.BeforeDeleteEvent;
 import org.springframework.data.mongodb.core.mapping.event.BeforeSaveEvent;
 import org.subnode.actpub.ActPubService;
 import org.subnode.config.NodeName;
-import org.subnode.exception.base.RuntimeEx;
 import org.subnode.model.client.NodeProp;
 import org.subnode.model.client.PrivilegeType;
 import org.subnode.mongo.model.SubNode;
-import org.subnode.util.ThreadLocals;
 import org.subnode.util.XString;
 
 public class MongoEventListener extends AbstractMongoEventListener<SubNode> {
@@ -78,6 +76,13 @@ public class MongoEventListener extends AbstractMongoEventListener<SubNode> {
 			// log.debug("New Node ID generated: " + id);
 		}
 		dbObj.put(SubNode.FIELD_ID, id);
+
+		// Force ordinal to have an integer value (non-null). How to do 
+		// "constraints" in MongoDB (todo-1)
+		if (node.getOrdinal() == null) {
+			node.setOrdinal(0L);
+			dbObj.put(SubNode.FIELD_ORDINAL, 0L);
+		}
 
 		// log.debug("onBeforeSave: ID: " + node.getId().toHexString());
 

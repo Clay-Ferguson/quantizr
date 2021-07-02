@@ -139,7 +139,19 @@ public class MongoCreate {
 		long maxOrdinal = 0;
 
 		auth.auth(session, node, PrivilegeType.READ);
-		Criteria criteria = Criteria.where(SubNode.FIELD_ORDINAL).gte(ordinal);
+
+		/* First detect any nodes that have no ordinal, and set ordinal to 0. This is basically a data repair 
+		because we oridinally didn't have the MongoEventListener capable of setting any null ordinal to 0L. What
+		we really need is a global fix to all existing databases and then we can remove this check (todo-1) */
+		Criteria criteria = Criteria.where(SubNode.FIELD_ORDINAL).is(null);
+		for (SubNode child : read.getChildrenUnderParentPath(session, node.getPath(), null, null, 0, null, criteria)) {
+			child.setOrdinal(0L);
+		}
+
+		// save all if there's any to save.
+		update.saveSession(session);
+
+		criteria = Criteria.where(SubNode.FIELD_ORDINAL).gte(ordinal);
 		// log.debug("insertOrdinal GTE " + ordinal);
 		for (SubNode child : read.getChildrenUnderParentPath(session, node.getPath(), null, null, 0, null, criteria)) {
 			long o = child.getOrdinal() == null ? 0L : child.getOrdinal().longValue();

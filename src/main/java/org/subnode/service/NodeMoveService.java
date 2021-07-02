@@ -29,12 +29,11 @@ import org.subnode.response.SelectAllNodesResponse;
 import org.subnode.response.SetNodePositionResponse;
 
 /**
- * Service for controlling the positions (ordinals) of nodes relative to their
- * parents and/or moving nodes to locate them under a different parent. This is
- * similar type of functionality to cut-and-paste in file systems. Currently
- * there is no way to 'clone' or copy nodes, but user can move any existing
- * nodes they have to any new location they want, subject to security
- * constraints of course.
+ * Service for controlling the positions (ordinals) of nodes relative to their parents and/or moving
+ * nodes to locate them under a different parent. This is similar type of functionality to
+ * cut-and-paste in file systems. Currently there is no way to 'clone' or copy nodes, but user can
+ * move any existing nodes they have to any new location they want, subject to security constraints
+ * of course.
  */
 @Component
 public class NodeMoveService {
@@ -61,8 +60,8 @@ public class NodeMoveService {
 	/*
 	 * Moves the the node to a new ordinal/position location (relative to parent)
 	 *
-	 * We allow the special case of req.siblingId="[topNode]" and that indicates
-	 * move the node to be the first node under its parent.
+	 * We allow the special case of req.siblingId="[topNode]" and that indicates move the node to be the
+	 * first node under its parent.
 	 */
 	public SetNodePositionResponse setNodePosition(MongoSession session, SetNodePositionRequest req) {
 		SetNodePositionResponse res = new SetNodePositionResponse();
@@ -119,17 +118,17 @@ public class NodeMoveService {
 		}
 		create.insertOrdinal(session, parentNode, 0L, 1L);
 
-		// todo-2: there is a slight ineffieiency here in that 'node' does end up
-		// getting saved
-		// both as part of the insertOrdinal, and also then with the setting of it to
-		// zero. Will be
-		// easy to fix when I get to it, but is low priority for now.
+		/*
+		 * todo-2: there is a slight ineffieiency here in that 'node' does end up getting saved both as part
+		 * of the insertOrdinal, and also then with the setting of it to zero. Will be easy to fix when I
+		 * get to it, but is low priority for now.
+		 */
 		update.saveSession(session);
 
 		node.setOrdinal(0L);
 		update.saveSession(session);
 	}
-	
+
 	public void moveNodeToBottom(MongoSession session, SubNode node) {
 		SubNode parentNode = read.getParent(session, node);
 		if (parentNode == null) {
@@ -142,8 +141,8 @@ public class NodeMoveService {
 	}
 
 	/*
-	 * Note: Browser can send nodes these in any order, in the request, and always
-	 * the lowest ordinal is the one we keep and join to
+	 * Note: Browser can send nodes these in any order, in the request, and always the lowest ordinal is
+	 * the one we keep and join to
 	 */
 	public JoinNodesResponse joinNodes(MongoSession session, JoinNodesRequest req) {
 		JoinNodesResponse res = new JoinNodesResponse();
@@ -194,7 +193,7 @@ public class NodeMoveService {
 					n.setContent(null);
 					n.touch();
 					update.save(session, n);
-				} 
+				}
 				/* or else we delete the node */
 				else {
 					delete.deleteNode(session, n, false);
@@ -230,9 +229,9 @@ public class NodeMoveService {
 			// back out the number of bytes it was using
 			if (!session.isAdmin()) {
 				/*
-				 * NOTE: There is no equivalent to this on the IPFS code path for deleting ipfs
-				 * becuase since we don't do reference counting we let the garbage collecion
-				 * cleanup be the only way user quotas are deducted from
+				 * NOTE: There is no equivalent to this on the IPFS code path for deleting ipfs becuase since we
+				 * don't do reference counting we let the garbage collecion cleanup be the only way user quotas are
+				 * deducted from
 				 */
 				userManagerService.addNodeBytesToUserNodeBytes(node, userNode, -1);
 			}
@@ -246,8 +245,7 @@ public class NodeMoveService {
 	}
 
 	/*
-	 * Moves a set of nodes to a new location, underneath (i.e. children of) the
-	 * target node specified.
+	 * Moves a set of nodes to a new location, underneath (i.e. children of) the target node specified.
 	 */
 	public MoveNodesResponse moveNodes(MongoSession session, MoveNodesRequest req) {
 		MoveNodesResponse res = new MoveNodesResponse();
@@ -259,10 +257,9 @@ public class NodeMoveService {
 	}
 
 	/*
-	 * If req.location==inside then the targetId is the parent node we will be
-	 * inserting children into, but if req.location==inline the targetId represents
-	 * the child who will become a sibling of what we are inserting, and the
-	 * inserted nodes will be pasted in directly below that ordinal (i.e. new
+	 * If req.location==inside then the targetId is the parent node we will be inserting children into,
+	 * but if req.location==inline the targetId represents the child who will become a sibling of what
+	 * we are inserting, and the inserted nodes will be pasted in directly below that ordinal (i.e. new
 	 * siblings posted in below it)
 	 */
 	private void moveNodesInternal(MongoSession session, String location, String targetId, List<String> nodeIds) {
@@ -270,8 +267,7 @@ public class NodeMoveService {
 		log.debug("moveNodesInternal: targetId=" + targetId + " location=" + location);
 		SubNode targetNode = read.getNode(session, targetId);
 
-		SubNode parentToPasteInto = location.equalsIgnoreCase("inside") ? targetNode
-				: read.getParent(session, targetNode);
+		SubNode parentToPasteInto = location.equalsIgnoreCase("inside") ? targetNode : read.getParent(session, targetNode);
 
 		auth.ownerAuth(session, parentToPasteInto);
 		String parentPath = parentToPasteInto.getPath();
@@ -302,9 +298,9 @@ public class NodeMoveService {
 			SubNode nodeParent = read.getParent(session, node);
 
 			/*
-			 * If this 'node' will be changing parents (moving to new parent) we need to
-			 * update its subgraph, of all children and also update its own path, otherwise
-			 * it's staying under same parent and only it's ordinal will change.
+			 * If this 'node' will be changing parents (moving to new parent) we need to update its subgraph, of
+			 * all children and also update its own path, otherwise it's staying under same parent and only it's
+			 * ordinal will change.
 			 */
 			if (nodeParent.getId().compareTo(parentToPasteInto.getId()) != 0) {
 				changePathOfSubGraph(session, node, parentPath);
@@ -326,8 +322,7 @@ public class NodeMoveService {
 
 		for (SubNode node : read.getSubGraph(session, graphRoot, null, 0)) {
 			if (!node.getPath().startsWith(originalPath)) {
-				throw new RuntimeEx(
-						"Algorighm failure: path " + node.getPath() + " should have started with " + originalPath);
+				throw new RuntimeEx("Algorighm failure: path " + node.getPath() + " should have started with " + originalPath);
 			}
 			log.debug("PROCESSING MOVE: oldPath: " + node.getPath());
 
