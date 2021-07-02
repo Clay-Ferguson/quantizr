@@ -14,6 +14,7 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
 
 /* General Widget that doesn't fit any more reusable or specific category other than a plain Div, but inherits capability of Comp class */
 export class OpenGraphPanel extends Div {
+    loading: boolean;
 
     constructor(key: string, private url: string) {
         super(null, {
@@ -22,13 +23,17 @@ export class OpenGraphPanel extends Div {
         });
         this.domAddEvent = this.domAddEvent.bind(this);
 
+        /* The state should always contain loading==true (if currently querying the server) or a non-null 'og'. A completed but failed
+         pull of the open graph data should result in og being an empty object and not null. */
         let og = S.meta64.openGraphData.get(url);
-        this.mergeState({ og });
+        if (og) {
+            this.mergeState({ og });
+        }
     }
 
     domAddEvent(): void {
         let elm: HTMLElement = this.getRef();
-        if (!elm || !elm.isConnected) return;
+        if (!elm || !elm.isConnected || this.getState().og) return;
         let og = S.meta64.openGraphData.get(this.url);
         if (!og) {
             let observer = new IntersectionObserver(entries => {
@@ -36,36 +41,30 @@ export class OpenGraphPanel extends Div {
                     if (entry.isIntersecting) {
                         let og = S.meta64.openGraphData.get(this.url);
                         if (!og) {
-                            // set a value so we know we can't re-enter into here again.
-                            S.meta64.openGraphData.set(this.url, {});
-
-                            // wait 2 seconds before showing the loading indicator.
-                            // setTimeout(() => {
-                            //     if (!elm.isConnected) return;
-
-                            //     let og = S.meta64.openGraphData.get(this.url);
-                            //     if (!og) {
-                            //         this.mergeState({ loading: true });
-                            //     }
-                            // }, 2000);
-
-                            S.util.loadOpenGraph(this.url, (og: any) => {
-                                S.meta64.openGraphData.set(this.url, og || {});
-                                if (!elm.isConnected) return;
-                                this.mergeState({ loading: false, og });
-                            });
-                            this.loadNext();
+                            if (!this.loading) {
+                                this.loading = true;
+                                S.util.loadOpenGraph(this.url, (og: any) => {
+                                    this.loading = false;
+                                    if (!og) {
+                                        og = {};
+                                    }
+                                    S.meta64.openGraphData.set(this.url, og);
+                                    if (!elm.isConnected) return;
+                                    this.mergeState({ og });
+                                });
+                            }
                         }
                         else {
-                            this.mergeState({ loading: false, og });
+                            this.mergeState({ og });
                         }
+                        this.loadNext();
                     }
                 });
             });
             observer.observe(elm.parentElement);
         }
         else {
-            this.mergeState({ loading: false, og });
+            this.mergeState({ og });
         }
         super.domAddEvent();
     }
@@ -80,18 +79,21 @@ export class OpenGraphPanel extends Div {
                 if (count++ < 1) {
                     let og = S.meta64.openGraphData.get(o.url);
                     if (!og) {
-                        // set a value so we know we can't re-enter into here again.
-                        S.meta64.openGraphData.set(o.url, {});
-
-                        // console.log("nextup: " + o.url);
-                        S.util.loadOpenGraph(o.url, (og: any) => {
-                            S.meta64.openGraphData.set(o.url, og || {});
-                            if (!o.getRef()) return;
-                            o.mergeState({ loading: false, og });
-                        });
+                        if (!o.loading) {
+                            o.loading = true;
+                            S.util.loadOpenGraph(o.url, (og: any) => {
+                                o.loading = false;
+                                if (!og) {
+                                    og = {};
+                                }
+                                S.meta64.openGraphData.set(o.url, og);
+                                if (!o.getRef()) return;
+                                o.mergeState({ og });
+                            });
+                        }
                     }
                     else {
-                        o.mergeState({ loading: false, og });
+                        o.mergeState({ og });
                     }
                 }
             }
@@ -103,22 +105,11 @@ export class OpenGraphPanel extends Div {
 
     preRender(): void {
         let state = this.getState();
-        // if (state.loading) {
-        //     this.setChildren([
-        //         // This spinner works fine, but I decided after using it, it's a better user experience to just not
-        //         // even indicate to the user that a link is attempting to have it's OpenGraph displayed. Just let it popup
-        //         // if ready, but if not the user sees a nice clean page regardlessl.
-        //         // new Div(null, {
-        //         //     className: "progressSpinner"
-        //         // }, [new Spinner()])
-        //     ]);
-        //     return;
-        // }
-        let o: any = state.og;
-        if (!o) {
+        if (state.loading || !state.og) {
             this.setChildren(null);
             return;
-        };
+        }
+        let o: any = state.og;
         let title = o.ogTitle || o.twitterTitle;
         let desc = o.ogDecsciption || o.twitterDescription;
         let image = o.ogImage || o.twitterImage;
