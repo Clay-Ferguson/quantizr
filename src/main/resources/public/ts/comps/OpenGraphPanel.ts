@@ -54,12 +54,18 @@ export class OpenGraphPanel extends Div {
                                 if (!elm.isConnected) return;
                                 this.mergeState({ loading: false, og });
                             });
+                            this.loadNext();
                         }
-                        this.loadNext();
+                        else {
+                            this.mergeState({ loading: false, og });
+                        }
                     }
                 });
             });
             observer.observe(elm.parentElement);
+        }
+        else {
+            this.mergeState({ loading: false, og });
         }
         super.domAddEvent();
     }
@@ -83,6 +89,9 @@ export class OpenGraphPanel extends Div {
                             if (!o.getRef()) return;
                             o.mergeState({ loading: false, og });
                         });
+                    }
+                    else {
+                        o.mergeState({ loading: false, og });
                     }
                 }
             }
