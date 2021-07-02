@@ -86,16 +86,15 @@ export class Edit implements EditIntf {
             do need even when edit mode is technically off */
             const editingAllowed = /* state.userPreferences.editMode && */ this.isEditAllowed(node, state);
             if (editingAllowed) {
-                /*
-                 * Server will have sent us back the raw text content, that should be markdown instead of any HTML, so
-                 * that we can display this and save.
-                 */
+                /* Either run the node editor as a popup or embedded, depending on whether we have a fullscreen
+                calendar up and wether we're on the main tab, etc */
                 if (state.mobileMode ||
-                    // node will not found on tree.
+                    // node not found on tree.
                     (!S.meta64.getDisplayingNode(state, res.nodeInfo.id) &&
                         !S.meta64.getDisplayingNode(state, S.meta64.newNodeTargetId)) ||
                     // not currently viewing tree
-                    S.meta64.activeTab !== C.TAB_MAIN) {
+                    S.meta64.activeTab !== C.TAB_MAIN ||
+                    S.meta64.fullscreenViewerActive(state)) {
                     const dlg = new EditNodeDlg(res.nodeInfo, encrypt, showJumpButton, state);
                     dlg.open();
                 } else {
