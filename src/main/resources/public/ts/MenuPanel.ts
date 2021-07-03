@@ -254,7 +254,12 @@ export class MenuPanel extends Div {
 
             // new MenuItem("Select All", S.edit.selectAllNodes, () => { return  !state.isAnonUser }), //
 
-            new MenuItem("Transfer Node", MenuPanel.transferNode, !state.isAnonUser && selNodeIsMine), //
+            // This feature CAN easily work for all users (although currently disabled on server for all but admin), but
+            // we need some sort of "acceptance" feature for the recipient to take control, because for now they way this
+            // works is you can take your own node and create the appearance that someone else authored it simply by
+            // transferring the node to them, so we need some better process of acceptance.
+            state.isAdminUser ? new MenuItem("Transfer Node", MenuPanel.transferNode, !state.isAnonUser && selNodeIsMine) : null, //
+
             new MenuItem("Update Headings", S.edit.updateHeadings, !state.isAnonUser && selNodeIsMine), //
             new MenuItem("Search and Replace", MenuPanel.searchAndReplace, !state.isAnonUser && selNodeIsMine), //
 

@@ -535,7 +535,7 @@ export class Edit implements EditIntf {
 
         const selNodesArray = S.meta64.getSelNodeIdsArray(state);
         if (!selNodesArray || selNodesArray.length === 0) {
-            S.util.showMessage("You have not selected any nodes to join.", "Warning");
+            S.util.showMessage("Select some nodes to join.", "Warning");
             return;
         }
 
@@ -570,7 +570,7 @@ export class Edit implements EditIntf {
         const selNodesArray = S.meta64.getSelNodeIdsArray(state);
 
         if (!selNodesArray || selNodesArray.length === 0) {
-            S.util.showMessage("You have not selected any nodes to delete.", "Warning");
+            S.util.showMessage("Select some nodes to delete.", "Warning");
             return;
         }
 

@@ -10,7 +10,6 @@ export interface UserIntf {
     logout(updateLocalDb: boolean, state: AppState): any;
     deleteAllUserLocalDbEntries(): any;
     loginResponse(res: J.LoginResponse, usr: string, pwd: string, usingLocalDb: boolean, state: AppState): any;
-    transferNode(recursive: boolean, nodeId: string, fromUser: string, toUser: string, state: AppState): void;
     queryUserProfile(userId: string): Promise<void>;
     checkMessages(): Promise<void>;
 }

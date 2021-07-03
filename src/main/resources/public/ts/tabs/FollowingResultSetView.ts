@@ -1,3 +1,4 @@
+import { AppState } from "../AppState";
 import { Constants as C } from "../Constants";
 import { FollowingRSInfo } from "../FollowingRSInfo";
 import { TabDataIntf } from "../intf/TabDataIntf";
@@ -25,7 +26,7 @@ export class FollowingResultSetView<I extends FollowingRSInfo> extends ResultSet
         S.srch.showFollowing(delta === 0 ? 0 : info.page + delta, info.showingFollowingOfUser);
     }
 
-    renderHeading(): CompIntf {
+    renderHeading(state: AppState): CompIntf {
         let info = this.data.rsInfo as FollowingRSInfo;
         return new Heading(4, "@" + info.showingFollowingOfUser + " is Following...", { className: "resultsTitle" });
     }

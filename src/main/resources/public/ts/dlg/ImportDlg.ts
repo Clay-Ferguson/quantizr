@@ -53,7 +53,7 @@ export class ImportDlg extends DialogBase {
 
         let hltNode = S.meta64.getHighlightedNode(this.appState);
         if (!hltNode) {
-            new MessageDlg("You have not selected a node to import into.", "Import", null, null, false, 0, this.appState).open();
+            new MessageDlg("Select a node to import into.", "Import", null, null, false, 0, this.appState).open();
             return;
         }
 

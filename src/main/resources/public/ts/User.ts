@@ -247,18 +247,6 @@ export class User implements UserIntf {
         }
     }
 
-    transferNode = (recursive: boolean, nodeId: string, fromUser: string, toUser: string, state: AppState): void => {
-        S.util.ajax<J.TransferNodeRequest, J.TransferNodeResponse>("transferNode", {
-            recursive,
-            nodeId,
-            fromUser,
-            toUser
-        }, (res: J.TransferNodeResponse) => {
-            S.view.refreshTree(null, false, false, null, false, true, true, state);
-            S.util.showMessage(res.message, "Success");
-        });
-    }
-
     checkMessages = (): Promise<void> => {
         return new Promise<void>((resolve, reject) => {
             S.util.ajax<J.CheckMessagesRequest, J.CheckMessagesResponse>("checkMessages", {

@@ -741,6 +741,9 @@ public class AppController implements ErrorController {
 	@RequestMapping(value = API_PATH + "/transferNode", method = RequestMethod.POST)
 	public @ResponseBody Object transferNode(@RequestBody TransferNodeRequest req, HttpSession session) {
 		return callProc.run("export", req, session, ms -> {
+			if (!ThreadLocals.getSessionContext().isAdmin()) {
+				throw ExUtil.wrapEx("admin only function.");
+			}
 			return nodeEditService.transferNode(ms, req);
 		});
 	}

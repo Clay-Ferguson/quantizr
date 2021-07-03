@@ -763,7 +763,7 @@ public class NodeEditService {
 		}
 
 		if (transfers > 0) {
-			update.saveSession(session);
+			update.saveSession(auth.getAdminSession());
 		}
 
 		res.setMessage(String.valueOf(transfers) + " nodes were transferred.");

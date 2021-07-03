@@ -34,7 +34,8 @@ export class TransferNodeDlg extends DialogBase {
         return [
             new Form(null, [
                 new FormGroup(null, [
-                    new TextField("From User", null, null, null, false, this.fromUserState),
+                    // Only the admin user can transfer from anyone to anyone. Other users can only transfer nodes they own
+                    this.appState.isAdminUser ? new TextField("From User", null, null, null, false, this.fromUserState) : null,
                     new TextField("To User", null, null, null, false, this.toUserState)
                 ]),
                 new FormGroup(null, [
@@ -79,7 +80,15 @@ export class TransferNodeDlg extends DialogBase {
             return;
         }
 
-        S.user.transferNode(this.getState().recursive, node.id, this.fromUserState.getValue(), this.toUserState.getValue(), this.appState);
-        this.close();
+        S.util.ajax<J.TransferNodeRequest, J.TransferNodeResponse>("transferNode", {
+            recursive: this.getState().recursive,
+            nodeId: node.id,
+            fromUser: this.fromUserState.getValue(),
+            toUser: this.toUserState.getValue()
+        }, (res: J.TransferNodeResponse) => {
+            S.view.refreshTree(null, false, false, null, false, true, true, this.appState);
+            S.util.showMessage(res.message, "Success");
+            this.close();
+        });
     }
 }

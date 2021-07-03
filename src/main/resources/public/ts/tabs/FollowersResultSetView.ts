@@ -26,9 +26,12 @@ export class FollowersResultSetView<I extends FollowersRSInfo> extends ResultSet
         S.srch.showFollowers(delta === 0 ? 0 : info.page + delta, info.showingFollowersOfUser);
     }
 
-    renderHeading(): CompIntf {
+    renderHeading(state: AppState): CompIntf {
         let info = this.data.rsInfo as FollowersRSInfo;
-        return new Heading(4, "Followers of @" + info.showingFollowersOfUser + "...", { className: "resultsTitle" });
+        let text = info.showingFollowersOfUser === state.userName //
+            ? "Your followers..." //
+            : "Followers of @" + info.showingFollowersOfUser + "...";
+        return new Heading(4, text, { className: "resultsTitle" });
     }
 
     /* Renders the info for the OWNER of 'node', and not the content of the actual node, becasue the content will basically
