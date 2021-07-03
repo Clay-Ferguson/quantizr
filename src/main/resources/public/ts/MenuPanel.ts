@@ -214,7 +214,7 @@ export class MenuPanel extends Div {
             }
 
             bookmarkItems.push(new MenuItem("Manage...", MenuPanel.openBookmarksNode, !state.isAnonUser));
-            children.push(new Menu("Bookmarks", bookmarkItems));
+            children.push(new Menu("Bookmarks", bookmarkItems, S.meta64.loadBookmarks));
         }
 
         children.push(new Menu("My Nodes", [

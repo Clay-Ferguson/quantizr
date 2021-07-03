@@ -1162,10 +1162,8 @@ public class UserManagerService {
 	}
 
 	public int getMaxUploadSize(MongoSession session) {
-
-		// todo-0: shouldn't anon users have ZERO quota?
 		if (session.isAnon()) {
-			return Const.DEFAULT_USER_QUOTA;
+			return 0;
 		}
 		if (session.isAdmin()) {
 			return Integer.MAX_VALUE;

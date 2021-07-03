@@ -87,7 +87,7 @@ export class Meta64 implements Meta64Intf {
     openGraphData: Map<string, any> = new Map<string, any>();
 
     /* Map of all OpenGraphPanels in top to bottom rendered order. Each instance of an OpenGraphPanel
-    needs to soemhow associate to an array like this that's TAB_SPECIFIC (todo-0), and for now we
+    needs to somehow associate to an array like this that's TAB SPECIFIC (todo-1), and for now we
     just let this apply to the Feed tab */
     openGraphComps: OpenGraphPanel[] = [];
 

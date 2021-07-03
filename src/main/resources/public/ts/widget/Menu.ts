@@ -13,7 +13,7 @@ export class Menu extends Div {
 
     static activeMenu: string = C.SITE_NAV_MENU_TEXT;
 
-    constructor(public name: string, public menuItems: CompIntf[]) {
+    constructor(public name: string, public menuItems: CompIntf[], private onClickCallback: Function = null) {
         super(null, {
             className: "card menuCard"
         });
@@ -42,11 +42,8 @@ export class Menu extends Div {
                         let expanded = headingElm && headingElm.getAttribute("aria-expanded") === "true";
                         Menu.activeMenu = expanded ? this.name : null;
                         // console.log("Expand or collapse: " + this.name + " expan=" + expanded);
-
-                        // todo-0: proof of concept temporary hack, verifying this works before doing 'correctly'.
-                        // This works well and will be sent in as an "onClickCallback" member variable, soon.
-                        if (this.name === "Bookmarks") {
-                            S.meta64.loadBookmarks();
+                        if (this.onClickCallback) {
+                            this.onClickCallback();
                         }
                     }, 500);
                 }
