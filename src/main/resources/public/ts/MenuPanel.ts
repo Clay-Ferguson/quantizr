@@ -241,7 +241,6 @@ export class MenuPanel extends Div {
         children.push(new Menu("Friends", [
             new MenuItem("My Friends", MenuPanel.openFriendsNode, !state.isAnonUser),
             new MenuItem("Followers", MenuPanel.showFollowers, !state.isAnonUser),
-            new MenuItem("Find Users", MenuPanel.findUsers, !state.isAnonUser), //
             new MenuItem("Blocked Users", MenuPanel.openBlockedUsersNode, !state.isAnonUser)
         ]));
 
@@ -318,7 +317,10 @@ export class MenuPanel extends Div {
 
             new MenuItem("By Node Name", MenuPanel.searchByName, !state.isAnonUser && !!hltNode), //
 
-            new MenuItem("By Node ID", MenuPanel.searchById, !state.isAnonUser && !!hltNode) //
+            new MenuItem("By Node ID", MenuPanel.searchById, !state.isAnonUser && !!hltNode), //
+
+            new MenuItemSeparator(),
+            new MenuItem("Find Users", MenuPanel.findUsers, !state.isAnonUser) //
 
             // new MenuItem("Files", nav.searchFiles, () => { return  !state.isAnonUser && S.meta64.allowFileSystemSearch },
             //    () => { return  !state.isAnonUser && S.meta64.allowFileSystemSearch })
