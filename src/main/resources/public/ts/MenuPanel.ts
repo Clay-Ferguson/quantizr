@@ -51,11 +51,6 @@ export class MenuPanel extends Div {
         S.nav.openContentNode("~" + J.NodeType.FRIEND_LIST);
     };
 
-    static addFriend = () => {
-        S.meta64.addFriendPending = true;
-        S.nav.openContentNode("~" + J.NodeType.FRIEND_LIST);
-    };
-
     static openBookmarksNode = () => {
         let state = store.getState();
         S.meta64.setUserPreferences(state, true);
@@ -245,7 +240,6 @@ export class MenuPanel extends Div {
 
         children.push(new Menu("Friends", [
             new MenuItem("My Friends", MenuPanel.openFriendsNode, !state.isAnonUser),
-            new MenuItem("Add Friend", MenuPanel.addFriend, !state.isAnonUser),
             new MenuItem("Followers", MenuPanel.showFollowers, !state.isAnonUser),
             new MenuItem("Find Users", MenuPanel.findUsers, !state.isAnonUser), //
             new MenuItem("Blocked Users", MenuPanel.openBlockedUsersNode, !state.isAnonUser)

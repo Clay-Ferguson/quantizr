@@ -30,12 +30,6 @@ export class BlockedUsersTypeHandler extends TypeBase {
             new Heading(4, "Blocked Users", {
                 className: "marginAll"
             })
-            // new ButtonBar([
-            //     new Button("Add Friend", () => S.edit.createNode(node, J.NodeType.FRIEND, false/true?, null, null, state), {
-            //         title: "Add a new Friend (i.e. Follow someone)"
-            //     })
-            // ], null, "float-right marginBottom"),
-            // new Clearfix(),
             // new CollapsibleHelpPanel("Help", S.meta64.config.help.type.friendsList.render,
             //     (state: boolean) => {
             //         FriendsListTypeHandler.helpExpanded = state;

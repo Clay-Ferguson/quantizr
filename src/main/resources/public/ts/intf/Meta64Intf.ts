@@ -5,7 +5,6 @@ import * as J from "../JavaIntf";
 import { CompIntf } from "../widget/base/CompIntf";
 
 export interface Meta64Intf {
-
     hiddenRenderingEnabled: boolean;
     config: any;
     mainMenu: MainMenuDlg;
@@ -15,7 +14,6 @@ export interface Meta64Intf {
     curUrlPath: string;
     deviceWidth: number;
     deviceHeight: number;
-    addFriendPending: boolean;
     activeTab: string;
     lastScrollTime: number;
 

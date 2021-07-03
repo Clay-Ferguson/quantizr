@@ -35,12 +35,10 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (s: Singletons) => {
 });
 
 export class Meta64 implements Meta64Intf {
-
     config: any;
     mainMenu: MainMenuDlg;
     hiddenRenderingEnabled: boolean = true;
     noScrollToId: string = null;
-    addFriendPending: boolean = false;
     activeTab: string;
     lastScrollTime: number = 0;
 
@@ -948,7 +946,7 @@ export class Meta64 implements Meta64Intf {
             s.isAdminUser = res.userName === "admin";
             s.isAnonUser = res.userName === J.PrincipalName.ANON;
 
-            console.log("LoginResponse userName = " + res.userName);
+            // console.log("LoginResponse userName = " + res.userName);
 
             // bash scripting is an experimental feature, and i'll only enable for admin for now, until i'm
             // sure i'm keeping this feature.

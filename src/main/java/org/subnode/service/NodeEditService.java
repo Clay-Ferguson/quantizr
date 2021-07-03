@@ -404,50 +404,6 @@ public class NodeEditService {
 		/* Remember the initial ipfs link */
 		String initIpfsLink = node.getStrProp(NodeProp.IPFS_LINK);
 
-		/*
-		 * todo-1: eventually we need a plugin-type architecture to decouple this kind of type-specific code
-		 * from the general node saving.
-		 * 
-		 * Here, we are enforcing that only one node under the user's FRIENDS list is allowed for each user.
-		 * No duplicate friend nodes. This is really ugly and I need to research how MongoDB can be made to
-		 * enforce some kind of constraints. This is the only place in the code thus far this got ugly
-		 * however. (i.e. lack of constraints being a bit of a problem)
-		 */
-		if (node.getType().equals(NodeType.FRIEND.s())) {
-			String friendUserName = (String) nodeInfo.getPropVal(NodeProp.USER.s());
-			if (friendUserName.startsWith("@")) {
-				friendUserName = XString.stripIfStartsWith(friendUserName, "@");
-				nodeInfo.setPropVal(NodeProp.USER.s(), friendUserName);
-			}
-
-			if (ThreadLocals.getSessionContext().getUserName().equals(friendUserName)) {
-				throw new RuntimeEx("You can't have a Friend that is yourself.");
-			}
-
-			// todo-0: this was an ugly quick and dirty way to reject duplicate friend adds. Need to accomplish
-			// this with some kind of genuine unique constraint. Worst case scenario we can just have a single collection
-			// and then put a constraint on it, because lots of stuff will exist as a unique list like this, including
-			// the UserName? cache we already have (queued crawled users)
-			Iterable<SubNode> friendNodes =
-					read.findSubNodesByProp(session, node.getParentPath(), NodeProp.USER.s(), friendUserName);
-
-			for (SubNode friendNode : friendNodes) {
-				/*
-				 * If we find any node that isn't the one we're editing then it's a duplicate and we just should
-				 * reject any saves. We delete it to fix the problem, and abort this save
-				 */
-				if (!friendNode.getId().toHexString().equals(nodeId)) {
-					delete.delete(session, node, false);
-					throw new RuntimeEx("User already exists: " + friendUserName);
-				}
-
-				String userName = friendNode.getStrProp(NodeProp.USER.s());
-				if (ThreadLocals.getSessionContext().getUserName().equals(userName)) {
-					delete.delete(session, friendNode, false);
-					throw new RuntimeEx("You can't have a Friend that is defined as yourself.");
-				}
-			}
-		}
 
 		/*
 		 * The only purpose of this limit is to stop hackers from using up lots of space, because our only
@@ -607,12 +563,6 @@ public class NodeEditService {
 		// to send only to users who should see it.
 		if (AclService.isPublic(session, node)) {
 			userFeedService.pushTimelineUpdateToBrowsers(session, newNodeInfo);
-		}
-
-		// todo-1: eventually we need a plugin-type architecture to decouple this kind
-		// of type-specific code from the general node saving.
-		if (node.getType().equals(NodeType.FRIEND.s())) {
-			updateSavedFriendNode(node);
 		}
 
 		res.setSuccess(true);
