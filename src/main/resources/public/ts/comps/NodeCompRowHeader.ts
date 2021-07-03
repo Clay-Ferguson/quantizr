@@ -111,9 +111,10 @@ export class NodeCompRowHeader extends Div {
         }
 
         if (S.props.isPublic(node)) {
+            let appendNode = S.props.isPublicWritable(node) ? "Anyone can reply" : "No Replies Allowed";
             floatUpperRightDiv.addChild(new Icon({
                 className: "fa fa-globe fa-lg iconMarginLeft",
-                title: "Node is Public\n(Shared to everyone)"
+                title: "Node is Public\n(" + appendNode + ")"
             }));
         }
         else if (S.props.isShared(node)) {
