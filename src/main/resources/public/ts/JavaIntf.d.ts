@@ -644,7 +644,7 @@ export interface ResponseBase {
     success: boolean;
     message: string;
     stackTrace: string;
-    errorType: ErrorType;
+    errorType: string;
 }
 
 export interface PropertyInfo {

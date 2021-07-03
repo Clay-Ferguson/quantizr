@@ -2,6 +2,7 @@ package org.subnode.util;
 
 import java.io.IOException;
 import java.io.InputStream;
+import org.subnode.exception.OutOfSpaceException;
 
 /**
  * Wraps a stream to a certain limited size so that it will simply throw an exception if the stream
@@ -16,6 +17,6 @@ public class LimitedInputStreamEx extends LimitedInputStream {
 
 	@Override
 	protected void raiseError(long pSizeMax, long pCount) throws IOException {
-		throw new IOException("stream to large.");
+		throw new OutOfSpaceException();
 	}
 }

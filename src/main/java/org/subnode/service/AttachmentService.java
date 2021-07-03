@@ -359,7 +359,7 @@ public class AttachmentService {
 						log.error("Failed to get image length.", e);
 					}
 				} catch (final Exception e) {
-					throw new RuntimeEx(e);
+					throw ExUtil.wrapEx(e);
 				} finally {
 					if (closeStream) {
 						StreamUtil.close(is, isTemp);

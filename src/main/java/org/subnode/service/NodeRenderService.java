@@ -97,7 +97,7 @@ public class NodeRenderService {
 		} catch (NodeAuthFailedException e) {
 			res.setSuccess(false);
 			res.setMessage("Unauthorized.");
-			res.setErrorType(ErrorType.AUTH);
+			res.setErrorType(ErrorType.AUTH.s());
 			log.error("error", e);
 			return res;
 		}
@@ -175,7 +175,7 @@ public class NodeRenderService {
 					// no children
 					// showing.
 					if (isActualUplevelRequest) {
-						res.setErrorType(ErrorType.AUTH);
+						res.setErrorType(ErrorType.AUTH.s());
 						res.setSuccess(true);
 						return res;
 					}

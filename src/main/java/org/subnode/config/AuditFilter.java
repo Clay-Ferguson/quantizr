@@ -8,16 +8,18 @@ import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.GenericFilterBean;
 
 /**
- * Servlet filter that intercepts calls coming into a server and logs all the
- * request info as well as all request and session parameters/attributes.
+ * Servlet filter that intercepts calls coming into a server and logs all the request info as well
+ * as all request and session parameters/attributes.
  */
 // To enable, uncomment this annotation.
 // @Component
@@ -42,6 +44,10 @@ public class AuditFilter extends GenericFilterBean {
 			chain.doFilter(request, response);
 		} finally {
 			if (verbose) {
+				if (response instanceof HttpServletResponse) {
+					HttpServletResponse sres = (HttpServletResponse) response;
+					log.debug("RESPONSE: " + String.valueOf(sres.getStatus())+" contentType: "+sres.getContentType());
+				}
 				postProcess(sreq);
 			}
 		}
@@ -289,6 +295,5 @@ public class AuditFilter extends GenericFilterBean {
 		}
 	}
 
-	public void destroy() {
-	}
+	public void destroy() {}
 }

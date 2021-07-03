@@ -99,7 +99,6 @@ public class CallProcessor {
 
 			if (ret instanceof ResponseBase) {
 				ResponseBase orb = (ResponseBase) ret;
-
 				orb.setSuccess(false);
 				setErrorType(orb, e);
 
@@ -135,7 +134,7 @@ public class CallProcessor {
 
 	private void setErrorType(ResponseBase res, Exception ex) {
 		if (ex instanceof OutOfSpaceException) {
-			res.setErrorType(ErrorType.OUT_OF_SPACE);
+			res.setErrorType(ErrorType.OUT_OF_SPACE.s());
 		}
 	}
 

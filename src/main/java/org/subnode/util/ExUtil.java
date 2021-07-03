@@ -21,13 +21,13 @@ public class ExUtil {
 			runnable.run();
 		}
 		catch (Exception e) {
-			//log.error("oops.");
 			throw wrapEx(e);
 		}
 	}
-	public static RuntimeEx wrapEx(Throwable ex) {
-		if (ex instanceof RuntimeEx) {
-			return (RuntimeEx) ex;
+
+	public static RuntimeException wrapEx(Throwable ex) {
+		if (ex instanceof RuntimeException) {
+			return (RuntimeException) ex;
 		}
 		return new RuntimeEx(ex);
 	}

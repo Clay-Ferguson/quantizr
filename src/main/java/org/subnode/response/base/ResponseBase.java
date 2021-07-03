@@ -1,13 +1,12 @@
 package org.subnode.response.base;
 
-import org.subnode.model.client.ErrorType;
 import org.subnode.util.ThreadLocals;
 
 public class ResponseBase {
 	private boolean success;
 	private String message;
 	private String stackTrace;
-	private ErrorType errorType;
+	private String errorType;
 
 	public ResponseBase() {
 		ThreadLocals.setResponse(this);
@@ -37,11 +36,11 @@ public class ResponseBase {
 		this.stackTrace = stackTrace;
 	}
 
-	public ErrorType getErrorType() {
+	public String getErrorType() {
 		return errorType;
 	}
 
-	public void setErrorType(ErrorType errorType) {
+	public void setErrorType(String errorType) {
 		this.errorType = errorType;
 	}
 }
