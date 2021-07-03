@@ -71,14 +71,7 @@ export class FeedView extends AppTab {
         let children: Comp[] = [];
 
         let refreshFeedButtonBar = new ButtonBar([
-            state.isAnonUser ? null : new Button("New Post", () => S.edit.addNode(null, null, state), { title: "Post something awesome on the Fediverse!" }, "btn-primary"),
-            new Span(null, {
-                className: (((state.feedDirty || state.feedWaitingForUserRefresh) && !state.feedLoading) ? "feedDirtyButton" : "feedNotDirtyButton")
-            }, [
-                new Button("Refresh" + (state.feedDirty ? " (New Posts)" : ""), () => {
-                    FeedView.refresh();
-                })
-            ])
+            state.isAnonUser ? null : new Button("New Post", () => S.edit.addNode(null, null, state), { title: "Post something awesome on the Fediverse!" }, "btn-primary")
         ], null, "float-right");
 
         children.push(refreshFeedButtonBar);
@@ -100,7 +93,14 @@ export class FeedView extends AppTab {
         if (!state.mobileMode || FeedView.searchTextState.getValue()) {
             children.push(new ButtonBar([
                 new Span(null, { className: "feedSearchField" }, [new TextField("Search", false, null, null, false, FeedView.searchTextState)]),
-                new Button("Clear", () => { this.clearSearch(); }, { className: "feedClearButton" })
+                new Button("Clear", () => { this.clearSearch(); }, { className: "feedClearButton" }),
+                new Span(null, {
+                    className: (((state.feedDirty || state.feedWaitingForUserRefresh) && !state.feedLoading) ? "feedDirtyButton" : "feedNotDirtyButton")
+                }, [
+                    new Button("Refresh" + (state.feedDirty ? " (New Posts)" : ""), () => {
+                        FeedView.refresh();
+                    })
+                ])
             ], "marginTop"));
         }
 
@@ -174,8 +174,8 @@ export class FeedView extends AppTab {
         S.srch.feed("~" + J.NodeType.FRIEND_LIST, null, FeedView.page, FeedView.searchTextState.getValue(), false);
     }
 
-    makeFilterButtonsBar = (state: AppState): Span => {
-        return new Span(null, { className: "checkboxBar" }, [
+    makeFilterButtonsBar = (state: AppState): Div => {
+        return new Div(null, { className: "checkboxBar" }, [
             state.isAnonUser ? null : new Checkbox("Friends", {
                 title: "Include nodes posted by your friends"
             }, {

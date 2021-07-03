@@ -30,27 +30,53 @@ export class CollapsiblePanel extends Comp {
         let style = this.textLink ? "file-link" : "btn btn-info ";
         let collapseClass = this.getState().expanded ? "expand" : "collapse";
 
-        return this.e(this.elementName, {
-            key: "panel_" + this.getId()
-        },
-            // This span is the expande/collapse button itself
-            this.e("span", {
-                className: style + " " + this.extraToggleButtonClass + (state.expanded ? " icon-up" : " icon-down"),
-                // Warning: This can't be camel case!
-                "data-toggle": collapseClass,
-                id: "btn_" + this.getId(),
-                key: "btn_" + this.getId(),
-                onClick: this.onToggle
-            }, state.expanded ? this.expandedButtonText : this.collapsedButtonText),
-
-            // This div and it's children holds the actual collapsible content.
-            this.e("div", {
-                className: collapseClass + " " + this.extraDivStyle,
-                id: this.getId(),
-                key: "content_" + this.getId()
+        /* If the component is expanded we render the button INSIDE the main area,
+        which is the area that would be HIDDEN when the component is NOT expanded. */
+        if (state.expanded) {
+            return this.e(this.elementName, {
+                key: "panel_" + this.getId()
             },
-                this.buildChildren()
-            ));
+                // This div and it's children holds the actual collapsible content.
+                this.e("div", {
+                    className: collapseClass + " " + this.extraDivStyle,
+                    id: this.getId(),
+                    key: "content_" + this.getId()
+                },
+                    // This span is the expande/collapse button itself
+                    this.e("span", {
+                        className: style + " " + this.extraToggleButtonClass + (state.expanded ? " icon-up" : " icon-down"),
+                        // Warning: This can't be camel case!
+                        "data-toggle": collapseClass,
+                        id: "btn_" + this.getId(),
+                        key: "btn_" + this.getId(),
+                        onClick: this.onToggle
+                    }, state.expanded ? this.expandedButtonText : this.collapsedButtonText),
+                    this.buildChildren()
+                ));
+        }
+        else {
+            return this.e(this.elementName, {
+                key: "panel_" + this.getId()
+            },
+                // This span is the expande/collapse button itself
+                this.e("span", {
+                    className: style + " " + this.extraToggleButtonClass + (state.expanded ? " icon-up" : " icon-down"),
+                    // Warning: This can't be camel case!
+                    "data-toggle": collapseClass,
+                    id: "btn_" + this.getId(),
+                    key: "btn_" + this.getId(),
+                    onClick: this.onToggle
+                }, state.expanded ? this.expandedButtonText : this.collapsedButtonText),
+
+                // This div and it's children holds the actual collapsible content.
+                this.e("div", {
+                    className: collapseClass + " " + this.extraDivStyle,
+                    id: this.getId(),
+                    key: "content_" + this.getId()
+                },
+                    this.buildChildren()
+                ));
+        }
     }
 
     onToggle = (): void => {

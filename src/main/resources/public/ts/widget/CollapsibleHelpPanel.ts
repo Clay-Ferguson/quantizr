@@ -11,7 +11,7 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
 
 export class CollapsibleHelpPanel extends CollapsiblePanel {
 
-    constructor(title: string, html: string, stateCallback: Function = null, expanded: boolean = false, elementName: string = "div") {
-        super(title, title, null, [new Html(html, { className: "helpPanel" })], false, stateCallback, expanded, "marginRight", "marginTop", elementName);
+    constructor(title: string, html: string, stateCallback: Function = null, expanded: boolean = false, elementName: string = "div", moreStyles: string = "") {
+        super(title, title, null, [new Html(html)], false, stateCallback, expanded, "marginRight " + moreStyles, "marginTop helpPanel", elementName);
     }
 }

@@ -107,7 +107,7 @@ export class SearchUsersDlg extends DialogBase {
                 new CollapsibleHelpPanel("Help", S.meta64.config.help.search.dialog,
                     (state: boolean) => {
                         SearchUsersDlg.helpExpanded = state;
-                    }, SearchUsersDlg.helpExpanded),
+                    }, SearchUsersDlg.helpExpanded, "div", "marginBottom"),
                 new ButtonBar([
                     new Button("Search", this.search, null, "btn-primary"),
                     // this Graph button will work, but why graph users? ... there are no linkages between them... yet.

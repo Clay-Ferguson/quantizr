@@ -74,7 +74,7 @@ export class NodeStatsDlg extends DialogBase {
             new CollapsibleHelpPanel("Help: About Node Stats", S.meta64.config.help.nodeStats.dialog,
                 (state: boolean) => {
                     NodeStatsDlg.helpExpanded = state;
-                }, NodeStatsDlg.helpExpanded),
+                }, NodeStatsDlg.helpExpanded, "div", "marginBottom"),
 
             new ButtonBar([
                 new Button("Ok", () => {

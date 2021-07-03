@@ -77,7 +77,7 @@ export class SearchContentDlg extends DialogBase {
                 new CollapsibleHelpPanel("Help", S.meta64.config.help.search.dialog,
                     (state: boolean) => {
                         SearchContentDlg.helpExpanded = state;
-                    }, SearchContentDlg.helpExpanded),
+                    }, SearchContentDlg.helpExpanded, "div", "marginBottom"),
                 new ButtonBar([
                     new Button("Search", this.search, null, "btn-primary"),
                     new Button("Graph", this.graph, null, "btn-primary"),

@@ -37,7 +37,7 @@ export class FriendsListTypeHandler extends TypeBase {
             new CollapsibleHelpPanel("Help", S.meta64.config.help.type.friendsList.render,
                 (state: boolean) => {
                     FriendsListTypeHandler.helpExpanded = state;
-                }, FriendsListTypeHandler.helpExpanded)
+                }, FriendsListTypeHandler.helpExpanded, "div", "marginBottom marginLeft")
         ]);
     }
 }

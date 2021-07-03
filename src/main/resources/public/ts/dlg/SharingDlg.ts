@@ -33,10 +33,10 @@ export class SharingDlg extends DialogBase {
                 new CollapsibleHelpPanel("Help", S.meta64.config.help.sharing.dialog,
                     (state: boolean) => {
                         SharingDlg.helpExpanded = state;
-                    }, SharingDlg.helpExpanded),
+                    }, SharingDlg.helpExpanded, "div", "marginBottom"),
                 new EditPrivsTable(this.getState().nodePrivsInfo, this.removePrivilege),
                 new ButtonBar([
-                    new Button("Add Username", this.shareToPersonDlg, null, "btn-primary"),
+                    new Button("Add User", this.shareToPersonDlg, null, "btn-primary"),
                     new Button("Add Friend", async () => {
                         let friendsDlg: FriendsDlg = new FriendsDlg(this.appState, true);
                         await friendsDlg.open();
@@ -44,8 +44,8 @@ export class SharingDlg extends DialogBase {
                             this.shareImmediate(friendsDlg.getState().selectedName);
                         }
                     }, null, "btn-primary"),
-                    new Button("Make Public", () => { this.shareNodeToPublic(true); }, null, "btn-secondary"),
-                    new Button("Make Public (No replies)", () => { this.shareNodeToPublic(false); }, null, "btn-secondary"),
+                    new Button("Public (Allow replies)", () => { this.shareNodeToPublic(true); }, null, "btn-secondary"),
+                    new Button("Public (No replies)", () => { this.shareNodeToPublic(false); }, null, "btn-secondary"),
                     new Button("Close", () => {
                         this.close();
                         if (this.dirty) {
