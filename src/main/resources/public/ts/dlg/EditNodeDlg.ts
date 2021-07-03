@@ -521,10 +521,7 @@ export class EditNodeDlg extends DialogBase {
             if (ipfsLink) {
                 bottomBinRow = new Div(null, { className: "marginTop" }, [
                     ipfsLink ? new Div(`CID: ${ipfsLink}`) : null,
-                    ipfsLink ? new Div(`Type: ${mime}`) : null,
-
-                    // todo-0: work is needed on IPFS.
-                    ipfsLink ? new Div("Note: In this dev instance, published IPFS files will not be available on other IPFS gateways.") : null
+                    ipfsLink ? new Div(`Type: ${mime}`) : null
                 ]);
             }
 
