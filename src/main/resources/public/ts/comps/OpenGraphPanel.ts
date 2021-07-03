@@ -145,17 +145,23 @@ export class OpenGraphPanel extends Div {
             }) : new Div(title, {
                 className: "openGraphTitle"
             }),
-            new HorizontalLayout([
-                new Div(null, { className: "openGraphLhs" }, [
-                    image?.url ? new Img(null, {
-                        className: "openGraphImage",
-                        src: image.url
-                    }) : null
-                ]),
-                new Div(null, { className: "openGraphRhs" }, [
+            image?.url
+                // if we have an image then render a left-hand side and right-hand side.
+                ? new HorizontalLayout([
+                    new Div(null, { className: "openGraphLhs" }, [
+                        new Img(null, {
+                            className: "openGraphImage",
+                            src: image.url
+                        })
+                    ]),
+                    new Div(null, { className: "openGraphRhs" }, [
+                        new Div(desc)
+                    ])
+                ])
+                // if no image just display the description in a div
+                : new Div(null, { className: "openGraphNoImage" }, [
                     new Div(desc)
                 ])
-            ])
         ]);
     }
 }
