@@ -64,7 +64,8 @@ public class ActPubService {
     public static int refreshForeignUsersQueuedCount = 0;
     public static String lastRefreshForeignUsersCycleTime = "n/a";
     public static int inboxCount = 0;
-    public static boolean refreshInProgress = false;
+    public static boolean userRefresh = false;
+    public static boolean bigRefresh = false;
     private static final Logger log = LoggerFactory.getLogger(ActPubService.class);
 
     @Autowired
@@ -178,8 +179,8 @@ public class ActPubService {
             String inReplyTo = parent.getStrProp(NodeProp.ACT_PUB_OBJ_URL);
             APList attachments = createAttachmentsList(node);
 
-            sendNote(ms, toUserNames, ThreadLocals.getSessionContext().getUserName(), inReplyTo, node.getContent(),
-                    attachments, subNodeUtil.getIdBasedUrl(node), privateMessage);
+            sendNote(ms, toUserNames, ThreadLocals.getSessionContext().getUserName(), inReplyTo, node.getContent(), attachments,
+                    subNodeUtil.getIdBasedUrl(node), privateMessage);
         } //
         catch (Exception e) {
             log.error("sendNote failed", e);
@@ -599,8 +600,8 @@ public class ActPubService {
         if (toAccountNode == null) {
             toAccountNode = getAcctNodeByActorUrl(ms, objAttributedTo);
         }
-        SubNode newNode = create.createNode(ms, parentNode, null, null, 0L, CreateNodeLocation.FIRST, null,
-                toAccountNode.getId(), true);
+        SubNode newNode =
+                create.createNode(ms, parentNode, null, null, 0L, CreateNodeLocation.FIRST, null, toAccountNode.getId(), true);
 
         // todo-1: need a new node prop type that is just 'html' and tells us to render
         // content as raw html if set, or for now
@@ -954,24 +955,31 @@ public class ActPubService {
         apCache.usersPendingRefresh.put(apUserName, false);
     }
 
-    static Object bigRefreshLock = new Object();
-
     /* every 90 minutes ping all the outboxes */
     @Scheduled(fixedDelay = 90 * DateUtil.MINUTE_MILLIS)
     public void bigRefresh() {
-        synchronized (bigRefreshLock) {
+        if (bigRefresh)
+            return;
+        try {
+            bigRefresh = true;
             refreshForeignUsers();
+        } finally {
+            bigRefresh = false;
         }
     }
 
-    static Object userRefreshLock = new Object();
-    
-    /* Run every few seconds */
+    /*
+     * Run every few seconds
+     * 
+     * we need a state like 'refreshInProgress' on ALL Scheduled functions now that we have a threapool
+     */
     @Scheduled(fixedDelay = 3 * 1000)
     public void userRefresh() {
-        synchronized (userRefreshLock) {
-            if (!appProp.isActPubEnabled())
-                return;
+        if (userRefresh || !appProp.isActPubEnabled())
+            return;
+
+        try {
+            userRefresh = true;
 
             try {
                 saveUserNames();
@@ -980,15 +988,12 @@ public class ActPubService {
                 log.error("saveUserNames", e);
             }
 
-            try {
-                refreshInProgress = true;
-                refreshUsers();
-            } catch (Exception e) {
-                // log and ignore.
-                log.error("refresh outboxes", e);
-            } finally {
-                refreshInProgress = false;
-            }
+            refreshUsers();
+        } catch (Exception e) {
+            // log and ignore.
+            log.error("refresh outboxes", e);
+        } finally {
+            userRefresh = false;
         }
     }
 
@@ -1039,7 +1044,7 @@ public class ActPubService {
 
     private void saveUserNames() {
         List<String> names = new LinkedList<>(apCache.allUserNames.keySet());
-        
+
         for (final String name : names) {
             Boolean done = apCache.allUserNames.get(name);
             if (done)
@@ -1056,6 +1061,7 @@ public class ActPubService {
              * faster to check for dups before calling save here.
              */
             try {
+                log.debug("Saving Name: " + fName);
                 ops.save(fName);
             } catch (Exception e) {
                 // this will happen for every duplicate. so A LOT!
@@ -1154,7 +1160,7 @@ public class ActPubService {
                 }
             }
 
-            for (FediverseName fName: toDelete) {
+            for (FediverseName fName : toDelete) {
                 ops.remove(fName);
             }
 
@@ -1188,7 +1194,7 @@ public class ActPubService {
     public String getStatsReport() {
         StringBuilder sb = new StringBuilder();
         sb.append("\nActivityPub Stats:\n");
-        sb.append("Refresh in progress: " + (refreshInProgress ? "true" : "false") + "\n");
+        sb.append("Refresh in progress: " + (userRefresh ? "true" : "false") + "\n");
         sb.append("Cached Usernames: " + apCache.allUserNames.size() + "\n");
         sb.append("Users Currently Queued (for refresh): " + queuedUserCount() + "\n");
         sb.append("Refresh Foreign Users Cycles: " + refreshForeignUsersCycles + "\n");

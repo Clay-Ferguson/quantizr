@@ -116,14 +116,16 @@ public class RSSFeedService {
 
 	private static final int MAX_FEEDS_PER_AGGREGATE = 40;
 
-	static Object runLock = new Object();
+	static boolean run = false;
 
 	/*
 	 * Runs immediately at startup, and then every 30 minutes, to refresh the feedCache.
 	 */
 	@Scheduled(fixedDelay = 30 * 60 * 1000)
 	public void run() {
-		synchronized (runLock) {
+		if (run) return;
+		try {
+			run = true;
 			runCount++;
 			if (runCount == 1) {
 				startupPreCache();
@@ -138,6 +140,8 @@ public class RSSFeedService {
 			refreshFeedCache();
 			aggregateCache.clear();
 			proxyCache.clear();
+		} finally {
+			run = false;
 		}
 	}
 
@@ -595,8 +599,7 @@ public class RSSFeedService {
 		List<SyndEntry> entries = new LinkedList<SyndEntry>();
 		feed.setEntries(entries);
 
-		final Iterable<SubNode> iter =
-				read.getChildren(ms, node, Sort.by(Sort.Direction.ASC, SubNode.FIELD_ORDINAL), null, 0);
+		final Iterable<SubNode> iter = read.getChildren(ms, node, Sort.by(Sort.Direction.ASC, SubNode.FIELD_ORDINAL), null, 0);
 		final List<SubNode> children = read.iterateToList(iter);
 
 		if (children != null) {

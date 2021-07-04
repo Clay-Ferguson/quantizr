@@ -50,7 +50,7 @@ public class NotificationDaemon {
 	public static final int INTERVAL_SECONDS = 10;
 	private int runCountdown = INTERVAL_SECONDS;
 
-	static Object runLock = new Object();
+	static boolean run = false;
 
 	/*
 	 * Note: Spring does correctly protect against concurrent runs. It will always wait until the last
@@ -65,38 +65,41 @@ public class NotificationDaemon {
 	 */
 	@Scheduled(fixedDelay = 1000)
 	public void run() {
-		synchronized (runLock) {
-			try {
-				if (AppServer.isShuttingDown() || !AppServer.isEnableScheduling()) {
-					log.debug("ignoring NotificationDeamon schedule cycle");
-					return;
-				}
-
-				runCounter++;
-
-				/* fail fast if no mail host is configured. */
-				if (StringUtils.isEmpty(appProp.getMailHost())) {
-					if (runCounter < 3) {
-						log.debug("NotificationDaemon is disabled, because no mail server is configured.");
-					}
-					return;
-				}
-
-				if (--runCountdown <= 0) {
-					runCountdown = INTERVAL_SECONDS;
-
-					arun.run((MongoSession ms) -> {
-						List<SubNode> mailNodes = outboxMgr.getMailNodes(ms);
-						if (mailNodes != null) {
-							log.debug("Found " + String.valueOf(mailNodes.size()) + " mailNodes to send.");
-							sendAllMail(ms, mailNodes);
-						} 
-						return null;
-					});
-				}
-			} catch (Exception e) {
-				log.error("notification deamo cycle fail", e);
+		if (run) return;
+		try {
+			run = true;
+			if (AppServer.isShuttingDown() || !AppServer.isEnableScheduling()) {
+				log.debug("ignoring NotificationDeamon schedule cycle");
+				return;
 			}
+
+			runCounter++;
+
+			/* fail fast if no mail host is configured. */
+			if (StringUtils.isEmpty(appProp.getMailHost())) {
+				if (runCounter < 3) {
+					log.debug("NotificationDaemon is disabled, because no mail server is configured.");
+				}
+				return;
+			}
+
+			if (--runCountdown <= 0) {
+				runCountdown = INTERVAL_SECONDS;
+
+				arun.run((MongoSession ms) -> {
+					List<SubNode> mailNodes = outboxMgr.getMailNodes(ms);
+					if (mailNodes != null) {
+						log.debug("Found " + String.valueOf(mailNodes.size()) + " mailNodes to send.");
+						sendAllMail(ms, mailNodes);
+					}
+					return null;
+				});
+			}
+		} catch (Exception e) {
+			log.error("notification deamo cycle fail", e);
+		}
+		finally {
+			run = false;
 		}
 	}
 
