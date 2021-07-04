@@ -2,12 +2,12 @@ package org.subnode.service;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
+import java.lang.management.ManagementFactory;
+import java.lang.management.RuntimeMXBean;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
 import com.mongodb.client.MongoDatabase;
-
 import org.apache.commons.lang3.StringUtils;
 import org.bson.Document;
 import org.bson.types.ObjectId;
@@ -19,24 +19,22 @@ import org.subnode.actpub.ActPubService;
 import org.subnode.config.AppFilter;
 import org.subnode.config.AppProp;
 import org.subnode.config.AppSessionListener;
+import org.subnode.config.SessionContext;
 import org.subnode.model.IPFSObjectStat;
 import org.subnode.model.UserStats;
 import org.subnode.model.client.NodeProp;
+import org.subnode.mongo.AdminRun;
 import org.subnode.mongo.MongoAppConfig;
-import org.subnode.mongo.MongoAuth;
 import org.subnode.mongo.MongoDelete;
 import org.subnode.mongo.MongoRead;
 import org.subnode.mongo.MongoSession;
 import org.subnode.mongo.MongoUpdate;
 import org.subnode.mongo.MongoUtil;
-import org.subnode.mongo.AdminRun;
 import org.subnode.mongo.model.SubNode;
 import org.subnode.util.Const;
 import org.subnode.util.ExUtil;
 import org.subnode.util.ThreadLocals;
 import org.subnode.util.XString;
-import java.lang.management.ManagementFactory;
-import java.lang.management.RuntimeMXBean;
 
 /**
  * Service methods for System related functions. Admin functions.
@@ -194,6 +192,38 @@ public class SystemService {
 		// oops this is worthless, because it's inside the docker image, but I'm leaving
 		// in place just in case in the future we do need to run some commands docker
 		// sb.append(runBashCommand("DISK STORAGE", "df -h"));
+		return sb.toString();
+	}
+
+	public String getSessionActivity() {
+		StringBuilder sb = new StringBuilder();
+		sb.append("Live Sessions:\n");
+
+		List<SessionContext> sessions = SessionContext.getHistoricalSessions();
+		sessions.sort((s1, s2) -> {
+			String s1key = s1.getUserName() + "/" + (s1.getIp() == null ? "?" : s1.getIp());
+			String s2key = s2.getUserName() + "/" + (s2.getIp() == null ? "?" : s2.getIp());
+			return s1key.compareTo(s2key);
+		});
+
+		for (SessionContext s : sessions) {
+			if (s.isLive()) {
+				sb.append("User: ");
+				sb.append(s.getUserName() + "/" + (s.getIp() == null ? "?" : s.getIp()));
+				sb.append("\n");
+				sb.append(s.dumpActions("      ", 3));
+			}
+		}
+
+		sb.append("\nPast Sessions:\n");
+		for (SessionContext s : sessions) {
+			if (!s.isLive()) {
+				sb.append("User: ");
+				sb.append(s.getPastUserName() + "/" + (s.getIp() == null ? "?" : s.getIp()));
+				sb.append("\n");
+				sb.append(s.dumpActions("      ", 3));
+			}
+		}
 		return sb.toString();
 	}
 

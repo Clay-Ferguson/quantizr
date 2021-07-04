@@ -1332,6 +1332,10 @@ public class AppController implements ErrorController {
 					res.getMessages().add(new InfoMessage(systemService.getSystemInfo(), null));
 					break;
 
+				case "getSessionActivity":
+					res.getMessages().add(new InfoMessage(systemService.getSessionActivity(), null));
+					break;
+
 				case "getJson":
 					res.getMessages().add(new InfoMessage(systemService.getJson(ms, req.getNodeId()), null));
 					break;

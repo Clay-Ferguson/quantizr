@@ -2,10 +2,10 @@ package org.subnode.config;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Random;
 import java.util.TimeZone;
 import javax.annotation.PreDestroy;
 import org.slf4j.Logger;
@@ -35,6 +35,8 @@ public class SessionContext {
 	// implements InitializingBean, DisposableBean {
 	private static final Logger log = LoggerFactory.getLogger(SessionContext.class);
 
+	private boolean live = true;
+
 	@Autowired
 	private UserFeedService userFeedService;
 
@@ -50,6 +52,10 @@ public class SessionContext {
 	private String timelinePath;
 
 	private String userName = PrincipalName.ANON.s();
+	private String pastUserName = userName;
+
+	private String ip;
+
 	private MongoSession ms = new MongoSession();
 
 	private String timezone;
@@ -72,6 +78,12 @@ public class SessionContext {
 	// this one WILL work with multiple sessions per user
 	public static final HashSet<SessionContext> allSessions = new HashSet<>();
 
+	// Full list of active and inactive (dead) sessions.
+	public static final HashSet<SessionContext> historicalSessions = new HashSet<>();
+
+	/* keeps track of total calls to each URI */
+	public HashMap<String, Integer> actionCounters = new HashMap<>();
+
 	private String captcha;
 	private int captchaFails = 0;
 
@@ -84,7 +96,7 @@ public class SessionContext {
 	 * even on page 2 they may be seeing some records they had already seen on page 1
 	 */
 	private Date feedMaxTime;
-	
+
 	private String userToken;
 
 	public SessionContext() {
@@ -92,6 +104,33 @@ public class SessionContext {
 		synchronized (allSessions) {
 			allSessions.add(this);
 		}
+		synchronized (historicalSessions) {
+			historicalSessions.add(this);
+		}
+	}
+
+	public void addAction(String actionName) {
+		Integer count = actionCounters.get(actionName);
+		if (count == null) {
+			actionCounters.put(actionName, 1);
+		} else {
+			actionCounters.put(actionName, count.intValue() + 1);
+		}
+	}
+
+	public String dumpActions(String prefix, int countThreshold) {
+		StringBuilder sb = new StringBuilder();
+		for (String actionName : actionCounters.keySet()) {
+			Integer count = (Integer) actionCounters.get(actionName);
+			if (count.intValue() >= countThreshold) {
+				sb.append(prefix);
+				sb.append(actionName);
+				sb.append(" ");
+				sb.append(String.valueOf(count));
+				sb.append("\n");
+			}
+		}
+		return sb.toString();
 	}
 
 	/* This is called only upon successful login of a non-anon user */
@@ -105,7 +144,7 @@ public class SessionContext {
 		}
 		log.debug("sessionContext authenticated hashCode=" + String.valueOf(hashCode()) + " user: " + userName + " to userToken "
 				+ userToken);
-		this.userName = userName;
+		setUserName(userName);
 	}
 
 	public boolean isAuthenticated() {
@@ -120,13 +159,15 @@ public class SessionContext {
 		if (token == null)
 			return false;
 
-		for (SessionContext sc : allSessions) {
-			if (token.equals(sc.getUserToken())) {
-				if (userName != null) {
-					// need to add IP check here too, but IP can be spoofed?
-					return userName.equals(sc.getUserName());
-				} else {
-					return true;
+		synchronized (allSessions) {
+			for (SessionContext sc : allSessions) {
+				if (token.equals(sc.getUserToken())) {
+					if (userName != null) {
+						// need to add IP check here too, but IP can be spoofed?
+						return userName.equals(sc.getUserName());
+					} else {
+						return true;
+					}
 				}
 			}
 		}
@@ -135,8 +176,8 @@ public class SessionContext {
 
 	public static boolean serverPushTest(UserFeedService svc) {
 		// for (SessionContext sc : allSessions) {
-		// 	log.debug("ServerPush Test: sessionUserName=" + sc.getUserName());
-		// 	svc.sendServerPushInfo(sc, new SessionTimeoutPushInfo());
+		// log.debug("ServerPush Test: sessionUserName=" + sc.getUserName());
+		// svc.sendServerPushInfo(sc, new SessionTimeoutPushInfo());
 		// }
 		return false;
 	}
@@ -145,18 +186,31 @@ public class SessionContext {
 		return userToken;
 	}
 
+	public static List<SessionContext> getAllSessions() {
+		synchronized (allSessions) {
+			return new LinkedList<SessionContext>(allSessions);
+		}
+	}
+
+	public static List<SessionContext> getHistoricalSessions() {
+		synchronized (historicalSessions) {
+			return new LinkedList<SessionContext>(historicalSessions);
+		}
+	}
+
 	public static List<SessionContext> getSessionsByUserName(String userName) {
 		if (userName == null)
 			return null;
 
 		List<SessionContext> list = null;
-
-		for (SessionContext sc : allSessions) {
-			if (userName.equals(sc.getUserName())) {
-				if (list == null) {
-					list = new LinkedList<SessionContext>();
+		synchronized (allSessions) {
+			for (SessionContext sc : allSessions) {
+				if (userName.equals(sc.getUserName())) {
+					if (list == null) {
+						list = new LinkedList<SessionContext>();
+					}
+					list.add(sc);
 				}
-				list.add(sc);
 			}
 		}
 		return list;
@@ -174,6 +228,7 @@ public class SessionContext {
 			// user is really checking their messages (like in UserFeedService), where this logic was moved to.
 			// userManagerService.updateLastActiveTime(this);
 			allSessions.remove(this);
+			setLive(false);
 		}
 	}
 
@@ -224,8 +279,20 @@ public class SessionContext {
 	}
 
 	public void setUserName(String userName) {
+		if (userName != null) {
+			pastUserName = userName;
+		}
 		this.userName = userName;
 	}
+
+	public String getPastUserName() {
+		return pastUserName;
+	}
+
+	public void setPastUserName(String pastUserName) {
+		this.pastUserName = pastUserName;
+	}
+
 
 	public String getUrlId() {
 		return urlId;
@@ -329,6 +396,22 @@ public class SessionContext {
 
 	public void setMongoSession(MongoSession ms) {
 		this.ms = ms;
+	}
+
+	public String getIp() {
+		return ip;
+	}
+
+	public void setIp(String ip) {
+		this.ip = ip;
+	}
+
+	public boolean isLive() {
+		return live;
+	}
+
+	public void setLive(boolean live) {
+		this.live = live;
 	}
 
 	// DO NOT DELETE: Keep for future reference

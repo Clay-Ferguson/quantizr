@@ -79,6 +79,7 @@ public class AppFilter extends GenericFilterBean {
 				//log.debug("***** SC: User: " + sc.getUserName());
 
 				httpReq = (HttpServletRequest) req;
+				sc.addAction(httpReq.getRequestURI());
 				String bearer = httpReq.getHeader("Bearer");
 
 				// if auth token is privided and doesn't exist that's a timeout session so send user
@@ -107,6 +108,7 @@ public class AppFilter extends GenericFilterBean {
 
 				HttpServletResponse httpRes = (HttpServletResponse) res;
 				ip = getClientIpAddr(httpReq);
+				sc.setIp(ip);
 
 				HttpSession session = httpReq.getSession(false);
 				if (session == null) {
