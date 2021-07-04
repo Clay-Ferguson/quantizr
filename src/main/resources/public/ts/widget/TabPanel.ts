@@ -34,18 +34,12 @@ export class TabPanel extends Div {
 
     preRender(): void {
         const state: AppState = useSelector((state: AppState) => state);
-        let dialog: DialogBase = null;
-        if (state.dialogStack.length > 0) {
-            dialog = state.dialogStack[state.dialogStack.length - 1];
-        }
-
-        let children: CompIntf[] = dialog ? [dialog] : this.buildTabs(state);
 
         let tabContent = new Div(null, {
             className: "row tab-content",
             role: "main",
             key: this.attribs.key + "_topdiv"
-        }, children);
+        }, this.buildTabs(state));
 
         this.setChildren([
             this.customTopComp,

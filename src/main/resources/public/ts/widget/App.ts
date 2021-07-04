@@ -1,6 +1,7 @@
 import { useSelector } from "react-redux";
 import { AppState } from "../AppState";
 import { Constants as C } from "../Constants";
+import { DialogBase } from "../DialogBase";
 import { PubSub } from "../PubSub";
 import { Singletons } from "../Singletons";
 import { CompIntf } from "./base/CompIntf";
@@ -11,13 +12,11 @@ import { FullScreenCalendar } from "./FullScreenCalendar";
 import { FullScreenControlBar } from "./FullScreenControlBar";
 import { FullScreenGraphViewer } from "./FullScreenGraphViewer";
 import { FullScreenImgViewer } from "./FullScreenImgViewer";
-import { Heading } from "./Heading";
 import { IconButton } from "./IconButton";
 import { Img } from "./Img";
 import { LeftNavPanel } from "./LeftNavPanel";
 import { Main } from "./Main";
 import { RightNavPanel } from "./RightNavPanel";
-import { Spinner } from "./Spinner";
 import { TabPanel } from "./TabPanel";
 
 let S: Singletons;
@@ -39,6 +38,15 @@ export class App extends Main {
         if (!state.guiReady) {
             this.setChildren(null);
             return;
+        }
+
+        // todo-1: put this in a function called 'getTopDialog'
+        if (state.dialogStack.length > 0) {
+            let dialog = state.dialogStack[state.dialogStack.length - 1];
+            if (dialog) {
+                this.setChildren([dialog]);
+                return;
+            }
         }
 
         let fullScreenViewer = this.getFullScreenViewer(state);
