@@ -1760,6 +1760,7 @@ i'm backing out for now
     padding-top: $smallGap;
     padding-bottom: $smallGap;
     padding-left: $smallGap;
+    margin-bottom: $smallGap;
 }
 
 .heading5 {
@@ -1926,6 +1927,7 @@ audio::-webkit-media-controls-play-button {
 
 .displayTable {
     display: table;
+    border-spacing: 10px;
 }
 
 .displayRow {

@@ -40,7 +40,8 @@ export class IconButton extends Comp {
 
         buttonChildren.push(this.e("i", {
             key: "i_" + this.getId(),
-            className: "fa fa-lg " + this.iconClass + toggleClass
+            // note: adding fa-lg into here makes the icon AND font noticeably larger.
+            className: "fa " + this.iconClass + toggleClass
         }, [this.e("span", {
             key: "s_txt_" + this.getId(),
             className: "button-font"

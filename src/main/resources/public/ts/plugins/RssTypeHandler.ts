@@ -414,7 +414,7 @@ export class RssTypeHandler extends TypeBase {
 
         if (hasAudioEnclosure) {
             let downloadLink = new Anchor(entry.enclosure.url, "[ Download " + entry.enclosure.type + " ]", { className: "rssDownloadLink" }, null, true);
-            let audioButton = new Button("Play Audio", playAudioFunc);
+            let audioButton = new Button("Play Audio", playAudioFunc, null, "btn-primary");
 
             children.push(new ButtonBar([audioButton, downloadLink], null, "rssMediaButtons"));
         }

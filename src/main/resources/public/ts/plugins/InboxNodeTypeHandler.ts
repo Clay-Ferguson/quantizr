@@ -53,6 +53,6 @@ export class InboxNodeTypeHandler extends TypeBase {
                 })
             ], null, "float-right marginBottom"),
             new Clearfix()
-        ], "marginAll");
+        ], "displayTable marginAll");
     }
 }

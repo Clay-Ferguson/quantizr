@@ -491,7 +491,7 @@ export class EditNodeDlg extends DialogBase {
 
             // NOTE: col numbers in the children of LayoutRow must add up to 12 (per bootstrap)!
             let topBinRow = new LayoutRow([
-                new Div(null, { className: "col-4" }, [
+                new Div(null, { className: "col-6" }, [
                     new Div((ipfsLink ? "IPFS " : "") + "Attachment", {
                         className: "smallHeading"
                     }),
@@ -499,7 +499,7 @@ export class EditNodeDlg extends DialogBase {
                 ]),
 
                 new Div(null, {
-                    className: "col-8"
+                    className: "col-6"
                 }, [
                     new Div(null, null, [
                         new HorizontalLayout([

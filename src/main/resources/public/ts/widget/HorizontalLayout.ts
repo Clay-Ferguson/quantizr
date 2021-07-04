@@ -11,10 +11,10 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
 
 export class HorizontalLayout extends Div {
 
-    constructor(initialComps: Comp[] = null, moreClasses: string = "", attribs: any = {}) {
+    constructor(initialComps: Comp[] = null, classes: string = "displayTable", attribs: any = {}) {
         super(null, attribs || {});
 
-        this.attribs.className = "displayTable " + (moreClasses || "");
+        this.attribs.className = classes;
         if (initialComps) {
             for (let comp of initialComps) {
                 if (!comp) continue;

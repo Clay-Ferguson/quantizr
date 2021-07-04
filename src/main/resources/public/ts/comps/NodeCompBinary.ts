@@ -8,8 +8,8 @@ import * as J from "../JavaIntf";
 import { PubSub } from "../PubSub";
 import { Singletons } from "../Singletons";
 import { Anchor } from "../widget/Anchor";
-import { ButtonBar } from "../widget/ButtonBar";
 import { Div } from "../widget/Div";
+import { HorizontalLayout } from "../widget/HorizontalLayout";
 import { Icon } from "../widget/Icon";
 import { IconButton } from "../widget/IconButton";
 import { Img } from "../widget/Img";
@@ -104,28 +104,28 @@ export class NodeCompBinary extends Div {
             this.setChildren([this.makeImageTag(node, state)]);
         }
         else if (S.props.hasVideo(node)) {
-            this.setChildren([new ButtonBar([
+            this.setChildren([new HorizontalLayout([
                 new IconButton("fa-play", "Play Video", {
                     onClick: () => {
                         new VideoPlayerDlg(S.render.getStreamUrlForNodeAttachment(node), null, state).open();
                     }
-                }),
+                }, "btn-primary"),
                 new Span("", {
                     className: "downloadLink"
                 }, [new Anchor(S.render.getUrlForNodeAttachment(node, true), "Download", { target: "_blank" })])
-            ], "marginAll")]);
+            ])]);
         }
         else if (S.props.hasAudio(node)) {
-            this.setChildren([new ButtonBar([
+            this.setChildren([new HorizontalLayout([
                 new IconButton("fa-play", "Play Audio", {
                     onClick: () => {
                         new AudioPlayerDlg(null, null, null, S.render.getStreamUrlForNodeAttachment(node), 0, state).open();
                     }
-                }),
+                }, "btn-primary"),
                 new Span("", {
                     className: "downloadLink"
                 }, [new Anchor(S.render.getUrlForNodeAttachment(node, true), "Download", { target: "_blank" })])
-            ], "marginAll")]);
+            ])]);
         }
         /*
          * If not an image we render a link to the attachment, so that it can be downloaded.
@@ -139,7 +139,7 @@ export class NodeCompBinary extends Div {
             if (fileType === "application/pdf" || fileType.startsWith("text/")) {
                 viewFileLink = new Anchor(S.render.getUrlForNodeAttachment(node, false), "View", {
                     target: "_blank",
-                    className: "marginLeft downloadLink"
+                    className: "downloadLink"
                 });
             }
 

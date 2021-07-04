@@ -73,7 +73,7 @@ export class SearchContentDlg extends DialogBase {
                             return this.getState().caseSensitive;
                         }
                     })
-                ], "marginBottom"),
+                ], "displayTable marginBottom"),
                 new CollapsibleHelpPanel("Help", S.meta64.config.help.search.dialog,
                     (state: boolean) => {
                         SearchContentDlg.helpExpanded = state;

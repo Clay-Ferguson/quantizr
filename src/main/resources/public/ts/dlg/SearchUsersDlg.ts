@@ -102,7 +102,7 @@ export class SearchUsersDlg extends DialogBase {
                             return this.getState().caseSensitive;
                         }
                     })
-                ], "marginBottom"),
+                ], "displayTable marginBottom"),
                 adminOptions,
                 new CollapsibleHelpPanel("Help", S.meta64.config.help.search.dialog,
                     (state: boolean) => {

@@ -686,7 +686,7 @@ export class Render implements RenderIntf {
                             className: "userBio"
                         })])
                 ])
-            ], "userInfo", {
+            ], "displayTable userInfo", {
                 onClick
             })
         ]);
