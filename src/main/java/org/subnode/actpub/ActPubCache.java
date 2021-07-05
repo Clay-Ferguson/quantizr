@@ -35,4 +35,7 @@ public class ActPubCache {
 
     /* Cache WebFinger objects by UserName in memory only for now */
     public final ConcurrentHashMap<String, APObj> webFingerCacheByUserName = new ConcurrentHashMap<>();
+
+    /* Cache WebFinger fails, so we don't try them again */
+    public final ConcurrentHashMap<String, Boolean> webFingerFailsByUserName = new ConcurrentHashMap<>();
 }

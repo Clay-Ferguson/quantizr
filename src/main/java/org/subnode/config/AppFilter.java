@@ -206,7 +206,10 @@ public class AppFilter extends GenericFilterBean {
 					httpReq.getRequestURI().endsWith("/getConfig") || //
 					httpReq.getRequestURI().endsWith("/getBookmarks") || //
 					httpReq.getRequestURI().endsWith("/login") || //
-					httpReq.getRequestURI().endsWith("/proxyGet")) {
+					httpReq.getRequestURI().endsWith("/proxyGet") || //
+					httpReq.getRequestURI().endsWith("/serverPush") || //
+					httpReq.getRequestURI().endsWith("/anonPageLoad")
+					) {
 				// these have priority
 			} else {
 				long wait = THROTTLE_INTERVAL - (curTime - info.getLastRequestTime());

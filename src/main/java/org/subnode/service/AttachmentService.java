@@ -520,7 +520,7 @@ public class AttachmentService {
 
 			final InputStream is = getStream(session, binSuffix, node, allowAuth);
 			final long size = node.getIntProp(NodeProp.BIN_SIZE.s() + binSuffix);
-			log.debug("Getting Binary for nodeId=" + nodeId + " size=" + size);
+			// log.debug("Getting Binary for nodeId=" + nodeId + " size=" + size);
 
 			response.setContentType(mimeTypeProp);
 
@@ -1072,7 +1072,7 @@ public class AttachmentService {
 	public InputStream getStreamByNode(final SubNode node, String binSuffix) {
 		if (node == null)
 			return null;
-		long startTime = System.currentTimeMillis();
+		// long startTime = System.currentTimeMillis();
 		// log.debug("getStreamByNode: " + node.getId().toHexString());
 
 		String id = node.getStrProp(NodeProp.BIN.s() + binSuffix);
@@ -1088,15 +1088,15 @@ public class AttachmentService {
 			return null;
 		}
 
-		long duration = System.currentTimeMillis() - startTime;
-		log.debug("grid.foundFile in " + String.valueOf(duration) + "ms");
-		startTime = System.currentTimeMillis();
+		// long duration = System.currentTimeMillis() - startTime;
+		// log.debug("grid.foundFile in " + String.valueOf(duration) + "ms");
+		// startTime = System.currentTimeMillis();
 
 		GridFsResource gridFsResource = new GridFsResource(gridFile, gridFsBucket.openDownloadStream(gridFile.getObjectId()));
 
-		duration = System.currentTimeMillis() - startTime;
-		log.debug("Created GridFsResource in " + String.valueOf(duration) + "ms");
-		startTime = System.currentTimeMillis();
+		// duration = System.currentTimeMillis() - startTime;
+		// log.debug("Created GridFsResource in " + String.valueOf(duration) + "ms");
+		// startTime = System.currentTimeMillis();
 
 		try {
 			final InputStream is = gridFsResource.getInputStream();
@@ -1104,8 +1104,8 @@ public class AttachmentService {
 				throw new RuntimeEx("Unable to get inputStream");
 			}
 
-			duration = System.currentTimeMillis() - startTime;
-			log.debug("GridFsResource stream obtained in " + String.valueOf(duration) + "ms");
+			// duration = System.currentTimeMillis() - startTime;
+			// log.debug("GridFsResource stream obtained in " + String.valueOf(duration) + "ms");
 
 			return is;
 		} catch (final Exception e) {

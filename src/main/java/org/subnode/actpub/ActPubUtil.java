@@ -327,18 +327,20 @@ public class ActPubUtil {
     public APObj getWebFinger(String resource) {
         apService.saveFediverseName(resource);
 
-        // For non-secure domains, they're required to have a port in their name,
-        // so this is users like bob@q1:8184 (for example), and that port is expected
-        // also to NOT be https 443 port.
-        if (resource.contains(":")) {
-            return getWebFingerSec(resource, false);
-        }
+        return getWebFingerSec(resource, true);
+        // need to re-enable this again if we plan on doing localhost fediverse testing (todo-0:)
+        // // For non-secure domains, they're required to have a port in their name,
+        // // so this is users like bob@q1:8184 (for example), and that port is expected
+        // // also to NOT be https 443 port.
+        // if (resource.contains(":")) {
+        //     return getWebFingerSec(resource, false);
+        // }
 
-        try {
-            return getWebFingerSec(resource, true);
-        } catch (Exception e) {
-            return getWebFingerSec(resource, false);
-        }
+        // try {
+        //     return getWebFingerSec(resource, true);
+        // } catch (Exception e) {
+        //     return getWebFingerSec(resource, false);
+        // }
     }
 
     /**
@@ -349,6 +351,11 @@ public class ActPubUtil {
             resource = resource.substring(1);
         }
         String host = (secure ? "https://" : "http://") + getHostFromUserName(resource);
+
+        Boolean failed = apCache.webFingerFailsByUserName.get(resource);
+        if (failed != null) {
+            return null;
+        }
 
         // return from cache if we have this cached
         APObj finger = apCache.webFingerCacheByUserName.get(resource);
@@ -362,6 +369,9 @@ public class ActPubUtil {
         if (finger != null) {
             // log.debug("Caching WebFinger: " + XString.prettyPrint(finger));
             apCache.webFingerCacheByUserName.put(resource, finger);
+        }
+        else {
+            apCache.webFingerFailsByUserName.put(resource, true);
         }
         return finger;
     }

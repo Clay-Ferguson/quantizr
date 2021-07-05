@@ -229,7 +229,7 @@ public class ActPubService {
 
             APObj webFinger = apUtil.getWebFinger(toUserName);
             if (webFinger == null) {
-                log.debug("Unable to get webfinger for " + toUserName);
+                // log.debug("Unable to get webfinger for " + toUserName);
                 continue;
             }
 
@@ -970,8 +970,6 @@ public class ActPubService {
 
     /*
      * Run every few seconds
-     * 
-     * we need a state like 'refreshInProgress' on ALL Scheduled functions now that we have a threapool
      */
     @Scheduled(fixedDelay = 3 * 1000)
     public void userRefresh() {
@@ -1008,7 +1006,7 @@ public class ActPubService {
                  * This is killing performance of the app so let's throttle it way back. Not sure if it's Disk or
                  * network I/O that's the problem but either way let's not read these so fast
                  */
-                Thread.sleep(1000);
+                Thread.sleep(500);
 
                 // flag as done (even if it fails we still want it flagged as done. no retries will be done).
                 apCache.usersPendingRefresh.put(userName, true);
@@ -1061,8 +1059,9 @@ public class ActPubService {
              * faster to check for dups before calling save here.
              */
             try {
-                log.debug("Saving Name: " + fName);
+                log.debug("Saving Name: " + fName.getName());
                 ops.save(fName);
+                Thread.sleep(500);
             } catch (Exception e) {
                 // this will happen for every duplicate. so A LOT!
             }
