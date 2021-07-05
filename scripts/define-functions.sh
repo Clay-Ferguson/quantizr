@@ -53,7 +53,9 @@ dockerUp () {
         fi
     fi
 
-    docker-compose -f ${docker_compose_yaml} up -d
+    # NOTE: --compatibility switch is required for the CPUS limitier to work,
+    # in a non-swarm docker setup, which we have
+    docker-compose --compatibility -f ${docker_compose_yaml} up -d
     verifySuccess "Docker Compose: up"
 
     # sleep 10

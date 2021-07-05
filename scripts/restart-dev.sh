@@ -16,7 +16,10 @@ cd $PRJROOT
 mvn --offline compiler:compile -DskipTests=true -Pjava-compile
 
 sudo rm -rf ${QUANTA_BASE}/log/*
-docker-compose -f ${docker_compose_yaml} restart quanta-dev
+
+# NOTE: --compatibility switch is required for the CPUS limitier to work,
+# in a non-swarm docker setup, which we have
+docker-compose --compatibility -f ${docker_compose_yaml} restart quanta-dev
 
 # This is another way, but slower. Not needed.
 # dockerDown quanta-dev

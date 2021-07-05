@@ -3,6 +3,11 @@ services:
 
     # https://hub.docker.com/r/ipfs/go-ipfs/
     ipfs-dev: 
+        deploy:
+            resources:
+              limits:
+                # limit IPFS usage to 15% CPU. IPFS is a hog and will consume all your CPU if you let it.
+                cpus: '0.15'
         container_name: ipfs-dev 
         environment:
             # IPFS_PROFILE options (lowpower | server)

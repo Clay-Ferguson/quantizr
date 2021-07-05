@@ -50,7 +50,7 @@ public class AppFilter extends GenericFilterBean {
 	 */
 	private static int simulateSlowServer = 0;
 
-	private static int THROTTLE_INTERVAL = 1000;
+	private static int THROTTLE_INTERVAL = 500;
 
 	/*
 	 * For debugging we can turn this flag on and disable the server from processing multiple requests

@@ -686,14 +686,14 @@ public class AttachmentService {
 				fileName = "filename";
 			}
 
-			long startTime = System.currentTimeMillis();
+			// long startTime = System.currentTimeMillis();
 			final InputStream is = getStream(session, "", node, false);
 
-			if (session.isAdmin() && Const.adminDebugStreaming) {
-				long duration = System.currentTimeMillis() - startTime;
-				log.debug("getStream took " + String.valueOf(duration) + "ms");
-			}
-			startTime = System.currentTimeMillis();
+			// if (session.isAdmin() && Const.adminDebugStreaming) {
+			// 	long duration = System.currentTimeMillis() - startTime;
+			// 	log.debug("getStream took " + String.valueOf(duration) + "ms");
+			// }
+			// startTime = System.currentTimeMillis();
 
 			long size = node.getIntProp(NodeProp.BIN_SIZE.s());
 
