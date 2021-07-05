@@ -107,7 +107,7 @@ export class NodeCompBinary extends Div {
             this.setChildren([new HorizontalLayout([
                 new IconButton("fa-play", "Play Video", {
                     onClick: () => {
-                        new VideoPlayerDlg(S.render.getStreamUrlForNodeAttachment(node), null, state).open();
+                        new VideoPlayerDlg("vidPlayer-" + node.id, S.render.getStreamUrlForNodeAttachment(node), null, state).open();
                     }
                 }, "btn-primary"),
                 new Span("", {

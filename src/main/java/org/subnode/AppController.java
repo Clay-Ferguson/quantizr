@@ -14,6 +14,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.web.servlet.error.ErrorController;
+import org.springframework.core.io.support.ResourceRegion;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -22,6 +24,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -39,8 +42,8 @@ import org.subnode.exception.base.RuntimeEx;
 import org.subnode.mail.MailSender;
 import org.subnode.model.client.NodeProp;
 import org.subnode.model.client.PrincipalName;
-import org.subnode.mongo.MongoRead;
 import org.subnode.mongo.AdminRun;
+import org.subnode.mongo.MongoRead;
 import org.subnode.mongo.model.SubNode;
 import org.subnode.request.AddFriendRequest;
 import org.subnode.request.AddPrivilegeRequest;
@@ -1072,33 +1075,27 @@ public class AppController implements ErrorController {
 		});
 	}
 
-	/*
-	 * This endpoint serves up large media files efficiently and supports seeking, so that the
-	 * fast-foward, rewind, seeking in video players works!!!
-	 */
-	@RequestMapping(value = API_PATH + "/filesys/{nodeId}", method = RequestMethod.GET)
-	public void getFileSystemResourceStreamMultiPart(//
-			@PathVariable("nodeId") String nodeId, //
-			@RequestParam(name = "disp", required = false) String disposition, //
-			HttpServletRequest request, HttpServletResponse response, //
-			HttpSession session) {
-		callProc.run("filesys", null, session, ms -> {
-			// disabling file reading for now.
-			// attachmentService.getFileSystemResourceStreamMultiPart(ms, nodeId,
-			// disposition, request, response);
-			return null;
-		});
-	}
+	///////////////////////////////////////////////
+	// @GetMapping("/videos/{name}/full")
+    // public ResponseEntity<UrlResource> getFullVideo(@PathVariable String name) throws MalformedURLException {
+    //     UrlResource video = new UrlResource("file:${video.location}/${name}");
+    //     return ResponseEntity.status(HttpStatus.PARTIAL_CONTENT)
+    //             .contentType(MediaTypeFactory.getMediaType(video).orElse(MediaType.APPLICATION_OCTET_STREAM))
+    //             .body(video);
+    // }
 
+	// todo-0: check 'disposition' in this and probably need to call some NON-streaming method if that's needed.
 	@RequestMapping(value = API_PATH + "/stream/{fileName}", method = RequestMethod.GET)
-	public void streamMultiPart(//
+	public ResponseEntity<ResourceRegion> streamMultiPart(//
 			@PathVariable("fileName") String fileName, //
-			@RequestParam("nodeId") String nodeId, @RequestParam(name = "disp", required = false) final String disp, //
-			HttpServletRequest request, HttpServletResponse response, //
+			@RequestParam("nodeId") String nodeId, //
+			@RequestParam(name = "disp", required = false) final String disp, //
+			@RequestHeader HttpHeaders headers, //
+			HttpServletRequest request, //
+			HttpServletResponse response, //
 			HttpSession session) {
-		callProc.run("stream", null, session, ms -> {
-			attachmentService.getStreamMultiPart(ms, nodeId, disp != null ? disp : "inline", request, response);
-			return null;
+		return (ResponseEntity<ResourceRegion>)callProc.run("stream", null, session, ms -> {
+			return attachmentService.getStreamResource(ms, headers, nodeId);
 		});
 	}
 

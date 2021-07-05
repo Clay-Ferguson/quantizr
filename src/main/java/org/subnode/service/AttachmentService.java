@@ -7,6 +7,7 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.net.URLConnection;
@@ -16,7 +17,6 @@ import java.util.Iterator;
 import javax.imageio.ImageIO;
 import javax.imageio.ImageReader;
 import javax.imageio.stream.ImageInputStream;
-import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBObject;
@@ -37,11 +37,15 @@ import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.ByteArrayResource;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.support.ResourceRegion;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.gridfs.GridFsResource;
 import org.springframework.data.mongodb.gridfs.GridFsTemplate;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpRange;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -80,7 +84,6 @@ import org.subnode.util.ImageUtil;
 import org.subnode.util.LimitedInputStream;
 import org.subnode.util.LimitedInputStreamEx;
 import org.subnode.util.MimeTypeUtils;
-import org.subnode.util.MultipartFileSender;
 import org.subnode.util.StreamUtil;
 import org.subnode.util.Util;
 import org.subnode.util.ValContainer;
@@ -269,8 +272,7 @@ public class AttachmentService {
 			} catch (final Exception ex) {
 				throw ExUtil.wrapEx(ex);
 			}
-		}
-		else {
+		} else {
 			auth.ownerAuthByThread(node);
 		}
 
@@ -665,37 +667,9 @@ public class AttachmentService {
 		}
 	}
 
-	public void getFileSystemResourceStreamMultiPart(final MongoSession session, final String nodeId, final String disposition,
-			final HttpServletRequest request, final HttpServletResponse response) {
-		try {
-			final SubNode node = read.getNode(session, nodeId, false);
-			if (node == null) {
-				throw new RuntimeEx("node not found: " + nodeId);
-			}
-
-			auth.auth(session, node, PrivilegeType.READ);
-
-			final String fullFileName = node.getStrProp(NodeProp.FS_LINK);
-			final File file = new File(fullFileName);
-
-			if (!file.exists() || !file.isFile()) {
-				throw new RuntimeEx("File not found: " + fullFileName);
-			}
-
-			MultipartFileSender.fromPath(file.toPath()).with(request).with(response).withDisposition(disposition).serveResource();
-		} catch (final Exception ex) {
-			throw ExUtil.wrapEx(ex);
-		}
-	}
-
-	/**
-	 * Returns the seekable stream of the attachment data (assuming it's a streamable media type, like
-	 * audio or video)
-	 */
-	public void getStreamMultiPart(MongoSession session, final String nodeId, final String disposition,
-			final HttpServletRequest request, final HttpServletResponse response) {
+	public Object getStreamResource(MongoSession session, HttpHeaders headers, String nodeId) {
 		BufferedInputStream inStream = null;
-
+		ResponseEntity<ResourceRegion> ret = null;
 		try {
 			session = MongoThreadLocal.ensure(session);
 
@@ -712,27 +686,52 @@ public class AttachmentService {
 				fileName = "filename";
 			}
 
-			final InputStream is = getStream(session, "", node, true);
-			final long size = node.getIntProp(NodeProp.BIN_SIZE.s());
+			long startTime = System.currentTimeMillis();
+			final InputStream is = getStream(session, "", node, false);
+
+			if (session.isAdmin() && Const.adminDebugStreaming) {
+				long duration = System.currentTimeMillis() - startTime;
+				log.debug("getStream took " + String.valueOf(duration) + "ms");
+			}
+			startTime = System.currentTimeMillis();
+
+			long size = node.getIntProp(NodeProp.BIN_SIZE.s());
 
 			if (size == 0) {
 				throw new RuntimeEx("Can't stream video without the file size. BIN_SIZE property missing");
 			}
 
 			inStream = new BufferedInputStream(is);
+			byte[] bytes = IOUtils.toByteArray(inStream);
 
-			MultipartFileSender.fromInputStream(inStream)//
-					.with(request).with(response)//
-					.withDisposition(disposition)//
-					.withFileName("file-" + node.getId().toHexString())//
-					.withLength(size)//
-					.withContentType(mimeTypeProp) //
-					.withLastModified(node.getModifyTime().getTime())//
-					.serveResource();
+			ResourceRegion region = resourceRegion(new ByteArrayResource(bytes), headers);
+			ret = ResponseEntity.status(HttpStatus.PARTIAL_CONTENT)
+								.contentType(MediaType.valueOf(mimeTypeProp))
+								.body(region);
+
 		} catch (final Exception e) {
 			log.error(e.getMessage());
 		}
+		return ret;
 	}
+
+	private ResourceRegion resourceRegion(Resource resource, HttpHeaders headers) throws IOException {
+		/* todo-1: Will a smaller chunk size be better to get the video playing sooner after first clicked, or
+		 will it do that at the cost of less overall resource effeciency? Need to research */
+        final long chunkSize = 500000L;
+        long contentLength = resource.contentLength();
+
+        HttpRange httpRange = headers.getRange().stream().findFirst().get();
+        if(httpRange != null) {
+            long start = httpRange.getRangeStart(contentLength);
+            long end = httpRange.getRangeEnd(contentLength);
+            long rangeLength = Long.min(chunkSize, end - start + 1);
+            return new ResourceRegion(resource, start, rangeLength);
+        } else {
+            long rangeLength = Long.min(chunkSize, contentLength);
+            return new ResourceRegion(resource, 0, rangeLength);
+        }
+    }
 
 	/*
 	 * Uploads an attachment not from the user's machine but from some arbitrary internet URL they have
@@ -1054,8 +1053,8 @@ public class AttachmentService {
 	 * Gets the binary data attachment stream from the node regardless of wether it's from IPFS_LINK or
 	 * BIN
 	 */
-	public InputStream getStream(final MongoSession session, String binSuffix, final SubNode node, final boolean _auth) {
-		if (_auth) {
+	public InputStream getStream(final MongoSession session, String binSuffix, final SubNode node, final boolean doAuth) {
+		if (doAuth) {
 			auth.auth(session, node, PrivilegeType.READ);
 		}
 
@@ -1073,7 +1072,8 @@ public class AttachmentService {
 	public InputStream getStreamByNode(final SubNode node, String binSuffix) {
 		if (node == null)
 			return null;
-		log.debug("getStreamByNode: " + node.getId().toHexString());
+		long startTime = System.currentTimeMillis();
+		// log.debug("getStreamByNode: " + node.getId().toHexString());
 
 		String id = node.getStrProp(NodeProp.BIN.s() + binSuffix);
 		if (id == null) {
@@ -1088,13 +1088,25 @@ public class AttachmentService {
 			return null;
 		}
 
-		final GridFsResource gridFsResource =
-				new GridFsResource(gridFile, gridFsBucket.openDownloadStream(gridFile.getObjectId()));
+		long duration = System.currentTimeMillis() - startTime;
+		log.debug("grid.foundFile in " + String.valueOf(duration) + "ms");
+		startTime = System.currentTimeMillis();
+
+		GridFsResource gridFsResource = new GridFsResource(gridFile, gridFsBucket.openDownloadStream(gridFile.getObjectId()));
+
+		duration = System.currentTimeMillis() - startTime;
+		log.debug("Created GridFsResource in " + String.valueOf(duration) + "ms");
+		startTime = System.currentTimeMillis();
+
 		try {
 			final InputStream is = gridFsResource.getInputStream();
 			if (is == null) {
 				throw new RuntimeEx("Unable to get inputStream");
 			}
+
+			duration = System.currentTimeMillis() - startTime;
+			log.debug("GridFsResource stream obtained in " + String.valueOf(duration) + "ms");
+
 			return is;
 		} catch (final Exception e) {
 			throw new RuntimeEx("unable to readStream", e);

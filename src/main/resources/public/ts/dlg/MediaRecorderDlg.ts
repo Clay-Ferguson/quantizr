@@ -308,7 +308,7 @@ export class MediaRecorderDlg extends DialogBase {
             const url = URL.createObjectURL(this.blob);
 
             if (this.videoMode) {
-                new VideoPlayerDlg(url, null, this.appState).open();
+                new VideoPlayerDlg("recorder", url, null, this.appState).open();
             }
             else {
                 new AudioPlayerDlg(null, null, null, url, 0, this.appState).open();

@@ -4,15 +4,20 @@ import { PubSub } from "../PubSub";
 import { Singletons } from "../Singletons";
 import { Comp } from "./base/Comp";
 
-let S : Singletons;
+let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
     S = ctx;
 });
 
 export class VideoPlayer extends Comp {
 
+    constructor(attrib: any) {
+        super(attrib);
+        // console.log("Created VideoPlayer Comp: ID=" + this.getId());
+    }
+
     getVideoElement(): HTMLVideoElement {
-        return <HTMLVideoElement> this.getRef();
+        return <HTMLVideoElement>this.getRef();
     }
 
     compRender(): ReactNode {

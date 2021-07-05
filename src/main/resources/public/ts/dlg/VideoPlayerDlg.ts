@@ -14,7 +14,7 @@ export class VideoPlayerDlg extends DialogBase {
 
     videoPlayer: VideoPlayer;
 
-    constructor(private sourceUrl: string, private mediaTitle: string, state: AppState) {
+    constructor(private domId: string, private sourceUrl: string, private mediaTitle: string, state: AppState) {
         super(mediaTitle || "Video", null, false, state, DialogMode.FULLSCREEN);
     }
 
@@ -25,6 +25,7 @@ export class VideoPlayerDlg extends DialogBase {
                 this.mediaTitle ? new TextContent(this.mediaTitle) : null,
                 new Div(null, { className: "fullWidth" }, [
                     this.videoPlayer = new VideoPlayer({
+                        id: this.domId + "-comp",
                         src: this.sourceUrl,
                         className: "videoPlayerElement",
                         // "ontimeupdate": () => { S.podcast.onTimeUpdate(this); },
