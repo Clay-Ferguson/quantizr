@@ -760,7 +760,7 @@ entire thing down some times, if it's jutting up against something */
 
 /* I was getting a crazy render flicker where the browser was apparently toggling scrollbar off and on 10 times per second
 it looked like and this wild ass guess at using 95% instead of 100% here as a fix solved the problem. 
-Will come back later and study this more. todo-0 */
+Will come back later and study this more. todo-1 */
 .fullWidth {
     width: 95%;
 }

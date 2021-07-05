@@ -328,7 +328,7 @@ public class ActPubUtil {
         apService.saveFediverseName(resource);
 
         return getWebFingerSec(resource, true);
-        // need to re-enable this again if we plan on doing localhost fediverse testing (todo-0:)
+        // need to re-enable this again if we plan on doing localhost fediverse testing (todo-1)
         // // For non-secure domains, they're required to have a port in their name,
         // // so this is users like bob@q1:8184 (for example), and that port is expected
         // // also to NOT be https 443 port.
