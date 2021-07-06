@@ -18,8 +18,10 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
 export class LogView extends AppTab implements LogViewIntf {
     static logs: string = "";
 
-    constructor(data: TabDataIntf) {
-        super(data);
+    constructor(state: AppState, data: TabDataIntf) {
+        super(state, data);
+        data.inst = this;
+
         Log.logView = this;
 
         // For some reason I can't get the console.log override to work.
@@ -41,10 +43,7 @@ export class LogView extends AppTab implements LogViewIntf {
     preRender(): void {
         const state: AppState = store.getState();
 
-        this.attribs.className = "tab-pane fade my-tab-pane";
-        if (state.activeTab === this.getId()) {
-            this.attribs.className += " show active";
-        }
+        this.attribs.className = this.getClass(state);
 
         this.setChildren([
             new Heading(3, "Log", { className: "logView" }),

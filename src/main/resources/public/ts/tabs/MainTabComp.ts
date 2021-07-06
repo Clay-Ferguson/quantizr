@@ -20,18 +20,16 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
 /* General Widget that doesn't fit any more reusable or specific category other than a plain Div, but inherits capability of Comp class */
 export class MainTabComp extends AppTab {
 
-    constructor(data: TabDataIntf) {
-        super(data);
+    constructor(state: AppState, data: TabDataIntf) {
+        super(state, data);
         this.attribs.key = "mainTabCompKey";
+        data.inst = this;
     }
 
     preRender(): void {
         let state: AppState = useSelector((state: AppState) => state);
 
-        this.attribs.className = "tab-pane fade my-tab-pane";
-        if (state.activeTab === this.getId()) {
-            this.attribs.className += " show active";
-        }
+        this.attribs.className = this.getClass(state);
 
         if (!state.node) {
             this.setChildren(null);

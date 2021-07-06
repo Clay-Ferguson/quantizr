@@ -22,13 +22,11 @@ export class TabPanel extends Div {
         const state: AppState = store.getState();
 
         if (state.mobileMode) {
-            this.attribs.className = "col-12 " + (state.userPreferences.editMode ? "tabPanelMobileEditMode" : "tabPanelMobile") + " normalScrollbar";
+            this.attribs.className = "col-12 tabPanelMobile";
         }
         else {
             let state: AppState = store.getState();
-            this.attribs.className = "col-" + state.mainPanelCols +
-                (state.userPreferences.editMode && state.activeTab === C.TAB_MAIN ? " tabPanelEditMode" : " tabPanel") +
-                " customScrollbar";
+            this.attribs.className = "col-" + state.mainPanelCols + " tabPanel";
         }
     }
 
@@ -53,39 +51,5 @@ export class TabPanel extends Div {
             tabs.push(tab.constructView(tab));
         }
         return tabs;
-    }
-
-    /* Note: The fact that we have the scrollbar on THIS component, means we have to manage
-     all the scroll states by 'S.meta64.activtTab' as the key to retrieve current scroll pos. It would have
-     also been possible to let EACH actual tab component do this independently, and somehow build that logic
-     into a base class of those views (todo-0: is menu panel an example of this?) */
-    reScroll = (elm: HTMLElement): void => {
-        /* Set the scroll position back to whatever it should be for the currently active tab.
-         todo-1: we have some scroll setting happening in the tab change event too
-         (do we need both this and that?) */
-        if (S.meta64.scrollPosByTabName.has(S.meta64.activeTab)) {
-            let newPos = S.meta64.scrollPosByTabName.get(S.meta64.activeTab);
-            // #DEBUG-SCROLLING
-            // console.log("scroll " + S.meta64.activeTab + " to " + newPos + " in onAddEvent");
-            elm.scrollTop = newPos;
-        }
-    }
-
-    domAddEvent(): void {
-        let elm = this.getRef();
-        this.reScroll(elm);
-
-        elm.addEventListener("scroll", () => {
-            // console.log("Scroll pos: " + S.meta64.activeTab + ": " + elm.scrollTop);
-            S.meta64.scrollPosByTabName.set(S.meta64.activeTab, elm.scrollTop);
-        }, { passive: true });
-
-        super.domAddEvent();
-    }
-
-    domPreUpdateEvent(): void {
-        let elm = this.getRef();
-        this.reScroll(elm);
-        super.domPreUpdateEvent();
     }
 }

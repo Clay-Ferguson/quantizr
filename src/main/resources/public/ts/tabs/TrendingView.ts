@@ -22,8 +22,9 @@ export class TrendingView extends AppTab {
 
     loaded: boolean = false;
 
-    constructor(data: TabDataIntf) {
-        super(data);
+    constructor(state: AppState, data: TabDataIntf) {
+        super(state, data);
+        data.inst = this;
 
         PubSub.subSingleOnce(C.PUBSUB_tabChanging, (tabName: string) => {
             // console.log("Tab Changing recieved in TrendingView: " + tabName);
@@ -56,10 +57,7 @@ export class TrendingView extends AppTab {
     preRender(): void {
         let state: AppState = useSelector((state: AppState) => state);
 
-        this.attribs.className = "tab-pane fade my-tab-pane";
-        if (state.activeTab === this.getId()) {
-            this.attribs.className += " show active";
-        }
+        this.attribs.className = this.getClass(state);
 
         let data = state.tabData.find(d => d.id === this.data.id);
         let res = data ? (data.rsInfo as TrendingRSInfo).res : null;

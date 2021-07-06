@@ -22,8 +22,6 @@ export interface Meta64Intf {
     parentIdToFocusNodeMap: Map<string, string>;
     curHighlightNodeCompRow: CompIntf;
 
-    scrollPosByTabName: Map<string, number>;
-
     draggableId: string;
     fadeStartTime: number;
 
@@ -76,9 +74,10 @@ export interface Meta64Intf {
     fullscreenViewerActive(state: AppState): boolean;
     showMyNewMessages(): void;
     showPublicFediverse(): void;
-    tabScrollTop(tabName?: string): void;
+    tabScrollTop(state: AppState, tabName?: string): void;
     loadBookmarks(): void;
     nodeIdIsVisible(node: J.NodeInfo, nodeId: string, parentPath: string, state: AppState): boolean;
     getDisplayingNode(state: AppState, nodeId: string): J.NodeInfo;
     clearLastNodeIds(): void;
+    getActiveTabComp(state: AppState): CompIntf;
 }

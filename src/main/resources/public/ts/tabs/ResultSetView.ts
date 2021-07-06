@@ -25,19 +25,15 @@ export abstract class ResultSetView extends AppTab {
     allowHeader: boolean = true;
     allowFooter: boolean = true;
 
-    constructor(data: TabDataIntf) {
-        super(data);
+    constructor(state: AppState, data: TabDataIntf) {
+        super(state, data);
     }
 
     preRender(): void {
         let state: AppState = useSelector((state: AppState) => state);
         let results = this.data && this.data.rsInfo.results;
         if (!results) return;
-        this.attribs.className = "tab-pane fade my-tab-pane";
-
-        if (state.activeTab === this.getId()) {
-            this.attribs.className += " show active";
-        }
+        this.attribs.className = this.getClass(state);
 
         let childCount = results.length;
 

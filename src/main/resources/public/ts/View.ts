@@ -183,23 +183,16 @@ export class View implements ViewIntf {
             });
         }
 
-        S.util.getElm(C.ID_TAB, (elm: HTMLElement) => {
-            elm.scrollTop = 0;
-        });
+        let activeTabComp = S.meta64.getActiveTabComp(state);
+        if (activeTabComp && activeTabComp.getRef()) {
+            activeTabComp.getRef().scrollTop = 0;
+        }
 
         if (!state.mobileMode) {
             S.util.getElm(C.ID_RHS, (elm: HTMLElement) => {
                 elm.scrollTop = 0;
             });
         }
-    }
-
-    scrollTo = (offset: number) => {
-        // #DEBUG-SCROLLING
-        // console.log("scrollTo: " + offset);
-        S.util.getElm(C.ID_TAB, (elm: HTMLElement) => {
-            elm.scrollTop = offset;
-        });
     }
 
     scrollToSelectedNode = (state: AppState): void => {

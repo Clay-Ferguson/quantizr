@@ -15,10 +15,11 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
 
 export class FollowingResultSetView<I extends FollowingRSInfo> extends ResultSetView {
 
-    constructor(data: TabDataIntf) {
-        super(data);
+    constructor(state: AppState, data: TabDataIntf) {
+        super(state, data);
         this.allowHeader = false;
         this.allowFooter = false;
+        data.inst = this;
     }
 
     pageChange(delta: number): void {

@@ -9,6 +9,10 @@ export interface TabDataIntf {
      multiple different instances of the same AppTab-derived class each one will need to have a unique id. This means
     we can in the future support multiple SearchView tabs opened simultaneously, each with a different ID of course */
     id: string;
+    scrollPos: number;
+
+    /* current instance (will change on every render potentially) */
+    inst?: CompIntf;
 
     constructView(data: TabDataIntf): CompIntf;
 

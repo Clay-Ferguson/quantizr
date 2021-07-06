@@ -17,8 +17,9 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
 
 export class FollowersResultSetView<I extends FollowersRSInfo> extends ResultSetView {
 
-    constructor(data: TabDataIntf) {
-        super(data);
+    constructor(state: AppState, data: TabDataIntf) {
+        super(state, data);
+        data.inst = this;
     }
 
     pageChange(delta: number): void {

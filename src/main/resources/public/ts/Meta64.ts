@@ -15,6 +15,7 @@ import { PubSub } from "./PubSub";
 import { ResultSetInfo } from "./ResultSetInfo";
 import { SharesRSInfo } from "./SharesRSInfo";
 import { Singletons } from "./Singletons";
+import { State } from "./State";
 import { FeedView } from "./tabs/FeedView";
 import { FollowersResultSetView } from "./tabs/FollowersResultSetView";
 import { FollowingResultSetView } from "./tabs/FollowingResultSetView";
@@ -77,10 +78,6 @@ export class Meta64 implements Meta64Intf {
     // maps the hash of an encrypted block of text to the unencrypted text, so that we never run the same
     // decryption code twice.
     decryptCache: Map<string, string> = new Map<string, string>();
-
-    /* For each tab, we keep track of it's scroll position, so that when switching to different tabs we
-    can reset each tab back to it's 'current' scroll position */
-    scrollPosByTabName: Map<string, number> = new Map<string, number>();
 
     /* Map of all URLs and the openGraph object retrieved for it */
     openGraphData: Map<string, any> = new Map<string, any>();
@@ -608,57 +605,65 @@ export class Meta64 implements Meta64Intf {
                     name: "Main",
                     id: C.TAB_MAIN,
                     isVisible: () => true,
-                    constructView: (data: TabDataIntf) => new MainTabComp(data),
-                    rsInfo: null
+                    constructView: (data: TabDataIntf) => new MainTabComp(s, data),
+                    rsInfo: null,
+                    scrollPos: 0
                 },
                 {
                     name: "Search",
                     id: C.TAB_SEARCH,
                     isVisible: () => this.resultSetHasData(C.TAB_SEARCH),
-                    constructView: (data: TabDataIntf) => new SearchResultSetView(data),
-                    rsInfo: new ResultSetInfo()
+                    constructView: (data: TabDataIntf) => new SearchResultSetView(s, data),
+                    rsInfo: new ResultSetInfo(),
+                    scrollPos: 0
                 },
                 {
                     name: "Shared Nodes",
                     id: C.TAB_SHARES,
                     isVisible: () => this.resultSetHasData(C.TAB_SHARES),
-                    constructView: (data: TabDataIntf) => new SharedNodesResultSetView<SharesRSInfo>(data),
-                    rsInfo: new SharesRSInfo()
+                    constructView: (data: TabDataIntf) => new SharedNodesResultSetView<SharesRSInfo>(s, data),
+                    rsInfo: new SharesRSInfo(),
+                    scrollPos: 0
                 },
                 {
                     name: "Timeline",
                     id: C.TAB_TIMELINE,
                     isVisible: () => this.resultSetHasData(C.TAB_TIMELINE),
-                    constructView: (data: TabDataIntf) => new TimelineResultSetView<TimelineRSInfo>(data),
-                    rsInfo: new TimelineRSInfo()
+                    constructView: (data: TabDataIntf) => new TimelineResultSetView<TimelineRSInfo>(s, data),
+                    rsInfo: new TimelineRSInfo(),
+                    scrollPos: 0
                 },
                 {
                     name: "Followers",
                     id: C.TAB_FOLLOWERS,
                     isVisible: () => this.resultSetHasData(C.TAB_FOLLOWERS),
-                    constructView: (data: TabDataIntf) => new FollowersResultSetView<FollowersRSInfo>(data),
-                    rsInfo: new FollowersRSInfo()
+                    constructView: (data: TabDataIntf) => new FollowersResultSetView<FollowersRSInfo>(s, data),
+                    rsInfo: new FollowersRSInfo(),
+                    scrollPos: 0
                 },
                 {
                     name: "Following",
                     id: C.TAB_FOLLOWING,
                     isVisible: () => this.resultSetHasData(C.TAB_FOLLOWING),
-                    constructView: (data: TabDataIntf) => new FollowingResultSetView<FollowingRSInfo>(data),
-                    rsInfo: new FollowingRSInfo()
+                    constructView: (data: TabDataIntf) => new FollowingResultSetView<FollowingRSInfo>(s, data),
+                    rsInfo: new FollowingRSInfo(),
+                    scrollPos: 0
                 },
                 {
                     name: "Fediverse",
                     id: C.TAB_FEED,
                     isVisible: () => true,
-                    constructView: (data: TabDataIntf) => new FeedView(data),
-                    rsInfo: null
+                    constructView: (data: TabDataIntf) => new FeedView(s, data),
+                    rsInfo: null,
+                    scrollPos: 0
                 },
                 {
                     name: "Trending",
                     id: C.TAB_TRENDING,
                     isVisible: () => true,
-                    constructView: (data: TabDataIntf) => new TrendingView(data),
-                    rsInfo: new TrendingRSInfo()
+                    constructView: (data: TabDataIntf) => new TrendingView(s, data),
+                    rsInfo: new TrendingRSInfo(),
+                    scrollPos: 0
                 }
 
                 // this is throwing a react error, but I'm not need to fix it yet.
@@ -684,8 +689,17 @@ export class Meta64 implements Meta64Intf {
         return data && data.rsInfo && data.rsInfo.results && data.rsInfo.results.length > 0;
     }
 
-    tabScrollTop = (tabName: string) => {
-        S.meta64.scrollPosByTabName.set(tabName || S.meta64.activeTab, 0);
+    getActiveTabComp = (state: AppState): CompIntf => {
+        if (!state.tabData) return null;
+        let data = state.tabData.find(d => d.id === state.activeTab);
+        return data ? data.inst : null;
+    }
+
+    tabScrollTop = (state: AppState, tabName: string) => {
+        let data = state.tabData.find(d => d.id === tabName);
+        if (data) {
+            data.scrollPos = 0;
+        }
     }
 
     /* This function manages persisting the scroll position when switching
@@ -699,16 +713,6 @@ export class Meta64 implements Meta64Intf {
         }
 
         // console.log("Changing from tab: " + prevTab + " to " + newTab);
-        if (newTab) {
-            if (this.scrollPosByTabName.has(newTab)) {
-                let newPos = this.scrollPosByTabName.get(newTab);
-
-                PubSub.subSingleOnce(C.PUBSUB_mainWindowScroll, () => {
-                    // console.log("Restoring tab " + newTab + " to " + newPos);
-                    S.view.scrollTo(newPos);
-                });
-            }
-        }
 
         PubSub.pub(C.PUBSUB_tabChanging, newTab);
     }

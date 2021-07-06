@@ -155,7 +155,7 @@ export class RssTypeHandler extends TypeBase {
                 }
                 else {
                     dispatch("Action_RSSUpdated", (s: AppState): AppState => {
-                        S.meta64.tabScrollTop(C.TAB_MAIN);
+                        S.meta64.tabScrollTop(s, C.TAB_MAIN);
                         if (!feed.items || feed.items.length === 0) {
                             s.feedCache[feedSrcHash] = RssTypeHandler.lastGoodFeed;
                             s.feedPage[feedSrcHash] = RssTypeHandler.lastGoodPage;

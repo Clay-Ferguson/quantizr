@@ -296,7 +296,7 @@ export class Nav implements NavIntf {
     }
 
     navHome = (state: AppState = null): void => {
-        S.meta64.scrollPosByTabName.set(C.TAB_MAIN, 0);
+        S.view.scrollAllTop(state);
 
         state = appState(state);
         // console.log("navHome()");

@@ -46,8 +46,9 @@ export class FeedView extends AppTab {
     static refreshCounter: number = 0;
     static helpExpanded: boolean = false;
 
-    constructor(data: TabDataIntf) {
-        super(data);
+    constructor(state: AppState, data: TabDataIntf) {
+        super(state, data);
+        data.inst = this;
     }
 
     preRender(): void {
@@ -58,10 +59,7 @@ export class FeedView extends AppTab {
             return;
         }
 
-        this.attribs.className = "tab-pane fade my-tab-pane";
-        if (state.activeTab === this.getId()) {
-            this.attribs.className += " show active";
-        }
+        this.attribs.className = this.getClass(state);
 
         /*
          * Number of rows that have actually made it onto the page to far. Note: some nodes get filtered out on the
