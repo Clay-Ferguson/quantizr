@@ -27,10 +27,21 @@ public class MongoThreadLocal {
 
 	private static int MAX_CACHE_SIZE = 50;
 
+	/*
+	 * todo-2: This is to allow our ExportJsonService.resetNode importer to work. This
+	 * is importing nodes that should be all self contained as an acyclical-directed graph (i.e. tree)
+	 * and there's no risk of nodes without parents, but they MAY be out of order so that the children
+	 * of some nodes may appear in the JSON being imported BEFORE their parents (which would cause the
+	 * parent check to fail, up until the full node graph has been imported), and so I'm creating this
+	 * hack to globally disable the check during the import only.
+	 */
+	private static final ThreadLocal<Boolean> parentCheckEnabled = new ThreadLocal<Boolean>();
+
 	public static void removeAll() {
 		getDirtyNodes().clear();
 		getCachedNodes().clear();
 		setWritesDisabled(false);
+		setParentCheckEnabled(true);
 		session.remove();
 	}
 
@@ -42,6 +53,16 @@ public class MongoThreadLocal {
 		if (writesDisabled.get() == null)
 			return false;
 		return writesDisabled.get();
+	}
+
+	public static void setParentCheckEnabled(Boolean val) {
+		parentCheckEnabled.set(val);
+	}
+
+	public static Boolean getParentCheckEnabled() {
+		if (parentCheckEnabled.get() == null)
+			return false;
+		return parentCheckEnabled.get();
 	}
 
 	public static void clearDirtyNodes() {

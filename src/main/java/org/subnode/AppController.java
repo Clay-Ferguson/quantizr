@@ -681,8 +681,6 @@ public class AppController implements ErrorController {
 			 * users just clicking things like the War and Peace book and trying to export that.
 			 */
 			arun.run(mongoSession -> {
-				// we don't check ownership of node at this time, but merely check sanity of
-				// whether this ID is even existing or not.
 				SubNode node = read.getNode(mongoSession, req.getNodeId());
 				if (node == null)
 					throw new RuntimeException("Node not found: " + req.getNodeId());

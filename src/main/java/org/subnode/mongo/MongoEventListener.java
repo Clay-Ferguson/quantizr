@@ -39,16 +39,6 @@ public class MongoEventListener extends AbstractMongoEventListener<SubNode> {
 	@Autowired
 	private ActPubService actPub;
 
-	/*
-	 * todo-2: This is a temporary hack to allow our ExportJsonService.resetNode importer to work. This
-	 * is importing nodes that should be all self contained as a directed graph and there's no risk of
-	 * nodes without parents, but they MAY be out of order so that the children of some nodes may appear
-	 * in the JSON being imported BEFORE their parents (which would cause the parent check to fail, up
-	 * until the full node graph has been imported), and so I'm creating this hack to globally disable
-	 * the check during the import only.
-	 */
-	public static boolean parentCheckEnabled = true;
-
 	/**
 	 * What we are doing in this method is assigning the ObjectId ourselves, because our path must
 	 * include this id at the very end, since the path itself must be unique. So we assign this prior to
@@ -77,7 +67,7 @@ public class MongoEventListener extends AbstractMongoEventListener<SubNode> {
 		}
 		dbObj.put(SubNode.FIELD_ID, id);
 
-		// Force ordinal to have an integer value (non-null). How to do 
+		// Force ordinal to have an integer value (non-null). How to do
 		// "constraints" in MongoDB (todo-1)
 		if (node.getOrdinal() == null) {
 			node.setOrdinal(0L);
@@ -115,7 +105,7 @@ public class MongoEventListener extends AbstractMongoEventListener<SubNode> {
 			}
 		}
 
-		if (parentCheckEnabled) {
+		if (MongoThreadLocal.getParentCheckEnabled()) {
 			read.checkParentExists(null, node);
 		}
 

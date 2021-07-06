@@ -23,6 +23,7 @@ import org.subnode.config.AppProp;
 import org.subnode.config.SpringContextUtil;
 import org.subnode.model.client.NodeProp;
 import org.subnode.mongo.MongoSession;
+import org.subnode.mongo.MongoThreadLocal;
 import org.subnode.mongo.MongoUpdate;
 import org.subnode.mongo.MongoUtil;
 import org.subnode.mongo.model.SubNode;
@@ -196,8 +197,7 @@ public class ExportJsonService {
 	 */
 	public String resetNode(MongoSession session, String subFolder) {
 		try {
-			// todo-0: disabling this. Need a different solution (maybe just an in-ram check ?)
-			// MongoEventListener.parentCheckEnabled = false;
+			MongoThreadLocal.setParentCheckEnabled(false);
 
 			String resourceName = "classpath:/nodes/" + subFolder + "/" + subFolder + ".json";
 			Resource resource = SpringContextUtil.getApplicationContext().getResource(resourceName);
@@ -230,9 +230,7 @@ public class ExportJsonService {
 					}
 				}
 			} finally {
-				// see note above.
-				// MongoEventListener.parentCheckEnabled = true;
-				
+				MongoThreadLocal.setParentCheckEnabled(true);		
 				StreamUtil.close(in);
 			}
 			log.debug("import successful.");

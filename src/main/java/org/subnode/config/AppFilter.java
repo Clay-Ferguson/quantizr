@@ -71,6 +71,9 @@ public class AppFilter extends GenericFilterBean {
 		}
 
 		try {
+			ThreadLocals.removeAll();
+			MongoThreadLocal.removeAll();
+			
 			int thisReqId = ++reqId;
 			String ip = null;
 
