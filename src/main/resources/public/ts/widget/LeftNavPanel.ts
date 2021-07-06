@@ -18,6 +18,8 @@ declare var g_brandingAppName;
 
 export class LeftNavPanel extends Div {
 
+    private static scrollPos: number = 0;
+
     constructor() {
         super(null, { id: C.ID_LHS, tabIndex: "-1" });
         this.domAddEvent = this.domAddEvent.bind(this);
@@ -55,6 +57,27 @@ export class LeftNavPanel extends Div {
             ]),
             new MenuPanel(state)
         ]);
+    }
+
+    reScroll = (elm: HTMLElement): void => {
+        elm.scrollTop = LeftNavPanel.scrollPos;
+    }
+
+    domAddEvent(): void {
+        let elm = this.getRef();
+        this.reScroll(elm);
+
+        elm.addEventListener("scroll", () => {
+            LeftNavPanel.scrollPos = elm.scrollTop;
+        }, { passive: true });
+
+        super.domAddEvent();
+    }
+
+    domPreUpdateEvent(): void {
+        let elm = this.getRef();
+        this.reScroll(elm);
+        super.domPreUpdateEvent();
     }
 
     // This was originally on the toolbar at top of page but if we bring this back it will be here (probably)

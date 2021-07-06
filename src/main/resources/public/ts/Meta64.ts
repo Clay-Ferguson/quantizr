@@ -40,7 +40,6 @@ export class Meta64 implements Meta64Intf {
     hiddenRenderingEnabled: boolean = true;
     noScrollToId: string = null;
     activeTab: string;
-    lastScrollTime: number = 0;
 
     newNodeTargetId: string;
     newNodeTargetOffset: number;

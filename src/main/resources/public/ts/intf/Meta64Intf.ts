@@ -15,7 +15,6 @@ export interface Meta64Intf {
     deviceWidth: number;
     deviceHeight: number;
     activeTab: string;
-    lastScrollTime: number;
 
     newNodeTargetId: string;
     newNodeTargetOffset: number;

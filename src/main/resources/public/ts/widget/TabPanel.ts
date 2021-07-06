@@ -55,6 +55,10 @@ export class TabPanel extends Div {
         return tabs;
     }
 
+    /* Note: The fact that we have the scrollbar on THIS component, means we have to manage
+     all the scroll states by 'S.meta64.activtTab' as the key to retrieve current scroll pos. It would have
+     also been possible to let EACH actual tab component do this independently, and somehow build that logic
+     into a base class of those views (todo-0: is menu panel an example of this?) */
     reScroll = (elm: HTMLElement): void => {
         /* Set the scroll position back to whatever it should be for the currently active tab.
          todo-1: we have some scroll setting happening in the tab change event too
@@ -73,7 +77,6 @@ export class TabPanel extends Div {
 
         elm.addEventListener("scroll", () => {
             // console.log("Scroll pos: " + S.meta64.activeTab + ": " + elm.scrollTop);
-            S.meta64.lastScrollTime = new Date().getTime();
             S.meta64.scrollPosByTabName.set(S.meta64.activeTab, elm.scrollTop);
         }, { passive: true });
 
