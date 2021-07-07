@@ -19,34 +19,36 @@ export class IconButton extends Comp {
 
     compRender(): ReactNode {
         let state = this.getState();
-        let _style = { display: (state.visible && !state.disabled ? "" : "none") };
-        let _attribs = { ...this.attribs, ...{ style: _style } };
+        this.attribs.style = { display: (state.visible && !state.disabled ? "" : "none") };
 
-        let toggleClass = "";
+        let iconClazz: string = "fa fa-lg " + this.iconClass;
         if (this.toggle === "on") {
-            toggleClass = " iconToggleOn";
+            iconClazz += " iconToggleOn";
         }
         else if (this.toggle === "off") {
-            toggleClass = " iconToggleOff";
+            iconClazz += " iconToggleOff";
         }
 
-        let buttonChildren = [];
+        let children = [];
         if (this.imageUrl) {
-            buttonChildren.push(this.e("img", {
+            children.push(this.e("img", {
                 key: "s_img_" + this.getId(),
                 src: this.imageUrl
             }));
         }
 
-        buttonChildren.push(this.e("i", {
+        children.push(this.e("i", {
             key: "i_" + this.getId(),
-            // note: adding fa-lg into here makes the icon AND font noticeably larger.
-            className: "fa " + this.iconClass + toggleClass
-        }, [this.e("span", {
-            key: "s_txt_" + this.getId(),
-            className: "button-font"
-        }, this.text === null ? null : " " + this.text)], true));
+            className: iconClazz
+        }));
 
-        return this.e("button", _attribs, buttonChildren);
+        if (this.text) {
+            children.push(
+                this.e("span", {
+                    key: "s_txt_" + this.getId(),
+                    className: "icon-button-font"
+                }, this.text));
+        }
+        return this.e("button", this.attribs, children);
     }
 }
