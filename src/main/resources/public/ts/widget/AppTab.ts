@@ -14,9 +14,11 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
 export class AppTab extends Div {
     data: TabDataIntf;
 
-    constructor(state: AppState, data: TabDataIntf) {
+    constructor(state: AppState, data: TabDataIntf, private extraEditModeClass: string = null) {
         super(null, {
-            id: data.id
+            id: data.id,
+            // tabIndex is required or else scrolling by arrow keys breaks.
+            tabIndex: "-1"
         });
         this.data = data;
     }
@@ -24,7 +26,7 @@ export class AppTab extends Div {
     getClass = (state: AppState): string => {
         let className = "tab-pane fade" +
             (state.mobileMode ? " my-tab-pane-mobile" : " my-tab-pane customScrollbar") +
-            (state.userPreferences.editMode ? " my-tab-pane-editmode" : "");
+            (state.userPreferences.editMode && this.extraEditModeClass ? (" " + this.extraEditModeClass) /* " my-tab-pane-editmode" */ : "");
 
         if (state.activeTab === this.getId()) {
             className += " show active";

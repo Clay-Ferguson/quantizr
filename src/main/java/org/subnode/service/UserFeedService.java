@@ -284,7 +284,8 @@ public class UserFeedService {
 		 * Users can manually add a property named "unpublish" to have a "public" node that nonetheles
 		 * doesn't show up in any feeds, but in the future maybe we will make this a checkbox on the editor.
 		 */
-		criteria = criteria.and(SubNode.FIELD_PROPERTIES + "." + NodeProp.UNPUBLISHED + ".value").is(null);
+		// disabling. I don't want to sacrifice any performance for this (yet)
+		// criteria = criteria.and(SubNode.FIELD_PROPERTIES + "." + NodeProp.UNPUBLISHED + ".value").is(null);
 
 		List<ObjectId> blockedUserIds = getBlockedUserIds();
 		if (blockedUserIds != null && blockedUserIds.size() > 0) {

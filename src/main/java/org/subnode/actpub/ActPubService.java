@@ -1006,7 +1006,7 @@ public class ActPubService {
                  * This is killing performance of the app so let's throttle it way back. Not sure if it's Disk or
                  * network I/O that's the problem but either way let's not read these so fast
                  */
-                Thread.sleep(500);
+                Thread.sleep(5000);
 
                 // flag as done (even if it fails we still want it flagged as done. no retries will be done).
                 apCache.usersPendingRefresh.put(userName, true);

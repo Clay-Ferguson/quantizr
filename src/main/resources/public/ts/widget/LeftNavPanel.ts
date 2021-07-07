@@ -21,7 +21,11 @@ export class LeftNavPanel extends Div {
     private static scrollPos: number = 0;
 
     constructor() {
-        super(null, { id: C.ID_LHS, tabIndex: "-1" });
+        super(null, {
+            id: C.ID_LHS,
+            // tabIndex is required or else scrolling by arrow keys breaks.
+            tabIndex: "-1"
+        });
         this.domAddEvent = this.domAddEvent.bind(this);
         let state: AppState = store.getState();
         let delta = state.mainPanelCols === 4 ? 1 : 0;

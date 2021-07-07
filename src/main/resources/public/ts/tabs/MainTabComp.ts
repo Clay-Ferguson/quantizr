@@ -21,7 +21,7 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
 export class MainTabComp extends AppTab {
 
     constructor(state: AppState, data: TabDataIntf) {
-        super(state, data);
+        super(state, data, "my-tab-pane-editmode");
         this.attribs.key = "mainTabCompKey";
         data.inst = this;
     }

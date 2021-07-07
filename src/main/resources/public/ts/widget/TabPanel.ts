@@ -16,7 +16,7 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (s: Singletons) => {
 export class TabPanel extends Div {
 
     constructor(private customTopComp: CompIntf = null) {
-        super(null, { id: C.ID_TAB, tabIndex: "-1" });
+        super(null, { id: C.ID_TAB });
         this.domAddEvent = this.domAddEvent.bind(this);
         this.domPreUpdateEvent = this.domPreUpdateEvent.bind(this);
         const state: AppState = store.getState();

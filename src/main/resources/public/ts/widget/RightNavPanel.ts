@@ -21,7 +21,11 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
 export class RightNavPanel extends Div {
 
     constructor() {
-        super(null, { id: C.ID_RHS, tabIndex: "-1" });
+        super(null, {
+            id: C.ID_RHS,
+            // tabIndex is required or else scrolling by arrow keys breaks.
+            tabIndex: "-1"
+        });
         let state: AppState = store.getState();
         let delta = state.mainPanelCols === 4 ? -1 : 0;
         let cols = 12 - Constants.leftNavPanelCols - state.mainPanelCols + delta;
