@@ -157,7 +157,7 @@ export class OpenGraphPanel extends Div {
                     new Div(null, { className: "openGraphRhs" }, [
                         new Div(desc)
                     ])
-                ])
+                ], "displayTableNoSpacing")
                 // if no image just display the description in a div
                 : new Div(null, { className: "openGraphNoImage" }, [
                     new Div(desc)
