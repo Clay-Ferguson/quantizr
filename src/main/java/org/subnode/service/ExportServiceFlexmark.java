@@ -3,6 +3,8 @@ package org.subnode.service;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
@@ -71,9 +73,8 @@ public class ExportServiceFlexmark {
 	private List<ExportIpfsFile> files = new LinkedList<>();
 
 	/*
-	 * Exports the node specified in the req. If the node specified is "/", or the
-	 * repository root, then we don't expect a filename, because we will generate a
-	 * timestamped one.
+	 * Exports the node specified in the req. If the node specified is "/", or the repository root, then
+	 * we don't expect a filename, because we will generate a timestamped one.
 	 * 
 	 * Format can be 'html' or 'pdf'
 	 */
@@ -160,9 +161,9 @@ public class ExportServiceFlexmark {
 				out = new FileOutputStream(new File(fullFileName));
 
 				/*
-				 * todo-1: we're writing to a physical file here EVEN when all we need it for is
-				 * to put out on IPFS. This can be improved to not need the physica file but do
-				 * it either all as streams or in byte array.
+				 * todo-1: we're writing to a physical file here EVEN when all we need it for is to put out on IPFS.
+				 * This can be improved to not need the physica file but do it either all as streams or in byte
+				 * array.
 				 */
 				PdfConverterExtension.exportToPdf(out, html, "", options);
 				wroteFile = true;
@@ -210,20 +211,17 @@ public class ExportServiceFlexmark {
 		rootDir = ipfs.addFileToDagRoot(rootDir.getHash(), "index.html", index.getHash());
 
 		/*
-		 * Next we add all the 'image' attachments that the HTML can point to (currently
-		 * only supports other IPFS-type uploads (images stored on ipfs already))
+		 * Next we add all the 'image' attachments that the HTML can point to (currently only supports other
+		 * IPFS-type uploads (images stored on ipfs already))
 		 * 
-		 * This will make images work inside this DAG file using no path so an image
-		 * file named 'my-image.jpg' will work in an html IMG tag with just
-		 * src='my-image.jpg'.
+		 * This will make images work inside this DAG file using no path so an image file named
+		 * 'my-image.jpg' will work in an html IMG tag with just src='my-image.jpg'.
 		 * 
-		 * However the tricky part is that since Quanta doesn't yet have a reverse proxy
-		 * and a way for 'end users' to directly access it's IPFS gateway we embed the
-		 * actual CID onto the end of the 'src' as a param like this:
-		 * src='my-image.jpg?cid=Qm123456...', so the Quanta server is able to use
-		 * queries like that and grab the correct data to return based on the 'cid='
-		 * arg, where as the rest of the IPFS internet gateways will hopefully ignore
-		 * that unknown parameter.
+		 * However the tricky part is that since Quanta doesn't yet have a reverse proxy and a way for 'end
+		 * users' to directly access it's IPFS gateway we embed the actual CID onto the end of the 'src' as
+		 * a param like this: src='my-image.jpg?cid=Qm123456...', so the Quanta server is able to use
+		 * queries like that and grab the correct data to return based on the 'cid=' arg, where as the rest
+		 * of the IPFS internet gateways will hopefully ignore that unknown parameter.
 		 */
 		for (ExportIpfsFile file : files) {
 			// todo-1: is there a way to add multiple files to a DAG all at once? Post this
@@ -287,39 +285,36 @@ public class ExportServiceFlexmark {
 				src = fileName + "?cid=" + cid;
 			}
 			/*
-			 * if this is already an IPFS linked thing, assume we're gonna have it's name
-			 * added in the DAG and so reference it in src
+			 * if this is already an IPFS linked thing, assume we're gonna have it's name added in the DAG and
+			 * so reference it in src
 			 */
 			else if (ipfsLink != null && fileName != null) {
 				// log.debug("Found IPFS file: " + fileName);
 				files.add(new ExportIpfsFile(ipfsLink, fileName, mime));
 
 				/*
-				 * NOTE: Since Quanta doesn't run a reverse proxy currently and doesn't have
-				 * it's IPFS gateway open to the internet we have to use this trick if sticking
-				 * on the cid parameter so that our AppController.getBinary function (which will
-				 * be called when the user references the resuorce) can use that instead of the
-				 * relative path to locate the file.
+				 * NOTE: Since Quanta doesn't run a reverse proxy currently and doesn't have it's IPFS gateway open
+				 * to the internet we have to use this trick if sticking on the cid parameter so that our
+				 * AppController.getBinary function (which will be called when the user references the resuorce) can
+				 * use that instead of the relative path to locate the file.
 				 * 
-				 * When normal other IPFS gateways are opening this content they'll reference
-				 * the actual 'fileName' and it will work because we do DAG-link that file into
-				 * the root CID DAG entry for this export!
+				 * When normal other IPFS gateways are opening this content they'll reference the actual 'fileName'
+				 * and it will work because we do DAG-link that file into the root CID DAG entry for this export!
 				 */
 				src = fileName + "?cid=" + ipfsLink;
 			}
 		}
 		/*
-		 * NOTE: When exporting to PDF (wither with or without IPFS export option) we
-		 * have to generate this kind of reference to the image resource, because
-		 * ultimately the Flexmark code that converts the HTML to the PDF will be
-		 * calling this image url to extract out the actual image data to embed directly
-		 * into the PDF file so also in this case it doesn't matter if the PDF is going
-		 * to be eventually put out on IPFS or simply provided to the user as a
-		 * downloadable link.
+		 * NOTE: When exporting to PDF (wither with or without IPFS export option) we have to generate this
+		 * kind of reference to the image resource, because ultimately the Flexmark code that converts the
+		 * HTML to the PDF will be calling this image url to extract out the actual image data to embed
+		 * directly into the PDF file so also in this case it doesn't matter if the PDF is going to be
+		 * eventually put out on IPFS or simply provided to the user as a downloadable link.
 		 */
 		else {
-			src = appProp.getHostAndPort() + "/mobile/api/bin/" + bin + "?nodeId=" + node.getId().toHexString()
-					+ "&token=" + ThreadLocals.getSessionContext().getUserToken();
+			String path = "/mobile/api/bin/" + bin + "?nodeId=" + node.getId().toHexString() + "&token="
+					+ URLEncoder.encode(ThreadLocals.getSessionContext().getUserToken(), StandardCharsets.UTF_8);
+			src = appProp.getHostAndPort() + path;
 		}
 
 		if (src == null)
