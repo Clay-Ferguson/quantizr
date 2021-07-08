@@ -73,8 +73,9 @@ export class MediaRecorderDlg extends DialogBase {
             try {
                 let audioInputOptions = [];
                 let videoInputOptions = [];
-                let audioInput = null;
-                let videoInput = null;
+
+                let audioInput: string = await S.localDB.getVal(C.LOCALDB_AUDIO_SOURCE);
+                let videoInput: string = await S.localDB.getVal(C.LOCALDB_VIDEO_SOURCE);
 
                 let devices: MediaDeviceInfo[] = await navigator.mediaDevices.enumerateDevices();
 
@@ -83,6 +84,7 @@ export class MediaRecorderDlg extends DialogBase {
                         // take the first one here
                         if (!audioInput) {
                             audioInput = device.deviceId;
+                            S.localDB.setVal(C.LOCALDB_AUDIO_SOURCE, audioInput, this.appState.userName);
                         }
 
                         // add to data for dropdown
@@ -93,6 +95,7 @@ export class MediaRecorderDlg extends DialogBase {
                         // take the first one here
                         if (!videoInput) {
                             videoInput = device.deviceId;
+                            S.localDB.setVal(C.LOCALDB_VIDEO_SOURCE, videoInput, this.appState.userName);
                         }
 
                         // add to data for dropdown
@@ -153,6 +156,7 @@ export class MediaRecorderDlg extends DialogBase {
 
         let audioSelect = new Selection(null, "Audio", state.audioInputOptions, "mediaStreamInputOption", "", {
             setValue: (val: string): void => {
+                S.localDB.setVal(C.LOCALDB_AUDIO_SOURCE, val, this.appState.userName);
                 this.mergeState({ audioInput: val });
                 setTimeout(() => {
                     this.resetStream();
@@ -167,6 +171,7 @@ export class MediaRecorderDlg extends DialogBase {
         if (this.videoMode) {
             videoSelect = new Selection(null, "Video", state.videoInputOptions, "mediaStreamInputOption", "", {
                 setValue: (val: string): void => {
+                    S.localDB.setVal(C.LOCALDB_VIDEO_SOURCE, val, this.appState.userName);
                     this.mergeState({ videoInput: val });
 
                     setTimeout(() => {
