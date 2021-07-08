@@ -2,16 +2,14 @@ package org.subnode.util;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.time.Instant;
+import java.time.OffsetDateTime;
 import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
-import java.time.temporal.TemporalAccessor;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Locale;
-
 import org.apache.commons.lang3.StringUtils;
 import org.subnode.exception.base.RuntimeEx;
 
@@ -218,18 +216,8 @@ public class DateUtil {
 
 	// This is from a trustworthy-looking StackOverflow article, but untested by me.
 	public static Date parseISOTime(String s) {
-		// if you know the input is UTC:
-		// java.util.Date date = Date.from( Instant.parse( "2014-12-12T10:39:40Z" ));
-
-		// These two from stack overflow were my original 'find'
-		// OffsetDateTime odt = OffsetDateTime.parse(timeStr);
-		// return Date.from(odt.toInstant());
-
-		// But this also came from StackOverflow...
-		TemporalAccessor ta = DateTimeFormatter.ISO_INSTANT.parse(s);
-		Instant i = Instant.from(ta);
-		Date d = Date.from(i);
-		return d;
+		OffsetDateTime odt = OffsetDateTime.parse(s);
+		return Date.from(odt.toInstant());
 	}
 
 	public static long getMillisFromDuration(String durationStr) {
