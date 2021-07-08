@@ -255,7 +255,7 @@ export abstract class DialogBase<S extends BaseCompState = any> extends Div<S> i
         page size before scrolling. This scrolling makes the dialog buttons always stay visible and not themselves scroll */
         if (this.internalScrolling) {
             const style = {
-                maxHeight: "" + (S.meta64.deviceHeight - 50) + "px"
+                maxHeight: "" + (window.innerHeight - 50) + "px"
             };
             contentAttribs = {
                 className: "dialogContentArea",

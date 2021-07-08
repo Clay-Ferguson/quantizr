@@ -1,7 +1,9 @@
+import { AppState } from "../AppState";
 import { Constants as C } from "../Constants";
 import { PubSub } from "../PubSub";
 import { Singletons } from "../Singletons";
 import { Anchor } from "../widget/Anchor";
+import { CompIntf } from "../widget/base/CompIntf";
 import { Div } from "../widget/Div";
 import { HorizontalLayout } from "../widget/HorizontalLayout";
 import { Icon } from "../widget/Icon";
@@ -16,7 +18,7 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
 export class OpenGraphPanel extends Div {
     loading: boolean;
 
-    constructor(key: string, private url: string) {
+    constructor(private appState: AppState, key: string, private url: string) {
         super(null, {
             title: url,
             key
@@ -124,7 +126,7 @@ export class OpenGraphPanel extends Div {
             o.ogUrl = this.url;
         }
 
-        let bookmarkIcon = o.ogUrl && !state.isAnonUser ? new Icon({
+        let bookmarkIcon = o.ogUrl && !this.appState.isAnonUser ? new Icon({
             className: "fa fa-bookmark fa-lg ogBookmarkIcon float-right",
             title: "Bookmark this RSS entry",
             onClick: () => {
@@ -136,18 +138,21 @@ export class OpenGraphPanel extends Div {
             desc = desc.substring(0, 800) + "...";
         }
 
-        this.attribs.className = "openGraphPanel";
-        this.setChildren([
-            bookmarkIcon,
-            o.ogUrl ? new Anchor(o.ogUrl, title, {
-                target: "_blank",
-                className: "openGraphTitle"
-            }) : new Div(title, {
-                className: "openGraphTitle"
-            }),
-            image?.url
+        let imgAndDesc: CompIntf = null;
+        if (image?.url) {
+            // if mobile portrait mode render image above (not beside) description
+            if (this.appState.mobileMode && window.innerWidth < window.innerHeight) {
+                imgAndDesc = new Div(null, null, [
+                    new Img(null, {
+                        className: "openGraphImageVert",
+                        src: image.url
+                    }),
+                    new Div(desc)
+                ]);
+            }
+            else {
                 // if we have an image then render a left-hand side and right-hand side.
-                ? new HorizontalLayout([
+                imgAndDesc = new HorizontalLayout([
                     new Div(null, { className: "openGraphLhs" }, [
                         new Img(null, {
                             className: "openGraphImage",
@@ -157,11 +162,26 @@ export class OpenGraphPanel extends Div {
                     new Div(null, { className: "openGraphRhs" }, [
                         new Div(desc)
                     ])
-                ], "displayTableNoSpacing")
-                // if no image just display the description in a div
-                : new Div(null, { className: "openGraphNoImage" }, [
-                    new Div(desc)
-                ])
+                ], "displayTableNoSpacing");
+            }
+        }
+        // if no image just display the description in a div
+        else {
+            imgAndDesc = new Div(null, { className: "openGraphNoImage" }, [
+                new Div(desc)
+            ]);
+        }
+
+        this.attribs.className = "openGraphPanel";
+        this.setChildren([
+            bookmarkIcon,
+            o.ogUrl ? new Anchor(o.ogUrl, title, {
+                target: "_blank",
+                className: "openGraphTitle"
+            }) : new Div(title, {
+                className: "openGraphTitle"
+            }),
+            imgAndDesc
         ]);
     }
 }

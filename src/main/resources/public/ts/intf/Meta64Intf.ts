@@ -12,8 +12,6 @@ export interface Meta64Intf {
     noScrollToId: string;
     appInitialized: boolean;
     curUrlPath: string;
-    deviceWidth: number;
-    deviceHeight: number;
     activeTab: string;
 
     newNodeTargetId: string;

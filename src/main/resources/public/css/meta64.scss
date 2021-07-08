@@ -1966,6 +1966,14 @@ audio::-webkit-media-controls-play-button {
     margin-top: 8px;
 }
 
+.openGraphImageVert {
+    border: 1px solid $nodeBorderBottomColor;
+    border-radius: $border-radius;
+    width: 50%;
+    margin-top: 8px;
+    margin-bottom: 10px;
+}
+
 .openGraphNoImage {
     margin-top: 8px;
     margin-right: 8px;

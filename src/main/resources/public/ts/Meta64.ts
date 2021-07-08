@@ -49,9 +49,6 @@ export class Meta64 implements Meta64Intf {
     appInitialized: boolean = false;
     curUrlPath: string = window.location.pathname + window.location.search;
 
-    /* screen capabilities */
-    deviceWidth: number = 0;
-    deviceHeight: number = 0;
     parentIdToFocusNodeMap: Map<string, string> = new Map<string, string>();
     curHighlightNodeCompRow: CompIntf = null;
 
@@ -516,17 +513,19 @@ export class Meta64 implements Meta64Intf {
             this.displaySignupMessage();
 
             window.addEventListener("orientationchange", () => {
+                // we force the page to re-render with an all new state.
                 dispatch("Action_orientationChange", (s: AppState): AppState => {
                     return s;
                 });
             });
 
-            window.addEventListener("resize", () => {
-                this.deviceWidth = window.innerWidth;
-                this.deviceHeight = window.innerHeight;
-            });
+            // not used. do not delete.
+            // window.addEventListener("resize", () => {
+            //     deviceWidth = window.innerWidth;
+            //     deviceHeight = window.innerHeight;
+            // });
 
-            // This works, but is not needed.
+            // This works, but is not needed. do not delete.
             // window.addEventListener("hashchange", function () {
             //     console.log("The hash has changed: hash=" + location.hash);
             // }, false);
@@ -535,12 +534,10 @@ export class Meta64 implements Meta64Intf {
 
             // todo-2: actually this is a nuisance unless user is actually EDITING a node right now
             // so until i make it able to detect if user is editing i'm removing this.
+            // do not delete.
             // window.onbeforeunload = () => {
             //     return "Leave [appName] ?";
             // };
-
-            this.deviceWidth = window.innerWidth;
-            this.deviceHeight = window.innerHeight;
 
             // This is the root react App component that contains the entire application
             this.app = new App(); // new AppDemo
