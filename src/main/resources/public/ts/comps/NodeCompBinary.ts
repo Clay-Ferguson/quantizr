@@ -4,6 +4,7 @@ import { AppState } from "../AppState";
 import { Constants as C } from "../Constants";
 import { AudioPlayerDlg } from "../dlg/AudioPlayerDlg";
 import { VideoPlayerDlg } from "../dlg/VideoPlayerDlg";
+import { DialogMode } from "../enums/DialogMode";
 import * as J from "../JavaIntf";
 import { PubSub } from "../PubSub";
 import { Singletons } from "../Singletons";
@@ -107,7 +108,7 @@ export class NodeCompBinary extends Div {
             this.setChildren([new HorizontalLayout([
                 new IconButton("fa-play", "Play Video", {
                     onClick: () => {
-                        new VideoPlayerDlg("vidPlayer-" + node.id, S.render.getStreamUrlForNodeAttachment(node), null, state).open();
+                        new VideoPlayerDlg("vidPlayer-" + node.id, S.render.getStreamUrlForNodeAttachment(node), null, DialogMode.FULLSCREEN, state).open();
                     }
                 }, "btn-primary"),
                 new Span("", {

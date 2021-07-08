@@ -744,12 +744,12 @@ entire thing down some times, if it's jutting up against something */
 it looked like and this wild ass guess at using 95% instead of 100% here as a fix solved the problem. 
 Will come back later and study this more. todo-1 */
 .fullWidth {
-    width: 95%;
+    width: 90%;
 }
 
 .videoPlayerElement {
     display: block;
-    width: 85%;
+    width: 60%;
     border: 3px solid gray;
     margin: 0 auto;
 }

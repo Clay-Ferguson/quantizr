@@ -1,6 +1,7 @@
 import { AppState } from "../AppState";
 import { Constants as C } from "../Constants";
 import { DialogBase } from "../DialogBase";
+import { DialogMode } from "../enums/DialogMode";
 import { PubSub } from "../PubSub";
 import { Singletons } from "../Singletons";
 import { CompIntf } from "../widget/base/CompIntf";
@@ -16,6 +17,7 @@ import { ConfirmDlg } from "./ConfirmDlg";
 import { VideoPlayerDlg } from "./VideoPlayerDlg";
 
 // https://developers.google.com/web/fundamentals/media/recording-audio
+// Need to persist in LOCAL browser storage which input selections (audio/video) are the current choice at all times.
 
 declare var MediaRecorder;
 
@@ -242,6 +244,7 @@ export class MediaRecorderDlg extends DialogBase {
         if (!this.recorder) {
             // I experimented with passing mimeTypes to Chrome and only the webm one seems to be supported, so we don't need
             // these options. May be smarter to just let the browser use it's default anyway for all sorts of other reasons.
+            // Note: Browser can set to: "video/webm;codecs=vp8,opus", which is only valid mime after truncating at ';' char.
             // let options = { mimeType: "audio/ogg" };
             // this.recorder = new MediaRecorder(this.stream, options);
             this.recorder = new MediaRecorder(this.stream);
@@ -308,7 +311,7 @@ export class MediaRecorderDlg extends DialogBase {
             const url = URL.createObjectURL(this.blob);
 
             if (this.videoMode) {
-                new VideoPlayerDlg("recorder", url, null, this.appState).open();
+                new VideoPlayerDlg("recorder", url, null, DialogMode.POPUP, this.appState).open();
             }
             else {
                 new AudioPlayerDlg(null, null, null, url, 0, this.appState).open();

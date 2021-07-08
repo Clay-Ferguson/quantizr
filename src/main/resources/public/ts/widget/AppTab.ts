@@ -21,6 +21,8 @@ export class AppTab extends Div {
             tabIndex: "-1"
         });
         this.data = data;
+        this.domAddEvent = this.domAddEvent.bind(this);
+        this.domPreUpdateEvent = this.domPreUpdateEvent.bind(this);
     }
 
     getClass = (state: AppState): string => {
@@ -44,6 +46,7 @@ export class AppTab extends Div {
         let elm = this.getRef();
         this.reScroll(elm);
 
+        // need to remove this listener in some other react state callback.
         elm.addEventListener("scroll", () => {
             // console.log("Scroll: " + elm.scrollTop);
             this.data.scrollPos = elm.scrollTop;

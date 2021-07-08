@@ -93,6 +93,8 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
                             let dlg: MediaRecorderDlg = new MediaRecorderDlg(this.appState, true, true);
                             await dlg.open();
                             if (dlg.uploadRequested) {
+                                // Convert a string like: "video/webm;codecs=vp8,opus" to just the mime part.
+                                dlg.blobType = S.util.chopAtLastChar(dlg.blobType, ";");
                                 this.dropzone.addFile(new File([dlg.blob], "video-recording.webm", { type: dlg.blobType }));
                                 this.runButtonEnablement();
                                 this.upload();
