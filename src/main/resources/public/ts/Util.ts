@@ -1092,22 +1092,13 @@ export class Util implements UtilIntf {
             // console.log("PUSHED STATE: url: " + url + ", state: " + JSON.stringify(state) + " length=" + history.length);
         }
 
-        let allowAdd = true;
+        // remove node if it exists in history (so we can add to top)
+        S.meta64.nodeHistory = S.meta64.nodeHistory.filter(function (h: NodeHistoryItem) {
+            return h.id !== node.id;
+        });
 
-        // if this is a dupliate don't allow add.
-        if (S.meta64.nodeHistory.length > 0 && S.meta64.nodeHistory[0].id === node.id) {
-            allowAdd = false;
-        }
-
-        if (allowAdd) {
-            // remove node if it exists in history (so we can add to top)
-            S.meta64.nodeHistory = S.meta64.nodeHistory.filter(function (h: NodeHistoryItem) {
-                return h.id !== node.id;
-            });
-
-            // now add to top.
-            S.meta64.nodeHistory.unshift({ id: node.id, content });
-        }
+        // now add to top.
+        S.meta64.nodeHistory.unshift({ id: node.id, content });
     }
 
     getPathPartForNamedNode = (node: J.NodeInfo): string => {

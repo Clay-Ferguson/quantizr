@@ -22,7 +22,7 @@ export class HistoryPanel extends Div {
         children.push(new Div("History", { className: "nodeHistoryTitle" }));
         S.meta64.nodeHistory.forEach((h: NodeHistoryItem) => {
             let d;
-            children.push(d = new Div("&#x1f535 " + h.content, {
+            children.push(d = new Div("&#x1f535 " + h.content + " - " + h.id, {
                 id: h.id + "_hist",
                 nid: h.id,
                 onClick: this.jumpToId,

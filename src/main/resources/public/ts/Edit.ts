@@ -11,6 +11,7 @@ import { PrefsDlg } from "./dlg/PrefsDlg";
 import { UploadFromFileDropzoneDlg } from "./dlg/UploadFromFileDropzoneDlg";
 import { EditIntf } from "./intf/EditIntf";
 import * as J from "./JavaIntf";
+import { NodeHistoryItem } from "./NodeHistoryItem";
 import { PubSub } from "./PubSub";
 import { Singletons } from "./Singletons";
 
@@ -272,6 +273,14 @@ export class Edit implements EditIntf {
     saveNodeResponse = async (node: J.NodeInfo, res: J.SaveNodeResponse, allowScroll: boolean, state: AppState): Promise<void> => {
         if (S.util.checkSuccess("Save node", res)) {
             await this.distributeKeys(node, res.aclEntries);
+
+            // find and update the history item if it exists.
+            let histItem: NodeHistoryItem = S.meta64.nodeHistory.find(function (h: NodeHistoryItem) {
+                return h.id === node.id;
+            });
+            if (histItem) {
+                histItem.content = S.util.getShortContent(node);
+            }
 
             // It's possible to end up editing a node that's not even on the page, or a child of a node on the page,
             // and so before refreshing the screen we check for that edge case.
