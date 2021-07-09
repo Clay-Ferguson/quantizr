@@ -16,6 +16,7 @@ import { UtilIntf } from "./intf/UtilIntf";
 import * as J from "./JavaIntf";
 import { PubSub } from "./PubSub";
 import { Singletons } from "./Singletons";
+import { NodeHistoryItem } from "./NodeHistoryItem";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (s: Singletons) => {
@@ -1053,7 +1054,8 @@ export class Util implements UtilIntf {
             return;
         }
 
-        // console.log("updateHistory: id=" + node.id + " name=" + node.name);
+        let content = this.getShortContent(node);
+        // console.log("updateHistory: id=" + node.id + " cont=" + content);
         let url, title, state;
         if (node.name) {
             const queryPath = this.getPathPartForNamedNode(node);
@@ -1077,7 +1079,8 @@ export class Util implements UtilIntf {
                 nodeId: node.id,
                 highlightId: (childNodeId && childNodeId !== node.id) ? childNodeId : null
             };
-            title = node.id;
+            // title = node.id;
+            title = content;
         }
 
         if (history.state && state.nodeId === history.state.nodeId) {
@@ -1087,6 +1090,23 @@ export class Util implements UtilIntf {
         else {
             history.pushState(state, title, url);
             // console.log("PUSHED STATE: url: " + url + ", state: " + JSON.stringify(state) + " length=" + history.length);
+        }
+
+        let allowAdd = true;
+
+        // if this is a dupliate don't allow add.
+        if (S.meta64.nodeHistory.length > 0 && S.meta64.nodeHistory[0].id === node.id) {
+            allowAdd = false;
+        }
+
+        if (allowAdd) {
+            // remove node if it exists in history (so we can add to top)
+            S.meta64.nodeHistory = S.meta64.nodeHistory.filter(function (h: NodeHistoryItem) {
+                return h.id !== node.id;
+            });
+
+            // now add to top.
+            S.meta64.nodeHistory.unshift({ id: node.id, content });
         }
     }
 

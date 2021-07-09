@@ -11,11 +11,11 @@ import { Meta64Intf } from "./intf/Meta64Intf";
 import { TabDataIntf } from "./intf/TabDataIntf";
 import * as J from "./JavaIntf";
 import { Log } from "./Log";
+import { NodeHistoryItem } from "./NodeHistoryItem";
 import { PubSub } from "./PubSub";
 import { ResultSetInfo } from "./ResultSetInfo";
 import { SharesRSInfo } from "./SharesRSInfo";
 import { Singletons } from "./Singletons";
-import { State } from "./State";
 import { FeedView } from "./tabs/FeedView";
 import { FollowersResultSetView } from "./tabs/FollowersResultSetView";
 import { FollowingResultSetView } from "./tabs/FollowingResultSetView";
@@ -83,6 +83,8 @@ export class Meta64 implements Meta64Intf {
     needs to somehow associate to an array like this that's TAB SPECIFIC (todo-1), and for now we
     just let this apply to the Feed tab */
     openGraphComps: OpenGraphPanel[] = [];
+
+    nodeHistory: NodeHistoryItem[] = [];
 
     sendTestEmail = (): void => {
         S.util.ajax<J.SendTestEmailRequest, J.SendTestEmailResponse>("sendTestEmail", {}, function (res: J.SendTestEmailResponse) {
@@ -382,6 +384,10 @@ export class Meta64 implements Meta64Intf {
     initApp = async (): Promise<void> => {
         return new Promise<void>(async (resolve, reject) => {
             Log.log("initApp()");
+
+            if (history.scrollRestoration) {
+                history.scrollRestoration = "manual";
+            }
 
             this.createAppTabs();
             const state: AppState = store.getState();

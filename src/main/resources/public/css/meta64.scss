@@ -2005,3 +2005,19 @@ audio::-webkit-media-controls-play-button {
     font-size: 80%;
     font-style: italic;
 }
+
+.nodeHistoryPanel {
+    margin-left: 15px;
+    margin-right: 15px;
+}
+
+.nodeHistoryTitle {
+    margin-top: 20px;
+    font-size: 140%;
+    border-bottom: 2px solid $nodeBorderBottomColor;
+}
+
+.nodeHistoryItem {
+    margin-top: 5px;
+    cursor: pointer;
+}
