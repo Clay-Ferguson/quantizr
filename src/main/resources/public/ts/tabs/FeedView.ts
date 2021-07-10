@@ -151,7 +151,7 @@ export class FeedView extends AppTab {
         }
 
         children.push(helpPanel);
-        this.setChildren(children);
+        this.setChildren([new Div(null, { className: "feedView" }, children)]);
     }
 
     clearSearch = () => {

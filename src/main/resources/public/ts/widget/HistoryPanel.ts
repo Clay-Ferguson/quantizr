@@ -18,11 +18,15 @@ export class HistoryPanel extends Div {
     }
 
     preRender(): void {
+        if (S.meta64.nodeHistory.length === 0) {
+            this.setChildren(null);
+            return;
+        }
         let children = [];
         children.push(new Div("History", { className: "nodeHistoryTitle" }));
         S.meta64.nodeHistory.forEach((h: NodeHistoryItem) => {
             let d;
-            children.push(d = new Div("&#x1f535 " + h.content + " - " + h.id, {
+            children.push(d = new Div("&#x1f535 " + h.content, {
                 id: h.id + "_hist",
                 nid: h.id,
                 onClick: this.jumpToId,
@@ -31,7 +35,7 @@ export class HistoryPanel extends Div {
             d.renderRawHtml = true;
         });
 
-        this.setChildren(children && children.length > 0 ? children : null);
+        this.setChildren(children);
     }
 
     /* We use the standard trick of storing the ID on the dom so we can avoid unnecessary function scopes */

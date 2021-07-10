@@ -160,7 +160,9 @@ public class SubNode {
 	/* Auth: Anyone can write the id as there's no pre-existing id */
 	@JsonProperty(FIELD_ID)
 	public void setId(ObjectId id) {
-		if (this.id != null && !this.id.equals(id)) {
+		// IDs are allowed to be set to null and ImportArchiveBase does this to force nodes to get saved
+		// as a new document when they're being imported.
+		if (id != null && this.id != null && !this.id.equals(id)) {
 			throw new RuntimeException("Node IDs are immutable.");
 		}
 		this.id = id;

@@ -46,7 +46,7 @@ export abstract class ResultSetView extends AppTab {
 
         let searchText = this.data.rsInfo.node ? S.util.getShortContent(this.data.rsInfo.node) : null;
         children.push(new Div(null, null, [
-            new Div(null, { className: "marginBottom" }, [
+            new Div(null, { className: "marginBottom marginTop" }, [
                 this.renderHeading(state),
                 this.data.rsInfo.node ? new Span(null, { className: "float-right" }, [
                     new IconButton("fa-arrow-left", "Back", {
