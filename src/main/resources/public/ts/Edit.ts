@@ -584,7 +584,7 @@ export class Edit implements EditIntf {
         }
 
         if (selNodesArray.find(id => id === state.homeNodeId)) {
-            S.util.showMessage("You can't delete your account root node! To close your account use the Account Menu", "Warning");
+            S.util.showMessage("You can't delete your account root node!", "Warning");
             return;
         }
 
@@ -607,6 +607,7 @@ export class Edit implements EditIntf {
                     nodeIds: selNodesArray,
                     childrenOnly: false
                 }, (res: J.DeleteNodesResponse) => {
+                    this.removeNodesFromHistory(selNodesArray, state);
                     this.removeNodesFromCalendarData(selNodesArray, state);
 
                     if (!postDelSelNodeId && !S.nav.displayingRepositoryRoot(state)) {
@@ -621,6 +622,26 @@ export class Edit implements EditIntf {
         ).open();
     }
 
+    /* Updates 'nodeHistory' when nodes are deleted */
+    removeNodesFromHistory = (selNodesArray: string[], appState: AppState) => {
+        if (!selNodesArray) return;
+        selNodesArray.forEach((id: string) => {
+            // remove any top level history item that matches 'id'
+            S.meta64.nodeHistory = S.meta64.nodeHistory.filter(function (h: NodeHistoryItem) {
+                return h.id !== id;
+            });
+
+            // scan all top level history items, and remove 'id' from any subItems
+            S.meta64.nodeHistory.forEach(function (h: NodeHistoryItem) {
+                if (h.subItems) {
+                    h.subItems = h.subItems.filter(function (hi: NodeHistoryItem) {
+                        return hi.id !== id;
+                    });
+                }
+            });
+        });
+    }
+
     removeNodesFromCalendarData = (selNodesArray: string[], appState: AppState) => {
         if (!appState.calendarData) return;
 
@@ -628,9 +649,10 @@ export class Edit implements EditIntf {
             appState.calendarData = appState.calendarData.filter((item: EventInput) => item.id !== id);
         });
 
-        dispatch("Action_UpdateCalendarData", (s: AppState): AppState => {
-            return appState;
-        });
+        // I'll leave this here commented until I actually TEST deleting calendar items again.
+        // dispatch("Action_UpdateCalendarData", (s: AppState): AppState => {
+        //     return appState;
+        // });
     }
 
     /* Gets the node we want to scroll to after a delete, but if we're deleting the page root we return null,

@@ -49,7 +49,6 @@ export class RightNavPanel extends Div {
         let displayName = state.displayName ? state.displayName : state.title;
 
         this.setChildren([
-            // todo-0: get rid of this top level div and make this class be IT.
             new Div(null, { className: "float-left" }, [
                 new Div(null, { className: "rightNavPanelInner" }, [
                     state.isAnonUser ? new Div("Login / Signup", {
