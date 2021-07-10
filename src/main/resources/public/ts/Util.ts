@@ -1046,7 +1046,7 @@ export class Util implements UtilIntf {
 
     /* NOTE: There's also a 'history.replaceState()' which doesn't build onto the history but modifies what it thinks
     the current location is. */
-    updateHistory = (node: J.NodeInfo, childNodeId: string = null, appState: AppState): void => {
+    updateHistory = (node: J.NodeInfo, childNode: J.NodeInfo = null, appState: AppState): void => {
         if (!node) {
             node = appState.node;
         }
@@ -1054,30 +1054,35 @@ export class Util implements UtilIntf {
             return;
         }
 
+        S.localDB.setVal(C.LOCALDB_LAST_PARENT_NODEID, node.id);
+        if (childNode) {
+            S.localDB.setVal(C.LOCALDB_LAST_CHILD_NODEID, childNode.id);
+        }
+
         let content = this.getShortContent(node);
-        // console.log("updateHistory: id=" + node.id + " cont=" + content);
+        // console.log("updateHistory: id=" + node.id + " subId=" + childNodeId + " cont=" + content);
         let url, title, state;
         if (node.name) {
             const queryPath = this.getPathPartForNamedNode(node);
             url = window.location.origin + queryPath;
 
-            if (childNodeId && childNodeId !== node.id) {
-                url += "#" + childNodeId;
+            if (childNode && childNode.id && childNode.id !== node.id) {
+                url += "#" + childNode.id;
             }
             state = {
                 nodeId: ":" + node.name,
-                highlightId: (childNodeId && childNodeId !== node.id) ? childNodeId : null
+                highlightId: (childNode && childNode.id && childNode.id !== node.id) ? childNode.id : null
             };
             title = node.name;
         }
         else {
             url = window.location.origin + "/app?id=" + node.id;
-            if (childNodeId && childNodeId !== node.id) {
-                url += "#" + childNodeId;
+            if (childNode && childNode.id && childNode.id !== node.id) {
+                url += "#" + childNode.id;
             }
             state = {
                 nodeId: node.id,
-                highlightId: (childNodeId && childNodeId !== node.id) ? childNodeId : null
+                highlightId: (childNode && childNode.id && childNode.id !== node.id) ? childNode.id : null
             };
             // title = node.id;
             title = content;
@@ -1092,13 +1097,62 @@ export class Util implements UtilIntf {
             // console.log("PUSHED STATE: url: " + url + ", state: " + JSON.stringify(state) + " length=" + history.length);
         }
 
+        this.updateNodeHistory(node, childNode, appState);
+    }
+
+    updateNodeHistory = (node: J.NodeInfo, childNode: J.NodeInfo = null, appState: AppState): void => {
+        let subItems = null;
+
+        /* First whenever we have a new 'node' we need to remove 'node' from any of the
+         subItems that exist, because any top level item doesn't need to also exist as a subItem */
+        S.meta64.nodeHistory.forEach(h => {
+            if (h.subItems) {
+                h.subItems = h.subItems.filter(function (hi: NodeHistoryItem) {
+                    return hi.id !== node.id;
+                });
+            }
+        });
+
+        // Lookup this history item so we can update the subIds first.
+        let histItem: NodeHistoryItem = S.meta64.nodeHistory.find(function (h: NodeHistoryItem) {
+            return h.id === node.id;
+        });
+
+        // if we found the histItem we need to update subIds
+        if (histItem) {
+            subItems = histItem.subItems;
+
+            if (childNode) {
+                if (subItems) {
+                    // remove id if it exists in history (so we can add to top)
+                    subItems = subItems.filter(function (item: NodeHistoryItem) {
+                        return item.id !== childNode.id && item.id !== node.id;
+                    });
+                }
+                else {
+                    subItems = [];
+                }
+
+                if (childNode.id !== node.id) {
+                    let childFound = S.meta64.nodeHistory.find(function (h: NodeHistoryItem) {
+                        return h.id === childNode.id;
+                    });
+
+                    // if this child at at a top level now, don't let it be appended as a child second level item.
+                    if (!childFound) {
+                        subItems.unshift({ id: childNode.id, content: this.getShortContent(childNode), subIds: null });
+                    }
+                }
+            }
+        }
+
         // remove node if it exists in history (so we can add to top)
         S.meta64.nodeHistory = S.meta64.nodeHistory.filter(function (h: NodeHistoryItem) {
             return h.id !== node.id;
         });
 
         // now add to top.
-        S.meta64.nodeHistory.unshift({ id: node.id, content });
+        S.meta64.nodeHistory.unshift({ id: node.id, content: this.getShortContent(node), subItems });
     }
 
     getPathPartForNamedNode = (node: J.NodeInfo): string => {

@@ -283,9 +283,7 @@ export class Meta64 implements Meta64Intf {
         }
 
         if (!state.isAnonUser) {
-            S.localDB.setVal(C.LOCALDB_LAST_PARENT_NODEID, state.node.id);
-            S.localDB.setVal(C.LOCALDB_LAST_CHILD_NODEID, node.id);
-            S.util.updateHistory(state.node, node.id, state);
+            S.util.updateHistory(state.node, node, state);
         }
         S.meta64.parentIdToFocusNodeMap.set(state.node.id, node.id);
 

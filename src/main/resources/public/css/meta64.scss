@@ -2025,10 +2025,25 @@ audio::-webkit-media-controls-play-button {
 .nodeHistoryTitle {
     margin-top: 20px;
     font-size: 140%;
-    border-bottom: 2px solid $nodeBorderBottomColor;
+    border-bottom: 3px solid $nodeBorderBottomColor;
 }
 
 .nodeHistoryItem {
+    margin-top: 8px;
+    cursor: pointer;
+    border-bottom: 2px dotted $nodeBorderBottomColor; 
+}
+
+.nodeHistorySubItem {
+    margin-left: 20px;
     margin-top: 5px;
     cursor: pointer;
+    border-bottom: 1px dotted $nodeBorderBottomColor; 
+    border-left: 6px solid $nodeBorderBottomColor;
+    padding-left: 6px;
+}
+
+.nodeHistorySubItemDots {
+    margin-left: 20px;
+    margin-top: 5px;
 }

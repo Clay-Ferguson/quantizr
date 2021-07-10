@@ -384,14 +384,15 @@ export class Render implements RenderIntf {
                         S.meta64.updateNodeMap(res.node, s);
                     }
 
+                    let targetNode: J.NodeInfo = null;
                     if (targetNodeId) {
                         // If you access /n/myNodeName we get here with targetNodeId being the name (and not the ID)
                         // so we have to call getNodeByName() to get the 'id' that goes with that node name.
                         if (targetNodeId.startsWith(":")) {
                             targetNodeId = targetNodeId.substring(1);
-                            const foundNode: J.NodeInfo = S.meta64.getNodeByName(res.node, targetNodeId, s);
-                            if (foundNode) {
-                                targetNodeId = foundNode.id;
+                            targetNode = S.meta64.getNodeByName(res.node, targetNodeId, s);
+                            if (targetNode) {
+                                targetNodeId = targetNode.id;
                             }
                         }
 
@@ -406,12 +407,9 @@ export class Render implements RenderIntf {
 
                     s.selectedNodes = {};
                     if (s.node && !s.isAnonUser) {
-                        S.localDB.setVal(C.LOCALDB_LAST_PARENT_NODEID, s.node.id);
-                        S.localDB.setVal(C.LOCALDB_LAST_CHILD_NODEID, targetNodeId);
-
                         // do this async just for performance
                         setTimeout(() => {
-                            S.util.updateHistory(s.node, targetNodeId, s);
+                            S.util.updateHistory(s.node, targetNode, s);
                         }, 10);
                     }
 

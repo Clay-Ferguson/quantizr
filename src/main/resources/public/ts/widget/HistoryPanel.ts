@@ -10,6 +10,8 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
 });
 
 export class HistoryPanel extends Div {
+    private static MAX_SUBITEMS = 5;
+
     constructor() {
         super(null, {
             id: C.ID_RHS + "_hist",
@@ -33,6 +35,33 @@ export class HistoryPanel extends Div {
                 className: "nodeHistoryItem"
             }));
             d.renderRawHtml = true;
+
+            if (h.subItems) {
+                let count = 0;
+                let dotsShown = false;
+                h.subItems.forEach((h: NodeHistoryItem) => {
+                    if (dotsShown) return;
+                    if (count++ < HistoryPanel.MAX_SUBITEMS) {
+                        let d;
+                        children.push(d = new Div(h.content, {
+                            id: h.id + "_subhist",
+                            nid: h.id,
+                            onClick: this.jumpToId,
+                            className: "nodeHistorySubItem"
+                        }));
+                        d.renderRawHtml = true;
+                    }
+                    else {
+                        if (!dotsShown) {
+                            dotsShown = true;
+                            children.push(new Div("...", {
+                                id: h.id + "_subhist",
+                                className: "nodeHistorySubItemDots"
+                            }));
+                        }
+                    }
+                });
+            }
         });
 
         this.setChildren(children);
