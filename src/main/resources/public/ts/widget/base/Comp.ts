@@ -439,27 +439,27 @@ export abstract class Comp<S extends BaseCompState = any> implements CompIntf {
     public domAddEvent(): void {
         // console.log("domAddEvent: " + this.jsClassName);
 
-        /* In order for a React Render to not loose focus (sometimes) we keep track of the last thing that
-        was clicked, and restore focus back to that whenever components are rendered. Without this code you can't even
-        do a click on a node row, and then start scrolling with keyboard,...it would take TWO clicks to force focus that
-        will allow scrolling using keyboard. */
-        if (this.attribs.onClick && this.attribs.id === Comp.focusElmId) {
-            // console.log("clicked element should have focus");
-            S.util.focusElmById(Comp.focusElmId);
+        let elm: HTMLElement = this.getRef();
+        if (!elm) {
+            // I'm getting this happening during rendering a timeline (somehow also dependent on WHAT kind of rows
+            // are IN the timeline), but I'm not convinced yet it's a bug, rather than
+            // just a component that's now gone, and somehow gets here despite being gone.
+            // console.error("elm not found in domAddEvent: " + this.jsClassName);
+            return;
+        }
+        else {
+            /* In order for a React Render to not loose focus (sometimes) we keep track of the last thing that
+            was clicked, and restore focus back to that whenever components are rendered. Without this code you can't even
+            do a click on a node row, and then start scrolling with keyboard,...it would take TWO clicks to force focus that
+            will allow scrolling using keyboard. */
+            if (this.attribs.onClick && this.attribs.id === Comp.focusElmId) {
+                // console.log("clicked element should have focus");
+                elm.focus();
+            }
         }
 
         if (this.domAddFuncs) {
-            let elm: HTMLElement = this.getRef();
-            if (!elm) {
-                // I'm getting this happening during rendering a timeline (somehow also dependent on WHAT kind of rows
-                // are IN the timeline), but I'm not convinced yet it's a bug, rather than
-                // just a component that's now gone, and somehow gets here despite being gone.
-                // console.error("elm not found in domAddEvent: " + this.jsClassName);
-                return;
-            }
-            else {
-                // console.log("domAddFuncs running for "+this.jsClassName+" for "+this.domAddFuncs.length+" functions.");
-            }
+            // console.log("domAddFuncs running for "+this.jsClassName+" for "+this.domAddFuncs.length+" functions.");
             this.domAddFuncs.forEach(function (func) {
                 func(elm);
             }, this);

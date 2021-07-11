@@ -626,8 +626,9 @@ export class Util implements UtilIntf {
         return this._ajaxCounter > 0;
     }
 
-    focusElmById = (id: string) => {
-        const elm: HTMLElement = this.domElm(id);
+    focusElmById = async (id: string) => {
+        // const elm: HTMLElement = this.domElm(id);
+        const elm: HTMLElement = await this.getElm(id);
 
         if (elm) {
             // console.log(`Element found (${id}), focusing`);
@@ -641,7 +642,7 @@ export class Util implements UtilIntf {
 
     /* set focus to element by id */
     delayedFocus = (id: string): void => {
-        setTimeout(() => {
+        setTimeout(async () => {
             this.focusElmById(id);
         }, 250);
     }
