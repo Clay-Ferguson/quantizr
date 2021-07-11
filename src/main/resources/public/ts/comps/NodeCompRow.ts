@@ -31,8 +31,9 @@ export class NodeCompRow extends Div {
         public isTableCell: boolean, public allowNodeMove: boolean, public imgSizeOverride: string, private allowHeaders: boolean,
         appState: AppState) {
         super(null, {
-            id: S.nav._UID_ROWID_PREFIX + node.id
-           // tabIndex: "-1"
+            id: S.nav._UID_ROWID_PREFIX + node.id,
+            // WARNING: Leave this tabIndex here. it's required for focsing/scrolling
+            tabIndex: "-1"
         });
 
         /* If we're in edit mode allow dragging */
