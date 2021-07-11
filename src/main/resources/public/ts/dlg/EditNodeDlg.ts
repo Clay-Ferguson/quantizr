@@ -416,7 +416,7 @@ export class EditNodeDlg extends DialogBase {
 
         if (allowContentEdit) {
             let hasContentProp = typeHandler && typeHandler.hasCustomProp("content");
-            let rows = this.appState.mobileMode ? "8" : "15";
+            let rows = this.appState.mobileMode ? "8" : "10";
             if (customProps && hasContentProp) {
                 rows = "4";
             }
@@ -1118,7 +1118,7 @@ export class EditNodeDlg extends DialogBase {
             });
         }
         else {
-            this.contentEditor = new TextArea(null, { rows }, this.contentEditorState, "textarea-min-15");
+            this.contentEditor = new TextArea(null, { rows }, this.contentEditorState, "textarea-min-10", true);
 
             let wrap: boolean = S.props.getNodePropVal(J.NodeProp.NOWRAP, this.appState.node) !== "1";
             this.contentEditor.setWordWrap(wrap);

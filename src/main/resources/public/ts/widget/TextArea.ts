@@ -18,10 +18,9 @@ export class TextArea extends Span implements I.TextEditorIntf {
     input: TextareaTag;
     textareaAttribs: any = {};
 
-    constructor(private label: string, attribs: any, private valState: ValidatedState<any>, moreClasses: string = "") {
+    constructor(private label: string, attribs: any, private valState: ValidatedState<any>, moreClasses: string = "", public calcRows: boolean = false) {
         // do not pass valState into base class, we want it to have state separately
         super(null);
-        // this.attribs.style = { fontFamily: "monospace" };
 
         if (attribs) {
             Object.assign(this.textareaAttribs, attribs);
@@ -118,7 +117,7 @@ export class TextArea extends Span implements I.TextEditorIntf {
         //     textarea.style.height = calcHeight(textarea.value) + "px";
         // });
 
-        children.push(this.input = new TextareaTag(_attribs, this.valState.v));
+        children.push(this.input = new TextareaTag(_attribs, this.valState.v, this.calcRows));
         this.setChildren(children);
     }
 }

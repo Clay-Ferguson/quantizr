@@ -624,7 +624,7 @@ entire thing down some times, if it's jutting up against something */
 }
 
 .app-modal-title {
-    margin-bottom: $smallGap;
+    margin-bottom: 4px;
     font-size: 150%;
 }
 
@@ -690,7 +690,7 @@ entire thing down some times, if it's jutting up against something */
 
 .app-modal-title-close-icon {
     cursor: pointer;
-    font-size: 230%;
+    font-size: 200%;
 
     //this icon vertical centering doesn't work, but it's acceptable looking.
     vertical-align: middle;
@@ -715,7 +715,7 @@ entire thing down some times, if it's jutting up against something */
     background-color: $modal-content-bg;
     border: 2px solid $modal-content-border-color;
     border-radius: $border-radius;
-    padding: 16px;
+    padding: 10px;
     width: 100%;
     margin-bottom: 10px;
     margin-top: 12px;
@@ -1077,19 +1077,20 @@ input[type="radio"] {
 }
 
 .textarea-min-4 {
-    font-family: inherit; //monospace;
+    font-family: inherit; 
     min-height: 4em;
 }
 
-.textarea-min-15 {
-    font-family: inherit; //monospace;
-    min-height: 15em;
+.textarea-min-10 {
+    font-family: inherit; 
+    // min-height: 10em;
+    // max-height: 60em;
 }
 
 .pre-textarea, .pre-textfield {
      //WARNING: Setting a font family here (other than inherit) causes noticeable flicker whenever react re-renders (during focus and blur eventing), 
      //but the solution appeared to be to set the font on the PARENT div of an input control (to monospace), and then use 'inherit' here as the actual font-family.
-    font-family: inherit; //monospace;
+    font-family: inherit; 
 }
 
 .my-ace-editor {

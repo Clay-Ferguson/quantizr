@@ -627,8 +627,10 @@ export class Util implements UtilIntf {
     }
 
     focusElmById = async (id: string) => {
-        // const elm: HTMLElement = this.domElm(id);
-        const elm: HTMLElement = await this.getElm(id);
+        const elm: HTMLElement = this.domElm(id);
+
+        // I got a little hasty and checked this in without testing. this does throw some errors.
+        // const elm: HTMLElement = await this.getElm(id);
 
         if (elm) {
             // console.log(`Element found (${id}), focusing`);
