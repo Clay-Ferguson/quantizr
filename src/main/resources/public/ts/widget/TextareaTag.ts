@@ -11,8 +11,9 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
 });
 
 export class TextareaTag extends Comp {
-
     static CHAR_THRESHOLD = 40;
+    static MIN_ROWS = 3;
+    static MAX_ROWS = 15;
 
     constructor(attribs: Object = {}, s?: State<any>, private calcRows: boolean = false) {
         super(attribs, s);
@@ -26,7 +27,7 @@ export class TextareaTag extends Comp {
     }
 
     calcRowsFunc(val: string): number {
-        let rows = 2;
+        let rows = TextareaTag.MIN_ROWS;
         if (val) {
             let arr = this.splitLines(val);
             if (arr) {
@@ -47,11 +48,11 @@ export class TextareaTag extends Comp {
             }
         }
 
-        if (rows < 2) {
-            rows = 2;
+        if (rows < TextareaTag.MIN_ROWS) {
+            rows = TextareaTag.MIN_ROWS;
         }
-        else if (rows > 15) {
-            rows = 15;
+        else if (rows > TextareaTag.MAX_ROWS) {
+            rows = TextareaTag.MAX_ROWS;
         }
 
         return rows;

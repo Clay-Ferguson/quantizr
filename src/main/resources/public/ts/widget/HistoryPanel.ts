@@ -27,6 +27,7 @@ export class HistoryPanel extends Div {
         let children = [];
         children.push(new Div("History", { className: "nodeHistoryTitle" }));
         S.meta64.nodeHistory.forEach((h: NodeHistoryItem) => {
+            if (!h.content) return;
             let d;
             children.push(d = new Div("&#x1f535 " + h.content, {
                 id: h.id + "_hist",
@@ -40,7 +41,7 @@ export class HistoryPanel extends Div {
                 let count = 0;
                 let dotsShown = false;
                 h.subItems.forEach((h: NodeHistoryItem) => {
-                    if (dotsShown) return;
+                    if (!h.content || dotsShown) return;
                     if (count++ < HistoryPanel.MAX_SUBITEMS) {
                         let d;
                         children.push(d = new Div(h.content, {
@@ -63,7 +64,6 @@ export class HistoryPanel extends Div {
                 });
             }
         });
-
         this.setChildren(children);
     }
 
