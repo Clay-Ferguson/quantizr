@@ -124,7 +124,6 @@ export class Render implements RenderIntf {
             },
 
             gfm: true,
-            tables: true,
             breaks: false,
             pedantic: false,
             smartLists: true,
