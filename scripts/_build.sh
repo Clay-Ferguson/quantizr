@@ -24,6 +24,7 @@ rm -rf ${PRJROOT}/src/main/resources/public/bundle.js
 # Packages can run "postinstall" script from their package.json and that is an attack vector we want to eliminate here.
 cd ${PRJROOT}/src/main/resources/public
 npm config set ignore-scripts true
+. on-build-start.sh
 
 cd ${PRJROOT}
 ${SCRIPTS}/run-linter.sh

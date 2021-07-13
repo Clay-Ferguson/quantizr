@@ -1,8 +1,5 @@
-// Note on compiling SASS/SCSS to CSS: That happens in 'on-build-start.sh'.
-
 const path = require("path");
 const CircularDependencyPlugin = require("circular-dependency-plugin");
-const WebpackShellPlugin = require("webpack-shell-plugin");
 
 const prod = process.argv.indexOf("-p") !== -1;
 const env = prod ? "prod" : "dev";
@@ -19,7 +16,21 @@ module.exports = {
 
     resolve: {
         // Add '.ts' and '.tsx' as resolvable extensions.
-        extensions: [".tsx", ".ts", ".js", ".json"]
+        extensions: [".tsx", ".ts", ".js", ".json"],
+
+        fallback: {
+            fs: false,
+            tls: false,
+            net: false,
+            path: false,
+            zlib: false,
+            http: false,
+            https: false,
+            stream: false,
+            crypto: false,
+            buffer: false,
+            timers: false
+        }
     },
 
     module: {
@@ -29,8 +40,7 @@ module.exports = {
                 test: /\.tsx?$/,
                 loader: "awesome-typescript-loader",
 
-                // NOTE: for webpack 5 I think this should be "options", instead of "query"
-                query: {
+                options: {
                     // Use this to point to your tsconfig.json.
                     configFileName: "./tsconfig." + env + ".json"
                 }
@@ -60,10 +70,6 @@ module.exports = {
     },
 
     plugins: [
-        new WebpackShellPlugin({
-            onBuildStart: ["./on-build-start.sh"]
-            // onBuildEnd: ['whatever else']
-        }),
         new CircularDependencyPlugin({
             // `onDetected` is called for each module that is cyclical
             onDetected({ module: webpackModuleRecord, paths, compilation }) {
