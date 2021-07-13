@@ -1,4 +1,3 @@
-import { AxiosPromise } from "axios";
 import { AppState } from "../AppState";
 import * as I from "../Interfaces";
 import * as J from "../JavaIntf";
@@ -51,7 +50,7 @@ export interface UtilIntf {
     getRemoteHost(): string;
     ajax<RequestBase, ResponseType>(postName: string, postData: RequestBase,
         callback?: (response: ResponseType) => void,
-        failCallback?: (response: string) => void): AxiosPromise<any>;
+        failCallback?: (response: string) => void): Promise<any>;
     logAndThrow(message: string);
     logAndReThrow(message: string, exception: any);
     ajaxReady(requestName): boolean;

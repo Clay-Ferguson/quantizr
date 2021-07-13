@@ -1,4 +1,3 @@
-import { AxiosPromise } from "axios";
 import { dispatch } from "./AppRedux";
 import { AppState } from "./AppState";
 import { Constants as C } from "./Constants";
@@ -69,7 +68,7 @@ export class Attachment implements AttachmentIntf {
     deleteAttachment = async (node: J.NodeInfo, state: AppState): Promise<boolean> => {
         let deleted = false;
         node = node || S.meta64.getHighlightedNode(state);
-        let delPromise: AxiosPromise<any> = null;
+        let delPromise: Promise<any> = null;
         if (node) {
             const dlg = new ConfirmDlg("Delete the Attachment on the Node?", "Confirm", //
                 () => {

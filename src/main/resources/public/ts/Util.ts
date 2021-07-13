@@ -1,6 +1,5 @@
 import { EventInput } from "@fullcalendar/react";
 import * as ogs from "open-graph-scraper-lite";
-import axios, { AxiosPromise, AxiosRequestConfig } from "axios";
 import * as marked from "marked";
 import { dispatch, store } from "./AppRedux";
 import { AppState } from "./AppState";
@@ -435,44 +434,47 @@ export class Util implements UtilIntf {
 
     ajax = <RequestType extends J.RequestBase, ResponseType>(postName: string, postData: RequestType, //
         callback?: (response: ResponseType) => void, //
-        failCallback?: (info: string) => void): AxiosPromise<any> => {
+        failCallback?: (info: string) => void): Promise<any> => {
         postData = postData || {} as RequestType;
-
-        let axiosRequest;
+        let reqPromise: Promise<ResponseType> = null;
 
         try {
-            if (this.logAjax) {
-                console.log("JSON-POST: [" + this.getRpcPath() + postName + "]" + this.prettyPrint(postData));
-            }
-            else if (this.logAjaxShort) {
-                console.log("JSON-POST: [" + this.getRpcPath() + postName + "]");
-            }
+            reqPromise = new Promise<ResponseType>((resolve, reject) => {
+                if (this.logAjax) {
+                    console.log("JSON-POST: [" + this.getRpcPath() + postName + "]" + this.prettyPrint(postData));
+                }
+                else if (this.logAjaxShort) {
+                    console.log("JSON-POST: [" + this.getRpcPath() + postName + "]");
+                }
 
-            let config: AxiosRequestConfig = {
-                // Without this withCredentials axios (at least for CORS requests) doesn't send enough info to allow the server
-                // to recognize the same "session", and makes the server malfunction becasue it thinks each request is a
-                // new session and fails the login security.
-                withCredentials: true
-            };
+                this._ajaxCounter++;
+                S.meta64.setOverlay(true);
 
-            // if we have an authToken put it in the header.
-            if (S.meta64.authToken) {
-                config.headers = {
-                    Bearer: S.meta64.authToken
-                };
-            }
-
-            this._ajaxCounter++;
-            S.meta64.setOverlay(true);
-            axiosRequest = axios.post(this.getRpcPath() + postName, postData, config);
+                fetch(this.getRpcPath() + postName, {
+                    method: "POST",
+                    body: JSON.stringify(postData),
+                    headers: {
+                        "Content-Type": "application/json",
+                        Bearer: S.meta64.authToken
+                    },
+                    mode: "cors", // no-cors, *cors, same-origin
+                    cache: "no-cache", // *default, no-cache, reload, force-cache, only-if-cached
+                    credentials: "same-origin", // include, *same-origin, omit
+                    referrerPolicy: "no-referrer"
+                })
+                    .then(res => res.json())
+                    .then(data => {
+                        resolve(data);
+                    })
+                    .catch((error) => {
+                        reject(error);
+                    });
+            });
         } catch (ex) {
             this.logAndReThrow("Failed starting request: " + postName, ex);
+            S.meta64.setOverlay(false);
+            return null;
         }
-
-        // This seems to be just a duplicate of the the/error below so it's redundant.
-        // axiosRequest.catch((error) => {
-        //     console.error(error);
-        // });
 
         /**
          * Notes
@@ -491,25 +493,25 @@ export class Util implements UtilIntf {
          * are resolved. It's a big "and condition" of resolvement, and if any of the promises passed to it end up
          * failing, it fails this "ANDed" one also.
          */
-        axiosRequest.then(//
+        reqPromise.then(//
             // ------------------------------------------------
             // Handle Success
             // ------------------------------------------------
-            (response) => {
+            (data: any) => {
                 try {
                     this._ajaxCounter--;
                     this.progressInterval(null);
 
-                    if (!response.data.success) {
-                        if (response.data.message) {
+                    if (!data.success) {
+                        if (data.message) {
                             console.error("FAILED JSON-RESULT: " + postName + "\n    JSON-RESULT-DATA: " +
-                                this.prettyPrint(response));
+                                this.prettyPrint(data));
 
                             if (typeof failCallback === "function") {
                                 failCallback(null);
                             }
                             else {
-                                this.showMessage(response.data.message, "Message");
+                                this.showMessage(data.message, "Message");
                             }
 
                             // if (response.data.errorType === J.ErrorType.TIMEOUT) {
@@ -522,11 +524,11 @@ export class Util implements UtilIntf {
 
                     if (this.logAjax) {
                         console.log("    JSON-RESULT: " + postName + "\n    JSON-RESULT-DATA: " +
-                            this.prettyPrint(response));
+                            this.prettyPrint(data));
                     }
 
                     if (typeof callback === "function") {
-                        callback(<ResponseType>response.data);
+                        callback(<ResponseType>data);
                     }
                 } catch (ex) {
                     this.logAndReThrow("Failed handling result of: " + postName, ex);
@@ -534,13 +536,14 @@ export class Util implements UtilIntf {
                 finally {
                     S.meta64.setOverlay(false);
                 }
-            },
+            })
+            // todo-0: test this error codepath.
             // ------------------------------------------------
             // Handle Fail
             // We should only reach here when there's an actual failure to call the server, and is completely
             // separete from the server perhaps haveing an exception where it sent back an error.
             // ------------------------------------------------
-            (error) => {
+            .catch((error) => {
                 try {
                     this._ajaxCounter--;
                     this.progressInterval(null);
@@ -590,8 +593,7 @@ export class Util implements UtilIntf {
                     S.meta64.setOverlay(false);
                 }
             });
-
-        return axiosRequest;
+        return reqPromise;
     }
 
     logAndThrow = (message: string) => {
