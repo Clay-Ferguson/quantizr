@@ -1,6 +1,7 @@
 // Note on compiling SASS/SCSS to CSS: That happens in 'on-build-start.sh'.
 
-const webpack = require("webpack");
+// const webpack = require("webpack");
+const path = require("path");
 const CircularDependencyPlugin = require("circular-dependency-plugin");
 const WebpackShellPlugin = require("webpack-shell-plugin");
 // const HtmlWebpackPlugin = require('html-webpack-plugin');
@@ -41,7 +42,11 @@ module.exports = {
             {
                 enforce: "pre",
                 test: /\.js$/,
-                loader: "source-map-loader"
+                loader: "source-map-loader",
+                exclude: [
+                    // this package has problems with their sourcemaps
+                    path.resolve(__dirname, "node_modules/chardet")
+                ]
             },
 
             {

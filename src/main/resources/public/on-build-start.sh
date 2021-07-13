@@ -11,6 +11,8 @@ echo "Running on-build-start.sh"
 # NOTE: If something goes wrong here check that the internal version of npm/node specified
 # in the pom-main.xml is the same as the version installed on the system.
 
+# Here's how to install node-sass on Ubuntu:
+#     sudo npm install --save-dev --unsafe-perm -g node-sass
 node-sass ./css/meta64.scss ./css/meta64.css --output-style compressed
 
 if [ $? -eq 0 ]

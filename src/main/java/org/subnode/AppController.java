@@ -250,6 +250,7 @@ public class AppController implements ErrorController {
 	@Autowired
 	private ActPubFollower apFollower;
 
+	// NOTE: server.error.path app property points to this.
 	private static final String ERROR_MAPPING = "/error";
 
 	@RequestMapping(value = ERROR_MAPPING)
@@ -293,11 +294,6 @@ public class AppController implements ErrorController {
 		thymeleafAttribs.put("DROPZONE_JS_HASH", fileUtils.genHashOfClasspathResource("/public/js/dropzone/dropzone.js"));
 		thymeleafAttribs.put("MATHJAX_JS_HASH", fileUtils.genHashOfClasspathResource("/public/js/math-jax/tex-chtml.js"));
 		thymeleafAttribs.put("ACE_JS_HASH", fileUtils.genHashOfClasspathResource("/public/js/ace/src-noconflict/ace.js"));
-	}
-
-	@Override
-	public String getErrorPath() {
-		return ERROR_MAPPING;
 	}
 
 	/*
