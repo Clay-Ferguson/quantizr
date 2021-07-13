@@ -1,10 +1,8 @@
 // Note on compiling SASS/SCSS to CSS: That happens in 'on-build-start.sh'.
 
-// const webpack = require("webpack");
 const path = require("path");
 const CircularDependencyPlugin = require("circular-dependency-plugin");
 const WebpackShellPlugin = require("webpack-shell-plugin");
-// const HtmlWebpackPlugin = require('html-webpack-plugin');
 
 const prod = process.argv.indexOf("-p") !== -1;
 const env = prod ? "prod" : "dev";
