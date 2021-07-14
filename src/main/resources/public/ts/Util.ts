@@ -1,5 +1,4 @@
 import { EventInput } from "@fullcalendar/react";
-import * as ogs from "open-graph-scraper-lite";
 import * as marked from "marked";
 import { dispatch, store } from "./AppRedux";
 import { AppState } from "./AppState";
@@ -1497,13 +1496,15 @@ export class Util implements UtilIntf {
                     response.text()
                         .then(html => {
                             try {
-                                ogs({ html })
-                                    .then((data: any) => {
-                                        callback(!data || data.error ? null : data.result);
-                                    })
-                                    .catch((err: any) => {
-                                        callback(null);
-                                    });
+                                // todo-0: I removed open-graph-scraper-lite for several reasons, so for now we don't support openGraph. ugh!
+                                callback(null); // <-- temp hack
+                                // ogs({ html })
+                                //     .then((data: any) => {
+                                //         callback(!data || data.error ? null : data.result);
+                                //     })
+                                //     .catch((err: any) => {
+                                //         callback(null);
+                                //     });
                             }
                             catch (e) {
                                 callback(null);

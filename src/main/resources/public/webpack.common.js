@@ -19,17 +19,11 @@ module.exports = {
         extensions: [".tsx", ".ts", ".js", ".json"],
 
         fallback: {
-            fs: false,
-            tls: false,
-            net: false,
-            path: false,
-            zlib: false,
-            http: false,
-            https: false,
-            stream: false,
-            crypto: false,
-            buffer: false,
-            timers: false
+            timers: require.resolve("timers-browserify"),
+            buffer: require.resolve("buffer/"),
+            https: require.resolve("https-browserify"),
+            http: require.resolve("stream-http"),
+            stream: require.resolve("stream-browserify")
         }
     },
 
