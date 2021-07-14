@@ -534,7 +534,7 @@ that's used during builds.
 		<profile>
 			<id>prod</id>
 			<properties>
-				<webpack.args>-p --config webpack.prod.js</webpack.args>
+				<webpack.args>--mode production --config webpack.prod.js</webpack.args>
 				<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 				<start-class>org.subnode.AppServer</start-class>
 				<java.version>11</java.version>
