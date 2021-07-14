@@ -87,9 +87,8 @@ export class NodeCompMarkdown extends Html {
             val = S.util.markdown(val);
 
             /* parse tags, to build OpenGraph */
-            // todo-0: open graph is disabled now because I don't want to use open-graph-scraper-lite. I no longer trust it.
-            // let state: AppState = store.getState();
-            // this.parseAnchorTags(val, content);
+            let state: AppState = store.getState();
+            this.parseAnchorTags(val, content);
         }
         return val;
     }

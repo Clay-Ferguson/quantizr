@@ -433,7 +433,8 @@ export class Util implements UtilIntf {
 
     ajax = <RequestType extends J.RequestBase, ResponseType>(postName: string, postData: RequestType, //
         callback?: (response: ResponseType) => void, //
-        failCallback?: (info: string) => void): Promise<any> => {
+        failCallback?: (info: string) => void,
+        background: boolean = false): Promise<any> => {
         postData = postData || {} as RequestType;
         let reqPromise: Promise<ResponseType> = null;
 
@@ -446,8 +447,10 @@ export class Util implements UtilIntf {
                     console.log("JSON-POST: [" + this.getRpcPath() + postName + "]");
                 }
 
-                this._ajaxCounter++;
-                S.meta64.setOverlay(true);
+                if (!background) {
+                    this._ajaxCounter++;
+                    S.meta64.setOverlay(true);
+                }
 
                 fetch(this.getRpcPath() + postName, {
                     method: "POST",
@@ -471,7 +474,9 @@ export class Util implements UtilIntf {
             });
         } catch (ex) {
             this.logAndReThrow("Failed starting request: " + postName, ex);
-            S.meta64.setOverlay(false);
+            if (!background) {
+                S.meta64.setOverlay(false);
+            }
             return null;
         }
 
@@ -498,8 +503,10 @@ export class Util implements UtilIntf {
             // ------------------------------------------------
             (data: any) => {
                 try {
-                    this._ajaxCounter--;
-                    this.progressInterval(null);
+                    if (!background) {
+                        this._ajaxCounter--;
+                        this.progressInterval(null);
+                    }
 
                     if (!data.success) {
                         if (data.message) {
@@ -533,7 +540,9 @@ export class Util implements UtilIntf {
                     this.logAndReThrow("Failed handling result of: " + postName, ex);
                 }
                 finally {
-                    S.meta64.setOverlay(false);
+                    if (!background) {
+                        S.meta64.setOverlay(false);
+                    }
                 }
             })
             // todo-0: test this error codepath.
@@ -544,8 +553,10 @@ export class Util implements UtilIntf {
             // ------------------------------------------------
             .catch((error) => {
                 try {
-                    this._ajaxCounter--;
-                    this.progressInterval(null);
+                    if (!background) {
+                        this._ajaxCounter--;
+                        this.progressInterval(null);
+                    }
                     const status = error.response ? error.response.status : "";
                     const info = "Status: " + status + " message: " + error.message + " stack: " + error.stack;
                     console.log("HTTP RESP [" + postName + "]: Error: " + info);
@@ -589,7 +600,9 @@ export class Util implements UtilIntf {
                     this.logAndReThrow("Failed processing: " + postName, ex);
                 }
                 finally {
-                    S.meta64.setOverlay(false);
+                    if (!background) {
+                        S.meta64.setOverlay(false);
+                    }
                 }
             });
         return reqPromise;
@@ -1482,41 +1495,13 @@ export class Util implements UtilIntf {
     }
 
     /* Queries the url for 'Open Graph' data and sendes it back using the callback */
-    loadOpenGraph = (urlRemote: string, callback: Function): void => {
-        // query thru proxyGet because of CORS.
-        try {
-            // console.log("Getting OG: " + urlRemote);
-            let url = S.util.getRemoteHost() + "/proxyGet?url=" + encodeURIComponent(urlRemote);
-            fetch(url)
-                .then(response => {
-                    if (!response) {
-                        callback(null);
-                        return;
-                    }
-                    response.text()
-                        .then(html => {
-                            try {
-                                // todo-0: I removed open-graph-scraper-lite for several reasons, so for now we don't support openGraph. ugh!
-                                callback(null); // <-- temp hack
-                                // ogs({ html })
-                                //     .then((data: any) => {
-                                //         callback(!data || data.error ? null : data.result);
-                                //     })
-                                //     .catch((err: any) => {
-                                //         callback(null);
-                                //     });
-                            }
-                            catch (e) {
-                                callback(null);
-                            }
-                        });
-                })
-                .catch(err => {
-                    callback(null);
-                });
-        }
-        catch (e) {
-            // ignore
-        }
+    loadOpenGraph = (url: string, callback: Function): void => {
+        // console.log("loadOpenGraph: " + url);
+        this.ajax<J.GetOpenGraphRequest, J.GetOpenGraphResponse>("getOpenGraph", {
+            url
+        }, (res: J.GetOpenGraphResponse) => {
+            // console.log("RES: " + S.util.prettyPrint(res));
+            callback(res.openGraph);
+        }, () => { callback(null); }, true);
     }
 }

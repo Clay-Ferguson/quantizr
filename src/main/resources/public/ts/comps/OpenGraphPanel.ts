@@ -8,6 +8,7 @@ import { Div } from "../widget/Div";
 import { HorizontalLayout } from "../widget/HorizontalLayout";
 import { Icon } from "../widget/Icon";
 import { Img } from "../widget/Img";
+import * as J from "../JavaIntf";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
@@ -27,7 +28,7 @@ export class OpenGraphPanel extends Div {
 
         /* The state should always contain loading==true (if currently querying the server) or a non-null 'og'. A completed but failed
          pull of the open graph data should result in og being an empty object and not null. */
-        let og = S.meta64.openGraphData.get(url);
+        let og: J.OpenGraph = S.meta64.openGraphData.get(url);
         if (og) {
             this.mergeState({ og });
         }
@@ -36,19 +37,23 @@ export class OpenGraphPanel extends Div {
     domAddEvent(): void {
         let elm: HTMLElement = this.getRef();
         if (!elm || !elm.isConnected || this.getState().og) return;
-        let og = S.meta64.openGraphData.get(this.url);
+        let og: J.OpenGraph = S.meta64.openGraphData.get(this.url);
         if (!og) {
             let observer = new IntersectionObserver(entries => {
                 entries.forEach((entry: any) => {
                     if (entry.isIntersecting) {
-                        let og = S.meta64.openGraphData.get(this.url);
+                        let og: J.OpenGraph = S.meta64.openGraphData.get(this.url);
                         if (!og) {
                             if (!this.loading) {
                                 this.loading = true;
-                                S.util.loadOpenGraph(this.url, (og: any) => {
+                                S.util.loadOpenGraph(this.url, (og: J.OpenGraph) => {
                                     this.loading = false;
                                     if (!og) {
-                                        og = {};
+                                        og = {
+                                            title: null,
+                                            description: null,
+                                            image: null
+                                        };
                                     }
                                     S.meta64.openGraphData.set(this.url, og);
                                     if (!elm.isConnected) return;
@@ -79,14 +84,18 @@ export class OpenGraphPanel extends Div {
             if (found) {
                 /* I think it's counterproductive for smooth scrolling to preload more than one */
                 if (count++ < 1) {
-                    let og = S.meta64.openGraphData.get(o.url);
+                    let og: J.OpenGraph = S.meta64.openGraphData.get(o.url);
                     if (!og) {
                         if (!o.loading) {
                             o.loading = true;
-                            S.util.loadOpenGraph(o.url, (og: any) => {
+                            S.util.loadOpenGraph(o.url, (og: J.OpenGraph) => {
                                 o.loading = false;
                                 if (!og) {
-                                    og = {};
+                                    og = {
+                                        title: null,
+                                        description: null,
+                                        image: null
+                                    };
                                 }
                                 S.meta64.openGraphData.set(o.url, og);
                                 if (!o.getRef()) return;
@@ -111,10 +120,13 @@ export class OpenGraphPanel extends Div {
             this.setChildren(null);
             return;
         }
+
+        // all 4 of these variables can be removed. (todo-0)
+        // also we have an "OpenGraph" type that should be used in TypeScript now (defined in Java)
         let o: any = state.og;
-        let title = o.ogTitle || o.twitterTitle;
-        let desc = o.ogDecsciption || o.twitterDescription;
-        let image = o.ogImage || o.twitterImage;
+        let title = o.title;
+        let desc = o.description;
+        let image = o.image;
 
         /* If neither a description nor image exists, this will not be interesting enough so don't render */
         if (!desc && !image) {
@@ -139,13 +151,13 @@ export class OpenGraphPanel extends Div {
         }
 
         let imgAndDesc: CompIntf = null;
-        if (image?.url) {
+        if (image) {
             // if mobile portrait mode render image above (not beside) description
             if (this.appState.mobileMode && window.innerWidth < window.innerHeight) {
                 imgAndDesc = new Div(null, null, [
                     new Img(null, {
                         className: "openGraphImageVert",
-                        src: image.url
+                        src: image
                     }),
                     new Div(desc)
                 ]);
@@ -156,7 +168,7 @@ export class OpenGraphPanel extends Div {
                     new Div(null, { className: "openGraphLhs" }, [
                         new Img(null, {
                             className: "openGraphImage",
-                            src: image.url
+                            src: image
                         })
                     ]),
                     new Div(null, { className: "openGraphRhs" }, [

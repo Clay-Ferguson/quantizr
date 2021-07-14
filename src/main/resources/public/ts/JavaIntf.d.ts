@@ -7,6 +7,12 @@ export interface Bookmark {
     selfId: string;
 }
 
+export interface OpenGraph {
+    title: string;
+    description: string;
+    image: string;
+}
+
 export interface UserProfile {
     displayName: string;
     userName: string;
@@ -129,6 +135,10 @@ export interface GetNodeStatsRequest extends RequestBase {
     nodeId: string;
     trending: boolean;
     feed: boolean;
+}
+
+export interface GetOpenGraphRequest extends RequestBase {
+    url: string;
 }
 
 export interface GetServerInfoRequest extends RequestBase {
@@ -458,6 +468,10 @@ export interface GetNodeStatsResponse extends ResponseBase {
     topWords: string[];
     topTags: string[];
     topMentions: string[];
+}
+
+export interface GetOpenGraphResponse extends ResponseBase {
+    openGraph: OpenGraph;
 }
 
 export interface GetPublicServerInfoResponse extends ResponseBase {

@@ -64,6 +64,7 @@ import org.subnode.request.GetFollowingRequest;
 import org.subnode.request.GetFriendsRequest;
 import org.subnode.request.GetNodePrivilegesRequest;
 import org.subnode.request.GetNodeStatsRequest;
+import org.subnode.request.GetOpenGraphRequest;
 import org.subnode.request.GetServerInfoRequest;
 import org.subnode.request.GetSharedNodesRequest;
 import org.subnode.request.GetUserAccountInfoRequest;
@@ -123,6 +124,7 @@ import org.subnode.service.GraphNodesService;
 import org.subnode.service.IPFSService;
 import org.subnode.service.ImportBookService;
 import org.subnode.service.ImportService;
+import org.subnode.service.JSoupService;
 import org.subnode.service.LuceneService;
 import org.subnode.service.NodeEditService;
 import org.subnode.service.NodeMoveService;
@@ -249,6 +251,9 @@ public class AppController implements ErrorController {
 
 	@Autowired
 	private ActPubFollower apFollower;
+
+	@Autowired
+	private JSoupService jsoupService;
 
 	// NOTE: server.error.path app property points to this.
 	private static final String ERROR_MAPPING = "/error";
@@ -622,6 +627,11 @@ public class AppController implements ErrorController {
 		return callProc.run("appDrop", req, session, ms -> {
 			return nodeEditService.appDrop(ms, req);
 		});
+	}
+
+	@RequestMapping(value = API_PATH + "/getOpenGraph", method = RequestMethod.POST)
+	public @ResponseBody Object getOpenGraph(@RequestBody GetOpenGraphRequest req, HttpSession session) {
+		return jsoupService.getOpenGraph(req);
 	}
 
 	@RequestMapping(value = API_PATH + "/getNodePrivileges", method = RequestMethod.POST)
@@ -1071,12 +1081,13 @@ public class AppController implements ErrorController {
 
 	///////////////////////////////////////////////
 	// @GetMapping("/videos/{name}/full")
-    // public ResponseEntity<UrlResource> getFullVideo(@PathVariable String name) throws MalformedURLException {
-    //     UrlResource video = new UrlResource("file:${video.location}/${name}");
-    //     return ResponseEntity.status(HttpStatus.PARTIAL_CONTENT)
-    //             .contentType(MediaTypeFactory.getMediaType(video).orElse(MediaType.APPLICATION_OCTET_STREAM))
-    //             .body(video);
-    // }
+	// public ResponseEntity<UrlResource> getFullVideo(@PathVariable String name) throws
+	/////////////////////////////////////////////// MalformedURLException {
+	// UrlResource video = new UrlResource("file:${video.location}/${name}");
+	// return ResponseEntity.status(HttpStatus.PARTIAL_CONTENT)
+	// .contentType(MediaTypeFactory.getMediaType(video).orElse(MediaType.APPLICATION_OCTET_STREAM))
+	// .body(video);
+	// }
 
 	@RequestMapping(value = API_PATH + "/stream/{fileName}", method = RequestMethod.GET)
 	public ResponseEntity<ResourceRegion> streamMultiPart(//
@@ -1087,7 +1098,7 @@ public class AppController implements ErrorController {
 			HttpServletRequest request, //
 			HttpServletResponse response, //
 			HttpSession session) {
-		return (ResponseEntity<ResourceRegion>)callProc.run("stream", null, session, ms -> {
+		return (ResponseEntity<ResourceRegion>) callProc.run("stream", null, session, ms -> {
 			return attachmentService.getStreamResource(ms, headers, nodeId);
 		});
 	}
@@ -1431,7 +1442,7 @@ public class AppController implements ErrorController {
 	// reference: https://www.baeldung.com/spring-server-sent-events
 	@GetMapping(API_PATH + "/serverPush")
 	public SseEmitter serverPush(HttpSession session) {
-		return (SseEmitter)callProc.run("serverPush", null, session, ms -> {
+		return (SseEmitter) callProc.run("serverPush", null, session, ms -> {
 			return sc.getPushEmitter();
 		});
 	}

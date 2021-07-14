@@ -34,7 +34,7 @@ export interface Meta64Intf {
     ctrlKeyTime: number;
     ctrlKeyCheck(): boolean;
     decryptCache: Map<string, string>;
-    openGraphData: Map<string, any>;
+    openGraphData: Map<string, J.OpenGraph>;
     openGraphComps: OpenGraphPanel[];
     nodeHistory: NodeHistoryItem[];
 

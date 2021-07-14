@@ -77,7 +77,7 @@ export class Meta64 implements Meta64Intf {
     decryptCache: Map<string, string> = new Map<string, string>();
 
     /* Map of all URLs and the openGraph object retrieved for it */
-    openGraphData: Map<string, any> = new Map<string, any>();
+    openGraphData: Map<string, J.OpenGraph> = new Map<string, J.OpenGraph>();
 
     /* Map of all OpenGraphPanels in top to bottom rendered order. Each instance of an OpenGraphPanel
     needs to somehow associate to an array like this that's TAB SPECIFIC (todo-1), and for now we

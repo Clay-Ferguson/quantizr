@@ -211,7 +211,8 @@ public class AppFilter extends GenericFilterBean {
 					httpReq.getRequestURI().endsWith("/login") || //
 					httpReq.getRequestURI().endsWith("/proxyGet") || //
 					httpReq.getRequestURI().endsWith("/serverPush") || //
-					httpReq.getRequestURI().endsWith("/anonPageLoad")
+					httpReq.getRequestURI().endsWith("/anonPageLoad") || //
+					httpReq.getRequestURI().endsWith("/getOpenGraph")
 					) {
 				// these have priority
 			} else {
@@ -346,7 +347,8 @@ public class AppFilter extends GenericFilterBean {
 				path.contains("/mobile/api/stream") || //
 				path.contains("/mobile/api/getNodeStats") || //
 				path.contains("/mobile/api/getUserAccountInfo") || //
-				path.contains("/mobile/api/anonPageLoad")) {
+				path.contains("/mobile/api/anonPageLoad") || //
+				path.contains("/mobile/api/getOpenGraph")) {
 			return false;
 		}
 		return path.contains("/mobile/api/");
