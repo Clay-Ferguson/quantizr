@@ -8,6 +8,7 @@ export interface Bookmark {
 }
 
 export interface OpenGraph {
+    url: string;
     title: string;
     description: string;
     image: string;

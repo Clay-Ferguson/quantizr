@@ -54,13 +54,16 @@ public class JSoupService {
 		con.userAgent(BROWSER_USER_AGENT);
 		Document doc = con.get();
 
-		// todo-0: add site_name, type, url
-		// twitter:card (like og:type)
-		// twitter:title, twitter:description, twitter:url, twitter:image
+		// todo-1: add site_name, type, url, twitter:url, twitter:card (like og:type)
 
 		openGraph.setTitle(getOg(doc, "og:title"));
 		if (openGraph.getTitle() == null) {
 			openGraph.setTitle(getOg(doc, "twitter:title"));
+		}
+
+		openGraph.setUrl(getOg(doc, "og:url"));
+		if (openGraph.getUrl() == null) {
+			openGraph.setUrl(getOg(doc, "twitter:url"));
 		}
 
 		openGraph.setDescription(getOg(doc, "og:description"));

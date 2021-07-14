@@ -52,7 +52,8 @@ export class OpenGraphPanel extends Div {
                                         og = {
                                             title: null,
                                             description: null,
-                                            image: null
+                                            image: null,
+                                            url: null
                                         };
                                     }
                                     S.meta64.openGraphData.set(this.url, og);
@@ -94,7 +95,8 @@ export class OpenGraphPanel extends Div {
                                     og = {
                                         title: null,
                                         description: null,
-                                        image: null
+                                        image: null,
+                                        url: null
                                     };
                                 }
                                 S.meta64.openGraphData.set(o.url, og);
@@ -121,45 +123,38 @@ export class OpenGraphPanel extends Div {
             return;
         }
 
-        // all 4 of these variables can be removed. (todo-0)
-        // also we have an "OpenGraph" type that should be used in TypeScript now (defined in Java)
-        let o: any = state.og;
-        let title = o.title;
-        let desc = o.description;
-        let image = o.image;
-
         /* If neither a description nor image exists, this will not be interesting enough so don't render */
-        if (!desc && !image) {
+        if (!state.og.description && !state.og.image) {
             this.setChildren(null);
             return null;
         }
 
-        if (!o.ogUrl) {
-            o.ogUrl = this.url;
+        if (!state.og.url) {
+            state.og.url = this.url;
         }
 
-        let bookmarkIcon = o.ogUrl && !this.appState.isAnonUser ? new Icon({
+        let bookmarkIcon = state.og.url && !this.appState.isAnonUser ? new Icon({
             className: "fa fa-bookmark fa-lg ogBookmarkIcon float-right",
             title: "Bookmark this RSS entry",
             onClick: () => {
-                S.edit.addLinkBookmark(o.ogUrl, null);
+                S.edit.addLinkBookmark(state.og.url, null);
             }
         }) : null;
 
-        if (desc?.length > 800) {
-            desc = desc.substring(0, 800) + "...";
+        if (state.og.description?.length > 804) {
+            state.og.description = state.og.description.substring(0, 800) + "...";
         }
 
         let imgAndDesc: CompIntf = null;
-        if (image) {
+        if (state.og.image) {
             // if mobile portrait mode render image above (not beside) description
             if (this.appState.mobileMode && window.innerWidth < window.innerHeight) {
                 imgAndDesc = new Div(null, null, [
                     new Img(null, {
                         className: "openGraphImageVert",
-                        src: image
+                        src: state.og.image
                     }),
-                    new Div(desc)
+                    new Div(state.og.desc)
                 ]);
             }
             else {
@@ -168,11 +163,11 @@ export class OpenGraphPanel extends Div {
                     new Div(null, { className: "openGraphLhs" }, [
                         new Img(null, {
                             className: "openGraphImage",
-                            src: image
+                            src: state.og.image
                         })
                     ]),
                     new Div(null, { className: "openGraphRhs" }, [
-                        new Div(desc)
+                        new Div(state.og.description)
                     ])
                 ], "displayTableNoSpacing");
             }
@@ -180,17 +175,17 @@ export class OpenGraphPanel extends Div {
         // if no image just display the description in a div
         else {
             imgAndDesc = new Div(null, { className: "openGraphNoImage" }, [
-                new Div(desc)
+                new Div(state.og.description)
             ]);
         }
 
         this.attribs.className = "openGraphPanel";
         this.setChildren([
             bookmarkIcon,
-            o.ogUrl ? new Anchor(o.ogUrl, title, {
+            state.og.url ? new Anchor(state.og.url, state.og.title, {
                 target: "_blank",
                 className: "openGraphTitle"
-            }) : new Div(title, {
+            }) : new Div(state.og.title, {
                 className: "openGraphTitle"
             }),
             imgAndDesc
