@@ -1994,6 +1994,9 @@ audio::-webkit-media-controls-play-button {
 .openGraphLhs {
     margin: 8px;
     width: 30%;
+    // This min width is required when there are some crazy long strings in the RHS, and the browser
+    // crowds out the left hand side smashin it down to zero size unless we give a min size.
+    min-width: 100px;
 }
 
 .openGraphRhs {
