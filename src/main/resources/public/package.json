@@ -31,7 +31,6 @@
   },
   "devDependencies": {
     "@types/bootstrap": "^4.5.0",
-    "@types/jquery": "^3.5.1",
     "@types/marked": "^2.0.4",
     "@types/popper.js": "^1.11.0",
     "@types/react": "^17.0.3",
@@ -41,7 +40,7 @@
     "awesome-typescript-loader": "^5.2.1",
     "buffer": "^6.0.3",
     "circular-dependency-plugin": "^5.2.2",
-    "css-loader": "^5.2.7",
+    "css-loader": "^6.0.0",
     "eslint": "^7.30.0",
     "eslint-config-standard": "^16.0.3",
     "eslint-plugin-import": "^2.23.4",
