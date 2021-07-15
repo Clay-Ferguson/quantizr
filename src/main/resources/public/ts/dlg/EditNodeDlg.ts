@@ -647,18 +647,18 @@ export class EditNodeDlg extends DialogBase {
             this.uploadButton = (!hasAttachment && allowUpload) ? new Button("Attach", this.upload) : null,
             allowShare ? new Button("Share", this.share) : null,
 
-            advancedButtons ? new Icon({
-                className: "fa " + (S.speech.speechActive ? "fa-microphone-slash" : "fa-microphone") + " fa-lg editorButtonIcon",
-                title: "Toggle on/off Speech Recognition to input text",
-                onClick: this.speechRecognition
-            }) : null,
-
             // show delete button only if we're in a fullscreen viewer (like Calendar view)
             S.meta64.fullscreenViewerActive(this.appState)
                 ? new Button("Delete", () => {
                     S.edit.deleteSelNodes(null, state.node.id);
                     this.close();
                 }) : null,
+
+            advancedButtons ? new Icon({
+                className: "fa " + (S.speech.speechActive ? "fa-microphone-slash" : "fa-microphone") + " fa-lg editorButtonIcon",
+                title: "Toggle on/off Speech Recognition to input text",
+                onClick: this.speechRecognition
+            }) : null,
 
             advancedButtons ? new Icon({
                 className: "fa fa-clock-o fa-lg editorButtonIcon",
