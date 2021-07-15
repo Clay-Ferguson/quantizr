@@ -70,18 +70,23 @@ public class AppFilter extends GenericFilterBean {
 			throw new RuntimeException("Server temporarily offline.");
 		}
 
+		boolean isAjaxCall = false;
+		HttpServletResponse httpRes = null;
 		try {
 			ThreadLocals.removeAll();
 			MongoThreadLocal.removeAll();
-			
+
 			int thisReqId = ++reqId;
 			String ip = null;
 
 			HttpServletRequest httpReq = null;
 			if (req instanceof HttpServletRequest) {
-				//log.debug("***** SC: User: " + sc.getUserName());
+				// log.debug("***** SC: User: " + sc.getUserName());
 
 				httpReq = (HttpServletRequest) req;
+				httpRes = (HttpServletResponse) res;
+				isAjaxCall = httpReq.getRequestURI().contains("/mobile/api/");
+
 				sc.addAction(httpReq.getRequestURI());
 				String bearer = httpReq.getHeader("Bearer");
 
@@ -109,7 +114,7 @@ public class AppFilter extends GenericFilterBean {
 					checkApiSecurity(bearer, httpReq);
 				}
 
-				HttpServletResponse httpRes = (HttpServletResponse) res;
+
 				ip = getClientIpAddr(httpReq);
 				sc.setIp(ip);
 
@@ -176,7 +181,6 @@ public class AppFilter extends GenericFilterBean {
 				}
 
 				if (logResponses) {
-					HttpServletResponse httpRes = (HttpServletResponse) res;
 					log.debug("    RES: [" + String.valueOf(thisReqId) + "]" /* +httpRes.getStatus() */
 							+ HttpStatus.valueOf(httpRes.getStatus()));
 				}
@@ -185,6 +189,16 @@ public class AppFilter extends GenericFilterBean {
 				log.error("Request Failed", ex);
 				throw ex;
 			}
+		} catch (Exception e) {
+			/*
+			 * we send back the error here, for AJAX calls so we don't bubble up to the default handling and
+			 * cause it to send back the html error page.
+			 */
+			if (isAjaxCall) {
+				httpRes.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+				return;
+			}
+			throw e;
 		} finally {
 			/* Set thread back to clean slate, for it's next cycle time in threadpool */
 			ThreadLocals.removeAll();
@@ -212,8 +226,7 @@ public class AppFilter extends GenericFilterBean {
 					httpReq.getRequestURI().endsWith("/proxyGet") || //
 					httpReq.getRequestURI().endsWith("/serverPush") || //
 					httpReq.getRequestURI().endsWith("/anonPageLoad") || //
-					httpReq.getRequestURI().endsWith("/getOpenGraph")
-					) {
+					httpReq.getRequestURI().endsWith("/getOpenGraph")) {
 				// these have priority
 			} else {
 				long wait = THROTTLE_INTERVAL - (curTime - info.getLastRequestTime());

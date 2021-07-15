@@ -464,9 +464,20 @@ export class Util implements UtilIntf {
                     credentials: "same-origin", // include, *same-origin, omit
                     referrerPolicy: "no-referrer"
                 })
-                    .then(res => res.json())
-                    .then(data => {
-                        resolve(data);
+                    .then((res: any) => {
+                        if (res.status !== 200) {
+                            reject({ response: res });
+                        }
+                        else {
+                            return res.text();
+                        }
+                    })
+                    .then((json: string) => {
+                        /* if we did a reject above in the first 'then' we will get here with json undefined
+                        so we ignore that */
+                        if (json) {
+                            resolve(JSON.parse(json));
+                        }
                     })
                     .catch((error) => {
                         reject(error);
@@ -594,7 +605,8 @@ export class Util implements UtilIntf {
                     }
                     else {
                         const status = error.response ? error.response.status : "";
-                        this.showMessage("Request failed: ERROR: " + status + ": " + error.message, "Warning", true);
+                        this.showMessage("Request failed: ERROR: " + status +
+                            (error.message ? (": " + error.message) : ""), "Warning", true);
                     }
                 } catch (ex) {
                     this.logAndReThrow("Failed processing: " + postName, ex);
