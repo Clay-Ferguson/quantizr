@@ -92,20 +92,6 @@ export class RssTypeHandler extends TypeBase {
         let feedSrcHash = S.util.hashOfString(feedSrc);
         let itemListContainer: Div = new Div("", { className: "rss-feed-listing" });
 
-        // todo-0: make sure these types are still able to be handled.
-        // var options = {
-        //     customFields: {
-        //         item: [
-        //             ["media:group", "mediaGroup"],
-        //             ["media:content", "mediaContent"],
-        //             ["media:thumbnail", "mediaThumbnail"],
-        //             ["category", "category"],
-        //             ["itunes:image", "itunesImage"],
-        //             ["itunes:subtitle", "itunesSubtitle"]
-        //         ]
-        //     }
-        // };
-
         /*
         If we find the RSS feed in the cache, use it.
         disabling cache for now: somehow the "Play Button" never works (onClick not wired) whenever it renders from the cache and i haven't had time to
@@ -146,10 +132,6 @@ export class RssTypeHandler extends TypeBase {
                 state.feedPage[feedSrcHash] = page;
             }
 
-            // console.log("Reading RSS: " + feedSrc);
-
-            // todo-0: we can get into cases where a fail to render disables the app. Even if user tries to comee back to
-            // different url the browser will point them to same one and continue to fail endlessly
             S.util.ajax<J.GetMultiRssRequest, J.GetMultiRssResponse>("getMultiRssFeed", {
                 urls: feedSrc,
                 page
@@ -163,8 +145,6 @@ export class RssTypeHandler extends TypeBase {
                     });
                 }
                 else {
-                    // console.log("FEED: " + S.util.prettyPrint(res.feed));
-
                     dispatch("Action_RSSUpdated", (s: AppState): AppState => {
                         S.meta64.tabScrollTop(s, C.TAB_MAIN);
                         if (!res.feed.entries || res.feed.entries.length === 0) {
