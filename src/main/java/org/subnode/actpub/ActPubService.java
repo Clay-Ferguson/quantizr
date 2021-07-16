@@ -1059,7 +1059,7 @@ public class ActPubService {
              * faster to check for dups before calling save here.
              */
             try {
-                log.debug("Saving Name: " + fName.getName());
+                // log.debug("Saving Name: " + fName.getName());
                 ops.save(fName);
                 Thread.sleep(500);
             } catch (Exception e) {

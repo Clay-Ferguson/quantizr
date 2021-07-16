@@ -204,13 +204,13 @@ of the spring configs for security are also perfected.
 <dependency>
     <groupId>com.rometools</groupId>
     <artifactId>rome</artifactId>
-    <version>1.15.0</version>
+    <version>1.16.0</version>
 </dependency>
 
 <dependency>
     <groupId>com.rometools</groupId>
     <artifactId>rome-modules</artifactId>
-    <version>1.15.0</version>
+    <version>1.16.0</version>
 </dependency>
 
 <dependency>
@@ -237,12 +237,6 @@ of the spring configs for security are also perfected.
     </exclusions>
 </dependency>
 -->
-
-<dependency>
-    <groupId>net.java.dev.rome</groupId>
-    <artifactId>rome</artifactId>
-    <version>1.0.0</version>
-</dependency>
 
 <dependency>
     <groupId>org.apache.pdfbox</groupId>
@@ -630,13 +624,13 @@ of the spring configs for security are also perfected.
 <dependency>
     <groupId>com.rometools</groupId>
     <artifactId>rome</artifactId>
-    <version>1.15.0</version>
+    <version>1.16.0</version>
 </dependency>
 
 <dependency>
     <groupId>com.rometools</groupId>
     <artifactId>rome-modules</artifactId>
-    <version>1.15.0</version>
+    <version>1.16.0</version>
 </dependency>
 
 <dependency>
@@ -663,12 +657,6 @@ of the spring configs for security are also perfected.
     </exclusions>
 </dependency>
 -->
-
-<dependency>
-    <groupId>net.java.dev.rome</groupId>
-    <artifactId>rome</artifactId>
-    <version>1.0.0</version>
-</dependency>
 
 <dependency>
     <groupId>org.apache.pdfbox</groupId>
@@ -896,13 +884,13 @@ of the spring configs for security are also perfected.
 <dependency>
     <groupId>com.rometools</groupId>
     <artifactId>rome</artifactId>
-    <version>1.15.0</version>
+    <version>1.16.0</version>
 </dependency>
 
 <dependency>
     <groupId>com.rometools</groupId>
     <artifactId>rome-modules</artifactId>
-    <version>1.15.0</version>
+    <version>1.16.0</version>
 </dependency>
 
 <dependency>
@@ -929,12 +917,6 @@ of the spring configs for security are also perfected.
     </exclusions>
 </dependency>
 -->
-
-<dependency>
-    <groupId>net.java.dev.rome</groupId>
-    <artifactId>rome</artifactId>
-    <version>1.0.0</version>
-</dependency>
 
 <dependency>
     <groupId>org.apache.pdfbox</groupId>
@@ -1338,13 +1320,13 @@ of the spring configs for security are also perfected.
 <dependency>
     <groupId>com.rometools</groupId>
     <artifactId>rome</artifactId>
-    <version>1.15.0</version>
+    <version>1.16.0</version>
 </dependency>
 
 <dependency>
     <groupId>com.rometools</groupId>
     <artifactId>rome-modules</artifactId>
-    <version>1.15.0</version>
+    <version>1.16.0</version>
 </dependency>
 
 <dependency>
@@ -1371,12 +1353,6 @@ of the spring configs for security are also perfected.
     </exclusions>
 </dependency>
 -->
-
-<dependency>
-    <groupId>net.java.dev.rome</groupId>
-    <artifactId>rome</artifactId>
-    <version>1.0.0</version>
-</dependency>
 
 <dependency>
     <groupId>org.apache.pdfbox</groupId>

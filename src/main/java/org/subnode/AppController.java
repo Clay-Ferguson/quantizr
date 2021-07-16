@@ -62,6 +62,7 @@ import org.subnode.request.GetConfigRequest;
 import org.subnode.request.GetFollowersRequest;
 import org.subnode.request.GetFollowingRequest;
 import org.subnode.request.GetFriendsRequest;
+import org.subnode.request.GetMultiRssRequest;
 import org.subnode.request.GetNodePrivilegesRequest;
 import org.subnode.request.GetNodeStatsRequest;
 import org.subnode.request.GetOpenGraphRequest;
@@ -534,31 +535,38 @@ public class AppController implements ErrorController {
 		});
 	}
 
-	/* url can be a single RSS url, or multiple newline delimted ones */
-	@GetMapping(value = {"/multiRssFeed"})
-	public void multiRssFeed(@RequestParam(value = "url", required = true) String url, //
-			@RequestParam(value = "page", required = false) String pageStr, //
-			HttpServletResponse response, //
-			HttpSession session) {
-		callProc.run("multiRssFeed", null, session, ms -> {
-			// log.debug("Processing multiRssFeed: url=" + url);
-			try {
-				int page = 1;
-				if (pageStr != null) {
-					try {
-						page = Integer.parseInt(pageStr);
-					} catch (Exception e) {
-						// ignore, and leave as 1 if page is invalid
-					}
-				}
-				rssFeedService.multiRssFeed(url, response.getWriter(), page);
-			} catch (Exception e) {
-				ExUtil.error(log, "multiRssFeed Error: ", e);
-				throw new RuntimeException("internal server error");
-			}
-			return null;
+	@RequestMapping(value = API_PATH + "/getMultiRssFeed", method = RequestMethod.POST)
+	public @ResponseBody Object getMultiRssFeed(@RequestBody GetMultiRssRequest req, HttpSession session) {
+		return callProc.run("getMultiRssFeed", req, session, ms -> {
+			return rssFeedService.getMultiRssFeed(req);
 		});
 	}
+
+	// /* url can be a single RSS url, or multiple newline delimted ones */
+	// @GetMapping(value = {"/multiRssFeed"})
+	// public void multiRssFeed(@RequestParam(value = "url", required = true) String url, //
+	// 		@RequestParam(value = "page", required = false) String pageStr, //
+	// 		HttpServletResponse response, //
+	// 		HttpSession session) {
+	// 	callProc.run("multiRssFeed", null, session, ms -> {
+	// 		// log.debug("Processing multiRssFeed: url=" + url);
+	// 		try {
+	// 			int page = 1;
+	// 			if (pageStr != null) {
+	// 				try {
+	// 					page = Integer.parseInt(pageStr);
+	// 				} catch (Exception e) {
+	// 					// ignore, and leave as 1 if page is invalid
+	// 				}
+	// 			}
+	// 			rssFeedService.multiRssFeed(url, response.getWriter(), page);
+	// 		} catch (Exception e) {
+	// 			ExUtil.error(log, "multiRssFeed Error: ", e);
+	// 			throw new RuntimeException("internal server error");
+	// 		}
+	// 		return null;
+	// 	});
+	// }
 
 	@RequestMapping(value = API_PATH + "/signup", method = RequestMethod.POST)
 	public @ResponseBody Object signup(@RequestBody SignupRequest req, HttpSession session) {

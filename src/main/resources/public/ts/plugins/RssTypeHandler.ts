@@ -1,4 +1,3 @@
-import * as RssParser from "rss-parser";
 import { dispatch } from "../AppRedux";
 import { AppState } from "../AppState";
 import { Constants as C } from "../Constants";
@@ -32,7 +31,7 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
 
 export class RssTypeHandler extends TypeBase {
     static expansionState: any = {};
-    static lastGoodFeed: any;
+    static lastGoodFeed: J.RssFeed;
     static lastGoodPage: number;
 
     constructor() {
@@ -84,6 +83,7 @@ export class RssTypeHandler extends TypeBase {
 
     render(node: J.NodeInfo, rowStyling: boolean, isTreeView: boolean, state: AppState): Comp {
 
+        // console.log("RSSTypeHandler.render");
         let feedSrc: string = S.props.getNodePropVal(J.NodeProp.RSS_FEED_SRC, node);
         if (!feedSrc) {
             return (new TextContent("Set the '" + J.NodeProp.RSS_FEED_SRC + "' node property to the RSS Feed URL.", "alert alert-info marginLeft marginTop"));
@@ -92,18 +92,19 @@ export class RssTypeHandler extends TypeBase {
         let feedSrcHash = S.util.hashOfString(feedSrc);
         let itemListContainer: Div = new Div("", { className: "rss-feed-listing" });
 
-        let parser = new RssParser({
-            customFields: {
-                item: [
-                    ["media:group", "mediaGroup"],
-                    ["media:content", "mediaContent"],
-                    ["media:thumbnail", "mediaThumbnail"],
-                    ["category", "category"],
-                    ["itunes:image", "itunesImage"],
-                    ["itunes:subtitle", "itunesSubtitle"]
-                ]
-            }
-        });
+        // todo-0: make sure these types are still able to be handled.
+        // var options = {
+        //     customFields: {
+        //         item: [
+        //             ["media:group", "mediaGroup"],
+        //             ["media:content", "mediaContent"],
+        //             ["media:thumbnail", "mediaThumbnail"],
+        //             ["category", "category"],
+        //             ["itunes:image", "itunesImage"],
+        //             ["itunes:subtitle", "itunesSubtitle"]
+        //         ]
+        //     }
+        // };
 
         /*
         If we find the RSS feed in the cache, use it.
@@ -129,7 +130,11 @@ export class RssTypeHandler extends TypeBase {
         }
         // otherwise read from the internet
         else {
-            state.feedCache[feedSrcHash] = "loading";
+            // update state to 'loading' immediately or else this can reenter.
+            dispatch("Action_RSSLoading", (s: AppState): AppState => {
+                s.feedCache[feedSrcHash] = "loading";
+                return s;
+            });
 
             itemListContainer.addChild(new Heading(4, "Loading RSS Feed..."));
             itemListContainer.addChild(new Div("For large feeds this can take a few seconds..."));
@@ -141,11 +146,15 @@ export class RssTypeHandler extends TypeBase {
                 state.feedPage[feedSrcHash] = page;
             }
 
-            let url = S.util.getRemoteHost() + "/multiRssFeed?url=" + encodeURIComponent(feedSrc) + "&page=" + page;
+            // console.log("Reading RSS: " + feedSrc);
 
-            // console.log("Reading RSS: " + url);
-            parser.parseURL(url, (err, feed) => {
-                if (!feed) {
+            // todo-0: we can get into cases where a fail to render disables the app. Even if user tries to comee back to
+            // different url the browser will point them to same one and continue to fail endlessly
+            S.util.ajax<J.GetMultiRssRequest, J.GetMultiRssResponse>("getMultiRssFeed", {
+                urls: feedSrc,
+                page
+            }, (res: J.GetMultiRssResponse) => {
+                if (!res.feed) {
                     // new MessageDlg(err.message || "RSS Feed failed to load.", "Warning", null, null, false, 0, state).open();
                     // console.log(err.message || "RSS Feed failed to load.");
                     dispatch("Action_RSSUpdated", (s: AppState): AppState => {
@@ -154,18 +163,20 @@ export class RssTypeHandler extends TypeBase {
                     });
                 }
                 else {
+                    // console.log("FEED: " + S.util.prettyPrint(res.feed));
+
                     dispatch("Action_RSSUpdated", (s: AppState): AppState => {
                         S.meta64.tabScrollTop(s, C.TAB_MAIN);
-                        if (!feed.items || feed.items.length === 0) {
-                            s.feedCache[feedSrcHash] = RssTypeHandler.lastGoodFeed;
-                            s.feedPage[feedSrcHash] = RssTypeHandler.lastGoodPage;
+                        if (!res.feed.entries || res.feed.entries.length === 0) {
+                            s.feedCache[feedSrcHash] = RssTypeHandler.lastGoodFeed || {};
+                            s.feedPage[feedSrcHash] = RssTypeHandler.lastGoodPage || 1;
                             setTimeout(() => {
                                 S.util.showMessage("No more RSS items found.", "RSS");
                             }, 250);
                         }
                         else {
-                            s.feedCache[feedSrcHash] = feed;
-                            RssTypeHandler.lastGoodFeed = feed;
+                            s.feedCache[feedSrcHash] = res.feed;
+                            RssTypeHandler.lastGoodFeed = res.feed;
                             RssTypeHandler.lastGoodPage = s.feedPage[feedSrcHash];
                         }
                         return s;
@@ -176,7 +187,7 @@ export class RssTypeHandler extends TypeBase {
         return itemListContainer;
     }
 
-    renderItem(feed: any, feedSrc: string, itemListContainer: Comp, state: AppState) {
+    renderItem(feed: J.RssFeed, feedSrc: string, itemListContainer: Comp, state: AppState) {
         let feedOut: Comp[] = [];
         // console.log("FEED: " + S.util.prettyPrint(feed));
 
@@ -206,15 +217,8 @@ export class RssTypeHandler extends TypeBase {
         if (feed.image) {
             feedOut.push(new Img(null, {
                 className: "rss-feed-image",
-                src: feed.image.url,
-                title: feed.image.title
-                // align: "left" // causes text to flow around
-            }));
-        }
-        else if (feed.itunes && feed.itunes.image) {
-            feedOut.push(new Img(null, {
-                className: "rss-feed-image",
-                src: feed.itunes.image
+                src: feed.image
+                // title: feed.image.title // todo-0: add this back.
                 // align: "left" // causes text to flow around
             }));
         }
@@ -246,14 +250,15 @@ export class RssTypeHandler extends TypeBase {
             feedOut.push(new Div(feedSrc));
         }
 
-        if (feed.creator) {
-            feedOut.push(new Div(feed.creator));
-        }
+        // todo-0: add back
+        // if (feed.creator) {
+        //     feedOut.push(new Div(feed.creator));
+        // }
 
         let feedOutDiv = new Div(null, { className: "marginBottom" }, feedOut);
         itemListContainer.safeGetChildren().push(feedOutDiv);
 
-        for (let item of feed.items) {
+        for (let item of feed.entries) {
             // console.log("FEED ITEM: " + S.util.prettyPrint(item));
             itemListContainer.safeGetChildren().push(this.buildFeedItem(feed, item, state));
         }
@@ -309,47 +314,47 @@ export class RssTypeHandler extends TypeBase {
         });
     }
 
-    buildFeedItem(feed: any, entry: any, state: AppState): Comp {
+    buildFeedItem(feed: J.RssFeed, entry: J.RssFeedEntry, state: AppState): Comp {
+        // console.log("ENTRY: " + S.util.prettyPrint(entry));
         let children: Comp[] = [];
         let headerDivChildren = [];
-
-        // console.log("ENTRY: " + S.util.prettyPrint(entry));
-
-        if (entry.mediaGroup && entry.mediaGroup["media:thumbnail"]) {
-            entry.mediaThumbnail = entry.mediaGroup["media:thumbnail"];
-            // 1: if this is an array we should display all?
-            if (entry.mediaThumbnail instanceof Array) {
-                entry.mediaThumbnail = entry.mediaThumbnail[0];
-            }
-        }
 
         /* todo-1: Sometimes entry.category can be an Object (not a String) here which will
         make React fail badly and render the entire page blank,
         blowing up the hole app, so we need probably validate EVERY
         property on entry with 'instanceof' like we're doing here to protect
         against that kind of chaos */
-        if (entry.category instanceof Object) {
-            // todo-1: put this kind of typeof in "S.util.isString"
-            if (entry.category.$ && (typeof entry.category.$.term === "string")) {
-                // Some feeds have the category text buried under "$.term" so we just fix that here. This is a quick fix
-                // only applicable to one feed afaik, and I'm not going to dig deeper into why we got this scenario (for now)
-                entry.category = entry.category.$.term;
-            }
-        }
+        // if (entry.category instanceof Object) {
+        //     // todo-1: put this kind of typeof in "S.util.isString"
+        //     if (entry.category.$ && (typeof entry.category.$.term === "string")) {
+        //         // Some feeds have the category text buried under "$.term" so we just fix that here. This is a quick fix
+        //         // only applicable to one feed afaik, and I'm not going to dig deeper into why we got this scenario (for now)
+        //         entry.category = entry.category.$.term;
+        //     }
+        // }
+        // if ((typeof entry.category === "string")) {
+        //     headerDivChildren.push(new Div(entry.category));
+        // }
 
-        if ((typeof entry.category === "string")) {
-            headerDivChildren.push(new Div(entry.category));
-        }
-
-        let hasAudioEnclosure = entry.enclosure && entry.enclosure.url && entry.enclosure.type &&
-            entry.enclosure.type.indexOf("audio/") !== -1;
         let playAudioFunc: Function = null;
 
-        if (hasAudioEnclosure) {
-            playAudioFunc = () => {
-                let dlg = new AudioPlayerDlg(feed.title, entry.title, null, entry.enclosure.url, 0, state);
-                dlg.open();
-            };
+        // todo-0: change to arrays to handle multiples of these types
+        let audioEnclosure: J.RssFeedEnclosure = null;
+        let imageEnclosure: J.RssFeedEnclosure = null;
+
+        if (entry.enclosures) {
+            entry.enclosures.forEach(enc => {
+                if (enc.type && enc.type.indexOf("audio/") !== -1) {
+                    audioEnclosure = enc;
+                    playAudioFunc = () => {
+                        let dlg = new AudioPlayerDlg(feed.title, entry.title, null, enc.url, 0, state);
+                        dlg.open();
+                    };
+                }
+                else if (enc.type && enc.type.indexOf("image/") !== -1) {
+                    imageEnclosure = enc;
+                }
+            });
         }
 
         let shortTitle = null;
@@ -360,6 +365,7 @@ export class RssTypeHandler extends TypeBase {
                 delimted string to extract a designation of which feed this item is from since they will all be
                 mixed and interwoven together from multiple sources based on the timestamp ordering (rev chron)
                 */
+            // todo-0: with new architecture this "::" hack can go away now!!
             let colonIdx = entry.title.indexOf(" :: ");
             if (colonIdx !== -1) {
                 feedTitle = entry.title.substring(0, colonIdx);
@@ -375,8 +381,7 @@ export class RssTypeHandler extends TypeBase {
                     dangerouslySetInnerHTML: { __html: shortTitle }
                 };
 
-                // If the entry.link is not given we default a click on it, to just play the audio.
-                if (!entry.link && hasAudioEnclosure) {
+                if (!entry.link && playAudioFunc) {
                     anchorAttribs.onClick = playAudioFunc;
                 }
 
@@ -394,7 +399,7 @@ export class RssTypeHandler extends TypeBase {
                 };
 
                 // If the entry.link is not given we default a click on it, to just play the audio.
-                if (!entry.link && hasAudioEnclosure) {
+                if (!entry.link && playAudioFunc) {
                     anchorAttribs.onClick = playAudioFunc;
                 }
 
@@ -404,92 +409,43 @@ export class RssTypeHandler extends TypeBase {
             }
         }
 
-        if (entry.itunesSubtitle && entry.itunesSubtitle !== entry.title) {
-            headerDivChildren.push(new Div(null, {
-                dangerouslySetInnerHTML: { __html: entry.itunesSubtitle }
-            }));
-        }
-
         children.push(new Div(null, null, headerDivChildren));
 
-        if (hasAudioEnclosure) {
-            let downloadLink = new Anchor(entry.enclosure.url, "[ Download " + entry.enclosure.type + " ]", { className: "rssDownloadLink" }, null, true);
+        if (playAudioFunc) {
+            let downloadLink = new Anchor(audioEnclosure.url, "[ Download " + audioEnclosure.type + " ]", { className: "rssDownloadLink" }, null, true);
             let audioButton = new Button("Play Audio", playAudioFunc, null, "btn-primary");
-
             children.push(new ButtonBar([audioButton, downloadLink], null, "rssMediaButtons"));
         }
 
         children.push(new Div(null, { className: "clearBoth" }));
 
-        // IMAGES
-        if (entry.mediaThumbnail && entry.mediaThumbnail.$) {
-            // console.log("mediaThumbnail: " + entry.mediaThumbnail.$.url);
-            let style: any = {};
-
-            children.push(new Img(null, {
-                style,
-                className: "rss-feed-image",
-                src: entry.mediaThumbnail.$.url
-                // align: "left" // causes text to flow around
-            }));
-        }
-        else if (entry.itunesImage && entry.itunesImage.$) {
-            // console.log("mediaThumbnail: " + entry.itunesImage.$.href);
+        if (imageEnclosure) {
             children.push(new Img(null, {
                 className: "rss-feed-image",
-                src: entry.itunesImage.$.href
-                // align: "left" // causes text to flow around
+                src: imageEnclosure.url
             }));
         }
 
-        if (entry.enclosure && entry.enclosure.url && entry.enclosure.type &&
-            entry.enclosure.type.indexOf("image/") !== -1) {
+        if (entry.thumbnail) {
             children.push(new Img(null, {
                 className: "rss-feed-image",
-                src: entry.enclosure.url
-            }));
-        }
-
-        /* if mediaContent is present with url and either the type is missing or the type is specified as image, then
-        assume image */
-        if (entry.mediaContent && entry.mediaContent.$ && entry.mediaContent.$.url &&
-            (!entry.mediaContent.$.type || entry.mediaContent.$.type.indexOf("image/") !== -1)) {
-            // console.log("mediaContentImage=" + entry.mediaContent.$.url);
-            children.push(new Img(null, {
-                className: "rss-feed-image",
-                src: entry.mediaContent.$.url
+                src: entry.thumbnail
             }));
         }
 
         if (!state.userPreferences.rssHeadlinesOnly) {
-            let mediaDescription = entry.mediaGroup ? entry.mediaGroup["media:description"] : null;
-
-            let textContent = null;
-            if (entry.content) {
-                textContent = entry.content;
-            }
-            else if (entry["content:encoded"]) {
-                textContent = entry["content:encoded"];
-            }
-            else if (entry.contentSnippet) {
-                textContent = entry.contentSnippet;
-            }
-            else if (mediaDescription) {
-                textContent = mediaDescription;
-            }
-
-            if (textContent) {
-                children.push(new Html(textContent));
+            if (entry.description) {
+                children.push(new Html(entry.description));
             }
         }
 
-        let dateStr = entry.pubDate;
-        if (entry.isoDate) {
-            let date = Date.parse(entry.isoDate);
-            if (date) {
-                dateStr = S.util.formatDateShort(new Date(date));
-            }
-        }
+        let dateStr = ""; // entry.pubDate; //todo-0: fix
+        // if (entry.isoDate) {
+        //     let date = Date.parse(entry.isoDate);
+        //     if (date) {
+        //         dateStr = S.util.formatDateShort(new Date(date));
+        //     }
+        // }
 
         let linkIcon = new Icon({
             className: "fa fa-link fa-lg rssLinkIcon",
@@ -528,6 +484,7 @@ export class RssTypeHandler extends TypeBase {
         children.push(new Div(null, { className: "float-right" }, [
             footerSpan, postIcon, linkIcon, bookmarkIcon
         ]));
+
         children.push(new Clearfix());
 
         return new Div(null, { className: "rss-feed-item" }, children);

@@ -12,8 +12,14 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import com.rometools.modules.mediarss.MediaEntryModuleImpl;
+import com.rometools.modules.mediarss.types.MediaGroup;
+import com.rometools.modules.mediarss.types.Metadata;
+import com.rometools.modules.mediarss.types.Thumbnail;
+import com.rometools.rome.feed.module.Module;
 import com.rometools.rome.feed.synd.SyndContent;
 import com.rometools.rome.feed.synd.SyndContentImpl;
+import com.rometools.rome.feed.synd.SyndEnclosure;
 import com.rometools.rome.feed.synd.SyndEntry;
 import com.rometools.rome.feed.synd.SyndEntryImpl;
 import com.rometools.rome.feed.synd.SyndFeed;
@@ -45,10 +51,15 @@ import org.subnode.config.AppProp;
 import org.subnode.exception.NodeAuthFailedException;
 import org.subnode.model.NodeMetaInfo;
 import org.subnode.model.client.NodeProp;
+import org.subnode.model.client.RssFeed;
+import org.subnode.model.client.RssFeedEnclosure;
+import org.subnode.model.client.RssFeedEntry;
+import org.subnode.mongo.AdminRun;
 import org.subnode.mongo.MongoRead;
 import org.subnode.mongo.MongoSession;
-import org.subnode.mongo.AdminRun;
 import org.subnode.mongo.model.SubNode;
+import org.subnode.request.GetMultiRssRequest;
+import org.subnode.response.GetMultiRssResponse;
 import org.subnode.util.Const;
 import org.subnode.util.ExUtil;
 import org.subnode.util.LimitedInputStreamEx;
@@ -123,7 +134,8 @@ public class RSSFeedService {
 	 */
 	@Scheduled(fixedDelay = 30 * 60 * 1000)
 	public void run() {
-		if (run) return;
+		if (run)
+			return;
 		try {
 			run = true;
 			runCount++;
@@ -357,7 +369,6 @@ public class RSSFeedService {
 			}
 
 			int timeout = 60; // seconds
-			// log.debug("Reading RSS stream");
 
 			if (USE_URL_READER) {
 				/*
@@ -428,10 +439,7 @@ public class RSSFeedService {
 			// }
 			// }
 
-			// log.debug("Feed " + url + " has " + inFeed.getEntries().size() + "
-			// entries.");
-			sanitizeFeed(inFeed);
-
+			// log.debug("Feed " + url + " has " + inFeed.getEntries().size() + " entries.");
 			// we update the cache regardless of 'fromCache' val. this is correct.
 			feedCache.put(url, inFeed);
 			return inFeed;
@@ -455,29 +463,6 @@ public class RSSFeedService {
 				StreamUtil.close(reader);
 			}
 		}
-	}
-
-	public void sanitizeFeed(SyndFeed feed) {
-		feed.setDescription(sanitizeHtml(feed.getDescription()));
-		for (SyndEntry entry : feed.getEntries()) {
-
-			// sanitize entry.title
-			if (entry.getTitle() != null) {
-				entry.setTitle(quoteFix(entry.getTitle()));
-			}
-
-			// sanitize entry.description.value
-			if (entry.getDescription() != null && entry.getDescription().getValue() != null) {
-				entry.getDescription().setValue(quoteFix(entry.getDescription().getValue()));
-			}
-
-			for (SyndContent content : entry.getContents()) {
-				if (content.getValue() != null) {
-					content.setValue(sanitizeHtml(content.getValue()));
-				}
-			}
-		}
-		// log.debug("SyndFeed: " + XString.prettyPrint(feed));
 	}
 
 	private String quoteFix(String html) {
@@ -510,22 +495,14 @@ public class RSSFeedService {
 		return policy.sanitize(html);
 	}
 
-	/*
-	 * Takes a newline delimited list of rss feed urls, and returns the feed for them as an aggregate
-	 * while also updating our caching
-	 * 
-	 * Page will be 1 offset (1, 2, 3, ...)
-	 */
-	public void multiRssFeed(String urls, Writer writer, int page) {
-
-		List<String> urlList = XString.tokenize(urls, "\n", true);
+	public GetMultiRssResponse getMultiRssFeed(GetMultiRssRequest req) {
+		GetMultiRssResponse res = new GetMultiRssResponse();
+		List<String> urlList = XString.tokenize(req.getUrls(), "\n", true);
 		urlList.removeIf(url -> url.startsWith("#") || StringUtils.isEmpty(url.trim()));
-
 		SyndFeed feed = null;
 
 		/* If multiple feeds we build an aggregate */
 		if (urlList.size() > 1) {
-
 			feed = new SyndFeedImpl();
 			feed.setEncoding("UTF-8");
 			feed.setFeedType("rss_2.0");
@@ -535,9 +512,8 @@ public class RSSFeedService {
 			feed.setLink("");
 			List<SyndEntry> entries = new LinkedList<>();
 			feed.setEntries(entries);
-			aggregateFeeds(urlList, entries, page);
+			aggregateFeeds(urlList, entries, req.getPage());
 			// log.debug("Sending back " + entries.size() + " entries.");
-			writeFeed(feed, writer);
 		}
 		/* If not an aggregate return the one external feed itself */
 		else {
@@ -545,12 +521,84 @@ public class RSSFeedService {
 			SyndFeed cachedFeed = getFeed(url, true);
 			if (cachedFeed != null) {
 				feed = new SyndFeedImpl();
-				cloneFeedForPage(feed, cachedFeed, page);
+				cloneFeedForPage(feed, cachedFeed, req.getPage());
 			}
 		}
 
-		if (feed != null) {
-			writeFeed(feed, writer);
+		fixFeed(feed);
+		RssFeed rssFeed = convertToFeed(feed);
+		// log.debug("FEED JSON: " + XString.prettyPrint(rssFeed));
+		res.setFeed(rssFeed);
+		return res;
+	}
+
+	public RssFeed convertToFeed(SyndFeed feed) {
+		RssFeed rf = new RssFeed();
+		rf.setTitle(feed.getTitle());
+		rf.setDescription(feed.getDescription());
+		rf.setAuthor(feed.getAuthor());
+		rf.setEncoding(feed.getEncoding());
+
+		if (feed.getImage() != null) {
+			rf.setImage(feed.getImage().getUrl());
+		}
+		rf.setLink(feed.getLink());
+
+		List<RssFeedEntry> rssEntries = new LinkedList<>();
+		rf.setEntries(rssEntries);
+
+		if (feed.getEntries() != null) {
+			for (SyndEntry entry : feed.getEntries()) {
+				// log.debug("Entry: " + XString.prettyPrint(entry));
+				RssFeedEntry e = new RssFeedEntry();
+				rssEntries.add(e);
+
+				if (entry.getDescription() != null) {
+					e.setDescription(entry.getDescription().getValue());
+				}
+				e.setTitle(entry.getTitle());
+				e.setLink(entry.getLink());
+
+				if (entry.getEnclosures() != null) {
+					List<RssFeedEnclosure> enclosures = new LinkedList<>();
+					e.setEnclosures(enclosures);
+
+					for (SyndEnclosure enc : entry.getEnclosures()) {
+						RssFeedEnclosure re = new RssFeedEnclosure();
+						re.setType(enc.getType());
+						re.setUrl(enc.getUrl());
+						enclosures.add(re);
+					}
+				}
+
+				processModules(e, entry);
+			}
+		}
+		return rf;
+	}
+
+	public void processModules(RssFeedEntry e, SyndEntry entry) {
+		if (entry.getModules() != null) {
+			for (Module m : entry.getModules()) {
+				if (m instanceof MediaEntryModuleImpl) {
+					final MediaEntryModuleImpl mm = (MediaEntryModuleImpl) m;
+					if (mm.getMediaGroups() != null) {
+						for (MediaGroup mg : mm.getMediaGroups()) {
+							Metadata md = mg.getMetadata();
+							if (md != null) {
+								if (md.getDescription() != null) {
+									e.setDescription(md.getDescription());
+								}
+								if (md.getThumbnail() != null) {
+									for (Thumbnail tn : mg.getMetadata().getThumbnail()) {
+										e.setThumbnail(tn.getUrl().toASCIIString());
+									}
+								}
+							}
+						}
+					}
+				}
+			}
 		}
 	}
 
@@ -565,6 +613,7 @@ public class RSSFeedService {
 		feed.setDescription(cachedFeed.getDescription());
 		feed.setAuthor(cachedFeed.getAuthor());
 		feed.setLink(cachedFeed.getLink());
+		feed.setImage(cachedFeed.getImage());
 
 		List<SyndEntry> entries = new LinkedList<>();
 		feed.setEntries(entries);

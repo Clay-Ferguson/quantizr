@@ -47,11 +47,7 @@ module.exports = {
                 enforce: "pre",
                 use: [{
                     loader: "source-map-loader"
-                }],
-                exclude: [
-                    // this package has problems with their sourcemaps
-                    path.resolve(__dirname, "node_modules/chardet")
-                ]
+                }]
             },
 
             {

@@ -14,6 +14,30 @@ export interface OpenGraph {
     image: string;
 }
 
+export interface RssFeed {
+    encoding: string;
+    title: string;
+    description: string;
+    author: string;
+    link: string;
+    image: string;
+    entries: RssFeedEntry[];
+}
+
+export interface RssFeedEnclosure {
+    type: string;
+    url: string;
+}
+
+export interface RssFeedEntry {
+    title: string;
+    image: string;
+    thumbnail: string;
+    description: string;
+    link: string;
+    enclosures: RssFeedEnclosure[];
+}
+
 export interface UserProfile {
     displayName: string;
     userName: string;
@@ -124,6 +148,11 @@ export interface GetFollowingRequest extends RequestBase {
 }
 
 export interface GetFriendsRequest extends RequestBase {
+}
+
+export interface GetMultiRssRequest extends RequestBase {
+    urls: string;
+    page: number;
 }
 
 export interface GetNodePrivilegesRequest extends RequestBase {
@@ -457,6 +486,10 @@ export interface GetFollowingResponse extends ResponseBase {
 
 export interface GetFriendsResponse extends ResponseBase {
     friends: FriendInfo[];
+}
+
+export interface GetMultiRssResponse extends ResponseBase {
+    feed: RssFeed;
 }
 
 export interface GetNodePrivilegesResponse extends ResponseBase {
