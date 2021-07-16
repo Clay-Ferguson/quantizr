@@ -198,7 +198,6 @@ export class RssTypeHandler extends TypeBase {
             feedOut.push(new Img(null, {
                 className: "rss-feed-image",
                 src: feed.image
-                // title: feed.image.title // todo-0: add this back.
                 // align: "left" // causes text to flow around
             }));
         }
@@ -323,7 +322,6 @@ export class RssTypeHandler extends TypeBase {
                 delimted string to extract a designation of which feed this item is from since they will all be
                 mixed and interwoven together from multiple sources based on the timestamp ordering (rev chron)
                 */
-            // todo-0: with new architecture this "::" hack can go away now!!
             let colonIdx = entry.title.indexOf(" :: ");
             if (colonIdx !== -1) {
                 feedTitle = entry.title.substring(0, colonIdx);
