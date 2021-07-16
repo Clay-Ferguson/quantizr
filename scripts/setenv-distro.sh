@@ -25,7 +25,7 @@ mkdir -p ${DEPLOY_TARGET}
 export ipfs_data=${DEPLOY_TARGET}/ipfs
 export ipfs_staging=${DEPLOY_TARGET}/ipfs/staging
 
-export QUANTA_VER=1.0.15
+export QUANTA_VER=1.0.16
 
 # Note: define-functions.sh is where we pass the ARGS into dockerfile
 export JAR_FILE=./org.subnode-0.0.1-SNAPSHOT.jar
