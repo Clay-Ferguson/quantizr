@@ -242,7 +242,7 @@ of the spring configs for security are also perfected.
 <dependency>
     <groupId>org.apache.pdfbox</groupId>
     <artifactId>pdfbox</artifactId>
-    <version>2.0.21</version>
+    <version>2.0.24</version>
 </dependency>
 
 <dependency>
@@ -663,7 +663,7 @@ of the spring configs for security are also perfected.
 <dependency>
     <groupId>org.apache.pdfbox</groupId>
     <artifactId>pdfbox</artifactId>
-    <version>2.0.21</version>
+    <version>2.0.24</version>
 </dependency>
 
 <dependency>
@@ -924,7 +924,7 @@ of the spring configs for security are also perfected.
 <dependency>
     <groupId>org.apache.pdfbox</groupId>
     <artifactId>pdfbox</artifactId>
-    <version>2.0.21</version>
+    <version>2.0.24</version>
 </dependency>
 
 <dependency>
@@ -1361,7 +1361,7 @@ of the spring configs for security are also perfected.
 <dependency>
     <groupId>org.apache.pdfbox</groupId>
     <artifactId>pdfbox</artifactId>
-    <version>2.0.21</version>
+    <version>2.0.24</version>
 </dependency>
 
 <dependency>
