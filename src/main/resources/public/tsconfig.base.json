@@ -1,13 +1,7 @@
 {
     "compilerOptions": {
         "target": "es6",
-        "lib": [
-            "dom",
-            "dom.iterable",
-            "esnext",
-            "ScriptHost"
-        ],
-        //"strict": true,
+        "lib": ["dom", "dom.iterable", "esnext"],
         "module": "esnext",
         "moduleResolution": "node",
         "jsx": "react",
@@ -21,15 +15,12 @@
         "watch": true,
         "allowJs": true,
         "allowSyntheticDefaultImports": true,
+        "skipLibCheck": true,
         "traceResolution" : true
     },
     "include": [
         "./ts/**/*"
     ],
-    // "exclude": [
-    //     "./node_modules/",
-    //     "./node/"
-    // ],
     "compileOnSave": true,
     "buildOnSave": true
 }

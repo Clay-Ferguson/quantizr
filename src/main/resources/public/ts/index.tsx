@@ -20,3 +20,9 @@ else if ((window as any).__page === "tsx-test") {
         document.getElementById("app")
     );
 }
+
+function index() {
+    return (<div></div>);
+}
+
+export default index;

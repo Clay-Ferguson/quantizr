@@ -16,15 +16,7 @@ module.exports = {
 
     resolve: {
         // Add '.ts' and '.tsx' as resolvable extensions.
-        extensions: [".tsx", ".ts", ".js", ".json"],
-
-        fallback: {
-            timers: require.resolve("timers-browserify"),
-            buffer: require.resolve("buffer/"),
-            https: require.resolve("https-browserify"),
-            http: require.resolve("stream-http"),
-            stream: require.resolve("stream-browserify")
-        }
+        extensions: [".tsx", ".ts", ".js", ".json"]
     },
 
     module: {
@@ -38,7 +30,8 @@ module.exports = {
                         // Use this to point to your tsconfig.json.
                         configFileName: "./tsconfig." + env + ".json"
                     }
-                }]
+                }],
+                exclude: /node_modules/
             },
 
             // All output '.js' files will have any sourcemaps re-processed by 'source-map-loader'.
