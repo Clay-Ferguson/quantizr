@@ -3,7 +3,9 @@ package org.subnode.model.client;
 import java.util.List;
 
 public class RssFeedEntry {
+    private String author;
     private String title;
+    private String publishDate;
     private String image;
     private String thumbnail;
     private String description;
@@ -56,5 +58,21 @@ public class RssFeedEntry {
 
     public void setThumbnail(String thumbnail) {
         this.thumbnail = thumbnail;
+    }
+
+    public String getPublishDate() {
+        return publishDate;
+    }
+
+    public void setPublishDate(String publishDate) {
+        this.publishDate = publishDate;
+    }
+
+    public String getAuthor() {
+        return author;
+    }
+
+    public void setAuthor(String author) {
+        this.author = author;
     }
 }

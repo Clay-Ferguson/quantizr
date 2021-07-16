@@ -79,6 +79,16 @@ public class DateUtil {
 		return zoneMap.get(String.valueOf(hours) + (dst ? "D" : "S"));
 	}
 
+	public static String shortFormatDate(long time) {
+		SimpleDateFormat format = new SimpleDateFormat(DATE_FORMAT_NO_TIME);
+		return format.format(time);
+	}
+
+	public static String standardFormatDate(long time) {
+		SimpleDateFormat format = new SimpleDateFormat(DATE_FORMAT_NO_TIMEZONE);
+		return format.format(time);
+	}
+
 	public static String getFormattedDate(long time) {
 		SimpleDateFormat format = new SimpleDateFormat(DATE_FORMAT);
 		return format.format(time);

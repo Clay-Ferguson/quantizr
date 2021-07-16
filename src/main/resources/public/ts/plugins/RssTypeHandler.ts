@@ -230,10 +230,9 @@ export class RssTypeHandler extends TypeBase {
             feedOut.push(new Div(feedSrc));
         }
 
-        // todo-0: add back
-        // if (feed.creator) {
-        //     feedOut.push(new Div(feed.creator));
-        // }
+        if (feed.author) {
+            feedOut.push(new Div(feed.author));
+        }
 
         let feedOutDiv = new Div(null, { className: "marginBottom" }, feedOut);
         itemListContainer.safeGetChildren().push(feedOutDiv);
@@ -316,27 +315,6 @@ export class RssTypeHandler extends TypeBase {
         //     headerDivChildren.push(new Div(entry.category));
         // }
 
-        let playAudioFunc: Function = null;
-
-        // todo-0: change to arrays to handle multiples of these types
-        let audioEnclosure: J.RssFeedEnclosure = null;
-        let imageEnclosure: J.RssFeedEnclosure = null;
-
-        if (entry.enclosures) {
-            entry.enclosures.forEach(enc => {
-                if (enc.type && enc.type.indexOf("audio/") !== -1) {
-                    audioEnclosure = enc;
-                    playAudioFunc = () => {
-                        let dlg = new AudioPlayerDlg(feed.title, entry.title, null, enc.url, 0, state);
-                        dlg.open();
-                    };
-                }
-                else if (enc.type && enc.type.indexOf("image/") !== -1) {
-                    imageEnclosure = enc;
-                }
-            });
-        }
-
         let shortTitle = null;
         let feedTitle = null;
         if (entry.title) {
@@ -361,10 +339,6 @@ export class RssTypeHandler extends TypeBase {
                     dangerouslySetInnerHTML: { __html: shortTitle }
                 };
 
-                if (!entry.link && playAudioFunc) {
-                    anchorAttribs.onClick = playAudioFunc;
-                }
-
                 headerDivChildren.push(new Div(null, { className: "marginBottom" }, [
                     new Anchor(entry.link, null, anchorAttribs)
                 ]));
@@ -378,11 +352,6 @@ export class RssTypeHandler extends TypeBase {
                     dangerouslySetInnerHTML: { __html: entry.title }
                 };
 
-                // If the entry.link is not given we default a click on it, to just play the audio.
-                if (!entry.link && playAudioFunc) {
-                    anchorAttribs.onClick = playAudioFunc;
-                }
-
                 headerDivChildren.push(new Div(null, { className: "marginBottom" }, [
                     new Anchor(entry.link, null, anchorAttribs)
                 ]));
@@ -391,19 +360,31 @@ export class RssTypeHandler extends TypeBase {
 
         children.push(new Div(null, null, headerDivChildren));
 
-        if (playAudioFunc) {
-            let downloadLink = new Anchor(audioEnclosure.url, "[ Download " + audioEnclosure.type + " ]", { className: "rssDownloadLink" }, null, true);
-            let audioButton = new Button("Play Audio", playAudioFunc, null, "btn-primary");
-            children.push(new ButtonBar([audioButton, downloadLink], null, "rssMediaButtons"));
+        // process audio enclosures
+        if (entry.enclosures) {
+            entry.enclosures.forEach(enc => {
+                if (enc.type && enc.type.indexOf("audio/") !== -1) {
+                    let downloadLink = new Anchor(enc.url, "[ Download " + enc.type + " ]", { className: "rssDownloadLink" }, null, true);
+                    let audioButton = new Button("Play Audio", () => {
+                        let dlg = new AudioPlayerDlg(feed.title, entry.title, null, enc.url, 0, state);
+                        dlg.open();
+                    }, null, "btn-primary");
+                    children.push(new ButtonBar([audioButton, downloadLink], null, "rssMediaButtons"));
+                }
+            });
         }
 
         children.push(new Div(null, { className: "clearBoth" }));
 
-        if (imageEnclosure) {
-            children.push(new Img(null, {
-                className: "rss-feed-image",
-                src: imageEnclosure.url
-            }));
+        if (entry.enclosures) {
+            entry.enclosures.forEach(enc => {
+                if (enc.type && enc.type.indexOf("image/") !== -1) {
+                    children.push(new Img(null, {
+                        className: "rss-feed-image",
+                        src: enc.url
+                    }));
+                }
+            });
         }
 
         if (entry.thumbnail) {
@@ -418,14 +399,6 @@ export class RssTypeHandler extends TypeBase {
                 children.push(new Html(entry.description));
             }
         }
-
-        let dateStr = ""; // entry.pubDate; //todo-0: fix
-        // if (entry.isoDate) {
-        //     let date = Date.parse(entry.isoDate);
-        //     if (date) {
-        //         dateStr = S.util.formatDateShort(new Date(date));
-        //     }
-        // }
 
         let linkIcon = new Icon({
             className: "fa fa-link fa-lg rssLinkIcon",
@@ -459,7 +432,7 @@ export class RssTypeHandler extends TypeBase {
             }
         }) : null;
 
-        let footerSpan = new Span(dateStr, { className: "marginRight" });
+        let footerSpan = new Span(entry.publishDate, { className: "marginRight" });
 
         children.push(new Div(null, { className: "float-right" }, [
             footerSpan, postIcon, linkIcon, bookmarkIcon

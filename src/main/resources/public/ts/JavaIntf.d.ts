@@ -30,7 +30,9 @@ export interface RssFeedEnclosure {
 }
 
 export interface RssFeedEntry {
+    author: string;
     title: string;
+    publishDate: string;
     image: string;
     thumbnail: string;
     description: string;

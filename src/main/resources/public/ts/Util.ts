@@ -556,7 +556,6 @@ export class Util implements UtilIntf {
                     }
                 }
             })
-            // todo-0: test this error codepath.
             // ------------------------------------------------
             // Handle Fail
             // We should only reach here when there's an actual failure to call the server, and is completely

@@ -61,6 +61,7 @@ import org.subnode.mongo.model.SubNode;
 import org.subnode.request.GetMultiRssRequest;
 import org.subnode.response.GetMultiRssResponse;
 import org.subnode.util.Const;
+import org.subnode.util.DateUtil;
 import org.subnode.util.ExUtil;
 import org.subnode.util.LimitedInputStreamEx;
 import org.subnode.util.StreamUtil;
@@ -558,6 +559,8 @@ public class RSSFeedService {
 				}
 				e.setTitle(entry.getTitle());
 				e.setLink(entry.getLink());
+				e.setPublishDate(DateUtil.shortFormatDate(entry.getPublishedDate().getTime()));
+				e.setAuthor(entry.getAuthor());
 
 				if (entry.getEnclosures() != null) {
 					List<RssFeedEnclosure> enclosures = new LinkedList<>();
