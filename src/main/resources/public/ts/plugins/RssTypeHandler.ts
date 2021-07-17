@@ -116,12 +116,6 @@ export class RssTypeHandler extends TypeBase {
         }
         // otherwise read from the internet
         else {
-            // update state to 'loading' immediately or else this can reenter.
-            dispatch("Action_RSSLoading", (s: AppState): AppState => {
-                s.feedCache[feedSrcHash] = "loading";
-                return s;
-            });
-
             itemListContainer.addChild(new Heading(4, "Loading RSS Feed..."));
             itemListContainer.addChild(new Div("For large feeds this can take a few seconds..."));
 
@@ -177,19 +171,20 @@ export class RssTypeHandler extends TypeBase {
             page = 1;
         }
 
-        itemListContainer.safeGetChildren().push(new Checkbox("Headlines Only", {
-            className: "float-right"
-        }, {
-            setValue: (checked: boolean): void => {
-                dispatch("Action_SetHealinesFlag", (s: AppState): AppState => {
-                    S.edit.setRssHeadlinesOnly(s, checked);
-                    return s;
-                });
-            },
-            getValue: (): boolean => {
-                return state.userPreferences.rssHeadlinesOnly;
-            }
-        }));
+        // todo-1: disabling until there's some way to sanatize html
+        // itemListContainer.safeGetChildren().push(new Checkbox("Headlines Only", {
+        //     className: "float-right"
+        // }, {
+        //     setValue: (checked: boolean): void => {
+        //         dispatch("Action_SetHeadlinesFlag", (s: AppState): AppState => {
+        //             S.edit.setRssHeadlinesOnly(s, checked);
+        //             return s;
+        //         });
+        //     },
+        //     getValue: (): boolean => {
+        //         return state.userPreferences.rssHeadlinesOnly;
+        //     }
+        // }));
 
         itemListContainer.safeGetChildren().push(this.makeNavButtonBar(page, feedSrcHash, state));
 
@@ -392,11 +387,13 @@ export class RssTypeHandler extends TypeBase {
             }));
         }
 
-        if (!state.userPreferences.rssHeadlinesOnly) {
-            if (entry.description) {
-                children.push(new Html(entry.description));
-            }
-        }
+        // todo-1: bring back after we have a way to get sanatized content. NO HTML!
+        // some sites are sending back bad descriptions here which need to be sanitized.
+        // if (!state.userPreferences.rssHeadlinesOnly) {
+        //     if (entry.description) {
+        //         children.push(new Html(entry.description));
+        //     }
+        // }
 
         let linkIcon = new Icon({
             className: "fa fa-link fa-lg rssLinkIcon",

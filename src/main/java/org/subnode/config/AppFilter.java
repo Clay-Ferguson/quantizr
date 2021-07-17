@@ -361,7 +361,8 @@ public class AppFilter extends GenericFilterBean {
 				path.contains("/mobile/api/getNodeStats") || //
 				path.contains("/mobile/api/getUserAccountInfo") || //
 				path.contains("/mobile/api/anonPageLoad") || //
-				path.contains("/mobile/api/getOpenGraph")) {
+				path.contains("/mobile/api/getOpenGraph") || //
+				path.contains("/mobile/api/getMultiRssFeed")) {
 			return false;
 		}
 		return path.contains("/mobile/api/");

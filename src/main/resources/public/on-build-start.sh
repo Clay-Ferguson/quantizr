@@ -12,6 +12,8 @@ echo "Running on-build-start.sh"
 # in the pom-main.xml is the same as the version installed on the system.
 
 # Here's how to install node-sass on Ubuntu:
+#     sudo apt update
+#     sudo apt install nodejs npm
 #     sudo npm install --save-dev --unsafe-perm -g node-sass
 node-sass ./css/meta64.scss ./css/meta64.css --output-style compressed
 
@@ -19,6 +21,6 @@ if [ $? -eq 0 ]
 then
     echo "SASS -> CSS generating successful."
 else
-    echo "SASS compiler failed."
+    echo "SASS compiler failed. Tip: See notes in the on-build-start.sh"
     exit 1
 fi

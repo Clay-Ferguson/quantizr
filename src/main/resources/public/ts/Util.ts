@@ -452,6 +452,7 @@ export class Util implements UtilIntf {
                     S.meta64.setOverlay(true);
                 }
 
+                // console.log("fetch: " + this.getRpcPath() + postName + " Bearer: " + S.meta64.authToken);
                 fetch(this.getRpcPath() + postName, {
                     method: "POST",
                     body: JSON.stringify(postData),

@@ -5,7 +5,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.subnode.util.MongoRunnableEx;
-import org.subnode.util.ThreadLocals;
 
 /**
  * Helper class to run some processing workload as the admin user. Simplifies by encapsulating the

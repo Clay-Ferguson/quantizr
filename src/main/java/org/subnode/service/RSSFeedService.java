@@ -554,9 +554,14 @@ public class RSSFeedService {
 				RssFeedEntry e = new RssFeedEntry();
 				rssEntries.add(e);
 
-				if (entry.getDescription() != null) {
-					e.setDescription(entry.getDescription().getValue());
-				}
+				// todo-1: need to verify we can run this thru the sanitizer method in this file, before
+				// re-enabling description. Need to be sure we are extracting NON-html,
+				// because sanatizing a massive block of HTML works, but craps it into a run-on
+				// paragraph that's super ugly
+				// if (entry.getDescription() != null) {
+				// 	e.setDescription(sanitizeHtml(entry.getDescription().getValue()));
+				// }
+
 				e.setTitle(entry.getTitle());
 				e.setLink(entry.getLink());
 				e.setPublishDate(DateUtil.shortFormatDate(entry.getPublishedDate().getTime()));
@@ -589,9 +594,12 @@ public class RSSFeedService {
 						for (MediaGroup mg : mm.getMediaGroups()) {
 							Metadata md = mg.getMetadata();
 							if (md != null) {
-								if (md.getDescription() != null) {
-									e.setDescription(md.getDescription());
-								}
+								// todo-1: need to verify we can run this thru the sanitizer method in this file, before
+								// re-enabling description.
+								// extract the text/plain to use here?
+								// if (md.getDescription() != null) {
+								// 	e.setDescription(sanitizeHtml(md.getDescription()));
+								// }
 								if (md.getThumbnail() != null) {
 									for (Thumbnail tn : mg.getMetadata().getThumbnail()) {
 										e.setThumbnail(tn.getUrl().toASCIIString());
@@ -691,9 +699,9 @@ public class RSSFeedService {
 				 */
 				description.setType("text/plain");
 				// description.setType("text/html");
-				description.setValue(metaInfo.getDescription() != null ? metaInfo.getDescription() : "");
+				// description.setValue(sanitizeHtml(metaInfo.getDescription() != null ? metaInfo.getDescription() : ""));
+				// entry.setDescription(description);
 
-				entry.setDescription(description);
 				entries.add(entry);
 			}
 		}
