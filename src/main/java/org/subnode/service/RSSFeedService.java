@@ -12,10 +12,15 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import com.rometools.modules.content.ContentItem;
+import com.rometools.modules.content.ContentModuleImpl;
+import com.rometools.modules.itunes.EntryInformationImpl;
 import com.rometools.modules.mediarss.MediaEntryModuleImpl;
+import com.rometools.modules.mediarss.types.MediaContent;
 import com.rometools.modules.mediarss.types.MediaGroup;
 import com.rometools.modules.mediarss.types.Metadata;
 import com.rometools.modules.mediarss.types.Thumbnail;
+import com.rometools.rome.feed.module.DCModuleImpl;
 import com.rometools.rome.feed.module.Module;
 import com.rometools.rome.feed.synd.SyndContent;
 import com.rometools.rome.feed.synd.SyndContentImpl;
@@ -54,6 +59,7 @@ import org.subnode.model.client.NodeProp;
 import org.subnode.model.client.RssFeed;
 import org.subnode.model.client.RssFeedEnclosure;
 import org.subnode.model.client.RssFeedEntry;
+import org.subnode.model.client.RssFeedMediaContent;
 import org.subnode.mongo.AdminRun;
 import org.subnode.mongo.MongoRead;
 import org.subnode.mongo.MongoSession;
@@ -102,6 +108,8 @@ public class RSSFeedService {
 	 */
 	private static final ConcurrentHashMap<String, SyndFeed> feedCache = new ConcurrentHashMap<>();
 
+	private static final ConcurrentHashMap<Integer, String> feedNameOfItem = new ConcurrentHashMap<>();
+
 	/*
 	 * keep track of which feeds failed so we don't try them again until another 30-min cycle
 	 */
@@ -127,7 +135,6 @@ public class RSSFeedService {
 	private static final int MAX_FEED_ITEMS = 50;
 
 	private static final int MAX_FEEDS_PER_AGGREGATE = 40;
-
 	static boolean run = false;
 
 	/*
@@ -274,10 +281,8 @@ public class RSSFeedService {
 	}
 
 	public void aggregateFeeds(List<String> urls, List<SyndEntry> entries, int page) {
-		log.debug("Generating aggregateFeed.");
 		try {
 			for (String url : urls) {
-
 				// reset this to zero for each feed.
 				int badDateCount = 0;
 
@@ -306,16 +311,7 @@ public class RSSFeedService {
 							}
 						}
 
-						if (entry.getPublishedDate() != null) {
-							SyndEntry entryClone = (SyndEntry) entry.clone();
-							/*
-							 * We use this slight hack/technique to allow our client to be able to parse the titles out of the
-							 * feeds for displaying them in a nicer way, while being unobtrusive enough that any podcast app
-							 * could display it and it looks fine as it also.
-							 */
-							entryClone.setTitle(inFeed.getTitle() + " :: " + entryClone.getTitle());
-							entries.add(entryClone);
-						}
+						entries.add(entry);
 					}
 				}
 			}
@@ -364,7 +360,7 @@ public class RSSFeedService {
 			if (fromCache) {
 				inFeed = feedCache.get(url);
 				if (inFeed != null) {
-					// log.debug("FEED: " + XString.prettyPrint(inFeed));
+					// log.debug("CACHE FEED HIT: " + XString.prettyPrint(inFeed));
 					return inFeed;
 				}
 			}
@@ -443,6 +439,14 @@ public class RSSFeedService {
 			// log.debug("Feed " + url + " has " + inFeed.getEntries().size() + " entries.");
 			// we update the cache regardless of 'fromCache' val. this is correct.
 			feedCache.put(url, inFeed);
+
+			// store knowledge of which feed Title goes with each entry instance.
+			if (inFeed.getEntries() != null) {
+				for (SyndEntry se : inFeed.getEntries()) {
+					feedNameOfItem.put(se.hashCode(), inFeed.getTitle());
+				}
+			}
+
 			return inFeed;
 		} catch (Exception e) {
 			/*
@@ -493,7 +497,11 @@ public class RSSFeedService {
 						.and(Sanitizers.STYLES).and(Sanitizers.TABLES);
 			}
 		}
-		return policy.sanitize(html);
+		html = policy.sanitize(html);
+		if (html.length() > 500) {
+			html = html.substring(0, 500) + "...";
+		}
+		return html;
 	}
 
 	public GetMultiRssResponse getMultiRssFeed(GetMultiRssRequest req) {
@@ -527,22 +535,31 @@ public class RSSFeedService {
 		}
 
 		fixFeed(feed);
-		RssFeed rssFeed = convertToFeed(feed);
+		boolean addFeedTitles = urlList.size() > 1;
+		RssFeed rssFeed = convertToFeed(feed, addFeedTitles);
 		// log.debug("FEED JSON: " + XString.prettyPrint(rssFeed));
 		res.setFeed(rssFeed);
 		return res;
 	}
 
-	public RssFeed convertToFeed(SyndFeed feed) {
+	public RssFeed convertToFeed(SyndFeed feed, boolean addFeedTitles) {
 		RssFeed rf = new RssFeed();
+		// log.debug("convertToFeed: title=" + feed.getTitle());
+
 		rf.setTitle(feed.getTitle());
-		rf.setDescription(feed.getDescription());
+		rf.setDescription(sanitizeHtml(feed.getDescription()));
 		rf.setAuthor(feed.getAuthor());
 		rf.setEncoding(feed.getEncoding());
 
 		if (feed.getImage() != null) {
 			rf.setImage(feed.getImage().getUrl());
 		}
+
+		// I was trying to get the "image" for peter schiff's Feed (not items, but feed itself), and this 
+		// was my first attempt, and it didn't work. Not sure if his feed is bad or what. Will come back to 
+		// this later, RSS is good enough for now. todo-1.
+		// processModules(feed, rf);
+
 		rf.setLink(feed.getLink());
 
 		List<RssFeedEntry> rssEntries = new LinkedList<>();
@@ -552,62 +569,238 @@ public class RSSFeedService {
 			for (SyndEntry entry : feed.getEntries()) {
 				// log.debug("Entry: " + XString.prettyPrint(entry));
 				RssFeedEntry e = new RssFeedEntry();
-				rssEntries.add(e);
-
-				// todo-1: need to verify we can run this thru the sanitizer method in this file, before
-				// re-enabling description. Need to be sure we are extracting NON-html,
-				// because sanatizing a massive block of HTML works, but craps it into a run-on
-				// paragraph that's super ugly
-				// if (entry.getDescription() != null) {
-				// 	e.setDescription(sanitizeHtml(entry.getDescription().getValue()));
-				// }
-
-				e.setTitle(entry.getTitle());
-				e.setLink(entry.getLink());
-				e.setPublishDate(DateUtil.shortFormatDate(entry.getPublishedDate().getTime()));
-				e.setAuthor(entry.getAuthor());
-
-				if (entry.getEnclosures() != null) {
-					List<RssFeedEnclosure> enclosures = new LinkedList<>();
-					e.setEnclosures(enclosures);
-
-					for (SyndEnclosure enc : entry.getEnclosures()) {
-						RssFeedEnclosure re = new RssFeedEnclosure();
-						re.setType(enc.getType());
-						re.setUrl(enc.getUrl());
-						enclosures.add(re);
-					}
+				if (addFeedTitles) {
+					e.setParentFeedTitle(feedNameOfItem.get(entry.hashCode()));
 				}
-
-				processModules(e, entry);
+				rssEntries.add(e);
+				processEntry(entry, e);
 			}
 		}
 		return rf;
 	}
 
-	public void processModules(RssFeedEntry e, SyndEntry entry) {
+	private void processEntry(SyndEntry entry, RssFeedEntry e) {
+		// log.debug("entry: " + entry.getTitle());
+
+		if (entry.getDescription() != null) {
+			e.setDescription(sanitizeHtml(entry.getDescription().getValue()));
+		}
+
+		e.setTitle(entry.getTitle());
+		e.setLink(entry.getLink());
+		e.setPublishDate(DateUtil.shortFormatDate(entry.getPublishedDate().getTime()));
+		e.setAuthor(entry.getAuthor());
+
+		if (entry.getEnclosures() != null) {
+			List<RssFeedEnclosure> enclosures = new LinkedList<>();
+			e.setEnclosures(enclosures);
+
+			for (SyndEnclosure enc : entry.getEnclosures()) {
+				RssFeedEnclosure re = new RssFeedEnclosure();
+				re.setType(enc.getType());
+				re.setUrl(enc.getUrl());
+				enclosures.add(re);
+			}
+		}
+
+		processModules(entry, e);
+	}
+
+	private void processModules(SyndFeed entry, RssFeed e) {
 		if (entry.getModules() != null) {
 			for (Module m : entry.getModules()) {
+
+				// log.debug("Module: " + m.getClass().getName());
 				if (m instanceof MediaEntryModuleImpl) {
-					final MediaEntryModuleImpl mm = (MediaEntryModuleImpl) m;
+					MediaEntryModuleImpl mm = (MediaEntryModuleImpl) m;
+					if (mm.getMediaContents() != null) {
+
+						// put new list on return object
+						List<RssFeedMediaContent> mediaContent = new LinkedList<>();
+
+						// add mediaContent to RssFeed ?
+						// e.setMediaContent(mediaContent);
+
+						// process all media contents
+						for (MediaContent mc : mm.getMediaContents()) {
+							RssFeedMediaContent rfmc = new RssFeedMediaContent();
+							rfmc.setType(mc.getType());
+							rfmc.setUrl(mc.getReference().toString());
+							rfmc.setMedium(mc.getMedium());
+							mediaContent.add(rfmc);
+						}
+					}
+
 					if (mm.getMediaGroups() != null) {
 						for (MediaGroup mg : mm.getMediaGroups()) {
 							Metadata md = mg.getMetadata();
 							if (md != null) {
-								// todo-1: need to verify we can run this thru the sanitizer method in this file, before
-								// re-enabling description.
-								// extract the text/plain to use here?
-								// if (md.getDescription() != null) {
-								// 	e.setDescription(sanitizeHtml(md.getDescription()));
-								// }
+
+								if (md.getDescription() != null) {
+									e.setDescription(sanitizeHtml(md.getDescription()));
+								}
+								if (md.getEmbed() != null) {
+									log.debug("Metadata Embed Url: " + md.getEmbed().getUrl());
+								}
+
+								if (md.getThumbnail() != null) {
+									for (Thumbnail tn : mg.getMetadata().getThumbnail()) {
+										e.setImage(tn.getUrl().toASCIIString());
+									}
+								}
+							} else {
+								log.debug("MediaGroup has no metadata.");
+							}
+						}
+					} else {
+						log.debug("media has no groups.");
+					}
+				} else if (m instanceof ContentModuleImpl) {
+					ContentModuleImpl contentMod = (ContentModuleImpl) m;
+					if (contentMod.getContents() != null) {
+						for (String contents : contentMod.getContents()) {
+							log.debug("CI.contents: " + contents);
+						}
+					}
+					if (contentMod.getContentItems() != null) {
+						for (ContentItem ci : contentMod.getContentItems()) {
+							log.debug("CI.encoding: " + ci.getContentEncoding());
+							log.debug("CI.format: " + ci.getContentFormat());
+							log.debug("CI.value: " + ci.getContentValue());
+							log.debug("CI.url: " + ci.getContentResource());
+						}
+					}
+				} else if (m instanceof EntryInformationImpl) {
+					EntryInformationImpl itunesMod = (EntryInformationImpl) m;
+
+					if (itunesMod.getImage() != null) {
+						try {
+							e.setImage(itunesMod.getImage().toURI().toString());
+						} catch (Exception e1) {
+							// ignore
+						}
+					} else {
+						e.setImage(itunesMod.getImageUri());
+					}
+
+					if (!StringUtils.isEmpty(itunesMod.getTitle())) {
+						e.setTitle(itunesMod.getTitle());
+					}
+					// e.setSubTitle(itunesMod.getSubtitle());
+
+					if (!StringUtils.isEmpty(itunesMod.getSummary())) {
+						e.setDescription(sanitizeHtml(itunesMod.getSummary()));
+					}
+				}
+				// what feeds use this? (todo-1)
+				else if (m instanceof DCModuleImpl) {
+					// DCModuleImpl dm = (DCModuleImpl) m;
+					// String dcFormat = dm.getFormat();
+					// String dcSource = dm.getSource();
+					// String dcTitle = dm.getTitle();
+					// log.debug("dcSource: " + dcSource);
+
+				} else {
+					log.debug("Unknown module type: " + m.getClass().getName());
+				}
+			}
+		}
+	}
+
+	private void processModules(SyndEntry entry, RssFeedEntry e) {
+		if (entry.getModules() != null) {
+			for (Module m : entry.getModules()) {
+
+				// log.debug("Module: " + m.getClass().getName());
+				if (m instanceof MediaEntryModuleImpl) {
+					MediaEntryModuleImpl mm = (MediaEntryModuleImpl) m;
+					if (mm.getMediaContents() != null) {
+
+						// put new list on return object
+						List<RssFeedMediaContent> mediaContent = new LinkedList<>();
+						e.setMediaContent(mediaContent);
+
+						// process all media contents
+						for (MediaContent mc : mm.getMediaContents()) {
+							RssFeedMediaContent rfmc = new RssFeedMediaContent();
+							rfmc.setType(mc.getType());
+							rfmc.setUrl(mc.getReference().toString());
+							rfmc.setMedium(mc.getMedium());
+							mediaContent.add(rfmc);
+						}
+					}
+
+					if (mm.getMediaGroups() != null) {
+						for (MediaGroup mg : mm.getMediaGroups()) {
+							Metadata md = mg.getMetadata();
+							if (md != null) {
+
+								if (md.getDescription() != null) {
+									e.setDescription(sanitizeHtml(md.getDescription()));
+								}
+								if (md.getEmbed() != null) {
+									log.debug("Metadata Embed Url: " + md.getEmbed().getUrl());
+								}
+
 								if (md.getThumbnail() != null) {
 									for (Thumbnail tn : mg.getMetadata().getThumbnail()) {
 										e.setThumbnail(tn.getUrl().toASCIIString());
 									}
 								}
+							} else {
+								log.debug("MediaGroup has no metadata.");
 							}
 						}
+					} else {
+						log.debug("media has no groups.");
 					}
+				} else if (m instanceof ContentModuleImpl) {
+					ContentModuleImpl contentMod = (ContentModuleImpl) m;
+					if (contentMod.getContents() != null) {
+						for (String contents : contentMod.getContents()) {
+							log.debug("CI.contents: " + contents);
+						}
+					}
+					if (contentMod.getContentItems() != null) {
+						for (ContentItem ci : contentMod.getContentItems()) {
+							log.debug("CI.encoding: " + ci.getContentEncoding());
+							log.debug("CI.format: " + ci.getContentFormat());
+							log.debug("CI.value: " + ci.getContentValue());
+							log.debug("CI.url: " + ci.getContentResource());
+						}
+					}
+				} else if (m instanceof EntryInformationImpl) {
+					EntryInformationImpl itunesMod = (EntryInformationImpl) m;
+
+					if (itunesMod.getImage() != null) {
+						try {
+							e.setImage(itunesMod.getImage().toURI().toString());
+						} catch (Exception e1) {
+							// ignore
+						}
+					} else {
+						e.setImage(itunesMod.getImageUri());
+					}
+
+					if (!StringUtils.isEmpty(itunesMod.getTitle())) {
+						e.setTitle(itunesMod.getTitle());
+					}
+					e.setSubTitle(itunesMod.getSubtitle());
+
+					if (!StringUtils.isEmpty(itunesMod.getSummary())) {
+						e.setDescription(sanitizeHtml(itunesMod.getSummary()));
+					}
+				}
+				// what feeds use this? (todo-1)
+				else if (m instanceof DCModuleImpl) {
+					// DCModuleImpl dm = (DCModuleImpl) m;
+					// String dcFormat = dm.getFormat();
+					// String dcSource = dm.getSource();
+					// String dcTitle = dm.getTitle();
+					// log.debug("dcSource: " + dcSource);
+
+				} else {
+					log.debug("Unknown module type: " + m.getClass().getName());
 				}
 			}
 		}
@@ -654,7 +847,7 @@ public class RSSFeedService {
 		NodeMetaInfo metaInfo = subNodeUtil.getNodeMetaInfo(node);
 		feed.setTitle(metaInfo.getTitle() != null ? metaInfo.getTitle() : "");
 		feed.setLink("");
-		feed.setDescription(metaInfo.getDescription() != null ? metaInfo.getDescription() : "");
+		feed.setDescription(sanitizeHtml(metaInfo.getDescription() != null ? metaInfo.getDescription() : ""));
 
 		List<SyndEntry> entries = new LinkedList<SyndEntry>();
 		feed.setEntries(entries);
@@ -698,9 +891,9 @@ public class RSSFeedService {
 				 * need to check what I'm doing here and see if we need "HTML" now here instead.
 				 */
 				description.setType("text/plain");
-				// description.setType("text/html");
-				// description.setValue(sanitizeHtml(metaInfo.getDescription() != null ? metaInfo.getDescription() : ""));
-				// entry.setDescription(description);
+				description.setType("text/html");
+				description.setValue(sanitizeHtml(metaInfo.getDescription() != null ? metaInfo.getDescription() : ""));
+				entry.setDescription(description);
 
 				entries.add(entry);
 			}
@@ -735,7 +928,7 @@ public class RSSFeedService {
 				// log.debug("FEED XML: " + feedStr);
 				writer.write(feedStr);
 			} catch (Exception e) {
-				ExUtil.error(log, "multiRssFeed Error: ", e);
+				ExUtil.error(log, "writeFeed Error: ", e);
 				throw new RuntimeException("internal server error");
 			}
 		}

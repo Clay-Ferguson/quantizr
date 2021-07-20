@@ -171,20 +171,19 @@ export class RssTypeHandler extends TypeBase {
             page = 1;
         }
 
-        // todo-1: disabling until there's some way to sanatize html
-        // itemListContainer.safeGetChildren().push(new Checkbox("Headlines Only", {
-        //     className: "float-right"
-        // }, {
-        //     setValue: (checked: boolean): void => {
-        //         dispatch("Action_SetHeadlinesFlag", (s: AppState): AppState => {
-        //             S.edit.setRssHeadlinesOnly(s, checked);
-        //             return s;
-        //         });
-        //     },
-        //     getValue: (): boolean => {
-        //         return state.userPreferences.rssHeadlinesOnly;
-        //     }
-        // }));
+        itemListContainer.safeGetChildren().push(new Checkbox("Headlines Only", {
+            className: "float-right"
+        }, {
+            setValue: (checked: boolean): void => {
+                dispatch("Action_SetHeadlinesFlag", (s: AppState): AppState => {
+                    S.edit.setRssHeadlinesOnly(s, checked);
+                    return s;
+                });
+            },
+            getValue: (): boolean => {
+                return state.userPreferences.rssHeadlinesOnly;
+            }
+        }));
 
         itemListContainer.safeGetChildren().push(this.makeNavButtonBar(page, feedSrcHash, state));
 
@@ -201,13 +200,13 @@ export class RssTypeHandler extends TypeBase {
         if (feed.title) {
             if (feed.link) {
                 feedOut.push(new Anchor(feed.link, feed.title, {
-                    style: { fontSize: "45px" },
+                    className: "rssFeedTitle",
                     target: "_blank"
                 }));
             }
             else {
                 feedOut.push(new Span(feed.title, {
-                    style: { fontSize: "45px" }
+                    className: "rssFeedTitle"
                 }));
             }
         }
@@ -309,46 +308,26 @@ export class RssTypeHandler extends TypeBase {
         //     headerDivChildren.push(new Div(entry.category));
         // }
 
-        let shortTitle = null;
-        let feedTitle = null;
         if (entry.title) {
-            /* If we are rendering a multiple RSS feed thing here then the title will have two parts here
-                that the server will have created using the "::" delimiter so we can use the left side of the
-                delimted string to extract a designation of which feed this item is from since they will all be
-                mixed and interwoven together from multiple sources based on the timestamp ordering (rev chron)
-                */
-            let colonIdx = entry.title.indexOf(" :: ");
-            if (colonIdx !== -1) {
-                feedTitle = entry.title.substring(0, colonIdx);
-                let headerAttribs: any = {
-                    dangerouslySetInnerHTML: { __html: feedTitle }
-                };
-                headerDivChildren.push(new Heading(5, null, headerAttribs));
+            if (entry.parentFeedTitle) {
+                headerDivChildren.push(new Div(null, {
+                    dangerouslySetInnerHTML: { __html: entry.parentFeedTitle }
+                }));
+            }
 
-                shortTitle = entry.title.substring(colonIdx + 4);
-                let anchorAttribs: any = {
+            headerDivChildren.push(new Div(null, { className: "marginBottom" }, [
+                new Anchor(entry.link, null, {
                     className: "rssAnchor",
                     target: "_blank",
-                    dangerouslySetInnerHTML: { __html: shortTitle }
-                };
-
-                headerDivChildren.push(new Div(null, { className: "marginBottom" }, [
-                    new Anchor(entry.link, null, anchorAttribs)
-                ]));
-            }
-            else {
-                shortTitle = entry.title;
-
-                let anchorAttribs: any = {
-                    className: "rssAnchor marginBottom",
-                    target: "_blank",
                     dangerouslySetInnerHTML: { __html: entry.title }
-                };
+                })
+            ]));
+        }
 
-                headerDivChildren.push(new Div(null, { className: "marginBottom" }, [
-                    new Anchor(entry.link, null, anchorAttribs)
-                ]));
-            }
+        if (entry.subTitle) {
+            headerDivChildren.push(new Span(entry.subTitle, {
+                className: "rssSubTitle"
+            }));
         }
 
         children.push(new Div(null, null, headerDivChildren));
@@ -387,13 +366,26 @@ export class RssTypeHandler extends TypeBase {
             }));
         }
 
-        // todo-1: bring back after we have a way to get sanatized content. NO HTML!
-        // some sites are sending back bad descriptions here which need to be sanitized.
-        // if (!state.userPreferences.rssHeadlinesOnly) {
-        //     if (entry.description) {
-        //         children.push(new Html(entry.description));
-        //     }
-        // }
+        if (entry.mediaContent) {
+            let imageAdded = false;
+            entry.mediaContent.forEach(mc => {
+                /* some feeds have the same image multiple times for some reason so we
+                    use imageAdded to keep it from appearing twice */
+                if (mc.medium === "image" && !imageAdded) {
+                    imageAdded = true;
+                    children.push(new Img(null, {
+                        className: "rss-feed-image",
+                        src: mc.url
+                    }));
+                }
+            });
+        }
+
+        if (!state.userPreferences.rssHeadlinesOnly) {
+            if (entry.description) {
+                children.push(new Html(entry.description));
+            }
+        }
 
         let linkIcon = new Icon({
             className: "fa fa-link fa-lg rssLinkIcon",

@@ -50,13 +50,18 @@ public class AppFilter extends GenericFilterBean {
 	 */
 	private static int simulateSlowServer = 0;
 
+	private static boolean THROTTLE_ENABLED = false;
 	private static int THROTTLE_INTERVAL = 500;
 
 	/*
 	 * For debugging we can turn this flag on and disable the server from processing multiple requests
-	 * simultenaously this is every helpful for debugging
+	 * simultenaously this is every helpful for debugging.
+	 * 
+	 * I noticed we're getting CONCURRENT calls happening for same user? Why? Isn't spring still 
+	 * enforcing a session mutext? (todo-0)
 	 */
 	private static boolean singleThreadDebugging = false;
+
 	private static final HashMap<String, IPInfo> ipInfo = new HashMap<>();
 
 	@PostConstruct
@@ -80,6 +85,7 @@ public class AppFilter extends GenericFilterBean {
 			String ip = null;
 
 			HttpServletRequest httpReq = null;
+			HttpSession session = null;
 			if (req instanceof HttpServletRequest) {
 				// log.debug("***** SC: User: " + sc.getUserName());
 
@@ -118,7 +124,7 @@ public class AppFilter extends GenericFilterBean {
 				ip = getClientIpAddr(httpReq);
 				sc.setIp(ip);
 
-				HttpSession session = httpReq.getSession(false);
+				session = httpReq.getSession(false);
 				if (session == null) {
 					log.trace("******** NO SESSION.");
 				} else {
@@ -229,12 +235,14 @@ public class AppFilter extends GenericFilterBean {
 					httpReq.getRequestURI().endsWith("/getOpenGraph")) {
 				// these have priority
 			} else {
-				long wait = THROTTLE_INTERVAL - (curTime - info.getLastRequestTime());
-				if (wait > 0) {
-					log.debug("throt: " + httpReq.getRequestURI() + " " + String.valueOf(wait));
-					try {
-						Thread.sleep(wait);
-					} catch (Exception e) {
+				if (THROTTLE_ENABLED) {
+					long wait = THROTTLE_INTERVAL - (curTime - info.getLastRequestTime());
+					if (wait > 0) {
+						log.debug("throt: " + httpReq.getRequestURI() + " " + String.valueOf(wait));
+						try {
+							Thread.sleep(wait);
+						} catch (Exception e) {
+						}
 					}
 				}
 			}

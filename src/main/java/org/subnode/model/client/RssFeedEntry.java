@@ -3,14 +3,25 @@ package org.subnode.model.client;
 import java.util.List;
 
 public class RssFeedEntry {
+    private String parentFeedTitle;
     private String author;
     private String title;
+    private String subTitle;
     private String publishDate;
     private String image;
     private String thumbnail;
     private String description;
     private String link;
     private List<RssFeedEnclosure> enclosures;
+    private List<RssFeedMediaContent> mediaContent;
+
+    public List<RssFeedMediaContent> getMediaContent() {
+        return mediaContent;
+    }
+
+    public void setMediaContent(List<RssFeedMediaContent> mediaContent) {
+        this.mediaContent = mediaContent;
+    }
 
     public String getLink() {
         return link;
@@ -74,5 +85,21 @@ public class RssFeedEntry {
 
     public void setAuthor(String author) {
         this.author = author;
+    }
+
+    public String getSubTitle() {
+        return subTitle;
+    }
+
+    public void setSubTitle(String subTitle) {
+        this.subTitle = subTitle;
+    }
+
+    public String getParentFeedTitle() {
+        return parentFeedTitle;
+    }
+
+    public void setParentFeedTitle(String parentFeedTitle) {
+        this.parentFeedTitle = parentFeedTitle;
     }
 }

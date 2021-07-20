@@ -30,14 +30,23 @@ export interface RssFeedEnclosure {
 }
 
 export interface RssFeedEntry {
+    parentFeedTitle: string;
     author: string;
     title: string;
+    subTitle: string;
     publishDate: string;
     image: string;
     thumbnail: string;
     description: string;
     link: string;
     enclosures: RssFeedEnclosure[];
+    mediaContent: RssFeedMediaContent[];
+}
+
+export interface RssFeedMediaContent {
+    type: string;
+    url: string;
+    medium: string;
 }
 
 export interface UserProfile {
