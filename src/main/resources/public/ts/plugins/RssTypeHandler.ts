@@ -311,6 +311,7 @@ export class RssTypeHandler extends TypeBase {
         if (entry.title) {
             if (entry.parentFeedTitle) {
                 headerDivChildren.push(new Div(null, {
+                    className: "rssParentTitle",
                     dangerouslySetInnerHTML: { __html: entry.parentFeedTitle }
                 }));
             }

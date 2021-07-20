@@ -498,8 +498,8 @@ public class RSSFeedService {
 			}
 		}
 		html = policy.sanitize(html);
-		if (html.length() > 500) {
-			html = html.substring(0, 500) + "...";
+		if (html.length() > 1000) {
+			html = html.substring(0, 1000) + "...";
 		}
 		return html;
 	}
@@ -590,6 +590,12 @@ public class RSSFeedService {
 		e.setLink(entry.getLink());
 		e.setPublishDate(DateUtil.shortFormatDate(entry.getPublishedDate().getTime()));
 		e.setAuthor(entry.getAuthor());
+
+		if (entry.getContents()!=null) {
+			for (SyndContent sc : entry.getContents()) {
+				e.setDescription(sanitizeHtml(sc.getValue()));
+			}
+		}
 
 		// DO NOT DELETE
 		// Don't know of use cases for this yet. Leaving as FYI.
