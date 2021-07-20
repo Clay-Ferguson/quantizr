@@ -555,8 +555,8 @@ public class RSSFeedService {
 			rf.setImage(feed.getImage().getUrl());
 		}
 
-		// I was trying to get the "image" for peter schiff's Feed (not items, but feed itself), and this 
-		// was my first attempt, and it didn't work. Not sure if his feed is bad or what. Will come back to 
+		// I was trying to get the "image" for peter schiff's Feed (not items, but feed itself), and this
+		// was my first attempt, and it didn't work. Not sure if his feed is bad or what. Will come back to
 		// this later, RSS is good enough for now. todo-1.
 		// processModules(feed, rf);
 
@@ -590,6 +590,13 @@ public class RSSFeedService {
 		e.setLink(entry.getLink());
 		e.setPublishDate(DateUtil.shortFormatDate(entry.getPublishedDate().getTime()));
 		e.setAuthor(entry.getAuthor());
+
+		// DO NOT DELETE
+		// Don't know of use cases for this yet. Leaving as FYI.
+		// List<Element> foreignMarkups = entry.getForeignMarkup();
+		// for (Element foreignMarkup : foreignMarkups) {
+		// 	String imgURL = foreignMarkup.getAttribute("url").getValue();
+		// }
 
 		if (entry.getEnclosures() != null) {
 			List<RssFeedEnclosure> enclosures = new LinkedList<>();
@@ -743,7 +750,7 @@ public class RSSFeedService {
 								}
 
 								if (md.getThumbnail() != null) {
-									for (Thumbnail tn : mg.getMetadata().getThumbnail()) {
+									for (Thumbnail tn : md.getThumbnail()) {
 										e.setThumbnail(tn.getUrl().toASCIIString());
 									}
 								}
@@ -754,6 +761,19 @@ public class RSSFeedService {
 					} else {
 						log.debug("media has no groups.");
 					}
+
+					Metadata md = mm.getMetadata();
+					if (md != null) {
+						if (md.getDescription() != null) {
+							e.setDescription(sanitizeHtml(md.getDescription()));
+						}
+
+						if (md.getThumbnail() != null) {
+							for (Thumbnail tn : md.getThumbnail()) {
+								e.setThumbnail(tn.getUrl().toASCIIString());
+							}
+						}
+					} 
 				} else if (m instanceof ContentModuleImpl) {
 					ContentModuleImpl contentMod = (ContentModuleImpl) m;
 					if (contentMod.getContents() != null) {
