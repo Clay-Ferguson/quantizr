@@ -406,6 +406,7 @@ a {
     border: 1px solid $nodeBorderBottomColor;
     min-height: 60px;
     border-radius: $border-radius;
+    max-height: 200px;
 }
 
 .profileImage {
@@ -823,7 +824,6 @@ Will come back later and study this more. todo-1 */
 }
 
 .rightNavPanelInner {
-    margin-right: 20px;
     min-width: 15em;
     margin-left: 10px;
 }
@@ -1427,6 +1427,7 @@ input[type="radio"] {
     // visibility: visible;
     animation-name: fadeToVisible;
     animation-duration: .5s;
+    margin-bottom: 20px;
 }
 
 .row-footer {
@@ -1744,12 +1745,12 @@ i'm backing out for now
 }
 
 .iconToggle {
-    padding: 5px;
+    padding: 2px;
 }
 
 .iconToggleOn {
     @extend .iconToggle;
-    border: 3px solid white;
+    border: 3px solid green;
 }
 
 .iconToggleOff {

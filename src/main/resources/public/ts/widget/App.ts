@@ -80,12 +80,13 @@ export class App extends Main {
                         new RightNavPanel()
                     ]),
 
-                    new IconButton("fa-angle-double-up", null, {
-                        onClick: e => {
-                            S.view.scrollAllTop(state);
-                        },
-                        title: "Scroll to Top"
-                    }, "btn-secondary scrollTopButtonUpperRight", "off"),
+                    // I don't like this clutter. Leaving as an example for now.
+                    // new IconButton("fa-angle-double-up", null, {
+                    //     onClick: e => {
+                    //         S.view.scrollAllTop(state);
+                    //     },
+                    //     title: "Scroll to Top"
+                    // }, "btn-secondary scrollTopButtonUpperRight", "off"),
 
                     new IconButton("fa-angle-double-up", null, {
                         onClick: e => {

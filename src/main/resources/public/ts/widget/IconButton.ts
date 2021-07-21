@@ -21,11 +21,14 @@ export class IconButton extends Comp {
         let state = this.getState();
         this.attribs.style = { display: (state.visible && !state.disabled ? "" : "none") };
 
-        let iconClazz: string = "fa fa-lg " + this.iconClass;
+        let iconClazz: string = "fa " + this.iconClass;
         if (this.toggle === "on") {
             iconClazz += " iconToggleOn";
         }
         else if (this.toggle === "off") {
+            iconClazz += " iconToggleOff";
+        }
+        else {
             iconClazz += " iconToggleOff";
         }
 

@@ -195,7 +195,7 @@ export class NodeCompButtonBar extends Div {
             if (editingAllowed) {
                 if (editableNode && !state.editNode) {
                     editNodeButton = new Button(null, S.edit.runEditNodeByClick, {
-                        iconclass: "fa fa-edit fa-lg",
+                        iconclass: "fa fa-edit",
                         title: "Edit Node",
                         nid: node.id
                     });
@@ -223,7 +223,7 @@ export class NodeCompButtonBar extends Div {
 
                     if (!node.lastChild && state.node.children && state.node.children.length > 1) {
                         moveNodeDownButton = new Icon({
-                            className: "fa fa-arrow-down fa-lg buttonBarIcon",
+                            className: "fa fa-arrow-down buttonBarIcon",
                             title: "Move Node down one position (lower)",
                             nid: node.id,
                             onClick: S.edit.moveNodeDown
@@ -273,6 +273,13 @@ export class NodeCompButtonBar extends Div {
             let searchButton: IconButton;
             let timelineButton: IconButton;
 
+            let fullScreenViewer = S.meta64.fullscreenViewerActive(state);
+
+            let prefsButton = !fullScreenViewer ? new IconButton("fa-certificate", null, {
+                onClick: e => { S.edit.toggleShowMetaData(state); },
+                title: state.userPreferences.showMetaData ? "Hide Avatars and Metadata" : "Show Avatars and Metadata"
+            }, "btn-secondary", state.userPreferences.showMetaData ? "on" : "off") : null;
+
             if (state.node && this.node.id === state.node.id) {
                 if (S.nav.parentVisibleToUser(state)) {
                     upLevelButton = new IconButton("fa-chevron-circle-up", "Up", {
@@ -307,7 +314,7 @@ export class NodeCompButtonBar extends Div {
                 });
             }
 
-            navButtonBar = new ButtonBar([searchButton, timelineButton, upLevelButton, prevButton, nextButton],
+            navButtonBar = new ButtonBar([prefsButton, searchButton, timelineButton, prevButton, nextButton, upLevelButton],
                 null, "float-right marginBottom");
             if (!navButtonBar.hasChildren()) {
                 navButtonBar = null;

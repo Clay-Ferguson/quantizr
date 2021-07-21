@@ -88,12 +88,14 @@ export class NodeCompRow extends Div {
             if (!state.editNode && !isPageRootNode && this.level === 1 && insertAllowed && S.edit.isInsertAllowed(node, state)) {
 
                 // todo-1: this button should have same enabelement as "new" button, on the page root ???
-                insertInlineButton = new IconButton("fa-plus", null, {
-                    onClick: (e) => {
-                        S.edit.insertNode(node.id, "u", 0 /* isFirst ? 0 : 1 */, state);
-                    },
-                    title: "Insert new node" + (this.isTableCell ? " (above this one)" : "")
-                }, "btn-secondary " + (this.isTableCell ? "" : "plusButtonFloatRight"));
+                insertInlineButton = new Div(null, { className: "marginLeft" }, [
+                    new IconButton("fa-plus", null, {
+                        onClick: (e) => {
+                            S.edit.insertNode(node.id, "u", 0 /* isFirst ? 0 : 1 */, state);
+                        },
+                        title: "Insert new node" + (this.isTableCell ? " (above this one)" : "")
+                    }, "btn-secondary " + (this.isTableCell ? "" : "plusButtonFloatRight"))
+                ]);
             }
         }
 
@@ -140,9 +142,9 @@ export class NodeCompRow extends Div {
             const targetId = S.props.getNodePropVal(J.NodeProp.TARGET_ID, node);
             if (targetId) {
                 jumpButton = new IconButton("fa-arrow-right", null, {
-                        onClick: () => S.view.jumpToId(targetId),
-                        title: "Jump to the Node"
-                    }, "float-right");
+                    onClick: () => S.view.jumpToId(targetId),
+                    title: "Jump to the Node"
+                }, "float-right");
             }
         }
 

@@ -48,6 +48,28 @@ export class RightNavPanel extends Div {
 
         let displayName = state.displayName ? state.displayName : state.title;
 
+        let allowEditMode = state.node && !state.isAnonUser;
+        let fullScreenViewer = S.meta64.fullscreenViewerActive(state);
+
+        let editButton = (allowEditMode && !fullScreenViewer) ? new IconButton("fa-pencil", null, {
+            onClick: e => { S.edit.toggleEditMode(state); },
+            title: "Turn edit mode " + (state.userPreferences.editMode ? "off" : "on")
+        }, "btn-secondary", state.userPreferences.editMode ? "on" : "off") : null;
+
+        let clipboardPasteButton = !state.isAnonUser ? new IconButton("fa-clipboard", null, {
+            onClick: e => {
+                S.edit.saveClipboardToChildNode("~" + J.NodeType.NOTES);
+            },
+            title: "Save clipboard (under Notes node)"
+        }, "btn-secondary", "off") : null;
+
+        let addNoteButton = !state.isAnonUser ? new IconButton("fa-sticky-note", null, {
+            onClick: e => {
+                S.edit.addNode("~" + J.NodeType.NOTES, null, state);
+            },
+            title: "Create new Note (under Notes node)"
+        }, "btn-secondary", "off") : null;
+
         this.setChildren([
             new Div(null, { className: "float-left" }, [
                 new Div(null, { className: "rightNavPanelInner" }, [
@@ -78,52 +100,22 @@ export class RightNavPanel extends Div {
                                     });
                                 }
                             }) : null,
-                            displayName && !state.isAnonUser ? new IconButton("fa-database", displayName, {
-                                title: "Go to your Account Root Node",
-                                onClick: e => { S.nav.navHome(state); }
-                            }, "btn-secondary") : null])
+                            editButton, clipboardPasteButton, addNoteButton
+                        ])
                     ]),
 
                     profileButton,
+                    displayName && !state.isAnonUser ? new IconButton("fa-database", displayName, {
+                        title: "Go to your Account Root Node",
+                        onClick: e => { S.nav.navHome(state); }
+                    }, "btn-secondary marginBottom marginRight") : null,
                     headerImg,
-                    avatarImg,
-                    this.makeButtonsBar(state),
+                    !headerImg ? new Div(null, null, [avatarImg]) : avatarImg,
                     new TabPanelButtons(true, "rhsMenu")
                 ]),
                 new HistoryPanel()
             ])
         ]);
-    }
-
-    makeButtonsBar = (state: AppState): CompIntf => {
-        let allowEditMode = state.node && !state.isAnonUser;
-        let fullScreenViewer = S.meta64.fullscreenViewerActive(state);
-
-        let editButton = (allowEditMode && !fullScreenViewer) ? new IconButton("fa-pencil", null, {
-            onClick: e => { S.edit.toggleEditMode(state); },
-            title: "Turn edit mode " + (state.userPreferences.editMode ? "off" : "on")
-        }, "btn-secondary", state.userPreferences.editMode ? "on" : "off") : null;
-
-        let prefsButton = !fullScreenViewer ? new IconButton("fa-certificate", null, {
-            onClick: e => { S.edit.toggleShowMetaData(state); },
-            title: state.userPreferences.showMetaData ? "Hide Avatars and Metadata" : "Show Avatars and Metadata"
-        }, "btn-secondary", state.userPreferences.showMetaData ? "on" : "off") : null;
-
-        let clipboardPasteButton = !state.isAnonUser ? new IconButton("fa-clipboard", null, {
-            onClick: e => {
-                S.edit.saveClipboardToChildNode("~" + J.NodeType.NOTES);
-            },
-            title: "Save clipboard (under Notes node)"
-        }, "btn-secondary", "off") : null;
-
-        let addNoteButton = !state.isAnonUser ? new IconButton("fa-sticky-note", null, {
-            onClick: e => {
-                S.edit.addNode("~" + J.NodeType.NOTES, null, state);
-            },
-            title: "Create new Note (under Notes node)"
-        }, "btn-secondary", "off") : null;
-
-        return new Div(null, { className: "marginBottom" }, [new ButtonBar([editButton, prefsButton, clipboardPasteButton, addNoteButton])]);
     }
 
     makeHeaderDiv = (state: AppState): CompIntf => {
