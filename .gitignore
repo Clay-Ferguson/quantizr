@@ -7,3 +7,4 @@ node_modules/
 src/main/resources/public/index.html
 src/main/resources/public/css/meta64.css
 src/main/resources/public/bundle.js.map
+src/main/resources/public/bundle.js.LICENSE.txt
