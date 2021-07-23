@@ -136,13 +136,17 @@ public class MongoCreate {
 	 * range of unused sequential ordinal values (range of 'ordinal+1' thru 'ordinal+1+rangeSize')
 	 */
 	public void insertOrdinal(MongoSession session, SubNode node, long ordinal, long rangeSize) {
-		long maxOrdinal = 0;
+		// todo-0: this is due for a bit more testing of all edge cases.
+		long maxOrdinal = ordinal + rangeSize;
 
 		auth.auth(session, node, PrivilegeType.READ);
 
-		/* First detect any nodes that have no ordinal, and set ordinal to 0. This is basically a data repair 
-		because we oridinally didn't have the MongoEventListener capable of setting any null ordinal to 0L. What
-		we really need is a global fix to all existing databases and then we can remove this check (todo-1) */
+		/*
+		 * First detect any nodes that have no ordinal, and set ordinal to 0. This is basically a data
+		 * repair because we originally didn't have the MongoEventListener capable of setting any null
+		 * ordinal to 0L. What we really need is a global fix to all existing databases and then we can
+		 * remove this check (todo-1)
+		 */
 		Criteria criteria = Criteria.where(SubNode.FIELD_ORDINAL).is(null);
 		for (SubNode child : read.getChildrenUnderParentPath(session, node.getPath(), null, null, 0, null, criteria)) {
 			child.setOrdinal(0L);
@@ -154,13 +158,7 @@ public class MongoCreate {
 		criteria = Criteria.where(SubNode.FIELD_ORDINAL).gte(ordinal);
 		// log.debug("insertOrdinal GTE " + ordinal);
 		for (SubNode child : read.getChildrenUnderParentPath(session, node.getPath(), null, null, 0, null, criteria)) {
-			long o = child.getOrdinal() == null ? 0L : child.getOrdinal().longValue();
-			o += rangeSize;
-			child.setOrdinal(o);
-
-			if (o > maxOrdinal) {
-				maxOrdinal = o;
-			}
+			child.setOrdinal(maxOrdinal++);
 		}
 
 		/*

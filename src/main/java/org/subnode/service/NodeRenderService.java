@@ -208,6 +208,7 @@ public class NodeRenderService {
 		// needs to be reworked.
 		ThreadLocals.getSessionContext().setUrlId(null);
 
+		// log.debug("renderNode Full Return: " + XString.prettyPrint(res));
 		return res;
 	}
 
@@ -239,7 +240,7 @@ public class NodeRenderService {
 		 * timestamp we'd need a ">=" on the timestamp itself instead. We request ROWS_PER_PAGE+1, because
 		 * that is enough to trigger 'endReached' logic to be set correctly
 		 */
-		int queryLimit = scanToNode != null ? 1000 : offset + limit + 2;
+		int queryLimit = scanToNode != null ? -1 : offset + limit + 2;
 
 		// log.debug("query: offset=" + offset + " limit=" + queryLimit + " scanToNode="
 		// + scanToNode);
@@ -250,6 +251,7 @@ public class NodeRenderService {
 		if (!StringUtils.isEmpty(orderBy)) {
 			sort = parseOrderByToSort(orderBy);
 		} else {
+			// log.debug("processRenderNode querying by ordinal.");
 			sort = Sort.by(Sort.Direction.ASC, SubNode.FIELD_ORDINAL);
 		}
 
@@ -289,8 +291,8 @@ public class NodeRenderService {
 			}
 			SubNode n = iterator.next();
 			idx++;
-			// log.debug("Iterate [" + idx + "]: nodeId" + n.getId().toHexString() + "
-			// scanToNode=" + scanToNode);
+			// log.debug("Iterate [" + idx + "]: nodeId" + n.getId().toHexString() + "scanToNode=" + scanToNode);
+			// log.debug("  DATA: " + XString.prettyPrint(n));
 
 			/* are we still just scanning for our target node */
 			if (scanToNode != null) {

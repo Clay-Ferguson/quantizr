@@ -2,6 +2,7 @@ import { useSelector } from "react-redux";
 import { appState, store } from "./AppRedux";
 import { AppState } from "./AppState";
 import { Constants as C } from "./Constants";
+import { AddFriendDlg } from "./dlg/AddFriendDlg";
 import { ConfirmDlg } from "./dlg/ConfirmDlg";
 import { ImportCryptoKeyDlg } from "./dlg/ImportCryptoKeyDlg";
 import { ManageEncryptionKeysDlg } from "./dlg/ManageEncryptionKeysDlg";
@@ -35,7 +36,6 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (s: Singletons) => {
  and each one can query for the state dynamically. This is all fixed except for the admin ones because those only
  affect the admin and are lower priority to fix */
 export class MenuPanel extends Div {
-
     constructor(state: AppState) {
         super(null, {
             id: "accordion",
@@ -49,6 +49,12 @@ export class MenuPanel extends Div {
 
     static openFriendsNode = () => {
         S.nav.openContentNode("~" + J.NodeType.FRIEND_LIST);
+    };
+
+    static addFriend = () => {
+        let state = store.getState();
+        let dlg = new AddFriendDlg(state);
+        dlg.open();
     };
 
     static openBookmarksNode = () => {
@@ -239,6 +245,7 @@ export class MenuPanel extends Div {
         ]));
 
         children.push(new Menu("Friends", [
+            new MenuItem("Add Friend", MenuPanel.addFriend, !state.isAnonUser),
             new MenuItem("My Friends", MenuPanel.openFriendsNode, !state.isAnonUser),
             new MenuItem("Followers", MenuPanel.showFollowers, !state.isAnonUser),
             new MenuItem("Blocked Users", MenuPanel.openBlockedUsersNode, !state.isAnonUser)

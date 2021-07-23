@@ -19,6 +19,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;
 import org.subnode.actpub.ActPubFollower;
 import org.subnode.actpub.ActPubFollowing;
+import org.subnode.actpub.ActPubService;
 import org.subnode.config.AppProp;
 import org.subnode.config.NodeName;
 import org.subnode.config.SessionContext;
@@ -128,6 +129,9 @@ public class UserManagerService {
 
 	@Autowired
 	private ActPubFollower apFollower;
+
+	@Autowired
+	private ActPubService apService;
 
 	@Autowired
 	private AclService acl;
@@ -739,6 +743,10 @@ public class UserManagerService {
 		final String userName = ThreadLocals.getSessionContext().getUserName();
 		session = MongoThreadLocal.ensure(session);
 
+		String _newUserName = req.getUserName();
+		_newUserName = XString.stripIfStartsWith(_newUserName, "@");
+		final String newUserName = _newUserName;
+
 		// get the Friend List of the follower
 		SubNode followerFriendList =
 				read.getUserNodeByType(session, userName, null, null, NodeType.FRIEND_LIST.s(), null, NodeName.FRIENDS);
@@ -746,8 +754,10 @@ public class UserManagerService {
 		/*
 		 * lookup to see if this followerFriendList node already has userToFollow already under it
 		 */
-		SubNode friendNode = read.findNodeByUserAndType(session, followerFriendList, req.getUserName(), NodeType.FRIEND.s());
+		SubNode friendNode = read.findNodeByUserAndType(session, followerFriendList, newUserName, NodeType.FRIEND.s());
 		if (friendNode == null) {
+			apService.loadForeignUser(newUserName);
+
 			// todo-2: for local users following fediverse this value needs to be here?
 			String followerActorUrl = null;
 
@@ -755,13 +765,13 @@ public class UserManagerService {
 			// '/u/userName/home'
 			String followerActorHtmlUrl = null;
 
-			friendNode = edit.createFriendNode(session, followerFriendList, req.getUserName(), //
+			friendNode = edit.createFriendNode(session, followerFriendList, newUserName, //
 					followerActorUrl, followerActorHtmlUrl);
 					
 			if (friendNode != null) {
 				ValContainer<SubNode> userNode = new ValContainer<SubNode>();
 				arun.run(s -> {
-					userNode.setVal(read.getUserNodeByUserName(s, req.getUserName()));
+					userNode.setVal(read.getUserNodeByUserName(s, newUserName));
 					return null;
 				});
 
@@ -769,14 +779,14 @@ public class UserManagerService {
 					friendNode.setProp(NodeProp.USER_NODE_ID.s(), userNode.getVal().getId().toHexString());
 				}
 
-				res.setMessage("Added new Friend: " + req.getUserName());
+				res.setMessage("Added new Friend: " + newUserName);
 			} else {
-				res.setMessage("Unable to add Friend: " + req.getUserName());
+				res.setMessage("Unable to add Friend: " + newUserName);
 			}
 
 			res.setSuccess(true);
 		} else {
-			res.setMessage("You're already following " + req.getUserName());
+			res.setMessage("You're already following " + newUserName);
 			res.setSuccess(true);
 		}
 		return res;

@@ -214,7 +214,7 @@ export class NodeCompButtonBar extends Div {
 
                     if (node.logicalOrdinal > 0) {
                         moveNodeUpButton = new Icon({
-                            className: "fa fa-arrow-up fa-lg buttonBarIcon",
+                            className: "fa fa-arrow-up buttonBarIcon",
                             title: "Move Node up one position (higher)",
                             nid: node.id,
                             onClick: S.edit.moveNodeUp

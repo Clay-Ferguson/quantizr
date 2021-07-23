@@ -258,6 +258,7 @@ public class ActPubService {
      * Fediverse, and updating the cache.
      */
     public SubNode getAcctNodeByUserName(MongoSession ms, String apUserName) {
+        apUserName = XString.stripIfStartsWith(apUserName, "@");
         if (!apUserName.contains("@")) {
             log.debug("Invalid foreign user name: " + apUserName);
             return null;
@@ -1011,33 +1012,38 @@ public class ActPubService {
                 // flag as done (even if it fails we still want it flagged as done. no retries will be done).
                 apCache.usersPendingRefresh.put(userName, true);
 
-                arun.run(session -> {
-                    // log.debug("Reload user outbox: " + userName);
-                    SubNode userNode = getAcctNodeByUserName(session, userName);
-                    if (userNode == null)
-                        return null;
-
-                    String actorUrl = userNode.getStrProp(NodeProp.ACT_PUB_ACTOR_ID.s());
-                    APObj actor = apUtil.getActorByUrl(actorUrl);
-                    if (actor != null) {
-                        apOutbox.loadForeignOutbox(session, actor, userNode, userName);
-
-                        /*
-                         * I was going to load followerCounts into userNode, but I decided to just query them live when
-                         * needed on the UserPreferences dialog
-                         */
-                        int followerCount = apFollower.loadRemoteFollowers(session, actor);
-                        int followingCount = apFollowing.loadRemoteFollowing(session, actor);
-                    } else {
-                        log.debug("Unable to get cached actor from url: " + actorUrl);
-                    }
-
-                    return null;
-                });
+                loadForeignUser(userName);
             } catch (Exception e) {
                 log.debug("Unable to load user: " + userName);
             }
         }
+    }
+
+    public void loadForeignUser(String userName) {
+        arun.run(session -> {
+            // log.debug("Reload user outbox: " + userName);
+            SubNode userNode = getAcctNodeByUserName(session, userName);
+            if (userNode == null) {
+                // log.debug("Unable to getAccount Node for userName: "+userName);
+                return null;
+            }
+
+            String actorUrl = userNode.getStrProp(NodeProp.ACT_PUB_ACTOR_ID.s());
+            APObj actor = apUtil.getActorByUrl(actorUrl);
+            if (actor != null) {
+                apOutbox.loadForeignOutbox(session, actor, userNode, userName);
+
+                /*
+                 * I was going to load followerCounts into userNode, but I decided to just query them live when
+                 * needed on the UserPreferences dialog
+                 */
+                int followerCount = apFollower.loadRemoteFollowers(session, actor);
+                int followingCount = apFollowing.loadRemoteFollowing(session, actor);
+            } else {
+                log.debug("Unable to get actor from url: " + actorUrl);
+            }
+            return null;
+        });
     }
 
     private void saveUserNames() {

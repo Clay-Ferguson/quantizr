@@ -26,10 +26,10 @@ import org.subnode.model.client.NodeProp;
 import org.subnode.model.client.NodeType;
 import org.subnode.model.client.PrincipalName;
 import org.subnode.model.client.PrivilegeType;
+import org.subnode.mongo.AdminRun;
 import org.subnode.mongo.MongoAuth;
 import org.subnode.mongo.MongoRead;
 import org.subnode.mongo.MongoSession;
-import org.subnode.mongo.AdminRun;
 import org.subnode.mongo.model.SubNode;
 import org.subnode.util.DateUtil;
 import org.subnode.util.ValContainer;
@@ -81,7 +81,6 @@ public class ActPubOutbox {
              * Query all existing known outbox items we have already saved for this foreign user
              */
             Iterable<SubNode> outboxItems = read.getSubGraph(ms, outboxNode, null, 0);
-
             String outboxUrl = AP.str(actor, APProp.outbox);
             APObj outbox = getOutbox(outboxUrl);
             if (outbox == null) {
@@ -104,10 +103,11 @@ public class ActPubOutbox {
             ValContainer<Integer> count = new ValContainer<>(0);
             final SubNode _userNode = userNode;
 
+            // log.debug("scanning outbox orderedCollection");
             apUtil.iterateOrderedCollection(outbox, Integer.MAX_VALUE, obj -> {
                 try {
                     // if (obj != null) {
-                    // log.debug("saveNote: OBJ=" + XString.prettyPrint(obj));
+                    //     log.debug("orderedCollection Item: OBJ=" + XString.prettyPrint(obj));
                     // }
 
                     String apId = AP.str(obj, APProp.id);

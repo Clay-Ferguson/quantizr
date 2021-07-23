@@ -1983,6 +1983,7 @@ audio::-webkit-media-controls-play-button {
     padding: 10px;
     margin-bottom: $smallGap;
     border-radius: $border-radius;
+    overflow-x: hidden;
 }
 
 .openGraphImage {

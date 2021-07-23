@@ -493,7 +493,9 @@ public class RSSFeedService {
 
 		if (policy == null) {
 			synchronized (policyLock) {
-				policy = Sanitizers.FORMATTING.and(Sanitizers.BLOCKS).and(Sanitizers.IMAGES).and(Sanitizers.LINKS)//
+				/* I have removed IMAGES only because it looks silly when we display an image that's also displayed
+				 as part of the feed formatting */
+				policy = Sanitizers.FORMATTING.and(Sanitizers.BLOCKS)/* .and(Sanitizers.IMAGES)*/.and(Sanitizers.LINKS)//
 						.and(Sanitizers.STYLES).and(Sanitizers.TABLES);
 			}
 		}
