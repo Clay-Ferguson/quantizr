@@ -70,6 +70,11 @@ export class RightNavPanel extends Div {
             title: "Create new Note (under Notes node)"
         }, "btn-secondary", "off") : null;
 
+        let prefsButton = !fullScreenViewer ? new IconButton("fa-certificate", null, {
+            onClick: e => { S.edit.toggleShowMetaData(state); },
+            title: state.userPreferences.showMetaData ? "Hide Avatars and Metadata" : "Show Avatars and Metadata"
+        }, "btn-secondary", state.userPreferences.showMetaData ? "on" : "off") : null;
+
         this.setChildren([
             new Div(null, { className: "float-left" }, [
                 new Div(null, { className: "rightNavPanelInner" }, [
@@ -100,7 +105,7 @@ export class RightNavPanel extends Div {
                                     });
                                 }
                             }) : null,
-                            editButton, clipboardPasteButton, addNoteButton
+                            clipboardPasteButton, addNoteButton, prefsButton, editButton
                         ])
                     ]),
 

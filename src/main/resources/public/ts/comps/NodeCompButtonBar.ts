@@ -273,13 +273,6 @@ export class NodeCompButtonBar extends Div {
             let searchButton: IconButton;
             let timelineButton: IconButton;
 
-            let fullScreenViewer = S.meta64.fullscreenViewerActive(state);
-
-            let prefsButton = !fullScreenViewer ? new IconButton("fa-certificate", null, {
-                onClick: e => { S.edit.toggleShowMetaData(state); },
-                title: state.userPreferences.showMetaData ? "Hide Avatars and Metadata" : "Show Avatars and Metadata"
-            }, "btn-secondary", state.userPreferences.showMetaData ? "on" : "off") : null;
-
             if (state.node && this.node.id === state.node.id) {
                 if (S.nav.parentVisibleToUser(state)) {
                     upLevelButton = new IconButton("fa-chevron-circle-up", "Up", {
@@ -314,7 +307,7 @@ export class NodeCompButtonBar extends Div {
                 });
             }
 
-            navButtonBar = new ButtonBar([prefsButton, searchButton, timelineButton, prevButton, nextButton, upLevelButton],
+            navButtonBar = new ButtonBar([searchButton, timelineButton, prevButton, nextButton, upLevelButton],
                 null, "float-right marginBottom");
             if (!navButtonBar.hasChildren()) {
                 navButtonBar = null;
