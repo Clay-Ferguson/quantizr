@@ -360,7 +360,13 @@ export class RssTypeHandler extends TypeBase {
             });
         }
 
-        if (entry.thumbnail) {
+        if (entry.image) {
+            children.push(new Img(null, {
+                className: "rss-feed-image",
+                src: entry.image
+            }));
+        }
+        else if (entry.thumbnail) {
             children.push(new Img(null, {
                 className: "rss-feed-image",
                 src: entry.thumbnail
@@ -432,19 +438,27 @@ export class RssTypeHandler extends TypeBase {
     }
 
     /* This will process all the images loaded by the RSS Feed content to make sure they're all 300px wide because
-    otherwise we get rediculously large images */
+    otherwise we can get rediculously large images. */
     getDomPreUpdateFunction(parent: CompIntf): void {
-        const urlSet: Set<string> = new Set<string>();
+        // DO NOT DELETE: This is an important example of how to detect dupliate images
+        // const urlSet: Set<string> = new Set<string>();
 
         S.util.forEachElmBySel("#" + parent.getId() + " .rss-feed-listing img", (el: HTMLElement, i) => {
 
             /* Because some feeds use the same image in the header and content we try to detect that here
-            and remove any but the first ocurrance of any given image on the entier page */
+            and remove any but the first ocurrance of any given image on the entire page.
+
+            NOTE: For now I decided it's a bit confusing to the user to have images disappar from the page, and it's
+            better to allow duplicate images to show up than to have some mysteriously not showing up.
+            
+            todo-1: We could use this same logic on each individual FEED ITEM (fediverse), but for now I decided not to
+            hide any dupliate images so this is commented out for now.
+            */
             let src: string = (el as any).src;
-            if (urlSet.has(src)) {
-                el.style.display = "none";
-                return;
-            }
+            // if (urlSet.has(src)) {
+            //     el.style.display = "none";
+            //     return;
+            // }
 
             el.removeAttribute("align");
 
@@ -452,7 +466,8 @@ export class RssTypeHandler extends TypeBase {
             // where there might not be enough space.
             el.style.display = "block";
 
-            urlSet.add(src);
+            // DO NOT DELETE: This is an important example of how to detect dupliate images
+            // urlSet.add(src);
 
             // console.log("IMG SRC: " + (el as any).src);
             el.style.borderRadius = ".6em";
