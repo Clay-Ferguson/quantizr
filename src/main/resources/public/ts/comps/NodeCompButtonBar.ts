@@ -245,7 +245,7 @@ export class NodeCompButtonBar extends Div {
             }
 
             if (!!state.nodesToMove && userCanPaste) {
-                pasteButtons = new Span(null, { className: "float-right" }, [
+                pasteButtons = new Span(null, { className: "float-right marginLeft" }, [
                     new Button("Paste Inside",
                         S.edit.pasteSelNodesInside, { nid: node.id }, "btn-secondary pasteButton"),
 
