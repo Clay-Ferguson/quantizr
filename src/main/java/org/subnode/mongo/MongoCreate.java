@@ -5,6 +5,7 @@ import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.stereotype.Component;
 import org.subnode.model.PropertyInfo;
@@ -156,8 +157,8 @@ public class MongoCreate {
 		update.saveSession(session);
 
 		criteria = Criteria.where(SubNode.FIELD_ORDINAL).gte(ordinal);
-		// log.debug("insertOrdinal GTE " + ordinal);
-		for (SubNode child : read.getChildrenUnderParentPath(session, node.getPath(), null, null, 0, null, criteria)) {
+		for (SubNode child : read.getChildrenUnderParentPath(session, node.getPath(),
+				Sort.by(Sort.Direction.ASC, SubNode.FIELD_ORDINAL), null, 0, null, criteria)) {
 			child.setOrdinal(maxOrdinal++);
 		}
 

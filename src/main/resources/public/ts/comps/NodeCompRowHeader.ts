@@ -78,7 +78,7 @@ export class NodeCompRowHeader extends Div {
         if (state.isAdminUser) {
             // looks like root node of pages don't have this ordinal set (it's -1 so for now we just hide it in that case)
             let ordinal = node.logicalOrdinal === -1 ? "" : node.logicalOrdinal;
-            children.push(new Span(ordinal + " " + node.type, { className: "marginRight" }));
+            children.push(new Span(ordinal + " [" + node.ordinal + "] " + node.type, { className: "marginRight" }));
         }
 
         children.push(new Icon({

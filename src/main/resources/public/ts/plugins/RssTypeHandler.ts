@@ -450,7 +450,7 @@ export class RssTypeHandler extends TypeBase {
 
             NOTE: For now I decided it's a bit confusing to the user to have images disappar from the page, and it's
             better to allow duplicate images to show up than to have some mysteriously not showing up.
-            
+
             todo-1: We could use this same logic on each individual FEED ITEM (fediverse), but for now I decided not to
             hide any dupliate images so this is commented out for now.
             */
