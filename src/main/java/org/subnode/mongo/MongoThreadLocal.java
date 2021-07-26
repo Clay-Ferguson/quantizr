@@ -23,19 +23,19 @@ public class MongoThreadLocal {
 
 	private static final ThreadLocal<LinkedHashMap<String, SubNode>> cachedNodes =
 			new ThreadLocal<LinkedHashMap<String, SubNode>>();
-	private static final ThreadLocal<Boolean> writesDisabled = new ThreadLocal<Boolean>();
+	private static final ThreadLocal<Boolean> writesDisabled = new ThreadLocal<>();
 
 	private static int MAX_CACHE_SIZE = 50;
 
 	/*
-	 * todo-2: This is to allow our ExportJsonService.resetNode importer to work. This
-	 * is importing nodes that should be all self contained as an acyclical-directed graph (i.e. tree)
-	 * and there's no risk of nodes without parents, but they MAY be out of order so that the children
-	 * of some nodes may appear in the JSON being imported BEFORE their parents (which would cause the
-	 * parent check to fail, up until the full node graph has been imported), and so I'm creating this
-	 * hack to globally disable the check during the import only.
+	 * todo-2: This is to allow our ExportJsonService.resetNode importer to work. This is importing
+	 * nodes that should be all self contained as an acyclical-directed graph (i.e. tree) and there's no
+	 * risk of nodes without parents, but they MAY be out of order so that the children of some nodes
+	 * may appear in the JSON being imported BEFORE their parents (which would cause the parent check to
+	 * fail, up until the full node graph has been imported), and so I'm creating this hack to globally
+	 * disable the check during the import only.
 	 */
-	private static final ThreadLocal<Boolean> parentCheckEnabled = new ThreadLocal<Boolean>();
+	private static final ThreadLocal<Boolean> parentCheckEnabled = new ThreadLocal<>();
 
 	public static void removeAll() {
 		getDirtyNodes().clear();
@@ -128,7 +128,8 @@ public class MongoThreadLocal {
 		 * saying with non-ACID databases transactions don't really 'work'
 		 */
 		if (nodeFound != null && nodeFound.hashCode() != node.hashCode()) {
-			log.debug("*************** WARNING: multiple instances of objectId " + node.getId().toHexString() + " are in memory.");
+			log.debug(
+					"*************** WARNING: multiple instances of objectId " + node.getId().toHexString() + " are in memory.");
 			return;
 		}
 

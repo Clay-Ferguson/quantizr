@@ -690,8 +690,8 @@ public class AttachmentService {
 			final InputStream is = getStream(session, "", node, false);
 
 			// if (session.isAdmin() && Const.adminDebugStreaming) {
-			// 	long duration = System.currentTimeMillis() - startTime;
-			// 	log.debug("getStream took " + String.valueOf(duration) + "ms");
+			// long duration = System.currentTimeMillis() - startTime;
+			// log.debug("getStream took " + String.valueOf(duration) + "ms");
 			// }
 			// startTime = System.currentTimeMillis();
 
@@ -705,9 +705,7 @@ public class AttachmentService {
 			byte[] bytes = IOUtils.toByteArray(inStream);
 
 			ResourceRegion region = resourceRegion(new ByteArrayResource(bytes), headers);
-			ret = ResponseEntity.status(HttpStatus.PARTIAL_CONTENT)
-								.contentType(MediaType.valueOf(mimeTypeProp))
-								.body(region);
+			ret = ResponseEntity.status(HttpStatus.PARTIAL_CONTENT).contentType(MediaType.valueOf(mimeTypeProp)).body(region);
 
 		} catch (final Exception e) {
 			log.error(e.getMessage());
@@ -716,22 +714,24 @@ public class AttachmentService {
 	}
 
 	private ResourceRegion resourceRegion(Resource resource, HttpHeaders headers) throws IOException {
-		/* todo-1: Will a smaller chunk size be better to get the video playing sooner after first clicked, or
-		 will it do that at the cost of less overall resource effeciency? Need to research */
-        final long chunkSize = 500000L;
-        long contentLength = resource.contentLength();
+		/*
+		 * todo-1: Will a smaller chunk size be better to get the video playing sooner after first clicked,
+		 * or will it do that at the cost of less overall resource effeciency? Need to research
+		 */
+		final long chunkSize = 500000L;
+		long contentLength = resource.contentLength();
 
-        HttpRange httpRange = headers.getRange().stream().findFirst().get();
-        if(httpRange != null) {
-            long start = httpRange.getRangeStart(contentLength);
-            long end = httpRange.getRangeEnd(contentLength);
-            long rangeLength = Long.min(chunkSize, end - start + 1);
-            return new ResourceRegion(resource, start, rangeLength);
-        } else {
-            long rangeLength = Long.min(chunkSize, contentLength);
-            return new ResourceRegion(resource, 0, rangeLength);
-        }
-    }
+		HttpRange httpRange = headers.getRange().stream().findFirst().get();
+		if (httpRange != null) {
+			long start = httpRange.getRangeStart(contentLength);
+			long end = httpRange.getRangeEnd(contentLength);
+			long rangeLength = Long.min(chunkSize, end - start + 1);
+			return new ResourceRegion(resource, start, rangeLength);
+		} else {
+			long rangeLength = Long.min(chunkSize, contentLength);
+			return new ResourceRegion(resource, 0, rangeLength);
+		}
+	}
 
 	/*
 	 * Uploads an attachment not from the user's machine but from some arbitrary internet URL they have
@@ -1061,7 +1061,12 @@ public class AttachmentService {
 		InputStream is = null;
 		String ipfsHash = node.getStrProp(NodeProp.IPFS_LINK.s() + binSuffix);
 		if (ipfsHash != null) {
-			// log.debug("Getting IPFS Stream: hash=" + ipfsHash);
+			/*
+			 * todo-1: When the IPFS link happens to be unreachable/invalid (or IFPS disabled?), this can
+			 * timeout here by taking too long. This wreaks havoc on the browser thread during some scenarios.
+			 * log.debug("Getting IPFS Stream for NodeId " + node.getId().toHexString() + " IPFS_CID=" +
+			 * ipfsHash);
+			 */
 			is = ipfsService.getStream(session, ipfsHash);
 		} else {
 			is = getStreamByNode(node, binSuffix);

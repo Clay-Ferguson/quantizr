@@ -296,9 +296,9 @@ export class Nav implements NavIntf {
     }
 
     navHome = (state: AppState = null): void => {
+        state = appState(state);
         S.view.scrollAllTop(state);
 
-        state = appState(state);
         // console.log("navHome()");
         if (state.isAnonUser) {
             S.meta64.loadAnonPageHome(null);

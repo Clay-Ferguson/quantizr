@@ -57,11 +57,14 @@ export class MenuPanel extends Div {
         dlg.open();
     };
 
-    static openBookmarksNode = () => {
-        let state = store.getState();
-        S.meta64.setUserPreferences(state, true);
-        S.nav.openContentNode("~" + J.NodeType.BOOKMARK_LIST);
-    };
+    // DO NOT DELETE
+    // I'll keep this in case there's a reason, but for now let's just rely on the fact that
+    // every bookmark has an edit icon to make this no longer needed.
+    // static openBookmarksNode = () => {
+    //     let state = store.getState();
+    //     S.meta64.setUserPreferences(state, true);
+    //     S.nav.openContentNode("~" + J.NodeType.BOOKMARK_LIST);
+    // };
 
     static continueEditing = () => {
         let state = store.getState();
@@ -195,7 +198,7 @@ export class MenuPanel extends Div {
             if (state.bookmarks) {
                 state.bookmarks.forEach((bookmark: J.Bookmark): boolean => {
                     bookmarkItems.push(new MenuItem(bookmark.name, () => S.view.jumpToId(bookmark.id || bookmark.selfId), true, null,
-                        bookmark.id ? new Icon({
+                        new Icon({
                             className: "fa fa-edit fa-lg float-right menuIcon",
                             title: "Edit this bookmark",
                             onClick: (event: any) => {
@@ -209,18 +212,20 @@ export class MenuPanel extends Div {
                                 }
                                 S.view.jumpToId(bookmark.selfId);
                             }
-                        }) : null
+                        })
                     ));
                     return true;
                 });
             }
 
+            // DO NOT DELETE
+            // if (bookmarkItems.length > 0) {
+            //     bookmarkItems.push(new MenuItemSeparator());
+            // }
+            // bookmarkItems.push(new MenuItem("Manage...", MenuPanel.openBookmarksNode, !state.isAnonUser));
             if (bookmarkItems.length > 0) {
-                bookmarkItems.push(new MenuItemSeparator());
+                children.push(new Menu("Bookmarks", bookmarkItems, S.meta64.loadBookmarks));
             }
-
-            bookmarkItems.push(new MenuItem("Manage...", MenuPanel.openBookmarksNode, !state.isAnonUser));
-            children.push(new Menu("Bookmarks", bookmarkItems, S.meta64.loadBookmarks));
         }
 
         children.push(new Menu("My Nodes", [
