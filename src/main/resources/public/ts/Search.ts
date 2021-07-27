@@ -51,7 +51,7 @@ export class Search implements SearchIntf {
                     info.node = node;
                     info.shareTarget = shareTarget;
                     info.accessOption = accessOption;
-                    info.endReached = !res.searchResults || res.searchResults.length < S.nav.ROWS_PER_PAGE;
+                    info.endReached = !res.searchResults || res.searchResults.length < J.ConstantInt.ROWS_PER_PAGE;
 
                     S.meta64.selectTabStateOnly(data.id, s);
                     return s;
@@ -104,7 +104,7 @@ export class Search implements SearchIntf {
                     data.rsInfo.fuzzy = fuzzy;
                     data.rsInfo.caseSensitive = caseSensitive;
                     data.rsInfo.prop = prop;
-                    data.rsInfo.endReached = !res.searchResults || res.searchResults.length < S.nav.ROWS_PER_PAGE;
+                    data.rsInfo.endReached = !res.searchResults || res.searchResults.length < J.ConstantInt.ROWS_PER_PAGE;
 
                     S.meta64.selectTabStateOnly(data.id, s);
                     return s;
@@ -172,7 +172,7 @@ export class Search implements SearchIntf {
                 info.prop = prop;
                 info.timeRangeType = timeRangeType;
                 info.node = node;
-                info.endReached = !res.searchResults || res.searchResults.length < S.nav.ROWS_PER_PAGE;
+                info.endReached = !res.searchResults || res.searchResults.length < J.ConstantInt.ROWS_PER_PAGE;
                 info.page = page;
 
                 S.meta64.selectTabStateOnly(data.id, s);
@@ -265,7 +265,7 @@ export class Search implements SearchIntf {
                     info.fuzzy = false;
                     info.caseSensitive = false;
                     info.prop = null;
-                    info.endReached = !res.searchResults || res.searchResults.length < S.nav.ROWS_PER_PAGE;
+                    info.endReached = !res.searchResults || res.searchResults.length < J.ConstantInt.ROWS_PER_PAGE;
                     info.showingFollowersOfUser = userName;
 
                     S.meta64.selectTabStateOnly(data.id, s);
@@ -306,7 +306,7 @@ export class Search implements SearchIntf {
                     info.fuzzy = false;
                     info.caseSensitive = false;
                     info.prop = null;
-                    info.endReached = !res.searchResults || res.searchResults.length < S.nav.ROWS_PER_PAGE;
+                    info.endReached = !res.searchResults || res.searchResults.length < J.ConstantInt.ROWS_PER_PAGE;
                     info.showingFollowingOfUser = userName;
 
                     S.meta64.selectTabStateOnly(data.id, s);

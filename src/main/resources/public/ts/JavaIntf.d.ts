@@ -785,6 +785,10 @@ export const enum Constant {
     ENC_TAG = "<[ENC]>",
 }
 
+export const enum ConstantInt {
+    ROWS_PER_PAGE = 25,
+}
+
 export const enum ErrorType {
     OUT_OF_SPACE = "oos",
     TIMEOUT = "timeout",

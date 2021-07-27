@@ -72,7 +72,7 @@ export class View implements ViewIntf {
     prevPage = (state: AppState): void => {
         let firstChildNode: J.NodeInfo = S.edit.getFirstChildNode(state);
         if (firstChildNode && firstChildNode.logicalOrdinal > 0) {
-            let targetOffset = firstChildNode.logicalOrdinal - S.nav.ROWS_PER_PAGE;
+            let targetOffset = firstChildNode.logicalOrdinal - J.ConstantInt.ROWS_PER_PAGE;
             if (targetOffset < 0) {
                 targetOffset = 0;
             }
@@ -91,7 +91,7 @@ export class View implements ViewIntf {
 
     lastPage = (state: AppState): void => {
         // console.log("Running lastPage Query");
-        // nav.mainOffset += nav.ROWS_PER_PAGE;
+        // nav.mainOffset += J.ConstantInt.ROWS_PER_PAGE;
         // this.loadPage(true, targetOffset, state);
     }
 

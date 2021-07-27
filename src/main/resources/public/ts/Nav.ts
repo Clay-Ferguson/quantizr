@@ -24,10 +24,6 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (s: Singletons) => {
 export class Nav implements NavIntf {
     _UID_ROWID_PREFIX: string = "row_";
 
-    /* todo-2: need to have this value passed from server rather than coded in TypeScript, however for now
-    this MUST match RenderNodeService.ROWS_PER_PAGE in Java on server. */
-    ROWS_PER_PAGE: number = 25;
-
     login = (state: AppState): void => {
         new LoginDlg(null, state).open();
     }

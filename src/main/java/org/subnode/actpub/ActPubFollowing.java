@@ -23,21 +23,21 @@ import org.subnode.actpub.model.APProp;
 import org.subnode.config.AppProp;
 import org.subnode.config.NodeName;
 import org.subnode.model.NodeInfo;
+import org.subnode.model.client.ConstantInt;
 import org.subnode.model.client.NodeProp;
 import org.subnode.model.client.NodeType;
 import org.subnode.model.client.PrincipalName;
+import org.subnode.mongo.AdminRun;
 import org.subnode.mongo.MongoAuth;
 import org.subnode.mongo.MongoDelete;
 import org.subnode.mongo.MongoRead;
 import org.subnode.mongo.MongoSession;
 import org.subnode.mongo.MongoThreadLocal;
 import org.subnode.mongo.MongoUtil;
-import org.subnode.mongo.AdminRun;
 import org.subnode.mongo.model.SubNode;
 import org.subnode.request.GetFollowingRequest;
 import org.subnode.response.GetFollowingResponse;
 import org.subnode.service.NodeEditService;
-import org.subnode.util.Const;
 import org.subnode.util.Convert;
 import org.subnode.util.ThreadLocals;
 
@@ -354,8 +354,8 @@ public class ActPubFollowing {
         if (query == null)
             return null;
 
-        query.limit(Const.ROWS_PER_PAGE);
-        query.skip(Const.ROWS_PER_PAGE * req.getPage());
+        query.limit(ConstantInt.ROWS_PER_PAGE.val());
+        query.skip(ConstantInt.ROWS_PER_PAGE.val() * req.getPage());
 
         Iterable<SubNode> iterable = util.find(query);
         List<NodeInfo> searchResults = new LinkedList<NodeInfo>();

@@ -4,8 +4,6 @@ import * as J from "../JavaIntf";
 export interface NavIntf {
     _UID_ROWID_PREFIX: string;
 
-    ROWS_PER_PAGE: number;
-
     login(state: AppState): void;
     logout(state: AppState): void;
     signup(state: AppState): void;

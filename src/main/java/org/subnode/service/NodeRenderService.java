@@ -18,9 +18,9 @@ import org.subnode.model.BreadcrumbInfo;
 import org.subnode.model.CalendarItem;
 import org.subnode.model.NodeInfo;
 import org.subnode.model.NodeMetaInfo;
+import org.subnode.model.client.ConstantInt;
 import org.subnode.model.client.ErrorType;
 import org.subnode.model.client.NodeProp;
-import org.subnode.model.client.PrivilegeType;
 import org.subnode.mongo.MongoAuth;
 import org.subnode.mongo.MongoRead;
 import org.subnode.mongo.MongoSession;
@@ -32,7 +32,6 @@ import org.subnode.request.RenderNodeRequest;
 import org.subnode.response.InitNodeEditResponse;
 import org.subnode.response.RenderCalendarResponse;
 import org.subnode.response.RenderNodeResponse;
-import org.subnode.util.Const;
 import org.subnode.util.Convert;
 import org.subnode.util.DateUtil;
 import org.subnode.util.SubNodeUtil;
@@ -187,11 +186,11 @@ public class NodeRenderService {
 			isWelcomePage = true;
 		}
 
-		int limit = Const.ROWS_PER_PAGE;
+		int limit = ConstantInt.ROWS_PER_PAGE.val();
 		if (node != null) {
 			// add pageSize hack to docs and admin part of user guide.
 			Long pageSize = node.getIntProp("pageSize");
-			if (pageSize != null && pageSize.intValue() > Const.ROWS_PER_PAGE) {
+			if (pageSize != null && pageSize.intValue() > ConstantInt.ROWS_PER_PAGE.val()) {
 				limit = pageSize.intValue();
 			}
 		}
