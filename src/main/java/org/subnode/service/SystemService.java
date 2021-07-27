@@ -171,14 +171,18 @@ public class SystemService {
 	public String getPerformancerReport() {
 		StringBuilder sb = new StringBuilder();
 		sb.append("Performance Report: " + sc.getUserName() + "\n");
+		int idx=1;
 		synchronized (sc.getStopwatchData()) {
 			for (StopwatchEntry se : sc.getStopwatchData()) {
+				sb.append(String.valueOf(idx));
+				sb.append(": ");
 				sb.append(se.getThreadName());
 				sb.append(" ");
 				sb.append(se.getEvent());
 				sb.append(" ");
 				sb.append(String.valueOf(se.getDuration()));
 				sb.append("\n");
+				idx++;
 			}
 		}
 		return sb.toString();

@@ -53,6 +53,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 import org.subnode.AppServer;
 import org.subnode.config.AppProp;
+import org.subnode.config.SessionContext;
 import org.subnode.exception.NodeAuthFailedException;
 import org.subnode.model.NodeMetaInfo;
 import org.subnode.model.client.NodeProp;
@@ -91,6 +92,9 @@ public class RSSFeedService {
 
 	@Autowired
 	private AdminRun arun;
+
+	@Autowired
+	private SessionContext sc;
 
 	private static boolean refreshingCache = false;
 
@@ -281,12 +285,15 @@ public class RSSFeedService {
 	}
 
 	public void aggregateFeeds(List<String> urls, List<SyndEntry> entries, int page) {
+		// sc.stopwatch("aggregateFeeds");
 		try {
 			for (String url : urls) {
+				// sc.stopwatch("starting feed: " + url);
 				// reset this to zero for each feed.
 				int badDateCount = 0;
 
 				SyndFeed inFeed = getFeed(url, true);
+				// sc.stopwatch("getFeedComplete");
 				if (inFeed != null) {
 					for (SyndEntry entry : inFeed.getEntries()) {
 
@@ -313,6 +320,7 @@ public class RSSFeedService {
 
 						entries.add(entry);
 					}
+					// sc.stopwatch("processedAllEntries");
 				}
 			}
 			entries.sort((s1, s2) -> s2.getPublishedDate().compareTo(s1.getPublishedDate()));
@@ -360,10 +368,13 @@ public class RSSFeedService {
 			if (fromCache) {
 				inFeed = feedCache.get(url);
 				if (inFeed != null) {
+					// sc.stopwatch("Cache Hit: " + url);
 					// log.debug("CACHE FEED HIT: " + XString.prettyPrint(inFeed));
 					return inFeed;
 				}
 			}
+
+			// sc.stopwatch("Cache Miss: Read from Internet: " + url);
 
 			int timeout = 60; // seconds
 
@@ -447,6 +458,7 @@ public class RSSFeedService {
 				}
 			}
 
+			// sc.stopwatch("Feed read from internet complete");
 			return inFeed;
 		} catch (Exception e) {
 			/*
@@ -493,9 +505,11 @@ public class RSSFeedService {
 
 		if (policy == null) {
 			synchronized (policyLock) {
-				/* I have removed IMAGES only because it looks silly when we display an image that's also displayed
-				 as part of the feed formatting */
-				policy = Sanitizers.FORMATTING.and(Sanitizers.BLOCKS)/* .and(Sanitizers.IMAGES)*/.and(Sanitizers.LINKS)//
+				/*
+				 * I have removed IMAGES only because it looks silly when we display an image that's also displayed
+				 * as part of the feed formatting
+				 */
+				policy = Sanitizers.FORMATTING.and(Sanitizers.BLOCKS)/* .and(Sanitizers.IMAGES) */.and(Sanitizers.LINKS)//
 						.and(Sanitizers.STYLES).and(Sanitizers.TABLES);
 			}
 		}
@@ -593,7 +607,7 @@ public class RSSFeedService {
 		e.setPublishDate(DateUtil.shortFormatDate(entry.getPublishedDate().getTime()));
 		e.setAuthor(entry.getAuthor());
 
-		if (entry.getContents()!=null) {
+		if (entry.getContents() != null) {
 			for (SyndContent sc : entry.getContents()) {
 				e.setDescription(sanitizeHtml(sc.getValue()));
 			}
@@ -603,7 +617,7 @@ public class RSSFeedService {
 		// Don't know of use cases for this yet. Leaving as FYI.
 		// List<Element> foreignMarkups = entry.getForeignMarkup();
 		// for (Element foreignMarkup : foreignMarkups) {
-		// 	String imgURL = foreignMarkup.getAttribute("url").getValue();
+		// String imgURL = foreignMarkup.getAttribute("url").getValue();
 		// }
 
 		if (entry.getEnclosures() != null) {
@@ -781,7 +795,7 @@ public class RSSFeedService {
 								e.setThumbnail(tn.getUrl().toASCIIString());
 							}
 						}
-					} 
+					}
 				} else if (m instanceof ContentModuleImpl) {
 					ContentModuleImpl contentMod = (ContentModuleImpl) m;
 					if (contentMod.getContents() != null) {

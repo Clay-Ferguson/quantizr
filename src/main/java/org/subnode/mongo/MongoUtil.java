@@ -368,7 +368,9 @@ public class MongoUtil {
 		 * user. That is, prefixed by their username followed by two dashes
 		 */
 		createIndex(session, SubNode.class, SubNode.FIELD_NAME);
+		createIndex(session, SubNode.class, SubNode.FIELD_TYPE);
 
+		createIndex(session, SubNode.class, SubNode.FIELD_OWNER);
 		createIndex(session, SubNode.class, SubNode.FIELD_ORDINAL);
 		createIndex(session, SubNode.class, SubNode.FIELD_MODIFY_TIME, Direction.DESC);
 		createIndex(session, SubNode.class, SubNode.FIELD_CREATE_TIME, Direction.DESC);

@@ -111,7 +111,7 @@ public class NodeSearchService {
 			SubNode node = read.getNode(session, searchText, true);
 			if (node != null) {
 				NodeInfo info = convert.convertToNodeInfo(ThreadLocals.getSessionContext(), session, node, true, false,
-						counter + 1, false, false);
+						counter + 1, false, false, false);
 				searchResults.add(info);
 			}
 		} else if ("node.name".equals(req.getSearchProp())) {
@@ -123,7 +123,7 @@ public class NodeSearchService {
 			SubNode node = read.getNode(session, searchText, true);
 			if (node != null) {
 				NodeInfo info = convert.convertToNodeInfo(ThreadLocals.getSessionContext(), session, node, true, false,
-						counter + 1, false, false);
+						counter + 1, false, false, false);
 				searchResults.add(info);
 			}
 		}
@@ -164,7 +164,7 @@ public class NodeSearchService {
 				for (final SubNode node : accountNodes) {
 					try {
 						NodeInfo info = convert.convertToNodeInfo(ThreadLocals.getSessionContext(), session, node, true, false,
-								counter + 1, false, false);
+								counter + 1, false, false, false);
 						searchResults.add(info);
 					} catch (Exception e) {
 					}
@@ -184,7 +184,7 @@ public class NodeSearchService {
 					try {
 						auth.auth(session, node, PrivilegeType.READ);
 						NodeInfo info = convert.convertToNodeInfo(ThreadLocals.getSessionContext(), session, node, true, false,
-								counter + 1, false, false);
+								counter + 1, false, false, false);
 						searchResults.add(info);
 					} catch (Exception e) {
 					}
@@ -253,7 +253,7 @@ public class NodeSearchService {
 			}
 
 			NodeInfo info = convert.convertToNodeInfo(ThreadLocals.getSessionContext(), session, node, true, false, counter + 1,
-					false, false);
+					false, false, false);
 			searchResults.add(info);
 		}
 

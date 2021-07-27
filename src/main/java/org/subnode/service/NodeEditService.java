@@ -233,7 +233,7 @@ public class NodeEditService {
 
 		update.save(session, newNode);
 		res.setNewNode(
-				convert.convertToNodeInfo(ThreadLocals.getSessionContext(), session, newNode, true, false, -1, false, false));
+				convert.convertToNodeInfo(ThreadLocals.getSessionContext(), session, newNode, true, false, -1, false, false, false));
 
 		res.setSuccess(true);
 		return res;
@@ -370,7 +370,7 @@ public class NodeEditService {
 
 		update.save(session, newNode);
 		res.setNewNode(
-				convert.convertToNodeInfo(ThreadLocals.getSessionContext(), session, newNode, true, false, -1, false, false));
+				convert.convertToNodeInfo(ThreadLocals.getSessionContext(), session, newNode, true, false, -1, false, false, false));
 
 		// if (req.isUpdateModTime() && !StringUtils.isEmpty(newNode.getContent()) //
 		// // don't evern send notifications when 'admin' is the one doing the editing.
@@ -556,7 +556,7 @@ public class NodeEditService {
 		});
 
 		NodeInfo newNodeInfo =
-				convert.convertToNodeInfo(ThreadLocals.getSessionContext(), session, node, true, false, -1, false, false);
+				convert.convertToNodeInfo(ThreadLocals.getSessionContext(), session, node, true, false, -1, false, false, false);
 		res.setNode(newNodeInfo);
 
 		// todo-1: for now we only push nodes if public, up to browsers rather than doing a specific check

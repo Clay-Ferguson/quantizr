@@ -117,8 +117,10 @@ public class NodeRenderService {
 
 		/* If only the single node was requested return that */
 		if (req.isSingleNode()) {
+			// todo-0: we pass true to check children on every node BUT we could run a background kind of thread on javascript
+			// that loads these all asynchronously.
 			NodeInfo nodeInfo =
-					convert.convertToNodeInfo(ThreadLocals.getSessionContext(), session, node, true, false, -1, false, false);
+					convert.convertToNodeInfo(ThreadLocals.getSessionContext(), session, node, true, false, -1, false, false, true);
 			res.setNode(nodeInfo);
 			res.setSuccess(true);
 			return res;
@@ -215,7 +217,7 @@ public class NodeRenderService {
 			SubNode scanToNode, long logicalOrdinal, int level, int limit) {
 
 		NodeInfo nodeInfo = convert.convertToNodeInfo(ThreadLocals.getSessionContext(), session, node, true, false,
-				logicalOrdinal, level > 0, false);
+				logicalOrdinal, level > 0, false, true);
 
 		if (level > 0) {
 			return nodeInfo;
@@ -437,7 +439,7 @@ public class NodeRenderService {
 		}
 
 		NodeInfo nodeInfo =
-				convert.convertToNodeInfo(ThreadLocals.getSessionContext(), session, node, false, true, -1, false, false);
+				convert.convertToNodeInfo(ThreadLocals.getSessionContext(), session, node, false, true, -1, false, false, false);
 		res.setNodeInfo(nodeInfo);
 		res.setSuccess(true);
 		return res;

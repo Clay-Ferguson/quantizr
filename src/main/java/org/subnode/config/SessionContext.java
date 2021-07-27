@@ -435,14 +435,21 @@ public class SessionContext {
 	// public void afterPropertiesSet() throws Exception {}
 
 	public void stopwatch(String action) {
+		// for now only admin user has stopwatch capability
+		if (userName == null || !userName.equals(PrincipalName.ADMIN.s()))
+			return;
+
 		StopwatchEntry se = null;
 
+		String threadName = Thread.currentThread().getName();
+		threadName = threadName.replace("https-jsse-nio-443-exec-", "T");
+
 		if (ThreadLocals.getStopwatchTime() == -1) {
-			se = new StopwatchEntry(action, -1, Thread.currentThread().getName());
+			se = new StopwatchEntry(action, -1, threadName);
 			log.debug("Stopwatch: " + action);
 		} else {
 			Integer duration = (int) (System.currentTimeMillis() - ThreadLocals.getStopwatchTime());
-			se = new StopwatchEntry(action, duration, Thread.currentThread().getName());
+			se = new StopwatchEntry(action, duration, threadName);
 			log.debug("Stopwatch: " + action + " elapsed: " + String.valueOf(duration) + "ms");
 		}
 

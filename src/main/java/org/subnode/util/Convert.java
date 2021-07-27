@@ -58,10 +58,12 @@ public class Convert {
 	/*
 	 * Generates a NodeInfo object, which is the primary data type that is also used on the
 	 * browser/client to encapsulate the data for a given node which is used by the browser to render
-	 * the node
+	 * the node.
+	 * 
+	 * todo-0: the childrenCheck is new here. Need to re-test all places where we pass false in!
 	 */
 	public NodeInfo convertToNodeInfo(SessionContext sc, MongoSession session, SubNode node, boolean htmlOnly,
-			boolean initNodeEdit, long ordinal, boolean allowInlineChildren, boolean lastChild) {
+			boolean initNodeEdit, long ordinal, boolean allowInlineChildren, boolean lastChild, boolean childrenCheck) {
 
 		/* If session user shouldn't be able to see secrets on this node remove them */
 		if (session.isAnon() || (session.getUserNodeId() != null && !session.getUserNodeId().equals(node.getOwner()))) {
@@ -102,7 +104,7 @@ public class Convert {
 			}
 		}
 
-		boolean hasChildren = read.hasChildren(session, node);
+		boolean hasChildren = childrenCheck ? read.hasChildren(session, node) : false;
 		// log.trace("hasNodes=" + hasChildren + " node: "+node.getId().toHexString());
 
 		List<PropertyInfo> propList = buildPropertyInfoList(sc, node, htmlOnly, initNodeEdit);
@@ -267,7 +269,7 @@ public class Convert {
 					boolean multiLevel = true;
 
 					nodeInfo.safeGetChildren().add(convertToNodeInfo(sc, session, n, htmlOnly, initNodeEdit,
-							inlineOrdinal++, multiLevel, lastChild));
+							inlineOrdinal++, multiLevel, lastChild, childrenCheck));
 				}
 			}
 		}

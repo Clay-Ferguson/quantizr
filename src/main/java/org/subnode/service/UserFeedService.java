@@ -47,7 +47,7 @@ import org.subnode.util.ThreadLocals;
 public class UserFeedService {
 	private static final Logger log = LoggerFactory.getLogger(UserFeedService.class);
 
-	static final int MAX_FEED_ITEMS = 50;
+	static final int MAX_FEED_ITEMS = 25;
 
 	@Autowired
 	private MongoRead read;
@@ -106,7 +106,7 @@ public class UserFeedService {
 				continue;
 
 			/* build our push message payload */
-			NodeInfo nodeInfo = convert.convertToNodeInfo(sc, session, node, true, false, 1, false, false);
+			NodeInfo nodeInfo = convert.convertToNodeInfo(sc, session, node, true, false, 1, false, false, true);
 			FeedPushInfo pushInfo = new FeedPushInfo(nodeInfo);
 
 			/*
@@ -371,8 +371,10 @@ public class UserFeedService {
 		SubNode lastNode = null;
 
 		for (SubNode node : iter) {
+			// sc.stopwatch("iter scan");
 			try {
-				NodeInfo info = convert.convertToNodeInfo(sc, session, node, true, false, counter + 1, false, false);
+				NodeInfo info = convert.convertToNodeInfo(sc, session, node, true, false, counter + 1, false, false, false);
+				// sc.stopwatch("iter convert");
 				searchResults.add(info);
 				lastNode = node;
 			} catch (Exception e) {
