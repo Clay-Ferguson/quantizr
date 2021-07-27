@@ -33,6 +33,7 @@ import org.subnode.mongo.MongoUtil;
 import org.subnode.mongo.model.SubNode;
 import org.subnode.util.Const;
 import org.subnode.util.ExUtil;
+import org.subnode.util.StopwatchEntry;
 import org.subnode.util.ThreadLocals;
 import org.subnode.util.XString;
 
@@ -75,6 +76,9 @@ public class SystemService {
 
 	@Autowired
 	private ActPubService apService;
+
+	@Autowired
+	private SessionContext sc;
 
 	public String rebuildIndexes() {
 		if (!ThreadLocals.getSessionContext().isAdmin()) {
@@ -162,6 +166,22 @@ public class SystemService {
 		} else {
 			return "node not found!";
 		}
+	}
+
+	public String getPerformancerReport() {
+		StringBuilder sb = new StringBuilder();
+		sb.append("Performance Report: " + sc.getUserName() + "\n");
+		synchronized (sc.getStopwatchData()) {
+			for (StopwatchEntry se : sc.getStopwatchData()) {
+				sb.append(se.getThreadName());
+				sb.append(" ");
+				sb.append(se.getEvent());
+				sb.append(" ");
+				sb.append(String.valueOf(se.getDuration()));
+				sb.append("\n");
+			}
+		}
+		return sb.toString();
 	}
 
 	public String getSystemInfo() {

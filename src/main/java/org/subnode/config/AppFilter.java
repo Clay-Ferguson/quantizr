@@ -80,7 +80,8 @@ public class AppFilter extends GenericFilterBean {
 		try {
 			ThreadLocals.removeAll();
 			MongoThreadLocal.removeAll();
-
+			ThreadLocals.setStopwatchTime(System.currentTimeMillis());
+			
 			int thisReqId = ++reqId;
 			String ip = null;
 

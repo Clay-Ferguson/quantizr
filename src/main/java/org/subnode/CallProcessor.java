@@ -65,6 +65,7 @@ public class CallProcessor {
 		}
 
 		try {
+			sc.stopwatch("> " + command);
 			if (mutex != null) {
 				mutex.lockEx();
 			}
@@ -117,6 +118,7 @@ public class CallProcessor {
 				orb.setStackTrace(ExceptionUtils.getStackTrace(e));
 			}
 		} finally {
+			sc.stopwatch("< " + command);
 			if (mutex != null) {
 				mutex.unlockEx();
 			}

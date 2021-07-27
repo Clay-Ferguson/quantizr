@@ -451,6 +451,11 @@ public class AppController implements ErrorController {
 		return actPub.dumpFediverseUsers();
 	}
 
+	@GetMapping(value = {"/performance-report"}, produces = MediaType.TEXT_PLAIN_VALUE)
+	public @ResponseBody String performanceReport() {
+		return systemService.getPerformancerReport();
+	}
+
 	@GetMapping(value = {"/multiRss"}, produces = MediaType.APPLICATION_RSS_XML_VALUE)
 	public void multiRss(@RequestParam(value = "id", required = true) String nodeId, //
 			HttpServletResponse response) {

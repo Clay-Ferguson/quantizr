@@ -2,10 +2,10 @@ package org.subnode.util;
 
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
-import org.subnode.config.SessionContext;
-import org.subnode.response.base.ResponseBase;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.subnode.config.SessionContext;
+import org.subnode.response.base.ResponseBase;
 
 /**
  * Thread Local Storage
@@ -73,15 +73,5 @@ public class ThreadLocals {
 		if (stopwatchTime.get() == null)
 			return -1L;
 		return stopwatchTime.get();
-	}
-
-	public static void stopwatch(String action) {
-		if (getStopwatchTime() != -1) {
-			log.debug("Stopwatch: " + action);
-		} else {
-			Long duration = System.currentTimeMillis() - getStopwatchTime();
-			log.debug("Stopwatch: " + action + " elapsed: " + String.valueOf(duration) + "ms");
-		}
-		setStopwatchTime(System.currentTimeMillis());
 	}
 }

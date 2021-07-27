@@ -365,7 +365,9 @@ public class UserFeedService {
 			query.skip(MAX_FEED_ITEMS * req.getPage());
 		}
 
+		sc.stopwatch("NodeFeedQuery--Start");
 		Iterable<SubNode> iter = util.find(query);
+		sc.stopwatch("NodeFeedQuery--Complete");
 		SubNode lastNode = null;
 
 		for (SubNode node : iter) {
@@ -376,6 +378,8 @@ public class UserFeedService {
 			} catch (Exception e) {
 			}
 		}
+
+		sc.stopwatch("NodeFeedQuery--Iterated");
 
 		/*
 		 * This is the correct logic since we only have a 'more' button and no 'back' button so that as the

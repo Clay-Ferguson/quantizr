@@ -22,6 +22,8 @@ import org.subnode.mongo.MongoUtil;
 import org.subnode.response.SessionTimeoutPushInfo;
 import org.subnode.service.UserFeedService;
 import org.subnode.util.DateUtil;
+import org.subnode.util.StopwatchEntry;
+import org.subnode.util.ThreadLocals;
 import org.subnode.util.Util;
 
 /**
@@ -84,6 +86,8 @@ public class SessionContext {
 	/* keeps track of total calls to each URI */
 	public HashMap<String, Integer> actionCounters = new HashMap<>();
 
+	public final List<StopwatchEntry> stopwatchData = new LinkedList<>();
+
 	private String captcha;
 	private int captchaFails = 0;
 
@@ -107,6 +111,10 @@ public class SessionContext {
 		synchronized (historicalSessions) {
 			historicalSessions.add(this);
 		}
+	}
+
+	public List<StopwatchEntry> getStopwatchData() {
+		return stopwatchData;
 	}
 
 	public void addAction(String actionName) {
@@ -425,4 +433,22 @@ public class SessionContext {
 	// // From InitializingBean interface
 	// @Override
 	// public void afterPropertiesSet() throws Exception {}
+
+	public void stopwatch(String action) {
+		StopwatchEntry se = null;
+
+		if (ThreadLocals.getStopwatchTime() == -1) {
+			se = new StopwatchEntry(action, -1, Thread.currentThread().getName());
+			log.debug("Stopwatch: " + action);
+		} else {
+			Integer duration = (int) (System.currentTimeMillis() - ThreadLocals.getStopwatchTime());
+			se = new StopwatchEntry(action, duration, Thread.currentThread().getName());
+			log.debug("Stopwatch: " + action + " elapsed: " + String.valueOf(duration) + "ms");
+		}
+
+		synchronized (stopwatchData) {
+			stopwatchData.add(se);
+		}
+		ThreadLocals.setStopwatchTime(System.currentTimeMillis());
+	}
 }
