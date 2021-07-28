@@ -582,6 +582,7 @@ export class Meta64 implements Meta64Intf {
 
             setTimeout(() => {
                 S.encryption.initKeys();
+                this.loadBookmarks();
             }, 1000);
 
             resolve();

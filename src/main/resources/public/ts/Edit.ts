@@ -616,6 +616,13 @@ export class Edit implements EditIntf {
                     } else {
                         this.deleteNodesResponse(res, postDelSelNodeId, state);
                     }
+
+                    /* We waste a tiny bit of CPU/bandwidth here by just always updating the bookmarks in case
+                     we just deleted some. This could be slightly improved to KNOW if we deleted any bookmarks, but
+                    the added complexity to achieve that for recursive tree deletes doesn't pay off */
+                    setTimeout(() => {
+                        S.meta64.loadBookmarks();
+                    }, 1000);
                 });
             },
             null, "btn-danger", "alert alert-danger", state

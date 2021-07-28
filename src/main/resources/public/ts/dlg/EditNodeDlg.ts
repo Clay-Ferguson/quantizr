@@ -988,6 +988,13 @@ export class EditNodeDlg extends DialogBase {
             if (askToSplit) {
                 new SplitNodeDlg(state.node, this.appState).open();
             }
+
+            // if we just saved a bookmark, reload bookmarks menu
+            if ((state.node as J.NodeInfo).type === J.NodeType.BOOKMARK) {
+                setTimeout(() => {
+                    S.meta64.loadBookmarks();
+                }, 1000);
+            }
         });
     }
 

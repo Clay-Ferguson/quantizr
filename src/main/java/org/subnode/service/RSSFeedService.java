@@ -93,9 +93,6 @@ public class RSSFeedService {
 	@Autowired
 	private AdminRun arun;
 
-	@Autowired
-	private SessionContext sc;
-
 	private static boolean refreshingCache = false;
 
 	private static final Object policyLock = new Object();
@@ -285,15 +282,12 @@ public class RSSFeedService {
 	}
 
 	public void aggregateFeeds(List<String> urls, List<SyndEntry> entries, int page) {
-		// sc.stopwatch("aggregateFeeds");
 		try {
 			for (String url : urls) {
-				// sc.stopwatch("starting feed: " + url);
 				// reset this to zero for each feed.
 				int badDateCount = 0;
 
 				SyndFeed inFeed = getFeed(url, true);
-				// sc.stopwatch("getFeedComplete");
 				if (inFeed != null) {
 					for (SyndEntry entry : inFeed.getEntries()) {
 
@@ -320,7 +314,6 @@ public class RSSFeedService {
 
 						entries.add(entry);
 					}
-					// sc.stopwatch("processedAllEntries");
 				}
 			}
 			entries.sort((s1, s2) -> s2.getPublishedDate().compareTo(s1.getPublishedDate()));
@@ -368,13 +361,10 @@ public class RSSFeedService {
 			if (fromCache) {
 				inFeed = feedCache.get(url);
 				if (inFeed != null) {
-					// sc.stopwatch("Cache Hit: " + url);
 					// log.debug("CACHE FEED HIT: " + XString.prettyPrint(inFeed));
 					return inFeed;
 				}
 			}
-
-			// sc.stopwatch("Cache Miss: Read from Internet: " + url);
 
 			int timeout = 60; // seconds
 
@@ -458,7 +448,6 @@ public class RSSFeedService {
 				}
 			}
 
-			// sc.stopwatch("Feed read from internet complete");
 			return inFeed;
 		} catch (Exception e) {
 			/*
@@ -608,8 +597,8 @@ public class RSSFeedService {
 		e.setAuthor(entry.getAuthor());
 
 		if (entry.getContents() != null) {
-			for (SyndContent sc : entry.getContents()) {
-				e.setDescription(sanitizeHtml(sc.getValue()));
+			for (SyndContent content : entry.getContents()) {
+				e.setDescription(sanitizeHtml(content.getValue()));
 			}
 		}
 
