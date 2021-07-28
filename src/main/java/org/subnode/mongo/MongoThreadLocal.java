@@ -23,7 +23,6 @@ public class MongoThreadLocal {
 
 	private static final ThreadLocal<LinkedHashMap<String, SubNode>> cachedNodes =
 			new ThreadLocal<LinkedHashMap<String, SubNode>>();
-	private static final ThreadLocal<Boolean> writesDisabled = new ThreadLocal<>();
 
 	private static int MAX_CACHE_SIZE = 50;
 
@@ -40,19 +39,8 @@ public class MongoThreadLocal {
 	public static void removeAll() {
 		getDirtyNodes().clear();
 		getCachedNodes().clear();
-		setWritesDisabled(false);
 		setParentCheckEnabled(true);
 		session.remove();
-	}
-
-	public static void setWritesDisabled(Boolean val) {
-		writesDisabled.set(val);
-	}
-
-	public static Boolean getWritesDisabled() {
-		if (writesDisabled.get() == null)
-			return false;
-		return writesDisabled.get();
 	}
 
 	public static void setParentCheckEnabled(Boolean val) {

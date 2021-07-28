@@ -15,6 +15,7 @@ import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.TextCriteria;
 import org.springframework.stereotype.Component;
+import org.subnode.actpub.ActPubService;
 import org.subnode.config.NodeName;
 import org.subnode.model.NodeInfo;
 import org.subnode.model.client.Bookmark;
@@ -23,6 +24,7 @@ import org.subnode.model.client.NodeProp;
 import org.subnode.model.client.NodeType;
 import org.subnode.model.client.PrincipalName;
 import org.subnode.model.client.PrivilegeType;
+import org.subnode.mongo.AdminRun;
 import org.subnode.mongo.MongoAuth;
 import org.subnode.mongo.MongoRead;
 import org.subnode.mongo.MongoSession;
@@ -40,7 +42,9 @@ import org.subnode.response.GetSharedNodesResponse;
 import org.subnode.response.NodeSearchResponse;
 import org.subnode.util.Convert;
 import org.subnode.util.EnglishDictionary;
+import org.subnode.util.ExUtil;
 import org.subnode.util.ThreadLocals;
+import org.subnode.util.XString;
 
 /**
  * Service for searching the repository. This searching is currently very basic, and just grabs the
@@ -79,6 +83,12 @@ public class NodeSearchService {
 	@Autowired
 	private NodeRenderService render;
 
+	@Autowired
+	private ActPubService apService;
+
+	@Autowired
+	private AdminRun arun;
+
 	public static Object trendingFeedInfoLock = new Object();
 	public static GetNodeStatsResponse trendingFeedInfo;
 
@@ -89,9 +99,6 @@ public class NodeSearchService {
 	static final int TRENDING_LIMIT = 10000;
 
 	public NodeSearchResponse search(MongoSession session, NodeSearchRequest req) {
-		// ensure this call can't write any data.
-		MongoThreadLocal.setWritesDisabled(true);
-
 		NodeSearchResponse res = new NodeSearchResponse();
 		session = MongoThreadLocal.ensure(session);
 
@@ -135,11 +142,23 @@ public class NodeSearchService {
 			 * If we're searching just for users do this.
 			 */
 			if (!StringUtils.isEmpty(req.getUserSearchType())) {
+				String findUserName = null;
 
 				TextCriteria textCriteria = null;
 				if (!StringUtils.isEmpty(req.getSearchText())) {
+					findUserName = req.getSearchText();
 					textCriteria = TextCriteria.forDefaultLanguage();
-					textCriteria.matching(req.getSearchText());
+
+					// make sure name is quoted for exact search, since it will contain delimiters
+					// which would other wise dirty up a search
+					String name = findUserName;
+					if (!name.startsWith("\"")) {
+						name = "\"" + name;
+					}
+					if (!name.endsWith("\"")) {
+						name = name + "\"";
+					}
+					textCriteria.matching(name);
 					textCriteria.caseSensitive(req.getCaseSensitive());
 				}
 
@@ -155,8 +174,9 @@ public class NodeSearchService {
 							Criteria.where(SubNode.FIELD_PROPERTIES + "." + NodeProp.ACT_PUB_ACTOR_URL.s() + ".value").is(null);
 				}
 
-				final Iterable<SubNode> accountNodes = read.getChildrenUnderParentPath(session, NodeName.ROOT_OF_ALL_USERS, null,
-				ConstantInt.ROWS_PER_PAGE.val(), ConstantInt.ROWS_PER_PAGE.val() * req.getPage(), textCriteria, moreCriteria);
+				Iterable<SubNode> accountNodes = read.getChildrenUnderParentPath(session, NodeName.ROOT_OF_ALL_USERS, null,
+						ConstantInt.ROWS_PER_PAGE.val(), ConstantInt.ROWS_PER_PAGE.val() * req.getPage(), textCriteria,
+						moreCriteria);
 				/*
 				 * scan all userAccountNodes, and set a zero amount for those not found (which will be the correct
 				 * amount).
@@ -167,7 +187,32 @@ public class NodeSearchService {
 								counter + 1, false, false, false);
 						searchResults.add(info);
 					} catch (Exception e) {
+						ExUtil.error(log, "faild converting user node", e);
 					}
+				}
+
+				/*
+				 * If we didn't find any results and we aren't searching
+				 * locally only then try to look this up as a username
+				 */
+				if (searchResults.size() == 0 && !"local".equals(req.getUserSearchType())) {
+					findUserName = findUserName.replace("\"", "");
+					findUserName = XString.stripIfStartsWith(findUserName, "@");
+					final String _findUserName = findUserName;
+					arun.run(ms -> {
+						SubNode userNode = apService.getAcctNodeByUserName(ms, _findUserName);
+						if (userNode != null) {
+							try {
+								NodeInfo info = convert.convertToNodeInfo(ThreadLocals.getSessionContext(), ms, userNode, true,
+										false, counter + 1, false, false, false);
+
+								searchResults.add(info);
+							} catch (Exception e) {
+								ExUtil.error(log, "faild converting user node", e);
+							}
+						}
+						return null;
+					});
 				}
 			}
 			// else we're doing a normal subgraph search for the text
@@ -179,8 +224,8 @@ public class NodeSearchService {
 				}
 
 				for (SubNode node : read.searchSubGraph(session, searchRoot, req.getSearchProp(), searchText, req.getSortField(),
-						ConstantInt.ROWS_PER_PAGE.val(), ConstantInt.ROWS_PER_PAGE.val() * req.getPage(), req.getFuzzy(), req.getCaseSensitive(),
-						req.getTimeRangeType())) {
+						ConstantInt.ROWS_PER_PAGE.val(), ConstantInt.ROWS_PER_PAGE.val() * req.getPage(), req.getFuzzy(),
+						req.getCaseSensitive(), req.getTimeRangeType())) {
 					try {
 						auth.auth(session, node, PrivilegeType.READ);
 						NodeInfo info = convert.convertToNodeInfo(ThreadLocals.getSessionContext(), session, node, true, false,
@@ -220,8 +265,9 @@ public class NodeSearchService {
 		 * 2) all my shared nodes globally, and the globally is done simply by passing null for the path
 		 * here
 		 */
-		for (SubNode node : auth.searchSubGraphByAcl(session, req.getPage() * ConstantInt.ROWS_PER_PAGE.val(), searchRoot.getPath(),
-				searchRoot.getOwner(), Sort.by(Sort.Direction.DESC, SubNode.FIELD_MODIFY_TIME), ConstantInt.ROWS_PER_PAGE.val())) {
+		for (SubNode node : auth.searchSubGraphByAcl(session, req.getPage() * ConstantInt.ROWS_PER_PAGE.val(),
+				searchRoot.getPath(), searchRoot.getOwner(), Sort.by(Sort.Direction.DESC, SubNode.FIELD_MODIFY_TIME),
+				ConstantInt.ROWS_PER_PAGE.val())) {
 
 			if (node.getAc() == null || node.getAc().size() == 0)
 				continue;

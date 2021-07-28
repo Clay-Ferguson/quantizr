@@ -287,9 +287,11 @@ public class ActPubService {
             log.debug("Load foreign user: " + apUserName);
             APObj webFinger = apUtil.getWebFinger(apUserName);
 
-            String actorUrl = apUtil.getActorUrlFromWebFingerObj(webFinger);
-            if (actorUrl != null) {
-                acctNode = getAcctNodeByActorUrl(ms, actorUrl);
+            if (webFinger != null) {
+                String actorUrl = apUtil.getActorUrlFromWebFingerObj(webFinger);
+                if (actorUrl != null) {
+                    acctNode = getAcctNodeByActorUrl(ms, actorUrl);
+                }
             }
         }
 

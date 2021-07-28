@@ -40,8 +40,6 @@ public class MongoUpdate {
 	private MongoAuth auth;
 
 	public void saveObj(Object obj) {
-		if (MongoThreadLocal.getWritesDisabled())
-			return;
 		ops.save(obj);
 	}
 
@@ -50,8 +48,6 @@ public class MongoUpdate {
 	}
 
 	public void save(MongoSession session, SubNode node, boolean allowAuth) {
-		if (MongoThreadLocal.getWritesDisabled())
-			return;
 		if (allowAuth) {
 			auth.ownerAuth(session, node);
 		}
@@ -75,7 +71,7 @@ public class MongoUpdate {
 	}
 
 	public void saveSession(MongoSession session, boolean asAdmin) {
-		if (session == null || session.saving || !MongoThreadLocal.hasDirtyNodes() || MongoThreadLocal.getWritesDisabled())
+		if (session == null || session.saving || !MongoThreadLocal.hasDirtyNodes())
 			return;
 
 		try {
