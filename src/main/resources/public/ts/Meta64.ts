@@ -590,14 +590,17 @@ export class Meta64 implements Meta64Intf {
     }
 
     loadBookmarks = (): void => {
-        S.util.ajax<J.GetBookmarksRequest, J.GetBookmarksResponse>("getBookmarks", {
-        },
-            (res: J.GetBookmarksResponse): void => {
-                dispatch("Action_loadBookmarks", (s: AppState): AppState => {
-                    s.bookmarks = res.bookmarks;
-                    return s;
+        let state: AppState = store.getState();
+        if (!state.isAnonUser) {
+            S.util.ajax<J.GetBookmarksRequest, J.GetBookmarksResponse>("getBookmarks", {
+            },
+                (res: J.GetBookmarksResponse): void => {
+                    dispatch("Action_loadBookmarks", (s: AppState): AppState => {
+                        s.bookmarks = res.bookmarks;
+                        return s;
+                    });
                 });
-            });
+        }
     }
 
     createAppTabs = (): void => {
