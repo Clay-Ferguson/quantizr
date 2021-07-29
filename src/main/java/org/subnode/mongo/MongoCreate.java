@@ -137,7 +137,6 @@ public class MongoCreate {
 	 * range of unused sequential ordinal values (range of 'ordinal+1' thru 'ordinal+1+rangeSize')
 	 */
 	public void insertOrdinal(MongoSession session, SubNode node, long ordinal, long rangeSize) {
-		// todo-0: this is due for a bit more testing of all edge cases.
 		long maxOrdinal = ordinal + rangeSize;
 
 		auth.auth(session, node, PrivilegeType.READ);

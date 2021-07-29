@@ -3,7 +3,6 @@ import { Constants as C } from "../Constants";
 import { TabDataIntf } from "../intf/TabDataIntf";
 import { PubSub } from "../PubSub";
 import { Singletons } from "../Singletons";
-import { State } from "../State";
 import { Div } from "./Div";
 
 let S: Singletons;

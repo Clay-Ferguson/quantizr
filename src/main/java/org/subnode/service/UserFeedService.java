@@ -371,10 +371,8 @@ public class UserFeedService {
 		SubNode lastNode = null;
 
 		for (SubNode node : iter) {
-			// sc.stopwatch("iter scan");
 			try {
 				NodeInfo info = convert.convertToNodeInfo(sc, session, node, true, false, counter + 1, false, false, false);
-				// sc.stopwatch("iter convert");
 				searchResults.add(info);
 				lastNode = node;
 			} catch (Exception e) {

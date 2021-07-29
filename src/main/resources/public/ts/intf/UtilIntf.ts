@@ -50,7 +50,8 @@ export interface UtilIntf {
     getRemoteHost(): string;
     ajax<RequestBase, ResponseType>(postName: string, postData: RequestBase,
         callback?: (response: ResponseType) => void,
-        failCallback?: (response: string) => void): Promise<any>;
+        failCallback?: (response: string) => void,
+        background?: boolean): Promise<any>;
     logAndThrow(message: string);
     logAndReThrow(message: string, exception: any);
     ajaxReady(requestName): boolean;

@@ -479,6 +479,9 @@ export class Render implements RenderIntf {
                                 */
                                 300);
                         });
+
+                        // see also: tag #getNodeMetaInfo
+                        this.getNodeMetaInfo(res.node);
                     }
                     else {
                         this.allowFadeInId = true;
@@ -489,6 +492,39 @@ export class Render implements RenderIntf {
         }
         catch (err) {
             console.error("render failed.");
+        }
+    }
+
+    /* Get information for each node. Namely for now just the 'hasChildren' state because it takes a actual query
+    per node to find that out.
+
+    Note: Users will be able to see the fading in fadeInRowBkgClz class for the length of time it takes
+    the getNodeMetaInfo, this is ok and is the current design. The fading now works kind of like a progress indicator
+    by keeping user busy watching something.
+    */
+    getNodeMetaInfo = (node: J.NodeInfo) => {
+        if (node.children) {
+            let ids: string[] = [];
+            for (let child of node.children) {
+                ids.push(child.id);
+            }
+
+            S.util.ajax<J.GetNodeMetaInfoRequest, J.GetNodeMetaInfoResponse>("getNodeMetaInfo", {
+                ids
+            }, (res: J.GetNodeMetaInfoResponse) => {
+                dispatch("Action_updateNodeMetaInfo", (s: AppState): AppState => {
+                    if (s.node && s.node.children) {
+                        s.node.hasChildren = true;
+                        for (let child of s.node.children) {
+                            let inf: J.NodeMetaIntf = res.nodeIntf.find(v => v.id === child.id);
+                            if (inf) {
+                                child.hasChildren = inf.hasChildren;
+                            }
+                        }
+                    }
+                    return s;
+                });
+            }, null, true);
         }
     }
 

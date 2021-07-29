@@ -63,6 +63,7 @@ import org.subnode.request.GetFollowersRequest;
 import org.subnode.request.GetFollowingRequest;
 import org.subnode.request.GetFriendsRequest;
 import org.subnode.request.GetMultiRssRequest;
+import org.subnode.request.GetNodeMetaInfoRequest;
 import org.subnode.request.GetNodePrivilegesRequest;
 import org.subnode.request.GetNodeStatsRequest;
 import org.subnode.request.GetOpenGraphRequest;
@@ -589,6 +590,14 @@ public class AppController implements ErrorController {
 			HttpServletRequest httpReq, HttpSession session) {
 		return callProc.run("renderCalendar", req, session, ms -> {
 			return nodeRenderService.renderCalendar(ms, req);
+		});
+	}
+
+	@RequestMapping(value = API_PATH + "/getNodeMetaInfo", method = RequestMethod.POST)
+	public @ResponseBody Object getNodeMetaInfo(@RequestBody GetNodeMetaInfoRequest req, //
+			HttpServletRequest httpReq, HttpSession session) {
+		return callProc.run("rendergetNodeMetaInfoNode", req, session, ms -> {
+			return nodeRenderService.getNodeMetaInfo(ms, req);
 		});
 	}
 

@@ -349,6 +349,7 @@ public class AppFilter extends GenericFilterBean {
 		}
 	}
 
+	// todo-0: app is super fragile if you forget to add one here. fix this.
 	private boolean isSecurePath(String path) {
 		if (path.contains("/mobile/api/login") || //
 				path.contains("/mobile/api/signup") || //
@@ -357,6 +358,7 @@ public class AppFilter extends GenericFilterBean {
 				path.contains("/mobile/api/getConfig") || //
 				path.contains("/mobile/api/serverPush") || //
 				path.contains("/mobile/api/renderNode") || //
+				path.contains("/mobile/api/getNodeMetaInfo") || //
 				path.contains("/mobile/api/bin") || //
 				path.contains("/mobile/api/captcha") || //
 				path.contains("/mobile/api/getUserProfile") || //

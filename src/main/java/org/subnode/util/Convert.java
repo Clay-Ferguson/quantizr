@@ -59,8 +59,6 @@ public class Convert {
 	 * Generates a NodeInfo object, which is the primary data type that is also used on the
 	 * browser/client to encapsulate the data for a given node which is used by the browser to render
 	 * the node.
-	 * 
-	 * todo-0: the childrenCheck is new here. Need to re-test all places where we pass false in!
 	 */
 	public NodeInfo convertToNodeInfo(SessionContext sc, MongoSession session, SubNode node, boolean htmlOnly,
 			boolean initNodeEdit, long ordinal, boolean allowInlineChildren, boolean lastChild, boolean childrenCheck) {

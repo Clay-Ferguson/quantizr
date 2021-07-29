@@ -276,6 +276,7 @@ export class NodeCompButtonBar extends Div {
             if (state.node && this.node.id === state.node.id) {
                 if (S.nav.parentVisibleToUser(state)) {
                     upLevelButton = new IconButton("fa-chevron-circle-up", "Up", {
+                        nid: node.id,
                         /* For onclick functions I need a new approach for some (not all) where I can get by
                         with using a function that accepts no arguments but does the trick of retrieving the single ID parameter
                         directly off the DOM */

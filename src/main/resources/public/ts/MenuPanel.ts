@@ -251,7 +251,7 @@ export class MenuPanel extends Div {
 
         children.push(new Menu("Friends", [
             // DO NOT DELETE (keep for future reference)
-            // This addFriend feature does work just fine, but things are simpler if we just let users be discovered thru 
+            // This addFriend feature does work just fine, but things are simpler if we just let users be discovered thru
             // the search menu, and they'll be addable as friends from there.
             // new MenuItem("Add Friend", MenuPanel.addFriend, !state.isAnonUser),
 

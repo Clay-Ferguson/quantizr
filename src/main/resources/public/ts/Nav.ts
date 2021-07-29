@@ -1,4 +1,4 @@
-import { appState, dispatch } from "./AppRedux";
+import { appState, dispatch, store } from "./AppRedux";
 import { AppState } from "./AppState";
 import { FeedView } from "./tabs/FeedView";
 import { Constants as C } from "./Constants";
@@ -112,7 +112,10 @@ export class Nav implements NavIntf {
             });
     }
 
-    navUpLevelClick = (): void => {
+    navUpLevelClick = async (evt: Event = null, id: string = null): Promise<void> => {
+        // for state management, especially for scrolling, we need to run the node click on the node
+        // before upLeveling from it.
+        await this.clickNodeRow(evt, id);
         this.navUpLevel(false);
     }
 
@@ -178,34 +181,39 @@ export class Nav implements NavIntf {
 
     /* NOTE: Elements that have this as an onClick method must have the nodeId
     on an attribute of the element */
-    clickNodeRow = (evt: Event, id: string, state?: AppState): void => {
-        id = S.util.allowIdFromEvent(evt, id);
-        state = appState(state);
+    clickNodeRow = async (evt: Event, id: string, state?: AppState): Promise<void> => {
+        return new Promise<void>(async (resolve, reject) => {
+            id = S.util.allowIdFromEvent(evt, id);
+            state = appState(state);
 
-        /* First check if this node is already highlighted and if so just return */
-        const hltNode = S.meta64.getHighlightedNode();
-        if (hltNode && hltNode.id === id) {
-            return;
-        }
+            /* First check if this node is already highlighted and if so just return */
+            const hltNode = S.meta64.getHighlightedNode();
+            if (hltNode && hltNode.id === id) {
+                resolve();
+                return;
+            }
 
-        const node: J.NodeInfo = state.idToNodeMap.get(id);
-        if (!node) {
-            // console.log("idToNodeMap: "+S.util.prettyPrint(state.idToNodeMap));
-            throw new Error("node not found in idToNodeMap: " + id);
-        }
+            const node: J.NodeInfo = state.idToNodeMap.get(id);
+            if (!node) {
+                reject();
+                // console.log("idToNodeMap: "+S.util.prettyPrint(state.idToNodeMap));
+                throw new Error("node not found in idToNodeMap: " + id);
+            }
 
-        /*
-         * sets which node is selected on this page (i.e. parent node of this page being the 'key')
-         */
-        S.meta64.highlightNode(node, false, state);
+            /*
+             * sets which node is selected on this page (i.e. parent node of this page being the 'key')
+             */
+            S.meta64.highlightNode(node, false, state);
 
-        // todo-1: without this timeout checkboxes on main tab don't work reliably. Need their state stored in global state to fix it
-        // in a good way.
-        setTimeout(() => {
-            dispatch("Action_FastRefresh", (s: AppState): AppState => {
-                return s;
-            });
-        }, 100);
+            // todo-1: without this timeout checkboxes on main tab don't work reliably. Need their state stored in global state to fix it
+            // in a good way.
+            setTimeout(() => {
+                dispatch("Action_FastRefresh", (s: AppState): AppState => {
+                    return s;
+                });
+                resolve();
+            }, 100);
+        });
     }
 
     openContentNode = (nodePathOrId: string, state: AppState = null): void => {

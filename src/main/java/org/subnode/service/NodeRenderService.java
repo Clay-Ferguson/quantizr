@@ -20,15 +20,18 @@ import org.subnode.model.NodeInfo;
 import org.subnode.model.NodeMetaInfo;
 import org.subnode.model.client.ConstantInt;
 import org.subnode.model.client.ErrorType;
+import org.subnode.model.client.NodeMetaIntf;
 import org.subnode.model.client.NodeProp;
 import org.subnode.mongo.MongoAuth;
 import org.subnode.mongo.MongoRead;
 import org.subnode.mongo.MongoSession;
 import org.subnode.mongo.MongoThreadLocal;
 import org.subnode.mongo.model.SubNode;
+import org.subnode.request.GetNodeMetaInfoRequest;
 import org.subnode.request.InitNodeEditRequest;
 import org.subnode.request.RenderCalendarRequest;
 import org.subnode.request.RenderNodeRequest;
+import org.subnode.response.GetNodeMetaInfoResponse;
 import org.subnode.response.InitNodeEditResponse;
 import org.subnode.response.RenderCalendarResponse;
 import org.subnode.response.RenderNodeResponse;
@@ -67,6 +70,23 @@ public class NodeRenderService {
 	private NodeRenderService render;
 
 	private static RenderNodeResponse welcomePage;
+
+	public GetNodeMetaInfoResponse getNodeMetaInfo(MongoSession session, GetNodeMetaInfoRequest req) {
+		GetNodeMetaInfoResponse res = new GetNodeMetaInfoResponse();
+
+		List<NodeMetaIntf> list = new LinkedList<>();
+		res.setNodeIntf(list);
+
+		for (String id : req.getIds()) {
+			SubNode node = read.getNode(session, id);
+			if (node != null) {
+				boolean hasChildren = read.hasChildren(session, node);
+				list.add(new NodeMetaIntf(id, hasChildren));
+			}
+		}
+		res.setSuccess(true);
+		return res;
+	}
 
 	/*
 	 * This is the call that gets all the data to show on a page. Whenever user is browsing to a new
@@ -117,10 +137,9 @@ public class NodeRenderService {
 
 		/* If only the single node was requested return that */
 		if (req.isSingleNode()) {
-			// todo-0: we pass true to check children on every node BUT we could run a background kind of thread on javascript
 			// that loads these all asynchronously.
-			NodeInfo nodeInfo =
-					convert.convertToNodeInfo(ThreadLocals.getSessionContext(), session, node, true, false, -1, false, false, true);
+			NodeInfo nodeInfo = convert.convertToNodeInfo(ThreadLocals.getSessionContext(), session, node, true, false, -1, false,
+					false, true);
 			res.setNode(nodeInfo);
 			res.setSuccess(true);
 			return res;
@@ -216,8 +235,17 @@ public class NodeRenderService {
 	private NodeInfo processRenderNode(MongoSession session, RenderNodeRequest req, RenderNodeResponse res, final SubNode node,
 			SubNode scanToNode, long logicalOrdinal, int level, int limit) {
 
+		/*
+		 * see also: tag #getNodeMetaInfo
+		 * 
+		 * Note: if you set the hasChildren to true, here to update children flag on nodes immediately here,
+		 * then you can also remove the getNodeMetaInfo() call wher eyou see that on the client, and that's
+		 * all you need to do, but for now we're using getNodeMetaInfo to query for all the children
+		 * asynchronously from the page load, after the page renders, to make things perform better (i.e.
+		 * faster diaplay of pages)
+		 */
 		NodeInfo nodeInfo = convert.convertToNodeInfo(ThreadLocals.getSessionContext(), session, node, true, false,
-				logicalOrdinal, level > 0, false, true);
+				logicalOrdinal, level > 0, false, false);
 
 		if (level > 0) {
 			return nodeInfo;
@@ -292,8 +320,9 @@ public class NodeRenderService {
 			}
 			SubNode n = iterator.next();
 			idx++;
-			// log.debug("Iterate [" + idx + "]: nodeId" + n.getId().toHexString() + "scanToNode=" + scanToNode);
-			// log.debug("  DATA: " + XString.prettyPrint(n));
+			// log.debug("Iterate [" + idx + "]: nodeId" + n.getId().toHexString() + "scanToNode=" +
+			// scanToNode);
+			// log.debug(" DATA: " + XString.prettyPrint(n));
 
 			/* are we still just scanning for our target node */
 			if (scanToNode != null) {
@@ -439,7 +468,7 @@ public class NodeRenderService {
 		}
 
 		NodeInfo nodeInfo =
-				convert.convertToNodeInfo(ThreadLocals.getSessionContext(), session, node, false, true, -1, false, false, false);
+				convert.convertToNodeInfo(ThreadLocals.getSessionContext(), session, node, false, true, -1, false, false, true);
 		res.setNodeInfo(nodeInfo);
 		res.setSuccess(true);
 		return res;

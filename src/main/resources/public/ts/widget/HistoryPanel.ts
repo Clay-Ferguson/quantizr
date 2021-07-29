@@ -40,12 +40,17 @@ export class HistoryPanel extends Div {
             if (h.subItems) {
                 let count = 0;
                 let dotsShown = false;
+
+                // we include topLevelId in the ids below so the React 'key' (same as id, by default) isn't
+                // ever able to be duplilcated, because that throws a warning in React.
+                let topLevelId = h.id;
+
                 h.subItems.forEach((h: NodeHistoryItem) => {
                     if (!h.content || dotsShown) return;
                     if (count++ < HistoryPanel.MAX_SUBITEMS) {
                         let d;
                         children.push(d = new Div(h.content, {
-                            id: h.id + "_subhist",
+                            id: topLevelId + "_" + h.id + "_subhist",
                             nid: h.id,
                             onClick: this.jumpToId,
                             className: "nodeHistorySubItem"
@@ -56,7 +61,7 @@ export class HistoryPanel extends Div {
                         if (!dotsShown) {
                             dotsShown = true;
                             children.push(new Div("...", {
-                                id: h.id + "_subhist",
+                                id: topLevelId + "_" + h.id + "_subhist",
                                 className: "nodeHistorySubItemDots"
                             }));
                         }

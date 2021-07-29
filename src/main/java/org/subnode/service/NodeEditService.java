@@ -556,7 +556,7 @@ public class NodeEditService {
 		});
 
 		NodeInfo newNodeInfo =
-				convert.convertToNodeInfo(ThreadLocals.getSessionContext(), session, node, true, false, -1, false, false, false);
+				convert.convertToNodeInfo(ThreadLocals.getSessionContext(), session, node, true, false, -1, false, false, true);
 		res.setNode(newNodeInfo);
 
 		// todo-1: for now we only push nodes if public, up to browsers rather than doing a specific check
