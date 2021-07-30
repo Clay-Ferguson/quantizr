@@ -121,7 +121,6 @@ public class AppFilter extends GenericFilterBean {
 					checkApiSecurity(bearer, httpReq);
 				}
 
-
 				ip = getClientIpAddr(httpReq);
 				sc.setIp(ip);
 
@@ -349,7 +348,7 @@ public class AppFilter extends GenericFilterBean {
 		}
 	}
 
-	// todo-0: app is super fragile if you forget to add one here. fix this.
+	// todo-1: app is too fragile if you forget to add one here. fix this.
 	private boolean isSecurePath(String path) {
 		if (path.contains("/mobile/api/login") || //
 				path.contains("/mobile/api/signup") || //

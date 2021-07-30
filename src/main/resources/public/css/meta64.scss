@@ -840,9 +840,9 @@ Will come back later and study this more. todo-1 */
     width: 100%;
 }
 
-// This 60px gap is what makes room for the '+' buttons on the RHS during editing
+// This 70px gap is what makes room for the '+' buttons on the RHS during editing
 .my-tab-pane-editmode {
-    padding-right: 60px;
+    padding-right: 70px;
 }
 
 .tabPanel {
@@ -1396,7 +1396,7 @@ input[type="radio"] {
 .plusButtonFloatRight {
     position: absolute;
     top: -1.2rem;
-    right: -2.8rem;
+    right: -3rem;
 }
 
 @keyframes fadeToHidden {
@@ -1711,7 +1711,7 @@ i'm backing out for now
     from {background-color: $gray-700;}
     to {background-color: transparent;}
 }
-  
+
 .fadeInRowBkgClz {
     animation-name: fadeInRowBkg;
     animation-duration: 3.5s;
@@ -1917,7 +1917,6 @@ audio::-webkit-media-controls-play-button {
 }
 
 .followingText {
-    font-size: 120%;
     font-weight: bold;
     margin-left: 15px;
     padding: 8px;
@@ -1928,7 +1927,6 @@ audio::-webkit-media-controls-play-button {
 }
 
 .blockingText {
-    font-size: 120%;
     font-weight: bold;
     margin-left: 15px;
     padding: 8px;
@@ -1939,7 +1937,6 @@ audio::-webkit-media-controls-play-button {
 }
 
 .followCount {
-    font-size: 120%;
     margin-left: 15px;
     padding: 8px;
     border: 2px solid $nodeBorderBottomColor;

@@ -243,7 +243,7 @@ export class MenuPanel extends Div {
         children.push(new Menu("Messages" + messagesSuffix, [
             new MenuItem("To/From Me" + messagesSuffix, MenuPanel.messagesToFromMe, !state.isAnonUser),
             new MenuItem("From Friends", MenuPanel.messagesFromFriends, !state.isAnonUser),
-            new MenuItem("Local Users", MenuPanel.messagesLocal, !state.isAnonUser),
+            new MenuItem("From Local Users", MenuPanel.messagesLocal, !state.isAnonUser),
             new MenuItem("All Fediverse", MenuPanel.messagesFediverse, !state.isAnonUser),
             new MenuItemSeparator(), //
             new MenuItem("My Posts", MenuPanel.openPostsNode, !state.isAnonUser)

@@ -75,7 +75,6 @@ export class Attachment implements AttachmentIntf {
                     delPromise = S.util.ajax<J.DeleteAttachmentRequest, J.DeleteAttachmentResponse>("deleteAttachment", {
                         nodeId: node.id
                     }, (res: J.DeleteAttachmentResponse): void => {
-                        this.deleteAttachmentResponse(res, node.id, state);
                         deleted = true;
                     });
                 }, null, null, null, state
@@ -86,16 +85,6 @@ export class Attachment implements AttachmentIntf {
             }
         }
         return deleted;
-    }
-
-    // kState=='keep state' (the state has been changed, keep changes)
-    deleteAttachmentResponse = (res: J.DeleteAttachmentResponse, id: string, kState: AppState): void => {
-        if (S.util.checkSuccess("Delete attachment", res)) {
-            // but for now just do a dispatch that forces a refresh from client memory (not server)
-            dispatch("Action_FastRefresh", (s: AppState): AppState => {
-                return kState;
-            });
-        }
     }
 
     removeBinaryProperties = (node: J.NodeInfo) => {

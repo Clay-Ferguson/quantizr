@@ -713,7 +713,7 @@ public class UserManagerService {
 			userNode = edit.createFriendNode(session, blockedList, req.getUserName(), followerActorUrl, followerActorHtmlUrl);
 			if (userNode != null) {
 				res.setMessage(
-						"Blocked user " + req.getUserName() + ". To manage blocks, go to `Menu -> Users -> Blocked Users`");
+						"Blocked user " + req.getUserName() + ". To manage blocks, go to `Menu -> Friends -> Blocked Users`");
 			} else {
 				res.setMessage("Unable to block user: " + req.getUserName());
 			}
