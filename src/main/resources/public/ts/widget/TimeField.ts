@@ -15,7 +15,7 @@ export class TimeField extends Div implements I.ValueIntf {
 
     input: Input;
 
-    constructor(private valState: ValidatedState<any>) {
+    constructor(private valState: ValidatedState<any>, private extraClass: string = null) {
         super(null);
     }
 
@@ -39,7 +39,8 @@ export class TimeField extends Div implements I.ValueIntf {
             new Div(null, {
                 /* NOTE: Yes we set font on the PARENT and then use 'inherit' to get it
                 to the component, or elase there's a react-rerender flicker. */
-                style: { fontFamily: "monospace" }
+                style: { fontFamily: "monospace" },
+                className: this.extraClass
             }, [
                 this.input = new Input({
                     className: "form-control pre-textfield",

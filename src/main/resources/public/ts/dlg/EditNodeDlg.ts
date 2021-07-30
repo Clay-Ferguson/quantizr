@@ -345,9 +345,6 @@ export class EditNodeDlg extends DialogBase {
 
         let allowContentEdit: boolean = typeHandler ? typeHandler.getAllowContentEdit() : true;
 
-        // let allowUpload: boolean = typeHandler ? (state.isAdminUser || typeHandler.allowAction(NodeActionType.upload, state.node, this.appState)) : true;
-        // let allowShare = true;
-
         let children = [
             S.speech.speechActive ? new TextContent("Speech-to-Text active. Mic listening...", "alert alert-primary") : null,
             new Form(null, [
@@ -458,7 +455,7 @@ export class EditNodeDlg extends DialogBase {
                 let propsButtonBar: ButtonBar = new ButtonBar([
                     new Button("Add Property", this.addProperty),
                     this.deletePropButton = new Button("Delete Property", this.deletePropertyButtonClick)
-                ], null, "float-right");
+                ], null, "float-right marginBottom");
 
                 this.deletePropButton.setEnabled(false);
 

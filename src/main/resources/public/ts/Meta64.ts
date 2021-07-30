@@ -655,7 +655,7 @@ export class Meta64 implements Meta64Intf {
                     scrollPos: 0
                 },
                 {
-                    name: "Fediverse",
+                    name: "Feed",
                     id: C.TAB_FEED,
                     isVisible: () => true,
                     constructView: (data: TabDataIntf) => new FeedView(s, data),

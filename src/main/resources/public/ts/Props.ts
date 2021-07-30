@@ -301,7 +301,8 @@ export class Props implements PropsIntf {
             J.NodeProp.BIN_FILENAME, //
             J.NodeProp.JSON_HASH, //
             J.NodeProp.IPFS_LINK, //
-            J.NodeProp.ENC_KEY
+            J.NodeProp.ENC_KEY, //
+            J.NodeProp.TYPE_LOCK
         ]);
 
         S.util.addAllToSet(this.controlBasedPropertyList, [ //

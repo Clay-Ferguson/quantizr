@@ -86,7 +86,7 @@ export class DateTimeField extends Span {
     preRender(): void {
         this.setChildren([
             new DateField(this.dateState),
-            new TimeField(this.timeState)
+            new TimeField(this.timeState, "marginLeft")
         ]);
     }
 }
