@@ -164,7 +164,7 @@ export class NodeCompButtonBar extends Div {
                     getValue: (): boolean => {
                         return !!state.selectedNodes[node.id];
                     }
-                });
+                }, true);
             }
 
             let insertAllowed = true;

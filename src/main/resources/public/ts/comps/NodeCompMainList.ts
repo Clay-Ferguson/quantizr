@@ -28,13 +28,13 @@ export class NodeCompMainList extends Div {
 
         let children: Comp[] = [];
         if (state.node && state.node.children) {
-            this.addPaginationButtons(children, state.endReached, "", state);
+            this.addPaginationButtons(children, state.endReached, "", state, true);
 
             let orderByProp = S.props.getNodePropVal(J.NodeProp.ORDER_BY, state.node);
             let allowNodeMove: boolean = !orderByProp;
             children.push(S.render.renderChildren(state.node, 1, allowNodeMove, state));
 
-            this.addPaginationButtons(children, state.endReached, "marginTop marginBottom", state);
+            this.addPaginationButtons(children, state.endReached, "marginTop marginBottom", state, false);
         }
 
         // No longer needed, because we have this on the menu now but check that all the gettingStarted (from yaml) content
@@ -47,10 +47,11 @@ export class NodeCompMainList extends Div {
         this.setChildren(children);
     }
 
-    addPaginationButtons = (children: Comp[], endReached: boolean, moreClasses: string, state: AppState) => {
+    addPaginationButtons = (children: Comp[], endReached: boolean, moreClasses: string, state: AppState, pageTop: boolean) => {
         let firstButton: Comp;
         let prevButton: Comp;
         let nextButton: Comp;
+        let nextNodeButton: Comp;
         let firstChild: J.NodeInfo = S.edit.getFirstChildNode(state);
 
         if (firstChild && firstChild.logicalOrdinal > 1) {
@@ -77,9 +78,17 @@ export class NodeCompMainList extends Div {
                 title: "Next Page"
             });
         }
+        else {
+            if (!pageTop && !S.nav.displayingRepositoryRoot(state)) {
+                nextNodeButton = new IconButton("fa-chevron-circle-right", null, {
+                    onClick: S.nav.navToNext,
+                    title: "Go to Next Node"
+                });
+            }
+        }
 
         if (firstButton || prevButton || nextButton) {
-            children.push(new ButtonBar([firstButton, prevButton, nextButton], "text-center " + moreClasses));
+            children.push(new ButtonBar([firstButton, prevButton, nextButton, nextNodeButton], "text-center " + moreClasses));
             children.push(new Clearfix());
         }
     }

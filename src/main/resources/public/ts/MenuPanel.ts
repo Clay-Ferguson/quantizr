@@ -255,7 +255,7 @@ export class MenuPanel extends Div {
             // the search menu, and they'll be addable as friends from there.
             // new MenuItem("Add Friend", MenuPanel.addFriend, !state.isAnonUser),
 
-            new MenuItem("My Friends", MenuPanel.openFriendsNode, !state.isAnonUser),
+            new MenuItem("Friends", MenuPanel.openFriendsNode, !state.isAnonUser),
             new MenuItem("Followers", MenuPanel.showFollowers, !state.isAnonUser),
             new MenuItem("Blocked Users", MenuPanel.openBlockedUsersNode, !state.isAnonUser)
         ]));
