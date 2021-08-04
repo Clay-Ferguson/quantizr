@@ -846,7 +846,7 @@ export class Edit implements EditIntf {
     }
 
     /* If node is non-null that means this is a reply to that 'node' but if node is 'null' that means
-    this user just probably clicked "New Post" on their Feed Tab and so we will let the server create some node
+    this user just probably clicked "+" (new post button) on their Feed Tab and so we will let the server create some node
     like "My Posts" in the root of the user's account to host this new 'reply' by creating the new node under that */
     addNode = async (nodeId: string, content: string, state: AppState) => {
         state = appState(state);

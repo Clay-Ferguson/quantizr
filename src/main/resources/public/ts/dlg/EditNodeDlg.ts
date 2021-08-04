@@ -528,9 +528,13 @@ export class EditNodeDlg extends DialogBase {
         }
 
         let sharingNames = S.util.getSharingNames(state.node, false);
-        let sharingSpan = null;
+        let sharingDiv = null;
         if (sharingNames) {
-            sharingSpan = new Span("Shared to: " + sharingNames);
+            let isPublic = sharingNames.toLowerCase().indexOf("public") !== -1;
+
+            sharingDiv = new Div("Shared to: " + sharingNames, {
+                className: "marginBottom float-right"
+            });
         }
 
         let helpPanel = this.editorHelp ? new CollapsibleHelpPanel("Help", this.editorHelp,
@@ -559,7 +563,7 @@ export class EditNodeDlg extends DialogBase {
             collapsiblePanel, helpPanel
         ]);
 
-        this.propertyEditFieldContainer.setChildren([mainPropsTable, sharingSpan, binarySection, rightFloatButtons,
+        this.propertyEditFieldContainer.setChildren([mainPropsTable, sharingDiv, binarySection, rightFloatButtons,
             new Clearfix()]);
         return children;
     }

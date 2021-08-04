@@ -8,6 +8,7 @@ import { PubSub } from "../PubSub";
 import { Singletons } from "../Singletons";
 import { Comp } from "../widget/base/Comp";
 import { CompIntf } from "../widget/base/CompIntf";
+import { Button } from "../widget/Button";
 import { Clearfix } from "../widget/Clearfix";
 import { Div } from "../widget/Div";
 import { IconButton } from "../widget/IconButton";
@@ -89,10 +90,10 @@ export class NodeCompRow extends Div {
 
                 // todo-1: this button should have same enabelement as "new" button, on the page root ???
                 insertInlineButton = new Div(null, { className: "marginLeft" }, [
-                    new IconButton("fa-plus", null, {
-                        onClick: (e) => {
-                            S.edit.insertNode(node.id, "u", 0 /* isFirst ? 0 : 1 */, state);
-                        },
+                    new Button(null, e => {
+                                 S.edit.insertNode(node.id, "u", 0 /* isFirst ? 0 : 1 */, state);
+                             }, {
+                        iconclass: "fa fa-plus",
                         title: "Insert new node" + (this.isTableCell ? " (above this one)" : "")
                     }, "btn-secondary " + (this.isTableCell ? "" : "plusButtonFloatRight"))
                 ]);
@@ -115,7 +116,7 @@ export class NodeCompRow extends Div {
         else if (layout && layout.indexOf("c") === 0 && (!!S.props.getNodePropVal(J.NodeProp.INLINE_CHILDREN, this.node) || this.node.id === state.node.id)) {
         }
         else {
-            layoutClass += state.userPreferences.editMode && state.userPreferences.showMetaData ? " row-border-edit" : " row-border";
+            layoutClass += state.userPreferences.editMode || state.userPreferences.showMetaData ? " row-border-edit" : " row-border";
         }
 
         let indentLevel = this.isTableCell ? 0 : this.level;

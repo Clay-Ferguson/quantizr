@@ -86,15 +86,15 @@ export class NodeCompVerticalRowLayout extends Div {
                 // todo-1: this button should have same enabelement as "new" button, on the page root
                 if (!state.editNode) {
                     comps.push(new Div(null, { className: "node-table-row" }, [
-                        new IconButton("fa-plus", null, {
-                            onClick: e => {
-                                if (lastNode) {
-                                    S.edit.insertNode(lastNode.id, "u", 1 /* isFirst ? 0 : 1 */, state);
-                                }
-                                else {
-                                    S.edit.newSubNode(null, state.node.id);
-                                }
-                            },
+                        new Button(null, e => {
+                            if (lastNode) {
+                                S.edit.insertNode(lastNode.id, "u", 1 /* isFirst ? 0 : 1 */, state);
+                            }
+                            else {
+                                S.edit.newSubNode(null, state.node.id);
+                            }
+                        }, {
+                            iconclass: "fa fa-plus",
                             title: "Insert new node"
                         }, "btn-secondary plusButtonFloatRight")
                     ]));

@@ -61,6 +61,19 @@ export class NodeCompRowHeader extends Div {
             }));
         }
 
+        let typeHandler: TypeHandlerIntf = S.plugin.getTypeHandler(node.type);
+        if (typeHandler) {
+            let iconClass = typeHandler.getIconClass();
+            if (iconClass) {
+                children.push(new Icon({
+                    className: iconClass + " rowTypeIcon",
+                    title: "Node Type: " + typeHandler.getName(),
+                    onMouseOver: () => { S.meta64.draggableId = node.id; },
+                    onMouseOut: () => { S.meta64.draggableId = null; }
+                }));
+            }
+        }
+
         if (node.name) {
             children.push(new Span(node.name, {
                 className: "btn-secondary nodeName",
@@ -140,7 +153,6 @@ export class NodeCompRowHeader extends Div {
                 ]));
         }
 
-        let typeHandler: TypeHandlerIntf = S.plugin.getTypeHandler(node.type);
         let editingAllowed = S.edit.isEditAllowed(node, state);
         let deleteAllowed = false;
         let editableNode = true;

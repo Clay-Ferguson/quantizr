@@ -102,6 +102,8 @@ export class NodeCompTableRowLayout extends Div {
             children.push(curRow);
         }
 
+        /* I'll leave this block here, for future reference, but it's dead code. If editMode is on we never do the
+        table layout but show each node as if it were vertical layout instead */
         if (this.allowHeaders && allowInsert && !state.isAnonUser && state.userPreferences.editMode) {
             let attribs = {};
             if (state.userPreferences.editMode) {
@@ -111,14 +113,14 @@ export class NodeCompTableRowLayout extends Div {
             if (this.level <= 1) {
                 // todo-1: this button should have same enablement as "new" button, on the page root
                 if (!state.editNode) {
-                    children.push(new IconButton("fa-plus", null, {
-                        onClick: e => {
-                            if (lastNode) {
-                                S.edit.insertNode(lastNode.id, "u", 1 /* isFirst ? 0 : 1 */, state);
-                            } else {
-                                S.edit.newSubNode(null, state.node.id);
-                            }
-                        },
+                    children.push(new Button(null, e => {
+                        if (lastNode) {
+                            S.edit.insertNode(lastNode.id, "u", 1 /* isFirst ? 0 : 1 */, state);
+                        } else {
+                            S.edit.newSubNode(null, state.node.id);
+                        }
+                    }, {
+                        iconclass: "fa fa-plus",
                         title: "Insert new node"
                     }, "btn-secondary marginLeft marginTop"));
                 }

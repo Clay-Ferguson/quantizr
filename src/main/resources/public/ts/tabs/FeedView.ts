@@ -69,7 +69,10 @@ export class FeedView extends AppTab {
         let children: Comp[] = [];
 
         let refreshFeedButtonBar = new ButtonBar([
-            state.isAnonUser ? null : new Button("New Post", () => S.edit.addNode(null, null, state), { title: "Post something awesome on the Fediverse!" }, "btn-primary")
+            state.isAnonUser ? null : new Button("", () => S.edit.addNode(null, null, state), {
+                className: "fa fa-plus",
+                title: "Post something to the Fediverse!"
+            }, "btn-primary")
         ], null, "float-right");
 
         children.push(refreshFeedButtonBar);

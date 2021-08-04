@@ -38,7 +38,6 @@ export class NodeCompButtonBar extends Div {
             return;
         }
 
-        let typeIcon: Icon;
         let encIcon: Icon;
         let sharedIcon: Icon;
         let openButton: Button;
@@ -54,21 +53,6 @@ export class NodeCompButtonBar extends Div {
 
         let isPageRootNode = state.node && this.node.id === state.node.id;
         let typeHandler: TypeHandlerIntf = S.plugin.getTypeHandler(node.type);
-
-        if (state.userPreferences.editMode) {
-            if (typeHandler) {
-                let iconClass = typeHandler.getIconClass();
-                if (iconClass) {
-                    typeIcon = new Icon({
-                        className: iconClass + " rowTypeIcon",
-                        title: "Node Type: " + typeHandler.getName(),
-                        onMouseOver: () => { S.meta64.draggableId = node.id; },
-                        onMouseOut: () => { S.meta64.draggableId = null; }
-                    });
-                }
-            }
-        }
-
         let editingAllowed = S.edit.isEditAllowed(node, state);
         let deleteAllowed = false;
         let editableNode = true;
@@ -134,9 +118,11 @@ export class NodeCompButtonBar extends Div {
             // If children are shown inline, no need to allow 'open' button in this case unless we're in edit mode
             (!isInlineChildren || state.userPreferences.editMode)) {
 
-            /* convert this button to a className attribute for styles */
-            openButton = new Button("Open", S.nav.openNodeById,
-                { title: "Open Node to access its children.", nid: node.id }, "btn-primary marginRight");
+            openButton = new Button(null, S.nav.openNodeById, {
+                iconclass: "fa fa-folder-open",
+                nid: node.id,
+                title: "Open Node to access its children"
+            }, "btn-primary");
         }
 
         /*
@@ -178,8 +164,11 @@ export class NodeCompButtonBar extends Div {
             let editInsertAllowed = S.edit.isInsertAllowed(node, state);
 
             if (C.NEW_ON_TOOLBAR && insertAllowed && editInsertAllowed && !state.editNode) {
-                createSubNodeButton = new Button("New", S.edit.newSubNode,
-                    { title: "Create new Node as a child of this node.", nid: node.id });
+                createSubNodeButton = new Button(null, S.edit.newSubNode, {
+                    iconclass: "fa fa-plus",
+                    nid: node.id,
+                    title: "Create new Node (as child of this node)"
+                });
             }
 
             if (C.INS_ON_TOOLBAR) {
@@ -255,7 +244,7 @@ export class NodeCompButtonBar extends Div {
             }
         }
 
-        let btnArray: Comp[] = [insertNodeButton, createSubNodeButton, editNodeButton,
+        let btnArray: Comp[] = [openButton, insertNodeButton, createSubNodeButton, editNodeButton,
             new Span(null, { className: "float-right" }, [moveNodeUpButton, //
                 moveNodeDownButton, cutNodeButton, deleteNodeButton, pasteButtons])];
 
@@ -275,7 +264,7 @@ export class NodeCompButtonBar extends Div {
 
             if (state.node && this.node.id === state.node.id) {
                 if (S.nav.parentVisibleToUser(state)) {
-                    upLevelButton = new IconButton("fa-chevron-circle-up", "Up", {
+                    upLevelButton = new IconButton("fa-folder", "Up", {
                         nid: node.id,
                         /* For onclick functions I need a new approach for some (not all) where I can get by
                         with using a function that accepts no arguments but does the trick of retrieving the single ID parameter
@@ -319,6 +308,6 @@ export class NodeCompButtonBar extends Div {
             buttonBar = null;
         }
 
-        this.setChildren([selButton, openButton, typeIcon, encIcon, sharedIcon, buttonBar, navButtonBar]);
+        this.setChildren([selButton, encIcon, sharedIcon, buttonBar, navButtonBar]);
     }
 }
