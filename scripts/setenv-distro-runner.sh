@@ -10,7 +10,7 @@ export docker_compose_yaml=docker-compose-distro.yaml
 export ipfs_data=${DEPLOY_TARGET}/ipfs
 export ipfs_staging=${DEPLOY_TARGET}/ipfs/staging
 
-export QUANTA_VER=1.0.16
+export QUANTA_VER=1.0.17
 
 export JAR_FILE=./org.subnode-0.0.1-SNAPSHOT.jar
 export PORT=8185
