@@ -15,6 +15,7 @@ import { Button } from "./widget/Button";
 import { ButtonBar } from "./widget/ButtonBar";
 import { Heading } from "./widget/Heading";
 import { VerticalLayout } from "./widget/VerticalLayout";
+import { Comp } from "./widget/base/Comp";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (s: Singletons) => {
@@ -208,10 +209,11 @@ export class Nav implements NavIntf {
             // todo-1: without this timeout checkboxes on main tab don't work reliably. Need their state stored in global state to fix it
             // in a good way.
             setTimeout(() => {
+                S.meta64.tempDisableAutoScroll();
                 dispatch("Action_FastRefresh", (s: AppState): AppState => {
                     return s;
                 });
-                S.util.delayedFocus(C.TAB_MAIN);
+                Comp.focusElmId = C.TAB_MAIN;
                 resolve();
             }, 100);
         });

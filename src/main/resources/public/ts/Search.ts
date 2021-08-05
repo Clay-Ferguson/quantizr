@@ -39,7 +39,7 @@ export class Search implements SearchIntf {
         }, (res) => {
             if (res.searchResults && res.searchResults.length > 0) {
                 dispatch("Action_RenderSearchResults", (s: AppState): AppState => {
-                    S.util.delayedFocus(C.TAB_SHARES);
+                    Comp.focusElmId = C.TAB_SHARES;
                     S.meta64.tabScrollTop(s, C.TAB_SHARES);
                     let data = s.tabData.find(d => d.id === C.TAB_SHARES);
                     if (!data) return;
@@ -91,7 +91,7 @@ export class Search implements SearchIntf {
                 }
 
                 dispatch("Action_RenderSearchResults", (s: AppState): AppState => {
-                    S.util.delayedFocus(C.TAB_SEARCH);
+                    Comp.focusElmId = C.TAB_SEARCH;
                     S.meta64.tabScrollTop(s, C.TAB_SEARCH);
                     let data = s.tabData.find(d => d.id === C.TAB_SEARCH);
                     if (!data) return;
@@ -163,7 +163,7 @@ export class Search implements SearchIntf {
             timeRangeType
         }, (res) => {
             dispatch("Action_RenderTimelineResults", (s: AppState): AppState => {
-                S.util.delayedFocus(C.TAB_TIMELINE);
+                Comp.focusElmId = C.TAB_TIMELINE;
                 S.meta64.tabScrollTop(s, C.TAB_TIMELINE);
                 let data = s.tabData.find(d => d.id === C.TAB_TIMELINE);
                 if (!data) return;
@@ -214,7 +214,7 @@ export class Search implements SearchIntf {
                 }
 
                 // if scrolling in new results grow the existing array
-                if (growResults) {
+                if (growResults && (s.feedResults == null || s.feedResults.length < C.MAX_DYNAMIC_ROWS)) {
                     // create a set for duplicate detection
                     let idSet: Set<string> = new Set<string>();
 
@@ -243,7 +243,7 @@ export class Search implements SearchIntf {
                     // }, 1000);
                 }
 
-                S.util.delayedFocus(C.TAB_FEED);
+                Comp.focusElmId = C.TAB_FEED;
                 return s;
             });
         });
@@ -273,7 +273,7 @@ export class Search implements SearchIntf {
         }, (res) => {
             if (res.searchResults && res.searchResults.length > 0) {
                 dispatch("Action_RenderSearchResults", (s: AppState): AppState => {
-                    S.util.delayedFocus(C.TAB_FOLLOWERS);
+                    Comp.focusElmId = C.TAB_FOLLOWERS;
                     S.meta64.tabScrollTop(s, C.TAB_FOLLOWERS);
                     let data = s.tabData.find(d => d.id === C.TAB_FOLLOWERS);
                     if (!data) return;
@@ -315,7 +315,7 @@ export class Search implements SearchIntf {
         }, (res) => {
             if (res.searchResults && res.searchResults.length > 0) {
                 dispatch("Action_RenderSearchResults", (s: AppState): AppState => {
-                    S.util.delayedFocus(C.TAB_FOLLOWING);
+                    Comp.focusElmId = C.TAB_FOLLOWING;
                     S.meta64.tabScrollTop(s, C.TAB_FOLLOWING);
                     let data = s.tabData.find(d => d.id === C.TAB_FOLLOWING);
                     if (!data) return;

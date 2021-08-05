@@ -21,6 +21,7 @@ export class View implements ViewIntf {
     docElm: any = (document.documentElement || document.body.parentNode || document.body);
 
     jumpToId = (id: string): void => {
+        // console.log("jumpToId: " + id);
         let state = store.getState();
         this.refreshTree(id, true, true, id, false, true, true, state);
     }
@@ -30,6 +31,11 @@ export class View implements ViewIntf {
      */
     refreshTree = (nodeId: string, zeroOffset: boolean, renderParentIfLeaf: boolean, highlightId: string, forceIPFSRefresh: boolean,
         allowScroll: boolean, setTab: boolean, state: AppState): void => {
+
+        // if we're going to be scrolling turn off the auto infinite scroll logic for this render.
+        if (allowScroll) {
+            S.meta64.tempDisableAutoScroll();
+        }
 
         // let childCount = state.node && state.node.children ? state.node.children.length : 0;
         // console.log("refreshTree with ID=" + nodeId + " childrenCount=" + childCount);
@@ -121,7 +127,7 @@ export class View implements ViewIntf {
             singleNode: false
         }, async (res: J.RenderNodeResponse) => {
             // if this is an "infinite scroll" call to load in additional nodes
-            if (growingPage) {
+            if (growingPage && (state.node == null || state.node.children == null || state.node.children.length < C.MAX_DYNAMIC_ROWS)) {
                 if (res.node && state.node && res.node.children && state.node.children) {
 
                     // create a set for duplicate detection
@@ -262,7 +268,7 @@ export class View implements ViewIntf {
                 }
 
                 // #DEBUG-SCROLLING
-                // console.log("scrollIntoView");
+                // console.log("scrollIntoView elm");
                 elm.scrollIntoView(true);
             }
             else {

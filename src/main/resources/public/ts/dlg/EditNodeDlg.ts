@@ -93,6 +93,9 @@ export class EditNodeDlg extends DialogBase {
                  */
             }
             EditNodeDlg.embedInstance = this;
+
+            // whenever we're rendering because an edit we disable any infinite scrolling logic for this render.
+            S.meta64.tempDisableAutoScroll();
         }
         this.mergeState({
             node,
@@ -984,6 +987,8 @@ export class EditNodeDlg extends DialogBase {
             node: state.node
         }, (res) => {
             S.render.fadeInId = state.node.id;
+            S.meta64.tempDisableAutoScroll();
+
             S.edit.saveNodeResponse(state.node, res, true, this.appState);
 
             if (askToSplit) {

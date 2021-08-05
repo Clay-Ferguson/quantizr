@@ -486,8 +486,7 @@ export class Render implements RenderIntf {
                     else {
                         this.allowFadeInId = true;
                     }
-
-                    S.util.delayedFocus(C.TAB_MAIN);
+                    Comp.focusElmId = C.TAB_MAIN;
                 }
                 return s;
             });

@@ -1,4 +1,5 @@
 import { useSelector } from "react-redux";
+import { store } from "../AppRedux";
 import { AppState } from "../AppState";
 import { Constants as C } from "../Constants";
 import * as J from "../JavaIntf";
@@ -84,11 +85,18 @@ export class NodeCompMainList extends Div {
                 // the nextButton scrolls into view, we load in more nodes!
                 nextButton.whenElm((elm: HTMLElement) => {
                     let observer = new IntersectionObserver(entries => {
-                        entries.forEach((entry: any) => {
-                            if (entry.isIntersecting) {
-                                S.view.growPage(state);
-                            }
-                        });
+                        /* We have to STILL check these conditions becasue this observer can be getting called any time
+                         and these conditions will always apply about controll if we want to grow page or not. */
+
+                        let state = store.getState();
+                        if (!state.editNode && S.meta64.allowGrowPage === 0) {
+                            entries.forEach((entry: any) => {
+                                if (entry.isIntersecting) {
+                                    // observer.disconnect();
+                                    S.view.growPage(state);
+                                }
+                            });
+                        }
                     });
                     observer.observe(elm);
                 });

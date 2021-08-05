@@ -15,6 +15,7 @@ import * as J from "./JavaIntf";
 import { PubSub } from "./PubSub";
 import { Singletons } from "./Singletons";
 import { NodeHistoryItem } from "./NodeHistoryItem";
+import { Comp } from "./widget/base/Comp";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (s: Singletons) => {
@@ -670,19 +671,11 @@ export class Util implements UtilIntf {
 
     /* set focus to element by id */
     delayedFocus = (id: string): void => {
-        // Note: we DO need to focus again after the delays
-        // or else we *can* sometimes loose focus, which means things
-        // come to a screetching halt when user is scrolling down until they
-        // CLICK AGAIN on the window. Annoying.
+        Comp.focusElmId = id;
         setTimeout(async () => {
-            // console.log("Focusing Id: " + id);
+            // console.log("delayed Focusing Id: " + id);
             this.focusElmById(id);
         }, 500);
-
-        setTimeout(async () => {
-            // console.log("Focusing Id: " + id);
-            this.focusElmById(id);
-        }, 1000);
     }
 
     /*

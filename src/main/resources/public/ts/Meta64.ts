@@ -27,6 +27,7 @@ import { TrendingView } from "./tabs/TrendingView";
 import { TimelineRSInfo } from "./TimelineRSInfo";
 import { TrendingRSInfo } from "./TrendingRSInfo";
 import { App } from "./widget/App";
+import { Comp } from "./widget/base/Comp";
 import { CompIntf } from "./widget/base/CompIntf";
 import { WelcomePanel } from "./widget/WelcomePanel";
 
@@ -86,10 +87,29 @@ export class Meta64 implements Meta64Intf {
 
     nodeHistory: NodeHistoryItem[] = [];
 
+    // 0 means we allow.
+    allowGrowPage: number = 0;
+
     sendTestEmail = (): void => {
         S.util.ajax<J.SendTestEmailRequest, J.SendTestEmailResponse>("sendTestEmail", {}, function (res: J.SendTestEmailResponse) {
             S.util.showMessage("Send Test Email Initiated.", "Note");
         });
+    }
+
+    /* We call this to temporarily disable the autoscroll in times like when we just edited something and we
+       don't want auto-scrolling interrupting us when we try to forcabily highlight and scroll to the node we just
+       got done editing for example
+       */
+    tempDisableAutoScroll = (): void => {
+        // inc ref counter
+        S.meta64.allowGrowPage++;
+
+        // wait a full 5 seconds before we allow the "more" button to ever
+        // trigger any autoscrolling again.
+        setTimeout(() => {
+            // dec ref counter
+            S.meta64.allowGrowPage--;
+        }, 3000);
     }
 
     showSystemNotification = (title: string, message: string): void => {
@@ -109,6 +129,7 @@ export class Meta64 implements Meta64Intf {
     }
 
     refresh = (state: AppState): void => {
+        // S.view.jumpToId(state.node.id);
         S.view.refreshTree(null, false, true, null, false, true, true, state);
     }
 
@@ -422,15 +443,17 @@ export class Meta64 implements Meta64Intf {
                 }
             };
 
-            // DO NOT DELETE (these come in handy for some kinds of debugging)
-            // document.body.addEventListener("click", function (e: any) {
-            //     e = e || window.event;
-            //     let target: HTMLElement = e.target;
-            //     console.log("document.body.click target.id=" + target.id);
-            // }, false);
-            // document.body.addEventListener("focusin", function (e: any) {
-            //     console.log("document.body.focusin target.id=" + e.target.id);
-            // });
+            document.body.addEventListener("click", function (e: any) {
+                e = e || window.event;
+                let target: HTMLElement = e.target;
+                Comp.focusElmId = null;
+                // console.log("document.body.click target.id=" + target.id);
+            }, false);
+
+            // DO NOT DELETE. Useful for debugging.
+            document.body.addEventListener("focusin", function (e: any) {
+                // console.log("focusin id=" + e.target.id);
+            });
 
             // This is a cool way of letting CTRL+UP, CTRL+DOWN scroll to next node.
             // WARNING: even with tabIndex added none of the other DIVS react renders seem to be able to accept an onKeyDown event.

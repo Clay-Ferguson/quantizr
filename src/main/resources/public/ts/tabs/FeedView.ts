@@ -157,6 +157,7 @@ export class FeedView extends AppTab {
                         let observer = new IntersectionObserver(entries => {
                             entries.forEach((entry: any) => {
                                 if (entry.isIntersecting) {
+                                    // observer.disconnect();
                                     S.srch.feed("~" + J.NodeType.FRIEND_LIST, null, ++FeedView.page, FeedView.searchTextState.getValue(), true, true);
                                 }
                             });

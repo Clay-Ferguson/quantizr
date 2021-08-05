@@ -302,6 +302,7 @@ export abstract class Comp<S extends BaseCompState = any> implements CompIntf {
     }
 
     focus(): void {
+        Comp.focusElmId = this.getId();
         this.whenElm((elm: HTMLElement) => {
             // console.log("elm focus: id=" + this.getId());
             S.util.delayedFocus(this.getId());
@@ -452,17 +453,14 @@ export abstract class Comp<S extends BaseCompState = any> implements CompIntf {
             return;
         }
         else {
-            /* DO NOT DELETE
-            (keep this for a while to be sure we will never need it again)
-
-            In order for a React Render to not loose focus (sometimes) we keep track of the last thing that
-            was clicked, and restore focus back to that whenever components are rendered. Without this code you can't even
-            do a click on a node row, and then start scrolling with keyboard,...it would take TWO clicks to force focus that
-            will allow scrolling using keyboard. */
-            // if (this.attribs.onClick && this.attribs.id === Comp.focusElmId) {
-            //     // console.log("clicked element should have focus");
-            //     elm.focus();
-            // }
+            /* React can loose focus so we manage that state ourselves using Comp.focusElmId */
+            if (Comp.focusElmId && this.attribs.id === Comp.focusElmId) {
+                setTimeout(() => {
+                    if (!Comp.focusElmId) return;
+                    // console.log("Comp Focusing Id: " + Comp.focusElmId);
+                    S.util.focusElmById(Comp.focusElmId);
+                }, 500);
+            }
         }
 
         if (this.domAddFuncs) {

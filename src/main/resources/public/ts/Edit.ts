@@ -87,6 +87,8 @@ export class Edit implements EditIntf {
             do need even when edit mode is technically off */
             const editingAllowed = /* state.userPreferences.editMode && */ this.isEditAllowed(node, state);
             if (editingAllowed) {
+                S.meta64.tempDisableAutoScroll();
+
                 /* Either run the node editor as a popup or embedded, depending on whether we have a fullscreen
                 calendar up and wether we're on the main tab, etc */
                 if (state.mobileMode ||
@@ -120,13 +122,17 @@ export class Edit implements EditIntf {
                 return s;
             });
 
-            S.view.refreshTree(null, false, false, nodeId, false, true, true, state);
+            S.meta64.tempDisableAutoScroll();
+            // S.view.refreshTree(null, false, false, nodeId, false, true, true, state);
+            S.view.jumpToId(nodeId);
         }
     }
 
-    private setNodePositionResponse = (res: J.SetNodePositionResponse, state: AppState): void => {
+    private setNodePositionResponse = (res: J.SetNodePositionResponse, id: string, state: AppState): void => {
         if (S.util.checkSuccess("Change node position", res)) {
-            S.meta64.refresh(state);
+            // todo-0: now that we have infinite scrolling this 'refresh' call might need to always bee jumpToId instead?
+            // S.meta64.refresh(state);
+            S.view.jumpToId(id);
         }
     }
 
@@ -207,7 +213,10 @@ export class Edit implements EditIntf {
                             newNodeName: "",
                             typeName: typeName || "u",
                             initialValue: clipboardText
-                        }, (res) => { S.meta64.refresh(state); });
+                        }, (res) => {
+                            S.meta64.tempDisableAutoScroll();
+                            S.meta64.refresh(state);
+                        });
                     } else {
                         S.util.ajax<J.CreateSubNodeRequest, J.CreateSubNodeResponse>("createSubNode", {
                             pendingEdit: false,
@@ -218,7 +227,10 @@ export class Edit implements EditIntf {
                             content: clipboardText,
                             typeLock: false,
                             properties: null
-                        }, (res) => { S.meta64.refresh(state); });
+                        }, (res) => {
+                            S.meta64.tempDisableAutoScroll();
+                            S.meta64.refresh(state);
+                        });
                     }
                 }, null, null, null, state
             ).open();
@@ -252,6 +264,7 @@ export class Edit implements EditIntf {
 
     insertNodeResponse = (res: J.InsertNodeResponse, state: AppState): void => {
         if (S.util.checkSuccess("Insert node", res)) {
+            S.meta64.tempDisableAutoScroll();
             S.meta64.updateNodeMap(res.newNode, state);
             S.meta64.highlightNode(res.newNode, false, state);
             this.runEditNode(null, res.newNode.id, false, false, state);
@@ -260,6 +273,7 @@ export class Edit implements EditIntf {
 
     createSubNodeResponse = (res: J.CreateSubNodeResponse, state: AppState): void => {
         if (S.util.checkSuccess("Create subnode", res)) {
+            S.meta64.tempDisableAutoScroll();
             if (!res.newNode) {
                 S.meta64.refresh(state);
             }
@@ -358,7 +372,7 @@ export class Edit implements EditIntf {
             S.util.ajax<J.SetNodePositionRequest, J.SetNodePositionResponse>("setNodePosition", {
                 nodeId: node.id,
                 targetName: "up"
-            }, (res) => { this.setNodePositionResponse(res, state); });
+            }, (res) => { this.setNodePositionResponse(res, id, state); });
         }
     }
 
@@ -375,7 +389,7 @@ export class Edit implements EditIntf {
             S.util.ajax<J.SetNodePositionRequest, J.SetNodePositionResponse>("setNodePosition", {
                 nodeId: node.id,
                 targetName: "down"
-            }, (res) => { this.setNodePositionResponse(res, state); });
+            }, (res) => { this.setNodePositionResponse(res, id, state); });
         }
     }
 
@@ -390,7 +404,7 @@ export class Edit implements EditIntf {
             S.util.ajax<J.SetNodePositionRequest, J.SetNodePositionResponse>("setNodePosition", {
                 nodeId: node.id,
                 targetName: "top"
-            }, (res) => { this.setNodePositionResponse(res, state); });
+            }, (res) => { this.setNodePositionResponse(res, id, state); });
         }
     }
 
@@ -406,7 +420,7 @@ export class Edit implements EditIntf {
                 nodeId: node.id,
                 targetName: "bottom"
             }, (res) => {
-                this.setNodePositionResponse(res, state);
+                this.setNodePositionResponse(res, id, state);
             });
         }
     }
@@ -616,6 +630,7 @@ export class Edit implements EditIntf {
                     nodeIds: selNodesArray,
                     childrenOnly: false
                 }, (res: J.DeleteNodesResponse) => {
+                    S.meta64.tempDisableAutoScroll();
                     this.removeNodesFromHistory(selNodesArray, state);
                     this.removeNodesFromCalendarData(selNodesArray, state);
 
@@ -743,7 +758,7 @@ export class Edit implements EditIntf {
             nodeIds: state.nodesToMove,
             location
         }, (res) => {
-            this.moveNodesResponse(res, null, state);
+            this.moveNodesResponse(res, nodeId, state);
         });
     }
 

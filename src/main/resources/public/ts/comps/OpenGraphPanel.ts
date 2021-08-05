@@ -56,6 +56,7 @@ export class OpenGraphPanel extends Div {
                                             url: null
                                         };
                                     }
+                                    // observer.disconnect();
                                     S.meta64.openGraphData.set(this.url, og);
                                     if (!elm.isConnected) return;
                                     this.mergeState({ og });

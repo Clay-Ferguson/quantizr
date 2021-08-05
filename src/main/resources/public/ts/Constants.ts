@@ -1,5 +1,8 @@
 export class Constants {
 
+    // max rows to allow to scroll in via infinite scroll capability before we reset back to 25 rows.
+    static MAX_DYNAMIC_ROWS = 200;
+
     static TREE_INFINITE_SCROLL = true;
     static FEED_INFINITE_SCROLL = true;
 
