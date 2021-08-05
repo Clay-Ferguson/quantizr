@@ -507,9 +507,12 @@ export class Render implements RenderIntf {
         if (node.children) {
             let ids: string[] = [];
             for (let child of node.children) {
-                ids.push(child.id);
+                if (!(child as any).metaInfDone) {
+                    ids.push(child.id);
+                }
             }
 
+            // console.log("MetaQuery idCount=" + ids.length);
             S.util.ajax<J.GetNodeMetaInfoRequest, J.GetNodeMetaInfoResponse>("getNodeMetaInfo", {
                 ids
             }, (res: J.GetNodeMetaInfoResponse) => {
@@ -517,9 +520,12 @@ export class Render implements RenderIntf {
                     if (s.node && s.node.children) {
                         s.node.hasChildren = true;
                         for (let child of s.node.children) {
-                            let inf: J.NodeMetaIntf = res.nodeIntf.find(v => v.id === child.id);
-                            if (inf) {
-                                child.hasChildren = inf.hasChildren;
+                            if (!(child as any).metaInfDone) {
+                                let inf: J.NodeMetaIntf = res.nodeIntf.find(v => v.id === child.id);
+                                if (inf) {
+                                    child.hasChildren = inf.hasChildren;
+                                }
+                                (child as any).metaInfDone = true;
                             }
                         }
                     }
