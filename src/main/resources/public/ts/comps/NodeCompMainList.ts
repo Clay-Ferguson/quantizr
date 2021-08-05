@@ -77,6 +77,22 @@ export class NodeCompMainList extends Div {
                 },
                 title: "Next Page"
             });
+
+            if (C.TREE_INFINITE_SCROLL && !pageTop) {
+                // If nextButton is the one at the bottom of the page we watch it so we can dynamically load in
+                // new content when it scrolls info view. What's happening here is that once
+                // the nextButton scrolls into view, we load in more nodes!
+                nextButton.whenElm((elm: HTMLElement) => {
+                    let observer = new IntersectionObserver(entries => {
+                        entries.forEach((entry: any) => {
+                            if (entry.isIntersecting) {
+                                S.view.growPage(state);
+                            }
+                        });
+                    });
+                    observer.observe(elm);
+                });
+            }
         }
         else {
             if (!pageTop && !S.nav.displayingRepositoryRoot(state)) {

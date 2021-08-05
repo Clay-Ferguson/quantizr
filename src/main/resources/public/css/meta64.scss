@@ -41,6 +41,10 @@ $fontFamily: 'QuantaCustomFont', 'Roboto','Verdana','Helvetica','Arial','sans-se
 
 @import "click-effect.scss";
 
+* {
+    outline: none;
+}
+
 $menuItemHoverBackgroundColor: $primary;
 $nodeBorderBottomColor: $gray-700;
 
@@ -1298,8 +1302,6 @@ input[type="radio"] {
 }
 
 .mainNodeContentStyle {
-    outline: none;
-
     @if $rootNodeBorder {
         border-bottom: $highlightBorderSize solid $nodeBorderBottomColor; 
         border-left: $highlightBorderSize solid $nodeBorderBottomColor; 
@@ -1495,20 +1497,17 @@ input[type="radio"] {
 .node-table-row {
     position: relative;
     padding-right: 10px;
-    outline: none;
     padding-top: 10px;
     padding-bottom: 8px;
 }
 
 .results-node-table-row {
     position: relative;
-    outline: none;
 }
 
 .feed-node-table-row {
     position: relative;
     padding-right: 10px;
-    outline: none;
     padding-top: 10px;
     padding-bottom: 8px;
     // no padding on bottom because reply button bar has enough space
@@ -1541,7 +1540,6 @@ i'm backing out for now
 }
 
 .node-grid-item {
-    outline: none;
     height: 100%;
     width: 100%;
     padding-right: 12px;

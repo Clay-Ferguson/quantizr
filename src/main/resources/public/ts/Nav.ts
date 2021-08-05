@@ -211,6 +211,7 @@ export class Nav implements NavIntf {
                 dispatch("Action_FastRefresh", (s: AppState): AppState => {
                     return s;
                 });
+                S.util.delayedFocus(C.TAB_MAIN);
                 resolve();
             }, 100);
         });

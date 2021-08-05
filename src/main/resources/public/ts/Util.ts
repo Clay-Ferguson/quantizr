@@ -652,7 +652,7 @@ export class Util implements UtilIntf {
         return this._ajaxCounter > 0;
     }
 
-    focusElmById = async (id: string) => {
+    focusElmById = (id: string) => {
         const elm: HTMLElement = this.domElm(id);
 
         // I got a little hasty and checked this in without testing. this does throw some errors.
@@ -670,9 +670,19 @@ export class Util implements UtilIntf {
 
     /* set focus to element by id */
     delayedFocus = (id: string): void => {
+        // Note: we DO need to focus again after the delays
+        // or else we *can* sometimes loose focus, which means things
+        // come to a screetching halt when user is scrolling down until they
+        // CLICK AGAIN on the window. Annoying.
         setTimeout(async () => {
+            // console.log("Focusing Id: " + id);
             this.focusElmById(id);
-        }, 250);
+        }, 500);
+
+        setTimeout(async () => {
+            // console.log("Focusing Id: " + id);
+            this.focusElmById(id);
+        }, 1000);
     }
 
     /*

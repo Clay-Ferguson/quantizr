@@ -295,7 +295,16 @@ export class Edit implements EditIntf {
                 parentPath = S.util.replaceAll(parentPath, "/r/p", "/r");
             }
 
-            S.view.refreshTree(null, false, false, node.id, false, allowScroll, false, state);
+            // todo-1: is jumpToNode(id) always better regardless of infinite scroll mode? Before I imlemented the
+            // infinite scroll this was doing the refreshTree, but I think refreshTree may actually be suboptimal.
+            // todo-0: need to search for all 'refreshTree' calls and make sure they're all going to work
+            // or identify others that would be better done by 'jumpToId' instead.
+            if (C.TREE_INFINITE_SCROLL) {
+                S.view.jumpToId(node.id);
+            }
+            else {
+                S.view.refreshTree(null, false, false, node.id, false, allowScroll, false, state);
+            }
 
             if (state.fullScreenCalendarId) {
                 S.render.showCalendar(state.fullScreenCalendarId, state);

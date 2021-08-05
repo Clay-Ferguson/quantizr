@@ -7,6 +7,7 @@ export interface ViewIntf {
     firstPage(state: AppState): void;
     prevPage(state: AppState): void;
     nextPage(state: AppState): void;
+    growPage(state: AppState): void;
     lastPage(state: AppState): void;
     scrollRelativeToNode(dir: string, state: AppState): void;
     scrollToSelectedNode(state: AppState): void;

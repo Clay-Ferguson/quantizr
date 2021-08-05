@@ -422,25 +422,14 @@ export class Meta64 implements Meta64Intf {
                 }
             };
 
-            // DO NOT DELETE: These click event listeners never worked to do what I needed, but the
-            // reason added was related to focus, so you can look at "Comp.focusElmId" to see that logic
-            // which accomplishes the objective, but not quite as perfectly as I'd like.
-            // DO NOT DELETE
-            // // document.body.addEventListener("click", function (e: any) {
-            // //     e = e || window.event;
-            // //     let target: HTMLElement = e.target;
-            // //     console.log("document.body.click target.id=" + target.id);
-            // //     if (target.getAttribute("tabIndex") !== undefined) {
-            // //         console.log("Has tab index.");
-            // //         Comp.focusElmId = target.id;
-            // //     }
-            // // }, false);
-            // DO NOT DELETE
+            // DO NOT DELETE (these come in handy for some kinds of debugging)
+            // document.body.addEventListener("click", function (e: any) {
+            //     e = e || window.event;
+            //     let target: HTMLElement = e.target;
+            //     console.log("document.body.click target.id=" + target.id);
+            // }, false);
             // document.body.addEventListener("focusin", function (e: any) {
-            //     console.log("document.body.click target.id=" + e.target.id);
-            //     // if (e.target.getAttribute("tabIndex") !== undefined) {;
-            //     //    Comp.focusElmId = e.target.id;
-            //     // }
+            //     console.log("document.body.focusin target.id=" + e.target.id);
             // });
 
             // This is a cool way of letting CTRL+UP, CTRL+DOWN scroll to next node.

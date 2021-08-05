@@ -24,7 +24,7 @@ export class LeftNavPanel extends Div {
         super(null, {
             id: C.ID_LHS,
             // tabIndex is required or else scrolling by arrow keys breaks.
-            tabIndex: "-1"
+            tabIndex: "1"
         });
         this.domAddEvent = this.domAddEvent.bind(this);
         this.domPreUpdateEvent = this.domPreUpdateEvent.bind(this);

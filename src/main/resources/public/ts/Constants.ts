@@ -1,5 +1,8 @@
 export class Constants {
 
+    static TREE_INFINITE_SCROLL = true;
+    static FEED_INFINITE_SCROLL = true;
+
     static ID_LHS = "leftNavPanelId";
     static ID_TAB = "tabPanelId";
     static ID_RHS = "rightNavPanelId";

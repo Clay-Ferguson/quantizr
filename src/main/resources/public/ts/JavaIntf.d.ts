@@ -799,7 +799,7 @@ export const enum Constant {
 }
 
 export const enum ConstantInt {
-    ROWS_PER_PAGE = 25,
+    ROWS_PER_PAGE = 10,
 }
 
 export const enum ErrorType {

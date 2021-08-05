@@ -17,7 +17,7 @@ export class AppTab extends Div {
         super(null, {
             id: data.id,
             // tabIndex is required or else scrolling by arrow keys breaks.
-            tabIndex: "-1"
+            tabIndex: "2"
         });
         this.data = data;
         this.domAddEvent = this.domAddEvent.bind(this);

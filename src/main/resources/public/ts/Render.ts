@@ -486,6 +486,8 @@ export class Render implements RenderIntf {
                     else {
                         this.allowFadeInId = true;
                     }
+
+                    S.util.delayedFocus(C.TAB_MAIN);
                 }
                 return s;
             });
@@ -530,7 +532,6 @@ export class Render implements RenderIntf {
 
     renderChildren = (node: J.NodeInfo, level: number, allowNodeMove: boolean, state: AppState): Comp => {
         if (!node || !node.children) return null;
-
         let allowAvatars = true;
 
         /*

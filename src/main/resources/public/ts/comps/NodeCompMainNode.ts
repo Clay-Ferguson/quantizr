@@ -25,9 +25,9 @@ export class NodeCompMainNode extends Div {
 
     constructor(state: AppState, public imgSizeOverride: string) {
         super(null, {
-            id: S.nav._UID_ROWID_PREFIX + state.node.id,
+            id: S.nav._UID_ROWID_PREFIX + state.node.id
             // WARNING: Leave this tabIndex here. it's required for focsing/scrolling
-            tabIndex: "-1"
+            // tabIndex: "-1"
         });
     }
 

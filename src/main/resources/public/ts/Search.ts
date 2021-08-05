@@ -9,7 +9,6 @@ import { FollowersRSInfo } from "./FollowersRSInfo";
 import { FollowingRSInfo } from "./FollowingRSInfo";
 import { SearchIntf } from "./intf/SearchIntf";
 import * as J from "./JavaIntf";
-import { Log } from "./Log";
 import { PubSub } from "./PubSub";
 import { SharesRSInfo } from "./SharesRSInfo";
 import { Singletons } from "./Singletons";
@@ -40,6 +39,7 @@ export class Search implements SearchIntf {
         }, (res) => {
             if (res.searchResults && res.searchResults.length > 0) {
                 dispatch("Action_RenderSearchResults", (s: AppState): AppState => {
+                    S.util.delayedFocus(C.TAB_SHARES);
                     S.meta64.tabScrollTop(s, C.TAB_SHARES);
                     let data = s.tabData.find(d => d.id === C.TAB_SHARES);
                     if (!data) return;
@@ -91,6 +91,7 @@ export class Search implements SearchIntf {
                 }
 
                 dispatch("Action_RenderSearchResults", (s: AppState): AppState => {
+                    S.util.delayedFocus(C.TAB_SEARCH);
                     S.meta64.tabScrollTop(s, C.TAB_SEARCH);
                     let data = s.tabData.find(d => d.id === C.TAB_SEARCH);
                     if (!data) return;
@@ -127,10 +128,10 @@ export class Search implements SearchIntf {
             forceIPFSRefresh: false,
             singleNode: false
         }, (res) => S.nav.navPageNodeResponse(res, state), // fail callback
-        (res: string) => {
-            S.meta64.clearLastNodeIds();
-            S.nav.navHome(state);
-        });
+            (res: string) => {
+                S.meta64.clearLastNodeIds();
+                S.nav.navHome(state);
+            });
     }
 
     /* prop = mtm (modification time) | ctm (create time) */
@@ -162,6 +163,7 @@ export class Search implements SearchIntf {
             timeRangeType
         }, (res) => {
             dispatch("Action_RenderTimelineResults", (s: AppState): AppState => {
+                S.util.delayedFocus(C.TAB_TIMELINE);
                 S.meta64.tabScrollTop(s, C.TAB_TIMELINE);
                 let data = s.tabData.find(d => d.id === C.TAB_TIMELINE);
                 if (!data) return;
@@ -181,7 +183,8 @@ export class Search implements SearchIntf {
         });
     }
 
-    feed = (nodeId: string, feedUserName: string, page: number, searchText: string, forceMetadataOn: boolean) => {
+    /* growResults==true is the "infinite scrolling" support */
+    feed = (nodeId: string, feedUserName: string, page: number, searchText: string, forceMetadataOn: boolean, growResults: boolean) => {
         let appState = store.getState();
         S.util.ajax<J.NodeFeedRequest, J.NodeFeedResponse>("nodeFeed", {
             page,
@@ -197,7 +200,6 @@ export class Search implements SearchIntf {
         }, (res: J.NodeFeedResponse) => {
             dispatch("Action_RenderFeedResults", (s: AppState): AppState => {
                 S.meta64.openGraphComps = [];
-                S.meta64.tabScrollTop(s, C.TAB_FEED);
                 // s.feedResults = S.meta64.removeRedundantFeedItems(res.searchResults || []);
 
                 // once user requests their stuff, turn off the new messages count indicator.
@@ -210,18 +212,38 @@ export class Search implements SearchIntf {
                 if (forceMetadataOn) {
                     s.userPreferences.showMetaData = true;
                 }
-                s.feedResults = res.searchResults;
+
+                // if scrolling in new results grow the existing array
+                if (growResults) {
+                    // create a set for duplicate detection
+                    let idSet: Set<string> = new Set<string>();
+
+                    // load set for known children.
+                    s.feedResults.forEach(child => {
+                        idSet.add(child.id);
+                    });
+
+                    s.feedResults = s.feedResults.concat(res.searchResults.filter(child => !idSet.has(child.id)));
+                }
+                // else we have a fresh array (reset the array)
+                else {
+                    s.feedResults = res.searchResults;
+                }
+
                 s.feedEndReached = res.endReached;
                 s.feedDirty = false;
                 s.feedLoading = false;
                 s.feedWaitingForUserRefresh = false;
-                S.meta64.selectTabStateOnly(C.TAB_FEED, s);
 
-                S.view.scrollAllTop(s);
-                // setTimeout(() => {
-                //     S.view.scrollAllTop(s);
-                // }, 1000);
+                if (!growResults) {
+                    S.meta64.selectTabStateOnly(C.TAB_FEED, s);
+                    S.view.scrollAllTop(s);
+                    // setTimeout(() => {
+                    //     S.view.scrollAllTop(s);
+                    // }, 1000);
+                }
 
+                S.util.delayedFocus(C.TAB_FEED);
                 return s;
             });
         });
@@ -251,6 +273,7 @@ export class Search implements SearchIntf {
         }, (res) => {
             if (res.searchResults && res.searchResults.length > 0) {
                 dispatch("Action_RenderSearchResults", (s: AppState): AppState => {
+                    S.util.delayedFocus(C.TAB_FOLLOWERS);
                     S.meta64.tabScrollTop(s, C.TAB_FOLLOWERS);
                     let data = s.tabData.find(d => d.id === C.TAB_FOLLOWERS);
                     if (!data) return;
@@ -292,6 +315,7 @@ export class Search implements SearchIntf {
         }, (res) => {
             if (res.searchResults && res.searchResults.length > 0) {
                 dispatch("Action_RenderSearchResults", (s: AppState): AppState => {
+                    S.util.delayedFocus(C.TAB_FOLLOWING);
                     S.meta64.tabScrollTop(s, C.TAB_FOLLOWING);
                     let data = s.tabData.find(d => d.id === C.TAB_FOLLOWING);
                     if (!data) return;
@@ -357,6 +381,7 @@ export class Search implements SearchIntf {
             className: clazz,
             id: cssId,
             nid: node.id
+            // tabIndex: "-1"
         }, [
             allowHeader ? new NodeCompRowHeader(node, true, false, isFeed, jumpButton) : null,
             content,

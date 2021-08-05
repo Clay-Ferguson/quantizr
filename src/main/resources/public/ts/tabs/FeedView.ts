@@ -52,6 +52,7 @@ export class FeedView extends AppTab {
     }
 
     preRender(): void {
+        // console.log("preRender: FeedView");
         let state: AppState = useSelector((state: AppState) => state);
 
         if (!FeedView.enabled && !state.isAdminUser) {
@@ -141,19 +142,35 @@ export class FeedView extends AppTab {
             });
 
             if (rowCount > 0 && !state.feedEndReached) {
-                children.push(new ButtonBar([
-                    new IconButton("fa-angle-right", "More", {
-                        onClick: (event) => {
-                            event.stopPropagation();
-                            event.preventDefault();
-                            S.srch.feed("~" + J.NodeType.FRIEND_LIST, null, ++FeedView.page, FeedView.searchTextState.getValue(), true);
-                        },
-                        title: "Next Page"
-                    })], "text-center marginTop marginBottom"));
+                let moreButton = new IconButton("fa-angle-right", "More", {
+                    onClick: (event) => {
+                        event.stopPropagation();
+                        event.preventDefault();
+                        S.srch.feed("~" + J.NodeType.FRIEND_LIST, null, ++FeedView.page, FeedView.searchTextState.getValue(), true, false);
+                    },
+                    title: "Next Page"
+                });
+
+                if (C.FEED_INFINITE_SCROLL) {
+                    // When the 'more' button scrolls into view go ahead and load more records.
+                    moreButton.whenElm((elm: HTMLElement) => {
+                        let observer = new IntersectionObserver(entries => {
+                            entries.forEach((entry: any) => {
+                                if (entry.isIntersecting) {
+                                    S.srch.feed("~" + J.NodeType.FRIEND_LIST, null, ++FeedView.page, FeedView.searchTextState.getValue(), true, true);
+                                }
+                            });
+                        });
+                        observer.observe(elm);
+                    });
+                }
+
+                children.push(new ButtonBar([moreButton], "text-center marginTop marginBottom"));
             }
         }
 
-        children.push(helpPanel);
+        // todo-0: now that we have 'infinite scrolling' this help button will have to go at the top of the page, not bottom
+        // children.push(helpPanel);
         this.setChildren([new Div(null, { className: "feedView" }, children)]);
     }
 
@@ -172,7 +189,7 @@ export class FeedView extends AppTab {
             return s;
         });
 
-        S.srch.feed("~" + J.NodeType.FRIEND_LIST, null, FeedView.page, FeedView.searchTextState.getValue(), false);
+        S.srch.feed("~" + J.NodeType.FRIEND_LIST, null, FeedView.page, FeedView.searchTextState.getValue(), false, false);
     }
 
     makeFilterButtonsBar = (state: AppState): Div => {

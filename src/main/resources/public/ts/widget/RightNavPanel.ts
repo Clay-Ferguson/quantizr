@@ -25,7 +25,7 @@ export class RightNavPanel extends Div {
         super(null, {
             id: C.ID_RHS,
             // tabIndex is required or else scrolling by arrow keys breaks.
-            tabIndex: "-1"
+            tabIndex: "3"
         });
         let state: AppState = store.getState();
         let delta = state.mainPanelCols === 4 ? -1 : 0;

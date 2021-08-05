@@ -30,7 +30,9 @@ export class View implements ViewIntf {
      */
     refreshTree = (nodeId: string, zeroOffset: boolean, renderParentIfLeaf: boolean, highlightId: string, forceIPFSRefresh: boolean,
         allowScroll: boolean, setTab: boolean, state: AppState): void => {
-        // console.log("refreshTree with ID=" + nodeId);
+
+        // let childCount = state.node && state.node.children ? state.node.children.length : 0;
+        // console.log("refreshTree with ID=" + nodeId + " childrenCount=" + childCount);
         if (!nodeId && state.node) {
             nodeId = state.node.id;
         }
@@ -66,7 +68,7 @@ export class View implements ViewIntf {
     }
 
     firstPage = (state: AppState): void => {
-        this.loadPage(false, 0, state);
+        this.loadPage(false, 0, false, state);
     }
 
     prevPage = (state: AppState): void => {
@@ -77,7 +79,7 @@ export class View implements ViewIntf {
                 targetOffset = 0;
             }
 
-            this.loadPage(false, targetOffset, state);
+            this.loadPage(false, targetOffset, false, state);
         }
     }
 
@@ -85,7 +87,7 @@ export class View implements ViewIntf {
         let lastChildNode: J.NodeInfo = S.edit.getLastChildNode(state);
         if (lastChildNode) {
             let targetOffset = lastChildNode.logicalOrdinal + 1;
-            this.loadPage(false, targetOffset, state);
+            this.loadPage(false, targetOffset, false, state);
         }
     }
 
@@ -95,7 +97,18 @@ export class View implements ViewIntf {
         // this.loadPage(true, targetOffset, state);
     }
 
-    private loadPage = (goToLastPage: boolean, offset: number, state: AppState): void => {
+    /* Part of 'infinite scrolling' this gets called when the user scrolls to the end of a page and we
+    need to load more records automatically, and add to existing page records */
+    growPage = (state: AppState): void => {
+        let lastChildNode: J.NodeInfo = S.edit.getLastChildNode(state);
+        if (lastChildNode) {
+            let targetOffset = lastChildNode.logicalOrdinal + 1;
+            this.loadPage(false, targetOffset, true, state);
+        }
+    }
+
+    /* Note: if growingPage==true we preserve the existing row data, and append more rows onto the current view */
+    private loadPage = (goToLastPage: boolean, offset: number, growingPage: boolean, state: AppState): void => {
         // console.log("loadPage nodeId=" + state.node.id);
         S.util.ajax<J.RenderNodeRequest, J.RenderNodeResponse>("renderNode", {
             nodeId: state.node.id,
@@ -103,11 +116,32 @@ export class View implements ViewIntf {
             siblingOffset: 0,
             renderParentIfLeaf: true,
             offset,
-            goToLastPage: goToLastPage,
+            goToLastPage,
             forceIPFSRefresh: false,
             singleNode: false
         }, async (res: J.RenderNodeResponse) => {
-            S.render.renderPageFromData(res, true, null, true, true);
+            // if this is an "infinite scroll" call to load in additional nodes
+            if (growingPage) {
+                if (res.node && state.node && res.node.children && state.node.children) {
+
+                    // create a set for duplicate detection
+                    let idSet: Set<string> = new Set<string>();
+
+                    // load set for known children.
+                    state.node.children.forEach(child => {
+                        idSet.add(child.id);
+                    });
+
+                    // assign 'res.node.chidren' as the new list appending in the new ones with dupliates removed.
+                    res.node.children = state.node.children.concat(res.node.children.filter(child => !idSet.has(child.id)));
+                }
+                S.render.renderPageFromData(res, false, null, false, false);
+                S.render.getNodeMetaInfo(res.node);
+            }
+            // else, loading in a page which overrides and discards all existing nodes in browser view
+            else {
+                S.render.renderPageFromData(res, true, null, true, true);
+            }
         },
             // fail callback
             (res: string) => {
