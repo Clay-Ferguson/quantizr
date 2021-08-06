@@ -1,8 +1,10 @@
+import { dispatch } from "../AppRedux";
 import { AppState } from "../AppState";
 import { NodeCompBinary } from "../comps/NodeCompBinary";
 import { Constants as C } from "../Constants";
 import { DialogBase } from "../DialogBase";
 import { SplitNodeDlg } from "../dlg/SplitNodeDlg";
+import { DialogMode } from "../enums/DialogMode";
 import { NodeActionType } from "../enums/NodeActionType";
 import * as I from "../Interfaces";
 import { ValueIntf } from "../Interfaces";
@@ -19,7 +21,7 @@ import { CompIntf } from "../widget/base/CompIntf";
 import { Button } from "../widget/Button";
 import { ButtonBar } from "../widget/ButtonBar";
 import { Checkbox } from "../widget/Checkbox";
-import { CollapsibleHelpPanel } from "../widget/CollapsibleHelpPanel";
+import { Clearfix } from "../widget/Clearfix";
 import { CollapsiblePanel } from "../widget/CollapsiblePanel";
 import { DateTimeField } from "../widget/DateTimeField";
 import { Div } from "../widget/Div";
@@ -29,6 +31,7 @@ import { Form } from "../widget/Form";
 import { FormGroup } from "../widget/FormGroup";
 import { FormInline } from "../widget/FormInline";
 import { Header } from "../widget/Header";
+import { HelpButton } from "../widget/HelpButton";
 import { HorizontalLayout } from "../widget/HorizontalLayout";
 import { Icon } from "../widget/Icon";
 import { Label } from "../widget/Label";
@@ -41,13 +44,10 @@ import { TextField } from "../widget/TextField";
 import { ChangeNodeTypeDlg } from "./ChangeNodeTypeDlg";
 import { ConfirmDlg } from "./ConfirmDlg";
 import { EditPropertyDlg } from "./EditPropertyDlg";
+import { EmojiPickerDlg } from "./EmojiPickerDlg";
 import { EncryptionDlg } from "./EncryptionDlg";
 import { FriendsDlg } from "./FriendsDlg";
-import { EmojiPickerDlg } from "./EmojiPickerDlg";
 import { UploadFromFileDropzoneDlg } from "./UploadFromFileDropzoneDlg";
-import { dispatch } from "../AppRedux";
-import { DialogMode } from "../enums/DialogMode";
-import { Clearfix } from "../widget/Clearfix";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
@@ -57,7 +57,6 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
 export class EditNodeDlg extends DialogBase {
 
     static embedInstance: EditNodeDlg;
-    static helpExpanded: boolean = false;
     editorHelp: string = null;
     header: Header;
     propertyEditFieldContainer: Div;
@@ -540,10 +539,7 @@ export class EditNodeDlg extends DialogBase {
             });
         }
 
-        let helpPanel = this.editorHelp ? new CollapsibleHelpPanel("Help", this.editorHelp,
-            (state: boolean) => {
-                EditNodeDlg.helpExpanded = state;
-            }, EditNodeDlg.helpExpanded, "span") : null;
+        let helpPanel = this.editorHelp ? new HelpButton(this.editorHelp) : null;
 
         // if this props table would be empty don't display it (set to null)
         if (propsTable && !propsTable.hasChildren()) {

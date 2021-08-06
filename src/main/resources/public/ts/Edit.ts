@@ -44,7 +44,8 @@ export class Edit implements EditIntf {
         }
 
         const dlg = new UploadFromFileDropzoneDlg(node.id, "", false, null, true, true, state, () => {
-            S.meta64.refresh(state);
+            S.view.jumpToId(node.id);
+            // S.meta64.refresh(state);
         });
         dlg.open();
     }
@@ -130,7 +131,7 @@ export class Edit implements EditIntf {
 
     private setNodePositionResponse = (res: J.SetNodePositionResponse, id: string, state: AppState): void => {
         if (S.util.checkSuccess("Change node position", res)) {
-            // todo-0: now that we have infinite scrolling this 'refresh' call might need to always bee jumpToId instead?
+            // todo-0: now that we have infinite scrolling this 'refresh' call might need to always be jumpToId instead?
             // S.meta64.refresh(state);
             S.view.jumpToId(id);
         }

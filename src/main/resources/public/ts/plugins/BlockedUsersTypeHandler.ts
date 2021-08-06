@@ -7,6 +7,7 @@ import { Singletons } from "../Singletons";
 import { Comp } from "../widget/base/Comp";
 import { Div } from "../widget/Div";
 import { Heading } from "../widget/Heading";
+import { HelpButton } from "../widget/HelpButton";
 import { TypeBase } from "./base/TypeBase";
 
 let S: Singletons;
@@ -29,11 +30,8 @@ export class BlockedUsersTypeHandler extends TypeBase {
         return new Div(null, null, [
             new Heading(4, "Blocked Users", {
                 className: "marginAll"
-            })
-            // new CollapsibleHelpPanel("Help", S.meta64.config.help.type.friendsList.render,
-            //     (state: boolean) => {
-            //         FriendsListTypeHandler.helpExpanded = state;
-            //     }, FriendsListTypeHandler.helpExpanded)
+            }),
+            new HelpButton(S.meta64.config.help.type.friendsList.render)
         ]);
     }
 }

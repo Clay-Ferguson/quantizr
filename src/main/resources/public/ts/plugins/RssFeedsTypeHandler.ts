@@ -10,6 +10,7 @@ import { ButtonBar } from "../widget/ButtonBar";
 import { Clearfix } from "../widget/Clearfix";
 import { Div } from "../widget/Div";
 import { Heading } from "../widget/Heading";
+import { HelpButton } from "../widget/HelpButton";
 import { TypeBase } from "./base/TypeBase";
 
 let S: Singletons;
@@ -38,13 +39,8 @@ export class RssFeedsTypeHandler extends TypeBase {
                     title: "Add a new RSS Feed Subscription"
                 })
             ], null, "float-right marginBottom"),
-            new Clearfix()
-
-            // todo-1: add help for this...
-            // new CollapsibleHelpPanel("Help", S.meta64.config.help.type.friendsList.render,
-            //     (state: boolean) => {
-            //         RssFeedsTypeHandler.helpExpanded = state;
-            //     }, RssFeedsTypeHandler.helpExpanded)
+            new Clearfix(),
+            new HelpButton(S.meta64.config.help.type.friendsList.render)
         ]);
     }
 }

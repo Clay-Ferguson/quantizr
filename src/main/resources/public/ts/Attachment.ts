@@ -27,7 +27,8 @@ export class Attachment implements AttachmentIntf {
         }
 
         const dlg = new UploadFromFileDropzoneDlg(node.id, "", toIpfs, autoAddFile, false, true, state, () => {
-            S.meta64.refresh(state);
+            S.view.jumpToId(node.id);
+            // S.meta64.refresh(state);
         });
         dlg.open();
 

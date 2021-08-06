@@ -8,8 +8,8 @@ import { CompIntf } from "../widget/base/CompIntf";
 import { Button } from "../widget/Button";
 import { ButtonBar } from "../widget/ButtonBar";
 import { Checkbox } from "../widget/Checkbox";
-import { CollapsibleHelpPanel } from "../widget/CollapsibleHelpPanel";
 import { Form } from "../widget/Form";
+import { HelpButton } from "../widget/HelpButton";
 import { HorizontalLayout } from "../widget/HorizontalLayout";
 import { RadioButton } from "../widget/RadioButton";
 import { RadioButtonGroup } from "../widget/RadioButtonGroup";
@@ -104,10 +104,7 @@ export class SearchUsersDlg extends DialogBase {
                     })
                 ], "displayTable marginBottom"),
                 adminOptions,
-                new CollapsibleHelpPanel("Help", S.meta64.config.help.search.dialog,
-                    (state: boolean) => {
-                        SearchUsersDlg.helpExpanded = state;
-                    }, SearchUsersDlg.helpExpanded, "div", "marginBottom"),
+                new HelpButton(S.meta64.config.help.search.dialog),
                 new ButtonBar([
                     new Button("Search", this.search, null, "btn-primary"),
                     // this Graph button will work, but why graph users? ... there are no linkages between them... yet.

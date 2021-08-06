@@ -13,10 +13,10 @@ import { Button } from "../widget/Button";
 import { ButtonBar } from "../widget/ButtonBar";
 import { Checkbox } from "../widget/Checkbox";
 import { Clearfix } from "../widget/Clearfix";
-import { CollapsibleHelpPanel } from "../widget/CollapsibleHelpPanel";
 import { CollapsiblePanel } from "../widget/CollapsiblePanel";
 import { Div } from "../widget/Div";
 import { Heading } from "../widget/Heading";
+import { HelpButton } from "../widget/HelpButton";
 import { IconButton } from "../widget/IconButton";
 import { Span } from "../widget/Span";
 import { Spinner } from "../widget/Spinner";
@@ -44,7 +44,6 @@ export class FeedView extends AppTab {
 
     static page: number = 0;
     static refreshCounter: number = 0;
-    static helpExpanded: boolean = false;
 
     constructor(state: AppState, data: TabDataIntf) {
         super(state, data);
@@ -69,14 +68,13 @@ export class FeedView extends AppTab {
         let rowCount = 0;
         let children: Comp[] = [];
 
-        let refreshFeedButtonBar = new ButtonBar([
+        children.push(new ButtonBar([
             state.isAnonUser ? null : new Button("", () => S.edit.addNode(null, null, state), {
                 className: "fa fa-plus",
                 title: "Post something to the Fediverse!"
             }, "btn-primary")
-        ], null, "float-right");
+        ], null, "float-right"));
 
-        children.push(refreshFeedButtonBar);
         children.push(new CollapsiblePanel("Filter", "Filter", null, [
             this.makeFilterButtonsBar(state)
         ], false,
@@ -84,12 +82,8 @@ export class FeedView extends AppTab {
                 FeedView.filterExpanded = state;
             }, FeedView.filterExpanded, "", "", "span"));
 
+        children.push(new HelpButton(S.meta64.config.help.fediverse.feed));
         children.push(new Clearfix());
-
-        let helpPanel = new CollapsibleHelpPanel("Help", S.meta64.config.help.fediverse.feed,
-            (state: boolean) => {
-                FeedView.helpExpanded = state;
-            }, FeedView.helpExpanded);
 
         // if this is mobile don't even show search field unless it's currently in use (like from a trending click)
         if (!state.mobileMode || FeedView.searchTextState.getValue()) {
@@ -165,13 +159,9 @@ export class FeedView extends AppTab {
                         observer.observe(elm);
                     });
                 }
-
                 children.push(new ButtonBar([moreButton], "text-center marginTop marginBottom"));
             }
         }
-
-        // todo-0: now that we have 'infinite scrolling' this help button will have to go at the top of the page, not bottom
-        // children.push(helpPanel);
         this.setChildren([new Div(null, { className: "feedView" }, children)]);
     }
 

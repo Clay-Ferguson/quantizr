@@ -9,6 +9,7 @@ import { Comp } from "../widget/base/Comp";
 import { ButtonBar } from "../widget/ButtonBar";
 import { Clearfix } from "../widget/Clearfix";
 import { Div } from "../widget/Div";
+import { HelpButton } from "../widget/HelpButton";
 import { IconButton } from "../widget/IconButton";
 
 let S: Singletons;
@@ -18,8 +19,6 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
 
 /* General Widget that doesn't fit any more reusable or specific category other than a plain Div, but inherits capability of Comp class */
 export class NodeCompMainList extends Div {
-    static helpExpanded: boolean = false;
-
     constructor() {
         super(null, { key: "nodeCompMaiList" });
     }
@@ -38,13 +37,7 @@ export class NodeCompMainList extends Div {
             this.addPaginationButtons(children, state.endReached, "marginTop marginBottom", state, false);
         }
 
-        // No longer needed, because we have this on the menu now but check that all the gettingStarted (from yaml) content
-        // is indeed mentioned in the User Guide (todo-1)
-        // children.push(new CollapsibleHelpPanel("Getting Started", S.meta64.config.help.gettingStarted,
-        //     (state: boolean) => {
-        //         NodeCompMainList.helpExpanded = state;
-        //     }, NodeCompMainList.helpExpanded));
-
+        // children.push(new HelpButton(S.meta64.config.help.gettingStarted));
         this.setChildren(children);
     }
 
@@ -111,7 +104,7 @@ export class NodeCompMainList extends Div {
             }
         }
 
-        if (firstButton || prevButton || nextButton) {
+        if (firstButton || prevButton || nextButton || nextNodeButton) {
             children.push(new ButtonBar([firstButton, prevButton, nextButton, nextNodeButton], "text-center " + moreClasses));
             children.push(new Clearfix());
         }

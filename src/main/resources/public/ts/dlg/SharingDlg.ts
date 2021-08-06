@@ -7,9 +7,9 @@ import { Singletons } from "../Singletons";
 import { CompIntf } from "../widget/base/CompIntf";
 import { Button } from "../widget/Button";
 import { ButtonBar } from "../widget/ButtonBar";
-import { CollapsibleHelpPanel } from "../widget/CollapsibleHelpPanel";
 import { EditPrivsTable } from "../widget/EditPrivsTable";
 import { Form } from "../widget/Form";
+import { HelpButton } from "../widget/HelpButton";
 import { FriendsDlg } from "./FriendsDlg";
 import { ShareToPersonDlg } from "./ShareToPersonDlg";
 
@@ -19,7 +19,6 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
 });
 
 export class SharingDlg extends DialogBase {
-    static helpExpanded: boolean = false;
     dirty: boolean = false;
 
     constructor(private node: J.NodeInfo, state: AppState) {
@@ -30,10 +29,7 @@ export class SharingDlg extends DialogBase {
     renderDlg(): CompIntf[] {
         return [
             new Form(null, [
-                new CollapsibleHelpPanel("Help", S.meta64.config.help.sharing.dialog,
-                    (state: boolean) => {
-                        SharingDlg.helpExpanded = state;
-                    }, SharingDlg.helpExpanded, "div", "marginBottom"),
+                new HelpButton(S.meta64.config.help.sharing.dialog),
                 new EditPrivsTable(this.getState().nodePrivsInfo, this.removePrivilege),
                 new ButtonBar([
                     new Button("Add User", this.shareToPersonDlg, null, "btn-primary"),
