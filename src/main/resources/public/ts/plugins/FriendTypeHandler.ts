@@ -21,7 +21,7 @@ export class FriendTypeHandler extends TypeBase {
     }
 
     getEditorHelp(): string {
-        return S.meta64.config.help.type.friend.editor;
+        return S.meta64?.config?.help?.type?.friend?.editor;
     }
 
     allowAction(action: NodeActionType, node: J.NodeInfo, appState: AppState): boolean {

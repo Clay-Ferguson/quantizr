@@ -72,7 +72,7 @@ export class SearchContentDlg extends DialogBase {
                         }
                     })
                 ], "displayTable marginBottom"),
-                new HelpButton(S.meta64.config.help.search.dialog),
+                new HelpButton(() => S.meta64?.config?.help?.search?.dialog),
                 new ButtonBar([
                     new Button("Search", this.search, null, "btn-primary"),
                     new Button("Graph", this.graph, null, "btn-primary"),

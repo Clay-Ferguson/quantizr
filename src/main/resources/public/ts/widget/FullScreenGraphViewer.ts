@@ -303,7 +303,9 @@ export class FullScreenGraphViewer extends Main {
     domUpdateEvent(): void {
         // #DEBUG-SCROLLING
         // console.log("scrollTop=0");
-        S.view.docElm.scrollTop = 0;
+        if (S.view.docElm) {
+            S.view.docElm.scrollTop = 0;
+        }
         super.domUpdateEvent();
     }
 

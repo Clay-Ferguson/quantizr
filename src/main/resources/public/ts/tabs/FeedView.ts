@@ -82,7 +82,7 @@ export class FeedView extends AppTab {
                 FeedView.filterExpanded = state;
             }, FeedView.filterExpanded, "", "", "span"));
 
-        children.push(new HelpButton(S.meta64.config.help.fediverse.feed));
+        children.push(new HelpButton(() => S.meta64?.config?.help?.fediverse?.feed));
         children.push(new Clearfix());
 
         // if this is mobile don't even show search field unless it's currently in use (like from a trending click)

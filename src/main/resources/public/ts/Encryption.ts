@@ -330,7 +330,7 @@ export class Encryption implements EncryptionIntf {
 
                     const pubKeyDat = await crypto.subtle.exportKey(Encryption.FORMAT_JWK, keyPair.publicKey);
                     pubKeyStr = JSON.stringify(pubKeyDat);
-                    console.log("Exporting key string: " + pubKeyStr);
+                    // console.log("Exporting key string: " + pubKeyStr);
                     republish = true;
                 }
 

@@ -36,6 +36,7 @@ export class AppTab extends Div {
     }
 
     reScroll = (elm: HTMLElement): void => {
+        if (!elm) return;
         // console.log("reScroll: " + elm.scrollTop);
         elm.scrollTop = this.data.scrollPos;
     }
@@ -43,20 +44,24 @@ export class AppTab extends Div {
     domAddEvent(): void {
         // console.log("domAddEvent: " + this.data.name);
         let elm = this.getRef();
-        this.reScroll(elm);
+        if (elm) {
+            this.reScroll(elm);
 
-        // need to remove this listener in some other react state callback.
-        elm.addEventListener("scroll", () => {
-            // console.log("Scroll: " + elm.scrollTop);
-            this.data.scrollPos = elm.scrollTop;
-        }, { passive: true });
+            // need to remove this listener in some other react state callback.
+            elm.addEventListener("scroll", () => {
+                // console.log("Scroll: " + elm.scrollTop);
+                this.data.scrollPos = elm.scrollTop;
+            }, { passive: true });
+        }
 
         super.domAddEvent();
     }
 
     domPreUpdateEvent(): void {
         let elm = this.getRef();
-        this.reScroll(elm);
+        if (elm) {
+            this.reScroll(elm);
+        }
         super.domPreUpdateEvent();
     }
 }

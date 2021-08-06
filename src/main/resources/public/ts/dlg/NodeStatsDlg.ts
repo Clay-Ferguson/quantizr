@@ -68,12 +68,11 @@ export class NodeStatsDlg extends DialogBase {
             mentionPanel && mentionPanel.hasChildren() ? mentionPanel : null,
             wordPanel.hasChildren() ? wordPanel : null,
 
-            new HelpButton(S.meta64.config.help.nodeStats.dialog),
-
             new ButtonBar([
                 new Button("Ok", () => {
                     this.close();
-                }, null, "btn-primary")
+                }, null, "btn-primary"),
+                new HelpButton(() => S.meta64?.config?.help?.nodeStats?.dialog)
             ])
         ];
     }

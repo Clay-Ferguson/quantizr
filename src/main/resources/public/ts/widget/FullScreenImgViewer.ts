@@ -42,7 +42,9 @@ export class FullScreenImgViewer extends Main {
     domUpdateEvent(): void {
         // #DEBUG-SCROLLING
         // console.log("domUpdateEvent scroll top");
-        S.view.docElm.scrollTop = 0;
+        if (S.view.docElm) {
+            S.view.docElm.scrollTop = 0;
+        }
         super.domUpdateEvent();
     }
 }

@@ -142,7 +142,7 @@ export class OpenGraphPanel extends Div {
             }
         }) : null;
 
-        if (state.og.description?.length > 804) {
+        if (state.og?.description?.length > 804) {
             state.og.description = state.og.description.substring(0, 800) + "...";
         }
 

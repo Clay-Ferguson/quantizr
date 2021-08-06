@@ -31,7 +31,7 @@ export class BlockedUsersTypeHandler extends TypeBase {
             new Heading(4, "Blocked Users", {
                 className: "marginAll"
             }),
-            new HelpButton(S.meta64.config.help.type.friendsList.render)
+            new HelpButton(() => S.meta64?.config?.help?.type?.friendsList?.render)
         ]);
     }
 }

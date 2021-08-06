@@ -21,6 +21,6 @@ export class MarkdownTypeHandler extends TypeBase {
     }
 
     getEditorHelp(): string {
-        return S.meta64.config.help.editor.dialog;
+        return S.meta64?.config?.help?.editor?.dialog;
     }
 }

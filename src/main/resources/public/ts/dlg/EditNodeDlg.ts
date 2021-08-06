@@ -539,7 +539,7 @@ export class EditNodeDlg extends DialogBase {
             });
         }
 
-        let helpPanel = this.editorHelp ? new HelpButton(this.editorHelp) : null;
+        let helpPanel = this.editorHelp ? new HelpButton(() => this.editorHelp) : null;
 
         // if this props table would be empty don't display it (set to null)
         if (propsTable && !propsTable.hasChildren()) {

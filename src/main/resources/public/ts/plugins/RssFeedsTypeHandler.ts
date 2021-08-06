@@ -40,7 +40,7 @@ export class RssFeedsTypeHandler extends TypeBase {
                 })
             ], null, "float-right marginBottom"),
             new Clearfix(),
-            new HelpButton(S.meta64.config.help.type.friendsList.render)
+            new HelpButton(() => S.meta64?.config?.help?.type?.friendsList?.render)
         ]);
     }
 }

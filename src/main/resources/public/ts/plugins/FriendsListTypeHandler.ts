@@ -29,7 +29,7 @@ export class FriendsListTypeHandler extends TypeBase {
             new Heading(4, "Friends List", {
                 className: "marginAll"
             }),
-            new HelpButton(S.meta64.config.help.type.friendsList.render)
+            new HelpButton(() => S.meta64?.config?.help?.type?.friendsList?.render)
         ]);
     }
 }

@@ -104,7 +104,7 @@ export class SearchUsersDlg extends DialogBase {
                     })
                 ], "displayTable marginBottom"),
                 adminOptions,
-                new HelpButton(S.meta64.config.help.search.dialog),
+                new HelpButton(() => S.meta64?.config?.help?.search?.dialog),
                 new ButtonBar([
                     new Button("Search", this.search, null, "btn-primary"),
                     // this Graph button will work, but why graph users? ... there are no linkages between them... yet.
