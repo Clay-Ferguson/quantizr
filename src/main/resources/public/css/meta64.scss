@@ -78,6 +78,11 @@ $smallBorderSize: 3px;
 //     }
 // }
 
+.mobileHeaderBar {
+    margin-top: 10px;
+    margin-left: 10px;
+}
+
 .displayNameTextField {
     max-width: 50%;
 }
@@ -860,6 +865,7 @@ Will come back later and study this more. todo-1 */
     margin-right: 0px !important;
     padding-left: 0px !important;
     padding-right: 20px !important;
+    background: $body-bg;
 }
 
 .tab-content {

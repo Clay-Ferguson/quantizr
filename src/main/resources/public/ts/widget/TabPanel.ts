@@ -7,6 +7,7 @@ import { PubSub } from "../PubSub";
 import { Singletons } from "../Singletons";
 import { CompIntf } from "./base/CompIntf";
 import { Div } from "./Div";
+import { IconButton } from "./IconButton";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (s: Singletons) => {
@@ -37,9 +38,17 @@ export class TabPanel extends Div {
             key: this.attribs.key + "_topdiv"
         }, this.buildTabs(state));
 
+        let scrollUpButton = state.mobileMode ? new IconButton("fa-angle-double-up", null, {
+            onClick: e => {
+                S.view.scrollAllTop(state);
+            },
+            title: "Scroll to Top"
+        }, "btn-primary scrollTopButtonLowerRight", "off") : null;
+
         this.setChildren([
             this.customTopComp,
-            tabContent
+            tabContent,
+            scrollUpButton
         ]);
     }
 

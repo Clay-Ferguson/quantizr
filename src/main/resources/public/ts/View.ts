@@ -217,18 +217,19 @@ export class View implements ViewIntf {
     scrollAllTop = (state: AppState) => {
         // #DEBUG-SCROLLING
         // console.log("scrollAllTop");
-        if (!state.mobileMode) {
-            S.util.getElm(C.ID_LHS, (elm: HTMLElement) => {
-                elm.scrollTop = 0;
-            });
-        }
-
         let activeTabComp = S.meta64.getActiveTabComp(state);
         if (activeTabComp && activeTabComp.getRef()) {
             activeTabComp.getRef().scrollTop = 0;
         }
 
-        if (!state.mobileMode) {
+        if (state.mobileMode) {
+            window.scrollTo(0, 0);
+        }
+        else {
+            S.util.getElm(C.ID_LHS, (elm: HTMLElement) => {
+                elm.scrollTop = 0;
+            });
+
             S.util.getElm(C.ID_RHS, (elm: HTMLElement) => {
                 elm.scrollTop = 0;
             });
