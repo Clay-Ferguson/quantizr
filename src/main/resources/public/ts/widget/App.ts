@@ -136,6 +136,12 @@ export class App extends Main {
                 // title: "Show Main Menu"
             }, "btn-secondary marginRight", "off");
 
+            let fullScreenViewer = S.meta64.fullscreenViewerActive(state);
+            let prefsButton = !fullScreenViewer ? new IconButton("fa-certificate", "Meta", {
+                onClick: e => { S.edit.toggleShowMetaData(state); },
+                title: state.userPreferences.showMetaData ? "Hide Avatars and Metadata" : "Show Avatars and Metadata"
+            }, "btn-secondary", state.userPreferences.showMetaData ? "on" : "off") : null;
+
             let loginButton = state.isAnonUser ? new IconButton("fa-sign-in", "", {
                 onClick: e => { S.nav.login(state); }
             }, "btn-primary marginRight", "off") : null;
@@ -157,7 +163,7 @@ export class App extends Main {
             // });
 
             let title = state.title ? new Button("@" + state.title, e => { S.nav.navHome(state); }, null, "btn-secondary float-right") : null;
-            comp = new Div(null, { className: "mobileHeaderBar" }, [logo, menuButton, loginButton, title]);
+            comp = new Div(null, { className: "mobileHeaderBar" }, [logo, menuButton, prefsButton, loginButton, title]);
         }
         return comp;
     }

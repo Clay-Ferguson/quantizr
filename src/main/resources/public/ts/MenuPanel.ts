@@ -435,7 +435,7 @@ export class MenuPanel extends Div {
             new MenuItemSeparator(), //
 
             new MenuItem("Edit Mode", MenuPanel.toggleEditMode, !state.isAnonUser, () => state.userPreferences.editMode), //
-            new MenuItem("Metadata", MenuPanel.toggleMetaData, !state.isAnonUser, () => state.userPreferences.showMetaData), //
+            new MenuItem("Metadata", MenuPanel.toggleMetaData, true, () => state.userPreferences.showMetaData), //
 
             // For now there is only ONE button on the Perferences dialog that is accessible as a toolbar button already, so
             // until we have at least one more preference the preferences dialog is not needed.
