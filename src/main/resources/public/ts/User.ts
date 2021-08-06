@@ -69,7 +69,7 @@ export class User implements UserIntf {
     }
 
     refreshLogin = async (state: AppState): Promise<void> => {
-        // console.log("refreshLogin.");
+        console.log("refreshLogin.");
 
         const loginState: string = await S.localDB.getVal(C.LOCALDB_LOGIN_STATE);
         /* if we have known state as logged out, then do nothing here */
@@ -89,7 +89,7 @@ export class User implements UserIntf {
         const callUsr: string = usr || "";
         const callPwd: string = pwd || "";
 
-        // console.log("refreshLogin with name: " + callUsr);
+        console.log("refreshLogin with name: " + callUsr);
 
         if (!callUsr) {
             this.defaultHandleAnonUser(state);
@@ -180,11 +180,15 @@ export class User implements UserIntf {
                 await S.localDB.setVal(C.LOCALDB_LOGIN_STATE, "1", "anon");
 
                 S.meta64.userName = usr;
-                // console.log("Logged in as: " + usr + " rootNode: " + res.rootNode + " authToken: " + res.authToken);
+                console.log("Logged in as: " + usr);
 
                 this.queryUserProfile(res.rootNode);
+
+                console.log("checking Messages");
                 this.checkMessages();
-                S.meta64.loadBookmarks();
+                setTimeout(() => {
+                    S.meta64.loadBookmarks();
+                }, 1000);
             }
 
             S.meta64.setStateVarsUsingLoginResponse(res);

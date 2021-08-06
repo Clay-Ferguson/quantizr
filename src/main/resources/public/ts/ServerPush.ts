@@ -25,7 +25,7 @@ export class ServerPush implements ServerPushIntf {
     }
 
     init = (): any => {
-        // console.log("ServerPush.init");
+        console.log("ServerPush.init");
 
         this.eventSource = new EventSource(S.util.getRpcPath() + "serverPush");
 

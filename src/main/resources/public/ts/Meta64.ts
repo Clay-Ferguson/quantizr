@@ -555,6 +555,7 @@ export class Meta64 implements Meta64Intf {
             //     return "Leave [appName] ?";
             // };
 
+            console.log("creating App");
             // This is the root react App component that contains the entire application
             this.app = new App(); // new AppDemo
 
@@ -594,7 +595,6 @@ export class Meta64 implements Meta64Intf {
 
             setTimeout(() => {
                 S.encryption.initKeys();
-                this.loadBookmarks();
             }, 1000);
 
             resolve();
@@ -607,6 +607,8 @@ export class Meta64 implements Meta64Intf {
             S.util.ajax<J.GetBookmarksRequest, J.GetBookmarksResponse>("getBookmarks", {
             },
                 (res: J.GetBookmarksResponse): void => {
+                    // let count = res.bookmarks ? res.bookmarks.length : 0;
+                    // console.log("bookmark count=" + count);
                     dispatch("Action_loadBookmarks", (s: AppState): AppState => {
                         s.bookmarks = res.bookmarks;
                         return s;
