@@ -137,6 +137,7 @@ export class App extends Main {
             }, "btn-secondary marginRight", "off");
 
             let fullScreenViewer = S.meta64.fullscreenViewerActive(state);
+
             let prefsButton = !fullScreenViewer ? new IconButton("fa-certificate", "Meta", {
                 onClick: e => { S.edit.toggleShowMetaData(state); },
                 title: state.userPreferences.showMetaData ? "Hide Avatars and Metadata" : "Show Avatars and Metadata"
@@ -162,7 +163,7 @@ export class App extends Main {
             //     title: "Go to Portal Home Node"
             // });
 
-            let title = state.title ? new Button("@" + state.title, e => { S.nav.navHome(state); }, null, "btn-secondary float-right") : null;
+            let title = state.title ? new Button("@" + state.title, e => { S.nav.navHome(state); }, null, "btn-secondary") : null;
             comp = new Div(null, { className: "mobileHeaderBar" }, [logo, menuButton, prefsButton, loginButton, title]);
         }
         return comp;

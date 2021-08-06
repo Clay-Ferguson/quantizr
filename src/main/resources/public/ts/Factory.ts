@@ -30,6 +30,7 @@ import { Singletons } from "./Singletons";
 import { User } from "./User";
 import { Util } from "./Util";
 import { View } from "./View";
+
 export class Factory {
     S: Singletons;
 
@@ -38,24 +39,29 @@ export class Factory {
      * to exist with no problems.
      */
     constructor() {
-        this.S = {
-            meta64: new Meta64(),
-            plugin: new PluginMgr(),
-            util: new Util(),
-            push: new ServerPush(),
-            edit: new Edit(),
-            attachment: new Attachment(),
-            encryption: new Encryption(),
-            nav: new Nav(),
-            props: new Props(),
-            render: new Render(),
-            srch: new Search(),
-            share: new Share(),
-            user: new User(),
-            view: new View(),
-            localDB: new LocalDB(),
-            speech: new SpeechRecog()
-        };
+        try {
+            this.S = {
+                meta64: new Meta64(),
+                plugin: new PluginMgr(),
+                util: new Util(),
+                push: new ServerPush(),
+                edit: new Edit(),
+                attachment: new Attachment(),
+                encryption: new Encryption(),
+                nav: new Nav(),
+                props: new Props(),
+                render: new Render(),
+                srch: new Search(),
+                share: new Share(),
+                user: new User(),
+                view: new View(),
+                localDB: new LocalDB(),
+                speech: new SpeechRecog()
+            };
+        }
+        catch (e) {
+            alert("app failed to initialize components.");
+        }
 
         PubSub.pub(C.PUBSUB_SingletonsReady, this.S);
 

@@ -187,13 +187,13 @@ export class Meta64 implements Meta64Intf {
         const selArray: string[] = [];
 
         if (!state.selectedNodes) {
-            // console.log("no selected nodes.");
+            Log.log("no selected nodes.");
         }
 
         S.util.forEachProp(state.selectedNodes, (id, val): boolean => {
             const node: J.NodeInfo = state.idToNodeMap.get(id);
             if (!node) {
-                // console.log("unable to find idToNodeMap for id=" + id);
+                Log.log("unable to find idToNodeMap for id=" + id);
             } else {
                 selArray.push(node.id);
             }
@@ -275,7 +275,7 @@ export class Meta64 implements Meta64Intf {
 
     /* Returns true if successful */
     highlightRowById = (id: string, scroll: boolean, state: AppState): boolean => {
-        // console.log("highlightRowById: " + id);
+        Log.log("highlightRowById: " + id);
         let node: J.NodeInfo = state.idToNodeMap.get(id);
         let ret = true;
 
@@ -292,13 +292,13 @@ export class Meta64 implements Meta64Intf {
                 S.view.scrollToTop();
             }
             ret = false;
-            // console.log("highlightRowById failed to find id: " + id);
+            Log.log("highlightRowById failed to find id: " + id);
         }
         return ret;
     }
 
     highlightNode = (node: J.NodeInfo, scroll: boolean, state: AppState): void => {
-        // console.log("highlghtNode");
+        Log.log("highlghtNode");
         if (!node || !state.node) {
             return;
         }
@@ -435,7 +435,7 @@ export class Meta64 implements Meta64Intf {
             in the context of SPAs
             */
             window.onpopstate = (event) => {
-                // console.log("POPSTATE: location: " + document.location + ", state: " + JSON.stringify(event.state));
+                Log.log("POPSTATE: location: " + document.location + ", state: " + JSON.stringify(event.state));
 
                 if (event.state && event.state.nodeId) {
                     S.view.refreshTree(event.state.nodeId, true, true, event.state.highlightId, false, true, true, store.getState());
@@ -447,20 +447,20 @@ export class Meta64 implements Meta64Intf {
                 e = e || window.event;
                 let target: HTMLElement = e.target;
                 Comp.focusElmId = null;
-                // console.log("document.body.click target.id=" + target.id);
+                Log.log("document.body.click target.id=" + target.id);
             }, false);
 
             // DO NOT DELETE. Useful for debugging.
-            document.body.addEventListener("focusin", function (e: any) {
-                // console.log("focusin id=" + e.target.id);
-            });
+            // document.body.addEventListener("focusin", function (e: any) {
+            //     Log.log("focusin id=" + e.target.id);
+            // });
 
             // This is a cool way of letting CTRL+UP, CTRL+DOWN scroll to next node.
             // WARNING: even with tabIndex added none of the other DIVS react renders seem to be able to accept an onKeyDown event.
             // Todo: before enabling this need to make sure 1) the Main Tab is selected and 2) No Dialogs are Open, because this WILL
             // capture events going to dialogs / edit fields
             document.body.addEventListener("keydown", (event: KeyboardEvent) => {
-                // console.log("keydown: " + event.code);
+                Log.log("keydown: " + event.code);
                 let state: AppState = store.getState();
 
                 switch (event.code) {
@@ -543,7 +543,7 @@ export class Meta64 implements Meta64Intf {
 
             // This works, but is not needed. do not delete.
             // window.addEventListener("hashchange", function () {
-            //     console.log("The hash has changed: hash=" + location.hash);
+            //     Log.log("The hash has changed: hash=" + location.hash);
             // }, false);
 
             this.initClickEffect();
@@ -555,7 +555,7 @@ export class Meta64 implements Meta64Intf {
             //     return "Leave [appName] ?";
             // };
 
-            console.log("creating App");
+            Log.log("creating App");
             // This is the root react App component that contains the entire application
             this.app = new App(); // new AppDemo
 
@@ -590,7 +590,7 @@ export class Meta64 implements Meta64Intf {
                     }
                 });
 
-            console.log("initApp complete.");
+            Log.log("initApp complete.");
             this.enableMouseEffect();
 
             setTimeout(() => {
@@ -608,7 +608,7 @@ export class Meta64 implements Meta64Intf {
             },
                 (res: J.GetBookmarksResponse): void => {
                     // let count = res.bookmarks ? res.bookmarks.length : 0;
-                    // console.log("bookmark count=" + count);
+                    // Log.log("bookmark count=" + count);
                     dispatch("Action_loadBookmarks", (s: AppState): AppState => {
                         s.bookmarks = res.bookmarks;
                         return s;
@@ -731,7 +731,7 @@ export class Meta64 implements Meta64Intf {
             return;
         }
 
-        // console.log("Changing from tab: " + prevTab + " to " + newTab);
+        Log.log("Changing from tab: " + prevTab + " to " + newTab);
 
         PubSub.pub(C.PUBSUB_tabChanging, newTab);
     }
@@ -858,7 +858,7 @@ export class Meta64 implements Meta64Intf {
     setOverlay = (showOverlay: boolean) => {
 
         Meta64.overlayCounter += showOverlay ? 1 : -1;
-        // console.log("overlayCounter=" + Meta64.overlayCounter);
+        Log.log("overlayCounter=" + Meta64.overlayCounter);
 
         /* if overlayCounter goes negative, that's a mismatch */
         if (Meta64.overlayCounter < 0) {
@@ -874,7 +874,7 @@ export class Meta64 implements Meta64Intf {
             setTimeout(() => {
                 // after the timer we check for the counter still being greater than zero (not an ==1 this time).
                 if (Meta64.overlayCounter > 0) {
-                    // console.log("showing overlay.");
+                    Log.log("showing overlay.");
                     const elm = S.util.domElm("overlayDiv");
                     if (elm) {
                         elm.style.display = "block";
@@ -884,13 +884,13 @@ export class Meta64 implements Meta64Intf {
             }, 1200);
         }
         else if (Meta64.overlayCounter === 0) {
-            // console.log("hiding overlay.");
+            Log.log("hiding overlay.");
             const elm = S.util.domElm("overlayDiv");
             if (elm) {
                 elm.style.display = "none";
             }
         }
-        // console.log("overlayCounter="+Meta64.overlayCounter);
+        Log.log("overlayCounter=" + Meta64.overlayCounter);
     }
 
     processUrlParams = (state: AppState): void => {
@@ -913,7 +913,7 @@ export class Meta64 implements Meta64Intf {
     }
 
     loadAnonPageHome = (state: AppState): void => {
-        // console.log("loadAnonPageHome()");
+        Log.log("loadAnonPageHome()");
 
         S.util.ajax<J.RenderNodeRequest, J.RenderNodeResponse>("anonPageLoad", null,
             (res: J.RenderNodeResponse): void => {
@@ -924,7 +924,7 @@ export class Meta64 implements Meta64Intf {
                 S.render.renderPageFromData(res, false, null, true, true);
             },
             (res: any): void => {
-                // console.log("loadAnonPage Home ajax fail");
+                Log.log("loadAnonPage Home ajax fail");
                 S.nav.login(state);
             }
         );
@@ -968,7 +968,7 @@ export class Meta64 implements Meta64Intf {
             s.isAdminUser = res.userName === "admin";
             s.isAnonUser = res.userName === J.PrincipalName.ANON;
 
-            // console.log("LoginResponse userName = " + res.userName);
+            Log.log("LoginResponse userName = " + res.userName);
 
             // bash scripting is an experimental feature, and i'll only enable for admin for now, until i'm
             // sure i'm keeping this feature.
