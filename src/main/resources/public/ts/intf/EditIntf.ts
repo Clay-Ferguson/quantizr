@@ -34,7 +34,6 @@ export interface EditIntf {
     createSubNode(id: any, typeName: string, createAtTop: boolean, parentNode: J.NodeInfo, state: AppState): void;
     selectAllNodes(state: AppState) : void;
     deleteSelNodes(evt: Event, nodeId: string);
-    getBestPostDeleteSelNode(state: AppState): J.NodeInfo;
     cutSelNodes(evt: Event, id: string): void;
     undoCutSelNodes(): void;
     pasteSelNodesInside(evt: Event, id: string);

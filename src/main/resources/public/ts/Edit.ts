@@ -64,14 +64,6 @@ export class Edit implements EditIntf {
         S.view.scrollToSelectedNode(state);
     }
 
-    private deleteNodesResponse = (res: J.DeleteNodesResponse, postDelSelNodeId: string, state: AppState): void => {
-        if (S.util.checkSuccess("Delete node", res)) {
-            // We only want to pass a nodeId here if we are going to root node.
-            const nodeId = postDelSelNodeId === state.homeNodeId ? postDelSelNodeId : null;
-            S.view.refreshTree(nodeId, false, false, postDelSelNodeId, false, true, true, state);
-        }
-    }
-
     private joinNodesResponse = (res: J.JoinNodesResponse, state: AppState): void => {
         state = appState(state);
         if (S.util.checkSuccess("Join node", res)) {
@@ -654,13 +646,6 @@ export class Edit implements EditIntf {
         let confirmMsg = "Delete " + selNodesArray.length + " node(s) ?";
         new ConfirmDlg(confirmMsg, "Confirm Delete " + selNodesArray.length,
             () => {
-                let postDelSelNodeId: string = null;
-
-                const node: J.NodeInfo = this.getBestPostDeleteSelNode(state);
-                if (node) {
-                    postDelSelNodeId = node.id;
-                }
-
                 S.util.ajax<J.DeleteNodesRequest, J.DeleteNodesResponse>("deleteNodes", {
                     nodeIds: selNodesArray,
                     childrenOnly: false
@@ -669,11 +654,21 @@ export class Edit implements EditIntf {
                     this.removeNodesFromHistory(selNodesArray, state);
                     this.removeNodesFromCalendarData(selNodesArray, state);
 
-                    if (!postDelSelNodeId && !S.nav.displayingRepositoryRoot(state)) {
-                        // we get here if user has deleted the last child (all children) of the parent of the current page
-                        S.nav.navUpLevel(true);
-                    } else {
-                        this.deleteNodesResponse(res, postDelSelNodeId, state);
+                    if (S.util.checkSuccess("Delete node", res)) {
+                        if (state.node.children) {
+                            state.node.children = state.node.children.filter(child => !selNodesArray.find(id => id === child.id));
+                        }
+
+                        if (state.node.children.length === 0) {
+                            S.view.jumpToId(state.node.id);
+                        }
+                        else {
+                            dispatch("Action_RefreshNodeFromServer", (s: AppState): AppState => {
+                                s.selectedNodes = {};
+                                s.node.children = state.node.children;
+                                return s;
+                            });
+                        }
                     }
 
                     /* We waste a tiny bit of CPU/bandwidth here by just always updating the bookmarks in case
@@ -719,40 +714,6 @@ export class Edit implements EditIntf {
         // dispatch("Action_UpdateCalendarData", (s: AppState): AppState => {
         //     return appState;
         // });
-    }
-
-    /* Gets the node we want to scroll to after a delete, but if we're deleting the page root we return null,
-    meaning we don't know which node to scroll to */
-    getBestPostDeleteSelNode = (state: AppState): J.NodeInfo => {
-        /* Use a hashmap-type approach to saving all selected nodes into a lookup map */
-        const nodesToDelMap: Object = S.meta64.getSelNodesAsMapById(state);
-
-        // If we are deleting the page root node return 'null' to trigger an 'upLevel'
-        if (nodesToDelMap[state.node.id]) {
-            return null;
-        }
-
-        let bestNode: J.NodeInfo = null;
-        let takeNextNode: boolean = false;
-        if (!state.node || !state.node.children) return null;
-
-        /* now we scan the children, and the last child we encounterd up until we find the fist one in nodesMap will be the
-        node we will want to select and scroll the user to AFTER the deleting is done */
-        for (let i = 0; i < state.node.children.length; i++) {
-            const node: J.NodeInfo = state.node.children[i];
-
-            /* is this one of the nodes we'll be deleting */
-            if (nodesToDelMap[node.id]) {
-                takeNextNode = true;
-            }
-            else {
-                if (takeNextNode) {
-                    return node;
-                }
-                bestNode = node;
-            }
-        }
-        return bestNode;
     }
 
     undoCutSelNodes = (): void => {

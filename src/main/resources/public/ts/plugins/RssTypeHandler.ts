@@ -141,6 +141,7 @@ export class RssTypeHandler extends TypeBase {
                 else {
                     dispatch("Action_RSSUpdated", (s: AppState): AppState => {
                         S.util.focusId(C.TAB_MAIN);
+                        S.meta64.tabScrollTop(s, C.TAB_MAIN);
                         setTimeout(() => {
                             S.meta64.tabScrollTop(s, C.TAB_MAIN);
                         }, 1000);
