@@ -86,7 +86,14 @@ export class TextArea extends Span implements I.TextEditorIntf {
         }
 
         let _attribs = { ...this.textareaAttribs };
-        _attribs.id = this.getId() + "_textarea";
+
+        // only if 'id' not already provided we set a default id for textarea,
+        // sometimes id is provided in order to help with persistence of focus
+        // across react re-renders.
+        if (!this.textareaAttribs.id) {
+            _attribs.id = this.getId() + "_textarea";
+        }
+
         if (!state.wordWrap) {
             _attribs.style = {
                 whiteSpace: "nowrap",

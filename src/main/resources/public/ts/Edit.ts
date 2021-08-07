@@ -440,7 +440,7 @@ export class Edit implements EditIntf {
         id = S.util.allowIdFromEvent(evt, id);
 
         // we set noScrollToId just to block the future attempt (one time) to
-        // scroll to this, because this is a hint telling us we are ALREAY
+        // scroll to this, because this is a hint telling us we are ALREADY
         // scrolled to this ID so any scrolling will be unnecessary
         S.meta64.noScrollToId = id;
         this.runEditNode(null, id, false, false, state);

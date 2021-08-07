@@ -258,7 +258,7 @@ export abstract class Comp<S extends BaseCompState = any> implements CompIntf {
         //     let func = obj.onClick;
         //     // wrap the click function to maintain focus element.
         //     obj.onClick = (arg: any) => {
-        //         Comp.focusElmId = obj.id;
+        //         S.util.focusId(obj.id);
         //         // console.log("Click (wrapped): " + this.jsClassName + " obj: " + S.util.prettyPrint(obj));
         //         func(arg);
         //     };
@@ -302,10 +302,12 @@ export abstract class Comp<S extends BaseCompState = any> implements CompIntf {
     }
 
     focus(): void {
+        // console.log("Comp.focus " + this.getId());
         Comp.focusElmId = this.getId();
         this.whenElm((elm: HTMLElement) => {
+            Comp.focusElmId = this.getId();
             // console.log("elm focus: id=" + this.getId());
-            S.util.delayedFocus(this.getId());
+            S.util.focusId(Comp.focusElmId);
         });
     }
 
@@ -455,11 +457,8 @@ export abstract class Comp<S extends BaseCompState = any> implements CompIntf {
         else {
             /* React can loose focus so we manage that state ourselves using Comp.focusElmId */
             if (Comp.focusElmId && this.attribs.id === Comp.focusElmId) {
-                setTimeout(() => {
-                    if (!Comp.focusElmId) return;
-                    // console.log("Comp Focusing Id: " + Comp.focusElmId);
-                    S.util.focusElmById(Comp.focusElmId);
-                }, 500);
+                // console.log("React render auto focus.");
+                S.util.focusId(Comp.focusElmId);
             }
         }
 

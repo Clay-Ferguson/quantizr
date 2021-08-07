@@ -39,7 +39,7 @@ export class Search implements SearchIntf {
         }, (res) => {
             if (res.searchResults && res.searchResults.length > 0) {
                 dispatch("Action_RenderSearchResults", (s: AppState): AppState => {
-                    Comp.focusElmId = C.TAB_SHARES;
+                    S.util.focusId(C.TAB_SHARES);
                     S.meta64.tabScrollTop(s, C.TAB_SHARES);
                     let data = s.tabData.find(d => d.id === C.TAB_SHARES);
                     if (!data) return;
@@ -91,7 +91,7 @@ export class Search implements SearchIntf {
                 }
 
                 dispatch("Action_RenderSearchResults", (s: AppState): AppState => {
-                    Comp.focusElmId = C.TAB_SEARCH;
+                    S.util.focusId(C.TAB_SEARCH);
                     S.meta64.tabScrollTop(s, C.TAB_SEARCH);
                     let data = s.tabData.find(d => d.id === C.TAB_SEARCH);
                     if (!data) return;
@@ -163,7 +163,7 @@ export class Search implements SearchIntf {
             timeRangeType
         }, (res) => {
             dispatch("Action_RenderTimelineResults", (s: AppState): AppState => {
-                Comp.focusElmId = C.TAB_TIMELINE;
+                S.util.focusId(C.TAB_TIMELINE);
                 S.meta64.tabScrollTop(s, C.TAB_TIMELINE);
                 let data = s.tabData.find(d => d.id === C.TAB_TIMELINE);
                 if (!data) return;
@@ -237,13 +237,12 @@ export class Search implements SearchIntf {
 
                 if (!growResults) {
                     S.meta64.selectTabStateOnly(C.TAB_FEED, s);
-                    S.view.scrollAllTop(s);
-                    // setTimeout(() => {
-                    //     S.view.scrollAllTop(s);
-                    // }, 1000);
+                    setTimeout(() => {
+                        S.view.scrollAllTop(s);
+                    }, 1000);
                 }
 
-                Comp.focusElmId = C.TAB_FEED;
+                S.util.focusId(C.TAB_FEED);
                 return s;
             });
         });
@@ -273,7 +272,7 @@ export class Search implements SearchIntf {
         }, (res) => {
             if (res.searchResults && res.searchResults.length > 0) {
                 dispatch("Action_RenderSearchResults", (s: AppState): AppState => {
-                    Comp.focusElmId = C.TAB_FOLLOWERS;
+                    S.util.focusId(C.TAB_FOLLOWERS);
                     S.meta64.tabScrollTop(s, C.TAB_FOLLOWERS);
                     let data = s.tabData.find(d => d.id === C.TAB_FOLLOWERS);
                     if (!data) return;
@@ -315,7 +314,7 @@ export class Search implements SearchIntf {
         }, (res) => {
             if (res.searchResults && res.searchResults.length > 0) {
                 dispatch("Action_RenderSearchResults", (s: AppState): AppState => {
-                    Comp.focusElmId = C.TAB_FOLLOWING;
+                    S.util.focusId(C.TAB_FOLLOWING);
                     S.meta64.tabScrollTop(s, C.TAB_FOLLOWING);
                     let data = s.tabData.find(d => d.id === C.TAB_FOLLOWING);
                     if (!data) return;

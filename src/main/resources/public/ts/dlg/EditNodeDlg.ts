@@ -1090,6 +1090,8 @@ export class EditNodeDlg extends DialogBase {
         let allowFocus = !this.contentEditor;
         // console.log("making field editor for val[" + value + "]");
 
+        // NOTE: If you bring back ace editor be sure to note that focus management need an id set
+        // like: {id: "mainTextContent"}, below
         if (C.ENABLE_ACE_EDITOR) {
             let aceMode = node.type === J.NodeType.PLAIN_TEXT ? "ace/mode/text" : "ace/mode/markdown";
             this.contentEditor = new AceEditPropTextarea(encrypted ? "[Encrypted]" : value, "25em", aceMode, isWordWrap);
@@ -1127,7 +1129,10 @@ export class EditNodeDlg extends DialogBase {
             });
         }
         else {
-            this.contentEditor = new TextArea(null, { rows }, this.contentEditorState, "textarea-min-10", true);
+            this.contentEditor = new TextArea(null, {
+                id: "mainTextContent",
+                rows
+            }, this.contentEditorState, "textarea-min-10", true);
 
             let wrap: boolean = S.props.getNodePropVal(J.NodeProp.NOWRAP, this.appState.node) !== "1";
             this.contentEditor.setWordWrap(wrap);

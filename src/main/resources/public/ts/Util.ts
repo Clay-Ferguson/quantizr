@@ -653,28 +653,35 @@ export class Util implements UtilIntf {
         return this._ajaxCounter > 0;
     }
 
-    focusElmById = (id: string) => {
-        const elm: HTMLElement = this.domElm(id);
-
-        // I got a little hasty and checked this in without testing. this does throw some errors.
-        // const elm: HTMLElement = await this.getElm(id);
-
-        if (elm) {
-            // console.log(`Element found (${id}), focusing`);
-            elm.focus();
-        }
-    }
-
     isElmVisible = (elm: HTMLElement) => {
         return elm && elm.offsetHeight > 0;
     }
 
-    /* set focus to element by id */
-    delayedFocus = (id: string): void => {
-        Comp.focusElmId = id;
-        setTimeout(async () => {
+    restoreFocus = (): void => {
+        if (!Comp.focusElmId) return;
+        // console.log("Restore focus: " + Comp.focusElmId);
+        setTimeout(() => {
             // console.log("delayed Focusing Id: " + id);
-            this.focusElmById(id);
+            const elm: HTMLElement = this.domElm(Comp.focusElmId);
+            if (elm) {
+                // console.log(`Element found (${id}), focusing`);
+                elm.focus();
+            }
+        }, 500);
+    }
+
+    /* set focus to element by id */
+    focusId = (id: string): void => {
+        if (!id) return;
+        // console.log("*** focusId = " + id);
+        Comp.focusElmId = id;
+        setTimeout(() => {
+            // console.log("delayed Focusing Id: " + id);
+            const elm: HTMLElement = this.domElm(id);
+            if (elm) {
+                // console.log(`Element found (${id}), focusing`);
+                elm.focus();
+            }
         }, 500);
     }
 

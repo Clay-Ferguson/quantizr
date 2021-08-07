@@ -56,9 +56,9 @@ export interface UtilIntf {
     logAndReThrow(message: string, exception: any);
     ajaxReady(requestName): boolean;
     isAjaxWaiting(): boolean;
-    focusElmById(id: string);
     isElmVisible(elm: HTMLElement);
-    delayedFocus(id: string): void;
+    restoreFocus(): void;
+    focusId(id: string): void;
     checkSuccess(opFriendlyName, res): boolean;
     flashMessage(message: string, title: string, preformatted?: boolean, sizeStyle?: string): void;
     showMessage(message: string, title: string, preformatted?: boolean, sizeStyle?: string): Promise<DialogBase>;

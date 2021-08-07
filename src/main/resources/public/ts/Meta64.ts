@@ -446,21 +446,23 @@ export class Meta64 implements Meta64Intf {
             document.body.addEventListener("click", function (e: any) {
                 e = e || window.event;
                 let target: HTMLElement = e.target;
+
+                // Whenever something is clicked, forget the pending focus data
                 Comp.focusElmId = null;
                 Log.log("document.body.click target.id=" + target.id);
             }, false);
 
             // DO NOT DELETE. Useful for debugging.
-            // document.body.addEventListener("focusin", function (e: any) {
-            //     Log.log("focusin id=" + e.target.id);
-            // });
+            document.body.addEventListener("focusin", function (e: any) {
+                // Log.log("focusin id=" + e.target.id);
+            });
 
             // This is a cool way of letting CTRL+UP, CTRL+DOWN scroll to next node.
             // WARNING: even with tabIndex added none of the other DIVS react renders seem to be able to accept an onKeyDown event.
             // Todo: before enabling this need to make sure 1) the Main Tab is selected and 2) No Dialogs are Open, because this WILL
             // capture events going to dialogs / edit fields
             document.body.addEventListener("keydown", (event: KeyboardEvent) => {
-                Log.log("keydown: " + event.code);
+                // Log.log("keydown: " + event.code);
                 let state: AppState = store.getState();
 
                 switch (event.code) {
@@ -858,7 +860,7 @@ export class Meta64 implements Meta64Intf {
     setOverlay = (showOverlay: boolean) => {
 
         Meta64.overlayCounter += showOverlay ? 1 : -1;
-        Log.log("overlayCounter=" + Meta64.overlayCounter);
+        // Log.log("overlayCounter=" + Meta64.overlayCounter);
 
         /* if overlayCounter goes negative, that's a mismatch */
         if (Meta64.overlayCounter < 0) {
@@ -874,7 +876,7 @@ export class Meta64 implements Meta64Intf {
             setTimeout(() => {
                 // after the timer we check for the counter still being greater than zero (not an ==1 this time).
                 if (Meta64.overlayCounter > 0) {
-                    Log.log("showing overlay.");
+                    // Log.log("showing overlay.");
                     const elm = S.util.domElm("overlayDiv");
                     if (elm) {
                         elm.style.display = "block";
@@ -884,13 +886,13 @@ export class Meta64 implements Meta64Intf {
             }, 1200);
         }
         else if (Meta64.overlayCounter === 0) {
-            Log.log("hiding overlay.");
+            // Log.log("hiding overlay.");
             const elm = S.util.domElm("overlayDiv");
             if (elm) {
                 elm.style.display = "none";
             }
         }
-        Log.log("overlayCounter=" + Meta64.overlayCounter);
+        // Log.log("overlayCounter=" + Meta64.overlayCounter);
     }
 
     processUrlParams = (state: AppState): void => {
