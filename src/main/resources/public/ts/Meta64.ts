@@ -449,7 +449,7 @@ export class Meta64 implements Meta64Intf {
 
                 // Whenever something is clicked, forget the pending focus data
                 Comp.focusElmId = null;
-                Log.log("document.body.click target.id=" + target.id);
+                // Log.log("document.body.click target.id=" + target.id);
             }, false);
 
             // DO NOT DELETE. Useful for debugging.

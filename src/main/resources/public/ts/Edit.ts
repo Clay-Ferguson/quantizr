@@ -131,8 +131,6 @@ export class Edit implements EditIntf {
 
     private setNodePositionResponse = (res: J.SetNodePositionResponse, id: string, state: AppState): void => {
         if (S.util.checkSuccess("Change node position", res)) {
-            // todo-0: now that we have infinite scrolling this 'refresh' call might need to always be jumpToId instead?
-            // S.meta64.refresh(state);
             S.view.jumpToId(id);
         }
     }
@@ -310,21 +308,57 @@ export class Edit implements EditIntf {
                 parentPath = S.util.replaceAll(parentPath, "/r/p", "/r");
             }
 
-            // todo-1: is jumpToNode(id) always better regardless of infinite scroll mode? Before I imlemented the
-            // infinite scroll this was doing the refreshTree, but I think refreshTree may actually be suboptimal.
-            // todo-0: need to search for all 'refreshTree' calls and make sure they're all going to work
-            // or identify others that would be better done by 'jumpToId' instead.
-            if (C.TREE_INFINITE_SCROLL) {
+            // if 'node.id' is not being displayed on the page we need to jump to it from scratch
+            if (!S.meta64.getDisplayingNode(state, node.id)) {
                 S.view.jumpToId(node.id);
             }
+            // otherwise we just pull down the new node data and replace it into our 'state.node.children' (or page root) and we're done.
             else {
-                S.view.refreshTree(null, false, false, node.id, false, allowScroll, false, state);
+                this.refreshNodeFromServer(node.id);
             }
 
             if (state.fullScreenCalendarId) {
                 S.render.showCalendar(state.fullScreenCalendarId, state);
             }
         }
+    }
+
+    refreshNodeFromServer = (nodeId: string): void => {
+        S.util.ajax<J.RenderNodeRequest, J.RenderNodeResponse>("renderNode", {
+            nodeId,
+            upLevel: false,
+            siblingOffset: 0,
+            renderParentIfLeaf: false,
+            offset: 0,
+            goToLastPage: false,
+            forceIPFSRefresh: false,
+            singleNode: true
+        },
+            (res: J.RenderNodeResponse) => {
+                if (!res.node) return;
+                dispatch("Action_RefreshNodeFromServer", (s: AppState): AppState => {
+                    // if the node is out page parent (page root)
+                    if (res.node.id === s.node.id) {
+                        // preserve the children, when updating the root node, because they will not have been obtained
+                        // due to the 'singleNode=true' in the request
+                        res.node.children = s.node.children;
+                        s.node = res.node;
+                    }
+                    // otherwise a child
+                    else if (s.node && s.node.children) {
+                        // replace the old node with the new node.
+                        s.node.children.forEach((node, i) => {
+                            if (node.id === res.node.id) {
+                                s.node.children[i] = res.node;
+                            }
+                        });
+                    }
+                    return s;
+                });
+            }, // fail callback
+            (res: string) => {
+                console.log("failed to refresh node: " + res);
+            });
     }
 
     distributeKeys = async (node: J.NodeInfo, aclEntries: J.AccessControlInfo[]): Promise<void> => {
