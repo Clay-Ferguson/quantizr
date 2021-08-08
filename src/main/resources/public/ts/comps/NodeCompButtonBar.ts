@@ -244,24 +244,13 @@ export class NodeCompButtonBar extends Div {
             }
         }
 
-        let btnArray: Comp[] = [openButton, insertNodeButton, createSubNodeButton, editNodeButton,
-            new Span(null, { className: "float-right" }, [moveNodeUpButton, //
-                moveNodeDownButton, cutNodeButton, deleteNodeButton, pasteButtons])];
-
-        if (this.extraButtons) {
-            btnArray = btnArray.concat(this.extraButtons);
-        }
-
-        let buttonBar = new ButtonBar(btnArray, null, "marginLeftIfNotFirst");
-        let navButtonBar = null;
+        let searchButton: Icon = null;
+        let timelineButton: Icon = null;
+        let upLevelButton: IconButton;
+        let prevButton: IconButton;
+        let nextButton: IconButton;
 
         if (isPageRootNode) {
-            let upLevelButton: IconButton;
-            let prevButton: IconButton;
-            let nextButton: IconButton;
-            let searchButton: IconButton;
-            let timelineButton: IconButton;
-
             if (state.node && this.node.id === state.node.id) {
                 if (S.nav.parentVisibleToUser(state)) {
                     upLevelButton = new IconButton("fa-folder", "Up", {
@@ -285,29 +274,38 @@ export class NodeCompButtonBar extends Div {
                         title: "Go to Next Node"
                     });
                 }
-
-                searchButton = new IconButton("fa-search", null, {
-                    onClick: S.nav.runSearch,
-                    title: "Search underneath Node"
-                });
-
-                timelineButton = new IconButton("fa-clock-o", null, {
-                    onClick: S.nav.runTimeline,
-                    title: "View Timeline (by Mod Time)"
-                });
             }
+       }
 
-            navButtonBar = new ButtonBar([searchButton, timelineButton, prevButton, nextButton, upLevelButton],
-                null, "float-right marginBottom");
-            if (!navButtonBar.hasChildren()) {
-                navButtonBar = null;
-            }
+        if (node.hasChildren) {
+            searchButton = new Icon({
+                className: "fa fa-search fa-lg buttonBarIcon",
+                title: "Search underneath Node",
+                nid: node.id,
+                onClick: S.nav.runSearch
+            });
+
+            timelineButton = new Icon({
+                className: "fa fa-clock-o fa-lg buttonBarIcon",
+                title: "View Timeline (by Mod Time)",
+                nid: node.id,
+                onClick: S.nav.runTimeline
+            });
         }
 
+        let btnArray: Comp[] = [openButton, upLevelButton, insertNodeButton, createSubNodeButton, editNodeButton, prevButton, nextButton,
+            new Span(null, { className: "float-right" }, [moveNodeUpButton, //
+                moveNodeDownButton, cutNodeButton, deleteNodeButton, searchButton, timelineButton, pasteButtons])];
+
+        if (this.extraButtons) {
+            btnArray = btnArray.concat(this.extraButtons);
+        }
+
+        let buttonBar = new ButtonBar(btnArray, null, "marginLeftIfNotFirst");
         if (buttonBar && !buttonBar.hasChildren()) {
             buttonBar = null;
         }
 
-        this.setChildren([selButton, encIcon, sharedIcon, buttonBar, navButtonBar]);
+        this.setChildren([selButton, encIcon, sharedIcon, buttonBar]);
     }
 }

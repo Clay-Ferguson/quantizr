@@ -93,7 +93,7 @@ export class FeedView extends AppTab {
                 new Span(null, {
                     className: (((state.feedDirty || state.feedWaitingForUserRefresh) && !state.feedLoading) ? "feedDirtyButton" : "feedNotDirtyButton")
                 }, [
-                    new Button("Refresh" + (state.feedDirty ? " (New Posts)" : ""), () => {
+                    new Button("Refresh", () => {
                         FeedView.refresh();
                     })
                 ])

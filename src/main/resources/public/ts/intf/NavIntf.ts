@@ -28,8 +28,8 @@ export interface NavIntf {
     navToSibling(siblingOffset: number, state?: AppState): void;
     navToPrev(): void;
     navToNext(): void;
-    runSearch(): void;
-    runTimeline(): void;
+    runSearch(evt: Event): void;
+    runTimeline(evt: Event): void;
     closeFullScreenViewer(appState: AppState): void;
     prevFullScreenImgViewer(appState: AppState): void;
     nextFullScreenImgViewer(appState: AppState): void;

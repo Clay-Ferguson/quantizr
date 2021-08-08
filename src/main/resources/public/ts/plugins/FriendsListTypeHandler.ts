@@ -5,6 +5,7 @@ import * as J from "../JavaIntf";
 import { PubSub } from "../PubSub";
 import { Singletons } from "../Singletons";
 import { Comp } from "../widget/base/Comp";
+import { Clearfix } from "../widget/Clearfix";
 import { Div } from "../widget/Div";
 import { Heading } from "../widget/Heading";
 import { HelpButton } from "../widget/HelpButton";
@@ -29,7 +30,8 @@ export class FriendsListTypeHandler extends TypeBase {
             new Heading(4, "Friends List", {
                 className: "marginAll"
             }),
-            new HelpButton(() => S.quanta?.config?.help?.type?.friendsList?.render)
+            new HelpButton(() => S.quanta?.config?.help?.type?.friendsList?.render, null, "btn-secondary float-right"),
+            new Clearfix()
         ]);
     }
 }

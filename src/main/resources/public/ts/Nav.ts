@@ -336,16 +336,27 @@ export class Nav implements NavIntf {
         S.quanta.loadAnonPageHome(null);
     }
 
-    runSearch = (): void => {
+    runSearch = (evt: Event): void => {
+        let id = S.util.allowIdFromEvent(evt, null);
         const state = appState();
-        this.clickNodeRow(null, state.node.id);
-        new SearchContentDlg(state).open();
+        this.clickNodeRow(null, id);
+        setTimeout(() => {
+            new SearchContentDlg(state).open();
+        }, 500);
     }
 
-    runTimeline = (): void => {
+    runTimeline = (evt: Event): void => {
+        let id = S.util.allowIdFromEvent(evt, null);
         const state = appState();
-        this.clickNodeRow(null, state.node.id);
-        S.srch.timeline(state.node, "mtm", state, null, "Rev-chron by Modify Time", 0);
+        this.clickNodeRow(null, id);
+
+        setTimeout(() => {
+            const node: J.NodeInfo = state.idToNodeMap.get(id);
+            if (!node) {
+                return;
+            }
+            S.srch.timeline(node, "mtm", state, null, "Rev-chron by Modify Time", 0);
+        }, 500);
     }
 
     closeFullScreenViewer = (appState: AppState): void => {

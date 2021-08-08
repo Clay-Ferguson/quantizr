@@ -7,7 +7,6 @@ import { Singletons } from "../Singletons";
 import { Comp } from "../widget/base/Comp";
 import { Div } from "../widget/Div";
 import { Heading } from "../widget/Heading";
-import { HelpButton } from "../widget/HelpButton";
 import { TypeBase } from "./base/TypeBase";
 
 let S: Singletons;
@@ -30,8 +29,10 @@ export class BlockedUsersTypeHandler extends TypeBase {
         return new Div(null, null, [
             new Heading(4, "Blocked Users", {
                 className: "marginAll"
-            }),
-            new HelpButton(() => S.quanta?.config?.help?.type?.friendsList?.render)
+            })
+            // oops do we have help for blocked users yet? todo-1
+            // new HelpButton(() => S.quanta?.config?.help?.type?.friendsList?.render, null, "btn-secondary float-right"),
+            // new Clearfix()
         ]);
     }
 }
