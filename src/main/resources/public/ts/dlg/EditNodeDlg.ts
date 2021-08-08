@@ -982,13 +982,20 @@ export class EditNodeDlg extends DialogBase {
         S.util.ajax<J.SaveNodeRequest, J.SaveNodeResponse>("saveNode", {
             node: state.node
         }, (res) => {
-            S.render.fadeInId = state.node.id;
-            S.quanta.tempDisableAutoScroll();
+            // if we're saving a bookmark but NOT viewing the bookmark list then we don't need to do any
+            // page refreshing after the edit.
+            if (res.node.type === J.NodeType.BOOKMARK && this.appState.node.type !== J.NodeType.BOOKMARK_LIST) {
+                // do nothing.
+            }
+            else {
+                S.render.fadeInId = state.node.id;
+                S.quanta.tempDisableAutoScroll();
 
-            S.edit.saveNodeResponse(state.node, res, true, this.appState);
+                S.edit.saveNodeResponse(state.node, res, true, this.appState);
 
-            if (askToSplit) {
-                new SplitNodeDlg(state.node, this.appState).open();
+                if (askToSplit) {
+                    new SplitNodeDlg(state.node, this.appState).open();
+                }
             }
 
             // if we just saved a bookmark, reload bookmarks menu
