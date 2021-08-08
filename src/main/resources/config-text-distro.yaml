@@ -7,7 +7,7 @@ intro1: >-
 intro2:
 
 # Tip: This 'menu' property is seen in TypeScript JSON as an array of objects in 
-# variable 'S.meta64.config'
+# variable 'S.quanta.config'
 #
 # Links here can be full url, or node names, or "tab:tabName"
 menu:

@@ -450,16 +450,16 @@ export class Util implements UtilIntf {
 
                 if (!background) {
                     this._ajaxCounter++;
-                    S.meta64.setOverlay(true);
+                    S.quanta.setOverlay(true);
                 }
 
-                // console.log("fetch: " + this.getRpcPath() + postName + " Bearer: " + S.meta64.authToken);
+                // console.log("fetch: " + this.getRpcPath() + postName + " Bearer: " + S.quanta.authToken);
                 fetch(this.getRpcPath() + postName, {
                     method: "POST",
                     body: JSON.stringify(postData),
                     headers: {
                         "Content-Type": "application/json",
-                        Bearer: S.meta64.authToken
+                        Bearer: S.quanta.authToken
                     },
                     mode: "cors", // no-cors, *cors, same-origin
                     cache: "no-cache", // *default, no-cache, reload, force-cache, only-if-cached
@@ -488,7 +488,7 @@ export class Util implements UtilIntf {
         } catch (ex) {
             this.logAndReThrow("Failed starting request: " + postName, ex);
             if (!background) {
-                S.meta64.setOverlay(false);
+                S.quanta.setOverlay(false);
             }
             return null;
         }
@@ -554,7 +554,7 @@ export class Util implements UtilIntf {
                 }
                 finally {
                     if (!background) {
-                        S.meta64.setOverlay(false);
+                        S.quanta.setOverlay(false);
                     }
                 }
             })
@@ -614,7 +614,7 @@ export class Util implements UtilIntf {
                 }
                 finally {
                     if (!background) {
-                        S.meta64.setOverlay(false);
+                        S.quanta.setOverlay(false);
                     }
                 }
             });
@@ -1144,7 +1144,7 @@ export class Util implements UtilIntf {
 
         /* First whenever we have a new 'node' we need to remove 'node' from any of the
          subItems that exist, because any top level item doesn't need to also exist as a subItem */
-        S.meta64.nodeHistory.forEach(h => {
+        S.quanta.nodeHistory.forEach(h => {
             if (h.subItems) {
                 h.subItems = h.subItems.filter(function (hi: NodeHistoryItem) {
                     return hi.id !== node.id;
@@ -1153,7 +1153,7 @@ export class Util implements UtilIntf {
         });
 
         // Lookup this history item so we can update the subIds first.
-        let histItem: NodeHistoryItem = S.meta64.nodeHistory.find(function (h: NodeHistoryItem) {
+        let histItem: NodeHistoryItem = S.quanta.nodeHistory.find(function (h: NodeHistoryItem) {
             return h.id === node.id;
         });
 
@@ -1173,7 +1173,7 @@ export class Util implements UtilIntf {
                 }
 
                 if (childNode.id !== node.id) {
-                    let childFound = S.meta64.nodeHistory.find(function (h: NodeHistoryItem) {
+                    let childFound = S.quanta.nodeHistory.find(function (h: NodeHistoryItem) {
                         return h.id === childNode.id;
                     });
 
@@ -1186,12 +1186,12 @@ export class Util implements UtilIntf {
         }
 
         // remove node if it exists in history (so we can add to top)
-        S.meta64.nodeHistory = S.meta64.nodeHistory.filter(function (h: NodeHistoryItem) {
+        S.quanta.nodeHistory = S.quanta.nodeHistory.filter(function (h: NodeHistoryItem) {
             return h.id !== node.id;
         });
 
         // now add to top.
-        S.meta64.nodeHistory.unshift({ id: node.id, content: this.getShortContent(node), subItems });
+        S.quanta.nodeHistory.unshift({ id: node.id, content: this.getShortContent(node), subItems });
     }
 
     getPathPartForNamedNode = (node: J.NodeInfo): string => {

@@ -66,7 +66,7 @@ export class SearchByNameDlg extends DialogBase {
         }
 
         // until we have better validation
-        let node = S.meta64.getHighlightedNode(this.appState);
+        let node = S.quanta.getHighlightedNode(this.appState);
         if (!node) {
             S.util.showMessage("No node is selected to search under.", "Warning");
             return;

@@ -62,7 +62,7 @@ export class MenuPanel extends Div {
     // every bookmark has an edit icon to make this no longer needed.
     // static openBookmarksNode = () => {
     //     let state = store.getState();
-    //     S.meta64.setUserPreferences(state, true);
+    //     S.quanta.setUserPreferences(state, true);
     //     S.nav.openContentNode("~" + J.NodeType.BOOKMARK_LIST);
     // };
 
@@ -100,7 +100,7 @@ export class MenuPanel extends Div {
     static export = () => S.edit.openExportDlg(appState(null));
     static testMicrophone = () => { new MediaRecorderDlg(appState(null), false, false).open(); };
     static testWebCam = () => { new MediaRecorderDlg(appState(null), true, false).open(); };
-    static mouseEffects = () => { S.meta64.toggleMouseEffect(); };
+    static mouseEffects = () => { S.quanta.toggleMouseEffect(); };
     static showUrls = () => S.render.showNodeUrl(null, appState(null));
     static showRawData = () => S.view.runServerCommand("getJson", "Node JSON Data", "The actual data stored on the server for this node...", appState(null));
     static nodeStats = () => S.view.getNodeStats(appState(null), false, false);
@@ -169,7 +169,7 @@ export class MenuPanel extends Div {
     preRender(): void {
         const state: AppState = useSelector((state: AppState) => state);
 
-        const hltNode: J.NodeInfo = S.meta64.getHighlightedNode(state);
+        const hltNode: J.NodeInfo = S.quanta.getHighlightedNode(state);
         const selNodeIsMine = !!hltNode && (hltNode.owner === state.userName || state.userName === "admin");
 
         const importFeatureEnabled = selNodeIsMine || (!!hltNode && state.homeNodeId === hltNode.id);
@@ -188,7 +188,7 @@ export class MenuPanel extends Div {
         }
 
         children.push(new Menu(C.SITE_NAV_MENU_TEXT, [
-            new MenuItem("Portal Home", S.meta64.loadAnonPageHome),
+            new MenuItem("Portal Home", S.quanta.loadAnonPageHome),
             new MenuItem("User Guide", MenuPanel.openUserGuide),
             ...this.siteNavCustomItems(state)
         ]));
@@ -204,11 +204,11 @@ export class MenuPanel extends Div {
                             onClick: (event: any) => {
                                 event.stopPropagation();
                                 event.preventDefault();
-                                S.meta64.setUserPreferences(state, true);
+                                S.quanta.setUserPreferences(state, true);
 
                                 // we have to do this Menu close manually here since this is not a MenuItem wrapped function.
-                                if (S.meta64.mainMenu) {
-                                    S.meta64.mainMenu.close();
+                                if (S.quanta.mainMenu) {
+                                    S.quanta.mainMenu.close();
                                 }
                                 S.view.jumpToId(bookmark.selfId);
                             }
@@ -262,7 +262,7 @@ export class MenuPanel extends Div {
 
         children.push(new Menu("Edit", [
             state.editNode ? new MenuItem("Continue editing...", MenuPanel.continueEditing, !state.isAnonUser) : null, //
-            new MenuItem("Clear Selections", S.meta64.clearSelNodes, !state.isAnonUser && S.util.getPropertyCount(state.selectedNodes) > 0), //
+            new MenuItem("Clear Selections", S.quanta.clearSelNodes, !state.isAnonUser && S.util.getPropertyCount(state.selectedNodes) > 0), //
 
             // new MenuItem("Cut", S.edit.cutSelNodes, () => { return !state.isAnonUser && selNodeCount > 0 && selNodeIsMine }), //
             new MenuItem("Undo Cut", S.edit.undoCutSelNodes, !state.isAnonUser && !!state.nodesToMove), //
@@ -338,8 +338,8 @@ export class MenuPanel extends Div {
             new MenuItemSeparator(),
             new MenuItem("Find Users", MenuPanel.findUsers, !state.isAnonUser) //
 
-            // new MenuItem("Files", nav.searchFiles, () => { return  !state.isAnonUser && S.meta64.allowFileSystemSearch },
-            //    () => { return  !state.isAnonUser && S.meta64.allowFileSystemSearch })
+            // new MenuItem("Files", nav.searchFiles, () => { return  !state.isAnonUser && S.quanta.allowFileSystemSearch },
+            //    () => { return  !state.isAnonUser && S.quanta.allowFileSystemSearch })
         ]));
 
         children.push(new Menu("Timeline", [
@@ -488,8 +488,8 @@ export class MenuPanel extends Div {
             ]));
 
             children.push(new Menu("Admin - Test", [
-                new MenuItem("TEST - Send Email", () => S.meta64.sendTestEmail()),
-                new MenuItem("TEST - Notification Display", () => S.meta64.showSystemNotification("Test Title", "This is a test message")),
+                new MenuItem("TEST - Send Email", () => S.quanta.sendTestEmail()),
+                new MenuItem("TEST - Notification Display", () => S.quanta.showSystemNotification("Test Title", "This is a test message")),
                 new MenuItem("TEST - Encryption", async () => {
                     await S.encryption.test();
                     S.util.showMessage("Encryption Test Complete. Check browser console for output.", "Note", true);
@@ -516,8 +516,8 @@ export class MenuPanel extends Div {
 
     siteNavCustomItems = (state: AppState): Div[] => {
         let items: Div[] = [];
-        if (S.meta64.config && S.meta64.config.menu && S.meta64.config.menu.siteNav) {
-            for (let menuItem of S.meta64.config.menu.siteNav) {
+        if (S.quanta.config && S.quanta.config.menu && S.quanta.config.menu.siteNav) {
+            for (let menuItem of S.quanta.config.menu.siteNav) {
                 if (menuItem.name === "separator") {
                     items.push(new MenuItemSeparator());
                 }
@@ -534,7 +534,7 @@ export class MenuPanel extends Div {
                             func = MenuPanel.messagesFediverse;
                         }
                         else {
-                            func = () => S.meta64.selectTab(tab);
+                            func = () => S.quanta.selectTab(tab);
                         }
                     }
                     // covers http and https
@@ -565,7 +565,7 @@ export class MenuPanel extends Div {
 
     getTabMenuItem(state: AppState, data: TabDataIntf): MenuItem {
         return new MenuItem(data.name, (event) => {
-            S.meta64.selectTab(data.id);
+            S.quanta.selectTab(data.id);
         }, true, () => state.activeTab === data.id);
     }
 }

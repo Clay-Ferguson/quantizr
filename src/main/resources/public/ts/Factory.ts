@@ -17,7 +17,7 @@ import { Edit } from "./Edit";
 import { Encryption } from "./Encryption";
 import { SpeechRecog } from "./SpeechRecog";
 import { LocalDB } from "./LocalDB";
-import { Meta64 } from "./Meta64";
+import { Quanta } from "./Quanta";
 import { Nav } from "./Nav";
 import { PluginMgr } from "./PluginMgr";
 import { Props } from "./Props";
@@ -41,7 +41,7 @@ export class Factory {
     constructor() {
         try {
             this.S = {
-                meta64: new Meta64(),
+                quanta: new Quanta(),
                 plugin: new PluginMgr(),
                 util: new Util(),
                 push: new ServerPush(),
@@ -67,6 +67,6 @@ export class Factory {
 
         // This is basically our main entrypoint into the app. This must ONLY be called after the SingletonsReady has been
         // called (line above) initializing all of them and wiring them all up.
-        this.S.meta64.initApp();
+        this.S.quanta.initApp();
     }
 }

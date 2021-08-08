@@ -179,7 +179,7 @@ export class Render implements RenderIntf {
     /* nodeId is parent node to query for calendar content */
     showCalendar = (nodeId: string, state: AppState): void => {
         if (!nodeId) {
-            let node = S.meta64.getHighlightedNode(state);
+            let node = S.quanta.getHighlightedNode(state);
             if (node) {
                 nodeId = node.id;
             }
@@ -202,7 +202,7 @@ export class Render implements RenderIntf {
 
     showNodeUrl = (node: J.NodeInfo, state: AppState): void => {
         if (!node) {
-            node = S.meta64.getHighlightedNode(state);
+            node = S.quanta.getHighlightedNode(state);
         }
         if (!node) {
             S.util.showMessage("You must first click on a node.", "Warning");
@@ -352,13 +352,13 @@ export class Render implements RenderIntf {
             // console.log("renderPageFromData: " + S.util.prettyPrint(res));
             dispatch("Action_RenderPage", (s: AppState): AppState => {
                 // if (allowScroll) {
-                //     S.meta64.tabScrollTop(C.TAB_MAIN);
+                //     S.quanta.tabScrollTop(C.TAB_MAIN);
                 // }
                 // console.log("update state in Action_RenderPage");
 
                 if (!s.activeTab || clickTab) {
-                    S.meta64.tabChanging(s.activeTab, C.TAB_MAIN, s);
-                    s.activeTab = S.meta64.activeTab = C.TAB_MAIN;
+                    S.quanta.tabChanging(s.activeTab, C.TAB_MAIN, s);
+                    s.activeTab = S.quanta.activeTab = C.TAB_MAIN;
                 }
 
                 s.guiReady = true;
@@ -380,7 +380,7 @@ export class Render implements RenderIntf {
 
                     s.idToNodeMap = new Map<string, J.NodeInfo>();
                     if (res) {
-                        S.meta64.updateNodeMap(res.node, s);
+                        S.quanta.updateNodeMap(res.node, s);
                     }
 
                     let targetNode: J.NodeInfo = null;
@@ -389,7 +389,7 @@ export class Render implements RenderIntf {
                         // so we have to call getNodeByName() to get the 'id' that goes with that node name.
                         if (targetNodeId.startsWith(":")) {
                             targetNodeId = targetNodeId.substring(1);
-                            targetNode = S.meta64.getNodeByName(res.node, targetNodeId, s);
+                            targetNode = S.quanta.getNodeByName(res.node, targetNodeId, s);
                             if (targetNode) {
                                 targetNodeId = targetNode.id;
                             }
@@ -428,9 +428,9 @@ export class Render implements RenderIntf {
                         // Note: the substring(1) trims the "#" character off.
                         if (allowScroll) {
                             // console.log("highlight: pendingLocationHash (allowScroll)");
-                            S.meta64.highlightRowById(s.pendingLocationHash.substring(1), true, s);
+                            S.quanta.highlightRowById(s.pendingLocationHash.substring(1), true, s);
 
-                            if (S.meta64.hiddenRenderingEnabled) {
+                            if (S.quanta.hiddenRenderingEnabled) {
                                 s.rendering = true;
                             }
                         }
@@ -438,25 +438,25 @@ export class Render implements RenderIntf {
                     }
                     else if (allowScroll && targetNodeId) {
                         // console.log("highlight: byId");
-                        if (!S.meta64.highlightRowById(targetNodeId, true, s)) {
+                        if (!S.quanta.highlightRowById(targetNodeId, true, s)) {
                             // anything to do here? didn't find node.
                         }
 
-                        if (S.meta64.hiddenRenderingEnabled) {
+                        if (S.quanta.hiddenRenderingEnabled) {
                             s.rendering = true;
                         }
                     } //
-                    else if (allowScroll && (scrollToTop || !S.meta64.getHighlightedNode(s))) {
+                    else if (allowScroll && (scrollToTop || !S.quanta.getHighlightedNode(s))) {
                         // console.log("highlight: scrollTop");
                         S.view.scrollToTop();
-                        if (S.meta64.hiddenRenderingEnabled) {
+                        if (S.quanta.hiddenRenderingEnabled) {
                             s.rendering = true;
                         }
                     } //
                     else if (allowScroll) {
                         // console.log("highlight: scrollToSelected");
                         S.view.scrollToSelectedNode(s);
-                        if (S.meta64.hiddenRenderingEnabled) {
+                        if (S.quanta.hiddenRenderingEnabled) {
                             s.rendering = true;
                         }
                     }
@@ -648,7 +648,7 @@ export class Render implements RenderIntf {
 
     showGraph = (node: J.NodeInfo, searchText: string, state: AppState): void => {
         if (!node) {
-            node = S.meta64.getHighlightedNode(state);
+            node = S.quanta.getHighlightedNode(state);
         }
 
         dispatch("Action_ShowGraph", (s: AppState): AppState => {

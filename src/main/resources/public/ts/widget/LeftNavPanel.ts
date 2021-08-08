@@ -49,14 +49,14 @@ export class LeftNavPanel extends Div {
                 }),
                 new Span(g_brandingAppName, {
                     className: "logo-text",
-                    onClick: e => { S.meta64.loadAnonPageHome(null); },
+                    onClick: e => { S.quanta.loadAnonPageHome(null); },
                     title: "Go to Portal Home Node"
                 }),
                 // todo-1: need to add a similar message over to the 'logo-text' that's active for mobile
                 // which is in a different class.
                 messages ? new Span(messages, {
                     className: "logo-text-small float-right",
-                    onClick: e => { S.meta64.showMyNewMessages(); },
+                    onClick: e => { S.quanta.showMyNewMessages(); },
                     title: "Show new messages"
                 }) : null
             ]),

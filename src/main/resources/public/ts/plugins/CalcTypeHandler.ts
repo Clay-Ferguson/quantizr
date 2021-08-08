@@ -23,7 +23,7 @@ export class CalcTypeHandler extends TypeBase {
     }
 
     getEditorHelp(): string {
-        return S.meta64?.config?.help?.type?.calculator?.editor;
+        return S.quanta?.config?.help?.type?.calculator?.editor;
     }
 
     allowAction(action: NodeActionType, node: J.NodeInfo, appState: AppState): boolean {

@@ -49,8 +49,8 @@ export class MenuItem extends Div {
         let state = this.getState();
         if (!state.enabled) return;
 
-        if (S.meta64.mainMenu) {
-            S.meta64.mainMenu.close();
+        if (S.quanta.mainMenu) {
+            S.quanta.mainMenu.close();
         }
         this.clickFunc();
     }

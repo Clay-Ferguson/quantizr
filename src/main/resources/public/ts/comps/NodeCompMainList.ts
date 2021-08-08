@@ -37,7 +37,7 @@ export class NodeCompMainList extends Div {
             this.addPaginationButtons(children, state.endReached, "marginTop marginBottom", state, false);
         }
 
-        // children.push(new HelpButton(S.meta64?.config?.help?.gettingStarted));
+        // children.push(new HelpButton(S.quanta?.config?.help?.gettingStarted));
         this.setChildren(children);
     }
 
@@ -82,7 +82,7 @@ export class NodeCompMainList extends Div {
                          and these conditions will always apply about controll if we want to grow page or not. */
 
                         let state = store.getState();
-                        if (!state.editNode && S.meta64.allowGrowPage === 0) {
+                        if (!state.editNode && S.quanta.allowGrowPage === 0) {
                             entries.forEach((entry: any) => {
                                 if (entry.isIntersecting) {
                                     // observer.disconnect();

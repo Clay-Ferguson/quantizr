@@ -51,7 +51,7 @@ export class TabPanelButtons extends Div {
             onClick: (event) => {
                 event.stopPropagation();
                 event.preventDefault();
-                S.meta64.selectTab(data.id);
+                S.quanta.selectTab(data.id);
             }
         }, [
             new Anchor("#" + data.id, data.name, {

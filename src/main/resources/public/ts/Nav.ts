@@ -46,7 +46,7 @@ export class Nav implements NavIntf {
     displayingRepositoryRoot = (state: AppState): boolean => {
         if (!state.node) return false;
         // one way to detect repository root (without path, since we don't send paths back to client) is as the only node that owns itself.
-        // console.log(S.util.prettyPrint(S.meta64.currentNodeData.node));
+        // console.log(S.util.prettyPrint(S.quanta.currentNodeData.node));
         return state.node.id === state.node.ownerId;
     }
 
@@ -75,7 +75,7 @@ export class Nav implements NavIntf {
     }
 
     navOpenSelectedNode = (state: AppState): void => {
-        const currentSelNode: J.NodeInfo = S.meta64.getHighlightedNode(state);
+        const currentSelNode: J.NodeInfo = S.quanta.getHighlightedNode(state);
         if (!currentSelNode) return;
         S.nav.openNodeById(null, currentSelNode.id, state);
     }
@@ -108,7 +108,7 @@ export class Nav implements NavIntf {
             },
             // fail callback
             (res: string) => {
-                S.meta64.clearLastNodeIds();
+                S.quanta.clearLastNodeIds();
                 this.navHome(state);
             });
     }
@@ -143,7 +143,7 @@ export class Nav implements NavIntf {
             // success callback
             (res: J.RenderNodeResponse) => {
                 if (processingDelete) {
-                    S.meta64.refresh(state);
+                    S.quanta.refresh(state);
                 }
                 else {
                     this.upLevelResponse(res, state.node.id, false, state);
@@ -151,7 +151,7 @@ export class Nav implements NavIntf {
             },
             // fail callback
             (res: string) => {
-                S.meta64.clearLastNodeIds();
+                S.quanta.clearLastNodeIds();
                 this.navHome(state);
             }
         );
@@ -161,7 +161,7 @@ export class Nav implements NavIntf {
      * turn of row selection DOM element of whatever row is currently selected
      */
     getSelectedDomElement = (state: AppState): HTMLElement => {
-        var currentSelNode = S.meta64.getHighlightedNode(state);
+        var currentSelNode = S.quanta.getHighlightedNode(state);
         if (currentSelNode) {
             /* get node by node identifier */
             const node: J.NodeInfo = state.idToNodeMap.get(currentSelNode.id);
@@ -188,7 +188,7 @@ export class Nav implements NavIntf {
             state = appState(state);
 
             /* First check if this node is already highlighted and if so just return */
-            const hltNode = S.meta64.getHighlightedNode();
+            const hltNode = S.quanta.getHighlightedNode();
             if (hltNode && hltNode.id === id) {
                 resolve();
                 return;
@@ -204,12 +204,12 @@ export class Nav implements NavIntf {
             /*
              * sets which node is selected on this page (i.e. parent node of this page being the 'key')
              */
-            S.meta64.highlightNode(node, false, state);
+            S.quanta.highlightNode(node, false, state);
 
             // todo-1: without this timeout checkboxes on main tab don't work reliably. Need their state stored in global state to fix it
             // in a good way.
             setTimeout(() => {
-                S.meta64.tempDisableAutoScroll();
+                S.quanta.tempDisableAutoScroll();
                 dispatch("Action_FastRefresh", (s: AppState): AppState => {
                     return s;
                 });
@@ -237,7 +237,7 @@ export class Nav implements NavIntf {
         },
             // fail callback
             (res: string) => {
-                S.meta64.clearLastNodeIds();
+                S.quanta.clearLastNodeIds();
                 this.navHome(state);
             });
     }
@@ -246,7 +246,7 @@ export class Nav implements NavIntf {
         id = S.util.allowIdFromEvent(evt, id);
         state = appState(state);
         const node: J.NodeInfo = state.idToNodeMap.get(id);
-        S.meta64.highlightNode(node, false, state);
+        S.quanta.highlightNode(node, false, state);
 
         if (!node) {
             S.util.showMessage("Unknown nodeId in openNodeByUid: " + id, "Warning");
@@ -266,9 +266,9 @@ export class Nav implements NavIntf {
     }
 
     navPageNodeResponse = (res: J.RenderNodeResponse, state: AppState): void => {
-        S.meta64.clearSelNodes(state);
+        S.quanta.clearSelNodes(state);
         S.render.renderPageFromData(res, true, null, true, true);
-        S.meta64.selectTab(C.TAB_MAIN);
+        S.quanta.selectTab(C.TAB_MAIN);
     }
 
     geoLocation = (state: AppState): void => {
@@ -299,8 +299,8 @@ export class Nav implements NavIntf {
     }
 
     showMainMenu = (state: AppState): void => {
-        S.meta64.mainMenu = new MainMenuDlg();
-        S.meta64.mainMenu.open();
+        S.quanta.mainMenu = new MainMenuDlg();
+        S.quanta.mainMenu.open();
     }
 
     navHome = (state: AppState = null): void => {
@@ -309,7 +309,7 @@ export class Nav implements NavIntf {
 
         // console.log("navHome()");
         if (state.isAnonUser) {
-            S.meta64.loadAnonPageHome(null);
+            S.quanta.loadAnonPageHome(null);
         } else {
             // console.log("renderNode (navHome): " + state.homeNodeId);
             S.util.ajax<J.RenderNodeRequest, J.RenderNodeResponse>("renderNode", {
@@ -324,7 +324,7 @@ export class Nav implements NavIntf {
             }, (res) => { this.navPageNodeResponse(res, state); },
                 // fail callback
                 (res: string) => {
-                    S.meta64.clearLastNodeIds();
+                    S.quanta.clearLastNodeIds();
 
                     // NOPE! This would be recursive!
                     // this.navHome(state);
@@ -333,7 +333,7 @@ export class Nav implements NavIntf {
     }
 
     navPublicHome = (state: AppState): void => {
-        S.meta64.loadAnonPageHome(null);
+        S.quanta.loadAnonPageHome(null);
     }
 
     runSearch = (): void => {
@@ -425,8 +425,8 @@ export class Nav implements NavIntf {
     messages = (props: Object): void => {
         dispatch("Action_SelectTab", (s: AppState): AppState => {
             s.guiReady = true;
-            S.meta64.tabChanging(s.activeTab, C.TAB_FEED, s);
-            s.activeTab = S.meta64.activeTab = C.TAB_FEED;
+            S.quanta.tabChanging(s.activeTab, C.TAB_FEED, s);
+            s.activeTab = S.quanta.activeTab = C.TAB_FEED;
             s = { ...s, ...props };
             return s;
         });

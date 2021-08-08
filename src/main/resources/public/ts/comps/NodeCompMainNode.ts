@@ -44,7 +44,7 @@ export class NodeCompMainNode extends Div {
             this.setChildren([EditNodeDlg.embedInstance || new EditNodeDlg(state.editNode, state.editEncrypt, state.editShowJumpButton, state, DialogMode.EMBED)]);
         }
         else {
-            let focusNode: J.NodeInfo = S.meta64.getHighlightedNode(state);
+            let focusNode: J.NodeInfo = S.quanta.getHighlightedNode(state);
             let selected: boolean = (focusNode && focusNode.id === node.id);
             this.attribs.className = "mainNodeContentStyle " + (selected ? "active-row-main" : "inactive-row-main");
 
@@ -52,7 +52,7 @@ export class NodeCompMainNode extends Div {
                 S.render.fadeInId = null;
                 S.render.allowFadeInId = false;
                 this.attribs.className += " fadeInRowBkgClz";
-                S.meta64.fadeStartTime = new Date().getTime();
+                S.quanta.fadeStartTime = new Date().getTime();
             }
 
             this.attribs.nid = node.id;

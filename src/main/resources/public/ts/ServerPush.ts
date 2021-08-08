@@ -43,9 +43,9 @@ export class ServerPush implements ServerPushIntf {
 
         this.eventSource.addEventListener("sessionTimeout", function (e: any) {
             // console.log("event: sessionTimeout.");
-            S.meta64.authToken = null;
-            S.meta64.userName = null;
-            if (S.meta64.loggingOut) return;
+            S.quanta.authToken = null;
+            S.quanta.userName = null;
+            if (S.quanta.loggingOut) return;
 
             // this might work ok, but for now, let's just force a page repload
             let state = store.getState();
@@ -105,7 +105,7 @@ export class ServerPush implements ServerPushIntf {
 
                         // scan for any nodes in feedResults where nodeInfo.parent.id is found in the list nodeInfo.id, and
                         // then remove the nodeInfo.id from the list becasue it would be redundant in the list.
-                        // s.feedResults = S.meta64.removeRedundantFeedItems(s.feedResults);
+                        // s.feedResults = S.quanta.removeRedundantFeedItems(s.feedResults);
                     }
                     else {
                         /* note: we could que up the incomming nodeInfo, and then avoid a call to the server but for now we just
@@ -118,8 +118,8 @@ export class ServerPush implements ServerPushIntf {
                         /* if the reciept of this server push makes us have new knowledge that one of our nodes
                         that didn't have children before now has children then update the state to have 'hasChildren'
                         on this node so the 'open' button will appear */
-                        S.meta64.showOpenButtonOnNode(nodeInfo, s);
-                        S.meta64.showSystemNotification("New Message", "From " + nodeInfo.owner + ": " + nodeInfo.content);
+                        S.quanta.showOpenButtonOnNode(nodeInfo, s);
+                        S.quanta.showSystemNotification("New Message", "From " + nodeInfo.owner + ": " + nodeInfo.content);
                     }
                     return s;
                 });

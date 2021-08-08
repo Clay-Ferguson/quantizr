@@ -94,7 +94,7 @@ export class EditNodeDlg extends DialogBase {
             EditNodeDlg.embedInstance = this;
 
             // whenever we're rendering because an edit we disable any infinite scrolling logic for this render.
-            S.meta64.tempDisableAutoScroll();
+            S.quanta.tempDisableAutoScroll();
         }
         this.mergeState({
             node,
@@ -648,7 +648,7 @@ export class EditNodeDlg extends DialogBase {
             allowShare ? new Button("Share", this.share) : null,
 
             // show delete button only if we're in a fullscreen viewer (like Calendar view)
-            S.meta64.fullscreenViewerActive(this.appState)
+            S.quanta.fullscreenViewerActive(this.appState)
                 ? new Button("Delete", () => {
                     S.edit.deleteSelNodes(null, state.node.id);
                     this.close();
@@ -692,8 +692,8 @@ export class EditNodeDlg extends DialogBase {
             EditNodeDlg.embedInstance = null;
             dispatch("Action_endEditing", (s: AppState): AppState => {
                 s.editNode = null;
-                S.meta64.newNodeTargetId = null;
-                S.meta64.newNodeTargetOffset = -1;
+                S.quanta.newNodeTargetId = null;
+                S.quanta.newNodeTargetOffset = -1;
                 s.editShowJumpButton = false;
                 s.editEncrypt = false;
                 return s;
@@ -983,7 +983,7 @@ export class EditNodeDlg extends DialogBase {
             node: state.node
         }, (res) => {
             S.render.fadeInId = state.node.id;
-            S.meta64.tempDisableAutoScroll();
+            S.quanta.tempDisableAutoScroll();
 
             S.edit.saveNodeResponse(state.node, res, true, this.appState);
 
@@ -994,7 +994,7 @@ export class EditNodeDlg extends DialogBase {
             // if we just saved a bookmark, reload bookmarks menu
             if ((state.node as J.NodeInfo).type === J.NodeType.BOOKMARK) {
                 setTimeout(() => {
-                    S.meta64.loadBookmarks();
+                    S.quanta.loadBookmarks();
                 }, 1000);
             }
         });
@@ -1212,7 +1212,7 @@ export class EditNodeDlg extends DialogBase {
         this.getState().node.properties = this.initialProps;
 
         if (this.binaryDirty) {
-            S.meta64.refresh(this.appState);
+            S.quanta.refresh(this.appState);
         }
     }
 }

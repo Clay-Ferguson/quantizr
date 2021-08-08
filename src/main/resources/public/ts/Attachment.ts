@@ -19,7 +19,7 @@ export class Attachment implements AttachmentIntf {
 
     openUploadFromFileDlg = (toIpfs: boolean, node: J.NodeInfo, autoAddFile: File, state: AppState): void => {
         if (node == null) {
-            node = S.meta64.getHighlightedNode(state);
+            node = S.quanta.getHighlightedNode(state);
         }
         if (!node) {
             S.util.showMessage("No node is selected.", "Warning");
@@ -28,7 +28,7 @@ export class Attachment implements AttachmentIntf {
 
         const dlg = new UploadFromFileDropzoneDlg(node.id, "", toIpfs, autoAddFile, false, true, state, () => {
             S.view.jumpToId(node.id);
-            // S.meta64.refresh(state);
+            // S.quanta.refresh(state);
         });
         dlg.open();
 
@@ -40,7 +40,7 @@ export class Attachment implements AttachmentIntf {
 
     openUploadFromUrlDlg = (nodeId: string, defaultUrl: string, onUploadFunc: Function, state: AppState): void => {
         if (!nodeId) {
-            let node = S.meta64.getHighlightedNode(state);
+            let node = S.quanta.getHighlightedNode(state);
             if (!node) {
                 S.util.showMessage("No node is selected.", "Warning");
                 return;
@@ -54,7 +54,7 @@ export class Attachment implements AttachmentIntf {
 
     openUploadFromIPFSDlg = (nodeId: string, defaultCid: string, onUploadFunc: Function, state: AppState): void => {
         if (!nodeId) {
-            let node = S.meta64.getHighlightedNode(state);
+            let node = S.quanta.getHighlightedNode(state);
             if (!node) {
                 S.util.showMessage("No node is selected.", "Warning");
                 return;
@@ -68,7 +68,7 @@ export class Attachment implements AttachmentIntf {
 
     deleteAttachment = async (node: J.NodeInfo, state: AppState): Promise<boolean> => {
         let deleted = false;
-        node = node || S.meta64.getHighlightedNode(state);
+        node = node || S.quanta.getHighlightedNode(state);
         let delPromise: Promise<any> = null;
         if (node) {
             const dlg = new ConfirmDlg("Delete the Attachment on the Node?", "Confirm", //

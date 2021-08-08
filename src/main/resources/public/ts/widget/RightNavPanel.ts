@@ -49,7 +49,7 @@ export class RightNavPanel extends Div {
         let displayName = state.displayName ? state.displayName : state.title;
 
         let allowEditMode = state.node && !state.isAnonUser;
-        let fullScreenViewer = S.meta64.fullscreenViewerActive(state);
+        let fullScreenViewer = S.quanta.fullscreenViewerActive(state);
 
         let editButton = (allowEditMode && !fullScreenViewer) ? new IconButton("fa-pencil", null, {
             onClick: e => { S.edit.toggleEditMode(state); },

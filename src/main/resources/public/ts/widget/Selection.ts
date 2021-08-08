@@ -35,7 +35,7 @@ export class Selection extends Comp {
             let state = store.getState();
             if (state.mouseEffect) {
                 const { top, left } = evt.target.getBoundingClientRect();
-                S.meta64.runClickAnimation(left + evt.target.offsetWidth / 2, top + evt.target.offsetHeight / 2);
+                S.quanta.runClickAnimation(left + evt.target.offsetWidth / 2, top + evt.target.offsetHeight / 2);
             }
 
             this.updateValFunc(evt.target.value);

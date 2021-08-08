@@ -7,7 +7,7 @@ import { ChangePasswordDlg } from "./dlg/ChangePasswordDlg";
 import { MainMenuDlg } from "./dlg/MainMenuDlg";
 import { FollowersRSInfo } from "./FollowersRSInfo";
 import { FollowingRSInfo } from "./FollowingRSInfo";
-import { Meta64Intf } from "./intf/Meta64Intf";
+import { QuantaIntf } from "./intf/QuantaIntf";
 import { TabDataIntf } from "./intf/TabDataIntf";
 import * as J from "./JavaIntf";
 import { Log } from "./Log";
@@ -36,7 +36,7 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (s: Singletons) => {
     S = s;
 });
 
-export class Meta64 implements Meta64Intf {
+export class Quanta implements QuantaIntf {
     config: any;
     mainMenu: MainMenuDlg;
     hiddenRenderingEnabled: boolean = true;
@@ -102,13 +102,13 @@ export class Meta64 implements Meta64Intf {
        */
     tempDisableAutoScroll = (): void => {
         // inc ref counter
-        S.meta64.allowGrowPage++;
+        S.quanta.allowGrowPage++;
 
         // wait a full 5 seconds before we allow the "more" button to ever
         // trigger any autoscrolling again.
         setTimeout(() => {
             // dec ref counter
-            S.meta64.allowGrowPage--;
+            S.quanta.allowGrowPage--;
         }, 3000);
     }
 
@@ -149,7 +149,7 @@ export class Meta64 implements Meta64Intf {
             else {
                 s.guiReady = true;
                 this.tabChanging(s.activeTab, tabName, s);
-                s.activeTab = S.meta64.activeTab = tabName;
+                s.activeTab = S.quanta.activeTab = tabName;
             }
             return s;
         });
@@ -167,7 +167,7 @@ export class Meta64 implements Meta64Intf {
         }
         else {
             this.tabChanging(state.activeTab, tabName, state);
-            state.activeTab = S.meta64.activeTab = tabName;
+            state.activeTab = S.quanta.activeTab = tabName;
         }
     }
 
@@ -266,7 +266,7 @@ export class Meta64 implements Meta64Intf {
     getHighlightedNode = (state: AppState = null): J.NodeInfo => {
         state = appState(state);
         if (!state.node) return null;
-        const id: string = S.meta64.parentIdToFocusNodeMap.get(state.node.id);
+        const id: string = S.quanta.parentIdToFocusNodeMap.get(state.node.id);
         if (id) {
             return state.idToNodeMap.get(id);
         }
@@ -306,7 +306,7 @@ export class Meta64 implements Meta64Intf {
         if (!state.isAnonUser) {
             S.util.updateHistory(state.node, node, state);
         }
-        S.meta64.parentIdToFocusNodeMap.set(state.node.id, node.id);
+        S.quanta.parentIdToFocusNodeMap.set(state.node.id, node.id);
 
         if (scroll) {
             S.view.scrollToSelectedNode(state);
@@ -471,7 +471,7 @@ export class Meta64 implements Meta64Intf {
                         this.ctrlKeyTime = new Date().getTime();
                         break;
                     case "Escape":
-                        if (S.meta64.fullscreenViewerActive(state)) {
+                        if (S.quanta.fullscreenViewerActive(state)) {
                             S.nav.closeFullScreenViewer(state);
                         }
 
@@ -588,7 +588,7 @@ export class Meta64 implements Meta64Intf {
             },
                 (res: J.GetConfigResponse): void => {
                     if (res.config) {
-                        S.meta64.config = res.config;
+                        S.quanta.config = res.config;
                     }
                 });
 
@@ -842,10 +842,10 @@ export class Meta64 implements Meta64Intf {
     keyDebounce = () => {
         const now = S.util.currentTimeMillis();
         // allow one operation every quarter second.
-        if (Meta64.lastKeyDownTime > 0 && now - Meta64.lastKeyDownTime < 250) {
+        if (Quanta.lastKeyDownTime > 0 && now - Quanta.lastKeyDownTime < 250) {
             return true;
         }
-        Meta64.lastKeyDownTime = now;
+        Quanta.lastKeyDownTime = now;
         return false;
     }
 
@@ -859,15 +859,15 @@ export class Meta64 implements Meta64Intf {
     static overlayCounter: number = 1; // this starting value is important.
     setOverlay = (showOverlay: boolean) => {
 
-        Meta64.overlayCounter += showOverlay ? 1 : -1;
+        Quanta.overlayCounter += showOverlay ? 1 : -1;
         // Log.log("overlayCounter=" + Meta64.overlayCounter);
 
         /* if overlayCounter goes negative, that's a mismatch */
-        if (Meta64.overlayCounter < 0) {
+        if (Quanta.overlayCounter < 0) {
             throw new Error("Overlay calls are mismatched");
         }
 
-        if (Meta64.overlayCounter === 1) {
+        if (Quanta.overlayCounter === 1) {
 
             /* Whenever we are about to show the overlay always give the app 0.7 seconds before showing the overlay in case
             the app did something real fast and the display of the overlay would have just been a wasted annoyance (visually)
@@ -875,7 +875,7 @@ export class Meta64 implements Meta64Intf {
             */
             setTimeout(() => {
                 // after the timer we check for the counter still being greater than zero (not an ==1 this time).
-                if (Meta64.overlayCounter > 0) {
+                if (Quanta.overlayCounter > 0) {
                     // Log.log("showing overlay.");
                     const elm = S.util.domElm("overlayDiv");
                     if (elm) {
@@ -885,7 +885,7 @@ export class Meta64 implements Meta64Intf {
                 }
             }, 1200);
         }
-        else if (Meta64.overlayCounter === 0) {
+        else if (Quanta.overlayCounter === 0) {
             // Log.log("hiding overlay.");
             const elm = S.util.domElm("overlayDiv");
             if (elm) {
@@ -935,7 +935,7 @@ export class Meta64 implements Meta64Intf {
     setUserPreferences = (state: AppState, flag: boolean) => {
         if (flag !== state.userPreferences.editMode) {
             state.userPreferences.editMode = flag;
-            S.meta64.saveUserPreferences(state);
+            S.quanta.saveUserPreferences(state);
         }
     }
 

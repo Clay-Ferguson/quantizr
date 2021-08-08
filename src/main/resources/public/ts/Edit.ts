@@ -37,7 +37,7 @@ export class Edit implements EditIntf {
     }
 
     openImportDlg = (state: AppState): void => {
-        const node: J.NodeInfo = S.meta64.getHighlightedNode(state);
+        const node: J.NodeInfo = S.quanta.getHighlightedNode(state);
         if (!node) {
             S.util.showMessage("No node is selected.", "Warning");
             return;
@@ -45,13 +45,13 @@ export class Edit implements EditIntf {
 
         const dlg = new UploadFromFileDropzoneDlg(node.id, "", false, null, true, true, state, () => {
             S.view.jumpToId(node.id);
-            // S.meta64.refresh(state);
+            // S.quanta.refresh(state);
         });
         dlg.open();
     }
 
     openExportDlg = (state: AppState): void => {
-        let node = S.meta64.getHighlightedNode(state);
+        let node = S.quanta.getHighlightedNode(state);
         if (node) {
             new ExportDlg(state, node).open();
         }
@@ -67,7 +67,7 @@ export class Edit implements EditIntf {
     private joinNodesResponse = (res: J.JoinNodesResponse, state: AppState): void => {
         state = appState(state);
         if (S.util.checkSuccess("Join node", res)) {
-            S.meta64.clearSelNodes(state);
+            S.quanta.clearSelNodes(state);
             S.view.refreshTree(state.node.id, false, false, null, false, true, true, state);
         }
     }
@@ -80,17 +80,17 @@ export class Edit implements EditIntf {
             do need even when edit mode is technically off */
             const editingAllowed = /* state.userPreferences.editMode && */ this.isEditAllowed(node, state);
             if (editingAllowed) {
-                S.meta64.tempDisableAutoScroll();
+                S.quanta.tempDisableAutoScroll();
 
                 /* Either run the node editor as a popup or embedded, depending on whether we have a fullscreen
                 calendar up and wether we're on the main tab, etc */
                 if (state.mobileMode ||
                     // node not found on tree.
-                    (!S.meta64.getDisplayingNode(state, res.nodeInfo.id) &&
-                        !S.meta64.getDisplayingNode(state, S.meta64.newNodeTargetId)) ||
+                    (!S.quanta.getDisplayingNode(state, res.nodeInfo.id) &&
+                        !S.quanta.getDisplayingNode(state, S.quanta.newNodeTargetId)) ||
                     // not currently viewing tree
-                    S.meta64.activeTab !== C.TAB_MAIN ||
-                    S.meta64.fullscreenViewerActive(state)) {
+                    S.quanta.activeTab !== C.TAB_MAIN ||
+                    S.quanta.fullscreenViewerActive(state)) {
                     const dlg = new EditNodeDlg(res.nodeInfo, encrypt, showJumpButton, state);
                     dlg.open();
                 } else {
@@ -115,7 +115,7 @@ export class Edit implements EditIntf {
                 return s;
             });
 
-            S.meta64.tempDisableAutoScroll();
+            S.quanta.tempDisableAutoScroll();
             // S.view.refreshTree(null, false, false, nodeId, false, true, true, state);
             S.view.jumpToId(nodeId);
         }
@@ -192,7 +192,7 @@ export class Edit implements EditIntf {
             return;
         }
 
-        if (S.meta64.ctrlKeyCheck()) {
+        if (S.quanta.ctrlKeyCheck()) {
             new ConfirmDlg("Paste your clipboard content into a new node?", "Create from Clipboard", //
                 async () => {
                     let clipboardText = await (navigator as any).clipboard.readText();
@@ -205,8 +205,8 @@ export class Edit implements EditIntf {
                             typeName: typeName || "u",
                             initialValue: clipboardText
                         }, (res) => {
-                            S.meta64.tempDisableAutoScroll();
-                            S.meta64.refresh(state);
+                            S.quanta.tempDisableAutoScroll();
+                            S.quanta.refresh(state);
                         });
                     } else {
                         S.util.ajax<J.CreateSubNodeRequest, J.CreateSubNodeResponse>("createSubNode", {
@@ -219,8 +219,8 @@ export class Edit implements EditIntf {
                             typeLock: false,
                             properties: null
                         }, (res) => {
-                            S.meta64.tempDisableAutoScroll();
-                            S.meta64.refresh(state);
+                            S.quanta.tempDisableAutoScroll();
+                            S.quanta.refresh(state);
                         });
                     }
                 }, null, null, null, state
@@ -255,21 +255,21 @@ export class Edit implements EditIntf {
 
     insertNodeResponse = (res: J.InsertNodeResponse, state: AppState): void => {
         if (S.util.checkSuccess("Insert node", res)) {
-            S.meta64.tempDisableAutoScroll();
-            S.meta64.updateNodeMap(res.newNode, state);
-            S.meta64.highlightNode(res.newNode, false, state);
+            S.quanta.tempDisableAutoScroll();
+            S.quanta.updateNodeMap(res.newNode, state);
+            S.quanta.highlightNode(res.newNode, false, state);
             this.runEditNode(null, res.newNode.id, false, false, state);
         }
     }
 
     createSubNodeResponse = (res: J.CreateSubNodeResponse, state: AppState): void => {
         if (S.util.checkSuccess("Create subnode", res)) {
-            S.meta64.tempDisableAutoScroll();
+            S.quanta.tempDisableAutoScroll();
             if (!res.newNode) {
-                S.meta64.refresh(state);
+                S.quanta.refresh(state);
             }
             else {
-                S.meta64.updateNodeMap(res.newNode, state);
+                S.quanta.updateNodeMap(res.newNode, state);
                 this.runEditNode(null, res.newNode.id, res.encrypt, false, state);
             }
         }
@@ -280,7 +280,7 @@ export class Edit implements EditIntf {
             await this.distributeKeys(node, res.aclEntries);
 
             // find and update the history item if it exists.
-            let histItem: NodeHistoryItem = S.meta64.nodeHistory.find(function (h: NodeHistoryItem) {
+            let histItem: NodeHistoryItem = S.quanta.nodeHistory.find(function (h: NodeHistoryItem) {
                 return h.id === node.id;
             });
             if (histItem) {
@@ -301,7 +301,7 @@ export class Edit implements EditIntf {
             }
 
             // if 'node.id' is not being displayed on the page we need to jump to it from scratch
-            if (!S.meta64.getDisplayingNode(state, node.id)) {
+            if (!S.quanta.getDisplayingNode(state, node.id)) {
                 S.view.jumpToId(node.id);
             }
             // otherwise we just pull down the new node data and replace it into our 'state.node.children' (or page root) and we're done.
@@ -367,12 +367,12 @@ export class Edit implements EditIntf {
 
     setRssHeadlinesOnly = async (state: AppState, val: boolean): Promise<void> => {
         state.userPreferences.rssHeadlinesOnly = val;
-        S.meta64.saveUserPreferences(state);
+        S.quanta.saveUserPreferences(state);
     }
 
     toggleEditMode = async (state: AppState): Promise<void> => {
         state.userPreferences.editMode = !state.userPreferences.editMode;
-        S.meta64.saveUserPreferences(state);
+        S.quanta.saveUserPreferences(state);
 
         /* scrolling is required because nodes will have scrolled out of view by the page just now updating */
         S.view.scrollToSelectedNode(state);
@@ -380,7 +380,7 @@ export class Edit implements EditIntf {
 
     toggleShowMetaData = async (state: AppState): Promise<void> => {
         state.userPreferences.showMetaData = !state.userPreferences.showMetaData;
-        S.meta64.saveUserPreferences(state);
+        S.quanta.saveUserPreferences(state);
 
         /* scrolling is required because nodes will have scrolled out of view by the page just now updating */
         S.view.scrollToSelectedNode(state);
@@ -390,7 +390,7 @@ export class Edit implements EditIntf {
         id = S.util.allowIdFromEvent(evt, id);
         state = appState(state);
         if (!id) {
-            const selNode: J.NodeInfo = S.meta64.getHighlightedNode(state);
+            const selNode: J.NodeInfo = S.quanta.getHighlightedNode(state);
             id = selNode.id;
         }
 
@@ -407,7 +407,7 @@ export class Edit implements EditIntf {
         id = S.util.allowIdFromEvent(evt, id);
         state = appState(state);
         if (!id) {
-            const selNode: J.NodeInfo = S.meta64.getHighlightedNode(state);
+            const selNode: J.NodeInfo = S.quanta.getHighlightedNode(state);
             id = selNode.id;
         }
 
@@ -423,7 +423,7 @@ export class Edit implements EditIntf {
     moveNodeToTop = (id: string = null, state: AppState = null): void => {
         state = appState(state);
         if (!id) {
-            const selNode: J.NodeInfo = S.meta64.getHighlightedNode(state);
+            const selNode: J.NodeInfo = S.quanta.getHighlightedNode(state);
             id = selNode.id;
         }
         const node: J.NodeInfo = state.idToNodeMap.get(id);
@@ -438,7 +438,7 @@ export class Edit implements EditIntf {
     moveNodeToBottom = (id: string = null, state: AppState = null): void => {
         state = appState(state);
         if (!id) {
-            const selNode: J.NodeInfo = S.meta64.getHighlightedNode(state);
+            const selNode: J.NodeInfo = S.quanta.getHighlightedNode(state);
             id = selNode.id;
         }
         const node: J.NodeInfo = state.idToNodeMap.get(id);
@@ -468,7 +468,7 @@ export class Edit implements EditIntf {
         // we set noScrollToId just to block the future attempt (one time) to
         // scroll to this, because this is a hint telling us we are ALREADY
         // scrolled to this ID so any scrolling will be unnecessary
-        S.meta64.noScrollToId = id;
+        S.quanta.noScrollToId = id;
         this.runEditNode(null, id, false, false, state);
     }
 
@@ -478,7 +478,7 @@ export class Edit implements EditIntf {
 
         state = appState(state);
         if (!id) {
-            let node = S.meta64.getHighlightedNode(state);
+            let node = S.quanta.getHighlightedNode(state);
             if (node) {
                 id = node.id;
             }
@@ -511,14 +511,14 @@ export class Edit implements EditIntf {
          */
         let node: J.NodeInfo = null;
         if (!id) {
-            node = S.meta64.getHighlightedNode(state);
+            node = S.quanta.getHighlightedNode(state);
         } else {
             node = state.idToNodeMap.get(id);
         }
 
         if (node) {
-            S.meta64.newNodeTargetId = id;
-            S.meta64.newNodeTargetOffset = ordinalOffset;
+            S.quanta.newNodeTargetId = id;
+            S.quanta.newNodeTargetOffset = ordinalOffset;
             this.startEditingNewNode(typeName, false, state.node, node, ordinalOffset, state);
         }
     }
@@ -526,7 +526,7 @@ export class Edit implements EditIntf {
     newSubNode = (evt: Event, id: string) => {
         id = S.util.allowIdFromEvent(evt, id);
         const state = store.getState();
-        if (S.meta64.ctrlKeyCheck()) {
+        if (S.quanta.ctrlKeyCheck()) {
             new ConfirmDlg("Paste your clipboard content into a new node?", "Create from Clipboard", //
                 async () => {
                     // todo-2: document this feature under 'tips and tricks' in the user guide.
@@ -546,7 +546,7 @@ export class Edit implements EditIntf {
          * node if there is a selected node.
          */
         if (!id) {
-            const node: J.NodeInfo = S.meta64.getHighlightedNode(state);
+            const node: J.NodeInfo = S.quanta.getHighlightedNode(state);
             if (node) {
                 parentNode = node;
             }
@@ -566,16 +566,16 @@ export class Edit implements EditIntf {
     }
 
     selectAllNodes = async (state: AppState): Promise<void> => {
-        const highlightNode = S.meta64.getHighlightedNode(state);
+        const highlightNode = S.quanta.getHighlightedNode(state);
         S.util.ajax<J.SelectAllNodesRequest, J.SelectAllNodesResponse>("selectAllNodes", {
             parentNodeId: highlightNode.id
         }, async (res: J.SelectAllNodesResponse) => {
-            S.meta64.selectAllNodes(res.nodeIds);
+            S.quanta.selectAllNodes(res.nodeIds);
         });
     }
 
     clearInbox = (state: AppState): void => {
-        S.meta64.clearSelNodes(state);
+        S.quanta.clearSelNodes(state);
 
         new ConfirmDlg("Permanently delete the nodes in your Inbox", "Cleaer Inbox",
             () => {
@@ -592,7 +592,7 @@ export class Edit implements EditIntf {
     joinNodes = (state?: AppState): void => {
         state = appState(state);
 
-        const selNodesArray = S.meta64.getSelNodeIdsArray(state);
+        const selNodesArray = S.quanta.getSelNodeIdsArray(state);
         if (!selNodesArray || selNodesArray.length === 0) {
             S.util.showMessage("Select some nodes to join.", "Warning");
             return;
@@ -626,7 +626,7 @@ export class Edit implements EditIntf {
             // we can let that change to 'state' get discarded in the next dispatch
             S.nav.setNodeSel(true, id, state);
         }
-        const selNodesArray = S.meta64.getSelNodeIdsArray(state);
+        const selNodesArray = S.quanta.getSelNodeIdsArray(state);
 
         if (!selNodesArray || selNodesArray.length === 0) {
             S.util.showMessage("Select some nodes to delete.", "Warning");
@@ -650,7 +650,7 @@ export class Edit implements EditIntf {
                     nodeIds: selNodesArray,
                     childrenOnly: false
                 }, (res: J.DeleteNodesResponse) => {
-                    S.meta64.tempDisableAutoScroll();
+                    S.quanta.tempDisableAutoScroll();
                     this.removeNodesFromHistory(selNodesArray, state);
                     this.removeNodesFromCalendarData(selNodesArray, state);
 
@@ -675,7 +675,7 @@ export class Edit implements EditIntf {
                      we just deleted some. This could be slightly improved to KNOW if we deleted any bookmarks, but
                     the added complexity to achieve that for recursive tree deletes doesn't pay off */
                     setTimeout(() => {
-                        S.meta64.loadBookmarks();
+                        S.quanta.loadBookmarks();
                     }, 1000);
                 });
             },
@@ -688,12 +688,12 @@ export class Edit implements EditIntf {
         if (!selNodesArray) return;
         selNodesArray.forEach((id: string) => {
             // remove any top level history item that matches 'id'
-            S.meta64.nodeHistory = S.meta64.nodeHistory.filter(function (h: NodeHistoryItem) {
+            S.quanta.nodeHistory = S.quanta.nodeHistory.filter(function (h: NodeHistoryItem) {
                 return h.id !== id;
             });
 
             // scan all top level history items, and remove 'id' from any subItems
-            S.meta64.nodeHistory.forEach(function (h: NodeHistoryItem) {
+            S.quanta.nodeHistory.forEach(function (h: NodeHistoryItem) {
                 if (h.subItems) {
                     h.subItems = h.subItems.filter(function (hi: NodeHistoryItem) {
                         return hi.id !== id;
@@ -728,7 +728,7 @@ export class Edit implements EditIntf {
 
         dispatch("Action_SetNodesToMove", (s: AppState): AppState => {
             S.nav.setNodeSel(true, id, s);
-            let selNodesArray = S.meta64.getSelNodeIdsArray(s);
+            let selNodesArray = S.quanta.getSelNodeIdsArray(s);
             s.nodesToMove = selNodesArray;
             s.selectedNodes = {};
             return s;
@@ -773,7 +773,7 @@ export class Edit implements EditIntf {
             "Confirm",
             () => {
                 /* inserting under whatever node user has focused */
-                const node = S.meta64.getHighlightedNode(state);
+                const node = S.quanta.getHighlightedNode(state);
 
                 if (!node) {
                     S.util.showMessage("No node is selected.", "Warning");
@@ -832,7 +832,7 @@ export class Edit implements EditIntf {
 
     splitNode = (node: J.NodeInfo, splitType: string, delimiter: string, state: AppState): void => {
         if (!node) {
-            node = S.meta64.getHighlightedNode(state);
+            node = S.quanta.getHighlightedNode(state);
         }
 
         if (!node) {
@@ -951,12 +951,12 @@ export class Edit implements EditIntf {
 
     updateHeadings = (state: AppState): void => {
         state = appState(state);
-        const node: J.NodeInfo = S.meta64.getHighlightedNode(state);
+        const node: J.NodeInfo = S.quanta.getHighlightedNode(state);
         if (node) {
             S.util.ajax<J.UpdateHeadingsRequest, J.UpdateHeadingsResponse>("updateHeadings", {
                 nodeId: node.id
             }, (res) => {
-                S.meta64.refresh(state);
+                S.quanta.refresh(state);
             });
         }
     }

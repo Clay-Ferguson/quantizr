@@ -136,7 +136,7 @@ export class App extends Main {
                 // title: "Show Main Menu"
             }, "btn-secondary marginRight", "off");
 
-            let fullScreenViewer = S.meta64.fullscreenViewerActive(state);
+            let fullScreenViewer = S.quanta.fullscreenViewerActive(state);
 
             let prefsButton = !fullScreenViewer ? new IconButton("fa-certificate", "Meta", {
                 onClick: e => { S.edit.toggleShowMetaData(state); },
@@ -159,7 +159,7 @@ export class App extends Main {
 
             // let appName = new Span(g_brandingAppName + messagesSuffix, {
             //     className: "logo-text",
-            //     onClick: e => { S.meta64.loadAnonPageHome(null); },
+            //     onClick: e => { S.quanta.loadAnonPageHome(null); },
             //     title: "Go to Portal Home Node"
             // });
 

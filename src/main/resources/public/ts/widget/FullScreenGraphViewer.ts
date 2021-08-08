@@ -29,7 +29,7 @@ export class FullScreenGraphViewer extends Main {
         this.domPreUpdateEvent = this.domPreUpdateEvent.bind(this);
 
         this.nodeId = appState.fullScreenGraphId;
-        let node: J.NodeInfo = S.meta64.findNodeById(appState, this.nodeId);
+        let node: J.NodeInfo = S.quanta.findNodeById(appState, this.nodeId);
 
         if (!node) {
             console.log("Can't find nodeId " + this.nodeId);

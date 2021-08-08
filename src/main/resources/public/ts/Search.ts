@@ -40,7 +40,7 @@ export class Search implements SearchIntf {
             if (res.searchResults && res.searchResults.length > 0) {
                 dispatch("Action_RenderSearchResults", (s: AppState): AppState => {
                     S.util.focusId(C.TAB_SHARES);
-                    S.meta64.tabScrollTop(s, C.TAB_SHARES);
+                    S.quanta.tabScrollTop(s, C.TAB_SHARES);
                     let data = s.tabData.find(d => d.id === C.TAB_SHARES);
                     if (!data) return;
                     let info = data.rsInfo as SharesRSInfo;
@@ -53,7 +53,7 @@ export class Search implements SearchIntf {
                     info.accessOption = accessOption;
                     info.endReached = !res.searchResults || res.searchResults.length < J.ConstantInt.ROWS_PER_PAGE;
 
-                    S.meta64.selectTabStateOnly(data.id, s);
+                    S.quanta.selectTabStateOnly(data.id, s);
                     return s;
                 });
             }
@@ -67,7 +67,7 @@ export class Search implements SearchIntf {
         /* Note that for 'userSearchType' we do want node to be null, because we're not searching under a node but
         will be searching under the admin owned "All Users" node instead */
         if (!node && !userSearchType) {
-            node = S.meta64.getHighlightedNode(state);
+            node = S.quanta.getHighlightedNode(state);
         }
 
         S.util.ajax<J.NodeSearchRequest, J.NodeSearchResponse>("nodeSearch", {
@@ -92,7 +92,7 @@ export class Search implements SearchIntf {
 
                 dispatch("Action_RenderSearchResults", (s: AppState): AppState => {
                     S.util.focusId(C.TAB_SEARCH);
-                    S.meta64.tabScrollTop(s, C.TAB_SEARCH);
+                    S.quanta.tabScrollTop(s, C.TAB_SEARCH);
                     let data = s.tabData.find(d => d.id === C.TAB_SEARCH);
                     if (!data) return;
 
@@ -107,7 +107,7 @@ export class Search implements SearchIntf {
                     data.rsInfo.prop = prop;
                     data.rsInfo.endReached = !res.searchResults || res.searchResults.length < J.ConstantInt.ROWS_PER_PAGE;
 
-                    S.meta64.selectTabStateOnly(data.id, s);
+                    S.quanta.selectTabStateOnly(data.id, s);
                     return s;
                 });
             }
@@ -129,7 +129,7 @@ export class Search implements SearchIntf {
             singleNode: false
         }, (res) => S.nav.navPageNodeResponse(res, state), // fail callback
             (res: string) => {
-                S.meta64.clearLastNodeIds();
+                S.quanta.clearLastNodeIds();
                 S.nav.navHome(state);
             });
     }
@@ -141,7 +141,7 @@ export class Search implements SearchIntf {
         including when the page==0 because user is just jumping to beginning. Need a specific param for saying
         it's ok to reset node or not */
         if (!node) {
-            node = S.meta64.getHighlightedNode(state);
+            node = S.quanta.getHighlightedNode(state);
         }
 
         if (!node) {
@@ -164,7 +164,7 @@ export class Search implements SearchIntf {
         }, (res) => {
             dispatch("Action_RenderTimelineResults", (s: AppState): AppState => {
                 S.util.focusId(C.TAB_TIMELINE);
-                S.meta64.tabScrollTop(s, C.TAB_TIMELINE);
+                S.quanta.tabScrollTop(s, C.TAB_TIMELINE);
                 let data = s.tabData.find(d => d.id === C.TAB_TIMELINE);
                 if (!data) return;
                 let info = data.rsInfo as TimelineRSInfo;
@@ -177,7 +177,7 @@ export class Search implements SearchIntf {
                 info.endReached = !res.searchResults || res.searchResults.length < J.ConstantInt.ROWS_PER_PAGE;
                 info.page = page;
 
-                S.meta64.selectTabStateOnly(data.id, s);
+                S.quanta.selectTabStateOnly(data.id, s);
                 return s;
             });
         });
@@ -199,8 +199,8 @@ export class Search implements SearchIntf {
             searchText
         }, (res: J.NodeFeedResponse) => {
             dispatch("Action_RenderFeedResults", (s: AppState): AppState => {
-                S.meta64.openGraphComps = [];
-                // s.feedResults = S.meta64.removeRedundantFeedItems(res.searchResults || []);
+                S.quanta.openGraphComps = [];
+                // s.feedResults = S.quanta.removeRedundantFeedItems(res.searchResults || []);
 
                 // once user requests their stuff, turn off the new messages count indicator.
                 if (s.feedFilterToMe) {
@@ -236,7 +236,7 @@ export class Search implements SearchIntf {
                 s.feedWaitingForUserRefresh = false;
 
                 if (!growResults) {
-                    S.meta64.selectTabStateOnly(C.TAB_FEED, s);
+                    S.quanta.selectTabStateOnly(C.TAB_FEED, s);
                     setTimeout(() => {
                         S.view.scrollAllTop(s);
                     }, 1000);
@@ -273,7 +273,7 @@ export class Search implements SearchIntf {
             if (res.searchResults && res.searchResults.length > 0) {
                 dispatch("Action_RenderSearchResults", (s: AppState): AppState => {
                     S.util.focusId(C.TAB_FOLLOWERS);
-                    S.meta64.tabScrollTop(s, C.TAB_FOLLOWERS);
+                    S.quanta.tabScrollTop(s, C.TAB_FOLLOWERS);
                     let data = s.tabData.find(d => d.id === C.TAB_FOLLOWERS);
                     if (!data) return;
                     let info = data.rsInfo as FollowersRSInfo;
@@ -290,7 +290,7 @@ export class Search implements SearchIntf {
                     info.endReached = !res.searchResults || res.searchResults.length < J.ConstantInt.ROWS_PER_PAGE;
                     info.showingFollowersOfUser = userName;
 
-                    S.meta64.selectTabStateOnly(data.id, s);
+                    S.quanta.selectTabStateOnly(data.id, s);
                     return s;
                 });
             }
@@ -315,7 +315,7 @@ export class Search implements SearchIntf {
             if (res.searchResults && res.searchResults.length > 0) {
                 dispatch("Action_RenderSearchResults", (s: AppState): AppState => {
                     S.util.focusId(C.TAB_FOLLOWING);
-                    S.meta64.tabScrollTop(s, C.TAB_FOLLOWING);
+                    S.quanta.tabScrollTop(s, C.TAB_FOLLOWING);
                     let data = s.tabData.find(d => d.id === C.TAB_FOLLOWING);
                     if (!data) return;
                     let info = data.rsInfo as FollowingRSInfo;
@@ -332,7 +332,7 @@ export class Search implements SearchIntf {
                     info.endReached = !res.searchResults || res.searchResults.length < J.ConstantInt.ROWS_PER_PAGE;
                     info.showingFollowingOfUser = userName;
 
-                    S.meta64.selectTabStateOnly(data.id, s);
+                    S.quanta.selectTabStateOnly(data.id, s);
                     return s;
                 });
             }
@@ -364,7 +364,7 @@ export class Search implements SearchIntf {
             S.render.fadeInId = null;
             S.render.allowFadeInId = false;
             clazz += " fadeInRowBkgClz";
-            S.meta64.fadeStartTime = new Date().getTime();
+            S.quanta.fadeStartTime = new Date().getTime();
         }
 
         if (isParent) {

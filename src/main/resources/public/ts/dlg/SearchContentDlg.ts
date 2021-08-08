@@ -72,7 +72,7 @@ export class SearchContentDlg extends DialogBase {
                         }
                     })
                 ], "displayTable marginBottom"),
-                new HelpButton(() => S.meta64?.config?.help?.search?.dialog),
+                new HelpButton(() => S.quanta?.config?.help?.search?.dialog),
                 new ButtonBar([
                     new Button("Search", this.search, null, "btn-primary"),
                     new Button("Graph", this.graph, null, "btn-primary"),
@@ -92,7 +92,7 @@ export class SearchContentDlg extends DialogBase {
         }
 
         // until we have better validation
-        let node = S.meta64.getHighlightedNode(this.appState);
+        let node = S.quanta.getHighlightedNode(this.appState);
         if (!node) {
             S.util.showMessage("No node is selected to search under.", "Warning");
             return;
@@ -114,7 +114,7 @@ export class SearchContentDlg extends DialogBase {
         }
 
         // until we have better validation
-        let node = S.meta64.getHighlightedNode(this.appState);
+        let node = S.quanta.getHighlightedNode(this.appState);
         if (!node) {
             S.util.showMessage("No node is selected to search under.", "Warning");
             return;

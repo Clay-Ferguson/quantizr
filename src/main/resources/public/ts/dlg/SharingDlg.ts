@@ -29,7 +29,7 @@ export class SharingDlg extends DialogBase {
     renderDlg(): CompIntf[] {
         return [
             new Form(null, [
-                new HelpButton(() => S.meta64?.config?.help?.sharing?.dialog),
+                new HelpButton(() => S.quanta?.config?.help?.sharing?.dialog),
                 new EditPrivsTable(this.getState().nodePrivsInfo, this.removePrivilege),
                 new ButtonBar([
                     new Button("Add User", this.shareToPersonDlg, null, "btn-primary"),
@@ -45,7 +45,7 @@ export class SharingDlg extends DialogBase {
                     new Button("Close", () => {
                         this.close();
                         if (this.dirty) {
-                            S.meta64.refresh(this.appState);
+                            S.quanta.refresh(this.appState);
                         }
                     })
                 ])

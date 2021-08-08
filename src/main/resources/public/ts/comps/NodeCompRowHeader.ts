@@ -68,8 +68,8 @@ export class NodeCompRowHeader extends Div {
                 children.push(new Icon({
                     className: iconClass + " rowTypeIcon",
                     title: "Node Type: " + typeHandler.getName(),
-                    onMouseOver: () => { S.meta64.draggableId = node.id; },
-                    onMouseOut: () => { S.meta64.draggableId = null; }
+                    onMouseOver: () => { S.quanta.draggableId = node.id; },
+                    onMouseOut: () => { S.quanta.draggableId = null; }
                 }));
             }
         }

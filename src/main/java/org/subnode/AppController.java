@@ -293,7 +293,7 @@ public class AppController implements ErrorController {
 		thymeleafAttribs.put("intro2", appProp.getConfigText("intro2"));
 
 		thymeleafAttribs.put("BUNDLE_JS_HASH", fileUtils.genHashOfClasspathResource("/public/bundle.js"));
-		thymeleafAttribs.put("MAIN_CSS_HASH", fileUtils.genHashOfClasspathResource("/public/css/meta64.css"));
+		thymeleafAttribs.put("MAIN_CSS_HASH", fileUtils.genHashOfClasspathResource("/public/css/quanta.css"));
 		thymeleafAttribs.put("FONT_AWESOME_CSS_HASH",
 				fileUtils.genHashOfClasspathResource("/public/font-awesome-4.7.0/css/font-awesome.min.css"));
 		thymeleafAttribs.put("DROPZONE_CSS_HASH", fileUtils.genHashOfClasspathResource("/public/js/dropzone/dropzone.css"));

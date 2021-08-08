@@ -5,7 +5,7 @@ import * as J from "../JavaIntf";
 import { NodeHistoryItem } from "../NodeHistoryItem";
 import { CompIntf } from "../widget/base/CompIntf";
 
-export interface Meta64Intf {
+export interface QuantaIntf {
     hiddenRenderingEnabled: boolean;
     config: any;
     mainMenu: MainMenuDlg;

@@ -121,7 +121,7 @@ export class TypeBase implements TypeHandlerIntf {
                 if (count++ < 10) {
                     let og = new OpenGraphPanel(state, "og" + count + "_" + comp.getId(), url);
                     children.push(og);
-                    S.meta64.openGraphComps.push(og);
+                    S.quanta.openGraphComps.push(og);
                 }
             });
             return new Div(null, null, children);

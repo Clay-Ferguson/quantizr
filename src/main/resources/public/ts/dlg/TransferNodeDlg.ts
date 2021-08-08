@@ -74,7 +74,7 @@ export class TransferNodeDlg extends DialogBase {
             return;
         }
 
-        let node: J.NodeInfo = S.meta64.getHighlightedNode(this.appState);
+        let node: J.NodeInfo = S.quanta.getHighlightedNode(this.appState);
         if (!node) {
             S.util.showMessage("No node was selected.", "Warning");
             return;

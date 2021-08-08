@@ -94,7 +94,7 @@ export class UploadFromIPFSDlg extends DialogBase {
                 this.onUploadFunc();
             }
             else {
-                S.meta64.refresh(this.appState);
+                S.quanta.refresh(this.appState);
             }
         }
     }

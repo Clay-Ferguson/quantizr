@@ -528,9 +528,9 @@ export class Encryption implements EncryptionIntf {
             let cipherHash: string = S.util.hashOfString(skpd.cipherText);
 
             // if we have already decrypted this data return the result.
-            if (S.meta64.decryptCache.get(cipherHash)) {
+            if (S.quanta.decryptCache.get(cipherHash)) {
                 // console.log("decryption cache hit!");
-                resolve(S.meta64.decryptCache.get(cipherHash));
+                resolve(S.quanta.decryptCache.get(cipherHash));
                 return;
             }
 
@@ -556,7 +556,7 @@ export class Encryption implements EncryptionIntf {
                 const symKey = await crypto.subtle.importKey(Encryption.FORMAT_JWK, symKeyJsonObj, this.SYM_ALGO, true, this.OP_ENC_DEC);
                 ret = await this.symDecryptString(symKey, skpd.cipherText);
                 // console.log("            output: [" + ret + "]");
-                S.meta64.decryptCache.set(cipherHash, ret);
+                S.quanta.decryptCache.set(cipherHash, ret);
             }
             catch (ex) {
                 // todo-2: this was happening when 'importKey' failed for admin user, but I think admin user may not store keys? Need to just

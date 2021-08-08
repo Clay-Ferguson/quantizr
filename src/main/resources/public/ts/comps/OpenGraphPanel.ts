@@ -28,7 +28,7 @@ export class OpenGraphPanel extends Div {
 
         /* The state should always contain loading==true (if currently querying the server) or a non-null 'og'. A completed but failed
          pull of the open graph data should result in og being an empty object and not null. */
-        let og: J.OpenGraph = S.meta64.openGraphData.get(url);
+        let og: J.OpenGraph = S.quanta.openGraphData.get(url);
         if (og) {
             this.mergeState({ og });
         }
@@ -37,12 +37,12 @@ export class OpenGraphPanel extends Div {
     domAddEvent(): void {
         let elm: HTMLElement = this.getRef();
         if (!elm || !elm.isConnected || this.getState().og) return;
-        let og: J.OpenGraph = S.meta64.openGraphData.get(this.url);
+        let og: J.OpenGraph = S.quanta.openGraphData.get(this.url);
         if (!og) {
             let observer = new IntersectionObserver(entries => {
                 entries.forEach((entry: any) => {
                     if (entry.isIntersecting) {
-                        let og: J.OpenGraph = S.meta64.openGraphData.get(this.url);
+                        let og: J.OpenGraph = S.quanta.openGraphData.get(this.url);
                         if (!og) {
                             if (!this.loading) {
                                 this.loading = true;
@@ -57,7 +57,7 @@ export class OpenGraphPanel extends Div {
                                         };
                                     }
                                     // observer.disconnect();
-                                    S.meta64.openGraphData.set(this.url, og);
+                                    S.quanta.openGraphData.set(this.url, og);
                                     if (!elm.isConnected) return;
                                     this.mergeState({ og });
                                 });
@@ -82,11 +82,11 @@ export class OpenGraphPanel extends Div {
     loadNext = (): void => {
         let found = false;
         let count = 0;
-        S.meta64.openGraphComps.forEach(o => {
+        S.quanta.openGraphComps.forEach(o => {
             if (found) {
                 /* I think it's counterproductive for smooth scrolling to preload more than one */
                 if (count++ < 1) {
-                    let og: J.OpenGraph = S.meta64.openGraphData.get(o.url);
+                    let og: J.OpenGraph = S.quanta.openGraphData.get(o.url);
                     if (!og) {
                         if (!o.loading) {
                             o.loading = true;
@@ -100,7 +100,7 @@ export class OpenGraphPanel extends Div {
                                         url: null
                                     };
                                 }
-                                S.meta64.openGraphData.set(o.url, og);
+                                S.quanta.openGraphData.set(o.url, og);
                                 if (!o.getRef()) return;
                                 o.mergeState({ og });
                             });

@@ -19,7 +19,7 @@ export class Share implements ShareIntf {
      */
     editNodeSharing = async (state: AppState, node: J.NodeInfo): Promise<void> => {
         if (!node) {
-            node = S.meta64.getHighlightedNode(state);
+            node = S.quanta.getHighlightedNode(state);
         }
 
         if (!node) {
@@ -33,7 +33,7 @@ export class Share implements ShareIntf {
     /* If target is non-null we only return shares to that particlar person (or public) */
     findSharedNodes = (state: AppState = null, shareTarget: string = null, accessOption: string = null): void => {
         state = appState(state);
-        const focusNode: J.NodeInfo = S.meta64.getHighlightedNode(state);
+        const focusNode: J.NodeInfo = S.quanta.getHighlightedNode(state);
         if (focusNode == null) {
             return;
         }

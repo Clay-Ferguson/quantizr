@@ -60,11 +60,11 @@ export class User implements UserIntf {
         // if (tab === "feed") {
         if (window.location.href.endsWith("/app")) {
             setTimeout(() => {
-                S.meta64.showPublicFediverse();
+                S.quanta.showPublicFediverse();
             }, 10);
         }
         else {
-            S.meta64.loadAnonPageHome(null);
+            S.quanta.loadAnonPageHome(null);
         }
     }
 
@@ -100,7 +100,7 @@ export class User implements UserIntf {
                 tzOffset: new Date().getTimezoneOffset(),
                 dst: S.util.daylightSavingsTime
             }, async (res: J.LoginResponse) => {
-                S.meta64.authToken = res.authToken;
+                S.quanta.authToken = res.authToken;
 
                 // console.log("login: " + S.util.prettyPrint(res));
                 if (res && !res.success) {
@@ -114,7 +114,7 @@ export class User implements UserIntf {
                     this.loginResponse(res, res.userName, callPwd, false, state);
                 } else {
                     if (res.success) {
-                        S.meta64.setStateVarsUsingLoginResponse(res);
+                        S.quanta.setStateVarsUsingLoginResponse(res);
                     }
 
                     this.defaultHandleAnonUser(state);
@@ -122,7 +122,7 @@ export class User implements UserIntf {
             },
                 async (error: string) => {
                     await S.user.deleteAllUserLocalDbEntries();
-                    S.meta64.loadAnonPageHome(null);
+                    S.quanta.loadAnonPageHome(null);
                 });
         }
     }
@@ -141,14 +141,14 @@ export class User implements UserIntf {
             await S.localDB.setVal(C.LOCALDB_LOGIN_STATE, "0", "anon");
         }
 
-        S.meta64.loggingOut = true;
+        S.quanta.loggingOut = true;
         S.util.ajax<J.LogoutRequest, J.LogoutResponse>("logout", {}, this.logoutResponse, this.logoutResponse);
     }
 
     logoutResponse = (): void => {
         S.push.close();
-        S.meta64.authToken = null;
-        S.meta64.userName = null;
+        S.quanta.authToken = null;
+        S.quanta.userName = null;
         window.location.href = window.location.origin; // + "/app";
     }
 
@@ -179,7 +179,7 @@ export class User implements UserIntf {
                 await S.localDB.setVal(C.LOCALDB_LOGIN_STATE, "1");
                 await S.localDB.setVal(C.LOCALDB_LOGIN_STATE, "1", "anon");
 
-                S.meta64.userName = usr;
+                S.quanta.userName = usr;
                 console.log("Logged in as: " + usr);
 
                 this.queryUserProfile(res.rootNode);
@@ -187,11 +187,11 @@ export class User implements UserIntf {
                 console.log("checking Messages");
                 this.checkMessages();
                 setTimeout(() => {
-                    S.meta64.loadBookmarks();
+                    S.quanta.loadBookmarks();
                 }, 1000);
             }
 
-            S.meta64.setStateVarsUsingLoginResponse(res);
+            S.quanta.setStateVarsUsingLoginResponse(res);
 
             // we just processed a dispatch so we need to get the current state now.
             state = store.getState();
@@ -229,7 +229,7 @@ export class User implements UserIntf {
                 // if (tab === "feed") {
                 setTimeout(() => {
                     // todo-1: new logic, always send anon users to fediverse view
-                    S.meta64.showPublicFediverse();
+                    S.quanta.showPublicFediverse();
                 }, 10);
                 // }
             }

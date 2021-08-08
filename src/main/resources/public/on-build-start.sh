@@ -15,7 +15,7 @@ echo "Running on-build-start.sh"
 #     sudo apt update
 #     sudo apt install nodejs npm
 #     sudo npm install --save-dev --unsafe-perm -g node-sass
-node-sass ./css/meta64.scss ./css/meta64.css --output-style compressed
+node-sass ./css/quanta.scss ./css/quanta.css --output-style compressed
 
 if [ $? -eq 0 ]
 then

@@ -59,7 +59,7 @@ export class PrefsDlg extends DialogBase {
 
     savePreferencesResponse = (res: J.SaveUserPreferencesResponse): void => {
         if (S.util.checkSuccess("Saving Preferences", res)) {
-            S.meta64.refresh(this.appState);
+            S.quanta.refresh(this.appState);
         }
     }
 }

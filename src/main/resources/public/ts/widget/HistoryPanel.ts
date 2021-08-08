@@ -20,13 +20,13 @@ export class HistoryPanel extends Div {
     }
 
     preRender(): void {
-        if (S.meta64.nodeHistory.length === 0) {
+        if (S.quanta.nodeHistory.length === 0) {
             this.setChildren(null);
             return;
         }
         let children = [];
         children.push(new Div("History", { className: "nodeHistoryTitle" }));
-        S.meta64.nodeHistory.forEach((h: NodeHistoryItem) => {
+        S.quanta.nodeHistory.forEach((h: NodeHistoryItem) => {
             if (!h.content) return;
             let d;
             children.push(d = new Div("&#x1f535 " + h.content, {

@@ -126,9 +126,9 @@ export class NodeCompMarkdown extends Html {
             let cipherHash: string = S.util.hashOfString(cipherText);
 
             // if we have already decrypted this data use the result.
-            if (S.meta64.decryptCache.get(cipherHash)) {
+            if (S.quanta.decryptCache.get(cipherHash)) {
 
-                let clearText = S.meta64.decryptCache.get(cipherHash);
+                let clearText = S.quanta.decryptCache.get(cipherHash);
                 clearText = this.renderRawMarkdown(this.node, clearText);
 
                 this.mergeState({

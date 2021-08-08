@@ -49,7 +49,7 @@ export class NodeCompRow extends Div {
         /* If mouse is not over type icon during a drag start don't allow dragging. This way the entire ROW is the thing that is
         getting dragged, but we don't accept drag events anywhere on the node, because we specifically don't want to. We intentionally
         have draggableId so make is so that the user can only do a drag by clicking the type icon itself to start the drag. */
-        if (S.meta64.draggableId !== this.node.id) {
+        if (S.quanta.draggableId !== this.node.id) {
             ev.preventDefault();
             return;
         }
@@ -121,7 +121,7 @@ export class NodeCompRow extends Div {
 
         let indentLevel = this.isTableCell ? 0 : this.level;
         let style = indentLevel > 0 ? { marginLeft: "" + ((indentLevel - 1) * 30) + "px" } : null;
-        let focusNode: J.NodeInfo = S.meta64.getHighlightedNode(state);
+        let focusNode: J.NodeInfo = S.quanta.getHighlightedNode(state);
         let selected: boolean = (focusNode && focusNode.id === id);
         this.attribs.className = (layoutClass || "") + (selected ? " active-row" : " inactive-row");
 
@@ -129,7 +129,7 @@ export class NodeCompRow extends Div {
             S.render.fadeInId = null;
             S.render.allowFadeInId = false;
             this.attribs.className += " fadeInRowBkgClz";
-            S.meta64.fadeStartTime = new Date().getTime();
+            S.quanta.fadeStartTime = new Date().getTime();
         }
 
         this.attribs.style = style;

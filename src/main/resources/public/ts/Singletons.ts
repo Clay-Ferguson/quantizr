@@ -3,7 +3,7 @@ import { AttachmentIntf } from "./intf/AttachmentIntf";
 import { EditIntf } from "./intf/EditIntf";
 import { EncryptionIntf } from "./intf/EncryptionIntf";
 import { LocalDBIntf } from "./intf/LocalDBIntf";
-import { Meta64Intf } from "./intf/Meta64Intf";
+import { QuantaIntf } from "./intf/QuantaIntf";
 import { NavIntf } from "./intf/NavIntf";
 import { PluginMgrIntf } from "./intf/PluginMgrIntf";
 import { PropsIntf } from "./intf/PropsIntf";
@@ -18,7 +18,7 @@ import { ViewIntf } from "./intf/ViewIntf";
 /* Similar to a SpringContext in a Java app, these singletons are all pre-instantiated and guaranteed not
 to result in any circular-references during load time, because they instantiate only other interfaces */
 export interface Singletons {
-    meta64: Meta64Intf;
+    quanta: QuantaIntf;
     plugin: PluginMgrIntf;
     util: UtilIntf;
     push: ServerPushIntf;

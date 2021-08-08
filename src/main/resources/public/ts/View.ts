@@ -34,7 +34,7 @@ export class View implements ViewIntf {
 
         // if we're going to be scrolling turn off the auto infinite scroll logic for this render.
         if (allowScroll) {
-            S.meta64.tempDisableAutoScroll();
+            S.quanta.tempDisableAutoScroll();
         }
 
         // let childCount = state.node && state.node.children ? state.node.children.length : 0;
@@ -44,7 +44,7 @@ export class View implements ViewIntf {
         }
 
         if (!highlightId) {
-            const currentSelNode: J.NodeInfo = S.meta64.getHighlightedNode(state);
+            const currentSelNode: J.NodeInfo = S.quanta.getHighlightedNode(state);
             highlightId = currentSelNode ? currentSelNode.id : nodeId;
         }
 
@@ -68,7 +68,7 @@ export class View implements ViewIntf {
             S.render.renderPageFromData(res, false, highlightId, setTab, allowScroll);
         }, // fail callback
             (res: string) => {
-                S.meta64.clearLastNodeIds();
+                S.quanta.clearLastNodeIds();
                 S.nav.navHome(state);
             });
     }
@@ -151,14 +151,14 @@ export class View implements ViewIntf {
         },
             // fail callback
             (res: string) => {
-                S.meta64.clearLastNodeIds();
+                S.quanta.clearLastNodeIds();
                 S.nav.navHome(state);
             });
     }
 
     // todo-2: need to add logic to detect if this is root node on the page, and if so, we consider the first child the target
     scrollRelativeToNode = (dir: string, state: AppState) => {
-        const currentSelNode: J.NodeInfo = S.meta64.getHighlightedNode(state);
+        const currentSelNode: J.NodeInfo = S.quanta.getHighlightedNode(state);
         if (!currentSelNode) return;
 
         let newNode: J.NodeInfo = null;
@@ -167,7 +167,7 @@ export class View implements ViewIntf {
         if (currentSelNode.id === state.node.id) {
             // if going down that means first child node.
             if (dir === "down" && state.node.children && state.node.children.length > 0) {
-                S.meta64.highlightNode(state.node.children[0], true, state);
+                S.quanta.highlightNode(state.node.children[0], true, state);
             }
             else if (dir === "up") {
                 S.nav.navUpLevel(false);
@@ -183,7 +183,7 @@ export class View implements ViewIntf {
                 if (nodeFound && dir === "down") {
                     ret = true;
                     newNode = child;
-                    S.meta64.highlightNode(child, true, state);
+                    S.quanta.highlightNode(child, true, state);
                 }
 
                 if (child.id === currentSelNode.id) {
@@ -191,11 +191,11 @@ export class View implements ViewIntf {
                         if (prevChild) {
                             ret = true;
                             newNode = prevChild;
-                            S.meta64.highlightNode(prevChild, true, state);
+                            S.quanta.highlightNode(prevChild, true, state);
                         }
                         else {
                             newNode = state.node;
-                            S.meta64.highlightNode(state.node, true, state);
+                            S.quanta.highlightNode(state.node, true, state);
                         }
                     }
                     nodeFound = true;
@@ -217,7 +217,7 @@ export class View implements ViewIntf {
     scrollAllTop = (state: AppState) => {
         // #DEBUG-SCROLLING
         // console.log("scrollAllTop");
-        let activeTabComp = S.meta64.getActiveTabComp(state);
+        let activeTabComp = S.quanta.getActiveTabComp(state);
         if (activeTabComp && activeTabComp.getRef()) {
             activeTabComp.getRef().scrollTop = 0;
         }
@@ -237,7 +237,7 @@ export class View implements ViewIntf {
     }
 
     scrollToSelectedNode = (state: AppState): void => {
-        // S.meta64.setOverlay(true);
+        // S.quanta.setOverlay(true);
 
         let func = () => {
             // NOTE: LEAVE THIS timer code here until the new pubsub-based scrolling timing is well proven
@@ -246,13 +246,13 @@ export class View implements ViewIntf {
             /* Check to see if we are rendering the top node (page root), and if so
             it is better looking to just scroll to zero index, because that will always
             be what user wants to see */
-            const currentSelNode: J.NodeInfo = S.meta64.getHighlightedNode(state);
+            const currentSelNode: J.NodeInfo = S.quanta.getHighlightedNode(state);
 
             /* the scrolling got slightly convoluted, so I invented 'editNodeId' just to be able to detect
              a case where the user is editing a node and we KNOW we don't need to scroll after editing,
              so this is where we detect and reset that scenario. */
-            if (currentSelNode && currentSelNode.id === S.meta64.noScrollToId) {
-                S.meta64.noScrollToId = null;
+            if (currentSelNode && currentSelNode.id === S.quanta.noScrollToId) {
+                S.quanta.noScrollToId = null;
                 return;
             }
 
@@ -278,7 +278,7 @@ export class View implements ViewIntf {
         };
         //     } finally {
         //         setTimeout(() => {
-        //             S.meta64.setOverlay(false);
+        //             S.quanta.setOverlay(false);
         //         }, 100);
         //     }
         // }, 100);
@@ -297,7 +297,7 @@ export class View implements ViewIntf {
     }
 
     getNodeStats = (state: AppState, trending: boolean, feed: boolean) => {
-        const node = S.meta64.getHighlightedNode(state);
+        const node = S.quanta.getHighlightedNode(state);
 
         S.util.ajax<J.GetNodeStatsRequest, J.GetNodeStatsResponse>("getNodeStats", {
             nodeId: node ? node.id : null,
@@ -310,7 +310,7 @@ export class View implements ViewIntf {
     }
 
     runServerCommand = (command: string, dlgTitle: string, dlgDescription: string, state: AppState) => {
-        const node = S.meta64.getHighlightedNode(state);
+        const node = S.quanta.getHighlightedNode(state);
 
         S.util.ajax<J.GetServerInfoRequest, J.GetServerInfoResponse>("getServerInfo", {
             command: command,
