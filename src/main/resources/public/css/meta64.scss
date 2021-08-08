@@ -843,9 +843,7 @@ Will come back later and study this more. todo-1 */
     height: 100%;
     overflow-y: scroll;
     overflow-x: hidden;
-
-    // todo-0: (testing pending) I think on some platforms for Firefix only, the scrollbar needs this spaceing
-    padding-right: 20px;
+    padding-right: 15px;
 }
 
 .my-tab-pane-mobile {

@@ -26,14 +26,9 @@ export class HelpButton extends Comp {
     }
 
     openHelpDialog = (): void => {
-        let state = store.getState();
-        // todo-0: this shouldn'g require an exception but also catch ANY non-true
-        // getHelpText
-        try {
-            new MessageDlg(null, "Help", null, new Html(this.getHelpText()), false, 0, state).open();
-        }
-        catch (e) {
-            alert("Unable to load help content.");
+        let helpText = this.getHelpText();
+        if (helpText) {
+            new MessageDlg(null, "Help", null, new Html(helpText), false, 0, store.getState()).open();
         }
     }
 
