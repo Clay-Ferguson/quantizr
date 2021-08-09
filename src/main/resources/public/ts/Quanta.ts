@@ -687,7 +687,7 @@ export class Quanta implements QuantaIntf {
                     scrollPos: 0
                 }
 
-                // this is throwing a react error, but I'm not need to fix it yet.
+                // this is throwing a react error, but we don't need this now anyaay
                 // {
                 //     name: "Log",
                 //     id: C.TAB_LOG,

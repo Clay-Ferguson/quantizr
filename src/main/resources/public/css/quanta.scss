@@ -697,12 +697,12 @@ entire thing down some times, if it's jutting up against something */
 
 .app-modal-title {
     margin-bottom: 4px;
-    font-size: 140%;
+    font-size: 130%;
 }
 
 .app-modal-title-close-icon {
     cursor: pointer;
-    font-size: 200%;
+    font-size: 180%;
 
     //this icon vertical centering doesn't work, but it's acceptable looking.
     vertical-align: middle;
@@ -1025,12 +1025,12 @@ input[type="radio"] {
     margin-top: $smallGap;
 }
 
-.bigMarginRight {
-    margin-right: $bigGap; 
-}
-
 .bigMarginBottom {
     margin-bottom: $bigGap; 
+}
+
+.bigMarginRight {
+    margin-right: $bigGap; 
 }
 
 .bigMarginTop {
@@ -1753,18 +1753,18 @@ i'm backing out for now
 }
 
 .iconToggle {
-    padding: 2px;
+    // padding: 2px;
     border-radius: 4px;
 }
 
 .iconToggleOn {
     @extend .iconToggle;
-    border: 2px solid green;
+    border: 3px solid green;
 }
 
 .iconToggleOff {
     @extend .iconToggle;
-    border: 2px solid transparent;
+    border: 3px solid transparent;
 }
 
 .selectLabel {
@@ -1787,9 +1787,6 @@ i'm backing out for now
 }
 
 .editBinaryContainer {
-    padding-top: $smallGap;
-    padding-bottom: $smallGap;
-    padding-left: $smallGap;
     margin-bottom: $smallGap;
 }
 
@@ -1811,6 +1808,11 @@ i'm backing out for now
     cursor: pointer;
     border: 1px solid gray;
     border-radius: $border-radius;
+}
+
+.deleteAttachmentLink {
+    cursor: pointer;
+    margin: 12px;
 }
 
 .dialogContentArea {
@@ -2018,6 +2020,22 @@ audio::-webkit-media-controls-play-button {
     // This min width is required when there are some crazy long strings in the RHS, and the browser
     // crowds out the left hand side smashin it down to zero size unless we give a min size.
     min-width: 100px;
+}
+
+.rhsLogoutLink {
+    margin-top: 25px;
+    margin-right: 55px;
+    cursor: pointer;
+}
+
+.sharingLabel {
+    padding: 5px;
+    border: 3px solid green;
+    border-radius: 8px;
+}
+
+.floatRightHeaderDiv {
+    margin-bottom: 6px;
 }
 
 .openGraphRhs {

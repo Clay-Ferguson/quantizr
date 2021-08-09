@@ -277,7 +277,7 @@ export class NodeCompButtonBar extends Div {
             }
        }
 
-        if (node.hasChildren) {
+        if (node.hasChildren && (isPageRootNode || state.userPreferences.editMode)) {
             searchButton = new Icon({
                 className: "fa fa-search fa-lg buttonBarIcon",
                 title: "Search underneath Node",

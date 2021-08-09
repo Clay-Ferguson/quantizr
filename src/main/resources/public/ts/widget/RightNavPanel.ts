@@ -118,7 +118,11 @@ export class RightNavPanel extends Div {
                     !headerImg ? new Div(null, null, [avatarImg]) : avatarImg,
                     new TabPanelButtons(true, "rhsMenu")
                 ]),
-                new HistoryPanel()
+                new HistoryPanel(),
+                !state.isAnonUser ? new Div("Logout", {
+                    className: "float-right rhsLogoutLink",
+                    onClick: S.nav.logout
+                }) : null
             ])
         ]);
     }

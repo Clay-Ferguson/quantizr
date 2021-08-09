@@ -34,6 +34,7 @@ import { Header } from "../widget/Header";
 import { HelpButton } from "../widget/HelpButton";
 import { HorizontalLayout } from "../widget/HorizontalLayout";
 import { Icon } from "../widget/Icon";
+import { IconButton } from "../widget/IconButton";
 import { Label } from "../widget/Label";
 import { LayoutRow } from "../widget/LayoutRow";
 import { Selection } from "../widget/Selection";
@@ -60,8 +61,8 @@ export class EditNodeDlg extends DialogBase {
     editorHelp: string = null;
     header: Header;
     propertyEditFieldContainer: Div;
-    uploadButton: Button;
-    deleteUploadButton: Button;
+    uploadButton: IconButton;
+    deleteUploadButton: Div;
     deletePropButton: Button;
     contentEditor: I.TextEditorIntf;
     contentEditorState: ValidatedState<any> = new ValidatedState<any>();
@@ -489,31 +490,25 @@ export class EditNodeDlg extends DialogBase {
             }
 
             // NOTE: col numbers in the children of LayoutRow must add up to 12 (per bootstrap)!
-            let topBinRow = new LayoutRow([
-                new Div(null, { className: "col-6" }, [
+            let topBinRow = new HorizontalLayout([
+                new Div(null, { className: "bigMarginRight" }, [
                     new Div((ipfsLink ? "IPFS " : "") + "Attachment", {
                         className: "smallHeading"
                     }),
-                    new NodeCompBinary(state.node, true, false, null)
+                    new NodeCompBinary(state.node, true, false, null),
+                    this.deleteUploadButton = new Div("Delete", {
+                        className: "deleteAttachmentLink",
+                        onClick: this.deleteUpload
+                    })
                 ]),
 
-                new Div(null, {
-                    className: "col-6"
-                }, [
-                    new Div(null, null, [
-                        new HorizontalLayout([
-                            imgSizeSelection,
-                            pinCheckbox
-                        ])
-                    ]),
-                    new ButtonBar([
-                        this.deleteUploadButton = new Button("Delete", this.deleteUpload, { title: "Delete this Attachment" }),
-                        this.uploadButton = new Button("Replace", this.upload, { title: "Upload a new Attachment" })
-
-                        // todo-1: this is not doing what I want but it unimportant so removing it for now.
-                        // ipfsLink ? new Button("IPFS Link", () => S.render.showNodeUrl(state.node, this.appState), { title: "Show the IPFS URL for the attached file." }) : null
-                    ], null, "float-right marginRight")
+                new HorizontalLayout([
+                    imgSizeSelection,
+                    pinCheckbox
                 ])
+
+                // todo-1: this is not doing what I want but it unimportant so removing it for now.
+                // ipfsLink ? new Button("IPFS Link", () => S.render.showNodeUrl(state.node, this.appState), { title: "Show the IPFS URL for the attached file." }) : null
             ]);
 
             let bottomBinRow = null;
@@ -531,12 +526,14 @@ export class EditNodeDlg extends DialogBase {
 
         let sharingNames = S.util.getSharingNames(state.node, false);
         let sharingDiv = null;
+        let sharingDivClearFix = null;
         if (sharingNames) {
-            let isPublic = sharingNames.toLowerCase().indexOf("public") !== -1;
+            // let isPublic = sharingNames.toLowerCase().indexOf("public") !== -1;
 
             sharingDiv = new Div("Shared to: " + sharingNames, {
-                className: "marginBottom float-right"
+                className: "marginBottom float-right sharingLabel"
             });
+            sharingDivClearFix = new Clearfix();
         }
 
         let helpPanel = this.editorHelp ? new HelpButton(() => this.editorHelp) : null;
@@ -562,7 +559,7 @@ export class EditNodeDlg extends DialogBase {
             collapsiblePanel, helpPanel
         ]);
 
-        this.propertyEditFieldContainer.setChildren([mainPropsTable, sharingDiv, binarySection, rightFloatButtons,
+        this.propertyEditFieldContainer.setChildren([mainPropsTable, sharingDiv, sharingDivClearFix, binarySection, rightFloatButtons,
             new Clearfix()]);
         return children;
     }
@@ -642,10 +639,17 @@ export class EditNodeDlg extends DialogBase {
                 this.close();
             }, { title: "Save this node and close editor." }, "btn-primary"),
 
-            new Button("Cancel", this.cancelEdit, null, "btn-secondary bigMarginRight"),
+            new Button("Cancel", this.cancelEdit, null),
 
-            this.uploadButton = (!hasAttachment && allowUpload) ? new Button("Attach", this.upload) : null,
-            allowShare ? new Button("Share", this.share) : null,
+            this.uploadButton = allowUpload ? new IconButton("fa-upload", null, {
+                onClick: this.upload,
+                title: "Upload file attachment"
+            }) : null,
+
+            allowShare ? new IconButton("fa-envelope", null, {
+                onClick: this.share,
+                title: "Share Node"
+            }) : null,
 
             // show delete button only if we're in a fullscreen viewer (like Calendar view)
             S.quanta.fullscreenViewerActive(this.appState)
