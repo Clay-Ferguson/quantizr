@@ -108,7 +108,7 @@ export class Edit implements EditIntf {
     }
 
     /* nodeId is optional and represents what to highlight after the paste if anything */
-    private moveNodesResponse = (res: J.MoveNodesResponse, nodeId: string, state: AppState): void => {
+    private moveNodesResponse = (res: J.MoveNodesResponse, nodeId: string, pasting: boolean, state: AppState): void => {
         if (S.util.checkSuccess("Move nodes", res)) {
             dispatch("Action_SetNodesToMove", (s: AppState): AppState => {
                 s.nodesToMove = null;
@@ -116,8 +116,13 @@ export class Edit implements EditIntf {
             });
 
             S.quanta.tempDisableAutoScroll();
-            // S.view.refreshTree(null, false, false, nodeId, false, true, true, state);
-            S.view.jumpToId(nodeId);
+            // if pasting do a kind of refresh which will maintain us at the same page parent.
+            if (pasting) {
+                S.view.refreshTree(null, false, false, nodeId, false, true, true, state);
+            }
+            else {
+                S.view.jumpToId(nodeId);
+            }
         }
     }
 
@@ -754,7 +759,7 @@ export class Edit implements EditIntf {
             nodeIds: state.nodesToMove,
             location
         }, (res) => {
-            this.moveNodesResponse(res, nodeId, state);
+            this.moveNodesResponse(res, nodeId, true, state);
         });
     }
 
@@ -945,7 +950,7 @@ export class Edit implements EditIntf {
             location: isFirst ? "inline-above" : "inline"
         }, (res) => {
             S.render.fadeInId = sourceNodeId;
-            this.moveNodesResponse(res, sourceNodeId, state);
+            this.moveNodesResponse(res, sourceNodeId, false, state);
         });
     }
 
