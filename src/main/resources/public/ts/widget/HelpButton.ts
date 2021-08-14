@@ -1,11 +1,11 @@
 import { ReactNode } from "react";
 import { store } from "../AppRedux";
+import { Markdown } from "../comps/Markdown";
 import { Constants as C } from "../Constants";
 import { MessageDlg } from "../dlg/MessageDlg";
 import { PubSub } from "../PubSub";
 import { Singletons } from "../Singletons";
 import { Comp } from "./base/Comp";
-import { Html } from "./Html";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
@@ -28,7 +28,16 @@ export class HelpButton extends Comp {
     openHelpDialog = (): void => {
         let helpText = this.getHelpText();
         if (helpText) {
-            new MessageDlg(null, "Help", null, new Html(helpText), false, 0, store.getState()).open();
+            // By convention the first line of text is taken as the title for the help
+            let idx = helpText.indexOf("\n");
+            if (idx !== -1) {
+                let title = helpText.substring(0, idx);
+                let content = helpText.substring(idx);
+                // content = content.replace("\n\n", "[nl]");
+                // content = content.replace("\n", " ");
+                // content = content.replace("[nl]", "\n\n");
+                new MessageDlg(null, title, null, new Markdown(content), false, 0, store.getState()).open();
+            }
         }
     }
 

@@ -73,8 +73,6 @@ export class NodeCompMarkdown extends Html {
             }
         }
         else {
-            S.render.initMarkdown();
-
             // todo-2: put some more thought into this...
             // turning this off because when it appears in a url, blows up the link. Need to find some better way.
             // if (S.srch.searchText) {

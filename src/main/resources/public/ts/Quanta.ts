@@ -409,6 +409,8 @@ export class Quanta implements QuantaIntf {
                 history.scrollRestoration = "manual";
             }
 
+            S.render.initMarkdown();
+
             this.createAppTabs();
             const state: AppState = store.getState();
             state.pendingLocationHash = window.location.hash;
