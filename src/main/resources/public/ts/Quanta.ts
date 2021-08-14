@@ -21,6 +21,7 @@ import { FollowersResultSetView } from "./tabs/FollowersResultSetView";
 import { FollowingResultSetView } from "./tabs/FollowingResultSetView";
 import { MainTabComp } from "./tabs/MainTabComp";
 import { SearchResultSetView } from "./tabs/SearchResultSetView";
+import { ServerInfoView } from "./tabs/ServerInfoView";
 import { SharedNodesResultSetView } from "./tabs/SharedNodesResultSetView";
 import { TimelineResultSetView } from "./tabs/TimelineResultSetView";
 import { TrendingView } from "./tabs/TrendingView";
@@ -684,6 +685,17 @@ export class Quanta implements QuantaIntf {
                     isVisible: () => true,
                     constructView: (data: TabDataIntf) => new TrendingView(s, data),
                     rsInfo: new TrendingRSInfo(),
+                    scrollPos: 0
+                },
+                {
+                    name: "Server Info",
+                    id: C.TAB_SERVERINFO,
+                    isVisible: () => {
+                        let state: AppState = store.getState();
+                        return !!state.serverInfoText;
+                    },
+                    constructView: (data: TabDataIntf) => new ServerInfoView(s, data),
+                    rsInfo: null,
                     scrollPos: 0
                 }
 

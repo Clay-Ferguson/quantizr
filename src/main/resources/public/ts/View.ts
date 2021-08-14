@@ -333,7 +333,12 @@ export class View implements ViewIntf {
                             m.message = dlgDescription + "\n\n" + m.message;
                         }
 
-                        S.util.showMessage(m.message, dlgTitle || "Server Reply", true);
+                        dispatch("Action_showServerInfo", (s: AppState): AppState => {
+                            S.quanta.tabChanging(s.activeTab, C.TAB_SERVERINFO, s);
+                            s.activeTab = S.quanta.activeTab = C.TAB_SERVERINFO;
+                            s.serverInfoText = m.message;
+                            return s;
+                        });
                     });
                 }
             });

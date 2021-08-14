@@ -141,4 +141,6 @@ export class AppState {
     editNode: J.NodeInfo;
     editShowJumpButton: boolean;
     editEncrypt: boolean;
+
+    serverInfoText: string = null;
 }

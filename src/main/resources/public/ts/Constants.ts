@@ -18,6 +18,7 @@ export class Constants {
     static TAB_FOLLOWING: string = "followingResultSetView";
     static TAB_FEED: string = "feedTab";
     static TAB_TRENDING: string = "trendingTab";
+    static TAB_SERVERINFO: string = "serverInfoTab";
     static TAB_LOG: string = "logTab"
 
     static SITE_NAV_MENU_TEXT = "Site Nav";

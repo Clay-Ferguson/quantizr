@@ -78,6 +78,11 @@ $smallBorderSize: 3px;
 //     }
 // }
 
+.serverInfoText {
+    width: 100%;
+    overflow: auto;
+}
+
 .mobileHeaderBar {
     margin-top: 10px;
     margin-left: 10px;
