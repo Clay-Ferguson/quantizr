@@ -276,7 +276,7 @@ export class Quanta implements QuantaIntf {
 
     /* Returns true if successful */
     highlightRowById = (id: string, scroll: boolean, state: AppState): boolean => {
-        Log.log("highlightRowById: " + id);
+        // Log.log("highlightRowById: " + id);
         let node: J.NodeInfo = state.idToNodeMap.get(id);
         let ret = true;
 
@@ -293,13 +293,12 @@ export class Quanta implements QuantaIntf {
                 S.view.scrollToTop();
             }
             ret = false;
-            Log.log("highlightRowById failed to find id: " + id);
+            // Log.log("highlightRowById failed to find id: " + id);
         }
         return ret;
     }
 
     highlightNode = (node: J.NodeInfo, scroll: boolean, state: AppState): void => {
-        Log.log("highlghtNode");
         if (!node || !state.node) {
             return;
         }
@@ -747,8 +746,7 @@ export class Quanta implements QuantaIntf {
             return;
         }
 
-        Log.log("Changing from tab: " + prevTab + " to " + newTab);
-
+        // Log.log("Changing from tab: " + prevTab + " to " + newTab);
         PubSub.pub(C.PUBSUB_tabChanging, newTab);
     }
 

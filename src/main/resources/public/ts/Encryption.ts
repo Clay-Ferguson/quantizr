@@ -243,7 +243,6 @@ export class Encryption implements EncryptionIntf {
     }
 
     initKeys = async (forceUpdate: boolean = false, republish: boolean = false, showConfirm: boolean = false) => {
-        console.log("initKeys");
         await this.initAsymetricKeys(forceUpdate, republish, showConfirm);
         await this.initSymetricKey(forceUpdate);
     }

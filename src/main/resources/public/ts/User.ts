@@ -184,7 +184,6 @@ export class User implements UserIntf {
 
                 this.queryUserProfile(res.rootNode);
 
-                console.log("checking Messages");
                 this.checkMessages();
                 setTimeout(() => {
                     S.quanta.loadBookmarks();

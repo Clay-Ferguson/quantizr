@@ -1216,7 +1216,8 @@ input[type="radio"] {
     */
     
     width: 100%; 
-    border: 1px dotted green;
+    border: 1px solid green;
+    border-radius: $border-radius;
 }
 
 .full-screen-img {
