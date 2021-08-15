@@ -43,7 +43,7 @@ export class SharingDlg extends DialogBase {
                     new Button("Public (No replies)", () => { this.shareNodeToPublic(false); }, null, "btn-secondary"),
                     new Button("Close", () => {
                         this.close();
-                        if (this.dirty) {
+                        if (this.dirty && this.appState.activeTab === C.TAB_MAIN) {
                             S.quanta.refresh(this.appState);
                         }
                     }),

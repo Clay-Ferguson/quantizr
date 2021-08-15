@@ -284,6 +284,11 @@ export class Edit implements EditIntf {
         if (S.util.checkSuccess("Save node", res)) {
             await this.distributeKeys(node, res.aclEntries);
 
+            // If we're on some tab other than MAIN (tree) we don't need to update anything.
+            if (state.activeTab !== C.TAB_MAIN) {
+                return;
+            }
+
             // find and update the history item if it exists.
             let histItem: NodeHistoryItem = S.quanta.nodeHistory.find(function (h: NodeHistoryItem) {
                 return h.id === node.id;

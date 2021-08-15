@@ -498,7 +498,8 @@ export class EditNodeDlg extends DialogBase {
                     new NodeCompBinary(state.node, true, false, null),
                     this.deleteUploadButton = new Div("Delete", {
                         className: "deleteAttachmentLink",
-                        onClick: this.deleteUpload
+                        onClick: this.deleteUpload,
+                        title: "Delete this attachment"
                     })
                 ]),
 
@@ -531,7 +532,8 @@ export class EditNodeDlg extends DialogBase {
             // let isPublic = sharingNames.toLowerCase().indexOf("public") !== -1;
 
             sharingDiv = new Div("Shared to: " + sharingNames, {
-                className: "marginBottom float-right sharingLabel"
+                className: "marginBottom float-right sharingLabel",
+                onClick: this.share
             });
             sharingDivClearFix = new Clearfix();
         }

@@ -609,7 +609,7 @@ public class MongoAuth {
 		if (words != null) {
 			for (String word : words) {
 				// detect the pattern @name@server.com or @name
-				if (word.length() > 6 && word.startsWith("@") && StringUtils.countMatches(word, "@") <= 2) {
+				if (word.length() > 1 && word.startsWith("@") && StringUtils.countMatches(word, "@") <= 2) {
 					word = word.substring(1);
 
 					// This second 'startsWith' check ensures we ignore patterns that start with
