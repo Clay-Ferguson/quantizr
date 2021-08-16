@@ -153,9 +153,6 @@ public class ActPubFollowing {
 
         /*
          * Protocol says we need to send this acceptance back:
-         * 
-         * todo-0: these kinds of runnables need a MongoSession for the threadlocal!!!, or be sure the
-         * 'arun.run' is INSIDE it not outside it.
          */
         Runnable runnable = () -> {
             arun.<APObj>run(session -> {

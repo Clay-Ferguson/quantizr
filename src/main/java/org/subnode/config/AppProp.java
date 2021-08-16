@@ -37,7 +37,6 @@ public class AppProp /* implements EnvironmentAware */ {
 	private boolean daemonsEnabled = false; // <--- todo-0
 
 	// turns on verbose ActivityPub Logging
-	// todo-0: turn off.
 	private boolean apLog = true; // <--- todo-0
 
 	private String protocolHostAndPort = null;

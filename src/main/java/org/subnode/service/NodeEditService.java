@@ -112,8 +112,6 @@ public class NodeEditService {
 	@Autowired
 	private IPFSService ipfsService;
 
-	// todo-0: check calls wrapped by this for the possibility of a thread local access that will fail
-	// when the thres is not a request thread
 	@Autowired
 	private AsyncExec asyncExec;
 
@@ -161,8 +159,8 @@ public class NodeEditService {
 		}
 
 		if (NodeType.BOOKMARK.s().equals(req.getTypeName())) {
-			
-			//Note: if linkBookmark node will null here. that's fine.
+
+			// Note: if linkBookmark node will null here. that's fine.
 			SubNode nodeToBookmark = node;
 
 			node = read.getUserNodeByType(session, session.getUserName(), null, "### Bookmarks", NodeType.BOOKMARK_LIST.s(), null,
@@ -234,8 +232,8 @@ public class NodeEditService {
 		}
 
 		update.save(session, newNode);
-		res.setNewNode(
-				convert.convertToNodeInfo(ThreadLocals.getSessionContext(), session, newNode, true, false, -1, false, false, false));
+		res.setNewNode(convert.convertToNodeInfo(ThreadLocals.getSessionContext(), session, newNode, true, false, -1, false,
+				false, false));
 
 		res.setSuccess(true);
 		return res;
@@ -371,8 +369,8 @@ public class NodeEditService {
 		auth.setDefaultReplyAcl(null, parentNode, newNode);
 
 		update.save(session, newNode);
-		res.setNewNode(
-				convert.convertToNodeInfo(ThreadLocals.getSessionContext(), session, newNode, true, false, -1, false, false, false));
+		res.setNewNode(convert.convertToNodeInfo(ThreadLocals.getSessionContext(), session, newNode, true, false, -1, false,
+				false, false));
 
 		// if (req.isUpdateModTime() && !StringUtils.isEmpty(newNode.getContent()) //
 		// // don't evern send notifications when 'admin' is the one doing the editing.
@@ -495,38 +493,41 @@ public class NodeEditService {
 		if (ipfsLink != null) {
 
 			asyncExec.run(() -> {
-				// if there's no 'ref' property this is not a foreign reference, which means we
-				// DO pin this.
-				if (node.getStrProp(NodeProp.IPFS_REF.s()) == null) {
-					/*
-					 * Only if this is the first ipfs link ever added, or is a new link, then we need to pin and update
-					 * user quota
-					 */
-					if (initIpfsLink == null || !initIpfsLink.equals(ipfsLink)) {
-						ipfs.addPin(ipfsLink);
+				arun.run(sess -> {
+					// if there's no 'ref' property this is not a foreign reference, which means we
+					// DO pin this.
+					if (node.getStrProp(NodeProp.IPFS_REF.s()) == null) {
+						/*
+						 * Only if this is the first ipfs link ever added, or is a new link, then we need to pin and update
+						 * user quota
+						 */
+						if (initIpfsLink == null || !initIpfsLink.equals(ipfsLink)) {
+							ipfs.addPin(ipfsLink);
 
-						// always get bytes here from IPFS, and update the node prop with that too.
-						IPFSObjectStat stat = ipfsService.objectStat(ipfsLink, false);
-						node.setProp(NodeProp.BIN_SIZE.s(), stat.getCumulativeSize());
+							// always get bytes here from IPFS, and update the node prop with that too.
+							IPFSObjectStat stat = ipfsService.objectStat(ipfsLink, false);
+							node.setProp(NodeProp.BIN_SIZE.s(), stat.getCumulativeSize());
 
-						/* And finally update this user's quota for the added storage */
-						SubNode accountNode = read.getUserNodeByUserName(session, null);
-						if (accountNode != null) {
-							userManagerService.addBytesToUserNodeBytes(stat.getCumulativeSize(), accountNode, 1);
+							/* And finally update this user's quota for the added storage */
+							SubNode accountNode = read.getUserNodeByUserName(sess, null);
+							if (accountNode != null) {
+								userManagerService.addBytesToUserNodeBytes(stat.getCumulativeSize(), accountNode, 1);
+							}
 						}
 					}
-				}
-				// otherwise we don't pin it.
-				else {
-					/*
-					 * Don't do this removePin. Leave this comment here as a warning of what not to do! We can't simply
-					 * remove the CID from our IPFS database because some node stopped using it, because there may be
-					 * many other users/nodes potentially using it, so we let the releaseOrphanIPFSPins be our only way
-					 * pins ever get removed, because that method does a safe and correct delete of all pins that are
-					 * truly no longer in use by anyone
-					 */
-					// ipfs.removePin(ipfsLink);
-				}
+					// otherwise we don't pin it.
+					else {
+						/*
+						 * Don't do this removePin. Leave this comment here as a warning of what not to do! We can't simply
+						 * remove the CID from our IPFS database because some node stopped using it, because there may be
+						 * many other users/nodes potentially using it, so we let the releaseOrphanIPFSPins be our only way
+						 * pins ever get removed, because that method does a safe and correct delete of all pins that are
+						 * truly no longer in use by anyone
+						 */
+						// ipfs.removePin(ipfsLink);
+					}
+					return null;
+				});
 			});
 		}
 
@@ -536,25 +537,28 @@ public class NodeEditService {
 		 */
 		util.setPendingPath(node, false);
 
+		final String sessionUserName = ThreadLocals.getSessionContext().getUserName();
+
 		asyncExec.run(() -> {
-			/* Send notification to local server or to remote server when a node is added */
-			if (!StringUtils.isEmpty(node.getContent()) //
-					// don't send notifications when 'admin' is the one doing the editing.
-					&& !PrincipalName.ADMIN.s().equals(ThreadLocals.getSessionContext().getUserName())) {
+			arun.run(s -> {
+				/* Send notification to local server or to remote server when a node is added */
+				if (!StringUtils.isEmpty(node.getContent()) //
+						// don't send notifications when 'admin' is the one doing the editing.
+						&& !PrincipalName.ADMIN.s().equals(sessionUserName)) {
 
-				SubNode parent = read.getNode(session, node.getParentPath(), false);
+					SubNode parent = read.getNode(session, node.getParentPath(), false);
 
-				if (parent != null) {
-					arun.run(s -> {
+					if (parent != null) {
 						auth.saveMentionsToNodeACL(s, node);
 
 						if (apService.sendNotificationForNodeEdit(s, parent, node)) {
 							userFeedService.pushNodeUpdateToBrowsers(s, node);
 						}
 						return null;
-					});
+					}
 				}
-			}
+				return null;
+			});
 		});
 
 		NodeInfo newNodeInfo =

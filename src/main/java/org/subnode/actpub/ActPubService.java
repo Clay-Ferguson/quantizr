@@ -154,11 +154,16 @@ public class ActPubService {
              */
             if (node.getAc() != null) {
                 for (String k : node.getAc().keySet()) {
-                    // todo-0: If this node is shared ONLY to public, does the AP spec and/or Mastodon apps, still
-                    // blast this out to other servers in some public way or even by having knowledge of who is 
-                    // following the owner of this node on foreign servers, and then sending it out to each one, one at a time?
-                    // Current behavior of Quanta is that we ONLY post to accounts this node is specifically shared to
-                    // so if it's only set to public (no user shares) then NOTHING is sent out to other federated servers.
+                    /*
+                     * todo-0 : If this node is shared ONLY to public, does the AP spec and/or Mastodon apps, still
+                     * blast this out to other servers in some public way or even by having knowledge of who is
+                     * following the owner of this node on foreign servers, and then sending it out to each one, one at
+                     * a time?
+                     * 
+                     * Current behavior is that we ONLY post to accounts this node is specifically shared to
+                     * so if it's only set to public (no user shares) then NOTHING is sent out to other federated
+                     * servers.
+                     */
                     if (PrincipalName.PUBLIC.s().equals(k)) {
                         privateMessage = false;
                     } else {
