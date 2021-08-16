@@ -31,16 +31,16 @@ export class RssFeedsTypeHandler extends TypeBase {
 
     render(node: J.NodeInfo, rowStyling: boolean, isTreeView: boolean, state: AppState): Comp {
         return new Div(null, null, [
-            new Heading(4, "RSS Feed Subscriptions", {
-                className: "marginAll"
-            }),
             new ButtonBar([
                 new Button("Add RSS Feed", () => S.edit.createNode(node, J.NodeType.RSS_FEED, false, null, null, state), {
                     title: "Add a new RSS Feed Subscription"
                 })
-            ], null, "float-right marginBottom"),
-            new Clearfix(),
-            new HelpButton(() => S.quanta?.config?.help?.type?.friendsList?.render)
+            ], null, "float-right"),
+            new Heading(4, "RSS Feed Subscriptions", {
+                className: "marginAll"
+            })
+            // new Clearfix(),
+            // new HelpButton(() => S.quanta?.config?.help?.type?.friendsList?.render)
         ]);
     }
 }

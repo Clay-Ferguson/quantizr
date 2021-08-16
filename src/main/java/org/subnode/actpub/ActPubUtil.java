@@ -62,6 +62,9 @@ public class ActPubUtil {
     @Autowired
     private ActPubService apService;
 
+    @Autowired
+    private ActPubUtil apUtil;
+
     /*
      * RestTemplate is thread-safe and reusable, and has no state, so we need only one final static
      * instance ever
@@ -227,7 +230,7 @@ public class ActPubUtil {
     public void securePost(String userDoingPost, MongoSession ms, String privateKey, String toInbox, String actor,
             APObj message, MediaType acceptType) {
         try {
-            // log.debug("Secure post to " + toInbox);
+            apUtil.log("Secure post to " + toInbox);
             /* if private key not sent then get it using the session */
             if (privateKey == null) {
                 privateKey = apCrypto.getPrivateKey(ms, userDoingPost);
@@ -239,7 +242,7 @@ public class ActPubUtil {
 
             String body = XString.prettyPrint(message);
             byte[] bodyBytes = body.getBytes(StandardCharsets.UTF_8);
-            // log.debug("Posting Object:\n" + body);
+            apUtil.log("Posting Object:\n" + body);
 
             byte[] privKeyBytes = Base64.getDecoder().decode(privateKey);
             KeyFactory kf = KeyFactory.getInstance("RSA");
@@ -444,7 +447,7 @@ public class ActPubUtil {
                                                     .put(APProp.type, APConst.CONTENT_TYPE_JSON_ACTIVITY_SHORT) //
                                                     .put(APProp.href, makeActorUrlForUserName(username))));
 
-                            // log.debug("Reply with WebFinger: " + XString.prettyPrint(webFinger));
+                            apUtil.log("Reply with WebFinger: " + XString.prettyPrint(webFinger));
                             return webFinger;
                         }
                     }
@@ -685,6 +688,12 @@ public class ActPubUtil {
                         return;
                 }
             }
+        }
+    }
+
+    public void log(String message) {
+        if (appProp.isApLog()) {
+            log.debug(message);
         }
     }
 }

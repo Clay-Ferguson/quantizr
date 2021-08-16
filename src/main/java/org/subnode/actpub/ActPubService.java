@@ -154,6 +154,11 @@ public class ActPubService {
              */
             if (node.getAc() != null) {
                 for (String k : node.getAc().keySet()) {
+                    // todo-0: If this node is shared ONLY to public, does the AP spec and/or Mastodon apps, still
+                    // blast this out to other servers in some public way or even by having knowledge of who is 
+                    // following the owner of this node on foreign servers, and then sending it out to each one, one at a time?
+                    // Current behavior of Quanta is that we ONLY post to accounts this node is specifically shared to
+                    // so if it's only set to public (no user shares) then NOTHING is sent out to other federated servers.
                     if (PrincipalName.PUBLIC.s().equals(k)) {
                         privateMessage = false;
                     } else {
@@ -208,6 +213,8 @@ public class ActPubService {
     /* Sends note outbound to other servers */
     public void sendNote(MongoSession ms, List<String> toUserNames, String fromUser, String inReplyTo, String content,
             APList attachments, String noteUrl, boolean privateMessage) {
+        if (toUserNames == null)
+            return;
 
         String host = appProp.getMetaHost();
         String fromActor = null;
@@ -229,7 +236,7 @@ public class ActPubService {
 
             APObj webFinger = apUtil.getWebFinger(toUserName);
             if (webFinger == null) {
-                // log.debug("Unable to get webfinger for " + toUserName);
+                apUtil.log("Unable to get webfinger for " + toUserName);
                 continue;
             }
 
@@ -345,7 +352,7 @@ public class ActPubService {
             log.debug("Can't import a user that's not from a foreign server.");
             return null;
         }
-        // log.debug("importing Actor: " + apUserName);
+        apUtil.log("importing Actor: " + apUserName);
 
         saveFediverseName(apUserName);
 
@@ -422,6 +429,7 @@ public class ActPubService {
         if (type == null)
             return;
         type = type.trim();
+        apUtil.log("inbox type: " + type);
 
         switch (type) {
             case APType.Create:
@@ -446,7 +454,7 @@ public class ActPubService {
     public void processUndoAction(Object payload) {
         Object obj = AP.obj(payload, APProp.object);
         String type = AP.str(obj, APProp.type);
-
+        apUtil.log("Undo Type: " + type);
         switch (type) {
             case APType.Follow:
                 apFollowing.processFollowAction(obj, true);
@@ -477,16 +485,17 @@ public class ActPubService {
             apCrypto.verifySignature(httpReq, pubKey);
 
             Object object = AP.obj(payload, APProp.object);
+            String type = AP.str(object, APProp.type);
+            apUtil.log("create type: " + type);
 
-            switch (AP.str(object, APProp.type)) {
+            switch (type) {
                 case APType.Note:
                     processCreateNote(session, actorUrl, actorObj, object);
                     break;
 
                 default:
                     // this captures videos? and other things (todo-1: add more support)
-                    // log.debug("Unhandled Create action (object type not supported): " +
-                    // XString.prettyPrint(payload));
+                    log.debug("Unhandled Create action");
                     break;
             }
             return null;
@@ -615,8 +624,10 @@ public class ActPubService {
         // todo-1: I haven't yet tested that mentions are parsable in any Mastodon text using this method
         // but we at least know other instances of Quanta will have these extractable this way.
         HashSet<String> mentionsSet = auth.parseMentions(contentHtml);
-        for (String mentionName : mentionsSet) {
-            saveFediverseName(mentionName);
+        if (mentionsSet != null) {
+            for (String mentionName : mentionsSet) {
+                saveFediverseName(mentionName);
+            }
         }
 
         newNode.setModifyTime(published);
@@ -646,7 +657,7 @@ public class ActPubService {
                     Arrays.asList(PrivilegeType.READ.s(), PrivilegeType.WRITE.s()), null);
         }
 
-        // log.debug("saveNote: OBJ=" + XString.prettyPrint(obj));
+        apUtil.log("saveNote: OBJ=" + XString.prettyPrint(obj));
 
         update.save(ms, newNode);
         addAttachmentIfExists(ms, newNode, obj);
@@ -685,7 +696,7 @@ public class ActPubService {
      * shares the node to either all the followers or the specific actor
      */
     private void shareToUsersForUrl(MongoSession ms, SubNode node, String url) {
-        // log.debug("shareToUsersForUrl: " + url);
+        apUtil.log("shareToUsersForUrl: " + url);
 
         if (url.endsWith("#Public")) {
             node.safeGetAc().put(PrincipalName.PUBLIC.s(), new AccessControl(null, PrivilegeType.READ.s()));
@@ -870,7 +881,7 @@ public class ActPubService {
 
                         .put(APProp.supportsFriendRequests, true);
 
-                // log.debug("Reply with Actor: " + XString.prettyPrint(actor));
+                apUtil.log("Reply with Actor: " + XString.prettyPrint(actor));
                 return actor;
             }
         } catch (Exception e) {
@@ -961,6 +972,9 @@ public class ActPubService {
     /* every 90 minutes ping all the outboxes */
     @Scheduled(fixedDelay = 90 * DateUtil.MINUTE_MILLIS)
     public void bigRefresh() {
+        if (!appProp.isDaemonsEnabled())
+            return;
+
         if (bigRefresh)
             return;
         try {
@@ -976,7 +990,7 @@ public class ActPubService {
      */
     @Scheduled(fixedDelay = 3 * 1000)
     public void userRefresh() {
-        if (userRefresh || !appProp.isActPubEnabled())
+        if (userRefresh || !appProp.isActPubEnabled() || !appProp.isDaemonsEnabled())
             return;
 
         try {
@@ -1000,6 +1014,8 @@ public class ActPubService {
 
     private void refreshUsers() {
         for (final String userName : apCache.usersPendingRefresh.keySet()) {
+            if (!appProp.isDaemonsEnabled())
+                break;
             try {
                 Boolean done = apCache.usersPendingRefresh.get(userName);
                 if (done)
@@ -1105,6 +1121,9 @@ public class ActPubService {
                     read.findTypedNodesUnderPath(session, NodeName.ROOT_OF_ALL_USERS, NodeType.ACCOUNT.s());
 
             for (SubNode node : accountNodes) {
+                if (!appProp.isDaemonsEnabled())
+                    break;
+
                 String userName = node.getStrProp(NodeProp.USER.s());
                 if (userName == null || !userName.contains("@"))
                     continue;

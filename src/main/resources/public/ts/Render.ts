@@ -17,6 +17,7 @@ import { Singletons } from "./Singletons";
 import { Comp } from "./widget/base/Comp";
 import { Button } from "./widget/Button";
 import { ButtonBar } from "./widget/ButtonBar";
+import { Clearfix } from "./widget/Clearfix";
 import { Div } from "./widget/Div";
 import { Heading } from "./widget/Heading";
 import { HorizontalLayout } from "./widget/HorizontalLayout";
@@ -682,7 +683,8 @@ export class Render implements RenderIntf {
         let img: Img = imgSrc
             ? new Img(null, {
                 className: iconClass,
-                src: imgSrc
+                src: imgSrc,
+                onClick
             }) : null;
 
         let disp = displayName ? displayName + " (@" + user + ")" : ("@" + user);
@@ -690,32 +692,33 @@ export class Render implements RenderIntf {
         if (className) attribs.className = className;
 
         return new Div(null, attribs, [
-            new ButtonBar([
-                // todo-1: need to make ALL calls be able to do a newSubNode here without so we don't need
-                // the showMessagesButton flag.
-                showMessageButton ? new Button("Message", S.edit.newSubNode, {
-                    title: "Send Private Message",
-                    nid: nodeId
-                }) : null,
-                actorUrl ? new Button("Go to User Page", () => {
-                    window.open(actorUrl, "_blank");
-                }) : null
-            ], null, "float-right marginBottom"),
-
             new HorizontalLayout([
-                img,
-                new Div(null, null, [
-                    new Div(null, null, [
-                        new Heading(4, disp, {
-                            className: "marginAll"
-                        }),
-                        new Html(userBio, {
-                            className: "userBio"
-                        })])
-                ])
-            ], "displayTable userInfo", {
-                onClick
-            })
+                new Div(null, { className: "friendLhs" }, [
+                    img
+                ]),
+                new Div(null, { className: "friendRhs" }, [
+                    new ButtonBar([
+                        // todo-1: need to make ALL calls be able to do a newSubNode here without so we don't need
+                        // the showMessagesButton flag.
+                        showMessageButton ? new Button("Message", S.edit.newSubNode, {
+                            title: "Send Private Message",
+                            nid: nodeId
+                        }) : null,
+                        actorUrl ? new Button("Go to User Page", () => {
+                            window.open(actorUrl, "_blank");
+                        }) : null
+                    ], null, "float-right"),
+                    new Clearfix(),
+
+                    new Heading(4, disp, {
+                        className: "marginAll clickable",
+                        onClick
+                    }),
+                    new Html(userBio, {
+                        className: "userBio"
+                    })])
+
+            ], "displayTable userInfo", null)
         ]);
     }
 }

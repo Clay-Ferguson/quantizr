@@ -112,6 +112,8 @@ public class NodeEditService {
 	@Autowired
 	private IPFSService ipfsService;
 
+	// todo-0: check calls wrapped by this for the possibility of a thread local access that will fail
+	// when the thres is not a request thread
 	@Autowired
 	private AsyncExec asyncExec;
 
@@ -285,7 +287,7 @@ public class NodeEditService {
 		properties.add(new PropertyInfo(NodeProp.USER.s(), userToFollow));
 
 		SubNode newNode = create.createNode(session, parentFriendsList, null, NodeType.FRIEND.s(), 0L, CreateNodeLocation.LAST,
-				properties, null, true);
+				properties, parentFriendsList.getOwner(), true);
 		newNode.setProp(NodeProp.TYPE_LOCK.s(), Boolean.valueOf(true));
 
 		if (followerActorUrl != null) {

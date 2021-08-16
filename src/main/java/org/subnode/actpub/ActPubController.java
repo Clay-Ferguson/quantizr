@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.subnode.actpub.model.APObj;
 import org.subnode.config.AppProp;
+import org.subnode.util.XString;
 
 // @CrossOrigin --> Access-Control-Allow-Credentials
 
@@ -61,6 +62,7 @@ public class ActPubController {
 	@RequestMapping(value = APConst.PATH_WEBFINGER, method = RequestMethod.GET, produces = APConst.CONTENT_TYPE_JSON_JRD)
 	public @ResponseBody Object webFinger(//
 			@RequestParam(value = "resource", required = true) String resource) {
+		apUtil.log("getWebFinger: " + resource);
 		Object ret = apUtil.generateWebFinger(resource);
 		if (ret != null)
 			return ret;
@@ -87,7 +89,7 @@ public class ActPubController {
 			HttpServletRequest req, //
 			HttpServletResponse response) throws Exception {
 		String url = appProp.getProtocolHostAndPort() + "/u/" + userName + "/home";
-		// log.debug("Redirecting to: " + url);
+		apUtil.log("Redirecting to: " + url);
 		response.sendRedirect(url);
 	}
 
@@ -98,6 +100,7 @@ public class ActPubController {
 			produces = APConst.CONTENT_TYPE_JSON_ACTIVITY)
 	public @ResponseBody Object actor(//
 			@PathVariable(value = "userName", required = true) String userName) {
+		apUtil.log("getActor: " + userName);
 		Object ret = apService.generateActor(userName);
 		if (ret != null)
 			return ret;
@@ -117,7 +120,7 @@ public class ActPubController {
 			HttpServletRequest httpReq) {
 		try {
 			APObj payload = mapper.readValue(body, new TypeReference<>() {});
-			// log.debug("INBOX incoming payload: " + XString.prettyPrint(payload));
+			apUtil.log("INBOX incoming payload: " + XString.prettyPrint(payload));
 			ActPubService.inboxCount++;
 			apService.processInboxPost(httpReq, payload);
 			return new ResponseEntity<String>(HttpStatus.OK);
@@ -152,7 +155,7 @@ public class ActPubController {
 			ret = apOutbox.generateOutbox(userName);
 		}
 		if (ret != null) {
-			// log.debug("Reply with Outbox: " + XString.prettyPrint(ret));
+			apUtil.log("Reply with Outbox: " + XString.prettyPrint(ret));
 			return ret;
 		}
 		return new ResponseEntity<String>(HttpStatus.OK);
@@ -174,7 +177,7 @@ public class ActPubController {
 			ret = apFollower.generateFollowers(userName);
 		}
 		if (ret != null) {
-			// log.debug("Reply with Followers: " + XString.prettyPrint(ret));
+			apUtil.log("Reply with Followers: " + XString.prettyPrint(ret));
 			return ret;
 		}
 		return new ResponseEntity<String>(HttpStatus.OK);
@@ -196,7 +199,7 @@ public class ActPubController {
 			ret = apFollowing.generateFollowing(userName);
 		}
 		if (ret != null) {
-			// log.debug("Reply with Following: " + XString.prettyPrint(ret));
+			apUtil.log("Reply with Following: " + XString.prettyPrint(ret));
 			return ret;
 		}
 		return new ResponseEntity<String>(HttpStatus.OK);

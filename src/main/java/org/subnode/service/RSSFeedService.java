@@ -143,6 +143,7 @@ public class RSSFeedService {
 	 */
 	@Scheduled(fixedDelay = 30 * 60 * 1000)
 	public void run() {
+		if (!appProp.isDaemonsEnabled()) return;
 		if (run)
 			return;
 		try {

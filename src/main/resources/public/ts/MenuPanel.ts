@@ -469,6 +469,7 @@ export class MenuPanel extends Div {
 
                 // new MenuItem("Backup DB", () => S.view.runServerCommand("BackupDb", "Backup DB Response", null, state)), //
                 new MenuItem("Server Info", () => S.view.runServerCommand("getServerInfo", "Server Info", null, state)), //
+                new MenuItem("Toggle Daemons", () => S.view.runServerCommand("toggleDaemons", "Toggle Daemons", null, state)), //
                 new MenuItem("View Session Activity", () => S.view.runServerCommand("getSessionActivity", "Session Activity", null, state)), //
                 new MenuItem("Fediverse Users", () => window.open(S.util.getHostAndPort() + "/fediverse-users", "_blank")), //
                 new MenuItem("Performance Report", () => window.open(S.util.getHostAndPort() + "/performance-report", "_blank")), //

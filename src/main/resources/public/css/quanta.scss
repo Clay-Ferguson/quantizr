@@ -482,6 +482,14 @@ a {
     border: 1px solid $nodeBorderBottomColor;
 }
 
+.friendLhs {
+    width: 25%;
+}
+
+.friendRhs {
+    width: 75%;
+}
+
 /* it's a bit ugly that we have to style the icon differently based on if it's on a list view or the main tree */
 .listFriendImage {
     max-width: 120px;
@@ -1986,9 +1994,14 @@ audio::-webkit-media-controls-play-button {
     cursor: pointer;
 }
 
+.clickable {
+    cursor: pointer;
+}
+
 .userInfo {
     cursor: pointer;
     padding: 10px;
+    width: 100%;
 }
 
 .openGraphPanel {

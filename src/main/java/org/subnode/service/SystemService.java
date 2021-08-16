@@ -190,6 +190,7 @@ public class SystemService {
 
 	public String getSystemInfo() {
 		StringBuilder sb = new StringBuilder();
+		sb.append("Daemons Enabed: "+String.valueOf(appProp.isDaemonsEnabled())+"\n");
 		Runtime runtime = Runtime.getRuntime();
 		runtime.gc();
 		long freeMem = runtime.freeMemory() / Const.ONE_MB;

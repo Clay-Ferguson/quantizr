@@ -1328,6 +1328,11 @@ public class AppController implements ErrorController {
 					res.getMessages().add(new InfoMessage("Fediverse refresh initiated...", null));
 					break;
 
+				case "toggleDaemons":
+					appProp.setDaemonsEnabled(!appProp.isDaemonsEnabled());
+					res.getMessages().add(new InfoMessage(systemService.getSystemInfo(), null));
+					break;
+
 				case "getServerInfo":
 					res.getMessages().add(new InfoMessage(systemService.getSystemInfo(), null));
 					break;

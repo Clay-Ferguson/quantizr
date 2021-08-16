@@ -243,6 +243,10 @@ public class MongoAuth {
 	}
 
 	public void ownerAuth(MongoSession session, SubNode node) {
+		if (session == null) {
+			throw new RuntimeEx("null session passed to ownerAuth.");
+		}
+
 		if (node == null) {
 			throw new RuntimeEx("Auth Failed. Node did not exist.");
 		}
@@ -599,6 +603,8 @@ public class MongoAuth {
 	}
 
 	public HashSet<String> parseMentions(String message) {
+		if (message == null)
+			return null;
 		HashSet<String> userNames = new HashSet<>();
 
 		// prepare so that newlines are compatable with out tokenizing
@@ -630,6 +636,9 @@ public class MongoAuth {
 	 */
 	public HashSet<String> saveMentionsToNodeACL(MongoSession session, SubNode node) {
 		HashSet<String> mentionsSet = parseMentions(node.getContent());
+		if (mentionsSet == null) {
+			return null;
+		}
 
 		boolean acChanged = false;
 		HashMap<String, AccessControl> ac = node.getAc();

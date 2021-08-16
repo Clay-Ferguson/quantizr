@@ -33,6 +33,13 @@ public class AppProp /* implements EnvironmentAware */ {
 	@Autowired
 	private Environment env;
 
+	// if false this disables all backgrouind processing.
+	private boolean daemonsEnabled = false; // <--- todo-0
+
+	// turns on verbose ActivityPub Logging
+	// todo-0: turn off.
+	private boolean apLog = true; // <--- todo-0
+
 	private String protocolHostAndPort = null;
 
 	public static final ObjectMapper yamlMapper = new ObjectMapper(new YAMLFactory());
@@ -86,8 +93,7 @@ public class AppProp /* implements EnvironmentAware */ {
 				Resource resource = SpringContextUtil.getApplicationContext().getResource("classpath:" + fileName);
 				is = resource.getInputStream();
 
-				map = yamlMapper.readValue(is, new TypeReference<HashMap<String, Object>>() {
-				});
+				map = yamlMapper.readValue(is, new TypeReference<HashMap<String, Object>>() {});
 
 				if (map == null) {
 					map = new HashMap<>();
@@ -111,8 +117,7 @@ public class AppProp /* implements EnvironmentAware */ {
 				// if an external config file is found use it.
 				if (file.isFile()) {
 					log.debug("Loading config from file system: " + fileName);
-					map = yamlMapper.readValue(file, new TypeReference<HashMap<String, Object>>() {
-					});
+					map = yamlMapper.readValue(file, new TypeReference<HashMap<String, Object>>() {});
 				}
 
 				if (map == null) {
@@ -302,5 +307,22 @@ public class AppProp /* implements EnvironmentAware */ {
 			return folder;
 		String userDir = System.getProperty("user.dir");
 		return folder.replace("{user.dir}", userDir);
+	}
+
+	public boolean isDaemonsEnabled() {
+		return daemonsEnabled;
+	}
+
+	public void setDaemonsEnabled(boolean daemonsEnabled) {
+		this.daemonsEnabled = daemonsEnabled;
+		log.debug("setDaemonsEnabled: " + String.valueOf(daemonsEnabled));
+	}
+
+	public boolean isApLog() {
+		return apLog;
+	}
+
+	public void setApLog(boolean apLog) {
+		this.apLog = apLog;
 	}
 }

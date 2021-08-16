@@ -40,6 +40,7 @@ import org.subnode.response.GetFollowingResponse;
 import org.subnode.service.NodeEditService;
 import org.subnode.util.Convert;
 import org.subnode.util.ThreadLocals;
+import org.subnode.util.XString;
 
 @Component
 public class ActPubFollowing {
@@ -92,8 +93,7 @@ public class ActPubFollowing {
      */
     public void setFollowing(String followerUserName, String apUserName, boolean following) {
         try {
-            // log.debug("Local Follower User: " + followerUserName + " setFollowing: " + apUserName + "
-            // following=" + following);
+            apUtil.log("Local Follower User: " + followerUserName + " setFollowing: " + apUserName + "following=" + following);
             // admin doesn't follow/unfollow
             if (PrincipalName.ADMIN.s().equalsIgnoreCase(followerUserName)) {
                 return;
@@ -143,26 +143,33 @@ public class ActPubFollowing {
      * If 'unFollow' is true we actually do an unfollow instead of a follow.
      */
     public void processFollowAction(Object followAction, boolean unFollow) {
-        arun.<APObj>run(session -> {
-            // Actor URL of actor doing the following
-            String followerActorUrl = AP.str(followAction, APProp.actor);
-            if (followerActorUrl == null) {
-                log.debug("no 'actor' found on follows action request posted object");
-                return null;
-            }
 
-            /* Protocol says we need to send this acceptance back */
-            Runnable runnable = () -> {
+        // Actor URL of actor doing the following
+        String followerActorUrl = AP.str(followAction, APProp.actor);
+        if (followerActorUrl == null) {
+            log.debug("no 'actor' found on follows action request posted object");
+            return;
+        }
+
+        /*
+         * Protocol says we need to send this acceptance back:
+         * 
+         * todo-0: these kinds of runnables need a MongoSession for the threadlocal!!!, or be sure the
+         * 'arun.run' is INSIDE it not outside it.
+         */
+        Runnable runnable = () -> {
+            arun.<APObj>run(session -> {
                 try {
                     APObj followerActor = apUtil.getActorByUrl(followerActorUrl);
                     if (followerActor == null) {
-                        return;
+                        return null;
                     }
                     String followerActorHtmlUrl = AP.str(followerActor, APProp.url);
 
-                    // log.debug("getLongUserNameFromActorUrl: " + actorUrl + "\n" +
-                    // XString.prettyPrint(actor));
+                    log.debug("getLongUserNameFromActorUrl: " + followerActor + "\n" + XString.prettyPrint(followerActor));
                     String followerUserName = apUtil.getLongUserNameFromActor(followerActor);
+
+                    // warning: the return value is not used but the side effect of calling this is still needed.
                     SubNode followerAccountNode = apService.getAcctNodeByUserName(session, followerUserName);
                     apService.userEncountered(followerUserName, false);
 
@@ -170,26 +177,28 @@ public class ActPubFollowing {
                     String actorBeingFollowedUrl = AP.str(followAction, APProp.object);
                     if (actorBeingFollowedUrl == null) {
                         log.debug("no 'object' found on follows action request posted object");
-                        return;
+                        return null;
                     }
 
                     String userToFollow = apUtil.getLocalUserNameFromActorUrl(actorBeingFollowedUrl);
                     if (userToFollow == null) {
                         log.debug("unable to get a user name from actor url: " + actorBeingFollowedUrl);
-                        return;
+                        return null;
                     }
 
                     // get the Friend List of the follower
                     SubNode followerFriendList = read.getUserNodeByType(session, followerUserName, null, null,
                             NodeType.FRIEND_LIST.s(), null, NodeName.FRIENDS);
-
+                            
                     /*
                      * lookup to see if this followerFriendList node already has userToFollow already under it
                      */
                     SubNode friendNode =
                             read.findNodeByUserAndType(session, followerFriendList, userToFollow, NodeType.FRIEND.s());
+
                     if (friendNode == null) {
                         if (!unFollow) {
+                            apUtil.log("unable to find user node by name: " + followerUserName + " so creating.");
                             friendNode = edit.createFriendNode(session, followerFriendList, userToFollow, followerActorUrl,
                                     followerActorHtmlUrl);
                             // userFeedService.sendServerPushInfo(localUserName,
@@ -221,15 +230,16 @@ public class ActPubFollowing {
 
                     String followerInbox = AP.str(followerActor, APProp.inbox);
 
-                    // log.debug("Sending Accept of Follow Request to inbox " + followerInbox);
-                    String userDoingPost = ThreadLocals.getSessionContext().getUserName();
-                    apUtil.securePost(userDoingPost, session, privateKey, followerInbox, actorBeingFollowedUrl, accept, null);
+                    log.debug("Sending Accept of Follow Request to inbox " + followerInbox);
+
+                    apUtil.securePost(null, session, privateKey, followerInbox, actorBeingFollowedUrl, accept, null);
                 } catch (Exception e) {
+                    log.error("Failed sending follow reply.", e);
                 }
-            };
-            executor.execute(runnable);
-            return null;
-        });
+                return null;
+            });
+        };
+        executor.execute(runnable);
     }
 
     /**
@@ -312,7 +322,7 @@ public class ActPubFollowing {
         APObj outbox = apUtil.getJson(url, APConst.MT_APP_ACTJSON);
         // ActPubService.outboxQueryCount++;
         // ActPubService.cycleOutboxQueryCount++;
-        // log.debug("Outbox: " + XString.prettyPrint(outbox));
+        apUtil.log("Following: " + XString.prettyPrint(outbox));
         return outbox;
     }
 

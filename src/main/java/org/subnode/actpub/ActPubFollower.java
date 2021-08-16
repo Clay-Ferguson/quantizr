@@ -32,6 +32,7 @@ import org.subnode.request.GetFollowersRequest;
 import org.subnode.response.GetFollowersResponse;
 import org.subnode.util.Convert;
 import org.subnode.util.ThreadLocals;
+import org.subnode.util.XString;
 
 @Component
 public class ActPubFollower {
@@ -104,7 +105,7 @@ public class ActPubFollower {
                     // for now just add the url for future crawling. todo-1: later we can do something more meaningful
                     // with each actor url.
                     if (apService.saveFediverseName(followerActorUrl)) {
-                        // log.debug("follower: " + followerActorUrl); 
+                        // log.debug("follower: " + followerActorUrl);
                     }
                 } else {
                     log.debug("Unexpected follower item class: " + obj.getClass().getName());
@@ -126,7 +127,7 @@ public class ActPubFollower {
         APObj outbox = apUtil.getJson(url, APConst.MT_APP_ACTJSON);
         // ActPubService.outboxQueryCount++;
         // ActPubService.cycleOutboxQueryCount++;
-        // log.debug("Outbox: " + XString.prettyPrint(outbox));
+        apUtil.log("Followers: " + XString.prettyPrint(outbox));
         return outbox;
     }
 
