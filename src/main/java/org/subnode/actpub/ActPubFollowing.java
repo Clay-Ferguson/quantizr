@@ -93,7 +93,8 @@ public class ActPubFollowing {
      */
     public void setFollowing(String followerUserName, String apUserName, boolean following) {
         try {
-            apUtil.log("Local Follower User: " + followerUserName + " setFollowing: " + apUserName + "following=" + following);
+            apUtil.log("Local Follower User (person doing the): " + followerUserName + " setFollowing: " + apUserName
+                    + "following=" + following);
             // admin doesn't follow/unfollow
             if (PrincipalName.ADMIN.s().equalsIgnoreCase(followerUserName)) {
                 return;
@@ -127,6 +128,8 @@ public class ActPubFollowing {
                 if (toActor != null) {
                     String toInbox = AP.str(toActor, APProp.inbox);
                     apUtil.securePost(followerUserName, session, null, toInbox, sessionActorUrl, action, null);
+                } else {
+                    apUtil.log("Unable to get actor to post to: " + actorUrlOfUserBeingFollowed);
                 }
                 return null;
             });
@@ -186,7 +189,7 @@ public class ActPubFollowing {
                     // get the Friend List of the follower
                     SubNode followerFriendList = read.getUserNodeByType(session, followerUserName, null, null,
                             NodeType.FRIEND_LIST.s(), null, NodeName.FRIENDS);
-                            
+
                     /*
                      * lookup to see if this followerFriendList node already has userToFollow already under it
                      */

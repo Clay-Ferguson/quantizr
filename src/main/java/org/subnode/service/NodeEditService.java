@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.subnode.actpub.ActPubFollowing;
 import org.subnode.actpub.ActPubService;
+import org.subnode.actpub.ActPubUtil;
 import org.subnode.config.AppProp;
 import org.subnode.config.NodeName;
 import org.subnode.exception.base.RuntimeEx;
@@ -83,9 +84,6 @@ public class NodeEditService {
 	private MongoUpdate update;
 
 	@Autowired
-	private MongoDelete delete;
-
-	@Autowired
 	private UserFeedService userFeedService;
 
 	@Autowired
@@ -96,6 +94,9 @@ public class NodeEditService {
 
 	@Autowired
 	private ActPubFollowing apFollowing;
+
+	@Autowired
+	private ActPubUtil apUtil;
 
 	@Autowired
 	private AclService aclService;
@@ -586,6 +587,7 @@ public class NodeEditService {
 		if (friendUserName != null) {
 			// if a foreign user, update thru ActivityPub.
 			if (friendUserName.contains("@") && !ThreadLocals.getSessionContext().isAdmin()) {
+				apUtil.log("calling setFollowing=true, to post follow to foreign server.");
 				String followerUser = ThreadLocals.getSessionContext().getUserName();
 				apFollowing.setFollowing(followerUser, friendUserName, true);
 			}

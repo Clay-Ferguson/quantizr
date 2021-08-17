@@ -160,9 +160,8 @@ public class ActPubService {
                      * following the owner of this node on foreign servers, and then sending it out to each one, one at
                      * a time?
                      * 
-                     * Current behavior is that we ONLY post to accounts this node is specifically shared to
-                     * so if it's only set to public (no user shares) then NOTHING is sent out to other federated
-                     * servers.
+                     * Current behavior is that we ONLY post to accounts this node is specifically shared to so if it's
+                     * only set to public (no user shares) then NOTHING is sent out to other federated servers.
                      */
                     if (PrincipalName.PUBLIC.s().equals(k)) {
                         privateMessage = false;
@@ -296,7 +295,7 @@ public class ActPubService {
          * the very beginning which is to get webFinger first and load from there
          */
         if (acctNode == null) {
-            log.debug("Load foreign user: " + apUserName);
+            log.debug("Loading foreign user: " + apUserName);
             APObj webFinger = apUtil.getWebFinger(apUserName);
 
             if (webFinger != null) {
@@ -312,6 +311,8 @@ public class ActPubService {
             // Any time we have an account node being cached we should cache it by it's ID too right away.
             apCache.acctNodesById.put(acctNode.getId().toHexString(), acctNode);
             apCache.acctNodesByUserName.put(apUserName, acctNode);
+        } else {
+            log.error("Unable to load user: " + apUserName);
         }
         return acctNode;
     }

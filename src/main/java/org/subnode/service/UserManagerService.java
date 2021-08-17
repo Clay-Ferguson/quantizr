@@ -20,6 +20,7 @@ import org.springframework.stereotype.Component;
 import org.subnode.actpub.ActPubFollower;
 import org.subnode.actpub.ActPubFollowing;
 import org.subnode.actpub.ActPubService;
+import org.subnode.actpub.ActPubUtil;
 import org.subnode.config.AppProp;
 import org.subnode.config.NodeName;
 import org.subnode.config.SessionContext;
@@ -132,6 +133,9 @@ public class UserManagerService {
 
 	@Autowired
 	private ActPubService apService;
+
+	@Autowired
+	private ActPubUtil apUtil;
 
 	@Autowired
 	private AclService acl;
@@ -739,6 +743,7 @@ public class UserManagerService {
 	 * if the user wasn't already a friend
 	 */
 	public AddFriendResponse addFriend(MongoSession session, final AddFriendRequest req) {
+		apUtil.log("addFriend request: " + XString.prettyPrint(req));
 		AddFriendResponse res = new AddFriendResponse();
 		final String userName = ThreadLocals.getSessionContext().getUserName();
 		session = MongoThreadLocal.ensure(session);
@@ -756,6 +761,7 @@ public class UserManagerService {
 		 */
 		SubNode friendNode = read.findNodeByUserAndType(session, followerFriendList, newUserName, NodeType.FRIEND.s());
 		if (friendNode == null) {
+			apUtil.log("loadForeignUser: " + newUserName);
 			apService.loadForeignUser(newUserName);
 
 			// todo-2: for local users following fediverse this value needs to be here?
@@ -765,9 +771,10 @@ public class UserManagerService {
 			// '/u/userName/home'
 			String followerActorHtmlUrl = null;
 
+			apUtil.log("Creating friendNode for " + newUserName);
 			friendNode = edit.createFriendNode(session, followerFriendList, newUserName, //
 					followerActorUrl, followerActorHtmlUrl);
-					
+
 			if (friendNode != null) {
 				ValContainer<SubNode> userNode = new ValContainer<SubNode>();
 				arun.run(s -> {
@@ -779,6 +786,7 @@ public class UserManagerService {
 					friendNode.setProp(NodeProp.USER_NODE_ID.s(), userNode.getVal().getId().toHexString());
 				}
 
+				edit.updateSavedFriendNode(friendNode);
 				res.setMessage("Added new Friend: " + newUserName);
 			} else {
 				res.setMessage("Unable to add Friend: " + newUserName);
