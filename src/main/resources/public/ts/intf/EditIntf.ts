@@ -43,7 +43,7 @@ export interface EditIntf {
     insertBookWarAndPeace(state: AppState): void;
     clearInbox(state: AppState): void;
     newSubNode(evt: Event, id: string);
-    addNode(nodeId: string, content: string, state: AppState): void;
+    addNode(nodeId: string, content: string, shareToUserId: string, state: AppState): void;
     createNode(node: J.NodeInfo, typeName: string, pendingEdit: boolean, payloadType: string, content: string, state: AppState): void;
     addCalendarEntry(initDate: number, state: AppState): void;
     moveNodeByDrop(targetNodeId: string, sourceNodeId: string, isFirts: boolean): void;

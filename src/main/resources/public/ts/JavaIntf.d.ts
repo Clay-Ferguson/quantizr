@@ -113,6 +113,7 @@ export interface CreateSubNodeRequest extends RequestBase {
     createAtTop: boolean;
     typeLock: boolean;
     properties: PropertyInfo[];
+    shareToUserId: string;
     payloadType?: string;
 }
 

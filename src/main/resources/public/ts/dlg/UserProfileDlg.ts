@@ -130,7 +130,8 @@ export class UserProfileDlg extends DialogBase {
                     localUser && state.userProfile.homeNodeId ? new Button("Home Node", () => this.openUserHomePage(state, "home")) : null, //
                     localUser ? new Button("Posts", () => this.openUserHomePage(state, "posts")) : null, //
 
-                    !this.appState.isAnonUser && !state.userProfile.following && this.readOnly && state.userProfile.userName !== this.appState.userName ? new Button("Add as Friend", this.addFriend) : null,
+                    !this.appState.isAnonUser && this.readOnly && state.userProfile.userName !== this.appState.userName ? new Button("Message", this.sendMessage) : null,
+                    !this.appState.isAnonUser && !state.userProfile.following && this.readOnly && state.userProfile.userName !== this.appState.userName ? new Button("Follow", this.addFriend) : null,
                     !this.appState.isAnonUser && !state.userProfile.blocked && this.readOnly && state.userProfile.userName !== this.appState.userName ? new Button("Block User", this.blockUser) : null,
                     state.userProfile.actorUrl ? new Button("Go to User Page", () => {
                         window.open(state.userProfile.actorUrl, "_blank");
@@ -198,6 +199,10 @@ export class UserProfileDlg extends DialogBase {
         }, (res: J.AddFriendResponse) => {
             S.util.showMessage(res.message, "New Friend");
         });
+    }
+
+    sendMessage = (): void => {
+        S.edit.addNode(null, null, this.userNodeId, this.appState);
     }
 
     blockUser = (): void => {
@@ -344,6 +349,8 @@ export class UserProfileDlg extends DialogBase {
         return new Promise<void>((resolve, reject) => {
             S.util.ajax<J.GetUserAccountInfoRequest, J.GetUserAccountInfoResponse>("getUserAccountInfo", null,
                 async (res: J.GetUserAccountInfoResponse) => {
+                    // what is going on here?, we're not using 'res' at all? What does this call do just update
+                    // something on the server to prepare the 'reload' all. This looks inefficient (todo-0)
                     await this.reload(this.userNodeId);
                     resolve();
                 }, () => resolve());

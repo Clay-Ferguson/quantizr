@@ -65,7 +65,7 @@ export class RightNavPanel extends Div {
 
         let addNoteButton = !state.isAnonUser ? new IconButton("fa-sticky-note", null, {
             onClick: e => {
-                S.edit.addNode("~" + J.NodeType.NOTES, null, state);
+                S.edit.addNode("~" + J.NodeType.NOTES, null, null, state);
             },
             title: "Create new Note (under Notes node)"
         }, "btn-secondary", "off") : null;

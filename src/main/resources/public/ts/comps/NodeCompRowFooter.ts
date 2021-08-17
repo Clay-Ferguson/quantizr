@@ -37,7 +37,7 @@ export class NodeCompRowFooter extends Div {
                         S.util.showMessage("Login to create content and reply to nodes.", "Login!");
                     }
                     else {
-                        S.edit.addNode(this.node.id, null, state);
+                        S.edit.addNode(this.node.id, null, null, state);
                     }
                 }
             }, "Reply", "marginRight"));

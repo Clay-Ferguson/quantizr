@@ -639,7 +639,10 @@ public class MongoAuth {
 		if (mentionsSet == null) {
 			return null;
 		}
-
+		return saveMentionsToNodeACL(mentionsSet, session, node);
+	}
+	
+	public HashSet<String> saveMentionsToNodeACL(HashSet<String> mentionsSet, MongoSession session, SubNode node) {
 		boolean acChanged = false;
 		HashMap<String, AccessControl> ac = node.getAc();
 

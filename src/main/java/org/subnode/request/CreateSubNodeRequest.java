@@ -22,6 +22,17 @@ public class CreateSubNodeRequest extends RequestBase {
 	// default properties to add, or null if none
 	private List<PropertyInfo> properties;
 
+	// for a DM this can be optionally provided to share the node with this person immeidately.
+	private String shareToUserId;
+
+	public String getShareToUserId() {
+		return shareToUserId;
+	}
+
+	public void setShareToUserId(String shareToUserId) {
+		this.shareToUserId = shareToUserId;
+	}
+
 	/* special purpose values for when creating special types of nodes */
 	@Nullable
 	private String payloadType;

@@ -1,6 +1,7 @@
 package org.subnode.service;
 
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import org.apache.commons.lang3.StringUtils;
@@ -26,12 +27,12 @@ import org.subnode.mongo.AdminRun;
 import org.subnode.mongo.CreateNodeLocation;
 import org.subnode.mongo.MongoAuth;
 import org.subnode.mongo.MongoCreate;
-import org.subnode.mongo.MongoDelete;
 import org.subnode.mongo.MongoRead;
 import org.subnode.mongo.MongoSession;
 import org.subnode.mongo.MongoThreadLocal;
 import org.subnode.mongo.MongoUpdate;
 import org.subnode.mongo.MongoUtil;
+import org.subnode.mongo.model.AccessControl;
 import org.subnode.mongo.model.SubNode;
 import org.subnode.request.AppDropRequest;
 import org.subnode.request.CreateSubNodeRequest;
@@ -219,10 +220,19 @@ public class NodeEditService {
 			newNode.setProp(NodeProp.TYPE_LOCK.s(), Boolean.valueOf(true));
 		}
 
-		if (makePublic) {
+		// if a user to share to (a Direct Message) is provided, add it.
+		if (req.getShareToUserId() != null) {
+			HashMap<String, AccessControl> ac = new HashMap<>();
+			ac.put(req.getShareToUserId(), new AccessControl(null, PrivilegeType.READ.s() + "," + PrivilegeType.WRITE.s()));
+			newNode.setAc(ac);
+		}
+		// else maybe public.
+		else if (makePublic) {
 			aclService.addPrivilege(session, newNode, PrincipalName.PUBLIC.s(),
 					Arrays.asList(PrivilegeType.READ.s(), PrivilegeType.WRITE.s()), null);
-		} else {
+		}
+		// else add default sharing
+		else {
 			// we always determine the access controls from the parent for any new nodes
 			auth.setDefaultReplyAcl(null, node, newNode);
 

@@ -69,7 +69,7 @@ export class FeedView extends AppTab {
         let children: Comp[] = [];
 
         children.push(new ButtonBar([
-            state.isAnonUser ? null : new Button("", () => S.edit.addNode(null, null, state), {
+            state.isAnonUser ? null : new Button("", () => S.edit.addNode(null, null, null, state), {
                 className: "fa fa-plus",
                 title: "Post something to the Fediverse!"
             }, "btn-primary")

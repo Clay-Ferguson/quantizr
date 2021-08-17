@@ -222,7 +222,8 @@ export class Edit implements EditIntf {
                             createAtTop,
                             content: clipboardText,
                             typeLock: false,
-                            properties: null
+                            properties: null,
+                            shareToUserId: null
                         }, (res) => {
                             S.quanta.tempDisableAutoScroll();
                             S.quanta.refresh(state);
@@ -250,7 +251,8 @@ export class Edit implements EditIntf {
                     createAtTop,
                     content: null,
                     typeLock: false,
-                    properties: null
+                    properties: null,
+                    shareToUserId: null
                 }, (res) => {
                     this.createSubNodeResponse(res, state);
                 });
@@ -828,7 +830,8 @@ export class Edit implements EditIntf {
             createAtTop: true,
             content: clipText,
             typeLock: false,
-            properties: null
+            properties: null,
+            shareToUserId: null
         },
             () => {
                 let message = parentId ? "Clipboard saved" : "Clipboard text saved under Notes node.";
@@ -878,7 +881,7 @@ export class Edit implements EditIntf {
     /* If node is non-null that means this is a reply to that 'node' but if node is 'null' that means
     this user just probably clicked "+" (new post button) on their Feed Tab and so we will let the server create some node
     like "My Posts" in the root of the user's account to host this new 'reply' by creating the new node under that */
-    addNode = async (nodeId: string, content: string, state: AppState) => {
+    addNode = async (nodeId: string, content: string, shareToUserId: string, state: AppState) => {
         state = appState(state);
 
         // auto-enable edit mode
@@ -894,7 +897,8 @@ export class Edit implements EditIntf {
             createAtTop: false,
             content,
             typeLock: false,
-            properties: null
+            properties: null,
+            shareToUserId
         }, (res) => {
             this.createSubNodeResponse(res, state);
         });
@@ -912,7 +916,8 @@ export class Edit implements EditIntf {
             content,
             typeLock: true,
             properties: null,
-            payloadType
+            payloadType,
+            shareToUserId: null
         }, async (res) => {
             // auto-enable edit mode
             if (!state.userPreferences.editMode) {
@@ -934,7 +939,8 @@ export class Edit implements EditIntf {
             createAtTop: true,
             content: null,
             typeLock: true,
-            properties: [{ name: J.NodeProp.DATE, value: "" + initDate }]
+            properties: [{ name: J.NodeProp.DATE, value: "" + initDate }],
+            shareToUserId: null
         }, (res) => {
             this.createSubNodeResponse(res, state);
         });
