@@ -196,13 +196,13 @@ public class SessionContext {
 
 	public static List<SessionContext> getAllSessions() {
 		synchronized (allSessions) {
-			return new LinkedList<SessionContext>(allSessions);
+			return new LinkedList<>(allSessions);
 		}
 	}
 
 	public static List<SessionContext> getHistoricalSessions() {
 		synchronized (historicalSessions) {
-			return new LinkedList<SessionContext>(historicalSessions);
+			return new LinkedList<>(historicalSessions);
 		}
 	}
 
@@ -215,7 +215,7 @@ public class SessionContext {
 			for (SessionContext sc : allSessions) {
 				if (userName.equals(sc.getUserName())) {
 					if (list == null) {
-						list = new LinkedList<SessionContext>();
+						list = new LinkedList<>();
 					}
 					list.add(sc);
 				}

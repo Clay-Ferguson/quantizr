@@ -104,7 +104,7 @@ public class GraphNodesService {
 	private void processNodes(String rootPath, int rootLevel, HashMap<String, GraphNode> mapByPath) {
 		// get a collection to hold keys so we don't get concurrent modification
 		// exception when updating the map.
-		List<String> keys = new LinkedList<String>();
+		List<String> keys = new LinkedList<>();
 		for (String path : mapByPath.keySet()) {
 			keys.add(path);
 		}

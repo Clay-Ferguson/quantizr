@@ -368,7 +368,7 @@ public class ActPubFollowing {
         query.skip(ConstantInt.ROWS_PER_PAGE.val() * req.getPage());
 
         Iterable<SubNode> iterable = util.find(query);
-        List<NodeInfo> searchResults = new LinkedList<NodeInfo>();
+        List<NodeInfo> searchResults = new LinkedList<>();
         int counter = 0;
 
         for (SubNode node : iterable) {

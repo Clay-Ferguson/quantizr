@@ -881,7 +881,7 @@ public class RSSFeedService {
 		feed.setLink("");
 		feed.setDescription(sanitizeHtml(metaInfo.getDescription() != null ? metaInfo.getDescription() : ""));
 
-		List<SyndEntry> entries = new LinkedList<SyndEntry>();
+		List<SyndEntry> entries = new LinkedList<>();
 		feed.setEntries(entries);
 
 		final Iterable<SubNode> iter = read.getChildren(ms, node, Sort.by(Sort.Direction.ASC, SubNode.FIELD_ORDINAL), null, 0);

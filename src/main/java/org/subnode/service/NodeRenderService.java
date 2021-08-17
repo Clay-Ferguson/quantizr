@@ -131,7 +131,7 @@ public class NodeRenderService {
 			return res;
 		}
 
-		LinkedList<BreadcrumbInfo> breadcrumbs = new LinkedList<BreadcrumbInfo>();
+		LinkedList<BreadcrumbInfo> breadcrumbs = new LinkedList<>();
 		res.setBreadcrumbs(breadcrumbs);
 		getBreadcrumbs(session, node, breadcrumbs);
 
@@ -251,7 +251,7 @@ public class NodeRenderService {
 			return nodeInfo;
 		}
 
-		nodeInfo.setChildren(new LinkedList<NodeInfo>());
+		nodeInfo.setChildren(new LinkedList<>());
 
 		/*
 		 * If we are scanning to a node we know we need to start from zero offset, or else we use the offset

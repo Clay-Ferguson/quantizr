@@ -184,7 +184,7 @@ public class ActPubUtil {
                     HttpHeaders headers = new HttpHeaders();
 
                     if (mediaType != null) {
-                        List<MediaType> acceptableMediaTypes = new LinkedList<MediaType>();
+                        List<MediaType> acceptableMediaTypes = new LinkedList<>();
                         acceptableMediaTypes.add(mediaType);
                         headers.setAccept(acceptableMediaTypes);
                     }
@@ -387,7 +387,7 @@ public class ActPubUtil {
 
             HttpHeaders headers = new HttpHeaders();
             if (acceptType != null) {
-                List<MediaType> acceptableMediaTypes = new LinkedList<MediaType>();
+                List<MediaType> acceptableMediaTypes = new LinkedList<>();
                 acceptableMediaTypes.add(acceptType);
                 headers.setAccept(acceptableMediaTypes);
             }

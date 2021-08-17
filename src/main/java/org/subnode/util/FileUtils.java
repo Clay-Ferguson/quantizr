@@ -253,7 +253,7 @@ public class FileUtils {
 	}
 
 	public static void makeFileRunnable(String fileName) throws Exception {
-		Set<PosixFilePermission> perms = new HashSet<PosixFilePermission>();
+		Set<PosixFilePermission> perms = new HashSet<>();
 		perms.add(PosixFilePermission.OWNER_READ);
 		perms.add(PosixFilePermission.OWNER_WRITE);
 		perms.add(PosixFilePermission.OWNER_EXECUTE);

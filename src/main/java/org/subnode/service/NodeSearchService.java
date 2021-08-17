@@ -321,7 +321,7 @@ public class NodeSearchService {
 	}
 
 	public void getBookmarks(MongoSession session, GetBookmarksRequest req, GetBookmarksResponse res) {
-		List<Bookmark> bookmarks = new LinkedList<Bookmark>();
+		List<Bookmark> bookmarks = new LinkedList<>();
 
 		List<SubNode> bookmarksNode = userManagerService.getSpecialNodesList(session, NodeType.BOOKMARK_LIST.s());
 		if (bookmarksNode != null) {
@@ -384,7 +384,7 @@ public class NodeSearchService {
 									Criteria.where(SubNode.FIELD_TYPE).ne(NodeType.POSTS.s()), //
 									Criteria.where(SubNode.FIELD_TYPE).ne(NodeType.ACT_PUB_POSTS.s()));
 
-			List<Criteria> orCriteria = new LinkedList<Criteria>();
+			List<Criteria> orCriteria = new LinkedList<>();
 
 			// or a node that is shared to any of the sharedToAny users
 			for (String share : sharedToAny) {

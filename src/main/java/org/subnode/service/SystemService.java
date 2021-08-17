@@ -101,7 +101,7 @@ public class SystemService {
 		 * Create map to hold all user account storage statistics which gets updated by the various
 		 * processing in here and then written out in 'writeUserStats' below
 		 */
-		final HashMap<ObjectId, UserStats> statsMap = new HashMap<ObjectId, UserStats>();
+		final HashMap<ObjectId, UserStats> statsMap = new HashMap<>();
 
 		attachmentService.gridMaintenanceScan(statsMap);
 		String ret = ipfsGarbageCollect(statsMap);

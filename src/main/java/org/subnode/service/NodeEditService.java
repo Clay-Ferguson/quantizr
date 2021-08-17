@@ -292,7 +292,7 @@ public class NodeEditService {
 
 	public SubNode createFriendNode(MongoSession session, SubNode parentFriendsList, String userToFollow, String followerActorUrl,
 			String followerActorHtmlUrl) {
-		List<PropertyInfo> properties = new LinkedList<PropertyInfo>();
+		List<PropertyInfo> properties = new LinkedList<>();
 		properties.add(new PropertyInfo(NodeProp.USER.s(), userToFollow));
 
 		SubNode newNode = create.createNode(session, parentFriendsList, null, NodeType.FRIEND.s(), 0L, CreateNodeLocation.LAST,

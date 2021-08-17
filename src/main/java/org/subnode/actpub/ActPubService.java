@@ -1156,7 +1156,7 @@ public class ActPubService {
 
             Iterable<SubNode> accountNodes =
                     read.findTypedNodesUnderPath(session, NodeName.ROOT_OF_ALL_USERS, NodeType.ACCOUNT.s());
-            HashSet<String> knownUsers = new HashSet<String>();
+            HashSet<String> knownUsers = new HashSet<>();
             for (SubNode node : accountNodes) {
                 String userName = node.getStrProp(NodeProp.USER.s());
                 if (userName == null)
