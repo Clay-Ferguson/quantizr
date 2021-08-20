@@ -66,7 +66,6 @@ export abstract class ResultSetView extends AppTab {
         let i = 0;
         let jumpButton = state.isAdminUser || !this.data.rsInfo.userSearchType;
         results.forEach((node: J.NodeInfo) => {
-            // console.log("node: " + S.util.prettyPrint(node));
             S.srch.initSearchNode(node);
             let c = this.renderItem(node, i, childCount, rowCount, jumpButton, state);
             if (c) {

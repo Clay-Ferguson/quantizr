@@ -15,6 +15,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.subnode.AppController;
@@ -29,6 +30,7 @@ import org.subnode.model.client.NodeProp;
 import org.subnode.model.client.NodeType;
 import org.subnode.model.client.PrincipalName;
 import org.subnode.model.client.PrivilegeType;
+import org.subnode.mongo.AdminRun;
 import org.subnode.mongo.CreateNodeLocation;
 import org.subnode.mongo.MongoAuth;
 import org.subnode.mongo.MongoCreate;
@@ -37,7 +39,6 @@ import org.subnode.mongo.MongoRead;
 import org.subnode.mongo.MongoSession;
 import org.subnode.mongo.MongoUpdate;
 import org.subnode.mongo.MongoUtil;
-import org.subnode.mongo.AdminRun;
 import org.subnode.mongo.model.AccessControl;
 import org.subnode.mongo.model.FediverseName;
 import org.subnode.mongo.model.SubNode;
@@ -154,15 +155,6 @@ public class ActPubService {
              */
             if (node.getAc() != null) {
                 for (String k : node.getAc().keySet()) {
-                    /*
-                     * todo-0 : If this node is shared ONLY to public, does the AP spec and/or Mastodon apps, still
-                     * blast this out to other servers in some public way or even by having knowledge of who is
-                     * following the owner of this node on foreign servers, and then sending it out to each one, one at
-                     * a time?
-                     * 
-                     * Current behavior is that we ONLY post to accounts this node is specifically shared to so if it's
-                     * only set to public (no user shares) then NOTHING is sent out to other federated servers.
-                     */
                     if (PrincipalName.PUBLIC.s().equals(k)) {
                         privateMessage = false;
                     } else {
@@ -188,14 +180,70 @@ public class ActPubService {
             String inReplyTo = parent.getStrProp(NodeProp.ACT_PUB_OBJ_URL);
             APList attachments = createAttachmentsList(node);
 
-            sendNote(ms, toUserNames, ThreadLocals.getSessionContext().getUserName(), inReplyTo, node.getContent(), attachments,
-                    subNodeUtil.getIdBasedUrl(node), privateMessage);
+            String fromUser = ThreadLocals.getSessionContext().getUserName();
+            String fromActor = apUtil.makeActorUrlForUserName(fromUser);
+            String noteUrl = subNodeUtil.getIdBasedUrl(node);
+
+            // When posting a public message we send out to all unique sharedInboxes here
+            if (!privateMessage) {
+                HashSet<String> sharedInboxes = getSharedInboxesOfFollowers(fromUser);
+
+                if (sharedInboxes.size() > 0) {
+                    APObj message = apFactory.newCreateMessageForNote(toUserNames, fromActor, inReplyTo, node.getContent(),
+                            noteUrl, privateMessage, attachments);
+
+                    for (String inbox : sharedInboxes) {
+                        apUtil.securePost(fromUser, ms, null, inbox, fromActor, message, null);
+                    }
+                }
+            }
+
+            if (toUserNames.size() > 0) {
+                sendNote(ms, toUserNames, fromUser, inReplyTo, node.getContent(), attachments, noteUrl, privateMessage);
+            }
         } //
         catch (Exception e) {
             log.error("sendNote failed", e);
             throw new RuntimeException(e);
         }
         return true;
+    }
+
+    /*
+     * Finds all the foreign server followers of userName, and returns the unique set of sharedInboxes
+     * of them all
+     */
+    public HashSet<String> getSharedInboxesOfFollowers(String userName) {
+        log.debug("Getting sharedInboxes");
+        HashSet<String> set = new HashSet<>();
+        MongoSession adminSession = auth.getAdminSession();
+
+        // This query gets the FRIEND nodes that specifify userName on them
+        Query query = apFollower.followersOfUser_query(adminSession, userName);
+        if (query == null)
+            return null;
+
+        Iterable<SubNode> iterable = util.find(query);
+
+        for (SubNode node : iterable) {
+            log.debug("follower: " + XString.prettyPrint(node));
+            /*
+             * Note: The OWNER of this FRIEND node is the person doing the follow, so we look up their account
+             * node which is in node.ownerId
+             */
+            SubNode followerAccount = read.getNode(adminSession, node.getOwner());
+            if (followerAccount != null) {
+                String followerUserName = followerAccount.getStrProp(NodeProp.USER);
+                if (followerUserName.contains("@")) {
+                    String sharedInbox = followerAccount.getStrProp(NodeProp.ACT_PUB_SHARED_INBOX);
+                    if (sharedInbox != null) {
+                        log.debug("SharedInbox: " + sharedInbox);
+                        set.add(sharedInbox);
+                    }
+                }
+            }
+        }
+        return set;
     }
 
     public APList createAttachmentsList(SubNode node) {
@@ -380,6 +428,23 @@ public class ActPubService {
                 String curIconUrl = userNode.getStrProp(NodeProp.ACT_PUB_USER_ICON_URL.s());
                 if (!iconUrl.equals(curIconUrl)) {
                     if (userNode.setProp(NodeProp.ACT_PUB_USER_ICON_URL.s(), iconUrl)) {
+                        changed = true;
+                    }
+                }
+            }
+        }
+
+        /*
+         * todo-0: Now that we're adding shareInbox, need an admin menu item that can refresh ALL existing
+         * users by re-reading their WebFinger info and updating, so this code runs again
+         */
+        Object endpoints = AP.obj(actor, APProp.endpoints);
+        if (endpoints != null) {
+            String sharedInbox = AP.str(endpoints, APProp.sharedInbox);
+            if (sharedInbox != null) {
+                String curSharedInbox = userNode.getStrProp(NodeProp.ACT_PUB_SHARED_INBOX.s());
+                if (!sharedInbox.equals(curSharedInbox)) {
+                    if (userNode.setProp(NodeProp.ACT_PUB_SHARED_INBOX.s(), sharedInbox)) {
                         changed = true;
                     }
                 }

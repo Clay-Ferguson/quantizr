@@ -675,20 +675,20 @@ public class RSSFeedService {
 						log.debug("media has no groups.");
 					}
 				} else if (m instanceof ContentModuleImpl) {
-					ContentModuleImpl contentMod = (ContentModuleImpl) m;
-					if (contentMod.getContents() != null) {
-						for (String contents : contentMod.getContents()) {
-							log.debug("CI.contents: " + contents);
-						}
-					}
-					if (contentMod.getContentItems() != null) {
-						for (ContentItem ci : contentMod.getContentItems()) {
-							log.debug("CI.encoding: " + ci.getContentEncoding());
-							log.debug("CI.format: " + ci.getContentFormat());
-							log.debug("CI.value: " + ci.getContentValue());
-							log.debug("CI.url: " + ci.getContentResource());
-						}
-					}
+					// ContentModuleImpl contentMod = (ContentModuleImpl) m;
+					// if (contentMod.getContents() != null) {
+					// 	for (String contents : contentMod.getContents()) {
+					// 		log.debug("CI.contents: " + contents);
+					// 	}
+					// }
+					// if (contentMod.getContentItems() != null) {
+					// 	for (ContentItem ci : contentMod.getContentItems()) {
+					// 		log.debug("CI.encoding: " + ci.getContentEncoding());
+					// 		log.debug("CI.format: " + ci.getContentFormat());
+					// 		log.debug("CI.value: " + ci.getContentValue());
+					// 		log.debug("CI.url: " + ci.getContentResource());
+					// 	}
+					// }
 				} else if (m instanceof EntryInformationImpl) {
 					EntryInformationImpl itunesMod = (EntryInformationImpl) m;
 

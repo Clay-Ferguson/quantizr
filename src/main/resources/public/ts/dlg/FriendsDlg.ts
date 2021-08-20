@@ -40,20 +40,31 @@ export class FriendsDlg extends DialogBase {
             }
         };
 
+        this.mergeState({
+            loading: true
+        });
+
         S.util.ajax<J.GetFriendsRequest, J.GetFriendsResponse>("getFriends", {
         }, (res: J.GetFriendsResponse): void => {
             this.mergeState({
-                friends: res.friends
+                friends: res.friends,
+                loading: false
             });
         });
     }
 
     renderDlg(): CompIntf[] {
+        let message = null;
+        if (this.getState().loading) {
+            message = "Loading...";
+        }
+        else if (!this.getState().friends) {
+            message = "You haven't yet added any friends yet!";
+        }
+
         return [
-            // I hacked this to make it just tell the user they have no friends and
-            // show juse the close button but we could do something much better here.
             new Form(null, [
-                !this.getState().friends ? new Div("You haven't yet added any friends yet!")
+                !this.getState().friends ? new Div(message)
                     : new FriendsTable(this.getState().friends, this.selectionValueIntf),
                 new ButtonBar([
                     (this.getState().friends && !this.instantSelect) ? new Button("Choose", () => {

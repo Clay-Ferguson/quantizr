@@ -208,7 +208,7 @@ public class NodeSearchService {
 
 								searchResults.add(info);
 							} catch (Exception e) {
-								ExUtil.error(log, "faild converting user node", e);
+								ExUtil.error(log, "failed converting user node", e);
 							}
 						}
 						return null;

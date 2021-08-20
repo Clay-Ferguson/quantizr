@@ -711,10 +711,7 @@ public class UserManagerService {
 		 */
 		SubNode userNode = read.findNodeByUserAndType(session, blockedList, req.getUserName(), NodeType.FRIEND.s());
 		if (userNode == null) {
-			String followerActorUrl = null;
-			String followerActorHtmlUrl = null;
-
-			userNode = edit.createFriendNode(session, blockedList, req.getUserName(), followerActorUrl, followerActorHtmlUrl);
+			userNode = edit.createFriendNode(session, blockedList, req.getUserName());
 			if (userNode != null) {
 				res.setMessage(
 						"Blocked user " + req.getUserName() + ". To manage blocks, go to `Menu -> Friends -> Blocked Users`");
@@ -764,16 +761,8 @@ public class UserManagerService {
 			apUtil.log("loadForeignUser: " + newUserName);
 			apService.loadForeignUser(newUserName);
 
-			// todo-2: for local users following fediverse this value needs to be here?
-			String followerActorUrl = null;
-
-			// we can definitely put a value here if needed, eventually, even if a non-AP one like
-			// '/u/userName/home'
-			String followerActorHtmlUrl = null;
-
 			apUtil.log("Creating friendNode for " + newUserName);
-			friendNode = edit.createFriendNode(session, followerFriendList, newUserName, //
-					followerActorUrl, followerActorHtmlUrl);
+			friendNode = edit.createFriendNode(session, followerFriendList, newUserName);
 
 			if (friendNode != null) {
 				ValContainer<SubNode> userNode = new ValContainer<SubNode>();

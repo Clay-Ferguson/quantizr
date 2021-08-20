@@ -42,10 +42,6 @@ export class FollowersResultSetView<I extends FollowersRSInfo> extends ResultSet
     Probably need a static method on FriendTypeHandler itself which can do everything based on input parameters only.
     */
     renderItem(node: J.NodeInfo, i: number, childCount: number, rowCount: number, jumpButton: boolean, state: AppState): CompIntf {
-        if (node.owner.indexOf("@") !== -1) {
-            return null;
-        }
-
         let userNodeId: string = S.props.getNodePropVal(J.NodeProp.USER_NODE_ID, node);
         let imgSrc = node.avatarVer ? S.render.getAvatarImgUrl(node.ownerId, node.avatarVer) : null;
         let userBio: string = S.props.getNodePropVal(J.NodeProp.USER_BIO, node);

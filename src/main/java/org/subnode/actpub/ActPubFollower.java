@@ -132,8 +132,8 @@ public class ActPubFollower {
     }
 
     /**
-     * Returns followers for LOCAL users only 'userName'. This doesn't use ActPub or query any remote
-     * servers
+     * Returns followers for LOCAL users only following 'userName'. This doesn't use ActPub or query any
+     * remote servers
      * 
      * Returns a list of all the 'actor urls' for all the users that are following user 'userName'
      */
@@ -241,9 +241,17 @@ public class ActPubFollower {
         return ops.count(query, SubNode.class);
     }
 
+    /*
+     * todo-0: this method name is misleading. This gets each FRIEND node wherever they exist under
+     * possession of various people, and it's those accounts (the ownerId) on each node, that are the
+     * actual FOLLOWERS
+     */
     public Query followersOfUser_query(MongoSession ms, String userName) {
         Query query = new Query();
 
+        // todo-0: This actually just gets all the FRIEND nodes that point to 'friend=userName', but the
+        // FOLLOWERS (actually follower accountIDs)
+        // would be the OWNER of each of these nodes right?
         Criteria criteria =
                 Criteria.where(SubNode.FIELD_PATH).regex(util.regexRecursiveChildrenOfPath(NodeName.ROOT_OF_ALL_USERS)) //
                         .and(SubNode.FIELD_PROPERTIES + "." + NodeProp.USER.s() + ".value").is(userName) //

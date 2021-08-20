@@ -13,12 +13,13 @@ public enum NodeProp {
     ACT_PUB_OBJ_URL("ap:objUrl", "s"), //
     ACT_PUB_OBJ_ATTRIBUTED_TO("ap:objAttributedTo", "s"), //
     ACT_PUB_USER_ICON_URL("ap:userIcon", "s"), //
+    ACT_PUB_SHARED_INBOX("ap:sharedInbox", "s"), //
     ACT_PUB_USER_IMAGE_URL("ap:userImage", "s"), //
 
-    // points to URL of actor object
+    // points to URL of actor object (APProp.id prop on actual Actor Objects)
     ACT_PUB_ACTOR_ID("ap:actorId", "s"), //
 
-    //this is the url of the HTML for the user (for browsing directly to)
+    // this is the url of the HTML for the user (APProp.url prop on actual Actor Objects)
     ACT_PUB_ACTOR_URL("ap:actorUrl", "s"), //
     
     ACT_PUB_ACTOR_INBOX("ap:actorInbox", "s"), //

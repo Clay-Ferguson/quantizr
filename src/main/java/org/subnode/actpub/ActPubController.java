@@ -107,16 +107,33 @@ public class ActPubController {
 		return new ResponseEntity<String>(HttpStatus.NOT_FOUND);
 	}
 
+    /**
+	 * Shared Inbox POST
+	 */
+	@RequestMapping(value = APConst.PATH_INBOX, method = RequestMethod.POST,
+			produces = APConst.CONTENT_TYPE_JSON_LD)
+	public @ResponseBody Object sharedInboxPost(//
+			@RequestBody String body, //
+			HttpServletRequest httpReq) {
+		try {
+			APObj payload = mapper.readValue(body, new TypeReference<>() {});
+			apUtil.log("shared INBOX incoming payload: " + XString.prettyPrint(payload));
+			ActPubService.inboxCount++;
+			apService.processInboxPost(httpReq, payload);
+			return new ResponseEntity<String>(HttpStatus.OK);
+		} catch (Exception e) {
+			return new ResponseEntity<String>(HttpStatus.BAD_REQUEST);
+		}
+	}
+
 	/**
-	 * Inbox POST
-	 * 
-	 * If no userName specified it's the system 'sharedInbox'
+	 * User Inbox POST
 	 */
 	@RequestMapping(value = APConst.PATH_INBOX + "/{userName}", method = RequestMethod.POST,
 			produces = APConst.CONTENT_TYPE_JSON_LD)
 	public @ResponseBody Object inboxPost(//
 			@RequestBody String body, //
-			@PathVariable(value = "userName", required = false) String userName, //
+			@PathVariable(value = "userName", required = true) String userName, //
 			HttpServletRequest httpReq) {
 		try {
 			APObj payload = mapper.readValue(body, new TypeReference<>() {});

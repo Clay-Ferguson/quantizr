@@ -1,7 +1,7 @@
 package org.subnode.actpub.model;
 
 /**
- * Accept object.
+ * Language object.
  */
 public class APOLanguage extends APObj {
     public APOLanguage() {

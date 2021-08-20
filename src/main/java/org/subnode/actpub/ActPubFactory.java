@@ -130,6 +130,8 @@ public class ActPubFactory {
 		List<String> ccActors = new LinkedList<>();
 		for (String userName : toUserNames) {
 			try {
+				// todo-0: we should try to get actorUrl from DB without resorting to a webFinger, and only do webFinger
+				// as a last resort
 				APObj webFinger = apUtil.getWebFinger(userName);
 				if (webFinger == null)
 					continue;
@@ -138,7 +140,7 @@ public class ActPubFactory {
 				if (actorUrl == null)
 					continue;
 
-				// if public message put all the individuals in the 'cc', else they go in the 'to'.
+				// if public message put all the individuals in the 'cc' and "...#Public" as the only 'to', else they go in the 'to'.
 				if (!privateMessage) {
 					ccActors.add(actorUrl);
 				} else {

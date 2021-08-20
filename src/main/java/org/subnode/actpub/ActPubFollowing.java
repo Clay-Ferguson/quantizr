@@ -154,9 +154,6 @@ public class ActPubFollowing {
             return;
         }
 
-        /*
-         * Protocol says we need to send this acceptance back:
-         */
         Runnable runnable = () -> {
             arun.<APObj>run(session -> {
                 try {
@@ -164,13 +161,21 @@ public class ActPubFollowing {
                     if (followerActor == null) {
                         return null;
                     }
-                    String followerActorHtmlUrl = AP.str(followerActor, APProp.url);
 
                     log.debug("getLongUserNameFromActorUrl: " + followerActor + "\n" + XString.prettyPrint(followerActor));
                     String followerUserName = apUtil.getLongUserNameFromActor(followerActor);
 
-                    // warning: the return value is not used but the side effect of calling this is still needed.
+                    // this will lookup the user AND import it it's a non-existant user
                     SubNode followerAccountNode = apService.getAcctNodeByUserName(session, followerUserName);
+                    if (followerAccountNode == null) {
+                        throw new RuntimeException("Unable to get or import user: " + followerUserName);
+                    }
+
+                    // warning: the return value is not used but the side effect of calling this is still needed.
+                    // todo-0: look for other AP specific places that this is called where 'getAcctNdoeByUserName' is better
+                    // in case the user is totally unknown/foreign.
+                    // SubNode followerAccountNode = apService.getAcctNodeByUserName(session, followerUserName);
+
                     apService.userEncountered(followerUserName, false);
 
                     // Actor being followed (local to our server)
@@ -199,8 +204,7 @@ public class ActPubFollowing {
                     if (friendNode == null) {
                         if (!unFollow) {
                             apUtil.log("unable to find user node by name: " + followerUserName + " so creating.");
-                            friendNode = edit.createFriendNode(session, followerFriendList, userToFollow, followerActorUrl,
-                                    followerActorHtmlUrl);
+                            friendNode = edit.createFriendNode(session, followerFriendList, userToFollow);
                             // userFeedService.sendServerPushInfo(localUserName,
                             // new NotificationMessage("apReply", null, contentHtml, toUserName));
                         }

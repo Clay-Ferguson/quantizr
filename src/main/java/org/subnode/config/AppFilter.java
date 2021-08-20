@@ -101,7 +101,7 @@ public class AppFilter extends GenericFilterBean {
 				// back to welcome page. Should also blow away all browser memory. New browser page load.
 				if (!StringUtils.isEmpty(bearer) && !SessionContext.validToken(bearer, null)) {
 					// just ignore an invalid token like it was not there.
-					log.debug("Ignoring obsolete bearer token.");
+					// log.debug("Ignoring obsolete bearer token.");
 					bearer = null;
 					sc.setUserName(PrincipalName.ANON.s());
 

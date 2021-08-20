@@ -290,25 +290,35 @@ public class NodeEditService {
 		return tags.toString();
 	}
 
-	public SubNode createFriendNode(MongoSession session, SubNode parentFriendsList, String userToFollow, String followerActorUrl,
-			String followerActorHtmlUrl) {
-		List<PropertyInfo> properties = new LinkedList<>();
-		properties.add(new PropertyInfo(NodeProp.USER.s(), userToFollow));
+	public SubNode createFriendNode(MongoSession session, SubNode parentFriendsList, String userToFollow) {
 
-		SubNode newNode = create.createNode(session, parentFriendsList, null, NodeType.FRIEND.s(), 0L, CreateNodeLocation.LAST,
-				properties, parentFriendsList.getOwner(), true);
-		newNode.setProp(NodeProp.TYPE_LOCK.s(), Boolean.valueOf(true));
+		SubNode userNode = read.getUserNodeByUserName(session, userToFollow);
+		if (userNode != null) {
+			List<PropertyInfo> properties = new LinkedList<>();
+			properties.add(new PropertyInfo(NodeProp.USER.s(), userToFollow));
+			properties.add(new PropertyInfo(NodeProp.USER_NODE_ID.s(), userNode.getId().toHexString()));
 
-		if (followerActorUrl != null) {
-			newNode.setProp(NodeProp.ACT_PUB_ACTOR_ID.s(), followerActorUrl);
+			SubNode newNode = create.createNode(session, parentFriendsList, null, NodeType.FRIEND.s(), 0L,
+					CreateNodeLocation.LAST, properties, parentFriendsList.getOwner(), true);
+			newNode.setProp(NodeProp.TYPE_LOCK.s(), Boolean.valueOf(true));
+
+			String userToFollowActorId = userNode.getStrProp(NodeProp.ACT_PUB_ACTOR_ID.s());
+			if (userToFollowActorId != null) {
+				newNode.setProp(NodeProp.ACT_PUB_ACTOR_ID.s(), userToFollowActorId);
+			}
+
+			String userToFollowActorUrl = userNode.getStrProp(NodeProp.ACT_PUB_ACTOR_URL.s());
+			if (userToFollowActorUrl != null) {
+				newNode.setProp(NodeProp.ACT_PUB_ACTOR_URL.s(), userToFollowActorUrl);
+			}
+
+			apUtil.log("Saved Friend Node (as a Follow): " + XString.prettyPrint(newNode));
+			update.save(session, newNode);
+
+			return newNode;
+		} else {
+			throw new RuntimeException("User not found: " + userToFollow);
 		}
-
-		if (followerActorHtmlUrl != null) {
-			newNode.setProp(NodeProp.ACT_PUB_ACTOR_URL.s(), followerActorHtmlUrl);
-		}
-
-		update.save(session, newNode);
-		return newNode;
 	}
 
 	public AppDropResponse appDrop(MongoSession session, AppDropRequest req) {

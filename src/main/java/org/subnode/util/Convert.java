@@ -190,7 +190,6 @@ public class Convert {
 			if (userUrl != null) {
 				nodeInfo.safeGetClientProps().add(new PropertyInfo(NodeProp.ACT_PUB_ACTOR_URL.s(), userUrl));
 			}
-
 			String friendAccountId = node.getStrProp(NodeProp.USER_NODE_ID);
 			// log.debug("friendAccountId=" + friendAccountId + " on nodeId=" + node.getId().toHexString());
 
