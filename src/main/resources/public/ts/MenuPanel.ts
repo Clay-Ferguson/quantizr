@@ -475,6 +475,7 @@ export class MenuPanel extends Div {
                 new MenuItem("Performance Report", () => window.open(S.util.getHostAndPort() + "/performance-report", "_blank")), //
                 new MenuItem("Refresh RSS Cache", () => S.view.runServerCommand("refreshRssCache", "Refresh RSS Cache", null, state)), //
                 new MenuItem("Refresh Fediverse", () => S.view.runServerCommand("refreshFediverseUsers", "Refresh Fediverse Users", null, state)), //
+                new MenuItem("Refresh AP Accts", () => S.view.runServerCommand("refreshAPAccounts", "Refresh AP Accounts", null, state)), //
                 new MenuItem("Reset Public Node", () => S.view.runServerCommand("initializeAppContent", null, null, state)), //
                 new MenuItem("Insert Book: War and Peace", () => S.edit.insertBookWarAndPeace(state))
             ]));

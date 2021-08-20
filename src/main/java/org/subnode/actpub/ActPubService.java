@@ -61,6 +61,7 @@ public class ActPubService {
     public static int outboxQueryCount = 0;
     public static int cycleOutboxQueryCount = 0;
     public static int newPostsInCycle = 0;
+    public static int accountsRefreshed = 0;
     public static int refreshForeignUsersCycles = 0;
     public static int refreshForeignUsersQueuedCount = 0;
     public static String lastRefreshForeignUsersCycleTime = "n/a";
@@ -335,7 +336,7 @@ public class ActPubService {
 
         // if we have actor object skip the step of getting it and import using it.
         if (actor != null) {
-            acctNode = importActor(ms, actor);
+            acctNode = importActor(ms, null, actor);
         }
 
         /*
@@ -381,7 +382,7 @@ public class ActPubService {
 
         // if webfinger was successful, ensure the user is imported into our system.
         if (actor != null) {
-            acctNode = importActor(ms, actor);
+            acctNode = importActor(ms, null, actor);
             if (acctNode != null) {
                 // Any time we have an account node being cached we should cache it by it's ID too right away.
                 apCache.acctNodesById.put(acctNode.getId().toHexString(), acctNode);
@@ -392,32 +393,38 @@ public class ActPubService {
     }
 
     /*
-     * Returns account node of the user, creating one if not already existing
+     * Returns account node of the user, creating one if not already existing. If the userNode already
+     * exists and the caller happens to have it we can pass in as non-null userNode and it will get
+     * used.
      */
-    public SubNode importActor(MongoSession ms, Object actor) {
-        String apUserName = apUtil.getLongUserNameFromActor(actor);
+    public SubNode importActor(MongoSession ms, SubNode userNode, Object actor) {
 
-        apUserName = apUserName.trim();
-
-        // This checks for both the non-port and has-port versions of the host (host may or may not have
-        // port)
-        if (apUserName.endsWith("@" + appProp.getMetaHost().toLowerCase())
-                || apUserName.contains("@" + appProp.getMetaHost().toLowerCase() + ":")) {
-            log.debug("Can't import a user that's not from a foreign server.");
-            return null;
-        }
-        apUtil.log("importing Actor: " + apUserName);
-
-        saveFediverseName(apUserName);
-
-        // Try to get the userNode for this actor
-        SubNode userNode = read.getUserNodeByUserName(ms, apUserName);
-
-        /*
-         * If we don't have this user in our system, create them.
-         */
+        // if userNode unknown then get and/or create one. May be creating a brand new one even.
         if (userNode == null) {
-            userNode = util.createUser(ms, apUserName, null, null, true);
+            String apUserName = apUtil.getLongUserNameFromActor(actor);
+
+            apUserName = apUserName.trim();
+
+            // This checks for both the non-port and has-port versions of the host (host may or may not have
+            // port)
+            if (apUserName.endsWith("@" + appProp.getMetaHost().toLowerCase())
+                    || apUserName.contains("@" + appProp.getMetaHost().toLowerCase() + ":")) {
+                log.debug("Can't import a user that's not from a foreign server.");
+                return null;
+            }
+            apUtil.log("importing Actor: " + apUserName);
+
+            saveFediverseName(apUserName);
+
+            // Try to get the userNode for this actor
+            userNode = read.getUserNodeByUserName(ms, apUserName);
+
+            /*
+             * If we don't have this user in our system, create them.
+             */
+            if (userNode == null) {
+                userNode = util.createUser(ms, apUserName, null, null, true);
+            }
         }
 
         boolean changed = false;
@@ -1108,6 +1115,77 @@ public class ActPubService {
         }
     }
 
+    /*
+     * This insures everything about all users is as up-to-date as possible by doing the equivalent an
+     * importActor, but non-destructively to keep all existing nodes and posts
+     * 
+     * There are several kinds of ways these can fail like this: (so we need to be able to assign
+     * statuses to accounts for these cases or at least a PASS/FAIL so the admin can optionally clean up
+     * old/dead accounts)
+     * 
+     * get webFinger: Alice5401@mastodon.online 2021-08-20 17:33:48,996 DEBUG
+     * org.subnode.actpub.ActPubUtil [threadPoolTaskExecutor-1] failed getting json:
+     * https://mastodon.online/users/Alice5401 -> 410 Gone: [{"error":"Gone"}]
+     * 
+     * and ths... get webFinger: reddit@societal.co 2021-08-20 17:33:46,824 DEBUG
+     * org.subnode.actpub.ActPubUtil [threadPoolTaskExecutor-1] failed getting json:
+     * https://societal.co/users/reddit -> Unexpected character ('<' (code 60)): expected a valid value
+     * (JSON String, Number, Array, Object or token 'null', 'true' or 'false') at [Source:
+     * (StringReader); line: 1, column: 2]
+     * 
+     * and this... DEBUG org.subnode.actpub.ActPubUtil [threadPoolTaskExecutor-1] failed getting json:
+     * https://high.cat/users/archillect -> 401 Unauthorized: [Request not signed] 2021-08-20
+     * 17:33:33,061
+     */
+    public void refreshActorPropsForAllUsers() {
+        Runnable runnable = () -> {
+            accountsRefreshed = 0;
+
+            arun.run(session -> {
+                // Query to pull all user accounts
+                Iterable<SubNode> accountNodes =
+                        read.findTypedNodesUnderPath(session, NodeName.ROOT_OF_ALL_USERS, NodeType.ACCOUNT.s());
+
+                for (SubNode acctNode : accountNodes) {
+
+                    // get userName, and skip over any that aren't foreign accounts
+                    String userName = acctNode.getStrProp(NodeProp.USER.s());
+                    if (userName == null || !userName.contains("@"))
+                        continue;
+
+                    log.debug("get webFinger: " + userName);
+                    String url = acctNode.getStrProp(NodeProp.ACT_PUB_ACTOR_ID.s());
+
+                    try {
+                        if (url != null) {
+                            APObj actor = apUtil.getJson(url, APConst.MT_APP_ACTJSON);
+
+                            if (actor != null) {
+                                // we could double check userName, and bail if wrong, but this is not needed.
+                                // String userName = getLongUserNameFromActor(actor);
+                                apCache.actorsByUrl.put(url, actor);
+                                apCache.actorsByUserName.put(userName, actor);
+
+                                // since we're passing in the account node this importActor will basically just update the
+                                // properties on it and save it.
+                                importActor(session, acctNode, actor);
+                                // log.debug("import ok");
+                                accountsRefreshed++;
+                            }
+                        }
+                    } catch (Exception e) {
+                        // todo-1: eating this for now.
+                        log.debug("Failed getting actor: " + url);
+                    }
+                }
+                log.debug("Finished refreshActorPropsForAllUsers");
+
+                return null;
+            });
+        };
+        executor.execute(runnable);
+    }
+
     public void loadForeignUser(String userName) {
         arun.run(session -> {
             // log.debug("Reload user outbox: " + userName);
@@ -1291,6 +1369,7 @@ public class ActPubService {
     public String getStatsReport() {
         StringBuilder sb = new StringBuilder();
         sb.append("\nActivityPub Stats:\n");
+        sb.append("Accounts Refreshed: " + accountsRefreshed + "\n");
         sb.append("Refresh in progress: " + (userRefresh ? "true" : "false") + "\n");
         sb.append("Cached Usernames: " + apCache.allUserNames.size() + "\n");
         sb.append("Users Currently Queued (for refresh): " + queuedUserCount() + "\n");
