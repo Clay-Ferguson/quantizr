@@ -141,7 +141,7 @@ public class ActPubFollower {
         final List<String> followers = new LinkedList<>();
 
         arun.run(session -> {
-            Iterable<SubNode> iter = findFollowersOfUser(session, userName);
+            Iterable<SubNode> iter = getFriendsByUserName(session, userName);
 
             for (SubNode n : iter) {
                 // log.debug("Follower found: " + XString.prettyPrint(n));
@@ -176,8 +176,8 @@ public class ActPubFollower {
         return ret;
     }
 
-    public Iterable<SubNode> findFollowersOfUser(MongoSession ms, String userName) {
-        Query query = followersOfUser_query(ms, userName);
+    public Iterable<SubNode> getFriendsByUserName(MongoSession ms, String userName) {
+        Query query = getFriendsByUserName_query(ms, userName);
         if (query == null)
             return null;
         return util.find(query);
@@ -189,7 +189,7 @@ public class ActPubFollower {
         ms = MongoThreadLocal.ensure(ms);
 
         MongoSession adminSession = auth.getAdminSession();
-        Query query = followersOfUser_query(adminSession, req.getTargetUserName());
+        Query query = getFriendsByUserName_query(adminSession, req.getTargetUserName());
         if (query == null)
             return null;
 
@@ -235,23 +235,14 @@ public class ActPubFollower {
     }
 
     public long countFollowersOfLocalUser(MongoSession ms, String userName) {
-        Query query = followersOfUser_query(ms, userName);
+        Query query = getFriendsByUserName_query(ms, userName);
         if (query == null)
             return 0L;
         return ops.count(query, SubNode.class);
     }
 
-    /*
-     * todo-0: this method name is misleading. This gets each FRIEND node wherever they exist under
-     * possession of various people, and it's those accounts (the ownerId) on each node, that are the
-     * actual FOLLOWERS
-     */
-    public Query followersOfUser_query(MongoSession ms, String userName) {
+    public Query getFriendsByUserName_query(MongoSession ms, String userName) {
         Query query = new Query();
-
-        // todo-0: This actually just gets all the FRIEND nodes that point to 'friend=userName', but the
-        // FOLLOWERS (actually follower accountIDs)
-        // would be the OWNER of each of these nodes right?
         Criteria criteria =
                 Criteria.where(SubNode.FIELD_PATH).regex(util.regexRecursiveChildrenOfPath(NodeName.ROOT_OF_ALL_USERS)) //
                         .and(SubNode.FIELD_PROPERTIES + "." + NodeProp.USER.s() + ".value").is(userName) //

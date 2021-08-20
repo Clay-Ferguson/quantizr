@@ -220,7 +220,7 @@ public class ActPubService {
         MongoSession adminSession = auth.getAdminSession();
 
         // This query gets the FRIEND nodes that specifify userName on them
-        Query query = apFollower.followersOfUser_query(adminSession, userName);
+        Query query = apFollower.getFriendsByUserName_query(adminSession, userName);
         if (query == null)
             return null;
 
@@ -441,10 +441,6 @@ public class ActPubService {
             }
         }
 
-        /*
-         * todo-0: Now that we're adding shareInbox, need an admin menu item that can refresh ALL existing
-         * users by re-reading their WebFinger info and updating, so this code runs again
-         */
         Object endpoints = AP.obj(actor, APProp.endpoints);
         if (endpoints != null) {
             String sharedInbox = AP.str(endpoints, APProp.sharedInbox);

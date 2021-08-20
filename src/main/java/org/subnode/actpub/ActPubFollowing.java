@@ -171,11 +171,6 @@ public class ActPubFollowing {
                         throw new RuntimeException("Unable to get or import user: " + followerUserName);
                     }
 
-                    // warning: the return value is not used but the side effect of calling this is still needed.
-                    // todo-0: look for other AP specific places that this is called where 'getAcctNdoeByUserName' is better
-                    // in case the user is totally unknown/foreign.
-                    // SubNode followerAccountNode = apService.getAcctNodeByUserName(session, followerUserName);
-
                     apService.userEncountered(followerUserName, false);
 
                     // Actor being followed (local to our server)
