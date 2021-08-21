@@ -286,8 +286,6 @@ public class ActPubService {
                 continue;
             }
 
-            // todo-0: whenever all you need is actorUrl from a webFinger call the new method to get that from
-            // the userName
             APObj webFinger = apUtil.getWebFinger(toUserName);
             if (webFinger == null) {
                 apUtil.log("Unable to get webfinger for " + toUserName);
@@ -332,8 +330,7 @@ public class ActPubService {
             return acctNode;
         }
 
-        // try to read from DB
-        // todo-0: if we ALWAYS read from DB like this the data (Actor props) can get stale over time (solve this)
+        // todo-1: if we ALWAYS read from DB like this the data (Actor props) can get stale over time (solve this)
         // (to not have the 'stale issue', let's just not read from DB ever right here)
         // acctNode = read.getUserNodeByUserName(ms, apUserName);
 
@@ -343,8 +340,6 @@ public class ActPubService {
 
             // if we have actor object skip the step of getting it and import using it.
             if (actor != null) {
-                // todo-0: importActor needs a tryDb=false flag so in cases like this where we KNOW we jsut
-                // queried for it and failed we can avoid querying again.
                 acctNode = importActor(ms, null, actor);
             }
         // }

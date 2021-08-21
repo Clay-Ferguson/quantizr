@@ -375,31 +375,31 @@ public class ActPubUtil {
     /**
      * Sec suffix means 'security' option (https vs http)
      */
-    public APObj getWebFingerSec(String resource, boolean secure) {
-        if (resource.startsWith("@")) {
-            resource = resource.substring(1);
+    public APObj getWebFingerSec(String userName, boolean secure) {
+        if (userName.startsWith("@")) {
+            userName = userName.substring(1);
         }
-        String host = (secure ? "https://" : "http://") + getHostFromUserName(resource);
+        String host = (secure ? "https://" : "http://") + getHostFromUserName(userName);
 
-        Boolean failed = apCache.webFingerFailsByUserName.get(resource);
+        Boolean failed = apCache.webFingerFailsByUserName.get(userName);
         if (failed != null) {
             return null;
         }
 
         // return from cache if we have this cached
-        APObj finger = apCache.webFingerCacheByUserName.get(resource);
+        APObj finger = apCache.webFingerCacheByUserName.get(userName);
         if (finger != null) {
             return finger;
         }
 
-        String url = host + APConst.PATH_WEBFINGER + "?resource=acct:" + resource;
+        String url = host + APConst.PATH_WEBFINGER + "?resource=acct:" + userName;
         finger = getJson(url, APConst.MT_APP_JRDJSON);
 
         if (finger != null) {
             // log.debug("Caching WebFinger: " + XString.prettyPrint(finger));
-            apCache.webFingerCacheByUserName.put(resource, finger);
+            apCache.webFingerCacheByUserName.put(userName, finger);
         } else {
-            apCache.webFingerFailsByUserName.put(resource, true);
+            apCache.webFingerFailsByUserName.put(userName, true);
         }
         return finger;
     }
