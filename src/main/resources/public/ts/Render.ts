@@ -710,8 +710,8 @@ export class Render implements RenderIntf {
                     ], null, "float-right"),
                     new Clearfix(),
 
-                    new Heading(4, disp, {
-                        className: "marginAll clickable",
+                    new Div(disp, {
+                        className: "marginAll userName clickable",
                         onClick
                     }),
                     new Html(userBio, {
