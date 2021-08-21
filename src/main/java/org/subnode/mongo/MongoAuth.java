@@ -260,6 +260,8 @@ public class MongoAuth {
 		}
 
 		if (!session.getUserNodeId().equals(node.getOwner())) {
+			log.error("Unable to save Node (expected ownerId " + session.getUserNodeId().toHexString() + "): "
+					+ XString.prettyPrint(node));
 			throw new NodeAuthFailedException();
 		}
 	}
@@ -641,7 +643,7 @@ public class MongoAuth {
 		}
 		return saveMentionsToNodeACL(mentionsSet, session, node);
 	}
-	
+
 	public HashSet<String> saveMentionsToNodeACL(HashSet<String> mentionsSet, MongoSession session, SubNode node) {
 		boolean acChanged = false;
 		HashMap<String, AccessControl> ac = node.getAc();

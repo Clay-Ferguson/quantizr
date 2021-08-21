@@ -30,7 +30,7 @@ public class AdminRun {
 			savedMs = MongoThreadLocal.getMongoSession();
 			MongoThreadLocal.setMongoSession(ms = auth.getAdminSession());
 			ret = runner.run(ms);
-			update.saveSession(ms);
+			update.saveSession(ms, true);
 		}
 		catch (Exception ex) {
 			log.error("error", ex);

@@ -292,7 +292,7 @@ public class NodeEditService {
 
 	public SubNode createFriendNode(MongoSession session, SubNode parentFriendsList, String userToFollow) {
 
-		SubNode userNode = read.getUserNodeByUserName(session, userToFollow);
+		SubNode userNode = read.getUserNodeByUserName(session, userToFollow, false);
 		if (userNode != null) {
 			List<PropertyInfo> properties = new LinkedList<>();
 			properties.add(new PropertyInfo(NodeProp.USER.s(), userToFollow));

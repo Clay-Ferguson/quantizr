@@ -192,8 +192,8 @@ public class NodeSearchService {
 				}
 
 				/*
-				 * If we didn't find any results and we aren't searching
-				 * locally only then try to look this up as a username
+				 * If we didn't find any results and we aren't searching locally only then try to look this up as a
+				 * username
 				 */
 				if (searchResults.size() == 0 && !"local".equals(req.getUserSearchType())) {
 					findUserName = findUserName.replace("\"", "");

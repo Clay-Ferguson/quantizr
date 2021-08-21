@@ -85,7 +85,7 @@ public class MongoUpdate {
 				}
 
 				/*
-				 * We use 'nodes' list to avoid a concurrent modification 
+				 * We use 'nodes' list to avoid a concurrent modification
 				 */
 				List<SubNode> nodes = new LinkedList<>();
 

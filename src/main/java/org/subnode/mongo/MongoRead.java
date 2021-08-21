@@ -783,6 +783,10 @@ public class MongoRead {
     }
 
     public SubNode getUserNodeByUserName(MongoSession session, String user) {
+        return getUserNodeByUserName(session, user, true);
+    }
+
+    public SubNode getUserNodeByUserName(MongoSession session, String user, boolean allowAuth) {
         String cacheKey = "USRNODE-" + user;
         SubNode ret = MongoThreadLocal.getCachedNode(cacheKey);
         if (ret != null) {
@@ -818,7 +822,9 @@ public class MongoRead {
         query.addCriteria(criteria);
 
         ret = util.findOne(query);
-        auth.auth(session, ret, PrivilegeType.READ);
+        if (allowAuth) {
+            auth.auth(session, ret, PrivilegeType.READ);
+        }
         if (ret != null) {
             MongoThreadLocal.cacheNode(cacheKey, ret);
         }
