@@ -215,7 +215,6 @@ public class ActPubService {
      * of them all
      */
     public HashSet<String> getSharedInboxesOfFollowers(String userName) {
-        log.debug("Getting sharedInboxes");
         HashSet<String> set = new HashSet<>();
         MongoSession adminSession = auth.getAdminSession();
 
@@ -227,7 +226,7 @@ public class ActPubService {
         Iterable<SubNode> iterable = util.find(query);
 
         for (SubNode node : iterable) {
-            log.debug("follower: " + XString.prettyPrint(node));
+            // log.debug("follower: " + XString.prettyPrint(node));
             /*
              * Note: The OWNER of this FRIEND node is the person doing the follow, so we look up their account
              * node which is in node.ownerId
@@ -238,7 +237,7 @@ public class ActPubService {
                 if (followerUserName.contains("@")) {
                     String sharedInbox = followerAccount.getStrProp(NodeProp.ACT_PUB_SHARED_INBOX);
                     if (sharedInbox != null) {
-                        log.debug("SharedInbox: " + sharedInbox);
+                        // log.debug("SharedInbox: " + sharedInbox);
                         set.add(sharedInbox);
                     }
                 }
@@ -287,6 +286,8 @@ public class ActPubService {
                 continue;
             }
 
+            // todo-0: whenever all you need is actorUrl from a webFinger call the new method to get that from
+            // the userName
             APObj webFinger = apUtil.getWebFinger(toUserName);
             if (webFinger == null) {
                 apUtil.log("Unable to get webfinger for " + toUserName);
@@ -331,13 +332,22 @@ public class ActPubService {
             return acctNode;
         }
 
-        /* First try to get a cached APObj */
-        APObj actor = apCache.actorsByUserName.get(apUserName);
+        // try to read from DB
+        // todo-0: if we ALWAYS read from DB like this the data (Actor props) can get stale over time (solve this)
+        // (to not have the 'stale issue', let's just not read from DB ever right here)
+        // acctNode = read.getUserNodeByUserName(ms, apUserName);
 
-        // if we have actor object skip the step of getting it and import using it.
-        if (actor != null) {
-            acctNode = importActor(ms, null, actor);
-        }
+        // if (acctNode == null) {
+            /* First try to get a cached actor APObj */
+            APObj actor = apCache.actorsByUserName.get(apUserName);
+
+            // if we have actor object skip the step of getting it and import using it.
+            if (actor != null) {
+                // todo-0: importActor needs a tryDb=false flag so in cases like this where we KNOW we jsut
+                // queried for it and failed we can avoid querying again.
+                acctNode = importActor(ms, null, actor);
+            }
+        // }
 
         /*
          * if we were unable to get the acctNode, then we need to read it from scratch meaning starting at

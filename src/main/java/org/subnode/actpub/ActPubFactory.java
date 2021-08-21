@@ -62,11 +62,7 @@ public class ActPubFactory {
 		APList tagList = new APList();
 		for (String userName : toUserNames) {
 			try {
-				APObj webFinger = apUtil.getWebFinger(userName);
-				if (webFinger == null)
-					continue;
-
-				String actorUrl = apUtil.getActorUrlFromWebFingerObj(webFinger);
+				String actorUrl = apUtil.getActorUrlFromUserName(userName);
 				if (actorUrl == null)
 					continue;
 
@@ -130,13 +126,7 @@ public class ActPubFactory {
 		List<String> ccActors = new LinkedList<>();
 		for (String userName : toUserNames) {
 			try {
-				// todo-0: we should try to get actorUrl from DB without resorting to a webFinger, and only do webFinger
-				// as a last resort
-				APObj webFinger = apUtil.getWebFinger(userName);
-				if (webFinger == null)
-					continue;
-
-				String actorUrl = apUtil.getActorUrlFromWebFingerObj(webFinger);
+				String actorUrl = apUtil.getActorUrlFromUserName(userName);
 				if (actorUrl == null)
 					continue;
 

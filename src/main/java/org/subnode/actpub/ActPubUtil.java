@@ -37,6 +37,8 @@ import org.subnode.actpub.model.APList;
 import org.subnode.actpub.model.APObj;
 import org.subnode.actpub.model.APProp;
 import org.subnode.config.AppProp;
+import org.subnode.model.client.NodeProp;
+import org.subnode.mongo.MongoAuth;
 import org.subnode.mongo.MongoRead;
 import org.subnode.mongo.MongoSession;
 import org.subnode.mongo.model.SubNode;
@@ -64,6 +66,9 @@ public class ActPubUtil {
 
     @Autowired
     private ActPubUtil apUtil;
+
+    @Autowired
+    private MongoAuth auth;
 
     /*
      * RestTemplate is thread-safe and reusable, and has no state, so we need only one final static
@@ -103,6 +108,7 @@ public class ActPubUtil {
         return userName.substring(0, atIdx);
     }
 
+    /* Builds an actor url for a LOCAL userName */
     public String makeActorUrlForUserName(String userName) {
         return appProp.getProtocolHostAndPort() + APConst.ACTOR_PATH + "/" + userName;
     }
@@ -227,8 +233,8 @@ public class ActPubUtil {
      * 
      * WARNING: If privateKey is passed as 'null' you MUST be calling this from HTTP request thread.
      */
-    public void securePost(String userDoingPost, MongoSession ms, String privateKey, String toInbox, String actor,
-            APObj message, MediaType acceptType) {
+    public void securePost(String userDoingPost, MongoSession ms, String privateKey, String toInbox, String actor, APObj message,
+            MediaType acceptType) {
         try {
             apUtil.log("Secure post to " + toInbox);
             /* if private key not sent then get it using the session */
@@ -316,6 +322,26 @@ public class ActPubUtil {
         return actor;
     }
 
+    public String getActorUrlFromUserName(String userName) {
+        String actorUrl = null;
+
+        MongoSession adminSession = auth.getAdminSession();
+        SubNode userNode = apService.getAcctNodeByUserName(adminSession, userName);
+        if (userNode != null) {
+            actorUrl = userNode.getStrProp(NodeProp.ACT_PUB_ACTOR_ID.s());
+        }
+
+        // DO NOT DELETE: this is the other way to get the actorUrl without reading or creating the user
+        // in our DB but we're not doing this.
+        // String actorUrl = null;
+        // APObj webFinger = apUtil.getWebFinger(userName);
+        // if (webFinger != null) {
+        // actorUrl = apUtil.getActorUrlFromWebFingerObj(webFinger);
+        // }
+
+        return actorUrl;
+    }
+
     /*
      * https://server.org/.well-known/webfinger?resource=acct:someuser@server.org
      * 
@@ -336,13 +362,13 @@ public class ActPubUtil {
         // // so this is users like bob@q1:8184 (for example), and that port is expected
         // // also to NOT be https 443 port.
         // if (resource.contains(":")) {
-        //     return getWebFingerSec(resource, false);
+        // return getWebFingerSec(resource, false);
         // }
 
         // try {
-        //     return getWebFingerSec(resource, true);
+        // return getWebFingerSec(resource, true);
         // } catch (Exception e) {
-        //     return getWebFingerSec(resource, false);
+        // return getWebFingerSec(resource, false);
         // }
     }
 
@@ -372,8 +398,7 @@ public class ActPubUtil {
         if (finger != null) {
             // log.debug("Caching WebFinger: " + XString.prettyPrint(finger));
             apCache.webFingerCacheByUserName.put(resource, finger);
-        }
-        else {
+        } else {
             apCache.webFingerFailsByUserName.put(resource, true);
         }
         return finger;
