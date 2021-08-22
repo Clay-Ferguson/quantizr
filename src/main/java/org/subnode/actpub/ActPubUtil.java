@@ -317,7 +317,6 @@ public class ActPubUtil {
         } catch (Exception e) {
             // todo-1: eating this for now.
         }
-
         // log.debug("Actor: " + XString.prettyPrint(actor));
         return actor;
     }
@@ -338,7 +337,6 @@ public class ActPubUtil {
         // if (webFinger != null) {
         // actorUrl = apUtil.getActorUrlFromWebFingerObj(webFinger);
         // }
-
         return actorUrl;
     }
 
@@ -558,7 +556,6 @@ public class ActPubUtil {
             log.debug("unable to get a user name from actor url: " + actorUrl);
             return null;
         }
-
         ret = actorUrl.substring(lastIdx + 1);
         return ret;
     }
@@ -594,8 +591,7 @@ public class ActPubUtil {
         int maxPageQueries = 2;
         int pageQueries = 0;
 
-        // log.debug("interateOrderedCollection(): " +
-        // XString.prettyPrint(collectionObj));
+        // log.debug("interateOrderedCollection(): " + XString.prettyPrint(collectionObj));
         int count = 0;
         /*
          * We user apIdSet to avoid processing any dupliates, because the AP spec calls on us to do this and

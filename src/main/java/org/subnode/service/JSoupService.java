@@ -11,7 +11,6 @@ import org.springframework.stereotype.Component;
 import org.subnode.model.client.OpenGraph;
 import org.subnode.request.GetOpenGraphRequest;
 import org.subnode.response.GetOpenGraphResponse;
-import org.subnode.util.ExUtil;
 
 @Component
 public class JSoupService {
@@ -36,7 +35,8 @@ public class JSoupService {
 				}
 				res.setOpenGraph(openGraph);
 			} catch (Exception e) {
-				ExUtil.error(log, "failed parsing OpenGraph", e);
+				// ignore this error, for now (todo-1)
+				// ExUtil.error(log, "failed parsing OpenGraph", e);
 			}
 		}
 		return res;

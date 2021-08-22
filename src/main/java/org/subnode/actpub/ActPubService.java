@@ -180,7 +180,6 @@ public class ActPubService {
             // String apId = parent.getStringProp(NodeProp.ACT_PUB_ID.s());
             String inReplyTo = parent.getStrProp(NodeProp.ACT_PUB_OBJ_URL);
             APList attachments = createAttachmentsList(node);
-
             String fromUser = ThreadLocals.getSessionContext().getUserName();
             String fromActor = apUtil.makeActorUrlForUserName(fromUser);
             String noteUrl = subNodeUtil.getIdBasedUrl(node);
@@ -258,7 +257,6 @@ public class ActPubService {
                             .put(APProp.mediaType, mime) //
                             .put(APProp.url, appProp.getProtocolHostAndPort() + "/f/id/" + node.getId().toHexString()));
         }
-
         return attachments;
     }
 
@@ -610,7 +608,7 @@ public class ActPubService {
          * If a foreign user is replying to a specific node, we put the reply under that node
          */
         if (nodeBeingRepliedTo != null) {
-            saveNote(ms, null, nodeBeingRepliedTo, obj, false, false);
+            saveNote(ms, null, nodeBeingRepliedTo, obj, true, false);
         }
         /*
          * Otherwise the node is not a reply so we put it under POSTS node inside the foreign account node
@@ -623,7 +621,7 @@ public class ActPubService {
                 String userName = actorAccountNode.getStrProp(NodeProp.USER.s());
                 SubNode postsNode = read.getUserNodeByType(ms, userName, actorAccountNode, "### Posts",
                         NodeType.ACT_PUB_POSTS.s(), Arrays.asList(PrivilegeType.READ.s()), NodeName.POSTS);
-                saveNote(ms, actorAccountNode, postsNode, obj, false, false);
+                saveNote(ms, actorAccountNode, postsNode, obj, true, false);
             }
         }
     }
@@ -949,7 +947,6 @@ public class ActPubService {
                          * this in our ActPubController. We tolerate Mastodon breaking spec here.
                          */
                         .put(APProp.url, host + "/u/" + userName + "/home") //
-
                         .put(APProp.endpoints, new APObj().put(APProp.sharedInbox, host + APConst.PATH_INBOX)) //
 
                         .put(APProp.publicKey, new APObj() //
@@ -1154,7 +1151,7 @@ public class ActPubService {
                     if (userName == null || !userName.contains("@"))
                         continue;
 
-                    log.debug("get webFinger: " + userName);
+                    // log.debug("get webFinger: " + userName);
                     String url = acctNode.getStrProp(NodeProp.ACT_PUB_ACTOR_ID.s());
 
                     try {
@@ -1180,7 +1177,6 @@ public class ActPubService {
                     }
                 }
                 log.debug("Finished refreshActorPropsForAllUsers");
-
                 return null;
             });
         };
@@ -1286,7 +1282,6 @@ public class ActPubService {
             synchronized (NodeSearchService.trendingFeedInfoLock) {
                 NodeSearchService.trendingFeedInfo = null;
             }
-
             return null;
         });
     }
@@ -1297,7 +1292,6 @@ public class ActPubService {
             return "ActivityPub not enabled";
 
         return arun.run(session -> {
-
             Iterable<SubNode> accountNodes =
                     read.findTypedNodesUnderPath(session, NodeName.ROOT_OF_ALL_USERS, NodeType.ACCOUNT.s());
             HashSet<String> knownUsers = new HashSet<>();

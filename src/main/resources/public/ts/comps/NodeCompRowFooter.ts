@@ -25,10 +25,9 @@ export class NodeCompRowFooter extends Div {
         let state: AppState = useSelector((state: AppState) => state);
         let children = [];
         let publicReadOnly = S.props.isPublicReadOnly(this.node);
-        let acCount = S.props.getAcCount(this.node);
 
         /* Show the reply button unless we detect it's only shared to public and is readonly */
-        if (this.isFeed && !(publicReadOnly && acCount === 1)) {
+        if (this.isFeed && !publicReadOnly) {
             children.push(new Icon({
                 title: "Reply to this Node",
                 className: "fa fa-reply fa-lg rowFooterIcon",
