@@ -139,7 +139,7 @@ public class NodeRenderService {
 		if (req.isSingleNode()) {
 			// that loads these all asynchronously.
 			NodeInfo nodeInfo = convert.convertToNodeInfo(ThreadLocals.getSessionContext(), session, node, true, false, -1, false,
-					false, true);
+					false, true, false);
 			res.setNode(nodeInfo);
 			res.setSuccess(true);
 			return res;
@@ -245,7 +245,7 @@ public class NodeRenderService {
 		 * faster diaplay of pages)
 		 */
 		NodeInfo nodeInfo = convert.convertToNodeInfo(ThreadLocals.getSessionContext(), session, node, true, false,
-				logicalOrdinal, level > 0, false, false);
+				logicalOrdinal, level > 0, false, false, false);
 
 		if (level > 0) {
 			return nodeInfo;
@@ -468,7 +468,7 @@ public class NodeRenderService {
 		}
 
 		NodeInfo nodeInfo =
-				convert.convertToNodeInfo(ThreadLocals.getSessionContext(), session, node, false, true, -1, false, false, true);
+				convert.convertToNodeInfo(ThreadLocals.getSessionContext(), session, node, false, true, -1, false, false, true, false);
 		res.setNodeInfo(nodeInfo);
 		res.setSuccess(true);
 		return res;

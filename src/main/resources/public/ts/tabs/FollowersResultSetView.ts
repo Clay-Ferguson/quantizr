@@ -42,12 +42,28 @@ export class FollowersResultSetView<I extends FollowersRSInfo> extends ResultSet
     Probably need a static method on FriendTypeHandler itself which can do everything based on input parameters only.
     */
     renderItem(node: J.NodeInfo, i: number, childCount: number, rowCount: number, jumpButton: boolean, state: AppState): CompIntf {
-        let userNodeId: string = S.props.getNodePropVal(J.NodeProp.USER_NODE_ID, node);
-        let imgSrc = node.avatarVer ? S.render.getAvatarImgUrl(node.ownerId, node.avatarVer) : null;
-        let userBio: string = S.props.getNodePropVal(J.NodeProp.USER_BIO, node);
+        // console.log("Render Follower: " + S.util.prettyPrint(node));
 
-        return S.render.renderUser(state, node.id, node.owner, userBio, userNodeId, imgSrc, null,
-            node.displayName, "userFeedItem", "listFriendImage", false, (evt: any) => {
+        // let user: string = S.props.getNodePropVal(J.NodeProp.USER, node);
+        // let userBio: string = S.props.getClientPropVal(J.NodeProp.USER_BIO, node);
+        // let userNodeId: string = S.props.getNodePropVal(J.NodeProp.USER_NODE_ID, node);
+
+        // let actorUrl = S.props.getClientPropVal(J.NodeProp.ACT_PUB_ACTOR_URL, node);
+        let displayName = S.props.getClientPropVal(J.NodeProp.DISPLAY_NAME, node);
+        let accntUser = S.props.getClientPropVal("accntUser", node);
+        let imgSrc = S.props.getClientPropVal(J.NodeProp.ACT_PUB_USER_ICON_URL, node);
+
+        /* If not ActivityPub try as local user */
+        if (!imgSrc) {
+            let avatarVer: string = S.props.getClientPropVal("avatarVer", node);
+            let accntId: string = S.props.getClientPropVal("accntId", node);
+            if (avatarVer) {
+                imgSrc = S.render.getAvatarImgUrl(accntId, avatarVer);
+            }
+        }
+
+        return S.render.renderUser(state, null, accntUser, null, null, imgSrc, null,
+            displayName, "userFeedItem", "listFriendImage", false, (evt: any) => {
                 new UserProfileDlg(node.ownerId, state).open();
             });
     }

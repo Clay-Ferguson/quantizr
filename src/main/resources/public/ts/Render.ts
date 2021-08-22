@@ -677,6 +677,7 @@ export class Render implements RenderIntf {
         return newValue;
     };
 
+    // todo-0: userNodeId not used (state?)
     renderUser(state: AppState, nodeId: string, user: string, userBio: string, userNodeId: string, imgSrc: string, actorUrl: string,
         displayName: string, className: string, iconClass: string, showMessageButton: boolean, onClick: Function): Comp {
 
@@ -687,7 +688,6 @@ export class Render implements RenderIntf {
                 onClick
             }) : null;
 
-        let disp = displayName ? displayName + " (@" + user + ")" : ("@" + user);
         let attribs: any = {};
         if (className) attribs.className = className;
 
@@ -697,26 +697,35 @@ export class Render implements RenderIntf {
                     img
                 ]),
                 new Div(null, { className: "friendRhs" }, [
-                    new ButtonBar([
-                        // todo-1: need to make ALL calls be able to do a newSubNode here without so we don't need
-                        // the showMessagesButton flag.
-                        showMessageButton ? new Button("Message", S.edit.newSubNode, {
-                            title: "Send Private Message",
-                            nid: nodeId
-                        }) : null,
-                        actorUrl ? new Button("Go to User Page", () => {
-                            window.open(actorUrl, "_blank");
-                        }) : null
-                    ], null, "float-right"),
-                    new Clearfix(),
 
-                    new Div(disp, {
-                        className: "marginAll userName clickable",
+                    // I'm removing this becasue we can click on the image and to these thru the Profile Dialog of the user.
+                    // new ButtonBar([
+                    //     // todo-1: need to make ALL calls be able to do a newSubNode here without so we don't need
+                    //     // the showMessagesButton flag.
+                    //     showMessageButton ? new Button("Message", S.edit.newSubNode, {
+                    //         title: "Send Private Message",
+                    //         nid: nodeId
+                    //     }) : null,
+                    //     actorUrl ? new Button("Go to User Page", () => {
+                    //         window.open(actorUrl, "_blank");
+                    //     }) : null
+                    // ], null, "float-right"),
+                    // new Clearfix(),
+
+                    new Div(displayName, {
+                        className: "userName clickable",
                         onClick
                     }),
-                    new Html(userBio, {
-                        className: "userBio"
-                    })])
+                    new Div("@" + user, {
+                        className: (displayName ? "" : "userName ") + "clickable",
+                        onClick
+                    })
+
+                    // The page just looks cleaner with the username only. We can click them to see their bio text.
+                    // userBio ? new Html(userBio, {
+                    //     className: "userBio"
+                    // }) : null
+                ])
 
             ], "displayTable userInfo", null)
         ]);

@@ -106,7 +106,7 @@ public class UserFeedService {
 				continue;
 
 			/* build our push message payload */
-			NodeInfo nodeInfo = convert.convertToNodeInfo(sc, session, node, true, false, 1, false, false, true);
+			NodeInfo nodeInfo = convert.convertToNodeInfo(sc, session, node, true, false, 1, false, false, true, false);
 			FeedPushInfo pushInfo = new FeedPushInfo(nodeInfo);
 
 			/*
@@ -197,7 +197,6 @@ public class UserFeedService {
 			return res;
 
 		session = MongoThreadLocal.ensure(session);
-
 		String pathToSearch = NodeName.ROOT_OF_ALL_USERS;
 
 		Query query = new Query();
@@ -372,7 +371,7 @@ public class UserFeedService {
 
 		for (SubNode node : iter) {
 			try {
-				NodeInfo info = convert.convertToNodeInfo(sc, session, node, true, false, counter + 1, false, false, false);
+				NodeInfo info = convert.convertToNodeInfo(sc, session, node, true, false, counter + 1, false, false, false, false);
 				searchResults.add(info);
 				lastNode = node;
 			} catch (Exception e) {

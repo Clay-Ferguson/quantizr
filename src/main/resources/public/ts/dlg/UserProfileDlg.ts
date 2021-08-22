@@ -350,7 +350,7 @@ export class UserProfileDlg extends DialogBase {
             S.util.ajax<J.GetUserAccountInfoRequest, J.GetUserAccountInfoResponse>("getUserAccountInfo", null,
                 async (res: J.GetUserAccountInfoResponse) => {
                     // what is going on here?, we're not using 'res' at all? What does this call do just update
-                    // something on the server to prepare the 'reload' all. This looks inefficient (todo-0)
+                    // something on the server to prepare the 'reload' all. This looks inefficient (todo-1)
                     await this.reload(this.userNodeId);
                     resolve();
                 }, () => resolve());
