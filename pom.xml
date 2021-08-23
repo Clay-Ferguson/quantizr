@@ -198,7 +198,7 @@ of the spring configs for security are also perfected.
 <dependency>
     <groupId>org.jsoup</groupId>
     <artifactId>jsoup</artifactId>
-    <version>1.13.1</version>
+    <version>1.14.2</version>
 </dependency>
 
 <dependency>
@@ -619,7 +619,7 @@ of the spring configs for security are also perfected.
 <dependency>
     <groupId>org.jsoup</groupId>
     <artifactId>jsoup</artifactId>
-    <version>1.13.1</version>
+    <version>1.14.2</version>
 </dependency>
 
 <dependency>
@@ -880,7 +880,7 @@ of the spring configs for security are also perfected.
 <dependency>
     <groupId>org.jsoup</groupId>
     <artifactId>jsoup</artifactId>
-    <version>1.13.1</version>
+    <version>1.14.2</version>
 </dependency>
 
 <dependency>
@@ -1317,7 +1317,7 @@ of the spring configs for security are also perfected.
 <dependency>
     <groupId>org.jsoup</groupId>
     <artifactId>jsoup</artifactId>
-    <version>1.13.1</version>
+    <version>1.14.2</version>
 </dependency>
 
 <dependency>
