@@ -1045,7 +1045,7 @@ public class UserManagerService {
 	public GetFriendsResponse getFriends(MongoSession session) {
 		GetFriendsResponse res = new GetFriendsResponse();
 
-		List<SubNode> friendNodes = getSpecialNodesList(session, NodeType.FRIEND_LIST.s());
+		List<SubNode> friendNodes = getSpecialNodesList(session, NodeType.FRIEND_LIST.s(), null, true);
 
 		if (friendNodes != null) {
 			List<FriendInfo> friends = new LinkedList<>();
@@ -1079,12 +1079,13 @@ public class UserManagerService {
 	}
 
 	/**
-	 * Looks in the user's account under their 'underType' type node and returns all the children.
+	 * Looks in the userName's account under their 'underType' type node and returns all the children.
+	 * If userName is passed as null, then we use the currently logged in user
 	 */
-	public List<SubNode> getSpecialNodesList(MongoSession session, String underType) {
+	public List<SubNode> getSpecialNodesList(MongoSession session, String underType, String userName, boolean sort) {
 		session = MongoThreadLocal.ensure(session);
 		List<SubNode> nodeList = new LinkedList<>();
-		SubNode userNode = read.getUserNodeByUserName(session, null);
+		SubNode userNode = read.getUserNodeByUserName(session, userName);
 		if (userNode == null)
 			return null;
 
@@ -1092,8 +1093,8 @@ public class UserManagerService {
 		if (parentNode == null)
 			return null;
 
-		for (SubNode friendNode : read.getChildren(session, parentNode, Sort.by(Sort.Direction.ASC, SubNode.FIELD_ORDINAL), null,
-				0)) {
+		for (SubNode friendNode : read.getChildren(session, parentNode,
+				sort ? Sort.by(Sort.Direction.ASC, SubNode.FIELD_ORDINAL) : null, null, 0)) {
 			nodeList.add(friendNode);
 		}
 		return nodeList;

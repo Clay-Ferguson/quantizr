@@ -323,7 +323,7 @@ public class NodeSearchService {
 	public void getBookmarks(MongoSession session, GetBookmarksRequest req, GetBookmarksResponse res) {
 		List<Bookmark> bookmarks = new LinkedList<>();
 
-		List<SubNode> bookmarksNode = userManagerService.getSpecialNodesList(session, NodeType.BOOKMARK_LIST.s());
+		List<SubNode> bookmarksNode = userManagerService.getSpecialNodesList(session, NodeType.BOOKMARK_LIST.s(), null, true);
 		if (bookmarksNode != null) {
 			for (SubNode bmNode : bookmarksNode) {
 				String targetId = bmNode.getStrProp(NodeProp.TARGET_ID);

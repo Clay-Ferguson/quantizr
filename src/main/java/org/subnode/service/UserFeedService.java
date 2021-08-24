@@ -25,6 +25,7 @@ import org.subnode.model.NodeInfo;
 import org.subnode.model.client.NodeProp;
 import org.subnode.model.client.NodeType;
 import org.subnode.model.client.PrincipalName;
+import org.subnode.mongo.AdminRun;
 import org.subnode.mongo.MongoAuth;
 import org.subnode.mongo.MongoRead;
 import org.subnode.mongo.MongoSession;
@@ -69,6 +70,11 @@ public class UserFeedService {
 
 	@Autowired
 	private MongoTemplate ops;
+
+	@Autowired
+	private AdminRun arun;
+
+	private static final HashSet<ObjectId> adminBlockedUsers = new HashSet<>();
 
 	@Autowired
 	@Qualifier("threadPoolTaskExecutor")
@@ -279,16 +285,36 @@ public class UserFeedService {
 			criteria = criteria.and(SubNode.FIELD_PROPERTIES + "." + NodeProp.ACT_PUB_SENSITIVE + ".value").is(null);
 		}
 
+		HashSet<ObjectId> blockedUserIds = new HashSet<>();
+
+		/*
+		 * This is our slightly confusing way of detecting that this is a 'global Fediverse' (either local
+		 * or remote) query, and will be subject to the admin blocked users
+		 */
+		if (!req.getToMe() && !req.getFromMe() && !req.getFromFriends()) {
+			getBlockedUserIds(blockedUserIds, PrincipalName.ADMIN.s());
+		}
+
 		/*
 		 * Users can manually add a property named "unpublish" to have a "public" node that nonetheles
 		 * doesn't show up in any feeds, but in the future maybe we will make this a checkbox on the editor.
 		 */
 		// disabling. I don't want to sacrifice any performance for this (yet)
-		// criteria = criteria.and(SubNode.FIELD_PROPERTIES + "." + NodeProp.UNPUBLISHED + ".value").is(null);
+		// criteria = criteria.and(SubNode.FIELD_PROPERTIES + "." + NodeProp.UNPUBLISHED +
+		// ".value").is(null);
 
-		List<ObjectId> blockedUserIds = getBlockedUserIds();
-		if (blockedUserIds != null && blockedUserIds.size() > 0) {
+		getBlockedUserIds(blockedUserIds, null);
+		if (blockedUserIds.size() > 0) {
 			criteria = criteria.and(SubNode.FIELD_OWNER).nin(blockedUserIds);
+		}
+
+		/*
+		 * Save the 'string' representations for use below, so mask out places where users may be following
+		 * a user that will effectively be blocked
+		 */
+		HashSet<String> blockedIdStrings = new HashSet<>();
+		for (ObjectId blockedId : blockedUserIds) {
+			blockedIdStrings.add(blockedId.toHexString());
 		}
 
 		// reset feedMaxTime if we're getting first page of results
@@ -317,13 +343,15 @@ public class UserFeedService {
 		}
 
 		if (req.getFromFriends()) {
-			List<SubNode> friendNodes = userManagerService.getSpecialNodesList(session, NodeType.FRIEND_LIST.s());
+			List<SubNode> friendNodes = userManagerService.getSpecialNodesList(session, NodeType.FRIEND_LIST.s(), null, true);
 			if (friendNodes != null) {
 				for (SubNode friendNode : friendNodes) {
 
 					// the USER_NODE_ID property on friends nodes contains the actual account ID of this friend.
 					String userNodeId = friendNode.getStrProp(NodeProp.USER_NODE_ID);
-					if (userNodeId != null) {
+
+					// if we have a userNodeId and they aren't in the blocked list.
+					if (userNodeId != null && !blockedIdStrings.contains(userNodeId)) {
 						orCriteria.add(Criteria.where(SubNode.FIELD_OWNER).is(new ObjectId(userNodeId)));
 					}
 				}
@@ -371,7 +399,8 @@ public class UserFeedService {
 
 		for (SubNode node : iter) {
 			try {
-				NodeInfo info = convert.convertToNodeInfo(sc, session, node, true, false, counter + 1, false, false, false, false);
+				NodeInfo info =
+						convert.convertToNodeInfo(sc, session, node, true, false, counter + 1, false, false, false, false);
 				searchResults.add(info);
 				lastNode = node;
 			} catch (Exception e) {
@@ -399,15 +428,38 @@ public class UserFeedService {
 	}
 
 	/* todo-1: need to cache this in the session */
-	public List<ObjectId> getBlockedUserIds() {
-		List<SubNode> nodeList = userManagerService.getSpecialNodesList(null, NodeType.BLOCKED_USERS.s());
-		if (nodeList == null)
-			return null;
-		List<ObjectId> objList = new LinkedList<ObjectId>();
-		for (SubNode node : nodeList) {
-			String userNodeId = node.getStrProp(NodeProp.USER_NODE_ID.s());
-			objList.add(new ObjectId(userNodeId));
+	public void getBlockedUserIds(HashSet<ObjectId> set, String userName) {
+		boolean forAdmin = userName != null && userName.equals(PrincipalName.ADMIN.s());
+
+		/*
+		 * If admin-blocked users are cached, always use cached value. Note: For now it actually requires a
+		 * server restart to refresh this cached list, but eventually we'll have a way to make blocked users
+		 * go into effect immediately. todo-0
+		 */
+		if (forAdmin && adminBlockedUsers.size() > 0) {
+			synchronized (adminBlockedUsers) {
+				set.addAll(adminBlockedUsers);
+			}
+			return;
 		}
-		return objList;
+
+		arun.run(ms -> {
+			List<SubNode> nodeList = userManagerService.getSpecialNodesList(ms, NodeType.BLOCKED_USERS.s(), userName, false);
+			if (nodeList == null)
+				return null;
+
+			for (SubNode node : nodeList) {
+				String userNodeId = node.getStrProp(NodeProp.USER_NODE_ID.s());
+				ObjectId oid = new ObjectId(userNodeId);
+				set.add(oid);
+
+				if (forAdmin) {
+					synchronized (adminBlockedUsers) {
+						adminBlockedUsers.add(oid);
+					}
+				}
+			}
+			return null;
+		});
 	}
 }
