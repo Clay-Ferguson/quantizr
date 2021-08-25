@@ -52,6 +52,8 @@ import org.subnode.response.SearchAndReplaceResponse;
 import org.subnode.response.SplitNodeResponse;
 import org.subnode.response.TransferNodeResponse;
 import org.subnode.response.UpdateHeadingsResponse;
+import org.subnode.types.TypeBase;
+import org.subnode.types.TypePluginMgr;
 import org.subnode.util.AsyncExec;
 import org.subnode.util.Convert;
 import org.subnode.util.SubNodeUtil;
@@ -118,10 +120,7 @@ public class NodeEditService {
 	private AsyncExec asyncExec;
 
 	@Autowired
-	private AppProp appProp;
-
-	@Autowired
-	private NodeRenderService render;
+	private TypePluginMgr typePluginMgr;
 
 	/*
 	 * Creates a new node as a *child* node of the node specified in the request. Should ONLY be called
@@ -160,32 +159,14 @@ public class NodeEditService {
 			}
 		}
 
-		if (NodeType.BOOKMARK.s().equals(req.getTypeName())) {
+		ValContainer<SubNode> vcNode = new ValContainer<>(node);
 
-			// Note: if linkBookmark node will null here. that's fine.
-			SubNode nodeToBookmark = node;
-
-			node = read.getUserNodeByType(session, session.getUserName(), null, "### Bookmarks", NodeType.BOOKMARK_LIST.s(), null,
-					null);
-
-			if (!linkBookmark) {
-				req.setContent(render.getFirstLineAbbreviation(nodeToBookmark.getContent(), 100));
-			}
-		} else
-		/*
-		 * need a more pluggable approach to special cases like this. For RSS Feeds we want a containment
-		 * node so that the feed doesn't get rendered until the user expands so we have to have an extra
-		 * node in here. We can add a dialog later to let the user pass a string in here instead of cramming
-		 * in "Edit me!", but I think this is perfectly fine as is.
-		 */
-		if (NodeType.RSS_FEED.s().equals(req.getTypeName())) {
-			SubNode holderNode = create.createNode(session, node, null, NodeType.NONE.s(), 0L, CreateNodeLocation.FIRST,
-					req.getProperties(), null, false);
-			holderNode.setContent("#### Edit this. Add your RSS title!");
-			holderNode.touch();
-			update.save(session, holderNode);
-			node = holderNode;
+		/* Do all type-specific conversion processing */
+		for (TypeBase typePlugin : typePluginMgr.getTypes()) {
+			typePlugin.createSubNode(session, vcNode, req, linkBookmark);
 		}
+
+		node = vcNode.getVal();
 
 		if (node == null) {
 			res.setMessage("unable to locate parent for insert");
@@ -582,8 +563,8 @@ public class NodeEditService {
 			});
 		});
 
-		NodeInfo newNodeInfo =
-				convert.convertToNodeInfo(ThreadLocals.getSessionContext(), session, node, true, false, -1, false, false, true, false);
+		NodeInfo newNodeInfo = convert.convertToNodeInfo(ThreadLocals.getSessionContext(), session, node, true, false, -1, false,
+				false, true, false);
 		res.setNode(newNodeInfo);
 
 		// todo-1: for now we only push nodes if public, up to browsers rather than doing a specific check

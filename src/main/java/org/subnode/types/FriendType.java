@@ -5,6 +5,7 @@ import org.springframework.stereotype.Component;
 import org.subnode.model.NodeInfo;
 import org.subnode.model.PropertyInfo;
 import org.subnode.model.client.NodeProp;
+import org.subnode.model.client.NodeType;
 import org.subnode.mongo.MongoRead;
 import org.subnode.mongo.MongoSession;
 import org.subnode.mongo.model.SubNode;
@@ -22,6 +23,8 @@ public class FriendType extends TypeBase {
 
     @Override
     public void convert(MongoSession session, NodeInfo nodeInfo, SubNode node, boolean getFollowers) {
+        if (!node.getType().equals(NodeType.FRIEND.s())) return;
+        
         // yes this is redundant and loads userUrl again below, but I need to test this before removing it.
         String userUrl = node.getStrProp(NodeProp.ACT_PUB_ACTOR_URL.s());
         if (userUrl != null) {
