@@ -293,6 +293,10 @@ public class UserFeedService {
 		 */
 		if (!req.getToMe() && !req.getFromMe() && !req.getFromFriends()) {
 			getBlockedUserIds(blockedUserIds, PrincipalName.ADMIN.s());
+
+			// for global queries, we only show posts over 80 characters to try to eliminate posts that are
+			// replies like "thanks" or "you're right" etc.
+			criteria = criteria.and(SubNode.FIELD_CONTENT).regex("^.{80,}$");
 		}
 
 		/*
