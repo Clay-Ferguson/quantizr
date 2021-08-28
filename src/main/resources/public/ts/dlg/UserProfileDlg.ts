@@ -210,7 +210,7 @@ export class UserProfileDlg extends DialogBase {
         S.util.ajax<J.BlockUserRequest, J.BlockUserResponse>("blockUser", {
             userName: state.userProfile.userName
         }, (res: J.AddFriendResponse) => {
-            S.util.showMessage(res.message, "Blocked " + state.userProfile.userName);
+            S.util.showMessage("Blocked User: " + state.userProfile.userName);
         });
     }
 

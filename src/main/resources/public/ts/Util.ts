@@ -667,7 +667,7 @@ export class Util implements UtilIntf {
                 // console.log(`Element found (${id}), focusing`);
                 elm.focus();
             }
-        }, 500);
+        }, 750);
     }
 
     /* set focus to element by id */
@@ -682,7 +682,7 @@ export class Util implements UtilIntf {
                 // console.log(`Element found (${id}), focusing`);
                 elm.focus();
             }
-        }, 500);
+        }, 750);
     }
 
     /*

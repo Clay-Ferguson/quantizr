@@ -677,8 +677,7 @@ export class Render implements RenderIntf {
         return newValue;
     };
 
-    // todo-0: userNodeId not used (state?)
-    renderUser(state: AppState, nodeId: string, user: string, userBio: string, userNodeId: string, imgSrc: string, actorUrl: string,
+    renderUser(nodeId: string, user: string, userBio: string, imgSrc: string, actorUrl: string,
         displayName: string, className: string, iconClass: string, showMessageButton: boolean, onClick: Function): Comp {
 
         let img: Img = imgSrc

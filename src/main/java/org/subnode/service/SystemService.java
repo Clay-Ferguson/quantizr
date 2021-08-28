@@ -78,6 +78,9 @@ public class SystemService {
 	private ActPubService apService;
 
 	@Autowired
+	private UserFeedService userFeedService;
+
+	@Autowired
 	private SessionContext sc;
 
 	public String rebuildIndexes() {
@@ -171,7 +174,7 @@ public class SystemService {
 	public String getPerformancerReport() {
 		StringBuilder sb = new StringBuilder();
 		sb.append("Performance Report: " + sc.getUserName() + "\n");
-		int idx=1;
+		int idx = 1;
 		synchronized (sc.getStopwatchData()) {
 			for (StopwatchEntry se : sc.getStopwatchData()) {
 				sb.append(String.valueOf(idx));
@@ -189,8 +192,14 @@ public class SystemService {
 	}
 
 	public String getSystemInfo() {
+		// todo-0: this is kind of a tricky side effect, until I figure out a perhaps
+		// better way to trigger the adminBlockedUsers cache to refresh.
+		synchronized (userFeedService.adminBlockedUsers) {
+			userFeedService.adminBlockedUsers.clear();
+		}
+
 		StringBuilder sb = new StringBuilder();
-		sb.append("Daemons Enabed: "+String.valueOf(appProp.isDaemonsEnabled())+"\n");
+		sb.append("Daemons Enabed: " + String.valueOf(appProp.isDaemonsEnabled()) + "\n");
 		Runtime runtime = Runtime.getRuntime();
 		runtime.gc();
 		long freeMem = runtime.freeMemory() / Const.ONE_MB;

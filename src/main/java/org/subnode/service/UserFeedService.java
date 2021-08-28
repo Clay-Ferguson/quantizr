@@ -74,7 +74,7 @@ public class UserFeedService {
 	@Autowired
 	private AdminRun arun;
 
-	private static final HashSet<ObjectId> adminBlockedUsers = new HashSet<>();
+	public final HashSet<ObjectId> adminBlockedUsers = new HashSet<>();
 
 	@Autowired
 	@Qualifier("threadPoolTaskExecutor")
@@ -287,15 +287,18 @@ public class UserFeedService {
 
 		HashSet<ObjectId> blockedUserIds = new HashSet<>();
 
+		boolean isPublicCuratedFeed = !req.getToMe() && !req.getFromMe() && !req.getFromFriends();
+
 		/*
 		 * This is our slightly confusing way of detecting that this is a 'global Fediverse' (either local
 		 * or remote) query, and will be subject to the admin blocked users
 		 */
-		if (!req.getToMe() && !req.getFromMe() && !req.getFromFriends()) {
+		if (isPublicCuratedFeed) {
 			getBlockedUserIds(blockedUserIds, PrincipalName.ADMIN.s());
 
 			// for global queries, we only show posts over 80 characters to try to eliminate posts that are
-			// replies like "thanks" or "you're right" etc.
+			// replies like "thanks" or "you're right" etc. I haven't fully tested this, so for now I'm hand
+			// coding an additional filter for the 80 char requirement in the loop below
 			criteria = criteria.and(SubNode.FIELD_CONTENT).regex("^.{80,}$");
 		}
 
@@ -402,6 +405,12 @@ public class UserFeedService {
 		SubNode lastNode = null;
 
 		for (SubNode node : iter) {
+			if (isPublicCuratedFeed) {
+				if (node.getContent() == null || node.getContent().length() < 80) {
+					continue;
+				}
+			}
+
 			try {
 				NodeInfo info =
 						convert.convertToNodeInfo(sc, session, node, true, false, counter + 1, false, false, false, false);
@@ -431,14 +440,11 @@ public class UserFeedService {
 		return res;
 	}
 
-	/* todo-1: need to cache this in the session */
 	public void getBlockedUserIds(HashSet<ObjectId> set, String userName) {
 		boolean forAdmin = userName != null && userName.equals(PrincipalName.ADMIN.s());
 
 		/*
-		 * If admin-blocked users are cached, always use cached value. Note: For now it actually requires a
-		 * server restart to refresh this cached list, but eventually we'll have a way to make blocked users
-		 * go into effect immediately. todo-0
+		 * If admin-blocked users are cached, always use cached value.
 		 */
 		if (forAdmin && adminBlockedUsers.size() > 0) {
 			synchronized (adminBlockedUsers) {
