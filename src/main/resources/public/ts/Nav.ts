@@ -355,7 +355,7 @@ export class Nav implements NavIntf {
             if (!node) {
                 return;
             }
-            S.srch.timeline(node, "mtm", state, null, "Rev-chron by Modify Time", 0);
+            S.srch.timeline(node, "mtm", state, null, "Rev-chron by Modify Time", 0, true);
         }, 500);
     }
 

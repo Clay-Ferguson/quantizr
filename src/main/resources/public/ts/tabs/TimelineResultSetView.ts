@@ -24,6 +24,6 @@ export class TimelineResultSetView<I extends TimelineRSInfo> extends ResultSetVi
 
         S.srch.timeline(this.data.rsInfo.node, this.data.rsInfo.prop, state, this.data.rsInfo.timeRangeType,
             this.data.rsInfo.description,
-            delta === 0 ? 0 : this.data.rsInfo.page + delta);
+            delta === 0 ? 0 : this.data.rsInfo.page + delta, this.data.rsInfo.recursive);
     }
 }

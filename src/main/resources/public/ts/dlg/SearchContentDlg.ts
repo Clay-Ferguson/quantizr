@@ -32,7 +32,8 @@ export class SearchContentDlg extends DialogBase {
 
         this.mergeState({
             fuzzy: false,
-            caseSensitive: false
+            caseSensitive: false,
+            recursive: true
         });
         this.searchTextState.setValue(SearchContentDlg.defaultSearchText);
     }
@@ -69,6 +70,14 @@ export class SearchContentDlg extends DialogBase {
                         },
                         getValue: (): boolean => {
                             return this.getState().caseSensitive;
+                        }
+                    }),
+                    new Checkbox("Recursive", null, {
+                        setValue: (checked: boolean): void => {
+                            this.mergeState({ recursive: checked });
+                        },
+                        getValue: (): boolean => {
+                            return this.getState().recursive;
                         }
                     })
                 ], "displayTable marginBottom"),
@@ -124,6 +133,6 @@ export class SearchContentDlg extends DialogBase {
 
         let desc = "Content: " + SearchContentDlg.defaultSearchText;
         S.srch.search(node, null, SearchContentDlg.defaultSearchText, this.appState, null, desc, this.getState().fuzzy,
-            this.getState().caseSensitive, 0, this.close);
+            this.getState().caseSensitive, 0, this.getState().recursive, this.close);
     }
 }

@@ -572,7 +572,7 @@ public class MongoRead {
      * timeRangeType: futureOnly, pastOnly, all
      */
     public Iterable<SubNode> searchSubGraph(MongoSession session, SubNode node, String prop, String text, String sortField,
-            int limit, int skip, boolean fuzzy, boolean caseSensitive, String timeRangeType) {
+            int limit, int skip, boolean fuzzy, boolean caseSensitive, String timeRangeType, boolean recursive) {
         auth.auth(session, node, PrivilegeType.READ);
 
         Query query = new Query();
@@ -590,7 +590,9 @@ public class MongoRead {
          * string. Without the trailing (.+)$ we would be including the node itself in addition to all its
          * children.
          */
-        Criteria criteria = Criteria.where(SubNode.FIELD_PATH).regex(util.regexRecursiveChildrenOfPath(node.getPath()));
+        Criteria criteria = recursive ? //
+                Criteria.where(SubNode.FIELD_PATH).regex(util.regexRecursiveChildrenOfPath(node.getPath())) //
+                : Criteria.where(SubNode.FIELD_PATH).regex(util.regexDirectChildrenOfPath(node.getPath()));
         query.addCriteria(criteria);
 
         if (!StringUtils.isEmpty(text)) {

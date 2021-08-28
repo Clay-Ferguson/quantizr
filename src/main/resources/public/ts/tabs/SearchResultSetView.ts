@@ -30,6 +30,9 @@ export class SearchResultSetView extends ResultSetView {
             this.data.rsInfo.fuzzy,
             this.data.rsInfo.caseSensitive,
             delta === 0 ? 0 : this.data.rsInfo.page + delta,
+
+            // need to set this rsInfo value in various places (todo-0)
+            this.data.rsInfo.recursive,
             null);
     }
 }

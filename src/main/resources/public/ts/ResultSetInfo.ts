@@ -12,4 +12,5 @@ export class ResultSetInfo {
     public caseSensitive: boolean;
     public searchText: string;
     public userSearchType: string;
+    public recursive: boolean;
 }

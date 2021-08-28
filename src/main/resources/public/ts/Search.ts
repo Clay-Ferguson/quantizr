@@ -63,7 +63,7 @@ export class Search implements SearchIntf {
         });
     }
 
-    search = (node: J.NodeInfo, prop: string, searchText: string, state: AppState, userSearchType: string, description: string, fuzzy: boolean, caseSensitive: boolean, page: number, successCallback: Function): void => {
+    search = (node: J.NodeInfo, prop: string, searchText: string, state: AppState, userSearchType: string, description: string, fuzzy: boolean, caseSensitive: boolean, page: number, recursive: boolean, successCallback: Function): void => {
         /* Note that for 'userSearchType' we do want node to be null, because we're not searching under a node but
         will be searching under the admin owned "All Users" node instead */
         if (!node && !userSearchType) {
@@ -83,7 +83,8 @@ export class Search implements SearchIntf {
             caseSensitive,
             userSearchType,
             searchDefinition: "",
-            timeRangeType: null
+            timeRangeType: null,
+            recursive
         }, (res) => {
             if (res.searchResults && res.searchResults.length > 0) {
                 if (successCallback) {
@@ -104,6 +105,7 @@ export class Search implements SearchIntf {
                     data.rsInfo.searchText = searchText;
                     data.rsInfo.fuzzy = fuzzy;
                     data.rsInfo.caseSensitive = caseSensitive;
+                    data.rsInfo.recursive = recursive;
                     data.rsInfo.prop = prop;
                     data.rsInfo.endReached = !res.searchResults || res.searchResults.length < J.ConstantInt.ROWS_PER_PAGE;
 
@@ -135,7 +137,7 @@ export class Search implements SearchIntf {
     }
 
     /* prop = mtm (modification time) | ctm (create time) */
-    timeline = (node: J.NodeInfo, prop: string, state: AppState, timeRangeType: string, timelineDescription: string, page: number) => {
+    timeline = (node: J.NodeInfo, prop: string, state: AppState, timeRangeType: string, timelineDescription: string, page: number, recursive: boolean) => {
 
         /* this code AND other similar code needs a way to lockin the node, here so it can't change during pagination
         including when the page==0 because user is just jumping to beginning. Need a specific param for saying
@@ -160,7 +162,8 @@ export class Search implements SearchIntf {
             caseSensitive: false,
             searchDefinition: "timeline",
             userSearchType: null,
-            timeRangeType
+            timeRangeType,
+            recursive
         }, (res) => {
             dispatch("Action_RenderTimelineResults", (s: AppState): AppState => {
                 S.util.focusId(C.TAB_TIMELINE);
@@ -173,6 +176,7 @@ export class Search implements SearchIntf {
                 info.description = timelineDescription;
                 info.prop = prop;
                 info.timeRangeType = timeRangeType;
+                info.recursive = recursive;
                 info.node = node;
                 info.endReached = !res.searchResults || res.searchResults.length < J.ConstantInt.ROWS_PER_PAGE;
                 info.page = page;

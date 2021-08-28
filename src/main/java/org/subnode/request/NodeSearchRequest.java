@@ -33,6 +33,8 @@ public class NodeSearchRequest extends RequestBase {
 
 	private String timeRangeType;
 
+	private boolean recursive;
+
 	public String getNodeId() {
 		return nodeId;
 	}
@@ -120,4 +122,13 @@ public class NodeSearchRequest extends RequestBase {
 	public void setPage(int page) {
 		this.page = page;
 	}
+
+	public boolean isRecursive() {
+		return recursive;
+	}
+
+	public void setRecursive(boolean recursive) {
+		this.recursive = recursive;
+	}
+
 }
