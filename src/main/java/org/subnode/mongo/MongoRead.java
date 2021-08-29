@@ -572,7 +572,7 @@ public class MongoRead {
      * timeRangeType: futureOnly, pastOnly, all
      */
     public Iterable<SubNode> searchSubGraph(MongoSession session, SubNode node, String prop, String text, String sortField,
-            int limit, int skip, boolean fuzzy, boolean caseSensitive, String timeRangeType, boolean recursive) {
+            String sortDir, int limit, int skip, boolean fuzzy, boolean caseSensitive, String timeRangeType, boolean recursive) {
         auth.auth(session, node, PrivilegeType.READ);
 
         Query query = new Query();
@@ -626,9 +626,9 @@ public class MongoRead {
             }
         }
 
-        boolean revChron = true;
         if (!StringUtils.isEmpty(sortField)) {
             if ("prp.date.value".equals(sortField) && timeRangeType != null) {
+                sortDir = "DESC";
                 // example date RANGE condition:
                 // query.addCriteria(Criteria.where("startDate").gte(startDate).lt(endDate));
                 // and this 'may' be the same:
@@ -638,7 +638,7 @@ public class MongoRead {
                 if ("futureOnly".equals(timeRangeType)) {
                     // because we want to show the soonest items on top, for "future" query, we have
                     // to sort in order (not rev-chron)
-                    revChron = false;
+                    sortDir = "ASC";
                     query.addCriteria(Criteria.where(sortField).gt(new Date().getTime()));
                 } //
                 else if ("pastOnly".equals(timeRangeType)) {
@@ -650,7 +650,12 @@ public class MongoRead {
                     query.addCriteria(Criteria.where(sortField).ne(null));
                 }
             }
-            query.with(Sort.by(revChron ? Sort.Direction.DESC : Sort.Direction.ASC, sortField));
+
+            if (!StringUtils.isEmpty(sortField)) {
+                query.with(
+                        Sort.by((sortDir != null && sortDir.equalsIgnoreCase("DESC")) ? Sort.Direction.DESC : Sort.Direction.ASC,
+                                sortField));
+            }
         }
         return util.find(query);
     }

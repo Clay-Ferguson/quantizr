@@ -78,6 +78,6 @@ export class SearchByIDDlg extends DialogBase {
 
         let desc = "For ID: " + SearchByIDDlg.defaultSearchText;
         S.srch.search(node, "node.id", SearchByIDDlg.defaultSearchText, this.appState, null, desc, false,
-            false, 0, true, this.close);
+            false, 0, true, null, null, this.close);
     }
 }

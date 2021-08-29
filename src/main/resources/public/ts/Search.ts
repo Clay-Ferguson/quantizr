@@ -63,7 +63,7 @@ export class Search implements SearchIntf {
         });
     }
 
-    search = (node: J.NodeInfo, prop: string, searchText: string, state: AppState, userSearchType: string, description: string, fuzzy: boolean, caseSensitive: boolean, page: number, recursive: boolean, successCallback: Function): void => {
+    search = (node: J.NodeInfo, prop: string, searchText: string, state: AppState, userSearchType: string, description: string, fuzzy: boolean, caseSensitive: boolean, page: number, recursive: boolean, sortField: string, sortDir: string, successCallback: Function): void => {
         /* Note that for 'userSearchType' we do want node to be null, because we're not searching under a node but
         will be searching under the admin owned "All Users" node instead */
         if (!node && !userSearchType) {
@@ -76,8 +76,8 @@ export class Search implements SearchIntf {
             // for userSearchTypes this node can be null
             nodeId: node ? node.id : null,
             searchText,
-            sortDir: "DESC",
-            sortField: "mtm",
+            sortDir,
+            sortField,
             searchProp: prop,
             fuzzy,
             caseSensitive,
@@ -106,6 +106,8 @@ export class Search implements SearchIntf {
                     data.rsInfo.fuzzy = fuzzy;
                     data.rsInfo.caseSensitive = caseSensitive;
                     data.rsInfo.recursive = recursive;
+                    data.rsInfo.sortField = sortField;
+                    data.rsInfo.sortDir = sortDir;
                     data.rsInfo.prop = prop;
                     data.rsInfo.endReached = !res.searchResults || res.searchResults.length < J.ConstantInt.ROWS_PER_PAGE;
 

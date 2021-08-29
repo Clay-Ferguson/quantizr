@@ -33,6 +33,8 @@ export class SearchResultSetView extends ResultSetView {
 
             // need to set this rsInfo value in various places (todo-0)
             this.data.rsInfo.recursive,
+            this.data.rsInfo.sortField,
+            this.data.rsInfo.sortDir,
             null);
     }
 }

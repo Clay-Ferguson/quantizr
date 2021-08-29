@@ -8,9 +8,11 @@ import { CompIntf } from "../widget/base/CompIntf";
 import { Button } from "../widget/Button";
 import { ButtonBar } from "../widget/ButtonBar";
 import { Checkbox } from "../widget/Checkbox";
+import { Div } from "../widget/Div";
 import { Form } from "../widget/Form";
 import { HelpButton } from "../widget/HelpButton";
 import { HorizontalLayout } from "../widget/HorizontalLayout";
+import { Selection } from "../widget/Selection";
 import { TextField } from "../widget/TextField";
 
 let S: Singletons;
@@ -33,7 +35,9 @@ export class SearchContentDlg extends DialogBase {
         this.mergeState({
             fuzzy: false,
             caseSensitive: false,
-            recursive: true
+            recursive: true,
+            sortField: "0",
+            sortDir: ""
         });
         this.searchTextState.setValue(SearchContentDlg.defaultSearchText);
     }
@@ -81,6 +85,22 @@ export class SearchContentDlg extends DialogBase {
                         }
                     })
                 ], "displayTable marginBottom"),
+                new Div(null, null, [
+                    new Selection(null, "Sort by", [
+                        { key: "0", val: "Relevance" },
+                        { key: "ctm", val: "Create Time" },
+                        { key: "mtm", val: "Modify Time" }
+                    ], "m-2", "searchDlgOrderBy", {
+                        setValue: (val: string): void => {
+                            this.mergeState({
+                                sortField: val,
+                                sortDir: val === "0" ? "" : "DESC"
+                            });
+                        },
+                        getValue: (): string => {
+                            return this.getState().sortField;
+                        }
+                    })]),
                 new HelpButton(() => S.quanta?.config?.help?.search?.dialog),
                 new ButtonBar([
                     new Button("Search", this.search, null, "btn-primary"),
@@ -133,6 +153,10 @@ export class SearchContentDlg extends DialogBase {
 
         let desc = "Content: " + SearchContentDlg.defaultSearchText;
         S.srch.search(node, null, SearchContentDlg.defaultSearchText, this.appState, null, desc, this.getState().fuzzy,
-            this.getState().caseSensitive, 0, this.getState().recursive, this.close);
+            this.getState().caseSensitive, 0,
+            this.getState().recursive,
+            this.getState().sortField,
+            this.getState().sortDir,
+            this.close);
     }
 }

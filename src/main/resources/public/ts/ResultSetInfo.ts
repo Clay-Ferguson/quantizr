@@ -13,4 +13,6 @@ export class ResultSetInfo {
     public searchText: string;
     public userSearchType: string;
     public recursive: boolean;
+    public sortField: string;
+    public sortDir: string;
 }
