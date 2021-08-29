@@ -22,8 +22,13 @@ export class TimelineResultSetView<I extends TimelineRSInfo> extends ResultSetVi
     pageChange(delta: number): void {
         let state: AppState = store.getState();
 
+        let page = this.data.rsInfo.page;
+        if (delta !== null) {
+            page = delta === 0 ? 0 : this.data.rsInfo.page + delta;
+        }
+
         S.srch.timeline(this.data.rsInfo.node, this.data.rsInfo.prop, state, this.data.rsInfo.timeRangeType,
             this.data.rsInfo.description,
-            delta === 0 ? 0 : this.data.rsInfo.page + delta, this.data.rsInfo.recursive);
+            page, this.data.rsInfo.recursive);
     }
 }

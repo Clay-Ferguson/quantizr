@@ -90,20 +90,26 @@ export abstract class ResultSetView extends AppTab {
     }
 
     addPaginationBar = (state: AppState, children: CompIntf[]): void => {
-        children.push(new ButtonBar([
-            this.data.rsInfo.page > 1 ? new IconButton("fa-angle-double-left", null, {
-                onClick: () => this.pageChange(0),
-                title: "First Page"
-            }) : null,
-            this.data.rsInfo.page > 0 ? new IconButton("fa-angle-left", null, {
-                onClick: () => this.pageChange(-1),
-                title: "Previous Page"
-            }) : null,
-            !this.data.rsInfo.endReached ? new IconButton("fa-angle-right", "More", {
-                onClick: () => this.pageChange(1),
-                title: "Next Page"
-            }) : null
-        ], "text-center marginBottom marginTop"));
+        children.push(
+            new Span("Pg. " + (this.data.rsInfo.page + 1), { className: "float-right" }),
+            new ButtonBar([
+                new IconButton("fa-refresh", null, {
+                    onClick: () => this.pageChange(null),
+                    title: "Refresh"
+                }),
+                this.data.rsInfo.page > 1 ? new IconButton("fa-angle-double-left", null, {
+                    onClick: () => this.pageChange(0),
+                    title: "First Page"
+                }) : null,
+                this.data.rsInfo.page > 0 ? new IconButton("fa-angle-left", null, {
+                    onClick: () => this.pageChange(-1),
+                    title: "Previous Page"
+                }) : null,
+                !this.data.rsInfo.endReached ? new IconButton("fa-angle-right", "More", {
+                    onClick: () => this.pageChange(1),
+                    title: "Next Page"
+                }) : null
+            ], "text-center marginBottom marginTop"));
     }
 
     abstract pageChange(delta: number): void;

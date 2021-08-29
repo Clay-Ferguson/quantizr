@@ -21,6 +21,11 @@ export class SearchResultSetView extends ResultSetView {
     pageChange(delta: number): void {
         let state: AppState = store.getState();
 
+        let page = this.data.rsInfo.page;
+        if (delta !== null) {
+            page = delta === 0 ? 0 : this.data.rsInfo.page + delta;
+        }
+
         S.srch.search(this.data.rsInfo.node,
             this.data.rsInfo.prop,
             this.data.rsInfo.searchText,
@@ -29,7 +34,7 @@ export class SearchResultSetView extends ResultSetView {
             this.data.rsInfo.description,
             this.data.rsInfo.fuzzy,
             this.data.rsInfo.caseSensitive,
-            delta === 0 ? 0 : this.data.rsInfo.page + delta,
+            page,
 
             // need to set this rsInfo value in various places (todo-0)
             this.data.rsInfo.recursive,

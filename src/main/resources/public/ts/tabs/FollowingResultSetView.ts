@@ -24,7 +24,13 @@ export class FollowingResultSetView<I extends FollowingRSInfo> extends ResultSet
 
     pageChange(delta: number): void {
         let info = this.data.rsInfo as FollowingRSInfo;
-        S.srch.showFollowing(delta === 0 ? 0 : info.page + delta, info.showingFollowingOfUser);
+        let page = info.page;
+
+        // Yes the check against null IS required. Don't change.
+        if (delta !== null) {
+            page = delta === 0 ? 0 : info.page + delta;
+        }
+        S.srch.showFollowing(page, info.showingFollowingOfUser);
     }
 
     renderHeading(state: AppState): CompIntf {

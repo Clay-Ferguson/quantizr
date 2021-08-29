@@ -23,8 +23,13 @@ export class SharedNodesResultSetView<I extends SharesRSInfo> extends ResultSetV
         let state: AppState = store.getState();
         let info = this.data.rsInfo as I;
 
+        let page = info.page;
+        if (delta !== null) {
+            page = delta === 0 ? 0 : info.page + delta;
+        }
+
         S.srch.findSharedNodes(info.node,
-            delta === 0 ? 0 : info.page + delta,
+            page,
             info.shareNodesType,
             info.shareTarget,
             info.accessOption,
