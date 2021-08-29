@@ -156,8 +156,17 @@ export class FullScreenGraphViewer extends Main {
                 .join("circle")
 
                 .attr("fill", d => {
-                    if (d.data.id === _this.nodeId) return "red";
-                    return d.data.highlight ? "green" : "black";
+                    let color = "black";
+                    if (d.data.id === _this.nodeId) {
+                        color = "red";
+                    }
+                    else if (d.data.highlight) {
+                        color = "green";
+                    }
+                    // For some bizarre reason whenever we return "black" from here it renders as WHITE insead. Every other color
+                    // seems to work fine, but it just insists that black get rendered as white.
+                    // console.log("color[" + d.data.id + "]=" + color);
+                    return color;
                 })
                 .attr("stroke", d => {
                     return _this.getColorForLevel(d.data.level);
@@ -172,8 +181,8 @@ export class FullScreenGraphViewer extends Main {
 
                 .on("click", function (event: any, d) {
                     d3.select(this)
-                        .style("fill", "white")
-                        .style("stroke", "red");
+                        .style("fill", "green");
+                    // .style("stroke", "red");
 
                     _this.tooltip.text("Opening...")
                         .style("left", (event.pageX + 15) + "px")
