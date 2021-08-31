@@ -242,31 +242,31 @@ public class UserFeedService {
 
 		int counter = 0;
 
-		/* Finds nodes that have shares to any of the people listed in sharedToAny */
+		/* Query will include nodes that have shares to any of the people listed in sharedToAny */
 		List<String> sharedToAny = new LinkedList<>();
 
 		if (req.getToPublic()) {
 			sharedToAny.add(PrincipalName.PUBLIC.s());
 		}
 
-		SubNode userAccountNode = null;
+		SubNode myAcntNode = null;
 
 		// includes shares TO me.
 		if (req.getToMe()) {
-			if (userAccountNode == null) {
-				userAccountNode = read.getNode(session, sc.getRootId());
+			if (myAcntNode == null) {
+				myAcntNode = read.getNode(session, sc.getRootId());
 			}
 
-			if (userAccountNode != null) {
-				sharedToAny.add(userAccountNode.getOwner().toHexString());
+			if (myAcntNode != null) {
+				sharedToAny.add(myAcntNode.getOwner().toHexString());
 
 				/*
 				 * setting last active time to this current time, will stop the GUI from showing the user an
 				 * indication that they have new messages, because we know they're querying messages NOW, so this is
 				 * a way to reset
 				 */
-				userAccountNode.setProp(NodeProp.LAST_ACTIVE_TIME.s(), sc.getLastActiveTime());
-				update.save(session, userAccountNode);
+				myAcntNode.setProp(NodeProp.LAST_ACTIVE_TIME.s(), sc.getLastActiveTime());
+				update.save(session, myAcntNode);
 			}
 		}
 		List<NodeInfo> searchResults = new LinkedList<>();
@@ -276,7 +276,7 @@ public class UserFeedService {
 		Query query = new Query();
 		Criteria criteria = Criteria.where(SubNode.FIELD_PATH).regex(util.regexRecursiveChildrenOfPath(pathToSearch)) //
 
-				// This pattern is what is required when you have multiple conditions added to a single field.
+				// This 'andOperator' pattern is what is required when you have multiple conditions added to a single field.
 				.andOperator(Criteria.where(SubNode.FIELD_TYPE).ne(NodeType.FRIEND.s()), //
 						Criteria.where(SubNode.FIELD_TYPE).ne(NodeType.POSTS.s()), //
 						Criteria.where(SubNode.FIELD_TYPE).ne(NodeType.ACT_PUB_POSTS.s()));
@@ -336,14 +336,14 @@ public class UserFeedService {
 		List<Criteria> orCriteria = new LinkedList<>();
 
 		if (req.getFromMe()) {
-			if (userAccountNode == null) {
-				userAccountNode = read.getNode(session, sc.getRootId());
+			if (myAcntNode == null) {
+				myAcntNode = read.getNode(session, sc.getRootId());
 			}
 
-			if (userAccountNode != null) {
+			if (myAcntNode != null) {
 				orCriteria.add(
 						// where node is owned by us.
-						Criteria.where(SubNode.FIELD_OWNER).is(userAccountNode.getOwner()) //
+						Criteria.where(SubNode.FIELD_OWNER).is(myAcntNode.getOwner()) //
 								// and the node has any sharing on it.
 								.and(SubNode.FIELD_AC).ne(null));
 			}
