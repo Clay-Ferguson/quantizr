@@ -114,7 +114,11 @@ export class FeedView extends AppTab {
         if (!state.mobileMode || FeedView.searchTextState.getValue()) {
             searchButtonBar = new ButtonBar([
                 new Span(null, { className: "feedSearchField" }, [new TextField("Search", false, null, null, false, FeedView.searchTextState)]),
-                new Button("Clear", () => { this.clearSearch(); }, { className: "feedClearButton" })
+                new Button("Clear", () => { this.clearSearch(); }, { className: "feedClearButton" }),
+                !state.feedFilterRootNode ? new IconButton("fa-refresh", null, {
+                    onClick: () => FeedView.refresh(),
+                    title: "Refresh"
+                }) : null
             ], "marginTop");
         }
 
