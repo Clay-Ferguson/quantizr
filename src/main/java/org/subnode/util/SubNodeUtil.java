@@ -3,7 +3,6 @@ package org.subnode.util;
 import java.util.HashSet;
 import java.util.List;
 import java.util.UUID;
-
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,9 +18,9 @@ import org.subnode.mongo.MongoCreate;
 import org.subnode.mongo.MongoRead;
 import org.subnode.mongo.MongoSession;
 import org.subnode.mongo.MongoUpdate;
-import org.subnode.mongo.MongoUtil;
 import org.subnode.mongo.model.SubNode;
 import org.subnode.mongo.model.SubNodePropertyMap;
+import org.subnode.service.NodeRenderService;
 
 /**
  * Assorted general utility functions related to SubNodes.
@@ -32,6 +31,9 @@ import org.subnode.mongo.model.SubNodePropertyMap;
 @Component
 public class SubNodeUtil {
 	private static final Logger log = LoggerFactory.getLogger(SubNodeUtil.class);
+
+	@Autowired
+	private NodeRenderService nodeRender;
 
 	@Autowired
 	private MongoCreate create;
@@ -251,17 +253,19 @@ public class SubNodeUtil {
 
 		int newLineIdx = description.indexOf("\n");
 		if (newLineIdx != -1) {
+			// call this once to start just so the title extraction works.
+			description = nodeRender.stripRenderTags(description);
+
 			String ogTitle = description.substring(0, newLineIdx).trim();
-
-			// remove leading hash marks which will be there if this is a markdown heading.
-			while (ogTitle.startsWith("#")) {
-				ogTitle = XString.stripIfStartsWith(ogTitle, "#");
-			}
-			ogTitle = ogTitle.trim();
-
+			ogTitle = nodeRender.stripRenderTags(ogTitle);
 			ret.setTitle(ogTitle);
-			ret.setDescription(description.substring(newLineIdx + 1).trim());
+
+			description = description.substring(newLineIdx).trim();
+			description = nodeRender.stripRenderTags(description);
+			ret.setDescription(description);
 		} else {
+			ret.setTitle("Quanta");
+			description = nodeRender.stripRenderTags(description);
 			ret.setDescription(description);
 		}
 

@@ -467,8 +467,8 @@ public class NodeRenderService {
 			return res;
 		}
 
-		NodeInfo nodeInfo =
-				convert.convertToNodeInfo(ThreadLocals.getSessionContext(), session, node, false, true, -1, false, false, true, false);
+		NodeInfo nodeInfo = convert.convertToNodeInfo(ThreadLocals.getSessionContext(), session, node, false, true, -1, false,
+				false, true, false);
 		res.setNodeInfo(nodeInfo);
 		res.setSuccess(true);
 		return res;
@@ -625,14 +625,26 @@ public class NodeRenderService {
 		}
 	}
 
-	public String getFirstLineAbbreviation(String content, int maxLen) {
+	public String stripRenderTags(String content) {
 		if (content == null)
 			return null;
-
 		content = content.replace("{{imgUpperRight}}", "");
 		content = content.replace("{{imgUpperLeft}}", "");
 		content = content.replace("{{img}}", "");
 		content = content.trim();
+
+		while (content.startsWith("#")) {
+			content = XString.stripIfStartsWith(content, "#");
+		}
+		content = content.trim();
+		return content;
+	}
+
+	public String getFirstLineAbbreviation(String content, int maxLen) {
+		if (content == null)
+			return null;
+
+		content = stripRenderTags(content);
 
 		content = XString.truncateAfterFirst(content, "\n");
 		content = XString.truncateAfterFirst(content, "\r");

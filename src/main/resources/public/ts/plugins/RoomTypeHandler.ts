@@ -35,7 +35,7 @@ export class RoomTypeHandler extends TypeBase {
         return new Div(null, null, [
             baseComp,
             new ButtonBar([
-                new Button("Chat Room", () => {
+                new Button("Join Room", () => {
                     S.nav.openNodeFeed(null, node.id);
                 })
             ], "marginLeft marginBottom")
