@@ -255,6 +255,9 @@ public class SubNodeUtil {
 		if (newLineIdx != -1) {
 			// call this once to start just so the title extraction works.
 			description = nodeRender.stripRenderTags(description);
+			
+			// get the new idx, it might have changed.
+			newLineIdx = description.indexOf("\n");
 
 			String ogTitle = description.substring(0, newLineIdx).trim();
 			ogTitle = nodeRender.stripRenderTags(ogTitle);
