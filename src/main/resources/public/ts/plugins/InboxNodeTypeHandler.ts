@@ -8,7 +8,6 @@ import { Comp } from "../widget/base/Comp";
 import { Button } from "../widget/Button";
 import { ButtonBar } from "../widget/ButtonBar";
 import { Clearfix } from "../widget/Clearfix";
-import { Div } from "../widget/Div";
 import { Heading } from "../widget/Heading";
 import { HorizontalLayout } from "../widget/HorizontalLayout";
 import { TypeBase } from "./base/TypeBase";
@@ -40,8 +39,6 @@ export class InboxNodeTypeHandler extends TypeBase {
     }
 
     render(node: J.NodeInfo, rowStyling: boolean, isTreeView: boolean, state: AppState): Comp {
-
-        // let user: string = S.props.getNodePropVal(J.NodeProp.USER, node);
         return new HorizontalLayout([
             new Heading(4, "Inbox"),
 

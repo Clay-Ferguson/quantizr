@@ -261,9 +261,8 @@ export class MenuPanel extends Div {
             ? " (" + state.newMessageCount + " new)" : "";
 
         children.push(new Menu("Messages" + messagesSuffix, [
-            // I'll keep this code commented, but there's a button on each node for it, so we don't need it.
-            // new MenuItem("Node Feed", () => MenuPanel.messagesNodeFeed(state), !state.isAnonUser && hltNode?.id != null),
-            // new MenuItemSeparator(), //
+            new MenuItem("Node Feed (Chat)", () => MenuPanel.messagesNodeFeed(state), !state.isAnonUser && hltNode?.id != null),
+            new MenuItemSeparator(), //
             new MenuItem("To/From Me" + messagesSuffix, MenuPanel.messagesToFromMe, !state.isAnonUser),
             new MenuItem("From Friends", MenuPanel.messagesFromFriends, !state.isAnonUser),
             new MenuItem("From Local Users", MenuPanel.messagesLocal, !state.isAnonUser),

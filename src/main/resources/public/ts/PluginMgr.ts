@@ -2,6 +2,7 @@ import { PluginMgrIntf } from "./intf/PluginMgrIntf";
 import { TypeHandlerIntf } from "./intf/TypeHandlerIntf";
 import { AccountTypeHandler } from "./plugins/AccountTypeHandler";
 import { CalcTypeHandler } from "./plugins/CalcTypeHandler";
+import { RoomTypeHandler } from "./plugins/RoomTypeHandler";
 import { FriendsListTypeHandler } from "./plugins/FriendsListTypeHandler";
 import { BlockedUsersTypeHandler } from "./plugins/BlockedUsersTypeHandler";
 import { FriendTypeHandler } from "./plugins/FriendTypeHandler";
@@ -48,6 +49,7 @@ export class PluginMgr implements PluginMgrIntf {
         this.addTypeHandler(new RssFeedsTypeHandler());
         this.addTypeHandler(new RssTypeHandler());
         this.addTypeHandler(new CalcTypeHandler());
+        this.addTypeHandler(new RoomTypeHandler());
         this.addTypeHandler(new IPFSNodeTypeHandler());
         this.addTypeHandler(new RepoRootTypeHandler());
         this.addTypeHandler(new AccountTypeHandler());

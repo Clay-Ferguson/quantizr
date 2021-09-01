@@ -449,7 +449,13 @@ public class UserFeedService {
 		}
 
 		query.addCriteria(criteria);
-		query.with(Sort.by(Sort.Direction.DESC, SubNode.FIELD_MODIFY_TIME));
+
+		// if we have a node id this is like a chat room type, and so we sort by create time.
+		if (req.getNodeId() != null) {
+			query.with(Sort.by(Sort.Direction.DESC, SubNode.FIELD_CREATE_TIME));
+		} else {
+			query.with(Sort.by(Sort.Direction.DESC, SubNode.FIELD_MODIFY_TIME));
+		}
 		query.limit(MAX_FEED_ITEMS);
 
 		if (req.getPage() > 0) {

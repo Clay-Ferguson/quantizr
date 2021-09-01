@@ -1,6 +1,5 @@
-import { appState, dispatch, store } from "./AppRedux";
+import { appState, dispatch } from "./AppRedux";
 import { AppState } from "./AppState";
-import { FeedView } from "./tabs/FeedView";
 import { Constants as C } from "./Constants";
 import { LoginDlg } from "./dlg/LoginDlg";
 import { MainMenuDlg } from "./dlg/MainMenuDlg";
@@ -11,11 +10,11 @@ import { NavIntf } from "./intf/NavIntf";
 import * as J from "./JavaIntf";
 import { PubSub } from "./PubSub";
 import { Singletons } from "./Singletons";
+import { FeedView } from "./tabs/FeedView";
 import { Button } from "./widget/Button";
 import { ButtonBar } from "./widget/ButtonBar";
 import { Heading } from "./widget/Heading";
 import { VerticalLayout } from "./widget/VerticalLayout";
-import { Comp } from "./widget/base/Comp";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (s: Singletons) => {
@@ -359,8 +358,8 @@ export class Nav implements NavIntf {
         }, 500);
     }
 
-    openNodeFeed = (evt: Event): void => {
-        let id = S.util.allowIdFromEvent(evt, null);
+    openNodeFeed = (evt: Event, id: string): void => {
+        id = S.util.allowIdFromEvent(evt, id);
         const state = appState();
         this.clickNodeRow(null, id);
 

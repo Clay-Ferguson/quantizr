@@ -892,6 +892,7 @@ export const enum NodeType {
     REPO_ROOT = "sn:repoRoot",
     INBOX = "sn:inbox",
     INBOX_ENTRY = "sn:inboxEntry",
+    ROOM = "sn:room",
     NOTES = "sn:notes",
     BOOKMARK = "sn:bookmark",
     BOOKMARK_LIST = "sn:bookmarkList",
