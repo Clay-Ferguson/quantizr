@@ -73,8 +73,11 @@ import org.subnode.util.XString;
 
 // IPFS Reference: https://docs.ipfs.io/reference/http/api
 
-/* todo-1: There are several places in here where we're getting back a "String" from a restTemplate.exchange for getting back JSON, and we can
-probably define a POJO and let the converter convert do this for us always instead */
+/*
+ * todo-1: There are several places in here where we're getting back a "String" from a
+ * restTemplate.exchange for getting back JSON, and we can probably define a POJO and let the
+ * converter convert do this for us always instead
+ */
 
 @Component
 public class IPFSService {
@@ -91,14 +94,14 @@ public class IPFSService {
     private static String API_REPO;
 
     /*
-     * originally this was 'data-endcoding' (or at least i got that from somewhere),
-     * but now their example page seems to show 'encoding' is the name here.
+     * originally this was 'data-endcoding' (or at least i got that from somewhere), but now their
+     * example page seems to show 'encoding' is the name here.
      */
     public static String ENCODING_PARAM_NAME = "encoding";
 
     /*
-     * RestTempalte is thread-safe and reusable, and has no state, so we need only
-     * one final static instance ever
+     * RestTempalte is thread-safe and reusable, and has no state, so we need only one final static
+     * instance ever
      */
     private static final RestTemplate restTemplate = new RestTemplate(Util.getClientHttpRequestFactory());
     private static final ObjectMapper mapper = new ObjectMapper();
@@ -122,7 +125,7 @@ public class IPFSService {
     AttachmentService attachmentService;
 
     @Autowired
-	private UserManagerService userManagerService;
+    private UserManagerService userManagerService;
 
     @PostConstruct
     public void init() {
@@ -144,10 +147,9 @@ public class IPFSService {
     }
 
     /*
-     * this appears to be broken due to a bug in IPFS? Haven't reported an error to
-     * them yet. Returns HTTP success (200), but no data. It should be returnin JSON
-     * but doesn't, so I have hacked the postForJsonReply to always return 'success'
-     * in this scenario (200 with no body)
+     * this appears to be broken due to a bug in IPFS? Haven't reported an error to them yet. Returns
+     * HTTP success (200), but no data. It should be returnin JSON but doesn't, so I have hacked the
+     * postForJsonReply to always return 'success' in this scenario (200 with no body)
      */
     public String repoVerify() {
         String url = API_REPO + "/verify";
@@ -167,9 +169,10 @@ public class IPFSService {
 
     public String getRepoGC() {
         String url = API_REPO + "/gc";
-        // LinkedHashMap<String, Object> res = Cast.toLinkedHashMap(postForJsonReply(url, LinkedHashMap.class));
+        // LinkedHashMap<String, Object> res = Cast.toLinkedHashMap(postForJsonReply(url,
+        // LinkedHashMap.class));
         // return "\nIPFS Repository Garbage Collect:\n" + XString.prettyPrint(res) + "\n";
-        String res = (String)postForJsonReply(url, String.class);
+        String res = (String) postForJsonReply(url, String.class);
         return "\nIPFS Repository Garbage Collect:\n" + res + "\n";
     }
 
@@ -199,8 +202,7 @@ public class IPFSService {
     }
 
     /**
-     * Reads the bytes from 'ipfs hash', expecting them to be UTF-8 and returns the
-     * string.
+     * Reads the bytes from 'ipfs hash', expecting them to be UTF-8 and returns the string.
      * 
      * NOTE: The hash is allowed to have a subpath here.
      */
@@ -275,8 +277,7 @@ public class IPFSService {
     /**
      * @param hash
      * @param encoding text | json
-     * @return MerkleNode of the hash, as requested usingn the 'encoding=' url
-     *         argument specified.
+     * @return MerkleNode of the hash, as requested usingn the 'encoding=' url argument specified.
      */
     public final MerkleNode getMerkleNode(String hash, String encoding) {
         MerkleNode ret = null;
@@ -304,8 +305,7 @@ public class IPFSService {
     }
 
     /**
-     * Returns string of the the hash get, as requested usingn the 'encoding=' url
-     * argument specified.
+     * Returns string of the the hash get, as requested usingn the 'encoding=' url argument specified.
      */
     public final String getAsString(String hash, String encoding) {
         String ret = null;
@@ -342,8 +342,8 @@ public class IPFSService {
         return ret;
     }
 
-    public MerkleLink dagPutFromString(MongoSession session, String val, String mimeType,
-            ValContainer<Integer> streamSize, ValContainer<String> cid) {
+    public MerkleLink dagPutFromString(MongoSession session, String val, String mimeType, ValContainer<Integer> streamSize,
+            ValContainer<String> cid) {
         return writeFromStream(session, API_DAG + "/put", IOUtils.toInputStream(val), null, streamSize, cid);
     }
 
@@ -364,14 +364,13 @@ public class IPFSService {
 
     public MerkleLink addFileFromStream(MongoSession session, String fileName, InputStream stream, String mimeType,
             ValContainer<Integer> streamSize, ValContainer<String> cid) {
-        return writeFromStream(session,
-                API_FILES + "/write?arg=" + fileName + "&create=true&parents=true&truncate=true", stream, null,
-                streamSize, cid);
+        return writeFromStream(session, API_FILES + "/write?arg=" + fileName + "&create=true&parents=true&truncate=true", stream,
+                null, streamSize, cid);
     }
 
     /*
-     * NOTE: Default behavior according to IPFS docs is that without the 'pin'
-     * argument on this call it DOES pin the file
+     * NOTE: Default behavior according to IPFS docs is that without the 'pin' argument on this call it
+     * DOES pin the file
      */
     public MerkleLink addFromStream(MongoSession session, InputStream stream, String fileName, String mimeType,
             ValContainer<Integer> streamSize, ValContainer<String> cid, boolean wrapInFolder) {
@@ -401,10 +400,9 @@ public class IPFSService {
 
     // https://medium.com/red6-es/uploading-a-file-with-a-filename-with-spring-resttemplate-8ec5e7dc52ca
     /*
-     * todo-1: addition of 'fileName' is very new and very important here. Evaluate
-     * everywhere we can pass this in and also check if there are ways we can avoid
-     * the old need for mime guessing by always basing off extension on this
-     * filename?
+     * todo-1: addition of 'fileName' is very new and very important here. Evaluate everywhere we can
+     * pass this in and also check if there are ways we can avoid the old need for mime guessing by
+     * always basing off extension on this filename?
      */
     public MerkleLink writeFromStream(MongoSession session, String endpoint, InputStream stream, String fileName,
             ValContainer<Integer> streamSize, ValContainer<String> cid) {
@@ -420,8 +418,7 @@ public class IPFSService {
             headers.setContentType(MediaType.MULTIPART_FORM_DATA);
             HttpEntity<MultiValueMap<String, Object>> requestEntity = new HttpEntity<>(bodyMap, headers);
 
-            ResponseEntity<String> response = restTemplate.exchange(endpoint, HttpMethod.POST, requestEntity,
-                    String.class);
+            ResponseEntity<String> response = restTemplate.exchange(endpoint, HttpMethod.POST, requestEntity, String.class);
             MediaType contentType = response.getHeaders().getContentType();
 
             // log.debug("writeFromStream Raw Response: " + XString.prettyPrint(response));
@@ -455,8 +452,7 @@ public class IPFSService {
             fileName = "file";
         }
         MultiValueMap<String, String> fileMap = new LinkedMultiValueMap<>();
-        ContentDisposition contentDisposition = ContentDisposition.builder("form-data").name("file").filename(fileName)
-                .build();
+        ContentDisposition contentDisposition = ContentDisposition.builder("form-data").name("file").filename(fileName).build();
         fileMap.add(HttpHeaders.CONTENT_DISPOSITION, contentDisposition.toString());
         HttpEntity<InputStreamResource> fileEntity = new HttpEntity<>(new InputStreamResource(is), fileMap);
         return fileEntity;
@@ -473,8 +469,7 @@ public class IPFSService {
             HttpEntity<MultiValueMap<String, Object>> requestEntity = new HttpEntity<>(bodyMap, headers);
 
             ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.POST, requestEntity, String.class);
-            ret = mapper.readValue(response.getBody(), new TypeReference<Map<String, Object>>() {
-            });
+            ret = mapper.readValue(response.getBody(), new TypeReference<Map<String, Object>>() {});
 
             // ret output:
             // {
@@ -498,8 +493,7 @@ public class IPFSService {
             HttpEntity<MultiValueMap<String, Object>> requestEntity = new HttpEntity<>(bodyMap, headers);
 
             ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.POST, requestEntity, String.class);
-            ret = mapper.readValue(response.getBody(), new TypeReference<Map<String, Object>>() {
-            });
+            ret = mapper.readValue(response.getBody(), new TypeReference<Map<String, Object>>() {});
 
         } catch (Exception e) {
             log.error("Failed in restTemplate.exchange", e);
@@ -512,37 +506,35 @@ public class IPFSService {
     }
 
     /*
-     * Adds an existing CID into the directory strcture at rootCid, and returns the
-     * new rootCid
+     * Adds an existing CID into the directory strcture at rootCid, and returns the new rootCid
      */
     public MerkleNode addFileToDagRoot(String rootCid, String filePath, String fileCid) {
         if (StringUtils.isEmpty(filePath)) {
             filePath = fileCid;
         }
-        return postToGetMerkleNode(API_OBJECT + "/patch/add-link?arg=" + rootCid + "&arg=" + filePath + "&arg="
-                + fileCid + "&create=true");
+        return postToGetMerkleNode(
+                API_OBJECT + "/patch/add-link?arg=" + rootCid + "&arg=" + filePath + "&arg=" + fileCid + "&create=true");
     }
 
     /*
-     * Creates a node holding this CID in the current user (SessionContext) account
-     * under their EXPORTS node type.
+     * Creates a node holding this CID in the current user (SessionContext) account under their EXPORTS
+     * node type.
      * 
-     * todo-1: need to document this (and how user must delete the export node to
-     * release their pins) in the User Guide
+     * todo-1: need to document this (and how user must delete the export node to release their pins) in
+     * the User Guide
      *
-     * Note: childerenFiles will be all the files linked into this resource under a
-     * common DAG, and we have to add them here, primarily to ensure garbage
-     * collector will keep them, but secondly it's a nice-feature for user to be
-     * able to browse them individually.
+     * Note: childerenFiles will be all the files linked into this resource under a common DAG, and we
+     * have to add them here, primarily to ensure garbage collector will keep them, but secondly it's a
+     * nice-feature for user to be able to browse them individually.
      */
     public void writeIpfsExportNode(MongoSession session, String cid, String mime, String fileName,
             List<ExportIpfsFile> childrenFiles) {
-        SubNode exportParent = read.getUserNodeByType(session, session.getUserName(), null, "### Exports",
-                NodeType.EXPORTS.s(), null, null);
+        SubNode exportParent =
+                read.getUserNodeByType(session, session.getUserName(), null, "### Exports", NodeType.EXPORTS.s(), null, null);
 
         if (exportParent != null) {
-            SubNode node = create.createNode(session, exportParent, null, NodeType.NONE.s(), 0L,
-                    CreateNodeLocation.FIRST, null, null, true);
+            SubNode node = create.createNode(session, exportParent, null, NodeType.NONE.s(), 0L, CreateNodeLocation.FIRST, null,
+                    null, true);
 
             node.setOwner(exportParent.getOwner());
             // use export filename here
@@ -555,8 +547,8 @@ public class IPFSService {
 
             if (childrenFiles != null) {
                 for (ExportIpfsFile file : childrenFiles) {
-                    SubNode child = create.createNode(session, node, null, NodeType.NONE.s(), 0L,
-                            CreateNodeLocation.LAST, null, null, true);
+                    SubNode child = create.createNode(session, node, null, NodeType.NONE.s(), 0L, CreateNodeLocation.LAST, null,
+                            null, true);
 
                     child.setOwner(exportParent.getOwner());
                     child.setContent("IPFS File: " + file.getFileName() + "\n\nMime: " + file.getMime());
@@ -578,10 +570,8 @@ public class IPFSService {
             MultiValueMap<String, Object> bodyMap = new LinkedMultiValueMap<>();
             HttpEntity<MultiValueMap<String, Object>> requestEntity = new HttpEntity<>(bodyMap, headers);
 
-            ResponseEntity<String> response = restTemplate.exchange(endpoint, HttpMethod.POST, requestEntity,
-                    String.class);
-            ret = mapper.readValue(response.getBody(), new TypeReference<MerkleNode>() {
-            });
+            ResponseEntity<String> response = restTemplate.exchange(endpoint, HttpMethod.POST, requestEntity, String.class);
+            ret = mapper.readValue(response.getBody(), new TypeReference<MerkleNode>() {});
             // log.debug("new Object: " + XString.prettyPrint(ret));
 
         } catch (Exception e) {
@@ -614,10 +604,9 @@ public class IPFSService {
 
         try {
             /*
-             * To set contentType and contentLength here we'd need to read the entire stream
-             * into byte array and get that info, and then use the byte array to stream the
-             * result. For now things seem to work without us holding it all in memory which
-             * is ideal
+             * To set contentType and contentLength here we'd need to read the entire stream into byte array and
+             * get that info, and then use the byte array to stream the result. For now things seem to work
+             * without us holding it all in memory which is ideal
              */
             // response.setContentType(mimeTypeProp);
             // response.setContentLength((int) size);
@@ -654,7 +643,7 @@ public class IPFSService {
             InputStream is = response.getEntity().getContent();
             return is;
         } catch (Exception e) {
-            log.error("getStream failed: sourceUrl", e);
+            log.error("getStream failed: " + sourceUrl, e);
             throw new RuntimeEx("Streaming failed.", e);
         }
     }
@@ -690,8 +679,7 @@ public class IPFSService {
 
             for (IPFSDirEntry entry : dir.getEntries()) {
                 /*
-                 * as a workaround to the IPFS bug, we rely on the logic of "if not a json file,
-                 * it's a folder
+                 * as a workaround to the IPFS bug, we rely on the logic of "if not a json file, it's a folder
                  */
                 if (!entry.getName().endsWith(".json")) {
                     dumpDir(path + "/" + entry.getName(), allFilePaths);

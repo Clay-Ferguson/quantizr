@@ -359,6 +359,27 @@ export class Nav implements NavIntf {
         }, 500);
     }
 
+    openNodeFeed = (evt: Event): void => {
+        let id = S.util.allowIdFromEvent(evt, null);
+        const state = appState();
+        this.clickNodeRow(null, id);
+
+        setTimeout(() => {
+            const node: J.NodeInfo = state.idToNodeMap.get(id);
+            if (!node) {
+                return;
+            }
+            this.messages({
+                feedFilterFriends: false,
+                feedFilterToMe: false,
+                feedFilterFromMe: false,
+                feedFilterToPublic: true,
+                feedFilterLocalServer: true,
+                feedFilterRootNode: node
+            });
+        }, 500);
+    }
+
     closeFullScreenViewer = (appState: AppState): void => {
         dispatch("Action_CloseFullScreenViewer", (s: AppState): AppState => {
             s.fullScreenViewId = null;
@@ -429,7 +450,6 @@ export class Nav implements NavIntf {
                 return ret;
             });
         }
-
         return newNode;
     }
 

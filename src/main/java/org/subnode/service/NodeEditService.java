@@ -2,6 +2,7 @@ package org.subnode.service;
 
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import org.apache.commons.lang3.StringUtils;
@@ -13,7 +14,6 @@ import org.springframework.stereotype.Component;
 import org.subnode.actpub.ActPubFollowing;
 import org.subnode.actpub.ActPubService;
 import org.subnode.actpub.ActPubUtil;
-import org.subnode.config.AppProp;
 import org.subnode.config.NodeName;
 import org.subnode.exception.base.RuntimeEx;
 import org.subnode.model.IPFSObjectStat;
@@ -406,7 +406,6 @@ public class NodeEditService {
 		/* Remember the initial ipfs link */
 		String initIpfsLink = node.getStrProp(NodeProp.IPFS_LINK);
 
-
 		/*
 		 * The only purpose of this limit is to stop hackers from using up lots of space, because our only
 		 * current quota is on attachment file size uploads
@@ -548,13 +547,19 @@ public class NodeEditService {
 						// don't send notifications when 'admin' is the one doing the editing.
 						&& !PrincipalName.ADMIN.s().equals(sessionUserName)) {
 
+					HashSet<Integer> sessionsPushed = new HashSet<>();
+
+					// todo-0: need an output param from this function to pass to the push method below
+					// so it can be smart enough not to push the same node to the same browser twice here.
+					userFeedService.pushNodeToMonitoringBrowsers(s, sessionsPushed, node);
+
 					SubNode parent = read.getNode(session, node.getParentPath(), false);
 
 					if (parent != null) {
 						auth.saveMentionsToNodeACL(s, node);
 
 						if (apService.sendNotificationForNodeEdit(s, parent, node)) {
-							userFeedService.pushNodeUpdateToBrowsers(s, node);
+							userFeedService.pushNodeUpdateToBrowsers(s, sessionsPushed, node);
 						}
 						return null;
 					}

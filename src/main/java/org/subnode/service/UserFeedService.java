@@ -81,7 +81,7 @@ public class UserFeedService {
 	private Executor executor;
 
 	/* Notify all users being shared to on this node */
-	public void pushNodeUpdateToBrowsers(MongoSession session, SubNode node) {
+	public void pushNodeUpdateToBrowsers(MongoSession session, HashSet<Integer> sessionsPushed, SubNode node) {
 		// log.debug("Pushing update to all friends: id=" + node.getId().toHexString());
 
 		/* get list of userNames this node is shared to (one of them may be 'public') */
@@ -107,6 +107,11 @@ public class UserFeedService {
 
 		/* Scan all sessions and push message to the ones that need to see it */
 		for (SessionContext sc : allSessions) {
+			// if we know we already just pushed to this session, we can skip it in here.
+			if (sessionsPushed != null && sessionsPushed.contains(sc.hashCode())) {
+				continue;
+			}
+
 			/* Anonymous sessions won't have userName and can be ignored */
 			if (sc.getUserName() == null)
 				continue;
@@ -121,6 +126,45 @@ public class UserFeedService {
 			if (usersSharedToSet.contains(sc.getUserName())) {
 				// push notification message to browser
 				sendServerPushInfo(sc, pushInfo);
+			}
+		}
+	}
+
+	/*
+	 * Send a push to all users who are monitoring this node or any ancestor of it. This will be the
+	 * users who have opened some ancestor node as their "Feed Node" (viewing feed of that specific
+	 * node)
+	 */
+	public void pushNodeToMonitoringBrowsers(MongoSession session, HashSet<Integer> sessionsPushed, SubNode node) {
+		/*
+		 * Get a local list of 'allSessions' so we can release the lock on the SessionContent varible
+		 * immediately
+		 */
+		List<SessionContext> allSessions = new LinkedList<>();
+		synchronized (SessionContext.allSessions) {
+			allSessions.addAll(SessionContext.allSessions);
+		}
+
+		/* Scan all sessions and push message to the ones that need to see it */
+		for (SessionContext sc : allSessions) {
+			/* Anonymous sessions won't have userName and can be ignored */
+			if (sc.getUserName() == null)
+				continue;
+
+			// if this node starts with the 'watchingPath' of the user that means the node is a descendant of
+			// the watching path
+			if (node.getPath() != null && sc.getWatchingPath() != null && node.getPath().startsWith(sc.getWatchingPath())) {
+
+				/* build our push message payload */
+				NodeInfo nodeInfo = convert.convertToNodeInfo(sc, session, node, true, false, 1, false, false, true, false);
+				FeedPushInfo pushInfo = new FeedPushInfo(nodeInfo);
+
+				// push notification message to browser
+				sendServerPushInfo(sc, pushInfo);
+
+				if (sessionsPushed != null) {
+					sessionsPushed.add(sc.hashCode());
+				}
 			}
 		}
 	}
@@ -273,10 +317,23 @@ public class UserFeedService {
 		res.setSearchResults(searchResults);
 		String pathToSearch = NodeName.ROOT_OF_ALL_USERS;
 
+		if (req.getNodeId() != null) {
+			SubNode rootNode = read.getNode(session, req.getNodeId());
+			if (rootNode == null) {
+				throw new RuntimeException("Node not found: " + req.getNodeId());
+			}
+			pathToSearch = rootNode.getPath();
+
+			sc.setWatchingPath(pathToSearch);
+		} else {
+			sc.setWatchingPath(null);
+		}
+
 		Query query = new Query();
 		Criteria criteria = Criteria.where(SubNode.FIELD_PATH).regex(util.regexRecursiveChildrenOfPath(pathToSearch)) //
 
-				// This 'andOperator' pattern is what is required when you have multiple conditions added to a single field.
+				// This 'andOperator' pattern is what is required when you have multiple conditions added to a
+				// single field.
 				.andOperator(Criteria.where(SubNode.FIELD_TYPE).ne(NodeType.FRIEND.s()), //
 						Criteria.where(SubNode.FIELD_TYPE).ne(NodeType.POSTS.s()), //
 						Criteria.where(SubNode.FIELD_TYPE).ne(NodeType.ACT_PUB_POSTS.s()));
@@ -287,7 +344,7 @@ public class UserFeedService {
 
 		HashSet<ObjectId> blockedUserIds = new HashSet<>();
 
-		boolean isPublicCuratedFeed = !req.getToMe() && !req.getFromMe() && !req.getFromFriends();
+		boolean isPublicCuratedFeed = req.getNodeId() == null && (!req.getToMe() && !req.getFromMe() && !req.getFromFriends());
 
 		/*
 		 * This is our slightly confusing way of detecting that this is a 'global Fediverse' (either local

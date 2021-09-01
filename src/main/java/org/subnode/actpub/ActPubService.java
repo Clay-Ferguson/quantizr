@@ -740,7 +740,7 @@ public class ActPubService {
         addAttachmentIfExists(ms, newNode, obj);
 
         try {
-            userFeedService.pushNodeUpdateToBrowsers(ms, newNode);
+            userFeedService.pushNodeUpdateToBrowsers(ms, null, newNode);
         } catch (Exception e) {
             log.error("pushNodeUpdateToBrowsers failed (ignoring error)", e);
         }

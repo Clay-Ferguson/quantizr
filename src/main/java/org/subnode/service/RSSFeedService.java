@@ -141,7 +141,8 @@ public class RSSFeedService {
 	 */
 	@Scheduled(fixedDelay = 30 * 60 * 1000)
 	public void run() {
-		if (!appProp.isDaemonsEnabled()) return;
+		if (!appProp.isDaemonsEnabled())
+			return;
 		if (run)
 			return;
 		try {
@@ -538,11 +539,13 @@ public class RSSFeedService {
 			}
 		}
 
-		fixFeed(feed);
-		boolean addFeedTitles = urlList.size() > 1;
-		RssFeed rssFeed = convertToFeed(feed, addFeedTitles);
-		// log.debug("FEED JSON: " + XString.prettyPrint(rssFeed));
-		res.setFeed(rssFeed);
+		if (feed != null) {
+			fixFeed(feed);
+			boolean addFeedTitles = urlList.size() > 1;
+			RssFeed rssFeed = convertToFeed(feed, addFeedTitles);
+			// log.debug("FEED JSON: " + XString.prettyPrint(rssFeed));
+			res.setFeed(rssFeed);
+		}
 		return res;
 	}
 
@@ -675,17 +678,17 @@ public class RSSFeedService {
 				} else if (m instanceof ContentModuleImpl) {
 					// ContentModuleImpl contentMod = (ContentModuleImpl) m;
 					// if (contentMod.getContents() != null) {
-					// 	for (String contents : contentMod.getContents()) {
-					// 		log.debug("CI.contents: " + contents);
-					// 	}
+					// for (String contents : contentMod.getContents()) {
+					// log.debug("CI.contents: " + contents);
+					// }
 					// }
 					// if (contentMod.getContentItems() != null) {
-					// 	for (ContentItem ci : contentMod.getContentItems()) {
-					// 		log.debug("CI.encoding: " + ci.getContentEncoding());
-					// 		log.debug("CI.format: " + ci.getContentFormat());
-					// 		log.debug("CI.value: " + ci.getContentValue());
-					// 		log.debug("CI.url: " + ci.getContentResource());
-					// 	}
+					// for (ContentItem ci : contentMod.getContentItems()) {
+					// log.debug("CI.encoding: " + ci.getContentEncoding());
+					// log.debug("CI.format: " + ci.getContentFormat());
+					// log.debug("CI.value: " + ci.getContentValue());
+					// log.debug("CI.url: " + ci.getContentResource());
+					// }
 					// }
 				} else if (m instanceof EntryInformationImpl) {
 					EntryInformationImpl itunesMod = (EntryInformationImpl) m;
@@ -787,17 +790,17 @@ public class RSSFeedService {
 				} else if (m instanceof ContentModuleImpl) {
 					// ContentModuleImpl contentMod = (ContentModuleImpl) m;
 					// if (contentMod.getContents() != null) {
-					// 	for (String contents : contentMod.getContents()) {
-					// 		log.debug("CI.contents: " + contents);
-					// 	}
+					// for (String contents : contentMod.getContents()) {
+					// log.debug("CI.contents: " + contents);
+					// }
 					// }
 					// if (contentMod.getContentItems() != null) {
-					// 	for (ContentItem ci : contentMod.getContentItems()) {
-					// 		log.debug("CI.encoding: " + ci.getContentEncoding());
-					// 		log.debug("CI.format: " + ci.getContentFormat());
-					// 		log.debug("CI.value: " + ci.getContentValue());
-					// 		log.debug("CI.url: " + ci.getContentResource());
-					// 	}
+					// for (ContentItem ci : contentMod.getContentItems()) {
+					// log.debug("CI.encoding: " + ci.getContentEncoding());
+					// log.debug("CI.format: " + ci.getContentFormat());
+					// log.debug("CI.value: " + ci.getContentValue());
+					// log.debug("CI.url: " + ci.getContentResource());
+					// }
 					// }
 				} else if (m instanceof EntryInformationImpl) {
 					EntryInformationImpl itunesMod = (EntryInformationImpl) m;
@@ -933,6 +936,8 @@ public class RSSFeedService {
 	}
 
 	private void fixFeed(SyndFeed feed) {
+		if (feed == null)
+			return;
 		if (StringUtils.isEmpty(feed.getEncoding()))
 			feed.setEncoding("UTF-8");
 		if (StringUtils.isEmpty(feed.getFeedType()))
@@ -948,7 +953,7 @@ public class RSSFeedService {
 	}
 
 	private void writeFeed(SyndFeed feed, Writer writer) {
-		if (writer != null) {
+		if (writer != null && feed != null) {
 			try {
 				fixFeed(feed);
 				SyndFeedOutput output = new SyndFeedOutput();

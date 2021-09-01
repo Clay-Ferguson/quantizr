@@ -194,7 +194,7 @@ export class Search implements SearchIntf {
         let appState = store.getState();
         S.util.ajax<J.NodeFeedRequest, J.NodeFeedResponse>("nodeFeed", {
             page,
-            nodeId,
+            nodeId: appState.feedFilterRootNode?.id,
             feedUserName,
             toMe: appState.feedFilterToMe,
             fromMe: appState.feedFilterFromMe,

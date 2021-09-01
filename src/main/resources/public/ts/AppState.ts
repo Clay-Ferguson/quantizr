@@ -49,6 +49,10 @@ export class AppState {
     feedFilterToPublic: boolean = true;
     feedFilterLocalServer: boolean = false;
 
+    /* If we're presenting a specific node as the root of our "Feed" view this holds it's id, otherwise
+     for any non-node specific feed query this stays null. */
+    feedFilterRootNode: J.NodeInfo;
+
     // must be true to allow NSFW materials.
     feedFilterNSFW: boolean = true;
 

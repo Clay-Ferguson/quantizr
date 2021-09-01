@@ -246,6 +246,7 @@ export class NodeCompButtonBar extends Div {
 
         let searchButton: Icon = null;
         let timelineButton: Icon = null;
+        let nodeFeedButton: Icon = null;
         let upLevelButton: IconButton;
         let prevButton: IconButton;
         let nextButton: IconButton;
@@ -275,7 +276,7 @@ export class NodeCompButtonBar extends Div {
                     });
                 }
             }
-       }
+        }
 
         if (isPageRootNode || (node.hasChildren && state.userPreferences.editMode)) {
             searchButton = new Icon({
@@ -291,11 +292,18 @@ export class NodeCompButtonBar extends Div {
                 nid: node.id,
                 onClick: S.nav.runTimeline
             });
+
+            nodeFeedButton = new Icon({
+                className: "fa fa-comments fa-lg buttonBarIcon",
+                title: "Open a Feed View of this Node",
+                nid: node.id,
+                onClick: S.nav.openNodeFeed
+            });
         }
 
         let btnArray: Comp[] = [openButton, upLevelButton, insertNodeButton, createSubNodeButton, editNodeButton, prevButton, nextButton,
             new Span(null, { className: "float-right" }, [moveNodeUpButton, //
-                moveNodeDownButton, cutNodeButton, deleteNodeButton, searchButton, timelineButton, pasteButtons])];
+                moveNodeDownButton, cutNodeButton, deleteNodeButton, nodeFeedButton, searchButton, timelineButton, pasteButtons])];
 
         if (this.extraButtons) {
             btnArray = btnArray.concat(this.extraButtons);

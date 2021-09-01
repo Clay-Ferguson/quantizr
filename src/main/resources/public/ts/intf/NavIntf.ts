@@ -30,6 +30,7 @@ export interface NavIntf {
     navToNext(): void;
     runSearch(evt: Event): void;
     runTimeline(evt: Event): void;
+    openNodeFeed(evt: Event): void;
     closeFullScreenViewer(appState: AppState): void;
     prevFullScreenImgViewer(appState: AppState): void;
     nextFullScreenImgViewer(appState: AppState): void;

@@ -9,6 +9,7 @@ import { Singletons } from "../Singletons";
 import { ValidatedState } from "../ValidatedState";
 import { AppTab } from "../widget/AppTab";
 import { Comp } from "../widget/base/Comp";
+import { CompIntf } from "../widget/base/CompIntf";
 import { Button } from "../widget/Button";
 import { ButtonBar } from "../widget/ButtonBar";
 import { Checkbox } from "../widget/Checkbox";
@@ -44,6 +45,7 @@ export class FeedView extends AppTab {
 
     static page: number = 0;
     static refreshCounter: number = 0;
+    static autoRefresh: boolean = true;
 
     constructor(state: AppState, data: TabDataIntf) {
         super(state, data);
@@ -68,37 +70,75 @@ export class FeedView extends AppTab {
         let rowCount = 0;
         let children: Comp[] = [];
 
+        if (state.feedFilterRootNode) {
+            let content = S.util.getShortContent(state.feedFilterRootNode);
+            children.push(new Div(null, null, [
+                new Div(null, { className: "marginTop" }, [
+                    this.renderHeading(state),
+                    new Span(null, { className: "float-right" }, [
+                        new Span(null, {
+                            className: (((state.feedDirty || state.feedWaitingForUserRefresh) && !state.feedLoading) ? "feedDirtyButton" : "feedNotDirtyButton")
+                        }, [
+                            new IconButton("fa-refresh", null, {
+                                onClick: () => FeedView.refresh(),
+                                title: "Refresh"
+                            })]),
+                        new IconButton("fa-arrow-left", "Back", {
+                            onClick: () => S.view.jumpToId(state.feedFilterRootNode.id),
+                            title: "Back to Node"
+                        })
+                    ]),
+                    new Clearfix()
+                ]),
+                content ? new TextContent(content, "resultsContentHeading alert alert-secondary") : null
+            ]));
+        }
+        else {
+            children.push(new Div(null, null, [
+                new Div(null, { className: "marginBottom marginTop" }, [
+                    this.renderHeading(state)
+                ])
+            ]));
+        }
+
         children.push(new ButtonBar([
-            state.isAnonUser ? null : new Button("", () => S.edit.addNode(null, null, null, state), {
-                className: "fa fa-plus",
-                title: "Post something to the Fediverse!"
+            // NOTE: state.feedFilterRootNode?.id will be null here, for full fediverse (not a node chat/node feed) scenario.
+            state.isAnonUser ? null : new Button("", () => S.edit.addNode(state.feedFilterRootNode?.id, null, null, state), {
+                className: "fa " + (state.feedFilterRootNode?.id ? "fa-reply" : "fa-plus"),
+                title: state.feedFilterRootNode?.id ? "Reply to this Node" : "Post something to the Fediverse!"
             }, "btn-primary")
         ], null, "float-right"));
 
-        children.push(new CollapsiblePanel("Filter", "Filter", null, [
-            this.makeFilterButtonsBar(state)
+        let searchButtonBar = null;
+        // if this is mobile don't even show search field unless it's currently in use (like from a trending click)
+        if (!state.mobileMode || FeedView.searchTextState.getValue()) {
+            searchButtonBar = new ButtonBar([
+                new Span(null, { className: "feedSearchField" }, [new TextField("Search", false, null, null, false, FeedView.searchTextState)]),
+                new Button("Clear", () => { this.clearSearch(); }, { className: "feedClearButton" })
+            ], "marginTop");
+        }
+
+        children.push(new CollapsiblePanel("Options", "Options", null, [
+            this.makeFilterButtonsBar(state),
+            searchButtonBar
         ], false,
             (state: boolean) => {
                 FeedView.filterExpanded = state;
             }, FeedView.filterExpanded, "", "", "span"));
 
         children.push(new HelpButton(() => S.quanta?.config?.help?.fediverse?.feed));
-        children.push(new Clearfix());
 
-        // if this is mobile don't even show search field unless it's currently in use (like from a trending click)
-        if (!state.mobileMode || FeedView.searchTextState.getValue()) {
-            children.push(new ButtonBar([
-                new Span(null, { className: "feedSearchField" }, [new TextField("Search", false, null, null, false, FeedView.searchTextState)]),
-                new Button("Clear", () => { this.clearSearch(); }, { className: "feedClearButton" }),
-                new Span(null, {
-                    className: (((state.feedDirty || state.feedWaitingForUserRefresh) && !state.feedLoading) ? "feedDirtyButton" : "feedNotDirtyButton")
-                }, [
-                    new Button("Refresh", () => {
-                        FeedView.refresh();
-                    })
-                ])
-            ], "marginTop"));
+        if (state.feedFilterRootNode?.id) {
+            children.push(new Checkbox("Auto-refresh (chat mode)", { className: "marginLeft" }, {
+                setValue: (checked: boolean): void => {
+                    FeedView.autoRefresh = checked;
+                },
+                getValue: (): boolean => {
+                    return FeedView.autoRefresh;
+                }
+            }));
         }
+        children.push(new Clearfix());
 
         if (state.feedLoading) {
             children.push(new Div(null, null, [
@@ -163,6 +203,11 @@ export class FeedView extends AppTab {
             }
         }
         this.setChildren([new Div(null, { className: "feedView" }, children)]);
+    }
+
+    /* overridable (don't use arrow function) */
+    renderHeading(state: AppState): CompIntf {
+        return new Heading(4, state.feedFilterRootNode ? "Node Feed" : "Fediverse Feed", { className: "resultsTitle" });
     }
 
     clearSearch = () => {
@@ -281,5 +326,16 @@ export class FeedView extends AppTab {
                 }
             })
         ]);
+    }
+
+    /* If we have the Auto-Refresh checkbox checked by the user, and we just detected new changes comming in then we do a request
+    from the server for a refresh */
+    static feedDirtyNow = (state: AppState): void => {
+        // put in a delay timer since we call this from other state processing functions.
+        setTimeout(() => {
+            if (FeedView.autoRefresh && !state.feedLoading && !state.feedWaitingForUserRefresh) {
+                FeedView.refresh();
+            }
+        }, 500);
     }
 }

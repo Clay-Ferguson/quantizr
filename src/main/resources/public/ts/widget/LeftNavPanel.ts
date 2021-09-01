@@ -40,6 +40,13 @@ export class LeftNavPanel extends Div {
         let messages = state.newMessageCount > 0
             ? (state.newMessageCount + " message" + s) : "";
 
+        // todo-0: this is a hack to keep the new incomming "chat" messages (Node Feed) from tricking
+        // user into clicking on it which takes them AWAY from the chat. We do this by setting messages to null
+        // if feedFilterRoodNode is non-null which means user is in a node chat
+        if (state.feedFilterRootNode) {
+            messages = null;
+        }
+
         this.setChildren([
             new Div(null, null, [
                 new Img(this.getId() + "_logo", {

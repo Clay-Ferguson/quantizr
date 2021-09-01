@@ -1028,7 +1028,8 @@ export class Quanta implements QuantaIntf {
             feedFilterToMe: true,
             feedFilterFromMe: true,
             feedFilterToPublic: false,
-            feedFilterLocalServer: false
+            feedFilterLocalServer: false,
+            feedFilterRootNode: null
         });
     }
 
@@ -1038,7 +1039,8 @@ export class Quanta implements QuantaIntf {
             feedFilterToMe: false,
             feedFilterFromMe: false,
             feedFilterToPublic: true,
-            feedFilterLocalServer: false
+            feedFilterLocalServer: false,
+            feedFilterRootNode: null
         });
     }
 }

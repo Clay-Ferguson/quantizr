@@ -44,7 +44,7 @@ export abstract class ResultSetView extends AppTab {
         let rowCount = 0;
         let children: CompIntf[] = [];
 
-        let searchText = this.data.rsInfo.node ? S.util.getShortContent(this.data.rsInfo.node) : null;
+        let content = this.data.rsInfo.node ? S.util.getShortContent(this.data.rsInfo.node) : null;
         children.push(new Div(null, null, [
             new Div(null, { className: "marginBottom marginTop" }, [
                 this.renderHeading(state),
@@ -55,7 +55,7 @@ export abstract class ResultSetView extends AppTab {
                     })
                 ]) : null
             ]),
-            searchText ? new TextContent(searchText, "resultsContentHeading alert alert-secondary") : null,
+            content ? new TextContent(content, "resultsContentHeading alert alert-secondary") : null,
             this.data.rsInfo.description ? new Div(this.data.rsInfo.description) : null
         ]));
 

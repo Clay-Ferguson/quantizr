@@ -103,6 +103,11 @@ public class SessionContext {
 
 	private String userToken;
 
+	/* When the user is viewing the Node Feed for a specific node, this will be the path of that root node,
+	and we use this so we can easily do a 'browser push' to any user whenever something new is created under 
+	a that feed. */
+	private String watchingPath;
+
 	public SessionContext() {
 		log.trace(String.format("Creating Session object hashCode[%d]", hashCode()));
 		synchronized (allSessions) {
@@ -457,5 +462,13 @@ public class SessionContext {
 			stopwatchData.add(se);
 		}
 		ThreadLocals.setStopwatchTime(System.currentTimeMillis());
+	}
+
+	public String getWatchingPath() {
+		return watchingPath;
+	}
+
+	public void setWatchingPath(String watchingPath) {
+		this.watchingPath = watchingPath;
 	}
 }
