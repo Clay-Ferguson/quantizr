@@ -374,15 +374,16 @@ public class NodeSearchService {
 			List<String> sharedToAny = new LinkedList<>();
 			sharedToAny.add(PrincipalName.PUBLIC.s());
 
+			List<Criteria> ands = new LinkedList<>();
 			Query query = new Query();
 			Criteria criteria =
-					Criteria.where(SubNode.FIELD_PATH).regex(util.regexRecursiveChildrenOfPath(NodeName.ROOT_OF_ALL_USERS)) //
+					Criteria.where(SubNode.FIELD_PATH).regex(util.regexRecursiveChildrenOfPath(NodeName.ROOT_OF_ALL_USERS));
 
-							// This pattern is what is required when you have multiple conditions added to a
-							// single field.
-							.andOperator(Criteria.where(SubNode.FIELD_TYPE).ne(NodeType.FRIEND.s()), //
-									Criteria.where(SubNode.FIELD_TYPE).ne(NodeType.POSTS.s()), //
-									Criteria.where(SubNode.FIELD_TYPE).ne(NodeType.ACT_PUB_POSTS.s()));
+			// This pattern is what is required when you have multiple conditions added to a
+			// single field.
+			ands.add(Criteria.where(SubNode.FIELD_TYPE).ne(NodeType.FRIEND.s())); //
+			ands.add(Criteria.where(SubNode.FIELD_TYPE).ne(NodeType.POSTS.s())); //
+			ands.add(Criteria.where(SubNode.FIELD_TYPE).ne(NodeType.ACT_PUB_POSTS.s()));
 
 			List<Criteria> orCriteria = new LinkedList<>();
 
@@ -391,7 +392,8 @@ public class NodeSearchService {
 				orCriteria.add(Criteria.where(SubNode.FIELD_AC + "." + share).ne(null));
 			}
 
-			criteria.orOperator((Criteria[]) orCriteria.toArray(new Criteria[orCriteria.size()]));
+			ands.add(new Criteria().orOperator((Criteria[]) orCriteria.toArray(new Criteria[orCriteria.size()])));
+			criteria.andOperator(ands);
 
 			query.addCriteria(criteria);
 			query.with(Sort.by(Sort.Direction.DESC, SubNode.FIELD_MODIFY_TIME));

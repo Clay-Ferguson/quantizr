@@ -368,6 +368,8 @@ export class Nav implements NavIntf {
             if (!node) {
                 return;
             }
+            FeedView.searchTextState.setValue("");
+
             this.messages({
                 feedFilterFriends: false,
                 feedFilterToMe: false,

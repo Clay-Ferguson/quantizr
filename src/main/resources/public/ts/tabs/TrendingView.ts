@@ -120,6 +120,9 @@ export class TrendingView extends AppTab {
         let word = S.util.getPropFromDom(evt, "word");
         if (!word) return;
         FeedView.searchTextState.setValue(word);
+
+        // expand so users can see what's going on with the search string and know they can clear it.
+        FeedView.filterExpanded = true;
         S.nav.messages({
             feedFilterFriends: false,
             feedFilterToMe: false,

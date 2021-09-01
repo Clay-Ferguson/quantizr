@@ -20,6 +20,7 @@ import { TypeHandlerIntf } from "./intf/TypeHandlerIntf";
 import * as J from "./JavaIntf";
 import { PubSub } from "./PubSub";
 import { Singletons } from "./Singletons";
+import { FeedView } from "./tabs/FeedView";
 import { Div } from "./widget/Div";
 import { Icon } from "./widget/Icon";
 import { Menu } from "./widget/Menu";
@@ -108,6 +109,7 @@ export class MenuPanel extends Div {
     static nodeStats = () => S.view.getNodeStats(appState(null), false, false);
 
     static messagesToFromMe = () => {
+        FeedView.searchTextState.setValue("");
         S.nav.messages({
             feedFilterFriends: false,
             feedFilterToMe: true,
@@ -119,6 +121,7 @@ export class MenuPanel extends Div {
     }
 
     static messagesFromFriends = () => {
+        FeedView.searchTextState.setValue("");
         S.nav.messages({
             feedFilterFriends: true,
             feedFilterToMe: false,
@@ -130,6 +133,7 @@ export class MenuPanel extends Div {
     }
 
     static messagesLocal = () => {
+        FeedView.searchTextState.setValue("");
         S.nav.messages({
             feedFilterFriends: false,
             feedFilterToMe: false,
@@ -143,7 +147,7 @@ export class MenuPanel extends Div {
     static messagesNodeFeed = (state: AppState) => {
         const hltNode: J.NodeInfo = S.quanta.getHighlightedNode(state);
         if (!hltNode) return;
-
+        FeedView.searchTextState.setValue("");
         S.nav.messages({
             feedFilterFriends: false,
             feedFilterToMe: false,
@@ -155,6 +159,7 @@ export class MenuPanel extends Div {
     }
 
     static messagesFediverse = () => {
+        FeedView.searchTextState.setValue("");
         S.nav.messages({
             feedFilterFriends: false,
             feedFilterToMe: false,

@@ -25,6 +25,7 @@ import org.subnode.model.NodeInfo;
 import org.subnode.model.client.NodeProp;
 import org.subnode.model.client.NodeType;
 import org.subnode.model.client.PrincipalName;
+import org.subnode.model.client.PrivilegeType;
 import org.subnode.mongo.AdminRun;
 import org.subnode.mongo.MongoAuth;
 import org.subnode.mongo.MongoRead;
@@ -284,19 +285,54 @@ public class UserFeedService {
 		NodeFeedResponse res = new NodeFeedResponse();
 		session = MongoThreadLocal.ensure(session);
 
+		String pathToSearch = NodeName.ROOT_OF_ALL_USERS;
+		boolean doAuth = true;
+		if (req.getNodeId() != null) {
+			// Get the chat room node (root of the chat room query)
+			SubNode rootNode = read.getNode(session, req.getNodeId());
+			if (rootNode == null) {
+				throw new RuntimeException("Node not found: " + req.getNodeId());
+			}
+			pathToSearch = rootNode.getPath();
+
+			/* if the chat root is public disable all auth logic in this method */
+			if (AclService.isPublic(session, rootNode)) {
+				// do nothing, for now.
+			}
+			/*
+			 * If chat node is NOT public we try to check out read auth on it and if not this will throw an
+			 * exception which is the correct flow here
+			 */
+			else {
+				try {
+					auth.auth(session, rootNode, PrivilegeType.READ);
+				} catch (Exception e) {
+					sc.setWatchingPath(null);
+					throw e;
+				}
+			}
+			// Then we set the public chat to indicate to the rest of the code below not do do any
+			// further authorization.
+			doAuth = false;
+			sc.setWatchingPath(pathToSearch);
+
+		} else {
+			sc.setWatchingPath(null);
+		}
+
 		int counter = 0;
 
 		/* Query will include nodes that have shares to any of the people listed in sharedToAny */
 		List<String> sharedToAny = new LinkedList<>();
 
-		if (req.getToPublic()) {
+		if (doAuth && req.getToPublic()) {
 			sharedToAny.add(PrincipalName.PUBLIC.s());
 		}
 
 		SubNode myAcntNode = null;
 
 		// includes shares TO me.
-		if (req.getToMe()) {
+		if (doAuth && req.getToMe()) {
 			if (myAcntNode == null) {
 				myAcntNode = read.getNode(session, sc.getRootId());
 			}
@@ -315,28 +351,18 @@ public class UserFeedService {
 		}
 		List<NodeInfo> searchResults = new LinkedList<>();
 		res.setSearchResults(searchResults);
-		String pathToSearch = NodeName.ROOT_OF_ALL_USERS;
-
-		if (req.getNodeId() != null) {
-			SubNode rootNode = read.getNode(session, req.getNodeId());
-			if (rootNode == null) {
-				throw new RuntimeException("Node not found: " + req.getNodeId());
-			}
-			pathToSearch = rootNode.getPath();
-
-			sc.setWatchingPath(pathToSearch);
-		} else {
-			sc.setWatchingPath(null);
-		}
 
 		Query query = new Query();
-		Criteria criteria = Criteria.where(SubNode.FIELD_PATH).regex(util.regexRecursiveChildrenOfPath(pathToSearch)) //
+		List<Criteria> ands = new LinkedList<>();
+		Criteria criteria = Criteria.where(SubNode.FIELD_PATH).regex(util.regexRecursiveChildrenOfPath(pathToSearch)); //
 
-				// This 'andOperator' pattern is what is required when you have multiple conditions added to a
-				// single field.
-				.andOperator(Criteria.where(SubNode.FIELD_TYPE).ne(NodeType.FRIEND.s()), //
-						Criteria.where(SubNode.FIELD_TYPE).ne(NodeType.POSTS.s()), //
-						Criteria.where(SubNode.FIELD_TYPE).ne(NodeType.ACT_PUB_POSTS.s()));
+		if (req.getNodeId() == null) {
+			// This 'andOperator' pattern is what is required when you have multiple conditions added to a
+			// single field.
+			ands.add(Criteria.where(SubNode.FIELD_TYPE).ne(NodeType.FRIEND.s()));//
+			ands.add(Criteria.where(SubNode.FIELD_TYPE).ne(NodeType.POSTS.s())); //
+			ands.add(Criteria.where(SubNode.FIELD_TYPE).ne(NodeType.ACT_PUB_POSTS.s()));
+		}
 
 		if (!req.getNsfw()) {
 			criteria = criteria.and(SubNode.FIELD_PROPERTIES + "." + NodeProp.ACT_PUB_SENSITIVE + ".value").is(null);
@@ -392,7 +418,7 @@ public class UserFeedService {
 
 		List<Criteria> orCriteria = new LinkedList<>();
 
-		if (req.getFromMe()) {
+		if (doAuth && req.getFromMe()) {
 			if (myAcntNode == null) {
 				myAcntNode = read.getNode(session, sc.getRootId());
 			}
@@ -406,7 +432,7 @@ public class UserFeedService {
 			}
 		}
 
-		if (req.getFromFriends()) {
+		if (doAuth && req.getFromFriends()) {
 			List<SubNode> friendNodes = userManagerService.getSpecialNodesList(session, NodeType.FRIEND_LIST.s(), null, true);
 			if (friendNodes != null) {
 				for (SubNode friendNode : friendNodes) {
@@ -422,17 +448,21 @@ public class UserFeedService {
 			}
 		}
 
-		// or a node that is shared to any of the sharedToAny users
-		for (String share : sharedToAny) {
-			orCriteria.add(Criteria.where(SubNode.FIELD_AC + "." + share).ne(null));
+		if (doAuth) {
+			// or a node that is shared to any of the sharedToAny users
+			for (String share : sharedToAny) {
+				orCriteria.add(Criteria.where(SubNode.FIELD_AC + "." + share).ne(null));
+			}
 		}
 
-		if (orCriteria.size() == 0) {
-			res.setSuccess(true);
-			return res;
+		if (orCriteria.size() > 0) {
+			ands.add(new Criteria().orOperator((Criteria[]) orCriteria.toArray(new Criteria[orCriteria.size()])));
 		}
 
-		criteria.orOperator((Criteria[]) orCriteria.toArray(new Criteria[orCriteria.size()]));
+		// Only one andOperator call is allowed so we accumulate 'ands' in the list before using.
+		if (ands.size() > 0) {
+			criteria.andOperator(ands);
+		}
 
 		// use attributedTo proptery to determine whether a node is 'local' (posted by this server) or not.
 		if (req.getLocalOnly()) {

@@ -103,9 +103,8 @@ export class FeedView extends AppTab {
 
         children.push(new ButtonBar([
             // NOTE: state.feedFilterRootNode?.id will be null here, for full fediverse (not a node chat/node feed) scenario.
-            state.isAnonUser ? null : new Button("", () => S.edit.addNode(state.feedFilterRootNode?.id, null, null, state), {
-                className: "fa " + (state.feedFilterRootNode?.id ? "fa-reply" : "fa-plus"),
-                title: state.feedFilterRootNode?.id ? "Reply to this Node" : "Post something to the Fediverse!"
+            state.isAnonUser ? null : new Button("Post", () => S.edit.addNode(state.feedFilterRootNode?.id, null, null, state), {
+                title: state.feedFilterRootNode?.id ? "Post to this Chat Room" : "Post something to the Fediverse!"
             }, "btn-primary")
         ], null, "float-right"));
 
@@ -133,7 +132,7 @@ export class FeedView extends AppTab {
         children.push(new HelpButton(() => S.quanta?.config?.help?.fediverse?.feed));
 
         if (state.feedFilterRootNode?.id) {
-            children.push(new Checkbox("Auto-refresh (chat mode)", { className: "marginLeft" }, {
+            children.push(new Checkbox("Auto-refresh", { className: "marginLeft" }, {
                 setValue: (checked: boolean): void => {
                     FeedView.autoRefresh = checked;
                 },
@@ -144,7 +143,9 @@ export class FeedView extends AppTab {
         }
         children.push(new Clearfix());
 
-        if (state.feedLoading) {
+        let childCount = state.feedResults ? state.feedResults.length : 0;
+
+        if (state.feedLoading && childCount === 0) {
             children.push(new Div(null, null, [
                 new Heading(4, "Loading Feed..."),
                 new Div(null, {
@@ -170,7 +171,6 @@ export class FeedView extends AppTab {
         }
         else {
             let i = 0;
-            let childCount = state.feedResults.length;
             state.feedResults.forEach((node: J.NodeInfo) => {
                 // console.log("FEED: node id=" + node.id + " content: " + node.content);
                 S.srch.initSearchNode(node);
@@ -211,7 +211,7 @@ export class FeedView extends AppTab {
 
     /* overridable (don't use arrow function) */
     renderHeading(state: AppState): CompIntf {
-        return new Heading(4, state.feedFilterRootNode ? "Node Feed" : "Fediverse Feed", { className: "resultsTitle" });
+        return new Heading(4, state.feedFilterRootNode ? "Chat Room" : "Fediverse Feed", { className: "resultsTitle" });
     }
 
     clearSearch = () => {
