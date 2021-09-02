@@ -284,7 +284,9 @@ export class MenuPanel extends Div {
 
             new MenuItem("Friends", MenuPanel.openFriendsNode, !state.isAnonUser),
             new MenuItem("Followers", MenuPanel.showFollowers, !state.isAnonUser),
-            new MenuItem("Blocked Users", MenuPanel.openBlockedUsersNode, !state.isAnonUser)
+            new MenuItem("Blocked", MenuPanel.openBlockedUsersNode, !state.isAnonUser),
+            new MenuItemSeparator(),
+            new MenuItem("Find People", MenuPanel.findUsers, !state.isAnonUser) //
         ]));
 
         children.push(new Menu("Edit", [
@@ -360,10 +362,7 @@ export class MenuPanel extends Div {
 
             new MenuItem("By Node Name", MenuPanel.searchByName, !state.isAnonUser && !!hltNode), //
 
-            new MenuItem("By Node ID", MenuPanel.searchById, !state.isAnonUser && !!hltNode), //
-
-            new MenuItemSeparator(),
-            new MenuItem("Find Users", MenuPanel.findUsers, !state.isAnonUser) //
+            new MenuItem("By Node ID", MenuPanel.searchById, !state.isAnonUser && !!hltNode) //
 
             // new MenuItem("Files", nav.searchFiles, () => { return  !state.isAnonUser && S.quanta.allowFileSystemSearch },
             //    () => { return  !state.isAnonUser && S.quanta.allowFileSystemSearch })
