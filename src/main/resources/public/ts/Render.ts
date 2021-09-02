@@ -373,8 +373,10 @@ export class Render implements RenderIntf {
                         s.endReached = res.endReached;
                         s.breadcrumbs = res.breadcrumbs;
 
-                        /* Another slight hack to make viewing 'posts' node turn on metaData */
-                        if (s.node.type === J.NodeType.POSTS) {
+                        debugger;
+                        /* Another slight hack to make viewing 'posts' or chat rooms nodes turn on metaData */
+                        if (s.node.type === J.NodeType.POSTS ||
+                            s.node.type === J.NodeType.ROOM) {
                             s.userPreferences.showMetaData = true;
                         }
                     }

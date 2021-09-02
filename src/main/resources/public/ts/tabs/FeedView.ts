@@ -18,6 +18,7 @@ import { CollapsiblePanel } from "../widget/CollapsiblePanel";
 import { Div } from "../widget/Div";
 import { Heading } from "../widget/Heading";
 import { HelpButton } from "../widget/HelpButton";
+import { Icon } from "../widget/Icon";
 import { IconButton } from "../widget/IconButton";
 import { Span } from "../widget/Span";
 import { Spinner } from "../widget/Spinner";
@@ -69,39 +70,36 @@ export class FeedView extends AppTab {
          */
         let rowCount = 0;
         let children: Comp[] = [];
+        let content = state.feedFilterRootNode ? S.util.getShortContent(state.feedFilterRootNode) : null;
 
-        if (state.feedFilterRootNode) {
-            let content = S.util.getShortContent(state.feedFilterRootNode);
-            children.push(new Div(null, null, [
-                new Div(null, { className: "marginTop" }, [
-                    this.renderHeading(state),
-                    new Span(null, { className: "float-right" }, [
-                        new Span(null, {
-                            className: (((state.feedDirty || state.feedWaitingForUserRefresh) && !state.feedLoading) ? "feedDirtyButton" : "feedNotDirtyButton")
-                        }, [
-                            new IconButton("fa-refresh", null, {
-                                onClick: () => FeedView.refresh(),
-                                title: "Refresh"
-                            })]),
-                        new IconButton("fa-arrow-left", "Back", {
-                            onClick: () => S.view.jumpToId(state.feedFilterRootNode.id),
-                            title: "Back to Node"
-                        })
-                    ]),
-                    new Clearfix()
+        children.push(new Div(null, null, [
+            new Div(null, { className: "marginTop" }, [
+                this.renderHeading(state),
+                new Span(null, { className: "float-right" }, [
+                    state.feedFilterRootNode ? new IconButton("fa-arrow-left", "Back", {
+                        onClick: () => S.view.jumpToId(state.feedFilterRootNode.id),
+                        title: "Back to Node"
+                    }) : null
                 ]),
-                content ? new TextContent(content, "resultsContentHeading alert alert-secondary") : null
-            ]));
-        }
-        else {
-            children.push(new Div(null, null, [
-                new Div(null, { className: "marginBottom marginTop" }, [
-                    this.renderHeading(state)
-                ])
-            ]));
+                new Clearfix()
+            ]),
+            content ? new TextContent(content, "resultsContentHeading alert alert-secondary") : null
+        ]));
+
+        let newItems = null;
+        if ((state.feedDirty || state.feedWaitingForUserRefresh) && !state.feedLoading) {
+            newItems = new Icon({
+                className: "fa fa-lightbulb-o fa-lg feedDirtyIcon marginRight",
+                title: "New content available. Refresh!"
+            });
         }
 
         children.push(new ButtonBar([
+            newItems,
+            new IconButton("fa-refresh", null, {
+                onClick: () => FeedView.refresh(),
+                title: "Refresh"
+            }),
             // NOTE: state.feedFilterRootNode?.id will be null here, for full fediverse (not a node chat/node feed) scenario.
             state.isAnonUser ? null : new Button("Post", () => S.edit.addNode(state.feedFilterRootNode?.id, null, null, state), {
                 title: state.feedFilterRootNode?.id ? "Post to this Chat Room" : "Post something to the Fediverse!"
@@ -113,11 +111,7 @@ export class FeedView extends AppTab {
         if (!state.mobileMode || FeedView.searchTextState.getValue()) {
             searchButtonBar = new ButtonBar([
                 new Span(null, { className: "feedSearchField" }, [new TextField("Search", false, null, null, false, FeedView.searchTextState)]),
-                new Button("Clear", () => { this.clearSearch(); }, { className: "feedClearButton" }),
-                !state.feedFilterRootNode ? new IconButton("fa-refresh", null, {
-                    onClick: () => FeedView.refresh(),
-                    title: "Refresh"
-                }) : null
+                new Button("Clear", () => { this.clearSearch(); }, { className: "feedClearButton" })
             ], "marginTop");
         }
 
@@ -130,17 +124,15 @@ export class FeedView extends AppTab {
             }, FeedView.filterExpanded, "", "", "span"));
 
         children.push(new HelpButton(() => S.quanta?.config?.help?.fediverse?.feed));
+        children.push(new Checkbox("Auto-refresh", { className: "marginLeft" }, {
+            setValue: (checked: boolean): void => {
+                FeedView.autoRefresh = checked;
+            },
+            getValue: (): boolean => {
+                return FeedView.autoRefresh;
+            }
+        }));
 
-        if (state.feedFilterRootNode?.id) {
-            children.push(new Checkbox("Auto-refresh", { className: "marginLeft" }, {
-                setValue: (checked: boolean): void => {
-                    FeedView.autoRefresh = checked;
-                },
-                getValue: (): boolean => {
-                    return FeedView.autoRefresh;
-                }
-            }));
-        }
         children.push(new Clearfix());
 
         let childCount = state.feedResults ? state.feedResults.length : 0;

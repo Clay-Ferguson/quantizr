@@ -395,7 +395,8 @@ a {
 }
 
 .resultsTitle {
-    display: inline;
+    display: inline-block;
+    margin-bottom: 10px;
 }
 
 .trendingTitle {

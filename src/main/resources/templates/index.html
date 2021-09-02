@@ -17,23 +17,14 @@
 
     <meta property="og:type" th:if="${not #strings.isEmpty(ogDescription)}" content="website" />
     <meta property="og:title" th:if="${not #strings.isEmpty(ogTitle)}" th:attr="content=${ogTitle}" />
-    <!-- <meta property="og:site_name" content="${ogSiteName}"/> -->
     <meta property="og:description" th:if="${not #strings.isEmpty(ogDescription)}" th:attr="content=${ogDescription}" />
     <meta property="og:image" th:if="${not #strings.isEmpty(ogImage)}" th:attr="content=${ogImage}" />
     <meta property="og:url" th:if="${not #strings.isEmpty(ogUrl)}" th:attr="content=${ogUrl}" />
 
     <meta name="twitter:card" th:if="${not #strings.isEmpty(ogDescription)}" content="summary" />
-    <!-- <meta name="twitter:site" content="@yourwebsite"/>
-    <meta name="twitter:creator" content="@yourtwitterhandle"/> -->
     <meta name="twitter:title" th:if="${not #strings.isEmpty(ogTitle)}" th:attr="content=${ogTitle}" />
     <meta name="twitter:description" th:if="${not #strings.isEmpty(ogDescription)}"
         th:attr="content=${ogDescription}" />
-
-    <!-- NOTE: Twitter is refusing to display this image. The link is working, and their validator shows it working, 
-        but twitter itself still refuses to show any images ever. meta name is correct, url is working, robots.txt is correct.
-        It's almost like the quanta.wiki domain is banned from Twitter, because everything in this link is definitely correct.        
-        https://cards-dev.twitter.com/validator
-    -->
     <meta name="twitter:image" th:if="${not #strings.isEmpty(ogImage)}" th:attr="content=${ogImage}" />
 
     <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png?v=3" />

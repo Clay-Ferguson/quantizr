@@ -361,24 +361,50 @@ export class Nav implements NavIntf {
     openNodeFeed = (evt: Event, id: string): void => {
         id = S.util.allowIdFromEvent(evt, id);
         const state = appState();
-        this.clickNodeRow(null, id);
 
-        setTimeout(() => {
-            const node: J.NodeInfo = state.idToNodeMap.get(id);
-            if (!node) {
-                return;
-            }
-            FeedView.searchTextState.setValue("");
-
-            this.messages({
-                feedFilterFriends: false,
-                feedFilterToMe: false,
-                feedFilterFromMe: false,
-                feedFilterToPublic: true,
-                feedFilterLocalServer: true,
-                feedFilterRootNode: node
-            });
-        }, 500);
+        let node: J.NodeInfo = state.idToNodeMap.get(id);
+        // Try to get node from local memory...
+        if (node) {
+            setTimeout(() => {
+                FeedView.searchTextState.setValue("");
+                this.messages({
+                    feedFilterFriends: false,
+                    feedFilterToMe: false,
+                    feedFilterFromMe: false,
+                    feedFilterToPublic: true,
+                    feedFilterLocalServer: true,
+                    feedFilterRootNode: node
+                });
+            }, 500);
+        }
+        // if node not in local memory, then we have to get it from the server first...
+        else {
+            S.util.ajax<J.RenderNodeRequest, J.RenderNodeResponse>("renderNode", {
+                nodeId: id,
+                upLevel: false,
+                siblingOffset: 0,
+                renderParentIfLeaf: false,
+                offset: 0,
+                goToLastPage: false,
+                forceIPFSRefresh: false,
+                singleNode: true
+            },
+                (res: J.RenderNodeResponse) => {
+                    if (!res.node) return;
+                    FeedView.searchTextState.setValue("");
+                    this.messages({
+                        feedFilterFriends: false,
+                        feedFilterToMe: false,
+                        feedFilterFromMe: false,
+                        feedFilterToPublic: true,
+                        feedFilterLocalServer: true,
+                        feedFilterRootNode: res.node
+                    });
+                }, // fail callback
+                (res: string) => {
+                    console.log("failed to refresh node: " + res);
+                });
+        }
     }
 
     closeFullScreenViewer = (appState: AppState): void => {
