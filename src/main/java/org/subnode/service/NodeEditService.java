@@ -161,7 +161,7 @@ public class NodeEditService {
 
 		ValContainer<SubNode> vcNode = new ValContainer<>(node);
 
-		/* Do all type-specific conversion processing */
+		/* Do all type-specific conversion processing. */
 		for (TypeBase typePlugin : typePluginMgr.getTypes()) {
 			typePlugin.createSubNode(session, vcNode, req, linkBookmark);
 		}
@@ -548,9 +548,6 @@ public class NodeEditService {
 						&& !PrincipalName.ADMIN.s().equals(sessionUserName)) {
 
 					HashSet<Integer> sessionsPushed = new HashSet<>();
-
-					// todo-0: need an output param from this function to pass to the push method below
-					// so it can be smart enough not to push the same node to the same browser twice here.
 					userFeedService.pushNodeToMonitoringBrowsers(s, sessionsPushed, node);
 
 					SubNode parent = read.getNode(session, node.getParentPath(), false);

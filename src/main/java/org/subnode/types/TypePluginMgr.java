@@ -10,13 +10,21 @@ import org.springframework.stereotype.Component;
 public class TypePluginMgr {
 
     @Autowired
-    private FriendType friendTypePlugin;
+    private FriendType friendType;
+
+    @Autowired
+    private BookmarkType bookmarkType;
+
+    @Autowired
+    private RssFeedType rssFeedType;
 
     private List<TypeBase> types = new LinkedList<>();
 
     @PostConstruct
     private void init() {
-        types.add(friendTypePlugin);
+        types.add(friendType);
+        types.add(bookmarkType);
+        types.add(rssFeedType);
     }
 
     public List<TypeBase> getTypes() {
