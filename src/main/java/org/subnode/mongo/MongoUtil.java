@@ -41,6 +41,7 @@ import org.subnode.util.ExUtil;
 import org.subnode.util.ImageSize;
 import org.subnode.util.ImageUtil;
 import org.subnode.util.SubNodeUtil;
+import org.subnode.util.ThreadLocals;
 import org.subnode.util.ValContainer;
 import org.subnode.util.XString;
 
@@ -127,7 +128,7 @@ public class MongoUtil {
 		if (objId == null)
 			return null;
 	
-		SubNode node = MongoThreadLocal.getCachedNode(objId.toHexString());
+		SubNode node = ThreadLocals.getCachedNode(objId.toHexString());
 		if (node == null) {
 			node = ops.findById(objId, SubNode.class);
 		}
@@ -139,7 +140,7 @@ public class MongoUtil {
 			return null;
 		}
 
-		SubNode dirty = MongoThreadLocal.getDirtyNodes().get(node.getId());
+		SubNode dirty = ThreadLocals.getDirtyNodes().get(node.getId());
 		if (dirty != null) {
 			return dirty;
 		}

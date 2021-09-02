@@ -28,7 +28,7 @@ import org.subnode.model.MerkleNode;
 import org.subnode.model.client.NodeProp;
 import org.subnode.mongo.MongoRead;
 import org.subnode.mongo.MongoSession;
-import org.subnode.mongo.MongoThreadLocal;
+
 import org.subnode.mongo.model.SubNode;
 import org.subnode.request.ExportRequest;
 import org.subnode.response.ExportResponse;
@@ -79,7 +79,7 @@ public class ExportServiceFlexmark {
 	 * Format can be 'html' or 'pdf'
 	 */
 	public void export(MongoSession session, String format, ExportRequest req, ExportResponse res) {
-		session = MongoThreadLocal.ensure(session);
+		session = ThreadLocals.ensure(session);
 		this.session = session;
 		this.format = format;
 		this.req = req;

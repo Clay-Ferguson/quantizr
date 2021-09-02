@@ -29,7 +29,7 @@ import org.subnode.mongo.MongoAuth;
 import org.subnode.mongo.MongoCreate;
 import org.subnode.mongo.MongoRead;
 import org.subnode.mongo.MongoSession;
-import org.subnode.mongo.MongoThreadLocal;
+
 import org.subnode.mongo.MongoUpdate;
 import org.subnode.mongo.MongoUtil;
 import org.subnode.mongo.model.AccessControl;
@@ -128,9 +128,9 @@ public class NodeEditService {
 	 */
 	public CreateSubNodeResponse createSubNode(MongoSession session, CreateSubNodeRequest req) {
 		log.debug("createSubNode");
-		MongoThreadLocal.dumpDirtyNodes(); //todo-0: temp code
+		ThreadLocals.dumpDirtyNodes(); //todo-0: temp code
 		CreateSubNodeResponse res = new CreateSubNodeResponse();
-		session = MongoThreadLocal.ensure(session);
+		session = ThreadLocals.ensure(session);
 
 		boolean linkBookmark = "linkBookmark".equals(req.getPayloadType());
 		String nodeId = req.getNodeId();
@@ -304,7 +304,7 @@ public class NodeEditService {
 
 	public AppDropResponse appDrop(MongoSession session, AppDropRequest req) {
 		AppDropResponse res = new AppDropResponse();
-		session = MongoThreadLocal.ensure(session);
+		session = ThreadLocals.ensure(session);
 		String data = req.getData();
 		String lcData = data.toLowerCase();
 
@@ -346,7 +346,7 @@ public class NodeEditService {
 	 */
 	public InsertNodeResponse insertNode(MongoSession session, InsertNodeRequest req) {
 		InsertNodeResponse res = new InsertNodeResponse();
-		session = MongoThreadLocal.ensure(session);
+		session = ThreadLocals.ensure(session);
 		String parentNodeId = req.getParentId();
 		log.debug("Inserting under parent: " + parentNodeId);
 		SubNode parentNode = read.getNode(session, parentNodeId);
@@ -388,7 +388,7 @@ public class NodeEditService {
 		SaveNodeResponse res = new SaveNodeResponse();
 		// log.debug("Controller saveNode: " + Thread.currentThread().getName());
 
-		_session = MongoThreadLocal.ensure(_session);
+		_session = ThreadLocals.ensure(_session);
 		final MongoSession session = _session;
 
 		NodeInfo nodeInfo = req.getNode();
@@ -640,7 +640,7 @@ public class NodeEditService {
 	 */
 	public DeletePropertyResponse deleteProperty(MongoSession session, DeletePropertyRequest req) {
 		DeletePropertyResponse res = new DeletePropertyResponse();
-		session = MongoThreadLocal.ensure(session);
+		session = ThreadLocals.ensure(session);
 		String nodeId = req.getNodeId();
 		SubNode node = read.getNode(session, nodeId);
 		auth.ownerAuthByThread(node);
@@ -659,7 +659,7 @@ public class NodeEditService {
 	 */
 	public SplitNodeResponse splitNode(MongoSession session, SplitNodeRequest req) {
 		SplitNodeResponse res = new SplitNodeResponse();
-		session = MongoThreadLocal.ensure(session);
+		session = ThreadLocals.ensure(session);
 		String nodeId = req.getNodeId();
 
 		// log.debug("Splitting node: " + nodeId);
@@ -729,7 +729,7 @@ public class NodeEditService {
 
 	public TransferNodeResponse transferNode(MongoSession session, TransferNodeRequest req) {
 		TransferNodeResponse res = new TransferNodeResponse();
-		session = MongoThreadLocal.ensure(session);
+		session = ThreadLocals.ensure(session);
 		int transfers = 0;
 		String nodeId = req.getNodeId();
 
@@ -799,7 +799,7 @@ public class NodeEditService {
 	 */
 	public UpdateHeadingsResponse updateHeadings(MongoSession session, UpdateHeadingsRequest req) {
 		UpdateHeadingsResponse res = new UpdateHeadingsResponse();
-		session = MongoThreadLocal.ensure(session);
+		session = ThreadLocals.ensure(session);
 
 		SubNode node = read.getNode(session, req.getNodeId(), true);
 		String content = node.getContent();
@@ -881,7 +881,7 @@ public class NodeEditService {
 
 	public SearchAndReplaceResponse searchAndReplace(MongoSession session, SearchAndReplaceRequest req) {
 		SearchAndReplaceResponse res = new SearchAndReplaceResponse();
-		session = MongoThreadLocal.ensure(session);
+		session = ThreadLocals.ensure(session);
 		int replacements = 0;
 		String nodeId = req.getNodeId();
 

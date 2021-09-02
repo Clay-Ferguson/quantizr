@@ -24,13 +24,14 @@ import org.subnode.config.AppProp;
 import org.subnode.model.client.NodeProp;
 import org.subnode.mongo.MongoRead;
 import org.subnode.mongo.MongoSession;
-import org.subnode.mongo.MongoThreadLocal;
+
 import org.subnode.mongo.model.SubNode;
 import org.subnode.request.ExportRequest;
 import org.subnode.response.ExportResponse;
 import org.subnode.util.ExUtil;
 import org.subnode.util.FileUtils;
 import org.subnode.util.SubNodeUtil;
+import org.subnode.util.ThreadLocals;
 import org.subnode.util.XString;
 
 /**
@@ -82,7 +83,7 @@ public class ExportPdfServicePdfBox {
 	 * timestamped one.
 	 */
 	public void export(MongoSession session, ExportRequest req, ExportResponse res) {
-		session = MongoThreadLocal.ensure(session);
+		session = ThreadLocals.ensure(session);
 		this.session = session;
 		this.req = req;
 		String nodeId = req.getNodeId();

@@ -12,11 +12,12 @@ import org.springframework.stereotype.Component;
 import org.subnode.mongo.MongoAuth;
 import org.subnode.mongo.MongoRead;
 import org.subnode.mongo.MongoSession;
-import org.subnode.mongo.MongoThreadLocal;
+
 import org.subnode.mongo.model.SubNode;
 import org.subnode.request.PublishNodeToIpfsRequest;
 import org.subnode.response.PublishNodeToIpfsResponse;
 import org.subnode.util.ExUtil;
+import org.subnode.util.ThreadLocals;
 import org.subnode.util.XString;
 
 /*
@@ -46,7 +47,7 @@ public class SyncToIpfsService {
 	int orphansRemoved = 0;
 
 	public void writeIpfsFiles(MongoSession session, PublishNodeToIpfsRequest req, final PublishNodeToIpfsResponse res) {
-		session = MongoThreadLocal.ensure(session);
+		session = ThreadLocals.ensure(session);
 		this.session = session;
 		final String nodeId = req.getNodeId();
 		final SubNode node = read.getNode(session, nodeId);

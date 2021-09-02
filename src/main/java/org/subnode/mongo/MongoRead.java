@@ -28,7 +28,7 @@ import org.subnode.util.ThreadLocals;
 import org.subnode.util.XString;
 
 /*
- * There are many more opportunities in this class to use the MongoThreadLocal.nodeCache to store
+ * There are many more opportunities in this class to use the ThreadLocals.nodeCache to store
  * information in the thread for use during context of one call
  */
 @Component
@@ -269,7 +269,7 @@ public class MongoRead {
 
     public SubNode findNodeByPath(String path) {
         path = XString.stripIfEndsWith(path, "/");
-        SubNode ret = MongoThreadLocal.getCachedNode(path);
+        SubNode ret = ThreadLocals.getCachedNode(path);
         if (ret == null) {
             Query query = new Query();
             query.addCriteria(Criteria.where(SubNode.FIELD_PATH).is(path));
@@ -795,7 +795,7 @@ public class MongoRead {
 
     public SubNode getUserNodeByUserName(MongoSession session, String user, boolean allowAuth) {
         String cacheKey = "USRNODE-" + user;
-        SubNode ret = MongoThreadLocal.getCachedNode(cacheKey);
+        SubNode ret = ThreadLocals.getCachedNode(cacheKey);
         if (ret != null) {
             return ret;
         }
@@ -833,7 +833,7 @@ public class MongoRead {
             auth.auth(session, ret, PrivilegeType.READ);
         }
         if (ret != null) {
-            MongoThreadLocal.cacheNode(cacheKey, ret);
+            ThreadLocals.cacheNode(cacheKey, ret);
         }
         return ret;
     }

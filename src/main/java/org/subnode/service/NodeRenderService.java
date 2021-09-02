@@ -25,7 +25,7 @@ import org.subnode.model.client.NodeProp;
 import org.subnode.mongo.MongoAuth;
 import org.subnode.mongo.MongoRead;
 import org.subnode.mongo.MongoSession;
-import org.subnode.mongo.MongoThreadLocal;
+
 import org.subnode.mongo.model.SubNode;
 import org.subnode.request.GetNodeMetaInfoRequest;
 import org.subnode.request.InitNodeEditRequest;
@@ -104,7 +104,7 @@ public class NodeRenderService {
 		}
 
 		RenderNodeResponse res = new RenderNodeResponse();
-		session = MongoThreadLocal.ensure(session);
+		session = ThreadLocals.ensure(session);
 
 		String targetId = req.getNodeId();
 		boolean isActualUplevelRequest = req.isUpLevel();
@@ -455,7 +455,7 @@ public class NodeRenderService {
 
 	public InitNodeEditResponse initNodeEdit(MongoSession session, InitNodeEditRequest req) {
 		InitNodeEditResponse res = new InitNodeEditResponse();
-		session = MongoThreadLocal.ensure(session);
+		session = ThreadLocals.ensure(session);
 
 		String nodeId = req.getNodeId();
 		SubNode node = read.getNode(session, nodeId);
@@ -480,7 +480,7 @@ public class NodeRenderService {
 	 * that page data.
 	 */
 	public RenderNodeResponse anonPageLoad(MongoSession session, RenderNodeRequest req) {
-		session = MongoThreadLocal.ensure(session);
+		session = ThreadLocals.ensure(session);
 
 		String id = appProp.getUserLandingPageNode();
 		// log.debug("Anon Render Node ID: " + id);
@@ -545,7 +545,7 @@ public class NodeRenderService {
 
 	public RenderCalendarResponse renderCalendar(MongoSession session, RenderCalendarRequest req) {
 		RenderCalendarResponse res = new RenderCalendarResponse();
-		session = MongoThreadLocal.ensure(session);
+		session = ThreadLocals.ensure(session);
 
 		SubNode node = read.getNode(session, req.getNodeId());
 		if (node == null) {
@@ -578,7 +578,7 @@ public class NodeRenderService {
 	}
 
 	public void getBreadcrumbs(MongoSession session, SubNode node, LinkedList<BreadcrumbInfo> list) {
-		session = MongoThreadLocal.ensure(session);
+		session = ThreadLocals.ensure(session);
 
 		try {
 			if (node != null) {

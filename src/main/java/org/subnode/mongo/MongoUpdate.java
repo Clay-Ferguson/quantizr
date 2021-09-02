@@ -64,7 +64,7 @@ public class MongoUpdate {
 		} else {
 			ops.save(node);
 		}
-		MongoThreadLocal.clean(node);
+		ThreadLocals.clean(node);
 	}
 
 	public void saveSession(MongoSession session) {
@@ -72,7 +72,7 @@ public class MongoUpdate {
 	}
 
 	public void saveSession(MongoSession session, boolean asAdmin) {
-		if (session == null || session.saving || !MongoThreadLocal.hasDirtyNodes())
+		if (session == null || session.saving || !ThreadLocals.hasDirtyNodes())
 			return;
 
 		try {
@@ -81,7 +81,7 @@ public class MongoUpdate {
 
 			synchronized (session) {
 				// recheck hasDirtyNodes again after we get inside the lock.
-				if (!MongoThreadLocal.hasDirtyNodes()) {
+				if (!ThreadLocals.hasDirtyNodes()) {
 					return;
 				}
 
@@ -93,7 +93,7 @@ public class MongoUpdate {
 				/*
 				 * check that we are allowed to write all, before we start writing any
 				 */
-				for (SubNode node : MongoThreadLocal.getDirtyNodes().values()) {
+				for (SubNode node : ThreadLocals.getDirtyNodes().values()) {
 					if (!asAdmin) {
 						try {
 							auth.ownerAuth(session, node);
@@ -117,7 +117,7 @@ public class MongoUpdate {
 				 * This theoretically should never find any dirty nodes, because we just saved them all but we
 				 * definitely still want this line of code here
 				 */
-				MongoThreadLocal.clearDirtyNodes();
+				ThreadLocals.clearDirtyNodes();
 			}
 		} finally {
 			session.saving = false;

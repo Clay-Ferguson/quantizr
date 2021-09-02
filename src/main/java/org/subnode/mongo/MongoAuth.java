@@ -28,6 +28,7 @@ import org.subnode.model.client.PrincipalName;
 import org.subnode.model.client.PrivilegeType;
 import org.subnode.mongo.model.AccessControl;
 import org.subnode.mongo.model.SubNode;
+import org.subnode.util.ThreadLocals;
 import org.subnode.util.XString;
 
 @Component
@@ -272,7 +273,7 @@ public class MongoAuth {
 	}
 
 	public void ownerAuthByThread(SubNode node) {
-		ownerAuth(MongoThreadLocal.getMongoSession(), node);
+		ownerAuth(ThreadLocals.getMongoSession(), node);
 	}
 
 	public void auth(MongoSession session, SubNode node, PrivilegeType... privs) {

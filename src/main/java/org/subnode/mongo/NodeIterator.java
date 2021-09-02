@@ -2,6 +2,7 @@ package org.subnode.mongo;
 
 import java.util.Iterator;
 import org.subnode.mongo.model.SubNode;
+import org.subnode.util.ThreadLocals;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -26,7 +27,7 @@ class NodeIterator implements Iterator<SubNode> {
     public SubNode next() {
         SubNode node = iter.next();
         if (node != null) {
-            SubNode dirty = MongoThreadLocal.getDirtyNodes().get(node.getId());
+            SubNode dirty = ThreadLocals.getDirtyNodes().get(node.getId());
             if (dirty != null) {
                 // log.debug("ITER-WRAPPER: Got a dirty one: " + dirty.getId().toHexString());
                 return dirty;

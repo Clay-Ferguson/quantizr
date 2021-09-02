@@ -67,7 +67,7 @@ import org.subnode.mongo.MongoAuth;
 import org.subnode.mongo.MongoCreate;
 import org.subnode.mongo.MongoRead;
 import org.subnode.mongo.MongoSession;
-import org.subnode.mongo.MongoThreadLocal;
+
 import org.subnode.mongo.MongoUpdate;
 import org.subnode.mongo.MongoUtil;
 import org.subnode.mongo.model.SubNode;
@@ -85,6 +85,7 @@ import org.subnode.util.LimitedInputStream;
 import org.subnode.util.LimitedInputStreamEx;
 import org.subnode.util.MimeTypeUtils;
 import org.subnode.util.StreamUtil;
+import org.subnode.util.ThreadLocals;
 import org.subnode.util.Util;
 import org.subnode.util.ValContainer;
 
@@ -143,7 +144,7 @@ public class AttachmentService {
 		}
 
 		try {
-			session = MongoThreadLocal.ensure(session);
+			session = ThreadLocals.ensure(session);
 
 			/*
 			 * OLD LOGIC: Uploading a single file attaches to the current node, but uploading multiple files
@@ -421,7 +422,7 @@ public class AttachmentService {
 			}
 		}
 
-		// MongoThreadLocal.clearDirtyNodes();
+		// ThreadLocals.clearDirtyNodes();
 		update.save(session, node);
 	}
 
@@ -430,7 +431,7 @@ public class AttachmentService {
 	 */
 	public DeleteAttachmentResponse deleteAttachment(MongoSession session, final DeleteAttachmentRequest req) {
 		final DeleteAttachmentResponse res = new DeleteAttachmentResponse();
-		session = MongoThreadLocal.ensure(session);
+		session = ThreadLocals.ensure(session);
 
 		final String nodeId = req.getNodeId();
 		final SubNode node = read.getNode(session, nodeId);
@@ -483,7 +484,7 @@ public class AttachmentService {
 		BufferedOutputStream outStream = null;
 
 		try {
-			session = MongoThreadLocal.ensure(session);
+			session = ThreadLocals.ensure(session);
 
 			if (node == null) {
 				node = read.getNode(session, nodeId, false);
@@ -671,7 +672,7 @@ public class AttachmentService {
 		BufferedInputStream inStream = null;
 		ResponseEntity<ResourceRegion> ret = null;
 		try {
-			session = MongoThreadLocal.ensure(session);
+			session = ThreadLocals.ensure(session);
 
 			final SubNode node = read.getNode(session, nodeId, false);
 			auth.auth(session, node, PrivilegeType.READ);
@@ -796,7 +797,7 @@ public class AttachmentService {
 			maxFileSize = userManagerService.getMaxUploadSize(session);
 		}
 
-		session = MongoThreadLocal.ensure(session);
+		session = ThreadLocals.ensure(session);
 
 		final String mimeType = Util.getMimeFromDataUrl(sourceUrl);
 
@@ -837,7 +838,7 @@ public class AttachmentService {
 			maxFileSize = userManagerService.getMaxUploadSize(session);
 		}
 
-		session = MongoThreadLocal.ensure(session);
+		session = ThreadLocals.ensure(session);
 
 		LimitedInputStreamEx limitedIs = null;
 

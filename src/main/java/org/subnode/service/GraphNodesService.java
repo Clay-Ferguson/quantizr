@@ -13,7 +13,7 @@ import org.subnode.model.client.PrivilegeType;
 import org.subnode.mongo.MongoAuth;
 import org.subnode.mongo.MongoRead;
 import org.subnode.mongo.MongoSession;
-import org.subnode.mongo.MongoThreadLocal;
+
 import org.subnode.mongo.model.SubNode;
 import org.subnode.request.GraphRequest;
 import org.subnode.response.GraphResponse;
@@ -36,7 +36,7 @@ public class GraphNodesService {
 	public GraphResponse graphNodes(MongoSession session, GraphRequest req) {
 		HashMap<String, GraphNode> mapByPath = new HashMap<>();
 		GraphResponse res = new GraphResponse();
-		session = MongoThreadLocal.ensure(session);
+		session = ThreadLocals.ensure(session);
 
 		boolean searching = !StringUtils.isEmpty(req.getSearchText());
 		SubNode node = read.getNode(session, req.getNodeId(), true);

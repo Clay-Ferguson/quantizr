@@ -41,7 +41,7 @@ import org.subnode.mongo.MongoCreate;
 import org.subnode.mongo.MongoDelete;
 import org.subnode.mongo.MongoRead;
 import org.subnode.mongo.MongoSession;
-import org.subnode.mongo.MongoThreadLocal;
+
 import org.subnode.mongo.MongoUpdate;
 import org.subnode.mongo.MongoUtil;
 import org.subnode.mongo.model.SubNode;
@@ -210,7 +210,7 @@ public class UserManagerService {
 			}
 			session.setUserNodeId(userNode.getId());
 			sc.setMongoSession(session);
-			MongoThreadLocal.setMongoSession(session);
+			ThreadLocals.setMongoSession(session);
 
 			processLogin(session, res, sc.getUserName());
 			log.debug("login: user=" + sc.getUserName());
@@ -698,7 +698,7 @@ public class UserManagerService {
 	public BlockUserResponse blockUser(MongoSession session, final BlockUserRequest req) {
 		BlockUserResponse res = new BlockUserResponse();
 		final String userName = ThreadLocals.getSC().getUserName();
-		session = MongoThreadLocal.ensure(session);
+		session = ThreadLocals.ensure(session);
 
 		// get the node that holds all blocked users
 		SubNode blockedList =
@@ -741,7 +741,7 @@ public class UserManagerService {
 		apUtil.log("addFriend request: " + XString.prettyPrint(req));
 		AddFriendResponse res = new AddFriendResponse();
 		final String userName = ThreadLocals.getSC().getUserName();
-		session = MongoThreadLocal.ensure(session);
+		session = ThreadLocals.ensure(session);
 
 		String _newUserName = req.getUserName();
 		_newUserName = XString.stripIfStartsWith(_newUserName, "@");
@@ -901,7 +901,7 @@ public class UserManagerService {
 	 */
 	public ChangePasswordResponse changePassword(MongoSession session, final ChangePasswordRequest req) {
 		ChangePasswordResponse res = new ChangePasswordResponse();
-		session = MongoThreadLocal.ensure(session);
+		session = ThreadLocals.ensure(session);
 
 		ValContainer<SubNode> userNode = new ValContainer<>();
 		ValContainer<String> userName = new ValContainer<>();
@@ -1081,7 +1081,7 @@ public class UserManagerService {
 	 * If userName is passed as null, then we use the currently logged in user
 	 */
 	public List<SubNode> getSpecialNodesList(MongoSession session, String underType, String userName, boolean sort) {
-		session = MongoThreadLocal.ensure(session);
+		session = ThreadLocals.ensure(session);
 		List<SubNode> nodeList = new LinkedList<>();
 		SubNode userNode = read.getUserNodeByUserName(session, userName);
 		if (userNode == null)
@@ -1134,7 +1134,7 @@ public class UserManagerService {
 	}
 
 	public String getUserAccountsReport(MongoSession session) {
-		session = MongoThreadLocal.ensure(session);
+		session = ThreadLocals.ensure(session);
 		int localUserCount = 0;
 		int foreignUserCount = 0;
 

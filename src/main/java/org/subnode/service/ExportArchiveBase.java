@@ -24,7 +24,7 @@ import org.subnode.model.client.NodeType;
 import org.subnode.mongo.MongoAuth;
 import org.subnode.mongo.MongoRead;
 import org.subnode.mongo.MongoSession;
-import org.subnode.mongo.MongoThreadLocal;
+
 import org.subnode.mongo.model.SubNode;
 import org.subnode.request.ExportRequest;
 import org.subnode.response.ExportResponse;
@@ -32,6 +32,7 @@ import org.subnode.util.ExUtil;
 import org.subnode.util.FileUtils;
 import org.subnode.util.StreamUtil;
 import org.subnode.util.SubNodeUtil;
+import org.subnode.util.ThreadLocals;
 import org.subnode.util.ValContainer;
 import org.subnode.util.XString;
 
@@ -78,7 +79,7 @@ public abstract class ExportArchiveBase {
 	private MongoSession session;
 
 	public void export(MongoSession session, final ExportRequest req, final ExportResponse res) {
-		session = MongoThreadLocal.ensure(session);
+		session = ThreadLocals.ensure(session);
 		this.session = session;
 
 		if (!FileUtils.dirExists(appProp.getAdminDataFolder())) {

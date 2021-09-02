@@ -25,7 +25,7 @@ import org.subnode.model.client.NodeType;
 import org.subnode.mongo.AdminRun;
 import org.subnode.mongo.MongoAuth;
 import org.subnode.mongo.MongoSession;
-import org.subnode.mongo.MongoThreadLocal;
+
 import org.subnode.mongo.MongoUtil;
 import org.subnode.mongo.model.SubNode;
 import org.subnode.request.GetFollowersRequest;
@@ -186,7 +186,7 @@ public class ActPubFollower {
     // todo-1: review how do functions like this recieves the admin session?
     public GetFollowersResponse getFollowers(MongoSession ms, GetFollowersRequest req) {
         GetFollowersResponse res = new GetFollowersResponse();
-        ms = MongoThreadLocal.ensure(ms);
+        ms = ThreadLocals.ensure(ms);
 
         MongoSession adminSession = auth.getAdminSession();
         Query query = getFriendsByUserName_query(adminSession, req.getTargetUserName());

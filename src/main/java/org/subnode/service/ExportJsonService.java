@@ -23,7 +23,7 @@ import org.subnode.config.AppProp;
 import org.subnode.config.SpringContextUtil;
 import org.subnode.model.client.NodeProp;
 import org.subnode.mongo.MongoSession;
-import org.subnode.mongo.MongoThreadLocal;
+
 import org.subnode.mongo.MongoUpdate;
 import org.subnode.mongo.MongoUtil;
 import org.subnode.mongo.model.SubNode;
@@ -31,6 +31,7 @@ import org.subnode.util.ExUtil;
 import org.subnode.util.FileUtils;
 import org.subnode.util.LimitedInputStreamEx;
 import org.subnode.util.StreamUtil;
+import org.subnode.util.ThreadLocals;
 import org.subnode.util.ValContainer;
 
 /**
@@ -197,7 +198,7 @@ public class ExportJsonService {
 	 */
 	public String resetNode(MongoSession session, String subFolder) {
 		try {
-			MongoThreadLocal.setParentCheckEnabled(false);
+			ThreadLocals.setParentCheckEnabled(false);
 
 			String resourceName = "classpath:/nodes/" + subFolder + "/" + subFolder + ".json";
 			Resource resource = SpringContextUtil.getApplicationContext().getResource(resourceName);
@@ -230,7 +231,7 @@ public class ExportJsonService {
 					}
 				}
 			} finally {
-				MongoThreadLocal.setParentCheckEnabled(true);		
+				ThreadLocals.setParentCheckEnabled(true);		
 				StreamUtil.close(in);
 			}
 			log.debug("import successful.");

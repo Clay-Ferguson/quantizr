@@ -20,6 +20,7 @@ import org.subnode.config.NodeName;
 import org.subnode.model.client.NodeProp;
 import org.subnode.model.client.PrivilegeType;
 import org.subnode.mongo.model.SubNode;
+import org.subnode.util.ThreadLocals;
 import org.subnode.util.XString;
 
 public class MongoEventListener extends AbstractMongoEventListener<SubNode> {
@@ -105,7 +106,7 @@ public class MongoEventListener extends AbstractMongoEventListener<SubNode> {
 			}
 		}
 
-		if (MongoThreadLocal.getParentCheckEnabled()) {
+		if (ThreadLocals.getParentCheckEnabled()) {
 			read.checkParentExists(null, node);
 		}
 
@@ -214,7 +215,7 @@ public class MongoEventListener extends AbstractMongoEventListener<SubNode> {
 	public void onAfterSave(AfterSaveEvent<SubNode> event) {
 		SubNode node = event.getSource();
 		if (node != null) {
-			MongoThreadLocal.cacheNode(node);
+			ThreadLocals.cacheNode(node);
 		}
 	}
 
@@ -236,7 +237,7 @@ public class MongoEventListener extends AbstractMongoEventListener<SubNode> {
 			}
 		}
 
-		MongoThreadLocal.cacheNode(node);
+		ThreadLocals.cacheNode(node);
 	}
 
 	@Override
@@ -252,7 +253,7 @@ public class MongoEventListener extends AbstractMongoEventListener<SubNode> {
 					auth.ownerAuthByThread(node);
 				}
 				// because nodes can be orphaned, we clear the entire cache any time any nodes are deleted
-				MongoThreadLocal.clearCachedNodes();
+				ThreadLocals.clearCachedNodes();
 				actPub.deleteNodeNotify((ObjectId) id);
 			}
 		}
@@ -267,7 +268,7 @@ public class MongoEventListener extends AbstractMongoEventListener<SubNode> {
 		if (verbose)
 			log.trace("saveAuth in MongoListener");
 
-		MongoSession ms = MongoThreadLocal.getMongoSession();
+		MongoSession ms = ThreadLocals.getMongoSession();
 		if (ms != null) {
 			if (ms.isAdmin())
 				return;

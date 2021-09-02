@@ -21,7 +21,7 @@ import org.springframework.web.filter.GenericFilterBean;
 import org.subnode.model.IPInfo;
 import org.subnode.model.client.PrincipalName;
 import org.subnode.mongo.MongoRepository;
-import org.subnode.mongo.MongoThreadLocal;
+
 import org.subnode.util.ThreadLocals;
 import org.subnode.util.Util;
 import org.subnode.util.XString;
@@ -83,7 +83,6 @@ public class AppFilter extends GenericFilterBean {
 		HttpServletResponse httpRes = null;
 		try {
 			ThreadLocals.removeAll();
-			MongoThreadLocal.removeAll();
 			ThreadLocals.setStopwatchTime(System.currentTimeMillis());
 			
 			int thisReqId = ++reqId;
@@ -212,7 +211,6 @@ public class AppFilter extends GenericFilterBean {
 		} finally {
 			/* Set thread back to clean slate, for it's next cycle time in threadpool */
 			ThreadLocals.removeAll();
-			MongoThreadLocal.removeAll();
 		}
 	}
 

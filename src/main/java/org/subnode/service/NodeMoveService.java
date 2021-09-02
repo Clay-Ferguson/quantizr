@@ -14,7 +14,7 @@ import org.subnode.mongo.MongoCreate;
 import org.subnode.mongo.MongoDelete;
 import org.subnode.mongo.MongoRead;
 import org.subnode.mongo.MongoSession;
-import org.subnode.mongo.MongoThreadLocal;
+
 import org.subnode.mongo.MongoUpdate;
 import org.subnode.mongo.model.SubNode;
 import org.subnode.request.DeleteNodesRequest;
@@ -27,6 +27,7 @@ import org.subnode.response.JoinNodesResponse;
 import org.subnode.response.MoveNodesResponse;
 import org.subnode.response.SelectAllNodesResponse;
 import org.subnode.response.SetNodePositionResponse;
+import org.subnode.util.ThreadLocals;
 
 /**
  * Service for controlling the positions (ordinals) of nodes relative to their parents and/or moving
@@ -65,7 +66,7 @@ public class NodeMoveService {
 	 */
 	public SetNodePositionResponse setNodePosition(MongoSession session, SetNodePositionRequest req) {
 		SetNodePositionResponse res = new SetNodePositionResponse();
-		session = MongoThreadLocal.ensure(session);
+		session = ThreadLocals.ensure(session);
 
 		String nodeId = req.getNodeId();
 
@@ -146,7 +147,7 @@ public class NodeMoveService {
 	 */
 	public JoinNodesResponse joinNodes(MongoSession session, JoinNodesRequest req) {
 		JoinNodesResponse res = new JoinNodesResponse();
-		session = MongoThreadLocal.ensure(session);
+		session = ThreadLocals.ensure(session);
 
 		// add to list becasue we will sort
 		ArrayList<SubNode> nodes = new ArrayList<SubNode>();
@@ -214,7 +215,7 @@ public class NodeMoveService {
 	 */
 	public DeleteNodesResponse deleteNodes(MongoSession session, DeleteNodesRequest req) {
 		DeleteNodesResponse res = new DeleteNodesResponse();
-		session = MongoThreadLocal.ensure(session);
+		session = ThreadLocals.ensure(session);
 
 		SubNode userNode = read.getUserNodeByUserName(null, null);
 		if (userNode == null) {
@@ -249,7 +250,7 @@ public class NodeMoveService {
 	 */
 	public MoveNodesResponse moveNodes(MongoSession session, MoveNodesRequest req) {
 		MoveNodesResponse res = new MoveNodesResponse();
-		session = MongoThreadLocal.ensure(session);
+		session = ThreadLocals.ensure(session);
 
 		moveNodesInternal(session, req.getLocation(), req.getTargetNodeId(), req.getNodeIds());
 		res.setSuccess(true);
@@ -335,7 +336,7 @@ public class NodeMoveService {
 
 	public SelectAllNodesResponse selectAllNodes(MongoSession session, SelectAllNodesRequest req) {
 		SelectAllNodesResponse res = new SelectAllNodesResponse();
-		session = MongoThreadLocal.ensure(session);
+		session = ThreadLocals.ensure(session);
 
 		String nodeId = req.getParentNodeId();
 		SubNode node = read.getNode(session, nodeId);

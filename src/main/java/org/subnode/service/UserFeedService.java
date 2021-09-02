@@ -30,7 +30,7 @@ import org.subnode.mongo.AdminRun;
 import org.subnode.mongo.MongoAuth;
 import org.subnode.mongo.MongoRead;
 import org.subnode.mongo.MongoSession;
-import org.subnode.mongo.MongoThreadLocal;
+
 import org.subnode.mongo.MongoUpdate;
 import org.subnode.mongo.MongoUtil;
 import org.subnode.mongo.model.SubNode;
@@ -247,7 +247,7 @@ public class UserFeedService {
 		if (sc.isAnonUser())
 			return res;
 
-		session = MongoThreadLocal.ensure(session);
+		session = ThreadLocals.ensure(session);
 		String pathToSearch = NodeName.ROOT_OF_ALL_USERS;
 
 		Query query = new Query();
@@ -283,7 +283,7 @@ public class UserFeedService {
 	public NodeFeedResponse generateFeed(MongoSession session, NodeFeedRequest req) {
 		SessionContext sc = ThreadLocals.getSC();
 		NodeFeedResponse res = new NodeFeedResponse();
-		session = MongoThreadLocal.ensure(session);
+		session = ThreadLocals.ensure(session);
 
 		String pathToSearch = NodeName.ROOT_OF_ALL_USERS;
 		boolean doAuth = true;

@@ -32,7 +32,7 @@ import org.subnode.mongo.MongoAuth;
 import org.subnode.mongo.MongoDelete;
 import org.subnode.mongo.MongoRead;
 import org.subnode.mongo.MongoSession;
-import org.subnode.mongo.MongoThreadLocal;
+
 import org.subnode.mongo.MongoUtil;
 import org.subnode.mongo.model.SubNode;
 import org.subnode.request.GetFollowingRequest;
@@ -356,7 +356,7 @@ public class ActPubFollowing {
 
     public GetFollowingResponse getFollowing(MongoSession ms, GetFollowingRequest req) {
         GetFollowingResponse res = new GetFollowingResponse();
-        ms = MongoThreadLocal.ensure(ms);
+        ms = ThreadLocals.ensure(ms);
 
         MongoSession adminSession = auth.getAdminSession();
         Query query = findFollowingOfUser_query(adminSession, req.getTargetUserName());

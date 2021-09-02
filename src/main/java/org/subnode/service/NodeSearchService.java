@@ -28,7 +28,7 @@ import org.subnode.mongo.AdminRun;
 import org.subnode.mongo.MongoAuth;
 import org.subnode.mongo.MongoRead;
 import org.subnode.mongo.MongoSession;
-import org.subnode.mongo.MongoThreadLocal;
+
 import org.subnode.mongo.MongoUtil;
 import org.subnode.mongo.model.AccessControl;
 import org.subnode.mongo.model.SubNode;
@@ -100,7 +100,7 @@ public class NodeSearchService {
 
 	public NodeSearchResponse search(MongoSession session, NodeSearchRequest req) {
 		NodeSearchResponse res = new NodeSearchResponse();
-		session = MongoThreadLocal.ensure(session);
+		session = ThreadLocals.ensure(session);
 
 		String searchText = req.getSearchText();
 		if (StringUtils.isEmpty(searchText) && //
@@ -243,7 +243,7 @@ public class NodeSearchService {
 
 	public GetSharedNodesResponse getSharedNodes(MongoSession session, GetSharedNodesRequest req) {
 		GetSharedNodesResponse res = new GetSharedNodesResponse();
-		session = MongoThreadLocal.ensure(session);
+		session = ThreadLocals.ensure(session);
 
 		List<NodeInfo> searchResults = new LinkedList<>();
 		res.setSearchResults(searchResults);
@@ -406,7 +406,7 @@ public class NodeSearchService {
 		 * running a stats request under the 'Node Info' main menu
 		 */
 		else {
-			session = MongoThreadLocal.ensure(session);
+			session = ThreadLocals.ensure(session);
 			SubNode searchRoot = read.getNode(session, req.getNodeId());
 
 			Sort sort = null;

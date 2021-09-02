@@ -9,6 +9,7 @@ import org.subnode.AppServer;
 import org.subnode.actpub.ActPubService;
 import org.subnode.config.AppProp;
 import org.subnode.model.client.PrincipalName;
+import org.subnode.util.ThreadLocals;
 
 @Component
 public class MongoRepository {
@@ -88,7 +89,7 @@ public class MongoRepository {
 			return;
 
 		MongoSession adminSession = new MongoSession(PrincipalName.ADMIN.s());
-		MongoThreadLocal.setMongoSession(adminSession);
+		ThreadLocals.setMongoSession(adminSession);
 
 		synchronized (lock) {
 			if (initialized)

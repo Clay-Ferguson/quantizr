@@ -13,11 +13,12 @@ import org.springframework.web.multipart.MultipartFile;
 import org.subnode.config.SpringContextUtil;
 import org.subnode.mongo.MongoRead;
 import org.subnode.mongo.MongoSession;
-import org.subnode.mongo.MongoThreadLocal;
+
 import org.subnode.mongo.MongoUpdate;
 import org.subnode.mongo.model.SubNode;
 import org.subnode.util.ExUtil;
 import org.subnode.util.StreamUtil;
+import org.subnode.util.ThreadLocals;
 
 @Component
 public class ImportService {
@@ -33,7 +34,7 @@ public class ImportService {
 		if (nodeId == null) {
 			throw ExUtil.wrapEx("target nodeId not provided");
 		}
-		session = MongoThreadLocal.ensure(session);
+		session = ThreadLocals.ensure(session);
 
 		SubNode node = read.getNode(session, nodeId);
 		if (node == null) {

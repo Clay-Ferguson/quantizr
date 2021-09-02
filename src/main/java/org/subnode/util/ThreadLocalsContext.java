@@ -1,10 +1,15 @@
 package org.subnode.util;
 
+import java.util.HashMap;
+import java.util.LinkedHashMap;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.subnode.config.SessionContext;
+import org.subnode.mongo.MongoSession;
+import org.subnode.mongo.model.SubNode;
 import org.subnode.response.base.ResponseBase;
 
 /**
@@ -18,4 +23,8 @@ public class ThreadLocalsContext {
 	public HttpSession httpSession;
 	public SessionContext sessionContext;
 	public ResponseBase response;
+	public MongoSession session;
+	public HashMap<ObjectId, SubNode> dirtyNodes;
+	public LinkedHashMap<String, SubNode> cachedNodes;
+	public Boolean parentCheckEnabled;
 }

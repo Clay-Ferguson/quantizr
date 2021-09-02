@@ -8,7 +8,7 @@ import org.subnode.config.SpringContextUtil;
 import org.subnode.mongo.MongoAuth;
 import org.subnode.mongo.MongoRead;
 import org.subnode.mongo.MongoSession;
-import org.subnode.mongo.MongoThreadLocal;
+
 import org.subnode.mongo.MongoUpdate;
 import org.subnode.mongo.model.SubNode;
 import org.subnode.request.InsertBookRequest;
@@ -38,7 +38,7 @@ public class ImportBookService {
 
 	public InsertBookResponse insertBook(MongoSession session, InsertBookRequest req) {
 		InsertBookResponse res = new InsertBookResponse();
-		session = MongoThreadLocal.ensure(session);
+		session = ThreadLocals.ensure(session);
 		if (!ThreadLocals.getSC().isAdmin() && !ThreadLocals.getSC().isTestAccount()) {
 			throw ExUtil.wrapEx("insertBook is an admin-only feature.");
 		}

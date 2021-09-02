@@ -21,8 +21,9 @@ import org.springframework.data.mongodb.core.mapping.Field;
 import org.subnode.model.client.NodeProp;
 import org.subnode.model.client.NodeType;
 import org.subnode.mongo.MongoAuth;
-import org.subnode.mongo.MongoThreadLocal;
+
 import org.subnode.util.ExUtil;
+import org.subnode.util.ThreadLocals;
 import org.subnode.util.Util;
 import org.subnode.util.XString;
 
@@ -209,7 +210,7 @@ public class SubNode {
 			return;
 
 		MongoAuth.inst.ownerAuthByThread(this);
-		MongoThreadLocal.dirty(this);
+		ThreadLocals.dirty(this);
 
 		/*
 		 * nullify path hash if the path is changing so that MongoEventListener will update the value when
@@ -229,7 +230,7 @@ public class SubNode {
 	public void setPathHash(String pathHash) {
 		if (Util.equalObjs(pathHash, this.pathHash))
 			return;
-		MongoThreadLocal.dirty(this);
+		ThreadLocals.dirty(this);
 		this.pathHash = pathHash;
 	}
 
@@ -242,7 +243,7 @@ public class SubNode {
 	public void setOrdinal(Long ordinal) {
 		if (Util.equalObjs(ordinal, this.ordinal))
 			return;
-		MongoThreadLocal.dirty(this);
+		ThreadLocals.dirty(this);
 		this.ordinal = ordinal;
 	}
 
@@ -265,7 +266,7 @@ public class SubNode {
 		 * changing the value here, we can bypass setting this 'dirty' flag? I probably have this
 		 * performance/optimization on my todo list but i'm putting this note here just in case
 		 */
-		MongoThreadLocal.dirty(this);
+		ThreadLocals.dirty(this);
 		this.maxChildOrdinal = maxChildOrdinal;
 	}
 
@@ -279,7 +280,7 @@ public class SubNode {
 	public void setOwner(ObjectId owner) {
 		if (Util.equalObjs(owner, this.owner))
 			return;
-		MongoThreadLocal.dirty(this);
+		ThreadLocals.dirty(this);
 		this.owner = owner;
 	}
 
@@ -295,7 +296,7 @@ public class SubNode {
 
 	@JsonProperty(FIELD_CREATE_TIME)
 	public void setCreateTime(Date createTime) {
-		MongoThreadLocal.dirty(this);
+		ThreadLocals.dirty(this);
 		this.createTime = createTime;
 	}
 
@@ -306,7 +307,7 @@ public class SubNode {
 
 	@JsonProperty(FIELD_MODIFY_TIME)
 	public void setModifyTime(Date modifyTime) {
-		MongoThreadLocal.dirty(this);
+		ThreadLocals.dirty(this);
 		this.modifyTime = modifyTime;
 	}
 
@@ -329,7 +330,7 @@ public class SubNode {
 
 	@JsonProperty(FIELD_AC)
 	public void setAc(HashMap<String, AccessControl> ac) {
-		MongoThreadLocal.dirty(this);
+		ThreadLocals.dirty(this);
 		this.ac = ac;
 	}
 
@@ -350,13 +351,13 @@ public class SubNode {
 
 	@JsonProperty(FIELD_PROPERTIES)
 	public void setProperties(SubNodePropertyMap properties) {
-		MongoThreadLocal.dirty(this);
+		ThreadLocals.dirty(this);
 		this.properties = properties;
 	}
 
 	@JsonIgnore
 	public boolean setProp(String key, SubNodePropVal val) {
-		MongoThreadLocal.dirty(this);
+		ThreadLocals.dirty(this);
 		boolean changed = false;
 		if (val == null) {
 			changed = properties().containsKey(key);
@@ -371,7 +372,7 @@ public class SubNode {
 
 	@JsonIgnore
 	public boolean setProp(String key, Object val) {
-		MongoThreadLocal.dirty(this);
+		ThreadLocals.dirty(this);
 		boolean changed = false;
 		if (val == null) {
 			changed = properties().containsKey(key);
@@ -386,7 +387,7 @@ public class SubNode {
 
 	@JsonIgnore
 	public void deleteProp(String key) {
-		MongoThreadLocal.dirty(this);
+		ThreadLocals.dirty(this);
 		properties().remove(key);
 	}
 
@@ -511,7 +512,7 @@ public class SubNode {
 	public void setType(String type) {
 		if (Util.equalObjs(type, this.type))
 			return;
-		MongoThreadLocal.dirty(this);
+		ThreadLocals.dirty(this);
 		this.type = type;
 	}
 
@@ -524,7 +525,7 @@ public class SubNode {
 	public void setName(String name) {
 		if (Util.equalObjs(name, this.name))
 			return;
-		MongoThreadLocal.dirty(this);
+		ThreadLocals.dirty(this);
 		this.name = name;
 	}
 
@@ -537,7 +538,7 @@ public class SubNode {
 	public void setContent(String content) {
 		if (Util.equalObjs(content, this.content))
 			return;
-		MongoThreadLocal.dirty(this);
+		ThreadLocals.dirty(this);
 		this.content = content;
 	}
 
@@ -554,7 +555,7 @@ public class SubNode {
 	}
 
 	public void addProperties(SubNodePropertyMap properties) {
-		MongoThreadLocal.dirty(this);
+		ThreadLocals.dirty(this);
 		properties().putAll(properties);
 	}
 }
