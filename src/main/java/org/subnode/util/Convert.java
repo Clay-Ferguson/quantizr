@@ -65,7 +65,7 @@ public class Convert {
 	 * the node.
 	 */
 	public NodeInfo convertToNodeInfo(SessionContext sc, MongoSession session, SubNode node, boolean htmlOnly,
-			boolean initNodeEdit, long ordinal, boolean allowInlineChildren, boolean lastChild, boolean childrenCheck, 
+			boolean initNodeEdit, long ordinal, boolean allowInlineChildren, boolean lastChild, boolean childrenCheck,
 			boolean getFollowers) {
 
 		/* If session user shouldn't be able to see secrets on this node remove them */
@@ -116,7 +116,7 @@ public class Convert {
 		if (node.getOwner() == null) {
 			throw new RuntimeException("node has no owner: " + node.getId().toHexString());
 		}
-		
+
 		String ownerId = node.getOwner().toHexString();
 		String avatarVer = null;
 
@@ -152,8 +152,8 @@ public class Convert {
 
 		String owner = userNode == null ? PrincipalName.ADMIN.s() : nameProp;
 
-		log.trace("RENDER ID=" + node.getId().toHexString() + " rootId=" + ownerId + " session.rootId="
-				+ sc.getRootId() + " node.content=" + node.getContent() + " owner=" + owner);
+		log.trace("RENDER ID=" + node.getId().toHexString() + " rootId=" + ownerId + " session.rootId=" + sc.getRootId()
+				+ " node.content=" + node.getContent() + " owner=" + owner);
 
 		// log.debug("RENDER nodeId: " + node.getId().toHexString()+" -- json:
 		// "+XString.prettyPrint(node));
@@ -183,9 +183,10 @@ public class Convert {
 				imageSize != null ? imageSize.getHeight() : 0, //
 				node.getType(), ordinal, lastChild, cipherKey, dataUrl, avatarVer, apAvatar, apImage);
 
-		/* Do all type-specific conversion processing */
-		for (TypeBase typePlugin : typePluginMgr.getTypes()) {
-			typePlugin.convert(session, nodeInfo, node, getFollowers);
+		// if this node type has a plugin run it's converter to let it contribute
+		TypeBase plugin = typePluginMgr.getPluginByType(node.getType());
+		if (plugin != null) {
+			plugin.convert(session, nodeInfo, node, getFollowers);
 		}
 
 		if (allowInlineChildren) {
@@ -210,8 +211,8 @@ public class Convert {
 					// the 'inlineChildren' capability
 					boolean multiLevel = true;
 
-					nodeInfo.safeGetChildren().add(convertToNodeInfo(sc, session, n, htmlOnly, initNodeEdit,
-							inlineOrdinal++, multiLevel, lastChild, childrenCheck, false));
+					nodeInfo.safeGetChildren().add(convertToNodeInfo(sc, session, n, htmlOnly, initNodeEdit, inlineOrdinal++,
+							multiLevel, lastChild, childrenCheck, false));
 				}
 			}
 		}

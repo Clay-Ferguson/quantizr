@@ -159,14 +159,12 @@ public class NodeEditService {
 			}
 		}
 
-		ValContainer<SubNode> vcNode = new ValContainer<>(node);
-
-		/* Do all type-specific conversion processing. */
-		for (TypeBase typePlugin : typePluginMgr.getTypes()) {
-			typePlugin.createSubNode(session, vcNode, req, linkBookmark);
+		TypeBase plugin = typePluginMgr.getPluginByType(req.getTypeName());
+		if (plugin != null) {
+			ValContainer<SubNode> vcNode = new ValContainer<>(node);
+			plugin.createSubNode(session, vcNode, req, linkBookmark);
+			node = vcNode.getVal();
 		}
-
-		node = vcNode.getVal();
 
 		if (node == null) {
 			res.setMessage("unable to locate parent for insert");
@@ -386,7 +384,6 @@ public class NodeEditService {
 
 	public SaveNodeResponse saveNode(MongoSession _session, SaveNodeRequest req) {
 		SaveNodeResponse res = new SaveNodeResponse();
-
 		// log.debug("Controller saveNode: " + Thread.currentThread().getName());
 
 		_session = MongoThreadLocal.ensure(_session);

@@ -1,33 +1,25 @@
 package org.subnode.types;
 
-import java.util.LinkedList;
-import java.util.List;
-import javax.annotation.PostConstruct;
-import org.springframework.beans.factory.annotation.Autowired;
+import java.util.HashMap;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 @Component
 public class TypePluginMgr {
+    private static final Logger log = LoggerFactory.getLogger(TypePluginMgr.class);
+    private static HashMap<String, TypeBase> types = new HashMap<>();
 
-    @Autowired
-    private FriendType friendType;
-
-    @Autowired
-    private BookmarkType bookmarkType;
-
-    @Autowired
-    private RssFeedType rssFeedType;
-
-    private List<TypeBase> types = new LinkedList<>();
-
-    @PostConstruct
-    private void init() {
-        types.add(friendType);
-        types.add(bookmarkType);
-        types.add(rssFeedType);
+    public static void addType(TypeBase type) {
+        log.debug("Plugin: "+type.getClass().getName());
+        types.put(type.getName().toLowerCase(), type);
     }
 
-    public List<TypeBase> getTypes() {
+    public HashMap<String, TypeBase> getTypes() {
         return types;
+    }
+
+    public TypeBase getPluginByType(String type) {
+        return types.get(type.toLowerCase());
     }
 }

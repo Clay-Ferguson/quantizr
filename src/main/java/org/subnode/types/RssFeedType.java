@@ -22,13 +22,10 @@ public class RssFeedType extends TypeBase {
 
     @Override
     public String getName() {
-        return "sn:rssFeed";
+        return "sn:rssfeed";
     }
 
     public void createSubNode(MongoSession session, ValContainer<SubNode> node, CreateSubNodeRequest req, boolean linkBookmark) {
-        if (!NodeType.RSS_FEED.s().equals(req.getTypeName()))
-            return;
-
         SubNode holderNode = create.createNode(session, node.getVal(), null, NodeType.NONE.s(), 0L, CreateNodeLocation.FIRST,
                 req.getProperties(), null, false);
         holderNode.setContent("#### Edit this. Add your RSS title!");
