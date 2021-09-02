@@ -15,6 +15,7 @@ import org.subnode.mongo.MongoSession;
 import org.subnode.mongo.model.SubNode;
 import org.subnode.util.ExUtil;
 import org.subnode.util.StreamUtil;
+import org.subnode.util.ThreadLocals;
 
 @Component
 @Scope("prototype")
@@ -37,9 +38,9 @@ public class ImportTarService extends ImportArchiveBase {
 		}
 		used = true;
 
-		final SubNode userNode = read.getUserNodeByUserName(auth.getAdminSession(), sc.getUserName());
+		final SubNode userNode = read.getUserNodeByUserName(auth.getAdminSession(), ThreadLocals.getSC().getUserName());
 		if (userNode == null) {
-			throw new RuntimeEx("UserNode not found: " + sc.getUserName());
+			throw new RuntimeEx("UserNode not found: " + ThreadLocals.getSC().getUserName());
 		}
 
 		try {

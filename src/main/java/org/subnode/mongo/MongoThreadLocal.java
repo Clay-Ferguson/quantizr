@@ -9,6 +9,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.subnode.mongo.model.SubNode;
 
+// todo-0: The @Async annotated function needs this too! argh. Consider merging into ThreadLocals and getting rid of this class.
+
 public class MongoThreadLocal {
 	private static final Logger log = LoggerFactory.getLogger(MongoThreadLocal.class);
 

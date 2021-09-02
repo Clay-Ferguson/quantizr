@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Component;
+import org.subnode.config.SessionContext;
 import org.subnode.config.SpringContextUtil;
 import org.subnode.exception.base.RuntimeEx;
 import org.subnode.mongo.MongoAuth;
@@ -20,6 +21,7 @@ import org.subnode.util.Const;
 import org.subnode.util.ExUtil;
 import org.subnode.util.LimitedInputStreamEx;
 import org.subnode.util.StreamUtil;
+import org.subnode.util.ThreadLocals;
 
 /**
  * Import from ZIP files. Imports zip files that have the same type of directory
@@ -66,6 +68,7 @@ public class ImportZipService extends ImportArchiveBase {
 	/* Returns the first node created which is always the root of the import */
 	public SubNode importFromStream(MongoSession session, InputStream inputStream, SubNode node,
 			boolean isNonRequestThread) {
+		SessionContext sc = ThreadLocals.getSC();
 		if (used) {
 			throw new RuntimeEx("Prototype bean used multiple times is not allowed.");
 		}

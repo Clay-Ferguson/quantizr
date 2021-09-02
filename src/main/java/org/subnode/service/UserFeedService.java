@@ -241,7 +241,7 @@ public class UserFeedService {
 	}
 
 	public CheckMessagesResponse checkMessages(MongoSession session, CheckMessagesRequest req) {
-		SessionContext sc = ThreadLocals.getSessionContext();
+		SessionContext sc = ThreadLocals.getSC();
 		CheckMessagesResponse res = new CheckMessagesResponse();
 
 		if (sc.isAnonUser())
@@ -281,7 +281,7 @@ public class UserFeedService {
 	 * Generated content of the "Feed" for a user.
 	 */
 	public NodeFeedResponse generateFeed(MongoSession session, NodeFeedRequest req) {
-		SessionContext sc = ThreadLocals.getSessionContext();
+		SessionContext sc = ThreadLocals.getSC();
 		NodeFeedResponse res = new NodeFeedResponse();
 		session = MongoThreadLocal.ensure(session);
 

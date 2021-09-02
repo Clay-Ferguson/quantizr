@@ -649,7 +649,7 @@ public class IPFSService {
     }
 
     public PublishNodeToIpfsResponse publishNodeToIpfs(MongoSession ms, PublishNodeToIpfsRequest req) {
-        if (!ThreadLocals.getSessionContext().isAdmin()) {
+        if (!ThreadLocals.getSC().isAdmin()) {
             throw ExUtil.wrapEx("admin only function.");
         }
 
@@ -660,7 +660,7 @@ public class IPFSService {
     }
 
     public LoadNodeFromIpfsResponse loadNodeFromIpfs(MongoSession ms, LoadNodeFromIpfsRequest req) {
-        if (!ThreadLocals.getSessionContext().isAdmin()) {
+        if (!ThreadLocals.getSC().isAdmin()) {
             throw ExUtil.wrapEx("admin only function.");
         }
 

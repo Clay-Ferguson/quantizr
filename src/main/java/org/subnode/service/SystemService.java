@@ -80,11 +80,8 @@ public class SystemService {
 	@Autowired
 	private UserFeedService userFeedService;
 
-	@Autowired
-	private SessionContext sc;
-
 	public String rebuildIndexes() {
-		if (!ThreadLocals.getSessionContext().isAdmin()) {
+		if (!ThreadLocals.getSC().isAdmin()) {
 			throw ExUtil.wrapEx("admin only function.");
 		}
 
@@ -173,10 +170,10 @@ public class SystemService {
 
 	public String getPerformancerReport() {
 		StringBuilder sb = new StringBuilder();
-		sb.append("Performance Report: " + sc.getUserName() + "\n");
+		sb.append("Performance Report: " + ThreadLocals.getSC().getUserName() + "\n");
 		int idx = 1;
-		synchronized (sc.getStopwatchData()) {
-			for (StopwatchEntry se : sc.getStopwatchData()) {
+		synchronized (ThreadLocals.getSC().getStopwatchData()) {
+			for (StopwatchEntry se : ThreadLocals.getSC().getStopwatchData()) {
 				sb.append(String.valueOf(idx));
 				sb.append(": ");
 				sb.append(se.getThreadName());

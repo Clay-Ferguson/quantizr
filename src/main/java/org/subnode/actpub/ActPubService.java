@@ -180,7 +180,7 @@ public class ActPubService {
             // String apId = parent.getStringProp(NodeProp.ACT_PUB_ID.s());
             String inReplyTo = parent.getStrProp(NodeProp.ACT_PUB_OBJ_URL);
             APList attachments = createAttachmentsList(node);
-            String fromUser = ThreadLocals.getSessionContext().getUserName();
+            String fromUser = ThreadLocals.getSC().getUserName();
             String fromActor = apUtil.makeActorUrlForUserName(fromUser);
             String noteUrl = subNodeUtil.getIdBasedUrl(node);
 
@@ -303,7 +303,7 @@ public class ActPubService {
                 APObj message = apFactory.newCreateMessageForNote(toUserNames, fromActor, inReplyTo, content, noteUrl,
                         privateMessage, attachments);
 
-                String userDoingPost = ThreadLocals.getSessionContext().getUserName();
+                String userDoingPost = ThreadLocals.getSC().getUserName();
                 apUtil.securePost(userDoingPost, ms, null, inbox, fromActor, message, null);
             }
         }
@@ -981,7 +981,7 @@ public class ActPubService {
                 if (friendUserName != null) {
                     // if a foreign user, update thru ActivityPub
                     if (friendUserName.contains("@")) {
-                        String followerUser = ThreadLocals.getSessionContext().getUserName();
+                        String followerUser = ThreadLocals.getSC().getUserName();
                         apFollowing.setFollowing(followerUser, friendUserName, false);
                     }
                 }

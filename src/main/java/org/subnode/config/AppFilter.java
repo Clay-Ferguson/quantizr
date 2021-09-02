@@ -38,6 +38,10 @@ public class AppFilter extends GenericFilterBean {
 	private static boolean logRequests = false;
 	private static boolean logResponses = false;
 
+	/* IMPORTANT: This should be the ONLY place we autowire SessionContext, because our deamon threads
+	will be created by the thread pool executor and will fail to autowire, so we always have all code
+	always get SessionContext from ThreadLocal only, so that it can be set on any thread including pooled
+	daemon threads */
 	@Autowired
 	private SessionContext sc;
 
@@ -136,7 +140,7 @@ public class AppFilter extends GenericFilterBean {
 					session = httpReq.getSession(true);
 				}
 				ThreadLocals.setHttpSession(session);
-				ThreadLocals.setSessionContext(sc);
+				ThreadLocals.setSC(sc);
 				String queryString = httpReq.getQueryString();
 
 				if (simulateSlowServer > 0 && httpReq.getRequestURI().contains("/mobile/api/")) {

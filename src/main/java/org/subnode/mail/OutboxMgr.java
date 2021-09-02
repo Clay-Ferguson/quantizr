@@ -100,7 +100,7 @@ public class OutboxMgr {
 					// trim to 280 like twitter.
 					String shortContent = XString.trimToMaxLen(node.getContent(), 280) + "...";
 					String content =
-							String.format("#### New from: %s\n%s", ThreadLocals.getSessionContext().getUserName(), shortContent);
+							String.format("#### New from: %s\n%s", ThreadLocals.getSC().getUserName(), shortContent);
 
 					notifyNode.setOwner(userInbox.getOwner());
 					notifyNode.setContent(content);
@@ -119,7 +119,7 @@ public class OutboxMgr {
 						userFeedService.sendServerPushInfo(sc,
 								// todo-2: fill in the two null parameters here if/when you ever bring this method back.
 								new NotificationMessage("newInboxNode", node.getId().toHexString(), "New node shared to you.",
-										ThreadLocals.getSessionContext().getUserName()));
+										ThreadLocals.getSC().getUserName()));
 					}
 				}
 			}

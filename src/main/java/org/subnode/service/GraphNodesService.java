@@ -53,7 +53,7 @@ public class GraphNodesService {
 			if (StringUtils.isEmpty(req.getSearchText())) {
 				results = read.getSubGraph(session, node, null, 0);
 			} else {
-				int limit = ThreadLocals.getSessionContext().isAdmin() ? Integer.MAX_VALUE : 1000;
+				int limit = ThreadLocals.getSC().isAdmin() ? Integer.MAX_VALUE : 1000;
 				results = read.searchSubGraph(session, node, "content", req.getSearchText(), null, null, limit, 0, false, false, null, true);
 			}
 

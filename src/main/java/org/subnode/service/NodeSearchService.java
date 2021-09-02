@@ -117,19 +117,19 @@ public class NodeSearchService {
 		if ("node.id".equals(req.getSearchProp())) {
 			SubNode node = read.getNode(session, searchText, true);
 			if (node != null) {
-				NodeInfo info = convert.convertToNodeInfo(ThreadLocals.getSessionContext(), session, node, true, false,
+				NodeInfo info = convert.convertToNodeInfo(ThreadLocals.getSC(), session, node, true, false,
 						counter + 1, false, false, false, false);
 				searchResults.add(info);
 			}
 		} else if ("node.name".equals(req.getSearchProp())) {
-			if (ThreadLocals.getSessionContext().isAdmin()) {
+			if (ThreadLocals.getSC().isAdmin()) {
 				searchText = ":" + searchText;
 			} else {
-				searchText = ":" + ThreadLocals.getSessionContext().getUserName() + ":" + searchText;
+				searchText = ":" + ThreadLocals.getSC().getUserName() + ":" + searchText;
 			}
 			SubNode node = read.getNode(session, searchText, true);
 			if (node != null) {
-				NodeInfo info = convert.convertToNodeInfo(ThreadLocals.getSessionContext(), session, node, true, false,
+				NodeInfo info = convert.convertToNodeInfo(ThreadLocals.getSC(), session, node, true, false,
 						counter + 1, false, false, false, false);
 				searchResults.add(info);
 			}
@@ -183,7 +183,7 @@ public class NodeSearchService {
 				 */
 				for (final SubNode node : accountNodes) {
 					try {
-						NodeInfo info = convert.convertToNodeInfo(ThreadLocals.getSessionContext(), session, node, true, false,
+						NodeInfo info = convert.convertToNodeInfo(ThreadLocals.getSC(), session, node, true, false,
 								counter + 1, false, false, false, false);
 						searchResults.add(info);
 					} catch (Exception e) {
@@ -203,7 +203,7 @@ public class NodeSearchService {
 						SubNode userNode = apService.getAcctNodeByUserName(ms, _findUserName);
 						if (userNode != null) {
 							try {
-								NodeInfo info = convert.convertToNodeInfo(ThreadLocals.getSessionContext(), ms, userNode, true,
+								NodeInfo info = convert.convertToNodeInfo(ThreadLocals.getSC(), ms, userNode, true,
 										false, counter + 1, false, false, false, false);
 
 								searchResults.add(info);
@@ -220,7 +220,7 @@ public class NodeSearchService {
 				SubNode searchRoot = read.getNode(session, req.getNodeId());
 
 				if ("timeline".equals(req.getSearchDefinition())) {
-					ThreadLocals.getSessionContext().setTimelinePath(searchRoot.getPath());
+					ThreadLocals.getSC().setTimelinePath(searchRoot.getPath());
 				}
 
 				for (SubNode node : read.searchSubGraph(session, searchRoot, req.getSearchProp(), searchText, req.getSortField(),
@@ -228,7 +228,7 @@ public class NodeSearchService {
 						req.getFuzzy(), req.getCaseSensitive(), req.getTimeRangeType(), req.isRecursive())) {
 					try {
 						auth.auth(session, node, PrivilegeType.READ);
-						NodeInfo info = convert.convertToNodeInfo(ThreadLocals.getSessionContext(), session, node, true, false,
+						NodeInfo info = convert.convertToNodeInfo(ThreadLocals.getSC(), session, node, true, false,
 								counter + 1, false, false, false, false);
 						searchResults.add(info);
 					} catch (Exception e) {
@@ -255,7 +255,7 @@ public class NodeSearchService {
 		// SubNode searchRoot = api.getNode(session, req.getNodeId());
 
 		// search under account root only
-		SubNode searchRoot = read.getNode(session, ThreadLocals.getSessionContext().getRootId());
+		SubNode searchRoot = read.getNode(session, ThreadLocals.getSC().getRootId());
 
 		/*
 		 * todo-2: Eventually we want two ways of searching here.
@@ -298,7 +298,7 @@ public class NodeSearchService {
 				}
 			}
 
-			NodeInfo info = convert.convertToNodeInfo(ThreadLocals.getSessionContext(), session, node, true, false, counter + 1,
+			NodeInfo info = convert.convertToNodeInfo(ThreadLocals.getSC(), session, node, true, false, counter + 1,
 					false, false, false, false);
 			searchResults.add(info);
 		}

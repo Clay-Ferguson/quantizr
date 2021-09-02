@@ -52,9 +52,6 @@ public abstract class ImportArchiveBase {
 	public MimeUtil mimeUtil;
 
 	@Autowired
-	public SessionContext sc;
-
-	@Autowired
 	public FileUtils fileUtils;
 
 	public String targetPath;

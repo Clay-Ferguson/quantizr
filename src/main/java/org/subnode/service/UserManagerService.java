@@ -140,9 +140,6 @@ public class UserManagerService {
 	@Autowired
 	private AclService acl;
 
-	@Autowired
-	private SessionContext sc;
-
 	/* Private keys of each user by user name as key */
 	public static final ConcurrentHashMap<String, String> privateKeysByUserName = new ConcurrentHashMap<>();
 
@@ -152,6 +149,7 @@ public class UserManagerService {
 	 */
 	public LoginResponse login(LoginRequest req) {
 		LoginResponse res = new LoginResponse();
+		SessionContext sc = ThreadLocals.getSC();
 		// log.debug("login: " + XString.prettyPrint(req));
 
 		/* Anonymous user */
@@ -254,7 +252,7 @@ public class UserManagerService {
 	}
 
 	public void processLogin(MongoSession session, LoginResponse res, String userName) {
-
+		SessionContext sc = ThreadLocals.getSC();
 		// log.debug("processLogin: " + userName);
 		SubNode userNode = read.getUserNodeByUserName(auth.getAdminSession(), userName);
 
@@ -316,9 +314,9 @@ public class UserManagerService {
 
 	public CloseAccountResponse closeAccount(CloseAccountRequest req) {
 		CloseAccountResponse res = new CloseAccountResponse();
-		log.debug("Closing Account: " + ThreadLocals.getSessionContext().getUserName());
+		log.debug("Closing Account: " + ThreadLocals.getSC().getUserName());
 		arun.run(session -> {
-			String userName = ThreadLocals.getSessionContext().getUserName();
+			String userName = ThreadLocals.getSC().getUserName();
 
 			SubNode ownerNode = read.getUserNodeByUserName(session, userName);
 			if (ownerNode != null) {
@@ -496,8 +494,8 @@ public class UserManagerService {
 			}
 
 			if (!automated) {
-				if (!ThreadLocals.getSessionContext().getCaptcha().equals(req.getCaptcha())) {
-					int captchaFails = ThreadLocals.getSessionContext().getCaptchaFails();
+				if (!ThreadLocals.getSC().getCaptcha().equals(req.getCaptcha())) {
+					int captchaFails = ThreadLocals.getSC().getCaptchaFails();
 
 					if (captchaFails > 0) {
 						try {
@@ -507,7 +505,7 @@ public class UserManagerService {
 						} catch (Exception e) {
 						}
 					}
-					ThreadLocals.getSessionContext().setCaptchaFails(captchaFails + 1);
+					ThreadLocals.getSC().setCaptchaFails(captchaFails + 1);
 					res.setCaptchaError("Wrong captcha. Try again.");
 					res.setSuccess(false);
 				}
@@ -572,7 +570,7 @@ public class UserManagerService {
 
 	public SavePublicKeyResponse savePublicKey(final SavePublicKeyRequest req) {
 		SavePublicKeyResponse res = new SavePublicKeyResponse();
-		final String userName = ThreadLocals.getSessionContext().getUserName();
+		final String userName = ThreadLocals.getSC().getUserName();
 
 		arun.run(session -> {
 			SubNode userNode = read.getUserNodeByUserName(session, userName);
@@ -595,7 +593,7 @@ public class UserManagerService {
 
 	public GetUserAccountInfoResponse getUserAccountInfo(final GetUserAccountInfoRequest req) {
 		GetUserAccountInfoResponse res = new GetUserAccountInfoResponse();
-		final String userName = ThreadLocals.getSessionContext().getUserName();
+		final String userName = ThreadLocals.getSC().getUserName();
 
 		arun.run(session -> {
 			SubNode userNode = read.getUserNodeByUserName(session, userName);
@@ -624,13 +622,13 @@ public class UserManagerService {
 	public SaveUserPreferencesResponse saveUserPreferences(final SaveUserPreferencesRequest req) {
 		SaveUserPreferencesResponse res = new SaveUserPreferencesResponse();
 
-		UserPreferences userPreferences = ThreadLocals.getSessionContext().getUserPreferences();
+		UserPreferences userPreferences = ThreadLocals.getSC().getUserPreferences();
 		// note: This will be null if session has timed out.
 		if (userPreferences == null) {
 			return res;
 		}
 
-		final String userName = ThreadLocals.getSessionContext().getUserName();
+		final String userName = ThreadLocals.getSC().getUserName();
 
 		arun.run(session -> {
 			SubNode prefsNode = read.getUserNodeByUserName(session, userName);
@@ -665,7 +663,7 @@ public class UserManagerService {
 
 	public SaveUserProfileResponse saveUserProfile(final SaveUserProfileRequest req) {
 		SaveUserProfileResponse res = new SaveUserProfileResponse();
-		final String userName = ThreadLocals.getSessionContext().getUserName();
+		final String userName = ThreadLocals.getSC().getUserName();
 
 		arun.run(session -> {
 			boolean failed = false;
@@ -699,7 +697,7 @@ public class UserManagerService {
 
 	public BlockUserResponse blockUser(MongoSession session, final BlockUserRequest req) {
 		BlockUserResponse res = new BlockUserResponse();
-		final String userName = ThreadLocals.getSessionContext().getUserName();
+		final String userName = ThreadLocals.getSC().getUserName();
 		session = MongoThreadLocal.ensure(session);
 
 		// get the node that holds all blocked users
@@ -742,7 +740,7 @@ public class UserManagerService {
 	public AddFriendResponse addFriend(MongoSession session, final AddFriendRequest req) {
 		apUtil.log("addFriend request: " + XString.prettyPrint(req));
 		AddFriendResponse res = new AddFriendResponse();
-		final String userName = ThreadLocals.getSessionContext().getUserName();
+		final String userName = ThreadLocals.getSC().getUserName();
 		session = MongoThreadLocal.ensure(session);
 
 		String _newUserName = req.getUserName();
@@ -791,7 +789,7 @@ public class UserManagerService {
 
 	public GetUserProfileResponse getUserProfile(final GetUserProfileRequest req) {
 		GetUserProfileResponse res = new GetUserProfileResponse();
-		final String sessionUserName = ThreadLocals.getSessionContext().getUserName();
+		final String sessionUserName = ThreadLocals.getSC().getUserName();
 
 		arun.run(session -> {
 			SubNode userNode = null;
@@ -833,7 +831,7 @@ public class UserManagerService {
 				Long followingCount = apFollowing.countFollowingOfUser(session, nodeUserName, actorUrl);
 				userProfile.setFollowingCount(followingCount.intValue());
 
-				if (!ThreadLocals.getSessionContext().isAnonUser()) {
+				if (!ThreadLocals.getSC().isAnonUser()) {
 					/*
 					 * Only for local users do we attemp to generate followers and following, but theoretically we can
 					 * use the ActPub API to query for this for foreign users also.
@@ -854,7 +852,7 @@ public class UserManagerService {
 	}
 
 	public boolean userIsFollowedByMe(MongoSession session, String maybeFollowedUser) {
-		final String userName = ThreadLocals.getSessionContext().getUserName();
+		final String userName = ThreadLocals.getSC().getUserName();
 		SubNode friendsList =
 				read.getUserNodeByType(session, userName, null, null, NodeType.FRIEND_LIST.s(), null, NodeName.BLOCKED_USERS);
 		SubNode userNode = read.findNodeByUserAndType(session, friendsList, maybeFollowedUser, NodeType.FRIEND.s());
@@ -862,7 +860,7 @@ public class UserManagerService {
 	}
 
 	public boolean userIsBlockedByMe(MongoSession session, String maybeBlockedUser) {
-		final String userName = ThreadLocals.getSessionContext().getUserName();
+		final String userName = ThreadLocals.getSC().getUserName();
 		SubNode blockedList =
 				read.getUserNodeByType(session, userName, null, null, NodeType.BLOCKED_USERS.s(), null, NodeName.BLOCKED_USERS);
 		SubNode userNode = read.findNodeByUserAndType(session, blockedList, maybeBlockedUser, NodeType.FRIEND.s());
@@ -1177,7 +1175,7 @@ public class UserManagerService {
 			return Integer.MAX_VALUE;
 		}
 
-		SubNode userNode = read.getUserNodeByUserName(auth.getAdminSession(), sc.getUserName());
+		SubNode userNode = read.getUserNodeByUserName(auth.getAdminSession(), ThreadLocals.getSC().getUserName());
 		long ret = userNode.getIntProp(NodeProp.BIN_QUOTA.s());
 		if (ret == 0) {
 			return Const.DEFAULT_USER_QUOTA;

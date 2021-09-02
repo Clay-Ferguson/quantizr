@@ -19,6 +19,7 @@ import org.subnode.service.IPFSService;
 import org.subnode.util.Cast;
 import org.subnode.util.ThreadLocals;
 import org.subnode.util.ValContainer;
+import org.subnode.util.XString;
 
 @Component
 public class MongoUpdate {
@@ -94,7 +95,14 @@ public class MongoUpdate {
 				 */
 				for (SubNode node : MongoThreadLocal.getDirtyNodes().values()) {
 					if (!asAdmin) {
-						auth.ownerAuth(session, node);
+						try {
+							auth.ownerAuth(session, node);
+						} catch (Exception e) {
+							log.debug("Dirty node save attempt failed: " + XString.prettyPrint(node));
+							log.debug("Your mongoSession has user: " + session.getUserName() + //
+									" and your ThreadLocal session is: " + ThreadLocals.getSC().getUserName());
+							throw e;
+						}
 					}
 					nodes.add(node);
 				}

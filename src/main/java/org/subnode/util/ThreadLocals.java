@@ -33,6 +33,25 @@ public class ThreadLocals {
 		stopwatchTime.remove();
 	}
 
+	public static ThreadLocalsContext getContext() {
+		// log.debug("getting context from thread: " + Thread.currentThread().getName());
+		ThreadLocalsContext ctx = new ThreadLocalsContext();
+		ctx.threadId = Thread.currentThread().getId();
+		ctx.httpSession = getHttpSession();
+		ctx.servletResponse = getServletResponse();
+		ctx.sessionContext = getSC();
+		ctx.response = getResponse();
+		return ctx;
+	}
+
+	public static void setContext(ThreadLocalsContext ctx) {
+		// log.debug("setting context into thread: " + Thread.currentThread().getName());
+		setHttpSession(ctx.httpSession);
+		setServletResponse(ctx.servletResponse);
+		setSC(ctx.sessionContext);
+		setResponse(ctx.response);
+	}
+
 	public static void setHttpSession(HttpSession session) {
 		httpSession.set(session);
 	}
@@ -41,11 +60,11 @@ public class ThreadLocals {
 		return httpSession.get();
 	}
 
-	public static void setSessionContext(SessionContext sc) {
+	public static void setSC(SessionContext sc) {
 		sessionContext.set(sc);
 	}
 
-	public static SessionContext getSessionContext() {
+	public static SessionContext getSC() {
 		return sessionContext.get();
 	}
 

@@ -10,7 +10,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.web.util.WebUtils;
-import org.subnode.config.SessionContext;
 import org.subnode.exception.NotLoggedInException;
 import org.subnode.exception.OutOfSpaceException;
 import org.subnode.model.client.ErrorType;
@@ -29,9 +28,6 @@ import org.subnode.util.XString;
 @Component
 public class CallProcessor {
 	private static final Logger log = LoggerFactory.getLogger(CallProcessor.class);
-
-	@Autowired
-	private SessionContext sc;
 
 	@Autowired
 	private MongoUpdate update;
@@ -65,7 +61,7 @@ public class CallProcessor {
 		}
 
 		try {
-			sc.stopwatch("> " + command);
+			ThreadLocals.getSC().stopwatch("> " + command);
 			if (mutex != null) {
 				mutex.lockEx();
 			}
@@ -77,8 +73,8 @@ public class CallProcessor {
 				// mutexCounter++;
 				// log.debug("Enter: mutexCounter: "+String.valueOf(mutexCounter));
 				Date now = new Date();
-				sc.setLastActiveTime(now.getTime());
-				MongoSession ms = sc.getMongoSession();
+				ThreadLocals.getSC().setLastActiveTime(now.getTime());
+				MongoSession ms = ThreadLocals.getSC().getMongoSession();
 				MongoThreadLocal.setMongoSession(ms);
 				ret = runner.run(ms);
 				update.saveSession(ms);
@@ -118,7 +114,7 @@ public class CallProcessor {
 				orb.setStackTrace(ExceptionUtils.getStackTrace(e));
 			}
 		} finally {
-			sc.stopwatch("< " + command);
+			ThreadLocals.getSC().stopwatch("< " + command);
 			if (mutex != null) {
 				mutex.unlockEx();
 			}

@@ -313,7 +313,7 @@ public class ExportServiceFlexmark {
 		 */
 		else {
 			String path = "/mobile/api/bin/" + bin + "?nodeId=" + node.getId().toHexString() + "&token="
-					+ URLEncoder.encode(ThreadLocals.getSessionContext().getUserToken(), StandardCharsets.UTF_8);
+					+ URLEncoder.encode(ThreadLocals.getSC().getUserToken(), StandardCharsets.UTF_8);
 			src = appProp.getHostAndPort() + path;
 		}
 

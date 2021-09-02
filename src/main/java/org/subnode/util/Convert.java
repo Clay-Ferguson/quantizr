@@ -289,7 +289,7 @@ public class Convert {
 		return ret;
 	}
 
-	public AccessControlInfo convertToAccessControlInfo(SessionContext sessioContext, SubNode node, String principalId,
+	public AccessControlInfo convertToAccessControlInfo(SessionContext sc, SubNode node, String principalId,
 			AccessControl ac) {
 		AccessControlInfo acInfo = new AccessControlInfo();
 		acInfo.setPrincipalNodeId(principalId);

@@ -127,6 +127,8 @@ public class NodeEditService {
 	 * by the controller that accepts a node being created by the GUI/user
 	 */
 	public CreateSubNodeResponse createSubNode(MongoSession session, CreateSubNodeRequest req) {
+		log.debug("createSubNode");
+		MongoThreadLocal.dumpDirtyNodes(); //todo-0: temp code
 		CreateSubNodeResponse res = new CreateSubNodeResponse();
 		session = MongoThreadLocal.ensure(session);
 
@@ -140,9 +142,8 @@ public class NodeEditService {
 		 * "My Posts" node
 		 */
 		if (nodeId == null && !linkBookmark) {
-			node = read.getUserNodeByType(session, null, null,
-					"### " + ThreadLocals.getSessionContext().getUserName() + "'s Public Posts", NodeType.POSTS.s(),
-					Arrays.asList(PrivilegeType.READ.s()), NodeName.POSTS);
+			node = read.getUserNodeByType(session, null, null, "### " + ThreadLocals.getSC().getUserName() + "'s Public Posts",
+					NodeType.POSTS.s(), Arrays.asList(PrivilegeType.READ.s()), NodeName.POSTS);
 
 			if (node != null) {
 				nodeId = node.getId().toHexString();
@@ -222,9 +223,10 @@ public class NodeEditService {
 		}
 
 		update.save(session, newNode);
-		res.setNewNode(convert.convertToNodeInfo(ThreadLocals.getSessionContext(), session, newNode, true, false, -1, false,
-				false, false, false));
+		res.setNewNode(
+				convert.convertToNodeInfo(ThreadLocals.getSC(), session, newNode, true, false, -1, false, false, false, false));
 
+		log.debug("createSubNode complete");
 		res.setSuccess(true);
 		return res;
 	}
@@ -369,8 +371,8 @@ public class NodeEditService {
 		auth.setDefaultReplyAcl(null, parentNode, newNode);
 
 		update.save(session, newNode);
-		res.setNewNode(convert.convertToNodeInfo(ThreadLocals.getSessionContext(), session, newNode, true, false, -1, false,
-				false, false, false));
+		res.setNewNode(
+				convert.convertToNodeInfo(ThreadLocals.getSC(), session, newNode, true, false, -1, false, false, false, false));
 
 		// if (req.isUpdateModTime() && !StringUtils.isEmpty(newNode.getContent()) //
 		// // don't evern send notifications when 'admin' is the one doing the editing.
@@ -431,8 +433,8 @@ public class NodeEditService {
 			String nodeName = nodeInfo.getName().trim();
 
 			// if not admin we have to lookup the node with "userName:nodeName" format
-			if (!ThreadLocals.getSessionContext().isAdmin()) {
-				nodeName = ThreadLocals.getSessionContext().getUserName() + ":" + nodeName;
+			if (!ThreadLocals.getSC().isAdmin()) {
+				nodeName = ThreadLocals.getSC().getUserName() + ":" + nodeName;
 			}
 
 			/*
@@ -490,7 +492,7 @@ public class NodeEditService {
 		String ipfsLink = node.getStrProp(NodeProp.IPFS_LINK);
 		if (ipfsLink != null) {
 
-			asyncExec.run(() -> {
+			asyncExec.run(ThreadLocals.getContext(), () -> {
 				arun.run(sess -> {
 					// if there's no 'ref' property this is not a foreign reference, which means we
 					// DO pin this.
@@ -535,9 +537,9 @@ public class NodeEditService {
 		 */
 		util.setPendingPath(node, false);
 
-		final String sessionUserName = ThreadLocals.getSessionContext().getUserName();
+		final String sessionUserName = ThreadLocals.getSC().getUserName();
 
-		asyncExec.run(() -> {
+		asyncExec.run(ThreadLocals.getContext(), () -> {
 			arun.run(s -> {
 				/* Send notification to local server or to remote server when a node is added */
 				if (!StringUtils.isEmpty(node.getContent()) //
@@ -562,15 +564,17 @@ public class NodeEditService {
 			});
 		});
 
-		NodeInfo newNodeInfo = convert.convertToNodeInfo(ThreadLocals.getSessionContext(), session, node, true, false, -1, false,
-				false, true, false);
+		NodeInfo newNodeInfo =
+				convert.convertToNodeInfo(ThreadLocals.getSC(), session, node, true, false, -1, false, false, true, false);
 		res.setNode(newNodeInfo);
 
-		// todo-1: for now we only push nodes if public, up to browsers rather than doing a specific check
-		// to send only to users who should see it.
-		if (AclService.isPublic(session, node)) {
-			userFeedService.pushTimelineUpdateToBrowsers(session, newNodeInfo);
-		}
+		asyncExec.run(ThreadLocals.getContext(), () -> {
+			// todo-1: for now we only push nodes if public, up to browsers rather than doing a specific check
+			// to send only to users who should see it.
+			if (AclService.isPublic(session, node)) {
+				userFeedService.pushTimelineUpdateToBrowsers(session, newNodeInfo);
+			}
+		});
 
 		res.setSuccess(true);
 		return res;
@@ -586,9 +590,9 @@ public class NodeEditService {
 		final String friendUserName = node.getStrProp(NodeProp.USER.s());
 		if (friendUserName != null) {
 			// if a foreign user, update thru ActivityPub.
-			if (friendUserName.contains("@") && !ThreadLocals.getSessionContext().isAdmin()) {
+			if (friendUserName.contains("@") && !ThreadLocals.getSC().isAdmin()) {
 				apUtil.log("calling setFollowing=true, to post follow to foreign server.");
-				String followerUser = ThreadLocals.getSessionContext().getUserName();
+				String followerUser = ThreadLocals.getSC().getUserName();
 				apFollowing.setFollowing(followerUser, friendUserName, true);
 			}
 
@@ -601,9 +605,9 @@ public class NodeEditService {
 				 * search of them, and a load/update of their outbox
 				 */
 				if (friendUserName.contains("@")) {
-					asyncExec.run(() -> {
+					asyncExec.run(ThreadLocals.getContext(), () -> {
 						arun.run(s -> {
-							if (!ThreadLocals.getSessionContext().isAdmin()) {
+							if (!ThreadLocals.getSC().isAdmin()) {
 								apService.getAcctNodeByUserName(s, friendUserName);
 							}
 

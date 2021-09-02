@@ -705,7 +705,7 @@ public class MongoRead {
             List<String> defaultPrivs, String defaultName) {
         if (userNode == null) {
             if (userName == null) {
-                userName = ThreadLocals.getSessionContext().getUserName();
+                userName = ThreadLocals.getSC().getUserName();
             }
             userNode = getUserNodeByUserName(session, userName);
         }
@@ -765,7 +765,7 @@ public class MongoRead {
         }
 
         if (type.equals(NodeType.POSTS.s())) {
-            return "### " + ThreadLocals.getSessionContext().getUserName() + "'s Public Posts";
+            return "### " + ThreadLocals.getSC().getUserName() + "'s Public Posts";
         }
 
         if (type.equals(NodeType.NOTES.s())) {
@@ -800,7 +800,7 @@ public class MongoRead {
             return ret;
         }
         if (user == null) {
-            user = ThreadLocals.getSessionContext().getUserName();
+            user = ThreadLocals.getSC().getUserName();
         }
         user = user.trim();
 

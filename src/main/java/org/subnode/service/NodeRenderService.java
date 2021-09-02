@@ -138,7 +138,7 @@ public class NodeRenderService {
 		/* If only the single node was requested return that */
 		if (req.isSingleNode()) {
 			// that loads these all asynchronously.
-			NodeInfo nodeInfo = convert.convertToNodeInfo(ThreadLocals.getSessionContext(), session, node, true, false, -1, false,
+			NodeInfo nodeInfo = convert.convertToNodeInfo(ThreadLocals.getSC(), session, node, true, false, -1, false,
 					false, true, false);
 			res.setNode(nodeInfo);
 			res.setSuccess(true);
@@ -226,7 +226,7 @@ public class NodeRenderService {
 
 		// todo-1: this was a quick fix, and this urlId handling is also a slight bit awkward and maybe
 		// needs to be reworked.
-		ThreadLocals.getSessionContext().setUrlId(null);
+		ThreadLocals.getSC().setUrlId(null);
 
 		// log.debug("renderNode Full Return: " + XString.prettyPrint(res));
 		return res;
@@ -244,7 +244,7 @@ public class NodeRenderService {
 		 * asynchronously from the page load, after the page renders, to make things perform better (i.e.
 		 * faster diaplay of pages)
 		 */
-		NodeInfo nodeInfo = convert.convertToNodeInfo(ThreadLocals.getSessionContext(), session, node, true, false,
+		NodeInfo nodeInfo = convert.convertToNodeInfo(ThreadLocals.getSC(), session, node, true, false,
 				logicalOrdinal, level > 0, false, false, false);
 
 		if (level > 0) {
@@ -467,7 +467,7 @@ public class NodeRenderService {
 			return res;
 		}
 
-		NodeInfo nodeInfo = convert.convertToNodeInfo(ThreadLocals.getSessionContext(), session, node, false, true, -1, false,
+		NodeInfo nodeInfo = convert.convertToNodeInfo(ThreadLocals.getSC(), session, node, false, true, -1, false,
 				false, true, false);
 		res.setNodeInfo(nodeInfo);
 		res.setSuccess(true);
@@ -485,9 +485,9 @@ public class NodeRenderService {
 		String id = appProp.getUserLandingPageNode();
 		// log.debug("Anon Render Node ID: " + id);
 
-		if (ThreadLocals.getSessionContext().getUrlId() != null) {
-			id = ThreadLocals.getSessionContext().getUrlId();
-			ThreadLocals.getSessionContext().setUrlId(null);
+		if (ThreadLocals.getSC().getUrlId() != null) {
+			id = ThreadLocals.getSC().getUrlId();
+			ThreadLocals.getSC().setUrlId(null);
 		}
 
 		// log.debug("anonPageLoad id=" + id);

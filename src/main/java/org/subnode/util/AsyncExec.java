@@ -1,29 +1,42 @@
 package org.subnode.util;
 
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 
-/* Warning do not call this run method from INSIDE this class. Due to the spring proxy 'issue' you can't do that */
+/*
+ * Warning do not call this run method from INSIDE this class. Due to the spring proxy 'issue' you
+ * can't do that
+ */
 @Component
 public class AsyncExec {
-
     /*
-     * For now we can run each 'runnable' in it's own thread just the way
-     * spring @Async was designed but I can also envision later converting this into
-     * a Queue container that lets a single other thread just eat away at the queue
-     * always in ONE single dedicated thread, which may cause less contention and be
-     * more 'healthy' use of system resources, because the only reason we have async
-     * capability is so that the REST endpoints can return as fast as possible and
-     * queue any async functions that can be done in the background, so a single
-     * queue and background thread can accomplish this potentially better with less
-     * thread contention, by running async queued functions sequentially in that
-     * thread.
+     * *** DO NOT DELETE *** This is left here as an example of what NOT TO DO. Because of the way
+     * Spring Annotated methods use the 'proxy' interface (i.e. like AOP) if you call an annotated
+     * method from another method INSIDE the same class, the annotation gets ignored, because in that
+     * case it goes around the proxy (not calling thru proxy) and therefore the method below will FAIL
+     * by executing the @Async SYNCHRONOUSLY in the same thread. Note that the exception that can be
+     * thrown based by checking threadId is also protecting us against this mistake.
      */
-    
-    // oops: we can't do async thread UNTIL SessionContext and ThreadLocals is taken care of.
-    // import org.springframework.scheduling.annotation.Async;
-    // @Async("threadPoolTaskExecutor")
+    // public void run(Runnable runnable) {
+    // run(ThreadLocals.getContext(), runnable);
+    // }
 
-    public void run(Runnable runnable) {
+    // WARNING: This thread (all methods called of course) needs to avoid attempting to get
+    // SessionContext autowiring or access ThreadLocals from the request thread so....
+    // todo-0: Should we STOP ever autowiring SessionContext and always stuff that into thread-locals in
+    // the webfilter instead
+    // todo-0: setting the ThreadLocal in this thread should work, just pass from the calling thread.
+    @Async("threadPoolTaskExecutor")
+    public void run(ThreadLocalsContext tlc, Runnable runnable) {
+
+        /*
+         * if the currently executing threadId is the same as the one from the passed in 'tlc' we definitely
+         * have a bug, and the @Async annotation is not having an effect.
+         */
+        if (Thread.currentThread().getId() == tlc.threadId) {
+            throw new RuntimeException("AsyncExec ran running synchronously!");
+        }
+        ThreadLocals.setContext(tlc);
         runnable.run();
     }
 }
