@@ -142,7 +142,6 @@ export class View implements ViewIntf {
                     res.node.children = state.node.children.concat(res.node.children.filter(child => !idSet.has(child.id)));
                 }
                 S.render.renderPageFromData(res, false, null, false, false);
-                S.render.getNodeMetaInfo(res.node);
             }
             // else, loading in a page which overrides and discards all existing nodes in browser view
             else {

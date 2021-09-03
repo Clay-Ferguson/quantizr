@@ -138,8 +138,8 @@ public class NodeRenderService {
 		/* If only the single node was requested return that */
 		if (req.isSingleNode()) {
 			// that loads these all asynchronously.
-			NodeInfo nodeInfo = convert.convertToNodeInfo(ThreadLocals.getSC(), session, node, true, false, -1, false,
-					false, true, false);
+			NodeInfo nodeInfo =
+					convert.convertToNodeInfo(ThreadLocals.getSC(), session, node, true, false, -1, false, false, true, false);
 			res.setNode(nodeInfo);
 			res.setSuccess(true);
 			return res;
@@ -238,14 +238,19 @@ public class NodeRenderService {
 		/*
 		 * see also: tag #getNodeMetaInfo
 		 * 
-		 * Note: if you set the hasChildren to true, here to update children flag on nodes immediately here,
-		 * then you can also remove the getNodeMetaInfo() call wher eyou see that on the client, and that's
+		 * Note: if you set the hasChildren to true here to update children flag on nodes immediately here,
+		 * then you can also remove the getNodeMetaInfo() call where you see that on the client, and that's
 		 * all you need to do, but for now we're using getNodeMetaInfo to query for all the children
 		 * asynchronously from the page load, after the page renders, to make things perform better (i.e.
-		 * faster diaplay of pages)
+		 * faster diaplay of pages).
+		 * 
+		 * So this means the page first renders *without* knowing of any 'hasChildren' (resulting in no
+		 * expand icons displayed), and then slightly after that the client calls getNodeMetaInfo() to
+		 * retrieve that information asynchronously and then updates the page, showing all the expand icons
+		 * on all the nodes that have children.
 		 */
-		NodeInfo nodeInfo = convert.convertToNodeInfo(ThreadLocals.getSC(), session, node, true, false,
-				logicalOrdinal, level > 0, false, false, false);
+		NodeInfo nodeInfo = convert.convertToNodeInfo(ThreadLocals.getSC(), session, node, true, false, logicalOrdinal, level > 0,
+				false, false, false);
 
 		if (level > 0) {
 			return nodeInfo;
@@ -467,8 +472,8 @@ public class NodeRenderService {
 			return res;
 		}
 
-		NodeInfo nodeInfo = convert.convertToNodeInfo(ThreadLocals.getSC(), session, node, false, true, -1, false,
-				false, true, false);
+		NodeInfo nodeInfo =
+				convert.convertToNodeInfo(ThreadLocals.getSC(), session, node, false, true, -1, false, false, true, false);
 		res.setNodeInfo(nodeInfo);
 		res.setSuccess(true);
 		return res;

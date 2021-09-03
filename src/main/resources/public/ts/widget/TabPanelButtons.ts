@@ -45,6 +45,13 @@ export class TabPanelButtons extends Div {
     }
 
     getTabButton(state: AppState, data: TabDataIntf): Li {
+        let tabName = data.name;
+
+        // slight hack until we have 'name' as a function and not a string.
+        if (tabName === "Feed" && state.feedFilterRootNode) {
+            tabName = "Chat Room";
+        }
+
         return new Li(null, {
             className: "nav-item navItem",
             style: { display: data.isVisible() ? "inline" : "none" },
@@ -54,7 +61,7 @@ export class TabPanelButtons extends Div {
                 S.quanta.selectTab(data.id);
             }
         }, [
-            new Anchor("#" + data.id, data.name, {
+            new Anchor("#" + data.id, tabName, {
                 "data-toggle": "tab",
                 className: "nav-link myNavTab" + (state.activeTab === data.id ? " active" : "")
             })

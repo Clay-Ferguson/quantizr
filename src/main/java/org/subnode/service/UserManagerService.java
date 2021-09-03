@@ -71,6 +71,7 @@ import org.subnode.response.SavePublicKeyResponse;
 import org.subnode.response.SaveUserPreferencesResponse;
 import org.subnode.response.SaveUserProfileResponse;
 import org.subnode.response.SignupResponse;
+import org.subnode.util.AsyncExec;
 import org.subnode.util.Const;
 import org.subnode.util.DateUtil;
 import org.subnode.util.ExUtil;
@@ -139,6 +140,9 @@ public class UserManagerService {
 
 	@Autowired
 	private AclService acl;
+
+	@Autowired
+	private AsyncExec asyncExec;
 
 	/* Private keys of each user by user name as key */
 	public static final ConcurrentHashMap<String, String> privateKeysByUserName = new ConcurrentHashMap<>();
@@ -747,43 +751,50 @@ public class UserManagerService {
 		_newUserName = XString.stripIfStartsWith(_newUserName, "@");
 		final String newUserName = _newUserName;
 
-		// get the Friend List of the follower
-		SubNode followerFriendList =
-				read.getUserNodeByType(session, userName, null, null, NodeType.FRIEND_LIST.s(), null, NodeName.FRIENDS);
+		asyncExec.run(ThreadLocals.getContext(), () -> {
+			MongoSession ms = ThreadLocals.getMongoSession();
 
-		/*
-		 * lookup to see if this followerFriendList node already has userToFollow already under it
-		 */
-		SubNode friendNode = read.findNodeByUserAndType(session, followerFriendList, newUserName, NodeType.FRIEND.s());
-		if (friendNode == null) {
-			apUtil.log("loadForeignUser: " + newUserName);
-			apService.loadForeignUser(newUserName);
+			// get the Friend List of the follower
+			SubNode followerFriendList =
+					read.getUserNodeByType(ms, userName, null, null, NodeType.FRIEND_LIST.s(), null, NodeName.FRIENDS);
 
-			apUtil.log("Creating friendNode for " + newUserName);
-			friendNode = edit.createFriendNode(session, followerFriendList, newUserName);
+			/*
+			 * lookup to see if this followerFriendList node already has userToFollow already under it
+			 */
+			SubNode friendNode = read.findNodeByUserAndType(ms, followerFriendList, newUserName, NodeType.FRIEND.s());
 
-			if (friendNode != null) {
-				ValContainer<SubNode> userNode = new ValContainer<SubNode>();
-				arun.run(s -> {
-					userNode.setVal(read.getUserNodeByUserName(s, newUserName));
-					return null;
-				});
+			// if friendNode was non-null here it means we were already following the user.
+			if (friendNode == null) {
+				apUtil.log("loadForeignUser: " + newUserName);
+				apService.loadForeignUser(newUserName);
 
-				if (userNode.getVal() != null) {
-					friendNode.setProp(NodeProp.USER_NODE_ID.s(), userNode.getVal().getId().toHexString());
+				apUtil.log("Creating friendNode for " + newUserName);
+				friendNode = edit.createFriendNode(ms, followerFriendList, newUserName);
+
+				if (friendNode != null) {
+					ValContainer<SubNode> userNode = new ValContainer<SubNode>();
+					arun.run(s -> {
+						userNode.setVal(read.getUserNodeByUserName(s, newUserName));
+						return null;
+					});
+
+					if (userNode.getVal() != null) {
+						friendNode.setProp(NodeProp.USER_NODE_ID.s(), userNode.getVal().getId().toHexString());
+					}
+
+					edit.updateSavedFriendNode(friendNode);
+
+					// todo-1: eventually we can have a design that pushes these results back to the browser async
+					// instead of optimistically saying 'Added friend'
+					// res.setMessage("Added Friend: " + newUserName);
+				} else {
+
+					// res.setMessage("Unable to add Friend: " + newUserName);
 				}
-
-				edit.updateSavedFriendNode(friendNode);
-				res.setMessage("Added new Friend: " + newUserName);
-			} else {
-				res.setMessage("Unable to add Friend: " + newUserName);
-			}
-
-			res.setSuccess(true);
-		} else {
-			res.setMessage("You're already following " + newUserName);
-			res.setSuccess(true);
-		}
+			} 
+		});
+		res.setMessage("Added Friend: " + newUserName);
+		res.setSuccess(true);
 		return res;
 	}
 

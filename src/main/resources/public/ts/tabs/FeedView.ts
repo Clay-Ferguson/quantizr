@@ -71,11 +71,24 @@ export class FeedView extends AppTab {
         let rowCount = 0;
         let children: Comp[] = [];
         let content = state.feedFilterRootNode ? S.util.getShortContent(state.feedFilterRootNode) : null;
+        let showBookmarkIcon: boolean = false;
+
+        // set showBookmarkIcon visible if we don't already have it bookmarked
+        if (state.feedFilterRootNode) {
+            showBookmarkIcon = !state.bookmarks.find((bookmark: J.Bookmark): boolean => {
+                return bookmark.id === state.feedFilterRootNode.id;
+            });
+        }
 
         children.push(new Div(null, null, [
             new Div(null, { className: "marginTop" }, [
                 this.renderHeading(state),
                 new Span(null, { className: "float-right" }, [
+                    showBookmarkIcon ? new Icon({
+                        className: "fa fa-bookmark fa-lg clickable marginRight",
+                        title: "Bookmark Chat Room",
+                        onClick: () => S.edit.addBookmark(state.feedFilterRootNode, state)
+                    }) : null,
                     state.feedFilterRootNode ? new IconButton("fa-arrow-left", "Back", {
                         onClick: () => S.view.jumpToId(state.feedFilterRootNode.id),
                         title: "Back to Node"

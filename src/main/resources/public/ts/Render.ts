@@ -15,14 +15,11 @@ import * as J from "./JavaIntf";
 import { PubSub } from "./PubSub";
 import { Singletons } from "./Singletons";
 import { Comp } from "./widget/base/Comp";
-import { Button } from "./widget/Button";
-import { ButtonBar } from "./widget/ButtonBar";
-import { Clearfix } from "./widget/Clearfix";
 import { Div } from "./widget/Div";
 import { Heading } from "./widget/Heading";
 import { HorizontalLayout } from "./widget/HorizontalLayout";
-import { Html } from "./widget/Html";
 import { Img } from "./widget/Img";
+import { Span } from "./widget/Span";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (s: Singletons) => {
@@ -373,8 +370,7 @@ export class Render implements RenderIntf {
                         s.endReached = res.endReached;
                         s.breadcrumbs = res.breadcrumbs;
 
-                        debugger;
-                        /* Another slight hack to make viewing 'posts' or chat rooms nodes turn on metaData */
+                        /* Slight hack to make viewing 'posts' or chat rooms nodes turn on metaData */
                         if (s.node.type === J.NodeType.POSTS ||
                             s.node.type === J.NodeType.ROOM) {
                             s.userPreferences.showMetaData = true;
@@ -482,13 +478,13 @@ export class Render implements RenderIntf {
                                 */
                                 300);
                         });
-
-                        // see also: tag #getNodeMetaInfo
-                        this.getNodeMetaInfo(res.node);
                     }
                     else {
                         this.allowFadeInId = true;
                     }
+
+                    // see also: tag #getNodeMetaInfo
+                    this.getNodeMetaInfo(res.node);
 
                     // only focus the TAB if we're not editing, because if editing the edit field will be focused. In other words,
                     // if we're about to initiate editing a TextArea field will be getting focus
@@ -511,36 +507,52 @@ export class Render implements RenderIntf {
     Note: Users will be able to see the fading in fadeInRowBkgClz class for the length of time it takes
     the getNodeMetaInfo, this is ok and is the current design. The fading now works kind of like a progress indicator
     by keeping user busy watching something.
+
+    This function will perform well even if called repeatedly. Only does the work once as neccessary so we can call this
+    safely after every time we get new data from the server, with no unnecessarey performance hit.
     */
     getNodeMetaInfo = (node: J.NodeInfo) => {
-        if (node.children) {
+        if (node && node.children) {
+            // Holds the list of IDs we will query for. Only those with "metainfDone==false", meaning we
+            // haven't yet pulled the metadata yet.
             let ids: string[] = [];
+
             for (let child of node.children) {
                 if (!(child as any).metaInfDone) {
                     ids.push(child.id);
                 }
             }
 
-            // console.log("MetaQuery idCount=" + ids.length);
-            S.util.ajax<J.GetNodeMetaInfoRequest, J.GetNodeMetaInfoResponse>("getNodeMetaInfo", {
-                ids
-            }, (res: J.GetNodeMetaInfoResponse) => {
-                dispatch("Action_updateNodeMetaInfo", (s: AppState): AppState => {
-                    if (s.node && s.node.children) {
-                        s.node.hasChildren = true;
-                        for (let child of s.node.children) {
-                            if (!(child as any).metaInfDone) {
-                                let inf: J.NodeMetaIntf = res.nodeIntf.find(v => v.id === child.id);
-                                if (inf) {
-                                    child.hasChildren = inf.hasChildren;
+            if (ids.length > 0) {
+                // console.log("MetaQuery idCount=" + ids.length);
+                S.util.ajax<J.GetNodeMetaInfoRequest, J.GetNodeMetaInfoResponse>("getNodeMetaInfo", {
+                    ids
+                }, (res: J.GetNodeMetaInfoResponse) => {
+                    dispatch("Action_updateNodeMetaInfo", (s: AppState): AppState => {
+                        if (s.node && s.node.children) {
+                            s.node.hasChildren = true;
+
+                            // iterate all children
+                            for (let child of s.node.children) {
+
+                                // if this is a child we will have just pulled down
+                                if (!(child as any).metaInfDone) {
+
+                                    // find the child in what we just pulled down.
+                                    let inf: J.NodeMetaIntf = res.nodeIntf.find(v => v.id === child.id);
+
+                                    // set the hasChildren to the value we just pulled down.
+                                    if (inf) {
+                                        child.hasChildren = inf.hasChildren;
+                                    }
+                                    (child as any).metaInfDone = true;
                                 }
-                                (child as any).metaInfDone = true;
                             }
                         }
-                    }
-                    return s;
-                });
-            }, null, true);
+                        return s;
+                    });
+                }, null, true);
+            }
         }
     }
 
@@ -714,13 +726,16 @@ export class Render implements RenderIntf {
                     // new Clearfix(),
 
                     new Div(displayName, {
-                        className: "userName clickable",
-                        onClick
+                        className: "userName"
                     }),
-                    new Div("@" + user, {
-                        className: (displayName ? "" : "userName ") + "clickable",
-                        onClick
-                    })
+                    new Div(null, null, [
+                        // we use a span because the div stretches across empty space and does a mouse click
+                        // when you didn't intend to click the actual name sometimes.
+                        new Span("@" + user, {
+                            className: (displayName ? "" : "userName ") + "clickable",
+                            onClick
+                        })
+                    ])
 
                     // The page just looks cleaner with the username only. We can click them to see their bio text.
                     // userBio ? new Html(userBio, {
