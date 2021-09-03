@@ -8,6 +8,7 @@ import { MessageDlg } from "./dlg/MessageDlg";
 import { FollowersRSInfo } from "./FollowersRSInfo";
 import { FollowingRSInfo } from "./FollowingRSInfo";
 import { SearchIntf } from "./intf/SearchIntf";
+import { TabDataIntf } from "./intf/TabDataIntf";
 import * as J from "./JavaIntf";
 import { PubSub } from "./PubSub";
 import { SharesRSInfo } from "./SharesRSInfo";
@@ -187,6 +188,33 @@ export class Search implements SearchIntf {
                 return s;
             });
         });
+    }
+
+    /* If we have the Auto-Refresh checkbox checked by the user, and we just detected new changes comming in then we do a request
+    from the server for a refresh */
+    feedDirtyNow = (state: AppState): void => {
+        let feedData: TabDataIntf = S.quanta.getTabDataById(C.TAB_FEED);
+
+        // put in a delay timer since we call this from other state processing functions.
+        setTimeout(() => {
+            if (feedData?.props?.autoRefresh && !state.feedLoading && !state.feedWaitingForUserRefresh) {
+                this.refreshFeed();
+            }
+        }, 500);
+    }
+
+    refreshFeed = () => {
+        let feedData: TabDataIntf = S.quanta.getTabDataById(C.TAB_FEED);
+        if (feedData) {
+            feedData.props.page = 0;
+            feedData.props.refreshCounter++;
+        }
+        dispatch("Action_RefreshFeed", (s: AppState): AppState => {
+            s.feedLoading = true;
+            return s;
+        });
+
+        S.srch.feed(feedData.props.page, feedData.props.searchTextState.getValue(), false, false);
     }
 
     /* growResults==true is the "infinite scrolling" support */

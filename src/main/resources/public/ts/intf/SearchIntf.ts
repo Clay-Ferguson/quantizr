@@ -18,4 +18,6 @@ export interface SearchIntf {
     feed(page: number, searchText: string, forceMetadataOn: boolean, growResults: boolean): any;
     showFollowers(page: number, userName: string): void;
     showFollowing(page: number, userName: string): void;
+    feedDirtyNow(state: AppState): void;
+    refreshFeed(): void;
 }

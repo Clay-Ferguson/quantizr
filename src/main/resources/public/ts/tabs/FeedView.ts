@@ -36,10 +36,6 @@ Preparing to support multiple instances of this (feed + chat), we need to remove
 */
 export class FeedView extends AppTab {
 
-    static page: number = 0;
-    static refreshCounter: number = 0;
-    static autoRefresh: boolean = true;
-
     constructor(state: AppState, data: TabDataIntf) {
         super(state, data);
         data.inst = this;
@@ -97,7 +93,7 @@ export class FeedView extends AppTab {
         children.push(new ButtonBar([
             newItems,
             new IconButton("fa-refresh", null, {
-                onClick: () => FeedView.refresh(),
+                onClick: () => S.srch.refreshFeed(),
                 title: "Refresh"
             }),
             // NOTE: state.feedFilterRootNode?.id will be null here, for full fediverse (not a node chat/node feed) scenario.
@@ -126,10 +122,10 @@ export class FeedView extends AppTab {
         children.push(new HelpButton(() => S.quanta?.config?.help?.fediverse?.feed));
         children.push(new Checkbox("Auto-refresh", { className: "marginLeft" }, {
             setValue: (checked: boolean): void => {
-                FeedView.autoRefresh = checked;
+                this.data.props.autoRefresh = checked;
             },
             getValue: (): boolean => {
-                return FeedView.autoRefresh;
+                return this.data.props.autoRefresh;
             }
         }));
 
@@ -145,10 +141,10 @@ export class FeedView extends AppTab {
                 }, [new Spinner()])
             ]));
         }
-        else if (FeedView.refreshCounter === 0) {
+        else if (this.data.props.refreshCounter === 0) {
             // if user has never done a refresh at all yet, do the first one for them automatically.
             if (state.activeTab === C.TAB_FEED) {
-                setTimeout(FeedView.refresh, 100);
+                setTimeout(this.data.props.refresh, 100);
             }
             else {
                 children.push(new Heading(4, "Refresh when ready."));
@@ -176,7 +172,7 @@ export class FeedView extends AppTab {
                     onClick: (event) => {
                         event.stopPropagation();
                         event.preventDefault();
-                        S.srch.feed(++FeedView.page, this.data.props.searchTextState.getValue(), true, false);
+                        S.srch.feed(++this.data.props.page, this.data.props.searchTextState.getValue(), true, false);
                     },
                     title: "Next Page"
                 });
@@ -188,7 +184,7 @@ export class FeedView extends AppTab {
                             entries.forEach((entry: any) => {
                                 if (entry.isIntersecting) {
                                     // observer.disconnect();
-                                    S.srch.feed(++FeedView.page, this.data.props.searchTextState.getValue(), true, true);
+                                    S.srch.feed(++this.data.props.page, this.data.props.searchTextState.getValue(), true, true);
                                 }
                             });
                         });
@@ -209,20 +205,8 @@ export class FeedView extends AppTab {
     clearSearch = () => {
         if (this.data.props.searchTextState.getValue()) {
             this.data.props.searchTextState.setValue("");
-            FeedView.refresh();
+            S.srch.refreshFeed();
         }
-    }
-
-    static refresh = () => {
-        FeedView.page = 0;
-        FeedView.refreshCounter++;
-        dispatch("Action_SetFeedFilterType", (s: AppState): AppState => {
-            s.feedLoading = true;
-            return s;
-        });
-
-        let feedData: TabDataIntf = S.quanta.getTabDataById(C.TAB_FEED);
-        S.srch.feed(FeedView.page, feedData.props.searchTextState.getValue(), false, false);
     }
 
     makeFilterButtonsBar = (state: AppState): Div => {
@@ -323,16 +307,5 @@ export class FeedView extends AppTab {
                 }
             })
         ]);
-    }
-
-    /* If we have the Auto-Refresh checkbox checked by the user, and we just detected new changes comming in then we do a request
-    from the server for a refresh */
-    static feedDirtyNow = (state: AppState): void => {
-        // put in a delay timer since we call this from other state processing functions.
-        setTimeout(() => {
-            if (FeedView.autoRefresh && !state.feedLoading && !state.feedWaitingForUserRefresh) {
-                FeedView.refresh();
-            }
-        }, 500);
     }
 }

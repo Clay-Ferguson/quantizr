@@ -495,6 +495,6 @@ export class Nav implements NavIntf {
             s = { ...s, ...props };
             return s;
         });
-        setTimeout(FeedView.refresh, 250);
+        setTimeout(S.srch.refreshFeed, 250);
     }
 }

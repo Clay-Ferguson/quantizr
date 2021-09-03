@@ -112,7 +112,7 @@ export class ServerPush implements ServerPushIntf {
                         /* note: we could que up the incomming nodeInfo, and then avoid a call to the server but for now we just
                         keep it simple and only set a dirty flag */
                         s.feedDirty = true;
-                        FeedView.feedDirtyNow(s);
+                        S.srch.feedDirtyNow(s);
                         if (nodeInfo.content && nodeInfo.content.startsWith(J.Constant.ENC_TAG)) {
                             nodeInfo.content = "[Encrypted]";
                         }

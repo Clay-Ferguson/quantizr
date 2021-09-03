@@ -686,7 +686,11 @@ export class Quanta implements QuantaIntf {
                     constructView: (data: TabDataIntf) => new FeedView(s, data),
                     rsInfo: null,
                     scrollPos: 0,
+                    // need typesafe props (todo-1)
                     props: {
+                        page: 0,
+                        refreshCounter: 0,
+                        autoRefresh: true,
                         searchTextState: new ValidatedState<any>()
                     }
                 },
