@@ -27,6 +27,7 @@ import { TimelineResultSetView } from "./tabs/TimelineResultSetView";
 import { TrendingView } from "./tabs/TrendingView";
 import { TimelineRSInfo } from "./TimelineRSInfo";
 import { TrendingRSInfo } from "./TrendingRSInfo";
+import { ValidatedState } from "./ValidatedState";
 import { App } from "./widget/App";
 import { Comp } from "./widget/base/Comp";
 import { CompIntf } from "./widget/base/CompIntf";
@@ -630,7 +631,8 @@ export class Quanta implements QuantaIntf {
                     isVisible: () => true,
                     constructView: (data: TabDataIntf) => new MainTabComp(s, data),
                     rsInfo: null,
-                    scrollPos: 0
+                    scrollPos: 0,
+                    props: {}
                 },
                 {
                     name: "Search",
@@ -638,7 +640,8 @@ export class Quanta implements QuantaIntf {
                     isVisible: () => this.resultSetHasData(C.TAB_SEARCH),
                     constructView: (data: TabDataIntf) => new SearchResultSetView(s, data),
                     rsInfo: new ResultSetInfo(),
-                    scrollPos: 0
+                    scrollPos: 0,
+                    props: {}
                 },
                 {
                     name: "Shared Nodes",
@@ -646,7 +649,8 @@ export class Quanta implements QuantaIntf {
                     isVisible: () => this.resultSetHasData(C.TAB_SHARES),
                     constructView: (data: TabDataIntf) => new SharedNodesResultSetView<SharesRSInfo>(s, data),
                     rsInfo: new SharesRSInfo(),
-                    scrollPos: 0
+                    scrollPos: 0,
+                    props: {}
                 },
                 {
                     name: "Timeline",
@@ -654,7 +658,8 @@ export class Quanta implements QuantaIntf {
                     isVisible: () => this.resultSetHasData(C.TAB_TIMELINE),
                     constructView: (data: TabDataIntf) => new TimelineResultSetView<TimelineRSInfo>(s, data),
                     rsInfo: new TimelineRSInfo(),
-                    scrollPos: 0
+                    scrollPos: 0,
+                    props: {}
                 },
                 {
                     name: "Followers",
@@ -662,7 +667,8 @@ export class Quanta implements QuantaIntf {
                     isVisible: () => this.resultSetHasData(C.TAB_FOLLOWERS),
                     constructView: (data: TabDataIntf) => new FollowersResultSetView<FollowersRSInfo>(s, data),
                     rsInfo: new FollowersRSInfo(),
-                    scrollPos: 0
+                    scrollPos: 0,
+                    props: {}
                 },
                 {
                     name: "Following",
@@ -670,7 +676,8 @@ export class Quanta implements QuantaIntf {
                     isVisible: () => this.resultSetHasData(C.TAB_FOLLOWING),
                     constructView: (data: TabDataIntf) => new FollowingResultSetView<FollowingRSInfo>(s, data),
                     rsInfo: new FollowingRSInfo(),
-                    scrollPos: 0
+                    scrollPos: 0,
+                    props: {}
                 },
                 {
                     name: "Feed",
@@ -678,7 +685,10 @@ export class Quanta implements QuantaIntf {
                     isVisible: () => true,
                     constructView: (data: TabDataIntf) => new FeedView(s, data),
                     rsInfo: null,
-                    scrollPos: 0
+                    scrollPos: 0,
+                    props: {
+                        searchTextState: new ValidatedState<any>()
+                    }
                 },
                 {
                     name: "Trending",
@@ -686,7 +696,8 @@ export class Quanta implements QuantaIntf {
                     isVisible: () => true,
                     constructView: (data: TabDataIntf) => new TrendingView(s, data),
                     rsInfo: new TrendingRSInfo(),
-                    scrollPos: 0
+                    scrollPos: 0,
+                    props: {}
                 },
                 {
                     name: "Server Info",
@@ -697,7 +708,8 @@ export class Quanta implements QuantaIntf {
                     },
                     constructView: (data: TabDataIntf) => new ServerInfoView(s, data),
                     rsInfo: null,
-                    scrollPos: 0
+                    scrollPos: 0,
+                    props: {}
                 }
 
                 // this is throwing a react error, but we don't need this now anyaay
@@ -710,11 +722,18 @@ export class Quanta implements QuantaIntf {
                 //         return state.isAdminUser;
                 //     },
                 //     constructView: (data: TabDataIntf) => new LogView(data),
-                //     rsInfo: null
+                //     rsInfo: null,
+                //     props: {}
                 // }
             ];
             return s;
         });
+    }
+
+    getTabDataById = (id: string): TabDataIntf => {
+        let state: AppState = store.getState();
+        let data = state.tabData.find(d => d.id === id);
+        return data;
     }
 
     resultSetHasData = (id: string) => {

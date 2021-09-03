@@ -84,7 +84,10 @@ export class NodeStatsDlg extends DialogBase {
         if (!word) return;
 
         if (this.feed) {
-            FeedView.searchTextState.setValue(word);
+            let feedData = S.quanta.getTabDataById(C.TAB_FEED);
+            if (feedData) {
+                feedData.props.searchTextState.setValue(word);
+            }
             S.nav.messages({
                 feedFilterFriends: false,
                 feedFilterToMe: false,

@@ -6,7 +6,6 @@ import { TabDataIntf } from "../intf/TabDataIntf";
 import * as J from "../JavaIntf";
 import { PubSub } from "../PubSub";
 import { Singletons } from "../Singletons";
-import { ValidatedState } from "../ValidatedState";
 import { AppTab } from "../widget/AppTab";
 import { Comp } from "../widget/base/Comp";
 import { CompIntf } from "../widget/base/CompIntf";
@@ -30,19 +29,12 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
     S = ctx;
 });
 
-/* General Widget that doesn't fit any more reusable or specific category other than a plain Div, but inherits capability of Comp class */
+/* General Widget that doesn't fit any more reusable or specific category other than a plain Div,
+but inherits capability of Comp classl
+
+Preparing to support multiple instances of this (feed + chat), we need to remove all 'static' props. (todo-0)
+*/
 export class FeedView extends AppTab {
-
-    static enabled: boolean = true;
-
-    // need to initially set to expanded=true for 'desktop' mode only.
-    static filterExpanded: boolean = false;
-    static searchTextState: ValidatedState<any> = new ValidatedState<any>();
-
-    /* Controls wether the view automatically refreshes before letting the user choose what options (checkboxes) they want.
-    I'm disabling because I don't like this. If I'm wanting to find just "To me" for example then I have to wait for it
-    to first query stuff I don't care about first. So I'd just rather click the "Refresh" button myself each time. */
-    static automaticInitialRefresh: boolean = true;
 
     static page: number = 0;
     static refreshCounter: number = 0;
@@ -56,11 +48,6 @@ export class FeedView extends AppTab {
     preRender(): void {
         // console.log("preRender: FeedView");
         let state: AppState = useSelector((state: AppState) => state);
-
-        if (!FeedView.enabled && !state.isAdminUser) {
-            this.setChildren([new Div("temporarily unavailable.")]);
-            return;
-        }
 
         this.attribs.className = this.getClass(state);
 
@@ -121,9 +108,9 @@ export class FeedView extends AppTab {
 
         let searchButtonBar = null;
         // if this is mobile don't even show search field unless it's currently in use (like from a trending click)
-        if (!state.mobileMode || FeedView.searchTextState.getValue()) {
+        if (!state.mobileMode || this.data.props.searchTextState.getValue()) {
             searchButtonBar = new ButtonBar([
-                new Span(null, { className: "feedSearchField" }, [new TextField("Search", false, null, null, false, FeedView.searchTextState)]),
+                new Span(null, { className: "feedSearchField" }, [new TextField("Search", false, null, null, false, this.data.props.searchTextState)]),
                 new Button("Clear", () => { this.clearSearch(); }, { className: "feedClearButton" })
             ], "marginTop");
         }
@@ -133,8 +120,8 @@ export class FeedView extends AppTab {
             searchButtonBar
         ], false,
             (state: boolean) => {
-                FeedView.filterExpanded = state;
-            }, FeedView.filterExpanded, "", "", "span"));
+                this.data.props.filterExpanded = state;
+            }, this.data.props.filterExpanded, "", "", "span"));
 
         children.push(new HelpButton(() => S.quanta?.config?.help?.fediverse?.feed));
         children.push(new Checkbox("Auto-refresh", { className: "marginLeft" }, {
@@ -160,7 +147,7 @@ export class FeedView extends AppTab {
         }
         else if (FeedView.refreshCounter === 0) {
             // if user has never done a refresh at all yet, do the first one for them automatically.
-            if (FeedView.automaticInitialRefresh && state.activeTab === C.TAB_FEED) {
+            if (state.activeTab === C.TAB_FEED) {
                 setTimeout(FeedView.refresh, 100);
             }
             else {
@@ -189,7 +176,7 @@ export class FeedView extends AppTab {
                     onClick: (event) => {
                         event.stopPropagation();
                         event.preventDefault();
-                        S.srch.feed("~" + J.NodeType.FRIEND_LIST, null, ++FeedView.page, FeedView.searchTextState.getValue(), true, false);
+                        S.srch.feed(++FeedView.page, this.data.props.searchTextState.getValue(), true, false);
                     },
                     title: "Next Page"
                 });
@@ -201,7 +188,7 @@ export class FeedView extends AppTab {
                             entries.forEach((entry: any) => {
                                 if (entry.isIntersecting) {
                                     // observer.disconnect();
-                                    S.srch.feed("~" + J.NodeType.FRIEND_LIST, null, ++FeedView.page, FeedView.searchTextState.getValue(), true, true);
+                                    S.srch.feed(++FeedView.page, this.data.props.searchTextState.getValue(), true, true);
                                 }
                             });
                         });
@@ -220,8 +207,8 @@ export class FeedView extends AppTab {
     }
 
     clearSearch = () => {
-        if (FeedView.searchTextState.getValue()) {
-            FeedView.searchTextState.setValue("");
+        if (this.data.props.searchTextState.getValue()) {
+            this.data.props.searchTextState.setValue("");
             FeedView.refresh();
         }
     }
@@ -234,7 +221,8 @@ export class FeedView extends AppTab {
             return s;
         });
 
-        S.srch.feed("~" + J.NodeType.FRIEND_LIST, null, FeedView.page, FeedView.searchTextState.getValue(), false, false);
+        let feedData: TabDataIntf = S.quanta.getTabDataById(C.TAB_FEED);
+        S.srch.feed(FeedView.page, feedData.props.searchTextState.getValue(), false, false);
     }
 
     makeFilterButtonsBar = (state: AppState): Div => {

@@ -69,7 +69,6 @@ public class ThreadLocals {
 		session.remove();
 	}
 
-	// todo-0: need to add new mongo-specific props too!
 	public static ThreadLocalsContext getContext() {
 		// log.debug("getting context from thread: " + Thread.currentThread().getName());
 		ThreadLocalsContext ctx = new ThreadLocalsContext();

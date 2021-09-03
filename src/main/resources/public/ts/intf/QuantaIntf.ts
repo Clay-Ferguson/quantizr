@@ -4,6 +4,7 @@ import { MainMenuDlg } from "../dlg/MainMenuDlg";
 import * as J from "../JavaIntf";
 import { NodeHistoryItem } from "../NodeHistoryItem";
 import { CompIntf } from "../widget/base/CompIntf";
+import { TabDataIntf } from "./TabDataIntf";
 
 export interface QuantaIntf {
     hiddenRenderingEnabled: boolean;
@@ -87,4 +88,5 @@ export interface QuantaIntf {
     clearLastNodeIds(): void;
     getActiveTabComp(state: AppState): CompIntf;
     tempDisableAutoScroll(): void;
+    getTabDataById(id: string): TabDataIntf;
 }

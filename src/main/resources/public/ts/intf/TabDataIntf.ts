@@ -20,4 +20,5 @@ export interface TabDataIntf {
     isVisible(): boolean;
 
     rsInfo: ResultSetInfo;
+    props: any;
 }

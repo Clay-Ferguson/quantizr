@@ -45,7 +45,6 @@ export class AppState {
     feedFilterFriends: boolean = false;
     feedFilterToMe: boolean = false;
     feedFilterFromMe: boolean = false;
-
     feedFilterToPublic: boolean = true;
     feedFilterLocalServer: boolean = false;
 

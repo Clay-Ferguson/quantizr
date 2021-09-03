@@ -190,12 +190,11 @@ export class Search implements SearchIntf {
     }
 
     /* growResults==true is the "infinite scrolling" support */
-    feed = (nodeId: string, feedUserName: string, page: number, searchText: string, forceMetadataOn: boolean, growResults: boolean) => {
+    feed = (page: number, searchText: string, forceMetadataOn: boolean, growResults: boolean) => {
         let appState = store.getState();
         S.util.ajax<J.NodeFeedRequest, J.NodeFeedResponse>("nodeFeed", {
             page,
             nodeId: appState.feedFilterRootNode?.id,
-            feedUserName,
             toMe: appState.feedFilterToMe,
             fromMe: appState.feedFilterFromMe,
             toPublic: appState.feedFilterToPublic,

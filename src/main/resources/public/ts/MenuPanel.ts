@@ -109,7 +109,10 @@ export class MenuPanel extends Div {
     static nodeStats = () => S.view.getNodeStats(appState(null), false, false);
 
     static messagesToFromMe = () => {
-        FeedView.searchTextState.setValue("");
+        let feedData = S.quanta.getTabDataById(C.TAB_FEED);
+        if (feedData) {
+            feedData.props.searchTextState.setValue("");
+        }
         S.nav.messages({
             feedFilterFriends: false,
             feedFilterToMe: true,
@@ -121,7 +124,10 @@ export class MenuPanel extends Div {
     }
 
     static messagesFromFriends = () => {
-        FeedView.searchTextState.setValue("");
+        let feedData = S.quanta.getTabDataById(C.TAB_FEED);
+        if (feedData) {
+            feedData.props.searchTextState.setValue("");
+        }
         S.nav.messages({
             feedFilterFriends: true,
             feedFilterToMe: false,
@@ -133,7 +139,10 @@ export class MenuPanel extends Div {
     }
 
     static messagesLocal = () => {
-        FeedView.searchTextState.setValue("");
+        let feedData = S.quanta.getTabDataById(C.TAB_FEED);
+        if (feedData) {
+            feedData.props.searchTextState.setValue("");
+        }
         S.nav.messages({
             feedFilterFriends: false,
             feedFilterToMe: false,
@@ -147,7 +156,10 @@ export class MenuPanel extends Div {
     static messagesNodeFeed = (state: AppState) => {
         const hltNode: J.NodeInfo = S.quanta.getHighlightedNode(state);
         if (!hltNode) return;
-        FeedView.searchTextState.setValue("");
+        let feedData = S.quanta.getTabDataById(C.TAB_FEED);
+        if (feedData) {
+            feedData.props.searchTextState.setValue("");
+        }
         S.nav.messages({
             feedFilterFriends: false,
             feedFilterToMe: false,
@@ -159,7 +171,10 @@ export class MenuPanel extends Div {
     }
 
     static messagesFediverse = () => {
-        FeedView.searchTextState.setValue("");
+        let feedData = S.quanta.getTabDataById(C.TAB_FEED);
+        if (feedData) {
+            feedData.props.searchTextState.setValue("");
+        }
         S.nav.messages({
             feedFilterFriends: false,
             feedFilterToMe: false,

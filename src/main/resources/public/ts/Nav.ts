@@ -366,7 +366,11 @@ export class Nav implements NavIntf {
         // Try to get node from local memory...
         if (node) {
             setTimeout(() => {
-                FeedView.searchTextState.setValue("");
+                let feedData = S.quanta.getTabDataById(C.TAB_FEED);
+                if (feedData) {
+                    feedData.props.searchTextState.setValue("");
+                }
+
                 this.messages({
                     feedFilterFriends: false,
                     feedFilterToMe: false,
@@ -391,7 +395,10 @@ export class Nav implements NavIntf {
             },
                 (res: J.RenderNodeResponse) => {
                     if (!res.node) return;
-                    FeedView.searchTextState.setValue("");
+                    let feedData = S.quanta.getTabDataById(C.TAB_FEED);
+                    if (feedData) {
+                        feedData.props.searchTextState.setValue("");
+                    }
                     this.messages({
                         feedFilterFriends: false,
                         feedFilterToMe: false,

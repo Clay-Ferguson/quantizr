@@ -21,11 +21,6 @@ public class AsyncExec {
     // run(ThreadLocals.getContext(), runnable);
     // }
 
-    // WARNING: This thread (all methods called of course) needs to avoid attempting to get
-    // SessionContext autowiring or access ThreadLocals from the request thread so....
-    // todo-0: Should we STOP ever autowiring SessionContext and always stuff that into thread-locals in
-    // the webfilter instead
-    // todo-0: setting the ThreadLocal in this thread should work, just pass from the calling thread.
     @Async("threadPoolTaskExecutor")
     public void run(ThreadLocalsContext tlc, Runnable runnable) {
 

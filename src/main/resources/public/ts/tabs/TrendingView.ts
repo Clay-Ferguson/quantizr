@@ -11,7 +11,6 @@ import { AppTab } from "../widget/AppTab";
 import { Div } from "../widget/Div";
 import { Heading } from "../widget/Heading";
 import { Span } from "../widget/Span";
-import { FeedView } from "./FeedView";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
@@ -119,10 +118,15 @@ export class TrendingView extends AppTab {
     searchWord = (evt: Event) => {
         let word = S.util.getPropFromDom(evt, "word");
         if (!word) return;
-        FeedView.searchTextState.setValue(word);
 
         // expand so users can see what's going on with the search string and know they can clear it.
-        FeedView.filterExpanded = true;
+        // If feed tab exists, expand the filter part
+        let feedData = S.quanta.getTabDataById(C.TAB_FEED);
+        if (feedData) {
+            feedData.props.searchTextState.setValue(word);
+            feedData.props.filterExpanded = true;
+        }
+
         S.nav.messages({
             feedFilterFriends: false,
             feedFilterToMe: false,
