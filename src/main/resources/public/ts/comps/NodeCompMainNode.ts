@@ -40,7 +40,7 @@ export class NodeCompMainNode extends Div {
             return;
         }
 
-        if (state.editNode != null && node.id === state.editNode.id) {
+        if (state.editNode && state.editNodeOnTab === C.TAB_MAIN && node.id === state.editNode.id) {
             this.setChildren([EditNodeDlg.embedInstance || new EditNodeDlg(state.editNode, state.editEncrypt, state.editShowJumpButton, state, DialogMode.EMBED)]);
         }
         else {

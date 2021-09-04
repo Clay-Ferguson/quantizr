@@ -42,11 +42,11 @@ export class NodeCompVerticalRowLayout extends Div {
                     //     console.log("RENDER ROW[" + i + "]: node.id=" + n.id + " targetNodeId=" + S.quanta.newNodeTargetId);
                     // }
 
-                    if (state.editNode != null && S.quanta.newNodeTargetId === n.id && S.quanta.newNodeTargetOffset === 0) {
+                    if (state.editNode && state.editNodeOnTab === C.TAB_MAIN && S.quanta.newNodeTargetId === n.id && S.quanta.newNodeTargetOffset === 0) {
                         comps.push(EditNodeDlg.embedInstance || new EditNodeDlg(state.editNode, state.editEncrypt, state.editShowJumpButton, state, DialogMode.EMBED));
                     }
 
-                    if (state.editNode != null && n.id === state.editNode.id) {
+                    if (state.editNode && state.editNodeOnTab === C.TAB_MAIN && n.id === state.editNode.id) {
                         comps.push(EditNodeDlg.embedInstance || new EditNodeDlg(state.editNode, state.editEncrypt, state.editShowJumpButton, state, DialogMode.EMBED));
                     }
                     else {
@@ -69,7 +69,7 @@ export class NodeCompVerticalRowLayout extends Div {
                         }
                     }
 
-                    if (state.editNode != null && S.quanta.newNodeTargetId === n.id && S.quanta.newNodeTargetOffset === 1) {
+                    if (state.editNode && state.editNodeOnTab === C.TAB_MAIN && S.quanta.newNodeTargetId === n.id && S.quanta.newNodeTargetOffset === 1) {
                         comps.push(EditNodeDlg.embedInstance || new EditNodeDlg(state.editNode, state.editEncrypt, state.editShowJumpButton, state, DialogMode.EMBED));
                     }
                 }

@@ -74,8 +74,7 @@ public class CallProcessor {
 				// log.debug("Enter: mutexCounter: "+String.valueOf(mutexCounter));
 				Date now = new Date();
 				ThreadLocals.getSC().setLastActiveTime(now.getTime());
-				MongoSession ms = ThreadLocals.getSC().getMongoSession();
-				ThreadLocals.setMongoSession(ms);
+				MongoSession ms = ThreadLocals.getMongoSession();
 				ret = runner.run(ms);
 				update.saveSession(ms);
 			}
@@ -120,10 +119,7 @@ public class CallProcessor {
 			}
 			// mutexCounter--;
 			// log.debug("Exit: mutexCounter: "+String.valueOf(mutexCounter));
-
-			/* cleanup this thread, servers reuse threads */
-			ThreadLocals.setMongoSession(null);
-			ThreadLocals.setResponse(null);
+			ThreadLocals.removeAll();
 		}
 
 		logResponse(ret);

@@ -25,13 +25,11 @@ import org.subnode.mongo.model.SubNode;
  */
 public class ThreadLocals {
 	private static final Logger log = LoggerFactory.getLogger(ThreadLocal.class);
-
 	private static final ThreadLocal<HttpServletResponse> servletResponse = new ThreadLocal<>();
 	private static final ThreadLocal<HttpSession> httpSession = new ThreadLocal<>();
 	private static final ThreadLocal<SessionContext> sessionContext = new ThreadLocal<>();
 	private static final ThreadLocal<ResponseBase> response = new ThreadLocal<>();
 	private static final ThreadLocal<Long> stopwatchTime = new ThreadLocal<>();
-
 	private static final ThreadLocal<MongoSession> session = new ThreadLocal<>();
 
 	/*
@@ -74,26 +72,14 @@ public class ThreadLocals {
 		ThreadLocalsContext ctx = new ThreadLocalsContext();
 		ctx.threadId = Thread.currentThread().getId();
 		ctx.httpSession = getHttpSession();
-		ctx.servletResponse = getServletResponse();
 		ctx.sessionContext = getSC();
-		ctx.response = getResponse();
-		ctx.session = getMongoSession();
-		ctx.dirtyNodes = getDirtyNodes();
-		ctx.cachedNodes = getCachedNodes();
-		ctx.parentCheckEnabled = getParentCheckEnabled();
 		return ctx;
 	}
 
 	public static void setContext(ThreadLocalsContext ctx) {
 		// log.debug("setting context into thread: " + Thread.currentThread().getName());
 		setHttpSession(ctx.httpSession);
-		setServletResponse(ctx.servletResponse);
-		setSC(ctx.sessionContext);
-		setResponse(ctx.response);
-		setMongoSession(ctx.session);
-		setDirtyNodes(ctx.dirtyNodes);
-		setCachedNodes(ctx.cachedNodes);
-		setParentCheckEnabled(ctx.parentCheckEnabled);
+		setSC(ctx.sessionContext.cloneForThread());
 	}
 
 	public static void setHttpSession(HttpSession session) {
@@ -106,6 +92,12 @@ public class ThreadLocals {
 
 	public static void setSC(SessionContext sc) {
 		sessionContext.set(sc);
+		initMongoSession(sc);
+	}
+
+	public static void initMongoSession(SessionContext sc) {
+		MongoSession ms = new MongoSession(sc.getUserName(), sc.getUserNodeId());
+		setMongoSession(ms);
 	}
 
 	public static SessionContext getSC() {
@@ -261,7 +253,13 @@ public class ThreadLocals {
 	}
 
 	public static MongoSession ensure(MongoSession ms) {
-		return ms != null ? ms : session.get();
+		MongoSession ret = ms != null ? ms : session.get();
+
+		// this should never happen, but if we didn't have a mongoSession here make one to return
+		if (ret == null && getSC() != null) {
+			ret = new MongoSession(getSC().getUserName(), getSC().getUserNodeId());
+		}
+		return ret;
 	}
 
 	public static MongoSession getMongoSession() {

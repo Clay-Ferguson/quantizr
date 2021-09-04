@@ -36,6 +36,10 @@ export class NodeCompRowFooter extends Div {
                         S.util.showMessage("Login to create content and reply to nodes.", "Login!");
                     }
                     else {
+                        // todo-0: modifying this state is a super shortcut way to pass the editNodeReplyToId
+                        // thru the next 5 function calls, for the proof of concept, which we will eventually
+                        // do as actual parameters.
+                        state.editNodeReplyToId = this.node.id;
                         S.edit.addNode(this.node.id, null, null, state);
                     }
                 }

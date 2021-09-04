@@ -88,7 +88,7 @@ public class MongoRepository {
 		if (initialized)
 			return;
 
-		MongoSession adminSession = new MongoSession(PrincipalName.ADMIN.s());
+		MongoSession adminSession = auth.getAdminSession();
 		ThreadLocals.setMongoSession(adminSession);
 
 		synchronized (lock) {

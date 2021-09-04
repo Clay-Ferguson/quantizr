@@ -228,9 +228,7 @@ public class SubNode {
 
 	@JsonProperty(FIELD_PATH_HASH)
 	public void setPathHash(String pathHash) {
-		if (Util.equalObjs(pathHash, this.pathHash))
-			return;
-		ThreadLocals.dirty(this);
+		// This is a special function only called from MongoEventListener, so we don't need to call ThreadLocals.dirty
 		this.pathHash = pathHash;
 	}
 

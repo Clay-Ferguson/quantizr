@@ -2,6 +2,8 @@ import { useSelector } from "react-redux";
 import { dispatch, store } from "../AppRedux";
 import { AppState } from "../AppState";
 import { Constants as C } from "../Constants";
+import { EditNodeDlg } from "../dlg/EditNodeDlg";
+import { DialogMode } from "../enums/DialogMode";
 import { TabDataIntf } from "../intf/TabDataIntf";
 import * as J from "../JavaIntf";
 import { PubSub } from "../PubSub";
@@ -30,10 +32,7 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
 });
 
 /* General Widget that doesn't fit any more reusable or specific category other than a plain Div,
-but inherits capability of Comp classl
-
-Preparing to support multiple instances of this (feed + chat), we need to remove all 'static' props. (todo-0)
-*/
+but inherits capability of Comp class */
 export class FeedView extends AppTab {
 
     constructor(state: AppState, data: TabDataIntf) {
@@ -132,6 +131,11 @@ export class FeedView extends AppTab {
 
         let childCount = this.data.props.feedResults ? this.data.props.feedResults.length : 0;
 
+        // if editing a new post (not a reply)
+        if (state.editNode && state.editNodeOnTab === C.TAB_FEED && !state.editNodeReplyToId) {
+            children.push(EditNodeDlg.embedInstance || new EditNodeDlg(state.editNode, state.editEncrypt, state.editShowJumpButton, state, DialogMode.EMBED));
+        }
+
         if (this.data.props.feedLoading && childCount === 0) {
             children.push(new Div(null, null, [
                 new Heading(4, "Loading Feed..."),
@@ -161,6 +165,11 @@ export class FeedView extends AppTab {
                 children.push(S.srch.renderSearchResultAsListItem(node, i, childCount, rowCount, "feed", true, false, true, true, true, true, state));
                 i++;
                 rowCount++;
+
+                // editing a reply inline.
+                if (state.editNode && state.editNodeOnTab === C.TAB_FEED && state.editNodeReplyToId === node.id) {
+                    children.push(EditNodeDlg.embedInstance || new EditNodeDlg(state.editNode, state.editEncrypt, state.editShowJumpButton, state, DialogMode.EMBED));
+                }
             });
 
             if (rowCount > 0 && !this.data.props.feedEndReached) {

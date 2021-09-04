@@ -373,7 +373,7 @@ export class Render implements RenderIntf {
                         /* Slight hack to make viewing 'posts' or chat rooms nodes turn on metaData */
                         if (s.node.type === J.NodeType.POSTS ||
                             s.node.type === J.NodeType.ROOM) {
-                            s.userPreferences.showMetaData = true;
+                            S.edit.setMetadataOption(true);
                         }
                     }
 

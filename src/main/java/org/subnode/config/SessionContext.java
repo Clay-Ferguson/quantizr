@@ -8,17 +8,19 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.TimeZone;
 import javax.annotation.PreDestroy;
+import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
-import org.springframework.context.annotation.ScopedProxyMode;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 import org.subnode.model.UserPreferences;
 import org.subnode.model.client.PrincipalName;
-import org.subnode.mongo.MongoSession;
+import org.subnode.mongo.MongoAuth;
+import org.subnode.mongo.MongoRead;
 import org.subnode.mongo.MongoUtil;
+import org.subnode.mongo.model.SubNode;
 import org.subnode.response.SessionTimeoutPushInfo;
 import org.subnode.service.UserFeedService;
 import org.subnode.util.DateUtil;
@@ -26,12 +28,8 @@ import org.subnode.util.StopwatchEntry;
 import org.subnode.util.ThreadLocals;
 import org.subnode.util.Util;
 
-/**
- * The ScopedProxyMode.TARGET_CLASS annotation allows this session bean to be available on
- * singletons or other beans that are not themselves session scoped.
- */
 @Component
-@Scope(value = "session", proxyMode = ScopedProxyMode.TARGET_CLASS)
+@Scope("prototype")
 public class SessionContext {
 	// DO NOT DELETE (keep for future ref)
 	// implements InitializingBean, DisposableBean {
@@ -41,6 +39,13 @@ public class SessionContext {
 
 	@Autowired
 	private UserFeedService userFeedService;
+
+	@Autowired
+	private MongoAuth auth;
+
+	@Autowired
+	private MongoRead read;
+
 
 	/* Identification of user's account root node. */
 	private String rootId;
@@ -54,12 +59,9 @@ public class SessionContext {
 	private String timelinePath;
 
 	private String userName = PrincipalName.ANON.s();
+	private ObjectId userNodeId;
 	private String pastUserName = userName;
-
 	private String ip;
-
-	private MongoSession ms = new MongoSession();
-
 	private String timezone;
 	private String timeZoneAbbrev;
 
@@ -86,7 +88,7 @@ public class SessionContext {
 	/* keeps track of total calls to each URI */
 	public HashMap<String, Integer> actionCounters = new HashMap<>();
 
-	public final List<StopwatchEntry> stopwatchData = new LinkedList<>();
+	public List<StopwatchEntry> stopwatchData = new LinkedList<>();
 
 	private String captcha;
 	private int captchaFails = 0;
@@ -103,19 +105,51 @@ public class SessionContext {
 
 	private String userToken;
 
-	/* When the user is viewing the Node Feed for a specific node, this will be the path of that root node,
-	and we use this so we can easily do a 'browser push' to any user whenever something new is created under 
-	a that feed. */
+	/*
+	 * When the user is viewing the Node Feed for a specific node, this will be the path of that root
+	 * node, and we use this so we can easily do a 'browser push' to any user whenever something new is
+	 * created under a that feed.
+	 */
 	private String watchingPath;
 
 	public SessionContext() {
 		log.trace(String.format("Creating Session object hashCode[%d]", hashCode()));
+
 		synchronized (allSessions) {
 			allSessions.add(this);
 		}
 		synchronized (historicalSessions) {
 			historicalSessions.add(this);
 		}
+	}
+
+	/* Creates a new instance that inherits all the values that could be used by a different thread */
+	public SessionContext cloneForThread() {
+		SessionContext sc = (SessionContext) SpringContextUtil.getBean(SessionContext.class);
+
+		sc.live = this.live;
+		sc.rootId = this.rootId;
+		sc.timelinePath = this.timelinePath;
+		sc.userName = this.userName;
+		sc.pastUserName = this.pastUserName;
+		sc.ip = this.ip;
+		sc.timezone = this.timezone;
+		sc.timeZoneAbbrev = this.timeZoneAbbrev;
+		sc.lastLoginTime = this.lastLoginTime;
+		sc.lastActiveTime = this.lastActiveTime;
+		sc.userPreferences = this.userPreferences;
+		sc.urlId = this.urlId;
+		sc.counter = sc.counter;
+		sc.pushEmitter = new SseEmitter();
+		sc.actionCounters = new HashMap<>();
+		sc.stopwatchData = new LinkedList<>();
+		sc.captcha = this.captcha;
+		sc.captchaFails = this.captchaFails;
+		sc.feedMaxTime = this.feedMaxTime;
+		sc.userToken = sc.userToken;
+		sc.watchingPath = watchingPath;
+
+		return sc;
 	}
 
 	public List<StopwatchEntry> getStopwatchData() {
@@ -147,7 +181,7 @@ public class SessionContext {
 	}
 
 	/* This is called only upon successful login of a non-anon user */
-	public void setAuthenticated(String userName) {
+	public void setAuthenticated(String userName, ObjectId userNodeId) {
 		if (userName.equals(PrincipalName.ANON.s())) {
 			throw new RuntimeException("invalid call to setAuthenticated for anon.");
 		}
@@ -158,6 +192,19 @@ public class SessionContext {
 		log.debug("sessionContext authenticated hashCode=" + String.valueOf(hashCode()) + " user: " + userName + " to userToken "
 				+ userToken);
 		setUserName(userName);
+
+		if (userNodeId == null) {
+			SubNode userNode = read.getUserNodeByUserName(auth.getAdminSession(), userName);
+			// we found user's node.
+			if (userNode != null) {
+				setUserNodeId(userNode.getId());
+			} else {
+				throw new RuntimeException("No userNode found for user: " + userName);
+			}
+		}
+		else {
+			setUserNodeId(userNodeId);
+		}
 	}
 
 	public boolean isAuthenticated() {
@@ -283,10 +330,6 @@ public class SessionContext {
 		}
 	}
 
-	/*
-	 * This can create nasty bugs. I should be always getting user name from the actual session object
-	 * itself in all the logic... in most every case except maybe login process.
-	 */
 	public String getUserName() {
 		return userName;
 	}
@@ -403,14 +446,6 @@ public class SessionContext {
 		this.timelinePath = timelinePath;
 	}
 
-	public MongoSession getMongoSession() {
-		return ms;
-	}
-
-	public void setMongoSession(MongoSession ms) {
-		this.ms = ms;
-	}
-
 	public String getIp() {
 		return ip;
 	}
@@ -470,5 +505,13 @@ public class SessionContext {
 
 	public void setWatchingPath(String watchingPath) {
 		this.watchingPath = watchingPath;
+	}
+
+	public ObjectId getUserNodeId() {
+		return userNodeId;
+	}
+
+	public void setUserNodeId(ObjectId userNodeId) {
+		this.userNodeId = userNodeId;
 	}
 }

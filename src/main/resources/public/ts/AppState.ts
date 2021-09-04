@@ -113,12 +113,11 @@ export class AppState {
     rssFeedPage = {};
 
     mainPanelCols: number = 5;
-
     bookmarks: J.Bookmark[];
-
     editNode: J.NodeInfo;
+    editNodeOnTab: string; // holds the tab name of the tab responsible for any current embed edit of 'editNode'
+    editNodeReplyToId: string;
     editShowJumpButton: boolean;
     editEncrypt: boolean;
-
     serverInfoText: string = null;
 }

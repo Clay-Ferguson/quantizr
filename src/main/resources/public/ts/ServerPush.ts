@@ -85,9 +85,19 @@ export class ServerPush implements ServerPushIntf {
         });
 
         this.eventSource.addEventListener("feedPush", function (e: any) {
+            let state = store.getState();
+
             const obj: J.FeedPushInfo = JSON.parse(e.data);
             let feedData: TabDataIntf = S.quanta.getTabDataById(null, C.TAB_FEED);
             // console.log("Incomming Push (FeedPushInfo): " + S.util.prettyPrint(obj));
+
+            // Ignore changes comming in during edit if we're editing on feed tab (inline)
+            // which will be find because in this case when we are done editing we always
+            // do a feedRefresh after editing, because it picks up that we set feedDirty here.
+            if (state.activeTab === C.TAB_FEED && state.editNode) {
+                feedData.props.feedDirty = true;
+                return;
+            }
 
             const nodeInfo: J.NodeInfo = obj.nodeInfo;
             if (nodeInfo) {

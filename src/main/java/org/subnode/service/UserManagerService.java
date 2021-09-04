@@ -152,6 +152,7 @@ public class UserManagerService {
 	 * anonymouse user
 	 */
 	public LoginResponse login(LoginRequest req) {
+		SubNode userNode = null;
 		LoginResponse res = new LoginResponse();
 		SessionContext sc = ThreadLocals.getSC();
 		// log.debug("login: " + XString.prettyPrint(req));
@@ -159,18 +160,21 @@ public class UserManagerService {
 		/* Anonymous user */
 		if (req.getUserName() == null || PrincipalName.ANON.s().equals(req.getUserName())) {
 			log.debug("Anonymous user login.");
+			// just as a precaution update the sc userName to anon values
+			sc.setUserName(PrincipalName.ANON.s());
+			sc.setUserNodeId(null);
 		}
 		/* Admin Login */
 		else if (PrincipalName.ADMIN.s().equals(req.getUserName())) {
 			if (req.getPassword().equals(appProp.getMongoAdminPassword())) {
-				sc.setAuthenticated(req.getUserName());
+				sc.setAuthenticated(req.getUserName(), null);
 			} else
 				throw new RuntimeEx("Login failed. Wrong admin password.");
 		}
 		/* User Login */
 		else {
 			// try to lookup the actual user's node
-			SubNode userNode = read.getUserNodeByUserName(auth.getAdminSession(), req.getUserName());
+			userNode = read.getUserNodeByUserName(auth.getAdminSession(), req.getUserName());
 
 			// we found user's node.
 			if (userNode != null) {
@@ -178,11 +182,11 @@ public class UserManagerService {
 				 * We can log in as any user we want if we have the admin password.
 				 */
 				if (req.getPassword().equals(appProp.getMongoAdminPassword())) {
-					sc.setAuthenticated(req.getUserName());
+					sc.setAuthenticated(req.getUserName(), userNode.getId());
 				}
 				// else it's an ordinary user so we check the password against their user node
 				else if (userNode.getStrProp(NodeProp.PWD_HASH.s()).equals(util.getHashOfPassword(req.getPassword()))) {
-					sc.setAuthenticated(req.getUserName());
+					sc.setAuthenticated(req.getUserName(), userNode.getId());
 				} else {
 					throw new RuntimeEx("Login failed. Wrong password for user: " + req.getUserName());
 				}
@@ -190,6 +194,9 @@ public class UserManagerService {
 				throw new RuntimeEx("Login failed. User not found: " + req.getUserName());
 			}
 		}
+
+		// If we reach here we either have ANON user or some authenticated user (password checked)
+		ThreadLocals.initMongoSession(sc);
 
 		/*
 		 * We have to get timezone information from the user's browser, so that all times on all nodes
@@ -207,23 +214,15 @@ public class UserManagerService {
 		}
 
 		if (sc.isAuthenticated()) {
-			MongoSession session = new MongoSession(sc.getUserName());
-			SubNode userNode = read.getUserNodeByUserName(auth.getAdminSession(), sc.getUserName());
-			if (userNode == null) {
-				throw new RuntimeException("UserNode not found for userName " + sc.getUserName());
-			}
-			session.setUserNodeId(userNode.getId());
-			sc.setMongoSession(session);
-			ThreadLocals.setMongoSession(session);
-
-			processLogin(session, res, sc.getUserName());
+			MongoSession ms = ThreadLocals.getMongoSession();
+			processLogin(ms, res, sc.getUserName());
 			log.debug("login: user=" + sc.getUserName());
 
 			// ensure we've pre-created this node.
-			SubNode postsNode = read.getUserNodeByType(session, sc.getUserName(), null, "### Posts", NodeType.POSTS.s(),
+			SubNode postsNode = read.getUserNodeByType(ms, sc.getUserName(), null, "### Posts", NodeType.POSTS.s(),
 					Arrays.asList(PrivilegeType.READ.s()), NodeName.POSTS);
 
-			ensureUserHomeNodeExists(session, sc.getUserName(), "### " + sc.getUserName()
+			ensureUserHomeNodeExists(ms, sc.getUserName(), "### " + sc.getUserName()
 					+ "'s Public Node &#x1f389;\n\nEdit the content and children of this node. It represents you to the outside world.\n\n"
 					+ "Go here for a Quick Start guide: * https://quanta.wiki/n/quick-start", NodeType.NONE.s(), NodeName.HOME);
 		} else {
@@ -791,7 +790,7 @@ public class UserManagerService {
 
 					// res.setMessage("Unable to add Friend: " + newUserName);
 				}
-			} 
+			}
 		});
 		res.setMessage("Added Friend: " + newUserName);
 		res.setSuccess(true);

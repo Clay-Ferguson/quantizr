@@ -10,6 +10,7 @@ import { ManageAccountDlg } from "./dlg/ManageAccountDlg";
 import { PrefsDlg } from "./dlg/PrefsDlg";
 import { UploadFromFileDropzoneDlg } from "./dlg/UploadFromFileDropzoneDlg";
 import { EditIntf } from "./intf/EditIntf";
+import { TabDataIntf } from "./intf/TabDataIntf";
 import * as J from "./JavaIntf";
 import { NodeHistoryItem } from "./NodeHistoryItem";
 import { PubSub } from "./PubSub";
@@ -82,9 +83,22 @@ export class Edit implements EditIntf {
             if (editingAllowed) {
                 S.quanta.tempDisableAutoScroll();
 
+                /* If we're editing on the feed tab, we set the 'state.editNode' which makes the gui know to render
+                the editor at that place rather than opening a popup now */
+                if (S.quanta.activeTab === C.TAB_FEED) {
+                    dispatch("Action_startEditingInFeed", (s: AppState): AppState => {
+                        // this is passed in from the actual mouse click function and is a temp hack (todo-0)
+                        s.editNodeReplyToId = state.editNodeReplyToId;
+                        s.editNodeOnTab = S.quanta.activeTab;
+                        s.editNode = res.nodeInfo;
+                        s.editShowJumpButton = showJumpButton;
+                        s.editEncrypt = encrypt;
+                        return s;
+                    });
+                }
                 /* Either run the node editor as a popup or embedded, depending on whether we have a fullscreen
                 calendar up and wether we're on the main tab, etc */
-                if (state.mobileMode ||
+                else if (state.mobileMode ||
                     // node not found on tree.
                     (!S.quanta.getDisplayingNode(state, res.nodeInfo.id) &&
                         !S.quanta.getDisplayingNode(state, S.quanta.newNodeTargetId)) ||
@@ -96,6 +110,7 @@ export class Edit implements EditIntf {
                 } else {
                     dispatch("Action_startEditing", (s: AppState): AppState => {
                         s.editNode = res.nodeInfo;
+                        s.editNodeOnTab = S.quanta.activeTab;
                         s.editShowJumpButton = showJumpButton;
                         s.editEncrypt = encrypt;
                         return s;
@@ -286,6 +301,14 @@ export class Edit implements EditIntf {
         if (S.util.checkSuccess("Save node", res)) {
             await this.distributeKeys(node, res.aclEntries);
 
+            // if on feed tab, and it became durty while we were editing then refrsh it.
+            if (state.activeTab === C.TAB_FEED) {
+                let feedData: TabDataIntf = S.quanta.getTabDataById(null, C.TAB_FEED);
+                if (feedData?.props?.feedDirty) {
+                    S.srch.refreshFeed();
+                }
+            }
+
             // If we're on some tab other than MAIN (tree) we don't need to update anything.
             if (state.activeTab !== C.TAB_MAIN) {
                 return;
@@ -390,7 +413,15 @@ export class Edit implements EditIntf {
         S.view.scrollToSelectedNode(state);
     }
 
-    toggleShowMetaData = async (state: AppState): Promise<void> => {
+    setMetadataOption = (val: boolean): void => {
+        setTimeout(() => {
+            let state = store.getState();
+            state.userPreferences.showMetaData = val;
+            S.quanta.saveUserPreferences(state);
+        }, 100);
+    };
+
+    toggleShowMetaData = (state: AppState): void => {
         state.userPreferences.showMetaData = !state.userPreferences.showMetaData;
         S.quanta.saveUserPreferences(state);
 
@@ -487,7 +518,6 @@ export class Edit implements EditIntf {
     /* This can run as an actuall click event function in which only 'evt' is non-null here */
     runEditNode = (evt: Event, id: string, encrypt: boolean, showJumpButton: boolean, state?: AppState): void => {
         id = S.util.allowIdFromEvent(evt, id);
-
         state = appState(state);
         if (!id) {
             let node = S.quanta.getHighlightedNode(state);

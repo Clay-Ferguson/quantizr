@@ -246,13 +246,11 @@ public class MongoTest implements TestIntf {
 	}
 
 	private MongoSession asUser(String userName) {
-		MongoSession session = new MongoSession(userName);
-
 		SubNode userNode = read.getUserNodeByUserName(auth.getAdminSession(), userName);
 		if (userNode == null) {
 			throw new RuntimeException("UserNode not found for userName " + userName);
 		}
-		session.setUserNodeId(userNode.getId());
+		MongoSession session = new MongoSession(userName, userNode.getId());
 		asSession(session);
 		return session;
 	}

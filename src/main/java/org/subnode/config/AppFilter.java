@@ -21,7 +21,6 @@ import org.springframework.web.filter.GenericFilterBean;
 import org.subnode.model.IPInfo;
 import org.subnode.model.client.PrincipalName;
 import org.subnode.mongo.MongoRepository;
-
 import org.subnode.util.ThreadLocals;
 import org.subnode.util.Util;
 import org.subnode.util.XString;
@@ -37,14 +36,7 @@ public class AppFilter extends GenericFilterBean {
 	private static int reqId = 0;
 	private static boolean logRequests = false;
 	private static boolean logResponses = false;
-
-	/* IMPORTANT: This should be the ONLY place we autowire SessionContext, because our deamon threads
-	will be created by the thread pool executor and will fail to autowire, so we always have all code
-	always get SessionContext from ThreadLocal only, so that it can be set on any thread including pooled
-	daemon threads */
-	@Autowired
-	private SessionContext sc;
-
+	private static final String QSC = "QSC";
 	@Autowired
 	private AppProp appProp;
 
@@ -60,9 +52,6 @@ public class AppFilter extends GenericFilterBean {
 	/*
 	 * For debugging we can turn this flag on and disable the server from processing multiple requests
 	 * simultenaously this is every helpful for debugging.
-	 * 
-	 * I noticed we're getting CONCURRENT calls happening for same user? Why? Isn't spring still 
-	 * enforcing a session mutext? (todo-1)
 	 */
 	private static boolean singleThreadDebugging = false;
 
@@ -84,7 +73,6 @@ public class AppFilter extends GenericFilterBean {
 		try {
 			ThreadLocals.removeAll();
 			ThreadLocals.setStopwatchTime(System.currentTimeMillis());
-			
 			int thisReqId = ++reqId;
 			String ip = null;
 
@@ -96,6 +84,28 @@ public class AppFilter extends GenericFilterBean {
 				httpReq = (HttpServletRequest) req;
 				httpRes = (HttpServletResponse) res;
 				isAjaxCall = httpReq.getRequestURI().contains("/mobile/api/");
+
+				session = httpReq.getSession(false);
+				if (session == null) {
+					log.trace("******** NO SESSION.");
+				} else {
+					log.trace("******** SESSION existed: lastAccessed: "
+							+ ((System.currentTimeMillis() - session.getLastAccessedTime()) / 1000) + "secs ago.");
+				}
+
+				if (session == null) {
+					session = httpReq.getSession(true);
+				}
+
+				// Ensure we have a Quanta Session Context
+				SessionContext sc = (SessionContext) session.getAttribute(QSC);
+
+				// if we don't have a SessionContext yet or it timed out then create a new one.
+				if (sc == null || !sc.isLive()) {
+					sc = (SessionContext) SpringContextUtil.getBean(SessionContext.class);
+					session.setAttribute(QSC, sc);
+				}
+				ThreadLocals.setSC(sc);
 
 				sc.addAction(httpReq.getRequestURI());
 				String bearer = httpReq.getHeader("Bearer");
@@ -121,25 +131,13 @@ public class AppFilter extends GenericFilterBean {
 				}
 
 				if (isSecurePath(httpReq.getRequestURI())) {
-					checkApiSecurity(bearer, httpReq);
+					checkApiSecurity(bearer, httpReq, sc);
 				}
 
 				ip = getClientIpAddr(httpReq);
 				sc.setIp(ip);
 
-				session = httpReq.getSession(false);
-				if (session == null) {
-					log.trace("******** NO SESSION.");
-				} else {
-					log.trace("******** SESSION existed: lastAccessed: "
-							+ ((System.currentTimeMillis() - session.getLastAccessedTime()) / 1000) + "secs ago.");
-				}
-
-				if (session == null) {
-					session = httpReq.getSession(true);
-				}
 				ThreadLocals.setHttpSession(session);
-				ThreadLocals.setSC(sc);
 				String queryString = httpReq.getQueryString();
 
 				if (simulateSlowServer > 0 && httpReq.getRequestURI().contains("/mobile/api/")) {
@@ -337,7 +335,7 @@ public class AppFilter extends GenericFilterBean {
 	 * Secure path check requires a non-anonymous user to be on this session and also already
 	 * authenticated
 	 */
-	private void checkApiSecurity(String bearer, HttpServletRequest req) {
+	private void checkApiSecurity(String bearer, HttpServletRequest req, SessionContext sc) {
 		// otherwise require secure header
 		if (bearer == null) {
 			throw new RuntimeException("Auth failed. no bearer token: " + req.getRequestURI());

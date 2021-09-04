@@ -698,6 +698,8 @@ export class EditNodeDlg extends DialogBase {
             EditNodeDlg.embedInstance = null;
             dispatch("Action_endEditing", (s: AppState): AppState => {
                 s.editNode = null;
+                s.editNodeOnTab = null;
+                s.editNodeReplyToId = null;
                 S.quanta.newNodeTargetId = null;
                 S.quanta.newNodeTargetOffset = -1;
                 s.editShowJumpButton = false;
@@ -996,7 +998,6 @@ export class EditNodeDlg extends DialogBase {
             else {
                 S.render.fadeInId = state.node.id;
                 S.quanta.tempDisableAutoScroll();
-
                 S.edit.saveNodeResponse(state.node, res, true, this.appState);
 
                 if (askToSplit) {
@@ -1072,7 +1073,8 @@ export class EditNodeDlg extends DialogBase {
                 }
                 else {
                     valEditor = new TextArea(null, {
-                        rows: "" + rows
+                        rows: "" + rows,
+                        id: "prop_" + this.getState().node.id
                     }, propState, "textarea-min-4");
                 }
             }
@@ -1143,7 +1145,7 @@ export class EditNodeDlg extends DialogBase {
         }
         else {
             this.contentEditor = new TextArea(null, {
-                id: "mainTextContent",
+                id: "edit_" + this.getState().node.id,
                 rows
             }, this.contentEditorState, "textarea-min-10", true);
 

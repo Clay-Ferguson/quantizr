@@ -229,9 +229,10 @@ public class UserFeedService {
 			} catch (Exception ex) {
 				pushEmitter.completeWithError(ex);
 			} finally {
-				// todo-1: this can be done in a slightly cleaner way (more decoiupled)
+				// todo-1: this can be done in a slightly cleaner way (more decoupled)
 				if (info instanceof SessionTimeoutPushInfo) {
-					sc.setMongoSession(null);
+					ThreadLocals.setMongoSession(null);
+					sc.setLive(false);
 					sc.setRootId(null);
 					sc.setUserName(null);
 					sc.setPushEmitter(null);

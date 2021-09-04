@@ -51,4 +51,5 @@ export interface EditIntf {
     updateHeadings(state: AppState): void;
     addLinkBookmark(content: string, state: AppState): void;
     addBookmark(node: J.NodeInfo, state: AppState): void;
+    setMetadataOption(val: boolean): void;
 }

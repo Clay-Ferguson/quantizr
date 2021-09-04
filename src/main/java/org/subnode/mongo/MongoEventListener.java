@@ -145,18 +145,17 @@ public class MongoEventListener extends AbstractMongoEventListener<SubNode> {
 		saveAuthByThread(node, isNew);
 
 		String pathHash = DigestUtils.sha256Hex(node.getPath());
-		// log.debug("CHECK PathHash=" + pathHash);
+		// log.debug("CHECK pathHash=" + pathHash);
 
 		if (!pathHash.equals(node.getPathHash())) {
 			dbObj.put(SubNode.FIELD_PATH_HASH, pathHash);
 			node.setPathHash(pathHash);
-			// log.debug("RESET PathHash=" + pathHash);
+			// log.debug("RESET pathHash=" + pathHash);
 		}
 
 		/* Node name not allowed to contain : or ~ */
 		String nodeName = node.getName();
 		if (nodeName != null) {
-
 			nodeName = nodeName.replace(":", "-");
 			nodeName = nodeName.replace("~", "-");
 			nodeName = nodeName.replace("/", "-");
@@ -188,6 +187,8 @@ public class MongoEventListener extends AbstractMongoEventListener<SubNode> {
 				dbObj.put(SubNode.FIELD_AC, node.getAc());
 			}
 		}
+
+		ThreadLocals.clean(node);
 	}
 
 	/*
@@ -251,6 +252,7 @@ public class MongoEventListener extends AbstractMongoEventListener<SubNode> {
 				if (node != null) {
 					log.trace("MDB del: " + node.getPath());
 					auth.ownerAuthByThread(node);
+					ThreadLocals.clean(node);
 				}
 				// because nodes can be orphaned, we clear the entire cache any time any nodes are deleted
 				ThreadLocals.clearCachedNodes();

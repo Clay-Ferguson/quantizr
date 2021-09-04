@@ -248,7 +248,7 @@ export class Search implements SearchIntf {
                 s.guiReady = true;
 
                 if (forceMetadataOn) {
-                    s.userPreferences.showMetaData = true;
+                    S.edit.setMetadataOption(true);
                 }
 
                 // if scrolling in new results grow the existing array

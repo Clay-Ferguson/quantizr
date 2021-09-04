@@ -13,7 +13,6 @@ import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.stereotype.Component;
 import org.subnode.model.UserStats;
 import org.subnode.model.client.NodeProp;
-import org.subnode.model.client.PrivilegeType;
 import org.subnode.mongo.model.SubNode;
 import org.subnode.service.IPFSService;
 import org.subnode.util.Cast;
@@ -24,6 +23,8 @@ import org.subnode.util.XString;
 @Component
 public class MongoUpdate {
 	private static final Logger log = LoggerFactory.getLogger(MongoUpdate.class);
+
+	private static final ThreadLocal<Boolean> saving = new ThreadLocal<>();
 
 	@Autowired
 	private MongoTemplate ops;
@@ -72,12 +73,12 @@ public class MongoUpdate {
 	}
 
 	public void saveSession(MongoSession session, boolean asAdmin) {
-		if (session == null || session.saving || !ThreadLocals.hasDirtyNodes())
+		if (session == null || (saving.get() != null && saving.get().booleanValue()) || !ThreadLocals.hasDirtyNodes())
 			return;
 
 		try {
 			// we check the saving flag to ensure we don't go into circular recursion here.
-			session.saving = true;
+			saving.set(true);
 
 			synchronized (session) {
 				// recheck hasDirtyNodes again after we get inside the lock.
@@ -120,7 +121,7 @@ public class MongoUpdate {
 				ThreadLocals.clearDirtyNodes();
 			}
 		} finally {
-			session.saving = false;
+			saving.set(false);
 		}
 	}
 

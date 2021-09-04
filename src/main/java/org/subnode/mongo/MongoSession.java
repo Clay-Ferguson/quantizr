@@ -11,16 +11,21 @@ public class MongoSession {
 	private String userName;
 	private ObjectId userNodeId;
 
-	// tiny bit of a hack to detect and avoid recursion in the saveSession
-	// Since it's very simple and reliable I'm going with this.
-	public boolean saving = false;
-
 	public MongoSession() {
 		userName = PrincipalName.ANON.s();
 	}
 
 	public MongoSession(String userName) {
 		this.userName = userName;
+	}
+
+	public MongoSession(String userName, ObjectId userNodeId) {
+		this.userName = userName;
+		this.userNodeId = userNodeId;
+	}
+
+	public MongoSession clone() {
+		return new MongoSession(userName, userNodeId);
 	}
 
 	public boolean isAdmin() {
