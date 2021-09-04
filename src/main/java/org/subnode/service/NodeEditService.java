@@ -557,6 +557,8 @@ public class NodeEditService {
 						&& !PrincipalName.ADMIN.s().equals(sessionUserName)) {
 
 					HashSet<Integer> sessionsPushed = new HashSet<>();
+
+					// push any chat messages that need to go out.
 					userFeedService.pushNodeToMonitoringBrowsers(s, sessionsPushed, node);
 
 					SubNode parent = read.getNode(session, node.getParentPath(), false);

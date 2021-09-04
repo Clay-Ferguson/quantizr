@@ -88,5 +88,5 @@ export interface QuantaIntf {
     clearLastNodeIds(): void;
     getActiveTabComp(state: AppState): CompIntf;
     tempDisableAutoScroll(): void;
-    getTabDataById(id: string): TabDataIntf;
+    getTabDataById(state: AppState, id: string): TabDataIntf;
 }

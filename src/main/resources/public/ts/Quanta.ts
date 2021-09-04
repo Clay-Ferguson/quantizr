@@ -691,7 +691,17 @@ export class Quanta implements QuantaIntf {
                         page: 0,
                         refreshCounter: 0,
                         autoRefresh: true,
-                        searchTextState: new ValidatedState<any>()
+                        searchTextState: new ValidatedState<any>(),
+
+                        feedFilterFriends: false,
+                        feedFilterToMe: false,
+                        feedFilterFromMe: false,
+                        feedFilterToPublic: true,
+                        feedFilterLocalServer: false,
+
+                        /* If we're presenting a specific node as the root of our "Feed" view this holds it's id, otherwise
+                         for any non-node specific feed query this stays null. */
+                        feedFilterRootNode: null
                     }
                 },
                 {
@@ -734,8 +744,10 @@ export class Quanta implements QuantaIntf {
         });
     }
 
-    getTabDataById = (id: string): TabDataIntf => {
-        let state: AppState = store.getState();
+    getTabDataById = (state: AppState, id: string): TabDataIntf => {
+        if (!state) {
+            state = store.getState();
+        }
         let data = state.tabData.find(d => d.id === id);
         return data;
     }

@@ -192,23 +192,24 @@ export class Search implements SearchIntf {
 
     /* If we have the Auto-Refresh checkbox checked by the user, and we just detected new changes comming in then we do a request
     from the server for a refresh */
-    feedDirtyNow = (state: AppState): void => {
-        let feedData: TabDataIntf = S.quanta.getTabDataById(C.TAB_FEED);
+    feedDirtyNotify = (state: AppState): void => {
+        let feedData: TabDataIntf = S.quanta.getTabDataById(state, C.TAB_FEED);
 
         // put in a delay timer since we call this from other state processing functions.
         setTimeout(() => {
-            if (feedData?.props?.autoRefresh && !state.feedLoading && !state.feedWaitingForUserRefresh) {
+            if (feedData?.props?.autoRefresh && !state.feedLoading) {
                 this.refreshFeed();
             }
         }, 500);
     }
 
     refreshFeed = () => {
-        let feedData: TabDataIntf = S.quanta.getTabDataById(C.TAB_FEED);
+        let feedData: TabDataIntf = S.quanta.getTabDataById(null, C.TAB_FEED);
         if (feedData) {
             feedData.props.page = 0;
             feedData.props.refreshCounter++;
         }
+
         dispatch("Action_RefreshFeed", (s: AppState): AppState => {
             s.feedLoading = true;
             return s;
@@ -220,14 +221,18 @@ export class Search implements SearchIntf {
     /* growResults==true is the "infinite scrolling" support */
     feed = (page: number, searchText: string, forceMetadataOn: boolean, growResults: boolean) => {
         let appState = store.getState();
+        let feedData: TabDataIntf = S.quanta.getTabDataById(appState, C.TAB_FEED);
+        if (!feedData) {
+            return;
+        }
         S.util.ajax<J.NodeFeedRequest, J.NodeFeedResponse>("nodeFeed", {
             page,
-            nodeId: appState.feedFilterRootNode?.id,
-            toMe: appState.feedFilterToMe,
-            fromMe: appState.feedFilterFromMe,
-            toPublic: appState.feedFilterToPublic,
-            localOnly: appState.feedFilterLocalServer,
-            fromFriends: appState.feedFilterFriends,
+            nodeId: feedData.props.feedFilterRootNode?.id,
+            toMe: feedData.props.feedFilterToMe,
+            fromMe: feedData.props.feedFilterFromMe,
+            toPublic: feedData.props.feedFilterToPublic,
+            localOnly: feedData.props.feedFilterLocalServer,
+            fromFriends: feedData.props.feedFilterFriends,
             nsfw: appState.feedFilterNSFW,
             searchText
         }, (res: J.NodeFeedResponse) => {
@@ -236,7 +241,7 @@ export class Search implements SearchIntf {
                 // s.feedResults = S.quanta.removeRedundantFeedItems(res.searchResults || []);
 
                 // once user requests their stuff, turn off the new messages count indicator.
-                if (s.feedFilterToMe) {
+                if (feedData.props.feedFilterToMe) {
                     s.newMessageCount = 0;
                 }
 
@@ -266,7 +271,6 @@ export class Search implements SearchIntf {
                 s.feedEndReached = res.endReached;
                 s.feedDirty = false;
                 s.feedLoading = false;
-                s.feedWaitingForUserRefresh = false;
 
                 if (!growResults) {
                     S.quanta.selectTabStateOnly(C.TAB_FEED, s);

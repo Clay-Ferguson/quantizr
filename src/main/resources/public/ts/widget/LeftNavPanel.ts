@@ -2,6 +2,7 @@ import { useSelector } from "react-redux";
 import { store } from "../AppRedux";
 import { AppState } from "../AppState";
 import { Constants as C } from "../Constants";
+import { TabDataIntf } from "../intf/TabDataIntf";
 import { MenuPanel } from "../MenuPanel";
 import { PubSub } from "../PubSub";
 import { Singletons } from "../Singletons";
@@ -35,6 +36,7 @@ export class LeftNavPanel extends Div {
 
     preRender(): void {
         let state: AppState = useSelector((state: AppState) => state);
+        let feedData: TabDataIntf = S.quanta.getTabDataById(state, C.TAB_FEED);
 
         let s = state.newMessageCount > 1 ? "s" : "";
         let messages = state.newMessageCount > 0
@@ -44,7 +46,7 @@ export class LeftNavPanel extends Div {
         // user into clicking on it which takes them AWAY from the chat. We do this by setting messages to null
         // if feedFilterRoodNode is non-null which means user is in a node chat. I should consider having
         // a "Chat" tab that's separate from the "Feed" tab. Maybe the ChatView should be subclass of FeedView?
-        if (state.feedFilterRootNode) {
+        if (feedData?.props?.feedFilterRootNode) {
             messages = null;
         }
 

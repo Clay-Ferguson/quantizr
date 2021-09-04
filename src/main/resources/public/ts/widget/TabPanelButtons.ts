@@ -46,9 +46,10 @@ export class TabPanelButtons extends Div {
 
     getTabButton(state: AppState, data: TabDataIntf): Li {
         let tabName = data.name;
+        let feedData: TabDataIntf = S.quanta.getTabDataById(state, C.TAB_FEED);
 
         // slight hack until we have 'name' as a function and not a string.
-        if (tabName === "Feed" && state.feedFilterRootNode) {
+        if (tabName === "Feed" && feedData?.props?.feedFilterRootNode) {
             tabName = "Chat Room";
         }
 

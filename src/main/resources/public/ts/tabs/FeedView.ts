@@ -42,7 +42,6 @@ export class FeedView extends AppTab {
     }
 
     preRender(): void {
-        // console.log("preRender: FeedView");
         let state: AppState = useSelector((state: AppState) => state);
 
         this.attribs.className = this.getClass(state);
@@ -53,13 +52,13 @@ export class FeedView extends AppTab {
          */
         let rowCount = 0;
         let children: Comp[] = [];
-        let content = state.feedFilterRootNode ? S.util.getShortContent(state.feedFilterRootNode) : null;
+        let content = this.data.props.feedFilterRootNode ? S.util.getShortContent(this.data.props.feedFilterRootNode) : null;
         let showBookmarkIcon: boolean = false;
 
         // set showBookmarkIcon visible if we don't already have it bookmarked
-        if (state.feedFilterRootNode) {
+        if (this.data.props.feedFilterRootNode) {
             showBookmarkIcon = !state.bookmarks.find((bookmark: J.Bookmark): boolean => {
-                return bookmark.id === state.feedFilterRootNode.id;
+                return bookmark.id === this.data.props.feedFilterRootNode.id;
             });
         }
 
@@ -70,10 +69,10 @@ export class FeedView extends AppTab {
                     showBookmarkIcon ? new Icon({
                         className: "fa fa-bookmark fa-lg clickable marginRight",
                         title: "Bookmark Chat Room",
-                        onClick: () => S.edit.addBookmark(state.feedFilterRootNode, state)
+                        onClick: () => S.edit.addBookmark(this.data.props.feedFilterRootNode, state)
                     }) : null,
-                    state.feedFilterRootNode ? new IconButton("fa-arrow-left", "Back", {
-                        onClick: () => S.view.jumpToId(state.feedFilterRootNode.id),
+                    this.data.props.feedFilterRootNode ? new IconButton("fa-arrow-left", "Back", {
+                        onClick: () => S.view.jumpToId(this.data.props.feedFilterRootNode.id),
                         title: "Back to Node"
                     }) : null
                 ]),
@@ -83,7 +82,7 @@ export class FeedView extends AppTab {
         ]));
 
         let newItems = null;
-        if ((state.feedDirty || state.feedWaitingForUserRefresh) && !state.feedLoading) {
+        if (state.feedDirty && !state.feedLoading) {
             newItems = new Icon({
                 className: "fa fa-lightbulb-o fa-lg feedDirtyIcon marginRight",
                 title: "New content available. Refresh!"
@@ -97,8 +96,8 @@ export class FeedView extends AppTab {
                 title: "Refresh"
             }),
             // NOTE: state.feedFilterRootNode?.id will be null here, for full fediverse (not a node chat/node feed) scenario.
-            state.isAnonUser ? null : new Button("Post", () => S.edit.addNode(state.feedFilterRootNode?.id, null, null, state), {
-                title: state.feedFilterRootNode?.id ? "Post to this Chat Room" : "Post something to the Fediverse!"
+            state.isAnonUser ? null : new Button("Post", () => S.edit.addNode(this.data.props.feedFilterRootNode?.id, null, null, state), {
+                title: this.data.props.feedFilterRootNode?.id ? "Post to this Chat Room" : "Post something to the Fediverse!"
             }, "btn-primary")
         ], null, "float-right"));
 
@@ -144,14 +143,11 @@ export class FeedView extends AppTab {
         else if (this.data.props.refreshCounter === 0) {
             // if user has never done a refresh at all yet, do the first one for them automatically.
             if (state.activeTab === C.TAB_FEED) {
-                setTimeout(this.data.props.refresh, 100);
+                setTimeout(S.srch.refreshFeed, 100);
             }
             else {
                 children.push(new Heading(4, "Refresh when ready."));
             }
-        }
-        else if (state.feedWaitingForUserRefresh) {
-            children.push(new Heading(4, "Refresh when ready."));
         }
         else if (!state.feedResults || state.feedResults.length === 0) {
             children.push(new Div("Nothing to display."));
@@ -199,7 +195,7 @@ export class FeedView extends AppTab {
 
     /* overridable (don't use arrow function) */
     renderHeading(state: AppState): CompIntf {
-        return new Heading(4, state.feedFilterRootNode ? "Chat Room" : "Fediverse Feed", { className: "resultsTitle" });
+        return new Heading(4, this.data.props.feedFilterRootNode ? "Chat Room" : "Fediverse Feed", { className: "resultsTitle" });
     }
 
     clearSearch = () => {
@@ -216,13 +212,12 @@ export class FeedView extends AppTab {
             }, {
                 setValue: (checked: boolean): void => {
                     dispatch("Action_SetFeedFilterType", (s: AppState): AppState => {
-                        s.feedWaitingForUserRefresh = true;
-                        s.feedFilterFriends = checked;
+                        this.data.props.feedFilterFriends = checked;
                         return s;
                     });
                 },
                 getValue: (): boolean => {
-                    return store.getState().feedFilterFriends;
+                    return this.data.props.feedFilterFriends;
                 }
             }),
 
@@ -231,13 +226,12 @@ export class FeedView extends AppTab {
             }, {
                 setValue: (checked: boolean): void => {
                     dispatch("Action_SetFeedFilterType", (s: AppState): AppState => {
-                        s.feedWaitingForUserRefresh = true;
-                        s.feedFilterToMe = checked;
+                        this.data.props.feedFilterToMe = checked;
                         return s;
                     });
                 },
                 getValue: (): boolean => {
-                    return store.getState().feedFilterToMe;
+                    return this.data.props.feedFilterToMe;
                 }
             }),
 
@@ -246,13 +240,12 @@ export class FeedView extends AppTab {
             }, {
                 setValue: (checked: boolean): void => {
                     dispatch("Action_SetFeedFilterType", (s: AppState): AppState => {
-                        s.feedWaitingForUserRefresh = true;
-                        s.feedFilterFromMe = checked;
+                        this.data.props.feedFilterFromMe = checked;
                         return s;
                     });
                 },
                 getValue: (): boolean => {
-                    return store.getState().feedFilterFromMe;
+                    return this.data.props.feedFilterFromMe;
                 }
             }),
 
@@ -261,13 +254,12 @@ export class FeedView extends AppTab {
             }, {
                 setValue: (checked: boolean): void => {
                     dispatch("Action_SetFeedFilterType", (s: AppState): AppState => {
-                        s.feedWaitingForUserRefresh = true;
-                        s.feedFilterToPublic = checked;
+                        this.data.props.feedFilterToPublic = checked;
                         return s;
                     });
                 },
                 getValue: (): boolean => {
-                    return store.getState().feedFilterToPublic;
+                    return this.data.props.feedFilterToPublic;
                 }
             }),
 
@@ -276,19 +268,18 @@ export class FeedView extends AppTab {
             }, {
                 setValue: (checked: boolean): void => {
                     dispatch("Action_SetFeedFilterType", (s: AppState): AppState => {
-                        s.feedWaitingForUserRefresh = true;
-                        s.feedFilterLocalServer = checked;
+                        this.data.props.feedFilterLocalServer = checked;
 
                         /* to help keep users probably get what they want, set 'public' also to true as the default
                          any time someone clicks 'Local' because that's the likely use case */
                         if (checked) {
-                            s.feedFilterToPublic = true;
+                            this.data.props.feedFilterToPublic = true;
                         }
                         return s;
                     });
                 },
                 getValue: (): boolean => {
-                    return store.getState().feedFilterLocalServer;
+                    return this.data.props.feedFilterLocalServer;
                 }
             }),
 
@@ -297,7 +288,6 @@ export class FeedView extends AppTab {
             }, {
                 setValue: (checked: boolean): void => {
                     dispatch("Action_SetFeedFilterType", (s: AppState): AppState => {
-                        s.feedWaitingForUserRefresh = true;
                         s.feedFilterNSFW = checked;
                         return s;
                     });

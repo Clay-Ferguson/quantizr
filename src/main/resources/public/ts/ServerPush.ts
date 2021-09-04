@@ -84,7 +84,6 @@ export class ServerPush implements ServerPushIntf {
         });
 
         this.eventSource.addEventListener("feedPush", function (e: any) {
-
             const obj: J.FeedPushInfo = JSON.parse(e.data);
             // console.log("Incomming Push (FeedPushInfo): " + S.util.prettyPrint(obj));
 
@@ -112,7 +111,7 @@ export class ServerPush implements ServerPushIntf {
                         /* note: we could que up the incomming nodeInfo, and then avoid a call to the server but for now we just
                         keep it simple and only set a dirty flag */
                         s.feedDirty = true;
-                        S.srch.feedDirtyNow(s);
+                        S.srch.feedDirtyNotify(s);
                         if (nodeInfo.content && nodeInfo.content.startsWith(J.Constant.ENC_TAG)) {
                             nodeInfo.content = "[Encrypted]";
                         }

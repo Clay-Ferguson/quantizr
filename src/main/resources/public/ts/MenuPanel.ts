@@ -109,7 +109,7 @@ export class MenuPanel extends Div {
     static nodeStats = () => S.view.getNodeStats(appState(null), false, false);
 
     static messagesToFromMe = () => {
-        let feedData = S.quanta.getTabDataById(C.TAB_FEED);
+        let feedData = S.quanta.getTabDataById(null, C.TAB_FEED);
         if (feedData) {
             feedData.props.searchTextState.setValue("");
         }
@@ -124,7 +124,7 @@ export class MenuPanel extends Div {
     }
 
     static messagesFromFriends = () => {
-        let feedData = S.quanta.getTabDataById(C.TAB_FEED);
+        let feedData = S.quanta.getTabDataById(null, C.TAB_FEED);
         if (feedData) {
             feedData.props.searchTextState.setValue("");
         }
@@ -139,7 +139,7 @@ export class MenuPanel extends Div {
     }
 
     static messagesLocal = () => {
-        let feedData = S.quanta.getTabDataById(C.TAB_FEED);
+        let feedData = S.quanta.getTabDataById(null, C.TAB_FEED);
         if (feedData) {
             feedData.props.searchTextState.setValue("");
         }
@@ -156,7 +156,7 @@ export class MenuPanel extends Div {
     static messagesNodeFeed = (state: AppState) => {
         const hltNode: J.NodeInfo = S.quanta.getHighlightedNode(state);
         if (!hltNode) return;
-        let feedData = S.quanta.getTabDataById(C.TAB_FEED);
+        let feedData = S.quanta.getTabDataById(state, C.TAB_FEED);
         if (feedData) {
             feedData.props.searchTextState.setValue("");
         }
@@ -171,7 +171,7 @@ export class MenuPanel extends Div {
     }
 
     static messagesFediverse = () => {
-        let feedData = S.quanta.getTabDataById(C.TAB_FEED);
+        let feedData = S.quanta.getTabDataById(null, C.TAB_FEED);
         if (feedData) {
             feedData.props.searchTextState.setValue("");
         }

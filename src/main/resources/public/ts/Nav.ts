@@ -7,10 +7,10 @@ import { MessageDlg } from "./dlg/MessageDlg";
 import { PrefsDlg } from "./dlg/PrefsDlg";
 import { SearchContentDlg } from "./dlg/SearchContentDlg";
 import { NavIntf } from "./intf/NavIntf";
+import { TabDataIntf } from "./intf/TabDataIntf";
 import * as J from "./JavaIntf";
 import { PubSub } from "./PubSub";
 import { Singletons } from "./Singletons";
-import { FeedView } from "./tabs/FeedView";
 import { Button } from "./widget/Button";
 import { ButtonBar } from "./widget/ButtonBar";
 import { Heading } from "./widget/Heading";
@@ -366,7 +366,7 @@ export class Nav implements NavIntf {
         // Try to get node from local memory...
         if (node) {
             setTimeout(() => {
-                let feedData = S.quanta.getTabDataById(C.TAB_FEED);
+                let feedData = S.quanta.getTabDataById(state, C.TAB_FEED);
                 if (feedData) {
                     feedData.props.searchTextState.setValue("");
                 }
@@ -395,7 +395,7 @@ export class Nav implements NavIntf {
             },
                 (res: J.RenderNodeResponse) => {
                     if (!res.node) return;
-                    let feedData = S.quanta.getTabDataById(C.TAB_FEED);
+                    let feedData = S.quanta.getTabDataById(state, C.TAB_FEED);
                     if (feedData) {
                         feedData.props.searchTextState.setValue("");
                     }
@@ -488,11 +488,22 @@ export class Nav implements NavIntf {
     }
 
     messages = (props: Object): void => {
+        let feedData: TabDataIntf = S.quanta.getTabDataById(null, C.TAB_FEED);
+        if (!feedData) {
+            return;
+        }
+
         dispatch("Action_SelectTab", (s: AppState): AppState => {
             s.guiReady = true;
             S.quanta.tabChanging(s.activeTab, C.TAB_FEED, s);
             s.activeTab = S.quanta.activeTab = C.TAB_FEED;
-            s = { ...s, ...props };
+
+            // todo-1: find out if this is really necessary to foce React to render tabs.
+            // Clone up a new tabData
+            // s.tabData = [...s.tabData];
+
+            // merge props prarmeter into the feed data props.
+            feedData.props = { ...feedData.props, ...props };
             return s;
         });
         setTimeout(S.srch.refreshFeed, 250);

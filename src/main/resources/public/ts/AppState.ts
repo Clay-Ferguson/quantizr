@@ -42,22 +42,8 @@ export class AppState {
     /* name of currently logged in user */
     userName: string = J.PrincipalName.ANON;
 
-    feedFilterFriends: boolean = false;
-    feedFilterToMe: boolean = false;
-    feedFilterFromMe: boolean = false;
-    feedFilterToPublic: boolean = true;
-    feedFilterLocalServer: boolean = false;
-
-    /* If we're presenting a specific node as the root of our "Feed" view this holds it's id, otherwise
-     for any non-node specific feed query this stays null. */
-    feedFilterRootNode: J.NodeInfo;
-
     // must be true to allow NSFW materials.
     feedFilterNSFW: boolean = true;
-
-    // when true indicates the Feed will show "Refresh when ready..." and not display data
-    // until user has set their checkboxes and clicks "Refresh Feed" button.
-    feedWaitingForUserRefresh: boolean = true;
 
     // todo-1: need to rename 'title', actually holds userName
     title: string = "";
