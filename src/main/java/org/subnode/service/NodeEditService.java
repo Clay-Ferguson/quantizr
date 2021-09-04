@@ -127,8 +127,7 @@ public class NodeEditService {
 	 * by the controller that accepts a node being created by the GUI/user
 	 */
 	public CreateSubNodeResponse createSubNode(MongoSession session, CreateSubNodeRequest req) {
-		log.debug("createSubNode");
-		ThreadLocals.dumpDirtyNodes(); //todo-0: temp code
+		// log.debug("createSubNode");
 		CreateSubNodeResponse res = new CreateSubNodeResponse();
 		session = ThreadLocals.ensure(session);
 
@@ -182,9 +181,6 @@ public class NodeEditService {
 			parentHashTags = "\n\n" + parentHashTags + "\n";
 		}
 
-		log.debug("dumping again.");
-		ThreadLocals.dumpDirtyNodes(); //todo-0: temp code
-
 		SubNode newNode =
 				create.createNode(session, node, null, req.getTypeName(), 0L, createLoc, req.getProperties(), null, true);
 
@@ -202,9 +198,6 @@ public class NodeEditService {
 		if (req.isTypeLock()) {
 			newNode.setProp(NodeProp.TYPE_LOCK.s(), Boolean.valueOf(true));
 		}
-
-		log.debug("dumping again(2).");
-		ThreadLocals.dumpDirtyNodes(); //todo-0: temp code
 
 		// if a user to share to (a Direct Message) is provided, add it.
 		if (req.getShareToUserId() != null) {
@@ -229,10 +222,6 @@ public class NodeEditService {
 		}
 
 		update.save(session, newNode);
-
-		log.debug("dumping again(3).");
-		ThreadLocals.dumpDirtyNodes(); //todo-0: temp code
-
 		res.setNewNode(
 				convert.convertToNodeInfo(ThreadLocals.getSC(), session, newNode, true, false, -1, false, false, false, false));
 

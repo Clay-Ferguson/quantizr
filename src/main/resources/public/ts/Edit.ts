@@ -73,7 +73,7 @@ export class Edit implements EditIntf {
         }
     }
 
-    public initNodeEditResponse = (res: J.InitNodeEditResponse, encrypt: boolean, showJumpButton: boolean, state: AppState): void => {
+    public initNodeEditResponse = (res: J.InitNodeEditResponse, encrypt: boolean, showJumpButton: boolean, replyToId: string, state: AppState): void => {
         if (S.util.checkSuccess("Editing node", res)) {
             const node: J.NodeInfo = res.nodeInfo;
 
@@ -87,8 +87,7 @@ export class Edit implements EditIntf {
                 the editor at that place rather than opening a popup now */
                 if (S.quanta.activeTab === C.TAB_FEED) {
                     dispatch("Action_startEditingInFeed", (s: AppState): AppState => {
-                        // this is passed in from the actual mouse click function and is a temp hack (todo-0)
-                        s.editNodeReplyToId = state.editNodeReplyToId;
+                        s.editNodeReplyToId = replyToId;
                         s.editNodeOnTab = S.quanta.activeTab;
                         s.editNode = res.nodeInfo;
                         s.editShowJumpButton = showJumpButton;
@@ -269,7 +268,7 @@ export class Edit implements EditIntf {
                     properties: null,
                     shareToUserId: null
                 }, (res) => {
-                    this.createSubNodeResponse(res, state);
+                    this.createSubNodeResponse(res, null, state);
                 });
             }
         }
@@ -280,11 +279,11 @@ export class Edit implements EditIntf {
             S.quanta.tempDisableAutoScroll();
             S.quanta.updateNodeMap(res.newNode, state);
             S.quanta.highlightNode(res.newNode, false, state);
-            this.runEditNode(null, res.newNode.id, false, false, state);
+            this.runEditNode(null, res.newNode.id, false, false, null, state);
         }
     }
 
-    createSubNodeResponse = (res: J.CreateSubNodeResponse, state: AppState): void => {
+    createSubNodeResponse = (res: J.CreateSubNodeResponse, replyToId: string, state: AppState): void => {
         if (S.util.checkSuccess("Create subnode", res)) {
             S.quanta.tempDisableAutoScroll();
             if (!res.newNode) {
@@ -292,7 +291,7 @@ export class Edit implements EditIntf {
             }
             else {
                 S.quanta.updateNodeMap(res.newNode, state);
-                this.runEditNode(null, res.newNode.id, res.encrypt, false, state);
+                this.runEditNode(null, res.newNode.id, res.encrypt, false, replyToId, state);
             }
         }
     }
@@ -512,11 +511,11 @@ export class Edit implements EditIntf {
         // scroll to this, because this is a hint telling us we are ALREADY
         // scrolled to this ID so any scrolling will be unnecessary
         S.quanta.noScrollToId = id;
-        this.runEditNode(null, id, false, false, state);
+        this.runEditNode(null, id, false, false, null, state);
     }
 
     /* This can run as an actuall click event function in which only 'evt' is non-null here */
-    runEditNode = (evt: Event, id: string, encrypt: boolean, showJumpButton: boolean, state?: AppState): void => {
+    runEditNode = (evt: Event, id: string, encrypt: boolean, showJumpButton: boolean, replyToId: string, state?: AppState): void => {
         id = S.util.allowIdFromEvent(evt, id);
         state = appState(state);
         if (!id) {
@@ -534,7 +533,7 @@ export class Edit implements EditIntf {
         S.util.ajax<J.InitNodeEditRequest, J.InitNodeEditResponse>("initNodeEdit", {
             nodeId: id
         }, (res) => {
-            this.initNodeEditResponse(res, encrypt, showJumpButton, state);
+            this.initNodeEditResponse(res, encrypt, showJumpButton, replyToId, state);
         });
     }
 
@@ -911,7 +910,7 @@ export class Edit implements EditIntf {
     /* If node is non-null that means this is a reply to that 'node' but if node is 'null' that means
     this user just probably clicked "+" (new post button) on their Feed Tab and so we will let the server create some node
     like "My Posts" in the root of the user's account to host this new 'reply' by creating the new node under that */
-    addNode = async (nodeId: string, content: string, shareToUserId: string, state: AppState) => {
+    addNode = async (nodeId: string, content: string, shareToUserId: string, replyToId: string, state: AppState) => {
         state = appState(state);
 
         // auto-enable edit mode
@@ -930,7 +929,7 @@ export class Edit implements EditIntf {
             properties: null,
             shareToUserId
         }, (res) => {
-            this.createSubNodeResponse(res, state);
+            this.createSubNodeResponse(res, replyToId, state);
         });
     }
 
@@ -953,7 +952,7 @@ export class Edit implements EditIntf {
             if (!state.userPreferences.editMode) {
                 await S.edit.toggleEditMode(state);
             }
-            this.createSubNodeResponse(res, state);
+            this.createSubNodeResponse(res, null, state);
             return null;
         });
     }
@@ -972,7 +971,7 @@ export class Edit implements EditIntf {
             properties: [{ name: J.NodeProp.DATE, value: "" + initDate }],
             shareToUserId: null
         }, (res) => {
-            this.createSubNodeResponse(res, state);
+            this.createSubNodeResponse(res, null, state);
         });
     }
 
