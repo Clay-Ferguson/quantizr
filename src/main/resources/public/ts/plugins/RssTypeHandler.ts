@@ -97,12 +97,12 @@ export class RssTypeHandler extends TypeBase {
         disabling cache for now: somehow the "Play Button" never works (onClick not wired) whenever it renders from the cache and i haven't had time to
         figure this out yet.
         */
-        if (state.feedCache[feedSrcHash] === "failed") {
+        if (state.rssFeedCache[feedSrcHash] === "failed") {
             return new Div("Feed Failed: " + feedSrc, {
                 className: "marginAll"
             });
         }
-        else if (state.feedCache[feedSrcHash] === "loading") {
+        else if (state.rssFeedCache[feedSrcHash] === "loading") {
             return new Div(null, null, [
                 new Heading(4, "Loading Feeds..."),
                 new Div(null, {
@@ -111,8 +111,8 @@ export class RssTypeHandler extends TypeBase {
             ]);
         }
         /* if the feedCache doesn't contain either "failed" or "loading" then treat it like data and render it */
-        else if (state.feedCache[feedSrcHash]) {
-            this.renderItem(state.feedCache[feedSrcHash], feedSrc, itemListContainer, state);
+        else if (state.rssFeedCache[feedSrcHash]) {
+            this.renderItem(state.rssFeedCache[feedSrcHash], feedSrc, itemListContainer, state);
         }
         // otherwise read from the internet
         else {
@@ -120,10 +120,10 @@ export class RssTypeHandler extends TypeBase {
             itemListContainer.addChild(new Div("For large feeds this can take a few seconds..."));
 
             /* warning: paging here is not zero offset. First page is number 1 */
-            let page: number = state.feedPage[feedSrcHash];
+            let page: number = state.rssFeedPage[feedSrcHash];
             if (!page) {
                 page = 1;
-                state.feedPage[feedSrcHash] = page;
+                state.rssFeedPage[feedSrcHash] = page;
             }
 
             S.util.ajax<J.GetMultiRssRequest, J.GetMultiRssResponse>("getMultiRssFeed", {
@@ -134,7 +134,7 @@ export class RssTypeHandler extends TypeBase {
                     // new MessageDlg(err.message || "RSS Feed failed to load.", "Warning", null, null, false, 0, state).open();
                     // console.log(err.message || "RSS Feed failed to load.");
                     dispatch("Action_RSSUpdated", (s: AppState): AppState => {
-                        s.feedCache[feedSrcHash] = "failed";
+                        s.rssFeedCache[feedSrcHash] = "failed";
                         return s;
                     });
                 }
@@ -147,16 +147,16 @@ export class RssTypeHandler extends TypeBase {
                         }, 1000);
 
                         if (!res.feed.entries || res.feed.entries.length === 0) {
-                            s.feedCache[feedSrcHash] = RssTypeHandler.lastGoodFeed || {};
-                            s.feedPage[feedSrcHash] = RssTypeHandler.lastGoodPage || 1;
+                            s.rssFeedCache[feedSrcHash] = RssTypeHandler.lastGoodFeed || {};
+                            s.rssFeedPage[feedSrcHash] = RssTypeHandler.lastGoodPage || 1;
                             setTimeout(() => {
                                 S.util.showMessage("No more RSS items found.", "RSS");
                             }, 250);
                         }
                         else {
-                            s.feedCache[feedSrcHash] = res.feed;
+                            s.rssFeedCache[feedSrcHash] = res.feed;
                             RssTypeHandler.lastGoodFeed = res.feed;
-                            RssTypeHandler.lastGoodPage = s.feedPage[feedSrcHash];
+                            RssTypeHandler.lastGoodPage = s.rssFeedPage[feedSrcHash];
                         }
                         return s;
                     });
@@ -171,7 +171,7 @@ export class RssTypeHandler extends TypeBase {
         // console.log("FEED: " + S.util.prettyPrint(feed));
 
         let feedSrcHash = S.util.hashOfString(feedSrc);
-        let page: number = state.feedPage[feedSrcHash];
+        let page: number = state.rssFeedPage[feedSrcHash];
         if (!page) {
             page = 1;
         }
@@ -274,7 +274,7 @@ export class RssTypeHandler extends TypeBase {
 
     /* cleverly does both prev or next paging */
     pageBump = (feedSrcHash: string, state: AppState, bump: number) => {
-        let page: number = state.feedPage[feedSrcHash];
+        let page: number = state.rssFeedPage[feedSrcHash];
         if (!page) {
             page = 1;
         }
@@ -285,8 +285,8 @@ export class RssTypeHandler extends TypeBase {
     setPage = (feedSrcHash: string, state: AppState, page: number) => {
         dispatch("Action_RSSUpdated", (s: AppState): AppState => {
             // deleting will force a requery from the server
-            delete s.feedCache[feedSrcHash];
-            s.feedPage[feedSrcHash] = page;
+            delete s.rssFeedCache[feedSrcHash];
+            s.rssFeedPage[feedSrcHash] = page;
             return s;
         });
     }
