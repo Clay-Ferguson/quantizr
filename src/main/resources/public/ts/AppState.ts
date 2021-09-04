@@ -28,10 +28,6 @@ export class AppState {
     */
     rendering: boolean = false;
 
-    /* flag that indicates the user can click "Refresh" because there are new changes read */
-    feedDirty: boolean = false;
-    feedLoading: boolean = false;
-
     inlineEditId: string;
     inlineEditVal: string;
 
@@ -42,18 +38,12 @@ export class AppState {
     /* name of currently logged in user */
     userName: string = J.PrincipalName.ANON;
 
-    // must be true to allow NSFW materials.
-    feedFilterNSFW: boolean = true;
-
     // todo-1: need to rename 'title', actually holds userName
     title: string = "";
     displayName: string = "";
 
     node: J.NodeInfo;
     endReached: boolean;
-
-    feedResults: NodeInfo[];
-    feedEndReached: boolean = false;
 
     /* Node Ids to move */
     nodesToMove: string[];
@@ -90,7 +80,6 @@ export class AppState {
 
     userProfile: J.UserProfile = null;
     newMessageCount: number = 0;
-
     selectedNodes: any = {};
 
     /* maps node.id values to NodeInfo.java objects

@@ -82,7 +82,7 @@ export class FeedView extends AppTab {
         ]));
 
         let newItems = null;
-        if (state.feedDirty && !state.feedLoading) {
+        if (this.data.props.feedDirty && !this.data.props.feedLoading) {
             newItems = new Icon({
                 className: "fa fa-lightbulb-o fa-lg feedDirtyIcon marginRight",
                 title: "New content available. Refresh!"
@@ -130,9 +130,9 @@ export class FeedView extends AppTab {
 
         children.push(new Clearfix());
 
-        let childCount = state.feedResults ? state.feedResults.length : 0;
+        let childCount = this.data.props.feedResults ? this.data.props.feedResults.length : 0;
 
-        if (state.feedLoading && childCount === 0) {
+        if (this.data.props.feedLoading && childCount === 0) {
             children.push(new Div(null, null, [
                 new Heading(4, "Loading Feed..."),
                 new Div(null, {
@@ -149,13 +149,13 @@ export class FeedView extends AppTab {
                 children.push(new Heading(4, "Refresh when ready."));
             }
         }
-        else if (!state.feedResults || state.feedResults.length === 0) {
+        else if (!this.data.props.feedResults || this.data.props.feedResults.length === 0) {
             children.push(new Div("Nothing to display."));
             children.push(new TextContent("Tip: Select 'Public' checkbox, to see the entire Fediverse (all public posts)."));
         }
         else {
             let i = 0;
-            state.feedResults.forEach((node: J.NodeInfo) => {
+            this.data.props.feedResults.forEach((node: J.NodeInfo) => {
                 // console.log("FEED: node id=" + node.id + " content: " + node.content);
                 S.srch.initSearchNode(node);
                 children.push(S.srch.renderSearchResultAsListItem(node, i, childCount, rowCount, "feed", true, false, true, true, true, true, state));
@@ -163,7 +163,7 @@ export class FeedView extends AppTab {
                 rowCount++;
             });
 
-            if (rowCount > 0 && !state.feedEndReached) {
+            if (rowCount > 0 && !this.data.props.feedEndReached) {
                 let moreButton = new IconButton("fa-angle-right", "More", {
                     onClick: (event) => {
                         event.stopPropagation();
@@ -288,12 +288,12 @@ export class FeedView extends AppTab {
             }, {
                 setValue: (checked: boolean): void => {
                     dispatch("Action_SetFeedFilterType", (s: AppState): AppState => {
-                        s.feedFilterNSFW = checked;
+                        this.data.props.feedFilterNSFW = checked;
                         return s;
                     });
                 },
                 getValue: (): boolean => {
-                    return store.getState().feedFilterNSFW;
+                    return this.data.props.feedFilterNSFW;
                 }
             })
         ]);

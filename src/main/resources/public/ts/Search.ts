@@ -197,7 +197,7 @@ export class Search implements SearchIntf {
 
         // put in a delay timer since we call this from other state processing functions.
         setTimeout(() => {
-            if (feedData?.props?.autoRefresh && !state.feedLoading) {
+            if (feedData?.props?.autoRefresh && !feedData.props.feedLoading) {
                 this.refreshFeed();
             }
         }, 500);
@@ -211,7 +211,7 @@ export class Search implements SearchIntf {
         }
 
         dispatch("Action_RefreshFeed", (s: AppState): AppState => {
-            s.feedLoading = true;
+            feedData.props.feedLoading = true;
             return s;
         });
 
@@ -233,7 +233,7 @@ export class Search implements SearchIntf {
             toPublic: feedData.props.feedFilterToPublic,
             localOnly: feedData.props.feedFilterLocalServer,
             fromFriends: feedData.props.feedFilterFriends,
-            nsfw: appState.feedFilterNSFW,
+            nsfw: feedData.props.feedFilterNSFW,
             searchText
         }, (res: J.NodeFeedResponse) => {
             dispatch("Action_RenderFeedResults", (s: AppState): AppState => {
@@ -252,25 +252,25 @@ export class Search implements SearchIntf {
                 }
 
                 // if scrolling in new results grow the existing array
-                if (growResults && (s.feedResults == null || s.feedResults.length < C.MAX_DYNAMIC_ROWS)) {
+                if (growResults && (feedData.props.feedResults == null || feedData.props.feedResults.length < C.MAX_DYNAMIC_ROWS)) {
                     // create a set for duplicate detection
                     let idSet: Set<string> = new Set<string>();
 
                     // load set for known children.
-                    s.feedResults.forEach(child => {
+                    feedData.props.feedResults.forEach(child => {
                         idSet.add(child.id);
                     });
 
-                    s.feedResults = s.feedResults.concat(res.searchResults.filter(child => !idSet.has(child.id)));
+                    feedData.props.feedResults = feedData.props.feedResults.concat(res.searchResults.filter(child => !idSet.has(child.id)));
                 }
                 // else we have a fresh array (reset the array)
                 else {
-                    s.feedResults = res.searchResults;
+                    feedData.props.feedResults = res.searchResults;
                 }
 
-                s.feedEndReached = res.endReached;
-                s.feedDirty = false;
-                s.feedLoading = false;
+                feedData.props.feedEndReached = res.endReached;
+                feedData.props.feedDirty = false;
+                feedData.props.feedLoading = false;
 
                 if (!growResults) {
                     S.quanta.selectTabStateOnly(C.TAB_FEED, s);

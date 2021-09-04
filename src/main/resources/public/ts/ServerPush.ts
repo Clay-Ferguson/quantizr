@@ -3,6 +3,7 @@ import { AppState } from "./AppState";
 import { Constants as C } from "./Constants";
 import { MessageDlg } from "./dlg/MessageDlg";
 import { ServerPushIntf } from "./intf/ServerPushIntf";
+import { TabDataIntf } from "./intf/TabDataIntf";
 import * as J from "./JavaIntf";
 import { PubSub } from "./PubSub";
 import { Singletons } from "./Singletons";
@@ -85,6 +86,7 @@ export class ServerPush implements ServerPushIntf {
 
         this.eventSource.addEventListener("feedPush", function (e: any) {
             const obj: J.FeedPushInfo = JSON.parse(e.data);
+            let feedData: TabDataIntf = S.quanta.getTabDataById(null, C.TAB_FEED);
             // console.log("Incomming Push (FeedPushInfo): " + S.util.prettyPrint(obj));
 
             const nodeInfo: J.NodeInfo = obj.nodeInfo;
@@ -92,7 +94,7 @@ export class ServerPush implements ServerPushIntf {
                 // todo-1: I think this dispatch is working, but another full FeedView refresh (from actual server query too) is somehow following after also
                 // so need to check and see how to avoid that.
                 dispatch("Action_RenderFeedResults", (s: AppState): AppState => {
-                    s.feedResults = s.feedResults || [];
+                    feedData.props.feedResults = feedData.props.feedResults || [];
 
                     /* If we detect the incomming change that is our own creation, we display it, but if it's not our own we
                     don't display because for now we aren't doing live feed updates since that can be a nuisance for users to have the
@@ -101,7 +103,7 @@ export class ServerPush implements ServerPushIntf {
 
                         // this is a slight hack to cause the new rows to animate their background, but it's ok, and I plan to leave it like this
                         S.render.fadeInId = nodeInfo.id;
-                        s.feedResults.unshift(nodeInfo);
+                        feedData.props.feedResults.unshift(nodeInfo);
 
                         // scan for any nodes in feedResults where nodeInfo.parent.id is found in the list nodeInfo.id, and
                         // then remove the nodeInfo.id from the list becasue it would be redundant in the list.
@@ -110,7 +112,7 @@ export class ServerPush implements ServerPushIntf {
                     else {
                         /* note: we could que up the incomming nodeInfo, and then avoid a call to the server but for now we just
                         keep it simple and only set a dirty flag */
-                        s.feedDirty = true;
+                        feedData.props.feedDirty = true;
                         S.srch.feedDirtyNotify(s);
                         if (nodeInfo.content && nodeInfo.content.startsWith(J.Constant.ENC_TAG)) {
                             nodeInfo.content = "[Encrypted]";

@@ -316,11 +316,13 @@ export class Quanta implements QuantaIntf {
 
     /* Find node by looking everywhere we possibly can on local storage for it */
     findNodeById = (state: AppState, nodeId: string): J.NodeInfo => {
+        let feedData: TabDataIntf = S.quanta.getTabDataById(null, C.TAB_FEED);
+
         // first look in normal tree map for main view.
         let node: J.NodeInfo = state.idToNodeMap.get(nodeId);
 
         if (!node) {
-            node = state.feedResults.find(n => n.id === nodeId);
+            node = feedData.props.feedResults.find(n => n.id === nodeId);
         }
 
         if (!node) {
@@ -701,7 +703,16 @@ export class Quanta implements QuantaIntf {
 
                         /* If we're presenting a specific node as the root of our "Feed" view this holds it's id, otherwise
                          for any non-node specific feed query this stays null. */
-                        feedFilterRootNode: null
+                        feedFilterRootNode: null,
+
+                        feedDirty: false,
+                        feedLoading: false,
+
+                        // must be true to allow NSFW materials.
+                        feedFilterNSFW: true,
+
+                        feedResults: null, // NodeInfo[];
+                        feedEndReached: false
                     }
                 },
                 {
@@ -1033,19 +1044,19 @@ export class Quanta implements QuantaIntf {
     }
 
     // todo-2: need to decide if I want this. It's disabled currently (not called)
-    removeRedundantFeedItems = (feedResults: J.NodeInfo[]): J.NodeInfo[] => {
-        if (!feedResults || feedResults.length === 0) return feedResults;
+    removeRedundantFeedItems = (feedRes: J.NodeInfo[]): J.NodeInfo[] => {
+        if (!feedRes || feedRes.length === 0) return feedRes;
 
         // first build teh set of ids that that are in 'ni.parent.id'
         const idSet: Set<string> = new Set<string>();
-        feedResults.forEach((ni: J.NodeInfo) => {
+        feedRes.forEach((ni: J.NodeInfo) => {
             if (ni.parent) {
                 idSet.add(ni.parent.id);
             }
         });
 
         // now return filtered list only for items where 'id' is not in the set above.
-        return feedResults.filter(ni => !idSet.has(ni.id));
+        return feedRes.filter(ni => !idSet.has(ni.id));
     }
 
     fullscreenViewerActive = (state: AppState): boolean => {
