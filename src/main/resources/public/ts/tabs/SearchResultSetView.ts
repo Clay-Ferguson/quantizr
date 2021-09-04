@@ -35,8 +35,6 @@ export class SearchResultSetView extends ResultSetView {
             this.data.rsInfo.fuzzy,
             this.data.rsInfo.caseSensitive,
             page,
-
-            // need to set this rsInfo value in various places (todo-0)
             this.data.rsInfo.recursive,
             this.data.rsInfo.sortField,
             this.data.rsInfo.sortDir,
