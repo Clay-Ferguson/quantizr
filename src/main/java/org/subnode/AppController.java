@@ -1449,7 +1449,9 @@ public class AppController implements ErrorController {
 	@GetMapping(API_PATH + "/serverPush")
 	public SseEmitter serverPush(HttpSession session) {
 		return (SseEmitter) callProc.run("serverPush", null, session, ms -> {
-			return ThreadLocals.getSC().getPushEmitter();
+			synchronized (ThreadLocals.getSC().getPushEmitter()) {
+				return ThreadLocals.getSC().getPushEmitter();
+			}
 		});
 	}
 

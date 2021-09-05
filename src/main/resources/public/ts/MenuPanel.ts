@@ -119,7 +119,8 @@ export class MenuPanel extends Div {
             feedFilterFromMe: true,
             feedFilterToPublic: false,
             feedFilterLocalServer: false,
-            feedFilterRootNode: null
+            feedFilterRootNode: null,
+            feedResults: null
         });
     }
 
@@ -134,7 +135,8 @@ export class MenuPanel extends Div {
             feedFilterFromMe: false,
             feedFilterToPublic: false,
             feedFilterLocalServer: false,
-            feedFilterRootNode: null
+            feedFilterRootNode: null,
+            feedResults: null
         });
     }
 
@@ -149,7 +151,8 @@ export class MenuPanel extends Div {
             feedFilterFromMe: false,
             feedFilterToPublic: true,
             feedFilterLocalServer: true,
-            feedFilterRootNode: null
+            feedFilterRootNode: null,
+            feedResults: null
         });
     }
 
@@ -166,7 +169,8 @@ export class MenuPanel extends Div {
             feedFilterFromMe: false,
             feedFilterToPublic: true,
             feedFilterLocalServer: true,
-            feedFilterRootNode: hltNode
+            feedFilterRootNode: hltNode,
+            feedResults: null
         });
     }
 
@@ -181,7 +185,8 @@ export class MenuPanel extends Div {
             feedFilterFromMe: false,
             feedFilterToPublic: true,
             feedFilterLocalServer: false,
-            feedFilterRootNode: null
+            feedFilterRootNode: null,
+            feedResults: null
         });
     }
 

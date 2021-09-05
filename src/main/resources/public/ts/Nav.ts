@@ -376,7 +376,8 @@ export class Nav implements NavIntf {
                     feedFilterFromMe: false,
                     feedFilterToPublic: true,
                     feedFilterLocalServer: true,
-                    feedFilterRootNode: node
+                    feedFilterRootNode: node,
+                    feedResults: null
                 });
             }, 500);
         }
@@ -404,7 +405,8 @@ export class Nav implements NavIntf {
                         feedFilterFromMe: false,
                         feedFilterToPublic: true,
                         feedFilterLocalServer: true,
-                        feedFilterRootNode: res.node
+                        feedFilterRootNode: res.node,
+                        feedResults: null
                     });
                 }, // fail callback
                 (res: string) => {
@@ -497,14 +499,10 @@ export class Nav implements NavIntf {
             S.quanta.tabChanging(s.activeTab, C.TAB_FEED, s);
             s.activeTab = S.quanta.activeTab = C.TAB_FEED;
 
-            // todo-1: find out if this is really necessary to foce React to render tabs.
-            // Clone up a new tabData
-            // s.tabData = [...s.tabData];
-
             // merge props prarmeter into the feed data props.
             feedData.props = { ...feedData.props, ...props };
             return s;
         });
-        setTimeout(S.srch.refreshFeed, 250);
+        setTimeout(S.srch.refreshFeed, 10);
     }
 }

@@ -776,6 +776,8 @@ export class Quanta implements QuantaIntf {
     }
 
     tabScrollTop = (state: AppState, tabName: string) => {
+        // #DEBUG-SCROLLING
+        // console.log("Scrolling tab " + tabName + " to top");
         let data = state.tabData.find(d => d.id === tabName);
         if (data) {
             data.scrollPos = 0;
@@ -1075,7 +1077,8 @@ export class Quanta implements QuantaIntf {
             feedFilterFromMe: true,
             feedFilterToPublic: false,
             feedFilterLocalServer: false,
-            feedFilterRootNode: null
+            feedFilterRootNode: null,
+            feedResults: null
         });
     }
 
@@ -1086,7 +1089,8 @@ export class Quanta implements QuantaIntf {
             feedFilterFromMe: false,
             feedFilterToPublic: true,
             feedFilterLocalServer: false,
-            feedFilterRootNode: null
+            feedFilterRootNode: null,
+            feedResults: null
         });
     }
 }

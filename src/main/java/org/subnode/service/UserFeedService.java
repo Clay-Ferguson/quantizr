@@ -97,17 +97,8 @@ public class UserFeedService {
 		HashSet<String> usersSharedToSet = new HashSet<>();
 		usersSharedToSet.addAll(usersSharedTo);
 
-		/*
-		 * Get a local list of 'allSessions' so we can release the lock on the SessionContent varible
-		 * immediately
-		 */
-		List<SessionContext> allSessions = new LinkedList<>();
-		synchronized (SessionContext.allSessions) {
-			allSessions.addAll(SessionContext.allSessions);
-		}
-
 		/* Scan all sessions and push message to the ones that need to see it */
-		for (SessionContext sc : allSessions) {
+		for (SessionContext sc : SessionContext.getAllSessions()) {
 			// if we know we already just pushed to this session, we can skip it in here.
 			if (sessionsPushed != null && sessionsPushed.contains(sc.hashCode())) {
 				continue;
@@ -137,20 +128,16 @@ public class UserFeedService {
 	 * node)
 	 */
 	public void pushNodeToMonitoringBrowsers(MongoSession session, HashSet<Integer> sessionsPushed, SubNode node) {
-		/*
-		 * Get a local list of 'allSessions' so we can release the lock on the SessionContent varible
-		 * immediately
-		 */
-		List<SessionContext> allSessions = new LinkedList<>();
-		synchronized (SessionContext.allSessions) {
-			allSessions.addAll(SessionContext.allSessions);
-		}
+		// log.debug("Push to monitoring Browsers: node.content=" + node.getContent());
 
 		/* Scan all sessions and push message to the ones that need to see it */
-		for (SessionContext sc : allSessions) {
+		for (SessionContext sc : SessionContext.getAllSessions()) {
 			/* Anonymous sessions won't have userName and can be ignored */
 			if (sc.getUserName() == null)
 				continue;
+
+			// log.debug("Pushing to SessionContext: hashCode=" + sc.hashCode() + " user=" + sc.getUserName() + " token="
+			// 		+ sc.getUserToken());
 
 			// if this node starts with the 'watchingPath' of the user that means the node is a descendant of
 			// the watching path
@@ -172,17 +159,8 @@ public class UserFeedService {
 
 	/* Notify all browser timelines if they have new info */
 	public void pushTimelineUpdateToBrowsers(MongoSession session, NodeInfo nodeInfo) {
-		/*
-		 * Get a local list of 'allSessions' so we can release the lock on the SessionContent varible
-		 * immediately
-		 */
-		List<SessionContext> allSessions = new LinkedList<>();
-		synchronized (SessionContext.allSessions) {
-			allSessions.addAll(SessionContext.allSessions);
-		}
-
 		/* Scan all sessions and push message to the ones that need to see it */
-		for (SessionContext sc : allSessions) {
+		for (SessionContext sc : SessionContext.getAllSessions()) {
 			/* Anonymous sessions can be ignored */
 			if (sc.getUserName() == null)
 				continue;
@@ -210,32 +188,35 @@ public class UserFeedService {
 			if (pushEmitter == null)
 				return;
 
-			try {
-				SseEventBuilder event = SseEmitter.event() //
-						.data(info) //
-						.id(String.valueOf(info.hashCode()))//
-						.name(info.getType());
+			synchronized (pushEmitter) {
+				// log.debug("Pushing to Session User: " + sc.getUserName());
+				try {
+					SseEventBuilder event = SseEmitter.event() //
+							.data(info) //
+							.id(String.valueOf(info.hashCode()))//
+							.name(info.getType());
 
-				pushEmitter.send(event);
+					pushEmitter.send(event);
 
-				/*
-				 * DO NOT DELETE. This way of sending also works, and I was originally doing it this way and picking
-				 * up in eventSource.onmessage = e => {} on the browser, but I decided to use the builder instead
-				 * and let the 'name' in the builder route different objects to different event listeners on the
-				 * client. Not really sure if either approach has major advantages over the other.
-				 * 
-				 * pushEmitter.send(info, MediaType.APPLICATION_JSON);
-				 */
-			} catch (Exception ex) {
-				pushEmitter.completeWithError(ex);
-			} finally {
-				// todo-1: this can be done in a slightly cleaner way (more decoupled)
-				if (info instanceof SessionTimeoutPushInfo) {
-					ThreadLocals.setMongoSession(null);
-					sc.setLive(false);
-					sc.setRootId(null);
-					sc.setUserName(null);
-					sc.setPushEmitter(null);
+					/*
+					 * DO NOT DELETE. This way of sending also works, and I was originally doing it this way and picking
+					 * up in eventSource.onmessage = e => {} on the browser, but I decided to use the builder instead
+					 * and let the 'name' in the builder route different objects to different event listeners on the
+					 * client. Not really sure if either approach has major advantages over the other.
+					 * 
+					 * pushEmitter.send(info, MediaType.APPLICATION_JSON);
+					 */
+				} catch (Exception ex) {
+					pushEmitter.completeWithError(ex);
+				} finally {
+					// todo-1: this can be done in a slightly cleaner way (more decoupled)
+					if (info instanceof SessionTimeoutPushInfo) {
+						ThreadLocals.setMongoSession(null);
+						sc.setLive(false);
+						sc.setRootId(null);
+						sc.setUserName(null);
+						sc.setPushEmitter(null);
+					}
 				}
 			}
 		});

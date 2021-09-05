@@ -15,6 +15,7 @@ import * as J from "./JavaIntf";
 import { NodeHistoryItem } from "./NodeHistoryItem";
 import { PubSub } from "./PubSub";
 import { Singletons } from "./Singletons";
+import { FeedView } from "./tabs/FeedView";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (s: Singletons) => {
@@ -303,8 +304,8 @@ export class Edit implements EditIntf {
             // if on feed tab, and it became dirty while we were editing then refresh it.
             if (state.activeTab === C.TAB_FEED) {
                 let feedData: TabDataIntf = S.quanta.getTabDataById(null, C.TAB_FEED);
-                if (feedData?.props?.feedDirty) {
-                    S.srch.refreshFeed();
+                if (feedData?.props?.feedDirtyList) {
+                    FeedView.updateFromFeedDirtyList(feedData, state);
                 }
             }
 

@@ -102,6 +102,9 @@ public class AppFilter extends GenericFilterBean {
 
 				// if we don't have a SessionContext yet or it timed out then create a new one.
 				if (sc == null || !sc.isLive()) {
+					// Note: we create SessionContext objects here on some requests that don't need them, but that's ok
+					// becasue all our code makes the assumption there will be a SessionContext on the thread.
+					// log.debug("Creating new session at req "+httpReq.getRequestURI());
 					sc = (SessionContext) SpringContextUtil.getBean(SessionContext.class);
 					session.setAttribute(QSC, sc);
 				}
@@ -110,7 +113,7 @@ public class AppFilter extends GenericFilterBean {
 				sc.addAction(httpReq.getRequestURI());
 				String bearer = httpReq.getHeader("Bearer");
 
-				// if auth token is privided and doesn't exist that's a timeout session so send user
+				// if auth token is privided and doesn't exist that's a timed out session so send user
 				// back to welcome page. Should also blow away all browser memory. New browser page load.
 				if (!StringUtils.isEmpty(bearer) && !SessionContext.validToken(bearer, null)) {
 					// just ignore an invalid token like it was not there.

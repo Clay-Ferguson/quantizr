@@ -80,7 +80,7 @@ public class SessionContext {
 	private SseEmitter pushEmitter = new SseEmitter();
 
 	// this one WILL work with multiple sessions per user
-	public static final HashSet<SessionContext> allSessions = new HashSet<>();
+	private static final HashSet<SessionContext> allSessions = new HashSet<>();
 
 	// Full list of active and inactive (dead) sessions.
 	public static final HashSet<SessionContext> historicalSessions = new HashSet<>();
@@ -127,26 +127,26 @@ public class SessionContext {
 	public SessionContext cloneForThread() {
 		SessionContext sc = (SessionContext) SpringContextUtil.getBean(SessionContext.class);
 
-		sc.live = this.live;
-		sc.rootId = this.rootId;
-		sc.timelinePath = this.timelinePath;
-		sc.userName = this.userName;
-		sc.pastUserName = this.pastUserName;
-		sc.ip = this.ip;
-		sc.timezone = this.timezone;
-		sc.timeZoneAbbrev = this.timeZoneAbbrev;
-		sc.lastLoginTime = this.lastLoginTime;
-		sc.lastActiveTime = this.lastActiveTime;
-		sc.userPreferences = this.userPreferences;
-		sc.urlId = this.urlId;
-		sc.counter = sc.counter;
-		sc.pushEmitter = new SseEmitter();
+		sc.live = live;
+		sc.rootId = rootId;
+		sc.timelinePath = timelinePath;
+		sc.userName = userName;
+		sc.pastUserName = pastUserName;
+		sc.ip = ip;
+		sc.timezone = timezone;
+		sc.timeZoneAbbrev = timeZoneAbbrev;
+		sc.lastLoginTime = lastLoginTime;
+		sc.lastActiveTime = lastActiveTime;
+		sc.userPreferences = userPreferences;
+		sc.urlId = urlId;
+		sc.counter = counter;
+		sc.pushEmitter = pushEmitter;
 		sc.actionCounters = new HashMap<>();
 		sc.stopwatchData = new LinkedList<>();
-		sc.captcha = this.captcha;
-		sc.captchaFails = this.captchaFails;
-		sc.feedMaxTime = this.feedMaxTime;
-		sc.userToken = sc.userToken;
+		sc.captcha = captcha;
+		sc.captchaFails = captchaFails;
+		sc.feedMaxTime = feedMaxTime;
+		sc.userToken = userToken;
 		sc.watchingPath = watchingPath;
 
 		return sc;
@@ -201,8 +201,7 @@ public class SessionContext {
 			} else {
 				throw new RuntimeException("No userNode found for user: " + userName);
 			}
-		}
-		else {
+		} else {
 			setUserNodeId(userNodeId);
 		}
 	}
@@ -246,10 +245,25 @@ public class SessionContext {
 		return userToken;
 	}
 
+	/*
+	 * todo-0: we're still ending up with way too many sessions that are dupliates from the same
+	 * browser, so until I find out the cause of that we can at least ensure we only can ever send back
+	 * unique (by login token) sessions from this function as a wokraround/crutch
+	 */
 	public static List<SessionContext> getAllSessions() {
+		List<SessionContext> ret = new LinkedList<>();
+		HashSet<String> tokens = new HashSet<>();
 		synchronized (allSessions) {
-			return new LinkedList<>(allSessions);
+			for (SessionContext sc : allSessions) {
+				if (sc.isLive() && sc.getUserToken() != null) {
+					if (!tokens.contains(sc.getUserToken())) {
+						ret.add(sc);
+						tokens.add(sc.getUserToken());
+					}
+				}
+			}
 		}
+		return ret;
 	}
 
 	public static List<SessionContext> getHistoricalSessions() {

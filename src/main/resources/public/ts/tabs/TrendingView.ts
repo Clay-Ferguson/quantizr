@@ -133,7 +133,8 @@ export class TrendingView extends AppTab {
             feedFilterFromMe: false,
             feedFilterToPublic: true,
             feedFilterLocalServer: false,
-            feedFilterRootNode: null
+            feedFilterRootNode: null,
+            feedResults: null
         });
     }
 }

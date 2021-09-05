@@ -81,7 +81,7 @@ export class FeedView extends AppTab {
         ]));
 
         let newItems = null;
-        if (this.data.props.feedDirty && !this.data.props.feedLoading) {
+        if ((this.data.props.feedDirty || this.data.props.feedDirtyList) && !this.data.props.feedLoading) {
             newItems = new Icon({
                 className: "fa fa-lightbulb-o fa-lg feedDirtyIcon marginRight",
                 title: "New content available. Refresh!"
@@ -321,5 +321,20 @@ export class FeedView extends AppTab {
                 }
             })
         ]);
+    }
+
+    static updateFromFeedDirtyList = (feedData: TabDataIntf, state: AppState): void => {
+        if (feedData?.props?.feedDirtyList) {
+            for (let node of feedData.props.feedDirtyList) {
+                // console.log("Force Feed: " + node.content);
+                S.push.forceFeedItem(node, feedData, state);
+            }
+            feedData.props.feedDirtyList = null;
+
+            // all the data in feedData will have been updated by forceFeedItem to just force react to render now.
+            dispatch("Action_ForceFeedResults", (s: AppState): AppState => {
+                return s;
+            });
+        }
     }
 }
