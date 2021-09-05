@@ -24,23 +24,6 @@ export class NodeCompRowFooter extends Div {
     preRender(): void {
         let state: AppState = useSelector((state: AppState) => state);
         let children = [];
-        let publicReadOnly = S.props.isPublicReadOnly(this.node);
-
-        /* Show the reply button unless we detect it's only shared to public and is readonly */
-        if (this.isFeed && !publicReadOnly) {
-            children.push(new Icon({
-                title: "Reply to this Node",
-                className: "fa fa-reply fa-lg rowFooterIcon",
-                onClick: () => {
-                    if (state.isAnonUser) {
-                        S.util.showMessage("Login to create content and reply to nodes.", "Login!");
-                    }
-                    else {
-                        S.edit.addNode(this.node.id, null, null, this.node.id, state);
-                    }
-                }
-            }, "Reply", "marginRight"));
-        }
 
         if (this.node.owner.indexOf("@") !== -1) {
             let inReplTo = S.props.getNodePropVal(J.NodeProp.ACT_PUB_OBJ_INREPLYTO, this.node);

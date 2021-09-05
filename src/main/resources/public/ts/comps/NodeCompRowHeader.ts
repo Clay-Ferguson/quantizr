@@ -103,9 +103,27 @@ export class NodeCompRowHeader extends Div {
         // Allow bookmarking any kind of node other than bookmark nodes.
         if (!state.isAnonUser && node.type !== J.NodeType.BOOKMARK && node.type !== J.NodeType.BOOKMARK_LIST) {
             children.push(new Icon({
-                className: "fa fa-bookmark fa-lg",
+                className: "fa fa-bookmark fa-lg marginRight",
                 title: "Bookmark this Node",
                 onClick: () => S.edit.addBookmark(node, state)
+            }));
+        }
+
+        let publicReadOnly = S.props.isPublicReadOnly(node);
+
+        /* Show the reply button unless we detect it's only shared to public and is readonly */
+        if (this.isFeed && !publicReadOnly) {
+            children.push(new Icon({
+                title: "Reply to this Node",
+                className: "fa fa-reply fa-lg",
+                onClick: () => {
+                    if (state.isAnonUser) {
+                        S.util.showMessage("Login to create content and reply to nodes.", "Login!");
+                    }
+                    else {
+                        S.edit.addNode(node.id, null, null, node.id, state);
+                    }
+                }
             }));
         }
 
@@ -154,25 +172,16 @@ export class NodeCompRowHeader extends Div {
         }
 
         let editingAllowed = S.edit.isEditAllowed(node, state);
-        let deleteAllowed = false;
         let editableNode = true;
 
         if (state.isAdminUser) {
             editingAllowed = true;
-            deleteAllowed = true;
             editableNode = true;
         }
         else if (typeHandler) {
             if (editingAllowed) {
                 editingAllowed = typeHandler.allowAction(NodeActionType.editNode, node, state);
-                deleteAllowed = typeHandler.allowAction(NodeActionType.delete, node, state);
                 editableNode = typeHandler.allowAction(NodeActionType.editNode, node, state);
-            }
-        }
-        else {
-            // bug fix. this case was not covered.
-            if (editingAllowed) {
-                deleteAllowed = true;
             }
         }
 
