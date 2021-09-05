@@ -192,12 +192,11 @@ export class Search implements SearchIntf {
 
     /* If we have the Auto-Refresh checkbox checked by the user, and we just detected new changes comming in then we do a request
     from the server for a refresh */
-    feedDirtyNotify = (state: AppState): void => {
-        let feedData: TabDataIntf = S.quanta.getTabDataById(state, C.TAB_FEED);
-
+    delayedRefreshFeed = (state: AppState): void => {
         // put in a delay timer since we call this from other state processing functions.
         setTimeout(() => {
-            if (feedData?.props?.autoRefresh && !feedData.props.feedLoading) {
+            let feedData: TabDataIntf = S.quanta.getTabDataById(state, C.TAB_FEED);
+            if (!feedData.props.feedLoading) {
                 this.refreshFeed();
             }
         }, 500);
@@ -424,11 +423,8 @@ export class Search implements SearchIntf {
             allowFooter ? new NodeCompRowFooter(node, isFeed) : null
         ]);
 
-        /* yeah, it's slightly awkward to choose a style based on isFeed here */
-        let itemClass = isFeed ? "userFeedItemCompact" : "userFeedItem"; // (index === count - 1) ? "userFeedItemLast" : "userFeedItem";
-
         return new Div(null, {
-            className: isParent ? "userFeedItemParent" : itemClass
+            className: isParent ? "userFeedItemParent" : "userFeedItem"
         }, [parentItem, div]);
     }
 

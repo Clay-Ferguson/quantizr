@@ -796,13 +796,13 @@ export class Quanta implements QuantaIntf {
         PubSub.pub(C.PUBSUB_tabChanging, newTab);
     }
 
-    /* We look at the node, and get the parent path from it, and then if there is a node matching that being displayed
+    /* We look at the node, and get the parent path from it, and then if there is a node matching that's being displayed
     in the tree we ensure that the "Open" button is visible. This normally indicates this node has been replied to
 
     If a reducer is running, just pass the state, because it will be the state we need, but if not we will be doing a
     getState and then dispatching the change.
     */
-    showOpenButtonOnNode = (node: J.NodeInfo, state: AppState): void => {
+    refreshOpenButtonOnNode = (node: J.NodeInfo, state: AppState): void => {
         if (!node || !state.node || !state.node.children) return;
         let doDispatch = state == null;
         if (!state) {

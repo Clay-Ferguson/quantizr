@@ -648,7 +648,7 @@ export class EditNodeDlg extends DialogBase {
                 title: "Upload file attachment"
             }) : null,
 
-            allowShare ? new IconButton("fa-envelope", null, {
+            allowShare ? new IconButton("fa-users", null, {
                 onClick: this.share,
                 title: "Share Node"
             }) : null,

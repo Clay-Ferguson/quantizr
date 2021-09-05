@@ -46,7 +46,7 @@ export interface QuantaIntf {
     allowGrowPage: number;
 
     tabChanging(prevTab: string, newTab: string, state: AppState): void;
-    showOpenButtonOnNode(node: J.NodeInfo, state: AppState): void;
+    refreshOpenButtonOnNode(node: J.NodeInfo, state: AppState): void;
     toggleMouseEffect(): void;
     runClickAnimation(x: number, y: number): void;
     setOverlay(showOverlay: boolean): void;

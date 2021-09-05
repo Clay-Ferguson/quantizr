@@ -300,7 +300,7 @@ export class Edit implements EditIntf {
         if (S.util.checkSuccess("Save node", res)) {
             await this.distributeKeys(node, res.aclEntries);
 
-            // if on feed tab, and it became durty while we were editing then refrsh it.
+            // if on feed tab, and it became dirty while we were editing then refresh it.
             if (state.activeTab === C.TAB_FEED) {
                 let feedData: TabDataIntf = S.quanta.getTabDataById(null, C.TAB_FEED);
                 if (feedData?.props?.feedDirty) {

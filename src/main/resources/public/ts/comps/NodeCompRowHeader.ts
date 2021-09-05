@@ -7,6 +7,7 @@ import { TypeHandlerIntf } from "../intf/TypeHandlerIntf";
 import * as J from "../JavaIntf";
 import { PubSub } from "../PubSub";
 import { Singletons } from "../Singletons";
+import { ButtonBar } from "../widget/ButtonBar";
 import { Clearfix } from "../widget/Clearfix";
 import { Div } from "../widget/Div";
 import { Icon } from "../widget/Icon";
@@ -185,18 +186,19 @@ export class NodeCompRowHeader extends Div {
             }
         }
 
+        let editButton: IconButton = null;
+        let jumpButton: IconButton = null;
+
         /* Note: if this is on the main tree then we don't show the edit button here because it'll be
         showing up in a different place. We show here only for timeline, or search results views */
         if (!this.isMainTree && state.userPreferences.editMode) {
             if (editingAllowed && editableNode && !state.editNode) {
-                floatUpperRightDiv.addChild(new Span(null, { className: "marginLeft" }, [
-                    new IconButton("fa-edit", null, {
-                        className: "marginLeft",
-                        onClick: S.edit.runEditNodeByClick,
-                        title: "Edit Node",
-                        nid: node.id
-                    })
-                ]));
+                editButton = new IconButton("fa-edit", null, {
+                    className: "marginLeft",
+                    onClick: S.edit.runEditNodeByClick,
+                    title: "Edit Node",
+                    nid: node.id
+                });
             }
 
             // DO NOT DELETE:
@@ -227,24 +229,24 @@ export class NodeCompRowHeader extends Div {
             const targetId = S.props.getNodePropVal(J.NodeProp.TARGET_ID, this.node);
             if (targetId) {
                 jumpButtonAdded = true;
-                floatUpperRightDiv.addChild(new Span(null, { className: "marginLeft" }, [
-                    new IconButton("fa-arrow-right", null, {
-                        className: "marginLeft",
-                        onClick: () => S.view.jumpToId(targetId),
-                        title: "Jump to the Node"
-                    })
-                ]));
+                jumpButton = new IconButton("fa-arrow-right", null, {
+                    className: "marginLeft",
+                    onClick: () => S.view.jumpToId(targetId),
+                    title: "Jump to the Node"
+                });
             }
         }
 
         if (this.jumpButton && !jumpButtonAdded) {
-            floatUpperRightDiv.addChild(new Span(null, { className: "marginLeft" }, [
-                new IconButton("fa-arrow-right", null, {
-                    className: "marginLeft",
-                    onClick: () => S.srch.clickSearchNode(node.id, state),
-                    title: "Jump to this Node in the Main Tab"
-                })
-            ]));
+            jumpButton = new IconButton("fa-arrow-right", null, {
+                className: "marginLeft",
+                onClick: () => S.srch.clickSearchNode(node.id, state),
+                title: "Jump to this Node in the Main Tab"
+            });
+        }
+
+        if (editButton || jumpButton) {
+            floatUpperRightDiv.addChild(new ButtonBar([editButton, jumpButton], null, "marginLeft"));
         }
 
         if (floatUpperRightDiv.hasChildren()) {

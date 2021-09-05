@@ -131,8 +131,14 @@ export class FeedView extends AppTab {
 
         let childCount = this.data.props.feedResults ? this.data.props.feedResults.length : 0;
 
+        // if we're editing an existing item determine that before starting to render rows.
+        let editingExistingItem = false;
+        if (state.editNode && state.editNodeOnTab === C.TAB_FEED) {
+            editingExistingItem = this.data.props.feedResults.findIndex(n => n.id === state.editNode.id) !== -1;
+        }
+
         // if editing a new post (not a reply)
-        if (state.editNode && state.editNodeOnTab === C.TAB_FEED && !state.editNodeReplyToId) {
+        if (!editingExistingItem && state.editNode && state.editNodeOnTab === C.TAB_FEED && !state.editNodeReplyToId) {
             children.push(EditNodeDlg.embedInstance || new EditNodeDlg(state.editNode, state.editEncrypt, state.editShowJumpButton, state, DialogMode.EMBED));
         }
 
@@ -160,19 +166,28 @@ export class FeedView extends AppTab {
         else {
             let i = 0;
             this.data.props.feedResults.forEach((node: J.NodeInfo) => {
-                // console.log("FEED: node id=" + node.id + " content: " + node.content);
-                S.srch.initSearchNode(node);
-                children.push(S.srch.renderSearchResultAsListItem(node, i, childCount, rowCount, "feed", true, false, true, true, true, true, state));
-                i++;
-                rowCount++;
 
-                // editing a reply inline.
-                if (state.editNode && state.editNodeOnTab === C.TAB_FEED && state.editNodeReplyToId === node.id) {
+                // If we're editing this item right on the feed page, render the editor instead of the row
+                if (editingExistingItem && node.id === state.editNode.id) {
                     children.push(EditNodeDlg.embedInstance || new EditNodeDlg(state.editNode, state.editEncrypt, state.editShowJumpButton, state, DialogMode.EMBED));
+                }
+                // Otherwise render the item and *maybe* an editor below it (only if we're editing a reply to the node)
+                else {
+                    // console.log("FEED: node id=" + node.id + " content: " + node.content);
+                    S.srch.initSearchNode(node);
+                    children.push(S.srch.renderSearchResultAsListItem(node, i, childCount, rowCount, "feed", true, false, true, true, true, true, state));
+                    i++;
+                    rowCount++;
+
+                    // editing a reply inline.
+                    if (state.editNode && state.editNodeOnTab === C.TAB_FEED && state.editNodeReplyToId === node.id) {
+                        children.push(EditNodeDlg.embedInstance || new EditNodeDlg(state.editNode, state.editEncrypt, state.editShowJumpButton, state, DialogMode.EMBED));
+                    }
                 }
             });
 
-            if (rowCount > 0 && !this.data.props.feedEndReached) {
+            // only show "More" button if we aren't currently editing. Wouldn't make sense to navigage while editing.
+            if (!state.editNode && rowCount > 0 && !this.data.props.feedEndReached) {
                 let moreButton = new IconButton("fa-angle-right", "More", {
                     onClick: (event) => {
                         event.stopPropagation();

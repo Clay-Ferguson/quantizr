@@ -37,7 +37,7 @@ export class RoomTypeHandler extends TypeBase {
             new ButtonBar([
                 new Button("Join Room", () => {
                     S.nav.openNodeFeed(null, node.id);
-                })
+                }, null, "btn-primary")
             ], "marginLeft marginBottom")
         ]);
     }
