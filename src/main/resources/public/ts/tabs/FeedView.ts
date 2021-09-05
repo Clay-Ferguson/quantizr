@@ -204,7 +204,7 @@ export class FeedView extends AppTab {
 
     /* overridable (don't use arrow function) */
     renderHeading(state: AppState): CompIntf {
-        return new Heading(4, this.data.props.feedFilterRootNode ? "Chat Room" : "Fediverse Feed", { className: "resultsTitle" });
+        return new Heading(4, this.data.props.feedFilterRootNode ? "Chat Room" : "Feed", { className: "resultsTitle" });
     }
 
     clearSearch = () => {

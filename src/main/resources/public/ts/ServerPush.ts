@@ -113,7 +113,14 @@ export class ServerPush implements ServerPushIntf {
 
                         // this is a slight hack to cause the new rows to animate their background, but it's ok, and I plan to leave it like this
                         S.render.fadeInId = nodeInfo.id;
-                        feedData.props.feedResults.unshift(nodeInfo);
+
+                        // if item is already in feedResults replace it, or else put it at the start of the array.
+                        let idx = feedData.props.feedResults.findIndex(item => item.id === nodeInfo.id);
+                        if (idx === -1) {
+                            feedData.props.feedResults.unshift(nodeInfo);
+                        } else {
+                            feedData.props.feedResults[idx] = (nodeInfo);
+                        }
 
                         // scan for any nodes in feedResults where nodeInfo.parent.id is found in the list nodeInfo.id, and
                         // then remove the nodeInfo.id from the list becasue it would be redundant in the list.

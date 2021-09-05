@@ -265,7 +265,6 @@ export class Nav implements NavIntf {
     }
 
     navPageNodeResponse = (res: J.RenderNodeResponse, state: AppState): void => {
-        S.quanta.clearSelNodes(state);
         S.render.renderPageFromData(res, true, null, true, true);
         S.quanta.selectTab(C.TAB_MAIN);
     }

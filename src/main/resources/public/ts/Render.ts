@@ -403,7 +403,6 @@ export class Render implements RenderIntf {
                         }
                     }
 
-                    s.selectedNodes = {};
                     if (s.node && !s.isAnonUser) {
                         // do this async just for performance
                         setTimeout(() => {
