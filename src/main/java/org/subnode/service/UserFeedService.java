@@ -75,8 +75,6 @@ public class UserFeedService {
 	@Autowired
 	private AdminRun arun;
 
-	public final HashSet<ObjectId> adminBlockedUsers = new HashSet<>();
-
 	@Autowired
 	@Qualifier("threadPoolTaskExecutor")
 	private Executor executor;
@@ -352,21 +350,6 @@ public class UserFeedService {
 
 		HashSet<ObjectId> blockedUserIds = new HashSet<>();
 
-		boolean isPublicCuratedFeed = req.getNodeId() == null && (!req.getToMe() && !req.getFromMe() && !req.getFromFriends());
-
-		/*
-		 * This is our slightly confusing way of detecting that this is a 'global Fediverse' (either local
-		 * or remote) query, and will be subject to the admin blocked users
-		 */
-		if (isPublicCuratedFeed) {
-			getBlockedUserIds(blockedUserIds, PrincipalName.ADMIN.s());
-
-			// for global queries, we only show posts over 80 characters to try to eliminate posts that are
-			// replies like "thanks" or "you're right" etc. I haven't fully tested this, so for now I'm hand
-			// coding an additional filter for the 80 char requirement in the loop below
-			criteria = criteria.and(SubNode.FIELD_CONTENT).regex("^.{80,}$");
-		}
-
 		/*
 		 * Users can manually add a property named "unpublish" to have a "public" node that nonetheles
 		 * doesn't show up in any feeds, but in the future maybe we will make this a checkbox on the editor.
@@ -375,7 +358,7 @@ public class UserFeedService {
 		// criteria = criteria.and(SubNode.FIELD_PROPERTIES + "." + NodeProp.UNPUBLISHED +
 		// ".value").is(null);
 
-		getBlockedUserIds(blockedUserIds, null);
+		getBlockedUserIds(blockedUserIds);
 		if (blockedUserIds.size() > 0) {
 			criteria = criteria.and(SubNode.FIELD_OWNER).nin(blockedUserIds);
 		}
@@ -480,12 +463,6 @@ public class UserFeedService {
 		SubNode lastNode = null;
 
 		for (SubNode node : iter) {
-			if (isPublicCuratedFeed) {
-				if (node.getContent() == null || node.getContent().length() < 80) {
-					continue;
-				}
-			}
-
 			try {
 				NodeInfo info =
 						convert.convertToNodeInfo(sc, session, node, true, false, counter + 1, false, false, false, false);
@@ -515,21 +492,9 @@ public class UserFeedService {
 		return res;
 	}
 
-	public void getBlockedUserIds(HashSet<ObjectId> set, String userName) {
-		boolean forAdmin = userName != null && userName.equals(PrincipalName.ADMIN.s());
-
-		/*
-		 * If admin-blocked users are cached, always use cached value.
-		 */
-		if (forAdmin && adminBlockedUsers.size() > 0) {
-			synchronized (adminBlockedUsers) {
-				set.addAll(adminBlockedUsers);
-			}
-			return;
-		}
-
+	public void getBlockedUserIds(HashSet<ObjectId> set) {
 		arun.run(ms -> {
-			List<SubNode> nodeList = userManagerService.getSpecialNodesList(ms, NodeType.BLOCKED_USERS.s(), userName, false);
+			List<SubNode> nodeList = userManagerService.getSpecialNodesList(ms, NodeType.BLOCKED_USERS.s(), null, false);
 			if (nodeList == null)
 				return null;
 
@@ -537,12 +502,6 @@ public class UserFeedService {
 				String userNodeId = node.getStrProp(NodeProp.USER_NODE_ID.s());
 				ObjectId oid = new ObjectId(userNodeId);
 				set.add(oid);
-
-				if (forAdmin) {
-					synchronized (adminBlockedUsers) {
-						adminBlockedUsers.add(oid);
-					}
-				}
 			}
 			return null;
 		});

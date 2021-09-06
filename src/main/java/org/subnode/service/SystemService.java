@@ -189,12 +189,6 @@ public class SystemService {
 	}
 
 	public String getSystemInfo() {
-		// todo-1: this is kind of a tricky side effect, until I figure out a perhaps
-		// better way to trigger the adminBlockedUsers cache to refresh.
-		synchronized (userFeedService.adminBlockedUsers) {
-			userFeedService.adminBlockedUsers.clear();
-		}
-
 		StringBuilder sb = new StringBuilder();
 		sb.append("Daemons Enabed: " + String.valueOf(appProp.isDaemonsEnabled()) + "\n");
 		Runtime runtime = Runtime.getRuntime();
