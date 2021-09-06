@@ -55,7 +55,7 @@ export class FeedView extends AppTab {
         let showBookmarkIcon: boolean = false;
 
         // set showBookmarkIcon visible if we don't already have it bookmarked
-        if (this.data.props.feedFilterRootNode) {
+        if (this.data.props.feedFilterRootNode && state.bookmarks) {
             showBookmarkIcon = !state.bookmarks.find((bookmark: J.Bookmark): boolean => {
                 return bookmark.id === this.data.props.feedFilterRootNode.id;
             });
