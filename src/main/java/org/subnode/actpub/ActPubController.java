@@ -137,7 +137,7 @@ public class ActPubController {
 			HttpServletRequest httpReq) {
 		try {
 			APObj payload = mapper.readValue(body, new TypeReference<>() {});
-			apUtil.log("INBOX incoming payload: " + XString.prettyPrint(payload));
+			apUtil.log("AP INBOX incoming: " + XString.prettyPrint(payload));
 			ActPubService.inboxCount++;
 			apService.processInboxPost(httpReq, payload);
 			return new ResponseEntity<String>(HttpStatus.OK);

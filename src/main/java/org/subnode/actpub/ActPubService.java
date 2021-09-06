@@ -328,18 +328,19 @@ public class ActPubService {
             return acctNode;
         }
 
-        // todo-1: if we ALWAYS read from DB like this the data (Actor props) can get stale over time (solve this)
+        // todo-1: if we ALWAYS read from DB like this the data (Actor props) can get stale over time (solve
+        // this)
         // (to not have the 'stale issue', let's just not read from DB ever right here)
         // acctNode = read.getUserNodeByUserName(ms, apUserName);
 
         // if (acctNode == null) {
-            /* First try to get a cached actor APObj */
-            APObj actor = apCache.actorsByUserName.get(apUserName);
+        /* First try to get a cached actor APObj */
+        APObj actor = apCache.actorsByUserName.get(apUserName);
 
-            // if we have actor object skip the step of getting it and import using it.
-            if (actor != null) {
-                acctNode = importActor(ms, null, actor);
-            }
+        // if we have actor object skip the step of getting it and import using it.
+        if (actor != null) {
+            acctNode = importActor(ms, null, actor);
+        }
         // }
 
         /*
@@ -545,7 +546,7 @@ public class ActPubService {
 
     public void processCreateAction(HttpServletRequest httpReq, Object payload) {
         arun.<Object>run(session -> {
-
+            apUtil.log("processCreateAction");
             String actorUrl = AP.str(payload, APProp.actor);
             if (actorUrl == null) {
                 log.debug("no 'actor' found on create action request posted object");
@@ -581,6 +582,7 @@ public class ActPubService {
 
     /* obj is the 'Note' object */
     public void processCreateNote(MongoSession ms, String actorUrl, Object actorObj, Object obj) {
+        apUtil.log("processCreateNote");
         /*
          * If this is a 'reply' post then parse the ID out of this, and if we can find that node by that id
          * then insert the reply under that, instead of the default without this id which is to put in
@@ -608,7 +610,8 @@ public class ActPubService {
          * If a foreign user is replying to a specific node, we put the reply under that node
          */
         if (nodeBeingRepliedTo != null) {
-            saveNote(ms, null, nodeBeingRepliedTo, obj, true, false);
+            apUtil.log("foreign actor replying to a quanta node.");
+            saveNote(ms, null, nodeBeingRepliedTo, obj, false, false);
         }
         /*
          * Otherwise the node is not a reply so we put it under POSTS node inside the foreign account node
@@ -616,12 +619,13 @@ public class ActPubService {
          * node will show up in those people's FEEDs
          */
         else {
+            apUtil.log("not reply to existing Quanta node.");
             SubNode actorAccountNode = getAcctNodeByActorUrl(ms, actorUrl);
             if (actorAccountNode != null) {
                 String userName = actorAccountNode.getStrProp(NodeProp.USER.s());
                 SubNode postsNode = read.getUserNodeByType(ms, userName, actorAccountNode, "### Posts",
                         NodeType.ACT_PUB_POSTS.s(), Arrays.asList(PrivilegeType.READ.s()), NodeName.POSTS);
-                saveNote(ms, actorAccountNode, postsNode, obj, true, false);
+                saveNote(ms, actorAccountNode, postsNode, obj, false, false);
             }
         }
     }
@@ -629,17 +633,16 @@ public class ActPubService {
     /*
      * Saves inbound note comming from other foreign servers
      * 
-     * system==true means we have a daemon thread doing the processing.
-     * 
      * todo-1: when importing users in bulk (like at startup or the admin menu), some of these queries
      * in here will be redundant. Look for ways to optimize.
      * 
-     * temp = true, means we are loading an outbox of a user and not, recieving a message specifically
-     * to a local user so the node should be considered 'temporary' and can be deleted after a week or
-     * so to clean the Db.
+     * temp = true, means we are loading an outbox of a user and not recieving a message specifically to
+     * a local user so the node should be considered 'temporary' and can be deleted after a week or so
+     * to clean the Db.
      */
     public void saveNote(MongoSession ms, SubNode toAccountNode, SubNode parentNode, Object obj, boolean forcePublic,
             boolean temp) {
+        apUtil.log("saveNote");
         String id = AP.str(obj, APProp.id);
 
         /*
@@ -692,6 +695,8 @@ public class ActPubService {
         SubNode newNode =
                 create.createNode(ms, parentNode, null, null, 0L, CreateNodeLocation.FIRST, null, toAccountNode.getId(), true);
 
+        apUtil.log("createNode");
+
         // todo-1: need a new node prop type that is just 'html' and tells us to render
         // content as raw html if set, or for now
         // we could be clever and just detect if it DOES have tags and does NOT have
@@ -706,7 +711,6 @@ public class ActPubService {
                 saveFediverseName(mentionName);
             }
         }
-
         newNode.setModifyTime(published);
 
         if (sensitive != null && sensitive.booleanValue()) {
@@ -734,11 +738,8 @@ public class ActPubService {
                     Arrays.asList(PrivilegeType.READ.s(), PrivilegeType.WRITE.s()), null);
         }
 
-        apUtil.log("saveNote: OBJ=" + XString.prettyPrint(obj));
-
         update.save(ms, newNode);
         addAttachmentIfExists(ms, newNode, obj);
-
         try {
             userFeedService.pushNodeUpdateToBrowsers(ms, null, newNode);
         } catch (Exception e) {
@@ -757,14 +758,14 @@ public class ActPubService {
             /* Build up all the access controls */
             for (Object to : list) {
                 if (to instanceof String) {
-                    String shareToUrl = (String) to;
-
                     /* The spec allows either a 'followers' URL here or an 'actor' URL here */
-                    shareToUsersForUrl(ms, node, shareToUrl);
+                    shareToUsersForUrl(ms, node, (String) to);
                 } else {
-                    log.debug("to list entry not supported: " + to.getClass().getName());
+                    apUtil.log("to list entry not supported: " + to.getClass().getName());
                 }
             }
+        } else {
+            apUtil.log("No addressing to " + propName);
         }
     }
 
@@ -825,6 +826,7 @@ public class ActPubService {
      * actorUrl points to a local user
      */
     private void shareNodeToActorByUrl(MongoSession ms, SubNode node, String actorUrl) {
+        apUtil.log("Sharing node to actorUrl: " + actorUrl);
         /*
          * Yes we tolerate for this to execute with the 'public' designation in place of an actorUrl here
          */
@@ -848,13 +850,16 @@ public class ActPubService {
                 String longUserName = apUtil.getLongUserNameFromActorUrl(actorUrl);
                 acctNode = read.getUserNodeByUserName(ms, longUserName);
             } else {
+                // todo-0: add this. What we should do here is just import the user node and NOT load any inboxes, 
+                // and this will avoid the unwanted web-crawler chain reaction.
+                apUtil.log("not sharing. We don't currently recognize sharing to unknown foreign users.");
                 /*
                  * todo-1: this is contributing to our [currently] unwanted FEDIVERSE CRAWLER effect chain reaction.
                  * The rule here should be either don't load foreign users whose outboxes you don't plan to load or
                  * else have some property on the node that designates if we need to read the actual outbox or if
                  * you DO want to add a user and not load their outbox.
                  */
-                // acctNode = loadForeignUserByActorUrl(session, actorUrl);
+                // acctNode = loadForeignUserByActorUrl(ms, actorUrl);
                 saveFediverseName(actorUrl);
             }
 
@@ -864,7 +869,10 @@ public class ActPubService {
         }
 
         if (acctId != null) {
+            apUtil.log("node shared to UserNodeId: " + acctId);
             node.safeGetAc().put(acctId, new AccessControl(null, PrivilegeType.READ.s() + "," + PrivilegeType.WRITE.s()));
+        } else {
+            apUtil.log("not sharing to this user.");
         }
     }
 
@@ -1185,7 +1193,7 @@ public class ActPubService {
 
     public void loadForeignUser(String userName) {
         arun.run(session -> {
-            // log.debug("Reload user outbox: " + userName);
+            apUtil.log("Reload user outbox: " + userName);
             SubNode userNode = getAcctNodeByUserName(session, userName);
             if (userNode == null) {
                 // log.debug("Unable to getAccount Node for userName: "+userName);
@@ -1356,8 +1364,9 @@ public class ActPubService {
                 totalDelCount += delCount;
                 log.debug("Foreign User: " + userName + ". Deleted " + delCount);
             }
-
-            return "Deleted " + String.valueOf(totalDelCount) + " old posts.";
+            String message = "AP Maintence Complete. Deleted " + String.valueOf(totalDelCount) + " old posts.";
+            log.debug(message);
+            return message;
         });
     }
 

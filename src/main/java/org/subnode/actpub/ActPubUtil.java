@@ -712,9 +712,10 @@ public class ActPubUtil {
         }
     }
 
+    // see logback-spring.xml!
     public void log(String message) {
         if (appProp.isApLog()) {
-            log.debug(message);
+            log.trace(message);
         }
     }
 }

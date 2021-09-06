@@ -33,6 +33,7 @@ import org.subnode.mongo.MongoSession;
 import org.subnode.mongo.model.SubNode;
 import org.subnode.util.DateUtil;
 import org.subnode.util.ValContainer;
+import org.subnode.util.XString;
 
 @Component
 public class ActPubOutbox {
@@ -107,7 +108,7 @@ public class ActPubOutbox {
             apUtil.iterateOrderedCollection(outbox, Integer.MAX_VALUE, obj -> {
                 try {
                     // if (obj != null) {
-                    //     log.debug("orderedCollection Item: OBJ=" + XString.prettyPrint(obj));
+                    // log.debug("orderedCollection Item: OBJ=" + XString.prettyPrint(obj));
                     // }
 
                     String apId = AP.str(obj, APProp.id);
@@ -134,7 +135,7 @@ public class ActPubOutbox {
                             else if (AP.isType(object, APType.Note)) {
                                 try {
                                     ActPubService.newPostsInCycle++;
-                                    apService.saveNote(ms, _userNode, outboxNode, object, true, true);
+                                    apService.saveNote(ms, _userNode, outboxNode, object, false, true);
                                     count.setVal(count.getVal() + 1);
                                 } catch (Exception e) {
                                     // log and ignore.
@@ -163,7 +164,7 @@ public class ActPubOutbox {
         APObj outbox = apUtil.getJson(url, APConst.MT_APP_ACTJSON);
         ActPubService.outboxQueryCount++;
         ActPubService.cycleOutboxQueryCount++;
-        // log.debug("Outbox: " + XString.prettyPrint(outbox));
+        apUtil.log("Outbox [" + url + "]\n" + XString.prettyPrint(outbox));
         return outbox;
     }
 

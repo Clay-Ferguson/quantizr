@@ -131,7 +131,7 @@ public class ActPubCrypto {
                 throw new RuntimeException("Signature verify failed.");
             }
         } catch (Exception e) {
-            throw new RuntimeException("Signature check failed.");
+            throw new RuntimeException(e);
         }
     }
 
