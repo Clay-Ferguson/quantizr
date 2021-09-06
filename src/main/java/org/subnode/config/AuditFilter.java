@@ -1,6 +1,7 @@
 package org.subnode.config;
 
 import java.io.IOException;
+import java.util.Collection;
 import java.util.Enumeration;
 
 import javax.servlet.FilterChain;
@@ -21,14 +22,16 @@ import org.springframework.web.filter.GenericFilterBean;
  * Servlet filter that intercepts calls coming into a server and logs all the request info as well
  * as all request and session parameters/attributes.
  */
-// To enable, uncomment this annotation.
-// @Component
-// @Order(1)
+// To enable, uncomment this annotations:
+// import org.springframework.core.annotation.Order;
+// import org.springframework.stereotype.Component;
+@Component
+@Order(1)
 public class AuditFilter extends GenericFilterBean {
 
 	private static final Logger log = LoggerFactory.getLogger(AuditFilter.class);
 	private static String INDENT = "    ";
-	private static boolean verbose = false;
+	private static boolean verbose = true;
 
 	@Override
 	public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
@@ -46,9 +49,8 @@ public class AuditFilter extends GenericFilterBean {
 			if (verbose) {
 				if (response instanceof HttpServletResponse) {
 					HttpServletResponse sres = (HttpServletResponse) response;
-					log.debug("RESPONSE: " + String.valueOf(sres.getStatus())+" contentType: "+sres.getContentType());
+					postProcess(sreq, sres);
 				}
-				postProcess(sreq);
 			}
 		}
 	}
@@ -71,67 +73,61 @@ public class AuditFilter extends GenericFilterBean {
 
 	public static String getRequestInfo(HttpServletRequest sreq) {
 		StringBuilder sb = new StringBuilder();
-		sb.append("Request information:\n");
 		sb.append(INDENT);
-		sb.append("Request method: ");
+		sb.append("meth url: ");
 		sb.append(sreq.getMethod());
-		sb.append("\n");
-		sb.append(INDENT);
-		sb.append("Request URI: ");
+		sb.append(" ");
 		sb.append(sreq.getRequestURI());
 		sb.append("\n");
+
 		sb.append(INDENT);
-		sb.append("Request protocol: ");
+		sb.append("proto path: ");
 		sb.append(sreq.getProtocol());
-		sb.append("\n");
-		sb.append(INDENT);
-		sb.append("Servlet path: ");
+		sb.append(" ");
 		sb.append(sreq.getServletPath());
 		sb.append("\n");
+
+		if (sreq.getPathInfo() != null || sreq.getPathTranslated() != null) {
+			sb.append(INDENT);
+			sb.append("pinfo -> ptrans: ");
+			sb.append(sreq.getPathInfo());
+			sb.append(" -> ");
+			sb.append(sreq.getPathTranslated());
+			sb.append("\n");
+		}
+
+		if (sreq.getQueryString() != null) {
+			sb.append(INDENT);
+			sb.append("q: ");
+			sb.append(sreq.getQueryString());
+			sb.append("\n");
+		}
+
 		sb.append(INDENT);
-		sb.append("Path info: ");
-		sb.append(sreq.getPathInfo());
-		sb.append("\n");
-		sb.append(INDENT);
-		sb.append("Path translated: ");
-		sb.append(sreq.getPathTranslated());
-		sb.append("\n");
-		sb.append(INDENT);
-		sb.append("Query string: ");
-		sb.append(sreq.getQueryString());
-		sb.append("\n");
-		sb.append(INDENT);
-		sb.append("Content length: ");
+		sb.append("len typ: ");
 		sb.append(sreq.getContentLength());
-		sb.append("\n");
-		sb.append(INDENT);
-		sb.append("Content type: ");
+		sb.append(" ");
 		sb.append(sreq.getContentType());
 		sb.append("\n");
+
 		sb.append(INDENT);
-		sb.append("Server name: ");
+		sb.append("server port usr: ");
 		sb.append(sreq.getServerName());
-		sb.append("\n");
-		sb.append(INDENT);
-		sb.append("Server port: ");
+		sb.append(" ");
 		sb.append(sreq.getServerPort());
-		sb.append("\n");
-		sb.append(INDENT);
-		sb.append("Remote user: ");
+		sb.append(" ");
 		sb.append(sreq.getRemoteUser());
 		sb.append("\n");
+
 		sb.append(INDENT);
-		sb.append("Remote address: ");
+		sb.append("adrs host auth: ");
 		sb.append(sreq.getRemoteAddr());
-		sb.append("\n");
-		sb.append(INDENT);
-		sb.append("Remote host: ");
+		sb.append(" ");
 		sb.append(sreq.getRemoteHost());
-		sb.append("\n");
-		sb.append(INDENT);
-		sb.append("Authorization scheme: ");
+		sb.append(" ");
 		sb.append(sreq.getAuthType());
 		sb.append("\n");
+
 		return sb.toString();
 	}
 
@@ -139,13 +135,29 @@ public class AuditFilter extends GenericFilterBean {
 		StringBuilder sb = new StringBuilder();
 		Enumeration<?> e = sreq.getHeaderNames();
 		if (e.hasMoreElements()) {
-			sb.append("Request headers:\n");
+			sb.append("headers:\n");
 			while (e.hasMoreElements()) {
 				String name = (String) e.nextElement();
 				sb.append(INDENT);
 				sb.append(name);
 				sb.append(": ");
 				sb.append(sreq.getHeader(name));
+				sb.append("\n");
+			}
+		}
+		return sb.toString();
+	}
+
+	private String getHeaderInfo(HttpServletResponse sres) {
+		StringBuilder sb = new StringBuilder();
+		Collection<String> names = sres.getHeaderNames();
+		if (names.size() > 0) {
+			sb.append("headers:\n");
+			for (String name : names) {
+				sb.append(INDENT);
+				sb.append(name);
+				sb.append(": ");
+				sb.append(sres.getHeader(name));
 				sb.append("\n");
 			}
 		}
@@ -164,7 +176,7 @@ public class AuditFilter extends GenericFilterBean {
 					sb.append(INDENT);
 					sb.append("[");
 					sb.append(name);
-					sb.append("] = ");
+					sb.append("]=");
 					sb.append(vals[0]);
 
 					for (int i = 1; i < vals.length; i++) {
@@ -185,18 +197,18 @@ public class AuditFilter extends GenericFilterBean {
 		Object reqAttrs = sreq.getAttributeNames();
 		if (reqAttrs != null && reqAttrs instanceof Enumeration<?>) {
 			Enumeration<?> attrs = (Enumeration<?>) reqAttrs;
-			sb.append("Request Attributes\n");
+			sb.append("Req Attrs:\n");
 			while (attrs.hasMoreElements()) {
 				String attr = attrs.nextElement().toString();
 				if (sreq.getAttribute(attr) != null) {
 					sb.append(INDENT);
 					sb.append(attr);
-					sb.append(" = ");
+					sb.append("=");
 					sb.append(sreq.getAttribute(attr).toString());
 				} else {
 					sb.append(INDENT);
 					sb.append(attr);
-					sb.append(" = NULL");
+					sb.append("=null");
 				}
 				sb.append("\n");
 			}
@@ -210,7 +222,7 @@ public class AuditFilter extends GenericFilterBean {
 		Object sessionAattrs = session.getAttributeNames();
 		if (sessionAattrs != null && sessionAattrs instanceof Enumeration<?>) {
 			Enumeration<?> attrs = (Enumeration<?>) sessionAattrs;
-			sb.append("Session Attributes\n");
+			sb.append("Sess Attrs:\n");
 			while (attrs.hasMoreElements()) {
 				String attr = attrs.nextElement().toString();
 				if (session.getAttribute(attr) != null) {
@@ -221,7 +233,7 @@ public class AuditFilter extends GenericFilterBean {
 				} else {
 					sb.append(INDENT);
 					sb.append(attr);
-					sb.append(" = NULL");
+					sb.append("=null");
 				}
 				sb.append("\n");
 			}
@@ -249,6 +261,7 @@ public class AuditFilter extends GenericFilterBean {
 		if (sreq == null)
 			return;
 
+		// NON-VERBOSE
 		if (!verbose) {
 			StringBuilder sb = new StringBuilder();
 			sb.append("REQ: ");
@@ -262,13 +275,14 @@ public class AuditFilter extends GenericFilterBean {
 			sb.append(" [from ");
 			sb.append(sreq.getRemoteAddr());
 			sb.append("]");
-			log.debug(sb.toString());
+			log.trace(sb.toString());
 			return;
 		}
 
+		// VERBOSE
 		try {
 			StringBuilder sb = new StringBuilder();
-			sb.append("PRE REQ INFO:\n");
+			sb.append("\n>\n");
 			sb.append(getConfigParamInfo());
 			sb.append(getRequestInfo(sreq));
 			sb.append(getRequestParameterInfo(sreq));
@@ -276,20 +290,23 @@ public class AuditFilter extends GenericFilterBean {
 			sb.append(getParameterInfo(sreq));
 			sb.append(getAttributeInfo(sreq));
 			sb.append(getSessionAttributeInfo(sreq));
-			log.debug(sb.toString());
+			log.trace(sb.toString());
 		} catch (Exception e) {
 			log.error("error", e);
 		}
 	}
 
-	private void postProcess(HttpServletRequest sreq) {
+	private void postProcess(HttpServletRequest sreq, HttpServletResponse sres) {
 		try {
-			if (sreq == null)
+			if (sreq == null || sres == null)
 				return;
+
 			StringBuilder sb = new StringBuilder();
-			sb.append("POST REQ INFO:\n");
+			sb.append("\n<: " + String.valueOf(sres.getStatus()) + " ctyp: " + sres.getContentType() + "\n");
+			sb.append(getHeaderInfo(sres));
 			sb.append(getSessionAttributeInfo(sreq));
-			log.debug(sb.toString());
+			sb.append("++++++\n");
+			log.trace(sb.toString());
 		} catch (Exception e) {
 			log.error("error", e);
 		}
