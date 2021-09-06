@@ -204,7 +204,10 @@ export class UserProfileDlg extends DialogBase {
     }
 
     sendMessage = (): void => {
-        S.edit.addNode(null, null, this.userNodeId, null, this.appState);
+        this.close();
+        setTimeout(() => {
+            S.edit.addNode(null, null, this.userNodeId, null, this.appState);
+        }, 10);
     }
 
     blockUser = (): void => {
