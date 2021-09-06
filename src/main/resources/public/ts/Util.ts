@@ -412,9 +412,6 @@ export class Util implements UtilIntf {
         return location.protocol + "//" + location.hostname + (location.port ? ":" + location.port : "");
     }
 
-    /* Calls to SERVER must do this URL. We allow CORS, and can run the server itself on port 8181 for example, and then let
-    the webpack dev server be able to be serving up the JS file(s) on a separate port 8080. Theoretically this should work even
-    if the server is truly on a different Machine/IP, but i haven't tried that scenario yet */
     getRemoteHost = (): string => {
         if (this.rhost) {
             return this.rhost;

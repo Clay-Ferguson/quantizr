@@ -11,7 +11,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -25,7 +24,7 @@ import org.subnode.util.XString;
 // @CrossOrigin --> Access-Control-Allow-Credentials
 
 @Controller
-@CrossOrigin
+// @CrossOrigin (done by AppFilter. Spring doesn't do it.)
 public class ActPubController {
 	private static final Logger log = LoggerFactory.getLogger(ActPubController.class);
 

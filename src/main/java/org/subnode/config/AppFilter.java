@@ -137,6 +137,10 @@ public class AppFilter extends GenericFilterBean {
 					checkApiSecurity(bearer, httpReq, sc);
 				}
 
+				if (isCrossOriginPath(httpReq.getRequestURI())) {
+					httpRes.setHeader("Access-Control-Allow-Origin", "*");
+				}
+
 				ip = getClientIpAddr(httpReq);
 				sc.setIp(ip);
 
@@ -275,7 +279,7 @@ public class AppFilter extends GenericFilterBean {
 				// This is the tricky one. If we have versioned the URL we detect it this hacky way also picking up
 				// v param.
 				req.getRequestURI().contains("?v=")) {
-			((HttpServletResponse) res).setHeader("Cache-Control", "public, must-revalidate, max-age=31536000");
+			res.setHeader("Cache-Control", "public, must-revalidate, max-age=31536000");
 		}
 	}
 
@@ -349,6 +353,11 @@ public class AppFilter extends GenericFilterBean {
 		} else {
 			// log.debug("Bearer accepted: " + bearer);
 		}
+	}
+
+	private boolean isCrossOriginPath(String path) {
+		return (path.contains("/.well-known/") || //
+				path.contains("/ap/"));
 	}
 
 	// todo-1: app is too fragile if you forget to add one here. fix this.
