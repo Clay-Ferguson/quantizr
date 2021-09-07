@@ -284,7 +284,12 @@ public class MongoEventListener extends AbstractMongoEventListener<SubNode> {
 				if (parent == null)
 					throw new RuntimeException("unable to get node parent: " + node.getParentPath());
 
-				auth.auth(ms, parent, PrivilegeType.WRITE);
+				// todo-0: need cleaner code for this
+				// but don't bother checking if this is an activity pub node being replied to.
+				String apId = parent.getStrProp(NodeProp.ACT_PUB_ID);
+				if (apId == null) {
+					auth.auth(ms, parent, PrivilegeType.WRITE);
+				}
 			}
 		}
 	}

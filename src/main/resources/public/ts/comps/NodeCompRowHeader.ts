@@ -111,9 +111,10 @@ export class NodeCompRowHeader extends Div {
         }
 
         let publicReadOnly = S.props.isPublicReadOnly(node);
+        let actPubId = S.props.getNodePropVal(J.NodeProp.ACT_PUB_ID, node);
 
-        /* Show the reply button unless we detect it's only shared to public and is readonly */
-        if (this.isFeed && !publicReadOnly) {
+        // always show a reply if activity pub, or else only if on feed view.
+        if ((this.isFeed && !publicReadOnly) || actPubId) {
             children.push(new Icon({
                 title: "Reply to this Node",
                 className: "fa fa-reply fa-lg",

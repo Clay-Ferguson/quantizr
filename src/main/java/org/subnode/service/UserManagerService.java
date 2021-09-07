@@ -750,6 +750,7 @@ public class UserManagerService {
 		_newUserName = XString.stripIfStartsWith(_newUserName, "@");
 		final String newUserName = _newUserName;
 
+		// This is concurrency safe because by the time we get to this asyncExec, we're done processing in this request thread.
 		asyncExec.run(ThreadLocals.getContext(), () -> {
 			MongoSession ms = ThreadLocals.getMongoSession();
 

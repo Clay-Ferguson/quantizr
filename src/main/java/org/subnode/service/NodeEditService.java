@@ -116,8 +116,8 @@ public class NodeEditService {
 	@Autowired
 	private IPFSService ipfsService;
 
-	@Autowired
-	private AsyncExec asyncExec;
+	// @Autowired
+	// private AsyncExec asyncExec;
 
 	@Autowired
 	private TypePluginMgr typePluginMgr;
@@ -167,12 +167,16 @@ public class NodeEditService {
 		}
 
 		if (node == null) {
-			res.setMessage("unable to locate parent for insert");
-			res.setSuccess(false);
-			return res;
+			throw new RuntimeException("unable to locate parent for insert");
 		}
 
-		auth.auth(session, node, PrivilegeType.WRITE);
+		// todo-0: need cleaner code for this
+		// If this is an ActivityPub node (loaded from external source) we always allow anyone to reply
+		// under it.
+		String apId = node.getStrProp(NodeProp.ACT_PUB_ID);
+		if (apId == null) {
+			auth.auth(session, node, PrivilegeType.WRITE);
+		}
 
 		CreateNodeLocation createLoc = req.isCreateAtTop() ? CreateNodeLocation.FIRST : CreateNodeLocation.LAST;
 
@@ -349,7 +353,17 @@ public class NodeEditService {
 		String parentNodeId = req.getParentId();
 		log.debug("Inserting under parent: " + parentNodeId);
 		SubNode parentNode = read.getNode(session, parentNodeId);
-		auth.auth(session, parentNode, PrivilegeType.WRITE);
+		if (parentNode == null) {
+			throw new RuntimeException("Unable to find parent note to insert under: " + parentNodeId);
+		}
+
+		// todo-0: need cleaner code for this
+		// If this is an ActivityPub node (loaded from external source) we always allow anyone to reply
+		// under it.
+		String apId = parentNode.getStrProp(NodeProp.ACT_PUB_ID);
+		if (apId == null) {
+			auth.auth(session, parentNode, PrivilegeType.WRITE);
+		}
 
 		SubNode newNode = create.createNode(session, parentNode, null, req.getTypeName(), req.getTargetOrdinal(),
 				CreateNodeLocation.ORDINAL, null, null, true);
@@ -383,6 +397,8 @@ public class NodeEditService {
 		return res;
 	}
 
+	// todo-0: Each place where async is removed we need to check that we can support queued outbound JSON posts that 
+	// happen and slow things down, because until those posts are async this code will be slow.
 	public SaveNodeResponse saveNode(MongoSession _session, SaveNodeRequest req) {
 		SaveNodeResponse res = new SaveNodeResponse();
 		// log.debug("Controller saveNode: " + Thread.currentThread().getName());
@@ -491,7 +507,7 @@ public class NodeEditService {
 		String ipfsLink = node.getStrProp(NodeProp.IPFS_LINK);
 		if (ipfsLink != null) {
 
-			asyncExec.run(ThreadLocals.getContext(), () -> {
+			// asyncExec.run(ThreadLocals.getContext(), () -> {
 				arun.run(sess -> {
 					// if there's no 'ref' property this is not a foreign reference, which means we
 					// DO pin this.
@@ -527,7 +543,7 @@ public class NodeEditService {
 					}
 					return null;
 				});
-			});
+			// });
 		}
 
 		/*
@@ -538,7 +554,7 @@ public class NodeEditService {
 
 		final String sessionUserName = ThreadLocals.getSC().getUserName();
 
-		asyncExec.run(ThreadLocals.getContext(), () -> {
+		// asyncExec.run(ThreadLocals.getContext(), () -> {
 			arun.run(s -> {
 				/* Send notification to local server or to remote server when a node is added */
 				if (!StringUtils.isEmpty(node.getContent()) //
@@ -563,19 +579,19 @@ public class NodeEditService {
 				}
 				return null;
 			});
-		});
+		// });
 
 		NodeInfo newNodeInfo =
 				convert.convertToNodeInfo(ThreadLocals.getSC(), session, node, true, false, -1, false, false, true, false);
 		res.setNode(newNodeInfo);
 
-		asyncExec.run(ThreadLocals.getContext(), () -> {
+		// asyncExec.run(ThreadLocals.getContext(), () -> {
 			// todo-1: for now we only push nodes if public, up to browsers rather than doing a specific check
 			// to send only to users who should see it.
 			if (AclService.isPublic(session, node)) {
 				userFeedService.pushTimelineUpdateToBrowsers(session, newNodeInfo);
 			}
-		});
+		// });
 
 		res.setSuccess(true);
 		return res;
@@ -606,20 +622,21 @@ public class NodeEditService {
 				 * search of them, and a load/update of their outbox
 				 */
 				if (friendUserName.contains("@")) {
-					asyncExec.run(ThreadLocals.getContext(), () -> {
-						arun.run(s -> {
-							if (!ThreadLocals.getSC().isAdmin()) {
-								apService.getAcctNodeByUserName(s, friendUserName);
-							}
+					// NO! Concurrency fail! (todo-0) speed this up without async
+					// asyncExec.run(ThreadLocals.getContext(), () -> {
+					arun.run(s -> {
+						if (!ThreadLocals.getSC().isAdmin()) {
+							apService.getAcctNodeByUserName(s, friendUserName);
+						}
 
-							/*
-							 * The only time we pass true to load the user into the system is when they're being added as a
-							 * friend.
-							 */
-							apService.userEncountered(friendUserName, true);
-							return null;
-						});
+						/*
+						 * The only time we pass true to load the user into the system is when they're being added as a
+						 * friend.
+						 */
+						apService.userEncountered(friendUserName, true);
+						return null;
 					});
+					// });
 				}
 
 				ValContainer<SubNode> userNode = new ValContainer<SubNode>();

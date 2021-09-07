@@ -4,7 +4,7 @@ public enum PrivilegeType {
 	/* Can read the node and entire subgraph of nodes it contains */
 	READ("rd"), //
 
-	/* Can read and write this node. Write to subnodes is not granted by this. */
+	/* Can read and create children under this node. Write to subnodes is not granted by this. */
 	WRITE("wr"); //
 
 	public final String name;
