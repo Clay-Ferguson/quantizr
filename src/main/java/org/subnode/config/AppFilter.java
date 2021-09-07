@@ -84,10 +84,10 @@ public class AppFilter extends GenericFilterBean {
 				httpReq = (HttpServletRequest) req;
 				httpRes = (HttpServletResponse) res;
 				isAjaxCall = httpReq.getRequestURI().contains("/mobile/api/");
+				boolean isPublicResource = httpReq.getRequestURI().contains("/public/");
 
-				// todo-0:
-				// this was wrong because /app and /n/ and /u/ (and other endpoints?) also depend on having SessionContext
-				// if (isAjaxCall) {
+				// if not accessing some kind of public resource then create a session (and SessionContext)
+				if (!isPublicResource) {
 					session = httpReq.getSession(false);
 					if (session == null) {
 						log.trace("******** NO SESSION.");
@@ -143,7 +143,7 @@ public class AppFilter extends GenericFilterBean {
 					ip = getClientIpAddr(httpReq);
 					sc.setIp(ip);
 					ThreadLocals.setHttpSession(session);
-				// }
+				}
 
 				if (isCrossOriginPath(httpReq.getRequestURI())) {
 					httpRes.setHeader("Access-Control-Allow-Origin", "*");

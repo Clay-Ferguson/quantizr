@@ -655,8 +655,6 @@ public class ActPubService {
      * temp = true, means we are loading an outbox of a user and not recieving a message specifically to
      * a local user so the node should be considered 'temporary' and can be deleted after a week or so
      * to clean the Db.
-     * 
-     * todo-0: is toAccountNode the (node being replied to) or always the ACCOUNT NODE???
      */
     public void saveNote(MongoSession ms, SubNode toAccountNode, SubNode parentNode, Object obj, boolean forcePublic,
             boolean temp) {
