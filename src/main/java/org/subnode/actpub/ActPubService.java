@@ -47,6 +47,7 @@ import org.subnode.service.AttachmentService;
 import org.subnode.service.NodeSearchService;
 import org.subnode.service.UserFeedService;
 import org.subnode.service.UserManagerService;
+import org.subnode.util.AsyncExec;
 import org.subnode.util.DateUtil;
 import org.subnode.util.EnglishDictionary;
 import org.subnode.util.SubNodeUtil;
@@ -140,21 +141,32 @@ public class ActPubService {
     @Qualifier("threadPoolTaskExecutor")
     private Executor executor;
 
+    @Autowired
+    private AsyncExec asyncExec;
+
+    private static final Object inboxLock = new Object(); 
+
     /*
      * When 'node' has been created under 'parent' (by the sessionContext user) this will send a
-     * notification to foreign servers.
+     * notification to foreign servers. This call returns immediately and delegates teh actuall
+     * proccessing to a daemon thread.
      */
-    public boolean sendNotificationForNodeEdit(MongoSession ms, SubNode parent, SubNode node) {
-        try {
-            List<String> toUserNames = new LinkedList<>();
+    public void sendNotificationForNodeEdit(MongoSession ms, String inReplyTo, ObjectId nodeId) {
+        asyncExec.run(ThreadLocals.getContext(), () -> {
+            try {
+                SubNode node = read.getNode(ms, nodeId);
+                if (node == null || node.getAc() == null) {
+                    return;
+                }
 
-            boolean privateMessage = true;
-            /*
-             * Now we need to lookup all userNames from the ACL info, to add them all to 'toUserNames', and we
-             * can avoid doing any work for the ones in 'toUserNamesSet', because we know they already are taken
-             * care of (in the list)
-             */
-            if (node.getAc() != null) {
+                List<String> toUserNames = new LinkedList<>();
+                boolean privateMessage = true;
+
+                /*
+                 * Now we need to lookup all userNames from the ACL info, to add them all to 'toUserNames', and we
+                 * can avoid doing any work for the ones in 'toUserNamesSet', because we know they already are taken
+                 * care of (in the list)
+                 */
                 for (String k : node.getAc().keySet()) {
                     if (PrincipalName.PUBLIC.s().equals(k)) {
                         privateMessage = false;
@@ -173,40 +185,37 @@ public class ActPubService {
                         }
                     }
                 }
-            } else {
-                return false;
-            }
 
-            // String apId = parent.getStringProp(NodeProp.ACT_PUB_ID.s());
-            String inReplyTo = parent.getStrProp(NodeProp.ACT_PUB_OBJ_URL);
-            APList attachments = createAttachmentsList(node);
-            String fromUser = ThreadLocals.getSC().getUserName();
-            String fromActor = apUtil.makeActorUrlForUserName(fromUser);
-            String noteUrl = subNodeUtil.getIdBasedUrl(node);
+                // String apId = parent.getStringProp(NodeProp.ACT_PUB_ID.s());
 
-            // When posting a public message we send out to all unique sharedInboxes here
-            if (!privateMessage) {
-                HashSet<String> sharedInboxes = getSharedInboxesOfFollowers(fromUser);
+                APList attachments = createAttachmentsList(node);
+                String fromUser = ThreadLocals.getSC().getUserName();
+                String fromActor = apUtil.makeActorUrlForUserName(fromUser);
+                String noteUrl = subNodeUtil.getIdBasedUrl(node);
 
-                if (sharedInboxes.size() > 0) {
-                    APObj message = apFactory.newCreateMessageForNote(toUserNames, fromActor, inReplyTo, node.getContent(),
-                            noteUrl, privateMessage, attachments);
+                // When posting a public message we send out to all unique sharedInboxes here
+                if (!privateMessage) {
+                    HashSet<String> sharedInboxes = getSharedInboxesOfFollowers(fromUser);
 
-                    for (String inbox : sharedInboxes) {
-                        apUtil.securePost(fromUser, ms, null, inbox, fromActor, message, null);
+                    if (sharedInboxes.size() > 0) {
+                        APObj message = apFactory.newCreateMessageForNote(toUserNames, fromActor, inReplyTo, node.getContent(),
+                                noteUrl, privateMessage, attachments);
+
+                        for (String inbox : sharedInboxes) {
+                            apUtil.securePost(fromUser, ms, null, inbox, fromActor, message, null);
+                        }
                     }
                 }
-            }
 
-            if (toUserNames.size() > 0) {
-                sendNote(ms, toUserNames, fromUser, inReplyTo, node.getContent(), attachments, noteUrl, privateMessage);
+                if (toUserNames.size() > 0) {
+                    sendNote(ms, toUserNames, fromUser, inReplyTo, node.getContent(), attachments, noteUrl, privateMessage);
+                }
+            } //
+            catch (Exception e) {
+                log.error("sendNote failed", e);
+                throw new RuntimeException(e);
             }
-        } //
-        catch (Exception e) {
-            log.error("sendNote failed", e);
-            throw new RuntimeException(e);
-        }
-        return true;
+        });
     }
 
     /*
@@ -503,28 +512,35 @@ public class ActPubService {
      * follow a user on this server
      */
     public void processInboxPost(HttpServletRequest httpReq, Object payload) {
-        String type = AP.str(payload, APProp.type);
-        if (type == null)
-            return;
-        type = type.trim();
-        apUtil.log("inbox type: " + type);
+        // todo-1: for now we mutext the inbox becasue I noticed a scenario where Mastodon post TWO simultaneous
+        // calls for the SAME node, and it ended up duplicating because both were in memory at same time
+        // AND we don't have constraints. We need a constraint on "ap:id" property.
+        //
+        // todo-0: create the constraint
+        synchronized (inboxLock) {
+            String type = AP.str(payload, APProp.type);
+            if (type == null)
+                return;
+            type = type.trim();
+            apUtil.log("inbox type: " + type);
 
-        switch (type) {
-            case APType.Create:
-                processCreateAction(httpReq, payload);
-                break;
+            switch (type) {
+                case APType.Create:
+                    processCreateAction(httpReq, payload);
+                    break;
 
-            case APType.Follow:
-                apFollowing.processFollowAction(payload, false);
-                break;
+                case APType.Follow:
+                    apFollowing.processFollowAction(payload, false);
+                    break;
 
-            case APType.Undo:
-                processUndoAction(payload);
-                break;
+                case APType.Undo:
+                    processUndoAction(payload);
+                    break;
 
-            default:
-                log.debug("Unsupported type:" + XString.prettyPrint(payload));
-                break;
+                default:
+                    log.debug("Unsupported type:" + XString.prettyPrint(payload));
+                    break;
+            }
         }
     }
 
@@ -639,6 +655,8 @@ public class ActPubService {
      * temp = true, means we are loading an outbox of a user and not recieving a message specifically to
      * a local user so the node should be considered 'temporary' and can be deleted after a week or so
      * to clean the Db.
+     * 
+     * todo-0: is toAccountNode the (node being replied to) or always the ACCOUNT NODE???
      */
     public void saveNote(MongoSession ms, SubNode toAccountNode, SubNode parentNode, Object obj, boolean forcePublic,
             boolean temp) {
@@ -650,7 +668,7 @@ public class ActPubService {
          */
         SubNode dupNode = read.findSubNodeByProp(ms, parentNode.getPath(), NodeProp.ACT_PUB_ID.s(), id);
         if (dupNode != null) {
-            // log.debug("duplicate ActivityPub post ignored: " + id);
+            // apUtil.log("duplicate ActivityPub post ignored: " + id);
             return;
         }
 
@@ -850,7 +868,7 @@ public class ActPubService {
                 String longUserName = apUtil.getLongUserNameFromActorUrl(actorUrl);
                 acctNode = read.getUserNodeByUserName(ms, longUserName);
             } else {
-                // todo-0: add this. What we should do here is just import the user node and NOT load any inboxes, 
+                // todo-0: add this. What we should do here is just import the user node and NOT load any inboxes,
                 // and this will avoid the unwanted web-crawler chain reaction.
                 apUtil.log("not sharing. We don't currently recognize sharing to unknown foreign users.");
                 /*

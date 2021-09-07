@@ -147,6 +147,10 @@ public class ActPubController {
 
 	/**
 	 * User Inbox POST
+	 *  
+	 * WARNING: This inbox and the Shared inbox (above) can both be called simultaneously in cases when someone
+	 * is doing a public reply to a Quanta node, and so Mastodon sends out the public inbox post and the post to the
+	 * user simultaneously. We have ActPubService#inboxLock for being sure this won't cause duplicate records.
 	 */
 	@RequestMapping(value = APConst.PATH_INBOX + "/{userName}", method = RequestMethod.POST, produces = { //
 			APConst.CTYPE_LD_JSON, //

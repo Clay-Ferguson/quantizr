@@ -383,8 +383,6 @@ public class NodeEditService {
 		return res;
 	}
 
-	/* todo-0: All code in here that results in http posting (to IPFS or to ActivityPub servers) needs to have some way
-	of queueing the post for async processing */
 	public SaveNodeResponse saveNode(MongoSession _session, SaveNodeRequest req) {
 		SaveNodeResponse res = new SaveNodeResponse();
 		// log.debug("Controller saveNode: " + Thread.currentThread().getName());
@@ -502,17 +500,9 @@ public class NodeEditService {
 				 */
 				if (initIpfsLink == null || !initIpfsLink.equals(ipfsLink)) {
 					arun.run(sess -> {
-						ipfs.addPin(ipfsLink);
-
-						// always get bytes here from IPFS, and update the node prop with that too.
-						IPFSObjectStat stat = ipfsService.objectStat(ipfsLink, false);
-						node.setProp(NodeProp.BIN_SIZE.s(), stat.getCumulativeSize());
-
-						/* And finally update this user's quota for the added storage */
-						SubNode accountNode = read.getUserNodeByUserName(sess, null);
-						if (accountNode != null) {
-							userManagerService.addBytesToUserNodeBytes(stat.getCumulativeSize(), accountNode, 1);
-						}
+						// don't pass the actual node into here, because it runs in a separate thread and would be
+						// a concurrency problem.
+						ipfsService.ipfsAsyncPinNode(sess, node.getId());
 						return null;
 					});
 				}
@@ -520,7 +510,7 @@ public class NodeEditService {
 			// otherwise we don't pin it.
 			else {
 				/*
-				 * Don't do this removePin. Leave this comment here as a warning of what not to do! We can't simply
+				 * Don't do this removePin. Leave this comment here as a warning of what NOT to do! We can't simply
 				 * remove the CID from our IPFS database because some node stopped using it, because there may be
 				 * many other users/nodes potentially using it, so we let the releaseOrphanIPFSPins be our only way
 				 * pins ever get removed, because that method does a safe and correct delete of all pins that are
@@ -554,7 +544,9 @@ public class NodeEditService {
 				if (parent != null) {
 					auth.saveMentionsToNodeACL(s, node);
 
-					if (apService.sendNotificationForNodeEdit(s, parent, node)) {
+					if (node.getAc() != null) {
+						String inReplyTo = parent.getStrProp(NodeProp.ACT_PUB_OBJ_URL);
+						apService.sendNotificationForNodeEdit(s, inReplyTo, node.getId());
 						userFeedService.pushNodeUpdateToBrowsers(s, sessionsPushed, node);
 					}
 					return null;

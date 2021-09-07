@@ -25,6 +25,7 @@ import org.apache.http.client.HttpClient;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.HttpClientBuilder;
+import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -61,6 +62,7 @@ import org.subnode.request.LoadNodeFromIpfsRequest;
 import org.subnode.request.PublishNodeToIpfsRequest;
 import org.subnode.response.LoadNodeFromIpfsResponse;
 import org.subnode.response.PublishNodeToIpfsResponse;
+import org.subnode.util.AsyncExec;
 import org.subnode.util.Cast;
 import org.subnode.util.Const;
 import org.subnode.util.ExUtil;
@@ -127,6 +129,9 @@ public class IPFSService {
     @Autowired
     private UserManagerService userManagerService;
 
+    @Autowired
+    private AsyncExec asyncExec;
+
     @PostConstruct
     public void init() {
         API_BASE = appProp.getIPFSApiHostAndPort() + "/api/v0";
@@ -174,6 +179,29 @@ public class IPFSService {
         // return "\nIPFS Repository Garbage Collect:\n" + XString.prettyPrint(res) + "\n";
         String res = (String) postForJsonReply(url, String.class);
         return "\nIPFS Repository Garbage Collect:\n" + res + "\n";
+    }
+
+    public void ipfsAsyncPinNode(MongoSession ms, ObjectId nodeId) {
+        asyncExec.run(ThreadLocals.getContext(), () -> {
+            SubNode node = read.getNode(ms, nodeId);
+            if (node == null)
+                return;
+            String ipfsLink = node.getStrProp(NodeProp.IPFS_LINK);
+            addPin(ipfsLink);
+
+            // always get bytes here from IPFS, and update the node prop with that too.
+            IPFSObjectStat stat = objectStat(ipfsLink, false);
+
+            // note: the enclosing scope this we're running in will take care of comitting the node change to
+            // the db.
+            node.setProp(NodeProp.BIN_SIZE.s(), stat.getCumulativeSize());
+
+            /* And finally update this user's quota for the added storage */
+            SubNode accountNode = read.getUserNodeByUserName(ms, null);
+            if (accountNode != null) {
+                userManagerService.addBytesToUserNodeBytes(stat.getCumulativeSize(), accountNode, 1);
+            }
+        });
     }
 
     /* Ensures this node's attachment is saved to IPFS and returns the CID of it */
