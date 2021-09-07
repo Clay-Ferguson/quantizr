@@ -318,7 +318,7 @@ public class ActPubFollowing {
         if (url == null)
             return null;
 
-        APObj outbox = apUtil.getJson(url, APConst.MT_APP_ACTJSON);
+        APObj outbox = apUtil.getJson(url, APConst.MTYPE_ACT_JSON);
         // ActPubService.outboxQueryCount++;
         // ActPubService.cycleOutboxQueryCount++;
         apUtil.log("Following: " + XString.prettyPrint(outbox));

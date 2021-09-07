@@ -803,7 +803,7 @@ public class ActPubService {
              */
             boolean allow = false;
             if (allow) {
-                APObj followersObj = apUtil.getJson(url, APConst.MT_APP_ACTJSON);
+                APObj followersObj = apUtil.getJson(url, APConst.MTYPE_ACT_JSON);
                 if (followersObj != null) {
                     // note/warning: the ActPubFollower.java class also has code to read followers.
                     apUtil.iterateOrderedCollection(followersObj, MAX_FOLLOWERS, obj -> {
@@ -1164,7 +1164,7 @@ public class ActPubService {
 
                     try {
                         if (url != null) {
-                            APObj actor = apUtil.getJson(url, APConst.MT_APP_ACTJSON);
+                            APObj actor = apUtil.getJson(url, APConst.MTYPE_ACT_JSON);
 
                             if (actor != null) {
                                 // we could double check userName, and bail if wrong, but this is not needed.

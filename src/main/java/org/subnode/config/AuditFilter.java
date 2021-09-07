@@ -25,8 +25,8 @@ import org.springframework.web.filter.GenericFilterBean;
 // To enable, uncomment these annotations:
 // import org.springframework.core.annotation.Order;
 // import org.springframework.stereotype.Component;
-// @Component
-// @Order(1)
+@Component
+@Order(1)
 public class AuditFilter extends GenericFilterBean {
 
 	private static final Logger log = LoggerFactory.getLogger(AuditFilter.class);

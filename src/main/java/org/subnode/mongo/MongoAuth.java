@@ -276,6 +276,13 @@ public class MongoAuth {
 		ownerAuth(ThreadLocals.getMongoSession(), node);
 	}
 
+	public void authForChildNodeCreate(MongoSession session, SubNode node) {
+		String apId = node.getStrProp(NodeProp.ACT_PUB_ID);
+		if (apId == null) {
+			auth(session, node, PrivilegeType.WRITE);
+		}
+	}
+
 	public void auth(MongoSession session, SubNode node, PrivilegeType... privs) {
 		// during server init no auth is required.
 		if (node == null || !MongoRepository.fullInit) {

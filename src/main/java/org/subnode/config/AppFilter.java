@@ -85,72 +85,72 @@ public class AppFilter extends GenericFilterBean {
 				httpRes = (HttpServletResponse) res;
 				isAjaxCall = httpReq.getRequestURI().contains("/mobile/api/");
 
-				session = httpReq.getSession(false);
-				if (session == null) {
-					log.trace("******** NO SESSION.");
-				} else {
-					log.trace("******** SESSION existed: lastAccessed: "
-							+ ((System.currentTimeMillis() - session.getLastAccessedTime()) / 1000) + "secs ago.");
-				}
+				if (isAjaxCall) {
+					session = httpReq.getSession(false);
+					if (session == null) {
+						log.trace("******** NO SESSION.");
+					} else {
+						log.trace("******** SESSION existed: lastAccessed: "
+								+ ((System.currentTimeMillis() - session.getLastAccessedTime()) / 1000) + "secs ago.");
+					}
 
-				if (session == null) {
-					session = httpReq.getSession(true);
-				}
+					if (session == null) {
+						session = httpReq.getSession(true);
+					}
 
-				// Ensure we have a Quanta Session Context
-				SessionContext sc = (SessionContext) session.getAttribute(QSC);
+					// Ensure we have a Quanta Session Context
+					SessionContext sc = (SessionContext) session.getAttribute(QSC);
 
-				// if we don't have a SessionContext yet or it timed out then create a new one.
-				if (sc == null || !sc.isLive()) {
-					// Note: we create SessionContext objects here on some requests that don't need them, but that's ok
-					// becasue all our code makes the assumption there will be a SessionContext on the thread.
-					// log.debug("Creating new session at req "+httpReq.getRequestURI());
-					sc = (SessionContext) SpringContextUtil.getBean(SessionContext.class);
-					session.setAttribute(QSC, sc);
-				}
-				ThreadLocals.setSC(sc);
+					// if we don't have a SessionContext yet or it timed out then create a new one.
+					if (sc == null || !sc.isLive()) {
+						// Note: we create SessionContext objects here on some requests that don't need them, but that's ok
+						// becasue all our code makes the assumption there will be a SessionContext on the thread.
+						// log.debug("Creating new session at req "+httpReq.getRequestURI());
+						sc = (SessionContext) SpringContextUtil.getBean(SessionContext.class);
+						session.setAttribute(QSC, sc);
+					}
+					ThreadLocals.setSC(sc);
 
-				sc.addAction(httpReq.getRequestURI());
-				String bearer = httpReq.getHeader("Bearer");
+					sc.addAction(httpReq.getRequestURI());
+					String bearer = httpReq.getHeader("Bearer");
 
-				// if auth token is privided and doesn't exist that's a timed out session so send user
-				// back to welcome page. Should also blow away all browser memory. New browser page load.
-				if (!StringUtils.isEmpty(bearer) && !SessionContext.validToken(bearer, null)) {
-					// just ignore an invalid token like it was not there.
-					// log.debug("Ignoring obsolete bearer token.");
-					bearer = null;
-					sc.setUserName(PrincipalName.ANON.s());
+					// if auth token is privided and doesn't exist that's a timed out session so send user
+					// back to welcome page. Should also blow away all browser memory. New browser page load.
+					if (!StringUtils.isEmpty(bearer) && !SessionContext.validToken(bearer, null)) {
+						// just ignore an invalid token like it was not there.
+						// log.debug("Ignoring obsolete bearer token.");
+						bearer = null;
+						sc.setUserName(PrincipalName.ANON.s());
 
-					// this redirect would only apply to an HTML page request, but we have a lot of REST/ajax where
-					// this redirect would not make sense.
-					// log.debug("Bad or timed out token. Redirecting to land page.");
-					// ((HttpServletResponse)res).sendRedirect("/app");
-					// return;
-				}
+						// this redirect would only apply to an HTML page request, but we have a lot of REST/ajax where
+						// this redirect would not make sense.
+						// log.debug("Bad or timed out token. Redirecting to land page.");
+						// ((HttpServletResponse)res).sendRedirect("/app");
+						// return;
+					}
 
-				// if no bearer is given, and no userName is set, then set to ANON
-				if (bearer == null && sc.getUserName() == null) {
-					sc.setUserName(PrincipalName.ANON.s());
-				}
+					// if no bearer is given, and no userName is set, then set to ANON
+					if (bearer == null && sc.getUserName() == null) {
+						sc.setUserName(PrincipalName.ANON.s());
+					}
 
-				if (isSecurePath(httpReq.getRequestURI())) {
-					checkApiSecurity(bearer, httpReq, sc);
+					if (isSecurePath(httpReq.getRequestURI())) {
+						checkApiSecurity(bearer, httpReq, sc);
+					}
+
+					ip = getClientIpAddr(httpReq);
+					sc.setIp(ip);
+					ThreadLocals.setHttpSession(session);
 				}
 
 				if (isCrossOriginPath(httpReq.getRequestURI())) {
 					httpRes.setHeader("Access-Control-Allow-Origin", "*");
 				}
-
-				ip = getClientIpAddr(httpReq);
-				sc.setIp(ip);
-
-				ThreadLocals.setHttpSession(session);
 				String queryString = httpReq.getQueryString();
 
 				if (simulateSlowServer > 0 && httpReq.getRequestURI().contains("/mobile/api/")) {
 					Util.sleep(simulateSlowServer);
 				}
-
 				setCachingHeader(httpReq, httpRes);
 
 				if (logRequests) {

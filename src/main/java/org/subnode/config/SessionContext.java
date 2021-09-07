@@ -246,10 +246,6 @@ public class SessionContext {
 	}
 
 	/*
-	 * todo-0: we're still ending up with way too many sessions that are duplicates from the same
-	 * browser, so until I find out the cause of that we can at least ensure we only can ever send back
-	 * unique (by login token) sessions from this function as a wokraround/crutch.
-	 * 
 	 * UPDATE: This is simply happening becasue the WebFilter is not able to detect when something is a 
 	 * static file and so it generates SessionContext on every session it sees.
 	 */

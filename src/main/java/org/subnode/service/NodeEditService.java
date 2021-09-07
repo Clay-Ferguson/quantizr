@@ -116,8 +116,8 @@ public class NodeEditService {
 	@Autowired
 	private IPFSService ipfsService;
 
-	// @Autowired
-	// private AsyncExec asyncExec;
+	@Autowired
+	private AsyncExec asyncExec;
 
 	@Autowired
 	private TypePluginMgr typePluginMgr;
@@ -170,14 +170,7 @@ public class NodeEditService {
 			throw new RuntimeException("unable to locate parent for insert");
 		}
 
-		// todo-0: need cleaner code for this
-		// If this is an ActivityPub node (loaded from external source) we always allow anyone to reply
-		// under it.
-		String apId = node.getStrProp(NodeProp.ACT_PUB_ID);
-		if (apId == null) {
-			auth.auth(session, node, PrivilegeType.WRITE);
-		}
-
+		auth.authForChildNodeCreate(session, node);
 		CreateNodeLocation createLoc = req.isCreateAtTop() ? CreateNodeLocation.FIRST : CreateNodeLocation.LAST;
 
 		String parentHashTags = parseHashTags(node.getContent());
@@ -357,14 +350,7 @@ public class NodeEditService {
 			throw new RuntimeException("Unable to find parent note to insert under: " + parentNodeId);
 		}
 
-		// todo-0: need cleaner code for this
-		// If this is an ActivityPub node (loaded from external source) we always allow anyone to reply
-		// under it.
-		String apId = parentNode.getStrProp(NodeProp.ACT_PUB_ID);
-		if (apId == null) {
-			auth.auth(session, parentNode, PrivilegeType.WRITE);
-		}
-
+		auth.authForChildNodeCreate(session, parentNode);
 		SubNode newNode = create.createNode(session, parentNode, null, req.getTypeName(), req.getTargetOrdinal(),
 				CreateNodeLocation.ORDINAL, null, null, true);
 
@@ -397,8 +383,8 @@ public class NodeEditService {
 		return res;
 	}
 
-	// todo-0: Each place where async is removed we need to check that we can support queued outbound JSON posts that 
-	// happen and slow things down, because until those posts are async this code will be slow.
+	/* todo-0: All code in here that results in http posting (to IPFS or to ActivityPub servers) needs to have some way
+	of queueing the post for async processing */
 	public SaveNodeResponse saveNode(MongoSession _session, SaveNodeRequest req) {
 		SaveNodeResponse res = new SaveNodeResponse();
 		// log.debug("Controller saveNode: " + Thread.currentThread().getName());
@@ -407,7 +393,7 @@ public class NodeEditService {
 		final MongoSession session = _session;
 
 		NodeInfo nodeInfo = req.getNode();
-		String nodeId = nodeInfo.getId();
+		final String nodeId = nodeInfo.getId();
 
 		// log.debug("saveNode. nodeId=" + XString.prettyPrint(nodeInfo));
 		SubNode node = read.getNode(session, nodeId);
@@ -507,43 +493,41 @@ public class NodeEditService {
 		String ipfsLink = node.getStrProp(NodeProp.IPFS_LINK);
 		if (ipfsLink != null) {
 
-			// asyncExec.run(ThreadLocals.getContext(), () -> {
-				arun.run(sess -> {
-					// if there's no 'ref' property this is not a foreign reference, which means we
-					// DO pin this.
-					if (node.getStrProp(NodeProp.IPFS_REF.s()) == null) {
-						/*
-						 * Only if this is the first ipfs link ever added, or is a new link, then we need to pin and update
-						 * user quota
-						 */
-						if (initIpfsLink == null || !initIpfsLink.equals(ipfsLink)) {
-							ipfs.addPin(ipfsLink);
+			// if there's no 'ref' property this is not a foreign reference, which means we
+			// DO pin this.
+			if (node.getStrProp(NodeProp.IPFS_REF.s()) == null) {
+				/*
+				 * Only if this is the first ipfs link ever added, or is a new link, then we need to pin and update
+				 * user quota
+				 */
+				if (initIpfsLink == null || !initIpfsLink.equals(ipfsLink)) {
+					arun.run(sess -> {
+						ipfs.addPin(ipfsLink);
 
-							// always get bytes here from IPFS, and update the node prop with that too.
-							IPFSObjectStat stat = ipfsService.objectStat(ipfsLink, false);
-							node.setProp(NodeProp.BIN_SIZE.s(), stat.getCumulativeSize());
+						// always get bytes here from IPFS, and update the node prop with that too.
+						IPFSObjectStat stat = ipfsService.objectStat(ipfsLink, false);
+						node.setProp(NodeProp.BIN_SIZE.s(), stat.getCumulativeSize());
 
-							/* And finally update this user's quota for the added storage */
-							SubNode accountNode = read.getUserNodeByUserName(sess, null);
-							if (accountNode != null) {
-								userManagerService.addBytesToUserNodeBytes(stat.getCumulativeSize(), accountNode, 1);
-							}
+						/* And finally update this user's quota for the added storage */
+						SubNode accountNode = read.getUserNodeByUserName(sess, null);
+						if (accountNode != null) {
+							userManagerService.addBytesToUserNodeBytes(stat.getCumulativeSize(), accountNode, 1);
 						}
-					}
-					// otherwise we don't pin it.
-					else {
-						/*
-						 * Don't do this removePin. Leave this comment here as a warning of what not to do! We can't simply
-						 * remove the CID from our IPFS database because some node stopped using it, because there may be
-						 * many other users/nodes potentially using it, so we let the releaseOrphanIPFSPins be our only way
-						 * pins ever get removed, because that method does a safe and correct delete of all pins that are
-						 * truly no longer in use by anyone
-						 */
-						// ipfs.removePin(ipfsLink);
-					}
-					return null;
-				});
-			// });
+						return null;
+					});
+				}
+			}
+			// otherwise we don't pin it.
+			else {
+				/*
+				 * Don't do this removePin. Leave this comment here as a warning of what not to do! We can't simply
+				 * remove the CID from our IPFS database because some node stopped using it, because there may be
+				 * many other users/nodes potentially using it, so we let the releaseOrphanIPFSPins be our only way
+				 * pins ever get removed, because that method does a safe and correct delete of all pins that are
+				 * truly no longer in use by anyone
+				 */
+				// ipfs.removePin(ipfsLink);
+			}
 		}
 
 		/*
@@ -554,44 +538,40 @@ public class NodeEditService {
 
 		final String sessionUserName = ThreadLocals.getSC().getUserName();
 
-		// asyncExec.run(ThreadLocals.getContext(), () -> {
+		/* Send notification to local server or to remote server when a node is added */
+		if (!StringUtils.isEmpty(node.getContent()) //
+				// don't send notifications when 'admin' is the one doing the editing.
+				&& !PrincipalName.ADMIN.s().equals(sessionUserName)) {
+
 			arun.run(s -> {
-				/* Send notification to local server or to remote server when a node is added */
-				if (!StringUtils.isEmpty(node.getContent()) //
-						// don't send notifications when 'admin' is the one doing the editing.
-						&& !PrincipalName.ADMIN.s().equals(sessionUserName)) {
+				// SubNode n = read.getNode(s, nodeId);
+				HashSet<Integer> sessionsPushed = new HashSet<>();
 
-					HashSet<Integer> sessionsPushed = new HashSet<>();
+				// push any chat messages that need to go out.
+				userFeedService.pushNodeToMonitoringBrowsers(s, sessionsPushed, node);
 
-					// push any chat messages that need to go out.
-					userFeedService.pushNodeToMonitoringBrowsers(s, sessionsPushed, node);
+				SubNode parent = read.getNode(session, node.getParentPath(), false);
+				if (parent != null) {
+					auth.saveMentionsToNodeACL(s, node);
 
-					SubNode parent = read.getNode(session, node.getParentPath(), false);
-
-					if (parent != null) {
-						auth.saveMentionsToNodeACL(s, node);
-
-						if (apService.sendNotificationForNodeEdit(s, parent, node)) {
-							userFeedService.pushNodeUpdateToBrowsers(s, sessionsPushed, node);
-						}
-						return null;
+					if (apService.sendNotificationForNodeEdit(s, parent, node)) {
+						userFeedService.pushNodeUpdateToBrowsers(s, sessionsPushed, node);
 					}
+					return null;
 				}
 				return null;
 			});
-		// });
+		}
 
 		NodeInfo newNodeInfo =
 				convert.convertToNodeInfo(ThreadLocals.getSC(), session, node, true, false, -1, false, false, true, false);
 		res.setNode(newNodeInfo);
 
-		// asyncExec.run(ThreadLocals.getContext(), () -> {
-			// todo-1: for now we only push nodes if public, up to browsers rather than doing a specific check
-			// to send only to users who should see it.
-			if (AclService.isPublic(session, node)) {
-				userFeedService.pushTimelineUpdateToBrowsers(session, newNodeInfo);
-			}
-		// });
+		// todo-1: for now we only push nodes if public, up to browsers rather than doing a specific check
+		// to send only to users who should see it.
+		if (AclService.isPublic(session, node)) {
+			userFeedService.pushTimelineUpdateToBrowsers(session, newNodeInfo);
+		}
 
 		res.setSuccess(true);
 		return res;
@@ -622,21 +602,20 @@ public class NodeEditService {
 				 * search of them, and a load/update of their outbox
 				 */
 				if (friendUserName.contains("@")) {
-					// NO! Concurrency fail! (todo-0) speed this up without async
-					// asyncExec.run(ThreadLocals.getContext(), () -> {
-					arun.run(s -> {
-						if (!ThreadLocals.getSC().isAdmin()) {
-							apService.getAcctNodeByUserName(s, friendUserName);
-						}
+					asyncExec.run(ThreadLocals.getContext(), () -> {
+						arun.run(s -> {
+							if (!ThreadLocals.getSC().isAdmin()) {
+								apService.getAcctNodeByUserName(s, friendUserName);
+							}
 
-						/*
-						 * The only time we pass true to load the user into the system is when they're being added as a
-						 * friend.
-						 */
-						apService.userEncountered(friendUserName, true);
-						return null;
+							/*
+							 * The only time we pass true to load the user into the system is when they're being added as a
+							 * friend.
+							 */
+							apService.userEncountered(friendUserName, true);
+							return null;
+						});
 					});
-					// });
 				}
 
 				ValContainer<SubNode> userNode = new ValContainer<SubNode>();

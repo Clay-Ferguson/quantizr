@@ -8,6 +8,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -55,10 +56,18 @@ public class ActPubController {
 		mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 	}
 
+	/*
+	 * todo-1: I'm not sure if the CHARSET version of the produces is needed here (in any of the methods
+	 * below), but afaik is harmless, so I'm keeping it for now.
+	 */
+
 	/**
 	 * WebFinger GET
 	 */
-	@RequestMapping(value = APConst.PATH_WEBFINGER, method = RequestMethod.GET, produces = APConst.CONTENT_TYPE_JSON_JRD)
+	@RequestMapping(value = APConst.PATH_WEBFINGER, method = RequestMethod.GET, produces = { //
+			APConst.CTYPE_JRD_JSON, //
+			APConst.CTYPE_JRD_JSON + "; " + APConst.CHARSET //
+	})
 	public @ResponseBody Object webFinger(//
 			@RequestParam(value = "resource", required = true) String resource) {
 		apUtil.log("getWebFinger: " + resource);
@@ -95,22 +104,33 @@ public class ActPubController {
 	/**
 	 * Actor GET
 	 */
-	@RequestMapping(value = APConst.ACTOR_PATH + "/{userName}", method = RequestMethod.GET,
-			produces = APConst.CONTENT_TYPE_JSON_ACTIVITY)
+	@RequestMapping(value = APConst.ACTOR_PATH + "/{userName}", method = RequestMethod.GET, produces = { //
+			APConst.CTYPE_ACT_JSON, //
+			APConst.CTYPE_ACT_JSON + "; " + APConst.CHARSET, //
+			APConst.CTYPE_LD_JSON + "; " + APConst.APS_PROFILE // <----- this is a big change (per spec?)
+	})
 	public @ResponseBody Object actor(//
 			@PathVariable(value = "userName", required = true) String userName) {
 		apUtil.log("getActor: " + userName);
 		Object ret = apService.generateActor(userName);
-		if (ret != null)
-			return ret;
+		if (ret != null) {
+			// This pattern is needed to ENSURE a specific content type.
+			HttpHeaders hdr = new HttpHeaders();
+			hdr.setContentType(APConst.MTYPE_ACT_JSON);
+			return new ResponseEntity<Object>(ret, hdr, HttpStatus.OK);
+		}
+
 		return new ResponseEntity<String>(HttpStatus.NOT_FOUND);
 	}
 
-    /**
+	/**
 	 * Shared Inbox POST
 	 */
-	@RequestMapping(value = APConst.PATH_INBOX, method = RequestMethod.POST,
-			produces = APConst.CONTENT_TYPE_JSON_LD)
+	@RequestMapping(value = APConst.PATH_INBOX, method = RequestMethod.POST, produces = {//
+			APConst.CTYPE_LD_JSON, //
+			APConst.CTYPE_LD_JSON + "; " + APConst.CHARSET, //
+			APConst.CTYPE_LD_JSON + "; " + APConst.APS_PROFILE //
+	})
 	public @ResponseBody Object sharedInboxPost(//
 			@RequestBody String body, //
 			HttpServletRequest httpReq) {
@@ -128,8 +148,11 @@ public class ActPubController {
 	/**
 	 * User Inbox POST
 	 */
-	@RequestMapping(value = APConst.PATH_INBOX + "/{userName}", method = RequestMethod.POST,
-			produces = APConst.CONTENT_TYPE_JSON_LD)
+	@RequestMapping(value = APConst.PATH_INBOX + "/{userName}", method = RequestMethod.POST, produces = { //
+			APConst.CTYPE_LD_JSON, //
+			APConst.CTYPE_LD_JSON + "; " + APConst.CHARSET, //
+			APConst.CTYPE_LD_JSON + "; " + APConst.APS_PROFILE //
+	})
 	public @ResponseBody Object inboxPost(//
 			@RequestBody String body, //
 			@PathVariable(value = "userName", required = true) String userName, //
@@ -148,8 +171,11 @@ public class ActPubController {
 	/**
 	 * Outbox GET
 	 */
-	@RequestMapping(value = APConst.PATH_OUTBOX + "/{userName}", method = RequestMethod.GET,
-			produces = APConst.CONTENT_TYPE_JSON_ACTIVITY)
+	@RequestMapping(value = APConst.PATH_OUTBOX + "/{userName}", method = RequestMethod.GET, produces = { //
+			APConst.CTYPE_ACT_JSON, //
+			APConst.CTYPE_ACT_JSON + "; " + APConst.CHARSET, //
+			APConst.CTYPE_LD_JSON + "; " + APConst.APS_PROFILE // <----- this is a big change (per spec?)
+	})
 	public @ResponseBody Object outbox(//
 			@PathVariable(value = "userName", required = true) String userName,
 			@RequestParam(value = "min_id", required = false) String minId,
@@ -180,8 +206,11 @@ public class ActPubController {
 	/**
 	 * Followers GET
 	 */
-	@RequestMapping(value = APConst.PATH_FOLLOWERS + "/{userName}", method = RequestMethod.GET,
-			produces = APConst.CONTENT_TYPE_JSON_ACTIVITY)
+	@RequestMapping(value = APConst.PATH_FOLLOWERS + "/{userName}", method = RequestMethod.GET, produces = { //
+			APConst.CTYPE_ACT_JSON, //
+			APConst.CTYPE_ACT_JSON + "; " + APConst.CHARSET, //
+			APConst.CTYPE_LD_JSON + "; " + APConst.APS_PROFILE // <----- this is a big change (per spec?)
+	})
 	public @ResponseBody Object getFollowers(//
 			@PathVariable(value = "userName", required = false) String userName,
 			@RequestParam(value = "min_id", required = false) String minId,
@@ -202,8 +231,11 @@ public class ActPubController {
 	/**
 	 * Following GET
 	 */
-	@RequestMapping(value = APConst.PATH_FOLLOWING + "/{userName}", method = RequestMethod.GET,
-			produces = APConst.CONTENT_TYPE_JSON_ACTIVITY)
+	@RequestMapping(value = APConst.PATH_FOLLOWING + "/{userName}", method = RequestMethod.GET, produces = { //
+			APConst.CTYPE_ACT_JSON, //
+			APConst.CTYPE_ACT_JSON + "; " + APConst.CHARSET, //
+			APConst.CTYPE_LD_JSON + "; " + APConst.APS_PROFILE // <----- this is a big change (per spec?)
+	})
 	public @ResponseBody Object getFollowing(//
 			@PathVariable(value = "userName", required = false) String userName,
 			@RequestParam(value = "min_id", required = false) String minId,
