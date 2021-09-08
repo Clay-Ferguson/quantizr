@@ -16,7 +16,6 @@ import org.subnode.actpub.ActPubService;
 import org.subnode.actpub.ActPubUtil;
 import org.subnode.config.NodeName;
 import org.subnode.exception.base.RuntimeEx;
-import org.subnode.model.IPFSObjectStat;
 import org.subnode.model.NodeInfo;
 import org.subnode.model.PropertyInfo;
 import org.subnode.model.client.NodeProp;
@@ -29,7 +28,6 @@ import org.subnode.mongo.MongoAuth;
 import org.subnode.mongo.MongoCreate;
 import org.subnode.mongo.MongoRead;
 import org.subnode.mongo.MongoSession;
-
 import org.subnode.mongo.MongoUpdate;
 import org.subnode.mongo.MongoUtil;
 import org.subnode.mongo.model.AccessControl;
@@ -87,9 +85,6 @@ public class NodeEditService {
 	private MongoUpdate update;
 
 	@Autowired
-	private UserFeedService userFeedService;
-
-	@Autowired
 	private AdminRun arun;
 
 	@Autowired
@@ -108,12 +103,6 @@ public class NodeEditService {
 	private MongoAuth auth;
 
 	@Autowired
-	private IPFSService ipfs;
-
-	@Autowired
-	private UserManagerService userManagerService;
-
-	@Autowired
 	private IPFSService ipfsService;
 
 	@Autowired
@@ -121,6 +110,9 @@ public class NodeEditService {
 
 	@Autowired
 	private TypePluginMgr typePluginMgr;
+
+	@Autowired
+	private PushService pushService;
 
 	/*
 	 * Creates a new node as a *child* node of the node specified in the request. Should ONLY be called
@@ -534,11 +526,10 @@ public class NodeEditService {
 				&& !PrincipalName.ADMIN.s().equals(sessionUserName)) {
 
 			arun.run(s -> {
-				// SubNode n = read.getNode(s, nodeId);
 				HashSet<Integer> sessionsPushed = new HashSet<>();
 
 				// push any chat messages that need to go out.
-				userFeedService.pushNodeToMonitoringBrowsers(s, sessionsPushed, node);
+				pushService.pushNodeToMonitoringBrowsers(s, sessionsPushed, node);
 
 				SubNode parent = read.getNode(session, node.getParentPath(), false);
 				if (parent != null) {
@@ -547,7 +538,7 @@ public class NodeEditService {
 					if (node.getAc() != null) {
 						String inReplyTo = parent.getStrProp(NodeProp.ACT_PUB_OBJ_URL);
 						apService.sendNotificationForNodeEdit(s, inReplyTo, node.getId());
-						userFeedService.pushNodeUpdateToBrowsers(s, sessionsPushed, node);
+						pushService.pushNodeUpdateToBrowsers(s, sessionsPushed, node);
 					}
 					return null;
 				}
@@ -562,7 +553,7 @@ public class NodeEditService {
 		// todo-1: for now we only push nodes if public, up to browsers rather than doing a specific check
 		// to send only to users who should see it.
 		if (AclService.isPublic(session, node)) {
-			userFeedService.pushTimelineUpdateToBrowsers(session, newNodeInfo);
+			pushService.pushTimelineUpdateToBrowsers(session, newNodeInfo);
 		}
 
 		res.setSuccess(true);

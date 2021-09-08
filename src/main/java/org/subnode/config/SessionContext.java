@@ -23,6 +23,7 @@ import org.subnode.mongo.MongoUtil;
 import org.subnode.mongo.model.SubNode;
 import org.subnode.response.SessionTimeoutPushInfo;
 import org.subnode.service.UserFeedService;
+import org.subnode.service.PushService;
 import org.subnode.util.DateUtil;
 import org.subnode.util.StopwatchEntry;
 import org.subnode.util.ThreadLocals;
@@ -38,7 +39,7 @@ public class SessionContext {
 	private boolean live = true;
 
 	@Autowired
-	private UserFeedService userFeedService;
+	private PushService pushService;
 
 	@Autowired
 	private MongoAuth auth;
@@ -292,7 +293,7 @@ public class SessionContext {
 	@PreDestroy
 	public void preDestroy() {
 		log.trace(String.format("Destroying Session object hashCode[%d] of user %s", hashCode(), userName));
-		userFeedService.sendServerPushInfo(this, new SessionTimeoutPushInfo());
+		pushService.sendServerPushInfo(this, new SessionTimeoutPushInfo());
 
 		synchronized (allSessions) {
 			// This "lastActiveTime", should really be called "last message checked time", becaues that's the

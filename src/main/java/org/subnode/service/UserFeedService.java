@@ -17,8 +17,6 @@ import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.TextCriteria;
 import org.springframework.stereotype.Component;
-import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
-import org.springframework.web.servlet.mvc.method.annotation.SseEmitter.SseEventBuilder;
 import org.subnode.config.NodeName;
 import org.subnode.config.SessionContext;
 import org.subnode.model.NodeInfo;
@@ -30,18 +28,14 @@ import org.subnode.mongo.AdminRun;
 import org.subnode.mongo.MongoAuth;
 import org.subnode.mongo.MongoRead;
 import org.subnode.mongo.MongoSession;
-
 import org.subnode.mongo.MongoUpdate;
 import org.subnode.mongo.MongoUtil;
 import org.subnode.mongo.model.SubNode;
 import org.subnode.request.CheckMessagesRequest;
 import org.subnode.request.NodeFeedRequest;
 import org.subnode.response.CheckMessagesResponse;
-import org.subnode.response.FeedPushInfo;
-import org.subnode.response.NodeEditedPushInfo;
 import org.subnode.response.NodeFeedResponse;
-import org.subnode.response.ServerPushInfo;
-import org.subnode.response.SessionTimeoutPushInfo;
+import org.subnode.util.AsyncExec;
 import org.subnode.util.Convert;
 import org.subnode.util.ThreadLocals;
 
@@ -76,149 +70,11 @@ public class UserFeedService {
 	private AdminRun arun;
 
 	@Autowired
+	private AsyncExec asyncExec;
+
+	@Autowired
 	@Qualifier("threadPoolTaskExecutor")
 	private Executor executor;
-
-	/* Notify all users being shared to on this node */
-	public void pushNodeUpdateToBrowsers(MongoSession session, HashSet<Integer> sessionsPushed, SubNode node) {
-		// log.debug("Pushing update to all friends: id=" + node.getId().toHexString());
-
-		/* get list of userNames this node is shared to (one of them may be 'public') */
-		List<String> usersSharedTo = auth.getUsersSharedTo(session, node);
-
-		// if node has no sharing we're done here
-		if (usersSharedTo == null) {
-			return;
-		}
-
-		// put user names in a hash set for faster performance
-		HashSet<String> usersSharedToSet = new HashSet<>();
-		usersSharedToSet.addAll(usersSharedTo);
-
-		/* Scan all sessions and push message to the ones that need to see it */
-		for (SessionContext sc : SessionContext.getAllSessions()) {
-			// if we know we already just pushed to this session, we can skip it in here.
-			if (sessionsPushed != null && sessionsPushed.contains(sc.hashCode())) {
-				continue;
-			}
-
-			/* Anonymous sessions won't have userName and can be ignored */
-			if (sc.getUserName() == null)
-				continue;
-
-			/* build our push message payload */
-			NodeInfo nodeInfo = convert.convertToNodeInfo(sc, session, node, true, false, 1, false, false, true, false);
-			FeedPushInfo pushInfo = new FeedPushInfo(nodeInfo);
-
-			/*
-			 * push if the sc user is in the shared set or this session is OURs,
-			 */
-			if (usersSharedToSet.contains(sc.getUserName())) {
-				// push notification message to browser
-				sendServerPushInfo(sc, pushInfo);
-			}
-		}
-	}
-
-	/*
-	 * Send a push to all users who are monitoring this node or any ancestor of it. This will be the
-	 * users who have opened some ancestor node as their "Feed Node" (viewing feed of that specific
-	 * node)
-	 */
-	public void pushNodeToMonitoringBrowsers(MongoSession session, HashSet<Integer> sessionsPushed, SubNode node) {
-		// log.debug("Push to monitoring Browsers: node.content=" + node.getContent());
-
-		/* Scan all sessions and push message to the ones that need to see it */
-		for (SessionContext sc : SessionContext.getAllSessions()) {
-			/* Anonymous sessions won't have userName and can be ignored */
-			if (sc.getUserName() == null)
-				continue;
-
-			// log.debug("Pushing to SessionContext: hashCode=" + sc.hashCode() + " user=" + sc.getUserName() + " token="
-			// 		+ sc.getUserToken());
-
-			// if this node starts with the 'watchingPath' of the user that means the node is a descendant of
-			// the watching path
-			if (node.getPath() != null && sc.getWatchingPath() != null && node.getPath().startsWith(sc.getWatchingPath())) {
-
-				/* build our push message payload */
-				NodeInfo nodeInfo = convert.convertToNodeInfo(sc, session, node, true, false, 1, false, false, true, false);
-				FeedPushInfo pushInfo = new FeedPushInfo(nodeInfo);
-
-				// push notification message to browser
-				sendServerPushInfo(sc, pushInfo);
-
-				if (sessionsPushed != null) {
-					sessionsPushed.add(sc.hashCode());
-				}
-			}
-		}
-	}
-
-	/* Notify all browser timelines if they have new info */
-	public void pushTimelineUpdateToBrowsers(MongoSession session, NodeInfo nodeInfo) {
-		/* Scan all sessions and push message to the ones that need to see it */
-		for (SessionContext sc : SessionContext.getAllSessions()) {
-			/* Anonymous sessions can be ignored */
-			if (sc.getUserName() == null)
-				continue;
-
-			/*
-			 * Nodes whose path starts with "timeline path", are subnodes of (or descendants of) the timeline
-			 * node and therefore will be sent to their respecitve browsers
-			 */
-			if (sc.getTimelinePath() == null || !nodeInfo.getPath().startsWith(sc.getTimelinePath())) {
-				continue;
-			}
-
-			NodeEditedPushInfo pushInfo = new NodeEditedPushInfo(nodeInfo);
-			sendServerPushInfo(sc, pushInfo);
-		}
-	}
-
-	public void sendServerPushInfo(SessionContext sc, ServerPushInfo info) {
-		// If user is currently logged in we have a session here.
-		if (sc == null)
-			return;
-
-		executor.execute(() -> {
-			SseEmitter pushEmitter = sc.getPushEmitter();
-			if (pushEmitter == null)
-				return;
-
-			synchronized (pushEmitter) {
-				// log.debug("Pushing to Session User: " + sc.getUserName());
-				try {
-					SseEventBuilder event = SseEmitter.event() //
-							.data(info) //
-							.id(String.valueOf(info.hashCode()))//
-							.name(info.getType());
-
-					pushEmitter.send(event);
-
-					/*
-					 * DO NOT DELETE. This way of sending also works, and I was originally doing it this way and picking
-					 * up in eventSource.onmessage = e => {} on the browser, but I decided to use the builder instead
-					 * and let the 'name' in the builder route different objects to different event listeners on the
-					 * client. Not really sure if either approach has major advantages over the other.
-					 * 
-					 * pushEmitter.send(info, MediaType.APPLICATION_JSON);
-					 */
-				} catch (Exception ex) {
-					pushEmitter.completeWithError(ex);
-				} finally {
-					// todo-1: this can be done in a slightly cleaner way (more decoupled)
-					if (info instanceof SessionTimeoutPushInfo) {
-						ThreadLocals.setMongoSession(null);
-						sc.setLive(false);
-						sc.setRootId(null);
-						sc.setUserName(null);
-						sc.setPushEmitter(null);
-					}
-				}
-			}
-		});
-	}
 
 	public CheckMessagesResponse checkMessages(MongoSession session, CheckMessagesRequest req) {
 		SessionContext sc = ThreadLocals.getSC();
@@ -259,6 +115,7 @@ public class UserFeedService {
 
 	/*
 	 * Generated content of the "Feed" for a user.
+	 * 
 	 */
 	public NodeFeedResponse generateFeed(MongoSession session, NodeFeedRequest req) {
 		SessionContext sc = ThreadLocals.getSC();
@@ -267,6 +124,11 @@ public class UserFeedService {
 
 		String pathToSearch = NodeName.ROOT_OF_ALL_USERS;
 		boolean doAuth = true;
+
+		/*
+		 * if we're doing a 'feed' under a specific root node this is like the 'chat feature' and is
+		 * normally only called for a chat-room type node.
+		 */
 		if (req.getNodeId() != null) {
 			// Get the chat room node (root of the chat room query)
 			SubNode rootNode = read.getNode(session, req.getNodeId());
@@ -285,65 +147,80 @@ public class UserFeedService {
 			 */
 			else {
 				try {
-					auth.auth(session, rootNode, PrivilegeType.READ);
+					auth.auth(session, rootNode, PrivilegeType.READ, PrivilegeType.WRITE);
 				} catch (Exception e) {
 					sc.setWatchingPath(null);
 					throw e;
 				}
 			}
-			// Then we set the public chat to indicate to the rest of the code below not do do any
-			// further authorization.
+			/*
+			 * Then we set the public chat to indicate to the rest of the code below not to do any further
+			 * authorization, becasue the way ACL works on chart rooms is if a person is authorized to READ
+			 * (what about WRITE? todo-1: probably should make the above read and write) the actual CHAT NODE
+			 * itself (the root of the chat nodes) then they are known to be granted access to all children
+			 */
 			doAuth = false;
 			sc.setWatchingPath(pathToSearch);
-
 		} else {
 			sc.setWatchingPath(null);
 		}
 
 		int counter = 0;
-
-		/* Query will include nodes that have shares to any of the people listed in sharedToAny */
-		List<String> sharedToAny = new LinkedList<>();
+		List<Criteria> orCriteria = new LinkedList<>();
 
 		if (doAuth && req.getToPublic()) {
-			sharedToAny.add(PrincipalName.PUBLIC.s());
+			orCriteria.add(Criteria.where(SubNode.FIELD_AC + "." + PrincipalName.PUBLIC.s()).ne(null));
 		}
 
 		SubNode myAcntNode = null;
 
 		// includes shares TO me.
 		if (doAuth && req.getToMe()) {
-			if (myAcntNode == null) {
-				myAcntNode = read.getNode(session, sc.getRootId());
-			}
+			myAcntNode = read.getNode(session, sc.getRootId());
 
 			if (myAcntNode != null) {
-				sharedToAny.add(myAcntNode.getOwner().toHexString());
+				orCriteria.add(Criteria.where(SubNode.FIELD_AC + "." + myAcntNode.getOwner().toHexString()).ne(null));
 
-				/*
-				 * setting last active time to this current time, will stop the GUI from showing the user an
-				 * indication that they have new messages, because we know they're querying messages NOW, so this is
-				 * a way to reset
-				 */
-				myAcntNode.setProp(NodeProp.LAST_ACTIVE_TIME.s(), sc.getLastActiveTime());
-				update.save(session, myAcntNode);
+				final SubNode _myAcntNode = myAcntNode;
+				final MongoSession _s = session;
+				long lastActiveTime = sc.getLastActiveTime();
+				// do this work in async thread to make this query more performant
+				asyncExec.run(ThreadLocals.getContext(), () -> {
+					/*
+					 * setting last active time to this current time, will stop the GUI from showing the user an
+					 * indication that they have new messages, because we know they're querying messages NOW, so this is
+					 * a way to reset
+					 */
+					_myAcntNode.setProp(NodeProp.LAST_ACTIVE_TIME.s(), lastActiveTime);
+					update.save(_s, _myAcntNode);
+				});
 			}
 		}
 		List<NodeInfo> searchResults = new LinkedList<>();
 		res.setSearchResults(searchResults);
 
 		Query query = new Query();
+
+		// construct the list of ANDed conditions for the whole query, we can only have one list if ANDs
+		// due to MongoDB restriction. todo-0: check if these could've all been accomplished as
+		// criteria = criteria.and, because I'm unsure as of right now. I'm pretty sure becasue if you look
+		// at how blocked users are done below it's just 'criteria.and' which is the same thing this 'ands'
+		// does.
 		List<Criteria> ands = new LinkedList<>();
+
+		// initialize criteria using the Path to select the correct sub-graph of the tree
 		Criteria criteria = Criteria.where(SubNode.FIELD_PATH).regex(util.regexRecursiveChildrenOfPath(pathToSearch)); //
 
 		if (req.getNodeId() == null) {
 			// This 'andOperator' pattern is what is required when you have multiple conditions added to a
-			// single field.
+			// single field. Would this be more performant as a 'nin()' call like we do for blocked users
+			// (see below)?
 			ands.add(Criteria.where(SubNode.FIELD_TYPE).ne(NodeType.FRIEND.s()));//
 			ands.add(Criteria.where(SubNode.FIELD_TYPE).ne(NodeType.POSTS.s())); //
 			ands.add(Criteria.where(SubNode.FIELD_TYPE).ne(NodeType.ACT_PUB_POSTS.s()));
 		}
 
+		// add the criteria for sensitive flag
 		if (!req.getNsfw()) {
 			criteria = criteria.and(SubNode.FIELD_PROPERTIES + "." + NodeProp.ACT_PUB_SENSITIVE + ".value").is(null);
 		}
@@ -358,14 +235,15 @@ public class UserFeedService {
 		// criteria = criteria.and(SubNode.FIELD_PROPERTIES + "." + NodeProp.UNPUBLISHED +
 		// ".value").is(null);
 
+		// Add criteria for blocking users using the 'not in' list (nin)
 		getBlockedUserIds(blockedUserIds);
 		if (blockedUserIds.size() > 0) {
 			criteria = criteria.and(SubNode.FIELD_OWNER).nin(blockedUserIds);
 		}
 
 		/*
-		 * Save the 'string' representations for use below, so mask out places where users may be following
-		 * a user that will effectively be blocked
+		 * Save the 'string' representations for blocked user ids for use below, to mask out places where
+		 * users may be following a user that will effectively be blocked
 		 */
 		HashSet<String> blockedIdStrings = new HashSet<>();
 		for (ObjectId blockedId : blockedUserIds) {
@@ -380,8 +258,6 @@ public class UserFeedService {
 		else if (sc.getFeedMaxTime() != null) {
 			criteria = criteria.and(SubNode.FIELD_MODIFY_TIME).lt(sc.getFeedMaxTime());
 		}
-
-		List<Criteria> orCriteria = new LinkedList<>();
 
 		if (doAuth && req.getFromMe()) {
 			if (myAcntNode == null) {
@@ -400,6 +276,8 @@ public class UserFeedService {
 		if (doAuth && req.getFromFriends()) {
 			List<SubNode> friendNodes = userManagerService.getSpecialNodesList(session, NodeType.FRIEND_LIST.s(), null, true);
 			if (friendNodes != null) {
+				// todo-0: Since there's a 'nin' function for executing BLOCKing of users (above), I bet the better
+				// way to do these friends with an 'in()' call. Does in() exist? it must!
 				for (SubNode friendNode : friendNodes) {
 
 					// the USER_NODE_ID property on friends nodes contains the actual account ID of this friend.
@@ -410,13 +288,6 @@ public class UserFeedService {
 						orCriteria.add(Criteria.where(SubNode.FIELD_OWNER).is(new ObjectId(userNodeId)));
 					}
 				}
-			}
-		}
-
-		if (doAuth) {
-			// or a node that is shared to any of the sharedToAny users
-			for (String share : sharedToAny) {
-				orCriteria.add(Criteria.where(SubNode.FIELD_AC + "." + share).ne(null));
 			}
 		}
 
@@ -432,7 +303,7 @@ public class UserFeedService {
 		// use attributedTo proptery to determine whether a node is 'local' (posted by this server) or not.
 		if (req.getLocalOnly()) {
 			// note: the ".value" part is recently added, but actually since this is a compare to null should
-			// not be needed.
+			// not be needed. todo-0: I'm wondering if this should be checking apid property instead? Check this.
 			criteria = criteria.and(SubNode.FIELD_PROPERTIES + "." + NodeProp.ACT_PUB_OBJ_ATTRIBUTED_TO.s() + ".value").is(null);
 		}
 

@@ -54,7 +54,7 @@ export class TabPanelButtons extends Div {
         }
 
         return new Li(null, {
-            className: "nav-item navItem",
+            className: "nav-item",
             style: { display: data.isVisible() ? "inline" : "none" },
             onClick: (event) => {
                 event.stopPropagation();

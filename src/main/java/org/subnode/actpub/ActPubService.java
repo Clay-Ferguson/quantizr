@@ -45,7 +45,6 @@ import org.subnode.mongo.model.SubNode;
 import org.subnode.service.AclService;
 import org.subnode.service.AttachmentService;
 import org.subnode.service.NodeSearchService;
-import org.subnode.service.UserFeedService;
 import org.subnode.service.UserManagerService;
 import org.subnode.util.AsyncExec;
 import org.subnode.util.DateUtil;
@@ -53,6 +52,7 @@ import org.subnode.util.EnglishDictionary;
 import org.subnode.util.SubNodeUtil;
 import org.subnode.util.ThreadLocals;
 import org.subnode.util.XString;
+import org.subnode.service.PushService;
 
 @Component
 public class ActPubService {
@@ -102,7 +102,7 @@ public class ActPubService {
     private MongoAuth auth;
 
     @Autowired
-    private UserFeedService userFeedService;
+    private PushService pushService;
 
     @Autowired
     private AclService acl;
@@ -755,7 +755,7 @@ public class ActPubService {
         update.save(ms, newNode);
         addAttachmentIfExists(ms, newNode, obj);
         try {
-            userFeedService.pushNodeUpdateToBrowsers(ms, null, newNode);
+            pushService.pushNodeUpdateToBrowsers(ms, null, newNode);
         } catch (Exception e) {
             log.error("pushNodeUpdateToBrowsers failed (ignoring error)", e);
         }

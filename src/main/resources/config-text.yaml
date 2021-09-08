@@ -63,13 +63,14 @@ help:
   fediverse:
     feed: |
       Fediverse Feed
-      This is your Fediverse *feed* that shows a reverse chronological stream of posts from people you Follow.
-      
-      Use the 'Friends' button to jump over to the part of your main tree where your Friends List is stored to manage your friends.
+      This is your Fediverse *feed* that shows a reverse chronological stream of posts, from this server and/or other 
+      federated servers.
 
-      Use any 'Jump' button in the feed to go the the main content tree location of that post. Unlike other social media apps 
-      this platform stores all content on a Tree Structure, so in addition to appearing in the Feed, all nodes 
-      have a more permanent location on this large global tree.
+      The `Friends, To Me, From Me, and Public` options cause a query using the "locical OR" operation, which means 
+      results will be shon for nodes that match *any of* things you select (as opposed to *all of* them).
+
+      While the `Local` and `NSFT` checkboxes use a "logical AND", so if you select the `Local` checkbox you will see
+      nodes that are all only from this fediverse server, that you are logged into now.
       
       #### Filter Options
 
@@ -79,6 +80,10 @@ help:
       * Public &rarr; Includes nodes that are shared to everyone (public sharing) 
       * Local &rarr; Includes nodes only from users who have an account on this server 
       * NSFW &rarr; Includes nodes flagged as 'sensitive' or potentially offensive (Not safe for work)
+
+      Use any 'Jump' button in the feed to go the the main content tree location of that post. 
+      Quanta stores all content on a Tree-like Database, so in addition to appearing in the Feed, all nodes 
+      have a more permanent location on this large global tree.
 
   gettingStarted: |
     Getting Started

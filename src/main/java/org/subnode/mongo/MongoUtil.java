@@ -402,6 +402,10 @@ public class MongoUtil {
 
 		createUniqueIndex(session, SubNode.class, SubNode.FIELD_PATH_HASH);
 
+		// Other indexes that *could* be added but we don't, just as a performance enhancer is
+		// Unique node names: Key = node.owner+node.name (or just node.name for admin)
+		// Unique Friends: Key = node.owner+node.friendId? (meaning only ONE Friend type node per user account)
+
 		// dropIndex(session, SubNode.class, "unique-apid");
 		createPartialUniqueIndex(session, "unique-apid", SubNode.class,
 				SubNode.FIELD_PROPERTIES + "." + NodeProp.ACT_PUB_ID.s() + ".value");

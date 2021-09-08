@@ -10,15 +10,15 @@ import org.subnode.config.NodeName;
 import org.subnode.config.SessionContext;
 import org.subnode.model.client.NodeProp;
 import org.subnode.model.client.NodeType;
+import org.subnode.mongo.AdminRun;
 import org.subnode.mongo.CreateNodeLocation;
 import org.subnode.mongo.MongoCreate;
 import org.subnode.mongo.MongoRead;
 import org.subnode.mongo.MongoSession;
 import org.subnode.mongo.MongoUpdate;
-import org.subnode.mongo.AdminRun;
 import org.subnode.mongo.model.SubNode;
 import org.subnode.response.NotificationMessage;
-import org.subnode.service.UserFeedService;
+import org.subnode.service.PushService;
 import org.subnode.util.SubNodeUtil;
 import org.subnode.util.ThreadLocals;
 import org.subnode.util.XString;
@@ -56,7 +56,7 @@ public class OutboxMgr {
 	private SubNodeUtil apiUtil;
 
 	@Autowired
-	private UserFeedService userFeedService;
+	private PushService pushService;
 
 	@Autowired
 	private NotificationDaemon notificationDaemon;
@@ -116,7 +116,7 @@ public class OutboxMgr {
 				List<SessionContext> scList = SessionContext.getSessionsByUserName(recieverUserName);
 				if (scList != null) {
 					for (SessionContext sc : scList) {
-						userFeedService.sendServerPushInfo(sc,
+						pushService.sendServerPushInfo(sc,
 								// todo-2: fill in the two null parameters here if/when you ever bring this method back.
 								new NotificationMessage("newInboxNode", node.getId().toHexString(), "New node shared to you.",
 										ThreadLocals.getSC().getUserName()));
