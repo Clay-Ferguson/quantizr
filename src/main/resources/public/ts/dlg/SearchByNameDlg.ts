@@ -23,7 +23,7 @@ export class SearchByNameDlg extends DialogBase {
     searchTextState: ValidatedState<any> = new ValidatedState<any>();
 
     constructor(state: AppState) {
-        super("Search by Node Name", "app-modal-content-medium-width", false, state);
+        super("Search", "app-modal-content-medium-width", false, state);
         this.whenElm((elm: HTMLElement) => {
             this.searchTextField.focus();
         });
@@ -65,17 +65,10 @@ export class SearchByNameDlg extends DialogBase {
             return;
         }
 
-        // until we have better validation
-        let node = S.quanta.getHighlightedNode(this.appState);
-        if (!node) {
-            S.util.showMessage("No node is selected to search under.", "Warning");
-            return;
-        }
-
         SearchByNameDlg.defaultSearchText = this.searchTextState.getValue();
 
         let desc = "Node Name: " + SearchByNameDlg.defaultSearchText;
-        S.srch.search(node, "node.name", SearchByNameDlg.defaultSearchText, this.appState, null, desc, false,
+        S.srch.search(null, "node.name", SearchByNameDlg.defaultSearchText, this.appState, null, desc, false,
             false, 0, true, "mtm", "DESC", this.close);
     }
 }

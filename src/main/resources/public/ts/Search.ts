@@ -65,12 +65,8 @@ export class Search implements SearchIntf {
     }
 
     search = (node: J.NodeInfo, prop: string, searchText: string, state: AppState, userSearchType: string, description: string, fuzzy: boolean, caseSensitive: boolean, page: number, recursive: boolean, sortField: string, sortDir: string, successCallback: Function): void => {
-        /* Note that for 'userSearchType' we do want node to be null, because we're not searching under a node but
-        will be searching under the admin owned "All Users" node instead */
-        if (!node && !userSearchType) {
-            node = S.quanta.getHighlightedNode(state);
-        }
-
+        // todo-0: insead of the "userSearchType" we already have 'prop' which can hold node.id, node.name, and users,
+        // and really designate a TYPE of search, not the property to be searched.
         S.util.ajax<J.NodeSearchRequest, J.NodeSearchResponse>("nodeSearch", {
             page,
 

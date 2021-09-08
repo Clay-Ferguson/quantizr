@@ -697,7 +697,7 @@ export class Util implements UtilIntf {
     }
 
     flashMessage = (message: string, title: string, preformatted: boolean = false, sizeStyle: string = null): void => {
-        new MessageDlg(message, title, null, null, preformatted, 4500, null).open();
+        new MessageDlg(message, title, null, null, preformatted, 3000, null).open();
     }
 
     showMessage = (message: string, title: string, preformatted: boolean = false, sizeStyle: string = null): Promise<DialogBase> => {

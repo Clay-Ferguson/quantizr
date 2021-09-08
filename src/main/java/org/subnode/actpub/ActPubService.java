@@ -144,7 +144,7 @@ public class ActPubService {
     @Autowired
     private AsyncExec asyncExec;
 
-    private static final Object inboxLock = new Object(); 
+    private static final Object inboxLock = new Object();
 
     /*
      * When 'node' has been created under 'parent' (by the sessionContext user) this will send a
@@ -512,7 +512,8 @@ public class ActPubService {
      * follow a user on this server
      */
     public void processInboxPost(HttpServletRequest httpReq, Object payload) {
-        // todo-1: for now we mutext the inbox becasue I noticed a scenario where Mastodon post TWO simultaneous
+        // todo-1: for now we mutext the inbox becasue I noticed a scenario where Mastodon post TWO
+        // simultaneous
         // calls for the SAME node, and we shouldn't allow that.
         synchronized (inboxLock) {
             String type = AP.str(payload, APProp.type);
@@ -863,10 +864,11 @@ public class ActPubService {
                 String longUserName = apUtil.getLongUserNameFromActorUrl(actorUrl);
                 acctNode = read.getUserNodeByUserName(ms, longUserName);
             } else {
-                // todo-0: add this. What we should do here is just import the user node and NOT load any inboxes,
-                // and this will avoid the unwanted web-crawler chain reaction.
-                apUtil.log("not sharing. We don't currently recognize sharing to unknown foreign users.");
                 /*
+                 * todo-0: add this. What we should do here is just import the user node and NOT load any inboxes,
+                 * and this will avoid the unwanted web-crawler chain reaction. We don't currently recognize sharing
+                 * to unknown foreign users.");
+                 *
                  * todo-1: this is contributing to our [currently] unwanted FEDIVERSE CRAWLER effect chain reaction.
                  * The rule here should be either don't load foreign users whose outboxes you don't plan to load or
                  * else have some property on the node that designates if we need to read the actual outbox or if

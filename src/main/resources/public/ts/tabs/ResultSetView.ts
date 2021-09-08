@@ -44,7 +44,12 @@ export abstract class ResultSetView extends AppTab {
         let rowCount = 0;
         let children: CompIntf[] = [];
 
-        let content = this.data.rsInfo.node ? S.util.getShortContent(this.data.rsInfo.node) : null;
+        let content = null;
+        if (this.data.rsInfo.prop !== "node.id" && //
+            this.data.rsInfo.prop !== "node.name") {
+            content = this.data.rsInfo.node ? S.util.getShortContent(this.data.rsInfo.node) : null;
+        }
+
         children.push(new Div(null, null, [
             new Div(null, { className: "marginBottom marginTop" }, [
                 this.renderHeading(state),

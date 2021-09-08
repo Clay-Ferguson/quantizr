@@ -378,8 +378,8 @@ export class MenuPanel extends Div {
 
         children.push(new Menu("Search", [
             new MenuItem("By Content", MenuPanel.searchByContent, !state.isAnonUser && !!hltNode), //
-            new MenuItem("By Node Name", MenuPanel.searchByName, !state.isAnonUser && !!hltNode), //
-            new MenuItem("By Node ID", MenuPanel.searchById, !state.isAnonUser && !!hltNode) //
+            new MenuItem("By Node Name", MenuPanel.searchByName, !state.isAnonUser), //
+            new MenuItem("By Node ID", MenuPanel.searchById, !state.isAnonUser) //
 
             // new MenuItem("Files", nav.searchFiles, () => { return  !state.isAnonUser && S.quanta.allowFileSystemSearch },
             //    () => { return  !state.isAnonUser && S.quanta.allowFileSystemSearch })
