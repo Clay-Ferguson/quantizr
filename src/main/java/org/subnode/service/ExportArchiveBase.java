@@ -54,7 +54,7 @@ public abstract class ExportArchiveBase {
 	private MongoAuth auth;
 
 	@Autowired
-	private SubNodeUtil util;
+	private SubNodeUtil snUtil;
 
 	@Autowired
 	private AttachmentService attachmentService;
@@ -88,7 +88,7 @@ public abstract class ExportArchiveBase {
 
 		final String nodeId = req.getNodeId();
 		final SubNode node = read.getNode(session, nodeId);
-		String fileName = util.getExportFileName(req.getFileName(), node);
+		String fileName = snUtil.getExportFileName(req.getFileName(), node);
 		shortFileName = fileName + "." + getFileExtension();
 		fullFileName = appProp.getAdminDataFolder() + File.separator + shortFileName;
 

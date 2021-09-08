@@ -34,7 +34,7 @@ public class ExportTextService {
 	private MongoRead read;
 
 	@Autowired
-	private SubNodeUtil util;
+	private SubNodeUtil snUtil;
 
 	@Autowired
 	private AppProp appProp;
@@ -84,7 +84,7 @@ public class ExportTextService {
 		}
 
 		SubNode exportNode = read.getNode(session, nodeId, true);
-		String fileName = util.getExportFileName(req.getFileName(), exportNode);
+		String fileName = snUtil.getExportFileName(req.getFileName(), exportNode);
 		shortFileName = fileName + ".md";
 		fullFileName = appProp.getAdminDataFolder() + File.separator + shortFileName;
 

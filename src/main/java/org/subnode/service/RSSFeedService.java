@@ -83,7 +83,7 @@ public class RSSFeedService {
 	private MongoRead read;
 
 	@Autowired
-	private SubNodeUtil subNodeUtil;
+	private SubNodeUtil snUtil;
 
 	@Autowired
 	private AppProp appProp;
@@ -877,7 +877,7 @@ public class RSSFeedService {
 		feed.setEncoding("UTF-8");
 		feed.setFeedType("rss_2.0");
 
-		NodeMetaInfo metaInfo = subNodeUtil.getNodeMetaInfo(node);
+		NodeMetaInfo metaInfo = snUtil.getNodeMetaInfo(node);
 		feed.setTitle(metaInfo.getTitle() != null ? metaInfo.getTitle() : "");
 		feed.setLink("");
 		feed.setDescription(sanitizeHtml(metaInfo.getDescription() != null ? metaInfo.getDescription() : ""));
@@ -890,7 +890,7 @@ public class RSSFeedService {
 
 		if (children != null) {
 			for (final SubNode n : children) {
-				metaInfo = subNodeUtil.getNodeMetaInfo(n);
+				metaInfo = snUtil.getNodeMetaInfo(n);
 
 				// Currently the link will be an attachment URL, but need to research how ROME
 				// handles attachments.

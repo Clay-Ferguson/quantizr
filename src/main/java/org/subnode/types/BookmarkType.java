@@ -21,7 +21,7 @@ public class BookmarkType extends TypeBase {
 
     @Override
     public String getName() {
-        return "sn:bookmark";
+        return NodeType.BOOKMARK.s();
     }
 
     public void createSubNode(MongoSession session, ValContainer<SubNode> node, CreateSubNodeRequest req, boolean linkBookmark) {

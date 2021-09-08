@@ -22,7 +22,7 @@ public class RssFeedType extends TypeBase {
 
     @Override
     public String getName() {
-        return "sn:rssfeed";
+        return NodeType.RSS_FEED.s();
     }
 
     public void createSubNode(MongoSession session, ValContainer<SubNode> node, CreateSubNodeRequest req, boolean linkBookmark) {

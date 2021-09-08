@@ -52,7 +52,7 @@ public class NodeRenderService {
 	private static final Logger log = LoggerFactory.getLogger(NodeRenderService.class);
 
 	@Autowired
-	private SubNodeUtil subNodeUtil;
+	private SubNodeUtil snUtil;
 
 	@Autowired
 	private MongoRead read;
@@ -536,7 +536,7 @@ public class NodeRenderService {
 	public void populateSocialCardProps(SubNode node, Model model) {
 		if (node == null)
 			return;
-		NodeMetaInfo metaInfo = subNodeUtil.getNodeMetaInfo(node);
+		NodeMetaInfo metaInfo = snUtil.getNodeMetaInfo(node);
 		model.addAttribute("ogTitle", metaInfo.getTitle());
 		model.addAttribute("ogDescription", metaInfo.getDescription());
 

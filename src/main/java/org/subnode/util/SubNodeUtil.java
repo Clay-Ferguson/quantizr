@@ -1,5 +1,6 @@
 package org.subnode.util;
 
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.UUID;
@@ -13,11 +14,13 @@ import org.subnode.config.AppProp;
 import org.subnode.model.NodeMetaInfo;
 import org.subnode.model.client.NodeProp;
 import org.subnode.model.client.PrincipalName;
+import org.subnode.model.client.PrivilegeType;
 import org.subnode.mongo.CreateNodeLocation;
 import org.subnode.mongo.MongoCreate;
 import org.subnode.mongo.MongoRead;
 import org.subnode.mongo.MongoSession;
 import org.subnode.mongo.MongoUpdate;
+import org.subnode.mongo.model.AccessControl;
 import org.subnode.mongo.model.SubNode;
 import org.subnode.mongo.model.SubNodePropertyMap;
 import org.subnode.service.NodeRenderService;
@@ -65,6 +68,12 @@ public class SubNodeUtil {
 	 */
 	public static boolean isSavableProperty(String propertyName) {
 		return !nonSavableProperties.contains(propertyName);
+	}
+
+	public void setNodePublicWritable(SubNode node) {
+		HashMap<String, AccessControl> ac = new HashMap<>();
+		ac.put(PrincipalName.PUBLIC.s(), new AccessControl(null, PrivilegeType.READ.s() + "," + PrivilegeType.WRITE.s()));
+		node.setAc(ac);
 	}
 
 	public String getFriendlyNodeUrl(MongoSession session, SubNode node) {
@@ -255,7 +264,7 @@ public class SubNodeUtil {
 		if (newLineIdx != -1) {
 			// call this once to start just so the title extraction works.
 			description = nodeRender.stripRenderTags(description);
-			
+
 			// get the new idx, it might have changed.
 			newLineIdx = description.indexOf("\n");
 

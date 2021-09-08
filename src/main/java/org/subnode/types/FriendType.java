@@ -18,7 +18,7 @@ public class FriendType extends TypeBase {
 
     @Override
     public String getName() {
-        return "sn:friend";
+        return NodeType.FRIEND.s();
     }
 
     @Override

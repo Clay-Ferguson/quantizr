@@ -48,7 +48,7 @@ public class ExportServiceFlexmark {
 	private static final Logger log = LoggerFactory.getLogger(ExportServiceFlexmark.class);
 
 	@Autowired
-	private SubNodeUtil util;
+	private SubNodeUtil snUtil;
 
 	@Autowired
 	private AppProp appProp;
@@ -108,7 +108,7 @@ public class ExportServiceFlexmark {
 		}
 
 		SubNode exportNode = read.getNode(session, nodeId, true);
-		String fileName = util.getExportFileName(req.getFileName(), exportNode);
+		String fileName = snUtil.getExportFileName(req.getFileName(), exportNode);
 		shortFileName = fileName + "." + format;
 		fullFileName = appProp.getAdminDataFolder() + File.separator + shortFileName;
 		boolean wroteFile = false;

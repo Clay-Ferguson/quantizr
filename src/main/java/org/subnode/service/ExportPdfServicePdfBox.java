@@ -43,7 +43,7 @@ public class ExportPdfServicePdfBox {
 	private static final Logger log = LoggerFactory.getLogger(ExportPdfServicePdfBox.class);
 
 	@Autowired
-	private SubNodeUtil util;
+	private SubNodeUtil snUtil;
 
 	@Autowired
 	private AppProp appProp;
@@ -111,7 +111,7 @@ public class ExportPdfServicePdfBox {
 		setFontSize(baseFontSize);
 
 		SubNode exportNode = read.getNode(session, nodeId, true);
-		String fileName = util.getExportFileName(req.getFileName(), exportNode);
+		String fileName = snUtil.getExportFileName(req.getFileName(), exportNode);
 		shortFileName = fileName + ".pdf"; 
 		fullFileName = appProp.getAdminDataFolder() + File.separator + shortFileName;
 

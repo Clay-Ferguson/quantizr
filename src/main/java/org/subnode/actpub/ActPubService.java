@@ -114,7 +114,7 @@ public class ActPubService {
     private AttachmentService attachmentService;
 
     @Autowired
-    private SubNodeUtil subNodeUtil;
+    private SubNodeUtil snUtil;
 
     @Autowired
     private ActPubUtil apUtil;
@@ -191,7 +191,7 @@ public class ActPubService {
                 APList attachments = createAttachmentsList(node);
                 String fromUser = ThreadLocals.getSC().getUserName();
                 String fromActor = apUtil.makeActorUrlForUserName(fromUser);
-                String noteUrl = subNodeUtil.getIdBasedUrl(node);
+                String noteUrl = snUtil.getIdBasedUrl(node);
 
                 // When posting a public message we send out to all unique sharedInboxes here
                 if (!privateMessage) {

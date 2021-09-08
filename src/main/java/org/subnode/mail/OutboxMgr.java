@@ -53,7 +53,7 @@ public class OutboxMgr {
 	private String mailBatchSize = "10";
 
 	@Autowired
-	private SubNodeUtil apiUtil;
+	private SubNodeUtil snUtil;
 
 	@Autowired
 	private PushService pushService;
@@ -142,7 +142,7 @@ public class OutboxMgr {
 		String toUserName = toUserNode.getStrProp(NodeProp.USER.s());
 		// log.debug("sending node notification email to: " + email);
 
-		String nodeUrl = apiUtil.getFriendlyNodeUrl(ms, node);
+		String nodeUrl = snUtil.getFriendlyNodeUrl(ms, node);
 		String content =
 				String.format(appProp.getConfigText("brandingAppName") + " user '%s' shared a node to your '%s' account.<p>\n\n" + //
 						"%s", fromUserName, toUserName, nodeUrl);
@@ -196,9 +196,9 @@ public class OutboxMgr {
 				return OutboxMgr.outboxNode;
 			}
 
-			apiUtil.ensureNodeExists(ms, "/" + NodeName.ROOT, NodeName.OUTBOX, null, "Outbox", null, true, null, null);
+			snUtil.ensureNodeExists(ms, "/" + NodeName.ROOT, NodeName.OUTBOX, null, "Outbox", null, true, null, null);
 
-			OutboxMgr.outboxNode = apiUtil.ensureNodeExists(ms, "/" + NodeName.ROOT, NodeName.OUTBOX + "/" + NodeName.SYSTEM,
+			OutboxMgr.outboxNode = snUtil.ensureNodeExists(ms, "/" + NodeName.ROOT, NodeName.OUTBOX + "/" + NodeName.SYSTEM,
 					null, "System Messages", null, true, null, null);
 			return OutboxMgr.outboxNode;
 		}

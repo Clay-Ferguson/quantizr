@@ -74,7 +74,7 @@ public class MongoUtil {
 	private MongoTemplate ops;
 
 	@Autowired
-	private SubNodeUtil apiUtil;
+	private SubNodeUtil snUtil;
 
 	@Autowired
 	private AclService aclService;
@@ -641,14 +641,14 @@ public class MongoUtil {
 		SubNode adminNode = read.getUserNodeByUserName(session, adminUser);
 		if (adminNode == null) {
 			adminNode =
-					apiUtil.ensureNodeExists(session, "/", NodeName.ROOT, null, "Root", NodeType.REPO_ROOT.s(), true, null, null);
+					snUtil.ensureNodeExists(session, "/", NodeName.ROOT, null, "Root", NodeType.REPO_ROOT.s(), true, null, null);
 
 			adminNode.setProp(NodeProp.USER.s(), PrincipalName.ADMIN.s());
 			adminNode.setProp(NodeProp.USER_PREF_EDIT_MODE.s(), false);
 			adminNode.setProp(NodeProp.USER_PREF_RSS_HEADINGS_ONLY.s(), true);
 			update.save(session, adminNode);
 
-			apiUtil.ensureNodeExists(session, "/" + NodeName.ROOT, NodeName.USER, null, "Users", null, true, null, null);
+			snUtil.ensureNodeExists(session, "/" + NodeName.ROOT, NodeName.USER, null, "Users", null, true, null, null);
 		}
 
 		createPublicNodes(session);
@@ -657,7 +657,7 @@ public class MongoUtil {
 	public void createPublicNodes(MongoSession session) {
 		log.debug("creating Public Nodes");
 		ValContainer<Boolean> created = new ValContainer<>(Boolean.FALSE);
-		SubNode publicNode = apiUtil.ensureNodeExists(session, "/" + NodeName.ROOT, NodeName.PUBLIC, null, "Public", null, true,
+		SubNode publicNode = snUtil.ensureNodeExists(session, "/" + NodeName.ROOT, NodeName.PUBLIC, null, "Public", null, true,
 				null, created);
 
 		if (created.getVal()) {
@@ -667,7 +667,7 @@ public class MongoUtil {
 		created = new ValContainer<>(Boolean.FALSE);
 
 		// create home node (admin owned node named 'home').
-		SubNode publicHome = apiUtil.ensureNodeExists(session, "/" + NodeName.ROOT + "/" + NodeName.PUBLIC, NodeName.HOME,
+		SubNode publicHome = snUtil.ensureNodeExists(session, "/" + NodeName.ROOT + "/" + NodeName.PUBLIC, NodeName.HOME,
 				NodeName.HOME, "Public Home", null, true, null, created);
 
 		// make node public
@@ -682,7 +682,7 @@ public class MongoUtil {
 		 * directly in the server root, which is a private node
 		 */
 		created = new ValContainer<>(Boolean.FALSE);
-		SubNode publicWelcome = apiUtil.ensureNodeExists(session, "/" + NodeName.ROOT, NodeName.WELCOME, "welcome-page",
+		SubNode publicWelcome = snUtil.ensureNodeExists(session, "/" + NodeName.ROOT, NodeName.WELCOME, "welcome-page",
 				"### Welcome Node\n\nDefault landing page content. Admin should edit this node, named 'welcome-page'", null, true,
 				null, created);
 
