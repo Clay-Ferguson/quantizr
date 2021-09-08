@@ -449,6 +449,27 @@ public class MongoUtil {
 		log.debug(sb.toString());
 	}
 
+	// WARNING: I wote this but never tested it, nor did I ever find any examples online. Ended up not needing any
+	// compound indexes (yet)
+	public void createPartialUniqueIndexComp2(MongoSession session, String name, Class<?> clazz, String property1,
+			String property2) {
+		auth.requireAdmin(session);
+		update.saveSession(session);
+
+		try {
+			// Ensures unuque values for 'property' (but allows duplicates of nodes missing the property)
+			ops.indexOps(clazz).ensureIndex(//
+					new Index().on(property1, Direction.ASC) //
+							.on(property2, Direction.ASC) //
+							.unique() //
+							.named(name) //
+							// Note: also instead of exists, something like ".gt('')" would probably work too
+							.partial(PartialIndexFilter.of(Criteria.where(property1).exists(true).and(property2).exists(true))));
+		} catch (Exception e) {
+			ExUtil.error(log, "Failed to create partial unique index: " + name, e);
+		}
+	}
+
 	// NOTE: Properties like this don't appear to be supported: "prp['ap:id'].value", but prp.apid.value
 	// works
 	//
