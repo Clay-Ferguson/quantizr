@@ -3,12 +3,14 @@ package org.subnode.mongo;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.regex.Pattern;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoCursor;
 import com.mongodb.client.MongoDatabase;
 import org.apache.commons.codec.digest.DigestUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.bson.Document;
 import org.bson.types.ObjectId;
 import org.slf4j.Logger;
@@ -19,8 +21,10 @@ import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.index.Index;
 import org.springframework.data.mongodb.core.index.IndexField;
 import org.springframework.data.mongodb.core.index.IndexInfo;
+import org.springframework.data.mongodb.core.index.PartialIndexFilter;
 import org.springframework.data.mongodb.core.index.TextIndexDefinition;
 import org.springframework.data.mongodb.core.index.TextIndexDefinition.TextIndexDefinitionBuilder;
+import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Component;
 import org.subnode.config.AppProp;
@@ -82,6 +86,9 @@ public class MongoUtil {
 	private MongoUpdate update;
 
 	@Autowired
+	private MongoDelete delete;
+
+	@Autowired
 	private MongoAuth auth;
 
 	private static SubNode systemRootNode;
@@ -127,7 +134,7 @@ public class MongoUtil {
 	public SubNode findById(ObjectId objId) {
 		if (objId == null)
 			return null;
-	
+
 		SubNode node = ThreadLocals.getCachedNode(objId.toHexString());
 		if (node == null) {
 			node = ops.findById(objId, SubNode.class);
@@ -351,7 +358,38 @@ public class MongoUtil {
 		createAllIndexes(session);
 	}
 
+	// DO NOT DELETE:
+	// Leaving this here for future reference for any DB-conversions.
+	// This code was for removing dupliate apids and renaming a property
+	public void preprocessDatabase(MongoSession session) {
+		log.debug("DupCheck");
+		Iterable<SubNode> nodes = ops.findAll(SubNode.class);
+		HashSet<String> set = new HashSet<>();
+		List<SubNode> delNodes = new LinkedList<>();
+
+		for (SubNode node : nodes) {
+			String apId = node.getStrProp("ap:id");
+			if (!StringUtils.isEmpty(apId)) {
+				if (set.contains(apId)) {
+					log.debug("DUP apid: " + apId);
+					delNodes.add(node);
+				} else {
+					set.add(apId);
+					node.setProp("apid", apId);
+					node.deleteProp("ap:id");
+				}
+			}
+		}
+
+		for (SubNode node : delNodes) {
+			log.debug("DUP DEL: " + node.getId().toHexString());
+			delete.delete(node);
+		}
+		update.saveSession(session);
+	}
+
 	public void createAllIndexes(MongoSession session) {
+		// preprocessDatabase(session);
 		try {
 			// dropIndex(session, SubNode.class, SubNode.FIELD_PATH + "_1");
 			dropIndex(session, SubNode.class, SubNode.FIELD_NAME + "_1");
@@ -363,6 +401,10 @@ public class MongoUtil {
 		ops.indexOps(FediverseName.class).ensureIndex(new Index().on(FediverseName.FIELD_NAME, Direction.ASC).unique());
 
 		createUniqueIndex(session, SubNode.class, SubNode.FIELD_PATH_HASH);
+
+		// dropIndex(session, SubNode.class, "unique-apid");
+		createPartialUniqueIndex(session, "unique-apid", SubNode.class,
+				SubNode.FIELD_PROPERTIES + "." + NodeProp.ACT_PUB_ID.s() + ".value");
 
 		/*
 		 * NOTE: Every non-admin owned noded must have only names that are prefixed with "UserName--" of the
@@ -405,6 +447,26 @@ public class MongoUtil {
 			}
 		}
 		log.debug(sb.toString());
+	}
+
+	// NOTE: Properties like this don't appear to be supported: "prp['ap:id'].value", but prp.apid.value
+	// works
+	//
+	public void createPartialUniqueIndex(MongoSession session, String name, Class<?> clazz, String property) {
+		auth.requireAdmin(session);
+		update.saveSession(session);
+
+		try {
+			// Ensures unuque values for 'property' (but allows duplicates of nodes missing the property)
+			ops.indexOps(clazz).ensureIndex(//
+					new Index().on(property, Direction.ASC) //
+							.unique() //
+							.named(name) //
+							// Note: also instead of exists, something like ".gt('')" would probably work too
+							.partial(PartialIndexFilter.of(Criteria.where(property).exists(true))));
+		} catch (Exception e) {
+			ExUtil.error(log, "Failed to create partial unique index: " + name, e);
+		}
 	}
 
 	public void createUniqueIndex(MongoSession session, Class<?> clazz, String property) {

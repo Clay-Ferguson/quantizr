@@ -513,10 +513,7 @@ public class ActPubService {
      */
     public void processInboxPost(HttpServletRequest httpReq, Object payload) {
         // todo-1: for now we mutext the inbox becasue I noticed a scenario where Mastodon post TWO simultaneous
-        // calls for the SAME node, and it ended up duplicating because both were in memory at same time
-        // AND we don't have constraints. We need a constraint on "ap:id" property.
-        //
-        // todo-0: create the constraint
+        // calls for the SAME node, and we shouldn't allow that.
         synchronized (inboxLock) {
             String type = AP.str(payload, APProp.type);
             if (type == null)

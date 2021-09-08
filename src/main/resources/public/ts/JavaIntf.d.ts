@@ -810,7 +810,7 @@ export const enum ErrorType {
 }
 
 export const enum NodeProp {
-    ACT_PUB_ID = "ap:id",
+    ACT_PUB_ID = "apid",
     ACT_PUB_OBJ_TYPE = "ap:objType",
     ACT_PUB_OBJ_CONTENT = "ap:objContent",
     ACT_PUB_OBJ_INREPLYTO = "ap:objInReplyTo",

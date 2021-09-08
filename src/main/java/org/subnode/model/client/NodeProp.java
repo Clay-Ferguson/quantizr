@@ -5,7 +5,7 @@ import com.fasterxml.jackson.annotation.JsonValue;
 public enum NodeProp {
 
     // Activity Pub Properties
-    ACT_PUB_ID("ap:id", "s"), //
+    ACT_PUB_ID("apid", "s"), //
     ACT_PUB_OBJ_TYPE("ap:objType", "s"), //
 
     ACT_PUB_OBJ_CONTENT("ap:objContent", "s"), //
