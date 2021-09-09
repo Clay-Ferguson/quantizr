@@ -25,6 +25,7 @@ import org.subnode.model.client.PrivilegeType;
 import org.subnode.mongo.model.SubNode;
 import org.subnode.service.AclService;
 import org.subnode.util.ThreadLocals;
+import org.subnode.util.Util;
 import org.subnode.util.XString;
 
 /*
@@ -292,6 +293,19 @@ public class MongoRead {
         SubNode ret = util.findById(objId);
         if (ret != null && allowAuth) {
             auth.auth(session, ret, PrivilegeType.READ);
+        }
+        return ret;
+    }
+
+    // todo-1: Need to implement a save hook/callback capability in the MongoListener so we can get 
+    // notifications sent to any threads that are waiting to lookup a node
+    // once it exists, but we will STILL probably need to DO the lookup so we don't 
+    // have concurrent access threading bug.
+    public SubNode getNode(MongoSession session, ObjectId objId, boolean allowAuth, int retries) {
+        SubNode ret = getNode(session, objId, allowAuth);
+        while (ret == null && retries-- > 0) {
+            Util.sleep(3000);
+            ret = getNode(session, objId, allowAuth);
         }
         return ret;
     }

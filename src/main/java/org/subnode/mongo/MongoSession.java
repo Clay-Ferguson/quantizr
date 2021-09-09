@@ -15,12 +15,11 @@ public class MongoSession {
 		userName = PrincipalName.ANON.s();
 	}
 
-	public MongoSession(String userName) {
-		this.userName = userName;
-	}
-
 	public MongoSession(String userName, ObjectId userNodeId) {
 		this.userName = userName;
+		if (userNodeId == null && !PrincipalName.ANON.s().equals(userName)) {
+			log.error("WARNING: created MongoSession with null userNodeId!");
+		}
 		this.userNodeId = userNodeId;
 	}
 

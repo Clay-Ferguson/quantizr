@@ -9,8 +9,13 @@ public enum NodeProp {
     ACT_PUB_OBJ_TYPE("ap:objType", "s"), //
 
     ACT_PUB_OBJ_CONTENT("ap:objContent", "s"), //
+
+      // For "AP Note" Objects (per spec) this is the "inReplyTo" property on the node.
     ACT_PUB_OBJ_INREPLYTO("ap:objInReplyTo", "s"), //
+
+    // For "AP Note" Objects (per spec) this is the "url" property on the node.
     ACT_PUB_OBJ_URL("ap:objUrl", "s"), //
+    
     ACT_PUB_OBJ_ATTRIBUTED_TO("ap:objAttributedTo", "s"), //
     ACT_PUB_USER_ICON_URL("ap:userIcon", "s"), //
     ACT_PUB_SHARED_INBOX("ap:sharedInbox", "s"), //

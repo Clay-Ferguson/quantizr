@@ -14,6 +14,7 @@ import org.springframework.stereotype.Component;
 import org.subnode.actpub.ActPubFollowing;
 import org.subnode.actpub.ActPubService;
 import org.subnode.actpub.ActPubUtil;
+import org.subnode.actpub.model.APList;
 import org.subnode.config.NodeName;
 import org.subnode.exception.base.RuntimeEx;
 import org.subnode.model.NodeInfo;
@@ -113,6 +114,9 @@ public class NodeEditService {
 
 	@Autowired
 	private PushService pushService;
+
+	@Autowired
+	private SubNodeUtil snUtil;
 
 	/*
 	 * Creates a new node as a *child* node of the node specified in the request. Should ONLY be called
@@ -429,8 +433,8 @@ public class NodeEditService {
 			}
 
 			/*
-			 * We don't use unique index on node name, because we want to save storage space on the server, so
-			 * we have to do the uniqueness check ourselves here manually
+			 * We don't use unique index on node name, because it's not worth the performance overhead, so we
+			 * have to do the uniqueness check ourselves here manually
 			 */
 			SubNode nodeByName = read.getNodeByName(session, nodeName);
 			if (nodeByName != null) {
@@ -536,8 +540,19 @@ public class NodeEditService {
 					auth.saveMentionsToNodeACL(s, node);
 
 					if (node.getAc() != null) {
+
+						// Get the inReplyTo from the parent property (foreign node) or if not found generate one based on
+						// what the local server version of it is.
 						String inReplyTo = parent.getStrProp(NodeProp.ACT_PUB_OBJ_URL);
-						apService.sendNotificationForNodeEdit(s, inReplyTo, node.getId());
+						if (inReplyTo == null) {
+							inReplyTo = snUtil.getIdBasedUrl(parent);
+						}
+
+						APList attachments = apService.createAttachmentsList(node);
+						String nodeUrl = snUtil.getIdBasedUrl(node);
+
+						apService.sendNotificationForNodeEdit(s, inReplyTo, snUtil.cloneAcl(node), attachments, node.getContent(),
+								nodeUrl);
 						pushService.pushNodeUpdateToBrowsers(s, sessionsPushed, node);
 					}
 					return null;

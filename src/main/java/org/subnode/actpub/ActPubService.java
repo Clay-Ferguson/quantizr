@@ -4,6 +4,7 @@ import java.security.PublicKey;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -45,6 +46,7 @@ import org.subnode.mongo.model.SubNode;
 import org.subnode.service.AclService;
 import org.subnode.service.AttachmentService;
 import org.subnode.service.NodeSearchService;
+import org.subnode.service.PushService;
 import org.subnode.service.UserManagerService;
 import org.subnode.util.AsyncExec;
 import org.subnode.util.DateUtil;
@@ -52,7 +54,6 @@ import org.subnode.util.EnglishDictionary;
 import org.subnode.util.SubNodeUtil;
 import org.subnode.util.ThreadLocals;
 import org.subnode.util.XString;
-import org.subnode.service.PushService;
 
 @Component
 public class ActPubService {
@@ -148,17 +149,16 @@ public class ActPubService {
 
     /*
      * When 'node' has been created under 'parent' (by the sessionContext user) this will send a
-     * notification to foreign servers. This call returns immediately and delegates teh actuall
+     * notification to foreign servers. This call returns immediately and delegates the actuall
      * proccessing to a daemon thread.
+     * 
+     * For concurrency reasons, note that we pass in the nodeId to this method rather than the node
+     * even if we do have the node, becuase we want to make sure there's no concurrent access.
      */
-    public void sendNotificationForNodeEdit(MongoSession ms, String inReplyTo, ObjectId nodeId) {
+    public void sendNotificationForNodeEdit(MongoSession ms, String inReplyTo, HashMap<String, AccessControl> acl, 
+    APList attachments, String content, String noteUrl) {
         asyncExec.run(ThreadLocals.getContext(), () -> {
             try {
-                SubNode node = read.getNode(ms, nodeId);
-                if (node == null || node.getAc() == null) {
-                    return;
-                }
-
                 List<String> toUserNames = new LinkedList<>();
                 boolean privateMessage = true;
 
@@ -167,7 +167,7 @@ public class ActPubService {
                  * can avoid doing any work for the ones in 'toUserNamesSet', because we know they already are taken
                  * care of (in the list)
                  */
-                for (String k : node.getAc().keySet()) {
+                for (String k : acl.keySet()) {
                     if (PrincipalName.PUBLIC.s().equals(k)) {
                         privateMessage = false;
                     } else {
@@ -187,18 +187,15 @@ public class ActPubService {
                 }
 
                 // String apId = parent.getStringProp(NodeProp.ACT_PUB_ID.s());
-
-                APList attachments = createAttachmentsList(node);
                 String fromUser = ThreadLocals.getSC().getUserName();
                 String fromActor = apUtil.makeActorUrlForUserName(fromUser);
-                String noteUrl = snUtil.getIdBasedUrl(node);
 
                 // When posting a public message we send out to all unique sharedInboxes here
                 if (!privateMessage) {
                     HashSet<String> sharedInboxes = getSharedInboxesOfFollowers(fromUser);
 
                     if (sharedInboxes.size() > 0) {
-                        APObj message = apFactory.newCreateMessageForNote(toUserNames, fromActor, inReplyTo, node.getContent(),
+                        APObj message = apFactory.newCreateMessageForNote(toUserNames, fromActor, inReplyTo, content,
                                 noteUrl, privateMessage, attachments);
 
                         for (String inbox : sharedInboxes) {
@@ -208,7 +205,7 @@ public class ActPubService {
                 }
 
                 if (toUserNames.size() > 0) {
-                    sendNote(ms, toUserNames, fromUser, inReplyTo, node.getContent(), attachments, noteUrl, privateMessage);
+                    sendNote(ms, toUserNames, fromUser, inReplyTo, content, attachments, noteUrl, privateMessage);
                 }
             } //
             catch (Exception e) {

@@ -32,6 +32,7 @@ import org.subnode.mongo.MongoRead;
 import org.subnode.mongo.MongoSession;
 import org.subnode.mongo.model.SubNode;
 import org.subnode.util.DateUtil;
+import org.subnode.util.SubNodeUtil;
 import org.subnode.util.ValContainer;
 import org.subnode.util.XString;
 
@@ -56,6 +57,9 @@ public class ActPubOutbox {
 
     @Autowired
     private MongoAuth auth;
+
+    @Autowired
+    private SubNodeUtil snUtil;
 
     @Autowired
     @Qualifier("threadPoolTaskExecutor")
@@ -220,7 +224,7 @@ public class ActPubOutbox {
     }
 
     /*
-     * todo-1: Security isn't implemented on this call yet, but the only caller to this is passing
+     * todo-0: Security isn't implemented on this call yet, but the only caller to this is passing
      * "public" as 'sharedTo' so we are safe to implement this outbox currently as only able to send
      * back public info.
      */
@@ -250,6 +254,12 @@ public class ActPubOutbox {
                 for (SubNode child : auth.searchSubGraphByAclUser(mongoSession, null, sharedToList,
                         Sort.by(Sort.Direction.DESC, SubNode.FIELD_MODIFY_TIME), MAX_PER_PAGE, userNode.getOwner())) {
 
+                    String replyTo = null;
+                    SubNode parent = read.getParent(mongoSession, child, false);
+                    if (parent != null) {
+                        replyTo = snUtil.getIdBasedUrl(parent);
+                    }
+
                     if (items.size() >= MAX_PER_PAGE) {
                         // ocPage.setPrev(outboxBase + "?page=" + String.valueOf(pgNo - 1));
                         // ocPage.setNext(outboxBase + "?page=" + String.valueOf(pgNo + 1));
@@ -261,22 +271,27 @@ public class ActPubOutbox {
                         String published = DateUtil.isoStringFromDate(child.getModifyTime());
                         String actor = apUtil.makeActorUrlForUserName(userName);
 
+                        APONote note = new APONote() //
+                                .put(APProp.id, nodeIdBase + hexId) //
+                                .put(APProp.summary, null) //
+                                .put(APProp.published, published) //
+                                .put(APProp.url, nodeIdBase + hexId) //
+                                .put(APProp.attributedTo, actor) //
+                                .put(APProp.to, new APList().val(APConst.CONTEXT_STREAMS_PUBLIC)) //
+                                .put(APProp.sensitive, false) //
+                                .put(APProp.content, child.getContent());
+
+                        if (replyTo != null) {
+                            note = note.put(APProp.inReplyTo, replyTo);
+                        }
+
                         items.add(new APOCreate() //
+                                // todo-0: what is the create=t here? That was part of my own temporary test right?
                                 .put(APProp.id, nodeIdBase + hexId + "&create=t") //
                                 .put(APProp.actor, actor) //
                                 .put(APProp.published, published) //
                                 .put(APProp.to, new APList().val(APConst.CONTEXT_STREAMS_PUBLIC)) //
-                                .put(APProp.object, new APONote() //
-                                        .put(APProp.id, nodeIdBase + hexId) //
-                                        .put(APProp.summary, null) //
-                                        .put(APProp.replyTo, null) //
-                                        .put(APProp.published, published) //
-                                        .put(APProp.url, nodeIdBase + hexId) //
-                                        .put(APProp.attributedTo, actor) //
-                                        .put(APProp.to, new APList().val(APConst.CONTEXT_STREAMS_PUBLIC)) //
-                                        .put(APProp.sensitive, false) //
-                                        .put(APProp.content, child.getContent())//
-                        ));
+                                .put(APProp.object, note));
                     }
                 }
 

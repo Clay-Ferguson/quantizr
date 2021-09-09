@@ -56,6 +56,10 @@ public class ActPubFactory {
 				.put(APProp.sensitive, false) //
 				.put(APProp.content, content);
 
+		if (inReplyTo != null) {
+			ret = ret.put(APProp.inReplyTo, inReplyTo);
+		}
+
 		LinkedList<String> toList = new LinkedList<>();
 		LinkedList<String> ccList = new LinkedList<>();
 
@@ -130,7 +134,8 @@ public class ActPubFactory {
 				if (actorUrl == null)
 					continue;
 
-				// if public message put all the individuals in the 'cc' and "...#Public" as the only 'to', else they go in the 'to'.
+				// if public message put all the individuals in the 'cc' and "...#Public" as the only 'to', else
+				// they go in the 'to'.
 				if (!privateMessage) {
 					ccActors.add(actorUrl);
 				} else {

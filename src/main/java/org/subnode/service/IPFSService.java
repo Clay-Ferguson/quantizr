@@ -183,7 +183,10 @@ public class IPFSService {
 
     public void ipfsAsyncPinNode(MongoSession ms, ObjectId nodeId) {
         asyncExec.run(ThreadLocals.getContext(), () -> {
-            SubNode node = read.getNode(ms, nodeId);
+            // wait for node to be saved. Waits up to 30 seconds. 
+            Util.sleep(3000);
+            SubNode node = read.getNode(ms, nodeId, false, 10);
+
             if (node == null)
                 return;
             String ipfsLink = node.getStrProp(NodeProp.IPFS_LINK);

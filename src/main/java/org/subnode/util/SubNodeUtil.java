@@ -61,6 +61,12 @@ public class SubNodeUtil {
 		nonSavableProperties.add(NodeProp.BIN_QUOTA.s());
 	}
 
+	public HashMap<String, AccessControl> cloneAcl(SubNode node) {
+		if (node.getAc() == null)
+			return null;
+		return new HashMap<String, AccessControl>(node.getAc());
+	}
+
 	/*
 	 * Currently there's a bug in the client code where it sends nulls for some nonsavable types, so
 	 * before even fixing the client I decided to just make the server side block those. This is more

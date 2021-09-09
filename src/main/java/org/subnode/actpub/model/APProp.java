@@ -39,7 +39,6 @@ public class APProp {
     public static final String orderedItems = "orderedItems";
     public static final String partOf = "partOf";
     public static final String rel = "rel";
-    public static final String replyTo = "replyTo";
     public static final String endpoints = "endpoints";
     public static final String publicKey = "publicKey";
     public static final String publicKeyPem = "publicKeyPem";

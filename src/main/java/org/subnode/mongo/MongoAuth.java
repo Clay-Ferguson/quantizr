@@ -55,8 +55,8 @@ public class MongoAuth {
 	@Autowired
 	private ActPubService actPub;
 
-	private static final MongoSession adminSession = new MongoSession(PrincipalName.ADMIN.s());
-	private static final MongoSession anonSession = new MongoSession(PrincipalName.ANON.s());
+	private static MongoSession adminSession;
+	private static MongoSession anonSession;
 
 	private static final HashMap<String, String> userNamesByAccountId = new HashMap<>();
 	private static final HashMap<String, String> displayNamesByAccountId = new HashMap<>();
@@ -67,13 +67,16 @@ public class MongoAuth {
 	}
 
 	public MongoSession getAdminSession() {
-		if (adminSession.getUserNodeId() == null) {
-			adminSession.setUserNodeId(read.getDbRoot().getId());
+		if (adminSession == null) {
+			adminSession = new MongoSession(PrincipalName.ADMIN.s(), read.getDbRoot().getId());
 		}
 		return adminSession;
 	}
 
 	public MongoSession getAnonSession() {
+		if (anonSession == null) {
+			anonSession = new MongoSession(PrincipalName.ANON.s(), null);
+		}
 		return anonSession;
 	}
 
@@ -549,7 +552,8 @@ public class MongoAuth {
 				orCriteria.add(Criteria.where(SubNode.FIELD_AC + "." + share).ne(null));
 			}
 
-			criteria = criteria.andOperator(new Criteria().orOperator((Criteria[]) orCriteria.toArray(new Criteria[orCriteria.size()])));
+			criteria = criteria
+					.andOperator(new Criteria().orOperator((Criteria[]) orCriteria.toArray(new Criteria[orCriteria.size()])));
 		}
 
 		if (ownerIdMatch != null) {
