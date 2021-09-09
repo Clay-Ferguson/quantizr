@@ -36,6 +36,8 @@ public class SessionContext {
 	// implements InitializingBean, DisposableBean {
 	private static final Logger log = LoggerFactory.getLogger(SessionContext.class);
 
+	public static final String QSC = "QSC";
+
 	private boolean live = true;
 
 	@Autowired
@@ -291,8 +293,7 @@ public class SessionContext {
 		return list;
 	}
 
-	@PreDestroy
-	public void preDestroy() {
+	public void sessionTimeout() {
 		log.trace(String.format("Destroying Session object hashCode[%d] of user %s", hashCode(), userName));
 		pushService.sendServerPushInfo(this, new SessionTimeoutPushInfo());
 

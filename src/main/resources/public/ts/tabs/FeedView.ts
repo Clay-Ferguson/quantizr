@@ -118,14 +118,17 @@ export class FeedView extends AppTab {
             }, this.data.props.filterExpanded, "", "", "span"));
 
         children.push(new HelpButton(() => S.quanta?.config?.help?.fediverse?.feed));
-        children.push(new Checkbox("Auto-refresh", { className: "marginLeft" }, {
-            setValue: (checked: boolean): void => {
-                this.data.props.autoRefresh = checked;
-            },
-            getValue: (): boolean => {
-                return this.data.props.autoRefresh;
-            }
-        }));
+
+        if (this.data.props.feedFilterRootNode) {
+            children.push(new Checkbox("Auto-refresh", { className: "marginLeft" }, {
+                setValue: (checked: boolean): void => {
+                    this.data.props.autoRefresh = checked;
+                },
+                getValue: (): boolean => {
+                    return this.data.props.autoRefresh;
+                }
+            }));
+        }
 
         children.push(new Clearfix());
 

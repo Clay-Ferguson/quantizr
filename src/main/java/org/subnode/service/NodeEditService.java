@@ -218,7 +218,6 @@ public class NodeEditService {
 		res.setNewNode(
 				convert.convertToNodeInfo(ThreadLocals.getSC(), session, newNode, true, false, -1, false, false, false, false));
 
-		log.debug("createSubNode complete");
 		res.setSuccess(true);
 		return res;
 	}

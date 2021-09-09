@@ -36,7 +36,7 @@ public class AppFilter extends GenericFilterBean {
 	private static int reqId = 0;
 	private static boolean logRequests = false;
 	private static boolean logResponses = false;
-	private static final String QSC = "QSC";
+
 	@Autowired
 	private AppProp appProp;
 
@@ -101,7 +101,7 @@ public class AppFilter extends GenericFilterBean {
 					}
 
 					// Ensure we have a Quanta Session Context
-					SessionContext sc = (SessionContext) session.getAttribute(QSC);
+					SessionContext sc = (SessionContext) session.getAttribute(SessionContext.QSC);
 
 					// if we don't have a SessionContext yet or it timed out then create a new one.
 					if (sc == null || !sc.isLive()) {
@@ -109,7 +109,7 @@ public class AppFilter extends GenericFilterBean {
 						// becasue all our code makes the assumption there will be a SessionContext on the thread.
 						// log.debug("Creating new session at req "+httpReq.getRequestURI());
 						sc = (SessionContext) SpringContextUtil.getBean(SessionContext.class);
-						session.setAttribute(QSC, sc);
+						session.setAttribute(SessionContext.QSC, sc);
 					}
 					ThreadLocals.setSC(sc);
 
