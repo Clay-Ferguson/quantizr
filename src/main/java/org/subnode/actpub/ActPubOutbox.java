@@ -210,7 +210,7 @@ public class ActPubOutbox {
      * if minId=="0" that means "last page", and if minId==null it means first page
      */
     public APOOrderedCollectionPage generateOutboxPage(String userName, String minId) {
-        APList items = getOutboxItems(userName, PrincipalName.PUBLIC.s(), minId);
+        APList items = getOutboxItems(userName, minId);
 
         // this is a self-reference url (id)
         String url = appProp.getProtocolHostAndPort() + APConst.PATH_OUTBOX + "/" + userName + "?min_id=" + minId + "&page=true";
@@ -223,12 +223,13 @@ public class ActPubOutbox {
         return ret;
     }
 
-    /*
-     * todo-0: Security isn't implemented on this call yet, but the only caller to this is passing
-     * "public" as 'sharedTo' so we are safe to implement this outbox currently as only able to send
-     * back public info.
-     */
-    public APList getOutboxItems(String userName, String sharedTo, String minId) {
+    public APList getOutboxItems(String userName, String minId) {
+        /*
+         * For now we only support retrieving public nodes here but we need to do the proper thing here
+         * eventually to adhere to the ActivityPub spec regarding authenticating what user is calling this
+         */
+        String sharedTo = PrincipalName.PUBLIC.s();
+
         String host = appProp.getProtocolHostAndPort();
         APList retItems = null;
         String nodeIdBase = host + "/app?id=";
@@ -286,7 +287,7 @@ public class ActPubOutbox {
                         }
 
                         items.add(new APOCreate() //
-                                // todo-0: what is the create=t here? That was part of my own temporary test right?
+                                // todo-1: what is the create=t here? That was part of my own temporary test right?
                                 .put(APProp.id, nodeIdBase + hexId + "&create=t") //
                                 .put(APProp.actor, actor) //
                                 .put(APProp.published, published) //

@@ -132,6 +132,7 @@ public class SessionContext {
 		sc.rootId = rootId;
 		sc.timelinePath = timelinePath;
 		sc.userName = userName;
+		sc.userNodeId = userNodeId;
 		sc.pastUserName = pastUserName;
 		sc.ip = ip;
 		sc.timezone = timezone;

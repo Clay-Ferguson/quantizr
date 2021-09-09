@@ -1,5 +1,6 @@
 package org.subnode.service;
 
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -75,6 +76,11 @@ public class UserFeedService {
 	@Autowired
 	@Qualifier("threadPoolTaskExecutor")
 	private Executor executor;
+
+	private static List<String> excludeTypes = Arrays.asList( //
+			NodeType.FRIEND.s(), //
+			NodeType.POSTS.s(), //
+			NodeType.ACT_PUB_POSTS.s());
 
 	public CheckMessagesResponse checkMessages(MongoSession session, CheckMessagesRequest req) {
 		SessionContext sc = ThreadLocals.getSC();
@@ -168,6 +174,8 @@ public class UserFeedService {
 		int counter = 0;
 		List<Criteria> orCriteria = new LinkedList<>();
 
+		// todo-1: should the 'friends' and 'public' options be mutually exclusive?? If someone's looking for
+		// all public nodes why "OR" into that any friends?
 		if (doAuth && req.getToPublic()) {
 			orCriteria.add(Criteria.where(SubNode.FIELD_AC + "." + PrincipalName.PUBLIC.s()).ne(null));
 		}
@@ -201,23 +209,24 @@ public class UserFeedService {
 
 		Query query = new Query();
 
-		// construct the list of ANDed conditions for the whole query, we can only have one list if ANDs
-		// due to MongoDB restriction. todo-0: check if these could've all been accomplished as
-		// criteria = criteria.and, because I'm unsure as of right now. I'm pretty sure becasue if you look
-		// at how blocked users are done below it's just 'criteria.and' which is the same thing this 'ands'
-		// does.
-		List<Criteria> ands = new LinkedList<>();
+		/*
+		 * construct the list of ANDed conditions for the whole query, we can only have one list if ANDs due
+		 * to MongoDB restriction.
+		 * 
+		 * todo-0: check if these (the 'ands' list) could've all been accomplished as criteria =
+		 * criteria.and, because I'm unsure as of right now. I'm pretty sure becasue if you look at how
+		 * blocked users are done below it's just 'criteria.and' which is the same thing this 'ands' does.
+		 */
+		// DO NOT DELETE
+		// (Keep 'ands' for future reference in case we need that code pattern ever)
+		// List<Criteria> ands = new LinkedList<>();
 
 		// initialize criteria using the Path to select the correct sub-graph of the tree
 		Criteria criteria = Criteria.where(SubNode.FIELD_PATH).regex(util.regexRecursiveChildrenOfPath(pathToSearch)); //
 
 		if (req.getNodeId() == null) {
-			// This 'andOperator' pattern is what is required when you have multiple conditions added to a
-			// single field. Would this be more performant as a 'nin()' call like we do for blocked users
-			// (see below)?
-			ands.add(Criteria.where(SubNode.FIELD_TYPE).ne(NodeType.FRIEND.s()));//
-			ands.add(Criteria.where(SubNode.FIELD_TYPE).ne(NodeType.POSTS.s())); //
-			ands.add(Criteria.where(SubNode.FIELD_TYPE).ne(NodeType.ACT_PUB_POSTS.s()));
+			// ands.add(Criteria.where(SubNode.FIELD_TYPE).nin(excludeTypes));//
+			criteria = criteria.and(SubNode.FIELD_TYPE).nin(excludeTypes);
 		}
 
 		// add the criteria for sensitive flag
@@ -276,34 +285,38 @@ public class UserFeedService {
 		if (doAuth && req.getFromFriends()) {
 			List<SubNode> friendNodes = userManagerService.getSpecialNodesList(session, NodeType.FRIEND_LIST.s(), null, true);
 			if (friendNodes != null) {
-				// todo-0: Since there's a 'nin' function for executing BLOCKing of users (above), I bet the better
-				// way to do these friends with an 'in()' call. Does in() exist? it must!
-				for (SubNode friendNode : friendNodes) {
+				List<ObjectId> friendIds = new LinkedList<>();
 
+				for (SubNode friendNode : friendNodes) {
 					// the USER_NODE_ID property on friends nodes contains the actual account ID of this friend.
 					String userNodeId = friendNode.getStrProp(NodeProp.USER_NODE_ID);
 
 					// if we have a userNodeId and they aren't in the blocked list.
 					if (userNodeId != null && !blockedIdStrings.contains(userNodeId)) {
-						orCriteria.add(Criteria.where(SubNode.FIELD_OWNER).is(new ObjectId(userNodeId)));
+						friendIds.add(new ObjectId(userNodeId));
+						// orCriteria.add(Criteria.where(SubNode.FIELD_OWNER).is(new ObjectId(userNodeId)));
 					}
+				}
+
+				if (friendIds.size() > 0) {
+					orCriteria.add(Criteria.where(SubNode.FIELD_OWNER).in(friendIds));
 				}
 			}
 		}
 
 		if (orCriteria.size() > 0) {
-			ands.add(new Criteria().orOperator((Criteria[]) orCriteria.toArray(new Criteria[orCriteria.size()])));
+			// ands.add(new Criteria().orOperator((Criteria[]) orCriteria.toArray(new Criteria[orCriteria.size()])));
+			criteria = criteria.orOperator((Criteria[]) orCriteria.toArray(new Criteria[orCriteria.size()]));
 		}
 
 		// Only one andOperator call is allowed so we accumulate 'ands' in the list before using.
-		if (ands.size() > 0) {
-			criteria.andOperator(ands);
-		}
+		// if (ands.size() > 0) {
+		// 	criteria.andOperator(ands);
+		// }
 
 		// use attributedTo proptery to determine whether a node is 'local' (posted by this server) or not.
 		if (req.getLocalOnly()) {
-			// note: the ".value" part is recently added, but actually since this is a compare to null should
-			// not be needed. todo-0: I'm wondering if this should be checking apid property instead? Check this.
+			// todo-1: should be checking apid property instead? 
 			criteria = criteria.and(SubNode.FIELD_PROPERTIES + "." + NodeProp.ACT_PUB_OBJ_ATTRIBUTED_TO.s() + ".value").is(null);
 		}
 

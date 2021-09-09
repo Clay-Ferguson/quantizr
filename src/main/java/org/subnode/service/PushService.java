@@ -37,6 +37,7 @@ public class PushService {
 	@Autowired
 	@Qualifier("threadPoolTaskExecutor")
 	private Executor executor;
+
 	/* Notify all users being shared to on this node */
 	public void pushNodeUpdateToBrowsers(MongoSession session, HashSet<Integer> sessionsPushed, SubNode node) {
 		// log.debug("Pushing update to all friends: id=" + node.getId().toHexString());
@@ -92,8 +93,8 @@ public class PushService {
 			if (sc.getUserName() == null)
 				continue;
 
-			// log.debug("Pushing to SessionContext: hashCode=" + sc.hashCode() + " user=" + sc.getUserName() + " token="
-			// 		+ sc.getUserToken());
+			//log.debug("Pushing NODE to SessionContext: hashCode=" + sc.hashCode() + " user=" + sc.getUserName() + " token="
+			//		+ sc.getUserToken() + "\nJSON: " + XString.prettyPrint(node));
 
 			// if this node starts with the 'watchingPath' of the user that means the node is a descendant of
 			// the watching path

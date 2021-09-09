@@ -535,7 +535,7 @@ public class NodeEditService {
 				// push any chat messages that need to go out.
 				pushService.pushNodeToMonitoringBrowsers(s, sessionsPushed, node);
 
-				SubNode parent = read.getNode(session, node.getParentPath(), false);
+				SubNode parent = read.getParent(session, node, false);
 				if (parent != null) {
 					auth.saveMentionsToNodeACL(s, node);
 
@@ -556,6 +556,8 @@ public class NodeEditService {
 						pushService.pushNodeUpdateToBrowsers(s, sessionsPushed, node);
 					}
 					return null;
+				} else {
+					log.error("Unable to find parent node for path: " + node.getPath());
 				}
 				return null;
 			});

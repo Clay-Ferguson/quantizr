@@ -28,7 +28,7 @@ public class AccessControl {
 	public AccessControl() {
 	}
 
-	// Check places that call this with null key. Is that correct ? todo-0
+	// Check places that call this with null key. Is that correct ? todo-1
 	public AccessControl(String key, String prvs) {
 		this.key = key;
 		this.prvs = prvs;
