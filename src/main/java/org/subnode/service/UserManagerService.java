@@ -223,8 +223,7 @@ public class UserManagerService {
 					Arrays.asList(PrivilegeType.READ.s()), NodeName.POSTS);
 
 			ensureUserHomeNodeExists(ms, sc.getUserName(), "### " + sc.getUserName()
-					+ "'s Public Node &#x1f389;\n\nEdit the content and children of this node. It represents you to the outside world.\n\n"
-					+ "Go here for a Quick Start guide: * https://quanta.wiki/n/quick-start", NodeType.NONE.s(), NodeName.HOME);
+					+ "'s Node", NodeType.NONE.s(), NodeName.HOME);
 		} else {
 			res.setUserPreferences(getDefaultUserPreferences());
 		}

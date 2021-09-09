@@ -45,7 +45,11 @@ export class UserProfileDlg extends DialogBase {
     getTitleText(): string {
         const state: any = this.getState();
         if (!state.userProfile) return "";
-        return (this.readOnly ? "Profile: " : "Edit Profile: ") + "@" + state.userProfile.userName;
+        let userName = state.userProfile.userName;
+        if (userName.indexOf("@") === -1) {
+            userName = userName + "@" + window.location.hostname;
+        }
+        return userName;
     }
 
     renderDlg(): CompIntf[] {

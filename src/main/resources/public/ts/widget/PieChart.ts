@@ -13,7 +13,7 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
 export class PieChart extends Div {
 
     constructor(private data: any[]) {
-        super();
+        super(null, { className: "marginBottom" });
         this.domPreUpdateEvent = this.domPreUpdateEvent.bind(this);
     }
 
