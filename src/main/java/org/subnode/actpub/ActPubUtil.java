@@ -576,6 +576,10 @@ public class ActPubUtil {
         }
     }
 
+    public boolean isPublicAddressed(String address) {
+        return address.endsWith("#Public") || address.equals("Public") || address.equals("as:Public");
+    }
+
     public boolean isLocalUrl(String url) {
         return url != null && url.startsWith(appProp.getHttpProtocol() + "://" + appProp.getMetaHost());
     }

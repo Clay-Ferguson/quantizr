@@ -832,7 +832,7 @@ public class ActPubService {
     private void shareToUsersForUrl(MongoSession ms, SubNode node, String url) {
         apUtil.log("shareToUsersForUrl: " + url);
 
-        if (url.endsWith("#Public")) {
+        if (apUtil.isPublicAddressed(url)) {
             node.safeGetAc().put(PrincipalName.PUBLIC.s(), new AccessControl(null, PrivilegeType.READ.s()));
             return;
         }
