@@ -510,8 +510,7 @@ public class ActPubService {
      */
     public void processInboxPost(HttpServletRequest httpReq, Object payload) {
         // todo-1: for now we mutext the inbox becasue I noticed a scenario where Mastodon post TWO
-        // simultaneous
-        // calls for the SAME node, and we shouldn't allow that.
+        // simultaneous calls for the SAME node, and we shouldn't allow that.
         synchronized (inboxLock) {
             String type = AP.str(payload, APProp.type);
             if (type == null)
@@ -1314,6 +1313,8 @@ public class ActPubService {
         return arun.run(session -> {
             Iterable<SubNode> accountNodes =
                     read.findTypedNodesUnderPath(session, NodeName.ROOT_OF_ALL_USERS, NodeType.ACCOUNT.s());
+
+            // Load the list of all known users
             HashSet<String> knownUsers = new HashSet<>();
             for (SubNode node : accountNodes) {
                 String userName = node.getStrProp(NodeProp.USER.s());
@@ -1324,13 +1325,12 @@ public class ActPubService {
 
             Iterable<FediverseName> recs = ops.findAll(FediverseName.class);
             int numLoaded = 0;
-            List<FediverseName> toDelete = new LinkedList<>();
             for (FediverseName fName : recs) {
                 try {
                     String userName = fName.getName();
                     log.debug("crawled user: " + userName);
 
-                    // yes this userName may be an actor url, and if so we convert it to an actual username.
+                    // This userName may be an actor url, and if so we convert it to an actual username.
                     if (userName.startsWith("https://")) {
                         userName = apUtil.getLongUserNameFromActorUrl(userName);
                         // log.debug("Converted to: " + userName);
@@ -1349,11 +1349,6 @@ public class ActPubService {
                     log.error("queueing FediverseName failed.", e);
                 }
             }
-
-            for (FediverseName fName : toDelete) {
-                ops.remove(fName);
-            }
-
             return "Queued some new users to crawl.";
         });
     }

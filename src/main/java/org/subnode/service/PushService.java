@@ -93,8 +93,9 @@ public class PushService {
 			if (sc.getUserName() == null)
 				continue;
 
-			//log.debug("Pushing NODE to SessionContext: hashCode=" + sc.hashCode() + " user=" + sc.getUserName() + " token="
-			//		+ sc.getUserToken() + "\nJSON: " + XString.prettyPrint(node));
+			// log.debug("Pushing NODE to SessionContext: hashCode=" + sc.hashCode() + " user=" +
+			// sc.getUserName() + " token="
+			// + sc.getUserToken() + "\nJSON: " + XString.prettyPrint(node));
 
 			// if this node starts with the 'watchingPath' of the user that means the node is a descendant of
 			// the watching path
@@ -146,7 +147,7 @@ public class PushService {
 				return;
 
 			synchronized (pushEmitter) {
-				// log.debug("Pushing to Session User: " + sc.getUserName());
+				// log.debug("Pushing to Session User: " + sc.getUserName() + " " + XString.prettyPrint(info));
 				try {
 					SseEventBuilder event = SseEmitter.event() //
 							.data(info) //
