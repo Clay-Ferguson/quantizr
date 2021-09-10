@@ -160,6 +160,15 @@ public class MongoDelete {
 		ops.remove(node);
 	}
 
+	public void deleteBySubNodePropVal(String prop, String val) {
+		log.debug("Deleting by prop=" + prop + " val=" + val);
+		Query query = new Query();
+		Criteria criteria = Criteria.where(SubNode.FIELD_PROPERTIES + "." + prop + ".value").is(val);
+		query.addCriteria(criteria);
+		DeleteResult res = ops.remove(query, SubNode.class);
+		log.debug("Nodes deleted: " + res.getDeletedCount());
+	}
+
 	/*
 	 * This algorithm requires one hash value of memory for every non-leaf node in the DB to run so it's
 	 * very fast but at the cost of memory use

@@ -152,11 +152,11 @@ public class ActPubService {
      * notification to foreign servers. This call returns immediately and delegates the actuall
      * proccessing to a daemon thread.
      * 
-     * For concurrency reasons, note that we pass in the nodeId to this method rather than the node
-     * even if we do have the node, becuase we want to make sure there's no concurrent access.
+     * For concurrency reasons, note that we pass in the nodeId to this method rather than the node even
+     * if we do have the node, becuase we want to make sure there's no concurrent access.
      */
-    public void sendNotificationForNodeEdit(MongoSession ms, String inReplyTo, HashMap<String, AccessControl> acl, 
-    APList attachments, String content, String noteUrl) {
+    public void sendNotificationForNodeEdit(MongoSession ms, String inReplyTo, HashMap<String, AccessControl> acl,
+            APList attachments, String content, String noteUrl) {
         asyncExec.run(ThreadLocals.getContext(), () -> {
             try {
                 List<String> toUserNames = new LinkedList<>();
@@ -195,8 +195,8 @@ public class ActPubService {
                     HashSet<String> sharedInboxes = getSharedInboxesOfFollowers(fromUser);
 
                     if (sharedInboxes.size() > 0) {
-                        APObj message = apFactory.newCreateMessageForNote(toUserNames, fromActor, inReplyTo, content,
-                                noteUrl, privateMessage, attachments);
+                        APObj message = apFactory.newCreateMessageForNote(toUserNames, fromActor, inReplyTo, content, noteUrl,
+                                privateMessage, attachments);
 
                         for (String inbox : sharedInboxes) {
                             apUtil.securePost(fromUser, ms, null, inbox, fromActor, message, null);
@@ -531,6 +531,10 @@ public class ActPubService {
                     processUndoAction(payload);
                     break;
 
+                case APType.Delete:
+                    processDeleteAction(httpReq, payload);
+                    break;
+
                 default:
                     log.debug("Unsupported type:" + XString.prettyPrint(payload));
                     break;
@@ -588,6 +592,48 @@ public class ActPubService {
             }
             return null;
         });
+    }
+
+    public void processDeleteAction(HttpServletRequest httpReq, Object payload) {
+        arun.<Object>run(session -> {
+            apUtil.log("processDeleteAction");
+            String actorUrl = AP.str(payload, APProp.actor);
+            if (actorUrl == null) {
+                log.debug("no 'actor' found on create action request posted object");
+                return null;
+            }
+
+            APObj actorObj = apUtil.getActorByUrl(actorUrl);
+            if (actorObj == null) {
+                log.debug("Unable to load actorUrl: " + actorUrl);
+                return null;
+            }
+
+            PublicKey pubKey = apCrypto.getPublicKeyFromActor(actorObj);
+            apCrypto.verifySignature(httpReq, pubKey);
+
+            Object object = AP.obj(payload, APProp.object);
+            String type = AP.str(object, APProp.type);
+            apUtil.log("delete type: " + type);
+
+            switch (type) {
+                case APType.Tombstone:
+                    processCreateTombstone(session, actorUrl, actorObj, object);
+                    break;
+
+                default:
+                    // this captures videos? and other things (todo-1: add more support)
+                    log.debug("Unhandled Create action");
+                    break;
+            }
+            return null;
+        });
+    }
+
+    public void processCreateTombstone(MongoSession ms, String actorUrl, Object actorObj, Object obj) {
+        apUtil.log("processCreateTombstone");
+        String id = AP.str(obj, APProp.id);
+        delete.deleteBySubNodePropVal(NodeProp.ACT_PUB_ID.s(), id);
     }
 
     /* obj is the 'Note' object */
