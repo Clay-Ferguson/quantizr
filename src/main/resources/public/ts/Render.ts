@@ -26,6 +26,13 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (s: Singletons) => {
     S = s;
 });
 
+function imageErrorFunc(evt: any) {
+    console.log("remove broken img");
+    evt.target.hidden = true;
+    evt.target.onerror = null;
+    return true;
+}
+
 export class Render implements RenderIntf {
     private debug: boolean = false;
     private markedRenderer = null;
@@ -224,8 +231,7 @@ export class Render implements RenderIntf {
                 }
             }));
 
-        let content = S.util.getShortContent(node);
-        let markdownIdUrl = "[" + content + "](/app?id=" + node.id + ")";
+        let markdownIdUrl = "[link](/app?id=" + node.id + ")";
         children.push(new Heading(5, "Markdown Link"), //
             new Div(markdownIdUrl, {
                 className: "anchorBigMarginBottom",
@@ -641,6 +647,7 @@ export class Render implements RenderIntf {
         return new Img(key, {
             src,
             className: "avatarImage",
+            onError: imageErrorFunc,
             title: "User: @" + node.owner + "\n\nShow Profile",
             // align: "left", // causes text to flow around
 

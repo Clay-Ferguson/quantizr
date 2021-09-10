@@ -225,6 +225,7 @@ public class UserFeedService {
 		Criteria criteria = Criteria.where(SubNode.FIELD_PATH).regex(util.regexRecursiveChildrenOfPath(pathToSearch)); //
 
 		if (req.getNodeId() == null) {
+			// do not delete
 			// ands.add(Criteria.where(SubNode.FIELD_TYPE).nin(excludeTypes));//
 			criteria = criteria.and(SubNode.FIELD_TYPE).nin(excludeTypes);
 		}
@@ -294,6 +295,7 @@ public class UserFeedService {
 					// if we have a userNodeId and they aren't in the blocked list.
 					if (userNodeId != null && !blockedIdStrings.contains(userNodeId)) {
 						friendIds.add(new ObjectId(userNodeId));
+						// do not delete
 						// orCriteria.add(Criteria.where(SubNode.FIELD_OWNER).is(new ObjectId(userNodeId)));
 					}
 				}
@@ -305,10 +307,12 @@ public class UserFeedService {
 		}
 
 		if (orCriteria.size() > 0) {
+			// do not delete
 			// ands.add(new Criteria().orOperator((Criteria[]) orCriteria.toArray(new Criteria[orCriteria.size()])));
 			criteria = criteria.orOperator((Criteria[]) orCriteria.toArray(new Criteria[orCriteria.size()]));
 		}
 
+		// do not delete
 		// Only one andOperator call is allowed so we accumulate 'ands' in the list before using.
 		// if (ands.size() > 0) {
 		// 	criteria.andOperator(ands);
