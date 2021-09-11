@@ -8,7 +8,6 @@ import org.springframework.stereotype.Component;
 import org.subnode.AppServer;
 import org.subnode.actpub.ActPubService;
 import org.subnode.config.AppProp;
-import org.subnode.model.client.PrincipalName;
 import org.subnode.util.ThreadLocals;
 
 @Component

@@ -112,9 +112,7 @@ public class CaptchaMaker {
             g.shear(-shearX, -shearY);
             g.rotate(-angle, x, y);
 
-            /*
-             * note lineIdx remainder controls back and forth tilt angle of line
-             */
+            // note lineIdx remainder controls back and forth tilt angle of line
             int delta = (lineIdx % 2 == 0) ? rand.nextInt(imgHeight) : -rand.nextInt(imgHeight);
 
             g.drawLine(0, y - delta, imgWidth, y + delta);

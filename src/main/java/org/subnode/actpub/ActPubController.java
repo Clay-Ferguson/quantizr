@@ -107,7 +107,7 @@ public class ActPubController {
 	@RequestMapping(value = APConst.ACTOR_PATH + "/{userName}", method = RequestMethod.GET, produces = { //
 			APConst.CTYPE_ACT_JSON, //
 			APConst.CTYPE_ACT_JSON + "; " + APConst.CHARSET, //
-			APConst.CTYPE_LD_JSON + "; " + APConst.APS_PROFILE // <----- this is a big change (per spec?)
+			APConst.CTYPE_LD_JSON + "; " + APConst.APS_PROFILE // 
 	})
 	public @ResponseBody Object actor(//
 			@PathVariable(value = "userName", required = true) String userName) {
@@ -178,7 +178,7 @@ public class ActPubController {
 	@RequestMapping(value = APConst.PATH_OUTBOX + "/{userName}", method = RequestMethod.GET, produces = { //
 			APConst.CTYPE_ACT_JSON, //
 			APConst.CTYPE_ACT_JSON + "; " + APConst.CHARSET, //
-			APConst.CTYPE_LD_JSON + "; " + APConst.APS_PROFILE // <----- this is a big change (per spec?)
+			APConst.CTYPE_LD_JSON + "; " + APConst.APS_PROFILE // 
 	})
 	public @ResponseBody Object outbox(//
 			@PathVariable(value = "userName", required = true) String userName,
@@ -213,7 +213,7 @@ public class ActPubController {
 	@RequestMapping(value = APConst.PATH_FOLLOWERS + "/{userName}", method = RequestMethod.GET, produces = { //
 			APConst.CTYPE_ACT_JSON, //
 			APConst.CTYPE_ACT_JSON + "; " + APConst.CHARSET, //
-			APConst.CTYPE_LD_JSON + "; " + APConst.APS_PROFILE // <----- this is a big change (per spec?)
+			APConst.CTYPE_LD_JSON + "; " + APConst.APS_PROFILE // 
 	})
 	public @ResponseBody Object getFollowers(//
 			@PathVariable(value = "userName", required = false) String userName,
@@ -238,7 +238,7 @@ public class ActPubController {
 	@RequestMapping(value = APConst.PATH_FOLLOWING + "/{userName}", method = RequestMethod.GET, produces = { //
 			APConst.CTYPE_ACT_JSON, //
 			APConst.CTYPE_ACT_JSON + "; " + APConst.CHARSET, //
-			APConst.CTYPE_LD_JSON + "; " + APConst.APS_PROFILE // <----- this is a big change (per spec?)
+			APConst.CTYPE_LD_JSON + "; " + APConst.APS_PROFILE // 
 	})
 	public @ResponseBody Object getFollowing(//
 			@PathVariable(value = "userName", required = false) String userName,

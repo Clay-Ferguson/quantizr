@@ -55,9 +55,6 @@ public class AclService {
 	@Autowired
 	private UserManagerService userManagerService;
 
-	@Autowired
-	private OutboxMgr outboxMgr;
-
 	/**
 	 * Returns the privileges that exist on the node identified in the request.
 	 */

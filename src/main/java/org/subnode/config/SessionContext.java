@@ -7,7 +7,6 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.TimeZone;
-import javax.annotation.PreDestroy;
 import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,7 +21,6 @@ import org.subnode.mongo.MongoRead;
 import org.subnode.mongo.MongoUtil;
 import org.subnode.mongo.model.SubNode;
 import org.subnode.response.SessionTimeoutPushInfo;
-import org.subnode.service.UserFeedService;
 import org.subnode.service.PushService;
 import org.subnode.util.DateUtil;
 import org.subnode.util.StopwatchEntry;
@@ -37,7 +35,6 @@ public class SessionContext {
 	private static final Logger log = LoggerFactory.getLogger(SessionContext.class);
 
 	public static final String QSC = "QSC";
-
 	private boolean live = true;
 
 	@Autowired
@@ -237,20 +234,12 @@ public class SessionContext {
 		return false;
 	}
 
-	public static boolean serverPushTest(UserFeedService svc) {
-		// for (SessionContext sc : allSessions) {
-		// log.debug("ServerPush Test: sessionUserName=" + sc.getUserName());
-		// svc.sendServerPushInfo(sc, new SessionTimeoutPushInfo());
-		// }
-		return false;
-	}
-
 	public String getUserToken() {
 		return userToken;
 	}
 
 	/*
-	 * UPDATE: This is simply happening becasue the WebFilter is not able to detect when something is a 
+	 * UPDATE: This is simply happening becasue the WebFilter is not able to detect when something is a
 	 * static file and so it generates SessionContext on every session it sees.
 	 */
 	public static List<SessionContext> getAllSessions() {
@@ -298,11 +287,12 @@ public class SessionContext {
 		pushService.sendServerPushInfo(this, new SessionTimeoutPushInfo());
 
 		synchronized (allSessions) {
-			// This "lastActiveTime", should really be called "last message checked time", becaues that's the
-			// purpose
-			// it serves, so I think setting this here is undesirable, but we should only reset when the
-			// user is really checking their messages (like in UserFeedService), where this logic was moved to.
-			// userManagerService.updateLastActiveTime(this);
+			/*
+			 * This "lastActiveTime", should really be called "last message checked time", becaues that's the
+			 * purpose it serves, so I think setting this here is undesirable, but we should only reset when the
+			 * user is really checking their messages (like in UserFeedService), where this logic was moved to.
+			 * userManagerService.updateLastActiveTime(this);
+			 */
 			allSessions.remove(this);
 			setLive(false);
 		}
@@ -326,22 +316,18 @@ public class SessionContext {
 
 		/* If we have a short timezone abbreviation display timezone with it */
 		if (getTimeZoneAbbrev() != null) {
-
 			SimpleDateFormat dateFormat = new SimpleDateFormat(DateUtil.DATE_FORMAT_NO_TIMEZONE, DateUtil.DATE_FORMAT_LOCALE);
 			if (getTimezone() != null) {
 				dateFormat.setTimeZone(TimeZone.getTimeZone(getTimezone()));
 			}
-
 			return dateFormat.format(date) + " " + getTimeZoneAbbrev();
 		}
 		/* else display timezone in standard GMT format */
 		else {
-
 			SimpleDateFormat dateFormat = new SimpleDateFormat(DateUtil.DATE_FORMAT_WITH_TIMEZONE, DateUtil.DATE_FORMAT_LOCALE);
 			if (getTimezone() != null) {
 				dateFormat.setTimeZone(TimeZone.getTimeZone(getTimezone()));
 			}
-
 			return dateFormat.format(date);
 		}
 	}
@@ -364,7 +350,6 @@ public class SessionContext {
 	public void setPastUserName(String pastUserName) {
 		this.pastUserName = pastUserName;
 	}
-
 
 	public String getUrlId() {
 		return urlId;

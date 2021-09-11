@@ -14,12 +14,12 @@ import org.subnode.response.GetOpenGraphResponse;
 
 @Component
 public class JSoupService {
+	private static final Logger log = LoggerFactory.getLogger(JSoupService.class);
+	
 	public final ConcurrentHashMap<String, OpenGraph> ogCache = new ConcurrentHashMap<>();
 
 	public static final String BROWSER_USER_AGENT =
 			"Browser: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.114 Safari/537.36";
-
-	private static final Logger log = LoggerFactory.getLogger(JSoupService.class);
 
 	public GetOpenGraphResponse getOpenGraph(GetOpenGraphRequest ogReq) {
 		GetOpenGraphResponse res = new GetOpenGraphResponse();

@@ -464,7 +464,6 @@ public class MongoAuth {
 				ret.add(acei);
 			}
 		});
-
 		return ret.size() == 0 ? null : ret;
 	}
 

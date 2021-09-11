@@ -77,9 +77,6 @@ public class SystemService {
 	@Autowired
 	private ActPubService apService;
 
-	@Autowired
-	private UserFeedService userFeedService;
-
 	public String rebuildIndexes() {
 		if (!ThreadLocals.getSC().isAdmin()) {
 			throw ExUtil.wrapEx("admin only function.");

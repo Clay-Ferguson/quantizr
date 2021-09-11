@@ -25,9 +25,6 @@ public class LuceneService {
 	@Autowired
 	private FileIndexer fileIndexer;
 
-	@Autowired
-	private FileSearcher searcher;
-
 	public LuceneIndexResponse reindex(MongoSession session, String nodeId, String searchFolder) {
 		LuceneIndexResponse res = new LuceneIndexResponse();
 		String ret = null;

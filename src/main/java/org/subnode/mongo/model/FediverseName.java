@@ -21,9 +21,9 @@ import org.springframework.data.mongodb.core.mapping.Field;
 @JsonInclude(Include.NON_NULL)
 @JsonPropertyOrder({SubNode.FIELD_ID, SubNode.FIELD_NAME, SubNode.FIELD_CREATE_TIME})
 public class FediverseName {
-	public static final String FIELD_ID = "_id";
-
 	private static final Logger log = LoggerFactory.getLogger(FediverseName.class);
+	
+	public static final String FIELD_ID = "_id";
 
 	@Id
 	@Field(FIELD_ID)

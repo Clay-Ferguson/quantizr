@@ -154,7 +154,6 @@ public class MongoAppConfig extends AbstractMongoClientConfiguration {
 				mongoClient = MongoClients.create(settings);
 
 				if (mongoClient != null) {
-
 					if (credential != null) {
 						for (String db : mongoClient.listDatabaseNames()) {
 							log.debug("MONGO DB NAME: " + db);

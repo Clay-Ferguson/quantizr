@@ -73,9 +73,6 @@ public class NodeSearchService {
 	private EnglishDictionary englishDictionary;
 
 	@Autowired
-	private MongoTemplate ops;
-
-	@Autowired
 	private MongoUtil util;
 
 	@Autowired
