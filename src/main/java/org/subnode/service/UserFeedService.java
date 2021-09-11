@@ -209,24 +209,10 @@ public class UserFeedService {
 
 		Query query = new Query();
 
-		/*
-		 * construct the list of ANDed conditions for the whole query, we can only have one list if ANDs due
-		 * to MongoDB restriction.
-		 * 
-		 * todo-0: check if these (the 'ands' list) could've all been accomplished as criteria =
-		 * criteria.and, because I'm unsure as of right now. I'm pretty sure becasue if you look at how
-		 * blocked users are done below it's just 'criteria.and' which is the same thing this 'ands' does.
-		 */
-		// DO NOT DELETE
-		// (Keep 'ands' for future reference in case we need that code pattern ever)
-		// List<Criteria> ands = new LinkedList<>();
-
 		// initialize criteria using the Path to select the correct sub-graph of the tree
 		Criteria criteria = Criteria.where(SubNode.FIELD_PATH).regex(util.regexRecursiveChildrenOfPath(pathToSearch)); //
 
 		if (req.getNodeId() == null) {
-			// do not delete
-			// ands.add(Criteria.where(SubNode.FIELD_TYPE).nin(excludeTypes));//
 			criteria = criteria.and(SubNode.FIELD_TYPE).nin(excludeTypes);
 		}
 
@@ -295,8 +281,6 @@ public class UserFeedService {
 					// if we have a userNodeId and they aren't in the blocked list.
 					if (userNodeId != null && !blockedIdStrings.contains(userNodeId)) {
 						friendIds.add(new ObjectId(userNodeId));
-						// do not delete
-						// orCriteria.add(Criteria.where(SubNode.FIELD_OWNER).is(new ObjectId(userNodeId)));
 					}
 				}
 
@@ -307,16 +291,8 @@ public class UserFeedService {
 		}
 
 		if (orCriteria.size() > 0) {
-			// do not delete
-			// ands.add(new Criteria().orOperator((Criteria[]) orCriteria.toArray(new Criteria[orCriteria.size()])));
 			criteria = criteria.orOperator((Criteria[]) orCriteria.toArray(new Criteria[orCriteria.size()]));
 		}
-
-		// do not delete
-		// Only one andOperator call is allowed so we accumulate 'ands' in the list before using.
-		// if (ands.size() > 0) {
-		// 	criteria.andOperator(ands);
-		// }
 
 		// use attributedTo proptery to determine whether a node is 'local' (posted by this server) or not.
 		if (req.getLocalOnly()) {
