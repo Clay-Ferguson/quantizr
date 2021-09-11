@@ -29,7 +29,7 @@ public class NodeSearchRequest extends RequestBase {
 	// special definition name which gives the server a hint about what kind of search this is
 	private String searchDefinition;
 
-	private String userSearchType;
+	private String searchType;
 
 	private String timeRangeType;
 
@@ -99,12 +99,12 @@ public class NodeSearchRequest extends RequestBase {
 		this.searchDefinition = searchDefinition;
 	}
 
-	public String getUserSearchType() {
-		return userSearchType;
+	public String getSearchType() {
+		return searchType;
 	}
 
-	public void setUserSearchType(String userSearchType) {
-		this.userSearchType = userSearchType;
+	public void setSearchType(String searchType) {
+		this.searchType = searchType;
 	}
 
 	public String getTimeRangeType() {

@@ -30,7 +30,7 @@ export class SearchResultSetView extends ResultSetView {
             this.data.rsInfo.prop,
             this.data.rsInfo.searchText,
             state,
-            this.data.rsInfo.userSearchType,
+            this.data.rsInfo.searchType,
             this.data.rsInfo.description,
             this.data.rsInfo.fuzzy,
             this.data.rsInfo.caseSensitive,

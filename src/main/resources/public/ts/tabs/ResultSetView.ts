@@ -69,7 +69,7 @@ export abstract class ResultSetView extends AppTab {
         this.addPaginationBar(state, children);
 
         let i = 0;
-        let jumpButton = state.isAdminUser || !this.data.rsInfo.userSearchType;
+        let jumpButton = state.isAdminUser || !this.data.rsInfo.searchType;
         results.forEach((node: J.NodeInfo) => {
             S.srch.initSearchNode(node);
             let c = this.renderItem(node, i, childCount, rowCount, jumpButton, state);

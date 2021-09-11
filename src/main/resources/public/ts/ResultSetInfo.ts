@@ -11,7 +11,7 @@ export class ResultSetInfo {
     public fuzzy: boolean;
     public caseSensitive: boolean;
     public searchText: string;
-    public userSearchType: string;
+    public searchType: string;
     public recursive: boolean;
     public sortField: string;
     public sortDir: string;

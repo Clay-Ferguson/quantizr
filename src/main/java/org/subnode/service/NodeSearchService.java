@@ -19,6 +19,7 @@ import org.subnode.actpub.ActPubService;
 import org.subnode.config.NodeName;
 import org.subnode.model.NodeInfo;
 import org.subnode.model.client.Bookmark;
+import org.subnode.model.client.Constant;
 import org.subnode.model.client.ConstantInt;
 import org.subnode.model.client.NodeProp;
 import org.subnode.model.client.NodeType;
@@ -104,7 +105,7 @@ public class NodeSearchService {
 
 		String searchText = req.getSearchText();
 		if (StringUtils.isEmpty(searchText) && //
-				StringUtils.isEmpty(req.getUserSearchType()) && //
+				StringUtils.isEmpty(req.getSearchType()) && //
 				// note: for timelines this is called but with a sort
 				StringUtils.isEmpty(req.getSortField())) {
 			throw new RuntimeException("Search text required.");
@@ -141,7 +142,7 @@ public class NodeSearchService {
 			 * 
 			 * If we're searching just for users do this.
 			 */
-			if (!StringUtils.isEmpty(req.getUserSearchType())) {
+			if (!StringUtils.isEmpty(req.getSearchType())) {
 				String findUserName = null;
 
 				TextCriteria textCriteria = null;
@@ -164,12 +165,12 @@ public class NodeSearchService {
 
 				Criteria moreCriteria = null;
 				// searching only Foreign users
-				if ("foreign".equals(req.getUserSearchType())) {
+				if (Constant.SEARCH_TYPE_USER_FOREIGN.s().equals(req.getSearchType())) {
 					moreCriteria =
 							Criteria.where(SubNode.FIELD_PROPERTIES + "." + NodeProp.ACT_PUB_ACTOR_URL.s() + ".value").ne(null);
 				}
-				// searching only Local users
-				else if ("local".equals(req.getUserSearchType())) {
+				// searching only Local users 
+				else if (Constant.SEARCH_TYPE_USER_LOCAL.s().equals(req.getSearchType())) {
 					moreCriteria =
 							Criteria.where(SubNode.FIELD_PROPERTIES + "." + NodeProp.ACT_PUB_ACTOR_URL.s() + ".value").is(null);
 				}
@@ -195,7 +196,7 @@ public class NodeSearchService {
 				 * If we didn't find any results and we aren't searching locally only then try to look this up as a
 				 * username
 				 */
-				if (searchResults.size() == 0 && !"local".equals(req.getUserSearchType())) {
+				if (searchResults.size() == 0 && !Constant.SEARCH_TYPE_USER_LOCAL.s().equals(req.getSearchType())) {
 					findUserName = findUserName.replace("\"", "");
 					findUserName = XString.stripIfStartsWith(findUserName, "@");
 					final String _findUserName = findUserName;

@@ -1,6 +1,7 @@
 import { AppState } from "../AppState";
 import { Constants as C } from "../Constants";
 import { DialogBase } from "../DialogBase";
+import * as J from "../JavaIntf";
 import { PubSub } from "../PubSub";
 import { Singletons } from "../Singletons";
 import { ValidatedState } from "../ValidatedState";
@@ -35,7 +36,7 @@ export class SearchUsersDlg extends DialogBase {
 
         this.mergeState({
             fuzzy: false,
-            userSearchType: "local",
+            searchType: J.Constant.SEARCH_TYPE_USER_LOCAL,
             caseSensitive: false
         });
         this.searchTextState.setValue(SearchUsersDlg.defaultSearchText);
@@ -52,31 +53,31 @@ export class SearchUsersDlg extends DialogBase {
             this.appState.isAdminUser ? new RadioButton("Search All Users", false, "optionsGroup", null, {
                 setValue: (checked: boolean): void => {
                     if (checked) {
-                        this.mergeState({ userSearchType: "all" });
+                        this.mergeState({ searchType: J.Constant.SEARCH_TYPE_USER_ALL });
                     }
                 },
                 getValue: (): boolean => {
-                    return this.getState().userSearchType === "all";
+                    return this.getState().searchType === J.Constant.SEARCH_TYPE_USER_ALL;
                 }
             }) : null,
             new RadioButton("Search Local Users", true, "optionsGroup", null, {
                 setValue: (checked: boolean): void => {
                     if (checked) {
-                        this.mergeState({ userSearchType: "local" });
+                        this.mergeState({ searchType: J.Constant.SEARCH_TYPE_USER_LOCAL });
                     }
                 },
                 getValue: (): boolean => {
-                    return this.getState().userSearchType === "local";
+                    return this.getState().searchType === J.Constant.SEARCH_TYPE_USER_LOCAL;
                 }
             }),
             new RadioButton("Search Foreign Users", false, "optionsGroup", null, {
                 setValue: (checked: boolean): void => {
                     if (checked) {
-                        this.mergeState({ userSearchType: "foreign" });
+                        this.mergeState({ searchType: J.Constant.SEARCH_TYPE_USER_FOREIGN });
                     }
                 },
                 getValue: (): boolean => {
-                    return this.getState().userSearchType === "foreign";
+                    return this.getState().searchType === J.Constant.SEARCH_TYPE_USER_FOREIGN;
                 }
             })
         ], "marginBottom");
@@ -130,7 +131,7 @@ export class SearchUsersDlg extends DialogBase {
         SearchUsersDlg.defaultSearchText = this.searchTextState.getValue();
 
         let desc = "User " + SearchUsersDlg.defaultSearchText;
-        S.srch.search(null, "", SearchUsersDlg.defaultSearchText, this.appState, this.getState().userSearchType, desc,
+        S.srch.search(null, "", SearchUsersDlg.defaultSearchText, this.appState, this.getState().searchType, desc,
             this.getState().fuzzy,
             this.getState().caseSensitive, 0, true, "mtm", "DESC", this.close);
     }

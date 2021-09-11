@@ -296,7 +296,7 @@ export interface NodeSearchRequest extends RequestBase {
     fuzzy: boolean;
     caseSensitive: boolean;
     searchDefinition: string;
-    userSearchType: string;
+    searchType: string;
     timeRangeType: string;
     recursive: boolean;
 }
@@ -796,6 +796,9 @@ export interface PrivilegeInfo {
 }
 
 export const enum Constant {
+    SEARCH_TYPE_USER_LOCAL = "userLocal",
+    SEARCH_TYPE_USER_ALL = "userAll",
+    SEARCH_TYPE_USER_FOREIGN = "userForeign",
     ENC_TAG = "<[ENC]>",
 }
 

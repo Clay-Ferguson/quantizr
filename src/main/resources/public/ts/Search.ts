@@ -64,21 +64,17 @@ export class Search implements SearchIntf {
         });
     }
 
-    search = (node: J.NodeInfo, prop: string, searchText: string, state: AppState, userSearchType: string, description: string, fuzzy: boolean, caseSensitive: boolean, page: number, recursive: boolean, sortField: string, sortDir: string, successCallback: Function): void => {
-        // todo-0: insead of the "userSearchType" we already have 'prop' which can hold node.id, node.name, and users,
-        // and really designate a TYPE of search, not the property to be searched.
+    search = (node: J.NodeInfo, prop: string, searchText: string, state: AppState, searchType: string, description: string, fuzzy: boolean, caseSensitive: boolean, page: number, recursive: boolean, sortField: string, sortDir: string, successCallback: Function): void => {
         S.util.ajax<J.NodeSearchRequest, J.NodeSearchResponse>("nodeSearch", {
             page,
-
-            // for userSearchTypes this node can be null
-            nodeId: node ? node.id : null,
+            nodeId: node ? node.id : null, // for user searchTypes this node can be null
             searchText,
             sortDir,
             sortField,
             searchProp: prop,
             fuzzy,
             caseSensitive,
-            userSearchType,
+            searchType,
             searchDefinition: "",
             timeRangeType: null,
             recursive
@@ -96,7 +92,7 @@ export class Search implements SearchIntf {
 
                     data.rsInfo.results = res.searchResults;
                     data.rsInfo.page = page;
-                    data.rsInfo.userSearchType = userSearchType;
+                    data.rsInfo.searchType = searchType;
                     data.rsInfo.description = description;
                     data.rsInfo.node = node;
                     data.rsInfo.searchText = searchText;
@@ -160,7 +156,7 @@ export class Search implements SearchIntf {
             fuzzy: false,
             caseSensitive: false,
             searchDefinition: "timeline",
-            userSearchType: null,
+            searchType: null,
             timeRangeType,
             recursive
         }, (res) => {
@@ -312,7 +308,7 @@ export class Search implements SearchIntf {
 
                     info.results = res.searchResults;
                     info.page = page;
-                    info.userSearchType = null;
+                    info.searchType = null;
                     info.description = null;
                     info.node = null;
                     info.searchText = null;
@@ -354,7 +350,7 @@ export class Search implements SearchIntf {
 
                     info.results = res.searchResults;
                     info.page = page;
-                    info.userSearchType = null;
+                    info.searchType = null;
                     info.description = null;
                     info.node = null;
                     info.searchText = null;
