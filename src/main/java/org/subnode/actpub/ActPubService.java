@@ -907,10 +907,6 @@ public class ActPubService {
                 acctNode = read.getUserNodeByUserName(ms, longUserName);
             } else {
                 /*
-                 * todo-0: add this. What we should do here is just import the user node and NOT load any inboxes,
-                 * and this will avoid the unwanted web-crawler chain reaction. We don't currently recognize sharing
-                 * to unknown foreign users.");
-                 *
                  * todo-1: this is contributing to our [currently] unwanted FEDIVERSE CRAWLER effect chain reaction.
                  * The rule here should be either don't load foreign users whose outboxes you don't plan to load or
                  * else have some property on the node that designates if we need to read the actual outbox or if

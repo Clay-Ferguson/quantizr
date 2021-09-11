@@ -85,8 +85,6 @@ services:
             httpProtocol: "http" 
              # q1 and q2 are pointed to '127.0.0.1' in /etc/hosts file.
             metaHost: "q2" 
-            reSaveAll: "false"
-            forceIndexRebuild: "false"
             allowFileSystemSearch: "false"
             actPubEnabled: "true" 
             spring.http.multipart.max-file-size: "200MB" 

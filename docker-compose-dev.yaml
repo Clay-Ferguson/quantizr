@@ -121,8 +121,6 @@ services:
             server.port: "${PORT}" 
             httpProtocol: "http" 
             metaHost: "${quanta_domain}" 
-            reSaveAll: "false"
-            forceIndexRebuild: "false"
             allowFileSystemSearch: "false"
             actPubEnabled: "false" 
             spring.http.multipart.max-file-size: "200MB" 

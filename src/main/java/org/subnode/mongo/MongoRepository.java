@@ -109,17 +109,9 @@ public class MongoRepository {
 			// ensure the root variable is set.
 			read.getDbRoot();
 
-			if (appProp.getForceIndexRebuild()) {
-				util.dropAllIndexes(adminSession);
-			}
-
 			util.createAllIndexes(adminSession);
 			util.createAdminUser(adminSession);
 			repoUtil.createTestAccounts();
-
-			if (appProp.getReSaveAll()) {
-				util.reSaveAll(adminSession);
-			}
 
 			// update.runRepairs();
 

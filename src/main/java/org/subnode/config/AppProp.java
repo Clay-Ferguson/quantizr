@@ -227,14 +227,6 @@ public class AppProp /* implements EnvironmentAware */ {
 		return env.getProperty("mongoAdminUserName");
 	}
 
-	public boolean getForceIndexRebuild() {
-		return APConst.TRUE.equals(env.getProperty("forceIndexRebuild"));
-	}
-
-	public boolean getReSaveAll() {
-		return APConst.TRUE.equals(env.getProperty("reSaveAll"));
-	}
-
 	/* Should be set to true if mongo security is turned on requiring credentials */
 	public boolean getMongoSecurity() {
 		return APConst.TRUE.equals(env.getProperty("mongoSecurity"));

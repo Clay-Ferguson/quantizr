@@ -286,7 +286,7 @@ public class MongoUtil {
 	 */
 	// ********* DO NOT DELETE *********
 	// (this is needed from time to time)
-	public void reSaveAll(MongoSession session) {
+	public void convertDb(MongoSession session) {
 		// processAllNodes(session);
 	}
 
