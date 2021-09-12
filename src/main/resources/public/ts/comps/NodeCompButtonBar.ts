@@ -142,13 +142,13 @@ export class NodeCompButtonBar extends Div {
                 }, {
                     setValue: (checked: boolean): void => {
                         if (checked) {
-                            state.selectedNodes[node.id] = true;
+                            state.selectedNodes.add(node.id);
                         } else {
-                            delete state.selectedNodes[node.id];
+                            state.selectedNodes.delete(node.id);
                         }
                     },
                     getValue: (): boolean => {
-                        return !!state.selectedNodes[node.id];
+                        return state.selectedNodes.has(node.id);
                     }
                 }, true);
             }

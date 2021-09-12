@@ -173,32 +173,15 @@ export class Quanta implements QuantaIntf {
         }
     }
 
-    getSelNodeUidsArray = (state: AppState): string[] => {
-        const selArray: string[] = [];
-        S.util.forEachProp(state.selectedNodes, (id, val): boolean => {
-            selArray.push(id);
-            return true;
-        });
-        return selArray;
-    }
-
-    /**
-    Returns a new array of all the selected nodes each time it's called.
-    */
     getSelNodeIdsArray = (state: AppState): string[] => {
         const selArray: string[] = [];
 
-        if (!state.selectedNodes) {
+        if (!state.selectedNodes.size) {
             Log.log("no selected nodes.");
         }
 
-        S.util.forEachProp(state.selectedNodes, (id, val): boolean => {
-            const node: J.NodeInfo = state.idToNodeMap.get(id);
-            if (!node) {
-                Log.log("unable to find idToNodeMap for id=" + id);
-            } else {
-                selArray.push(node.id);
-            }
+        state.selectedNodes.forEach(id => {
+            selArray.push(id);
             return true;
         });
         return selArray;
@@ -226,7 +209,7 @@ export class Quanta implements QuantaIntf {
     /* Gets selected nodes as NodeInfo.java objects array */
     getSelNodesArray = (state: AppState): J.NodeInfo[] => {
         const selArray: J.NodeInfo[] = [];
-        S.util.forEachProp(state.selectedNodes, (id, val): boolean => {
+        state.selectedNodes.forEach(id => {
             const node = state.idToNodeMap.get(id);
             if (node) {
                 selArray.push(node);
@@ -239,7 +222,7 @@ export class Quanta implements QuantaIntf {
     clearSelNodes = (state: AppState = null) => {
         state = appState(state);
         dispatch("Action_ClearSelections", (s: AppState): AppState => {
-            s.selectedNodes = {};
+            s.selectedNodes.clear();
             return s;
         });
     }
@@ -248,9 +231,9 @@ export class Quanta implements QuantaIntf {
         // DO NOT DELETE (feature work in progress)
         // //todo-2: large numbers of selected nodes isn't going to scale well in this design
         // // but i am not letting perfection be the enemy of good here (yet)
-        // this.selectedNodes = {};
+        // this.selectedNodes.clear();
         // nodeIds.forEach( (nodeId, index) => {
-        //     this.selectedNodes[nodeId] = true;
+        //     this.selectedNodes.add(nodeId);
         // });
     }
 
@@ -344,9 +327,8 @@ export class Quanta implements QuantaIntf {
     /* WARNING: This is NOT the highlighted node. This is whatever node has the CHECKBOX selection */
     getSingleSelectedNode = (state: AppState): J.NodeInfo => {
         let ret = null;
-        S.util.forEachProp(state.selectedNodes, (id, val): boolean => {
+        state.selectedNodes.forEach(id => {
             ret = state.idToNodeMap.get(id);
-            return false;
         });
         return ret;
     }

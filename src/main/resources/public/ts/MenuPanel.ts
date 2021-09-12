@@ -313,7 +313,7 @@ export class MenuPanel extends Div {
 
         children.push(new Menu("Edit", [
             state.editNode ? new MenuItem("Continue editing...", MenuPanel.continueEditing, !state.isAnonUser) : null, //
-            new MenuItem("Clear Selections", S.quanta.clearSelNodes, !state.isAnonUser && S.util.getPropertyCount(state.selectedNodes) > 0), //
+            new MenuItem("Clear Selections", S.quanta.clearSelNodes, !state.isAnonUser && state.selectedNodes.size > 0), //
 
             // new MenuItem("Cut", S.edit.cutSelNodes, () => { return !state.isAnonUser && selNodeCount > 0 && selNodeIsMine }), //
             new MenuItem("Undo Cut", S.edit.undoCutSelNodes, !state.isAnonUser && !!state.nodesToMove), //

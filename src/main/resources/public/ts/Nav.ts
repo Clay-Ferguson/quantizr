@@ -258,9 +258,9 @@ export class Nav implements NavIntf {
         if (!id) return;
         state = appState(state);
         if (selected) {
-            state.selectedNodes[id] = true;
+            state.selectedNodes.add(id);
         } else {
-            delete state.selectedNodes[id];
+            state.selectedNodes.delete(id);
         }
     }
 

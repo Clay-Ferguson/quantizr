@@ -80,7 +80,9 @@ export class AppState {
 
     userProfile: J.UserProfile = null;
     newMessageCount: number = 0;
-    selectedNodes: any = {};
+
+    // ids of selected nodes
+    selectedNodes: Set<string> = new Set<string>();
 
     /* maps node.id values to NodeInfo.java objects
     Make this use a Map type (typescript)

@@ -55,7 +55,6 @@ export interface QuantaIntf {
     refresh(state: AppState): void;
     selectTabStateOnly(tabName: string, state: AppState): void;
     selectTab(pageName: string, clickEvent?: boolean): void;
-    getSelNodeUidsArray(state: AppState): string[];
     getSelNodeIdsArray(state: AppState): string[];
     getSelNodesAsMapById(state: AppState): Object;
     getSelNodesArray(state: AppState): J.NodeInfo[];

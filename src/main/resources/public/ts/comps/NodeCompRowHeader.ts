@@ -174,16 +174,19 @@ export class NodeCompRowHeader extends Div {
         }
 
         let editingAllowed = S.edit.isEditAllowed(node, state);
+        let deleteAllowed = false;
         let editableNode = true;
 
         if (state.isAdminUser) {
             editingAllowed = true;
             editableNode = true;
+            deleteAllowed = true;
         }
         else if (typeHandler) {
             if (editingAllowed) {
                 editingAllowed = typeHandler.allowAction(NodeActionType.editNode, node, state);
                 editableNode = typeHandler.allowAction(NodeActionType.editNode, node, state);
+                deleteAllowed = typeHandler.allowAction(NodeActionType.delete, node, state);
             }
         }
 
@@ -202,19 +205,14 @@ export class NodeCompRowHeader extends Div {
                 });
             }
 
-            // DO NOT DELETE:
-            // This code works but the renderPageFromData it eventually calls is super tightly coupled to the
-            // logic of switching over to the MainTab, which we wouldn't want in this scenario, so until the tab
-            // switching is decoupled I'm disabling the ability to delete from a non-Tree Tab view. We got lucky
-            // in the "Edit Node" button just above, because that works fine and doesn't switch tabs on us.
-            // if (deleteAllowed && node.id !== state.homeNodeId) {
-            //     floatUpperRightDiv.addChild(new Icon({
-            //         className: "fa fa-trash fa-lg buttonBarIcon",
-            //         title: "Delete selected nodes",
-            //         nid: node.id,
-            //         onClick: S.edit.deleteSelNodes
-            //     }));
-            // }
+            if (deleteAllowed && node.id !== state.homeNodeId) {
+                floatUpperRightDiv.addChild(new Icon({
+                    className: "fa fa-trash fa-lg buttonBarIcon",
+                    title: "Delete selected nodes",
+                    nid: node.id,
+                    onClick: S.edit.deleteSelNodes
+                }));
+            }
         }
 
         let jumpButtonAdded = false;

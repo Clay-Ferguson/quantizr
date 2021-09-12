@@ -5,7 +5,7 @@ export interface SearchIntf {
     _UID_ROWID_PREFIX: string;
 
     highlightRowNode: J.NodeInfo;
-    idToNodeMap : Map<string, J.NodeInfo>;
+    idToNodeMap: Map<string, J.NodeInfo>;
 
     findSharedNodes(node: J.NodeInfo, page: number, type: string, shareTarget: string, accessOption: string, state: AppState): void;
     searchAndReplace(recursive: boolean, nodeId: string, search: string, replace: string, state: AppState): any;
@@ -20,4 +20,5 @@ export interface SearchIntf {
     showFollowing(page: number, userName: string): void;
     delayedRefreshFeed(state: AppState): void;
     refreshFeed(): void;
+    removeNodeById(id: string, state: AppState): void;
 }

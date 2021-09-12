@@ -182,6 +182,22 @@ export class Search implements SearchIntf {
         });
     }
 
+    removeNodeById = (id: string, state: AppState) => {
+        // todo-1: we could do this a more polymorphic way and delegate deleting to each plugin type.
+        state.tabData.forEach((td: TabDataIntf) => {
+
+            // for normal resultsets
+            if (td.rsInfo?.results) {
+                td.rsInfo.results = td.rsInfo.results.filter(n => id !== n.id);
+            }
+
+            // for feed results
+            if (td.props?.feedResults) {
+                td.props.feedResults = td.props.feedResults.filter(n => id !== n.id);
+            }
+        });
+    }
+
     /* If we have the Auto-Refresh checkbox checked by the user, and we just detected new changes comming in then we do a request
     from the server for a refresh */
     delayedRefreshFeed = (state: AppState): void => {

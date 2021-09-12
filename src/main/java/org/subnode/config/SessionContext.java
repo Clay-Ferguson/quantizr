@@ -108,7 +108,8 @@ public class SessionContext {
 	/*
 	 * When the user is viewing the Node Feed for a specific node, this will be the path of that root
 	 * node, and we use this so we can easily do a 'browser push' to any user whenever something new is
-	 * created under a that feed.
+	 * created under a that feed. todo-1: we could rename this to "chatNodePath", because it's basically
+	 * the chat node when the user is in a chat room.
 	 */
 	private String watchingPath;
 

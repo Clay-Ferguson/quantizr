@@ -668,6 +668,8 @@ export class Edit implements EditIntf {
             // we can let that change to 'state' get discarded in the next dispatch
             S.nav.setNodeSel(true, id, state);
         }
+
+        // note: the setNodeSel above isn't causing this to get anything here
         const selNodesArray = S.quanta.getSelNodeIdsArray(state);
 
         if (!selNodesArray || selNodesArray.length === 0) {
@@ -706,8 +708,14 @@ export class Edit implements EditIntf {
                         }
                         else {
                             dispatch("Action_RefreshNodeFromServer", (s: AppState): AppState => {
-                                s.selectedNodes = {};
                                 s.node.children = state.node.children;
+
+                                // remove this node from all data from all the tabs, so they all refresh without
+                                // the deleted node without being queries from the server again.
+                                selNodesArray.forEach(id => {
+                                    S.srch.removeNodeById(id, s);
+                                });
+                                s.selectedNodes.clear();
                                 return s;
                             });
                         }
@@ -772,7 +780,7 @@ export class Edit implements EditIntf {
             S.nav.setNodeSel(true, id, s);
             let selNodesArray = S.quanta.getSelNodeIdsArray(s);
             s.nodesToMove = selNodesArray;
-            s.selectedNodes = {};
+            s.selectedNodes.clear();
             return s;
         });
     }
