@@ -11,13 +11,11 @@ import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-
+import java.util.concurrent.ConcurrentHashMap;
 import javax.annotation.PostConstruct;
 import javax.servlet.http.HttpServletResponse;
-
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpResponse;
@@ -36,6 +34,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
@@ -51,12 +50,12 @@ import org.subnode.model.MerkleLink;
 import org.subnode.model.MerkleNode;
 import org.subnode.model.client.NodeProp;
 import org.subnode.model.client.NodeType;
+import org.subnode.mongo.AdminRun;
 import org.subnode.mongo.CreateNodeLocation;
 import org.subnode.mongo.MongoCreate;
 import org.subnode.mongo.MongoRead;
 import org.subnode.mongo.MongoSession;
 import org.subnode.mongo.MongoUpdate;
-import org.subnode.mongo.AdminRun;
 import org.subnode.mongo.model.SubNode;
 import org.subnode.request.LoadNodeFromIpfsRequest;
 import org.subnode.request.PublishNodeToIpfsRequest;
@@ -65,6 +64,7 @@ import org.subnode.response.PublishNodeToIpfsResponse;
 import org.subnode.util.AsyncExec;
 import org.subnode.util.Cast;
 import org.subnode.util.Const;
+import org.subnode.util.DateUtil;
 import org.subnode.util.ExUtil;
 import org.subnode.util.LimitedInputStreamEx;
 import org.subnode.util.StreamUtil;
@@ -77,7 +77,7 @@ import org.subnode.util.XString;
 
 /*
  * todo-1: There are several places in here where we're getting back a "String" from a
- * restTemplate.exchange for getting back JSON, and we can probably define a POJO and let the
+ * restTemplate.exchange for getting back JSON, and we can probably define a POJO and let the spring
  * converter convert do this for us always instead
  */
 
@@ -95,6 +95,8 @@ public class IPFSService {
     private static String API_NAME;
     private static String API_REPO;
 
+    private final ConcurrentHashMap<String, Boolean> failedCIDs = new ConcurrentHashMap<>();
+
     /*
      * originally this was 'data-endcoding' (or at least i got that from somewhere), but now their
      * example page seems to show 'encoding' is the name here.
@@ -102,7 +104,7 @@ public class IPFSService {
     public static String ENCODING_PARAM_NAME = "encoding";
 
     /*
-     * RestTempalte is thread-safe and reusable, and has no state, so we need only one final static
+     * RestTemplate is thread-safe and reusable, and has no state, so we need only one final static
      * instance ever
      */
     private static final RestTemplate restTemplate = new RestTemplate(Util.getClientHttpRequestFactory());
@@ -145,6 +147,12 @@ public class IPFSService {
         API_REPO = API_BASE + "/repo";
     }
 
+    /* On regular interval forget which CIDs have failed and allow them to be retried */
+    @Scheduled(fixedDelay = 10 * DateUtil.MINUTE_MILLIS)
+    public void clearFailedCIDs() {
+        failedCIDs.clear();
+    }
+
     public String getRepoStat() {
         String url = API_REPO + "/stat?human=true";
         LinkedHashMap<String, Object> res = Cast.toLinkedHashMap(postForJsonReply(url, LinkedHashMap.class));
@@ -183,7 +191,7 @@ public class IPFSService {
 
     public void ipfsAsyncPinNode(MongoSession ms, ObjectId nodeId) {
         asyncExec.run(ThreadLocals.getContext(), () -> {
-            // wait for node to be saved. Waits up to 30 seconds. 
+            // wait for node to be saved. Waits up to 30 seconds.
             Util.sleep(3000);
             SubNode node = read.getNode(ms, nodeId, false, 10);
 
@@ -657,10 +665,16 @@ public class IPFSService {
     }
 
     public InputStream getStream(MongoSession session, String hash) {
+
+        if (failedCIDs.get(hash) != null) {
+            // log.debug("Abort CID already failed: " + hash);
+            throw new RuntimeException("failed CIDs: " + hash);
+        }
+
         String sourceUrl = appProp.getIPFSGatewayHostAndPort() + "/ipfs/" + hash;
 
         try {
-            int timeout = 20;
+            int timeout = 15;
             RequestConfig config = RequestConfig.custom() //
                     .setConnectTimeout(timeout * 1000) //
                     .setConnectionRequestTimeout(timeout * 1000) //
@@ -674,6 +688,7 @@ public class IPFSService {
             InputStream is = response.getEntity().getContent();
             return is;
         } catch (Exception e) {
+            failedCIDs.put(hash, true);
             log.error("getStream failed: " + sourceUrl, e);
             throw new RuntimeEx("Streaming failed.", e);
         }
