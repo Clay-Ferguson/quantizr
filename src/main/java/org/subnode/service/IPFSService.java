@@ -94,6 +94,7 @@ public class IPFSService {
     private static String API_TAR;
     private static String API_NAME;
     private static String API_REPO;
+    private static String API_PUBSUB;
 
     private final ConcurrentHashMap<String, Boolean> failedCIDs = new ConcurrentHashMap<>();
 
@@ -145,6 +146,7 @@ public class IPFSService {
         API_TAR = API_BASE + "/tar";
         API_NAME = API_BASE + "/name";
         API_REPO = API_BASE + "/repo";
+        API_PUBSUB = API_BASE + "/pubsub";
     }
 
     /* On regular interval forget which CIDs have failed and allow them to be retried */
@@ -534,6 +536,60 @@ public class IPFSService {
             ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.POST, requestEntity, String.class);
             ret = mapper.readValue(response.getBody(), new TypeReference<Map<String, Object>>() {});
 
+        } catch (Exception e) {
+            log.error("Failed in restTemplate.exchange", e);
+        }
+        return ret;
+    }
+
+    // WARNING: This won't work until I figure out how to enable pubsub in the IPFS docker configs:
+    // https://github.com/ipfs/go-ipfs/issues/7595
+    // PubSub subscribe
+    public Map<String, Object> sub(String topic) {
+        Map<String, Object> ret = null;
+        try {
+            String url = API_PUBSUB + "/sub?arg=" + topic;
+
+            HttpHeaders headers = new HttpHeaders();
+            MultiValueMap<String, Object> bodyMap = new LinkedMultiValueMap<>();
+            HttpEntity<MultiValueMap<String, Object>> requestEntity = new HttpEntity<>(bodyMap, headers);
+
+            ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.POST, requestEntity, String.class);
+            ret = mapper.readValue(response.getBody(), new TypeReference<Map<String, Object>>() {});
+            log.debug("IPFS sub to " + topic + "\n" + XString.prettyPrint(ret));
+
+            // ret output:
+            // {
+            // "Name" : "QmYHQEW7NTczSxcaorguczFRNwAY1r7UkF8uU4FMTGMRJm",
+            // "Value" : "/ipfs/bafyreibr77jhjmkltu7zcnyqwtx46fgacbjc7ayejcfp7yazxc6xt476xe"
+            // }
+        } catch (Exception e) {
+            log.error("Failed in restTemplate.exchange", e);
+        }
+        return ret;
+    }
+
+    // WARNING: This won't work until I figure out how to enable pubsub in the IPFS docker configs:
+    // https://github.com/ipfs/go-ipfs/issues/7595
+    // PubSub publish
+    public Map<String, Object> pub(String topic, String message) {
+        Map<String, Object> ret = null;
+        try {
+            String url = API_PUBSUB + "/pub?arg=" + topic + "&arg=" + message;
+
+            HttpHeaders headers = new HttpHeaders();
+            MultiValueMap<String, Object> bodyMap = new LinkedMultiValueMap<>();
+            HttpEntity<MultiValueMap<String, Object>> requestEntity = new HttpEntity<>(bodyMap, headers);
+
+            ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.POST, requestEntity, String.class);
+            ret = mapper.readValue(response.getBody(), new TypeReference<Map<String, Object>>() {});
+            log.debug("IPFS pub to " + topic + "\n" + XString.prettyPrint(ret));
+
+            // ret output:
+            // {
+            // "Name" : "QmYHQEW7NTczSxcaorguczFRNwAY1r7UkF8uU4FMTGMRJm",
+            // "Value" : "/ipfs/bafyreibr77jhjmkltu7zcnyqwtx46fgacbjc7ayejcfp7yazxc6xt476xe"
+            // }
         } catch (Exception e) {
             log.error("Failed in restTemplate.exchange", e);
         }
