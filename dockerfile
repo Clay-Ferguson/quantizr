@@ -22,6 +22,8 @@ WORKDIR /quanta
 EXPOSE ${PORT}
 EXPOSE ${PORT_DEBUG}
 EXPOSE 4001
+# Swarm UDP; should be exposed to the public
+EXPOSE 4001/udp
 
 COPY ${JAR_FILE} /quanta/app.jar
 RUN sh -c 'touch /quanta/app.jar' 

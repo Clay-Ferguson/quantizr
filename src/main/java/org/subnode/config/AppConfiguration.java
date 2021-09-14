@@ -159,10 +159,11 @@ public class AppConfiguration implements WebMvcConfigurer {
 	@Bean
 	@Scope("singleton")
 	public RestTemplate restTemplate() {
+		int timeout = 30000;
 		HttpComponentsClientHttpRequestFactory httpRequestFactory = new HttpComponentsClientHttpRequestFactory();
-		// httpRequestFactory.setConnectionRequestTimeout(timeout);
-		// httpRequestFactory.setConnectTimeout(timeout);
-		// httpRequestFactory.setReadTimeout(timeout);
+		httpRequestFactory.setConnectionRequestTimeout(timeout);
+		httpRequestFactory.setConnectTimeout(timeout);
+		httpRequestFactory.setReadTimeout(timeout);
 		return new RestTemplate(httpRequestFactory);
 	}
 

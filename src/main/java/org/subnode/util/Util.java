@@ -88,9 +88,12 @@ public class Util {
 	}
 
 	public static ClientHttpRequestFactory getClientHttpRequestFactory() {
+		// todo-0: change this back to something reasonable
 		int timeout = 30000;
 		HttpComponentsClientHttpRequestFactory clientHttpRequestFactory = new HttpComponentsClientHttpRequestFactory();
+		clientHttpRequestFactory.setConnectionRequestTimeout(timeout);
 		clientHttpRequestFactory.setConnectTimeout(timeout);
+		clientHttpRequestFactory.setReadTimeout(timeout);
 		return clientHttpRequestFactory;
 	}
 

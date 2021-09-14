@@ -537,13 +537,14 @@ export class MenuPanel extends Div {
             ]));
 
             children.push(new Menu("Admin - Test", [
-                new MenuItem("TEST - Send Email", () => S.quanta.sendTestEmail()),
-                new MenuItem("TEST - Notification Display", () => S.quanta.showSystemNotification("Test Title", "This is a test message")),
-                new MenuItem("TEST - Encryption", async () => {
+                new MenuItem("IPFS PubSub", () => S.view.runServerCommand("ipfsPubSubTest", "PubSub Test", null, state)), //
+                new MenuItem("Send Email", () => S.quanta.sendTestEmail()),
+                new MenuItem("Notification Display", () => S.quanta.showSystemNotification("Test Title", "This is a test message")),
+                new MenuItem("Encryption", async () => {
                     await S.encryption.test();
                     S.util.showMessage("Encryption Test Complete. Check browser console for output.", "Note", true);
                 }),
-                new MenuItem("TEST - Text to Speech", async () => {
+                new MenuItem("Text to Speech", async () => {
                     const tts = window.speechSynthesis;
                     // let voices = tts.getVoices();
                     // for (let i = 0; i < voices.length; i++) {

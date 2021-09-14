@@ -28,16 +28,9 @@ public class IPFSTest implements TestIntf {
         log.debug("IPFSTest.test() running.");
         // testUploadDirectory();
 
-        // can't run this until we know how to enable PubSub with IPFS docker image.
-        // pubSubTest();
+        // ipfs.getRepoStat();
     }
 
-    /* Verify we can do pubSub. This isn't a great test becasue we're doing it all internal to our gateway
-    but as a first test to prove we can do this, it's fine */
-    private void pubSubTest() {
-        ipfs.sub("ClaysTopic");
-        ipfs.pub("ClaysTopic", "Awesome test message!");
-    }
 
     private void testUploadDirectory() {
         arun.run(mongoSession -> {

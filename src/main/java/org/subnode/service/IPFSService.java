@@ -2,10 +2,14 @@ package org.subnode.service;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.FileInputStream;
+import java.io.IOException;
 import java.io.InputStream;
+import java.net.HttpURLConnection;
 import java.net.URI;
 import java.net.URL;
+import java.util.Base64;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
@@ -95,6 +99,9 @@ public class IPFSService {
     private static String API_NAME;
     private static String API_REPO;
     private static String API_PUBSUB;
+    private static String API_SWARM;
+    private static String API_CONFIG;
+    private static String API_ID;
 
     private final ConcurrentHashMap<String, Boolean> failedCIDs = new ConcurrentHashMap<>();
 
@@ -110,9 +117,6 @@ public class IPFSService {
      */
     private static final RestTemplate restTemplate = new RestTemplate(Util.getClientHttpRequestFactory());
     private static final ObjectMapper mapper = new ObjectMapper();
-
-    @Autowired
-    private AdminRun arun;
 
     @Autowired
     private MongoRead read;
@@ -135,6 +139,9 @@ public class IPFSService {
     @Autowired
     private AsyncExec asyncExec;
 
+    @Autowired
+    private AdminRun arun;
+
     @PostConstruct
     public void init() {
         API_BASE = appProp.getIPFSApiHostAndPort() + "/api/v0";
@@ -147,6 +154,9 @@ public class IPFSService {
         API_NAME = API_BASE + "/name";
         API_REPO = API_BASE + "/repo";
         API_PUBSUB = API_BASE + "/pubsub";
+        API_SWARM = API_BASE + "/swarm";
+        API_CONFIG = API_BASE + "/config";
+        API_ID = API_BASE + "/id";
     }
 
     /* On regular interval forget which CIDs have failed and allow them to be retried */
@@ -155,10 +165,65 @@ public class IPFSService {
         failedCIDs.clear();
     }
 
+    public void setPubSubOptions() {
+        LinkedHashMap<String, Object> res = null;
+
+        // Pubsub.Router="floodsub" | "gossipsub"
+        res = Cast.toLinkedHashMap(postForJsonReply(API_CONFIG + "?arg=Pubsub.Router&arg=gossipsub", LinkedHashMap.class));
+        log.debug("\nIPFS Pubsub.Router set:\n" + XString.prettyPrint(res) + "\n");
+
+        res = Cast.toLinkedHashMap(
+                postForJsonReply(API_CONFIG + "?arg=Pubsub.DisableSigning&arg=false&bool=true", LinkedHashMap.class));
+        log.debug("\nIPFS Pubsub.DisableSigning set:\n" + XString.prettyPrint(res) + "\n");
+    }
+
+    public void doSwarmConnect() {
+        arun.run(ms -> {
+            List<String> adrsList = getSwarmConnectAddresses(ms);
+            if (adrsList != null) {
+                for (String adrs : adrsList) {
+                    if (adrs.startsWith("/")) {
+                        swarmConnect(adrs);
+                    }
+                }
+            }
+            return null;
+        });
+    }
+
+    public List<String> getSwarmConnectAddresses(MongoSession ms) {
+        List<String> ret = null;
+        SubNode node = read.getNode(ms, ":ipfsSwarmAddresses");
+        if (node != null) {
+            log.debug("swarmAddresses: " + node.getContent());
+            ret = XString.tokenize(node.getContent(), "\n", true);
+        }
+        return ret;
+    }
+
     public String getRepoStat() {
-        String url = API_REPO + "/stat?human=true";
-        LinkedHashMap<String, Object> res = Cast.toLinkedHashMap(postForJsonReply(url, LinkedHashMap.class));
-        return "\nIPFS Repository Status:\n" + XString.prettyPrint(res) + "\n";
+        StringBuilder sb = new StringBuilder();
+        LinkedHashMap<String, Object> res = null;
+
+        String topic = "claystopic";
+        // pub(topic, "message" + String.valueOf(System.currentTimeMillis()));
+
+        res = Cast.toLinkedHashMap(postForJsonReply(API_REPO + "/stat?human=true", LinkedHashMap.class));
+        sb.append("\nIPFS Repository Status:\n" + XString.prettyPrint(res) + "\n");
+
+        res = Cast.toLinkedHashMap(postForJsonReply(API_CONFIG + "/show", LinkedHashMap.class));
+        sb.append("\nIPFS Config:\n" + XString.prettyPrint(res) + "\n");
+
+        res = Cast.toLinkedHashMap(postForJsonReply(API_ID, LinkedHashMap.class));
+        sb.append("\nIPFS Instance ID:\n" + XString.prettyPrint(res) + "\n");
+
+        res = Cast.toLinkedHashMap(postForJsonReply(API_PUBSUB + "/peers?arg=" + topic, LinkedHashMap.class));
+        sb.append("\nIPFS Peers for topic:\n" + XString.prettyPrint(res) + "\n");
+
+        res = Cast.toLinkedHashMap(postForJsonReply(API_PUBSUB + "/ls", LinkedHashMap.class));
+        sb.append("\nIPFS Topics List:\n" + XString.prettyPrint(res) + "\n");
+
+        return sb.toString();
     }
 
     /*
@@ -189,6 +254,33 @@ public class IPFSService {
         // return "\nIPFS Repository Garbage Collect:\n" + XString.prettyPrint(res) + "\n";
         String res = (String) postForJsonReply(url, String.class);
         return "\nIPFS Repository Garbage Collect:\n" + res + "\n";
+    }
+
+    public String pubSubTest() {
+        log.debug("IPFS pubsub test.");
+        setPubSubOptions();
+        doSwarmConnect();
+        Util.sleep(3000);
+
+        // log.debug("Checking swarmPeers");
+        // swarmPeers();
+
+        asyncExec.run(ThreadLocals.getContext(), () -> {
+            log.debug("Subscribing");
+            sub("claystopic");
+            log.debug("Subscribe complete.");
+        });
+
+        asyncExec.run(ThreadLocals.getContext(), () -> {
+            Util.sleep(3000);
+            log.debug("Publishing");
+            for (int i = 0; i < 20; i++) {
+                pub("claystopic", "message-" + String.valueOf(i));
+                Util.sleep(1000);
+            }
+            log.debug("Publish complete.");
+        });
+        return "PubSub Test started.";
     }
 
     public void ipfsAsyncPinNode(MongoSession ms, ObjectId nodeId) {
@@ -542,13 +634,53 @@ public class IPFSService {
         return ret;
     }
 
-    // WARNING: This won't work until I figure out how to enable pubsub in the IPFS docker configs:
-    // https://github.com/ipfs/go-ipfs/issues/7595
-    // PubSub subscribe
-    public Map<String, Object> sub(String topic) {
+    public void sub(String topic) {
+        String url = API_PUBSUB + "/sub?arg=" + topic;
+        try {
+            HttpURLConnection conn = configureConnection(new URL(url), "POST");
+            InputStream is = conn.getInputStream();
+            getObjectStream(is);
+        } catch (Exception e) {
+            log.error("Failed to read:", e);
+        }
+    }
+
+    HttpURLConnection configureConnection(URL target, String method) throws IOException {
+        HttpURLConnection conn = (HttpURLConnection) target.openConnection();
+        conn.setRequestMethod(method);
+        // conn.setRequestProperty("Content-Type", "application/json");
+        conn.setConnectTimeout(30000);
+        conn.setReadTimeout(30000);
+        return conn;
+    }
+
+    private void getObjectStream(InputStream in) throws IOException {
+        byte LINE_FEED = (byte) 10;
+        ByteArrayOutputStream resp = new ByteArrayOutputStream();
+        byte[] buf = new byte[4096];
+        int r;
+
+        while ((r = in.read(buf)) >= 0) {
+            resp.write(buf, 0, r);
+            if (buf[r - 1] == LINE_FEED) {
+                log.debug("LINE: " + new String(resp.toByteArray()));
+                Map<String, Object> msg = mapper.readValue(resp.toByteArray(), new TypeReference<Map<String, Object>>() {});
+                String data = (String) msg.get("data");
+                String seqno = (String) msg.get("seqno");
+                String from = (String) msg.get("from");
+                log.debug("MSG: " + (new String(Base64.getDecoder().decode(data))) + "\n" + //
+                        "    SEQ: " + seqno + "\n" + //
+                        "    FROM: " + from);
+                resp = new ByteArrayOutputStream();
+            }
+        }
+    }
+
+    public Map<String, Object> swarmConnect(String peer) {
         Map<String, Object> ret = null;
         try {
-            String url = API_PUBSUB + "/sub?arg=" + topic;
+            log.debug("Swarm connect: " + peer);
+            String url = API_SWARM + "/connect?arg=" + peer;
 
             HttpHeaders headers = new HttpHeaders();
             MultiValueMap<String, Object> bodyMap = new LinkedMultiValueMap<>();
@@ -556,21 +688,32 @@ public class IPFSService {
 
             ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.POST, requestEntity, String.class);
             ret = mapper.readValue(response.getBody(), new TypeReference<Map<String, Object>>() {});
-            log.debug("IPFS sub to " + topic + "\n" + XString.prettyPrint(ret));
-
-            // ret output:
-            // {
-            // "Name" : "QmYHQEW7NTczSxcaorguczFRNwAY1r7UkF8uU4FMTGMRJm",
-            // "Value" : "/ipfs/bafyreibr77jhjmkltu7zcnyqwtx46fgacbjc7ayejcfp7yazxc6xt476xe"
-            // }
+            log.debug("IPFS swarm connect: " + XString.prettyPrint(ret));
         } catch (Exception e) {
             log.error("Failed in restTemplate.exchange", e);
         }
         return ret;
     }
 
-    // WARNING: This won't work until I figure out how to enable pubsub in the IPFS docker configs:
-    // https://github.com/ipfs/go-ipfs/issues/7595
+    // PubSub List peers
+    public Map<String, Object> swarmPeers() {
+        Map<String, Object> ret = null;
+        try {
+            String url = API_SWARM + "/peers";
+
+            HttpHeaders headers = new HttpHeaders();
+            MultiValueMap<String, Object> bodyMap = new LinkedMultiValueMap<>();
+            HttpEntity<MultiValueMap<String, Object>> requestEntity = new HttpEntity<>(bodyMap, headers);
+
+            ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.POST, requestEntity, String.class);
+            ret = mapper.readValue(response.getBody(), new TypeReference<Map<String, Object>>() {});
+            log.debug("IPFS swarm peers: " + XString.prettyPrint(ret));
+        } catch (Exception e) {
+            log.error("Failed in restTemplate.exchange", e);
+        }
+        return ret;
+    }
+
     // PubSub publish
     public Map<String, Object> pub(String topic, String message) {
         Map<String, Object> ret = null;
@@ -582,14 +725,8 @@ public class IPFSService {
             HttpEntity<MultiValueMap<String, Object>> requestEntity = new HttpEntity<>(bodyMap, headers);
 
             ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.POST, requestEntity, String.class);
-            ret = mapper.readValue(response.getBody(), new TypeReference<Map<String, Object>>() {});
-            log.debug("IPFS pub to " + topic + "\n" + XString.prettyPrint(ret));
-
-            // ret output:
-            // {
-            // "Name" : "QmYHQEW7NTczSxcaorguczFRNwAY1r7UkF8uU4FMTGMRJm",
-            // "Value" : "/ipfs/bafyreibr77jhjmkltu7zcnyqwtx46fgacbjc7ayejcfp7yazxc6xt476xe"
-            // }
+            // ret = mapper.readValue(response.getBody(), new TypeReference<Map<String, Object>>() {});
+            log.debug("IPFS pub to [resp code=" + response.getStatusCode() + "] " + topic + "\n" + response.getBody());
         } catch (Exception e) {
             log.error("Failed in restTemplate.exchange", e);
         }
@@ -721,7 +858,6 @@ public class IPFSService {
     }
 
     public InputStream getStream(MongoSession session, String hash) {
-
         if (failedCIDs.get(hash) != null) {
             // log.debug("Abort CID already failed: " + hash);
             throw new RuntimeException("failed CIDs: " + hash);

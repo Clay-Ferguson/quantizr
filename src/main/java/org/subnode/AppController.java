@@ -1335,6 +1335,10 @@ public class AppController implements ErrorController {
 					res.getMessages().add(new InfoMessage(systemService.getSystemInfo(), null));
 					break;
 
+				case "ipfsPubSubTest":
+					res.getMessages().add(new InfoMessage(ipfsService.pubSubTest(), null));
+					break;
+
 				case "getServerInfo":
 					res.getMessages().add(new InfoMessage(systemService.getSystemInfo(), null));
 					break;
