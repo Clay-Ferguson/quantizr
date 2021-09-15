@@ -49,6 +49,7 @@ import org.subnode.request.AddFriendRequest;
 import org.subnode.request.BlockUserRequest;
 import org.subnode.request.ChangePasswordRequest;
 import org.subnode.request.CloseAccountRequest;
+import org.subnode.request.DeleteFriendRequest;
 import org.subnode.request.GetUserAccountInfoRequest;
 import org.subnode.request.GetUserProfileRequest;
 import org.subnode.request.LoginRequest;
@@ -61,6 +62,7 @@ import org.subnode.response.AddFriendResponse;
 import org.subnode.response.BlockUserResponse;
 import org.subnode.response.ChangePasswordResponse;
 import org.subnode.response.CloseAccountResponse;
+import org.subnode.response.DeleteFriendResponse;
 import org.subnode.response.FriendInfo;
 import org.subnode.response.GetFriendsResponse;
 import org.subnode.response.GetUserAccountInfoResponse;
@@ -222,8 +224,8 @@ public class UserManagerService {
 			SubNode postsNode = read.getUserNodeByType(ms, sc.getUserName(), null, "### Posts", NodeType.POSTS.s(),
 					Arrays.asList(PrivilegeType.READ.s()), NodeName.POSTS);
 
-			ensureUserHomeNodeExists(ms, sc.getUserName(), "### " + sc.getUserName()
-					+ "'s Node", NodeType.NONE.s(), NodeName.HOME);
+			ensureUserHomeNodeExists(ms, sc.getUserName(), "### " + sc.getUserName() + "'s Node", NodeType.NONE.s(),
+					NodeName.HOME);
 		} else {
 			res.setUserPreferences(getDefaultUserPreferences());
 		}
@@ -735,12 +737,33 @@ public class UserManagerService {
 		return res;
 	}
 
+	public DeleteFriendResponse deleteFriend(MongoSession session, final DeleteFriendRequest req) {
+		// apUtil.log("deleteFriend request: " + XString.prettyPrint(req));
+		DeleteFriendResponse res = new DeleteFriendResponse();
+		session = ThreadLocals.ensure(session);
+
+		// This loop over friendNodes could be done all in a single delete query command, but for now let's
+		// just do the delete this way using our existing methods.
+		List<SubNode> friendNodes = getSpecialNodesList(session, NodeType.FRIEND_LIST.s(), null, true);
+		if (friendNodes != null) {
+			for (SubNode friendNode : friendNodes) {
+				// the USER_NODE_ID property on friends nodes contains the actual account ID of this friend.
+				String userNodeId = friendNode.getStrProp(NodeProp.USER_NODE_ID);
+				if (req.getUserNodeId().equals(userNodeId)) {
+					delete.delete(session, friendNode, false);
+				}
+			}
+		}
+		res.setSuccess(true);
+		return res;
+	}
+
 	/*
 	 * Adds 'req.userName' as a friend by creating a FRIEND node under the current user's FRIENDS_LIST
 	 * if the user wasn't already a friend
 	 */
 	public AddFriendResponse addFriend(MongoSession session, final AddFriendRequest req) {
-		apUtil.log("addFriend request: " + XString.prettyPrint(req));
+		// apUtil.log("addFriend request: " + XString.prettyPrint(req));
 		AddFriendResponse res = new AddFriendResponse();
 		final String userName = ThreadLocals.getSC().getUserName();
 		session = ThreadLocals.ensure(session);
@@ -749,7 +772,8 @@ public class UserManagerService {
 		_newUserName = XString.stripIfStartsWith(_newUserName, "@");
 		final String newUserName = _newUserName;
 
-		// This is concurrency safe because by the time we get to this asyncExec, we're done processing in this request thread.
+		// This is concurrency safe because by the time we get to this asyncExec, we're done processing in
+		// this request thread.
 		asyncExec.run(ThreadLocals.getContext(), () -> {
 			MongoSession ms = ThreadLocals.getMongoSession();
 

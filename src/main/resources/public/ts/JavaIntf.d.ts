@@ -121,6 +121,10 @@ export interface DeleteAttachmentRequest extends RequestBase {
     nodeId: string;
 }
 
+export interface DeleteFriendRequest extends RequestBase {
+    userNodeId: string;
+}
+
 export interface DeleteNodesRequest extends RequestBase {
     nodeIds: string[];
     childrenOnly: boolean;
@@ -456,6 +460,9 @@ export interface CreateSubNodeResponse extends ResponseBase {
 }
 
 export interface DeleteAttachmentResponse extends ResponseBase {
+}
+
+export interface DeleteFriendResponse extends ResponseBase {
 }
 
 export interface DeleteNodesResponse extends ResponseBase {

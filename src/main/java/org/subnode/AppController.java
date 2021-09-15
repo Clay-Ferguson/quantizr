@@ -54,6 +54,7 @@ import org.subnode.request.CheckMessagesRequest;
 import org.subnode.request.CloseAccountRequest;
 import org.subnode.request.CreateSubNodeRequest;
 import org.subnode.request.DeleteAttachmentRequest;
+import org.subnode.request.DeleteFriendRequest;
 import org.subnode.request.DeleteNodesRequest;
 import org.subnode.request.DeletePropertyRequest;
 import org.subnode.request.ExportRequest;
@@ -1239,6 +1240,13 @@ public class AppController implements ErrorController {
 	public @ResponseBody Object addFriend(@RequestBody AddFriendRequest req, HttpSession session) {
 		return callProc.run("addFriend", req, session, ms -> {
 			return userManagerService.addFriend(ms, req);
+		});
+	}
+
+	@RequestMapping(value = API_PATH + "/deleteFriend", method = RequestMethod.POST)
+	public @ResponseBody Object deleteFriend(@RequestBody DeleteFriendRequest req, HttpSession session) {
+		return callProc.run("deleteFriend", req, session, ms -> {
+			return userManagerService.deleteFriend(ms, req);
 		});
 	}
 

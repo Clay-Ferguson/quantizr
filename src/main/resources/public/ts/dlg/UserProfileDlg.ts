@@ -75,9 +75,11 @@ export class UserProfileDlg extends DialogBase {
                 new Div(null, { className: "marginBottom" }, [
                     new Div(null, { className: "float-right" }, [
                         state.userProfile.blocked ? new Span("BLOCKED", { className: "blockingText" }) : null,
-
-                        // todo-1: add a click handler to this which deletes the friend node (unfollows)
-                        state.userProfile.following ? new Span("You Follow", { className: "followingText" }) : null,
+                        state.userProfile.following ? new Span("You Follow", {
+                            className: "followingText",
+                            onClick: this.deleteFriend,
+                            title: "Click to Unfollow user"
+                        }) : null,
 
                         state.userProfile.followerCount > 0 ? new Span(state.userProfile.followerCount + " followers", {
                             onClick: () => {
@@ -148,6 +150,14 @@ export class UserProfileDlg extends DialogBase {
         ];
 
         return children;
+    }
+
+    deleteFriend = () => {
+        S.util.ajax<J.DeleteFriendRequest, J.DeleteFriendResponse>("deleteFriend", {
+            userNodeId: this.userNodeId
+        }, (res: J.AddFriendResponse) => {
+            this.reload(this.userNodeId);
+        });
     }
 
     /**
