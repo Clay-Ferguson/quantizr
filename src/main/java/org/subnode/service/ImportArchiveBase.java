@@ -13,6 +13,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.subnode.exception.base.RuntimeEx;
 import org.subnode.model.client.NodeProp;
+import org.subnode.mongo.AdminRun;
 import org.subnode.mongo.MongoRead;
 import org.subnode.mongo.MongoSession;
 import org.subnode.mongo.MongoUpdate;
@@ -22,6 +23,8 @@ import org.subnode.util.ExUtil;
 import org.subnode.util.FileUtils;
 import org.subnode.util.LimitedInputStreamEx;
 import org.subnode.util.MimeUtil;
+import org.subnode.util.ValContainer;
+import org.subnode.util.XString;
 
 public abstract class ImportArchiveBase {
 	private static final Logger log = LoggerFactory.getLogger(ImportArchiveBase.class);
@@ -29,9 +32,9 @@ public abstract class ImportArchiveBase {
 	public static final ObjectMapper jsonMapper = new ObjectMapper();
 
 	/*
-	 * This is used to detect if this 'prototype scope' object might have been
-	 * autowired, and is getting called for a second time which is NOT supported.
-	 * Each use of this object requires a new instance of it.
+	 * This is used to detect if this 'prototype scope' object might have been autowired, and is getting
+	 * called for a second time which is NOT supported. Each use of this object requires a new instance
+	 * of it.
 	 */
 	public boolean used;
 
@@ -53,6 +56,9 @@ public abstract class ImportArchiveBase {
 	@Autowired
 	public FileUtils fileUtils;
 
+	@Autowired
+	private AdminRun arun;
+
 	public String targetPath;
 	public MongoSession session;
 	public SubNode importRootNode;
@@ -72,29 +78,45 @@ public abstract class ImportArchiveBase {
 			} else if (mimeUtil.isJsonFileType(fileName)) {
 				log.debug("  isJSON: " + fileName);
 				String json = IOUtils.toString(zis, "UTF-8");
-				//log.debug("  JSON STRING: " + json);
-				SubNode node = jsonMapper.readValue(json, SubNode.class);
+				// log.debug(" JSON STRING: " + json);
 
-				//log.debug("   from JAVA:" + XString.prettyPrint(node));
+				ValContainer<String> oldId = new ValContainer<>();
 
-				node.setPath(targetPath + node.getPath());
-				String oldId = node.getId().toHexString();
+				// run unmarshalling as admin (otherwise setPath can bark about user being not same as owner)
+				SubNode node = (SubNode) arun.run(ms -> {
+					try {
+						SubNode n = jsonMapper.readValue(json, SubNode.class);
 
-				/*
-				 * delete the BIN prop now, because it will have to be added during this import,
-				 * and the existing BIN id will no longer apply
-				 */
-				node.deleteProp(NodeProp.BIN.s());
+						n.setPath(targetPath + n.getPath());
+						oldId.setVal(n.getId().toHexString());
 
-				// nullify name because we don't want to blow up indexes
-				node.setName(null);
+						/*
+						 * delete the BIN prop now, because it will have to be added during this import, and the existing
+						 * BIN id will no longer apply
+						 */
+						n.deleteProp(NodeProp.BIN.s());
 
-				// we must nullify the node ID so that it creates a new node when saved.
-				node.setId(null);
-				node.setOwner(ownerId);
+						// nullify name because we don't want to blow up indexes
+						n.setName(null);
+
+						// we must nullify the node ID so that it creates a new node when saved.
+						n.setId(null);
+						n.setOwner(ownerId);
+						log.debug("IMPORT NODE: " + XString.prettyPrint(n));
+						return n;
+					} catch (Exception e) {
+						log.error("Failed unmarshalling node: " + json);
+						return null;
+					}
+				});
+
+				if (node == null) {
+					throw new RuntimeException("import unmarshalling failed.");
+				}
+
 				update.save(session, node);
 
-				oldIdToNewIdMap.put(oldId, node.getId().toHexString());
+				oldIdToNewIdMap.put(oldId.getVal(), node.getId().toHexString());
 			}
 			// Any other TEXT file
 			else if (mimeUtil.isTextTypeFileName(fileName)) {
@@ -104,8 +126,8 @@ public abstract class ImportArchiveBase {
 			// Or else treat as binary attachment
 			else {
 				/*
-				 * check fo a slash in name to avoide any of our root files, which for the HTML
-				 * viewing only (of exploded jars)
+				 * check fo a slash in name to avoide any of our root files, which for the HTML viewing only (of
+				 * exploded jars)
 				 */
 				if (lastSlashIdx != -1) {
 					log.debug("  isBIN: " + fileName);
@@ -118,16 +140,14 @@ public abstract class ImportArchiveBase {
 	}
 
 	/*
-	 * The part of the file name not including the extension will be the actual
-	 * nodeId of the node onto which we need to attach the binary after translating
-	 * thru oldIdToNewIdMap however!
+	 * The part of the file name not including the extension will be the actual nodeId of the node onto
+	 * which we need to attach the binary after translating thru oldIdToNewIdMap however!
 	 */
 	public void storeBinary(ArchiveEntry entry, InputStream zis, String fileName) {
 		String nodeId = fileUtils.stripExtension(fileName);
 		/*
-		 * todo-2: it would be nice if there WERE a
-		 * way for an export to extract data out of IPFS and save it in the exported
-		 * file
+		 * todo-2: it would be nice if there WERE a way for an export to extract data out of IPFS and save
+		 * it in the exported file
 		 */
 		nodeId = oldIdToNewIdMap.get(nodeId);
 
@@ -141,8 +161,8 @@ public abstract class ImportArchiveBase {
 			LimitedInputStreamEx lzis = new LimitedInputStreamEx(zis, Integer.MAX_VALUE);
 
 			// log.debug("Attaching binary to nodeId: " + node.getId().toHexString());
-			attachmentService.attachBinaryFromStream(session, "", node, null, fileName, length, lzis, mimeType, -1, -1,
-					false, false, false, true, false, false, true, null);
+			attachmentService.attachBinaryFromStream(session, "", node, null, fileName, length, lzis, mimeType, -1, -1, false,
+					false, false, true, false, false, true, null);
 		} else {
 			// this is normal to get here and indicates this file is NOT an attachment file.
 		}
