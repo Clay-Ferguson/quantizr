@@ -105,6 +105,9 @@ public class IPFSService {
 
     private final ConcurrentHashMap<String, Boolean> failedCIDs = new ConcurrentHashMap<>();
 
+    LinkedHashMap<String, Object> instanceId = null;
+    Object instanceIdLock = new Object();
+
     /*
      * originally this was 'data-endcoding' (or at least i got that from somewhere), but now their
      * example page seems to show 'encoding' is the name here.
@@ -142,6 +145,8 @@ public class IPFSService {
     @Autowired
     private AdminRun arun;
 
+    private static int heartbeatCounter = 0;
+
     @PostConstruct
     public void init() {
         API_BASE = appProp.getIPFSApiHostAndPort() + "/api/v0";
@@ -165,7 +170,17 @@ public class IPFSService {
         failedCIDs.clear();
     }
 
+    // send out a heartbeat from this server every few seconds for testing purposes
+    @Scheduled(fixedDelay = 10 * DateUtil.SECOND_MILLIS)
+    public void ipsmHeartbeat() {
+        // ensure instanceId loaded
+        getInstanceId();
+        pub("ipsm-heartbeat", (String)instanceId.get("ID") + "-ipsm-" + String.valueOf(heartbeatCounter++) + "\n");
+    }
+
     public void setPubSubOptions() {
+        // Only used this for some testing (shouldn't be required?)
+        // if these are the defaults ?
         LinkedHashMap<String, Object> res = null;
 
         // Pubsub.Router="floodsub" | "gossipsub"
@@ -256,6 +271,15 @@ public class IPFSService {
         return "\nIPFS Repository Garbage Collect:\n" + res + "\n";
     }
 
+    public LinkedHashMap<String, Object> getInstanceId() {
+        synchronized (instanceIdLock) {
+            if (instanceId == null) {
+                instanceId = Cast.toLinkedHashMap(postForJsonReply(API_ID, LinkedHashMap.class));
+            }
+            return instanceId;
+        }
+    }
+
     public String pubSubTest() {
         log.debug("IPFS pubsub test.");
         setPubSubOptions();
@@ -267,19 +291,25 @@ public class IPFSService {
 
         asyncExec.run(ThreadLocals.getContext(), () -> {
             log.debug("Subscribing");
-            sub("claystopic");
+
+            // we do some reads every few seconds so we should pick up several heartbeats
+            // if there are any being sent from other servers
+            for (int x = 0; x < 6; x++) {
+                sub("ipsm-heartbeat");
+                Util.sleep(10000);
+            }
             log.debug("Subscribe complete.");
         });
 
-        asyncExec.run(ThreadLocals.getContext(), () -> {
-            Util.sleep(3000);
-            log.debug("Publishing");
-            for (int i = 0; i < 20; i++) {
-                pub("claystopic", "message-" + String.valueOf(i));
-                Util.sleep(1000);
-            }
-            log.debug("Publish complete.");
-        });
+        // asyncExec.run(ThreadLocals.getContext(), () -> {
+        // Util.sleep(3000);
+        // log.debug("Publishing");
+        // for (int i = 0; i < 20; i++) {
+        // pub("claystopic", "message-" + String.valueOf(i));
+        // Util.sleep(1000);
+        // }
+        // log.debug("Publish complete.");
+        // });
         return "PubSub Test started.";
     }
 
@@ -726,7 +756,7 @@ public class IPFSService {
 
             ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.POST, requestEntity, String.class);
             // ret = mapper.readValue(response.getBody(), new TypeReference<Map<String, Object>>() {});
-            log.debug("IPFS pub to [resp code=" + response.getStatusCode() + "] " + topic + "\n" + response.getBody());
+            log.debug("IPFS pub to [resp code=" + response.getStatusCode() + "] " + topic);
         } catch (Exception e) {
             log.error("Failed in restTemplate.exchange", e);
         }

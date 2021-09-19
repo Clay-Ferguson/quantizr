@@ -75,6 +75,7 @@ services:
             - '${ipfs_data}:/data/ipfs'
         ports:
             - "4001:4001"
+            - "4001:4001/udp"
         networks:
             - net-dev
         # We could have this actual image if we weren't building from a custom dockerfile
