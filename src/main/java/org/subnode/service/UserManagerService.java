@@ -632,12 +632,16 @@ public class UserManagerService {
 			return res;
 		}
 
+		final UserPreferences reqUserPrefs = req.getUserPreferences();
+
+		// once triggered it stays on (for now)
+		if (reqUserPrefs.isEnableIPSM()) {
+			ThreadLocals.getSC().setEnableIPSM(true);
+		}
 		final String userName = ThreadLocals.getSC().getUserName();
 
 		arun.run(session -> {
 			SubNode prefsNode = read.getUserNodeByUserName(session, userName);
-
-			UserPreferences reqUserPrefs = req.getUserPreferences();
 
 			/*
 			 * Assign preferences as properties on this node,

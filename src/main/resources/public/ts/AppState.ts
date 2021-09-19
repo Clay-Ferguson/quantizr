@@ -75,7 +75,8 @@ export class AppState {
         editMode: false,
         showMetaData: false,
         rssHeadlinesOnly: true,
-        maxUploadFileSize: 0
+        maxUploadFileSize: 0,
+        enableIPSM: false
     };
 
     userProfile: J.UserProfile = null;

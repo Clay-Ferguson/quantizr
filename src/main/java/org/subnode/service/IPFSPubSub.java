@@ -208,6 +208,12 @@ public class IPFSPubSub {
             return;
 
         for (SessionContext sc : SessionContext.getAllSessions()) {
+
+            // only consider sessions that have viewed their IPSM tab
+            if (!sc.isEnableIPSM()) {
+                continue;
+            }
+
             log.debug("Pushing to session: sc.user: " + sc.getUserName() + " " + payload);
 
             // todo-0: need a way to ONLY send to clients who have at least once visited their IPSM tab.

@@ -769,6 +769,7 @@ export interface UserPreferences {
     editMode: boolean;
     showMetaData: boolean;
     rssHeadlinesOnly: boolean;
+    enableIPSM: boolean;
     maxUploadFileSize: number;
 }
 

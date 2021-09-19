@@ -10,6 +10,21 @@ public class UserPreferences {
 	private boolean showMetaData;
 	private boolean rssHeadlinesOnly;
 
+	// not persisted to DB yet. (todo-0)
+	@JsonProperty(required = false)
+	private boolean enableIPSM;
+
+	@JsonProperty(required = false)
+	private long maxUploadFileSize;
+
+	public boolean isEnableIPSM() {
+		return enableIPSM;
+	}
+
+	public void setEnableIPSM(boolean enableIPSM) {
+		this.enableIPSM = enableIPSM;
+	}
+
 	public boolean isRssHeadlinesOnly() {
 		return rssHeadlinesOnly;
 	}
@@ -17,9 +32,6 @@ public class UserPreferences {
 	public void setRssHeadlinesOnly(boolean rssHeadlinesOnly) {
 		this.rssHeadlinesOnly = rssHeadlinesOnly;
 	}
-
-	@JsonProperty(required = false)
-	private long maxUploadFileSize;
 
 	public boolean isEditMode() {
 		return editMode;

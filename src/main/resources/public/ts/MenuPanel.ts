@@ -114,6 +114,10 @@ export class MenuPanel extends Div {
             }, 250);
             return s;
         });
+
+        let state = appState(null);
+        state.userPreferences.enableIPSM = true;
+        S.quanta.saveUserPreferences(state);
     };
 
     static messagesToFromMe = () => {

@@ -104,6 +104,15 @@ public class SessionContext {
 	private Date feedMaxTime;
 
 	private String userToken;
+	private boolean enableIPSM;
+
+	public boolean isEnableIPSM() {
+		return enableIPSM;
+	}
+
+	public void setEnableIPSM(boolean enableIPSM) {
+		this.enableIPSM = enableIPSM;
+	}
 
 	/*
 	 * When the user is viewing the Node Feed for a specific node, this will be the path of that root
@@ -159,6 +168,7 @@ public class SessionContext {
 		sc.feedMaxTime = feedMaxTime;
 		sc.userToken = userToken;
 		sc.watchingPath = watchingPath;
+		sc.enableIPSM = enableIPSM;
 		return sc;
 	}
 
