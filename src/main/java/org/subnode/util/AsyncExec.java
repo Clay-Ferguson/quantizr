@@ -23,15 +23,16 @@ public class AsyncExec {
 
     @Async("threadPoolTaskExecutor")
     public void run(ThreadLocalsContext tlc, Runnable runnable) {
-
-        /*
-         * if the currently executing threadId is the same as the one from the passed in 'tlc' we definitely
-         * have a bug, and the @Async annotation is not having an effect.
-         */
-        if (Thread.currentThread().getId() == tlc.threadId) {
-            throw new RuntimeException("AsyncExec ran running synchronously!");
+        if (tlc != null) {
+            /*
+             * if the currently executing threadId is the same as the one from the passed in 'tlc' we definitely
+             * have a bug, and the @Async annotation is not having an effect.
+             */
+            if (Thread.currentThread().getId() == tlc.threadId) {
+                throw new RuntimeException("AsyncExec ran running synchronously!");
+            }
+            ThreadLocals.setContext(tlc);
         }
-        ThreadLocals.setContext(tlc);
         runnable.run();
     }
 }

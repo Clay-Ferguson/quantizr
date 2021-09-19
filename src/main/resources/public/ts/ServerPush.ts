@@ -90,6 +90,13 @@ export class ServerPush implements ServerPushIntf {
             this.feedPushItem(data.nodeInfo, state);
         }, false);
 
+        this.eventSource.addEventListener("ipsmPush", (e: any) => {
+            let state = store.getState();
+            const data: J.IPSMPushInfo = JSON.parse(e.data);
+            // console.log("IPSM: " + data.payload);
+            this.ipsmPushItem(data.payload, state);
+        }, false);
+
         this.eventSource.addEventListener("newInboxNode", (e: any) => {
             const obj: J.NotificationMessage = JSON.parse(e.data);
             // console.log("Incomming Push (NotificationMessage): " + S.util.prettyPrint(obj));
@@ -125,6 +132,19 @@ export class ServerPush implements ServerPushIntf {
             // then remove the nodeInfo.id from the list becasue it would be redundant in the list.
             // s.feedResults = S.quanta.removeRedundantFeedItems(s.feedResults);
         }
+    }
+
+    ipsmPushItem = (payload: string, state: AppState) => {
+        let feedData: TabDataIntf = S.quanta.getTabDataById(null, C.TAB_IPSM);
+        if (!feedData) return;
+
+        dispatch("Action_RenderIPSMFeedResults", (s: AppState): AppState => {
+            feedData.props.events = feedData.props.events || [];
+
+            // add to head of array (rev-chron view)
+            feedData.props.events.unshift(payload);
+            return s;
+        });
     }
 
     feedPushItem = (nodeInfo: J.NodeInfo, state: AppState): void => {

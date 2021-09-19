@@ -1345,8 +1345,10 @@ public class AppController implements ErrorController {
 					break;
 
 				case "ipfsPubSubTest":
-					res.getMessages().add(new InfoMessage(ipfsService.pubSubTest(), null));
-					break;
+					// currently unused (leaving hook in place)
+					throw new RuntimeException("ipfsPubSubTest depricated");
+					// res.getMessages().add(new InfoMessage(ipfsService.pubSubTest(), null));
+					// break;
 
 				case "getServerInfo":
 					res.getMessages().add(new InfoMessage(systemService.getSystemInfo(), null));

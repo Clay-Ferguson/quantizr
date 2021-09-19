@@ -2,14 +2,10 @@ package org.subnode.service;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.FileInputStream;
-import java.io.IOException;
 import java.io.InputStream;
-import java.net.HttpURLConnection;
 import java.net.URI;
 import java.net.URL;
-import java.util.Base64;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
@@ -89,23 +85,23 @@ import org.subnode.util.XString;
 public class IPFSService {
     private static final Logger log = LoggerFactory.getLogger(IPFSService.class);
 
-    private static String API_BASE;
-    private static String API_CAT;
-    private static String API_FILES;
-    private static String API_PIN;
-    private static String API_OBJECT;
-    private static String API_DAG;
-    private static String API_TAR;
-    private static String API_NAME;
-    private static String API_REPO;
-    private static String API_PUBSUB;
-    private static String API_SWARM;
-    private static String API_CONFIG;
-    private static String API_ID;
+    public static String API_BASE;
+    public static String API_CAT;
+    public static String API_FILES;
+    public static String API_PIN;
+    public static String API_OBJECT;
+    public static String API_DAG;
+    public static String API_TAR;
+    public static String API_NAME;
+    public static String API_REPO;
+    public static String API_PUBSUB;
+    public static String API_SWARM;
+    public static String API_CONFIG;
+    public static String API_ID;
 
     private final ConcurrentHashMap<String, Boolean> failedCIDs = new ConcurrentHashMap<>();
 
-    LinkedHashMap<String, Object> instanceId = null;
+    public LinkedHashMap<String, Object> instanceId = null;
     Object instanceIdLock = new Object();
 
     /*
@@ -145,8 +141,6 @@ public class IPFSService {
     @Autowired
     private AdminRun arun;
 
-    private static int heartbeatCounter = 0;
-
     @PostConstruct
     public void init() {
         API_BASE = appProp.getIPFSApiHostAndPort() + "/api/v0";
@@ -168,28 +162,6 @@ public class IPFSService {
     @Scheduled(fixedDelay = 10 * DateUtil.MINUTE_MILLIS)
     public void clearFailedCIDs() {
         failedCIDs.clear();
-    }
-
-    // send out a heartbeat from this server every few seconds for testing purposes
-    @Scheduled(fixedDelay = 10 * DateUtil.SECOND_MILLIS)
-    public void ipsmHeartbeat() {
-        // ensure instanceId loaded
-        getInstanceId();
-        pub("ipsm-heartbeat", (String)instanceId.get("ID") + "-ipsm-" + String.valueOf(heartbeatCounter++) + "\n");
-    }
-
-    public void setPubSubOptions() {
-        // Only used this for some testing (shouldn't be required?)
-        // if these are the defaults ?
-        LinkedHashMap<String, Object> res = null;
-
-        // Pubsub.Router="floodsub" | "gossipsub"
-        res = Cast.toLinkedHashMap(postForJsonReply(API_CONFIG + "?arg=Pubsub.Router&arg=gossipsub", LinkedHashMap.class));
-        log.debug("\nIPFS Pubsub.Router set:\n" + XString.prettyPrint(res) + "\n");
-
-        res = Cast.toLinkedHashMap(
-                postForJsonReply(API_CONFIG + "?arg=Pubsub.DisableSigning&arg=false&bool=true", LinkedHashMap.class));
-        log.debug("\nIPFS Pubsub.DisableSigning set:\n" + XString.prettyPrint(res) + "\n");
     }
 
     public void doSwarmConnect() {
@@ -278,39 +250,6 @@ public class IPFSService {
             }
             return instanceId;
         }
-    }
-
-    public String pubSubTest() {
-        log.debug("IPFS pubsub test.");
-        setPubSubOptions();
-        doSwarmConnect();
-        Util.sleep(3000);
-
-        // log.debug("Checking swarmPeers");
-        // swarmPeers();
-
-        asyncExec.run(ThreadLocals.getContext(), () -> {
-            log.debug("Subscribing");
-
-            // we do some reads every few seconds so we should pick up several heartbeats
-            // if there are any being sent from other servers
-            for (int x = 0; x < 6; x++) {
-                sub("ipsm-heartbeat");
-                Util.sleep(10000);
-            }
-            log.debug("Subscribe complete.");
-        });
-
-        // asyncExec.run(ThreadLocals.getContext(), () -> {
-        // Util.sleep(3000);
-        // log.debug("Publishing");
-        // for (int i = 0; i < 20; i++) {
-        // pub("claystopic", "message-" + String.valueOf(i));
-        // Util.sleep(1000);
-        // }
-        // log.debug("Publish complete.");
-        // });
-        return "PubSub Test started.";
     }
 
     public void ipfsAsyncPinNode(MongoSession ms, ObjectId nodeId) {
@@ -664,48 +603,6 @@ public class IPFSService {
         return ret;
     }
 
-    public void sub(String topic) {
-        String url = API_PUBSUB + "/sub?arg=" + topic;
-        try {
-            HttpURLConnection conn = configureConnection(new URL(url), "POST");
-            InputStream is = conn.getInputStream();
-            getObjectStream(is);
-        } catch (Exception e) {
-            log.error("Failed to read:", e);
-        }
-    }
-
-    HttpURLConnection configureConnection(URL target, String method) throws IOException {
-        HttpURLConnection conn = (HttpURLConnection) target.openConnection();
-        conn.setRequestMethod(method);
-        // conn.setRequestProperty("Content-Type", "application/json");
-        conn.setConnectTimeout(30000);
-        conn.setReadTimeout(30000);
-        return conn;
-    }
-
-    private void getObjectStream(InputStream in) throws IOException {
-        byte LINE_FEED = (byte) 10;
-        ByteArrayOutputStream resp = new ByteArrayOutputStream();
-        byte[] buf = new byte[4096];
-        int r;
-
-        while ((r = in.read(buf)) >= 0) {
-            resp.write(buf, 0, r);
-            if (buf[r - 1] == LINE_FEED) {
-                log.debug("LINE: " + new String(resp.toByteArray()));
-                Map<String, Object> msg = mapper.readValue(resp.toByteArray(), new TypeReference<Map<String, Object>>() {});
-                String data = (String) msg.get("data");
-                String seqno = (String) msg.get("seqno");
-                String from = (String) msg.get("from");
-                log.debug("MSG: " + (new String(Base64.getDecoder().decode(data))) + "\n" + //
-                        "    SEQ: " + seqno + "\n" + //
-                        "    FROM: " + from);
-                resp = new ByteArrayOutputStream();
-            }
-        }
-    }
-
     public Map<String, Object> swarmConnect(String peer) {
         Map<String, Object> ret = null;
         try {
@@ -738,25 +635,6 @@ public class IPFSService {
             ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.POST, requestEntity, String.class);
             ret = mapper.readValue(response.getBody(), new TypeReference<Map<String, Object>>() {});
             log.debug("IPFS swarm peers: " + XString.prettyPrint(ret));
-        } catch (Exception e) {
-            log.error("Failed in restTemplate.exchange", e);
-        }
-        return ret;
-    }
-
-    // PubSub publish
-    public Map<String, Object> pub(String topic, String message) {
-        Map<String, Object> ret = null;
-        try {
-            String url = API_PUBSUB + "/pub?arg=" + topic + "&arg=" + message;
-
-            HttpHeaders headers = new HttpHeaders();
-            MultiValueMap<String, Object> bodyMap = new LinkedMultiValueMap<>();
-            HttpEntity<MultiValueMap<String, Object>> requestEntity = new HttpEntity<>(bodyMap, headers);
-
-            ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.POST, requestEntity, String.class);
-            // ret = mapper.readValue(response.getBody(), new TypeReference<Map<String, Object>>() {});
-            log.debug("IPFS pub to [resp code=" + response.getStatusCode() + "] " + topic);
         } catch (Exception e) {
             log.error("Failed in restTemplate.exchange", e);
         }

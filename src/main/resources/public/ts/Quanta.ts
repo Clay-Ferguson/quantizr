@@ -19,6 +19,7 @@ import { Singletons } from "./Singletons";
 import { FeedView } from "./tabs/FeedView";
 import { FollowersResultSetView } from "./tabs/FollowersResultSetView";
 import { FollowingResultSetView } from "./tabs/FollowingResultSetView";
+import { IPSMView } from "./tabs/IPSMView";
 import { MainTabComp } from "./tabs/MainTabComp";
 import { SearchResultSetView } from "./tabs/SearchResultSetView";
 import { ServerInfoView } from "./tabs/ServerInfoView";
@@ -695,6 +696,21 @@ export class Quanta implements QuantaIntf {
 
                         feedResults: null, // NodeInfo[];
                         feedEndReached: false
+                    }
+                },
+                {
+                    name: "IPSM Console",
+                    id: C.TAB_IPSM,
+                    isVisible: () => {
+                        let state: AppState = store.getState();
+                        return state.ipsmActive;
+                    },
+                    constructView: (data: TabDataIntf) => new IPSMView(s, data),
+                    rsInfo: null,
+                    scrollPos: 0,
+                    // need typesafe props (todo-1)
+                    props: {
+                        events: null // for now string[]
                     }
                 },
                 {

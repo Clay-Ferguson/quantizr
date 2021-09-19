@@ -1,5 +1,5 @@
 import { useSelector } from "react-redux";
-import { appState, store } from "./AppRedux";
+import { appState, dispatch, store } from "./AppRedux";
 import { AppState } from "./AppState";
 import { Constants as C } from "./Constants";
 import { AddFriendDlg } from "./dlg/AddFriendDlg";
@@ -20,7 +20,6 @@ import { TypeHandlerIntf } from "./intf/TypeHandlerIntf";
 import * as J from "./JavaIntf";
 import { PubSub } from "./PubSub";
 import { Singletons } from "./Singletons";
-import { FeedView } from "./tabs/FeedView";
 import { Div } from "./widget/Div";
 import { Icon } from "./widget/Icon";
 import { Menu } from "./widget/Menu";
@@ -107,6 +106,15 @@ export class MenuPanel extends Div {
     static showUrls = () => S.render.showNodeUrl(null, appState(null));
     static showRawData = () => S.view.runServerCommand("getJson", "Node JSON Data", "The actual data stored on the server for this node...", appState(null));
     static nodeStats = () => S.view.getNodeStats(appState(null), false, false);
+    static setIpsmActive = () => {
+        dispatch("Action_startEditingInFeed", (s: AppState): AppState => {
+            s.ipsmActive = true;
+            setTimeout(() => {
+                S.quanta.selectTab(C.TAB_IPSM);
+            }, 250);
+            return s;
+        });
+    };
 
     static messagesToFromMe = () => {
         let feedData = S.quanta.getTabDataById(null, C.TAB_FEED);
@@ -425,7 +433,8 @@ export class MenuPanel extends Div {
              the code in place for future reference. */
             new MenuItem("Mouse Effects", MenuPanel.mouseEffects, !state.isAnonUser && !state.mobileMode, () => state.mouseEffect),
 
-            new MenuItem("My GEO Location", S.nav.geoLocation)
+            new MenuItem("My GEO Location", S.nav.geoLocation), //
+            new MenuItem("Open IPSM Console", MenuPanel.setIpsmActive, !state.isAnonUser) //
         ]));
 
         children.push(new Menu("Node Info", [

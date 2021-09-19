@@ -10,6 +10,7 @@ import org.springframework.stereotype.Component;
 import org.subnode.AppController;
 import org.subnode.exception.base.RuntimeEx;
 import org.subnode.mongo.MongoRepository;
+import org.subnode.service.IPFSPubSub;
 import org.subnode.util.EnglishDictionary;
 
 /**
@@ -33,6 +34,9 @@ public class SpringContextUtil implements ApplicationContextAware {
 	@Autowired
 	private TestRunner testRunner;
 
+	@Autowired
+	private IPFSPubSub pubSub;
+
 	/* main() entrypoint */
 	@Override
 	public void setApplicationContext(ApplicationContext context) throws BeansException {
@@ -43,6 +47,7 @@ public class SpringContextUtil implements ApplicationContextAware {
 			mongoRepo.init();
 			appController.init();
 			englishDictionary.init();
+			pubSub.init();
 		}
 		catch (Exception e) {
 			log.error("application startup failed.");

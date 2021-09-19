@@ -565,6 +565,10 @@ export interface GraphResponse extends ResponseBase {
     rootNode: GraphNode;
 }
 
+export interface IPSMPushInfo extends ServerPushInfo {
+    payload: string;
+}
+
 export interface ImportResponse extends ResponseBase {
 }
 
