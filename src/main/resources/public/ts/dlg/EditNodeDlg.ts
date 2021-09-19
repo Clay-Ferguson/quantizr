@@ -786,7 +786,8 @@ export class EditNodeDlg extends DialogBase {
         });
 
         // Ensure the have the panel expanded so we can see the new date.
-        EditNodeDlg.morePanelExpanded = true;
+        // nope, i decided I don't like this auto-expanding.
+        // EditNodeDlg.morePanelExpanded = true;
         this.mergeState({ state });
     }
 

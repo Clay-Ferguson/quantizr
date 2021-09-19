@@ -1747,6 +1747,7 @@ i'm backing out for now
 .userFeedItem {
     padding-top: 5px;
     border-top: 2px solid $nodeBorderBottomColor;
+    padding-bottom: $smallGap;
 }
 
 .userFeedParent {
