@@ -137,3 +137,10 @@
     <!-- version not needed, since it comes from springboot -->
 </dependency>
 
+<!-- https://mvnrepository.com/artifact/com.fasterxml/jackson-module-json-org -->
+<dependency>
+    <groupId>com.fasterxml</groupId>
+    <artifactId>jackson-module-json-org</artifactId>
+    <version>0.9.1</version> 
+</dependency>
+
