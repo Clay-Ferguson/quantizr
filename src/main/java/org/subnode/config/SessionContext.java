@@ -124,10 +124,19 @@ public class SessionContext {
 		}
 	}
 
+	/* Extra layer of security to invalidate this session object */
+	public void forceAnonymous() {
+		userToken = null;
+		userName = PrincipalName.ANON.s();
+		rootId = null;
+		userNodeId = null;
+		timelinePath = null;
+		watchingPath = null;
+	}
+
 	/* Creates a new instance that inherits all the values that could be used by a different thread */
 	public SessionContext cloneForThread() {
 		SessionContext sc = (SessionContext) SpringContextUtil.getBean(SessionContext.class);
-
 		sc.live = live;
 		sc.rootId = rootId;
 		sc.timelinePath = timelinePath;
@@ -150,7 +159,6 @@ public class SessionContext {
 		sc.feedMaxTime = feedMaxTime;
 		sc.userToken = userToken;
 		sc.watchingPath = watchingPath;
-
 		return sc;
 	}
 

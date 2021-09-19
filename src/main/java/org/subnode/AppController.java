@@ -575,6 +575,7 @@ public class AppController implements ErrorController {
 	@RequestMapping(value = API_PATH + "/logout", method = RequestMethod.POST)
 	public @ResponseBody Object logout(@RequestBody LogoutRequest req, HttpSession session) {
 		return callProc.run("logout", req, session, ms -> {
+			ThreadLocals.getSC().forceAnonymous();
 			// WARNING: ms will be null here always. Don't use.
 			session.invalidate();
 			LogoutResponse res = new LogoutResponse();
