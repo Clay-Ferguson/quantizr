@@ -210,7 +210,7 @@ public class IPFSPubSub {
         for (SessionContext sc : SessionContext.getAllSessions()) {
 
             // only consider sessions that have viewed their IPSM tab
-            if (!sc.isEnableIPSM()) {
+            if (!sc.isEnableIPSM() || sc.isAnonUser() || !sc.isLive()) {
                 continue;
             }
 

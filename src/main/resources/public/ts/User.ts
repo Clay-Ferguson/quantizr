@@ -187,6 +187,7 @@ export class User implements UserIntf {
                 this.checkMessages();
                 setTimeout(() => {
                     S.quanta.loadBookmarks();
+                    S.push.init();
                 }, 1000);
             }
 

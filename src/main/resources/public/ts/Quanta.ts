@@ -566,10 +566,6 @@ export class Quanta implements QuantaIntf {
             S.util.initProgressMonitor();
             this.processUrlParams(null);
             this.setOverlay(false);
-
-            // Initialize the 'ServerPush' client-side connection
-            S.push.init();
-
             this.playAudioIfRequested();
 
             await S.util.ajax<J.GetConfigRequest, J.GetConfigResponse>("getConfig", {

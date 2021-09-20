@@ -147,7 +147,7 @@ public class PushService {
 				return;
 
 			synchronized (pushEmitter) {
-				// log.debug("Pushing to Session User: " + sc.getUserName() + " " + XString.prettyPrint(info));
+				log.debug("Pushing to User: " + sc.getUserName());
 				try {
 					SseEventBuilder event = SseEmitter.event() //
 							.data(info) //
@@ -164,7 +164,9 @@ public class PushService {
 					 * 
 					 * pushEmitter.send(info, MediaType.APPLICATION_JSON);
 					 */
+					log.debug("Pushed ok");
 				} catch (Exception ex) {
+					log.error("FAILED Pushing to Session User: " + sc.getUserName());
 					pushEmitter.completeWithError(ex);
 				} finally {
 					// todo-1: this can be done in a slightly cleaner way (more decoupled)
@@ -173,7 +175,9 @@ public class PushService {
 						sc.setLive(false);
 						sc.setRootId(null);
 						sc.setUserName(null);
-						sc.setPushEmitter(null);
+
+						// todo-0: do we want this or not???
+						// sc.setPushEmitter(null);
 					}
 				}
 			}
