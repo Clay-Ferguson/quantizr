@@ -614,6 +614,10 @@ public class ActPubService {
 
             Object object = AP.obj(payload, APProp.object);
             String type = AP.str(object, APProp.type);
+            if (type == null) {
+                log.error("No delete type specified in delete request: " + XString.prettyPrint(payload));
+                return null;
+            }
             apUtil.log("delete type: " + type);
 
             switch (type) {
