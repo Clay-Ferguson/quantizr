@@ -55,6 +55,14 @@ export class View implements ViewIntf {
         }
 
         // console.log("refreshTree: nodeId=" + nodeId);
+
+        /* named nodes aren't persisting in url without this and i may decide to just get rid
+         of 'renderParentIfLeaf' (todo-0) but for now i'm just fixing the case when we are 
+         rendering a named node. */
+        if (nodeId.indexOf(":") !== -1) {
+            renderParentIfLeaf = false;
+        }
+
         S.util.ajax<J.RenderNodeRequest, J.RenderNodeResponse>("renderNode", {
             nodeId,
             upLevel: false,
@@ -115,7 +123,7 @@ export class View implements ViewIntf {
 
     /* Note: if growingPage==true we preserve the existing row data, and append more rows onto the current view */
     private loadPage = (goToLastPage: boolean, offset: number, growingPage: boolean, state: AppState): void => {
-        // console.log("loadPage nodeId=" + state.node.id);
+        console.log("loadPage nodeId=" + state.node.id);
         S.util.ajax<J.RenderNodeRequest, J.RenderNodeResponse>("renderNode", {
             nodeId: state.node.id,
             upLevel: false,

@@ -351,6 +351,7 @@ export class Edit implements EditIntf {
     }
 
     refreshNodeFromServer = (nodeId: string): void => {
+        // console.log("refreshNodeFromServer");
         S.util.ajax<J.RenderNodeRequest, J.RenderNodeResponse>("renderNode", {
             nodeId,
             upLevel: false,
