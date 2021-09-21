@@ -57,7 +57,7 @@ export class View implements ViewIntf {
         // console.log("refreshTree: nodeId=" + nodeId);
 
         /* named nodes aren't persisting in url without this and i may decide to just get rid
-         of 'renderParentIfLeaf' (todo-0) but for now i'm just fixing the case when we are 
+         of 'renderParentIfLeaf' (todo-0) but for now i'm just fixing the case when we are
          rendering a named node. */
         if (nodeId.indexOf(":") !== -1) {
             renderParentIfLeaf = false;

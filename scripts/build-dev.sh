@@ -42,4 +42,12 @@ dockerCheck quanta-dev
 dockerCheck mongo-dev
 dockerCheck ipfs-dev
 
+# configure ipfs 
+# todo-1: need to find out if there's a way to pass config parameters into the ipfs docker file or not, because that
+# would be much cleaner than setting these parameters and then doing a restart
+ipfsConfig ipfs-dev
+
+# check ipfs again
+dockerCheck ipfs-dev
+
 # read -p "Build and Start Complete. press a key"

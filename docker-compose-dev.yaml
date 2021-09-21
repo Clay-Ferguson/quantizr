@@ -69,6 +69,7 @@ services:
             IPFS_PATH: "/data/ipfs"
         expose:
             - '4001'
+            - '5001'
         # WARNING: volumes will not handle '~' character for home folder. Do not use.
         volumes:
             - '${ipfs_staging}:/export'
@@ -76,6 +77,7 @@ services:
         ports:
             - "4001:4001"
             - "4001:4001/udp"
+            - "5001:5001"
         networks:
             - net-dev
         # We could have this actual image if we weren't building from a custom dockerfile
