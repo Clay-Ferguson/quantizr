@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.subnode.exception.base.RuntimeEx;
 import org.subnode.model.client.NodeProp;
+import org.subnode.mongo.AdminRun;
 import org.subnode.mongo.MongoAuth;
 import org.subnode.mongo.MongoCreate;
 import org.subnode.mongo.MongoDelete;
@@ -54,6 +55,9 @@ public class NodeMoveService {
 
 	@Autowired
 	private MongoAuth auth;
+
+	@Autowired
+	private AdminRun arun;
 
 	@Autowired
 	private UserManagerService userManagerService;
@@ -298,22 +302,29 @@ public class NodeMoveService {
 			auth.ownerAuth(session, node);
 			SubNode nodeParent = read.getParent(session, node);
 
-			/*
-			 * If this 'node' will be changing parents (moving to new parent) we need to update its subgraph, of
-			 * all children and also update its own path, otherwise it's staying under same parent and only it's
-			 * ordinal will change.
-			 */
-			if (nodeParent.getId().compareTo(parentToPasteInto.getId()) != 0) {
-				changePathOfSubGraph(session, node, parentPath);
-				node.setPath(parentPath + "/" + node.getLastPathPart());
-			}
+			Long _targetOrdinal = curTargetOrdinal;
+			arun.run(ms -> {
+				/*
+				 * If this 'node' will be changing parents (moving to new parent) we need to update its subgraph, of
+				 * all children and also update its own path, otherwise it's staying under same parent and only it's
+				 * ordinal will change.
+				 */
+				if (nodeParent.getId().compareTo(parentToPasteInto.getId()) != 0) {
+					changePathOfSubGraph(ms, node, parentPath);
+					node.setPath(parentPath + "/" + node.getLastPathPart());
+				}
 
-			node.setOrdinal(curTargetOrdinal);
-			node.setDisableParentCheck(true);
-
+				node.setOrdinal(_targetOrdinal);
+				node.setDisableParentCheck(true);
+				return null;
+			});
 			curTargetOrdinal++;
 		}
-		update.saveSession(session);
+
+		arun.run(ms -> {
+			update.saveSession(ms);
+			return null;
+		});
 	}
 
 	private void changePathOfSubGraph(MongoSession session, SubNode graphRoot, String newPathPrefix) {
