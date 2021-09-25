@@ -7,6 +7,18 @@ export interface Bookmark {
     selfId: string;
 }
 
+export interface IPSMData {
+    mime: string;
+    data: string;
+}
+
+export interface IPSMMessage {
+    from: string;
+    sig: string;
+    content: IPSMData[];
+    ts: number;
+}
+
 export interface NodeMetaIntf {
     id: string;
     hasChildren: boolean;

@@ -17,8 +17,12 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.client.ClientHttpRequestFactory;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 
 public class Util {
 	private static final Logger log = LoggerFactory.getLogger(Util.class);
@@ -32,8 +36,10 @@ public class Util {
 		}
 	}
 
-	/* Generates a very strong unguessable token. We could also use JWT here, but for our architecture
-	the only requirement is unique and unguessable. */
+	/*
+	 * Generates a very strong unguessable token. We could also use JWT here, but for our architecture
+	 * the only requirement is unique and unguessable.
+	 */
 	public static String genStrongToken() {
 		// Warning: SimpleDateFormat is not threadsafe. Always create here.
 		SimpleDateFormat dateFormat = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss z", Locale.US);
@@ -95,6 +101,13 @@ public class Util {
 		clientHttpRequestFactory.setConnectTimeout(timeout);
 		clientHttpRequestFactory.setReadTimeout(timeout);
 		return clientHttpRequestFactory;
+	}
+
+	public static HttpEntity<MultiValueMap<String, Object>> getBasicRequestEntity() {
+		HttpHeaders headers = new HttpHeaders();
+		MultiValueMap<String, Object> bodyMap = new LinkedMultiValueMap<>();
+		HttpEntity<MultiValueMap<String, Object>> requestEntity = new HttpEntity<>(bodyMap, headers);
+		return requestEntity;
 	}
 
 	// //other example from Baeldung

@@ -106,8 +106,11 @@ export class MenuPanel extends Div {
     static showUrls = () => S.render.showNodeUrl(null, appState(null));
     static showRawData = () => S.view.runServerCommand("getJson", "Node JSON Data", "The actual data stored on the server for this node...", appState(null));
     static nodeStats = () => S.view.getNodeStats(appState(null), false, false);
+
+    // DO NOT DELETE
+    // Experimental IPSM Console will be repurposed as a live log window of server events for the Admin user.
     static setIpsmActive = () => {
-        dispatch("Action_startEditingInFeed", (s: AppState): AppState => {
+        dispatch("Action_enableIpsm", (s: AppState): AppState => {
             s.ipsmActive = true;
             setTimeout(() => {
                 S.quanta.selectTab(C.TAB_IPSM);
@@ -437,8 +440,10 @@ export class MenuPanel extends Div {
              the code in place for future reference. */
             new MenuItem("Mouse Effects", MenuPanel.mouseEffects, !state.isAnonUser && !state.mobileMode, () => state.mouseEffect),
 
-            new MenuItem("My GEO Location", S.nav.geoLocation), //
-            new MenuItem("Open IPSM Console", MenuPanel.setIpsmActive, !state.isAnonUser) //
+            new MenuItem("My GEO Location", S.nav.geoLocation) //
+
+            // DO NOT DELETE
+            // new MenuItem("Open IPSM Console", MenuPanel.setIpsmActive, !state.isAnonUser) //
         ]));
 
         children.push(new Menu("Node Info", [

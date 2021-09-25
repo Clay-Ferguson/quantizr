@@ -30,6 +30,7 @@ public class XString {
 		jsonMapper.setSerializationInclusion(Include.NON_NULL);
 	}
 	private static ObjectWriter jsonPrettyWriter = jsonMapper.writerWithDefaultPrettyPrinter();
+	private static ObjectWriter jsonCompactWriter = jsonMapper.writer();
 
 	public static String prettyPrint(Object obj) {
 		if (obj == null)
@@ -40,6 +41,20 @@ public class XString {
 
 		try {
 			return jsonPrettyWriter.writeValueAsString(obj);
+		} catch (JsonProcessingException e) {
+			return "";
+		}
+	}
+
+	public static String compactPrint(Object obj) {
+		if (obj == null)
+			return "null";
+		if (obj instanceof String) {
+			return (String) obj;
+		}
+
+		try {
+			return jsonCompactWriter.writeValueAsString(obj);
 		} catch (JsonProcessingException e) {
 			return "";
 		}

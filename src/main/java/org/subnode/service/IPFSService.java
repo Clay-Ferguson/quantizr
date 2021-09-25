@@ -192,9 +192,6 @@ public class IPFSService {
         StringBuilder sb = new StringBuilder();
         LinkedHashMap<String, Object> res = null;
 
-        String topic = "claystopic";
-        // pub(topic, "message" + String.valueOf(System.currentTimeMillis()));
-
         res = Cast.toLinkedHashMap(postForJsonReply(API_REPO + "/stat?human=true", LinkedHashMap.class));
         sb.append("\nIPFS Repository Status:\n" + XString.prettyPrint(res) + "\n");
 
@@ -204,11 +201,11 @@ public class IPFSService {
         res = Cast.toLinkedHashMap(postForJsonReply(API_ID, LinkedHashMap.class));
         sb.append("\nIPFS Instance ID:\n" + XString.prettyPrint(res) + "\n");
 
-        res = Cast.toLinkedHashMap(postForJsonReply(API_PUBSUB + "/peers?arg=" + topic, LinkedHashMap.class));
-        sb.append("\nIPFS Peers for topic:\n" + XString.prettyPrint(res) + "\n");
+        // res = Cast.toLinkedHashMap(postForJsonReply(API_PUBSUB + "/peers?arg=" + topic, LinkedHashMap.class));
+        // sb.append("\nIPFS Peers for topic:\n" + XString.prettyPrint(res) + "\n");
 
-        res = Cast.toLinkedHashMap(postForJsonReply(API_PUBSUB + "/ls", LinkedHashMap.class));
-        sb.append("\nIPFS Topics List:\n" + XString.prettyPrint(res) + "\n");
+        // res = Cast.toLinkedHashMap(postForJsonReply(API_PUBSUB + "/ls", LinkedHashMap.class));
+        // sb.append("\nIPFS Topics List:\n" + XString.prettyPrint(res) + "\n");
 
         return sb.toString();
     }
@@ -312,10 +309,11 @@ public class IPFSService {
         String ret = null;
         try {
             String url = API_CAT + "?arg=" + hash;
-            ResponseEntity<byte[]> result = restTemplate.getForEntity(new URI(url), byte[].class);
-            ret = new String(result.getBody(), "UTF-8");
+            ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.POST, Util.getBasicRequestEntity(), String.class);
+            ret = response.getBody();
+            // log.debug("IPFS post cat. Ret " + response.getStatusCode() + "] " + ret);
         } catch (Exception e) {
-            // log.error("Failed in restTemplate.getForEntity", e);
+            log.error("Failed to cat: " + hash, e);
         }
         return ret;
     }

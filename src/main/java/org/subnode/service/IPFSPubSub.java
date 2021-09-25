@@ -1,6 +1,5 @@
 package org.subnode.service;
 
-
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -26,7 +25,10 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 import org.subnode.AppServer;
 import org.subnode.config.SessionContext;
+import org.subnode.model.client.IPSMData;
+import org.subnode.model.client.IPSMMessage;
 import org.subnode.response.IPSMPushInfo;
+import org.subnode.response.ServerPushInfo;
 import org.subnode.util.AsyncExec;
 import org.subnode.util.Cast;
 import org.subnode.util.DateUtil;
@@ -48,6 +50,10 @@ public class IPFSPubSub {
     @Autowired
     private IPFSService ipfs;
 
+    private static final boolean IPSM_ENABLE = false;
+    private static final String IPSM_TOPIC_HEARTBEAT = "ipsm-heartbeat";
+    private static final String IPSM_TOPIC_TEST = "/ipsm/test";
+
     private static final RestTemplate restTemplate = new RestTemplate(Util.getClientHttpRequestFactory());
     private static final ObjectMapper mapper = new ObjectMapper();
 
@@ -61,6 +67,7 @@ public class IPFSPubSub {
         LinkedHashMap<String, Object> res = null;
 
         // Pubsub.Router="floodsub" | "gossipsub"
+        // todo-0: can add this to the startup bash scripts along with the CORS configs.
         res = Cast.toLinkedHashMap(
                 ipfs.postForJsonReply(IPFSService.API_CONFIG + "?arg=Pubsub.Router&arg=gossipsub", LinkedHashMap.class));
         log.debug("\nIPFS Pubsub.Router set:\n" + XString.prettyPrint(res) + "\n");
@@ -70,38 +77,49 @@ public class IPFSPubSub {
         log.debug("\nIPFS Pubsub.DisableSigning set:\n" + XString.prettyPrint(res) + "\n");
     }
 
+    // DO NOT DELETE (IPSM)
     // send out a heartbeat from this server every few seconds for testing purposes
-    @Scheduled(fixedDelay = 10 * DateUtil.SECOND_MILLIS)
-    public void ipsmHeartbeat() {
-        // ensure instanceId loaded
-        ipfs.getInstanceId();
-        pub("ipsm-heartbeat", (String) ipfs.instanceId.get("ID") + "-ipsm-" + String.valueOf(heartbeatCounter++) + "\n");
-    }
+    // @Scheduled(fixedDelay = 10 * DateUtil.SECOND_MILLIS)
+    // public void ipsmHeartbeat() {
+    // if (IPSM_ENABLE) {
+    // // ensure instanceId loaded
+    // ipfs.getInstanceId();
+    // pub(IPSM_TOPIC_HEARTBEAT, (String) ipfs.instanceId.get("ID") + "-ipsm-" +
+    // String.valueOf(heartbeatCounter++) + "\n");
+    // }}
 
     public void init() {
         // log.debug("Checking swarmPeers");
         // swarmPeers();
 
-        log.debug("pubSubInit");
-        asyncExec.run(null, () -> {
-            setOptions();
+        if (IPSM_ENABLE) {
+            asyncExec.run(null, () -> {
+                setOptions();
 
-            // todo-0: this can throw errors when self-dialing, or whatever. not stopping things from working
-            // afaik.
-            // but I need to look into swarm peers more.
-            ipfs.doSwarmConnect();
-            Util.sleep(3000);
-
-            log.debug("Subscribing");
-
-            // we do some reads every few seconds so we should pick up several heartbeats
-            // if there are any being sent from other servers
-            while (!AppServer.isShuttingDown()) {
-                sub("ipsm-heartbeat");
+                // todo-0: this can throw errors when self-dialing, or whatever. not stopping things from working
+                // afaik.
+                // but I need to look into swarm peers more.
+                ipfs.doSwarmConnect();
                 Util.sleep(3000);
-            }
-            log.debug("Subscribe thread terminating");
-        });
+                openChannel(IPSM_TOPIC_HEARTBEAT);
+                openChannel(IPSM_TOPIC_TEST);
+            });
+        }
+    }
+
+    public void openChannel(String topic) {
+        if (IPSM_ENABLE) {
+            asyncExec.run(null, () -> {
+                log.debug("openChannel: " + topic);
+                // we do some reads every few seconds so we should pick up several heartbeats
+                // if there are any being sent from other servers
+                while (!AppServer.isShuttingDown()) {
+                    sub(topic);
+                    Util.sleep(1000);
+                }
+                log.debug("channel sub thread terminating: " + topic);
+            });
+        }
     }
 
     // PubSub publish
@@ -130,7 +148,7 @@ public class IPFSPubSub {
             InputStream is = conn.getInputStream();
             getObjectStream(is);
         } catch (Exception e) {
-            log.error("Failed to read:", e);
+            log.error("Failed to read: " + topic); // , e);
         }
     }
 
@@ -176,11 +194,9 @@ public class IPFSPubSub {
             return;
 
         String data = (String) msg.get("data");
-        String seqno = (String) msg.get("seqno");
+        // String seqno = (String) msg.get("seqno");
         String payload = (new String(Base64.getDecoder().decode(data)));
-        log.debug("MSG: " + payload + "\n" + //
-                "    SEQ: " + seqno + "\n" + //
-                "    FROM: " + from);
+        log.debug("PAYLOAD: " + payload);
         processInboundPayload(payload);
     }
 
@@ -207,6 +223,19 @@ public class IPFSPubSub {
         if (payload == null)
             return;
 
+        ServerPushInfo pushInfo = null;
+        payload = payload.trim();
+        if (payload.startsWith("{") && payload.endsWith("}")) {
+            IPSMMessage msg = parseIpsmPayload(payload);
+            if (msg == null)
+                return;
+
+            String message = getMessageText(msg);
+            pushInfo = new IPSMPushInfo(message);
+        } else {
+            pushInfo = new IPSMPushInfo(payload);
+        }
+
         for (SessionContext sc : SessionContext.getAllSessions()) {
 
             // only consider sessions that have viewed their IPSM tab
@@ -215,12 +244,43 @@ public class IPFSPubSub {
             }
 
             log.debug("Pushing to session: sc.user: " + sc.getUserName() + " " + payload);
-
-            // todo-0: need a way to ONLY send to clients who have at least once visited their IPSM tab.
-            // or even queue these up per browser to send only once every 5 seconds or so, max
-            // for now we just bombard client.
-            IPSMPushInfo pushInfo = new IPSMPushInfo(payload);
             push.sendServerPushInfo(sc, pushInfo);
         }
+    }
+
+    private String getMessageText(IPSMMessage msg) {
+        if (msg == null || msg.getContent() == null)
+            return null;
+        StringBuilder sb = new StringBuilder();
+        for (IPSMData data : msg.getContent()) {
+            String text = ipfs.catToString(data.getData());
+            sb.append(text);
+        }
+        return sb.toString();
+    }
+
+    private IPSMMessage parseIpsmPayload(String payload) {
+        try {
+            IPSMMessage msg = mapper.readValue(payload, IPSMMessage.class);
+            if (verifySignature(msg)) {
+                log.debug("Signature Failed.");
+                return null;
+            }
+            if (msg != null) {
+                log.debug("JSON: " + XString.prettyPrint(msg));
+            }
+            return msg;
+        } catch (Exception e) {
+            log.error("JSON Parse failed: " + payload);
+            return null;
+        }
+    }
+
+    // https://www.npmjs.com/package/node-rsa
+    // Default signature scheme: 'pkcs1-sha256'
+    public boolean verifySignature(IPSMMessage msg) {
+        String strDat = String.valueOf(msg.getTs()) + XString.compactPrint(msg.getContent());
+        // log.debug("strDat=" + strDat);
+        return true;
     }
 }

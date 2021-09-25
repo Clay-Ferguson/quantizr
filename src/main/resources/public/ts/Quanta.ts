@@ -694,21 +694,23 @@ export class Quanta implements QuantaIntf {
                         feedEndReached: false
                     }
                 },
-                {
-                    name: "IPSM Console",
-                    id: C.TAB_IPSM,
-                    isVisible: () => {
-                        let state: AppState = store.getState();
-                        return state.ipsmActive;
-                    },
-                    constructView: (data: TabDataIntf) => new IPSMView(s, data),
-                    rsInfo: null,
-                    scrollPos: 0,
-                    // need typesafe props (todo-1)
-                    props: {
-                        events: null // for now string[]
-                    }
-                },
+                // DO NOT DELETE
+                // The IPSMView will be repurposed as a server event log viewer
+                // {
+                //     name: "IPSM Console",
+                //     id: C.TAB_IPSM,
+                //     isVisible: () => {
+                //         let state: AppState = store.getState();
+                //         return state.ipsmActive;
+                //     },
+                //     constructView: (data: TabDataIntf) => new IPSMView(s, data),
+                //     rsInfo: null,
+                //     scrollPos: 0,
+                //     // need typesafe props (todo-1)
+                //     props: {
+                //         events: null // for now string[]
+                //     }
+                // },
                 {
                     name: "Trending",
                     id: C.TAB_TRENDING,
