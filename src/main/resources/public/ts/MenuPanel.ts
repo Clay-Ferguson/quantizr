@@ -370,7 +370,7 @@ export class MenuPanel extends Div {
         let typeHandlers = S.plugin.getAllTypeHandlers();
         typeHandlers.forEach((typeHandler: TypeHandlerIntf, k: string): boolean => {
             if (state.isAdminUser || typeHandler.getAllowUserSelect()) {
-                createMenuItems.push(new MenuItem(typeHandler.getName(), () => S.edit.createNode(hltNode, typeHandler.getTypeName(), true, null, null, state), //
+                createMenuItems.push(new MenuItem(typeHandler.getName(), () => S.edit.createNode(hltNode, typeHandler.getTypeName(), true, true, null, null, state), //
                     !state.isAnonUser && !!hltNode));
             }
             return true;

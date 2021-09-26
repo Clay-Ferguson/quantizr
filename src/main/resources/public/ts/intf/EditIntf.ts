@@ -16,7 +16,7 @@ export interface EditIntf {
     isInsertAllowed(node: any, state: AppState): boolean;
     startEditingNewNode(typeName: string, createAtTop: boolean, parentNode: J.NodeInfo, nodeInsertTarget: J.NodeInfo, ordinalOffset: number, state: AppState): void;
     insertNodeResponse(res: J.InsertNodeResponse, state: AppState): void;
-    createSubNodeResponse(res: J.CreateSubNodeResponse, replyToId: string, state: AppState): void;
+    createSubNodeResponse(res: J.CreateSubNodeResponse, forceUsePopup: boolean, replyToId: string, state: AppState): void;
     saveNodeResponse(node: J.NodeInfo, res: J.SaveNodeResponse, allowScroll: boolean, state: AppState): void;
     toggleEditMode(state: AppState): void;
     setRssHeadlinesOnly(state: AppState, val: boolean): Promise<void>;
@@ -28,7 +28,7 @@ export interface EditIntf {
     getFirstChildNode(state: AppState): any;
     getLastChildNode(state: AppState): any;
     runEditNodeByClick(evt: Event, id: string, state?: AppState): void;
-    runEditNode(evt: Event, id: string, encrypt: boolean, showJumpButton: boolean, replyToId: string, state?: AppState): void;
+    runEditNode(evt: Event, id: string, forceUsePopup: boolean, encrypt: boolean, showJumpButton: boolean, replyToId: string, state?: AppState): void;
     insertNode(id: string, typeName: string, ordinalOffset: number, state?: AppState): void;
     toolbarInsertNode(evt: Event, id: string): void;
     createSubNode(id: any, typeName: string, createAtTop: boolean, parentNode: J.NodeInfo, state: AppState): void;
@@ -44,10 +44,10 @@ export interface EditIntf {
     clearInbox(state: AppState): void;
     newSubNode(evt: Event, id: string);
     addNode(nodeId: string, content: string, shareToUserId: string, replyToId: string, state: AppState): void;
-    createNode(node: J.NodeInfo, typeName: string, pendingEdit: boolean, payloadType: string, content: string, state: AppState): void;
+    createNode(node: J.NodeInfo, typeName: string, forceUsePopup: boolean, pendingEdit: boolean, payloadType: string, content: string, state: AppState): void;
     addCalendarEntry(initDate: number, state: AppState): void;
     moveNodeByDrop(targetNodeId: string, sourceNodeId: string, isFirts: boolean): void;
-    initNodeEditResponse(res: J.InitNodeEditResponse, encrypt: boolean, showJumpButton: boolean, replyToId: string, state: AppState): void;
+    initNodeEditResponse(res: J.InitNodeEditResponse, forceUsePopup: boolean, encrypt: boolean, showJumpButton: boolean, replyToId: string, state: AppState): void;
     updateHeadings(state: AppState): void;
     addLinkBookmark(content: string, state: AppState): void;
     addBookmark(node: J.NodeInfo, state: AppState): void;

@@ -1010,7 +1010,7 @@ export class EditNodeDlg extends DialogBase {
             if ((state.node as J.NodeInfo).type === J.NodeType.BOOKMARK) {
                 setTimeout(() => {
                     S.quanta.loadBookmarks();
-                }, 1000);
+                }, 250);
             }
         });
     }

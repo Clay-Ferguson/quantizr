@@ -45,7 +45,9 @@ dockerCheck ipfs-dev
 # configure ipfs 
 # todo-1: need to find out if there's a way to pass config parameters into the ipfs docker file or not, because that
 # would be much cleaner than setting these parameters and then doing a restart
-ipfsConfig ipfs-dev
+# Disabling this for now. Only needed to enable HTTP API over port 5001, and also needs to be run just once instead
+# of every time we build.
+# ipfsConfig ipfs-dev
 
 # check ipfs again
 dockerCheck ipfs-dev

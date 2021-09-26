@@ -32,7 +32,7 @@ export class RssFeedsTypeHandler extends TypeBase {
     render(node: J.NodeInfo, rowStyling: boolean, isTreeView: boolean, state: AppState): Comp {
         return new Div(null, null, [
             new ButtonBar([
-                new Button("Add RSS Feed", () => S.edit.createNode(node, J.NodeType.RSS_FEED, false, null, null, state), {
+                new Button("Add RSS Feed", () => S.edit.createNode(node, J.NodeType.RSS_FEED, true, false, null, null, state), {
                     title: "Add a new RSS Feed Subscription"
                 })
             ], null, "float-right"),

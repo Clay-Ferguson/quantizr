@@ -74,7 +74,7 @@ export class Edit implements EditIntf {
         }
     }
 
-    public initNodeEditResponse = (res: J.InitNodeEditResponse, encrypt: boolean, showJumpButton: boolean, replyToId: string, state: AppState): void => {
+    public initNodeEditResponse = (res: J.InitNodeEditResponse, forceUsePopup: boolean, encrypt: boolean, showJumpButton: boolean, replyToId: string, state: AppState): void => {
         if (S.util.checkSuccess("Editing node", res)) {
             const node: J.NodeInfo = res.nodeInfo;
 
@@ -84,9 +84,18 @@ export class Edit implements EditIntf {
             if (editingAllowed) {
                 S.quanta.tempDisableAutoScroll();
 
+                // these conditions determine if we want to run editing in popup, instead of inline in the page.
+                let editInPopup = forceUsePopup || state.mobileMode ||
+                    // node not found on tree.
+                    (!S.quanta.getDisplayingNode(state, res.nodeInfo.id) &&
+                        !S.quanta.getDisplayingNode(state, S.quanta.newNodeTargetId)) ||
+                    // not currently viewing tree
+                    S.quanta.activeTab !== C.TAB_MAIN ||
+                    S.quanta.fullscreenViewerActive(state);
+
                 /* If we're editing on the feed tab, we set the 'state.editNode' which makes the gui know to render
                 the editor at that place rather than opening a popup now */
-                if (S.quanta.activeTab === C.TAB_FEED) {
+                if (!forceUsePopup && S.quanta.activeTab === C.TAB_FEED) {
                     dispatch("Action_startEditingInFeed", (s: AppState): AppState => {
                         s.editNodeReplyToId = replyToId;
                         s.editNodeOnTab = S.quanta.activeTab;
@@ -98,13 +107,7 @@ export class Edit implements EditIntf {
                 }
                 /* Either run the node editor as a popup or embedded, depending on whether we have a fullscreen
                 calendar up and wether we're on the main tab, etc */
-                else if (state.mobileMode ||
-                    // node not found on tree.
-                    (!S.quanta.getDisplayingNode(state, res.nodeInfo.id) &&
-                        !S.quanta.getDisplayingNode(state, S.quanta.newNodeTargetId)) ||
-                    // not currently viewing tree
-                    S.quanta.activeTab !== C.TAB_MAIN ||
-                    S.quanta.fullscreenViewerActive(state)) {
+                else if (editInPopup) {
                     const dlg = new EditNodeDlg(res.nodeInfo, encrypt, showJumpButton, state);
                     dlg.open();
                 } else {
@@ -269,7 +272,7 @@ export class Edit implements EditIntf {
                     properties: null,
                     shareToUserId: null
                 }, (res) => {
-                    this.createSubNodeResponse(res, null, state);
+                    this.createSubNodeResponse(res, false, null, state);
                 });
             }
         }
@@ -280,11 +283,11 @@ export class Edit implements EditIntf {
             S.quanta.tempDisableAutoScroll();
             S.quanta.updateNodeMap(res.newNode, state);
             S.quanta.highlightNode(res.newNode, false, state);
-            this.runEditNode(null, res.newNode.id, false, false, null, state);
+            this.runEditNode(null, res.newNode.id, false, false, false, null, state);
         }
     }
 
-    createSubNodeResponse = (res: J.CreateSubNodeResponse, replyToId: string, state: AppState): void => {
+    createSubNodeResponse = (res: J.CreateSubNodeResponse, forceUsePopup: boolean, replyToId: string, state: AppState): void => {
         if (S.util.checkSuccess("Create subnode", res)) {
             S.quanta.tempDisableAutoScroll();
             if (!res.newNode) {
@@ -292,7 +295,7 @@ export class Edit implements EditIntf {
             }
             else {
                 S.quanta.updateNodeMap(res.newNode, state);
-                this.runEditNode(null, res.newNode.id, res.encrypt, false, replyToId, state);
+                this.runEditNode(null, res.newNode.id, forceUsePopup, res.encrypt, false, replyToId, state);
             }
         }
     }
@@ -513,11 +516,11 @@ export class Edit implements EditIntf {
         // scroll to this, because this is a hint telling us we are ALREADY
         // scrolled to this ID so any scrolling will be unnecessary
         S.quanta.noScrollToId = id;
-        this.runEditNode(null, id, false, false, null, state);
+        this.runEditNode(null, id, false, false, false, null, state);
     }
 
     /* This can run as an actuall click event function in which only 'evt' is non-null here */
-    runEditNode = (evt: Event, id: string, encrypt: boolean, showJumpButton: boolean, replyToId: string, state?: AppState): void => {
+    runEditNode = (evt: Event, id: string, forceUsePopup: boolean, encrypt: boolean, showJumpButton: boolean, replyToId: string, state?: AppState): void => {
         id = S.util.allowIdFromEvent(evt, id);
         state = appState(state);
         if (!id) {
@@ -535,7 +538,7 @@ export class Edit implements EditIntf {
         S.util.ajax<J.InitNodeEditRequest, J.InitNodeEditResponse>("initNodeEdit", {
             nodeId: id
         }, (res) => {
-            this.initNodeEditResponse(res, encrypt, showJumpButton, replyToId, state);
+            this.initNodeEditResponse(res, forceUsePopup, encrypt, showJumpButton, replyToId, state);
         });
     }
 
@@ -909,12 +912,12 @@ export class Edit implements EditIntf {
     }
 
     addBookmark = (node: J.NodeInfo, state: AppState): void => {
-        this.createNode(node, J.NodeType.BOOKMARK, true, null, null, state);
+        this.createNode(node, J.NodeType.BOOKMARK, true, true, null, null, state);
     }
 
     addLinkBookmark = (content: any, state: AppState): void => {
         state = appState(state);
-        this.createNode(null, J.NodeType.BOOKMARK, true, "linkBookmark", content, state);
+        this.createNode(null, J.NodeType.BOOKMARK, true, true, "linkBookmark", content, state);
     }
 
     /* If node is non-null that means this is a reply to that 'node' but if node is 'null' that means
@@ -939,11 +942,11 @@ export class Edit implements EditIntf {
             properties: null,
             shareToUserId
         }, (res) => {
-            this.createSubNodeResponse(res, replyToId, state);
+            this.createSubNodeResponse(res, false, replyToId, state);
         });
     }
 
-    createNode = (node: J.NodeInfo, typeName: string, pendingEdit: boolean, payloadType: string, content: string, state: AppState) => {
+    createNode = (node: J.NodeInfo, typeName: string, forceUsePopup: boolean, pendingEdit: boolean, payloadType: string, content: string, state: AppState) => {
         state = appState(state);
 
         S.util.ajax<J.CreateSubNodeRequest, J.CreateSubNodeResponse>("createSubNode", {
@@ -962,7 +965,7 @@ export class Edit implements EditIntf {
             if (!state.userPreferences.editMode) {
                 await S.edit.toggleEditMode(state);
             }
-            this.createSubNodeResponse(res, null, state);
+            this.createSubNodeResponse(res, forceUsePopup, null, state);
             return null;
         });
     }
@@ -981,7 +984,7 @@ export class Edit implements EditIntf {
             properties: [{ name: J.NodeProp.DATE, value: "" + initDate }],
             shareToUserId: null
         }, (res) => {
-            this.createSubNodeResponse(res, null, state);
+            this.createSubNodeResponse(res, false, null, state);
         });
     }
 
