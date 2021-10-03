@@ -14,10 +14,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.filter.GenericFilterBean;
 import org.subnode.util.Util;
 
-/**
- * Servlet filter that intercepts calls coming into a server and logs all the request info as well
- * as all request and session parameters/attributes.
- */
 @Component
 @Order(3)
 public class HitFilter extends GenericFilterBean {
@@ -29,7 +25,12 @@ public class HitFilter extends GenericFilterBean {
 	public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
 			throws IOException, ServletException {
 
-		updateHitCounter((HttpServletRequest) request);
+		HttpServletRequest sreq = null;
+		if (request instanceof HttpServletRequest) {
+			sreq = (HttpServletRequest) request;
+			updateHitCounter(sreq);
+		}
+
 		chain.doFilter(request, response);
 	}
 

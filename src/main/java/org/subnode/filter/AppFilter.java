@@ -1,8 +1,6 @@
 package org.subnode.filter;
 
 import java.io.IOException;
-import java.util.HashMap;
-import javax.annotation.PostConstruct;
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
@@ -13,14 +11,11 @@ import javax.servlet.http.HttpSession;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.GenericFilterBean;
-import org.subnode.config.AppProp;
 import org.subnode.config.SessionContext;
-import org.subnode.model.IPInfo;
 import org.subnode.model.client.PrincipalName;
 import org.subnode.mongo.MongoRepository;
 import org.subnode.util.ThreadLocals;
@@ -29,7 +24,7 @@ import org.subnode.util.XString;
 
 /**
  * This is Web Filter for processing AppController.API_PATH endpoints(path configured in
- * AppConfiguration)
+ * AppConfiguration.java)
  */
 @Component
 @Order(4)
@@ -40,30 +35,11 @@ public class AppFilter extends GenericFilterBean {
 	private static boolean logRequests = true;
 	private static boolean logResponses = false;
 
-	@Autowired
-	private AppProp appProp;
-
 	/*
 	 * if non-zero this is used to put a millisecond delay (determined by its value) onto every request
 	 * that comes thru as an API call.
 	 */
 	private static int simulateSlowServer = 0;
-
-	private static boolean THROTTLE_ENABLED = false;
-	private static int THROTTLE_INTERVAL = 500;
-
-	/*
-	 * For debugging we can turn this flag on and disable the server from processing multiple requests
-	 * simultenaously this is every helpful for debugging.
-	 */
-	private static boolean singleThreadDebugging = false;
-
-	private static final HashMap<String, IPInfo> ipInfo = new HashMap<>();
-
-	@PostConstruct
-	public void postConstruct() {
-		THROTTLE_INTERVAL = appProp.getThrottleTime();
-	}
 
 	@Override
 	public void doFilter(ServletRequest req, ServletResponse res, FilterChain chain) throws IOException, ServletException {
@@ -76,7 +52,6 @@ public class AppFilter extends GenericFilterBean {
 			ThreadLocals.removeAll();
 			ThreadLocals.setStopwatchTime(System.currentTimeMillis());
 			int thisReqId = ++reqId;
-			String ip = null;
 
 			HttpServletRequest httpReq = null;
 			HttpSession session = null;
@@ -84,16 +59,19 @@ public class AppFilter extends GenericFilterBean {
 				// log.debug("***** SC: User: " + sc.getUserName());
 
 				httpReq = (HttpServletRequest) req;
-				log.trace(httpReq.getRequestURI() + " -> " + httpReq.getQueryString());
 				httpRes = (HttpServletResponse) res;
+				
+				log.trace(httpReq.getRequestURI() + " -> " + httpReq.getQueryString());
 				session = httpReq.getSession(true);
 				SessionContext sc = SessionContext.init(session);
 
 				sc.addAction(httpReq.getRequestURI());
 				String bearer = httpReq.getHeader("Bearer");
 
-				// if auth token is privided and doesn't exist that's a timed out session so send user
-				// back to welcome page. Should also blow away all browser memory. New browser page load.
+				/*
+				 * if auth token is privided and doesn't exist that's a timed out session so send user back to
+				 * welcome page. Should also blow away all browser memory. New browser page load.
+				 */
 				if (!StringUtils.isEmpty(bearer) && !SessionContext.validToken(bearer, null)) {
 					// just ignore an invalid token like it was not there.
 					log.trace("Ignoring bad bearer token: " + bearer);
@@ -111,10 +89,8 @@ public class AppFilter extends GenericFilterBean {
 					checkApiSecurity(bearer, httpReq, sc);
 				}
 
-				ip = Util.getClientIpAddr(httpReq);
-				sc.setIp(ip);
+				sc.setIp(Util.getClientIpAddr(httpReq));
 				ThreadLocals.setHttpSession(session);
-				String queryString = httpReq.getQueryString();
 
 				if (simulateSlowServer > 0) {
 					Util.sleep(simulateSlowServer);
@@ -122,7 +98,7 @@ public class AppFilter extends GenericFilterBean {
 
 				if (logRequests) {
 					String url = "REQ[" + String.valueOf(thisReqId) + "]: URI=" + httpReq.getRequestURI() + "  QueryString="
-							+ queryString;
+							+ httpReq.getQueryString();
 					log.debug(url + "\nParameters: " + XString.prettyPrint(httpReq.getParameterMap()));
 				}
 			} else {
@@ -134,31 +110,7 @@ public class AppFilter extends GenericFilterBean {
 			}
 
 			try {
-				IPInfo info = null;
-				synchronized (ipInfo) {
-					info = ipInfo.get(ip);
-					if (info == null) {
-						ipInfo.put(ip, info = new IPInfo());
-					}
-				}
-				throttleRequest(httpReq, info);
-
-				/*
-				 * singleThreadDebugging creates one lock per IP so that each machine calling our server gets single
-				 * threaded, but other servers can call in parallel
-				 */
-				if (singleThreadDebugging) {
-					if (ip == null) {
-						ip = "unknown";
-					}
-
-					synchronized (info.getLock()) {
-						chain.doFilter(req, res);
-					}
-				} else {
-					chain.doFilter(req, res);
-				}
-
+				chain.doFilter(req, res);
 				if (logResponses) {
 					log.debug("    RES: [" + String.valueOf(thisReqId) + "]" /* +httpRes.getStatus() */
 							+ HttpStatus.valueOf(httpRes.getStatus()));
@@ -177,42 +129,6 @@ public class AppFilter extends GenericFilterBean {
 			/* Set thread back to clean slate, for it's next cycle time in threadpool */
 			ThreadLocals.removeAll();
 		}
-	}
-
-	private void throttleRequest(HttpServletRequest httpReq, IPInfo info) {
-		if (httpReq == null)
-			return;
-
-		long curTime = System.currentTimeMillis();
-		if (info.getLastRequestTime() == 0) {
-			info.setLastRequestTime(curTime);
-			return;
-		}
-
-		// log.debug("check:" + httpReq.getRequestURI());
-		if (httpReq.getRequestURI().endsWith("/checkMessages") || //
-				httpReq.getRequestURI().endsWith("/getUserProfile") || //
-				httpReq.getRequestURI().endsWith("/getConfig") || //
-				httpReq.getRequestURI().endsWith("/getBookmarks") || //
-				httpReq.getRequestURI().endsWith("/login") || //
-				httpReq.getRequestURI().endsWith("/proxyGet") || //
-				httpReq.getRequestURI().endsWith("/serverPush") || //
-				httpReq.getRequestURI().endsWith("/anonPageLoad") || //
-				httpReq.getRequestURI().endsWith("/getOpenGraph")) {
-			// these have priority
-		} else {
-			if (THROTTLE_ENABLED) {
-				long wait = THROTTLE_INTERVAL - (curTime - info.getLastRequestTime());
-				if (wait > 0) {
-					log.debug("throt: " + httpReq.getRequestURI() + " " + String.valueOf(wait));
-					try {
-						Thread.sleep(wait);
-					} catch (Exception e) {
-					}
-				}
-			}
-		}
-		info.setLastRequestTime(System.currentTimeMillis());
 	}
 
 	/*
