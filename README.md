@@ -6,7 +6,7 @@
 
 Join the Fediverse!
 
-A new kind of decentralized and federated social media and content management platform. Connect to the Fediverse with unique and powerful features like wikis, blogging, document collaboration, conversation threads, encrypted secure messaging, video/audio recording & sharing, file sharing, a podcatcher, and much more.
+A new kind of social media and content management platform. Connect to the Fediverse with unique and powerful features like wikis, blogging, document collaboration, conversation threads, encrypted secure messaging, video/audio recording & sharing, file sharing, a podcatcher, and much more.
 
 Create hierarchically organized content that's always editable like a wiki and shared on the Fediverse and/or IPFS. Quanta is a new kind of platform with a new kind of architecture where you always have complete control of your own data.
 

@@ -8,6 +8,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.web.embedded.tomcat.TomcatServletWebServerFactory;
+import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.boot.web.servlet.server.ServletWebServerFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -20,6 +21,7 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.servlet.ViewResolver;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+import org.subnode.AppController;
 import org.thymeleaf.spring5.SpringTemplateEngine;
 import org.thymeleaf.spring5.view.ThymeleafViewResolver;
 import org.thymeleaf.templateresolver.ClassLoaderTemplateResolver;
@@ -39,7 +41,19 @@ public class AppConfiguration implements WebMvcConfigurer {
 	@Autowired
 	private AppProp appProp;
 
+	@Autowired
+	private AppFilter appFilter;
+
 	private static ThreadPoolTaskExecutor executor;
+
+	@Bean
+	public FilterRegistrationBean<AppFilter> appFilterRegistration() {
+		FilterRegistrationBean<AppFilter> registration = new FilterRegistrationBean<>();
+		registration.setFilter(appFilter);
+		registration.addUrlPatterns(AppController.API_PATH + "/*");
+		// registration.setOrder(1);
+		return registration;
+	}
 
 	/*
 	 * To avoid error message during startup
@@ -51,7 +65,10 @@ public class AppConfiguration implements WebMvcConfigurer {
 		return new ConcurrentTaskScheduler(); // single threaded by default
 	}
 
-	/* This method is not perfectly thread-safe but Spring initializes this during context initialization only so it's ok */
+	/*
+	 * This method is not perfectly thread-safe but Spring initializes this during context
+	 * initialization only so it's ok
+	 */
 	@Bean(name = "threadPoolTaskExecutor")
 	public ThreadPoolTaskExecutor threadPoolTaskExecutor() {
 		if (executor != null) {

@@ -7,6 +7,7 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.TimeZone;
+import javax.servlet.http.HttpSession;
 import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -131,6 +132,22 @@ public class SessionContext {
 		synchronized (historicalSessions) {
 			historicalSessions.add(this);
 		}
+	}
+
+	static SessionContext init(HttpSession session) {
+		// Ensure we have a Quanta Session Context
+		SessionContext sc = (SessionContext) session.getAttribute(SessionContext.QSC);
+
+		// if we don't have a SessionContext yet or it timed out then create a new one.
+		if (sc == null || !sc.isLive()) {
+			// Note: we create SessionContext objects here on some requests that don't need them, but that's ok
+			// becasue all our code makes the assumption there will be a SessionContext on the thread.
+			// log.debug("Creating new session at req "+httpReq.getRequestURI());
+			sc = (SessionContext) SpringContextUtil.getBean(SessionContext.class);
+			session.setAttribute(SessionContext.QSC, sc);
+		}
+		ThreadLocals.setSC(sc);
+		return sc;
 	}
 
 	/* Extra layer of security to invalidate this session object */

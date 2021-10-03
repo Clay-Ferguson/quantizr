@@ -28,9 +28,6 @@ export class ServerPush implements ServerPushIntf {
 
     init = (): any => {
         console.log("ServerPush.init");
-
-        // todo-0: If I keep seeing breakages in connectivity, I might either try recreating this eventSource
-        // once every minute or so???
         this.eventSource = new EventSource(S.util.getRpcPath() + "serverPush");
 
         // DO NOT DELETE.

@@ -10,12 +10,19 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
 import java.util.concurrent.ConcurrentHashMap;
+import javax.servlet.http.HttpServletRequest;
 import org.apache.commons.lang3.StringUtils;
 import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.web.authentication.WebAuthenticationDetails;
 import org.springframework.stereotype.Component;
 import org.subnode.actpub.ActPubFollower;
 import org.subnode.actpub.ActPubFollowing;
@@ -41,7 +48,6 @@ import org.subnode.mongo.MongoCreate;
 import org.subnode.mongo.MongoDelete;
 import org.subnode.mongo.MongoRead;
 import org.subnode.mongo.MongoSession;
-
 import org.subnode.mongo.MongoUpdate;
 import org.subnode.mongo.MongoUtil;
 import org.subnode.mongo.model.SubNode;
@@ -146,6 +152,9 @@ public class UserManagerService {
 	@Autowired
 	private AsyncExec asyncExec;
 
+	@Autowired
+	protected AuthenticationManager authenticationManager;
+
 	/* Private keys of each user by user name as key */
 	public static final ConcurrentHashMap<String, String> privateKeysByUserName = new ConcurrentHashMap<>();
 
@@ -153,8 +162,7 @@ public class UserManagerService {
 	 * Note that this function does 'succeed' even with ANON user given, and just considers that an
 	 * anonymouse user
 	 */
-	public LoginResponse login(LoginRequest req) {
-		SubNode userNode = null;
+	public LoginResponse login(HttpServletRequest httpReq, LoginRequest req) {
 		LoginResponse res = new LoginResponse();
 		SessionContext sc = ThreadLocals.getSC();
 		// log.debug("login: " + XString.prettyPrint(req));
@@ -168,32 +176,33 @@ public class UserManagerService {
 		}
 		/* Admin Login */
 		else if (PrincipalName.ADMIN.s().equals(req.getUserName())) {
-			if (req.getPassword().equals(appProp.getMongoAdminPassword())) {
-				sc.setAuthenticated(req.getUserName(), null);
-			} else
-				throw new RuntimeEx("Login failed. Wrong admin password.");
+			// springLogin throws exception if it fails.
+			springLogin(req.getUserName(), req.getPassword(), httpReq);
+			sc.setAuthenticated(req.getUserName(), null);
 		}
 		/* User Login */
 		else {
-			// try to lookup the actual user's node
-			userNode = read.getUserNodeByUserName(auth.getAdminSession(), req.getUserName());
-
-			// we found user's node.
-			if (userNode != null) {
-				/**
-				 * We can log in as any user we want if we have the admin password.
-				 */
-				if (req.getPassword().equals(appProp.getMongoAdminPassword())) {
-					sc.setAuthenticated(req.getUserName(), userNode.getId());
-				}
-				// else it's an ordinary user so we check the password against their user node
-				else if (userNode.getStrProp(NodeProp.PWD_HASH.s()).equals(util.getHashOfPassword(req.getPassword()))) {
+			/**
+			 * We can log in as any user we want if we have the admin password, so we read the user from the DB
+			 * go get their password and feed it into Spring Security as if they had entered it.
+			 */
+			if (req.getPassword().equals(appProp.getMongoAdminPassword())) {
+				SubNode userNode = read.getUserNodeByUserName(auth.getAdminSession(), req.getUserName());
+				// we found user's node.
+				if (userNode != null) {
+					// springLogin throws exception if it fails.
+					springLogin(req.getUserName(), userNode.getStrProp(NodeProp.PWD_HASH.s()), httpReq);
 					sc.setAuthenticated(req.getUserName(), userNode.getId());
 				} else {
-					throw new RuntimeEx("Login failed. Wrong password for user: " + req.getUserName());
+					throw new RuntimeEx("Login failed. User not found: " + req.getUserName());
 				}
-			} else {
-				throw new RuntimeEx("Login failed. User not found: " + req.getUserName());
+			}
+			// else ordinary Spring Auth for user.
+			else {
+				String pwdHash = util.getHashOfPassword(req.getPassword());
+				// springLogin throws exception if it fails.
+				springLogin(req.getUserName(), pwdHash, httpReq);
+				sc.setAuthenticated(req.getUserName(), null);
 			}
 		}
 
@@ -235,6 +244,15 @@ public class UserManagerService {
 		res.setMessage("login ok.");
 		res.setSuccess(true);
 		return res;
+	}
+
+	public void springLogin(String userName, String password, HttpServletRequest httpReq) {
+		UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(userName, password,
+				Arrays.asList(new SimpleGrantedAuthority("ROLE_USER")));
+		authToken.setDetails(new WebAuthenticationDetails(httpReq));
+		Authentication authentication = authenticationManager.authenticate(authToken);
+		SecurityContextHolder.getContext().setAuthentication(authentication);
+		// log.debug("Spring login successful: User=" + userName);
 	}
 
 	public void ensureUserHomeNodeExists(MongoSession session, String userName, String content, String type, String name) {

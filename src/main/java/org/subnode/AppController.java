@@ -16,9 +16,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.web.servlet.error.ErrorController;
 import org.springframework.core.io.support.ResourceRegion;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -557,9 +561,9 @@ public class AppController implements ErrorController {
 	}
 
 	@RequestMapping(value = API_PATH + "/login", method = RequestMethod.POST)
-	public @ResponseBody Object login(@RequestBody LoginRequest req, HttpSession session) {
+	public @ResponseBody Object login(@RequestBody LoginRequest req, HttpServletRequest httpReq, HttpSession session) {
 		return callProc.run("login", req, session, ms -> {
-			return userManagerService.login(req);
+			return userManagerService.login(httpReq, req);
 		});
 	}
 
@@ -573,11 +577,20 @@ public class AppController implements ErrorController {
 	}
 
 	@RequestMapping(value = API_PATH + "/logout", method = RequestMethod.POST)
-	public @ResponseBody Object logout(@RequestBody LogoutRequest req, HttpSession session) {
+	public @ResponseBody Object logout(@RequestBody LogoutRequest req, HttpServletRequest sreq, HttpServletResponse sres,
+			HttpSession session) {
 		return callProc.run("logout", req, session, ms -> {
 			ThreadLocals.getSC().forceAnonymous();
+
 			// WARNING: ms will be null here always. Don't use.
 			session.invalidate();
+
+			Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+			if (auth != null) {
+				new SecurityContextLogoutHandler().logout(sreq, sres, auth);
+			}
+			SecurityContextHolder.getContext().setAuthentication(null);
+
 			LogoutResponse res = new LogoutResponse();
 			res.setSuccess(true);
 			return res;
@@ -1347,8 +1360,8 @@ public class AppController implements ErrorController {
 				case "ipfsPubSubTest":
 					// currently unused (leaving hook in place)
 					throw new RuntimeException("ipfsPubSubTest depricated");
-					// res.getMessages().add(new InfoMessage(ipfsService.pubSubTest(), null));
-					// break;
+				// res.getMessages().add(new InfoMessage(ipfsService.pubSubTest(), null));
+				// break;
 
 				case "getServerInfo":
 					res.getMessages().add(new InfoMessage(systemService.getSystemInfo(), null));

@@ -3,7 +3,6 @@ package org.subnode.config;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.Enumeration;
-
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
@@ -11,7 +10,6 @@ import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.annotation.Order;
@@ -22,16 +20,14 @@ import org.springframework.web.filter.GenericFilterBean;
  * Servlet filter that intercepts calls coming into a server and logs all the request info as well
  * as all request and session parameters/attributes.
  */
-// To enable, uncomment these annotations:
-// import org.springframework.core.annotation.Order;
-// import org.springframework.stereotype.Component;
 @Component
 @Order(1)
 public class AuditFilter extends GenericFilterBean {
 
 	private static final Logger log = LoggerFactory.getLogger(AuditFilter.class);
 	private static String INDENT = "    ";
-	private static boolean verbose = true;
+	private static boolean enabled = true;
+	private static boolean verbose = false;
 
 	@Override
 	public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
@@ -43,13 +39,20 @@ public class AuditFilter extends GenericFilterBean {
 		}
 
 		try {
-			preProcess(sreq);
+			if (enabled) {
+				preProcess(sreq);
+			}
 			chain.doFilter(request, response);
 		} finally {
-			if (verbose) {
-				if (response instanceof HttpServletResponse) {
+			if (enabled) {
+				if (verbose) {
+					if (response instanceof HttpServletResponse) {
+						HttpServletResponse sres = (HttpServletResponse) response;
+						postProcess(sreq, sres);
+					}
+				} else {
 					HttpServletResponse sres = (HttpServletResponse) response;
-					postProcess(sreq, sres);
+					log.debug("RESP: " + sres.getStatus());
 				}
 			}
 		}
@@ -275,6 +278,7 @@ public class AuditFilter extends GenericFilterBean {
 			sb.append(" [from ");
 			sb.append(sreq.getRemoteAddr());
 			sb.append("]");
+			// sb.append(" SpringAuth=" + Util.isSpringAuthenticated());
 			log.trace(sb.toString());
 			return;
 		}
@@ -290,6 +294,7 @@ public class AuditFilter extends GenericFilterBean {
 			sb.append(getParameterInfo(sreq));
 			sb.append(getAttributeInfo(sreq));
 			sb.append(getSessionAttributeInfo(sreq));
+			// sb.append(" SpringAuth=" + Util.isSpringAuthenticated());
 			log.trace(sb.toString());
 		} catch (Exception e) {
 			log.error("error", e);

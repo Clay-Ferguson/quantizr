@@ -52,6 +52,16 @@
         <appender-ref ref="AuditRollingFile" />
     </logger>
 
+    <logger name="org.subnode.config.AppFilter" level="trace" additivity="false">
+        <appender-ref ref="AuditRollingFile" />
+    </logger>
+
+    <!-- #DEBUG-SECURITY
+    <logger name="org.springframework.security" level="debug" additivity="false">
+        <appender-ref ref="AuditRollingFile" />
+    </logger>
+    -->
+
     <logger name="org.subnode.actpub.ActPubUtil" level="trace" additivity="false">
         <appender-ref ref="AuditRollingFile" />
     </logger>

@@ -29,25 +29,10 @@
     </exclusions>
 </dependency>
 
-<!-- WARNING: adding this will totally disable the app, until ALL
-of the spring configs for security are also perfected. 
-(but our custom security is better than Spring for now at least)
-
 <dependency>
     <groupId>org.springframework.boot</groupId>
     <artifactId>spring-boot-starter-security</artifactId>
-        <exclusions>
-        <exclusion>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-logging</artifactId>
-        </exclusion>
-        <exclusion>
-            <groupId>org.hibernate</groupId>
-            <artifactId>hibernate-validator</artifactId>
-        </exclusion>
-    </exclusions>
 </dependency>
--->
 
 <dependency>
     <groupId>org.springframework.boot</groupId>

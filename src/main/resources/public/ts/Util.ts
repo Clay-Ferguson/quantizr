@@ -456,7 +456,7 @@ export class Util implements UtilIntf {
                     body: JSON.stringify(postData),
                     headers: {
                         "Content-Type": "application/json",
-                        Bearer: S.quanta.authToken
+                        Bearer: S.quanta.authToken || ""
                     },
                     mode: "cors", // no-cors, *cors, same-origin
                     cache: "no-cache", // *default, no-cache, reload, force-cache, only-if-cached

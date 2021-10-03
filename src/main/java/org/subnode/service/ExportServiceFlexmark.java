@@ -22,6 +22,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;
+import org.subnode.AppController;
 import org.subnode.config.AppProp;
 import org.subnode.model.MerkleLink;
 import org.subnode.model.MerkleNode;
@@ -312,7 +313,7 @@ public class ExportServiceFlexmark {
 		 * eventually put out on IPFS or simply provided to the user as a downloadable link.
 		 */
 		else {
-			String path = "/mobile/api/bin/" + bin + "?nodeId=" + node.getId().toHexString() + "&token="
+			String path = AppController.API_PATH + "/bin/" + bin + "?nodeId=" + node.getId().toHexString() + "&token="
 					+ URLEncoder.encode(ThreadLocals.getSC().getUserToken(), StandardCharsets.UTF_8);
 			src = appProp.getHostAndPort() + path;
 		}

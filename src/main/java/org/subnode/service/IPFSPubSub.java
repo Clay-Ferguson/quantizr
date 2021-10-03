@@ -96,9 +96,10 @@ public class IPFSPubSub {
             asyncExec.run(null, () -> {
                 setOptions();
 
-                // todo-0: this can throw errors when self-dialing, or whatever. not stopping things from working
-                // afaik.
-                // but I need to look into swarm peers more.
+                /*
+                 * todo-0: this can throw errors when self-dialing, or whatever. not stopping things from working
+                 * afaik. but I need to look into swarm peers more.
+                 */
                 ipfs.doSwarmConnect();
                 Util.sleep(3000);
                 openChannel(IPSM_TOPIC_HEARTBEAT);

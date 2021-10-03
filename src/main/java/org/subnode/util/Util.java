@@ -21,6 +21,7 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.client.ClientHttpRequestFactory;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 
@@ -34,6 +35,16 @@ public class Util {
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
+	}
+
+	public static boolean isSpringAuthenticated() {
+		return SecurityContextHolder.getContext().getAuthentication() != null
+				&& SecurityContextHolder.getContext().getAuthentication().isAuthenticated();
+
+		// DO NOT DELETE (yet)
+		// //when Anonymous Authentication is enabled
+		// !(SecurityContextHolder.getContext().getAuthentication()
+		// instanceof AnonymousAuthenticationToken)
 	}
 
 	/*
@@ -94,8 +105,7 @@ public class Util {
 	}
 
 	public static ClientHttpRequestFactory getClientHttpRequestFactory() {
-		// todo-0: change this back to something reasonable
-		int timeout = 30000;
+		int timeout = 10000;
 		HttpComponentsClientHttpRequestFactory clientHttpRequestFactory = new HttpComponentsClientHttpRequestFactory();
 		clientHttpRequestFactory.setConnectionRequestTimeout(timeout);
 		clientHttpRequestFactory.setConnectTimeout(timeout);
