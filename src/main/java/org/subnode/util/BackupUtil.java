@@ -3,7 +3,6 @@ package org.subnode.util;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 /**
  * For future reference only, I'm keeping this is as an example of how to call a SpringBoot app as a

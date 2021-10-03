@@ -12,13 +12,11 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.subnode.exception.base.RuntimeEx;
-import org.subnode.mail.OutboxMgr;
 import org.subnode.model.client.NodeProp;
 import org.subnode.model.client.PrincipalName;
 import org.subnode.mongo.MongoAuth;
 import org.subnode.mongo.MongoRead;
 import org.subnode.mongo.MongoSession;
-
 import org.subnode.mongo.MongoUpdate;
 import org.subnode.mongo.model.AccessControl;
 import org.subnode.mongo.model.MongoPrincipal;
@@ -139,13 +137,6 @@ public class AclService {
 	/**
 	 * Adds the privileges to the node sharing this node to principal, which will be either a userName
 	 * or 'public' (when the node is being shared to public)
-	 * 
-	 * @param session
-	 * @param node
-	 * @param principal
-	 * @param privileges
-	 * @param res
-	 * @return
 	 */
 	public boolean addPrivilege(MongoSession session, SubNode node, String principal, List<String> privileges,
 			AddPrivilegeResponse res) {

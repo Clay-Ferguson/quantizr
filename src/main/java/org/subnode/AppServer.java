@@ -21,9 +21,11 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 @SpringBootApplication
 @EnableScheduling
 @ServletComponentScan
-// NOTE: You can either use an ErrorController (which what we are doing) or else you can use the
-// actual hosting server's fallback error page by adding this annotation, but only do one or the
-// other.
+/*
+ * NOTE: You can either use an ErrorController (which what we are doing) or else you can use the
+ * actual hosting server's fallback error page by adding this annotation, but only do one or the
+ * other.
+ */
 // @EnableAutoConfiguration(exclude = {ErrorMvcAutoConfiguration.class})
 public class AppServer {
 	private static final Logger log = LoggerFactory.getLogger(AppServer.class);

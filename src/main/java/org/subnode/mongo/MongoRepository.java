@@ -24,9 +24,6 @@ public class MongoRepository {
 	private MongoRead read;
 
 	@Autowired
-	private AppProp appProp;
-
-	@Autowired
 	private MongoUtil repoUtil;
 
 	@Autowired

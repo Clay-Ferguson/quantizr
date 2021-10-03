@@ -27,7 +27,6 @@ import org.subnode.mongo.model.SubNode;
  */
 @Component
 public class NotificationDaemon {
-
 	private static final Logger log = LoggerFactory.getLogger(NotificationDaemon.class);
 
 	@Autowired
@@ -46,10 +45,8 @@ public class NotificationDaemon {
 	private MailSender mailSender;
 
 	private int runCounter = 0;
-
 	public static final int INTERVAL_SECONDS = 10;
 	private int runCountdown = INTERVAL_SECONDS;
-
 	static boolean run = false;
 
 	/*

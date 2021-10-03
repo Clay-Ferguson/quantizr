@@ -18,7 +18,6 @@ import org.springframework.data.mongodb.core.mapping.event.BeforeSaveEvent;
 import org.subnode.actpub.ActPubService;
 import org.subnode.config.NodeName;
 import org.subnode.model.client.NodeProp;
-import org.subnode.model.client.PrivilegeType;
 import org.subnode.mongo.model.SubNode;
 import org.subnode.util.ThreadLocals;
 import org.subnode.util.XString;

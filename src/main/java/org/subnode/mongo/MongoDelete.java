@@ -87,12 +87,11 @@ public class MongoDelete {
 		Criteria criteria = Criteria.where(SubNode.FIELD_PATH).regex(util.regexRecursiveChildrenOfPath(userNode.getPath())) //
 				.and(SubNode.FIELD_MODIFY_TIME).lt(date); //
 
-		// once we've had the TEMP prop in place for 7 days, we can then process this
-		// code from the
-		// root path of all users rather than running it once on each foreign user node,
-		// and remove
-		// 'ForUser' from method name
-		// and(SubNode.FIELD_PROPERTIES + "." + NodeProp.TEMP.s() + ".value").ne(null));
+		/*
+		 * once we've had the TEMP prop in place for 7 days, we can then process this code from the root
+		 * path of all users rather than running it once on each foreign user node, and remove 'ForUser'
+		 * from method name and(SubNode.FIELD_PROPERTIES + "." + NodeProp.TEMP.s() + ".value").ne(null));
+		 */
 
 		query.addCriteria(criteria);
 

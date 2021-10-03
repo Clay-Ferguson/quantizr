@@ -2,9 +2,6 @@ package org.subnode.actpub.model;
 
 import org.subnode.actpub.APConst;
 
-/**
- * Create object.
- */
 public class APOCreate extends APObj {
     public APOCreate() {
         put(APProp.context, new APList() //

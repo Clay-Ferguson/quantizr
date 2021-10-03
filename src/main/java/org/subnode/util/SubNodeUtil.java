@@ -297,7 +297,6 @@ public class SubNodeUtil {
 
 		ret.setAttachmentUrl(url);
 		ret.setAttachmentMime(mime);
-
 		ret.setUrl(appProp.getHostAndPort() + "/app?id=" + node.getId().toHexString());
 		return ret;
 	}

@@ -34,7 +34,6 @@ public class AppSessionListener implements HttpSessionListener {
 		 */
 		session.setAttribute(WebUtils.SESSION_MUTEX_ATTRIBUTE, new LockEx("SESSION-LockEx:" + session.getId(), true, 180000, 1));
 		sessionCounter++;
-		// log.debug("Session/Lock Created");
 	}
 
 	@Override

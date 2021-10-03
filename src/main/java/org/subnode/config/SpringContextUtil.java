@@ -37,12 +37,10 @@ public class SpringContextUtil implements ApplicationContextAware {
 	@Autowired
 	private IPFSPubSub pubSub;
 
-	/* main() entrypoint */
 	@Override
 	public void setApplicationContext(ApplicationContext context) throws BeansException {
 		log.debug("SpringContextUtil initialized context.");
 		SpringContextUtil.context = context;
-
 		try {
 			mongoRepo.init();
 			appController.init();
@@ -53,7 +51,6 @@ public class SpringContextUtil implements ApplicationContextAware {
 			log.error("application startup failed.");
 			throw new RuntimeEx(e);
 		}
-
 		testRunner.test();
 	}
 

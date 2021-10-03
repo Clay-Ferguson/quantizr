@@ -140,9 +140,11 @@ public class SessionContext {
 
 		// if we don't have a SessionContext yet or it timed out then create a new one.
 		if (sc == null || !sc.isLive()) {
-			// Note: we create SessionContext objects here on some requests that don't need them, but that's ok
-			// becasue all our code makes the assumption there will be a SessionContext on the thread.
-			// log.debug("Creating new session at req "+httpReq.getRequestURI());
+			/*
+			 * Note: we create SessionContext objects here on some requests that don't need them, but that's ok
+			 * becasue all our code makes the assumption there will be a SessionContext on the thread.
+			 * log.debug("Creating new session at req "+httpReq.getRequestURI());
+			 */
 			sc = (SessionContext) SpringContextUtil.getBean(SessionContext.class);
 			session.setAttribute(SessionContext.QSC, sc);
 		}

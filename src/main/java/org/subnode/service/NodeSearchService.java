@@ -10,7 +10,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
-import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.TextCriteria;
@@ -29,7 +28,6 @@ import org.subnode.mongo.AdminRun;
 import org.subnode.mongo.MongoAuth;
 import org.subnode.mongo.MongoRead;
 import org.subnode.mongo.MongoSession;
-
 import org.subnode.mongo.MongoUtil;
 import org.subnode.mongo.model.AccessControl;
 import org.subnode.mongo.model.SubNode;
@@ -339,7 +337,6 @@ public class NodeSearchService {
 	}
 
 	public void getNodeStats(MongoSession session, GetNodeStatsRequest req, GetNodeStatsResponse res) {
-
 		/*
 		 * If this is the 'feed' being queried, then get the data from trendingFeedInfo (the cache), or else
 		 * cache it
@@ -515,7 +512,6 @@ public class NodeSearchService {
 			if (topMentions.size() >= 100)
 				break;
 		}
-
 		res.setSuccess(true);
 
 		/*

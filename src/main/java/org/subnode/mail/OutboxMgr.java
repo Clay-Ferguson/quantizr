@@ -50,8 +50,6 @@ public class OutboxMgr {
 	@Autowired
 	private AppProp appProp;
 
-	private String mailBatchSize = "10";
-
 	@Autowired
 	private SubNodeUtil snUtil;
 
@@ -61,18 +59,13 @@ public class OutboxMgr {
 	@Autowired
 	private NotificationDaemon notificationDaemon;
 
+	private String mailBatchSize = "10";
 	private static SubNode outboxNode = null;
 	private static final Object outboxLock = new Object();
 
 	/**
 	 * Adds a node into the user's "Inbox" as an indicator to them that the 'node' added needs their
 	 * attention, for some reason or that someone has shared this node with them.
-	 * 
-	 * @param session
-	 * @param recieverUserName
-	 * @param userNode
-	 * @param node
-	 * @param notifyMessage
 	 */
 	public void addInboxNotification(String recieverUserName, SubNode userNode, SubNode node, String notifyMessage) {
 
@@ -131,11 +124,6 @@ public class OutboxMgr {
 	 * Sends an email notification to the user associated with 'toUserNode' (a person's account root
 	 * node), telling them that 'fromUserName' has shared a node with them, and including a link to the
 	 * shared node in the email.
-	 * 
-	 * @param ms
-	 * @param fromUserName
-	 * @param toUserNode
-	 * @param node
 	 */
 	public void sendEmailNotification(MongoSession ms, String fromUserName, SubNode toUserNode, SubNode node) {
 		String email = toUserNode.getStrProp(NodeProp.EMAIL.s());
@@ -170,7 +158,6 @@ public class OutboxMgr {
 		outboundEmailNode.setProp(NodeProp.EMAIL_RECIP.s(), recipients);
 
 		update.save(ms, outboundEmailNode);
-
 		notificationDaemon.setOutboxDirty();
 	}
 

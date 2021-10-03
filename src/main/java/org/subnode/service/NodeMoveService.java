@@ -268,7 +268,6 @@ public class NodeMoveService {
 	 * siblings posted in below it)
 	 */
 	private void moveNodesInternal(MongoSession session, String location, String targetId, List<String> nodeIds) {
-
 		log.debug("moveNodesInternal: targetId=" + targetId + " location=" + location);
 		SubNode targetNode = read.getNode(session, targetId);
 

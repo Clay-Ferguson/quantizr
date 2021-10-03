@@ -2,9 +2,6 @@ package org.subnode.actpub.model;
 
 import org.subnode.actpub.APConst;
 
-/**
- * OrderedCollectionPage object.
- */
 public class APOOrderedCollectionPage extends APObj {
     public APOOrderedCollectionPage() {
         put(APProp.context, APConst.CONTEXT_STREAMS);

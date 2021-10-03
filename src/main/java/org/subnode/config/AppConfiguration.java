@@ -47,12 +47,12 @@ public class AppConfiguration implements WebMvcConfigurer {
 
 	private static ThreadPoolTaskExecutor executor;
 
+	/* NOTE: The AppFilter is the only one of our filters that we limit the path for */
 	@Bean
 	public FilterRegistrationBean<AppFilter> appFilterRegistration() {
 		FilterRegistrationBean<AppFilter> registration = new FilterRegistrationBean<>();
 		registration.setFilter(appFilter);
 		registration.addUrlPatterns(AppController.API_PATH + "/*");
-		// registration.setOrder(1);
 		return registration;
 	}
 
@@ -63,6 +63,7 @@ public class AppConfiguration implements WebMvcConfigurer {
 	 */
 	@Bean
 	public TaskScheduler taskScheduler() {
+		// todo-0: are we single threading here?
 		return new ConcurrentTaskScheduler(); // single threaded by default
 	}
 

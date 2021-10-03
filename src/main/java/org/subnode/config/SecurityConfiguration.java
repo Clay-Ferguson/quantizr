@@ -69,27 +69,12 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
         // needed.
         //
         // http.authorizeRequests() //
-        // // NOTE: Spring auto-prefixes "ROLE_" so this is really "ROLE_USER" here;
+        // NOTE: Spring auto-prefixes "ROLE_" so this is really "ROLE_USER" here;
         // .antMatchers(AppController.API_PATH + "/*").hasRole("USER")
-        // // .antMatchers("/user").hasAnyRole("ADMIN", "USER")
-
-        // // .antMatchers("/user").hasAnyRole("ADMIN", "USER"))
-        // // root page request
-        // // .antMatchers("/").permitAll()
-
-        // // any request
-        // // .antMatchers("/**").permitAll() //
-        // // .antMatchers(AppController.API_PATH + "/**").permitAll().anyRequest().authenticated()
+        // .antMatchers("/user").hasAnyRole("ADMIN", "USER")
+        // .antMatchers("/").permitAll()
+        // .antMatchers(AppController.API_PATH + "/**").permitAll().anyRequest().authenticated()
         // .and().addFilterBefore(auditFilter, BasicAuthenticationFilter.class);
-
-        // http.authorizeRequests().anyRequest()// allow all urls
-        // .authenticated()// all URLs are allowed by any authenticated user, no role restrictions.
-        // .and().formLogin()// enable form based authentication
-        // //.loginPage("/my-login")// use a custom login URI
-        // .permitAll(true)// login URI can be accessed by anyone
-        // .and().logout()// default logout handling
-        // //.logoutSuccessUrl("/my-login?logout")// our new logout success url, we are not replacing other
-        // .permitAll();// allow all as it will be accessed when user is not logged in anymore
     }
 
     /*
