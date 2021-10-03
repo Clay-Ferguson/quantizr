@@ -15,6 +15,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.NoOpPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.subnode.AppController;
+import org.subnode.filter.AuditFilter;
 
 // @EnableWebSecurity(debug = true) // #DEBUG-SECURITY
 @EnableWebSecurity

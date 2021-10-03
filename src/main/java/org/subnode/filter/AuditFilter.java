@@ -1,4 +1,4 @@
-package org.subnode.config;
+package org.subnode.filter;
 
 import java.io.IOException;
 import java.util.Collection;

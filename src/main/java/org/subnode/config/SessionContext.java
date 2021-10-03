@@ -134,7 +134,7 @@ public class SessionContext {
 		}
 	}
 
-	static SessionContext init(HttpSession session) {
+	public static SessionContext init(HttpSession session) {
 		// Ensure we have a Quanta Session Context
 		SessionContext sc = (SessionContext) session.getAttribute(SessionContext.QSC);
 

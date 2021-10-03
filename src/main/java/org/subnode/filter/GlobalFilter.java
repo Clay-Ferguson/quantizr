@@ -1,4 +1,4 @@
-package org.subnode.config;
+package org.subnode.filter;
 
 import java.io.IOException;
 import javax.servlet.FilterChain;
@@ -13,6 +13,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.GenericFilterBean;
+import org.subnode.config.SessionContext;
 
 @Component
 @Order(2)

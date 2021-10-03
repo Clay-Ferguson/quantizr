@@ -1,4 +1,4 @@
-package org.subnode.config;
+package org.subnode.filter;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -18,6 +18,8 @@ import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.GenericFilterBean;
+import org.subnode.config.AppProp;
+import org.subnode.config.SessionContext;
 import org.subnode.model.IPInfo;
 import org.subnode.model.client.PrincipalName;
 import org.subnode.mongo.MongoRepository;
@@ -34,8 +36,6 @@ import org.subnode.util.XString;
 public class AppFilter extends GenericFilterBean {
 	private static final Logger log = LoggerFactory.getLogger(AppFilter.class);
 
-	//todo-0: move all the stuff related to hit counting into a dedicated HitCounterFilter class
-	private static final HashMap<String, Integer> uniqueIpHits = new HashMap<>();
 	private static int reqId = 0;
 	private static boolean logRequests = true;
 	private static boolean logResponses = false;
@@ -111,7 +111,7 @@ public class AppFilter extends GenericFilterBean {
 					checkApiSecurity(bearer, httpReq, sc);
 				}
 
-				ip = getClientIpAddr(httpReq);
+				ip = Util.getClientIpAddr(httpReq);
 				sc.setIp(ip);
 				ThreadLocals.setHttpSession(session);
 				String queryString = httpReq.getQueryString();
@@ -125,8 +125,6 @@ public class AppFilter extends GenericFilterBean {
 							+ queryString;
 					log.debug(url + "\nParameters: " + XString.prettyPrint(httpReq.getParameterMap()));
 				}
-
-				updateHitCounter(httpReq);
 			} else {
 				// log.debug("******* req class: "+req.getClass().getName());
 			}
@@ -165,7 +163,6 @@ public class AppFilter extends GenericFilterBean {
 					log.debug("    RES: [" + String.valueOf(thisReqId) + "]" /* +httpRes.getStatus() */
 							+ HttpStatus.valueOf(httpRes.getStatus()));
 				}
-
 			} catch (RuntimeException ex) {
 				log.error("Request Failed", ex);
 				throw ex;
@@ -216,61 +213,6 @@ public class AppFilter extends GenericFilterBean {
 			}
 		}
 		info.setLastRequestTime(System.currentTimeMillis());
-	}
-
-	private void updateHitCounter(HttpServletRequest httpReq) {
-		String ip = getClientIpAddr(httpReq);
-
-		synchronized (uniqueIpHits) {
-			Integer hitCount = ip != null ? uniqueIpHits.get(ip) : null;
-
-			if (hitCount == null) {
-				uniqueIpHits.put(ip, 1);
-			} else {
-				hitCount = hitCount.intValue() + 1;
-				uniqueIpHits.put(ip, hitCount);
-			}
-		}
-	}
-
-	/*
-	 * I found this code online and it is not fully tested, but according to my research it is the best
-	 * way you can try determining the source IP.
-	 */
-	public static String getClientIpAddr(HttpServletRequest request) {
-		String ip = request.getHeader("X-Forwarded-For");
-		if (!unknownIp(ip))
-			return ip;
-
-		ip = request.getHeader("Proxy-Client-IP");
-		if (!unknownIp(ip))
-			return ip;
-
-		ip = request.getHeader("WL-Proxy-Client-IP");
-		if (!unknownIp(ip))
-			return ip;
-
-		ip = request.getHeader("HTTP_CLIENT_IP");
-		if (!unknownIp(ip))
-			return ip;
-
-		ip = request.getHeader("HTTP_X_FORWARDED_FOR");
-		if (!unknownIp(ip))
-			return ip;
-
-		ip = request.getRemoteAddr();
-		if (!unknownIp(ip))
-			return ip;
-
-		return "unknown";
-	}
-
-	public static boolean unknownIp(String ip) {
-		return ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip);
-	}
-
-	public static HashMap<String, Integer> getUniqueIpHits() {
-		return uniqueIpHits;
 	}
 
 	/*

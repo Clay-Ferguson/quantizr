@@ -16,10 +16,10 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.subnode.actpub.ActPubService;
-import org.subnode.config.AppFilter;
 import org.subnode.config.AppProp;
 import org.subnode.config.AppSessionListener;
 import org.subnode.config.SessionContext;
+import org.subnode.filter.HitFilter;
 import org.subnode.model.IPFSObjectStat;
 import org.subnode.model.UserStats;
 import org.subnode.model.client.NodeProp;
@@ -281,11 +281,11 @@ public class SystemService {
 	}
 
 	private static String getIpReport() {
-		return "Number of Unique IPs since startup: " + AppFilter.getUniqueIpHits().size() + "\n";
+		return "Number of Unique IPs since startup: " + HitFilter.getUniqueIpHits().size() + "\n";
 		// StringBuilder sb = new StringBuilder();
 		// sb.append("Unique IPs During Run<br>");
 		// int count = 0;
-		// HashMap<String, Integer> map = AppFilter.getUniqueIpHits();
+		// HashMap<String, Integer> map = HitFilter.getUniqueIpHits();
 		// synchronized (map) {
 		// for (String key : map.keySet()) {
 		// int hits = map.get(key);

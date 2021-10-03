@@ -37,6 +37,42 @@ public class Util {
 		}
 	}
 
+	/*
+	 * I found this code online and it is not fully tested, but according to my research it is the best
+	 * way you can try determining the source IP.
+	 */
+	public static String getClientIpAddr(HttpServletRequest request) {
+		String ip = request.getHeader("X-Forwarded-For");
+		if (!unknownIp(ip))
+			return ip;
+
+		ip = request.getHeader("Proxy-Client-IP");
+		if (!unknownIp(ip))
+			return ip;
+
+		ip = request.getHeader("WL-Proxy-Client-IP");
+		if (!unknownIp(ip))
+			return ip;
+
+		ip = request.getHeader("HTTP_CLIENT_IP");
+		if (!unknownIp(ip))
+			return ip;
+
+		ip = request.getHeader("HTTP_X_FORWARDED_FOR");
+		if (!unknownIp(ip))
+			return ip;
+
+		ip = request.getRemoteAddr();
+		if (!unknownIp(ip))
+			return ip;
+
+		return "unknown";
+	}
+
+	public static boolean unknownIp(String ip) {
+		return ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip);
+	}
+
 	public static boolean isSpringAuthenticated() {
 		return SecurityContextHolder.getContext().getAuthentication() != null
 				&& SecurityContextHolder.getContext().getAuthentication().isAuthenticated();
