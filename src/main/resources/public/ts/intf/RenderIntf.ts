@@ -21,7 +21,7 @@ export interface RenderIntf {
     injectSubstitutions(node: J.NodeInfo, content: string): string;
     showNodeUrl(node: J.NodeInfo, state: AppState): void;
     showGraph(node: J.NodeInfo, searchText: string, state: AppState): void;
-    showCalendar(nodeId: string, state: AppState): void;
+    showCalendar(nodeId: string, allNodes: boolean, state: AppState): void;
     renderPageFromData(data: J.RenderNodeResponse, scrollToTop: boolean, targetNodeId: string, clickTab: boolean, allowScroll: boolean): void;
     getUrlForNodeAttachment(node: J.NodeInfo, downloadLink: boolean): string;
     getStreamUrlForNodeAttachment(node: J.NodeInfo): string;

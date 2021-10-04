@@ -182,7 +182,7 @@ export class Render implements RenderIntf {
     }
 
     /* nodeId is parent node to query for calendar content */
-    showCalendar = (nodeId: string, state: AppState): void => {
+    showCalendar = (nodeId: string, allNodes: boolean, state: AppState): void => {
         if (!nodeId) {
             let node = S.quanta.getHighlightedNode(state);
             if (node) {
@@ -195,10 +195,12 @@ export class Render implements RenderIntf {
         }
 
         S.util.ajax<J.RenderCalendarRequest, J.RenderCalendarResponse>("renderCalendar", {
+            allNodes,
             nodeId
         }, (res: J.RenderCalendarResponse) => {
             dispatch("Action_ShowCalendar", (s: AppState): AppState => {
                 s.fullScreenCalendarId = nodeId;
+                s.fullScreenCalendarAllNodes = allNodes;
                 s.calendarData = S.util.buildCalendarData(res.items);
                 return s;
             });

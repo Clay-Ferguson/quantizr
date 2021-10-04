@@ -348,7 +348,7 @@ export class Edit implements EditIntf {
             }
 
             if (state.fullScreenCalendarId) {
-                S.render.showCalendar(state.fullScreenCalendarId, state);
+                S.render.showCalendar(state.fullScreenCalendarId, state.fullScreenCalendarAllNodes, state);
             }
         }
     }

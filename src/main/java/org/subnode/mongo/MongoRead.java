@@ -297,9 +297,9 @@ public class MongoRead {
         return ret;
     }
 
-    // todo-1: Need to implement a save hook/callback capability in the MongoListener so we can get 
+    // todo-1: Need to implement a save hook/callback capability in the MongoListener so we can get
     // notifications sent to any threads that are waiting to lookup a node
-    // once it exists, but we will STILL probably need to DO the lookup so we don't 
+    // once it exists, but we will STILL probably need to DO the lookup so we don't
     // have concurrent access threading bug.
     public SubNode getNode(MongoSession session, ObjectId objId, boolean allowAuth, int retries) {
         SubNode ret = getNode(session, objId, allowAuth);
@@ -677,19 +677,23 @@ public class MongoRead {
     /**
      * Special purpose query to get all nodes that have a "date" property.
      */
-    public Iterable<SubNode> getCalendar(MongoSession session, SubNode node) {
+    public Iterable<SubNode> getCalendar(MongoSession session, SubNode node, boolean allNodes) {
         auth.auth(session, node, PrivilegeType.READ);
 
         Query query = new Query();
         Criteria criteria = Criteria.where(SubNode.FIELD_PATH).regex(util.regexRecursiveChildrenOfPath(node.getPath()));
 
-        // this mod time condition is simply to be sure the user has 'saved' the node
-        // and not pick up new
-        // node currently being crafted
+        /*
+         * this mod time condition is simply to be sure the user has 'saved' the node and not pick up new
+         * node currently being crafted
+         */
         criteria = criteria.and(SubNode.FIELD_MODIFY_TIME).ne(null);
         query.addCriteria(criteria);
-        query.addCriteria(Criteria.where(SubNode.FIELD_PROPERTIES + "." + NodeProp.DATE + ".value").ne(null));
 
+        // only add the DATA criteria if we're not getting ALL nodes.
+        if (!allNodes) {
+            query.addCriteria(Criteria.where(SubNode.FIELD_PROPERTIES + "." + NodeProp.DATE + ".value").ne(null));
+        }
         return util.find(query);
     }
 
