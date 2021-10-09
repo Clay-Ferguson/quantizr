@@ -89,7 +89,8 @@ export class SearchContentDlg extends DialogBase {
                     new Selection(null, "Sort by", [
                         { key: "0", val: "Relevance" },
                         { key: "ctm", val: "Create Time" },
-                        { key: "mtm", val: "Modify Time" }
+                        { key: "mtm", val: "Modify Time" },
+                        { key: "contentLength", val: "Text Length" }
                     ], "m-2", "searchDlgOrderBy", {
                         setValue: (val: string): void => {
                             this.mergeState({

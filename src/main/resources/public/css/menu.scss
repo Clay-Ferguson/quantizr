@@ -18,7 +18,7 @@
 }
 
 .menuItemSeparator {
-    border-bottom: 3px solid $nodeBorderBottomColor;
+    border-bottom: 2px solid $nodeBorderBottomColor;
 }
 
 .mainMenuItemDisabled {
@@ -55,9 +55,9 @@
 
 .menuCardBody {
     padding: 0px;
-    border-left: 3px solid #444;
-    border-right: 3px solid #444;
-    border-bottom: 3px solid #444;
+    border-left: 2px solid #444;
+    border-right: 2px solid #444;
+    border-bottom: 2px solid #444;
     padding: 6px;
     border-radius: 0 0 $border-radius $border-radius;
 }
@@ -86,6 +86,7 @@
 .menuHeading[aria-expanded=true] {
     background-color: $secondary;
     border-radius: $border-radius $border-radius 0 0 !important;
+    border: 2px solid #444;
 }
 
 .mainMenuItemEnabled:hover {

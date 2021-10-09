@@ -17,9 +17,6 @@ public class MongoSession {
 
 	public MongoSession(String userName, ObjectId userNodeId) {
 		this.userName = userName;
-		if (userNodeId == null && !PrincipalName.ANON.s().equals(userName)) {
-			log.error("WARNING: created MongoSession with null userNodeId!");
-		}
 		this.userNodeId = userNodeId;
 	}
 

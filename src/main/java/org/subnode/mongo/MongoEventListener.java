@@ -39,6 +39,9 @@ public class MongoEventListener extends AbstractMongoEventListener<SubNode> {
 	@Autowired
 	private ActPubService actPub;
 
+	@Autowired
+	private MongoUtil mongoUtil;
+
 	/**
 	 * What we are doing in this method is assigning the ObjectId ourselves, because our path must
 	 * include this id at the very end, since the path itself must be unique. So we assign this prior to
@@ -133,24 +136,21 @@ public class MongoEventListener extends AbstractMongoEventListener<SubNode> {
 		 * part of the path
 		 */
 		if (node.getPath().endsWith("/?")) {
-			// Note: Any code here prior to 11/6/2020, did NOT have the last path part as
-			// the ID, but was
-			// instad a function of the hash of the ID.
-			String path = XString.removeLastChar(node.getPath()) + id.toHexString();
+			String path = mongoUtil.findAvailablePath(XString.removeLastChar(node.getPath()));
 			dbObj.put(SubNode.FIELD_PATH, path);
 			node.setPath(path);
 		}
 
 		saveAuthByThread(node, isNew);
 
-		String pathHash = DigestUtils.sha256Hex(node.getPath());
-		// log.debug("CHECK pathHash=" + pathHash);
-
-		if (!pathHash.equals(node.getPathHash())) {
-			dbObj.put(SubNode.FIELD_PATH_HASH, pathHash);
-			node.setPathHash(pathHash);
-			// log.debug("RESET pathHash=" + pathHash);
-		}
+		// DO NOT DELETE
+		// String pathHash = DigestUtils.sha256Hex(node.getPath());
+		// // log.debug("CHECK path=" + node.getPath() + " pathHash=" + pathHash);
+		// if (!pathHash.equals(node.getPathHash())) {
+		// 	dbObj.put(SubNode.FIELD_PATH_HASH, pathHash);
+		// 	node.setPathHash(pathHash);
+		// 	// log.debug("RESET pathHash=" + pathHash);
+		// }
 
 		/* Node name not allowed to contain : or ~ */
 		String nodeName = node.getName();
@@ -182,8 +182,12 @@ public class MongoEventListener extends AbstractMongoEventListener<SubNode> {
 				dbObj.put(SubNode.FIELD_AC, null);
 			}
 			// Remove any share to self because that never makes sense
-			else if (node.getAc().remove(node.getOwner().toHexString()) != null) {
-				dbObj.put(SubNode.FIELD_AC, node.getAc());
+			else {
+				if (node.getOwner() != null) {
+					if (node.getAc().remove(node.getOwner().toHexString()) != null) {
+						dbObj.put(SubNode.FIELD_AC, node.getAc());
+					}
+				}
 			}
 		}
 

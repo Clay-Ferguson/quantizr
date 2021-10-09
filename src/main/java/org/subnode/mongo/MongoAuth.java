@@ -55,8 +55,8 @@ public class MongoAuth {
 	@Autowired
 	private ActPubService actPub;
 
-	private static MongoSession adminSession;
-	private static MongoSession anonSession;
+	public static MongoSession adminSession;
+	public static MongoSession anonSession;
 
 	private static final HashMap<String, String> userNamesByAccountId = new HashMap<>();
 	private static final HashMap<String, String> displayNamesByAccountId = new HashMap<>();
@@ -68,7 +68,8 @@ public class MongoAuth {
 
 	public MongoSession getAdminSession() {
 		if (adminSession == null) {
-			adminSession = new MongoSession(PrincipalName.ADMIN.s(), read.getDbRoot().getId());
+			SubNode root = read.getDbRoot();
+			adminSession = new MongoSession(PrincipalName.ADMIN.s(), root == null ? null : root.getId());
 		}
 		return adminSession;
 	}

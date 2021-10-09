@@ -11,7 +11,11 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.aggregation.Aggregation;
+import org.springframework.data.mongodb.core.aggregation.AggregationOperation;
+import org.springframework.data.mongodb.core.aggregation.AggregationResults;
 import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.CriteriaDefinition;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.TextCriteria;
 import org.springframework.stereotype.Component;
@@ -125,12 +129,11 @@ public class MongoRead {
 
         String parentPath = getParentPath(node);
         if (parentPath == null || parentPath.equals("") || parentPath.equals("/") || parentPath.equals("/r")
-                || parentPath.equals("/r/p") || parentPath.equals("/r/p/"))
+                || parentPath.equals(NodeName.PENDING_PATH) || parentPath.equals(NodeName.PENDING_PATH + "/"))
             return;
 
-        // todo-1: use constants here, or even make a function to do this too.
-        if (parentPath.startsWith("/r/p/")) {
-            parentPath = parentPath.replace("/r/p/", "/r/");
+        if (parentPath.startsWith(NodeName.PENDING_PATH + "/")) {
+            parentPath = parentPath.replace(NodeName.PENDING_PATH + "/", "/r/");
         }
 
         // no need to check root.
@@ -589,15 +592,8 @@ public class MongoRead {
             String sortDir, int limit, int skip, boolean fuzzy, boolean caseSensitive, String timeRangeType, boolean recursive) {
         auth.auth(session, node, PrivilegeType.READ);
 
-        Query query = new Query();
-
-        if (limit > 0) {
-            query.limit(limit);
-        }
-
-        if (skip > 0) {
-            query.skip(skip);
-        }
+        List<CriteriaDefinition> criterias = new LinkedList<>();
+        Sort sort = null;
 
         /*
          * This regex finds all that START WITH path, have some characters after path, before the end of the
@@ -607,20 +603,19 @@ public class MongoRead {
         Criteria criteria = recursive ? //
                 Criteria.where(SubNode.FIELD_PATH).regex(util.regexRecursiveChildrenOfPath(node.getPath())) //
                 : Criteria.where(SubNode.FIELD_PATH).regex(util.regexDirectChildrenOfPath(node.getPath()));
-        query.addCriteria(criteria);
+        criterias.add(criteria);
 
         if (!StringUtils.isEmpty(text)) {
-
             if (fuzzy) {
                 if (StringUtils.isEmpty(prop)) {
                     prop = SubNode.FIELD_CONTENT;
                 }
 
                 if (caseSensitive) {
-                    query.addCriteria(Criteria.where(prop).regex(text));
+                    criterias.add(Criteria.where(prop).regex(text));
                 } else {
                     // i==insensitive (case)
-                    query.addCriteria(Criteria.where(prop).regex(text, "i"));
+                    criterias.add(Criteria.where(prop).regex(text, "i"));
                 }
             } else {
                 // Query query = Query.query(
@@ -636,7 +631,7 @@ public class MongoRead {
                 TextCriteria textCriteria = TextCriteria.forDefaultLanguage();
                 textCriteria.matching(text);
                 textCriteria.caseSensitive(caseSensitive);
-                query.addCriteria(textCriteria);
+                criterias.add(textCriteria);
             }
         }
 
@@ -653,25 +648,91 @@ public class MongoRead {
                     // because we want to show the soonest items on top, for "future" query, we have
                     // to sort in order (not rev-chron)
                     sortDir = "ASC";
-                    query.addCriteria(Criteria.where(sortField).gt(new Date().getTime()));
+                    criterias.add(Criteria.where(sortField).gt(new Date().getTime()));
                 } //
                 else if ("pastOnly".equals(timeRangeType)) {
-                    query.addCriteria(Criteria.where(sortField).lt(new Date().getTime()));
+                    criterias.add(Criteria.where(sortField).lt(new Date().getTime()));
                 }
                 // if showing all dates the condition here is that there at least IS a 'date'
                 // prop on the node
                 else if ("all".equals(timeRangeType)) {
-                    query.addCriteria(Criteria.where(sortField).ne(null));
+                    criterias.add(Criteria.where(sortField).ne(null));
                 }
             }
 
             if (!StringUtils.isEmpty(sortField)) {
-                query.with(
-                        Sort.by((sortDir != null && sortDir.equalsIgnoreCase("DESC")) ? Sort.Direction.DESC : Sort.Direction.ASC,
-                                sortField));
+                if ("contentLength".equals(sortField)) {
+                    sortDir = "ASC";
+                }
+                sort = Sort.by((sortDir != null && sortDir.equalsIgnoreCase("DESC")) ? Sort.Direction.DESC : Sort.Direction.ASC,
+                        sortField);
             }
         }
-        return util.find(query);
+
+        /*
+         * For a calculated field we do an Aggregate Query operation. The purpose of this entire Aggregation
+         * is to calculate contentLength on the fly so we can sort on it.
+         */
+        if ("contentLength".equals(sortField)) {
+            List<AggregationOperation> aggOps = new LinkedList<>();
+
+            /*
+             * MongoDB requires any TextCriteria (full-text search) to be the first op in the pipeline so we
+             * process it first here
+             */
+            for (CriteriaDefinition c : criterias) {
+                if (c instanceof TextCriteria) {
+                    aggOps.add(Aggregation.match(c));
+                }
+            }
+
+            /* Next we process all non-TextCriteria conditions */
+            for (CriteriaDefinition c : criterias) {
+                if (!(c instanceof TextCriteria)) {
+                    aggOps.add(Aggregation.match(c));
+                }
+            }
+
+            // calculate contentLength
+            aggOps.add(Aggregation.project().andInclude(SubNode.ALL_FIELDS)//
+                    .andExpression("strLenCP(cont)").as("contentLength"));
+
+            /*
+             * IMPORTANT: Having 'sort' before 'skip' and 'limit' is REQUIRED to get correct behavior, because
+             * with aggregates we doing a step by step pipeline of processing so we need records in the correct
+             * order before we do limit or skip and so the ordering of these 'ops' does that.
+             */
+            aggOps.add(Aggregation.sort(sort));
+            aggOps.add(Aggregation.skip((long) skip));
+            aggOps.add(Aggregation.limit(limit));
+
+            Aggregation agg = Aggregation.newAggregation(aggOps);
+
+            AggregationResults<SubNode> results = ops.aggregate(agg, SubNode.class, SubNode.class);
+            return results.getMappedResults();
+        }
+        // Otherwise a standard Query.
+        else {
+            Query query = new Query();
+
+            for (CriteriaDefinition c : criterias) {
+                query.addCriteria(c);
+            }
+
+            if (sort != null) {
+                query.with(sort);
+            }
+
+            if (limit > 0) {
+                query.limit(limit);
+            }
+
+            if (skip > 0) {
+                query.skip(skip);
+            }
+
+            return util.find(query);
+        }
     }
 
     /**

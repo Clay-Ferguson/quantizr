@@ -3,14 +3,14 @@ package org.subnode.mongo;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.List;
+import java.util.Random;
+import java.util.StringTokenizer;
 import java.util.regex.Pattern;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoCursor;
 import com.mongodb.client.MongoDatabase;
 import org.apache.commons.codec.digest.DigestUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.bson.Document;
 import org.bson.types.ObjectId;
 import org.slf4j.Logger;
@@ -86,12 +86,20 @@ public class MongoUtil {
 	private MongoUpdate update;
 
 	@Autowired
-	private MongoDelete delete;
+	private MongoUtil mongoUtil;
 
 	@Autowired
 	private MongoAuth auth;
 
 	private static SubNode systemRootNode;
+
+	private static final Random rand = new Random();
+
+	/*
+	 * removed 'r' and 'p' since those are 'root' and 'pending' (see setPendingPath), and we need very
+	 * performanc way to translate from /r/p to /r path and vice verse
+	 */
+	static final String PATH_CHARS = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnoqstuvwxyz";
 
 	// todo-2: need to look into bulk-ops for doing this saveSession updating
 	// tips:
@@ -140,6 +148,44 @@ public class MongoUtil {
 			node = ops.findById(objId, SubNode.class);
 		}
 		return nodeOrDirtyNode(node);
+	}
+
+	/*
+	 * Takes a path like "/a/b/" OR "/a/b" and finds any random longer path that's not currently used.
+	 * Note that since we don't require to end with "/" this function can be extending an existing leaf
+	 * name, or if the path does end with "/", then it has the effect of finding a new leaf from
+	 * scratch.
+	 */
+	public String findAvailablePath(String path) {
+		int tries = 0;
+		while (true) {
+			/*
+			 * Append one random char to path. Statistically if we keep adding characters it becomes
+			 * exponentially more likely we find an unused path.
+			 */
+			path += PATH_CHARS.charAt(rand.nextInt(PATH_CHARS.length()));
+
+			/*
+			 * if we encountered two misses, start adding two characters per iteration (at least), because this
+			 * node has lots of children
+			 */
+			if (tries >= 2) {
+				path += PATH_CHARS.charAt(rand.nextInt(PATH_CHARS.length()));
+			}
+
+			// after 3 fails get even more aggressive with 3 new chars per loop here.
+			if (tries >= 3) {
+				path += PATH_CHARS.charAt(rand.nextInt(PATH_CHARS.length()));
+			}
+
+			Query query = new Query();
+			query.addCriteria(Criteria.where(SubNode.FIELD_PATH).is(path));
+
+			if (!ops.exists(query, SubNode.class)) {
+				return path;
+			}
+			tries++;
+		}
 	}
 
 	public SubNode nodeOrDirtyNode(SubNode node) {
@@ -211,17 +257,25 @@ public class MongoUtil {
 	/*
 	 * Make node either start with /r/p/ or ensure that it does NOT start with /r/p
 	 * 
-	 * p=pending, meaning user has not yet saved, and if they cancel the node gets orphaned and
-	 * eventually cleaned up by the system automatically.
+	 * 'p' means pending, and indicates user has not yet saved a new node they're currently editing, and
+	 * if they cancel the node gets orphaned and eventually cleaned up by the system automatically.
 	 */
 	public void setPendingPath(SubNode node, boolean pending) {
 		String pendingPath = NodeName.PENDING_PATH + "/";
 		String rootPath = "/" + NodeName.ROOT + "/";
 
+		// ensure node starts with /r/p
 		if (pending && !node.getPath().startsWith(pendingPath)) {
 			node.setPath(node.getPath().replace(rootPath, pendingPath));
-		} else if (!pending && node.getPath().startsWith(pendingPath)) {
-			node.setPath(node.getPath().replace(pendingPath, rootPath));
+		}
+		// ensure node starts with /r and not /r/p
+		else if (!pending && node.getPath().startsWith(pendingPath)) {
+			// get 'p' out of the path, first
+			String path = node.getPath().replace(pendingPath, rootPath);
+
+			// and finally ensure we have an UNUSED (not duplicate) path
+			path = mongoUtil.findAvailablePath(path);
+			node.setPath(path);
 		}
 	}
 
@@ -362,49 +416,87 @@ public class MongoUtil {
 	// Leaving this here for future reference for any DB-conversions.
 	// This code was for removing dupliate apids and renaming a property
 	public void preprocessDatabase(MongoSession session) {
-		log.debug("DupCheck");
+		// NO LONGER NEEDED.
+		// This was a one time conversion to get the DB updated to the newer shorter path parts.
+		// shortenPathParts(session);
+	}
+
+	// Alters all paths parts that are over 10 characters long, on all nodes
+	public void shortenPathParts(MongoSession session) {
+		int lenLimit = 10;
 		Iterable<SubNode> nodes = ops.findAll(SubNode.class);
-		HashSet<String> set = new HashSet<>();
-		List<SubNode> delNodes = new LinkedList<>();
+		HashMap<String, Integer> set = new HashMap<>();
+		int idx = 0;
 
 		for (SubNode node : nodes) {
-			String apId = node.getStrProp("ap:id");
-			if (!StringUtils.isEmpty(apId)) {
-				if (set.contains(apId)) {
-					log.debug("DUP apid: " + apId);
-					delNodes.add(node);
-				} else {
-					set.add(apId);
-					node.setProp("apid", apId);
-					node.deleteProp("ap:id");
+			StringTokenizer t = new StringTokenizer(node.getPath(), "/", false);
+
+			while (t.hasMoreTokens()) {
+				String part = t.nextToken().trim();
+				if (part.length() < lenLimit)
+					continue;
+
+				if (set.get(part) == null) {
+					Integer x = idx++;
+					set.put(part, x);
 				}
 			}
 		}
 
-		for (SubNode node : delNodes) {
-			log.debug("DUP DEL: " + node.getId().toHexString());
-			delete.delete(node);
+		nodes = ops.findAll(SubNode.class);
+		int maxPathLen = 0;
+
+		for (SubNode node : nodes) {
+			StringTokenizer t = new StringTokenizer(node.getPath(), "/", true);
+			StringBuilder fullPath = new StringBuilder();
+
+			while (t.hasMoreTokens()) {
+				String part = t.nextToken().trim();
+
+				// if delimiter, or short parths, just take them as is
+				if (part.length() < lenLimit) {
+					fullPath.append(part);
+				}
+				// if path part find it's unique integer, and insert
+				else {
+					Integer partIdx = set.get(part);
+
+					// if the database changed underneath it we just take that as another new path part
+					if (partIdx == null) {
+						partIdx = idx++;
+						set.put(part, partIdx);
+					}
+					fullPath.append(String.valueOf(partIdx));
+				}
+			}
+
+			// log.debug("fullPath: " + fullPath);
+			if (fullPath.length() > maxPathLen) {
+				maxPathLen = fullPath.length();
+			}
+			node.setPath(fullPath.toString());
+			ops.save(node);
 		}
-		update.saveSession(session);
+		log.debug("PATH PROCESSING DONE: maxPathLen=" + maxPathLen);
 	}
 
 	public void createAllIndexes(MongoSession session) {
-		// preprocessDatabase(session);
-		try {
-			// dropIndex(session, SubNode.class, SubNode.FIELD_PATH + "_1");
-			dropIndex(session, SubNode.class, SubNode.FIELD_NAME + "_1");
-		} catch (Exception e) {
-			log.debug("no field name index found. ok. this is fine.");
-		}
-		log.debug("creating all indexes.");
+		preprocessDatabase(session);
+		log.debug("checking all indexes.");
 
 		ops.indexOps(FediverseName.class).ensureIndex(new Index().on(FediverseName.FIELD_NAME, Direction.ASC).unique());
 
-		createUniqueIndex(session, SubNode.class, SubNode.FIELD_PATH_HASH);
+		// DO NOT DELETE
+		// Here's info about index performance with prefix queries;
+		// https://docs.mongodb.com/manual/reference/operator/query/regex/#index-use
+		// createUniqueIndex(session, SubNode.class, SubNode.FIELD_PATH_HASH);
+
+		createUniqueIndex(session, SubNode.class, SubNode.FIELD_PATH);
 
 		// Other indexes that *could* be added but we don't, just as a performance enhancer is
 		// Unique node names: Key = node.owner+node.name (or just node.name for admin)
-		// Unique Friends: Key = node.owner+node.friendId? (meaning only ONE Friend type node per user account)
+		// Unique Friends: Key = node.owner+node.friendId? (meaning only ONE Friend type node per user
+		// account)
 
 		// dropIndex(session, SubNode.class, "unique-apid");
 		createPartialUniqueIndex(session, "unique-apid", SubNode.class,
@@ -453,7 +545,8 @@ public class MongoUtil {
 		log.debug(sb.toString());
 	}
 
-	// WARNING: I wote this but never tested it, nor did I ever find any examples online. Ended up not needing any
+	// WARNING: I wote this but never tested it, nor did I ever find any examples online. Ended up not
+	// needing any
 	// compound indexes (yet)
 	public void createPartialUniqueIndexComp2(MongoSession session, String name, Class<?> clazz, String property1,
 			String property2) {
@@ -578,7 +671,14 @@ public class MongoUtil {
 	 */
 	public String regexRecursiveChildrenOfPath(String path) {
 		path = XString.stripIfEndsWith(path, "/");
-		return "^" + Pattern.quote(path) + "\\/(.+)$";
+
+		// Based on this page:
+		// https://docs.mongodb.com/manual/reference/operator/query/regex/#index-use
+		// It looks like this might be the best performance here:
+		return "^" + Pattern.quote(path) + "\\/.*";
+
+		// Legacy implementation
+		// return "^" + Pattern.quote(path) + "\\/(.+)$";
 	}
 
 	public SubNode createUser(MongoSession session, String user, String email, String password, boolean automated) {
@@ -643,6 +743,14 @@ public class MongoUtil {
 			adminNode =
 					snUtil.ensureNodeExists(session, "/", NodeName.ROOT, null, "Root", NodeType.REPO_ROOT.s(), true, null, null);
 
+			// ==== todo-0: temp fix
+			// (only fixes bug in initial DB startup/initiation)
+			MongoAuth.adminSession = null;
+			MongoSession adminSession = auth.getAdminSession();
+			ThreadLocals.setMongoSession(adminSession);
+			session = adminSession;
+			// ===== end fix
+
 			adminNode.setProp(NodeProp.USER.s(), PrincipalName.ADMIN.s());
 			adminNode.setProp(NodeProp.USER_PREF_EDIT_MODE.s(), false);
 			adminNode.setProp(NodeProp.USER_PREF_RSS_HEADINGS_ONLY.s(), true);
@@ -657,8 +765,8 @@ public class MongoUtil {
 	public void createPublicNodes(MongoSession session) {
 		log.debug("creating Public Nodes");
 		ValContainer<Boolean> created = new ValContainer<>(Boolean.FALSE);
-		SubNode publicNode = snUtil.ensureNodeExists(session, "/" + NodeName.ROOT, NodeName.PUBLIC, null, "Public", null, true,
-				null, created);
+		SubNode publicNode =
+				snUtil.ensureNodeExists(session, "/" + NodeName.ROOT, NodeName.PUBLIC, null, "Public", null, true, null, created);
 
 		if (created.getVal()) {
 			aclService.addPrivilege(session, publicNode, PrincipalName.PUBLIC.s(), Arrays.asList(PrivilegeType.READ.s()), null);

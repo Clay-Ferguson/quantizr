@@ -47,6 +47,7 @@ import org.subnode.model.client.NodeProp;
 import org.subnode.model.client.PrincipalName;
 import org.subnode.mongo.AdminRun;
 import org.subnode.mongo.MongoRead;
+import org.subnode.mongo.MongoRepository;
 import org.subnode.mongo.model.SubNode;
 import org.subnode.request.AddFriendRequest;
 import org.subnode.request.AddPrivilegeRequest;
@@ -332,6 +333,9 @@ public class AppController implements ErrorController {
 			@RequestParam(value = "passCode", required = false) String passCode, //
 			Model model) {
 		try {
+			if (!MongoRepository.fullInit) {
+				throw new RuntimeException("Server temporarily offline.");
+			}
 			initThymeleafAttribs();
 
 			// log.debug("AppController.index: sessionUser=" +
@@ -383,6 +387,9 @@ public class AppController implements ErrorController {
 	@RequestMapping(value = {"/"})
 	public String welcome(@RequestParam(value = "signupCode", required = false) String signupCode, //
 			Model model) {
+		if (!MongoRepository.fullInit) {
+			throw new RuntimeException("Server temporarily offline.");
+		}
 		initThymeleafAttribs();
 
 		// NOTE: Not currently used. For now we are not initializing any of these page

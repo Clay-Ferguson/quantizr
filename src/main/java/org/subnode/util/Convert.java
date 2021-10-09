@@ -114,7 +114,7 @@ public class Convert {
 		List<AccessControlInfo> acList = buildAccessControlList(sc, node);
 
 		if (node.getOwner() == null) {
-			throw new RuntimeException("node has no owner: " + node.getId().toHexString());
+			throw new RuntimeException("node has no owner: " + node.getId().toHexString() + " node.path=" + node.getPath());
 		}
 
 		String ownerId = node.getOwner().toHexString();
@@ -289,8 +289,7 @@ public class Convert {
 		return ret;
 	}
 
-	public AccessControlInfo convertToAccessControlInfo(SessionContext sc, SubNode node, String principalId,
-			AccessControl ac) {
+	public AccessControlInfo convertToAccessControlInfo(SessionContext sc, SubNode node, String principalId, AccessControl ac) {
 		AccessControlInfo acInfo = new AccessControlInfo();
 		acInfo.setPrincipalNodeId(principalId);
 

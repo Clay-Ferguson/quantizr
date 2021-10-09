@@ -37,6 +37,7 @@ import org.subnode.mongo.MongoAuth;
 import org.subnode.mongo.MongoCreate;
 import org.subnode.mongo.MongoDelete;
 import org.subnode.mongo.MongoRead;
+import org.subnode.mongo.MongoRepository;
 import org.subnode.mongo.MongoSession;
 import org.subnode.mongo.MongoUpdate;
 import org.subnode.mongo.MongoUtil;
@@ -1113,7 +1114,7 @@ public class ActPubService {
     /* every 90 minutes ping all the outboxes */
     @Scheduled(fixedDelay = 90 * DateUtil.MINUTE_MILLIS)
     public void bigRefresh() {
-        if (!appProp.isDaemonsEnabled())
+        if (!appProp.isDaemonsEnabled() || !MongoRepository.fullInit)
             return;
 
         if (bigRefresh)
@@ -1131,7 +1132,7 @@ public class ActPubService {
      */
     @Scheduled(fixedDelay = 3 * 1000)
     public void userRefresh() {
-        if (userRefresh || !appProp.isActPubEnabled() || !appProp.isDaemonsEnabled())
+        if (userRefresh || !appProp.isActPubEnabled() || !appProp.isDaemonsEnabled() || !MongoRepository.fullInit)
             return;
 
         try {

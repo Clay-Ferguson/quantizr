@@ -7,7 +7,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.subnode.AppServer;
 import org.subnode.actpub.ActPubService;
-import org.subnode.config.AppProp;
 import org.subnode.util.ThreadLocals;
 
 @Component
@@ -109,8 +108,6 @@ public class MongoRepository {
 			util.createAllIndexes(adminSession);
 			util.createAdminUser(adminSession);
 			repoUtil.createTestAccounts();
-
-			// update.runRepairs();
 
 			log.debug("MongoRepository fully initialized.");
 			fullInit = true;

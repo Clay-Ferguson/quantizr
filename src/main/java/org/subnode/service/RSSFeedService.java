@@ -61,6 +61,7 @@ import org.subnode.model.client.RssFeedEntry;
 import org.subnode.model.client.RssFeedMediaContent;
 import org.subnode.mongo.AdminRun;
 import org.subnode.mongo.MongoRead;
+import org.subnode.mongo.MongoRepository;
 import org.subnode.mongo.MongoSession;
 import org.subnode.mongo.model.SubNode;
 import org.subnode.request.GetMultiRssRequest;
@@ -141,10 +142,9 @@ public class RSSFeedService {
 	 */
 	@Scheduled(fixedDelay = 30 * 60 * 1000)
 	public void run() {
-		if (!appProp.isDaemonsEnabled())
+		if (run || !appProp.isDaemonsEnabled() || !MongoRepository.fullInit)
 			return;
-		if (run)
-			return;
+		
 		try {
 			run = true;
 			runCount++;

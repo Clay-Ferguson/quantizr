@@ -12,6 +12,7 @@ import org.subnode.AppServer;
 import org.subnode.config.AppProp;
 import org.subnode.model.client.NodeProp;
 import org.subnode.mongo.MongoDelete;
+import org.subnode.mongo.MongoRepository;
 import org.subnode.mongo.MongoSession;
 import org.subnode.mongo.AdminRun;
 import org.subnode.mongo.model.SubNode;
@@ -62,7 +63,7 @@ public class NotificationDaemon {
 	 */
 	@Scheduled(fixedDelay = 1000)
 	public void run() {
-		if (run) return;
+		if (run || !MongoRepository.fullInit) return;
 		try {
 			run = true;
 			if (AppServer.isShuttingDown() || !AppServer.isEnableScheduling()) {

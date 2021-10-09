@@ -54,6 +54,7 @@ import org.subnode.mongo.AdminRun;
 import org.subnode.mongo.CreateNodeLocation;
 import org.subnode.mongo.MongoCreate;
 import org.subnode.mongo.MongoRead;
+import org.subnode.mongo.MongoRepository;
 import org.subnode.mongo.MongoSession;
 import org.subnode.mongo.MongoUpdate;
 import org.subnode.mongo.model.SubNode;
@@ -161,6 +162,7 @@ public class IPFSService {
     /* On regular interval forget which CIDs have failed and allow them to be retried */
     @Scheduled(fixedDelay = 10 * DateUtil.MINUTE_MILLIS)
     public void clearFailedCIDs() {
+        if (!MongoRepository.fullInit) return;
         failedCIDs.clear();
     }
 

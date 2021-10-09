@@ -60,7 +60,9 @@ public class MongoTest implements TestIntf {
 		log.debug("*****************************************************************************************");
 		log.debug("MongoTest Running!");
 
-		authTest();
+		testPathRegex();
+
+		// authTest();
 
 		// // Verify we can lookup the node we just inserted, by ObjectId
 		// SubNode nodeFoundById = read.getNode(adminSession, node.getId());
@@ -211,10 +213,14 @@ public class MongoTest implements TestIntf {
 
 		// Recursive Children Test
 		String rc = mongoUtil.regexRecursiveChildrenOfPath("/abc");
+		verify("/abc/x".matches(rc));
 		verify("/abc/def".matches(rc));
 		verify("/abc/def/x".matches(rc));
 		verify("/abc/def/xyz/nop".matches(rc));
 		verify(!"/abcx".matches(rc));
+
+		// the final slash is built into the query.
+		verify(!"/abc".matches(rc));
 	}
 
 	public void verify(boolean val) {

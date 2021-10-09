@@ -228,6 +228,7 @@ public class NodeSearchService {
 								counter + 1, false, false, false, false);
 						searchResults.add(info);
 					} catch (Exception e) {
+						ExUtil.error(log, "Failed converting node", e);
 					}
 				}
 			}

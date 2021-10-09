@@ -27,6 +27,7 @@ import org.subnode.AppServer;
 import org.subnode.config.SessionContext;
 import org.subnode.model.client.IPSMData;
 import org.subnode.model.client.IPSMMessage;
+import org.subnode.mongo.MongoRepository;
 import org.subnode.response.IPSMPushInfo;
 import org.subnode.response.ServerPushInfo;
 import org.subnode.util.AsyncExec;
@@ -182,6 +183,7 @@ public class IPFSPubSub {
     // clear throttle counters every minute.
     @Scheduled(fixedDelay = DateUtil.MINUTE_MILLIS)
     public void clearThrottles() {
+        if (!MongoRepository.fullInit) return;
         synchronized (fromCounter) {
             fromCounter.clear();
         }
