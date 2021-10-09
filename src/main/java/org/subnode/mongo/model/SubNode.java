@@ -56,7 +56,7 @@ import org.subnode.util.XString;
 @Document(collection = "nodes")
 @TypeAlias("n1")
 @JsonInclude(Include.NON_NULL)
-@JsonPropertyOrder({SubNode.FIELD_PATH, /* DO NOT DELETE: SubNode.FIELD_PATH_HASH,*/ SubNode.FIELD_CONTENT, SubNode.FIELD_NAME, SubNode.FIELD_ID,
+@JsonPropertyOrder({SubNode.FIELD_PATH, SubNode.FIELD_CONTENT, SubNode.FIELD_NAME, SubNode.FIELD_ID,
 		SubNode.FIELD_MAX_CHILD_ORDINAL, SubNode.FIELD_ORDINAL, SubNode.FIELD_OWNER, SubNode.FIELD_CREATE_TIME,
 		SubNode.FIELD_MODIFY_TIME, SubNode.FIELD_AC, SubNode.FIELD_PROPERTIES})
 public class SubNode {
@@ -78,19 +78,6 @@ public class SubNode {
 	public static final String FIELD_PATH = "pth";
 	@Field(FIELD_PATH)
 	private String path;
-
-	/* DO NOT DELETE
-	 * This property gets updated during the save event processing, and we store the hash of the path in
-	 * here, so that we can achieve the equivalent of a unique key on the path (indirectly via this
-	 * hash) because the full path becomes to long for MongoDb indexes to allow, but also because using
-	 * the hash for uniqueness is faster
-	 * 
-	 * removing this path hash, but keeping the code commented out as a pattern for
-	 * whenever something in the future may need to have a hash assigned to it.
-	 */
-	// public static final String FIELD_PATH_HASH = "phash";
-	// @Field(FIELD_PATH_HASH)
-	// private String pathHash;
 
 	public static final String FIELD_TYPE = "typ";
 	@Field(FIELD_TYPE)
@@ -134,7 +121,6 @@ public class SubNode {
 	public static final String[] ALL_FIELDS = { //
 			SubNode.FIELD_PATH, //
 			SubNode.FIELD_TYPE, //
-			// SubNode.FIELD_PATH_HASH, // DO NOT DELETE
 			SubNode.FIELD_CONTENT, //
 			SubNode.FIELD_NAME, //
 			SubNode.FIELD_ID, //
@@ -206,12 +192,6 @@ public class SubNode {
 		return path;
 	}
 
-	// DO NOT DELETE
-	// @JsonProperty(FIELD_PATH_HASH)
-	// public String getPathHash() {
-	// 	return pathHash;
-	// }
-
 	@Transient
 	@JsonIgnore
 	public String getParentPath() {
@@ -239,29 +219,11 @@ public class SubNode {
 
 		MongoAuth.inst.ownerAuthByThread(this);
 		ThreadLocals.dirty(this);
-
-		// DO NOT DELETE
-		// /*
-		//  * nullify path hash if the path is changing so that MongoEventListener will update the value when
-		//  * saving
-		//  */
-		// if (!path.equals(this.path)) {
-		// 	this.pathHash = null;
-		// }
-
 		this.path = path;
 
 		// NOTE: We CANNOT update the cache here, because all the validation for a node
 		// is done and MongoEventListener, so this node is currently "untrusted" with it's new path.
 	}
-
-	// DO NOT DELETE
-	// @JsonProperty(FIELD_PATH_HASH)
-	// public void setPathHash(String pathHash) {
-	// 	// This is a special function only called from MongoEventListener, so we don't need to call
-	// 	// ThreadLocals.dirty
-	// 	this.pathHash = pathHash;
-	// }
 
 	@JsonProperty(FIELD_ORDINAL)
 	public Long getOrdinal() {

@@ -143,15 +143,6 @@ public class MongoEventListener extends AbstractMongoEventListener<SubNode> {
 
 		saveAuthByThread(node, isNew);
 
-		// DO NOT DELETE
-		// String pathHash = DigestUtils.sha256Hex(node.getPath());
-		// // log.debug("CHECK path=" + node.getPath() + " pathHash=" + pathHash);
-		// if (!pathHash.equals(node.getPathHash())) {
-		// 	dbObj.put(SubNode.FIELD_PATH_HASH, pathHash);
-		// 	node.setPathHash(pathHash);
-		// 	// log.debug("RESET pathHash=" + pathHash);
-		// }
-
 		/* Node name not allowed to contain : or ~ */
 		String nodeName = node.getName();
 		if (nodeName != null) {

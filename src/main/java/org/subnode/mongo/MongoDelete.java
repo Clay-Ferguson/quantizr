@@ -187,11 +187,6 @@ public class MongoDelete {
 		/* Scan every node in the database and store it's path hash in the set */
 		Iterable<SubNode> nodes = util.find(query);
 		for (SubNode node : nodes) {
-			/*
-			 * Theoretically the node.getPathHash() should already contain this hash, but to be super paranoid
-			 * we just recalculate that hash here since the consequences of it being out of sync could be data
-			 * loss.
-			 */
 			pathHashSet.add(DigestUtils.sha256Hex(node.getPath()));
 		}
 

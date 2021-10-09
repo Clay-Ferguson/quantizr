@@ -325,21 +325,6 @@ public class MongoUtil {
 		return "Node Count: " + numDocs + "<br>Total JSON Size: " + kb + " KB<br>";
 	}
 
-	/*
-	 * Whenever we do something like reindex in a new way, we might need to reprocess every object, to
-	 * generate any kind of auto-generated fields that need to be there before indexes build we call
-	 * this.
-	 * 
-	 * For example when the path hash was introduced (i.e. SubNode.FIELD_PATH_HASH) we ran this to
-	 * create all the path hashes so that a unique index could be built, because the uniqueness test
-	 * would fail until we generated all the proper data, which required a modification on every node in
-	 * the entire DB.
-	 * 
-	 * Note that MongoEventListener#onBeforeSave does execute even if all we are doing is reading nodes
-	 * and then resaving them.
-	 */
-	// ********* DO NOT DELETE *********
-	// (this is needed from time to time)
 	public void convertDb(MongoSession session) {
 		// processAllNodes(session);
 	}
@@ -485,11 +470,6 @@ public class MongoUtil {
 		log.debug("checking all indexes.");
 
 		ops.indexOps(FediverseName.class).ensureIndex(new Index().on(FediverseName.FIELD_NAME, Direction.ASC).unique());
-
-		// DO NOT DELETE
-		// Here's info about index performance with prefix queries;
-		// https://docs.mongodb.com/manual/reference/operator/query/regex/#index-use
-		// createUniqueIndex(session, SubNode.class, SubNode.FIELD_PATH_HASH);
 
 		createUniqueIndex(session, SubNode.class, SubNode.FIELD_PATH);
 
