@@ -68,9 +68,21 @@ export class Nav implements NavIntf {
                 s.pageMessage = "The node above is not shared.";
                 return s;
             });
+
+            this.delayedClearPageMessage();
+
         } else {
             S.render.renderPageFromData(res, scrollToTop, id, true, true);
         }
+    }
+
+    delayedClearPageMessage = (): void => {
+        setTimeout(() => {
+            dispatch("Action_ClearPageMessage", (s: AppState): AppState => {
+                s.pageMessage = null;
+                return s;
+            });
+        }, 5000);
     }
 
     navOpenSelectedNode = (state: AppState): void => {
