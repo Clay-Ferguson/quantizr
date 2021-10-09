@@ -76,6 +76,7 @@
     border: none;
     padding: 10px; 
     border-radius: $border-radius $border-radius 0 0;
+    border: 2px solid transparent;
 }
 
 .menuHeading:hover {

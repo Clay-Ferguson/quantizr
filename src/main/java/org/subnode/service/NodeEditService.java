@@ -169,11 +169,6 @@ public class NodeEditService {
 		auth.authForChildNodeCreate(session, node);
 		CreateNodeLocation createLoc = req.isCreateAtTop() ? CreateNodeLocation.FIRST : CreateNodeLocation.LAST;
 
-		String parentHashTags = parseHashTags(node.getContent());
-		if (parentHashTags.length() > 0) {
-			parentHashTags = "\n\n" + parentHashTags + "\n";
-		}
-
 		SubNode newNode =
 				create.createNode(session, node, null, req.getTypeName(), 0L, createLoc, req.getProperties(), null, true);
 
@@ -181,7 +176,7 @@ public class NodeEditService {
 			util.setPendingPath(newNode, true);
 		}
 
-		newNode.setContent(parentHashTags + (req.getContent() != null ? req.getContent() : ""));
+		newNode.setContent(req.getContent() != null ? req.getContent() : "");
 		newNode.touch();
 
 		if (NodeType.BOOKMARK.s().equals(req.getTypeName())) {
@@ -220,46 +215,6 @@ public class NodeEditService {
 
 		res.setSuccess(true);
 		return res;
-	}
-
-	/*
-	 * Takes a message that may have some hashtags in it and returns a string with all those hashtags in
-	 * it space delimited
-	 */
-	public String parseHashTags(String message) {
-		if (message == null)
-			return "";
-		StringBuilder tags = new StringBuilder();
-
-		// prepare so that newlines are compatable with out tokenizing
-		message = message.replace("\n", " ");
-		message = message.replace("\r", " ");
-
-		/*
-		 * Mastodon jams a bunch of html together like this for example: #<span>bot</span> So we replace
-		 * that html with spaces to make the tokenizer work. However I think it also stores tags in
-		 * structured JSON?
-		 */
-		message = message.replace("#<span>", "#");
-		message = message.replace("<span>", " ");
-		message = message.replace("</span>", " ");
-		message = message.replace("<", " ");
-		message = message.replace(">", " ");
-
-		List<String> words = XString.tokenize(message, " ", true);
-		if (words != null) {
-			for (String word : words) {
-				// be sure there aren't multiple pound signs other than just the first
-				// character.
-				if (word.length() > 2 && word.startsWith("#") && StringUtils.countMatches(word, "#") == 1) {
-					if (tags.length() > 0) {
-						tags.append(" ");
-					}
-					tags.append(word);
-				}
-			}
-		}
-		return tags.toString();
 	}
 
 	public SubNode createFriendNode(MongoSession session, SubNode parentFriendsList, String userToFollow) {
