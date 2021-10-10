@@ -30,8 +30,6 @@ public enum NodeProp {
     ACT_PUB_ACTOR_INBOX("ap:actorInbox", "s"), //
     ACT_PUB_SENSITIVE("ap:nsfw", "s"), //
 
-    UNPUBLISHED("unpublished", "s"), //
-
     /*
      * This is the encrypted symetric key to the node data, that was encrypted using
      * the private key of the owner of the node. When nodes are shared to other
