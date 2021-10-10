@@ -205,9 +205,14 @@ export class FeedView extends AppTab {
                     moreButton.whenElm((elm: HTMLElement) => {
                         let observer = new IntersectionObserver(entries => {
                             entries.forEach((entry: any) => {
-                                if (entry.isIntersecting) {
+                                if (S.quanta.allowIntersectingObserver && entry.isIntersecting) {
                                     // observer.disconnect();
                                     S.srch.feed(++this.data.props.page, this.data.props.searchTextState.getValue(), true, true);
+
+                                    // it's possible that the next render COULD immediately show the NEXT button so we
+                                    // use this "allow" varible to control
+                                    S.quanta.allowIntersectingObserver = false;
+                                    setTimeout(() => { S.quanta.allowIntersectingObserver = true; }, 3000);
                                 }
                             });
                         });

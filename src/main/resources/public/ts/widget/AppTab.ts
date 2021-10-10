@@ -38,7 +38,7 @@ export class AppTab extends Div {
     reScroll = (elm: HTMLElement): void => {
         if (!elm) return;
         // #DEBUG-SCROLLING
-        // console.log("reScroll: " + elm.scrollTop);
+        // console.log("reScroll [" + this.data.name + "]: " + elm.scrollTop);
         elm.scrollTop = this.data.scrollPos;
     }
 

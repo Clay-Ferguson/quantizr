@@ -135,9 +135,12 @@ export class View implements ViewIntf {
             singleNode: false
         }, async (res: J.RenderNodeResponse) => {
             // if this is an "infinite scroll" call to load in additional nodes
-            if (growingPage && (state.node == null || state.node.children == null || state.node.children.length < C.MAX_DYNAMIC_ROWS)) {
-                if (res.node && state.node && res.node.children && state.node.children) {
+            if (growingPage) {
+                let scrollToTop = true;
 
+                /* if the response has some children, and we already have local children we can add to, and we haven't reached
+                max dynamic rows yet, then make our children equal the concatenatio existing rows plus new rows */
+                if (res?.node?.children && state?.node?.children && state.node.children.length < C.MAX_DYNAMIC_ROWS) {
                     // create a set for duplicate detection
                     let idSet: Set<string> = new Set<string>();
 
@@ -148,8 +151,21 @@ export class View implements ViewIntf {
 
                     // assign 'res.node.chidren' as the new list appending in the new ones with dupliates removed.
                     res.node.children = state.node.children.concat(res.node.children.filter(child => !idSet.has(child.id)));
+                    scrollToTop = false;
                 }
-                S.render.renderPageFromData(res, false, null, false, false);
+
+                if (scrollToTop) {
+                    S.view.scrollAllTop(state);
+
+                    // This is the currently untested final way to try to get the scroll to top to happen
+                    // regarding the bug mentioned above this if block.
+                    setTimeout(() => {
+                        S.render.renderPageFromData(res, scrollToTop, null, false, scrollToTop);
+                    }, 1000);
+                }
+                else {
+                    S.render.renderPageFromData(res, scrollToTop, null, false, scrollToTop);
+                }
             }
             // else, loading in a page which overrides and discards all existing nodes in browser view
             else {

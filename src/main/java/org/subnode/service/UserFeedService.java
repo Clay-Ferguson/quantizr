@@ -124,11 +124,14 @@ public class UserFeedService {
 	 * 
 	 */
 	public NodeFeedResponse generateFeed(MongoSession session, NodeFeedRequest req) {
+		/* Set this flag to generate large resultset of all nodes in root */
+		boolean testQuery = true;
+
 		SessionContext sc = ThreadLocals.getSC();
 		NodeFeedResponse res = new NodeFeedResponse();
 		session = ThreadLocals.ensure(session);
 
-		String pathToSearch = NodeName.ROOT_OF_ALL_USERS;
+		String pathToSearch = testQuery ? "/r" : NodeName.ROOT_OF_ALL_USERS;
 		boolean doAuth = true;
 
 		/*
@@ -174,16 +177,18 @@ public class UserFeedService {
 		int counter = 0;
 		List<Criteria> orCriteria = new LinkedList<>();
 
-		// todo-1: should the 'friends' and 'public' options be mutually exclusive?? If someone's looking for
-		// all public nodes why "OR" into that any friends?
-		if (doAuth && req.getToPublic()) {
+		/*
+		 * todo-1: should the 'friends' and 'public' options be mutually exclusive?? If someone's looking
+		 * for all public nodes why "OR" into that any friends?
+		 */
+		if (!testQuery && doAuth && req.getToPublic()) {
 			orCriteria.add(Criteria.where(SubNode.FIELD_AC + "." + PrincipalName.PUBLIC.s()).ne(null));
 		}
 
 		SubNode myAcntNode = null;
 
 		// includes shares TO me.
-		if (doAuth && req.getToMe()) {
+		if (!testQuery && doAuth && req.getToMe()) {
 			myAcntNode = read.getNode(session, sc.getRootId());
 
 			if (myAcntNode != null) {
@@ -255,7 +260,7 @@ public class UserFeedService {
 			criteria = criteria.and(SubNode.FIELD_MODIFY_TIME).lt(sc.getFeedMaxTime());
 		}
 
-		if (doAuth && req.getFromMe()) {
+		if (!testQuery && doAuth && req.getFromMe()) {
 			if (myAcntNode == null) {
 				myAcntNode = read.getNode(session, sc.getRootId());
 			}
@@ -269,7 +274,7 @@ public class UserFeedService {
 			}
 		}
 
-		if (doAuth && req.getFromFriends()) {
+		if (!testQuery && doAuth && req.getFromFriends()) {
 			List<SubNode> friendNodes = userManagerService.getSpecialNodesList(session, NodeType.FRIEND_LIST.s(), null, true);
 			if (friendNodes != null) {
 				List<ObjectId> friendIds = new LinkedList<>();
@@ -296,7 +301,7 @@ public class UserFeedService {
 
 		// use attributedTo proptery to determine whether a node is 'local' (posted by this server) or not.
 		if (req.getLocalOnly()) {
-			// todo-1: should be checking apid property instead? 
+			// todo-1: should be checking apid property instead?
 			criteria = criteria.and(SubNode.FIELD_PROPERTIES + "." + NodeProp.ACT_PUB_OBJ_ATTRIBUTED_TO.s() + ".value").is(null);
 		}
 

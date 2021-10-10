@@ -15,6 +15,7 @@ export interface QuantaIntf {
     appInitialized: boolean;
     curUrlPath: string;
     activeTab: string;
+    allowIntersectingObserver: boolean;
 
     newNodeTargetId: string;
     newNodeTargetOffset: number;

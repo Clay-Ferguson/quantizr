@@ -253,22 +253,29 @@ export class Search implements SearchIntf {
                 }
 
                 s.guiReady = true;
+                let scrollToTop = true;
 
                 if (forceMetadataOn) {
                     S.edit.setMetadataOption(true);
                 }
 
                 // if scrolling in new results grow the existing array
-                if (growResults && (feedData.props.feedResults == null || feedData.props.feedResults.length < C.MAX_DYNAMIC_ROWS)) {
-                    // create a set for duplicate detection
-                    let idSet: Set<string> = new Set<string>();
+                if (growResults) {
+                    if (feedData?.props?.feedResults && res?.searchResults && feedData.props.feedResults.length < C.MAX_DYNAMIC_ROWS) {
+                        // create a set for duplicate detection
+                        let idSet: Set<string> = new Set<string>();
 
-                    // load set for known children.
-                    feedData.props.feedResults.forEach(child => {
-                        idSet.add(child.id);
-                    });
+                        // load set for known children.
+                        feedData.props.feedResults.forEach(child => {
+                            idSet.add(child.id);
+                        });
 
-                    feedData.props.feedResults = feedData.props.feedResults.concat(res.searchResults.filter(child => !idSet.has(child.id)));
+                        scrollToTop = false;
+                        feedData.props.feedResults = feedData.props.feedResults.concat(res.searchResults.filter(child => !idSet.has(child.id)));
+                    }
+                    else {
+                        feedData.props.feedResults = res.searchResults;
+                    }
                 }
                 // else we have a fresh array (reset the array)
                 else {
@@ -279,7 +286,7 @@ export class Search implements SearchIntf {
                 feedData.props.feedDirty = false;
                 feedData.props.feedLoading = false;
 
-                if (!growResults) {
+                if (scrollToTop) {
                     S.quanta.selectTabStateOnly(C.TAB_FEED, s);
                     setTimeout(() => {
                         S.view.scrollAllTop(s);

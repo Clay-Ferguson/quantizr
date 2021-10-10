@@ -45,6 +45,7 @@ export class Quanta implements QuantaIntf {
     hiddenRenderingEnabled: boolean = true;
     noScrollToId: string = null;
     activeTab: string;
+    allowIntersectingObserver: boolean = true;
 
     newNodeTargetId: string;
     newNodeTargetOffset: number;
