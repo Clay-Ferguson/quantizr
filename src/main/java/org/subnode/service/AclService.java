@@ -264,6 +264,13 @@ public class AclService {
 	}
 
 	public void removeAclEntry(MongoSession session, SubNode node, String principalNodeId, String privToRemove) {
+
+		/* special syntax is we remove all if asterisk specified */
+		if (principalNodeId.equals("*")) {
+			node.setAc(null);
+			update.save(session, node);
+			return;
+		}
 		HashSet<String> setToRemove = XString.tokenizeToSet(privToRemove, ",", true);
 
 		HashMap<String, AccessControl> acl = node.getAc();
@@ -332,10 +339,7 @@ public class AclService {
 		SubNode node = read.getNode(session, nodeId);
 		auth.ownerAuth(session, node);
 
-		String principalNodeId = req.getPrincipalNodeId();
-		String privilege = req.getPrivilege();
-
-		removeAclEntry(session, node, principalNodeId, privilege);
+		removeAclEntry(session, node, req.getPrincipalNodeId(), req.getPrivilege());
 		res.setSuccess(true);
 		return res;
 	}

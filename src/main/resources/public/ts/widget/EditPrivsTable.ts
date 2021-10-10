@@ -1,6 +1,6 @@
 import * as I from "../Interfaces";
+import { Div } from "./Div";
 import { EditPrivsTableRow } from "./EditPrivsTableRow";
-import { Heading } from "./Heading";
 import { ListBox } from "./ListBox";
 
 export class EditPrivsTable extends ListBox {
@@ -19,7 +19,7 @@ export class EditPrivsTable extends ListBox {
         }
 
         if (children.length === 0) {
-            children.push(new Heading(4, "Node is not currently shared, but may be accessible via any shared parents."));
+            children.push(new Div("Node is not currently shared, but may be accessible via any shared parents."));
         }
 
         this.setChildren(children);

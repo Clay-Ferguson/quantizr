@@ -7,6 +7,8 @@ import { Singletons } from "../Singletons";
 import { CompIntf } from "../widget/base/CompIntf";
 import { Button } from "../widget/Button";
 import { ButtonBar } from "../widget/ButtonBar";
+import { Clearfix } from "../widget/Clearfix";
+import { Div } from "../widget/Div";
 import { EditPrivsTable } from "../widget/EditPrivsTable";
 import { Form } from "../widget/Form";
 import { HelpButton } from "../widget/HelpButton";
@@ -30,6 +32,11 @@ export class SharingDlg extends DialogBase {
         return [
             new Form(null, [
                 new EditPrivsTable(this.getState().nodePrivsInfo, this.removePrivilege),
+                S.props.isShared(this.node) ? new Div("Remove All", {
+                    className: "marginBottom marginRight float-right clickable",
+                    onClick: this.removeAllPrivileges
+                }) : null,
+                new Clearfix(),
                 new ButtonBar([
                     new Button("Add User", this.shareToPersonDlg, null, "btn-primary"),
                     new Button("Add Friend", async () => {
@@ -82,6 +89,22 @@ export class SharingDlg extends DialogBase {
         }, (res: J.GetNodePrivilegesResponse): void => {
             this.node.ac = res.aclEntries;
             this.mergeState({ nodePrivsInfo: res });
+        });
+    }
+
+    removeAllPrivileges = (): void => {
+        this.dirty = true;
+        S.util.ajax<J.RemovePrivilegeRequest, J.RemovePrivilegeResponse>("removePrivilege", {
+            nodeId: this.node.id,
+            principalNodeId: "*",
+            privilege: "*"
+        }, (res: J.RemovePrivilegeResponse) => {
+            this.removePrivilegeResponse(res);
+
+            // Give user time to see the removal, and then close out the dialog.
+            setTimeout(() => {
+                this.close();
+            }, 1000);
         });
     }
 
