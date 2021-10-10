@@ -50,15 +50,14 @@
     @if $highlightActiveMenuItems {
         border-left: 5px solid $nodeBorderBottomColor; 
     } 
-    padding: 6px;
+    padding: 5px 5px 5px 10px; 
 }
 
 .menuCardBody {
-    padding: 0px;
     border-left: 2px solid #444;
     border-right: 2px solid #444;
     border-bottom: 2px solid #444;
-    padding: 6px;
+    padding: 5px;
     border-radius: 0 0 $border-radius $border-radius;
 }
 
@@ -74,7 +73,7 @@
     //background-color: $list-group-bg;
     background-color: transparent;
     border: none;
-    padding: 10px; 
+    padding: 5px 5px 5px 15px; 
     border-radius: $border-radius $border-radius 0 0;
     border: 2px solid transparent;
 }
