@@ -124,8 +124,11 @@ public class UserFeedService {
 	 * 
 	 */
 	public NodeFeedResponse generateFeed(MongoSession session, NodeFeedRequest req) {
-		/* Set this flag to generate large resultset of all nodes in root */
-		boolean testQuery = true;
+		/*
+		 * Set this flag to generate large resultset of all nodes in root, just for exercising this method
+		 * without 'real' data.
+		 */
+		boolean testQuery = false;
 
 		SessionContext sc = ThreadLocals.getSC();
 		NodeFeedResponse res = new NodeFeedResponse();
