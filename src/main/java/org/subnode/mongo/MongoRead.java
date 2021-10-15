@@ -670,6 +670,9 @@ public class MongoRead {
         }
 
         /*
+         * We support the special case of "contentLength" as sort order string, which is not a "real"
+         * property, but a calculated one.
+         *
          * For a calculated field we do an Aggregate Query operation. The purpose of this entire Aggregation
          * is to calculate contentLength on the fly so we can sort on it.
          */

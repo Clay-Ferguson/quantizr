@@ -49,7 +49,8 @@ mkdir -p ${DEPLOY_TARGET}/config
 cp ${PRJROOT}/secrets/secrets.sh    ${DEPLOY_TARGET}
 
 # Default app configs
-cp ${PRJROOT}/src/main/resources/config-text-distro.yaml    ${DEPLOY_TARGET}/config
+# We only need this if overriding/extending the default properties
+# cp ${PRJROOT}/src/main/resources/config-text-distro.yaml    ${DEPLOY_TARGET}/config
 
 # copy our banding folder to deploy target
 rsync -aAX --delete --force --progress --stats "${PRJROOT}/branding/" "${DEPLOY_TARGET}/branding/"

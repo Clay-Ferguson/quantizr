@@ -122,6 +122,8 @@ help:
   search:
     dialog: |
       Search Tips
+
+      The following tips apply for non-Regex option (Regex rules are separate):
       
       * To search for a multi-word phrase (or an exact match on a word) enclose it in double quotes.
       * To find all nodes that contain any of a list words enter the words with spaces between them

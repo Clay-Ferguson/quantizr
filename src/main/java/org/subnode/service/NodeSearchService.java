@@ -99,11 +99,13 @@ public class NodeSearchService {
 		session = ThreadLocals.ensure(session);
 
 		String searchText = req.getSearchText();
+
+		// if no search text OR sort order specified that's a bad request.
 		if (StringUtils.isEmpty(searchText) && //
 				StringUtils.isEmpty(req.getSearchType()) && //
 				// note: for timelines this is called but with a sort
 				StringUtils.isEmpty(req.getSortField())) {
-			throw new RuntimeException("Search text required.");
+			throw new RuntimeException("Search text or ordering required.");
 		}
 
 		List<NodeInfo> searchResults = new LinkedList<>();

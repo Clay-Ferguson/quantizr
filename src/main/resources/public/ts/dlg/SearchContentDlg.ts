@@ -60,14 +60,14 @@ export class SearchContentDlg extends DialogBase {
                 this.searchTextField = new TextField("Search", false, this.search, null, false, this.searchTextState),
                 new HorizontalLayout([
                     // Allow fuzzy search for admin only. It's cpu intensive.
-                    this.appState.isAdminUser ? new Checkbox("Fuzzy Search (slower)", null, {
+                    new Checkbox("Regex", null, {
                         setValue: (checked: boolean): void => {
                             this.mergeState({ fuzzy: checked });
                         },
                         getValue: (): boolean => {
                             return this.getState().fuzzy;
                         }
-                    }) : null,
+                    }),
                     new Checkbox("Case Sensitive", null, {
                         setValue: (checked: boolean): void => {
                             this.mergeState({ caseSensitive: checked });
