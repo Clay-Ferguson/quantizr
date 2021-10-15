@@ -618,15 +618,9 @@ public class MongoRead {
                     criterias.add(Criteria.where(prop).regex(text, "i"));
                 }
             } else {
-                // Query query = Query.query(
-                // Criteria.where("aBooleanProperty").is(true).
-                // and(anIntegerProperty).is(1)).
-                // addCriteria(TextCriteria.
-                // forLanguage("en"). // effectively the same as forDefaultLanguage() here
-                // matching("a text that is indexed for full text search")));
-
-                // List<YourDocumentType> result = mongoTemplate.findAll(query.
-                // YourDocumentType.class);
+                // .matchingAny("search term1", "search term2") 
+                // .matching("search term") // matches any that contain "serch" OR "term"
+                // .matchingPhrase("search term")
 
                 TextCriteria textCriteria = TextCriteria.forDefaultLanguage();
                 textCriteria.matching(text);
