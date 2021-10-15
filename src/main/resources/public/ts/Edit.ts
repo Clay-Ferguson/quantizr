@@ -76,11 +76,9 @@ export class Edit implements EditIntf {
 
     public initNodeEditResponse = (res: J.InitNodeEditResponse, forceUsePopup: boolean, encrypt: boolean, showJumpButton: boolean, replyToId: string, state: AppState): void => {
         if (S.util.checkSuccess("Editing node", res)) {
-            const node: J.NodeInfo = res.nodeInfo;
-
             /* NOTE: Removing 'editMode' check here is new 4/14/21, and without was stopping editing from calendar view which we
             do need even when edit mode is technically off */
-            const editingAllowed = /* state.userPreferences.editMode && */ this.isEditAllowed(node, state);
+            const editingAllowed = /* state.userPreferences.editMode && */ this.isEditAllowed(res.nodeInfo, state);
             if (editingAllowed) {
                 S.quanta.tempDisableAutoScroll();
 

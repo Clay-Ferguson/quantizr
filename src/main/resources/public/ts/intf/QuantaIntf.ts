@@ -25,6 +25,7 @@ export interface QuantaIntf {
 
     draggableId: string;
     fadeStartTime: number;
+    currentFocusId: string;
 
     /* doesn't need to be in state */
     userName: string;

@@ -676,6 +676,15 @@ export class Util implements UtilIntf {
             // console.log("delayed Focusing Id: " + id);
             const elm: HTMLElement = this.domElm(id);
             if (elm) {
+                // todo-0: make "edit_" a constant. Also this is a fix to a focus bug
+                // using the 'safest' way to do this without any redesign.
+                // If the current focus is on an 'editor' then don't let this logic focus AWAY
+                // from the editor. That breaks user input/keyboard.
+                if (S.quanta.currentFocusId && //
+                    S.quanta.currentFocusId.startsWith("edit_") && document.getElementById(S.quanta.currentFocusId)) {
+                    // console.log("Ignoring call to focus away from editor while editing.");
+                    return;
+                }
                 // console.log(`Element found (${id}), focusing`);
                 elm.focus();
             }

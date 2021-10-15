@@ -68,6 +68,8 @@ export class Quanta implements QuantaIntf {
     // by doing which would happen if it rendered before the fade effect was complete. (see fadeInRowBkgClz)
     public fadeStartTime: number = 0;
 
+    public currentFocusId: string = null;
+
     /* We save userName+password in these vars to pass in every request
     so that we can log back in again silently after any session timeout */
     userName: string;
@@ -441,9 +443,9 @@ export class Quanta implements QuantaIntf {
                 // Log.log("document.body.click target.id=" + target.id);
             }, false);
 
-            // DO NOT DELETE. Useful for debugging.
-            document.body.addEventListener("focusin", function (e: any) {
+            document.body.addEventListener("focusin", (e: any) => {
                 // Log.log("focusin id=" + e.target.id);
+                this.currentFocusId = e.target.id;
             });
 
             // This is a cool way of letting CTRL+UP, CTRL+DOWN scroll to next node.

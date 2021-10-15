@@ -496,6 +496,7 @@ export class Render implements RenderIntf {
                     // only focus the TAB if we're not editing, because if editing the edit field will be focused. In other words,
                     // if we're about to initiate editing a TextArea field will be getting focus
                     // so we don't want to set the MAIN tab as the focus and mess that up.
+                    // console.log("focus MAIN_TAB during render.");
                     if (!s.editNode) {
                         S.util.focusId(C.TAB_MAIN);
                     }

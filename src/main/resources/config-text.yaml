@@ -12,12 +12,12 @@ intro1: >-
 # Links here can be full url, or node names, or "tab:tabName"
 menu:
   siteNav:
-    - name: "separator"
-      link: ""
-    - name: "News"
-      link: ":news"
-    - name: "Podcasts"
-      link: ":podcasts"
+    # - name: "separator"
+    #   link: ""
+    # - name: "News"
+    #   link: ":news"
+    # - name: "Podcasts"
+    #   link: ":podcasts"
     # welp. This list went back to nothing, for now.
     # - name: "separator"
     #   link: ""

@@ -224,7 +224,8 @@ export class Nav implements NavIntf {
                 dispatch("Action_FastRefresh", (s: AppState): AppState => {
                     return s;
                 });
-                // console.log("nodeClickRow");
+
+                // console.log("nodeClickRow. Focusing Main tab");
                 S.util.focusId(C.TAB_MAIN);
                 resolve();
             }, 100);
