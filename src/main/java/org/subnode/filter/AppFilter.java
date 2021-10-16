@@ -60,7 +60,7 @@ public class AppFilter extends GenericFilterBean {
 
 				httpReq = (HttpServletRequest) req;
 				httpRes = (HttpServletResponse) res;
-				
+
 				log.trace(httpReq.getRequestURI() + " -> " + httpReq.getQueryString());
 				session = httpReq.getSession(true);
 				SessionContext sc = SessionContext.init(session);
@@ -150,8 +150,10 @@ public class AppFilter extends GenericFilterBean {
 
 	// todo-1: app is too fragile if you forget to add one here. fix this.
 	private boolean isSecurePath(String path) {
-		// todo-1: /bin is an unusual case: can be ../bin/avatar or just ../bin
+		// todo-1: /bin & /stream is an unusual case: can be ../bin/avatar or just ../bin
 		if (path.contains("/bin") || //
+				path.contains("/stream") || //
+				// todo-0: make sure ALL these are good with endsWith (had a bug for /stream)
 				path.endsWith("/login") || //
 				path.endsWith("/signup") || //
 				path.endsWith("/savePublicKey") || //
@@ -168,7 +170,6 @@ public class AppFilter extends GenericFilterBean {
 				path.endsWith("/nodeSearch") || //
 				path.endsWith("/graphNodes") || //
 				path.endsWith("/resetPassword") || //
-				path.endsWith("/stream") || //
 				path.endsWith("/getNodeStats") || //
 				path.endsWith("/getUserAccountInfo") || //
 				path.endsWith("/anonPageLoad") || //

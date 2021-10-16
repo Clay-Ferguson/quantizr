@@ -4,7 +4,7 @@
 # Builds a production distro zip file, which should be able to be unzipped and run on any
 # linux box to run an instance of the app, with all default settings. Startup scripts in this zip file should
 # be able to be run by non-developers and is stand-alone, with minimal setup required
-# to get an instance of Quanta up and running. It used docker-compose and will download all binaries
+# to get an instance of Quanta up and running. It uses docker-compose and will download all binaries
 # and all executable code from the Public Docker Repository
 # =================================================================================================
 
