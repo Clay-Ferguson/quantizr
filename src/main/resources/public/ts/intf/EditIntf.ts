@@ -52,4 +52,5 @@ export interface EditIntf {
     addLinkBookmark(content: string, state: AppState): void;
     addBookmark(node: J.NodeInfo, state: AppState): void;
     setMetadataOption(val: boolean): void;
+    refreshNodeFromServer(nodeId: string): Promise<J.NodeInfo>;
 }

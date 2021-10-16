@@ -351,43 +351,51 @@ export class Edit implements EditIntf {
         }
     }
 
-    refreshNodeFromServer = (nodeId: string): void => {
-        // console.log("refreshNodeFromServer");
-        S.util.ajax<J.RenderNodeRequest, J.RenderNodeResponse>("renderNode", {
-            nodeId,
-            upLevel: false,
-            siblingOffset: 0,
-            renderParentIfLeaf: false,
-            offset: 0,
-            goToLastPage: false,
-            forceIPFSRefresh: false,
-            singleNode: true
-        },
-            (res: J.RenderNodeResponse) => {
-                if (!res.node) return;
-                dispatch("Action_RefreshNodeFromServer", (s: AppState): AppState => {
-                    // if the node is out page parent (page root)
-                    if (res.node.id === s.node.id) {
-                        // preserve the children, when updating the root node, because they will not have been obtained
-                        // due to the 'singleNode=true' in the request
-                        res.node.children = s.node.children;
-                        s.node = res.node;
+    refreshNodeFromServer = async (nodeId: string): Promise<J.NodeInfo> => {
+        // console.log("refreshNodeFromServer: " + nodeId);
+        return new Promise<J.NodeInfo>(async (resolve, reject) => {
+            S.util.ajax<J.RenderNodeRequest, J.RenderNodeResponse>("renderNode", {
+                nodeId,
+                upLevel: false,
+                siblingOffset: 0,
+                renderParentIfLeaf: false,
+                offset: 0,
+                goToLastPage: false,
+                forceIPFSRefresh: false,
+                singleNode: true
+            },
+                (res: J.RenderNodeResponse) => {
+                    if (!res.node) {
+                        resolve(null);
+                        return;
                     }
-                    // otherwise a child
-                    else if (s.node && s.node.children) {
-                        // replace the old node with the new node.
-                        s.node.children.forEach((node, i) => {
-                            if (node.id === res.node.id) {
-                                s.node.children[i] = res.node;
-                            }
-                        });
-                    }
-                    return s;
+                    dispatch("Action_RefreshNodeFromServer", (s: AppState): AppState => {
+                        // if the node is our page parent (page root)
+                        if (res.node.id === s.node.id) {
+                            // preserve the children, when updating the root node, because they will not have been obtained
+                            // due to the 'singleNode=true' in the request
+                            res.node.children = s.node.children;
+                            s.node = res.node;
+                        }
+                        // otherwise a child
+                        else if (s.node && s.node.children) {
+                            // replace the old node with the new node.
+                            s.node.children.forEach((node, i) => {
+                                if (node.id === res.node.id) {
+                                    s.node.children[i] = res.node;
+                                }
+                            });
+                        }
+                        S.quanta.updateNodeMap(res.node, s);
+                        resolve(res.node);
+                        return s;
+                    });
+                }, // fail callback
+                (res: string) => {
+                    console.log("failed to refresh node: " + res);
+                    resolve(null);
                 });
-            }, // fail callback
-            (res: string) => {
-                console.log("failed to refresh node: " + res);
-            });
+        });
     }
 
     distributeKeys = async (node: J.NodeInfo, aclEntries: J.AccessControlInfo[]): Promise<void> => {

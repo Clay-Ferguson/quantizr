@@ -408,6 +408,7 @@ export class Nav implements NavIntf {
             },
                 (res: J.RenderNodeResponse) => {
                     if (!res.node) return;
+                    S.quanta.updateNodeMap(res.node, state);
                     let feedData = S.quanta.getTabDataById(state, C.TAB_FEED);
                     if (feedData) {
                         feedData.props.searchTextState.setValue("");
