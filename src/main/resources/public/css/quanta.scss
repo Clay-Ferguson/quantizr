@@ -1750,6 +1750,12 @@ i'm backing out for now
     padding-bottom: $smallGap;
 }
 
+.userFeedItemHighlight {
+    padding-top: 5px;
+    border: 2px solid green;
+    padding-bottom: $smallGap;
+}
+
 .userFeedParent {
     border: 2px solid $nodeBorderBottomColor;
 }

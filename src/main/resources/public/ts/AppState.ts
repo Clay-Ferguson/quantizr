@@ -88,6 +88,8 @@ export class AppState {
     // ids of selected nodes
     selectedNodes: Set<string> = new Set<string>();
 
+    highlightSearchNode: J.NodeInfo = null;
+
     /* maps node.id values to NodeInfo.java objects
     Make this use a Map type (typescript)
     */

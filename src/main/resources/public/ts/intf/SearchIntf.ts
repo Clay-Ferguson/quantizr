@@ -4,7 +4,6 @@ import * as J from "../JavaIntf";
 export interface SearchIntf {
     _UID_ROWID_PREFIX: string;
 
-    highlightRowNode: J.NodeInfo;
     idToNodeMap: Map<string, J.NodeInfo>;
 
     findSharedNodes(node: J.NodeInfo, page: number, type: string, shareTarget: string, accessOption: string, state: AppState): void;

@@ -150,7 +150,7 @@ export class AudioPlayerDlg extends DialogBase {
                 ]),
                 new ButtonBar([
                     new Button("Copy", this.copyToClipboard),
-                    new Button("Post", this.postComment)
+                    !this.appState.isAnonUser ? new Button("Post", this.postComment) : null
                 ]),
                 this.customDiv
             ])

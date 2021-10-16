@@ -25,10 +25,6 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (s: Singletons) => {
 export class Search implements SearchIntf {
     _UID_ROWID_PREFIX: string = "srch_row_";
 
-    /*
-     * Will be the last row clicked on (NodeInfo.java object) and having the red highlight bar
-     */
-    highlightRowNode: J.NodeInfo = null;
     idToNodeMap: Map<string, J.NodeInfo> = new Map<string, J.NodeInfo>();
 
     findSharedNodes = (node: J.NodeInfo, page: number, type: string, shareTarget: string, accessOption: string, state: AppState): void => {
@@ -442,21 +438,28 @@ export class Search implements SearchIntf {
             allowFooter ? new NodeCompRowFooter(node, isFeed) : null
         ]);
 
+        let divClass: string = state.highlightSearchNode?.id === node.id ? "userFeedItemHighlight" : "userFeedItem";
+
         return new Div(null, {
-            className: isParent ? "userFeedItemParent" : "userFeedItem"
+            className: isParent ? "userFeedItemParent" : divClass
         }, [parentItem, div]);
     }
 
     clickSearchNode = (id: string, state: AppState) => {
-        /*
-         * update highlight node to point to the node clicked on, just to persist it for later
-         */
-        this.highlightRowNode = this.idToNodeMap.get(id);
-        if (!this.highlightRowNode) {
-            throw new Error("Unable to find uid in search results: " + id);
-        }
+        dispatch("Action_RenderSearchResults", (s: AppState): AppState => {
+            /*
+             * update highlight node to point to the node clicked on, just to persist it for later
+             */
+            s.highlightSearchNode = this.idToNodeMap.get(id);
+            if (!s.highlightSearchNode) {
+                throw new Error("Unable to find uid in search results: " + id);
+            }
 
-        S.view.jumpToId(this.highlightRowNode.id);
+            setTimeout(() => {
+                S.view.jumpToId(s.highlightSearchNode.id);
+            }, 500);
+            return s;
+        });
     }
 
     searchAndReplace = (recursive: boolean, nodeId: string, search: string, replace: string, state: AppState): void => {
