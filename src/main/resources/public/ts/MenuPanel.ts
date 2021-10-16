@@ -254,8 +254,8 @@ export class MenuPanel extends Div {
             ...this.siteNavCustomItems(state)
         ]));
 
+        let bookmarkItems = [];
         if (!state.isAnonUser) {
-            let bookmarkItems = [];
             if (state.bookmarks) {
                 state.bookmarks.forEach((bookmark: J.Bookmark): boolean => {
                     bookmarkItems.push(new MenuItem(bookmark.name, () => S.view.jumpToId(bookmark.id || bookmark.selfId), true, null,
@@ -286,11 +286,11 @@ export class MenuPanel extends Div {
             // bookmarkItems.push(new MenuItem("Manage...", MenuPanel.openBookmarksNode, !state.isAnonUser));
             if (bookmarkItems.length > 0) {
                 children.push(new Menu(C.BOOKMARKS_MENU_TEXT, bookmarkItems));
-
-                if (!Menu.userClickedMenu) {
-                    Menu.activeMenu = C.BOOKMARKS_MENU_TEXT;
-                }
             }
+        }
+
+        if (!Menu.userClickedMenu) {
+            Menu.activeMenu = bookmarkItems.length > 0 ? C.BOOKMARKS_MENU_TEXT : (state.isAnonUser ? C.SITE_NAV_MENU_TEXT : null);
         }
 
         children.push(new Menu("My Nodes", [

@@ -12,7 +12,7 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (s: Singletons) => {
 export class Menu extends Div {
 
     static userClickedMenu: boolean = false;
-    static activeMenu: string = C.SITE_NAV_MENU_TEXT;
+    static activeMenu: string = null;
 
     constructor(public name: string, public menuItems: CompIntf[], private onClickCallback: Function = null) {
         super(null, {
