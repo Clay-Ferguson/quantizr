@@ -22,6 +22,14 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
 
 export class SearchContentDlg extends DialogBase {
     static defaultSearchText: string = "";
+    static dlgState: any = {
+        fuzzy: false,
+        caseSensitive: false,
+        recursive: true,
+        sortField: "0",
+        sortDir: ""
+    };
+
     searchTextField: TextField;
     searchTextState: ValidatedState<any> = new ValidatedState<any>();
 
@@ -32,13 +40,7 @@ export class SearchContentDlg extends DialogBase {
             this.searchTextField.focus();
         });
 
-        this.mergeState({
-            fuzzy: false,
-            caseSensitive: false,
-            recursive: true,
-            sortField: "0",
-            sortDir: ""
-        });
+        this.mergeState(SearchContentDlg.dlgState);
         this.searchTextState.setValue(SearchContentDlg.defaultSearchText);
     }
 
@@ -62,6 +64,7 @@ export class SearchContentDlg extends DialogBase {
                     // Allow fuzzy search for admin only. It's cpu intensive.
                     new Checkbox("Regex", null, {
                         setValue: (checked: boolean): void => {
+                            SearchContentDlg.dlgState.fuzzy = checked;
                             this.mergeState({ fuzzy: checked });
                         },
                         getValue: (): boolean => {
@@ -70,6 +73,7 @@ export class SearchContentDlg extends DialogBase {
                     }),
                     new Checkbox("Case Sensitive", null, {
                         setValue: (checked: boolean): void => {
+                            SearchContentDlg.dlgState.caseSensitive = checked;
                             this.mergeState({ caseSensitive: checked });
                         },
                         getValue: (): boolean => {
@@ -78,6 +82,7 @@ export class SearchContentDlg extends DialogBase {
                     }),
                     new Checkbox("Recursive", null, {
                         setValue: (checked: boolean): void => {
+                            SearchContentDlg.dlgState.recursive = checked;
                             this.mergeState({ recursive: checked });
                         },
                         getValue: (): boolean => {
@@ -93,9 +98,13 @@ export class SearchContentDlg extends DialogBase {
                         { key: "contentLength", val: "Text Length" }
                     ], "m-2", "searchDlgOrderBy", {
                         setValue: (val: string): void => {
+                            let sortDir = val === "0" ? "" : "DESC";
+                            SearchContentDlg.dlgState.sortField = val;
+                            SearchContentDlg.dlgState.sortDir = sortDir;
+
                             this.mergeState({
                                 sortField: val,
-                                sortDir: val === "0" ? "" : "DESC"
+                                sortDir: sortDir
                             });
                         },
                         getValue: (): string => {
