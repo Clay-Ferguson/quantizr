@@ -23,6 +23,7 @@ export class Constants {
     static TAB_LOG: string = "logTab"
 
     static SITE_NAV_MENU_TEXT = "Site Nav";
+    static BOOKMARKS_MENU_TEXT = "Bookmarks";
 
     static leftNavPanelCols: number = 3;
 

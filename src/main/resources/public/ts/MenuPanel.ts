@@ -285,7 +285,11 @@ export class MenuPanel extends Div {
             // }
             // bookmarkItems.push(new MenuItem("Manage...", MenuPanel.openBookmarksNode, !state.isAnonUser));
             if (bookmarkItems.length > 0) {
-                children.push(new Menu("Bookmarks", bookmarkItems));
+                children.push(new Menu(C.BOOKMARKS_MENU_TEXT, bookmarkItems));
+
+                if (!Menu.userClickedMenu) {
+                    Menu.activeMenu = C.BOOKMARKS_MENU_TEXT;
+                }
             }
         }
 

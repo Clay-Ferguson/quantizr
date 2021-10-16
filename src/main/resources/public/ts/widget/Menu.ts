@@ -11,6 +11,7 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (s: Singletons) => {
 });
 export class Menu extends Div {
 
+    static userClickedMenu: boolean = false;
     static activeMenu: string = C.SITE_NAV_MENU_TEXT;
 
     constructor(public name: string, public menuItems: CompIntf[], private onClickCallback: Function = null) {
@@ -41,6 +42,7 @@ export class Menu extends Div {
                         let headingElm = document.getElementById("heading" + this.getId());
                         let expanded = headingElm && headingElm.getAttribute("aria-expanded") === "true";
                         Menu.activeMenu = expanded ? this.name : null;
+                        Menu.userClickedMenu = true;
                         // console.log("Expand or collapse: " + this.name + " expan=" + expanded);
                         if (this.onClickCallback) {
                             this.onClickCallback();
