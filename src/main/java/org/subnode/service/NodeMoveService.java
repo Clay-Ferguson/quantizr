@@ -241,7 +241,11 @@ public class NodeMoveService {
 				userManagerService.addNodeBytesToUserNodeBytes(node, userNode, -1);
 			}
 
-			delete.deleteNode(session, node, req.isChildrenOnly());
+			try {
+				delete.deleteNode(session, node, req.isChildrenOnly());
+			} catch (Exception e) {
+				// ignore failed deletes.
+			}
 		}
 
 		update.saveSession(session);
