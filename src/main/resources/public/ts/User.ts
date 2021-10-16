@@ -204,7 +204,7 @@ export class User implements UserIntf {
             if (res.homeNodeOverride) {
                 id = res.homeNodeOverride;
                 // console.log("homeNodeOverride=" + id);
-                if (id.startsWith("~")) {
+                if (id && id.startsWith("~")) {
                     renderLeafIfParent = false;
                 }
             } //

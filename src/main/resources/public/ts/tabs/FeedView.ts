@@ -201,23 +201,25 @@ export class FeedView extends AppTab {
                 });
 
                 if (C.FEED_INFINITE_SCROLL) {
-                    // When the 'more' button scrolls into view go ahead and load more records.
-                    moreButton.whenElm((elm: HTMLElement) => {
-                        let observer = new IntersectionObserver(entries => {
-                            entries.forEach((entry: any) => {
-                                if (S.quanta.allowIntersectingObserver && entry.isIntersecting) {
-                                    // observer.disconnect();
-                                    S.srch.feed(++this.data.props.page, this.data.props.searchTextState.getValue(), true, true);
+                    if (this.data.props.feedResults?.length < C.MAX_DYNAMIC_ROWS) {
+                        // When the 'more' button scrolls into view go ahead and load more records.
+                        moreButton.whenElm((elm: HTMLElement) => {
+                            let observer = new IntersectionObserver(entries => {
+                                entries.forEach((entry: any) => {
+                                    if (S.quanta.allowIntersectingObserver && entry.isIntersecting) {
+                                        // observer.disconnect();
+                                        S.srch.feed(++this.data.props.page, this.data.props.searchTextState.getValue(), true, true);
 
-                                    // it's possible that the next render COULD immediately show the NEXT button so we
-                                    // use this "allow" varible to control
-                                    S.quanta.allowIntersectingObserver = false;
-                                    setTimeout(() => { S.quanta.allowIntersectingObserver = true; }, 3000);
-                                }
+                                        // it's possible that the next render COULD immediately show the NEXT button so we
+                                        // use this "allow" varible to control
+                                        S.quanta.allowIntersectingObserver = false;
+                                        setTimeout(() => { S.quanta.allowIntersectingObserver = true; }, 3000);
+                                    }
+                                });
                             });
+                            observer.observe(elm);
                         });
-                        observer.observe(elm);
-                    });
+                    }
                 }
                 children.push(new ButtonBar([moreButton], "text-center marginTop marginBottom"));
             }

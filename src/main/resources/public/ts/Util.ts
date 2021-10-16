@@ -257,6 +257,7 @@ export class Util implements UtilIntf {
     }
 
     stripIfStartsWith = (s: string, str: string): string => {
+        if (!s) return s;
         if (s.startsWith(str)) {
             return s.substring(str.length);
         }
@@ -725,6 +726,7 @@ export class Util implements UtilIntf {
     }
 
     elementExists = (id: string): boolean => {
+        if (!id) return false;
         if (id.startsWith("#")) {
             id = id.substring(1);
         }
@@ -828,7 +830,7 @@ export class Util implements UtilIntf {
     * Gets the RAW DOM element and displays an error message if it's not found. Do not prefix with "#"
     */
     domElm = (id: string): HTMLElement => {
-
+        if (!id) return null;
         if (id.startsWith("#")) {
             console.log("whenElm removed obsolete preceding # from ID " + id);
             id = id.substring(1);

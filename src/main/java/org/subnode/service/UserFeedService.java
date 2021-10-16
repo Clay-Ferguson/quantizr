@@ -246,15 +246,6 @@ public class UserFeedService {
 			blockedIdStrings.add(blockedId.toHexString());
 		}
 
-		// reset feedMaxTime if we're getting first page of results
-		if (req.getPage() == 0) {
-			sc.setFeedMaxTime(null);
-		}
-		// if not getting first page of results use the modifyTime < feedMaxTime to ensure good paging.
-		else if (sc.getFeedMaxTime() != null) {
-			criteria = criteria.and(SubNode.FIELD_MODIFY_TIME).lt(sc.getFeedMaxTime());
-		}
-
 		if (!testQuery && doAuth && req.getFromMe()) {
 			if (myAcntNode == null) {
 				myAcntNode = read.getNode(session, sc.getRootId());
@@ -337,15 +328,6 @@ public class UserFeedService {
 		}
 
 		sc.stopwatch("NodeFeedQuery--Iterated");
-
-		/*
-		 * This is the correct logic since we only have a 'more' button and no 'back' button so that as the
-		 * user clicks more button we go further back in time and always update feedMaxTime here to ensure
-		 * we don't encounter records we've already seen
-		 */
-		if (lastNode != null) {
-			sc.setFeedMaxTime(lastNode.getModifyTime());
-		}
 
 		if (searchResults.size() < MAX_FEED_ITEMS) {
 			res.setEndReached(true);

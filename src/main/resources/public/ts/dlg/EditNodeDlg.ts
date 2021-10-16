@@ -900,7 +900,7 @@ export class EditNodeDlg extends DialogBase {
                 /* Else need to ensure node is encrypted */
                 else {
                     // if we need to encrypt and the content is not currently encrypted.
-                    if (!state.node.content.startsWith(J.Constant.ENC_TAG)) {
+                    if (!state.node.content?.startsWith(J.Constant.ENC_TAG)) {
                         let content = this.contentEditor.getValue();
 
                         let skdp: SymKeyDataPackage = await S.encryption.encryptSharableString(null, content);

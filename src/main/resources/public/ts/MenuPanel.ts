@@ -595,25 +595,27 @@ export class MenuPanel extends Div {
                     let link: string = menuItem.link;
                     let func: Function = null;
 
-                    // allows ability to select a tab
-                    if (link.startsWith("tab:")) {
-                        let tab = link.substring(4);
+                    if (link) {
+                        // allows ability to select a tab
+                        if (link.startsWith("tab:")) {
+                            let tab = link.substring(4);
 
-                        /* special case for feed tab */
-                        if (tab === C.TAB_FEED) {
-                            func = MenuPanel.messagesFediverse;
+                            /* special case for feed tab */
+                            if (tab === C.TAB_FEED) {
+                                func = MenuPanel.messagesFediverse;
+                            }
+                            else {
+                                func = () => S.quanta.selectTab(tab);
+                            }
                         }
+                        // covers http and https
+                        else if (link.startsWith("http")) {
+                            func = () => window.open(link);
+                        }
+                        // named nodes like ":myName"
                         else {
-                            func = () => S.quanta.selectTab(tab);
+                            func = () => S.nav.openContentNode(link, state);
                         }
-                    }
-                    // covers http and https
-                    else if (link.startsWith("http")) {
-                        func = () => window.open(link);
-                    }
-                    // named nodes like ":myName"
-                    else {
-                        func = () => S.nav.openContentNode(link, state);
                     }
 
                     items.push(new MenuItem(menuItem.name, func));

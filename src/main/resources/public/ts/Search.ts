@@ -232,6 +232,7 @@ export class Search implements SearchIntf {
         if (!feedData) {
             return;
         }
+        // console.log("Getting results page=" + page);
         S.util.ajax<J.NodeFeedRequest, J.NodeFeedResponse>("nodeFeed", {
             page,
             nodeId: feedData.props.feedFilterRootNode?.id,
@@ -272,14 +273,17 @@ export class Search implements SearchIntf {
 
                         scrollToTop = false;
                         feedData.props.feedResults = feedData.props.feedResults.concat(res.searchResults.filter(child => !idSet.has(child.id)));
+                        // console.log("Grow Results. Now has: " + feedData.props.feedResults.length);
                     }
                     else {
                         feedData.props.feedResults = res.searchResults;
+                        // console.log("Replaced Results(1). Now has: " + feedData.props.feedResults.length);
                     }
                 }
                 // else we have a fresh array (reset the array)
                 else {
                     feedData.props.feedResults = res.searchResults;
+                    // console.log("Grow Results(2). Now has: " + feedData.props.feedResults.length);
                 }
 
                 feedData.props.feedEndReached = res.endReached;

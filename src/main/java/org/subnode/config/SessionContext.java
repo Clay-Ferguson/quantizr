@@ -94,16 +94,6 @@ public class SessionContext {
 	private String captcha;
 	private int captchaFails = 0;
 
-	/*
-	 * If this time is non-null it represents the newest time on the first node of the first page of
-	 * results the last time query query for the first page (page=0) was done. We use this so that in
-	 * case the database is updated with new results, none of those results can alter the pagination and
-	 * the pagination will be consistent until the user clicks refresh feed again. The case we are
-	 * avoiding is for example when user clicks 'more' to go to page 2, if the database had updated then
-	 * even on page 2 they may be seeing some records they had already seen on page 1
-	 */
-	private Date feedMaxTime;
-
 	private String userToken;
 	private boolean enableIPSM;
 
@@ -184,7 +174,6 @@ public class SessionContext {
 		sc.stopwatchData = new LinkedList<>();
 		sc.captcha = captcha;
 		sc.captchaFails = captchaFails;
-		sc.feedMaxTime = feedMaxTime;
 		sc.userToken = userToken;
 		sc.watchingPath = watchingPath;
 		sc.enableIPSM = enableIPSM;
@@ -451,14 +440,6 @@ public class SessionContext {
 
 	public void setPushEmitter(SseEmitter pushEmitter) {
 		this.pushEmitter = pushEmitter;
-	}
-
-	public Date getFeedMaxTime() {
-		return feedMaxTime;
-	}
-
-	public void setFeedMaxTime(Date feedMaxTime) {
-		this.feedMaxTime = feedMaxTime;
 	}
 
 	public String getCaptcha() {
