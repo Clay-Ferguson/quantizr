@@ -59,7 +59,7 @@ export class SearchContentDlg extends DialogBase {
     renderDlg(): CompIntf[] {
         return [
             new Form(null, [
-                this.searchTextField = new TextField("Search", false, this.search, null, false, this.searchTextState),
+                this.searchTextField = new TextField(null, false, this.search, null, false, this.searchTextState),
                 new HorizontalLayout([
                     // Allow fuzzy search for admin only. It's cpu intensive.
                     new Checkbox("Regex", null, {

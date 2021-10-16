@@ -12,7 +12,6 @@ import { ButtonBar } from "../widget/ButtonBar";
 import { Form } from "../widget/Form";
 import { TextContent } from "../widget/TextContent";
 import { TextField } from "../widget/TextField";
-import { FriendsDlg } from "./FriendsDlg";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
