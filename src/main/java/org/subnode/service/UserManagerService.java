@@ -182,28 +182,14 @@ public class UserManagerService {
 		}
 		/* User Login */
 		else {
-			/**
-			 * We can log in as any user we want if we have the admin password, so we read the user from the DB
-			 * go get their password and feed it into Spring Security as if they had entered it.
-			 */
-			if (req.getPassword().equals(appProp.getMongoAdminPassword())) {
-				SubNode userNode = read.getUserNodeByUserName(auth.getAdminSession(), req.getUserName());
-				// we found user's node.
-				if (userNode != null) {
-					// springLogin throws exception if it fails.
-					springLogin(req.getUserName(), userNode.getStrProp(NodeProp.PWD_HASH.s()), httpReq);
-					sc.setAuthenticated(req.getUserName(), userNode.getId());
-				} else {
-					throw new RuntimeEx("Login failed. User not found: " + req.getUserName());
-				}
-			}
-			// else ordinary Spring Auth for user.
-			else {
-				String pwdHash = util.getHashOfPassword(req.getPassword());
-				// springLogin throws exception if it fails.
-				springLogin(req.getUserName(), pwdHash, httpReq);
-				sc.setAuthenticated(req.getUserName(), null);
-			}
+			// lookup userNode to get the ACTUAL (case sensitive) userName to put in sesssion.
+			SubNode userNode = read.getUserNodeByUserName(auth.getAdminSession(), req.getUserName());
+			String userName = userNode.getStrProp(NodeProp.USER.s());
+
+			String pwdHash = util.getHashOfPassword(req.getPassword());
+			// springLogin throws exception if it fails.
+			springLogin(userName, pwdHash, httpReq);
+			sc.setAuthenticated(userName, null);
 		}
 
 		// If we reach here we either have ANON user or some authenticated user (password checked)
