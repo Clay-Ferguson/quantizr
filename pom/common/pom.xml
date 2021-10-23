@@ -110,7 +110,7 @@ https://books.sonatype.com/mvnref-book/reference/pom-relationships-sect-pom-best
         <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-compress</artifactId>
-            <version>1.19</version>
+            <version>1.21</version>
         </dependency>
 
         <dependency>
