@@ -1,0 +1,1 @@
+NOTE: Thos pom.xml is simply for grouping dependencies into 'common' so that there is no repetition in the main 'pom.xml' file for the app.

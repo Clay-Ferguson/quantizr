@@ -29,9 +29,8 @@ npm config set ignore-scripts true
 cd ${PRJROOT}
 ${SCRIPTS}/run-linter.sh
 
-# Generate 'pom.xml' dynamically from file parts
-cd ${PRJROOT}/pom-fragments
-./pom-generate.sh
+cd ${PRJROOT}/pom/common
+mvn install
 
 cd ${PRJROOT}
 # These aren't normally needed, so I'll just keep commented out most of time. 
