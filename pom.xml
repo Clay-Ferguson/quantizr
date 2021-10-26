@@ -176,20 +176,10 @@ that's used during builds.
 						<artifactId>frontend-maven-plugin</artifactId>
 						<!-- Use the latest released version:
 				https://repo1.maven.org/maven2/com/github/eirslett/frontend-maven-plugin/ -->
-						<version>1.9.1</version>
+						<version>1.12.0</version>
 
 						<configuration>
 							<workingDirectory>src/main/resources/public</workingDirectory>
-
-							<environmentVariables>
-								<!-- Simple var -->
-								<Jon>Snow</Jon>
-								<Tyrion>Lannister</Tyrion>
-
-								<!-- Var value take from maven properties 
-						<NODE_ENV>${NODE_ENV}</NODE_ENV>
-						-->
-							</environmentVariables>
 						</configuration>
 
 						<executions>
@@ -483,20 +473,10 @@ that's used during builds.
 						<artifactId>frontend-maven-plugin</artifactId>
 						<!-- Use the latest released version:
 				https://repo1.maven.org/maven2/com/github/eirslett/frontend-maven-plugin/ -->
-						<version>1.9.1</version>
+						<version>1.12.0</version>
 
 						<configuration>
 							<workingDirectory>src/main/resources/public</workingDirectory>
-
-							<environmentVariables>
-								<!-- Simple var -->
-								<Jon>Snow</Jon>
-								<Tyrion>Lannister</Tyrion>
-
-								<!-- Var value take from maven properties 
-						<NODE_ENV>${NODE_ENV}</NODE_ENV>
-						-->
-							</environmentVariables>
 						</configuration>
 
 						<executions>
@@ -654,20 +634,10 @@ that's used during builds.
 						<artifactId>frontend-maven-plugin</artifactId>
 						<!-- Use the latest released version:
 				https://repo1.maven.org/maven2/com/github/eirslett/frontend-maven-plugin/ -->
-						<version>1.9.1</version>
+						<version>1.12.0</version>
 
 						<configuration>
 							<workingDirectory>src/main/resources/public</workingDirectory>
-
-							<environmentVariables>
-								<!-- Simple var -->
-								<Jon>Snow</Jon>
-								<Tyrion>Lannister</Tyrion>
-
-								<!-- Var value take from maven properties 
-						<NODE_ENV>${NODE_ENV}</NODE_ENV>
-						-->
-							</environmentVariables>
 						</configuration>
 
 						<executions>
@@ -792,20 +762,10 @@ that's used during builds.
 						<artifactId>frontend-maven-plugin</artifactId>
 						<!-- Use the latest released version:
 						https://repo1.maven.org/maven2/com/github/eirslett/frontend-maven-plugin/ -->
-						<version>1.9.1</version>
+						<version>1.12.0</version>
 
 						<configuration>
 							<workingDirectory>src/main/resources/public</workingDirectory>
-
-							<environmentVariables>
-								<!-- Simple var -->
-								<Jon>Snow</Jon>
-								<Tyrion>Lannister</Tyrion>
-
-								<!-- Var value take from maven properties 
-								<NODE_ENV>${NODE_ENV}</NODE_ENV>
-								-->
-							</environmentVariables>
 						</configuration>
 
 						<executions>

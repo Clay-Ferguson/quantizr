@@ -34,6 +34,19 @@ module.exports = {
                 exclude: /node_modules/
             },
 
+            // this pattern may be reqiured for newer versions...
+            // //////////////////////
+            // {
+            //     test: /\.tsx?$/,
+            //     loader: "ts-loader",
+            //     options: {
+            //         // Use this to point to your tsconfig.json.
+            //         configFile: "tsconfig." + env + ".json"
+            //     },
+            //     exclude: /node_modules/
+            // },
+            // //////////////////////
+
             // All output '.js' files will have any sourcemaps re-processed by 'source-map-loader'.
             {
                 test: /\.js$/,

@@ -23,6 +23,7 @@ rm -rf ${PRJROOT}/src/main/resources/public/bundle.js
 # Run ignore-scripts for some security from NodeJS
 # Packages can run "postinstall" script from their package.json and that is an attack vector we want to eliminate here.
 cd ${PRJROOT}/src/main/resources/public
+# NOTE: run 'npm outdated' in this folder to view all outdated versions.
 npm config set ignore-scripts true
 . on-build-start.sh
 
