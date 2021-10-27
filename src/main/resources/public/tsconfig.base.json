@@ -6,21 +6,17 @@
         "moduleResolution": "node",
         "jsx": "react",
         "noImplicitAny": false,
+
         "noImplicitUseStrict": false,
         "removeComments": true,
         "preserveConstEnums": true,
         "suppressImplicitAnyIndexErrors": true,
+
         "noEmitOnError": true,
-        "noEmit": true,
-        "watch": true,
         "allowJs": true,
         "allowSyntheticDefaultImports": true,
-        "skipLibCheck": true,
-        "traceResolution" : true
     },
     "include": [
         "./ts/**/*"
     ],
-    "compileOnSave": true,
-    "buildOnSave": true
 }

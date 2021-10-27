@@ -15,37 +15,21 @@ module.exports = {
     },
 
     resolve: {
-        // Add '.ts' and '.tsx' as resolvable extensions.
         extensions: [".tsx", ".ts", ".js", ".json"]
     },
 
     module: {
         rules: [
-            // All files with a '.ts' or '.tsx' extension will be handled by 'awesome-typescript-loader'.
             {
                 test: /\.tsx?$/,
                 use: [{
-                    loader: "awesome-typescript-loader",
+                    loader: "ts-loader",
                     options: {
-                        // Use this to point to your tsconfig.json.
-                        configFileName: "./tsconfig." + env + ".json"
+                        configFile: "tsconfig." + env + ".json"
                     }
                 }],
                 exclude: /node_modules/
             },
-
-            // this pattern may be reqiured for newer versions...
-            // //////////////////////
-            // {
-            //     test: /\.tsx?$/,
-            //     loader: "ts-loader",
-            //     options: {
-            //         // Use this to point to your tsconfig.json.
-            //         configFile: "tsconfig." + env + ".json"
-            //     },
-            //     exclude: /node_modules/
-            // },
-            // //////////////////////
 
             // All output '.js' files will have any sourcemaps re-processed by 'source-map-loader'.
             {
