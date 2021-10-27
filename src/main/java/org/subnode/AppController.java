@@ -294,7 +294,9 @@ public class AppController implements ErrorController {
 		thymeleafAttribs.put("intro1", appProp.getConfigText("intro1"));
 		thymeleafAttribs.put("intro2", appProp.getConfigText("intro2"));
 
-		thymeleafAttribs.put("BUNDLE_JS_HASH", fileUtils.genHashOfClasspathResource("/public/bundle.js"));
+		// todo-0: html-webpack-plugin has a 'hash' option (boolean) that can automatically
+		// do all this kind of hashing for us.
+		// https://github.com/jantimon/html-webpack-plugin#options
 		thymeleafAttribs.put("MAIN_CSS_HASH", fileUtils.genHashOfClasspathResource("/public/css/quanta.css"));
 		thymeleafAttribs.put("FONT_AWESOME_CSS_HASH",
 				fileUtils.genHashOfClasspathResource("/public/font-awesome-4.7.0/css/font-awesome.min.css"));

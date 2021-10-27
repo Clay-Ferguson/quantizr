@@ -1,5 +1,6 @@
 const path = require("path");
 const CircularDependencyPlugin = require("circular-dependency-plugin");
+const HtmlWebpackPlugin = require("html-webpack-plugin");
 
 const prod = process.argv.indexOf("-p") !== -1;
 const env = prod ? "prod" : "dev";
@@ -9,12 +10,14 @@ console.log("TARGET ENV: " + env);
 module.exports = {
     entry: "./ts/index.tsx",
 
+    // this puts our bundle.js file into current folder "public"
     output: {
-        filename: "bundle.js",
+        filename: "bundle.[contenthash].js",
         path: __dirname
     },
 
     resolve: {
+        // ".scss", ".css", ".jpg"
         extensions: [".tsx", ".ts", ".js", ".json"]
     },
 
@@ -40,6 +43,7 @@ module.exports = {
                 }]
             },
 
+            // I don't think this is even used. We don't import css this way.
             {
                 test: /\.css$/i,
                 use: [{
@@ -49,16 +53,59 @@ module.exports = {
                 }]
             },
 
+            // This will be how we DO import SCSS eventually.
+            // {
+            //     // handles both scss or css files.
+            //     test: /\.(sc|c)ss$/i,
+            //     use: [{
+            //         loader: "style-loader"
+            //     }, {
+            //         loader: "css-loader"
+            //     }, {
+            //         loader: "sass-loader"
+            //     }]
+            // },
+
             {
                 test: /\.htm$/,
                 use: [{
                     loader: "html-loader"
                 }]
             }
+
+            // Webpack 5 way of doing what used to be 'file-loader'
+            // {
+            //     test: /\.(jpg)$/,
+            //     type: "asset/resource"
+            // }
         ]
     },
 
     plugins: [
+        new HtmlWebpackPlugin({
+            filename: "../templates/index.html",
+            template: "../templates/indexTemplate.html",
+
+            // we don't want any path prefix on our bundle file so this is empty.
+            publicPath: ""
+        }),
+
+        new HtmlWebpackPlugin({
+            filename: "../templates/welcome.html",
+            template: "../templates/welcomeTemplate.html",
+
+            // we don't want any path prefix on our bundle file so this is empty.
+            publicPath: ""
+        }),
+
+        new HtmlWebpackPlugin({
+            filename: "../templates/demo/tsx-test.html",
+            template: "../templates/demo/tsx-testTemplate.html",
+
+            // we don't want any path prefix on our bundle file so this is empty.
+            publicPath: ""
+        }),
+
         new CircularDependencyPlugin({
             // `onDetected` is called for each module that is cyclical
             onDetected({ module: webpackModuleRecord, paths, compilation }) {

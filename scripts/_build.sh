@@ -18,7 +18,9 @@ if [ "$CLEAN" == "true" ]; then
     rm -rf ${PRJROOT}/bin/*
 fi
 
-rm -rf ${PRJROOT}/src/main/resources/public/bundle.js
+rm -rf ${PRJROOT}/src/main/resources/public/bundle.*.js
+rm -rf ${PRJROOT}/src/main/resources/public/bundle.*.js.LICENSE.txt
+rm -rf ${PRJROOT}/src/main/resources/public/bundle.*.js.map
 
 # Run ignore-scripts for some security from NodeJS
 # Packages can run "postinstall" script from their package.json and that is an attack vector we want to eliminate here.
