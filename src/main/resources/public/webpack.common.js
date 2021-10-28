@@ -17,8 +17,7 @@ module.exports = {
     },
 
     resolve: {
-        // ".scss", ".css", ".jpg"
-        extensions: [".tsx", ".ts", ".js", ".json"]
+        extensions: [".tsx", ".ts", ".js", ".json", ".scss"]
     },
 
     module: {
@@ -42,42 +41,29 @@ module.exports = {
                     loader: "source-map-loader"
                 }]
             },
-
-            // I don't think this is even used. We don't import css this way.
             {
-                test: /\.css$/i,
+                // handles both scss or css files.
+                test: /\.(sc|c)ss$/i,
                 use: [{
                     loader: "style-loader"
                 }, {
                     loader: "css-loader"
+                }, {
+                    loader: "sass-loader"
                 }]
             },
-
-            // This will be how we DO import SCSS eventually.
-            // {
-            //     // handles both scss or css files.
-            //     test: /\.(sc|c)ss$/i,
-            //     use: [{
-            //         loader: "style-loader"
-            //     }, {
-            //         loader: "css-loader"
-            //     }, {
-            //         loader: "sass-loader"
-            //     }]
-            // },
-
             {
                 test: /\.htm$/,
                 use: [{
                     loader: "html-loader"
                 }]
-            }
+            },
 
             // Webpack 5 way of doing what used to be 'file-loader'
-            // {
-            //     test: /\.(jpg)$/,
-            //     type: "asset/resource"
-            // }
+            {
+                test: /\.(jpg)$/,
+                type: "asset/resource"
+            }
         ]
     },
 

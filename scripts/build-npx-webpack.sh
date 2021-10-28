@@ -14,7 +14,6 @@ cd ${script_folder}
 source ./setenv-dev.sh
 
 cd ${PRJROOT}/src/main/resources/public
-. on-build-start.sh
 
 # todo-0: Once we have SCSS compile being done by webpack, we can put a "build script" in the package.json which is more standard.
 # and then we can compile with "npm run build" instead of npx

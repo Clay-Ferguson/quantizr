@@ -297,7 +297,6 @@ public class AppController implements ErrorController {
 		// todo-0: html-webpack-plugin has a 'hash' option (boolean) that can automatically
 		// do all this kind of hashing for us.
 		// https://github.com/jantimon/html-webpack-plugin#options
-		thymeleafAttribs.put("MAIN_CSS_HASH", fileUtils.genHashOfClasspathResource("/public/css/quanta.css"));
 		thymeleafAttribs.put("FONT_AWESOME_CSS_HASH",
 				fileUtils.genHashOfClasspathResource("/public/font-awesome-4.7.0/css/font-awesome.min.css"));
 		thymeleafAttribs.put("DROPZONE_CSS_HASH", fileUtils.genHashOfClasspathResource("/public/js/dropzone/dropzone.css"));

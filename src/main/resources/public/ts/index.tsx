@@ -3,9 +3,7 @@ import { Factory } from "./Factory";
 import React from "react";
 import ReactDOM from "react-dom";
 import TsxApp from "./TsxApp";
-
-// SCSS not ready yet in webpack.
-// import "../css/quanta.scss";
+import "../css/quanta.scss";
 
 // set in index.html
 declare var __page;

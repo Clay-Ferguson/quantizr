@@ -27,7 +27,6 @@ rm -rf ${PRJROOT}/src/main/resources/public/bundle.*.js.map
 cd ${PRJROOT}/src/main/resources/public
 # NOTE: run 'npm outdated' in this folder to view all outdated versions.
 npm config set ignore-scripts true
-. on-build-start.sh
 
 cd ${PRJROOT}
 ${SCRIPTS}/run-linter.sh

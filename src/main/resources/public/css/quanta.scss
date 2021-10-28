@@ -1,6 +1,8 @@
 
 @import "variables.scss";
 
+$brandingBase: '../../../../../branding';
+
 $profileImgSize: 200px;
 $rootNodeBorder: true;
 $highlightActiveMenuItems: false;
@@ -224,7 +226,7 @@ a {
 
 .welcomeBackground {
     background-size: 100% auto;
-    background-image: url(/branding/PIA09561_large.jpg);
+    background-image: url($brandingBase + '/PIA09561_large.jpg');
 
     //This 100 and auto makes the image fill horizontally but not alter it's aspect ratio
 

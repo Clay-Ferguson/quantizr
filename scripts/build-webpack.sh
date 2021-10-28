@@ -9,9 +9,6 @@ cd ${script_folder}
 # set -x
 source ./setenv-dev.sh
 
-cd ${PRJROOT}/src/main/resources/public
-. on-build-start.sh
-
 cd ${PRJROOT}
 mvn generate-resources -DskipTests -Pwebpack
 
