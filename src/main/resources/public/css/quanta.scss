@@ -80,6 +80,17 @@ $smallBorderSize: 3px;
 //     }
 // }
 
+@font-face {
+    font-family: "QuantaCustomFont";
+    src: url('../fonts/Roboto-Light.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal; 
+}
+
+body {
+    font-family: "QuantaCustomFont" !important;
+}
+
 .serverInfoText {
     width: 100%;
     overflow: auto;

@@ -8,12 +8,16 @@ const env = prod ? "prod" : "dev";
 console.log("TARGET ENV: " + env);
 
 module.exports = {
-    entry: "./ts/index.tsx",
+    entry: {
+        // todo-0: make this a path.resolve()
+        main: "./ts/index.tsx"
+    },
 
     // this puts our bundle.js file into current folder "public"
     output: {
-        filename: "bundle.[contenthash].js",
-        path: __dirname
+        path: path.resolve(__dirname, "dist"),
+        filename: "[name].[contenthash].js",
+        clean: true
     },
 
     resolve: {
@@ -69,35 +73,35 @@ module.exports = {
 
     plugins: [
         new HtmlWebpackPlugin({
-            filename: "../templates/index.html",
-            template: "../templates/indexTemplate.html",
+            filename: "../../templates/index.html",
+            template: "indexTemplate.html",
 
             // we don't want any path prefix on our bundle file so this is empty.
-            publicPath: ""
+            publicPath: "/dist"
         }),
 
         new HtmlWebpackPlugin({
-            filename: "../templates/error.html",
-            template: "../templates/errorTemplate.html",
+            filename: "../../templates/error.html",
+            template: "errorTemplate.html",
 
             // we don't want any path prefix on our bundle file so this is empty.
-            publicPath: ""
+            publicPath: "/dist"
         }),
 
         new HtmlWebpackPlugin({
-            filename: "../templates/welcome.html",
-            template: "../templates/welcomeTemplate.html",
+            filename: "../../templates/welcome.html",
+            template: "welcomeTemplate.html",
 
             // we don't want any path prefix on our bundle file so this is empty.
-            publicPath: ""
+            publicPath: "/dist"
         }),
 
         new HtmlWebpackPlugin({
-            filename: "../templates/demo/tsx-test.html",
-            template: "../templates/demo/tsx-testTemplate.html",
+            filename: "../../templates/tsx-test.html",
+            template: "tsx-testTemplate.html",
 
             // we don't want any path prefix on our bundle file so this is empty.
-            publicPath: ""
+            publicPath: "/dist"
         }),
 
         new CircularDependencyPlugin({
