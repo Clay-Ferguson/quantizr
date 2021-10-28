@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<!-- ERROR PAGE -->
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <base href="/" />
+
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <title>Quanta</title>
+</head>
+
+<body class="welcomeBackground">
+    <h3 style="margin: 2em;">Oops. Nothing found.
+        <p>
+            <a class="btn btn-outline-success btn-lg errorBackButton" th:href="${hostAndPort}">Quanta Home</a>
+        </p>
+    </h3>
+</body>
+
+</html>

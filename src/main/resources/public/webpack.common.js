@@ -77,6 +77,14 @@ module.exports = {
         }),
 
         new HtmlWebpackPlugin({
+            filename: "../templates/error.html",
+            template: "../templates/errorTemplate.html",
+
+            // we don't want any path prefix on our bundle file so this is empty.
+            publicPath: ""
+        }),
+
+        new HtmlWebpackPlugin({
             filename: "../templates/welcome.html",
             template: "../templates/welcomeTemplate.html",
 
