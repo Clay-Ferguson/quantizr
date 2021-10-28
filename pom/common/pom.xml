@@ -116,7 +116,7 @@ https://books.sonatype.com/mvnref-book/reference/pom-relationships-sect-pom-best
         <dependency>
             <groupId>org.apache.httpcomponents</groupId>
             <artifactId>httpclient</artifactId>
-            <version>4.5.9</version>
+            <version>4.5.13</version>
         </dependency>
 
         <dependency>
