@@ -29,7 +29,11 @@
         // all the above added after upgrading to latest version and I may not keep.
 
         "quotes": ["error", "double", { "avoidEscape": true }],
-        "semi": ["error", "always"],
+        
+        // todo-0: turn back on.
+        // "semi": ["error", "always"],
+        "semi": "off",
+
         // "indent": ["error", 4],
         //"spaced-comment": "off",
         "camelcase": "off",

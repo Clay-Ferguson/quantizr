@@ -9,3 +9,5 @@ src/main/resources/public/dist
 src/main/resources/templates
 
 
+src/main/resources/templates/error.html
+src/main/resources/templates/error.html

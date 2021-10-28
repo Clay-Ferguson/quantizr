@@ -36,7 +36,7 @@ export class Attachment implements AttachmentIntf {
         nothing else is required. Server side processing is still in place for it
         (new UploadFromFileDlg()).open();
         */
-    }
+    };
 
     openUploadFromUrlDlg = (nodeId: string, defaultUrl: string, onUploadFunc: Function, state: AppState): void => {
         if (!nodeId) {
@@ -50,7 +50,7 @@ export class Attachment implements AttachmentIntf {
 
         const dlg = new UploadFromUrlDlg(nodeId, defaultUrl, onUploadFunc, state);
         dlg.open();
-    }
+    };
 
     openUploadFromIPFSDlg = (nodeId: string, defaultCid: string, onUploadFunc: Function, state: AppState): void => {
         if (!nodeId) {
@@ -64,7 +64,7 @@ export class Attachment implements AttachmentIntf {
 
         const dlg = new UploadFromIPFSDlg(nodeId, defaultCid, onUploadFunc, state);
         dlg.open();
-    }
+    };
 
     deleteAttachment = async (node: J.NodeInfo, state: AppState): Promise<boolean> => {
         let deleted = false;
@@ -86,7 +86,7 @@ export class Attachment implements AttachmentIntf {
             }
         }
         return deleted;
-    }
+    };
 
     removeBinaryProperties = (node: J.NodeInfo) => {
         if (node) {
@@ -94,5 +94,5 @@ export class Attachment implements AttachmentIntf {
                 S.props.deleteProp(node, s);
             });
         }
-    }
+    };
 }
