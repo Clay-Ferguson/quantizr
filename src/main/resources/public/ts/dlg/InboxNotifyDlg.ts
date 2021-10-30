@@ -40,7 +40,7 @@ export class InboxNotifyDlg extends DialogBase {
                         S.nav.openContentNode(this.nodeId, this.appState);
                     }) : null,
                     new Button("Close", this.close)
-                ])
+                ], "marginTop")
             ])
         ];
     }

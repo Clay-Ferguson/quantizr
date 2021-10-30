@@ -71,7 +71,7 @@ export class FriendsDlg extends DialogBase {
                         this.close();
                     }, null, "btn-primary") : null,
                     new Button("Close", this.close)
-                ])
+                ], "marginTop")
             ])
         ];
     }

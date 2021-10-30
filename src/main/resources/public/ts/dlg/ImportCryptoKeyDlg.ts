@@ -17,7 +17,6 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
 });
 
 export class ImportCryptoKeyDlg extends DialogBase {
-
     keyState: ValidatedState<any> = new ValidatedState<any>();
 
     constructor(state: AppState) {
@@ -32,7 +31,7 @@ export class ImportCryptoKeyDlg extends DialogBase {
                 new ButtonBar([
                     new Button("Import", this.import, null, "btn-primary"),
                     new Button("Close", this.close)
-                ])
+                ], "marginTop")
             ])
         ];
     }

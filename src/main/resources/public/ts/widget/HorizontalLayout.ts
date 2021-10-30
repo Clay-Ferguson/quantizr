@@ -9,6 +9,7 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
     S = ctx;
 });
 
+// todo-0: need to make this support adding children dynamically
 export class HorizontalLayout extends Div {
 
     constructor(initialComps: Comp[] = null, classes: string = "displayTable", attribs: any = {}) {

@@ -29,7 +29,7 @@ export class RadioButton extends Comp {
         this.attribs.type = "radio";
         this.attribs.label = label;
         this.attribs.value = "val-" + this.getId();
-        this.attribs.className = "custom-control-input";
+        this.attribs.className = "form-check-input";
     }
 
     // Handler to update state
@@ -56,13 +56,13 @@ export class RadioButton extends Comp {
 
         return this.e("span", {
             key: this.attribs.id + "_span",
-            className: "myRadioButton custom-control custom-radio inline-radio"
+            className: "form-check"
         },
             this.e("input", this.attribs),
             this.e("label", {
                 key: this.attribs.id + "_label",
                 htmlFor: this.attribs.id,
-                className: "custom-control-label radioLabel"
+                className: "form-check-label radioLabel"
             }, this.label || ""));
     }
 }

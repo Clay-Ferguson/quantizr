@@ -57,7 +57,8 @@ export class UploadFromIPFSDlg extends DialogBase {
                 new ButtonBar([
                     this.uploadButton = new Button("Save", this.upload, null, "btn-primary"),
                     new Button("Close", this.close)
-                ])
+                ], "marginTop")
+
                 // todo-1: this would be very nice to have!
                 // new Span(null, { className: "marginLeft" }, [
                 //     new Checkbox("PIN a copy on this server", null, {

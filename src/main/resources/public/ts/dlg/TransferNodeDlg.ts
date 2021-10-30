@@ -10,7 +10,7 @@ import { Button } from "../widget/Button";
 import { ButtonBar } from "../widget/ButtonBar";
 import { Checkbox } from "../widget/Checkbox";
 import { Form } from "../widget/Form";
-import { FormGroup } from "../widget/FormGroup";
+import { HorizontalLayout } from "../widget/HorizontalLayout";
 import { TextField } from "../widget/TextField";
 
 let S: Singletons;
@@ -33,12 +33,12 @@ export class TransferNodeDlg extends DialogBase {
     renderDlg(): CompIntf[] {
         return [
             new Form(null, [
-                new FormGroup(null, [
+                new HorizontalLayout([
                     // Only the admin user can transfer from anyone to anyone. Other users can only transfer nodes they own
                     this.appState.isAdminUser ? new TextField("From User", null, null, null, false, this.fromUserState) : null,
                     new TextField("To User", null, null, null, false, this.toUserState)
                 ]),
-                new FormGroup(null, [
+                new HorizontalLayout([
                     new Checkbox("Include Sub-Nodes", null, {
                         setValue: (checked: boolean): void => {
                             this.mergeState({ recursive: checked });
@@ -51,7 +51,7 @@ export class TransferNodeDlg extends DialogBase {
                 new ButtonBar([
                     new Button("Transfer", this.transfer, null, "btn-primary"),
                     new Button("Close", this.close)
-                ])
+                ], "marginTop")
             ])
         ];
     }

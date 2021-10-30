@@ -104,7 +104,7 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
                     }, "btn-secondary"),
 
                     new Button("Close", this.close)
-                ])
+                ], "marginTop")
             ])
         ];
 

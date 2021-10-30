@@ -50,7 +50,7 @@ export class SignupDlg extends DialogBase {
                         new ButtonBar([
                             new Button("Create Account", this.signup, null, "btn-primary"),
                             new Button("Cancel", this.close)
-                        ])
+                        ], "marginTop")
                     ])
                 ])
             ])

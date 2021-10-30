@@ -24,7 +24,7 @@ export class EditPrivsTableRow extends ListBoxRow {
     }
 
     renderAclPrivileges(aclEntry: J.AccessControlInfo): Div {
-        let div = new Div(null, { className: "float-right marginBottom" });
+        let div = new Div(null, { className: "float-end marginBottom" });
 
         aclEntry.privileges.forEach(function (privilege, index) {
             div.addChild(

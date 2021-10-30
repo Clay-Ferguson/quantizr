@@ -16,7 +16,7 @@ export class FullScreenControlBar extends Div {
 
     constructor() {
         super();
-        this.attribs.className = "float-right fullScreenToolbar";
+        this.attribs.className = "float-end fullScreenToolbar";
     }
 
     preRender(): void {

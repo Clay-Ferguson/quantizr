@@ -26,10 +26,7 @@ import { CollapsiblePanel } from "../widget/CollapsiblePanel";
 import { DateTimeField } from "../widget/DateTimeField";
 import { Div } from "../widget/Div";
 import { EditPropsTable } from "../widget/EditPropsTable";
-import { EditPropsTableRow } from "../widget/EditPropsTableRow";
 import { Form } from "../widget/Form";
-import { FormGroup } from "../widget/FormGroup";
-import { FormInline } from "../widget/FormInline";
 import { Header } from "../widget/Header";
 import { HelpButton } from "../widget/HelpButton";
 import { HorizontalLayout } from "../widget/HorizontalLayout";
@@ -223,7 +220,7 @@ export class EditNodeDlg extends DialogBase {
             { key: "c4", val: "4 columns" },
             { key: "c5", val: "5 columns" },
             { key: "c6", val: "6 columns" }
-        ], "m-2", "", new PropValueHolder(this.getState().node, J.NodeProp.LAYOUT, "v")); // w-25
+        ], "width-7rem", "col-3", new PropValueHolder(this.getState().node, J.NodeProp.LAYOUT, "v"));
         return selection;
     }
 
@@ -235,7 +232,7 @@ export class EditNodeDlg extends DialogBase {
             { key: "3", val: "Medium" },
             { key: "4", val: "Low" },
             { key: "5", val: "Backlog" }
-        ], "m-2", "", new PropValueHolder(this.getState().node, J.NodeProp.PRIORITY, "0"));
+        ], "width-7rem", "col-3", new PropValueHolder(this.getState().node, J.NodeProp.PRIORITY, "0"));
     }
 
     createImgSizeSelection = (label: string, allowNone: boolean, extraClasses: string, valueIntf: ValueIntf): Selection => {
@@ -264,7 +261,7 @@ export class EditNodeDlg extends DialogBase {
             { key: "1000px", val: "1000px" }
         ]);
 
-        return new Selection(null, label, options, "m-2 width-7rem", extraClasses, valueIntf);
+        return new Selection(null, label, options, "width-7rem", extraClasses, valueIntf);
     }
 
     getTitleIconComp(): CompIntf {
@@ -370,21 +367,22 @@ export class EditNodeDlg extends DialogBase {
             getValue: (): boolean => {
                 return S.props.getNodePropVal(J.NodeProp.NOWRAP, state.node) !== "1";
             }
-        });
+        }, "col-3");
 
-        /* Note: Using FormInline causes the elements to be laid out left to right, rather than one per row */
-        let selectionsBar = new FormInline(null, [
+        let selectionsBar = new Div(null, { className: "row marginTop" }, [
             state.node.hasChildren ? this.createLayoutSelection() : null,
-            state.node.hasChildren ? this.createImgSizeSelection("Images", true, null, //
+            state.node.hasChildren ? this.createImgSizeSelection("Images", true, "col-3", //
                 new PropValueHolder(this.getState().node, J.NodeProp.CHILDREN_IMG_SIZES, "n")) : null,
-            this.createPrioritySelection(),
+            this.createPrioritySelection()
+        ]);
 
+        let checkboxesBar = new Div(null, { className: "row marginLeft marginTop" }, [
             state.node.hasChildren ? new Checkbox("Inline Children", null,
-                this.makeCheckboxPropValueHandler(J.NodeProp.INLINE_CHILDREN)) : null,
+                this.makeCheckboxPropValueHandler(J.NodeProp.INLINE_CHILDREN), "col-3") : null,
             wordWrapCheckbox
         ]);
 
-        let imgSizeSelection = S.props.hasImage(state.node) ? this.createImgSizeSelection("Image Size", false, "float-right", //
+        let imgSizeSelection = S.props.hasImage(state.node) ? this.createImgSizeSelection("Image Size", false, "float-end", //
             new PropValueHolder(this.getState().node, J.NodeProp.IMG_SIZE, "100%")) : null;
 
         // This is the table that contains the custom editable properties inside the collapsable panel at the bottom.
@@ -394,15 +392,17 @@ export class EditNodeDlg extends DialogBase {
         // if customProps exists then the props are all added into 'editPropsTable' instead of the collapsible panel
         if (!customProps) {
             propsTable = new EditPropsTable({
-                className: "edit-props-table form-group-border"
+                className: "edit-props-table form-group-border marginBottom"
             });
             // This is the container that holds the custom properties if provided, or else the name+content textarea at the top of not
-            mainPropsTable = new EditPropsTable();
+            mainPropsTable = new EditPropsTable({
+                className: "marginBottom"
+            });
         }
         else {
             // This is the container that holds the custom properties if provided, or else the name+content textarea at the top of not
             mainPropsTable = new EditPropsTable({
-                className: "edit-props-table form-group-border"
+                className: "edit-props-table form-group-border marginBottom"
             });
         }
 
@@ -422,7 +422,7 @@ export class EditNodeDlg extends DialogBase {
             }
 
             if (!customProps || hasContentProp) {
-                let contentTableRow = this.makeContentEditorFormGroup(state.node, isWordWrap, rows);
+                let contentTableRow = this.makeContentEditor(state.node, isWordWrap, rows);
                 mainPropsTable.addChild(contentTableRow);
                 this.contentEditor.setWordWrap(isWordWrap);
             }
@@ -456,14 +456,14 @@ export class EditNodeDlg extends DialogBase {
         if (allowPropertyAdd) {
             if (numPropsShowing > 0) {
                 let propsButtonBar: ButtonBar = new ButtonBar([
-                    new Button("Add Property", this.addProperty),
-                    this.deletePropButton = new Button("Delete Property", this.deletePropertyButtonClick)
-                ], null, "float-right marginBottom");
+                    new Button("Add", this.addProperty),
+                    this.deletePropButton = new Button("Delete", this.deletePropertyButtonClick)
+                ], null, "float-end");
 
                 this.deletePropButton.setEnabled(false);
 
                 // adds the button bar to the top of the list of children.
-                propsParent.safeGetChildren().unshift(propsButtonBar);
+                propsParent.safeGetChildren().unshift(propsButtonBar, new Clearfix());
             }
         }
 
@@ -532,13 +532,11 @@ export class EditNodeDlg extends DialogBase {
             // let isPublic = sharingNames.toLowerCase().indexOf("public") !== -1;
 
             sharingDiv = new Div("Shared to: " + sharingNames, {
-                className: "marginBottom float-right sharingLabel",
+                className: "marginBottom float-end sharingLabel",
                 onClick: this.share
             });
             sharingDivClearFix = new Clearfix();
         }
-
-        let helpPanel = this.editorHelp ? new HelpButton(() => this.editorHelp) : null;
 
         // if this props table would be empty don't display it (set to null)
         if (propsTable && !propsTable.hasChildren()) {
@@ -546,19 +544,19 @@ export class EditNodeDlg extends DialogBase {
         }
 
         let collapsiblePanel = !customProps ? new CollapsiblePanel(null, null, null, [
-            new Div(null, { className: "marginBottom marginRight" }, [
+            new Div(null, { className: "marginBottom marginRight marginTop" }, [
                 new Button("Type", this.openChangeNodeTypeDlg),
                 !customProps ? new Button("Encrypt", () => { this.openEncryptionDlg(true); }) : null,
                 allowPropertyAdd && numPropsShowing === 0 ? new Button("Props", this.addProperty) : null
             ]),
-            nodeNameTextField, selectionsBar, propsTable
+            nodeNameTextField, selectionsBar, checkboxesBar, propsTable
         ], false,
             (state: boolean) => {
                 EditNodeDlg.morePanelExpanded = state;
             }, EditNodeDlg.morePanelExpanded, "marginRight", "marginTop", "span") : null;
 
         let rightFloatButtons = new Div(null, { className: "marginBottom" }, [
-            collapsiblePanel, helpPanel
+            collapsiblePanel
         ]);
 
         this.propertyEditFieldContainer.setChildren([mainPropsTable, sharingDiv, sharingDivClearFix, binarySection, rightFloatButtons,
@@ -629,7 +627,7 @@ export class EditNodeDlg extends DialogBase {
         let allowUpload: boolean = typeHandler ? (state.isAdminUser || typeHandler.allowAction(NodeActionType.upload, state.node, this.appState)) : true;
         let allowShare: boolean = typeHandler ? (state.isAdminUser || typeHandler.allowAction(NodeActionType.share, state.node, this.appState)) : true;
 
-        let typeLocked = !!S.props.getNodePropVal(J.NodeProp.TYPE_LOCK, state.node);
+        // let typeLocked = !!S.props.getNodePropVal(J.NodeProp.TYPE_LOCK, state.node);
         let datePropExists = S.props.getNodeProp(J.NodeProp.DATE, state.node);
 
         let numPropsShowing = this.countPropsShowing();
@@ -652,6 +650,8 @@ export class EditNodeDlg extends DialogBase {
                 onClick: this.share,
                 title: "Share Node"
             }) : null,
+
+            this.editorHelp ? new HelpButton(() => this.editorHelp) : null,
 
             // show delete button only if we're in a fullscreen viewer (like Calendar view)
             S.quanta.fullscreenViewerActive(this.appState)
@@ -1019,11 +1019,11 @@ export class EditNodeDlg extends DialogBase {
         });
     }
 
-    makePropEditor = (typeHandler: TypeHandlerIntf, propEntry: J.PropertyInfo, allowCheckbox: boolean, rows: number): EditPropsTableRow => {
-        let tableRow = new EditPropsTableRow();
+    makePropEditor = (typeHandler: TypeHandlerIntf, propEntry: J.PropertyInfo, allowCheckbox: boolean, rows: number): Div => {
+        let tableRow = new Div();
         let allowEditAllProps: boolean = this.appState.isAdminUser;
         let isReadOnly = S.render.isReadOnlyProperty(propEntry.name);
-        let formGroup = new FormGroup();
+        let editItems = [];
         let label = typeHandler ? typeHandler.getEditLabelForProp(propEntry.name) : propEntry.name;
         // console.log("making single prop editor: prop[" + propEntry.name + "] val[" + propEntry.value + "]");
 
@@ -1044,7 +1044,7 @@ export class EditNodeDlg extends DialogBase {
                 disabled: "disabled"
             }, propState);
 
-            formGroup.addChild(textarea);
+            editItems.push(textarea);
         }
         else {
             if (allowCheckbox) {
@@ -1062,11 +1062,11 @@ export class EditNodeDlg extends DialogBase {
                     getValue: (): boolean => {
                         return this.getState().selectedProps.has(propEntry.name);
                     }
-                }, true);
-                formGroup.addChild(checkbox);
+                });
+                editItems.push(checkbox);
             }
             else {
-                formGroup.addChild(new Label(label));
+                editItems.push(new Label(label));
             }
 
             let valEditor: CompIntf = null;
@@ -1080,7 +1080,7 @@ export class EditNodeDlg extends DialogBase {
                     valEditor = new TextArea(null, {
                         rows: "" + rows,
                         id: "prop_" + this.getState().node.id
-                    }, propState, "textarea-min-4");
+                    }, propState, "textarea-min-4 displayCell");
                 }
             }
             else {
@@ -1095,15 +1095,15 @@ export class EditNodeDlg extends DialogBase {
                 }
             }
 
-            formGroup.addChild(valEditor as any as Comp);
+            editItems.push(valEditor as any as Comp);
         }
-        tableRow.addChildren([formGroup]);
+        tableRow.addChildren([new Div(null, null, editItems)]);
         return tableRow;
     }
 
-    makeContentEditorFormGroup = (node: J.NodeInfo, isWordWrap: boolean, rows: string): FormGroup => {
+    makeContentEditor = (node: J.NodeInfo, isWordWrap: boolean, rows: string): Div => {
         let value = node.content || "";
-        let formGroup = new FormGroup();
+        let editItems = [];
         let encrypted = value.startsWith(J.Constant.ENC_TAG);
 
         // if this is the first pass thru here (not a re-render) then allow focus() to get called
@@ -1152,7 +1152,7 @@ export class EditNodeDlg extends DialogBase {
             this.contentEditor = new TextArea(null, {
                 id: "edit_" + this.getState().node.id,
                 rows
-            }, this.contentEditorState, "textarea-min-10", true);
+            }, this.contentEditorState, "font-inherit displayCell", true);
 
             let wrap: boolean = S.props.getNodePropVal(J.NodeProp.NOWRAP, this.appState.node) !== "1";
             this.contentEditor.setWordWrap(wrap);
@@ -1182,8 +1182,9 @@ export class EditNodeDlg extends DialogBase {
                 this.contentEditor.focus();
             }
         }
-        formGroup.addChild(this.contentEditor as any as Comp);
-        return formGroup;
+
+        editItems.push(this.contentEditor as any as Comp);
+        return new Div(null, null, editItems);
     }
 
     deletePropertyButtonClick = (): void => {

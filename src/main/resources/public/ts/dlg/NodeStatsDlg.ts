@@ -73,7 +73,7 @@ export class NodeStatsDlg extends DialogBase {
                     this.close();
                 }, null, "btn-primary"),
                 new HelpButton(() => S.quanta?.config?.help?.nodeStats?.dialog)
-            ])
+            ], "marginTop")
         ];
     }
 

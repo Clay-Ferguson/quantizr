@@ -37,7 +37,7 @@ export class EncryptionDlg extends DialogBase {
                         this.close();
                     }, null, "btn-primary"),
                     new Button("Cancel", this.close)
-                ])
+                ], "marginTop")
             ])
         ];
     }

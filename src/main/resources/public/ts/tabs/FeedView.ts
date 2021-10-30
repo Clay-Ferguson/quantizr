@@ -64,7 +64,7 @@ export class FeedView extends AppTab {
         children.push(new Div(null, null, [
             new Div(null, { className: "marginTop" }, [
                 this.renderHeading(state),
-                new Span(null, { className: "float-right" }, [
+                new Span(null, { className: "float-end" }, [
                     showBookmarkIcon ? new Icon({
                         className: "fa fa-bookmark fa-lg clickable marginRight",
                         title: "Bookmark Chat Room",
@@ -98,7 +98,7 @@ export class FeedView extends AppTab {
             state.isAnonUser ? null : new Button("Post", () => S.edit.addNode(this.data.props.feedFilterRootNode?.id, null, null, null, state), {
                 title: this.data.props.feedFilterRootNode?.id ? "Post to this Chat Room" : "Post something to the Fediverse!"
             }, "btn-primary")
-        ], null, "float-right"));
+        ], null, "float-end"));
 
         let searchButtonBar = null;
         // if this is mobile don't even show search field unless it's currently in use (like from a trending click)

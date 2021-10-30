@@ -48,7 +48,7 @@ export class InboxNodeTypeHandler extends TypeBase {
                 new Button("Clear Inbox", () => {
                     S.edit.clearInbox(state);
                 })
-            ], null, "float-right marginBottom"),
+            ], null, "float-end marginBottom"),
             new Clearfix()
         ], "displayTable marginAll");
     }

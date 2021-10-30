@@ -37,7 +37,7 @@ export class ChangeNodeTypeDlg extends DialogBase {
                 new ButtonBar([
                     new Button("Set Type", this.setNodeType, null, "btn-primary"),
                     new Button("Cancel", this.close)
-                ])
+                ], "marginTop")
             ])
         ];
     }

@@ -31,7 +31,7 @@ export class BlockedUsersTypeHandler extends TypeBase {
                 className: "marginAll"
             })
             // oops do we have help for blocked users yet? todo-1
-            // new HelpButton(() => S.quanta?.config?.help?.type?.friendsList?.render, null, "btn-secondary float-right"),
+            // new HelpButton(() => S.quanta?.config?.help?.type?.friendsList?.render, null, "btn-secondary float-end"),
             // new Clearfix()
         ]);
     }

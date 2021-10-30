@@ -150,7 +150,7 @@ export class NodeCompButtonBar extends Div {
                     getValue: (): boolean => {
                         return state.selectedNodes.has(node.id);
                     }
-                }, true);
+                }, "float-start");
             }
 
             let insertAllowed = true;
@@ -234,7 +234,7 @@ export class NodeCompButtonBar extends Div {
             }
 
             if (!!state.nodesToMove && userCanPaste) {
-                pasteButtons = new Span(null, { className: "float-right marginLeft" }, [
+                pasteButtons = new Span(null, { className: "float-end marginLeft" }, [
                     new Button("Paste Inside",
                         S.edit.pasteSelNodesInside, { nid: node.id }, "btn-secondary pasteButton"),
 
@@ -302,7 +302,7 @@ export class NodeCompButtonBar extends Div {
         }
 
         let btnArray: Comp[] = [openButton, upLevelButton, insertNodeButton, createSubNodeButton, editNodeButton, prevButton, nextButton,
-            new Span(null, { className: "float-right" }, [moveNodeUpButton, //
+            new Span(null, { className: "float-end" }, [moveNodeUpButton, //
                 moveNodeDownButton, cutNodeButton, deleteNodeButton, nodeFeedButton, searchButton, timelineButton, pasteButtons])];
 
         if (this.extraButtons) {

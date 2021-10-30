@@ -73,7 +73,7 @@ export class UserProfileDlg extends DialogBase {
                 profileImg,
                 // todo-1: currently there's no 'unblock' user has to go do that in their blocked users node.
                 new Div(null, { className: "marginBottom" }, [
-                    new Div(null, { className: "float-right" }, [
+                    new Div(null, { className: "float-end" }, [
                         state.userProfile.blocked ? new Span("BLOCKED", { className: "blockingText" }) : null,
                         state.userProfile.following ? new Span("You Follow", {
                             className: "followingText",
@@ -129,7 +129,7 @@ export class UserProfileDlg extends DialogBase {
                             this.bioState)
                 ]),
 
-                this.readOnly ? null : new Anchor(null, "Logout", { className: "float-right logoutLink", onClick: S.nav.logout }),
+                this.readOnly ? null : new Anchor(null, "Logout", { className: "float-end logoutLink", onClick: S.nav.logout }),
 
                 new ButtonBar([
                     this.appState.isAnonUser || this.readOnly ? null : new Button("Save", this.save, null, "btn-primary"),
@@ -145,7 +145,7 @@ export class UserProfileDlg extends DialogBase {
                         window.open(state.userProfile.actorUrl, "_blank");
                     }) : null,
                     new Button("Close", this.close, null)
-                ], null, "marginTop")
+                ], "marginTop")
             ])
         ];
 

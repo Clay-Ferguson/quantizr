@@ -18,7 +18,7 @@ export class Selection extends Comp {
         super(attribs);
         // w-25 = width 25%
         // https://hackerthemes.com/bootstrap-cheatsheet/#m-1
-        this.attribs.className = "custom-select " + moreClasses;
+        this.attribs.className = "form-select " + moreClasses;
 
         selectionOptions.forEach((row: any) => {
             // NOTE: for default selection we do it this way rather than the 'elm.selectedIndex' which is used to
@@ -72,7 +72,7 @@ export class Selection extends Comp {
         return this.e("div", {
             id: this.getId() + "_sel",
             key: this.getId() + "_sel",
-            className: "form-group " + (this.outterClasses || "")
+            className: this.outterClasses || ""
         }, children);
     }
 }

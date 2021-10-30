@@ -116,7 +116,7 @@ export class SearchContentDlg extends DialogBase {
                     new Button("Search", this.search, null, "btn-primary"),
                     new Button("Graph", this.graph, null, "btn-primary"),
                     new Button("Close", this.close)
-                ])
+                ], "marginTop")
             ])
         ];
     }

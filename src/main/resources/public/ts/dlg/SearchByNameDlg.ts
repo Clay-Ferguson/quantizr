@@ -16,7 +16,6 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
 });
 
 export class SearchByNameDlg extends DialogBase {
-
     static defaultSearchText: string = "";
 
     searchTextField: TextField;
@@ -51,7 +50,7 @@ export class SearchByNameDlg extends DialogBase {
                 new ButtonBar([
                     new Button("Search", this.search, null, "btn-primary"),
                     new Button("Close", this.close)
-                ])
+                ], "marginTop")
             ])
         ];
     }

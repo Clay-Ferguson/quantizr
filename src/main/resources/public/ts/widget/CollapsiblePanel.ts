@@ -46,7 +46,7 @@ export class CollapsiblePanel extends Comp {
                     this.e("span", {
                         className: style + " " + this.extraToggleButtonClass + (state.expanded ? " icon-up" : " icon-down"),
                         // Warning: This can't be camel case!
-                        "data-toggle": collapseClass,
+                        "data-bs-toggle": collapseClass,
                         id: "btn_" + this.getId(),
                         key: "btn_" + this.getId(),
                         onClick: this.onToggle
@@ -56,13 +56,14 @@ export class CollapsiblePanel extends Comp {
         }
         else {
             return this.e(this.elementName, {
-                key: "panel_" + this.getId()
+                key: "panel_" + this.getId(),
+                className: "marginTop"
             },
                 // This span is the expande/collapse button itself
                 this.e("span", {
                     className: style + " " + this.extraToggleButtonClass + (state.expanded ? " icon-up" : " icon-down"),
                     // Warning: This can't be camel case!
-                    "data-toggle": collapseClass,
+                    "data-bs-toggle": collapseClass,
                     id: "btn_" + this.getId(),
                     key: "btn_" + this.getId(),
                     onClick: this.onToggle

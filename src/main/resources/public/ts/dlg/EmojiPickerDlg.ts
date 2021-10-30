@@ -40,7 +40,7 @@ export class EmojiPickerDlg extends DialogBase {
                 new EmojiPicker(this.selectionValueIntf),
                 new ButtonBar([
                     new Button("Cancel", this.close)
-                ])
+                ], "marginTop")
             ])
         ];
     }

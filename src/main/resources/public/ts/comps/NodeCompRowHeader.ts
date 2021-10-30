@@ -136,7 +136,7 @@ export class NodeCompRowHeader extends Div {
         }
 
         let floatUpperRightDiv: Div = new Div(null, {
-            className: "float-right floatRightHeaderDiv"
+            className: "float-end floatRightHeaderDiv"
         });
 
         if (node.lastModified) {

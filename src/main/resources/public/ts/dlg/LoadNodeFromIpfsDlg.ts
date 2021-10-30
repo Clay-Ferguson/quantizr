@@ -9,7 +9,7 @@ import { CompIntf } from "../widget/base/CompIntf";
 import { Button } from "../widget/Button";
 import { ButtonBar } from "../widget/ButtonBar";
 import { Form } from "../widget/Form";
-import { FormGroup } from "../widget/FormGroup";
+import { HorizontalLayout } from "../widget/HorizontalLayout";
 import { TextField } from "../widget/TextField";
 
 let S: Singletons;
@@ -28,13 +28,13 @@ export class LoadNodeFromIpfsDlg extends DialogBase {
     renderDlg(): CompIntf[] {
         return [
             new Form(null, [
-                new FormGroup(null, [
+                new HorizontalLayout([
                     new TextField("IPFS Path", false, this.load, null, false, this.ipfsPathState)
                 ]),
                 new ButtonBar([
                     new Button("Load", this.load, null, "btn-primary"),
                     new Button("Close", this.close)
-                ])
+                ], "marginTop")
             ])
         ];
     }

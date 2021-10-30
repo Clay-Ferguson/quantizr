@@ -40,7 +40,7 @@ export class MenuPanel extends Div {
         super(null, {
             id: "accordion",
             role: "tablist",
-            className: state.mobileMode ? "menuPanelMobile" : "menuPanel"
+            className: (state.mobileMode ? "menuPanelMobile" : "menuPanel") + " accordion"
         });
     }
 
@@ -260,7 +260,7 @@ export class MenuPanel extends Div {
                 state.bookmarks.forEach((bookmark: J.Bookmark): boolean => {
                     bookmarkItems.push(new MenuItem(bookmark.name, () => S.view.jumpToId(bookmark.id || bookmark.selfId), true, null,
                         new Icon({
-                            className: "fa fa-edit fa-lg float-right menuIcon",
+                            className: "fa fa-edit fa-lg float-end menuIcon",
                             title: "Edit this bookmark",
                             onClick: (event: any) => {
                                 event.stopPropagation();
@@ -417,7 +417,11 @@ export class MenuPanel extends Div {
 
         children.push(new Menu("Calendar", [
             new MenuItem("Dates", MenuPanel.showCalendarDates, !state.isAnonUser && !!hltNode),
-            new MenuItem("All", MenuPanel.showCalendarAll, !state.isAnonUser && !!hltNode),
+
+            // todo-0: This feature has a bug. It seems to be using either modTime or createTime from each node instead of the
+            // date property.
+            // new MenuItem("All", MenuPanel.showCalendarAll, !state.isAnonUser && !!hltNode),
+
             new MenuItemSeparator(), //
             new MenuItem("Future Dates", MenuPanel.calendarFutureDates, !state.isAnonUser && !!hltNode), //
             new MenuItem("Past Dates", MenuPanel.calendarPastDates, !state.isAnonUser && !!hltNode), //

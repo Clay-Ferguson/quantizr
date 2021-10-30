@@ -14,7 +14,6 @@ export class ProgressDlg extends DialogBase {
         return [
             new Div(null, {
                 className: "progressSpinner"
-
             }, [new Spinner()])
         ];
     }

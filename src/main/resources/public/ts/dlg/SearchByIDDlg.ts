@@ -51,7 +51,7 @@ export class SearchByIDDlg extends DialogBase {
                 new ButtonBar([
                     new Button("Search", this.search, null, "btn-primary"),
                     new Button("Close", this.close)
-                ])
+                ], "marginTop")
             ])
         ];
     }

@@ -9,7 +9,7 @@ import { Button } from "../widget/Button";
 import { ButtonBar } from "../widget/ButtonBar";
 import { Checkbox } from "../widget/Checkbox";
 import { Form } from "../widget/Form";
-import { FormGroup } from "../widget/FormGroup";
+import { HorizontalLayout } from "../widget/HorizontalLayout";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
@@ -25,7 +25,7 @@ export class PrefsDlg extends DialogBase {
     renderDlg(): CompIntf[] {
         return [
             new Form(null, [
-                new FormGroup(null, [
+                new HorizontalLayout([
                     new Checkbox("Show Node Metadata", null, {
                         setValue: (checked: boolean): void => {
                             this.appState.userPreferences.showMetaData = checked;
@@ -38,7 +38,7 @@ export class PrefsDlg extends DialogBase {
                 new ButtonBar([
                     new Button("Save", this.savePreferences, null, "btn-primary"),
                     new Button("Cancel", this.close)
-                ])
+                ], "marginTop")
             ])
         ];
     }

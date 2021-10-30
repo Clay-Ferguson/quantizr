@@ -30,7 +30,7 @@ export class ImportDlg extends DialogBase {
             new ButtonBar([
                 new Button("Import", this.importNodes, null, "btn-primary"),
                 new Button("Close", this.close)
-            ])
+            ], "marginTop")
         ];
     }
 

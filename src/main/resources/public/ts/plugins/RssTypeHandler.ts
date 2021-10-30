@@ -177,7 +177,7 @@ export class RssTypeHandler extends TypeBase {
         }
 
         itemListContainer.safeGetChildren().push(new Checkbox("Headlines Only", {
-            className: "float-right"
+            className: "float-end"
         }, {
             setValue: (checked: boolean): void => {
                 dispatch("Action_SetHeadlinesFlag", (s: AppState): AppState => {
@@ -433,7 +433,7 @@ export class RssTypeHandler extends TypeBase {
 
         let footerSpan = new Span(entry.publishDate, { className: "marginRight" });
 
-        children.push(new Div(null, { className: "float-right" }, [
+        children.push(new Div(null, { className: "float-end" }, [
             footerSpan, postIcon, linkIcon, bookmarkIcon
         ]));
 

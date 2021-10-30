@@ -120,7 +120,7 @@ export class RightNavPanel extends Div {
                 ]),
                 new HistoryPanel(),
                 !state.isAnonUser ? new Div("Logout", {
-                    className: "float-right rhsLogoutLink",
+                    className: "float-end rhsLogoutLink",
                     onClick: S.nav.logout
                 }) : null
             ])

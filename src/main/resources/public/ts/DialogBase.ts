@@ -234,7 +234,7 @@ export abstract class DialogBase<S extends BaseCompState = any> extends Div<S> i
         }
 
         titleChildren = titleChildren.concat(timesIcon = new Span("&times;", {
-            className: "float-right app-modal-title-close-icon",
+            className: "float-end app-modal-title-close-icon",
             onClick: this.close,
             title: "Close Dialog"
         }));

@@ -10,7 +10,7 @@ import { Button } from "../widget/Button";
 import { ButtonBar } from "../widget/ButtonBar";
 import { Checkbox } from "../widget/Checkbox";
 import { Form } from "../widget/Form";
-import { FormGroup } from "../widget/FormGroup";
+import { HorizontalLayout } from "../widget/HorizontalLayout";
 import { TextField } from "../widget/TextField";
 
 let S: Singletons;
@@ -33,11 +33,11 @@ export class SearchAndReplaceDlg extends DialogBase {
     renderDlg(): CompIntf[] {
         return [
             new Form(null, [
-                new FormGroup(null, [
+                new HorizontalLayout([
                     new TextField("Search for", null, null, null, false, this.searchState),
                     new TextField("Replace with", null, null, null, false, this.replaceState)
                 ]),
-                new FormGroup(null, [
+                new HorizontalLayout([
                     new Checkbox("Include Sub-Nodes", null, {
                         setValue: (checked: boolean): void => {
                             this.mergeState({ recursive: checked });
@@ -50,7 +50,7 @@ export class SearchAndReplaceDlg extends DialogBase {
                 new ButtonBar([
                     new Button("Replace", this.replace, null, "btn-primary"),
                     new Button("Close", this.close)
-                ])
+                ], "marginTop")
             ])
         ];
     }

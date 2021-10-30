@@ -18,7 +18,6 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
 });
 
 export class SearchFileSystemDlg extends DialogBase {
-
     static defaultSearchText: string = "";
     searchTextField: TextField;
     searchTextState: ValidatedState<any> = new ValidatedState<any>();
@@ -54,7 +53,7 @@ export class SearchFileSystemDlg extends DialogBase {
                 new ButtonBar([
                     new Button("Search", this.searchNodes),
                     new Button("Close", this.close)
-                ])
+                ], "marginTop")
             ])
         ];
     }

@@ -35,7 +35,7 @@ export class RssFeedsTypeHandler extends TypeBase {
                 new Button("Add RSS Feed", () => S.edit.createNode(node, J.NodeType.RSS_FEED, true, false, null, null, state), {
                     title: "Add a new RSS Feed Subscription"
                 })
-            ], null, "float-right"),
+            ], null, "float-end"),
             new Heading(4, "RSS Feed Subscriptions", {
                 className: "marginAll"
             })

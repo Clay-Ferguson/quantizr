@@ -65,7 +65,7 @@ export class LeftNavPanel extends Div {
                 // todo-1: need to add a similar message over to the 'logo-text' that's active for mobile
                 // which is in a different class.
                 messages ? new Span(messages, {
-                    className: "logo-text-small float-right",
+                    className: "logo-text-small float-end",
                     onClick: e => { S.quanta.showMyNewMessages(); },
                     title: "Show new messages"
                 }) : null

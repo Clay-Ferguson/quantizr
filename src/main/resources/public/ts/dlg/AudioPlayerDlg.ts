@@ -122,7 +122,7 @@ export class AudioPlayerDlg extends DialogBase {
                 ]),
                 new ButtonBar([
                     new Button("Close", this.destroyPlayer)
-                ]),
+                ], "marginTop"),
                 new ButtonBar([
                     new Button("< 30s", (): void => {
                         this.skip(-30);
@@ -130,7 +130,7 @@ export class AudioPlayerDlg extends DialogBase {
                     new Button("30s >", (): void => {
                         this.skip(30);
                     })
-                ]),
+                ], "marginTop"),
                 new ButtonBar([
                     new Button("1x", (): void => {
                         this.speed(1);
@@ -147,11 +147,11 @@ export class AudioPlayerDlg extends DialogBase {
                     new Button("2x", (): void => {
                         this.speed(2);
                     })
-                ]),
+                ], "marginTop"),
                 new ButtonBar([
                     new Button("Copy", this.copyToClipboard),
                     !this.appState.isAnonUser ? new Button("Post", this.postComment) : null
-                ]),
+                ], "marginTop"),
                 this.customDiv
             ])
         ];

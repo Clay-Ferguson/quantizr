@@ -8,9 +8,9 @@ import { CompIntf } from "../widget/base/CompIntf";
 import { Button } from "../widget/Button";
 import { ButtonBar } from "../widget/ButtonBar";
 import { Form } from "../widget/Form";
-import { FormGroup } from "../widget/FormGroup";
 import { TextField } from "../widget/TextField";
 import * as J from "../JavaIntf";
+import { HorizontalLayout } from "../widget/HorizontalLayout";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
@@ -27,13 +27,13 @@ export class AddFriendDlg extends DialogBase {
     renderDlg(): CompIntf[] {
         return [
             new Form(null, [
-                new FormGroup(null, [
+                new HorizontalLayout([
                     new TextField("User Name", false, this.addFriend, null, false, this.userState)
                 ]),
                 new ButtonBar([
                     new Button("Add Friend", this.addFriend, null, "btn-primary"),
                     new Button("Close", this.close)
-                ])
+                ], "marginTop")
             ])
         ];
     }

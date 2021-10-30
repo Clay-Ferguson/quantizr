@@ -33,7 +33,7 @@ export class SharingDlg extends DialogBase {
             new Form(null, [
                 new EditPrivsTable(this.getState().nodePrivsInfo, this.removePrivilege),
                 S.props.isShared(this.node) ? new Div("Remove All", {
-                    className: "marginBottom marginRight float-right clickable",
+                    className: "marginBottom marginRight float-end clickable",
                     onClick: this.removeAllPrivileges
                 }) : null,
                 new Clearfix(),
@@ -55,7 +55,7 @@ export class SharingDlg extends DialogBase {
                         }
                     }),
                     new HelpButton(() => S.quanta?.config?.help?.sharing?.dialog)
-                ])
+                ], "marginTop")
             ])
         ];
     }

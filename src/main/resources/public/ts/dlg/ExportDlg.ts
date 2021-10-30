@@ -51,11 +51,7 @@ export class ExportDlg extends DialogBase {
             ], "radioButtonsBar"),
             new Div(null, null, [
                 new Checkbox("Save to IPFS", null, this.saveToIpfsState)
-            ]),
-            new ButtonBar([
-                new Button("Export", this.exportNodes, null, "btn-primary"),
-                new Button("Close", this.close)
-            ], null, "marginTop")
+            ])
         ];
     }
 
@@ -117,5 +113,12 @@ export class ExportDlg extends DialogBase {
 
             S.view.scrollToSelectedNode(this.appState);
         }
+    }
+
+    renderButtons(): CompIntf {
+        return new ButtonBar([
+            new Button("Export", this.exportNodes, null, "btn-primary"),
+            new Button("Close", this.close)
+        ], "marginTop");
     }
 }

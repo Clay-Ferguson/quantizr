@@ -731,7 +731,7 @@ export class Render implements RenderIntf {
                     //     actorUrl ? new Button("Go to User Page", () => {
                     //         window.open(actorUrl, "_blank");
                     //     }) : null
-                    // ], null, "float-right"),
+                    // ], null, "float-end"),
                     // new Clearfix(),
 
                     new Div(displayName, {

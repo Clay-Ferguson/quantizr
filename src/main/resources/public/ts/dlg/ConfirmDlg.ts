@@ -26,7 +26,7 @@ export class ConfirmDlg extends DialogBase {
                         this.noCallback();
                         this.close();
                     } : this.close)
-                ])
+                ], "marginTop")
             ])
         ];
     }

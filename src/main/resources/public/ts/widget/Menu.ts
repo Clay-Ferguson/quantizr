@@ -16,7 +16,7 @@ export class Menu extends Div {
 
     constructor(public name: string, public menuItems: CompIntf[], private onClickCallback: Function = null) {
         super(null, {
-            className: "card menuCard"
+            className: "card menuCard accordion-item"
         });
     }
 
@@ -28,9 +28,9 @@ export class Menu extends Div {
 
         this.setChildren([
             new Div(this.name, {
-                className: "card-header menuHeading mb-0",
+                className: "card-header menuHeading mb-0 accordion-header",
                 "aria-expanded": Menu.activeMenu === this.name ? "true" : "false",
-                "data-toggle": "collapse",
+                "data-bs-toggle": "collapse",
                 // "data-target": "#collapse" + this.getId(),
                 href: "#collapse" + this.getId(),
                 role: "tab",
@@ -53,10 +53,10 @@ export class Menu extends Div {
 
             new Div(null, {
                 id: "collapse" + this.getId(),
-                className: "collapse" + (show ? " show" : ""),
+                className: "accordion-collapse collapse" + (show ? " show" : ""),
                 role: "tabpanel",
                 "aria-labelledby": "heading" + this.getId(),
-                "data-parent": "#accordion"
+                "data-bs-parent": "#accordion"
             }, [
                 new Div(null, {
                     className: "card-body menuCardBody"

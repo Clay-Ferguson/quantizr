@@ -9,7 +9,7 @@ import { CompIntf } from "../widget/base/CompIntf";
 import { Button } from "../widget/Button";
 import { ButtonBar } from "../widget/ButtonBar";
 import { Form } from "../widget/Form";
-import { FormGroup } from "../widget/FormGroup";
+import { HorizontalLayout } from "../widget/HorizontalLayout";
 import { TextField } from "../widget/TextField";
 import { ConfirmDlg } from "./ConfirmDlg";
 import { ResetPasswordDlg } from "./ResetPasswordDlg";
@@ -31,15 +31,9 @@ export class LoginDlg extends DialogBase {
     renderDlg(): CompIntf[] {
         return [
             new Form(null, [
-                new FormGroup(null, [
+                new HorizontalLayout([
                     new TextField("User", false, this.login, null, false, this.userState),
                     new TextField("Password", true, this.login, null, false, this.pwdState)
-                ]),
-                new ButtonBar([
-                    new Button("Login", this.login, null, "btn-primary"),
-                    new Button("Signup", this.signup, null),
-                    new Button("Forgot Password", this.resetPassword),
-                    new Button("Close", this.close)
                 ])
             ])
         ];
@@ -115,5 +109,14 @@ export class LoginDlg extends DialogBase {
                 new ResetPasswordDlg(usr, this.appState).open();
             }, null, null, null, this.appState
         ).open();
+    }
+
+    renderButtons(): CompIntf {
+        return new ButtonBar([
+            new Button("Login", this.login, null, "btn-primary"),
+            new Button("Signup", this.signup, null),
+            new Button("Forgot Password", this.resetPassword),
+            new Button("Close", this.close)
+        ], "marginTop")
     }
 }

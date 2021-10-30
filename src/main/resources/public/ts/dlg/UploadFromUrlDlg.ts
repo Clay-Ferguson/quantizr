@@ -49,7 +49,7 @@ export class UploadFromUrlDlg extends DialogBase {
                 new ButtonBar([
                     this.uploadButton = new Button("Upload", this.upload, null, "btn-primary"),
                     new Button("Close", this.close)
-                ]),
+                ], "marginTop"),
                 new Span(null, { className: "marginLeft" }, [
                     new Checkbox("Store a copy on this server", null, {
                         setValue: (checked: boolean): void => {

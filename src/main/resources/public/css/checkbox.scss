@@ -1,0 +1,28 @@
+.form-check {
+    display: flex;
+    align-items: center;
+}
+
+.form-check label {
+    margin-left: 10px;
+    font-size: 18px;
+    font-weight: 500;
+}
+
+.form-check .form-check-input[type=checkbox] {
+    border-radius: .15em;
+    height: 30px;
+    width: 30px;
+}
+
+.form-check .form-check-input[type=radio] {
+    border-radius: 100%;
+    height: 30px;
+    width: 30px;
+}
+
+.form-switch .form-check-input[type=checkbox] {
+    border-radius: .5em;
+    height: 20px;
+    width: 40px;
+}

@@ -40,11 +40,11 @@ export class ManageAccountDlg extends DialogBase {
             new CollapsiblePanel(null, null, null, [
                 new Button("Close Account", this.closeAccount),
                 new Button("Change Password", this.changePassword)
-            ], false, null, false, "float-right"),
+            ], false, null, false, "float-end"),
 
             new ButtonBar([
                 new Button("Close", this.close)
-            ])
+            ], "marginTop")
         ];
     }
 

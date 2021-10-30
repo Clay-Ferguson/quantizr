@@ -9,7 +9,6 @@ console.log("TARGET ENV: " + env);
 
 module.exports = {
     entry: {
-        // todo-0: make this a path.resolve()
         main: "./ts/index.tsx"
     },
 
@@ -78,6 +77,10 @@ module.exports = {
 
             // we don't want any path prefix on our bundle file so this is empty.
             publicPath: "/dist"
+
+            // somehow the app just hangs with these options...
+            // scriptLoading: "blocking",
+            // inject: "head"
         }),
 
         new HtmlWebpackPlugin({
@@ -86,6 +89,8 @@ module.exports = {
 
             // we don't want any path prefix on our bundle file so this is empty.
             publicPath: "/dist"
+            // scriptLoading: "blocking",
+            // inject: "head"
         }),
 
         new HtmlWebpackPlugin({
@@ -93,15 +98,19 @@ module.exports = {
             template: "welcomeTemplate.html",
 
             // we don't want any path prefix on our bundle file so this is empty.
-            publicPath: "/dist"
+            publicPath: "/dist",
+            scriptLoading: "blocking",
+            inject: "head"
         }),
 
         new HtmlWebpackPlugin({
-            filename: "../../templates/tsx-test.html",
+            filename: "../../templates/demo/tsx-test.html",
             template: "tsx-testTemplate.html",
 
             // we don't want any path prefix on our bundle file so this is empty.
             publicPath: "/dist"
+            // scriptLoading: "blocking",
+            // inject: "head"
         }),
 
         new CircularDependencyPlugin({

@@ -135,7 +135,7 @@ export class OpenGraphPanel extends Div {
         }
 
         let bookmarkIcon = state.og.url && !this.appState.isAnonUser ? new Icon({
-            className: "fa fa-bookmark fa-lg ogBookmarkIcon float-right",
+            className: "fa fa-bookmark fa-lg ogBookmarkIcon float-end",
             title: "Bookmark this RSS entry",
             onClick: () => {
                 S.edit.addLinkBookmark(state.og.url, null);

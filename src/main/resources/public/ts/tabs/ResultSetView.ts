@@ -53,7 +53,7 @@ export abstract class ResultSetView extends AppTab {
         children.push(new Div(null, null, [
             new Div(null, { className: "marginBottom marginTop" }, [
                 this.renderHeading(state),
-                this.data.rsInfo.node ? new Span(null, { className: "float-right" }, [
+                this.data.rsInfo.node ? new Span(null, { className: "float-end" }, [
                     new IconButton("fa-arrow-left", "Back", {
                         onClick: () => S.view.jumpToId(this.data.rsInfo.node.id),
                         title: "Back to Node"
@@ -96,7 +96,7 @@ export abstract class ResultSetView extends AppTab {
 
     addPaginationBar = (state: AppState, children: CompIntf[]): void => {
         children.push(
-            new Span("Pg. " + (this.data.rsInfo.page + 1), { className: "float-right" }),
+            new Span("Pg. " + (this.data.rsInfo.page + 1), { className: "float-end" }),
             new ButtonBar([
                 new IconButton("fa-refresh", null, {
                     onClick: () => this.pageChange(null),
