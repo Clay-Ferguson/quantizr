@@ -28,9 +28,6 @@ cd ${PRJROOT}/src/main/resources/public
 # NOTE: run 'npm outdated' in this folder to view all outdated versions.
 npm config set ignore-scripts true
 
-cd ${PRJROOT}
-${SCRIPTS}/run-linter.sh
-
 cd ${PRJROOT}/pom/common
 mvn install
 

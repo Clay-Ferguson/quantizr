@@ -1,6 +1,7 @@
 const path = require("path");
 const CircularDependencyPlugin = require("circular-dependency-plugin");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
+const ESLintPlugin = require("eslint-webpack-plugin");
 
 const prod = process.argv.indexOf("-p") !== -1;
 const env = prod ? "prod" : "dev";
@@ -111,6 +112,12 @@ module.exports = {
             publicPath: "/dist"
             // scriptLoading: "blocking",
             // inject: "head"
+        }),
+
+        new ESLintPlugin({
+            // todo-0: add 'tsx'
+            extensions: [".ts", ".js"],
+            exclude: "node_modules"
         }),
 
         new CircularDependencyPlugin({

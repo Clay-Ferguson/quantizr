@@ -16,9 +16,14 @@
         "sourceType": "module"
     },
     "plugins": [
-        "react",
+        "react", 
         "@typescript-eslint"
     ],
+    "settings": {
+        "react": {
+          "version": "detect"
+        }
+    },
     "rules": {
         "no-var": "off",
         "node/handle-callback-err": "off",
