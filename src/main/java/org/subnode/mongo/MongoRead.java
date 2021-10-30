@@ -735,7 +735,7 @@ public class MongoRead {
     /**
      * Special purpose query to get all nodes that have a "date" property.
      */
-    public Iterable<SubNode> getCalendar(MongoSession session, SubNode node, boolean allNodes) {
+    public Iterable<SubNode> getCalendar(MongoSession session, SubNode node) {
         auth.auth(session, node, PrivilegeType.READ);
 
         Query query = new Query();
@@ -747,11 +747,8 @@ public class MongoRead {
          */
         criteria = criteria.and(SubNode.FIELD_MODIFY_TIME).ne(null);
         query.addCriteria(criteria);
-
-        // only add the DATA criteria if we're not getting ALL nodes.
-        if (!allNodes) {
-            query.addCriteria(Criteria.where(SubNode.FIELD_PROPERTIES + "." + NodeProp.DATE + ".value").ne(null));
-        }
+        query.addCriteria(Criteria.where(SubNode.FIELD_PROPERTIES + "." + NodeProp.DATE + ".value").ne(null));
+        
         return util.find(query);
     }
 

@@ -335,7 +335,6 @@ export interface RemovePrivilegeRequest extends RequestBase {
 }
 
 export interface RenderCalendarRequest extends RequestBase {
-    allNodes: boolean;
     nodeId: string;
 }
 

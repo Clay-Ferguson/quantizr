@@ -59,9 +59,6 @@ export class AppState {
     fullScreenGraphId: string = null;
     fullScreenCalendarId: string = null;
 
-    // keeps track of the 'allNodes' flag for displaying calendars
-    fullScreenCalendarAllNodes: boolean = false;
-
     graphSearchText: string = null;
 
     calendarData: EventInput[];

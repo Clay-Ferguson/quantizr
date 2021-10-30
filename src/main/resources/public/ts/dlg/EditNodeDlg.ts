@@ -60,7 +60,7 @@ export class EditNodeDlg extends DialogBase {
     propertyEditFieldContainer: Div;
     uploadButton: IconButton;
     deleteUploadButton: Div;
-    deletePropButton: Button;
+    deletePropButton: IconButton;
     contentEditor: I.TextEditorIntf;
     contentEditorState: ValidatedState<any> = new ValidatedState<any>();
     nameState: ValidatedState<any> = new ValidatedState<any>();
@@ -456,8 +456,15 @@ export class EditNodeDlg extends DialogBase {
         if (allowPropertyAdd) {
             if (numPropsShowing > 0) {
                 let propsButtonBar: ButtonBar = new ButtonBar([
-                    new Button("Add", this.addProperty),
-                    this.deletePropButton = new Button("Delete", this.deletePropertyButtonClick)
+
+                    new IconButton("fa fa-plus", null, {
+                        onClick: this.addProperty,
+                        title: "Add property"
+                    }),
+                    this.deletePropButton = new IconButton("fa fa-minus", null, {
+                        onClick: this.deletePropertyButtonClick,
+                        title: "Delete property"
+                    })
                 ], null, "float-end");
 
                 this.deletePropButton.setEnabled(false);

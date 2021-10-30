@@ -560,7 +560,7 @@ public class NodeRenderService {
 		LinkedList<CalendarItem> items = new LinkedList<>();
 		res.setItems(items);
 
-		for (SubNode n : read.getCalendar(session, node, req.isAllNodes())) {
+		for (SubNode n : read.getCalendar(session, node)) {
 			CalendarItem item = new CalendarItem();
 
 			String content = n.getContent();
@@ -568,26 +568,16 @@ public class NodeRenderService {
 
 			item.setTitle(content);
 			item.setId(n.getId().toHexString());
+			item.setStart(n.getIntProp(NodeProp.DATE.s()));
 
-			// If we're putting ALL nodes on the calendar use the Mod Time for the time.
-			if (req.isAllNodes()) {
-				item.setStart(n.getModifyTime().getTime());
-				// only a 10 second duration here! (no duration)
-				item.setEnd(item.getStart() + (10*1000));
-
-			} 
-			// Otherwise the DATA property will be the time to use
-			else {
-				item.setStart(n.getIntProp(NodeProp.DATE.s()));
-
-				String durationStr = n.getStrProp(NodeProp.DURATION.s());
-				long duration = DateUtil.getMillisFromDuration(durationStr);
-				if (duration == 0) {
-					duration = 60 * 60 * 1000;
-				}
-
-				item.setEnd(item.getStart() + duration);
+			String durationStr = n.getStrProp(NodeProp.DURATION.s());
+			long duration = DateUtil.getMillisFromDuration(durationStr);
+			if (duration == 0) {
+				duration = 60 * 60 * 1000;
 			}
+
+			item.setEnd(item.getStart() + duration);
+
 			items.add(item);
 		}
 

@@ -434,7 +434,6 @@ export class Nav implements NavIntf {
             s.fullScreenViewId = null;
             s.fullScreenGraphId = null;
             s.fullScreenCalendarId = null;
-            s.fullScreenCalendarAllNodes = false;
             return s;
         });
     }

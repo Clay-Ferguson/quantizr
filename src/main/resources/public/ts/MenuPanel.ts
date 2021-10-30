@@ -92,8 +92,7 @@ export class MenuPanel extends Div {
     static timelineByModified = () => S.srch.timeline(null, "mtm", appState(null), null, "Rev-chron by Modify Time", 0, true);
     static timelineByCreatedNonRecursive = () => S.srch.timeline(null, "ctm", appState(null), null, "Rev-chron by Create Time (non-Recursive)", 0, false);
     static timelineByModifiedNonRecursive = () => S.srch.timeline(null, "mtm", appState(null), null, "Rev-chron by Modify Time (non-Recursive)", 0, false);
-    static showCalendarDates = () => { S.render.showCalendar(null, false, appState(null)); }
-    static showCalendarAll = () => { S.render.showCalendar(null, true, appState(null)); }
+    static showCalendar = () => { S.render.showCalendar(null, appState(null)); }
     static calendarFutureDates = () => S.srch.timeline(null, "prp.date.value", appState(null), "futureOnly", "Future calendar dates (Soonest at the top)", 0, true);
     static calendarPastDates = () => S.srch.timeline(null, "prp.date.value", appState(null), "pastOnly", "Past calendar dates (Newest at the top)", 0, true);
     static calendarAllDates = () => S.srch.timeline(null, "prp.date.value", appState(null), "all", "All calendar dates", 0, true);
@@ -416,16 +415,11 @@ export class MenuPanel extends Div {
         ]));
 
         children.push(new Menu("Calendar", [
-            new MenuItem("Dates", MenuPanel.showCalendarDates, !state.isAnonUser && !!hltNode),
-
-            // todo-0: This feature has a bug. It seems to be using either modTime or createTime from each node instead of the
-            // date property.
-            // new MenuItem("All", MenuPanel.showCalendarAll, !state.isAnonUser && !!hltNode),
-
+            new MenuItem("Display", MenuPanel.showCalendar, !state.isAnonUser && !!hltNode),
             new MenuItemSeparator(), //
-            new MenuItem("Future Dates", MenuPanel.calendarFutureDates, !state.isAnonUser && !!hltNode), //
-            new MenuItem("Past Dates", MenuPanel.calendarPastDates, !state.isAnonUser && !!hltNode), //
-            new MenuItem("All Dates", MenuPanel.calendarAllDates, !state.isAnonUser && !!hltNode) //
+            new MenuItem("Future", MenuPanel.calendarFutureDates, !state.isAnonUser && !!hltNode), //
+            new MenuItem("Past", MenuPanel.calendarPastDates, !state.isAnonUser && !!hltNode), //
+            new MenuItem("All", MenuPanel.calendarAllDates, !state.isAnonUser && !!hltNode) //
         ]));
 
         children.push(new Menu("Tools", [
