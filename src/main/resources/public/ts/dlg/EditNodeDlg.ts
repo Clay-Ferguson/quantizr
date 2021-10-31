@@ -15,7 +15,6 @@ import { PropValueHolder } from "../PropValueHolder";
 import { PubSub } from "../PubSub";
 import { Singletons } from "../Singletons";
 import { ValidatedState } from "../ValidatedState";
-import { AceEditPropTextarea } from "../widget/AceEditPropTextarea";
 import { Comp } from "../widget/base/Comp";
 import { CompIntf } from "../widget/base/CompIntf";
 import { Button } from "../widget/Button";
@@ -1080,15 +1079,10 @@ export class EditNodeDlg extends DialogBase {
             let multiLine = rows > 1;
 
             if (multiLine) {
-                if (C.ENABLE_ACE_EDITOR) {
-                    valEditor = new AceEditPropTextarea(propEntry.value, "" + rows + "em", null, false);
-                }
-                else {
-                    valEditor = new TextArea(null, {
-                        rows: "" + rows,
-                        id: "prop_" + this.getState().node.id
-                    }, propState, "textarea-min-4 displayCell");
-                }
+                valEditor = new TextArea(null, {
+                    rows: "" + rows,
+                    id: "prop_" + this.getState().node.id
+                }, propState, "textarea-min-4 displayCell");
             }
             else {
                 /* todo-1: eventually we will have data types, but for now we use a hack
@@ -1117,77 +1111,37 @@ export class EditNodeDlg extends DialogBase {
         let allowFocus = !this.contentEditor;
         // console.log("making field editor for val[" + value + "]");
 
-        // NOTE: If you bring back ace editor be sure to note that focus management need an id set
-        // like: {id: "mainTextContent"}, below
-        if (C.ENABLE_ACE_EDITOR) {
-            let aceMode = node.type === J.NodeType.PLAIN_TEXT ? "ace/mode/text" : "ace/mode/markdown";
-            this.contentEditor = new AceEditPropTextarea(encrypted ? "[Encrypted]" : value, "25em", aceMode, isWordWrap);
+        this.contentEditor = new TextArea(null, {
+            id: "edit_" + this.getState().node.id,
+            rows
+        }, this.contentEditorState, "font-inherit displayCell", true);
 
-            this.contentEditor.whenElm((elm: HTMLElement) => {
-                let timer = setInterval(() => {
-                    if ((this.contentEditor as AceEditPropTextarea).getAceEditor()) {
+        let wrap: boolean = S.props.getNodePropVal(J.NodeProp.NOWRAP, this.appState.node) !== "1";
+        this.contentEditor.setWordWrap(wrap);
 
-                        if (encrypted) {
-                            // console.log('decrypting: ' + value);
-                            let cipherText = value.substring(J.Constant.ENC_TAG.length);
-                            (async () => {
-                                let cipherKey = S.props.getCryptoKey(node, this.appState);
-                                if (cipherKey) {
-                                    let clearText: string = await S.encryption.decryptSharableString(null, { cipherKey, cipherText });
+        this.contentEditor.whenElm((elm: HTMLElement) => {
+            if (encrypted) {
+                // console.log("decrypting: " + value);
+                let cipherText = value.substring(J.Constant.ENC_TAG.length);
+                (async () => {
+                    let cipherKey = S.props.getCryptoKey(node, this.appState);
+                    if (cipherKey) {
+                        let clearText: string = await S.encryption.decryptSharableString(null, { cipherKey, cipherText });
 
-                                    if (clearText == null) {
-                                        this.contentEditorState.setError("Decryption Failed");
-                                    }
-                                    else {
-                                        // console.log('decrypted to:' + value);
-                                        (this.contentEditor as AceEditPropTextarea).setValue(clearText);
-                                    }
-                                }
-                            })();
+                        if (clearText == null) {
+                            this.contentEditorState.setError("Decryption Failed");
                         }
-
-                        clearInterval(timer);
-
-                        if (allowFocus) {
-                            (this.contentEditor as AceEditPropTextarea).getAceEditor().focus();
+                        else {
+                            // console.log("decrypted to:" + value);
+                            this.contentEditorState.setValue(clearText);
                         }
                     }
-                }, 250);
-            });
-        }
-        else {
-            this.contentEditor = new TextArea(null, {
-                id: "edit_" + this.getState().node.id,
-                rows
-            }, this.contentEditorState, "font-inherit displayCell", true);
-
-            let wrap: boolean = S.props.getNodePropVal(J.NodeProp.NOWRAP, this.appState.node) !== "1";
-            this.contentEditor.setWordWrap(wrap);
-
-            this.contentEditor.whenElm((elm: HTMLElement) => {
-                if (encrypted) {
-                    // console.log("decrypting: " + value);
-                    let cipherText = value.substring(J.Constant.ENC_TAG.length);
-                    (async () => {
-                        let cipherKey = S.props.getCryptoKey(node, this.appState);
-                        if (cipherKey) {
-                            let clearText: string = await S.encryption.decryptSharableString(null, { cipherKey, cipherText });
-
-                            if (clearText == null) {
-                                this.contentEditorState.setError("Decryption Failed");
-                            }
-                            else {
-                                // console.log("decrypted to:" + value);
-                                this.contentEditorState.setValue(clearText);
-                            }
-                        }
-                    })();
-                }
-            });
-
-            if (allowFocus) {
-                this.contentEditor.focus();
+                })();
             }
+        });
+
+        if (allowFocus) {
+            this.contentEditor.focus();
         }
 
         editItems.push(this.contentEditor as any as Comp);

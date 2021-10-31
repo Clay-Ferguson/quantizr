@@ -294,9 +294,7 @@ public class AppController implements ErrorController {
 		thymeleafAttribs.put("intro1", appProp.getConfigText("intro1"));
 		thymeleafAttribs.put("intro2", appProp.getConfigText("intro2"));
 
-		// todo-0: use webpack loader for all these
 		thymeleafAttribs.put("DARCULA_CSS_HASH", fileUtils.genHashOfClasspathResource("/public/css/highlightjs/darcula.css"));
-		thymeleafAttribs.put("ACE_JS_HASH", fileUtils.genHashOfClasspathResource("/public/js/ace/src-noconflict/ace.js"));
 	}
 
 	/*

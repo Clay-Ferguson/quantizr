@@ -30,11 +30,6 @@ export class Constants {
     static readonly ONE_MB = 1048576; // 1024 * 1024;
     static readonly MAX_UPLOAD_MB = 20;
 
-    /* Feature Flags */
-    /* ======================================================================== */
-    /* Ace editor is disabled because it doesn't have spell-checker and I decided spellchecking is a requirement */
-    static readonly ENABLE_ACE_EDITOR: boolean = false;
-
     static readonly NEW_ON_ROOT: boolean = false;
     static readonly NEW_ON_TOOLBAR: boolean = true;
     static readonly INS_ON_TOOLBAR: boolean = false;
