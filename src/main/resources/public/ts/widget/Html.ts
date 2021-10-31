@@ -5,29 +5,10 @@ import { Singletons } from "../Singletons";
 import { Comp } from "./base/Comp";
 import { CompIntf } from "./base/CompIntf";
 
-// https://github.com/mathjax/MathJax-demos-web
-// https://github.com/mathjax/MathJax-node
-//
-// Supposedly mathjax-node should work, but I never got this import to
-// compile without errors, so I just went back to loading MathJax from CDN
-// as a script tag in the HTML.
-//
-// import { MathJax } from "mathjax-node";
-// MathJax.config({
-//     MathJax: {
-//         tex: {
-//             inlineMath: [['[math]', '[/math]']]
-//         }
-//     }
-// });
-// MathJax.start();
-
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
     S = ctx;
 });
-
-declare var MathJax;
 
 // see: https://www.npmjs.com/package/react-emoji-render
 // https://codesandbox.io/s/xjpy58llxq
@@ -75,35 +56,27 @@ export class Html extends Comp {
         // return <div>{parseEmojisAndHtml(this.getState().content)}</div>;
     }
 
-    /* We do two things in here:
-    1) update formula rendering (MathJax), and
-    2) change all "a" tags inside this div to have a target=_blank
-    */
+    /* change all "a" tags inside this div to have a target=_blank */
     domPreUpdateEvent(): void {
         let elm = this.getRef();
         if (!elm) return;
-        if (MathJax && MathJax.typeset) {
-            // note: MathJax.typesetPromise(), also exists
-            MathJax.typeset([elm]);
+        S.util.forEachElmBySel("#" + this.getId() + " a", (el, i) => {
+            let href = el.getAttribute("href");
 
-            S.util.forEachElmBySel("#" + this.getId() + " a", (el, i) => {
-                let href = el.getAttribute("href");
-
-                // Detect this is a link to this instance we are being served from...
-                if (href && href.indexOf && (href.indexOf("/") === 0 || href.indexOf(window.location.origin) !== -1)) {
-                    /* This code makes it where it where links to our own app that point to
-                    specific named locations on the tree will NOT open in separate browser tab but
-                    will open in the current browser tab as is the default without the 'target='
-                    attribute on an anchor tag. */
-                    if (href.indexOf("/app?id=:") !== -1 ||
-                        href.indexOf("/app?id=~") !== -1 ||
-                        href.indexOf("/app?tab=") !== -1) {
-                        return;
-                    }
+            // Detect this is a link to this instance we are being served from...
+            if (href && href.indexOf && (href.indexOf("/") === 0 || href.indexOf(window.location.origin) !== -1)) {
+                /* This code makes it where it where links to our own app that point to
+                specific named locations on the tree will NOT open in separate browser tab but
+                will open in the current browser tab as is the default without the 'target='
+                attribute on an anchor tag. */
+                if (href.indexOf("/app?id=:") !== -1 ||
+                    href.indexOf("/app?id=~") !== -1 ||
+                    href.indexOf("/app?tab=") !== -1) {
+                    return;
                 }
-                el.setAttribute("target", "_blank");
-            });
-        }
+            }
+            el.setAttribute("target", "_blank");
+        });
         super.domPreUpdateEvent();
     }
 }
