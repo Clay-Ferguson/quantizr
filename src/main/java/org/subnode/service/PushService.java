@@ -175,9 +175,6 @@ public class PushService {
 						sc.setLive(false);
 						sc.setRootId(null);
 						sc.setUserName(null);
-
-						// todo-0: do we want this or not???
-						// sc.setPushEmitter(null);
 					}
 				}
 			}

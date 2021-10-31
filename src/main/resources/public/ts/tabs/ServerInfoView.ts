@@ -29,7 +29,7 @@ export class ServerInfoView extends AppTab {
             new Div(null, { className: "marginTop" }, [
 
                 // todo-0: the "Show Raw Data" command makes this show up and we don't want that.
-                // (for now let's just remove it)
+                // For now let's just remove it, until we can make it show up only on Server Info page
                 // new Button("Refresh", () => {
                 //     S.view.runServerCommand("getServerInfo", "Server Info", null, state);
                 // }, { className: "float-end" }),

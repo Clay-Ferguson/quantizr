@@ -24,7 +24,6 @@ import { Clearfix } from "../widget/Clearfix";
 import { CollapsiblePanel } from "../widget/CollapsiblePanel";
 import { DateTimeField } from "../widget/DateTimeField";
 import { Div } from "../widget/Div";
-import { EditPropsTable } from "../widget/EditPropsTable";
 import { Form } from "../widget/Form";
 import { Header } from "../widget/Header";
 import { HelpButton } from "../widget/HelpButton";
@@ -390,17 +389,17 @@ export class EditNodeDlg extends DialogBase {
 
         // if customProps exists then the props are all added into 'editPropsTable' instead of the collapsible panel
         if (!customProps) {
-            propsTable = new EditPropsTable({
+            propsTable = new Div(null, {
                 className: "edit-props-table form-group-border marginBottom"
             });
             // This is the container that holds the custom properties if provided, or else the name+content textarea at the top of not
-            mainPropsTable = new EditPropsTable({
+            mainPropsTable = new Div(null, {
                 className: "marginBottom"
             });
         }
         else {
             // This is the container that holds the custom properties if provided, or else the name+content textarea at the top of not
-            mainPropsTable = new EditPropsTable({
+            mainPropsTable = new Div(null, {
                 className: "edit-props-table form-group-border marginBottom"
             });
         }
