@@ -293,8 +293,6 @@ public class AppController implements ErrorController {
 		thymeleafAttribs.put("introSubtitle", appProp.getConfigText("introSubtitle"));
 		thymeleafAttribs.put("intro1", appProp.getConfigText("intro1"));
 		thymeleafAttribs.put("intro2", appProp.getConfigText("intro2"));
-
-		thymeleafAttribs.put("DARCULA_CSS_HASH", fileUtils.genHashOfClasspathResource("/public/css/highlightjs/darcula.css"));
 	}
 
 	/*

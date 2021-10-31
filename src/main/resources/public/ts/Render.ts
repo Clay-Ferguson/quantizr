@@ -1,5 +1,7 @@
-import * as highlightjs from "highlightjs";
-import * as marked from "marked";
+import marked from "marked";
+import highlightjs from "highlight.js";
+import "highlight.js/styles/github.css";
+
 import { toArray } from "react-emoji-render";
 import { dispatch } from "./AppRedux";
 import { AppState } from "./AppState";
@@ -24,6 +26,7 @@ import { Span } from "./widget/Span";
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (s: Singletons) => {
     S = s;
+    highlightjs.initHighlightingOnLoad();
 });
 
 function imageErrorFunc(evt: any) {
@@ -114,19 +117,37 @@ export class Render implements RenderIntf {
             const highlighted = validLang ? highlightjs.highlight(language, code).value : code;
 
             // Render the highlighted code with `hljs` class.
-            return `<pre><code class="hljs ${language}">${highlighted}</code></pre>`;
+            // return `<pre><code class="hljs ${language}">${highlighted}</code></pre>`;
+            return highlighted;
         };
 
+        // https://marked.js.org/using_advanced#highlight
         marked.setOptions({
-            renderer: this.markedRenderer,
+            renderer: new marked.Renderer(),
 
-            // This appears to be working just fine, but i don't have the CSS styles added into the distro yet
-            // so none of the actual highlighting works yet, so i'm just commenting out for now, until i add classes.
-            //
-            // Note: using the 'markedRenderer.code' set above do we still need this highlight call here? I have no idea. Need to check/test
-            highlight: function (code) {
-                return highlightjs.highlightAuto(code).value;
+            highlight: (code, language) => {
+                // Check whether the given language is valid for highlight.js.
+                const validLang = !!(language && highlightjs.getLanguage(language));
+
+                // Highlight only if the language is valid.
+                const highlighted = validLang ? highlightjs.highlight(language, code).value : code;
+
+                // Render the highlighted code with `hljs` class.
+                // return `<pre><code class="hljs ${language}">${highlighted}</code></pre>`;
+                return highlighted;
             },
+
+            // example from marked website...
+            // highlight: function(code, lang) {
+            //     const language = highlightjs.getLanguage(lang) ? lang : "plaintext";
+            //     return highlightjs.highlight(code, { language }).value;
+            // },
+
+            // our original highlight function...
+            // highlight: function (code) {
+            //     return highlightjs.highlightAuto(code).value;
+            // },
+            langPrefix: "hljs language-", // highlight.js css expects a top-level 'hljs' class.
 
             gfm: true,
             breaks: false,

@@ -120,7 +120,6 @@ public abstract class ExportArchiveBase {
 		writeRootFile("exported.js");
 		writeRootFile("marked.min.js");
 		writeRootFile("exported.css");
-		writeRootFile("darcula.css");
 	}
 
 	private void writeRootFile(final String fileName) {
@@ -150,7 +149,6 @@ public abstract class ExportArchiveBase {
 
 		html.append("<head>\n");
 		html.append("<link rel='stylesheet' href='" + rootPath + "exported.css' />");
-		html.append("<link rel='stylesheet' href='" + rootPath + "darcula.css' />");
 		html.append("</head>\n");
 
 		html.append("<body>\n");
