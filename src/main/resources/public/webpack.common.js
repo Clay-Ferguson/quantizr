@@ -115,8 +115,7 @@ module.exports = {
         }),
 
         new ESLintPlugin({
-            // todo-0: add 'tsx'
-            extensions: [".ts", ".js"],
+            extensions: [".txs", ".ts", ".js"],
             exclude: "node_modules"
         }),
 

@@ -62,6 +62,8 @@ export class Constants {
 
     static readonly ATT_MAX_WIDTH: string = "att-max-width";
 
+    static readonly ID_PREFIX_EDIT: string = "edit_";
+
     // static readonly PAY_PAL_BUTTON: string = `<form action='https://www.paypal.com/cgi-bin/webscr' method='post' target='_blank'>
     // <input type='hidden' name='cmd' value='_donations' />
     // <input type='hidden' name='business' value='YD984BLHTSZYL' />

@@ -1111,7 +1111,7 @@ export class EditNodeDlg extends DialogBase {
         // console.log("making field editor for val[" + value + "]");
 
         this.contentEditor = new TextArea(null, {
-            id: "edit_" + this.getState().node.id,
+            id: C.ID_PREFIX_EDIT + this.getState().node.id,
             rows
         }, this.contentEditorState, "font-inherit displayCell", true);
 
