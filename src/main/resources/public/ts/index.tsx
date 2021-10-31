@@ -3,7 +3,9 @@ import { Factory } from "./Factory";
 import React from "react";
 import ReactDOM from "react-dom";
 import TsxApp from "./TsxApp";
+
 import "../css/quanta.scss";
+import "font-awesome/css/font-awesome.min.css";
 
 // set in index.html
 declare var __page;
