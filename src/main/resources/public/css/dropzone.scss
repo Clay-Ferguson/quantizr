@@ -1,28 +1,26 @@
-/* Dropzone message */
-
-.dz-message {
-    font-size: large;
-
-    // todo-2: this background is dropzone-controled and it seems to have issues, so I'm just removing it for now.
-    // background-image: url("/js/dropzone/upload.png");
-    // background-repeat: no-repeat;
-    // background-attachment: fixed;
-    // background-position: center;
-    // height: 100%;
-}
-
 .dropzone {
     background-color: $modal-content-bg;
     border: 4px dashed lightGray;
-    margin-bottom: 16px;
     height: 420px;
-    padding: 0;
+    padding: 10px;
     overflow-y: auto;
-    /* min-height: 0px !important; */
+    display: flex;
+    flex-wrap: wrap;
 }
 
-/* This tweak keeps the dropzone error message from covering up the 'remove file' link under the preview image
-which it will do by default. */
-.dropzone .dz-preview .dz-error-message {
-    top: 150px!important;
+.dz-message {
+    display: none;
+}
+
+// for some reason the success and error marks are STAYING visible (my bug?) so we just hide them.
+.dz-success-mark {
+    display: none;
+}
+
+.dz-error-mark {
+    display: none;
+}
+
+.dropzone .dz-preview {
+    width: 25%;
 }

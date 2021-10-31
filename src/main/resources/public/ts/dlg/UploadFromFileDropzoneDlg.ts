@@ -14,20 +14,14 @@ import { HorizontalLayout } from "../widget/HorizontalLayout";
 import { IconButton } from "../widget/IconButton";
 import { ConfirmDlg } from "./ConfirmDlg";
 import { MediaRecorderDlg } from "./MediaRecorderDlg";
+import Dropzone from "dropzone";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
     S = ctx;
 });
 
-/* Note: There is a react-dropzone package that exists, but for now we just use the standard approach from the
-https://dropzonejs.com website and load the 'js' file in an HTML script tag, and do things without an npm module
-for dropzone */
-
-declare var Dropzone;
-
 export class UploadFromFileDropzoneDlg extends DialogBase {
-
     hiddenInputContainer: Div;
     uploadButton: Button;
 
@@ -67,6 +61,7 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
                         }
                     })
                 ]),
+                new Div("Click to Add Files (or Drag and Drop)"),
                 this.dropzoneDiv = new Div("", { className: "dropzone" }),
                 this.hiddenInputContainer = new Div(null, { style: { display: "none" } }),
                 new ButtonBar([
@@ -237,7 +232,7 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
             maxFiles: this.maxFiles,
 
             addRemoveLinks: true,
-            dictDefaultMessage: "Click Here to Add Files (or Drag & Drop)",
+            dictDefaultMessage: "Add", // we have dz-message hidden actually so this has no effect.
             hiddenInputContainer: "#" + this.hiddenInputContainer.getId(),
 
             // ref: https://www.dropzonejs.com/#event-list
