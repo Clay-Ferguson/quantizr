@@ -240,7 +240,7 @@ export class FeedView extends AppTab {
     }
 
     makeFilterButtonsBar = (state: AppState): Div => {
-        return new Div(null, { className: "checkboxBar" }, [
+        return new Div(null, { className: "marginTop" }, [
             state.isAnonUser ? null : new Checkbox("Friends", {
                 title: "Include nodes posted by your friends"
             }, {
