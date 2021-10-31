@@ -17,7 +17,8 @@ export class Button extends Comp {
             this.attribs.className = "";
         }
 
-        this.attribs.className += " btn " + moreClasses;
+        // somehow this 'clickable' class seems to have no effect
+        this.attribs.className += " btn clickable " + moreClasses;
         this.attribs.type = "button";
         this.attribs.onClick = callback;
         this.setText(text);

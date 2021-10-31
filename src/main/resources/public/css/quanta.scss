@@ -867,7 +867,8 @@ Will come back later and study this more. todo-1 */
 
 .tabPanel {
     height: 100%;
-    padding-left: 10px;
+    padding-left: 0px;
+    padding-right: 0px;
 }
 
 .tabPanelMobile {
@@ -882,6 +883,7 @@ Will come back later and study this more. todo-1 */
     margin-left: 5px; 
     margin-right: 0px;
     height: 100%;
+    padding-left: 0px;
 }
 
 .ipfsCidText {

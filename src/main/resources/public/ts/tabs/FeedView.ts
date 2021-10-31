@@ -50,7 +50,7 @@ export class FeedView extends AppTab {
          * client side for various reasons.
          */
         let rowCount = 0;
-        let children: Comp[] = [];
+        let topChildren: Comp[] = [];
         let content = this.data.props.feedFilterRootNode ? S.util.getShortContent(this.data.props.feedFilterRootNode) : null;
         let showBookmarkIcon: boolean = false;
 
@@ -61,7 +61,7 @@ export class FeedView extends AppTab {
             });
         }
 
-        children.push(new Div(null, null, [
+        topChildren.push(new Div(null, null, [
             new Div(null, { className: "marginTop" }, [
                 this.renderHeading(state),
                 new Span(null, { className: "float-end" }, [
@@ -88,12 +88,13 @@ export class FeedView extends AppTab {
             });
         }
 
-        children.push(new ButtonBar([
+        topChildren.push(new ButtonBar([
             newItems,
             new IconButton("fa-refresh", null, {
                 onClick: () => S.srch.refreshFeed(),
                 title: "Refresh"
             }),
+            new HelpButton(() => S.quanta?.config?.help?.fediverse?.feed),
             // NOTE: state.feedFilterRootNode?.id will be null here, for full fediverse (not a node chat/node feed) scenario.
             state.isAnonUser ? null : new Button("Post", () => S.edit.addNode(this.data.props.feedFilterRootNode?.id, null, null, null, state), {
                 title: this.data.props.feedFilterRootNode?.id ? "Post to this Chat Room" : "Post something to the Fediverse!"
@@ -106,10 +107,10 @@ export class FeedView extends AppTab {
             searchButtonBar = new ButtonBar([
                 new Span(null, { className: "feedSearchField" }, [new TextField("Search", false, null, null, false, this.data.props.searchTextState)]),
                 new Button("Clear", () => { this.clearSearch(); }, { className: "feedClearButton" })
-            ], "marginTop");
+            ]);
         }
 
-        children.push(new CollapsiblePanel("Options", "Options", null, [
+        topChildren.push(new CollapsiblePanel("Options", "Options", null, [
             this.makeFilterButtonsBar(state),
             searchButtonBar
         ], false,
@@ -117,10 +118,8 @@ export class FeedView extends AppTab {
                 this.data.props.filterExpanded = state;
             }, this.data.props.filterExpanded, "", "", "span"));
 
-        children.push(new HelpButton(() => S.quanta?.config?.help?.fediverse?.feed));
-
         if (this.data.props.feedFilterRootNode) {
-            children.push(new Checkbox("Auto-refresh", { className: "marginLeft" }, {
+            topChildren.push(new Checkbox("Auto-refresh", { className: "marginLeft" }, {
                 setValue: (checked: boolean): void => {
                     this.data.props.autoRefresh = checked;
                 },
@@ -130,7 +129,8 @@ export class FeedView extends AppTab {
             }));
         }
 
-        children.push(new Clearfix());
+        let children: Comp[] = [];
+        children.push(new Div(null, { className: "marginBottom" }, topChildren));
 
         let childCount = this.data.props.feedResults ? this.data.props.feedResults.length : 0;
 
