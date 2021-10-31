@@ -365,7 +365,7 @@ export class EditNodeDlg extends DialogBase {
             getValue: (): boolean => {
                 return S.props.getNodePropVal(J.NodeProp.NOWRAP, state.node) !== "1";
             }
-        }, "col-3");
+        }, "col-4");
 
         let selectionsBar = new Div(null, { className: "row marginTop" }, [
             state.node.hasChildren ? this.createLayoutSelection() : null,
@@ -376,7 +376,7 @@ export class EditNodeDlg extends DialogBase {
 
         let checkboxesBar = new Div(null, { className: "row marginLeft marginTop" }, [
             state.node.hasChildren ? new Checkbox("Inline Children", null,
-                this.makeCheckboxPropValueHandler(J.NodeProp.INLINE_CHILDREN), "col-3") : null,
+                this.makeCheckboxPropValueHandler(J.NodeProp.INLINE_CHILDREN), "col-4") : null,
             wordWrapCheckbox
         ]);
 

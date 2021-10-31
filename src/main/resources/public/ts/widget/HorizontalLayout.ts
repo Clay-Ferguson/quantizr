@@ -1,3 +1,4 @@
+import { ReactNode } from "react";
 import { Constants as C } from "../Constants";
 import { PubSub } from "../PubSub";
 import { Singletons } from "../Singletons";
@@ -9,15 +10,20 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
     S = ctx;
 });
 
-// todo-0: need to make this support adding children dynamically
+/* WARNING: This class doesn't expect 'this.children' to be directly added to, but always only the
+'this.comps' should be considered the children to be modified if they need to be modified after the
+constructor is called. This is because we dynamically render a table layout here and build the table
+children dynamically at render time */
 export class HorizontalLayout extends Div {
 
-    constructor(initialComps: Comp[] = null, classes: string = "displayTable", attribs: any = {}) {
+    constructor(public comps: Comp[] = null, classes: string = "displayTable", attribs: any = {}) {
         super(null, attribs || {});
-
         this.attribs.className = classes;
-        if (initialComps) {
-            for (let comp of initialComps) {
+    }
+
+    compRender(): ReactNode {
+        if (this.comps) {
+            for (let comp of this.comps) {
                 if (!comp) continue;
                 if (!comp.attribs) {
                     comp.attribs = {};
@@ -34,6 +40,7 @@ export class HorizontalLayout extends Div {
             }
         }
 
-        this.setChildren([new Div(null, { className: "displayRow" }, initialComps)]);
+        this.setChildren([new Div(null, { className: "displayRow" }, this.comps)]);
+        return super.compRender();
     }
 }
