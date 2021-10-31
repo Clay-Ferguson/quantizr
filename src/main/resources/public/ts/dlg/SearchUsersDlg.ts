@@ -50,7 +50,7 @@ export class SearchUsersDlg extends DialogBase {
         let adminOptions = null;
 
         adminOptions = new RadioButtonGroup([
-            this.appState.isAdminUser ? new RadioButton("Search All Users", false, "optionsGroup", null, {
+            this.appState.isAdminUser ? new RadioButton("All Users", false, "optionsGroup", null, {
                 setValue: (checked: boolean): void => {
                     if (checked) {
                         this.mergeState({ searchType: J.Constant.SEARCH_TYPE_USER_ALL });
@@ -60,7 +60,7 @@ export class SearchUsersDlg extends DialogBase {
                     return this.getState().searchType === J.Constant.SEARCH_TYPE_USER_ALL;
                 }
             }) : null,
-            new RadioButton("Search Local Users", true, "optionsGroup", null, {
+            new RadioButton("Local Users", true, "optionsGroup", null, {
                 setValue: (checked: boolean): void => {
                     if (checked) {
                         this.mergeState({ searchType: J.Constant.SEARCH_TYPE_USER_LOCAL });
@@ -70,7 +70,7 @@ export class SearchUsersDlg extends DialogBase {
                     return this.getState().searchType === J.Constant.SEARCH_TYPE_USER_LOCAL;
                 }
             }),
-            new RadioButton("Search Foreign Users", false, "optionsGroup", null, {
+            new RadioButton("Foreign Users", false, "optionsGroup", null, {
                 setValue: (checked: boolean): void => {
                     if (checked) {
                         this.mergeState({ searchType: J.Constant.SEARCH_TYPE_USER_FOREIGN });
@@ -105,9 +105,9 @@ export class SearchUsersDlg extends DialogBase {
                     })
                 ], "displayTable marginBottom"),
                 adminOptions,
-                new HelpButton(() => S.quanta?.config?.help?.search?.dialog),
                 new ButtonBar([
                     new Button("Search", this.search, null, "btn-primary"),
+                    new HelpButton(() => S.quanta?.config?.help?.search?.dialog),
                     // this Graph button will work, but why graph users? ... there are no linkages between them... yet.
                     // todo-1: however the VERY amazing feature of showing a true "Graph of Who is Following Who" would be
                     // possible and not even all that difficult based on the existing code already written.

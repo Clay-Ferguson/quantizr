@@ -111,10 +111,10 @@ export class SearchContentDlg extends DialogBase {
                             return this.getState().sortField;
                         }
                     })]),
-                new HelpButton(() => S.quanta?.config?.help?.search?.dialog),
                 new ButtonBar([
                     new Button("Search", this.search, null, "btn-primary"),
                     new Button("Graph", this.graph, null, "btn-primary"),
+                    new HelpButton(() => S.quanta?.config?.help?.search?.dialog),
                     new Button("Close", this.close)
                 ], "marginTop")
             ])
