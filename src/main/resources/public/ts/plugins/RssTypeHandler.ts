@@ -433,11 +433,13 @@ export class RssTypeHandler extends TypeBase {
 
         let footerSpan = new Span(entry.publishDate, { className: "marginRight" });
 
-        children.push(new Div(null, { className: "float-end" }, [
-            footerSpan, postIcon, linkIcon, bookmarkIcon
+        children.push(new Div(null, null, [
+            new Span(null, { className: "float-end" }, [
+                footerSpan, postIcon, linkIcon, bookmarkIcon
+            ]),
+            // is this clearfix needed now that we wrapped this stuff in this div?
+            new Clearfix()
         ]));
-
-        children.push(new Clearfix());
 
         return new Div(null, { className: "rss-feed-item" }, children);
     }
