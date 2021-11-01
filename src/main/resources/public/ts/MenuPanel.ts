@@ -15,6 +15,8 @@ import { SearchUsersDlg } from "./dlg/SearchUsersDlg";
 import { SplitNodeDlg } from "./dlg/SplitNodeDlg";
 import { TransferNodeDlg } from "./dlg/TransferNodeDlg";
 import { UserProfileDlg } from "./dlg/UserProfileDlg";
+import { VideoTorrentPlayerDlg } from "./dlg/VideoTorrentPlayerDlg";
+import { DialogMode } from "./enums/DialogMode";
 import { TabDataIntf } from "./intf/TabDataIntf";
 import { TypeHandlerIntf } from "./intf/TypeHandlerIntf";
 import * as J from "./JavaIntf";
@@ -559,6 +561,9 @@ export class MenuPanel extends Div {
             ]));
 
             children.push(new Menu("Admin - Test", [
+                new MenuItem("WebTorrent Video", () => {
+                    new VideoTorrentPlayerDlg("vidPlayer-1", null, null, DialogMode.FULLSCREEN, state).open();
+                }),
                 new MenuItem("IPFS PubSub", () => S.view.runServerCommand("ipfsPubSubTest", "PubSub Test", null, state)), //
                 new MenuItem("Send Email", () => S.quanta.sendTestEmail()),
                 new MenuItem("Notification Display", () => S.quanta.showSystemNotification("Test Title", "This is a test message")),
