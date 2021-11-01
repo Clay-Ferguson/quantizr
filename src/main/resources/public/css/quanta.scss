@@ -950,7 +950,7 @@ Will come back later and study this more. todo-1 */
     margin-top: 0px;
     margin-left: 0px;
     margin-right: 0px;
-    margin-bottom: 16px;    
+    margin-bottom: 10px;    
 }
 
 .downloadLink {
@@ -1632,7 +1632,6 @@ i'm backing out for now
 }
 
 .timeRemainingEditField {
-    width: 5em !important;
     margin-left: 5px;
 }
 
@@ -1865,6 +1864,7 @@ audio::-webkit-media-controls-play-button {
 // element and then "display: inline-block" on the element to be centered in the parent.
 .playerButtonsContainer {
     text-align: center;
+    margin-top: 20px;
 }
 
 .playerButton {

@@ -102,62 +102,62 @@ export class AudioPlayerDlg extends DialogBase {
                     preload: "auto",
                     controlsList: "nodownload"
                 }),
+                new Div(null, { className: "row" }, [
+                    new ButtonBar([
+                        new Button("1x", (): void => {
+                            this.speed(1);
+                        }),
+                        new Button("1.25x", (): void => {
+                            this.speed(1.25);
+                        }),
+                        new Button("1.5x", (): void => {
+                            this.speed(1.5);
+                        }),
+                        new Button("1.75x", (): void => {
+                            this.speed(1.75);
+                        }),
+                        new Button("2x", (): void => {
+                            this.speed(2);
+                        })
+                    ], "col-9"),
+                    new ButtonBar([
+                        new Button("< 30s", (): void => {
+                            this.skip(-30);
+                        }),
+                        new Button("30s >", (): void => {
+                            this.skip(30);
+                        })
+                    ], "col-3 float-end")
+                ]),
+
                 new Div(null, { className: "playerButtonsContainer" }, [
                     this.playButton = new Icon({
                         className: "playerButton fa fa-play fa-3x",
                         style: { display: "none" },
-                        onClick: () => {
-                            if (this.player) this.player.play();
-                        }
+                        onClick: () => this.player?.play()
                     }),
                     this.pauseButton = new Icon({
                         className: "playerButton fa fa-pause fa-3x",
-                        onClick: () => {
-                            if (this.player) this.player.pause();
-                        }
+                        onClick: () => this.player?.pause()
                     })
                 ]),
-                new Div(null, null, [
-                    this.timeLeftTextField = new TextField("Stop After (mins.)", false, null, "timeRemainingEditField", true, this.timeLeftState)
+                new Div(null, { className: "row" }, [
+                    new ButtonBar([
+                        new Button("Copy", this.copyToClipboard),
+                        !this.appState.isAnonUser ? new Button("Post", this.postComment) : null,
+                        new Button("Close", this.destroyPlayer)
+                    ], "col-9 d-flex align-items-end"),
+                    new Div(null, { className: "col-3 float-end" }, [
+                        this.timeLeftTextField = new TextField("Timer (mins.)", false, null, "timeRemainingEditField", true, this.timeLeftState)
+                    ])
                 ]),
-                new ButtonBar([
-                    new Button("Close", this.destroyPlayer)
-                ], "marginTop"),
-                new ButtonBar([
-                    new Button("< 30s", (): void => {
-                        this.skip(-30);
-                    }),
-                    new Button("30s >", (): void => {
-                        this.skip(30);
-                    })
-                ], "marginTop"),
-                new ButtonBar([
-                    new Button("1x", (): void => {
-                        this.speed(1);
-                    }),
-                    new Button("1.25x", (): void => {
-                        this.speed(1.25);
-                    }),
-                    new Button("1.5x", (): void => {
-                        this.speed(1.5);
-                    }),
-                    new Button("1.75x", (): void => {
-                        this.speed(1.75);
-                    }),
-                    new Button("2x", (): void => {
-                        this.speed(2);
-                    })
-                ], "marginTop"),
-                new ButtonBar([
-                    new Button("Copy", this.copyToClipboard),
-                    !this.appState.isAnonUser ? new Button("Post", this.postComment) : null
-                ], "marginTop"),
                 this.customDiv
             ])
         ];
 
         this.audioPlayer.whenElm((elm: HTMLElement) => {
             this.player = elm as HTMLAudioElement;
+            if (!this.player) return;
             this.player.onpause = (event) => {
                 this.updatePlayButton();
             };
@@ -173,14 +173,13 @@ export class AudioPlayerDlg extends DialogBase {
     }
 
     updatePlayButton = (): void => {
-        if (this.player) {
-            this.playButton.whenElm((elm: HTMLElement) => {
-                elm.style.display = this.player.paused || this.player.ended ? "inline-block" : "none";
-            });
-            this.pauseButton.whenElm((elm: HTMLElement) => {
-                elm.style.display = !this.player.paused && !this.player.ended ? "inline-block" : "none";
-            });
-        }
+        if (!this.player) return;
+        this.playButton.whenElm((elm: HTMLElement) => {
+            elm.style.display = this.player.paused || this.player.ended ? "inline-block" : "none";
+        });
+        this.pauseButton.whenElm((elm: HTMLElement) => {
+            elm.style.display = !this.player.paused && !this.player.ended ? "inline-block" : "none";
+        });
     }
 
     cancel(): void {

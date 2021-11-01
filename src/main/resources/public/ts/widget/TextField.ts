@@ -21,13 +21,13 @@ export class TextField extends Div implements I.TextEditorIntf, I.ValueIntf {
     icon: ToggleIcon;
 
     constructor(public label: string, private isPassword: boolean, private onEnterKey: () => void, private inputClasses: string, //
-        private labelOnLeft: boolean, private valState: ValidatedState<any>) {
+        private labelOnLeft: boolean, private valState: ValidatedState<any> = null, private outterClass: string = "") {
         // do not pass valState into base class, we want it to have state separately
         super(null);
 
         Object.assign(this.attribs, {
             name: this.getId(),
-            className: "form-group" + (labelOnLeft ? " form-inline" : "")
+            className: "form-group" + (labelOnLeft ? " form-inline " : " ") + this.outterClass
         });
 
         this.mergeState({
