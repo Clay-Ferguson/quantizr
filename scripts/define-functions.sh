@@ -25,7 +25,8 @@ ipfsConfig () {
     echo "Sleeping a few seconds before accessing ipfs"
     sleep 20s
 
-    # todo-0: I'm pretty sure maybe only the API headers need to be set and not Gateway, but haven't confirmed yet
+    # todo-1: I'm pretty sure maybe only the API headers need to be set and not Gateway, but haven't confirmed yet
+    # (Also there's probably a way to do this inside an actual config text file, rather than on command line)
     docker-compose -f ${docker_compose_yaml} exec $1 ipfs config --json API.HTTPHeaders.Access-Control-Allow-Origin '["*"]'
     docker-compose -f ${docker_compose_yaml} exec $1 ipfs config --json API.HTTPHeaders.Access-Control-Allow-Methods '["PUT", "GET", "POST"]'
 

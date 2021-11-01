@@ -28,13 +28,11 @@ export class ServerInfoView extends AppTab {
         this.setChildren([
             new Div(null, { className: "marginTop" }, [
 
-                // todo-0: the "Show Raw Data" command makes this show up and we don't want that.
-                // For now let's just remove it, until we can make it show up only on Server Info page
-                // new Button("Refresh", () => {
-                //     S.view.runServerCommand("getServerInfo", "Server Info", null, state);
-                // }, { className: "float-end" }),
+                state.serverInfoCommand === "getServerInfo" ? new Button("Refresh", () => {
+                    S.view.runServerCommand("getServerInfo", "Server Info", null, state);
+                }, { className: "float-end" }) : null,
 
-                new Heading(3, this.data.name),
+                new Heading(3, state.serverInfoTitle),
                 new Pre(state.serverInfoText, { className: "serverInfoText" })
             ])
         ]);

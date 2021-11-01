@@ -57,7 +57,7 @@ export class View implements ViewIntf {
         // console.log("refreshTree: nodeId=" + nodeId);
 
         /* named nodes aren't persisting in url without this and i may decide to just get rid
-         of 'renderParentIfLeaf' (todo-0) but for now i'm just fixing the case when we are
+         of 'renderParentIfLeaf' altogether (todo-1) but for now i'm just fixing the case when we are
          rendering a named node. */
         if (nodeId.indexOf(":") !== -1) {
             renderParentIfLeaf = false;
@@ -336,11 +336,10 @@ export class View implements ViewIntf {
         const node = S.quanta.getHighlightedNode(state);
 
         S.util.ajax<J.GetServerInfoRequest, J.GetServerInfoResponse>("getServerInfo", {
-            command: command,
+            command,
             nodeId: node ? node.id : null
         },
             (res: J.GetServerInfoResponse) => {
-
                 if (res.messages) {
                     res.messages.forEach(m => {
                         /* a bit confusing here but this command is the same as the name of the AJAX call above (getServerInfo), but
@@ -360,6 +359,8 @@ export class View implements ViewIntf {
                             S.quanta.tabChanging(s.activeTab, C.TAB_SERVERINFO, s);
                             s.activeTab = S.quanta.activeTab = C.TAB_SERVERINFO;
                             s.serverInfoText = m.message;
+                            s.serverInfoCommand = command;
+                            s.serverInfoTitle = dlgTitle;
                             return s;
                         });
                     });

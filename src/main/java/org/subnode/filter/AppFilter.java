@@ -151,9 +151,14 @@ public class AppFilter extends GenericFilterBean {
 	// todo-1: app is too fragile if you forget to add one here. fix this.
 	private boolean isSecurePath(String path) {
 		// todo-1: /bin & /stream is an unusual case: can be ../bin/avatar or just ../bin
-		if (path.contains("/bin") || //
+		if (
+		// CONTAINS
+		// ========
+		path.contains("/bin") || //
 				path.contains("/stream") || //
-				// todo-0: make sure ALL these are good with endsWith (had a bug for /stream)
+
+				// ENDS WITH
+				// =========
 				path.endsWith("/login") || //
 				path.endsWith("/signup") || //
 				path.endsWith("/savePublicKey") || //

@@ -125,6 +125,8 @@ export class AppState {
     editShowJumpButton: boolean;
     editEncrypt: boolean;
     serverInfoText: string = null;
+    serverInfoCommand: string = null;
+    serverInfoTitle: string = null;
 
     ipsmActive: boolean = false;
 }

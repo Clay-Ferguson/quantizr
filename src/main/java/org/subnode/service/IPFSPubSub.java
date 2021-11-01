@@ -68,7 +68,7 @@ public class IPFSPubSub {
         LinkedHashMap<String, Object> res = null;
 
         // Pubsub.Router="floodsub" | "gossipsub"
-        // todo-0: can add this to the startup bash scripts along with the CORS configs.
+        // todo-1: we can add this to the startup bash scripts along with the CORS configs?
         res = Cast.toLinkedHashMap(
                 ipfs.postForJsonReply(IPFSService.API_CONFIG + "?arg=Pubsub.Router&arg=gossipsub", LinkedHashMap.class));
         log.debug("\nIPFS Pubsub.Router set:\n" + XString.prettyPrint(res) + "\n");

@@ -10,7 +10,7 @@ public class UserPreferences {
 	private boolean showMetaData;
 	private boolean rssHeadlinesOnly;
 
-	// not persisted to DB yet. (todo-0)
+	// not persisted to DB yet. (todo-1)
 	@JsonProperty(required = false)
 	private boolean enableIPSM;
 
