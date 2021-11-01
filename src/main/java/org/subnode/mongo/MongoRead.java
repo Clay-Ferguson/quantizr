@@ -62,14 +62,17 @@ public class MongoRead {
     @Autowired
     private AclService aclService;
 
+    private static final Object dbRootLock = new Object();
     private SubNode dbRoot;
 
     // we call this during app init so we don't need to have thread safety here the rest of the time.
     public SubNode getDbRoot() {
-        if (dbRoot == null) {
-            dbRoot = findNodeByPath("/" + NodeName.ROOT);
+        synchronized (dbRootLock) {
+            if (dbRoot == null) {
+                dbRoot = findNodeByPath("/" + NodeName.ROOT);
+            }
+            return dbRoot;
         }
-        return dbRoot;
     }
 
     /**
@@ -618,7 +621,7 @@ public class MongoRead {
                     criterias.add(Criteria.where(prop).regex(text, "i"));
                 }
             } else {
-                // .matchingAny("search term1", "search term2") 
+                // .matchingAny("search term1", "search term2")
                 // .matching("search term") // matches any that contain "serch" OR "term"
                 // .matchingPhrase("search term")
 
@@ -748,7 +751,7 @@ public class MongoRead {
         criteria = criteria.and(SubNode.FIELD_MODIFY_TIME).ne(null);
         query.addCriteria(criteria);
         query.addCriteria(Criteria.where(SubNode.FIELD_PROPERTIES + "." + NodeProp.DATE + ".value").ne(null));
-        
+
         return util.find(query);
     }
 

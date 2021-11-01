@@ -723,18 +723,14 @@ public class MongoUtil {
 			adminNode =
 					snUtil.ensureNodeExists(session, "/", NodeName.ROOT, null, "Root", NodeType.REPO_ROOT.s(), true, null, null);
 
-			// ==== todo-0: temp fix
-			// (only fixes bug in initial DB startup/initiation)
-			MongoAuth.adminSession = null;
-			MongoSession adminSession = auth.getAdminSession();
-			ThreadLocals.setMongoSession(adminSession);
-			session = adminSession;
-			// ===== end fix
-
 			adminNode.setProp(NodeProp.USER.s(), PrincipalName.ADMIN.s());
 			adminNode.setProp(NodeProp.USER_PREF_EDIT_MODE.s(), false);
 			adminNode.setProp(NodeProp.USER_PREF_RSS_HEADINGS_ONLY.s(), true);
 			update.save(session, adminNode);
+
+			/* If we just created this user we know the session object here won't have the adminNode id in it yet
+			 and it needs to for all subsequent operations. */
+			session.setUserNodeId(adminNode.getId());
 
 			snUtil.ensureNodeExists(session, "/" + NodeName.ROOT, NodeName.USER, null, "Users", null, true, null, null);
 		}
