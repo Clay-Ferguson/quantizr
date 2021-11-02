@@ -1,10 +1,10 @@
-import { dispatch } from "./AppRedux";
 import { AppState } from "./AppState";
 import { Constants as C } from "./Constants";
 import { ConfirmDlg } from "./dlg/ConfirmDlg";
 import { UploadFromFileDropzoneDlg } from "./dlg/UploadFromFileDropzoneDlg";
-import { UploadFromUrlDlg } from "./dlg/UploadFromUrlDlg";
 import { UploadFromIPFSDlg } from "./dlg/UploadFromIPFSDlg";
+import { UploadFromTorrentDlg } from "./dlg/UploadFromTorrentDlg";
+import { UploadFromUrlDlg } from "./dlg/UploadFromUrlDlg";
 import { AttachmentIntf } from "./intf/AttachmentIntf";
 import * as J from "./JavaIntf";
 import { PubSub } from "./PubSub";
@@ -49,6 +49,20 @@ export class Attachment implements AttachmentIntf {
         }
 
         const dlg = new UploadFromUrlDlg(nodeId, defaultUrl, onUploadFunc, state);
+        dlg.open();
+    };
+
+    openUploadFromTorrentDlg = (nodeId: string, defaultUrl: string, onUploadFunc: Function, state: AppState): void => {
+        if (!nodeId) {
+            let node = S.quanta.getHighlightedNode(state);
+            if (!node) {
+                S.util.showMessage("No node is selected.", "Warning");
+                return;
+            }
+            nodeId = node.id;
+        }
+
+        const dlg = new UploadFromTorrentDlg(nodeId, defaultUrl, onUploadFunc, state);
         dlg.open();
     };
 

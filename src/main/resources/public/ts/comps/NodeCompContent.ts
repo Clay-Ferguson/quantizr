@@ -71,7 +71,7 @@ export class NodeCompContent extends Div {
          showing the normal attachment for this node, because that will the same as the avatar */
         let isAnAccountNode = node.ownerId && node.id === node.ownerId;
 
-        if (!embeddedImg && S.props.hasBinary(node) && !isAnAccountNode) {
+        if (!embeddedImg && (S.props.hasBinary(node) || S.props.hasTorrent(node)) && !isAnAccountNode) {
             children.push(new NodeCompBinary(node, false, false, this.imgSizeOverride));
         }
 

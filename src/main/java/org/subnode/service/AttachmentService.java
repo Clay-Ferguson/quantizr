@@ -74,9 +74,11 @@ import org.subnode.mongo.model.SubNode;
 import org.subnode.mongo.model.SubNodePropVal;
 import org.subnode.request.DeleteAttachmentRequest;
 import org.subnode.request.UploadFromIPFSRequest;
+import org.subnode.request.UploadFromTorrentRequest;
 import org.subnode.request.UploadFromUrlRequest;
 import org.subnode.response.DeleteAttachmentResponse;
 import org.subnode.response.UploadFromIPFSResponse;
+import org.subnode.response.UploadFromTorrentResponse;
 import org.subnode.response.UploadFromUrlResponse;
 import org.subnode.util.Const;
 import org.subnode.util.ExUtil;
@@ -745,6 +747,20 @@ public class AttachmentService {
 		return res;
 	}
 
+	public UploadFromTorrentResponse uploadFromTorrent(final MongoSession session, final UploadFromTorrentRequest req) {
+		final UploadFromTorrentResponse res = new UploadFromTorrentResponse();
+		SubNode node = read.getNode(session, req.getNodeId());
+		if (node == null) {
+			throw new RuntimeException("node not found: id=" + req.getNodeId());
+		}
+
+		auth.ownerAuthByThread(node);
+		node.setProp(NodeProp.TORRENT_ID.s(), req.getTorrentId());
+		update.save(session, node);
+		res.setSuccess(true);
+		return res;
+	}
+
 	public UploadFromIPFSResponse attachFromIPFS(final MongoSession session, final UploadFromIPFSRequest req) {
 		final UploadFromIPFSResponse res = new UploadFromIPFSResponse();
 		if (req.getNodeId() == null) {
@@ -839,7 +855,6 @@ public class AttachmentService {
 		}
 
 		session = ThreadLocals.ensure(session);
-
 		LimitedInputStreamEx limitedIs = null;
 
 		try {

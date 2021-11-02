@@ -64,11 +64,12 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
                 new Div("Click to Add Files (or Drag and Drop)"),
                 this.dropzoneDiv = new Div("", { className: "dropzone" }),
                 this.hiddenInputContainer = new Div(null, { style: { display: "none" } }),
+                new Div("From other sources..."),
                 new ButtonBar([
-                    this.uploadButton = new Button(this.importMode ? "Import" : "Upload", this.upload, null, "btn-primary"),
-                    this.importMode ? null : new Button("From URL", this.uploadFromUrl),
-                    this.importMode ? null : new Button("From IPFS", this.uploadFromIPFS),
-                    this.importMode ? null : new Button("From Clipboard", this.uploadFromClipboard),
+                    this.importMode ? null : new Button("URL", this.uploadFromUrl),
+                    this.importMode ? null : new Button("IPFS", this.uploadFromIPFS),
+                    this.importMode ? null : new Button("Clipboard", this.uploadFromClipboard),
+                    this.importMode ? null : new Button("Torrent", this.uploadFromTorrent),
 
                     this.importMode || !this.allowRecording ? null : new IconButton("fa-microphone", /* "From Mic" */ null, {
                         onClick: async () => {
@@ -96,8 +97,10 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
                             }
                         },
                         title: "Record Video as Attachment"
-                    }, "btn-secondary"),
-
+                    }, "btn-secondary")
+                ]),
+                new ButtonBar([
+                    this.uploadButton = new Button(this.importMode ? "Import" : "Upload", this.upload, null, "btn-primary"),
                     new Button("Close", this.close)
                 ], "marginTop")
             ])
@@ -112,6 +115,16 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
     uploadFromUrl = (): void => {
         let state = this.getState();
         S.attachment.openUploadFromUrlDlg(this.nodeId, null, () => {
+            this.close();
+            if (this.afterUploadFunc) {
+                this.afterUploadFunc();
+            }
+        }, state);
+    }
+
+    uploadFromTorrent = (): void => {
+        let state = this.getState();
+        S.attachment.openUploadFromTorrentDlg(this.nodeId, null, () => {
             this.close();
             if (this.afterUploadFunc) {
                 this.afterUploadFunc();

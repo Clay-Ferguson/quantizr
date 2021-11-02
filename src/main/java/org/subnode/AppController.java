@@ -109,6 +109,7 @@ import org.subnode.request.SplitNodeRequest;
 import org.subnode.request.TransferNodeRequest;
 import org.subnode.request.UpdateHeadingsRequest;
 import org.subnode.request.UploadFromIPFSRequest;
+import org.subnode.request.UploadFromTorrentRequest;
 import org.subnode.request.UploadFromUrlRequest;
 import org.subnode.response.CloseAccountResponse;
 import org.subnode.response.ExportResponse;
@@ -1161,6 +1162,13 @@ public class AppController implements ErrorController {
 	public @ResponseBody Object uploadFromUrl(@RequestBody UploadFromUrlRequest req, HttpSession session) {
 		return callProc.run("uploadFromUrl", req, session, ms -> {
 			return attachmentService.readFromUrl(ms, req);
+		});
+	}
+
+	@RequestMapping(value = API_PATH + "/uploadFromTorrent", method = RequestMethod.POST)
+	public @ResponseBody Object uploadFromTorrent(@RequestBody UploadFromTorrentRequest req, HttpSession session) {
+		return callProc.run("uploadFromTorrent", req, session, ms -> {
+			return attachmentService.uploadFromTorrent(ms, req);
 		});
 	}
 

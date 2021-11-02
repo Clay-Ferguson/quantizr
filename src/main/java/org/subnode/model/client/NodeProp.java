@@ -127,6 +127,8 @@ public enum NodeProp {
      */
     BIN_DATA_URL("sn:dataUrl", "s"), //
 
+    TORRENT_ID("sn:torrentId", "s"), //
+
     // This is for bash script names to whow up when browing on the tree
     // todo-1: oops we have THREE properties in there that all mapp to sn:fileName
     FILE_NAME("sn:fileName", "s"), //

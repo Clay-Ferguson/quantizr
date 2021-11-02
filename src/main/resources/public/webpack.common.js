@@ -3,6 +3,10 @@ const CircularDependencyPlugin = require("circular-dependency-plugin");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
 const ESLintPlugin = require("eslint-webpack-plugin");
 
+// NOTE: This is only needed to make WebTorrent work, without
+// WebTorrent we could remove this.
+const NodePolyfillPlugin = require("node-polyfill-webpack-plugin");
+
 const prod = process.argv.indexOf("-p") !== -1;
 const env = prod ? "prod" : "dev";
 
@@ -118,6 +122,8 @@ module.exports = {
             extensions: [".txs", ".ts", ".js"],
             exclude: "node_modules"
         }),
+
+        new NodePolyfillPlugin(),
 
         new CircularDependencyPlugin({
             // `onDetected` is called for each module that is cyclical

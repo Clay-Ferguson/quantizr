@@ -226,6 +226,11 @@ export class Props implements PropsIntf {
         return (target && target.startsWith("video/"));
     }
 
+    hasTorrent = (node: J.NodeInfo): boolean => {
+        const target = this.getNodePropVal(J.NodeProp.TORRENT_ID, node);
+        return !!target;
+    }
+
     getNodePropVal = (propertyName: string, node: J.NodeInfo): string => {
         const prop: J.PropertyInfo = this.getNodeProp(propertyName, node);
         return prop ? prop.value : null;

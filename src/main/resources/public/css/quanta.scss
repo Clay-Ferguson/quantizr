@@ -1860,6 +1860,10 @@ audio::-webkit-media-controls-play-button {
     display: none !important;
 }
 
+.webTorrentPlayer {
+    text-align: center;
+}
+
 // NOTE: The way to center an element inside another element is user "text-align: center" on the parent 
 // element and then "display: inline-block" on the element to be centered in the parent.
 .playerButtonsContainer {
