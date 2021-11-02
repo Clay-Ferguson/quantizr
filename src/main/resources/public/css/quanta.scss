@@ -1864,6 +1864,13 @@ audio::-webkit-media-controls-play-button {
     text-align: center;
 }
 
+.torrentDropTarget {
+    margin: 20px 0 20px 0;
+    padding: 20px;
+    border: 4px dotted gray;
+    border-radius: $border-radius;
+}
+
 // NOTE: The way to center an element inside another element is user "text-align: center" on the parent 
 // element and then "display: inline-block" on the element to be centered in the parent.
 .playerButtonsContainer {

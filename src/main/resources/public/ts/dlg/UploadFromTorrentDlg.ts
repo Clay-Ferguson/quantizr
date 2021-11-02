@@ -8,8 +8,11 @@ import { ValidatedState } from "../ValidatedState";
 import { CompIntf } from "../widget/base/CompIntf";
 import { Button } from "../widget/Button";
 import { ButtonBar } from "../widget/ButtonBar";
+import { Div } from "../widget/Div";
 import { Form } from "../widget/Form";
 import { TextField } from "../widget/TextField";
+import WebTorrent from "webtorrent";
+import dragDrop from "drag-drop";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
@@ -19,6 +22,8 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
 export class UploadFromTorrentDlg extends DialogBase {
     uploadButton: Button;
     urlState: ValidatedState<any> = new ValidatedState<any>();
+    dropTarget: Div;
+    loaded: boolean = false;
 
     constructor(private nodeId: string, private url: string, private onUploadFunc: Function, state: AppState) {
         super("Attach Torrent", null, false, state);
@@ -39,14 +44,33 @@ export class UploadFromTorrentDlg extends DialogBase {
     }
 
     renderDlg(): CompIntf[] {
-        return [
+        let children = [
             new Form(null, [
-                new TextField("Torrent/Magnet Link", false, null, null, false, this.urlState),
+                new TextField("Existing Torrent/Magnet Link", false, null, null, false, this.urlState),
+                this.dropTarget = new Div("Drag Files Here to Create Torrent", { className: "torrentDropTarget" }),
                 new ButtonBar([
-                    this.uploadButton = new Button("Upload", this.upload, null, "btn-primary"),
+                    this.uploadButton = new Button("Save", this.upload, null, "btn-primary"),
                     new Button("Close", this.close)
                 ], "marginTop")
-        ])];
+            ])];
+
+        this.dropTarget.whenElm((elm: HTMLElement) => {
+            this.load();
+        });
+        return children;
+    }
+
+    load = () => {
+        if (this.loaded) return;
+        this.loaded = true;
+        let client: any = new WebTorrent();
+
+        dragDrop("#" + this.dropTarget.getId(), (files) => {
+            client.seed(files, (torrent) => {
+                console.log("Client is seeding " + torrent.magnetURI);
+                this.urlState.setValue(torrent.magnetURI);
+            })
+        })
     }
 
     upload = (): void => {
