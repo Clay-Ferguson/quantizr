@@ -16,6 +16,7 @@ import { PubSub } from "./PubSub";
 import { Singletons } from "./Singletons";
 import { NodeHistoryItem } from "./NodeHistoryItem";
 import { Comp } from "./widget/base/Comp";
+import DOMPurify from "dompurify";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (s: Singletons) => {
@@ -35,6 +36,8 @@ let currencyFormatter = new Intl.NumberFormat("en-US", {
 export class Util implements UtilIntf {
 
     weekday: string[] = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+
+    static readonly DOM_PURIFY_CONFIG = { USE_PROFILES: { html: true } };
 
     static escapeMap = {
         "&": "&amp;",
@@ -1400,7 +1403,7 @@ export class Util implements UtilIntf {
         val = this.stripIfStartsWith(val, "<p>");
         val = this.stripIfEndsWith(val, "</p>");
 
-        return val;
+        return DOMPurify.sanitize(val, Util.DOM_PURIFY_CONFIG);
     }
 
     // returns true if all children are same owner as parent
