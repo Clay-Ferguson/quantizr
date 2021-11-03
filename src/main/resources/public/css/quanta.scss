@@ -1871,6 +1871,12 @@ audio::-webkit-media-controls-play-button {
     border-radius: $border-radius;
 }
 
+.torrentListItem {
+    margin: 10px;
+    padding: 10px;
+    cursor: pointer;
+}
+
 // NOTE: The way to center an element inside another element is user "text-align: center" on the parent 
 // element and then "display: inline-block" on the element to be centered in the parent.
 .playerButtonsContainer {

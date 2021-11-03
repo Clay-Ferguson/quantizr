@@ -38,6 +38,7 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
     uploadFailed: boolean = false;
     errorShown: boolean = false;
     numFiles: number = 0;
+    toWebTorrent: boolean = false;
 
     /* We allow either nodeId or 'node' to be passed in here */
     constructor(private nodeId: string, private binSuffix: string, private toIpfs: boolean, //
@@ -58,6 +59,14 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
                         },
                         getValue: (): boolean => {
                             return this.toIpfs;
+                        }
+                    }),
+                    new Checkbox("Create WebTorrent", null, {
+                        setValue: (checked: boolean): void => {
+                            this.toWebTorrent = checked;
+                        },
+                        getValue: (): boolean => {
+                            return this.toWebTorrent;
                         }
                     })
                 ]),
@@ -199,8 +208,29 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
             const files = this.dropzone.getAcceptedFiles();
 
             if (files) {
-                this.numFiles = files.length;
-                this.dropzone.processQueue();
+                if (this.toWebTorrent) {
+                    // todo-0: show warning and ignore if multiple files (WebTorrent fails on that. need to research)
+                    S.torrent.wtc.seed(files, (torrent) => {
+                        // S.util.showMessage("Created Torrent:\n\n" + torrent.magnetURI, "WebTorrent", true);
+
+                        // send torrend magnet up to server to save on node.
+                        S.util.ajax<J.UploadFromTorrentRequest, J.UploadFromTorrentResponse>("uploadFromTorrent", {
+                            nodeId: this.nodeId,
+                            torrentId: torrent.magnetURI
+                        }, (res: J.UploadFromTorrentResponse): void => {
+                            if (S.util.checkSuccess("Upload from Torrent", res)) {
+                                this.close();
+                                if (this.afterUploadFunc) {
+                                    this.afterUploadFunc();
+                                }
+                            }
+                        });
+                    });
+                }
+                else {
+                    this.numFiles = files.length;
+                    this.dropzone.processQueue();
+                }
             }
         }
         return true;

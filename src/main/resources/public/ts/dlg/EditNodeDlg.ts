@@ -43,6 +43,7 @@ import { EditPropertyDlg } from "./EditPropertyDlg";
 import { EmojiPickerDlg } from "./EmojiPickerDlg";
 import { EncryptionDlg } from "./EncryptionDlg";
 import { FriendsDlg } from "./FriendsDlg";
+import { TorrentListingDlg } from "./TorrentListingDlg";
 import { UploadFromFileDropzoneDlg } from "./UploadFromFileDropzoneDlg";
 
 let S: Singletons;
@@ -530,6 +531,16 @@ export class EditNodeDlg extends DialogBase {
             ]);
         }
 
+        let torrentSection = null;
+        if (S.props.hasTorrent(state.node)) {
+            const torrentId = S.props.getNodePropVal(J.NodeProp.TORRENT_ID, state.node);
+            torrentSection = new Div(null, null, [new IconButton("fa-magnet", "Torrent", {
+                onClick: () => {
+                    new TorrentListingDlg(torrentId, DialogMode.POPUP, state).open();
+                }
+            }, "btn-primary")]);
+        }
+
         let sharingNames = S.util.getSharingNames(state.node, false);
         let sharingDiv = null;
         let sharingDivClearFix = null;
@@ -564,7 +575,7 @@ export class EditNodeDlg extends DialogBase {
             collapsiblePanel
         ]);
 
-        this.propertyEditFieldContainer.setChildren([mainPropsTable, sharingDiv, sharingDivClearFix, binarySection, rightFloatButtons,
+        this.propertyEditFieldContainer.setChildren([mainPropsTable, sharingDiv, sharingDivClearFix, binarySection, torrentSection, rightFloatButtons,
             new Clearfix()]);
         return children;
     }

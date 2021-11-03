@@ -15,18 +15,19 @@ import { Attachment } from "./Attachment";
 import { Constants as C } from "./Constants";
 import { Edit } from "./Edit";
 import { Encryption } from "./Encryption";
-import { SpeechRecog } from "./SpeechRecog";
 import { LocalDB } from "./LocalDB";
-import { Quanta } from "./Quanta";
 import { Nav } from "./Nav";
 import { PluginMgr } from "./PluginMgr";
 import { Props } from "./Props";
 import { PubSub } from "./PubSub";
+import { Quanta } from "./Quanta";
 import { Render } from "./Render";
 import { Search } from "./Search";
 import { ServerPush } from "./ServerPush";
 import { Share } from "./Share";
 import { Singletons } from "./Singletons";
+import { SpeechRecog } from "./SpeechRecog";
+import { Torrent } from "./Torrent";
 import { User } from "./User";
 import { Util } from "./Util";
 import { View } from "./View";
@@ -56,7 +57,8 @@ export class Factory {
                 user: new User(),
                 view: new View(),
                 localDB: new LocalDB(),
-                speech: new SpeechRecog()
+                speech: new SpeechRecog(),
+                torrent: new Torrent()
             };
         }
         catch (e) {

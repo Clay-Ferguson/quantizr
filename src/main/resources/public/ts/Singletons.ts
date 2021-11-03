@@ -14,6 +14,7 @@ import { ShareIntf } from "./intf/ShareIntf";
 import { UserIntf } from "./intf/UserIntf";
 import { UtilIntf } from "./intf/UtilIntf";
 import { ViewIntf } from "./intf/ViewIntf";
+import { TorrentIntf } from "./intf/TorrentIntf";
 
 /* Similar to a SpringContext in a Java app, these singletons are all pre-instantiated and guaranteed not
 to result in any circular-references during load time, because they instantiate only other interfaces */
@@ -34,4 +35,5 @@ export interface Singletons {
     view: ViewIntf;
     localDB: LocalDBIntf;
     speech: SpeechRecogIntf;
+    torrent: TorrentIntf;
 }

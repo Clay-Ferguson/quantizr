@@ -3,8 +3,8 @@ import { dispatch } from "../AppRedux";
 import { AppState } from "../AppState";
 import { Constants as C } from "../Constants";
 import { AudioPlayerDlg } from "../dlg/AudioPlayerDlg";
+import { TorrentListingDlg } from "../dlg/TorrentListingDlg";
 import { VideoPlayerDlg } from "../dlg/VideoPlayerDlg";
-import { VideoTorrentPlayerDlg } from "../dlg/VideoTorrentPlayerDlg";
 import { DialogMode } from "../enums/DialogMode";
 import * as J from "../JavaIntf";
 import { PubSub } from "../PubSub";
@@ -132,9 +132,9 @@ export class NodeCompBinary extends Div {
         else if (S.props.hasTorrent(node)) {
             const torrentId = S.props.getNodePropVal(J.NodeProp.TORRENT_ID, node);
             this.setChildren([new HorizontalLayout([
-                new IconButton("fa-play", "Open Torrent", {
+                new IconButton("fa-magnet", "Torrent", {
                     onClick: () => {
-                        new VideoTorrentPlayerDlg(torrentId, "Torrent", DialogMode.FULLSCREEN, state).open();
+                        new TorrentListingDlg(torrentId, DialogMode.POPUP, state).open();
                     }
                 }, "btn-primary")
             ])]);
