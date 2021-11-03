@@ -894,7 +894,6 @@ export const enum NodeProp {
     BIN_FILENAME = "sn:fileName",
     BIN_SIZE = "sn:size",
     BIN_DATA_URL = "sn:dataUrl",
-    TORRENT_ID = "sn:torrentId",
     FILE_NAME = "sn:fileName",
     JSON_FILE_SEARCH_RESULT = "sn:json",
     NOWRAP = "sn:nowrap",

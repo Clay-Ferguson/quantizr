@@ -130,7 +130,7 @@ export class NodeCompBinary extends Div {
             ])]);
         }
         else if (S.props.hasTorrent(node)) {
-            const torrentId = S.props.getNodePropVal(J.NodeProp.TORRENT_ID, node);
+            const torrentId = S.props.getNodePropVal(J.NodeProp.BIN_URL, node);
             this.setChildren([new HorizontalLayout([
                 new IconButton("fa-magnet", "Torrent", {
                     onClick: () => {

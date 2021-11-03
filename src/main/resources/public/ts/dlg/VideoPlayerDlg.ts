@@ -22,7 +22,6 @@ export class VideoPlayerDlg extends DialogBase {
         return [
             new Form(null, [
                 // space is at a premium for mobile, so let's just not even show the header.
-                this.mediaTitle ? new TextContent(this.mediaTitle) : null,
                 new Div(null, { className: "fullWidth" }, [
                     this.videoPlayer = new VideoPlayer({
                         id: this.domId + "-comp",

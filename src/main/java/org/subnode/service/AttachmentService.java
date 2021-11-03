@@ -755,7 +755,7 @@ public class AttachmentService {
 		}
 
 		auth.ownerAuthByThread(node);
-		node.setProp(NodeProp.TORRENT_ID.s(), req.getTorrentId());
+		node.setProp(NodeProp.BIN_URL.s(), req.getTorrentId());
 		update.save(session, node);
 		res.setSuccess(true);
 		return res;

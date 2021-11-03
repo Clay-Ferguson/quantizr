@@ -45,7 +45,7 @@ export class TorrentListingDlg extends DialogBase {
 
         if (!this.getState().files || this.getState().files.length === 0) {
             children.push(new Div("Loading Torrent..."));
-            children.push(new Spinner());
+            children.push(new Div(null, { className: "torrentSpinnerDiv" }, [new Spinner()]));
             if (this.getState().noSeeders) {
                 children.push(new Div("No seeders found yet. This torrent may be dead?"));
             }

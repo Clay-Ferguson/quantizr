@@ -227,8 +227,8 @@ export class Props implements PropsIntf {
     }
 
     hasTorrent = (node: J.NodeInfo): boolean => {
-        const target = this.getNodePropVal(J.NodeProp.TORRENT_ID, node);
-        return !!target;
+        const target = this.getNodePropVal(J.NodeProp.BIN_URL, node);
+        return target && target.startsWith("magnet:");
     }
 
     getNodePropVal = (propertyName: string, node: J.NodeInfo): string => {
@@ -294,7 +294,7 @@ export class Props implements PropsIntf {
 
             J.NodeProp.IPFS_LINK, //
             J.NodeProp.IPFS_LINK_NAME, //
-            J.NodeProp.IPFS_OK //
+            J.NodeProp.IPFS_OK
         ]);
 
         S.util.addAllToSet(this.readOnlyPropertyList, [ //
