@@ -8,6 +8,7 @@ import { Singletons } from "../Singletons";
 import { CompIntf } from "./base/CompIntf";
 import { Button } from "./Button";
 import { ButtonBar } from "./ButtonBar";
+import { Checkbox } from "./Checkbox";
 import { Div } from "./Div";
 import { HistoryPanel } from "./HistoryPanel";
 import { IconButton } from "./IconButton";
@@ -51,11 +52,6 @@ export class RightNavPanel extends Div {
         let allowEditMode = state.node && !state.isAnonUser;
         let fullScreenViewer = S.quanta.fullscreenViewerActive(state);
 
-        let editButton = (allowEditMode && !fullScreenViewer) ? new IconButton("fa-pencil", null, {
-            onClick: e => { S.edit.toggleEditMode(state); },
-            title: "Turn edit mode " + (state.userPreferences.editMode ? "off" : "on")
-        }, "btn-secondary", state.userPreferences.editMode ? "on" : "off") : null;
-
         let clipboardPasteButton = !state.isAnonUser ? new IconButton("fa-clipboard", null, {
             onClick: e => {
                 S.edit.saveClipboardToChildNode("~" + J.NodeType.NOTES);
@@ -70,11 +66,6 @@ export class RightNavPanel extends Div {
             title: "Create new Note (under Notes node)"
         }, "btn-secondary", "off") : null;
 
-        let prefsButton = !fullScreenViewer ? new IconButton("fa-certificate", null, {
-            onClick: e => { S.edit.toggleShowMetaData(state); },
-            title: state.userPreferences.showMetaData ? "Hide Avatars and Metadata" : "Show Avatars and Metadata"
-        }, "btn-secondary", state.userPreferences.showMetaData ? "on" : "off") : null;
-
         this.setChildren([
             new Div(null, { className: "float-left" }, [
                 new Div(null, { className: "rightNavPanelInner" }, [
@@ -82,6 +73,25 @@ export class RightNavPanel extends Div {
                         className: "signupLinkText",
                         onClick: e => { S.nav.login(state); }
                     }) : null,
+
+                    new Div(null, { className: "bigMarginBottom" }, [
+                        !fullScreenViewer ? new Checkbox("Metadata", null, {
+                            setValue: (checked: boolean): void => {
+                                S.edit.toggleShowMetaData(state);
+                            },
+                            getValue: (): boolean => {
+                                return state.userPreferences.showMetaData;
+                            }
+                        }, "form-switch form-check-inline") : null,
+                        (allowEditMode && !fullScreenViewer) ? new Checkbox("Edit", null, {
+                            setValue: (checked: boolean): void => {
+                                S.edit.toggleEditMode(state);
+                            },
+                            getValue: (): boolean => {
+                                return state.userPreferences.editMode;
+                            }
+                        }, "form-switch form-check-inline") : null
+                    ]),
 
                     new Div(null, { className: "marginBottom" }, [
                         new ButtonBar([
@@ -105,7 +115,7 @@ export class RightNavPanel extends Div {
                                     });
                                 }
                             }) : null,
-                            clipboardPasteButton, addNoteButton, prefsButton, editButton
+                            clipboardPasteButton, addNoteButton
                         ])
                     ]),
 
