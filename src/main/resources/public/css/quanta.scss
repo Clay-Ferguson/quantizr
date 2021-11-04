@@ -700,6 +700,7 @@ strong em {
 .rssAnchor {
     cursor: pointer;
     font-size: 25px;
+    text-decoration: none;
 }
 
 .app-modal-title {
@@ -1056,10 +1057,6 @@ Will come back later and study this more. todo-1 */
    display: flex;
 }
 @import 'button.scss';
-
-.basicButton {
-    //margin-right: 7px;
-}
 
 /* 
 &#x25B2; ▲
@@ -1662,6 +1659,7 @@ i'm backing out for now
 
 .rssFeedTitle {
     font-size: 150%;
+    text-decoration: none;
 }
 
 .rssSubTitle {

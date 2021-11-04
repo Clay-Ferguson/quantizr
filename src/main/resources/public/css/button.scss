@@ -12,17 +12,15 @@
 .btn {
     border-radius: 0 !important;
     border: 1px solid slategrey;
-    cursor: pointer;
+    cursor: pointer !important;
 }
 
 .btn[disabled] {
     font-style: italic;
-    cursor: auto;
 }
 
 .btn:hover {
     border: 1px solid white;
-    cursor: auto;
 }
 
 .errorBackButton {
