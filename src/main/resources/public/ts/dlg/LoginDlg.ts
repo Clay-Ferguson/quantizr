@@ -8,8 +8,8 @@ import { ValidatedState } from "../ValidatedState";
 import { CompIntf } from "../widget/base/CompIntf";
 import { Button } from "../widget/Button";
 import { ButtonBar } from "../widget/ButtonBar";
+import { Div } from "../widget/Div";
 import { Form } from "../widget/Form";
-import { HorizontalLayout } from "../widget/HorizontalLayout";
 import { TextField } from "../widget/TextField";
 import { ConfirmDlg } from "./ConfirmDlg";
 import { ResetPasswordDlg } from "./ResetPasswordDlg";
@@ -31,10 +31,10 @@ export class LoginDlg extends DialogBase {
     renderDlg(): CompIntf[] {
         return [
             new Form(null, [
-                new HorizontalLayout([
-                    new TextField("User", false, this.login, null, false, this.userState),
-                    new TextField("Password", true, this.login, null, false, this.pwdState)
-                ])
+                new TextField("User", false, this.login, null, false, this.userState),
+                new TextField("Password", true, this.login, null, false, this.pwdState),
+                new Div("Signup", { className: "clickable marginTop", onClick: this.signup }),
+                new Div("Forgot Password", { className: "clickable marginTop", onClick: this.resetPassword })
             ])
         ];
     }
@@ -114,9 +114,7 @@ export class LoginDlg extends DialogBase {
     renderButtons(): CompIntf {
         return new ButtonBar([
             new Button("Login", this.login, null, "btn-primary"),
-            new Button("Signup", this.signup, null),
-            new Button("Forgot Password", this.resetPassword),
             new Button("Close", this.close)
-        ], "marginTop")
+        ], "marginTop");
     }
 }
