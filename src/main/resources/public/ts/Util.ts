@@ -803,7 +803,6 @@ export class Util implements UtilIntf {
                 const maxWaitTime = 5000;
 
                 const interval = setInterval(() => {
-
                     // oops I only want this on PROD because when debugging it can timeout too much when breakpoints are set.
                     accumWaitTime += timeSlice;
                     if (accumWaitTime >= maxWaitTime) {
@@ -1495,30 +1494,6 @@ export class Util implements UtilIntf {
             s.mobileMode = !s.mobileMode;
             return s;
         });
-    }
-
-    // untested
-    // https://stackoverflow.com/questions/1038727/how-to-get-browser-width-using-javascript-code
-    getBrowserWidth() {
-        return Math.max(
-            document.body.scrollWidth,
-            document.documentElement.scrollWidth,
-            document.body.offsetWidth,
-            document.documentElement.offsetWidth,
-            document.documentElement.clientWidth
-        );
-    }
-
-    // untested
-    // https://stackoverflow.com/questions/1038727/how-to-get-browser-width-using-javascript-code
-    getBrowserHeight() {
-        return Math.max(
-            document.body.scrollHeight,
-            document.documentElement.scrollHeight,
-            document.body.offsetHeight,
-            document.documentElement.offsetHeight,
-            document.documentElement.clientHeight
-        );
     }
 
     isLocalUserName = (userName: string): boolean => {
