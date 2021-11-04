@@ -372,7 +372,7 @@ public class ActPubFollowing {
 
         for (SubNode node : iterable) {
             NodeInfo info = convert.convertToNodeInfo(ThreadLocals.getSC(), adminSession, node, true, false,
-                    counter + 1, false, false, false, true);
+                    counter + 1, false, false, false, false);
             searchResults.add(info);
         }
 

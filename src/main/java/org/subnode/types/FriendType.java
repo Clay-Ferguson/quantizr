@@ -22,7 +22,7 @@ public class FriendType extends TypeBase {
     }
 
     @Override
-    public void convert(MongoSession session, NodeInfo nodeInfo, SubNode node, boolean getFollowers) {    
+    public void convert(MongoSession session, NodeInfo nodeInfo, SubNode node, boolean getFollowers) {
         // yes this is redundant and loads userUrl again below, but I need to test this before removing it.
         String userUrl = node.getStrProp(NodeProp.ACT_PUB_ACTOR_URL.s());
         if (userUrl != null) {
@@ -71,7 +71,8 @@ public class FriendType extends TypeBase {
 
                 String friendDisplayName = accountNode.getStrProp(NodeProp.DISPLAY_NAME.s());
                 if (friendDisplayName != null) {
-                    nodeInfo.safeGetClientProps().add(new PropertyInfo(NodeProp.DISPLAY_NAME.s(), friendDisplayName));
+                    nodeInfo.safeGetClientProps()
+                            .add(new PropertyInfo(NodeProp.DISPLAY_NAME.s(), friendDisplayName));
                 }
 
                 /*
