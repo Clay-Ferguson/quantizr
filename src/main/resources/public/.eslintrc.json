@@ -35,7 +35,6 @@
 
         "quotes": ["error", "double", { "avoidEscape": true }],
         
-        // todo-0: turn back on.
         // "semi": ["error", "always"],
         "semi": "off",
 

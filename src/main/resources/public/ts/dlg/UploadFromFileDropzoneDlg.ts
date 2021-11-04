@@ -209,7 +209,12 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
 
             if (files) {
                 if (this.toWebTorrent) {
-                    // todo-0: show warning and ignore if multiple files (WebTorrent fails on that. need to research)
+                    // todo-1: verify this is really true (multi-files not working)
+                    if (files.length > 1) {
+                        S.util.showMessage("Multi-file WebTorrent are not yet supported.", "Warning");
+                        return;
+                    }
+
                     S.torrent.wtc.seed(files, (torrent) => {
                         // S.util.showMessage("Created Torrent:\n\n" + torrent.magnetURI, "WebTorrent", true);
 

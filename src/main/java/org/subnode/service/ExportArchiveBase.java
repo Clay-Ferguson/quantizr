@@ -117,10 +117,8 @@ public abstract class ExportArchiveBase {
 	}
 
 	private void writeRootFiles() {
+		// These files are how our exported HTML content get the ability to render markdown content.
 		writeRootFile("exported.js");
-		// todo-0: Need to update this. It will currently be broken after moving to NPM module for marked, or at
-		// least we need to be sure our builder copies from the node_modules the updated version of this
-		// JS file during each build.
 		writeRootFile("marked.min.js");
 		writeRootFile("exported.css");
 	}
