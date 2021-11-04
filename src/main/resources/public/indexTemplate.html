@@ -31,20 +31,6 @@
     <link rel="manifest" href="/site.webmanifest" />
 
     <title th:text="${brandingAppName}"></title>
-</head>
-
-<body class="app-body">
-    <noscript>
-        This app requires JavaScript.
-    </noscript>
-
-    <div id="app">
-        <div id="bigSpinner" class="col-6 mx-auto text-center" style="margin-top: 6rem; display: none;">
-            <div class="spinner-border text-success" style="border-width: 0.4rem; width: 6rem; height: 6rem;" role="status">
-                <span class="sr-only">Loading...</span>
-            </div>
-        </div>
-    </div>
 
     <script th:inline="javascript">
         var __page = "index";
@@ -59,52 +45,22 @@
 
         /* Thymeleaf vars */
         var g_brandingAppName = [[${brandingAppName}]];
-
-        function areCookiesEnabled() {
-            try {
-                document.cookie = 'cookietest=1';
-                var cookiesEnabled = document.cookie.indexOf('cookietest=') !== -1;
-                document.cookie = 'cookietest=1; expires=Thu, 01-Jan-1970 00:00:01 GMT';
-                return cookiesEnabled;
-            } catch (e) {
-                return false;
-            }
-        }
-
-        if (!areCookiesEnabled()) {
-            alert('This app requires cookies to be enabled.');
-        }
-
-        function oldIEdetection() {
-            var ua = window.navigator.userAgent;
-            var msie = ua.indexOf('MSIE ');
-            if (msie > 0) {
-                __page = null;
-                // IE 10 or older, return version number
-                return parseInt(ua.substring(msie + 5, ua.indexOf('.', msie)), 10);
-            }
-            var trident = ua.indexOf('Trident/');
-            if (trident > 0) {
-                __page = null;
-                // IE 11, return version number
-                var rv = ua.indexOf('rv:');
-                return parseInt(ua.substring(rv + 3, ua.indexOf('.', rv)), 10);
-            }
-            var edge = ua.indexOf('Edge/');
-            if (edge > 0) {
-                //Edge (IE 12+), return version number
-                //return 'IE ' + parseInt(ua.substring(edge + 5, ua.indexOf('.', edge)), 10);
-                return null;
-            }
-            // User uses other browser
-            return null;
-        }
-        var result = oldIEdetection();
-        if (result) {
-            document.write("Browser not supported: IE " + result);
-            document.write("<br>Try a modern browser like Chrome, Firefox, or Edge.")
-        }
     </script>
+
+</head>
+
+<body class="app-body">
+    <noscript>
+        This app requires JavaScript.
+    </noscript>
+
+    <div id="app">
+        <div id="bigSpinner" class="col-6 mx-auto text-center" style="margin-top: 6rem; display: none;">
+            <div class="spinner-border text-success" style="border-width: 0.4rem; width: 6rem; height: 6rem;" role="status">
+                <span class="sr-only">Loading...</span>
+            </div>
+        </div>
+    </div>
 
     <div id="overlayDiv" class="overlay"></div>
 </body>
