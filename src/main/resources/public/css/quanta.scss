@@ -512,7 +512,7 @@ a {
 
 /* it's a bit ugly that we have to style the icon differently based on if it's on a list view or the main tree */
 .listFriendImage {
-    max-width: 120px;
+    max-width: 70px;
     cursor: pointer;
     border: 2px solid $nodeBorderBottomColor;
     border-radius: $border-radius;
@@ -1992,7 +1992,6 @@ audio::-webkit-media-controls-play-button {
 
 .userInfo {
     cursor: pointer;
-    padding: 10px;
     width: 100%;
 }
 
