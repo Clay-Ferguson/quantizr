@@ -434,83 +434,94 @@ export class Quanta implements QuantaIntf {
                 }
             };
 
-            document.body.addEventListener("click", function (e: any) {
-                e = e || window.event;
-                let target: HTMLElement = e.target;
-
-                // Whenever something is clicked, forget the pending focus data
-                Comp.focusElmId = null;
-                // Log.log("document.body.click target.id=" + target.id);
-            }, false);
-
-            document.body.addEventListener("focusin", (e: any) => {
-                // Log.log("focusin id=" + e.target.id);
-                this.currentFocusId = e.target.id;
-            });
-
-            // This is a cool way of letting CTRL+UP, CTRL+DOWN scroll to next node.
-            // WARNING: even with tabIndex added none of the other DIVS react renders seem to be able to accept an onKeyDown event.
-            // Todo: before enabling this need to make sure 1) the Main Tab is selected and 2) No Dialogs are Open, because this WILL
-            // capture events going to dialogs / edit fields
-            document.body.addEventListener("keydown", (event: KeyboardEvent) => {
-                // Log.log("keydown: " + event.code);
-                let state: AppState = store.getState();
-
-                switch (event.code) {
-                    case "ControlLeft":
-                        this.ctrlKey = true;
-                        this.ctrlKeyTime = new Date().getTime();
-                        break;
-                    case "Escape":
-                        if (S.quanta.fullscreenViewerActive(state)) {
-                            S.nav.closeFullScreenViewer(state);
-                        }
-
-                        break;
-
-                    // case "ArrowDown":
-                    //     if (this.keyDebounce()) return;
-                    //     state = store.getState();
-                    //     S.view.scrollRelativeToNode("down", state);
-                    //     break;
-
-                    // case "ArrowUp":
-                    //     if (this.keyDebounce()) return;
-                    //     state = store.getState();
-                    //     S.view.scrollRelativeToNode("up", state);
-                    //     break;
-
-                    case "ArrowLeft":
-                        if (this.keyDebounce()) return;
-                        // S.nav.navUpLevel();
-                        if (state.fullScreenViewId) {
-                            S.nav.prevFullScreenImgViewer(state);
-                        }
-                        break;
-
-                    case "ArrowRight":
-                        if (this.keyDebounce()) return;
-                        state = store.getState();
-                        // S.nav.navOpenSelectedNode(state);
-                        if (state.fullScreenViewId) {
-                            S.nav.nextFullScreenImgViewer(state);
-                        }
-                        break;
-
-                    default: break;
+            /* We have to run this timer to wait for document.body to exist becasue we load our JS in the HTML HEAD
+            and we load in the head because we need our styling in place BEFORE the page renders or else you get that
+            well-known issue of a momentarily unstyled render before the page finishes loading */
+            const interval = setInterval(() => {
+                if (!document?.body) {
+                    console.log("Waiting for document.body");
+                    return;
                 }
-                // }
-            });
+                clearInterval(interval);
 
-            document.body.addEventListener("keyup", (event: KeyboardEvent) => {
-                switch (event.code) {
-                    case "ControlLeft":
-                        this.ctrlKey = false;
-                        this.ctrlKeyTime = -1;
-                        break;
-                    default: break;
-                }
-            });
+                document.body.addEventListener("click", function (e: any) {
+                    e = e || window.event;
+                    let target: HTMLElement = e.target;
+
+                    // Whenever something is clicked, forget the pending focus data
+                    Comp.focusElmId = null;
+                    // Log.log("document.body.click target.id=" + target.id);
+                }, false);
+
+                document.body.addEventListener("focusin", (e: any) => {
+                    // Log.log("focusin id=" + e.target.id);
+                    this.currentFocusId = e.target.id;
+                });
+
+                // This is a cool way of letting CTRL+UP, CTRL+DOWN scroll to next node.
+                // WARNING: even with tabIndex added none of the other DIVS react renders seem to be able to accept an onKeyDown event.
+                // Todo: before enabling this need to make sure 1) the Main Tab is selected and 2) No Dialogs are Open, because this WILL
+                // capture events going to dialogs / edit fields
+                document.body.addEventListener("keydown", (event: KeyboardEvent) => {
+                    // Log.log("keydown: " + event.code);
+                    let state: AppState = store.getState();
+
+                    switch (event.code) {
+                        case "ControlLeft":
+                            this.ctrlKey = true;
+                            this.ctrlKeyTime = new Date().getTime();
+                            break;
+                        case "Escape":
+                            if (S.quanta.fullscreenViewerActive(state)) {
+                                S.nav.closeFullScreenViewer(state);
+                            }
+
+                            break;
+
+                        // case "ArrowDown":
+                        //     if (this.keyDebounce()) return;
+                        //     state = store.getState();
+                        //     S.view.scrollRelativeToNode("down", state);
+                        //     break;
+
+                        // case "ArrowUp":
+                        //     if (this.keyDebounce()) return;
+                        //     state = store.getState();
+                        //     S.view.scrollRelativeToNode("up", state);
+                        //     break;
+
+                        case "ArrowLeft":
+                            if (this.keyDebounce()) return;
+                            // S.nav.navUpLevel();
+                            if (state.fullScreenViewId) {
+                                S.nav.prevFullScreenImgViewer(state);
+                            }
+                            break;
+
+                        case "ArrowRight":
+                            if (this.keyDebounce()) return;
+                            state = store.getState();
+                            // S.nav.navOpenSelectedNode(state);
+                            if (state.fullScreenViewId) {
+                                S.nav.nextFullScreenImgViewer(state);
+                            }
+                            break;
+
+                        default: break;
+                    }
+                    // }
+                });
+
+                document.body.addEventListener("keyup", (event: KeyboardEvent) => {
+                    switch (event.code) {
+                        case "ControlLeft":
+                            this.ctrlKey = false;
+                            this.ctrlKeyTime = -1;
+                            break;
+                        default: break;
+                    }
+                });
+            }, 250);
 
             if (this.appInitialized) {
                 return;
