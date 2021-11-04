@@ -50,18 +50,44 @@ export class Util implements UtilIntf {
         "=": "&#x3D;"
     };
 
-    // todo-p1: need to complete these
     fileExtensionTypes = {
         md: "md",
         txt: "txt",
         sh: "txt",
+
         jpg: "img",
         png: "img",
         jpeg: "img",
+
         mp3: "audio",
+        ogg: "audio",
+        wma: "audio",
         opus: "audio",
         m4a: "audio",
-        mp4: "video"
+        aac: "audio",
+        flac: "audio",
+        aiff: "audio",
+        alac: "audio",
+        dsd: "audio",
+        pcm: "audio",
+        wav: "audio",
+
+        mp4: "video",
+        m4p: "video",
+        m4v: "video",
+        mp2: "video",
+        wmv: "video",
+        qt: "video",
+        mpeg: "video",
+        mpe: "video",
+        mpv: "video",
+        webm: "video",
+        mpg: "video",
+        avi: "video",
+        mov: "video",
+        flv: "video",
+        swf: "video",
+        avchd: "video"
     };
 
     editableExtensions = {
@@ -175,8 +201,9 @@ export class Util implements UtilIntf {
     /** Returns one of the types listed in 'fileExtensionTypes' based on fileName where fileName can either be an actual
     extension or else a full filename including extension */
     getFileTypeFormFileName = (fileName: string): string => {
-        const ext = this.getFileExtensionFromFileName(fileName);
-        return this.fileExtensionTypes[ext];
+        const ext: string = this.getFileExtensionFromFileName(fileName);
+        if (!ext) return;
+        return this.fileExtensionTypes[ext.toLowerCase()];
     }
 
     getFileExtensionFromFileName = (fileName: string): string => {
