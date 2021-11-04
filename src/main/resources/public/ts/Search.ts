@@ -311,7 +311,7 @@ export class Search implements SearchIntf {
 
     showFollowers = (page: number, userName: string): void => {
         let state: AppState = store.getState();
-        if (state.isAnonUser || state.isAdminUser) return;
+        if (state.isAnonUser) return;
 
         if (!userName) {
             userName = state.userName;
@@ -353,7 +353,7 @@ export class Search implements SearchIntf {
 
     showFollowing = (page: number, userName: string): void => {
         let state: AppState = store.getState();
-        if (state.isAnonUser || state.isAdminUser) return;
+        if (state.isAnonUser) return;
 
         if (!userName) {
             userName = state.userName;
