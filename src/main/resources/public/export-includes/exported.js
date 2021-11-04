@@ -10,7 +10,7 @@ window.onload = function () {
         var elId = location.hash.replace('#', '');
         var scrollToEl = document.getElementById(elId);
         if (scrollToEl) {
-            //scrollToEl.scrollIntoView(true);
+            // scrollToEl.scrollIntoView(true);
             scrollToEl.style.borderLeft = "10px solid green";
         }
     }

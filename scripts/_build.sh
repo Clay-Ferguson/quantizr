@@ -18,9 +18,9 @@ if [ "$CLEAN" == "true" ]; then
     rm -rf ${PRJROOT}/bin/*
 fi
 
-rm -rf ${PRJROOT}/src/main/resources/public/bundle.*.js
-rm -rf ${PRJROOT}/src/main/resources/public/bundle.*.js.LICENSE.txt
-rm -rf ${PRJROOT}/src/main/resources/public/bundle.*.js.map
+# copy the marked js file into location where export engine finds it
+cp ${PRJROOT}/src/main/resources/public/node_modules/marked/marked.min.js \
+   ${PRJROOT}/src/main/resources/public/export-includes/marked.min.js
 
 # Run ignore-scripts for some security from NodeJS
 # Packages can run "postinstall" script from their package.json and that is an attack vector we want to eliminate here.
