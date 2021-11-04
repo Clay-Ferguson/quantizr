@@ -61,10 +61,40 @@ export class FeedView extends AppTab {
             });
         }
 
+        let topRightControls = [];
+        // if this is mobile don't even show search field unless it's currently in use (like from a trending click)
+        if (!state.mobileMode || this.data.props.searchTextState.getValue()) {
+            topRightControls = [
+                new Span(null, { className: "feedSearchField" }, [new TextField("Search", false, null, null, false, this.data.props.searchTextState)]),
+                new Button("Clear", () => this.clearSearch(), { className: "feedClearButton" })
+            ];
+        }
+
+        let newItems = null;
+        if ((this.data.props.feedDirty || this.data.props.feedDirtyList) && !this.data.props.feedLoading) {
+            newItems = new Icon({
+                className: "fa fa-lightbulb-o fa-lg feedDirtyIcon marginRight",
+                title: "New content available. Refresh!"
+            });
+        }
+
         topChildren.push(new Div(null, null, [
             new Div(null, { className: "marginTop" }, [
                 this.renderHeading(state),
                 new Span(null, { className: "float-end" }, [
+                    ...topRightControls,
+
+                    newItems,
+                    new IconButton("fa-refresh", null, {
+                        onClick: () => S.srch.refreshFeed(),
+                        title: "Refresh"
+                    }),
+                    new HelpButton(() => S.quanta?.config?.help?.fediverse?.feed),
+                    // NOTE: state.feedFilterRootNode?.id will be null here, for full fediverse (not a node chat/node feed) scenario.
+                    state.isAnonUser ? null : new Button("Post", () => S.edit.addNode(this.data.props.feedFilterRootNode?.id, null, null, null, state), {
+                        title: this.data.props.feedFilterRootNode?.id ? "Post to this Chat Room" : "Post something to the Fediverse!"
+                    }, "btn-primary"),
+
                     showBookmarkIcon ? new Icon({
                         className: "fa fa-bookmark fa-lg clickable marginRight",
                         title: "Bookmark Chat Room",
@@ -80,39 +110,8 @@ export class FeedView extends AppTab {
             content ? new TextContent(content, "resultsContentHeading alert alert-secondary") : null
         ]));
 
-        let newItems = null;
-        if ((this.data.props.feedDirty || this.data.props.feedDirtyList) && !this.data.props.feedLoading) {
-            newItems = new Icon({
-                className: "fa fa-lightbulb-o fa-lg feedDirtyIcon marginRight",
-                title: "New content available. Refresh!"
-            });
-        }
-
-        topChildren.push(new ButtonBar([
-            newItems,
-            new IconButton("fa-refresh", null, {
-                onClick: () => S.srch.refreshFeed(),
-                title: "Refresh"
-            }),
-            new HelpButton(() => S.quanta?.config?.help?.fediverse?.feed),
-            // NOTE: state.feedFilterRootNode?.id will be null here, for full fediverse (not a node chat/node feed) scenario.
-            state.isAnonUser ? null : new Button("Post", () => S.edit.addNode(this.data.props.feedFilterRootNode?.id, null, null, null, state), {
-                title: this.data.props.feedFilterRootNode?.id ? "Post to this Chat Room" : "Post something to the Fediverse!"
-            }, "btn-primary")
-        ], null, "float-end"));
-
-        let searchButtonBar = null;
-        // if this is mobile don't even show search field unless it's currently in use (like from a trending click)
-        if (!state.mobileMode || this.data.props.searchTextState.getValue()) {
-            searchButtonBar = new ButtonBar([
-                new Span(null, { className: "feedSearchField" }, [new TextField("Search", false, null, null, false, this.data.props.searchTextState)]),
-                new Button("Clear", () => { this.clearSearch(); }, { className: "feedClearButton" })
-            ]);
-        }
-
         topChildren.push(new CollapsiblePanel("Options", "Options", null, [
-            this.makeFilterButtonsBar(state),
-            searchButtonBar
+            this.makeFilterButtonsBar(state)
         ], false,
             (state: boolean) => {
                 this.data.props.filterExpanded = state;

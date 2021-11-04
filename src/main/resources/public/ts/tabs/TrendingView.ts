@@ -124,7 +124,6 @@ export class TrendingView extends AppTab {
         let feedData = S.quanta.getTabDataById(null, C.TAB_FEED);
         if (feedData) {
             feedData.props.searchTextState.setValue(word);
-            feedData.props.filterExpanded = true;
         }
 
         S.nav.messages({
