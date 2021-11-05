@@ -47,8 +47,8 @@ public class AuditFilter extends GenericFilterBean {
 						postProcess(sreq, sres);
 					}
 				} else {
-					HttpServletResponse sres = (HttpServletResponse) response;
-					log.debug("RESP: " + sres.getStatus());
+					// HttpServletResponse sres = (HttpServletResponse) response;
+					// log.debug("RESP: " + sres.getStatus());
 				}
 			}
 		}

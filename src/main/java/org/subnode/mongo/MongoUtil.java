@@ -482,6 +482,8 @@ public class MongoUtil {
 		createPartialUniqueIndex(session, "unique-apid", SubNode.class,
 				SubNode.FIELD_PROPERTIES + "." + NodeProp.ACT_PUB_ID.s() + ".value");
 
+		createUniqueFriendsIndex(session);
+
 		/*
 		 * NOTE: Every non-admin owned noded must have only names that are prefixed with "UserName--" of the
 		 * user. That is, prefixed by their username followed by two dashes
@@ -496,6 +498,27 @@ public class MongoUtil {
 		createTextIndexes(session, SubNode.class);
 
 		logIndexes(session, SubNode.class);
+	}
+
+	/* Creates an index which will guarantee no duplicate friends can be 
+	created. Note this one index also makes it impossible to have the same user both blocked and followed
+	becasue those are both saved as FRIEND nodes on the tree and therefore would violate this constraint
+	which is exactly what we want. */
+	public void createUniqueFriendsIndex(MongoSession session) {
+		auth.requireAdmin(session);
+		update.saveSession(session);
+		String indexName = "unique-friends";
+
+		try {
+			ops.indexOps(SubNode.class).ensureIndex(//
+					new Index().on(SubNode.FIELD_OWNER, Direction.ASC) //
+							.on(SubNode.FIELD_PROPERTIES + "." + NodeProp.USER_NODE_ID.s() + ".value", Direction.ASC) //
+							.unique() //
+							.named(indexName) //
+							.partial(PartialIndexFilter.of(Criteria.where(SubNode.FIELD_TYPE).is(NodeType.FRIEND.s()))));
+		} catch (Exception e) {
+			ExUtil.error(log, "Failed to create partial unique index: " + indexName, e);
+		}
 	}
 
 	public void dropAllIndexes(MongoSession session) {
@@ -525,9 +548,10 @@ public class MongoUtil {
 		log.debug(sb.toString());
 	}
 
-	// WARNING: I wote this but never tested it, nor did I ever find any examples online. Ended up not
-	// needing any
-	// compound indexes (yet)
+	/*
+	 * WARNING: I wote this but never tested it, nor did I ever find any examples online. Ended up not
+	 * needing any compound indexes (yet)
+	 */
 	public void createPartialUniqueIndexComp2(MongoSession session, String name, Class<?> clazz, String property1,
 			String property2) {
 		auth.requireAdmin(session);
@@ -547,15 +571,16 @@ public class MongoUtil {
 		}
 	}
 
-	// NOTE: Properties like this don't appear to be supported: "prp['ap:id'].value", but prp.apid.value
-	// works
-	//
+	/*
+	 * NOTE: Properties like this don't appear to be supported: "prp['ap:id'].value", but prp.apid.value
+	 * works
+	 */
 	public void createPartialUniqueIndex(MongoSession session, String name, Class<?> clazz, String property) {
 		auth.requireAdmin(session);
 		update.saveSession(session);
 
 		try {
-			// Ensures unuque values for 'property' (but allows duplicates of nodes missing the property)
+			// Ensures unque values for 'property' (but allows duplicates of nodes missing the property)
 			ops.indexOps(clazz).ensureIndex(//
 					new Index().on(property, Direction.ASC) //
 							.unique() //
@@ -728,8 +753,10 @@ public class MongoUtil {
 			adminNode.setProp(NodeProp.USER_PREF_RSS_HEADINGS_ONLY.s(), true);
 			update.save(session, adminNode);
 
-			/* If we just created this user we know the session object here won't have the adminNode id in it yet
-			 and it needs to for all subsequent operations. */
+			/*
+			 * If we just created this user we know the session object here won't have the adminNode id in it
+			 * yet and it needs to for all subsequent operations.
+			 */
 			session.setUserNodeId(adminNode.getId());
 
 			snUtil.ensureNodeExists(session, "/" + NodeName.ROOT, NodeName.USER, null, "Users", null, true, null, null);
