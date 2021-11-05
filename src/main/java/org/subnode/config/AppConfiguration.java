@@ -63,7 +63,6 @@ public class AppConfiguration implements WebMvcConfigurer {
 	 */
 	@Bean
 	public TaskScheduler taskScheduler() {
-		// todo-0: are we single threading here?
 		return new ConcurrentTaskScheduler(); // single threaded by default
 	}
 
@@ -78,8 +77,8 @@ public class AppConfiguration implements WebMvcConfigurer {
 		}
 
 		executor = new ThreadPoolTaskExecutor();
-		executor.setCorePoolSize(25);
-		executor.setMaxPoolSize(50);
+		executor.setCorePoolSize(20);
+		executor.setMaxPoolSize(45);
 		// t.setAllowCoreThreadTimeOut(true);
 		// t.setKeepAliveSeconds(120);
 		return executor;
@@ -167,7 +166,7 @@ public class AppConfiguration implements WebMvcConfigurer {
 
 	private Connector redirectConnector() {
 		Connector connector =
-				new Connector(TomcatServletWebServerFactory.DEFAULT_PROTOCOL /* "org.apache.coyote.http11.Http11NioProtocol" */);
+				new Connector(TomcatServletWebServerFactory.DEFAULT_PROTOCOL);
 		connector.setScheme("http");
 		connector.setPort(80);
 		connector.setSecure(false);

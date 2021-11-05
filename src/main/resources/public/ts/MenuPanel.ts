@@ -104,7 +104,7 @@ export class MenuPanel extends Div {
     static testWebCam = () => { new MediaRecorderDlg(appState(null), true, false).open(); };
     static mouseEffects = () => { S.quanta.toggleMouseEffect(); };
     static showUrls = () => S.render.showNodeUrl(null, appState(null));
-    static showRawData = () => S.view.runServerCommand("getJson", "Node JSON Data", "The actual data stored on the server for this node...", appState(null));
+    static showRawData = () => S.view.runServerCommand("getJson", "Node JSON Data", "", appState(null));
     static nodeStats = () => S.view.getNodeStats(appState(null), false, false);
 
     // DO NOT DELETE
@@ -505,8 +505,8 @@ export class MenuPanel extends Div {
             state.isAnonUser ? new MenuItem("Signup", S.nav.signup, state.isAnonUser) : null,
             new MenuItemSeparator(), //
 
-            new MenuItem("Edit Mode", MenuPanel.toggleEditMode, !state.isAnonUser, () => state.userPreferences.editMode), //
-            new MenuItem("Metadata", MenuPanel.toggleMetaData, true, () => state.userPreferences.showMetaData), //
+            new MenuItem("Edit", MenuPanel.toggleEditMode, !state.isAnonUser, () => state.userPreferences.editMode), //
+            new MenuItem("Info", MenuPanel.toggleMetaData, true, () => state.userPreferences.showMetaData), //
 
             // For now there is only ONE button on the Perferences dialog that is accessible as a toolbar button already, so
             // until we have at least one more preference the preferences dialog is not needed.
