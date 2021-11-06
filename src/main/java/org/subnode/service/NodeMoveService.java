@@ -238,7 +238,7 @@ public class NodeMoveService {
 				 * don't do reference counting we let the garbage collecion cleanup be the only way user quotas are
 				 * deducted from
 				 */
-				userManagerService.addNodeBytesToUserNodeBytes(node, userNode, -1);
+				userManagerService.addNodeBytesToUserNodeBytes(session, node, userNode, -1);
 			}
 
 			try {

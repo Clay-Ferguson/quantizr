@@ -272,7 +272,7 @@ public class IPFSService {
             /* And finally update this user's quota for the added storage */
             SubNode accountNode = read.getUserNodeByUserName(ms, null);
             if (accountNode != null) {
-                userManagerService.addBytesToUserNodeBytes(stat.getCumulativeSize(), accountNode, 1);
+                userManagerService.addBytesToUserNodeBytes(ms, stat.getCumulativeSize(), accountNode, 1);
             }
         });
     }

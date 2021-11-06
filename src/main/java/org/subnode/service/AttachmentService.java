@@ -171,9 +171,13 @@ public class AttachmentService {
 			/*
 			 * if uploading multiple files check quota first, to make sure there's space for all files before we
 			 * start uploading any of them If there's only one file, the normal flow will catch an out of space
-			 * problem, so we don't need to do it in advance in here as we do for multiple file uploads only
+			 * problem, so we don't need to do it in advance in here as we do for multiple file uploads only.
+			 * 
+			 * Also we only do this check if not admin. Admin can upload unlimited amounts.
+			 * 
+			 * todo-0: don't we need to also run this even if ONE file being uploaded?
 			 */
-			if (uploadFiles.length > 1) {
+			if (!session.isAdmin() && uploadFiles.length > 1) {
 				final SubNode userNode = read.getUserNodeByUserName(null, null);
 
 				// get how many bytes of storage the user currently holds
@@ -1015,7 +1019,7 @@ public class AttachmentService {
 
 		// update the user quota which enforces their total storage limit
 		if (!session.isAdmin()) {
-			userManagerService.addBytesToUserNodeBytes(streamCount, userNode, 1);
+			userManagerService.addBytesToUserNodeBytes(session, streamCount, userNode, 1);
 		}
 
 		if (userNode == null) {
@@ -1042,7 +1046,7 @@ public class AttachmentService {
 			node.setProp(NodeProp.BIN_SIZE.s() + binSuffix, streamSize.getVal());
 
 			/* consume user quota space */
-			userManagerService.addBytesToUserNodeBytes(streamSize.getVal(), userNode, 1);
+			userManagerService.addBytesToUserNodeBytes(session, streamSize.getVal(), userNode, 1);
 		}
 	}
 
@@ -1059,7 +1063,7 @@ public class AttachmentService {
 			 * don't do reference counting we let the garbage collecion cleanup be the only way user quotas are
 			 * deducted from
 			 */
-			userManagerService.addNodeBytesToUserNodeBytes(node, userNode, -1);
+			userManagerService.addNodeBytesToUserNodeBytes(session, node, userNode, -1);
 		}
 
 		grid.delete(new Query(Criteria.where("_id").is(id)));
@@ -1246,7 +1250,7 @@ public class AttachmentService {
 								final Query query = new Query(Criteria.where("_id").is(file.getId()));
 
 								// Note: It's not a bug that we don't call this here:
-								// userManagerService.addNodeBytesToUserNodeBytes(node, null, -1);
+								// userManagerService.addNodeBytesToUserNodeBytes(session, node, null, -1);
 								// Because all the userstats are updated at the end of this scan.
 								grid.delete(query);
 								delCount++;

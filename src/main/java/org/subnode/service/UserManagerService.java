@@ -359,7 +359,7 @@ public class UserManagerService {
 	 * @param userNode
 	 * @param sign Controls if this is a subtract or an add (should be always 1 or -1)
 	 */
-	public void addNodeBytesToUserNodeBytes(SubNode node, SubNode userNode, int sign) {
+	public void addNodeBytesToUserNodeBytes(MongoSession ms, SubNode node, SubNode userNode, int sign) {
 		if (node == null) {
 			/*
 			 * todo-1: need to investigate this. I did a public shared node from one user and had a conversation
@@ -379,7 +379,7 @@ public class UserManagerService {
 				userNode = read.getUserNodeByUserName(null, null);
 			}
 
-			addBytesToUserNodeBytes(binSize, userNode, sign);
+			addBytesToUserNodeBytes(ms, binSize, userNode, sign);
 		}
 	}
 
@@ -387,7 +387,7 @@ public class UserManagerService {
 	 * We have 'sign' so we can use this method to either deduct from or add to the user's total usage
 	 * amount
 	 */
-	public void addBytesToUserNodeBytes(long binSize, SubNode userNode, int sign) {
+	public void addBytesToUserNodeBytes(MongoSession ms, long binSize, SubNode userNode, int sign) {
 		if (userNode == null) {
 			userNode = read.getUserNodeByUserName(null, null);
 		}
@@ -405,7 +405,7 @@ public class UserManagerService {
 		}
 
 		Long userQuota = userNode.getIntProp(NodeProp.BIN_QUOTA.s());
-		if (binTotal > userQuota) {
+		if (!ms.isAdmin() && binTotal > userQuota) {
 			throw new OutOfSpaceException();
 		}
 
