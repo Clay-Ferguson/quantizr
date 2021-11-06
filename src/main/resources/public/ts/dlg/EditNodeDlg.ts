@@ -41,7 +41,6 @@ import { ChangeNodeTypeDlg } from "./ChangeNodeTypeDlg";
 import { ConfirmDlg } from "./ConfirmDlg";
 import { EditPropertyDlg } from "./EditPropertyDlg";
 import { EmojiPickerDlg } from "./EmojiPickerDlg";
-import { EncryptionDlg } from "./EncryptionDlg";
 import { FriendsDlg } from "./FriendsDlg";
 import { TorrentListingDlg } from "./TorrentListingDlg";
 import { UploadFromFileDropzoneDlg } from "./UploadFromFileDropzoneDlg";
@@ -68,6 +67,7 @@ export class EditNodeDlg extends DialogBase {
     propStates: Map<string, ValidatedState<any>> = new Map<string, ValidatedState<any>>();
 
     static morePanelExpanded: boolean = false;
+    pendingEncryptionChange: boolean = false;
 
     // if user uploads or deletes an upload we set this, to force refresh when dialog closes even if they don't click save.
     binaryDirty: boolean = false;
@@ -107,8 +107,8 @@ export class EditNodeDlg extends DialogBase {
         an encrypted node. (i.e. the parent of this node is encrypted) */
         if (encrypt) {
             setTimeout(() => {
-                this.openEncryptionDlg(false);
-            }, 1000);
+                this.setEncryption(true);
+            }, 500);
         }
     }
 
@@ -355,6 +355,15 @@ export class EditNodeDlg extends DialogBase {
             ])
         ];
 
+        let encryptCheckBox: Checkbox = !customProps ? new Checkbox("Encrypt", { className: "marginLeft" }, {
+            setValue: (checked: boolean): void => {
+                this.setEncryption(checked);
+            },
+            getValue: (): boolean => {
+                return S.props.isEncrypted(state.node);
+            }
+        }, "col-4") : null;
+
         let wordWrapCheckbox = new Checkbox("Word Wrap", { className: "marginLeft" }, {
             setValue: (checked: boolean): void => {
                 // this is counter-intuitive that we invert here because 'NOWRAP' is a negation of "wrap"
@@ -378,7 +387,8 @@ export class EditNodeDlg extends DialogBase {
         let checkboxesBar = new Div(null, { className: "row marginLeft marginTop" }, [
             state.node.hasChildren ? new Checkbox("Inline Children", null,
                 this.makeCheckboxPropValueHandler(J.NodeProp.INLINE_CHILDREN), "col-4") : null,
-            wordWrapCheckbox
+            wordWrapCheckbox,
+            encryptCheckBox
         ]);
 
         let imgSizeSelection = S.props.hasImage(state.node) ? this.createImgSizeSelection("Image Size", false, "float-end", //
@@ -552,7 +562,6 @@ export class EditNodeDlg extends DialogBase {
         let collapsiblePanel = !customProps ? new CollapsiblePanel(null, null, null, [
             new Div(null, { className: "marginBottom marginRight marginTop" }, [
                 new Button("Type", this.openChangeNodeTypeDlg),
-                !customProps ? new Button("Encrypt", () => { this.openEncryptionDlg(true); }) : null,
                 allowPropertyAdd && numPropsShowing === 0 ? new Button("Props", this.addProperty) : null
             ]),
             nodeNameTextField, selectionsBar, checkboxesBar, propsTable
@@ -876,54 +885,51 @@ export class EditNodeDlg extends DialogBase {
         }
     }
 
-    /* todo-1: rename this method because it doesn't always actually run the dialog */
-    openEncryptionDlg = (runDlg: boolean): void => {
+    setEncryption = (encrypt: boolean): void => {
         let state = this.getState();
+        if (this.pendingEncryptionChange) return;
+
         (async () => {
             let encrypted: boolean = S.props.isEncrypted(state.node);
-            let encryptNow = true;
 
-            if (runDlg) {
-                let dlg = new EncryptionDlg(encrypted, this.appState);
-
-                /* awaits until dialog is closed */
-                await dlg.open();
-                encryptNow = dlg.encrypted;
-            }
-
-            if (encryptNow && S.props.isPublic(state.node)) {
+            if (encrypt && S.props.isPublic(state.node)) {
                 S.util.showMessage("Cannot encrypt a node that is shared to public. Remove public share first.", "Warning");
                 return;
             }
 
             /* only if the encryption setting changed do we need to do anything here */
-            if (encrypted !== encryptNow) {
-
-                /* If we're turning off encryption for the node */
-                if (!encryptNow) {
-                    /* Take what's in the editor and put
-                    that into this.node.content, because it's the correct and only place the correct updated text is guaranteed to be
-                    in the case where the user made some changes before disabling encryption. */
-                    state.node.content = this.contentEditor.getValue();
-                    S.props.setNodePropVal(J.NodeProp.ENC_KEY, state.node, null);
-                }
-                /* Else need to ensure node is encrypted */
-                else {
-                    // if we need to encrypt and the content is not currently encrypted.
-                    if (!state.node.content?.startsWith(J.Constant.ENC_TAG)) {
-                        let content = this.contentEditor.getValue();
-
-                        let skdp: SymKeyDataPackage = await S.encryption.encryptSharableString(null, content);
-                        state.node.content = J.Constant.ENC_TAG + skdp.cipherText;
-
-                        /* Set ENC_KEY to be the encrypted key, which when decrypted can be used to decrypt
-                        the content of the node. This ENC_KEY was encrypted with the public key of the owner of this node,
-                        and so can only be decrypted with their private key. */
-                        S.props.setNodePropVal(J.NodeProp.ENC_KEY, state.node, skdp.cipherKey);
+            if (encrypted !== encrypt) {
+                this.pendingEncryptionChange = true;
+                try {
+                    /* If we're turning off encryption for the node */
+                    if (!encrypt) {
+                        /* Take what's in the editor and put
+                        that into this.node.content, because it's the correct and only place the correct updated text is guaranteed to be
+                        in the case where the user made some changes before disabling encryption. */
+                        state.node.content = this.contentEditor.getValue();
+                        S.props.setNodePropVal(J.NodeProp.ENC_KEY, state.node, null);
                     }
-                }
+                    /* Else need to ensure node is encrypted */
+                    else {
+                        // if we need to encrypt and the content is not currently encrypted.
+                        if (!state.node.content?.startsWith(J.Constant.ENC_TAG)) {
+                            let content = this.contentEditor.getValue();
 
-                this.mergeState(state);
+                            let skdp: SymKeyDataPackage = await S.encryption.encryptSharableString(null, content);
+                            state.node.content = J.Constant.ENC_TAG + skdp.cipherText;
+
+                            /* Set ENC_KEY to be the encrypted key, which when decrypted can be used to decrypt
+                            the content of the node. This ENC_KEY was encrypted with the public key of the owner of this node,
+                            and so can only be decrypted with their private key. */
+                            S.props.setNodePropVal(J.NodeProp.ENC_KEY, state.node, skdp.cipherKey);
+                        }
+                    }
+
+                    this.mergeState(state);
+                }
+                finally {
+                    this.pendingEncryptionChange = false;
+                }
             }
         })();
     }

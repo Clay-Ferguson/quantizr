@@ -26,7 +26,12 @@ export class RssFeedsTypeHandler extends TypeBase {
     }
 
     allowAction(action: NodeActionType, node: J.NodeInfo, appState: AppState): boolean {
-        return false;
+        switch (action) {
+            case NodeActionType.delete:
+                return true;
+            default:
+                return false;
+        }
     }
 
     render(node: J.NodeInfo, rowStyling: boolean, isTreeView: boolean, state: AppState): Comp {
