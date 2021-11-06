@@ -88,6 +88,9 @@ export class Nav implements NavIntf {
     navOpenSelectedNode = (state: AppState): void => {
         const currentSelNode: J.NodeInfo = S.quanta.getHighlightedNode(state);
         if (!currentSelNode) return;
+        if (C.DEBUG_SCROLLING) {
+            console.log("navOpenSelectedNode");
+        }
         S.nav.openNodeById(null, currentSelNode.id, state);
     }
 
@@ -263,7 +266,11 @@ export class Nav implements NavIntf {
         if (!node) {
             S.util.showMessage("Unknown nodeId in openNodeByUid: " + id, "Warning");
         } else {
-            S.view.refreshTree(node.id, true, true, null, false, true, true, state);
+            if (C.DEBUG_SCROLLING) {
+                console.log("openNodeById");
+            }
+            // NOTE: Passing true for "scrollToTop" is new on 11/6/21
+            S.view.refreshTree(node.id, true, true, null, false, true, true, true, state);
         }
     }
 

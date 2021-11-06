@@ -135,8 +135,11 @@ export class Quanta implements QuantaIntf {
     }
 
     refresh = (state: AppState): void => {
+        if (C.DEBUG_SCROLLING) {
+            console.log("Quanta.refresh");
+        }
         // S.view.jumpToId(state.node.id);
-        S.view.refreshTree(null, false, true, null, false, true, true, state);
+        S.view.refreshTree(null, false, true, null, false, true, true, true, state);
     }
 
     selectTab = (tabName: string): void => {
@@ -429,7 +432,7 @@ export class Quanta implements QuantaIntf {
                 Log.log("POPSTATE: location: " + document.location + ", state: " + JSON.stringify(event.state));
 
                 if (event.state && event.state.nodeId) {
-                    S.view.refreshTree(event.state.nodeId, true, true, event.state.highlightId, false, true, true, store.getState());
+                    S.view.refreshTree(event.state.nodeId, true, true, event.state.highlightId, false, false /* <---- todo-0: test, if this should be true */, true, true, store.getState());
                     this.selectTab(C.TAB_MAIN);
                 }
             };
@@ -786,8 +789,9 @@ export class Quanta implements QuantaIntf {
     }
 
     tabScrollTop = (state: AppState, tabName: string) => {
-        // #DEBUG-SCROLLING
-        // console.log("Scrolling tab " + tabName + " to top");
+        if (C.DEBUG_SCROLLING) {
+            console.log("Scrolling tab " + tabName + " to top");
+        }
         let data = state.tabData.find(d => d.id === tabName);
         if (data) {
             data.scrollPos = 0;

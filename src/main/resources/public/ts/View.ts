@@ -23,17 +23,21 @@ export class View implements ViewIntf {
     jumpToId = (id: string): void => {
         // console.log("jumpToId: " + id);
         let state = store.getState();
-        this.refreshTree(id, true, true, id, false, true, true, state);
+        if (C.DEBUG_SCROLLING) {
+            console.log("view.jumpToId");
+        }
+        // todo-0: should this scrollToTop be true ?
+        this.refreshTree(id, true, true, id, false, false, true, true, state);
     }
 
     /*
      * newId is optional and if specified makes the page scroll to and highlight that node upon re-rendering.
      */
     refreshTree = (nodeId: string, zeroOffset: boolean, renderParentIfLeaf: boolean, highlightId: string, forceIPFSRefresh: boolean,
-        allowScroll: boolean, setTab: boolean, state: AppState): void => {
+        scrollToTop: boolean, allowScroll: boolean, setTab: boolean, state: AppState): void => {
 
         // if we're going to be scrolling turn off the auto infinite scroll logic for this render.
-        if (allowScroll) {
+        if (allowScroll || scrollToTop) {
             S.quanta.tempDisableAutoScroll();
         }
 
@@ -73,7 +77,10 @@ export class View implements ViewIntf {
             forceIPFSRefresh,
             singleNode: false
         }, async (res: J.RenderNodeResponse) => {
-            S.render.renderPageFromData(res, false, highlightId, setTab, allowScroll);
+            if (C.DEBUG_SCROLLING) {
+                console.log("refreshTree -> renderPageFromData (scrollTop=" + scrollToTop + ")");
+            }
+            S.render.renderPageFromData(res, scrollToTop, highlightId, setTab, allowScroll);
         }, // fail callback
             (res: string) => {
                 S.quanta.clearLastNodeIds();
@@ -160,15 +167,24 @@ export class View implements ViewIntf {
                     // This is the currently untested final way to try to get the scroll to top to happen
                     // regarding the bug mentioned above this if block.
                     setTimeout(() => {
+                        if (C.DEBUG_SCROLLING) {
+                            console.log("loadPage(1) -> renderPageFromData (scrollTop=" + scrollToTop + ")");
+                        }
                         S.render.renderPageFromData(res, scrollToTop, null, false, scrollToTop);
                     }, 1000);
                 }
                 else {
+                    if (C.DEBUG_SCROLLING) {
+                        console.log("loadPage(2) -> renderPageFromData (scrollTop=" + scrollToTop + ")");
+                    }
                     S.render.renderPageFromData(res, scrollToTop, null, false, scrollToTop);
                 }
             }
             // else, loading in a page which overrides and discards all existing nodes in browser view
             else {
+                if (C.DEBUG_SCROLLING) {
+                    console.log("loadPage(3) -> renderPageFromData (scrollTop=true)");
+                }
                 S.render.renderPageFromData(res, true, null, true, true);
             }
         },
@@ -238,8 +254,9 @@ export class View implements ViewIntf {
     }
 
     scrollAllTop = (state: AppState) => {
-        // #DEBUG-SCROLLING
-        // console.log("scrollAllTop");
+        if (C.DEBUG_SCROLLING) {
+            console.log("scrollAllTop");
+        }
         let activeTabComp = S.quanta.getActiveTabComp(state);
         if (activeTabComp && activeTabComp.getRef()) {
             activeTabComp.getRef().scrollTop = 0;
@@ -291,8 +308,9 @@ export class View implements ViewIntf {
                     elm = elm.firstElementChild;
                 }
 
-                // #DEBUG-SCROLLING
-                // console.log("scrollIntoView elm");
+                if (C.DEBUG_SCROLLING) {
+                    console.log("scrollIntoView elm");
+                }
                 elm.scrollIntoView(true);
             }
             else {

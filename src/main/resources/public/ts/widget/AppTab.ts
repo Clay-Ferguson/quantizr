@@ -37,8 +37,9 @@ export class AppTab extends Div {
 
     reScroll = (elm: HTMLElement): void => {
         if (!elm) return;
-        // #DEBUG-SCROLLING
-        // console.log("reScroll [" + this.data.name + "]: " + elm.scrollTop);
+        if (C.DEBUG_SCROLLING) {
+            console.log("reScroll [" + this.data.name + "]: " + elm.scrollTop);
+        }
         elm.scrollTop = this.data.scrollPos;
     }
 
@@ -48,10 +49,10 @@ export class AppTab extends Div {
         if (elm) {
             this.reScroll(elm);
 
-            // need to remove this listener in some other react state callback.
             elm.addEventListener("scroll", () => {
-                // #DEBUG-SCROLLING
-                // console.log("Scroll: " + elm.scrollTop);
+                if (C.DEBUG_SCROLLING) {
+                    console.log("Scroll Evt: " + elm.scrollTop);
+                }
                 this.data.scrollPos = elm.scrollTop;
             }, { passive: true });
         }

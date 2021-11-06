@@ -117,7 +117,9 @@ export class NodeCompButtonBar extends Div {
         if (node.hasChildren && !isPageRootNode &&
             // If children are shown inline, no need to allow 'open' button in this case unless we're in edit mode
             (!isInlineChildren || state.userPreferences.editMode)) {
-
+            if (C.DEBUG_SCROLLING) {
+                console.log("openButton");
+            }
             openButton = new Button(null, S.nav.openNodeById, {
                 iconclass: "fa fa-folder-open",
                 nid: node.id,

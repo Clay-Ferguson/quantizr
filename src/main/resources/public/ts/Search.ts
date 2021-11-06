@@ -469,7 +469,7 @@ export class Search implements SearchIntf {
             search,
             replace
         }, (res: J.SearchAndReplaceResponse) => {
-            S.view.refreshTree(null, false, false, null, false, true, true, state);
+            S.view.refreshTree(null, false, false, null, false, false, true, true, state);
             S.util.showMessage(res.message, "Success");
         });
     }

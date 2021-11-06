@@ -86,7 +86,7 @@ export class TransferNodeDlg extends DialogBase {
             fromUser: this.fromUserState.getValue(),
             toUser: this.toUserState.getValue()
         }, (res: J.TransferNodeResponse) => {
-            S.view.refreshTree(null, false, false, null, false, true, true, this.appState);
+            S.view.refreshTree(null, false, false, null, false, true, true, true, this.appState);
             S.util.showMessage(res.message, "Success");
             this.close();
         });

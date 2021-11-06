@@ -374,11 +374,12 @@ export class Render implements RenderIntf {
         }
 
         try {
-            // console.log("renderPageFromData: " + S.util.prettyPrint(res));
+            if (C.DEBUG_SCROLLING) {
+                console.log("renderPageFromData: scrollToTop=" + scrollToTop + " allowScroll=" + allowScroll);
+            }
+            // console.log("Data:" + S.util.prettyPrint(res));
+
             dispatch("Action_RenderPage", (s: AppState): AppState => {
-                // if (allowScroll) {
-                //     S.quanta.tabScrollTop(C.TAB_MAIN);
-                // }
                 // console.log("update state in Action_RenderPage");
 
                 if (!s.activeTab || clickTab) {
@@ -472,14 +473,18 @@ export class Render implements RenderIntf {
                         }
                     } //
                     else if (allowScroll && (scrollToTop || !S.quanta.getHighlightedNode(s))) {
-                        // console.log("highlight: scrollTop");
+                        if (C.DEBUG_SCROLLING) {
+                            console.log("rendering highlight: scrollTop");
+                        }
                         S.view.scrollToTop();
                         if (S.quanta.hiddenRenderingEnabled) {
                             s.rendering = true;
                         }
                     } //
                     else if (allowScroll) {
-                        // console.log("highlight: scrollToSelected");
+                        if (C.DEBUG_SCROLLING) {
+                            console.log("highlight: scrollToSelected");
+                        }
                         S.view.scrollToSelectedNode(s);
                         if (S.quanta.hiddenRenderingEnabled) {
                             s.rendering = true;
