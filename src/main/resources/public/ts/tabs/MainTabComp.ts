@@ -28,7 +28,6 @@ export class MainTabComp extends AppTab {
 
     preRender(): void {
         let state: AppState = useSelector((state: AppState) => state);
-
         this.attribs.className = this.getClass(state);
 
         if (!state.node) {

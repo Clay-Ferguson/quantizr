@@ -42,7 +42,6 @@ import { ConfirmDlg } from "./ConfirmDlg";
 import { EditPropertyDlg } from "./EditPropertyDlg";
 import { EmojiPickerDlg } from "./EmojiPickerDlg";
 import { FriendsDlg } from "./FriendsDlg";
-import { TorrentListingDlg } from "./TorrentListingDlg";
 import { UploadFromFileDropzoneDlg } from "./UploadFromFileDropzoneDlg";
 
 let S: Singletons;
@@ -79,7 +78,7 @@ export class EditNodeDlg extends DialogBase {
     allowEditAllProps: boolean = false;
 
     constructor(node: J.NodeInfo, private encrypt: boolean, private showJumpButton: boolean, state: AppState, mode: DialogMode = null) {
-        super("Edit", mode === DialogMode.EMBED ? "app-embed-content" : "app-modal-content", false, state, mode);
+        super("[none]", mode === DialogMode.EMBED ? "app-embed-content" : "app-modal-content", false, state, mode);
         this.close = this.close.bind(this);
 
         if (mode === DialogMode.EMBED) {
@@ -303,19 +302,21 @@ export class EditNodeDlg extends DialogBase {
         return span;
     }
 
-    getTitleText(): string {
-        let state = this.getState();
-        let ret = null;
+    // DO NOT DELETE
+    // Editor actually looks much better without any title text.
+    // getTitleText(): string {
+    //     let state = this.getState();
+    //     let ret = null;
 
-        let typeHandler: TypeHandlerIntf = S.plugin.getTypeHandler(state.node.type);
-        if (typeHandler) {
-            ret = "Edit (" + typeHandler.getName() + ")";
-        }
-        else {
-            ret = "Edit";
-        }
-        return ret;
-    }
+    //     let typeHandler: TypeHandlerIntf = S.plugin.getTypeHandler(state.node.type);
+    //     if (typeHandler) {
+    //         ret = "Edit (" + typeHandler.getName() + ")";
+    //     }
+    //     else {
+    //         ret = "Edit";
+    //     }
+    //     return ret;
+    // }
 
     getExtraTitleBarComps(): CompIntf[] {
         let state = this.getState();
@@ -362,7 +363,7 @@ export class EditNodeDlg extends DialogBase {
             getValue: (): boolean => {
                 return S.props.isEncrypted(state.node);
             }
-        }, "col-4") : null;
+        }, "col-3") : null;
 
         let wordWrapCheckbox = new Checkbox("Word Wrap", { className: "marginLeft" }, {
             setValue: (checked: boolean): void => {
@@ -375,7 +376,7 @@ export class EditNodeDlg extends DialogBase {
             getValue: (): boolean => {
                 return S.props.getNodePropVal(J.NodeProp.NOWRAP, state.node) !== "1";
             }
-        }, "col-4");
+        }, "col-3");
 
         let selectionsBar = new Div(null, { className: "row marginTop" }, [
             state.node.hasChildren ? this.createLayoutSelection() : null,
@@ -386,7 +387,7 @@ export class EditNodeDlg extends DialogBase {
 
         let checkboxesBar = new Div(null, { className: "row marginLeft marginTop" }, [
             state.node.hasChildren ? new Checkbox("Inline Children", null,
-                this.makeCheckboxPropValueHandler(J.NodeProp.INLINE_CHILDREN), "col-4") : null,
+                this.makeCheckboxPropValueHandler(J.NodeProp.INLINE_CHILDREN), "col-3") : null,
             wordWrapCheckbox,
             encryptCheckBox
         ]);

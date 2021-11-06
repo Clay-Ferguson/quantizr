@@ -32,8 +32,8 @@ export abstract class ResultSetView extends AppTab {
     preRender(): void {
         let state: AppState = useSelector((state: AppState) => state);
         let results = this.data && this.data.rsInfo.results;
-        if (!results) return;
         this.attribs.className = this.getClass(state);
+        if (!results) return;
 
         let childCount = results.length;
 

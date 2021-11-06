@@ -1,9 +1,9 @@
 import { EventInput } from "@fullcalendar/react";
 import clientInfo from "./ClientInfo";
+import { Constants as C } from "./Constants";
 import { DialogBase } from "./DialogBase";
 import { TabDataIntf } from "./intf/TabDataIntf";
 import * as J from "./JavaIntf";
-import { NodeInfo } from "./JavaIntf";
 
 /* root react Redux state for entire app */
 export class AppState {
@@ -64,7 +64,7 @@ export class AppState {
     calendarData: EventInput[];
     calendarShowWeekends: boolean = false;
 
-    fullScreenImageSize: string = "100%";
+    fullScreenImageSize: string = C.FULL_SCREEN_MAX_WIDTH;
 
     /* holds array of all parent items all the way up the tree (as far as user is authorized) */
     breadcrumbs: J.BreadcrumbInfo[];

@@ -47,7 +47,6 @@ public class SessionContext {
 	@Autowired
 	private MongoRead read;
 
-
 	/* Identification of user's account root node. */
 	private String rootId;
 

@@ -227,7 +227,13 @@ export abstract class DialogBase<S extends BaseCompState = any> extends Div<S> i
         const titleIconComp: CompIntf = this.getTitleIconComp();
         const titleText: string = this.getTitleText();
         const extraHeaderComps = this.getExtraTitleBarComps();
-        let titleChildren: CompIntf[] = [titleIconComp, new Span(titleText || this.title)];
+        let useTitle = titleText || this.title;
+
+        // slight hack. we need a 'showTitle' flag separately (todo-1)
+        if (useTitle === "[none]") useTitle = null;
+        let titleChildren: CompIntf[] = [titleIconComp,
+            useTitle ? new Span(useTitle) : null
+        ];
 
         if (extraHeaderComps) {
             titleChildren = titleChildren.concat(extraHeaderComps);

@@ -1,11 +1,11 @@
 import { useSelector } from "react-redux";
 import { AppState } from "../AppState";
 import { Constants as C } from "../Constants";
-import { DialogBase } from "../DialogBase";
 import { PubSub } from "../PubSub";
 import { Singletons } from "../Singletons";
 import { CompIntf } from "./base/CompIntf";
 import { Button } from "./Button";
+import { Checkbox } from "./Checkbox";
 import { Clearfix } from "./Clearfix";
 import { Div } from "./Div";
 import { FullScreenCalendar } from "./FullScreenCalendar";
@@ -138,10 +138,15 @@ export class App extends Main {
 
             let fullScreenViewer = S.quanta.fullscreenViewerActive(state);
 
-            let prefsButton = !fullScreenViewer ? new IconButton("fa-certificate", "Meta", {
-                onClick: e => { S.edit.toggleShowMetaData(state); },
-                title: state.userPreferences.showMetaData ? "Hide Avatars and Metadata" : "Show Avatars and Metadata"
-            }, "btn-secondary", state.userPreferences.showMetaData ? "on" : "off") : null;
+            let prefsButton = !fullScreenViewer
+                ? new Checkbox("Info", { className: "marginLeft" }, {
+                    setValue: (checked: boolean): void => {
+                        S.edit.toggleShowMetaData(state);
+                    },
+                    getValue: (): boolean => {
+                        return state.userPreferences.showMetaData;
+                    }
+                }, "form-switch form-check-inline") : null;
 
             let loginButton = state.isAnonUser ? new IconButton("fa-sign-in", "", {
                 onClick: e => { S.nav.login(state); }
@@ -164,7 +169,7 @@ export class App extends Main {
             // });
 
             let title = state.title ? new Button("@" + state.title, e => { S.nav.navHome(state); }, null, "btn-secondary") : null;
-            comp = new Div(null, { className: "mobileHeaderBar" }, [logo, menuButton, prefsButton, loginButton, title]);
+            comp = new Div(null, { className: "mobileHeaderBar" }, [logo, menuButton, loginButton, title, prefsButton]);
         }
         return comp;
     }

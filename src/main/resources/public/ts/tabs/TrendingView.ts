@@ -55,7 +55,6 @@ export class TrendingView extends AppTab {
 
     preRender(): void {
         let state: AppState = useSelector((state: AppState) => state);
-
         this.attribs.className = this.getClass(state);
 
         let data = state.tabData.find(d => d.id === this.data.id);

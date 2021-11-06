@@ -31,6 +31,11 @@ export class Constants {
     static readonly MAX_UPLOAD_MB = 20;
     static readonly DEBUG_SCROLLING = false;
 
+    // This works well at 100% but requires user to scroll down when the content was taller than
+    // what can fit on the screen, and for making the Quanta Screencasts a good experience, for now
+    // I'm making this 75% instead so they fit better, but this isn't the final solution here.
+    static readonly FULL_SCREEN_MAX_WIDTH = "75%";
+
     static readonly NEW_ON_ROOT: boolean = false;
     static readonly NEW_ON_TOOLBAR: boolean = true;
     static readonly INS_ON_TOOLBAR: boolean = false;

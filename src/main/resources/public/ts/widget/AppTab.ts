@@ -32,6 +32,7 @@ export class AppTab extends Div {
         if (state.activeTab === this.getId()) {
             className += " show active";
         }
+        // console.log("ID: " + this.data.id + " className=" + className);
         return className;
     }
 
