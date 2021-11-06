@@ -483,6 +483,7 @@ public class MongoUtil {
 				SubNode.FIELD_PROPERTIES + "." + NodeProp.ACT_PUB_ID.s() + ".value");
 
 		createUniqueFriendsIndex(session);
+		createUniqueNodeNameIndex(session);
 
 		/*
 		 * NOTE: Every non-admin owned noded must have only names that are prefixed with "UserName--" of the
@@ -516,6 +517,24 @@ public class MongoUtil {
 							.unique() //
 							.named(indexName) //
 							.partial(PartialIndexFilter.of(Criteria.where(SubNode.FIELD_TYPE).is(NodeType.FRIEND.s()))));
+		} catch (Exception e) {
+			ExUtil.error(log, "Failed to create partial unique index: " + indexName, e);
+		}
+	}
+
+	/* Creates an index which will guarantee no duplicate node names can exist, for any user */
+	public void createUniqueNodeNameIndex(MongoSession session) {
+		auth.requireAdmin(session);
+		update.saveSession(session);
+		String indexName = "unique-node-name";
+
+		try {
+			ops.indexOps(SubNode.class).ensureIndex(//
+					new Index().on(SubNode.FIELD_OWNER, Direction.ASC) //
+							.on(SubNode.FIELD_NAME, Direction.ASC) //
+							.unique() //
+							.named(indexName) //
+							.partial(PartialIndexFilter.of(Criteria.where(SubNode.FIELD_NAME).gt(""))));
 		} catch (Exception e) {
 			ExUtil.error(log, "Failed to create partial unique index: " + indexName, e);
 		}
