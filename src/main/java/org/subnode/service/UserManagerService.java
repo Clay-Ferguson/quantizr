@@ -776,9 +776,15 @@ public class UserManagerService {
 		final String userName = ThreadLocals.getSC().getUserName();
 		session = ThreadLocals.ensure(session);
 
-		String _newUserName = req.getUserName();
+		String _newUserName = req.getUserName().trim();
 		_newUserName = XString.stripIfStartsWith(_newUserName, "@");
 		final String newUserName = _newUserName;
+
+		if (newUserName.equalsIgnoreCase(PrincipalName.ADMIN.s())) {
+			res.setMessage("You can't be friends with the admin.");
+			res.setSuccess(false);
+			return res;
+		}
 
 		// This is concurrency safe because by the time we get to this asyncExec, we're done processing in
 		// this request thread.
