@@ -50,15 +50,16 @@ export class NodeCompTableRowLayout extends Div {
         let allowInsert = S.edit.isInsertAllowed(this.node, state);
         let curCols = 0;
         let lastNode: J.NodeInfo = null;
+        let rowIdx = 0;
 
-        for (let i = 0; i < this.node.children.length; i++) {
+        this.node.children?.forEach((n: J.NodeInfo) => {
+            if (!n) return;
             let comps: Comp[] = [];
-            let n: J.NodeInfo = this.node.children[i];
 
             if (!(nodesToMove && nodesToMove.find(id => id === n.id))) {
 
                 if (this.debug && n) {
-                    console.log("RENDER ROW[" + i + "]: node.id=" + n.id);
+                    console.log("RENDER ROW[" + rowIdx + "]: node.id=" + n.id);
                 }
 
                 let childrenImgSizes = S.props.getNodePropVal(J.NodeProp.CHILDREN_IMG_SIZES, this.node);
@@ -69,7 +70,7 @@ export class NodeCompTableRowLayout extends Div {
                 }
                 else {
                     lastNode = n;
-                    let row: Comp = new NodeCompRow(n, typeHandler, i, childCount, rowCount + 1, this.level, true, this.allowNodeMove, childrenImgSizes, this.allowHeaders, true, state);
+                    let row: Comp = new NodeCompRow(n, typeHandler, rowIdx, childCount, rowCount + 1, this.level, true, this.allowNodeMove, childrenImgSizes, this.allowHeaders, true, state);
                     comps.push(row);
                 }
 
@@ -94,7 +95,8 @@ export class NodeCompTableRowLayout extends Div {
                     curCols = 0;
                 }
             }
-        }
+            rowIdx++;
+        });
 
         // the last row might not have filled up yet but add it still
         if (curCols > 0) {

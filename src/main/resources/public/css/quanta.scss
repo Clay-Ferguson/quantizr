@@ -1297,11 +1297,6 @@ Will come back later and study this more. todo-1 */
     cursor: pointer;
 }
 
-.nodeCompButtonBar {
-    border-top: 2px dotted $nodeBorderBottomColor;
-    padding-top: 5px;
-}
-
 .mainNodeContentStyle {
     @if $rootNodeBorder {
         border-bottom: $highlightBorderSize solid $nodeBorderBottomColor; 

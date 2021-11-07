@@ -73,10 +73,9 @@ export class NodeCompMainNode extends Div {
                 }
             }
 
-            let extraClass = state.userPreferences.showMetaData && state.userPreferences.editMode ? "nodeCompButtonBar" : null;
             this.setChildren([
                 header,
-                !state.inlineEditId ? new NodeCompButtonBar(node, false, 1, null, extraClass) : null,
+                !state.inlineEditId ? new NodeCompButtonBar(node, false, 1, null, null) : null,
                 new Clearfix("bbcf_" + node.id),
                 jumpButton,
                 new NodeCompContent(node, false, true, null, null, this.imgSizeOverride, true),

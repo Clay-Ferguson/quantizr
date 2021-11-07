@@ -33,61 +33,57 @@ export class NodeCompVerticalRowLayout extends Div {
         let allowInsert = S.edit.isInsertAllowed(this.node, state);
         let rowCount: number = 0;
         let lastNode: J.NodeInfo = null;
+        let rowIdx = 0;
 
-        // search for all these old-school ways of iterating a list and make them modern! (todo-0)
-        for (let i = 0; i < this.node.children.length; i++) {
-            let n: J.NodeInfo = this.node.children[i];
-            if (n) {
-                if (!(state.nodesToMove && state.nodesToMove.find(id => id === n.id))) {
+        this.node.children?.forEach((n: J.NodeInfo) => {
+            if (!n) return;
+            if (!(state.nodesToMove && state.nodesToMove.find(id => id === n.id))) {
+                // console.log("RENDER ROW[" + rowIdx + "]: node.id=" + n.id + " targetNodeId=" + S.quanta.newNodeTargetId);
 
-                    // if (n) {
-                    //     console.log("RENDER ROW[" + i + "]: node.id=" + n.id + " targetNodeId=" + S.quanta.newNodeTargetId);
-                    // }
+                if (state.editNode && state.editNodeOnTab === C.TAB_MAIN && S.quanta.newNodeTargetId === n.id && S.quanta.newNodeTargetOffset === 0) {
+                    comps.push(EditNodeDlg.embedInstance || new EditNodeDlg(state.editNode, state.editEncrypt, state.editShowJumpButton, state, DialogMode.EMBED));
+                }
 
-                    if (state.editNode && state.editNodeOnTab === C.TAB_MAIN && S.quanta.newNodeTargetId === n.id && S.quanta.newNodeTargetOffset === 0) {
-                        comps.push(EditNodeDlg.embedInstance || new EditNodeDlg(state.editNode, state.editEncrypt, state.editShowJumpButton, state, DialogMode.EMBED));
-                    }
+                if (state.editNode && state.editNodeOnTab === C.TAB_MAIN && n.id === state.editNode.id) {
+                    comps.push(EditNodeDlg.embedInstance || new EditNodeDlg(state.editNode, state.editEncrypt, state.editShowJumpButton, state, DialogMode.EMBED));
+                }
+                else {
+                    let childrenImgSizes = S.props.getNodePropVal(J.NodeProp.CHILDREN_IMG_SIZES, this.node);
+                    let typeHandler: TypeHandlerIntf = S.plugin.getTypeHandler(n.type);
 
-                    if (state.editNode && state.editNodeOnTab === C.TAB_MAIN && n.id === state.editNode.id) {
-                        comps.push(EditNodeDlg.embedInstance || new EditNodeDlg(state.editNode, state.editEncrypt, state.editShowJumpButton, state, DialogMode.EMBED));
+                    // special case where we aren't in edit mode, and we run across a markdown type with blank content, then don't render it.
+                    if (typeHandler && typeHandler.getTypeName() === J.NodeType.NONE && !n.content && !state.userPreferences.editMode && !S.props.hasBinary(n)) {
                     }
                     else {
-                        let childrenImgSizes = S.props.getNodePropVal(J.NodeProp.CHILDREN_IMG_SIZES, this.node);
-                        let typeHandler: TypeHandlerIntf = S.plugin.getTypeHandler(n.type);
+                        lastNode = n;
+                        let row: Comp = null;
+                        // NOTE: This collapsesComps type thing is intentionally not done on the NodeCompTableRowLayout layout type
+                        // because if the user wants their Account root laid out in a grid just let them do that and show everything
+                        // without doing any collapsedComps.
+                        if (typeHandler && typeHandler.isSpecialAccountNode()) {
+                            row = new NodeCompRow(n, typeHandler, rowIdx, childCount, rowCount + 1, this.level, false, false, childrenImgSizes, this.allowHeaders, false, state);
 
-                        // special case where we aren't in edit mode, and we run across a markdown type with blank content, then don't render it.
-                        if (typeHandler && typeHandler.getTypeName() === J.NodeType.NONE && !n.content && !state.userPreferences.editMode && !S.props.hasBinary(n)) {
+                            // I'm gonna be evil here and do this object without a type.
+                            collapsedComps.push({ comp: row, subOrdinal: typeHandler.subOrdinal() });
                         }
                         else {
-                            lastNode = n;
-                            let row: Comp = null;
-                            // NOTE: This collapsesComps type thing is intentionally not done on the NodeCompTableRowLayout layout type
-                            // because if the user wants their Account root laid out in a grid just let them do that and show everything
-                            // without doing any collapsedComps.
-                            if (typeHandler && typeHandler.isSpecialAccountNode()) {
-                                row = new NodeCompRow(n, typeHandler, i, childCount, rowCount + 1, this.level, false, false, childrenImgSizes, this.allowHeaders, false, state);
-
-                                // I'm gonna be evil here and do this object without a type.
-                                collapsedComps.push({ comp: row, subOrdinal: typeHandler.subOrdinal() });
-                            }
-                            else {
-                                row = new NodeCompRow(n, typeHandler, i, childCount, rowCount + 1, this.level, false, false, childrenImgSizes, this.allowHeaders, true, state);
-                                comps.push(row);
-                            }
-                        }
-
-                        rowCount++;
-                        if (n.children) {
-                            comps.push(S.render.renderChildren(n, this.level + 1, this.allowNodeMove, state));
+                            row = new NodeCompRow(n, typeHandler, rowIdx, childCount, rowCount + 1, this.level, false, false, childrenImgSizes, this.allowHeaders, true, state);
+                            comps.push(row);
                         }
                     }
 
-                    if (state.editNode && state.editNodeOnTab === C.TAB_MAIN && S.quanta.newNodeTargetId === n.id && S.quanta.newNodeTargetOffset === 1) {
-                        comps.push(EditNodeDlg.embedInstance || new EditNodeDlg(state.editNode, state.editEncrypt, state.editShowJumpButton, state, DialogMode.EMBED));
+                    rowCount++;
+                    if (n.children) {
+                        comps.push(S.render.renderChildren(n, this.level + 1, this.allowNodeMove, state));
                     }
                 }
+
+                if (state.editNode && state.editNodeOnTab === C.TAB_MAIN && S.quanta.newNodeTargetId === n.id && S.quanta.newNodeTargetOffset === 1) {
+                    comps.push(EditNodeDlg.embedInstance || new EditNodeDlg(state.editNode, state.editEncrypt, state.editShowJumpButton, state, DialogMode.EMBED));
+                }
             }
-        }
+            rowIdx++;
+        });
 
         if (this.allowHeaders && allowInsert && !state.isAnonUser && state.userPreferences.editMode) {
             let attribs = {};
