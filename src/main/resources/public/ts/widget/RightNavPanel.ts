@@ -20,6 +20,8 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
     S = ctx;
 });
 
+declare var g_brandingAppName;
+
 export class RightNavPanel extends Div {
 
     constructor() {
@@ -95,7 +97,7 @@ export class RightNavPanel extends Div {
 
                     new Div(null, { className: "marginBottom" }, [
                         new ButtonBar([
-                            !state.isAnonUser && state.mainPanelCols > 4 ? new IconButton("fa-caret-left", null, {
+                            state.mainPanelCols > 4 ? new IconButton("fa-caret-left", null, {
                                 className: "widthAdjustLink",
                                 title: "Narrower view",
                                 onClick: () => {
@@ -105,7 +107,7 @@ export class RightNavPanel extends Div {
                                     });
                                 }
                             }) : null,
-                            !state.isAnonUser && state.mainPanelCols < 7 ? new IconButton("fa-caret-right", null, {
+                            state.mainPanelCols < 7 ? new IconButton("fa-caret-right", null, {
                                 className: "widthAdjustLink",
                                 title: "Wider view",
                                 onClick: () => {
@@ -115,7 +117,12 @@ export class RightNavPanel extends Div {
                                     });
                                 }
                             }) : null,
-                            clipboardPasteButton, addNoteButton
+                            clipboardPasteButton,
+                            addNoteButton,
+                            new IconButton("fa-home", null, {
+                                title: g_brandingAppName + " Home",
+                                onClick: S.quanta.loadAnonPageHome
+                            })
                         ])
                     ]),
 

@@ -44,7 +44,8 @@ export class MenuPanel extends Div {
         });
     }
 
-    static openUserGuide = () => S.nav.openContentNode(":user-guide");
+    // leaving for reference how to open this.
+    // static openUserGuide = () => S.nav.openContentNode(":user-guide");
     static openNotesNode = () => S.nav.openContentNode("~" + J.NodeType.NOTES);
 
     static openFriendsNode = () => {
@@ -247,12 +248,6 @@ export class MenuPanel extends Div {
             children.push(new Menu("Tabs", this.getTabMenuItems(state)));
         }
 
-        children.push(new Menu(C.SITE_NAV_MENU_TEXT, [
-            new MenuItem("Portal Home", S.quanta.loadAnonPageHome),
-            new MenuItem("User Guide", MenuPanel.openUserGuide),
-            ...this.siteNavCustomItems(state)
-        ]));
-
         let bookmarkItems = [];
         if (!state.isAnonUser) {
             if (state.bookmarks) {
@@ -289,7 +284,7 @@ export class MenuPanel extends Div {
         }
 
         if (!Menu.userClickedMenu) {
-            Menu.activeMenu = bookmarkItems.length > 0 ? C.BOOKMARKS_MENU_TEXT : (state.isAnonUser ? C.SITE_NAV_MENU_TEXT : null);
+            Menu.activeMenu = bookmarkItems.length > 0 ? C.BOOKMARKS_MENU_TEXT : null;
         }
 
         children.push(new Menu("My Nodes", [
