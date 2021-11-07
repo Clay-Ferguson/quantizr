@@ -29,6 +29,7 @@ export class AppState {
     rendering: boolean = false;
 
     otherAccountNodesExpanded: boolean = false;
+    linksToAttachmentsExpanded: boolean = false;
 
     inlineEditId: string;
     inlineEditVal: string;

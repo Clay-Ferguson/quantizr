@@ -75,18 +75,6 @@ export class NodeCompRowHeader extends Div {
             }
         }
 
-        if (node.name) {
-            children.push(new Span(node.name, {
-                className: "btn-secondary nodeName",
-                title: "Copy name-based URL to clipboard",
-                onClick: () => {
-                    let url = window.location.origin + S.util.getPathPartForNamedNode(node);
-                    S.util.copyToClipboard(url);
-                    S.util.flashMessage("Copied to Clipboard: " + url, "Clipboard", true);
-                }
-            }));
-        }
-
         /* for admin user shwo id, ordinal, and type right on the row. We have a bug where
         the logicalOrdinal is showing as -1 here, but it's just because it's not being set on the server. */
         if (state.isAdminUser) {

@@ -1252,6 +1252,12 @@ Will come back later and study this more. todo-1 */
     padding-left: $smallGap;
 }
 
+.attachmentLinksPanel {
+    border: 1px solid $nodeBorderBottomColor;
+    border-radius: $border-radius;
+    padding-left: $smallGap;
+}
+
 .ace-edit-panel {
     margin-top: $smallGap;
     position: absolute;

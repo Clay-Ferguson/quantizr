@@ -1,7 +1,6 @@
-import marked from "marked";
 import highlightjs from "highlight.js";
 import "highlight.js/styles/github.css";
-
+import marked from "marked";
 import { toArray } from "react-emoji-render";
 import { dispatch } from "./AppRedux";
 import { AppState } from "./AppState";
@@ -17,6 +16,7 @@ import * as J from "./JavaIntf";
 import { PubSub } from "./PubSub";
 import { Singletons } from "./Singletons";
 import { Comp } from "./widget/base/Comp";
+import { CollapsiblePanel } from "./widget/CollapsiblePanel";
 import { Div } from "./widget/Div";
 import { Heading } from "./widget/Heading";
 import { HorizontalLayout } from "./widget/HorizontalLayout";
@@ -292,8 +292,11 @@ export class Render implements RenderIntf {
 
         let bin = S.props.getNodePropVal(J.NodeProp.BIN, node);
         if (bin) {
+            let attachmentComps: Comp[] = [];
+            attachmentComps.push(new Heading(3, "Attachment URLs"));
+
             let attByIdUrl = window.location.origin + "/f/id/" + node.id;
-            children.push(new Heading(5, "View Attachment By Id"), //
+            attachmentComps.push(new Heading(5, "View By Id"), //
                 new Div(attByIdUrl, {
                     className: "anchorBigMarginBottom",
                     title: "Click -> Copy to clipboard",
@@ -305,7 +308,7 @@ export class Render implements RenderIntf {
                 }));
 
             let downloadttByIdUrl = attByIdUrl + "?download=y";
-            children.push(new Heading(5, "Download Attachment By Id"), //
+            attachmentComps.push(new Heading(5, "Download By Id"), //
                 new Div(downloadttByIdUrl, {
                     className: "anchorBigMarginBottom",
                     title: "Click -> Copy to clipboard",
@@ -315,12 +318,10 @@ export class Render implements RenderIntf {
                         dlgHolder.dlg.close();
                     }
                 }));
-        }
 
-        if (node.name) {
-            if (bin) {
+            if (node.name) {
                 let attByNameUrl = window.location.origin + S.util.getPathPartForNamedNodeAttachment(node);
-                children.push(new Heading(5, "View Attachment By Name"), //
+                attachmentComps.push(new Heading(5, "View By Name"), //
                     new Div(attByNameUrl, {
                         className: "anchorBigMarginBottom",
                         title: "Click -> Copy to clipboard",
@@ -332,7 +333,7 @@ export class Render implements RenderIntf {
                     }));
 
                 let downloadAttByNameUrl = attByNameUrl + "?download=y";
-                children.push(new Heading(5, "Download Attachment By Name"), //
+                attachmentComps.push(new Heading(5, "Download By Name"), //
                     new Div(downloadAttByNameUrl, {
                         className: "anchorBigMarginBottom",
                         title: "Click -> Copy to clipboard",
@@ -343,6 +344,10 @@ export class Render implements RenderIntf {
                         }
                     }));
             }
+
+            children.push(new CollapsiblePanel("Attachment URLs", "Hide", null, attachmentComps, false, (s: boolean) => {
+                state.linksToAttachmentsExpanded = s;
+            }, state.linksToAttachmentsExpanded, "marginAll", "attachmentLinksPanel"));
         }
 
         let ipfsLink = S.props.getNodePropVal(J.NodeProp.IPFS_LINK, node);
@@ -359,7 +364,7 @@ export class Render implements RenderIntf {
                 }));
         }
 
-        dlgHolder.dlg = new MessageDlg(null, "URLs", null, new Div(null, null, children), false, 0, null);
+        dlgHolder.dlg = new MessageDlg(null, "Node URLs", null, new Div(null, null, children), false, 0, null);
         dlgHolder.dlg.open();
     }
 
