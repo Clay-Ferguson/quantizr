@@ -9,7 +9,6 @@ import { Comp } from "../widget/base/Comp";
 import { ButtonBar } from "../widget/ButtonBar";
 import { Clearfix } from "../widget/Clearfix";
 import { Div } from "../widget/Div";
-import { HelpButton } from "../widget/HelpButton";
 import { IconButton } from "../widget/IconButton";
 
 let S: Singletons;

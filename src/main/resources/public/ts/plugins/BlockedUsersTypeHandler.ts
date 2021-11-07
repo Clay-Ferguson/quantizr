@@ -27,12 +27,17 @@ export class BlockedUsersTypeHandler extends TypeBase {
 
     render(node: J.NodeInfo, rowStyling: boolean, isTreeView: boolean, state: AppState): Comp {
         return new Div(null, null, [
-            new Heading(4, "Blocked Users", {
+            new Heading(4, this.displayName, {
                 className: "marginAll"
             })
-            // oops do we have help for blocked users yet? todo-1
-            // new HelpButton(() => S.quanta?.config?.help?.type?.friendsList?.render, null, "btn-secondary float-end"),
-            // new Clearfix()
         ]);
+    }
+
+    isSpecialAccountNode(): boolean {
+        return true;
+    }
+
+    subOrdinal(): number {
+        return 4;
     }
 }

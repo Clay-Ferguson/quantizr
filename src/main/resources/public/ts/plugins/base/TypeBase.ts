@@ -161,4 +161,13 @@ export class TypeBase implements TypeHandlerIntf {
             });
         }
     }
+
+    /* When this returns true we know the main view should embed these nodes in a collapsed panel */
+    isSpecialAccountNode(): boolean {
+        return false;
+    }
+
+    subOrdinal(): number {
+        return -1;
+    }
 }

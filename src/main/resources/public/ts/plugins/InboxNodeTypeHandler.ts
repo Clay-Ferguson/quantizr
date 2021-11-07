@@ -52,4 +52,12 @@ export class InboxNodeTypeHandler extends TypeBase {
             new Clearfix()
         ], "displayTable marginAll");
     }
+
+    isSpecialAccountNode(): boolean {
+        return true;
+    }
+
+    subOrdinal(): number {
+        return 3;
+    }
 }

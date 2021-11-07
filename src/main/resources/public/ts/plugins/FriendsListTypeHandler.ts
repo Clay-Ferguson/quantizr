@@ -33,4 +33,12 @@ export class FriendsListTypeHandler extends TypeBase {
             })
         ]);
     }
+
+    isSpecialAccountNode(): boolean {
+        return true;
+    }
+
+    subOrdinal(): number {
+        return 2;
+    }
 }

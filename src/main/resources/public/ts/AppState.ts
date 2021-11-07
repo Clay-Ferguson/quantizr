@@ -28,6 +28,8 @@ export class AppState {
     */
     rendering: boolean = false;
 
+    otherAccountNodesExpanded: boolean = false;
+
     inlineEditId: string;
     inlineEditVal: string;
 

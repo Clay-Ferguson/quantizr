@@ -9,8 +9,8 @@ import { PubSub } from "../PubSub";
 import { Singletons } from "../Singletons";
 import { Comp } from "../widget/base/Comp";
 import { Button } from "../widget/Button";
+import { CollapsiblePanel } from "../widget/CollapsiblePanel";
 import { Div } from "../widget/Div";
-import { IconButton } from "../widget/IconButton";
 import { NodeCompRow } from "./NodeCompRow";
 
 let S: Singletons;
@@ -29,10 +29,12 @@ export class NodeCompVerticalRowLayout extends Div {
         let state: AppState = useSelector((state: AppState) => state);
         let childCount: number = this.node.children.length;
         let comps: Comp[] = [];
+        let collapsedComps: Object[] = [];
         let allowInsert = S.edit.isInsertAllowed(this.node, state);
         let rowCount: number = 0;
         let lastNode: J.NodeInfo = null;
 
+        // search for all these old-school ways of iterating a list and make them modern! (todo-0)
         for (let i = 0; i < this.node.children.length; i++) {
             let n: J.NodeInfo = this.node.children[i];
             if (n) {
@@ -50,7 +52,6 @@ export class NodeCompVerticalRowLayout extends Div {
                         comps.push(EditNodeDlg.embedInstance || new EditNodeDlg(state.editNode, state.editEncrypt, state.editShowJumpButton, state, DialogMode.EMBED));
                     }
                     else {
-
                         let childrenImgSizes = S.props.getNodePropVal(J.NodeProp.CHILDREN_IMG_SIZES, this.node);
                         let typeHandler: TypeHandlerIntf = S.plugin.getTypeHandler(n.type);
 
@@ -59,8 +60,20 @@ export class NodeCompVerticalRowLayout extends Div {
                         }
                         else {
                             lastNode = n;
-                            let row: Comp = new NodeCompRow(n, i, childCount, rowCount + 1, this.level, false, this.allowNodeMove, childrenImgSizes, this.allowHeaders, state);
-                            comps.push(row);
+                            let row: Comp = null;
+                            // NOTE: This collapsesComps type thing is intentionally not done on the NodeCompTableRowLayout layout type
+                            // because if the user wants their Account root laid out in a grid just let them do that and show everything
+                            // without doing any collapsedComps.
+                            if (typeHandler && typeHandler.isSpecialAccountNode()) {
+                                row = new NodeCompRow(n, typeHandler, i, childCount, rowCount + 1, this.level, false, false, childrenImgSizes, this.allowHeaders, false, state);
+
+                                // I'm gonna be evil here and do this object without a type.
+                                collapsedComps.push({ comp: row, subOrdinal: typeHandler.subOrdinal() });
+                            }
+                            else {
+                                row = new NodeCompRow(n, typeHandler, i, childCount, rowCount + 1, this.level, false, false, childrenImgSizes, this.allowHeaders, true, state);
+                                comps.push(row);
+                            }
                         }
 
                         rowCount++;
@@ -107,6 +120,15 @@ export class NodeCompVerticalRowLayout extends Div {
                     }
                 }
             }
+        }
+
+        if (collapsedComps.length > 0) {
+            // put them in subOrdinal order on the page.
+            collapsedComps.sort((a: any, b: any) => a.subOrdinal - b.subOrdinal);
+
+            comps.push(new CollapsiblePanel("Other Account Nodes", "Hide", null, collapsedComps.map((c: any) => c.comp), false, (s: boolean) => {
+                state.otherAccountNodesExpanded = s;
+            }, state.otherAccountNodesExpanded, "marginAll", "specialAccountNodesPanel"));
         }
 
         this.setChildren(comps);

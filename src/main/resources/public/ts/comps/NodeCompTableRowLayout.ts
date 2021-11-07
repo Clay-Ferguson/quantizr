@@ -8,7 +8,6 @@ import { Singletons } from "../Singletons";
 import { Comp } from "../widget/base/Comp";
 import { Button } from "../widget/Button";
 import { Div } from "../widget/Div";
-import { IconButton } from "../widget/IconButton";
 import { NodeCompRow } from "./NodeCompRow";
 
 let S: Singletons;
@@ -70,7 +69,7 @@ export class NodeCompTableRowLayout extends Div {
                 }
                 else {
                     lastNode = n;
-                    let row: Comp = new NodeCompRow(n, i, childCount, rowCount + 1, this.level, true, this.allowNodeMove, childrenImgSizes, this.allowHeaders, state);
+                    let row: Comp = new NodeCompRow(n, typeHandler, i, childCount, rowCount + 1, this.level, true, this.allowNodeMove, childrenImgSizes, this.allowHeaders, true, state);
                     comps.push(row);
                 }
 

@@ -518,7 +518,7 @@ a {
 }
 
 .treeFriendImage {
-    max-width: 120px;
+    max-width: 70px;
     cursor: pointer;
     border: 2px solid $nodeBorderBottomColor;
     margin: 0 10px 0px 10px;
@@ -1023,6 +1023,10 @@ Will come back later and study this more. todo-1 */
     margin-top: $bigGap; 
 }
 
+.bigMarginLeft {
+    margin-left: $bigGap; 
+}
+
 .anchorBigMarginBottom {
     display: inline-block;
     margin-bottom: $smallGap; 
@@ -1240,6 +1244,12 @@ Will come back later and study this more. todo-1 */
     cursor: pointer;
     /* background: lightGray; */
     padding-bottom: 5px;
+}
+
+.specialAccountNodesPanel {
+    border: 1px solid $nodeBorderBottomColor;
+    border-radius: $border-radius;
+    padding-left: $smallGap;
 }
 
 .ace-edit-panel {

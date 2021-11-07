@@ -22,4 +22,8 @@ export interface TypeHandlerIntf {
     getAllowUserSelect(): boolean;
     hasCustomProp(prop: string): boolean;
     getEditorHelp(): string;
+    isSpecialAccountNode(): boolean;
+
+    // for sorting on client side (namely for items packaged in a collapsable panel on account root page.)
+    subOrdinal(): number;
 }

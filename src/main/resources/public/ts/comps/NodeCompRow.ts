@@ -28,17 +28,17 @@ export class NodeCompRow extends Div {
     /* we have this flag so we can turn off buttons to troubleshoot performance. */
     static showButtonBar: boolean = true;
 
-    constructor(public node: J.NodeInfo, public index: number, public count: number, public rowCount: number, public level: number,
+    constructor(public node: J.NodeInfo, typeHandler: TypeHandlerIntf, public index: number, public count: number, public rowCount: number, public level: number,
         public isTableCell: boolean, public allowNodeMove: boolean, public imgSizeOverride: string, private allowHeaders: boolean,
-        appState: AppState) {
+        public allowInlineInsertButton: boolean, appState: AppState) {
         super(null, {
             id: S.nav._UID_ROWID_PREFIX + node.id
             // WARNING: Leave this tabIndex here. it's required for focsing/scrolling
             // tabIndex: "-1"
         });
 
-        /* If we're in edit mode allow dragging */
-        if (appState.userPreferences.editMode && !appState.inlineEditId) {
+        /* If we're in edit mode allow dragging. Note nodes with subOrdinals can't be dragged */
+        if ((typeHandler == null || typeHandler.subOrdinal() === -1) && appState.userPreferences.editMode && !appState.inlineEditId) {
             this.attribs.draggable = "true";
             this.attribs.onDragStart = this.dragStart;
             this.attribs.onDragEnd = this.dragEnd;
@@ -86,13 +86,13 @@ export class NodeCompRow extends Div {
 
             let isPageRootNode = state.node && this.node.id === state.node.id;
 
-            if (!state.editNode && !isPageRootNode && this.level === 1 && insertAllowed && S.edit.isInsertAllowed(node, state)) {
+            if (this.allowInlineInsertButton && !state.editNode && !isPageRootNode && this.level === 1 && insertAllowed && S.edit.isInsertAllowed(node, state)) {
 
-                // todo-1: this button should have same enabelement as "new" button, on the page root ???
+                // todo-1: this button should have same enablement as "new" button, on the page root ???
                 insertInlineButton = new Div(null, { className: "marginLeft" }, [
                     new Button(null, e => {
-                                 S.edit.insertNode(node.id, "u", 0 /* isFirst ? 0 : 1 */, state);
-                             }, {
+                        S.edit.insertNode(node.id, "u", 0 /* isFirst ? 0 : 1 */, state);
+                    }, {
                         iconclass: "fa fa-plus",
                         title: "Insert new node" + (this.isTableCell ? " (above this one)" : "")
                     }, "btn-secondary " + (this.isTableCell ? "" : "plusButtonFloatRight"))
