@@ -26,7 +26,6 @@ export class View implements ViewIntf {
         if (C.DEBUG_SCROLLING) {
             console.log("view.jumpToId");
         }
-        // todo-0: should this scrollToTop be true ?
         this.refreshTree(id, true, true, id, false, false, true, true, state);
     }
 

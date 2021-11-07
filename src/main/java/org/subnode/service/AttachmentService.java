@@ -174,8 +174,6 @@ public class AttachmentService {
 			 * problem, so we don't need to do it in advance in here as we do for multiple file uploads only.
 			 * 
 			 * Also we only do this check if not admin. Admin can upload unlimited amounts.
-			 * 
-			 * todo-0: don't we need to also run this even if ONE file being uploaded?
 			 */
 			if (!session.isAdmin() && uploadFiles.length > 1) {
 				final SubNode userNode = read.getUserNodeByUserName(null, null);

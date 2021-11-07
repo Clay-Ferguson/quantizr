@@ -432,7 +432,7 @@ export class Quanta implements QuantaIntf {
                 Log.log("POPSTATE: location: " + document.location + ", state: " + JSON.stringify(event.state));
 
                 if (event.state && event.state.nodeId) {
-                    S.view.refreshTree(event.state.nodeId, true, true, event.state.highlightId, false, false /* <---- todo-0: test, if this should be true */, true, true, store.getState());
+                    S.view.refreshTree(event.state.nodeId, true, true, event.state.highlightId, false, false, true, true, store.getState());
                     this.selectTab(C.TAB_MAIN);
                 }
             };

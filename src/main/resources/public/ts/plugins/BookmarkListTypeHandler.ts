@@ -27,8 +27,6 @@ export class BookmarkListTypeHandler extends TypeBase {
         return true;
     }
 
-    // todo-0: use a non-"-1" value here to stop this node from
-    // participating in any "drag-n-drop" (for all nodes)
     subOrdinal(): number {
         return 1;
     }
