@@ -72,10 +72,6 @@ export class Render implements RenderIntf {
         let imgInline = "<img class=\"img-block\" width=\"{{imgSize}}\" src=\"{{imgUrl}}\">";
         val = S.util.replaceAll(val, "{{img}}", imgInline);
 
-        if (val.indexOf("{{paypal-button}}") !== -1) {
-            val = S.util.replaceAll(val, "{{paypal-button}}", C.PAY_PAL_BUTTON);
-        }
-
         let imgSize = S.props.getNodePropVal(J.NodeProp.IMG_SIZE, node);
         // actual size prop is saved as "0"
         if (imgSize && imgSize !== "0") {
