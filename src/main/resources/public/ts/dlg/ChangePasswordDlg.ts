@@ -92,7 +92,7 @@ export class ChangePasswordDlg extends DialogBase {
                     if (this.passCode) {
                         window.location.href = window.location.origin + "/app";
                     }
-                }, null, false, 0, this.appState
+                }, null, false, 0, null, this.appState
             );
             dlg.open();
         }

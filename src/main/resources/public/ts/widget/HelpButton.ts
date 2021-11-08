@@ -36,7 +36,7 @@ export class HelpButton extends Comp {
                 // content = content.replace("\n\n", "[nl]");
                 // content = content.replace("\n", " ");
                 // content = content.replace("[nl]", "\n\n");
-                new MessageDlg(null, title, null, new Markdown(content), false, 0, store.getState()).open();
+                new MessageDlg(null, title, null, new Markdown(content), false, 0, null, store.getState()).open();
             }
         }
     }

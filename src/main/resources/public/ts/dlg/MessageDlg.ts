@@ -12,8 +12,8 @@ import { TextContent } from "../widget/TextContent";
 export class MessageDlg extends DialogBase {
 
     constructor(private message: string, title: string, private callback: Function, private customWidget: Comp, private preformatted: boolean,
-        private flashTimeout: number, state: AppState) {
-        super(title, null, false, state);
+        private flashTimeout: number, classOverride: string, state: AppState) {
+        super(title, classOverride, false, state);
 
         if (this.flashTimeout > 0) {
             setTimeout(() => {

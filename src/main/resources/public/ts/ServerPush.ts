@@ -7,7 +7,6 @@ import { TabDataIntf } from "./intf/TabDataIntf";
 import * as J from "./JavaIntf";
 import { PubSub } from "./PubSub";
 import { Singletons } from "./Singletons";
-import { FeedView } from "./tabs/FeedView";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (s: Singletons) => {
@@ -53,13 +52,39 @@ export class ServerPush implements ServerPushIntf {
             // S.nav.login(state);
             // window.location.href = window.location.origin + "/app";
 
-            let dlg = new MessageDlg("Session timed out.", "Quanta",
+            new MessageDlg("Session ended.", "Quanta",
                 () => {
                     // todo-1: need to look for places we should do this instead of the location.href in order to preserve url
                     history.go(0);
-                }, null, false, 0, state
-            );
-            dlg.open();
+                }, null, false, 0, "app-modal-content-tiny-width", state
+            ).open();
+
+            // ========== BEGIN: ==========
+            // todo-1
+            // If client knows what the timeout time is, it can theoretically run this code
+            // every .9 of that intervial, and check the current time against the last known ajax call time, and then
+            // prompt the user to continue with the session
+            // let waitSeconds = 30;
+            // let userAlive = false;
+            // new ConfirmDlg("Keep session open?", null, //
+            //     // User will have waitSeconds seconds to click yes.
+            //     () => {
+            //         userAlive = true;
+            //         S.util.ajax<any, any>("ping", {});
+            //     },
+            //     // User says no reload page immeidately
+            //     () => {
+            //         window.location.href = window.location.origin;
+            //     }, null, null, state
+            // ).open();
+            // // wait for waitSeconds more seconds for user to confirm.
+            // setTimeout(() => {
+            //     if (!userAlive) {
+            //         window.location.href = window.location.origin;
+            //     }
+            // }, waitSeconds * 1000);
+            // // history.go(0);
+            // ========== END ==========
         });
 
         this.eventSource.addEventListener("nodeEdited", (e: any) => {

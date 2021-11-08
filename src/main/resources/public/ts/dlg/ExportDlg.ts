@@ -108,7 +108,7 @@ export class ExportDlg extends DialogBase {
                         }
                     }) : null,
                     res.ipfsMime ? new Div("mime type: " + res.ipfsMime) : null
-                ]), false, 0, this.appState
+                ]), false, 0, null, this.appState
             ).open();
 
             S.view.scrollToSelectedNode(this.appState);

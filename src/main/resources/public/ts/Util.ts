@@ -612,7 +612,6 @@ export class Util implements UtilIntf {
                         //     // window.onbeforeunload = null;
                         //     // window.location.href = window.location.origin;
                         //     // await S.localDB.setVal(cnst.LOCALDB_LOGIN_STATE, "0");
-
                         //     // NOTE: This opens the login dialog. Requires user to click login before attempting a login.
                         //     S.nav.login(state);
                         // }, 200);
@@ -735,11 +734,11 @@ export class Util implements UtilIntf {
     }
 
     flashMessage = (message: string, title: string, preformatted: boolean = false, sizeStyle: string = null): void => {
-        new MessageDlg(message, title, null, null, preformatted, 3000, null).open();
+        new MessageDlg(message, title, null, null, preformatted, 3000, null, null).open();
     }
 
     showMessage = (message: string, title: string, preformatted: boolean = false, sizeStyle: string = null): Promise<DialogBase> => {
-        return new MessageDlg(message, title, null, null, preformatted, 0, null).open();
+        return new MessageDlg(message, title, null, null, preformatted, 0, null, null).open();
     }
 
     addAllToSet = (set: Set<string>, array): void => {

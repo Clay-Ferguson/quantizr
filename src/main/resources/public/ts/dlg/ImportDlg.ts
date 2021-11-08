@@ -53,7 +53,7 @@ export class ImportDlg extends DialogBase {
 
         let hltNode = S.quanta.getHighlightedNode(this.appState);
         if (!hltNode) {
-            new MessageDlg("Select a node to import into.", "Import", null, null, false, 0, this.appState).open();
+            new MessageDlg("Select a node to import into.", "Import", null, null, false, 0, null, this.appState).open();
             return;
         }
 
@@ -67,7 +67,7 @@ export class ImportDlg extends DialogBase {
 
     importResponse = (res: J.ImportResponse): void => {
         if (S.util.checkSuccess("Import", res)) {
-            new MessageDlg("Import Successful", "Import", null, null, false, 0, this.appState).open();
+            new MessageDlg("Import Successful", "Import", null, null, false, 0, null, this.appState).open();
 
             S.view.refreshTree(null, false, false, null, false, true, true, true, store.getState());
             S.view.scrollToSelectedNode(this.appState);

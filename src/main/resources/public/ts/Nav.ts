@@ -307,12 +307,12 @@ export class Nav implements NavIntf {
                                 S.util.copyToClipboard(googleUrl);
                                 S.util.flashMessage("Copied to Clipboard: " + googleUrl, "Clipboard", true);
                             })])
-                    ]), false, 0, state
+                    ]), false, 0, null, state
                 ).open();
             });
         }
         else {
-            new MessageDlg("GeoLocation is not available on this device.", "Message", null, null, false, 0, state).open();
+            new MessageDlg("GeoLocation is not available on this device.", "Message", null, null, false, 0, null, state).open();
         }
     }
 

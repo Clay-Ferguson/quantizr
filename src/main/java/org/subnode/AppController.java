@@ -1425,6 +1425,7 @@ public class AppController implements ErrorController {
 	@RequestMapping(value = API_PATH + "/ping", method = RequestMethod.POST)
 	public @ResponseBody Object ping(@RequestBody PingRequest req, HttpSession session) {
 		return callProc.run("ping", req, session, ms -> {
+			// log.debug("ping from browser");
 			PingResponse res = new PingResponse();
 			res.setServerInfo("Server: t=" + System.currentTimeMillis());
 			res.setSuccess(true);

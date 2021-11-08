@@ -55,7 +55,7 @@ export class Search implements SearchIntf {
                 });
             }
             else {
-                new MessageDlg("No search results found for " + type + " shared nodes", "Search", null, null, false, 0, state).open();
+                new MessageDlg("No search results found for " + type + " shared nodes", "Search", null, null, false, 0, null, state).open();
             }
         });
     }
@@ -105,7 +105,7 @@ export class Search implements SearchIntf {
                 });
             }
             else {
-                new MessageDlg("No search results found.", "Search", null, null, false, 0, state).open();
+                new MessageDlg("No search results found.", "Search", null, null, false, 0, null, state).open();
             }
         });
     }
@@ -346,7 +346,7 @@ export class Search implements SearchIntf {
                 });
             }
             else {
-                new MessageDlg("No search results found.", "Followers", null, null, false, 0, state).open();
+                new MessageDlg("No search results found.", "Followers", null, null, false, 0, null, state).open();
             }
         });
     }
@@ -388,7 +388,7 @@ export class Search implements SearchIntf {
                 });
             }
             else {
-                new MessageDlg("No search results found.", "Following", null, null, false, 0, state).open();
+                new MessageDlg("No search results found.", "Following", null, null, false, 0, null, state).open();
             }
         });
     }

@@ -360,7 +360,7 @@ export class Render implements RenderIntf {
                 }));
         }
 
-        dlgHolder.dlg = new MessageDlg(null, "Node URLs", null, new Div(null, null, children), false, 0, null);
+        dlgHolder.dlg = new MessageDlg(null, "Node URLs", null, new Div(null, null, children), false, 0, null, null);
         dlgHolder.dlg.open();
     }
 
