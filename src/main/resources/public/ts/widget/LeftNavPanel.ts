@@ -30,7 +30,8 @@ export class LeftNavPanel extends Div {
         this.domAddEvent = this.domAddEvent.bind(this);
         this.domPreUpdateEvent = this.domPreUpdateEvent.bind(this);
         let state: AppState = store.getState();
-        let delta = state.mainPanelCols === 4 ? 1 : 0;
+        let panelCols = state.userPreferences.mainPanelCols || 5;
+        let delta = panelCols === 4 ? 1 : 0;
         this.attribs.className = "col-" + (C.leftNavPanelCols + delta) + " leftNavPanel customScrollbar";
     }
 

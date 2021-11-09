@@ -659,6 +659,9 @@ public class UserManagerService {
 			boolean rssHeadingsOnly = reqUserPrefs.isRssHeadlinesOnly();
 			prefsNode.setProp(NodeProp.USER_PREF_RSS_HEADINGS_ONLY.s(), rssHeadingsOnly);
 
+			Long v = reqUserPrefs.getMainPanelCols();
+			prefsNode.setProp(NodeProp.USER_PREF_MAIN_PANEL_COLS.s(), v);
+
 			/*
 			 * Also update session-scope object, because server-side functions that need preference information
 			 * will get it from there instead of loading it from repository. The only time we load user
@@ -938,6 +941,13 @@ public class UserManagerService {
 				maxFileSize = Const.DEFAULT_USER_QUOTA;
 			}
 			userPrefs.setMaxUploadFileSize(maxFileSize);
+
+			long mainPanelCols = prefsNode.getIntProp(NodeProp.USER_PREF_MAIN_PANEL_COLS.s());
+			if (mainPanelCols == 0) {
+				mainPanelCols = 5;
+			}
+			userPrefs.setMainPanelCols(mainPanelCols);
+
 			return null;
 		});
 

@@ -423,6 +423,14 @@ export class Edit implements EditIntf {
         S.view.scrollToSelectedNode(state);
     }
 
+    setMainPanelCols = (val: number): void => {
+        setTimeout(() => {
+            let state = store.getState();
+            state.userPreferences.mainPanelCols = val;
+            S.quanta.saveUserPreferences(state);
+        }, 100);
+    };
+
     setMetadataOption = (val: boolean): void => {
         setTimeout(() => {
             let state = store.getState();

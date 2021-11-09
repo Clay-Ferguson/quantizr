@@ -79,7 +79,8 @@ export class AppState {
         showMetaData: false,
         rssHeadlinesOnly: true,
         maxUploadFileSize: 0,
-        enableIPSM: false
+        enableIPSM: false,
+        mainPanelCols: 5
     };
 
     userProfile: J.UserProfile = null;
@@ -120,7 +121,6 @@ export class AppState {
     // being able to click 'more...' button to page thru a feed.
     rssFeedPage = {};
 
-    mainPanelCols: number = 5;
     bookmarks: J.Bookmark[];
     editNode: J.NodeInfo;
     editNodeOnTab: string; // holds the tab name of the tab responsible for any current embed edit of 'editNode'

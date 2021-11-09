@@ -9,6 +9,7 @@ public class UserPreferences {
 	private boolean editMode;
 	private boolean showMetaData;
 	private boolean rssHeadlinesOnly;
+	private long mainPanelCols = 5;
 
 	// not persisted to DB yet. (todo-1)
 	@JsonProperty(required = false)
@@ -57,5 +58,15 @@ public class UserPreferences {
 	@JsonProperty(required = false)
 	public void setMaxUploadFileSize(long maxUploadFileSize) {
 		this.maxUploadFileSize = maxUploadFileSize;
+	}
+
+	@JsonProperty(required = false)
+	public long getMainPanelCols() {
+		return mainPanelCols;
+	}
+
+	@JsonProperty(required = false)
+	public void setMainPanelCols(long mainPanelCols) {
+		this.mainPanelCols = mainPanelCols;
 	}
 }

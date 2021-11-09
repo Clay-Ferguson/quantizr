@@ -31,8 +31,9 @@ export class RightNavPanel extends Div {
             tabIndex: "3"
         });
         let state: AppState = store.getState();
-        let delta = state.mainPanelCols === 4 ? -1 : 0;
-        let cols = 12 - Constants.leftNavPanelCols - state.mainPanelCols + delta;
+        let panelCols = state.userPreferences.mainPanelCols || 5;
+        let delta = panelCols === 4 ? -1 : 0;
+        let cols = 12 - Constants.leftNavPanelCols - state.userPreferences.mainPanelCols + delta;
         this.attribs.className = "col-" + cols + " rightNavPanel customScrollbar";
     }
 
@@ -68,6 +69,8 @@ export class RightNavPanel extends Div {
             title: "Create new Note (under Notes node)"
         }, "btn-secondary", "off") : null;
 
+        let panelCols = state.userPreferences.mainPanelCols || 5;
+
         this.setChildren([
             new Div(null, { className: "float-left" }, [
                 new Div(null, { className: "rightNavPanelInner" }, [
@@ -97,22 +100,22 @@ export class RightNavPanel extends Div {
 
                     new Div(null, { className: "marginBottom" }, [
                         new ButtonBar([
-                            state.mainPanelCols > 4 ? new IconButton("fa-caret-left", null, {
+                            panelCols > 4 ? new IconButton("fa-caret-left", null, {
                                 className: "widthAdjustLink",
                                 title: "Narrower view",
                                 onClick: () => {
                                     dispatch("Action_widthAdjust", (s: AppState): AppState => {
-                                        s.mainPanelCols--;
+                                        S.edit.setMainPanelCols(--s.userPreferences.mainPanelCols);
                                         return s;
                                     });
                                 }
                             }) : null,
-                            state.mainPanelCols < 7 ? new IconButton("fa-caret-right", null, {
+                            panelCols < 7 ? new IconButton("fa-caret-right", null, {
                                 className: "widthAdjustLink",
                                 title: "Wider view",
                                 onClick: () => {
                                     dispatch("Action_widthAdjust", (s: AppState): AppState => {
-                                        s.mainPanelCols++;
+                                        S.edit.setMainPanelCols(++s.userPreferences.mainPanelCols);
                                         return s;
                                     });
                                 }

@@ -789,6 +789,7 @@ export interface UserPreferences {
     editMode: boolean;
     showMetaData: boolean;
     rssHeadlinesOnly: boolean;
+    mainPanelCols: number;
     enableIPSM: boolean;
     maxUploadFileSize: number;
 }
@@ -866,6 +867,7 @@ export const enum NodeProp {
     USER_PREF_SHOW_METADATA = "sn:showMetaData",
     USER_PREF_PASSWORD_RESET_AUTHCODE = "sn:pwdResetAuth",
     USER_PREF_RSS_HEADINGS_ONLY = "sn:rssHeadingsOnly",
+    USER_PREF_MAIN_PANEL_COLS = "sn:mainPanelCols",
     SIGNUP_PENDING = "sn:signupPending",
     EMAIL_CONTENT = "sn:content",
     EMAIL_RECIP = "sn:recip",

@@ -25,7 +25,8 @@ export class TabPanel extends Div {
         }
         else {
             let state: AppState = store.getState();
-            this.attribs.className = "col-" + state.mainPanelCols + " tabPanel";
+            let panelCols = state.userPreferences.mainPanelCols || 5;
+            this.attribs.className = "col-" + panelCols + " tabPanel";
         }
     }
 

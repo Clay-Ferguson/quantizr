@@ -50,6 +50,7 @@ export class PrefsDlg extends DialogBase {
                     editMode: this.appState.userPreferences.editMode,
                     showMetaData: this.appState.userPreferences.showMetaData,
                     rssHeadlinesOnly: this.appState.userPreferences.rssHeadlinesOnly,
+                    mainPanelCols: this.appState.userPreferences.mainPanelCols,
                     maxUploadFileSize: -1,
                     enableIPSM: false // we never need to enable this here. Only the menu can trigger it to set for now.
                 }

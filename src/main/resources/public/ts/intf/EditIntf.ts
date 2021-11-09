@@ -21,6 +21,7 @@ export interface EditIntf {
     toggleEditMode(state: AppState): void;
     setRssHeadlinesOnly(state: AppState, val: boolean): Promise<void>;
     toggleShowMetaData(state: AppState): void;
+    setMainPanelCols(val: number): void;
     moveNodeUp(evt: Event, id: string, state?: AppState): void;
     moveNodeDown(evt: Event, id: string, state?: AppState): void;
     moveNodeToTop(id: string, state: AppState): void;
