@@ -81,25 +81,21 @@ export class Attachment implements AttachmentIntf {
     };
 
     deleteAttachment = async (node: J.NodeInfo, state: AppState): Promise<boolean> => {
-        let deleted = false;
         node = node || S.quanta.getHighlightedNode(state);
-        let delPromise: Promise<any> = null;
+
         if (node) {
-            const dlg = new ConfirmDlg("Delete the Attachment on the Node?", "Confirm", //
-                () => {
-                    delPromise = S.util.ajax<J.DeleteAttachmentRequest, J.DeleteAttachmentResponse>("deleteAttachment", {
-                        nodeId: node.id
-                    }, (res: J.DeleteAttachmentResponse): void => {
-                        deleted = true;
-                    });
-                }, null, null, null, state
+            let dlg = new ConfirmDlg("Delete the Attachment on the Node?", "Confirm", //
+                null, null, null, null, state
             );
             await dlg.open();
-            if (delPromise) {
-                await delPromise;
+            if (dlg.yes) {
+                await S.util.ajax<J.DeleteAttachmentRequest, J.DeleteAttachmentResponse>("deleteAttachment", {
+                    nodeId: node.id
+                });
             }
+            return dlg.yes;
         }
-        return deleted;
+        return false;
     };
 
     removeBinaryProperties = (node: J.NodeInfo) => {

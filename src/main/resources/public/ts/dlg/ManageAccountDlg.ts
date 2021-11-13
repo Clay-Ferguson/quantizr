@@ -48,35 +48,31 @@ export class ManageAccountDlg extends DialogBase {
         ];
     }
 
-    preLoad(): Promise<void> {
-        return new Promise<void>((resolve, reject) => {
-            S.util.ajax<J.GetUserAccountInfoRequest, J.GetUserAccountInfoResponse>("getUserAccountInfo", null,
-                (res: J.GetUserAccountInfoResponse) => {
-                    let used = "";
-                    if (res.binQuota <= 0) {
-                        res.binQuota = 20 * 1024 * 1024;
-                    }
-                    if (res.binQuota > 0) {
-                        if (res.binTotal < 10) {
-                            used = "0%";
-                        }
-                        else {
-                            used = (res.binTotal * 100 / res.binQuota).toFixed(1) + "%";
-                        }
-                    }
+    async preLoad(): Promise<void> {
+        let res: J.GetUserAccountInfoResponse = await S.util.ajax<J.GetUserAccountInfoRequest, J.GetUserAccountInfoResponse>("getUserAccountInfo", null);
 
-                    let info = //
-                        "Your Storage Quota: " + S.util.formatMemory(res.binQuota) + "\n" +//
-                        "Storage Used: " + S.util.formatMemory(res.binTotal) + "\n" +//
-                        "Percent Used: " + used;
+        let used = "";
+        if (res.binQuota <= 0) {
+            res.binQuota = 20 * 1024 * 1024;
+        }
+        if (res.binQuota > 0) {
+            if (res.binTotal < 10) {
+                used = "0%";
+            }
+            else {
+                used = (res.binTotal * 100 / res.binQuota).toFixed(1) + "%";
+            }
+        }
 
-                    this.mergeState({
-                        info,
-                        binQuota: res.binQuota,
-                        binTotal: res.binTotal
-                    });
-                    resolve();
-                }, () => resolve());
+        let info = //
+            "Your Storage Quota: " + S.util.formatMemory(res.binQuota) + "\n" +//
+            "Storage Used: " + S.util.formatMemory(res.binTotal) + "\n" +//
+            "Percent Used: " + used;
+
+        this.mergeState({
+            info,
+            binQuota: res.binQuota,
+            binTotal: res.binTotal
         });
     }
 

@@ -463,7 +463,7 @@ export class Util implements UtilIntf {
     ajax = <RequestType extends J.RequestBase, ResponseType>(postName: string, postData: RequestType, //
         callback?: (response: ResponseType) => void, //
         failCallback?: (info: string) => void,
-        background: boolean = false): Promise<any> => {
+        background: boolean = false): Promise<ResponseType> => {
         postData = postData || {} as RequestType;
         let reqPromise: Promise<ResponseType> = null;
 
@@ -561,12 +561,8 @@ export class Util implements UtilIntf {
                                 this.showMessage(data.message, "Message");
                             }
 
-                            // if (response.data.errorType === J.ErrorType.TIMEOUT) {
-                            // }
                             return;
                         }
-                        // WARNING: this looks like the right place for a return but does NOT work. Be careful.
-                        // return;
                     }
 
                     if (this.logAjax) {

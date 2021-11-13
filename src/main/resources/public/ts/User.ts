@@ -252,29 +252,27 @@ export class User implements UserIntf {
     }
 
     checkMessages = async (): Promise<void> => {
-        S.util.ajax<J.CheckMessagesRequest, J.CheckMessagesResponse>("checkMessages", {
-        }, (res: J.CheckMessagesResponse): void => {
-            // console.log("Response: " + S.util.prettyPrint(res));
-            if (res) {
-                dispatch("Action_SetNewMessageCount", (s: AppState): AppState => {
-                    s.newMessageCount = res.numNew;
-                    return s;
-                });
-            }
+        let res: J.CheckMessagesResponse = await S.util.ajax<J.CheckMessagesRequest, J.CheckMessagesResponse>("checkMessages", {
         });
+        if (res) {
+            dispatch("Action_SetNewMessageCount", (s: AppState): AppState => {
+                s.newMessageCount = res.numNew;
+                return s;
+            });
+        }
     }
 
     queryUserProfile = async (userId: string): Promise<void> => {
-        S.util.ajax<J.GetUserProfileRequest, J.GetUserProfileResponse>("getUserProfile", {
+        let res: J.GetUserProfileResponse = await S.util.ajax<J.GetUserProfileRequest, J.GetUserProfileResponse>("getUserProfile", {
             userId
-        }, (res: J.GetUserProfileResponse): void => {
-            // console.log("queryUserProfile Response: " + S.util.prettyPrint(res));
-            if (res && res.userProfile) {
-                dispatch("Action_SetUserProfile", (s: AppState): AppState => {
-                    s.userProfile = res.userProfile;
-                    return s;
-                });
-            }
         });
+
+        // console.log("queryUserProfile Response: " + S.util.prettyPrint(res));
+        if (res?.userProfile) {
+            dispatch("Action_SetUserProfile", (s: AppState): AppState => {
+                s.userProfile = res.userProfile;
+                return s;
+            });
+        }
     }
 }
