@@ -48,10 +48,13 @@ export interface UtilIntf {
     getHostAndPort(): string;
     getRpcPath(): string;
     getRemoteHost(): string;
+
+    // todo-0: both callbacks can now be eliminated with async/await
     ajax<RequestBase, ResponseType>(postName: string, postData: RequestBase,
         callback?: (response: ResponseType) => void,
         failCallback?: (response: string) => void,
         background?: boolean): Promise<any>;
+
     logAndThrow(message: string);
     logAndReThrow(message: string, exception: any);
     ajaxReady(requestName): boolean;

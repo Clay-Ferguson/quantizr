@@ -251,36 +251,30 @@ export class User implements UserIntf {
         }
     }
 
-    checkMessages = (): Promise<void> => {
-        return new Promise<void>((resolve, reject) => {
-            S.util.ajax<J.CheckMessagesRequest, J.CheckMessagesResponse>("checkMessages", {
-            }, (res: J.CheckMessagesResponse): void => {
-                // console.log("Response: " + S.util.prettyPrint(res));
-                if (res) {
-                    dispatch("Action_SetNewMessageCount", (s: AppState): AppState => {
-                        s.newMessageCount = res.numNew;
-                        return s;
-                    });
-                }
-                resolve();
-            }, () => resolve());
+    checkMessages = async (): Promise<void> => {
+        S.util.ajax<J.CheckMessagesRequest, J.CheckMessagesResponse>("checkMessages", {
+        }, (res: J.CheckMessagesResponse): void => {
+            // console.log("Response: " + S.util.prettyPrint(res));
+            if (res) {
+                dispatch("Action_SetNewMessageCount", (s: AppState): AppState => {
+                    s.newMessageCount = res.numNew;
+                    return s;
+                });
+            }
         });
     }
 
-    queryUserProfile = (userId: string): Promise<void> => {
-        return new Promise<void>((resolve, reject) => {
-            S.util.ajax<J.GetUserProfileRequest, J.GetUserProfileResponse>("getUserProfile", {
-                userId
-            }, (res: J.GetUserProfileResponse): void => {
-                // console.log("queryUserProfile Response: " + S.util.prettyPrint(res));
-                if (res && res.userProfile) {
-                    dispatch("Action_SetUserProfile", (s: AppState): AppState => {
-                        s.userProfile = res.userProfile;
-                        return s;
-                    });
-                }
-                resolve();
-            }, () => resolve());
+    queryUserProfile = async (userId: string): Promise<void> => {
+        S.util.ajax<J.GetUserProfileRequest, J.GetUserProfileResponse>("getUserProfile", {
+            userId
+        }, (res: J.GetUserProfileResponse): void => {
+            // console.log("queryUserProfile Response: " + S.util.prettyPrint(res));
+            if (res && res.userProfile) {
+                dispatch("Action_SetUserProfile", (s: AppState): AppState => {
+                    s.userProfile = res.userProfile;
+                    return s;
+                });
+            }
         });
     }
 }

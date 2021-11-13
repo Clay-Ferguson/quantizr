@@ -144,7 +144,7 @@ export abstract class DialogBase<S extends BaseCompState = any> extends Div<S> i
     /* NOTE: preLoad is always forced to complete BEFORE any dialog GUI is allowed to render (excepet in EMBED mode) in case we need to
     get information from the server before displaying the dialog. This is optional. Many dialogs of course don't need to get data
     from the server before displaying */
-    preLoad(): Promise<void> {
+    async preLoad(): Promise<void> {
         return null;
     }
 

@@ -10,6 +10,6 @@ export interface UserIntf {
     logout(updateLocalDb: boolean, state: AppState): any;
     deleteAllUserLocalDbEntries(): any;
     loginResponse(res: J.LoginResponse, usr: string, pwd: string, usingLocalDb: boolean, state: AppState): any;
-    queryUserProfile(userId: string): Promise<void>;
-    checkMessages(): Promise<void>;
+    queryUserProfile(userId: string): void;
+    checkMessages(): void;
 }

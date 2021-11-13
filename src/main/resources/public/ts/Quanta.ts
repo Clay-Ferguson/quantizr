@@ -393,215 +393,211 @@ export class Quanta implements QuantaIntf {
     }
 
     initApp = async (): Promise<void> => {
-        return new Promise<void>(async (resolve, reject) => {
-            Log.log("initApp()");
+        Log.log("initApp()");
 
-            if (history.scrollRestoration) {
-                history.scrollRestoration = "manual";
-            }
+        if (history.scrollRestoration) {
+            history.scrollRestoration = "manual";
+        }
 
-            S.render.initMarkdown();
+        S.render.initMarkdown();
 
-            this.createAppTabs();
-            const state: AppState = store.getState();
-            state.pendingLocationHash = window.location.hash;
-            S.plugin.initPlugins();
+        this.createAppTabs();
+        const state: AppState = store.getState();
+        state.pendingLocationHash = window.location.hash;
+        S.plugin.initPlugins();
 
-            (window as any).addEvent = (object: any, type: any, callback: any) => {
-                if (object == null || typeof (object) === "undefined") {
-                    return;
-                }
-                if (object.addEventListener) {
-                    object.addEventListener(type, callback, false);
-                } else if (object.attachEvent) {
-                    object.attachEvent("on" + type, callback);
-                } else {
-                    object["on" + type] = callback;
-                }
-            };
-
-            // leaving for future reference. Currently not needed.
-            // window.onhashchange = function (e) {
-            // }
-
-            /*
-            NOTE: This works in conjunction with pushState, and is part of what it takes to make the back button (browser hisotry) work
-            in the context of SPAs
-            */
-            window.onpopstate = (event) => {
-                Log.log("POPSTATE: location: " + document.location + ", state: " + JSON.stringify(event.state));
-
-                if (event.state && event.state.nodeId) {
-                    S.view.refreshTree(event.state.nodeId, true, true, event.state.highlightId, false, false, true, true, store.getState());
-                    this.selectTab(C.TAB_MAIN);
-                }
-            };
-
-            /* We have to run this timer to wait for document.body to exist becasue we load our JS in the HTML HEAD
-            and we load in the head because we need our styling in place BEFORE the page renders or else you get that
-            well-known issue of a momentarily unstyled render before the page finishes loading */
-            const interval = setInterval(() => {
-                if (!document?.body) {
-                    console.log("Waiting for document.body");
-                    return;
-                }
-                clearInterval(interval);
-
-                document.body.addEventListener("click", function (e: any) {
-                    e = e || window.event;
-                    let target: HTMLElement = e.target;
-
-                    // Whenever something is clicked, forget the pending focus data
-                    Comp.focusElmId = null;
-                    // Log.log("document.body.click target.id=" + target.id);
-                }, false);
-
-                document.body.addEventListener("focusin", (e: any) => {
-                    // Log.log("focusin id=" + e.target.id);
-                    this.currentFocusId = e.target.id;
-                });
-
-                // This is a cool way of letting CTRL+UP, CTRL+DOWN scroll to next node.
-                // WARNING: even with tabIndex added none of the other DIVS react renders seem to be able to accept an onKeyDown event.
-                // Todo: before enabling this need to make sure 1) the Main Tab is selected and 2) No Dialogs are Open, because this WILL
-                // capture events going to dialogs / edit fields
-                document.body.addEventListener("keydown", (event: KeyboardEvent) => {
-                    // Log.log("keydown: " + event.code);
-                    let state: AppState = store.getState();
-
-                    switch (event.code) {
-                        case "ControlLeft":
-                            this.ctrlKey = true;
-                            this.ctrlKeyTime = new Date().getTime();
-                            break;
-                        case "Escape":
-                            if (S.quanta.fullscreenViewerActive(state)) {
-                                S.nav.closeFullScreenViewer(state);
-                            }
-
-                            break;
-
-                        // case "ArrowDown":
-                        //     if (this.keyDebounce()) return;
-                        //     state = store.getState();
-                        //     S.view.scrollRelativeToNode("down", state);
-                        //     break;
-
-                        // case "ArrowUp":
-                        //     if (this.keyDebounce()) return;
-                        //     state = store.getState();
-                        //     S.view.scrollRelativeToNode("up", state);
-                        //     break;
-
-                        case "ArrowLeft":
-                            if (this.keyDebounce()) return;
-                            // S.nav.navUpLevel();
-                            if (state.fullScreenViewId) {
-                                S.nav.prevFullScreenImgViewer(state);
-                            }
-                            break;
-
-                        case "ArrowRight":
-                            if (this.keyDebounce()) return;
-                            state = store.getState();
-                            // S.nav.navOpenSelectedNode(state);
-                            if (state.fullScreenViewId) {
-                                S.nav.nextFullScreenImgViewer(state);
-                            }
-                            break;
-
-                        default: break;
-                    }
-                    // }
-                });
-
-                document.body.addEventListener("keyup", (event: KeyboardEvent) => {
-                    switch (event.code) {
-                        case "ControlLeft":
-                            this.ctrlKey = false;
-                            this.ctrlKeyTime = -1;
-                            break;
-                        default: break;
-                    }
-                });
-            }, 250);
-
-            if (this.appInitialized) {
+        (window as any).addEvent = (object: any, type: any, callback: any) => {
+            if (object == null || typeof (object) === "undefined") {
                 return;
             }
+            if (object.addEventListener) {
+                object.addEventListener(type, callback, false);
+            } else if (object.attachEvent) {
+                object.attachEvent("on" + type, callback);
+            } else {
+                object["on" + type] = callback;
+            }
+        };
 
-            this.appInitialized = true;
+        // leaving for future reference. Currently not needed.
+        // window.onhashchange = function (e) {
+        // }
 
-            S.props.initConstants();
-            this.displaySignupMessage();
+        /*
+        NOTE: This works in conjunction with pushState, and is part of what it takes to make the back button (browser hisotry) work
+        in the context of SPAs
+        */
+        window.onpopstate = (event) => {
+            Log.log("POPSTATE: location: " + document.location + ", state: " + JSON.stringify(event.state));
 
-            window.addEventListener("orientationchange", () => {
-                // we force the page to re-render with an all new state.
-                dispatch("Action_orientationChange", (s: AppState): AppState => {
-                    return s;
-                });
+            if (event.state && event.state.nodeId) {
+                S.view.refreshTree(event.state.nodeId, true, true, event.state.highlightId, false, false, true, true, store.getState());
+                this.selectTab(C.TAB_MAIN);
+            }
+        };
+
+        /* We have to run this timer to wait for document.body to exist becasue we load our JS in the HTML HEAD
+        and we load in the head because we need our styling in place BEFORE the page renders or else you get that
+        well-known issue of a momentarily unstyled render before the page finishes loading */
+        const interval = setInterval(() => {
+            if (!document?.body) {
+                console.log("Waiting for document.body");
+                return;
+            }
+            clearInterval(interval);
+
+            document.body.addEventListener("click", function (e: any) {
+                e = e || window.event;
+                let target: HTMLElement = e.target;
+
+                // Whenever something is clicked, forget the pending focus data
+                Comp.focusElmId = null;
+                // Log.log("document.body.click target.id=" + target.id);
+            }, false);
+
+            document.body.addEventListener("focusin", (e: any) => {
+                // Log.log("focusin id=" + e.target.id);
+                this.currentFocusId = e.target.id;
             });
 
-            // not used. do not delete.
-            // window.addEventListener("resize", () => {
-            //     deviceWidth = window.innerWidth;
-            //     deviceHeight = window.innerHeight;
-            // });
+            // This is a cool way of letting CTRL+UP, CTRL+DOWN scroll to next node.
+            // WARNING: even with tabIndex added none of the other DIVS react renders seem to be able to accept an onKeyDown event.
+            // Todo: before enabling this need to make sure 1) the Main Tab is selected and 2) No Dialogs are Open, because this WILL
+            // capture events going to dialogs / edit fields
+            document.body.addEventListener("keydown", (event: KeyboardEvent) => {
+                // Log.log("keydown: " + event.code);
+                let state: AppState = store.getState();
 
-            // This works, but is not needed. do not delete.
-            // window.addEventListener("hashchange", function () {
-            //     Log.log("The hash has changed: hash=" + location.hash);
-            // }, false);
+                switch (event.code) {
+                    case "ControlLeft":
+                        this.ctrlKey = true;
+                        this.ctrlKeyTime = new Date().getTime();
+                        break;
+                    case "Escape":
+                        if (S.quanta.fullscreenViewerActive(state)) {
+                            S.nav.closeFullScreenViewer(state);
+                        }
 
-            this.initClickEffect();
+                        break;
 
-            // todo-2: actually this is a nuisance unless user is actually EDITING a node right now
-            // so until i make it able to detect if user is editing i'm removing this.
-            // do not delete.
-            // window.onbeforeunload = () => {
-            //     return "Leave [appName] ?";
-            // };
+                    // case "ArrowDown":
+                    //     if (this.keyDebounce()) return;
+                    //     state = store.getState();
+                    //     S.view.scrollRelativeToNode("down", state);
+                    //     break;
 
-            Log.log("creating App");
-            // This is the root react App component that contains the entire application
-            this.app = new App(); // new AppDemo
+                    // case "ArrowUp":
+                    //     if (this.keyDebounce()) return;
+                    //     state = store.getState();
+                    //     S.view.scrollRelativeToNode("up", state);
+                    //     break;
 
-            if ((window as any).__page === "index") {
-                this.app.updateDOM(store, "app");
-            }
-            else if ((window as any).__page === "welcome") {
-                let welcomePanel = new WelcomePanel();
-                welcomePanel.updateDOM(store, "welcomePanel");
-            }
+                    case "ArrowLeft":
+                        if (this.keyDebounce()) return;
+                        // S.nav.navUpLevel();
+                        if (state.fullScreenViewId) {
+                            S.nav.prevFullScreenImgViewer(state);
+                        }
+                        break;
 
-            /*
-             * This call checks the server to see if we have a session already, and gets back the login information from
-             * the session, and then renders page content, after that.
-             */
-            S.user.refreshLogin(store.getState());
+                    case "ArrowRight":
+                        if (this.keyDebounce()) return;
+                        state = store.getState();
+                        // S.nav.navOpenSelectedNode(state);
+                        if (state.fullScreenViewId) {
+                            S.nav.nextFullScreenImgViewer(state);
+                        }
+                        break;
 
-            S.util.initProgressMonitor();
-            this.processUrlParams(null);
-            this.setOverlay(false);
-            this.playAudioIfRequested();
+                    default: break;
+                }
+                // }
+            });
 
-            await S.util.ajax<J.GetConfigRequest, J.GetConfigResponse>("getConfig", {
-            },
-                (res: J.GetConfigResponse): void => {
-                    if (res.config) {
-                        S.quanta.config = res.config;
-                    }
-                });
+            document.body.addEventListener("keyup", (event: KeyboardEvent) => {
+                switch (event.code) {
+                    case "ControlLeft":
+                        this.ctrlKey = false;
+                        this.ctrlKeyTime = -1;
+                        break;
+                    default: break;
+                }
+            });
+        }, 250);
 
-            Log.log("initApp complete.");
-            this.enableMouseEffect();
+        if (this.appInitialized) {
+            return;
+        }
 
-            setTimeout(() => {
-                S.encryption.initKeys();
-            }, 1000);
+        this.appInitialized = true;
 
-            resolve();
+        S.props.initConstants();
+        this.displaySignupMessage();
+
+        window.addEventListener("orientationchange", () => {
+            // we force the page to re-render with an all new state.
+            dispatch("Action_orientationChange", (s: AppState): AppState => {
+                return s;
+            });
         });
+
+        // not used. do not delete.
+        // window.addEventListener("resize", () => {
+        //     deviceWidth = window.innerWidth;
+        //     deviceHeight = window.innerHeight;
+        // });
+
+        // This works, but is not needed. do not delete.
+        // window.addEventListener("hashchange", function () {
+        //     Log.log("The hash has changed: hash=" + location.hash);
+        // }, false);
+
+        this.initClickEffect();
+
+        // todo-2: actually this is a nuisance unless user is actually EDITING a node right now
+        // so until i make it able to detect if user is editing i'm removing this.
+        // do not delete.
+        // window.onbeforeunload = () => {
+        //     return "Leave [appName] ?";
+        // };
+
+        Log.log("creating App");
+        // This is the root react App component that contains the entire application
+        this.app = new App(); // new AppDemo
+
+        if ((window as any).__page === "index") {
+            this.app.updateDOM(store, "app");
+        }
+        else if ((window as any).__page === "welcome") {
+            let welcomePanel = new WelcomePanel();
+            welcomePanel.updateDOM(store, "welcomePanel");
+        }
+
+        /*
+         * This call checks the server to see if we have a session already, and gets back the login information from
+         * the session, and then renders page content, after that.
+         */
+        S.user.refreshLogin(store.getState());
+
+        S.util.initProgressMonitor();
+        this.processUrlParams(null);
+        this.setOverlay(false);
+        this.playAudioIfRequested();
+
+        await S.util.ajax<J.GetConfigRequest, J.GetConfigResponse>("getConfig", {
+        },
+            (res: J.GetConfigResponse): void => {
+                if (res.config) {
+                    S.quanta.config = res.config;
+                }
+            });
+
+        Log.log("initApp complete.");
+        this.enableMouseEffect();
+
+        setTimeout(() => {
+            S.encryption.initKeys();
+        }, 1000);
     }
 
     loadBookmarks = (): void => {

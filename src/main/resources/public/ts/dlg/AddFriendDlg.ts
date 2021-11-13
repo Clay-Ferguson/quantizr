@@ -50,9 +50,6 @@ export class AddFriendDlg extends DialogBase {
         return valid;
     }
 
-    preLoad = async () => {
-    }
-
     addFriend = (): void => {
         if (!this.validate()) {
             return;
