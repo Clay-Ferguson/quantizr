@@ -37,11 +37,12 @@ export class UploadFromTorrentDlg extends DialogBase {
         return children;
     }
 
-    upload = (): void => {
-        S.util.ajax<J.UploadFromTorrentRequest, J.UploadFromTorrentResponse>("uploadFromTorrent", {
+    upload = async () => {
+        let res: J.UploadFromTorrentResponse = await S.util.ajax<J.UploadFromTorrentRequest, J.UploadFromTorrentResponse>("uploadFromTorrent", {
             nodeId: this.nodeId,
             torrentId: this.urlState.getValue()
-        }, this.uploadFromTorrentResponse);
+        });
+        this.uploadFromTorrentResponse(res);
     }
 
     uploadFromTorrentResponse = (res: J.UploadFromTorrentResponse): void => {

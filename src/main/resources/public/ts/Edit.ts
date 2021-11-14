@@ -220,19 +220,16 @@ export class Edit implements EditIntf {
             if (dlg.yes) {
                 let clipboardText = await (navigator as any).clipboard.readText();
                 if (nodeInsertTarget) {
-                    S.util.ajax<J.InsertNodeRequest, J.InsertNodeResponse>("insertNode", {
+                    await S.util.ajax<J.InsertNodeRequest, J.InsertNodeResponse>("insertNode", {
                         pendingEdit: false,
                         parentId: parentNode.id,
                         targetOrdinal: nodeInsertTarget.ordinal + ordinalOffset,
                         newNodeName: "",
                         typeName: typeName || "u",
                         initialValue: clipboardText
-                    }, (res) => {
-                        S.quanta.tempDisableAutoScroll();
-                        S.quanta.refresh(state);
                     });
                 } else {
-                    S.util.ajax<J.CreateSubNodeRequest, J.CreateSubNodeResponse>("createSubNode", {
+                    await S.util.ajax<J.CreateSubNodeRequest, J.CreateSubNodeResponse>("createSubNode", {
                         pendingEdit: false,
                         nodeId: parentNode.id,
                         newNodeName: "",
@@ -242,25 +239,25 @@ export class Edit implements EditIntf {
                         typeLock: false,
                         properties: null,
                         shareToUserId: null
-                    }, (res) => {
-                        S.quanta.tempDisableAutoScroll();
-                        S.quanta.refresh(state);
                     });
                 }
+                S.quanta.tempDisableAutoScroll();
+                S.quanta.refresh(state);
             }
         }
         else {
             if (nodeInsertTarget) {
-                S.util.ajax<J.InsertNodeRequest, J.InsertNodeResponse>("insertNode", {
+                let res: J.InsertNodeResponse = await S.util.ajax<J.InsertNodeRequest, J.InsertNodeResponse>("insertNode", {
                     pendingEdit: true,
                     parentId: parentNode.id,
                     targetOrdinal: nodeInsertTarget.ordinal + ordinalOffset,
                     newNodeName: "",
                     typeName: typeName || "u",
                     initialValue: ""
-                }, (res) => { this.insertNodeResponse(res, state); });
+                });
+                this.insertNodeResponse(res, state);
             } else {
-                S.util.ajax<J.CreateSubNodeRequest, J.CreateSubNodeResponse>("createSubNode", {
+                let res: J.CreateSubNodeResponse = await S.util.ajax<J.CreateSubNodeRequest, J.CreateSubNodeResponse>("createSubNode", {
                     pendingEdit: true,
                     nodeId: parentNode.id,
                     newNodeName: "",
@@ -270,9 +267,8 @@ export class Edit implements EditIntf {
                     typeLock: false,
                     properties: null,
                     shareToUserId: null
-                }, (res) => {
-                    this.createSubNodeResponse(res, false, null, state);
                 });
+                this.createSubNodeResponse(res, false, null, state);
             }
         }
     }
@@ -352,50 +348,41 @@ export class Edit implements EditIntf {
         }
     }
 
-    refreshNodeFromServer = async (nodeId: string): Promise<J.NodeInfo> => {
+    refreshNodeFromServer = async (nodeId: string): Promise<void> => {
         // console.log("refreshNodeFromServer: " + nodeId);
-        return new Promise<J.NodeInfo>(async (resolve, reject) => {
-            S.util.ajax<J.RenderNodeRequest, J.RenderNodeResponse>("renderNode", {
-                nodeId,
-                upLevel: false,
-                siblingOffset: 0,
-                renderParentIfLeaf: false,
-                offset: 0,
-                goToLastPage: false,
-                forceIPFSRefresh: false,
-                singleNode: true
-            },
-                (res: J.RenderNodeResponse) => {
-                    if (!res.node) {
-                        resolve(null);
-                        return;
+        let res: J.RenderNodeResponse = await S.util.ajax<J.RenderNodeRequest, J.RenderNodeResponse>("renderNode", {
+            nodeId,
+            upLevel: false,
+            siblingOffset: 0,
+            renderParentIfLeaf: false,
+            offset: 0,
+            goToLastPage: false,
+            forceIPFSRefresh: false,
+            singleNode: true
+        });
+
+        if (!res?.node) {
+            return;
+        }
+        dispatch("Action_RefreshNodeFromServer", (s: AppState): AppState => {
+            // if the node is our page parent (page root)
+            if (res.node.id === s.node.id) {
+                // preserve the children, when updating the root node, because they will not have been obtained
+                // due to the 'singleNode=true' in the request
+                res.node.children = s.node.children;
+                s.node = res.node;
+            }
+            // otherwise a child
+            else if (s.node && s.node.children) {
+                // replace the old node with the new node.
+                s.node.children.forEach((node, i) => {
+                    if (node.id === res.node.id) {
+                        s.node.children[i] = res.node;
                     }
-                    dispatch("Action_RefreshNodeFromServer", (s: AppState): AppState => {
-                        // if the node is our page parent (page root)
-                        if (res.node.id === s.node.id) {
-                            // preserve the children, when updating the root node, because they will not have been obtained
-                            // due to the 'singleNode=true' in the request
-                            res.node.children = s.node.children;
-                            s.node = res.node;
-                        }
-                        // otherwise a child
-                        else if (s.node && s.node.children) {
-                            // replace the old node with the new node.
-                            s.node.children.forEach((node, i) => {
-                                if (node.id === res.node.id) {
-                                    s.node.children[i] = res.node;
-                                }
-                            });
-                        }
-                        S.quanta.updateNodeMap(res.node, s);
-                        resolve(res.node);
-                        return s;
-                    });
-                }, // fail callback
-                (res: string) => {
-                    console.log("failed to refresh node: " + res);
-                    resolve(null);
                 });
+            }
+            S.quanta.updateNodeMap(res.node, s);
+            return s;
         });
     }
 
@@ -448,7 +435,7 @@ export class Edit implements EditIntf {
         S.view.scrollToSelectedNode(state);
     }
 
-    moveNodeUp = (evt: Event, id: string, state?: AppState): void => {
+    moveNodeUp = async (evt: Event, id: string, state?: AppState): Promise<void> => {
         id = S.util.allowIdFromEvent(evt, id);
         state = appState(state);
         if (!id) {
@@ -458,14 +445,15 @@ export class Edit implements EditIntf {
 
         const node: J.NodeInfo = state.idToNodeMap.get(id);
         if (node) {
-            S.util.ajax<J.SetNodePositionRequest, J.SetNodePositionResponse>("setNodePosition", {
+            let res: J.SetNodePositionResponse = await S.util.ajax<J.SetNodePositionRequest, J.SetNodePositionResponse>("setNodePosition", {
                 nodeId: node.id,
                 targetName: "up"
-            }, (res) => { this.setNodePositionResponse(res, id, state); });
+            });
+            this.setNodePositionResponse(res, id, state);
         }
     }
 
-    moveNodeDown = (evt: Event, id: string, state: AppState): void => {
+    moveNodeDown = async (evt: Event, id: string, state: AppState): Promise<void> => {
         id = S.util.allowIdFromEvent(evt, id);
         state = appState(state);
         if (!id) {
@@ -475,14 +463,15 @@ export class Edit implements EditIntf {
 
         const node: J.NodeInfo = state.idToNodeMap.get(id);
         if (node) {
-            S.util.ajax<J.SetNodePositionRequest, J.SetNodePositionResponse>("setNodePosition", {
+            let res: J.SetNodePositionResponse = await S.util.ajax<J.SetNodePositionRequest, J.SetNodePositionResponse>("setNodePosition", {
                 nodeId: node.id,
                 targetName: "down"
-            }, (res) => { this.setNodePositionResponse(res, id, state); });
+            });
+            this.setNodePositionResponse(res, id, state);
         }
     }
 
-    moveNodeToTop = (id: string = null, state: AppState = null): void => {
+    moveNodeToTop = async (id: string = null, state: AppState = null): Promise<void> => {
         state = appState(state);
         if (!id) {
             const selNode: J.NodeInfo = S.quanta.getHighlightedNode(state);
@@ -490,14 +479,15 @@ export class Edit implements EditIntf {
         }
         const node: J.NodeInfo = state.idToNodeMap.get(id);
         if (node) {
-            S.util.ajax<J.SetNodePositionRequest, J.SetNodePositionResponse>("setNodePosition", {
+            let res: J.SetNodePositionResponse = await S.util.ajax<J.SetNodePositionRequest, J.SetNodePositionResponse>("setNodePosition", {
                 nodeId: node.id,
                 targetName: "top"
-            }, (res) => { this.setNodePositionResponse(res, id, state); });
+            });
+            this.setNodePositionResponse(res, id, state);
         }
     }
 
-    moveNodeToBottom = (id: string = null, state: AppState = null): void => {
+    moveNodeToBottom = async (id: string = null, state: AppState = null): Promise<void> => {
         state = appState(state);
         if (!id) {
             const selNode: J.NodeInfo = S.quanta.getHighlightedNode(state);
@@ -505,12 +495,11 @@ export class Edit implements EditIntf {
         }
         const node: J.NodeInfo = state.idToNodeMap.get(id);
         if (node) {
-            S.util.ajax<J.SetNodePositionRequest, J.SetNodePositionResponse>("setNodePosition", {
+            let res: J.SetNodePositionResponse = await S.util.ajax<J.SetNodePositionRequest, J.SetNodePositionResponse>("setNodePosition", {
                 nodeId: node.id,
                 targetName: "bottom"
-            }, (res) => {
-                this.setNodePositionResponse(res, id, state);
             });
+            this.setNodePositionResponse(res, id, state);
         }
     }
 
@@ -535,7 +524,7 @@ export class Edit implements EditIntf {
     }
 
     /* This can run as an actuall click event function in which only 'evt' is non-null here */
-    runEditNode = (evt: Event, id: string, forceUsePopup: boolean, encrypt: boolean, showJumpButton: boolean, replyToId: string, state?: AppState): void => {
+    runEditNode = async (evt: Event, id: string, forceUsePopup: boolean, encrypt: boolean, showJumpButton: boolean, replyToId: string, state?: AppState) => {
         id = S.util.allowIdFromEvent(evt, id);
         state = appState(state);
         if (!id) {
@@ -550,11 +539,10 @@ export class Edit implements EditIntf {
             return;
         }
 
-        S.util.ajax<J.InitNodeEditRequest, J.InitNodeEditResponse>("initNodeEdit", {
+        let res: J.InitNodeEditResponse = await S.util.ajax<J.InitNodeEditRequest, J.InitNodeEditResponse>("initNodeEdit", {
             nodeId: id
-        }, (res) => {
-            this.initNodeEditResponse(res, forceUsePopup, encrypt, showJumpButton, replyToId, state);
         });
+        this.initNodeEditResponse(res, forceUsePopup, encrypt, showJumpButton, replyToId, state);
     }
 
     toolbarInsertNode = (evt: Event, id: string): void => {
@@ -628,11 +616,10 @@ export class Edit implements EditIntf {
 
     selectAllNodes = async (state: AppState): Promise<void> => {
         const highlightNode = S.quanta.getHighlightedNode(state);
-        S.util.ajax<J.SelectAllNodesRequest, J.SelectAllNodesResponse>("selectAllNodes", {
+        let res: J.SelectAllNodesResponse = await S.util.ajax<J.SelectAllNodesRequest, J.SelectAllNodesResponse>("selectAllNodes", {
             parentNodeId: highlightNode.id
-        }, async (res: J.SelectAllNodesResponse) => {
-            S.quanta.selectAllNodes(res.nodeIds);
         });
+        S.quanta.selectAllNodes(res.nodeIds);
     }
 
     clearInbox = async (state: AppState): Promise<void> => {
@@ -642,12 +629,11 @@ export class Edit implements EditIntf {
             "btn-danger", "alert alert-danger", state);
         await dlg.open();
         if (dlg.yes) {
-            S.util.ajax<J.DeleteNodesRequest, J.DeleteNodesResponse>("deleteNodes", {
+            await S.util.ajax<J.DeleteNodesRequest, J.DeleteNodesResponse>("deleteNodes", {
                 nodeIds: ["~" + J.NodeType.INBOX],
                 childrenOnly: true
-            }, (res: J.DeleteNodesResponse) => {
-                S.nav.openContentNode(state.homeNodePath, state);
             });
+            S.nav.openContentNode(state.homeNodePath, state);
         }
     }
 
@@ -665,11 +651,10 @@ export class Edit implements EditIntf {
             "btn-danger", "alert alert-danger", state);
         await dlg.open();
         if (dlg.yes) {
-            S.util.ajax<J.JoinNodesRequest, J.JoinNodesResponse>("joinNodes", {
+            let res: J.JoinNodesResponse = await S.util.ajax<J.JoinNodesRequest, J.JoinNodesResponse>("joinNodes", {
                 nodeIds: selNodesArray
-            }, (res: J.JoinNodesResponse) => {
-                this.joinNodesResponse(res, state);
             });
+            this.joinNodesResponse(res, state);
         }
     }
 
@@ -712,44 +697,43 @@ export class Edit implements EditIntf {
             "btn-danger", "alert alert-danger", state);
         await dlg.open();
         if (dlg.yes) {
-            S.util.ajax<J.DeleteNodesRequest, J.DeleteNodesResponse>("deleteNodes", {
+            let res: J.DeleteNodesResponse = await S.util.ajax<J.DeleteNodesRequest, J.DeleteNodesResponse>("deleteNodes", {
                 nodeIds: selNodesArray,
                 childrenOnly: false
-            }, (res: J.DeleteNodesResponse) => {
-                S.quanta.tempDisableAutoScroll();
-                this.removeNodesFromHistory(selNodesArray, state);
-                this.removeNodesFromCalendarData(selNodesArray, state);
+            });
+            S.quanta.tempDisableAutoScroll();
+            this.removeNodesFromHistory(selNodesArray, state);
+            this.removeNodesFromCalendarData(selNodesArray, state);
 
-                if (S.util.checkSuccess("Delete node", res)) {
-                    if (state.node.children) {
-                        state.node.children = state.node.children.filter(child => !selNodesArray.find(id => id === child.id));
-                    }
-
-                    if (state.node.children.length === 0) {
-                        S.view.jumpToId(state.node.id);
-                    }
-                    else {
-                        dispatch("Action_RefreshNodeFromServer", (s: AppState): AppState => {
-                            s.node.children = state.node.children;
-
-                            // remove this node from all data from all the tabs, so they all refresh without
-                            // the deleted node without being queries from the server again.
-                            selNodesArray.forEach(id => {
-                                S.srch.removeNodeById(id, s);
-                            });
-                            s.selectedNodes.clear();
-                            return s;
-                        });
-                    }
+            if (S.util.checkSuccess("Delete node", res)) {
+                if (state.node.children) {
+                    state.node.children = state.node.children.filter(child => !selNodesArray.find(id => id === child.id));
                 }
 
-                /* We waste a tiny bit of CPU/bandwidth here by just always updating the bookmarks in case
-                 we just deleted some. This could be slightly improved to KNOW if we deleted any bookmarks, but
-                the added complexity to achieve that for recursive tree deletes doesn't pay off */
-                setTimeout(() => {
-                    S.quanta.loadBookmarks();
-                }, 1000);
-            });
+                if (state.node.children.length === 0) {
+                    S.view.jumpToId(state.node.id);
+                }
+                else {
+                    dispatch("Action_RefreshNodeFromServer", (s: AppState): AppState => {
+                        s.node.children = state.node.children;
+
+                        // remove this node from all data from all the tabs, so they all refresh without
+                        // the deleted node without being queries from the server again.
+                        selNodesArray.forEach(id => {
+                            S.srch.removeNodeById(id, s);
+                        });
+                        s.selectedNodes.clear();
+                        return s;
+                    });
+                }
+            }
+
+            /* We waste a tiny bit of CPU/bandwidth here by just always updating the bookmarks in case
+             we just deleted some. This could be slightly improved to KNOW if we deleted any bookmarks, but
+            the added complexity to achieve that for recursive tree deletes doesn't pay off */
+            setTimeout(() => {
+                S.quanta.loadBookmarks();
+            }, 1000);
         }
     }
 
@@ -812,20 +796,19 @@ export class Edit implements EditIntf {
     }
 
     // location=inside | inline | inline-above (todo-2: put in java-aware enum)
-    pasteSelNodes = (nodeId: string, location: string, state?: AppState): void => {
+    pasteSelNodes = async (nodeId: string, location: string, state?: AppState): Promise<void> => {
         state = appState(state);
         /*
          * For now, we will just cram the nodes onto the end of the children of the currently selected
          * page. Later on we can get more specific about allowing precise destination location for moved
          * nodes.
          */
-        S.util.ajax<J.MoveNodesRequest, J.MoveNodesResponse>("moveNodes", {
+        let res: J.MoveNodesResponse = await S.util.ajax<J.MoveNodesRequest, J.MoveNodesResponse>("moveNodes", {
             targetNodeId: nodeId,
             nodeIds: state.nodesToMove,
             location
-        }, (res) => {
-            this.moveNodesResponse(res, nodeId, true, state);
         });
+        this.moveNodesResponse(res, nodeId, true, state);
     }
 
     pasteSelNodes_InlineAbove = (evt: Event, id: string) => {
@@ -849,11 +832,12 @@ export class Edit implements EditIntf {
             if (!node) {
                 S.util.showMessage("No node is selected.", "Warning");
             } else {
-                S.util.ajax<J.InsertBookRequest, J.InsertBookResponse>("insertBook", {
+                let res: J.InsertBookResponse = await S.util.ajax<J.InsertBookRequest, J.InsertBookResponse>("insertBook", {
                     nodeId: node.id,
                     bookName: "War and Peace",
                     truncated: S.user.isTestUserAccount(state)
-                }, (res) => { this.insertBookResponse(res, state); });
+                });
+                this.insertBookResponse(res, state);
             }
         }
     }
@@ -880,7 +864,7 @@ export class Edit implements EditIntf {
             return;
         }
 
-        S.util.ajax<J.CreateSubNodeRequest, J.CreateSubNodeResponse>("createSubNode", {
+        await S.util.ajax<J.CreateSubNodeRequest, J.CreateSubNodeResponse>("createSubNode", {
             pendingEdit: false,
             nodeId: parentId,
             newNodeName: "",
@@ -890,18 +874,17 @@ export class Edit implements EditIntf {
             typeLock: false,
             properties: null,
             shareToUserId: null
-        },
-            () => {
-                let message = parentId ? "Clipboard saved" : "Clipboard text saved under Notes node.";
-                S.util.flashMessage(message + "...\n\n" + clipText, "Note", true);
-                setTimeout(() => {
-                    let state: AppState = store.getState();
-                    S.view.refreshTree(null, true, false, null, false, false, true, true, state);
-                }, 4200);
-            });
+        });
+
+        let message = parentId ? "Clipboard saved" : "Clipboard text saved under Notes node.";
+        S.util.flashMessage(message + "...\n\n" + clipText, "Note", true);
+        setTimeout(() => {
+            let state: AppState = store.getState();
+            S.view.refreshTree(null, true, false, null, false, false, true, true, state);
+        }, 4200);
     }
 
-    splitNode = (node: J.NodeInfo, splitType: string, delimiter: string, state: AppState): void => {
+    splitNode = async (node: J.NodeInfo, splitType: string, delimiter: string, state: AppState): Promise<void> => {
         if (!node) {
             node = S.quanta.getHighlightedNode(state);
         }
@@ -911,13 +894,12 @@ export class Edit implements EditIntf {
             return;
         }
 
-        S.util.ajax<J.SplitNodeRequest, J.SplitNodeResponse>("splitNode", {
+        let res: J.SplitNodeResponse = await S.util.ajax<J.SplitNodeRequest, J.SplitNodeResponse>("splitNode", {
             splitType: splitType,
             nodeId: node.id,
             delimiter
-        }, (res) => {
-            this.splitNodeResponse(res, state);
         });
+        this.splitNodeResponse(res, state);
     }
 
     splitNodeResponse = (res: J.SplitNodeResponse, state: AppState): void => {
@@ -947,7 +929,7 @@ export class Edit implements EditIntf {
             await S.edit.toggleEditMode(state);
         }
 
-        S.util.ajax<J.CreateSubNodeRequest, J.CreateSubNodeResponse>("createSubNode", {
+        let res: J.CreateSubNodeResponse = await S.util.ajax<J.CreateSubNodeRequest, J.CreateSubNodeResponse>("createSubNode", {
             pendingEdit: true,
             nodeId,
             newNodeName: "",
@@ -957,15 +939,14 @@ export class Edit implements EditIntf {
             typeLock: false,
             properties: null,
             shareToUserId
-        }, (res) => {
-            this.createSubNodeResponse(res, false, replyToId, state);
         });
+        this.createSubNodeResponse(res, false, replyToId, state);
     }
 
-    createNode = (node: J.NodeInfo, typeName: string, forceUsePopup: boolean, pendingEdit: boolean, payloadType: string, content: string, state: AppState) => {
+    createNode = async (node: J.NodeInfo, typeName: string, forceUsePopup: boolean, pendingEdit: boolean, payloadType: string, content: string, state: AppState) => {
         state = appState(state);
 
-        S.util.ajax<J.CreateSubNodeRequest, J.CreateSubNodeResponse>("createSubNode", {
+        let res: J.CreateSubNodeResponse = await S.util.ajax<J.CreateSubNodeRequest, J.CreateSubNodeResponse>("createSubNode", {
             pendingEdit,
             nodeId: node ? node.id : null,
             newNodeName: "",
@@ -976,20 +957,19 @@ export class Edit implements EditIntf {
             properties: null,
             payloadType,
             shareToUserId: null
-        }, async (res) => {
-            // auto-enable edit mode
-            if (!state.userPreferences.editMode) {
-                await S.edit.toggleEditMode(state);
-            }
-            this.createSubNodeResponse(res, forceUsePopup, null, state);
-            return null;
         });
+
+        // auto-enable edit mode
+        if (!state.userPreferences.editMode) {
+            await S.edit.toggleEditMode(state);
+        }
+        this.createSubNodeResponse(res, forceUsePopup, null, state);
     }
 
-    addCalendarEntry = (initDate: number, state: AppState) => {
+    addCalendarEntry = async (initDate: number, state: AppState) => {
         state = appState(state);
 
-        S.util.ajax<J.CreateSubNodeRequest, J.CreateSubNodeResponse>("createSubNode", {
+        let res: J.CreateSubNodeResponse = await S.util.ajax<J.CreateSubNodeRequest, J.CreateSubNodeResponse>("createSubNode", {
             pendingEdit: false,
             nodeId: state.fullScreenCalendarId,
             newNodeName: "",
@@ -999,12 +979,11 @@ export class Edit implements EditIntf {
             typeLock: true,
             properties: [{ name: J.NodeProp.DATE, value: "" + initDate }],
             shareToUserId: null
-        }, (res) => {
-            this.createSubNodeResponse(res, false, null, state);
         });
+        this.createSubNodeResponse(res, false, null, state);
     }
 
-    moveNodeByDrop = (targetNodeId: string, sourceNodeId: string, isFirst: boolean): void => {
+    moveNodeByDrop = async (targetNodeId: string, sourceNodeId: string, isFirst: boolean): Promise<void> => {
         /* if node being dropped on itself, then ignore */
         if (targetNodeId === sourceNodeId) {
             return;
@@ -1013,25 +992,23 @@ export class Edit implements EditIntf {
         // console.log("Moving node[" + targetNodeId + "] into position of node[" + sourceNodeId + "]");
         const state = appState(null);
 
-        S.util.ajax<J.MoveNodesRequest, J.MoveNodesResponse>("moveNodes", {
+        let res: J.MoveNodesResponse = await S.util.ajax<J.MoveNodesRequest, J.MoveNodesResponse>("moveNodes", {
             targetNodeId,
             nodeIds: [sourceNodeId],
             location: isFirst ? "inline-above" : "inline"
-        }, (res) => {
-            S.render.fadeInId = sourceNodeId;
-            this.moveNodesResponse(res, sourceNodeId, false, state);
         });
+        S.render.fadeInId = sourceNodeId;
+        this.moveNodesResponse(res, sourceNodeId, false, state);
     }
 
-    updateHeadings = (state: AppState): void => {
+    updateHeadings = async (state: AppState): Promise<void> => {
         state = appState(state);
         const node: J.NodeInfo = S.quanta.getHighlightedNode(state);
         if (node) {
-            S.util.ajax<J.UpdateHeadingsRequest, J.UpdateHeadingsResponse>("updateHeadings", {
+            await S.util.ajax<J.UpdateHeadingsRequest, J.UpdateHeadingsResponse>("updateHeadings", {
                 nodeId: node.id
-            }, (res) => {
-                S.quanta.refresh(state);
             });
+            S.quanta.refresh(state);
         }
     }
 }

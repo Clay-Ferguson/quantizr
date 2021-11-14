@@ -215,21 +215,21 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
                         return;
                     }
 
-                    S.torrent.wtc.seed(files, (torrent) => {
+                    S.torrent.wtc.seed(files, async (torrent) => {
                         // S.util.showMessage("Created Torrent:\n\n" + torrent.magnetURI, "WebTorrent", true);
 
                         // send torrend magnet up to server to save on node.
-                        S.util.ajax<J.UploadFromTorrentRequest, J.UploadFromTorrentResponse>("uploadFromTorrent", {
+                        let res: J.UploadFromTorrentResponse = await S.util.ajax<J.UploadFromTorrentRequest, J.UploadFromTorrentResponse>("uploadFromTorrent", {
                             nodeId: this.nodeId,
                             torrentId: torrent.magnetURI
-                        }, (res: J.UploadFromTorrentResponse): void => {
-                            if (S.util.checkSuccess("Upload from Torrent", res)) {
-                                this.close();
-                                if (this.afterUploadFunc) {
-                                    this.afterUploadFunc();
-                                }
-                            }
                         });
+
+                        if (S.util.checkSuccess("Upload from Torrent", res)) {
+                            this.close();
+                            if (this.afterUploadFunc) {
+                                this.afterUploadFunc();
+                            }
+                        }
                     });
                 }
                 else {

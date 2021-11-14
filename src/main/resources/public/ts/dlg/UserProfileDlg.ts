@@ -152,12 +152,11 @@ export class UserProfileDlg extends DialogBase {
         return children;
     }
 
-    deleteFriend = () => {
-        S.util.ajax<J.DeleteFriendRequest, J.DeleteFriendResponse>("deleteFriend", {
+    deleteFriend = async () => {
+        let res: J.DeleteFriendResponse = await S.util.ajax<J.DeleteFriendRequest, J.DeleteFriendResponse>("deleteFriend", {
             userNodeId: this.userNodeId
-        }, (res: J.AddFriendResponse) => {
-            this.reload(this.userNodeId);
         });
+        this.reload(this.userNodeId);
     }
 
     /**
@@ -182,39 +181,36 @@ export class UserProfileDlg extends DialogBase {
         }
     }
 
-    reload = (userNodeId: string): Promise<void> => {
-        return new Promise<void>((resolve, reject) => {
-            S.util.ajax<J.GetUserProfileRequest, J.GetUserProfileResponse>("getUserProfile", {
-                userId: userNodeId
-            }, (res: J.GetUserProfileResponse): void => {
-                // console.log("UserProfile Response: " + S.util.prettyPrint(res));
-                if (res && res.userProfile) {
-                    this.bioState.setValue(res.userProfile.userBio);
-                    this.displayNameState.setValue(res.userProfile.displayName);
-                    this.mergeState({
-                        userProfile: res.userProfile
-                    });
-                }
-                resolve();
-            }, () => resolve());
+    reload = async (userNodeId: string) => {
+        let res: J.GetUserProfileResponse = await S.util.ajax<J.GetUserProfileRequest, J.GetUserProfileResponse>("getUserProfile", {
+            userId: userNodeId
         });
+
+        // console.log("UserProfile Response: " + S.util.prettyPrint(res));
+        if (res?.userProfile) {
+            this.bioState.setValue(res.userProfile.userBio);
+            this.displayNameState.setValue(res.userProfile.displayName);
+            this.mergeState({
+                userProfile: res.userProfile
+            });
+        }
     }
 
-    save = (): void => {
-        S.util.ajax<J.SaveUserProfileRequest, J.SaveUserProfileResponse>("saveUserProfile", {
+    save = async () => {
+        let res: J.SaveUserProfileResponse = await S.util.ajax<J.SaveUserProfileRequest, J.SaveUserProfileResponse>("saveUserProfile", {
             userName: null,
             userBio: this.bioState.getValue(),
             displayName: this.displayNameState.getValue()
-        }, this.saveResponse);
+        });
+        this.saveResponse(res);
     }
 
-    addFriend = (): void => {
+    addFriend = async () => {
         const state: any = this.getState();
-        S.util.ajax<J.AddFriendRequest, J.AddFriendResponse>("addFriend", {
+        let res: J.AddFriendResponse = await S.util.ajax<J.AddFriendRequest, J.AddFriendResponse>("addFriend", {
             userName: state.userProfile.userName
-        }, (res: J.AddFriendResponse) => {
-            S.util.showMessage(res.message, "New Friend");
         });
+        S.util.showMessage(res.message, "New Friend");
     }
 
     sendMessage = (): void => {
@@ -224,13 +220,12 @@ export class UserProfileDlg extends DialogBase {
         }, 10);
     }
 
-    blockUser = (): void => {
+    blockUser = async () => {
         const state: any = this.getState();
-        S.util.ajax<J.BlockUserRequest, J.BlockUserResponse>("blockUser", {
+        await S.util.ajax<J.BlockUserRequest, J.BlockUserResponse>("blockUser", {
             userName: state.userProfile.userName
-        }, (res: J.AddFriendResponse) => {
-            S.util.showMessage("Blocked User: " + state.userProfile.userName);
         });
+        S.util.showMessage("Blocked User: " + state.userProfile.userName);
     }
 
     close(): void {
@@ -261,22 +256,22 @@ export class UserProfileDlg extends DialogBase {
             src = S.render.getAvatarImgUrl(state.userProfile.userNodeId || this.appState.homeNodeId, avatarVer);
         }
 
-        let onClick = (evt) => {
+        let onClick = async (evt) => {
             if (this.readOnly) return;
 
-            let dlg = new UploadFromFileDropzoneDlg(state.userProfile.userNodeId, "", false, null, false, false, this.appState, () => {
+            let dlg = new UploadFromFileDropzoneDlg(state.userProfile.userNodeId, "", false, null, false, false, this.appState, async () => {
 
-                S.util.ajax<J.GetUserProfileRequest, J.GetUserProfileResponse>("getUserProfile", {
+                let res: J.GetUserProfileResponse = await S.util.ajax<J.GetUserProfileRequest, J.GetUserProfileResponse>("getUserProfile", {
                     userId: state.userProfile.userNodeId
-                }, (res: J.GetUserProfileResponse): void => {
-                    if (res && res.userProfile) {
-                        state.userProfile.avatarVer = res.userProfile.avatarVer;
-                        state.userProfile.userNodeId = res.userProfile.userNodeId;
-                        this.mergeState({
-                            userProfile: state.userProfile
-                        });
-                    }
                 });
+
+                if (res?.userProfile) {
+                    state.userProfile.avatarVer = res.userProfile.avatarVer;
+                    state.userProfile.userNodeId = res.userProfile.userNodeId;
+                    this.mergeState({
+                        userProfile: state.userProfile
+                    });
+                }
             });
             dlg.open();
         };
@@ -323,19 +318,19 @@ export class UserProfileDlg extends DialogBase {
         let onClick = (evt) => {
             if (this.readOnly) return;
 
-            let dlg = new UploadFromFileDropzoneDlg(state.userProfile.userNodeId, "Header", false, null, false, false, this.appState, () => {
+            let dlg = new UploadFromFileDropzoneDlg(state.userProfile.userNodeId, "Header", false, null, false, false, this.appState, async () => {
 
-                S.util.ajax<J.GetUserProfileRequest, J.GetUserProfileResponse>("getUserProfile", {
+                let res: J.GetUserProfileResponse = await S.util.ajax<J.GetUserProfileRequest, J.GetUserProfileResponse>("getUserProfile", {
                     userId: state.userProfile.userNodeId
-                }, (res: J.GetUserProfileResponse): void => {
-                    if (res && res.userProfile) {
-                        state.userProfile.headerImageVer = res.userProfile.headerImageVer;
-                        state.userProfile.userNodeId = res.userProfile.userNodeId;
-                        this.mergeState({
-                            userProfile: state.userProfile
-                        });
-                    }
                 });
+
+                if (res?.userProfile) {
+                    state.userProfile.headerImageVer = res.userProfile.headerImageVer;
+                    state.userProfile.userNodeId = res.userProfile.userNodeId;
+                    this.mergeState({
+                        userProfile: state.userProfile
+                    });
+                }
             });
             dlg.open();
         };
@@ -364,15 +359,8 @@ export class UserProfileDlg extends DialogBase {
         }
     }
 
-    preLoad(): Promise<void> {
-        return new Promise<void>((resolve, reject) => {
-            S.util.ajax<J.GetUserAccountInfoRequest, J.GetUserAccountInfoResponse>("getUserAccountInfo", null,
-                async (res: J.GetUserAccountInfoResponse) => {
-                    // what is going on here?, we're not using 'res' at all? What does this call do just update
-                    // something on the server to prepare the 'reload' all. This looks inefficient (todo-1)
-                    await this.reload(this.userNodeId);
-                    resolve();
-                }, () => resolve());
-        });
+    async preLoad(): Promise<void> {
+        await S.util.ajax<J.GetUserAccountInfoRequest, J.GetUserAccountInfoResponse>("getUserAccountInfo");
+        await this.reload(this.userNodeId);
     }
 }

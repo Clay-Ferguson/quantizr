@@ -168,7 +168,7 @@ export class App extends Main {
             //     title: "Go to Portal Home Node"
             // });
 
-            let title = state.title ? new Button("@" + state.title, e => { S.nav.navHome(state); }, null, "btn-secondary") : null;
+            let title = state.title ? new Button("@" + state.title, e => S.nav.navHome(state), null, "btn-secondary") : null;
             comp = new Div(null, { className: "mobileHeaderBar" }, [logo, menuButton, loginButton, title, prefsButton]);
         }
         return comp;

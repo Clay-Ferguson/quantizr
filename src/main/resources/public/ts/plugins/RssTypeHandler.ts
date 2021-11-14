@@ -126,11 +126,13 @@ export class RssTypeHandler extends TypeBase {
                 state.rssFeedPage[feedSrcHash] = page;
             }
 
-            S.util.ajax<J.GetMultiRssRequest, J.GetMultiRssResponse>("getMultiRssFeed", {
-                urls: feedSrc,
-                page
-            }, (res: J.GetMultiRssResponse) => {
-                if (!res.feed) {
+            (async () => {
+                let res: J.GetMultiRssResponse = await S.util.ajax<J.GetMultiRssRequest, J.GetMultiRssResponse>("getMultiRssFeed", {
+                    urls: feedSrc,
+                    page
+                });
+
+                if (!res?.feed) {
                     // new MessageDlg(err.message || "RSS Feed failed to load.", "Warning", null, null, false, 0, state).open();
                     // console.log(err.message || "RSS Feed failed to load.");
                     dispatch("Action_RSSUpdated", (s: AppState): AppState => {
@@ -161,7 +163,7 @@ export class RssTypeHandler extends TypeBase {
                         return s;
                     });
                 }
-            });
+            })();
         }
         return itemListContainer;
     }

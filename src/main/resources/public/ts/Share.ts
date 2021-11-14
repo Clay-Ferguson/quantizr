@@ -12,6 +12,8 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (s: Singletons) => {
     S = s;
 });
 
+// todo-0: move these methods into Search.ts, and get rid of this class.
+
 export class Share implements ShareIntf {
 
     /*

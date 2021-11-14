@@ -344,13 +344,12 @@ export class Encryption implements EncryptionIntf {
                         pubKeyStr = JSON.stringify(publicKeyDat);
                     }
 
-                    S.util.ajax<J.SavePublicKeyRequest, J.SavePublicKeyResponse>("savePublicKey", {
+                    let res: J.SavePublicKeyResponse = await S.util.ajax<J.SavePublicKeyRequest, J.SavePublicKeyResponse>("savePublicKey", {
                         keyJson: pubKeyStr
-                    }, (res: J.SavePublicKeyResponse): void => {
-                        if (showConfirm) {
-                            S.util.showMessage(res.message, "Published Public Key");
-                        }
                     });
+                    if (showConfirm) {
+                        S.util.showMessage(res.message, "Published Public Key");
+                    }
                 }
             }
             finally {

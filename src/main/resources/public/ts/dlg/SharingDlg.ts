@@ -60,12 +60,13 @@ export class SharingDlg extends DialogBase {
         ];
     }
 
-    shareImmediate = (userName: string) => {
-        S.util.ajax<J.AddPrivilegeRequest, J.AddPrivilegeResponse>("addPrivilege", {
+    shareImmediate = async (userName: string) => {
+        await S.util.ajax<J.AddPrivilegeRequest, J.AddPrivilegeResponse>("addPrivilege", {
             nodeId: this.node.id,
             principal: userName,
             privileges: [J.PrivilegeType.READ, J.PrivilegeType.WRITE]
-        }, this.reload);
+        });
+        this.reload();
     }
 
     preLoad(): Promise<void> {
@@ -81,51 +82,50 @@ export class SharingDlg extends DialogBase {
     /*
      * Gets privileges from server and saves into state.
      */
-    reload = (): void => {
-        S.util.ajax<J.GetNodePrivilegesRequest, J.GetNodePrivilegesResponse>("getNodePrivileges", {
+    reload = async () => {
+        let res: J.GetNodePrivilegesResponse = await S.util.ajax<J.GetNodePrivilegesRequest, J.GetNodePrivilegesResponse>("getNodePrivileges", {
             nodeId: this.node.id,
             includeAcl: true,
             includeOwners: true
-        }, (res: J.GetNodePrivilegesResponse): void => {
-            this.node.ac = res.aclEntries;
-            this.mergeState({ nodePrivsInfo: res });
         });
+        this.node.ac = res.aclEntries;
+        this.mergeState({ nodePrivsInfo: res });
     }
 
-    removeAllPrivileges = (): void => {
+    removeAllPrivileges = async () => {
         this.dirty = true;
-        S.util.ajax<J.RemovePrivilegeRequest, J.RemovePrivilegeResponse>("removePrivilege", {
+        let res: J.RemovePrivilegeResponse = await S.util.ajax<J.RemovePrivilegeRequest, J.RemovePrivilegeResponse>("removePrivilege", {
             nodeId: this.node.id,
             principalNodeId: "*",
             privilege: "*"
-        }, (res: J.RemovePrivilegeResponse) => {
-            this.removePrivilegeResponse(res);
-
-            // Give user time to see the removal, and then close out the dialog.
-            setTimeout(() => {
-                this.close();
-            }, 1000);
         });
+        this.removePrivilegeResponse();
+
+        // Give user time to see the removal, and then close out the dialog.
+        setTimeout(() => {
+            this.close();
+        }, 1000);
     }
 
-    removePrivilege = (principalNodeId: string, privilege: string): void => {
+    removePrivilege = async (principalNodeId: string, privilege: string) => {
         this.dirty = true;
-        S.util.ajax<J.RemovePrivilegeRequest, J.RemovePrivilegeResponse>("removePrivilege", {
+        let res: J.RemovePrivilegeResponse = await S.util.ajax<J.RemovePrivilegeRequest, J.RemovePrivilegeResponse>("removePrivilege", {
             nodeId: this.node.id,
             principalNodeId,
             privilege
-        }, this.removePrivilegeResponse);
+        });
+        this.removePrivilegeResponse();
     }
 
-    removePrivilegeResponse = (res: J.RemovePrivilegeResponse): void => {
-        S.util.ajax<J.GetNodePrivilegesRequest, J.GetNodePrivilegesResponse>("getNodePrivileges", {
+    removePrivilegeResponse = async () => {
+        let res: J.GetNodePrivilegesResponse = await S.util.ajax<J.GetNodePrivilegesRequest, J.GetNodePrivilegesResponse>("getNodePrivileges", {
             nodeId: this.node.id,
             includeAcl: true,
             includeOwners: true
-        }, (res: J.GetNodePrivilegesResponse): void => {
-            this.node.ac = res.aclEntries;
-            this.mergeState({ nodePrivsInfo: res });
         });
+
+        this.node.ac = res.aclEntries;
+        this.mergeState({ nodePrivsInfo: res });
     }
 
     shareToPersonDlg = async (): Promise<void> => {
@@ -137,7 +137,7 @@ export class SharingDlg extends DialogBase {
         return null;
     }
 
-    shareNodeToPublic = (allowAppends: boolean): void => {
+    shareNodeToPublic = async (allowAppends: boolean) => {
         this.dirty = true;
         let encrypted = S.props.isEncrypted(this.node);
         if (encrypted) {
@@ -150,10 +150,11 @@ export class SharingDlg extends DialogBase {
          *
          * TODO: this additional call can be avoided as an optimization
          */
-        S.util.ajax<J.AddPrivilegeRequest, J.AddPrivilegeResponse>("addPrivilege", {
+        await S.util.ajax<J.AddPrivilegeRequest, J.AddPrivilegeResponse>("addPrivilege", {
             nodeId: this.node.id,
             principal: "public",
             privileges: allowAppends ? [J.PrivilegeType.READ, J.PrivilegeType.WRITE] : [J.PrivilegeType.READ]
-        }, this.reload);
+        });
+        this.reload();
     }
 }

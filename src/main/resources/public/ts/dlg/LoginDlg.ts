@@ -73,7 +73,7 @@ export class LoginDlg extends DialogBase {
         S.nav.signup(this.appState);
     }
 
-    login = (): void => {
+    login = async (): Promise<void> => {
         if (!this.validate()) {
             return;
         }
@@ -86,16 +86,16 @@ export class LoginDlg extends DialogBase {
         let pwd = this.pwdState.getValue();
 
         if (usr && pwd) {
-            S.util.ajax<J.LoginRequest, J.LoginResponse>("login", {
+            let res: J.LoginResponse = await S.util.ajax<J.LoginRequest, J.LoginResponse>("login", {
                 userName: usr,
                 password: pwd,
                 tzOffset: new Date().getTimezoneOffset(),
                 dst: S.util.daylightSavingsTime
-            }, (res: J.LoginResponse) => {
-                S.quanta.authToken = res.authToken;
-                S.user.loginResponse(res, usr, pwd, true, this.appState);
-                this.close();
             });
+
+            S.quanta.authToken = res.authToken;
+            S.user.loginResponse(res, usr, pwd, true, this.appState);
+            this.close();
         }
     }
 

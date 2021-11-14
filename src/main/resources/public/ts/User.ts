@@ -15,7 +15,7 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (s: Singletons) => {
 
 export class User implements UserIntf {
 
-    closeAccountResponse = (res: J.CloseAccountResponse): void => {
+    closeAccountResponse = (): void => {
         /* Remove warning dialog to ask user about leaving the page */
         window.onbeforeunload = null;
 
@@ -37,7 +37,8 @@ export class User implements UserIntf {
         await dlg.open();
         if (dlg.yes) {
             this.deleteAllUserLocalDbEntries();
-            S.util.ajax<J.CloseAccountRequest, J.CloseAccountResponse>("closeAccount", {}, this.closeAccountResponse);
+            await S.util.ajax<J.CloseAccountRequest, J.CloseAccountResponse>("closeAccount");
+            this.closeAccountResponse();
         }
     }
 
@@ -98,12 +99,13 @@ export class User implements UserIntf {
         if (!callUsr) {
             this.defaultHandleAnonUser(state);
         } else {
-            S.util.ajax<J.LoginRequest, J.LoginResponse>("login", {
-                userName: callUsr,
-                password: callPwd,
-                tzOffset: new Date().getTimezoneOffset(),
-                dst: S.util.daylightSavingsTime
-            }, async (res: J.LoginResponse) => {
+            try {
+                let res: J.LoginResponse = await S.util.ajax<J.LoginRequest, J.LoginResponse>("login", {
+                    userName: callUsr,
+                    password: callPwd,
+                    tzOffset: new Date().getTimezoneOffset(),
+                    dst: S.util.daylightSavingsTime
+                });
                 S.quanta.authToken = res.authToken;
 
                 // console.log("login: " + S.util.prettyPrint(res));
@@ -123,11 +125,11 @@ export class User implements UserIntf {
 
                     this.defaultHandleAnonUser(state);
                 }
-            },
-                async (error: string) => {
-                    await S.user.deleteAllUserLocalDbEntries();
-                    S.quanta.loadAnonPageHome(null);
-                });
+            }
+            catch (e) {
+                await S.user.deleteAllUserLocalDbEntries();
+                S.quanta.loadAnonPageHome(null);
+            }
         }
     }
 
@@ -146,7 +148,12 @@ export class User implements UserIntf {
         }
 
         S.quanta.loggingOut = true;
-        S.util.ajax<J.LogoutRequest, J.LogoutResponse>("logout", {}, this.logoutResponse, this.logoutResponse);
+        try {
+            await S.util.ajax<J.LogoutRequest, J.LogoutResponse>("logout");
+        }
+        finally {
+            this.logoutResponse();
+        }
     }
 
     logoutResponse = (): void => {
@@ -256,8 +263,7 @@ export class User implements UserIntf {
     }
 
     checkMessages = async (): Promise<void> => {
-        let res: J.CheckMessagesResponse = await S.util.ajax<J.CheckMessagesRequest, J.CheckMessagesResponse>("checkMessages", {
-        });
+        let res: J.CheckMessagesResponse = await S.util.ajax<J.CheckMessagesRequest, J.CheckMessagesResponse>("checkMessages");
         if (res) {
             dispatch("Action_SetNewMessageCount", (s: AppState): AppState => {
                 s.newMessageCount = res.numNew;

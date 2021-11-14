@@ -831,36 +831,25 @@ export class EditNodeDlg extends DialogBase {
     }
 
     /* Queries the server for the purpose of just loading the binary properties into node, and leaving everything else intact */
-    refreshBinaryPropsFromServer = (node: J.NodeInfo): Promise<void> => {
-        return new Promise<void>(async (resolve, reject) => {
-            S.util.ajax<J.RenderNodeRequest, J.RenderNodeResponse>("renderNode", {
-                nodeId: node.id,
-                upLevel: false,
-                siblingOffset: 0,
-                renderParentIfLeaf: false,
-                offset: 0,
-                goToLastPage: false,
-                forceIPFSRefresh: false,
-                singleNode: true
-            },
-                (res: J.RenderNodeResponse) => {
-                    try {
-                        if (res.node.properties) {
-                            S.props.transferBinaryProps(res.node, node);
-
-                            if (res.node) {
-                                S.quanta.updateNodeMap(res.node, this.appState);
-                            }
-                        }
-                    }
-                    finally {
-                        resolve();
-                    }
-                }, // fail callback
-                (res: string) => {
-                    resolve();
-                });
+    refreshBinaryPropsFromServer = async (node: J.NodeInfo): Promise<void> => {
+        let res: J.RenderNodeResponse = await S.util.ajax<J.RenderNodeRequest, J.RenderNodeResponse>("renderNode", {
+            nodeId: node.id,
+            upLevel: false,
+            siblingOffset: 0,
+            renderParentIfLeaf: false,
+            offset: 0,
+            goToLastPage: false,
+            forceIPFSRefresh: false,
+            singleNode: true
         });
+
+        if (res.node?.properties) {
+            S.props.transferBinaryProps(res.node, node);
+
+            if (res.node) {
+                S.quanta.updateNodeMap(res.node, this.appState);
+            }
+        }
     }
 
     deleteUpload = async (): Promise<void> => {
@@ -941,17 +930,17 @@ export class EditNodeDlg extends DialogBase {
         this.mergeState({ node: state.node });
     }
 
-    deleteProperty(propName: string) {
-        S.util.ajax<J.DeletePropertyRequest, J.DeletePropertyResponse>("deleteProperty", {
+    deleteProperty = async (propName: string) => {
+        let res: J.DeletePropertyResponse = await S.util.ajax<J.DeletePropertyRequest, J.DeletePropertyResponse>("deleteProperty", {
             nodeId: this.getState().node.id,
             propName
-        }, (res) => {
-            if (S.util.checkSuccess("Delete property", res)) {
-                let state = this.getState();
-                S.props.deleteProp(state.node, propName);
-                this.mergeState(state);
-            }
         });
+
+        if (S.util.checkSuccess("Delete property", res)) {
+            let state = this.getState();
+            S.props.deleteProp(state.node, propName);
+            this.mergeState(state);
+        }
     }
 
     // Takes all the propStates values and converts them into node properties on the node
@@ -1005,31 +994,31 @@ export class EditNodeDlg extends DialogBase {
         this.savePropsToNode();
         // console.log("calling saveNode(). PostData=" + S.util.prettyPrint(state.node));
 
-        S.util.ajax<J.SaveNodeRequest, J.SaveNodeResponse>("saveNode", {
+        let res: J.SaveNodeResponse = await S.util.ajax<J.SaveNodeRequest, J.SaveNodeResponse>("saveNode", {
             node: state.node
-        }, (res) => {
-            // if we're saving a bookmark but NOT viewing the bookmark list then we don't need to do any
-            // page refreshing after the edit.
-            if (res.node.type === J.NodeType.BOOKMARK && this.appState.node.type !== J.NodeType.BOOKMARK_LIST) {
-                // do nothing.
-            }
-            else {
-                S.render.fadeInId = state.node.id;
-                S.quanta.tempDisableAutoScroll();
-                S.edit.saveNodeResponse(state.node, res, true, this.appState);
-
-                if (askToSplit) {
-                    new SplitNodeDlg(state.node, this.appState).open();
-                }
-            }
-
-            // if we just saved a bookmark, reload bookmarks menu
-            if ((state.node as J.NodeInfo).type === J.NodeType.BOOKMARK) {
-                setTimeout(() => {
-                    S.quanta.loadBookmarks();
-                }, 250);
-            }
         });
+
+        // if we're saving a bookmark but NOT viewing the bookmark list then we don't need to do any
+        // page refreshing after the edit.
+        if (res.node.type === J.NodeType.BOOKMARK && this.appState.node.type !== J.NodeType.BOOKMARK_LIST) {
+            // do nothing.
+        }
+        else {
+            S.render.fadeInId = state.node.id;
+            S.quanta.tempDisableAutoScroll();
+            S.edit.saveNodeResponse(state.node, res, true, this.appState);
+
+            if (askToSplit) {
+                new SplitNodeDlg(state.node, this.appState).open();
+            }
+        }
+
+        // if we just saved a bookmark, reload bookmarks menu
+        if ((state.node as J.NodeInfo).type === J.NodeType.BOOKMARK) {
+            setTimeout(() => {
+                S.quanta.loadBookmarks();
+            }, 250);
+        }
     }
 
     makePropEditor = (typeHandler: TypeHandlerIntf, propEntry: J.PropertyInfo, allowCheckbox: boolean, rows: number): Div => {

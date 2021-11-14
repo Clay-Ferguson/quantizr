@@ -124,13 +124,14 @@ export class SignupDlg extends DialogBase {
         this.signupNow(null);
     }
 
-    signupNow = (reCaptchaToken: string): void => {
-        S.util.ajax<J.SignupRequest, J.SignupResponse>("signup", {
+    signupNow = async (reCaptchaToken: string) => {
+        let res: J.SignupResponse = await S.util.ajax<J.SignupRequest, J.SignupResponse>("signup", {
             userName: this.userState.getValue(),
             password: this.passwordState.getValue(),
             email: this.emailState.getValue(),
             captcha: this.captchaState.getValue()
-        }, this.signupResponse);
+        });
+        this.signupResponse(res);
     }
 
     signupResponse = async (res: J.SignupResponse): Promise<void> => {

@@ -50,18 +50,17 @@ export class AddFriendDlg extends DialogBase {
         return valid;
     }
 
-    addFriend = (): void => {
+    addFriend = async (): Promise<void> => {
         if (!this.validate()) {
             return;
         }
         let userName = this.userState.getValue();
         if (userName) {
             const state: any = this.getState();
-            S.util.ajax<J.AddFriendRequest, J.AddFriendResponse>("addFriend", {
+            let res: J.AddFriendResponse = await S.util.ajax<J.AddFriendRequest, J.AddFriendResponse>("addFriend", {
                 userName
-            }, (res: J.AddFriendResponse) => {
-                S.util.showMessage(res.message, "New Friend");
             });
+            S.util.showMessage(res.message, "New Friend");
         }
         this.close();
     }

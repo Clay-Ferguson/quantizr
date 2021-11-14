@@ -35,12 +35,13 @@ export class FullScreenGraphViewer extends Main {
             console.log("Can't find nodeId " + this.nodeId);
         }
 
-        S.util.ajax<J.GraphRequest, J.GraphResponse>("graphNodes", {
-            searchText: appState.graphSearchText,
-            nodeId: this.nodeId
-        }, (resp: J.GraphResponse) => {
-            this.mergeState({ data: resp.rootNode });
-        });
+        (async () => {
+            let res: J.GraphResponse = await S.util.ajax<J.GraphRequest, J.GraphResponse>("graphNodes", {
+                searchText: appState.graphSearchText,
+                nodeId: this.nodeId
+            });
+            this.mergeState({ data: res.rootNode });
+        })();
     }
 
     preRender(): void {
@@ -268,8 +269,8 @@ export class FullScreenGraphViewer extends Main {
         }
     }
 
-    updateTooltip = (d: any, x: number, y: number) => {
-        const res = S.util.ajax<J.RenderNodeRequest, J.RenderNodeResponse>("renderNode", {
+    updateTooltip = async (d: any, x: number, y: number) => {
+        let res: J.RenderNodeResponse = await S.util.ajax<J.RenderNodeRequest, J.RenderNodeResponse>("renderNode", {
             nodeId: d.data.id,
             upLevel: false,
             siblingOffset: 0,
@@ -278,17 +279,16 @@ export class FullScreenGraphViewer extends Main {
             goToLastPage: false,
             forceIPFSRefresh: false,
             singleNode: true
-        },
-            (res: J.RenderNodeResponse) => {
-                if (res.node) {
-                    let content = res.node.content;
-                    if (content.length > 100) {
-                        content = content.substring(0, 100) + "...";
-                    }
-                    d.data.name = content;
-                    this.showTooltip(d, x, y);
-                }
-            });
+        });
+
+        if (res?.node) {
+            let content = res.node.content;
+            if (content.length > 100) {
+                content = content.substring(0, 100) + "...";
+            }
+            d.data.name = content;
+            this.showTooltip(d, x, y);
+        }
     }
 
     showTooltip = (d: any, x: number, y: number) => {

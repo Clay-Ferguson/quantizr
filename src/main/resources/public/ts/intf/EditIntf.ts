@@ -5,7 +5,7 @@ export interface EditIntf {
     showReadOnlyProperties: boolean;
 
     saveClipboardToChildNode(parentId?: string): void;
-    splitNode(node: J.NodeInfo, splitType: string, delimiter: string, state: AppState): void;
+    splitNode(node: J.NodeInfo, splitType: string, delimiter: string, state: AppState): Promise<void>;
     joinNodes(state?: AppState): Promise<void>;
     openChangePasswordDlg(state: AppState): void;
     openManageAccountDlg(state: AppState): void;
@@ -22,7 +22,7 @@ export interface EditIntf {
     setRssHeadlinesOnly(state: AppState, val: boolean): Promise<void>;
     toggleShowMetaData(state: AppState): void;
     setMainPanelCols(val: number): void;
-    moveNodeUp(evt: Event, id: string, state?: AppState): void;
+    moveNodeUp(evt: Event, id: string, state?: AppState): Promise<void>;
     moveNodeDown(evt: Event, id: string, state?: AppState): void;
     moveNodeToTop(id: string, state: AppState): void;
     moveNodeToBottom(id: string, state: AppState): void;
@@ -38,7 +38,7 @@ export interface EditIntf {
     cutSelNodes(evt: Event, id: string): void;
     undoCutSelNodes(): void;
     pasteSelNodesInside(evt: Event, id: string);
-    pasteSelNodes(nodeId: string, location: string, state?: AppState): void;
+    pasteSelNodes(nodeId: string, location: string, state?: AppState): Promise<void>;
     pasteSelNodes_InlineAbove(evt: Event, id: string);
     pasteSelNodes_Inline(evt: Event, id: string);
     insertBookWarAndPeace(state: AppState): Promise<void>;
@@ -47,11 +47,11 @@ export interface EditIntf {
     addNode(nodeId: string, content: string, shareToUserId: string, replyToId: string, state: AppState): void;
     createNode(node: J.NodeInfo, typeName: string, forceUsePopup: boolean, pendingEdit: boolean, payloadType: string, content: string, state: AppState): void;
     addCalendarEntry(initDate: number, state: AppState): void;
-    moveNodeByDrop(targetNodeId: string, sourceNodeId: string, isFirts: boolean): void;
+    moveNodeByDrop(targetNodeId: string, sourceNodeId: string, isFirts: boolean): Promise<void>;
     initNodeEditResponse(res: J.InitNodeEditResponse, forceUsePopup: boolean, encrypt: boolean, showJumpButton: boolean, replyToId: string, state: AppState): void;
-    updateHeadings(state: AppState): void;
+    updateHeadings(state: AppState): Promise<void>;
     addLinkBookmark(content: string, state: AppState): void;
     addBookmark(node: J.NodeInfo, state: AppState): void;
     setMetadataOption(val: boolean): void;
-    refreshNodeFromServer(nodeId: string): Promise<J.NodeInfo>;
+    refreshNodeFromServer(nodeId: string): Promise<void>;
 }

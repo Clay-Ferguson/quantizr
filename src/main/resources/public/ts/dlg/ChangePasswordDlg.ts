@@ -62,17 +62,18 @@ export class ChangePasswordDlg extends DialogBase {
      * where it will validate the passCode, and if it's valid use it to perform the correct password change on the correct
      * user.
      */
-    changePassword = (): void => {
+    changePassword = async (): Promise<void> => {
         if (!this.validate()) {
             return;
         }
         let pwd = this.pwdState.getValue();
 
         if (pwd && pwd.length >= 4) {
-            S.util.ajax<J.ChangePasswordRequest, J.ChangePasswordResponse>("changePassword", {
+            let res: J.ChangePasswordResponse = await S.util.ajax<J.ChangePasswordRequest, J.ChangePasswordResponse>("changePassword", {
                 newPassword: pwd,
                 passCode: this.passCode
-            }, this.changePasswordResponse);
+            });
+            this.changePasswordResponse(res);
         } else {
             S.util.showMessage("Invalid password(s).", "Warning");
         }

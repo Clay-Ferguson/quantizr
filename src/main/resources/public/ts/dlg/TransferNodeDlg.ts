@@ -69,7 +69,7 @@ export class TransferNodeDlg extends DialogBase {
         return valid;
     }
 
-    transfer = (): void => {
+    transfer = async () => {
         if (!this.validate()) {
             return;
         }
@@ -80,15 +80,15 @@ export class TransferNodeDlg extends DialogBase {
             return;
         }
 
-        S.util.ajax<J.TransferNodeRequest, J.TransferNodeResponse>("transferNode", {
+        let res: J.TransferNodeResponse = await S.util.ajax<J.TransferNodeRequest, J.TransferNodeResponse>("transferNode", {
             recursive: this.getState().recursive,
             nodeId: node.id,
             fromUser: this.fromUserState.getValue(),
             toUser: this.toUserState.getValue()
-        }, (res: J.TransferNodeResponse) => {
-            S.view.refreshTree(null, false, false, null, false, true, true, true, this.appState);
-            S.util.showMessage(res.message, "Success");
-            this.close();
         });
+
+        S.view.refreshTree(null, false, false, null, false, true, true, true, this.appState);
+        S.util.showMessage(res.message, "Success");
+        this.close();
     }
 }

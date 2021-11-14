@@ -46,7 +46,7 @@ export class ImportDlg extends DialogBase {
         return valid;
     }
 
-    importNodes = (): void => {
+    importNodes = async () => {
         if (!this.validate()) {
             return;
         }
@@ -57,10 +57,11 @@ export class ImportDlg extends DialogBase {
             return;
         }
 
-        S.util.ajax<J.ImportRequest, J.ImportResponse>("import", {
+        let res: J.ImportResponse = await S.util.ajax<J.ImportRequest, J.ImportResponse>("import", {
             nodeId: hltNode.id,
             sourceFileName: this.fileNameState.getValue()
-        }, this.importResponse);
+        });
+        this.importResponse(res);
 
         this.close();
     }

@@ -60,20 +60,21 @@ export class UploadFromUrlDlg extends DialogBase {
                         }
                     })
                 ])
-        ])
+            ])
         ];
     }
 
-    upload = (): void => {
+    upload = async () => {
         if (!this.validate()) {
             return;
         }
 
-        S.util.ajax<J.UploadFromUrlRequest, J.UploadFromUrlResponse>("uploadFromUrl", {
+        let res: J.UploadFromUrlResponse = await S.util.ajax<J.UploadFromUrlRequest, J.UploadFromUrlResponse>("uploadFromUrl", {
             storeLocally: UploadFromUrlDlg.storeLocally,
             nodeId: this.nodeId,
             sourceUrl: this.urlState.getValue()
-        }, this.uploadFromUrlResponse);
+        });
+        this.uploadFromUrlResponse(res);
     }
 
     uploadFromUrlResponse = (res: J.UploadFromUrlResponse): void => {

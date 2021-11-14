@@ -96,10 +96,9 @@ export class Quanta implements QuantaIntf {
     // 0 means we allow.
     allowGrowPage: number = 0;
 
-    sendTestEmail = (): void => {
-        S.util.ajax<J.SendTestEmailRequest, J.SendTestEmailResponse>("sendTestEmail", {}, function (res: J.SendTestEmailResponse) {
-            S.util.showMessage("Send Test Email Initiated.", "Note");
-        });
+    sendTestEmail = async () => {
+        await S.util.ajax<J.SendTestEmailRequest, J.SendTestEmailResponse>("sendTestEmail");
+        S.util.showMessage("Send Test Email Initiated.", "Note");
     }
 
     /* We call this to temporarily disable the autoscroll in times like when we just edited something and we
@@ -250,8 +249,6 @@ export class Quanta implements QuantaIntf {
             nodeId: node.id,
             includeAcl: false,
             includeOwners: true
-        }, (res: J.GetNodePrivilegesResponse) => {
-            // this.updateNodeInfoResponse(res, node);
         });
     }
 
@@ -584,13 +581,10 @@ export class Quanta implements QuantaIntf {
         this.setOverlay(false);
         this.playAudioIfRequested();
 
-        await S.util.ajax<J.GetConfigRequest, J.GetConfigResponse>("getConfig", {
-        },
-            (res: J.GetConfigResponse): void => {
-                if (res.config) {
-                    S.quanta.config = res.config;
-                }
-            });
+        let res: J.GetConfigResponse = await S.util.ajax<J.GetConfigRequest, J.GetConfigResponse>("getConfig");
+        if (res.config) {
+            S.quanta.config = res.config;
+        }
 
         Log.log("initApp complete.");
         this.enableMouseEffect();
@@ -600,19 +594,16 @@ export class Quanta implements QuantaIntf {
         }, 1000);
     }
 
-    loadBookmarks = (): void => {
+    loadBookmarks = async (): Promise<void> => {
         let state: AppState = store.getState();
         if (!state.isAnonUser) {
-            S.util.ajax<J.GetBookmarksRequest, J.GetBookmarksResponse>("getBookmarks", {
-            },
-                (res: J.GetBookmarksResponse): void => {
-                    // let count = res.bookmarks ? res.bookmarks.length : 0;
-                    // Log.log("bookmark count=" + count);
-                    dispatch("Action_loadBookmarks", (s: AppState): AppState => {
-                        s.bookmarks = res.bookmarks;
-                        return s;
-                    });
-                });
+            let res: J.GetBookmarksResponse = await S.util.ajax<J.GetBookmarksRequest, J.GetBookmarksResponse>("getBookmarks");
+            // let count = res.bookmarks ? res.bookmarks.length : 0;
+            // Log.log("bookmark count=" + count);
+            dispatch("Action_loadBookmarks", (s: AppState): AppState => {
+                s.bookmarks = res.bookmarks;
+                return s;
+            });
         }
     }
 
@@ -984,22 +975,21 @@ export class Quanta implements QuantaIntf {
         }
     }
 
-    loadAnonPageHome = (state: AppState): void => {
+    loadAnonPageHome = async (state: AppState): Promise<void> => {
         Log.log("loadAnonPageHome()");
 
-        S.util.ajax<J.RenderNodeRequest, J.RenderNodeResponse>("anonPageLoad", null,
-            (res: J.RenderNodeResponse): void => {
-                if (!res.success || res.errorType === J.ErrorType.AUTH) {
-                    S.util.showMessage("Unable to access the requested page without being logged in. Try loading the URL without parameters, or log in.", "Warning");
-                }
-                state = appState(state);
-                S.render.renderPageFromData(res, false, null, true, true);
-            },
-            (res: any): void => {
-                Log.log("loadAnonPage Home ajax fail");
-                S.nav.login(state);
+        try {
+            let res: J.RenderNodeResponse = await S.util.ajax<J.RenderNodeRequest, J.RenderNodeResponse>("anonPageLoad");
+            if (!res.success || res.errorType === J.ErrorType.AUTH) {
+                S.util.showMessage("Unable to access the requested page without being logged in. Try loading the URL without parameters, or log in.", "Warning");
             }
-        );
+            state = appState(state);
+            S.render.renderPageFromData(res, false, null, true, true);
+        }
+        catch (e) {
+            Log.log("loadAnonPage Home ajax fail");
+            S.nav.login(state);
+        }
     }
 
     setUserPreferences = (state: AppState, flag: boolean) => {
@@ -1009,9 +999,9 @@ export class Quanta implements QuantaIntf {
         }
     }
 
-    saveUserPreferences = (state: AppState): void => {
+    saveUserPreferences = async (state: AppState): Promise<void> => {
         if (!state.isAnonUser) {
-            S.util.ajax<J.SaveUserPreferencesRequest, J.SaveUserPreferencesResponse>("saveUserPreferences", {
+            await S.util.ajax<J.SaveUserPreferencesRequest, J.SaveUserPreferencesResponse>("saveUserPreferences", {
                 userPreferences: state.userPreferences
             });
         }
@@ -1019,12 +1009,6 @@ export class Quanta implements QuantaIntf {
         dispatch("Action_SetUserPreferences", (s: AppState): AppState => {
             s.userPreferences = state.userPreferences;
             return s;
-        });
-    }
-
-    openSystemFile = (fileName: string) => {
-        S.util.ajax<J.OpenSystemFileRequest, J.OpenSystemFileResponse>("openSystemFile", {
-            fileName
         });
     }
 

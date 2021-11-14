@@ -19,8 +19,8 @@ export class WelcomePanel extends Div {
     constructor(attribs: Object = {}) {
         super(null, attribs);
 
-        setTimeout(() => {
-            S.util.ajax<J.RenderNodeRequest, J.RenderNodeResponse>("renderNode", {
+        setTimeout(async () => {
+            let res: J.RenderNodeResponse = await S.util.ajax<J.RenderNodeRequest, J.RenderNodeResponse>("renderNode", {
                 nodeId: ":welcome-page",
                 upLevel: false,
                 siblingOffset: 0,
@@ -29,9 +29,9 @@ export class WelcomePanel extends Div {
                 goToLastPage: false,
                 forceIPFSRefresh: false,
                 singleNode: false
-            }, (res) => {
-                this.mergeState({ welcomeNode: res.node });
             });
+
+            this.mergeState({ welcomeNode: res.node });
         }, 20);
     }
 

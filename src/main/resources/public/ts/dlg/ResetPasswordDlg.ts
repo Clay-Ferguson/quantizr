@@ -69,15 +69,16 @@ export class ResetPasswordDlg extends DialogBase {
         return valid;
     }
 
-    resetPassword = (): void => {
+    resetPassword = async () => {
         if (!this.validate()) {
             return;
         }
 
-        S.util.ajax<J.ResetPasswordRequest, J.ResetPasswordResponse>("resetPassword", {
+        let res: J.ResetPasswordResponse = await S.util.ajax<J.ResetPasswordRequest, J.ResetPasswordResponse>("resetPassword", {
             user: this.userState.getValue(),
             email: this.emailState.getValue()
-        }, this.resetPasswordResponse);
+        });
+        this.resetPasswordResponse(res);
     }
 
     resetPasswordResponse = (res: J.ResetPasswordResponse): void => {

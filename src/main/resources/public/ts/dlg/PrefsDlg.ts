@@ -43,9 +43,9 @@ export class PrefsDlg extends DialogBase {
         ];
     }
 
-    savePreferences = (): void => {
+    savePreferences = async (): Promise<void> => {
         if (!this.appState.isAnonUser) {
-            S.util.ajax<J.SaveUserPreferencesRequest, J.SaveUserPreferencesResponse>("saveUserPreferences", {
+            let res: J.SaveUserPreferencesResponse = await S.util.ajax<J.SaveUserPreferencesRequest, J.SaveUserPreferencesResponse>("saveUserPreferences", {
                 userPreferences: {
                     editMode: this.appState.userPreferences.editMode,
                     showMetaData: this.appState.userPreferences.showMetaData,
@@ -54,7 +54,8 @@ export class PrefsDlg extends DialogBase {
                     maxUploadFileSize: -1,
                     enableIPSM: false // we never need to enable this here. Only the menu can trigger it to set for now.
                 }
-            }, this.savePreferencesResponse);
+            });
+            this.savePreferencesResponse(res);
         }
         this.close();
     }

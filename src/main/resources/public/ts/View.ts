@@ -32,8 +32,8 @@ export class View implements ViewIntf {
     /*
      * newId is optional and if specified makes the page scroll to and highlight that node upon re-rendering.
      */
-    refreshTree = (nodeId: string, zeroOffset: boolean, renderParentIfLeaf: boolean, highlightId: string, forceIPFSRefresh: boolean,
-        scrollToTop: boolean, allowScroll: boolean, setTab: boolean, state: AppState): void => {
+    refreshTree = async (nodeId: string, zeroOffset: boolean, renderParentIfLeaf: boolean, highlightId: string, forceIPFSRefresh: boolean,
+        scrollToTop: boolean, allowScroll: boolean, setTab: boolean, state: AppState): Promise<void> => {
 
         // if we're going to be scrolling turn off the auto infinite scroll logic for this render.
         if (allowScroll || scrollToTop) {
@@ -66,25 +66,26 @@ export class View implements ViewIntf {
             renderParentIfLeaf = false;
         }
 
-        S.util.ajax<J.RenderNodeRequest, J.RenderNodeResponse>("renderNode", {
-            nodeId,
-            upLevel: false,
-            siblingOffset: 0,
-            renderParentIfLeaf,
-            offset,
-            goToLastPage: false,
-            forceIPFSRefresh,
-            singleNode: false
-        }, async (res: J.RenderNodeResponse) => {
+        try {
+            let res: J.RenderNodeResponse = await S.util.ajax<J.RenderNodeRequest, J.RenderNodeResponse>("renderNode", {
+                nodeId,
+                upLevel: false,
+                siblingOffset: 0,
+                renderParentIfLeaf,
+                offset,
+                goToLastPage: false,
+                forceIPFSRefresh,
+                singleNode: false
+            });
             if (C.DEBUG_SCROLLING) {
                 console.log("refreshTree -> renderPageFromData (scrollTop=" + scrollToTop + ")");
             }
             S.render.renderPageFromData(res, scrollToTop, highlightId, setTab, allowScroll);
-        }, // fail callback
-            (res: string) => {
-                S.quanta.clearLastNodeIds();
-                S.nav.navHome(state);
-            });
+        }
+        catch (e) {
+            S.quanta.clearLastNodeIds();
+            S.nav.navHome(state);
+        }
     }
 
     firstPage = (state: AppState): void => {
@@ -128,18 +129,21 @@ export class View implements ViewIntf {
     }
 
     /* Note: if growingPage==true we preserve the existing row data, and append more rows onto the current view */
-    private loadPage = (goToLastPage: boolean, offset: number, growingPage: boolean, state: AppState): void => {
+    private loadPage = async (goToLastPage: boolean, offset: number, growingPage: boolean, state: AppState): Promise<void> => {
         console.log("loadPage nodeId=" + state.node.id);
-        S.util.ajax<J.RenderNodeRequest, J.RenderNodeResponse>("renderNode", {
-            nodeId: state.node.id,
-            upLevel: false,
-            siblingOffset: 0,
-            renderParentIfLeaf: true,
-            offset,
-            goToLastPage,
-            forceIPFSRefresh: false,
-            singleNode: false
-        }, async (res: J.RenderNodeResponse) => {
+
+        try {
+            let res: J.RenderNodeResponse = await S.util.ajax<J.RenderNodeRequest, J.RenderNodeResponse>("renderNode", {
+                nodeId: state.node.id,
+                upLevel: false,
+                siblingOffset: 0,
+                renderParentIfLeaf: true,
+                offset,
+                goToLastPage,
+                forceIPFSRefresh: false,
+                singleNode: false
+            });
+
             // if this is an "infinite scroll" call to load in additional nodes
             if (growingPage) {
                 let scrollToTop = true;
@@ -186,12 +190,11 @@ export class View implements ViewIntf {
                 }
                 S.render.renderPageFromData(res, true, null, true, true);
             }
-        },
-            // fail callback
-            (res: string) => {
-                S.quanta.clearLastNodeIds();
-                S.nav.navHome(state);
-            });
+        }
+        catch (e) {
+            S.quanta.clearLastNodeIds();
+            S.nav.navHome(state);
+        }
     }
 
     // todo-2: need to add logic to detect if this is root node on the page, and if so, we consider the first child the target
@@ -336,52 +339,49 @@ export class View implements ViewIntf {
         });
     }
 
-    getNodeStats = (state: AppState, trending: boolean, feed: boolean) => {
+    getNodeStats = async (state: AppState, trending: boolean, feed: boolean): Promise<any> => {
         const node = S.quanta.getHighlightedNode(state);
 
-        S.util.ajax<J.GetNodeStatsRequest, J.GetNodeStatsResponse>("getNodeStats", {
+        let res: J.GetNodeStatsResponse = await S.util.ajax<J.GetNodeStatsRequest, J.GetNodeStatsResponse>("getNodeStats", {
             nodeId: node ? node.id : null,
             trending,
             feed
-        },
-            (res: J.GetNodeStatsResponse) => {
-                new NodeStatsDlg(res, trending, feed, state).open();
-            });
+        });
+        new NodeStatsDlg(res, trending, feed, state).open();
     }
 
-    runServerCommand = (command: string, dlgTitle: string, dlgDescription: string, state: AppState) => {
+    runServerCommand = async (command: string, dlgTitle: string, dlgDescription: string, state: AppState): Promise<void> => {
         const node = S.quanta.getHighlightedNode(state);
 
-        S.util.ajax<J.GetServerInfoRequest, J.GetServerInfoResponse>("getServerInfo", {
+        let res: J.GetServerInfoResponse = await S.util.ajax<J.GetServerInfoRequest, J.GetServerInfoResponse>("getServerInfo", {
             command,
             nodeId: node ? node.id : null
-        },
-            (res: J.GetServerInfoResponse) => {
-                if (res.messages) {
-                    res.messages.forEach(m => {
-                        /* a bit confusing here but this command is the same as the name of the AJAX call above (getServerInfo), but
-                      there are other commands that exist also */
-                        if (command === "getServerInfo") {
-                            m.message += "\nBrowser Memory: " + S.util.getBrowserMemoryInfo() + "\n";
-                            m.message += "Build Time: " + BUILDTIME + "\n";
-                            m.message += "Profile: " + PROFILE + "\n";
-                        }
+        });
 
-                        /* For now just prefix description onto the text. This will be made 'prettier' later todo-2 */
-                        if (dlgDescription) {
-                            m.message = dlgDescription + "\n\n" + m.message;
-                        }
-
-                        dispatch("Action_showServerInfo", (s: AppState): AppState => {
-                            S.quanta.tabChanging(s.activeTab, C.TAB_SERVERINFO, s);
-                            s.activeTab = S.quanta.activeTab = C.TAB_SERVERINFO;
-                            s.serverInfoText = m.message;
-                            s.serverInfoCommand = command;
-                            s.serverInfoTitle = dlgTitle;
-                            return s;
-                        });
-                    });
+        if (res.messages) {
+            res.messages.forEach(m => {
+                /* a bit confusing here but this command is the same as the name of the AJAX call above (getServerInfo), but
+              there are other commands that exist also */
+                if (command === "getServerInfo") {
+                    m.message += "\nBrowser Memory: " + S.util.getBrowserMemoryInfo() + "\n";
+                    m.message += "Build Time: " + BUILDTIME + "\n";
+                    m.message += "Profile: " + PROFILE + "\n";
                 }
+
+                /* For now just prefix description onto the text. This will be made 'prettier' later todo-2 */
+                if (dlgDescription) {
+                    m.message = dlgDescription + "\n\n" + m.message;
+                }
+
+                dispatch("Action_showServerInfo", (s: AppState): AppState => {
+                    S.quanta.tabChanging(s.activeTab, C.TAB_SERVERINFO, s);
+                    s.activeTab = S.quanta.activeTab = C.TAB_SERVERINFO;
+                    s.serverInfoText = m.message;
+                    s.serverInfoCommand = command;
+                    s.serverInfoTitle = dlgTitle;
+                    return s;
+                });
             });
+        }
     }
 }

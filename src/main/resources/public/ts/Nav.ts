@@ -102,29 +102,27 @@ export class Nav implements NavIntf {
         S.nav.navToSibling(1);
     }
 
-    navToSibling = (siblingOffset: number, state?: AppState): void => {
+    navToSibling = async (siblingOffset: number, state?: AppState): Promise<void> => {
         state = appState(state);
         if (!state.node) return null;
 
-        S.util.ajax<J.RenderNodeRequest, J.RenderNodeResponse>("renderNode", {
-            nodeId: state.node.id,
-            upLevel: false,
-            siblingOffset: siblingOffset,
-            renderParentIfLeaf: true,
-            offset: 0,
-            goToLastPage: false,
-            forceIPFSRefresh: false,
-            singleNode: false
-        },
-            // success callback
-            (res: J.RenderNodeResponse) => {
-                this.upLevelResponse(res, null, true, state);
-            },
-            // fail callback
-            (res: string) => {
-                S.quanta.clearLastNodeIds();
-                this.navHome(state);
+        try {
+            let res: J.RenderNodeResponse = await S.util.ajax<J.RenderNodeRequest, J.RenderNodeResponse>("renderNode", {
+                nodeId: state.node.id,
+                upLevel: false,
+                siblingOffset: siblingOffset,
+                renderParentIfLeaf: true,
+                offset: 0,
+                goToLastPage: false,
+                forceIPFSRefresh: false,
+                singleNode: false
             });
+            this.upLevelResponse(res, null, true, state);
+        }
+        catch (e) {
+            S.quanta.clearLastNodeIds();
+            this.navHome(state);
+        }
     }
 
     navUpLevelClick = async (evt: Event = null, id: string = null): Promise<void> => {
@@ -134,7 +132,7 @@ export class Nav implements NavIntf {
         this.navUpLevel(false);
     }
 
-    navUpLevel = (processingDelete: boolean): void => {
+    navUpLevel = async (processingDelete: boolean): Promise<void> => {
         const state = appState();
         if (!state.node) return null;
 
@@ -144,31 +142,29 @@ export class Nav implements NavIntf {
             return;
         }
 
-        S.util.ajax<J.RenderNodeRequest, J.RenderNodeResponse>("renderNode", {
-            nodeId: state.node.id,
-            upLevel: true,
-            siblingOffset: 0,
-            renderParentIfLeaf: false,
-            offset: 0,
-            goToLastPage: false,
-            forceIPFSRefresh: false,
-            singleNode: false
-        },
-            // success callback
-            (res: J.RenderNodeResponse) => {
-                if (processingDelete) {
-                    S.quanta.refresh(state);
-                }
-                else {
-                    this.upLevelResponse(res, state.node.id, false, state);
-                }
-            },
-            // fail callback
-            (res: string) => {
-                S.quanta.clearLastNodeIds();
-                this.navHome(state);
+        try {
+            let res: J.RenderNodeResponse = await S.util.ajax<J.RenderNodeRequest, J.RenderNodeResponse>("renderNode", {
+                nodeId: state.node.id,
+                upLevel: true,
+                siblingOffset: 0,
+                renderParentIfLeaf: false,
+                offset: 0,
+                goToLastPage: false,
+                forceIPFSRefresh: false,
+                singleNode: false
+            });
+
+            if (processingDelete) {
+                S.quanta.refresh(state);
             }
-        );
+            else {
+                this.upLevelResponse(res, state.node.id, false, state);
+            }
+        }
+        catch (e) {
+            S.quanta.clearLastNodeIds();
+            this.navHome(state);
+        }
     }
 
     /*
@@ -190,7 +186,6 @@ export class Nav implements NavIntf {
                 return S.util.domElm(nodeId);
             }
         }
-
         return null;
     }
 
@@ -235,26 +230,27 @@ export class Nav implements NavIntf {
         });
     }
 
-    openContentNode = (nodePathOrId: string, state: AppState = null): void => {
+    openContentNode = async (nodePathOrId: string, state: AppState = null): Promise<void> => {
         state = appState(state);
         // console.log("openContentNode(): " + nodePathOrId);
-        S.util.ajax<J.RenderNodeRequest, J.RenderNodeResponse>("renderNode", {
-            nodeId: nodePathOrId,
-            upLevel: false,
-            siblingOffset: 0,
-            renderParentIfLeaf: null,
-            offset: 0,
-            goToLastPage: false,
-            forceIPFSRefresh: false,
-            singleNode: false
-        }, (res) => {
-            this.navPageNodeResponse(res, state);
-        },
-            // fail callback
-            (res: string) => {
-                S.quanta.clearLastNodeIds();
-                this.navHome(state);
+
+        try {
+            let res: J.RenderNodeResponse = await S.util.ajax<J.RenderNodeRequest, J.RenderNodeResponse>("renderNode", {
+                nodeId: nodePathOrId,
+                upLevel: false,
+                siblingOffset: 0,
+                renderParentIfLeaf: null,
+                offset: 0,
+                goToLastPage: false,
+                forceIPFSRefresh: false,
+                singleNode: false
             });
+            this.navPageNodeResponse(res, state);
+        }
+        catch (e) {
+            S.quanta.clearLastNodeIds();
+            this.navHome(state);
+        }
     }
 
     openNodeById = (evt: Event, id: string, state: AppState): void => {
@@ -321,7 +317,7 @@ export class Nav implements NavIntf {
         S.quanta.mainMenu.open();
     }
 
-    navHome = (state: AppState = null): void => {
+    navHome = async (state: AppState = null): Promise<void> => {
         state = appState(state);
         S.view.scrollAllTop(state);
 
@@ -329,24 +325,23 @@ export class Nav implements NavIntf {
         if (state.isAnonUser) {
             S.quanta.loadAnonPageHome(null);
         } else {
-            // console.log("renderNode (navHome): " + state.homeNodeId);
-            S.util.ajax<J.RenderNodeRequest, J.RenderNodeResponse>("renderNode", {
-                nodeId: state.homeNodeId,
-                upLevel: false,
-                siblingOffset: 0,
-                renderParentIfLeaf: null,
-                offset: 0,
-                goToLastPage: false,
-                forceIPFSRefresh: false,
-                singleNode: false
-            }, (res) => { this.navPageNodeResponse(res, state); },
-                // fail callback
-                (res: string) => {
-                    S.quanta.clearLastNodeIds();
-
-                    // NOPE! This would be recursive!
-                    // this.navHome(state);
+            try {
+                // console.log("renderNode (navHome): " + state.homeNodeId);
+                let res: J.RenderNodeResponse = await S.util.ajax<J.RenderNodeRequest, J.RenderNodeResponse>("renderNode", {
+                    nodeId: state.homeNodeId,
+                    upLevel: false,
+                    siblingOffset: 0,
+                    renderParentIfLeaf: null,
+                    offset: 0,
+                    goToLastPage: false,
+                    forceIPFSRefresh: false,
+                    singleNode: false
                 });
+                this.navPageNodeResponse(res, state);
+            }
+            catch (e) {
+                S.quanta.clearLastNodeIds();
+            }
         }
     }
 
@@ -377,7 +372,7 @@ export class Nav implements NavIntf {
         }, 500);
     }
 
-    openNodeFeed = (evt: Event, id: string): void => {
+    openNodeFeed = async (evt: Event, id: string): Promise<void> => {
         id = S.util.allowIdFromEvent(evt, id);
         const state = appState();
 
@@ -403,7 +398,7 @@ export class Nav implements NavIntf {
         }
         // if node not in local memory, then we have to get it from the server first...
         else {
-            S.util.ajax<J.RenderNodeRequest, J.RenderNodeResponse>("renderNode", {
+            let res: J.RenderNodeResponse = await S.util.ajax<J.RenderNodeRequest, J.RenderNodeResponse>("renderNode", {
                 nodeId: id,
                 upLevel: false,
                 siblingOffset: 0,
@@ -412,27 +407,23 @@ export class Nav implements NavIntf {
                 goToLastPage: false,
                 forceIPFSRefresh: false,
                 singleNode: true
-            },
-                (res: J.RenderNodeResponse) => {
-                    if (!res.node) return;
-                    S.quanta.updateNodeMap(res.node, state);
-                    let feedData = S.quanta.getTabDataById(state, C.TAB_FEED);
-                    if (feedData) {
-                        feedData.props.searchTextState.setValue("");
-                    }
-                    this.messages({
-                        feedFilterFriends: false,
-                        feedFilterToMe: false,
-                        feedFilterFromMe: false,
-                        feedFilterToPublic: true,
-                        feedFilterLocalServer: true,
-                        feedFilterRootNode: res.node,
-                        feedResults: null
-                    });
-                }, // fail callback
-                (res: string) => {
-                    console.log("failed to refresh node: " + res);
-                });
+            });
+
+            if (!res.node) return;
+            S.quanta.updateNodeMap(res.node, state);
+            let feedData = S.quanta.getTabDataById(state, C.TAB_FEED);
+            if (feedData) {
+                feedData.props.searchTextState.setValue("");
+            }
+            this.messages({
+                feedFilterFriends: false,
+                feedFilterToMe: false,
+                feedFilterFromMe: false,
+                feedFilterToPublic: true,
+                feedFilterLocalServer: true,
+                feedFilterRootNode: res.node,
+                feedResults: null
+            });
         }
     }
 

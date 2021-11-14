@@ -199,7 +199,7 @@ export class Render implements RenderIntf {
     }
 
     /* nodeId is parent node to query for calendar content */
-    showCalendar = (nodeId: string, state: AppState): void => {
+    showCalendar = async (nodeId: string, state: AppState) => {
         if (!nodeId) {
             let node = S.quanta.getHighlightedNode(state);
             if (node) {
@@ -211,14 +211,13 @@ export class Render implements RenderIntf {
             return;
         }
 
-        S.util.ajax<J.RenderCalendarRequest, J.RenderCalendarResponse>("renderCalendar", {
+        let res: J.RenderCalendarResponse = await S.util.ajax<J.RenderCalendarRequest, J.RenderCalendarResponse>("renderCalendar", {
             nodeId
-        }, (res: J.RenderCalendarResponse) => {
-            dispatch("Action_ShowCalendar", (s: AppState): AppState => {
-                s.fullScreenCalendarId = nodeId;
-                s.calendarData = S.util.buildCalendarData(res.items);
-                return s;
-            });
+        });
+        dispatch("Action_ShowCalendar", (s: AppState): AppState => {
+            s.fullScreenCalendarId = nodeId;
+            s.calendarData = S.util.buildCalendarData(res.items);
+            return s;
         });
     }
 
@@ -544,7 +543,7 @@ export class Render implements RenderIntf {
     This function will perform well even if called repeatedly. Only does the work once as neccessary so we can call this
     safely after every time we get new data from the server, with no unnecessarey performance hit.
     */
-    getNodeMetaInfo = (node: J.NodeInfo) => {
+    getNodeMetaInfo = async (node: J.NodeInfo) => {
         if (node && node.children) {
             // Holds the list of IDs we will query for. Only those with "metainfDone==false", meaning we
             // haven't yet pulled the metadata yet.
@@ -558,33 +557,33 @@ export class Render implements RenderIntf {
 
             if (ids.length > 0) {
                 // console.log("MetaQuery idCount=" + ids.length);
-                S.util.ajax<J.GetNodeMetaInfoRequest, J.GetNodeMetaInfoResponse>("getNodeMetaInfo", {
+                let res: J.GetNodeMetaInfoResponse = await S.util.ajax<J.GetNodeMetaInfoRequest, J.GetNodeMetaInfoResponse>("getNodeMetaInfo", {
                     ids
-                }, (res: J.GetNodeMetaInfoResponse) => {
-                    dispatch("Action_updateNodeMetaInfo", (s: AppState): AppState => {
-                        if (s.node && s.node.children) {
-                            s.node.hasChildren = true;
+                }, true);
 
-                            // iterate all children
-                            for (let child of s.node.children) {
+                dispatch("Action_updateNodeMetaInfo", (s: AppState): AppState => {
+                    if (s.node && s.node.children) {
+                        s.node.hasChildren = true;
 
-                                // if this is a child we will have just pulled down
-                                if (!(child as any).metaInfDone) {
+                        // iterate all children
+                        for (let child of s.node.children) {
 
-                                    // find the child in what we just pulled down.
-                                    let inf: J.NodeMetaIntf = res.nodeIntf.find(v => v.id === child.id);
+                            // if this is a child we will have just pulled down
+                            if (!(child as any).metaInfDone) {
 
-                                    // set the hasChildren to the value we just pulled down.
-                                    if (inf) {
-                                        child.hasChildren = inf.hasChildren;
-                                    }
-                                    (child as any).metaInfDone = true;
+                                // find the child in what we just pulled down.
+                                let inf: J.NodeMetaIntf = res.nodeIntf.find(v => v.id === child.id);
+
+                                // set the hasChildren to the value we just pulled down.
+                                if (inf) {
+                                    child.hasChildren = inf.hasChildren;
                                 }
+                                (child as any).metaInfDone = true;
                             }
                         }
-                        return s;
-                    });
-                }, null, true);
+                    }
+                    return s;
+                });
             }
         }
     }

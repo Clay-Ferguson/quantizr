@@ -294,13 +294,6 @@ export class NodeCompButtonBar extends Div {
                 nid: node.id,
                 onClick: S.nav.runTimeline
             });
-
-            // nodeFeedButton = new Icon({
-            //     className: "fa fa-comments fa-lg buttonBarIcon",
-            //     title: "Open a Feed View of this Node",
-            //     nid: node.id,
-            //     onClick: S.nav.openNodeFeed
-            // });
         }
 
         let btnArray: Comp[] = [openButton, upLevelButton, insertNodeButton, createSubNodeButton, editNodeButton, prevButton, nextButton,

@@ -70,21 +70,22 @@ export class UploadFromIPFSDlg extends DialogBase {
                 //         }
                 //     })
                 // ])
-        ])
+            ])
         ];
     }
 
-    upload = (): void => {
+    upload = async () => {
         if (!this.validate()) {
             return;
         }
 
-        S.util.ajax<J.UploadFromIPFSRequest, J.UploadFromIPFSResponse>("uploadFromIPFS", {
+        let res: J.UploadFromIPFSResponse = await S.util.ajax<J.UploadFromIPFSRequest, J.UploadFromIPFSResponse>("uploadFromIPFS", {
             pinLocally: false, // UploadFromUrlDlg.storeLocally,
             nodeId: this.nodeId,
             cid: this.cidState.getValue(),
             mime: this.mimeState.getValue()
-        }, this.uploadFromIPFSResponse);
+        });
+        this.uploadFromIPFSResponse(res);
     }
 
     uploadFromIPFSResponse = (res: J.UploadFromUrlResponse): void => {

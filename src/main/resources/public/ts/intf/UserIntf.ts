@@ -2,7 +2,7 @@ import { AppState } from "../AppState";
 import * as J from "../JavaIntf";
 
 export interface UserIntf {
-    closeAccountResponse(res: J.CloseAccountResponse, state: AppState): void;
+    closeAccountResponse(): void;
     closeAccount(): Promise<void>;
     isTestUserAccount(state: AppState): boolean;
     openSignupPg(state: AppState): void;

@@ -3,7 +3,7 @@ import { AppState } from "../AppState";
 export interface ViewIntf {
     docElm: any;
     jumpToId(id: string): void;
-    refreshTree(nodeId: string, zeroOffset: boolean, renderParentIfLeaf: boolean, highlightId: string, forceIPFSRefresh: boolean, scrollToTop: boolean, allowScroll: boolean, setTab: boolean, state: AppState): void;
+    refreshTree(nodeId: string, zeroOffset: boolean, renderParentIfLeaf: boolean, highlightId: string, forceIPFSRefresh: boolean, scrollToTop: boolean, allowScroll: boolean, setTab: boolean, state: AppState): Promise<void>;
     firstPage(state: AppState): void;
     prevPage(state: AppState): void;
     nextPage(state: AppState): void;
@@ -12,7 +12,7 @@ export interface ViewIntf {
     scrollRelativeToNode(dir: string, state: AppState): void;
     scrollToSelectedNode(state: AppState): void;
     scrollToTop(afterFunc?: Function): Promise<void>;
-    runServerCommand(command: string, dlgTitle: string, dlgDescription: string, state: AppState): any;
-    getNodeStats(state: AppState, trending: boolean, feed: boolean): any;
+    runServerCommand(command: string, dlgTitle: string, dlgDescription: string, state: AppState): Promise<void>;
+    getNodeStats(state: AppState, trending: boolean, feed: boolean): Promise<void>;
     scrollAllTop(state: AppState): void;
 }

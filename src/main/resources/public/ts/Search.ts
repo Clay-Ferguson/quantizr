@@ -27,41 +27,40 @@ export class Search implements SearchIntf {
 
     idToNodeMap: Map<string, J.NodeInfo> = new Map<string, J.NodeInfo>();
 
-    findSharedNodes = (node: J.NodeInfo, page: number, type: string, shareTarget: string, accessOption: string, state: AppState): void => {
-        S.util.ajax<J.GetSharedNodesRequest, J.GetSharedNodesResponse>("getSharedNodes", {
+    findSharedNodes = async (node: J.NodeInfo, page: number, type: string, shareTarget: string, accessOption: string, state: AppState): Promise<void> => {
+        let res: J.GetSharedNodesResponse = await S.util.ajax<J.GetSharedNodesRequest, J.GetSharedNodesResponse>("getSharedNodes", {
             page,
             nodeId: node.id,
             shareTarget,
             accessOption
-        }, (res) => {
-            if (res.searchResults && res.searchResults.length > 0) {
-                dispatch("Action_RenderSearchResults", (s: AppState): AppState => {
-                    S.util.focusId(C.TAB_SHARES);
-                    S.quanta.tabScrollTop(s, C.TAB_SHARES);
-                    let data = s.tabData.find(d => d.id === C.TAB_SHARES);
-                    if (!data) return;
-                    let info = data.rsInfo as SharesRSInfo;
-
-                    info.results = res.searchResults;
-                    info.page = page;
-                    info.description = "Showing " + type + " shared nodes";
-                    info.node = node;
-                    info.shareTarget = shareTarget;
-                    info.accessOption = accessOption;
-                    info.endReached = !res.searchResults || res.searchResults.length < J.ConstantInt.ROWS_PER_PAGE;
-
-                    S.quanta.selectTabStateOnly(data.id, s);
-                    return s;
-                });
-            }
-            else {
-                new MessageDlg("No search results found for " + type + " shared nodes", "Search", null, null, false, 0, null, state).open();
-            }
         });
+        if (res.searchResults?.length > 0) {
+            dispatch("Action_RenderSearchResults", (s: AppState): AppState => {
+                S.util.focusId(C.TAB_SHARES);
+                S.quanta.tabScrollTop(s, C.TAB_SHARES);
+                let data = s.tabData.find(d => d.id === C.TAB_SHARES);
+                if (!data) return;
+                let info = data.rsInfo as SharesRSInfo;
+
+                info.results = res.searchResults;
+                info.page = page;
+                info.description = "Showing " + type + " shared nodes";
+                info.node = node;
+                info.shareTarget = shareTarget;
+                info.accessOption = accessOption;
+                info.endReached = !res.searchResults || res.searchResults.length < J.ConstantInt.ROWS_PER_PAGE;
+
+                S.quanta.selectTabStateOnly(data.id, s);
+                return s;
+            });
+        }
+        else {
+            new MessageDlg("No search results found for " + type + " shared nodes", "Search", null, null, false, 0, null, state).open();
+        }
     }
 
-    search = (node: J.NodeInfo, prop: string, searchText: string, state: AppState, searchType: string, description: string, fuzzy: boolean, caseSensitive: boolean, page: number, recursive: boolean, sortField: string, sortDir: string, successCallback: Function): void => {
-        S.util.ajax<J.NodeSearchRequest, J.NodeSearchResponse>("nodeSearch", {
+    search = async (node: J.NodeInfo, prop: string, searchText: string, state: AppState, searchType: string, description: string, fuzzy: boolean, caseSensitive: boolean, page: number, recursive: boolean, sortField: string, sortDir: string, successCallback: Function): Promise<void> => {
+        let res: J.NodeSearchResponse = await S.util.ajax<J.NodeSearchRequest, J.NodeSearchResponse>("nodeSearch", {
             page,
             nodeId: node ? node.id : null, // for user searchTypes this node can be null
             searchText,
@@ -74,61 +73,44 @@ export class Search implements SearchIntf {
             searchDefinition: "",
             timeRangeType: null,
             recursive
-        }, (res) => {
-            if (res.searchResults && res.searchResults.length > 0) {
-                if (successCallback) {
-                    successCallback();
-                }
-
-                dispatch("Action_RenderSearchResults", (s: AppState): AppState => {
-                    S.util.focusId(C.TAB_SEARCH);
-                    S.quanta.tabScrollTop(s, C.TAB_SEARCH);
-                    let data = s.tabData.find(d => d.id === C.TAB_SEARCH);
-                    if (!data) return;
-
-                    data.rsInfo.results = res.searchResults;
-                    data.rsInfo.page = page;
-                    data.rsInfo.searchType = searchType;
-                    data.rsInfo.description = description;
-                    data.rsInfo.node = node;
-                    data.rsInfo.searchText = searchText;
-                    data.rsInfo.fuzzy = fuzzy;
-                    data.rsInfo.caseSensitive = caseSensitive;
-                    data.rsInfo.recursive = recursive;
-                    data.rsInfo.sortField = sortField;
-                    data.rsInfo.sortDir = sortDir;
-                    data.rsInfo.prop = prop;
-                    data.rsInfo.endReached = !res.searchResults || res.searchResults.length < J.ConstantInt.ROWS_PER_PAGE;
-
-                    S.quanta.selectTabStateOnly(data.id, s);
-                    return s;
-                });
-            }
-            else {
-                new MessageDlg("No search results found.", "Search", null, null, false, 0, null, state).open();
-            }
         });
-    }
 
-    searchFilesResponse = (res: J.FileSearchResponse, state: AppState) => {
-        S.util.ajax<J.RenderNodeRequest, J.RenderNodeResponse>("renderNode", {
-            nodeId: res.searchResultNodeId,
-            upLevel: false,
-            siblingOffset: 0,
-            renderParentIfLeaf: null,
-            offset: 0,
-            goToLastPage: false,
-            forceIPFSRefresh: false,
-            singleNode: false
-        }, (res) => S.nav.navPageNodeResponse(res, state), // fail callback
-            (res: string) => {
-                S.quanta.clearLastNodeIds();
-                S.nav.navHome(state);
+        if (res.searchResults && res.searchResults.length > 0) {
+            if (successCallback) {
+                successCallback();
+            }
+
+            dispatch("Action_RenderSearchResults", (s: AppState): AppState => {
+                S.util.focusId(C.TAB_SEARCH);
+                S.quanta.tabScrollTop(s, C.TAB_SEARCH);
+                let data = s.tabData.find(d => d.id === C.TAB_SEARCH);
+                if (!data) return;
+
+                data.rsInfo.results = res.searchResults;
+                data.rsInfo.page = page;
+                data.rsInfo.searchType = searchType;
+                data.rsInfo.description = description;
+                data.rsInfo.node = node;
+                data.rsInfo.searchText = searchText;
+                data.rsInfo.fuzzy = fuzzy;
+                data.rsInfo.caseSensitive = caseSensitive;
+                data.rsInfo.recursive = recursive;
+                data.rsInfo.sortField = sortField;
+                data.rsInfo.sortDir = sortDir;
+                data.rsInfo.prop = prop;
+                data.rsInfo.endReached = !res.searchResults || res.searchResults.length < J.ConstantInt.ROWS_PER_PAGE;
+
+                S.quanta.selectTabStateOnly(data.id, s);
+                return s;
             });
+        }
+        else {
+            new MessageDlg("No search results found.", "Search", null, null, false, 0, null, state).open();
+        }
     }
 
     /* prop = mtm (modification time) | ctm (create time) */
-    timeline = (node: J.NodeInfo, prop: string, state: AppState, timeRangeType: string, timelineDescription: string, page: number, recursive: boolean) => {
+    timeline = async (node: J.NodeInfo, prop: string, state: AppState, timeRangeType: string, timelineDescription: string, page: number, recursive: boolean) => {
 
         /* this code AND other similar code needs a way to lockin the node, here so it can't change during pagination
         including when the page==0 because user is just jumping to beginning. Need a specific param for saying
@@ -142,7 +124,7 @@ export class Search implements SearchIntf {
             return;
         }
 
-        S.util.ajax<J.NodeSearchRequest, J.NodeSearchResponse>("nodeSearch", {
+        let res: J.NodeSearchResponse = await S.util.ajax<J.NodeSearchRequest, J.NodeSearchResponse>("nodeSearch", {
             page,
             nodeId: node.id,
             searchText: "",
@@ -155,26 +137,26 @@ export class Search implements SearchIntf {
             searchType: null,
             timeRangeType,
             recursive
-        }, (res) => {
-            dispatch("Action_RenderTimelineResults", (s: AppState): AppState => {
-                S.util.focusId(C.TAB_TIMELINE);
-                S.quanta.tabScrollTop(s, C.TAB_TIMELINE);
-                let data = s.tabData.find(d => d.id === C.TAB_TIMELINE);
-                if (!data) return;
-                let info = data.rsInfo as TimelineRSInfo;
+        });
 
-                info.results = res.searchResults;
-                info.description = timelineDescription;
-                info.prop = prop;
-                info.timeRangeType = timeRangeType;
-                info.recursive = recursive;
-                info.node = node;
-                info.endReached = !res.searchResults || res.searchResults.length < J.ConstantInt.ROWS_PER_PAGE;
-                info.page = page;
+        dispatch("Action_RenderTimelineResults", (s: AppState): AppState => {
+            S.util.focusId(C.TAB_TIMELINE);
+            S.quanta.tabScrollTop(s, C.TAB_TIMELINE);
+            let data = s.tabData.find(d => d.id === C.TAB_TIMELINE);
+            if (!data) return;
+            let info = data.rsInfo as TimelineRSInfo;
 
-                S.quanta.selectTabStateOnly(data.id, s);
-                return s;
-            });
+            info.results = res.searchResults;
+            info.description = timelineDescription;
+            info.prop = prop;
+            info.timeRangeType = timeRangeType;
+            info.recursive = recursive;
+            info.node = node;
+            info.endReached = !res.searchResults || res.searchResults.length < J.ConstantInt.ROWS_PER_PAGE;
+            info.page = page;
+
+            S.quanta.selectTabStateOnly(data.id, s);
+            return s;
         });
     }
 
@@ -222,14 +204,14 @@ export class Search implements SearchIntf {
     }
 
     /* growResults==true is the "infinite scrolling" support */
-    feed = (page: number, searchText: string, forceMetadataOn: boolean, growResults: boolean) => {
+    feed = async (page: number, searchText: string, forceMetadataOn: boolean, growResults: boolean) => {
         let appState = store.getState();
         let feedData: TabDataIntf = S.quanta.getTabDataById(appState, C.TAB_FEED);
         if (!feedData) {
             return;
         }
         // console.log("Getting results page=" + page);
-        S.util.ajax<J.NodeFeedRequest, J.NodeFeedResponse>("nodeFeed", {
+        let res: J.NodeFeedResponse = await S.util.ajax<J.NodeFeedRequest, J.NodeFeedResponse>("nodeFeed", {
             page,
             nodeId: feedData.props.feedFilterRootNode?.id,
             toMe: feedData.props.feedFilterToMe,
@@ -239,63 +221,63 @@ export class Search implements SearchIntf {
             fromFriends: feedData.props.feedFilterFriends,
             nsfw: feedData.props.feedFilterNSFW,
             searchText
-        }, (res: J.NodeFeedResponse) => {
-            dispatch("Action_RenderFeedResults", (s: AppState): AppState => {
-                S.quanta.openGraphComps = [];
-                // s.feedResults = S.quanta.removeRedundantFeedItems(res.searchResults || []);
+        });
 
-                // once user requests their stuff, turn off the new messages count indicator.
-                if (feedData.props.feedFilterToMe) {
-                    s.newMessageCount = 0;
+        dispatch("Action_RenderFeedResults", (s: AppState): AppState => {
+            S.quanta.openGraphComps = [];
+            // s.feedResults = S.quanta.removeRedundantFeedItems(res.searchResults || []);
+
+            // once user requests their stuff, turn off the new messages count indicator.
+            if (feedData.props.feedFilterToMe) {
+                s.newMessageCount = 0;
+            }
+
+            s.guiReady = true;
+            let scrollToTop = true;
+
+            if (forceMetadataOn) {
+                S.edit.setMetadataOption(true);
+            }
+
+            // if scrolling in new results grow the existing array
+            if (growResults) {
+                if (feedData?.props?.feedResults && res?.searchResults && feedData.props.feedResults.length < C.MAX_DYNAMIC_ROWS) {
+                    // create a set for duplicate detection
+                    let idSet: Set<string> = new Set<string>();
+
+                    // load set for known children.
+                    feedData.props.feedResults.forEach(child => {
+                        idSet.add(child.id);
+                    });
+
+                    scrollToTop = false;
+                    feedData.props.feedResults = feedData.props.feedResults.concat(res.searchResults.filter(child => !idSet.has(child.id)));
+                    // console.log("Grow Results. Now has: " + feedData.props.feedResults.length);
                 }
-
-                s.guiReady = true;
-                let scrollToTop = true;
-
-                if (forceMetadataOn) {
-                    S.edit.setMetadataOption(true);
-                }
-
-                // if scrolling in new results grow the existing array
-                if (growResults) {
-                    if (feedData?.props?.feedResults && res?.searchResults && feedData.props.feedResults.length < C.MAX_DYNAMIC_ROWS) {
-                        // create a set for duplicate detection
-                        let idSet: Set<string> = new Set<string>();
-
-                        // load set for known children.
-                        feedData.props.feedResults.forEach(child => {
-                            idSet.add(child.id);
-                        });
-
-                        scrollToTop = false;
-                        feedData.props.feedResults = feedData.props.feedResults.concat(res.searchResults.filter(child => !idSet.has(child.id)));
-                        // console.log("Grow Results. Now has: " + feedData.props.feedResults.length);
-                    }
-                    else {
-                        feedData.props.feedResults = res.searchResults;
-                        // console.log("Replaced Results(1). Now has: " + feedData.props.feedResults.length);
-                    }
-                }
-                // else we have a fresh array (reset the array)
                 else {
                     feedData.props.feedResults = res.searchResults;
-                    // console.log("Grow Results(2). Now has: " + feedData.props.feedResults.length);
+                    // console.log("Replaced Results(1). Now has: " + feedData.props.feedResults.length);
                 }
+            }
+            // else we have a fresh array (reset the array)
+            else {
+                feedData.props.feedResults = res.searchResults;
+                // console.log("Grow Results(2). Now has: " + feedData.props.feedResults.length);
+            }
 
-                feedData.props.feedEndReached = res.endReached;
-                feedData.props.feedDirty = false;
-                feedData.props.feedLoading = false;
+            feedData.props.feedEndReached = res.endReached;
+            feedData.props.feedDirty = false;
+            feedData.props.feedLoading = false;
 
-                if (scrollToTop) {
-                    S.quanta.selectTabStateOnly(C.TAB_FEED, s);
-                    setTimeout(() => {
-                        S.view.scrollAllTop(s);
-                    }, 1000);
-                }
+            if (scrollToTop) {
+                S.quanta.selectTabStateOnly(C.TAB_FEED, s);
+                setTimeout(() => {
+                    S.view.scrollAllTop(s);
+                }, 1000);
+            }
 
-                S.util.focusId(C.TAB_FEED);
-                return s;
-            });
+            S.util.focusId(C.TAB_FEED);
+            return s;
         });
     }
 
@@ -309,7 +291,7 @@ export class Search implements SearchIntf {
         }
     }
 
-    showFollowers = (page: number, userName: string): void => {
+    showFollowers = async (page: number, userName: string): Promise<void> => {
         let state: AppState = store.getState();
         if (state.isAnonUser) return;
 
@@ -317,41 +299,41 @@ export class Search implements SearchIntf {
             userName = state.userName;
         }
 
-        S.util.ajax<J.GetFollowersRequest, J.GetFollowersResponse>("getFollowers", {
+        let res: J.GetFollowersResponse = await S.util.ajax<J.GetFollowersRequest, J.GetFollowersResponse>("getFollowers", {
             page,
             targetUserName: userName
-        }, (res) => {
-            if (res.searchResults && res.searchResults.length > 0) {
-                dispatch("Action_RenderSearchResults", (s: AppState): AppState => {
-                    S.util.focusId(C.TAB_FOLLOWERS);
-                    S.quanta.tabScrollTop(s, C.TAB_FOLLOWERS);
-                    let data = s.tabData.find(d => d.id === C.TAB_FOLLOWERS);
-                    if (!data) return;
-                    let info = data.rsInfo as FollowersRSInfo;
-
-                    info.results = res.searchResults;
-                    info.page = page;
-                    info.searchType = null;
-                    info.description = null;
-                    info.node = null;
-                    info.searchText = null;
-                    info.fuzzy = false;
-                    info.caseSensitive = false;
-                    info.prop = null;
-                    info.endReached = !res.searchResults || res.searchResults.length < J.ConstantInt.ROWS_PER_PAGE;
-                    info.showingFollowersOfUser = userName;
-
-                    S.quanta.selectTabStateOnly(data.id, s);
-                    return s;
-                });
-            }
-            else {
-                new MessageDlg("No search results found.", "Followers", null, null, false, 0, null, state).open();
-            }
         });
+
+        if (res.searchResults?.length > 0) {
+            dispatch("Action_RenderSearchResults", (s: AppState): AppState => {
+                S.util.focusId(C.TAB_FOLLOWERS);
+                S.quanta.tabScrollTop(s, C.TAB_FOLLOWERS);
+                let data = s.tabData.find(d => d.id === C.TAB_FOLLOWERS);
+                if (!data) return;
+                let info = data.rsInfo as FollowersRSInfo;
+
+                info.results = res.searchResults;
+                info.page = page;
+                info.searchType = null;
+                info.description = null;
+                info.node = null;
+                info.searchText = null;
+                info.fuzzy = false;
+                info.caseSensitive = false;
+                info.prop = null;
+                info.endReached = !res.searchResults || res.searchResults.length < J.ConstantInt.ROWS_PER_PAGE;
+                info.showingFollowersOfUser = userName;
+
+                S.quanta.selectTabStateOnly(data.id, s);
+                return s;
+            });
+        }
+        else {
+            new MessageDlg("No search results found.", "Followers", null, null, false, 0, null, state).open();
+        }
     }
 
-    showFollowing = (page: number, userName: string): void => {
+    showFollowing = async (page: number, userName: string): Promise<void> => {
         let state: AppState = store.getState();
         if (state.isAnonUser) return;
 
@@ -359,38 +341,38 @@ export class Search implements SearchIntf {
             userName = state.userName;
         }
 
-        S.util.ajax<J.GetFollowingRequest, J.GetFollowingResponse>("getFollowing", {
+        let res: J.GetFollowingResponse = await S.util.ajax<J.GetFollowingRequest, J.GetFollowingResponse>("getFollowing", {
             page,
             targetUserName: userName
-        }, (res) => {
-            if (res.searchResults && res.searchResults.length > 0) {
-                dispatch("Action_RenderSearchResults", (s: AppState): AppState => {
-                    S.util.focusId(C.TAB_FOLLOWING);
-                    S.quanta.tabScrollTop(s, C.TAB_FOLLOWING);
-                    let data = s.tabData.find(d => d.id === C.TAB_FOLLOWING);
-                    if (!data) return;
-                    let info = data.rsInfo as FollowingRSInfo;
-
-                    info.results = res.searchResults;
-                    info.page = page;
-                    info.searchType = null;
-                    info.description = null;
-                    info.node = null;
-                    info.searchText = null;
-                    info.fuzzy = false;
-                    info.caseSensitive = false;
-                    info.prop = null;
-                    info.endReached = !res.searchResults || res.searchResults.length < J.ConstantInt.ROWS_PER_PAGE;
-                    info.showingFollowingOfUser = userName;
-
-                    S.quanta.selectTabStateOnly(data.id, s);
-                    return s;
-                });
-            }
-            else {
-                new MessageDlg("No search results found.", "Following", null, null, false, 0, null, state).open();
-            }
         });
+
+        if (res.searchResults && res.searchResults.length > 0) {
+            dispatch("Action_RenderSearchResults", (s: AppState): AppState => {
+                S.util.focusId(C.TAB_FOLLOWING);
+                S.quanta.tabScrollTop(s, C.TAB_FOLLOWING);
+                let data = s.tabData.find(d => d.id === C.TAB_FOLLOWING);
+                if (!data) return;
+                let info = data.rsInfo as FollowingRSInfo;
+
+                info.results = res.searchResults;
+                info.page = page;
+                info.searchType = null;
+                info.description = null;
+                info.node = null;
+                info.searchText = null;
+                info.fuzzy = false;
+                info.caseSensitive = false;
+                info.prop = null;
+                info.endReached = !res.searchResults || res.searchResults.length < J.ConstantInt.ROWS_PER_PAGE;
+                info.showingFollowingOfUser = userName;
+
+                S.quanta.selectTabStateOnly(data.id, s);
+                return s;
+            });
+        }
+        else {
+            new MessageDlg("No search results found.", "Following", null, null, false, 0, null, state).open();
+        }
     }
 
     /*
@@ -462,15 +444,14 @@ export class Search implements SearchIntf {
         });
     }
 
-    searchAndReplace = (recursive: boolean, nodeId: string, search: string, replace: string, state: AppState): void => {
-        S.util.ajax<J.SearchAndReplaceRequest, J.SearchAndReplaceResponse>("searchAndReplace", {
+    searchAndReplace = async (recursive: boolean, nodeId: string, search: string, replace: string, state: AppState): Promise<void> => {
+        let res: J.SearchAndReplaceResponse = await S.util.ajax<J.SearchAndReplaceRequest, J.SearchAndReplaceResponse>("searchAndReplace", {
             recursive,
             nodeId,
             search,
             replace
-        }, (res: J.SearchAndReplaceResponse) => {
-            S.view.refreshTree(null, false, false, null, false, false, true, true, state);
-            S.util.showMessage(res.message, "Success");
         });
+        S.view.refreshTree(null, false, false, null, false, false, true, true, state);
+        S.util.showMessage(res.message, "Success");
     }
 }

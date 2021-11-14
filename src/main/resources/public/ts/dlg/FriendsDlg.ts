@@ -44,13 +44,13 @@ export class FriendsDlg extends DialogBase {
             loading: true
         });
 
-        S.util.ajax<J.GetFriendsRequest, J.GetFriendsResponse>("getFriends", {
-        }, (res: J.GetFriendsResponse): void => {
+        (async () => {
+            let res: J.GetFriendsResponse = await S.util.ajax<J.GetFriendsRequest, J.GetFriendsResponse>("getFriends");
             this.mergeState({
                 friends: res.friends,
                 loading: false
             });
-        });
+        })();
     }
 
     renderDlg(): CompIntf[] {

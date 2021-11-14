@@ -52,16 +52,16 @@ export class LoadNodeFromIpfsDlg extends DialogBase {
         return valid;
     }
 
-    load = (): void => {
+    load = async (): Promise<void> => {
         if (!this.validate()) {
             return;
         }
         let path = this.ipfsPathState.getValue();
 
-        S.util.ajax<J.LoadNodeFromIpfsRequest, J.LoadNodeFromIpfsResponse>("loadNodeFromIpfs", {
+        let res: J.LoadNodeFromIpfsResponse = await S.util.ajax<J.LoadNodeFromIpfsRequest, J.LoadNodeFromIpfsResponse>("loadNodeFromIpfs", {
             path
-        }, (res) => {
-            S.util.showMessage(res.message, "Server Reply", true);
         });
+
+        S.util.showMessage(res.message, "Server Reply", true);
     }
 }

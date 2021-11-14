@@ -70,10 +70,9 @@ export interface QuantaIntf {
     initApp(): Promise<void>;
     processUrlParams(state: AppState): void;
     displaySignupMessage(): void
-    loadAnonPageHome(state: AppState): void;
+    loadAnonPageHome(state: AppState): Promise<void>;
     setUserPreferences(state: AppState, flag: boolean): void;
-    saveUserPreferences(state: AppState): void;
-    openSystemFile(fileName: string);
+    saveUserPreferences(state: AppState): Promise<void>;
     setStateVarsUsingLoginResponse(res: J.LoginResponse): void;
     updateNodeMap(node: J.NodeInfo, state: AppState): void;
     removeRedundantFeedItems(feedResults: J.NodeInfo[]): J.NodeInfo[];

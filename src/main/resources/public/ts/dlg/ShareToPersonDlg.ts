@@ -68,12 +68,13 @@ export class ShareToPersonDlg extends DialogBase {
         this.shareImmediate(this.userNameState.getValue());
     }
 
-    shareImmediate = (userName: string) => {
-        S.util.ajax<J.AddPrivilegeRequest, J.AddPrivilegeResponse>("addPrivilege", {
+    shareImmediate = async (userName: string) => {
+        let res: J.AddPrivilegeResponse = await S.util.ajax<J.AddPrivilegeRequest, J.AddPrivilegeResponse>("addPrivilege", {
             nodeId: this.node.id,
             principal: userName,
             privileges: [J.PrivilegeType.READ, J.PrivilegeType.WRITE]
-        }, this.reload);
+        });
+        this.reload(res);
     }
 
     reload = async (res: J.AddPrivilegeResponse): Promise<void> => {

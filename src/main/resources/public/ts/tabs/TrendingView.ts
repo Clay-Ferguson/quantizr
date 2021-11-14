@@ -37,20 +37,18 @@ export class TrendingView extends AppTab {
         });
     }
 
-    refresh = (): void => {
-        S.util.ajax<J.GetNodeStatsRequest, J.GetNodeStatsResponse>("getNodeStats", {
+    refresh = async () => {
+        let res: J.GetNodeStatsResponse = await S.util.ajax<J.GetNodeStatsRequest, J.GetNodeStatsResponse>("getNodeStats", {
             nodeId: null,
             trending: true,
             feed: true
-        },
-            (res: J.GetNodeStatsResponse) => {
-                dispatch("Action_RenderSearchResults", (s: AppState): AppState => {
-                    let data = s.tabData.find(d => d.id === this.data.id);
-                    if (!data) return;
-                    (data.rsInfo as TrendingRSInfo).res = res;
-                    return s;
-                });
-            });
+        });
+        dispatch("Action_RenderSearchResults", (s: AppState): AppState => {
+            let data = s.tabData.find(d => d.id === this.data.id);
+            if (!data) return;
+            (data.rsInfo as TrendingRSInfo).res = res;
+            return s;
+        });
     }
 
     preRender(): void {

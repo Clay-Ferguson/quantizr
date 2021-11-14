@@ -460,9 +460,7 @@ export class Util implements UtilIntf {
         return this.getRemoteHost() + "/mobile/api/";
     }
 
-    ajax = <RequestType extends J.RequestBase, ResponseType>(postName: string, postData: RequestType, //
-        callback?: (response: ResponseType) => void, //
-        failCallback?: (info: string) => void,
+    ajax = <RequestType extends J.RequestBase, ResponseType>(postName: string, postData: RequestType,
         background: boolean = false): Promise<ResponseType> => {
         postData = postData || {} as RequestType;
         let reqPromise: Promise<ResponseType> = null;
@@ -553,14 +551,7 @@ export class Util implements UtilIntf {
                         if (data.message) {
                             console.error("FAILED JSON-RESULT: " + postName + "\n    JSON-RESULT-DATA: " +
                                 this.prettyPrint(data));
-
-                            if (typeof failCallback === "function") {
-                                failCallback(null);
-                            }
-                            else {
-                                this.showMessage(data.message, "Message");
-                            }
-
+                            this.showMessage(data.message, "Message");
                             return;
                         }
                     }
@@ -568,10 +559,6 @@ export class Util implements UtilIntf {
                     if (this.logAjax) {
                         console.log("    JSON-RESULT: " + postName + "\n    JSON-RESULT-DATA: " +
                             this.prettyPrint(data));
-                    }
-
-                    if (typeof callback === "function") {
-                        callback(<ResponseType>data);
                     }
                 } catch (ex) {
                     this.logAndReThrow("Failed handling result of: " + postName, ex);
@@ -593,7 +580,7 @@ export class Util implements UtilIntf {
                         this._ajaxCounter--;
                         this.progressInterval(null);
                     }
-                    const status = error.response ? error.response.status : "";
+                    let status = error.response ? error.response.status : "";
                     const info = "Status: " + status + " message: " + error.message + " stack: " + error.stack;
                     console.log("HTTP RESP [" + postName + "]: Error: " + info);
 
@@ -624,14 +611,10 @@ export class Util implements UtilIntf {
                     msg += info;
                     console.error("Request failed: msg=" + msg);
 
-                    if (typeof failCallback === "function") {
-                        failCallback(msg);
-                    }
-                    else {
-                        const status = error.response ? error.response.status : "";
-                        this.showMessage("Request failed: ERROR: " + status +
-                            (error.message ? (": " + error.message) : ""), "Warning", true);
-                    }
+                    status = error.response ? error.response.status : "";
+                    this.showMessage("Request failed: ERROR: " + status +
+                        (error.message ? (": " + error.message) : ""), "Warning", true);
+
                 } catch (ex) {
                     this.logAndReThrow("Failed processing: " + postName, ex);
                 }
@@ -1445,12 +1428,11 @@ export class Util implements UtilIntf {
         return currencyFormatter.format(n);
     }
 
-    publishNodeToIpfs = (node: J.NodeInfo): any => {
-        this.ajax<J.PublishNodeToIpfsRequest, J.PublishNodeToIpfsResponse>("publishNodeToIpfs", {
+    publishNodeToIpfs = async (node: J.NodeInfo) => {
+        let res: J.PublishNodeToIpfsResponse = await this.ajax<J.PublishNodeToIpfsRequest, J.PublishNodeToIpfsResponse>("publishNodeToIpfs", {
             nodeId: node.id
-        }, (res) => {
-            this.showMessage(res.message, "Server Reply", true);
         });
+        this.showMessage(res.message, "Server Reply", true);
     }
 
     loadNodeFromIpfs = (node: J.NodeInfo): any => {
@@ -1524,14 +1506,19 @@ export class Util implements UtilIntf {
         return userName && userName.indexOf("@") === -1;
     }
 
-    /* Queries the url for 'Open Graph' data and sendes it back using the callback */
-    loadOpenGraph = (url: string, callback: Function): void => {
+    /* Queries the url for 'Open Graph' data and sendes it back using the callback.
+    todo-0: do this withoutout callback.
+    */
+    loadOpenGraph = async (url: string, callback: Function) => {
         // console.log("loadOpenGraph: " + url);
-        this.ajax<J.GetOpenGraphRequest, J.GetOpenGraphResponse>("getOpenGraph", {
-            url
-        }, (res: J.GetOpenGraphResponse) => {
-            // console.log("RES: " + S.util.prettyPrint(res));
+        try {
+            let res: J.GetOpenGraphResponse = await this.ajax<J.GetOpenGraphRequest, J.GetOpenGraphResponse>("getOpenGraph", {
+                url
+            }, true);
             callback(res.openGraph);
-        }, () => { callback(null); }, true);
+        }
+        catch (e) {
+            callback(null);
+        }
     }
 }

@@ -58,7 +58,7 @@ export class SearchFileSystemDlg extends DialogBase {
         ];
     }
 
-    searchNodes = (state: AppState): void => {
+    searchNodes = async (state: AppState) => {
         if (!this.validate()) {
             return;
         }
@@ -76,10 +76,11 @@ export class SearchFileSystemDlg extends DialogBase {
 
         SearchFileSystemDlg.defaultSearchText = this.searchTextState.getValue();
 
-        S.util.ajax<J.LuceneSearchRequest, J.LuceneSearchResponse>("luceneSearch", {
+        let res: J.LuceneSearchResponse = await S.util.ajax<J.LuceneSearchRequest, J.LuceneSearchResponse>("luceneSearch", {
             nodeId: node.id,
             text: SearchFileSystemDlg.defaultSearchText
-        }, this.searchNodesResponse);
+        });
+        this.searchNodesResponse(res);
     }
 
     searchNodesResponse = (res: J.LuceneSearchResponse) => {

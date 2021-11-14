@@ -46,6 +46,7 @@ export const useAppState = (state?: AppState): AppState => {
     return state || useSelector((s: AppState) => s);
 };
 
+// NOTE: This dispatch is synchronous (not asynchronous)
 export const dispatch = (actionName: string, update: (state: AppState) => AppState) => {
     // console.log("Dispatch Running: " + actionName);
     store.dispatch({ type: actionName, update });
