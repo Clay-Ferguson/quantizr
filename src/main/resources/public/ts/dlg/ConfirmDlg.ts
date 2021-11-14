@@ -12,8 +12,7 @@ export class ConfirmDlg extends DialogBase {
 
     yes: boolean = false;
 
-    constructor(private text: string, title: string, private yesCallback: Function,
-        private noCallback: Function, private yesButtonClass, private textClass: string, state: AppState) {
+    constructor(private text: string, title: string, private yesButtonClass, private textClass: string, state: AppState) {
         super(title, "app-modal-content-narrow-width", false, state);
     }
 
@@ -23,16 +22,11 @@ export class ConfirmDlg extends DialogBase {
                 new TextContent(this.text, this.textClass),
                 new ButtonBar([
                     new Button("Yes", () => {
-                        if (this.yesCallback) this.yesCallback();
                         // note: Important to set answer here before closing (closing resolves a promise)
                         this.yes = true;
                         this.close();
                     }, null, this.yesButtonClass || "btn-primary"),
-                    new Button("No", this.noCallback ? () => {
-                        if (this.noCallback) this.noCallback();
-                        this.yes = false;
-                        this.close();
-                    } : this.close)
+                    new Button("No", this.close)
                 ], "marginTop")
             ])
         ];

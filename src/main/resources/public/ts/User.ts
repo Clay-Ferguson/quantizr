@@ -23,18 +23,22 @@ export class User implements UserIntf {
         window.location.href = window.location.origin;
     }
 
-    closeAccount = (): void => {
+    closeAccount = async (): Promise<void> => {
         let state = store.getState();
-        new ConfirmDlg("Are you sure you want to close your account?", "Close Account",
-            () => {
-                new ConfirmDlg("Your data will be deleted and can never be recovered. Are you sure?", "Last Chance... One more Click",
-                    () => {
-                        this.deleteAllUserLocalDbEntries();
-                        S.util.ajax<J.CloseAccountRequest, J.CloseAccountResponse>("closeAccount", {}, this.closeAccountResponse);
-                    }, null, null, null, state
-                ).open();
-            }, null, null, null, state
-        ).open();
+        let dlg: ConfirmDlg = new ConfirmDlg("Are you sure you want to close your account?", "Close Account",
+            null, null, state);
+        await dlg.open();
+        if (!dlg.yes) {
+            return;
+        }
+
+        dlg = new ConfirmDlg("Your data will be deleted and can never be recovered. Are you sure?", "Close Account",
+            null, null, state);
+        await dlg.open();
+        if (dlg.yes) {
+            this.deleteAllUserLocalDbEntries();
+            S.util.ajax<J.CloseAccountRequest, J.CloseAccountResponse>("closeAccount", {}, this.closeAccountResponse);
+        }
     }
 
     /*

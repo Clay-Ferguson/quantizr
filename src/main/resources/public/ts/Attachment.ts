@@ -84,9 +84,7 @@ export class Attachment implements AttachmentIntf {
         node = node || S.quanta.getHighlightedNode(state);
 
         if (node) {
-            let dlg = new ConfirmDlg("Delete the Attachment on the Node?", "Confirm", //
-                null, null, null, null, state
-            );
+            let dlg: ConfirmDlg = new ConfirmDlg("Delete the Attachment on the Node?", "Confirm", null, null, state);
             await dlg.open();
             if (dlg.yes) {
                 await S.util.ajax<J.DeleteAttachmentRequest, J.DeleteAttachmentResponse>("deleteAttachment", {

@@ -99,16 +99,15 @@ export class LoginDlg extends DialogBase {
         }
     }
 
-    resetPassword = (): any => {
+    resetPassword = async (): Promise<any> => {
         let usr = this.userState.getValue();
 
-        new ConfirmDlg("Reset your password ?",
-            "Confirm",
-            () => {
-                this.close();
-                new ResetPasswordDlg(usr, this.appState).open();
-            }, null, null, null, this.appState
-        ).open();
+        let dlg: ConfirmDlg = new ConfirmDlg("Reset your password ?", "Confirm", null, null, this.appState);
+        await dlg.open();
+        if (dlg.yes) {
+            this.close();
+            new ResetPasswordDlg(usr, this.appState).open();
+        }
     }
 
     renderButtons(): CompIntf {

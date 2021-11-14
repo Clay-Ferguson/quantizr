@@ -1387,16 +1387,18 @@ export class Util implements UtilIntf {
         };
     }
 
-    generateNewCryptoKeys = (state: AppState): any => {
-        new ConfirmDlg("Gernerate new Crypto Keys?", "Warning",
-            () => {
-                new ConfirmDlg("Warning: Any data encrypted with your current key will become inaccessible, unless you reimport your current key back in.", "Last Chance... One more Click",
-                    () => {
-                        S.encryption.initKeys(true);
-                    }, null, "btn-danger", "alert alert-danger", state
-                ).open();
-            }, null, "btn-danger", "alert alert-danger", state
-        ).open();
+    generateNewCryptoKeys = async (state: AppState): Promise<any> => {
+        let dlg: ConfirmDlg = new ConfirmDlg("Gernerate new Crypto Keys?", "Warning",
+            "btn-danger", "alert alert-danger", state);
+        await dlg.open();
+        if (!dlg.yes) return;
+
+        dlg = new ConfirmDlg("Warning: Any data encrypted with your current key will become inaccessible, unless you reimport your current key back in.", "Last Chance... One more Click",
+            "btn-danger", "alert alert-danger", state);
+        await dlg.open();
+        if (dlg.yes) {
+            S.encryption.initKeys(true);
+        }
     }
 
     buildCalendarData = (items: J.CalendarItem[]): EventInput[] => {

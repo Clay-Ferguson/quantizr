@@ -107,7 +107,7 @@ export interface UtilIntf {
     removeHtmlTags(text: string): string;
     setDropHandler(attribs: any, func: (elm: any) => void): void;
     resetDropHandler(attribs: any): void;
-    generateNewCryptoKeys(state: AppState): any;
+    generateNewCryptoKeys(state: AppState): Promise<any>;
     buildCalendarData(items: J.CalendarItem[]): EventInput[];
     markdown(val: string): any;
     allChildrenAreSameOwner(node: J.NodeInfo): boolean;

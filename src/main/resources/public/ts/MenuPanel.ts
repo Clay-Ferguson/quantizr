@@ -206,13 +206,16 @@ export class MenuPanel extends Div {
         });
     }
 
-    static showKeys = () => {
-        new ConfirmDlg("Warning: Be sure you aren't sharing your screen. Security keys will be displayed!!", "Show Encryption Keys",
-            () => {
+    static showKeys = (): void => {
+        let f = async () => {
+            let dlg: ConfirmDlg = new ConfirmDlg("Warning: Be sure you aren't sharing your screen. Security keys will be displayed!!", "Show Encryption Keys",
+                "btn-danger", "alert alert-danger", appState(null));
+            await dlg.open();
+            if (dlg.yes) {
                 new ManageEncryptionKeysDlg(appState(null)).open();
-            },
-            null, "btn-danger", "alert alert-danger", appState(null)
-        ).open();
+            }
+        };
+        f();
     };
 
     static generateKeys = () => { S.util.generateNewCryptoKeys(appState(null)); };

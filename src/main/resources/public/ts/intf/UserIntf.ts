@@ -3,7 +3,7 @@ import * as J from "../JavaIntf";
 
 export interface UserIntf {
     closeAccountResponse(res: J.CloseAccountResponse, state: AppState): void;
-    closeAccount(): void;
+    closeAccount(): Promise<void>;
     isTestUserAccount(state: AppState): boolean;
     openSignupPg(state: AppState): void;
     refreshLogin(state: AppState): void;

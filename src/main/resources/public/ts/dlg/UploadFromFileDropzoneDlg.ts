@@ -385,7 +385,7 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
         });
     }
 
-    updateFileList = (dropzoneEvt: any): void => {
+    updateFileList = async (dropzoneEvt: any): Promise<void> => {
         this.fileList = dropzoneEvt.getAddedFiles();
         this.fileList = this.fileList.concat(dropzoneEvt.getQueuedFiles());
 
@@ -394,17 +394,11 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
         for each file */
         if (!this.importMode && !this.zipQuestionAnswered && this.hasAnyZipFiles()) {
             this.zipQuestionAnswered = true;
-            new ConfirmDlg("Do you want Zip files exploded onto the tree when uploaded?",
-                "Explode Zips?", //
-                // yes function
-                () => {
-                    this.explodeZips = true;
-                },
-                // no function
-                () => {
-                    this.explodeZips = false;
-                }, null, null, this.appState
-            ).open();
+            let dlg: ConfirmDlg = new ConfirmDlg("Do you want Zip files exploded onto the tree when uploaded?",
+                "Explode Zips?", null, null, this.appState);
+
+            await dlg.open();
+            this.explodeZips = dlg.yes;
         }
     }
 

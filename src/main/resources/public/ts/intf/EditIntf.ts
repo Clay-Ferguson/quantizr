@@ -6,7 +6,7 @@ export interface EditIntf {
 
     saveClipboardToChildNode(parentId?: string): void;
     splitNode(node: J.NodeInfo, splitType: string, delimiter: string, state: AppState): void;
-    joinNodes(state?: AppState): void;
+    joinNodes(state?: AppState): Promise<void>;
     openChangePasswordDlg(state: AppState): void;
     openManageAccountDlg(state: AppState): void;
     editPreferences(state: AppState): void;
@@ -34,16 +34,16 @@ export interface EditIntf {
     toolbarInsertNode(evt: Event, id: string): void;
     createSubNode(id: any, typeName: string, createAtTop: boolean, parentNode: J.NodeInfo, state: AppState): void;
     selectAllNodes(state: AppState) : void;
-    deleteSelNodes(evt: Event, nodeId: string);
+    deleteSelNodes(evt: Event, nodeId: string): Promise<void>;
     cutSelNodes(evt: Event, id: string): void;
     undoCutSelNodes(): void;
     pasteSelNodesInside(evt: Event, id: string);
     pasteSelNodes(nodeId: string, location: string, state?: AppState): void;
     pasteSelNodes_InlineAbove(evt: Event, id: string);
     pasteSelNodes_Inline(evt: Event, id: string);
-    insertBookWarAndPeace(state: AppState): void;
-    clearInbox(state: AppState): void;
-    newSubNode(evt: Event, id: string);
+    insertBookWarAndPeace(state: AppState): Promise<void>;
+    clearInbox(state: AppState): Promise<void>;
+    newSubNode(evt: Event, id: string): Promise<void>;
     addNode(nodeId: string, content: string, shareToUserId: string, replyToId: string, state: AppState): void;
     createNode(node: J.NodeInfo, typeName: string, forceUsePopup: boolean, pendingEdit: boolean, payloadType: string, content: string, state: AppState): void;
     addCalendarEntry(initDate: number, state: AppState): void;

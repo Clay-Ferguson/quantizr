@@ -337,13 +337,14 @@ export class MediaRecorderDlg extends DialogBase {
         }
     }
 
-    cancel = (): void => {
+    cancel = async (): Promise<void> => {
         if (this.recorded) {
-            new ConfirmDlg("Abandon the current recording?", "Abandon Recording",
-                () => {
-                    this.cancelImmediate();
-                }, null, "btn-danger", "alert alert-danger", this.appState
-            ).open();
+            let dlg: ConfirmDlg = new ConfirmDlg("Abandon the current recording?", "Abandon Recording",
+                "btn-danger", "alert alert-danger", this.appState);
+            await dlg.open();
+            if (dlg.yes) {
+                this.cancelImmediate();
+            }
         }
         else {
             this.cancelImmediate();

@@ -1155,12 +1155,13 @@ export class EditNodeDlg extends DialogBase {
         return new Div(null, null, editItems);
     }
 
-    deletePropertyButtonClick = (): void => {
-        new ConfirmDlg("Delete the selected properties?", "Confirm Delete",
-            () => {
-                this.deleteSelectedProperties();
-            }, null, null, null, this.appState
-        ).open();
+    deletePropertyButtonClick = async (): Promise<void> => {
+        let dlg: ConfirmDlg = new ConfirmDlg("Delete the selected properties?", "Confirm Delete",
+            null, null, this.appState);
+        await dlg.open();
+        if (dlg.yes) {
+            this.deleteSelectedProperties();
+        }
     }
 
     deleteSelectedProperties = (): void => {

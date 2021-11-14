@@ -214,39 +214,40 @@ export class Edit implements EditIntf {
         }
 
         if (S.quanta.ctrlKeyCheck()) {
-            new ConfirmDlg("Paste your clipboard content into a new node?", "Create from Clipboard", //
-                async () => {
-                    let clipboardText = await (navigator as any).clipboard.readText();
-                    if (nodeInsertTarget) {
-                        S.util.ajax<J.InsertNodeRequest, J.InsertNodeResponse>("insertNode", {
-                            pendingEdit: false,
-                            parentId: parentNode.id,
-                            targetOrdinal: nodeInsertTarget.ordinal + ordinalOffset,
-                            newNodeName: "",
-                            typeName: typeName || "u",
-                            initialValue: clipboardText
-                        }, (res) => {
-                            S.quanta.tempDisableAutoScroll();
-                            S.quanta.refresh(state);
-                        });
-                    } else {
-                        S.util.ajax<J.CreateSubNodeRequest, J.CreateSubNodeResponse>("createSubNode", {
-                            pendingEdit: false,
-                            nodeId: parentNode.id,
-                            newNodeName: "",
-                            typeName: typeName || "u",
-                            createAtTop,
-                            content: clipboardText,
-                            typeLock: false,
-                            properties: null,
-                            shareToUserId: null
-                        }, (res) => {
-                            S.quanta.tempDisableAutoScroll();
-                            S.quanta.refresh(state);
-                        });
-                    }
-                }, null, null, null, state
-            ).open();
+            let dlg: ConfirmDlg = new ConfirmDlg("Paste your clipboard content into a new node?", "Create from Clipboard", //
+                null, null, state);
+            await dlg.open();
+            if (dlg.yes) {
+                let clipboardText = await (navigator as any).clipboard.readText();
+                if (nodeInsertTarget) {
+                    S.util.ajax<J.InsertNodeRequest, J.InsertNodeResponse>("insertNode", {
+                        pendingEdit: false,
+                        parentId: parentNode.id,
+                        targetOrdinal: nodeInsertTarget.ordinal + ordinalOffset,
+                        newNodeName: "",
+                        typeName: typeName || "u",
+                        initialValue: clipboardText
+                    }, (res) => {
+                        S.quanta.tempDisableAutoScroll();
+                        S.quanta.refresh(state);
+                    });
+                } else {
+                    S.util.ajax<J.CreateSubNodeRequest, J.CreateSubNodeResponse>("createSubNode", {
+                        pendingEdit: false,
+                        nodeId: parentNode.id,
+                        newNodeName: "",
+                        typeName: typeName || "u",
+                        createAtTop,
+                        content: clipboardText,
+                        typeLock: false,
+                        properties: null,
+                        shareToUserId: null
+                    }, (res) => {
+                        S.quanta.tempDisableAutoScroll();
+                        S.quanta.refresh(state);
+                    });
+                }
+            }
         }
         else {
             if (nodeInsertTarget) {
@@ -583,16 +584,16 @@ export class Edit implements EditIntf {
         }
     }
 
-    newSubNode = (evt: Event, id: string) => {
+    newSubNode = async (evt: Event, id: string): Promise<void> => {
         id = S.util.allowIdFromEvent(evt, id);
         const state = store.getState();
         if (S.quanta.ctrlKeyCheck()) {
-            new ConfirmDlg("Paste your clipboard content into a new node?", "Create from Clipboard", //
-                async () => {
-                    // todo-2: document this feature under 'tips and tricks' in the user guide.
-                    this.saveClipboardToChildNode(id);
-                }, null, null, null, state
-            ).open();
+            let dlg: ConfirmDlg = new ConfirmDlg("Paste your clipboard content into a new node?", "Create from Clipboard", //
+                null, null, state);
+            await dlg.open();
+            if (dlg.yes) {
+                this.saveClipboardToChildNode(id);
+            }
         }
         else {
             this.createSubNode(id, null, true, state.node, null);
@@ -634,22 +635,23 @@ export class Edit implements EditIntf {
         });
     }
 
-    clearInbox = (state: AppState): void => {
+    clearInbox = async (state: AppState): Promise<void> => {
         S.quanta.clearSelNodes(state);
 
-        new ConfirmDlg("Permanently delete the nodes in your Inbox", "Cleaer Inbox",
-            () => {
-                S.util.ajax<J.DeleteNodesRequest, J.DeleteNodesResponse>("deleteNodes", {
-                    nodeIds: ["~" + J.NodeType.INBOX],
-                    childrenOnly: true
-                }, (res: J.DeleteNodesResponse) => {
-                    S.nav.openContentNode(state.homeNodePath, state);
-                });
-            }, null, "btn-danger", "alert alert-danger", state
-        ).open();
+        let dlg: ConfirmDlg = new ConfirmDlg("Permanently delete the nodes in your Inbox", "Cleaer Inbox",
+            "btn-danger", "alert alert-danger", state);
+        await dlg.open();
+        if (dlg.yes) {
+            S.util.ajax<J.DeleteNodesRequest, J.DeleteNodesResponse>("deleteNodes", {
+                nodeIds: ["~" + J.NodeType.INBOX],
+                childrenOnly: true
+            }, (res: J.DeleteNodesResponse) => {
+                S.nav.openContentNode(state.homeNodePath, state);
+            });
+        }
     }
 
-    joinNodes = (state?: AppState): void => {
+    joinNodes = async (state?: AppState): Promise<void> => {
         state = appState(state);
 
         const selNodesArray = S.quanta.getSelNodeIdsArray(state);
@@ -659,23 +661,23 @@ export class Edit implements EditIntf {
         }
 
         let confirmMsg = "Join " + selNodesArray.length + " node(s) ?";
-        new ConfirmDlg(confirmMsg, "Confirm Join " + selNodesArray.length,
-            () => {
-                S.util.ajax<J.JoinNodesRequest, J.JoinNodesResponse>("joinNodes", {
-                    nodeIds: selNodesArray
-                }, (res: J.JoinNodesResponse) => {
-                    this.joinNodesResponse(res, state);
-                });
-            },
-            null, "btn-danger", "alert alert-danger", state
-        ).open();
+        let dlg: ConfirmDlg = new ConfirmDlg(confirmMsg, "Confirm Join " + selNodesArray.length,
+            "btn-danger", "alert alert-danger", state);
+        await dlg.open();
+        if (dlg.yes) {
+            S.util.ajax<J.JoinNodesRequest, J.JoinNodesResponse>("joinNodes", {
+                nodeIds: selNodesArray
+            }, (res: J.JoinNodesResponse) => {
+                this.joinNodesResponse(res, state);
+            });
+        }
     }
 
     /*
      * Deletes the selNodesArray items, and if none are passed then we fall back to using whatever the user
      * has currenly selected (via checkboxes)
      */
-    deleteSelNodes = (evt: Event = null, id: string = null): void => {
+    deleteSelNodes = async (evt: Event = null, id: string = null): Promise<void> => {
         let state = store.getState();
         id = S.util.allowIdFromEvent(evt, id);
 
@@ -706,49 +708,49 @@ export class Edit implements EditIntf {
         }
 
         let confirmMsg = "Delete " + selNodesArray.length + " node(s) ?";
-        new ConfirmDlg(confirmMsg, "Confirm Delete " + selNodesArray.length,
-            () => {
-                S.util.ajax<J.DeleteNodesRequest, J.DeleteNodesResponse>("deleteNodes", {
-                    nodeIds: selNodesArray,
-                    childrenOnly: false
-                }, (res: J.DeleteNodesResponse) => {
-                    S.quanta.tempDisableAutoScroll();
-                    this.removeNodesFromHistory(selNodesArray, state);
-                    this.removeNodesFromCalendarData(selNodesArray, state);
+        let dlg: ConfirmDlg = new ConfirmDlg(confirmMsg, "Confirm Delete " + selNodesArray.length,
+            "btn-danger", "alert alert-danger", state);
+        await dlg.open();
+        if (dlg.yes) {
+            S.util.ajax<J.DeleteNodesRequest, J.DeleteNodesResponse>("deleteNodes", {
+                nodeIds: selNodesArray,
+                childrenOnly: false
+            }, (res: J.DeleteNodesResponse) => {
+                S.quanta.tempDisableAutoScroll();
+                this.removeNodesFromHistory(selNodesArray, state);
+                this.removeNodesFromCalendarData(selNodesArray, state);
 
-                    if (S.util.checkSuccess("Delete node", res)) {
-                        if (state.node.children) {
-                            state.node.children = state.node.children.filter(child => !selNodesArray.find(id => id === child.id));
-                        }
-
-                        if (state.node.children.length === 0) {
-                            S.view.jumpToId(state.node.id);
-                        }
-                        else {
-                            dispatch("Action_RefreshNodeFromServer", (s: AppState): AppState => {
-                                s.node.children = state.node.children;
-
-                                // remove this node from all data from all the tabs, so they all refresh without
-                                // the deleted node without being queries from the server again.
-                                selNodesArray.forEach(id => {
-                                    S.srch.removeNodeById(id, s);
-                                });
-                                s.selectedNodes.clear();
-                                return s;
-                            });
-                        }
+                if (S.util.checkSuccess("Delete node", res)) {
+                    if (state.node.children) {
+                        state.node.children = state.node.children.filter(child => !selNodesArray.find(id => id === child.id));
                     }
 
-                    /* We waste a tiny bit of CPU/bandwidth here by just always updating the bookmarks in case
-                     we just deleted some. This could be slightly improved to KNOW if we deleted any bookmarks, but
-                    the added complexity to achieve that for recursive tree deletes doesn't pay off */
-                    setTimeout(() => {
-                        S.quanta.loadBookmarks();
-                    }, 1000);
-                });
-            },
-            null, "btn-danger", "alert alert-danger", state
-        ).open();
+                    if (state.node.children.length === 0) {
+                        S.view.jumpToId(state.node.id);
+                    }
+                    else {
+                        dispatch("Action_RefreshNodeFromServer", (s: AppState): AppState => {
+                            s.node.children = state.node.children;
+
+                            // remove this node from all data from all the tabs, so they all refresh without
+                            // the deleted node without being queries from the server again.
+                            selNodesArray.forEach(id => {
+                                S.srch.removeNodeById(id, s);
+                            });
+                            s.selectedNodes.clear();
+                            return s;
+                        });
+                    }
+                }
+
+                /* We waste a tiny bit of CPU/bandwidth here by just always updating the bookmarks in case
+                 we just deleted some. This could be slightly improved to KNOW if we deleted any bookmarks, but
+                the added complexity to achieve that for recursive tree deletes doesn't pay off */
+                setTimeout(() => {
+                    S.quanta.loadBookmarks();
+                }, 1000);
+            });
+        }
     }
 
     /* Updates 'nodeHistory' when nodes are deleted */
@@ -836,24 +838,24 @@ export class Edit implements EditIntf {
         this.pasteSelNodes(id, "inline");
     }
 
-    insertBookWarAndPeace = (state: AppState): void => {
-        new ConfirmDlg("Warning: You should have an EMPTY node selected now, to serve as the root node of the book!",
-            "Confirm",
-            () => {
-                /* inserting under whatever node user has focused */
-                const node = S.quanta.getHighlightedNode(state);
+    insertBookWarAndPeace = async (state: AppState): Promise<void> => {
+        let dlg: ConfirmDlg = new ConfirmDlg("Warning: You should have an EMPTY node selected now, to serve as the root node of the book!",
+            "Confirm", null, null, state);
+        await dlg.open();
+        if (dlg.yes) {
+            /* inserting under whatever node user has focused */
+            const node = S.quanta.getHighlightedNode(state);
 
-                if (!node) {
-                    S.util.showMessage("No node is selected.", "Warning");
-                } else {
-                    S.util.ajax<J.InsertBookRequest, J.InsertBookResponse>("insertBook", {
-                        nodeId: node.id,
-                        bookName: "War and Peace",
-                        truncated: S.user.isTestUserAccount(state)
-                    }, (res) => { this.insertBookResponse(res, state); });
-                }
-            }, null, null, null, state
-        ).open();
+            if (!node) {
+                S.util.showMessage("No node is selected.", "Warning");
+            } else {
+                S.util.ajax<J.InsertBookRequest, J.InsertBookResponse>("insertBook", {
+                    nodeId: node.id,
+                    bookName: "War and Peace",
+                    truncated: S.user.isTestUserAccount(state)
+                }, (res) => { this.insertBookResponse(res, state); });
+            }
+        }
     }
 
     saveClipboardToChildNode = async (parentId: string): Promise<void> => {
