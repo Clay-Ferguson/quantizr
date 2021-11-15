@@ -69,14 +69,9 @@ export class SharingDlg extends DialogBase {
         this.reload();
     }
 
-    preLoad(): Promise<void> {
-        return new Promise<void>((resolve, reject) => {
-            try {
-                this.reload();
-            } finally {
-                resolve();
-            }
-        });
+    async preLoad(): Promise<void> {
+        // Note: 11/15/21 the 'await' is new here. This was all synchronous before (i.e. immediately resolved promise)
+        await this.reload();
     }
 
     /*

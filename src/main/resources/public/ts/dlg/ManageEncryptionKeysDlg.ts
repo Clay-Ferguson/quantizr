@@ -28,11 +28,8 @@ export class ManageEncryptionKeysDlg extends DialogBase {
         ];
     }
 
-    preLoad(): Promise<void> {
-        return new Promise<void>(async (resolve, reject) => {
-            let keyJson: string = await S.encryption.exportKeys();
-            this.mergeState({ keyJson });
-            resolve();
-        });
+    async preLoad(): Promise<void> {
+        let keyJson: string = await S.encryption.exportKeys();
+        this.mergeState({ keyJson });
     }
 }

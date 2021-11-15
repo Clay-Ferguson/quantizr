@@ -192,6 +192,7 @@ export class Nav implements NavIntf {
     /* NOTE: Elements that have this as an onClick method must have the nodeId
     on an attribute of the element */
     clickNodeRow = async (evt: Event, id: string, state?: AppState): Promise<void> => {
+        // since we resolve inside the timeout async/wait pattern is not used here.
         return new Promise<void>(async (resolve, reject) => {
             id = S.util.allowIdFromEvent(evt, id);
             state = appState(state);

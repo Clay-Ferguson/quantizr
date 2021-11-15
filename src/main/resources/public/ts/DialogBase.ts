@@ -26,7 +26,7 @@ export abstract class DialogBase<S extends BaseCompState = any> extends Div<S> i
     static BACKDROP_PREFIX = "backdrop-";
     static backdropZIndex: number = 16000000; // z-index
 
-    // NOTE: resolve function says null for EMBED mode.
+    // NOTE: resolve function stays null for EMBED mode.
     resolve: Function;
 
     aborted: boolean = false;
@@ -86,6 +86,9 @@ export abstract class DialogBase<S extends BaseCompState = any> extends Div<S> i
             return;
         }
         this.opened = true;
+
+        // We use an actual Promise and not async/await because our resolve function is held long term, and
+        // represents the closing of the dialog.
         return new Promise<DialogBase>(async (resolve, reject) => {
             if (this.mode === DialogMode.POPUP) {
                 // Create dialog container and attach to document.body.

@@ -51,77 +51,65 @@ export class MediaRecorderDlg extends DialogBase {
         });
     }
 
-    preLoad(): Promise<void> {
-        return new Promise<void>(async (resolve, reject) => {
-            try {
-                await this.scanDevices();
-                await this.resetStream();
-            }
-            catch (e) {
-                console.log("Can't access recording devices, or user refused.");
-                // just close this dialog if we can't access recording devices.
-                this.abort();
-            }
-            finally {
-                resolve();
-            }
-        });
+    async preLoad(): Promise<void> {
+        try {
+            await this.scanDevices();
+            await this.resetStream();
+        }
+        catch (e) {
+            console.log("Can't access recording devices, or user refused.");
+            // just close this dialog if we can't access recording devices.
+            this.abort();
+        }
     }
 
     scanDevices = async (): Promise<void> => {
-        return new Promise<void>(async (resolve, reject) => {
-            try {
-                let audioInputOptions = [];
-                let videoInputOptions = [];
+        let audioInputOptions = [];
+        let videoInputOptions = [];
 
-                let audioInput: string = await S.localDB.getVal(C.LOCALDB_AUDIO_SOURCE);
-                let videoInput: string = await S.localDB.getVal(C.LOCALDB_VIDEO_SOURCE);
+        let audioInput: string = await S.localDB.getVal(C.LOCALDB_AUDIO_SOURCE);
+        let videoInput: string = await S.localDB.getVal(C.LOCALDB_VIDEO_SOURCE);
 
-                let devices: MediaDeviceInfo[] = await navigator.mediaDevices.enumerateDevices();
+        let devices: MediaDeviceInfo[] = await navigator.mediaDevices.enumerateDevices();
 
-                devices.forEach((device: MediaDeviceInfo) => {
-                    if (device.kind === "audioinput") {
-                        // take the first one here
-                        if (!audioInput) {
-                            audioInput = device.deviceId;
-                            S.localDB.setVal(C.LOCALDB_AUDIO_SOURCE, audioInput, this.appState.userName);
-                        }
-
-                        // add to data for dropdown
-                        audioInputOptions.push({ key: device.deviceId, val: device.label });
-                    }
-                    else if (device.kind === "videoinput") {
-
-                        // take the first one here
-                        if (!videoInput) {
-                            videoInput = device.deviceId;
-                            S.localDB.setVal(C.LOCALDB_VIDEO_SOURCE, videoInput, this.appState.userName);
-                        }
-
-                        // add to data for dropdown
-                        videoInputOptions.push({ key: device.deviceId, val: device.label });
-                    }
-                });
-
-                this.mergeState({ audioInput, videoInput, audioInputOptions, videoInputOptions });
-
-                /* if videoMode and we don't have at least one audio and video input then abort */
-                if (this.videoMode) {
-                    if (audioInputOptions.length === 0 && videoInputOptions.length === 0) {
-                        this.abort();
-                    }
+        devices.forEach((device: MediaDeviceInfo) => {
+            if (device.kind === "audioinput") {
+                // take the first one here
+                if (!audioInput) {
+                    audioInput = device.deviceId;
+                    S.localDB.setVal(C.LOCALDB_AUDIO_SOURCE, audioInput, this.appState.userName);
                 }
-                /* if audio mode and we don't have at least one audio input then abort */
-                else {
-                    if (audioInputOptions.length === 0) {
-                        this.abort();
-                    }
-                }
+
+                // add to data for dropdown
+                audioInputOptions.push({ key: device.deviceId, val: device.label });
             }
-            finally {
-                resolve();
+            else if (device.kind === "videoinput") {
+
+                // take the first one here
+                if (!videoInput) {
+                    videoInput = device.deviceId;
+                    S.localDB.setVal(C.LOCALDB_VIDEO_SOURCE, videoInput, this.appState.userName);
+                }
+
+                // add to data for dropdown
+                videoInputOptions.push({ key: device.deviceId, val: device.label });
             }
         });
+
+        this.mergeState({ audioInput, videoInput, audioInputOptions, videoInputOptions });
+
+        /* if videoMode and we don't have at least one audio and video input then abort */
+        if (this.videoMode) {
+            if (audioInputOptions.length === 0 && videoInputOptions.length === 0) {
+                this.abort();
+            }
+        }
+        /* if audio mode and we don't have at least one audio input then abort */
+        else {
+            if (audioInputOptions.length === 0) {
+                this.abort();
+            }
+        }
     }
 
     renderDlg(): CompIntf[] {
@@ -206,37 +194,32 @@ export class MediaRecorderDlg extends DialogBase {
     }
 
     resetStream = async () => {
-        return new Promise<void>(async (resolve, reject) => {
-            try {
-                this.stop();
+        try {
+            this.stop();
 
-                // stop() doesn't always nullify 'recorder' but we do it here. Any time stream is changing
-                // we force it to recreate the recorder object.
-                this.recorder = null;
+            // stop() doesn't always nullify 'recorder' but we do it here. Any time stream is changing
+            // we force it to recreate the recorder object.
+            this.recorder = null;
 
-                let state = this.getState();
-                let constraints: any = { audio: { deviceId: state.audioInput } };
-                if (this.videoMode) {
-                    constraints.video = { deviceId: state.videoInput };
-                }
-
-                this.closeStream();
-                this.stream = await navigator.mediaDevices.getUserMedia(constraints);
-                if (!this.stream) {
-                    this.abort();
-                }
-
-                if (this.videoMode) {
-                    this.displayStream();
-                }
+            let state = this.getState();
+            let constraints: any = { audio: { deviceId: state.audioInput } };
+            if (this.videoMode) {
+                constraints.video = { deviceId: state.videoInput };
             }
-            catch (e) {
+
+            this.closeStream();
+            this.stream = await navigator.mediaDevices.getUserMedia(constraints);
+            if (!this.stream) {
                 this.abort();
             }
-            finally {
-                resolve();
+
+            if (this.videoMode) {
+                this.displayStream();
             }
-        });
+        }
+        catch (e) {
+            this.abort();
+        }
     }
 
     newRecording = () => {

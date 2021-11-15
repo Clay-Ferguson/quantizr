@@ -466,6 +466,7 @@ export class Util implements UtilIntf {
         let reqPromise: Promise<ResponseType> = null;
 
         try {
+            // todo-0: We can use async/await here in the two promises involved in this.
             reqPromise = new Promise<ResponseType>((resolve, reject) => {
                 if (this.logAjax) {
                     console.log("JSON-POST: [" + this.getRpcPath() + postName + "]" + this.prettyPrint(postData));
@@ -787,6 +788,7 @@ export class Util implements UtilIntf {
     /* We return a promise that resolves to the element, but also support a callback function
     that can be used optionally whenver that's more convenient */
     getElm = (id: string, exResolve: (elm: HTMLElement) => void = null): Promise<HTMLElement> => {
+        // Promise is used here instead of async/await because of the resolve being done inside the timer.
         return new Promise<HTMLElement>((resolve, reject) => {
 
             // First we immediately try to get the element.
