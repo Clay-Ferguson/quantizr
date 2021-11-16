@@ -10,7 +10,6 @@ import { PropsIntf } from "./intf/PropsIntf";
 import { RenderIntf } from "./intf/RenderIntf";
 import { SearchIntf } from "./intf/SearchIntf";
 import { ServerPushIntf } from "./intf/ServerPushIntf";
-import { ShareIntf } from "./intf/ShareIntf";
 import { UserIntf } from "./intf/UserIntf";
 import { UtilIntf } from "./intf/UtilIntf";
 import { ViewIntf } from "./intf/ViewIntf";
@@ -30,7 +29,6 @@ export interface Singletons {
     props: PropsIntf;
     render: RenderIntf;
     srch: SearchIntf;
-    share: ShareIntf;
     user: UserIntf;
     view: ViewIntf;
     localDB: LocalDBIntf;

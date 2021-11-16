@@ -54,4 +54,6 @@ export interface EditIntf {
     addBookmark(node: J.NodeInfo, state: AppState): void;
     setMetadataOption(val: boolean): void;
     refreshNodeFromServer(nodeId: string): Promise<void>;
+    editNodeSharing(state: AppState, node?: J.NodeInfo): void;
+    addCipherKeyToNode(node: J.NodeInfo, principalPublicKeyStr: string, principalNodeId: string): Promise<void>;
 }

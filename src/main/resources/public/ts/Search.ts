@@ -1,4 +1,4 @@
-import { dispatch, store } from "./AppRedux";
+import { appState, dispatch, store } from "./AppRedux";
 import { AppState } from "./AppState";
 import { NodeCompContent } from "./comps/NodeCompContent";
 import { NodeCompRowFooter } from "./comps/NodeCompRowFooter";
@@ -453,5 +453,24 @@ export class Search implements SearchIntf {
         });
         S.view.refreshTree(null, false, false, null, false, false, true, true, state);
         S.util.showMessage(res.message, "Success");
+    }
+
+    /* If target is non-null we only return shares to that particlar person (or public) */
+    findShares = (state: AppState = null, shareTarget: string = null, accessOption: string = null): void => {
+        state = appState(state);
+        const focusNode: J.NodeInfo = S.quanta.getHighlightedNode(state);
+        if (focusNode == null) {
+            return;
+        }
+
+        let type = "all";
+        if (accessOption === J.PrivilegeType.READ) {
+            type = "read-only";
+        }
+        else if (accessOption === J.PrivilegeType.WRITE) {
+            type = "appendable";
+        }
+
+        S.srch.findSharedNodes(focusNode, 0, type, shareTarget, accessOption, state);
     }
 }

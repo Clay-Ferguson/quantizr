@@ -24,7 +24,6 @@ import { Quanta } from "./Quanta";
 import { Render } from "./Render";
 import { Search } from "./Search";
 import { ServerPush } from "./ServerPush";
-import { Share } from "./Share";
 import { Singletons } from "./Singletons";
 import { SpeechRecog } from "./SpeechRecog";
 import { Torrent } from "./Torrent";
@@ -53,7 +52,6 @@ export class Factory {
                 props: new Props(),
                 render: new Render(),
                 srch: new Search(),
-                share: new Share(),
                 user: new User(),
                 view: new View(),
                 localDB: new LocalDB(),

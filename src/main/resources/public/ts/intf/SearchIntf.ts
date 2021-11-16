@@ -6,6 +6,7 @@ export interface SearchIntf {
 
     idToNodeMap: Map<string, J.NodeInfo>;
 
+    findShares(state: AppState, shareTarget: string, accessOption: string): void;
     findSharedNodes(node: J.NodeInfo, page: number, type: string, shareTarget: string, accessOption: string, state: AppState): Promise<void>;
     searchAndReplace(recursive: boolean, nodeId: string, search: string, replace: string, state: AppState): any;
     search(node: J.NodeInfo, prop: string, searchText: string, state: AppState, searchType: string, description: string, fuzzy: boolean, caseSensitive: boolean, page: number, recursive: boolean, sortField: string, sortDir: string, successCallback: Function): Promise<void>;

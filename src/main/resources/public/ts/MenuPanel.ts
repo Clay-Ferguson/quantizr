@@ -81,9 +81,9 @@ export class MenuPanel extends Div {
     static searchAndReplace = () => { new SearchAndReplaceDlg(appState(null)).open(); };
     static splitNode = () => { new SplitNodeDlg(null, appState(null)).open(); }
     static joinNodes = () => { S.edit.joinNodes(); }
-    static showPublicWritableShares = () => { S.share.findSharedNodes(null, "public", J.PrivilegeType.WRITE); }
-    static showPublicReadonlyShares = () => { S.share.findSharedNodes(null, "public", J.PrivilegeType.READ); }
-    static showAllShares = () => { S.share.findSharedNodes(null, null, null); }
+    static showPublicWritableShares = () => { S.srch.findShares(null, "public", J.PrivilegeType.WRITE); }
+    static showPublicReadonlyShares = () => { S.srch.findShares(null, "public", J.PrivilegeType.READ); }
+    static showAllShares = () => { S.srch.findShares(null, null, null); }
     static searchByContent = () => { new SearchContentDlg(appState(null)).open(); };
     static searchByName = () => { new SearchByNameDlg(appState(null)).open(); }
     static searchById = () => { new SearchByIDDlg(appState(null)).open(); };
@@ -382,7 +382,7 @@ export class MenuPanel extends Div {
 
         children.push(new Menu("Share", [
             // moved into editor dialog
-            // new MenuItem("Edit Node Sharing", () => S.share.editNodeSharing(state), //
+            // new MenuItem("Edit Node Sharing", () => S.edit.editNodeSharing(state), //
             //     !state.isAnonUser && !!highlightNode && selNodeIsMine), //
 
             new MenuItem("Show All Shares", MenuPanel.showAllShares, //

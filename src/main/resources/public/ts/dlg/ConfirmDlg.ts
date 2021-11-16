@@ -6,13 +6,11 @@ import { ButtonBar } from "../widget/ButtonBar";
 import { Form } from "../widget/Form";
 import { TextContent } from "../widget/TextContent";
 
-// todo-0: now that we support setting the 'yes' property we can
-// refactor to not use the yes/no callbacks any more.
 export class ConfirmDlg extends DialogBase {
 
     yes: boolean = false;
 
-    constructor(private text: string, title: string, private yesButtonClass, private textClass: string, state: AppState) {
+    constructor(private text: string, title: string, private yesButtonClass: string, private textClass: string, state: AppState) {
         super(title, "app-modal-content-narrow-width", false, state);
     }
 

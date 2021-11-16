@@ -813,7 +813,7 @@ export class EditNodeDlg extends DialogBase {
 
     share = async (): Promise<void> => {
         let state = this.getState();
-        await S.share.editNodeSharing(this.appState, state.node);
+        await S.edit.editNodeSharing(this.appState, state.node);
         this.mergeState({ node: state.node });
         return null;
     }

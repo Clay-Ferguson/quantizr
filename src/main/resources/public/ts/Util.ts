@@ -466,7 +466,6 @@ export class Util implements UtilIntf {
         let reqPromise: Promise<ResponseType> = null;
 
         try {
-            // todo-0: We can use async/await here in the two promises involved in this.
             reqPromise = new Promise<ResponseType>((resolve, reject) => {
                 if (this.logAjax) {
                     console.log("JSON-POST: [" + this.getRpcPath() + postName + "]" + this.prettyPrint(postData));
@@ -1508,9 +1507,7 @@ export class Util implements UtilIntf {
         return userName && userName.indexOf("@") === -1;
     }
 
-    /* Queries the url for 'Open Graph' data and sendes it back using the callback.
-    todo-0: do this withoutout callback.
-    */
+    // Queries the url for 'Open Graph' data and sendes it back using the callback.
     loadOpenGraph = async (url: string, callback: Function) => {
         // console.log("loadOpenGraph: " + url);
         try {

@@ -81,7 +81,7 @@ export class ShareToPersonDlg extends DialogBase {
         if (S.util.checkSuccess("Share Node with Person", res)) {
             this.close();
             if (res.principalPublicKey) {
-                await S.share.addCipherKeyToNode(this.node, res.principalPublicKey, res.principalNodeId);
+                await S.edit.addCipherKeyToNode(this.node, res.principalPublicKey, res.principalNodeId);
             }
             this.sharedNodeFunc(res);
         }

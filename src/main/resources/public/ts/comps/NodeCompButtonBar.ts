@@ -100,7 +100,7 @@ export class NodeCompButtonBar extends Div {
             let sharingNames = S.util.getSharingNames(node, true);
             sharedIcon = new Icon({
                 className: "fa fa-share-alt fa-lg rowIcon",
-                onClick: () => S.share.editNodeSharing(state, node),
+                onClick: () => S.edit.editNodeSharing(state, node),
                 title: "Shared to:\n" + sharingNames
             });
         }
