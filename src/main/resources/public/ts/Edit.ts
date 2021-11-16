@@ -711,19 +711,22 @@ export class Edit implements EditIntf {
                     state.node.children = state.node.children.filter(child => !selNodesArray.find(id => id === child.id));
                 }
 
+                dispatch("Action_NodeDeleteComplete", (s: AppState): AppState => {
+                    // remove this node from all data from all the tabs, so they all refresh without
+                    // the deleted node without being queries from the server again.
+                    selNodesArray.forEach(id => {
+                        S.srch.removeNodeById(id, s);
+                    });
+                    s.selectedNodes.clear();
+                    return s;
+                });
+
                 if (state.node.children.length === 0) {
                     S.view.jumpToId(state.node.id);
                 }
                 else {
-                    dispatch("Action_RefreshNodeFromServer", (s: AppState): AppState => {
+                    dispatch("Action_UpdateChildren", (s: AppState): AppState => {
                         s.node.children = state.node.children;
-
-                        // remove this node from all data from all the tabs, so they all refresh without
-                        // the deleted node without being queries from the server again.
-                        selNodesArray.forEach(id => {
-                            S.srch.removeNodeById(id, s);
-                        });
-                        s.selectedNodes.clear();
                         return s;
                     });
                 }
