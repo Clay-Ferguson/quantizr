@@ -1,6 +1,8 @@
 # Quanta Distro
 
-NOTE: The tar file in this folder was created by running build-distro.sh. Extracting this tar file is the minimal (simplest) way to run an instance of Quanta. The setenv-distro.sh file is where most of the configuration parameters are. One such parameter is the DEPLOY_TARGET env variable, which controls where the content of this tar file will go before beign zipped. This folder will be a place where you can also run Quanta from, since it's already there and unzipped.
+NOTE: The tar file in this folder was created by running `build-distro.sh`. Note: Before you run this build script you should edit `setenv-distro-runner.sh` and `setenv-distro.sh` script files to bump up the QUANTA_VER to some future version number.
+
+Extracting this tar file is the minimal (simplest) way to run an instance of Quanta. The `setenv-distro.sh` file is where most of the configuration parameters are. One such parameter is the `DEPLOY_TARGET` env variable, which controls where the content of this tar file will go before being zipped. This folder will be a place where you can also run Quanta from, since it's already there and unzipped.
 
 ### How to run a Quanta instance
 
@@ -8,7 +10,7 @@ To run a Quanta instance from the Docker Public Repository you can simply unzip 
 
 The only prerequisite is that you need to have `docker` and `docker-compose` installed.
 
-NOTE: You should edit the password in `secrets.sh`, before your first run, and that password will become your `admin` user password which you can use to login as the `admin` user. This same password will be securing your MongoDB instance and will also be the admin password for the Web App.
+NOTE: You should edit the password in `secrets.sh`, before your first run, because that password will become your `admin` user password which you can use to login as the `admin` user. This same password will be securing your MongoDB instance and will also be the admin password for the Web App.
 
 ### Linux Commands
 
@@ -36,9 +38,5 @@ sudo ./run-distro.sh
 The following tip is for less-technical users, but most people will be running from a Linode instance or similar and so it won't apply:
 
 TIP: For the most secure environment run this in a VirtualBox instance and then open port 8185 by selecting `Settings -> Network -> Advanced -> Port Forwarding` and then adding a TCP Protocol entry that maps Host port 8185 to Guest Port 8185. Then you can browse the app from your host machine. Of course to make the app visible to the rest of the internet you'd need to open this port on your Router also.
-
-****
-
-**Welcome to the Fediverse!**
 
 
