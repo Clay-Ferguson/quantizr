@@ -436,7 +436,7 @@ public class NodeEditService {
 
 		/*
 		 * If we have an IPFS attachment and there's no IPFS_REF property that means it should be pinned.
-		 * (REF means 'referenced' and external to our server).
+		 * (IPFS_REF means 'referenced' and external to our server).
 		 */
 		String ipfsLink = node.getStrProp(NodeProp.IPFS_LINK);
 		if (ipfsLink != null) {

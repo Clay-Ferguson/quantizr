@@ -1039,8 +1039,6 @@ public class AttachmentService {
 		MerkleLink ret = ipfsService.addFromStream(session, stream, null, mimeType, streamSize, null, false);
 		if (ret != null) {
 			node.setProp(NodeProp.IPFS_LINK.s() + binSuffix, ret.getHash());
-			// NOTE: Lack of the REF property indicated we store internally (pinned file)
-			// node.setProp(NodeProp.IPFS_REF.s() + binSuffix, "0");
 			node.setProp(NodeProp.BIN_SIZE.s() + binSuffix, streamSize.getVal());
 
 			/* consume user quota space */

@@ -162,7 +162,8 @@ public class IPFSService {
     /* On regular interval forget which CIDs have failed and allow them to be retried */
     @Scheduled(fixedDelay = 10 * DateUtil.MINUTE_MILLIS)
     public void clearFailedCIDs() {
-        if (!MongoRepository.fullInit) return;
+        if (!MongoRepository.fullInit)
+            return;
         failedCIDs.clear();
     }
 
@@ -203,7 +204,8 @@ public class IPFSService {
         res = Cast.toLinkedHashMap(postForJsonReply(API_ID, LinkedHashMap.class));
         sb.append("\nIPFS Instance ID:\n" + XString.prettyPrint(res) + "\n");
 
-        // res = Cast.toLinkedHashMap(postForJsonReply(API_PUBSUB + "/peers?arg=" + topic, LinkedHashMap.class));
+        // res = Cast.toLinkedHashMap(postForJsonReply(API_PUBSUB + "/peers?arg=" + topic,
+        // LinkedHashMap.class));
         // sb.append("\nIPFS Peers for topic:\n" + XString.prettyPrint(res) + "\n");
 
         // res = Cast.toLinkedHashMap(postForJsonReply(API_PUBSUB + "/ls", LinkedHashMap.class));
@@ -253,7 +255,12 @@ public class IPFSService {
 
     public void ipfsAsyncPinNode(MongoSession ms, ObjectId nodeId) {
         asyncExec.run(ThreadLocals.getContext(), () -> {
-            // wait for node to be saved. Waits up to 30 seconds.
+            // wait for node to be saved. Waits up to 30 seconds, because of the 10 retries.
+            /*
+             * todo-1: What we could do here instead of what is essentially polling we're doing is hook into the
+             * MongoEventListener class and have a pub/sub model in effect so we can detect immediately when the
+             * node is saved.
+             */
             Util.sleep(3000);
             SubNode node = read.getNode(ms, nodeId, false, 10);
 
@@ -311,7 +318,8 @@ public class IPFSService {
         String ret = null;
         try {
             String url = API_CAT + "?arg=" + hash;
-            ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.POST, Util.getBasicRequestEntity(), String.class);
+            ResponseEntity<String> response =
+                    restTemplate.exchange(url, HttpMethod.POST, Util.getBasicRequestEntity(), String.class);
             ret = response.getBody();
             // log.debug("IPFS post cat. Ret " + response.getStatusCode() + "] " + ret);
         } catch (Exception e) {

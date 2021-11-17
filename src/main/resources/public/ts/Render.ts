@@ -345,7 +345,7 @@ export class Render implements RenderIntf {
             }, state.linksToAttachmentsExpanded, "marginAll", "attachmentLinksPanel"));
         }
 
-        let ipfsLink = S.props.getNodePropVal(J.NodeProp.IPFS_LINK, node);
+        let ipfsLink = "ipfs://" + S.props.getNodePropVal(J.NodeProp.IPFS_LINK, node);
         if (ipfsLink) {
             children.push(new Heading(5, "IPFS CID"), //
                 new Div(ipfsLink, {

@@ -1034,7 +1034,7 @@ public class MongoRead {
         /* Match the PIN to cid */
         Criteria criteria = Criteria.where(SubNode.FIELD_PROPERTIES + "." + NodeProp.IPFS_LINK.s() + ".value").is(cid);
 
-        /* And only consider nodes that are NOT REFs (meaning REF prop==null) */
+        /* And only consider nodes that are NOT REFs (meaning IPFS_REF prop==null) */
         criteria = criteria.and(SubNode.FIELD_PROPERTIES + "." + NodeProp.IPFS_REF.s() + ".value").is(null);
 
         query.addCriteria(criteria);

@@ -91,7 +91,11 @@ public enum NodeProp {
     // FS_LUCENE("fs:lucene"), //
 
     IPFS_LINK("ipfs:link", "s"), //
+    
+    // When a node has this IPFS_REF property it means the IPFS_LINK on the node is completely external to us
+    // and might not even be pinned on our gateway. REF means reference (external reference, from some other gateway)
     IPFS_REF("ipfs:ref", "s"), //
+
     JSON_HASH("ipfs:json", "s"), //
     SAVE_TO_IPFS("sn:saveToIpfs", "s"), //
     IPFS_LINK_NAME("ipfs:linkName", "s"), //
