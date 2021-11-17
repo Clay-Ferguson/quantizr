@@ -77,10 +77,11 @@ public class UserFeedService {
 	@Qualifier("threadPoolTaskExecutor")
 	private Executor executor;
 
-	private static List<String> excludeTypes = Arrays.asList( //
-			NodeType.FRIEND.s(), //
-			NodeType.POSTS.s(), //
-			NodeType.ACT_PUB_POSTS.s());
+	// DO NOT DELETE (part of example to keep below)
+	// private static List<String> excludeTypes = Arrays.asList( //
+	// 		NodeType.FRIEND.s(), //
+	// 		NodeType.POSTS.s(), //
+	// 		NodeType.ACT_PUB_POSTS.s());
 
 	public CheckMessagesResponse checkMessages(MongoSession session, CheckMessagesRequest req) {
 		SessionContext sc = ThreadLocals.getSC();
@@ -93,12 +94,16 @@ public class UserFeedService {
 		String pathToSearch = NodeName.ROOT_OF_ALL_USERS;
 
 		Query query = new Query();
-		Criteria criteria = Criteria.where(SubNode.FIELD_PATH).regex(util.regexRecursiveChildrenOfPath(pathToSearch)) //
+		Criteria criteria = Criteria.where(SubNode.FIELD_PATH).regex(util.regexRecursiveChildrenOfPath(pathToSearch)); //
 
+		// limit to just markdown types (no type)
+		criteria = criteria.and(SubNode.FIELD_TYPE).is(NodeType.NONE.s());
+
+		// DO NOT DELETE (keep as example)
 				// This pattern is what is required when you have multiple conditions added to a single field.
-				.andOperator(Criteria.where(SubNode.FIELD_TYPE).ne(NodeType.FRIEND.s()), //
-						Criteria.where(SubNode.FIELD_TYPE).ne(NodeType.POSTS.s()), //
-						Criteria.where(SubNode.FIELD_TYPE).ne(NodeType.ACT_PUB_POSTS.s()));
+				// .andOperator(Criteria.where(SubNode.FIELD_TYPE).ne(NodeType.FRIEND.s()), //
+				// 		Criteria.where(SubNode.FIELD_TYPE).ne(NodeType.POSTS.s()), //
+				// 		Criteria.where(SubNode.FIELD_TYPE).ne(NodeType.ACT_PUB_POSTS.s()));
 
 		SubNode searchRoot = read.getNode(session, sc.getRootId());
 
@@ -220,9 +225,13 @@ public class UserFeedService {
 		// initialize criteria using the Path to select the correct sub-graph of the tree
 		Criteria criteria = Criteria.where(SubNode.FIELD_PATH).regex(util.regexRecursiveChildrenOfPath(pathToSearch)); //
 
-		if (req.getNodeId() == null) {
-			criteria = criteria.and(SubNode.FIELD_TYPE).nin(excludeTypes);
-		}
+		// DO NOT DELETE (keep as an example of how to do this)
+		// if (req.getNodeId() == null) {
+		// 	criteria = criteria.and(SubNode.FIELD_TYPE).nin(excludeTypes);
+		// }
+
+		// limit to just markdown types (no type)
+		criteria = criteria.and(SubNode.FIELD_TYPE).is(NodeType.NONE.s());
 
 		// add the criteria for sensitive flag
 		if (!req.getNsfw()) {
@@ -315,14 +324,12 @@ public class UserFeedService {
 		sc.stopwatch("NodeFeedQuery--Start");
 		Iterable<SubNode> iter = util.find(query);
 		sc.stopwatch("NodeFeedQuery--Complete");
-		SubNode lastNode = null;
 
 		for (SubNode node : iter) {
 			try {
 				NodeInfo info =
 						convert.convertToNodeInfo(sc, session, node, true, false, counter + 1, false, false, false, false);
 				searchResults.add(info);
-				lastNode = node;
 			} catch (Exception e) {
 			}
 		}
