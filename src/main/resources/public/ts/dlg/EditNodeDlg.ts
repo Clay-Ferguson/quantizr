@@ -533,6 +533,7 @@ export class EditNodeDlg extends DialogBase {
             if (ipfsLink) {
                 bottomBinRow = new Div(null, { className: "marginLeft marginBottom" }, [
                     ipfsLink ? new Div(`CID: ${ipfsLink}`, {
+                        className: "clickable",
                         title: "Click -> Copy to clipboard",
                         onClick: () => {
                             S.util.copyToClipboard(`ipfs://${ipfsLink}`);
