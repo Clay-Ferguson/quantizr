@@ -2088,23 +2088,26 @@ audio::-webkit-media-controls-play-button {
 
 .nodeHistoryTitle {
     margin-top: 20px;
-    font-size: 140%;
+    padding-bottom: 10px;
+    font-size: 120%;
     border-bottom: 3px solid $nodeBorderBottomColor;
+}
+
+.lockFont {
+    font-size: 90%;
 }
 
 .nodeHistoryItem {
     margin-top: 8px;
+    padding: 6px 6px 6px 0px;
     cursor: pointer;
-    border-bottom: 2px dotted $nodeBorderBottomColor; 
+    border: 4px solid transparent; 
 }
 
 .nodeHistorySubItem {
     margin-left: 20px;
-    margin-top: 5px;
     cursor: pointer;
-    border-bottom: 1px dotted $nodeBorderBottomColor; 
-    border-left: 6px solid $nodeBorderBottomColor;
-    padding-left: 6px;
+    border: 4px solid transparent;
 }
 
 .nodeHistorySubItemDots {

@@ -5,6 +5,7 @@ import { Singletons } from "../Singletons";
 import { CompIntf } from "./base/CompIntf";
 import { Checkbox } from "./Checkbox";
 import { Div } from "./Div";
+import { Span } from "./Span";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
@@ -27,8 +28,9 @@ export class HistoryPanel extends Div {
             return;
         }
         let children = [];
-        children.push(new Div("History", { className: "nodeHistoryTitle" }, [
-            new Checkbox("Lock", { className: "float-end" }, {
+        children.push(new Div(null, { className: "nodeHistoryTitle" }, [
+            new Span("History"),
+            new Checkbox("Lock", { className: "lockFont marginBottom float-end" }, {
                 setValue: (checked: boolean): void => {
                     S.quanta.nodeHistoryLocked = checked;
                 },
@@ -41,7 +43,8 @@ export class HistoryPanel extends Div {
             if (!h.content) return;
             let d: CompIntf;
 
-            children.push(d = new Div("&#x1f535 " + h.content, {
+            // unicode here is the big blue bullet character
+            children.push(d = new Div("&#x1f535;&nbsp;" + h.content, {
                 id: h.id + "_hist",
                 nid: h.id,
                 onClick: this.jumpToId,
@@ -64,7 +67,8 @@ export class HistoryPanel extends Div {
                     if (!h.content || dotsShown) return;
                     if (count++ < HistoryPanel.MAX_SUBITEMS) {
                         let d;
-                        children.push(d = new Div(h.content, {
+                         // unicode here is the smaller bullet character
+                        children.push(d = new Div("&#x25b6;&nbsp;" + h.content, {
                             id: topLevelId + "_" + h.id + "_subhist",
                             nid: h.id,
                             onClick: this.jumpToId,
