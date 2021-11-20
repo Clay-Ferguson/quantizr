@@ -1154,6 +1154,7 @@ export class Util implements UtilIntf {
     }
 
     updateNodeHistory = (node: J.NodeInfo, childNode: J.NodeInfo = null, appState: AppState): void => {
+        if (S.quanta.nodeHistoryLocked) return;
         let subItems = null;
 
         /* First whenever we have a new 'node' we need to remove 'node' from any of the
@@ -1339,7 +1340,7 @@ export class Util implements UtilIntf {
     }
 
     // https://www.w3schools.com/jsref/tryit.asp?filename=tryjsref_ondragenter
-    setDropHandler = (attribs: any, func: (elm: any) => void): void => {
+    setDropHandler = (attribs: any, fullOutline: boolean, func: (elm: any) => void): void => {
         // console.log("setDropHandler: nodeId=" + attribs.id);
         const nonDragBorder = "";
 
@@ -1353,20 +1354,35 @@ export class Util implements UtilIntf {
             event.preventDefault();
             // console.log("onDragOver: id=" + event.target.id);
             event.dataTransfer.dropEffect = "copy"; // See the section on the DataTransfer object.
-            event.currentTarget.style.borderTop = "4px solid green";
+            if (fullOutline) {
+                event.currentTarget.style.border = "4px solid green";
+            }
+            else {
+                event.currentTarget.style.borderTop = "4px solid green";
+            }
         };
 
         attribs.onDragLeave = function (event) {
             event.stopPropagation();
             event.preventDefault();
-            event.currentTarget.style.borderTop = "4px solid transparent";
+            if (fullOutline) {
+                event.currentTarget.style.border = "4px solid transparent";
+            }
+            else {
+                event.currentTarget.style.borderTop = "4px solid transparent";
+            }
         };
 
         attribs.onDrop = function (event) {
             // console.log("onDrop: id="+event.target.id);
             event.stopPropagation();
             event.preventDefault();
-            event.currentTarget.style.borderTop = "4px solid transparent";
+            if (fullOutline) {
+                event.currentTarget.style.border = "4px solid transparent";
+            }
+            else {
+                event.currentTarget.style.borderTop = "4px solid transparent";
+            }
             func(event);
         };
     }

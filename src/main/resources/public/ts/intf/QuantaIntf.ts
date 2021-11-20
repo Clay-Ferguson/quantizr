@@ -40,6 +40,7 @@ export interface QuantaIntf {
     openGraphData: Map<string, J.OpenGraph>;
     openGraphComps: OpenGraphPanel[];
     nodeHistory: NodeHistoryItem[];
+    nodeHistoryLocked: boolean;
 
     // after any kind of edit, delete, move, we will be rendering a page that needs to do some scrolling AND MAY
     // potentially render the MORE button onto the screen which would trigger a page grow, so we have this flag to

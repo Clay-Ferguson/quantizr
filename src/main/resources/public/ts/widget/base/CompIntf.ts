@@ -7,6 +7,7 @@ export interface CompIntf {
     e : Function;
     attribs: any;
     jsClassName: string;
+    renderRawHtml: boolean;
 
     getId(): string;
     whenElm(func: Function);

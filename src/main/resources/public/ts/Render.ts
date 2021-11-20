@@ -157,7 +157,7 @@ export class Render implements RenderIntf {
         if (!node) return;
         // console.log("Setting drop handler: nodeId=" + node.id + " attribs.id=" + attribs.id);
 
-        S.util.setDropHandler(attribs, (evt: DragEvent) => {
+        S.util.setDropHandler(attribs, false, (evt: DragEvent) => {
             const data = evt.dataTransfer.items;
 
             // todo-2: right now we only actually support one file being dragged? Would be nice to support multiples
@@ -176,7 +176,7 @@ export class Render implements RenderIntf {
                         }
                         /* this is the case where a user is moving a node by dragging it over another node */
                         else if (s.startsWith(S.nav._UID_ROWID_PREFIX)) {
-                            S.edit.moveNodeByDrop(node.id, s.substring(4), isFirst);
+                            S.edit.moveNodeByDrop(node.id, s.substring(4), isFirst ? "inline-above" : "inline", false);
                         }
                     });
                     return;

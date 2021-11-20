@@ -47,7 +47,7 @@ export interface EditIntf {
     addNode(nodeId: string, content: string, shareToUserId: string, replyToId: string, state: AppState): void;
     createNode(node: J.NodeInfo, typeName: string, forceUsePopup: boolean, pendingEdit: boolean, payloadType: string, content: string, state: AppState): void;
     addCalendarEntry(initDate: number, state: AppState): void;
-    moveNodeByDrop(targetNodeId: string, sourceNodeId: string, isFirts: boolean): Promise<void>;
+    moveNodeByDrop(targetNodeId: string, sourceNodeId: string, location: string, refreshCurrentNode: boolean): Promise<void>;
     initNodeEditResponse(res: J.InitNodeEditResponse, forceUsePopup: boolean, encrypt: boolean, showJumpButton: boolean, replyToId: string, state: AppState): void;
     updateHeadings(state: AppState): Promise<void>;
     addLinkBookmark(content: string, state: AppState): void;

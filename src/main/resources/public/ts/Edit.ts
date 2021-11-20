@@ -987,7 +987,7 @@ export class Edit implements EditIntf {
         this.createSubNodeResponse(res, false, null, state);
     }
 
-    moveNodeByDrop = async (targetNodeId: string, sourceNodeId: string, isFirst: boolean): Promise<void> => {
+    moveNodeByDrop = async (targetNodeId: string, sourceNodeId: string, location: string, refreshCurrentNode: boolean): Promise<void> => {
         /* if node being dropped on itself, then ignore */
         if (targetNodeId === sourceNodeId) {
             return;
@@ -999,10 +999,32 @@ export class Edit implements EditIntf {
         let res: J.MoveNodesResponse = await S.util.ajax<J.MoveNodesRequest, J.MoveNodesResponse>("moveNodes", {
             targetNodeId,
             nodeIds: [sourceNodeId],
-            location: isFirst ? "inline-above" : "inline"
+            location
         });
         S.render.fadeInId = sourceNodeId;
-        this.moveNodesResponse(res, sourceNodeId, false, state);
+
+        if (refreshCurrentNode) {
+            if (S.util.checkSuccess("Move nodes", res)) {
+                dispatch("Action_SetNodesToMove", (s: AppState): AppState => {
+                    s.nodesToMove = null;
+                    return s;
+                });
+                S.quanta.tempDisableAutoScroll();
+                let state: AppState = store.getState();
+                S.view.refreshTree(null, // nodeId
+                    false, // zeroOffset
+                    false, // renderLeafIfParent
+                    null, // highlightId
+                    false, // forceIPFSRefresh
+                    false, // scrollToTop
+                    false, // allowScroll
+                    false, // setTab
+                    state);
+            }
+        }
+        else {
+            this.moveNodesResponse(res, sourceNodeId, false, state);
+        }
     }
 
     updateHeadings = async (state: AppState): Promise<void> => {
@@ -1032,11 +1054,11 @@ export class Edit implements EditIntf {
         await dlg.open();
     }
 
-     /* Whenever we share an encrypted node to a another user, this is the final operation we run which
-    generates a key to the data which is encrypted with the public key of the person (identified by principalNodeId)
-    the node is shared to. Then publishes that key info into the DB, so that only the other person who this node is shared to
-    can use their private key to decrypt the key to the data, to view the node.
-    */
+    /* Whenever we share an encrypted node to a another user, this is the final operation we run which
+   generates a key to the data which is encrypted with the public key of the person (identified by principalNodeId)
+   the node is shared to. Then publishes that key info into the DB, so that only the other person who this node is shared to
+   can use their private key to decrypt the key to the data, to view the node.
+   */
     addCipherKeyToNode = async (node: J.NodeInfo, principalPublicKeyStr: string, principalNodeId: string): Promise<void> => {
         if (principalNodeId === "public") {
             console.warn("public node has encryption turned on. This is a bug.");

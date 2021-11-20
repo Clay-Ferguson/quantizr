@@ -92,6 +92,7 @@ export class Quanta implements QuantaIntf {
     openGraphComps: OpenGraphPanel[] = [];
 
     nodeHistory: NodeHistoryItem[] = [];
+    nodeHistoryLocked: false;
 
     // 0 means we allow.
     allowGrowPage: number = 0;
