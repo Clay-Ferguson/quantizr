@@ -112,6 +112,7 @@ export class Nav implements NavIntf {
                 upLevel: false,
                 siblingOffset: siblingOffset,
                 renderParentIfLeaf: true,
+                forceRenderParent: false,
                 offset: 0,
                 goToLastPage: false,
                 forceIPFSRefresh: false,
@@ -148,6 +149,7 @@ export class Nav implements NavIntf {
                 upLevel: true,
                 siblingOffset: 0,
                 renderParentIfLeaf: false,
+                forceRenderParent: false,
                 offset: 0,
                 goToLastPage: false,
                 forceIPFSRefresh: false,
@@ -241,6 +243,7 @@ export class Nav implements NavIntf {
                 upLevel: false,
                 siblingOffset: 0,
                 renderParentIfLeaf: null,
+                forceRenderParent: false,
                 offset: 0,
                 goToLastPage: false,
                 forceIPFSRefresh: false,
@@ -267,7 +270,7 @@ export class Nav implements NavIntf {
                 console.log("openNodeById");
             }
             // NOTE: Passing true for "scrollToTop" is new on 11/6/21
-            S.view.refreshTree(node.id, true, true, null, false, true, true, true, state);
+            S.view.refreshTree(node.id, true, true, null, false, true, true, true, false, state);
         }
     }
 
@@ -332,7 +335,8 @@ export class Nav implements NavIntf {
                     nodeId: state.homeNodeId,
                     upLevel: false,
                     siblingOffset: 0,
-                    renderParentIfLeaf: null,
+                    renderParentIfLeaf: false,
+                    forceRenderParent: false,
                     offset: 0,
                     goToLastPage: false,
                     forceIPFSRefresh: false,
@@ -404,6 +408,7 @@ export class Nav implements NavIntf {
                 upLevel: false,
                 siblingOffset: 0,
                 renderParentIfLeaf: false,
+                forceRenderParent: false,
                 offset: 0,
                 goToLastPage: false,
                 forceIPFSRefresh: false,

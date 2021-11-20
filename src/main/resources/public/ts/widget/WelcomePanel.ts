@@ -25,6 +25,7 @@ export class WelcomePanel extends Div {
                 upLevel: false,
                 siblingOffset: 0,
                 renderParentIfLeaf: null,
+                forceRenderParent: false,
                 offset: 0,
                 goToLastPage: false,
                 forceIPFSRefresh: false,

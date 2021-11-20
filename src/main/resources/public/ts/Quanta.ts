@@ -139,7 +139,7 @@ export class Quanta implements QuantaIntf {
             console.log("Quanta.refresh");
         }
         // S.view.jumpToId(state.node.id);
-        S.view.refreshTree(null, false, true, null, false, true, true, true, state);
+        S.view.refreshTree(null, false, true, null, false, true, true, true, false, state);
     }
 
     selectTab = (tabName: string): void => {
@@ -429,7 +429,7 @@ export class Quanta implements QuantaIntf {
             Log.log("POPSTATE: location: " + document.location + ", state: " + JSON.stringify(event.state));
 
             if (event.state && event.state.nodeId) {
-                S.view.refreshTree(event.state.nodeId, true, true, event.state.highlightId, false, false, true, true, store.getState());
+                S.view.refreshTree(event.state.nodeId, true, true, event.state.highlightId, false, false, true, true, false, store.getState());
                 this.selectTab(C.TAB_MAIN);
             }
         };

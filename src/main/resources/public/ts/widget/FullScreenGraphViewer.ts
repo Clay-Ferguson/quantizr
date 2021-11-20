@@ -275,6 +275,7 @@ export class FullScreenGraphViewer extends Main {
             upLevel: false,
             siblingOffset: 0,
             renderParentIfLeaf: false,
+            forceRenderParent: false,
             offset: 0,
             goToLastPage: false,
             forceIPFSRefresh: false,

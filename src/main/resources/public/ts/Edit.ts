@@ -63,7 +63,7 @@ export class Edit implements EditIntf {
     private insertBookResponse = (res: J.InsertBookResponse, state: AppState): void => {
         S.util.checkSuccess("Insert Book", res);
 
-        S.view.refreshTree(null, true, false, null, false, true, true, true, state);
+        S.view.refreshTree(null, true, false, null, false, true, true, true, false, state);
         S.view.scrollToSelectedNode(state);
     }
 
@@ -71,7 +71,7 @@ export class Edit implements EditIntf {
         state = appState(state);
         if (S.util.checkSuccess("Join node", res)) {
             S.quanta.clearSelNodes(state);
-            S.view.refreshTree(state.node.id, false, false, null, false, false, true, true, state);
+            S.view.refreshTree(state.node.id, false, false, null, false, false, true, true, false, state);
         }
     }
 
@@ -135,7 +135,7 @@ export class Edit implements EditIntf {
             S.quanta.panelsUpdating();
             // if pasting do a kind of refresh which will maintain us at the same page parent.
             if (pasting) {
-                S.view.refreshTree(null, false, false, nodeId, false, false, true, true, state);
+                S.view.refreshTree(null, false, false, nodeId, false, false, true, true, false, state);
             }
             else {
                 S.view.jumpToId(nodeId);
@@ -145,7 +145,7 @@ export class Edit implements EditIntf {
 
     private setNodePositionResponse = (res: J.SetNodePositionResponse, id: string, state: AppState): void => {
         if (S.util.checkSuccess("Change node position", res)) {
-            S.view.jumpToId(id);
+            S.view.jumpToId(id, true);
         }
     }
 
@@ -356,6 +356,7 @@ export class Edit implements EditIntf {
             upLevel: false,
             siblingOffset: 0,
             renderParentIfLeaf: false,
+            forceRenderParent: false,
             offset: 0,
             goToLastPage: false,
             forceIPFSRefresh: false,
@@ -884,7 +885,7 @@ export class Edit implements EditIntf {
         S.util.flashMessage(message + "...\n\n" + clipText, "Note", true);
         setTimeout(() => {
             let state: AppState = store.getState();
-            S.view.refreshTree(null, true, false, null, false, false, true, true, state);
+            S.view.refreshTree(null, true, false, null, false, false, true, true, false, state);
         }, 4200);
     }
 
@@ -908,7 +909,7 @@ export class Edit implements EditIntf {
 
     splitNodeResponse = (res: J.SplitNodeResponse, state: AppState): void => {
         if (S.util.checkSuccess("Split content", res)) {
-            S.view.refreshTree(null, false, false, null, false, false, true, true, state);
+            S.view.refreshTree(null, false, false, null, false, false, true, true, false, state);
             S.view.scrollToSelectedNode(state);
         }
     }
@@ -1019,6 +1020,7 @@ export class Edit implements EditIntf {
                     false, // scrollToTop
                     false, // allowScroll
                     false, // setTab
+                    false, // forceRenderParent
                     state);
             }
         }

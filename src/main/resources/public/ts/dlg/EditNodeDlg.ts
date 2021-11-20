@@ -844,6 +844,7 @@ export class EditNodeDlg extends DialogBase {
             upLevel: false,
             siblingOffset: 0,
             renderParentIfLeaf: false,
+            forceRenderParent: false,
             offset: 0,
             goToLastPage: false,
             forceIPFSRefresh: false,

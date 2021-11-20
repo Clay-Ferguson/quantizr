@@ -451,7 +451,7 @@ export class Search implements SearchIntf {
             search,
             replace
         });
-        S.view.refreshTree(null, false, false, null, false, false, true, true, state);
+        S.view.refreshTree(null, false, false, null, false, false, true, true, false, state);
         S.util.showMessage(res.message, "Success");
     }
 

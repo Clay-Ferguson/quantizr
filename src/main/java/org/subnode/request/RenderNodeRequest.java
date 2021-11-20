@@ -25,6 +25,15 @@ public class RenderNodeRequest extends RequestBase {
 
 	private boolean upLevel;
 	private boolean renderParentIfLeaf;
+	private boolean forceRenderParent;
+
+	public boolean isForceRenderParent() {
+		return forceRenderParent;
+	}
+
+	public void setForceRenderParent(boolean forceRenderParent) {
+		this.forceRenderParent = forceRenderParent;
+	}
 
 	private boolean goToLastPage;
 

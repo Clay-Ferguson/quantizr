@@ -20,20 +20,20 @@ export class View implements ViewIntf {
 
     docElm: any = (document.documentElement || document.body.parentNode || document.body);
 
-    jumpToId = (id: string): void => {
+    jumpToId = (id: string, forceRenderParent: boolean = false): void => {
         // console.log("jumpToId: " + id);
         let state = store.getState();
         if (C.DEBUG_SCROLLING) {
             console.log("view.jumpToId");
         }
-        this.refreshTree(id, true, true, id, false, false, true, true, state);
+        this.refreshTree(id, true, true, id, false, false, true, true, forceRenderParent, state);
     }
 
     /*
      * newId is optional and if specified makes the page scroll to and highlight that node upon re-rendering.
      */
     refreshTree = async (nodeId: string, zeroOffset: boolean, renderParentIfLeaf: boolean, highlightId: string, forceIPFSRefresh: boolean,
-        scrollToTop: boolean, allowScroll: boolean, setTab: boolean, state: AppState): Promise<void> => {
+        scrollToTop: boolean, allowScroll: boolean, setTab: boolean, forceRenderParent: boolean, state: AppState): Promise<void> => {
 
         // if we're going to be scrolling turn off the auto infinite scroll logic for this render.
         if (allowScroll || scrollToTop) {
@@ -72,6 +72,7 @@ export class View implements ViewIntf {
                 upLevel: false,
                 siblingOffset: 0,
                 renderParentIfLeaf,
+                forceRenderParent,
                 offset,
                 goToLastPage: false,
                 forceIPFSRefresh,
@@ -138,6 +139,7 @@ export class View implements ViewIntf {
                 upLevel: false,
                 siblingOffset: 0,
                 renderParentIfLeaf: true,
+                forceRenderParent: false,
                 offset,
                 goToLastPage,
                 forceIPFSRefresh: false,

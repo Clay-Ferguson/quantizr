@@ -246,7 +246,7 @@ export class User implements UserIntf {
             }
             else {
                 // console.log("loginResponse final refresh id chosen: " + id);
-                S.view.refreshTree(id, true, renderLeafIfParent, childId, false, false, true, true, state);
+                S.view.refreshTree(id, true, renderLeafIfParent, childId, false, false, true, true, false, state);
             }
         } else {
             console.log("LocalDb login failed.");

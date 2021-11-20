@@ -152,7 +152,7 @@ public class NodeRenderService {
 		 */
 		SubNode scanToNode = null;
 
-		if (req.isRenderParentIfLeaf() && !read.hasChildren(session, node)) {
+		if (req.isForceRenderParent() || (req.isRenderParentIfLeaf() && !read.hasChildren(session, node))) {
 			req.setUpLevel(true);
 		}
 
