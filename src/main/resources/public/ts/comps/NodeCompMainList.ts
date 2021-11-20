@@ -81,7 +81,7 @@ export class NodeCompMainList extends Div {
                          and these conditions will always apply about controll if we want to grow page or not. */
 
                         let state = store.getState();
-                        if (!state.editNode && S.quanta.allowGrowPage === 0) {
+                        if (!state.editNode && S.quanta.updatingCounter === 0) {
                             entries.forEach((entry: any) => {
                                 if (S.quanta.allowIntersectingObserver && entry.isIntersecting) {
                                     // observer.disconnect();

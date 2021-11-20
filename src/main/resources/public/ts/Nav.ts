@@ -219,7 +219,7 @@ export class Nav implements NavIntf {
             // todo-1: without this timeout checkboxes on main tab don't work reliably. Need their state stored in global state to fix it
             // in a good way.
             setTimeout(() => {
-                S.quanta.tempDisableAutoScroll();
+                S.quanta.panelsUpdating();
                 dispatch("Action_FastRefresh", (s: AppState): AppState => {
                     return s;
                 });

@@ -37,7 +37,7 @@ export class View implements ViewIntf {
 
         // if we're going to be scrolling turn off the auto infinite scroll logic for this render.
         if (allowScroll || scrollToTop) {
-            S.quanta.tempDisableAutoScroll();
+            S.quanta.panelsUpdating();
         }
 
         // let childCount = state.node && state.node.children ? state.node.children.length : 0;

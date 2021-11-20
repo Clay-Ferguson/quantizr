@@ -45,16 +45,20 @@ export class AppTab extends Div {
     }
 
     domAddEvent(): void {
-        // console.log("domAddEvent: " + this.data.name);
+        if (C.DEBUG_SCROLLING) {
+            console.log("domAddEvent: " + this.data.name);
+        }
         let elm = this.getRef();
         if (elm) {
             this.reScroll(elm);
 
             elm.addEventListener("scroll", () => {
                 if (C.DEBUG_SCROLLING) {
-                    console.log("Scroll Evt: " + elm.scrollTop);
+                    console.log("Scroll Evt [" + this.data.name + "]: " + elm.scrollTop);
                 }
-                this.data.scrollPos = elm.scrollTop;
+                if (S.quanta.updatingCounter === 0) {
+                    this.data.scrollPos = elm.scrollTop;
+                }
             }, { passive: true });
         }
 

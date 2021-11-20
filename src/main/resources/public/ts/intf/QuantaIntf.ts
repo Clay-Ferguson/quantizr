@@ -46,7 +46,7 @@ export interface QuantaIntf {
     // potentially render the MORE button onto the screen which would trigger a page grow, so we have this flag to
     // disable the infinite scrolling until it makes sense to allow it.
     // to support: reentry, we consider this 'true' when zero. It's a ref counter type thing.
-    allowGrowPage: number;
+    updatingCounter: number;
 
     tabChanging(prevTab: string, newTab: string, state: AppState): void;
     refreshOpenButtonOnNode(node: J.NodeInfo, state: AppState): void;
@@ -88,6 +88,6 @@ export interface QuantaIntf {
     getDisplayingNode(state: AppState, nodeId: string): J.NodeInfo;
     clearLastNodeIds(): void;
     getActiveTabComp(state: AppState): CompIntf;
-    tempDisableAutoScroll(): void;
+    panelsUpdating(): void;
     getTabDataById(state: AppState, id: string): TabDataIntf;
 }

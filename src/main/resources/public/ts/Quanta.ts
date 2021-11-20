@@ -95,7 +95,7 @@ export class Quanta implements QuantaIntf {
     nodeHistoryLocked: false;
 
     // 0 means we allow.
-    allowGrowPage: number = 0;
+    updatingCounter: number = 0;
 
     sendTestEmail = async () => {
         await S.util.ajax<J.SendTestEmailRequest, J.SendTestEmailResponse>("sendTestEmail");
@@ -104,17 +104,17 @@ export class Quanta implements QuantaIntf {
 
     /* We call this to temporarily disable the autoscroll in times like when we just edited something and we
        don't want auto-scrolling interrupting us when we try to forcabily highlight and scroll to the node we just
-       got done editing for example
+       got done editing for example.
        */
-    tempDisableAutoScroll = (): void => {
+    panelsUpdating = (): void => {
         // inc ref counter
-        S.quanta.allowGrowPage++;
+        S.quanta.updatingCounter++;
 
         // wait a full 5 seconds before we allow the "more" button to ever
         // trigger any autoscrolling again.
         setTimeout(() => {
             // dec ref counter
-            S.quanta.allowGrowPage--;
+            S.quanta.updatingCounter--;
         }, 3000);
     }
 

@@ -28,7 +28,7 @@ export class Constants {
 
     static readonly ONE_MB = 1048576; // 1024 * 1024;
     static readonly MAX_UPLOAD_MB = 20;
-    static readonly DEBUG_SCROLLING = false;
+    static readonly DEBUG_SCROLLING = true;
 
     // This works well at 100% but requires user to scroll down when the content was taller than
     // what can fit on the screen, and for making the Quanta Screencasts a good experience, for now
