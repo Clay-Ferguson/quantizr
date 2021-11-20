@@ -981,8 +981,11 @@ export class Quanta implements QuantaIntf {
 
         try {
             let res: J.RenderNodeResponse = await S.util.ajax<J.RenderNodeRequest, J.RenderNodeResponse>("anonPageLoad");
+
+            // if we have trouble accessing even the anon page just drop out to landing page.
             if (!res.success || res.errorType === J.ErrorType.AUTH) {
-                S.util.showMessage("Unable to access the requested page without being logged in. Try loading the URL without parameters, or log in.", "Warning");
+                window.location.href = window.location.origin;
+                return;
             }
             state = appState(state);
             S.render.renderPageFromData(res, false, null, true, true);

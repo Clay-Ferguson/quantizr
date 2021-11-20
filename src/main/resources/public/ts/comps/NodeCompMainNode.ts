@@ -23,12 +23,38 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
 /* General Widget that doesn't fit any more reusable or specific category other than a plain Div, but inherits capability of Comp class */
 export class NodeCompMainNode extends Div {
 
-    constructor(state: AppState, public imgSizeOverride: string) {
+    constructor(private state: AppState, public imgSizeOverride: string) {
         super(null, {
             id: S.nav._UID_ROWID_PREFIX + state.node.id
             // WARNING: Leave this tabIndex here. it's required for focsing/scrolling
             // tabIndex: "-1"
         });
+
+        let typeHandler = S.plugin.getTypeHandler(J.NodeType.NONE);
+
+        /* If we're in edit mode allow dragging. Note nodes with subOrdinals can't be dragged */
+        if ((typeHandler == null || typeHandler.subOrdinal() === -1) && state.userPreferences.editMode && !state.inlineEditId) {
+            this.attribs.draggable = "true";
+            this.attribs.onDragStart = this.dragStart;
+            this.attribs.onDragEnd = this.dragEnd;
+        }
+    }
+
+    dragStart = (ev): void => {
+        // let state: AppState = useSelector((state: AppState) => state);
+        /* If mouse is not over type icon during a drag start don't allow dragging. This way the entire ROW is the thing that is
+        getting dragged, but we don't accept drag events anywhere on the node, because we specifically don't want to. We intentionally
+        have draggableId so make is so that the user can only do a drag by clicking the type icon itself to start the drag. */
+        if (S.quanta.draggableId !== this.state.node.id) {
+            ev.preventDefault();
+            return;
+        }
+        ev.target.style.borderLeft = "6px dotted green";
+        ev.dataTransfer.setData("text", ev.target.id);
+    }
+
+    dragEnd = (ev): void => {
+        ev.target.style.borderLeft = "6px solid transparent";
     }
 
     preRender(): void {

@@ -313,6 +313,11 @@ public class NodeMoveService {
 				 * ordinal will change.
 				 */
 				if (nodeParent.getId().compareTo(parentToPasteInto.getId()) != 0) {
+
+					// if a parent node is attempting to be pasted into one of it's children that's an impossible move so we fail
+					if (parentToPasteInto.getPath().startsWith(node.getPath())) {
+						throw new RuntimeException("Impossible node move requested.");
+					}
 					changePathOfSubGraph(ms, node, parentPath);
 					node.setPath(parentPath + "/" + node.getLastPathPart());
 				}
@@ -341,8 +346,9 @@ public class NodeMoveService {
 			}
 			log.debug("PROCESSING MOVE: oldPath: " + node.getPath());
 
-			String newPath = newPathPrefix + "/" + node.getPath().substring(originalParentPathLen + 1);
-			log.debug("    newPath: " + newPath);
+			String pathSuffix = node.getPath().substring(originalParentPathLen + 1);
+			String newPath = newPathPrefix + "/" + pathSuffix;
+			// log.debug("    newPath: [" + newPathPrefix + "]/[" + pathSuffix + "]");
 			node.setPath(newPath);
 			node.setDisableParentCheck(true);
 		}
