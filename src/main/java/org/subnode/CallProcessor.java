@@ -104,9 +104,9 @@ public class CallProcessor {
 					 * for now, we can just send back the actual exception message
 					 */
 					if (e.getMessage() != null) {
-						orb.setMessage("Request Failed: " + e.getMessage());
+						orb.setMessage("Failed: " + e.getMessage());
 					} else {
-						orb.setMessage("Request Failed.");
+						orb.setMessage("Failed.");
 					}
 				}
 

@@ -116,7 +116,7 @@ public class AppFilter extends GenericFilterBean {
 							+ HttpStatus.valueOf(httpRes.getStatus()));
 				}
 			} catch (RuntimeException ex) {
-				log.error("Request Failed", ex);
+				log.error("Failed", ex);
 				throw ex;
 			}
 		} catch (Exception e) {

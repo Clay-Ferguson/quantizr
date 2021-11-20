@@ -547,18 +547,22 @@ export class Util implements UtilIntf {
                         this.progressInterval(null);
                     }
 
-                    if (!data.success) {
-                        if (data.message) {
-                            console.error("FAILED JSON-RESULT: " + postName + "\n    JSON-RESULT-DATA: " +
-                                this.prettyPrint(data));
-                            this.showMessage(data.message, "Message");
-                            return;
-                        }
-                    }
-
                     if (this.logAjax) {
                         console.log("    JSON-RESULT: " + postName + "\n    JSON-RESULT-DATA: " +
                             this.prettyPrint(data));
+                    }
+
+                    if (!data.success && data.message) {
+                        // if we didn't just console log it then console log it now.
+                        if (!this.logAjax) {
+                            console.error("FAILED JSON-RESULT: " + postName + "\n    JSON-RESULT-DATA: " +
+                                this.prettyPrint(data));
+                        }
+                        this.showMessage(data.message, "Message");
+
+                        // get rid of message so it can't be shown again
+                        data.message = null;
+                        return;
                     }
                 } catch (ex) {
                     this.logAndReThrow("Failed handling result of: " + postName, ex);
@@ -601,7 +605,7 @@ export class Util implements UtilIntf {
                         return;
                     }
 
-                    let msg: string = `Server request failed: \nPostName: ${postName}\n`;
+                    let msg: string = `Failed: \nPostName: ${postName}\n`;
                     msg += "PostData: " + this.prettyPrint(postData) + "\n";
 
                     if (error.response) {
@@ -612,9 +616,8 @@ export class Util implements UtilIntf {
                     console.error("Request failed: msg=" + msg);
 
                     status = error.response ? error.response.status : "";
-                    this.showMessage("Request failed: ERROR: " + status +
+                    this.showMessage("Failed: " + status +
                         (error.message ? (": " + error.message) : ""), "Warning", true);
-
                 } catch (ex) {
                     this.logAndReThrow("Failed processing: " + postName, ex);
                 }
@@ -706,7 +709,7 @@ export class Util implements UtilIntf {
      * requires: res.success res.message
      */
     checkSuccess = (opFriendlyName, res): boolean => {
-        if (!res || !res.success) {
+        if ((!res || !res.success) && res.message) {
             this.showMessage(opFriendlyName + " failed: " + res.message, "Warning");
         }
         return res.success;
