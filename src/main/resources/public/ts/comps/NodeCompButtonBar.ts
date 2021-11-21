@@ -329,11 +329,8 @@ export class NodeCompButtonBar extends Div {
 
                 if (d.kind === "string") {
                     d.getAsString((s) => {
-                        if (s.startsWith(S.nav._UID_ROWID_PREFIX)) {
-                            console.log("String: " + s);
-                            debugger;
-                            S.edit.moveNodeByDrop(id, s.substring(4), "inside", true);
-                        }
+                        // console.log("String: " + s);
+                        S.edit.moveNodeByDrop(id, s, "inside", true);
                     });
                     return;
                 }

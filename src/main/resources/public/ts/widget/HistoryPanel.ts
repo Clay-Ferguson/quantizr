@@ -1,10 +1,12 @@
 import { Constants as C } from "../Constants";
+import { TypeHandlerIntf } from "../intf/TypeHandlerIntf";
 import { NodeHistoryItem } from "../NodeHistoryItem";
 import { PubSub } from "../PubSub";
 import { Singletons } from "../Singletons";
 import { CompIntf } from "./base/CompIntf";
 import { Checkbox } from "./Checkbox";
 import { Div } from "./Div";
+import { Icon } from "./Icon";
 import { Span } from "./Span";
 
 let S: Singletons;
@@ -39,19 +41,41 @@ export class HistoryPanel extends Div {
                 }
             }, "form-switch form-check-inline")
         ]));
+
         S.quanta.nodeHistory.forEach((h: NodeHistoryItem) => {
             if (!h.content) return;
-            let d: CompIntf;
+            let parentDropTarg: CompIntf;
+            let parentIcon: Icon;
+            let d = null;
+
+            let typeHandler: TypeHandlerIntf = S.plugin.getTypeHandler(h.type);
+            if (typeHandler) {
+                let iconClass = typeHandler.getIconClass();
+                if (iconClass) {
+                    parentIcon = new Icon({
+                        className: iconClass + " rowTypeIcon",
+                        title: "Node Type: " + typeHandler.getName(),
+                        onMouseOver: () => { S.quanta.draggableId = h.id; },
+                        onMouseOut: () => { S.quanta.draggableId = null; }
+                    });
+                }
+            }
 
             // unicode here is the big blue bullet character
-            children.push(d = new Div("&#x1f535;&nbsp;" + h.content, {
+            children.push(parentDropTarg = new Div(null, {
                 id: h.id + "_hist",
                 nid: h.id,
                 onClick: this.jumpToId,
-                className: "nodeHistoryItem"
-            }));
+                className: "nodeHistoryItem",
+                draggable: "true",
+                onDragStart: (evt) => this.dragStart(evt, h.id),
+                onDragEnd: this.dragEnd
+            }, [
+                parentIcon,
+                d = new Span(h.content)
+            ]));
 
-            this.makeDropTarget(d.attribs, h.id);
+            this.makeDropTarget(parentDropTarg.attribs, h.id);
             // do we need to sanitize html here?
             d.renderRawHtml = true;
 
@@ -66,15 +90,36 @@ export class HistoryPanel extends Div {
                 h.subItems.forEach((h: NodeHistoryItem) => {
                     if (!h.content || dotsShown) return;
                     if (count++ < HistoryPanel.MAX_SUBITEMS) {
-                        let d;
-                         // unicode here is the smaller bullet character
-                        children.push(d = new Div("&#x25b6;&nbsp;" + h.content, {
+                        let dropTarg: Span;
+                        let icon: Icon;
+
+                        let typeHandler: TypeHandlerIntf = S.plugin.getTypeHandler(h.type);
+                        if (typeHandler) {
+                            let iconClass = typeHandler.getIconClass();
+                            if (iconClass) {
+                                icon = new Icon({
+                                    className: iconClass + " rowTypeIcon",
+                                    title: "Node Type: " + typeHandler.getName(),
+                                    onMouseOver: () => { S.quanta.draggableId = h.id; },
+                                    onMouseOut: () => { S.quanta.draggableId = null; }
+                                });
+                            }
+                        }
+
+                        children.push(dropTarg = new Div(null, {
+                            className: "nodeHistorySubItem",
                             id: topLevelId + "_" + h.id + "_subhist",
                             nid: h.id,
                             onClick: this.jumpToId,
-                            className: "nodeHistorySubItem"
-                        }));
-                        this.makeDropTarget(d.attribs, h.id);
+                            draggable: "true",
+                            onDragStart: (evt) => this.dragStart(evt, h.id),
+                            onDragEnd: this.dragEnd
+                        }, [
+                            icon,
+                            d = new Span(h.content)
+                        ]));
+
+                        this.makeDropTarget(dropTarg.attribs, h.id);
                         d.renderRawHtml = true;
                     }
                     else {
@@ -92,6 +137,19 @@ export class HistoryPanel extends Div {
         this.setChildren(children);
     }
 
+    dragStart = (ev: any, draggingId: string): void => {
+        if (S.quanta.draggableId !== draggingId) {
+            ev.preventDefault();
+            return;
+        }
+        ev.target.style.border = "6px dotted green";
+        ev.dataTransfer.setData("text", draggingId);
+    }
+
+    dragEnd = (ev): void => {
+        ev.target.style.border = "6px solid transparent";
+    }
+
     makeDropTarget = (attribs: any, id: string) => {
         S.util.setDropHandler(attribs, true, (evt: DragEvent) => {
             const data = evt.dataTransfer.items;
@@ -103,10 +161,8 @@ export class HistoryPanel extends Div {
 
                 if (d.kind === "string") {
                     d.getAsString((s) => {
-                        if (s.startsWith(S.nav._UID_ROWID_PREFIX)) {
-                            console.log("String: " + s);
-                            S.edit.moveNodeByDrop(id, s.substring(4), "inside", true);
-                        }
+                        // console.log("String: " + s);
+                        S.edit.moveNodeByDrop(id, s, "inside", true);
                     });
                     return;
                 }

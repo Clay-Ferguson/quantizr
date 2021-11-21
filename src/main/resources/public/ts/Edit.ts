@@ -989,6 +989,8 @@ export class Edit implements EditIntf {
     }
 
     moveNodeByDrop = async (targetNodeId: string, sourceNodeId: string, location: string, refreshCurrentNode: boolean): Promise<void> => {
+        // console.log("targetNodeId=" + targetNodeId);
+
         /* if node being dropped on itself, then ignore */
         if (targetNodeId === sourceNodeId) {
             return;
@@ -1007,6 +1009,7 @@ export class Edit implements EditIntf {
         if (refreshCurrentNode) {
             if (S.util.checkSuccess("Move nodes", res)) {
                 dispatch("Action_SetNodesToMove", (s: AppState): AppState => {
+                    S.util.removeHistorySubItem(sourceNodeId);
                     s.nodesToMove = null;
                     return s;
                 });
@@ -1022,6 +1025,7 @@ export class Edit implements EditIntf {
                     false, // setTab
                     false, // forceRenderParent
                     state);
+                S.util.flashMessage("Node moved successfully.", "Move", true);
             }
         }
         else {

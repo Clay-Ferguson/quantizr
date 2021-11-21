@@ -40,21 +40,21 @@ export class NodeCompRow extends Div {
         /* If we're in edit mode allow dragging. Note nodes with subOrdinals can't be dragged */
         if ((typeHandler == null || typeHandler.subOrdinal() === -1) && appState.userPreferences.editMode && !appState.inlineEditId) {
             this.attribs.draggable = "true";
-            this.attribs.onDragStart = this.dragStart;
+            this.attribs.onDragStart = (evt) => this.dragStart(evt, node.id);
             this.attribs.onDragEnd = this.dragEnd;
         }
     }
 
-    dragStart = (ev): void => {
+    dragStart = (ev: any, draggingId: string): void => {
         /* If mouse is not over type icon during a drag start don't allow dragging. This way the entire ROW is the thing that is
         getting dragged, but we don't accept drag events anywhere on the node, because we specifically don't want to. We intentionally
         have draggableId so make is so that the user can only do a drag by clicking the type icon itself to start the drag. */
-        if (S.quanta.draggableId !== this.node.id) {
+        if (S.quanta.draggableId !== draggingId) {
             ev.preventDefault();
             return;
         }
         ev.target.style.borderLeft = "6px dotted green";
-        ev.dataTransfer.setData("text", ev.target.id);
+        ev.dataTransfer.setData("text", draggingId);
     }
 
     dragEnd = (ev): void => {

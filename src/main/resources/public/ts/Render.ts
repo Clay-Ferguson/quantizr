@@ -175,8 +175,8 @@ export class Render implements RenderIntf {
                             S.attachment.openUploadFromUrlDlg(node ? node.id : null, s, null, state);
                         }
                         /* this is the case where a user is moving a node by dragging it over another node */
-                        else if (s.startsWith(S.nav._UID_ROWID_PREFIX)) {
-                            S.edit.moveNodeByDrop(node.id, s.substring(4), isFirst ? "inline-above" : "inline", false);
+                        else {
+                            S.edit.moveNodeByDrop(node.id, s, isFirst ? "inline-above" : "inline", false);
                         }
                     });
                     return;

@@ -1156,9 +1156,23 @@ export class Util implements UtilIntf {
         this.updateNodeHistory(node, childNode, appState);
     }
 
+    removeHistorySubItem = (nodeId: string): void => {
+        /* First whenever we have a new 'node' we need to remove 'node' from any of the
+         subItems that exist, because any top level item doesn't need to also exist as a subItem */
+        S.quanta.nodeHistory.forEach(h => {
+            if (h.subItems) {
+                h.subItems = h.subItems.filter(function (hi: NodeHistoryItem) {
+                    return hi.id !== nodeId;
+                });
+            }
+        });
+    }
+
     updateNodeHistory = (node: J.NodeInfo, childNode: J.NodeInfo = null, appState: AppState): void => {
         if (S.quanta.nodeHistoryLocked) return;
         let subItems = null;
+
+        this.removeHistorySubItem(node.id);
 
         /* First whenever we have a new 'node' we need to remove 'node' from any of the
          subItems that exist, because any top level item doesn't need to also exist as a subItem */
@@ -1197,7 +1211,8 @@ export class Util implements UtilIntf {
 
                     // if this child at at a top level now, don't let it be appended as a child second level item.
                     if (!childFound) {
-                        subItems.unshift({ id: childNode.id, content: this.getShortContent(childNode), subIds: null });
+                        // new NodeHistoryItem
+                        subItems.unshift({ id: childNode.id, type: childNode.type, content: this.getShortContent(childNode), subIds: null });
                     }
                 }
             }
@@ -1209,7 +1224,7 @@ export class Util implements UtilIntf {
         });
 
         // now add to top.
-        S.quanta.nodeHistory.unshift({ id: node.id, content: this.getShortContent(node), subItems });
+        S.quanta.nodeHistory.unshift({ id: node.id, type: node.type, content: this.getShortContent(node), subItems });
     }
 
     getPathPartForNamedNode = (node: J.NodeInfo): string => {
