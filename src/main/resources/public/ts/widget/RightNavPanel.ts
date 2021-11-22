@@ -9,6 +9,7 @@ import { CompIntf } from "./base/CompIntf";
 import { Button } from "./Button";
 import { ButtonBar } from "./ButtonBar";
 import { Checkbox } from "./Checkbox";
+import { CollapsiblePanel } from "./CollapsiblePanel";
 import { Div } from "./Div";
 import { HistoryPanel } from "./HistoryPanel";
 import { IconButton } from "./IconButton";
@@ -23,6 +24,8 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
 declare var g_brandingAppName;
 
 export class RightNavPanel extends Div {
+
+    static historyExpanded: boolean = false;
 
     constructor() {
         super(null, {
@@ -138,7 +141,16 @@ export class RightNavPanel extends Div {
                     !headerImg ? new Div(null, null, [avatarImg]) : avatarImg,
                     new TabPanelButtons(true, "rhsMenu")
                 ]),
+
                 new HistoryPanel(),
+                // This collapsable panel works fine but is kind of awkward asthetically
+                // new CollapsiblePanel("History", "History", null, [
+                //     new HistoryPanel()
+                // ], false,
+                //     (state: boolean) => {
+                //         RightNavPanel.historyExpanded = state;
+                //     }, RightNavPanel.historyExpanded, "historyPanelButton", "", "div"),
+
                 !state.isAnonUser ? new Div("Logout", {
                     className: "float-end rhsLogoutLink",
                     onClick: S.nav.logout

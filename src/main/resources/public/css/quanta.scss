@@ -2097,9 +2097,12 @@ audio::-webkit-media-controls-play-button {
     font-size: 90%;
 }
 
+.historyPanelButton {
+    margin-left: 15px;
+}
+
 .nodeHistoryItem {
     margin-top: 8px;
-    padding: 6px 6px 6px 0px;
     cursor: pointer;
     border: 4px solid transparent; 
 }
