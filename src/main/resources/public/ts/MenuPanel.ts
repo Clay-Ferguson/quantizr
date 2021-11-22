@@ -97,7 +97,6 @@ export class MenuPanel extends Div {
     static calendarFutureDates = () => S.srch.timeline(null, "prp.date.value", appState(null), "futureOnly", "Future calendar dates (Soonest at the top)", 0, true);
     static calendarPastDates = () => S.srch.timeline(null, "prp.date.value", appState(null), "pastOnly", "Past calendar dates (Newest at the top)", 0, true);
     static calendarAllDates = () => S.srch.timeline(null, "prp.date.value", appState(null), "all", "All calendar dates", 0, true);
-    static toolsShowGraph = () => S.render.showGraph(null, null, appState(null));
     static toolsShowClipboard = () => S.edit.saveClipboardToChildNode("~" + J.NodeType.NOTES);
     static import = () => S.edit.openImportDlg(appState(null));
     static export = () => S.edit.openExportDlg(appState(null));
@@ -421,7 +420,6 @@ export class MenuPanel extends Div {
         ]));
 
         children.push(new Menu("Tools", [
-            new MenuItem("Show Graph", MenuPanel.toolsShowGraph, !state.isAnonUser && !!hltNode), //
             new MenuItem("Save Clipboard", MenuPanel.toolsShowClipboard, !state.isAnonUser), //
 
             // for now, we don't need the 'show properties' and it may never be needed again

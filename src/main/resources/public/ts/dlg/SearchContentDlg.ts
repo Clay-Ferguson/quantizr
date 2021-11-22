@@ -122,10 +122,6 @@ export class SearchContentDlg extends DialogBase {
     }
 
     graph = () => {
-        if (!this.validate()) {
-            return;
-        }
-
         if (!S.util.ajaxReady("searchNodes")) {
             return;
         }
