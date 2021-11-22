@@ -44,18 +44,6 @@ export class SearchContentDlg extends DialogBase {
         this.searchTextState.setValue(SearchContentDlg.defaultSearchText);
     }
 
-    validate = (): boolean => {
-        let valid = true;
-        if (!this.searchTextState.getValue()) {
-            this.searchTextState.setError("Cannot be empty.");
-            valid = false;
-        }
-        else {
-            this.searchTextState.setError(null);
-        }
-        return valid;
-    }
-
     renderDlg(): CompIntf[] {
         return [
             new Form(null, [
@@ -95,10 +83,14 @@ export class SearchContentDlg extends DialogBase {
                         { key: "0", val: "Relevance" },
                         { key: "ctm", val: "Create Time" },
                         { key: "mtm", val: "Modify Time" },
-                        { key: "contentLength", val: "Text Length" }
+                        { key: "contentLength", val: "Text Length" },
+                        { key: "prp.priority.value", val: "Priority" }
                     ], "m-2", "searchDlgOrderBy", {
                         setValue: (val: string): void => {
                             let sortDir = val === "0" ? "" : "DESC";
+                            if (val === "prp.priority.value") {
+                                sortDir = "asc";
+                            }
                             SearchContentDlg.dlgState.sortField = val;
                             SearchContentDlg.dlgState.sortDir = sortDir;
 
@@ -140,10 +132,6 @@ export class SearchContentDlg extends DialogBase {
     }
 
     search = () => {
-        if (!this.validate()) {
-            return;
-        }
-
         if (!S.util.ajaxReady("searchNodes")) {
             return;
         }

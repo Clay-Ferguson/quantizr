@@ -283,7 +283,7 @@ public class NodeRenderService {
 		Sort sort = null;
 
 		if (!StringUtils.isEmpty(orderBy)) {
-			sort = parseOrderByToSort(orderBy);
+			sort = parseOrderBy(orderBy);
 		} else {
 			// log.debug("processRenderNode querying by ordinal.");
 			sort = Sort.by(Sort.Direction.ASC, SubNode.FIELD_ORDINAL);
@@ -437,23 +437,21 @@ public class NodeRenderService {
 	}
 
 	/*
+	 * Nodes can have a propety like orderBy="priority asc", and that allow the children to be displayed
+	 * in that order.
+	 *
 	 * parses something like "priority asc" into a Sort object, assuming the field is in the property
 	 * array of the node, rather than the name of an actual SubNode object member property.
 	 */
-	private Sort parseOrderByToSort(String orderBy) {
+	private Sort parseOrderBy(String orderBy) {
 		Sort sort = null;
 		int spaceIdx = orderBy.indexOf(" ");
 		String dir = "asc"; // asc or desc
 		if (spaceIdx != -1) {
-			dir = orderBy.substring(spaceIdx + 1);
 			orderBy = orderBy.substring(0, spaceIdx);
-		}
-
-		// todo-1: is this a bug? should there be a ".value" after order by?
-		sort = Sort.by(dir.equals("asc") ? Sort.Direction.ASC : Sort.Direction.DESC, SubNode.FIELD_PROPERTIES + "." + orderBy);
-
-		if (orderBy.equals("priority")) {
-			sort = sort.and(Sort.by(Sort.Direction.DESC, SubNode.FIELD_MODIFY_TIME));
+			dir = orderBy.substring(spaceIdx + 1);
+			sort = Sort.by(dir.equals("asc") ? Sort.Direction.ASC : Sort.Direction.DESC,
+					SubNode.FIELD_PROPERTIES + "." + orderBy);
 		}
 		return sort;
 	}
