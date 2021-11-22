@@ -145,7 +145,7 @@ export class SearchContentDlg extends DialogBase {
 
         SearchContentDlg.defaultSearchText = this.searchTextState.getValue();
 
-        let desc = "Content: " + SearchContentDlg.defaultSearchText;
+        let desc = SearchContentDlg.defaultSearchText ? ("Content: " + SearchContentDlg.defaultSearchText) : "";
         S.srch.search(node, null, SearchContentDlg.defaultSearchText, this.appState, null, desc, this.getState().fuzzy,
             this.getState().caseSensitive, 0,
             this.getState().recursive,
