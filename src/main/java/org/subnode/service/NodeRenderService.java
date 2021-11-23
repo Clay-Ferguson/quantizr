@@ -284,7 +284,9 @@ public class NodeRenderService {
 
 		if (!StringUtils.isEmpty(orderBy)) {
 			sort = parseOrderBy(orderBy);
-		} else {
+		}
+
+		if (sort == null) {
 			// log.debug("processRenderNode querying by ordinal.");
 			sort = Sort.by(Sort.Direction.ASC, SubNode.FIELD_ORDINAL);
 		}
@@ -448,10 +450,10 @@ public class NodeRenderService {
 		int spaceIdx = orderBy.indexOf(" ");
 		String dir = "asc"; // asc or desc
 		if (spaceIdx != -1) {
-			orderBy = orderBy.substring(0, spaceIdx);
+			String orderByProp = orderBy.substring(0, spaceIdx);
 			dir = orderBy.substring(spaceIdx + 1);
 			sort = Sort.by(dir.equals("asc") ? Sort.Direction.ASC : Sort.Direction.DESC,
-					SubNode.FIELD_PROPERTIES + "." + orderBy);
+					SubNode.FIELD_PROPERTIES + "." + orderByProp);
 		}
 		return sort;
 	}
