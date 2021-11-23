@@ -15,7 +15,6 @@ export interface QuantaIntf {
     appInitialized: boolean;
     curUrlPath: string;
     activeTab: string;
-    allowIntersectingObserver: boolean;
 
     newNodeTargetId: string;
     newNodeTargetOffset: number;
@@ -41,12 +40,6 @@ export interface QuantaIntf {
     openGraphComps: OpenGraphPanel[];
     nodeHistory: NodeHistoryItem[];
     nodeHistoryLocked: boolean;
-
-    // after any kind of edit, delete, move, we will be rendering a page that needs to do some scrolling AND MAY
-    // potentially render the MORE button onto the screen which would trigger a page grow, so we have this flag to
-    // disable the infinite scrolling until it makes sense to allow it.
-    // to support: reentry, we consider this 'true' when zero. It's a ref counter type thing.
-    updatingCounter: number;
 
     tabChanging(prevTab: string, newTab: string, state: AppState): void;
     refreshOpenButtonOnNode(node: J.NodeInfo, state: AppState): void;
@@ -88,6 +81,5 @@ export interface QuantaIntf {
     getDisplayingNode(state: AppState, nodeId: string): J.NodeInfo;
     clearLastNodeIds(): void;
     getActiveTabComp(state: AppState): CompIntf;
-    panelsUpdating(): void;
     getTabDataById(state: AppState, id: string): TabDataIntf;
 }

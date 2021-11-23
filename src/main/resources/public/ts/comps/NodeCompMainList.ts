@@ -67,9 +67,10 @@ export class NodeCompMainList extends Div {
                     event.stopPropagation();
                     event.preventDefault();
                     S.view.nextPage(state);
-                },
-                title: "Next Page"
+                }
             });
+
+            let buttonCreateTime: number = new Date().getTime();
 
             if (C.TREE_INFINITE_SCROLL && !pageTop) {
                 // If nextButton is the one at the bottom of the page we watch it so we can dynamically load in
@@ -81,16 +82,23 @@ export class NodeCompMainList extends Div {
                          and these conditions will always apply about controll if we want to grow page or not. */
 
                         let state = store.getState();
-                        if (!state.editNode && S.quanta.updatingCounter === 0) {
-                            entries.forEach((entry: any) => {
-                                if (S.quanta.allowIntersectingObserver && entry.isIntersecting) {
-                                    // observer.disconnect();
-                                    S.view.growPage(state);
 
-                                    // it's possible that the next render COULD immediately show the NEXT button so we
-                                    // use this "allow" varible to control
-                                    S.quanta.allowIntersectingObserver = false;
-                                    setTimeout(() => { S.quanta.allowIntersectingObserver = true; }, 3000);
+                        // Make sure this button has existed for 3 seconds at least before allowing it to trigger a growPage, becasue
+                        // if it renders as visible without the user scrolling to it that would be bad by triggering a grow
+                        // in an awkward way.
+                        if (!state.editNode) {
+                            entries.forEach((entry: any) => {
+                                if (entry.isIntersecting) {
+                                    // if this button comes into visibility within 2 seconds of it being created
+                                    // that means it was rendered visible without user scrolling so in this case
+                                    // we want to disallow the auto loading
+                                    let curTime: number = new Date().getTime();
+                                    if (curTime - buttonCreateTime < 3000) {
+                                        observer.disconnect();
+                                        return;
+                                    }
+
+                                    S.view.growPage(state);
                                 }
                             });
                         }

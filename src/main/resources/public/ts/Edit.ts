@@ -81,8 +81,6 @@ export class Edit implements EditIntf {
             do need even when edit mode is technically off */
             const editingAllowed = /* state.userPreferences.editMode && */ this.isEditAllowed(res.nodeInfo, state);
             if (editingAllowed) {
-                S.quanta.panelsUpdating();
-
                 // these conditions determine if we want to run editing in popup, instead of inline in the page.
                 let editInPopup = forceUsePopup || state.mobileMode ||
                     // node not found on tree.
@@ -132,7 +130,6 @@ export class Edit implements EditIntf {
                 return s;
             });
 
-            S.quanta.panelsUpdating();
             // if pasting do a kind of refresh which will maintain us at the same page parent.
             if (pasting) {
                 S.view.refreshTree(null, false, false, nodeId, false, false, true, true, false, state);
@@ -242,7 +239,6 @@ export class Edit implements EditIntf {
                         shareToUserId: null
                     });
                 }
-                S.quanta.panelsUpdating();
                 S.quanta.refresh(state);
             }
         }
@@ -276,7 +272,6 @@ export class Edit implements EditIntf {
 
     insertNodeResponse = (res: J.InsertNodeResponse, state: AppState): void => {
         if (S.util.checkSuccess("Insert node", res)) {
-            S.quanta.panelsUpdating();
             S.quanta.updateNodeMap(res.newNode, state);
             S.quanta.highlightNode(res.newNode, false, state);
             this.runEditNode(null, res.newNode.id, false, false, false, null, state);
@@ -285,7 +280,6 @@ export class Edit implements EditIntf {
 
     createSubNodeResponse = (res: J.CreateSubNodeResponse, forceUsePopup: boolean, replyToId: string, state: AppState): void => {
         if (S.util.checkSuccess("Create subnode", res)) {
-            S.quanta.panelsUpdating();
             if (!res.newNode) {
                 S.quanta.refresh(state);
             }
@@ -703,7 +697,6 @@ export class Edit implements EditIntf {
                 nodeIds: selNodesArray,
                 childrenOnly: false
             });
-            S.quanta.panelsUpdating();
             this.removeNodesFromHistory(selNodesArray, state);
             this.removeNodesFromCalendarData(selNodesArray, state);
 
@@ -1013,7 +1006,6 @@ export class Edit implements EditIntf {
                     s.nodesToMove = null;
                     return s;
                 });
-                S.quanta.panelsUpdating();
                 let state: AppState = store.getState();
                 S.view.refreshTree(null, // nodeId
                     false, // zeroOffset

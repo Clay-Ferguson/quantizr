@@ -45,7 +45,6 @@ export class Quanta implements QuantaIntf {
     hiddenRenderingEnabled: boolean = true;
     noScrollToId: string = null;
     activeTab: string;
-    allowIntersectingObserver: boolean = true;
 
     newNodeTargetId: string;
     newNodeTargetOffset: number;
@@ -94,28 +93,9 @@ export class Quanta implements QuantaIntf {
     nodeHistory: NodeHistoryItem[] = [];
     nodeHistoryLocked: false;
 
-    // 0 means we allow.
-    updatingCounter: number = 0;
-
     sendTestEmail = async () => {
         await S.util.ajax<J.SendTestEmailRequest, J.SendTestEmailResponse>("sendTestEmail");
         S.util.showMessage("Send Test Email Initiated.", "Note");
-    }
-
-    /* We call this to temporarily disable the autoscroll in times like when we just edited something and we
-       don't want auto-scrolling interrupting us when we try to forcabily highlight and scroll to the node we just
-       got done editing for example.
-       */
-    panelsUpdating = (): void => {
-        // inc ref counter
-        S.quanta.updatingCounter++;
-
-        // wait a full 5 seconds before we allow the "more" button to ever
-        // trigger any autoscrolling again.
-        setTimeout(() => {
-            // dec ref counter
-            S.quanta.updatingCounter--;
-        }, 3000);
     }
 
     showSystemNotification = (title: string, message: string): void => {

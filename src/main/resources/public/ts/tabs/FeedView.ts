@@ -194,24 +194,28 @@ export class FeedView extends AppTab {
                         event.stopPropagation();
                         event.preventDefault();
                         S.srch.feed(++this.data.props.page, this.data.props.searchTextState.getValue(), true, false);
-                    },
-                    title: "Next Page"
+                    }
                 });
+                let buttonCreateTime: number = new Date().getTime();
 
                 if (C.FEED_INFINITE_SCROLL) {
                     if (this.data.props.feedResults?.length < C.MAX_DYNAMIC_ROWS) {
                         // When the 'more' button scrolls into view go ahead and load more records.
                         moreButton.whenElm((elm: HTMLElement) => {
                             let observer = new IntersectionObserver(entries => {
-                                entries.forEach((entry: any) => {
-                                    if (S.quanta.allowIntersectingObserver && entry.isIntersecting) {
-                                        // observer.disconnect();
-                                        S.srch.feed(++this.data.props.page, this.data.props.searchTextState.getValue(), true, true);
 
-                                        // it's possible that the next render COULD immediately show the NEXT button so we
-                                        // use this "allow" varible to control
-                                        S.quanta.allowIntersectingObserver = false;
-                                        setTimeout(() => { S.quanta.allowIntersectingObserver = true; }, 3000);
+                                entries.forEach((entry: any) => {
+                                    if (entry.isIntersecting) {
+                                        // if this button comes into visibility within 2 seconds of it being created
+                                        // that means it was rendered visible without user scrolling so in this case
+                                        // we want to disallow the auto loading
+                                        let curTime: number = new Date().getTime();
+                                        if (curTime - buttonCreateTime < 3000) {
+                                            observer.disconnect();
+                                            return;
+                                        }
+
+                                        S.srch.feed(++this.data.props.page, this.data.props.searchTextState.getValue(), true, true);
                                     }
                                 });
                             });

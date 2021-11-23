@@ -35,11 +35,6 @@ export class View implements ViewIntf {
     refreshTree = async (nodeId: string, zeroOffset: boolean, renderParentIfLeaf: boolean, highlightId: string, forceIPFSRefresh: boolean,
         scrollToTop: boolean, allowScroll: boolean, setTab: boolean, forceRenderParent: boolean, state: AppState): Promise<void> => {
 
-        // if we're going to be scrolling turn off the auto infinite scroll logic for this render.
-        if (allowScroll || scrollToTop) {
-            S.quanta.panelsUpdating();
-        }
-
         // let childCount = state.node && state.node.children ? state.node.children.length : 0;
         // console.log("refreshTree with ID=" + nodeId + " childrenCount=" + childCount);
         if (!nodeId && state.node) {

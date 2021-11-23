@@ -88,9 +88,6 @@ export class EditNodeDlg extends DialogBase {
                  */
             }
             EditNodeDlg.embedInstance = this;
-
-            // whenever we're rendering because an edit we disable any infinite scrolling logic for this render.
-            S.quanta.panelsUpdating();
         }
         this.mergeState({
             node,
@@ -1013,7 +1010,6 @@ export class EditNodeDlg extends DialogBase {
         }
         else {
             S.render.fadeInId = state.node.id;
-            S.quanta.panelsUpdating();
             S.edit.saveNodeResponse(state.node, res, true, this.appState);
 
             if (askToSplit) {
