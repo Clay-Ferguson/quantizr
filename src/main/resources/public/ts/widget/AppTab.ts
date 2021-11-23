@@ -56,9 +56,7 @@ export class AppTab extends Div {
                 if (C.DEBUG_SCROLLING) {
                     console.log("Scroll Evt [" + this.data.name + "]: " + elm.scrollTop);
                 }
-                if (S.quanta.updatingCounter === 0) {
-                    this.data.scrollPos = elm.scrollTop;
-                }
+                this.data.scrollPos = elm.scrollTop;
             }, { passive: true });
         }
 
