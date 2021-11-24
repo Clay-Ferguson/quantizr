@@ -48,10 +48,6 @@ export class RightNavPanel extends Div {
 
         let headerImg = this.makeHeaderDiv(state);
         let avatarImg = this.makeAvatarDiv(state, !!headerImg);
-        let profileButton = !state.isAnonUser && !headerImg && !avatarImg
-            ? new Button("Edit Profile", () => {
-                new UserProfileDlg(null, appState(null)).open();
-            }, null, "btn-secondary marginBottom") : null;
 
         let displayName = state.displayName ? state.displayName : state.title;
 
@@ -125,18 +121,20 @@ export class RightNavPanel extends Div {
                             }) : null,
                             clipboardPasteButton,
                             addNoteButton,
+                            displayName && !state.isAnonUser ? new IconButton("fa-database", null, {
+                                title: "Go to your Account Root Node",
+                                onClick: e => S.nav.navHome(state)
+                            }) : null,
                             new IconButton("fa-home", null, {
                                 title: g_brandingAppName + " Home",
                                 onClick: S.quanta.loadAnonPageHome
                             })
                         ])
                     ]),
-
-                    profileButton,
-                    displayName && !state.isAnonUser ? new IconButton("fa-database", displayName, {
-                        title: "Go to your Account Root Node",
-                        onClick: e => S.nav.navHome(state)
-                    }, "btn-secondary marginBottom marginRight") : null,
+                    displayName && !state.isAnonUser ? new Div(displayName, {
+                        className: "clickable",
+                        onClick: () => { new UserProfileDlg(null, appState(null)).open(); }
+                    }) : null,
                     headerImg,
                     !headerImg ? new Div(null, null, [avatarImg]) : avatarImg,
                     new TabPanelButtons(true, "rhsMenu")
