@@ -94,8 +94,6 @@ export class SearchContentDlg extends DialogBase {
                     })
                     // requirePriorityCheckbox
                 ], "displayTable marginBottom"),
-                // todo-0: need a way to indicate to the search endpoint that when doing this search by
-                // priority it should also require priority to exist (non null) on each node.
                 new Div(null, null, [
                     new Selection(null, "Sort by", [
                         { key: "0", val: "Relevance" },

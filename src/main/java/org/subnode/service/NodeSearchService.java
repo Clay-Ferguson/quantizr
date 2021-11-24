@@ -115,8 +115,8 @@ public class NodeSearchService {
 		if ("node.id".equals(req.getSearchProp())) {
 			SubNode node = read.getNode(session, searchText, true);
 			if (node != null) {
-				NodeInfo info = convert.convertToNodeInfo(ThreadLocals.getSC(), session, node, true, false,
-						counter + 1, false, false, false, false);
+				NodeInfo info = convert.convertToNodeInfo(ThreadLocals.getSC(), session, node, true, false, counter + 1, false,
+						false, false, false);
 				searchResults.add(info);
 			}
 		} else if ("node.name".equals(req.getSearchProp())) {
@@ -127,91 +127,18 @@ public class NodeSearchService {
 			}
 			SubNode node = read.getNode(session, searchText, true);
 			if (node != null) {
-				NodeInfo info = convert.convertToNodeInfo(ThreadLocals.getSC(), session, node, true, false,
-						counter + 1, false, false, false, false);
+				NodeInfo info = convert.convertToNodeInfo(ThreadLocals.getSC(), session, node, true, false, counter + 1, false,
+						false, false, false);
 				searchResults.add(info);
 			}
 		}
 		// othwerwise we're searching all node properties
 		else {
-			/*
-			 * USER Search
-			 * 
-			 * If we're searching just for users do this.
-			 */
-			if (!StringUtils.isEmpty(req.getSearchType())) {
-				String findUserName = null;
-
-				TextCriteria textCriteria = null;
-				if (!StringUtils.isEmpty(req.getSearchText())) {
-					findUserName = req.getSearchText();
-					textCriteria = TextCriteria.forDefaultLanguage();
-
-					// make sure name is quoted for exact search, since it will contain delimiters
-					// which would other wise dirty up a search
-					String name = findUserName;
-					if (!name.startsWith("\"")) {
-						name = "\"" + name;
-					}
-					if (!name.endsWith("\"")) {
-						name = name + "\"";
-					}
-					textCriteria.matching(name);
-					textCriteria.caseSensitive(req.getCaseSensitive());
-				}
-
-				Criteria moreCriteria = null;
-				// searching only Foreign users
-				if (Constant.SEARCH_TYPE_USER_FOREIGN.s().equals(req.getSearchType())) {
-					moreCriteria =
-							Criteria.where(SubNode.FIELD_PROPERTIES + "." + NodeProp.ACT_PUB_ACTOR_URL.s() + ".value").ne(null);
-				}
-				// searching only Local users 
-				else if (Constant.SEARCH_TYPE_USER_LOCAL.s().equals(req.getSearchType())) {
-					moreCriteria =
-							Criteria.where(SubNode.FIELD_PROPERTIES + "." + NodeProp.ACT_PUB_ACTOR_URL.s() + ".value").is(null);
-				}
-
-				Iterable<SubNode> accountNodes = read.getChildrenUnderParentPath(session, NodeName.ROOT_OF_ALL_USERS, null,
-						ConstantInt.ROWS_PER_PAGE.val(), ConstantInt.ROWS_PER_PAGE.val() * req.getPage(), textCriteria,
-						moreCriteria);
-				/*
-				 * scan all userAccountNodes, and set a zero amount for those not found (which will be the correct
-				 * amount).
-				 */
-				for (final SubNode node : accountNodes) {
-					try {
-						NodeInfo info = convert.convertToNodeInfo(ThreadLocals.getSC(), session, node, true, false,
-								counter + 1, false, false, false, false);
-						searchResults.add(info);
-					} catch (Exception e) {
-						ExUtil.error(log, "faild converting user node", e);
-					}
-				}
-
-				/*
-				 * If we didn't find any results and we aren't searching locally only then try to look this up as a
-				 * username
-				 */
-				if (searchResults.size() == 0 && !Constant.SEARCH_TYPE_USER_LOCAL.s().equals(req.getSearchType())) {
-					findUserName = findUserName.replace("\"", "");
-					findUserName = XString.stripIfStartsWith(findUserName, "@");
-					final String _findUserName = findUserName;
-					arun.run(ms -> {
-						SubNode userNode = apService.getAcctNodeByUserName(ms, _findUserName);
-						if (userNode != null) {
-							try {
-								NodeInfo info = convert.convertToNodeInfo(ThreadLocals.getSC(), ms, userNode, true,
-										false, counter + 1, false, false, false, false);
-
-								searchResults.add(info);
-							} catch (Exception e) {
-								ExUtil.error(log, "failed converting user node", e);
-							}
-						}
-						return null;
-					});
-				}
+			/* USER Search */
+			if (Constant.SEARCH_TYPE_USER_FOREIGN.s().equals(req.getSearchType()) || //
+					Constant.SEARCH_TYPE_USER_LOCAL.s().equals(req.getSearchType()) || //
+					Constant.SEARCH_TYPE_USER_ALL.s().equals(req.getSearchType())) {
+				userSearch(session, req, searchResults);
 			}
 			// else we're doing a normal subgraph search for the text
 			else {
@@ -223,11 +150,12 @@ public class NodeSearchService {
 
 				for (SubNode node : read.searchSubGraph(session, searchRoot, req.getSearchProp(), searchText, req.getSortField(),
 						req.getSortDir(), ConstantInt.ROWS_PER_PAGE.val(), ConstantInt.ROWS_PER_PAGE.val() * req.getPage(),
-						req.getFuzzy(), req.getCaseSensitive(), req.getTimeRangeType(), req.isRecursive(), req.isRequirePriority())) {
+						req.getFuzzy(), req.getCaseSensitive(), req.getTimeRangeType(), req.isRecursive(),
+						req.isRequirePriority())) {
 					try {
 						auth.auth(session, node, PrivilegeType.READ);
-						NodeInfo info = convert.convertToNodeInfo(ThreadLocals.getSC(), session, node, true, false,
-								counter + 1, false, false, false, false);
+						NodeInfo info = convert.convertToNodeInfo(ThreadLocals.getSC(), session, node, true, false, counter + 1,
+								false, false, false, false);
 						searchResults.add(info);
 					} catch (Exception e) {
 						ExUtil.error(log, "Failed converting node", e);
@@ -238,6 +166,79 @@ public class NodeSearchService {
 
 		res.setSuccess(true);
 		return res;
+	}
+
+	private void userSearch(MongoSession session, NodeSearchRequest req, List<NodeInfo> searchResults) {
+		String findUserName = null;
+		int counter = 0;
+
+		TextCriteria textCriteria = null;
+		if (!StringUtils.isEmpty(req.getSearchText())) {
+			findUserName = req.getSearchText();
+			textCriteria = TextCriteria.forDefaultLanguage();
+
+			// make sure name is quoted for exact search, since it will contain delimiters
+			// which would other wise dirty up a search
+			String name = findUserName;
+			if (!name.startsWith("\"")) {
+				name = "\"" + name;
+			}
+			if (!name.endsWith("\"")) {
+				name = name + "\"";
+			}
+			textCriteria.matching(name);
+			textCriteria.caseSensitive(req.getCaseSensitive());
+		}
+
+		Criteria moreCriteria = null;
+		// searching only Foreign users
+		if (Constant.SEARCH_TYPE_USER_FOREIGN.s().equals(req.getSearchType())) {
+			moreCriteria = Criteria.where(SubNode.FIELD_PROPERTIES + "." + NodeProp.ACT_PUB_ACTOR_URL.s() + ".value").ne(null);
+		}
+		// searching only Local users
+		else if (Constant.SEARCH_TYPE_USER_LOCAL.s().equals(req.getSearchType())) {
+			moreCriteria = Criteria.where(SubNode.FIELD_PROPERTIES + "." + NodeProp.ACT_PUB_ACTOR_URL.s() + ".value").is(null);
+		}
+
+		Iterable<SubNode> accountNodes = read.getChildrenUnderParentPath(session, NodeName.ROOT_OF_ALL_USERS, null,
+				ConstantInt.ROWS_PER_PAGE.val(), ConstantInt.ROWS_PER_PAGE.val() * req.getPage(), textCriteria, moreCriteria);
+		/*
+		 * scan all userAccountNodes, and set a zero amount for those not found (which will be the correct
+		 * amount).
+		 */
+		for (final SubNode node : accountNodes) {
+			try {
+				NodeInfo info = convert.convertToNodeInfo(ThreadLocals.getSC(), session, node, true, false, counter + 1, false,
+						false, false, false);
+				searchResults.add(info);
+			} catch (Exception e) {
+				ExUtil.error(log, "faild converting user node", e);
+			}
+		}
+
+		/*
+		 * If we didn't find any results and we aren't searching locally only then try to look this up as a
+		 * username
+		 */
+		if (searchResults.size() == 0 && !Constant.SEARCH_TYPE_USER_LOCAL.s().equals(req.getSearchType())) {
+			findUserName = findUserName.replace("\"", "");
+			findUserName = XString.stripIfStartsWith(findUserName, "@");
+			final String _findUserName = findUserName;
+			arun.run(ms -> {
+				SubNode userNode = apService.getAcctNodeByUserName(ms, _findUserName);
+				if (userNode != null) {
+					try {
+						NodeInfo info = convert.convertToNodeInfo(ThreadLocals.getSC(), ms, userNode, true, false, counter + 1,
+								false, false, false, false);
+
+						searchResults.add(info);
+					} catch (Exception e) {
+						ExUtil.error(log, "failed converting user node", e);
+					}
+				}
+				return null;
+			});
+		}
 	}
 
 	public GetSharedNodesResponse getSharedNodes(MongoSession session, GetSharedNodesRequest req) {
@@ -297,8 +298,8 @@ public class NodeSearchService {
 				}
 			}
 
-			NodeInfo info = convert.convertToNodeInfo(ThreadLocals.getSC(), session, node, true, false, counter + 1,
-					false, false, false, false);
+			NodeInfo info = convert.convertToNodeInfo(ThreadLocals.getSC(), session, node, true, false, counter + 1, false, false,
+					false, false);
 			searchResults.add(info);
 		}
 
