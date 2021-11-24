@@ -121,14 +121,14 @@ export class RightNavPanel extends Div {
                             }) : null,
                             clipboardPasteButton,
                             addNoteButton,
-                            displayName && !state.isAnonUser ? new IconButton("fa-database", null, {
-                                title: "Go to your Account Root Node",
-                                onClick: e => S.nav.navHome(state)
-                            }) : null,
                             new IconButton("fa-home", null, {
                                 title: g_brandingAppName + " Home",
                                 onClick: S.quanta.loadAnonPageHome
-                            })
+                            }),
+                            displayName && !state.isAnonUser ? new IconButton("fa-database", null, {
+                                title: "Go to your Account Root Node",
+                                onClick: e => S.nav.navHome(state)
+                            }) : null
                         ])
                     ]),
                     displayName && !state.isAnonUser ? new Div(displayName, {
@@ -140,19 +140,12 @@ export class RightNavPanel extends Div {
                     new TabPanelButtons(true, "rhsMenu")
                 ]),
 
-                new HistoryPanel(),
-                // This collapsable panel works fine but is kind of awkward asthetically
-                // new CollapsiblePanel("History", "History", null, [
-                //     new HistoryPanel()
-                // ], false,
-                //     (state: boolean) => {
-                //         RightNavPanel.historyExpanded = state;
-                //     }, RightNavPanel.historyExpanded, "historyPanelButton", "", "div"),
-
-                !state.isAnonUser ? new Div("Logout", {
-                    className: "float-end rhsLogoutLink",
-                    onClick: S.nav.logout
-                }) : null
+                new CollapsiblePanel("History", "History", null, [
+                    new HistoryPanel()
+                ], true,
+                    (state: boolean) => {
+                        RightNavPanel.historyExpanded = state;
+                    }, RightNavPanel.historyExpanded, "", "histPanelExpanded", "histPanelCollapsed", "div")
             ])
         ]);
     }

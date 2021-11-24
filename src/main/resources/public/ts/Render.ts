@@ -342,17 +342,17 @@ export class Render implements RenderIntf {
 
             children.push(new CollapsiblePanel("Attachment URLs", "Hide", null, attachmentComps, false, (s: boolean) => {
                 state.linksToAttachmentsExpanded = s;
-            }, state.linksToAttachmentsExpanded, "marginAll", "attachmentLinksPanel"));
+            }, state.linksToAttachmentsExpanded, "marginAll", "attachmentLinksPanel", ""));
         }
 
-        let ipfsLink = "ipfs://" + S.props.getNodePropVal(J.NodeProp.IPFS_LINK, node);
+        let ipfsLink = S.props.getNodePropVal(J.NodeProp.IPFS_LINK, node);
         if (ipfsLink) {
             children.push(new Heading(5, "IPFS CID"), //
                 new Div(ipfsLink, {
                     className: "anchorBigMarginBottom",
                     title: "Click -> Copy to clipboard",
                     onClick: () => {
-                        S.util.copyToClipboard(ipfsLink);
+                        S.util.copyToClipboard("ipfs://" + ipfsLink);
                         S.util.flashMessage("Copied link to Clipboard", "Clipboard", true);
                         dlgHolder.dlg.close();
                     }

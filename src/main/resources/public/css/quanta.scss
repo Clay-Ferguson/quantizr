@@ -613,6 +613,23 @@ strong em {
     font-weight: bold;
 }
 
+.histPanelExpanded {
+    margin-top: 30px;
+    margin-left: $smallGap;
+    border: 2px solid $nodeBorderBottomColor;
+    border-radius: $border-radius;
+}
+
+.histPanelCollapsed {
+    margin-top: 40px;
+    margin-left: 25px;
+}
+
+.collapse-panel-link {
+    margin: $smallGap;
+    cursor: pointer;
+}
+
 .folder-link {
     margin-top: $smallGap;
     margin-left: $smallGap;
@@ -1256,6 +1273,7 @@ Will come back later and study this more. todo-1 */
     border: 1px solid $nodeBorderBottomColor;
     border-radius: $border-radius;
     padding-left: $smallGap;
+    margin-bottom: $smallGap;
 }
 
 .ace-edit-panel {
@@ -2041,7 +2059,7 @@ audio::-webkit-media-controls-play-button {
     min-width: 100px;
 }
 
-.rhsLogoutLink {
+.rhsLink {
     margin-top: 25px;
     margin-right: 55px;
     cursor: pointer;
@@ -2086,19 +2104,8 @@ audio::-webkit-media-controls-play-button {
     margin-right: 15px;
 }
 
-.nodeHistoryTitle {
-    margin-top: 20px;
-    padding-bottom: 10px;
-    font-size: 120%;
-    border-bottom: 3px solid $nodeBorderBottomColor;
-}
-
 .lockFont {
     font-size: 90%;
-}
-
-.historyPanelButton {
-    margin-left: 15px;
 }
 
 .nodeHistoryItem {

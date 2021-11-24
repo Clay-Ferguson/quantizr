@@ -124,7 +124,7 @@ export class NodeCompVerticalRowLayout extends Div {
 
             comps.push(new CollapsiblePanel("Other Account Nodes", "Hide", null, collapsedComps.map((c: any) => c.comp), false, (s: boolean) => {
                 state.otherAccountNodesExpanded = s;
-            }, state.otherAccountNodesExpanded, "marginAll", "specialAccountNodesPanel"));
+            }, state.otherAccountNodesExpanded, "marginAll", "specialAccountNodesPanel", ""));
         }
 
         this.setChildren(comps);

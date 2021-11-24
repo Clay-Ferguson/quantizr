@@ -114,7 +114,7 @@ export class FeedView extends AppTab {
         ], false,
             (state: boolean) => {
                 this.data.props.filterExpanded = state;
-            }, this.data.props.filterExpanded, "", "", "span"));
+            }, this.data.props.filterExpanded, "", "", "", "span"));
 
         if (this.data.props.feedFilterRootNode) {
             topChildren.push(new Checkbox("Auto-refresh", { className: "marginLeft" }, {

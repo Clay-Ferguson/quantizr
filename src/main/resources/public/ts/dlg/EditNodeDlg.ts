@@ -573,7 +573,7 @@ export class EditNodeDlg extends DialogBase {
         ], false,
             (state: boolean) => {
                 EditNodeDlg.morePanelExpanded = state;
-            }, EditNodeDlg.morePanelExpanded, "marginRight", "marginTop", "span") : null;
+            }, EditNodeDlg.morePanelExpanded, "marginRight", "marginTop", "marginTop", "span") : null;
 
         let rightFloatButtons = new Div(null, { className: "marginBottom" }, [
             collapsiblePanel

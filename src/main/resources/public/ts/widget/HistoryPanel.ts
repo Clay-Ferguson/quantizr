@@ -30,8 +30,7 @@ export class HistoryPanel extends Div {
             return;
         }
         let children = [];
-        children.push(new Div(null, { className: "nodeHistoryTitle" }, [
-            new Span("History"),
+        children.push(new Div(null, null, [
             new Checkbox("Lock", { className: "lockFont marginBottom float-end" }, {
                 setValue: (checked: boolean): void => {
                     S.quanta.nodeHistoryLocked = checked;

@@ -11,9 +11,17 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
 
 export class CollapsiblePanel extends Comp {
 
-    constructor(private collapsedButtonText: string, private expandedButtonText: string, attribs: Object = {}, initialChildren: Comp[] = null, private textLink: boolean = false,
-        private stateCallback: Function = null, expanded: boolean = false, private extraToggleButtonClass = "",
-        private extraDivStyle: string = "", private elementName: string = "div") {
+    constructor(private collapsedButtonText: string,
+        private expandedButtonText: string,
+        attribs: Object = {},
+        initialChildren: Comp[] = null,
+        private textLink: boolean = false,
+        private stateCallback: Function = null,
+        expanded: boolean = false,
+        private extraToggleButtonClass = "",
+        private extraDivStyleExpanded: string = "",
+        private extraDivStyleCollapsed: string = "",
+        private elementName: string = "div") {
         super(attribs);
         this.setChildren(initialChildren);
         this.collapsedButtonText = collapsedButtonText || "More ";
@@ -27,18 +35,19 @@ export class CollapsiblePanel extends Comp {
 
     compRender(): ReactNode {
         let state = this.getState();
-        let style = this.textLink ? "file-link" : "btn btn-info ";
+        let style = this.textLink ? "collapse-panel-link" : "btn btn-info ";
         let collapseClass = this.getState().expanded ? "expand" : "collapse";
 
         /* If the component is expanded we render the button INSIDE the main area,
         which is the area that would be HIDDEN when the component is NOT expanded. */
         if (state.expanded) {
             return this.e(this.elementName, {
-                key: "panel_" + this.getId()
+                key: "panel_" + this.getId(),
+                className: this.extraDivStyleExpanded
             },
                 // This div and it's children holds the actual collapsible content.
                 this.e("div", {
-                    className: collapseClass + " " + this.extraDivStyle,
+                    className: collapseClass,
                     id: this.getId(),
                     key: "content_" + this.getId()
                 },
@@ -57,7 +66,7 @@ export class CollapsiblePanel extends Comp {
         else {
             return this.e(this.elementName, {
                 key: "panel_" + this.getId(),
-                className: "marginTop"
+                className: this.extraDivStyleCollapsed
             },
                 // This span is the expande/collapse button itself
                 this.e("span", {
@@ -71,7 +80,7 @@ export class CollapsiblePanel extends Comp {
 
                 // This div and it's children holds the actual collapsible content.
                 this.e("div", {
-                    className: collapseClass + " " + this.extraDivStyle,
+                    className: collapseClass,
                     id: this.getId(),
                     key: "content_" + this.getId()
                 },
