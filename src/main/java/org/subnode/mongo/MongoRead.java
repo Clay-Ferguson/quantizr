@@ -592,7 +592,8 @@ public class MongoRead {
      * timeRangeType: futureOnly, pastOnly, all
      */
     public Iterable<SubNode> searchSubGraph(MongoSession session, SubNode node, String prop, String text, String sortField,
-            String sortDir, int limit, int skip, boolean fuzzy, boolean caseSensitive, String timeRangeType, boolean recursive) {
+            String sortDir, int limit, int skip, boolean fuzzy, boolean caseSensitive, String timeRangeType, boolean recursive,
+            boolean requirePriority) {
         auth.auth(session, node, PrivilegeType.READ);
 
         List<CriteriaDefinition> criterias = new LinkedList<>();
@@ -630,6 +631,10 @@ public class MongoRead {
                 textCriteria.caseSensitive(caseSensitive);
                 criterias.add(textCriteria);
             }
+        }
+
+        if (requirePriority) {
+            criterias.add(Criteria.where("prp.priority.value").gt("0"));
         }
 
         if (!StringUtils.isEmpty(sortField)) {

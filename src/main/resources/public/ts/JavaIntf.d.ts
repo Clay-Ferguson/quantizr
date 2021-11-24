@@ -315,6 +315,7 @@ export interface NodeSearchRequest extends RequestBase {
     searchType: string;
     timeRangeType: string;
     recursive: boolean;
+    requirePriority: boolean;
 }
 
 export interface OpenSystemFileRequest extends RequestBase {

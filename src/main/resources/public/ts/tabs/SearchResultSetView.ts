@@ -38,6 +38,7 @@ export class SearchResultSetView extends ResultSetView {
             this.data.rsInfo.recursive,
             this.data.rsInfo.sortField,
             this.data.rsInfo.sortDir,
+            false,
             null);
     }
 }

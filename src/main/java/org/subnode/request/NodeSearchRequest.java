@@ -35,6 +35,8 @@ public class NodeSearchRequest extends RequestBase {
 
 	private boolean recursive;
 
+	private boolean requirePriority;
+
 	public String getNodeId() {
 		return nodeId;
 	}
@@ -131,4 +133,11 @@ public class NodeSearchRequest extends RequestBase {
 		this.recursive = recursive;
 	}
 
+	public boolean isRequirePriority() {
+		return requirePriority;
+	}
+
+	public void setRequirePriority(boolean requirePriority) {
+		this.requirePriority = requirePriority;
+	}
 }

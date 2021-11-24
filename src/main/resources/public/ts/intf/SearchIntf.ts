@@ -9,7 +9,7 @@ export interface SearchIntf {
     findShares(state: AppState, shareTarget: string, accessOption: string): void;
     findSharedNodes(node: J.NodeInfo, page: number, type: string, shareTarget: string, accessOption: string, state: AppState): Promise<void>;
     searchAndReplace(recursive: boolean, nodeId: string, search: string, replace: string, state: AppState): any;
-    search(node: J.NodeInfo, prop: string, searchText: string, state: AppState, searchType: string, description: string, fuzzy: boolean, caseSensitive: boolean, page: number, recursive: boolean, sortField: string, sortDir: string, successCallback: Function): Promise<void>;
+    search(node: J.NodeInfo, prop: string, searchText: string, state: AppState, searchType: string, description: string, fuzzy: boolean, caseSensitive: boolean, page: number, recursive: boolean, sortField: string, sortDir: string, requirePriority: boolean, successCallback: Function): Promise<void>;
     timeline(node: J.NodeInfo, prop: string, state: AppState, timeRangeType: string, timelineDescription: string, page: number, recursive: boolean): any;
     initSearchNode(node: J.NodeInfo): any;
     renderSearchResultAsListItem(node: J.NodeInfo, index: number, count: number, rowCount: number, prefix: string, isFeed: boolean, isParent: boolean, allowAvatars: boolean, jumpButton: boolean, allowHeader: boolean, allowFooter: boolean, state: AppState): any;

@@ -223,7 +223,7 @@ public class NodeSearchService {
 
 				for (SubNode node : read.searchSubGraph(session, searchRoot, req.getSearchProp(), searchText, req.getSortField(),
 						req.getSortDir(), ConstantInt.ROWS_PER_PAGE.val(), ConstantInt.ROWS_PER_PAGE.val() * req.getPage(),
-						req.getFuzzy(), req.getCaseSensitive(), req.getTimeRangeType(), req.isRecursive())) {
+						req.getFuzzy(), req.getCaseSensitive(), req.getTimeRangeType(), req.isRecursive(), req.isRequirePriority())) {
 					try {
 						auth.auth(session, node, PrivilegeType.READ);
 						NodeInfo info = convert.convertToNodeInfo(ThreadLocals.getSC(), session, node, true, false,

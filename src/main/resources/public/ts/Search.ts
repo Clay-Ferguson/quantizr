@@ -59,7 +59,7 @@ export class Search implements SearchIntf {
         }
     }
 
-    search = async (node: J.NodeInfo, prop: string, searchText: string, state: AppState, searchType: string, description: string, fuzzy: boolean, caseSensitive: boolean, page: number, recursive: boolean, sortField: string, sortDir: string, successCallback: Function): Promise<void> => {
+    search = async (node: J.NodeInfo, prop: string, searchText: string, state: AppState, searchType: string, description: string, fuzzy: boolean, caseSensitive: boolean, page: number, recursive: boolean, sortField: string, sortDir: string, requirePriority: boolean, successCallback: Function): Promise<void> => {
         let res: J.NodeSearchResponse = await S.util.ajax<J.NodeSearchRequest, J.NodeSearchResponse>("nodeSearch", {
             page,
             nodeId: node ? node.id : null, // for user searchTypes this node can be null
@@ -72,7 +72,8 @@ export class Search implements SearchIntf {
             searchType,
             searchDefinition: "",
             timeRangeType: null,
-            recursive
+            recursive,
+            requirePriority
         });
 
         if (res.searchResults && res.searchResults.length > 0) {
@@ -136,7 +137,8 @@ export class Search implements SearchIntf {
             searchDefinition: "timeline",
             searchType: null,
             timeRangeType,
-            recursive
+            recursive,
+            requirePriority: false
         });
 
         dispatch("Action_RenderTimelineResults", (s: AppState): AppState => {

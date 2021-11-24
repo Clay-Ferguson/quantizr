@@ -54,7 +54,7 @@ public class GraphNodesService {
 				results = read.getSubGraph(session, node, null, 0);
 			} else {
 				int limit = ThreadLocals.getSC().isAdmin() ? Integer.MAX_VALUE : 1000;
-				results = read.searchSubGraph(session, node, "content", req.getSearchText(), null, null, limit, 0, true, false, null, true);
+				results = read.searchSubGraph(session, node, "content", req.getSearchText(), null, null, limit, 0, true, false, null, true, false);
 			}
 
 			for (SubNode n : results) {

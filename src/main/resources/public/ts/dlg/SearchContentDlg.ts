@@ -25,6 +25,7 @@ export class SearchContentDlg extends DialogBase {
     static dlgState: any = {
         fuzzy: false,
         caseSensitive: false,
+        requirePriority: false,
         recursive: true,
         sortField: "0",
         sortDir: ""
@@ -45,6 +46,20 @@ export class SearchContentDlg extends DialogBase {
     }
 
     renderDlg(): CompIntf[] {
+
+        let requirePriorityCheckbox = null;
+        if (this.getState().sortField === "prp.priority.value") {
+            requirePriorityCheckbox = new Checkbox("Require Priority", null, {
+                setValue: (checked: boolean): void => {
+                    SearchContentDlg.dlgState.requirePriority = checked;
+                    this.mergeState({ requirePriority: checked });
+                },
+                getValue: (): boolean => {
+                    return this.getState().requirePriority;
+                }
+            });
+        }
+
         return [
             new Form(null, [
                 this.searchTextField = new TextField(null, false, this.search, null, false, this.searchTextState),
@@ -77,6 +92,7 @@ export class SearchContentDlg extends DialogBase {
                             return this.getState().recursive;
                         }
                     })
+                    // requirePriorityCheckbox
                 ], "displayTable marginBottom"),
                 // todo-0: need a way to indicate to the search endpoint that when doing this search by
                 // priority it should also require priority to exist (non null) on each node.
@@ -104,7 +120,9 @@ export class SearchContentDlg extends DialogBase {
                         getValue: (): string => {
                             return this.getState().sortField;
                         }
-                    })]),
+                    }),
+                    requirePriorityCheckbox
+                ]),
                 new ButtonBar([
                     new Button("Search", this.search, null, "btn-primary"),
                     new Button("Graph", this.graph, null, "btn-primary"),
@@ -148,11 +166,18 @@ export class SearchContentDlg extends DialogBase {
         SearchContentDlg.defaultSearchText = this.searchTextState.getValue();
 
         let desc = SearchContentDlg.defaultSearchText ? ("Content: " + SearchContentDlg.defaultSearchText) : "";
+
+        let requirePriority = this.getState().requirePriority;
+        if (this.getState().sortField !== "prp.priority.value") {
+            requirePriority = false;
+        }
+
         S.srch.search(node, null, SearchContentDlg.defaultSearchText, this.appState, null, desc, this.getState().fuzzy,
             this.getState().caseSensitive, 0,
             this.getState().recursive,
             this.getState().sortField,
             this.getState().sortDir,
+            requirePriority,
             this.close);
     }
 }
