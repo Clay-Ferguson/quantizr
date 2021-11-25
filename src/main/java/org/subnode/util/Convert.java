@@ -64,13 +64,13 @@ public class Convert {
 	 * browser/client to encapsulate the data for a given node which is used by the browser to render
 	 * the node.
 	 */
-	public NodeInfo convertToNodeInfo(SessionContext sc, MongoSession session, SubNode node, boolean htmlOnly,
+	public NodeInfo convertToNodeInfo(SessionContext sc, MongoSession ms, SubNode node, boolean htmlOnly,
 			boolean initNodeEdit, long ordinal, boolean allowInlineChildren, boolean lastChild, boolean childrenCheck,
 			boolean getFollowers) {
 
 		/* If session user shouldn't be able to see secrets on this node remove them */
-		if (session.isAnon() || (session.getUserNodeId() != null && !session.getUserNodeId().equals(node.getOwner()))) {
-			if (!session.isAdmin()) {
+		if (ms.isAnon() || (ms.getUserNodeId() != null && !ms.getUserNodeId().equals(node.getOwner()))) {
+			if (!ms.isAdmin()) {
 				node.clearSecretProperties();
 			}
 		}
@@ -86,7 +86,7 @@ public class Convert {
 
 				String dataUrlProp = node.getStrProp(NodeProp.BIN_DATA_URL.s());
 				if (dataUrlProp != null) {
-					dataUrl = attachmentService.getStringByNode(session, node);
+					dataUrl = attachmentService.getStringByNode(ms, node);
 
 					// sanity check here.
 					if (!dataUrl.startsWith("data:")) {
@@ -107,7 +107,7 @@ public class Convert {
 			}
 		}
 
-		boolean hasChildren = childrenCheck ? read.hasChildren(session, node) : false;
+		boolean hasChildren = childrenCheck ? read.hasChildren(ms, node) : false;
 		// log.trace("hasNodes=" + hasChildren + " node: "+node.getId().toHexString());
 
 		List<PropertyInfo> propList = buildPropertyInfoList(sc, node, htmlOnly, initNodeEdit);
@@ -126,7 +126,7 @@ public class Convert {
 		 * ownership info we need to show user.
 		 */
 		String nameProp = null;
-		SubNode userNode = read.getNode(session, node.getOwner(), false);
+		SubNode userNode = read.getNode(ms, node.getOwner(), false);
 		String displayName = null;
 
 		if (userNode == null) {
@@ -186,14 +186,14 @@ public class Convert {
 		// if this node type has a plugin run it's converter to let it contribute
 		TypeBase plugin = typePluginMgr.getPluginByType(node.getType());
 		if (plugin != null) {
-			plugin.convert(session, nodeInfo, node, getFollowers);
+			plugin.convert(ms, nodeInfo, node, getFollowers);
 		}
 
 		if (allowInlineChildren) {
 			boolean hasInlineChildren = node.getBooleanProp(NodeProp.INLINE_CHILDREN.s());
 			if (hasInlineChildren) {
 				Iterable<SubNode> nodeIter =
-						read.getChildren(session, node, Sort.by(Sort.Direction.ASC, SubNode.FIELD_ORDINAL), 100, 0);
+						read.getChildren(ms, node, Sort.by(Sort.Direction.ASC, SubNode.FIELD_ORDINAL), 100, 0);
 				Iterator<SubNode> iterator = nodeIter.iterator();
 				long inlineOrdinal = 0;
 				while (true) {
@@ -211,7 +211,7 @@ public class Convert {
 					// the 'inlineChildren' capability
 					boolean multiLevel = true;
 
-					nodeInfo.safeGetChildren().add(convertToNodeInfo(sc, session, n, htmlOnly, initNodeEdit, inlineOrdinal++,
+					nodeInfo.safeGetChildren().add(convertToNodeInfo(sc, ms, n, htmlOnly, initNodeEdit, inlineOrdinal++,
 							multiLevel, lastChild, childrenCheck, false));
 				}
 			}

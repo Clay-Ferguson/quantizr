@@ -324,8 +324,8 @@ public class ActPubUtil {
     public String getActorUrlFromUserName(String userName) {
         String actorUrl = null;
 
-        MongoSession adminSession = auth.getAdminSession();
-        SubNode userNode = apService.getAcctNodeByUserName(adminSession, userName);
+        MongoSession as = auth.getAdminSession();
+        SubNode userNode = apService.getAcctNodeByUserName(as, userName);
         if (userNode != null) {
             actorUrl = userNode.getStrProp(NodeProp.ACT_PUB_ACTOR_ID.s());
         }

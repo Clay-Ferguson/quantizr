@@ -285,7 +285,7 @@ public class IPFSService {
     }
 
     /* Ensures this node's attachment is saved to IPFS and returns the CID of it */
-    public final String saveNodeAttachmentToIpfs(MongoSession session, SubNode node) {
+    public final String saveNodeAttachmentToIpfs(MongoSession ms, SubNode node) {
         String cid = null;
         String mime = node.getStrProp(NodeProp.BIN_MIME);
         String fileName = node.getStrProp(NodeProp.FILENAME);
@@ -293,7 +293,7 @@ public class IPFSService {
         InputStream is = attachmentService.getStreamByNode(node, "");
         if (is != null) {
             try {
-                MerkleLink ret = addFromStream(session, is, fileName, mime, null, null, false);
+                MerkleLink ret = addFromStream(ms, is, fileName, mime, null, null, false);
                 if (ret != null) {
                     cid = ret.getHash();
                 }
@@ -452,29 +452,29 @@ public class IPFSService {
         return ret;
     }
 
-    public MerkleLink dagPutFromString(MongoSession session, String val, String mimeType, ValContainer<Integer> streamSize,
+    public MerkleLink dagPutFromString(MongoSession ms, String val, String mimeType, ValContainer<Integer> streamSize,
             ValContainer<String> cid) {
-        return writeFromStream(session, API_DAG + "/put", IOUtils.toInputStream(val), null, streamSize, cid);
+        return writeFromStream(ms, API_DAG + "/put", IOUtils.toInputStream(val), null, streamSize, cid);
     }
 
-    public MerkleLink dagPutFromStream(MongoSession session, InputStream stream, String mimeType,
+    public MerkleLink dagPutFromStream(MongoSession ms, InputStream stream, String mimeType,
             ValContainer<Integer> streamSize, ValContainer<String> cid) {
-        return writeFromStream(session, API_DAG + "/put", stream, null, streamSize, cid);
+        return writeFromStream(ms, API_DAG + "/put", stream, null, streamSize, cid);
     }
 
-    public MerkleLink addFileFromString(MongoSession session, String text, String fileName, String mimeType,
+    public MerkleLink addFileFromString(MongoSession ms, String text, String fileName, String mimeType,
             boolean wrapInFolder) {
         InputStream stream = IOUtils.toInputStream(text);
         try {
-            return addFromStream(session, stream, fileName, mimeType, null, null, wrapInFolder);
+            return addFromStream(ms, stream, fileName, mimeType, null, null, wrapInFolder);
         } finally {
             StreamUtil.close(stream);
         }
     }
 
-    public MerkleLink addFileFromStream(MongoSession session, String fileName, InputStream stream, String mimeType,
+    public MerkleLink addFileFromStream(MongoSession ms, String fileName, InputStream stream, String mimeType,
             ValContainer<Integer> streamSize, ValContainer<String> cid) {
-        return writeFromStream(session, API_FILES + "/write?arg=" + fileName + "&create=true&parents=true&truncate=true", stream,
+        return writeFromStream(ms, API_FILES + "/write?arg=" + fileName + "&create=true&parents=true&truncate=true", stream,
                 null, streamSize, cid);
     }
 
@@ -482,13 +482,13 @@ public class IPFSService {
      * NOTE: Default behavior according to IPFS docs is that without the 'pin' argument on this call it
      * DOES pin the file
      */
-    public MerkleLink addFromStream(MongoSession session, InputStream stream, String fileName, String mimeType,
+    public MerkleLink addFromStream(MongoSession ms, InputStream stream, String fileName, String mimeType,
             ValContainer<Integer> streamSize, ValContainer<String> cid, boolean wrapInFolder) {
         String endpoint = API_BASE + "/add?stream-channels=true";
         if (wrapInFolder) {
             endpoint += "&wrap-with-directory=true";
         }
-        return writeFromStream(session, endpoint, stream, fileName, streamSize, cid);
+        return writeFromStream(ms, endpoint, stream, fileName, streamSize, cid);
     }
 
     public Map<String, Object> addTarFromFile(String fileName) {
@@ -503,9 +503,9 @@ public class IPFSService {
         return null;
     }
 
-    public MerkleLink addTarFromStream(MongoSession session, InputStream stream, ValContainer<Integer> streamSize,
+    public MerkleLink addTarFromStream(MongoSession ms, InputStream stream, ValContainer<Integer> streamSize,
             ValContainer<String> cid) {
-        return writeFromStream(session, API_TAR + "/add", stream, null, streamSize, cid);
+        return writeFromStream(ms, API_TAR + "/add", stream, null, streamSize, cid);
     }
 
     // https://medium.com/red6-es/uploading-a-file-with-a-filename-with-spring-resttemplate-8ec5e7dc52ca
@@ -514,7 +514,7 @@ public class IPFSService {
      * pass this in and also check if there are ways we can avoid the old need for mime guessing by
      * always basing off extension on this filename?
      */
-    public MerkleLink writeFromStream(MongoSession session, String endpoint, InputStream stream, String fileName,
+    public MerkleLink writeFromStream(MongoSession ms, String endpoint, InputStream stream, String fileName,
             ValContainer<Integer> streamSize, ValContainer<String> cid) {
         // log.debug("Writing file: " + path);
         MerkleLink ret = null;
@@ -522,7 +522,7 @@ public class IPFSService {
             HttpHeaders headers = new HttpHeaders();
 
             MultiValueMap<String, Object> bodyMap = new LinkedMultiValueMap<>();
-            LimitedInputStreamEx lis = new LimitedInputStreamEx(stream, userManagerService.getMaxUploadSize(session));
+            LimitedInputStreamEx lis = new LimitedInputStreamEx(stream, userManagerService.getMaxUploadSize(ms));
             bodyMap.add("file", makeFileEntity(lis, fileName));
 
             headers.setContentType(MediaType.MULTIPART_FORM_DATA);
@@ -569,7 +569,7 @@ public class IPFSService {
     }
 
     // todo-1: convert to actual type, not map.
-    public Map<String, Object> ipnsPublish(MongoSession session, String key, String cid) {
+    public Map<String, Object> ipnsPublish(MongoSession ms, String key, String cid) {
         Map<String, Object> ret = null;
         try {
             String url = API_NAME + "/publish?arg=" + cid + "&=" + key;
@@ -593,7 +593,7 @@ public class IPFSService {
     }
 
     // todo-1: convert return val to a type (not map)
-    public Map<String, Object> ipnsResolve(MongoSession session, String name) {
+    public Map<String, Object> ipnsResolve(MongoSession ms, String name) {
         Map<String, Object> ret = null;
         try {
             String url = API_NAME + "/resolve?arg=" + name;
@@ -675,13 +675,13 @@ public class IPFSService {
      * have to add them here, primarily to ensure garbage collector will keep them, but secondly it's a
      * nice-feature for user to be able to browse them individually.
      */
-    public void writeIpfsExportNode(MongoSession session, String cid, String mime, String fileName,
+    public void writeIpfsExportNode(MongoSession ms, String cid, String mime, String fileName,
             List<ExportIpfsFile> childrenFiles) {
         SubNode exportParent =
-                read.getUserNodeByType(session, session.getUserName(), null, "### Exports", NodeType.EXPORTS.s(), null, null);
+                read.getUserNodeByType(ms, ms.getUserName(), null, "### Exports", NodeType.EXPORTS.s(), null, null);
 
         if (exportParent != null) {
-            SubNode node = create.createNode(session, exportParent, null, NodeType.NONE.s(), 0L, CreateNodeLocation.FIRST, null,
+            SubNode node = create.createNode(ms, exportParent, null, NodeType.NONE.s(), 0L, CreateNodeLocation.FIRST, null,
                     null, true);
 
             node.setOwner(exportParent.getOwner());
@@ -691,11 +691,11 @@ public class IPFSService {
             node.setProp(NodeProp.IPFS_LINK.s(), cid);
             node.setProp(NodeProp.BIN_MIME.s(), mime);
             node.setProp(NodeProp.BIN_FILENAME.s(), fileName);
-            update.save(session, node);
+            update.save(ms, node);
 
             if (childrenFiles != null) {
                 for (ExportIpfsFile file : childrenFiles) {
-                    SubNode child = create.createNode(session, node, null, NodeType.NONE.s(), 0L, CreateNodeLocation.LAST, null,
+                    SubNode child = create.createNode(ms, node, null, NodeType.NONE.s(), 0L, CreateNodeLocation.LAST, null,
                             null, true);
 
                     child.setOwner(exportParent.getOwner());
@@ -705,7 +705,7 @@ public class IPFSService {
                     child.setProp(NodeProp.BIN_MIME.s(), file.getMime());
                     child.setProp(NodeProp.BIN_FILENAME.s(), file.getFileName());
                     child.setProp(NodeProp.IMG_SIZE.s(), "200px");
-                    update.save(session, child);
+                    update.save(ms, child);
                 }
             }
         }
@@ -746,7 +746,7 @@ public class IPFSService {
         return (String) postForJsonReply(url, String.class);
     }
 
-    public void streamResponse(HttpServletResponse response, MongoSession session, String hash, String mimeType) {
+    public void streamResponse(HttpServletResponse response, MongoSession ms, String hash, String mimeType) {
         BufferedInputStream inStream = null;
         BufferedOutputStream outStream = null;
 
@@ -760,7 +760,7 @@ public class IPFSService {
             // response.setContentLength((int) size);
             response.setHeader("Cache-Control", "public, max-age=31536000");
 
-            inStream = new BufferedInputStream(getStream(session, hash));
+            inStream = new BufferedInputStream(getStream(ms, hash));
             outStream = new BufferedOutputStream(response.getOutputStream());
 
             IOUtils.copy(inStream, outStream);
@@ -773,7 +773,7 @@ public class IPFSService {
         }
     }
 
-    public InputStream getStream(MongoSession session, String hash) {
+    public InputStream getStream(MongoSession ms, String hash) {
         if (failedCIDs.get(hash) != null) {
             // log.debug("Abort CID already failed: " + hash);
             throw new RuntimeException("failed CIDs: " + hash);

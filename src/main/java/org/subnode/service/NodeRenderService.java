@@ -71,16 +71,16 @@ public class NodeRenderService {
 
 	private static RenderNodeResponse welcomePage;
 
-	public GetNodeMetaInfoResponse getNodeMetaInfo(MongoSession session, GetNodeMetaInfoRequest req) {
+	public GetNodeMetaInfoResponse getNodeMetaInfo(MongoSession ms, GetNodeMetaInfoRequest req) {
 		GetNodeMetaInfoResponse res = new GetNodeMetaInfoResponse();
 
 		List<NodeMetaIntf> list = new LinkedList<>();
 		res.setNodeIntf(list);
 
 		for (String id : req.getIds()) {
-			SubNode node = read.getNode(session, id);
+			SubNode node = read.getNode(ms, id);
 			if (node != null) {
-				boolean hasChildren = read.hasChildren(session, node);
+				boolean hasChildren = read.hasChildren(ms, node);
 				list.add(new NodeMetaIntf(id, hasChildren));
 			}
 		}
@@ -92,19 +92,19 @@ public class NodeRenderService {
 	 * This is the call that gets all the data to show on a page. Whenever user is browsing to a new
 	 * page, this method gets called once per page and retrieves all the data for that page.
 	 */
-	public RenderNodeResponse renderNode(MongoSession session, RenderNodeRequest req) {
+	public RenderNodeResponse renderNode(MongoSession ms, RenderNodeRequest req) {
 		boolean isWelcomePage = req.getNodeId().equals(":welcome-page");
 
 		/*
 		 * Return cached version of welcome page if generated, but not for admin because admin should be
 		 * able to make edits and then those edits update the cache
 		 */
-		if (isWelcomePage && welcomePage != null && !session.isAdmin()) {
+		if (isWelcomePage && welcomePage != null && !ms.isAdmin()) {
 			return welcomePage;
 		}
 
 		RenderNodeResponse res = new RenderNodeResponse();
-		session = ThreadLocals.ensure(session);
+		ms = ThreadLocals.ensure(ms);
 
 		String targetId = req.getNodeId();
 		boolean isActualUplevelRequest = req.isUpLevel();
@@ -112,7 +112,7 @@ public class NodeRenderService {
 		// log.debug("renderNode: \nreq=" + XString.prettyPrint(req));
 		SubNode node = null;
 		try {
-			node = read.getNode(session, targetId);
+			node = read.getNode(ms, targetId);
 		} catch (NodeAuthFailedException e) {
 			res.setSuccess(false);
 			res.setMessage("Unauthorized.");
@@ -123,7 +123,7 @@ public class NodeRenderService {
 
 		if (node == null) {
 			log.debug("nodeId not found: " + targetId + " sending user to :public instead");
-			node = read.getNode(session, appProp.getUserLandingPageNode());
+			node = read.getNode(ms, appProp.getUserLandingPageNode());
 		}
 
 		if (node == null) {
@@ -133,13 +133,13 @@ public class NodeRenderService {
 
 		LinkedList<BreadcrumbInfo> breadcrumbs = new LinkedList<>();
 		res.setBreadcrumbs(breadcrumbs);
-		getBreadcrumbs(session, node, breadcrumbs);
+		getBreadcrumbs(ms, node, breadcrumbs);
 
 		/* If only the single node was requested return that */
 		if (req.isSingleNode()) {
 			// that loads these all asynchronously.
 			NodeInfo nodeInfo =
-					convert.convertToNodeInfo(ThreadLocals.getSC(), session, node, true, false, -1, false, false, true, false);
+					convert.convertToNodeInfo(ThreadLocals.getSC(), ms, node, true, false, -1, false, false, true, false);
 			res.setNode(nodeInfo);
 			res.setSuccess(true);
 			return res;
@@ -152,7 +152,7 @@ public class NodeRenderService {
 		 */
 		SubNode scanToNode = null;
 
-		if (req.isForceRenderParent() || (req.isRenderParentIfLeaf() && !read.hasChildren(session, node))) {
+		if (req.isForceRenderParent() || (req.isRenderParentIfLeaf() && !read.hasChildren(ms, node))) {
 			req.setUpLevel(true);
 		}
 
@@ -161,16 +161,16 @@ public class NodeRenderService {
 		 * having to first 'uplevel' and then click on the prev or next node.
 		 */
 		if (req.getSiblingOffset() != 0) {
-			SubNode parent = read.getParent(session, node);
+			SubNode parent = read.getParent(ms, node);
 			if (req.getSiblingOffset() < 0) {
-				SubNode nodeAbove = read.getSiblingAbove(session, node);
+				SubNode nodeAbove = read.getSiblingAbove(ms, node);
 				if (nodeAbove != null) {
 					node = nodeAbove;
 				} else {
 					node = parent != null ? parent : node;
 				}
 			} else if (req.getSiblingOffset() > 0) {
-				SubNode nodeBelow = read.getSiblingBelow(session, node);
+				SubNode nodeBelow = read.getSiblingBelow(ms, node);
 				if (nodeBelow != null) {
 					node = nodeBelow;
 				} else {
@@ -182,7 +182,7 @@ public class NodeRenderService {
 		} else {
 			if (req.isUpLevel()) {
 				try {
-					SubNode parent = read.getParent(session, node);
+					SubNode parent = read.getParent(ms, node);
 					if (parent != null) {
 						scanToNode = node;
 						node = parent;
@@ -216,7 +216,7 @@ public class NodeRenderService {
 			}
 		}
 
-		NodeInfo nodeInfo = processRenderNode(session, req, res, node, scanToNode, -1, 0, limit);
+		NodeInfo nodeInfo = processRenderNode(ms, req, res, node, scanToNode, -1, 0, limit);
 		res.setNode(nodeInfo);
 		res.setSuccess(true);
 
@@ -232,7 +232,7 @@ public class NodeRenderService {
 		return res;
 	}
 
-	private NodeInfo processRenderNode(MongoSession session, RenderNodeRequest req, RenderNodeResponse res, final SubNode node,
+	private NodeInfo processRenderNode(MongoSession ms, RenderNodeRequest req, RenderNodeResponse res, final SubNode node,
 			SubNode scanToNode, long logicalOrdinal, int level, int limit) {
 
 		/*
@@ -249,7 +249,7 @@ public class NodeRenderService {
 		 * retrieve that information asynchronously and then updates the page, showing all the expand icons
 		 * on all the nodes that have children.
 		 */
-		NodeInfo nodeInfo = convert.convertToNodeInfo(ThreadLocals.getSC(), session, node, true, false, logicalOrdinal, level > 0,
+		NodeInfo nodeInfo = convert.convertToNodeInfo(ThreadLocals.getSC(), ms, node, true, false, logicalOrdinal, level > 0,
 				false, false, false);
 
 		if (level > 0) {
@@ -291,7 +291,7 @@ public class NodeRenderService {
 			sort = Sort.by(Sort.Direction.ASC, SubNode.FIELD_ORDINAL);
 		}
 
-		Iterable<SubNode> nodeIter = read.getChildren(session, node, sort, queryLimit, offset);
+		Iterable<SubNode> nodeIter = read.getChildren(ms, node, sort, queryLimit, offset);
 		Iterator<SubNode> iterator = nodeIter.iterator();
 		int idx = offset;
 
@@ -347,7 +347,7 @@ public class NodeRenderService {
 							for (int i = count - 1; i >= 0; i--) {
 								SubNode sn = slidingWindow.get(i);
 								relativeIdx--;
-								ninfo = processRenderNode(session, req, res, sn, null, relativeIdx, level + 1, limit);
+								ninfo = processRenderNode(ms, req, res, sn, null, relativeIdx, level + 1, limit);
 								nodeInfo.getChildren().add(0, ninfo);
 
 								/*
@@ -389,7 +389,7 @@ public class NodeRenderService {
 			}
 
 			/* if we get here we're accumulating rows */
-			ninfo = processRenderNode(session, req, res, n, null, idx - 1L, level + 1, limit);
+			ninfo = processRenderNode(ms, req, res, n, null, idx - 1L, level + 1, limit);
 			nodeInfo.getChildren().add(ninfo);
 
 			if (nodeInfo.getChildren().size() >= limit) {
@@ -414,7 +414,7 @@ public class NodeRenderService {
 					SubNode sn = slidingWindow.get(i);
 					relativeIdx--;
 
-					ninfo = processRenderNode(session, req, res, sn, null, (long) relativeIdx, level + 1, limit);
+					ninfo = processRenderNode(ms, req, res, sn, null, (long) relativeIdx, level + 1, limit);
 					nodeInfo.getChildren().add(0, ninfo);
 
 					// If we have enough records we're done
@@ -458,13 +458,13 @@ public class NodeRenderService {
 		return sort;
 	}
 
-	public InitNodeEditResponse initNodeEdit(MongoSession session, InitNodeEditRequest req) {
+	public InitNodeEditResponse initNodeEdit(MongoSession ms, InitNodeEditRequest req) {
 		InitNodeEditResponse res = new InitNodeEditResponse();
-		session = ThreadLocals.ensure(session);
+		ms = ThreadLocals.ensure(ms);
 
 		String nodeId = req.getNodeId();
-		SubNode node = read.getNode(session, nodeId);
-		auth.ownerAuth(session, node);
+		SubNode node = read.getNode(ms, nodeId);
+		auth.ownerAuth(ms, node);
 
 		if (node == null) {
 			res.setMessage("Node not found.");
@@ -473,7 +473,7 @@ public class NodeRenderService {
 		}
 
 		NodeInfo nodeInfo =
-				convert.convertToNodeInfo(ThreadLocals.getSC(), session, node, false, true, -1, false, false, true, false);
+				convert.convertToNodeInfo(ThreadLocals.getSC(), ms, node, false, true, -1, false, false, true, false);
 		res.setNodeInfo(nodeInfo);
 		res.setSuccess(true);
 		return res;
@@ -484,8 +484,8 @@ public class NodeRenderService {
 	 * when a non-logged in user (i.e. anonymouse user) is browsing the site, and this method retrieves
 	 * that page data.
 	 */
-	public RenderNodeResponse anonPageLoad(MongoSession session, RenderNodeRequest req) {
-		session = ThreadLocals.ensure(session);
+	public RenderNodeResponse anonPageLoad(MongoSession ms, RenderNodeRequest req) {
+		ms = ThreadLocals.ensure(ms);
 
 		String id = appProp.getUserLandingPageNode();
 		// log.debug("Anon Render Node ID: " + id);
@@ -498,7 +498,7 @@ public class NodeRenderService {
 		// log.debug("anonPageLoad id=" + id);
 		req.setNodeId(id);
 
-		RenderNodeResponse res = renderNode(session, req);
+		RenderNodeResponse res = renderNode(ms, req);
 		return res;
 	}
 
@@ -511,12 +511,12 @@ public class NodeRenderService {
 	 * Returns true if there was a node at 'nodeName' and false otherwise.
 	 */
 	public boolean thymeleafRenderNode(HashMap<String, String> model, String nodeName) {
-		MongoSession session = auth.getAdminSession();
+		MongoSession as = auth.getAdminSession();
 		boolean ret = false;
 
-		SubNode node = read.getNodeByName(session, nodeName, true);
+		SubNode node = read.getNodeByName(as, nodeName, true);
 		if (node != null) {
-			final Iterable<SubNode> iter = read.getNamedNodes(session, node);
+			final Iterable<SubNode> iter = read.getNamedNodes(as, node);
 			final List<SubNode> children = read.iterateToList(iter);
 
 			if (children != null) {
@@ -548,11 +548,11 @@ public class NodeRenderService {
 		model.addAttribute("ogUrl", metaInfo.getUrl());
 	}
 
-	public RenderCalendarResponse renderCalendar(MongoSession session, RenderCalendarRequest req) {
+	public RenderCalendarResponse renderCalendar(MongoSession ms, RenderCalendarRequest req) {
 		RenderCalendarResponse res = new RenderCalendarResponse();
-		session = ThreadLocals.ensure(session);
+		ms = ThreadLocals.ensure(ms);
 
-		SubNode node = read.getNode(session, req.getNodeId());
+		SubNode node = read.getNode(ms, req.getNodeId());
 		if (node == null) {
 			return res;
 		}
@@ -560,7 +560,7 @@ public class NodeRenderService {
 		LinkedList<CalendarItem> items = new LinkedList<>();
 		res.setItems(items);
 
-		for (SubNode n : read.getCalendar(session, node)) {
+		for (SubNode n : read.getCalendar(ms, node)) {
 			CalendarItem item = new CalendarItem();
 
 			String content = n.getContent();
@@ -584,12 +584,12 @@ public class NodeRenderService {
 		return res;
 	}
 
-	public void getBreadcrumbs(MongoSession session, SubNode node, LinkedList<BreadcrumbInfo> list) {
-		session = ThreadLocals.ensure(session);
+	public void getBreadcrumbs(MongoSession ms, SubNode node, LinkedList<BreadcrumbInfo> list) {
+		ms = ThreadLocals.ensure(ms);
 
 		try {
 			if (node != null) {
-				node = read.getParent(session, node);
+				node = read.getParent(ms, node);
 			}
 
 			while (node != null) {
@@ -621,7 +621,7 @@ public class NodeRenderService {
 				bci.setType(node.getType());
 				list.add(0, bci);
 
-				node = read.getParent(session, node);
+				node = read.getParent(ms, node);
 			}
 		} catch (Exception e) {
 			/*

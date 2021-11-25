@@ -71,7 +71,7 @@ public class ExportJsonService {
 	 * Dumps all nodes that have property "pth" starting with 'pathPrefix', or all
 	 * nodes if pathPrefix is null.
 	 */
-	public String dumpAllNodes(MongoSession session, String pathPrefix, String fileName) {
+	public String dumpAllNodes(MongoSession ms, String pathPrefix, String fileName) {
 		try {
 			if (!FileUtils.dirExists(appProp.getAdminDataFolder())) {
 				throw ExUtil.wrapEx("adminDataFolder does not exist");
@@ -133,7 +133,7 @@ public class ExportJsonService {
 		}
 	}
 
-	private boolean readBinaryFromResource(MongoSession session, SubNode node, String binFileName, String subFolder) {
+	private boolean readBinaryFromResource(MongoSession ms, SubNode node, String binFileName, String subFolder) {
 		boolean ret = false;
 
 		String binMime = node.getStrProp(NodeProp.BIN_MIME.s());
@@ -146,9 +146,9 @@ public class ExportJsonService {
 				String resourceName = "classpath:/nodes/" + subFolder + "/" + oid.toHexString() + "-" + binFileName;
 				Resource resource = SpringContextUtil.getApplicationContext().getResource(resourceName);
 				is = resource.getInputStream();
-				lis = new LimitedInputStreamEx(is, userManagerService.getMaxUploadSize(session));
-				attachmentService.writeStream(session, "", node, lis, binFileName, binMime, null);
-				update.save(session, node);
+				lis = new LimitedInputStreamEx(is, userManagerService.getMaxUploadSize(ms));
+				attachmentService.writeStream(ms, "", node, lis, binFileName, binMime, null);
+				update.save(ms, node);
 
 			} catch (Exception e) {
 				e.printStackTrace();
@@ -196,7 +196,7 @@ public class ExportJsonService {
 	 * NOTE: This code no longer being used, but I want to keep for future reference 
 	 * if we ever need to import JSON into the DB again in some automated way.
 	 */
-	public String resetNode(MongoSession session, String subFolder) {
+	public String resetNode(MongoSession ms, String subFolder) {
 		try {
 			ThreadLocals.setParentCheckEnabled(false);
 
@@ -222,12 +222,12 @@ public class ExportJsonService {
 
 					// jsonToNodeService.importJsonContent(json, node);
 					SubNode node = objectMapper.readValue(json, SubNode.class);
-					update.save(session, node);
+					update.save(ms, node);
 
 					String binFileName = node.getStrProp(NodeProp.BIN_FILENAME.s());
 					if (binFileName != null) {
-						attachmentService.deleteBinary(session, "", node, null);
-						readBinaryFromResource(session, node, binFileName, subFolder);
+						attachmentService.deleteBinary(ms, "", node, null);
+						readBinaryFromResource(ms, node, binFileName, subFolder);
 					}
 				}
 			} finally {

@@ -45,20 +45,20 @@ public class MongoUpdate {
 		ops.save(obj);
 	}
 
-	public void save(MongoSession session, SubNode node) {
-		save(session, node, true);
+	public void save(MongoSession ms, SubNode node) {
+		save(ms, node, true);
 	}
 
-	public void save(MongoSession session, SubNode node, boolean allowAuth) {
+	public void save(MongoSession ms, SubNode node, boolean allowAuth) {
 		if (allowAuth) {
-			auth.ownerAuth(session, node);
+			auth.ownerAuth(ms, node);
 		}
 		// log.debug("MongoApi.save: DATA: " + XString.prettyPrint(node));
 
 		// if not doing allowAuth, we need to be sure the thread has admin session
 		// so the MongoEventListener can allow all access.
 		if (!allowAuth) {
-			arun.run(ms -> {
+			arun.run(as -> {
 				ops.save(node);
 				return null;
 			});
@@ -68,19 +68,19 @@ public class MongoUpdate {
 		ThreadLocals.clean(node);
 	}
 
-	public void saveSession(MongoSession session) {
-		saveSession(session, false);
+	public void saveSession(MongoSession ms) {
+		saveSession(ms, false);
 	}
 
-	public void saveSession(MongoSession session, boolean asAdmin) {
-		if (session == null || (saving.get() != null && saving.get().booleanValue()) || !ThreadLocals.hasDirtyNodes())
+	public void saveSession(MongoSession ms, boolean asAdmin) {
+		if (ms == null || (saving.get() != null && saving.get().booleanValue()) || !ThreadLocals.hasDirtyNodes())
 			return;
 
 		try {
 			// we check the saving flag to ensure we don't go into circular recursion here.
 			saving.set(true);
 
-			synchronized (session) {
+			synchronized (ms) {
 				// recheck hasDirtyNodes again after we get inside the lock.
 				if (!ThreadLocals.hasDirtyNodes()) {
 					return;
@@ -97,10 +97,10 @@ public class MongoUpdate {
 				for (SubNode node : ThreadLocals.getDirtyNodes().values()) {
 					if (!asAdmin) {
 						try {
-							auth.ownerAuth(session, node);
+							auth.ownerAuth(ms, node);
 						} catch (Exception e) {
 							log.debug("Dirty node save attempt failed: " + XString.prettyPrint(node));
-							log.debug("Your mongoSession has user: " + session.getUserName() + //
+							log.debug("Your mongoSession has user: " + ms.getUserName() + //
 									" and your ThreadLocal session is: " + ThreadLocals.getSC().getUserName());
 							throw e;
 						}
@@ -111,7 +111,7 @@ public class MongoUpdate {
 				for (SubNode node : nodes) {
 					// log.debug("saveSession: Saving Dirty. nodeId=" + (node.getId()==null ? "null
 					// (new node?)" : node.getId().toHexString()));
-					save(session, node, false);
+					save(ms, node, false);
 				}
 
 				/*
@@ -130,7 +130,7 @@ public class MongoUpdate {
 	 */
 	public String releaseOrphanIPFSPins(HashMap<ObjectId, UserStats> statsMap) {
 		ValContainer<String> ret = new ValContainer<>("failed");
-		arun.run(session -> {
+		arun.run(as -> {
 			int pinCount = 0, orphanCount = 0;
 			LinkedHashMap<String, Object> pins = Cast.toLinkedHashMap(ipfs.getPins());
 			if (pins != null) {
@@ -139,7 +139,7 @@ public class MongoUpdate {
 				 * if not we remove the pin
 				 */
 				for (String pin : pins.keySet()) {
-					SubNode ipfsNode = read.findByIPFSPinned(session, pin);
+					SubNode ipfsNode = read.findByIPFSPinned(as, pin);
 					if (ipfsNode != null) {
 						pinCount++;
 						// log.debug("Found IPFS CID=" + pin + " on nodeId " +
@@ -182,7 +182,7 @@ public class MongoUpdate {
 		return ret.getVal();
 	}
 
-	public void runRepairs(MongoSession session) {
+	public void runRepairs(MongoSession ms) {
 		// not currently used
 		// Query query = new Query();
 		// query.addCriteria(Criteria.where(SubNode.FIELD_TYPE).is("u"));

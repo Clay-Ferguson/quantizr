@@ -56,19 +56,19 @@ public class AclService {
 	/**
 	 * Returns the privileges that exist on the node identified in the request.
 	 */
-	public GetNodePrivilegesResponse getNodePrivileges(MongoSession session, GetNodePrivilegesRequest req) {
+	public GetNodePrivilegesResponse getNodePrivileges(MongoSession ms, GetNodePrivilegesRequest req) {
 		GetNodePrivilegesResponse res = new GetNodePrivilegesResponse();
-		session = ThreadLocals.ensure(session);
+		ms = ThreadLocals.ensure(ms);
 
 		String nodeId = req.getNodeId();
-		SubNode node = read.getNode(session, nodeId);
+		SubNode node = read.getNode(ms, nodeId);
 
 		if (!req.isIncludeAcl() && !req.isIncludeOwners()) {
 			throw ExUtil.wrapEx("no specific information requested for getNodePrivileges");
 		}
 
 		if (req.isIncludeAcl()) {
-			res.setAclEntries(auth.getAclEntries(session, node));
+			res.setAclEntries(auth.getAclEntries(ms, node));
 		}
 
 		if (req.isIncludeOwners()) {
@@ -84,16 +84,16 @@ public class AclService {
 	/*
 	 * Adds or updates a new privilege to a node
 	 */
-	public AddPrivilegeResponse addPrivilege(MongoSession session, AddPrivilegeRequest req) {
+	public AddPrivilegeResponse addPrivilege(MongoSession ms, AddPrivilegeRequest req) {
 		AddPrivilegeResponse res = new AddPrivilegeResponse();
-		session = ThreadLocals.ensure(session);
+		ms = ThreadLocals.ensure(ms);
 
 		String nodeId = req.getNodeId();
 		req.setPrincipal(XString.stripIfStartsWith(req.getPrincipal(), "@"));
-		SubNode node = read.getNode(session, nodeId);
-		auth.ownerAuth(session, node);
+		SubNode node = read.getNode(ms, nodeId);
+		auth.ownerAuth(ms, node);
 
-		boolean success = addPrivilege(session, node, req.getPrincipal(), req.getPrivileges(), res);
+		boolean success = addPrivilege(ms, node, req.getPrincipal(), req.getPrivileges(), res);
 		res.setSuccess(success);
 		return res;
 	}
@@ -101,25 +101,25 @@ public class AclService {
 	/*
 	 * Adds or updates a new encryption key to a node
 	 */
-	public SetCipherKeyResponse setCipherKey(MongoSession session, SetCipherKeyRequest req) {
+	public SetCipherKeyResponse setCipherKey(MongoSession ms, SetCipherKeyRequest req) {
 		SetCipherKeyResponse res = new SetCipherKeyResponse();
-		session = ThreadLocals.ensure(session);
+		ms = ThreadLocals.ensure(ms);
 
 		String nodeId = req.getNodeId();
-		SubNode node = read.getNode(session, nodeId);
-		auth.ownerAuth(session, node);
+		SubNode node = read.getNode(ms, nodeId);
+		auth.ownerAuth(ms, node);
 
 		String cipherKey = node.getStrProp(NodeProp.ENC_KEY.s());
 		if (cipherKey == null) {
 			throw new RuntimeEx("Attempted to alter keys on a non-encrypted node.");
 		}
 
-		boolean success = setCipherKey(session, node, req.getPrincipalNodeId(), req.getCipherKey(), res);
+		boolean success = setCipherKey(ms, node, req.getPrincipalNodeId(), req.getCipherKey(), res);
 		res.setSuccess(success);
 		return res;
 	}
 
-	public boolean setCipherKey(MongoSession session, SubNode node, String principalNodeId, String cipherKey,
+	public boolean setCipherKey(MongoSession ms, SubNode node, String principalNodeId, String cipherKey,
 			SetCipherKeyResponse res) {
 		boolean ret = false;
 
@@ -128,7 +128,7 @@ public class AclService {
 		if (ac != null) {
 			ac.setKey(cipherKey);
 			node.setAc(acl);
-			update.save(session, node);
+			update.save(ms, node);
 			ret = true;
 		}
 		return ret;
@@ -138,7 +138,7 @@ public class AclService {
 	 * Adds the privileges to the node sharing this node to principal, which will be either a userName
 	 * or 'public' (when the node is being shared to public)
 	 */
-	public boolean addPrivilege(MongoSession session, SubNode node, String principal, List<String> privileges,
+	public boolean addPrivilege(MongoSession ms, SubNode node, String principal, List<String> privileges,
 			AddPrivilegeResponse res) {
 
 		if (principal == null || node == null)
@@ -238,7 +238,7 @@ public class AclService {
 			ac.setPrvs(prvs);
 			acl.put(mapKey, ac);
 			node.setAc(acl);
-			update.save(session, node);
+			update.save(ms, node);
 
 			// if (!principal.equalsIgnoreCase(PrincipalName.PUBLIC.s())) {
 			// SubNode fromUserNode = read.getNode(session, node.getOwner());
@@ -263,12 +263,12 @@ public class AclService {
 		return true;
 	}
 
-	public void removeAclEntry(MongoSession session, SubNode node, String principalNodeId, String privToRemove) {
+	public void removeAclEntry(MongoSession ms, SubNode node, String principalNodeId, String privToRemove) {
 
 		/* special syntax is we remove all if asterisk specified */
 		if (principalNodeId.equals("*")) {
 			node.setAc(null);
-			update.save(session, node);
+			update.save(ms, node);
 			return;
 		}
 		HashSet<String> setToRemove = XString.tokenizeToSet(privToRemove, ",", true);
@@ -324,27 +324,27 @@ public class AclService {
 				node.setAc(acl);
 			}
 
-			update.save(session, node);
+			update.save(ms, node);
 		}
 	}
 
 	/*
 	 * Removes the privilege specified in the request from the node specified in the request
 	 */
-	public RemovePrivilegeResponse removePrivilege(MongoSession session, RemovePrivilegeRequest req) {
+	public RemovePrivilegeResponse removePrivilege(MongoSession ms, RemovePrivilegeRequest req) {
 		RemovePrivilegeResponse res = new RemovePrivilegeResponse();
-		session = ThreadLocals.ensure(session);
+		ms = ThreadLocals.ensure(ms);
 
 		String nodeId = req.getNodeId();
-		SubNode node = read.getNode(session, nodeId);
-		auth.ownerAuth(session, node);
+		SubNode node = read.getNode(ms, nodeId);
+		auth.ownerAuth(ms, node);
 
-		removeAclEntry(session, node, req.getPrincipalNodeId(), req.getPrivilege());
+		removeAclEntry(ms, node, req.getPrincipalNodeId(), req.getPrivilege());
 		res.setSuccess(true);
 		return res;
 	}
 
-	public List<String> getOwnerNames(MongoSession session, SubNode node) {
+	public List<String> getOwnerNames(MongoSession ms, SubNode node) {
 		Set<String> ownerSet = new HashSet<>();
 		/*
 		 * We walk up the tree util we get to the root, or find ownership on node, or any of it's parents
@@ -352,7 +352,7 @@ public class AclService {
 
 		int sanityCheck = 0;
 		while (++sanityCheck < 100) {
-			List<MongoPrincipal> principals = getNodePrincipals(session, node);
+			List<MongoPrincipal> principals = getNodePrincipals(ms, node);
 			for (MongoPrincipal p : principals) {
 
 				/*
@@ -360,13 +360,13 @@ public class AclService {
 				 * to client, and the client should be able to deal with that (i think). depends on how much
 				 * ownership info we need to show user. ownerSet.add(p.getUserNodeId());
 				 */
-				SubNode userNode = read.getNode(session, p.getUserNodeId());
+				SubNode userNode = read.getNode(ms, p.getUserNodeId());
 				String userName = userNode.getStrProp(NodeProp.USER.s());
 				ownerSet.add(userName);
 			}
 
 			if (principals.size() == 0) {
-				node = read.getParent(session, node);
+				node = read.getParent(ms, node);
 				if (node == null)
 					break;
 			} else {
@@ -379,7 +379,7 @@ public class AclService {
 		return ownerList;
 	}
 
-	public static List<MongoPrincipal> getNodePrincipals(MongoSession session, SubNode node) {
+	public static List<MongoPrincipal> getNodePrincipals(MongoSession ms, SubNode node) {
 		List<MongoPrincipal> principals = new LinkedList<>();
 		MongoPrincipal principal = new MongoPrincipal();
 		principal.setUserNodeId(node.getId());
@@ -388,7 +388,7 @@ public class AclService {
 		return principals;
 	}
 
-	public static boolean isPublic(MongoSession session, SubNode node) {
+	public static boolean isPublic(MongoSession ms, SubNode node) {
 		return node.getAc() != null && node.getAc().containsKey(PrincipalName.PUBLIC.s());
 	}
 }

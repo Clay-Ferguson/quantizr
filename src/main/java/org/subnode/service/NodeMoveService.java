@@ -68,26 +68,26 @@ public class NodeMoveService {
 	 * We allow the special case of req.siblingId="[topNode]" and that indicates move the node to be the
 	 * first node under its parent.
 	 */
-	public SetNodePositionResponse setNodePosition(MongoSession session, SetNodePositionRequest req) {
+	public SetNodePositionResponse setNodePosition(MongoSession ms, SetNodePositionRequest req) {
 		SetNodePositionResponse res = new SetNodePositionResponse();
-		session = ThreadLocals.ensure(session);
+		ms = ThreadLocals.ensure(ms);
 
 		String nodeId = req.getNodeId();
 
-		SubNode node = read.getNode(session, nodeId);
-		auth.ownerAuth(session, node);
+		SubNode node = read.getNode(ms, nodeId);
+		auth.ownerAuth(ms, node);
 		if (node == null) {
 			throw new RuntimeEx("Node not found: " + nodeId);
 		}
 
 		if ("up".equals(req.getTargetName())) {
-			moveNodeUp(session, node);
+			moveNodeUp(ms, node);
 		} else if ("down".equals(req.getTargetName())) {
-			moveNodeDown(session, node);
+			moveNodeDown(ms, node);
 		} else if ("top".equals(req.getTargetName())) {
-			moveNodeToTop(session, node);
+			moveNodeToTop(ms, node);
 		} else if ("bottom".equals(req.getTargetName())) {
-			moveNodeToBottom(session, node);
+			moveNodeToBottom(ms, node);
 		} else {
 			throw new RuntimeEx("Invalid target type: " + req.getTargetName());
 		}
@@ -96,69 +96,69 @@ public class NodeMoveService {
 		return res;
 	}
 
-	public void moveNodeUp(MongoSession session, SubNode node) {
-		SubNode nodeAbove = read.getSiblingAbove(session, node);
+	public void moveNodeUp(MongoSession ms, SubNode node) {
+		SubNode nodeAbove = read.getSiblingAbove(ms, node);
 		if (nodeAbove != null) {
 			Long saveOrdinal = nodeAbove.getOrdinal();
 			nodeAbove.setOrdinal(node.getOrdinal());
 			node.setOrdinal(saveOrdinal);
 		}
-		update.saveSession(session);
+		update.saveSession(ms);
 	}
 
-	public void moveNodeDown(MongoSession session, SubNode node) {
-		SubNode nodeBelow = read.getSiblingBelow(session, node);
+	public void moveNodeDown(MongoSession ms, SubNode node) {
+		SubNode nodeBelow = read.getSiblingBelow(ms, node);
 		if (nodeBelow != null) {
 			Long saveOrdinal = nodeBelow.getOrdinal();
 			nodeBelow.setOrdinal(node.getOrdinal());
 			node.setOrdinal(saveOrdinal);
 		}
-		update.saveSession(session);
+		update.saveSession(ms);
 	}
 
-	public void moveNodeToTop(MongoSession session, SubNode node) {
-		SubNode parentNode = read.getParent(session, node);
+	public void moveNodeToTop(MongoSession ms, SubNode node) {
+		SubNode parentNode = read.getParent(ms, node);
 		if (parentNode == null) {
 			return;
 		}
-		create.insertOrdinal(session, parentNode, 0L, 1L);
+		create.insertOrdinal(ms, parentNode, 0L, 1L);
 
 		/*
 		 * todo-2: there is a slight ineffieiency here in that 'node' does end up getting saved both as part
 		 * of the insertOrdinal, and also then with the setting of it to zero. Will be easy to fix when I
 		 * get to it, but is low priority for now.
 		 */
-		update.saveSession(session);
+		update.saveSession(ms);
 
 		node.setOrdinal(0L);
-		update.saveSession(session);
+		update.saveSession(ms);
 	}
 
-	public void moveNodeToBottom(MongoSession session, SubNode node) {
-		SubNode parentNode = read.getParent(session, node);
+	public void moveNodeToBottom(MongoSession ms, SubNode node) {
+		SubNode parentNode = read.getParent(ms, node);
 		if (parentNode == null) {
 			return;
 		}
-		long ordinal = read.getMaxChildOrdinal(session, parentNode) + 1L;
+		long ordinal = read.getMaxChildOrdinal(ms, parentNode) + 1L;
 		node.setOrdinal(ordinal);
 		parentNode.setMaxChildOrdinal(ordinal);
-		update.saveSession(session);
+		update.saveSession(ms);
 	}
 
 	/*
 	 * Note: Browser can send nodes these in any order, in the request, and always the lowest ordinal is
 	 * the one we keep and join to
 	 */
-	public JoinNodesResponse joinNodes(MongoSession session, JoinNodesRequest req) {
+	public JoinNodesResponse joinNodes(MongoSession ms, JoinNodesRequest req) {
 		JoinNodesResponse res = new JoinNodesResponse();
-		session = ThreadLocals.ensure(session);
+		ms = ThreadLocals.ensure(ms);
 
 		// add to list becasue we will sort
 		ArrayList<SubNode> nodes = new ArrayList<SubNode>();
 
 		String parentPath = null;
 		for (String nodeId : req.getNodeIds()) {
-			SubNode node = read.getNode(session, nodeId);
+			SubNode node = read.getNode(ms, nodeId);
 
 			if (parentPath == null) {
 				parentPath = node.getParentPath();
@@ -168,7 +168,7 @@ public class NodeMoveService {
 				return res;
 			}
 
-			auth.ownerAuth(session, node);
+			auth.ownerAuth(ms, node);
 			nodes.add(node);
 		}
 
@@ -197,11 +197,11 @@ public class NodeMoveService {
 				if (n.getStrProp(NodeProp.BIN) != null || n.getStrProp(NodeProp.IPFS_LINK) != null) {
 					n.setContent(null);
 					n.touch();
-					update.save(session, n);
+					update.save(ms, n);
 				}
 				/* or else we delete the node */
 				else {
-					delete.deleteNode(session, n, false);
+					delete.deleteNode(ms, n, false);
 				}
 			}
 			counter++;
@@ -209,7 +209,7 @@ public class NodeMoveService {
 
 		firstNode.setContent(sb.toString());
 		firstNode.touch();
-		update.saveSession(session);
+		update.saveSession(ms);
 		res.setSuccess(true);
 		return res;
 	}
@@ -217,9 +217,9 @@ public class NodeMoveService {
 	/*
 	 * Deletes the set of nodes specified in the request
 	 */
-	public DeleteNodesResponse deleteNodes(MongoSession session, DeleteNodesRequest req) {
+	public DeleteNodesResponse deleteNodes(MongoSession ms, DeleteNodesRequest req) {
 		DeleteNodesResponse res = new DeleteNodesResponse();
-		session = ThreadLocals.ensure(session);
+		ms = ThreadLocals.ensure(ms);
 
 		SubNode userNode = read.getUserNodeByUserName(null, null);
 		if (userNode == null) {
@@ -228,27 +228,27 @@ public class NodeMoveService {
 
 		for (String nodeId : req.getNodeIds()) {
 			// lookup the node we're going to delete
-			SubNode node = read.getNode(session, nodeId);
+			SubNode node = read.getNode(ms, nodeId);
 			auth.ownerAuthByThread(node);
 
 			// back out the number of bytes it was using
-			if (!session.isAdmin()) {
+			if (!ms.isAdmin()) {
 				/*
 				 * NOTE: There is no equivalent to this on the IPFS code path for deleting ipfs becuase since we
 				 * don't do reference counting we let the garbage collecion cleanup be the only way user quotas are
 				 * deducted from
 				 */
-				userManagerService.addNodeBytesToUserNodeBytes(session, node, userNode, -1);
+				userManagerService.addNodeBytesToUserNodeBytes(ms, node, userNode, -1);
 			}
 
 			try {
-				delete.deleteNode(session, node, req.isChildrenOnly());
+				delete.deleteNode(ms, node, req.isChildrenOnly());
 			} catch (Exception e) {
 				// ignore failed deletes.
 			}
 		}
 
-		update.saveSession(session);
+		update.saveSession(ms);
 		res.setSuccess(true);
 		return res;
 	}
@@ -256,11 +256,11 @@ public class NodeMoveService {
 	/*
 	 * Moves a set of nodes to a new location, underneath (i.e. children of) the target node specified.
 	 */
-	public MoveNodesResponse moveNodes(MongoSession session, MoveNodesRequest req) {
+	public MoveNodesResponse moveNodes(MongoSession ms, MoveNodesRequest req) {
 		MoveNodesResponse res = new MoveNodesResponse();
-		session = ThreadLocals.ensure(session);
+		ms = ThreadLocals.ensure(ms);
 
-		moveNodesInternal(session, req.getLocation(), req.getTargetNodeId(), req.getNodeIds());
+		moveNodesInternal(ms, req.getLocation(), req.getTargetNodeId(), req.getNodeIds());
 		res.setSuccess(true);
 		return res;
 	}
@@ -271,13 +271,13 @@ public class NodeMoveService {
 	 * we are inserting, and the inserted nodes will be pasted in directly below that ordinal (i.e. new
 	 * siblings posted in below it)
 	 */
-	private void moveNodesInternal(MongoSession session, String location, String targetId, List<String> nodeIds) {
+	private void moveNodesInternal(MongoSession ms, String location, String targetId, List<String> nodeIds) {
 		log.debug("moveNodesInternal: targetId=" + targetId + " location=" + location);
-		SubNode targetNode = read.getNode(session, targetId);
+		SubNode targetNode = read.getNode(ms, targetId);
 
-		SubNode parentToPasteInto = location.equalsIgnoreCase("inside") ? targetNode : read.getParent(session, targetNode);
+		SubNode parentToPasteInto = location.equalsIgnoreCase("inside") ? targetNode : read.getParent(ms, targetNode);
 
-		auth.ownerAuth(session, parentToPasteInto);
+		auth.ownerAuth(ms, parentToPasteInto);
 		String parentPath = parentToPasteInto.getPath();
 		// log.debug("targetPath: " + targetPath);
 		Long curTargetOrdinal = null;
@@ -290,23 +290,23 @@ public class NodeMoveService {
 		// enum)
 		else if (location.equalsIgnoreCase("inline")) {
 			curTargetOrdinal = targetNode.getOrdinal() + 1;
-			create.insertOrdinal(session, parentToPasteInto, curTargetOrdinal, nodeIds.size());
+			create.insertOrdinal(ms, parentToPasteInto, curTargetOrdinal, nodeIds.size());
 		}
 		// location==inline-above
 		else if (location.equalsIgnoreCase("inline-above")) {
 			curTargetOrdinal = targetNode.getOrdinal();
-			create.insertOrdinal(session, parentToPasteInto, curTargetOrdinal, nodeIds.size());
+			create.insertOrdinal(ms, parentToPasteInto, curTargetOrdinal, nodeIds.size());
 		}
 
 		for (String nodeId : nodeIds) {
 			// log.debug("Moving ID: " + nodeId);
 
-			SubNode node = read.getNode(session, nodeId);
-			auth.ownerAuth(session, node);
-			SubNode nodeParent = read.getParent(session, node);
+			SubNode node = read.getNode(ms, nodeId);
+			auth.ownerAuth(ms, node);
+			SubNode nodeParent = read.getParent(ms, node);
 
 			Long _targetOrdinal = curTargetOrdinal;
-			arun.run(ms -> {
+			arun.run(as -> {
 				/*
 				 * If this 'node' will be changing parents (moving to new parent) we need to update its subgraph, of
 				 * all children and also update its own path, otherwise it's staying under same parent and only it's
@@ -318,7 +318,7 @@ public class NodeMoveService {
 					if (parentToPasteInto.getPath().startsWith(node.getPath())) {
 						throw new RuntimeException("Impossible node move requested.");
 					}
-					changePathOfSubGraph(ms, node, parentPath);
+					changePathOfSubGraph(as, node, parentPath);
 					node.setPath(parentPath + "/" + node.getLastPathPart());
 				}
 
@@ -329,18 +329,18 @@ public class NodeMoveService {
 			curTargetOrdinal++;
 		}
 
-		arun.run(ms -> {
-			update.saveSession(ms);
+		arun.run(as -> {
+			update.saveSession(as);
 			return null;
 		});
 	}
 
-	private void changePathOfSubGraph(MongoSession session, SubNode graphRoot, String newPathPrefix) {
+	private void changePathOfSubGraph(MongoSession ms, SubNode graphRoot, String newPathPrefix) {
 		String originalPath = graphRoot.getPath();
 		log.debug("originalPath (graphRoot.path): " + originalPath);
 		int originalParentPathLen = graphRoot.getParentPath().length();
 
-		for (SubNode node : read.getSubGraph(session, graphRoot, null, 0)) {
+		for (SubNode node : read.getSubGraph(ms, graphRoot, null, 0)) {
 			if (!node.getPath().startsWith(originalPath)) {
 				throw new RuntimeEx("Algorighm failure: path " + node.getPath() + " should have started with " + originalPath);
 			}
@@ -354,13 +354,13 @@ public class NodeMoveService {
 		}
 	}
 
-	public SelectAllNodesResponse selectAllNodes(MongoSession session, SelectAllNodesRequest req) {
+	public SelectAllNodesResponse selectAllNodes(MongoSession ms, SelectAllNodesRequest req) {
 		SelectAllNodesResponse res = new SelectAllNodesResponse();
-		session = ThreadLocals.ensure(session);
+		ms = ThreadLocals.ensure(ms);
 
 		String nodeId = req.getParentNodeId();
-		SubNode node = read.getNode(session, nodeId);
-		List<String> nodeIds = read.getChildrenIds(session, node, false, null);
+		SubNode node = read.getNode(ms, nodeId);
+		List<String> nodeIds = read.getChildrenIds(ms, node, false, null);
 		res.setNodeIds(nodeIds);
 		res.setSuccess(true);
 		return res;

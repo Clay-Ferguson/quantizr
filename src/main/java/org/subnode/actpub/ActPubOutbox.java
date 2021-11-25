@@ -193,13 +193,13 @@ public class ActPubOutbox {
      * works before we try to figure out how to do private auth comming from specific user(s)
      */
     public Long getOutboxItemCount(final String userName, String sharedTo) {
-        Long totalItems = arun.run(mongoSession -> {
+        Long totalItems = arun.run(as -> {
             long count = 0;
             SubNode userNode = read.getUserNodeByUserName(null, userName);
             if (userNode != null) {
                 List<String> sharedToList = new LinkedList<>();
                 sharedToList.add(sharedTo);
-                count = auth.countSubGraphByAclUser(mongoSession, null, sharedToList, userNode.getOwner());
+                count = auth.countSubGraphByAclUser(as, null, sharedToList, userNode.getOwner());
             }
             return Long.valueOf(count);
         });
@@ -240,7 +240,7 @@ public class ActPubOutbox {
                 return null;
             }
 
-            retItems = (APList) arun.run(mongoSession -> {
+            retItems = (APList) arun.run(as -> {
                 APList items = new APList();
                 int MAX_PER_PAGE = 25;
                 boolean collecting = false;
@@ -252,11 +252,11 @@ public class ActPubOutbox {
                 List<String> sharedToList = new LinkedList<String>();
                 sharedToList.add(sharedTo);
 
-                for (SubNode child : auth.searchSubGraphByAclUser(mongoSession, null, sharedToList,
+                for (SubNode child : auth.searchSubGraphByAclUser(as, null, sharedToList,
                         Sort.by(Sort.Direction.DESC, SubNode.FIELD_MODIFY_TIME), MAX_PER_PAGE, userNode.getOwner())) {
 
                     String replyTo = null;
-                    SubNode parent = read.getParent(mongoSession, child, false);
+                    SubNode parent = read.getParent(as, child, false);
                     if (parent != null) {
                         replyTo = snUtil.getIdBasedUrl(parent);
                     }

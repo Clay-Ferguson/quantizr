@@ -20,7 +20,7 @@ public class RoomType extends TypeBase {
         return NodeType.ROOM.s();
     }
 
-    public void createSubNode(MongoSession session, ValContainer<SubNode> node, CreateSubNodeRequest req, boolean linkBookmark) {
+    public void createSubNode(MongoSession ms, ValContainer<SubNode> node, CreateSubNodeRequest req, boolean linkBookmark) {
         snUtil.setNodePublicWritable(node.getVal());
     }
 }

@@ -241,25 +241,25 @@ public class UserManagerService {
 		// log.debug("Spring login successful: User=" + userName);
 	}
 
-	public void ensureUserHomeNodeExists(MongoSession session, String userName, String content, String type, String name) {
-		SubNode userNode = read.getUserNodeByUserName(session, userName);
+	public void ensureUserHomeNodeExists(MongoSession ms, String userName, String content, String type, String name) {
+		SubNode userNode = read.getUserNodeByUserName(ms, userName);
 		if (userNode != null) {
-			SubNode userHomeNode = read.getNodeByName(session, userName + ":" + name);
+			SubNode userHomeNode = read.getNodeByName(ms, userName + ":" + name);
 			if (userHomeNode == null) {
-				SubNode node = create.createNode(session, userNode, null, type, 0L, CreateNodeLocation.LAST, null, null, true);
+				SubNode node = create.createNode(ms, userNode, null, type, 0L, CreateNodeLocation.LAST, null, null, true);
 				node.setOwner(userNode.getId());
 				if (name != null) {
 					node.setName(name);
 				}
 				node.setContent(content);
 				node.touch();
-				acl.addPrivilege(session, node, PrincipalName.PUBLIC.s(), Arrays.asList(PrivilegeType.READ.s()), null);
-				update.save(session, node);
+				acl.addPrivilege(ms, node, PrincipalName.PUBLIC.s(), Arrays.asList(PrivilegeType.READ.s()), null);
+				update.save(ms, node);
 			}
 		}
 	}
 
-	public void processLogin(MongoSession session, LoginResponse res, String userName) {
+	public void processLogin(MongoSession ms, LoginResponse res, String userName) {
 		SessionContext sc = ThreadLocals.getSC();
 		// log.debug("processLogin: " + userName);
 		SubNode userNode = read.getUserNodeByUserName(auth.getAdminSession(), userName);
@@ -293,7 +293,7 @@ public class UserManagerService {
 		userNode.setProp(NodeProp.LAST_LOGIN_TIME.s(), now.getTime());
 
 		ensureValidCryptoKeys(userNode);
-		update.save(session, userNode);
+		update.save(ms, userNode);
 	}
 
 	/*
@@ -336,13 +336,13 @@ public class UserManagerService {
 	}
 
 	/**
-	 * @param session
+	 * @param ms
 	 * @param userStats Holds a map of User Root Node (account node) IDs as key mapped to the UserStats
 	 *        for that user.
 	 */
-	public void writeUserStats(final MongoSession session, HashMap<ObjectId, UserStats> userStats) {
+	public void writeUserStats(final MongoSession ms, HashMap<ObjectId, UserStats> userStats) {
 		userStats.forEach((final ObjectId key, final UserStats stat) -> {
-			SubNode node = read.getNode(session, key);
+			SubNode node = read.getNode(ms, key);
 			if (node != null) {
 				// log.debug("Setting stat.binUsage=" + stat.binUsage);
 				node.setProp(NodeProp.BIN_TOTAL.s(), stat.binUsage);
@@ -450,8 +450,8 @@ public class UserManagerService {
 		});
 	}
 
-	public void initNewUser(MongoSession session, String userName, String password, String email, boolean automated) {
-		SubNode userNode = util.createUser(session, userName, email, password, automated);
+	public void initNewUser(MongoSession ms, String userName, String password, String email, boolean automated) {
+		SubNode userNode = util.createUser(ms, userName, email, password, automated);
 		if (userNode != null) {
 			log.debug("Successful signup complete.");
 		}
@@ -539,14 +539,14 @@ public class UserManagerService {
 	 * Adds user to the list of pending accounts and they will stay in pending status until their
 	 * signupCode has been used to validate their email address.
 	 */
-	public void initiateSignup(MongoSession session, String userName, String password, String email) {
+	public void initiateSignup(MongoSession ms, String userName, String password, String email) {
 
-		SubNode ownerNode = read.getUserNodeByUserName(session, userName);
+		SubNode ownerNode = read.getUserNodeByUserName(ms, userName);
 		if (ownerNode != null) {
 			throw new RuntimeEx("User already exists.");
 		}
 
-		SubNode newUserNode = util.createUser(session, userName, email, password, false);
+		SubNode newUserNode = util.createUser(ms, userName, email, password, false);
 
 		/*
 		 * It's easiest to use the actua new UserNode ID as the 'signup code' to send to the user, because
@@ -710,21 +710,21 @@ public class UserManagerService {
 		return res;
 	}
 
-	public BlockUserResponse blockUser(MongoSession session, final BlockUserRequest req) {
+	public BlockUserResponse blockUser(MongoSession ms, final BlockUserRequest req) {
 		BlockUserResponse res = new BlockUserResponse();
 		final String userName = ThreadLocals.getSC().getUserName();
-		session = ThreadLocals.ensure(session);
+		ms = ThreadLocals.ensure(ms);
 
 		// get the node that holds all blocked users
 		SubNode blockedList =
-				read.getUserNodeByType(session, userName, null, null, NodeType.BLOCKED_USERS.s(), null, NodeName.BLOCKED_USERS);
+				read.getUserNodeByType(ms, userName, null, null, NodeType.BLOCKED_USERS.s(), null, NodeName.BLOCKED_USERS);
 
 		/*
 		 * lookup to see if this will be a duplicate
 		 */
-		SubNode userNode = read.findNodeByUserAndType(session, blockedList, req.getUserName(), NodeType.FRIEND.s());
+		SubNode userNode = read.findNodeByUserAndType(ms, blockedList, req.getUserName(), NodeType.FRIEND.s());
 		if (userNode == null) {
-			userNode = edit.createFriendNode(session, blockedList, req.getUserName());
+			userNode = edit.createFriendNode(ms, blockedList, req.getUserName());
 			if (userNode != null) {
 				res.setMessage(
 						"Blocked user " + req.getUserName() + ". To manage blocks, go to `Menu -> Friends -> Blocked Users`");
@@ -748,20 +748,20 @@ public class UserManagerService {
 		return res;
 	}
 
-	public DeleteFriendResponse deleteFriend(MongoSession session, final DeleteFriendRequest req) {
+	public DeleteFriendResponse deleteFriend(MongoSession ms, final DeleteFriendRequest req) {
 		// apUtil.log("deleteFriend request: " + XString.prettyPrint(req));
 		DeleteFriendResponse res = new DeleteFriendResponse();
-		session = ThreadLocals.ensure(session);
+		ms = ThreadLocals.ensure(ms);
 
 		// This loop over friendNodes could be done all in a single delete query command, but for now let's
 		// just do the delete this way using our existing methods.
-		List<SubNode> friendNodes = getSpecialNodesList(session, NodeType.FRIEND_LIST.s(), null, true);
+		List<SubNode> friendNodes = getSpecialNodesList(ms, NodeType.FRIEND_LIST.s(), null, true);
 		if (friendNodes != null) {
 			for (SubNode friendNode : friendNodes) {
 				// the USER_NODE_ID property on friends nodes contains the actual account ID of this friend.
 				String userNodeId = friendNode.getStrProp(NodeProp.USER_NODE_ID);
 				if (req.getUserNodeId().equals(userNodeId)) {
-					delete.delete(session, friendNode, false);
+					delete.delete(ms, friendNode, false);
 				}
 			}
 		}
@@ -773,11 +773,11 @@ public class UserManagerService {
 	 * Adds 'req.userName' as a friend by creating a FRIEND node under the current user's FRIENDS_LIST
 	 * if the user wasn't already a friend
 	 */
-	public AddFriendResponse addFriend(MongoSession session, final AddFriendRequest req) {
+	public AddFriendResponse addFriend(MongoSession ms, final AddFriendRequest req) {
 		// apUtil.log("addFriend request: " + XString.prettyPrint(req));
 		AddFriendResponse res = new AddFriendResponse();
 		final String userName = ThreadLocals.getSC().getUserName();
-		session = ThreadLocals.ensure(session);
+		ms = ThreadLocals.ensure(ms);
 
 		String _newUserName = req.getUserName().trim();
 		_newUserName = XString.stripIfStartsWith(_newUserName, "@");
@@ -792,16 +792,16 @@ public class UserManagerService {
 		// This is concurrency safe because by the time we get to this asyncExec, we're done processing in
 		// this request thread.
 		asyncExec.run(ThreadLocals.getContext(), () -> {
-			MongoSession ms = ThreadLocals.getMongoSession();
+			MongoSession mst = ThreadLocals.getMongoSession();
 
 			// get the Friend List of the follower
 			SubNode followerFriendList =
-					read.getUserNodeByType(ms, userName, null, null, NodeType.FRIEND_LIST.s(), null, NodeName.FRIENDS);
+					read.getUserNodeByType(mst, userName, null, null, NodeType.FRIEND_LIST.s(), null, NodeName.FRIENDS);
 
 			/*
 			 * lookup to see if this followerFriendList node already has userToFollow already under it
 			 */
-			SubNode friendNode = read.findNodeByUserAndType(ms, followerFriendList, newUserName, NodeType.FRIEND.s());
+			SubNode friendNode = read.findNodeByUserAndType(mst, followerFriendList, newUserName, NodeType.FRIEND.s());
 
 			// if friendNode was non-null here it means we were already following the user.
 			if (friendNode == null) {
@@ -809,7 +809,7 @@ public class UserManagerService {
 				apService.loadForeignUser(newUserName);
 
 				apUtil.log("Creating friendNode for " + newUserName);
-				friendNode = edit.createFriendNode(ms, followerFriendList, newUserName);
+				friendNode = edit.createFriendNode(mst, followerFriendList, newUserName);
 
 				if (friendNode != null) {
 					ValContainer<SubNode> userNode = new ValContainer<SubNode>();
@@ -902,19 +902,19 @@ public class UserManagerService {
 		return res;
 	}
 
-	public boolean userIsFollowedByMe(MongoSession session, String maybeFollowedUser) {
+	public boolean userIsFollowedByMe(MongoSession ms, String maybeFollowedUser) {
 		final String userName = ThreadLocals.getSC().getUserName();
 		SubNode friendsList =
-				read.getUserNodeByType(session, userName, null, null, NodeType.FRIEND_LIST.s(), null, NodeName.BLOCKED_USERS);
-		SubNode userNode = read.findNodeByUserAndType(session, friendsList, maybeFollowedUser, NodeType.FRIEND.s());
+				read.getUserNodeByType(ms, userName, null, null, NodeType.FRIEND_LIST.s(), null, NodeName.BLOCKED_USERS);
+		SubNode userNode = read.findNodeByUserAndType(ms, friendsList, maybeFollowedUser, NodeType.FRIEND.s());
 		return userNode != null;
 	}
 
-	public boolean userIsBlockedByMe(MongoSession session, String maybeBlockedUser) {
+	public boolean userIsBlockedByMe(MongoSession ms, String maybeBlockedUser) {
 		final String userName = ThreadLocals.getSC().getUserName();
 		SubNode blockedList =
-				read.getUserNodeByType(session, userName, null, null, NodeType.BLOCKED_USERS.s(), null, NodeName.BLOCKED_USERS);
-		SubNode userNode = read.findNodeByUserAndType(session, blockedList, maybeBlockedUser, NodeType.FRIEND.s());
+				read.getUserNodeByType(ms, userName, null, null, NodeType.BLOCKED_USERS.s(), null, NodeName.BLOCKED_USERS);
+		SubNode userNode = read.findNodeByUserAndType(ms, blockedList, maybeBlockedUser, NodeType.FRIEND.s());
 		return userNode != null;
 	}
 
@@ -957,9 +957,9 @@ public class UserManagerService {
 	/*
 	 * Runs when user is doing the 'change password' or 'reset password'
 	 */
-	public ChangePasswordResponse changePassword(MongoSession session, final ChangePasswordRequest req) {
+	public ChangePasswordResponse changePassword(MongoSession ms, final ChangePasswordRequest req) {
 		ChangePasswordResponse res = new ChangePasswordResponse();
-		session = ThreadLocals.ensure(session);
+		ms = ThreadLocals.ensure(ms);
 
 		ValContainer<SubNode> userNode = new ValContainer<>();
 		ValContainer<String> userName = new ValContainer<>();
@@ -969,14 +969,14 @@ public class UserManagerService {
 			/*
 			 * We can run this block as admin, because the codePart below is secret and is checked for a match
 			 */
-			arun.run(mongoSession -> {
+			arun.run(as -> {
 
 				String userNodeId = XString.truncateAfterFirst(passCode, "-");
 
 				if (userNodeId == null) {
 					throw new RuntimeEx("Unable to find userNodeId: " + userNodeId);
 				}
-				userNode.setVal(read.getNode(mongoSession, userNodeId));
+				userNode.setVal(read.getNode(as, userNodeId));
 
 				if (userNode.getVal() == null) {
 					throw ExUtil.wrapEx("Invald password reset code.");
@@ -1003,7 +1003,7 @@ public class UserManagerService {
 				return null;
 			});
 		} else {
-			userNode.setVal(read.getUserNodeByUserName(session, session.getUserName()));
+			userNode.setVal(read.getUserNodeByUserName(ms, ms.getUserName()));
 
 			if (userNode.getVal() == null) {
 				throw ExUtil.wrapEx("changePassword cannot find user.");
@@ -1018,7 +1018,7 @@ public class UserManagerService {
 			userNode.getVal().setProp(NodeProp.PWD_HASH.s(), util.getHashOfPassword(password));
 			userNode.getVal().deleteProp(NodeProp.USER_PREF_PASSWORD_RESET_AUTHCODE.s());
 
-			update.save(session, userNode.getVal());
+			update.save(ms, userNode.getVal());
 		}
 
 		res.setUser(userName.getVal());
@@ -1098,10 +1098,10 @@ public class UserManagerService {
 		return res;
 	}
 
-	public GetFriendsResponse getFriends(MongoSession session) {
+	public GetFriendsResponse getFriends(MongoSession ms) {
 		GetFriendsResponse res = new GetFriendsResponse();
 
-		List<SubNode> friendNodes = getSpecialNodesList(session, NodeType.FRIEND_LIST.s(), null, true);
+		List<SubNode> friendNodes = getSpecialNodesList(ms, NodeType.FRIEND_LIST.s(), null, true);
 
 		if (friendNodes != null) {
 			List<FriendInfo> friends = new LinkedList<>();
@@ -1119,7 +1119,7 @@ public class UserManagerService {
 
 					String userNodeId = friendNode.getStrProp(NodeProp.USER_NODE_ID);
 
-					SubNode friendAccountNode = read.getNode(session, userNodeId, false);
+					SubNode friendAccountNode = read.getNode(ms, userNodeId, false);
 					if (friendAccountNode != null) {
 						fi.setAvatarVer(friendAccountNode.getStrProp(NodeProp.BIN));
 					}
@@ -1138,18 +1138,18 @@ public class UserManagerService {
 	 * Looks in the userName's account under their 'underType' type node and returns all the children.
 	 * If userName is passed as null, then we use the currently logged in user
 	 */
-	public List<SubNode> getSpecialNodesList(MongoSession session, String underType, String userName, boolean sort) {
-		session = ThreadLocals.ensure(session);
+	public List<SubNode> getSpecialNodesList(MongoSession ms, String underType, String userName, boolean sort) {
+		ms = ThreadLocals.ensure(ms);
 		List<SubNode> nodeList = new LinkedList<>();
-		SubNode userNode = read.getUserNodeByUserName(session, userName);
+		SubNode userNode = read.getUserNodeByUserName(ms, userName);
 		if (userNode == null)
 			return null;
 
-		SubNode parentNode = read.findTypedNodeUnderPath(session, userNode.getPath(), underType);
+		SubNode parentNode = read.findTypedNodeUnderPath(ms, userNode.getPath(), underType);
 		if (parentNode == null)
 			return null;
 
-		for (SubNode friendNode : read.getChildren(session, parentNode,
+		for (SubNode friendNode : read.getChildren(ms, parentNode,
 				sort ? Sort.by(Sort.Direction.ASC, SubNode.FIELD_ORDINAL) : null, null, 0)) {
 			nodeList.add(friendNode);
 		}
@@ -1191,14 +1191,14 @@ public class UserManagerService {
 		// });
 	}
 
-	public String getUserAccountsReport(MongoSession session) {
-		session = ThreadLocals.ensure(session);
+	public String getUserAccountsReport(MongoSession ms) {
+		ms = ThreadLocals.ensure(ms);
 		int localUserCount = 0;
 		int foreignUserCount = 0;
 
 		StringBuilder sb = new StringBuilder();
 		final Iterable<SubNode> accountNodes =
-				read.getChildrenUnderParentPath(session, NodeName.ROOT_OF_ALL_USERS, null, null, 0, null, null);
+				read.getChildrenUnderParentPath(ms, NodeName.ROOT_OF_ALL_USERS, null, null, 0, null, null);
 
 		for (final SubNode accountNode : accountNodes) {
 			String userName = accountNode.getStrProp(NodeProp.USER);
@@ -1217,19 +1217,19 @@ public class UserManagerService {
 	}
 
 	public void updateLastActiveTime(SessionContext sc) {
-		MongoSession session = auth.getAdminSession();
-		SubNode userNode = read.getUserNodeByUserName(session, sc.getUserName());
+		MongoSession ms = auth.getAdminSession();
+		SubNode userNode = read.getUserNodeByUserName(ms, sc.getUserName());
 		if (userNode != null) {
 			userNode.setProp(NodeProp.LAST_ACTIVE_TIME.s(), sc.getLastActiveTime());
-			update.save(session, userNode);
+			update.save(ms, userNode);
 		}
 	}
 
-	public int getMaxUploadSize(MongoSession session) {
-		if (session.isAnon()) {
+	public int getMaxUploadSize(MongoSession ms) {
+		if (ms.isAnon()) {
 			return 0;
 		}
-		if (session.isAdmin()) {
+		if (ms.isAdmin()) {
 			return Integer.MAX_VALUE;
 		}
 

@@ -36,15 +36,15 @@ public class ImportBookService {
 	@Autowired
 	private MongoAuth auth;
 
-	public InsertBookResponse insertBook(MongoSession session, InsertBookRequest req) {
+	public InsertBookResponse insertBook(MongoSession ms, InsertBookRequest req) {
 		InsertBookResponse res = new InsertBookResponse();
-		session = ThreadLocals.ensure(session);
+		ms = ThreadLocals.ensure(ms);
 		if (!ThreadLocals.getSC().isAdmin() && !ThreadLocals.getSC().isTestAccount()) {
 			throw ExUtil.wrapEx("insertBook is an admin-only feature.");
 		}
 
 		String nodeId = req.getNodeId();
-		SubNode node = read.getNode(session, nodeId);
+		SubNode node = read.getNode(ms, nodeId);
 		auth.ownerAuthByThread(node);
 		log.debug("Insert Root: " + XString.prettyPrint(node));
 
@@ -52,9 +52,9 @@ public class ImportBookService {
 		 * for now we don't check book name. Only one book exists: War and Peace
 		 */
 		ImportWarAndPeace iwap = SpringContextUtil.getApplicationContext().getBean(ImportWarAndPeace.class);
-		iwap.importBook(session, "classpath:war-and-peace.txt", node, safeBooleanVal(req.getTruncated()) ? 2 : Integer.MAX_VALUE);
+		iwap.importBook(ms, "classpath:war-and-peace.txt", node, safeBooleanVal(req.getTruncated()) ? 2 : Integer.MAX_VALUE);
 
-		update.saveSession(session);
+		update.saveSession(ms);
 		res.setSuccess(true);
 		return res;
 	}

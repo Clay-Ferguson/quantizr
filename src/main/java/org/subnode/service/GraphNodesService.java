@@ -33,13 +33,13 @@ public class GraphNodesService {
 	@Autowired
 	private MongoAuth auth;
 
-	public GraphResponse graphNodes(MongoSession session, GraphRequest req) {
+	public GraphResponse graphNodes(MongoSession ms, GraphRequest req) {
 		HashMap<String, GraphNode> mapByPath = new HashMap<>();
 		GraphResponse res = new GraphResponse();
-		session = ThreadLocals.ensure(session);
+		ms = ThreadLocals.ensure(ms);
 
 		boolean searching = !StringUtils.isEmpty(req.getSearchText());
-		SubNode node = read.getNode(session, req.getNodeId(), true);
+		SubNode node = read.getNode(ms, req.getNodeId(), true);
 		GraphNode gnode = new GraphNode(node.getId().toHexString(), getNodeName(node), node.getPath(), 0, false);
 		String rootPath = node.getPath();
 		int rootLevel = StringUtils.countMatches(rootPath, "/");
@@ -52,19 +52,19 @@ public class GraphNodesService {
 
 			// Run subgraph query to get all nodes if no search text provided
 			if (StringUtils.isEmpty(req.getSearchText())) {
-				results = read.getSubGraph(session, node, null, 0);
+				results = read.getSubGraph(ms, node, null, 0);
 			}
 			// If search text provided run subgraph search.
 			else {
 				int limit = ThreadLocals.getSC().isAdmin() ? Integer.MAX_VALUE : 1000;
-				results = read.searchSubGraph(session, node, "content", req.getSearchText(), null, null, limit, 0, true, false,
+				results = read.searchSubGraph(ms, node, "content", req.getSearchText(), null, null, limit, 0, true, false,
 						null, true, false);
 			}
 
 			// Construct the GraphNode object for each result and add to mapByPath
 			for (SubNode n : results) {
 				try {
-					auth.auth(session, node, PrivilegeType.READ);
+					auth.auth(ms, node, PrivilegeType.READ);
 					GraphNode gn = new GraphNode(n.getId().toHexString(), getNodeName(n), n.getPath(),
 							StringUtils.countMatches(n.getPath(), "/") - rootLevel, searching);
 					mapByPath.put(gn.getPath(), gn);

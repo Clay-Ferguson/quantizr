@@ -45,15 +45,13 @@ public class ImportWarAndPeace {
 	StringBuilder paragraph = new StringBuilder();
 
 	private int globalBook = 0;
-	private int globalChapter = 0;
-	private int globalVerse = 0;
 	private boolean halt;
 	private MongoSession session;
 
-	public void importBook(MongoSession session, String resourceName, SubNode root, int maxBooks) {
+	public void importBook(MongoSession ms, String resourceName, SubNode root, int maxBooks) {
 		try {
 			this.root = root;
-			this.session = session;
+			this.session = ms;
 			this.maxBooks = maxBooks;
 			Resource resource = SpringContextUtil.getApplicationContext().getResource(resourceName);
 			InputStream is = resource.getInputStream();
@@ -116,7 +114,6 @@ public class ImportWarAndPeace {
 
 	private boolean processChapter(String line) {
 		if (line.startsWith("CHAPTER ")) {
-			globalChapter++;
 			log.debug("Processing Chapter: " + line);
 			if (curBook == null)
 				throw ExUtil.wrapEx("book is null.");
@@ -146,7 +143,6 @@ public class ImportWarAndPeace {
 			return false;
 		if (curChapter == null || curBook == null)
 			return false;
-		globalVerse++;
 
 		// line = XString.injectForQuotations(line);
 

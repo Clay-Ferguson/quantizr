@@ -94,9 +94,9 @@ public class NodeSearchService {
 
 	static final int TRENDING_LIMIT = 10000;
 
-	public NodeSearchResponse search(MongoSession session, NodeSearchRequest req) {
+	public NodeSearchResponse search(MongoSession ms, NodeSearchRequest req) {
 		NodeSearchResponse res = new NodeSearchResponse();
-		session = ThreadLocals.ensure(session);
+		ms = ThreadLocals.ensure(ms);
 
 		String searchText = req.getSearchText();
 
@@ -113,9 +113,9 @@ public class NodeSearchService {
 		int counter = 0;
 
 		if ("node.id".equals(req.getSearchProp())) {
-			SubNode node = read.getNode(session, searchText, true);
+			SubNode node = read.getNode(ms, searchText, true);
 			if (node != null) {
-				NodeInfo info = convert.convertToNodeInfo(ThreadLocals.getSC(), session, node, true, false, counter + 1, false,
+				NodeInfo info = convert.convertToNodeInfo(ThreadLocals.getSC(), ms, node, true, false, counter + 1, false,
 						false, false, false);
 				searchResults.add(info);
 			}
@@ -125,9 +125,9 @@ public class NodeSearchService {
 			} else {
 				searchText = ":" + ThreadLocals.getSC().getUserName() + ":" + searchText;
 			}
-			SubNode node = read.getNode(session, searchText, true);
+			SubNode node = read.getNode(ms, searchText, true);
 			if (node != null) {
-				NodeInfo info = convert.convertToNodeInfo(ThreadLocals.getSC(), session, node, true, false, counter + 1, false,
+				NodeInfo info = convert.convertToNodeInfo(ThreadLocals.getSC(), ms, node, true, false, counter + 1, false,
 						false, false, false);
 				searchResults.add(info);
 			}
@@ -138,23 +138,23 @@ public class NodeSearchService {
 			if (Constant.SEARCH_TYPE_USER_FOREIGN.s().equals(req.getSearchType()) || //
 					Constant.SEARCH_TYPE_USER_LOCAL.s().equals(req.getSearchType()) || //
 					Constant.SEARCH_TYPE_USER_ALL.s().equals(req.getSearchType())) {
-				userSearch(session, req, searchResults);
+				userSearch(ms, req, searchResults);
 			}
 			// else we're doing a normal subgraph search for the text
 			else {
-				SubNode searchRoot = read.getNode(session, req.getNodeId());
+				SubNode searchRoot = read.getNode(ms, req.getNodeId());
 
 				if ("timeline".equals(req.getSearchDefinition())) {
 					ThreadLocals.getSC().setTimelinePath(searchRoot.getPath());
 				}
 
-				for (SubNode node : read.searchSubGraph(session, searchRoot, req.getSearchProp(), searchText, req.getSortField(),
+				for (SubNode node : read.searchSubGraph(ms, searchRoot, req.getSearchProp(), searchText, req.getSortField(),
 						req.getSortDir(), ConstantInt.ROWS_PER_PAGE.val(), ConstantInt.ROWS_PER_PAGE.val() * req.getPage(),
 						req.getFuzzy(), req.getCaseSensitive(), req.getTimeRangeType(), req.isRecursive(),
 						req.isRequirePriority())) {
 					try {
-						auth.auth(session, node, PrivilegeType.READ);
-						NodeInfo info = convert.convertToNodeInfo(ThreadLocals.getSC(), session, node, true, false, counter + 1,
+						auth.auth(ms, node, PrivilegeType.READ);
+						NodeInfo info = convert.convertToNodeInfo(ThreadLocals.getSC(), ms, node, true, false, counter + 1,
 								false, false, false, false);
 						searchResults.add(info);
 					} catch (Exception e) {
@@ -168,7 +168,7 @@ public class NodeSearchService {
 		return res;
 	}
 
-	private void userSearch(MongoSession session, NodeSearchRequest req, List<NodeInfo> searchResults) {
+	private void userSearch(MongoSession ms, NodeSearchRequest req, List<NodeInfo> searchResults) {
 		String findUserName = null;
 		int counter = 0;
 
@@ -200,7 +200,7 @@ public class NodeSearchService {
 			moreCriteria = Criteria.where(SubNode.FIELD_PROPERTIES + "." + NodeProp.ACT_PUB_ACTOR_URL.s() + ".value").is(null);
 		}
 
-		Iterable<SubNode> accountNodes = read.getChildrenUnderParentPath(session, NodeName.ROOT_OF_ALL_USERS, null,
+		Iterable<SubNode> accountNodes = read.getChildrenUnderParentPath(ms, NodeName.ROOT_OF_ALL_USERS, null,
 				ConstantInt.ROWS_PER_PAGE.val(), ConstantInt.ROWS_PER_PAGE.val() * req.getPage(), textCriteria, moreCriteria);
 		/*
 		 * scan all userAccountNodes, and set a zero amount for those not found (which will be the correct
@@ -208,7 +208,7 @@ public class NodeSearchService {
 		 */
 		for (final SubNode node : accountNodes) {
 			try {
-				NodeInfo info = convert.convertToNodeInfo(ThreadLocals.getSC(), session, node, true, false, counter + 1, false,
+				NodeInfo info = convert.convertToNodeInfo(ThreadLocals.getSC(), ms, node, true, false, counter + 1, false,
 						false, false, false);
 				searchResults.add(info);
 			} catch (Exception e) {
@@ -224,11 +224,11 @@ public class NodeSearchService {
 			findUserName = findUserName.replace("\"", "");
 			findUserName = XString.stripIfStartsWith(findUserName, "@");
 			final String _findUserName = findUserName;
-			arun.run(ms -> {
-				SubNode userNode = apService.getAcctNodeByUserName(ms, _findUserName);
+			arun.run(as -> {
+				SubNode userNode = apService.getAcctNodeByUserName(as, _findUserName);
 				if (userNode != null) {
 					try {
-						NodeInfo info = convert.convertToNodeInfo(ThreadLocals.getSC(), ms, userNode, true, false, counter + 1,
+						NodeInfo info = convert.convertToNodeInfo(ThreadLocals.getSC(), as, userNode, true, false, counter + 1,
 								false, false, false, false);
 
 						searchResults.add(info);
@@ -241,9 +241,9 @@ public class NodeSearchService {
 		}
 	}
 
-	public GetSharedNodesResponse getSharedNodes(MongoSession session, GetSharedNodesRequest req) {
+	public GetSharedNodesResponse getSharedNodes(MongoSession ms, GetSharedNodesRequest req) {
 		GetSharedNodesResponse res = new GetSharedNodesResponse();
-		session = ThreadLocals.ensure(session);
+		ms = ThreadLocals.ensure(ms);
 
 		List<NodeInfo> searchResults = new LinkedList<>();
 		res.setSearchResults(searchResults);
@@ -255,7 +255,7 @@ public class NodeSearchService {
 		// SubNode searchRoot = api.getNode(session, req.getNodeId());
 
 		// search under account root only
-		SubNode searchRoot = read.getNode(session, ThreadLocals.getSC().getRootId());
+		SubNode searchRoot = read.getNode(ms, ThreadLocals.getSC().getRootId());
 
 		/*
 		 * todo-2: Eventually we want two ways of searching here.
@@ -265,7 +265,7 @@ public class NodeSearchService {
 		 * 2) all my shared nodes globally, and the globally is done simply by passing null for the path
 		 * here
 		 */
-		for (SubNode node : auth.searchSubGraphByAcl(session, req.getPage() * ConstantInt.ROWS_PER_PAGE.val(),
+		for (SubNode node : auth.searchSubGraphByAcl(ms, req.getPage() * ConstantInt.ROWS_PER_PAGE.val(),
 				searchRoot.getPath(), searchRoot.getOwner(), Sort.by(Sort.Direction.DESC, SubNode.FIELD_MODIFY_TIME),
 				ConstantInt.ROWS_PER_PAGE.val())) {
 
@@ -298,7 +298,7 @@ public class NodeSearchService {
 				}
 			}
 
-			NodeInfo info = convert.convertToNodeInfo(ThreadLocals.getSC(), session, node, true, false, counter + 1, false, false,
+			NodeInfo info = convert.convertToNodeInfo(ThreadLocals.getSC(), ms, node, true, false, counter + 1, false, false,
 					false, false);
 			searchResults.add(info);
 		}
@@ -320,10 +320,10 @@ public class NodeSearchService {
 		return content;
 	}
 
-	public void getBookmarks(MongoSession session, GetBookmarksRequest req, GetBookmarksResponse res) {
+	public void getBookmarks(MongoSession ms, GetBookmarksRequest req, GetBookmarksResponse res) {
 		List<Bookmark> bookmarks = new LinkedList<>();
 
-		List<SubNode> bookmarksNode = userManagerService.getSpecialNodesList(session, NodeType.BOOKMARK_LIST.s(), null, true);
+		List<SubNode> bookmarksNode = userManagerService.getSpecialNodesList(ms, NodeType.BOOKMARK_LIST.s(), null, true);
 		if (bookmarksNode != null) {
 			for (SubNode bmNode : bookmarksNode) {
 				String targetId = bmNode.getStrProp(NodeProp.TARGET_ID);
@@ -340,7 +340,7 @@ public class NodeSearchService {
 		res.setBookmarks(bookmarks);
 	}
 
-	public void getNodeStats(MongoSession session, GetNodeStatsRequest req, GetNodeStatsResponse res) {
+	public void getNodeStats(MongoSession ms, GetNodeStatsRequest req, GetNodeStatsResponse res) {
 		/*
 		 * If this is the 'feed' being queried, then get the data from trendingFeedInfo (the cache), or else
 		 * cache it
@@ -405,8 +405,8 @@ public class NodeSearchService {
 		 * running a stats request under the 'Node Info' main menu
 		 */
 		else {
-			session = ThreadLocals.ensure(session);
-			SubNode searchRoot = read.getNode(session, req.getNodeId());
+			ms = ThreadLocals.ensure(ms);
+			SubNode searchRoot = read.getNode(ms, req.getNodeId());
 
 			Sort sort = null;
 			int limit = 0;
@@ -415,7 +415,7 @@ public class NodeSearchService {
 				limit = TRENDING_LIMIT;
 			}
 
-			iter = read.getSubGraph(session, searchRoot, sort, limit);
+			iter = read.getSubGraph(ms, searchRoot, sort, limit);
 		}
 
 		for (SubNode node : iter) {

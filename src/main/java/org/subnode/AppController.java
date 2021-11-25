@@ -346,10 +346,10 @@ public class AppController implements ErrorController {
 				ThreadLocals.getSC().setUrlId(id);
 				// log.debug("ID specified on url=" + id);
 				String _id = id;
-				arun.run(mongoSession -> {
+				arun.run(ms -> {
 					// we don't check ownership of node at this time, but merely check sanity of
 					// whether this ID is even existing or not.
-					SubNode node = read.getNode(mongoSession, _id);
+					SubNode node = read.getNode(ms, _id);
 					nodeRenderService.populateSocialCardProps(node, model);
 					if (node == null) {
 						log.debug("Node did not exist.");
@@ -459,9 +459,9 @@ public class AppController implements ErrorController {
 	@GetMapping(value = {"/multiRss"}, produces = MediaType.APPLICATION_RSS_XML_VALUE)
 	public void multiRss(@RequestParam(value = "id", required = true) String nodeId, //
 			HttpServletResponse response) {
-		arun.run(mongoSession -> {
+		arun.run(ms -> {
 			try {
-				rssFeedService.multiRss(mongoSession, nodeId, response.getWriter());
+				rssFeedService.multiRss(ms, nodeId, response.getWriter());
 			} catch (Exception e) {
 				throw new RuntimeException("internal server error");
 			}
@@ -477,9 +477,9 @@ public class AppController implements ErrorController {
 			HttpServletResponse response, //
 			HttpSession session) {
 		callProc.run("rss", null, session, ms -> {
-			arun.run(mongoSession -> {
+			arun.run(as -> {
 				try {
-					rssFeedService.getRssFeed(mongoSession, nodeId, response.getWriter());
+					rssFeedService.getRssFeed(as, nodeId, response.getWriter());
 				} catch (Exception e) {
 					throw new RuntimeException("internal server error");
 				}
@@ -543,7 +543,7 @@ public class AppController implements ErrorController {
 	@RequestMapping(value = API_PATH + "/getMultiRssFeed", method = RequestMethod.POST)
 	public @ResponseBody Object getMultiRssFeed(@RequestBody GetMultiRssRequest req, HttpSession session) {
 		return callProc.run("getMultiRssFeed", req, session, ms -> {
-			return arun.run(mongoSession -> {
+			return arun.run(as -> {
 				// log.debug("getMultiRssFeed: " + XString.prettyPrint(req));
 				return rssFeedService.getMultiRssFeed(req);
 			});
@@ -694,8 +694,8 @@ public class AppController implements ErrorController {
 			 * export, because this will potentially consume a lot of their storage quota and we don't want
 			 * users just clicking things like the War and Peace book and trying to export that.
 			 */
-			arun.run(mongoSession -> {
-				SubNode node = read.getNode(mongoSession, req.getNodeId());
+			arun.run(as -> {
+				SubNode node = read.getNode(as, req.getNodeId());
 				if (node == null)
 					throw new RuntimeException("Node not found: " + req.getNodeId());
 
@@ -925,10 +925,10 @@ public class AppController implements ErrorController {
 
 			if (id != null) {
 				String _id = id;
-				arun.run(mongoSession -> {
+				arun.run(ms -> {
 					// we don't check ownership of node at this time, but merely check sanity of
 					// whether this ID is even existing or not.
-					SubNode node = read.getNode(mongoSession, _id);
+					SubNode node = read.getNode(ms, _id);
 
 					String _gid = gid;
 
@@ -957,7 +957,7 @@ public class AppController implements ErrorController {
 						log.debug("Node did not exist: " + _id);
 						throw new RuntimeException("Node not found.");
 					} else {
-						attachmentService.getBinary(mongoSession, "", node, null, download != null, response);
+						attachmentService.getBinary(ms, "", node, null, download != null, response);
 					}
 					return null;
 				});
@@ -998,8 +998,8 @@ public class AppController implements ErrorController {
 		if (token == null) {
 			// Check if this is an 'avatar' request and if so bypass security
 			if ("avatar".equals(binId)) {
-				arun.run(mongoSession -> {
-					attachmentService.getBinary(mongoSession, "", null, nodeId, download != null, response);
+				arun.run(ms -> {
+					attachmentService.getBinary(ms, "", null, nodeId, download != null, response);
 					return null;
 				});
 			}
@@ -1028,8 +1028,8 @@ public class AppController implements ErrorController {
 			}
 		} else {
 			if (SessionContext.validToken(token, null)) {
-				arun.run(mongoSession -> {
-					attachmentService.getBinary(mongoSession, "", null, nodeId, download != null, response);
+				arun.run(ms -> {
+					attachmentService.getBinary(ms, "", null, nodeId, download != null, response);
 					return null;
 				});
 			}

@@ -24,12 +24,12 @@ public class BookmarkType extends TypeBase {
         return NodeType.BOOKMARK.s();
     }
 
-    public void createSubNode(MongoSession session, ValContainer<SubNode> node, CreateSubNodeRequest req, boolean linkBookmark) {
+    public void createSubNode(MongoSession ms, ValContainer<SubNode> node, CreateSubNodeRequest req, boolean linkBookmark) {
         // Note: if 'linkBookmark' is true then 'node' will be null here, and that's ok.
         SubNode nodeToBookmark = null;
         if (node != null) {
             nodeToBookmark = node.getVal();
-            node.setVal(read.getUserNodeByType(session, session.getUserName(), null, "### Bookmarks", NodeType.BOOKMARK_LIST.s(),
+            node.setVal(read.getUserNodeByType(ms, ms.getUserName(), null, "### Bookmarks", NodeType.BOOKMARK_LIST.s(),
                     null, null));
         }
         if (!linkBookmark && nodeToBookmark != null) {

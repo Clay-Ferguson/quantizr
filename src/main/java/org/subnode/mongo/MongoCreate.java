@@ -29,25 +29,25 @@ public class MongoCreate {
 	@Autowired
 	private AdminRun arun;
 
-	public SubNode createNode(MongoSession session, SubNode parent, String type, Long ordinal, CreateNodeLocation location,
+	public SubNode createNode(MongoSession ms, SubNode parent, String type, Long ordinal, CreateNodeLocation location,
 			boolean updateParentOrdinals) {
-		return createNode(session, parent, null, type, ordinal, location, null, null, updateParentOrdinals);
+		return createNode(ms, parent, null, type, ordinal, location, null, null, updateParentOrdinals);
 	}
 
-	public SubNode createNode(MongoSession session, String path) {
-		SubNode node = new SubNode(session.getUserNodeId(), path, NodeType.NONE.s(), null);
+	public SubNode createNode(MongoSession ms, String path) {
+		SubNode node = new SubNode(ms.getUserNodeId(), path, NodeType.NONE.s(), null);
 		return node;
 	}
 
-	public SubNode createNode(MongoSession session, String path, String type) {
+	public SubNode createNode(MongoSession ms, String path, String type) {
 		if (type == null) {
 			type = NodeType.NONE.s();
 		}
-		SubNode node = new SubNode(session.getUserNodeId(), path, type, null);
+		SubNode node = new SubNode(ms.getUserNodeId(), path, type, null);
 		return node;
 	}
 
-	public SubNode createNodeAsOwner(MongoSession session, String path, String type, ObjectId ownerId) {
+	public SubNode createNodeAsOwner(MongoSession ms, String path, String type, ObjectId ownerId) {
 		if (type == null) {
 			type = NodeType.NONE.s();
 		}
@@ -63,7 +63,7 @@ public class MongoCreate {
 	 * 
 	 * relPath can be null if no path is known
 	 */
-	public SubNode createNode(MongoSession session, SubNode parent, String relPath, String type, Long ordinal,
+	public SubNode createNode(MongoSession ms, SubNode parent, String relPath, String type, Long ordinal,
 			CreateNodeLocation location, List<PropertyInfo> properties, ObjectId ownerId, boolean updateParentOrdinals) {
 		if (relPath == null) {
 			/*
@@ -79,7 +79,7 @@ public class MongoCreate {
 		String path = (parent == null ? "" : parent.getPath()) + "/" + relPath;
 
 		if (ownerId == null) {
-			ownerId = session.getUserNodeId();
+			ownerId = ms.getUserNodeId();
 		}
 
 		// for now not worried about ordinals for root nodes.
@@ -93,8 +93,8 @@ public class MongoCreate {
 
 				Long _ordinal = ordinal;
 				// this updates the parent so we run as admin.
-				ordinal = (Long) arun.run(ms -> {
-					return prepOrdinalForLocation(ms, location, parent, _ordinal);
+				ordinal = (Long) arun.run(as -> {
+					return prepOrdinalForLocation(as, location, parent, _ordinal);
 				});
 			}
 		}
@@ -110,24 +110,24 @@ public class MongoCreate {
 		return node;
 	}
 
-	private Long prepOrdinalForLocation(MongoSession session, CreateNodeLocation location, SubNode parent, Long ordinal) {
+	private Long prepOrdinalForLocation(MongoSession ms, CreateNodeLocation location, SubNode parent, Long ordinal) {
 		switch (location) {
 			case FIRST:
 				ordinal = 0L;
-				insertOrdinal(session, parent, 0L, 1L);
+				insertOrdinal(ms, parent, 0L, 1L);
 				break;
 			case LAST:
-				ordinal = read.getMaxChildOrdinal(session, parent) + 1;
+				ordinal = read.getMaxChildOrdinal(ms, parent) + 1;
 				parent.setMaxChildOrdinal(ordinal);
 				break;
 			case ORDINAL:
-				insertOrdinal(session, parent, ordinal, 1L);
+				insertOrdinal(ms, parent, ordinal, 1L);
 				break;
 			default:
 				throw new RuntimeException("Unknown ordinal");
 		}
 
-		update.saveSession(session);
+		update.saveSession(ms);
 		return ordinal;
 	}
 
@@ -136,10 +136,10 @@ public class MongoCreate {
 	 * slot for the new ordinal positions for some new nodes to be inserted into this newly available
 	 * range of unused sequential ordinal values (range of 'ordinal+1' thru 'ordinal+1+rangeSize')
 	 */
-	public void insertOrdinal(MongoSession session, SubNode node, long ordinal, long rangeSize) {
+	public void insertOrdinal(MongoSession ms, SubNode node, long ordinal, long rangeSize) {
 		long maxOrdinal = ordinal + rangeSize;
 
-		auth.auth(session, node, PrivilegeType.READ);
+		auth.auth(ms, node, PrivilegeType.READ);
 
 		/*
 		 * First detect any nodes that have no ordinal, and set ordinal to 0. This is basically a data
@@ -148,15 +148,15 @@ public class MongoCreate {
 		 * remove this check (todo-1)
 		 */
 		Criteria criteria = Criteria.where(SubNode.FIELD_ORDINAL).is(null);
-		for (SubNode child : read.getChildrenUnderParentPath(session, node.getPath(), null, null, 0, null, criteria)) {
+		for (SubNode child : read.getChildrenUnderParentPath(ms, node.getPath(), null, null, 0, null, criteria)) {
 			child.setOrdinal(0L);
 		}
 
 		// save all if there's any to save.
-		update.saveSession(session);
+		update.saveSession(ms);
 
 		criteria = Criteria.where(SubNode.FIELD_ORDINAL).gte(ordinal);
-		for (SubNode child : read.getChildrenUnderParentPath(session, node.getPath(),
+		for (SubNode child : read.getChildrenUnderParentPath(ms, node.getPath(),
 				Sort.by(Sort.Direction.ASC, SubNode.FIELD_ORDINAL), null, 0, null, criteria)) {
 			child.setOrdinal(maxOrdinal++);
 		}

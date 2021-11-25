@@ -82,9 +82,9 @@ public class ExportPdfServicePdfBox {
 	 * repository root, then we don't expect a filename, because we will generate a
 	 * timestamped one.
 	 */
-	public void export(MongoSession session, ExportRequest req, ExportResponse res) {
-		session = ThreadLocals.ensure(session);
-		this.session = session;
+	public void export(MongoSession ms, ExportRequest req, ExportResponse res) {
+		ms = ThreadLocals.ensure(ms);
+		this.session = ms;
 		this.req = req;
 		String nodeId = req.getNodeId();
 
@@ -96,21 +96,21 @@ public class ExportPdfServicePdfBox {
 			throw ExUtil.wrapEx("Exporting entire repository is not supported.");
 		} else {
 			log.info("Exporting to Text File");
-			exportNodeToFile(session, nodeId);
+			exportNodeToFile(ms, nodeId);
 			res.setFileName(shortFileName);
 		}
 
 		res.setSuccess(true);
 	}
 
-	private void exportNodeToFile(MongoSession session, String nodeId) {
+	private void exportNodeToFile(MongoSession ms, String nodeId) {
 		if (!FileUtils.dirExists(appProp.getAdminDataFolder())) {
 			throw ExUtil.wrapEx("adminDataFolder does not exist.");
 		}
 
 		setFontSize(baseFontSize);
 
-		SubNode exportNode = read.getNode(session, nodeId, true);
+		SubNode exportNode = read.getNode(ms, nodeId, true);
 		String fileName = snUtil.getExportFileName(req.getFileName(), exportNode);
 		shortFileName = fileName + ".pdf"; 
 		fullFileName = appProp.getAdminDataFolder() + File.separator + shortFileName;

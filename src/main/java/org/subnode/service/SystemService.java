@@ -146,8 +146,8 @@ public class SystemService {
 		// maxMem));
 	}
 
-	public String getJson(MongoSession session, String nodeId) {
-		SubNode node = read.getNode(session, nodeId, true);
+	public String getJson(MongoSession ms, String nodeId) {
+		SubNode node = read.getNode(ms, nodeId, true);
 		if (node != null) {
 			String ret = XString.prettyPrint(node);
 

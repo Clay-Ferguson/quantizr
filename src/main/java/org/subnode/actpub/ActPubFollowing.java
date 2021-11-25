@@ -358,8 +358,8 @@ public class ActPubFollowing {
         GetFollowingResponse res = new GetFollowingResponse();
         ms = ThreadLocals.ensure(ms);
 
-        MongoSession adminSession = auth.getAdminSession();
-        Query query = findFollowingOfUser_query(adminSession, req.getTargetUserName());
+        MongoSession as = auth.getAdminSession();
+        Query query = findFollowingOfUser_query(as, req.getTargetUserName());
         if (query == null)
             return null;
 
@@ -371,7 +371,7 @@ public class ActPubFollowing {
         int counter = 0;
 
         for (SubNode node : iterable) {
-            NodeInfo info = convert.convertToNodeInfo(ThreadLocals.getSC(), adminSession, node, true, false,
+            NodeInfo info = convert.convertToNodeInfo(ThreadLocals.getSC(), as, node, true, false,
                     counter + 1, false, false, false, false);
             searchResults.add(info);
         }

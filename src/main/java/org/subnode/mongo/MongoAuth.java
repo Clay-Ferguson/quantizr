@@ -166,10 +166,10 @@ public class MongoAuth {
 	 * Returns a list of all user names that are shared to on this node, including "public" if any are
 	 * public.
 	 */
-	public List<String> getUsersSharedTo(MongoSession session, SubNode node) {
+	public List<String> getUsersSharedTo(MongoSession ms, SubNode node) {
 		List<String> userNames = null;
 
-		List<AccessControlInfo> acList = getAclEntries(session, node);
+		List<AccessControlInfo> acList = getAclEntries(ms, node);
 		if (acList != null) {
 			for (AccessControlInfo info : acList) {
 				String userNodeId = info.getPrincipalNodeId();
@@ -179,7 +179,7 @@ public class MongoAuth {
 					name = PrincipalName.PUBLIC.s();
 				} //
 				else if (userNodeId != null) {
-					SubNode accountNode = read.getNode(session, userNodeId);
+					SubNode accountNode = read.getNode(ms, userNodeId);
 					if (accountNode != null) {
 						name = accountNode.getStrProp(NodeProp.USER);
 					}
@@ -206,12 +206,12 @@ public class MongoAuth {
 	 * 
 	 * session should be null, or else an existing admin session.
 	 */
-	public void setDefaultReplyAcl(MongoSession session, SubNode parent, SubNode child) {
+	public void setDefaultReplyAcl(MongoSession ms, SubNode parent, SubNode child) {
 		if (parent == null || child == null)
 			return;
 
-		if (session == null) {
-			session = getAdminSession();
+		if (ms == null) {
+			ms = getAdminSession();
 		}
 
 		HashMap<String, AccessControl> ac = parent.getAc();
@@ -232,7 +232,7 @@ public class MongoAuth {
 
 			// if we have a userProp, find the account node for the user
 			if (userName != null) {
-				SubNode accountNode = read.getUserNodeByUserName(session, userName);
+				SubNode accountNode = read.getUserNodeByUserName(ms, userName);
 				if (accountNode != null) {
 					ac.put(accountNode.getId().toHexString(), new AccessControl(null, "rd,wr"));
 				}
@@ -254,8 +254,8 @@ public class MongoAuth {
 				!userName.equalsIgnoreCase(PrincipalName.ANON.s());
 	}
 
-	public void ownerAuth(MongoSession session, SubNode node) {
-		if (session == null) {
+	public void ownerAuth(MongoSession ms, SubNode node) {
+		if (ms == null) {
 			throw new RuntimeEx("null session passed to ownerAuth.");
 		}
 
@@ -263,23 +263,23 @@ public class MongoAuth {
 			throw new RuntimeEx("Auth Failed. Node did not exist.");
 		}
 
-		if (session.isAdmin()) {
+		if (ms.isAdmin()) {
 			return;
 		}
 
-		if (session.getUserNodeId() == null) {
-			throw new RuntimeException("session has no userNode: " + XString.prettyPrint(session));
+		if (ms.getUserNodeId() == null) {
+			throw new RuntimeException("session has no userNode: " + XString.prettyPrint(ms));
 		}
 
-		if (!session.getUserNodeId().equals(node.getOwner())) {
-			log.error("Unable to save Node (expected ownerId " + session.getUserNodeId().toHexString() + "): "
+		if (!ms.getUserNodeId().equals(node.getOwner())) {
+			log.error("Unable to save Node (expected ownerId " + ms.getUserNodeId().toHexString() + "): "
 					+ XString.prettyPrint(node));
 			throw new NodeAuthFailedException();
 		}
 	}
 
-	public void requireAdmin(MongoSession session) {
-		if (!session.isAdmin())
+	public void requireAdmin(MongoSession ms) {
+		if (!ms.isAdmin())
 			throw new RuntimeEx("auth fail");
 	}
 
@@ -287,14 +287,14 @@ public class MongoAuth {
 		ownerAuth(ThreadLocals.getMongoSession(), node);
 	}
 
-	public void authForChildNodeCreate(MongoSession session, SubNode node) {
+	public void authForChildNodeCreate(MongoSession ms, SubNode node) {
 		String apId = node.getStrProp(NodeProp.ACT_PUB_ID);
 		if (apId == null) {
-			auth(session, node, PrivilegeType.WRITE);
+			auth(ms, node, PrivilegeType.WRITE);
 		}
 	}
 
-	public void auth(MongoSession session, SubNode node, PrivilegeType... privs) {
+	public void auth(MongoSession ms, SubNode node, PrivilegeType... privs) {
 		// during server init no auth is required.
 		if (node == null || !MongoRepository.fullInit) {
 			return;
@@ -302,13 +302,13 @@ public class MongoAuth {
 		if (verbose)
 			log.trace("auth: " + node.getPath());
 
-		if (session.isAdmin()) {
+		if (ms.isAdmin()) {
 			if (verbose)
 				log.trace("you are admin. auth success.");
 			return; // admin can do anything. skip auth
 		}
 
-		auth(session, node, Arrays.asList(privs));
+		auth(ms, node, Arrays.asList(privs));
 	}
 
 	/*
@@ -316,26 +316,26 @@ public class MongoAuth {
 	 * This is because the very definition of the 'owner' on any given node is the ID of the user's root
 	 * node of the user who owns it
 	 */
-	public boolean isAnAccountNode(MongoSession session, SubNode node) {
+	public boolean isAnAccountNode(MongoSession ms, SubNode node) {
 		return node.getId().toHexString().equals(node.getOwner().toHexString());
 	}
 
 	/* Returns true if this user on this session has privType access to 'node' */
-	public void auth(MongoSession session, SubNode node, List<PrivilegeType> priv) {
+	public void auth(MongoSession ms, SubNode node, List<PrivilegeType> priv) {
 		// during server init no auth is required.
 		if (node == null || !MongoRepository.fullInit) {
 			return;
 		}
 
 		// admin has full power over all nodes
-		if (session.isAdmin()) {
+		if (ms.isAdmin()) {
 			if (verbose)
 				log.trace("auth granted. you're admin.");
 			return;
 		}
 
 		if (verbose)
-			log.trace("auth path " + node.getPath() + " for " + session.getUserName());
+			log.trace("auth path " + node.getPath() + " for " + ms.getUserName());
 
 		/* Special case if this node is named 'home' it is readable by anyone */
 		if (node != null && NodeName.HOME.equals(node.getName()) && priv.size() == 1 && priv.get(0).name().equals("READ")) {
@@ -351,14 +351,14 @@ public class MongoAuth {
 		}
 
 		// if this session user is the owner of this node, then they have full power
-		if (session.getUserNodeId() != null && session.getUserNodeId().equals(node.getOwner())) {
+		if (ms.getUserNodeId() != null && ms.getUserNodeId().equals(node.getOwner())) {
 			if (verbose)
-				log.trace("allow: user " + session.getUserName() + " owns node. accountId: " + node.getOwner().toHexString());
+				log.trace("allow: user " + ms.getUserName() + " owns node. accountId: " + node.getOwner().toHexString());
 			return;
 		}
 
 		// Find any ancestor that has priv shared to this user.
-		if (ancestorAuth(session, node, priv)) {
+		if (ancestorAuth(ms, node, priv)) {
 			log.trace("ancestor auth success.");
 			return;
 		}
@@ -370,15 +370,15 @@ public class MongoAuth {
 	/*
 	 * Returns true if the user in 'session' has 'priv' access to node.
 	 */
-	private boolean ancestorAuth(MongoSession session, SubNode node, List<PrivilegeType> privs) {
-		if (session.isAdmin())
+	private boolean ancestorAuth(MongoSession ms, SubNode node, List<PrivilegeType> privs) {
+		if (ms.isAdmin())
 			return true;
 		if (verbose)
 			log.trace("ancestorAuth: path=" + node.getPath());
 
 		/* get the non-null sessionUserNodeId if not anonymous user */
-		String sessionUserNodeId = session.getUserNodeId() != null ? session.getUserNodeId().toHexString() : null;
-		ObjectId sessId = session.getUserNodeId() != null ? session.getUserNodeId() : null;
+		String sessionUserNodeId = ms.getUserNodeId() != null ? ms.getUserNodeId().toHexString() : null;
+		ObjectId sessId = ms.getUserNodeId() != null ? ms.getUserNodeId() : null;
 
 		// scan up the tree until we find a node that allows access
 		while (node != null) {
@@ -395,7 +395,7 @@ public class MongoAuth {
 				return true;
 			}
 
-			node = read.getParent(session, node, false);
+			node = read.getParent(ms, node, false);
 			if (node != null) {
 				if (verbose)
 					log.trace("parent path=" + node.getPath());
@@ -454,7 +454,7 @@ public class MongoAuth {
 		return false;
 	}
 
-	public List<AccessControlInfo> getAclEntries(MongoSession session, SubNode node) {
+	public List<AccessControlInfo> getAclEntries(MongoSession ms, SubNode node) {
 		HashMap<String, AccessControl> aclMap = node.getAc();
 		if (aclMap == null) {
 			return null;
@@ -467,7 +467,7 @@ public class MongoAuth {
 		List<AccessControlInfo> ret = new LinkedList<>();
 
 		aclMap.forEach((k, v) -> {
-			AccessControlInfo acei = createAccessControlInfo(session, k, v.getPrvs());
+			AccessControlInfo acei = createAccessControlInfo(ms, k, v.getPrvs());
 			if (acei != null) {
 				ret.add(acei);
 			}
@@ -475,7 +475,7 @@ public class MongoAuth {
 		return ret.size() == 0 ? null : ret;
 	}
 
-	public AccessControlInfo createAccessControlInfo(MongoSession session, String principalId, String authType) {
+	public AccessControlInfo createAccessControlInfo(MongoSession ms, String principalId, String authType) {
 		String displayName = null;
 		String principalName = null;
 		String publicKey = null;
@@ -487,7 +487,7 @@ public class MongoAuth {
 		}
 		/* else we need the user name */
 		else {
-			SubNode principalNode = read.getNode(session, principalId, false);
+			SubNode principalNode = read.getNode(ms, principalId, false);
 			if (principalNode == null) {
 				return null;
 			}
@@ -511,11 +511,11 @@ public class MongoAuth {
 	 * being shared with), regardless of the type of share 'rd,rw'. To find public shares pass 'public'
 	 * in sharedTo instead
 	 */
-	public Iterable<SubNode> searchSubGraphByAclUser(MongoSession session, String pathToSearch, List<String> sharedToAny,
+	public Iterable<SubNode> searchSubGraphByAclUser(MongoSession ms, String pathToSearch, List<String> sharedToAny,
 			Sort sort, int limit, ObjectId ownerIdMatch) {
 
-		update.saveSession(session);
-		Query query = subGraphByAclUser_query(session, pathToSearch, sharedToAny, ownerIdMatch);
+		update.saveSession(ms);
+		Query query = subGraphByAclUser_query(ms, pathToSearch, sharedToAny, ownerIdMatch);
 		if (query == null)
 			return null;
 
@@ -532,17 +532,17 @@ public class MongoAuth {
 	 * shared with), regardless of the type of share 'rd,rw'. To find public shares pass 'public' in
 	 * sharedTo instead
 	 */
-	public long countSubGraphByAclUser(MongoSession session, String pathToSearch, List<String> sharedToAny,
+	public long countSubGraphByAclUser(MongoSession ms, String pathToSearch, List<String> sharedToAny,
 			ObjectId ownerIdMatch) {
-		update.saveSession(session);
-		Query query = subGraphByAclUser_query(session, pathToSearch, sharedToAny, ownerIdMatch);
+		update.saveSession(ms);
+		Query query = subGraphByAclUser_query(ms, pathToSearch, sharedToAny, ownerIdMatch);
 		if (query == null)
 			return 0L;
 		Long ret = ops.count(query, SubNode.class);
 		return ret;
 	}
 
-	private Query subGraphByAclUser_query(MongoSession session, String pathToSearch, List<String> sharedToAny,
+	private Query subGraphByAclUser_query(MongoSession ms, String pathToSearch, List<String> sharedToAny,
 			ObjectId ownerIdMatch) {
 		// this will be node.getPath() to search under the node, or null for searching
 		// under all user content.
@@ -576,10 +576,10 @@ public class MongoAuth {
 	// ========================================================================
 
 	/* Finds nodes that have any sharing on them at all */
-	public Iterable<SubNode> searchSubGraphByAcl(MongoSession session, int skip, String pathToSearch, ObjectId ownerIdMatch,
+	public Iterable<SubNode> searchSubGraphByAcl(MongoSession ms, int skip, String pathToSearch, ObjectId ownerIdMatch,
 			Sort sort, int limit) {
-		update.saveSession(session);
-		Query query = subGraphByAcl_query(session, pathToSearch, ownerIdMatch);
+		update.saveSession(ms);
+		Query query = subGraphByAcl_query(ms, pathToSearch, ownerIdMatch);
 
 		if (sort != null) {
 			query.with(sort);
@@ -594,13 +594,13 @@ public class MongoAuth {
 	}
 
 	/* Finds nodes that have any sharing on them at all */
-	public long countSubGraphByAcl(MongoSession session, String pathToSearch, ObjectId ownerIdMatch) {
-		update.saveSession(session);
-		Query query = subGraphByAcl_query(session, pathToSearch, ownerIdMatch);
+	public long countSubGraphByAcl(MongoSession ms, String pathToSearch, ObjectId ownerIdMatch) {
+		update.saveSession(ms);
+		Query query = subGraphByAcl_query(ms, pathToSearch, ownerIdMatch);
 		return ops.count(query, SubNode.class);
 	}
 
-	public Query subGraphByAcl_query(MongoSession session, String pathToSearch, ObjectId ownerIdMatch) {
+	public Query subGraphByAcl_query(MongoSession ms, String pathToSearch, ObjectId ownerIdMatch) {
 		Query query = new Query();
 
 		if (pathToSearch == null) {
@@ -655,21 +655,21 @@ public class MongoAuth {
 	 * existing) to the node sharing on the node, which ensures the person mentioned has visibility of
 	 * this node and that it will also appear in their FEED listing
 	 */
-	public HashSet<String> saveMentionsToNodeACL(MongoSession session, SubNode node) {
+	public HashSet<String> saveMentionsToNodeACL(MongoSession ms, SubNode node) {
 		HashSet<String> mentionsSet = parseMentions(node.getContent());
 		if (mentionsSet == null) {
 			return null;
 		}
-		return saveMentionsToNodeACL(mentionsSet, session, node);
+		return saveMentionsToNodeACL(mentionsSet, ms, node);
 	}
 
-	public HashSet<String> saveMentionsToNodeACL(HashSet<String> mentionsSet, MongoSession session, SubNode node) {
+	public HashSet<String> saveMentionsToNodeACL(HashSet<String> mentionsSet, MongoSession ms, SubNode node) {
 		boolean acChanged = false;
 		HashMap<String, AccessControl> ac = node.getAc();
 
 		// make sure all parsed toUserNamesSet user names are saved into the node acl */
 		for (String userName : mentionsSet) {
-			SubNode acctNode = read.getUserNodeByUserName(session, userName);
+			SubNode acctNode = read.getUserNodeByUserName(ms, userName);
 
 			/*
 			 * If this is a foreign 'mention' user name that is not imported into our system, we auto-import
@@ -707,7 +707,7 @@ public class MongoAuth {
 
 		if (acChanged) {
 			node.setAc(ac);
-			update.save(session, node);
+			update.save(ms, node);
 		}
 		return mentionsSet;
 	}

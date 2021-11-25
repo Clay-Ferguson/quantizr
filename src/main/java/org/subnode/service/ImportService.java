@@ -30,13 +30,13 @@ public class ImportService {
 	@Autowired
 	private MongoUpdate update;
 
-	public ResponseEntity<?> streamImport(MongoSession session, String nodeId, MultipartFile[] uploadFiles) {
+	public ResponseEntity<?> streamImport(MongoSession ms, String nodeId, MultipartFile[] uploadFiles) {
 		if (nodeId == null) {
 			throw ExUtil.wrapEx("target nodeId not provided");
 		}
-		session = ThreadLocals.ensure(session);
+		ms = ThreadLocals.ensure(ms);
 
-		SubNode node = read.getNode(session, nodeId);
+		SubNode node = read.getNode(ms, nodeId);
 		if (node == null) {
 			throw ExUtil.wrapEx("Node not found.");
 		}
@@ -59,8 +59,8 @@ public class ImportService {
 
 					ImportZipService importZipService = (ImportZipService) SpringContextUtil
 							.getBean(ImportZipService.class);
-					importZipService.importFromStream(session, in, node, false);
-					update.saveSession(session);
+					importZipService.importFromStream(ms, in, node, false);
+					update.saveSession(ms);
 				}
 				else if (fileName.toLowerCase().endsWith(".tar")) {
 					log.debug("Import TAR to Node: " + node.getPath());
@@ -68,8 +68,8 @@ public class ImportService {
 
 					ImportTarService importTarService = (ImportTarService)
 					SpringContextUtil.getBean(ImportTarService.class);
-					importTarService.importFromStream(session, in, node, false);
-					update.saveSession(session);
+					importTarService.importFromStream(ms, in, node, false);
+					update.saveSession(ms);
 				} else {
 					throw ExUtil.wrapEx("Only ZIP or TAR files are supported for importing.");
 				}

@@ -78,11 +78,11 @@ public class MongoRead {
     /**
      * Gets account name from the root node associated with whoever owns 'node'
      */
-    public String getNodeOwner(MongoSession session, SubNode node) {
+    public String getNodeOwner(MongoSession ms, SubNode node) {
         if (node.getOwner() == null) {
             throw new RuntimeEx("Node has null owner: " + XString.prettyPrint(node));
         }
-        SubNode userNode = getNode(session, node.getOwner());
+        SubNode userNode = getNode(ms, node.getOwner());
         return userNode.getStrProp(NodeProp.USER.s());
     }
 
@@ -90,30 +90,30 @@ public class MongoRead {
         return XString.truncateAfterLast(node.getPath(), "/");
     }
 
-    public long getChildCount(MongoSession session, SubNode node) {
+    public long getChildCount(MongoSession ms, SubNode node) {
         Query query = new Query();
         Criteria criteria = Criteria.where(SubNode.FIELD_PATH).regex(util.regexDirectChildrenOfPath(node.getPath()));
         query.addCriteria(criteria);
         return ops.count(query, SubNode.class);
     }
 
-    public boolean hasChildren(MongoSession session, SubNode node) {
+    public boolean hasChildren(MongoSession ms, SubNode node) {
         Query query = new Query();
         Criteria criteria = Criteria.where(SubNode.FIELD_PATH).regex(util.regexDirectChildrenOfPath(node.getPath()));
         query.addCriteria(criteria);
         return ops.exists(query, SubNode.class);
     }
 
-    public long getNodeCount(MongoSession session) {
-        if (session == null) {
-            session = auth.getAdminSession();
+    public long getNodeCount(MongoSession ms) {
+        if (ms == null) {
+            ms = auth.getAdminSession();
         }
         Query query = new Query();
         return ops.count(query, SubNode.class);
     }
 
-    public SubNode getChildAt(MongoSession session, SubNode node, long idx) {
-        auth.auth(session, node, PrivilegeType.READ);
+    public SubNode getChildAt(MongoSession ms, SubNode node, long idx) {
+        auth.auth(ms, node, PrivilegeType.READ);
         Query query = new Query();
         Criteria criteria = Criteria.where(//
                 SubNode.FIELD_PATH).regex(util.regexDirectChildrenOfPath(node.getPath()))//
@@ -125,7 +125,7 @@ public class MongoRead {
     }
 
     /* Throws an exception if the parent of 'node' does not exist */
-    public void checkParentExists(MongoSession session, SubNode node) {
+    public void checkParentExists(MongoSession ms, SubNode node) {
         boolean isRootPath = util.isRootPath(node.getPath());
         if (node.isDisableParentCheck() || isRootPath)
             return;
@@ -144,7 +144,7 @@ public class MongoRead {
             return;
         }
 
-        SubNode parentNode = getNode(session, parentPath, false);
+        SubNode parentNode = getNode(ms, parentPath, false);
         if (parentNode != null)
             return;
 
@@ -157,8 +157,8 @@ public class MongoRead {
         }
     }
 
-    public SubNode getNodeByName(MongoSession session, String name) {
-        return getNodeByName(session, name, true);
+    public SubNode getNodeByName(MongoSession ms, String name) {
+        return getNodeByName(ms, name, true);
     }
 
     /*
@@ -168,7 +168,7 @@ public class MongoRead {
      * 
      * 2) "userName:nodeName" (a named node some user has created)
      */
-    public SubNode getNodeByName(MongoSession session, String name, boolean allowAuth) {
+    public SubNode getNodeByName(MongoSession ms, String name, boolean allowAuth) {
         Query query = new Query();
 
         if (name == null)
@@ -215,14 +215,14 @@ public class MongoRead {
         }
 
         if (allowAuth) {
-            auth.auth(session, ret, PrivilegeType.READ);
+            auth.auth(ms, ret, PrivilegeType.READ);
         }
 
         return ret;
     }
 
-    public SubNode getNode(MongoSession session, String identifier) {
-        return getNode(session, identifier, true);
+    public SubNode getNode(MongoSession ms, String identifier) {
+        return getNode(ms, identifier, true);
     }
 
     /**
@@ -238,7 +238,7 @@ public class MongoRead {
      *    (we support just '~inbox' also as a type shorthand where the sn: is missing)
      * </pre>
      */
-    public SubNode getNode(MongoSession session, String identifier, boolean allowAuth) {
+    public SubNode getNode(MongoSession ms, String identifier, boolean allowAuth) {
         if (identifier == null)
             return null;
         if (identifier.equals("/")) {
@@ -253,15 +253,15 @@ public class MongoRead {
             if (!typeName.startsWith("sn:")) {
                 typeName = "sn:" + typeName;
             }
-            ret = getUserNodeByType(session, session.getUserName(), null, null, typeName, null, null);
+            ret = getUserNodeByType(ms, ms.getUserName(), null, null, typeName, null, null);
         }
         // Node name lookups are done by prefixing the search with a colon (:)
         else if (identifier.startsWith(":")) {
-            ret = getNodeByName(session, identifier.substring(1), allowAuth);
+            ret = getNodeByName(ms, identifier.substring(1), allowAuth);
         }
         // If search doesn't start with a slash then it's a nodeId and not a path
         else if (!identifier.startsWith("/")) {
-            ret = getNode(session, new ObjectId(identifier), allowAuth);
+            ret = getNode(ms, new ObjectId(identifier), allowAuth);
         }
         // otherwise this is a path lookup
         else {
@@ -269,7 +269,7 @@ public class MongoRead {
         }
 
         if (allowAuth) {
-            auth.auth(session, ret, PrivilegeType.READ);
+            auth.auth(ms, ret, PrivilegeType.READ);
         }
         return ret;
     }
@@ -285,20 +285,20 @@ public class MongoRead {
         return ret;
     }
 
-    public boolean nodeExists(MongoSession session, ObjectId id) {
+    public boolean nodeExists(MongoSession ms, ObjectId id) {
         Query query = new Query();
         query.addCriteria(Criteria.where(SubNode.FIELD_ID).is(id));
         return ops.exists(query, SubNode.class);
     }
 
-    public SubNode getNode(MongoSession session, ObjectId objId) {
-        return getNode(session, objId, true);
+    public SubNode getNode(MongoSession ms, ObjectId objId) {
+        return getNode(ms, objId, true);
     }
 
-    public SubNode getNode(MongoSession session, ObjectId objId, boolean allowAuth) {
+    public SubNode getNode(MongoSession ms, ObjectId objId, boolean allowAuth) {
         SubNode ret = util.findById(objId);
         if (ret != null && allowAuth) {
-            auth.auth(session, ret, PrivilegeType.READ);
+            auth.auth(ms, ret, PrivilegeType.READ);
         }
         return ret;
     }
@@ -307,23 +307,23 @@ public class MongoRead {
     // notifications sent to any threads that are waiting to lookup a node
     // once it exists, but we will STILL probably need to DO the lookup so we don't
     // have concurrent access threading bug.
-    public SubNode getNode(MongoSession session, ObjectId objId, boolean allowAuth, int retries) {
-        SubNode ret = getNode(session, objId, allowAuth);
+    public SubNode getNode(MongoSession ms, ObjectId objId, boolean allowAuth, int retries) {
+        SubNode ret = getNode(ms, objId, allowAuth);
         while (ret == null && retries-- > 0) {
             Util.sleep(3000);
-            ret = getNode(session, objId, allowAuth);
+            ret = getNode(ms, objId, allowAuth);
         }
         return ret;
     }
 
-    public SubNode getParent(MongoSession session, SubNode node) {
-        return getParent(session, node, true);
+    public SubNode getParent(MongoSession ms, SubNode node) {
+        return getParent(ms, node, true);
     }
 
     /*
      * WARNING: This always converts a 'pending' path to a non-pending one (/r/p/ v.s. /r/)
      */
-    public SubNode getParent(MongoSession session, SubNode node, boolean allowAuth) {
+    public SubNode getParent(MongoSession ms, SubNode node, boolean allowAuth) {
         String path = node.getPath();
         if ("/".equals(path)) {
             return null;
@@ -340,17 +340,17 @@ public class MongoRead {
          */
         parentPath = parentPath.replace(pendingPath, rootPath);
 
-        SubNode ret = getNode(session, parentPath);
+        SubNode ret = getNode(ms, parentPath);
         if (ret != null && allowAuth) {
-            auth.auth(session, ret, PrivilegeType.READ);
+            auth.auth(ms, ret, PrivilegeType.READ);
         }
 
         return ret;
     }
 
-    public List<SubNode> getChildrenAsList(MongoSession session, SubNode node, boolean ordered, Integer limit) {
+    public List<SubNode> getChildrenAsList(MongoSession ms, SubNode node, boolean ordered, Integer limit) {
         Iterable<SubNode> iter =
-                getChildren(session, node, ordered ? Sort.by(Sort.Direction.ASC, SubNode.FIELD_ORDINAL) : null, limit, 0);
+                getChildren(ms, node, ordered ? Sort.by(Sort.Direction.ASC, SubNode.FIELD_ORDINAL) : null, limit, 0);
         return iterateToList(iter);
     }
 
@@ -363,8 +363,8 @@ public class MongoRead {
         return list;
     }
 
-    public List<String> getChildrenIds(MongoSession session, SubNode node, boolean ordered, Integer limit) {
-        auth.auth(session, node, PrivilegeType.READ);
+    public List<String> getChildrenIds(MongoSession ms, SubNode node, boolean ordered, Integer limit) {
+        auth.auth(ms, node, PrivilegeType.READ);
 
         Query query = new Query();
         if (limit != null) {
@@ -401,7 +401,7 @@ public class MongoRead {
      * If node is null it's path is considered empty string, and it represents the 'root' of the tree.
      * There is no actual NODE that is root node,
      */
-    public Iterable<SubNode> getChildrenUnderParentPath(MongoSession session, String path, Sort sort, Integer limit, int skip,
+    public Iterable<SubNode> getChildrenUnderParentPath(MongoSession ms, String path, Sort sort, Integer limit, int skip,
             TextCriteria textCriteria, Criteria moreCriteria) {
 
         Query query = new Query();
@@ -446,14 +446,14 @@ public class MongoRead {
      * If node is null it's path is considered empty string, and it represents the 'root' of the tree.
      * There is no actual NODE that is root node
      */
-    public Iterable<SubNode> getChildren(MongoSession session, SubNode node, Sort sort, Integer limit, int skip) {
-        auth.auth(session, node, PrivilegeType.READ);
-        return getChildrenUnderParentPath(session, node.getPath(), sort, limit, skip, null, null);
+    public Iterable<SubNode> getChildren(MongoSession ms, SubNode node, Sort sort, Integer limit, int skip) {
+        auth.auth(ms, node, PrivilegeType.READ);
+        return getChildrenUnderParentPath(ms, node.getPath(), sort, limit, skip, null, null);
     }
 
-    public Iterable<SubNode> getChildren(MongoSession session, SubNode node) {
-        auth.auth(session, node, PrivilegeType.READ);
-        return getChildrenUnderParentPath(session, node.getPath(), null, null, 0, null, null);
+    public Iterable<SubNode> getChildren(MongoSession ms, SubNode node) {
+        auth.auth(ms, node, PrivilegeType.READ);
+        return getChildrenUnderParentPath(ms, node.getPath(), null, null, 0, null, null);
     }
 
     /*
@@ -463,7 +463,7 @@ public class MongoRead {
      * top one and using that for my MAX operation. AFAIK this might even be the most efficient
      * approach. Who knows.
      */
-    public Long getMaxChildOrdinal(MongoSession session, SubNode node) {
+    public Long getMaxChildOrdinal(MongoSession ms, SubNode node) {
         // Do not delete this commented stuff. Can be helpful to get aggregates
         // working.
         // MatchOperation match = new
@@ -482,7 +482,7 @@ public class MongoRead {
         // SubNode.class);
         // List<SubNode> orderCount = results.getMappedResults();
 
-        auth.auth(session, node, PrivilegeType.READ);
+        auth.auth(ms, node, PrivilegeType.READ);
 
         // todo-2: research if there's a way to query for just one, rather than simply
         // callingfindOne at the end? What's best practice here?
@@ -500,8 +500,8 @@ public class MongoRead {
         return nodeFound.getOrdinal();
     }
 
-    public SubNode getNewestChild(MongoSession session, SubNode node) {
-        auth.auth(session, node, PrivilegeType.READ);
+    public SubNode getNewestChild(MongoSession ms, SubNode node) {
+        auth.auth(ms, node, PrivilegeType.READ);
 
         Query query = new Query();
         Criteria criteria = Criteria.where(SubNode.FIELD_PATH).regex(util.regexDirectChildrenOfPath(node.getPath()));
@@ -512,8 +512,8 @@ public class MongoRead {
         return nodeFound;
     }
 
-    public SubNode getSiblingAbove(MongoSession session, SubNode node) {
-        auth.auth(session, node, PrivilegeType.READ);
+    public SubNode getSiblingAbove(MongoSession ms, SubNode node) {
+        auth.auth(ms, node, PrivilegeType.READ);
 
         if (node.getOrdinal() == null) {
             node.setOrdinal(0L);
@@ -534,8 +534,8 @@ public class MongoRead {
         return nodeFound;
     }
 
-    public SubNode getSiblingBelow(MongoSession session, SubNode node) {
-        auth.auth(session, node, PrivilegeType.READ);
+    public SubNode getSiblingBelow(MongoSession ms, SubNode node) {
+        auth.auth(ms, node, PrivilegeType.READ);
         if (node.getOrdinal() == null) {
             node.setOrdinal(0L);
         }
@@ -558,8 +558,8 @@ public class MongoRead {
     /*
      * Gets (recursively) all nodes under 'node', by using all paths starting with the path of that node
      */
-    public Iterable<SubNode> getSubGraph(MongoSession session, SubNode node, Sort sort, int limit) {
-        auth.auth(session, node, PrivilegeType.READ);
+    public Iterable<SubNode> getSubGraph(MongoSession ms, SubNode node, Sort sort, int limit) {
+        auth.auth(ms, node, PrivilegeType.READ);
 
         Query query = new Query();
         /*
@@ -591,10 +591,10 @@ public class MongoRead {
      * 
      * timeRangeType: futureOnly, pastOnly, all
      */
-    public Iterable<SubNode> searchSubGraph(MongoSession session, SubNode node, String prop, String text, String sortField,
+    public Iterable<SubNode> searchSubGraph(MongoSession ms, SubNode node, String prop, String text, String sortField,
             String sortDir, int limit, int skip, boolean fuzzy, boolean caseSensitive, String timeRangeType, boolean recursive,
             boolean requirePriority) {
-        auth.auth(session, node, PrivilegeType.READ);
+        auth.auth(ms, node, PrivilegeType.READ);
 
         List<CriteriaDefinition> criterias = new LinkedList<>();
         Sort sort = null;
@@ -743,8 +743,8 @@ public class MongoRead {
     /**
      * Special purpose query to get all nodes that have a "date" property.
      */
-    public Iterable<SubNode> getCalendar(MongoSession session, SubNode node) {
-        auth.auth(session, node, PrivilegeType.READ);
+    public Iterable<SubNode> getCalendar(MongoSession ms, SubNode node) {
+        auth.auth(ms, node, PrivilegeType.READ);
 
         Query query = new Query();
         Criteria criteria = Criteria.where(SubNode.FIELD_PATH).regex(util.regexRecursiveChildrenOfPath(node.getPath()));
@@ -764,8 +764,8 @@ public class MongoRead {
      * todo-2: This is very low hanging fruit to make this a feature on the Search menu. In other words
      * implementing an "All Named Nodes" search would be trivial with this.
      */
-    public Iterable<SubNode> getNamedNodes(MongoSession session, SubNode node) {
-        auth.auth(session, node, PrivilegeType.READ);
+    public Iterable<SubNode> getNamedNodes(MongoSession ms, SubNode node) {
+        auth.auth(ms, node, PrivilegeType.READ);
 
         Query query = new Query();
         Criteria criteria = Criteria.where(SubNode.FIELD_PATH).regex(util.regexRecursiveChildrenOfPath(node.getPath()));
@@ -782,13 +782,13 @@ public class MongoRead {
      * todo-1: For each different 'type' call to this method we just need a dedicated method that takes
      * no arguments in order to wap it so that the parameter sets aren't scattered/repeated in the code
      */
-    public SubNode getUserNodeByType(MongoSession session, String userName, SubNode userNode, String content, String type,
+    public SubNode getUserNodeByType(MongoSession ms, String userName, SubNode userNode, String content, String type,
             List<String> defaultPrivs, String defaultName) {
         if (userNode == null) {
             if (userName == null) {
                 userName = ThreadLocals.getSC().getUserName();
             }
-            userNode = getUserNodeByUserName(session, userName);
+            userNode = getUserNodeByUserName(ms, userName);
         }
 
         if (userNode == null) {
@@ -797,10 +797,10 @@ public class MongoRead {
         }
 
         String path = userNode.getPath();
-        SubNode node = findTypedNodeUnderPath(session, path, type);
+        SubNode node = findTypedNodeUnderPath(ms, path, type);
 
         if (node == null) {
-            node = create.createNode(session, userNode, null, type, 0L, CreateNodeLocation.LAST, null, null, true);
+            node = create.createNode(ms, userNode, null, type, 0L, CreateNodeLocation.LAST, null, null, true);
             node.setOwner(userNode.getId());
 
             if (content == null) {
@@ -814,10 +814,10 @@ public class MongoRead {
             }
 
             if (defaultPrivs != null) {
-                aclService.addPrivilege(session, node, PrincipalName.PUBLIC.s(), defaultPrivs, null);
+                aclService.addPrivilege(ms, node, PrincipalName.PUBLIC.s(), defaultPrivs, null);
             }
 
-            update.save(session, node);
+            update.save(ms, node);
         }
 
         /*
@@ -826,8 +826,8 @@ public class MongoRead {
          */
         if (node != null && NodeType.POSTS.s().equals(type) && !NodeName.POSTS.equals(node.getName())) {
             node.setName(NodeName.POSTS);
-            aclService.addPrivilege(session, node, PrincipalName.PUBLIC.s(), Arrays.asList(PrivilegeType.READ.s()), null);
-            update.save(session, node);
+            aclService.addPrivilege(ms, node, PrincipalName.PUBLIC.s(), Arrays.asList(PrivilegeType.READ.s()), null);
+            update.save(ms, node);
         }
         return node;
     }
@@ -870,11 +870,11 @@ public class MongoRead {
         return userName.substring(0, atIdx);
     }
 
-    public SubNode getUserNodeByUserName(MongoSession session, String user) {
-        return getUserNodeByUserName(session, user, true);
+    public SubNode getUserNodeByUserName(MongoSession ms, String user) {
+        return getUserNodeByUserName(ms, user, true);
     }
 
-    public SubNode getUserNodeByUserName(MongoSession session, String user, boolean allowAuth) {
+    public SubNode getUserNodeByUserName(MongoSession ms, String user, boolean allowAuth) {
         String cacheKey = "USRNODE-" + user;
         SubNode ret = ThreadLocals.getCachedNode(cacheKey);
         if (ret != null) {
@@ -889,8 +889,8 @@ public class MongoRead {
         // character.
         user = convertIfLocalName(user);
 
-        if (session == null) {
-            session = auth.getAdminSession();
+        if (ms == null) {
+            ms = auth.getAdminSession();
         }
 
         // For the ADMIN user their root node is considered to be the entire root of the
@@ -911,7 +911,7 @@ public class MongoRead {
 
         ret = util.findOne(query);
         if (allowAuth) {
-            auth.auth(session, ret, PrivilegeType.READ);
+            auth.auth(ms, ret, PrivilegeType.READ);
         }
         if (ret != null) {
             ThreadLocals.cacheNode(cacheKey, ret);
@@ -923,7 +923,7 @@ public class MongoRead {
      * Finds and returns the first node matching userName and type under the 'node', or null if not
      * existing
      */
-    public SubNode findNodeByUserAndType(MongoSession session, SubNode node, String userName, String type) {
+    public SubNode findNodeByUserAndType(MongoSession ms, SubNode node, String userName, String type) {
 
         // Other wise for ordinary users root is based off their username
         Query query = new Query();
@@ -941,7 +941,7 @@ public class MongoRead {
     /*
      * Finds the first node matching 'type' under 'path' (non-recursively, direct children only)
      */
-    public SubNode findTypedNodeUnderPath(MongoSession session, String path, String type) {
+    public SubNode findTypedNodeUnderPath(MongoSession ms, String path, String type) {
 
         // Other wise for ordinary users root is based off their username
         Query query = new Query();
@@ -952,7 +952,7 @@ public class MongoRead {
         query.addCriteria(criteria);
         SubNode ret = util.findOne(query);
 
-        auth.auth(session, ret, PrivilegeType.READ);
+        auth.auth(ms, ret, PrivilegeType.READ);
         return ret;
     }
 
@@ -963,20 +963,20 @@ public class MongoRead {
     /*
      * Finds the first node matching 'type' under 'path' (non-recursively, direct children only)
      */
-    public Iterable<SubNode> findTypedNodesUnderPath(MongoSession session, String path, String type) {
-        Query query = typedNodesUnderPath_query(session, path, type);
+    public Iterable<SubNode> findTypedNodesUnderPath(MongoSession ms, String path, String type) {
+        Query query = typedNodesUnderPath_query(ms, path, type);
         return util.find(query);
     }
 
     /*
      * Finds the first node matching 'type' under 'path' (non-recursively, direct children only)
      */
-    public long countTypedNodesUnderPath(MongoSession session, String path, String type) {
-        Query query = typedNodesUnderPath_query(session, path, type);
+    public long countTypedNodesUnderPath(MongoSession ms, String path, String type) {
+        Query query = typedNodesUnderPath_query(ms, path, type);
         return ops.count(query, SubNode.class);
     }
 
-    public Query typedNodesUnderPath_query(MongoSession session, String path, String type) {
+    public Query typedNodesUnderPath_query(MongoSession ms, String path, String type) {
         Query query = new Query();
         Criteria criteria = Criteria.where(SubNode.FIELD_PATH).regex(util.regexRecursiveChildrenOfPath(path))//
                 .and(SubNode.FIELD_TYPE).is(type);
@@ -991,7 +991,7 @@ public class MongoRead {
      * Returns one (or first) node contained directly under path (non-recursively) that has a matching
      * propName and propVal
      */
-    public SubNode findSubNodeByProp(MongoSession session, String path, String propName, String propVal) {
+    public SubNode findSubNodeByProp(MongoSession ms, String path, String propName, String propVal) {
 
         // Other wise for ordinary users root is based off their username
         Query query = new Query();
@@ -1001,7 +1001,7 @@ public class MongoRead {
 
         query.addCriteria(criteria);
         SubNode ret = util.findOne(query);
-        auth.auth(session, ret, PrivilegeType.READ);
+        auth.auth(ms, ret, PrivilegeType.READ);
         return ret;
     }
 
@@ -1009,7 +1009,7 @@ public class MongoRead {
      * Same as findSubNodeByProp but returns multiples. Finda ALL nodes contained directly under path
      * (non-recursively) that has a matching propName and propVal
      */
-    public Iterable<SubNode> findSubNodesByProp(MongoSession session, String path, String propName, String propVal) {
+    public Iterable<SubNode> findSubNodesByProp(MongoSession ms, String path, String propName, String propVal) {
 
         // Other wise for ordinary users root is based off their username
         Query query = new Query();
@@ -1024,16 +1024,16 @@ public class MongoRead {
     /*
      * Returns one (or first) node that has a matching propName and propVal
      */
-    public SubNode findSubNodeByProp(MongoSession session, String propName, String propVal) {
+    public SubNode findSubNodeByProp(MongoSession ms, String propName, String propVal) {
         Query query = new Query();
         Criteria criteria = Criteria.where(SubNode.FIELD_PROPERTIES + "." + propName + ".value").is(propVal);
         query.addCriteria(criteria);
         SubNode ret = util.findOne(query);
-        auth.auth(session, ret, PrivilegeType.READ);
+        auth.auth(ms, ret, PrivilegeType.READ);
         return ret;
     }
 
-    public SubNode findByIPFSPinned(MongoSession session, String cid) {
+    public SubNode findByIPFSPinned(MongoSession ms, String cid) {
         Query query = new Query();
 
         /* Match the PIN to cid */
@@ -1044,7 +1044,7 @@ public class MongoRead {
 
         query.addCriteria(criteria);
         SubNode ret = util.findOne(query);
-        auth.auth(session, ret, PrivilegeType.READ);
+        auth.auth(ms, ret, PrivilegeType.READ);
         return ret;
     }
 }

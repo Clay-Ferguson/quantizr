@@ -36,11 +36,11 @@ public class MongoDelete {
 	@Autowired
 	private MongoUtil util;
 
-	public void deleteNode(MongoSession session, SubNode node, boolean childrenOnly) {
+	public void deleteNode(MongoSession ms, SubNode node, boolean childrenOnly) {
 		if (!childrenOnly) {
-			attachmentService.deleteBinary(session, "", node, null);
+			attachmentService.deleteBinary(ms, "", node, null);
 		}
-		delete(session, node, childrenOnly);
+		delete(ms, node, childrenOnly);
 	}
 
 	/*
@@ -49,7 +49,7 @@ public class MongoDelete {
 	 * the browser or cancel the editing and orphan the node that way, and this method which we call
 	 * only at startup, cleans up any and all of the orphans
 	 */
-	public void removeAbandonedNodes(MongoSession session) {
+	public void removeAbandonedNodes(MongoSession ms) {
 		Query query = new Query();
 		query.addCriteria(Criteria.where(SubNode.FIELD_MODIFY_TIME).is(null));
 
@@ -61,7 +61,7 @@ public class MongoDelete {
 	 * Deletes old activity pub posts, just to save space on our server. This destroys perfectly good
 	 * data so we need to make it an admin option (todo-1)
 	 */
-	public long deleteOldActPubPosts(SubNode parent, MongoSession session) {
+	public long deleteOldActPubPosts(SubNode parent, MongoSession ms) {
 		Query query = new Query();
 
 		// date 30 days ago.
@@ -78,7 +78,7 @@ public class MongoDelete {
 	}
 
 	/* This is a way to cleanup old records, but it's needed yet */
-	public void cleanupOldTempNodesForUser(MongoSession session, SubNode userNode) {
+	public void cleanupOldTempNodesForUser(MongoSession ms, SubNode userNode) {
 		Query query = new Query();
 
 		LocalDate ldt = LocalDate.now().minusDays(5);
@@ -124,11 +124,11 @@ public class MongoDelete {
 	 * Said more simply: Replace 'regexRecursiveChildrenOfPath' with 'regexDirectChildrenOfPath' in this
 	 * method if you want to increase performance of deletes at the cost of some additional memory.
 	 */
-	public long delete(MongoSession session, SubNode node, boolean childrenOnly) {
-		auth.ownerAuth(session, node);
+	public long delete(MongoSession ms, SubNode node, boolean childrenOnly) {
+		auth.ownerAuth(ms, node);
 		log.debug("Deleting under path: " + node.getPath());
 
-		update.saveSession(session);
+		update.saveSession(ms);
 
 		/*
 		 * First delete all the children of the node by using the path, knowing all their paths 'start with'
@@ -172,14 +172,14 @@ public class MongoDelete {
 	 * This algorithm requires one hash value of memory for every non-leaf node in the DB to run so it's
 	 * very fast but at the cost of memory use
 	 */
-	public void deleteNodeOrphans(MongoSession session) {
+	public void deleteNodeOrphans(MongoSession ms) {
 		log.debug("deleteNodeOrphans()");
 		// long nodeCount = read.getNodeCount(null);
 		// log.debug("initial Node Count: " + nodeCount);
 
 		HashSet<String> pathHashSet = new HashSet<>();
-		if (session == null) {
-			session = auth.getAdminSession();
+		if (ms == null) {
+			ms = auth.getAdminSession();
 		}
 
 		Query query = new Query();

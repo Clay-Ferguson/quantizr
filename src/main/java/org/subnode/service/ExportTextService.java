@@ -56,9 +56,9 @@ public class ExportTextService {
 	 * repository root, then we don't expect a filename, because we will generate a
 	 * timestamped one.
 	 */
-	public void export(MongoSession session, ExportRequest req, ExportResponse res) {
-		session = ThreadLocals.ensure(session);
-		this.session = session;
+	public void export(MongoSession ms, ExportRequest req, ExportResponse res) {
+		ms = ThreadLocals.ensure(ms);
+		this.session = ms;
 		this.req = req;
 		this.res = res;
 		String nodeId = req.getNodeId();
@@ -71,19 +71,19 @@ public class ExportTextService {
 			throw ExUtil.wrapEx("Exporting entire repository is not supported.");
 		} else {
 			log.info("Exporting to Text File");
-			exportNodeToFile(session, nodeId);
+			exportNodeToFile(ms, nodeId);
 			res.setFileName(shortFileName);
 		}
 
 		res.setSuccess(true);
 	}
 
-	private void exportNodeToFile(MongoSession session, String nodeId) {
+	private void exportNodeToFile(MongoSession ms, String nodeId) {
 		if (!FileUtils.dirExists(appProp.getAdminDataFolder())) {
 			throw ExUtil.wrapEx("adminDataFolder does not exist.");
 		}
 
-		SubNode exportNode = read.getNode(session, nodeId, true);
+		SubNode exportNode = read.getNode(ms, nodeId, true);
 		String fileName = snUtil.getExportFileName(req.getFileName(), exportNode);
 		shortFileName = fileName + ".md";
 		fullFileName = appProp.getAdminDataFolder() + File.separator + shortFileName;
@@ -101,8 +101,8 @@ public class ExportTextService {
 				try {
 					is = new FileInputStream(fullFileName);
 					String mime = "text/markdown";
-					MerkleLink ret = ipfs.addFromStream(session, is, shortFileName, mime, null, null, false);
-					ipfs.writeIpfsExportNode(session, ret.getHash(), mime, shortFileName, null);
+					MerkleLink ret = ipfs.addFromStream(ms, is, shortFileName, mime, null, null, false);
+					ipfs.writeIpfsExportNode(ms, ret.getHash(), mime, shortFileName, null);
 					res.setIpfsCid(ret.getHash());
 					res.setIpfsMime(mime);
 				} finally {

@@ -229,21 +229,21 @@ public class MongoTest implements TestIntf {
 		}
 	}
 
-	public void runBinaryTests(MongoSession session) {
+	public void runBinaryTests(MongoSession ms) {
 		log.debug("Running binaries tests.");
 
 		try {
-			SubNode node = create.createNode(session, "/binaries");
-			update.save(session, node);
-			int maxFileSize = userManagerService.getMaxUploadSize(session);
-			attachmentService.writeStream(session, "", node,
+			SubNode node = create.createNode(ms, "/binaries");
+			update.save(ms, node);
+			int maxFileSize = userManagerService.getMaxUploadSize(ms);
+			attachmentService.writeStream(ms, "", node,
 					new LimitedInputStreamEx(new FileInputStream("/home/clay/test-image.png"), maxFileSize), null, "image/png",
 					null);
-			update.save(session, node);
+			update.save(ms, node);
 
 			log.debug("inserted root for binary testing.", null, "image/png", null);
 
-			InputStream inStream = attachmentService.getStream(session, "", node, true);
+			InputStream inStream = attachmentService.getStream(ms, "", node, true);
 			FileUtils.copyInputStreamToFile(inStream, new File("/home/clay/test-image2.png"));
 			log.debug("completed reading back the file, and writing out a copy.");
 		} catch (Exception e) {
@@ -256,12 +256,12 @@ public class MongoTest implements TestIntf {
 		if (userNode == null) {
 			throw new RuntimeException("UserNode not found for userName " + userName);
 		}
-		MongoSession session = new MongoSession(userName, userNode.getId());
-		asSession(session);
-		return session;
+		MongoSession ms = new MongoSession(userName, userNode.getId());
+		asSession(ms);
+		return ms;
 	}
 
-	private void asSession(MongoSession session) {
-		ThreadLocals.setMongoSession(session);
+	private void asSession(MongoSession ms) {
+		ThreadLocals.setMongoSession(ms);
 	}
 }

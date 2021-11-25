@@ -215,7 +215,7 @@ public class MongoUtil {
 			return;
 		}
 
-		arun.run((MongoSession session) -> {
+		arun.run(ms -> {
 			for (String accountInfo : testUserAccountsList) {
 				log.debug("Verifying test Account: " + accountInfo);
 
@@ -227,7 +227,7 @@ public class MongoUtil {
 
 				String userName = accountInfoList.get(0);
 
-				SubNode ownerNode = read.getUserNodeByUserName(session, userName);
+				SubNode ownerNode = read.getUserNodeByUserName(ms, userName);
 				if (ownerNode == null) {
 					log.debug("userName not found: " + userName + ". Account will be created.");
 					SignupRequest signupReq = new SignupRequest();
@@ -284,9 +284,9 @@ public class MongoUtil {
 		return path.startsWith("/") && path.substring(1).indexOf("/") == -1;
 	}
 
-	public Iterable<SubNode> findAllNodes(MongoSession session) {
-		auth.requireAdmin(session);
-		update.saveSession(session);
+	public Iterable<SubNode> findAllNodes(MongoSession ms) {
+		auth.requireAdmin(ms);
+		update.saveSession(ms);
 		return ops.findAll(SubNode.class);
 	}
 
@@ -325,11 +325,11 @@ public class MongoUtil {
 		return "Node Count: " + numDocs + "<br>Total JSON Size: " + kb + " KB<br>";
 	}
 
-	public void convertDb(MongoSession session) {
+	public void convertDb(MongoSession ms) {
 		// processAllNodes(session);
 	}
 
-	public void processAllNodes(MongoSession session) {
+	public void processAllNodes(MongoSession ms) {
 		// ValContainer<Long> nodesProcessed = new ValContainer<Long>(0L);
 
 		// Query query = new Query();
@@ -392,22 +392,22 @@ public class MongoUtil {
 		return count;
 	}
 
-	public void rebuildIndexes(MongoSession session) {
-		dropAllIndexes(session);
-		createAllIndexes(session);
+	public void rebuildIndexes(MongoSession ms) {
+		dropAllIndexes(ms);
+		createAllIndexes(ms);
 	}
 
 	// DO NOT DELETE:
 	// Leaving this here for future reference for any DB-conversions.
 	// This code was for removing dupliate apids and renaming a property
-	public void preprocessDatabase(MongoSession session) {
+	public void preprocessDatabase(MongoSession ms) {
 		// NO LONGER NEEDED.
 		// This was a one time conversion to get the DB updated to the newer shorter path parts.
 		// shortenPathParts(session);
 	}
 
 	// Alters all paths parts that are over 10 characters long, on all nodes
-	public void shortenPathParts(MongoSession session) {
+	public void shortenPathParts(MongoSession ms) {
 		int lenLimit = 10;
 		Iterable<SubNode> nodes = ops.findAll(SubNode.class);
 		HashMap<String, Integer> set = new HashMap<>();
@@ -465,13 +465,13 @@ public class MongoUtil {
 		log.debug("PATH PROCESSING DONE: maxPathLen=" + maxPathLen);
 	}
 
-	public void createAllIndexes(MongoSession session) {
-		preprocessDatabase(session);
+	public void createAllIndexes(MongoSession ms) {
+		preprocessDatabase(ms);
 		log.debug("checking all indexes.");
 
 		ops.indexOps(FediverseName.class).ensureIndex(new Index().on(FediverseName.FIELD_NAME, Direction.ASC).unique());
 
-		createUniqueIndex(session, SubNode.class, SubNode.FIELD_PATH);
+		createUniqueIndex(ms, SubNode.class, SubNode.FIELD_PATH);
 
 		// Other indexes that *could* be added but we don't, just as a performance enhancer is
 		// Unique node names: Key = node.owner+node.name (or just node.name for admin)
@@ -479,35 +479,35 @@ public class MongoUtil {
 		// account)
 
 		// dropIndex(session, SubNode.class, "unique-apid");
-		createPartialUniqueIndex(session, "unique-apid", SubNode.class,
+		createPartialUniqueIndex(ms, "unique-apid", SubNode.class,
 				SubNode.FIELD_PROPERTIES + "." + NodeProp.ACT_PUB_ID.s() + ".value");
 
-		createUniqueFriendsIndex(session);
-		createUniqueNodeNameIndex(session);
+		createUniqueFriendsIndex(ms);
+		createUniqueNodeNameIndex(ms);
 
 		/*
 		 * NOTE: Every non-admin owned noded must have only names that are prefixed with "UserName--" of the
 		 * user. That is, prefixed by their username followed by two dashes
 		 */
-		createIndex(session, SubNode.class, SubNode.FIELD_NAME);
-		createIndex(session, SubNode.class, SubNode.FIELD_TYPE);
+		createIndex(ms, SubNode.class, SubNode.FIELD_NAME);
+		createIndex(ms, SubNode.class, SubNode.FIELD_TYPE);
 
-		createIndex(session, SubNode.class, SubNode.FIELD_OWNER);
-		createIndex(session, SubNode.class, SubNode.FIELD_ORDINAL);
-		createIndex(session, SubNode.class, SubNode.FIELD_MODIFY_TIME, Direction.DESC);
-		createIndex(session, SubNode.class, SubNode.FIELD_CREATE_TIME, Direction.DESC);
-		createTextIndexes(session, SubNode.class);
+		createIndex(ms, SubNode.class, SubNode.FIELD_OWNER);
+		createIndex(ms, SubNode.class, SubNode.FIELD_ORDINAL);
+		createIndex(ms, SubNode.class, SubNode.FIELD_MODIFY_TIME, Direction.DESC);
+		createIndex(ms, SubNode.class, SubNode.FIELD_CREATE_TIME, Direction.DESC);
+		createTextIndexes(ms, SubNode.class);
 
-		logIndexes(session, SubNode.class);
+		logIndexes(ms, SubNode.class);
 	}
 
 	/* Creates an index which will guarantee no duplicate friends can be 
 	created. Note this one index also makes it impossible to have the same user both blocked and followed
 	becasue those are both saved as FRIEND nodes on the tree and therefore would violate this constraint
 	which is exactly what we want. */
-	public void createUniqueFriendsIndex(MongoSession session) {
-		auth.requireAdmin(session);
-		update.saveSession(session);
+	public void createUniqueFriendsIndex(MongoSession ms) {
+		auth.requireAdmin(ms);
+		update.saveSession(ms);
 		String indexName = "unique-friends";
 
 		try {
@@ -523,9 +523,9 @@ public class MongoUtil {
 	}
 
 	/* Creates an index which will guarantee no duplicate node names can exist, for any user */
-	public void createUniqueNodeNameIndex(MongoSession session) {
-		auth.requireAdmin(session);
-		update.saveSession(session);
+	public void createUniqueNodeNameIndex(MongoSession ms) {
+		auth.requireAdmin(ms);
+		update.saveSession(ms);
 		String indexName = "unique-node-name";
 
 		try {
@@ -540,22 +540,22 @@ public class MongoUtil {
 		}
 	}
 
-	public void dropAllIndexes(MongoSession session) {
-		auth.requireAdmin(session);
-		update.saveSession(session);
+	public void dropAllIndexes(MongoSession ms) {
+		auth.requireAdmin(ms);
+		update.saveSession(ms);
 		ops.indexOps(SubNode.class).dropAllIndexes();
 	}
 
-	public void dropIndex(MongoSession session, Class<?> clazz, String indexName) {
-		auth.requireAdmin(session);
+	public void dropIndex(MongoSession ms, Class<?> clazz, String indexName) {
+		auth.requireAdmin(ms);
 		log.debug("Dropping index: " + indexName);
-		update.saveSession(session);
+		update.saveSession(ms);
 		ops.indexOps(clazz).dropIndex(indexName);
 	}
 
-	public void logIndexes(MongoSession session, Class<?> clazz) {
+	public void logIndexes(MongoSession ms, Class<?> clazz) {
 		StringBuilder sb = new StringBuilder();
-		update.saveSession(session);
+		update.saveSession(ms);
 		List<IndexInfo> indexes = ops.indexOps(clazz).getIndexInfo();
 		for (IndexInfo idx : indexes) {
 			List<IndexField> indexFields = idx.getIndexFields();
@@ -571,10 +571,10 @@ public class MongoUtil {
 	 * WARNING: I wote this but never tested it, nor did I ever find any examples online. Ended up not
 	 * needing any compound indexes (yet)
 	 */
-	public void createPartialUniqueIndexComp2(MongoSession session, String name, Class<?> clazz, String property1,
+	public void createPartialUniqueIndexComp2(MongoSession ms, String name, Class<?> clazz, String property1,
 			String property2) {
-		auth.requireAdmin(session);
-		update.saveSession(session);
+		auth.requireAdmin(ms);
+		update.saveSession(ms);
 
 		try {
 			// Ensures unuque values for 'property' (but allows duplicates of nodes missing the property)
@@ -594,9 +594,9 @@ public class MongoUtil {
 	 * NOTE: Properties like this don't appear to be supported: "prp['ap:id'].value", but prp.apid.value
 	 * works
 	 */
-	public void createPartialUniqueIndex(MongoSession session, String name, Class<?> clazz, String property) {
-		auth.requireAdmin(session);
-		update.saveSession(session);
+	public void createPartialUniqueIndex(MongoSession ms, String name, Class<?> clazz, String property) {
+		auth.requireAdmin(ms);
+		update.saveSession(ms);
 
 		try {
 			// Ensures unque values for 'property' (but allows duplicates of nodes missing the property)
@@ -611,21 +611,21 @@ public class MongoUtil {
 		}
 	}
 
-	public void createUniqueIndex(MongoSession session, Class<?> clazz, String property) {
-		auth.requireAdmin(session);
-		update.saveSession(session);
+	public void createUniqueIndex(MongoSession ms, Class<?> clazz, String property) {
+		auth.requireAdmin(ms);
+		update.saveSession(ms);
 		ops.indexOps(clazz).ensureIndex(new Index().on(property, Direction.ASC).unique());
 	}
 
-	public void createIndex(MongoSession session, Class<?> clazz, String property) {
-		auth.requireAdmin(session);
-		update.saveSession(session);
+	public void createIndex(MongoSession ms, Class<?> clazz, String property) {
+		auth.requireAdmin(ms);
+		update.saveSession(ms);
 		ops.indexOps(clazz).ensureIndex(new Index().on(property, Direction.ASC));
 	}
 
-	public void createIndex(MongoSession session, Class<?> clazz, String property, Direction dir) {
-		auth.requireAdmin(session);
-		update.saveSession(session);
+	public void createIndex(MongoSession ms, Class<?> clazz, String property, Direction dir) {
+		auth.requireAdmin(ms);
+		update.saveSession(ms);
 		ops.indexOps(clazz).ensureIndex(new Index().on(property, dir));
 	}
 
@@ -659,19 +659,19 @@ public class MongoUtil {
 	// ops.indexOps(clazz).ensureIndex(textIndex);
 	// }
 
-	public void createTextIndexes(MongoSession session, Class<?> clazz) {
-		auth.requireAdmin(session);
+	public void createTextIndexes(MongoSession ms, Class<?> clazz) {
+		auth.requireAdmin(ms);
 
 		TextIndexDefinition textIndex = new TextIndexDefinitionBuilder().onAllFields()
 				// .onField(SubNode.FIELD_PROPERTIES+"."+NodeProp.CONTENT)
 				.build();
 
-		update.saveSession(session);
+		update.saveSession(ms);
 		ops.indexOps(clazz).ensureIndex(textIndex);
 	}
 
-	public void dropCollection(MongoSession session, Class<?> clazz) {
-		auth.requireAdmin(session);
+	public void dropCollection(MongoSession ms, Class<?> clazz) {
+		auth.requireAdmin(ms);
 		ops.dropCollection(clazz);
 	}
 
@@ -705,8 +705,8 @@ public class MongoUtil {
 		// return "^" + Pattern.quote(path) + "\\/(.+)$";
 	}
 
-	public SubNode createUser(MongoSession session, String user, String email, String password, boolean automated) {
-		SubNode userNode = read.getUserNodeByUserName(session, user);
+	public SubNode createUser(MongoSession ms, String user, String email, String password, boolean automated) {
+		SubNode userNode = read.getUserNodeByUserName(ms, user);
 		if (userNode != null) {
 			throw new RuntimeException("User already existed: " + user);
 		}
@@ -716,12 +716,12 @@ public class MongoUtil {
 		// user.");
 		// }
 
-		auth.requireAdmin(session);
+		auth.requireAdmin(ms);
 		String newUserNodePath = NodeName.ROOT_OF_ALL_USERS + "/?";
 		// todo-2: is user validated here (no invalid characters, etc. and invalid
 		// flowpaths tested?)
 
-		userNode = create.createNode(session, newUserNodePath, NodeType.ACCOUNT.s());
+		userNode = create.createNode(ms, newUserNodePath, NodeType.ACCOUNT.s());
 		ObjectId id = new ObjectId();
 		userNode.setId(id);
 		userNode.setOwner(id);
@@ -741,7 +741,7 @@ public class MongoUtil {
 			userNode.setProp(NodeProp.SIGNUP_PENDING.s(), true);
 		}
 
-		update.save(session, userNode);
+		update.save(ms, userNode);
 		return userNode;
 	}
 
@@ -759,49 +759,49 @@ public class MongoUtil {
 	 * The admin node is also the repository root node, so it owns all other nodes, by the definition of
 	 * they way security is inheritive.
 	 */
-	public void createAdminUser(MongoSession session) {
+	public void createAdminUser(MongoSession ms) {
 		String adminUser = appProp.getMongoAdminUserName();
 
-		SubNode adminNode = read.getUserNodeByUserName(session, adminUser);
+		SubNode adminNode = read.getUserNodeByUserName(ms, adminUser);
 		if (adminNode == null) {
 			adminNode =
-					snUtil.ensureNodeExists(session, "/", NodeName.ROOT, null, "Root", NodeType.REPO_ROOT.s(), true, null, null);
+					snUtil.ensureNodeExists(ms, "/", NodeName.ROOT, null, "Root", NodeType.REPO_ROOT.s(), true, null, null);
 
 			adminNode.setProp(NodeProp.USER.s(), PrincipalName.ADMIN.s());
 			adminNode.setProp(NodeProp.USER_PREF_EDIT_MODE.s(), false);
 			adminNode.setProp(NodeProp.USER_PREF_RSS_HEADINGS_ONLY.s(), true);
-			update.save(session, adminNode);
+			update.save(ms, adminNode);
 
 			/*
 			 * If we just created this user we know the session object here won't have the adminNode id in it
 			 * yet and it needs to for all subsequent operations.
 			 */
-			session.setUserNodeId(adminNode.getId());
+			ms.setUserNodeId(adminNode.getId());
 
-			snUtil.ensureNodeExists(session, "/" + NodeName.ROOT, NodeName.USER, null, "Users", null, true, null, null);
+			snUtil.ensureNodeExists(ms, "/" + NodeName.ROOT, NodeName.USER, null, "Users", null, true, null, null);
 		}
 
-		createPublicNodes(session);
+		createPublicNodes(ms);
 	}
 
-	public void createPublicNodes(MongoSession session) {
+	public void createPublicNodes(MongoSession ms) {
 		log.debug("creating Public Nodes");
 		ValContainer<Boolean> created = new ValContainer<>(Boolean.FALSE);
 		SubNode publicNode =
-				snUtil.ensureNodeExists(session, "/" + NodeName.ROOT, NodeName.PUBLIC, null, "Public", null, true, null, created);
+				snUtil.ensureNodeExists(ms, "/" + NodeName.ROOT, NodeName.PUBLIC, null, "Public", null, true, null, created);
 
 		if (created.getVal()) {
-			aclService.addPrivilege(session, publicNode, PrincipalName.PUBLIC.s(), Arrays.asList(PrivilegeType.READ.s()), null);
+			aclService.addPrivilege(ms, publicNode, PrincipalName.PUBLIC.s(), Arrays.asList(PrivilegeType.READ.s()), null);
 		}
 
 		created = new ValContainer<>(Boolean.FALSE);
 
 		// create home node (admin owned node named 'home').
-		SubNode publicHome = snUtil.ensureNodeExists(session, "/" + NodeName.ROOT + "/" + NodeName.PUBLIC, NodeName.HOME,
+		SubNode publicHome = snUtil.ensureNodeExists(ms, "/" + NodeName.ROOT + "/" + NodeName.PUBLIC, NodeName.HOME,
 				NodeName.HOME, "Public Home", null, true, null, created);
 
 		// make node public
-		aclService.addPrivilege(session, publicHome, PrincipalName.PUBLIC.s(), Arrays.asList(PrivilegeType.READ.s()), null);
+		aclService.addPrivilege(ms, publicHome, PrincipalName.PUBLIC.s(), Arrays.asList(PrivilegeType.READ.s()), null);
 
 		log.debug("Public Home Node exists at id: " + publicHome.getId() + " path=" + publicHome.getPath());
 
@@ -812,12 +812,12 @@ public class MongoUtil {
 		 * directly in the server root, which is a private node
 		 */
 		created = new ValContainer<>(Boolean.FALSE);
-		SubNode publicWelcome = snUtil.ensureNodeExists(session, "/" + NodeName.ROOT, NodeName.WELCOME, "welcome-page",
+		SubNode publicWelcome = snUtil.ensureNodeExists(ms, "/" + NodeName.ROOT, NodeName.WELCOME, "welcome-page",
 				"### Welcome Node\n\nDefault landing page content. Admin should edit this node, named 'welcome-page'", null, true,
 				null, created);
 
 		if (created.getVal()) {
-			aclService.addPrivilege(session, publicWelcome, PrincipalName.PUBLIC.s(), Arrays.asList(PrivilegeType.READ.s()),
+			aclService.addPrivilege(ms, publicWelcome, PrincipalName.PUBLIC.s(), Arrays.asList(PrivilegeType.READ.s()),
 					null);
 		}
 

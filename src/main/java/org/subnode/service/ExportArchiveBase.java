@@ -78,16 +78,16 @@ public abstract class ExportArchiveBase {
 
 	private MongoSession session;
 
-	public void export(MongoSession session, final ExportRequest req, final ExportResponse res) {
-		session = ThreadLocals.ensure(session);
-		this.session = session;
+	public void export(MongoSession ms, final ExportRequest req, final ExportResponse res) {
+		ms = ThreadLocals.ensure(ms);
+		this.session = ms;
 
 		if (!FileUtils.dirExists(appProp.getAdminDataFolder())) {
 			throw ExUtil.wrapEx("adminDataFolder does not exist: " + appProp.getAdminDataFolder());
 		}
 
 		final String nodeId = req.getNodeId();
-		final SubNode node = read.getNode(session, nodeId);
+		final SubNode node = read.getNode(ms, nodeId);
 		String fileName = snUtil.getExportFileName(req.getFileName(), node);
 		shortFileName = fileName + "." + getFileExtension();
 		fullFileName = appProp.getAdminDataFolder() + File.separator + shortFileName;
@@ -97,7 +97,7 @@ public abstract class ExportArchiveBase {
 			openOutputStream(fullFileName);
 			writeRootFiles();
 			rootPathParent = node.getParentPath();
-			auth.ownerAuth(session, node);
+			auth.ownerAuth(ms, node);
 			final ArrayList<SubNode> nodeStack = new ArrayList<>();
 			nodeStack.add(node);
 			recurseNode("../", "", node, nodeStack, 0, null, null);
@@ -265,7 +265,7 @@ public abstract class ExportArchiveBase {
 	 * fileNameCont is an output parameter that has the complete filename minus the period and
 	 * extension.
 	 */
-	private void processNodeExport(final MongoSession session, final String parentFolder, final String deeperPath,
+	private void processNodeExport(final MongoSession ms, final String parentFolder, final String deeperPath,
 			final SubNode node, final StringBuilder html, final boolean writeFile, final ValContainer<String> fileNameCont,
 			final boolean allowOpenButton, final int level, final boolean isTopRow) {
 		try {
@@ -293,7 +293,7 @@ public abstract class ExportArchiveBase {
 				 * trying to get the children for all nodes we encounter, so this will be redundant, but I don't
 				 * want to refactor now to solve this yet. That's almost an optimization that should come later
 				 */
-				boolean hasChildren = read.hasChildren(session, node);
+				boolean hasChildren = read.hasChildren(ms, node);
 				if (hasChildren) {
 					final String htmlFile = "./" + deeperPath + fileName + "/" + fileName + ".html";
 					html.append("<a href='" + htmlFile + "'><button class='open-button'>Open</button></a>");
@@ -331,7 +331,7 @@ public abstract class ExportArchiveBase {
 			 */
 			final String dataUrl = node.getStrProp(NodeProp.BIN_DATA_URL.s());
 			if ("t".equals(dataUrl)) {
-				imgUrl = attachmentService.getStringByNode(session, node);
+				imgUrl = attachmentService.getStringByNode(ms, node);
 
 				// sanity check here.
 				if (!imgUrl.startsWith("data:")) {
@@ -410,7 +410,7 @@ public abstract class ExportArchiveBase {
 
 					InputStream is = null;
 					try {
-						is = attachmentService.getStream(session, "", node, false);
+						is = attachmentService.getStream(ms, "", node, false);
 						if (is != null) {
 							final BufferedInputStream bis = new BufferedInputStream(is);
 							final long length = node.getIntProp(NodeProp.BIN_SIZE.s());

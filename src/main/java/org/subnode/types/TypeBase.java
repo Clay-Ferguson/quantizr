@@ -22,7 +22,7 @@ public abstract class TypeBase {
     /* Must match the actual type name of the nodes */
     public abstract String getName();
 
-    public void convert(MongoSession session, NodeInfo nodeInfo, SubNode node, boolean getFollowers) {}
+    public void convert(MongoSession ms, NodeInfo nodeInfo, SubNode node, boolean getFollowers) {}
 
-    public void createSubNode(MongoSession session, ValContainer<SubNode> node, CreateSubNodeRequest req, boolean linkBookmark) {}
+    public void createSubNode(MongoSession ms, ValContainer<SubNode> node, CreateSubNodeRequest req, boolean linkBookmark) {}
 }

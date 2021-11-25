@@ -31,7 +31,7 @@ public class ImportTarService extends ImportArchiveBase {
 	private MongoRead read;
 
 	/* Returns the first node created which is always the root of the import */
-	public SubNode importFromStream(final MongoSession session, final InputStream is, final SubNode node,
+	public SubNode importFromStream(final MongoSession ms, final InputStream is, final SubNode node,
 			final boolean isNonRequestThread) {
 		if (used) {
 			throw new RuntimeEx("Prototype bean used multiple times is not allowed.");
@@ -45,7 +45,7 @@ public class ImportTarService extends ImportArchiveBase {
 
 		try {
 			targetPath = node.getPath();
-			this.session = session;
+			this.session = ms;
 
 			zis = new TarArchiveInputStream(is);
 			TarArchiveEntry entry;

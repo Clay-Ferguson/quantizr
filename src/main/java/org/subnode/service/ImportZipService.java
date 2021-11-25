@@ -46,14 +46,14 @@ public class ImportZipService extends ImportArchiveBase {
 	 * imports the file directly from an internal resource file (classpath resource,
 	 * built into WAR file itself)
 	 */
-	public SubNode inportFromResource(MongoSession session, String resourceName, SubNode node, String nodeName) {
+	public SubNode inportFromResource(MongoSession ms, String resourceName, SubNode node, String nodeName) {
 
 		Resource resource = SpringContextUtil.getApplicationContext().getResource(resourceName);
 		InputStream is = null;
 		SubNode rootNode = null;
 		try {
 			is = resource.getInputStream();
-			rootNode = importFromStream(session, is, node, true);
+			rootNode = importFromStream(ms, is, node, true);
 		} catch (Exception e) {
 			throw ExUtil.wrapEx(e);
 		} finally {
@@ -61,12 +61,12 @@ public class ImportZipService extends ImportArchiveBase {
 		}
 
 		log.debug("Finished Input From Zip file.");
-		update.saveSession(session);
+		update.saveSession(ms);
 		return rootNode;
 	}
 
 	/* Returns the first node created which is always the root of the import */
-	public SubNode importFromStream(MongoSession session, InputStream inputStream, SubNode node,
+	public SubNode importFromStream(MongoSession ms, InputStream inputStream, SubNode node,
 			boolean isNonRequestThread) {
 		SessionContext sc = ThreadLocals.getSC();
 		if (used) {
@@ -82,7 +82,7 @@ public class ImportZipService extends ImportArchiveBase {
 		LimitedInputStreamEx is = null;
 		try {
 			targetPath = node.getPath();
-			this.session = session;
+			this.session = ms;
 
 			// todo-1: replace with the true amount of storage this user has remaining. Admin is unlimited. 
 			int maxSize = sc.isAdmin() ? Integer.MAX_VALUE : Const.DEFAULT_USER_QUOTA;

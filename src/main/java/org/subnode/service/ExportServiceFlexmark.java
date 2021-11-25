@@ -79,9 +79,9 @@ public class ExportServiceFlexmark {
 	 * 
 	 * Format can be 'html' or 'pdf'
 	 */
-	public void export(MongoSession session, String format, ExportRequest req, ExportResponse res) {
-		session = ThreadLocals.ensure(session);
-		this.session = session;
+	public void export(MongoSession ms, String format, ExportRequest req, ExportResponse res) {
+		ms = ThreadLocals.ensure(ms);
+		this.session = ms;
 		this.format = format;
 		this.req = req;
 		this.res = res;
@@ -96,19 +96,19 @@ public class ExportServiceFlexmark {
 			throw ExUtil.wrapEx("Exporting entire repository is not supported.");
 		} else {
 			log.info("Exporting to Text File");
-			exportNodeToFile(session, nodeId);
+			exportNodeToFile(ms, nodeId);
 			res.setFileName(shortFileName);
 		}
 
 		res.setSuccess(true);
 	}
 
-	private void exportNodeToFile(MongoSession session, String nodeId) {
+	private void exportNodeToFile(MongoSession ms, String nodeId) {
 		if (!FileUtils.dirExists(appProp.getAdminDataFolder())) {
 			throw ExUtil.wrapEx("adminDataFolder does not exist.");
 		}
 
-		SubNode exportNode = read.getNode(session, nodeId, true);
+		SubNode exportNode = read.getNode(ms, nodeId, true);
 		String fileName = snUtil.getExportFileName(req.getFileName(), exportNode);
 		shortFileName = fileName + "." + format;
 		fullFileName = appProp.getAdminDataFolder() + File.separator + shortFileName;
@@ -176,8 +176,8 @@ public class ExportServiceFlexmark {
 					try {
 						is = new FileInputStream(fullFileName);
 						String mime = "application/pdf";
-						MerkleLink ret = ipfs.addFromStream(session, is, shortFileName, mime, null, null, false);
-						ipfs.writeIpfsExportNode(session, ret.getHash(), mime, shortFileName, null);
+						MerkleLink ret = ipfs.addFromStream(ms, is, shortFileName, mime, null, null, false);
+						ipfs.writeIpfsExportNode(ms, ret.getHash(), mime, shortFileName, null);
 
 						res.setIpfsCid(ret.getHash());
 						res.setIpfsMime(mime);

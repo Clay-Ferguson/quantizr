@@ -46,16 +46,16 @@ public class SyncToIpfsService {
 	int totalNodes = 0;
 	int orphansRemoved = 0;
 
-	public void writeIpfsFiles(MongoSession session, PublishNodeToIpfsRequest req, final PublishNodeToIpfsResponse res) {
-		session = ThreadLocals.ensure(session);
-		this.session = session;
+	public void writeIpfsFiles(MongoSession ms, PublishNodeToIpfsRequest req, final PublishNodeToIpfsResponse res) {
+		ms = ThreadLocals.ensure(ms);
+		this.session = ms;
 		final String nodeId = req.getNodeId();
-		final SubNode node = read.getNode(session, nodeId);
+		final SubNode node = read.getNode(ms, nodeId);
 
 		boolean success = false;
 		try {
-			auth.ownerAuth(session, node);
-			Iterable<SubNode> results = read.getSubGraph(session, node, null, 0);
+			auth.ownerAuth(ms, node);
+			Iterable<SubNode> results = read.getSubGraph(ms, node, null, 0);
 
 			processNode(node);
 			for (SubNode n : results) {

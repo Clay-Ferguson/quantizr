@@ -22,7 +22,7 @@ public class FriendType extends TypeBase {
     }
 
     @Override
-    public void convert(MongoSession session, NodeInfo nodeInfo, SubNode node, boolean getFollowers) {
+    public void convert(MongoSession ms, NodeInfo nodeInfo, SubNode node, boolean getFollowers) {
         // yes this is redundant and loads userUrl again below, but I need to test this before removing it.
         String userUrl = node.getStrProp(NodeProp.ACT_PUB_ACTOR_URL.s());
         if (userUrl != null) {
@@ -42,7 +42,7 @@ public class FriendType extends TypeBase {
          * be null, and is normal
          */
         if (accountId != null) {
-            SubNode accountNode = read.getNode(session, accountId, false);
+            SubNode accountNode = read.getNode(ms, accountId, false);
 
             /*
              * to load up a friend node for the browser to display, we have to populate these "Client Props", on

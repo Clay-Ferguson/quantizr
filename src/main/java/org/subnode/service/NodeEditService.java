@@ -122,10 +122,10 @@ public class NodeEditService {
 	 * Creates a new node as a *child* node of the node specified in the request. Should ONLY be called
 	 * by the controller that accepts a node being created by the GUI/user
 	 */
-	public CreateSubNodeResponse createSubNode(MongoSession session, CreateSubNodeRequest req) {
+	public CreateSubNodeResponse createSubNode(MongoSession ms, CreateSubNodeRequest req) {
 		// log.debug("createSubNode");
 		CreateSubNodeResponse res = new CreateSubNodeResponse();
-		session = ThreadLocals.ensure(session);
+		ms = ThreadLocals.ensure(ms);
 
 		boolean linkBookmark = "linkBookmark".equals(req.getPayloadType());
 		String nodeId = req.getNodeId();
@@ -137,7 +137,7 @@ public class NodeEditService {
 		 * "My Posts" node
 		 */
 		if (nodeId == null && !linkBookmark) {
-			node = read.getUserNodeByType(session, null, null, "### " + ThreadLocals.getSC().getUserName() + "'s Public Posts",
+			node = read.getUserNodeByType(ms, null, null, "### " + ThreadLocals.getSC().getUserName() + "'s Public Posts",
 					NodeType.POSTS.s(), Arrays.asList(PrivilegeType.READ.s()), NodeName.POSTS);
 
 			if (node != null) {
@@ -149,16 +149,16 @@ public class NodeEditService {
 		/* Node still null, then try other ways of getting it */
 		if (node == null && !linkBookmark) {
 			if (nodeId.equals("~" + NodeType.NOTES.s())) {
-				node = read.getUserNodeByType(session, session.getUserName(), null, "### Notes", NodeType.NOTES.s(), null, null);
+				node = read.getUserNodeByType(ms, ms.getUserName(), null, "### Notes", NodeType.NOTES.s(), null, null);
 			} else {
-				node = read.getNode(session, nodeId);
+				node = read.getNode(ms, nodeId);
 			}
 		}
 
 		TypeBase plugin = typePluginMgr.getPluginByType(req.getTypeName());
 		if (plugin != null) {
 			ValContainer<SubNode> vcNode = new ValContainer<>(node);
-			plugin.createSubNode(session, vcNode, req, linkBookmark);
+			plugin.createSubNode(ms, vcNode, req, linkBookmark);
 			node = vcNode.getVal();
 		}
 
@@ -166,11 +166,11 @@ public class NodeEditService {
 			throw new RuntimeException("unable to locate parent for insert");
 		}
 
-		auth.authForChildNodeCreate(session, node);
+		auth.authForChildNodeCreate(ms, node);
 		CreateNodeLocation createLoc = req.isCreateAtTop() ? CreateNodeLocation.FIRST : CreateNodeLocation.LAST;
 
 		SubNode newNode =
-				create.createNode(session, node, null, req.getTypeName(), 0L, createLoc, req.getProperties(), null, true);
+				create.createNode(ms, node, null, req.getTypeName(), 0L, createLoc, req.getProperties(), null, true);
 
 		if (req.isPendingEdit()) {
 			util.setPendingPath(newNode, true);
@@ -195,7 +195,7 @@ public class NodeEditService {
 		}
 		// else maybe public.
 		else if (makePublic) {
-			aclService.addPrivilege(session, newNode, PrincipalName.PUBLIC.s(),
+			aclService.addPrivilege(ms, newNode, PrincipalName.PUBLIC.s(),
 					Arrays.asList(PrivilegeType.READ.s(), PrivilegeType.WRITE.s()), null);
 		}
 		// else add default sharing
@@ -209,23 +209,23 @@ public class NodeEditService {
 			}
 		}
 
-		update.save(session, newNode);
+		update.save(ms, newNode);
 		res.setNewNode(
-				convert.convertToNodeInfo(ThreadLocals.getSC(), session, newNode, true, false, -1, false, false, false, false));
+				convert.convertToNodeInfo(ThreadLocals.getSC(), ms, newNode, true, false, -1, false, false, false, false));
 
 		res.setSuccess(true);
 		return res;
 	}
 
-	public SubNode createFriendNode(MongoSession session, SubNode parentFriendsList, String userToFollow) {
+	public SubNode createFriendNode(MongoSession ms, SubNode parentFriendsList, String userToFollow) {
 
-		SubNode userNode = read.getUserNodeByUserName(session, userToFollow, false);
+		SubNode userNode = read.getUserNodeByUserName(ms, userToFollow, false);
 		if (userNode != null) {
 			List<PropertyInfo> properties = new LinkedList<>();
 			properties.add(new PropertyInfo(NodeProp.USER.s(), userToFollow));
 			properties.add(new PropertyInfo(NodeProp.USER_NODE_ID.s(), userNode.getId().toHexString()));
 
-			SubNode newNode = create.createNode(session, parentFriendsList, null, NodeType.FRIEND.s(), 0L,
+			SubNode newNode = create.createNode(ms, parentFriendsList, null, NodeType.FRIEND.s(), 0L,
 					CreateNodeLocation.LAST, properties, parentFriendsList.getOwner(), true);
 			newNode.setProp(NodeProp.TYPE_LOCK.s(), Boolean.valueOf(true));
 
@@ -240,7 +240,7 @@ public class NodeEditService {
 			}
 
 			apUtil.log("Saved Friend Node (as a Follow): " + XString.prettyPrint(newNode));
-			update.save(session, newNode);
+			update.save(ms, newNode);
 
 			return newNode;
 		} else {
@@ -248,9 +248,9 @@ public class NodeEditService {
 		}
 	}
 
-	public AppDropResponse appDrop(MongoSession session, AppDropRequest req) {
+	public AppDropResponse appDrop(MongoSession ms, AppDropRequest req) {
 		AppDropResponse res = new AppDropResponse();
-		session = ThreadLocals.ensure(session);
+		ms = ThreadLocals.ensure(ms);
 		String data = req.getData();
 		String lcData = data.toLowerCase();
 
@@ -264,7 +264,7 @@ public class NodeEditService {
 		}
 
 		SubNode linksNode =
-				read.getUserNodeByType(session, session.getUserName(), null, "### Notes", NodeType.NOTES.s(), null, null);
+				read.getUserNodeByType(ms, ms.getUserName(), null, "### Notes", NodeType.NOTES.s(), null, null);
 
 		if (linksNode == null) {
 			log.warn("unable to get linksNode");
@@ -272,14 +272,14 @@ public class NodeEditService {
 		}
 
 		SubNode newNode =
-				create.createNode(session, linksNode, null, NodeType.NONE.s(), 0L, CreateNodeLocation.LAST, null, null, true);
+				create.createNode(ms, linksNode, null, NodeType.NONE.s(), 0L, CreateNodeLocation.LAST, null, null, true);
 
 		String title = lcData.startsWith("http") ? Util.extractTitleFromUrl(data) : null;
 		String content = title != null ? "#### " + title + "\n" : "";
 		content += data;
 		newNode.setContent(content);
 		newNode.touch();
-		update.save(session, newNode);
+		update.save(ms, newNode);
 
 		res.setMessage("Drop Accepted: Created link to: " + data);
 		return res;
@@ -290,18 +290,18 @@ public class NodeEditService {
 	 * node specified in the request. Should ONLY be called by the controller that accepts a node being
 	 * created by the GUI/user
 	 */
-	public InsertNodeResponse insertNode(MongoSession session, InsertNodeRequest req) {
+	public InsertNodeResponse insertNode(MongoSession ms, InsertNodeRequest req) {
 		InsertNodeResponse res = new InsertNodeResponse();
-		session = ThreadLocals.ensure(session);
+		ms = ThreadLocals.ensure(ms);
 		String parentNodeId = req.getParentId();
 		log.debug("Inserting under parent: " + parentNodeId);
-		SubNode parentNode = read.getNode(session, parentNodeId);
+		SubNode parentNode = read.getNode(ms, parentNodeId);
 		if (parentNode == null) {
 			throw new RuntimeException("Unable to find parent note to insert under: " + parentNodeId);
 		}
 
-		auth.authForChildNodeCreate(session, parentNode);
-		SubNode newNode = create.createNode(session, parentNode, null, req.getTypeName(), req.getTargetOrdinal(),
+		auth.authForChildNodeCreate(ms, parentNode);
+		SubNode newNode = create.createNode(ms, parentNode, null, req.getTypeName(), req.getTargetOrdinal(),
 				CreateNodeLocation.ORDINAL, null, null, true);
 
 		if (req.getInitialValue() != null) {
@@ -319,9 +319,9 @@ public class NodeEditService {
 		// we always copy the access controls from the parent for any new nodes
 		auth.setDefaultReplyAcl(null, parentNode, newNode);
 
-		update.save(session, newNode);
+		update.save(ms, newNode);
 		res.setNewNode(
-				convert.convertToNodeInfo(ThreadLocals.getSC(), session, newNode, true, false, -1, false, false, false, false));
+				convert.convertToNodeInfo(ThreadLocals.getSC(), ms, newNode, true, false, -1, false, false, false, false));
 
 		// if (req.isUpdateModTime() && !StringUtils.isEmpty(newNode.getContent()) //
 		// // don't evern send notifications when 'admin' is the one doing the editing.
@@ -333,19 +333,19 @@ public class NodeEditService {
 		return res;
 	}
 
-	public SaveNodeResponse saveNode(MongoSession _session, SaveNodeRequest req) {
+	public SaveNodeResponse saveNode(MongoSession _ms, SaveNodeRequest req) {
 		SaveNodeResponse res = new SaveNodeResponse();
 		// log.debug("Controller saveNode: " + Thread.currentThread().getName());
 
-		_session = ThreadLocals.ensure(_session);
-		final MongoSession session = _session;
+		_ms = ThreadLocals.ensure(_ms);
+		final MongoSession ms = _ms;
 
 		NodeInfo nodeInfo = req.getNode();
 		final String nodeId = nodeInfo.getId();
 
 		// log.debug("saveNode. nodeId=" + XString.prettyPrint(nodeInfo));
-		SubNode node = read.getNode(session, nodeId);
-		auth.ownerAuth(session, node);
+		SubNode node = read.getNode(ms, nodeId);
+		auth.ownerAuth(ms, node);
 
 		if (node == null) {
 			throw new RuntimeEx("Unable find node to save: nodeId=" + nodeId);
@@ -390,7 +390,7 @@ public class NodeEditService {
 			 * We don't use unique index on node name, because it's not worth the performance overhead, so we
 			 * have to do the uniqueness check ourselves here manually
 			 */
-			SubNode nodeByName = read.getNodeByName(session, nodeName);
+			SubNode nodeByName = read.getNodeByName(ms, nodeName);
 			if (nodeByName != null) {
 				throw new RuntimeEx("Node name is already in use. Duplicates not allowed.");
 			}
@@ -409,7 +409,7 @@ public class NodeEditService {
 					 * trying to save stuff that is illegal to save, but we have to assume the worst behavior from
 					 * client code, for security and robustness.
 					 */
-					if (session.isAdmin() || SubNodeUtil.isSavableProperty(property.getName())) {
+					if (ms.isAdmin() || SubNodeUtil.isSavableProperty(property.getName())) {
 						// log.debug("Property to save: " + property.getName() + "=" +
 						// property.getValue());
 						node.setProp(property.getName(), property.getValue());
@@ -431,7 +431,7 @@ public class NodeEditService {
 		}
 		/* if node is currently encrypted */
 		else {
-			res.setAclEntries(auth.getAclEntries(session, node));
+			res.setAclEntries(auth.getAclEntries(ms, node));
 		}
 
 		/*
@@ -489,7 +489,7 @@ public class NodeEditService {
 				// push any chat messages that need to go out.
 				pushService.pushNodeToMonitoringBrowsers(s, sessionsPushed, node);
 
-				SubNode parent = read.getParent(session, node, false);
+				SubNode parent = read.getParent(ms, node, false);
 				if (parent != null) {
 					auth.saveMentionsToNodeACL(s, node);
 
@@ -518,13 +518,13 @@ public class NodeEditService {
 		}
 
 		NodeInfo newNodeInfo =
-				convert.convertToNodeInfo(ThreadLocals.getSC(), session, node, true, false, -1, false, false, true, false);
+				convert.convertToNodeInfo(ThreadLocals.getSC(), ms, node, true, false, -1, false, false, true, false);
 		res.setNode(newNodeInfo);
 
 		// todo-1: for now we only push nodes if public, up to browsers rather than doing a specific check
 		// to send only to users who should see it.
-		if (AclService.isPublic(session, node)) {
-			pushService.pushTimelineUpdateToBrowsers(session, newNodeInfo);
+		if (AclService.isPublic(ms, node)) {
+			pushService.pushTimelineUpdateToBrowsers(ms, newNodeInfo);
 		}
 
 		res.setSuccess(true);
@@ -589,16 +589,16 @@ public class NodeEditService {
 	/*
 	 * Removes the property specified in the request from the node specified in the request
 	 */
-	public DeletePropertyResponse deleteProperty(MongoSession session, DeletePropertyRequest req) {
+	public DeletePropertyResponse deleteProperty(MongoSession ms, DeletePropertyRequest req) {
 		DeletePropertyResponse res = new DeletePropertyResponse();
-		session = ThreadLocals.ensure(session);
+		ms = ThreadLocals.ensure(ms);
 		String nodeId = req.getNodeId();
-		SubNode node = read.getNode(session, nodeId);
+		SubNode node = read.getNode(ms, nodeId);
 		auth.ownerAuthByThread(node);
 
 		String propertyName = req.getPropName();
 		node.deleteProp(propertyName);
-		update.save(session, node);
+		update.save(ms, node);
 		res.setSuccess(true);
 		return res;
 	}
@@ -608,16 +608,16 @@ public class NodeEditService {
 	 * nodes they can pass into here and double spaces become splitpoints, and this splitNode method
 	 * will break it all up into individual nodes.
 	 */
-	public SplitNodeResponse splitNode(MongoSession session, SplitNodeRequest req) {
+	public SplitNodeResponse splitNode(MongoSession ms, SplitNodeRequest req) {
 		SplitNodeResponse res = new SplitNodeResponse();
-		session = ThreadLocals.ensure(session);
+		ms = ThreadLocals.ensure(ms);
 		String nodeId = req.getNodeId();
 
 		// log.debug("Splitting node: " + nodeId);
-		SubNode node = read.getNode(session, nodeId);
-		SubNode parentNode = read.getParent(session, node);
+		SubNode node = read.getNode(ms, nodeId);
+		SubNode parentNode = read.getParent(ms, node);
 
-		auth.ownerAuth(session, node);
+		auth.ownerAuth(ms, node);
 		String content = node.getContent();
 		boolean containsDelim = content.contains(req.getDelimiter());
 
@@ -652,8 +652,8 @@ public class NodeEditService {
 
 		int numNewSlots = contentParts.length - 1;
 		if (numNewSlots > 0) {
-			create.insertOrdinal(session, parentForNewNodes, firstOrdinal, numNewSlots);
-			update.save(session, parentForNewNodes);
+			create.insertOrdinal(ms, parentForNewNodes, firstOrdinal, numNewSlots);
+			update.save(ms, parentForNewNodes);
 		}
 
 		int idx = 0;
@@ -663,13 +663,13 @@ public class NodeEditService {
 			if (idx == 0) {
 				node.setContent(part);
 				node.touch();
-				update.save(session, node);
+				update.save(ms, node);
 			} else {
-				SubNode newNode = create.createNode(session, parentForNewNodes, null, firstOrdinal + idx,
+				SubNode newNode = create.createNode(ms, parentForNewNodes, null, firstOrdinal + idx,
 						CreateNodeLocation.ORDINAL, false);
 				newNode.setContent(part);
 				newNode.touch();
-				update.save(session, newNode);
+				update.save(ms, newNode);
 			}
 			idx++;
 		}
@@ -678,15 +678,15 @@ public class NodeEditService {
 		return res;
 	}
 
-	public TransferNodeResponse transferNode(MongoSession session, TransferNodeRequest req) {
+	public TransferNodeResponse transferNode(MongoSession ms, TransferNodeRequest req) {
 		TransferNodeResponse res = new TransferNodeResponse();
-		session = ThreadLocals.ensure(session);
+		ms = ThreadLocals.ensure(ms);
 		int transfers = 0;
 		String nodeId = req.getNodeId();
 
 		log.debug("Transfer node: " + nodeId);
-		SubNode node = read.getNode(session, nodeId);
-		auth.ownerAuth(session, node);
+		SubNode node = read.getNode(ms, nodeId);
+		auth.ownerAuth(ms, node);
 
 		SubNode toUserNode = read.getUserNodeByUserName(auth.getAdminSession(), req.getToUser());
 		if (toUserNode == null) {
@@ -706,19 +706,19 @@ public class NodeEditService {
 			node.setOwner(toUserNode.getOwner());
 			transfers++;
 		} else {
-			if (transferNode(session, node, fromUserNode.getOwner(), toUserNode.getOwner())) {
+			if (transferNode(ms, node, fromUserNode.getOwner(), toUserNode.getOwner())) {
 				transfers++;
 			}
 		}
 
 		if (req.isRecursive()) {
-			for (SubNode n : read.getSubGraph(session, node, null, 0)) {
+			for (SubNode n : read.getSubGraph(ms, node, null, 0)) {
 				// log.debug("Node: path=" + path + " content=" + n.getContent());
 				if (fromUserNode == null) {
 					n.setOwner(toUserNode.getOwner());
 					transfers++;
 				} else {
-					if (transferNode(session, n, fromUserNode.getOwner(), toUserNode.getOwner())) {
+					if (transferNode(ms, n, fromUserNode.getOwner(), toUserNode.getOwner())) {
 						transfers++;
 					}
 				}
@@ -735,7 +735,7 @@ public class NodeEditService {
 	}
 
 	/* Returns true if a transfer was done */
-	public boolean transferNode(MongoSession session, SubNode node, ObjectId fromUserObjId, ObjectId toUserObjId) {
+	public boolean transferNode(MongoSession ms, SubNode node, ObjectId fromUserObjId, ObjectId toUserObjId) {
 		/* is this a node we are transferring */
 		if (fromUserObjId.equals(node.getOwner())) {
 			node.setOwner(toUserObjId);
@@ -748,28 +748,28 @@ public class NodeEditService {
 	 * This makes ALL the headings of all the sibling nodes match the heading level of the req.nodeId
 	 * passed in.
 	 */
-	public UpdateHeadingsResponse updateHeadings(MongoSession session, UpdateHeadingsRequest req) {
+	public UpdateHeadingsResponse updateHeadings(MongoSession ms, UpdateHeadingsRequest req) {
 		UpdateHeadingsResponse res = new UpdateHeadingsResponse();
-		session = ThreadLocals.ensure(session);
+		ms = ThreadLocals.ensure(ms);
 
-		SubNode node = read.getNode(session, req.getNodeId(), true);
+		SubNode node = read.getNode(ms, req.getNodeId(), true);
 		String content = node.getContent();
 		if (content != null) {
 			content = content.trim();
 			int baseLevel = XString.getHeadingLevel(content);
 
-			SubNode parent = read.getParent(session, node);
+			SubNode parent = read.getParent(ms, node);
 			if (parent != null) {
-				for (SubNode n : read.getChildren(session, parent)) {
-					updateHeadingsForNode(session, n, baseLevel);
+				for (SubNode n : read.getChildren(ms, parent)) {
+					updateHeadingsForNode(ms, n, baseLevel);
 				}
-				update.saveSession(session);
+				update.saveSession(ms);
 			}
 		}
 		return res;
 	}
 
-	private void updateHeadingsForNode(MongoSession session, SubNode node, int level) {
+	private void updateHeadingsForNode(MongoSession ms, SubNode node, int level) {
 		if (node == null)
 			return;
 
@@ -830,30 +830,30 @@ public class NodeEditService {
 		}
 	}
 
-	public SearchAndReplaceResponse searchAndReplace(MongoSession session, SearchAndReplaceRequest req) {
+	public SearchAndReplaceResponse searchAndReplace(MongoSession ms, SearchAndReplaceRequest req) {
 		SearchAndReplaceResponse res = new SearchAndReplaceResponse();
-		session = ThreadLocals.ensure(session);
+		ms = ThreadLocals.ensure(ms);
 		int replacements = 0;
 		String nodeId = req.getNodeId();
 
 		// log.debug("searchingAndReplace node: " + nodeId);
-		SubNode node = read.getNode(session, nodeId);
-		auth.ownerAuth(session, node);
+		SubNode node = read.getNode(ms, nodeId);
+		auth.ownerAuth(ms, node);
 
-		if (replaceText(session, node, req.getSearch(), req.getReplace())) {
+		if (replaceText(ms, node, req.getSearch(), req.getReplace())) {
 			replacements++;
 		}
 
 		if (req.isRecursive()) {
-			for (SubNode n : read.getSubGraph(session, node, null, 0)) {
-				if (replaceText(session, n, req.getSearch(), req.getReplace())) {
+			for (SubNode n : read.getSubGraph(ms, node, null, 0)) {
+				if (replaceText(ms, n, req.getSearch(), req.getReplace())) {
 					replacements++;
 				}
 			}
 		}
 
 		if (replacements > 0) {
-			update.saveSession(session);
+			update.saveSession(ms);
 		}
 
 		res.setMessage(String.valueOf(replacements) + " nodes were updated.");
@@ -861,7 +861,7 @@ public class NodeEditService {
 		return res;
 	}
 
-	private boolean replaceText(MongoSession session, SubNode node, String search, String replace) {
+	private boolean replaceText(MongoSession ms, SubNode node, String search, String replace) {
 		String content = node.getContent();
 		if (content == null)
 			return false;

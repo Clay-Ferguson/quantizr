@@ -25,12 +25,12 @@ public class RssFeedType extends TypeBase {
         return NodeType.RSS_FEED.s();
     }
 
-    public void createSubNode(MongoSession session, ValContainer<SubNode> node, CreateSubNodeRequest req, boolean linkBookmark) {
-        SubNode holderNode = create.createNode(session, node.getVal(), null, NodeType.NONE.s(), 0L, CreateNodeLocation.FIRST,
+    public void createSubNode(MongoSession ms, ValContainer<SubNode> node, CreateSubNodeRequest req, boolean linkBookmark) {
+        SubNode holderNode = create.createNode(ms, node.getVal(), null, NodeType.NONE.s(), 0L, CreateNodeLocation.FIRST,
                 req.getProperties(), null, false);
         holderNode.setContent("#### Edit this. Add your RSS title!");
         holderNode.touch();
-        update.save(session, holderNode);
+        update.save(ms, holderNode);
         node.setVal(holderNode);
     }
 }

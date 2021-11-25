@@ -82,14 +82,14 @@ public class SubNodeUtil {
 		node.setAc(ac);
 	}
 
-	public String getFriendlyNodeUrl(MongoSession session, SubNode node) {
+	public String getFriendlyNodeUrl(MongoSession ms, SubNode node) {
 		// if node doesn't thave a name, make ID-based url
 		if (StringUtils.isEmpty(node.getName())) {
 			return String.format("%s/app?id=%s", appProp.getHostAndPort(), node.getId().toHexString());
 		}
 		// else format this node name based on whether the node is admin owned or not.
 		else {
-			String owner = read.getNodeOwner(session, node);
+			String owner = read.getNodeOwner(ms, node);
 
 			// if admin owns node
 			if (owner.equalsIgnoreCase(PrincipalName.ADMIN.s())) {
@@ -106,12 +106,12 @@ public class SubNodeUtil {
 	 * Ensures a node at parentPath/pathName exists and that it's also named 'nodeName' (if nodeName is
 	 * provides), by creating said node if not already existing or leaving it as is if it does exist.
 	 */
-	public SubNode ensureNodeExists(MongoSession session, String parentPath, String pathName, String nodeName,
+	public SubNode ensureNodeExists(MongoSession ms, String parentPath, String pathName, String nodeName,
 			String defaultContent, String primaryTypeName, boolean saveImmediate, SubNodePropertyMap props,
 			ValContainer<Boolean> created) {
 
 		if (nodeName != null) {
-			SubNode nodeByName = read.getNodeByName(session, nodeName);
+			SubNode nodeByName = read.getNodeByName(ms, nodeName);
 			if (nodeByName != null) {
 				return nodeByName;
 			}
@@ -122,7 +122,7 @@ public class SubNodeUtil {
 		}
 
 		// log.debug("Looking up node by path: "+(parentPath+name));
-		SubNode node = read.getNode(session, fixPath(parentPath + pathName));
+		SubNode node = read.getNode(ms, fixPath(parentPath + pathName));
 
 		// if we found the node and it's name matches (if provided)
 		if (node != null && (nodeName == null || nodeName.equals(node.getName()))) {
@@ -143,7 +143,7 @@ public class SubNodeUtil {
 
 		SubNode parent = null;
 		if (!parentPath.equals("/")) {
-			parent = read.getNode(session, parentPath);
+			parent = read.getNode(ms, parentPath);
 			if (parent == null) {
 				throw ExUtil.wrapEx("Expected parent not found: " + parentPath);
 			}
@@ -154,7 +154,7 @@ public class SubNodeUtil {
 
 			String path = fixPath(parentPath + nameToken);
 			// log.debug("ensuring node exists: parentPath=" + path);
-			node = read.getNode(session, path);
+			node = read.getNode(ms, path);
 
 			/*
 			 * if this node is found continue on, using it as current parent to build on
@@ -165,7 +165,7 @@ public class SubNodeUtil {
 				// log.debug("Creating " + nameToken + " node, which didn't exist.");
 
 				/* Note if parent PARAMETER here is null we are adding a root node */
-				parent = create.createNode(session, parent, nameToken, primaryTypeName, 0L, CreateNodeLocation.LAST, null, null,
+				parent = create.createNode(ms, parent, nameToken, primaryTypeName, 0L, CreateNodeLocation.LAST, null, null,
 						true);
 
 				if (parent == null) {
@@ -177,7 +177,7 @@ public class SubNodeUtil {
 					parent.setContent("");
 					parent.touch();
 				}
-				update.save(session, parent);
+				update.save(ms, parent);
 			}
 			parentPath += nameToken + "/";
 		}
@@ -196,7 +196,7 @@ public class SubNodeUtil {
 		}
 
 		if (saveImmediate && nodesCreated) {
-			update.saveSession(session);
+			update.saveSession(ms);
 		}
 		return parent;
 	}

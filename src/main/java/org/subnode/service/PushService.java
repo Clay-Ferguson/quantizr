@@ -39,11 +39,11 @@ public class PushService {
 	private Executor executor;
 
 	/* Notify all users being shared to on this node */
-	public void pushNodeUpdateToBrowsers(MongoSession session, HashSet<Integer> sessionsPushed, SubNode node) {
+	public void pushNodeUpdateToBrowsers(MongoSession ms, HashSet<Integer> sessionsPushed, SubNode node) {
 		// log.debug("Pushing update to all friends: id=" + node.getId().toHexString());
 
 		/* get list of userNames this node is shared to (one of them may be 'public') */
-		List<String> usersSharedTo = auth.getUsersSharedTo(session, node);
+		List<String> usersSharedTo = auth.getUsersSharedTo(ms, node);
 
 		// if node has no sharing we're done here
 		if (usersSharedTo == null) {
@@ -66,7 +66,7 @@ public class PushService {
 				continue;
 
 			/* build our push message payload */
-			NodeInfo nodeInfo = convert.convertToNodeInfo(sc, session, node, true, false, 1, false, false, true, false);
+			NodeInfo nodeInfo = convert.convertToNodeInfo(sc, ms, node, true, false, 1, false, false, true, false);
 			FeedPushInfo pushInfo = new FeedPushInfo(nodeInfo);
 
 			/*
@@ -84,7 +84,7 @@ public class PushService {
 	 * users who have opened some ancestor node as their "Feed Node" (viewing feed of that specific
 	 * node)
 	 */
-	public void pushNodeToMonitoringBrowsers(MongoSession session, HashSet<Integer> sessionsPushed, SubNode node) {
+	public void pushNodeToMonitoringBrowsers(MongoSession ms, HashSet<Integer> sessionsPushed, SubNode node) {
 		// log.debug("Push to monitoring Browsers: node.content=" + node.getContent());
 
 		/* Scan all sessions and push message to the ones that need to see it */
@@ -102,7 +102,7 @@ public class PushService {
 			if (node.getPath() != null && sc.getWatchingPath() != null && node.getPath().startsWith(sc.getWatchingPath())) {
 
 				/* build our push message payload */
-				NodeInfo nodeInfo = convert.convertToNodeInfo(sc, session, node, true, false, 1, false, false, true, false);
+				NodeInfo nodeInfo = convert.convertToNodeInfo(sc, ms, node, true, false, 1, false, false, true, false);
 				FeedPushInfo pushInfo = new FeedPushInfo(nodeInfo);
 
 				// push notification message to browser
@@ -116,7 +116,7 @@ public class PushService {
 	}
 
 	/* Notify all browser timelines if they have new info */
-	public void pushTimelineUpdateToBrowsers(MongoSession session, NodeInfo nodeInfo) {
+	public void pushTimelineUpdateToBrowsers(MongoSession ms, NodeInfo nodeInfo) {
 		/* Scan all sessions and push message to the ones that need to see it */
 		for (SessionContext sc : SessionContext.getAllSessions()) {
 			/* Anonymous sessions can be ignored */

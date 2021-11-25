@@ -222,10 +222,10 @@ public class ActPubService {
      */
     public HashSet<String> getSharedInboxesOfFollowers(String userName) {
         HashSet<String> set = new HashSet<>();
-        MongoSession adminSession = auth.getAdminSession();
+        MongoSession as = auth.getAdminSession();
 
         // This query gets the FRIEND nodes that specifify userName on them
-        Query query = apFollower.getFriendsByUserName_query(adminSession, userName);
+        Query query = apFollower.getFriendsByUserName_query(as, userName);
         if (query == null)
             return null;
 
@@ -237,7 +237,7 @@ public class ActPubService {
              * Note: The OWNER of this FRIEND node is the person doing the follow, so we look up their account
              * node which is in node.ownerId
              */
-            SubNode followerAccount = read.getNode(adminSession, node.getOwner());
+            SubNode followerAccount = read.getNode(as, node.getOwner());
             if (followerAccount != null) {
                 String followerUserName = followerAccount.getStrProp(NodeProp.USER);
                 if (followerUserName.contains("@")) {

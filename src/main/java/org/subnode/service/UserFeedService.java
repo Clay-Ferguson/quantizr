@@ -82,14 +82,14 @@ public class UserFeedService {
 	// 		NodeType.POSTS.s(), //
 	// 		NodeType.ACT_PUB_POSTS.s());
 
-	public CheckMessagesResponse checkMessages(MongoSession session, CheckMessagesRequest req) {
+	public CheckMessagesResponse checkMessages(MongoSession ms, CheckMessagesRequest req) {
 		SessionContext sc = ThreadLocals.getSC();
 		CheckMessagesResponse res = new CheckMessagesResponse();
 
 		if (sc.isAnonUser())
 			return res;
 
-		session = ThreadLocals.ensure(session);
+		ms = ThreadLocals.ensure(ms);
 		String pathToSearch = NodeName.ROOT_OF_ALL_USERS;
 
 		Query query = new Query();
@@ -104,7 +104,7 @@ public class UserFeedService {
 				// 		Criteria.where(SubNode.FIELD_TYPE).ne(NodeType.POSTS.s()), //
 				// 		Criteria.where(SubNode.FIELD_TYPE).ne(NodeType.ACT_PUB_POSTS.s()));
 
-		SubNode searchRoot = read.getNode(session, sc.getRootId());
+		SubNode searchRoot = read.getNode(ms, sc.getRootId());
 
 		Long lastActiveLong = searchRoot.getIntProp(NodeProp.LAST_ACTIVE_TIME.s());
 		if (lastActiveLong == 0) {
@@ -127,7 +127,7 @@ public class UserFeedService {
 	 * Generated content of the "Feed" for a user.
 	 * 
 	 */
-	public NodeFeedResponse generateFeed(MongoSession session, NodeFeedRequest req) {
+	public NodeFeedResponse generateFeed(MongoSession ms, NodeFeedRequest req) {
 		/*
 		 * Set this flag to generate large resultset of all nodes in root, just for exercising this method
 		 * without 'real' data.
@@ -136,7 +136,7 @@ public class UserFeedService {
 
 		SessionContext sc = ThreadLocals.getSC();
 		NodeFeedResponse res = new NodeFeedResponse();
-		session = ThreadLocals.ensure(session);
+		ms = ThreadLocals.ensure(ms);
 
 		String pathToSearch = testQuery ? "/r" : NodeName.ROOT_OF_ALL_USERS;
 		boolean doAuth = true;
@@ -147,14 +147,14 @@ public class UserFeedService {
 		 */
 		if (req.getNodeId() != null) {
 			// Get the chat room node (root of the chat room query)
-			SubNode rootNode = read.getNode(session, req.getNodeId());
+			SubNode rootNode = read.getNode(ms, req.getNodeId());
 			if (rootNode == null) {
 				throw new RuntimeException("Node not found: " + req.getNodeId());
 			}
 			pathToSearch = rootNode.getPath();
 
 			/* if the chat root is public disable all auth logic in this method */
-			if (AclService.isPublic(session, rootNode)) {
+			if (AclService.isPublic(ms, rootNode)) {
 				// do nothing, for now.
 			}
 			/*
@@ -163,7 +163,7 @@ public class UserFeedService {
 			 */
 			else {
 				try {
-					auth.auth(session, rootNode, PrivilegeType.READ, PrivilegeType.WRITE);
+					auth.auth(ms, rootNode, PrivilegeType.READ, PrivilegeType.WRITE);
 				} catch (Exception e) {
 					sc.setWatchingPath(null);
 					throw e;
@@ -196,13 +196,13 @@ public class UserFeedService {
 
 		// includes shares TO me.
 		if (!testQuery && doAuth && req.getToMe()) {
-			myAcntNode = read.getNode(session, sc.getRootId());
+			myAcntNode = read.getNode(ms, sc.getRootId());
 
 			if (myAcntNode != null) {
 				orCriteria.add(Criteria.where(SubNode.FIELD_AC + "." + myAcntNode.getOwner().toHexString()).ne(null));
 
 				final SubNode _myAcntNode = myAcntNode;
-				final MongoSession _s = session;
+				final MongoSession _s = ms;
 				long lastActiveTime = sc.getLastActiveTime();
 				// do this work in async thread to make this query more performant
 				asyncExec.run(ThreadLocals.getContext(), () -> {
@@ -256,7 +256,7 @@ public class UserFeedService {
 
 		if (!testQuery && doAuth && req.getFromMe()) {
 			if (myAcntNode == null) {
-				myAcntNode = read.getNode(session, sc.getRootId());
+				myAcntNode = read.getNode(ms, sc.getRootId());
 			}
 
 			if (myAcntNode != null) {
@@ -269,7 +269,7 @@ public class UserFeedService {
 		}
 
 		if (!testQuery && doAuth && req.getFromFriends()) {
-			List<SubNode> friendNodes = userManagerService.getSpecialNodesList(session, NodeType.FRIEND_LIST.s(), null, true);
+			List<SubNode> friendNodes = userManagerService.getSpecialNodesList(ms, NodeType.FRIEND_LIST.s(), null, true);
 			if (friendNodes != null) {
 				List<ObjectId> friendIds = new LinkedList<>();
 
@@ -327,7 +327,7 @@ public class UserFeedService {
 		for (SubNode node : iter) {
 			try {
 				NodeInfo info =
-						convert.convertToNodeInfo(sc, session, node, true, false, counter + 1, false, false, false, false);
+						convert.convertToNodeInfo(sc, ms, node, true, false, counter + 1, false, false, false, false);
 				searchResults.add(info);
 			} catch (Exception e) {
 			}
