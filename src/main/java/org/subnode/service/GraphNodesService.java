@@ -50,13 +50,18 @@ public class GraphNodesService {
 		try {
 			Iterable<SubNode> results = null;
 
+			// Run subgraph query to get all nodes if no search text provided
 			if (StringUtils.isEmpty(req.getSearchText())) {
 				results = read.getSubGraph(session, node, null, 0);
-			} else {
+			}
+			// If search text provided run subgraph search.
+			else {
 				int limit = ThreadLocals.getSC().isAdmin() ? Integer.MAX_VALUE : 1000;
-				results = read.searchSubGraph(session, node, "content", req.getSearchText(), null, null, limit, 0, true, false, null, true, false);
+				results = read.searchSubGraph(session, node, "content", req.getSearchText(), null, null, limit, 0, true, false,
+						null, true, false);
 			}
 
+			// Construct the GraphNode object for each result and add to mapByPath
 			for (SubNode n : results) {
 				try {
 					auth.auth(session, node, PrivilegeType.READ);
@@ -67,6 +72,7 @@ public class GraphNodesService {
 				}
 			}
 
+			// processNodes ensuring we have a coherent/complete/consistent tree (no orphans)
 			processNodes(rootPath, rootLevel, mapByPath);
 			res.setRootNode(gnode);
 		} catch (Exception ex) {
@@ -110,7 +116,11 @@ public class GraphNodesService {
 		}
 
 		/*
-		 * First scan to create any parents that don't exist, putting them in newNodes
+		 * First scan to create any parents that don't exist, putting them in mapByPath. Since the query to
+		 * get nodes wasn't a pure recursive method we can have nodes in 'mapByPath' which don't have their
+		 * parent in mapByPath, so we want to pull all those parents into 'mapByPath' too, to be sure we
+		 * have a an actual proper directed graph to send back to client (no orphans in it, not connected to
+		 * root)
 		 */
 		for (String path : keys) {
 			ensureEnoughParents(rootPath, rootLevel, path, mapByPath);

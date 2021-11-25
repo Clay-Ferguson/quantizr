@@ -49,7 +49,6 @@ export class FullScreenGraphViewer extends Main {
     }
 
     domPreUpdateEvent(): void {
-        let elm = this.getRef();
         let state = this.getState();
         if (!state.data) return;
 
@@ -62,12 +61,13 @@ export class FullScreenGraphViewer extends Main {
     }
 
     forceDirectedTree = () => {
-        let _this = this;
-        let margin = { top: 0, right: 0, bottom: 0, left: 0 };
-        let width = window.innerWidth;
-        let height = window.innerHeight;
+        let thiz = this;
 
-        function chart(selection) {
+        return function (selection: any) {
+            let margin = { top: 0, right: 0, bottom: 0, left: 0 };
+            let width = window.innerWidth;
+            let height = window.innerHeight;
+
             let data = selection.datum();
             let chartWidth = width - margin.left - margin.right;
             let chartHeight = height - margin.top - margin.bottom;
@@ -82,51 +82,30 @@ export class FullScreenGraphViewer extends Main {
                 .force("x", d3.forceX())
                 .force("y", d3.forceY());
 
-            _this.tooltip = selection
+            thiz.tooltip = selection
                 .append("div")
                 .attr("class", "tooltip alert alert-secondary")
                 .style("font-size", "14px")
                 .style("pointer-events", "none");
 
-            let mouseover = (event: any, d) => {
-                if (d.data.id.startsWith("/")) {
-                    _this.updateTooltip(d, event.pageX, event.pageY);
-                }
-                else {
-                    _this.showTooltip(d, event.pageX, event.pageY);
-                }
-            };
-
-            let mouseout = () => {
-                _this.tooltip.transition()
-                    .duration(300)
-                    .style("opacity", 0);
-            };
-
             let drag = function (simulation) {
-                function dragstarted(event, d) {
-                    _this.isDragging = true;
-                    if (!event.active) simulation.alphaTarget(0.3).restart();
-                    d.fx = d.x;
-                    d.fy = d.y;
-                }
-
-                function dragged(event, d) {
-                    d.fx = event.x;
-                    d.fy = event.y;
-                }
-
-                function dragended(event, d) {
-                    if (!event.active) simulation.alphaTarget(0);
-                    d.fx = null;
-                    d.fy = null;
-                    _this.isDragging = false;
-                }
-
                 return d3.drag()
-                    .on("start", dragstarted)
-                    .on("drag", dragged)
-                    .on("end", dragended);
+                    .on("start", function (event: any, d: any) {
+                        thiz.isDragging = true;
+                        if (!event.active) simulation.alphaTarget(0.3).restart();
+                        d.fx = d.x;
+                        d.fy = d.y;
+                    })
+                    .on("drag", function (event: any, d: any) {
+                        d.fx = event.x;
+                        d.fy = event.y;
+                    })
+                    .on("end", function (event: any, d: any) {
+                        if (!event.active) simulation.alphaTarget(0);
+                        d.fx = null;
+                        d.fy = null;
+                        thiz.isDragging = false;
+                    });
             };
 
             let svg = selection
@@ -145,9 +124,9 @@ export class FullScreenGraphViewer extends Main {
                 .attr("stroke", "#999")
                 .attr("stroke-width", 1.5)
                 .attr("stroke-opacity", 0.6)
-                .selectAll("line") // PathShape (leave this comment, referenced below)
+                .selectAll("line")
                 .data(links)
-                .join("line"); // PathShape (leave this comment, referenced below)
+                .join("line");
 
             let node = g.append("g")
                 .attr("stroke-width", 1.5)
@@ -157,63 +136,53 @@ export class FullScreenGraphViewer extends Main {
                 .join("circle")
 
                 .attr("fill", d => {
-                    let color = "black";
-                    if (d.data.id === _this.nodeId) {
+                    let color = "transparent";
+                    if (d.data.id === thiz.nodeId) {
                         color = "red";
                     }
                     else if (d.data.highlight) {
                         color = "green";
                     }
-                    // For some bizarre reason whenever we return "black" from here it renders as WHITE insead. Every other color
-                    // seems to work fine, but it just insists that black get rendered as white.
-                    // console.log("color[" + d.data.id + "]=" + color);
                     return color;
                 })
                 .attr("stroke", d => {
-                    return _this.getColorForLevel(d.data.level);
+                    return thiz.getColorForLevel(d.data.level);
                 })
                 .attr("r", d => {
-                    if (d.data.id === _this.nodeId) return 5;
+                    if (d.data.id === thiz.nodeId) return 5;
                     return 3.5;
                 })
 
-                .on("mouseover", mouseover)
-                .on("mouseout", mouseout)
+                .on("mouseover", (event: any, d) => {
+                    if (d.data.id.startsWith("/")) {
+                        thiz.updateTooltip(d, event.pageX, event.pageY);
+                    }
+                    else {
+                        thiz.showTooltip(d, event.pageX, event.pageY);
+                    }
+                })
+                .on("mouseout", () => {
+                    thiz.tooltip.transition()
+                        .duration(300)
+                        .style("opacity", 0);
+                })
 
                 .on("click", function (event: any, d) {
                     d3.select(this)
                         .style("fill", "green");
-                    // .style("stroke", "red");
 
-                    _this.tooltip.text("Opening...")
+                    thiz.tooltip.text("Opening...")
                         .style("left", (event.pageX + 15) + "px")
                         .style("top", (event.pageY - 50) + "px");
 
-                    // use timeout to give user time to notice the circle was colored white now
-                    setTimeout(() => {
-                        if (d.data.id) {
-                            window.open(S.util.getHostAndPort() + "/app?id=" + d.data.id, "_blank");
-                        }
-                    }, 1000);
+                    if (d.data.id) {
+                        window.open(S.util.getHostAndPort() + "/app?id=" + d.data.id, "_blank");
+                    }
                 })
 
                 .call(drag(simulation));
 
             simulation.on("tick", () => {
-                // -------------------
-                // DO NOT DELETE (if PathShape (above) is 'path' use this)
-                // link.attr("d", function (d) {
-                //     let dx = d.target.x - d.source.x;
-                //     let dy = d.target.y - d.source.y;
-                //     let dr = Math.sqrt(dx * dx + dy * dy);
-                //     return "M" + d.source.x + "," + d.source.y + "A" + dr + "," + dr + " 1 0,1 " + d.target.x + "," + d.target.y;
-                // });
-                // node
-                //     .attr("cx", d => d.x)
-                //     .attr("cy", d => d.y);
-                // -------------------
-
-                // If PathShape (above) is 'line' do this
                 link
                     .attr("x1", d => d.source.x)
                     .attr("y1", d => d.source.y)
@@ -226,16 +195,14 @@ export class FullScreenGraphViewer extends Main {
             });
 
             let zoomHandler = d3.zoom()
-                .on("zoom", zoomAction);
+                .on("zoom", function (event: any) {
+                    const { transform } = event;
+                    g.attr("stroke-width", 1 / transform.k);
+                    g.attr("transform", transform);
+                });
 
-            function zoomAction(event) {
-                const { transform } = event;
-                g.attr("stroke-width", 1 / transform.k);
-                g.attr("transform", transform);
-            }
             zoomHandler(svg);
-        }
-        return chart;
+        };
     }
 
     getColorForLevel(level: number): string {
