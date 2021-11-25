@@ -613,6 +613,11 @@ strong em {
     font-weight: bold;
 }
 
+.splitNodeRadioButtonGroup {
+    padding: $smallGap;
+    margin-bottom: $smallGap;
+}
+
 .histPanelExpanded {
     margin-top: 30px;
     margin-left: $smallGap;
