@@ -1403,14 +1403,9 @@ public class AppController implements ErrorController {
 				throw ExUtil.wrapEx("admin only function.");
 			}
 
-			/*
-			 * todo-2: If we are searching a large directory structure here the search will take a long time and
-			 * just show a generic non-updated progress bar on the browser. We need a better way to push status
-			 * back to server and also not make user wait, but be able to close the dlg and move on. Probably we
-			 * need a Lucene Console tab we can just flip over to and then the user is free to look at it or
-			 * not, as they please, but it would be updating in near-realtime using server push, showing
-			 * indexing progress
-			 */
+			/* We need to run this in a thread, and return control back to browser imediately, and then
+			have the "ServerInfo" request able to display the current state of this indexing process, or potentially
+			have a dedicated ServerInfo-like tab to display the state in */
 			return luceneService.reindex(ms, req.getNodeId(), req.getPath());
 		});
 	}
@@ -1418,6 +1413,9 @@ public class AppController implements ErrorController {
 	@RequestMapping(value = API_PATH + "/luceneSearch", method = RequestMethod.POST)
 	public @ResponseBody Object luceneSearch(@RequestBody LuceneSearchRequest req, HttpSession session) {
 		return callProc.run("luceneSearch", req, session, ms -> {
+			if (!ThreadLocals.getSC().isAdmin()) {
+				throw ExUtil.wrapEx("admin only function.");
+			}
 			return luceneService.search(ms, req.getNodeId(), req.getText());
 		});
 	}

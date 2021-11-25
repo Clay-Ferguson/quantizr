@@ -12,7 +12,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.util.WebUtils;
 
 /**
- * Class for keeping track of number of sessions.
+ * For keeping track of sessions.
  */
 @Component
 public class AppSessionListener implements HttpSessionListener {

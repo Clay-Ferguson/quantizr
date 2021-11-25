@@ -344,7 +344,7 @@ public class Convert {
 	public String formatValue(SessionContext sc, Object value, boolean convertToHtml, boolean initNodeEdit) {
 		try {
 			if (value instanceof Date) {
-				return sc.formatTimeForUserTimezone((Date) value);
+				return DateUtil.formatTimeForUserTimezone((Date) value, sc.getTimezone(), sc.getTimeZoneAbbrev());
 			} else {
 				String ret = value.toString();
 

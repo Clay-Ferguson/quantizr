@@ -9,9 +9,9 @@ import org.springframework.scheduling.annotation.SchedulingConfigurer;
 import org.springframework.scheduling.config.ScheduledTaskRegistrar;
 
 /*
- * Without this the @Scheduled annotated functions all share the same thread and the long running
- * ActivityPub onces completely block the others and can disable things like signup processing,
- * email sending, etc.
+ * Without this config the @Scheduled annotated functions all share the same thread and the long
+ * running once completely block the others and can disable things like signup processing, email
+ * sending, etc.
  */
 @Configuration
 @EnableScheduling

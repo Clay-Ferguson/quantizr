@@ -90,7 +90,8 @@ public class AppConfiguration implements WebMvcConfigurer {
 		}
 	}
 
-	/*
+	/* DO NOT DELETE (keep for future reference)
+	 *
 	 * This method is removed because we switched to using the spring.resources.static-locations
 	 * property in application.properties file to accomplish loading static files
 	 */

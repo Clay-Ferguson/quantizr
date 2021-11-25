@@ -10,6 +10,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Locale;
+import java.util.TimeZone;
 import org.apache.commons.lang3.StringUtils;
 import org.subnode.exception.base.RuntimeEx;
 
@@ -242,6 +243,28 @@ public class DateUtil {
 			String hrs = durationStr.substring(0, colonIdx);
 			String mins = durationStr.substring(colonIdx + 1);
 			return (Integer.parseInt(hrs) * 60 + Integer.parseInt(mins)) * 60 * 1000;
+		}
+	}
+
+	public static String formatTimeForUserTimezone(Date date, String timezone, String timeZoneAbbrev) {
+		if (date == null)
+			return null;
+
+		/* If we have a short timezone abbreviation display timezone with it */
+		if (timeZoneAbbrev != null) {
+			SimpleDateFormat dateFormat = new SimpleDateFormat(DateUtil.DATE_FORMAT_NO_TIMEZONE, DateUtil.DATE_FORMAT_LOCALE);
+			if (timezone != null) {
+				dateFormat.setTimeZone(TimeZone.getTimeZone(timezone));
+			}
+			return dateFormat.format(date) + " " + timeZoneAbbrev;
+		}
+		/* else display timezone in standard GMT format */
+		else {
+			SimpleDateFormat dateFormat = new SimpleDateFormat(DateUtil.DATE_FORMAT_WITH_TIMEZONE, DateUtil.DATE_FORMAT_LOCALE);
+			if (timezone != null) {
+				dateFormat.setTimeZone(TimeZone.getTimeZone(timezone));
+			}
+			return dateFormat.format(date);
 		}
 	}
 }

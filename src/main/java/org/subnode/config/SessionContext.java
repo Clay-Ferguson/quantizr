@@ -1,12 +1,9 @@
 package org.subnode.config;
 
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.TimeZone;
 import javax.servlet.http.HttpSession;
 import org.bson.types.ObjectId;
 import org.slf4j.Logger;
@@ -23,7 +20,6 @@ import org.subnode.mongo.MongoUtil;
 import org.subnode.mongo.model.SubNode;
 import org.subnode.response.SessionTimeoutPushInfo;
 import org.subnode.service.PushService;
-import org.subnode.util.DateUtil;
 import org.subnode.util.StopwatchEntry;
 import org.subnode.util.ThreadLocals;
 import org.subnode.util.Util;
@@ -334,28 +330,6 @@ public class SessionContext {
 
 	public boolean isTestAccount() {
 		return MongoUtil.isTestAccountName(userName);
-	}
-
-	public String formatTimeForUserTimezone(Date date) {
-		if (date == null)
-			return null;
-
-		/* If we have a short timezone abbreviation display timezone with it */
-		if (getTimeZoneAbbrev() != null) {
-			SimpleDateFormat dateFormat = new SimpleDateFormat(DateUtil.DATE_FORMAT_NO_TIMEZONE, DateUtil.DATE_FORMAT_LOCALE);
-			if (getTimezone() != null) {
-				dateFormat.setTimeZone(TimeZone.getTimeZone(getTimezone()));
-			}
-			return dateFormat.format(date) + " " + getTimeZoneAbbrev();
-		}
-		/* else display timezone in standard GMT format */
-		else {
-			SimpleDateFormat dateFormat = new SimpleDateFormat(DateUtil.DATE_FORMAT_WITH_TIMEZONE, DateUtil.DATE_FORMAT_LOCALE);
-			if (getTimezone() != null) {
-				dateFormat.setTimeZone(TimeZone.getTimeZone(getTimezone()));
-			}
-			return dateFormat.format(date);
-		}
 	}
 
 	public String getUserName() {

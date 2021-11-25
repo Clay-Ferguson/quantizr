@@ -13,6 +13,9 @@ import org.subnode.mongo.MongoAuth;
 import org.subnode.mongo.MongoRead;
 import org.subnode.mongo.model.SubNode;
 
+/**
+ * Part of SpringSecurity implementation
+ */
 @Service
 public class AppUserDetailsService implements UserDetailsService {
     private static final Logger log = LoggerFactory.getLogger(AppUserDetailsService.class);

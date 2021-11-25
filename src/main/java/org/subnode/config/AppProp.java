@@ -21,13 +21,10 @@ import org.subnode.util.StreamUtil;
 import org.subnode.util.XString;
 
 /**
- * Primary class for accessing application properties.
- * <p>
- * NOTE: We could use EnvironmentAware but under normal circumstances apps can just Autowire the
- * Env, so that's what we do.
+ * Wrapper to access application properties.
  */
 @Component
-public class AppProp /* implements EnvironmentAware */ {
+public class AppProp {
 	private static final Logger log = LoggerFactory.getLogger(AppProp.class);
 
 	@Autowired
