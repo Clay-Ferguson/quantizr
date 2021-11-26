@@ -46,7 +46,7 @@ public class ExportTextService extends ServiceBase {
 		this.res = res;
 		String nodeId = req.getNodeId();
 
-		if (!FileUtils.dirExists(appProp.getAdminDataFolder())) {
+		if (!FileUtils.dirExists(prop.getAdminDataFolder())) {
 			throw ExUtil.wrapEx("adminDataFolder does not exist");
 		}
 
@@ -62,14 +62,14 @@ public class ExportTextService extends ServiceBase {
 	}
 
 	private void exportNodeToFile(MongoSession ms, String nodeId) {
-		if (!FileUtils.dirExists(appProp.getAdminDataFolder())) {
+		if (!FileUtils.dirExists(prop.getAdminDataFolder())) {
 			throw ExUtil.wrapEx("adminDataFolder does not exist.");
 		}
 
 		SubNode exportNode = read.getNode(ms, nodeId, true);
 		String fileName = snUtil.getExportFileName(req.getFileName(), exportNode);
 		shortFileName = fileName + ".md";
-		fullFileName = appProp.getAdminDataFolder() + File.separator + shortFileName;
+		fullFileName = prop.getAdminDataFolder() + File.separator + shortFileName;
 
 		try {
 			log.debug("Export Node: " + exportNode.getPath() + " to file " + fullFileName);

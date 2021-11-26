@@ -149,7 +149,7 @@ public class ActPubOutbox extends ServiceBase {
 
     public APOOrderedCollection generateOutbox(String userName) {
         // log.debug("Generate outbox for userName: " + userName);
-        String url = appProp.getProtocolHostAndPort() + APConst.PATH_OUTBOX + "/" + userName;
+        String url = prop.getProtocolHostAndPort() + APConst.PATH_OUTBOX + "/" + userName;
         Long totalItems = getOutboxItemCount(userName, PrincipalName.PUBLIC.s());
 
         APOOrderedCollection ret = new APOOrderedCollection() //
@@ -188,10 +188,10 @@ public class ActPubOutbox extends ServiceBase {
         APList items = getOutboxItems(userName, minId);
 
         // this is a self-reference url (id)
-        String url = appProp.getProtocolHostAndPort() + APConst.PATH_OUTBOX + "/" + userName + "?min_id=" + minId + "&page=true";
+        String url = prop.getProtocolHostAndPort() + APConst.PATH_OUTBOX + "/" + userName + "?min_id=" + minId + "&page=true";
 
         APOOrderedCollectionPage ret = new APOOrderedCollectionPage() //
-                .put(APProp.partOf, appProp.getProtocolHostAndPort() + APConst.PATH_OUTBOX + "/" + userName) //
+                .put(APProp.partOf, prop.getProtocolHostAndPort() + APConst.PATH_OUTBOX + "/" + userName) //
                 .put(APProp.id, url) //
                 .put(APProp.orderedItems, items) //
                 .put(APProp.totalItems, items.size());
@@ -205,7 +205,7 @@ public class ActPubOutbox extends ServiceBase {
          */
         String sharedTo = PrincipalName.PUBLIC.s();
 
-        String host = appProp.getProtocolHostAndPort();
+        String host = prop.getProtocolHostAndPort();
         APList retItems = null;
         String nodeIdBase = host + "/app?id=";
 

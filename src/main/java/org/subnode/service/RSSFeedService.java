@@ -125,7 +125,7 @@ public class RSSFeedService extends ServiceBase {
 	 */
 	@Scheduled(fixedDelay = 30 * 60 * 1000)
 	public void run() {
-		if (run || !appProp.isDaemonsEnabled() || !MongoRepository.fullInit)
+		if (run || !prop.isDaemonsEnabled() || !MongoRepository.fullInit)
 			return;
 		
 		try {
@@ -150,7 +150,7 @@ public class RSSFeedService extends ServiceBase {
 	}
 
 	public void startupPreCache() {
-		String rssNodeId = appProp.getRssAggregatePreCacheNodeId();
+		String rssNodeId = prop.getRssAggregatePreCacheNodeId();
 		if (StringUtils.isEmpty(rssNodeId))
 			return;
 
@@ -884,7 +884,7 @@ public class RSSFeedService extends ServiceBase {
 
 				entry.setTitle(metaInfo.getTitle() != null ? metaInfo.getTitle() : "ID: " + n.getId().toHexString());
 				entry.setLink(
-						metaInfo.getAttachmentUrl() != null ? metaInfo.getAttachmentUrl() : appProp.getProtocolHostAndPort());
+						metaInfo.getAttachmentUrl() != null ? metaInfo.getAttachmentUrl() : prop.getProtocolHostAndPort());
 
 				/*
 				 * todo-2: need menu item "Set Create Time", and "Set Modify Time", that prompts with the datetime

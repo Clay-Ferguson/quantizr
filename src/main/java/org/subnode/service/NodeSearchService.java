@@ -288,7 +288,7 @@ public class NodeSearchService extends ServiceBase {
 	public void getBookmarks(MongoSession ms, GetBookmarksRequest req, GetBookmarksResponse res) {
 		List<Bookmark> bookmarks = new LinkedList<>();
 
-		List<SubNode> bookmarksNode = usrMgr.getSpecialNodesList(ms, NodeType.BOOKMARK_LIST.s(), null, true);
+		List<SubNode> bookmarksNode = user.getSpecialNodesList(ms, NodeType.BOOKMARK_LIST.s(), null, true);
 		if (bookmarksNode != null) {
 			for (SubNode bmNode : bookmarksNode) {
 				String targetId = bmNode.getStrProp(NodeProp.TARGET_ID);
@@ -341,7 +341,7 @@ public class NodeSearchService extends ServiceBase {
 			List<Criteria> ands = new LinkedList<>();
 			Query query = new Query();
 			Criteria criteria =
-					Criteria.where(SubNode.FIELD_PATH).regex(util.regexRecursiveChildrenOfPath(NodeName.ROOT_OF_ALL_USERS));
+					Criteria.where(SubNode.FIELD_PATH).regex(mongoUtil.regexRecursiveChildrenOfPath(NodeName.ROOT_OF_ALL_USERS));
 
 			// This pattern is what is required when you have multiple conditions added to a
 			// single field.
@@ -363,7 +363,7 @@ public class NodeSearchService extends ServiceBase {
 			query.with(Sort.by(Sort.Direction.DESC, SubNode.FIELD_MODIFY_TIME));
 			query.limit(TRENDING_LIMIT);
 
-			iter = util.find(query);
+			iter = mongoUtil.find(query);
 		}
 		/*
 		 * Otherwise this is not a Feed Tab query but just an arbitrary node stats request, like a user

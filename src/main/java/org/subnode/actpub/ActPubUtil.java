@@ -86,7 +86,7 @@ public class ActPubUtil extends ServiceBase {
 
     /* Builds an actor url for a LOCAL userName */
     public String makeActorUrlForUserName(String userName) {
-        return appProp.getProtocolHostAndPort() + APConst.ACTOR_PATH + "/" + userName;
+        return prop.getProtocolHostAndPort() + APConst.ACTOR_PATH + "/" + userName;
     }
 
     /*
@@ -95,7 +95,7 @@ public class ActPubUtil extends ServiceBase {
      * Looks like this isn't being used.
      */
     public HashSet<String> getHostsFromUserNames(List<String> userNames) {
-        String host = appProp.getMetaHost();
+        String host = prop.getMetaHost();
         HashSet<String> hosts = new HashSet<>();
 
         for (String toUserName : userNames) {
@@ -433,7 +433,7 @@ public class ActPubUtil extends ServiceBase {
                     // strip the port number off if exists
                     String host = XString.truncateAfterFirst(fullHost, ":");
 
-                    if (host.equals(appProp.getMetaHost())) {
+                    if (host.equals(prop.getMetaHost())) {
                         String username = parts[0];
 
                         SubNode userNode = read.getUserNodeByUserName(null, username);
@@ -469,7 +469,7 @@ public class ActPubUtil extends ServiceBase {
          */
         if (isLocalActorUrl(actorUrl)) {
             String shortUserName = getLocalUserNameFromActorUrl(actorUrl);
-            String longUserName = shortUserName + "@" + appProp.getMetaHost();
+            String longUserName = shortUserName + "@" + prop.getMetaHost();
             return longUserName;
         }
 
@@ -513,7 +513,7 @@ public class ActPubUtil extends ServiceBase {
     }
 
     public boolean isLocalActorUrl(String actorUrl) {
-        return actorUrl.startsWith(appProp.getProtocolHostAndPort() + APConst.ACTOR_PATH + "/");
+        return actorUrl.startsWith(prop.getProtocolHostAndPort() + APConst.ACTOR_PATH + "/");
     }
 
     /*
@@ -557,7 +557,7 @@ public class ActPubUtil extends ServiceBase {
     }
 
     public boolean isLocalUrl(String url) {
-        return url != null && url.startsWith(appProp.getHttpProtocol() + "://" + appProp.getMetaHost());
+        return url != null && url.startsWith(prop.getHttpProtocol() + "://" + prop.getMetaHost());
     }
 
     public void iterateOrderedCollection(Object collectionObj, int maxCount, ActPubObserver observer) {
@@ -694,7 +694,7 @@ public class ActPubUtil extends ServiceBase {
 
     // see logback-spring.xml!
     public void log(String message) {
-        if (appProp.isApLog()) {
+        if (prop.isApLog()) {
             log.trace(message);
         }
     }

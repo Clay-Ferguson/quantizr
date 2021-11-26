@@ -98,7 +98,7 @@ public class NodeRenderService extends ServiceBase {
 
 		if (node == null) {
 			log.debug("nodeId not found: " + targetId + " sending user to :public instead");
-			node = read.getNode(ms, appProp.getUserLandingPageNode());
+			node = read.getNode(ms, prop.getUserLandingPageNode());
 		}
 
 		if (node == null) {
@@ -462,7 +462,7 @@ public class NodeRenderService extends ServiceBase {
 	public RenderNodeResponse anonPageLoad(MongoSession ms, RenderNodeRequest req) {
 		ms = ThreadLocals.ensure(ms);
 
-		String id = appProp.getUserLandingPageNode();
+		String id = prop.getUserLandingPageNode();
 		// log.debug("Anon Render Node ID: " + id);
 
 		if (ThreadLocals.getSC().getUrlId() != null) {

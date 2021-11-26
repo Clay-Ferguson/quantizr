@@ -112,7 +112,7 @@ public class NodeEditService extends ServiceBase {
 				create.createNode(ms, node, null, req.getTypeName(), 0L, createLoc, req.getProperties(), null, true);
 
 		if (req.isPendingEdit()) {
-			util.setPendingPath(newNode, true);
+			mongoUtil.setPendingPath(newNode, true);
 		}
 
 		newNode.setContent(req.getContent() != null ? req.getContent() : "");
@@ -252,7 +252,7 @@ public class NodeEditService extends ServiceBase {
 
 		// '/r/p/' = pending (nodes not yet published, being edited created by users)
 		if (req.isPendingEdit()) {
-			util.setPendingPath(newNode, true);
+			mongoUtil.setPendingPath(newNode, true);
 		}
 
 		// we always copy the access controls from the parent for any new nodes
@@ -366,7 +366,7 @@ public class NodeEditService extends ServiceBase {
 		// If removing encryption, remove it from all the ACL entries too.
 		String encKey = node.getStrProp(NodeProp.ENC_KEY.s());
 		if (encKey == null) {
-			util.removeAllEncryptionKeys(node);
+			mongoUtil.removeAllEncryptionKeys(node);
 		}
 		/* if node is currently encrypted */
 		else {
@@ -413,7 +413,7 @@ public class NodeEditService extends ServiceBase {
 		 * If the node being saved is currently in the pending area /p/ then we publish it now, and move it
 		 * out of pending.
 		 */
-		util.setPendingPath(node, false);
+		mongoUtil.setPendingPath(node, false);
 
 		String sessionUserName = ThreadLocals.getSC().getUserName();
 
@@ -426,7 +426,7 @@ public class NodeEditService extends ServiceBase {
 				HashSet<Integer> sessionsPushed = new HashSet<>();
 
 				// push any chat messages that need to go out.
-				pushService.pushNodeToMonitoringBrowsers(s, sessionsPushed, node);
+				push.pushNodeToMonitoringBrowsers(s, sessionsPushed, node);
 
 				SubNode parent = read.getParent(ms, node, false);
 				if (parent != null) {
@@ -446,7 +446,7 @@ public class NodeEditService extends ServiceBase {
 
 						apub.sendNotificationForNodeEdit(s, inReplyTo, snUtil.cloneAcl(node), attachments, node.getContent(),
 								nodeUrl);
-						pushService.pushNodeUpdateToBrowsers(s, sessionsPushed, node);
+						push.pushNodeUpdateToBrowsers(s, sessionsPushed, node);
 					}
 					return null;
 				} else {
@@ -463,7 +463,7 @@ public class NodeEditService extends ServiceBase {
 		// todo-1: for now we only push nodes if public, up to browsers rather than doing a specific check
 		// to send only to users who should see it.
 		if (AclService.isPublic(ms, node)) {
-			pushService.pushTimelineUpdateToBrowsers(ms, newNodeInfo);
+			push.pushTimelineUpdateToBrowsers(ms, newNodeInfo);
 		}
 
 		res.setSuccess(true);

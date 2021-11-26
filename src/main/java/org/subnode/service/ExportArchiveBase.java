@@ -201,7 +201,7 @@ public abstract class ExportArchiveBase extends ServiceBase {
 		String htmlFile = fileName.getVal() + ".html";
 		addFileEntry(htmlFile, html.toString().getBytes(StandardCharsets.UTF_8));
 
-		String relParent = "../" + fileUtils.getShortFileName(htmlFile);
+		String relParent = "../" + fileUtil.getShortFileName(htmlFile);
 
 		if (children != null) {
 			/* Second pass over children is the actual recursion down into the tree */

@@ -61,7 +61,7 @@ public class ActPubFollowing extends ServiceBase {
             arun.run(session -> {
                 String sessionActorUrl = apUtil.makeActorUrlForUserName(followerUserName);
                 APOFollow followAction = new APOFollow()
-                        .put(APProp.id, appProp.getProtocolHostAndPort() + "/follow/" + String.valueOf(new Date().getTime())) //
+                        .put(APProp.id, prop.getProtocolHostAndPort() + "/follow/" + String.valueOf(new Date().getTime())) //
                         .put(APProp.actor, sessionActorUrl) //
                         .put(APProp.object, actorUrlOfUserBeingFollowed);
                 APObj action = null;
@@ -74,7 +74,7 @@ public class ActPubFollowing extends ServiceBase {
                 else {
                     action = new APOUndo()//
                             .put(APProp.id,
-                                    appProp.getProtocolHostAndPort() + "/unfollow/" + String.valueOf(new Date().getTime())) //
+                                    prop.getProtocolHostAndPort() + "/unfollow/" + String.valueOf(new Date().getTime())) //
                             .put(APProp.actor, sessionActorUrl) //
                             .put(APProp.object, followAction);
                 }
@@ -200,7 +200,7 @@ public class ActPubFollowing extends ServiceBase {
      * Generates outbound following data
      */
     public APOOrderedCollection generateFollowing(String userName) {
-        String url = appProp.getProtocolHostAndPort() + APConst.PATH_FOLLOWING + "/" + userName;
+        String url = prop.getProtocolHostAndPort() + APConst.PATH_FOLLOWING + "/" + userName;
         Long totalItems = getFollowingCount(userName);
 
         APOOrderedCollection ret = new APOOrderedCollection() //
@@ -218,14 +218,14 @@ public class ActPubFollowing extends ServiceBase {
         List<String> following = getFollowing(userName, minId);
 
         // this is a self-reference url (id)
-        String url = appProp.getProtocolHostAndPort() + APConst.PATH_FOLLOWING + "/" + userName + "?page=true";
+        String url = prop.getProtocolHostAndPort() + APConst.PATH_FOLLOWING + "/" + userName + "?page=true";
         if (minId != null) {
             url += "&min_id=" + minId;
         }
         APOOrderedCollectionPage ret = new APOOrderedCollectionPage() //
                 .put(APProp.id, url) //
                 .put(APProp.orderedItems, following) //
-                .put(APProp.partOf, appProp.getProtocolHostAndPort() + APConst.PATH_FOLLOWING + "/" + userName)//
+                .put(APProp.partOf, prop.getProtocolHostAndPort() + APConst.PATH_FOLLOWING + "/" + userName)//
                 .put(APProp.totalItems, following.size());
         return ret;
     }
@@ -321,7 +321,7 @@ public class ActPubFollowing extends ServiceBase {
         query.limit(ConstantInt.ROWS_PER_PAGE.val());
         query.skip(ConstantInt.ROWS_PER_PAGE.val() * req.getPage());
 
-        Iterable<SubNode> iterable = util.find(query);
+        Iterable<SubNode> iterable = mongoUtil.find(query);
         List<NodeInfo> searchResults = new LinkedList<>();
         int counter = 0;
 
@@ -341,7 +341,7 @@ public class ActPubFollowing extends ServiceBase {
         if (query == null)
             return null;
 
-        return util.find(query);
+        return mongoUtil.find(query);
     }
 
     public long countFollowingOfUser(MongoSession ms, String userName, String actorUrl) {
@@ -387,7 +387,7 @@ public class ActPubFollowing extends ServiceBase {
 
         // query all the friends under
         Criteria criteria = Criteria.where(SubNode.FIELD_PATH) //
-                .regex(util.regexRecursiveChildrenOfPath(friendsListNode.getPath())) //
+                .regex(mongoUtil.regexRecursiveChildrenOfPath(friendsListNode.getPath())) //
                 .and(SubNode.FIELD_TYPE).is(NodeType.FRIEND.s());
 
         query.addCriteria(criteria);

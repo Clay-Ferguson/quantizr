@@ -56,7 +56,7 @@ public class AclService extends ServiceBase {
 		}
 
 		if (req.isIncludeOwners()) {
-			List<String> owners = usrMgr.getOwnerNames(node);
+			List<String> owners = user.getOwnerNames(node);
 			// log.info("Owner Count: " + owners.size());
 			res.setOwners(owners);
 		}

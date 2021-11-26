@@ -58,7 +58,7 @@ public class UserFeedService extends ServiceBase {
 		String pathToSearch = NodeName.ROOT_OF_ALL_USERS;
 
 		Query query = new Query();
-		Criteria criteria = Criteria.where(SubNode.FIELD_PATH).regex(util.regexRecursiveChildrenOfPath(pathToSearch)); //
+		Criteria criteria = Criteria.where(SubNode.FIELD_PATH).regex(mongoUtil.regexRecursiveChildrenOfPath(pathToSearch)); //
 
 		// limit to just markdown types (no type)
 		criteria = criteria.and(SubNode.FIELD_TYPE).is(NodeType.NONE.s());
@@ -187,7 +187,7 @@ public class UserFeedService extends ServiceBase {
 		Query query = new Query();
 
 		// initialize criteria using the Path to select the correct sub-graph of the tree
-		Criteria criteria = Criteria.where(SubNode.FIELD_PATH).regex(util.regexRecursiveChildrenOfPath(pathToSearch)); //
+		Criteria criteria = Criteria.where(SubNode.FIELD_PATH).regex(mongoUtil.regexRecursiveChildrenOfPath(pathToSearch)); //
 
 		// DO NOT DELETE (keep as an example of how to do this)
 		// if (req.getNodeId() == null) {
@@ -234,7 +234,7 @@ public class UserFeedService extends ServiceBase {
 		}
 
 		if (!testQuery && doAuth && req.getFromFriends()) {
-			List<SubNode> friendNodes = usrMgr.getSpecialNodesList(ms, NodeType.FRIEND_LIST.s(), null, true);
+			List<SubNode> friendNodes = user.getSpecialNodesList(ms, NodeType.FRIEND_LIST.s(), null, true);
 			if (friendNodes != null) {
 				List<ObjectId> friendIds = new LinkedList<>();
 
@@ -286,7 +286,7 @@ public class UserFeedService extends ServiceBase {
 		}
 
 		sc.stopwatch("NodeFeedQuery--Start");
-		Iterable<SubNode> iter = util.find(query);
+		Iterable<SubNode> iter = mongoUtil.find(query);
 		sc.stopwatch("NodeFeedQuery--Complete");
 
 		for (SubNode node : iter) {
@@ -310,7 +310,7 @@ public class UserFeedService extends ServiceBase {
 
 	public void getBlockedUserIds(HashSet<ObjectId> set) {
 		arun.run(ms -> {
-			List<SubNode> nodeList = usrMgr.getSpecialNodesList(ms, NodeType.BLOCKED_USERS.s(), null, false);
+			List<SubNode> nodeList = user.getSpecialNodesList(ms, NodeType.BLOCKED_USERS.s(), null, false);
 			if (nodeList == null)
 				return null;
 

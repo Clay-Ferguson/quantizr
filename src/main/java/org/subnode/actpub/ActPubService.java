@@ -145,7 +145,7 @@ public class ActPubService extends ServiceBase {
         if (query == null)
             return null;
 
-        Iterable<SubNode> iterable = util.find(query);
+        Iterable<SubNode> iterable = mongoUtil.find(query);
 
         for (SubNode node : iterable) {
             // log.debug("follower: " + XString.prettyPrint(node));
@@ -178,7 +178,7 @@ public class ActPubService extends ServiceBase {
                     new APObj() //
                             .put(APProp.type, APType.Document) //
                             .put(APProp.mediaType, mime) //
-                            .put(APProp.url, appProp.getProtocolHostAndPort() + "/f/id/" + node.getId().toHexString()));
+                            .put(APProp.url, prop.getProtocolHostAndPort() + "/f/id/" + node.getId().toHexString()));
         }
         return attachments;
     }
@@ -189,7 +189,7 @@ public class ActPubService extends ServiceBase {
         if (toUserNames == null)
             return;
 
-        String host = appProp.getMetaHost();
+        String host = prop.getMetaHost();
         String fromActor = null;
 
         /*
@@ -334,8 +334,8 @@ public class ActPubService extends ServiceBase {
 
             // This checks for both the non-port and has-port versions of the host (host may or may not have
             // port)
-            if (apUserName.endsWith("@" + appProp.getMetaHost().toLowerCase())
-                    || apUserName.contains("@" + appProp.getMetaHost().toLowerCase() + ":")) {
+            if (apUserName.endsWith("@" + prop.getMetaHost().toLowerCase())
+                    || apUserName.contains("@" + prop.getMetaHost().toLowerCase() + ":")) {
                 log.debug("Can't import a user that's not from a foreign server.");
                 return null;
             }
@@ -350,7 +350,7 @@ public class ActPubService extends ServiceBase {
              * If we don't have this user in our system, create them.
              */
             if (userNode == null) {
-                userNode = util.createUser(ms, apUserName, null, null, true);
+                userNode = mongoUtil.createUser(ms, apUserName, null, null, true);
             }
         }
 
@@ -718,7 +718,7 @@ public class ActPubService extends ServiceBase {
         update.save(ms, newNode);
         addAttachmentIfExists(ms, newNode, obj);
         try {
-            pushService.pushNodeUpdateToBrowsers(ms, null, newNode);
+            push.pushNodeUpdateToBrowsers(ms, null, newNode);
         } catch (Exception e) {
             log.error("pushNodeUpdateToBrowsers failed (ignoring error)", e);
         }
@@ -872,18 +872,18 @@ public class ActPubService extends ServiceBase {
      * Generates an Actor object for one of our own local users
      */
     public APObj generateActor(String userName) {
-        String host = appProp.getProtocolHostAndPort();
+        String host = prop.getProtocolHostAndPort();
 
         try {
             SubNode userNode = read.getUserNodeByUserName(null, userName);
             if (userNode != null) {
-                usrMgr.ensureValidCryptoKeys(userNode);
+                user.ensureValidCryptoKeys(userNode);
 
                 String publicKey = userNode.getStrProp(NodeProp.CRYPTO_KEY_PUBLIC.s());
                 String displayName = userNode.getStrProp(NodeProp.DISPLAY_NAME.s());
                 String avatarMime = userNode.getStrProp(NodeProp.BIN_MIME.s());
                 String avatarVer = userNode.getStrProp(NodeProp.BIN.s());
-                String avatarUrl = appProp.getProtocolHostAndPort() + AppController.API_PATH + "/bin/avatar" + "?nodeId="
+                String avatarUrl = prop.getProtocolHostAndPort() + AppController.API_PATH + "/bin/avatar" + "?nodeId="
                         + userNode.getId().toHexString() + "&v=" + avatarVer;
 
                 APObj actor = new APObj() //
@@ -908,7 +908,7 @@ public class ActPubService extends ServiceBase {
                 if (headerImageMime != null) {
                     String headerImageVer = userNode.getStrProp(NodeProp.BIN.s() + "Header");
                     if (headerImageVer != null) {
-                        String headerImageUrl = appProp.getProtocolHostAndPort() + AppController.API_PATH + "/bin/profileHeader"
+                        String headerImageUrl = prop.getProtocolHostAndPort() + AppController.API_PATH + "/bin/profileHeader"
                                 + "?nodeId=" + userNode.getId().toHexString() + "&v=" + headerImageVer;
 
                         actor.put(APProp.image, new APObj() //
@@ -1009,11 +1009,11 @@ public class ActPubService extends ServiceBase {
     public void queueUserForRefresh(String apUserName, boolean force) {
 
         // if not on production we don't run ActivityPub stuff. (todo-1: need to make it optional)
-        if (!appProp.isActPubEnabled()) {
+        if (!prop.isActPubEnabled()) {
             return;
         }
 
-        if (apUserName == null || !apUserName.contains("@") || apUserName.toLowerCase().endsWith("@" + appProp.getMetaHost()))
+        if (apUserName == null || !apUserName.contains("@") || apUserName.toLowerCase().endsWith("@" + prop.getMetaHost()))
             return;
 
         saveFediverseName(apUserName);
@@ -1030,7 +1030,7 @@ public class ActPubService extends ServiceBase {
     /* every 90 minutes ping all the outboxes */
     @Scheduled(fixedDelay = 90 * DateUtil.MINUTE_MILLIS)
     public void bigRefresh() {
-        if (!appProp.isDaemonsEnabled() || !MongoRepository.fullInit)
+        if (!prop.isDaemonsEnabled() || !MongoRepository.fullInit)
             return;
 
         if (bigRefresh)
@@ -1048,7 +1048,7 @@ public class ActPubService extends ServiceBase {
      */
     @Scheduled(fixedDelay = 3 * 1000)
     public void userRefresh() {
-        if (userRefresh || !appProp.isActPubEnabled() || !appProp.isDaemonsEnabled() || !MongoRepository.fullInit)
+        if (userRefresh || !prop.isActPubEnabled() || !prop.isDaemonsEnabled() || !MongoRepository.fullInit)
             return;
 
         try {
@@ -1072,7 +1072,7 @@ public class ActPubService extends ServiceBase {
 
     private void refreshUsers() {
         for (String userName : apCache.usersPendingRefresh.keySet()) {
-            if (!appProp.isDaemonsEnabled())
+            if (!prop.isDaemonsEnabled())
                 break;
             try {
                 Boolean done = apCache.usersPendingRefresh.get(userName);
@@ -1235,7 +1235,7 @@ public class ActPubService extends ServiceBase {
     }
 
     public void refreshForeignUsers() {
-        if (!appProp.isActPubEnabled())
+        if (!prop.isActPubEnabled())
             return;
 
         lastRefreshForeignUsersCycleTime = DateUtil.getFormattedDate(new Date().getTime());
@@ -1249,7 +1249,7 @@ public class ActPubService extends ServiceBase {
                     read.findTypedNodesUnderPath(session, NodeName.ROOT_OF_ALL_USERS, NodeType.ACCOUNT.s());
 
             for (SubNode node : accountNodes) {
-                if (!appProp.isDaemonsEnabled())
+                if (!prop.isDaemonsEnabled())
                     break;
 
                 String userName = node.getStrProp(NodeProp.USER.s());
@@ -1270,7 +1270,7 @@ public class ActPubService extends ServiceBase {
 
     /* This is just to pull in arbitary new users so our Fediverse feed is populated */
     public String crawlNewUsers() {
-        if (!appProp.isActPubEnabled())
+        if (!prop.isActPubEnabled())
             return "ActivityPub not enabled";
 
         return arun.run(session -> {
@@ -1317,7 +1317,7 @@ public class ActPubService extends ServiceBase {
     }
 
     public String maintainForeignUsers() {
-        if (!appProp.isActPubEnabled())
+        if (!prop.isActPubEnabled())
             return "ActivityPub not enabled";
 
         return arun.run(session -> {

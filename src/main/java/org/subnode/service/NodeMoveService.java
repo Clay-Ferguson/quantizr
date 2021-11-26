@@ -209,7 +209,7 @@ public class NodeMoveService extends ServiceBase {
 				 * don't do reference counting we let the garbage collecion cleanup be the only way user quotas are
 				 * deducted from
 				 */
-				usrMgr.addNodeBytesToUserNodeBytes(ms, node, userNode, -1);
+				user.addNodeBytesToUserNodeBytes(ms, node, userNode, -1);
 			}
 
 			try {

@@ -121,7 +121,7 @@ public class AttachmentService extends ServiceBase {
 
 			auth.ownerAuthByThread(node);
 
-			int maxFileSize = usrMgr.getMaxUploadSize(ms);
+			int maxFileSize = user.getMaxUploadSize(ms);
 			int imageCount = 0;
 
 			/*
@@ -226,7 +226,7 @@ public class AttachmentService extends ServiceBase {
 				 * don't need to worry about pending path for this one, and just can go with non-pending for the
 				 * correct safe behavior
 				 */
-				util.setPendingPath(newNode, false);
+				mongoUtil.setPendingPath(newNode, false);
 
 				update.save(ms, newNode);
 				node = newNode;
@@ -287,7 +287,7 @@ public class AttachmentService extends ServiceBase {
 		byte[] imageBytes = null;
 		InputStream isTemp = null;
 
-		int maxFileSize = usrMgr.getMaxUploadSize(ms);
+		int maxFileSize = user.getMaxUploadSize(ms);
 
 		/*
 		 * Clear out any pre-existing binary properties
@@ -544,11 +544,11 @@ public class AttachmentService extends ServiceBase {
 		BufferedOutputStream outStream = null;
 
 		try {
-			String fullFileName = appProp.getAdminDataFolder() + File.separator + fileName;
+			String fullFileName = prop.getAdminDataFolder() + File.separator + fileName;
 			File file = new File(fullFileName);
 			String checkPath = file.getCanonicalPath();
 
-			if (!checkPath.startsWith(appProp.getAdminDataFolder()))
+			if (!checkPath.startsWith(prop.getAdminDataFolder()))
 				throw ExUtil.wrapEx("bad request.");
 
 			if (!file.isFile())
@@ -768,7 +768,7 @@ public class AttachmentService extends ServiceBase {
 	public void readFromDataUrl(MongoSession ms, String sourceUrl, String nodeId, String mimeHint,
 			int maxFileSize) {
 		if (maxFileSize <= 0) {
-			maxFileSize = usrMgr.getMaxUploadSize(ms);
+			maxFileSize = user.getMaxUploadSize(ms);
 		}
 
 		ms = ThreadLocals.ensure(ms);
@@ -809,7 +809,7 @@ public class AttachmentService extends ServiceBase {
 		}
 
 		if (maxFileSize <= 0) {
-			maxFileSize = usrMgr.getMaxUploadSize(ms);
+			maxFileSize = user.getMaxUploadSize(ms);
 		}
 
 		ms = ThreadLocals.ensure(ms);
@@ -973,7 +973,7 @@ public class AttachmentService extends ServiceBase {
 
 		// update the user quota which enforces their total storage limit
 		if (!ms.isAdmin()) {
-			usrMgr.addBytesToUserNodeBytes(ms, streamCount, userNode, 1);
+			user.addBytesToUserNodeBytes(ms, streamCount, userNode, 1);
 		}
 
 		if (userNode == null) {
@@ -998,7 +998,7 @@ public class AttachmentService extends ServiceBase {
 			node.setProp(NodeProp.BIN_SIZE.s() + binSuffix, streamSize.getVal());
 
 			/* consume user quota space */
-			usrMgr.addBytesToUserNodeBytes(ms, streamSize.getVal(), userNode, 1);
+			user.addBytesToUserNodeBytes(ms, streamSize.getVal(), userNode, 1);
 		}
 	}
 
@@ -1015,7 +1015,7 @@ public class AttachmentService extends ServiceBase {
 			 * don't do reference counting we let the garbage collecion cleanup be the only way user quotas are
 			 * deducted from
 			 */
-			usrMgr.addNodeBytesToUserNodeBytes(ms, node, userNode, -1);
+			user.addNodeBytesToUserNodeBytes(ms, node, userNode, -1);
 		}
 
 		grid.delete(new Query(Criteria.where("_id").is(id)));

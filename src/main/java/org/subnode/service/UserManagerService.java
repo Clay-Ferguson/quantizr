@@ -117,7 +117,7 @@ public class UserManagerService extends ServiceBase {
 			SubNode userNode = read.getUserNodeByUserName(auth.getAdminSession(), req.getUserName());
 			String userName = userNode.getStrProp(NodeProp.USER.s());
 
-			String pwdHash = util.getHashOfPassword(req.getPassword());
+			String pwdHash = mongoUtil.getHashOfPassword(req.getPassword());
 			// springLogin throws exception if it fails.
 			springLogin(userName, pwdHash, httpReq);
 			sc.setAuthenticated(userName, null);
@@ -133,7 +133,7 @@ public class UserManagerService extends ServiceBase {
 		sc.setTimezone(DateUtil.getTimezoneFromOffset(req.getTzOffset()));
 		sc.setTimeZoneAbbrev(DateUtil.getUSTimezone(-req.getTzOffset() / 60, req.getDst()));
 
-		res.setAnonUserLandingPageNode(appProp.getUserLandingPageNode());
+		res.setAnonUserLandingPageNode(prop.getUserLandingPageNode());
 		log.debug("Processing Login: urlId=" + (sc.getUrlId() != null ? sc.getUrlId() : "null"));
 
 		if (sc.getUrlId() != null) {
@@ -215,7 +215,7 @@ public class UserManagerService extends ServiceBase {
 		res.setUserName(userNode.getStrProp(NodeProp.USER));
 		res.setDisplayName(userNode.getStrProp(NodeProp.DISPLAY_NAME));
 
-		res.setAllowFileSystemSearch(appProp.isAllowFileSystemSearch());
+		res.setAllowFileSystemSearch(prop.isAllowFileSystemSearch());
 		res.setUserPreferences(userPreferences);
 		res.setAuthToken(sc.getUserToken());
 
@@ -382,7 +382,7 @@ public class UserManagerService extends ServiceBase {
 	}
 
 	public void initNewUser(MongoSession ms, String userName, String password, String email, boolean automated) {
-		SubNode userNode = util.createUser(ms, userName, email, password, automated);
+		SubNode userNode = mongoUtil.createUser(ms, userName, email, password, automated);
 		if (userNode != null) {
 			log.debug("Successful signup complete.");
 		}
@@ -477,14 +477,14 @@ public class UserManagerService extends ServiceBase {
 			throw new RuntimeEx("User already exists.");
 		}
 
-		SubNode newUserNode = util.createUser(ms, userName, email, password, false);
+		SubNode newUserNode = mongoUtil.createUser(ms, userName, email, password, false);
 
 		/*
 		 * It's easiest to use the actua new UserNode ID as the 'signup code' to send to the user, because
 		 * it's random and tied to this user by definition
 		 */
 		String signupCode = newUserNode.getId().toHexString();
-		String signupLink = appProp.getHttpProtocol() + "://" + appProp.getMetaHost() + "?signupCode=" + signupCode;
+		String signupLink = prop.getHttpProtocol() + "://" + prop.getMetaHost() + "?signupCode=" + signupCode;
 		String content = null;
 
 		/*
@@ -492,13 +492,13 @@ public class UserManagerService extends ServiceBase {
 		 */
 		log.debug("Signup URL: " + signupLink);
 
-		String brandingAppName = appProp.getConfigText("brandingAppName");
+		String brandingAppName = prop.getConfigText("brandingAppName");
 
 		content = "Welcome to " + brandingAppName + ", " + userName + "!" + //
 				"<p>\nUse this link to complete the signup: <br>\n" + signupLink;
 
-		if (!StringUtils.isEmpty(appProp.getMailHost())) {
-			outboxMgr.queueEmail(email, brandingAppName + " - Account Signup", content);
+		if (!StringUtils.isEmpty(prop.getMailHost())) {
+			outbox.queueEmail(email, brandingAppName + " - Account Signup", content);
 		}
 	}
 
@@ -927,7 +927,7 @@ public class UserManagerService extends ServiceBase {
 					throw new RuntimeEx("changePassword should not be called fror admin user.");
 				}
 
-				userNode.getVal().setProp(NodeProp.PWD_HASH.s(), util.getHashOfPassword(password));
+				userNode.getVal().setProp(NodeProp.PWD_HASH.s(), mongoUtil.getHashOfPassword(password));
 				userNode.getVal().deleteProp(NodeProp.USER_PREF_PASSWORD_RESET_AUTHCODE.s());
 
 				// note: the adminRunner.run saves the session so we don't do that here.
@@ -946,7 +946,7 @@ public class UserManagerService extends ServiceBase {
 
 			String password = req.getNewPassword();
 			userName.setVal(userNode.getVal().getStrProp(NodeProp.USER.s()));
-			userNode.getVal().setProp(NodeProp.PWD_HASH.s(), util.getHashOfPassword(password));
+			userNode.getVal().setProp(NodeProp.PWD_HASH.s(), mongoUtil.getHashOfPassword(password));
 			userNode.getVal().deleteProp(NodeProp.USER_PREF_PASSWORD_RESET_AUTHCODE.s());
 
 			update.save(ms, userNode.getVal());
@@ -1013,14 +1013,14 @@ public class UserManagerService extends ServiceBase {
 			update.save(session, ownerNode);
 
 			String passCode = ownerNode.getId().toHexString() + "-" + String.valueOf(authCode);
-			String link = appProp.getHostAndPort() + "/app?passCode=" + passCode;
+			String link = prop.getHostAndPort() + "/app?passCode=" + passCode;
 
-			String brandingAppName = appProp.getConfigText("brandingAppName");
+			String brandingAppName = prop.getConfigText("brandingAppName");
 
 			String content = "Password reset was requested on " + brandingAppName + " account: " + user + //
 			"<p>\nGo to this link to reset your password: <br>\n" + link;
 
-			outboxMgr.queueEmail(email, brandingAppName + " Password Reset", content);
+			outbox.queueEmail(email, brandingAppName + " Password Reset", content);
 
 			res.setMessage("A password reset link has been sent to your email. Check your email in a minute or so.");
 			res.setSuccess(true);

@@ -67,7 +67,7 @@ public class MongoRepository extends ServiceBase {
 
 			MongoSession adminSession = auth.getAdminSession();
 			ThreadLocals.setMongoSession(adminSession);
-			util.createAdminUser(adminSession);
+			mongoUtil.createAdminUser(adminSession);
 
 			/* can shutdown during startup. */
 			if (AppServer.isShuttingDown())
@@ -80,8 +80,8 @@ public class MongoRepository extends ServiceBase {
 			 * this method because of calls to getRepository() always doing an init.
 			 */
 			initialized = true;
-			util.createAllIndexes(adminSession);
-			util.createTestAccounts();
+			mongoUtil.createAllIndexes(adminSession);
+			mongoUtil.createTestAccounts();
 
 			log.debug("MongoRepository fully initialized.");
 			fullInit = true;

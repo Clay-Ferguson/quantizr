@@ -40,7 +40,7 @@ public class ActPubFollower extends ServiceBase {
      * Generates outbound followers data
      */
     public APOOrderedCollection generateFollowers(String userName) {
-        String url = appProp.getProtocolHostAndPort() + APConst.PATH_FOLLOWERS + "/" + userName;
+        String url = prop.getProtocolHostAndPort() + APConst.PATH_FOLLOWERS + "/" + userName;
         Long totalItems = getFollowersCount(userName);
 
         APOOrderedCollection ret = new APOOrderedCollection() //
@@ -134,14 +134,14 @@ public class ActPubFollower extends ServiceBase {
         List<String> followers = getFollowers(userName, minId);
 
         // this is a self-reference url (id)
-        String url = appProp.getProtocolHostAndPort() + APConst.PATH_FOLLOWERS + "/" + userName + "?page=true";
+        String url = prop.getProtocolHostAndPort() + APConst.PATH_FOLLOWERS + "/" + userName + "?page=true";
         if (minId != null) {
             url += "&min_id=" + minId;
         }
         APOOrderedCollectionPage ret = new APOOrderedCollectionPage() //
                 .put(APProp.id, url) //
                 .put(APProp.orderedItems, followers) //
-                .put(APProp.partOf, appProp.getProtocolHostAndPort() + APConst.PATH_FOLLOWERS + "/" + userName)//
+                .put(APProp.partOf, prop.getProtocolHostAndPort() + APConst.PATH_FOLLOWERS + "/" + userName)//
                 .put(APProp.totalItems, followers.size());
         return ret;
     }
@@ -150,7 +150,7 @@ public class ActPubFollower extends ServiceBase {
         Query query = getFriendsByUserName_query(ms, userName);
         if (query == null)
             return null;
-        return util.find(query);
+        return mongoUtil.find(query);
     }
 
     // todo-1: review how do functions like this recieves the admin session?
@@ -166,7 +166,7 @@ public class ActPubFollower extends ServiceBase {
         query.limit(ConstantInt.ROWS_PER_PAGE.val());
         query.skip(ConstantInt.ROWS_PER_PAGE.val() * req.getPage());
 
-        Iterable<SubNode> iterable = util.find(query);
+        Iterable<SubNode> iterable = mongoUtil.find(query);
         List<NodeInfo> searchResults = new LinkedList<NodeInfo>();
         int counter = 0;
 
@@ -214,7 +214,7 @@ public class ActPubFollower extends ServiceBase {
     public Query getFriendsByUserName_query(MongoSession ms, String userName) {
         Query query = new Query();
         Criteria criteria =
-                Criteria.where(SubNode.FIELD_PATH).regex(util.regexRecursiveChildrenOfPath(NodeName.ROOT_OF_ALL_USERS)) //
+                Criteria.where(SubNode.FIELD_PATH).regex(mongoUtil.regexRecursiveChildrenOfPath(NodeName.ROOT_OF_ALL_USERS)) //
                         .and(SubNode.FIELD_PROPERTIES + "." + NodeProp.USER.s() + ".value").is(userName) //
                         .and(SubNode.FIELD_TYPE).is(NodeType.FRIEND.s());
 

@@ -113,7 +113,7 @@ public class IPFSService extends ServiceBase {
 
     @PostConstruct
     public void init() {
-        API_BASE = appProp.getIPFSApiHostAndPort() + "/api/v0";
+        API_BASE = prop.getIPFSApiHostAndPort() + "/api/v0";
         API_CAT = API_BASE + "/cat";
         API_FILES = API_BASE + "/files";
         API_PIN = API_BASE + "/pin";
@@ -248,7 +248,7 @@ public class IPFSService extends ServiceBase {
             /* And finally update this user's quota for the added storage */
             SubNode accountNode = read.getUserNodeByUserName(ms, null);
             if (accountNode != null) {
-                usrMgr.addBytesToUserNodeBytes(ms, stat.getCumulativeSize(), accountNode, 1);
+                user.addBytesToUserNodeBytes(ms, stat.getCumulativeSize(), accountNode, 1);
             }
         });
     }
@@ -491,7 +491,7 @@ public class IPFSService extends ServiceBase {
             HttpHeaders headers = new HttpHeaders();
 
             MultiValueMap<String, Object> bodyMap = new LinkedMultiValueMap<>();
-            LimitedInputStreamEx lis = new LimitedInputStreamEx(stream, usrMgr.getMaxUploadSize(ms));
+            LimitedInputStreamEx lis = new LimitedInputStreamEx(stream, user.getMaxUploadSize(ms));
             bodyMap.add("file", makeFileEntity(lis, fileName));
 
             headers.setContentType(MediaType.MULTIPART_FORM_DATA);
@@ -748,7 +748,7 @@ public class IPFSService extends ServiceBase {
             throw new RuntimeException("failed CIDs: " + hash);
         }
 
-        String sourceUrl = appProp.getIPFSGatewayHostAndPort() + "/ipfs/" + hash;
+        String sourceUrl = prop.getIPFSGatewayHostAndPort() + "/ipfs/" + hash;
 
         try {
             int timeout = 15;

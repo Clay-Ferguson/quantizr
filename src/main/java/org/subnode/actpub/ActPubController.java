@@ -77,7 +77,7 @@ public class ActPubController extends ServiceBase {
 			@PathVariable(value = "userName", required = true) String userName, //
 			HttpServletRequest req, //
 			HttpServletResponse response) throws Exception {
-		String url = appProp.getProtocolHostAndPort() + "/u/" + userName + "/home";
+		String url = prop.getProtocolHostAndPort() + "/u/" + userName + "/home";
 		apUtil.log("Redirecting to: " + url);
 		response.sendRedirect(url);
 	}

@@ -42,7 +42,7 @@ public class SystemService extends ServiceBase {
 		}
 
 		arun.run(mongoSession -> {
-			util.rebuildIndexes(mongoSession);
+			mongoUtil.rebuildIndexes(mongoSession);
 			return null;
 		});
 		return "success.";
@@ -63,7 +63,7 @@ public class SystemService extends ServiceBase {
 		String ret = ipfsGarbageCollect(statsMap);
 
 		arun.run(session -> {
-			usrMgr.writeUserStats(session, statsMap);
+			user.writeUserStats(session, statsMap);
 			return null;
 		});
 
@@ -146,7 +146,7 @@ public class SystemService extends ServiceBase {
 
 	public String getSystemInfo() {
 		StringBuilder sb = new StringBuilder();
-		sb.append("Daemons Enabed: " + String.valueOf(appProp.isDaemonsEnabled()) + "\n");
+		sb.append("Daemons Enabed: " + String.valueOf(prop.isDaemonsEnabled()) + "\n");
 		Runtime runtime = Runtime.getRuntime();
 		runtime.gc();
 		long freeMem = runtime.freeMemory() / Const.ONE_MB;
@@ -155,11 +155,11 @@ public class SystemService extends ServiceBase {
 		sb.append(getIpReport());
 		sb.append("Node Count: " + read.getNodeCount(null) + "\n");
 		sb.append("Attachment Count: " + attach.getGridItemCount() + "\n");
-		sb.append(usrMgr.getUserAccountsReport(null));
+		sb.append(user.getUserAccountsReport(null));
 
 		sb.append(apub.getStatsReport());
 
-		if (!StringUtils.isEmpty(appProp.getIPFSApiHostAndPort())) {
+		if (!StringUtils.isEmpty(prop.getIPFSApiHostAndPort())) {
 			sb.append(ipfs.getRepoStat());
 		}
 

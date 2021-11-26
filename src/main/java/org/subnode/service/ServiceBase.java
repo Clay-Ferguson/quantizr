@@ -61,7 +61,7 @@ public class ServiceBase {
 	protected MongoAuth auth;
 
 	@Autowired
-	protected MongoUtil util;
+	protected MongoUtil mongoUtil;
 
 	@Autowired
 	protected MongoAppConfig mac;
@@ -70,10 +70,10 @@ public class ServiceBase {
 	protected AclService acl;
 
 	@Autowired
-	protected UserManagerService usrMgr;
+	protected UserManagerService user;
 
 	@Autowired
-	protected AppProp appProp;
+	protected AppProp prop;
 
 	@Autowired
 	protected GridFsTemplate grid;
@@ -94,7 +94,7 @@ public class ServiceBase {
 	protected AttachmentService attach;
 
 	@Autowired
-	protected FileUtils fileUtils;
+	protected FileUtils fileUtil;
 
 	@Autowired
 	protected MimeUtil mimeUtil;
@@ -139,13 +139,13 @@ public class ServiceBase {
 	protected TypePluginMgr typePluginMgr;
 
 	@Autowired
-	protected PushService pushService;
+	protected PushService push;
 
 	@Autowired
 	protected EnglishDictionary english;
 
 	@Autowired
-	protected OutboxMgr outboxMgr;
+	protected OutboxMgr outbox;
 
 	@Autowired
 	protected Validator validator;

@@ -51,7 +51,7 @@ public class MongoDelete extends ServiceBase {
 		LocalDate ldt = LocalDate.now().minusDays(30);
 		Date date = Date.from(ldt.atStartOfDay(ZoneId.systemDefault()).toInstant());
 
-		Criteria criteria = Criteria.where(SubNode.FIELD_PATH).regex(util.regexRecursiveChildrenOfPath(parent.getPath())) //
+		Criteria criteria = Criteria.where(SubNode.FIELD_PATH).regex(mongoUtil.regexRecursiveChildrenOfPath(parent.getPath())) //
 				.and(SubNode.FIELD_PROPERTIES + "." + NodeProp.ACT_PUB_ID + ".value").ne(null) //
 				.and(SubNode.FIELD_MODIFY_TIME).lt(date);
 
@@ -67,7 +67,7 @@ public class MongoDelete extends ServiceBase {
 		LocalDate ldt = LocalDate.now().minusDays(5);
 		Date date = Date.from(ldt.atStartOfDay(ZoneId.systemDefault()).toInstant());
 
-		Criteria criteria = Criteria.where(SubNode.FIELD_PATH).regex(util.regexRecursiveChildrenOfPath(userNode.getPath())) //
+		Criteria criteria = Criteria.where(SubNode.FIELD_PATH).regex(mongoUtil.regexRecursiveChildrenOfPath(userNode.getPath())) //
 				.and(SubNode.FIELD_MODIFY_TIME).lt(date); //
 
 		/*
@@ -119,7 +119,7 @@ public class MongoDelete extends ServiceBase {
 		 * single operation! Nice!
 		 */
 		Query query = new Query();
-		query.addCriteria(Criteria.where(SubNode.FIELD_PATH).regex(util.regexRecursiveChildrenOfPath(node.getPath())));
+		query.addCriteria(Criteria.where(SubNode.FIELD_PATH).regex(mongoUtil.regexRecursiveChildrenOfPath(node.getPath())));
 
 		DeleteResult res = ops.remove(query, SubNode.class);
 		log.debug("Num of SubGraph deleted: " + res.getDeletedCount());
@@ -168,7 +168,7 @@ public class MongoDelete extends ServiceBase {
 		Query query = new Query();
 
 		/* Scan every node in the database and store it's path hash in the set */
-		Iterable<SubNode> nodes = util.find(query);
+		Iterable<SubNode> nodes = mongoUtil.find(query);
 		for (SubNode node : nodes) {
 			pathHashSet.add(DigestUtils.sha256Hex(node.getPath()));
 		}
@@ -187,7 +187,7 @@ public class MongoDelete extends ServiceBase {
 			 * Now scan every node again and any PARENT not in the set means that parent doesn't exist and so
 			 * the node is an orphan and can be deleted.
 			 */
-			nodes = util.find(query);
+			nodes = mongoUtil.find(query);
 			int deleteCount = 0;
 			for (SubNode node : nodes) {
 				// ignore the root node and any of it's children.

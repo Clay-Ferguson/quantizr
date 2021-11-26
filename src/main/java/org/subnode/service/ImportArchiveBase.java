@@ -114,7 +114,7 @@ public abstract class ImportArchiveBase extends ServiceBase {
 	 * which we need to attach the binary after translating thru oldIdToNewIdMap however!
 	 */
 	public void storeBinary(ArchiveEntry entry, InputStream zis, String fileName) {
-		String nodeId = fileUtils.stripExtension(fileName);
+		String nodeId = fileUtil.stripExtension(fileName);
 		/*
 		 * todo-2: it would be nice if there WERE a way for an export to extract data out of IPFS and save
 		 * it in the exported file

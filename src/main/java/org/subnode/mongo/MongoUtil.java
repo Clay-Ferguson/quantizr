@@ -169,7 +169,7 @@ public class MongoUtil extends ServiceBase {
 		 * The testUserAccounts is a comma delimited list of user accounts where each user account is a
 		 * colon-delimited list like username:password:email.
 		 */
-		final List<String> testUserAccountsList = XString.tokenize(appProp.getTestUserAccounts(), ",", true);
+		final List<String> testUserAccountsList = XString.tokenize(prop.getTestUserAccounts(), ",", true);
 		if (testUserAccountsList == null) {
 			return;
 		}
@@ -194,7 +194,7 @@ public class MongoUtil extends ServiceBase {
 					signupReq.setPassword(accountInfoList.get(1));
 					signupReq.setEmail(accountInfoList.get(2));
 
-					usrMgr.signup(signupReq, true);
+					user.signup(signupReq, true);
 				} else {
 					log.debug("account exists: " + userName);
 				}
@@ -233,7 +233,7 @@ public class MongoUtil extends ServiceBase {
 			String path = node.getPath().replace(pendingPath, rootPath);
 
 			// and finally ensure we have an UNUSED (not duplicate) path
-			path = util.findAvailablePath(path);
+			path = mongoUtil.findAvailablePath(path);
 			node.setPath(path);
 		}
 	}
@@ -719,7 +719,7 @@ public class MongoUtil extends ServiceBase {
 	 * they way security is inheritive.
 	 */
 	public void createAdminUser(MongoSession ms) {
-		String adminUser = appProp.getMongoAdminUserName();
+		String adminUser = prop.getMongoAdminUserName();
 
 		SubNode adminNode = read.getUserNodeByUserName(ms, adminUser);
 		if (adminNode == null) {

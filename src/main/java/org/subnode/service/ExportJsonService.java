@@ -53,11 +53,11 @@ public class ExportJsonService extends ServiceBase {
 	 */
 	public String dumpAllNodes(MongoSession ms, String pathPrefix, String fileName) {
 		try {
-			if (!FileUtils.dirExists(appProp.getAdminDataFolder())) {
+			if (!FileUtils.dirExists(prop.getAdminDataFolder())) {
 				throw ExUtil.wrapEx("adminDataFolder does not exist");
 			}
 
-			String targetFolder = appProp.getAdminDataFolder() + File.separator + fileName;
+			String targetFolder = prop.getAdminDataFolder() + File.separator + fileName;
 			FileUtils.createDirectory(targetFolder);
 
 			/* This is not a typo, this path will be like ".../fileName/fileName.json" */
@@ -69,10 +69,10 @@ public class ExportJsonService extends ServiceBase {
 			byte[] newLine = "\n,\n".getBytes(StandardCharsets.UTF_8);
 
 			Query query = new Query();
-			Criteria criteria = Criteria.where(SubNode.FIELD_PATH).regex(util.regexRecursiveChildrenOfPath(pathPrefix));
+			Criteria criteria = Criteria.where(SubNode.FIELD_PATH).regex(mongoUtil.regexRecursiveChildrenOfPath(pathPrefix));
 			query.addCriteria(criteria);
 
-			Iterable<SubNode> iter = util.find(query);
+			Iterable<SubNode> iter = mongoUtil.find(query);
 
 			BufferedOutputStream os = null;
 			try {
@@ -126,7 +126,7 @@ public class ExportJsonService extends ServiceBase {
 				String resourceName = "classpath:/nodes/" + subFolder + "/" + oid.toHexString() + "-" + binFileName;
 				Resource resource = SpringContextUtil.getApplicationContext().getResource(resourceName);
 				is = resource.getInputStream();
-				lis = new LimitedInputStreamEx(is, usrMgr.getMaxUploadSize(ms));
+				lis = new LimitedInputStreamEx(is, user.getMaxUploadSize(ms));
 				attach.writeStream(ms, "", node, lis, binFileName, binMime, null);
 				update.save(ms, node);
 

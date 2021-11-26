@@ -506,7 +506,7 @@ public class MongoAuth extends ServiceBase {
 		}
 
 		query.limit(limit);
-		return util.find(query);
+		return mongoUtil.find(query);
 	}
 
 	/*
@@ -533,7 +533,7 @@ public class MongoAuth extends ServiceBase {
 		}
 
 		Query query = new Query();
-		Criteria criteria = Criteria.where(SubNode.FIELD_PATH).regex(util.regexRecursiveChildrenOfPath(pathToSearch));
+		Criteria criteria = Criteria.where(SubNode.FIELD_PATH).regex(mongoUtil.regexRecursiveChildrenOfPath(pathToSearch));
 
 		if (sharedToAny != null && sharedToAny.size() > 0) {
 			List<Criteria> orCriteria = new LinkedList<>();
@@ -572,7 +572,7 @@ public class MongoAuth extends ServiceBase {
 		}
 
 		query.limit(limit);
-		return util.find(query);
+		return mongoUtil.find(query);
 	}
 
 	/* Finds nodes that have any sharing on them at all */
@@ -594,7 +594,7 @@ public class MongoAuth extends ServiceBase {
 		 * string. Without the trailing (.+)$ we would be including the node itself in addition to all its
 		 * children.
 		 */
-		Criteria criteria = Criteria.where(SubNode.FIELD_PATH).regex(util.regexRecursiveChildrenOfPath(pathToSearch)) //
+		Criteria criteria = Criteria.where(SubNode.FIELD_PATH).regex(mongoUtil.regexRecursiveChildrenOfPath(pathToSearch)) //
 				.and(SubNode.FIELD_AC).ne(null);
 
 		if (ownerIdMatch != null) {

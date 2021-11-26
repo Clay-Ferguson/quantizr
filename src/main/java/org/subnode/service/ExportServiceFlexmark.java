@@ -71,7 +71,7 @@ public class ExportServiceFlexmark extends ServiceBase {
 
 		String nodeId = req.getNodeId();
 
-		if (!FileUtils.dirExists(appProp.getAdminDataFolder())) {
+		if (!FileUtils.dirExists(prop.getAdminDataFolder())) {
 			throw ExUtil.wrapEx("adminDataFolder does not exist");
 		}
 
@@ -87,14 +87,14 @@ public class ExportServiceFlexmark extends ServiceBase {
 	}
 
 	private void exportNodeToFile(MongoSession ms, String nodeId) {
-		if (!FileUtils.dirExists(appProp.getAdminDataFolder())) {
+		if (!FileUtils.dirExists(prop.getAdminDataFolder())) {
 			throw ExUtil.wrapEx("adminDataFolder does not exist.");
 		}
 
 		SubNode exportNode = read.getNode(ms, nodeId, true);
 		String fileName = snUtil.getExportFileName(req.getFileName(), exportNode);
 		shortFileName = fileName + "." + format;
-		fullFileName = appProp.getAdminDataFolder() + File.separator + shortFileName;
+		fullFileName = prop.getAdminDataFolder() + File.separator + shortFileName;
 		boolean wroteFile = false;
 
 		FileOutputStream out = null;
@@ -298,7 +298,7 @@ public class ExportServiceFlexmark extends ServiceBase {
 		else {
 			String path = AppController.API_PATH + "/bin/" + bin + "?nodeId=" + node.getId().toHexString() + "&token="
 					+ URLEncoder.encode(ThreadLocals.getSC().getUserToken(), StandardCharsets.UTF_8);
-			src = appProp.getHostAndPort() + path;
+			src = prop.getHostAndPort() + path;
 		}
 
 		if (src == null)
@@ -312,7 +312,7 @@ public class ExportServiceFlexmark extends ServiceBase {
 	 */
 	private String generateHtml(String body) {
 		String ret = XString.getResourceAsString("/public/export-includes/flexmark/html-template.html");
-		ret = ret.replace("{{hostAndPort}}", appProp.getHostAndPort());
+		ret = ret.replace("{{hostAndPort}}", prop.getHostAndPort());
 		ret = ret.replace("{{body}}", body);
 		return ret;
 	}
