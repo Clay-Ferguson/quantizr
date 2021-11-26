@@ -29,7 +29,7 @@ import org.subnode.util.ExUtil;
 import org.subnode.util.FileUtils;
 import org.subnode.util.StreamUtil;
 import org.subnode.util.ThreadLocals;
-import org.subnode.util.ValContainer;
+import org.subnode.util.Val;
 import org.subnode.util.XString;
 
 /**
@@ -162,7 +162,7 @@ public abstract class ExportArchiveBase extends ServiceBase {
 		}
 
 		/* process the current node */
-		ValContainer<String> fileName = new ValContainer<>();
+		Val<String> fileName = new Val<>();
 
 		Iterable<SubNode> iter =
 				read.getChildren(session, node, Sort.by(Sort.Direction.ASC, SubNode.FIELD_ORDINAL), null, 0);
@@ -247,7 +247,7 @@ public abstract class ExportArchiveBase extends ServiceBase {
 	 * extension.
 	 */
 	private void processNodeExport(MongoSession ms, String parentFolder, String deeperPath,
-			SubNode node, StringBuilder html, boolean writeFile, ValContainer<String> fileNameCont,
+			SubNode node, StringBuilder html, boolean writeFile, Val<String> fileNameCont,
 			boolean allowOpenButton, int level, boolean isTopRow) {
 		try {
 			// log.debug("Processing Node: " + node.getContent()+" parentFolder:

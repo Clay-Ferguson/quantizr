@@ -27,7 +27,7 @@ import org.subnode.util.FileUtils;
 import org.subnode.util.LimitedInputStreamEx;
 import org.subnode.util.StreamUtil;
 import org.subnode.util.ThreadLocals;
-import org.subnode.util.ValContainer;
+import org.subnode.util.Val;
 
 /**
  * Import/Export of Raw JSON and Binaries to and from filesystem/classpath)
@@ -63,8 +63,8 @@ public class ExportJsonService extends ServiceBase {
 			/* This is not a typo, this path will be like ".../fileName/fileName.json" */
 			String fullFileName = targetFolder + File.separator + fileName + ".json";
 
-			ValContainer<Integer> numDocs = new ValContainer<>(0);
-			ValContainer<Integer> numBins = new ValContainer<>(0);
+			Val<Integer> numDocs = new Val<>(0);
+			Val<Integer> numBins = new Val<>(0);
 
 			byte[] newLine = "\n,\n".getBytes(StandardCharsets.UTF_8);
 

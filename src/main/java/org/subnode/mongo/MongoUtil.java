@@ -41,7 +41,7 @@ import org.subnode.util.ExUtil;
 import org.subnode.util.ImageSize;
 import org.subnode.util.ImageUtil;
 import org.subnode.util.ThreadLocals;
-import org.subnode.util.ValContainer;
+import org.subnode.util.Val;
 import org.subnode.util.XString;
 
 @Component
@@ -258,7 +258,7 @@ public class MongoUtil extends ServiceBase {
 	}
 
 	public void processAllNodes(MongoSession ms) {
-		// ValContainer<Long> nodesProcessed = new ValContainer<Long>(0L);
+		// Val<Long> nodesProcessed = new Val<Long>(0L);
 
 		// Query query = new Query();
 		// Criteria criteria = Criteria.where(SubNode.FIELD_ACL).ne(null);
@@ -289,7 +289,7 @@ public class MongoUtil extends ServiceBase {
 			return false;
 		}
 
-		ValContainer<Boolean> keysRemoved = new ValContainer<>(false);
+		Val<Boolean> keysRemoved = new Val<>(false);
 		aclMap.forEach((String key, AccessControl ac) -> {
 			if (ac.getKey() != null) {
 				ac.setKey(null);
@@ -714,7 +714,7 @@ public class MongoUtil extends ServiceBase {
 
 	public void createPublicNodes(MongoSession ms) {
 		log.debug("creating Public Nodes");
-		ValContainer<Boolean> created = new ValContainer<>(Boolean.FALSE);
+		Val<Boolean> created = new Val<>(Boolean.FALSE);
 		SubNode publicNode =
 				snUtil.ensureNodeExists(ms, "/" + NodeName.ROOT, NodeName.PUBLIC, null, "Public", null, true, null, created);
 
@@ -722,7 +722,7 @@ public class MongoUtil extends ServiceBase {
 			acl.addPrivilege(ms, publicNode, PrincipalName.PUBLIC.s(), Arrays.asList(PrivilegeType.READ.s()), null);
 		}
 
-		created = new ValContainer<>(Boolean.FALSE);
+		created = new Val<>(Boolean.FALSE);
 
 		// create home node (admin owned node named 'home').
 		SubNode publicHome = snUtil.ensureNodeExists(ms, "/" + NodeName.ROOT + "/" + NodeName.PUBLIC, NodeName.HOME,
@@ -739,7 +739,7 @@ public class MongoUtil extends ServiceBase {
 		 * be placed somewhere that users are not able to navigate directly to it, so we default it to being
 		 * directly in the server root, which is a private node
 		 */
-		created = new ValContainer<>(Boolean.FALSE);
+		created = new Val<>(Boolean.FALSE);
 		SubNode publicWelcome = snUtil.ensureNodeExists(ms, "/" + NodeName.ROOT, NodeName.WELCOME, "welcome-page",
 				"### Welcome Node\n\nDefault landing page content. Admin should edit this node, named 'welcome-page'", null, true,
 				null, created);

@@ -45,7 +45,7 @@ import org.subnode.types.TypeBase;
 import org.subnode.util.SubNodeUtil;
 import org.subnode.util.ThreadLocals;
 import org.subnode.util.Util;
-import org.subnode.util.ValContainer;
+import org.subnode.util.Val;
 import org.subnode.util.XString;
 
 /**
@@ -96,7 +96,7 @@ public class NodeEditService extends ServiceBase {
 
 		TypeBase plugin = typePluginMgr.getPluginByType(req.getTypeName());
 		if (plugin != null) {
-			ValContainer<SubNode> vcNode = new ValContainer<>(node);
+			Val<SubNode> vcNode = new Val<>(node);
 			plugin.createSubNode(ms, vcNode, req, linkBookmark);
 			node = vcNode.getVal();
 		}
@@ -511,7 +511,7 @@ public class NodeEditService extends ServiceBase {
 					});
 				}
 
-				ValContainer<SubNode> userNode = new ValContainer<SubNode>();
+				Val<SubNode> userNode = new Val<SubNode>();
 				arun.run(s -> {
 					userNode.setVal(read.getUserNodeByUserName(s, friendUserName));
 					return null;

@@ -70,7 +70,7 @@ import org.subnode.util.Const;
 import org.subnode.util.DateUtil;
 import org.subnode.util.ExUtil;
 import org.subnode.util.ThreadLocals;
-import org.subnode.util.ValContainer;
+import org.subnode.util.Val;
 import org.subnode.util.XString;
 
 /**
@@ -389,7 +389,7 @@ public class UserManagerService extends ServiceBase {
 	}
 
 	public List<String> getOwnerNames(SubNode node) {
-		ValContainer<List<String>> ret = new ValContainer<List<String>>();
+		Val<List<String>> ret = new Val<List<String>>();
 		arun.run(session -> {
 			ret.setVal(acl.getOwnerNames(session, node));
 			return null;
@@ -743,7 +743,7 @@ public class UserManagerService extends ServiceBase {
 				friendNode = edit.createFriendNode(mst, followerFriendList, newUserName);
 
 				if (friendNode != null) {
-					ValContainer<SubNode> userNode = new ValContainer<SubNode>();
+					Val<SubNode> userNode = new Val<SubNode>();
 					arun.run(s -> {
 						userNode.setVal(read.getUserNodeByUserName(s, newUserName));
 						return null;
@@ -892,8 +892,8 @@ public class UserManagerService extends ServiceBase {
 		ChangePasswordResponse res = new ChangePasswordResponse();
 		ms = ThreadLocals.ensure(ms);
 
-		ValContainer<SubNode> userNode = new ValContainer<>();
-		ValContainer<String> userName = new ValContainer<>();
+		Val<SubNode> userNode = new Val<>();
+		Val<String> userName = new Val<>();
 
 		String passCode = req.getPassCode();
 		if (passCode != null) {

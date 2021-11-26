@@ -78,7 +78,7 @@ import org.subnode.util.MimeTypeUtils;
 import org.subnode.util.StreamUtil;
 import org.subnode.util.ThreadLocals;
 import org.subnode.util.Util;
-import org.subnode.util.ValContainer;
+import org.subnode.util.Val;
 
 /**
  * Service for managing node attachments.
@@ -754,7 +754,7 @@ public class AttachmentService extends ServiceBase {
 	 * 
 	 *        'inputStream' is admittely a retrofit to this function for when we want to just call this
 	 *        method and get an inputStream handed back that can be read from. Normally the inputStream
-	 *        ValContainer is null and not used.
+	 *        Val is null and not used.
 	 */
 	public void readFromUrl(MongoSession ms, String sourceUrl, String nodeId, String mimeHint,
 			int maxFileSize, boolean storeLocally) {
@@ -990,7 +990,7 @@ public class AttachmentService extends ServiceBase {
 	public void writeStreamToIpfs(MongoSession ms, String binSuffix, SubNode node,
 			InputStream stream, String mimeType, SubNode userNode) {
 		auth.ownerAuthByThread(node);
-		ValContainer<Integer> streamSize = new ValContainer<>();
+		Val<Integer> streamSize = new Val<>();
 
 		MerkleLink ret = ipfs.addFromStream(ms, stream, null, mimeType, streamSize, null, false);
 		if (ret != null) {

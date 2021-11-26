@@ -18,8 +18,8 @@ import org.subnode.config.SpringContextUtil;
 @Component
 public class EnglishDictionary {
 	private static final Logger log = LoggerFactory.getLogger(EnglishDictionary.class);
-	private static final HashSet<String> dictWords = new HashSet<String>();
-	private static final HashSet<String> stopWords = new HashSet<String>();
+	private static final HashSet<String> dictWords = new HashSet<>();
+	private static final HashSet<String> stopWords = new HashSet<>();
 
 	public void init() {
 		initDictWords();

@@ -12,7 +12,7 @@ import java.io.InputStream;
  * NOTE: We cannot use the Apache Commons version of this class because it has private members that we need access to,
  * like 'count' for example.
  */
-public abstract class LimitedInputStream extends FilterInputStream implements Closeable {
+public abstract class LimitedInputStream extends FilterInputStream {
 
 	/**
 	 * The maximum size of an item, in bytes.

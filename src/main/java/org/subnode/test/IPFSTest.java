@@ -10,7 +10,7 @@ import org.subnode.model.MerkleLink;
 import org.subnode.model.MerkleNode;
 import org.subnode.mongo.AdminRun;
 import org.subnode.service.IPFSService;
-import org.subnode.util.ValContainer;
+import org.subnode.util.Val;
 import org.subnode.util.XString;
 
 @Component("IPFSTest")
@@ -54,7 +54,7 @@ public class IPFSTest implements TestIntf {
     public void oldTest2() throws Exception {
         // ipfs.getPins();
         arun.run(mongoSession -> {
-            ValContainer<String> cid = new ValContainer<>();
+            Val<String> cid = new Val<>();
             ipfs.dagPutFromString(mongoSession, "{\"data\": \"MY FIRST DAG PUT\"}", null, null, cid);
             log.debug("Cid=" + cid.getVal());
 

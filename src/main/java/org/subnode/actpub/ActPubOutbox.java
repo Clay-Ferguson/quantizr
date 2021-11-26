@@ -29,7 +29,7 @@ import org.subnode.mongo.MongoSession;
 import org.subnode.mongo.model.SubNode;
 import org.subnode.service.ServiceBase;
 import org.subnode.util.DateUtil;
-import org.subnode.util.ValContainer;
+import org.subnode.util.Val;
 import org.subnode.util.XString;
 
 @Component
@@ -80,7 +80,7 @@ public class ActPubOutbox extends ServiceBase {
                 }
             }
 
-            ValContainer<Integer> count = new ValContainer<>(0);
+            Val<Integer> count = new Val<>(0);
             final SubNode _userNode = userNode;
 
             // log.debug("scanning outbox orderedCollection");

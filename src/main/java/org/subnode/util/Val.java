@@ -7,12 +7,12 @@ package org.subnode.util;
  * parameter. Like doing output parameters in Java. Ordinarily used when the more than just one
  * return value from a method call is needed.
  */
-public class ValContainer<T> {
+public class Val<T> {
 	private T val;
 
-	public ValContainer() {}
+	public Val() {}
 
-	public ValContainer(T v) {
+	public Val(T v) {
 		this.val = v;
 	}
 

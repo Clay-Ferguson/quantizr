@@ -64,7 +64,7 @@ import org.subnode.util.LimitedInputStreamEx;
 import org.subnode.util.StreamUtil;
 import org.subnode.util.ThreadLocals;
 import org.subnode.util.Util;
-import org.subnode.util.ValContainer;
+import org.subnode.util.Val;
 import org.subnode.util.XString;
 
 // IPFS Reference: https://docs.ipfs.io/reference/http/api
@@ -421,13 +421,13 @@ public class IPFSService extends ServiceBase {
         return ret;
     }
 
-    public MerkleLink dagPutFromString(MongoSession ms, String val, String mimeType, ValContainer<Integer> streamSize,
-            ValContainer<String> cid) {
+    public MerkleLink dagPutFromString(MongoSession ms, String val, String mimeType, Val<Integer> streamSize,
+            Val<String> cid) {
         return writeFromStream(ms, API_DAG + "/put", IOUtils.toInputStream(val), null, streamSize, cid);
     }
 
     public MerkleLink dagPutFromStream(MongoSession ms, InputStream stream, String mimeType,
-            ValContainer<Integer> streamSize, ValContainer<String> cid) {
+            Val<Integer> streamSize, Val<String> cid) {
         return writeFromStream(ms, API_DAG + "/put", stream, null, streamSize, cid);
     }
 
@@ -442,7 +442,7 @@ public class IPFSService extends ServiceBase {
     }
 
     public MerkleLink addFileFromStream(MongoSession ms, String fileName, InputStream stream, String mimeType,
-            ValContainer<Integer> streamSize, ValContainer<String> cid) {
+            Val<Integer> streamSize, Val<String> cid) {
         return writeFromStream(ms, API_FILES + "/write?arg=" + fileName + "&create=true&parents=true&truncate=true", stream,
                 null, streamSize, cid);
     }
@@ -452,7 +452,7 @@ public class IPFSService extends ServiceBase {
      * DOES pin the file
      */
     public MerkleLink addFromStream(MongoSession ms, InputStream stream, String fileName, String mimeType,
-            ValContainer<Integer> streamSize, ValContainer<String> cid, boolean wrapInFolder) {
+            Val<Integer> streamSize, Val<String> cid, boolean wrapInFolder) {
         String endpoint = API_BASE + "/add?stream-channels=true";
         if (wrapInFolder) {
             endpoint += "&wrap-with-directory=true";
@@ -472,8 +472,8 @@ public class IPFSService extends ServiceBase {
         return null;
     }
 
-    public MerkleLink addTarFromStream(MongoSession ms, InputStream stream, ValContainer<Integer> streamSize,
-            ValContainer<String> cid) {
+    public MerkleLink addTarFromStream(MongoSession ms, InputStream stream, Val<Integer> streamSize,
+            Val<String> cid) {
         return writeFromStream(ms, API_TAR + "/add", stream, null, streamSize, cid);
     }
 
@@ -484,7 +484,7 @@ public class IPFSService extends ServiceBase {
      * always basing off extension on this filename?
      */
     public MerkleLink writeFromStream(MongoSession ms, String endpoint, InputStream stream, String fileName,
-            ValContainer<Integer> streamSize, ValContainer<String> cid) {
+            Val<Integer> streamSize, Val<String> cid) {
         // log.debug("Writing file: " + path);
         MerkleLink ret = null;
         try {

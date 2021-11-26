@@ -14,7 +14,7 @@ import org.subnode.mongo.MongoSession;
 import org.subnode.mongo.model.SubNode;
 import org.subnode.util.ExUtil;
 import org.subnode.util.LimitedInputStreamEx;
-import org.subnode.util.ValContainer;
+import org.subnode.util.Val;
 import org.subnode.util.XString;
 
 public abstract class ImportArchiveBase extends ServiceBase {
@@ -50,7 +50,7 @@ public abstract class ImportArchiveBase extends ServiceBase {
 				String json = IOUtils.toString(zis, "UTF-8");
 				// log.debug(" JSON STRING: " + json);
 
-				ValContainer<String> oldId = new ValContainer<>();
+				Val<String> oldId = new Val<>();
 
 				// run unmarshalling as admin (otherwise setPath can bark about user being not same as owner)
 				SubNode node = (SubNode) arun.run(ms -> {

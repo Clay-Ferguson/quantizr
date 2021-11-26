@@ -1,20 +1,15 @@
 package org.subnode.types;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.subnode.model.NodeInfo;
 import org.subnode.model.PropertyInfo;
 import org.subnode.model.client.NodeProp;
 import org.subnode.model.client.NodeType;
-import org.subnode.mongo.MongoRead;
 import org.subnode.mongo.MongoSession;
 import org.subnode.mongo.model.SubNode;
 
 @Component
 public class FriendType extends TypeBase {
-
-    @Autowired
-    private MongoRead read;
 
     @Override
     public String getName() {

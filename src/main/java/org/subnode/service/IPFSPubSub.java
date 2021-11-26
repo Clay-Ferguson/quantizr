@@ -39,17 +39,8 @@ import org.subnode.util.XString;
 // IPFS Reference: https://docs.ipfs.io/reference/http/api
 
 @Component
-public class IPFSPubSub {
+public class IPFSPubSub extends ServiceBase {
     private static final Logger log = LoggerFactory.getLogger(IPFSPubSub.class);
-
-    @Autowired
-    private AsyncExec asyncExec;
-
-    @Autowired
-    private PushService push;
-
-    @Autowired
-    private IPFSService ipfs;
 
     private static final boolean IPSM_ENABLE = false;
     private static final String IPSM_TOPIC_HEARTBEAT = "ipsm-heartbeat";
@@ -58,7 +49,7 @@ public class IPFSPubSub {
     private static final RestTemplate restTemplate = new RestTemplate(Util.getClientHttpRequestFactory());
     private static final ObjectMapper mapper = new ObjectMapper();
 
-    private static int heartbeatCounter = 0;
+    // private static int heartbeatCounter = 0;
 
     private static final HashMap<String, Integer> fromCounter = new HashMap<>();
 

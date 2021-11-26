@@ -5,6 +5,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.boot.SpringApplication;
 
 /**
+ * DO NOT DELETE
+ * 
  * For future reference only, I'm keeping this is as an example of how to call a SpringBoot app as a
  * command line app.
  */

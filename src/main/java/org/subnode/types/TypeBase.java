@@ -8,10 +8,11 @@ import org.subnode.model.NodeInfo;
 import org.subnode.mongo.MongoSession;
 import org.subnode.mongo.model.SubNode;
 import org.subnode.request.CreateSubNodeRequest;
-import org.subnode.util.ValContainer;
+import org.subnode.service.ServiceBase;
+import org.subnode.util.Val;
 
 @Component
-public abstract class TypeBase {
+public abstract class TypeBase extends ServiceBase {
     private static final Logger log = LoggerFactory.getLogger(TypeBase.class);
 
     @PostConstruct
@@ -24,5 +25,5 @@ public abstract class TypeBase {
 
     public void convert(MongoSession ms, NodeInfo nodeInfo, SubNode node, boolean getFollowers) {}
 
-    public void createSubNode(MongoSession ms, ValContainer<SubNode> node, CreateSubNodeRequest req, boolean linkBookmark) {}
+    public void createSubNode(MongoSession ms, Val<SubNode> node, CreateSubNodeRequest req, boolean linkBookmark) {}
 }

@@ -14,7 +14,7 @@ import org.subnode.mongo.model.SubNode;
 import org.subnode.service.ServiceBase;
 import org.subnode.util.Cast;
 import org.subnode.util.ThreadLocals;
-import org.subnode.util.ValContainer;
+import org.subnode.util.Val;
 import org.subnode.util.XString;
 
 @Component
@@ -111,7 +111,7 @@ public class MongoUpdate extends ServiceBase {
 	 * Unpins any IPFS data that is not currently referenced by MongoDb. Cleans up orphans.
 	 */
 	public String releaseOrphanIPFSPins(HashMap<ObjectId, UserStats> statsMap) {
-		ValContainer<String> ret = new ValContainer<>("failed");
+		Val<String> ret = new Val<>("failed");
 		arun.run(as -> {
 			int pinCount = 0, orphanCount = 0;
 			LinkedHashMap<String, Object> pins = Cast.toLinkedHashMap(ipfs.getPins());

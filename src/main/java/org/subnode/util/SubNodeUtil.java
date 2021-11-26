@@ -7,23 +7,18 @@ import java.util.UUID;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.subnode.AppController;
-import org.subnode.config.AppProp;
 import org.subnode.model.NodeMetaInfo;
 import org.subnode.model.client.NodeProp;
 import org.subnode.model.client.PrincipalName;
 import org.subnode.model.client.PrivilegeType;
 import org.subnode.mongo.CreateNodeLocation;
-import org.subnode.mongo.MongoCreate;
-import org.subnode.mongo.MongoRead;
 import org.subnode.mongo.MongoSession;
-import org.subnode.mongo.MongoUpdate;
 import org.subnode.mongo.model.AccessControl;
 import org.subnode.mongo.model.SubNode;
 import org.subnode.mongo.model.SubNodePropertyMap;
-import org.subnode.service.NodeRenderService;
+import org.subnode.service.ServiceBase;
 
 /**
  * Assorted general utility functions related to SubNodes.
@@ -32,23 +27,8 @@ import org.subnode.service.NodeRenderService;
  * scope bean and non-static methods.
  */
 @Component
-public class SubNodeUtil {
+public class SubNodeUtil extends ServiceBase {
 	private static final Logger log = LoggerFactory.getLogger(SubNodeUtil.class);
-
-	@Autowired
-	private NodeRenderService nodeRender;
-
-	@Autowired
-	private MongoCreate create;
-
-	@Autowired
-	private MongoRead read;
-
-	@Autowired
-	private MongoUpdate update;
-
-	@Autowired
-	private AppProp appProp;
 
 	/*
 	 * These are properties we should never allow the client to send back as part of a save operation.
@@ -85,7 +65,7 @@ public class SubNodeUtil {
 	public String getFriendlyNodeUrl(MongoSession ms, SubNode node) {
 		// if node doesn't thave a name, make ID-based url
 		if (StringUtils.isEmpty(node.getName())) {
-			return String.format("%s/app?id=%s", appProp.getHostAndPort(), node.getIdStr());
+			return String.format("%s/app?id=%s", prop.getHostAndPort(), node.getIdStr());
 		}
 		// else format this node name based on whether the node is admin owned or not.
 		else {
@@ -93,11 +73,11 @@ public class SubNodeUtil {
 
 			// if admin owns node
 			if (owner.equalsIgnoreCase(PrincipalName.ADMIN.s())) {
-				return String.format("%s/n/%s", appProp.getHostAndPort(), node.getName());
+				return String.format("%s/n/%s", prop.getHostAndPort(), node.getName());
 			}
 			// if non-admin owns node
 			else {
-				return String.format("%s/u/%s/%s", appProp.getHostAndPort(), owner, node.getName());
+				return String.format("%s/u/%s/%s", prop.getHostAndPort(), owner, node.getName());
 			}
 		}
 	}
@@ -108,7 +88,7 @@ public class SubNodeUtil {
 	 */
 	public SubNode ensureNodeExists(MongoSession ms, String parentPath, String pathName, String nodeName,
 			String defaultContent, String primaryTypeName, boolean saveImmediate, SubNodePropertyMap props,
-			ValContainer<Boolean> created) {
+			Val<Boolean> created) {
 
 		if (nodeName != null) {
 			SubNode nodeByName = read.getNodeByName(ms, nodeName);
@@ -269,21 +249,21 @@ public class SubNodeUtil {
 		int newLineIdx = description.indexOf("\n");
 		if (newLineIdx != -1) {
 			// call this once to start just so the title extraction works.
-			description = nodeRender.stripRenderTags(description);
+			description = render.stripRenderTags(description);
 
 			// get the new idx, it might have changed.
 			newLineIdx = description.indexOf("\n");
 
 			String ogTitle = description.substring(0, newLineIdx).trim();
-			ogTitle = nodeRender.stripRenderTags(ogTitle);
+			ogTitle = render.stripRenderTags(ogTitle);
 			ret.setTitle(ogTitle);
 
 			description = description.substring(newLineIdx).trim();
-			description = nodeRender.stripRenderTags(description);
+			description = render.stripRenderTags(description);
 			ret.setDescription(description);
 		} else {
 			ret.setTitle("Quanta");
-			description = nodeRender.stripRenderTags(description);
+			description = render.stripRenderTags(description);
 			ret.setDescription(description);
 		}
 
@@ -291,13 +271,13 @@ public class SubNodeUtil {
 		String mime = node.getStr(NodeProp.BIN_MIME.s());
 
 		if (url == null) {
-			url = appProp.getHostAndPort() + "/branding/logo-200px-tr.jpg";
+			url = prop.getHostAndPort() + "/branding/logo-200px-tr.jpg";
 			mime = "image/jpeg";
 		}
 
 		ret.setAttachmentUrl(url);
 		ret.setAttachmentMime(mime);
-		ret.setUrl(appProp.getHostAndPort() + "/app?id=" + node.getIdStr());
+		ret.setUrl(prop.getHostAndPort() + "/app?id=" + node.getIdStr());
 		return ret;
 	}
 
@@ -306,7 +286,7 @@ public class SubNodeUtil {
 
 		String bin = ipfsLink != null ? ipfsLink : node.getStr(NodeProp.BIN);
 		if (bin != null) {
-			return appProp.getHostAndPort() + AppController.API_PATH + "/bin/" + bin + "?nodeId=" + node.getIdStr();
+			return prop.getHostAndPort() + AppController.API_PATH + "/bin/" + bin + "?nodeId=" + node.getIdStr();
 		}
 
 		/* as last resort try to get any extrnally linked binary image */
@@ -319,6 +299,6 @@ public class SubNodeUtil {
 	}
 
 	public String getIdBasedUrl(SubNode node) {
-		return appProp.getProtocolHostAndPort() + "/app?id=" + node.getIdStr();
+		return prop.getProtocolHostAndPort() + "/app?id=" + node.getIdStr();
 	}
 }
