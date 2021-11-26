@@ -8,9 +8,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
-import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.aggregation.Aggregation;
 import org.springframework.data.mongodb.core.aggregation.AggregationOperation;
 import org.springframework.data.mongodb.core.aggregation.AggregationResults;
@@ -19,7 +17,6 @@ import org.springframework.data.mongodb.core.query.CriteriaDefinition;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.TextCriteria;
 import org.springframework.stereotype.Component;
-import org.subnode.config.AppProp;
 import org.subnode.config.NodeName;
 import org.subnode.exception.base.RuntimeEx;
 import org.subnode.model.client.NodeProp;
@@ -27,7 +24,7 @@ import org.subnode.model.client.NodeType;
 import org.subnode.model.client.PrincipalName;
 import org.subnode.model.client.PrivilegeType;
 import org.subnode.mongo.model.SubNode;
-import org.subnode.service.AclService;
+import org.subnode.service.ServiceBase;
 import org.subnode.util.ThreadLocals;
 import org.subnode.util.Util;
 import org.subnode.util.XString;
@@ -37,30 +34,8 @@ import org.subnode.util.XString;
  * information in the thread for use during context of one call
  */
 @Component
-public class MongoRead {
+public class MongoRead extends ServiceBase {
     private static final Logger log = LoggerFactory.getLogger(MongoRead.class);
-
-    @Autowired
-    private MongoTemplate ops;
-
-    @Autowired
-    private MongoCreate create;
-
-    @Autowired
-    private MongoUpdate update;
-
-    @Autowired
-    private MongoAuth auth;
-
-    @Autowired
-    private MongoUtil util;
-
-    @Autowired
-    private AppProp appProp;
-
-    // todo-1: rename to 'acl' everywhere like this.
-    @Autowired
-    private AclService aclService;
 
     private static final Object dbRootLock = new Object();
     private SubNode dbRoot;
@@ -814,7 +789,7 @@ public class MongoRead {
             }
 
             if (defaultPrivs != null) {
-                aclService.addPrivilege(ms, node, PrincipalName.PUBLIC.s(), defaultPrivs, null);
+                acl.addPrivilege(ms, node, PrincipalName.PUBLIC.s(), defaultPrivs, null);
             }
 
             update.save(ms, node);
@@ -826,7 +801,7 @@ public class MongoRead {
          */
         if (node != null && NodeType.POSTS.s().equals(type) && !NodeName.POSTS.equals(node.getName())) {
             node.setName(NodeName.POSTS);
-            aclService.addPrivilege(ms, node, PrincipalName.PUBLIC.s(), Arrays.asList(PrivilegeType.READ.s()), null);
+            acl.addPrivilege(ms, node, PrincipalName.PUBLIC.s(), Arrays.asList(PrivilegeType.READ.s()), null);
             update.save(ms, node);
         }
         return node;

@@ -7,7 +7,6 @@ import java.util.LinkedList;
 import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.subnode.actpub.model.AP;
 import org.subnode.actpub.model.APList;
@@ -16,17 +15,10 @@ import org.subnode.actpub.model.APOMention;
 import org.subnode.actpub.model.APONote;
 import org.subnode.actpub.model.APObj;
 import org.subnode.actpub.model.APProp;
+import org.subnode.service.ServiceBase;
 
 @Controller
-public class ActPubFactory {
-	@Autowired
-	public ActPubService apub;
-
-	@Autowired
-	public ActPubUtil apUtil;
-
-	@Autowired
-	public ActPubCache apCache;
+public class ActPubFactory extends ServiceBase {
 
 	private static final Logger log = LoggerFactory.getLogger(ActPubFactory.class);
 

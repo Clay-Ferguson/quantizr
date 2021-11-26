@@ -5,8 +5,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.gridfs.GridFsTemplate;
 import org.springframework.stereotype.Component;
+import org.subnode.actpub.ActPubCache;
+import org.subnode.actpub.ActPubCrypto;
+import org.subnode.actpub.ActPubFactory;
 import org.subnode.actpub.ActPubFollower;
 import org.subnode.actpub.ActPubFollowing;
+import org.subnode.actpub.ActPubOutbox;
 import org.subnode.actpub.ActPubService;
 import org.subnode.actpub.ActPubUtil;
 import org.subnode.config.AppProp;
@@ -29,18 +33,25 @@ import org.subnode.util.MimeUtil;
 import org.subnode.util.SubNodeUtil;
 import org.subnode.util.Validator;
 
+/*
+ * Give all @Components access to all other components. This is a desireable and intentional
+ * "monolith" and we intentionally break some OOP conventions here because "Services" (singletons)
+ * aren't enough of a significant member of any object hiearachy to need to adhere to the
+ * conventional OOP rules. There are no disadvantages whatsoever to doing this, and huge advantages
+ * in keeping code clean.
+ */
 @Component
 public class ServiceBase {
 	@Autowired
 	protected MongoTemplate ops;
-	
-    @Autowired
+
+	@Autowired
 	protected MongoCreate create;
 
-    @Autowired
+	@Autowired
 	protected MongoRead read;
 
-    @Autowired
+	@Autowired
 	protected MongoUpdate update;
 
 	@Autowired
@@ -49,13 +60,13 @@ public class ServiceBase {
 	@Autowired
 	protected MongoAuth auth;
 
-    @Autowired
+	@Autowired
 	protected MongoUtil util;
 
 	@Autowired
 	protected MongoAppConfig mac;
 
-    @Autowired
+	@Autowired
 	protected AclService acl;
 
 	@Autowired
@@ -89,7 +100,7 @@ public class ServiceBase {
 	protected MimeUtil mimeUtil;
 
 	@Autowired
-    protected AsyncExec asyncExec;
+	protected AsyncExec asyncExec;
 
 	@Autowired
 	protected FileIndexer fileIndexer;
@@ -110,7 +121,19 @@ public class ServiceBase {
 	protected ActPubFollower apFollower;
 
 	@Autowired
+	protected ActPubOutbox apOutbox;
+
+	@Autowired
 	protected ActPubUtil apUtil;
+
+	@Autowired
+	public ActPubCache apCache;
+
+	@Autowired
+	protected ActPubCrypto apCrypto;
+
+	@Autowired
+	protected ActPubFactory apFactory;
 
 	@Autowired
 	protected TypePluginMgr typePluginMgr;

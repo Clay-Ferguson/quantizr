@@ -21,7 +21,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -36,39 +35,16 @@ import org.subnode.actpub.model.AP;
 import org.subnode.actpub.model.APList;
 import org.subnode.actpub.model.APObj;
 import org.subnode.actpub.model.APProp;
-import org.subnode.config.AppProp;
 import org.subnode.model.client.NodeProp;
-import org.subnode.mongo.MongoAuth;
-import org.subnode.mongo.MongoRead;
 import org.subnode.mongo.MongoSession;
 import org.subnode.mongo.model.SubNode;
+import org.subnode.service.ServiceBase;
 import org.subnode.util.Util;
 import org.subnode.util.XString;
 
 @Component
-public class ActPubUtil {
+public class ActPubUtil extends ServiceBase {
     private static final Logger log = LoggerFactory.getLogger(ActPubUtil.class);
-
-    @Autowired
-    private AppProp appProp;
-
-    @Autowired
-    private MongoRead read;
-
-    @Autowired
-    private ActPubCrypto apCrypto;
-
-    @Autowired
-    private ActPubCache apCache;
-
-    @Autowired
-    private ActPubService apub;
-
-    @Autowired
-    private ActPubUtil apUtil;
-
-    @Autowired
-    private MongoAuth auth;
 
     /*
      * RestTemplate is thread-safe and reusable, and has no state, so we need only one final static

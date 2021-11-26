@@ -15,9 +15,7 @@ import org.bson.Document;
 import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort.Direction;
-import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.index.Index;
 import org.springframework.data.mongodb.core.index.IndexField;
 import org.springframework.data.mongodb.core.index.IndexInfo;
@@ -27,7 +25,6 @@ import org.springframework.data.mongodb.core.index.TextIndexDefinition.TextIndex
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Component;
-import org.subnode.config.AppProp;
 import org.subnode.config.NodeName;
 import org.subnode.model.client.NodeProp;
 import org.subnode.model.client.NodeType;
@@ -37,59 +34,21 @@ import org.subnode.mongo.model.AccessControl;
 import org.subnode.mongo.model.FediverseName;
 import org.subnode.mongo.model.SubNode;
 import org.subnode.request.SignupRequest;
-import org.subnode.service.AclService;
-import org.subnode.service.UserManagerService;
+import org.subnode.service.ServiceBase;
 import org.subnode.util.Const;
 import org.subnode.util.Convert;
 import org.subnode.util.ExUtil;
 import org.subnode.util.ImageSize;
 import org.subnode.util.ImageUtil;
-import org.subnode.util.SubNodeUtil;
 import org.subnode.util.ThreadLocals;
 import org.subnode.util.ValContainer;
 import org.subnode.util.XString;
 
 @Component
-public class MongoUtil {
+public class MongoUtil extends ServiceBase {
 	private static final Logger log = LoggerFactory.getLogger(MongoUtil.class);
 
-	@Autowired
-	private UserManagerService usrMgr;
-
-	@Autowired
-	private AdminRun arun;
-
-	@Autowired
-	private AppProp appProp;
-
-	@Autowired
-	private MongoRead read;
-
 	private static HashSet<String> testAccountNames = new HashSet<>();
-
-	@Autowired
-	private MongoAppConfig mac;
-
-	@Autowired
-	private MongoTemplate ops;
-
-	@Autowired
-	private SubNodeUtil snUtil;
-
-	@Autowired
-	private AclService aclService;
-
-	@Autowired
-	private MongoCreate create;
-
-	@Autowired
-	private MongoUpdate update;
-
-	@Autowired
-	private MongoUtil mongoUtil;
-
-	@Autowired
-	private MongoAuth auth;
 
 	private static SubNode systemRootNode;
 
@@ -274,7 +233,7 @@ public class MongoUtil {
 			String path = node.getPath().replace(pendingPath, rootPath);
 
 			// and finally ensure we have an UNUSED (not duplicate) path
-			path = mongoUtil.findAvailablePath(path);
+			path = util.findAvailablePath(path);
 			node.setPath(path);
 		}
 	}
@@ -791,7 +750,7 @@ public class MongoUtil {
 				snUtil.ensureNodeExists(ms, "/" + NodeName.ROOT, NodeName.PUBLIC, null, "Public", null, true, null, created);
 
 		if (created.getVal()) {
-			aclService.addPrivilege(ms, publicNode, PrincipalName.PUBLIC.s(), Arrays.asList(PrivilegeType.READ.s()), null);
+			acl.addPrivilege(ms, publicNode, PrincipalName.PUBLIC.s(), Arrays.asList(PrivilegeType.READ.s()), null);
 		}
 
 		created = new ValContainer<>(Boolean.FALSE);
@@ -801,7 +760,7 @@ public class MongoUtil {
 				NodeName.HOME, "Public Home", null, true, null, created);
 
 		// make node public
-		aclService.addPrivilege(ms, publicHome, PrincipalName.PUBLIC.s(), Arrays.asList(PrivilegeType.READ.s()), null);
+		acl.addPrivilege(ms, publicHome, PrincipalName.PUBLIC.s(), Arrays.asList(PrivilegeType.READ.s()), null);
 
 		log.debug("Public Home Node exists at id: " + publicHome.getId() + " path=" + publicHome.getPath());
 
@@ -817,7 +776,7 @@ public class MongoUtil {
 				null, created);
 
 		if (created.getVal()) {
-			aclService.addPrivilege(ms, publicWelcome, PrincipalName.PUBLIC.s(), Arrays.asList(PrivilegeType.READ.s()),
+			acl.addPrivilege(ms, publicWelcome, PrincipalName.PUBLIC.s(), Arrays.asList(PrivilegeType.READ.s()),
 					null);
 		}
 

@@ -20,46 +20,21 @@ import org.subnode.actpub.model.APOOrderedCollectionPage;
 import org.subnode.actpub.model.APObj;
 import org.subnode.actpub.model.APProp;
 import org.subnode.actpub.model.APType;
-import org.subnode.config.AppProp;
 import org.subnode.config.NodeName;
 import org.subnode.model.client.NodeProp;
 import org.subnode.model.client.NodeType;
 import org.subnode.model.client.PrincipalName;
 import org.subnode.model.client.PrivilegeType;
-import org.subnode.mongo.AdminRun;
-import org.subnode.mongo.MongoAuth;
-import org.subnode.mongo.MongoRead;
 import org.subnode.mongo.MongoSession;
 import org.subnode.mongo.model.SubNode;
+import org.subnode.service.ServiceBase;
 import org.subnode.util.DateUtil;
-import org.subnode.util.SubNodeUtil;
 import org.subnode.util.ValContainer;
 import org.subnode.util.XString;
 
 @Component
-public class ActPubOutbox {
+public class ActPubOutbox extends ServiceBase {
     private static final Logger log = LoggerFactory.getLogger(ActPubOutbox.class);
-
-    @Autowired
-    private ActPubUtil apUtil;
-
-    @Autowired
-    private AdminRun arun;
-
-    @Autowired
-    private AppProp appProp;
-
-    @Autowired
-    private ActPubService apub;
-
-    @Autowired
-    private MongoRead read;
-
-    @Autowired
-    private MongoAuth auth;
-
-    @Autowired
-    private SubNodeUtil snUtil;
 
     @Autowired
     @Qualifier("threadPoolTaskExecutor")

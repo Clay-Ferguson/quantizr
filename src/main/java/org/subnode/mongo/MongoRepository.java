@@ -3,39 +3,17 @@ package org.subnode.mongo;
 import javax.annotation.PreDestroy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.subnode.AppServer;
-import org.subnode.actpub.ActPubService;
+import org.subnode.service.ServiceBase;
 import org.subnode.util.ThreadLocals;
 
 @Component
-public class MongoRepository {
+public class MongoRepository extends ServiceBase {
 	private static final Logger log = LoggerFactory.getLogger(MongoRepository.class);
 
 	// hack for now to make RSS deamon wait.
 	public static boolean fullInit = false;
-
-	@Autowired
-	private MongoAppConfig mac;
-
-	@Autowired
-	private MongoRead read;
-
-	@Autowired
-	private MongoUtil repoUtil;
-
-	@Autowired
-	private MongoAuth auth;
-
-	@Autowired
-	private MongoUtil util;
-
-	@Autowired
-	private MongoDelete delete;
-
-	@Autowired
-	private ActPubService actPub;
 
 	/*
 	 * Because of the criticality of this variable, I am not using the Spring getter to get it, but just
@@ -103,13 +81,13 @@ public class MongoRepository {
 			 */
 			initialized = true;
 			util.createAllIndexes(adminSession);
-			repoUtil.createTestAccounts();
+			util.createTestAccounts();
 
 			log.debug("MongoRepository fully initialized.");
 			fullInit = true;
 
 			delete.removeAbandonedNodes(adminSession);
-			actPub.refreshForeignUsers();
+			apub.refreshForeignUsers();
 		}
 	}
 

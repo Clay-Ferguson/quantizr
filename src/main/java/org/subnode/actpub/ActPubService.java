@@ -15,7 +15,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
@@ -25,39 +24,25 @@ import org.subnode.actpub.model.APList;
 import org.subnode.actpub.model.APObj;
 import org.subnode.actpub.model.APProp;
 import org.subnode.actpub.model.APType;
-import org.subnode.config.AppProp;
 import org.subnode.config.NodeName;
 import org.subnode.model.client.NodeProp;
 import org.subnode.model.client.NodeType;
 import org.subnode.model.client.PrincipalName;
 import org.subnode.model.client.PrivilegeType;
-import org.subnode.mongo.AdminRun;
 import org.subnode.mongo.CreateNodeLocation;
-import org.subnode.mongo.MongoAuth;
-import org.subnode.mongo.MongoCreate;
-import org.subnode.mongo.MongoDelete;
-import org.subnode.mongo.MongoRead;
 import org.subnode.mongo.MongoRepository;
 import org.subnode.mongo.MongoSession;
-import org.subnode.mongo.MongoUpdate;
-import org.subnode.mongo.MongoUtil;
 import org.subnode.mongo.model.AccessControl;
 import org.subnode.mongo.model.FediverseName;
 import org.subnode.mongo.model.SubNode;
-import org.subnode.service.AclService;
-import org.subnode.service.AttachmentService;
 import org.subnode.service.NodeSearchService;
-import org.subnode.service.PushService;
-import org.subnode.service.UserManagerService;
-import org.subnode.util.AsyncExec;
+import org.subnode.service.ServiceBase;
 import org.subnode.util.DateUtil;
-import org.subnode.util.EnglishDictionary;
-import org.subnode.util.SubNodeUtil;
 import org.subnode.util.ThreadLocals;
 import org.subnode.util.XString;
 
 @Component
-public class ActPubService {
+public class ActPubService extends ServiceBase {
     public static final boolean ENGLISH_LANGUAGE_CHECK = false;
     public static final int MAX_MESSAGES = 10;
     public static final int MAX_FOLLOWERS = 20;
@@ -74,77 +59,8 @@ public class ActPubService {
     private static final Logger log = LoggerFactory.getLogger(ActPubService.class);
 
     @Autowired
-    private MongoUtil util;
-
-    @Autowired
-    private MongoRead read;
-
-    @Autowired
-    private MongoDelete delete;
-
-    @Autowired
-    private MongoUpdate update;
-
-    @Autowired
-    private MongoCreate create;
-
-    @Autowired
-    private ActPubFactory apFactory;
-
-    @Autowired
-    private ActPubCache apCache;
-
-    @Autowired
-    private EnglishDictionary english;
-
-    @Autowired
-    private AdminRun arun;
-
-    @Autowired
-    private MongoAuth auth;
-
-    @Autowired
-    private PushService pushService;
-
-    @Autowired
-    private AclService acl;
-
-    @Autowired
-    private AppProp appProp;
-
-    @Autowired
-    private AttachmentService attach;
-
-    @Autowired
-    private SubNodeUtil snUtil;
-
-    @Autowired
-    private ActPubUtil apUtil;
-
-    @Autowired
-    private ActPubFollowing apFollowing;
-
-    @Autowired
-    private ActPubFollower apFollower;
-
-    @Autowired
-    private ActPubOutbox apOutbox;
-
-    @Autowired
-    private ActPubCrypto apCrypto;
-
-    @Autowired
-    private UserManagerService usrMgr;
-
-    @Autowired
-    private MongoTemplate ops;
-
-    @Autowired
     @Qualifier("threadPoolTaskExecutor")
     private Executor executor;
-
-    @Autowired
-    private AsyncExec asyncExec;
 
     private static final Object inboxLock = new Object();
 

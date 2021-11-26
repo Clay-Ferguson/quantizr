@@ -12,24 +12,20 @@ import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.subnode.actpub.model.AP;
 import org.subnode.actpub.model.APProp;
 import org.subnode.model.client.NodeProp;
-import org.subnode.mongo.MongoRead;
 import org.subnode.mongo.MongoSession;
 import org.subnode.mongo.model.SubNode;
+import org.subnode.service.ServiceBase;
 import org.subnode.service.UserManagerService;
 import org.subnode.util.XString;
 
 @Component
-public class ActPubCrypto {
+public class ActPubCrypto extends ServiceBase {
 
     private static final Logger log = LoggerFactory.getLogger(ActPubCrypto.class);
-
-    @Autowired
-    private MongoRead read;
 
     /* Gets private RSA key from current user session */
     public String getPrivateKey(MongoSession ms, String userName) {

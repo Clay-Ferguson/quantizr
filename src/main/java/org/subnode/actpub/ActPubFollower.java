@@ -7,7 +7,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Component;
@@ -16,51 +15,22 @@ import org.subnode.actpub.model.APOOrderedCollection;
 import org.subnode.actpub.model.APOOrderedCollectionPage;
 import org.subnode.actpub.model.APObj;
 import org.subnode.actpub.model.APProp;
-import org.subnode.config.AppProp;
 import org.subnode.config.NodeName;
 import org.subnode.model.NodeInfo;
 import org.subnode.model.client.ConstantInt;
 import org.subnode.model.client.NodeProp;
 import org.subnode.model.client.NodeType;
-import org.subnode.mongo.AdminRun;
-import org.subnode.mongo.MongoAuth;
 import org.subnode.mongo.MongoSession;
-
-import org.subnode.mongo.MongoUtil;
 import org.subnode.mongo.model.SubNode;
 import org.subnode.request.GetFollowersRequest;
 import org.subnode.response.GetFollowersResponse;
-import org.subnode.util.Convert;
+import org.subnode.service.ServiceBase;
 import org.subnode.util.ThreadLocals;
 import org.subnode.util.XString;
 
 @Component
-public class ActPubFollower {
+public class ActPubFollower extends ServiceBase {
     private static final Logger log = LoggerFactory.getLogger(ActPubFollower.class);
-
-    @Autowired
-    private MongoTemplate ops;
-
-    @Autowired
-    private AdminRun arun;
-
-    @Autowired
-    private AppProp appProp;
-
-    @Autowired
-    private MongoUtil util;
-
-    @Autowired
-    private Convert convert;
-
-    @Autowired
-    private MongoAuth auth;
-
-    @Autowired
-    private ActPubService apub;
-
-    @Autowired
-    private ActPubUtil apUtil;
 
     @Autowired
     @Qualifier("threadPoolTaskExecutor")

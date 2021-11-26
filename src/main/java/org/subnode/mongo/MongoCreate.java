@@ -4,7 +4,6 @@ import java.util.List;
 import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.stereotype.Component;
@@ -12,22 +11,11 @@ import org.subnode.model.PropertyInfo;
 import org.subnode.model.client.NodeType;
 import org.subnode.model.client.PrivilegeType;
 import org.subnode.mongo.model.SubNode;
+import org.subnode.service.ServiceBase;
 
 @Component
-public class MongoCreate {
+public class MongoCreate extends ServiceBase {
 	private static final Logger log = LoggerFactory.getLogger(MongoCreate.class);
-
-	@Autowired
-	private MongoRead read;
-
-	@Autowired
-	private MongoUpdate update;
-
-	@Autowired
-	private MongoAuth auth;
-
-	@Autowired
-	private AdminRun arun;
 
 	public SubNode createNode(MongoSession ms, SubNode parent, String type, Long ordinal, CreateNodeLocation location,
 			boolean updateParentOrdinals) {

@@ -8,33 +8,16 @@ import com.mongodb.client.result.DeleteResult;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Component;
 import org.subnode.model.client.NodeProp;
 import org.subnode.mongo.model.SubNode;
-import org.subnode.service.AttachmentService;
+import org.subnode.service.ServiceBase;
 
 @Component
-public class MongoDelete {
+public class MongoDelete extends ServiceBase {
 	private static final Logger log = LoggerFactory.getLogger(MongoDelete.class);
-
-	@Autowired
-	private MongoTemplate ops;
-
-	@Autowired
-	private AttachmentService attach;
-
-	@Autowired
-	private MongoUpdate update;
-
-	@Autowired
-	private MongoAuth auth;
-
-	@Autowired
-	private MongoUtil util;
 
 	public void deleteNode(MongoSession ms, SubNode node, boolean childrenOnly) {
 		if (!childrenOnly) {
