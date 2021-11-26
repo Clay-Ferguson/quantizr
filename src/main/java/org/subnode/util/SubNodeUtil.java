@@ -85,7 +85,7 @@ public class SubNodeUtil {
 	public String getFriendlyNodeUrl(MongoSession ms, SubNode node) {
 		// if node doesn't thave a name, make ID-based url
 		if (StringUtils.isEmpty(node.getName())) {
-			return String.format("%s/app?id=%s", appProp.getHostAndPort(), node.getId().toHexString());
+			return String.format("%s/app?id=%s", appProp.getHostAndPort(), node.getIdStr());
 		}
 		// else format this node name based on whether the node is admin owned or not.
 		else {
@@ -262,7 +262,7 @@ public class SubNodeUtil {
 			if (node.getName() != null) {
 				description = "Node Name: " + node.getName();
 			} else {
-				description = "Node ID: " + node.getId().toHexString();
+				description = "Node ID: " + node.getIdStr();
 			}
 		}
 
@@ -297,7 +297,7 @@ public class SubNodeUtil {
 
 		ret.setAttachmentUrl(url);
 		ret.setAttachmentMime(mime);
-		ret.setUrl(appProp.getHostAndPort() + "/app?id=" + node.getId().toHexString());
+		ret.setUrl(appProp.getHostAndPort() + "/app?id=" + node.getIdStr());
 		return ret;
 	}
 
@@ -306,7 +306,7 @@ public class SubNodeUtil {
 
 		String bin = ipfsLink != null ? ipfsLink : node.getStrProp(NodeProp.BIN);
 		if (bin != null) {
-			return appProp.getHostAndPort() + AppController.API_PATH + "/bin/" + bin + "?nodeId=" + node.getId().toHexString();
+			return appProp.getHostAndPort() + AppController.API_PATH + "/bin/" + bin + "?nodeId=" + node.getIdStr();
 		}
 
 		/* as last resort try to get any extrnally linked binary image */
@@ -319,6 +319,6 @@ public class SubNodeUtil {
 	}
 
 	public String getIdBasedUrl(SubNode node) {
-		return appProp.getProtocolHostAndPort() + "/app?id=" + node.getId().toHexString();
+		return appProp.getProtocolHostAndPort() + "/app?id=" + node.getIdStr();
 	}
 }

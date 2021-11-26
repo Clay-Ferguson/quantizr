@@ -76,7 +76,7 @@ public class MongoEventListener extends AbstractMongoEventListener<SubNode> {
 			dbObj.put(SubNode.FIELD_ORDINAL, 0L);
 		}
 
-		// log.debug("onBeforeSave: ID: " + node.getId().toHexString());
+		// log.debug("onBeforeSave: ID: " + node.getIdStr());
 
 		// DO NOT DELETE
 		/*
@@ -227,7 +227,7 @@ public class MongoEventListener extends AbstractMongoEventListener<SubNode> {
 			if (auth.getAdminSession() != null) {
 				ObjectId ownerId = auth.getAdminSession().getUserNodeId();
 				node.setOwner(ownerId);
-				log.debug("Assigning admin as owner of node that had no owner (on load): " + node.getId().toHexString());
+				log.debug("Assigning admin as owner of node that had no owner (on load): " + node.getIdStr());
 			}
 		}
 

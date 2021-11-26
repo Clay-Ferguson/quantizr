@@ -179,7 +179,7 @@ public class ActPubService extends ServiceBase {
                     new APObj() //
                             .put(APProp.type, APType.Document) //
                             .put(APProp.mediaType, mime) //
-                            .put(APProp.url, prop.getProtocolHostAndPort() + "/f/id/" + node.getId().toHexString()));
+                            .put(APProp.url, prop.getProtocolHostAndPort() + "/f/id/" + node.getIdStr()));
         }
         return attachments;
     }
@@ -286,7 +286,7 @@ public class ActPubService extends ServiceBase {
         // if we got the SubNode, cache it before returning it.
         if (acctNode != null) {
             // Any time we have an account node being cached we should cache it by it's ID too right away.
-            apCache.acctNodesById.put(acctNode.getId().toHexString(), acctNode);
+            apCache.acctNodesById.put(acctNode.getIdStr(), acctNode);
             apCache.acctNodesByUserName.put(apUserName, acctNode);
         } else {
             log.error("Unable to load user: " + apUserName);
@@ -313,7 +313,7 @@ public class ActPubService extends ServiceBase {
             acctNode = importActor(ms, null, actor);
             if (acctNode != null) {
                 // Any time we have an account node being cached we should cache it by it's ID too right away.
-                apCache.acctNodesById.put(acctNode.getId().toHexString(), acctNode);
+                apCache.acctNodesById.put(acctNode.getIdStr(), acctNode);
                 apCache.acctNodesByActorUrl.put(actorUrl, acctNode);
             }
         }
@@ -418,7 +418,7 @@ public class ActPubService extends ServiceBase {
 
         /* cache the account node id for this user by the actor url */
         String selfRef = AP.str(actor, APProp.id); // actor url of 'actor' object, is the same as the 'id'
-        apCache.acctIdByActorUrl.put(selfRef, userNode.getId().toHexString());
+        apCache.acctIdByActorUrl.put(selfRef, userNode.getIdStr());
         return userNode;
     }
 
@@ -839,7 +839,7 @@ public class ActPubService extends ServiceBase {
             }
 
             if (acctNode != null) {
-                acctId = acctNode.getId().toHexString();
+                acctId = acctNode.getIdStr();
             }
         }
 
@@ -861,7 +861,7 @@ public class ActPubService extends ServiceBase {
             String url = AP.str(att, APProp.url);
 
             if (mediaType != null && url != null) {
-                attach.readFromUrl(ms, url, node.getId().toHexString(), mediaType, -1, false);
+                attach.readFromUrl(ms, url, node.getIdStr(), mediaType, -1, false);
 
                 // for now we only support one attachment so break out after uploading one.
                 break;
@@ -885,7 +885,7 @@ public class ActPubService extends ServiceBase {
                 String avatarMime = userNode.getStrProp(NodeProp.BIN_MIME.s());
                 String avatarVer = userNode.getStrProp(NodeProp.BIN.s());
                 String avatarUrl = prop.getProtocolHostAndPort() + AppController.API_PATH + "/bin/avatar" + "?nodeId="
-                        + userNode.getId().toHexString() + "&v=" + avatarVer;
+                        + userNode.getIdStr() + "&v=" + avatarVer;
 
                 APObj actor = new APObj() //
                         .put(APProp.context, new APList() //
@@ -910,7 +910,7 @@ public class ActPubService extends ServiceBase {
                     String headerImageVer = userNode.getStrProp(NodeProp.BIN.s() + "Header");
                     if (headerImageVer != null) {
                         String headerImageUrl = prop.getProtocolHostAndPort() + AppController.API_PATH + "/bin/profileHeader"
-                                + "?nodeId=" + userNode.getId().toHexString() + "&v=" + headerImageVer;
+                                + "?nodeId=" + userNode.getIdStr() + "&v=" + headerImageVer;
 
                         actor.put(APProp.image, new APObj() //
                                 .put(APProp.type, APType.Image) //

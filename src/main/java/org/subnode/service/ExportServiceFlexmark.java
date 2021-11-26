@@ -236,9 +236,8 @@ public class ExportServiceFlexmark extends ServiceBase {
 	}
 
 	private void processNode(SubNode node) {
-		String content = node.getContent();
 		markdown.append("\n");
-		markdown.append(content);
+		markdown.append(node.getContent());
 		markdown.append("\n");
 		writeImage(node);
 	}
@@ -296,7 +295,7 @@ public class ExportServiceFlexmark extends ServiceBase {
 		 * eventually put out on IPFS or simply provided to the user as a downloadable link.
 		 */
 		else {
-			String path = AppController.API_PATH + "/bin/" + bin + "?nodeId=" + node.getId().toHexString() + "&token="
+			String path = AppController.API_PATH + "/bin/" + bin + "?nodeId=" + node.getIdStr() + "&token="
 					+ URLEncoder.encode(ThreadLocals.getSC().getUserToken(), StandardCharsets.UTF_8);
 			src = prop.getHostAndPort() + path;
 		}

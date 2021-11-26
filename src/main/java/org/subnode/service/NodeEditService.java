@@ -80,7 +80,7 @@ public class NodeEditService extends ServiceBase {
 					NodeType.POSTS.s(), Arrays.asList(PrivilegeType.READ.s()), NodeName.POSTS);
 
 			if (node != null) {
-				nodeId = node.getId().toHexString();
+				nodeId = node.getIdStr();
 				makePublic = true;
 			}
 		}
@@ -162,7 +162,7 @@ public class NodeEditService extends ServiceBase {
 		if (userNode != null) {
 			List<PropertyInfo> properties = new LinkedList<>();
 			properties.add(new PropertyInfo(NodeProp.USER.s(), userToFollow));
-			properties.add(new PropertyInfo(NodeProp.USER_NODE_ID.s(), userNode.getId().toHexString()));
+			properties.add(new PropertyInfo(NodeProp.USER_NODE_ID.s(), userNode.getIdStr()));
 
 			SubNode newNode = create.createNode(ms, parentFriendsList, null, NodeType.FRIEND.s(), 0L,
 					CreateNodeLocation.LAST, properties, parentFriendsList.getOwner(), true);
@@ -518,7 +518,7 @@ public class NodeEditService extends ServiceBase {
 				});
 
 				if (userNode.getVal() != null) {
-					userNodeId = userNode.getVal().getId().toHexString();
+					userNodeId = userNode.getVal().getIdStr();
 					node.setProp(NodeProp.USER_NODE_ID.s(), userNodeId);
 				}
 			}

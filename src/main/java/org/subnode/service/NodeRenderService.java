@@ -302,7 +302,7 @@ public class NodeRenderService extends ServiceBase {
 			}
 			SubNode n = iterator.next();
 			idx++;
-			// log.debug("Iterate [" + idx + "]: nodeId" + n.getId().toHexString() + "scanToNode=" +
+			// log.debug("Iterate [" + idx + "]: nodeId" + n.getIdStr() + "scanToNode=" +
 			// scanToNode);
 			// log.debug(" DATA: " + XString.prettyPrint(n));
 
@@ -542,7 +542,7 @@ public class NodeRenderService extends ServiceBase {
 			content = render.getFirstLineAbbreviation(content, 25);
 
 			item.setTitle(content);
-			item.setId(n.getId().toHexString());
+			item.setId(n.getIdStr());
 			item.setStart(n.getIntProp(NodeProp.DATE.s()));
 
 			String durationStr = n.getStrProp(NodeProp.DURATION.s());
@@ -592,7 +592,7 @@ public class NodeRenderService extends ServiceBase {
 				}
 
 				bci.setName(content);
-				bci.setId(node.getId().toHexString());
+				bci.setId(node.getIdStr());
 				bci.setType(node.getType());
 				list.add(0, bci);
 

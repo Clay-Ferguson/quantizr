@@ -83,7 +83,7 @@ public class MongoDelete extends ServiceBase {
 
 		DeleteResult res = ops.remove(query, SubNode.class);
 		if (res.getDeletedCount() > 0) {
-			log.debug("Temp Records Deleted (Under User: " + userNode.getId().toHexString() + "): " + res.getDeletedCount());
+			log.debug("Temp Records Deleted (Under User: " + userNode.getIdStr() + "): " + res.getDeletedCount());
 		}
 	}
 
@@ -197,7 +197,7 @@ public class MongoDelete extends ServiceBase {
 				}
 
 				if (!pathHashSet.contains(DigestUtils.sha256Hex(node.getParentPath()))) {
-					// log.debug("ORPHAN NODE id=" + node.getId().toHexString() + " path=" + node.getPath() + " Content="
+					// log.debug("ORPHAN NODE id=" + node.getIdStr() + " path=" + node.getPath() + " Content="
 					// 		+ node.getContent());
 					orphanCount++;
 					deleteCount++;

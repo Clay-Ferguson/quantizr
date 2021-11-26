@@ -54,7 +54,7 @@ public class MongoUtil extends ServiceBase {
 
 	/*
 	 * removed 'r' and 'p' since those are 'root' and 'pending' (see setPendingPath), and we need very
-	 * performanc way to translate from /r/p to /r path and vice verse
+	 * performant way to translate from /r/p to /r path and vice verse
 	 */
 	static final String PATH_CHARS = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnoqstuvwxyz";
 
@@ -251,35 +251,6 @@ public class MongoUtil extends ServiceBase {
 		if (password == null)
 			return null;
 		return DigestUtils.sha256Hex(password).substring(0, 20);
-	}
-
-	/*
-	 * This was early code, and it not even practical in a large database. Leaving this code in place as
-	 * an example of how to call databae directly without spring.
-	 */
-	public String getNodeReport_obsolete() {
-		int numDocs = 0;
-		int totalJsonBytes = 0;
-		MongoDatabase database = mac.mongoClient().getDatabase(MongoAppConfig.databaseName);
-		MongoCollection<Document> col = database.getCollection("nodes");
-
-		MongoCursor<Document> cur = col.find().iterator();
-		try {
-			while (cur.hasNext()) {
-				Document doc = cur.next();
-				totalJsonBytes += doc.toJson().length();
-				numDocs++;
-			}
-		} catch (Exception ex) {
-			throw ExUtil.wrapEx(ex);
-		}
-
-		/*
-		 * todo-2: I have a 'formatMemory' written in javascript, and need to do same here or see if there's
-		 * an apachie string function for it.
-		 */
-		float kb = totalJsonBytes / 1024f;
-		return "Node Count: " + numDocs + "<br>Total JSON Size: " + kb + " KB<br>";
 	}
 
 	public void convertDb(MongoSession ms) {

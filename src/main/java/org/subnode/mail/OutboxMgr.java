@@ -3,23 +3,16 @@ package org.subnode.mail;
 import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import org.subnode.config.AppProp;
 import org.subnode.config.NodeName;
 import org.subnode.config.SessionContext;
 import org.subnode.model.client.NodeProp;
 import org.subnode.model.client.NodeType;
-import org.subnode.mongo.AdminRun;
 import org.subnode.mongo.CreateNodeLocation;
-import org.subnode.mongo.MongoCreate;
-import org.subnode.mongo.MongoRead;
 import org.subnode.mongo.MongoSession;
-import org.subnode.mongo.MongoUpdate;
 import org.subnode.mongo.model.SubNode;
 import org.subnode.response.NotificationMessage;
-import org.subnode.service.PushService;
-import org.subnode.util.SubNodeUtil;
+import org.subnode.service.ServiceBase;
 import org.subnode.util.ThreadLocals;
 import org.subnode.util.XString;
 
@@ -31,32 +24,8 @@ import org.subnode.util.XString;
  * 
  */
 @Component
-public class OutboxMgr {
+public class OutboxMgr extends ServiceBase {
 	private static final Logger log = LoggerFactory.getLogger(OutboxMgr.class);
-
-	@Autowired
-	private MongoCreate create;
-
-	@Autowired
-	private MongoRead read;
-
-	@Autowired
-	private MongoUpdate update;
-
-	@Autowired
-	private AdminRun arun;
-
-	@Autowired
-	private AppProp appProp;
-
-	@Autowired
-	private SubNodeUtil snUtil;
-
-	@Autowired
-	private PushService pushService;
-
-	@Autowired
-	private NotificationDaemon notificationDaemon;
 
 	private String mailBatchSize = "10";
 	private static SubNode outboxNode = null;
@@ -73,14 +42,14 @@ public class OutboxMgr {
 					read.getUserNodeByType(session, null, userNode, "### Inbox", NodeType.INBOX.s(), null, NodeName.INBOX);
 
 			if (userInbox != null) {
-				// log.debug("userInbox id=" + userInbox.getId().toHexString());
+				// log.debug("userInbox id=" + userInbox.getIdStr());
 
 				/*
 				 * First look to see if there is a target node already existing in this persons inbox that points to
 				 * the node in question
 				 */
 				SubNode notifyNode =
-						read.findSubNodeByProp(session, userInbox.getPath(), NodeProp.TARGET_ID.s(), node.getId().toHexString());
+						read.findSubNodeByProp(session, userInbox.getPath(), NodeProp.TARGET_ID.s(), node.getIdStr());
 
 				/*
 				 * If there's no notification for this node already in the user's inbox then add one
@@ -97,7 +66,7 @@ public class OutboxMgr {
 					notifyNode.setOwner(userInbox.getOwner());
 					notifyNode.setContent(content);
 					notifyNode.touch();
-					notifyNode.setProp(NodeProp.TARGET_ID.s(), node.getId().toHexString());
+					notifyNode.setProp(NodeProp.TARGET_ID.s(), node.getIdStr());
 					update.save(session, notifyNode);
 				}
 
@@ -108,9 +77,9 @@ public class OutboxMgr {
 				List<SessionContext> scList = SessionContext.getSessionsByUserName(recieverUserName);
 				if (scList != null) {
 					for (SessionContext sc : scList) {
-						pushService.sendServerPushInfo(sc,
+						push.sendServerPushInfo(sc,
 								// todo-2: fill in the two null parameters here if/when you ever bring this method back.
-								new NotificationMessage("newInboxNode", node.getId().toHexString(), "New node shared to you.",
+								new NotificationMessage("newInboxNode", node.getIdStr(), "New node shared to you.",
 										ThreadLocals.getSC().getUserName()));
 					}
 				}
@@ -131,10 +100,10 @@ public class OutboxMgr {
 
 		String nodeUrl = snUtil.getFriendlyNodeUrl(ms, node);
 		String content =
-				String.format(appProp.getConfigText("brandingAppName") + " user '%s' shared a node to your '%s' account.<p>\n\n" + //
+				String.format(prop.getConfigText("brandingAppName") + " user '%s' shared a node to your '%s' account.<p>\n\n" + //
 						"%s", fromUserName, toUserName, nodeUrl);
 
-		queueMailUsingAdminSession(ms, email, "A " + appProp.getConfigText("brandingAppName") + " Node was shared to you!",
+		queueMailUsingAdminSession(ms, email, "A " + prop.getConfigText("brandingAppName") + " Node was shared to you!",
 				content);
 	}
 
@@ -157,7 +126,7 @@ public class OutboxMgr {
 		outboundEmailNode.setProp(NodeProp.EMAIL_RECIP.s(), recipients);
 
 		update.save(ms, outboundEmailNode);
-		notificationDaemon.setOutboxDirty();
+		notify.setOutboxDirty();
 	}
 
 	/*
@@ -165,7 +134,7 @@ public class OutboxMgr {
 	 */
 	public List<SubNode> getMailNodes(MongoSession ms) {
 		SubNode outboxNode = getSystemOutbox(ms);
-		// log.debug("outbox id: " + outboxNode.getId().toHexString());
+		// log.debug("outbox id: " + outboxNode.getIdStr());
 
 		int mailBatchSizeInt = Integer.parseInt(mailBatchSize);
 		return read.getChildrenAsList(ms, outboxNode, false, mailBatchSizeInt);

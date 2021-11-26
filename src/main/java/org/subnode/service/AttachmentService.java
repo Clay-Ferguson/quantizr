@@ -449,7 +449,7 @@ public class AttachmentService extends ServiceBase {
 			if (node == null) {
 				node = read.getNode(ms, nodeId, false);
 			} else {
-				nodeId = node.getId().toHexString();
+				nodeId = node.getIdStr();
 			}
 
 			if (node == null) {
@@ -1036,7 +1036,7 @@ public class AttachmentService extends ServiceBase {
 			/*
 			 * todo-1: When the IPFS link happens to be unreachable/invalid (or IFPS disabled?), this can
 			 * timeout here by taking too long. This wreaks havoc on the browser thread during some scenarios.
-			 * log.debug("Getting IPFS Stream for NodeId " + node.getId().toHexString() + " IPFS_CID=" +
+			 * log.debug("Getting IPFS Stream for NodeId " + node.getIdStr() + " IPFS_CID=" +
 			 * ipfsHash);
 			 */
 			is = ipfs.getStream(ms, ipfsHash);
@@ -1050,7 +1050,7 @@ public class AttachmentService extends ServiceBase {
 		if (node == null)
 			return null;
 		// long startTime = System.currentTimeMillis();
-		// log.debug("getStreamByNode: " + node.getId().toHexString());
+		// log.debug("getStreamByNode: " + node.getIdStr());
 
 		String id = node.getStrProp(NodeProp.BIN.s() + binSuffix);
 		if (id == null) {
@@ -1103,7 +1103,7 @@ public class AttachmentService extends ServiceBase {
 	public String getStringByNodeEx(SubNode node) {
 		if (node == null)
 			return null;
-		log.debug("getStringByNode: " + node.getId().toHexString());
+		log.debug("getStringByNode: " + node.getIdStr());
 
 		String id = node.getStrProp("bin");
 		if (id == null) {
@@ -1226,14 +1226,14 @@ public class AttachmentService extends ServiceBase {
 			}
 
 			Iterable<SubNode> accountNodes =
-					read.getChildrenUnderParentPath(session, NodeName.ROOT_OF_ALL_USERS, null, null, 0, null, null);
+					read.getChildrenUnderPath(session, NodeName.ROOT_OF_ALL_USERS, null, null, 0, null, null);
 
 			/*
 			 * scan all userAccountNodes, and set a zero amount for those not found (which will be the correct
 			 * amount).
 			 */
 			for (SubNode accountNode : accountNodes) {
-				log.debug("Processing Account Node: id=" + accountNode.getId().toHexString());
+				log.debug("Processing Account Node: id=" + accountNode.getIdStr());
 				UserStats stats = statsMap.get(accountNode.getOwner());
 				if (stats == null) {
 					stats = new UserStats();

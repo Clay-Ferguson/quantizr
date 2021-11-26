@@ -136,7 +136,7 @@ public class MongoCreate extends ServiceBase {
 		 * remove this check (todo-1)
 		 */
 		Criteria criteria = Criteria.where(SubNode.FIELD_ORDINAL).is(null);
-		for (SubNode child : read.getChildrenUnderParentPath(ms, node.getPath(), null, null, 0, null, criteria)) {
+		for (SubNode child : read.getChildrenUnderPath(ms, node.getPath(), null, null, 0, null, criteria)) {
 			child.setOrdinal(0L);
 		}
 
@@ -144,7 +144,7 @@ public class MongoCreate extends ServiceBase {
 		update.saveSession(ms);
 
 		criteria = Criteria.where(SubNode.FIELD_ORDINAL).gte(ordinal);
-		for (SubNode child : read.getChildrenUnderParentPath(ms, node.getPath(),
+		for (SubNode child : read.getChildrenUnderPath(ms, node.getPath(),
 				Sort.by(Sort.Direction.ASC, SubNode.FIELD_ORDINAL), null, 0, null, criteria)) {
 			child.setOrdinal(maxOrdinal++);
 		}

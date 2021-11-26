@@ -29,11 +29,11 @@ class NodeIterator implements Iterator<SubNode> {
         if (node != null) {
             SubNode dirty = ThreadLocals.getDirtyNodes().get(node.getId());
             if (dirty != null) {
-                // log.debug("ITER-WRAPPER: Got a dirty one: " + dirty.getId().toHexString());
+                // log.debug("ITER-WRAPPER: Got a dirty one: " + dirty.getIdStr());
                 return dirty;
             }
         }
-        // log.debug("ITER-WRAPPER: " + node.getId().toHexString());
+        // log.debug("ITER-WRAPPER: " + node.getIdStr());
         return node;
     }
 

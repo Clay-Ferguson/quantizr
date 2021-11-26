@@ -186,7 +186,7 @@ public class MongoRead extends ServiceBase {
         SubNode ret = mongoUtil.findOne(query);
 
         if (ret != null) {
-            // log.debug("Node found: id=" + ret.getId().toHexString());
+            // log.debug("Node found: id=" + ret.getIdStr());
         }
 
         if (allowAuth) {
@@ -367,7 +367,7 @@ public class MongoRead extends ServiceBase {
         Iterable<SubNode> iter = mongoUtil.find(query);
         List<String> nodeIds = new LinkedList<>();
         for (SubNode n : iter) {
-            nodeIds.add(n.getId().toHexString());
+            nodeIds.add(n.getIdStr());
         }
         return nodeIds;
     }
@@ -376,7 +376,7 @@ public class MongoRead extends ServiceBase {
      * If node is null it's path is considered empty string, and it represents the 'root' of the tree.
      * There is no actual NODE that is root node,
      */
-    public Iterable<SubNode> getChildrenUnderParentPath(MongoSession ms, String path, Sort sort, Integer limit, int skip,
+    public Iterable<SubNode> getChildrenUnderPath(MongoSession ms, String path, Sort sort, Integer limit, int skip,
             TextCriteria textCriteria, Criteria moreCriteria) {
 
         Query query = new Query();
@@ -423,12 +423,12 @@ public class MongoRead extends ServiceBase {
      */
     public Iterable<SubNode> getChildren(MongoSession ms, SubNode node, Sort sort, Integer limit, int skip) {
         auth.auth(ms, node, PrivilegeType.READ);
-        return getChildrenUnderParentPath(ms, node.getPath(), sort, limit, skip, null, null);
+        return getChildrenUnderPath(ms, node.getPath(), sort, limit, skip, null, null);
     }
 
     public Iterable<SubNode> getChildren(MongoSession ms, SubNode node) {
         auth.auth(ms, node, PrivilegeType.READ);
-        return getChildrenUnderParentPath(ms, node.getPath(), null, null, 0, null, null);
+        return getChildrenUnderPath(ms, node.getPath(), null, null, 0, null, null);
     }
 
     /*

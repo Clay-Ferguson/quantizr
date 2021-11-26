@@ -212,7 +212,7 @@ public class ThreadLocals {
 		 */
 		if (nodeFound != null && nodeFound.hashCode() != node.hashCode()) {
 			log.debug(
-					"*************** WARNING: multiple instances of objectId " + node.getId().toHexString() + " are in memory.");
+					"*************** WARNING: multiple instances of objectId " + node.getIdStr() + " are in memory.");
 			return;
 		}
 
@@ -221,7 +221,7 @@ public class ThreadLocals {
 
 	/* Opposite of dirty */
 	public static void clean(SubNode node) {
-		// log.debug("Removing from Dirty: " + node.getId().toHexString());
+		// log.debug("Removing from Dirty: " + node.getIdStr());
 		getDirtyNodes().remove(node.getId());
 	}
 
@@ -238,7 +238,7 @@ public class ThreadLocals {
 			getCachedNodes().put(node.getPath(), node);
 		}
 		if (node.getId() != null) {
-			getCachedNodes().put(node.getId().toHexString(), node);
+			getCachedNodes().put(node.getIdStr(), node);
 		}
 	}
 

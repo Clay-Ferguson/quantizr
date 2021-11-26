@@ -174,7 +174,7 @@ public abstract class ExportArchiveBase extends ServiceBase {
 		html.append("<div class='top-row'/>\n");
 		processNodeExport(session, parentFolder, "", node, html, true, fileName, true, 0, true);
 		html.append("</div>\n");
-		String folder = node.getId().toHexString();
+		String folder = node.getIdStr();
 
 		if (children != null) {
 			/*
@@ -187,7 +187,7 @@ public abstract class ExportArchiveBase extends ServiceBase {
 				processNodeExport(session, parentFolder, "", n, html, false, null, allowOpenButton, 0, false);
 
 				if ("1".equals(inlineChildren)) {
-					String subFolder = n.getId().toHexString();
+					String subFolder = n.getIdStr();
 					// log.debug("Inline Node: "+node.getContent()+" subFolder="+subFolder);
 					inlineChildren(html, n, parentFolder, subFolder + "/", 1);
 				}
@@ -208,7 +208,7 @@ public abstract class ExportArchiveBase extends ServiceBase {
 			for (SubNode n : children) {
 				nodeStack.add(n);
 				recurseNode(rootPath + "../", parentFolder + "/" + folder, n, nodeStack, level + 1, relParent,
-						n.getId().toHexString());
+						n.getIdStr());
 				nodeStack.remove(n);
 			}
 		}
@@ -227,7 +227,7 @@ public abstract class ExportArchiveBase extends ServiceBase {
 			for (SubNode n : children) {
 				String inlineChildren = n.getStrProp(NodeProp.INLINE_CHILDREN.s());
 				boolean allowOpenButton = !"1".equals(inlineChildren);
-				String folder = n.getId().toHexString();
+				String folder = n.getIdStr();
 
 				processNodeExport(session, parentFolder, deeperPath, n, html, false, null, allowOpenButton, level, false);
 
@@ -253,7 +253,7 @@ public abstract class ExportArchiveBase extends ServiceBase {
 			// log.debug("Processing Node: " + node.getContent()+" parentFolder:
 			// "+parentFolder);
 
-			String nodeId = node.getId().toHexString();
+			String nodeId = node.getIdStr();
 			String fileName = nodeId;
 			String rowClass = isTopRow ? "" : "class='row-div'";
 

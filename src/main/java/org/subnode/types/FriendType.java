@@ -35,7 +35,7 @@ public class FriendType extends TypeBase {
          * as the friend)
          */
         String accountId = getFollowers ? node.getOwner().toHexString() : node.getStrProp(NodeProp.USER_NODE_ID);
-        // log.debug("friendAccountId=" + friendAccountId + " on nodeId=" + node.getId().toHexString());
+        // log.debug("friendAccountId=" + friendAccountId + " on nodeId=" + node.getIdStr());
 
         /*
          * NOTE: Right when the Friend node is first created, before a person has been selected, this WILL

@@ -83,13 +83,13 @@ public class Convert extends ServiceBase {
 		}
 
 		boolean hasChildren = childrenCheck ? read.hasChildren(ms, node) : false;
-		// log.trace("hasNodes=" + hasChildren + " node: "+node.getId().toHexString());
+		// log.trace("hasNodes=" + hasChildren + " node: "+node.getIdStr());
 
 		List<PropertyInfo> propList = buildPropertyInfoList(sc, node, htmlOnly, initNodeEdit);
 		List<AccessControlInfo> acList = buildAccessControlList(sc, node);
 
 		if (node.getOwner() == null) {
-			throw new RuntimeException("node has no owner: " + node.getId().toHexString() + " node.path=" + node.getPath());
+			throw new RuntimeException("node has no owner: " + node.getIdStr() + " node.path=" + node.getPath());
 		}
 
 		String ownerId = node.getOwner().toHexString();
@@ -110,7 +110,7 @@ public class Convert extends ServiceBase {
 			// be safe for now because the admin is the only user capable of import/export.
 			// log.debug("Unable to find userNode from nodeOwner: " + //
 			// (node.getOwner() != null ? ownerId : ("null owner on node: " +
-			// node.getId().toHexString())) + //
+			// node.getIdStr())) + //
 			// " tried to find owner=" + node.getOwner().toHexString());
 		} else {
 			nameProp = userNode.getStrProp(NodeProp.USER.s());
@@ -127,10 +127,10 @@ public class Convert extends ServiceBase {
 
 		String owner = userNode == null ? PrincipalName.ADMIN.s() : nameProp;
 
-		log.trace("RENDER ID=" + node.getId().toHexString() + " rootId=" + ownerId + " session.rootId=" + sc.getRootId()
+		log.trace("RENDER ID=" + node.getIdStr() + " rootId=" + ownerId + " session.rootId=" + sc.getRootId()
 				+ " node.content=" + node.getContent() + " owner=" + owner);
 
-		// log.debug("RENDER nodeId: " + node.getId().toHexString()+" -- json:
+		// log.debug("RENDER nodeId: " + node.getIdStr()+" -- json:
 		// "+XString.prettyPrint(node));
 
 		/*

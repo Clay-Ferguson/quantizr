@@ -69,10 +69,10 @@ public class MongoTest implements TestIntf {
 
 		// // Verify a lookup by hex string
 		// SubNode nodeFoundByStrId = read.getNode(adminSession,
-		// node.getId().toHexString());
+		// node.getIdStr());
 		// if (nodeFoundByStrId == null) {
 		// throw new RuntimeEx("Unable to find node by id: " +
-		// node.getId().toHexString());
+		// node.getIdStr());
 		// }
 
 		// // Set a property on the node and save the node

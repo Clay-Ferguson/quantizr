@@ -30,7 +30,7 @@ public class GraphNodesService extends ServiceBase {
 
 		boolean searching = !StringUtils.isEmpty(req.getSearchText());
 		SubNode node = read.getNode(ms, req.getNodeId(), true);
-		GraphNode gnode = new GraphNode(node.getId().toHexString(), getNodeName(node), node.getPath(), 0, false);
+		GraphNode gnode = new GraphNode(node.getIdStr(), getNodeName(node), node.getPath(), 0, false);
 		String rootPath = node.getPath();
 		int rootLevel = StringUtils.countMatches(rootPath, "/");
 
@@ -55,7 +55,7 @@ public class GraphNodesService extends ServiceBase {
 			for (SubNode n : results) {
 				try {
 					auth.auth(ms, node, PrivilegeType.READ);
-					GraphNode gn = new GraphNode(n.getId().toHexString(), getNodeName(n), n.getPath(),
+					GraphNode gn = new GraphNode(n.getIdStr(), getNodeName(n), n.getPath(),
 							StringUtils.countMatches(n.getPath(), "/") - rootLevel, searching);
 					mapByPath.put(gn.getPath(), gn);
 				} catch (Exception e) {

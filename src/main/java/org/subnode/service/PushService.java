@@ -32,7 +32,7 @@ public class PushService extends ServiceBase {
 
 	/* Notify all users being shared to on this node */
 	public void pushNodeUpdateToBrowsers(MongoSession ms, HashSet<Integer> sessionsPushed, SubNode node) {
-		// log.debug("Pushing update to all friends: id=" + node.getId().toHexString());
+		// log.debug("Pushing update to all friends: id=" + node.getIdStr());
 
 		/* get list of userNames this node is shared to (one of them may be 'public') */
 		List<String> usersSharedTo = auth.getUsersSharedTo(ms, node);

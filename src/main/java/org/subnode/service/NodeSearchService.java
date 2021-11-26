@@ -165,7 +165,7 @@ public class NodeSearchService extends ServiceBase {
 			moreCriteria = Criteria.where(SubNode.FIELD_PROPERTIES + "." + NodeProp.ACT_PUB_ACTOR_URL.s() + ".value").is(null);
 		}
 
-		Iterable<SubNode> accountNodes = read.getChildrenUnderParentPath(ms, NodeName.ROOT_OF_ALL_USERS, null,
+		Iterable<SubNode> accountNodes = read.getChildrenUnderPath(ms, NodeName.ROOT_OF_ALL_USERS, null,
 				ConstantInt.ROWS_PER_PAGE.val(), ConstantInt.ROWS_PER_PAGE.val() * req.getPage(), textCriteria, moreCriteria);
 		/*
 		 * scan all userAccountNodes, and set a zero amount for those not found (which will be the correct
@@ -249,7 +249,7 @@ public class NodeSearchService extends ServiceBase {
 				// if specifically searching for rd or wr
 				if (req.getAccessOption() != null) {
 					AccessControl ac = node.safeGetAc().get(req.getShareTarget());
-					// log.debug("NodeId: " + node.getId().toHexString() + " req=" + req.getAccessOption() + " privs="
+					// log.debug("NodeId: " + node.getIdStr() + " req=" + req.getAccessOption() + " privs="
 					// + ac.getPrvs());
 					if (req.getAccessOption().contains(PrivilegeType.READ.s()) && //
 							(!ac.getPrvs().contains(PrivilegeType.READ.s()) || //
@@ -296,7 +296,7 @@ public class NodeSearchService extends ServiceBase {
 				String shortContent = render.getFirstLineAbbreviation(bmNode.getContent(), 100);
 				bm.setName(shortContent);
 				bm.setId(targetId);
-				bm.setSelfId(bmNode.getId().toHexString());
+				bm.setSelfId(bmNode.getIdStr());
 				bookmarks.add(bm);
 			}
 		}

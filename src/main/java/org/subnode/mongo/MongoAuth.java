@@ -217,7 +217,7 @@ public class MongoAuth extends ServiceBase {
 			if (userName != null) {
 				SubNode accountNode = read.getUserNodeByUserName(ms, userName);
 				if (accountNode != null) {
-					ac.put(accountNode.getId().toHexString(), new AccessControl(null, "rd,wr"));
+					ac.put(accountNode.getIdStr(), new AccessControl(null, "rd,wr"));
 				}
 			}
 		}
@@ -300,7 +300,7 @@ public class MongoAuth extends ServiceBase {
 	 * node of the user who owns it
 	 */
 	public boolean isAnAccountNode(MongoSession ms, SubNode node) {
-		return node.getId().toHexString().equals(node.getOwner().toHexString());
+		return node.getIdStr().equals(node.getOwner().toHexString());
 	}
 
 	/* Returns true if this user on this session has privType access to 'node' */
@@ -393,7 +393,7 @@ public class MongoAuth extends ServiceBase {
 	 * check, and this is by design.
 	 */
 	public boolean nodeAuth(SubNode node, String sessionUserNodeId, List<PrivilegeType> privs) {
-		// log.debug("nodeAuth: nodeId: " + node.getId().toHexString());
+		// log.debug("nodeAuth: nodeId: " + node.getIdStr());
 		HashMap<String, AccessControl> acl = node.getAc();
 		if (acl == null) {
 			// log.debug("no acls.");
@@ -671,7 +671,7 @@ public class MongoAuth extends ServiceBase {
 			}
 
 			if (acctNode != null) {
-				String acctNodeId = acctNode.getId().toHexString();
+				String acctNodeId = acctNode.getIdStr();
 				if (ac == null || !ac.containsKey(acctNodeId)) {
 					/*
 					 * Lazy create 'ac' so that the net result of this method is never to assign non null when it could

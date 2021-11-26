@@ -58,7 +58,7 @@ public abstract class ImportArchiveBase extends ServiceBase {
 						SubNode n = jsonMapper.readValue(json, SubNode.class);
 
 						n.setPath(targetPath + n.getPath());
-						oldId.setVal(n.getId().toHexString());
+						oldId.setVal(n.getIdStr());
 
 						/*
 						 * delete the BIN prop now, because it will have to be added during this import, and the existing
@@ -85,8 +85,7 @@ public abstract class ImportArchiveBase extends ServiceBase {
 				}
 
 				update.save(session, node);
-
-				oldIdToNewIdMap.put(oldId.getVal(), node.getId().toHexString());
+				oldIdToNewIdMap.put(oldId.getVal(), node.getIdStr());
 			}
 			// Any other TEXT file
 			else if (mimeUtil.isTextTypeFileName(fileName)) {
@@ -130,7 +129,7 @@ public abstract class ImportArchiveBase extends ServiceBase {
 			String mimeType = node.getStrProp(NodeProp.BIN_MIME.s());
 			LimitedInputStreamEx lzis = new LimitedInputStreamEx(zis, Integer.MAX_VALUE);
 
-			// log.debug("Attaching binary to nodeId: " + node.getId().toHexString());
+			// log.debug("Attaching binary to nodeId: " + node.getIdStr());
 			attach.attachBinaryFromStream(session, "", node, null, fileName, length, lzis, mimeType, -1, -1, false,
 					false, false, true, false, false, true, null);
 		} else {

@@ -142,15 +142,9 @@ public class SubNode {
 
 	private boolean disableParentCheck;
 
+	@Transient
+	@JsonIgnore
 	private int contentLength;
-
-	public int getContentLength() {
-		return contentLength;
-	}
-
-	public void setContentLength(int contentLength) {
-		this.contentLength = contentLength;
-	}
 
 	@PersistenceConstructor
 	public SubNode() {
@@ -177,6 +171,12 @@ public class SubNode {
 	// @JsonProperty(FIELD_ID)
 	public ObjectId getId() {
 		return id;
+	}
+
+	@Transient
+	@JsonIgnore
+	public String getIdStr() {
+		return getId() != null ? getId().toHexString() : null;
 	}
 
 	/* Auth: Anyone can write the id as there's no pre-existing id */
@@ -590,5 +590,13 @@ public class SubNode {
 		synchronized (propLock) {
 			properties().putAll(properties);
 		}
+	}
+
+	public int getContentLength() {
+		return contentLength;
+	}
+
+	public void setContentLength(int contentLength) {
+		this.contentLength = contentLength;
 	}
 }

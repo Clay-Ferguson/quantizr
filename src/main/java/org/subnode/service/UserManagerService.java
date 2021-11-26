@@ -199,7 +199,7 @@ public class UserManagerService extends ServiceBase {
 			throw new RuntimeEx("User not found: " + userName);
 		}
 
-		String id = userNode.getId().toHexString();
+		String id = userNode.getIdStr();
 		if (id == null) {
 			throw new RuntimeException("userNode id is null for user: " + userName);
 		}
@@ -483,7 +483,7 @@ public class UserManagerService extends ServiceBase {
 		 * It's easiest to use the actua new UserNode ID as the 'signup code' to send to the user, because
 		 * it's random and tied to this user by definition
 		 */
-		String signupCode = newUserNode.getId().toHexString();
+		String signupCode = newUserNode.getIdStr();
 		String signupLink = prop.getHttpProtocol() + "://" + prop.getMetaHost() + "?signupCode=" + signupCode;
 		String content = null;
 
@@ -750,7 +750,7 @@ public class UserManagerService extends ServiceBase {
 					});
 
 					if (userNode.getVal() != null) {
-						friendNode.setProp(NodeProp.USER_NODE_ID.s(), userNode.getVal().getId().toHexString());
+						friendNode.setProp(NodeProp.USER_NODE_ID.s(), userNode.getVal().getIdStr());
 					}
 
 					edit.updateSavedFriendNode(friendNode);
@@ -794,7 +794,7 @@ public class UserManagerService extends ServiceBase {
 				userProfile.setDisplayName(displayName);
 
 				if (userHomeNode != null) {
-					userProfile.setHomeNodeId(userHomeNode.getId().toHexString());
+					userProfile.setHomeNodeId(userHomeNode.getIdStr());
 				}
 
 				String actorUrl = userNode.getStrProp(NodeProp.ACT_PUB_ACTOR_URL);
@@ -802,7 +802,7 @@ public class UserManagerService extends ServiceBase {
 				userProfile.setUserBio(userNode.getStrProp(NodeProp.USER_BIO.s()));
 				userProfile.setAvatarVer(userNode.getStrProp(NodeProp.BIN.s()));
 				userProfile.setHeaderImageVer(userNode.getStrProp(NodeProp.BIN.s() + "Header"));
-				userProfile.setUserNodeId(userNode.getId().toHexString());
+				userProfile.setUserNodeId(userNode.getIdStr());
 				userProfile.setApIconUrl(userNode.getStrProp(NodeProp.ACT_PUB_USER_ICON_URL));
 				userProfile.setApImageUrl(userNode.getStrProp(NodeProp.ACT_PUB_USER_IMAGE_URL));
 				userProfile.setActorUrl(actorUrl);
@@ -1012,7 +1012,7 @@ public class UserManagerService extends ServiceBase {
 			ownerNode.setProp(NodeProp.USER_PREF_PASSWORD_RESET_AUTHCODE.s(), String.valueOf(authCode));
 			update.save(session, ownerNode);
 
-			String passCode = ownerNode.getId().toHexString() + "-" + String.valueOf(authCode);
+			String passCode = ownerNode.getIdStr() + "-" + String.valueOf(authCode);
 			String link = prop.getHostAndPort() + "/app?passCode=" + passCode;
 
 			String brandingAppName = prop.getConfigText("brandingAppName");
@@ -1129,7 +1129,7 @@ public class UserManagerService extends ServiceBase {
 
 		StringBuilder sb = new StringBuilder();
 		Iterable<SubNode> accountNodes =
-				read.getChildrenUnderParentPath(ms, NodeName.ROOT_OF_ALL_USERS, null, null, 0, null, null);
+				read.getChildrenUnderPath(ms, NodeName.ROOT_OF_ALL_USERS, null, null, 0, null, null);
 
 		for (SubNode accountNode : accountNodes) {
 			String userName = accountNode.getStrProp(NodeProp.USER);

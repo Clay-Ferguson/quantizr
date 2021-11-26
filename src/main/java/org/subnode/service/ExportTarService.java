@@ -54,7 +54,7 @@ public class ExportTarService extends ExportArchiveBase {
         while (fileName.startsWith("/")) {
             fileName = fileName.substring(1);
         }
-        log.debug("Add Entry1: " + fileName + " bytes.length=" + bytes.length);
+        // log.debug("Add Entry1: " + fileName + " bytes.length=" + bytes.length);
 
         try {
             TarArchiveEntry tarArchiveEntry = new TarArchiveEntry(fileName);
@@ -77,7 +77,7 @@ public class ExportTarService extends ExportArchiveBase {
         while (fileName.startsWith("/")) {
             fileName = fileName.substring(1);
         }
-        log.debug("Add Entry2: " + fileName);
+        // log.debug("Add Entry2: " + fileName);
 
         try {
             TarArchiveEntry entry = new TarArchiveEntry(fileName);

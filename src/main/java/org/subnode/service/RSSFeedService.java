@@ -244,7 +244,7 @@ public class RSSFeedService extends ServiceBase {
 				int count = 0;
 				for (SubNode n : children) {
 					/* avoid infinite recursion here! */
-					if (n.getId().toHexString().equals(nodeId))
+					if (n.getIdStr().equals(nodeId))
 						continue;
 
 					String feedSrc = n.getStrProp(NodeProp.RSS_FEED_SRC.s());
@@ -882,7 +882,7 @@ public class RSSFeedService extends ServiceBase {
 				}
 				SyndEntry entry = new SyndEntryImpl();
 
-				entry.setTitle(metaInfo.getTitle() != null ? metaInfo.getTitle() : "ID: " + n.getId().toHexString());
+				entry.setTitle(metaInfo.getTitle() != null ? metaInfo.getTitle() : "ID: " + n.getIdStr());
 				entry.setLink(
 						metaInfo.getAttachmentUrl() != null ? metaInfo.getAttachmentUrl() : prop.getProtocolHostAndPort());
 

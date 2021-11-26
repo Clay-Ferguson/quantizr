@@ -4,18 +4,15 @@ import java.util.List;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 import org.subnode.AppServer;
-import org.subnode.config.AppProp;
 import org.subnode.model.client.NodeProp;
-import org.subnode.mongo.MongoDelete;
 import org.subnode.mongo.MongoRepository;
 import org.subnode.mongo.MongoSession;
-import org.subnode.mongo.AdminRun;
 import org.subnode.mongo.model.SubNode;
+import org.subnode.service.ServiceBase;
 
 /**
  * Deamon for sending emails periodically.
@@ -27,23 +24,8 @@ import org.subnode.mongo.model.SubNode;
  * at once. This is the most efficient way for lots of obvious reasons.
  */
 @Component
-public class NotificationDaemon {
+public class NotificationDaemon extends ServiceBase {
 	private static final Logger log = LoggerFactory.getLogger(NotificationDaemon.class);
-
-	@Autowired
-	private MongoDelete delete;
-
-	@Autowired
-	private AppProp appProp;
-
-	@Autowired
-	private AdminRun arun;
-
-	@Autowired
-	private OutboxMgr outboxMgr;
-
-	@Autowired
-	private MailSender mailSender;
 
 	private int runCounter = 0;
 	public static final int INTERVAL_SECONDS = 10;
@@ -74,7 +56,7 @@ public class NotificationDaemon {
 			runCounter++;
 
 			/* fail fast if no mail host is configured. */
-			if (StringUtils.isEmpty(appProp.getMailHost())) {
+			if (StringUtils.isEmpty(prop.getMailHost())) {
 				if (runCounter < 3) {
 					log.debug("NotificationDaemon is disabled, because no mail server is configured.");
 				}
@@ -85,7 +67,7 @@ public class NotificationDaemon {
 				runCountdown = INTERVAL_SECONDS;
 
 				arun.run((MongoSession ms) -> {
-					List<SubNode> mailNodes = outboxMgr.getMailNodes(ms);
+					List<SubNode> mailNodes = outbox.getMailNodes(ms);
 					if (mailNodes != null) {
 						log.debug("Found " + String.valueOf(mailNodes.size()) + " mailNodes to send.");
 						sendAllMail(ms, mailNodes);
@@ -116,9 +98,9 @@ public class NotificationDaemon {
 
 			synchronized (MailSender.getLock()) {
 				try {
-					mailSender.init();
+					mail.init();
 					for (SubNode node : nodes) {
-						log.debug("Iterating node to email. nodeId:" + node.getId().toHexString());
+						log.debug("Iterating node to email. nodeId:" + node.getIdStr());
 
 						String email = node.getStrProp(NodeProp.EMAIL_RECIP.s());
 						String subject = node.getStrProp(NodeProp.EMAIL_SUBJECT.s());
@@ -130,16 +112,16 @@ public class NotificationDaemon {
 							if (delete.delete(ms, node, false) > 0) {
 								// only send mail if we were able to delete the node, because other wise something is wrong
 								// without ability to delete and so we'd go into a loop sending this item multiple times.
-								mailSender.sendMail(email, null, content, subject);
+								mail.sendMail(email, null, content, subject);
 							} else {
-								log.debug("Unable to delete queued mail node: " + node.getId().toHexString());
+								log.debug("Unable to delete queued mail node: " + node.getIdStr());
 							}
 						} else {
 							log.debug("not sending email. Missing some properties. email or subject or content");
 						}
 					}
 				} finally {
-					mailSender.close();
+					mail.close();
 				}
 			}
 		}

@@ -92,7 +92,7 @@ public class MongoUpdate extends ServiceBase {
 
 				for (SubNode node : nodes) {
 					// log.debug("saveSession: Saving Dirty. nodeId=" + (node.getId()==null ? "null
-					// (new node?)" : node.getId().toHexString()));
+					// (new node?)" : node.getIdStr()));
 					save(ms, node, false);
 				}
 
@@ -125,7 +125,7 @@ public class MongoUpdate extends ServiceBase {
 					if (ipfsNode != null) {
 						pinCount++;
 						// log.debug("Found IPFS CID=" + pin + " on nodeId " +
-						// ipfsNode.getId().toHexString());
+						// ipfsNode.getIdStr());
 
 						if (statsMap != null) {
 							Long binSize = ipfsNode.getIntProp(NodeProp.BIN_SIZE.s());

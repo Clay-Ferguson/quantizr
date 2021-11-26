@@ -243,7 +243,7 @@ public class ActPubOutbox extends ServiceBase {
                     }
 
                     if (collecting) {
-                        String hexId = child.getId().toHexString();
+                        String hexId = child.getIdStr();
                         String published = DateUtil.isoStringFromDate(child.getModifyTime());
                         String actor = apUtil.makeActorUrlForUserName(userName);
 

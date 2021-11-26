@@ -154,7 +154,7 @@ public class AclService extends ServiceBase {
 				}
 				return false;
 			}
-			mapKey = principalNode.getId().toHexString();
+			mapKey = principalNode.getIdStr();
 
 			/*
 			 * If this node is encrypted we get the public key of the user being shared with to send back to the

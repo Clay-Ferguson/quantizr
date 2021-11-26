@@ -150,7 +150,7 @@ public class ExportJsonService extends ServiceBase {
 		InputStream is = attach.getStreamByNode(node, "");
 		if (is != null) {
 			try {
-				String targetFileName = targetFolder + File.separator + node.getId().toHexString() + "-" + binFileName;
+				String targetFileName = targetFolder + File.separator + node.getIdStr() + "-" + binFileName;
 				File targetFile = new File(targetFileName);
 				/* warning: we have our own FileUtils (conflict of name) */
 				org.apache.commons.io.FileUtils.copyInputStreamToFile(is, targetFile);
