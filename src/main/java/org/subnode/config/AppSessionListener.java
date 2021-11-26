@@ -16,8 +16,8 @@ import org.springframework.web.util.WebUtils;
  */
 @Component
 public class AppSessionListener implements HttpSessionListener {
-	private static int sessionCounter = 0;
 	private final Logger log = LoggerFactory.getLogger(AppSessionListener.class);
+	private static int sessionCounter = 0;
 
 	@Override
 	public void sessionCreated(HttpSessionEvent se) {

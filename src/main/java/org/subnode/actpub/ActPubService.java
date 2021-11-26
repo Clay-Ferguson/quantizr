@@ -43,6 +43,8 @@ import org.subnode.util.XString;
 
 @Component
 public class ActPubService extends ServiceBase {
+    private static final Logger log = LoggerFactory.getLogger(ActPubService.class);
+    
     public static final boolean ENGLISH_LANGUAGE_CHECK = false;
     public static final int MAX_MESSAGES = 10;
     public static final int MAX_FOLLOWERS = 20;
@@ -56,7 +58,6 @@ public class ActPubService extends ServiceBase {
     public static int inboxCount = 0;
     public static boolean userRefresh = false;
     public static boolean bigRefresh = false;
-    private static final Logger log = LoggerFactory.getLogger(ActPubService.class);
 
     @Autowired
     @Qualifier("threadPoolTaskExecutor")

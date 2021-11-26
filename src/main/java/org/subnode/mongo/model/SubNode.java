@@ -60,8 +60,8 @@ import org.subnode.util.XString;
 		SubNode.FIELD_MAX_CHILD_ORDINAL, SubNode.FIELD_ORDINAL, SubNode.FIELD_OWNER, SubNode.FIELD_CREATE_TIME,
 		SubNode.FIELD_MODIFY_TIME, SubNode.FIELD_AC, SubNode.FIELD_PROPERTIES})
 public class SubNode {
-	public static final String FIELD_ID = "_id";
 	private static final Logger log = LoggerFactory.getLogger(SubNode.class);
+	public static final String FIELD_ID = "_id";
 
 	@Id
 	@Field(FIELD_ID)

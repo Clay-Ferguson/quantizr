@@ -10,7 +10,6 @@ import java.util.Map;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;
 import org.subnode.config.SessionContext;
@@ -21,42 +20,19 @@ import org.subnode.model.PropertyInfo;
 import org.subnode.model.client.NodeProp;
 import org.subnode.model.client.PrincipalName;
 import org.subnode.model.client.PrivilegeType;
-import org.subnode.mongo.AdminRun;
-import org.subnode.mongo.MongoAuth;
-import org.subnode.mongo.MongoRead;
 import org.subnode.mongo.MongoSession;
-import org.subnode.mongo.MongoUtil;
 import org.subnode.mongo.model.AccessControl;
 import org.subnode.mongo.model.SubNode;
 import org.subnode.mongo.model.SubNodePropVal;
 import org.subnode.mongo.model.SubNodePropertyMap;
-import org.subnode.service.AttachmentService;
+import org.subnode.service.ServiceBase;
 import org.subnode.types.TypeBase;
-import org.subnode.types.TypePluginMgr;
 
 /**
  * Converting objects from one type to another, and formatting.
  */
 @Component
-public class Convert {
-	@Autowired
-	private MongoUtil util;
-
-	@Autowired
-	private MongoRead read;
-
-	@Autowired
-	private MongoAuth auth;
-
-	@Autowired
-	private AttachmentService attach;
-
-	@Autowired
-	private AdminRun arun;
-
-	@Autowired
-	private TypePluginMgr typePluginMgr;
-
+public class Convert extends ServiceBase {
 	private static final Logger log = LoggerFactory.getLogger(Convert.class);
 
 	/*
@@ -64,9 +40,8 @@ public class Convert {
 	 * browser/client to encapsulate the data for a given node which is used by the browser to render
 	 * the node.
 	 */
-	public NodeInfo convertToNodeInfo(SessionContext sc, MongoSession ms, SubNode node, boolean htmlOnly,
-			boolean initNodeEdit, long ordinal, boolean allowInlineChildren, boolean lastChild, boolean childrenCheck,
-			boolean getFollowers) {
+	public NodeInfo convertToNodeInfo(SessionContext sc, MongoSession ms, SubNode node, boolean htmlOnly, boolean initNodeEdit,
+			long ordinal, boolean allowInlineChildren, boolean lastChild, boolean childrenCheck, boolean getFollowers) {
 
 		/* If session user shouldn't be able to see secrets on this node remove them */
 		if (ms.isAnon() || (ms.getUserNodeId() != null && !ms.getUserNodeId().equals(node.getOwner()))) {
@@ -79,10 +54,10 @@ public class Convert {
 		String dataUrl = null;
 		String mimeType = node.getStrProp(NodeProp.BIN_MIME.s());
 		if (mimeType != null) {
-			boolean isImage = util.isImageAttached(node);
+			boolean isImage = mongoUtil.isImageAttached(node);
 
 			if (isImage) {
-				imageSize = util.getImageSize(node);
+				imageSize = mongoUtil.getImageSize(node);
 
 				String dataUrlProp = node.getStrProp(NodeProp.BIN_DATA_URL.s());
 				if (dataUrlProp != null) {

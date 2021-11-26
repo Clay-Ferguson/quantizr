@@ -19,8 +19,8 @@ import org.springframework.web.filter.GenericFilterBean;
 @Component
 @Order(1)
 public class AuditFilter extends GenericFilterBean {
-
 	private static final Logger log = LoggerFactory.getLogger(AuditFilter.class);
+	
 	private static String INDENT = "    ";
 	private static boolean enabled = true;
 	private static boolean verbose = false;

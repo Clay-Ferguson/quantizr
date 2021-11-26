@@ -21,7 +21,6 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class MailSender implements TransportListener {
-
 	private static final Logger log = LoggerFactory.getLogger(MailSender.class);
 
 	@Autowired

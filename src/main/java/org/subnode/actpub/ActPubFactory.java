@@ -19,7 +19,6 @@ import org.subnode.service.ServiceBase;
 
 @Controller
 public class ActPubFactory extends ServiceBase {
-
 	private static final Logger log = LoggerFactory.getLogger(ActPubFactory.class);
 
 	/**

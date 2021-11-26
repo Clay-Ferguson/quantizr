@@ -32,6 +32,7 @@ import org.subnode.util.XString;
 @Component
 public class MongoAuth extends ServiceBase {
 	private static final Logger log = LoggerFactory.getLogger(MongoAuth.class);
+	
 	private static final boolean verbose = false;
 
 	// in order for non-spring beans (namely just SubNode.java) to access this we cheat by using this

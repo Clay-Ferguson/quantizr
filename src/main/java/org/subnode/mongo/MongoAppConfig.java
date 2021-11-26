@@ -40,6 +40,7 @@ import org.subnode.util.ExUtil;
 // see also: ServerMonitorListener to detect heartbeats, etc.
 public class MongoAppConfig extends AbstractMongoClientConfiguration {
 	private static final Logger log = LoggerFactory.getLogger(MongoAppConfig.class);
+	
 	public static final String databaseName = "database";
 	private MongoClient mongoClient;
 	private GridFSBucket gridFsBucket;

@@ -32,7 +32,6 @@ import org.subnode.util.XString;
  */
 @Component
 public class OutboxMgr {
-
 	private static final Logger log = LoggerFactory.getLogger(OutboxMgr.class);
 
 	@Autowired

@@ -49,9 +49,7 @@ public class MongoUtil extends ServiceBase {
 	private static final Logger log = LoggerFactory.getLogger(MongoUtil.class);
 
 	private static HashSet<String> testAccountNames = new HashSet<>();
-
 	private static SubNode systemRootNode;
-
 	private static final Random rand = new Random();
 
 	/*

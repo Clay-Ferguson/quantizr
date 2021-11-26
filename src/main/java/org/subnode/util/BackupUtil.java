@@ -11,7 +11,6 @@ import org.springframework.boot.SpringApplication;
 // @SpringBootApplication
 // @EnableScheduling
 public class BackupUtil {
-
 	private static final Logger log = LoggerFactory.getLogger(BackupUtil.class);
 
 	public static void main(String[] args) {

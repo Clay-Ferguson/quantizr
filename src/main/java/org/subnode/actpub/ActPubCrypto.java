@@ -24,7 +24,6 @@ import org.subnode.util.XString;
 
 @Component
 public class ActPubCrypto extends ServiceBase {
-
     private static final Logger log = LoggerFactory.getLogger(ActPubCrypto.class);
 
     /* Gets private RSA key from current user session */
