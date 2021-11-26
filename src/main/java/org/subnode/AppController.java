@@ -35,18 +35,12 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
-import org.subnode.actpub.ActPubFollower;
-import org.subnode.actpub.ActPubFollowing;
-import org.subnode.actpub.ActPubService;
-import org.subnode.config.AppProp;
 import org.subnode.config.SessionContext;
 import org.subnode.config.SpringContextUtil;
 import org.subnode.exception.base.RuntimeEx;
 import org.subnode.mail.MailSender;
 import org.subnode.model.client.NodeProp;
 import org.subnode.model.client.PrincipalName;
-import org.subnode.mongo.AdminRun;
-import org.subnode.mongo.MongoRead;
 import org.subnode.mongo.MongoRepository;
 import org.subnode.mongo.model.SubNode;
 import org.subnode.request.AddFriendRequest;
@@ -122,30 +116,15 @@ import org.subnode.response.InfoMessage;
 import org.subnode.response.LogoutResponse;
 import org.subnode.response.PingResponse;
 import org.subnode.response.SendTestEmailResponse;
-import org.subnode.service.AclService;
-import org.subnode.service.AttachmentService;
 import org.subnode.service.ExportServiceFlexmark;
 import org.subnode.service.ExportTarService;
 import org.subnode.service.ExportTextService;
 import org.subnode.service.ExportZipService;
-import org.subnode.service.GraphNodesService;
-import org.subnode.service.IPFSService;
-import org.subnode.service.ImportBookService;
-import org.subnode.service.ImportService;
-import org.subnode.service.JSoupService;
-import org.subnode.service.LuceneService;
-import org.subnode.service.NodeEditService;
-import org.subnode.service.NodeMoveService;
-import org.subnode.service.NodeRenderService;
-import org.subnode.service.NodeSearchService;
 import org.subnode.service.RSSFeedService;
-import org.subnode.service.SystemService;
-import org.subnode.service.UserFeedService;
-import org.subnode.service.UserManagerService;
+import org.subnode.service.ServiceBase;
 import org.subnode.util.CaptchaMaker;
 import org.subnode.util.Const;
 import org.subnode.util.ExUtil;
-import org.subnode.util.FileUtils;
 import org.subnode.util.LimitedInputStreamEx;
 import org.subnode.util.ThreadLocals;
 import org.subnode.util.Util;
@@ -167,7 +146,7 @@ import org.subnode.util.Util;
  * in certain layers (abstraction related and for loose-coupling).
  */
 @Controller
-public class AppController implements ErrorController {
+public class AppController extends ServiceBase implements ErrorController {
 	private static final Logger log = LoggerFactory.getLogger(AppController.class);
 
 	public static final String API_PATH = "/mobile/api";
@@ -186,79 +165,7 @@ public class AppController implements ErrorController {
 	private static final RestTemplate restTemplate = new RestTemplate(Util.getClientHttpRequestFactory());
 
 	@Autowired
-	private FileUtils fileUtils;
-
-	@Autowired
-	private AdminRun arun;
-
-	@Autowired
 	private CallProcessor callProc;
-
-	@Autowired
-	private MongoRead read;
-
-	@Autowired
-	private UserManagerService usrMgr;
-
-	@Autowired
-	private NodeRenderService nodeRenderService;
-
-	@Autowired
-	private NodeSearchService nodeSearchService;
-
-	@Autowired
-	private ImportService importService;
-
-	@Autowired
-	private ImportBookService importBookService;
-
-	@Autowired
-	private NodeEditService nodeEditService;
-
-	@Autowired
-	private NodeMoveService nodeMoveService;
-
-	@Autowired
-	AttachmentService attach;
-
-	@Autowired
-	private AclService aclService;
-
-	@Autowired
-	private SystemService systemService;
-
-	@Autowired
-	private LuceneService luceneService;
-
-	@Autowired
-	private IPFSService ipfsService;
-
-	@Autowired
-	private MailSender mailSender;
-
-	@Autowired
-	private UserFeedService userFeedService;
-
-	@Autowired
-	private RSSFeedService rssFeedService;
-
-	@Autowired
-	private GraphNodesService graphNodesService;
-
-	@Autowired
-	private ActPubService actPub;
-
-	@Autowired
-	private AppProp appProp;
-
-	@Autowired
-	private ActPubFollowing apFollowing;
-
-	@Autowired
-	private ActPubFollower apFollower;
-
-	@Autowired
-	private JSoupService jsoupService;
 
 	// NOTE: server.error.path app property points to this.
 	private static final String ERROR_MAPPING = "/error";
@@ -266,7 +173,7 @@ public class AppController implements ErrorController {
 	@RequestMapping(value = ERROR_MAPPING)
 	public String error(Model model) {
 		init();
-		model.addAttribute("hostAndPort", appProp.getHostAndPort());
+		model.addAttribute("hostAndPort", prop.getHostAndPort());
 		model.addAllAttributes(thymeleafAttribs);
 		// pulls up error.html
 		return "error";
@@ -277,7 +184,7 @@ public class AppController implements ErrorController {
 	}
 
 	public void initThymeleafAttribs() {
-		if (appProp.getProfileName().equals("dev")) {
+		if (prop.getProfileName().equals("dev")) {
 			// force reload of attribs
 			thymeleafAttribs = null;
 		}
@@ -287,13 +194,13 @@ public class AppController implements ErrorController {
 
 		thymeleafAttribs = new HashMap<>();
 
-		thymeleafAttribs.put("instanceId", appProp.getInstanceId());
-		thymeleafAttribs.put("brandingAppName", appProp.getConfigText("brandingAppName"));
-		thymeleafAttribs.put("brandingMetaContent", appProp.getConfigText("brandingMetaContent"));
-		thymeleafAttribs.put("hostUrl", appProp.getProtocolHostAndPort());
-		thymeleafAttribs.put("introSubtitle", appProp.getConfigText("introSubtitle"));
-		thymeleafAttribs.put("intro1", appProp.getConfigText("intro1"));
-		thymeleafAttribs.put("intro2", appProp.getConfigText("intro2"));
+		thymeleafAttribs.put("instanceId", prop.getInstanceId());
+		thymeleafAttribs.put("brandingAppName", prop.getConfigText("brandingAppName"));
+		thymeleafAttribs.put("brandingMetaContent", prop.getConfigText("brandingMetaContent"));
+		thymeleafAttribs.put("hostUrl", prop.getProtocolHostAndPort());
+		thymeleafAttribs.put("introSubtitle", prop.getConfigText("introSubtitle"));
+		thymeleafAttribs.put("intro1", prop.getConfigText("intro1"));
+		thymeleafAttribs.put("intro2", prop.getConfigText("intro2"));
 	}
 
 	/*
@@ -314,7 +221,6 @@ public class AppController implements ErrorController {
 
 			@PathVariable(value = "nameOnUserNode", required = false) String nameOnUserNode, //
 			@PathVariable(value = "userName", required = false) String userName, //
-
 			@RequestParam(value = "id", required = false) String id, //
 
 			// be careful removing this, clicking on a node updates the browser history to
@@ -350,7 +256,7 @@ public class AppController implements ErrorController {
 					// we don't check ownership of node at this time, but merely check sanity of
 					// whether this ID is even existing or not.
 					SubNode node = read.getNode(ms, _id);
-					nodeRenderService.populateSocialCardProps(node, model);
+					render.populateSocialCardProps(node, model);
 					if (node == null) {
 						log.debug("Node did not exist.");
 						ThreadLocals.getSC().setUrlId(null);
@@ -404,7 +310,7 @@ public class AppController implements ErrorController {
 		}
 
 		if (signupCode != null) {
-			String signupResponse = usrMgr.processSignupCode(signupCode);
+			String signupResponse = user.processSignupCode(signupCode);
 			model.addAttribute("signupResponse", signupResponse);
 		}
 
@@ -448,12 +354,12 @@ public class AppController implements ErrorController {
 
 	@GetMapping(value = {"/fediverse-users"}, produces = MediaType.TEXT_PLAIN_VALUE)
 	public @ResponseBody String fediverseUsers() {
-		return actPub.dumpFediverseUsers();
+		return apub.dumpFediverseUsers();
 	}
 
 	@GetMapping(value = {"/performance-report"}, produces = MediaType.TEXT_PLAIN_VALUE)
 	public @ResponseBody String performanceReport() {
-		return systemService.getPerformancerReport();
+		return system.getPerformancerReport();
 	}
 
 	@GetMapping(value = {"/multiRss"}, produces = MediaType.APPLICATION_RSS_XML_VALUE)
@@ -461,7 +367,7 @@ public class AppController implements ErrorController {
 			HttpServletResponse response) {
 		arun.run(ms -> {
 			try {
-				rssFeedService.multiRss(ms, nodeId, response.getWriter());
+				rssFeed.multiRss(ms, nodeId, response.getWriter());
 			} catch (Exception e) {
 				throw new RuntimeException("internal server error");
 			}
@@ -479,7 +385,7 @@ public class AppController implements ErrorController {
 		callProc.run("rss", null, session, ms -> {
 			arun.run(as -> {
 				try {
-					rssFeedService.getRssFeed(as, nodeId, response.getWriter());
+					rssFeed.getRssFeed(as, nodeId, response.getWriter());
 				} catch (Exception e) {
 					throw new RuntimeException("internal server error");
 				}
@@ -545,7 +451,7 @@ public class AppController implements ErrorController {
 		return callProc.run("getMultiRssFeed", req, session, ms -> {
 			return arun.run(as -> {
 				// log.debug("getMultiRssFeed: " + XString.prettyPrint(req));
-				return rssFeedService.getMultiRssFeed(req);
+				return rssFeed.getMultiRssFeed(req);
 			});
 		});
 	}
@@ -553,21 +459,21 @@ public class AppController implements ErrorController {
 	@RequestMapping(value = API_PATH + "/signup", method = RequestMethod.POST)
 	public @ResponseBody Object signup(@RequestBody SignupRequest req, HttpSession session) {
 		return callProc.run("signup", req, session, ms -> {
-			return usrMgr.signup(req, false);
+			return user.signup(req, false);
 		});
 	}
 
 	@RequestMapping(value = API_PATH + "/login", method = RequestMethod.POST)
 	public @ResponseBody Object login(@RequestBody LoginRequest req, HttpServletRequest httpReq, HttpSession session) {
 		return callProc.run("login", req, session, ms -> {
-			return usrMgr.login(httpReq, req);
+			return user.login(httpReq, req);
 		});
 	}
 
 	@RequestMapping(value = API_PATH + "/closeAccount", method = RequestMethod.POST)
 	public @ResponseBody Object closeAccount(@RequestBody CloseAccountRequest req, HttpSession session) {
 		return callProc.run("closeAccount", req, session, ms -> {
-			CloseAccountResponse res = usrMgr.closeAccount(req);
+			CloseAccountResponse res = user.closeAccount(req);
 			session.invalidate();
 			return res;
 		});
@@ -598,7 +504,7 @@ public class AppController implements ErrorController {
 	public @ResponseBody Object renderCalendarNodes(@RequestBody RenderCalendarRequest req, //
 			HttpServletRequest httpReq, HttpSession session) {
 		return callProc.run("renderCalendar", req, session, ms -> {
-			return nodeRenderService.renderCalendar(ms, req);
+			return render.renderCalendar(ms, req);
 		});
 	}
 
@@ -606,7 +512,7 @@ public class AppController implements ErrorController {
 	public @ResponseBody Object getNodeMetaInfo(@RequestBody GetNodeMetaInfoRequest req, //
 			HttpServletRequest httpReq, HttpSession session) {
 		return callProc.run("rendergetNodeMetaInfoNode", req, session, ms -> {
-			return nodeRenderService.getNodeMetaInfo(ms, req);
+			return render.getNodeMetaInfo(ms, req);
 		});
 	}
 
@@ -614,14 +520,14 @@ public class AppController implements ErrorController {
 	public @ResponseBody Object renderNode(@RequestBody RenderNodeRequest req, //
 			HttpServletRequest httpReq, HttpSession session) {
 		return callProc.run("renderNode", req, session, ms -> {
-			return nodeRenderService.renderNode(ms, req);
+			return render.renderNode(ms, req);
 		});
 	}
 
 	@RequestMapping(value = API_PATH + "/initNodeEdit", method = RequestMethod.POST)
 	public @ResponseBody Object initNodeEdit(@RequestBody InitNodeEditRequest req, HttpSession session) {
 		return callProc.run("initNodeEdit", req, session, ms -> {
-			return nodeRenderService.initNodeEdit(ms, req);
+			return render.initNodeEdit(ms, req);
 		});
 	}
 
@@ -633,54 +539,54 @@ public class AppController implements ErrorController {
 	@RequestMapping(value = API_PATH + "/appDrop", method = RequestMethod.POST)
 	public @ResponseBody Object appDrop(@RequestBody AppDropRequest req, HttpSession session) {
 		return callProc.run("appDrop", req, session, ms -> {
-			return nodeEditService.appDrop(ms, req);
+			return edit.appDrop(ms, req);
 		});
 	}
 
 	@RequestMapping(value = API_PATH + "/getOpenGraph", method = RequestMethod.POST)
 	public @ResponseBody Object getOpenGraph(@RequestBody GetOpenGraphRequest req, HttpSession session) {
-		return jsoupService.getOpenGraph(req);
+		return jsoup.getOpenGraph(req);
 	}
 
 	@RequestMapping(value = API_PATH + "/getNodePrivileges", method = RequestMethod.POST)
 	public @ResponseBody Object getNodePrivileges(@RequestBody GetNodePrivilegesRequest req, HttpSession session) {
 		return callProc.run("getNodePrivileges", req, session, ms -> {
-			return aclService.getNodePrivileges(ms, req);
+			return acl.getNodePrivileges(ms, req);
 		});
 	}
 
 	@RequestMapping(value = API_PATH + "/getFriends", method = RequestMethod.POST)
 	public @ResponseBody Object getFriends(@RequestBody GetFriendsRequest req, HttpSession session) {
 		return callProc.run("getFriends", req, session, ms -> {
-			return usrMgr.getFriends(ms);
+			return user.getFriends(ms);
 		});
 	}
 
 	@RequestMapping(value = API_PATH + "/addPrivilege", method = RequestMethod.POST)
 	public @ResponseBody Object addPrivilege(@RequestBody AddPrivilegeRequest req, HttpSession session) {
 		return callProc.run("addPrivilege", req, session, ms -> {
-			return aclService.addPrivilege(ms, req);
+			return acl.addPrivilege(ms, req);
 		});
 	}
 
 	@RequestMapping(value = API_PATH + "/removePrivilege", method = RequestMethod.POST)
 	public @ResponseBody Object removePrivilege(@RequestBody RemovePrivilegeRequest req, HttpSession session) {
 		return callProc.run("removePrivilege", req, session, ms -> {
-			return aclService.removePrivilege(ms, req);
+			return acl.removePrivilege(ms, req);
 		});
 	}
 
 	@RequestMapping(value = API_PATH + "/savePublicKey", method = RequestMethod.POST)
 	public @ResponseBody Object savePublicKey(@RequestBody SavePublicKeyRequest req, HttpSession session) {
 		return callProc.run("addPrivilege", req, session, ms -> {
-			return usrMgr.savePublicKey(req);
+			return user.savePublicKey(req);
 		});
 	}
 
 	@RequestMapping(value = API_PATH + "/setCipherKey", method = RequestMethod.POST)
 	public @ResponseBody Object setCipherKey(@RequestBody SetCipherKeyRequest req, HttpSession session) {
 		return callProc.run("setCipherKey", req, session, ms -> {
-			return aclService.setCipherKey(ms, req);
+			return acl.setCipherKey(ms, req);
 		});
 	}
 
@@ -759,28 +665,28 @@ public class AppController implements ErrorController {
 			if (!ThreadLocals.getSC().isAdmin()) {
 				throw ExUtil.wrapEx("admin only function.");
 			}
-			return nodeEditService.transferNode(ms, req);
+			return edit.transferNode(ms, req);
 		});
 	}
 
 	@RequestMapping(value = API_PATH + "/searchAndReplace", method = RequestMethod.POST)
 	public @ResponseBody Object searchAndReplace(@RequestBody SearchAndReplaceRequest req, HttpSession session) {
 		return callProc.run("searchAndReplace", req, session, ms -> {
-			return nodeEditService.searchAndReplace(ms, req);
+			return edit.searchAndReplace(ms, req);
 		});
 	}
 
 	@RequestMapping(value = API_PATH + "/publishNodeToIpfs", method = RequestMethod.POST)
 	public @ResponseBody Object publishNodeToIpfs(@RequestBody PublishNodeToIpfsRequest req, HttpSession session) {
 		return callProc.run("publishNodeToIpfs", req, session, ms -> {
-			return ipfsService.publishNodeToIpfs(ms, req);
+			return ipfs.publishNodeToIpfs(ms, req);
 		});
 	}
 
 	@RequestMapping(value = API_PATH + "/loadNodeFromIpfs", method = RequestMethod.POST)
 	public @ResponseBody Object loadNodeFromIpfs(@RequestBody LoadNodeFromIpfsRequest req, HttpSession session) {
 		return callProc.run("loadNodeFromIpfs", req, session, ms -> {
-			return ipfsService.loadNodeFromIpfs(ms, req);
+			return ipfs.loadNodeFromIpfs(ms, req);
 		});
 	}
 
@@ -796,7 +702,7 @@ public class AppController implements ErrorController {
 	@RequestMapping(value = API_PATH + "/setNodePosition", method = RequestMethod.POST)
 	public @ResponseBody Object setNodePosition(@RequestBody SetNodePositionRequest req, HttpSession session) {
 		return callProc.run("setNodePosition", req, session, ms -> {
-			return nodeMoveService.setNodePosition(ms, req);
+			return move.setNodePosition(ms, req);
 		});
 	}
 
@@ -804,7 +710,7 @@ public class AppController implements ErrorController {
 	@RequestMapping(value = API_PATH + "/createSubNode", method = RequestMethod.POST)
 	public @ResponseBody Object createSubNode(@RequestBody CreateSubNodeRequest req, HttpSession session) {
 		return callProc.run("createSubNode", req, session, ms -> {
-			return nodeEditService.createSubNode(ms, req);
+			return edit.createSubNode(ms, req);
 		});
 	}
 
@@ -814,7 +720,7 @@ public class AppController implements ErrorController {
 	@RequestMapping(value = API_PATH + "/insertNode", method = RequestMethod.POST)
 	public @ResponseBody Object insertNode(@RequestBody InsertNodeRequest req, HttpSession session) {
 		return callProc.run("insertNode", req, session, ms -> {
-			return nodeEditService.insertNode(ms, req);
+			return edit.insertNode(ms, req);
 		});
 	}
 
@@ -832,63 +738,63 @@ public class AppController implements ErrorController {
 	@RequestMapping(value = API_PATH + "/deleteNodes", method = RequestMethod.POST)
 	public @ResponseBody Object deleteNodes(@RequestBody DeleteNodesRequest req, HttpSession session) {
 		return callProc.run("deleteNodes", req, session, ms -> {
-			return nodeMoveService.deleteNodes(ms, req);
+			return move.deleteNodes(ms, req);
 		});
 	}
 
 	@RequestMapping(value = API_PATH + "/joinNodes", method = RequestMethod.POST)
 	public @ResponseBody Object joinNodes(@RequestBody JoinNodesRequest req, HttpSession session) {
 		return callProc.run("joinNodes", req, session, ms -> {
-			return nodeMoveService.joinNodes(ms, req);
+			return move.joinNodes(ms, req);
 		});
 	}
 
 	@RequestMapping(value = API_PATH + "/selectAllNodes", method = RequestMethod.POST)
 	public @ResponseBody Object selectAllNodes(@RequestBody SelectAllNodesRequest req, HttpSession session) {
 		return callProc.run("selectAllNodes", req, session, ms -> {
-			return nodeMoveService.selectAllNodes(ms, req);
+			return move.selectAllNodes(ms, req);
 		});
 	}
 
 	@RequestMapping(value = API_PATH + "/updateHeadings", method = RequestMethod.POST)
 	public @ResponseBody Object updateHeadings(@RequestBody UpdateHeadingsRequest req, HttpSession session) {
 		return callProc.run("updateHeadings", req, session, ms -> {
-			return nodeEditService.updateHeadings(ms, req);
+			return edit.updateHeadings(ms, req);
 		});
 	}
 
 	@RequestMapping(value = API_PATH + "/moveNodes", method = RequestMethod.POST)
 	public @ResponseBody Object moveNodes(@RequestBody MoveNodesRequest req, HttpSession session) {
 		return callProc.run("moveNodes", req, session, ms -> {
-			return nodeMoveService.moveNodes(ms, req);
+			return move.moveNodes(ms, req);
 		});
 	}
 
 	@RequestMapping(value = API_PATH + "/deleteProperty", method = RequestMethod.POST)
 	public @ResponseBody Object deleteProperty(@RequestBody DeletePropertyRequest req, HttpSession session) {
 		return callProc.run("deleteProperty", req, session, ms -> {
-			return nodeEditService.deleteProperty(ms, req);
+			return edit.deleteProperty(ms, req);
 		});
 	}
 
 	@RequestMapping(value = API_PATH + "/saveNode", method = RequestMethod.POST)
 	public @ResponseBody Object saveNode(@RequestBody SaveNodeRequest req, HttpSession session) {
 		return callProc.run("saveNode", req, session, ms -> {
-			return nodeEditService.saveNode(ms, req);
+			return edit.saveNode(ms, req);
 		});
 	}
 
 	@RequestMapping(value = API_PATH + "/changePassword", method = RequestMethod.POST)
 	public @ResponseBody Object changePassword(@RequestBody ChangePasswordRequest req, HttpSession session) {
 		return callProc.run("changePassword", req, session, ms -> {
-			return usrMgr.changePassword(ms, req);
+			return user.changePassword(ms, req);
 		});
 	}
 
 	@RequestMapping(value = API_PATH + "/resetPassword", method = RequestMethod.POST)
 	public @ResponseBody Object resetPassword(@RequestBody ResetPasswordRequest req, HttpSession session) {
 		return callProc.run("resetPassword", req, session, ms -> {
-			return usrMgr.resetPassword(req);
+			return user.resetPassword(req);
 		});
 	}
 
@@ -1019,7 +925,7 @@ public class AppController implements ErrorController {
 			else {
 				callProc.run("bin", null, session, ms -> {
 					if (ipfsCid != null) {
-						ipfsService.streamResponse(response, ms, ipfsCid, null);
+						ipfs.streamResponse(response, ms, ipfsCid, null);
 					} else {
 						attach.getBinary(null, "", null, nodeId, download != null, response);
 					}
@@ -1182,14 +1088,14 @@ public class AppController implements ErrorController {
 	@RequestMapping(value = API_PATH + "/anonPageLoad", method = RequestMethod.POST)
 	public @ResponseBody Object anonPageLoad(@RequestBody RenderNodeRequest req, HttpSession session) {
 		return callProc.run("anonPageLoad", req, session, ms -> {
-			return nodeRenderService.anonPageLoad(null, req);
+			return render.anonPageLoad(null, req);
 		});
 	}
 
 	@RequestMapping(value = API_PATH + "/nodeSearch", method = RequestMethod.POST)
 	public @ResponseBody Object nodeSearch(@RequestBody NodeSearchRequest req, HttpSession session) {
 		return callProc.run("nodeSearch", req, session, ms -> {
-			return nodeSearchService.search(ms, req);
+			return search.search(ms, req);
 		});
 	}
 
@@ -1215,77 +1121,77 @@ public class AppController implements ErrorController {
 	@RequestMapping(value = API_PATH + "/nodeFeed", method = RequestMethod.POST)
 	public @ResponseBody Object nodeFeed(@RequestBody NodeFeedRequest req, HttpSession session) {
 		return callProc.run("nodeFeed", req, session, ms -> {
-			return userFeedService.generateFeed(ms, req);
+			return userFeed.generateFeed(ms, req);
 		});
 	}
 
 	@RequestMapping(value = API_PATH + "/checkMessages", method = RequestMethod.POST)
 	public @ResponseBody Object checkMessages(@RequestBody CheckMessagesRequest req, HttpSession session) {
 		return callProc.run("checkMessages", req, session, ms -> {
-			return userFeedService.checkMessages(ms, req);
+			return userFeed.checkMessages(ms, req);
 		});
 	}
 
 	@RequestMapping(value = API_PATH + "/getSharedNodes", method = RequestMethod.POST)
 	public @ResponseBody Object getSharedNodes(@RequestBody GetSharedNodesRequest req, HttpSession session) {
 		return callProc.run("getSharedNodes", req, session, ms -> {
-			return nodeSearchService.getSharedNodes(ms, req);
+			return search.getSharedNodes(ms, req);
 		});
 	}
 
 	@RequestMapping(value = API_PATH + "/saveUserPreferences", method = RequestMethod.POST)
 	public @ResponseBody Object saveUserPreferences(@RequestBody SaveUserPreferencesRequest req, HttpSession session) {
 		return callProc.run("saveUserPreferences", req, session, ms -> {
-			return usrMgr.saveUserPreferences(req);
+			return user.saveUserPreferences(req);
 		});
 	}
 
 	@RequestMapping(value = API_PATH + "/getUserProfile", method = RequestMethod.POST)
 	public @ResponseBody Object getUserProfile(@RequestBody GetUserProfileRequest req, HttpSession session) {
 		return callProc.run("getUserProfile", req, session, ms -> {
-			return usrMgr.getUserProfile(req);
+			return user.getUserProfile(req);
 		});
 	}
 
 	@RequestMapping(value = API_PATH + "/saveUserProfile", method = RequestMethod.POST)
 	public @ResponseBody Object saveUserProfile(@RequestBody SaveUserProfileRequest req, HttpSession session) {
 		return callProc.run("saveUserProfile", req, session, ms -> {
-			return usrMgr.saveUserProfile(req);
+			return user.saveUserProfile(req);
 		});
 	}
 
 	@RequestMapping(value = API_PATH + "/addFriend", method = RequestMethod.POST)
 	public @ResponseBody Object addFriend(@RequestBody AddFriendRequest req, HttpSession session) {
 		return callProc.run("addFriend", req, session, ms -> {
-			return usrMgr.addFriend(ms, req);
+			return user.addFriend(ms, req);
 		});
 	}
 
 	@RequestMapping(value = API_PATH + "/deleteFriend", method = RequestMethod.POST)
 	public @ResponseBody Object deleteFriend(@RequestBody DeleteFriendRequest req, HttpSession session) {
 		return callProc.run("deleteFriend", req, session, ms -> {
-			return usrMgr.deleteFriend(ms, req);
+			return user.deleteFriend(ms, req);
 		});
 	}
 
 	@RequestMapping(value = API_PATH + "/blockUser", method = RequestMethod.POST)
 	public @ResponseBody Object blockUser(@RequestBody BlockUserRequest req, HttpSession session) {
 		return callProc.run("blockUser", req, session, ms -> {
-			return usrMgr.blockUser(ms, req);
+			return user.blockUser(ms, req);
 		});
 	}
 
 	@RequestMapping(value = API_PATH + "/getUserAccountInfo", method = RequestMethod.POST)
 	public @ResponseBody Object getUserAccountInfo(@RequestBody GetUserAccountInfoRequest req, HttpSession session) {
 		return callProc.run("getUserAcccountInfo", req, session, ms -> {
-			return usrMgr.getUserAccountInfo(req);
+			return user.getUserAccountInfo(req);
 		});
 	}
 
 	@RequestMapping(value = API_PATH + "/getConfig", method = RequestMethod.POST)
 	public @ResponseBody Object getConfig(@RequestBody GetConfigRequest req, HttpSession session) {
 		GetConfigResponse res = new GetConfigResponse();
-		res.setConfig(appProp.getConfig());
+		res.setConfig(prop.getConfig());
 		return res;
 	}
 
@@ -1293,7 +1199,7 @@ public class AppController implements ErrorController {
 	public @ResponseBody Object getBookmarks(@RequestBody GetBookmarksRequest req, HttpSession session) {
 		return callProc.run("getBookmarks", req, session, ms -> {
 			GetBookmarksResponse res = new GetBookmarksResponse();
-			nodeSearchService.getBookmarks(ms, req, res);
+			search.getBookmarks(ms, req, res);
 			return res;
 		});
 	}
@@ -1302,7 +1208,7 @@ public class AppController implements ErrorController {
 	public @ResponseBody Object getNodeStats(@RequestBody GetNodeStatsRequest req, HttpSession session) {
 		return callProc.run("getNodeStats", req, session, ms -> {
 			GetNodeStatsResponse res = new GetNodeStatsResponse();
-			nodeSearchService.getNodeStats(ms, req, res);
+			search.getNodeStats(ms, req, res);
 			return res;
 		});
 	}
@@ -1323,42 +1229,42 @@ public class AppController implements ErrorController {
 			log.debug("Command: " + req.getCommand());
 			switch (req.getCommand()) {
 				case "crawlUsers":
-					res.getMessages().add(new InfoMessage(actPub.crawlNewUsers(), null));
+					res.getMessages().add(new InfoMessage(apub.crawlNewUsers(), null));
 					break;
 
 				case "actPubMaintenance":
-					res.getMessages().add(new InfoMessage(actPub.maintainForeignUsers(), null));
+					res.getMessages().add(new InfoMessage(apub.maintainForeignUsers(), null));
 					break;
 
 				case "compactDb":
-					res.getMessages().add(new InfoMessage(systemService.compactDb(), null));
+					res.getMessages().add(new InfoMessage(system.compactDb(), null));
 					break;
 
 				case "validateDb":
-					res.getMessages().add(new InfoMessage(systemService.validateDb(), null));
+					res.getMessages().add(new InfoMessage(system.validateDb(), null));
 					break;
 
 				case "rebuildIndexes":
-					res.getMessages().add(new InfoMessage(systemService.rebuildIndexes(), null));
+					res.getMessages().add(new InfoMessage(system.rebuildIndexes(), null));
 					break;
 
 				case "refreshRssCache":
-					res.getMessages().add(new InfoMessage(rssFeedService.refreshFeedCache(), null));
+					res.getMessages().add(new InfoMessage(rssFeed.refreshFeedCache(), null));
 					break;
 
 				case "refreshFediverseUsers":
-					actPub.refreshForeignUsers();
+					apub.refreshForeignUsers();
 					res.getMessages().add(new InfoMessage("Fediverse refresh initiated...", null));
 					break;
 
 				case "refreshAPAccounts":
-					actPub.refreshActorPropsForAllUsers();
+					apub.refreshActorPropsForAllUsers();
 					res.getMessages().add(new InfoMessage("Accounts refresh initiated...", null));
 					break;
 
 				case "toggleDaemons":
-					appProp.setDaemonsEnabled(!appProp.isDaemonsEnabled());
-					res.getMessages().add(new InfoMessage(systemService.getSystemInfo(), null));
+					prop.setDaemonsEnabled(!prop.isDaemonsEnabled());
+					res.getMessages().add(new InfoMessage(system.getSystemInfo(), null));
 					break;
 
 				case "ipfsPubSubTest":
@@ -1368,15 +1274,15 @@ public class AppController implements ErrorController {
 				// break;
 
 				case "getServerInfo":
-					res.getMessages().add(new InfoMessage(systemService.getSystemInfo(), null));
+					res.getMessages().add(new InfoMessage(system.getSystemInfo(), null));
 					break;
 
 				case "getSessionActivity":
-					res.getMessages().add(new InfoMessage(systemService.getSessionActivity(), null));
+					res.getMessages().add(new InfoMessage(system.getSessionActivity(), null));
 					break;
 
 				case "getJson":
-					res.getMessages().add(new InfoMessage(systemService.getJson(ms, req.getNodeId()), null));
+					res.getMessages().add(new InfoMessage(system.getJson(ms, req.getNodeId()), null));
 					break;
 
 				default:
@@ -1390,7 +1296,7 @@ public class AppController implements ErrorController {
 	@RequestMapping(value = API_PATH + "/graphNodes", method = RequestMethod.POST)
 	public @ResponseBody Object graphNodes(@RequestBody GraphRequest req, HttpSession session) {
 		return callProc.run("graphNodes", req, session, ms -> {
-			GraphResponse res = graphNodesService.graphNodes(ms, req);
+			GraphResponse res = graphNodes.graphNodes(ms, req);
 			res.setSuccess(true);
 			return res;
 		});
@@ -1406,7 +1312,7 @@ public class AppController implements ErrorController {
 			/* We need to run this in a thread, and return control back to browser imediately, and then
 			have the "ServerInfo" request able to display the current state of this indexing process, or potentially
 			have a dedicated ServerInfo-like tab to display the state in */
-			return luceneService.reindex(ms, req.getNodeId(), req.getPath());
+			return lucene.reindex(ms, req.getNodeId(), req.getPath());
 		});
 	}
 
@@ -1416,7 +1322,7 @@ public class AppController implements ErrorController {
 			if (!ThreadLocals.getSC().isAdmin()) {
 				throw ExUtil.wrapEx("admin only function.");
 			}
-			return luceneService.search(ms, req.getNodeId(), req.getText());
+			return lucene.search(ms, req.getNodeId(), req.getText());
 		});
 	}
 
@@ -1443,13 +1349,13 @@ public class AppController implements ErrorController {
 			String timeString = new Date().toString();
 			synchronized (MailSender.getLock()) {
 				try {
-					mailSender.init();
-					mailSender.sendMail("wclayf@gmail.com", null,
+					mail.init();
+					mail.sendMail("wclayf@gmail.com", null,
 							"<h1>Hello! Time=" + timeString + "</h1>This is the test email requested from the "
-									+ appProp.getConfigText("brandingAppName") + " admin menu.",
+									+ prop.getConfigText("brandingAppName") + " admin menu.",
 							"Test Subject");
 				} finally {
-					mailSender.close();
+					mail.close();
 				}
 			}
 			res.setSuccess(true);
@@ -1460,7 +1366,7 @@ public class AppController implements ErrorController {
 	@RequestMapping(value = API_PATH + "/splitNode", method = RequestMethod.POST)
 	public @ResponseBody Object splitNode(@RequestBody SplitNodeRequest req, HttpSession session) {
 		return callProc.run("splitNode", req, session, ms -> {
-			return nodeEditService.splitNode(ms, req);
+			return edit.splitNode(ms, req);
 		});
 	}
 

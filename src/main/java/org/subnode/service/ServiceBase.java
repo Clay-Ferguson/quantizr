@@ -160,5 +160,35 @@ public class ServiceBase {
 
 	@Autowired
 	protected NotificationDaemon notify;
+
+	@Autowired
+	protected NodeSearchService search;
+
+	@Autowired
+	protected NodeMoveService move;
+
+	@Autowired
+	protected JSoupService jsoup;
+
+	@Autowired
+	protected UserFeedService userFeed;
+
+	@Autowired
+	protected RSSFeedService rssFeed;
+
+	@Autowired
+	protected GraphNodesService graphNodes;
+
+	@Autowired
+	protected ImportService importService;
+
+	@Autowired
+	protected ImportBookService importBookService;
+
+	@Autowired
+	protected SystemService system;
+
+	@Autowired
+	protected LuceneService lucene;
 }
 
