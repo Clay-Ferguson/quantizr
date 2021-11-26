@@ -294,7 +294,7 @@ public class ActPubFollowing extends ServiceBase {
 
             for (SubNode n : iter) {
                 // log.debug("Follower found: " + XString.prettyPrint(n));
-                following.add(n.getStrProp(NodeProp.ACT_PUB_ACTOR_ID));
+                following.add(n.getStr(NodeProp.ACT_PUB_ACTOR_ID));
             }
             return null;
         });

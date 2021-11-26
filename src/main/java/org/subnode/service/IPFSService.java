@@ -235,7 +235,7 @@ public class IPFSService extends ServiceBase {
 
             if (node == null)
                 return;
-            String ipfsLink = node.getStrProp(NodeProp.IPFS_LINK);
+            String ipfsLink = node.getStr(NodeProp.IPFS_LINK);
             addPin(ipfsLink);
 
             // always get bytes here from IPFS, and update the node prop with that too.
@@ -243,7 +243,7 @@ public class IPFSService extends ServiceBase {
 
             // note: the enclosing scope this we're running in will take care of comitting the node change to
             // the db.
-            node.setProp(NodeProp.BIN_SIZE.s(), stat.getCumulativeSize());
+            node.set(NodeProp.BIN_SIZE.s(), stat.getCumulativeSize());
 
             /* And finally update this user's quota for the added storage */
             SubNode accountNode = read.getUserNodeByUserName(ms, null);
@@ -256,8 +256,8 @@ public class IPFSService extends ServiceBase {
     /* Ensures this node's attachment is saved to IPFS and returns the CID of it */
     public String saveNodeAttachmentToIpfs(MongoSession ms, SubNode node) {
         String cid = null;
-        String mime = node.getStrProp(NodeProp.BIN_MIME);
-        String fileName = node.getStrProp(NodeProp.FILENAME);
+        String mime = node.getStr(NodeProp.BIN_MIME);
+        String fileName = node.getStr(NodeProp.FILENAME);
 
         InputStream is = attach.getStreamByNode(node, "");
         if (is != null) {
@@ -657,9 +657,9 @@ public class IPFSService extends ServiceBase {
             // use export filename here
             node.setContent("IPFS Export: " + cid + "\n\nMime: " + mime);
             node.touch();
-            node.setProp(NodeProp.IPFS_LINK.s(), cid);
-            node.setProp(NodeProp.BIN_MIME.s(), mime);
-            node.setProp(NodeProp.BIN_FILENAME.s(), fileName);
+            node.set(NodeProp.IPFS_LINK.s(), cid);
+            node.set(NodeProp.BIN_MIME.s(), mime);
+            node.set(NodeProp.BIN_FILENAME.s(), fileName);
             update.save(ms, node);
 
             if (childrenFiles != null) {
@@ -670,10 +670,10 @@ public class IPFSService extends ServiceBase {
                     child.setOwner(exportParent.getOwner());
                     child.setContent("IPFS File: " + file.getFileName() + "\n\nMime: " + file.getMime());
                     child.touch();
-                    child.setProp(NodeProp.IPFS_LINK.s(), file.getCid());
-                    child.setProp(NodeProp.BIN_MIME.s(), file.getMime());
-                    child.setProp(NodeProp.BIN_FILENAME.s(), file.getFileName());
-                    child.setProp(NodeProp.IMG_SIZE.s(), "200px");
+                    child.set(NodeProp.IPFS_LINK.s(), file.getCid());
+                    child.set(NodeProp.BIN_MIME.s(), file.getMime());
+                    child.set(NodeProp.BIN_FILENAME.s(), file.getFileName());
+                    child.set(NodeProp.IMG_SIZE.s(), "200px");
                     update.save(ms, child);
                 }
             }

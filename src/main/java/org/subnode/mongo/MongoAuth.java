@@ -108,7 +108,7 @@ public class MongoAuth extends ServiceBase {
 		if (accountNode != null) {
 			synchronized (displayNamesByAccountId) {
 				// get the userName from the node, then put it in 'info' and cache it also.
-				String displayName = accountNode.getStrProp(NodeProp.DISPLAY_NAME);
+				String displayName = accountNode.getStr(NodeProp.DISPLAY_NAME);
 
 				displayNamesByAccountId.put(accountId, displayName);
 				return displayName;
@@ -136,7 +136,7 @@ public class MongoAuth extends ServiceBase {
 		if (accountNode != null) {
 			synchronized (userNamesByAccountId) {
 				// get the userName from the node, then put it in 'info' and cache it also.
-				String userName = accountNode.getStrProp(NodeProp.USER);
+				String userName = accountNode.getStr(NodeProp.USER);
 
 				userNamesByAccountId.put(accountId, userName);
 				return userName;
@@ -164,7 +164,7 @@ public class MongoAuth extends ServiceBase {
 				else if (userNodeId != null) {
 					SubNode accountNode = read.getNode(ms, userNodeId);
 					if (accountNode != null) {
-						name = accountNode.getStrProp(NodeProp.USER);
+						name = accountNode.getStr(NodeProp.USER);
 					}
 				}
 
@@ -211,7 +211,7 @@ public class MongoAuth extends ServiceBase {
 		 */
 		if (parent.getType().equals(NodeType.FRIEND.s())) {
 			// get user prop from node
-			String userName = parent.getStrProp(NodeProp.USER.s());
+			String userName = parent.getStr(NodeProp.USER.s());
 
 			// if we have a userProp, find the account node for the user
 			if (userName != null) {
@@ -271,7 +271,7 @@ public class MongoAuth extends ServiceBase {
 	}
 
 	public void authForChildNodeCreate(MongoSession ms, SubNode node) {
-		String apId = node.getStrProp(NodeProp.ACT_PUB_ID);
+		String apId = node.getStr(NodeProp.ACT_PUB_ID);
 		if (apId == null) {
 			auth(ms, node, PrivilegeType.WRITE);
 		}
@@ -474,10 +474,10 @@ public class MongoAuth extends ServiceBase {
 			if (principalNode == null) {
 				return null;
 			}
-			principalName = principalNode.getStrProp(NodeProp.USER.s());
-			displayName = principalNode.getStrProp(NodeProp.DISPLAY_NAME.s());
-			publicKey = principalNode.getStrProp(NodeProp.USER_PREF_PUBLIC_KEY.s());
-			avatarVer = principalNode.getStrProp(NodeProp.BIN);
+			principalName = principalNode.getStr(NodeProp.USER.s());
+			displayName = principalNode.getStr(NodeProp.DISPLAY_NAME.s());
+			publicKey = principalNode.getStr(NodeProp.USER_PREF_PUBLIC_KEY.s());
+			avatarVer = principalNode.getStr(NodeProp.BIN);
 		}
 
 		AccessControlInfo info = new AccessControlInfo(displayName, principalName, principalId, publicKey, avatarVer);

@@ -74,7 +74,7 @@ public class ActPubOutbox extends ServiceBase {
              */
             HashSet<String> apIdSet = new HashSet<>();
             for (SubNode n : outboxItems) {
-                String apId = n.getStrProp(NodeProp.ACT_PUB_ID.s());
+                String apId = n.getStr(NodeProp.ACT_PUB_ID.s());
                 if (apId != null) {
                     apIdSet.add(apId);
                 }

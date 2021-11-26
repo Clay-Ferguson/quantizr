@@ -52,14 +52,14 @@ public class Convert extends ServiceBase {
 
 		ImageSize imageSize = null;
 		String dataUrl = null;
-		String mimeType = node.getStrProp(NodeProp.BIN_MIME.s());
+		String mimeType = node.getStr(NodeProp.BIN_MIME.s());
 		if (mimeType != null) {
 			boolean isImage = mongoUtil.isImageAttached(node);
 
 			if (isImage) {
 				imageSize = mongoUtil.getImageSize(node);
 
-				String dataUrlProp = node.getStrProp(NodeProp.BIN_DATA_URL.s());
+				String dataUrlProp = node.getStr(NodeProp.BIN_DATA_URL.s());
 				if (dataUrlProp != null) {
 					dataUrl = attach.getStringByNode(ms, node);
 
@@ -73,11 +73,11 @@ public class Convert extends ServiceBase {
 
 		// ensure we have the best mimeType we can if not set in the data.
 		if (StringUtils.isEmpty(mimeType)) {
-			String binUrl = node.getStrProp(NodeProp.BIN_URL.s());
+			String binUrl = node.getStr(NodeProp.BIN_URL.s());
 			if (!StringUtils.isEmpty(binUrl)) {
 				mimeType = URLConnection.guessContentTypeFromName(binUrl);
 				if (!StringUtils.isEmpty(mimeType)) {
-					node.setProp(NodeProp.BIN_MIME.s(), mimeType);
+					node.set(NodeProp.BIN_MIME.s(), mimeType);
 				}
 			}
 		}
@@ -113,9 +113,9 @@ public class Convert extends ServiceBase {
 			// node.getIdStr())) + //
 			// " tried to find owner=" + node.getOwner().toHexString());
 		} else {
-			nameProp = userNode.getStrProp(NodeProp.USER.s());
-			avatarVer = userNode.getStrProp(NodeProp.BIN.s());
-			displayName = userNode.getStrProp(NodeProp.DISPLAY_NAME.s());
+			nameProp = userNode.getStr(NodeProp.USER.s());
+			avatarVer = userNode.getStr(NodeProp.BIN.s());
+			displayName = userNode.getStr(NodeProp.DISPLAY_NAME.s());
 
 			/*
 			 * todo-1: right here, get user profile off 'userNode', and put it into a map that will be sent back
@@ -148,8 +148,8 @@ public class Convert extends ServiceBase {
 			}
 		}
 
-		String apAvatar = userNode != null ? userNode.getStrProp(NodeProp.ACT_PUB_USER_ICON_URL) : null;
-		String apImage = userNode != null ? userNode.getStrProp(NodeProp.ACT_PUB_USER_IMAGE_URL) : null;
+		String apAvatar = userNode != null ? userNode.getStr(NodeProp.ACT_PUB_USER_ICON_URL) : null;
+		String apImage = userNode != null ? userNode.getStr(NodeProp.ACT_PUB_USER_IMAGE_URL) : null;
 
 		NodeInfo nodeInfo = new NodeInfo(node.jsonId(), node.getPath(), node.getName(), node.getContent(), displayName, owner,
 				ownerId, node.getOrdinal(), //
@@ -165,7 +165,7 @@ public class Convert extends ServiceBase {
 		}
 
 		if (allowInlineChildren) {
-			boolean hasInlineChildren = node.getBooleanProp(NodeProp.INLINE_CHILDREN.s());
+			boolean hasInlineChildren = node.getBool(NodeProp.INLINE_CHILDREN.s());
 			if (hasInlineChildren) {
 				Iterable<SubNode> nodeIter =
 						read.getChildren(ms, node, Sort.by(Sort.Direction.ASC, SubNode.FIELD_ORDINAL), 100, 0);
@@ -199,12 +199,12 @@ public class Convert extends ServiceBase {
 		ImageSize imageSize = new ImageSize();
 
 		try {
-			Long width = node.getIntProp(NodeProp.IMG_WIDTH.s());
+			Long width = node.getInt(NodeProp.IMG_WIDTH.s());
 			if (width != null) {
 				imageSize.setWidth(width.intValue());
 			}
 
-			Long height = node.getIntProp(NodeProp.IMG_HEIGHT.s());
+			Long height = node.getInt(NodeProp.IMG_HEIGHT.s());
 			if (height != null) {
 				imageSize.setHeight(height.intValue());
 			}

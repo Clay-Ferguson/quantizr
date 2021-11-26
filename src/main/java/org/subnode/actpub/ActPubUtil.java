@@ -303,7 +303,7 @@ public class ActPubUtil extends ServiceBase {
         MongoSession as = auth.getAdminSession();
         SubNode userNode = apub.getAcctNodeByUserName(as, userName);
         if (userNode != null) {
-            actorUrl = userNode.getStrProp(NodeProp.ACT_PUB_ACTOR_ID.s());
+            actorUrl = userNode.getStr(NodeProp.ACT_PUB_ACTOR_ID.s());
         }
 
         // DO NOT DELETE: this is the other way to get the actorUrl without reading or creating the user

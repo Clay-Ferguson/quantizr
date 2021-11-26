@@ -66,7 +66,7 @@ public class OutboxMgr extends ServiceBase {
 					notifyNode.setOwner(userInbox.getOwner());
 					notifyNode.setContent(content);
 					notifyNode.touch();
-					notifyNode.setProp(NodeProp.TARGET_ID.s(), node.getIdStr());
+					notifyNode.set(NodeProp.TARGET_ID.s(), node.getIdStr());
 					update.save(session, notifyNode);
 				}
 
@@ -94,8 +94,8 @@ public class OutboxMgr extends ServiceBase {
 	 * shared node in the email.
 	 */
 	public void sendEmailNotification(MongoSession ms, String fromUserName, SubNode toUserNode, SubNode node) {
-		String email = toUserNode.getStrProp(NodeProp.EMAIL.s());
-		String toUserName = toUserNode.getStrProp(NodeProp.USER.s());
+		String email = toUserNode.getStr(NodeProp.EMAIL.s());
+		String toUserName = toUserNode.getStr(NodeProp.USER.s());
 		// log.debug("sending node notification email to: " + email);
 
 		String nodeUrl = snUtil.getFriendlyNodeUrl(ms, node);
@@ -121,9 +121,9 @@ public class OutboxMgr extends ServiceBase {
 		SubNode outboundEmailNode = create.createNode(ms, outboxNode.getPath() + "/?", NodeType.NONE.s());
 
 		outboundEmailNode.setOwner(ms.getUserNodeId());
-		outboundEmailNode.setProp(NodeProp.EMAIL_CONTENT.s(), content);
-		outboundEmailNode.setProp(NodeProp.EMAIL_SUBJECT.s(), subject);
-		outboundEmailNode.setProp(NodeProp.EMAIL_RECIP.s(), recipients);
+		outboundEmailNode.set(NodeProp.EMAIL_CONTENT.s(), content);
+		outboundEmailNode.set(NodeProp.EMAIL_SUBJECT.s(), subject);
+		outboundEmailNode.set(NodeProp.EMAIL_RECIP.s(), recipients);
 
 		update.save(ms, outboundEmailNode);
 		notify.setOutboxDirty();

@@ -243,14 +243,14 @@ public class ExportServiceFlexmark extends ServiceBase {
 	}
 
 	private void writeImage(SubNode node) {
-		String bin = node.getStrProp(NodeProp.BIN.s());
-		String ipfsLink = node.getStrProp(NodeProp.IPFS_LINK);
+		String bin = node.getStr(NodeProp.BIN.s());
+		String ipfsLink = node.getStr(NodeProp.IPFS_LINK);
 		if (bin == null && ipfsLink == null) {
 			return;
 		}
 
 		String style = "";
-		String imgSize = node.getStrProp(NodeProp.IMG_SIZE.s());
+		String imgSize = node.getStr(NodeProp.IMG_SIZE.s());
 		if (imgSize != null && imgSize.endsWith("%") || imgSize.endsWith("px")) {
 			style = " style='width:" + imgSize + "'";
 		}
@@ -258,8 +258,8 @@ public class ExportServiceFlexmark extends ServiceBase {
 		String src = null;
 
 		if (req.isToIpfs() && "html".equals(format)) {
-			String fileName = node.getStrProp(NodeProp.FILENAME);
-			String mime = node.getStrProp(NodeProp.BIN_MIME);
+			String fileName = node.getStr(NodeProp.FILENAME);
+			String mime = node.getStr(NodeProp.BIN_MIME);
 
 			if (bin != null) {
 				String cid = ipfs.saveNodeAttachmentToIpfs(session, node);

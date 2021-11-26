@@ -291,7 +291,7 @@ public class NodeSearchService extends ServiceBase {
 		List<SubNode> bookmarksNode = user.getSpecialNodesList(ms, NodeType.BOOKMARK_LIST.s(), null, true);
 		if (bookmarksNode != null) {
 			for (SubNode bmNode : bookmarksNode) {
-				String targetId = bmNode.getStrProp(NodeProp.TARGET_ID);
+				String targetId = bmNode.getStr(NodeProp.TARGET_ID);
 				Bookmark bm = new Bookmark();
 				String shortContent = render.getFirstLineAbbreviation(bmNode.getContent(), 100);
 				bm.setName(shortContent);

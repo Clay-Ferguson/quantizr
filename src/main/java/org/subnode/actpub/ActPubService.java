@@ -98,7 +98,7 @@ public class ActPubService extends ServiceBase {
                         }
 
                         if (accntNode != null) {
-                            String userName = accntNode.getStrProp(NodeProp.USER.s());
+                            String userName = accntNode.getStr(NodeProp.USER.s());
                             toUserNames.add(userName);
                         }
                     }
@@ -156,9 +156,9 @@ public class ActPubService extends ServiceBase {
              */
             SubNode followerAccount = read.getNode(as, node.getOwner());
             if (followerAccount != null) {
-                String followerUserName = followerAccount.getStrProp(NodeProp.USER);
+                String followerUserName = followerAccount.getStr(NodeProp.USER);
                 if (followerUserName.contains("@")) {
-                    String sharedInbox = followerAccount.getStrProp(NodeProp.ACT_PUB_SHARED_INBOX);
+                    String sharedInbox = followerAccount.getStr(NodeProp.ACT_PUB_SHARED_INBOX);
                     if (sharedInbox != null) {
                         // log.debug("SharedInbox: " + sharedInbox);
                         set.add(sharedInbox);
@@ -171,8 +171,8 @@ public class ActPubService extends ServiceBase {
 
     public APList createAttachmentsList(SubNode node) {
         APList attachments = null;
-        String bin = node.getStrProp(NodeProp.BIN);
-        String mime = node.getStrProp(NodeProp.BIN_MIME);
+        String bin = node.getStr(NodeProp.BIN);
+        String mime = node.getStr(NodeProp.BIN_MIME);
 
         if (bin != null && mime != null) {
             attachments = new APList().val(//
@@ -360,9 +360,9 @@ public class ActPubService extends ServiceBase {
         if (icon != null) {
             String iconUrl = AP.str(icon, APProp.url);
             if (iconUrl != null) {
-                String curIconUrl = userNode.getStrProp(NodeProp.ACT_PUB_USER_ICON_URL.s());
+                String curIconUrl = userNode.getStr(NodeProp.ACT_PUB_USER_ICON_URL.s());
                 if (!iconUrl.equals(curIconUrl)) {
-                    if (userNode.setProp(NodeProp.ACT_PUB_USER_ICON_URL.s(), iconUrl)) {
+                    if (userNode.set(NodeProp.ACT_PUB_USER_ICON_URL.s(), iconUrl)) {
                         changed = true;
                     }
                 }
@@ -373,9 +373,9 @@ public class ActPubService extends ServiceBase {
         if (endpoints != null) {
             String sharedInbox = AP.str(endpoints, APProp.sharedInbox);
             if (sharedInbox != null) {
-                String curSharedInbox = userNode.getStrProp(NodeProp.ACT_PUB_SHARED_INBOX.s());
+                String curSharedInbox = userNode.getStr(NodeProp.ACT_PUB_SHARED_INBOX.s());
                 if (!sharedInbox.equals(curSharedInbox)) {
-                    if (userNode.setProp(NodeProp.ACT_PUB_SHARED_INBOX.s(), sharedInbox)) {
+                    if (userNode.set(NodeProp.ACT_PUB_SHARED_INBOX.s(), sharedInbox)) {
                         changed = true;
                     }
                 }
@@ -386,30 +386,30 @@ public class ActPubService extends ServiceBase {
         if (image != null) {
             String imageUrl = AP.str(image, APProp.url);
             if (imageUrl != null) {
-                String curImageUrl = userNode.getStrProp(NodeProp.ACT_PUB_USER_IMAGE_URL.s());
+                String curImageUrl = userNode.getStr(NodeProp.ACT_PUB_USER_IMAGE_URL.s());
                 if (!imageUrl.equals(curImageUrl)) {
-                    if (userNode.setProp(NodeProp.ACT_PUB_USER_IMAGE_URL.s(), imageUrl)) {
+                    if (userNode.set(NodeProp.ACT_PUB_USER_IMAGE_URL.s(), imageUrl)) {
                         changed = true;
                     }
                 }
             }
         }
 
-        if (userNode.setProp(NodeProp.USER_BIO.s(), AP.str(actor, APProp.summary)))
+        if (userNode.set(NodeProp.USER_BIO.s(), AP.str(actor, APProp.summary)))
             changed = true;
 
-        if (userNode.setProp(NodeProp.DISPLAY_NAME.s(), AP.str(actor, APProp.name)))
+        if (userNode.set(NodeProp.DISPLAY_NAME.s(), AP.str(actor, APProp.name)))
             changed = true;
 
         // this is the URL of the Actor JSON object
-        if (userNode.setProp(NodeProp.ACT_PUB_ACTOR_ID.s(), AP.str(actor, APProp.id)))
+        if (userNode.set(NodeProp.ACT_PUB_ACTOR_ID.s(), AP.str(actor, APProp.id)))
             changed = true;
 
-        if (userNode.setProp(NodeProp.ACT_PUB_ACTOR_INBOX.s(), AP.str(actor, APProp.inbox)))
+        if (userNode.set(NodeProp.ACT_PUB_ACTOR_INBOX.s(), AP.str(actor, APProp.inbox)))
             changed = true;
 
         // this is the URL of the HTML of the actor.
-        if (userNode.setProp(NodeProp.ACT_PUB_ACTOR_URL.s(), AP.str(actor, APProp.url)))
+        if (userNode.set(NodeProp.ACT_PUB_ACTOR_URL.s(), AP.str(actor, APProp.url)))
             changed = true;
 
         if (changed) {
@@ -600,7 +600,7 @@ public class ActPubService extends ServiceBase {
             apUtil.log("not reply to existing Quanta node.");
             SubNode actorAccountNode = getAcctNodeByActorUrl(ms, actorUrl);
             if (actorAccountNode != null) {
-                String userName = actorAccountNode.getStrProp(NodeProp.USER.s());
+                String userName = actorAccountNode.getStr(NodeProp.USER.s());
                 SubNode postsNode = read.getUserNodeByType(ms, userName, actorAccountNode, "### Posts",
                         NodeType.ACT_PUB_POSTS.s(), Arrays.asList(PrivilegeType.READ.s()), NodeName.POSTS);
                 saveNote(ms, actorAccountNode, postsNode, obj, false, false);
@@ -692,18 +692,18 @@ public class ActPubService extends ServiceBase {
         newNode.setModifyTime(published);
 
         if (sensitive != null && sensitive.booleanValue()) {
-            newNode.setProp(NodeProp.ACT_PUB_SENSITIVE.s(), "y");
+            newNode.set(NodeProp.ACT_PUB_SENSITIVE.s(), "y");
         }
 
         if (temp) {
-            newNode.setProp(NodeProp.TEMP.s(), "1");
+            newNode.set(NodeProp.TEMP.s(), "1");
         }
 
-        newNode.setProp(NodeProp.ACT_PUB_ID.s(), id);
-        newNode.setProp(NodeProp.ACT_PUB_OBJ_URL.s(), objUrl);
-        newNode.setProp(NodeProp.ACT_PUB_OBJ_INREPLYTO.s(), inReplyTo);
-        newNode.setProp(NodeProp.ACT_PUB_OBJ_TYPE.s(), objType);
-        newNode.setProp(NodeProp.ACT_PUB_OBJ_ATTRIBUTED_TO.s(), objAttributedTo);
+        newNode.set(NodeProp.ACT_PUB_ID.s(), id);
+        newNode.set(NodeProp.ACT_PUB_OBJ_URL.s(), objUrl);
+        newNode.set(NodeProp.ACT_PUB_OBJ_INREPLYTO.s(), inReplyTo);
+        newNode.set(NodeProp.ACT_PUB_OBJ_TYPE.s(), objType);
+        newNode.set(NodeProp.ACT_PUB_OBJ_ATTRIBUTED_TO.s(), objAttributedTo);
 
         // part of troubleshooting the non-english language detection
         // newNode.setProp("lang", lang);
@@ -880,10 +880,10 @@ public class ActPubService extends ServiceBase {
             if (userNode != null) {
                 user.ensureValidCryptoKeys(userNode);
 
-                String publicKey = userNode.getStrProp(NodeProp.CRYPTO_KEY_PUBLIC.s());
-                String displayName = userNode.getStrProp(NodeProp.DISPLAY_NAME.s());
-                String avatarMime = userNode.getStrProp(NodeProp.BIN_MIME.s());
-                String avatarVer = userNode.getStrProp(NodeProp.BIN.s());
+                String publicKey = userNode.getStr(NodeProp.CRYPTO_KEY_PUBLIC.s());
+                String displayName = userNode.getStr(NodeProp.DISPLAY_NAME.s());
+                String avatarMime = userNode.getStr(NodeProp.BIN_MIME.s());
+                String avatarVer = userNode.getStr(NodeProp.BIN.s());
                 String avatarUrl = prop.getProtocolHostAndPort() + AppController.API_PATH + "/bin/avatar" + "?nodeId="
                         + userNode.getIdStr() + "&v=" + avatarVer;
 
@@ -905,9 +905,9 @@ public class ActPubService extends ServiceBase {
                                 .put(APProp.mediaType, avatarMime) //
                                 .put(APProp.url, avatarUrl));
 
-                String headerImageMime = userNode.getStrProp(NodeProp.BIN_MIME.s() + "Header");
+                String headerImageMime = userNode.getStr(NodeProp.BIN_MIME.s() + "Header");
                 if (headerImageMime != null) {
-                    String headerImageVer = userNode.getStrProp(NodeProp.BIN.s() + "Header");
+                    String headerImageVer = userNode.getStr(NodeProp.BIN.s() + "Header");
                     if (headerImageVer != null) {
                         String headerImageUrl = prop.getProtocolHostAndPort() + AppController.API_PATH + "/bin/profileHeader"
                                 + "?nodeId=" + userNode.getIdStr() + "&v=" + headerImageVer;
@@ -919,7 +919,7 @@ public class ActPubService extends ServiceBase {
                     }
                 }
 
-                actor.put(APProp.summary, userNode.getStrProp(NodeProp.USER_BIO.s())) //
+                actor.put(APProp.summary, userNode.getStr(NodeProp.USER_BIO.s())) //
                         .put(APProp.inbox, host + APConst.PATH_INBOX + "/" + userName) //
                         .put(APProp.outbox, host + APConst.PATH_OUTBOX + "/" + userName) //
                         .put(APProp.followers, host + APConst.PATH_FOLLOWERS + "/" + userName) //
@@ -960,7 +960,7 @@ public class ActPubService extends ServiceBase {
         arun.run(session -> {
             SubNode node = read.getNode(session, nodeId);
             if (node != null && node.getType().equals(NodeType.FRIEND.s())) {
-                String friendUserName = node.getStrProp(NodeProp.USER.s());
+                String friendUserName = node.getStr(NodeProp.USER.s());
                 if (friendUserName != null) {
                     // if a foreign user, update thru ActivityPub
                     if (friendUserName.contains("@")) {
@@ -1130,12 +1130,12 @@ public class ActPubService extends ServiceBase {
                 for (SubNode acctNode : accountNodes) {
 
                     // get userName, and skip over any that aren't foreign accounts
-                    String userName = acctNode.getStrProp(NodeProp.USER.s());
+                    String userName = acctNode.getStr(NodeProp.USER.s());
                     if (userName == null || !userName.contains("@"))
                         continue;
 
                     // log.debug("get webFinger: " + userName);
-                    String url = acctNode.getStrProp(NodeProp.ACT_PUB_ACTOR_ID.s());
+                    String url = acctNode.getStr(NodeProp.ACT_PUB_ACTOR_ID.s());
 
                     try {
                         if (url != null) {
@@ -1175,7 +1175,7 @@ public class ActPubService extends ServiceBase {
                 return null;
             }
 
-            String actorUrl = userNode.getStrProp(NodeProp.ACT_PUB_ACTOR_ID.s());
+            String actorUrl = userNode.getStr(NodeProp.ACT_PUB_ACTOR_ID.s());
             APObj actor = apUtil.getActorByUrl(actorUrl);
             if (actor != null) {
                 apOutbox.loadForeignOutbox(session, actor, userNode, userName);
@@ -1253,7 +1253,7 @@ public class ActPubService extends ServiceBase {
                 if (!prop.isDaemonsEnabled())
                     break;
 
-                String userName = node.getStrProp(NodeProp.USER.s());
+                String userName = node.getStr(NodeProp.USER.s());
                 if (userName == null || !userName.contains("@"))
                     continue;
 
@@ -1281,7 +1281,7 @@ public class ActPubService extends ServiceBase {
             // Load the list of all known users
             HashSet<String> knownUsers = new HashSet<>();
             for (SubNode node : accountNodes) {
-                String userName = node.getStrProp(NodeProp.USER.s());
+                String userName = node.getStr(NodeProp.USER.s());
                 if (userName == null)
                     continue;
                 knownUsers.add(userName);
@@ -1327,7 +1327,7 @@ public class ActPubService extends ServiceBase {
                     read.findTypedNodesUnderPath(session, NodeName.ROOT_OF_ALL_USERS, NodeType.ACCOUNT.s());
 
             for (SubNode node : accountNodes) {
-                String userName = node.getStrProp(NodeProp.USER.s());
+                String userName = node.getStr(NodeProp.USER.s());
                 if (userName == null || !userName.contains("@"))
                     continue;
 

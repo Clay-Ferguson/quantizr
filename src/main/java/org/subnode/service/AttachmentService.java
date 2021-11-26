@@ -135,13 +135,13 @@ public class AttachmentService extends ServiceBase {
 				SubNode userNode = read.getUserNodeByUserName(null, null);
 
 				// get how many bytes of storage the user currently holds
-				Long binTotal = userNode.getIntProp(NodeProp.BIN_TOTAL.s());
+				Long binTotal = userNode.getInt(NodeProp.BIN_TOTAL.s());
 				if (binTotal == null) {
 					binTotal = 0L;
 				}
 
 				// get max amount user is allowed
-				Long userQuota = userNode.getIntProp(NodeProp.BIN_QUOTA.s());
+				Long userQuota = userNode.getInt(NodeProp.BIN_QUOTA.s());
 
 				for (MultipartFile uploadFile : uploadFiles) {
 					binTotal += uploadFile.getSize();
@@ -175,12 +175,12 @@ public class AttachmentService extends ServiceBase {
 			// if we have enough images to lay it out into a square of 3 cols switch to that
 			// layout
 			if (imageCount >= 9) {
-				node.setProp(NodeProp.LAYOUT.s(), "c3");
+				node.set(NodeProp.LAYOUT.s(), "c3");
 			}
 			// otherwise, if we have enough images to lay it out into a square of 2 cols
 			// switch to that layout.
 			else if (imageCount >= 2) {
-				node.setProp(NodeProp.LAYOUT.s(), "c2");
+				node.set(NodeProp.LAYOUT.s(), "c2");
 			}
 
 			update.saveSession(ms);
@@ -299,8 +299,8 @@ public class AttachmentService extends ServiceBase {
 		if (ImageUtil.isImageMime(mimeType)) {
 
 			// default image to be 100% size
-			if (node.getStrProp(NodeProp.IMG_SIZE.s() + binSuffix) == null) {
-				node.setProp(NodeProp.IMG_SIZE.s() + binSuffix, "100%");
+			if (node.getStr(NodeProp.IMG_SIZE.s() + binSuffix) == null) {
+				node.set(NodeProp.IMG_SIZE.s() + binSuffix, "100%");
 			}
 
 			if (calcImageSize) {
@@ -312,8 +312,8 @@ public class AttachmentService extends ServiceBase {
 					bufImg = ImageIO.read(isTemp);
 
 					try {
-						node.setProp(NodeProp.IMG_WIDTH.s() + binSuffix, bufImg.getWidth());
-						node.setProp(NodeProp.IMG_HEIGHT.s() + binSuffix, bufImg.getHeight());
+						node.set(NodeProp.IMG_WIDTH.s() + binSuffix, bufImg.getWidth());
+						node.set(NodeProp.IMG_HEIGHT.s() + binSuffix, bufImg.getHeight());
 					} catch (Exception e) {
 						/*
 						 * reading files from IPFS caused this exception, and I didn't investigate why yet, because I don't
@@ -331,27 +331,27 @@ public class AttachmentService extends ServiceBase {
 			}
 		}
 
-		node.setProp(NodeProp.BIN_MIME.s() + binSuffix, mimeType);
+		node.set(NodeProp.BIN_MIME.s() + binSuffix, mimeType);
 
 		if (dataUrl) {
-			node.setProp(NodeProp.BIN_DATA_URL.s() + binSuffix, "t"); // t=true
+			node.set(NodeProp.BIN_DATA_URL.s() + binSuffix, "t"); // t=true
 		}
 
 		SubNode userNode = read.getNode(ms, node.getOwner());
 
 		if (imageBytes == null) {
 			try {
-				node.setProp(NodeProp.BIN_SIZE.s() + binSuffix, size);
+				node.set(NodeProp.BIN_SIZE.s() + binSuffix, size);
 				if (toIpfs) {
 					writeStreamToIpfs(ms, binSuffix, node, inputStream, mimeType, userNode);
 				} else {
 					if (storeLocally) {
 						if (fileName != null) {
-							node.setProp(NodeProp.BIN_FILENAME.s() + binSuffix, fileName);
+							node.set(NodeProp.BIN_FILENAME.s() + binSuffix, fileName);
 						}
 						writeStream(ms, binSuffix, node, inputStream, fileName, mimeType, userNode);
 					} else {
-						node.setProp(NodeProp.BIN_URL.s() + binSuffix, sourceUrl);
+						node.set(NodeProp.BIN_URL.s() + binSuffix, sourceUrl);
 					}
 				}
 			} finally {
@@ -362,11 +362,11 @@ public class AttachmentService extends ServiceBase {
 		} else {
 			LimitedInputStreamEx is = null;
 			try {
-				node.setProp(NodeProp.BIN_SIZE.s() + binSuffix, imageBytes.length);
+				node.set(NodeProp.BIN_SIZE.s() + binSuffix, imageBytes.length);
 
 				if (storeLocally) {
 					if (fileName != null) {
-						node.setProp(NodeProp.BIN_FILENAME.s() + binSuffix, fileName);
+						node.set(NodeProp.BIN_FILENAME.s() + binSuffix, fileName);
 					}
 					is = new LimitedInputStreamEx(new ByteArrayInputStream(imageBytes), maxFileSize);
 					if (toIpfs) {
@@ -375,7 +375,7 @@ public class AttachmentService extends ServiceBase {
 						writeStream(ms, binSuffix, node, is, fileName, mimeType, userNode);
 					}
 				} else {
-					node.setProp(NodeProp.BIN_URL.s() + binSuffix, sourceUrl);
+					node.set(NodeProp.BIN_URL.s() + binSuffix, sourceUrl);
 				}
 			} finally {
 				StreamUtil.close(is);
@@ -407,16 +407,16 @@ public class AttachmentService extends ServiceBase {
 	 * Deletes all the binary-related properties from a node
 	 */
 	public void deleteAllBinaryProperties(SubNode node, String binSuffix) {
-		node.deleteProp(NodeProp.IMG_WIDTH.s() + binSuffix);
-		node.deleteProp(NodeProp.IMG_HEIGHT.s() + binSuffix);
-		node.deleteProp(NodeProp.BIN_MIME.s() + binSuffix);
-		node.deleteProp(NodeProp.BIN_FILENAME.s() + binSuffix);
-		node.deleteProp(NodeProp.BIN_SIZE.s() + binSuffix);
-		node.deleteProp(NodeProp.BIN.s() + binSuffix);
-		node.deleteProp(NodeProp.BIN_URL.s() + binSuffix);
-		node.deleteProp(NodeProp.BIN_DATA_URL.s() + binSuffix);
-		node.deleteProp(NodeProp.IPFS_LINK.s() + binSuffix);
-		node.deleteProp(NodeProp.IPFS_REF.s() + binSuffix);
+		node.delete(NodeProp.IMG_WIDTH.s() + binSuffix);
+		node.delete(NodeProp.IMG_HEIGHT.s() + binSuffix);
+		node.delete(NodeProp.BIN_MIME.s() + binSuffix);
+		node.delete(NodeProp.BIN_FILENAME.s() + binSuffix);
+		node.delete(NodeProp.BIN_SIZE.s() + binSuffix);
+		node.delete(NodeProp.BIN.s() + binSuffix);
+		node.delete(NodeProp.BIN_URL.s() + binSuffix);
+		node.delete(NodeProp.BIN_DATA_URL.s() + binSuffix);
+		node.delete(NodeProp.IPFS_LINK.s() + binSuffix);
+		node.delete(NodeProp.IPFS_REF.s() + binSuffix);
 	}
 
 	/**
@@ -456,7 +456,7 @@ public class AttachmentService extends ServiceBase {
 				throw ExUtil.wrapEx("node not found.");
 			}
 
-			boolean ipfs = StringUtils.isNotEmpty(node.getStrProp(NodeProp.IPFS_LINK.s() + binSuffix));
+			boolean ipfs = StringUtils.isNotEmpty(node.getStr(NodeProp.IPFS_LINK.s() + binSuffix));
 
 			// Everyone's account node can publish it's attachment and is assumed to be an
 			// avatar.
@@ -469,18 +469,18 @@ public class AttachmentService extends ServiceBase {
 				auth.auth(ms, node, PrivilegeType.READ);
 			}
 
-			String mimeTypeProp = node.getStrProp(NodeProp.BIN_MIME.s() + binSuffix);
+			String mimeTypeProp = node.getStr(NodeProp.BIN_MIME.s() + binSuffix);
 			if (mimeTypeProp == null) {
 				throw ExUtil.wrapEx("unable to find mimeType property");
 			}
 
-			String fileName = node.getStrProp(NodeProp.BIN_FILENAME.s() + binSuffix);
+			String fileName = node.getStr(NodeProp.BIN_FILENAME.s() + binSuffix);
 			if (fileName == null) {
 				fileName = "filename";
 			}
 
 			InputStream is = getStream(ms, binSuffix, node, allowAuth);
-			long size = node.getIntProp(NodeProp.BIN_SIZE.s() + binSuffix);
+			long size = node.getInt(NodeProp.BIN_SIZE.s() + binSuffix);
 			// log.debug("Getting Binary for nodeId=" + nodeId + " size=" + size);
 
 			response.setContentType(mimeTypeProp);
@@ -590,7 +590,7 @@ public class AttachmentService extends ServiceBase {
 			if (node == null) {
 				throw new RuntimeEx("node not found: " + nodeId);
 			}
-			String fullFileName = node.getStrProp(NodeProp.FS_LINK);
+			String fullFileName = node.getStr(NodeProp.FS_LINK);
 			File file = new File(fullFileName);
 
 			if (!file.exists() || !file.isFile()) {
@@ -637,12 +637,12 @@ public class AttachmentService extends ServiceBase {
 			SubNode node = read.getNode(ms, nodeId, false);
 			auth.auth(ms, node, PrivilegeType.READ);
 
-			String mimeTypeProp = node.getStrProp(NodeProp.BIN_MIME.s());
+			String mimeTypeProp = node.getStr(NodeProp.BIN_MIME.s());
 			if (mimeTypeProp == null) {
 				throw ExUtil.wrapEx("unable to find mimeType property");
 			}
 
-			String fileName = node.getStrProp(NodeProp.BIN_FILENAME.s());
+			String fileName = node.getStr(NodeProp.BIN_FILENAME.s());
 			if (fileName == null) {
 				fileName = "filename";
 			}
@@ -656,7 +656,7 @@ public class AttachmentService extends ServiceBase {
 			// }
 			// startTime = System.currentTimeMillis();
 
-			long size = node.getIntProp(NodeProp.BIN_SIZE.s());
+			long size = node.getInt(NodeProp.BIN_SIZE.s());
 
 			if (size == 0) {
 				throw new RuntimeEx("Can't stream video without the file size. BIN_SIZE property missing");
@@ -713,7 +713,7 @@ public class AttachmentService extends ServiceBase {
 		}
 
 		auth.ownerAuthByThread(node);
-		node.setProp(NodeProp.BIN_URL.s(), req.getTorrentId());
+		node.set(NodeProp.BIN_URL.s(), req.getTorrentId());
 		update.save(ms, node);
 		res.setSuccess(true);
 		return res;
@@ -731,17 +731,17 @@ public class AttachmentService extends ServiceBase {
 		}
 
 		auth.ownerAuthByThread(node);
-		node.setProp(NodeProp.IPFS_LINK.s(), req.getCid().trim());
+		node.set(NodeProp.IPFS_LINK.s(), req.getCid().trim());
 		String mime = req.getMime().trim().replace(".", "");
 
 		// If an extension was given (not a mime), then use it to make a filename, and
 		// generate the mime from it.
 		if (!mime.contains("/")) {
-			node.setProp(NodeProp.BIN_FILENAME.s(), "file." + mime);
+			node.set(NodeProp.BIN_FILENAME.s(), "file." + mime);
 			mime = MimeTypeUtils.getMimeType(mime);
 		}
 
-		node.setProp(NodeProp.BIN_MIME.s(), mime);
+		node.set(NodeProp.BIN_MIME.s(), mime);
 		update.save(ms, node);
 		res.setSuccess(true);
 		return res;
@@ -801,9 +801,9 @@ public class AttachmentService extends ServiceBase {
 			}
 
 			if (mimeType != null) {
-				node.setProp(NodeProp.BIN_MIME.s(), mimeType);
+				node.set(NodeProp.BIN_MIME.s(), mimeType);
 			}
-			node.setProp(NodeProp.BIN_URL.s(), sourceUrl);
+			node.set(NodeProp.BIN_URL.s(), sourceUrl);
 			update.saveSession(ms);
 			return;
 		}
@@ -983,8 +983,8 @@ public class AttachmentService extends ServiceBase {
 		/*
 		 * Now save the node also since the property on it needs to point to GridFS id
 		 */
-		node.setProp(NodeProp.BIN.s() + binSuffix, id);
-		node.setProp(NodeProp.BIN_SIZE.s() + binSuffix, streamCount);
+		node.set(NodeProp.BIN.s() + binSuffix, id);
+		node.set(NodeProp.BIN_SIZE.s() + binSuffix, streamCount);
 	}
 
 	public void writeStreamToIpfs(MongoSession ms, String binSuffix, SubNode node,
@@ -994,8 +994,8 @@ public class AttachmentService extends ServiceBase {
 
 		MerkleLink ret = ipfs.addFromStream(ms, stream, null, mimeType, streamSize, null, false);
 		if (ret != null) {
-			node.setProp(NodeProp.IPFS_LINK.s() + binSuffix, ret.getHash());
-			node.setProp(NodeProp.BIN_SIZE.s() + binSuffix, streamSize.getVal());
+			node.set(NodeProp.IPFS_LINK.s() + binSuffix, ret.getHash());
+			node.set(NodeProp.BIN_SIZE.s() + binSuffix, streamSize.getVal());
 
 			/* consume user quota space */
 			user.addBytesToUserNodeBytes(ms, streamSize.getVal(), userNode, 1);
@@ -1004,7 +1004,7 @@ public class AttachmentService extends ServiceBase {
 
 	public void deleteBinary(MongoSession ms, String binSuffix, SubNode node, SubNode userNode) {
 		auth.ownerAuthByThread(node);
-		String id = node.getStrProp(NodeProp.BIN.s() + binSuffix);
+		String id = node.getStr(NodeProp.BIN.s() + binSuffix);
 		if (id == null) {
 			return;
 		}
@@ -1031,7 +1031,7 @@ public class AttachmentService extends ServiceBase {
 		}
 
 		InputStream is = null;
-		String ipfsHash = node.getStrProp(NodeProp.IPFS_LINK.s() + binSuffix);
+		String ipfsHash = node.getStr(NodeProp.IPFS_LINK.s() + binSuffix);
 		if (ipfsHash != null) {
 			/*
 			 * todo-1: When the IPFS link happens to be unreachable/invalid (or IFPS disabled?), this can
@@ -1052,7 +1052,7 @@ public class AttachmentService extends ServiceBase {
 		// long startTime = System.currentTimeMillis();
 		// log.debug("getStreamByNode: " + node.getIdStr());
 
-		String id = node.getStrProp(NodeProp.BIN.s() + binSuffix);
+		String id = node.getStr(NodeProp.BIN.s() + binSuffix);
 		if (id == null) {
 			return null;
 		}
@@ -1105,7 +1105,7 @@ public class AttachmentService extends ServiceBase {
 			return null;
 		log.debug("getStringByNode: " + node.getIdStr());
 
-		String id = node.getStrProp("bin");
+		String id = node.getStr("bin");
 		if (id == null) {
 			return null;
 		}

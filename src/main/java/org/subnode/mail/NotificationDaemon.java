@@ -102,9 +102,9 @@ public class NotificationDaemon extends ServiceBase {
 					for (SubNode node : nodes) {
 						log.debug("Iterating node to email. nodeId:" + node.getIdStr());
 
-						String email = node.getStrProp(NodeProp.EMAIL_RECIP.s());
-						String subject = node.getStrProp(NodeProp.EMAIL_SUBJECT.s());
-						String content = node.getStrProp(NodeProp.EMAIL_CONTENT.s());
+						String email = node.getStr(NodeProp.EMAIL_RECIP.s());
+						String subject = node.getStr(NodeProp.EMAIL_SUBJECT.s());
+						String content = node.getStr(NodeProp.EMAIL_CONTENT.s());
 
 						if (!StringUtils.isEmpty(email) && !StringUtils.isEmpty(subject) && !StringUtils.isEmpty(content)) {
 

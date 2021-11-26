@@ -79,7 +79,7 @@ public class ExportJsonService extends ServiceBase {
 				os = new BufferedOutputStream(new FileOutputStream(fullFileName));
 				BufferedOutputStream _os = os;
 				iter.forEach((node) -> {
-					String binFileName = node.getStrProp(NodeProp.BIN_FILENAME.s());
+					String binFileName = node.getStr(NodeProp.BIN_FILENAME.s());
 					if (binFileName != null) {
 						if (saveBinaryToFileSystem(binFileName, targetFolder, node)) {
 							numBins.setVal(numBins.getVal() + 1);
@@ -116,7 +116,7 @@ public class ExportJsonService extends ServiceBase {
 	private boolean readBinaryFromResource(MongoSession ms, SubNode node, String binFileName, String subFolder) {
 		boolean ret = false;
 
-		String binMime = node.getStrProp(NodeProp.BIN_MIME.s());
+		String binMime = node.getStr(NodeProp.BIN_MIME.s());
 		ObjectId oid = node.getId();
 		if (oid != null) {
 
@@ -204,7 +204,7 @@ public class ExportJsonService extends ServiceBase {
 					SubNode node = objectMapper.readValue(json, SubNode.class);
 					update.save(ms, node);
 
-					String binFileName = node.getStrProp(NodeProp.BIN_FILENAME.s());
+					String binFileName = node.getStr(NodeProp.BIN_FILENAME.s());
 					if (binFileName != null) {
 						attach.deleteBinary(ms, "", node, null);
 						readBinaryFromResource(ms, node, binFileName, subFolder);

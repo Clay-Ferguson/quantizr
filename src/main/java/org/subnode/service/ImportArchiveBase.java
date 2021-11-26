@@ -64,7 +64,7 @@ public abstract class ImportArchiveBase extends ServiceBase {
 						 * delete the BIN prop now, because it will have to be added during this import, and the existing
 						 * BIN id will no longer apply
 						 */
-						n.deleteProp(NodeProp.BIN.s());
+						n.delete(NodeProp.BIN.s());
 
 						// nullify name because we don't want to blow up indexes
 						n.setName(null);
@@ -125,8 +125,8 @@ public abstract class ImportArchiveBase extends ServiceBase {
 			if (node == null) {
 				throw new RuntimeEx("Unable to find node by id: " + nodeId);
 			}
-			Long length = node.getIntProp(NodeProp.BIN_SIZE.s());
-			String mimeType = node.getStrProp(NodeProp.BIN_MIME.s());
+			Long length = node.getInt(NodeProp.BIN_SIZE.s());
+			String mimeType = node.getStr(NodeProp.BIN_MIME.s());
 			LimitedInputStreamEx lzis = new LimitedInputStreamEx(zis, Integer.MAX_VALUE);
 
 			// log.debug("Attaching binary to nodeId: " + node.getIdStr());

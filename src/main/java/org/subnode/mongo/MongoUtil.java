@@ -301,7 +301,7 @@ public class MongoUtil extends ServiceBase {
 	}
 
 	public boolean isImageAttached(SubNode node) {
-		String mime = node.getStrProp(NodeProp.BIN_MIME.s());
+		String mime = node.getStr(NodeProp.BIN_MIME.s());
 		return ImageUtil.isImageMime(mime);
 	}
 
@@ -653,20 +653,20 @@ public class MongoUtil extends ServiceBase {
 		ObjectId id = new ObjectId();
 		userNode.setId(id);
 		userNode.setOwner(id);
-		userNode.setProp(NodeProp.USER.s(), user);
-		userNode.setProp(NodeProp.EMAIL.s(), email);
-		userNode.setProp(NodeProp.PWD_HASH.s(), getHashOfPassword(password));
-		userNode.setProp(NodeProp.USER_PREF_EDIT_MODE.s(), false);
-		userNode.setProp(NodeProp.USER_PREF_RSS_HEADINGS_ONLY.s(), true);
-		userNode.setProp(NodeProp.BIN_TOTAL.s(), 0);
-		userNode.setProp(NodeProp.LAST_LOGIN_TIME.s(), 0);
-		userNode.setProp(NodeProp.BIN_QUOTA.s(), Const.DEFAULT_USER_QUOTA);
+		userNode.set(NodeProp.USER.s(), user);
+		userNode.set(NodeProp.EMAIL.s(), email);
+		userNode.set(NodeProp.PWD_HASH.s(), getHashOfPassword(password));
+		userNode.set(NodeProp.USER_PREF_EDIT_MODE.s(), false);
+		userNode.set(NodeProp.USER_PREF_RSS_HEADINGS_ONLY.s(), true);
+		userNode.set(NodeProp.BIN_TOTAL.s(), 0);
+		userNode.set(NodeProp.LAST_LOGIN_TIME.s(), 0);
+		userNode.set(NodeProp.BIN_QUOTA.s(), Const.DEFAULT_USER_QUOTA);
 
 		userNode.setContent("### Account: " + user);
 		userNode.touch();
 
 		if (!automated) {
-			userNode.setProp(NodeProp.SIGNUP_PENDING.s(), true);
+			userNode.set(NodeProp.SIGNUP_PENDING.s(), true);
 		}
 
 		update.save(ms, userNode);
@@ -695,9 +695,9 @@ public class MongoUtil extends ServiceBase {
 			adminNode =
 					snUtil.ensureNodeExists(ms, "/", NodeName.ROOT, null, "Root", NodeType.REPO_ROOT.s(), true, null, null);
 
-			adminNode.setProp(NodeProp.USER.s(), PrincipalName.ADMIN.s());
-			adminNode.setProp(NodeProp.USER_PREF_EDIT_MODE.s(), false);
-			adminNode.setProp(NodeProp.USER_PREF_RSS_HEADINGS_ONLY.s(), true);
+			adminNode.set(NodeProp.USER.s(), PrincipalName.ADMIN.s());
+			adminNode.set(NodeProp.USER_PREF_EDIT_MODE.s(), false);
+			adminNode.set(NodeProp.USER_PREF_RSS_HEADINGS_ONLY.s(), true);
 			update.save(ms, adminNode);
 
 			/*

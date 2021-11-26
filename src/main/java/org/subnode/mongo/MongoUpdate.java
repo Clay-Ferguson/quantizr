@@ -128,7 +128,7 @@ public class MongoUpdate extends ServiceBase {
 						// ipfsNode.getIdStr());
 
 						if (statsMap != null) {
-							Long binSize = ipfsNode.getIntProp(NodeProp.BIN_SIZE.s());
+							Long binSize = ipfsNode.getInt(NodeProp.BIN_SIZE.s());
 							if (binSize == null) {
 								// Note: If binTotal is ever zero here we SHOULD do what's in the comment above
 								// an call objectStat to put correct amount in.

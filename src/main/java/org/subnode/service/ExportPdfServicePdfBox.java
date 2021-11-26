@@ -169,13 +169,13 @@ public class ExportPdfServicePdfBox extends ServiceBase {
 
 	private void writeImage(SubNode node) {
 		try {
-			String bin = node.getStrProp(NodeProp.BIN.s());
+			String bin = node.getStr(NodeProp.BIN.s());
 			if (bin == null) {
 				return;
 			}
-			String mime = node.getStrProp(NodeProp.BIN_MIME.s());
+			String mime = node.getStr(NodeProp.BIN_MIME.s());
 
-			String imgSize = node.getStrProp(NodeProp.IMG_SIZE.s());
+			String imgSize = node.getStr(NodeProp.IMG_SIZE.s());
 			float sizeFactor = 1f;
 			if (imgSize != null && imgSize.endsWith("%")) {
 				imgSize = XString.stripIfEndsWith(imgSize, "%");

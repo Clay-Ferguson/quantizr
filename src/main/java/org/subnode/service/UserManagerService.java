@@ -115,7 +115,7 @@ public class UserManagerService extends ServiceBase {
 		else {
 			// lookup userNode to get the ACTUAL (case sensitive) userName to put in sesssion.
 			SubNode userNode = read.getUserNodeByUserName(auth.getAdminSession(), req.getUserName());
-			String userName = userNode.getStrProp(NodeProp.USER.s());
+			String userName = userNode.getStr(NodeProp.USER.s());
 
 			String pwdHash = mongoUtil.getHashOfPassword(req.getPassword());
 			// springLogin throws exception if it fails.
@@ -212,8 +212,8 @@ public class UserManagerService extends ServiceBase {
 		res.setRootNodePath(userNode.getPath());
 
 		// be sure to get userName off node so case sensitivity is exact.
-		res.setUserName(userNode.getStrProp(NodeProp.USER));
-		res.setDisplayName(userNode.getStrProp(NodeProp.DISPLAY_NAME));
+		res.setUserName(userNode.getStr(NodeProp.USER));
+		res.setDisplayName(userNode.getStr(NodeProp.DISPLAY_NAME));
 
 		res.setAllowFileSystemSearch(prop.isAllowFileSystemSearch());
 		res.setUserPreferences(userPreferences);
@@ -221,7 +221,7 @@ public class UserManagerService extends ServiceBase {
 
 		Date now = new Date();
 		sc.setLastLoginTime(now.getTime());
-		userNode.setProp(NodeProp.LAST_LOGIN_TIME.s(), now.getTime());
+		userNode.set(NodeProp.LAST_LOGIN_TIME.s(), now.getTime());
 
 		ensureValidCryptoKeys(userNode);
 		update.save(ms, userNode);
@@ -234,7 +234,7 @@ public class UserManagerService extends ServiceBase {
 	 */
 	public void ensureValidCryptoKeys(SubNode userNode) {
 		try {
-			String publicKey = userNode.getStrProp(NodeProp.CRYPTO_KEY_PUBLIC.s());
+			String publicKey = userNode.getStr(NodeProp.CRYPTO_KEY_PUBLIC.s());
 			if (publicKey == null) {
 				KeyPairGenerator kpg = KeyPairGenerator.getInstance("RSA");
 				kpg.initialize(2048);
@@ -243,8 +243,8 @@ public class UserManagerService extends ServiceBase {
 				publicKey = Base64.getEncoder().encodeToString(pair.getPublic().getEncoded());
 				String privateKey = Base64.getEncoder().encodeToString(pair.getPrivate().getEncoded());
 
-				userNode.setProp(NodeProp.CRYPTO_KEY_PUBLIC.s(), publicKey);
-				userNode.setProp(NodeProp.CRYPTO_KEY_PRIVATE.s(), privateKey);
+				userNode.set(NodeProp.CRYPTO_KEY_PUBLIC.s(), publicKey);
+				userNode.set(NodeProp.CRYPTO_KEY_PRIVATE.s(), privateKey);
 			}
 		} catch (Exception e) {
 			log.error("failed creating crypto keys", e);
@@ -276,7 +276,7 @@ public class UserManagerService extends ServiceBase {
 			SubNode node = read.getNode(ms, key);
 			if (node != null) {
 				// log.debug("Setting stat.binUsage=" + stat.binUsage);
-				node.setProp(NodeProp.BIN_TOTAL.s(), stat.binUsage);
+				node.set(NodeProp.BIN_TOTAL.s(), stat.binUsage);
 			} else {
 				log.debug("Node not found by key: " + key);
 			}
@@ -302,7 +302,7 @@ public class UserManagerService extends ServiceBase {
 		}
 
 		// get the size of the attachment on this node
-		long binSize = node.getIntProp(NodeProp.BIN_SIZE.s());
+		long binSize = node.getInt(NodeProp.BIN_SIZE.s());
 		if (binSize > 0L) {
 			// log.debug("Will +/- amt: " + binSize);
 
@@ -324,7 +324,7 @@ public class UserManagerService extends ServiceBase {
 		}
 
 		// get the current binTotal on the user account (max they are allowed to upload)
-		Long binTotal = userNode.getIntProp(NodeProp.BIN_TOTAL.s());
+		Long binTotal = userNode.getInt(NodeProp.BIN_TOTAL.s());
 		if (binTotal == null) {
 			binTotal = 0L;
 		}
@@ -335,13 +335,13 @@ public class UserManagerService extends ServiceBase {
 			binTotal = 0L;
 		}
 
-		Long userQuota = userNode.getIntProp(NodeProp.BIN_QUOTA.s());
+		Long userQuota = userNode.getInt(NodeProp.BIN_QUOTA.s());
 		if (!ms.isAdmin() && binTotal > userQuota) {
 			throw new OutOfSpaceException();
 		}
 
 		// log.debug("after binTotal=" + binTotal);
-		userNode.setProp(NodeProp.BIN_TOTAL.s(), binTotal);
+		userNode.set(NodeProp.BIN_TOTAL.s(), binTotal);
 	}
 
 	/*
@@ -362,15 +362,15 @@ public class UserManagerService extends ServiceBase {
 			SubNode node = read.getNode(session, signupCode);
 
 			if (node != null) {
-				if (!node.getBooleanProp(NodeProp.SIGNUP_PENDING.s())) {
+				if (!node.getBool(NodeProp.SIGNUP_PENDING.s())) {
 					return "Signup Complete. You may login now.";
 				} else {
-					String userName = node.getStrProp(NodeProp.USER.s());
+					String userName = node.getStr(NodeProp.USER.s());
 
 					if (PrincipalName.ADMIN.s().equalsIgnoreCase(userName)) {
 						return "processSignupCode should not be called for admin user.";
 					} else {
-						node.deleteProp(NodeProp.SIGNUP_PENDING.s());
+						node.delete(NodeProp.SIGNUP_PENDING.s());
 						update.save(session, node);
 						return "Signup Successful. You may login now.";
 					}
@@ -503,8 +503,8 @@ public class UserManagerService extends ServiceBase {
 	}
 
 	public void setDefaultUserPreferences(SubNode prefsNode) {
-		prefsNode.setProp(NodeProp.USER_PREF_EDIT_MODE.s(), false);
-		prefsNode.setProp(NodeProp.USER_PREF_RSS_HEADINGS_ONLY.s(), true);
+		prefsNode.set(NodeProp.USER_PREF_EDIT_MODE.s(), false);
+		prefsNode.set(NodeProp.USER_PREF_RSS_HEADINGS_ONLY.s(), true);
 	}
 
 	public SavePublicKeyResponse savePublicKey(SavePublicKeyRequest req) {
@@ -515,7 +515,7 @@ public class UserManagerService extends ServiceBase {
 			SubNode userNode = read.getUserNodeByUserName(session, userName);
 
 			if (userNode != null) {
-				userNode.setProp(NodeProp.USER_PREF_PUBLIC_KEY.s(), req.getKeyJson());
+				userNode.set(NodeProp.USER_PREF_PUBLIC_KEY.s(), req.getKeyJson());
 			} else {
 				log.debug("savePublicKey failed to find userName: " + userName);
 			}
@@ -543,8 +543,8 @@ public class UserManagerService extends ServiceBase {
 
 			try {
 				// foreign users won't have these.
-				Long binQuota = userNode.getIntProp(NodeProp.BIN_QUOTA.s());
-				Long binTotal = userNode.getIntProp(NodeProp.BIN_TOTAL.s());
+				Long binQuota = userNode.getInt(NodeProp.BIN_QUOTA.s());
+				Long binTotal = userNode.getInt(NodeProp.BIN_TOTAL.s());
 
 				// I really need to convert these props to Integers not Strings
 				res.setBinQuota(binQuota == null ? -1 : binQuota.intValue());
@@ -582,16 +582,16 @@ public class UserManagerService extends ServiceBase {
 			 * Assign preferences as properties on this node,
 			 */
 			boolean editMode = reqUserPrefs.isEditMode();
-			prefsNode.setProp(NodeProp.USER_PREF_EDIT_MODE.s(), editMode);
+			prefsNode.set(NodeProp.USER_PREF_EDIT_MODE.s(), editMode);
 
 			boolean showMetaData = reqUserPrefs.isShowMetaData();
-			prefsNode.setProp(NodeProp.USER_PREF_SHOW_METADATA.s(), showMetaData);
+			prefsNode.set(NodeProp.USER_PREF_SHOW_METADATA.s(), showMetaData);
 
 			boolean rssHeadingsOnly = reqUserPrefs.isRssHeadlinesOnly();
-			prefsNode.setProp(NodeProp.USER_PREF_RSS_HEADINGS_ONLY.s(), rssHeadingsOnly);
+			prefsNode.set(NodeProp.USER_PREF_RSS_HEADINGS_ONLY.s(), rssHeadingsOnly);
 
 			Long v = reqUserPrefs.getMainPanelCols();
-			prefsNode.setProp(NodeProp.USER_PREF_MAIN_PANEL_COLS.s(), v);
+			prefsNode.set(NodeProp.USER_PREF_MAIN_PANEL_COLS.s(), v);
 
 			/*
 			 * Also update session-scope object, because server-side functions that need preference information
@@ -630,8 +630,8 @@ public class UserManagerService extends ServiceBase {
 
 			if (!failed) {
 				// userNode.setProp(NodeProp.USER.s(), req.getUserName());
-				userNode.setProp(NodeProp.USER_BIO.s(), req.getUserBio());
-				userNode.setProp(NodeProp.DISPLAY_NAME.s(), req.getDisplayName());
+				userNode.set(NodeProp.USER_BIO.s(), req.getUserBio());
+				userNode.set(NodeProp.DISPLAY_NAME.s(), req.getDisplayName());
 				// sessionContext.setUserName(req.getUserName());
 				update.save(session, userNode);
 				res.setSuccess(true);
@@ -690,7 +690,7 @@ public class UserManagerService extends ServiceBase {
 		if (friendNodes != null) {
 			for (SubNode friendNode : friendNodes) {
 				// the USER_NODE_ID property on friends nodes contains the actual account ID of this friend.
-				String userNodeId = friendNode.getStrProp(NodeProp.USER_NODE_ID);
+				String userNodeId = friendNode.getStr(NodeProp.USER_NODE_ID);
 				if (req.getUserNodeId().equals(userNodeId)) {
 					delete.delete(ms, friendNode, false);
 				}
@@ -750,7 +750,7 @@ public class UserManagerService extends ServiceBase {
 					});
 
 					if (userNode.getVal() != null) {
-						friendNode.setProp(NodeProp.USER_NODE_ID.s(), userNode.getVal().getIdStr());
+						friendNode.set(NodeProp.USER_NODE_ID.s(), userNode.getVal().getIdStr());
 					}
 
 					edit.updateSavedFriendNode(friendNode);
@@ -785,8 +785,8 @@ public class UserManagerService extends ServiceBase {
 			if (userNode != null) {
 				UserProfile userProfile = new UserProfile();
 
-				String nodeUserName = userNode.getStrProp(NodeProp.USER.s());
-				String displayName = userNode.getStrProp(NodeProp.DISPLAY_NAME.s());
+				String nodeUserName = userNode.getStr(NodeProp.USER.s());
+				String displayName = userNode.getStr(NodeProp.DISPLAY_NAME.s());
 				SubNode userHomeNode = read.getNodeByName(session, nodeUserName + ":" + NodeName.HOME);
 
 				res.setUserProfile(userProfile);
@@ -797,14 +797,14 @@ public class UserManagerService extends ServiceBase {
 					userProfile.setHomeNodeId(userHomeNode.getIdStr());
 				}
 
-				String actorUrl = userNode.getStrProp(NodeProp.ACT_PUB_ACTOR_URL);
+				String actorUrl = userNode.getStr(NodeProp.ACT_PUB_ACTOR_URL);
 
-				userProfile.setUserBio(userNode.getStrProp(NodeProp.USER_BIO.s()));
-				userProfile.setAvatarVer(userNode.getStrProp(NodeProp.BIN.s()));
-				userProfile.setHeaderImageVer(userNode.getStrProp(NodeProp.BIN.s() + "Header"));
+				userProfile.setUserBio(userNode.getStr(NodeProp.USER_BIO.s()));
+				userProfile.setAvatarVer(userNode.getStr(NodeProp.BIN.s()));
+				userProfile.setHeaderImageVer(userNode.getStr(NodeProp.BIN.s() + "Header"));
 				userProfile.setUserNodeId(userNode.getIdStr());
-				userProfile.setApIconUrl(userNode.getStrProp(NodeProp.ACT_PUB_USER_ICON_URL));
-				userProfile.setApImageUrl(userNode.getStrProp(NodeProp.ACT_PUB_USER_IMAGE_URL));
+				userProfile.setApIconUrl(userNode.getStr(NodeProp.ACT_PUB_USER_ICON_URL));
+				userProfile.setApImageUrl(userNode.getStr(NodeProp.ACT_PUB_USER_IMAGE_URL));
 				userProfile.setActorUrl(actorUrl);
 
 				Long followerCount = apFollower.countFollowersOfUser(session, nodeUserName, actorUrl);
@@ -863,17 +863,17 @@ public class UserManagerService extends ServiceBase {
 			if (prefsNode == null) {
 				prefsNode = read.getUserNodeByUserName(session, userName);
 			}
-			userPrefs.setEditMode(prefsNode.getBooleanProp(NodeProp.USER_PREF_EDIT_MODE.s()));
-			userPrefs.setShowMetaData(prefsNode.getBooleanProp(NodeProp.USER_PREF_SHOW_METADATA.s()));
-			userPrefs.setRssHeadlinesOnly(prefsNode.getBooleanProp(NodeProp.USER_PREF_RSS_HEADINGS_ONLY.s()));
+			userPrefs.setEditMode(prefsNode.getBool(NodeProp.USER_PREF_EDIT_MODE.s()));
+			userPrefs.setShowMetaData(prefsNode.getBool(NodeProp.USER_PREF_SHOW_METADATA.s()));
+			userPrefs.setRssHeadlinesOnly(prefsNode.getBool(NodeProp.USER_PREF_RSS_HEADINGS_ONLY.s()));
 
-			long maxFileSize = prefsNode.getIntProp(NodeProp.BIN_QUOTA.s());
+			long maxFileSize = prefsNode.getInt(NodeProp.BIN_QUOTA.s());
 			if (maxFileSize == 0) {
 				maxFileSize = Const.DEFAULT_USER_QUOTA;
 			}
 			userPrefs.setMaxUploadFileSize(maxFileSize);
 
-			long mainPanelCols = prefsNode.getIntProp(NodeProp.USER_PREF_MAIN_PANEL_COLS.s());
+			long mainPanelCols = prefsNode.getInt(NodeProp.USER_PREF_MAIN_PANEL_COLS.s());
 			if (mainPanelCols == 0) {
 				mainPanelCols = 5;
 			}
@@ -915,20 +915,20 @@ public class UserManagerService extends ServiceBase {
 
 				String codePart = XString.parseAfterLast(passCode, "-");
 
-				String nodeCodePart = userNode.getVal().getStrProp(NodeProp.USER_PREF_PASSWORD_RESET_AUTHCODE.s());
+				String nodeCodePart = userNode.getVal().getStr(NodeProp.USER_PREF_PASSWORD_RESET_AUTHCODE.s());
 				if (!codePart.equals(nodeCodePart)) {
 					throw ExUtil.wrapEx("Invald password reset code.");
 				}
 
 				String password = req.getNewPassword();
-				userName.setVal(userNode.getVal().getStrProp(NodeProp.USER.s()));
+				userName.setVal(userNode.getVal().getStr(NodeProp.USER.s()));
 
 				if (PrincipalName.ADMIN.s().equals(userName.getVal())) {
 					throw new RuntimeEx("changePassword should not be called fror admin user.");
 				}
 
-				userNode.getVal().setProp(NodeProp.PWD_HASH.s(), mongoUtil.getHashOfPassword(password));
-				userNode.getVal().deleteProp(NodeProp.USER_PREF_PASSWORD_RESET_AUTHCODE.s());
+				userNode.getVal().set(NodeProp.PWD_HASH.s(), mongoUtil.getHashOfPassword(password));
+				userNode.getVal().delete(NodeProp.USER_PREF_PASSWORD_RESET_AUTHCODE.s());
 
 				// note: the adminRunner.run saves the session so we don't do that here.
 				return null;
@@ -945,9 +945,9 @@ public class UserManagerService extends ServiceBase {
 			}
 
 			String password = req.getNewPassword();
-			userName.setVal(userNode.getVal().getStrProp(NodeProp.USER.s()));
-			userNode.getVal().setProp(NodeProp.PWD_HASH.s(), mongoUtil.getHashOfPassword(password));
-			userNode.getVal().deleteProp(NodeProp.USER_PREF_PASSWORD_RESET_AUTHCODE.s());
+			userName.setVal(userNode.getVal().getStr(NodeProp.USER.s()));
+			userNode.getVal().set(NodeProp.PWD_HASH.s(), mongoUtil.getHashOfPassword(password));
+			userNode.getVal().delete(NodeProp.USER_PREF_PASSWORD_RESET_AUTHCODE.s());
 
 			update.save(ms, userNode.getVal());
 		}
@@ -990,7 +990,7 @@ public class UserManagerService extends ServiceBase {
 			 * step here because without this check anyone would be able to completely hijack anyone else's
 			 * account simply by issuing a password change to that account!
 			 */
-			String nodeEmail = ownerNode.getStrProp(NodeProp.EMAIL.s());
+			String nodeEmail = ownerNode.getStr(NodeProp.EMAIL.s());
 			if (nodeEmail == null || !nodeEmail.equals(email)) {
 				res.setMessage("Wrong user name and/or email.");
 				res.setSuccess(false);
@@ -1009,7 +1009,7 @@ public class UserManagerService extends ServiceBase {
 			int oneDayMillis = 60 * 60 * 1000;
 			long authCode = new Date().getTime() + oneDayMillis + rand.nextInt(oneDayMillis);
 
-			ownerNode.setProp(NodeProp.USER_PREF_PASSWORD_RESET_AUTHCODE.s(), String.valueOf(authCode));
+			ownerNode.set(NodeProp.USER_PREF_PASSWORD_RESET_AUTHCODE.s(), String.valueOf(authCode));
 			update.save(session, ownerNode);
 
 			String passCode = ownerNode.getIdStr() + "-" + String.valueOf(authCode);
@@ -1038,21 +1038,21 @@ public class UserManagerService extends ServiceBase {
 			List<FriendInfo> friends = new LinkedList<>();
 
 			for (SubNode friendNode : friendNodes) {
-				String userName = friendNode.getStrProp(NodeProp.USER.s());
+				String userName = friendNode.getStr(NodeProp.USER.s());
 				if (userName != null) {
 					FriendInfo fi = new FriendInfo();
 					fi.setUserName(userName);
 
 					SubNode userNode = read.getUserNodeByUserName(null, userName);
 					if (userNode != null) {
-						fi.setDisplayName(userNode.getStrProp(NodeProp.DISPLAY_NAME.s()));
+						fi.setDisplayName(userNode.getStr(NodeProp.DISPLAY_NAME.s()));
 					}
 
-					String userNodeId = friendNode.getStrProp(NodeProp.USER_NODE_ID);
+					String userNodeId = friendNode.getStr(NodeProp.USER_NODE_ID);
 
 					SubNode friendAccountNode = read.getNode(ms, userNodeId, false);
 					if (friendAccountNode != null) {
-						fi.setAvatarVer(friendAccountNode.getStrProp(NodeProp.BIN));
+						fi.setAvatarVer(friendAccountNode.getStr(NodeProp.BIN));
 					}
 					fi.setUserNodeId(userNodeId);
 					friends.add(fi);
@@ -1132,7 +1132,7 @@ public class UserManagerService extends ServiceBase {
 				read.getChildrenUnderPath(ms, NodeName.ROOT_OF_ALL_USERS, null, null, 0, null, null);
 
 		for (SubNode accountNode : accountNodes) {
-			String userName = accountNode.getStrProp(NodeProp.USER);
+			String userName = accountNode.getStr(NodeProp.USER);
 			if (userName != null) {
 				// if account is a 'foreign server' one, then clean it up
 				if (userName.contains("@")) {
@@ -1151,7 +1151,7 @@ public class UserManagerService extends ServiceBase {
 		MongoSession ms = auth.getAdminSession();
 		SubNode userNode = read.getUserNodeByUserName(ms, sc.getUserName());
 		if (userNode != null) {
-			userNode.setProp(NodeProp.LAST_ACTIVE_TIME.s(), sc.getLastActiveTime());
+			userNode.set(NodeProp.LAST_ACTIVE_TIME.s(), sc.getLastActiveTime());
 			update.save(ms, userNode);
 		}
 	}
@@ -1165,7 +1165,7 @@ public class UserManagerService extends ServiceBase {
 		}
 
 		SubNode userNode = read.getUserNodeByUserName(auth.getAdminSession(), ThreadLocals.getSC().getUserName());
-		long ret = userNode.getIntProp(NodeProp.BIN_QUOTA.s());
+		long ret = userNode.getInt(NodeProp.BIN_QUOTA.s());
 		if (ret == 0) {
 			return Const.DEFAULT_USER_QUOTA;
 		}

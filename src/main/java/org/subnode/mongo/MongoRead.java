@@ -58,7 +58,7 @@ public class MongoRead extends ServiceBase {
             throw new RuntimeEx("Node has null owner: " + XString.prettyPrint(node));
         }
         SubNode userNode = getNode(ms, node.getOwner());
-        return userNode.getStrProp(NodeProp.USER.s());
+        return userNode.getStr(NodeProp.USER.s());
     }
 
     public String getParentPath(SubNode node) {

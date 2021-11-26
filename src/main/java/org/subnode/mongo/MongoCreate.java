@@ -91,7 +91,7 @@ public class MongoCreate extends ServiceBase {
 
 		if (properties != null) {
 			for (PropertyInfo propInfo : properties) {
-				node.setProp(propInfo.getName(), propInfo.getValue());
+				node.set(propInfo.getName(), propInfo.getValue());
 			}
 		}
 

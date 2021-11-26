@@ -185,7 +185,7 @@ public class NodeRenderService extends ServiceBase {
 		int limit = ConstantInt.ROWS_PER_PAGE.val();
 		if (node != null) {
 			// add pageSize hack to docs and admin part of user guide.
-			Long pageSize = node.getIntProp("pageSize");
+			Long pageSize = node.getInt("pageSize");
 			if (pageSize != null && pageSize.intValue() > ConstantInt.ROWS_PER_PAGE.val()) {
 				limit = pageSize.intValue();
 			}
@@ -254,7 +254,7 @@ public class NodeRenderService extends ServiceBase {
 		// log.debug("query: offset=" + offset + " limit=" + queryLimit + " scanToNode="
 		// + scanToNode);
 
-		String orderBy = node.getStrProp(NodeProp.ORDER_BY.s());
+		String orderBy = node.getStr(NodeProp.ORDER_BY.s());
 		Sort sort = null;
 
 		if (!StringUtils.isEmpty(orderBy)) {
@@ -543,9 +543,9 @@ public class NodeRenderService extends ServiceBase {
 
 			item.setTitle(content);
 			item.setId(n.getIdStr());
-			item.setStart(n.getIntProp(NodeProp.DATE.s()));
+			item.setStart(n.getInt(NodeProp.DATE.s()));
 
-			String durationStr = n.getStrProp(NodeProp.DURATION.s());
+			String durationStr = n.getStr(NodeProp.DURATION.s());
 			long duration = DateUtil.getMillisFromDuration(durationStr);
 			if (duration == 0) {
 				duration = 60 * 60 * 1000;

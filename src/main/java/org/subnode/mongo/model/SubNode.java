@@ -367,7 +367,7 @@ public class SubNode {
 	}
 
 	@JsonIgnore
-	public boolean setProp(String key, Object val) {
+	public boolean set(String key, Object val) {
 		ThreadLocals.dirty(this);
 		synchronized (propLock) {
 			boolean changed = false;
@@ -384,7 +384,7 @@ public class SubNode {
 	}
 
 	@JsonIgnore
-	public void deleteProp(String key) {
+	public void delete(String key) {
 		ThreadLocals.dirty(this);
 		synchronized (propLock) {
 			properties().remove(key);
@@ -393,12 +393,12 @@ public class SubNode {
 
 	@Transient
 	@JsonIgnore
-	public String getStrProp(NodeProp prop) {
-		return getStrProp(prop.s());
+	public String getStr(NodeProp prop) {
+		return getStr(prop.s());
 	}
 
 	@JsonIgnore
-	public String getStrProp(String key) {
+	public String getStr(String key) {
 		try {
 			synchronized (propLock) {
 				SubNodePropVal v = properties().get(key);
@@ -414,7 +414,7 @@ public class SubNode {
 	}
 
 	@JsonIgnore
-	public Long getIntProp(String key) {
+	public Long getInt(String key) {
 		try {
 			synchronized (propLock) {
 				SubNodePropVal v = properties().get(key);
@@ -443,7 +443,7 @@ public class SubNode {
 	}
 
 	@JsonIgnore
-	public Date getDateProp(String key) {
+	public Date getDate(String key) {
 		try {
 			synchronized (propLock) {
 				SubNodePropVal v = properties().get(key);
@@ -457,7 +457,7 @@ public class SubNode {
 	}
 
 	@JsonIgnore
-	public Double getFloatProp(String key) {
+	public Double getFloat(String key) {
 		try {
 			synchronized (propLock) {
 				SubNodePropVal v = properties().get(key);
@@ -472,7 +472,7 @@ public class SubNode {
 	}
 
 	@JsonIgnore
-	public Boolean getBooleanProp(String key) {
+	public Boolean getBool(String key) {
 		try {
 			synchronized (propLock) {
 				SubNodePropVal v = properties().get(key);

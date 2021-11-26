@@ -71,7 +71,7 @@ public class UserFeedService extends ServiceBase {
 
 		SubNode searchRoot = read.getNode(ms, sc.getRootId());
 
-		Long lastActiveLong = searchRoot.getIntProp(NodeProp.LAST_ACTIVE_TIME.s());
+		Long lastActiveLong = searchRoot.getInt(NodeProp.LAST_ACTIVE_TIME.s());
 		if (lastActiveLong == 0) {
 			return res;
 		}
@@ -176,7 +176,7 @@ public class UserFeedService extends ServiceBase {
 					 * indication that they have new messages, because we know they're querying messages NOW, so this is
 					 * a way to reset
 					 */
-					_myAcntNode.setProp(NodeProp.LAST_ACTIVE_TIME.s(), lastActiveTime);
+					_myAcntNode.set(NodeProp.LAST_ACTIVE_TIME.s(), lastActiveTime);
 					update.save(_s, _myAcntNode);
 				});
 			}
@@ -240,7 +240,7 @@ public class UserFeedService extends ServiceBase {
 
 				for (SubNode friendNode : friendNodes) {
 					// the USER_NODE_ID property on friends nodes contains the actual account ID of this friend.
-					String userNodeId = friendNode.getStrProp(NodeProp.USER_NODE_ID);
+					String userNodeId = friendNode.getStr(NodeProp.USER_NODE_ID);
 
 					// if we have a userNodeId and they aren't in the blocked list.
 					if (userNodeId != null && !blockedIdStrings.contains(userNodeId)) {
@@ -315,7 +315,7 @@ public class UserFeedService extends ServiceBase {
 				return null;
 
 			for (SubNode node : nodeList) {
-				String userNodeId = node.getStrProp(NodeProp.USER_NODE_ID.s());
+				String userNodeId = node.getStr(NodeProp.USER_NODE_ID.s());
 				ObjectId oid = new ObjectId(userNodeId);
 				set.add(oid);
 			}

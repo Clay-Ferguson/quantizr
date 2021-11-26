@@ -119,11 +119,11 @@ public class NodeEditService extends ServiceBase {
 		newNode.touch();
 
 		if (NodeType.BOOKMARK.s().equals(req.getTypeName())) {
-			newNode.setProp(NodeProp.TARGET_ID.s(), req.getNodeId());
+			newNode.set(NodeProp.TARGET_ID.s(), req.getNodeId());
 		}
 
 		if (req.isTypeLock()) {
-			newNode.setProp(NodeProp.TYPE_LOCK.s(), Boolean.valueOf(true));
+			newNode.set(NodeProp.TYPE_LOCK.s(), Boolean.valueOf(true));
 		}
 
 		// if a user to share to (a Direct Message) is provided, add it.
@@ -142,7 +142,7 @@ public class NodeEditService extends ServiceBase {
 			// we always determine the access controls from the parent for any new nodes
 			auth.setDefaultReplyAcl(null, node, newNode);
 
-			String cipherKey = node.getStrProp(NodeProp.ENC_KEY.s());
+			String cipherKey = node.getStr(NodeProp.ENC_KEY.s());
 			if (cipherKey != null) {
 				res.setEncrypt(true);
 			}
@@ -166,16 +166,16 @@ public class NodeEditService extends ServiceBase {
 
 			SubNode newNode = create.createNode(ms, parentFriendsList, null, NodeType.FRIEND.s(), 0L,
 					CreateNodeLocation.LAST, properties, parentFriendsList.getOwner(), true);
-			newNode.setProp(NodeProp.TYPE_LOCK.s(), Boolean.valueOf(true));
+			newNode.set(NodeProp.TYPE_LOCK.s(), Boolean.valueOf(true));
 
-			String userToFollowActorId = userNode.getStrProp(NodeProp.ACT_PUB_ACTOR_ID.s());
+			String userToFollowActorId = userNode.getStr(NodeProp.ACT_PUB_ACTOR_ID.s());
 			if (userToFollowActorId != null) {
-				newNode.setProp(NodeProp.ACT_PUB_ACTOR_ID.s(), userToFollowActorId);
+				newNode.set(NodeProp.ACT_PUB_ACTOR_ID.s(), userToFollowActorId);
 			}
 
-			String userToFollowActorUrl = userNode.getStrProp(NodeProp.ACT_PUB_ACTOR_URL.s());
+			String userToFollowActorUrl = userNode.getStr(NodeProp.ACT_PUB_ACTOR_URL.s());
 			if (userToFollowActorUrl != null) {
-				newNode.setProp(NodeProp.ACT_PUB_ACTOR_URL.s(), userToFollowActorUrl);
+				newNode.set(NodeProp.ACT_PUB_ACTOR_URL.s(), userToFollowActorUrl);
 			}
 
 			apUtil.log("Saved Friend Node (as a Follow): " + XString.prettyPrint(newNode));
@@ -291,7 +291,7 @@ public class NodeEditService extends ServiceBase {
 		}
 
 		/* Remember the initial ipfs link */
-		String initIpfsLink = node.getStrProp(NodeProp.IPFS_LINK);
+		String initIpfsLink = node.getStr(NodeProp.IPFS_LINK);
 
 		/*
 		 * The only purpose of this limit is to stop hackers from using up lots of space, because our only
@@ -341,7 +341,7 @@ public class NodeEditService extends ServiceBase {
 			for (PropertyInfo property : nodeInfo.getProperties()) {
 
 				if ("[null]".equals(property.getValue())) {
-					node.deleteProp(property.getName());
+					node.delete(property.getName());
 				} else {
 					/*
 					 * save only if server determines the property is savable. Just protection. Client shouldn't be
@@ -351,7 +351,7 @@ public class NodeEditService extends ServiceBase {
 					if (ms.isAdmin() || SubNodeUtil.isSavableProperty(property.getName())) {
 						// log.debug("Property to save: " + property.getName() + "=" +
 						// property.getValue());
-						node.setProp(property.getName(), property.getValue());
+						node.set(property.getName(), property.getValue());
 					} else {
 						/**
 						 * TODO: This case indicates that data was sent unnecessarily. fix! (i.e. make sure this block
@@ -364,7 +364,7 @@ public class NodeEditService extends ServiceBase {
 		}
 
 		// If removing encryption, remove it from all the ACL entries too.
-		String encKey = node.getStrProp(NodeProp.ENC_KEY.s());
+		String encKey = node.getStr(NodeProp.ENC_KEY.s());
 		if (encKey == null) {
 			mongoUtil.removeAllEncryptionKeys(node);
 		}
@@ -377,12 +377,12 @@ public class NodeEditService extends ServiceBase {
 		 * If we have an IPFS attachment and there's no IPFS_REF property that means it should be pinned.
 		 * (IPFS_REF means 'referenced' and external to our server).
 		 */
-		String ipfsLink = node.getStrProp(NodeProp.IPFS_LINK);
+		String ipfsLink = node.getStr(NodeProp.IPFS_LINK);
 		if (ipfsLink != null) {
 
 			// if there's no 'ref' property this is not a foreign reference, which means we
 			// DO pin this.
-			if (node.getStrProp(NodeProp.IPFS_REF.s()) == null) {
+			if (node.getStr(NodeProp.IPFS_REF.s()) == null) {
 				/*
 				 * Only if this is the first ipfs link ever added, or is a new link, then we need to pin and update
 				 * user quota
@@ -436,7 +436,7 @@ public class NodeEditService extends ServiceBase {
 
 						// Get the inReplyTo from the parent property (foreign node) or if not found generate one based on
 						// what the local server version of it is.
-						String inReplyTo = parent.getStrProp(NodeProp.ACT_PUB_OBJ_URL);
+						String inReplyTo = parent.getStr(NodeProp.ACT_PUB_OBJ_URL);
 						if (inReplyTo == null) {
 							inReplyTo = snUtil.getIdBasedUrl(parent);
 						}
@@ -475,9 +475,9 @@ public class NodeEditService extends ServiceBase {
 	 * server
 	 */
 	public void updateSavedFriendNode(SubNode node) {
-		String userNodeId = node.getStrProp(NodeProp.USER_NODE_ID.s());
+		String userNodeId = node.getStr(NodeProp.USER_NODE_ID.s());
 
-		String friendUserName = node.getStrProp(NodeProp.USER.s());
+		String friendUserName = node.getStr(NodeProp.USER.s());
 		if (friendUserName != null) {
 			// if a foreign user, update thru ActivityPub.
 			if (friendUserName.contains("@") && !ThreadLocals.getSC().isAdmin()) {
@@ -519,7 +519,7 @@ public class NodeEditService extends ServiceBase {
 
 				if (userNode.getVal() != null) {
 					userNodeId = userNode.getVal().getIdStr();
-					node.setProp(NodeProp.USER_NODE_ID.s(), userNodeId);
+					node.set(NodeProp.USER_NODE_ID.s(), userNodeId);
 				}
 			}
 		}
@@ -536,7 +536,7 @@ public class NodeEditService extends ServiceBase {
 		auth.ownerAuthByThread(node);
 
 		String propertyName = req.getPropName();
-		node.deleteProp(propertyName);
+		node.delete(propertyName);
 		update.save(ms, node);
 		res.setSuccess(true);
 		return res;

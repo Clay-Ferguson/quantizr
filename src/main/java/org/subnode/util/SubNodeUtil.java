@@ -288,7 +288,7 @@ public class SubNodeUtil {
 		}
 
 		String url = getAttachmentUrl(node);
-		String mime = node.getStrProp(NodeProp.BIN_MIME.s());
+		String mime = node.getStr(NodeProp.BIN_MIME.s());
 
 		if (url == null) {
 			url = appProp.getHostAndPort() + "/branding/logo-200px-tr.jpg";
@@ -302,16 +302,16 @@ public class SubNodeUtil {
 	}
 
 	public String getAttachmentUrl(SubNode node) {
-		String ipfsLink = node.getStrProp(NodeProp.IPFS_LINK);
+		String ipfsLink = node.getStr(NodeProp.IPFS_LINK);
 
-		String bin = ipfsLink != null ? ipfsLink : node.getStrProp(NodeProp.BIN);
+		String bin = ipfsLink != null ? ipfsLink : node.getStr(NodeProp.BIN);
 		if (bin != null) {
 			return appProp.getHostAndPort() + AppController.API_PATH + "/bin/" + bin + "?nodeId=" + node.getIdStr();
 		}
 
 		/* as last resort try to get any extrnally linked binary image */
 		if (bin == null) {
-			bin = node.getStrProp(NodeProp.BIN_URL);
+			bin = node.getStr(NodeProp.BIN_URL);
 		}
 
 		// todo-1: will this fail to find "data:" type inline image data?

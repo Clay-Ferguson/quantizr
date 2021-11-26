@@ -110,7 +110,7 @@ public class SystemService extends ServiceBase {
 		if (node != null) {
 			String ret = XString.prettyPrint(node);
 
-			String ipfsLink = node.getStrProp(NodeProp.IPFS_LINK);
+			String ipfsLink = node.getStr(NodeProp.IPFS_LINK);
 			if (ipfsLink != null) {
 				IPFSObjectStat fullStat = ipfs.objectStat(ipfsLink, false);
 				if (fullStat != null) {

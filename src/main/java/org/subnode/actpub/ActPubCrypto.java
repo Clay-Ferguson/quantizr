@@ -41,7 +41,7 @@ public class ActPubCrypto extends ServiceBase {
         }
 
         /* get private key of this user so we can sign the outbound message */
-        privateKey = userNode.getStrProp(NodeProp.CRYPTO_KEY_PRIVATE);
+        privateKey = userNode.getStr(NodeProp.CRYPTO_KEY_PRIVATE);
         if (privateKey == null) {
             log.debug("Unable to update federated users. User didn't have a private key on his userNode: " + userName);
             return null;
