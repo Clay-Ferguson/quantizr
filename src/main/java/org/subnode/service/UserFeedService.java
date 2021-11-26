@@ -201,8 +201,8 @@ public class UserFeedService {
 			if (myAcntNode != null) {
 				orCriteria.add(Criteria.where(SubNode.FIELD_AC + "." + myAcntNode.getOwner().toHexString()).ne(null));
 
-				final SubNode _myAcntNode = myAcntNode;
-				final MongoSession _s = ms;
+				SubNode _myAcntNode = myAcntNode;
+				MongoSession _s = ms;
 				long lastActiveTime = sc.getLastActiveTime();
 				// do this work in async thread to make this query more performant
 				asyncExec.run(ThreadLocals.getContext(), () -> {

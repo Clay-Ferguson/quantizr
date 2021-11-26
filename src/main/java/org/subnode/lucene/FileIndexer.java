@@ -95,7 +95,7 @@ public class FileIndexer {
 		NONE, GZIP, XZIP
 	}
 
-	public void index(final String dirToIndex, final String luceneIndexDataSubDir, final String suffixes,
+	public void index(String dirToIndex, String luceneIndexDataSubDir, String suffixes,
 			boolean forceRebuild) {
 		init(forceRebuild, luceneIndexDataSubDir);
 		buildSuffixSet(suffixes);
@@ -660,7 +660,7 @@ public class FileIndexer {
 	/**
 	 * Get date attributes
 	 */
-	public static String getAttrVal(final BasicFileAttributes attr, final FileProperties prop) {
+	public static String getAttrVal(BasicFileAttributes attr, FileProperties prop) {
 		SimpleDateFormat format = new SimpleDateFormat(DateUtil.DATE_FORMAT);
 		switch (prop) {
 		case MODIFIED:
@@ -675,7 +675,7 @@ public class FileIndexer {
 	/**
 	 * Get document type
 	 */
-	public static String getDocType(final File f) {
+	public static String getDocType(File f) {
 		final int start = f.getName().lastIndexOf(".");
 		if (start == -1)
 			return "";
@@ -685,10 +685,10 @@ public class FileIndexer {
 	/**
 	 * Create lucene document from file attributes
 	 */
-	public static Document newLuceneDoc(final String content, final String path, final String name,
-			final String username, final String modified, final String size, final String created,
-			final String docType) {
-		final Document doc = new Document();
+	public static Document newLuceneDoc(String content, String path, String name,
+			String username, String modified, String size, String created,
+			String docType) {
+		Document doc = new Document();
 		doc.add(new Field("contents", content, TextField.TYPE_NOT_STORED));
 		doc.add(new StringField("filepath", path, Field.Store.YES));
 		doc.add(new StringField("author", username, Field.Store.YES));
@@ -696,7 +696,6 @@ public class FileIndexer {
 		doc.add(new StringField("size", size, Field.Store.YES));
 		doc.add(new StringField("created", created, Field.Store.YES));
 		doc.add(new StringField("doctype", docType, Field.Store.YES));
-
 		return doc;
 	}
 
@@ -712,7 +711,7 @@ public class FileIndexer {
 			try {
 				writer.close();
 				writer = null;
-			} catch (final Exception e) {
+			} catch (Exception e) {
 				log.error("Failed closing writer", e);
 			}
 		}
@@ -723,7 +722,7 @@ public class FileIndexer {
 			log.info("closing FSDirectory");
 			try {
 				fsDir.close();
-			} catch (final Exception e) {
+			} catch (Exception e) {
 				log.error("Failed closing writer", e);
 			}
 			fsDir = null;

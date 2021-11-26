@@ -226,7 +226,7 @@ public class RSSFeedService {
 	 * 
 	 * NOTE: pagination isn't supported yet in this. See "1" arg below, which means first page
 	 */
-	public void multiRss(MongoSession ms, final String nodeId, Writer writer) {
+	public void multiRss(MongoSession ms, String nodeId, Writer writer) {
 		SyndFeed feed = aggregateCache.get(nodeId);
 
 		// if we didn't find in the cache built the feed
@@ -253,13 +253,13 @@ public class RSSFeedService {
 			feed.setEntries(entries);
 			List<String> urls = new LinkedList<>();
 
-			final Iterable<SubNode> iter = read.getSubGraph(ms, node, null, 0);
-			final List<SubNode> children = read.iterateToList(iter);
+			Iterable<SubNode> iter = read.getSubGraph(ms, node, null, 0);
+			List<SubNode> children = read.iterateToList(iter);
 
 			// Scan to collect all the urls.
 			if (children != null) {
 				int count = 0;
-				for (final SubNode n : children) {
+				for (SubNode n : children) {
 					/* avoid infinite recursion here! */
 					if (n.getId().toHexString().equals(nodeId))
 						continue;
@@ -885,11 +885,11 @@ public class RSSFeedService {
 		List<SyndEntry> entries = new LinkedList<>();
 		feed.setEntries(entries);
 
-		final Iterable<SubNode> iter = read.getChildren(ms, node, Sort.by(Sort.Direction.ASC, SubNode.FIELD_ORDINAL), null, 0);
-		final List<SubNode> children = read.iterateToList(iter);
+		Iterable<SubNode> iter = read.getChildren(ms, node, Sort.by(Sort.Direction.ASC, SubNode.FIELD_ORDINAL), null, 0);
+		List<SubNode> children = read.iterateToList(iter);
 
 		if (children != null) {
-			for (final SubNode n : children) {
+			for (SubNode n : children) {
 				metaInfo = snUtil.getNodeMetaInfo(n);
 
 				// Currently the link will be an attachment URL, but need to research how ROME

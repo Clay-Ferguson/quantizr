@@ -138,7 +138,7 @@ public class ActPubFollower {
      * Returns a list of all the 'actor urls' for all the users that are following user 'userName'
      */
     public List<String> getFollowers(String userName, String minId) {
-        final List<String> followers = new LinkedList<>();
+        List<String> followers = new LinkedList<>();
 
         arun.run(session -> {
             Iterable<SubNode> iter = getFriendsByUserName(session, userName);

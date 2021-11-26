@@ -232,7 +232,7 @@ public class NodeRenderService {
 		return res;
 	}
 
-	private NodeInfo processRenderNode(MongoSession ms, RenderNodeRequest req, RenderNodeResponse res, final SubNode node,
+	private NodeInfo processRenderNode(MongoSession ms, RenderNodeRequest req, RenderNodeResponse res, SubNode node,
 			SubNode scanToNode, long logicalOrdinal, int level, int limit) {
 
 		/*
@@ -516,11 +516,11 @@ public class NodeRenderService {
 
 		SubNode node = read.getNodeByName(as, nodeName, true);
 		if (node != null) {
-			final Iterable<SubNode> iter = read.getNamedNodes(as, node);
-			final List<SubNode> children = read.iterateToList(iter);
+			Iterable<SubNode> iter = read.getNamedNodes(as, node);
+			List<SubNode> children = read.iterateToList(iter);
 
 			if (children != null) {
-				for (final SubNode child : children) {
+				for (SubNode child : children) {
 					if (!StringUtils.isEmpty(child.getName())) {
 						model.put(child.getName(), child.getContent());
 					}

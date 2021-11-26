@@ -1155,7 +1155,7 @@ public class ActPubService {
     }
 
     private void refreshUsers() {
-        for (final String userName : apCache.usersPendingRefresh.keySet()) {
+        for (String userName : apCache.usersPendingRefresh.keySet()) {
             if (!appProp.isDaemonsEnabled())
                 break;
             try {
@@ -1279,7 +1279,7 @@ public class ActPubService {
     private void saveUserNames() {
         List<String> names = new LinkedList<>(apCache.allUserNames.keySet());
 
-        for (final String name : names) {
+        for (String name : names) {
             Boolean done = apCache.allUserNames.get(name);
             if (done)
                 continue;

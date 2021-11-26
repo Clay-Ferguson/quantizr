@@ -206,7 +206,7 @@ public class NodeSearchService {
 		 * scan all userAccountNodes, and set a zero amount for those not found (which will be the correct
 		 * amount).
 		 */
-		for (final SubNode node : accountNodes) {
+		for (SubNode node : accountNodes) {
 			try {
 				NodeInfo info = convert.convertToNodeInfo(ThreadLocals.getSC(), ms, node, true, false, counter + 1, false,
 						false, false, false);

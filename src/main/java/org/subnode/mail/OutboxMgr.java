@@ -139,15 +139,15 @@ public class OutboxMgr {
 				content);
 	}
 
-	public void queueEmail(final String recipients, final String subject, final String content) {
+	public void queueEmail(String recipients, String subject, String content) {
 		arun.run(session -> {
 			queueMailUsingAdminSession(session, recipients, subject, content);
 			return null;
 		});
 	}
 
-	private void queueMailUsingAdminSession(MongoSession ms, final String recipients, final String subject,
-			final String content) {
+	private void queueMailUsingAdminSession(MongoSession ms, String recipients, String subject,
+			String content) {
 
 		SubNode outboxNode = getSystemOutbox(ms);
 		SubNode outboundEmailNode = create.createNode(ms, outboxNode.getPath() + "/?", NodeType.NONE.s());

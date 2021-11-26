@@ -140,7 +140,7 @@ public class AppConfiguration implements WebMvcConfigurer {
 	}
 
 	@Bean
-	public ServletWebServerFactory servletContainer(final GracefulShutdown gracefulShutdown) {
+	public ServletWebServerFactory servletContainer(GracefulShutdown gracefulShutdown) {
 		TomcatServletWebServerFactory factory = null;
 
 		if ("https".equalsIgnoreCase(appProp.getHttpProtocol())) {

@@ -338,10 +338,10 @@ public class NodeEditService {
 		// log.debug("Controller saveNode: " + Thread.currentThread().getName());
 
 		_ms = ThreadLocals.ensure(_ms);
-		final MongoSession ms = _ms;
+		MongoSession ms = _ms;
 
 		NodeInfo nodeInfo = req.getNode();
-		final String nodeId = nodeInfo.getId();
+		String nodeId = nodeInfo.getId();
 
 		// log.debug("saveNode. nodeId=" + XString.prettyPrint(nodeInfo));
 		SubNode node = read.getNode(ms, nodeId);
@@ -476,7 +476,7 @@ public class NodeEditService {
 		 */
 		util.setPendingPath(node, false);
 
-		final String sessionUserName = ThreadLocals.getSC().getUserName();
+		String sessionUserName = ThreadLocals.getSC().getUserName();
 
 		/* Send notification to local server or to remote server when a node is added */
 		if (!StringUtils.isEmpty(node.getContent()) //
@@ -538,7 +538,7 @@ public class NodeEditService {
 	public void updateSavedFriendNode(SubNode node) {
 		String userNodeId = node.getStrProp(NodeProp.USER_NODE_ID.s());
 
-		final String friendUserName = node.getStrProp(NodeProp.USER.s());
+		String friendUserName = node.getStrProp(NodeProp.USER.s());
 		if (friendUserName != null) {
 			// if a foreign user, update thru ActivityPub.
 			if (friendUserName.contains("@") && !ThreadLocals.getSC().isAdmin()) {

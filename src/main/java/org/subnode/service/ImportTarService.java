@@ -31,14 +31,14 @@ public class ImportTarService extends ImportArchiveBase {
 	private MongoRead read;
 
 	/* Returns the first node created which is always the root of the import */
-	public SubNode importFromStream(final MongoSession ms, final InputStream is, final SubNode node,
-			final boolean isNonRequestThread) {
+	public SubNode importFromStream(MongoSession ms, InputStream is, SubNode node,
+			boolean isNonRequestThread) {
 		if (used) {
 			throw new RuntimeEx("Prototype bean used multiple times is not allowed.");
 		}
 		used = true;
 
-		final SubNode userNode = read.getUserNodeByUserName(auth.getAdminSession(), ThreadLocals.getSC().getUserName());
+		SubNode userNode = read.getUserNodeByUserName(auth.getAdminSession(), ThreadLocals.getSC().getUserName());
 		if (userNode == null) {
 			throw new RuntimeEx("UserNode not found: " + ThreadLocals.getSC().getUserName());
 		}

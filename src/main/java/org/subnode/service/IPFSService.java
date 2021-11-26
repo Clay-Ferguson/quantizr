@@ -285,7 +285,7 @@ public class IPFSService {
     }
 
     /* Ensures this node's attachment is saved to IPFS and returns the CID of it */
-    public final String saveNodeAttachmentToIpfs(MongoSession ms, SubNode node) {
+    public String saveNodeAttachmentToIpfs(MongoSession ms, SubNode node) {
         String cid = null;
         String mime = node.getStrProp(NodeProp.BIN_MIME);
         String fileName = node.getStrProp(NodeProp.FILENAME);
@@ -314,7 +314,7 @@ public class IPFSService {
      * 
      * NOTE: The hash is allowed to have a subpath here.
      */
-    public final String catToString(String hash) {
+    public String catToString(String hash) {
         String ret = null;
         try {
             String url = API_CAT + "?arg=" + hash;
@@ -339,35 +339,35 @@ public class IPFSService {
         return is;
     }
 
-    public final IPFSDir getDir(String path) {
+    public IPFSDir getDir(String path) {
         String url = API_FILES + "/ls?arg=" + path + "&long=true";
         return (IPFSDir) postForJsonReply(url, IPFSDir.class);
     }
 
-    public final boolean removePin(String cid) {
+    public boolean removePin(String cid) {
         // log.debug("Remove Pin: " + cid);
         String url = API_PIN + "/rm?arg=" + cid;
         return postForJsonReply(url, Object.class) != null;
     }
 
-    public final boolean addPin(String cid) {
+    public boolean addPin(String cid) {
         // log.debug("Add Pin: " + cid);
         String url = API_PIN + "/add?arg=" + cid;
         return postForJsonReply(url, Object.class) != null;
     }
 
     /* Deletes the file or if a folder deletes it recursively */
-    public final boolean deletePath(String path) {
+    public boolean deletePath(String path) {
         String url = API_FILES + "/rm?arg=" + path + "&force=true";
         return postForJsonReply(url, Object.class) != null;
     }
 
-    public final boolean flushFiles(String path) {
+    public boolean flushFiles(String path) {
         String url = API_FILES + "/flush?arg=" + path;
         return postForJsonReply(url, Object.class) != null;
     }
 
-    public final LinkedHashMap<String, Object> getPins() {
+    public LinkedHashMap<String, Object> getPins() {
         LinkedHashMap<String, Object> pins = null;
         HashMap<String, Object> res = null;
         try {
@@ -389,7 +389,7 @@ public class IPFSService {
      * @param encoding text | json
      * @return MerkleNode of the hash, as requested usingn the 'encoding=' url argument specified.
      */
-    public final MerkleNode getMerkleNode(String hash, String encoding) {
+    public MerkleNode getMerkleNode(String hash, String encoding) {
         MerkleNode ret = null;
         try {
             String url = API_OBJECT + "/get?arg=" + hash + "&" + ENCODING_PARAM_NAME + "=" + encoding;
@@ -417,7 +417,7 @@ public class IPFSService {
     /**
      * Returns string of the the hash get, as requested usingn the 'encoding=' url argument specified.
      */
-    public final String getAsString(String hash, String encoding) {
+    public String getAsString(String hash, String encoding) {
         String ret = null;
         try {
             String url = API_OBJECT + "/get?arg=" + hash + "&" + ENCODING_PARAM_NAME + "=" + encoding;
@@ -439,7 +439,7 @@ public class IPFSService {
     /**
      * Returns JSON as string
      */
-    public final String dagGet(String hash) {
+    public String dagGet(String hash) {
         String ret = null;
         try {
             String url = API_DAG + "/get?arg=" + hash;
@@ -850,7 +850,7 @@ public class IPFSService {
         }
     }
 
-    public final Object postForJsonReply(String url, Class<?> clazz) {
+    public Object postForJsonReply(String url, Class<?> clazz) {
         Object ret = null;
         try {
             // log.debug("post: " + url);

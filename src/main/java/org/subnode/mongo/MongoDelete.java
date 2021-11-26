@@ -160,7 +160,7 @@ public class MongoDelete {
 	}
 
 	public void deleteBySubNodePropVal(String prop, String val) {
-		log.debug("Deleting by prop=" + prop + " val=" + val);
+		// log.debug("Deleting by prop=" + prop + " val=" + val);
 		Query query = new Query();
 		Criteria criteria = Criteria.where(SubNode.FIELD_PROPERTIES + "." + prop + ".value").is(val);
 		query.addCriteria(criteria);

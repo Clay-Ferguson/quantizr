@@ -192,7 +192,7 @@ public class ActPubOutbox {
      * todo-1: For now we just query the PUBLIC shares from the outbox, and verify that public query
      * works before we try to figure out how to do private auth comming from specific user(s)
      */
-    public Long getOutboxItemCount(final String userName, String sharedTo) {
+    public Long getOutboxItemCount(String userName, String sharedTo) {
         Long totalItems = arun.run(as -> {
             long count = 0;
             SubNode userNode = read.getUserNodeByUserName(null, userName);

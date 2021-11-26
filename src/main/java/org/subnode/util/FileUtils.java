@@ -31,8 +31,7 @@ public class FileUtils {
 	private static final Logger log = LoggerFactory.getLogger(FileUtils.class);
 
 	/*
-	 * Creates the set of file extensions that we allow user to
-	 * edit
+	 * Creates the set of file extensions that we allow user to edit
 	 */
 	private static HashSet<String> editableExtensions = new HashSet<>();
 	static {
@@ -49,13 +48,13 @@ public class FileUtils {
 		imageExtensions.add("bmp");
 	}
 
-	public String genHashOfClasspathResource(final String resourceName) {
+	public String genHashOfClasspathResource(String resourceName) {
 		InputStream is = null;
 		try {
-			Resource resource = SpringContextUtil.getApplicationContext().getResource("classpath:"+resourceName);
+			Resource resource = SpringContextUtil.getApplicationContext().getResource("classpath:" + resourceName);
 			is = resource.getInputStream();
 			return DigestUtils.md5Hex(is);
-		} catch (final Exception e) {
+		} catch (Exception e) {
 			throw new RuntimeEx("Unable to hash resource: " + resourceName, e);
 		} finally {
 			StreamUtil.close(is);
@@ -93,7 +92,7 @@ public class FileUtils {
 	 * 
 	 * output: file.txt
 	 */
-	public final String getShortFileName(String fileName) {
+	public String getShortFileName(String fileName) {
 		if (fileName == null)
 			return null;
 
@@ -113,7 +112,7 @@ public class FileUtils {
 	 * 
 	 * If no extension exists empty string is returned
 	 */
-	public final String getFileNameExtension(String fileName) {
+	public String getFileNameExtension(String fileName) {
 		if (fileName == null)
 			return null;
 
@@ -127,7 +126,7 @@ public class FileUtils {
 		return ext;
 	}
 
-	public final String stripExtension(String fileName) {
+	public String stripExtension(String fileName) {
 		if (fileName == null)
 			return null;
 

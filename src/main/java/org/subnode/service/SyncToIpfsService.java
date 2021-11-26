@@ -46,11 +46,11 @@ public class SyncToIpfsService {
 	int totalNodes = 0;
 	int orphansRemoved = 0;
 
-	public void writeIpfsFiles(MongoSession ms, PublishNodeToIpfsRequest req, final PublishNodeToIpfsResponse res) {
+	public void writeIpfsFiles(MongoSession ms, PublishNodeToIpfsRequest req, PublishNodeToIpfsResponse res) {
 		ms = ThreadLocals.ensure(ms);
 		this.session = ms;
-		final String nodeId = req.getNodeId();
-		final SubNode node = read.getNode(ms, nodeId);
+		String nodeId = req.getNodeId();
+		SubNode node = read.getNode(ms, nodeId);
 
 		boolean success = false;
 		try {
@@ -69,7 +69,7 @@ public class SyncToIpfsService {
 			success = true;
 		} catch (
 
-		final Exception ex) {
+		Exception ex) {
 			throw ExUtil.wrapEx(ex);
 		}
 

@@ -97,7 +97,7 @@ public class ExportJsonService {
 			BufferedOutputStream os = null;
 			try {
 				os = new BufferedOutputStream(new FileOutputStream(fullFileName));
-				final BufferedOutputStream _os = os;
+				BufferedOutputStream _os = os;
 				iter.forEach((node) -> {
 					String binFileName = node.getStrProp(NodeProp.BIN_FILENAME.s());
 					if (binFileName != null) {

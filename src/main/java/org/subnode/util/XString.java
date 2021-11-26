@@ -152,10 +152,10 @@ public class XString {
 		String ret = null;
 		resourceName = "classpath:" + resourceName; // "classpath:/public/export-includes/flexmark/html-template.html";
 		try {
-			final Resource resource = SpringContextUtil.getApplicationContext().getResource(resourceName);
+			Resource resource = SpringContextUtil.getApplicationContext().getResource(resourceName);
 			is = resource.getInputStream();
 			ret = IOUtils.toString(is, StandardCharsets.UTF_8.name());
-		} catch (final Exception e) {
+		} catch (Exception e) {
 			throw new RuntimeEx("Unable to read resource: " + resourceName, e);
 		} finally {
 			StreamUtil.close(is);
@@ -164,7 +164,7 @@ public class XString {
 	}
 
 	/* Truncates after delimiter including truncating the delimiter */
-	public final static String truncateAfterFirst(String text, String delim) {
+	public static String truncateAfterFirst(String text, String delim) {
 		if (text == null)
 			return null;
 
@@ -195,7 +195,7 @@ public class XString {
 		return str.substring(0, str.length() - 1);
 	}
 
-	public final static String truncateAfterLast(String text, String delim) {
+	public static String truncateAfterLast(String text, String delim) {
 		if (text == null)
 			return null;
 
@@ -206,7 +206,7 @@ public class XString {
 		return text;
 	}
 
-	public final static String parseAfterLast(String text, String delim) {
+	public static String parseAfterLast(String text, String delim) {
 		if (text == null)
 			return null;
 
@@ -222,7 +222,7 @@ public class XString {
 	 * 'count' chars long. Using simplest inefficient algorithm for now. Can be done faster with one
 	 * concat
 	 */
-	public final static String addLeadingZeroes(String val, int count) {
+	public static String addLeadingZeroes(String val, int count) {
 		while (val.length() < count) {
 			val = "0" + val;
 		}
@@ -232,7 +232,7 @@ public class XString {
 	/**
 	 * input: abc--file.txt, -- output: file.txt
 	 */
-	public final String truncateBefore(String fileName, String delims) {
+	public String truncateBefore(String fileName, String delims) {
 		if (fileName == null)
 			return null;
 
@@ -250,7 +250,7 @@ public class XString {
 	/**
 	 * input: abc--file.txt, . output: abc--file
 	 */
-	public final String truncateAfter(String fileName, String delims) {
+	public String truncateAfter(String fileName, String delims) {
 		if (fileName == null)
 			return null;
 
@@ -268,7 +268,7 @@ public class XString {
 	/**
 	 * input: /home/clay/path/file.txt output: /home/clay/path
 	 */
-	public final String getPathPart(String fileName) {
+	public String getPathPart(String fileName) {
 		if (fileName == null)
 			return null;
 

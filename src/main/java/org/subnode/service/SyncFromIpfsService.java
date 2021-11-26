@@ -68,7 +68,7 @@ public class SyncFromIpfsService {
 	 * So, for now, this algo will be slow, and will leave orphans around after pulling in from ipfs.
 	 * (orphans meaning those nodes didn't exist in the ipfs files)
 	 */
-	public void writeNodes(MongoSession ms, LoadNodeFromIpfsRequest req, final LoadNodeFromIpfsResponse res) {
+	public void writeNodes(MongoSession ms, LoadNodeFromIpfsRequest req, LoadNodeFromIpfsResponse res) {
 		ms = ThreadLocals.ensure(ms);
 		this.session = ms;
 

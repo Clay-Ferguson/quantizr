@@ -340,8 +340,8 @@ public class UserManagerService {
 	 * @param userStats Holds a map of User Root Node (account node) IDs as key mapped to the UserStats
 	 *        for that user.
 	 */
-	public void writeUserStats(final MongoSession ms, HashMap<ObjectId, UserStats> userStats) {
-		userStats.forEach((final ObjectId key, final UserStats stat) -> {
+	public void writeUserStats(MongoSession ms, HashMap<ObjectId, UserStats> userStats) {
+		userStats.forEach((ObjectId key, UserStats stat) -> {
 			SubNode node = read.getNode(ms, key);
 			if (node != null) {
 				// log.debug("Setting stat.binUsage=" + stat.binUsage);
@@ -421,7 +421,7 @@ public class UserManagerService {
 	 * We return whatever a message would be to the user that just says if the signupCode was accepted
 	 * or not and it's displayed on welcome.html only.
 	 */
-	public String processSignupCode(final String signupCode) {
+	public String processSignupCode(String signupCode) {
 		log.debug("User is trying signupCode: " + signupCode);
 		return arun.run(session -> {
 
@@ -458,7 +458,7 @@ public class UserManagerService {
 	}
 
 	public List<String> getOwnerNames(SubNode node) {
-		final ValContainer<List<String>> ret = new ValContainer<List<String>>();
+		ValContainer<List<String>> ret = new ValContainer<List<String>>();
 		arun.run(session -> {
 			ret.setVal(acu.getOwnerNames(session, node));
 			return null;
@@ -475,9 +475,9 @@ public class UserManagerService {
 		SignupResponse res = new SignupResponse();
 		arun.run(session -> {
 
-			final String userName = req.getUserName().trim();
-			final String password = req.getPassword().trim();
-			final String email = req.getEmail();
+			String userName = req.getUserName().trim();
+			String password = req.getPassword().trim();
+			String email = req.getEmail();
 
 			log.debug("Signup: userName=" + userName + " email=" + email);
 			res.setSuccess(true);
@@ -576,9 +576,9 @@ public class UserManagerService {
 		prefsNode.setProp(NodeProp.USER_PREF_RSS_HEADINGS_ONLY.s(), true);
 	}
 
-	public SavePublicKeyResponse savePublicKey(final SavePublicKeyRequest req) {
+	public SavePublicKeyResponse savePublicKey(SavePublicKeyRequest req) {
 		SavePublicKeyResponse res = new SavePublicKeyResponse();
-		final String userName = ThreadLocals.getSC().getUserName();
+		String userName = ThreadLocals.getSC().getUserName();
 
 		arun.run(session -> {
 			SubNode userNode = read.getUserNodeByUserName(session, userName);
@@ -599,9 +599,9 @@ public class UserManagerService {
 		return res;
 	}
 
-	public GetUserAccountInfoResponse getUserAccountInfo(final GetUserAccountInfoRequest req) {
+	public GetUserAccountInfoResponse getUserAccountInfo(GetUserAccountInfoRequest req) {
 		GetUserAccountInfoResponse res = new GetUserAccountInfoResponse();
-		final String userName = ThreadLocals.getSC().getUserName();
+		String userName = ThreadLocals.getSC().getUserName();
 
 		arun.run(session -> {
 			SubNode userNode = read.getUserNodeByUserName(session, userName);
@@ -627,7 +627,7 @@ public class UserManagerService {
 		return res;
 	}
 
-	public SaveUserPreferencesResponse saveUserPreferences(final SaveUserPreferencesRequest req) {
+	public SaveUserPreferencesResponse saveUserPreferences(SaveUserPreferencesRequest req) {
 		SaveUserPreferencesResponse res = new SaveUserPreferencesResponse();
 
 		UserPreferences userPreferences = ThreadLocals.getSC().getUserPreferences();
@@ -636,13 +636,13 @@ public class UserManagerService {
 			return res;
 		}
 
-		final UserPreferences reqUserPrefs = req.getUserPreferences();
+		UserPreferences reqUserPrefs = req.getUserPreferences();
 
 		// once triggered it stays on (for now)
 		if (reqUserPrefs.isEnableIPSM()) {
 			ThreadLocals.getSC().setEnableIPSM(true);
 		}
-		final String userName = ThreadLocals.getSC().getUserName();
+		String userName = ThreadLocals.getSC().getUserName();
 
 		arun.run(session -> {
 			SubNode prefsNode = read.getUserNodeByUserName(session, userName);
@@ -676,9 +676,9 @@ public class UserManagerService {
 		return res;
 	}
 
-	public SaveUserProfileResponse saveUserProfile(final SaveUserProfileRequest req) {
+	public SaveUserProfileResponse saveUserProfile(SaveUserProfileRequest req) {
 		SaveUserProfileResponse res = new SaveUserProfileResponse();
-		final String userName = ThreadLocals.getSC().getUserName();
+		String userName = ThreadLocals.getSC().getUserName();
 
 		arun.run(session -> {
 			boolean failed = false;
@@ -710,9 +710,9 @@ public class UserManagerService {
 		return res;
 	}
 
-	public BlockUserResponse blockUser(MongoSession ms, final BlockUserRequest req) {
+	public BlockUserResponse blockUser(MongoSession ms, BlockUserRequest req) {
 		BlockUserResponse res = new BlockUserResponse();
-		final String userName = ThreadLocals.getSC().getUserName();
+		String userName = ThreadLocals.getSC().getUserName();
 		ms = ThreadLocals.ensure(ms);
 
 		// get the node that holds all blocked users
@@ -748,7 +748,7 @@ public class UserManagerService {
 		return res;
 	}
 
-	public DeleteFriendResponse deleteFriend(MongoSession ms, final DeleteFriendRequest req) {
+	public DeleteFriendResponse deleteFriend(MongoSession ms, DeleteFriendRequest req) {
 		// apUtil.log("deleteFriend request: " + XString.prettyPrint(req));
 		DeleteFriendResponse res = new DeleteFriendResponse();
 		ms = ThreadLocals.ensure(ms);
@@ -773,15 +773,15 @@ public class UserManagerService {
 	 * Adds 'req.userName' as a friend by creating a FRIEND node under the current user's FRIENDS_LIST
 	 * if the user wasn't already a friend
 	 */
-	public AddFriendResponse addFriend(MongoSession ms, final AddFriendRequest req) {
+	public AddFriendResponse addFriend(MongoSession ms, AddFriendRequest req) {
 		// apUtil.log("addFriend request: " + XString.prettyPrint(req));
 		AddFriendResponse res = new AddFriendResponse();
-		final String userName = ThreadLocals.getSC().getUserName();
+		String userName = ThreadLocals.getSC().getUserName();
 		ms = ThreadLocals.ensure(ms);
 
 		String _newUserName = req.getUserName().trim();
 		_newUserName = XString.stripIfStartsWith(_newUserName, "@");
-		final String newUserName = _newUserName;
+		String newUserName = _newUserName;
 
 		if (newUserName.equalsIgnoreCase(PrincipalName.ADMIN.s())) {
 			res.setMessage("You can't be friends with the admin.");
@@ -838,9 +838,9 @@ public class UserManagerService {
 		return res;
 	}
 
-	public GetUserProfileResponse getUserProfile(final GetUserProfileRequest req) {
+	public GetUserProfileResponse getUserProfile(GetUserProfileRequest req) {
 		GetUserProfileResponse res = new GetUserProfileResponse();
-		final String sessionUserName = ThreadLocals.getSC().getUserName();
+		String sessionUserName = ThreadLocals.getSC().getUserName();
 
 		arun.run(session -> {
 			SubNode userNode = null;
@@ -903,7 +903,7 @@ public class UserManagerService {
 	}
 
 	public boolean userIsFollowedByMe(MongoSession ms, String maybeFollowedUser) {
-		final String userName = ThreadLocals.getSC().getUserName();
+		String userName = ThreadLocals.getSC().getUserName();
 		SubNode friendsList =
 				read.getUserNodeByType(ms, userName, null, null, NodeType.FRIEND_LIST.s(), null, NodeName.BLOCKED_USERS);
 		SubNode userNode = read.findNodeByUserAndType(ms, friendsList, maybeFollowedUser, NodeType.FRIEND.s());
@@ -911,7 +911,7 @@ public class UserManagerService {
 	}
 
 	public boolean userIsBlockedByMe(MongoSession ms, String maybeBlockedUser) {
-		final String userName = ThreadLocals.getSC().getUserName();
+		String userName = ThreadLocals.getSC().getUserName();
 		SubNode blockedList =
 				read.getUserNodeByType(ms, userName, null, null, NodeType.BLOCKED_USERS.s(), null, NodeName.BLOCKED_USERS);
 		SubNode userNode = read.findNodeByUserAndType(ms, blockedList, maybeBlockedUser, NodeType.FRIEND.s());
@@ -925,7 +925,7 @@ public class UserManagerService {
 	}
 
 	public UserPreferences getUserPreferences(String userName, SubNode _prefsNode) {
-		final UserPreferences userPrefs = new UserPreferences();
+		UserPreferences userPrefs = new UserPreferences();
 
 		arun.run(session -> {
 			SubNode prefsNode = _prefsNode;
@@ -957,7 +957,7 @@ public class UserManagerService {
 	/*
 	 * Runs when user is doing the 'change password' or 'reset password'
 	 */
-	public ChangePasswordResponse changePassword(MongoSession ms, final ChangePasswordRequest req) {
+	public ChangePasswordResponse changePassword(MongoSession ms, ChangePasswordRequest req) {
 		ChangePasswordResponse res = new ChangePasswordResponse();
 		ms = ThreadLocals.ensure(ms);
 
@@ -1031,7 +1031,7 @@ public class UserManagerService {
 		return !userName.equalsIgnoreCase(PrincipalName.ADMIN.s()) && !userName.equalsIgnoreCase(PrincipalName.ANON.s());
 	}
 
-	public ResetPasswordResponse resetPassword(final ResetPasswordRequest req) {
+	public ResetPasswordResponse resetPassword(ResetPasswordRequest req) {
 		ResetPasswordResponse res = new ResetPasswordResponse();
 		arun.run(session -> {
 
@@ -1197,10 +1197,10 @@ public class UserManagerService {
 		int foreignUserCount = 0;
 
 		StringBuilder sb = new StringBuilder();
-		final Iterable<SubNode> accountNodes =
+		Iterable<SubNode> accountNodes =
 				read.getChildrenUnderParentPath(ms, NodeName.ROOT_OF_ALL_USERS, null, null, 0, null, null);
 
-		for (final SubNode accountNode : accountNodes) {
+		for (SubNode accountNode : accountNodes) {
 			String userName = accountNode.getStrProp(NodeProp.USER);
 			if (userName != null) {
 				// if account is a 'foreign server' one, then clean it up
