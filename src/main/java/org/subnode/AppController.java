@@ -198,7 +198,7 @@ public class AppController implements ErrorController {
 	private MongoRead read;
 
 	@Autowired
-	private UserManagerService userManagerService;
+	private UserManagerService usrMgr;
 
 	@Autowired
 	private NodeRenderService nodeRenderService;
@@ -219,7 +219,7 @@ public class AppController implements ErrorController {
 	private NodeMoveService nodeMoveService;
 
 	@Autowired
-	AttachmentService attachmentService;
+	AttachmentService attach;
 
 	@Autowired
 	private AclService aclService;
@@ -404,7 +404,7 @@ public class AppController implements ErrorController {
 		}
 
 		if (signupCode != null) {
-			String signupResponse = userManagerService.processSignupCode(signupCode);
+			String signupResponse = usrMgr.processSignupCode(signupCode);
 			model.addAttribute("signupResponse", signupResponse);
 		}
 
@@ -553,21 +553,21 @@ public class AppController implements ErrorController {
 	@RequestMapping(value = API_PATH + "/signup", method = RequestMethod.POST)
 	public @ResponseBody Object signup(@RequestBody SignupRequest req, HttpSession session) {
 		return callProc.run("signup", req, session, ms -> {
-			return userManagerService.signup(req, false);
+			return usrMgr.signup(req, false);
 		});
 	}
 
 	@RequestMapping(value = API_PATH + "/login", method = RequestMethod.POST)
 	public @ResponseBody Object login(@RequestBody LoginRequest req, HttpServletRequest httpReq, HttpSession session) {
 		return callProc.run("login", req, session, ms -> {
-			return userManagerService.login(httpReq, req);
+			return usrMgr.login(httpReq, req);
 		});
 	}
 
 	@RequestMapping(value = API_PATH + "/closeAccount", method = RequestMethod.POST)
 	public @ResponseBody Object closeAccount(@RequestBody CloseAccountRequest req, HttpSession session) {
 		return callProc.run("closeAccount", req, session, ms -> {
-			CloseAccountResponse res = userManagerService.closeAccount(req);
+			CloseAccountResponse res = usrMgr.closeAccount(req);
 			session.invalidate();
 			return res;
 		});
@@ -652,7 +652,7 @@ public class AppController implements ErrorController {
 	@RequestMapping(value = API_PATH + "/getFriends", method = RequestMethod.POST)
 	public @ResponseBody Object getFriends(@RequestBody GetFriendsRequest req, HttpSession session) {
 		return callProc.run("getFriends", req, session, ms -> {
-			return userManagerService.getFriends(ms);
+			return usrMgr.getFriends(ms);
 		});
 	}
 
@@ -673,7 +673,7 @@ public class AppController implements ErrorController {
 	@RequestMapping(value = API_PATH + "/savePublicKey", method = RequestMethod.POST)
 	public @ResponseBody Object savePublicKey(@RequestBody SavePublicKeyRequest req, HttpSession session) {
 		return callProc.run("addPrivilege", req, session, ms -> {
-			return userManagerService.savePublicKey(req);
+			return usrMgr.savePublicKey(req);
 		});
 	}
 
@@ -881,14 +881,14 @@ public class AppController implements ErrorController {
 	@RequestMapping(value = API_PATH + "/changePassword", method = RequestMethod.POST)
 	public @ResponseBody Object changePassword(@RequestBody ChangePasswordRequest req, HttpSession session) {
 		return callProc.run("changePassword", req, session, ms -> {
-			return userManagerService.changePassword(ms, req);
+			return usrMgr.changePassword(ms, req);
 		});
 	}
 
 	@RequestMapping(value = API_PATH + "/resetPassword", method = RequestMethod.POST)
 	public @ResponseBody Object resetPassword(@RequestBody ResetPasswordRequest req, HttpSession session) {
 		return callProc.run("resetPassword", req, session, ms -> {
-			return userManagerService.resetPassword(req);
+			return usrMgr.resetPassword(req);
 		});
 	}
 
@@ -957,7 +957,7 @@ public class AppController implements ErrorController {
 						log.debug("Node did not exist: " + _id);
 						throw new RuntimeException("Node not found.");
 					} else {
-						attachmentService.getBinary(ms, "", node, null, download != null, response);
+						attach.getBinary(ms, "", node, null, download != null, response);
 					}
 					return null;
 				});
@@ -999,7 +999,7 @@ public class AppController implements ErrorController {
 			// Check if this is an 'avatar' request and if so bypass security
 			if ("avatar".equals(binId)) {
 				arun.run(ms -> {
-					attachmentService.getBinary(ms, "", null, nodeId, download != null, response);
+					attach.getBinary(ms, "", null, nodeId, download != null, response);
 					return null;
 				});
 			}
@@ -1011,7 +1011,7 @@ public class AppController implements ErrorController {
 					 * from normal 'bin' properties. This way we now to support multiple uploads onto any node, in this
 					 * very limites way.
 					 */
-					attachmentService.getBinary(ms, "Header", null, nodeId, download != null, response);
+					attach.getBinary(ms, "Header", null, nodeId, download != null, response);
 					return null;
 				});
 			}
@@ -1021,7 +1021,7 @@ public class AppController implements ErrorController {
 					if (ipfsCid != null) {
 						ipfsService.streamResponse(response, ms, ipfsCid, null);
 					} else {
-						attachmentService.getBinary(null, "", null, nodeId, download != null, response);
+						attach.getBinary(null, "", null, nodeId, download != null, response);
 					}
 					return null;
 				});
@@ -1029,7 +1029,7 @@ public class AppController implements ErrorController {
 		} else {
 			if (SessionContext.validToken(token, null)) {
 				arun.run(ms -> {
-					attachmentService.getBinary(ms, "", null, nodeId, download != null, response);
+					attach.getBinary(ms, "", null, nodeId, download != null, response);
 					return null;
 				});
 			}
@@ -1049,7 +1049,7 @@ public class AppController implements ErrorController {
 			@RequestParam(name = "disp", required = false) String disposition, //
 			HttpSession session, HttpServletResponse response) {
 		callProc.run("file", null, session, ms -> {
-			attachmentService.getFile(ms, fileName, disposition, response);
+			attach.getFile(ms, fileName, disposition, response);
 			return null;
 		});
 	}
@@ -1107,7 +1107,7 @@ public class AppController implements ErrorController {
 			HttpServletResponse response, //
 			HttpSession session) {
 		return (ResponseEntity<ResourceRegion>) callProc.run("stream", null, session, ms -> {
-			return attachmentService.getStreamResource(ms, headers, nodeId);
+			return attach.getStreamResource(ms, headers, nodeId);
 		});
 	}
 
@@ -1145,7 +1145,7 @@ public class AppController implements ErrorController {
 
 		return callProc.run("upload", null, session, ms -> {
 			// log.debug("Uploading as user: "+ms.getUser());
-			return attachmentService.uploadMultipleFiles(ms, _binSuffix, nodeId, uploadFiles,
+			return attach.uploadMultipleFiles(ms, _binSuffix, nodeId, uploadFiles,
 					explodeZips.equalsIgnoreCase("true"), "true".equalsIgnoreCase(ipfs),
 					"true".equalsIgnoreCase(createAsChildren));
 		});
@@ -1154,28 +1154,28 @@ public class AppController implements ErrorController {
 	@RequestMapping(value = API_PATH + "/deleteAttachment", method = RequestMethod.POST)
 	public @ResponseBody Object deleteAttachment(@RequestBody DeleteAttachmentRequest req, HttpSession session) {
 		return callProc.run("deleteAttachment", req, session, ms -> {
-			return attachmentService.deleteAttachment(ms, req);
+			return attach.deleteAttachment(ms, req);
 		});
 	}
 
 	@RequestMapping(value = API_PATH + "/uploadFromUrl", method = RequestMethod.POST)
 	public @ResponseBody Object uploadFromUrl(@RequestBody UploadFromUrlRequest req, HttpSession session) {
 		return callProc.run("uploadFromUrl", req, session, ms -> {
-			return attachmentService.readFromUrl(ms, req);
+			return attach.readFromUrl(ms, req);
 		});
 	}
 
 	@RequestMapping(value = API_PATH + "/uploadFromTorrent", method = RequestMethod.POST)
 	public @ResponseBody Object uploadFromTorrent(@RequestBody UploadFromTorrentRequest req, HttpSession session) {
 		return callProc.run("uploadFromTorrent", req, session, ms -> {
-			return attachmentService.uploadFromTorrent(ms, req);
+			return attach.uploadFromTorrent(ms, req);
 		});
 	}
 
 	@RequestMapping(value = API_PATH + "/uploadFromIPFS", method = RequestMethod.POST)
 	public @ResponseBody Object uploadFromIPFS(@RequestBody UploadFromIPFSRequest req, HttpSession session) {
 		return callProc.run("uploadFromIPFS", req, session, ms -> {
-			return attachmentService.attachFromIPFS(ms, req);
+			return attach.attachFromIPFS(ms, req);
 		});
 	}
 
@@ -1236,49 +1236,49 @@ public class AppController implements ErrorController {
 	@RequestMapping(value = API_PATH + "/saveUserPreferences", method = RequestMethod.POST)
 	public @ResponseBody Object saveUserPreferences(@RequestBody SaveUserPreferencesRequest req, HttpSession session) {
 		return callProc.run("saveUserPreferences", req, session, ms -> {
-			return userManagerService.saveUserPreferences(req);
+			return usrMgr.saveUserPreferences(req);
 		});
 	}
 
 	@RequestMapping(value = API_PATH + "/getUserProfile", method = RequestMethod.POST)
 	public @ResponseBody Object getUserProfile(@RequestBody GetUserProfileRequest req, HttpSession session) {
 		return callProc.run("getUserProfile", req, session, ms -> {
-			return userManagerService.getUserProfile(req);
+			return usrMgr.getUserProfile(req);
 		});
 	}
 
 	@RequestMapping(value = API_PATH + "/saveUserProfile", method = RequestMethod.POST)
 	public @ResponseBody Object saveUserProfile(@RequestBody SaveUserProfileRequest req, HttpSession session) {
 		return callProc.run("saveUserProfile", req, session, ms -> {
-			return userManagerService.saveUserProfile(req);
+			return usrMgr.saveUserProfile(req);
 		});
 	}
 
 	@RequestMapping(value = API_PATH + "/addFriend", method = RequestMethod.POST)
 	public @ResponseBody Object addFriend(@RequestBody AddFriendRequest req, HttpSession session) {
 		return callProc.run("addFriend", req, session, ms -> {
-			return userManagerService.addFriend(ms, req);
+			return usrMgr.addFriend(ms, req);
 		});
 	}
 
 	@RequestMapping(value = API_PATH + "/deleteFriend", method = RequestMethod.POST)
 	public @ResponseBody Object deleteFriend(@RequestBody DeleteFriendRequest req, HttpSession session) {
 		return callProc.run("deleteFriend", req, session, ms -> {
-			return userManagerService.deleteFriend(ms, req);
+			return usrMgr.deleteFriend(ms, req);
 		});
 	}
 
 	@RequestMapping(value = API_PATH + "/blockUser", method = RequestMethod.POST)
 	public @ResponseBody Object blockUser(@RequestBody BlockUserRequest req, HttpSession session) {
 		return callProc.run("blockUser", req, session, ms -> {
-			return userManagerService.blockUser(ms, req);
+			return usrMgr.blockUser(ms, req);
 		});
 	}
 
 	@RequestMapping(value = API_PATH + "/getUserAccountInfo", method = RequestMethod.POST)
 	public @ResponseBody Object getUserAccountInfo(@RequestBody GetUserAccountInfoRequest req, HttpSession session) {
 		return callProc.run("getUserAcccountInfo", req, session, ms -> {
-			return userManagerService.getUserAccountInfo(req);
+			return usrMgr.getUserAccountInfo(req);
 		});
 	}
 

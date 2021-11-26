@@ -5,15 +5,11 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import org.subnode.model.IPFSDir;
 import org.subnode.model.IPFSDirEntry;
-import org.subnode.mongo.MongoRead;
 import org.subnode.mongo.MongoSession;
-
-import org.subnode.mongo.MongoUpdate;
 import org.subnode.mongo.model.SubNode;
 import org.subnode.mongo.model.SubNodeIdentity;
 import org.subnode.request.LoadNodeFromIpfsRequest;
@@ -28,22 +24,13 @@ import org.subnode.util.XString;
  */
 @Component
 @Scope("prototype")
-public class SyncFromIpfsService {
+public class SyncFromIpfsService extends ServiceBase {
 	private static final Logger log = LoggerFactory.getLogger(SyncFromIpfsService.class);
 
 	public static final ObjectMapper jsonMapper = new ObjectMapper();
 	{
 		jsonMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 	}
-
-	@Autowired
-	IPFSService ipfsService;
-
-	@Autowired
-	private MongoRead read;
-
-	@Autowired
-	private MongoUpdate update;
 
 	int failedFiles = 0;
 	int matchingFiles = 0;
@@ -88,7 +75,7 @@ public class SyncFromIpfsService {
 	public boolean processPath(String path) {
 		boolean success = false;
 		log.debug("dumpDir: " + path);
-		IPFSDir dir = ipfsService.getDir(path);
+		IPFSDir dir = ipfs.getDir(path);
 		if (dir != null) {
 			log.debug("Dir: " + XString.prettyPrint(dir));
 
@@ -103,7 +90,7 @@ public class SyncFromIpfsService {
 					log.debug("processFile: " + fileName);
 
 					// read the node json from ipfs file
-					String json = ipfsService.readFile(fileName);
+					String json = ipfs.readFile(fileName);
 					if (json == null) {
 						log.debug("fileReadFailed: " + fileName);
 						failedFiles++;

@@ -25,7 +25,7 @@ public class MongoDelete {
 	private MongoTemplate ops;
 
 	@Autowired
-	private AttachmentService attachmentService;
+	private AttachmentService attach;
 
 	@Autowired
 	private MongoUpdate update;
@@ -38,7 +38,7 @@ public class MongoDelete {
 
 	public void deleteNode(MongoSession ms, SubNode node, boolean childrenOnly) {
 		if (!childrenOnly) {
-			attachmentService.deleteBinary(ms, "", node, null);
+			attach.deleteBinary(ms, "", node, null);
 		}
 		delete(ms, node, childrenOnly);
 	}
@@ -165,7 +165,7 @@ public class MongoDelete {
 		Criteria criteria = Criteria.where(SubNode.FIELD_PROPERTIES + "." + prop + ".value").is(val);
 		query.addCriteria(criteria);
 		DeleteResult res = ops.remove(query, SubNode.class);
-		log.debug("Nodes deleted: " + res.getDeletedCount());
+		// log.debug("Nodes deleted: " + res.getDeletedCount());
 	}
 
 	/*
@@ -214,8 +214,8 @@ public class MongoDelete {
 				}
 
 				if (!pathHashSet.contains(DigestUtils.sha256Hex(node.getParentPath()))) {
-					log.debug("ORPHAN NODE id=" + node.getId().toHexString() + " path=" + node.getPath() + " Content="
-							+ node.getContent());
+					// log.debug("ORPHAN NODE id=" + node.getId().toHexString() + " path=" + node.getPath() + " Content="
+					// 		+ node.getContent());
 					orphanCount++;
 					deleteCount++;
 					ops.remove(node);
@@ -237,7 +237,7 @@ public class MongoDelete {
 			}
 		}
 
-		log.debug("ORPHAN NODES DELETED=" + orphanCount);
+		// log.debug("ORPHAN NODES DELETED=" + orphanCount);
 		// nodeCount = read.getNodeCount(null);
 		// log.debug("final Node Count: " + nodeCount);
 	}

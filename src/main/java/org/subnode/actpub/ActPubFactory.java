@@ -20,7 +20,7 @@ import org.subnode.actpub.model.APProp;
 @Controller
 public class ActPubFactory {
 	@Autowired
-	public ActPubService apService;
+	public ActPubService apub;
 
 	@Autowired
 	public ActPubUtil apUtil;

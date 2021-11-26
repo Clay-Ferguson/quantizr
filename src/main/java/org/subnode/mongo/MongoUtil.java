@@ -54,7 +54,7 @@ public class MongoUtil {
 	private static final Logger log = LoggerFactory.getLogger(MongoUtil.class);
 
 	@Autowired
-	private UserManagerService userManagerService;
+	private UserManagerService usrMgr;
 
 	@Autowired
 	private AdminRun arun;
@@ -235,7 +235,7 @@ public class MongoUtil {
 					signupReq.setPassword(accountInfoList.get(1));
 					signupReq.setEmail(accountInfoList.get(2));
 
-					userManagerService.signup(signupReq, true);
+					usrMgr.signup(signupReq, true);
 				} else {
 					log.debug("account exists: " + userName);
 				}

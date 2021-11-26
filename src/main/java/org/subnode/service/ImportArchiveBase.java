@@ -2,31 +2,22 @@ package org.subnode.service;
 
 import java.io.InputStream;
 import java.util.HashMap;
-
 import com.fasterxml.jackson.databind.ObjectMapper;
-
 import org.apache.commons.compress.archivers.ArchiveEntry;
 import org.apache.commons.io.IOUtils;
 import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.subnode.exception.base.RuntimeEx;
 import org.subnode.model.client.NodeProp;
-import org.subnode.mongo.AdminRun;
-import org.subnode.mongo.MongoRead;
 import org.subnode.mongo.MongoSession;
-import org.subnode.mongo.MongoUpdate;
-import org.subnode.mongo.MongoUtil;
 import org.subnode.mongo.model.SubNode;
 import org.subnode.util.ExUtil;
-import org.subnode.util.FileUtils;
 import org.subnode.util.LimitedInputStreamEx;
-import org.subnode.util.MimeUtil;
 import org.subnode.util.ValContainer;
 import org.subnode.util.XString;
 
-public abstract class ImportArchiveBase {
+public abstract class ImportArchiveBase extends ServiceBase {
 	private static final Logger log = LoggerFactory.getLogger(ImportArchiveBase.class);
 
 	public static final ObjectMapper jsonMapper = new ObjectMapper();
@@ -37,27 +28,6 @@ public abstract class ImportArchiveBase {
 	 * of it.
 	 */
 	public boolean used;
-
-	@Autowired
-	public MongoUtil mongoUtil;
-
-	@Autowired
-	public MongoUpdate update;
-
-	@Autowired
-	public MongoRead read;
-
-	@Autowired
-	public AttachmentService attachmentService;
-
-	@Autowired
-	public MimeUtil mimeUtil;
-
-	@Autowired
-	public FileUtils fileUtils;
-
-	@Autowired
-	private AdminRun arun;
 
 	public String targetPath;
 	public MongoSession session;
@@ -161,7 +131,7 @@ public abstract class ImportArchiveBase {
 			LimitedInputStreamEx lzis = new LimitedInputStreamEx(zis, Integer.MAX_VALUE);
 
 			// log.debug("Attaching binary to nodeId: " + node.getId().toHexString());
-			attachmentService.attachBinaryFromStream(session, "", node, null, fileName, length, lzis, mimeType, -1, -1, false,
+			attach.attachBinaryFromStream(session, "", node, null, fileName, length, lzis, mimeType, -1, -1, false,
 					false, false, true, false, false, true, null);
 		} else {
 			// this is normal to get here and indicates this file is NOT an attachment file.

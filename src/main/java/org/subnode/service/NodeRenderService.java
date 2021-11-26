@@ -7,11 +7,9 @@ import java.util.List;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;
 import org.springframework.ui.Model;
-import org.subnode.config.AppProp;
 import org.subnode.exception.NodeAuthFailedException;
 import org.subnode.exception.base.RuntimeEx;
 import org.subnode.model.BreadcrumbInfo;
@@ -22,10 +20,7 @@ import org.subnode.model.client.ConstantInt;
 import org.subnode.model.client.ErrorType;
 import org.subnode.model.client.NodeMetaIntf;
 import org.subnode.model.client.NodeProp;
-import org.subnode.mongo.MongoAuth;
-import org.subnode.mongo.MongoRead;
 import org.subnode.mongo.MongoSession;
-
 import org.subnode.mongo.model.SubNode;
 import org.subnode.request.GetNodeMetaInfoRequest;
 import org.subnode.request.InitNodeEditRequest;
@@ -35,9 +30,7 @@ import org.subnode.response.GetNodeMetaInfoResponse;
 import org.subnode.response.InitNodeEditResponse;
 import org.subnode.response.RenderCalendarResponse;
 import org.subnode.response.RenderNodeResponse;
-import org.subnode.util.Convert;
 import org.subnode.util.DateUtil;
-import org.subnode.util.SubNodeUtil;
 import org.subnode.util.ThreadLocals;
 import org.subnode.util.XString;
 
@@ -48,26 +41,8 @@ import org.subnode.util.XString;
  * rendering the pages on the client as the user browses around on the tree.
  */
 @Component
-public class NodeRenderService {
+public class NodeRenderService extends ServiceBase {
 	private static final Logger log = LoggerFactory.getLogger(NodeRenderService.class);
-
-	@Autowired
-	private SubNodeUtil snUtil;
-
-	@Autowired
-	private MongoRead read;
-
-	@Autowired
-	private AppProp appProp;
-
-	@Autowired
-	private Convert convert;
-
-	@Autowired
-	private MongoAuth auth;
-
-	@Autowired
-	private NodeRenderService render;
 
 	private static RenderNodeResponse welcomePage;
 

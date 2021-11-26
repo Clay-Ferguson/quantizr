@@ -9,15 +9,11 @@ import java.util.Set;
 import java.util.StringTokenizer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.subnode.exception.base.RuntimeEx;
 import org.subnode.model.client.NodeProp;
 import org.subnode.model.client.PrincipalName;
-import org.subnode.mongo.MongoAuth;
-import org.subnode.mongo.MongoRead;
 import org.subnode.mongo.MongoSession;
-import org.subnode.mongo.MongoUpdate;
 import org.subnode.mongo.model.AccessControl;
 import org.subnode.mongo.model.MongoPrincipal;
 import org.subnode.mongo.model.SubNode;
@@ -38,20 +34,8 @@ import org.subnode.util.XString;
  * on nodes.
  */
 @Component
-public class AclService {
+public class AclService extends ServiceBase {
 	private static final Logger log = LoggerFactory.getLogger(AclService.class);
-
-	@Autowired
-	private MongoRead read;
-
-	@Autowired
-	private MongoUpdate update;
-
-	@Autowired
-	private MongoAuth auth;
-
-	@Autowired
-	private UserManagerService userManagerService;
 
 	/**
 	 * Returns the privileges that exist on the node identified in the request.
@@ -72,7 +56,7 @@ public class AclService {
 		}
 
 		if (req.isIncludeOwners()) {
-			List<String> owners = userManagerService.getOwnerNames(node);
+			List<String> owners = usrMgr.getOwnerNames(node);
 			// log.info("Owner Count: " + owners.size());
 			res.setOwners(owners);
 		}

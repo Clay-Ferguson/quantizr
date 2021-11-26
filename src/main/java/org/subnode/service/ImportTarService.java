@@ -5,12 +5,9 @@ import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
 import org.apache.commons.compress.archivers.tar.TarArchiveInputStream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import org.subnode.exception.base.RuntimeEx;
-import org.subnode.mongo.MongoAuth;
-import org.subnode.mongo.MongoRead;
 import org.subnode.mongo.MongoSession;
 import org.subnode.mongo.model.SubNode;
 import org.subnode.util.ExUtil;
@@ -23,12 +20,6 @@ public class ImportTarService extends ImportArchiveBase {
 	private static final Logger log = LoggerFactory.getLogger(ImportZipService.class);
 
 	private TarArchiveInputStream zis;
-
-	@Autowired
-	private MongoAuth auth;
-
-	@Autowired
-	private MongoRead read;
 
 	/* Returns the first node created which is always the root of the import */
 	public SubNode importFromStream(MongoSession ms, InputStream is, SubNode node,

@@ -62,7 +62,7 @@ public class ActPubUtil {
     private ActPubCache apCache;
 
     @Autowired
-    private ActPubService apService;
+    private ActPubService apub;
 
     @Autowired
     private ActPubUtil apUtil;
@@ -298,7 +298,7 @@ public class ActPubUtil {
         if (url == null)
             return null;
 
-        apService.saveFediverseName(url);
+        apub.saveFediverseName(url);
 
         // first try to return from cache.
         APObj actor = apCache.actorsByUrl.get(url);
@@ -325,7 +325,7 @@ public class ActPubUtil {
         String actorUrl = null;
 
         MongoSession as = auth.getAdminSession();
-        SubNode userNode = apService.getAcctNodeByUserName(as, userName);
+        SubNode userNode = apub.getAcctNodeByUserName(as, userName);
         if (userNode != null) {
             actorUrl = userNode.getStrProp(NodeProp.ACT_PUB_ACTOR_ID.s());
         }
@@ -352,7 +352,7 @@ public class ActPubUtil {
      * someuser@ip:port (special testing mode, insecure)
      */
     public APObj getWebFinger(String resource) {
-        apService.saveFediverseName(resource);
+        apub.saveFediverseName(resource);
 
         return getWebFingerSec(resource, true);
         // need to re-enable this again if we plan on doing localhost fediverse testing (todo-1)

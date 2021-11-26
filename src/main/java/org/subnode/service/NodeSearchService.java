@@ -8,13 +8,11 @@ import java.util.StringTokenizer;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.TextCriteria;
 import org.springframework.stereotype.Component;
-import org.subnode.actpub.ActPubService;
 import org.subnode.config.NodeName;
 import org.subnode.model.NodeInfo;
 import org.subnode.model.client.Bookmark;
@@ -24,11 +22,7 @@ import org.subnode.model.client.NodeProp;
 import org.subnode.model.client.NodeType;
 import org.subnode.model.client.PrincipalName;
 import org.subnode.model.client.PrivilegeType;
-import org.subnode.mongo.AdminRun;
-import org.subnode.mongo.MongoAuth;
-import org.subnode.mongo.MongoRead;
 import org.subnode.mongo.MongoSession;
-import org.subnode.mongo.MongoUtil;
 import org.subnode.mongo.model.AccessControl;
 import org.subnode.mongo.model.SubNode;
 import org.subnode.request.GetBookmarksRequest;
@@ -39,8 +33,6 @@ import org.subnode.response.GetBookmarksResponse;
 import org.subnode.response.GetNodeStatsResponse;
 import org.subnode.response.GetSharedNodesResponse;
 import org.subnode.response.NodeSearchResponse;
-import org.subnode.util.Convert;
-import org.subnode.util.EnglishDictionary;
 import org.subnode.util.ExUtil;
 import org.subnode.util.ThreadLocals;
 import org.subnode.util.XString;
@@ -55,35 +47,8 @@ import org.subnode.util.XString;
  * searching but I'm not fully doing so yet I don't believe.
  */
 @Component
-public class NodeSearchService {
+public class NodeSearchService extends ServiceBase {
 	private static final Logger log = LoggerFactory.getLogger(NodeSearchService.class);
-
-	@Autowired
-	private MongoRead read;
-
-	@Autowired
-	private MongoAuth auth;
-
-	@Autowired
-	private Convert convert;
-
-	@Autowired
-	private EnglishDictionary englishDictionary;
-
-	@Autowired
-	private MongoUtil util;
-
-	@Autowired
-	private UserManagerService userManagerService;
-
-	@Autowired
-	private NodeRenderService render;
-
-	@Autowired
-	private ActPubService apService;
-
-	@Autowired
-	private AdminRun arun;
 
 	public static Object trendingFeedInfoLock = new Object();
 	public static GetNodeStatsResponse trendingFeedInfo;
@@ -115,8 +80,8 @@ public class NodeSearchService {
 		if ("node.id".equals(req.getSearchProp())) {
 			SubNode node = read.getNode(ms, searchText, true);
 			if (node != null) {
-				NodeInfo info = convert.convertToNodeInfo(ThreadLocals.getSC(), ms, node, true, false, counter + 1, false,
-						false, false, false);
+				NodeInfo info = convert.convertToNodeInfo(ThreadLocals.getSC(), ms, node, true, false, counter + 1, false, false,
+						false, false);
 				searchResults.add(info);
 			}
 		} else if ("node.name".equals(req.getSearchProp())) {
@@ -127,8 +92,8 @@ public class NodeSearchService {
 			}
 			SubNode node = read.getNode(ms, searchText, true);
 			if (node != null) {
-				NodeInfo info = convert.convertToNodeInfo(ThreadLocals.getSC(), ms, node, true, false, counter + 1, false,
-						false, false, false);
+				NodeInfo info = convert.convertToNodeInfo(ThreadLocals.getSC(), ms, node, true, false, counter + 1, false, false,
+						false, false);
 				searchResults.add(info);
 			}
 		}
@@ -154,8 +119,8 @@ public class NodeSearchService {
 						req.isRequirePriority())) {
 					try {
 						auth.auth(ms, node, PrivilegeType.READ);
-						NodeInfo info = convert.convertToNodeInfo(ThreadLocals.getSC(), ms, node, true, false, counter + 1,
-								false, false, false, false);
+						NodeInfo info = convert.convertToNodeInfo(ThreadLocals.getSC(), ms, node, true, false, counter + 1, false,
+								false, false, false);
 						searchResults.add(info);
 					} catch (Exception e) {
 						ExUtil.error(log, "Failed converting node", e);
@@ -208,8 +173,8 @@ public class NodeSearchService {
 		 */
 		for (SubNode node : accountNodes) {
 			try {
-				NodeInfo info = convert.convertToNodeInfo(ThreadLocals.getSC(), ms, node, true, false, counter + 1, false,
-						false, false, false);
+				NodeInfo info = convert.convertToNodeInfo(ThreadLocals.getSC(), ms, node, true, false, counter + 1, false, false,
+						false, false);
 				searchResults.add(info);
 			} catch (Exception e) {
 				ExUtil.error(log, "faild converting user node", e);
@@ -225,7 +190,7 @@ public class NodeSearchService {
 			findUserName = XString.stripIfStartsWith(findUserName, "@");
 			final String _findUserName = findUserName;
 			arun.run(as -> {
-				SubNode userNode = apService.getAcctNodeByUserName(as, _findUserName);
+				SubNode userNode = apub.getAcctNodeByUserName(as, _findUserName);
 				if (userNode != null) {
 					try {
 						NodeInfo info = convert.convertToNodeInfo(ThreadLocals.getSC(), as, userNode, true, false, counter + 1,
@@ -265,8 +230,8 @@ public class NodeSearchService {
 		 * 2) all my shared nodes globally, and the globally is done simply by passing null for the path
 		 * here
 		 */
-		for (SubNode node : auth.searchSubGraphByAcl(ms, req.getPage() * ConstantInt.ROWS_PER_PAGE.val(),
-				searchRoot.getPath(), searchRoot.getOwner(), Sort.by(Sort.Direction.DESC, SubNode.FIELD_MODIFY_TIME),
+		for (SubNode node : auth.searchSubGraphByAcl(ms, req.getPage() * ConstantInt.ROWS_PER_PAGE.val(), searchRoot.getPath(),
+				searchRoot.getOwner(), Sort.by(Sort.Direction.DESC, SubNode.FIELD_MODIFY_TIME),
 				ConstantInt.ROWS_PER_PAGE.val())) {
 
 			if (node.getAc() == null || node.getAc().size() == 0)
@@ -323,7 +288,7 @@ public class NodeSearchService {
 	public void getBookmarks(MongoSession ms, GetBookmarksRequest req, GetBookmarksResponse res) {
 		List<Bookmark> bookmarks = new LinkedList<>();
 
-		List<SubNode> bookmarksNode = userManagerService.getSpecialNodesList(ms, NodeType.BOOKMARK_LIST.s(), null, true);
+		List<SubNode> bookmarksNode = usrMgr.getSpecialNodesList(ms, NodeType.BOOKMARK_LIST.s(), null, true);
 		if (bookmarksNode != null) {
 			for (SubNode bmNode : bookmarksNode) {
 				String targetId = bmNode.getStrProp(NodeProp.TARGET_ID);
@@ -429,7 +394,7 @@ public class NodeSearchService {
 			while (tokens.hasMoreTokens()) {
 				String token = tokens.nextToken().trim();
 
-				if (!englishDictionary.isStopWord(token)) {
+				if (!english.isStopWord(token)) {
 					String lcToken = token.toLowerCase();
 
 					// if word is a mention.

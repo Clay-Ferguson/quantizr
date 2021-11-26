@@ -21,17 +21,13 @@ import org.subnode.config.SpringContextUtil;
 import org.subnode.exception.base.RuntimeEx;
 import org.subnode.model.client.NodeProp;
 import org.subnode.model.client.NodeType;
-import org.subnode.mongo.MongoAuth;
-import org.subnode.mongo.MongoRead;
 import org.subnode.mongo.MongoSession;
-
 import org.subnode.mongo.model.SubNode;
 import org.subnode.request.ExportRequest;
 import org.subnode.response.ExportResponse;
 import org.subnode.util.ExUtil;
 import org.subnode.util.FileUtils;
 import org.subnode.util.StreamUtil;
-import org.subnode.util.SubNodeUtil;
 import org.subnode.util.ThreadLocals;
 import org.subnode.util.ValContainer;
 import org.subnode.util.XString;
@@ -44,23 +40,8 @@ import org.subnode.util.XString;
  * created that is dedicated just do doing that one export and so any member varibles in this class
  * have just that one export as their 'scope'
  */
-public abstract class ExportArchiveBase {
+public abstract class ExportArchiveBase extends ServiceBase {
 	private static final Logger log = LoggerFactory.getLogger(ExportArchiveBase.class);
-
-	@Autowired
-	private MongoRead read;
-
-	@Autowired
-	private MongoAuth auth;
-
-	@Autowired
-	private SubNodeUtil snUtil;
-
-	@Autowired
-	private AttachmentService attachmentService;
-
-	@Autowired
-	private FileUtils fileUtils;
 
 	private String shortFileName;
 	private String fullFileName;
@@ -331,7 +312,7 @@ public abstract class ExportArchiveBase {
 			 */
 			String dataUrl = node.getStrProp(NodeProp.BIN_DATA_URL.s());
 			if ("t".equals(dataUrl)) {
-				imgUrl = attachmentService.getStringByNode(ms, node);
+				imgUrl = attach.getStringByNode(ms, node);
 
 				// sanity check here.
 				if (!imgUrl.startsWith("data:")) {
@@ -410,7 +391,7 @@ public abstract class ExportArchiveBase {
 
 					InputStream is = null;
 					try {
-						is = attachmentService.getStream(ms, "", node, false);
+						is = attach.getStream(ms, "", node, false);
 						if (is != null) {
 							BufferedInputStream bis = new BufferedInputStream(is);
 							long length = node.getIntProp(NodeProp.BIN_SIZE.s());

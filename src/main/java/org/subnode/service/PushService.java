@@ -12,27 +12,19 @@ import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter.SseEventBuilder;
 import org.subnode.config.SessionContext;
 import org.subnode.model.NodeInfo;
-import org.subnode.mongo.MongoAuth;
 import org.subnode.mongo.MongoSession;
 import org.subnode.mongo.model.SubNode;
 import org.subnode.response.FeedPushInfo;
 import org.subnode.response.NodeEditedPushInfo;
 import org.subnode.response.ServerPushInfo;
 import org.subnode.response.SessionTimeoutPushInfo;
-import org.subnode.util.Convert;
 import org.subnode.util.ThreadLocals;
 
 @Component
-public class PushService {
+public class PushService extends ServiceBase {
 	private static final Logger log = LoggerFactory.getLogger(PushService.class);
 
 	static final int MAX_FEED_ITEMS = 25;
-
-	@Autowired
-	private Convert convert;
-
-	@Autowired
-	private MongoAuth auth;
 
 	@Autowired
 	@Qualifier("threadPoolTaskExecutor")

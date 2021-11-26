@@ -5,18 +5,10 @@ import java.util.List;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.subnode.exception.base.RuntimeEx;
 import org.subnode.model.client.NodeProp;
-import org.subnode.mongo.AdminRun;
-import org.subnode.mongo.MongoAuth;
-import org.subnode.mongo.MongoCreate;
-import org.subnode.mongo.MongoDelete;
-import org.subnode.mongo.MongoRead;
 import org.subnode.mongo.MongoSession;
-
-import org.subnode.mongo.MongoUpdate;
 import org.subnode.mongo.model.SubNode;
 import org.subnode.request.DeleteNodesRequest;
 import org.subnode.request.JoinNodesRequest;
@@ -38,29 +30,8 @@ import org.subnode.util.ThreadLocals;
  * of course.
  */
 @Component
-public class NodeMoveService {
+public class NodeMoveService extends ServiceBase {
 	private static final Logger log = LoggerFactory.getLogger(NodeMoveService.class);
-
-	@Autowired
-	private MongoCreate create;
-
-	@Autowired
-	private MongoRead read;
-
-	@Autowired
-	private MongoUpdate update;
-
-	@Autowired
-	private MongoDelete delete;
-
-	@Autowired
-	private MongoAuth auth;
-
-	@Autowired
-	private AdminRun arun;
-
-	@Autowired
-	private UserManagerService userManagerService;
 
 	/*
 	 * Moves the the node to a new ordinal/position location (relative to parent)
@@ -238,7 +209,7 @@ public class NodeMoveService {
 				 * don't do reference counting we let the garbage collecion cleanup be the only way user quotas are
 				 * deducted from
 				 */
-				userManagerService.addNodeBytesToUserNodeBytes(ms, node, userNode, -1);
+				usrMgr.addNodeBytesToUserNodeBytes(ms, node, userNode, -1);
 			}
 
 			try {

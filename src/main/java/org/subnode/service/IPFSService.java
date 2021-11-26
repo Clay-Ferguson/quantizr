@@ -26,7 +26,6 @@ import org.apache.http.impl.client.HttpClientBuilder;
 import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.ContentDisposition;
 import org.springframework.http.HttpEntity;
@@ -39,7 +38,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
-import org.subnode.config.AppProp;
 import org.subnode.config.SpringContextUtil;
 import org.subnode.exception.base.RuntimeEx;
 import org.subnode.model.IPFSDir;
@@ -50,19 +48,14 @@ import org.subnode.model.MerkleLink;
 import org.subnode.model.MerkleNode;
 import org.subnode.model.client.NodeProp;
 import org.subnode.model.client.NodeType;
-import org.subnode.mongo.AdminRun;
 import org.subnode.mongo.CreateNodeLocation;
-import org.subnode.mongo.MongoCreate;
-import org.subnode.mongo.MongoRead;
 import org.subnode.mongo.MongoRepository;
 import org.subnode.mongo.MongoSession;
-import org.subnode.mongo.MongoUpdate;
 import org.subnode.mongo.model.SubNode;
 import org.subnode.request.LoadNodeFromIpfsRequest;
 import org.subnode.request.PublishNodeToIpfsRequest;
 import org.subnode.response.LoadNodeFromIpfsResponse;
 import org.subnode.response.PublishNodeToIpfsResponse;
-import org.subnode.util.AsyncExec;
 import org.subnode.util.Cast;
 import org.subnode.util.Const;
 import org.subnode.util.DateUtil;
@@ -83,7 +76,7 @@ import org.subnode.util.XString;
  */
 
 @Component
-public class IPFSService {
+public class IPFSService extends ServiceBase {
     private static final Logger log = LoggerFactory.getLogger(IPFSService.class);
 
     public static String API_BASE;
@@ -117,30 +110,6 @@ public class IPFSService {
      */
     private static final RestTemplate restTemplate = new RestTemplate(Util.getClientHttpRequestFactory());
     private static final ObjectMapper mapper = new ObjectMapper();
-
-    @Autowired
-    private MongoRead read;
-
-    @Autowired
-    private MongoCreate create;
-
-    @Autowired
-    private MongoUpdate update;
-
-    @Autowired
-    private AppProp appProp;
-
-    @Autowired
-    AttachmentService attachmentService;
-
-    @Autowired
-    private UserManagerService userManagerService;
-
-    @Autowired
-    private AsyncExec asyncExec;
-
-    @Autowired
-    private AdminRun arun;
 
     @PostConstruct
     public void init() {
@@ -279,7 +248,7 @@ public class IPFSService {
             /* And finally update this user's quota for the added storage */
             SubNode accountNode = read.getUserNodeByUserName(ms, null);
             if (accountNode != null) {
-                userManagerService.addBytesToUserNodeBytes(ms, stat.getCumulativeSize(), accountNode, 1);
+                usrMgr.addBytesToUserNodeBytes(ms, stat.getCumulativeSize(), accountNode, 1);
             }
         });
     }
@@ -290,7 +259,7 @@ public class IPFSService {
         String mime = node.getStrProp(NodeProp.BIN_MIME);
         String fileName = node.getStrProp(NodeProp.FILENAME);
 
-        InputStream is = attachmentService.getStreamByNode(node, "");
+        InputStream is = attach.getStreamByNode(node, "");
         if (is != null) {
             try {
                 MerkleLink ret = addFromStream(ms, is, fileName, mime, null, null, false);
@@ -522,7 +491,7 @@ public class IPFSService {
             HttpHeaders headers = new HttpHeaders();
 
             MultiValueMap<String, Object> bodyMap = new LinkedMultiValueMap<>();
-            LimitedInputStreamEx lis = new LimitedInputStreamEx(stream, userManagerService.getMaxUploadSize(ms));
+            LimitedInputStreamEx lis = new LimitedInputStreamEx(stream, usrMgr.getMaxUploadSize(ms));
             bodyMap.add("file", makeFileEntity(lis, fileName));
 
             headers.setContentType(MediaType.MULTIPART_FORM_DATA);

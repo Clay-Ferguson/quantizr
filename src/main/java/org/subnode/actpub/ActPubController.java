@@ -30,7 +30,7 @@ public class ActPubController {
 	private static final Logger log = LoggerFactory.getLogger(ActPubController.class);
 
 	@Autowired
-	private ActPubService apService;
+	private ActPubService apub;
 
 	@Autowired
 	private ActPubOutbox apOutbox;
@@ -112,7 +112,7 @@ public class ActPubController {
 	public @ResponseBody Object actor(//
 			@PathVariable(value = "userName", required = true) String userName) {
 		apUtil.log("getActor: " + userName);
-		Object ret = apService.generateActor(userName);
+		Object ret = apub.generateActor(userName);
 		if (ret != null) {
 			// This pattern is needed to ENSURE a specific content type.
 			HttpHeaders hdr = new HttpHeaders();
@@ -138,7 +138,7 @@ public class ActPubController {
 			APObj payload = mapper.readValue(body, new TypeReference<>() {});
 			apUtil.log("shared INBOX incoming payload: " + XString.prettyPrint(payload));
 			ActPubService.inboxCount++;
-			apService.processInboxPost(httpReq, payload);
+			apub.processInboxPost(httpReq, payload);
 			return new ResponseEntity<String>(HttpStatus.OK);
 		} catch (Exception e) {
 			return new ResponseEntity<String>(HttpStatus.BAD_REQUEST);
@@ -165,7 +165,7 @@ public class ActPubController {
 			APObj payload = mapper.readValue(body, new TypeReference<>() {});
 			apUtil.log("AP INBOX incoming: " + XString.prettyPrint(payload));
 			ActPubService.inboxCount++;
-			apService.processInboxPost(httpReq, payload);
+			apub.processInboxPost(httpReq, payload);
 			return new ResponseEntity<String>(HttpStatus.OK);
 		} catch (Exception e) {
 			return new ResponseEntity<String>(HttpStatus.BAD_REQUEST);

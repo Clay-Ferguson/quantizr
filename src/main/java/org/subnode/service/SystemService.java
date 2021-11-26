@@ -13,23 +13,15 @@ import org.bson.Document;
 import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import org.subnode.actpub.ActPubService;
-import org.subnode.config.AppProp;
 import org.subnode.config.AppSessionListener;
 import org.subnode.config.SessionContext;
 import org.subnode.filter.HitFilter;
 import org.subnode.model.IPFSObjectStat;
 import org.subnode.model.UserStats;
 import org.subnode.model.client.NodeProp;
-import org.subnode.mongo.AdminRun;
 import org.subnode.mongo.MongoAppConfig;
-import org.subnode.mongo.MongoDelete;
-import org.subnode.mongo.MongoRead;
 import org.subnode.mongo.MongoSession;
-import org.subnode.mongo.MongoUpdate;
-import org.subnode.mongo.MongoUtil;
 import org.subnode.mongo.model.SubNode;
 import org.subnode.util.Const;
 import org.subnode.util.ExUtil;
@@ -41,41 +33,8 @@ import org.subnode.util.XString;
  * Service methods for System related functions. Admin functions.
  */
 @Component
-public class SystemService {
+public class SystemService extends ServiceBase {
 	private static final Logger log = LoggerFactory.getLogger(SystemService.class);
-
-	@Autowired
-	private MongoAppConfig mac;
-
-	@Autowired
-	private MongoRead read;
-
-	@Autowired
-	private MongoDelete delete;
-
-	@Autowired
-	private MongoUpdate update;
-
-	@Autowired
-	private MongoUtil mongoUtil;
-
-	@Autowired
-	private AdminRun arun;
-
-	@Autowired
-	private AttachmentService attachmentService;
-
-	@Autowired
-	private UserManagerService userManagerService;
-
-	@Autowired
-	private IPFSService ipfsService;
-
-	@Autowired
-	private AppProp appProp;
-
-	@Autowired
-	private ActPubService apService;
 
 	public String rebuildIndexes() {
 		if (!ThreadLocals.getSC().isAdmin()) {
@@ -83,7 +42,7 @@ public class SystemService {
 		}
 
 		arun.run(mongoSession -> {
-			mongoUtil.rebuildIndexes(mongoSession);
+			util.rebuildIndexes(mongoSession);
 			return null;
 		});
 		return "success.";
@@ -92,7 +51,7 @@ public class SystemService {
 	public String compactDb() {
 		delete.deleteNodeOrphans(null);
 		// do not delete.
-		// userManagerService.cleanUserAccounts();
+		// usrMgr.cleanUserAccounts();
 
 		/*
 		 * Create map to hold all user account storage statistics which gets updated by the various
@@ -100,11 +59,11 @@ public class SystemService {
 		 */
 		final HashMap<ObjectId, UserStats> statsMap = new HashMap<>();
 
-		attachmentService.gridMaintenanceScan(statsMap);
+		attach.gridMaintenanceScan(statsMap);
 		String ret = ipfsGarbageCollect(statsMap);
 
 		arun.run(session -> {
-			userManagerService.writeUserStats(session, statsMap);
+			usrMgr.writeUserStats(session, statsMap);
 			return null;
 		});
 
@@ -113,7 +72,7 @@ public class SystemService {
 	}
 
 	public String ipfsGarbageCollect(HashMap<ObjectId, UserStats> statsMap) {
-		String ret = ipfsService.getRepoGC();
+		String ret = ipfs.getRepoGC();
 		ret += update.releaseOrphanIPFSPins(statsMap);
 		return ret;
 	}
@@ -121,8 +80,8 @@ public class SystemService {
 	public String validateDb() {
 		// https://docs.mongodb.com/manual/reference/command/validate/
 		String ret = runMongoDbCommand(new Document("validate", "nodes").append("full", true));
-		ret += ipfsService.repoVerify();
-		ret += ipfsService.pinVerify();
+		ret += ipfs.repoVerify();
+		ret += ipfs.pinVerify();
 		return ret;
 	}
 
@@ -153,7 +112,7 @@ public class SystemService {
 
 			String ipfsLink = node.getStrProp(NodeProp.IPFS_LINK);
 			if (ipfsLink != null) {
-				IPFSObjectStat fullStat = ipfsService.objectStat(ipfsLink, false);
+				IPFSObjectStat fullStat = ipfs.objectStat(ipfsLink, false);
 				if (fullStat != null) {
 					ret += "\n\nIPFS Object Stats:\n" + XString.prettyPrint(fullStat);
 				}
@@ -195,13 +154,13 @@ public class SystemService {
 		sb.append(String.format("Sessions: %d\n", AppSessionListener.getSessionCounter()));
 		sb.append(getIpReport());
 		sb.append("Node Count: " + read.getNodeCount(null) + "\n");
-		sb.append("Attachment Count: " + attachmentService.getGridItemCount() + "\n");
-		sb.append(userManagerService.getUserAccountsReport(null));
+		sb.append("Attachment Count: " + attach.getGridItemCount() + "\n");
+		sb.append(usrMgr.getUserAccountsReport(null));
 
-		sb.append(apService.getStatsReport());
+		sb.append(apub.getStatsReport());
 
 		if (!StringUtils.isEmpty(appProp.getIPFSApiHostAndPort())) {
-			sb.append(ipfsService.getRepoStat());
+			sb.append(ipfs.getRepoStat());
 		}
 
 		RuntimeMXBean runtimeMxBean = ManagementFactory.getRuntimeMXBean();

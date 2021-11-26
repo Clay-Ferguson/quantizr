@@ -7,40 +7,23 @@ import java.io.FileOutputStream;
 import java.nio.charset.StandardCharsets;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;
-import org.subnode.config.AppProp;
 import org.subnode.model.MerkleLink;
-import org.subnode.mongo.MongoRead;
 import org.subnode.mongo.MongoSession;
-
 import org.subnode.mongo.model.SubNode;
 import org.subnode.request.ExportRequest;
 import org.subnode.response.ExportResponse;
 import org.subnode.util.ExUtil;
 import org.subnode.util.FileUtils;
 import org.subnode.util.StreamUtil;
-import org.subnode.util.SubNodeUtil;
 import org.subnode.util.ThreadLocals;
 
 @Component
 @Scope("prototype")
-public class ExportTextService {
+public class ExportTextService extends ServiceBase {
 	private static final Logger log = LoggerFactory.getLogger(ExportTextService.class);
-
-	@Autowired
-	private MongoRead read;
-
-	@Autowired
-	private SubNodeUtil snUtil;
-
-	@Autowired
-	private AppProp appProp;
-
-	@Autowired
-	private IPFSService ipfs;
 
 	private MongoSession session;
 

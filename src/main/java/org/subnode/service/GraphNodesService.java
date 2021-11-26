@@ -6,14 +6,10 @@ import java.util.List;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.subnode.model.GraphNode;
 import org.subnode.model.client.PrivilegeType;
-import org.subnode.mongo.MongoAuth;
-import org.subnode.mongo.MongoRead;
 import org.subnode.mongo.MongoSession;
-
 import org.subnode.mongo.model.SubNode;
 import org.subnode.request.GraphRequest;
 import org.subnode.response.GraphResponse;
@@ -22,16 +18,10 @@ import org.subnode.util.ThreadLocals;
 import org.subnode.util.XString;
 
 @Component
-public class GraphNodesService {
+public class GraphNodesService extends ServiceBase {
 	private static final Logger log = LoggerFactory.getLogger(GraphNodesService.class);
 
 	static int guid = 0;
-
-	@Autowired
-	private MongoRead read;
-
-	@Autowired
-	private MongoAuth auth;
 
 	public GraphResponse graphNodes(MongoSession ms, GraphRequest req) {
 		HashMap<String, GraphNode> mapByPath = new HashMap<>();

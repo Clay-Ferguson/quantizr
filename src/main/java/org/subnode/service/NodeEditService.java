@@ -9,11 +9,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import org.subnode.actpub.ActPubFollowing;
-import org.subnode.actpub.ActPubService;
-import org.subnode.actpub.ActPubUtil;
 import org.subnode.actpub.model.APList;
 import org.subnode.config.NodeName;
 import org.subnode.exception.base.RuntimeEx;
@@ -23,14 +19,8 @@ import org.subnode.model.client.NodeProp;
 import org.subnode.model.client.NodeType;
 import org.subnode.model.client.PrincipalName;
 import org.subnode.model.client.PrivilegeType;
-import org.subnode.mongo.AdminRun;
 import org.subnode.mongo.CreateNodeLocation;
-import org.subnode.mongo.MongoAuth;
-import org.subnode.mongo.MongoCreate;
-import org.subnode.mongo.MongoRead;
 import org.subnode.mongo.MongoSession;
-import org.subnode.mongo.MongoUpdate;
-import org.subnode.mongo.MongoUtil;
 import org.subnode.mongo.model.AccessControl;
 import org.subnode.mongo.model.SubNode;
 import org.subnode.request.AppDropRequest;
@@ -52,9 +42,6 @@ import org.subnode.response.SplitNodeResponse;
 import org.subnode.response.TransferNodeResponse;
 import org.subnode.response.UpdateHeadingsResponse;
 import org.subnode.types.TypeBase;
-import org.subnode.types.TypePluginMgr;
-import org.subnode.util.AsyncExec;
-import org.subnode.util.Convert;
 import org.subnode.util.SubNodeUtil;
 import org.subnode.util.ThreadLocals;
 import org.subnode.util.Util;
@@ -67,56 +54,8 @@ import org.subnode.util.XString;
  * service that performs those operations on the server, directly called from the HTML 'controller'
  */
 @Component
-public class NodeEditService {
+public class NodeEditService extends ServiceBase {
 	private static final Logger log = LoggerFactory.getLogger(NodeEditService.class);
-
-	@Autowired
-	private Convert convert;
-
-	@Autowired
-	private MongoUtil util;
-
-	@Autowired
-	private MongoCreate create;
-
-	@Autowired
-	private MongoRead read;
-
-	@Autowired
-	private MongoUpdate update;
-
-	@Autowired
-	private AdminRun arun;
-
-	@Autowired
-	private ActPubService apService;
-
-	@Autowired
-	private ActPubFollowing apFollowing;
-
-	@Autowired
-	private ActPubUtil apUtil;
-
-	@Autowired
-	private AclService aclService;
-
-	@Autowired
-	private MongoAuth auth;
-
-	@Autowired
-	private IPFSService ipfsService;
-
-	@Autowired
-	private AsyncExec asyncExec;
-
-	@Autowired
-	private TypePluginMgr typePluginMgr;
-
-	@Autowired
-	private PushService pushService;
-
-	@Autowired
-	private SubNodeUtil snUtil;
 
 	/*
 	 * Creates a new node as a *child* node of the node specified in the request. Should ONLY be called
@@ -195,7 +134,7 @@ public class NodeEditService {
 		}
 		// else maybe public.
 		else if (makePublic) {
-			aclService.addPrivilege(ms, newNode, PrincipalName.PUBLIC.s(),
+			acl.addPrivilege(ms, newNode, PrincipalName.PUBLIC.s(),
 					Arrays.asList(PrivilegeType.READ.s(), PrivilegeType.WRITE.s()), null);
 		}
 		// else add default sharing
@@ -452,7 +391,7 @@ public class NodeEditService {
 					arun.run(sess -> {
 						// don't pass the actual node into here, because it runs in a separate thread and would be
 						// a concurrency problem.
-						ipfsService.ipfsAsyncPinNode(sess, node.getId());
+						ipfs.ipfsAsyncPinNode(sess, node.getId());
 						return null;
 					});
 				}
@@ -502,10 +441,10 @@ public class NodeEditService {
 							inReplyTo = snUtil.getIdBasedUrl(parent);
 						}
 
-						APList attachments = apService.createAttachmentsList(node);
+						APList attachments = apub.createAttachmentsList(node);
 						String nodeUrl = snUtil.getIdBasedUrl(node);
 
-						apService.sendNotificationForNodeEdit(s, inReplyTo, snUtil.cloneAcl(node), attachments, node.getContent(),
+						apub.sendNotificationForNodeEdit(s, inReplyTo, snUtil.cloneAcl(node), attachments, node.getContent(),
 								nodeUrl);
 						pushService.pushNodeUpdateToBrowsers(s, sessionsPushed, node);
 					}
@@ -559,14 +498,14 @@ public class NodeEditService {
 					asyncExec.run(ThreadLocals.getContext(), () -> {
 						arun.run(s -> {
 							if (!ThreadLocals.getSC().isAdmin()) {
-								apService.getAcctNodeByUserName(s, friendUserName);
+								apub.getAcctNodeByUserName(s, friendUserName);
 							}
 
 							/*
 							 * The only time we pass true to load the user into the system is when they're being added as a
 							 * friend.
 							 */
-							apService.userEncountered(friendUserName, true);
+							apub.userEncountered(friendUserName, true);
 							return null;
 						});
 					});

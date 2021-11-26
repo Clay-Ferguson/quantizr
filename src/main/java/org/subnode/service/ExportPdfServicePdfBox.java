@@ -16,21 +16,16 @@ import org.apache.pdfbox.pdmodel.graphics.image.LosslessFactory;
 import org.apache.pdfbox.pdmodel.graphics.image.PDImageXObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;
-import org.subnode.config.AppProp;
 import org.subnode.model.client.NodeProp;
-import org.subnode.mongo.MongoRead;
 import org.subnode.mongo.MongoSession;
-
 import org.subnode.mongo.model.SubNode;
 import org.subnode.request.ExportRequest;
 import org.subnode.response.ExportResponse;
 import org.subnode.util.ExUtil;
 import org.subnode.util.FileUtils;
-import org.subnode.util.SubNodeUtil;
 import org.subnode.util.ThreadLocals;
 import org.subnode.util.XString;
 
@@ -39,20 +34,8 @@ import org.subnode.util.XString;
  */
 @Component
 @Scope("prototype")
-public class ExportPdfServicePdfBox {
+public class ExportPdfServicePdfBox extends ServiceBase {
 	private static final Logger log = LoggerFactory.getLogger(ExportPdfServicePdfBox.class);
-
-	@Autowired
-	private SubNodeUtil snUtil;
-
-	@Autowired
-	private AppProp appProp;
-
-	@Autowired
-	private MongoRead read;
-
-	@Autowired
-	private AttachmentService attachmentService;
 
 	private MongoSession session;
 
@@ -200,7 +183,7 @@ public class ExportPdfServicePdfBox {
 				sizeFactor = Float.valueOf(size).floatValue() / 100;
 			}
 
-			InputStream is = attachmentService.getStream(session, "", node, false);
+			InputStream is = attach.getStream(session, "", node, false);
 			if (is == null)
 				return;
 

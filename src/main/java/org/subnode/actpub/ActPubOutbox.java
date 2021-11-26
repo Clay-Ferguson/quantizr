@@ -50,7 +50,7 @@ public class ActPubOutbox {
     private AppProp appProp;
 
     @Autowired
-    private ActPubService apService;
+    private ActPubService apub;
 
     @Autowired
     private MongoRead read;
@@ -139,7 +139,7 @@ public class ActPubOutbox {
                             else if (AP.isType(object, APType.Note)) {
                                 try {
                                     ActPubService.newPostsInCycle++;
-                                    apService.saveNote(ms, _userNode, outboxNode, object, false, true);
+                                    apub.saveNote(ms, _userNode, outboxNode, object, false, true);
                                     count.setVal(count.getVal() + 1);
                                 } catch (Exception e) {
                                     // log and ignore.

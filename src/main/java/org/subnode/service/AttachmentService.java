@@ -20,7 +20,6 @@ import javax.imageio.stream.ImageInputStream;
 import javax.servlet.http.HttpServletResponse;
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBObject;
-import com.mongodb.client.gridfs.GridFSBucket;
 import com.mongodb.client.gridfs.GridFSFindIterable;
 import com.mongodb.client.gridfs.model.GridFSFile;
 import org.apache.commons.io.FilenameUtils;
@@ -36,14 +35,12 @@ import org.bson.Document;
 import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.ResourceRegion;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.gridfs.GridFsResource;
-import org.springframework.data.mongodb.gridfs.GridFsTemplate;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpRange;
 import org.springframework.http.HttpStatus;
@@ -52,7 +49,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBody;
-import org.subnode.config.AppProp;
 import org.subnode.config.NodeName;
 import org.subnode.config.SpringContextUtil;
 import org.subnode.exception.OutOfSpaceException;
@@ -61,15 +57,8 @@ import org.subnode.model.MerkleLink;
 import org.subnode.model.UserStats;
 import org.subnode.model.client.NodeProp;
 import org.subnode.model.client.PrivilegeType;
-import org.subnode.mongo.AdminRun;
 import org.subnode.mongo.CreateNodeLocation;
-import org.subnode.mongo.MongoAuth;
-import org.subnode.mongo.MongoCreate;
-import org.subnode.mongo.MongoRead;
 import org.subnode.mongo.MongoSession;
-
-import org.subnode.mongo.MongoUpdate;
-import org.subnode.mongo.MongoUtil;
 import org.subnode.mongo.model.SubNode;
 import org.subnode.mongo.model.SubNodePropVal;
 import org.subnode.request.DeleteAttachmentRequest;
@@ -100,41 +89,8 @@ import org.subnode.util.ValContainer;
  * Otherwise a download link is what gets displayed on the node.
  */
 @Component
-public class AttachmentService {
+public class AttachmentService extends ServiceBase {
 	private static final Logger log = LoggerFactory.getLogger(AttachmentService.class);
-
-	@Autowired
-	private MongoCreate create;
-
-	@Autowired
-	private MongoRead read;
-
-	@Autowired
-	private MongoUpdate update;
-
-	@Autowired
-	private MongoUtil util;
-
-	@Autowired
-	private MongoAuth auth;
-
-	@Autowired
-	private AppProp appProp;
-
-	@Autowired
-	private UserManagerService userManagerService;
-
-	@Autowired
-	private GridFsTemplate grid;
-
-	@Autowired
-	private GridFSBucket gridFsBucket;
-
-	@Autowired
-	private IPFSService ipfsService;
-
-	@Autowired
-	private AdminRun arun;
 
 	/*
 	 * Upload from User's computer. Standard HTML form-based uploading of a file from user machine
@@ -165,7 +121,7 @@ public class AttachmentService {
 
 			auth.ownerAuthByThread(node);
 
-			int maxFileSize = userManagerService.getMaxUploadSize(ms);
+			int maxFileSize = usrMgr.getMaxUploadSize(ms);
 			int imageCount = 0;
 
 			/*
@@ -331,7 +287,7 @@ public class AttachmentService {
 		byte[] imageBytes = null;
 		InputStream isTemp = null;
 
-		int maxFileSize = userManagerService.getMaxUploadSize(ms);
+		int maxFileSize = usrMgr.getMaxUploadSize(ms);
 
 		/*
 		 * Clear out any pre-existing binary properties
@@ -812,7 +768,7 @@ public class AttachmentService {
 	public void readFromDataUrl(MongoSession ms, String sourceUrl, String nodeId, String mimeHint,
 			int maxFileSize) {
 		if (maxFileSize <= 0) {
-			maxFileSize = userManagerService.getMaxUploadSize(ms);
+			maxFileSize = usrMgr.getMaxUploadSize(ms);
 		}
 
 		ms = ThreadLocals.ensure(ms);
@@ -853,7 +809,7 @@ public class AttachmentService {
 		}
 
 		if (maxFileSize <= 0) {
-			maxFileSize = userManagerService.getMaxUploadSize(ms);
+			maxFileSize = usrMgr.getMaxUploadSize(ms);
 		}
 
 		ms = ThreadLocals.ensure(ms);
@@ -1017,7 +973,7 @@ public class AttachmentService {
 
 		// update the user quota which enforces their total storage limit
 		if (!ms.isAdmin()) {
-			userManagerService.addBytesToUserNodeBytes(ms, streamCount, userNode, 1);
+			usrMgr.addBytesToUserNodeBytes(ms, streamCount, userNode, 1);
 		}
 
 		if (userNode == null) {
@@ -1036,13 +992,13 @@ public class AttachmentService {
 		auth.ownerAuthByThread(node);
 		ValContainer<Integer> streamSize = new ValContainer<>();
 
-		MerkleLink ret = ipfsService.addFromStream(ms, stream, null, mimeType, streamSize, null, false);
+		MerkleLink ret = ipfs.addFromStream(ms, stream, null, mimeType, streamSize, null, false);
 		if (ret != null) {
 			node.setProp(NodeProp.IPFS_LINK.s() + binSuffix, ret.getHash());
 			node.setProp(NodeProp.BIN_SIZE.s() + binSuffix, streamSize.getVal());
 
 			/* consume user quota space */
-			userManagerService.addBytesToUserNodeBytes(ms, streamSize.getVal(), userNode, 1);
+			usrMgr.addBytesToUserNodeBytes(ms, streamSize.getVal(), userNode, 1);
 		}
 	}
 
@@ -1059,7 +1015,7 @@ public class AttachmentService {
 			 * don't do reference counting we let the garbage collecion cleanup be the only way user quotas are
 			 * deducted from
 			 */
-			userManagerService.addNodeBytesToUserNodeBytes(ms, node, userNode, -1);
+			usrMgr.addNodeBytesToUserNodeBytes(ms, node, userNode, -1);
 		}
 
 		grid.delete(new Query(Criteria.where("_id").is(id)));
@@ -1083,7 +1039,7 @@ public class AttachmentService {
 			 * log.debug("Getting IPFS Stream for NodeId " + node.getId().toHexString() + " IPFS_CID=" +
 			 * ipfsHash);
 			 */
-			is = ipfsService.getStream(ms, ipfsHash);
+			is = ipfs.getStream(ms, ipfsHash);
 		} else {
 			is = getStreamByNode(node, binSuffix);
 		}
@@ -1113,7 +1069,7 @@ public class AttachmentService {
 		// log.debug("grid.foundFile in " + String.valueOf(duration) + "ms");
 		// startTime = System.currentTimeMillis();
 
-		GridFsResource gridFsResource = new GridFsResource(gridFile, gridFsBucket.openDownloadStream(gridFile.getObjectId()));
+		GridFsResource gridFsResource = new GridFsResource(gridFile, gridBucket.openDownloadStream(gridFile.getObjectId()));
 
 		// duration = System.currentTimeMillis() - startTime;
 		// log.debug("Created GridFsResource in " + String.valueOf(duration) + "ms");
@@ -1162,7 +1118,7 @@ public class AttachmentService {
 		}
 
 		GridFsResource gridFsResource =
-				new GridFsResource(gridFile, gridFsBucket.openDownloadStream(gridFile.getObjectId()));
+				new GridFsResource(gridFile, gridBucket.openDownloadStream(gridFile.getObjectId()));
 		try {
 			InputStream is = gridFsResource.getInputStream();
 			if (is == null) {
@@ -1178,7 +1134,7 @@ public class AttachmentService {
 	public int getGridItemCount() {
 		return arun.run(session -> {
 			int count = 0;
-			GridFSFindIterable files = gridFsBucket.find();
+			GridFSFindIterable files = gridBucket.find();
 
 			/* Scan all files in the grid */
 			if (files != null) {
@@ -1207,7 +1163,7 @@ public class AttachmentService {
 	public void gridMaintenanceScan(HashMap<ObjectId, UserStats> statsMap) {
 		arun.run(session -> {
 			int delCount = 0;
-			GridFSFindIterable files = gridFsBucket.find();
+			GridFSFindIterable files = gridBucket.find();
 
 			/* Scan all files in the grid */
 			if (files != null) {
@@ -1246,7 +1202,7 @@ public class AttachmentService {
 								Query query = new Query(Criteria.where("_id").is(file.getId()));
 
 								// Note: It's not a bug that we don't call this here:
-								// userManagerService.addNodeBytesToUserNodeBytes(session, node, null, -1);
+								// usrMgr.addNodeBytesToUserNodeBytes(session, node, null, -1);
 								// Because all the userstats are updated at the end of this scan.
 								grid.delete(query);
 								delCount++;

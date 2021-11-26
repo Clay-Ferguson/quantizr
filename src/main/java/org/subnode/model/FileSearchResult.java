@@ -2,7 +2,6 @@ package org.subnode.model;
 
 /**
  * Model representing a filename
- *
  */
 public class FileSearchResult {
 	private String fileName;

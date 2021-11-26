@@ -6,13 +6,9 @@ import java.nio.charset.StandardCharsets;
 import java.util.HashSet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
-import org.subnode.mongo.MongoAuth;
-import org.subnode.mongo.MongoRead;
 import org.subnode.mongo.MongoSession;
-
 import org.subnode.mongo.model.SubNode;
 import org.subnode.request.PublishNodeToIpfsRequest;
 import org.subnode.response.PublishNodeToIpfsResponse;
@@ -26,17 +22,8 @@ import org.subnode.util.XString;
  */
 @Component
 @Scope("prototype")
-public class SyncToIpfsService {
+public class SyncToIpfsService extends ServiceBase {
 	private static final Logger log = LoggerFactory.getLogger(SyncToIpfsService.class);
-
-	@Autowired
-	IPFSService ipfsService;
-
-	@Autowired
-	private MongoRead read;
-
-	@Autowired
-	private MongoAuth auth;
 
 	MongoSession session;
 
@@ -62,8 +49,8 @@ public class SyncToIpfsService {
 				processNode(n);
 			}
 
-			ipfsService.flushFiles(node.getPath());
-			ipfsService.dumpDir(node.getPath(), allFilePaths);
+			ipfs.flushFiles(node.getPath());
+			ipfs.dumpDir(node.getPath(), allFilePaths);
 			removeOrphanFiles();
 
 			success = true;
@@ -103,7 +90,7 @@ public class SyncToIpfsService {
 					// and this will delete children first.
 					path = XString.stripIfEndsWith(path, "/node.json");
 					log.debug("DELETE ORPHAN: " + path);
-					ipfsService.deletePath(path);
+					ipfs.deletePath(path);
 					orphansRemoved++;
 				} catch (Exception e) {
 					/*
@@ -134,7 +121,7 @@ public class SyncToIpfsService {
 	}
 
 	private void addFile(String fileName, String content) {
-		if (content.equals(ipfsService.readFile(fileName))) {
+		if (content.equals(ipfs.readFile(fileName))) {
 			// log.debug("not writing. Content was up to date.");
 			return;
 		}
@@ -146,6 +133,6 @@ public class SyncToIpfsService {
 	}
 
 	private void addEntry(String fileName, InputStream stream) {
-		ipfsService.addFileFromStream(session, fileName, stream, null, null, null);
+		ipfs.addFileFromStream(session, fileName, stream, null, null, null);
 	}
 }

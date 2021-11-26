@@ -49,7 +49,7 @@ public class Convert {
 	private MongoAuth auth;
 
 	@Autowired
-	private AttachmentService attachmentService;
+	private AttachmentService attach;
 
 	@Autowired
 	private AdminRun arun;
@@ -86,7 +86,7 @@ public class Convert {
 
 				String dataUrlProp = node.getStrProp(NodeProp.BIN_DATA_URL.s());
 				if (dataUrlProp != null) {
-					dataUrl = attachmentService.getStringByNode(ms, node);
+					dataUrl = attach.getStringByNode(ms, node);
 
 					// sanity check here.
 					if (!dataUrl.startsWith("data:")) {

@@ -44,14 +44,12 @@ import org.owasp.html.PolicyFactory;
 import org.owasp.html.Sanitizers;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpMethod;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 import org.subnode.AppServer;
-import org.subnode.config.AppProp;
 import org.subnode.exception.NodeAuthFailedException;
 import org.subnode.model.NodeMetaInfo;
 import org.subnode.model.client.NodeProp;
@@ -59,8 +57,6 @@ import org.subnode.model.client.RssFeed;
 import org.subnode.model.client.RssFeedEnclosure;
 import org.subnode.model.client.RssFeedEntry;
 import org.subnode.model.client.RssFeedMediaContent;
-import org.subnode.mongo.AdminRun;
-import org.subnode.mongo.MongoRead;
 import org.subnode.mongo.MongoRepository;
 import org.subnode.mongo.MongoSession;
 import org.subnode.mongo.model.SubNode;
@@ -71,26 +67,13 @@ import org.subnode.util.DateUtil;
 import org.subnode.util.ExUtil;
 import org.subnode.util.LimitedInputStreamEx;
 import org.subnode.util.StreamUtil;
-import org.subnode.util.SubNodeUtil;
 import org.subnode.util.Util;
 import org.subnode.util.XString;
 
 /* Proof of Concept RSS Publishing */
 @Component
-public class RSSFeedService {
+public class RSSFeedService extends ServiceBase {
 	private static final Logger log = LoggerFactory.getLogger(RSSFeedService.class);
-
-	@Autowired
-	private MongoRead read;
-
-	@Autowired
-	private SubNodeUtil snUtil;
-
-	@Autowired
-	private AppProp appProp;
-
-	@Autowired
-	private AdminRun arun;
 
 	private static boolean refreshingCache = false;
 

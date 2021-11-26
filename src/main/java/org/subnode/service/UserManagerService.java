@@ -24,16 +24,10 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.WebAuthenticationDetails;
 import org.springframework.stereotype.Component;
-import org.subnode.actpub.ActPubFollower;
-import org.subnode.actpub.ActPubFollowing;
-import org.subnode.actpub.ActPubService;
-import org.subnode.actpub.ActPubUtil;
-import org.subnode.config.AppProp;
 import org.subnode.config.NodeName;
 import org.subnode.config.SessionContext;
 import org.subnode.exception.OutOfSpaceException;
 import org.subnode.exception.base.RuntimeEx;
-import org.subnode.mail.OutboxMgr;
 import org.subnode.model.UserPreferences;
 import org.subnode.model.UserStats;
 import org.subnode.model.client.NodeProp;
@@ -41,15 +35,8 @@ import org.subnode.model.client.NodeType;
 import org.subnode.model.client.PrincipalName;
 import org.subnode.model.client.PrivilegeType;
 import org.subnode.model.client.UserProfile;
-import org.subnode.mongo.AdminRun;
 import org.subnode.mongo.CreateNodeLocation;
-import org.subnode.mongo.MongoAuth;
-import org.subnode.mongo.MongoCreate;
-import org.subnode.mongo.MongoDelete;
-import org.subnode.mongo.MongoRead;
 import org.subnode.mongo.MongoSession;
-import org.subnode.mongo.MongoUpdate;
-import org.subnode.mongo.MongoUtil;
 import org.subnode.mongo.model.SubNode;
 import org.subnode.request.AddFriendRequest;
 import org.subnode.request.BlockUserRequest;
@@ -79,13 +66,11 @@ import org.subnode.response.SavePublicKeyResponse;
 import org.subnode.response.SaveUserPreferencesResponse;
 import org.subnode.response.SaveUserProfileResponse;
 import org.subnode.response.SignupResponse;
-import org.subnode.util.AsyncExec;
 import org.subnode.util.Const;
 import org.subnode.util.DateUtil;
 import org.subnode.util.ExUtil;
 import org.subnode.util.ThreadLocals;
 import org.subnode.util.ValContainer;
-import org.subnode.util.Validator;
 import org.subnode.util.XString;
 
 /**
@@ -93,64 +78,10 @@ import org.subnode.util.XString;
  * preferences, and settings persisted per-user
  */
 @Component
-public class UserManagerService {
+public class UserManagerService extends ServiceBase {
 	private static final Logger log = LoggerFactory.getLogger(UserManagerService.class);
 
 	private static final Random rand = new Random();
-
-	@Autowired
-	private MongoUtil util;
-
-	@Autowired
-	private MongoAuth auth;
-
-	@Autowired
-	private MongoRead read;
-
-	@Autowired
-	private MongoCreate create;
-
-	@Autowired
-	private MongoUpdate update;
-
-	@Autowired
-	private MongoDelete delete;
-
-	@Autowired
-	private AppProp appProp;
-
-	@Autowired
-	private OutboxMgr outboxMgr;
-
-	@Autowired
-	private AdminRun arun;
-
-	@Autowired
-	private AclService acu;
-
-	@Autowired
-	private Validator validator;
-
-	@Autowired
-	private NodeEditService edit;
-
-	@Autowired
-	private ActPubFollowing apFollowing;
-
-	@Autowired
-	private ActPubFollower apFollower;
-
-	@Autowired
-	private ActPubService apService;
-
-	@Autowired
-	private ActPubUtil apUtil;
-
-	@Autowired
-	private AclService acl;
-
-	@Autowired
-	private AsyncExec asyncExec;
 
 	@Autowired
 	protected AuthenticationManager authenticationManager;
@@ -460,7 +391,7 @@ public class UserManagerService {
 	public List<String> getOwnerNames(SubNode node) {
 		ValContainer<List<String>> ret = new ValContainer<List<String>>();
 		arun.run(session -> {
-			ret.setVal(acu.getOwnerNames(session, node));
+			ret.setVal(acl.getOwnerNames(session, node));
 			return null;
 		});
 		return ret.getVal();
@@ -806,7 +737,7 @@ public class UserManagerService {
 			// if friendNode was non-null here it means we were already following the user.
 			if (friendNode == null) {
 				apUtil.log("loadForeignUser: " + newUserName);
-				apService.loadForeignUser(newUserName);
+				apub.loadForeignUser(newUserName);
 
 				apUtil.log("Creating friendNode for " + newUserName);
 				friendNode = edit.createFriendNode(mst, followerFriendList, newUserName);

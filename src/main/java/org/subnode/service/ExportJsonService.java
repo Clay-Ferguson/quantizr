@@ -13,19 +13,14 @@ import com.fasterxml.jackson.databind.ObjectWriter;
 import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.core.io.Resource;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Component;
-import org.subnode.config.AppProp;
 import org.subnode.config.SpringContextUtil;
 import org.subnode.model.client.NodeProp;
 import org.subnode.mongo.MongoSession;
-
-import org.subnode.mongo.MongoUpdate;
-import org.subnode.mongo.MongoUtil;
 import org.subnode.mongo.model.SubNode;
 import org.subnode.util.ExUtil;
 import org.subnode.util.FileUtils;
@@ -39,23 +34,8 @@ import org.subnode.util.ValContainer;
  */
 @Component
 @Scope("prototype")
-public class ExportJsonService {
+public class ExportJsonService extends ServiceBase {
 	private static final Logger log = LoggerFactory.getLogger(ExportJsonService.class);
-
-	@Autowired
-	private MongoUtil util;
-
-	@Autowired
-	private MongoUpdate update;
-
-	@Autowired
-	private AppProp appProp;
-
-	@Autowired
-	private AttachmentService attachmentService;
-
-	@Autowired
-	private UserManagerService userManagerService;
 
 	/* This object is Threadsafe so this is the correct usage 'static final' */
 	private static final ObjectMapper objectMapper = new ObjectMapper();
@@ -146,8 +126,8 @@ public class ExportJsonService {
 				String resourceName = "classpath:/nodes/" + subFolder + "/" + oid.toHexString() + "-" + binFileName;
 				Resource resource = SpringContextUtil.getApplicationContext().getResource(resourceName);
 				is = resource.getInputStream();
-				lis = new LimitedInputStreamEx(is, userManagerService.getMaxUploadSize(ms));
-				attachmentService.writeStream(ms, "", node, lis, binFileName, binMime, null);
+				lis = new LimitedInputStreamEx(is, usrMgr.getMaxUploadSize(ms));
+				attach.writeStream(ms, "", node, lis, binFileName, binMime, null);
 				update.save(ms, node);
 
 			} catch (Exception e) {
@@ -167,7 +147,7 @@ public class ExportJsonService {
 			log.debug("FileName: " + binFileName);
 		}
 
-		InputStream is = attachmentService.getStreamByNode(node, "");
+		InputStream is = attach.getStreamByNode(node, "");
 		if (is != null) {
 			try {
 				String targetFileName = targetFolder + File.separator + node.getId().toHexString() + "-" + binFileName;
@@ -226,7 +206,7 @@ public class ExportJsonService {
 
 					String binFileName = node.getStrProp(NodeProp.BIN_FILENAME.s());
 					if (binFileName != null) {
-						attachmentService.deleteBinary(ms, "", node, null);
+						attach.deleteBinary(ms, "", node, null);
 						readBinaryFromResource(ms, node, binFileName, subFolder);
 					}
 				}

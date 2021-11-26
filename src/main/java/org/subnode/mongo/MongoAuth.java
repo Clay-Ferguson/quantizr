@@ -134,7 +134,6 @@ public class MongoAuth {
 	}
 
 	public String getUserNameFromAccountNodeId(MongoSession ms, String accountId) {
-
 		// special case of a public share
 		if (PrincipalName.PUBLIC.s().equals(accountId)) {
 			return PrincipalName.PUBLIC.s();

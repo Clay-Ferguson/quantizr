@@ -2,14 +2,9 @@ package org.subnode.service;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.subnode.config.SpringContextUtil;
-import org.subnode.mongo.MongoAuth;
-import org.subnode.mongo.MongoRead;
 import org.subnode.mongo.MongoSession;
-
-import org.subnode.mongo.MongoUpdate;
 import org.subnode.mongo.model.SubNode;
 import org.subnode.request.InsertBookRequest;
 import org.subnode.response.InsertBookResponse;
@@ -24,17 +19,8 @@ import org.subnode.util.XString;
  * reasonable sized chunk of data (i.e. the entire book)
  */
 @Component
-public class ImportBookService {
+public class ImportBookService extends ServiceBase {
 	private static final Logger log = LoggerFactory.getLogger(ImportBookService.class);
-	
-	@Autowired
-	private MongoRead read;
-
-	@Autowired
-	private MongoUpdate update;
-
-	@Autowired
-	private MongoAuth auth;
 
 	public InsertBookResponse insertBook(MongoSession ms, InsertBookRequest req) {
 		InsertBookResponse res = new InsertBookResponse();

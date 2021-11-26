@@ -47,13 +47,10 @@ public class MongoTest implements TestIntf {
 	private MongoAuth auth;
 
 	@Autowired
-	private AppProp appProp;
+	private AttachmentService attach;
 
 	@Autowired
-	private AttachmentService attachmentService;
-
-	@Autowired
-	private UserManagerService userManagerService;
+	private UserManagerService usrMgr;
 
 	@Override
 	public void test() throws Exception {
@@ -235,15 +232,15 @@ public class MongoTest implements TestIntf {
 		try {
 			SubNode node = create.createNode(ms, "/binaries");
 			update.save(ms, node);
-			int maxFileSize = userManagerService.getMaxUploadSize(ms);
-			attachmentService.writeStream(ms, "", node,
+			int maxFileSize = usrMgr.getMaxUploadSize(ms);
+			attach.writeStream(ms, "", node,
 					new LimitedInputStreamEx(new FileInputStream("/home/clay/test-image.png"), maxFileSize), null, "image/png",
 					null);
 			update.save(ms, node);
 
 			log.debug("inserted root for binary testing.", null, "image/png", null);
 
-			InputStream inStream = attachmentService.getStream(ms, "", node, true);
+			InputStream inStream = attach.getStream(ms, "", node, true);
 			FileUtils.copyInputStreamToFile(inStream, new File("/home/clay/test-image2.png"));
 			log.debug("completed reading back the file, and writing out a copy.");
 		} catch (Exception e) {

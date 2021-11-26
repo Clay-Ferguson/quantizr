@@ -12,7 +12,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.domain.Sort;
-import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.TextCriteria;
@@ -24,53 +23,19 @@ import org.subnode.model.client.NodeProp;
 import org.subnode.model.client.NodeType;
 import org.subnode.model.client.PrincipalName;
 import org.subnode.model.client.PrivilegeType;
-import org.subnode.mongo.AdminRun;
-import org.subnode.mongo.MongoAuth;
-import org.subnode.mongo.MongoRead;
 import org.subnode.mongo.MongoSession;
-import org.subnode.mongo.MongoUpdate;
-import org.subnode.mongo.MongoUtil;
 import org.subnode.mongo.model.SubNode;
 import org.subnode.request.CheckMessagesRequest;
 import org.subnode.request.NodeFeedRequest;
 import org.subnode.response.CheckMessagesResponse;
 import org.subnode.response.NodeFeedResponse;
-import org.subnode.util.AsyncExec;
-import org.subnode.util.Convert;
 import org.subnode.util.ThreadLocals;
 
 @Component
-public class UserFeedService {
+public class UserFeedService extends ServiceBase {
 	private static final Logger log = LoggerFactory.getLogger(UserFeedService.class);
 
 	static final int MAX_FEED_ITEMS = 25;
-
-	@Autowired
-	private MongoRead read;
-
-	@Autowired
-	private MongoUpdate update;
-
-	@Autowired
-	private Convert convert;
-
-	@Autowired
-	private MongoAuth auth;
-
-	@Autowired
-	private MongoUtil util;
-
-	@Autowired
-	private UserManagerService userManagerService;
-
-	@Autowired
-	private MongoTemplate ops;
-
-	@Autowired
-	private AdminRun arun;
-
-	@Autowired
-	private AsyncExec asyncExec;
 
 	@Autowired
 	@Qualifier("threadPoolTaskExecutor")
@@ -78,9 +43,9 @@ public class UserFeedService {
 
 	// DO NOT DELETE (part of example to keep below)
 	// private static List<String> excludeTypes = Arrays.asList( //
-	// 		NodeType.FRIEND.s(), //
-	// 		NodeType.POSTS.s(), //
-	// 		NodeType.ACT_PUB_POSTS.s());
+	// NodeType.FRIEND.s(), //
+	// NodeType.POSTS.s(), //
+	// NodeType.ACT_PUB_POSTS.s());
 
 	public CheckMessagesResponse checkMessages(MongoSession ms, CheckMessagesRequest req) {
 		SessionContext sc = ThreadLocals.getSC();
@@ -99,10 +64,10 @@ public class UserFeedService {
 		criteria = criteria.and(SubNode.FIELD_TYPE).is(NodeType.NONE.s());
 
 		// DO NOT DELETE (keep as example)
-				// This pattern is what is required when you have multiple conditions added to a single field.
-				// .andOperator(Criteria.where(SubNode.FIELD_TYPE).ne(NodeType.FRIEND.s()), //
-				// 		Criteria.where(SubNode.FIELD_TYPE).ne(NodeType.POSTS.s()), //
-				// 		Criteria.where(SubNode.FIELD_TYPE).ne(NodeType.ACT_PUB_POSTS.s()));
+		// This pattern is what is required when you have multiple conditions added to a single field.
+		// .andOperator(Criteria.where(SubNode.FIELD_TYPE).ne(NodeType.FRIEND.s()), //
+		// Criteria.where(SubNode.FIELD_TYPE).ne(NodeType.POSTS.s()), //
+		// Criteria.where(SubNode.FIELD_TYPE).ne(NodeType.ACT_PUB_POSTS.s()));
 
 		SubNode searchRoot = read.getNode(ms, sc.getRootId());
 
@@ -226,7 +191,7 @@ public class UserFeedService {
 
 		// DO NOT DELETE (keep as an example of how to do this)
 		// if (req.getNodeId() == null) {
-		// 	criteria = criteria.and(SubNode.FIELD_TYPE).nin(excludeTypes);
+		// criteria = criteria.and(SubNode.FIELD_TYPE).nin(excludeTypes);
 		// }
 
 		// limit to just markdown types (no type)
@@ -269,7 +234,7 @@ public class UserFeedService {
 		}
 
 		if (!testQuery && doAuth && req.getFromFriends()) {
-			List<SubNode> friendNodes = userManagerService.getSpecialNodesList(ms, NodeType.FRIEND_LIST.s(), null, true);
+			List<SubNode> friendNodes = usrMgr.getSpecialNodesList(ms, NodeType.FRIEND_LIST.s(), null, true);
 			if (friendNodes != null) {
 				List<ObjectId> friendIds = new LinkedList<>();
 
@@ -326,8 +291,7 @@ public class UserFeedService {
 
 		for (SubNode node : iter) {
 			try {
-				NodeInfo info =
-						convert.convertToNodeInfo(sc, ms, node, true, false, counter + 1, false, false, false, false);
+				NodeInfo info = convert.convertToNodeInfo(sc, ms, node, true, false, counter + 1, false, false, false, false);
 				searchResults.add(info);
 			} catch (Exception e) {
 			}
@@ -346,7 +310,7 @@ public class UserFeedService {
 
 	public void getBlockedUserIds(HashSet<ObjectId> set) {
 		arun.run(ms -> {
-			List<SubNode> nodeList = userManagerService.getSpecialNodesList(ms, NodeType.BLOCKED_USERS.s(), null, false);
+			List<SubNode> nodeList = usrMgr.getSpecialNodesList(ms, NodeType.BLOCKED_USERS.s(), null, false);
 			if (nodeList == null)
 				return null;
 

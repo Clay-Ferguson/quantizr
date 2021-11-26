@@ -57,7 +57,7 @@ public class ActPubFollower {
     private MongoAuth auth;
 
     @Autowired
-    private ActPubService apService;
+    private ActPubService apub;
 
     @Autowired
     private ActPubUtil apUtil;
@@ -104,7 +104,7 @@ public class ActPubFollower {
 
                     // for now just add the url for future crawling. todo-1: later we can do something more meaningful
                     // with each actor url.
-                    if (apService.saveFediverseName(followerActorUrl)) {
+                    if (apub.saveFediverseName(followerActorUrl)) {
                         // log.debug("follower: " + followerActorUrl);
                     }
                 } else {

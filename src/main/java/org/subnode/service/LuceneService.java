@@ -2,11 +2,7 @@ package org.subnode.service;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import org.subnode.lucene.FileIndexer;
-import org.subnode.lucene.FileSearcher;
-import org.subnode.mongo.MongoRead;
 import org.subnode.mongo.MongoSession;
 import org.subnode.mongo.model.SubNode;
 import org.subnode.response.LuceneIndexResponse;
@@ -16,14 +12,8 @@ import org.subnode.response.LuceneSearchResponse;
  * Service for processing Lucene-related functions.
  */
 @Component
-public class LuceneService {
+public class LuceneService extends ServiceBase {
 	private static final Logger log = LoggerFactory.getLogger(LuceneService.class);
-
-	@Autowired
-	private MongoRead read;
-
-	@Autowired
-	private FileIndexer fileIndexer;
 
 	public LuceneIndexResponse reindex(MongoSession ms, String nodeId, String searchFolder) {
 		LuceneIndexResponse res = new LuceneIndexResponse();

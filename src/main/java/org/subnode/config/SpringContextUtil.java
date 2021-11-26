@@ -29,7 +29,7 @@ public class SpringContextUtil implements ApplicationContextAware {
 	private AppController appController;
 
 	@Autowired
-	private EnglishDictionary englishDictionary;
+	private EnglishDictionary english;
 
 	@Autowired
 	private TestRunner testRunner;
@@ -44,7 +44,7 @@ public class SpringContextUtil implements ApplicationContextAware {
 		try {
 			mongoRepo.init();
 			appController.init();
-			englishDictionary.init();
+			english.init();
 			pubSub.init();
 		}
 		catch (Exception e) {

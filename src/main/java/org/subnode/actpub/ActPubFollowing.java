@@ -59,7 +59,7 @@ public class ActPubFollowing {
     private AppProp appProp;
 
     @Autowired
-    private ActPubService apService;
+    private ActPubService apub;
 
     @Autowired
     private MongoRead read;
@@ -166,12 +166,12 @@ public class ActPubFollowing {
                     String followerUserName = apUtil.getLongUserNameFromActor(followerActor);
 
                     // this will lookup the user AND import it it's a non-existant user
-                    SubNode followerAccountNode = apService.getAcctNodeByUserName(session, followerUserName);
+                    SubNode followerAccountNode = apub.getAcctNodeByUserName(session, followerUserName);
                     if (followerAccountNode == null) {
                         throw new RuntimeException("Unable to get or import user: " + followerUserName);
                     }
 
-                    apService.userEncountered(followerUserName, false);
+                    apub.userEncountered(followerUserName, false);
 
                     // Actor being followed (local to our server)
                     String actorBeingFollowedUrl = AP.str(followAction, APProp.object);
@@ -298,7 +298,7 @@ public class ActPubFollowing {
 
                     // for now just add the url for future crawling. todo-1: later we can do something more meaningful
                     // with each actor url.
-                    if (apService.saveFediverseName(followingActorUrl)) {
+                    if (apub.saveFediverseName(followingActorUrl)) {
                         // log.debug("following: " + followingActorUrl);
                     }
                 } else {

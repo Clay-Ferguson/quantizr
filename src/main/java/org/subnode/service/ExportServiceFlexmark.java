@@ -18,25 +18,20 @@ import com.vladsch.flexmark.util.ast.Node;
 import com.vladsch.flexmark.util.data.MutableDataSet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;
 import org.subnode.AppController;
-import org.subnode.config.AppProp;
 import org.subnode.model.MerkleLink;
 import org.subnode.model.MerkleNode;
 import org.subnode.model.client.NodeProp;
-import org.subnode.mongo.MongoRead;
 import org.subnode.mongo.MongoSession;
-
 import org.subnode.mongo.model.SubNode;
 import org.subnode.request.ExportRequest;
 import org.subnode.response.ExportResponse;
 import org.subnode.util.ExUtil;
 import org.subnode.util.FileUtils;
 import org.subnode.util.StreamUtil;
-import org.subnode.util.SubNodeUtil;
 import org.subnode.util.ThreadLocals;
 import org.subnode.util.XString;
 
@@ -45,20 +40,8 @@ import org.subnode.util.XString;
  */
 @Component
 @Scope("prototype")
-public class ExportServiceFlexmark {
+public class ExportServiceFlexmark extends ServiceBase {
 	private static final Logger log = LoggerFactory.getLogger(ExportServiceFlexmark.class);
-
-	@Autowired
-	private SubNodeUtil snUtil;
-
-	@Autowired
-	private AppProp appProp;
-
-	@Autowired
-	private MongoRead read;
-
-	@Autowired
-	private IPFSService ipfs;
 
 	private MongoSession session;
 

@@ -95,7 +95,7 @@ public class ActPubService {
     private ActPubCache apCache;
 
     @Autowired
-    private EnglishDictionary englishDictionary;
+    private EnglishDictionary english;
 
     @Autowired
     private AdminRun arun;
@@ -113,7 +113,7 @@ public class ActPubService {
     private AppProp appProp;
 
     @Autowired
-    private AttachmentService attachmentService;
+    private AttachmentService attach;
 
     @Autowired
     private SubNodeUtil snUtil;
@@ -134,7 +134,7 @@ public class ActPubService {
     private ActPubCrypto apCrypto;
 
     @Autowired
-    private UserManagerService userManagerService;
+    private UserManagerService usrMgr;
 
     @Autowired
     private MongoTemplate ops;
@@ -739,7 +739,7 @@ public class ActPubService {
 
         if (ENGLISH_LANGUAGE_CHECK) {
             if (lang.equals("0")) {
-                if (!englishDictionary.isEnglish(contentHtml)) {
+                if (!english.isEnglish(contentHtml)) {
                     log.debug("Ignored Foreign: " + XString.prettyPrint(obj));
                     return;
                 } else {
@@ -944,7 +944,7 @@ public class ActPubService {
             String url = AP.str(att, APProp.url);
 
             if (mediaType != null && url != null) {
-                attachmentService.readFromUrl(ms, url, node.getId().toHexString(), mediaType, -1, false);
+                attach.readFromUrl(ms, url, node.getId().toHexString(), mediaType, -1, false);
 
                 // for now we only support one attachment so break out after uploading one.
                 break;
@@ -961,7 +961,7 @@ public class ActPubService {
         try {
             SubNode userNode = read.getUserNodeByUserName(null, userName);
             if (userNode != null) {
-                userManagerService.ensureValidCryptoKeys(userNode);
+                usrMgr.ensureValidCryptoKeys(userNode);
 
                 String publicKey = userNode.getStrProp(NodeProp.CRYPTO_KEY_PUBLIC.s());
                 String displayName = userNode.getStrProp(NodeProp.DISPLAY_NAME.s());
