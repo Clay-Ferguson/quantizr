@@ -983,7 +983,7 @@ public class AttachmentService extends ServiceBase {
 		/*
 		 * Now save the node also since the property on it needs to point to GridFS id
 		 */
-		node.setProp(NodeProp.BIN.s() + binSuffix, new SubNodePropVal(id));
+		node.setProp(NodeProp.BIN.s() + binSuffix, id);
 		node.setProp(NodeProp.BIN_SIZE.s() + binSuffix, streamCount);
 	}
 

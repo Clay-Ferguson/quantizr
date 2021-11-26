@@ -367,23 +367,6 @@ public class SubNode {
 	}
 
 	@JsonIgnore
-	public boolean setProp(String key, SubNodePropVal val) {
-		ThreadLocals.dirty(this);
-		synchronized (propLock) {
-			boolean changed = false;
-			if (val == null) {
-				changed = properties().containsKey(key);
-				properties().remove(key);
-			} else {
-				SubNodePropVal curVal = properties().get(key);
-				changed = curVal == null || !val.getValue().equals(curVal.getValue());
-				properties().put(key, val);
-			}
-			return changed;
-		}
-	}
-
-	@JsonIgnore
 	public boolean setProp(String key, Object val) {
 		ThreadLocals.dirty(this);
 		synchronized (propLock) {
