@@ -518,7 +518,7 @@ export class MenuPanel extends Div {
         ]));
 
         /* This was experimental, and does work perfectly well (based on a small aount of testing done).
-          These menu items can save a node subgraph to IPFS files (MFS) and the restore those nodes back
+          These menu items can save a node subgraph to IPFS files (MFS) and then restore those nodes back
           from that tree branch. But the feature is not currently needed or enabled.
           */
         // eslint-disable-next-line no-constant-condition

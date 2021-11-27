@@ -11,6 +11,7 @@ source ${SECRETS}/secrets.sh
 
 export ipfs_data=/home/clay/.ipfs
 export ipfs_staging=/home/clay/.ipfs/staging
+export ipfs_test_root=/home/clay/ipfs_test_root
 
 export quanta_domain=localhost
 

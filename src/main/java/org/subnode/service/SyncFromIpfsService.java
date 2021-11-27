@@ -18,10 +18,6 @@ import org.subnode.util.ExUtil;
 import org.subnode.util.ThreadLocals;
 import org.subnode.util.XString;
 
-/*
- * Writes every node under the target subnode (recursively) to an IPFS Mutable File System (MFS)
- * file
- */
 @Component
 @Scope("prototype")
 public class SyncFromIpfsService extends ServiceBase {
@@ -47,7 +43,7 @@ public class SyncFromIpfsService extends ServiceBase {
 	/*
 	 * todo-1: currently this is an inefficient AND imcomplete algo, and needs these two enhancements:
 	 * 
-	 * do a subGraph query at the root first (req.getPath()) and build up a HashSet of all IDs, then use
+	 * Do a subGraph query at the root first (req.getPath()) and build up a HashSet of all IDs, then use
 	 * that to know which nodes already do exist, as a performance aid. Then at the end any of those
 	 * that are NOT in the HashSet of all the node IDs that came from IPFS file scanning are known to be
 	 * orphans to be removed.

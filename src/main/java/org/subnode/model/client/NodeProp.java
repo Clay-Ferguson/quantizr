@@ -90,7 +90,12 @@ public enum NodeProp {
     // FS_FOLDER("fs:folder"), //
     // FS_LUCENE("fs:lucene"), //
 
+    // for inlining an image or other attachment as a single resource on a node use this (link)
     IPFS_LINK("ipfs:link", "s"), //
+
+    // To create an "Explorable" (by user) tree of content assign this property to a node, and set the
+    // type of the node to "sn:ipfsNode" (IPFS_NODE)
+    IPFS_CID("ipfs:cid", "s"),
     
     // When a node has this IPFS_REF property it means the IPFS_LINK on the node is completely external to us
     // and might not even be pinned on our gateway. REF means reference (external reference, from some other gateway)

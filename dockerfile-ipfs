@@ -2,6 +2,9 @@ FROM ipfs/go-ipfs:v0.9.1
 EXPOSE 4001
 # Swarm UDP; should be exposed to the public
 EXPOSE 4001/udp
+
+# NOTE: On production we do NOT open port 5001. This file you are now reading is not used
+# in production.
 EXPOSE 5001
 
 CMD ["daemon", "--migrate=true", "--enable-pubsub-experiment", "--enable-namesys-pubsub"]

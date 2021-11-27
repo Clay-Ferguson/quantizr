@@ -54,9 +54,7 @@ public class SyncToIpfsService extends ServiceBase {
 			removeOrphanFiles();
 
 			success = true;
-		} catch (
-
-		Exception ex) {
+		} catch (Exception ex) {
 			throw ExUtil.wrapEx(ex);
 		}
 
