@@ -48,7 +48,7 @@ export class ExportDlg extends DialogBase {
                 this.createRadioButton("Markdown", "md"),
                 this.createRadioButton("PDF", "pdf"),
                 this.createRadioButton("HTML", "html")
-            ], "radioButtonsBar"),
+            ], "radioButtonsBar marginTop"),
             new Div(null, null, [
                 new Checkbox("Save to IPFS", null, this.saveToIpfsState)
             ])
