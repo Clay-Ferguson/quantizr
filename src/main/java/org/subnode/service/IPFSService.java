@@ -793,7 +793,7 @@ public class IPFSService extends ServiceBase {
         return res;
     }
 
-    public void dumpDir(String path, HashSet<String> allFilePaths) {
+    public void traverseDir(String path, HashSet<String> allFilePaths) {
         // log.debug("dumpDir: " + path);
         IPFSDir dir = getDir(path);
         if (dir != null) {
@@ -805,7 +805,7 @@ public class IPFSService extends ServiceBase {
                  * as a workaround to the IPFS bug, we rely on the logic of "if not a json file, it's a folder
                  */
                 if (!entry.getName().endsWith(".json")) {
-                    dumpDir(path + "/" + entry.getName(), allFilePaths);
+                    traverseDir(path + "/" + entry.getName(), allFilePaths);
                 } else {
                     String fileName = path + "/" + entry.getName();
                     log.debug("dump: " + fileName);

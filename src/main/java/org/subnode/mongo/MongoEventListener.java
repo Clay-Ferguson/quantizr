@@ -2,7 +2,6 @@ package org.subnode.mongo;
 
 import java.util.Calendar;
 import java.util.Date;
-import org.apache.commons.codec.digest.DigestUtils;
 import org.bson.Document;
 import org.bson.types.ObjectId;
 import org.slf4j.Logger;
@@ -17,8 +16,8 @@ import org.springframework.data.mongodb.core.mapping.event.BeforeDeleteEvent;
 import org.springframework.data.mongodb.core.mapping.event.BeforeSaveEvent;
 import org.subnode.actpub.ActPubService;
 import org.subnode.config.NodeName;
-import org.subnode.model.client.NodeProp;
 import org.subnode.mongo.model.SubNode;
+import org.subnode.util.SubNodeUtil;
 import org.subnode.util.ThreadLocals;
 import org.subnode.util.XString;
 
@@ -40,6 +39,9 @@ public class MongoEventListener extends AbstractMongoEventListener<SubNode> {
 
 	@Autowired
 	private MongoUtil mongoUtil;
+
+	@Autowired
+	private SubNodeUtil snUtil;
 
 	/**
 	 * What we are doing in this method is assigning the ObjectId ourselves, because our path must
@@ -157,7 +159,7 @@ public class MongoEventListener extends AbstractMongoEventListener<SubNode> {
 			}
 		}
 
-		removeDefaultProps(node);
+		snUtil.removeDefaultProps(node);
 
 		if (node.getAc() != null) {
 			/*
@@ -182,27 +184,6 @@ public class MongoEventListener extends AbstractMongoEventListener<SubNode> {
 		}
 
 		ThreadLocals.clean(node);
-	}
-
-	/*
-	 * For properties that are being set to their default behaviors as if the property didn't exist
-	 * (such as vertical layout is assumed if no layout property is specified) we remove those
-	 * properties when the client is passing them in to be saved, or from any other source they are
-	 * being passed to be saved
-	 */
-	public void removeDefaultProps(SubNode node) {
-
-		/* If layout=="v" then remove the property */
-		String layout = node.getStr(NodeProp.LAYOUT.s());
-		if ("v".equals(layout)) {
-			node.delete(NodeProp.LAYOUT.s());
-		}
-
-		/* If priority=="0" then remove the property */
-		String priority = node.getStr(NodeProp.PRIORITY.s());
-		if ("0".equals(priority)) {
-			node.delete(NodeProp.PRIORITY.s());
-		}
 	}
 
 	@Override

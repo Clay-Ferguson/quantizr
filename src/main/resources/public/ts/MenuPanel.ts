@@ -522,7 +522,7 @@ export class MenuPanel extends Div {
           from that tree branch. But the feature is not currently needed or enabled.
           */
         // eslint-disable-next-line no-constant-condition
-        if (false && state.isAdminUser) {
+        if (state.isAdminUser) {
             children.push(new Menu("IPFS", [
                 new MenuItem("Sync: Nodes to IPFS", () => S.util.publishNodeToIpfs(hltNode), //
                     state.isAdminUser || (S.user.isTestUserAccount(state) && selNodeIsMine)), //

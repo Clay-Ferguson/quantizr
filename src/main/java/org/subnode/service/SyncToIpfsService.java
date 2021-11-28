@@ -16,9 +16,11 @@ import org.subnode.util.ExUtil;
 import org.subnode.util.ThreadLocals;
 import org.subnode.util.XString;
 
-/*
+/** 
+ * Prototype Bean: We instantiate a new instance of this bean every time it's run.
+ * 
  * Writes every node under the target subnode (recursively) to an IPFS Mutable File System (MFS)
- * file
+ * file.
  */
 @Component
 @Scope("prototype")
@@ -34,6 +36,7 @@ public class SyncToIpfsService extends ServiceBase {
 	int orphansRemoved = 0;
 
 	public void writeIpfsFiles(MongoSession ms, PublishNodeToIpfsRequest req, PublishNodeToIpfsResponse res) {
+		log.debug("writeIpfsFiles: " + XString.prettyPrint(res));
 		ms = ThreadLocals.ensure(ms);
 		this.session = ms;
 		String nodeId = req.getNodeId();
@@ -50,7 +53,7 @@ public class SyncToIpfsService extends ServiceBase {
 			}
 
 			ipfs.flushFiles(node.getPath());
-			ipfs.dumpDir(node.getPath(), allFilePaths);
+			ipfs.traverseDir(node.getPath(), allFilePaths);
 			removeOrphanFiles();
 
 			success = true;
@@ -86,7 +89,7 @@ public class SyncToIpfsService extends ServiceBase {
 					// to delete the files we really just delete it's parent folder instead, because
 					// each node has a decicated folder,
 					// and this will delete children first.
-					path = XString.stripIfEndsWith(path, "/node.json");
+					path = XString.stripIfEndsWith(path, "/n.json");
 					log.debug("DELETE ORPHAN: " + path);
 					ipfs.deletePath(path);
 					orphansRemoved++;
@@ -104,6 +107,9 @@ public class SyncToIpfsService extends ServiceBase {
 	}
 
 	private void processNode(SubNode node) {
+		// todo-1: This should be unnecessary but for now we need it.
+		snUtil.removeDefaultProps(node);
+
 		/*
 		 * todo-1: this and other places needs to generate canonical JSON (basically just sorted properties
 		 * ?) using this??
@@ -111,7 +117,7 @@ public class SyncToIpfsService extends ServiceBase {
 		// objectMapper.configure(SerializationFeature.ORDER_MAP_ENTRIES_BY_KEYS, true);
 		// objectMapper.configure(SerializationFeature.INDENT_OUTPUT, true);
 		String json = XString.prettyPrint(node);
-		String fileName = node.getPath() + "/node.json";
+		String fileName = node.getPath() + "/n.json";
 		log.debug("Sync to IPFS: " + fileName);
 		allNodePaths.add(fileName);
 		totalNodes++;
@@ -120,7 +126,7 @@ public class SyncToIpfsService extends ServiceBase {
 
 	private void addFile(String fileName, String content) {
 		if (content.equals(ipfs.readFile(fileName))) {
-			// log.debug("not writing. Content was up to date.");
+			log.debug("not writing. Content was up to date.");
 			return;
 		}
 		addFile(fileName, content.getBytes(StandardCharsets.UTF_8));

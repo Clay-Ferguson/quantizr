@@ -41,6 +41,37 @@ public class SubNodeUtil extends ServiceBase {
 		nonSavableProperties.add(NodeProp.BIN_QUOTA.s());
 	}
 
+	/*
+	 * For properties that are being set to their default behaviors as if the property didn't exist
+	 * (such as vertical layout is assumed if no layout property is specified) we remove those
+	 * properties when the client is passing them in to be saved, or from any other source they are
+	 * being passed to be saved
+	 */
+	public void removeDefaultProps(SubNode node) {
+
+		/* If layout=="v" then remove the property */
+		String layout = node.getStr(NodeProp.LAYOUT.s());
+		if ("v".equals(layout)) {
+			node.delete(NodeProp.LAYOUT.s());
+		}
+
+		/* If layout=="v" then remove the property */
+		String childrenImageSizes = node.getStr(NodeProp.CHILDREN_IMG_SIZES.s());
+		if ("n".equals(childrenImageSizes)) {
+			node.delete(NodeProp.CHILDREN_IMG_SIZES.s());
+		}
+
+		/* If priority=="0" then remove the property */
+		String priority = node.getStr(NodeProp.PRIORITY.s());
+		if ("0".equals(priority)) {
+			node.delete(NodeProp.PRIORITY.s());
+		}
+
+		if (node.getProperties() != null && node.getProperties().size() == 0) {
+			node.setProperties(null);
+		}
+	}
+
 	public HashMap<String, AccessControl> cloneAcl(SubNode node) {
 		if (node.getAc() == null)
 			return null;
@@ -86,9 +117,8 @@ public class SubNodeUtil extends ServiceBase {
 	 * Ensures a node at parentPath/pathName exists and that it's also named 'nodeName' (if nodeName is
 	 * provides), by creating said node if not already existing or leaving it as is if it does exist.
 	 */
-	public SubNode ensureNodeExists(MongoSession ms, String parentPath, String pathName, String nodeName,
-			String defaultContent, String primaryTypeName, boolean saveImmediate, SubNodePropertyMap props,
-			Val<Boolean> created) {
+	public SubNode ensureNodeExists(MongoSession ms, String parentPath, String pathName, String nodeName, String defaultContent,
+			String primaryTypeName, boolean saveImmediate, SubNodePropertyMap props, Val<Boolean> created) {
 
 		if (nodeName != null) {
 			SubNode nodeByName = read.getNodeByName(ms, nodeName);
@@ -145,8 +175,7 @@ public class SubNodeUtil extends ServiceBase {
 				// log.debug("Creating " + nameToken + " node, which didn't exist.");
 
 				/* Note if parent PARAMETER here is null we are adding a root node */
-				parent = create.createNode(ms, parent, nameToken, primaryTypeName, 0L, CreateNodeLocation.LAST, null, null,
-						true);
+				parent = create.createNode(ms, parent, nameToken, primaryTypeName, 0L, CreateNodeLocation.LAST, null, null, true);
 
 				if (parent == null) {
 					throw ExUtil.wrapEx("unable to create " + nameToken);
