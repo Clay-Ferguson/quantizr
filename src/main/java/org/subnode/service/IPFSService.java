@@ -108,7 +108,8 @@ public class IPFSService extends ServiceBase {
      * RestTemplate is thread-safe and reusable, and has no state, so we need only one final static
      * instance ever
      */
-    private static final RestTemplate restTemplate = new RestTemplate(Util.getClientHttpRequestFactory());
+    private static final RestTemplate restTemplate = new RestTemplate(Util.getClientHttpRequestFactory(10000));
+    private static final RestTemplate restTemplateNoTimeout = new RestTemplate(Util.getClientHttpRequestFactory(0));
     private static final ObjectMapper mapper = new ObjectMapper();
 
     @PostConstruct
@@ -421,18 +422,16 @@ public class IPFSService extends ServiceBase {
         return ret;
     }
 
-    public MerkleLink dagPutFromString(MongoSession ms, String val, String mimeType, Val<Integer> streamSize,
-            Val<String> cid) {
+    public MerkleLink dagPutFromString(MongoSession ms, String val, String mimeType, Val<Integer> streamSize, Val<String> cid) {
         return writeFromStream(ms, API_DAG + "/put", IOUtils.toInputStream(val), null, streamSize, cid);
     }
 
-    public MerkleLink dagPutFromStream(MongoSession ms, InputStream stream, String mimeType,
-            Val<Integer> streamSize, Val<String> cid) {
+    public MerkleLink dagPutFromStream(MongoSession ms, InputStream stream, String mimeType, Val<Integer> streamSize,
+            Val<String> cid) {
         return writeFromStream(ms, API_DAG + "/put", stream, null, streamSize, cid);
     }
 
-    public MerkleLink addFileFromString(MongoSession ms, String text, String fileName, String mimeType,
-            boolean wrapInFolder) {
+    public MerkleLink addFileFromString(MongoSession ms, String text, String fileName, String mimeType, boolean wrapInFolder) {
         InputStream stream = IOUtils.toInputStream(text);
         try {
             return addFromStream(ms, stream, fileName, mimeType, null, null, wrapInFolder);
@@ -442,9 +441,10 @@ public class IPFSService extends ServiceBase {
     }
 
     public MerkleLink addFileFromStream(MongoSession ms, String fileName, InputStream stream, String mimeType,
-            Val<Integer> streamSize, Val<String> cid) {
-        return writeFromStream(ms, API_FILES + "/write?arg=" + fileName + "&create=true&parents=true&truncate=true", stream,
-                null, streamSize, cid);
+            Val<Integer> streamSize) {
+        // NOTE: the 'write' endpoint doesn't send back any data (no way to get the CID back)
+        return writeFromStream(ms, API_FILES + "/write?arg=" + fileName + "&create=true&parents=true&truncate=true", stream, null,
+                streamSize, null);
     }
 
     /*
@@ -472,8 +472,7 @@ public class IPFSService extends ServiceBase {
         return null;
     }
 
-    public MerkleLink addTarFromStream(MongoSession ms, InputStream stream, Val<Integer> streamSize,
-            Val<String> cid) {
+    public MerkleLink addTarFromStream(MongoSession ms, InputStream stream, Val<Integer> streamSize, Val<String> cid) {
         return writeFromStream(ms, API_TAR + "/add", stream, null, streamSize, cid);
     }
 
@@ -500,7 +499,7 @@ public class IPFSService extends ServiceBase {
             ResponseEntity<String> response = restTemplate.exchange(endpoint, HttpMethod.POST, requestEntity, String.class);
             MediaType contentType = response.getHeaders().getContentType();
 
-            // log.debug("writeFromStream Raw Response: " + XString.prettyPrint(response));
+            log.debug("writeFromStream Raw Response: " + XString.prettyPrint(response));
 
             if (MediaType.APPLICATION_JSON.equals(contentType)) {
                 if (StringUtils.isEmpty(response.getBody())) {
@@ -541,13 +540,14 @@ public class IPFSService extends ServiceBase {
     public Map<String, Object> ipnsPublish(MongoSession ms, String key, String cid) {
         Map<String, Object> ret = null;
         try {
-            String url = API_NAME + "/publish?arg=" + cid + "&=" + key;
+            String url = API_NAME + "/publish?arg=" + cid + (key != null ? "&=" + key : "");
 
             HttpHeaders headers = new HttpHeaders();
             MultiValueMap<String, Object> bodyMap = new LinkedMultiValueMap<>();
             HttpEntity<MultiValueMap<String, Object>> requestEntity = new HttpEntity<>(bodyMap, headers);
 
-            ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.POST, requestEntity, String.class);
+            // Use a rest call with no timeout becasue publish can take a LONG time.
+            ResponseEntity<String> response = restTemplateNoTimeout.exchange(url, HttpMethod.POST, requestEntity, String.class);
             ret = mapper.readValue(response.getBody(), new TypeReference<Map<String, Object>>() {});
 
             // ret output:
@@ -650,8 +650,8 @@ public class IPFSService extends ServiceBase {
                 read.getUserNodeByType(ms, ms.getUserName(), null, "### Exports", NodeType.EXPORTS.s(), null, null);
 
         if (exportParent != null) {
-            SubNode node = create.createNode(ms, exportParent, null, NodeType.NONE.s(), 0L, CreateNodeLocation.FIRST, null,
-                    null, true);
+            SubNode node =
+                    create.createNode(ms, exportParent, null, NodeType.NONE.s(), 0L, CreateNodeLocation.FIRST, null, null, true);
 
             node.setOwner(exportParent.getOwner());
             // use export filename here
@@ -664,8 +664,8 @@ public class IPFSService extends ServiceBase {
 
             if (childrenFiles != null) {
                 for (ExportIpfsFile file : childrenFiles) {
-                    SubNode child = create.createNode(ms, node, null, NodeType.NONE.s(), 0L, CreateNodeLocation.LAST, null,
-                            null, true);
+                    SubNode child =
+                            create.createNode(ms, node, null, NodeType.NONE.s(), 0L, CreateNodeLocation.LAST, null, null, true);
 
                     child.setOwner(exportParent.getOwner());
                     child.setContent("IPFS File: " + file.getFileName() + "\n\nMime: " + file.getMime());

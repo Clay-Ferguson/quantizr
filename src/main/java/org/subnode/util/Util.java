@@ -140,8 +140,8 @@ public class Util {
 		return mime;
 	}
 
-	public static ClientHttpRequestFactory getClientHttpRequestFactory() {
-		int timeout = 10000;
+	// timeout=0 means infinite timeout (no timeout)
+	public static ClientHttpRequestFactory getClientHttpRequestFactory(int timeout) {
 		HttpComponentsClientHttpRequestFactory clientHttpRequestFactory = new HttpComponentsClientHttpRequestFactory();
 		clientHttpRequestFactory.setConnectionRequestTimeout(timeout);
 		clientHttpRequestFactory.setConnectTimeout(timeout);

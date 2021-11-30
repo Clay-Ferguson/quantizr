@@ -162,7 +162,7 @@ public class AppController extends ServiceBase implements ErrorController {
 	 * RestTemplate is thread-safe and reusable, and has no state, so we need only one final static
 	 * instance ever
 	 */
-	private static final RestTemplate restTemplate = new RestTemplate(Util.getClientHttpRequestFactory());
+	private static final RestTemplate restTemplate = new RestTemplate(Util.getClientHttpRequestFactory(10000));
 
 	@Autowired
 	private CallProcessor callProc;

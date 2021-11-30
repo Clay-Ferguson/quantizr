@@ -347,12 +347,40 @@ export class Render implements RenderIntf {
 
         let ipfsLink = S.props.getNodePropVal(J.NodeProp.IPFS_LINK, node);
         if (ipfsLink) {
-            children.push(new Heading(5, "IPFS CID"), //
-                new Div(ipfsLink, {
+            children.push(new Heading(5, "IPFS LINK"), //
+                new Div("ipfs://" + ipfsLink, {
                     className: "anchorBigMarginBottom",
                     title: "Click -> Copy to clipboard",
                     onClick: () => {
                         S.util.copyToClipboard("ipfs://" + ipfsLink);
+                        S.util.flashMessage("Copied link to Clipboard", "Clipboard", true);
+                        dlgHolder.dlg.close();
+                    }
+                }));
+        }
+
+        let ipfsCid = S.props.getNodePropVal(J.NodeProp.IPFS_CID, node);
+        if (ipfsCid) {
+            children.push(new Heading(5, "IPFS CID"), //
+                new Div("ipfs://" + ipfsCid, {
+                    className: "anchorBigMarginBottom",
+                    title: "Click -> Copy to clipboard",
+                    onClick: () => {
+                        S.util.copyToClipboard("ipfs://" + ipfsCid);
+                        S.util.flashMessage("Copied link to Clipboard", "Clipboard", true);
+                        dlgHolder.dlg.close();
+                    }
+                }));
+        }
+
+        let ipnsCid = S.props.getNodePropVal(J.NodeProp.IPNS_CID, node);
+        if (ipnsCid) {
+            children.push(new Heading(5, "IPNS Name"), //
+                new Div("ipns://" + ipnsCid, {
+                    className: "anchorBigMarginBottom",
+                    title: "Click -> Copy to clipboard",
+                    onClick: () => {
+                        S.util.copyToClipboard("ipns://" + ipnsCid);
                         S.util.flashMessage("Copied link to Clipboard", "Clipboard", true);
                         dlgHolder.dlg.close();
                     }

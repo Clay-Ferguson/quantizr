@@ -1,5 +1,4 @@
 import { AppState } from "../AppState";
-import { NodeCompMarkdown } from "../comps/NodeCompMarkdown";
 import { Constants as C } from "../Constants";
 import * as J from "../JavaIntf";
 import { PubSub } from "../PubSub";

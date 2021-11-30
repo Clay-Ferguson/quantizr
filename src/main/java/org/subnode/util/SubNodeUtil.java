@@ -41,6 +41,10 @@ public class SubNodeUtil extends ServiceBase {
 		nonSavableProperties.add(NodeProp.BIN_QUOTA.s());
 	}
 
+	public void removeUnwantedPropsForIPFS(SubNode node) {
+		node.delete(NodeProp.IPFS_CID.s());
+	}
+
 	/*
 	 * For properties that are being set to their default behaviors as if the property didn't exist
 	 * (such as vertical layout is assumed if no layout property is specified) we remove those

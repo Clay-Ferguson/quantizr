@@ -4,10 +4,13 @@ import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.HashSet;
+import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
+import org.subnode.model.IPFSDirStat;
+import org.subnode.model.client.NodeProp;
 import org.subnode.mongo.MongoSession;
 import org.subnode.mongo.model.SubNode;
 import org.subnode.request.PublishNodeToIpfsRequest;
@@ -16,11 +19,12 @@ import org.subnode.util.ExUtil;
 import org.subnode.util.ThreadLocals;
 import org.subnode.util.XString;
 
-/** 
+/**
  * Prototype Bean: We instantiate a new instance of this bean every time it's run.
  * 
  * Writes every node under the target subnode (recursively) to an IPFS Mutable File System (MFS)
- * file.
+ * file, and also removes any existing orphans from underneath the MFS path so that MFS is
+ * guaranteed to match the nodes tree perfectly after this operation.
  */
 @Component
 @Scope("prototype")
@@ -35,6 +39,10 @@ public class SyncToIpfsService extends ServiceBase {
 	int totalNodes = 0;
 	int orphansRemoved = 0;
 
+	/*
+	 * Creates MFS files (a folder structure/tree) that are identical in content to the JSON rendering
+	 * of each node, and at the same MFS path as the 'pth' property (Node path)
+	 */
 	public void writeIpfsFiles(MongoSession ms, PublishNodeToIpfsRequest req, PublishNodeToIpfsResponse res) {
 		log.debug("writeIpfsFiles: " + XString.prettyPrint(res));
 		ms = ThreadLocals.ensure(ms);
@@ -53,8 +61,21 @@ public class SyncToIpfsService extends ServiceBase {
 			}
 
 			ipfs.flushFiles(node.getPath());
+
+			// collects all paths into allFilePaths
 			ipfs.traverseDir(node.getPath(), allFilePaths);
 			removeOrphanFiles();
+
+			IPFSDirStat pathStat = ipfs.pathStat(node.getPath());
+			if (pathStat != null) {
+				node.set(NodeProp.IPFS_CID.s(), pathStat.getHash());
+
+				Map<String, Object> ipnsMap = ipfs.ipnsPublish(ms, null, pathStat.getHash());
+				String name = (String)ipnsMap.get("Name");
+				if (name!=null) {
+					node.set(NodeProp.IPNS_CID.s(), name);
+				}
+			}
 
 			success = true;
 		} catch (Exception ex) {
@@ -110,6 +131,8 @@ public class SyncToIpfsService extends ServiceBase {
 		// todo-1: This should be unnecessary but for now we need it.
 		snUtil.removeDefaultProps(node);
 
+		snUtil.removeUnwantedPropsForIPFS(node);
+
 		/*
 		 * todo-1: this and other places needs to generate canonical JSON (basically just sorted properties
 		 * ?) using this??
@@ -124,12 +147,17 @@ public class SyncToIpfsService extends ServiceBase {
 		addFile(fileName, json);
 	}
 
-	private void addFile(String fileName, String content) {
-		if (content.equals(ipfs.readFile(fileName))) {
+	/*
+	 * todo-1: there *is* a way to eliminate the need for the 'checkExisting' flag and make it always
+	 * true but for now the only way to return a CID even if not existing is to attempt to re-add every
+	 * time so we do that for now because it's simpler
+	 */
+	private void addFile(String fileName, String json) {
+		if (json.equals(ipfs.readFile(fileName))) {
 			log.debug("not writing. Content was up to date.");
 			return;
 		}
-		addFile(fileName, content.getBytes(StandardCharsets.UTF_8));
+		addFile(fileName, json.getBytes(StandardCharsets.UTF_8));
 	}
 
 	private void addFile(String fileName, byte[] bytes) {
@@ -137,6 +165,6 @@ public class SyncToIpfsService extends ServiceBase {
 	}
 
 	private void addEntry(String fileName, InputStream stream) {
-		ipfs.addFileFromStream(session, fileName, stream, null, null, null);
+		ipfs.addFileFromStream(session, fileName, stream, null, null);
 	}
 }

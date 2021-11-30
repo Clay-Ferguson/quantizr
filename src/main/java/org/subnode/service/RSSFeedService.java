@@ -84,7 +84,7 @@ public class RSSFeedService extends ServiceBase {
 	private boolean USE_URL_READER = false;
 	private boolean USE_SPRING_READER = true;
 
-	private static final RestTemplate restTemplate = new RestTemplate(Util.getClientHttpRequestFactory());
+	private static final RestTemplate restTemplate = new RestTemplate(Util.getClientHttpRequestFactory(10000));
 
 	/*
 	 * Cache of all feeds.

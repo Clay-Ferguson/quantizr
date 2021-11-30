@@ -104,7 +104,7 @@ export class MenuPanel extends Div {
     static testWebCam = () => { new MediaRecorderDlg(appState(null), true, false).open(); };
     static mouseEffects = () => { S.quanta.toggleMouseEffect(); };
     static showUrls = () => S.render.showNodeUrl(null, appState(null));
-    static showRawData = () => S.view.runServerCommand("getJson", "Node JSON Data", "", appState(null));
+    static showRawData = () => S.view.runServerCommand("getJson", "Node Data", "", appState(null));
     static nodeStats = () => S.view.getNodeStats(appState(null), false, false);
 
     // DO NOT DELETE
@@ -524,9 +524,9 @@ export class MenuPanel extends Div {
         // eslint-disable-next-line no-constant-condition
         if (state.isAdminUser) {
             children.push(new Menu("IPFS", [
-                new MenuItem("Sync: Nodes to IPFS", () => S.util.publishNodeToIpfs(hltNode), //
+                new MenuItem("Sync: To IPFS", () => S.util.publishNodeToIpfs(hltNode), //
                     state.isAdminUser || (S.user.isTestUserAccount(state) && selNodeIsMine)), //
-                new MenuItem("Sync: IPFS to Nodes", () => S.util.loadNodeFromIpfs(hltNode), //
+                new MenuItem("Sync: From IPFS", () => S.util.loadNodeFromIpfs(hltNode), //
                     state.isAdminUser || (S.user.isTestUserAccount(state) && selNodeIsMine)) //
             ]));
         }
