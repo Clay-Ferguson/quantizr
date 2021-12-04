@@ -129,7 +129,7 @@ export class NodeCompButtonBar extends Div {
             openButton = new Button(null, S.nav.openNodeById, {
                 iconclass: "fa fa-folder-open",
                 nid: node.id,
-                title: "Open Node to access its children"
+                title: "Open Node"
             }, "btn-primary");
         }
 
