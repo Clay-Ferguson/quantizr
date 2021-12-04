@@ -380,7 +380,9 @@ public class NodeSearchService extends ServiceBase {
 				limit = TRENDING_LIMIT;
 			}
 
-			iter = read.getSubGraph(ms, searchRoot, sort, limit);
+			// We pass true if this is a basic subgraph (not a Trending analysis), so that running Node Stats
+			// has the side effect of cleaning out orphans.
+			iter = read.getSubGraph(ms, searchRoot, sort, limit, limit == 0 ? true : false);
 		}
 
 		for (SubNode node : iter) {
@@ -444,6 +446,7 @@ public class NodeSearchService extends ServiceBase {
 			}
 			nodeCount++;
 		}
+		
 		List<WordStats> wordList = new ArrayList<>(wordMap.values());
 		List<WordStats> tagList = new ArrayList<>(tagMap.values());
 		List<WordStats> mentionList = new ArrayList<>(mentionMap.values());

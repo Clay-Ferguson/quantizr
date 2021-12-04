@@ -87,6 +87,19 @@ public class MongoDelete extends ServiceBase {
 		}
 	}
 
+	/* This method assumes security check is already done. */
+	public long deleteUnderPath(MongoSession ms, String path) {
+		// log.debug("Deleting under path: " + path);
+		update.saveSession(ms);
+		Query query = new Query();
+		query.addCriteria(Criteria.where(SubNode.FIELD_PATH).regex(mongoUtil.regexRecursiveChildrenOfPath(path)));
+
+		DeleteResult res = ops.remove(query, SubNode.class);
+		// log.debug("Num of SubGraph deleted: " + res.getDeletedCount());
+		long totalDelCount = res.getDeletedCount();
+		return totalDelCount;
+	}
+
 	/**
 	 * Currently cleaning up GridFS orphans is done in gridMaintenanceScan() only, so when we delete one
 	 * ore more nodes, potentially orphaning other nodes or GRID nodes (binary files), those orphans
@@ -138,6 +151,8 @@ public class MongoDelete extends ServiceBase {
 		return totalDelCount;
 	}
 
+	/* Note: We don't even use this becasue it wouldn'd delete the orphans. We always delete using
+	the path prefix query so all subnodes in the subgraph go away (no orphans) */
 	public void delete(SubNode node) {
 		ops.remove(node);
 	}
@@ -152,8 +167,8 @@ public class MongoDelete extends ServiceBase {
 	}
 
 	/*
-	 * This algorithm requires one hash value of memory for every non-leaf node in the DB to run so it's
-	 * very fast but at the cost of memory use
+	 * This algorithm requires on the order of one hash value of memory for every non-leaf node in the
+	 * DB to run so it's very fast but at the cost of memory use
 	 */
 	public void deleteNodeOrphans(MongoSession ms) {
 		log.debug("deleteNodeOrphans()");
@@ -198,7 +213,7 @@ public class MongoDelete extends ServiceBase {
 
 				if (!pathHashSet.contains(DigestUtils.sha256Hex(node.getParentPath()))) {
 					// log.debug("ORPHAN NODE id=" + node.getIdStr() + " path=" + node.getPath() + " Content="
-					// 		+ node.getContent());
+					// + node.getContent());
 					orphanCount++;
 					deleteCount++;
 					ops.remove(node);

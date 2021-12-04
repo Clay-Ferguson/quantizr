@@ -4,13 +4,10 @@ import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.HashSet;
-import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
-import org.subnode.model.IPFSDirStat;
-import org.subnode.model.client.NodeProp;
 import org.subnode.mongo.MongoSession;
 import org.subnode.mongo.model.SubNode;
 import org.subnode.request.PublishNodeToIpfsRequest;
@@ -20,11 +17,18 @@ import org.subnode.util.ThreadLocals;
 import org.subnode.util.XString;
 
 /**
- * Prototype Bean: We instantiate a new instance of this bean every time it's run.
  * 
- * Writes every node under the target subnode (recursively) to an IPFS Mutable File System (MFS)
- * file, and also removes any existing orphans from underneath the MFS path so that MFS is
- * guaranteed to match the nodes tree perfectly after this operation.
+ * Writes every node under the target subnode (recursively) to an IPFS Mutable File System (MFS) and
+ * also removes any existing orphans from underneath the MFS path so that MFS is guaranteed to match
+ * the nodes tree perfectly after this operation. The 'pth' (path) property on the node is used as
+ * the path for MFS.
+ * 
+ * Security: Note that for now, until encryption is added we only write the 'public' nodes to IPFS
+ * because IPFS is a public system, and currently the simple algo for this is to require that the
+ * ACTUAL node being saved into IPFS must itself be 'public' which by deinition means all children
+ * of it are public.
+ * 
+ * Spring 'Prototype-scope Bean': We instantiate a new instance of this bean every time it's run.
  */
 @Component
 @Scope("prototype")
@@ -40,8 +44,8 @@ public class SyncToIpfsService extends ServiceBase {
 	int orphansRemoved = 0;
 
 	/*
-	 * Creates MFS files (a folder structure/tree) that are identical in content to the JSON rendering
-	 * of each node, and at the same MFS path as the 'pth' property (Node path)
+	 * Creates MFS files (a folder structure/tree) that are identical in content to the JSON of each
+	 * node, and at the same MFS path as the 'pth' property (Node path)
 	 */
 	public void writeIpfsFiles(MongoSession ms, PublishNodeToIpfsRequest req, PublishNodeToIpfsResponse res) {
 		log.debug("writeIpfsFiles: " + XString.prettyPrint(res));
@@ -50,10 +54,14 @@ public class SyncToIpfsService extends ServiceBase {
 		String nodeId = req.getNodeId();
 		SubNode node = read.getNode(ms, nodeId);
 
+		if (!AclService.isPublic(ms, node)) {
+			throw new RuntimeException("This experimental IPFS feature only works for public nodes.");
+		}
+
 		boolean success = false;
 		try {
 			auth.ownerAuth(ms, node);
-			Iterable<SubNode> results = read.getSubGraph(ms, node, null, 0);
+			Iterable<SubNode> results = read.getSubGraph(ms, node, null, 0, true);
 
 			processNode(node);
 			for (SubNode n : results) {
@@ -66,16 +74,22 @@ public class SyncToIpfsService extends ServiceBase {
 			ipfs.traverseDir(node.getPath(), allFilePaths);
 			removeOrphanFiles();
 
-			IPFSDirStat pathStat = ipfs.pathStat(node.getPath());
-			if (pathStat != null) {
-				node.set(NodeProp.IPFS_CID.s(), pathStat.getHash());
+			// DO NOT DELETE
+			// For a "Federated" type of install we will be doing IPNS publish from a browser-only instantiation 
+			// of IPFS so the server never has access to any keys, but this would require an 'always-on' up-time
+			// for the IPNS name to stay active I think. However once "IPNSPubSub" is working (or even doing it ourselves,
+			// with plain IPFSPubSub we can potentially broadcast our new CID for any updated IPNS to all "listening" clients.
+			//
+			// IPFSDirStat pathStat = ipfs.pathStat(node.getPath());
+			// if (pathStat != null) {
+			// 	node.set(NodeProp.IPFS_CID.s(), pathStat.getHash());
 
-				Map<String, Object> ipnsMap = ipfs.ipnsPublish(ms, null, pathStat.getHash());
-				String name = (String)ipnsMap.get("Name");
-				if (name!=null) {
-					node.set(NodeProp.IPNS_CID.s(), name);
-				}
-			}
+			// 	Map<String, Object> ipnsMap = ipfs.ipnsPublish(ms, null, pathStat.getHash());
+			// 	String name = (String) ipnsMap.get("Name");
+			// 	if (name != null) {
+			// 		node.set(NodeProp.IPNS_CID.s(), name);
+			// 	}
+			// }
 
 			success = true;
 		} catch (Exception ex) {

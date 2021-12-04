@@ -308,14 +308,14 @@ public class NodeMoveService extends ServiceBase {
 
 	private void changePathOfSubGraph(MongoSession ms, SubNode graphRoot, String newPathPrefix) {
 		String originalPath = graphRoot.getPath();
-		log.debug("originalPath (graphRoot.path): " + originalPath);
+		// log.debug("originalPath (graphRoot.path): " + originalPath);
 		int originalParentPathLen = graphRoot.getParentPath().length();
 
-		for (SubNode node : read.getSubGraph(ms, graphRoot, null, 0)) {
+		for (SubNode node : read.getSubGraph(ms, graphRoot, null, 0, true)) {
 			if (!node.getPath().startsWith(originalPath)) {
 				throw new RuntimeEx("Algorighm failure: path " + node.getPath() + " should have started with " + originalPath);
 			}
-			log.debug("PROCESSING MOVE: oldPath: " + node.getPath());
+			// log.debug("PROCESSING MOVE: oldPath: " + node.getPath());
 
 			String pathSuffix = node.getPath().substring(originalParentPathLen + 1);
 			String newPath = newPathPrefix + "/" + pathSuffix;

@@ -48,6 +48,13 @@ public class SystemService extends ServiceBase {
 		return "success.";
 	}
 
+	/* This was created to make it easier to test the orphan handling functions, so we can intentionally create orphans */
+	public String deleteLeavingOrphans(MongoSession ms, String nodeId) {
+		SubNode node = read.getNode(ms, nodeId);
+		delete.delete(node);
+		return "Success.";
+	}
+
 	public String compactDb() {
 		delete.deleteNodeOrphans(null);
 		// do not delete.

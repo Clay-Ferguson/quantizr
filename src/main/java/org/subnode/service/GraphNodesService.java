@@ -42,7 +42,7 @@ public class GraphNodesService extends ServiceBase {
 
 			// Run subgraph query to get all nodes if no search text provided
 			if (StringUtils.isEmpty(req.getSearchText())) {
-				results = read.getSubGraph(ms, node, null, 0);
+				results = read.getSubGraph(ms, node, null, 0, true);
 			}
 			// If search text provided run subgraph search.
 			else {

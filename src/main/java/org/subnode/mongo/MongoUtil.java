@@ -3,15 +3,12 @@ package org.subnode.mongo;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
 import java.util.StringTokenizer;
 import java.util.regex.Pattern;
-import com.mongodb.client.MongoCollection;
-import com.mongodb.client.MongoCursor;
-import com.mongodb.client.MongoDatabase;
 import org.apache.commons.codec.digest.DigestUtils;
-import org.bson.Document;
 import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -69,6 +66,62 @@ public class MongoUtil extends ServiceBase {
 	// }
 	// ops.execute();
 	//
+
+	/*
+	 * The set of nodes in here MUST be known to be from an UNFILTERED and COMPLETE SubGraph query or
+	 * else this WILL result in DATA LOSS!
+	 * 
+	 * Note: rootNode will not be included in 'nodes'.
+	 * 
+	 * Most places we do a call like this: Iterable<SubNode> results = read.getSubGraph(ms, node, null,
+	 * 0); We will be better off to filterOutOrphans from the returned list before processing it.
+	 *
+	 */
+	public LinkedList<SubNode> filterOutOrphans(MongoSession ms, SubNode rootNode, Iterable<SubNode> nodes) {
+		LinkedList<SubNode> ret = new LinkedList<>();
+
+		// log.debug("Removing Orphans.");
+		HashSet<String> paths = new HashSet<>();
+
+		// this just helps us avoide redundant delete attempts
+		HashSet<String> pathsRemoved = new HashSet<>();
+
+		// log.debug("ROOT PTH: " + rootNode.getPath() + " content: " + rootNode.getContent());
+		paths.add(rootNode.getPath());
+
+		// Add all the paths
+		for (SubNode node : nodes) {
+			// log.debug("PTH: " + node.getPath() + " content: " + node.getContent());
+			paths.add(node.getPath());
+		}
+
+		// now identify all nodes that don't have a parent in the list
+		// todo-0: need to be ignoring the root one!
+		for (SubNode node : nodes) {
+			String parentPath = node.getParentPath();
+
+			// if parentPath not in paths this is an orphan
+			if (!paths.contains(parentPath)) {
+				// log.debug("ORPHAN: " + parentPath);
+
+				// if we haven't alread seen this parent path and deleted under it.
+				if (!pathsRemoved.contains(parentPath)) {
+					pathsRemoved.add(parentPath);
+					
+					// Since we know this parent doesn't exist we can delete all nodes that fall under it
+					// which would remove ALL siblings that are also orphans. Using this kind of pattern:
+					// ${parantPath}/* (that is, we append a slash and then find anything starting with that)
+					delete.deleteUnderPath(ms, parentPath);
+					// NOTE: we can also go ahead and DELETE these orphans as found (from the DB)
+				}
+			}
+			// otherwise add to our output results.
+			else {
+				ret.add(node);
+			}
+		}
+		return ret;
+	}
 
 	/**
 	 * This find method should wrap ALL queries to that we can run out code inside this NodeIterable
@@ -429,10 +482,12 @@ public class MongoUtil extends ServiceBase {
 		logIndexes(ms, SubNode.class);
 	}
 
-	/* Creates an index which will guarantee no duplicate friends can be 
-	created. Note this one index also makes it impossible to have the same user both blocked and followed
-	becasue those are both saved as FRIEND nodes on the tree and therefore would violate this constraint
-	which is exactly what we want. */
+	/*
+	 * Creates an index which will guarantee no duplicate friends can be created. Note this one index
+	 * also makes it impossible to have the same user both blocked and followed becasue those are both
+	 * saved as FRIEND nodes on the tree and therefore would violate this constraint which is exactly
+	 * what we want.
+	 */
 	public void createUniqueFriendsIndex(MongoSession ms) {
 		auth.requireAdmin(ms);
 		update.saveSession(ms);
@@ -499,8 +554,7 @@ public class MongoUtil extends ServiceBase {
 	 * WARNING: I wote this but never tested it, nor did I ever find any examples online. Ended up not
 	 * needing any compound indexes (yet)
 	 */
-	public void createPartialUniqueIndexComp2(MongoSession ms, String name, Class<?> clazz, String property1,
-			String property2) {
+	public void createPartialUniqueIndexComp2(MongoSession ms, String name, Class<?> clazz, String property1, String property2) {
 		auth.requireAdmin(ms);
 		update.saveSession(ms);
 
@@ -692,8 +746,7 @@ public class MongoUtil extends ServiceBase {
 
 		SubNode adminNode = read.getUserNodeByUserName(ms, adminUser);
 		if (adminNode == null) {
-			adminNode =
-					snUtil.ensureNodeExists(ms, "/", NodeName.ROOT, null, "Root", NodeType.REPO_ROOT.s(), true, null, null);
+			adminNode = snUtil.ensureNodeExists(ms, "/", NodeName.ROOT, null, "Root", NodeType.REPO_ROOT.s(), true, null, null);
 
 			adminNode.set(NodeProp.USER.s(), PrincipalName.ADMIN.s());
 			adminNode.set(NodeProp.USER_PREF_EDIT_MODE.s(), false);
@@ -745,8 +798,7 @@ public class MongoUtil extends ServiceBase {
 				null, created);
 
 		if (created.getVal()) {
-			acl.addPrivilege(ms, publicWelcome, PrincipalName.PUBLIC.s(), Arrays.asList(PrivilegeType.READ.s()),
-					null);
+			acl.addPrivilege(ms, publicWelcome, PrincipalName.PUBLIC.s(), Arrays.asList(PrivilegeType.READ.s()), null);
 		}
 
 		log.debug("Welcome Page Node exists at id: " + publicWelcome.getId() + " path=" + publicWelcome.getPath());

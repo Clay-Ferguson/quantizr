@@ -533,7 +533,14 @@ public class MongoRead extends ServiceBase {
     /*
      * Gets (recursively) all nodes under 'node', by using all paths starting with the path of that node
      */
-    public Iterable<SubNode> getSubGraph(MongoSession ms, SubNode node, Sort sort, int limit) {
+    public Iterable<SubNode> getSubGraph(MongoSession ms, SubNode node, Sort sort, int limit, boolean removeOrphans) {
+
+        // The removeOrphans algo REQUIRES all nodes to be returned (NO LIMIT) or else it would cause a massive
+        // loss of data by removing nodes that are NOT orphans!!!
+        // DO NOT REMOVE THIS CHECK!!!
+        if (removeOrphans && limit > 0) {
+            throw new RuntimeException("getSubGraph: invalid parameters");
+        }
         auth.auth(ms, node, PrivilegeType.READ);
 
         Query query = new Query();
@@ -556,7 +563,8 @@ public class MongoRead extends ServiceBase {
             query.limit(limit);
         }
 
-        return mongoUtil.find(query);
+        Iterable<SubNode> iter = mongoUtil.find(query);
+        return removeOrphans ? mongoUtil.filterOutOrphans(ms, node, iter) : iter;
     }
 
     /**

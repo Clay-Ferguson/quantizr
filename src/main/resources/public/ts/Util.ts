@@ -720,6 +720,7 @@ export class Util implements UtilIntf {
     }
 
     showMessage = (message: string, title: string, preformatted: boolean = false, sizeStyle: string = null): Promise<DialogBase> => {
+        if (!message) return;
         return new MessageDlg(message, title, null, null, preformatted, 0, null, null).open();
     }
 

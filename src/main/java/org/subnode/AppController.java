@@ -1240,6 +1240,10 @@ public class AppController extends ServiceBase implements ErrorController {
 					res.getMessages().add(new InfoMessage(system.compactDb(), null));
 					break;
 
+				case "deleteLeavingOrphans":
+					res.getMessages().add(new InfoMessage(system.deleteLeavingOrphans(ms, req.getNodeId()), null));
+					break;
+
 				case "validateDb":
 					res.getMessages().add(new InfoMessage(system.validateDb(), null));
 					break;
