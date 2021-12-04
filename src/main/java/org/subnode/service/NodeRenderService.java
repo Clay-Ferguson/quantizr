@@ -429,6 +429,13 @@ public class NodeRenderService extends ServiceBase {
 			dir = orderBy.substring(spaceIdx + 1);
 			sort = Sort.by(dir.equals("asc") ? Sort.Direction.ASC : Sort.Direction.DESC,
 					SubNode.FIELD_PROPERTIES + "." + orderByProp);
+
+			// when sorting by priority always do second leve REV-CHRON sort, so newest un-prioritized nodes appear at top
+			// todo-1: probably would be better to to just make this orderBy parser handle comma-delimited sort list
+			// which is not a difficult change
+			if (orderByProp.equals(NodeProp.PRIORITY.s())) {
+				sort = sort.and(Sort.by(Sort.Direction.DESC, SubNode.FIELD_MODIFY_TIME));
+			}
 		}
 		return sort;
 	}
