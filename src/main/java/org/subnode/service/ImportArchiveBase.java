@@ -125,7 +125,7 @@ public abstract class ImportArchiveBase extends ServiceBase {
 			if (node == null) {
 				throw new RuntimeEx("Unable to find node by id: " + nodeId);
 			}
-			Long length = node.getInt(NodeProp.BIN_SIZE.s());
+			Long length = node.getInt(NodeProp.BIN_SIZE);
 			String mimeType = node.getStr(NodeProp.BIN_MIME.s());
 			LimitedInputStreamEx lzis = new LimitedInputStreamEx(zis, Integer.MAX_VALUE);
 

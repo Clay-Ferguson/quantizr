@@ -165,7 +165,7 @@ public class Convert extends ServiceBase {
 		}
 
 		if (allowInlineChildren) {
-			boolean hasInlineChildren = node.getBool(NodeProp.INLINE_CHILDREN.s());
+			boolean hasInlineChildren = node.getBool(NodeProp.INLINE_CHILDREN);
 			if (hasInlineChildren) {
 				Iterable<SubNode> nodeIter =
 						read.getChildren(ms, node, Sort.by(Sort.Direction.ASC, SubNode.FIELD_ORDINAL), 100, 0);
@@ -199,12 +199,12 @@ public class Convert extends ServiceBase {
 		ImageSize imageSize = new ImageSize();
 
 		try {
-			Long width = node.getInt(NodeProp.IMG_WIDTH.s());
+			Long width = node.getInt(NodeProp.IMG_WIDTH);
 			if (width != null) {
 				imageSize.setWidth(width.intValue());
 			}
 
-			Long height = node.getInt(NodeProp.IMG_HEIGHT.s());
+			Long height = node.getInt(NodeProp.IMG_HEIGHT);
 			if (height != null) {
 				imageSize.setHeight(height.intValue());
 			}

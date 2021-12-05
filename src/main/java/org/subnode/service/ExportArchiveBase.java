@@ -394,7 +394,7 @@ public abstract class ExportArchiveBase extends ServiceBase {
 						is = attach.getStream(ms, "", node, false);
 						if (is != null) {
 							BufferedInputStream bis = new BufferedInputStream(is);
-							long length = node.getInt(NodeProp.BIN_SIZE.s());
+							long length = node.getInt(NodeProp.BIN_SIZE);
 							String binFileName = parentFolder + "/" + fileName + "/" + nodeId + ext;
 
 							if (length > 0) {

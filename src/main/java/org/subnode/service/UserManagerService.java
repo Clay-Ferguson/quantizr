@@ -302,7 +302,7 @@ public class UserManagerService extends ServiceBase {
 		}
 
 		// get the size of the attachment on this node
-		long binSize = node.getInt(NodeProp.BIN_SIZE.s());
+		long binSize = node.getInt(NodeProp.BIN_SIZE);
 		if (binSize > 0L) {
 			// log.debug("Will +/- amt: " + binSize);
 
@@ -324,7 +324,7 @@ public class UserManagerService extends ServiceBase {
 		}
 
 		// get the current binTotal on the user account (max they are allowed to upload)
-		Long binTotal = userNode.getInt(NodeProp.BIN_TOTAL.s());
+		Long binTotal = userNode.getInt(NodeProp.BIN_TOTAL);
 		if (binTotal == null) {
 			binTotal = 0L;
 		}
@@ -335,7 +335,7 @@ public class UserManagerService extends ServiceBase {
 			binTotal = 0L;
 		}
 
-		Long userQuota = userNode.getInt(NodeProp.BIN_QUOTA.s());
+		Long userQuota = userNode.getInt(NodeProp.BIN_QUOTA);
 		if (!ms.isAdmin() && binTotal > userQuota) {
 			throw new OutOfSpaceException();
 		}
@@ -362,7 +362,7 @@ public class UserManagerService extends ServiceBase {
 			SubNode node = read.getNode(session, signupCode);
 
 			if (node != null) {
-				if (!node.getBool(NodeProp.SIGNUP_PENDING.s())) {
+				if (!node.getBool(NodeProp.SIGNUP_PENDING)) {
 					return "Signup Complete. You may login now.";
 				} else {
 					String userName = node.getStr(NodeProp.USER.s());
@@ -543,8 +543,8 @@ public class UserManagerService extends ServiceBase {
 
 			try {
 				// foreign users won't have these.
-				Long binQuota = userNode.getInt(NodeProp.BIN_QUOTA.s());
-				Long binTotal = userNode.getInt(NodeProp.BIN_TOTAL.s());
+				Long binQuota = userNode.getInt(NodeProp.BIN_QUOTA);
+				Long binTotal = userNode.getInt(NodeProp.BIN_TOTAL);
 
 				// I really need to convert these props to Integers not Strings
 				res.setBinQuota(binQuota == null ? -1 : binQuota.intValue());
@@ -863,17 +863,17 @@ public class UserManagerService extends ServiceBase {
 			if (prefsNode == null) {
 				prefsNode = read.getUserNodeByUserName(session, userName);
 			}
-			userPrefs.setEditMode(prefsNode.getBool(NodeProp.USER_PREF_EDIT_MODE.s()));
-			userPrefs.setShowMetaData(prefsNode.getBool(NodeProp.USER_PREF_SHOW_METADATA.s()));
-			userPrefs.setRssHeadlinesOnly(prefsNode.getBool(NodeProp.USER_PREF_RSS_HEADINGS_ONLY.s()));
+			userPrefs.setEditMode(prefsNode.getBool(NodeProp.USER_PREF_EDIT_MODE));
+			userPrefs.setShowMetaData(prefsNode.getBool(NodeProp.USER_PREF_SHOW_METADATA));
+			userPrefs.setRssHeadlinesOnly(prefsNode.getBool(NodeProp.USER_PREF_RSS_HEADINGS_ONLY));
 
-			long maxFileSize = prefsNode.getInt(NodeProp.BIN_QUOTA.s());
+			long maxFileSize = prefsNode.getInt(NodeProp.BIN_QUOTA);
 			if (maxFileSize == 0) {
 				maxFileSize = Const.DEFAULT_USER_QUOTA;
 			}
 			userPrefs.setMaxUploadFileSize(maxFileSize);
 
-			long mainPanelCols = prefsNode.getInt(NodeProp.USER_PREF_MAIN_PANEL_COLS.s());
+			long mainPanelCols = prefsNode.getInt(NodeProp.USER_PREF_MAIN_PANEL_COLS);
 			if (mainPanelCols == 0) {
 				mainPanelCols = 5;
 			}
@@ -1165,7 +1165,7 @@ public class UserManagerService extends ServiceBase {
 		}
 
 		SubNode userNode = read.getUserNodeByUserName(auth.getAdminSession(), ThreadLocals.getSC().getUserName());
-		long ret = userNode.getInt(NodeProp.BIN_QUOTA.s());
+		long ret = userNode.getInt(NodeProp.BIN_QUOTA);
 		if (ret == 0) {
 			return Const.DEFAULT_USER_QUOTA;
 		}

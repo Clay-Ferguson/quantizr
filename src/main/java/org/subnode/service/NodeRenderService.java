@@ -557,7 +557,7 @@ public class NodeRenderService extends ServiceBase {
 
 			item.setTitle(content);
 			item.setId(n.getIdStr());
-			item.setStart(n.getInt(NodeProp.DATE.s()));
+			item.setStart(n.getInt(NodeProp.DATE));
 
 			String durationStr = n.getStr(NodeProp.DURATION.s());
 			long duration = DateUtil.getMillisFromDuration(durationStr);

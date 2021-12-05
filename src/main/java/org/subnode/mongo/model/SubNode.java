@@ -27,38 +27,15 @@ import org.subnode.util.Util;
 import org.subnode.util.XString;
 
 /**
- * Node paths are like:
- * 
- * /id1/id2/id2
- * 
- * Any nodes that are 'named' can have friendly names right in the path in leu of any or all IDs.
- * Requirement for a successful insert is merely that the parent must exist.
- * 
- * Forward slash delimited ids.
- * 
- * Basic path strategy:
- * 
- * https://docs.mongodb.com/manual/applications/data-models-tree-structures/
- * 
- * Node ordering of child nodes is done via 'ordinal' which is child position index.
- * 
- * todo-2: One enhancement here would be to let all the 'setter' methods check to see if it is
- * genuinely CHANGING the value as opposed to keeping same value, and in that case avoid the call to
- * MongoSession.dirty(this);
- * 
- * todo-2: Also similar to above note, a 'dirty' flag right inside this object would be good, to set
- * so that even direct calls to api.save(node) would bypass any actual saving if the object is known
- * to not be dirty. (Don't forget to default to 'dirty==true' for all new objects created, but not
- * ones loaded from DB. Be carful with this! This would be a very LATE STAGE optimization.)
+ * The primary element of storage for the entire Quanta DB.
  * 
  * todo-p0: should all @JsonIgnores in here also be @Transient ?
  */
 @Document(collection = "nodes")
 @TypeAlias("n1")
 @JsonInclude(Include.NON_NULL)
-@JsonPropertyOrder({SubNode.FIELD_PATH, SubNode.FIELD_CONTENT, SubNode.FIELD_NAME, SubNode.FIELD_ID,
-		SubNode.FIELD_ORDINAL, SubNode.FIELD_OWNER, SubNode.FIELD_CREATE_TIME,
-		SubNode.FIELD_MODIFY_TIME, SubNode.FIELD_AC, SubNode.FIELD_PROPERTIES})
+@JsonPropertyOrder({SubNode.FIELD_PATH, SubNode.FIELD_CONTENT, SubNode.FIELD_NAME, SubNode.FIELD_ID, SubNode.FIELD_ORDINAL,
+		SubNode.FIELD_OWNER, SubNode.FIELD_CREATE_TIME, SubNode.FIELD_MODIFY_TIME, SubNode.FIELD_AC, SubNode.FIELD_PROPERTIES})
 public class SubNode {
 	private static final Logger log = LoggerFactory.getLogger(SubNode.class);
 	public static final String FIELD_ID = "_id";
@@ -294,6 +271,7 @@ public class SubNode {
 		}
 	}
 
+	@Transient
 	@JsonIgnore
 	public HashMap<String, AccessControl> safeGetAc() {
 		synchronized (acLock) {
@@ -339,6 +317,7 @@ public class SubNode {
 		}
 	}
 
+	@Transient
 	@JsonIgnore
 	public boolean set(String key, Object val) {
 		ThreadLocals.dirty(this);
@@ -356,6 +335,7 @@ public class SubNode {
 		}
 	}
 
+	@Transient
 	@JsonIgnore
 	public void delete(String key) {
 		ThreadLocals.dirty(this);
@@ -370,6 +350,7 @@ public class SubNode {
 		return getStr(prop.s());
 	}
 
+	@Transient
 	@JsonIgnore
 	public String getStr(String key) {
 		try {
@@ -386,6 +367,13 @@ public class SubNode {
 		}
 	}
 
+	@Transient
+	@JsonIgnore
+	public Long getInt(NodeProp prop) {
+		return getInt(prop.s());
+	}
+
+	@Transient
 	@JsonIgnore
 	public Long getInt(String key) {
 		try {
@@ -415,6 +403,13 @@ public class SubNode {
 		}
 	}
 
+	@Transient
+	@JsonIgnore
+	public Date getDate(NodeProp prop) {
+		return getDate(prop.s());
+	}
+
+	@Transient
 	@JsonIgnore
 	public Date getDate(String key) {
 		try {
@@ -429,6 +424,13 @@ public class SubNode {
 		}
 	}
 
+	@Transient
+	@JsonIgnore
+	public Double getFloat(NodeProp prop) {
+		return getFloat(prop.s());
+	}
+
+	@Transient
 	@JsonIgnore
 	public Double getFloat(String key) {
 		try {
@@ -444,6 +446,13 @@ public class SubNode {
 		}
 	}
 
+	@Transient
+	@JsonIgnore
+	public Boolean getBool(NodeProp prop) {
+		return getBool(prop.s());
+	}
+
+	@Transient
 	@JsonIgnore
 	public Boolean getBool(String key) {
 		try {
@@ -468,6 +477,7 @@ public class SubNode {
 		}
 	}
 
+	@Transient
 	@JsonIgnore
 	private SubNodePropertyMap properties() {
 		synchronized (propLock) {
@@ -478,11 +488,13 @@ public class SubNode {
 		}
 	}
 
+	@Transient
 	@JsonIgnore
 	public boolean isType(NodeType type) {
 		return type.s().equals(this.type);
 	}
 
+	@Transient
 	@JsonIgnore
 	public boolean hasProperty(NodeProp prop) {
 		synchronized (propLock) {

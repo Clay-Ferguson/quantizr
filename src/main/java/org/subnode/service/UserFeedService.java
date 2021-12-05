@@ -71,7 +71,7 @@ public class UserFeedService extends ServiceBase {
 
 		SubNode searchRoot = read.getNode(ms, sc.getRootId());
 
-		Long lastActiveLong = searchRoot.getInt(NodeProp.LAST_ACTIVE_TIME.s());
+		Long lastActiveLong = searchRoot.getInt(NodeProp.LAST_ACTIVE_TIME);
 		if (lastActiveLong == 0) {
 			return res;
 		}

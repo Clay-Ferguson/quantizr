@@ -135,13 +135,13 @@ public class AttachmentService extends ServiceBase {
 				SubNode userNode = read.getUserNodeByUserName(null, null);
 
 				// get how many bytes of storage the user currently holds
-				Long binTotal = userNode.getInt(NodeProp.BIN_TOTAL.s());
+				Long binTotal = userNode.getInt(NodeProp.BIN_TOTAL);
 				if (binTotal == null) {
 					binTotal = 0L;
 				}
 
 				// get max amount user is allowed
-				Long userQuota = userNode.getInt(NodeProp.BIN_QUOTA.s());
+				Long userQuota = userNode.getInt(NodeProp.BIN_QUOTA);
 
 				for (MultipartFile uploadFile : uploadFiles) {
 					binTotal += uploadFile.getSize();
@@ -656,7 +656,7 @@ public class AttachmentService extends ServiceBase {
 			// }
 			// startTime = System.currentTimeMillis();
 
-			long size = node.getInt(NodeProp.BIN_SIZE.s());
+			long size = node.getInt(NodeProp.BIN_SIZE);
 
 			if (size == 0) {
 				throw new RuntimeEx("Can't stream video without the file size. BIN_SIZE property missing");
