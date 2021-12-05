@@ -97,6 +97,11 @@ public enum NodeProp {
     // type of the node to "sn:ipfsNode" (IPFS_NODE)
     IPFS_CID("ipfs:cid", "s"),
     IPNS_CID("ipns:cid", "s"),
+
+    // Represents an IPFS CID that is aht "Source" for the data in such a way that we assume
+    // the IPFS content will supercede (and take precedence), so that we can always read from IPFS
+    // and make that content be the content in our DB with fear of overwriting anything.
+    IPFS_SCID("ipfs:scid", "s"),
     
     // When a node has this IPFS_REF property it means the IPFS_LINK on the node is completely external to us
     // and might not even be pinned on our gateway. REF means reference (external reference, from some other gateway)

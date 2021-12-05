@@ -11,9 +11,11 @@ import org.subnode.model.DagLink;
 import org.subnode.model.DagNode;
 import org.subnode.model.IPFSDir;
 import org.subnode.model.IPFSDirEntry;
+import org.subnode.model.client.NodeProp;
 import org.subnode.mongo.MongoSession;
 import org.subnode.mongo.model.SubNode;
 import org.subnode.mongo.model.SubNodeIdentity;
+import org.subnode.mongo.model.SubNodePojo;
 import org.subnode.request.LoadNodeFromIpfsRequest;
 import org.subnode.response.LoadNodeFromIpfsResponse;
 import org.subnode.util.ExUtil;
@@ -62,15 +64,20 @@ public class SyncFromIpfsService extends ServiceBase {
 		this.session = ms;
 
 		try {
+			// if the path is a CID we load from CID however this flow path was never perfected/finised and was
+			// only ever a partially complete experiment
 			if (!req.getPath().startsWith("/")) {
-				if (traverseDag(req.getPath())) {
+				if (traverseDag(null, req.getPath(), 3)) {
 					res.setMessage(buildReport());
 					res.setSuccess(true);
 				} else {
 					res.setMessage("Unable to process: " + req.getPath());
 					res.setSuccess(false);
 				}
-			} else {
+			}
+			// Loading from an actual MFS path was completed, but is not very usable becasue we can only
+			// access data from the local MFS
+			else {
 				if (processPath(req.getPath())) {
 					res.setMessage(buildReport());
 					res.setSuccess(true);
@@ -84,7 +91,19 @@ public class SyncFromIpfsService extends ServiceBase {
 		}
 	}
 
-	public boolean traverseDag(String cid) {
+	public boolean loadNode(MongoSession ms, SubNode node) {
+		String cid = node.getStr(NodeProp.IPFS_SCID);
+		traverseDag(node, cid, 1);
+		return true;
+	}
+
+	/*
+	 * WORK IN PROGRESS: This code will be the core of how we can have an IPFS explorer capability that
+	 * can explore a DAG.
+	 * 
+	 * recursive will be the number of depth levels left allowed
+	 */
+	public boolean traverseDag(SubNode node, String cid, int recursive) {
 		boolean success = false;
 		DagNode dag = ipfs.getDagNode(cid);
 		if (dag != null) {
@@ -97,31 +116,40 @@ public class SyncFromIpfsService extends ServiceBase {
 			for (DagLink entry : dag.getLinks()) {
 				String entryCid = entry.getCid().getPath();
 
-				// we detect directory names as not having period in them
-				if (entry.getName().indexOf(".") == -1) {
-					traverseDag(entryCid);
-				}
-				// else process a file
-				else {
-					/*
-					 * as a workaround to the IPFS bug, we rely on the logic of "if not a json file, it's a folder
-					 */
-					if (!entry.getName().endsWith(".json")) {
-						traverseDag(entry.getCid().getPath());
+				/*
+				 * we rely on the logic of "if not a json file, it's a folder
+				 */
+				if (!entry.getName().endsWith(".json")) {
+					if (recursive > 0) {
+
+						// Incomplete: Left off working here. Need to crate newNode as a child of 'node', and put the
+						// entry.getCid.getPath() onto it's 'ipfs:scid' (make it explorable), and for now we could either
+						// just put it's CID also in as the text for it, or else actually read the text-content from the
+						// JSON
+						// (But we'd need to first query all subnodes under 'node' so we can be sure not to recreate any
+						// duplidate nodes in case this scid already exists).
+						// Also once we DO load a level we'd need to set a flag on the node to indicate we DID read it
+						// and to avoid attempting to traverse any node that's already fully loaded.
+						SubNode newNode = null;
+
+						traverseDag(newNode, entry.getCid().getPath(), recursive - 1);
+					}
+				} else {
+					// read the node json from ipfs file
+					String json = ipfs.catToString(entryCid);
+					if (json == null) {
+						log.debug("fileReadFailed: " + entryCid);
+						failedFiles++;
 					} else {
-						// read the node json from ipfs file
-						String json = ipfs.catToString(entryCid);
-						if (json == null) {
-							log.debug("fileReadFailed: " + entryCid);
-							failedFiles++;
-						} else {
-							log.debug("json: " + json);
-							/*
-							 * The proof-of-concept works, and we can injest all the JSON from IPFS DAG right here but until we
-							 * have a firm design for how to use this we can't make more progress. One approach is that we just
-							 * build a DAG-Explorer from here, and only ever traverse one level of the DAT at a time as a user
-							 * calls "renderNode" by expanding stuff.
-							 */
+						log.debug("json: " + json);
+
+						try {
+							SubNodePojo nodePojo = jsonMapper.readValue(json, SubNodePojo.class);
+							log.debug("nodePojo Parsed: " + XString.prettyPrint(nodePojo));
+							// update.save(session, nodePojo);
+							log.debug("Created Node: " + nodePojo.getId());
+						} catch (Exception e) {
+							// todo-0
 						}
 					}
 				}
@@ -152,7 +180,7 @@ public class SyncFromIpfsService extends ServiceBase {
 				// else process a file
 				else {
 					/*
-					 * as a workaround to the IPFS bug, we rely on the logic of "if not a json file, it's a folder
+					 * we rely on the logic of "if not a json file, it's a folder
 					 */
 					if (!entry.getName().endsWith(".json")) {
 						processPath(entryPath);
@@ -169,10 +197,12 @@ public class SyncFromIpfsService extends ServiceBase {
 							SubNodeIdentity node = null;
 							try {
 								/*
+								 * UPDATE: Now that we have SubNodePojo.java for deseralizing we no longer need SubNodeIdentity
+								 * and we can refactor it out.
+								 * 
 								 * todo-1: WARNING! Simply deserializing a SubNode object causes it to become a REAL node and
-								 * behave as if it were inserted into the DB, so that after json parses it even the
-								 * 'read.getNode()' Mongo query will find it and 'claim' that it's been inserted into the DB
-								 * already.
+								 * behave as if it were inserted into the DB, so that after json parses it 'read.getNode()' Mongo
+								 * query will immediately find it and 'claim' that it's been inserted into the DB already.
 								 * 
 								 * todo-0: reading this comment a year later I'm confused. I need to find out how calling
 								 * jsonMapper.readValue was actually interting into DB. Look into the constructor and see how/why

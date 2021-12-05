@@ -10,6 +10,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;
 import org.springframework.ui.Model;
+import org.subnode.config.SpringContextUtil;
 import org.subnode.exception.NodeAuthFailedException;
 import org.subnode.exception.base.RuntimeEx;
 import org.subnode.model.BreadcrumbInfo;
@@ -104,6 +105,11 @@ public class NodeRenderService extends ServiceBase {
 		if (node == null) {
 			res.setNoDataResponse("Node not found.");
 			return res;
+		}
+
+		if (node.getStr(NodeProp.IPFS_SCID) != null) {
+			SyncFromIpfsService svc = (SyncFromIpfsService) SpringContextUtil.getBean(SyncFromIpfsService.class);
+			svc.loadNode(ms, node);
 		}
 
 		LinkedList<BreadcrumbInfo> breadcrumbs = new LinkedList<>();

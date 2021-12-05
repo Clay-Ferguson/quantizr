@@ -149,7 +149,7 @@ public class SubNode {
 	@PersistenceConstructor
 	public SubNode() {
 		/*
-		 * WARNING: Do NOT initialize times (mod time or create time) in here this constructor gets called
+		 * WARNING: Do NOT initialize times (mod time or create time) in here. This constructor gets called
 		 * any time the persistence engine loads a node!!!!
 		 */
 	}
