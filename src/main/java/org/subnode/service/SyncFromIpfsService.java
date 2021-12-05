@@ -149,7 +149,7 @@ public class SyncFromIpfsService extends ServiceBase {
 							// update.save(session, nodePojo);
 							log.debug("Created Node: " + nodePojo.getId());
 						} catch (Exception e) {
-							// todo-0
+							// todo
 						}
 					}
 				}
@@ -203,11 +203,6 @@ public class SyncFromIpfsService extends ServiceBase {
 								 * todo-1: WARNING! Simply deserializing a SubNode object causes it to become a REAL node and
 								 * behave as if it were inserted into the DB, so that after json parses it 'read.getNode()' Mongo
 								 * query will immediately find it and 'claim' that it's been inserted into the DB already.
-								 * 
-								 * todo-0: reading this comment a year later I'm confused. I need to find out how calling
-								 * jsonMapper.readValue was actually interting into DB. Look into the constructor and see how/why
-								 * what was happening. JSON marshalling alone should NOT insert something into the DB right? -- OR
-								 * -- actually some kind of MongoDB annotations may be making MongoDB hook into it actually.
 								 * 
 								 * Solution: I created SubNodeIdentity to perform a pure (partial) deserialization, but I need to
 								 * check the rest of the codebase to be sure there's nowhere that this surprise will break things.

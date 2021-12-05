@@ -96,7 +96,6 @@ public class MongoUtil extends ServiceBase {
 		}
 
 		// now identify all nodes that don't have a parent in the list
-		// todo-0: need to be ignoring the root one!
 		for (SubNode node : nodes) {
 			String parentPath = node.getParentPath();
 
