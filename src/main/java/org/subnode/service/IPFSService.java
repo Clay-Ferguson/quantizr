@@ -793,26 +793,38 @@ public class IPFSService extends ServiceBase {
         return res;
     }
 
+    /* This has a side effect of deleting empty directories */
     public void traverseDir(String path, HashSet<String> allFilePaths) {
-        // log.debug("dumpDir: " + path);
+        log.debug("dumpDir: " + path);
         IPFSDir dir = getDir(path);
         if (dir != null) {
-            // log.debug("Dir: " + XString.prettyPrint(dir) + " EntryCount: " +
-            // dir.getEntries().size());
+            log.debug("Dir: " + XString.prettyPrint(dir));
+
+            if (dir.getEntries() == null) {
+                log.debug("DEL EMPTY FOLDER: " + path);
+                ipfs.deletePath(path);
+                return;
+            }
 
             for (IPFSDirEntry entry : dir.getEntries()) {
-                /*
-                 * as a workaround to the IPFS bug, we rely on the logic of "if not a json file, it's a folder
-                 */
-                if (!entry.getName().endsWith(".json")) {
-                    traverseDir(path + "/" + entry.getName(), allFilePaths);
+                String entryPath = path + "/" + entry.getName();
+
+                // entries with 0 size are folders
+                if (entry.getSize() == 0) {
+                    traverseDir(entryPath, allFilePaths);
                 } else {
-                    String fileName = path + "/" + entry.getName();
-                    log.debug("dump: " + fileName);
-                    // String readTest = readFile(fileName);
-                    // log.debug("readTest: " + readTest);
-                    if (allFilePaths != null) {
-                        allFilePaths.add(fileName);
+                    /*
+                     * as a workaround to the IPFS bug, we rely on the logic of "if not a json file, it's a folder
+                     */
+                    if (!entry.getName().endsWith(".json")) {
+                        traverseDir(entryPath, allFilePaths);
+                    } else {
+                        log.debug("dump: " + entryPath);
+                        // String readTest = readFile(entryPath);
+                        // log.debug("readTest: " + readTest);
+                        if (allFilePaths != null) {
+                            allFilePaths.add(entryPath);
+                        }
                     }
                 }
             }

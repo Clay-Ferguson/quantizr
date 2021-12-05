@@ -8,6 +8,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
+import org.subnode.model.IPFSDirStat;
+import org.subnode.model.client.NodeProp;
 import org.subnode.mongo.MongoSession;
 import org.subnode.mongo.model.SubNode;
 import org.subnode.request.PublishNodeToIpfsRequest;
@@ -74,22 +76,25 @@ public class SyncToIpfsService extends ServiceBase {
 			ipfs.traverseDir(node.getPath(), allFilePaths);
 			removeOrphanFiles();
 
-			// DO NOT DELETE
-			// For a "Federated" type of install we will be doing IPNS publish from a browser-only instantiation 
-			// of IPFS so the server never has access to any keys, but this would require an 'always-on' up-time
-			// for the IPNS name to stay active I think. However once "IPNSPubSub" is working (or even doing it ourselves,
-			// with plain IPFSPubSub we can potentially broadcast our new CID for any updated IPNS to all "listening" clients.
-			//
-			// IPFSDirStat pathStat = ipfs.pathStat(node.getPath());
-			// if (pathStat != null) {
-			// 	node.set(NodeProp.IPFS_CID.s(), pathStat.getHash());
+			IPFSDirStat pathStat = ipfs.pathStat(node.getPath());
+			if (pathStat != null) {
+				node.set(NodeProp.IPFS_CID.s(), pathStat.getHash());
 
-			// 	Map<String, Object> ipnsMap = ipfs.ipnsPublish(ms, null, pathStat.getHash());
-			// 	String name = (String) ipnsMap.get("Name");
-			// 	if (name != null) {
-			// 		node.set(NodeProp.IPNS_CID.s(), name);
-			// 	}
-			// }
+				/*
+				 * DO NOT DELETE
+				 * 
+				 * For a "Federated" type of install we will be doing IPNS publish from a browser-only instantiation
+				 * of IPFS so the server never has access to any keys, but this would require an 'always-on' up-time
+				 * for the IPNS name to stay active I think. However once "IPNSPubSub" is working (or even doing it
+				 * ourselves, with plain IPFSPubSub we can potentially broadcast our new CID for any updated IPNS to
+				 * all "listening" clients.
+				 */
+				// Map<String, Object> ipnsMap = ipfs.ipnsPublish(ms, null, pathStat.getHash());
+				// String name = (String) ipnsMap.get("Name");
+				// if (name != null) {
+				// 	node.set(NodeProp.IPNS_CID.s(), name);
+				// }
+			}
 
 			success = true;
 		} catch (Exception ex) {

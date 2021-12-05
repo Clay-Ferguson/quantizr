@@ -43,10 +43,11 @@ public class SyncFromIpfsService extends ServiceBase {
 	/*
 	 * todo-1: currently this is an inefficient AND imcomplete algo, and needs these two enhancements:
 	 * 
-	 * Do a subGraph query at the root first (req.getPath()) and build up a HashSet of all IDs, then use
-	 * that to know which nodes already do exist, as a performance aid. Then at the end any of those
-	 * that are NOT in the HashSet of all the node IDs that came from IPFS file scanning are known to be
-	 * orphans to be removed.
+	 * 1) Do a subGraph query at the root first (req.getPath()) and build up a HashSet of all IDs, then
+	 * use that to know which nodes already do exist, as a performance aid.
+	 * 
+	 * 2) Then at the end any of those that are NOT in the HashSet of all the node IDs that came from
+	 * IPFS file scanning are known to be orphans to be removed.
 	 * 
 	 * So, for now, this algo will be slow, and will leave orphans around after pulling in from ipfs.
 	 * (orphans meaning those nodes didn't exist in the ipfs files)
