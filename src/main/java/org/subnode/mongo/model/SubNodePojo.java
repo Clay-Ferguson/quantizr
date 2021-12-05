@@ -16,7 +16,7 @@ import org.slf4j.LoggerFactory;
  */
 @JsonInclude(Include.NON_NULL)
 @JsonPropertyOrder({SubNode.FIELD_PATH, SubNode.FIELD_CONTENT, SubNode.FIELD_NAME, SubNode.FIELD_ID,
-		SubNode.FIELD_MAX_CHILD_ORDINAL, SubNode.FIELD_ORDINAL, SubNode.FIELD_OWNER, SubNode.FIELD_CREATE_TIME,
+		SubNode.FIELD_ORDINAL, SubNode.FIELD_OWNER, SubNode.FIELD_CREATE_TIME,
 		SubNode.FIELD_MODIFY_TIME, SubNode.FIELD_AC, SubNode.FIELD_PROPERTIES})
 public class SubNodePojo {
 	private static final Logger log = LoggerFactory.getLogger(SubNodePojo.class);
@@ -26,9 +26,6 @@ public class SubNodePojo {
 
 	@JsonProperty(SubNode.FIELD_ORDINAL)
 	private Long ordinal;
-
-	@JsonProperty(SubNode.FIELD_MAX_CHILD_ORDINAL)
-	private Long maxChildOrdinal;
 
 	@JsonProperty(SubNode.FIELD_PATH)
 	private String path;
@@ -74,14 +71,6 @@ public class SubNodePojo {
 
 	public void setOrdinal(Long ordinal) {
 		this.ordinal = ordinal;
-	}
-
-	public Long getMaxChildOrdinal() {
-		return maxChildOrdinal;
-	}
-
-	public void setMaxChildOrdinal(Long maxChildOrdinal) {
-		this.maxChildOrdinal = maxChildOrdinal;
 	}
 
 	public String getPath() {

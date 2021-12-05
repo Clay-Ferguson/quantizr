@@ -112,7 +112,6 @@ public class NodeMoveService extends ServiceBase {
 		}
 		long ordinal = read.getMaxChildOrdinal(ms, parentNode) + 1L;
 		node.setOrdinal(ordinal);
-		parentNode.setMaxChildOrdinal(ordinal);
 		update.saveSession(ms);
 	}
 
@@ -255,7 +254,7 @@ public class NodeMoveService extends ServiceBase {
 
 		// location==inside
 		if (location.equalsIgnoreCase("inside")) {
-			curTargetOrdinal = targetNode.getMaxChildOrdinal() == null ? 0 : targetNode.getMaxChildOrdinal() + 1;
+			curTargetOrdinal = read.getMaxChildOrdinal(ms, targetNode) + 1;
 		}
 		// location==inline (todo-2: rename this to inline-below -- or better yet, do an
 		// enum)
@@ -285,7 +284,8 @@ public class NodeMoveService extends ServiceBase {
 				 */
 				if (nodeParent.getId().compareTo(parentToPasteInto.getId()) != 0) {
 
-					// if a parent node is attempting to be pasted into one of it's children that's an impossible move so we fail
+					// if a parent node is attempting to be pasted into one of it's children that's an impossible move
+					// so we fail
 					if (parentToPasteInto.getPath().startsWith(node.getPath())) {
 						throw new RuntimeException("Impossible node move requested.");
 					}
@@ -319,7 +319,7 @@ public class NodeMoveService extends ServiceBase {
 
 			String pathSuffix = node.getPath().substring(originalParentPathLen + 1);
 			String newPath = newPathPrefix + "/" + pathSuffix;
-			// log.debug("    newPath: [" + newPathPrefix + "]/[" + pathSuffix + "]");
+			// log.debug(" newPath: [" + newPathPrefix + "]/[" + pathSuffix + "]");
 			node.setPath(newPath);
 			node.setDisableParentCheck(true);
 		}

@@ -106,7 +106,6 @@ public class MongoCreate extends ServiceBase {
 				break;
 			case LAST:
 				ordinal = read.getMaxChildOrdinal(ms, parent) + 1;
-				parent.setMaxChildOrdinal(ordinal);
 				break;
 			case ORDINAL:
 				insertOrdinal(ms, parent, ordinal, 1L);
@@ -148,11 +147,5 @@ public class MongoCreate extends ServiceBase {
 				Sort.by(Sort.Direction.ASC, SubNode.FIELD_ORDINAL), null, 0, null, criteria)) {
 			child.setOrdinal(maxOrdinal++);
 		}
-
-		/*
-		 * even in the boundary case where there were no existing children, it's ok to set this node value
-		 * to zero here
-		 */
-		node.setMaxChildOrdinal(maxOrdinal);
 	}
 }

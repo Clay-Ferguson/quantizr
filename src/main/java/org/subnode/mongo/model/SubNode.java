@@ -57,7 +57,7 @@ import org.subnode.util.XString;
 @TypeAlias("n1")
 @JsonInclude(Include.NON_NULL)
 @JsonPropertyOrder({SubNode.FIELD_PATH, SubNode.FIELD_CONTENT, SubNode.FIELD_NAME, SubNode.FIELD_ID,
-		SubNode.FIELD_MAX_CHILD_ORDINAL, SubNode.FIELD_ORDINAL, SubNode.FIELD_OWNER, SubNode.FIELD_CREATE_TIME,
+		SubNode.FIELD_ORDINAL, SubNode.FIELD_OWNER, SubNode.FIELD_CREATE_TIME,
 		SubNode.FIELD_MODIFY_TIME, SubNode.FIELD_AC, SubNode.FIELD_PROPERTIES})
 public class SubNode {
 	private static final Logger log = LoggerFactory.getLogger(SubNode.class);
@@ -70,10 +70,6 @@ public class SubNode {
 	public static final String FIELD_ORDINAL = "ord";
 	@Field(FIELD_ORDINAL)
 	private Long ordinal;
-
-	public static final String FIELD_MAX_CHILD_ORDINAL = "mco";
-	@Field(FIELD_MAX_CHILD_ORDINAL)
-	private Long maxChildOrdinal;
 
 	public static final String FIELD_PATH = "pth";
 	@Field(FIELD_PATH)
@@ -132,7 +128,6 @@ public class SubNode {
 			SubNode.FIELD_CONTENT, //
 			SubNode.FIELD_NAME, //
 			SubNode.FIELD_ID, //
-			SubNode.FIELD_MAX_CHILD_ORDINAL, //
 			SubNode.FIELD_ORDINAL, //
 			SubNode.FIELD_OWNER, //
 			SubNode.FIELD_CREATE_TIME, //
@@ -246,28 +241,6 @@ public class SubNode {
 		this.ordinal = ordinal;
 	}
 
-	@JsonProperty(FIELD_MAX_CHILD_ORDINAL)
-	public Long getMaxChildOrdinal() {
-		return maxChildOrdinal;
-	}
-
-	/*
-	 * todo-2: review that this maxordinal is the best pattern/design, and also need to review that it's
-	 * always maintained, and even maybe create an admin option i can run that forcably updates all
-	 * these values based on current db content
-	 */
-	@JsonProperty(FIELD_MAX_CHILD_ORDINAL)
-	public void setMaxChildOrdinal(Long maxChildOrdinal) {
-		if (Util.equalObjs(maxChildOrdinal, this.maxChildOrdinal))
-			return;
-		/*
-		 * todo-2: what about logic that says if this node IS already persisted, and we are not actually
-		 * changing the value here, we can bypass setting this 'dirty' flag? I probably have this
-		 * performance/optimization on my todo list but i'm putting this note here just in case
-		 */
-		ThreadLocals.dirty(this);
-		this.maxChildOrdinal = maxChildOrdinal;
-	}
 
 	// we don't annotate this because we have a custom getter
 	// @JsonProperty(FIELD_OWNER)
