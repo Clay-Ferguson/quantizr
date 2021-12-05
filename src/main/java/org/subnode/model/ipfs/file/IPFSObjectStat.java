@@ -1,4 +1,4 @@
-package org.subnode.model;
+package org.subnode.model.ipfs.file;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 

@@ -1,4 +1,4 @@
-package org.subnode.model;
+package org.subnode.model.ipfs.dag;
 
 import java.util.List;
 import com.fasterxml.jackson.annotation.JsonProperty;

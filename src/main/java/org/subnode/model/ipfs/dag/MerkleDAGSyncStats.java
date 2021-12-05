@@ -1,4 +1,4 @@
-package org.subnode.model;
+package org.subnode.model.ipfs.dag;
 
 /**
  * Model representing a filename
