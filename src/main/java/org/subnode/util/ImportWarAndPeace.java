@@ -18,6 +18,17 @@ import org.subnode.mongo.MongoSession;
 import org.subnode.mongo.MongoUpdate;
 import org.subnode.mongo.model.SubNode;
 
+// todo-2: need to look into bulk-ops for doing this 
+	// tips:
+	// https://stackoverflow.com/questions/26657055/spring-data-mongodb-and-bulk-update
+	// BulkOperations ops = template.bulkOps(BulkMode.UNORDERED, Match.class);
+	// for (User user : users) {
+	// Update update = new Update();
+	// ...
+	// ops.updateOne(query(where("id").is(user.getId())), update);
+	// }
+	// ops.execute();
+
 /**
  * Reads the special proprietary-formatted file (not invented by the Quantizr developers) of the
  * book 'War and Peace' to load into the repository, because we use this book as sample/example

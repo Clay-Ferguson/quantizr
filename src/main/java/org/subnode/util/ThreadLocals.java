@@ -37,7 +37,7 @@ public class ThreadLocals {
 	 * done using the api.sessionSave() call. This is a way to not have to worry about doing SAVES on
 	 * every object that is touched during the processing of a thread/request.
 	 */
-	private static final ThreadLocal<HashMap<ObjectId, SubNode>> dirtyNodes = new ThreadLocal<HashMap<ObjectId, SubNode>>();
+	private static final ThreadLocal<HashMap<ObjectId, SubNode>> dirtyNodes = new ThreadLocal<>();
 
 	private static final ThreadLocal<LinkedHashMap<String, SubNode>> cachedNodes =
 			new ThreadLocal<LinkedHashMap<String, SubNode>>();

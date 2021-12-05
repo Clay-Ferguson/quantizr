@@ -55,18 +55,6 @@ public class MongoUtil extends ServiceBase {
 	 */
 	static final String PATH_CHARS = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnoqstuvwxyz";
 
-	// todo-2: need to look into bulk-ops for doing this saveSession updating
-	// tips:
-	// https://stackoverflow.com/questions/26657055/spring-data-mongodb-and-bulk-update
-	// BulkOperations ops = template.bulkOps(BulkMode.UNORDERED, Match.class);
-	// for (User user : users) {
-	// Update update = new Update();
-	// ...
-	// ops.updateOne(query(where("id").is(user.getId())), update);
-	// }
-	// ops.execute();
-	//
-
 	/*
 	 * The set of nodes in here MUST be known to be from an UNFILTERED and COMPLETE SubGraph query or
 	 * else this WILL result in DATA LOSS!
