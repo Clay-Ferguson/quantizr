@@ -40,6 +40,7 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 import org.subnode.config.SpringContextUtil;
 import org.subnode.exception.base.RuntimeEx;
+import org.subnode.model.DagNode;
 import org.subnode.model.IPFSDir;
 import org.subnode.model.IPFSDirEntry;
 import org.subnode.model.IPFSDirStat;
@@ -418,6 +419,17 @@ public class IPFSService extends ServiceBase {
             log.debug("RET: " + ret);
         } catch (Exception e) {
             log.error("Failed in restTemplate.getForEntity", e);
+        }
+        return ret;
+    }
+
+    public DagNode getDagNode(String cid) {
+        DagNode ret = null;
+        try {
+            String url = API_DAG + "/get?arg=" + cid;
+            ret = (DagNode) postForJsonReply(url, DagNode.class);
+        } catch (Exception e) {
+            log.error("Failed in getDagNode", e);
         }
         return ret;
     }
