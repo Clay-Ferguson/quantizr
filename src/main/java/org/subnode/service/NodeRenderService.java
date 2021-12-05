@@ -430,8 +430,10 @@ public class NodeRenderService extends ServiceBase {
 			sort = Sort.by(dir.equals("asc") ? Sort.Direction.ASC : Sort.Direction.DESC,
 					SubNode.FIELD_PROPERTIES + "." + orderByProp);
 
-			// when sorting by priority always do second leve REV-CHRON sort, so newest un-prioritized nodes appear at top
-			// todo-1: probably would be better to to just make this orderBy parser handle comma-delimited sort list
+			// when sorting by priority always do second leve REV-CHRON sort, so newest un-prioritized nodes
+			// appear at top
+			// todo-1: probably would be better to to just make this orderBy parser handle comma-delimited sort
+			// list
 			// which is not a difficult change
 			if (orderByProp.equals(NodeProp.PRIORITY.s())) {
 				sort = sort.and(Sort.by(Sort.Direction.DESC, SubNode.FIELD_MODIFY_TIME));
@@ -454,8 +456,7 @@ public class NodeRenderService extends ServiceBase {
 			return res;
 		}
 
-		NodeInfo nodeInfo =
-				convert.convertToNodeInfo(ThreadLocals.getSC(), ms, node, false, true, -1, false, false, true, false);
+		NodeInfo nodeInfo = convert.convertToNodeInfo(ThreadLocals.getSC(), ms, node, false, true, -1, false, false, true, false);
 		res.setNodeInfo(nodeInfo);
 		res.setSuccess(true);
 		return res;

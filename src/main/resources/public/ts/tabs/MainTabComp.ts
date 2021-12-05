@@ -38,7 +38,7 @@ export class MainTabComp extends AppTab {
         let renderableCrumbs = 0;
         if (state.breadcrumbs) {
             state.breadcrumbs.forEach(bc => {
-                if (bc.id !== state.homeNodeId) {
+                if (bc.id !== state.node.id && bc.id !== state.homeNodeId) {
                     renderableCrumbs++;
                 }
             });
@@ -50,7 +50,7 @@ export class MainTabComp extends AppTab {
                 // I'm not sure this rendering animation is still needed, or even noticeable. todo-2
                 className: state.rendering ? "compHidden" : "compVisible"
             }, [
-                renderableCrumbs > 1 && !state.mobileMode ? new BreadcrumbsPanel() : null,
+                renderableCrumbs > 0 && !state.mobileMode ? new BreadcrumbsPanel() : null,
                 state.pageMessage ? new Html(state.pageMessage, { className: "alert alert-info float-end" }) : null,
                 state.pageMessage ? new Clearfix() : null,
                 new NodeCompMainNode(state, null),

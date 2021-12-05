@@ -34,8 +34,8 @@ export class BreadcrumbsPanel extends Div {
 
         let children = [];
         state.breadcrumbs.forEach(bc => {
-            if (bc.id === state.homeNodeId) {
-                // ignore root node. we don't need it.
+            if (bc.id === state.node.id || bc.id === state.homeNodeId) {
+                // ignore root node or page root node. we don't need it.
             }
             else if (bc.id) {
                 if (!bc.name) {
