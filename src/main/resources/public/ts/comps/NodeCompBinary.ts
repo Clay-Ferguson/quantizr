@@ -22,8 +22,12 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
     S = ctx;
 });
 
+interface LocalState {
+    node: J.NodeInfo;
+}
+
 /* General Widget that doesn't fit any more reusable or specific category other than a plain Div, but inherits capability of Comp class */
-export class NodeCompBinary extends Div {
+export class NodeCompBinary extends Div<LocalState> {
 
     /* editorEmbed is true when this component is inside the node editor dialog */
     constructor(public node: J.NodeInfo, private isEditorEmbed: boolean, private isFullScreenEmbed: boolean, public imgSizeOverride: string) {

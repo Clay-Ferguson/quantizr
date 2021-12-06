@@ -17,12 +17,18 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
     S = ctx;
 });
 
+interface LocalState {
+    done?: boolean;
+    files?: any[];
+    noSeeders?: boolean;
+}
+
 /* NOTE: The other option for how to import webtorrent is to just
  pull in the JS like below (in which case we can also remove NodePolyfillPlugin too
  from the webpack config script) */
 // import WebTorrent from "webtorrent/webtorrent.min.js";
 
-export class TorrentListingDlg extends DialogBase {
+export class TorrentListingDlg extends DialogBase<LocalState> {
     torrentSeeded = false;
 
     constructor(private torrentId: string, dialogMode: DialogMode, state: AppState) {

@@ -14,7 +14,11 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (s: Singletons) => {
     S = s;
 });
 
-export class WelcomePanel extends Div {
+interface LocalState {
+    welcomeNode: J.NodeInfo;
+}
+
+export class WelcomePanel extends Div<LocalState> {
 
     constructor(attribs: Object = {}) {
         super(null, attribs);

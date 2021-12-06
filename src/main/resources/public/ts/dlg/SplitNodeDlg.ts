@@ -18,7 +18,13 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
     S = ctx;
 });
 
-export class SplitNodeDlg extends DialogBase {
+interface LocalState {
+    splitMode?: string;
+    splitType?: string;
+    delimiter?: string;
+}
+
+export class SplitNodeDlg extends DialogBase<LocalState> {
 
     delimiterState: ValidatedState<any> = new ValidatedState<any>();
 

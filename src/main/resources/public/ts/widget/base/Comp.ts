@@ -11,7 +11,6 @@ import { Constants as C } from "../../Constants";
 import { PubSub } from "../../PubSub";
 import { Singletons } from "../../Singletons";
 import { State } from "../../State";
-import { BaseCompState } from "./BaseCompState";
 import { CompIntf } from "./CompIntf";
 
 let S: Singletons;
@@ -23,7 +22,7 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
  * This base class is a hybrid that can render React components or can be used to render plain HTML to be used in innerHTML of elements.
  * The innerHTML approach is being phased out in order to transition fully over to normal ReactJS.
  */
-export abstract class Comp<S extends BaseCompState = any> implements CompIntf {
+export abstract class Comp<StateType = any> implements CompIntf {
     static renderCounter: number = 0;
     static focusElmId: string = null;
     public rendered: boolean = false;
@@ -58,14 +57,14 @@ export abstract class Comp<S extends BaseCompState = any> implements CompIntf {
      * allowRect can be set to false for components that are known to be used in cases where not all of their subchildren are react or for
      * whatever reason we want to disable react rendering, and fall back on render-to-text approach
      */
-    constructor(attribs?: any, private s?: State<S>) {
+    constructor(attribs?: any, private s?: State<StateType>) {
         this.domAddEvent = this.domAddEvent.bind(this);
         this.domRemoveEvent = this.domRemoveEvent.bind(this);
         this.domUpdateEvent = this.domUpdateEvent.bind(this);
         this.domPreUpdateEvent = this.domPreUpdateEvent.bind(this);
 
         if (!s) {
-            this.s = new State<S>();
+            this.s = new State<StateType>();
         }
         this.attribs = attribs || {};
 
@@ -355,7 +354,7 @@ export abstract class Comp<S extends BaseCompState = any> implements CompIntf {
     /* This is how you can add properties and overwrite them in existing state. Since all components are assumed to have
        both visible/enbled properties, this is the safest way to set other state that leaves visible/enabled props intact
        */
-    mergeState(moreState: S): any {
+    mergeState(moreState: StateType): any {
         this.s.mergeState(moreState);
     }
 
@@ -363,7 +362,7 @@ export abstract class Comp<S extends BaseCompState = any> implements CompIntf {
         this.mergeState({ forceRender: Comp.nextGuid() } as any);
     }
 
-    setState = (newState: any): any => {
+    setState = (newState: StateType): any => {
         this.s.setState(newState);
     }
 
@@ -377,11 +376,11 @@ export abstract class Comp<S extends BaseCompState = any> implements CompIntf {
 
     There are places where 'mergeState' works but 'setState' fails, that needs investigation like EditNodeDlg.
     */
-    setStateEx(state: any) {
+    setStateEx(state: StateType) {
         this.s.setStateEx(state);
     }
 
-    getState(): S {
+    getState(): StateType {
         return this.s.state;
     }
 

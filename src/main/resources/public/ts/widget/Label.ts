@@ -1,7 +1,11 @@
 import { ReactNode } from "react";
 import { Comp } from "./base/Comp";
 
-export class Label extends Comp {
+interface LocalState {
+    content: string;
+}
+
+export class Label extends Comp<LocalState> {
 
     constructor(content: string = "", attribs: Object = {}) {
         super(attribs);

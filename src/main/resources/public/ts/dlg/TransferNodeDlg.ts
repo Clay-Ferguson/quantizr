@@ -18,7 +18,11 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
     S = ctx;
 });
 
-export class TransferNodeDlg extends DialogBase {
+interface LocalState {
+    recursive?: boolean;
+}
+
+export class TransferNodeDlg extends DialogBase<LocalState> {
 
     toUserState: ValidatedState<any> = new ValidatedState<any>();
     fromUserState: ValidatedState<any> = new ValidatedState<any>();

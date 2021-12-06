@@ -15,8 +15,13 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
     S = ctx;
 });
 
+interface LocalState {
+    og: J.OpenGraph;
+    loading?: boolean;
+}
+
 /* General Widget that doesn't fit any more reusable or specific category other than a plain Div, but inherits capability of Comp class */
-export class OpenGraphPanel extends Div {
+export class OpenGraphPanel extends Div<LocalState> {
     loading: boolean;
 
     constructor(private appState: AppState, key: string, private url: string) {
@@ -155,7 +160,7 @@ export class OpenGraphPanel extends Div {
                         className: "openGraphImageVert",
                         src: state.og.image
                     }),
-                    new Div(state.og.desc)
+                    new Div(state.og.description)
                 ]);
             }
             else {

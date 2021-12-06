@@ -26,7 +26,7 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
 //     return newValue;
 // };
 
-export class Html extends Comp {
+export class Html<StateType = any> extends Comp<StateType> {
     constructor(content: string = "", attribs: Object = {}, initialChildren: CompIntf[] = null) {
         super(attribs);
         this.domPreUpdateEvent = this.domPreUpdateEvent.bind(this);
@@ -35,14 +35,14 @@ export class Html extends Comp {
     }
 
     setText = (content: string) => {
-        this.mergeState({ content });
+        this.mergeState({ content } as any);
     }
 
     compRender(): React.ReactNode {
         if (this.hasChildren()) {
             console.error("dangerouslySetInnerHTML component had children. This is a bug: id=" + this.getId() + " constructor.name=" + this.constructor.name);
         }
-        this.attribs.dangerouslySetInnerHTML = { __html: this.getState().content };
+        this.attribs.dangerouslySetInnerHTML = { __html: (this.getState() as any).content };
         return this.e("div", this.attribs);
 
         // ************* DO NOT DELETE. Method 1 and 2 both work, except #2 would need to be updated to

@@ -11,8 +11,13 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
     S = ctx;
 });
 
+interface LocalState {
+    content: string;
+    pendingDecrypt?: string;
+}
+
 /* General Widget that doesn't fit any more reusable or specific category other than a plain Div, but inherits capability of Comp class */
-export class NodeCompMarkdown extends Html {
+export class NodeCompMarkdown extends Html<LocalState> {
 
     /* This makes the encrypted text visible without editing the node which is important to have
     on so nodes shared to you can be seen, because a user can't edit nodes they don't own */
@@ -30,7 +35,8 @@ export class NodeCompMarkdown extends Html {
         this.attribs.className = "markdown-content " + widthStyle;
 
         let content = node.content || "";
-        let att: any = {
+        let att: LocalState = {
+            content: null
         };
 
         /* If this content is encrypted we set it in 'pendingDecrypt' to decrypt it asynchronously */

@@ -9,7 +9,12 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
     S = ctx;
 });
 
-export class ToggleIcon extends Comp {
+interface LocalState {
+    toggle?: boolean;
+    className?: string;
+}
+
+export class ToggleIcon extends Comp<LocalState> {
 
     constructor(private toggleOnClass: string, private toggleOffClass: string, attribs: Object = null) {
         super(attribs);

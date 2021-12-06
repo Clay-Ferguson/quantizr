@@ -17,7 +17,11 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (s: Singletons) => {
     S = s;
 });
 
-export class ResetPasswordDlg extends DialogBase {
+interface LocalState {
+    user: string;
+}
+
+export class ResetPasswordDlg extends DialogBase<LocalState> {
 
     userState: ValidatedState<any> = new ValidatedState<any>();
     emailState: ValidatedState<any> = new ValidatedState<any>();

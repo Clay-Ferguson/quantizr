@@ -7,7 +7,6 @@ import { DialogBaseImpl } from "./DialogBaseImpl";
 import { DialogMode } from "./enums/DialogMode";
 import { PubSub } from "./PubSub";
 import { Singletons } from "./Singletons";
-import { BaseCompState } from "./widget/base/BaseCompState";
 import { Comp } from "./widget/base/Comp";
 import { CompIntf } from "./widget/base/CompIntf";
 import { Div } from "./widget/Div";
@@ -18,7 +17,7 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (s: Singletons) => {
     S = s;
 });
 
-export abstract class DialogBase<S extends BaseCompState = any> extends Div<S> implements DialogBaseImpl {
+export abstract class DialogBase<StateType = any> extends Div<StateType> implements DialogBaseImpl {
 
     // ref counter that allows multiple dialogs to be opened on top of each other and only
     // when the final one closes out do we go back to enabling scrolling on body again.

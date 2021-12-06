@@ -18,16 +18,18 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
     S = ctx;
 });
 
-export class SearchAndReplaceDlg extends DialogBase {
+interface LocalState {
+    recursive: boolean;
+}
+
+export class SearchAndReplaceDlg extends DialogBase<LocalState> {
 
     searchState: ValidatedState<any> = new ValidatedState<any>();
     replaceState: ValidatedState<any> = new ValidatedState<any>();
 
     constructor(state: AppState) {
         super("Search and Replace", "app-modal-content-narrow-width", false, state);
-        this.mergeState({
-            recursive: true
-        });
+        this.mergeState({ recursive: true });
     }
 
     renderDlg(): CompIntf[] {

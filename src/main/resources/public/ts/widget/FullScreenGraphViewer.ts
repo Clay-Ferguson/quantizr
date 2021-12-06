@@ -16,7 +16,11 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
     S = ctx;
 });
 
-export class FullScreenGraphViewer extends Main {
+interface LocalState {
+    data: J.GraphNode;
+}
+
+export class FullScreenGraphViewer extends Main<LocalState> {
     nodeId: string;
     simulation: any;
     tooltip: any;

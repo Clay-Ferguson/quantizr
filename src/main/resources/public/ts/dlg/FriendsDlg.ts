@@ -17,7 +17,13 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
     S = ctx;
 });
 
-export class FriendsDlg extends DialogBase {
+interface LocalState {
+    selectedName?: string;
+    loading?: boolean;
+    friends?: J.FriendInfo[];
+}
+
+export class FriendsDlg extends DialogBase<LocalState> {
 
     selectionValueIntf: ValueIntf;
 

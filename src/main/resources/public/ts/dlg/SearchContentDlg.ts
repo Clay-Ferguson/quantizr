@@ -20,7 +20,16 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
     S = ctx;
 });
 
-export class SearchContentDlg extends DialogBase {
+interface LocalState {
+    sortField?: string;
+    requirePriority?: boolean;
+    caseSensitive?: boolean;
+    fuzzy?: boolean;
+    recursive?: boolean;
+    sortDir?: string;
+}
+
+export class SearchContentDlg extends DialogBase<LocalState> {
     static defaultSearchText: string = "";
     static dlgState: any = {
         fuzzy: false,
@@ -112,7 +121,7 @@ export class SearchContentDlg extends DialogBase {
 
                             this.mergeState({
                                 sortField: val,
-                                sortDir: sortDir
+                                sortDir
                             });
                         },
                         getValue: (): string => {

@@ -16,7 +16,13 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
     S = ctx;
 });
 
-export class ManageAccountDlg extends DialogBase {
+interface LocalState {
+    info: string;
+    binQuota: number;
+    binTotal: number;
+}
+
+export class ManageAccountDlg extends DialogBase<LocalState> {
 
     constructor(state: AppState) {
         super("Manage Account", "app-modal-content-narrow-width", false, state);

@@ -1,11 +1,10 @@
 import Picker from "emoji-picker-react";
 import { ReactNode } from "react";
 import { ValueIntf } from "../Interfaces";
-import { BaseCompState } from "./base/BaseCompState";
 import { Comp } from "./base/Comp";
 
 /* General Widget that doesn't fit any more reusable or specific category other than a plain Div, but inherits capability of Comp class */
-export class EmojiPicker<S extends BaseCompState = any> extends Comp<S> {
+export class EmojiPicker<StateType = any> extends Comp<StateType> {
 
     constructor(private selectionValueIntf: ValueIntf) {
         super();

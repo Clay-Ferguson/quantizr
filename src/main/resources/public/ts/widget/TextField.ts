@@ -16,7 +16,11 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
     S = ctx;
 });
 
-export class TextField extends Div implements I.TextEditorIntf, I.ValueIntf {
+interface LocalState {
+    inputType?: string;
+}
+
+export class TextField extends Div<LocalState> implements I.TextEditorIntf, I.ValueIntf {
     input: Input;
     icon: ToggleIcon;
 

@@ -25,7 +25,17 @@ let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (s: Singletons) => {
     S = s;
 });
-export class MediaRecorderDlg extends DialogBase {
+
+interface LocalState {
+    status?: string;
+    recording?: boolean;
+    audioInput?: string;
+    videoInput?: string;
+    audioInputOptions?: any[];
+    videoInputOptions?: any[];
+}
+
+export class MediaRecorderDlg extends DialogBase<LocalState> {
     stream: any;
     chunks = [];
     recorder: any;

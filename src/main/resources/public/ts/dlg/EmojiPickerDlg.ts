@@ -15,7 +15,11 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
     S = ctx;
 });
 
-export class EmojiPickerDlg extends DialogBase {
+interface LocalState {
+    selectedEmoji: string;
+}
+
+export class EmojiPickerDlg extends DialogBase<LocalState> {
 
     selectionValueIntf: ValueIntf;
 

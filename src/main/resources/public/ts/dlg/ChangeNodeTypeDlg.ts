@@ -7,7 +7,11 @@ import { ButtonBar } from "../widget/ButtonBar";
 import { Form } from "../widget/Form";
 import { NodeTypeListBox } from "../widget/NodeTypeListBox";
 
-export class ChangeNodeTypeDlg extends DialogBase {
+interface LocalState {
+    selType: string;
+}
+
+export class ChangeNodeTypeDlg extends DialogBase<LocalState> {
 
     selTypeValueIntf: ValueIntf;
     selCallback: Function = null;

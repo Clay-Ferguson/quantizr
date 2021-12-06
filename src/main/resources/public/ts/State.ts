@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-export class State<S> {
+export class State<StateType> {
     state: any = {};
 
     // this is 'overridable/assignable' so that we have a way to monitor values as they get assigned

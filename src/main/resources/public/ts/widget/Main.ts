@@ -1,10 +1,9 @@
 import { ReactNode } from "react";
-import { BaseCompState } from "./base/BaseCompState";
 import { Comp } from "./base/Comp";
 import { CompIntf } from "./base/CompIntf";
 
 /* General Widget that doesn't fit any more reusable or specific category other than a plain Div, but inherits capability of Comp class */
-export class Main<S extends BaseCompState = any> extends Comp<S> {
+export class Main<StateType = any> extends Comp<StateType> {
 
     constructor(content: string = "", attribs: Object = {}, public initialChildren: CompIntf[] = null) {
         super(attribs);

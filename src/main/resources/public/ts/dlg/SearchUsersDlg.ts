@@ -21,7 +21,13 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
     S = ctx;
 });
 
-export class SearchUsersDlg extends DialogBase {
+interface LocalState {
+    fuzzy?: boolean;
+    searchType?: string;
+    caseSensitive?: boolean;
+}
+
+export class SearchUsersDlg extends DialogBase<LocalState> {
     static helpExpanded: boolean = false;
     static defaultSearchText: string = "";
     searchTextField: TextField;

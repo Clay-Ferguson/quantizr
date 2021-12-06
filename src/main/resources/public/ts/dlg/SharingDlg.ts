@@ -20,7 +20,11 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
     S = ctx;
 });
 
-export class SharingDlg extends DialogBase {
+interface LocalState {
+    nodePrivsInfo: J.GetNodePrivilegesResponse;
+}
+
+export class SharingDlg extends DialogBase<LocalState> {
     dirty: boolean = false;
 
     constructor(private node: J.NodeInfo, state: AppState) {

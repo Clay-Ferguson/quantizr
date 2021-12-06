@@ -9,7 +9,12 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
     S = ctx;
 });
 
-export class Button extends Comp {
+interface LocalState {
+    text?: string;
+    enabled?: boolean;
+}
+
+export class Button extends Comp<LocalState> {
 
     constructor(text: string, public callback: Function, _attribs: Object = null, moreClasses: string = "btn-secondary") {
         super(_attribs);

@@ -10,7 +10,11 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
     S = ctx;
 });
 
-export class Input extends Comp {
+interface LocalState {
+    value: string;
+}
+
+export class Input extends Comp<LocalState> {
 
     constructor(attribs: Object = {}, s?: State<any>) {
         super(attribs, s);

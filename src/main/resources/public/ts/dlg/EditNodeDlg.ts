@@ -49,6 +49,10 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
     S = ctx;
 });
 
+interface LocalState {
+    // todo-0 (waiting on this one, until the rest are proven)
+}
+
 export class EditNodeDlg extends DialogBase {
 
     static embedInstance: EditNodeDlg;

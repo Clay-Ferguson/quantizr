@@ -10,7 +10,11 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
     S = ctx;
 });
 
-export class TextareaTag extends Comp {
+interface LocalState {
+    value: string;
+}
+
+export class TextareaTag extends Comp<LocalState> {
     static CHAR_THRESHOLD = 40;
     static MIN_ROWS = 3;
     static MAX_ROWS = 15;

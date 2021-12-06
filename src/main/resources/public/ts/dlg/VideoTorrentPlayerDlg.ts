@@ -26,7 +26,11 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
     S = ctx;
 });
 
-export class VideoTorrentPlayerDlg extends DialogBase {
+interface LocalState {
+    downloadLink: string;
+}
+
+export class VideoTorrentPlayerDlg extends DialogBase<LocalState> {
     videoDiv: Div = new Div(null, {
         className: "webTorrentPlayer"
     });

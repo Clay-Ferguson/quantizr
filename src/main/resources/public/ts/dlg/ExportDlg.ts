@@ -24,7 +24,12 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
     S = ctx;
 });
 
-export class ExportDlg extends DialogBase {
+interface LocalState {
+    exportType: string;
+    toIpfs?: boolean;
+}
+
+export class ExportDlg extends DialogBase<LocalState> {
 
     fileNameState: ValidatedState<any> = new ValidatedState<any>();
     saveToIpfsState: CompValueHolder<boolean> = new CompValueHolder<boolean>(this, "toIpfs");

@@ -26,7 +26,11 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
     S = ctx;
 });
 
-export class UserProfileDlg extends DialogBase {
+interface LocalState {
+    userProfile: any; // todo-0: fix type
+}
+
+export class UserProfileDlg extends DialogBase<LocalState> {
     readOnly: boolean;
     bioState: ValidatedState<any> = new ValidatedState<any>();
     displayNameState: ValidatedState<any> = new ValidatedState<any>();

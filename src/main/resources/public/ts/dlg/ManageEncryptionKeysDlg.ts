@@ -13,7 +13,11 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
     S = ctx;
 });
 
-export class ManageEncryptionKeysDlg extends DialogBase {
+interface LocalState {
+    keyJson: string;
+}
+
+export class ManageEncryptionKeysDlg extends DialogBase<LocalState> {
 
     constructor(state: AppState) {
         super("Encryption Keys", null, false, state);

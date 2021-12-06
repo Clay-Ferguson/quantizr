@@ -6,7 +6,12 @@ import { CompIntf } from "./base/CompIntf";
 import { Div } from "./Div";
 import { HorizontalLayout } from "./HorizontalLayout";
 
-export class CompDemoButton extends Div {
+interface LocalState {
+    idx?: number;
+    counter?: number;
+}
+
+export class CompDemoButton extends Div<LocalState> {
 
     constructor(public idx: number) {
         super(null, {

@@ -1,10 +1,12 @@
 import { ReactNode } from "react";
-import { BaseCompState } from "./base/BaseCompState";
 import { Comp } from "./base/Comp";
 import { CompIntf } from "./base/CompIntf";
 
+// So that users of this class don't need a state deriving from one with a 'content' prop
+// we use an 'as any' in here. Just a convenient tradeoff.
+
 /* General Widget that doesn't fit any more reusable or specific category other than a plain Div, but inherits capability of Comp class */
-export class Div<S extends BaseCompState = any> extends Comp<S> {
+export class Div<StateType = any> extends Comp<StateType> {
     constructor(public content: string = "", attribs: Object = {}, public initialChildren: CompIntf[] = null) {
         super(attribs);
         this.setChildren(this.initialChildren);

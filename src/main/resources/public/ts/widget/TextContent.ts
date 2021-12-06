@@ -9,7 +9,11 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
     S = ctx;
 });
 
-export class TextContent extends Comp {
+interface LocalState {
+    text: string;
+}
+
+export class TextContent extends Comp<LocalState> {
 
     constructor(text: string, classes: string = null, public preformatted: boolean = false) {
         super(null);

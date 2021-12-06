@@ -9,7 +9,11 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
     S = ctx;
 });
 
-export class CollapsiblePanel extends Comp {
+interface LocalState {
+    expanded?: boolean;
+}
+
+export class CollapsiblePanel extends Comp<LocalState> {
 
     constructor(private collapsedButtonText: string,
         private expandedButtonText: string,
@@ -36,7 +40,7 @@ export class CollapsiblePanel extends Comp {
     compRender(): ReactNode {
         let state = this.getState();
         let style = this.textLink ? "collapse-panel-link" : "btn btn-info ";
-        let collapseClass = this.getState().expanded ? "expand" : "collapse";
+        let collapseClass = state.expanded ? "expand" : "collapse";
 
         /* If the component is expanded we render the button INSIDE the main area,
         which is the area that would be HIDDEN when the component is NOT expanded. */
