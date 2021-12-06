@@ -25,6 +25,7 @@ import org.subnode.util.ExUtil;
 import org.subnode.util.ThreadLocals;
 import org.subnode.util.Util;
 import org.subnode.util.XString;
+import static org.subnode.util.Util.*;
 
 /**
  * The primary element of storage for the entire Quanta DB.
@@ -148,7 +149,7 @@ public class SubNode {
 	@Transient
 	@JsonIgnore
 	public String getIdStr() {
-		return getId() != null ? getId().toHexString() : null;
+		return ok(getId()) ? getId().toHexString() : null;
 	}
 
 	/* Auth: Anyone can write the id as there's no pre-existing id */
@@ -156,7 +157,7 @@ public class SubNode {
 	public void setId(ObjectId id) {
 		// IDs are allowed to be set to null and ImportArchiveBase does this to force nodes to get saved
 		// as a new document when they're being imported.
-		if (id != null && this.id != null && !this.id.equals(id)) {
+		if (ok(id) && ok(this.id) && !this.id.equals(id)) {
 			throw new RuntimeException("Node IDs are immutable.");
 		}
 		this.id = id;
@@ -164,7 +165,7 @@ public class SubNode {
 
 	@JsonGetter(FIELD_ID)
 	public String jsonId() {
-		return id != null ? id.toHexString() : null;
+		return ok(id) ? id.toHexString() : null;
 	}
 
 	@JsonProperty(FIELD_PATH)
@@ -175,7 +176,7 @@ public class SubNode {
 	@Transient
 	@JsonIgnore
 	public String getParentPath() {
-		if (getPath() == null)
+		if (no(getPath()))
 			return null;
 		return XString.truncateAfterLast(getPath(), "/");
 	}
@@ -183,7 +184,7 @@ public class SubNode {
 	@Transient
 	@JsonIgnore
 	public String getLastPathPart() {
-		if (getPath() == null)
+		if (no(getPath()))
 			return null;
 		return XString.parseAfterLast(getPath(), "/");
 	}
@@ -235,7 +236,7 @@ public class SubNode {
 
 	@JsonGetter(FIELD_OWNER)
 	public String jsonOwner() {
-		return owner != null ? owner.toHexString() : null;
+		return ok(owner) ? owner.toHexString() : null;
 	}
 
 	@JsonProperty(FIELD_CREATE_TIME)
@@ -275,7 +276,7 @@ public class SubNode {
 	@JsonIgnore
 	public HashMap<String, AccessControl> safeGetAc() {
 		synchronized (acLock) {
-			if (ac == null) {
+			if (no(ac)) {
 				ac = new HashMap<>();
 			}
 			return ac;
@@ -292,7 +293,7 @@ public class SubNode {
 
 	public void clearSecretProperties() {
 		synchronized (propLock) {
-			if (properties != null) {
+			if (ok(properties)) {
 				properties.remove(NodeProp.CRYPTO_KEY_PRIVATE.s());
 				properties.remove(NodeProp.EMAIL.s());
 				properties.remove(NodeProp.CODE.s());
@@ -323,12 +324,12 @@ public class SubNode {
 		ThreadLocals.dirty(this);
 		synchronized (propLock) {
 			boolean changed = false;
-			if (val == null) {
+			if (no(val)) {
 				changed = properties().containsKey(key);
 				properties().remove(key);
 			} else {
 				SubNodePropVal curVal = properties().get(key);
-				changed = curVal == null || !val.equals(curVal.getValue());
+				changed = no(curVal) || !val.equals(curVal.getValue());
 				properties().put(key, new SubNodePropVal(val));
 			}
 			return changed;
@@ -356,7 +357,7 @@ public class SubNode {
 		try {
 			synchronized (propLock) {
 				SubNodePropVal v = properties().get(key);
-				if (v == null || v.getValue() == null)
+				if (no(v) || no(v.getValue()))
 					return null;
 
 				return v.getValue().toString();
@@ -379,7 +380,7 @@ public class SubNode {
 		try {
 			synchronized (propLock) {
 				SubNodePropVal v = properties().get(key);
-				if (v == null || v.getValue() == null)
+				if (no(v) || no(v.getValue()))
 					return 0L;
 				Object val = v.getValue();
 
@@ -415,7 +416,7 @@ public class SubNode {
 		try {
 			synchronized (propLock) {
 				SubNodePropVal v = properties().get(key);
-				if (v == null || v.getValue() == null)
+				if (no(v) || no(v.getValue()))
 					return null;
 				return (Date) v.getValue();
 			}
@@ -436,7 +437,7 @@ public class SubNode {
 		try {
 			synchronized (propLock) {
 				SubNodePropVal v = properties().get(key);
-				if (v == null || v.getValue() == null)
+				if (no(v) || no(v.getValue()))
 					return 0.0;
 				return (Double) v.getValue();
 			}
@@ -458,7 +459,7 @@ public class SubNode {
 		try {
 			synchronized (propLock) {
 				SubNodePropVal v = properties().get(key);
-				if (v == null || v.getValue() == null)
+				if (no(v) || no(v.getValue()))
 					return false;
 
 				// Our current property editor only knows how to save strings, so we just cope
@@ -481,7 +482,7 @@ public class SubNode {
 	@JsonIgnore
 	private SubNodePropertyMap properties() {
 		synchronized (propLock) {
-			if (properties == null) {
+			if (no(properties)) {
 				properties = new SubNodePropertyMap();
 			}
 			return properties;
@@ -498,7 +499,7 @@ public class SubNode {
 	@JsonIgnore
 	public boolean hasProperty(NodeProp prop) {
 		synchronized (propLock) {
-			return properties != null && properties.containsKey(prop.s());
+			return ok(properties) && properties.containsKey(prop.s());
 		}
 	}
 

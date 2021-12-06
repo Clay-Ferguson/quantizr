@@ -7,6 +7,7 @@ import org.subnode.mongo.MongoSession;
 import org.subnode.mongo.model.SubNode;
 import org.subnode.response.LuceneIndexResponse;
 import org.subnode.response.LuceneSearchResponse;
+import static org.subnode.util.Util.*;
 
 /**
  * Service for processing Lucene-related functions.
@@ -19,19 +20,16 @@ public class LuceneService extends ServiceBase {
 		LuceneIndexResponse res = new LuceneIndexResponse();
 		String ret = null;
 		SubNode node = read.getNode(ms, nodeId, true);
-		if (node != null) {
+		if (ok(node)) {
 			/*
-			 * Remember 'searchFolder' will have to be visible to the VM and therefore this
-			 * might require adding a new mapping parameter to the startup shell script for
-			 * docker. Docker can't see the entire folder structure on the host machine, but
-			 * can only see what has specifically been shared to it.
+			 * Remember 'searchFolder' will have to be visible to the VM and therefore this might require adding
+			 * a new mapping parameter to the startup shell script for docker. Docker can't see the entire
+			 * folder structure on the host machine, but can only see what has specifically been shared to it.
 			 * 
-			 * NOTE: We're using the nodeId as the subdirectory in the lucene data folder to
-			 * keep the index of this node garanteed to be separate but determined by this
-			 * node (i.e. unique to this node)
+			 * NOTE: We're using the nodeId as the subdirectory in the lucene data folder to keep the index of
+			 * this node garanteed to be separate but determined by this node (i.e. unique to this node)
 			 */
-			fileIndexer.index(searchFolder /* "/tmp/search" */, nodeId, "sh,md,txt,pdf,zip,tar,json,gz,tgz,xz",
-					true);
+			fileIndexer.index(searchFolder /* "/tmp/search" */, nodeId, "sh,md,txt,pdf,zip,tar,json,gz,tgz,xz", true);
 			ret = fileIndexer.getSummaryReport();
 			fileIndexer.close();
 		}
@@ -46,8 +44,8 @@ public class LuceneService extends ServiceBase {
 		String ret = null;
 		// disabled for now.
 		// SubNode node = read.getNode(session, nodeId, true);
-		// if (node != null) {
-		// 	ret = searcher.search(nodeId, searchText);
+		// if (ok(node )) {
+		// ret = searcher.search(nodeId, searchText);
 		// }
 
 		res.setSuccess(true);

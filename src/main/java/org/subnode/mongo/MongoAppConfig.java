@@ -32,23 +32,24 @@ import org.springframework.data.mongodb.repository.config.EnableMongoRepositorie
 import org.subnode.config.AppProp;
 import org.subnode.exception.base.RuntimeEx;
 import org.subnode.util.ExUtil;
+import static org.subnode.util.Util.*;
 
-//Ref: http://mongodb.github.io/mongo-java-driver/3.7/driver/getting-started/quick-start-pojo/
+// Ref: http://mongodb.github.io/mongo-java-driver/3.7/driver/getting-started/quick-start-pojo/
 
 @Configuration
 @EnableMongoRepositories(basePackages = "org.subnode.mongo")
 // see also: ServerMonitorListener to detect heartbeats, etc.
 public class MongoAppConfig extends AbstractMongoClientConfiguration {
 	private static final Logger log = LoggerFactory.getLogger(MongoAppConfig.class);
-	
+
 	public static final String databaseName = "database";
 	private MongoClient mongoClient;
 	private GridFSBucket gridFsBucket;
 	private SimpleMongoClientDatabaseFactory factory;
 
 	/**
-	 * we have this so we can set it to true and know that MongoDb failed and
-	 * gracefully run in case we need to run for debugging purposes.
+	 * we have this so we can set it to true and know that MongoDb failed and gracefully run in case we
+	 * need to run for debugging purposes.
 	 */
 	public static boolean connectionFailed = false;
 
@@ -69,10 +70,10 @@ public class MongoAppConfig extends AbstractMongoClientConfiguration {
 		if (connectionFailed)
 			return null;
 
-		if (factory == null) {
+		if (no(factory)) {
 			try {
 				MongoClient mc = mongoClient();
-				if (mc != null) {
+				if (ok(mc)) {
 					factory = new SimpleMongoClientDatabaseFactory(mc, databaseName);
 				} else {
 					return null;
@@ -91,9 +92,9 @@ public class MongoAppConfig extends AbstractMongoClientConfiguration {
 		if (connectionFailed)
 			return null;
 
-		if (gridFsBucket == null) {
+		if (no(gridFsBucket)) {
 			MongoDatabaseFactory mdbf = mongoDbFactory();
-			if (mdbf != null) {
+			if (ok(mdbf)) {
 				MongoDatabase db = mdbf.getMongoDatabase();
 				gridFsBucket = GridFSBuckets.create(db);
 			}
@@ -111,7 +112,7 @@ public class MongoAppConfig extends AbstractMongoClientConfiguration {
 		if (connectionFailed)
 			return null;
 
-		if (mongoClient == null) {
+		if (no(mongoClient)) {
 			MongoCredential credential = null;
 
 			if (appProp.getMongoSecurity()) {
@@ -126,11 +127,11 @@ public class MongoAppConfig extends AbstractMongoClientConfiguration {
 				String mongoHost = appProp.getMongoDbHost();
 				Integer mongoPort = appProp.getMongoDbPort();
 
-				if (mongoHost == null) {
+				if (no(mongoHost)) {
 					throw new RuntimeEx("mongodb.host property is missing");
 				}
 
-				if (mongoPort == null) {
+				if (no(mongoPort)) {
 					throw new RuntimeEx("mongodb.port property is missing");
 				}
 
@@ -138,15 +139,14 @@ public class MongoAppConfig extends AbstractMongoClientConfiguration {
 				log.info("Connecting to MongoDb: " + uri);
 
 				/*
-				 * This codec registroy is what allows us to store objects that contain other
-				 * POJOS, like for example the way we're storing AccessControl objects in a map
-				 * inside SubNode
+				 * This codec registroy is what allows us to store objects that contain other POJOS, like for
+				 * example the way we're storing AccessControl objects in a map inside SubNode
 				 */
 				CodecRegistry pojoCodecRegistry = fromRegistries(MongoClientSettings.getDefaultCodecRegistry(),
 						fromProviders(PojoCodecProvider.builder().automatic(true).build()));
 
 				MongoClientSettings.Builder builder = MongoClientSettings.builder();
-				if (credential != null) {
+				if (ok(credential)) {
 					builder = builder.credential(credential);
 				}
 				builder = builder.applyConnectionString(new ConnectionString(uri)); //
@@ -154,8 +154,8 @@ public class MongoAppConfig extends AbstractMongoClientConfiguration {
 				MongoClientSettings settings = builder.build();
 				mongoClient = MongoClients.create(settings);
 
-				if (mongoClient != null) {
-					if (credential != null) {
+				if (ok(mongoClient)) {
+					if (ok(credential)) {
 						for (String db : mongoClient.listDatabaseNames()) {
 							log.debug("MONGO DB NAME: " + db);
 						}
@@ -182,7 +182,7 @@ public class MongoAppConfig extends AbstractMongoClientConfiguration {
 	@Bean
 	public MongoTemplate mongoTemplate() throws Exception {
 		MongoDatabaseFactory mdbf = mongoDbFactory();
-		if (mdbf != null) {
+		if (ok(mdbf)) {
 			MongoTemplate mt = new MongoTemplate(mdbf);
 			mt.setWriteResultChecking(WriteResultChecking.EXCEPTION);
 			return mt;
@@ -204,7 +204,7 @@ public class MongoAppConfig extends AbstractMongoClientConfiguration {
 	@Bean
 	public GridFsTemplate gridFsTemplate() throws Exception {
 		MongoDatabaseFactory mdbf = mongoDbFactory();
-		if (mdbf != null) {
+		if (ok(mdbf)) {
 			return new GridFsTemplate(mdbf, converter);
 		} else {
 			return null;

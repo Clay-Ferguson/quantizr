@@ -23,6 +23,7 @@ import org.subnode.service.PushService;
 import org.subnode.util.StopwatchEntry;
 import org.subnode.util.ThreadLocals;
 import org.subnode.util.Util;
+import static org.subnode.util.Util.*;
 
 @Component
 @Scope("prototype")
@@ -124,7 +125,7 @@ public class SessionContext {
 		SessionContext sc = (SessionContext) session.getAttribute(SessionContext.QSC);
 
 		// if we don't have a SessionContext yet or it timed out then create a new one.
-		if (sc == null || !sc.isLive()) {
+		if (no(sc) || !sc.isLive()) {
 			/*
 			 * Note: we create SessionContext objects here on some requests that don't need them, but that's ok
 			 * becasue all our code makes the assumption there will be a SessionContext on the thread.
@@ -181,7 +182,7 @@ public class SessionContext {
 
 	public void addAction(String actionName) {
 		Integer count = actionCounters.get(actionName);
-		if (count == null) {
+		if (no(count)) {
 			actionCounters.put(actionName, 1);
 		} else {
 			actionCounters.put(actionName, count.intValue() + 1);
@@ -209,17 +210,17 @@ public class SessionContext {
 			throw new RuntimeException("invalid call to setAuthenticated for anon.");
 		}
 
-		if (userToken == null) {
+		if (no(userToken)) {
 			userToken = Util.genStrongToken();
 		}
 		log.debug("sessionContext authenticated hashCode=" + String.valueOf(hashCode()) + " user: " + userName + " to userToken "
 				+ userToken);
 		setUserName(userName);
 
-		if (userNodeId == null) {
+		if (no(userNodeId)) {
 			SubNode userNode = read.getUserNodeByUserName(auth.getAdminSession(), userName);
 			// we found user's node.
-			if (userNode != null) {
+			if (ok(userNode)) {
 				setUserNodeId(userNode.getId());
 			} else {
 				throw new RuntimeException("No userNode found for user: " + userName);
@@ -230,7 +231,7 @@ public class SessionContext {
 	}
 
 	public boolean isAuthenticated() {
-		return userToken != null;
+		return ok(userToken);
 	}
 
 	/*
@@ -238,13 +239,13 @@ public class SessionContext {
 	 * and perhaps use Spring Security
 	 */
 	public static boolean validToken(String token, String userName) {
-		if (token == null)
+		if (no(token))
 			return false;
 
 		synchronized (allSessions) {
 			for (SessionContext sc : allSessions) {
 				if (token.equals(sc.getUserToken())) {
-					if (userName != null) {
+					if (ok(userName)) {
 						// need to add IP check here too, but IP can be spoofed?
 						return userName.equals(sc.getUserName());
 					} else {
@@ -269,7 +270,7 @@ public class SessionContext {
 		HashSet<String> tokens = new HashSet<>();
 		synchronized (allSessions) {
 			for (SessionContext sc : allSessions) {
-				if (sc.isLive() && sc.getUserToken() != null) {
+				if (sc.isLive() && ok(sc.getUserToken())) {
 					if (!tokens.contains(sc.getUserToken())) {
 						ret.add(sc);
 						tokens.add(sc.getUserToken());
@@ -287,14 +288,14 @@ public class SessionContext {
 	}
 
 	public static List<SessionContext> getSessionsByUserName(String userName) {
-		if (userName == null)
+		if (no(userName))
 			return null;
 
 		List<SessionContext> list = null;
 		synchronized (allSessions) {
 			for (SessionContext sc : allSessions) {
 				if (userName.equals(sc.getUserName())) {
-					if (list == null) {
+					if (no(list)) {
 						list = new LinkedList<>();
 					}
 					list.add(sc);
@@ -337,7 +338,7 @@ public class SessionContext {
 	}
 
 	public void setUserName(String userName) {
-		if (userName != null) {
+		if (ok(userName)) {
 			pastUserName = userName;
 		}
 		this.userName = userName;
@@ -469,7 +470,7 @@ public class SessionContext {
 
 	public void stopwatch(String action) {
 		// for now only admin user has stopwatch capability
-		if (userName == null || !userName.equals(PrincipalName.ADMIN.s()))
+		if (no(userName) || !userName.equals(PrincipalName.ADMIN.s()))
 			return;
 
 		StopwatchEntry se = null;

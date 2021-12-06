@@ -9,6 +9,7 @@ import org.slf4j.LoggerFactory;
 import org.subnode.actpub.APConst;
 import org.subnode.util.DateUtil;
 import org.subnode.util.XString;
+import static org.subnode.util.Util.*;
 
 /**
  * Because the ActivityPup spec has lots of places where the object types are completely variable,
@@ -23,7 +24,7 @@ public class AP {
     }
 
     public static boolean isType(Object obj, String type) {
-        if (obj == null)
+        if (no(obj))
             return false;
         return type.equalsIgnoreCase(str(obj, APProp.type));
     }
@@ -31,7 +32,7 @@ public class AP {
     public static String str(Object obj, String prop) {
         if (obj instanceof Map<?, ?>) {
             Object val = ((Map<?, ?>) obj).get(prop);
-            if (val == null) {
+            if (no(val)) {
                 return null;
             } else if (val instanceof String) {
                 return (String) val;
@@ -41,20 +42,20 @@ public class AP {
                 return null;
             } else {
                 log.error("unhandled type on str() return val: "
-                        + (val != null ? val.getClass().getName() : "null\n\non object:" + XString.prettyPrint(obj)));
+                        + (ok(val) ? val.getClass().getName() : "null\n\non object:" + XString.prettyPrint(obj)));
                 return null;
             }
         } else {
             return null;
         }
-        // throw new RuntimeException("unhandled type on str(): " + (obj != null ? obj.getClass().getName()
+        // throw new RuntimeException("unhandled type on str(): " + (ok(obj) ? obj.getClass().getName()
         // : "null"));
     }
 
     public static Boolean bool(Object obj, String prop) {
         if (obj instanceof Map<?, ?>) {
             Object val = ((Map<?, ?>) obj).get(prop);
-            if (val == null) {
+            if (no(val)) {
                 return false;
             } else if (val instanceof String) {
                 return ((String) val).equalsIgnoreCase(APConst.TRUE);
@@ -62,65 +63,65 @@ public class AP {
                 return ((Boolean) val).booleanValue();
             } else {
                 throw new RuntimeException(
-                        "unhandled type on bool() return val: " + (val != null ? val.getClass().getName() : "null"));
+                        "unhandled type on bool() return val: " + (ok(val) ? val.getClass().getName() : "null"));
             }
         }
-        throw new RuntimeException("unhandled type on bool(): " + (obj != null ? obj.getClass().getName() : "null"));
+        throw new RuntimeException("unhandled type on bool(): " + (ok(obj) ? obj.getClass().getName() : "null"));
     }
 
     public static Integer integer(Object obj, String prop) {
         if (obj instanceof Map<?, ?>) {
             Object val = ((Map<?, ?>) obj).get(prop);
-            if (val == null) {
+            if (no(val)) {
                 return 0;
             } else if (val instanceof Integer) {
                 return ((Integer) val).intValue();
             } else if (val instanceof Long) {
                 return ((Long) val).intValue();
-            }else if (val instanceof String) {
+            } else if (val instanceof String) {
                 return Integer.valueOf((String) val);
             } else {
                 throw new RuntimeException(
-                        "unhandled type on integer() return val: " + (val != null ? val.getClass().getName() : "null"));
+                        "unhandled type on integer() return val: " + (ok(val) ? val.getClass().getName() : "null"));
             }
         }
-        throw new RuntimeException("unhandled type on integer(): " + (obj != null ? obj.getClass().getName() : "null"));
+        throw new RuntimeException("unhandled type on integer(): " + (ok(obj) ? obj.getClass().getName() : "null"));
     }
 
     public static Date date(Object obj, String prop) {
         if (obj instanceof Map<?, ?>) {
             Object val = ((Map<?, ?>) obj).get(prop);
-            if (val == null) {
+            if (no(val)) {
                 return null;
             } else if (val instanceof String) {
                 return DateUtil.parseISOTime((String) val);
             } else {
                 throw new RuntimeException(
-                        "unhandled type on date() return val: " + (val != null ? val.getClass().getName() : "null"));
+                        "unhandled type on date() return val: " + (ok(val) ? val.getClass().getName() : "null"));
             }
         }
-        throw new RuntimeException("unhandled type on date(): " + (obj != null ? obj.getClass().getName() : "null"));
+        throw new RuntimeException("unhandled type on date(): " + (ok(obj) ? obj.getClass().getName() : "null"));
     }
 
     public static List<?> list(Object obj, String prop) {
         if (obj instanceof Map<?, ?>) {
             Object val = ((Map<?, ?>) obj).get(prop);
-            if (val == null) {
+            if (no(val)) {
                 return null;
             } else if (val instanceof List<?>) {
                 return (List<?>) val;
             } else {
                 throw new RuntimeException(
-                        "unhandled type on list() return val: " + (val != null ? val.getClass().getName() : "null"));
+                        "unhandled type on list() return val: " + (ok(val) ? val.getClass().getName() : "null"));
             }
         }
-        throw new RuntimeException("unhandled type on list(): " + (obj != null ? obj.getClass().getName() : "null"));
+        throw new RuntimeException("unhandled type on list(): " + (ok(obj) ? obj.getClass().getName() : "null"));
     }
 
     public static Object obj(Object obj, String prop) {
         if (obj instanceof Map<?, ?>) {
             return ((Map<?, ?>) obj).get(prop);
         }
-        throw new RuntimeException("unhandled type on obj(): " + (obj != null ? obj.getClass().getName() : "null"));
+        throw new RuntimeException("unhandled type on obj(): " + (ok(obj) ? obj.getClass().getName() : "null"));
     }
 }

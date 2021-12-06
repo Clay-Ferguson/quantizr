@@ -6,6 +6,7 @@ package org.subnode.util;
 import java.util.ArrayList;
 import java.util.StringTokenizer;
 import java.util.regex.Pattern;
+import static org.subnode.util.Util.*;
 
 /**
  * Some simple string pattern matching utilities.
@@ -47,7 +48,7 @@ public class StringPatternMatcher {
 	}
 
 	public void addListOfPatterns(String input) {
-		if (input == null || input.length() == 0) return;
+		if (no(input) || input.length() == 0) return;
 
 		StringTokenizer t = new StringTokenizer(input, ",", true);
 		String token;

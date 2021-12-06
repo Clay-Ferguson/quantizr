@@ -19,6 +19,7 @@ import org.subnode.actpub.APConst;
 import org.subnode.util.ExUtil;
 import org.subnode.util.StreamUtil;
 import org.subnode.util.XString;
+import static org.subnode.util.Util.*;
 
 /**
  * Wrapper to access application properties.
@@ -42,7 +43,7 @@ public class AppProp {
 	HashMap<String, Object> configMap = null;
 
 	public HashMap<String, Object> getConfig() {
-		if (configMap != null) {
+		if (ok(configMap)) {
 			return configMap;
 		}
 
@@ -54,7 +55,7 @@ public class AppProp {
 				/* For every key in internal set, override with the external val if found */
 				for (String key : configMapInternal.keySet()) {
 					Object val = configMapExternal.get(key);
-					if (val != null) {
+					if (ok(val)) {
 						configMapInternal.put(key, val);
 					}
 				}
@@ -64,7 +65,7 @@ public class AppProp {
 				ExUtil.error(log, "failed to load help-text.yaml", e);
 			}
 
-			if (configMap == null) {
+			if (no(configMap)) {
 				configMap = new HashMap<>();
 			}
 			return configMap;
@@ -91,7 +92,7 @@ public class AppProp {
 
 				map = yamlMapper.readValue(is, new TypeReference<HashMap<String, Object>>() {});
 
-				if (map == null) {
+				if (no(map)) {
 					map = new HashMap<>();
 				}
 
@@ -116,7 +117,7 @@ public class AppProp {
 					map = yamlMapper.readValue(file, new TypeReference<HashMap<String, Object>>() {});
 				}
 
-				if (map == null) {
+				if (no(map)) {
 					map = new HashMap<>();
 				}
 			} catch (Exception e) {
@@ -147,7 +148,7 @@ public class AppProp {
 	}
 
 	public String getProtocolHostAndPort() {
-		if (protocolHostAndPort != null)
+		if (ok(protocolHostAndPort))
 			return protocolHostAndPort;
 
 		protocolHostAndPort = getHttpProtocol() + "://" + getMetaHost();
@@ -276,7 +277,7 @@ public class AppProp {
 	/* considers property 'true' if it starts with letter 't', 'y' (yes), or 1 */
 	public boolean getBooleanProp(String propName) {
 		String val = env.getProperty(propName);
-		if (val == null)
+		if (no(val))
 			return false;
 		val = val.toLowerCase();
 		return val.startsWith("t") || val.startsWith("y") || val.startsWith("1");
@@ -291,7 +292,7 @@ public class AppProp {
 	}
 
 	public String translateDirs(String folder) {
-		if (folder == null)
+		if (no(folder))
 			return folder;
 		String userDir = System.getProperty("user.dir");
 		return folder.replace("{user.dir}", userDir);

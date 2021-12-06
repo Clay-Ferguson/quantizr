@@ -11,10 +11,11 @@ import org.springframework.data.annotation.Transient;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
+import static org.subnode.util.Util.*;
 
 /**
- * Primary object passed back to client to represent a 'node'. Client sees the
- * JSON version of this, in javascript.
+ * Primary object passed back to client to represent a 'node'. Client sees the JSON version of this,
+ * in javascript.
  */
 @JsonInclude(Include.NON_NULL)
 public class NodeInfo {
@@ -40,9 +41,8 @@ public class NodeInfo {
 	private List<PropertyInfo> properties;
 
 	/*
-	 * Holds information that the server needs to send back to the client to support
-	 * client features, but that are not actually stored properties on the actual
-	 * node
+	 * Holds information that the server needs to send back to the client to support client features,
+	 * but that are not actually stored properties on the actual node
 	 */
 	private List<PropertyInfo> clientProps;
 
@@ -50,11 +50,10 @@ public class NodeInfo {
 	private boolean hasChildren;
 
 	/*
-	 * For nodes that are encrypted but shared to the current user, we send back the
-	 * ciperKey (an encrypted sym key) for this node which is a key that can only be
-	 * decrypted by the private key on the user's browser, but decrypted by them on
-	 * their browser it gives the symmetric key to the encrypted data so they can
-	 * access the encrypted node content with it
+	 * For nodes that are encrypted but shared to the current user, we send back the ciperKey (an
+	 * encrypted sym key) for this node which is a key that can only be decrypted by the private key on
+	 * the user's browser, but decrypted by them on their browser it gives the symmetric key to the
+	 * encrypted data so they can access the encrypted node content with it
 	 */
 	private String cipherKey;
 
@@ -67,9 +66,9 @@ public class NodeInfo {
 	private int height;
 
 	/*
-	 * This is only populated when generating user "feeds", because we want the feed
-	 * to be able to show the context for the reply of a post, which entails showing
-	 * the parent of the reply above the reply
+	 * This is only populated when generating user "feeds", because we want the feed to be able to show
+	 * the context for the reply of a post, which entails showing the parent of the reply above the
+	 * reply
 	 */
 	private NodeInfo parent;
 
@@ -85,13 +84,12 @@ public class NodeInfo {
 	private String apAvatar;
 	private String apImage;
 
-	public NodeInfo() {
-	}
+	public NodeInfo() {}
 
-	public NodeInfo(String id, String path, String name, String content, String displayName, String owner, String ownerId, Long ordinal,
-			Date lastModified, List<PropertyInfo> properties, List<AccessControlInfo> ac, boolean hasChildren,
-			int width, int height, String type, long logicalOrdinal, boolean lastChild, String cipherKey,
-			String dataUrl, String avatarVer, String apAvatar, String apImage) {
+	public NodeInfo(String id, String path, String name, String content, String displayName, String owner, String ownerId,
+			Long ordinal, Date lastModified, List<PropertyInfo> properties, List<AccessControlInfo> ac, boolean hasChildren,
+			int width, int height, String type, long logicalOrdinal, boolean lastChild, String cipherKey, String dataUrl,
+			String avatarVer, String apAvatar, String apImage) {
 		this.id = id;
 		this.path = path;
 		this.name = name;
@@ -120,7 +118,7 @@ public class NodeInfo {
 	@Transient
 	@JsonIgnore
 	public Object getPropVal(String propName) {
-		if (properties == null)
+		if (no(properties))
 			return null;
 
 		for (PropertyInfo prop : properties) {
@@ -134,7 +132,7 @@ public class NodeInfo {
 	@Transient
 	@JsonIgnore
 	public void setPropVal(String propName, Object val) {
-		if (properties == null) {
+		if (no(properties)) {
 			safeGetProperties().add(new PropertyInfo(propName, val));
 			return;
 		}
@@ -175,7 +173,7 @@ public class NodeInfo {
 	}
 
 	public List<NodeInfo> safeGetChildren() {
-		if (children != null)
+		if (ok(children))
 			return children;
 		return children = new LinkedList<>();
 	}
@@ -205,7 +203,7 @@ public class NodeInfo {
 	}
 
 	public List<PropertyInfo> safeGetProperties() {
-		if (properties != null)
+		if (ok(properties))
 			return properties;
 		return properties = new LinkedList<>();
 	}
@@ -355,7 +353,7 @@ public class NodeInfo {
 	}
 
 	public List<PropertyInfo> safeGetClientProps() {
-		if (clientProps != null)
+		if (ok(clientProps))
 			return clientProps;
 		return clientProps = new LinkedList<>();
 	}

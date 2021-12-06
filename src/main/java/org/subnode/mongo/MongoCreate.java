@@ -12,6 +12,7 @@ import org.subnode.model.client.NodeType;
 import org.subnode.model.client.PrivilegeType;
 import org.subnode.mongo.model.SubNode;
 import org.subnode.service.ServiceBase;
+import static org.subnode.util.Util.*;
 
 @Component
 public class MongoCreate extends ServiceBase {
@@ -28,7 +29,7 @@ public class MongoCreate extends ServiceBase {
 	}
 
 	public SubNode createNode(MongoSession ms, String path, String type) {
-		if (type == null) {
+		if (no(type)) {
 			type = NodeType.NONE.s();
 		}
 		SubNode node = new SubNode(ms.getUserNodeId(), path, type, null);
@@ -36,7 +37,7 @@ public class MongoCreate extends ServiceBase {
 	}
 
 	public SubNode createNodeAsOwner(MongoSession ms, String path, String type, ObjectId ownerId) {
-		if (type == null) {
+		if (no(type)) {
 			type = NodeType.NONE.s();
 		}
 		// ObjectId ownerId = read.getOwnerNodeIdFromSession(session);
@@ -53,29 +54,29 @@ public class MongoCreate extends ServiceBase {
 	 */
 	public SubNode createNode(MongoSession ms, SubNode parent, String relPath, String type, Long ordinal,
 			CreateNodeLocation location, List<PropertyInfo> properties, ObjectId ownerId, boolean updateParentOrdinals) {
-		if (relPath == null) {
+		if (no(relPath)) {
 			/*
 			 * Adding a node ending in '?' will trigger for the system to generate a leaf node automatically.
 			 */
 			relPath = "?";
 		}
 
-		if (type == null) {
+		if (no(type)) {
 			type = NodeType.NONE.s();
 		}
 
-		String path = (parent == null ? "" : parent.getPath()) + "/" + relPath;
+		String path = (no(parent) ? "" : parent.getPath()) + "/" + relPath;
 
-		if (ownerId == null) {
+		if (no(ownerId)) {
 			ownerId = ms.getUserNodeId();
 		}
 
 		// for now not worried about ordinals for root nodes.
-		if (parent == null) {
+		if (no(parent)) {
 			ordinal = 0L;
 		} else {
 			if (updateParentOrdinals) {
-				if (ordinal == null) {
+				if (no(ordinal)) {
 					ordinal = 0L;
 				}
 
@@ -89,7 +90,7 @@ public class MongoCreate extends ServiceBase {
 
 		SubNode node = new SubNode(ownerId, path, type, ordinal);
 
-		if (properties != null) {
+		if (ok(properties)) {
 			for (PropertyInfo propInfo : properties) {
 				node.set(propInfo.getName(), propInfo.getValue());
 			}
@@ -143,8 +144,8 @@ public class MongoCreate extends ServiceBase {
 		update.saveSession(ms);
 
 		criteria = Criteria.where(SubNode.FIELD_ORDINAL).gte(ordinal);
-		for (SubNode child : read.getChildrenUnderPath(ms, node.getPath(),
-				Sort.by(Sort.Direction.ASC, SubNode.FIELD_ORDINAL), null, 0, null, criteria)) {
+		for (SubNode child : read.getChildrenUnderPath(ms, node.getPath(), Sort.by(Sort.Direction.ASC, SubNode.FIELD_ORDINAL),
+				null, 0, null, criteria)) {
 			child.setOrdinal(maxOrdinal++);
 		}
 	}

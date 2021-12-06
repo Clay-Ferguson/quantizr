@@ -14,6 +14,7 @@ import org.apache.commons.io.FilenameUtils;
 import org.apache.tika.Tika;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import static org.subnode.util.Util.*;
 
 public class MimeTypeUtils {
     private static final Logger log = LoggerFactory.getLogger(MimeTypeUtils.class);
@@ -42,8 +43,8 @@ public class MimeTypeUtils {
             // If that getContentType didn't find anything specific, try again.
             if ("application/octet-stream".equals(ret)) {
                 /*
-                 * todo-1: we have some direct calls to guessContentTypeFromName, that should
-                 * perhaps all be calling this method (getMimeType) instead.
+                 * todo-1: we have some direct calls to guessContentTypeFromName, that should perhaps all be calling
+                 * this method (getMimeType) instead.
                  */
                 ret = URLConnection.guessContentTypeFromName(fileName);
             }
@@ -54,10 +55,10 @@ public class MimeTypeUtils {
     // https://odoepner.wordpress.com/2013/07/29/transparently-improve-java-7-mime-type-recognition-with-apache-tika/
     public static String probeContentType(Path file) throws IOException {
         String mimeType = Files.probeContentType(file);
-        if (mimeType == null) {
+        if (no(mimeType)) {
             mimeType = tika.detect(file.toFile());
 
-            if (mimeType == null) {
+            if (no(mimeType)) {
                 mimeType = getMimeType(FilenameUtils.getExtension(String.valueOf(file.getFileName())));
             }
         }

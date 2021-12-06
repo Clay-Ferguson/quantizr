@@ -34,6 +34,7 @@ import org.subnode.response.RenderNodeResponse;
 import org.subnode.util.DateUtil;
 import org.subnode.util.ThreadLocals;
 import org.subnode.util.XString;
+import static org.subnode.util.Util.*;
 
 /**
  * Service for rendering the content of a page. The actual page is not rendered on the server side.
@@ -55,7 +56,7 @@ public class NodeRenderService extends ServiceBase {
 
 		for (String id : req.getIds()) {
 			SubNode node = read.getNode(ms, id);
-			if (node != null) {
+			if (ok(node)) {
 				boolean hasChildren = read.hasChildren(ms, node);
 				list.add(new NodeMetaIntf(id, hasChildren));
 			}
@@ -75,7 +76,7 @@ public class NodeRenderService extends ServiceBase {
 		 * Return cached version of welcome page if generated, but not for admin because admin should be
 		 * able to make edits and then those edits update the cache
 		 */
-		if (isWelcomePage && welcomePage != null && !ms.isAdmin()) {
+		if (isWelcomePage && ok(welcomePage) && !ms.isAdmin()) {
 			return welcomePage;
 		}
 
@@ -97,17 +98,17 @@ public class NodeRenderService extends ServiceBase {
 			return res;
 		}
 
-		if (node == null) {
+		if (no(node)) {
 			log.debug("nodeId not found: " + targetId + " sending user to :public instead");
 			node = read.getNode(ms, prop.getUserLandingPageNode());
 		}
 
-		if (node == null) {
+		if (no(node)) {
 			res.setNoDataResponse("Node not found.");
 			return res;
 		}
 
-		if (node.getStr(NodeProp.IPFS_SCID) != null) {
+		if (ok(node.getStr(NodeProp.IPFS_SCID))) {
 			SyncFromIpfsService svc = (SyncFromIpfsService) SpringContextUtil.getBean(SyncFromIpfsService.class);
 			svc.loadNode(ms, node);
 		}
@@ -145,26 +146,26 @@ public class NodeRenderService extends ServiceBase {
 			SubNode parent = read.getParent(ms, node);
 			if (req.getSiblingOffset() < 0) {
 				SubNode nodeAbove = read.getSiblingAbove(ms, node);
-				if (nodeAbove != null) {
+				if (ok(nodeAbove)) {
 					node = nodeAbove;
 				} else {
-					node = parent != null ? parent : node;
+					node = ok(parent) ? parent : node;
 				}
 			} else if (req.getSiblingOffset() > 0) {
 				SubNode nodeBelow = read.getSiblingBelow(ms, node);
-				if (nodeBelow != null) {
+				if (ok(nodeBelow)) {
 					node = nodeBelow;
 				} else {
-					node = parent != null ? parent : node;
+					node = ok(parent) ? parent : node;
 				}
 			} else {
-				node = parent != null ? parent : node;
+				node = ok(parent) ? parent : node;
 			}
 		} else {
 			if (req.isUpLevel()) {
 				try {
 					SubNode parent = read.getParent(ms, node);
-					if (parent != null) {
+					if (ok(parent)) {
 						scanToNode = node;
 						node = parent;
 					}
@@ -189,10 +190,10 @@ public class NodeRenderService extends ServiceBase {
 		}
 
 		int limit = ConstantInt.ROWS_PER_PAGE.val();
-		if (node != null) {
+		if (ok(node)) {
 			// add pageSize hack to docs and admin part of user guide.
 			Long pageSize = node.getInt("pageSize");
-			if (pageSize != null && pageSize.intValue() > ConstantInt.ROWS_PER_PAGE.val()) {
+			if (ok(pageSize) && pageSize.intValue() > ConstantInt.ROWS_PER_PAGE.val()) {
 				limit = pageSize.intValue();
 			}
 		}
@@ -243,7 +244,7 @@ public class NodeRenderService extends ServiceBase {
 		 * If we are scanning to a node we know we need to start from zero offset, or else we use the offset
 		 * passed in. Offset is the number of nodes to IGNORE before we start collecting nodes.
 		 */
-		int offset = scanToNode != null ? 0 : req.getOffset();
+		int offset = ok(scanToNode) ? 0 : req.getOffset();
 		if (offset < 0) {
 			offset = 0;
 		}
@@ -255,7 +256,7 @@ public class NodeRenderService extends ServiceBase {
 		 * timestamp we'd need a ">=" on the timestamp itself instead. We request ROWS_PER_PAGE+1, because
 		 * that is enough to trigger 'endReached' logic to be set correctly
 		 */
-		int queryLimit = scanToNode != null ? -1 : offset + limit + 2;
+		int queryLimit = ok(scanToNode) ? -1 : offset + limit + 2;
 
 		// log.debug("query: offset=" + offset + " limit=" + queryLimit + " scanToNode="
 		// + scanToNode);
@@ -267,7 +268,7 @@ public class NodeRenderService extends ServiceBase {
 			sort = parseOrderBy(orderBy);
 		}
 
-		if (sort == null) {
+		if (no(sort)) {
 			// log.debug("processRenderNode querying by ordinal.");
 			sort = Sort.by(Sort.Direction.ASC, SubNode.FIELD_ORDINAL);
 		}
@@ -313,7 +314,7 @@ public class NodeRenderService extends ServiceBase {
 			// log.debug(" DATA: " + XString.prettyPrint(n));
 
 			/* are we still just scanning for our target node */
-			if (scanToNode != null) {
+			if (ok(scanToNode)) {
 				/*
 				 * If this is the node we are scanning for turn off scan mode, and add up to ROWS_PER_PAGE-1 of any
 				 * sliding window nodes above it.
@@ -321,7 +322,7 @@ public class NodeRenderService extends ServiceBase {
 				if (n.getPath().equals(scanToNode.getPath())) {
 					scanToNode = null;
 
-					if (slidingWindow != null) {
+					if (ok(slidingWindow)) {
 						int count = slidingWindow.size();
 						if (count > 0) {
 							int relativeIdx = idx - 1;
@@ -355,7 +356,7 @@ public class NodeRenderService extends ServiceBase {
 				 */
 				else {
 					/* lazily create sliding window */
-					if (slidingWindow == null) {
+					if (no(slidingWindow)) {
 						slidingWindow = new LinkedList<>();
 					}
 
@@ -387,7 +388,7 @@ public class NodeRenderService extends ServiceBase {
 		 * if we accumulated less than ROWS_PER_PAGE, then try to scan back up the sliding window to build
 		 * up the ROW_PER_PAGE by looking at nodes that we encountered before we reached the end.
 		 */
-		if (slidingWindow != null && nodeInfo.getChildren().size() < limit) {
+		if (ok(slidingWindow) && nodeInfo.getChildren().size() < limit) {
 			int count = slidingWindow.size();
 			if (count > 0) {
 				int relativeIdx = idx - 1;
@@ -410,7 +411,7 @@ public class NodeRenderService extends ServiceBase {
 			log.trace("no child nodes found.");
 		}
 
-		if (endReached && ninfo != null && nodeInfo.getChildren().size() > 1) {
+		if (endReached && ok(ninfo) && nodeInfo.getChildren().size() > 1) {
 			ninfo.setLastChild(true);
 		}
 
@@ -456,7 +457,7 @@ public class NodeRenderService extends ServiceBase {
 		SubNode node = read.getNode(ms, nodeId);
 		auth.ownerAuth(ms, node);
 
-		if (node == null) {
+		if (no(node)) {
 			res.setMessage("Node not found.");
 			res.setSuccess(false);
 			return res;
@@ -479,7 +480,7 @@ public class NodeRenderService extends ServiceBase {
 		String id = prop.getUserLandingPageNode();
 		// log.debug("Anon Render Node ID: " + id);
 
-		if (ThreadLocals.getSC().getUrlId() != null) {
+		if (ok(ThreadLocals.getSC().getUrlId())) {
 			id = ThreadLocals.getSC().getUrlId();
 			ThreadLocals.getSC().setUrlId(null);
 		}
@@ -504,11 +505,11 @@ public class NodeRenderService extends ServiceBase {
 		boolean ret = false;
 
 		SubNode node = read.getNodeByName(as, nodeName, true);
-		if (node != null) {
+		if (ok(node)) {
 			Iterable<SubNode> iter = read.getNamedNodes(as, node);
 			List<SubNode> children = read.iterateToList(iter);
 
-			if (children != null) {
+			if (ok(children)) {
 				for (SubNode child : children) {
 					if (!StringUtils.isEmpty(child.getName())) {
 						model.put(child.getName(), child.getContent());
@@ -523,14 +524,14 @@ public class NodeRenderService extends ServiceBase {
 	}
 
 	public void populateSocialCardProps(SubNode node, Model model) {
-		if (node == null)
+		if (no(node))
 			return;
 		NodeMetaInfo metaInfo = snUtil.getNodeMetaInfo(node);
 		model.addAttribute("ogTitle", metaInfo.getTitle());
 		model.addAttribute("ogDescription", metaInfo.getDescription());
 
 		String mime = metaInfo.getAttachmentMime();
-		if (mime != null && mime.startsWith("image/")) {
+		if (ok(mime) && mime.startsWith("image/")) {
 			model.addAttribute("ogImage", metaInfo.getAttachmentUrl());
 		}
 
@@ -542,7 +543,7 @@ public class NodeRenderService extends ServiceBase {
 		ms = ThreadLocals.ensure(ms);
 
 		SubNode node = read.getNode(ms, req.getNodeId());
-		if (node == null) {
+		if (no(node)) {
 			return res;
 		}
 
@@ -577,11 +578,11 @@ public class NodeRenderService extends ServiceBase {
 		ms = ThreadLocals.ensure(ms);
 
 		try {
-			if (node != null) {
+			if (ok(node)) {
 				node = read.getParent(ms, node);
 			}
 
-			while (node != null) {
+			while (ok(node)) {
 				BreadcrumbInfo bci = new BreadcrumbInfo();
 				if (list.size() >= 5) {
 					// This toplevel one is shows up on the client as "..." indicating more parents
@@ -622,7 +623,7 @@ public class NodeRenderService extends ServiceBase {
 	}
 
 	public String stripRenderTags(String content) {
-		if (content == null)
+		if (no(content))
 			return null;
 		content = content.replace("{{imgUpperRight}}", "");
 		content = content.replace("{{imgUpperLeft}}", "");
@@ -637,7 +638,7 @@ public class NodeRenderService extends ServiceBase {
 	}
 
 	public String getFirstLineAbbreviation(String content, int maxLen) {
-		if (content == null)
+		if (no(content))
 			return null;
 
 		content = stripRenderTags(content);

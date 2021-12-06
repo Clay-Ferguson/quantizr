@@ -31,6 +31,7 @@ import org.subnode.service.ServiceBase;
 import org.subnode.util.DateUtil;
 import org.subnode.util.Val;
 import org.subnode.util.XString;
+import static org.subnode.util.Util.*;
 
 @Component
 public class ActPubOutbox extends ServiceBase {
@@ -46,13 +47,13 @@ public class ActPubOutbox extends ServiceBase {
      */
     public void loadForeignOutbox(MongoSession ms, Object actor, SubNode userNode, String apUserName) {
         try {
-            if (userNode == null) {
+            if (no(userNode)) {
                 userNode = read.getUserNodeByUserName(ms, apUserName);
             }
 
             SubNode outboxNode = read.getUserNodeByType(ms, apUserName, userNode, "### Posts", NodeType.ACT_PUB_POSTS.s(),
                     Arrays.asList(PrivilegeType.READ.s(), PrivilegeType.WRITE.s()), NodeName.POSTS);
-            if (outboxNode == null) {
+            if (no(outboxNode)) {
                 log.debug("no outbox for user: " + apUserName);
                 return;
             }
@@ -63,7 +64,7 @@ public class ActPubOutbox extends ServiceBase {
             Iterable<SubNode> outboxItems = read.getSubGraph(ms, outboxNode, null, 0, true);
             String outboxUrl = AP.str(actor, APProp.outbox);
             APObj outbox = getOutbox(outboxUrl);
-            if (outbox == null) {
+            if (no(outbox)) {
                 log.debug("Unable to get outbox for AP user: " + apUserName);
                 return;
             }
@@ -75,7 +76,7 @@ public class ActPubOutbox extends ServiceBase {
             HashSet<String> apIdSet = new HashSet<>();
             for (SubNode n : outboxItems) {
                 String apId = n.getStr(NodeProp.ACT_PUB_ID.s());
-                if (apId != null) {
+                if (ok(apId)) {
                     apIdSet.add(apId);
                 }
             }
@@ -86,7 +87,7 @@ public class ActPubOutbox extends ServiceBase {
             // log.debug("scanning outbox orderedCollection");
             apUtil.iterateOrderedCollection(outbox, Integer.MAX_VALUE, obj -> {
                 try {
-                    // if (obj != null) {
+                    // if (ok(obj )) {
                     // log.debug("orderedCollection Item: OBJ=" + XString.prettyPrint(obj));
                     // }
 
@@ -94,7 +95,7 @@ public class ActPubOutbox extends ServiceBase {
                     if (!apIdSet.contains(apId)) {
                         Object object = AP.obj(obj, APProp.object);
 
-                        if (object != null) {
+                        if (ok(object)) {
                             if (object instanceof String) {
                                 // todo-1: handle boosts.
                                 //
@@ -137,7 +138,7 @@ public class ActPubOutbox extends ServiceBase {
     }
 
     public APObj getOutbox(String url) {
-        if (url == null)
+        if (no(url))
             return null;
 
         APObj outbox = apUtil.getJson(url, APConst.MTYPE_ACT_JSON);
@@ -171,7 +172,7 @@ public class ActPubOutbox extends ServiceBase {
         Long totalItems = arun.run(as -> {
             long count = 0;
             SubNode userNode = read.getUserNodeByUserName(null, userName);
-            if (userNode != null) {
+            if (ok(userNode)) {
                 List<String> sharedToList = new LinkedList<>();
                 sharedToList.add(sharedTo);
                 count = auth.countSubGraphByAclUser(as, null, sharedToList, userNode.getOwner());
@@ -211,7 +212,7 @@ public class ActPubOutbox extends ServiceBase {
 
         try {
             SubNode userNode = read.getUserNodeByUserName(null, userName);
-            if (userNode == null) {
+            if (no(userNode)) {
                 return null;
             }
 
@@ -220,7 +221,7 @@ public class ActPubOutbox extends ServiceBase {
                 int MAX_PER_PAGE = 25;
                 boolean collecting = false;
 
-                if (minId == null) {
+                if (no(minId)) {
                     collecting = true;
                 }
 
@@ -232,7 +233,7 @@ public class ActPubOutbox extends ServiceBase {
 
                     String replyTo = null;
                     SubNode parent = read.getParent(as, child, false);
-                    if (parent != null) {
+                    if (ok(parent)) {
                         replyTo = snUtil.getIdBasedUrl(parent);
                     }
 
@@ -257,7 +258,7 @@ public class ActPubOutbox extends ServiceBase {
                                 .put(APProp.sensitive, false) //
                                 .put(APProp.content, child.getContent());
 
-                        if (replyTo != null) {
+                        if (ok(replyTo)) {
                             note = note.put(APProp.inReplyTo, replyTo);
                         }
 

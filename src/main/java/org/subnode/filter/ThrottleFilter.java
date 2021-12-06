@@ -17,6 +17,7 @@ import org.springframework.web.filter.GenericFilterBean;
 import org.subnode.config.AppProp;
 import org.subnode.model.IPInfo;
 import org.subnode.util.Util;
+import static org.subnode.util.Util.*;
 
 @Component
 @Order(3)
@@ -54,7 +55,7 @@ public class ThrottleFilter extends GenericFilterBean {
 			String ip = Util.getClientIpAddr(sreq);
 			synchronized (ipInfo) {
 				info = ipInfo.get(ip);
-				if (info == null) {
+				if (no(info)) {
 					ipInfo.put(ip, info = new IPInfo());
 				}
 			}
@@ -65,7 +66,7 @@ public class ThrottleFilter extends GenericFilterBean {
 		 * singleThreadDebugging creates one lock per IP so that each machine calling our server gets single
 		 * threaded, but other servers can call in parallel
 		 */
-		if (singleThreadDebugging && info != null) {
+		if (singleThreadDebugging && ok(info)) {
 			synchronized (info.getLock()) {
 				chain.doFilter(request, response);
 			}
@@ -75,7 +76,7 @@ public class ThrottleFilter extends GenericFilterBean {
 	}
 
 	private void throttleRequest(HttpServletRequest httpReq, IPInfo info) {
-		if (httpReq == null)
+		if (no(httpReq))
 			return;
 
 		long curTime = System.currentTimeMillis();

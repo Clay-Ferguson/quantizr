@@ -1,5 +1,6 @@
 package org.subnode.service;
 
+import static org.subnode.util.Util.ok;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -13,7 +14,6 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -30,11 +30,11 @@ import org.subnode.model.client.IPSMMessage;
 import org.subnode.mongo.MongoRepository;
 import org.subnode.response.IPSMPushInfo;
 import org.subnode.response.ServerPushInfo;
-import org.subnode.util.AsyncExec;
 import org.subnode.util.Cast;
 import org.subnode.util.DateUtil;
 import org.subnode.util.Util;
 import org.subnode.util.XString;
+import static org.subnode.util.Util.*;
 
 // IPFS Reference: https://docs.ipfs.io/reference/http/api
 
@@ -169,7 +169,8 @@ public class IPFSPubSub extends ServiceBase {
     // clear throttle counters every minute.
     @Scheduled(fixedDelay = DateUtil.MINUTE_MILLIS)
     public void clearThrottles() {
-        if (!MongoRepository.fullInit) return;
+        if (!MongoRepository.fullInit)
+            return;
         synchronized (fromCounter) {
             fromCounter.clear();
         }
@@ -177,7 +178,7 @@ public class IPFSPubSub extends ServiceBase {
 
     public void processInboundEvent(Map<String, Object> msg) {
         String from = (String) msg.get("from");
-        if (from == null)
+        if (no(from))
             return;
         if (throttle(from))
             return;
@@ -194,7 +195,7 @@ public class IPFSPubSub extends ServiceBase {
         synchronized (fromCounter) {
             Integer hitCount = fromCounter.get(from);
 
-            if (hitCount == null) {
+            if (no(hitCount)) {
                 fromCounter.put(from, 1);
                 return false;
             } else {
@@ -209,14 +210,14 @@ public class IPFSPubSub extends ServiceBase {
     }
 
     private void processInboundPayload(String payload) {
-        if (payload == null)
+        if (no(payload))
             return;
 
         ServerPushInfo pushInfo = null;
         payload = payload.trim();
         if (payload.startsWith("{") && payload.endsWith("}")) {
             IPSMMessage msg = parseIpsmPayload(payload);
-            if (msg == null)
+            if (no(msg))
                 return;
 
             String message = getMessageText(msg);
@@ -238,7 +239,7 @@ public class IPFSPubSub extends ServiceBase {
     }
 
     private String getMessageText(IPSMMessage msg) {
-        if (msg == null || msg.getContent() == null)
+        if (no(msg) || no(msg.getContent()))
             return null;
         StringBuilder sb = new StringBuilder();
         for (IPSMData data : msg.getContent()) {
@@ -255,7 +256,7 @@ public class IPFSPubSub extends ServiceBase {
                 log.debug("Signature Failed.");
                 return null;
             }
-            if (msg != null) {
+            if (ok(msg)) {
                 log.debug("JSON: " + XString.prettyPrint(msg));
             }
             return msg;

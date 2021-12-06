@@ -26,6 +26,7 @@ import org.subnode.filter.AppFilter;
 import org.thymeleaf.spring5.SpringTemplateEngine;
 import org.thymeleaf.spring5.view.ThymeleafViewResolver;
 import org.thymeleaf.templateresolver.ClassLoaderTemplateResolver;
+import static org.subnode.util.Util.*;
 
 /**
  * Standard Spring WebMvcConfigurerAdapter-derived class.
@@ -72,7 +73,7 @@ public class AppConfiguration implements WebMvcConfigurer {
 	 */
 	@Bean(name = "threadPoolTaskExecutor")
 	public ThreadPoolTaskExecutor threadPoolTaskExecutor() {
-		if (executor != null) {
+		if (ok(executor)) {
 			return executor;
 		}
 
@@ -85,12 +86,13 @@ public class AppConfiguration implements WebMvcConfigurer {
 	}
 
 	public static void shutdown() {
-		if (executor != null) {
+		if (ok(executor)) {
 			executor.shutdown();
 		}
 	}
 
-	/* DO NOT DELETE (keep for future reference)
+	/*
+	 * DO NOT DELETE (keep for future reference)
 	 *
 	 * This method is removed because we switched to using the spring.resources.static-locations
 	 * property in application.properties file to accomplish loading static files
@@ -120,7 +122,7 @@ public class AppConfiguration implements WebMvcConfigurer {
 	// ResourceHandlerRegistration reg = registry.addResourceHandler("/**");
 
 	// List<String> folders = XString.tokenize(appProp.getResourcesBaseFolder(), ",", true);
-	// if (folders != null) {
+	// if (ok(folders )) {
 	// for (String folder : folders) {
 	// File dir = new File(folder);
 	// if (dir.isDirectory()) {
@@ -166,8 +168,7 @@ public class AppConfiguration implements WebMvcConfigurer {
 	}
 
 	private Connector redirectConnector() {
-		Connector connector =
-				new Connector(TomcatServletWebServerFactory.DEFAULT_PROTOCOL);
+		Connector connector = new Connector(TomcatServletWebServerFactory.DEFAULT_PROTOCOL);
 		connector.setScheme("http");
 		connector.setPort(80);
 		connector.setSecure(false);

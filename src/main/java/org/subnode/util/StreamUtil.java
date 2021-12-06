@@ -8,6 +8,7 @@ import javax.imageio.ImageReader;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import static org.subnode.util.Util.*;
 
 public class StreamUtil {
 	private static final Logger log = LoggerFactory.getLogger(StreamUtil.class);
@@ -17,21 +18,17 @@ public class StreamUtil {
 			if (obj instanceof Closeable) {
 				try {
 					((Closeable) obj).close();
-				}
-				catch (Exception e) {
+				} catch (Exception e) {
 					e.printStackTrace();
 				}
-			}
-			else if (obj instanceof ImageReader) {
+			} else if (obj instanceof ImageReader) {
 				try {
 					((ImageReader) obj).dispose();
-				}
-				catch (Exception e) {
+				} catch (Exception e) {
 					e.printStackTrace();
 				}
-			}
-			else {
-				if (obj != null) {
+			} else {
+				if (ok(obj)) {
 					log.warn("Object to close was of unsupported type: " + obj.getClass().getName());
 				}
 			}
@@ -51,8 +48,8 @@ public class StreamUtil {
 			while ((aByte = aBuffered.read()) != -1) {
 
 				/*
-				 * if got an "a" but can't get a 'b' then streams are not same length, and this is
-				 * the case where stream "a" was longer
+				 * if got an "a" but can't get a 'b' then streams are not same length, and this is the case where
+				 * stream "a" was longer
 				 */
 				if ((bByte = bBuffered.read()) == -1) {
 					return false;
@@ -65,17 +62,15 @@ public class StreamUtil {
 			}
 
 			/*
-			 * once we ran to end of stream "a" make sure stream 'b' is also ended (checking that
-			 * 'b' isn't longer than "a")
+			 * once we ran to end of stream "a" make sure stream 'b' is also ended (checking that 'b' isn't
+			 * longer than "a")
 			 */
 			if (bBuffered.read() != -1) {
 				return false;
 			}
-		}
-		catch (Exception ex) {
+		} catch (Exception ex) {
 			throw ExUtil.wrapEx(ex);
-		}
-		finally {
+		} finally {
 			close(aBuffered, bBuffered);
 		}
 		return true;

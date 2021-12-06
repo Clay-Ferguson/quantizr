@@ -27,6 +27,7 @@ import org.subnode.response.GetFollowersResponse;
 import org.subnode.service.ServiceBase;
 import org.subnode.util.ThreadLocals;
 import org.subnode.util.XString;
+import static org.subnode.util.Util.*;
 
 @Component
 public class ActPubFollower extends ServiceBase {
@@ -56,7 +57,7 @@ public class ActPubFollower extends ServiceBase {
 
         String followersUrl = (String) AP.str(actor, APProp.followers);
         APObj followers = getFollowers(followersUrl);
-        if (followers == null) {
+        if (no(followers)) {
             log.debug("Unable to get followers for AP user: " + followersUrl);
             return 0;
         }
@@ -65,7 +66,7 @@ public class ActPubFollower extends ServiceBase {
 
         apUtil.iterateOrderedCollection(followers, Integer.MAX_VALUE, obj -> {
             try {
-                // if (obj != null) {
+                // if (ok(obj )) {
                 // log.debug("follower: OBJ=" + XString.prettyPrint(obj));
                 // }
 
@@ -91,7 +92,7 @@ public class ActPubFollower extends ServiceBase {
     }
 
     public APObj getFollowers(String url) {
-        if (url == null)
+        if (no(url))
             return null;
 
         APObj outbox = apUtil.getJson(url, APConst.MTYPE_ACT_JSON);
@@ -135,7 +136,7 @@ public class ActPubFollower extends ServiceBase {
 
         // this is a self-reference url (id)
         String url = prop.getProtocolHostAndPort() + APConst.PATH_FOLLOWERS + "/" + userName + "?page=true";
-        if (minId != null) {
+        if (ok(minId)) {
             url += "&min_id=" + minId;
         }
         APOOrderedCollectionPage ret = new APOOrderedCollectionPage() //
@@ -148,7 +149,7 @@ public class ActPubFollower extends ServiceBase {
 
     public Iterable<SubNode> getFriendsByUserName(MongoSession ms, String userName) {
         Query query = getFriendsByUserName_query(ms, userName);
-        if (query == null)
+        if (no(query))
             return null;
         return mongoUtil.find(query);
     }
@@ -160,7 +161,7 @@ public class ActPubFollower extends ServiceBase {
 
         MongoSession as = auth.getAdminSession();
         Query query = getFriendsByUserName_query(as, req.getTargetUserName());
-        if (query == null)
+        if (no(query))
             return null;
 
         query.limit(ConstantInt.ROWS_PER_PAGE.val());
@@ -171,8 +172,8 @@ public class ActPubFollower extends ServiceBase {
         int counter = 0;
 
         for (SubNode node : iterable) {
-            NodeInfo info = convert.convertToNodeInfo(ThreadLocals.getSC(), as, node, true, false,
-                    counter + 1, false, false, false, true);
+            NodeInfo info = convert.convertToNodeInfo(ThreadLocals.getSC(), as, node, true, false, counter + 1, false, false,
+                    false, true);
             searchResults.add(info);
         }
 
@@ -189,12 +190,12 @@ public class ActPubFollower extends ServiceBase {
         else {
             /* Starting with just actorUrl, lookup the follower count */
             int ret = 0;
-            if (actorUrl != null) {
+            if (ok(actorUrl)) {
                 APObj actor = apUtil.getActorByUrl(actorUrl);
-                if (actor != null) {
+                if (ok(actor)) {
                     String followersUrl = (String) AP.str(actor, APProp.followers);
                     APObj followers = getFollowers(followersUrl);
-                    if (followers == null) {
+                    if (no(followers)) {
                         log.debug("Unable to get followers for AP user: " + followersUrl);
                     }
                     ret = AP.integer(followers, APProp.totalItems);
@@ -206,7 +207,7 @@ public class ActPubFollower extends ServiceBase {
 
     public long countFollowersOfLocalUser(MongoSession ms, String userName) {
         Query query = getFriendsByUserName_query(ms, userName);
-        if (query == null)
+        if (no(query))
             return 0L;
         return ops.count(query, SubNode.class);
     }

@@ -7,6 +7,7 @@ import java.util.List;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import org.springframework.data.annotation.Transient;
+import static org.subnode.util.Util.*;
 
 public class GraphNode {
     private String id;
@@ -17,8 +18,7 @@ public class GraphNode {
     private List<GraphNode> children;
     private HashSet<String> childIds;
 
-    public GraphNode() {
-    }
+    public GraphNode() {}
 
     public GraphNode(String id, String name, String path, int level, boolean highlight) {
         this.id = id;
@@ -29,14 +29,14 @@ public class GraphNode {
     }
 
     public void addChild(GraphNode child) {
-        if (childIds != null && childIds.contains(child.getId()))
+        if (ok(childIds) && childIds.contains(child.getId()))
             return;
 
-        if (children == null) {
+        if (no(children)) {
             children = new LinkedList<>();
         }
         children.add(child);
-        if (childIds == null) {
+        if (no(childIds)) {
             childIds = new HashSet<>();
         }
         childIds.add(child.getId());

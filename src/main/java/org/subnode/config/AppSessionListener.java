@@ -11,6 +11,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import org.springframework.web.util.WebUtils;
 
+import static org.subnode.util.Util.*;
+
 /**
  * For keeping track of sessions.
  */
@@ -40,7 +42,7 @@ public class AppSessionListener implements HttpSessionListener {
 	public void sessionDestroyed(HttpSessionEvent se) {
 		HttpSession session = se.getSession();
 		SessionContext sc = (SessionContext) session.getAttribute(SessionContext.QSC);
-		if (sc != null) {
+		if (ok(sc)) {
 			session.removeAttribute(SessionContext.QSC);
 			sc.sessionTimeout();
 		}

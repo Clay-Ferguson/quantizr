@@ -29,6 +29,14 @@ public class Util {
 	private static final Logger log = LoggerFactory.getLogger(Util.class);
 	private static final Random rand = new Random();
 
+	public static boolean no(Object o) {
+		return o == null;
+	}
+
+	public static boolean ok(Object o) {
+		return o != null;
+	}
+
 	public static void sleep(long millis) {
 		try {
 			Thread.sleep(millis);
@@ -70,11 +78,11 @@ public class Util {
 	}
 
 	public static boolean unknownIp(String ip) {
-		return ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip);
+		return no(ip) || ip.length() == 0 || "unknown".equalsIgnoreCase(ip);
 	}
 
 	public static boolean isSpringAuthenticated() {
-		return SecurityContextHolder.getContext().getAuthentication() != null
+		return ok(SecurityContextHolder.getContext().getAuthentication())
 				&& SecurityContextHolder.getContext().getAuthentication().isAuthenticated();
 
 		// DO NOT DELETE (yet)
@@ -99,11 +107,11 @@ public class Util {
 	}
 
 	public static boolean equalObjs(Object o1, Object o2) {
-		if (o1 == null && o2 == null)
+		if (no(o1) && no(o2))
 			return true;
-		if (o1 != null && o2 == null)
+		if (ok(o1) && no(o2))
 			return false;
-		if (o2 != null && o1 == null)
+		if (ok(o2) && no(o1))
 			return false;
 		return o1.equals(o2);
 	}
@@ -125,7 +133,7 @@ public class Util {
 			}
 		}
 
-		if (query == null) {
+		if (no(query)) {
 			return url;
 		} else {
 			return url + "?" + query;

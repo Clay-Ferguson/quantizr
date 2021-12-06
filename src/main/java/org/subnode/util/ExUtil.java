@@ -3,11 +3,12 @@ package org.subnode.util;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.subnode.exception.base.RuntimeEx;
+import static org.subnode.util.Util.*;
 
 /**
- * We use RuntimeExceptions primarily for all exception handling, throughout the app because
- * of the cleanness of the API when it doesn't have to declare checked exceptions everywhere, and
- * this utility encapsulates the conversion of most checked exceptions to RuntimeExceptions.
+ * We use RuntimeExceptions primarily for all exception handling, throughout the app because of the
+ * cleanness of the API when it doesn't have to declare checked exceptions everywhere, and this
+ * utility encapsulates the conversion of most checked exceptions to RuntimeExceptions.
  * 
  * Note: This code doesn't ignore exceptions or alter our ability to properly handle ALL exceptions
  * of both types, but it just makes the code cleaner, by doing what the Java-language SHOULD have
@@ -15,12 +16,11 @@ import org.subnode.exception.base.RuntimeEx;
  */
 public class ExUtil {
 	private static final Logger log = LoggerFactory.getLogger(ExUtil.class);
-	
+
 	public static void run(Runnable runnable) {
 		try {
 			runnable.run();
-		}
-		catch (Exception e) {
+		} catch (Exception e) {
 			throw wrapEx(e);
 		}
 	}
@@ -41,7 +41,7 @@ public class ExUtil {
 		logger.debug(msg, e);
 
 		/* Not showing all sub-causes in the chain, but just the immediate one */
-		if (e.getCause() != null) {
+		if (ok(e.getCause())) {
 			logger.debug("cause:", e);
 		}
 	}
@@ -50,7 +50,7 @@ public class ExUtil {
 		logger.error(msg, e);
 
 		/* Not showing all sub-causes in the chain, but just the immediate one */
-		if (e.getCause() != null) {
+		if (ok(e.getCause())) {
 			logger.error("cause:", e);
 		}
 	}

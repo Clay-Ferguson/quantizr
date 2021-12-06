@@ -16,6 +16,7 @@ import org.subnode.util.ExUtil;
 import org.subnode.util.LimitedInputStreamEx;
 import org.subnode.util.Val;
 import org.subnode.util.XString;
+import static org.subnode.util.Util.*;
 
 public abstract class ImportArchiveBase extends ServiceBase {
 	private static final Logger log = LoggerFactory.getLogger(ImportArchiveBase.class);
@@ -80,7 +81,7 @@ public abstract class ImportArchiveBase extends ServiceBase {
 					}
 				});
 
-				if (node == null) {
+				if (no(node)) {
 					throw new RuntimeException("import unmarshalling failed.");
 				}
 
@@ -120,9 +121,9 @@ public abstract class ImportArchiveBase extends ServiceBase {
 		 */
 		nodeId = oldIdToNewIdMap.get(nodeId);
 
-		if (nodeId != null) {
+		if (ok(nodeId)) {
 			SubNode node = read.getNode(session, nodeId);
-			if (node == null) {
+			if (no(node)) {
 				throw new RuntimeEx("Unable to find node by id: " + nodeId);
 			}
 			Long length = node.getInt(NodeProp.BIN_SIZE);
@@ -130,8 +131,8 @@ public abstract class ImportArchiveBase extends ServiceBase {
 			LimitedInputStreamEx lzis = new LimitedInputStreamEx(zis, Integer.MAX_VALUE);
 
 			// log.debug("Attaching binary to nodeId: " + node.getIdStr());
-			attach.attachBinaryFromStream(session, "", node, null, fileName, length, lzis, mimeType, -1, -1, false,
-					false, false, true, false, false, true, null);
+			attach.attachBinaryFromStream(session, "", node, null, fileName, length, lzis, mimeType, -1, -1, false, false, false,
+					true, false, false, true, null);
 		} else {
 			// this is normal to get here and indicates this file is NOT an attachment file.
 		}

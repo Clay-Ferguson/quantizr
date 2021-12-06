@@ -18,6 +18,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import static org.subnode.util.Util.*;
 
 @Component
 public class MailSender implements TransportListener {
@@ -38,24 +39,25 @@ public class MailSender implements TransportListener {
 	private SMTPTransport transport;
 
 	/*
-	 * This method can and should be called before sending mails, close() method
-	 * should be called after mail is sent
+	 * This method can and should be called before sending mails, close() method should be called after
+	 * mail is sent
 	 */
 	public void init() {
-		if (!mailEnabled()) return;
+		if (!mailEnabled())
+			return;
 		log.trace("MailSender.init()");
 
 		String mailHost = appProp.getMailHost();
 		String mailUser = appProp.getMailUser();
 		String mailPassword = appProp.getMailPassword();
 
-		if (mailSession == null) {
+		if (no(mailSession)) {
 			props = new Properties();
 			props.put("mail.smtps.host", mailHost);
 			props.put("mail.smtps.auth", "true");
 
 			mailSession = Session.getInstance(props, null);
-			if (mailSession != null) {
+			if (ok(mailSession)) {
 				log.trace("Created mailSession");
 			}
 			mailSession.setDebug(debug);
@@ -63,7 +65,7 @@ public class MailSender implements TransportListener {
 
 		try {
 			transport = (SMTPTransport) mailSession.getTransport("smtps");
-			if (transport != null) {
+			if (ok(transport)) {
 				log.trace("Created mail transport.");
 			}
 
@@ -87,8 +89,9 @@ public class MailSender implements TransportListener {
 	}
 
 	public void close() {
-		if (!mailEnabled()) return;
-		if (transport != null) {
+		if (!mailEnabled())
+			return;
+		if (ok(transport)) {
 			try {
 				log.trace("closing transport");
 				transport.close();
@@ -101,13 +104,14 @@ public class MailSender implements TransportListener {
 	}
 
 	public void sendMail(String sendToAddress, String fromAddress, String content, String subjectLine) {
-		if (!mailEnabled()) return;
-		
-		if (fromAddress == null) {
+		if (!mailEnabled())
+			return;
+
+		if (no(fromAddress)) {
 			fromAddress = appProp.getMailFrom();
 		}
 
-		if (transport == null) {
+		if (no(transport)) {
 			throw ExUtil.wrapEx("Tried to use MailSender after close() call or without initializing.");
 		}
 
@@ -134,9 +138,9 @@ public class MailSender implements TransportListener {
 			// transport.connect(mailHost, mailUser, mailPassword);
 
 			/*
-			 * important: while inside this 'sendMessage' method, the 'messageDelivered'
-			 * callback will get called if the send is successful, so we can return the
-			 * value below, even though we do not set it in this method
+			 * important: while inside this 'sendMessage' method, the 'messageDelivered' callback will get
+			 * called if the send is successful, so we can return the value below, even though we do not set it
+			 * in this method
 			 */
 
 			transport.sendMessage(message, message.getRecipients(Message.RecipientType.TO));

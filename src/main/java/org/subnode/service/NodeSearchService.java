@@ -36,6 +36,7 @@ import org.subnode.response.NodeSearchResponse;
 import org.subnode.util.ExUtil;
 import org.subnode.util.ThreadLocals;
 import org.subnode.util.XString;
+import static org.subnode.util.Util.*;
 
 /**
  * Service for searching the repository. This searching is currently very basic, and just grabs the
@@ -79,7 +80,7 @@ public class NodeSearchService extends ServiceBase {
 
 		if ("node.id".equals(req.getSearchProp())) {
 			SubNode node = read.getNode(ms, searchText, true);
-			if (node != null) {
+			if (ok(node)) {
 				NodeInfo info = convert.convertToNodeInfo(ThreadLocals.getSC(), ms, node, true, false, counter + 1, false, false,
 						false, false);
 				searchResults.add(info);
@@ -91,7 +92,7 @@ public class NodeSearchService extends ServiceBase {
 				searchText = ":" + ThreadLocals.getSC().getUserName() + ":" + searchText;
 			}
 			SubNode node = read.getNode(ms, searchText, true);
-			if (node != null) {
+			if (ok(node)) {
 				NodeInfo info = convert.convertToNodeInfo(ThreadLocals.getSC(), ms, node, true, false, counter + 1, false, false,
 						false, false);
 				searchResults.add(info);
@@ -191,7 +192,7 @@ public class NodeSearchService extends ServiceBase {
 			final String _findUserName = findUserName;
 			arun.run(as -> {
 				SubNode userNode = apub.getAcctNodeByUserName(as, _findUserName);
-				if (userNode != null) {
+				if (ok(userNode)) {
 					try {
 						NodeInfo info = convert.convertToNodeInfo(ThreadLocals.getSC(), as, userNode, true, false, counter + 1,
 								false, false, false, false);
@@ -234,20 +235,20 @@ public class NodeSearchService extends ServiceBase {
 				searchRoot.getOwner(), Sort.by(Sort.Direction.DESC, SubNode.FIELD_MODIFY_TIME),
 				ConstantInt.ROWS_PER_PAGE.val())) {
 
-			if (node.getAc() == null || node.getAc().size() == 0)
+			if (no(node.getAc()) || node.getAc().size() == 0)
 				continue;
 
 			/*
 			 * If we're only looking for shares to a specific person (or public) then check here
 			 */
-			if (req.getShareTarget() != null) {
+			if (ok(req.getShareTarget())) {
 
 				if (!node.safeGetAc().containsKey(req.getShareTarget())) {
 					continue;
 				}
 
 				// if specifically searching for rd or wr
-				if (req.getAccessOption() != null) {
+				if (ok(req.getAccessOption())) {
 					AccessControl ac = node.safeGetAc().get(req.getShareTarget());
 					// log.debug("NodeId: " + node.getIdStr() + " req=" + req.getAccessOption() + " privs="
 					// + ac.getPrvs());
@@ -276,7 +277,7 @@ public class NodeSearchService extends ServiceBase {
 	// replace #<span> with " #". This is a quick and dirty way to fix the way
 	// Mastodon mangles hashes in the text.
 	public String fixMastodonMangles(String content) {
-		if (content == null)
+		if (no(content))
 			return null;
 		content = content.replace("#\\u003cspan\\u003e", " #");
 		content = content.replace("#<span>", " #");
@@ -289,7 +290,7 @@ public class NodeSearchService extends ServiceBase {
 		List<Bookmark> bookmarks = new LinkedList<>();
 
 		List<SubNode> bookmarksNode = user.getSpecialNodesList(ms, NodeType.BOOKMARK_LIST.s(), null, true);
-		if (bookmarksNode != null) {
+		if (ok(bookmarksNode)) {
 			for (SubNode bmNode : bookmarksNode) {
 				String targetId = bmNode.getStr(NodeProp.TARGET_ID);
 				Bookmark bm = new Bookmark();
@@ -311,7 +312,7 @@ public class NodeSearchService extends ServiceBase {
 		 * cache it
 		 */
 		synchronized (NodeSearchService.trendingFeedInfoLock) {
-			if (req.isFeed() && NodeSearchService.trendingFeedInfo != null) {
+			if (req.isFeed() && ok(NodeSearchService.trendingFeedInfo)) {
 				res.setStats(NodeSearchService.trendingFeedInfo.getStats());
 				res.setTopMentions(NodeSearchService.trendingFeedInfo.getTopMentions());
 				res.setTopTags(NodeSearchService.trendingFeedInfo.getTopTags());
@@ -386,7 +387,7 @@ public class NodeSearchService extends ServiceBase {
 		}
 
 		for (SubNode node : iter) {
-			if (node.getContent() == null)
+			if (no(node.getContent()))
 				continue;
 
 			String content = node.getContent();
@@ -405,7 +406,7 @@ public class NodeSearchService extends ServiceBase {
 							continue;
 
 						WordStats ws = mentionMap.get(lcToken);
-						if (ws == null) {
+						if (no(ws)) {
 							ws = new WordStats(token);
 							mentionMap.put(lcToken, ws);
 						}
@@ -422,7 +423,7 @@ public class NodeSearchService extends ServiceBase {
 							continue;
 
 						WordStats ws = tagMap.get(lcToken);
-						if (ws == null) {
+						if (no(ws)) {
 							ws = new WordStats(token);
 							tagMap.put(lcToken, ws);
 						}
@@ -435,7 +436,7 @@ public class NodeSearchService extends ServiceBase {
 						}
 
 						WordStats ws = wordMap.get(lcToken);
-						if (ws == null) {
+						if (no(ws)) {
 							ws = new WordStats(token);
 							wordMap.put(lcToken, ws);
 						}
@@ -446,7 +447,7 @@ public class NodeSearchService extends ServiceBase {
 			}
 			nodeCount++;
 		}
-		
+
 		List<WordStats> wordList = new ArrayList<>(wordMap.values());
 		List<WordStats> tagList = new ArrayList<>(tagMap.values());
 		List<WordStats> mentionList = new ArrayList<>(mentionMap.values());

@@ -14,6 +14,7 @@ import org.springframework.stereotype.Component;
 import org.subnode.model.client.NodeProp;
 import org.subnode.mongo.model.SubNode;
 import org.subnode.service.ServiceBase;
+import static org.subnode.util.Util.*;
 
 @Component
 public class MongoDelete extends ServiceBase {
@@ -151,8 +152,10 @@ public class MongoDelete extends ServiceBase {
 		return totalDelCount;
 	}
 
-	/* Note: We don't even use this becasue it wouldn'd delete the orphans. We always delete using
-	the path prefix query so all subnodes in the subgraph go away (no orphans) */
+	/*
+	 * Note: We don't even use this becasue it wouldn'd delete the orphans. We always delete using the
+	 * path prefix query so all subnodes in the subgraph go away (no orphans)
+	 */
 	public void delete(SubNode node) {
 		ops.remove(node);
 	}
@@ -176,7 +179,7 @@ public class MongoDelete extends ServiceBase {
 		// log.debug("initial Node Count: " + nodeCount);
 
 		HashSet<String> pathHashSet = new HashSet<>();
-		if (ms == null) {
+		if (no(ms)) {
 			ms = auth.getAdminSession();
 		}
 

@@ -2,6 +2,7 @@ package org.subnode.util;
 
 import java.awt.Image;
 import java.awt.image.BufferedImage;
+import static org.subnode.util.Util.*;
 
 /**
  * Image manipulation utilities
@@ -16,7 +17,7 @@ public class ImageUtil {
 	}
 
 	public static boolean isImageMime(String mimeType) {
-		return mimeType != null && mimeType.toLowerCase().startsWith("image/");
+		return ok(mimeType) && mimeType.toLowerCase().startsWith("image/");
 	}
 
 	public static String mimeToFomatName(String mimeType) {

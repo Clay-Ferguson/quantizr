@@ -32,6 +32,7 @@ import org.subnode.response.GetFollowingResponse;
 import org.subnode.service.ServiceBase;
 import org.subnode.util.ThreadLocals;
 import org.subnode.util.XString;
+import static org.subnode.util.Util.*;
 
 @Component
 public class ActPubFollowing extends ServiceBase {
@@ -73,14 +74,13 @@ public class ActPubFollowing extends ServiceBase {
                 // send unfollow action
                 else {
                     action = new APOUndo()//
-                            .put(APProp.id,
-                                    prop.getProtocolHostAndPort() + "/unfollow/" + String.valueOf(new Date().getTime())) //
+                            .put(APProp.id, prop.getProtocolHostAndPort() + "/unfollow/" + String.valueOf(new Date().getTime())) //
                             .put(APProp.actor, sessionActorUrl) //
                             .put(APProp.object, followAction);
                 }
 
                 APObj toActor = apUtil.getActorByUrl(actorUrlOfUserBeingFollowed);
-                if (toActor != null) {
+                if (ok(toActor)) {
                     String toInbox = AP.str(toActor, APProp.inbox);
                     apUtil.securePost(followerUserName, session, null, toInbox, sessionActorUrl, action, null);
                 } else {
@@ -104,7 +104,7 @@ public class ActPubFollowing extends ServiceBase {
 
         // Actor URL of actor doing the following
         String followerActorUrl = AP.str(followAction, APProp.actor);
-        if (followerActorUrl == null) {
+        if (no(followerActorUrl)) {
             log.debug("no 'actor' found on follows action request posted object");
             return;
         }
@@ -113,7 +113,7 @@ public class ActPubFollowing extends ServiceBase {
             arun.<APObj>run(session -> {
                 try {
                     APObj followerActor = apUtil.getActorByUrl(followerActorUrl);
-                    if (followerActor == null) {
+                    if (no(followerActor)) {
                         return null;
                     }
 
@@ -122,7 +122,7 @@ public class ActPubFollowing extends ServiceBase {
 
                     // this will lookup the user AND import it it's a non-existant user
                     SubNode followerAccountNode = apub.getAcctNodeByUserName(session, followerUserName);
-                    if (followerAccountNode == null) {
+                    if (no(followerAccountNode)) {
                         throw new RuntimeException("Unable to get or import user: " + followerUserName);
                     }
 
@@ -130,13 +130,13 @@ public class ActPubFollowing extends ServiceBase {
 
                     // Actor being followed (local to our server)
                     String actorBeingFollowedUrl = AP.str(followAction, APProp.object);
-                    if (actorBeingFollowedUrl == null) {
+                    if (no(actorBeingFollowedUrl)) {
                         log.debug("no 'object' found on follows action request posted object");
                         return null;
                     }
 
                     String userToFollow = apUtil.getLocalUserNameFromActorUrl(actorBeingFollowedUrl);
-                    if (userToFollow == null) {
+                    if (no(userToFollow)) {
                         log.debug("unable to get a user name from actor url: " + actorBeingFollowedUrl);
                         return null;
                     }
@@ -151,7 +151,7 @@ public class ActPubFollowing extends ServiceBase {
                     SubNode friendNode =
                             read.findNodeByUserAndType(session, followerFriendList, userToFollow, NodeType.FRIEND.s());
 
-                    if (friendNode == null) {
+                    if (no(friendNode)) {
                         if (!unFollow) {
                             apUtil.log("unable to find user node by name: " + followerUserName + " so creating.");
                             friendNode = edit.createFriendNode(session, followerFriendList, userToFollow);
@@ -219,7 +219,7 @@ public class ActPubFollowing extends ServiceBase {
 
         // this is a self-reference url (id)
         String url = prop.getProtocolHostAndPort() + APConst.PATH_FOLLOWING + "/" + userName + "?page=true";
-        if (minId != null) {
+        if (ok(minId)) {
             url += "&min_id=" + minId;
         }
         APOOrderedCollectionPage ret = new APOOrderedCollectionPage() //
@@ -235,7 +235,7 @@ public class ActPubFollowing extends ServiceBase {
 
         String followingUrl = (String) AP.str(actor, APProp.following);
         APObj followings = getFollowing(followingUrl);
-        if (followings == null) {
+        if (no(followings)) {
             log.debug("Unable to get followings for AP user: " + followingUrl);
             return 0;
         }
@@ -244,7 +244,7 @@ public class ActPubFollowing extends ServiceBase {
 
         apUtil.iterateOrderedCollection(followings, Integer.MAX_VALUE, obj -> {
             try {
-                // if (obj != null) {
+                // if (ok(obj )) {
                 // log.debug("follower: OBJ=" + XString.prettyPrint(obj));
                 // }
 
@@ -270,7 +270,7 @@ public class ActPubFollowing extends ServiceBase {
     }
 
     public APObj getFollowing(String url) {
-        if (url == null)
+        if (no(url))
             return null;
 
         APObj outbox = apUtil.getJson(url, APConst.MTYPE_ACT_JSON);
@@ -315,7 +315,7 @@ public class ActPubFollowing extends ServiceBase {
 
         MongoSession as = auth.getAdminSession();
         Query query = findFollowingOfUser_query(as, req.getTargetUserName());
-        if (query == null)
+        if (no(query))
             return null;
 
         query.limit(ConstantInt.ROWS_PER_PAGE.val());
@@ -326,8 +326,8 @@ public class ActPubFollowing extends ServiceBase {
         int counter = 0;
 
         for (SubNode node : iterable) {
-            NodeInfo info = convert.convertToNodeInfo(ThreadLocals.getSC(), as, node, true, false,
-                    counter + 1, false, false, false, false);
+            NodeInfo info = convert.convertToNodeInfo(ThreadLocals.getSC(), as, node, true, false, counter + 1, false, false,
+                    false, false);
             searchResults.add(info);
         }
 
@@ -338,7 +338,7 @@ public class ActPubFollowing extends ServiceBase {
     /* Returns FRIEND nodes for every user 'userName' is following */
     public Iterable<SubNode> findFollowingOfUser(MongoSession ms, String userName) {
         Query query = findFollowingOfUser_query(ms, userName);
-        if (query == null)
+        if (no(query))
             return null;
 
         return mongoUtil.find(query);
@@ -353,12 +353,12 @@ public class ActPubFollowing extends ServiceBase {
         else {
             /* Starting with just actorUrl, lookup the following count */
             int ret = 0;
-            if (actorUrl != null) {
+            if (ok(actorUrl)) {
                 APObj actor = apUtil.getActorByUrl(actorUrl);
-                if (actor != null) {
+                if (ok(actor)) {
                     String followingUrl = (String) AP.str(actor, APProp.following);
                     APObj following = getFollowing(followingUrl);
-                    if (following == null) {
+                    if (no(following)) {
                         log.debug("Unable to get followers for AP user: " + followingUrl);
                     }
                     ret = AP.integer(following, APProp.totalItems);
@@ -370,7 +370,7 @@ public class ActPubFollowing extends ServiceBase {
 
     public long countFollowingOfLocalUser(MongoSession ms, String userName) {
         Query query = findFollowingOfUser_query(ms, userName);
-        if (query == null)
+        if (no(query))
             return 0;
 
         return ops.count(query, SubNode.class);
@@ -382,7 +382,7 @@ public class ActPubFollowing extends ServiceBase {
         // get friends list node
         SubNode friendsListNode =
                 read.getUserNodeByType(ms, userName, null, null, NodeType.FRIEND_LIST.s(), null, NodeName.FRIENDS);
-        if (friendsListNode == null)
+        if (no(friendsListNode))
             return null;
 
         // query all the friends under

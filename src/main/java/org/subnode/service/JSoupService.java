@@ -11,11 +11,12 @@ import org.springframework.stereotype.Component;
 import org.subnode.model.client.OpenGraph;
 import org.subnode.request.GetOpenGraphRequest;
 import org.subnode.response.GetOpenGraphResponse;
+import static org.subnode.util.Util.*;
 
 @Component
 public class JSoupService {
 	private static final Logger log = LoggerFactory.getLogger(JSoupService.class);
-	
+
 	public final ConcurrentHashMap<String, OpenGraph> ogCache = new ConcurrentHashMap<>();
 
 	public static final String BROWSER_USER_AGENT =
@@ -25,12 +26,12 @@ public class JSoupService {
 		GetOpenGraphResponse res = new GetOpenGraphResponse();
 		OpenGraph openGraph = ogCache.get(ogReq.getUrl());
 
-		if (openGraph != null) {
+		if (ok(openGraph)) {
 			res.setOpenGraph(openGraph);
 		} else {
 			try {
 				openGraph = parseOpenGraph(ogReq.getUrl());
-				if (openGraph != null) {
+				if (ok(openGraph)) {
 					ogCache.put(ogReq.getUrl(), openGraph);
 				}
 				res.setOpenGraph(openGraph);
@@ -57,22 +58,22 @@ public class JSoupService {
 		// todo-1: add site_name, type, url, twitter:url, twitter:card (like og:type)
 
 		openGraph.setTitle(getOg(doc, "og:title"));
-		if (openGraph.getTitle() == null) {
+		if (no(openGraph.getTitle())) {
 			openGraph.setTitle(getOg(doc, "twitter:title"));
 		}
 
 		openGraph.setUrl(getOg(doc, "og:url"));
-		if (openGraph.getUrl() == null) {
+		if (no(openGraph.getUrl())) {
 			openGraph.setUrl(getOg(doc, "twitter:url"));
 		}
 
 		openGraph.setDescription(getOg(doc, "og:description"));
-		if (openGraph.getDescription() == null) {
+		if (no(openGraph.getDescription())) {
 			openGraph.setDescription(getOg(doc, "twitter:description"));
 		}
 
 		openGraph.setImage(getOg(doc, "og:image"));
-		if (openGraph.getImage() == null) {
+		if (no(openGraph.getImage())) {
 			openGraph.setImage(getOg(doc, "twitter:image"));
 		}
 		return openGraph;
@@ -80,6 +81,6 @@ public class JSoupService {
 
 	private String getOg(Document doc, String prop) {
 		Elements elm = doc.select("meta[property=" + prop + "]");
-		return elm != null ? elm.attr("content") : null;
+		return ok(elm) ? elm.attr("content") : null;
 	}
 }

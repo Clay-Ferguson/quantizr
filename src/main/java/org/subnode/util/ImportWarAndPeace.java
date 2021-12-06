@@ -17,17 +17,18 @@ import org.subnode.mongo.MongoCreate;
 import org.subnode.mongo.MongoSession;
 import org.subnode.mongo.MongoUpdate;
 import org.subnode.mongo.model.SubNode;
+import static org.subnode.util.Util.*;
 
-// todo-2: need to look into bulk-ops for doing this 
-	// tips:
-	// https://stackoverflow.com/questions/26657055/spring-data-mongodb-and-bulk-update
-	// BulkOperations ops = template.bulkOps(BulkMode.UNORDERED, Match.class);
-	// for (User user : users) {
-	// Update update = new Update();
-	// ...
-	// ops.updateOne(query(where("id").is(user.getId())), update);
-	// }
-	// ops.execute();
+// todo-2: need to look into bulk-ops for doing this
+// tips:
+// https://stackoverflow.com/questions/26657055/spring-data-mongodb-and-bulk-update
+// BulkOperations ops = template.bulkOps(BulkMode.UNORDERED, Match.class);
+// for (User user : users) {
+// Update update = new Update();
+// ...
+// ops.updateOne(query(where("id").is(user.getId())), update);
+// }
+// ops.execute();
 
 /**
  * Reads the special proprietary-formatted file (not invented by the Quantizr developers) of the
@@ -72,7 +73,7 @@ public class ImportWarAndPeace {
 				String line;
 				int lineCount = 0;
 
-				while (!halt && (line = in.readLine()) != null) {
+				while (!halt && ok(line = in.readLine())) {
 					line = line.trim();
 
 					/*
@@ -126,13 +127,13 @@ public class ImportWarAndPeace {
 	private boolean processChapter(String line) {
 		if (line.startsWith("CHAPTER ")) {
 			log.debug("Processing Chapter: " + line);
-			if (curBook == null)
+			if (no(curBook))
 				throw ExUtil.wrapEx("book is null.");
 
 			addParagraph();
 
 			curChapter = create.createNode(session, curBook, NodeType.NONE.s(), 0L, CreateNodeLocation.LAST, true);
-			curChapter.setContent(/* "C" + String.valueOf(globalChapter) + ". " +*/ line);
+			curChapter.setContent(/* "C" + String.valueOf(globalChapter) + ". " + */ line);
 			curChapter.touch();
 			update.save(session, curChapter);
 			return true;
@@ -152,7 +153,7 @@ public class ImportWarAndPeace {
 
 		if (line.length() == 0)
 			return false;
-		if (curChapter == null || curBook == null)
+		if (no(curChapter) || no(curBook))
 			return false;
 
 		// line = XString.injectForQuotations(line);
@@ -180,7 +181,7 @@ public class ImportWarAndPeace {
 			addParagraph();
 
 			curBook = create.createNode(session, root, NodeType.NONE.s(), 0L, CreateNodeLocation.LAST, true);
-			curBook.setContent(/* "B" + String.valueOf(globalBook) + ". " +*/ line);
+			curBook.setContent(/* "B" + String.valueOf(globalBook) + ". " + */ line);
 			curBook.touch();
 			update.save(session, curBook);
 			return true;

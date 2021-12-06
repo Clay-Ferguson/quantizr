@@ -16,6 +16,7 @@ import org.subnode.util.Cast;
 import org.subnode.util.ThreadLocals;
 import org.subnode.util.Val;
 import org.subnode.util.XString;
+import static org.subnode.util.Util.*;
 
 @Component
 public class MongoUpdate extends ServiceBase {
@@ -55,7 +56,7 @@ public class MongoUpdate extends ServiceBase {
 	}
 
 	public void saveSession(MongoSession ms, boolean asAdmin) {
-		if (ms == null || (saving.get() != null && saving.get().booleanValue()) || !ThreadLocals.hasDirtyNodes())
+		if (no(ms) || (ok(saving.get()) && saving.get().booleanValue()) || !ThreadLocals.hasDirtyNodes())
 			return;
 
 		try {
@@ -115,21 +116,21 @@ public class MongoUpdate extends ServiceBase {
 		arun.run(as -> {
 			int pinCount = 0, orphanCount = 0;
 			LinkedHashMap<String, Object> pins = Cast.toLinkedHashMap(ipfs.getPins());
-			if (pins != null) {
+			if (ok(pins)) {
 				/*
 				 * For each CID that is pinned we do a lookup to see if there's a Node that is using that PIN, and
 				 * if not we remove the pin
 				 */
 				for (String pin : pins.keySet()) {
 					SubNode ipfsNode = read.findByIPFSPinned(as, pin);
-					if (ipfsNode != null) {
+					if (ok(ipfsNode)) {
 						pinCount++;
 						// log.debug("Found IPFS CID=" + pin + " on nodeId " +
 						// ipfsNode.getIdStr());
 
-						if (statsMap != null) {
+						if (ok(statsMap)) {
 							Long binSize = ipfsNode.getInt(NodeProp.BIN_SIZE);
-							if (binSize == null) {
+							if (no(binSize)) {
 								// Note: If binTotal is ever zero here we SHOULD do what's in the comment above
 								// an call objectStat to put correct amount in.
 								binSize = 0L;
@@ -142,7 +143,7 @@ public class MongoUpdate extends ServiceBase {
 							 * becasue it should be correct.
 							 */
 							UserStats stats = statsMap.get(ipfsNode.getOwner());
-							if (stats == null) {
+							if (no(stats)) {
 								stats = new UserStats();
 								stats.binUsage = binSize;
 								statsMap.put(ipfsNode.getOwner(), stats);

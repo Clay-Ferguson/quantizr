@@ -18,12 +18,13 @@ import org.subnode.util.ExUtil;
 import org.subnode.util.LimitedInputStreamEx;
 import org.subnode.util.StreamUtil;
 import org.subnode.util.ThreadLocals;
+import static org.subnode.util.Util.*;
 
 /**
- * Import from ZIP files. Imports zip files that have the same type of directory
- * structure and content as the zip files that are exported from SubNode. The
- * zip file doesn't of course have to have been actually exported from SubNode
- * in order to import it, but merely have the proper layout/content.
+ * Import from ZIP files. Imports zip files that have the same type of directory structure and
+ * content as the zip files that are exported from SubNode. The zip file doesn't of course have to
+ * have been actually exported from SubNode in order to import it, but merely have the proper
+ * layout/content.
  */
 @Component
 @Scope("prototype")
@@ -33,8 +34,8 @@ public class ImportZipService extends ImportArchiveBase {
 	private ZipArchiveInputStream zis;
 
 	/*
-	 * imports the file directly from an internal resource file (classpath resource,
-	 * built into WAR file itself)
+	 * imports the file directly from an internal resource file (classpath resource, built into WAR file
+	 * itself)
 	 */
 	public SubNode inportFromResource(MongoSession ms, String resourceName, SubNode node, String nodeName) {
 
@@ -56,8 +57,7 @@ public class ImportZipService extends ImportArchiveBase {
 	}
 
 	/* Returns the first node created which is always the root of the import */
-	public SubNode importFromStream(MongoSession ms, InputStream inputStream, SubNode node,
-			boolean isNonRequestThread) {
+	public SubNode importFromStream(MongoSession ms, InputStream inputStream, SubNode node, boolean isNonRequestThread) {
 		SessionContext sc = ThreadLocals.getSC();
 		if (used) {
 			throw new RuntimeEx("Prototype bean used multiple times is not allowed.");
@@ -65,7 +65,7 @@ public class ImportZipService extends ImportArchiveBase {
 		used = true;
 
 		SubNode userNode = read.getUserNodeByUserName(auth.getAdminSession(), sc.getUserName());
-		if (userNode == null) {
+		if (no(userNode)) {
 			throw new RuntimeEx("UserNode not found: " + sc.getUserName());
 		}
 
@@ -74,13 +74,13 @@ public class ImportZipService extends ImportArchiveBase {
 			targetPath = node.getPath();
 			this.session = ms;
 
-			// todo-1: replace with the true amount of storage this user has remaining. Admin is unlimited. 
+			// todo-1: replace with the true amount of storage this user has remaining. Admin is unlimited.
 			int maxSize = sc.isAdmin() ? Integer.MAX_VALUE : Const.DEFAULT_USER_QUOTA;
 			is = new LimitedInputStreamEx(inputStream, maxSize);
 			zis = new ZipArchiveInputStream(is);
-			
+
 			ZipArchiveEntry entry;
-			while ((entry = zis.getNextZipEntry()) != null) {
+			while (ok(entry = zis.getNextZipEntry())) {
 				if (!entry.isDirectory()) {
 					processFile(entry, zis, userNode.getOwner());
 				}

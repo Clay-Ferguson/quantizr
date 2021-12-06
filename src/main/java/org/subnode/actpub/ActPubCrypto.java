@@ -21,6 +21,7 @@ import org.subnode.mongo.model.SubNode;
 import org.subnode.service.ServiceBase;
 import org.subnode.service.UserManagerService;
 import org.subnode.util.XString;
+import static org.subnode.util.Util.*;
 
 @Component
 public class ActPubCrypto extends ServiceBase {
@@ -30,19 +31,19 @@ public class ActPubCrypto extends ServiceBase {
     public String getPrivateKey(MongoSession ms, String userName) {
         /* First try to return the key from the cache */
         String privateKey = UserManagerService.privateKeysByUserName.get(userName);
-        if (privateKey != null) {
+        if (ok(privateKey)) {
             return privateKey;
         }
 
         /* get the userNode for the current user who edited a node */
         SubNode userNode = read.getUserNodeByUserName(ms, userName);
-        if (userNode == null) {
+        if (no(userNode)) {
             return null;
         }
 
         /* get private key of this user so we can sign the outbound message */
         privateKey = userNode.getStr(NodeProp.CRYPTO_KEY_PRIVATE);
-        if (privateKey == null) {
+        if (no(privateKey)) {
             log.debug("Unable to update federated users. User didn't have a private key on his userNode: " + userName);
             return null;
         }
@@ -54,12 +55,12 @@ public class ActPubCrypto extends ServiceBase {
 
     public void verifySignature(HttpServletRequest httpReq, PublicKey pubKey) {
         String reqHeaderSignature = httpReq.getHeader("Signature");
-        if (reqHeaderSignature == null) {
+        if (no(reqHeaderSignature)) {
             throw new RuntimeException("Signature missing from http header.");
         }
 
         final List<String> sigTokens = XString.tokenize(reqHeaderSignature, ",", true);
-        if (sigTokens == null || sigTokens.size() < 3) {
+        if (no(sigTokens) || sigTokens.size() < 3) {
             throw new RuntimeException("Signature tokens missing from http header.");
         }
 
@@ -90,11 +91,11 @@ public class ActPubCrypto extends ServiceBase {
             }
         }
 
-        if (keyID == null)
+        if (no(keyID))
             throw new RuntimeException("Header signature missing 'keyId'");
-        if (headers == null)
+        if (no(headers))
             throw new RuntimeException("Header signature missing 'headers'");
-        if (signature == null)
+        if (no(signature))
             throw new RuntimeException("Header signature missing 'signature'");
         if (!headers.contains("(request-target)"))
             throw new RuntimeException("(request-target) is not in signed headers");
@@ -133,11 +134,11 @@ public class ActPubCrypto extends ServiceBase {
     public PublicKey getPublicKeyFromActor(Object actorObj) {
         PublicKey pubKey = null;
         Object pubKeyObj = AP.obj(actorObj, APProp.publicKey);
-        if (pubKeyObj == null)
+        if (no(pubKeyObj))
             return null;
 
         String pkeyEncoded = AP.str(pubKeyObj, APProp.publicKeyPem);
-        if (pkeyEncoded == null)
+        if (no(pkeyEncoded))
             return null;
 
         // I took this replacement logic from 'Smitherene' project, and it seems to work

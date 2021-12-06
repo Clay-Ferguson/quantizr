@@ -13,6 +13,7 @@ import java.util.Locale;
 import java.util.TimeZone;
 import org.apache.commons.lang3.StringUtils;
 import org.subnode.exception.base.RuntimeEx;
+import static org.subnode.util.Util.*;
 
 /**
  * Date-related functions
@@ -247,13 +248,13 @@ public class DateUtil {
 	}
 
 	public static String formatTimeForUserTimezone(Date date, String timezone, String timeZoneAbbrev) {
-		if (date == null)
+		if (no(date))
 			return null;
 
 		/* If we have a short timezone abbreviation display timezone with it */
-		if (timeZoneAbbrev != null) {
+		if (ok(timeZoneAbbrev)) {
 			SimpleDateFormat dateFormat = new SimpleDateFormat(DateUtil.DATE_FORMAT_NO_TIMEZONE, DateUtil.DATE_FORMAT_LOCALE);
-			if (timezone != null) {
+			if (ok(timezone)) {
 				dateFormat.setTimeZone(TimeZone.getTimeZone(timezone));
 			}
 			return dateFormat.format(date) + " " + timeZoneAbbrev;
@@ -261,7 +262,7 @@ public class DateUtil {
 		/* else display timezone in standard GMT format */
 		else {
 			SimpleDateFormat dateFormat = new SimpleDateFormat(DateUtil.DATE_FORMAT_WITH_TIMEZONE, DateUtil.DATE_FORMAT_LOCALE);
-			if (timezone != null) {
+			if (ok(timezone)) {
 				dateFormat.setTimeZone(TimeZone.getTimeZone(timezone));
 			}
 			return dateFormat.format(date);

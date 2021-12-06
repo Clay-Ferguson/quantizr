@@ -28,6 +28,7 @@ import org.subnode.response.SetCipherKeyResponse;
 import org.subnode.util.ExUtil;
 import org.subnode.util.ThreadLocals;
 import org.subnode.util.XString;
+import static org.subnode.util.Util.*;
 
 /**
  * Service methods for (ACL): processing security, privileges, and Access Control List information
@@ -94,7 +95,7 @@ public class AclService extends ServiceBase {
 		auth.ownerAuth(ms, node);
 
 		String cipherKey = node.getStr(NodeProp.ENC_KEY.s());
-		if (cipherKey == null) {
+		if (no(cipherKey)) {
 			throw new RuntimeEx("Attempted to alter keys on a non-encrypted node.");
 		}
 
@@ -109,7 +110,7 @@ public class AclService extends ServiceBase {
 
 		HashMap<String, AccessControl> acl = node.getAc();
 		AccessControl ac = acl.get(principalNodeId);
-		if (ac != null) {
+		if (ok(ac)) {
 			ac.setKey(cipherKey);
 			node.setAc(acl);
 			update.save(ms, node);
@@ -125,7 +126,7 @@ public class AclService extends ServiceBase {
 	public boolean addPrivilege(MongoSession ms, SubNode node, String principal, List<String> privileges,
 			AddPrivilegeResponse res) {
 
-		if (principal == null || node == null)
+		if (no(principal) || no(node))
 			return false;
 		principal = principal.trim();
 
@@ -136,7 +137,7 @@ public class AclService extends ServiceBase {
 		boolean isPublic = false;
 		/* If we are sharing to public, then that's the map key */
 		if (principal.equalsIgnoreCase(PrincipalName.PUBLIC.s())) {
-			if (cipherKey != null) {
+			if (ok(cipherKey)) {
 				throw new RuntimeEx("Cannot make an encrypted node public.");
 			}
 			mapKey = PrincipalName.PUBLIC.s();
@@ -147,8 +148,8 @@ public class AclService extends ServiceBase {
 		 */
 		else {
 			principalNode = read.getUserNodeByUserName(auth.getAdminSession(), principal);
-			if (principalNode == null) {
-				if (res != null) {
+			if (no(principalNode)) {
+				if (ok(res)) {
 					res.setMessage("Unknown user name: " + principal);
 					res.setSuccess(false);
 				}
@@ -161,10 +162,10 @@ public class AclService extends ServiceBase {
 			 * client, which will then use it to encrypt the symmetric key to the data, and then send back up to
 			 * the server to store in this sharing entry
 			 */
-			if (cipherKey != null) {
+			if (ok(cipherKey)) {
 				String principalPubKey = principalNode.getStr(NodeProp.USER_PREF_PUBLIC_KEY.s());
-				if (principalPubKey == null) {
-					if (res != null) {
+				if (no(principalPubKey)) {
+					if (ok(res)) {
 						res.setMessage("User doesn't have a PublicKey available: " + principal);
 						res.setSuccess(false);
 						return false;
@@ -172,7 +173,7 @@ public class AclService extends ServiceBase {
 				}
 				log.debug("principalPublicKey: " + principalPubKey);
 
-				if (res != null) {
+				if (ok(res)) {
 					res.setPrincipalPublicKey(principalPubKey);
 					res.setPrincipalNodeId(mapKey);
 				}
@@ -182,7 +183,7 @@ public class AclService extends ServiceBase {
 		HashMap<String, AccessControl> acl = node.getAc();
 
 		/* initialize acl to a map if it's null, or if we're sharing to public */
-		if (acl == null) {
+		if (no(acl)) {
 			acl = new HashMap<>();
 		}
 
@@ -190,7 +191,7 @@ public class AclService extends ServiceBase {
 		 * Get access control entry from map, but if one is not found, we can just create one.
 		 */
 		AccessControl ac = acl.get(mapKey);
-		if (ac == null) {
+		if (no(ac)) {
 			ac = new AccessControl();
 		}
 
@@ -199,7 +200,7 @@ public class AclService extends ServiceBase {
 		 * to set from 'rd' to 'rd,rw' back and forth then it's better to set prvs to an empty string here
 		 * any time we detect this is 'public' priv being set.
 		 */
-		if (prvs == null || isPublic) {
+		if (no(prvs) || isPublic) {
 			prvs = "";
 		}
 
@@ -258,12 +259,12 @@ public class AclService extends ServiceBase {
 		HashSet<String> setToRemove = XString.tokenizeToSet(privToRemove, ",", true);
 
 		HashMap<String, AccessControl> acl = node.getAc();
-		if (acl == null)
+		if (no(acl))
 			return;
 
 		AccessControl ac = acl.get(principalNodeId);
 		String privs = ac.getPrvs();
-		if (privs == null) {
+		if (no(privs)) {
 			log.debug("ACL didn't contain principalNodeId " + principalNodeId + "\nACL DUMP: " + XString.prettyPrint(acl));
 			return;
 		}
@@ -351,7 +352,7 @@ public class AclService extends ServiceBase {
 
 			if (principals.size() == 0) {
 				node = read.getParent(ms, node);
-				if (node == null)
+				if (no(node))
 					break;
 			} else {
 				break;
@@ -373,6 +374,6 @@ public class AclService extends ServiceBase {
 	}
 
 	public static boolean isPublic(MongoSession ms, SubNode node) {
-		return node.getAc() != null && node.getAc().containsKey(PrincipalName.PUBLIC.s());
+		return ok(node.getAc()) && node.getAc().containsKey(PrincipalName.PUBLIC.s());
 	}
 }

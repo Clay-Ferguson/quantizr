@@ -7,6 +7,7 @@ import org.subnode.model.client.NodeProp;
 import org.subnode.model.client.NodeType;
 import org.subnode.mongo.MongoSession;
 import org.subnode.mongo.model.SubNode;
+import static org.subnode.util.Util.*;
 
 @Component
 public class FriendType extends TypeBase {
@@ -20,7 +21,7 @@ public class FriendType extends TypeBase {
     public void convert(MongoSession ms, NodeInfo nodeInfo, SubNode node, boolean getFollowers) {
         // yes this is redundant and loads userUrl again below, but I need to test this before removing it.
         String userUrl = node.getStr(NodeProp.ACT_PUB_ACTOR_URL.s());
-        if (userUrl != null) {
+        if (ok(userUrl)) {
             nodeInfo.safeGetClientProps().add(new PropertyInfo(NodeProp.ACT_PUB_ACTOR_URL.s(), userUrl));
         }
 
@@ -36,7 +37,7 @@ public class FriendType extends TypeBase {
          * NOTE: Right when the Friend node is first created, before a person has been selected, this WILL
          * be null, and is normal
          */
-        if (accountId != null) {
+        if (ok(accountId)) {
             SubNode accountNode = read.getNode(ms, accountId, false);
 
             /*
@@ -44,15 +45,15 @@ public class FriendType extends TypeBase {
              * the node object which are not properties of the node itself but values we generate right here on
              * demand. The "Client Props" is a completely different set than the actual node properties
              */
-            if (accountNode != null) {
+            if (ok(accountNode)) {
                 /* NOTE: This will be the bio for both ActivityPub users and local users */
                 String userBio = accountNode.getStr(NodeProp.USER_BIO.s());
-                if (userBio != null) {
+                if (ok(userBio)) {
                     nodeInfo.safeGetClientProps().add(new PropertyInfo(NodeProp.USER_BIO.s(), userBio));
                 }
 
                 userUrl = accountNode.getStr(NodeProp.ACT_PUB_ACTOR_URL.s());
-                if (userUrl != null) {
+                if (ok(userUrl)) {
                     nodeInfo.safeGetClientProps().add(new PropertyInfo(NodeProp.ACT_PUB_ACTOR_URL.s(), userUrl));
                 }
 
@@ -60,14 +61,13 @@ public class FriendType extends TypeBase {
                 nodeInfo.safeGetClientProps().add(new PropertyInfo("accntUser", accountNode.getStr(NodeProp.USER.s())));
 
                 String friendAvatarVer = accountNode.getStr(NodeProp.BIN.s());
-                if (friendAvatarVer != null) {
+                if (ok(friendAvatarVer)) {
                     nodeInfo.safeGetClientProps().add(new PropertyInfo("avatarVer", friendAvatarVer));
                 }
 
                 String friendDisplayName = accountNode.getStr(NodeProp.DISPLAY_NAME.s());
-                if (friendDisplayName != null) {
-                    nodeInfo.safeGetClientProps()
-                            .add(new PropertyInfo(NodeProp.DISPLAY_NAME.s(), friendDisplayName));
+                if (ok(friendDisplayName)) {
+                    nodeInfo.safeGetClientProps().add(new PropertyInfo(NodeProp.DISPLAY_NAME.s(), friendDisplayName));
                 }
 
                 /*
@@ -76,7 +76,7 @@ public class FriendType extends TypeBase {
                  */
 
                 String userIconUrl = accountNode.getStr(NodeProp.ACT_PUB_USER_ICON_URL.s());
-                if (userIconUrl != null) {
+                if (ok(userIconUrl)) {
                     nodeInfo.safeGetClientProps().add(new PropertyInfo(NodeProp.ACT_PUB_USER_ICON_URL.s(), userIconUrl));
                 }
 

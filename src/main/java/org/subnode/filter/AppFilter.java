@@ -21,6 +21,7 @@ import org.subnode.mongo.MongoRepository;
 import org.subnode.util.ThreadLocals;
 import org.subnode.util.Util;
 import org.subnode.util.XString;
+import static org.subnode.util.Util.*;
 
 /**
  * This is Web Filter for processing AppController.API_PATH endpoints(path configured in
@@ -80,7 +81,7 @@ public class AppFilter extends GenericFilterBean {
 				}
 
 				// if no bearer is given, and no userName is set, then set to ANON
-				if (bearer == null && sc.getUserName() == null) {
+				if (no(bearer) && no(sc.getUserName())) {
 					sc.setUserName(PrincipalName.ANON.s());
 				}
 
@@ -137,7 +138,7 @@ public class AppFilter extends GenericFilterBean {
 	 */
 	private void checkApiSecurity(String bearer, HttpServletRequest req, SessionContext sc) {
 		// otherwise require secure header
-		if (bearer == null) {
+		if (no(bearer)) {
 			throw new RuntimeException("Auth failed. no bearer token: " + req.getRequestURI());
 		}
 

@@ -28,6 +28,7 @@ import org.subnode.util.LimitedInputStreamEx;
 import org.subnode.util.StreamUtil;
 import org.subnode.util.ThreadLocals;
 import org.subnode.util.Val;
+import static org.subnode.util.Util.*;
 
 /**
  * Import/Export of Raw JSON and Binaries to and from filesystem/classpath)
@@ -45,11 +46,11 @@ public class ExportJsonService extends ServiceBase {
 	private static final ObjectWriter jsonWriter = objectMapper.writerWithDefaultPrettyPrinter();
 
 	/*
-	 * todo-2: need capability to handle binary files also, but before implementing
-	 * that look for any export options on the grid api itself.
+	 * todo-2: need capability to handle binary files also, but before implementing that look for any
+	 * export options on the grid api itself.
 	 * 
-	 * Dumps all nodes that have property "pth" starting with 'pathPrefix', or all
-	 * nodes if pathPrefix is null.
+	 * Dumps all nodes that have property "pth" starting with 'pathPrefix', or all nodes if pathPrefix
+	 * is null.
 	 */
 	public String dumpAllNodes(MongoSession ms, String pathPrefix, String fileName) {
 		try {
@@ -80,7 +81,7 @@ public class ExportJsonService extends ServiceBase {
 				BufferedOutputStream _os = os;
 				iter.forEach((node) -> {
 					String binFileName = node.getStr(NodeProp.BIN_FILENAME.s());
-					if (binFileName != null) {
+					if (ok(binFileName)) {
 						if (saveBinaryToFileSystem(binFileName, targetFolder, node)) {
 							numBins.setVal(numBins.getVal() + 1);
 						}
@@ -106,8 +107,7 @@ public class ExportJsonService extends ServiceBase {
 				StreamUtil.close(os);
 			}
 
-			return "NodeCount: " + numDocs.getVal() + " exported to " + fileName + ". BinaryCount=" + numBins.getVal()
-					+ "<p>";
+			return "NodeCount: " + numDocs.getVal() + " exported to " + fileName + ". BinaryCount=" + numBins.getVal() + "<p>";
 		} catch (Exception e) {
 			return "Failed exporting " + fileName;
 		}
@@ -118,7 +118,7 @@ public class ExportJsonService extends ServiceBase {
 
 		String binMime = node.getStr(NodeProp.BIN_MIME.s());
 		ObjectId oid = node.getId();
-		if (oid != null) {
+		if (ok(oid)) {
 
 			InputStream is = null;
 			LimitedInputStreamEx lis = null;
@@ -143,12 +143,12 @@ public class ExportJsonService extends ServiceBase {
 
 	private boolean saveBinaryToFileSystem(String binFileName, String targetFolder, SubNode node) {
 		boolean ret = false;
-		if (binFileName != null) {
+		if (ok(binFileName)) {
 			log.debug("FileName: " + binFileName);
 		}
 
 		InputStream is = attach.getStreamByNode(node, "");
-		if (is != null) {
+		if (ok(is)) {
 			try {
 				String targetFileName = targetFolder + File.separator + node.getIdStr() + "-" + binFileName;
 				File targetFile = new File(targetFileName);
@@ -169,12 +169,11 @@ public class ExportJsonService extends ServiceBase {
 	}
 
 	/*
-	 * Imports the data from /src/main/resources/nodes/[subFolder] into the db,
-	 * which will update the targetPath node path (like "/r/public"), content on the
-	 * tree.
+	 * Imports the data from /src/main/resources/nodes/[subFolder] into the db, which will update the
+	 * targetPath node path (like "/r/public"), content on the tree.
 	 * 
-	 * NOTE: This code no longer being used, but I want to keep for future reference 
-	 * if we ever need to import JSON into the DB again in some automated way.
+	 * NOTE: This code no longer being used, but I want to keep for future reference if we ever need to
+	 * import JSON into the DB again in some automated way.
 	 */
 	public String resetNode(MongoSession ms, String subFolder) {
 		try {
@@ -189,7 +188,7 @@ public class ExportJsonService extends ServiceBase {
 				String line;
 				StringBuilder buf = new StringBuilder();
 
-				while ((line = in.readLine()) != null) {
+				while (ok(line = in.readLine())) {
 					if (!line.equals(",")) {
 						buf.append(line);
 						buf.append("\n"); // not needed right?
@@ -205,13 +204,13 @@ public class ExportJsonService extends ServiceBase {
 					update.save(ms, node);
 
 					String binFileName = node.getStr(NodeProp.BIN_FILENAME.s());
-					if (binFileName != null) {
+					if (ok(binFileName)) {
 						attach.deleteBinary(ms, "", node, null);
 						readBinaryFromResource(ms, node, binFileName, subFolder);
 					}
 				}
 			} finally {
-				ThreadLocals.setParentCheckEnabled(true);		
+				ThreadLocals.setParentCheckEnabled(true);
 				StreamUtil.close(in);
 			}
 			log.debug("import successful.");

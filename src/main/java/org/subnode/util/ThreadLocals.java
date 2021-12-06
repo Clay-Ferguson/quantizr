@@ -13,6 +13,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.bson.types.ObjectId;
 import org.subnode.mongo.MongoSession;
 import org.subnode.mongo.model.SubNode;
+import static org.subnode.util.Util.*;
 
 /**
  * Thread Local Storage
@@ -125,7 +126,7 @@ public class ThreadLocals {
 	}
 
 	public static Long getStopwatchTime() {
-		if (stopwatchTime.get() == null)
+		if (no(stopwatchTime.get()))
 			return -1L;
 		return stopwatchTime.get();
 	}
@@ -135,7 +136,7 @@ public class ThreadLocals {
 	}
 
 	public static Boolean getParentCheckEnabled() {
-		if (parentCheckEnabled.get() == null)
+		if (no(parentCheckEnabled.get()))
 			return false;
 		return parentCheckEnabled.get();
 	}
@@ -149,7 +150,7 @@ public class ThreadLocals {
 	}
 
 	public static HashMap<ObjectId, SubNode> getDirtyNodes() {
-		if (dirtyNodes.get() == null) {
+		if (no(dirtyNodes.get())) {
 			dirtyNodes.set(new HashMap<ObjectId, SubNode>());
 		}
 		return dirtyNodes.get();
@@ -164,7 +165,7 @@ public class ThreadLocals {
 	}
 
 	private static LinkedHashMap<String, SubNode> getCachedNodes() {
-		if (cachedNodes.get() == null) {
+		if (no(cachedNodes.get())) {
 			LinkedHashMap<String, SubNode> cn = new LinkedHashMap<String, SubNode>(MAX_CACHE_SIZE + 1, .75F, false) {
 				protected boolean removeEldestEntry(Map.Entry<String, SubNode> eldest) {
 					return size() > MAX_CACHE_SIZE;
@@ -196,7 +197,7 @@ public class ThreadLocals {
 	 * request, are guaranteed to be written out
 	 */
 	public static void dirty(SubNode node) {
-		if (node.getId() == null) {
+		if (no(node.getId())) {
 			return;
 		}
 
@@ -210,9 +211,8 @@ public class ThreadLocals {
 		 * todo-1: Should we find a way to be sure this never happens? This is basically another way of
 		 * saying with non-ACID databases transactions don't really 'work'
 		 */
-		if (nodeFound != null && nodeFound.hashCode() != node.hashCode()) {
-			log.debug(
-					"*************** WARNING: multiple instances of objectId " + node.getIdStr() + " are in memory.");
+		if (ok(nodeFound) && nodeFound.hashCode() != node.hashCode()) {
+			log.debug("*************** WARNING: multiple instances of objectId " + node.getIdStr() + " are in memory.");
 			return;
 		}
 
@@ -231,13 +231,13 @@ public class ThreadLocals {
 	}
 
 	public static void cacheNode(SubNode node) {
-		if (node == null)
+		if (no(node))
 			return;
 
-		if (node.getPath() != null) {
+		if (ok(node.getPath())) {
 			getCachedNodes().put(node.getPath(), node);
 		}
-		if (node.getId() != null) {
+		if (ok(node.getId())) {
 			getCachedNodes().put(node.getIdStr(), node);
 		}
 	}
@@ -253,10 +253,10 @@ public class ThreadLocals {
 	}
 
 	public static MongoSession ensure(MongoSession ms) {
-		MongoSession ret = ms != null ? ms : session.get();
+		MongoSession ret = ok(ms) ? ms : session.get();
 
 		// this should never happen, but if we didn't have a mongoSession here make one to return
-		if (ret == null && getSC() != null) {
+		if (no(ret) && ok(getSC())) {
 			ret = new MongoSession(getSC().getUserName(), getSC().getUserNodeId());
 		}
 		return ret;

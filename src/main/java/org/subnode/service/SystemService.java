@@ -28,6 +28,7 @@ import org.subnode.util.ExUtil;
 import org.subnode.util.StopwatchEntry;
 import org.subnode.util.ThreadLocals;
 import org.subnode.util.XString;
+import static org.subnode.util.Util.*;
 
 /**
  * Service methods for System related functions. Admin functions.
@@ -48,7 +49,10 @@ public class SystemService extends ServiceBase {
 		return "success.";
 	}
 
-	/* This was created to make it easier to test the orphan handling functions, so we can intentionally create orphans */
+	/*
+	 * This was created to make it easier to test the orphan handling functions, so we can intentionally
+	 * create orphans
+	 */
 	public String deleteLeavingOrphans(MongoSession ms, String nodeId) {
 		SubNode node = read.getNode(ms, nodeId);
 		delete.delete(node);
@@ -114,13 +118,13 @@ public class SystemService extends ServiceBase {
 
 	public String getJson(MongoSession ms, String nodeId) {
 		SubNode node = read.getNode(ms, nodeId, true);
-		if (node != null) {
+		if (ok(node)) {
 			String ret = XString.prettyPrint(node);
 
 			String ipfsLink = node.getStr(NodeProp.IPFS_LINK);
-			if (ipfsLink != null) {
+			if (ok(ipfsLink)) {
 				IPFSObjectStat fullStat = ipfs.objectStat(ipfsLink, false);
-				if (fullStat != null) {
+				if (ok(fullStat)) {
 					ret += "\n\nIPFS Object Stats:\n" + XString.prettyPrint(fullStat);
 				}
 			}
@@ -189,15 +193,15 @@ public class SystemService extends ServiceBase {
 
 		List<SessionContext> sessions = SessionContext.getHistoricalSessions();
 		sessions.sort((s1, s2) -> {
-			String s1key = s1.getUserName() + "/" + (s1.getIp() == null ? "?" : s1.getIp());
-			String s2key = s2.getUserName() + "/" + (s2.getIp() == null ? "?" : s2.getIp());
+			String s1key = s1.getUserName() + "/" + (no(s1.getIp()) ? "?" : s1.getIp());
+			String s2key = s2.getUserName() + "/" + (no(s2.getIp()) ? "?" : s2.getIp());
 			return s1key.compareTo(s2key);
 		});
 
 		for (SessionContext s : sessions) {
 			if (s.isLive()) {
 				sb.append("User: ");
-				sb.append(s.getUserName() + "/" + (s.getIp() == null ? "?" : s.getIp()));
+				sb.append(s.getUserName() + "/" + (no(s.getIp()) ? "?" : s.getIp()));
 				sb.append("\n");
 				sb.append(s.dumpActions("      ", 3));
 			}
@@ -207,7 +211,7 @@ public class SystemService extends ServiceBase {
 		for (SessionContext s : sessions) {
 			if (!s.isLive()) {
 				sb.append("User: ");
-				sb.append(s.getPastUserName() + "/" + (s.getIp() == null ? "?" : s.getIp()));
+				sb.append(s.getPastUserName() + "/" + (no(s.getIp()) ? "?" : s.getIp()));
 				sb.append("\n");
 				sb.append(s.dumpActions("      ", 3));
 			}
@@ -230,7 +234,7 @@ public class SystemService extends ServiceBase {
 			String s;
 
 			BufferedReader stdout = new BufferedReader(new InputStreamReader(p.getInputStream()));
-			while ((s = stdout.readLine()) != null) {
+			while (ok(s = stdout.readLine())) {
 				output.append(s);
 				output.append("\n");
 			}

@@ -15,19 +15,20 @@ import org.subnode.mongo.model.SubNode;
 import org.subnode.util.ExUtil;
 import org.subnode.util.StreamUtil;
 import org.subnode.util.ThreadLocals;
+import static org.subnode.util.Util.*;
 
 @Component
 public class ImportService extends ServiceBase {
 	private static final Logger log = LoggerFactory.getLogger(ImportService.class);
 
 	public ResponseEntity<?> streamImport(MongoSession ms, String nodeId, MultipartFile[] uploadFiles) {
-		if (nodeId == null) {
+		if (no(nodeId)) {
 			throw ExUtil.wrapEx("target nodeId not provided");
 		}
 		ms = ThreadLocals.ensure(ms);
 
 		SubNode node = read.getNode(ms, nodeId);
-		if (node == null) {
+		if (no(node)) {
 			throw ExUtil.wrapEx("Node not found.");
 		}
 
@@ -47,17 +48,14 @@ public class ImportService extends ServiceBase {
 					log.debug("Import ZIP to Node: " + node.getPath());
 					in = new BufferedInputStream(new AutoCloseInputStream(uploadFile.getInputStream()));
 
-					ImportZipService importZipService = (ImportZipService) SpringContextUtil
-							.getBean(ImportZipService.class);
+					ImportZipService importZipService = (ImportZipService) SpringContextUtil.getBean(ImportZipService.class);
 					importZipService.importFromStream(ms, in, node, false);
 					update.saveSession(ms);
-				}
-				else if (fileName.toLowerCase().endsWith(".tar")) {
+				} else if (fileName.toLowerCase().endsWith(".tar")) {
 					log.debug("Import TAR to Node: " + node.getPath());
 					in = new BufferedInputStream(new AutoCloseInputStream(uploadFile.getInputStream()));
 
-					ImportTarService importTarService = (ImportTarService)
-					SpringContextUtil.getBean(ImportTarService.class);
+					ImportTarService importTarService = (ImportTarService) SpringContextUtil.getBean(ImportTarService.class);
 					importTarService.importFromStream(ms, in, node, false);
 					update.saveSession(ms);
 				} else {

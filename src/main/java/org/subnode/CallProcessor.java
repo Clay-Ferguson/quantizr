@@ -24,6 +24,7 @@ import org.subnode.util.LockEx;
 import org.subnode.util.MongoRunnableEx;
 import org.subnode.util.ThreadLocals;
 import org.subnode.util.XString;
+import static org.subnode.util.Util.*;
 
 @Component
 public class CallProcessor {
@@ -56,13 +57,13 @@ public class CallProcessor {
 
 		Object ret = null;
 		LockEx mutex = (LockEx) WebUtils.getSessionMutex(ThreadLocals.getHttpSession());
-		if (mutex == null) {
+		if (no(mutex)) {
 			log.error("Session mutex lock is null.");
 		}
 
 		try {
 			ThreadLocals.getSC().stopwatch("> " + command);
-			if (mutex != null) {
+			if (ok(mutex)) {
 				mutex.lockEx();
 			}
 
@@ -82,7 +83,7 @@ public class CallProcessor {
 		} catch (NotLoggedInException e1) {
 			HttpServletResponse res = ThreadLocals.getServletResponse();
 			try {
-				if (res != null) {
+				if (ok(res)) {
 					log.debug("Unauthorized. Not logged in.");
 					res.sendError(HttpServletResponse.SC_UNAUTHORIZED);
 				}
@@ -103,7 +104,7 @@ public class CallProcessor {
 					/*
 					 * for now, we can just send back the actual exception message
 					 */
-					if (e.getMessage() != null) {
+					if (ok(e.getMessage())) {
 						orb.setMessage("Failed: " + e.getMessage());
 					} else {
 						orb.setMessage("Failed.");
@@ -114,7 +115,7 @@ public class CallProcessor {
 			}
 		} finally {
 			ThreadLocals.getSC().stopwatch("< " + command);
-			if (mutex != null) {
+			if (ok(mutex)) {
 				mutex.unlockEx();
 			}
 			// mutexCounter--;
@@ -134,13 +135,13 @@ public class CallProcessor {
 
 	private static void logRequest(String url, Object req, HttpSession httpSession) {
 		if (logRequests) {
-			log.trace("REQ=" + url + " " + (req == null ? "none" : XString.prettyPrint(req)));
+			log.trace("REQ=" + url + " " + (no(req) ? "none" : XString.prettyPrint(req)));
 		}
 	}
 
 	private static void logResponse(Object res) {
 		if (logRequests) {
-			log.trace("RES=" + (res == null ? "none" : XString.prettyPrint(res)));
+			log.trace("RES=" + (no(res) ? "none" : XString.prettyPrint(res)));
 		}
 	}
 }

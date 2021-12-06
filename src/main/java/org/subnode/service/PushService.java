@@ -19,6 +19,7 @@ import org.subnode.response.NodeEditedPushInfo;
 import org.subnode.response.ServerPushInfo;
 import org.subnode.response.SessionTimeoutPushInfo;
 import org.subnode.util.ThreadLocals;
+import static org.subnode.util.Util.*;
 
 @Component
 public class PushService extends ServiceBase {
@@ -38,7 +39,7 @@ public class PushService extends ServiceBase {
 		List<String> usersSharedTo = auth.getUsersSharedTo(ms, node);
 
 		// if node has no sharing we're done here
-		if (usersSharedTo == null) {
+		if (no(usersSharedTo)) {
 			return;
 		}
 
@@ -49,12 +50,12 @@ public class PushService extends ServiceBase {
 		/* Scan all sessions and push message to the ones that need to see it */
 		for (SessionContext sc : SessionContext.getAllSessions()) {
 			// if we know we already just pushed to this session, we can skip it in here.
-			if (sessionsPushed != null && sessionsPushed.contains(sc.hashCode())) {
+			if (ok(sessionsPushed) && sessionsPushed.contains(sc.hashCode())) {
 				continue;
 			}
 
 			/* Anonymous sessions won't have userName and can be ignored */
-			if (sc.getUserName() == null)
+			if (no(sc.getUserName()))
 				continue;
 
 			/* build our push message payload */
@@ -82,7 +83,7 @@ public class PushService extends ServiceBase {
 		/* Scan all sessions and push message to the ones that need to see it */
 		for (SessionContext sc : SessionContext.getAllSessions()) {
 			/* Anonymous sessions won't have userName and can be ignored */
-			if (sc.getUserName() == null)
+			if (no(sc.getUserName()))
 				continue;
 
 			// log.debug("Pushing NODE to SessionContext: hashCode=" + sc.hashCode() + " user=" +
@@ -91,7 +92,7 @@ public class PushService extends ServiceBase {
 
 			// if this node starts with the 'watchingPath' of the user that means the node is a descendant of
 			// the watching path
-			if (node.getPath() != null && sc.getWatchingPath() != null && node.getPath().startsWith(sc.getWatchingPath())) {
+			if (ok(node.getPath()) && ok(sc.getWatchingPath()) && node.getPath().startsWith(sc.getWatchingPath())) {
 
 				/* build our push message payload */
 				NodeInfo nodeInfo = convert.convertToNodeInfo(sc, ms, node, true, false, 1, false, false, true, false);
@@ -100,7 +101,7 @@ public class PushService extends ServiceBase {
 				// push notification message to browser
 				sendServerPushInfo(sc, pushInfo);
 
-				if (sessionsPushed != null) {
+				if (ok(sessionsPushed)) {
 					sessionsPushed.add(sc.hashCode());
 				}
 			}
@@ -112,14 +113,14 @@ public class PushService extends ServiceBase {
 		/* Scan all sessions and push message to the ones that need to see it */
 		for (SessionContext sc : SessionContext.getAllSessions()) {
 			/* Anonymous sessions can be ignored */
-			if (sc.getUserName() == null)
+			if (no(sc.getUserName()))
 				continue;
 
 			/*
 			 * Nodes whose path starts with "timeline path", are subnodes of (or descendants of) the timeline
 			 * node and therefore will be sent to their respecitve browsers
 			 */
-			if (sc.getTimelinePath() == null || !nodeInfo.getPath().startsWith(sc.getTimelinePath())) {
+			if (no(sc.getTimelinePath()) || !nodeInfo.getPath().startsWith(sc.getTimelinePath())) {
 				continue;
 			}
 
@@ -130,12 +131,12 @@ public class PushService extends ServiceBase {
 
 	public void sendServerPushInfo(SessionContext sc, ServerPushInfo info) {
 		// If user is currently logged in we have a session here.
-		if (sc == null)
+		if (no(sc))
 			return;
 
 		executor.execute(() -> {
 			SseEmitter pushEmitter = sc.getPushEmitter();
-			if (pushEmitter == null)
+			if (no(pushEmitter))
 				return;
 
 			synchronized (pushEmitter) {

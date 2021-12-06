@@ -22,16 +22,17 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.subnode.config.AppProp;
 import org.subnode.util.StreamUtil;
+import static org.subnode.util.Util.*;
 
 /**
- * Searches files indexed by Lucene (i.e. a Lucene Search). This code assumes
- * that Lucene index already exists.
+ * Searches files indexed by Lucene (i.e. a Lucene Search). This code assumes that Lucene index
+ * already exists.
  * 
- * todo-2: Take another look at synchornized blocks in this code. I'm troubleshooting
- * and putting in temporary sync code right now.
+ * todo-2: Take another look at synchornized blocks in this code. I'm troubleshooting and putting in
+ * temporary sync code right now.
  * 
- * todo-2: - need ability to search only specific fields (path, content, date?)
- * - need ability to order either by score or by date (rev chron)
+ * todo-2: - need ability to search only specific fields (path, content, date?) - need ability to
+ * order either by score or by date (rev chron)
  */
 // todo-2: make this a prototype-scope bean?
 @Component
@@ -50,9 +51,8 @@ public class FileSearcher {
 		int hitsPerPage = 10;
 
 		/**
-		 * todo-2: Is it more efficient (or even threadsafe?) to hold one or more of
-		 * these two resources open for multiple searches, and potentially
-		 * simultaneous/threads?
+		 * todo-2: Is it more efficient (or even threadsafe?) to hold one or more of these two resources
+		 * open for multiple searches, and potentially simultaneous/threads?
 		 */
 		FSDirectory fsDir = null;
 		IndexReader reader = null;
@@ -75,9 +75,8 @@ public class FileSearcher {
 	}
 
 	/**
-	 * This demonstrates a typical paging search scenario, where the search engine
-	 * presents pages of size n to the user. The user can then go to the next page
-	 * if interested in the next hits.
+	 * This demonstrates a typical paging search scenario, where the search engine presents pages of
+	 * size n to the user. The user can then go to the next page if interested in the next hits.
 	 */
 	public void doPagingSearch(IndexSearcher searcher, Query query, int hitsPerPage) throws IOException {
 
@@ -90,10 +89,10 @@ public class FileSearcher {
 		for (int i = 0; i < hits.length; i++) {
 			Document doc = searcher.doc(hits[i].doc);
 			String path = doc.get("path");
-			if (path != null) {
+			if (ok(path)) {
 				write(String.valueOf(i + 1) + ". " + path);
 				String title = doc.get("title");
-				if (title != null) {
+				if (ok(title)) {
 					write("   Title: " + doc.get("title"));
 				}
 			} else {

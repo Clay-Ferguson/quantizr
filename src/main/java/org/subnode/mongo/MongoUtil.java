@@ -40,6 +40,7 @@ import org.subnode.util.ImageUtil;
 import org.subnode.util.ThreadLocals;
 import org.subnode.util.Val;
 import org.subnode.util.XString;
+import static org.subnode.util.Util.*;
 
 @Component
 public class MongoUtil extends ServiceBase {
@@ -94,7 +95,7 @@ public class MongoUtil extends ServiceBase {
 				// if we haven't alread seen this parent path and deleted under it.
 				if (!pathsRemoved.contains(parentPath)) {
 					pathsRemoved.add(parentPath);
-					
+
 					// Since we know this parent doesn't exist we can delete all nodes that fall under it
 					// which would remove ALL siblings that are also orphans. Using this kind of pattern:
 					// ${parantPath}/* (that is, we append a slash and then find anything starting with that)
@@ -117,7 +118,7 @@ public class MongoUtil extends ServiceBase {
 	 */
 	public NodeIterable find(Query query) {
 		Iterable<SubNode> iter = ops.find(query, SubNode.class);
-		if (iter == null) {
+		if (no(iter)) {
 			return null;
 		}
 		return new NodeIterable(iter);
@@ -137,11 +138,11 @@ public class MongoUtil extends ServiceBase {
 	 * object
 	 */
 	public SubNode findById(ObjectId objId) {
-		if (objId == null)
+		if (no(objId))
 			return null;
 
 		SubNode node = ThreadLocals.getCachedNode(objId.toHexString());
-		if (node == null) {
+		if (no(node)) {
 			node = ops.findById(objId, SubNode.class);
 		}
 		return nodeOrDirtyNode(node);
@@ -186,12 +187,12 @@ public class MongoUtil extends ServiceBase {
 	}
 
 	public SubNode nodeOrDirtyNode(SubNode node) {
-		if (node == null) {
+		if (no(node)) {
 			return null;
 		}
 
 		SubNode dirty = ThreadLocals.getDirtyNodes().get(node.getId());
-		if (dirty != null) {
+		if (ok(dirty)) {
 			return dirty;
 		}
 
@@ -208,7 +209,7 @@ public class MongoUtil extends ServiceBase {
 		 * colon-delimited list like username:password:email.
 		 */
 		final List<String> testUserAccountsList = XString.tokenize(prop.getTestUserAccounts(), ",", true);
-		if (testUserAccountsList == null) {
+		if (no(testUserAccountsList)) {
 			return;
 		}
 
@@ -217,7 +218,7 @@ public class MongoUtil extends ServiceBase {
 				log.debug("Verifying test Account: " + accountInfo);
 
 				final List<String> accountInfoList = XString.tokenize(accountInfo, ":", true);
-				if (accountInfoList == null || accountInfoList.size() != 3) {
+				if (no(accountInfoList) || accountInfoList.size() != 3) {
 					log.debug("Invalid User Info substring: " + accountInfo);
 					continue;
 				}
@@ -225,7 +226,7 @@ public class MongoUtil extends ServiceBase {
 				String userName = accountInfoList.get(0);
 
 				SubNode ownerNode = read.getUserNodeByUserName(ms, userName);
-				if (ownerNode == null) {
+				if (no(ownerNode)) {
 					log.debug("userName not found: " + userName + ". Account will be created.");
 					SignupRequest signupReq = new SignupRequest();
 					signupReq.setUserName(userName);
@@ -288,7 +289,7 @@ public class MongoUtil extends ServiceBase {
 	}
 
 	public String getHashOfPassword(String password) {
-		if (password == null)
+		if (no(password))
 			return null;
 		return DigestUtils.sha256Hex(password).substring(0, 20);
 	}
@@ -325,13 +326,13 @@ public class MongoUtil extends ServiceBase {
 	/* Returns true if there were actually some encryption keys removed */
 	public boolean removeAllEncryptionKeys(SubNode node) {
 		HashMap<String, AccessControl> aclMap = node.getAc();
-		if (aclMap == null) {
+		if (no(aclMap)) {
 			return false;
 		}
 
 		Val<Boolean> keysRemoved = new Val<>(false);
 		aclMap.forEach((String key, AccessControl ac) -> {
-			if (ac.getKey() != null) {
+			if (ok(ac.getKey())) {
 				ac.setKey(null);
 				keysRemoved.setVal(true);
 			}
@@ -389,7 +390,7 @@ public class MongoUtil extends ServiceBase {
 				if (part.length() < lenLimit)
 					continue;
 
-				if (set.get(part) == null) {
+				if (no(set.get(part))) {
 					Integer x = idx++;
 					set.put(part, x);
 				}
@@ -415,7 +416,7 @@ public class MongoUtil extends ServiceBase {
 					Integer partIdx = set.get(part);
 
 					// if the database changed underneath it we just take that as another new path part
-					if (partIdx == null) {
+					if (no(partIdx)) {
 						partIdx = idx++;
 						set.put(part, partIdx);
 					}
@@ -676,7 +677,7 @@ public class MongoUtil extends ServiceBase {
 
 	public SubNode createUser(MongoSession ms, String user, String email, String password, boolean automated) {
 		SubNode userNode = read.getUserNodeByUserName(ms, user);
-		if (userNode != null) {
+		if (ok(userNode)) {
 			throw new RuntimeException("User already existed: " + user);
 		}
 
@@ -715,7 +716,7 @@ public class MongoUtil extends ServiceBase {
 	}
 
 	public SubNode getSystemRootNode() {
-		if (systemRootNode == null) {
+		if (no(systemRootNode)) {
 			systemRootNode = read.getNode(auth.getAdminSession(), "/r");
 		}
 		return systemRootNode;
@@ -732,7 +733,7 @@ public class MongoUtil extends ServiceBase {
 		String adminUser = prop.getMongoAdminUserName();
 
 		SubNode adminNode = read.getUserNodeByUserName(ms, adminUser);
-		if (adminNode == null) {
+		if (no(adminNode)) {
 			adminNode = snUtil.ensureNodeExists(ms, "/", NodeName.ROOT, null, "Root", NodeType.REPO_ROOT.s(), true, null, null);
 
 			adminNode.set(NodeProp.USER.s(), PrincipalName.ADMIN.s());
@@ -803,11 +804,11 @@ public class MongoUtil extends ServiceBase {
 		// // ---------------------------------------------------------
 		// SubNode node = getNode(session, "/" + NodeName.ROOT + "/" + NodeName.PUBLIC +
 		// "/" + NodeName.HOME);
-		// if (node == null) {
+		// if (no(node )) {
 		// log.debug("Public node didn't exist. Creating.");
 		// node = getNode(session, "/" + NodeName.ROOT + "/" + NodeName.PUBLIC + "/" +
 		// NodeName.HOME);
-		// if (node == null) {
+		// if (no(node )) {
 		// log.debug("Error reading node that was just imported.");
 		// } else {
 		// long childCount = getChildCount(node);

@@ -34,6 +34,7 @@ import org.subnode.util.FileUtils;
 import org.subnode.util.StreamUtil;
 import org.subnode.util.ThreadLocals;
 import org.subnode.util.XString;
+import static org.subnode.util.Util.*;
 
 /**
  * https://github.com/vsch/flexmark-java
@@ -217,14 +218,14 @@ public class ExportServiceFlexmark extends ServiceBase {
 		String fullCid = rootDir.getHash() + "/index.html";
 		ipfs.writeIpfsExportNode(session, fullCid, mime, "index.html", files);
 
-		if (rootDir != null) {
+		if (ok(rootDir)) {
 			res.setIpfsCid(fullCid);
 			res.setIpfsMime(mime);
 		}
 	}
 
 	private void recurseNode(SubNode node, int level) {
-		if (node == null)
+		if (no(node))
 			return;
 
 		processNode(node);
@@ -245,13 +246,13 @@ public class ExportServiceFlexmark extends ServiceBase {
 	private void writeImage(SubNode node) {
 		String bin = node.getStr(NodeProp.BIN.s());
 		String ipfsLink = node.getStr(NodeProp.IPFS_LINK);
-		if (bin == null && ipfsLink == null) {
+		if (no(bin) && no(ipfsLink)) {
 			return;
 		}
 
 		String style = "";
 		String imgSize = node.getStr(NodeProp.IMG_SIZE.s());
-		if (imgSize != null && imgSize.endsWith("%") || imgSize.endsWith("px")) {
+		if (ok(imgSize) && imgSize.endsWith("%") || imgSize.endsWith("px")) {
 			style = " style='width:" + imgSize + "'";
 		}
 
@@ -261,7 +262,7 @@ public class ExportServiceFlexmark extends ServiceBase {
 			String fileName = node.getStr(NodeProp.FILENAME);
 			String mime = node.getStr(NodeProp.BIN_MIME);
 
-			if (bin != null) {
+			if (ok(bin)) {
 				String cid = ipfs.saveNodeAttachmentToIpfs(session, node);
 				// log.debug("Saved NodeID bin to IPFS: got CID=" + cid);
 				files.add(new ExportIpfsFile(cid, fileName, mime));
@@ -271,7 +272,7 @@ public class ExportServiceFlexmark extends ServiceBase {
 			 * if this is already an IPFS linked thing, assume we're gonna have it's name added in the DAG and
 			 * so reference it in src
 			 */
-			else if (ipfsLink != null && fileName != null) {
+			else if (ok(ipfsLink) && ok(fileName)) {
 				// log.debug("Found IPFS file: " + fileName);
 				files.add(new ExportIpfsFile(ipfsLink, fileName, mime));
 
@@ -300,7 +301,7 @@ public class ExportServiceFlexmark extends ServiceBase {
 			src = prop.getHostAndPort() + path;
 		}
 
-		if (src == null)
+		if (no(src))
 			return;
 
 		markdown.append("\n<img src='" + src + "' " + style + "/>\n");

@@ -13,6 +13,7 @@ import org.subnode.mongo.MongoRepository;
 import org.subnode.mongo.MongoSession;
 import org.subnode.mongo.model.SubNode;
 import org.subnode.service.ServiceBase;
+import static org.subnode.util.Util.*;
 
 /**
  * Deamon for sending emails periodically.
@@ -45,7 +46,8 @@ public class NotificationDaemon extends ServiceBase {
 	 */
 	@Scheduled(fixedDelay = 1000)
 	public void run() {
-		if (run || !MongoRepository.fullInit) return;
+		if (run || !MongoRepository.fullInit)
+			return;
 		try {
 			run = true;
 			if (AppServer.isShuttingDown() || !AppServer.isEnableScheduling()) {
@@ -68,7 +70,7 @@ public class NotificationDaemon extends ServiceBase {
 
 				arun.run((MongoSession ms) -> {
 					List<SubNode> mailNodes = outbox.getMailNodes(ms);
-					if (mailNodes != null) {
+					if (ok(mailNodes)) {
 						log.debug("Found " + String.valueOf(mailNodes.size()) + " mailNodes to send.");
 						sendAllMail(ms, mailNodes);
 					}
@@ -77,8 +79,7 @@ public class NotificationDaemon extends ServiceBase {
 			}
 		} catch (Exception e) {
 			log.error("notification deamo cycle fail", e);
-		}
-		finally {
+		} finally {
 			run = false;
 		}
 	}

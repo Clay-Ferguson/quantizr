@@ -15,6 +15,7 @@ import org.subnode.response.NotificationMessage;
 import org.subnode.service.ServiceBase;
 import org.subnode.util.ThreadLocals;
 import org.subnode.util.XString;
+import static org.subnode.util.Util.*;
 
 /**
  * Manages the node where we store all emails that are queued up to be sent.
@@ -41,7 +42,7 @@ public class OutboxMgr extends ServiceBase {
 			SubNode userInbox =
 					read.getUserNodeByType(session, null, userNode, "### Inbox", NodeType.INBOX.s(), null, NodeName.INBOX);
 
-			if (userInbox != null) {
+			if (ok(userInbox)) {
 				// log.debug("userInbox id=" + userInbox.getIdStr());
 
 				/*
@@ -54,14 +55,13 @@ public class OutboxMgr extends ServiceBase {
 				/*
 				 * If there's no notification for this node already in the user's inbox then add one
 				 */
-				if (notifyNode == null) {
+				if (no(notifyNode)) {
 					notifyNode = create.createNode(session, userInbox, null, NodeType.INBOX_ENTRY.s(), 0L,
 							CreateNodeLocation.FIRST, null, null, true);
 
 					// trim to 280 like twitter.
 					String shortContent = XString.trimToMaxLen(node.getContent(), 280) + "...";
-					String content =
-							String.format("#### New from: %s\n%s", ThreadLocals.getSC().getUserName(), shortContent);
+					String content = String.format("#### New from: %s\n%s", ThreadLocals.getSC().getUserName(), shortContent);
 
 					notifyNode.setOwner(userInbox.getOwner());
 					notifyNode.setContent(content);
@@ -75,7 +75,7 @@ public class OutboxMgr extends ServiceBase {
 				 * even.
 				 */
 				List<SessionContext> scList = SessionContext.getSessionsByUserName(recieverUserName);
-				if (scList != null) {
+				if (ok(scList)) {
 					for (SessionContext sc : scList) {
 						push.sendServerPushInfo(sc,
 								// todo-2: fill in the two null parameters here if/when you ever bring this method back.
@@ -103,8 +103,7 @@ public class OutboxMgr extends ServiceBase {
 				String.format(prop.getConfigText("brandingAppName") + " user '%s' shared a node to your '%s' account.<p>\n\n" + //
 						"%s", fromUserName, toUserName, nodeUrl);
 
-		queueMailUsingAdminSession(ms, email, "A " + prop.getConfigText("brandingAppName") + " Node was shared to you!",
-				content);
+		queueMailUsingAdminSession(ms, email, "A " + prop.getConfigText("brandingAppName") + " Node was shared to you!", content);
 	}
 
 	public void queueEmail(String recipients, String subject, String content) {
@@ -114,8 +113,7 @@ public class OutboxMgr extends ServiceBase {
 		});
 	}
 
-	private void queueMailUsingAdminSession(MongoSession ms, String recipients, String subject,
-			String content) {
+	private void queueMailUsingAdminSession(MongoSession ms, String recipients, String subject, String content) {
 
 		SubNode outboxNode = getSystemOutbox(ms);
 		SubNode outboundEmailNode = create.createNode(ms, outboxNode.getPath() + "/?", NodeType.NONE.s());
@@ -141,20 +139,20 @@ public class OutboxMgr extends ServiceBase {
 	}
 
 	public SubNode getSystemOutbox(MongoSession ms) {
-		if (OutboxMgr.outboxNode != null) {
+		if (ok(OutboxMgr.outboxNode)) {
 			return OutboxMgr.outboxNode;
 		}
 
 		synchronized (outboxLock) {
 			// yep it's correct threading to check the node value again once inside the lock
-			if (OutboxMgr.outboxNode != null) {
+			if (ok(OutboxMgr.outboxNode)) {
 				return OutboxMgr.outboxNode;
 			}
 
 			snUtil.ensureNodeExists(ms, "/" + NodeName.ROOT, NodeName.OUTBOX, null, "Outbox", null, true, null, null);
 
-			OutboxMgr.outboxNode = snUtil.ensureNodeExists(ms, "/" + NodeName.ROOT, NodeName.OUTBOX + "/" + NodeName.SYSTEM,
-					null, "System Messages", null, true, null, null);
+			OutboxMgr.outboxNode = snUtil.ensureNodeExists(ms, "/" + NodeName.ROOT, NodeName.OUTBOX + "/" + NodeName.SYSTEM, null,
+					"System Messages", null, true, null, null);
 			return OutboxMgr.outboxNode;
 		}
 	}

@@ -41,6 +41,7 @@ import org.subnode.mongo.model.SubNode;
 import org.subnode.service.ServiceBase;
 import org.subnode.util.Util;
 import org.subnode.util.XString;
+import static org.subnode.util.Util.*;
 
 @Component
 public class ActPubUtil extends ServiceBase {
@@ -116,13 +117,13 @@ public class ActPubUtil extends ServiceBase {
     }
 
     public String getActorUrlFromWebFingerObj(Object webFinger) {
-        if (webFinger == null)
+        if (no(webFinger))
             return null;
         Object self = getLinkByRel(webFinger, "self");
         // log.debug("Self Link: " + XString.prettyPrint(self));
 
         String actorUrl = null;
-        if (self != null) {
+        if (ok(self)) {
             actorUrl = AP.str(self, APProp.href);
         }
         return actorUrl;
@@ -135,7 +136,7 @@ public class ActPubUtil extends ServiceBase {
     public Object getLinkByRel(Object webFinger, String rel) {
         List<?> linksList = AP.list(webFinger, APProp.links);
 
-        if (linksList == null)
+        if (no(linksList))
             return null;
 
         for (Object link : linksList) {
@@ -165,7 +166,7 @@ public class ActPubUtil extends ServiceBase {
                 try {
                     HttpHeaders headers = new HttpHeaders();
 
-                    if (mediaType != null) {
+                    if (ok(mediaType)) {
                         List<MediaType> acceptableMediaTypes = new LinkedList<>();
                         acceptableMediaTypes.add(mediaType);
                         headers.setAccept(acceptableMediaTypes);
@@ -214,11 +215,11 @@ public class ActPubUtil extends ServiceBase {
         try {
             apUtil.log("Secure post to " + toInbox);
             /* if private key not sent then get it using the session */
-            if (privateKey == null) {
+            if (no(privateKey)) {
                 privateKey = apCrypto.getPrivateKey(ms, userDoingPost);
             }
 
-            if (privateKey == null) {
+            if (no(privateKey)) {
                 throw new RuntimeException("Unable to get provate key for user sending message.");
             }
 
@@ -271,21 +272,21 @@ public class ActPubUtil extends ServiceBase {
      * app restarts at least, o
      */
     public APObj getActorByUrl(String url) {
-        if (url == null)
+        if (no(url))
             return null;
 
         apub.saveFediverseName(url);
 
         // first try to return from cache.
         APObj actor = apCache.actorsByUrl.get(url);
-        if (actor != null) {
+        if (ok(actor)) {
             return actor;
         }
 
         try {
             actor = getJson(url, APConst.MTYPE_ACT_JSON);
 
-            if (actor != null) {
+            if (ok(actor)) {
                 String userName = getLongUserNameFromActor(actor);
                 apCache.actorsByUrl.put(url, actor);
                 apCache.actorsByUserName.put(userName, actor);
@@ -302,7 +303,7 @@ public class ActPubUtil extends ServiceBase {
 
         MongoSession as = auth.getAdminSession();
         SubNode userNode = apub.getAcctNodeByUserName(as, userName);
-        if (userNode != null) {
+        if (ok(userNode)) {
             actorUrl = userNode.getStr(NodeProp.ACT_PUB_ACTOR_ID.s());
         }
 
@@ -310,7 +311,7 @@ public class ActPubUtil extends ServiceBase {
         // in our DB but we're not doing this.
         // String actorUrl = null;
         // APObj webFinger = apUtil.getWebFinger(userName);
-        // if (webFinger != null) {
+        // if (ok(webFinger )) {
         // actorUrl = apUtil.getActorUrlFromWebFingerObj(webFinger);
         // }
         return actorUrl;
@@ -356,20 +357,20 @@ public class ActPubUtil extends ServiceBase {
         String host = (secure ? "https://" : "http://") + getHostFromUserName(userName);
 
         Boolean failed = apCache.webFingerFailsByUserName.get(userName);
-        if (failed != null) {
+        if (ok(failed)) {
             return null;
         }
 
         // return from cache if we have this cached
         APObj finger = apCache.webFingerCacheByUserName.get(userName);
-        if (finger != null) {
+        if (ok(finger)) {
             return finger;
         }
 
         String url = host + APConst.PATH_WEBFINGER + "?resource=acct:" + userName;
         finger = getJson(url, APConst.MTYPE_JRD_JSON);
 
-        if (finger != null) {
+        if (ok(finger)) {
             // log.debug("Caching WebFinger: " + XString.prettyPrint(finger));
             apCache.webFingerCacheByUserName.put(userName, finger);
         } else {
@@ -385,25 +386,25 @@ public class ActPubUtil extends ServiceBase {
             // log.debug("postJson to: " + url);
 
             HttpHeaders headers = new HttpHeaders();
-            if (acceptType != null) {
+            if (ok(acceptType)) {
                 List<MediaType> acceptableMediaTypes = new LinkedList<>();
                 acceptableMediaTypes.add(acceptType);
                 headers.setAccept(acceptableMediaTypes);
             }
 
-            if (headerHost != null) {
+            if (ok(headerHost)) {
                 headers.add("Host", headerHost);
             }
 
-            if (headerDate != null) {
+            if (ok(headerDate)) {
                 headers.add("Date", headerDate);
             }
 
-            if (headerSig != null) {
+            if (ok(headerSig)) {
                 headers.add("Signature", headerSig);
             }
 
-            if (digestHeader != null) {
+            if (ok(digestHeader)) {
                 headers.add("Digest", digestHeader);
             }
 
@@ -437,7 +438,7 @@ public class ActPubUtil extends ServiceBase {
                         String username = parts[0];
 
                         SubNode userNode = read.getUserNodeByUserName(null, username);
-                        if (userNode != null) {
+                        if (ok(userNode)) {
                             APObj webFinger = new APObj() //
                                     .put(APProp.subject, "acct:" + username + "@" + fullHost) //
                                     .put(APProp.links, new APList() //
@@ -460,7 +461,7 @@ public class ActPubUtil extends ServiceBase {
     }
 
     public String getLongUserNameFromActorUrl(String actorUrl) {
-        if (actorUrl == null) {
+        if (no(actorUrl)) {
             return null;
         }
 
@@ -474,7 +475,7 @@ public class ActPubUtil extends ServiceBase {
         }
 
         APObj actor = getActorByUrl(actorUrl);
-        if (actor == null) {
+        if (no(actor)) {
             return null;
         }
         // log.debug("getLongUserNameFromActorUrl: " + actorUrl + "\n" +
@@ -557,11 +558,11 @@ public class ActPubUtil extends ServiceBase {
     }
 
     public boolean isLocalUrl(String url) {
-        return url != null && url.startsWith(prop.getHttpProtocol() + "://" + prop.getMetaHost());
+        return ok(url) && url.startsWith(prop.getHttpProtocol() + "://" + prop.getMetaHost());
     }
 
     public void iterateOrderedCollection(Object collectionObj, int maxCount, ActPubObserver observer) {
-        if (collectionObj == null)
+        if (no(collectionObj))
             return;
         /*
          * To reduce load for our purposes we can limit to just getting 2 pages of results to update a user,
@@ -585,7 +586,7 @@ public class ActPubUtil extends ServiceBase {
          * have any paging
          */
         List<?> orderedItems = AP.list(collectionObj, APProp.orderedItems);
-        if (orderedItems != null) {
+        if (ok(orderedItems)) {
             /*
              * Commonly this will just be an array strings (like in a 'followers' collection on Mastodon)
              */
@@ -605,13 +606,13 @@ public class ActPubUtil extends ServiceBase {
          * end up with a empty array even when there ARE some
          */
         String firstPageUrl = AP.str(collectionObj, APProp.first);
-        if (firstPageUrl != null) {
+        if (ok(firstPageUrl)) {
             // log.debug("First Page Url: " + firstPageUrl);
             if (++pageQueries > maxPageQueries)
                 return;
-            Object ocPage = firstPageUrl == null ? null : getJson(firstPageUrl, APConst.MTYPE_ACT_JSON);
+            Object ocPage = no(firstPageUrl) ? null : getJson(firstPageUrl, APConst.MTYPE_ACT_JSON);
 
-            while (ocPage != null) {
+            while (ok(ocPage)) {
                 orderedItems = AP.list(ocPage, APProp.orderedItems);
                 for (Object apObj : orderedItems) {
 
@@ -619,7 +620,7 @@ public class ActPubUtil extends ServiceBase {
                     if (AP.hasProps(apObj)) {
                         String apId = AP.str(apObj, APProp.id);
                         // if no apId that's fine, just process item.
-                        if (apId == null) {
+                        if (no(apId)) {
                             if (!observer.item(apObj))
                                 return;
                         }
@@ -642,10 +643,10 @@ public class ActPubUtil extends ServiceBase {
                 }
 
                 String nextPage = AP.str(ocPage, APProp.next);
-                if (nextPage != null) {
+                if (ok(nextPage)) {
                     if (++pageQueries > maxPageQueries)
                         return;
-                    ocPage = nextPage == null ? null : getJson(nextPage, APConst.MTYPE_ACT_JSON);
+                    ocPage = no(nextPage) ? null : getJson(nextPage, APConst.MTYPE_ACT_JSON);
                 } else {
                     break;
                 }
@@ -653,13 +654,13 @@ public class ActPubUtil extends ServiceBase {
         }
 
         String lastPageUrl = AP.str(collectionObj, APProp.last);
-        if (lastPageUrl != null) {
+        if (ok(lastPageUrl)) {
             // log.debug("Last Page Url: " + lastPageUrl);
             if (++pageQueries > maxPageQueries)
                 return;
-            Object ocPage = lastPageUrl == null ? null : getJson(lastPageUrl, APConst.MTYPE_ACT_JSON);
+            Object ocPage = no(lastPageUrl) ? null : getJson(lastPageUrl, APConst.MTYPE_ACT_JSON);
 
-            if (ocPage != null) {
+            if (ok(ocPage)) {
                 orderedItems = AP.list(ocPage, APProp.orderedItems);
 
                 for (Object apObj : orderedItems) {
@@ -667,7 +668,7 @@ public class ActPubUtil extends ServiceBase {
                     if (AP.hasProps(apObj)) {
                         String apId = AP.str(apObj, APProp.id);
                         // if no apId that's fine, just process item.
-                        if (apId == null) {
+                        if (no(apId)) {
                             if (!observer.item(apObj))
                                 return;
                         }

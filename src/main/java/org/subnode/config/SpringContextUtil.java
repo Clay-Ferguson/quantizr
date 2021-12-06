@@ -12,6 +12,7 @@ import org.subnode.exception.base.RuntimeEx;
 import org.subnode.mongo.MongoRepository;
 import org.subnode.service.IPFSPubSub;
 import org.subnode.util.EnglishDictionary;
+import static org.subnode.util.Util.*;
 
 /**
  * Manages certain aspects of Spring application context.
@@ -46,8 +47,7 @@ public class SpringContextUtil implements ApplicationContextAware {
 			appController.init();
 			english.init();
 			pubSub.init();
-		}
-		catch (Exception e) {
+		} catch (Exception e) {
 			log.error("application startup failed.");
 			throw new RuntimeEx(e);
 		}
@@ -59,7 +59,7 @@ public class SpringContextUtil implements ApplicationContextAware {
 	}
 
 	public static Object getBean(Class clazz) {
-		if (context == null) {
+		if (no(context)) {
 			throw new RuntimeEx("SpringContextUtil accessed before spring initialized.");
 		}
 
@@ -67,7 +67,7 @@ public class SpringContextUtil implements ApplicationContextAware {
 	}
 
 	public static Object getBean(String name) {
-		if (context == null) {
+		if (no(context)) {
 			throw new RuntimeEx("SpringContextUtil accessed before spring initialized.");
 		}
 

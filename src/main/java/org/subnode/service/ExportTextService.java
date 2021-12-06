@@ -19,6 +19,7 @@ import org.subnode.util.ExUtil;
 import org.subnode.util.FileUtils;
 import org.subnode.util.StreamUtil;
 import org.subnode.util.ThreadLocals;
+import static org.subnode.util.Util.*;
 
 @Component
 @Scope("prototype")
@@ -35,9 +36,8 @@ public class ExportTextService extends ServiceBase {
 	private ExportResponse res;
 
 	/*
-	 * Exports the node specified in the req. If the node specified is "/", or the
-	 * repository root, then we don't expect a filename, because we will generate a
-	 * timestamped one.
+	 * Exports the node specified in the req. If the node specified is "/", or the repository root, then
+	 * we don't expect a filename, because we will generate a timestamped one.
 	 */
 	public void export(MongoSession ms, ExportRequest req, ExportResponse res) {
 		ms = ThreadLocals.ensure(ms);
@@ -76,7 +76,7 @@ public class ExportTextService extends ServiceBase {
 			output = new BufferedOutputStream(new FileOutputStream(fullFileName));
 			recurseNode(exportNode, 0);
 			output.flush();
-			StreamUtil.close(output); 
+			StreamUtil.close(output);
 
 			if (req.isToIpfs()) {
 				// now write the file we just generated out to IPFS.
@@ -96,13 +96,13 @@ public class ExportTextService extends ServiceBase {
 		} catch (Exception ex) {
 			throw ExUtil.wrapEx(ex);
 		} finally {
-			StreamUtil.close(output); 
+			StreamUtil.close(output);
 			(new File(fullFileName)).deleteOnExit();
 		}
 	}
 
 	private void recurseNode(SubNode node, int level) {
-		if (node == null)
+		if (no(node))
 			return;
 
 		/* process the current node */

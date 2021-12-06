@@ -2,6 +2,7 @@ package org.subnode.util;
 
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
+import static org.subnode.util.Util.*;
 
 /*
  * Warning do not call this run method from INSIDE this class. Due to the spring proxy 'issue' you
@@ -23,7 +24,7 @@ public class AsyncExec {
 
     @Async("threadPoolTaskExecutor")
     public void run(ThreadLocalsContext tlc, Runnable runnable) {
-        if (tlc != null) {
+        if (ok(tlc)) {
             /*
              * if the currently executing threadId is the same as the one from the passed in 'tlc' we definitely
              * have a bug, and the @Async annotation is not having an effect.

@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.subnode.actpub.model.APObj;
 import org.subnode.service.ServiceBase;
 import org.subnode.util.XString;
+import static org.subnode.util.Util.*;
 
 // @CrossOrigin --> Access-Control-Allow-Credentials
 
@@ -53,7 +54,7 @@ public class ActPubController extends ServiceBase {
 			@RequestParam(value = "resource", required = true) String resource) {
 		apUtil.log("getWebFinger: " + resource);
 		Object ret = apUtil.generateWebFinger(resource);
-		if (ret != null)
+		if (ok(ret))
 			return ret;
 		return new ResponseEntity<String>(HttpStatus.NOT_FOUND);
 	}
@@ -88,13 +89,13 @@ public class ActPubController extends ServiceBase {
 	@RequestMapping(value = APConst.ACTOR_PATH + "/{userName}", method = RequestMethod.GET, produces = { //
 			APConst.CTYPE_ACT_JSON, //
 			APConst.CTYPE_ACT_JSON + "; " + APConst.CHARSET, //
-			APConst.CTYPE_LD_JSON + "; " + APConst.APS_PROFILE // 
+			APConst.CTYPE_LD_JSON + "; " + APConst.APS_PROFILE //
 	})
 	public @ResponseBody Object actor(//
 			@PathVariable(value = "userName", required = true) String userName) {
 		apUtil.log("getActor: " + userName);
 		Object ret = apub.generateActor(userName);
-		if (ret != null) {
+		if (ok(ret)) {
 			// This pattern is needed to ENSURE a specific content type.
 			HttpHeaders hdr = new HttpHeaders();
 			hdr.setContentType(APConst.MTYPE_ACT_JSON);
@@ -128,10 +129,11 @@ public class ActPubController extends ServiceBase {
 
 	/**
 	 * User Inbox POST
-	 *  
-	 * WARNING: This inbox and the Shared inbox (above) can both be called simultaneously in cases when someone
-	 * is doing a public reply to a Quanta node, and so Mastodon sends out the public inbox post and the post to the
-	 * user simultaneously. We have ActPubService#inboxLock for being sure this won't cause duplicate records.
+	 * 
+	 * WARNING: This inbox and the Shared inbox (above) can both be called simultaneously in cases when
+	 * someone is doing a public reply to a Quanta node, and so Mastodon sends out the public inbox post
+	 * and the post to the user simultaneously. We have ActPubService#inboxLock for being sure this
+	 * won't cause duplicate records.
 	 */
 	@RequestMapping(value = APConst.PATH_INBOX + "/{userName}", method = RequestMethod.POST, produces = { //
 			APConst.CTYPE_LD_JSON, //
@@ -159,7 +161,7 @@ public class ActPubController extends ServiceBase {
 	@RequestMapping(value = APConst.PATH_OUTBOX + "/{userName}", method = RequestMethod.GET, produces = { //
 			APConst.CTYPE_ACT_JSON, //
 			APConst.CTYPE_ACT_JSON + "; " + APConst.CHARSET, //
-			APConst.CTYPE_LD_JSON + "; " + APConst.APS_PROFILE // 
+			APConst.CTYPE_LD_JSON + "; " + APConst.APS_PROFILE //
 	})
 	public @ResponseBody Object outbox(//
 			@PathVariable(value = "userName", required = true) String userName,
@@ -181,7 +183,7 @@ public class ActPubController extends ServiceBase {
 			 */
 			ret = apOutbox.generateOutbox(userName);
 		}
-		if (ret != null) {
+		if (ok(ret)) {
 			apUtil.log("Reply with Outbox: " + XString.prettyPrint(ret));
 			return ret;
 		}
@@ -194,7 +196,7 @@ public class ActPubController extends ServiceBase {
 	@RequestMapping(value = APConst.PATH_FOLLOWERS + "/{userName}", method = RequestMethod.GET, produces = { //
 			APConst.CTYPE_ACT_JSON, //
 			APConst.CTYPE_ACT_JSON + "; " + APConst.CHARSET, //
-			APConst.CTYPE_LD_JSON + "; " + APConst.APS_PROFILE // 
+			APConst.CTYPE_LD_JSON + "; " + APConst.APS_PROFILE //
 	})
 	public @ResponseBody Object getFollowers(//
 			@PathVariable(value = "userName", required = false) String userName,
@@ -206,7 +208,7 @@ public class ActPubController extends ServiceBase {
 		} else {
 			ret = apFollower.generateFollowers(userName);
 		}
-		if (ret != null) {
+		if (ok(ret)) {
 			apUtil.log("Reply with Followers: " + XString.prettyPrint(ret));
 			return ret;
 		}
@@ -219,7 +221,7 @@ public class ActPubController extends ServiceBase {
 	@RequestMapping(value = APConst.PATH_FOLLOWING + "/{userName}", method = RequestMethod.GET, produces = { //
 			APConst.CTYPE_ACT_JSON, //
 			APConst.CTYPE_ACT_JSON + "; " + APConst.CHARSET, //
-			APConst.CTYPE_LD_JSON + "; " + APConst.APS_PROFILE // 
+			APConst.CTYPE_LD_JSON + "; " + APConst.APS_PROFILE //
 	})
 	public @ResponseBody Object getFollowing(//
 			@PathVariable(value = "userName", required = false) String userName,
@@ -231,7 +233,7 @@ public class ActPubController extends ServiceBase {
 		} else {
 			ret = apFollowing.generateFollowing(userName);
 		}
-		if (ret != null) {
+		if (ok(ret)) {
 			apUtil.log("Reply with Following: " + XString.prettyPrint(ret));
 			return ret;
 		}

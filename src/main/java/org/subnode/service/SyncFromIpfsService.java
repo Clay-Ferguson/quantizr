@@ -21,6 +21,7 @@ import org.subnode.response.LoadNodeFromIpfsResponse;
 import org.subnode.util.ExUtil;
 import org.subnode.util.ThreadLocals;
 import org.subnode.util.XString;
+import static org.subnode.util.Util.*;
 
 @Component
 @Scope("prototype")
@@ -106,10 +107,10 @@ public class SyncFromIpfsService extends ServiceBase {
 	public boolean traverseDag(SubNode node, String cid, int recursive) {
 		boolean success = false;
 		DagNode dag = ipfs.getDagNode(cid);
-		if (dag != null) {
+		if (ok(dag)) {
 			log.debug("Dag Dir: " + XString.prettyPrint(dag));
 
-			if (dag.getLinks() == null) {
+			if (no(dag.getLinks())) {
 				return success;
 			}
 
@@ -137,7 +138,7 @@ public class SyncFromIpfsService extends ServiceBase {
 				} else {
 					// read the node json from ipfs file
 					String json = ipfs.catToString(entryCid);
-					if (json == null) {
+					if (no(json)) {
 						log.debug("fileReadFailed: " + entryCid);
 						failedFiles++;
 					} else {
@@ -164,10 +165,10 @@ public class SyncFromIpfsService extends ServiceBase {
 		log.debug("processDir: " + path);
 
 		IPFSDir dir = ipfs.getDir(path);
-		if (dir != null) {
+		if (ok(dir)) {
 			log.debug("Dir: " + XString.prettyPrint(dir));
 
-			if (dir.getEntries() == null) {
+			if (no(dir.getEntries())) {
 				return success;
 			}
 
@@ -189,7 +190,7 @@ public class SyncFromIpfsService extends ServiceBase {
 
 						// read the node json from ipfs file
 						String json = ipfs.readFile(entryPath);
-						if (json == null) {
+						if (no(json)) {
 							log.debug("fileReadFailed: " + entryPath);
 							failedFiles++;
 						} else {
@@ -212,7 +213,7 @@ public class SyncFromIpfsService extends ServiceBase {
 
 								// we assume the node.id values can be the same across Federated instances.
 								SubNode findNode = read.getNode(session, node.getId());
-								if (findNode != null) {
+								if (ok(findNode)) {
 									log.debug("Node existed: " + node.getId());
 									matchingFiles++;
 									// todo-1: check if node is same content here.

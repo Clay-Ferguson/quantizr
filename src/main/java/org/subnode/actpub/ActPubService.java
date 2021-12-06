@@ -40,11 +40,12 @@ import org.subnode.service.ServiceBase;
 import org.subnode.util.DateUtil;
 import org.subnode.util.ThreadLocals;
 import org.subnode.util.XString;
+import static org.subnode.util.Util.*;
 
 @Component
 public class ActPubService extends ServiceBase {
     private static final Logger log = LoggerFactory.getLogger(ActPubService.class);
-    
+
     public static final boolean ENGLISH_LANGUAGE_CHECK = false;
     public static final int MAX_MESSAGES = 10;
     public static final int MAX_FOLLOWERS = 20;
@@ -92,12 +93,12 @@ public class ActPubService extends ServiceBase {
                         // k will be a nodeId of an account node here.
                         SubNode accntNode = apCache.acctNodesById.get(k);
 
-                        if (accntNode == null) {
+                        if (no(accntNode)) {
                             accntNode = read.getNode(ms, k);
                             apCache.acctNodesById.put(k, accntNode);
                         }
 
-                        if (accntNode != null) {
+                        if (ok(accntNode)) {
                             String userName = accntNode.getStr(NodeProp.USER.s());
                             toUserNames.add(userName);
                         }
@@ -143,7 +144,7 @@ public class ActPubService extends ServiceBase {
 
         // This query gets the FRIEND nodes that specifify userName on them
         Query query = apFollower.getFriendsByUserName_query(as, userName);
-        if (query == null)
+        if (no(query))
             return null;
 
         Iterable<SubNode> iterable = mongoUtil.find(query);
@@ -155,11 +156,11 @@ public class ActPubService extends ServiceBase {
              * node which is in node.ownerId
              */
             SubNode followerAccount = read.getNode(as, node.getOwner());
-            if (followerAccount != null) {
+            if (ok(followerAccount)) {
                 String followerUserName = followerAccount.getStr(NodeProp.USER);
                 if (followerUserName.contains("@")) {
                     String sharedInbox = followerAccount.getStr(NodeProp.ACT_PUB_SHARED_INBOX);
-                    if (sharedInbox != null) {
+                    if (ok(sharedInbox)) {
                         // log.debug("SharedInbox: " + sharedInbox);
                         set.add(sharedInbox);
                     }
@@ -174,7 +175,7 @@ public class ActPubService extends ServiceBase {
         String bin = node.getStr(NodeProp.BIN);
         String mime = node.getStr(NodeProp.BIN_MIME);
 
-        if (bin != null && mime != null) {
+        if (ok(bin) && ok(mime)) {
             attachments = new APList().val(//
                     new APObj() //
                             .put(APProp.type, APType.Document) //
@@ -187,7 +188,7 @@ public class ActPubService extends ServiceBase {
     /* Sends note outbound to other servers */
     public void sendNote(MongoSession ms, List<String> toUserNames, String fromUser, String inReplyTo, String content,
             APList attachments, String noteUrl, boolean privateMessage) {
-        if (toUserNames == null)
+        if (no(toUserNames))
             return;
 
         String host = prop.getMetaHost();
@@ -209,18 +210,18 @@ public class ActPubService extends ServiceBase {
             }
 
             APObj webFinger = apUtil.getWebFinger(toUserName);
-            if (webFinger == null) {
+            if (no(webFinger)) {
                 apUtil.log("Unable to get webfinger for " + toUserName);
                 continue;
             }
 
             String toActorUrl = apUtil.getActorUrlFromWebFingerObj(webFinger);
             APObj toActorObj = apUtil.getActorByUrl(toActorUrl);
-            if (toActorObj != null) {
+            if (ok(toActorObj)) {
                 String inbox = AP.str(toActorObj, APProp.inbox);
 
                 /* lazy create fromActor here */
-                if (fromActor == null) {
+                if (no(fromActor)) {
                     fromActor = apUtil.makeActorUrlForUserName(fromUser);
                 }
 
@@ -248,7 +249,7 @@ public class ActPubService extends ServiceBase {
 
         // return from cache if we already have the value cached
         SubNode acctNode = apCache.acctNodesByUserName.get(apUserName);
-        if (acctNode != null) {
+        if (ok(acctNode)) {
             return acctNode;
         }
 
@@ -257,12 +258,12 @@ public class ActPubService extends ServiceBase {
         // (to not have the 'stale issue', let's just not read from DB ever right here)
         // acctNode = read.getUserNodeByUserName(ms, apUserName);
 
-        // if (acctNode == null) {
+        // if (no(acctNode )) {
         /* First try to get a cached actor APObj */
         APObj actor = apCache.actorsByUserName.get(apUserName);
 
         // if we have actor object skip the step of getting it and import using it.
-        if (actor != null) {
+        if (ok(actor)) {
             acctNode = importActor(ms, null, actor);
         }
         // }
@@ -271,20 +272,20 @@ public class ActPubService extends ServiceBase {
          * if we were unable to get the acctNode, then we need to read it from scratch meaning starting at
          * the very beginning which is to get webFinger first and load from there
          */
-        if (acctNode == null) {
+        if (no(acctNode)) {
             log.debug("Loading foreign user: " + apUserName);
             APObj webFinger = apUtil.getWebFinger(apUserName);
 
-            if (webFinger != null) {
+            if (ok(webFinger)) {
                 String actorUrl = apUtil.getActorUrlFromWebFingerObj(webFinger);
-                if (actorUrl != null) {
+                if (ok(actorUrl)) {
                     acctNode = getAcctNodeByActorUrl(ms, actorUrl);
                 }
             }
         }
 
         // if we got the SubNode, cache it before returning it.
-        if (acctNode != null) {
+        if (ok(acctNode)) {
             // Any time we have an account node being cached we should cache it by it's ID too right away.
             apCache.acctNodesById.put(acctNode.getIdStr(), acctNode);
             apCache.acctNodesByUserName.put(apUserName, acctNode);
@@ -302,16 +303,16 @@ public class ActPubService extends ServiceBase {
 
         /* return node from cache if already cached */
         SubNode acctNode = apCache.acctNodesByActorUrl.get(actorUrl);
-        if (acctNode != null) {
+        if (ok(acctNode)) {
             return acctNode;
         }
 
         APObj actor = apUtil.getActorByUrl(actorUrl);
 
         // if webfinger was successful, ensure the user is imported into our system.
-        if (actor != null) {
+        if (ok(actor)) {
             acctNode = importActor(ms, null, actor);
-            if (acctNode != null) {
+            if (ok(acctNode)) {
                 // Any time we have an account node being cached we should cache it by it's ID too right away.
                 apCache.acctNodesById.put(acctNode.getIdStr(), acctNode);
                 apCache.acctNodesByActorUrl.put(actorUrl, acctNode);
@@ -328,7 +329,7 @@ public class ActPubService extends ServiceBase {
     public SubNode importActor(MongoSession ms, SubNode userNode, Object actor) {
 
         // if userNode unknown then get and/or create one. May be creating a brand new one even.
-        if (userNode == null) {
+        if (no(userNode)) {
             String apUserName = apUtil.getLongUserNameFromActor(actor);
 
             apUserName = apUserName.trim();
@@ -350,16 +351,16 @@ public class ActPubService extends ServiceBase {
             /*
              * If we don't have this user in our system, create them.
              */
-            if (userNode == null) {
+            if (no(userNode)) {
                 userNode = mongoUtil.createUser(ms, apUserName, null, null, true);
             }
         }
 
         boolean changed = false;
         Object icon = AP.obj(actor, APProp.icon);
-        if (icon != null) {
+        if (ok(icon)) {
             String iconUrl = AP.str(icon, APProp.url);
-            if (iconUrl != null) {
+            if (ok(iconUrl)) {
                 String curIconUrl = userNode.getStr(NodeProp.ACT_PUB_USER_ICON_URL.s());
                 if (!iconUrl.equals(curIconUrl)) {
                     if (userNode.set(NodeProp.ACT_PUB_USER_ICON_URL.s(), iconUrl)) {
@@ -370,9 +371,9 @@ public class ActPubService extends ServiceBase {
         }
 
         Object endpoints = AP.obj(actor, APProp.endpoints);
-        if (endpoints != null) {
+        if (ok(endpoints)) {
             String sharedInbox = AP.str(endpoints, APProp.sharedInbox);
-            if (sharedInbox != null) {
+            if (ok(sharedInbox)) {
                 String curSharedInbox = userNode.getStr(NodeProp.ACT_PUB_SHARED_INBOX.s());
                 if (!sharedInbox.equals(curSharedInbox)) {
                     if (userNode.set(NodeProp.ACT_PUB_SHARED_INBOX.s(), sharedInbox)) {
@@ -383,9 +384,9 @@ public class ActPubService extends ServiceBase {
         }
 
         Object image = AP.obj(actor, APProp.image);
-        if (image != null) {
+        if (ok(image)) {
             String imageUrl = AP.str(image, APProp.url);
-            if (imageUrl != null) {
+            if (ok(imageUrl)) {
                 String curImageUrl = userNode.getStr(NodeProp.ACT_PUB_USER_IMAGE_URL.s());
                 if (!imageUrl.equals(curImageUrl)) {
                     if (userNode.set(NodeProp.ACT_PUB_USER_IMAGE_URL.s(), imageUrl)) {
@@ -431,7 +432,7 @@ public class ActPubService extends ServiceBase {
         // simultaneous calls for the SAME node, and we shouldn't allow that.
         synchronized (inboxLock) {
             String type = AP.str(payload, APProp.type);
-            if (type == null)
+            if (no(type))
                 return;
             type = type.trim();
             apUtil.log("inbox type: " + type);
@@ -480,13 +481,13 @@ public class ActPubService extends ServiceBase {
         arun.<Object>run(session -> {
             apUtil.log("processCreateAction");
             String actorUrl = AP.str(payload, APProp.actor);
-            if (actorUrl == null) {
+            if (no(actorUrl)) {
                 log.debug("no 'actor' found on create action request posted object");
                 return null;
             }
 
             APObj actorObj = apUtil.getActorByUrl(actorUrl);
-            if (actorObj == null) {
+            if (no(actorObj)) {
                 log.debug("Unable to load actorUrl: " + actorUrl);
                 return null;
             }
@@ -516,13 +517,13 @@ public class ActPubService extends ServiceBase {
         arun.<Object>run(session -> {
             apUtil.log("processDeleteAction");
             String actorUrl = AP.str(payload, APProp.actor);
-            if (actorUrl == null) {
+            if (no(actorUrl)) {
                 log.debug("no 'actor' found on create action request posted object");
                 return null;
             }
 
             APObj actorObj = apUtil.getActorByUrl(actorUrl);
-            if (actorObj == null) {
+            if (no(actorObj)) {
                 log.debug("Unable to load actorUrl: " + actorUrl);
                 return null;
             }
@@ -532,7 +533,7 @@ public class ActPubService extends ServiceBase {
 
             Object object = AP.obj(payload, APProp.object);
             String type = AP.str(object, APProp.type);
-            if (type == null) {
+            if (no(type)) {
                 log.error("No delete type specified in delete request: " + XString.prettyPrint(payload));
                 return null;
             }
@@ -587,7 +588,7 @@ public class ActPubService extends ServiceBase {
         /*
          * If a foreign user is replying to a specific node, we put the reply under that node
          */
-        if (nodeBeingRepliedTo != null) {
+        if (ok(nodeBeingRepliedTo)) {
             apUtil.log("foreign actor replying to a quanta node.");
             saveNote(ms, null, nodeBeingRepliedTo, obj, false, false);
         }
@@ -599,7 +600,7 @@ public class ActPubService extends ServiceBase {
         else {
             apUtil.log("not reply to existing Quanta node.");
             SubNode actorAccountNode = getAcctNodeByActorUrl(ms, actorUrl);
-            if (actorAccountNode != null) {
+            if (ok(actorAccountNode)) {
                 String userName = actorAccountNode.getStr(NodeProp.USER.s());
                 SubNode postsNode = read.getUserNodeByType(ms, userName, actorAccountNode, "### Posts",
                         NodeType.ACT_PUB_POSTS.s(), Arrays.asList(PrivilegeType.READ.s()), NodeName.POSTS);
@@ -627,7 +628,7 @@ public class ActPubService extends ServiceBase {
          * First look to see if there is a target node already existing for this so we don't add a duplicate
          */
         SubNode dupNode = read.findSubNodeByProp(ms, parentNode.getPath(), NodeProp.ACT_PUB_ID.s(), id);
-        if (dupNode != null) {
+        if (ok(dupNode)) {
             // apUtil.log("duplicate ActivityPub post ignored: " + id);
             return;
         }
@@ -643,9 +644,9 @@ public class ActPubService extends ServiceBase {
         // Ignore non-english for now (later we can make this a user-defined language selection)
         String lang = "0";
         Object context = AP.obj(obj, APProp.context);
-        if (context != null) {
+        if (ok(context)) {
             String language = AP.str(context, "@language");
-            if (language != null) {
+            if (ok(language)) {
                 lang = language;
                 if (!"en".equalsIgnoreCase(language)) {
                     log.debug("Ignoring Non-English");
@@ -667,7 +668,7 @@ public class ActPubService extends ServiceBase {
         }
 
         // foreign account will own this node, this may be passed if it's known or null can be passed in.
-        if (toAccountNode == null) {
+        if (no(toAccountNode)) {
             toAccountNode = getAcctNodeByActorUrl(ms, objAttributedTo);
         }
         SubNode newNode =
@@ -684,14 +685,14 @@ public class ActPubService extends ServiceBase {
         // todo-1: I haven't yet tested that mentions are parsable in any Mastodon text using this method
         // but we at least know other instances of Quanta will have these extractable this way.
         HashSet<String> mentionsSet = auth.parseMentions(contentHtml);
-        if (mentionsSet != null) {
+        if (ok(mentionsSet)) {
             for (String mentionName : mentionsSet) {
                 saveFediverseName(mentionName);
             }
         }
         newNode.setModifyTime(published);
 
-        if (sensitive != null && sensitive.booleanValue()) {
+        if (ok(sensitive) && sensitive.booleanValue()) {
             newNode.set(NodeProp.ACT_PUB_SENSITIVE.s(), "y");
         }
 
@@ -732,7 +733,7 @@ public class ActPubService extends ServiceBase {
      */
     private void shareToAllObjectRecipients(MongoSession ms, SubNode node, Object obj, String propName) {
         List<?> list = AP.list(obj, propName);
-        if (list != null) {
+        if (ok(list)) {
             /* Build up all the access controls */
             for (Object to : list) {
                 if (to instanceof String) {
@@ -782,7 +783,7 @@ public class ActPubService extends ServiceBase {
             boolean allow = false;
             if (allow) {
                 APObj followersObj = apUtil.getJson(url, APConst.MTYPE_ACT_JSON);
-                if (followersObj != null) {
+                if (ok(followersObj)) {
                     // note/warning: the ActPubFollower.java class also has code to read followers.
                     apUtil.iterateOrderedCollection(followersObj, MAX_FOLLOWERS, obj -> {
                         /*
@@ -821,7 +822,7 @@ public class ActPubService extends ServiceBase {
         /*
          * if acctId not found in cache load foreign user (will cause it to also get cached)
          */
-        if (acctId == null) {
+        if (no(acctId)) {
             SubNode acctNode = null;
 
             if (apUtil.isLocalActorUrl(actorUrl)) {
@@ -838,12 +839,12 @@ public class ActPubService extends ServiceBase {
                 saveFediverseName(actorUrl);
             }
 
-            if (acctNode != null) {
+            if (ok(acctNode)) {
                 acctId = acctNode.getIdStr();
             }
         }
 
-        if (acctId != null) {
+        if (ok(acctId)) {
             apUtil.log("node shared to UserNodeId: " + acctId);
             node.safeGetAc().put(acctId, new AccessControl(null, PrivilegeType.READ.s() + "," + PrivilegeType.WRITE.s()));
         } else {
@@ -853,14 +854,14 @@ public class ActPubService extends ServiceBase {
 
     private void addAttachmentIfExists(MongoSession ms, SubNode node, Object obj) {
         List<?> attachments = AP.list(obj, APProp.attachment);
-        if (attachments == null)
+        if (no(attachments))
             return;
 
         for (Object att : attachments) {
             String mediaType = AP.str(att, APProp.mediaType);
             String url = AP.str(att, APProp.url);
 
-            if (mediaType != null && url != null) {
+            if (ok(mediaType) && ok(url)) {
                 attach.readFromUrl(ms, url, node.getIdStr(), mediaType, -1, false);
 
                 // for now we only support one attachment so break out after uploading one.
@@ -877,7 +878,7 @@ public class ActPubService extends ServiceBase {
 
         try {
             SubNode userNode = read.getUserNodeByUserName(null, userName);
-            if (userNode != null) {
+            if (ok(userNode)) {
                 user.ensureValidCryptoKeys(userNode);
 
                 String publicKey = userNode.getStr(NodeProp.CRYPTO_KEY_PUBLIC.s());
@@ -906,9 +907,9 @@ public class ActPubService extends ServiceBase {
                                 .put(APProp.url, avatarUrl));
 
                 String headerImageMime = userNode.getStr(NodeProp.BIN_MIME.s() + "Header");
-                if (headerImageMime != null) {
+                if (ok(headerImageMime)) {
                     String headerImageVer = userNode.getStr(NodeProp.BIN.s() + "Header");
-                    if (headerImageVer != null) {
+                    if (ok(headerImageVer)) {
                         String headerImageUrl = prop.getProtocolHostAndPort() + AppController.API_PATH + "/bin/profileHeader"
                                 + "?nodeId=" + userNode.getIdStr() + "&v=" + headerImageVer;
 
@@ -959,9 +960,9 @@ public class ActPubService extends ServiceBase {
     public void deleteNodeNotify(ObjectId nodeId) {
         arun.run(session -> {
             SubNode node = read.getNode(session, nodeId);
-            if (node != null && node.getType().equals(NodeType.FRIEND.s())) {
+            if (ok(node) && node.getType().equals(NodeType.FRIEND.s())) {
                 String friendUserName = node.getStr(NodeProp.USER.s());
-                if (friendUserName != null) {
+                if (ok(friendUserName)) {
                     // if a foreign user, update thru ActivityPub
                     if (friendUserName.contains("@")) {
                         String followerUser = ThreadLocals.getSC().getUserName();
@@ -992,7 +993,7 @@ public class ActPubService extends ServiceBase {
      * Returns true if the name was added, or false if already existed
      */
     public boolean saveFediverseName(String name) {
-        if (name == null)
+        if (no(name))
             return false;
         name = name.trim();
 
@@ -1014,7 +1015,7 @@ public class ActPubService extends ServiceBase {
             return;
         }
 
-        if (apUserName == null || !apUserName.contains("@") || apUserName.toLowerCase().endsWith("@" + prop.getMetaHost()))
+        if (no(apUserName) || !apUserName.contains("@") || apUserName.toLowerCase().endsWith("@" + prop.getMetaHost()))
             return;
 
         saveFediverseName(apUserName);
@@ -1131,17 +1132,17 @@ public class ActPubService extends ServiceBase {
 
                     // get userName, and skip over any that aren't foreign accounts
                     String userName = acctNode.getStr(NodeProp.USER.s());
-                    if (userName == null || !userName.contains("@"))
+                    if (no(userName) || !userName.contains("@"))
                         continue;
 
                     // log.debug("get webFinger: " + userName);
                     String url = acctNode.getStr(NodeProp.ACT_PUB_ACTOR_ID.s());
 
                     try {
-                        if (url != null) {
+                        if (ok(url)) {
                             APObj actor = apUtil.getJson(url, APConst.MTYPE_ACT_JSON);
 
-                            if (actor != null) {
+                            if (ok(actor)) {
                                 // we could double check userName, and bail if wrong, but this is not needed.
                                 // String userName = getLongUserNameFromActor(actor);
                                 apCache.actorsByUrl.put(url, actor);
@@ -1170,14 +1171,14 @@ public class ActPubService extends ServiceBase {
         arun.run(session -> {
             apUtil.log("Reload user outbox: " + userName);
             SubNode userNode = getAcctNodeByUserName(session, userName);
-            if (userNode == null) {
+            if (no(userNode)) {
                 // log.debug("Unable to getAccount Node for userName: "+userName);
                 return null;
             }
 
             String actorUrl = userNode.getStr(NodeProp.ACT_PUB_ACTOR_ID.s());
             APObj actor = apUtil.getActorByUrl(actorUrl);
-            if (actor != null) {
+            if (ok(actor)) {
                 apOutbox.loadForeignOutbox(session, actor, userNode, userName);
 
                 /*
@@ -1254,7 +1255,7 @@ public class ActPubService extends ServiceBase {
                     break;
 
                 String userName = node.getStr(NodeProp.USER.s());
-                if (userName == null || !userName.contains("@"))
+                if (no(userName) || !userName.contains("@"))
                     continue;
 
                 refreshForeignUsersQueuedCount++;
@@ -1282,7 +1283,7 @@ public class ActPubService extends ServiceBase {
             HashSet<String> knownUsers = new HashSet<>();
             for (SubNode node : accountNodes) {
                 String userName = node.getStr(NodeProp.USER.s());
-                if (userName == null)
+                if (no(userName))
                     continue;
                 knownUsers.add(userName);
             }
@@ -1328,7 +1329,7 @@ public class ActPubService extends ServiceBase {
 
             for (SubNode node : accountNodes) {
                 String userName = node.getStr(NodeProp.USER.s());
-                if (userName == null || !userName.contains("@"))
+                if (no(userName) || !userName.contains("@"))
                     continue;
 
                 long delCount = delete.deleteOldActPubPosts(node, session);

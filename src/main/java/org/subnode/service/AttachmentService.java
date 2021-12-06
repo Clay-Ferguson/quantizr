@@ -79,6 +79,7 @@ import org.subnode.util.StreamUtil;
 import org.subnode.util.ThreadLocals;
 import org.subnode.util.Util;
 import org.subnode.util.Val;
+import static org.subnode.util.Util.*;
 
 /**
  * Service for managing node attachments.
@@ -95,9 +96,9 @@ public class AttachmentService extends ServiceBase {
 	/*
 	 * Upload from User's computer. Standard HTML form-based uploading of a file from user machine
 	 */
-	public ResponseEntity<?> uploadMultipleFiles(MongoSession ms, String binSuffix, String nodeId,
-			MultipartFile[] uploadFiles, boolean explodeZips, boolean toIpfs, boolean addAsChildren) {
-		if (nodeId == null) {
+	public ResponseEntity<?> uploadMultipleFiles(MongoSession ms, String binSuffix, String nodeId, MultipartFile[] uploadFiles,
+			boolean explodeZips, boolean toIpfs, boolean addAsChildren) {
+		if (no(nodeId)) {
 			throw ExUtil.wrapEx("target nodeId not provided");
 		}
 
@@ -115,7 +116,7 @@ public class AttachmentService extends ServiceBase {
 			 * UNDERNEATH this current node.
 			 */
 			SubNode node = read.getNode(ms, nodeId);
-			if (node == null) {
+			if (no(node)) {
 				throw ExUtil.wrapEx("Node not found.");
 			}
 
@@ -136,7 +137,7 @@ public class AttachmentService extends ServiceBase {
 
 				// get how many bytes of storage the user currently holds
 				Long binTotal = userNode.getInt(NodeProp.BIN_TOTAL);
-				if (binTotal == null) {
+				if (no(binTotal)) {
 					binTotal = 0L;
 				}
 
@@ -195,16 +196,14 @@ public class AttachmentService extends ServiceBase {
 	 * Gets the binary attachment from a supplied stream and loads it into the repository on the node
 	 * specified in 'nodeId'
 	 */
-	public void attachBinaryFromStream(MongoSession ms, String binSuffix, SubNode node, String nodeId,
-			String fileName, long size, LimitedInputStreamEx is, String mimeType, int width,
-			int height, boolean addAsChild, boolean explodeZips, boolean toIpfs,
-			boolean calcImageSize, boolean dataUrl, boolean closeStream, boolean storeLocally,
-			String sourceUrl) {
+	public void attachBinaryFromStream(MongoSession ms, String binSuffix, SubNode node, String nodeId, String fileName, long size,
+			LimitedInputStreamEx is, String mimeType, int width, int height, boolean addAsChild, boolean explodeZips,
+			boolean toIpfs, boolean calcImageSize, boolean dataUrl, boolean closeStream, boolean storeLocally, String sourceUrl) {
 
 		/*
 		 * If caller already has 'node' it can pass node, and avoid looking up node again
 		 */
-		if (node == null && nodeId != null) {
+		if (no(node) && ok(nodeId)) {
 			node = read.getNode(ms, nodeId);
 		}
 
@@ -214,8 +213,7 @@ public class AttachmentService extends ServiceBase {
 		if (addAsChild) {
 			auth.ownerAuth(ms, node);
 			try {
-				SubNode newNode =
-						create.createNode(ms, node, null, null, null, CreateNodeLocation.LAST, null, null, true);
+				SubNode newNode = create.createNode(ms, node, null, null, null, CreateNodeLocation.LAST, null, null, true);
 				newNode.setContent(fileName);
 				newNode.touch();
 
@@ -238,7 +236,7 @@ public class AttachmentService extends ServiceBase {
 		}
 
 		/* mimeType can be passed as null if it's not yet determined */
-		if (mimeType == null) {
+		if (no(mimeType)) {
 			mimeType = getBestMimeFromFileTypeName(fileName);
 		}
 
@@ -258,27 +256,26 @@ public class AttachmentService extends ServiceBase {
 		String mimeType = null;
 
 		/* mimeType can be passed as null if it's not yet determined */
-		if (mimeType == null) {
+		if (no(mimeType)) {
 			mimeType = URLConnection.guessContentTypeFromName(fileName);
 		}
 
-		if (mimeType == null) {
+		if (no(mimeType)) {
 			String ext = FilenameUtils.getExtension(fileName);
 			mimeType = MimeTypeUtils.getMimeType(ext);
 		}
 
 		/* fallback to at lest some acceptable mime type */
-		if (mimeType == null) {
+		if (no(mimeType)) {
 			mimeType = "application/octet-stream";
 		}
 
 		return mimeType;
 	}
 
-	public void saveBinaryStreamToNode(MongoSession ms, String binSuffix, LimitedInputStreamEx inputStream,
-			String mimeType, String fileName, long size, int width, int height, SubNode node,
-			boolean toIpfs, boolean calcImageSize, boolean dataUrl, boolean closeStream,
-			boolean storeLocally, String sourceUrl) {
+	public void saveBinaryStreamToNode(MongoSession ms, String binSuffix, LimitedInputStreamEx inputStream, String mimeType,
+			String fileName, long size, int width, int height, SubNode node, boolean toIpfs, boolean calcImageSize,
+			boolean dataUrl, boolean closeStream, boolean storeLocally, String sourceUrl) {
 		/*
 		 * NOTE: Setting this flag to false works just fine, and is more efficient, and will simply do
 		 * everything EXCEPT calculate the image size
@@ -299,7 +296,7 @@ public class AttachmentService extends ServiceBase {
 		if (ImageUtil.isImageMime(mimeType)) {
 
 			// default image to be 100% size
-			if (node.getStr(NodeProp.IMG_SIZE.s() + binSuffix) == null) {
+			if (no(node.getStr(NodeProp.IMG_SIZE.s() + binSuffix))) {
 				node.set(NodeProp.IMG_SIZE.s() + binSuffix, "100%");
 			}
 
@@ -339,14 +336,14 @@ public class AttachmentService extends ServiceBase {
 
 		SubNode userNode = read.getNode(ms, node.getOwner());
 
-		if (imageBytes == null) {
+		if (no(imageBytes)) {
 			try {
 				node.set(NodeProp.BIN_SIZE.s() + binSuffix, size);
 				if (toIpfs) {
 					writeStreamToIpfs(ms, binSuffix, node, inputStream, mimeType, userNode);
 				} else {
 					if (storeLocally) {
-						if (fileName != null) {
+						if (ok(fileName)) {
 							node.set(NodeProp.BIN_FILENAME.s() + binSuffix, fileName);
 						}
 						writeStream(ms, binSuffix, node, inputStream, fileName, mimeType, userNode);
@@ -365,7 +362,7 @@ public class AttachmentService extends ServiceBase {
 				node.set(NodeProp.BIN_SIZE.s() + binSuffix, imageBytes.length);
 
 				if (storeLocally) {
-					if (fileName != null) {
+					if (ok(fileName)) {
 						node.set(NodeProp.BIN_FILENAME.s() + binSuffix, fileName);
 					}
 					is = new LimitedInputStreamEx(new ByteArrayInputStream(imageBytes), maxFileSize);
@@ -446,13 +443,13 @@ public class AttachmentService extends ServiceBase {
 		try {
 			ms = ThreadLocals.ensure(ms);
 
-			if (node == null) {
+			if (no(node)) {
 				node = read.getNode(ms, nodeId, false);
 			} else {
 				nodeId = node.getIdStr();
 			}
 
-			if (node == null) {
+			if (no(node)) {
 				throw ExUtil.wrapEx("node not found.");
 			}
 
@@ -470,12 +467,12 @@ public class AttachmentService extends ServiceBase {
 			}
 
 			String mimeTypeProp = node.getStr(NodeProp.BIN_MIME.s() + binSuffix);
-			if (mimeTypeProp == null) {
+			if (no(mimeTypeProp)) {
 				throw ExUtil.wrapEx("unable to find mimeType property");
 			}
 
 			String fileName = node.getStr(NodeProp.BIN_FILENAME.s() + binSuffix);
-			if (fileName == null) {
+			if (no(fileName)) {
 				fileName = "filename";
 			}
 
@@ -534,8 +531,7 @@ public class AttachmentService extends ServiceBase {
 	/**
 	 * Downloads a file by name that is expected to be in the Admin Data Folder
 	 */
-	public void getFile(MongoSession ms, String fileName, String disposition,
-			HttpServletResponse response) {
+	public void getFile(MongoSession ms, String fileName, String disposition, HttpServletResponse response) {
 
 		if (fileName.contains(".."))
 			throw ExUtil.wrapEx("bad request.");
@@ -555,7 +551,7 @@ public class AttachmentService extends ServiceBase {
 				throw ExUtil.wrapEx("file not found.");
 
 			String mimeType = MimeTypeUtils.getMimeType(file);
-			if (disposition == null) {
+			if (no(disposition)) {
 				disposition = "inline";
 			}
 
@@ -579,15 +575,14 @@ public class AttachmentService extends ServiceBase {
 		}
 	}
 
-	public ResponseEntity<StreamingResponseBody> getFileSystemResourceStream(MongoSession ms, String nodeId,
-			String disposition) {
+	public ResponseEntity<StreamingResponseBody> getFileSystemResourceStream(MongoSession ms, String nodeId, String disposition) {
 		if (!ms.isAdmin()) {
 			throw new RuntimeEx("unauthorized");
 		}
 
 		try {
 			SubNode node = read.getNode(ms, nodeId, false);
-			if (node == null) {
+			if (no(node)) {
 				throw new RuntimeEx("node not found: " + nodeId);
 			}
 			String fullFileName = node.getStr(NodeProp.FS_LINK);
@@ -598,7 +593,7 @@ public class AttachmentService extends ServiceBase {
 			}
 
 			String mimeType = MimeTypeUtils.getMimeType(file);
-			if (disposition == null) {
+			if (no(disposition)) {
 				disposition = "inline";
 			}
 
@@ -638,12 +633,12 @@ public class AttachmentService extends ServiceBase {
 			auth.auth(ms, node, PrivilegeType.READ);
 
 			String mimeTypeProp = node.getStr(NodeProp.BIN_MIME.s());
-			if (mimeTypeProp == null) {
+			if (no(mimeTypeProp)) {
 				throw ExUtil.wrapEx("unable to find mimeType property");
 			}
 
 			String fileName = node.getStr(NodeProp.BIN_FILENAME.s());
-			if (fileName == null) {
+			if (no(fileName)) {
 				fileName = "filename";
 			}
 
@@ -683,7 +678,7 @@ public class AttachmentService extends ServiceBase {
 		long contentLength = resource.contentLength();
 
 		HttpRange httpRange = headers.getRange().stream().findFirst().get();
-		if (httpRange != null) {
+		if (ok(httpRange)) {
 			long start = httpRange.getRangeStart(contentLength);
 			long end = httpRange.getRangeEnd(contentLength);
 			long rangeLength = Long.min(chunkSize, end - start + 1);
@@ -708,7 +703,7 @@ public class AttachmentService extends ServiceBase {
 	public UploadFromTorrentResponse uploadFromTorrent(MongoSession ms, UploadFromTorrentRequest req) {
 		UploadFromTorrentResponse res = new UploadFromTorrentResponse();
 		SubNode node = read.getNode(ms, req.getNodeId());
-		if (node == null) {
+		if (no(node)) {
 			throw new RuntimeException("node not found: id=" + req.getNodeId());
 		}
 
@@ -721,12 +716,12 @@ public class AttachmentService extends ServiceBase {
 
 	public UploadFromIPFSResponse attachFromIPFS(MongoSession ms, UploadFromIPFSRequest req) {
 		UploadFromIPFSResponse res = new UploadFromIPFSResponse();
-		if (req.getNodeId() == null) {
+		if (no(req.getNodeId())) {
 			throw new RuntimeException("null nodeId");
 		}
 
 		SubNode node = read.getNode(ms, req.getNodeId());
-		if (node == null) {
+		if (no(node)) {
 			throw new RuntimeException("node not found: id=" + req.getNodeId());
 		}
 
@@ -756,8 +751,8 @@ public class AttachmentService extends ServiceBase {
 	 *        method and get an inputStream handed back that can be read from. Normally the inputStream
 	 *        Val is null and not used.
 	 */
-	public void readFromUrl(MongoSession ms, String sourceUrl, String nodeId, String mimeHint,
-			int maxFileSize, boolean storeLocally) {
+	public void readFromUrl(MongoSession ms, String sourceUrl, String nodeId, String mimeHint, int maxFileSize,
+			boolean storeLocally) {
 		if (sourceUrl.startsWith("data:")) {
 			readFromDataUrl(ms, sourceUrl, nodeId, mimeHint, maxFileSize);
 		} else {
@@ -765,8 +760,7 @@ public class AttachmentService extends ServiceBase {
 		}
 	}
 
-	public void readFromDataUrl(MongoSession ms, String sourceUrl, String nodeId, String mimeHint,
-			int maxFileSize) {
+	public void readFromDataUrl(MongoSession ms, String sourceUrl, String nodeId, String mimeHint, int maxFileSize) {
 		if (maxFileSize <= 0) {
 			maxFileSize = user.getMaxUploadSize(ms);
 		}
@@ -780,27 +774,27 @@ public class AttachmentService extends ServiceBase {
 			LimitedInputStreamEx limitedIs = new LimitedInputStreamEx(is, maxFileSize);
 
 			// insert 0L for size now, because we don't know it yet
-			attachBinaryFromStream(ms, "", null, nodeId, "data-url", 0L, limitedIs, mimeType, -1, -1, false, false, false,
-					false, true, true, true, sourceUrl);
+			attachBinaryFromStream(ms, "", null, nodeId, "data-url", 0L, limitedIs, mimeType, -1, -1, false, false, false, false,
+					true, true, true, sourceUrl);
 		} else {
 			throw new RuntimeEx("Unsupported inline data type.");
 		}
 	}
 
 	// https://tools.ietf.org/html/rfc2397
-	public void readFromStandardUrl(MongoSession ms, String sourceUrl, String nodeId, String mimeHint,
-			int maxFileSize, boolean storeLocally) {
+	public void readFromStandardUrl(MongoSession ms, String sourceUrl, String nodeId, String mimeHint, int maxFileSize,
+			boolean storeLocally) {
 
 		if (!storeLocally) {
 			SubNode node = read.getNode(ms, nodeId);
 			auth.ownerAuthByThread(node);
 
 			String mimeType = URLConnection.guessContentTypeFromName(sourceUrl);
-			if (StringUtils.isEmpty(mimeType) && mimeHint != null) {
+			if (StringUtils.isEmpty(mimeType) && ok(mimeHint)) {
 				mimeType = URLConnection.guessContentTypeFromName(mimeHint);
 			}
 
-			if (mimeType != null) {
+			if (ok(mimeType)) {
 				node.set(NodeProp.BIN_MIME.s(), mimeType);
 			}
 			node.set(NodeProp.BIN_URL.s(), sourceUrl);
@@ -824,7 +818,7 @@ public class AttachmentService extends ServiceBase {
 					.setSocketTimeout(timeout * 1000).build();
 
 			String mimeType = URLConnection.guessContentTypeFromName(sourceUrl);
-			if (StringUtils.isEmpty(mimeType) && mimeHint != null) {
+			if (StringUtils.isEmpty(mimeType) && ok(mimeHint)) {
 				mimeType = URLConnection.guessContentTypeFromName(mimeHint);
 			}
 
@@ -877,8 +871,8 @@ public class AttachmentService extends ServiceBase {
 					limitedIs = new LimitedInputStreamEx(is, maxFileSize);
 
 					// insert 0L for size now, because we don't know it yet
-					attachBinaryFromStream(ms, "", null, nodeId, sourceUrl, 0L, limitedIs, "", -1, -1, false, false, false,
-							true, false, true, storeLocally, sourceUrl);
+					attachBinaryFromStream(ms, "", null, nodeId, sourceUrl, 0L, limitedIs, "", -1, -1, false, false, false, true,
+							false, true, storeLocally, sourceUrl);
 				}
 			}
 		} catch (Exception e) {
@@ -898,8 +892,7 @@ public class AttachmentService extends ServiceBase {
 	// String mimeType = URLConnection.guessContentTypeFromStream(inputStream);
 	//
 	/* returns true if it was detected AND saved as an image */
-	private boolean detectAndSaveImage(MongoSession ms, String nodeId, String sourceUrl, URL url,
-			boolean storeLocally) {
+	private boolean detectAndSaveImage(MongoSession ms, String nodeId, String sourceUrl, URL url, boolean storeLocally) {
 		ImageInputStream is = null;
 		LimitedInputStreamEx is2 = null;
 		ImageReader reader = null;
@@ -913,7 +906,7 @@ public class AttachmentService extends ServiceBase {
 				reader = readers.next();
 				String formatName = reader.getFormatName();
 
-				if (formatName != null) {
+				if (ok(formatName)) {
 					formatName = formatName.toLowerCase();
 					// log.debug("determined format name of image url: " + formatName);
 					reader.setInput(is, true, false);
@@ -925,9 +918,8 @@ public class AttachmentService extends ServiceBase {
 					byte[] bytes = os.toByteArray();
 					is2 = new LimitedInputStreamEx(new ByteArrayInputStream(bytes), maxFileSize);
 
-					attachBinaryFromStream(ms, "", null, nodeId, sourceUrl, bytes.length, is2, mimeType,
-							bufImg.getWidth(null), bufImg.getHeight(null), false, false, false, true, false, true, storeLocally,
-							sourceUrl);
+					attachBinaryFromStream(ms, "", null, nodeId, sourceUrl, bytes.length, is2, mimeType, bufImg.getWidth(null),
+							bufImg.getHeight(null), false, false, false, true, false, true, storeLocally, sourceUrl);
 
 					return true;
 				}
@@ -941,14 +933,14 @@ public class AttachmentService extends ServiceBase {
 		return false;
 	}
 
-	public void writeStream(MongoSession ms, String binSuffix, SubNode node,
-			LimitedInputStreamEx stream, String fileName, String mimeType, SubNode userNode) {
+	public void writeStream(MongoSession ms, String binSuffix, SubNode node, LimitedInputStreamEx stream, String fileName,
+			String mimeType, SubNode userNode) {
 
 		auth.ownerAuthByThread(node);
 		DBObject metaData = new BasicDBObject();
 		metaData.put("nodeId" + binSuffix, node.getId());
 
-		if (userNode == null) {
+		if (no(userNode)) {
 			userNode = read.getUserNodeByUserName(null, null);
 		}
 
@@ -976,7 +968,7 @@ public class AttachmentService extends ServiceBase {
 			user.addBytesToUserNodeBytes(ms, streamCount, userNode, 1);
 		}
 
-		if (userNode == null) {
+		if (no(userNode)) {
 			throw new RuntimeEx("User not found.");
 		}
 
@@ -987,13 +979,13 @@ public class AttachmentService extends ServiceBase {
 		node.set(NodeProp.BIN_SIZE.s() + binSuffix, streamCount);
 	}
 
-	public void writeStreamToIpfs(MongoSession ms, String binSuffix, SubNode node,
-			InputStream stream, String mimeType, SubNode userNode) {
+	public void writeStreamToIpfs(MongoSession ms, String binSuffix, SubNode node, InputStream stream, String mimeType,
+			SubNode userNode) {
 		auth.ownerAuthByThread(node);
 		Val<Integer> streamSize = new Val<>();
 
 		MerkleLink ret = ipfs.addFromStream(ms, stream, null, mimeType, streamSize, null, false);
-		if (ret != null) {
+		if (ok(ret)) {
 			node.set(NodeProp.IPFS_LINK.s() + binSuffix, ret.getHash());
 			node.set(NodeProp.BIN_SIZE.s() + binSuffix, streamSize.getVal());
 
@@ -1005,7 +997,7 @@ public class AttachmentService extends ServiceBase {
 	public void deleteBinary(MongoSession ms, String binSuffix, SubNode node, SubNode userNode) {
 		auth.ownerAuthByThread(node);
 		String id = node.getStr(NodeProp.BIN.s() + binSuffix);
-		if (id == null) {
+		if (no(id)) {
 			return;
 		}
 
@@ -1032,12 +1024,11 @@ public class AttachmentService extends ServiceBase {
 
 		InputStream is = null;
 		String ipfsHash = node.getStr(NodeProp.IPFS_LINK.s() + binSuffix);
-		if (ipfsHash != null) {
+		if (ok(ipfsHash)) {
 			/*
 			 * todo-1: When the IPFS link happens to be unreachable/invalid (or IFPS disabled?), this can
 			 * timeout here by taking too long. This wreaks havoc on the browser thread during some scenarios.
-			 * log.debug("Getting IPFS Stream for NodeId " + node.getIdStr() + " IPFS_CID=" +
-			 * ipfsHash);
+			 * log.debug("Getting IPFS Stream for NodeId " + node.getIdStr() + " IPFS_CID=" + ipfsHash);
 			 */
 			is = ipfs.getStream(ms, ipfsHash);
 		} else {
@@ -1047,20 +1038,20 @@ public class AttachmentService extends ServiceBase {
 	}
 
 	public InputStream getStreamByNode(SubNode node, String binSuffix) {
-		if (node == null)
+		if (no(node))
 			return null;
 		// long startTime = System.currentTimeMillis();
 		// log.debug("getStreamByNode: " + node.getIdStr());
 
 		String id = node.getStr(NodeProp.BIN.s() + binSuffix);
-		if (id == null) {
+		if (no(id)) {
 			return null;
 		}
 
 		/* why not an import here? */
 		com.mongodb.client.gridfs.model.GridFSFile gridFile = grid.findOne(new Query(Criteria.where("_id").is(id)));
 		// new Query(Criteria.where("metadata.nodeId").is(nodeId)));
-		if (gridFile == null) {
+		if (no(gridFile)) {
 			log.debug("gridfs ID not found");
 			return null;
 		}
@@ -1077,7 +1068,7 @@ public class AttachmentService extends ServiceBase {
 
 		try {
 			InputStream is = gridFsResource.getInputStream();
-			if (is == null) {
+			if (no(is)) {
 				throw new RuntimeEx("Unable to get inputStream");
 			}
 
@@ -1092,7 +1083,7 @@ public class AttachmentService extends ServiceBase {
 
 	public String getStringByNode(MongoSession ms, SubNode node) {
 		String ret = null;
-		if (node != null) {
+		if (ok(node)) {
 			auth.auth(ms, node, PrivilegeType.READ);
 			ret = getStringByNodeEx(node);
 		}
@@ -1101,27 +1092,26 @@ public class AttachmentService extends ServiceBase {
 
 	/* Gets the content of the grid resource by reading it into a string */
 	public String getStringByNodeEx(SubNode node) {
-		if (node == null)
+		if (no(node))
 			return null;
 		log.debug("getStringByNode: " + node.getIdStr());
 
 		String id = node.getStr("bin");
-		if (id == null) {
+		if (no(id)) {
 			return null;
 		}
 
 		com.mongodb.client.gridfs.model.GridFSFile gridFile = grid.findOne(new Query(Criteria.where("_id").is(id)));
 		// new Query(Criteria.where("metadata.nodeId").is(nodeId)));
-		if (gridFile == null) {
+		if (no(gridFile)) {
 			log.debug("gridfs ID not found");
 			return null;
 		}
 
-		GridFsResource gridFsResource =
-				new GridFsResource(gridFile, gridBucket.openDownloadStream(gridFile.getObjectId()));
+		GridFsResource gridFsResource = new GridFsResource(gridFile, gridBucket.openDownloadStream(gridFile.getObjectId()));
 		try {
 			InputStream is = gridFsResource.getInputStream();
-			if (is == null) {
+			if (no(is)) {
 				throw new RuntimeEx("Unable to get inputStream");
 			}
 			String result = IOUtils.toString(is, StandardCharsets.UTF_8.name());
@@ -1137,7 +1127,7 @@ public class AttachmentService extends ServiceBase {
 			GridFSFindIterable files = gridBucket.find();
 
 			/* Scan all files in the grid */
-			if (files != null) {
+			if (ok(files)) {
 				/*
 				 * I am needing this quick and didn't find another way to do this other than brute force scan. Maybe
 				 * they are using a linked list so that there genuinely is no faster way ?
@@ -1166,10 +1156,10 @@ public class AttachmentService extends ServiceBase {
 			GridFSFindIterable files = gridBucket.find();
 
 			/* Scan all files in the grid */
-			if (files != null) {
+			if (ok(files)) {
 				for (GridFSFile file : files) {
 					Document meta = file.getMetadata();
-					if (meta != null) {
+					if (ok(meta)) {
 						/* Get which nodeId owns this grid file */
 						ObjectId id = (ObjectId) meta.get("nodeId");
 
@@ -1177,7 +1167,7 @@ public class AttachmentService extends ServiceBase {
 						 * If the grid file is not based off 'nodeId' then we still need to check if it's a Header image
 						 * (special case)
 						 */
-						if (id == null) {
+						if (no(id)) {
 							/*
 							 * todo-2: currently we only have "Header" as a (binSuffix), and it may stay that way forever, as
 							 * the only violation of the one-binary-per-node rule.
@@ -1188,14 +1178,14 @@ public class AttachmentService extends ServiceBase {
 							id = (ObjectId) meta.get("nodeIdHeader");
 						}
 
-						if (id != null) {
+						if (ok(id)) {
 							/* Find the node */
 							SubNode subNode = read.getNode(session, id);
 
 							/*
 							 * If the node doesn't exist then this grid file is an orphan and should go away
 							 */
-							if (subNode == null) {
+							if (no(subNode)) {
 								log.debug("Grid Orphan Delete: " + id.toHexString());
 
 								// Query query = new Query(GridFsCriteria.where("_id").is(file.getId());
@@ -1212,7 +1202,7 @@ public class AttachmentService extends ServiceBase {
 							 */
 							else {
 								UserStats stats = statsMap.get(subNode.getOwner());
-								if (stats == null) {
+								if (no(stats)) {
 									stats = new UserStats();
 									stats.binUsage = file.getLength();
 									statsMap.put(subNode.getOwner(), stats);
@@ -1235,7 +1225,7 @@ public class AttachmentService extends ServiceBase {
 			for (SubNode accountNode : accountNodes) {
 				log.debug("Processing Account Node: id=" + accountNode.getIdStr());
 				UserStats stats = statsMap.get(accountNode.getOwner());
-				if (stats == null) {
+				if (no(stats)) {
 					stats = new UserStats();
 					stats.binUsage = 0L;
 					statsMap.put(accountNode.getOwner(), stats);

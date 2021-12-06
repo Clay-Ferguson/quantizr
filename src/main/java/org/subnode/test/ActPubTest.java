@@ -10,6 +10,7 @@ import org.subnode.actpub.ActPubUtil;
 import org.subnode.actpub.model.APObj;
 import org.subnode.config.AppProp;
 import org.subnode.util.XString;
+import static org.subnode.util.Util.*;
 
 @Component("ActPubTest")
 public class ActPubTest implements TestIntf {
@@ -46,7 +47,7 @@ public class ActPubTest implements TestIntf {
         String webFingerUrl = targetUser + "@" + targetHostAndPort;
 
         APObj webFinger = apUtil.getWebFingerSec(webFingerUrl, false);
-        if (webFinger == null) {
+        if (no(webFinger)) {
             throw new Exception("Unable to get webFinger of " + webFingerUrl);
         }
 
@@ -55,7 +56,7 @@ public class ActPubTest implements TestIntf {
         /* ----- GET ACTOR ----- */
         String actorUrl = apUtil.getActorUrlFromWebFingerObj(webFinger);
         APObj actorObj = apUtil.getJson(actorUrl, APConst.MTYPE_ACT_JSON, 10);
-        if (actorObj == null) {
+        if (no(actorObj)) {
             throw new Exception("Unable to get actor: " + actorUrl);
         }
 

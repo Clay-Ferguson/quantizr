@@ -6,6 +6,7 @@ import java.util.concurrent.locks.ReentrantLock;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.subnode.exception.base.RuntimeEx;
+import static org.subnode.util.Util.*;
 
 public class LockEx extends ReentrantLock {
 	private static final Logger log = LoggerFactory.getLogger(LockEx.class);
@@ -16,16 +17,15 @@ public class LockEx extends ReentrantLock {
 	private long loopTimeoutSecs = 7;
 
 	/*
-	 * How long the lock waits before it assumes a deadlock might be happening, and
-	 * logs the deadlock warning
+	 * How long the lock waits before it assumes a deadlock might be happening, and logs the deadlock
+	 * warning
 	 */
 	private long deadlockTimeoutMillis = 3 * 60 * 1000;
 
 	/*
-	 * This boolean makes it so that rather than letting server threads get hung we
-	 * just throw an exception and fail one of the threads whenever we detect a
-	 * probable deadlock, so in this way we do 'recover' from deadlocks although not
-	 * gracefully.
+	 * This boolean makes it so that rather than letting server threads get hung we just throw an
+	 * exception and fail one of the threads whenever we detect a probable deadlock, so in this way we
+	 * do 'recover' from deadlocks although not gracefully.
 	 */
 	private boolean abortWhenDeadlockSuspected = true;
 
@@ -43,10 +43,10 @@ public class LockEx extends ReentrantLock {
 	}
 
 	/**
-	 * lock method which differs from the basic tryLock because it will keep trying
-	 * over and over and printing messages to error log if the lock is not able to
-	 * be obtained. So the logging is the important thing we are doing here. This
-	 * means that deadlocks will be able to be identified in the log file.
+	 * lock method which differs from the basic tryLock because it will keep trying over and over and
+	 * printing messages to error log if the lock is not able to be obtained. So the logging is the
+	 * important thing we are doing here. This means that deadlocks will be able to be identified in the
+	 * log file.
 	 */
 	public void lockEx() {
 		boolean success = false;
@@ -69,8 +69,8 @@ public class LockEx extends ReentrantLock {
 		if (!success && allowRetries) {
 			log.trace("lock was not obtained, will retry: " + lockName);
 			/*
-			 * if we timed out trying to get the lock we will go into a retry loop here
-			 * trying again every few seconds.
+			 * if we timed out trying to get the lock we will go into a retry loop here trying again every few
+			 * seconds.
 			 */
 			long startTime = System.currentTimeMillis();
 			while (!success) {
@@ -79,9 +79,8 @@ public class LockEx extends ReentrantLock {
 					logDeadlockWarning();
 					warningShown = true;
 					if (abortWhenDeadlockSuspected) {
-						throw new RuntimeEx(
-								"Aborting. Thread " + Thread.currentThread().getName() + " was hung waiting for lock "
-										+ lockName + " which was held by thread " + getOwner().getName());
+						throw new RuntimeEx("Aborting. Thread " + Thread.currentThread().getName() + " was hung waiting for lock "
+								+ lockName + " which was held by thread " + getOwner().getName());
 					}
 				}
 
@@ -103,10 +102,9 @@ public class LockEx extends ReentrantLock {
 		}
 
 		/*
-		 * if we printed a warning message becasue lock took a while to obtain then
-		 * print a mia culpa on that and because we got the lock now!!! Sometimes things
-		 * just take some time. That' ok. These messages are just to help diagnose REAL
-		 * confirmed deadlock situations.
+		 * if we printed a warning message becasue lock took a while to obtain then print a mia culpa on
+		 * that and because we got the lock now!!! Sometimes things just take some time. That' ok. These
+		 * messages are just to help diagnose REAL confirmed deadlock situations.
 		 */
 		if (warningShown && success) {
 			warningShown = false;
@@ -154,7 +152,7 @@ public class LockEx extends ReentrantLock {
 	// Note: We can's use ExceptionUtils.getStackTrace(e), because we support thread
 	// argument here
 	public static final String getStackTrace(Thread thread) {
-		if (thread == null) {
+		if (no(thread)) {
 			thread = Thread.currentThread();
 		}
 		StringBuilder sb = new StringBuilder();

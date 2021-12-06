@@ -10,6 +10,7 @@ import org.subnode.model.client.NodeProp;
 import org.subnode.model.client.PrincipalName;
 import org.subnode.mongo.model.SubNode;
 import org.subnode.service.ServiceBase;
+import static org.subnode.util.Util.*;
 
 /**
  * Part of SpringSecurity implementation
@@ -24,7 +25,7 @@ public class AppUserDetailsService extends ServiceBase implements UserDetailsSer
             return new AppUserDetails(userName, prop.getMongoAdminPassword());
         } else {
             SubNode userNode = read.getUserNodeByUserName(auth.getAdminSession(), userName);
-            if (userNode != null) {
+            if (ok(userNode)) {
                 String pwdHash = userNode.getStr(NodeProp.PWD_HASH.s());
                 return new AppUserDetails(userName, pwdHash);
             } else {

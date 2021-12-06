@@ -128,6 +128,7 @@ import org.subnode.util.ExUtil;
 import org.subnode.util.LimitedInputStreamEx;
 import org.subnode.util.ThreadLocals;
 import org.subnode.util.Util;
+import static org.subnode.util.Util.*;
 
 /**
  * Primary Spring MVC controller. All application logic from the browser connects directly to this
@@ -189,7 +190,7 @@ public class AppController extends ServiceBase implements ErrorController {
 			thymeleafAttribs = null;
 		}
 
-		if (thymeleafAttribs != null)
+		if (ok(thymeleafAttribs))
 			return;
 
 		thymeleafAttribs = new HashMap<>();
@@ -248,7 +249,7 @@ public class AppController extends ServiceBase implements ErrorController {
 				id = ":" + name;
 			}
 
-			if (id != null) {
+			if (ok(id)) {
 				ThreadLocals.getSC().setUrlId(id);
 				// log.debug("ID specified on url=" + id);
 				String _id = id;
@@ -257,7 +258,7 @@ public class AppController extends ServiceBase implements ErrorController {
 					// whether this ID is even existing or not.
 					SubNode node = read.getNode(ms, _id);
 					render.populateSocialCardProps(node, model);
-					if (node == null) {
+					if (no(node)) {
 						log.debug("Node did not exist.");
 						ThreadLocals.getSC().setUrlId(null);
 					} else {
@@ -296,7 +297,7 @@ public class AppController extends ServiceBase implements ErrorController {
 			/*
 			 * Note: this refreshes only when ADMIN is accessing it, so it's slow in this case.
 			 */
-			if (welcomeMap == null || PrincipalName.ADMIN.s().equals(ThreadLocals.getSC().getUserName())) {
+			if (no(welcomeMap) || PrincipalName.ADMIN.s().equals(ThreadLocals.getSC().getUserName())) {
 				synchronized (welcomeMapLock) {
 					HashMap<String, String> newMap = new HashMap<>();
 					// load content from a place that will not be a node visible to users
@@ -309,7 +310,7 @@ public class AppController extends ServiceBase implements ErrorController {
 			model.addAllAttributes(welcomeMap);
 		}
 
-		if (signupCode != null) {
+		if (ok(signupCode)) {
 			String signupResponse = user.processSignupCode(signupCode);
 			model.addAttribute("signupResponse", signupResponse);
 		}
@@ -330,7 +331,7 @@ public class AppController extends ServiceBase implements ErrorController {
 			Model model) {
 		initThymeleafAttribs();
 
-		// if (welcomeMap == null ||
+		// if (no(welcomeMap) ||
 		// PrincipalName.ADMIN.s().equals(sessionContext.getUserName())) {
 		// synchronized (welcomeMapLock) {
 		// HashMap<String, String> newMap = new HashMap<>();
@@ -413,7 +414,7 @@ public class AppController extends ServiceBase implements ErrorController {
 					cacheBytes = RSSFeedService.proxyCache.get(url);
 				}
 
-				if (cacheBytes != null) {
+				if (ok(cacheBytes)) {
 					// limiting the stream just becasue for now this is only used in feed
 					// processing, and 5MB is plenty
 					IOUtils.copy(new LimitedInputStreamEx(new ByteArrayInputStream(cacheBytes), 50 * Const.ONE_MB),
@@ -489,7 +490,7 @@ public class AppController extends ServiceBase implements ErrorController {
 			session.invalidate();
 
 			Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-			if (auth != null) {
+			if (ok(auth)) {
 				new SecurityContextLogoutHandler().logout(sreq, sres, auth);
 			}
 			SecurityContextHolder.getContext().setAuthentication(null);
@@ -602,7 +603,7 @@ public class AppController extends ServiceBase implements ErrorController {
 			 */
 			arun.run(as -> {
 				SubNode node = read.getNode(as, req.getNodeId());
-				if (node == null)
+				if (no(node))
 					throw new RuntimeException("Node not found: " + req.getNodeId());
 
 				if (!node.getOwner().toHexString().equals(ThreadLocals.getSC().getRootId())) {
@@ -829,7 +830,7 @@ public class AppController extends ServiceBase implements ErrorController {
 				id = ":" + nameOnAdminNode;
 			}
 
-			if (id != null) {
+			if (ok(id)) {
 				String _id = id;
 				arun.run(ms -> {
 					// we don't check ownership of node at this time, but merely check sanity of
@@ -840,13 +841,13 @@ public class AppController extends ServiceBase implements ErrorController {
 
 					// if no cachebuster gid was on url then redirect to a url that does have the
 					// gid
-					if (_gid == null) {
+					if (no(_gid)) {
 						_gid = node.getStr(NodeProp.IPFS_LINK.s());
-						if (_gid == null) {
+						if (no(_gid)) {
 							_gid = node.getStr(NodeProp.BIN.s());
 						}
 
-						if (_gid != null) {
+						if (ok(_gid)) {
 							try {
 								response.sendRedirect(Util.getFullURL(req, "gid=" + _gid));
 							} catch (Exception e) {
@@ -855,15 +856,15 @@ public class AppController extends ServiceBase implements ErrorController {
 						}
 					}
 
-					if (_gid == null) {
+					if (no(_gid)) {
 						throw new RuntimeException("No attachment data for node.");
 					}
 
-					if (node == null) {
+					if (no(node)) {
 						log.debug("Node did not exist: " + _id);
 						throw new RuntimeException("Node not found.");
 					} else {
-						attach.getBinary(ms, "", node, null, download != null, response);
+						attach.getBinary(ms, "", node, null, ok(download), response);
 					}
 					return null;
 				});
@@ -901,11 +902,11 @@ public class AppController extends ServiceBase implements ErrorController {
 			@RequestParam(value = "download", required = false) String download, //
 			HttpSession session, HttpServletResponse response) {
 
-		if (token == null) {
+		if (no(token)) {
 			// Check if this is an 'avatar' request and if so bypass security
 			if ("avatar".equals(binId)) {
 				arun.run(ms -> {
-					attach.getBinary(ms, "", null, nodeId, download != null, response);
+					attach.getBinary(ms, "", null, nodeId, ok(download), response);
 					return null;
 				});
 			}
@@ -917,17 +918,17 @@ public class AppController extends ServiceBase implements ErrorController {
 					 * from normal 'bin' properties. This way we now to support multiple uploads onto any node, in this
 					 * very limites way.
 					 */
-					attach.getBinary(ms, "Header", null, nodeId, download != null, response);
+					attach.getBinary(ms, "Header", null, nodeId, ok(download), response);
 					return null;
 				});
 			}
 			/* Else if not an avatar request then do a securer acccess */
 			else {
 				callProc.run("bin", null, session, ms -> {
-					if (ipfsCid != null) {
+					if (ok(ipfsCid)) {
 						ipfs.streamResponse(response, ms, ipfsCid, null);
 					} else {
-						attach.getBinary(null, "", null, nodeId, download != null, response);
+						attach.getBinary(null, "", null, nodeId, ok(download), response);
 					}
 					return null;
 				});
@@ -935,7 +936,7 @@ public class AppController extends ServiceBase implements ErrorController {
 		} else {
 			if (SessionContext.validToken(token, null)) {
 				arun.run(ms -> {
-					attach.getBinary(ms, "", null, nodeId, download != null, response);
+					attach.getBinary(ms, "", null, nodeId, ok(download), response);
 					return null;
 				});
 			}
@@ -1047,13 +1048,12 @@ public class AppController extends ServiceBase implements ErrorController {
 			@RequestParam(value = "createAsChildren", required = true) String createAsChildren, //
 			@RequestParam(value = "files", required = true) MultipartFile[] uploadFiles, //
 			HttpSession session) {
-		final String _binSuffix = binSuffix == null ? "" : binSuffix;
+		final String _binSuffix = no(binSuffix) ? "" : binSuffix;
 
 		return callProc.run("upload", null, session, ms -> {
 			// log.debug("Uploading as user: "+ms.getUser());
-			return attach.uploadMultipleFiles(ms, _binSuffix, nodeId, uploadFiles,
-					explodeZips.equalsIgnoreCase("true"), "true".equalsIgnoreCase(ipfs),
-					"true".equalsIgnoreCase(createAsChildren));
+			return attach.uploadMultipleFiles(ms, _binSuffix, nodeId, uploadFiles, explodeZips.equalsIgnoreCase("true"),
+					"true".equalsIgnoreCase(ipfs), "true".equalsIgnoreCase(createAsChildren));
 		});
 	}
 
@@ -1313,9 +1313,11 @@ public class AppController extends ServiceBase implements ErrorController {
 				throw ExUtil.wrapEx("admin only function.");
 			}
 
-			/* We need to run this in a thread, and return control back to browser imediately, and then
-			have the "ServerInfo" request able to display the current state of this indexing process, or potentially
-			have a dedicated ServerInfo-like tab to display the state in */
+			/*
+			 * We need to run this in a thread, and return control back to browser imediately, and then have the
+			 * "ServerInfo" request able to display the current state of this indexing process, or potentially
+			 * have a dedicated ServerInfo-like tab to display the state in
+			 */
 			return lucene.reindex(ms, req.getNodeId(), req.getPath());
 		});
 	}

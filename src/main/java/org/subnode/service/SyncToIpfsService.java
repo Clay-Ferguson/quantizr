@@ -17,6 +17,7 @@ import org.subnode.response.PublishNodeToIpfsResponse;
 import org.subnode.util.ExUtil;
 import org.subnode.util.ThreadLocals;
 import org.subnode.util.XString;
+import static org.subnode.util.Util.*;
 
 /**
  * 
@@ -77,7 +78,7 @@ public class SyncToIpfsService extends ServiceBase {
 			removeOrphanFiles();
 
 			IPFSDirStat pathStat = ipfs.pathStat(node.getPath());
-			if (pathStat != null) {
+			if (ok(pathStat)) {
 				node.set(NodeProp.IPFS_CID.s(), pathStat.getHash());
 
 				/*
@@ -91,8 +92,8 @@ public class SyncToIpfsService extends ServiceBase {
 				 */
 				// Map<String, Object> ipnsMap = ipfs.ipnsPublish(ms, null, pathStat.getHash());
 				// String name = (String) ipnsMap.get("Name");
-				// if (name != null) {
-				// 	node.set(NodeProp.IPNS_CID.s(), name);
+				// if (ok(name )) {
+				// node.set(NodeProp.IPNS_CID.s(), name);
 				// }
 			}
 

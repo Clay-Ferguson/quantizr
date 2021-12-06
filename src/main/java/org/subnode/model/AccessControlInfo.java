@@ -5,6 +5,7 @@ import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
+import static org.subnode.util.Util.*;
 
 /**
  * Represents a certain principal and a set of privileges the principal has.
@@ -18,10 +19,10 @@ public class AccessControlInfo {
 	private List<PrivilegeInfo> privileges;
 	private String publicKey;
 
-	public AccessControlInfo() {
-	}
+	public AccessControlInfo() {}
 
-	public AccessControlInfo(String displayName, String principalName, String principalNodeId, String publicKey, String avatarVer) {
+	public AccessControlInfo(String displayName, String principalName, String principalNodeId, String publicKey,
+			String avatarVer) {
 		this.displayName = displayName;
 		this.principalName = principalName;
 		this.principalNodeId = principalNodeId;
@@ -46,7 +47,7 @@ public class AccessControlInfo {
 	}
 
 	public void addPrivilege(PrivilegeInfo priv) {
-		if (privileges == null) {
+		if (no(privileges)) {
 			privileges = new LinkedList<>();
 		}
 		privileges.add(priv);

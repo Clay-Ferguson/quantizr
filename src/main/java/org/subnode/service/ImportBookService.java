@@ -12,6 +12,7 @@ import org.subnode.util.ExUtil;
 import org.subnode.util.ImportWarAndPeace;
 import org.subnode.util.ThreadLocals;
 import org.subnode.util.XString;
+import static org.subnode.util.Util.*;
 
 /**
  * Special-purpose code for importing the book War and Peace which ships with SubNode, and is used
@@ -46,6 +47,6 @@ public class ImportBookService extends ServiceBase {
 	}
 
 	public static boolean safeBooleanVal(Boolean val) {
-		return val != null && val.booleanValue();
+		return ok(val) && val.booleanValue();
 	}
 }

@@ -27,6 +27,7 @@ import org.subnode.mongo.model.SubNodePropVal;
 import org.subnode.mongo.model.SubNodePropertyMap;
 import org.subnode.service.ServiceBase;
 import org.subnode.types.TypeBase;
+import static org.subnode.util.Util.*;
 
 /**
  * Converting objects from one type to another, and formatting.
@@ -44,7 +45,7 @@ public class Convert extends ServiceBase {
 			long ordinal, boolean allowInlineChildren, boolean lastChild, boolean childrenCheck, boolean getFollowers) {
 
 		/* If session user shouldn't be able to see secrets on this node remove them */
-		if (ms.isAnon() || (ms.getUserNodeId() != null && !ms.getUserNodeId().equals(node.getOwner()))) {
+		if (ms.isAnon() || (ok(ms.getUserNodeId()) && !ms.getUserNodeId().equals(node.getOwner()))) {
 			if (!ms.isAdmin()) {
 				node.clearSecretProperties();
 			}
@@ -53,14 +54,14 @@ public class Convert extends ServiceBase {
 		ImageSize imageSize = null;
 		String dataUrl = null;
 		String mimeType = node.getStr(NodeProp.BIN_MIME.s());
-		if (mimeType != null) {
+		if (ok(mimeType)) {
 			boolean isImage = mongoUtil.isImageAttached(node);
 
 			if (isImage) {
 				imageSize = mongoUtil.getImageSize(node);
 
 				String dataUrlProp = node.getStr(NodeProp.BIN_DATA_URL.s());
-				if (dataUrlProp != null) {
+				if (ok(dataUrlProp)) {
 					dataUrl = attach.getStringByNode(ms, node);
 
 					// sanity check here.
@@ -88,7 +89,7 @@ public class Convert extends ServiceBase {
 		List<PropertyInfo> propList = buildPropertyInfoList(sc, node, htmlOnly, initNodeEdit);
 		List<AccessControlInfo> acList = buildAccessControlList(sc, node);
 
-		if (node.getOwner() == null) {
+		if (no(node.getOwner())) {
 			throw new RuntimeException("node has no owner: " + node.getIdStr() + " node.path=" + node.getPath());
 		}
 
@@ -104,12 +105,12 @@ public class Convert extends ServiceBase {
 		SubNode userNode = read.getNode(ms, node.getOwner(), false);
 		String displayName = null;
 
-		if (userNode == null) {
+		if (no(userNode)) {
 			// todo-1: looks like import corrupts the 'owner' (needs research), but the code
 			// below sets to owner to 'admin' which will
 			// be safe for now because the admin is the only user capable of import/export.
 			// log.debug("Unable to find userNode from nodeOwner: " + //
-			// (node.getOwner() != null ? ownerId : ("null owner on node: " +
+			// (ok(node.getOwner()) ? ownerId : ("null owner on node: " +
 			// node.getIdStr())) + //
 			// " tried to find owner=" + node.getOwner().toHexString());
 		} else {
@@ -125,10 +126,10 @@ public class Convert extends ServiceBase {
 			 */
 		}
 
-		String owner = userNode == null ? PrincipalName.ADMIN.s() : nameProp;
+		String owner = no(userNode) ? PrincipalName.ADMIN.s() : nameProp;
 
-		log.trace("RENDER ID=" + node.getIdStr() + " rootId=" + ownerId + " session.rootId=" + sc.getRootId()
-				+ " node.content=" + node.getContent() + " owner=" + owner);
+		log.trace("RENDER ID=" + node.getIdStr() + " rootId=" + ownerId + " session.rootId=" + sc.getRootId() + " node.content="
+				+ node.getContent() + " owner=" + owner);
 
 		// log.debug("RENDER nodeId: " + node.getIdStr()+" -- json:
 		// "+XString.prettyPrint(node));
@@ -138,29 +139,29 @@ public class Convert extends ServiceBase {
 		 * put in cipherKey, so send back so the user can decrypt the node.
 		 */
 		String cipherKey = null;
-		if (!ownerId.equals(sc.getRootId()) && node.getAc() != null) {
+		if (!ownerId.equals(sc.getRootId()) && ok(node.getAc())) {
 			AccessControl ac = node.getAc().get(sc.getRootId());
-			if (ac != null) {
+			if (ok(ac)) {
 				cipherKey = ac.getKey();
-				if (cipherKey != null) {
+				if (ok(cipherKey)) {
 					log.debug("Rendering Sent Back CipherKey: " + cipherKey);
 				}
 			}
 		}
 
-		String apAvatar = userNode != null ? userNode.getStr(NodeProp.ACT_PUB_USER_ICON_URL) : null;
-		String apImage = userNode != null ? userNode.getStr(NodeProp.ACT_PUB_USER_IMAGE_URL) : null;
+		String apAvatar = ok(userNode) ? userNode.getStr(NodeProp.ACT_PUB_USER_ICON_URL) : null;
+		String apImage = ok(userNode) ? userNode.getStr(NodeProp.ACT_PUB_USER_IMAGE_URL) : null;
 
 		NodeInfo nodeInfo = new NodeInfo(node.jsonId(), node.getPath(), node.getName(), node.getContent(), displayName, owner,
 				ownerId, node.getOrdinal(), //
 				node.getModifyTime(), propList, acList, hasChildren, //
-				imageSize != null ? imageSize.getWidth() : 0, //
-				imageSize != null ? imageSize.getHeight() : 0, //
+				ok(imageSize) ? imageSize.getWidth() : 0, //
+				ok(imageSize) ? imageSize.getHeight() : 0, //
 				node.getType(), ordinal, lastChild, cipherKey, dataUrl, avatarVer, apAvatar, apImage);
 
 		// if this node type has a plugin run it's converter to let it contribute
 		TypeBase plugin = typePluginMgr.getPluginByType(node.getType());
-		if (plugin != null) {
+		if (ok(plugin)) {
 			plugin.convert(ms, nodeInfo, node, getFollowers);
 		}
 
@@ -200,12 +201,12 @@ public class Convert extends ServiceBase {
 
 		try {
 			Long width = node.getInt(NodeProp.IMG_WIDTH);
-			if (width != null) {
+			if (ok(width)) {
 				imageSize.setWidth(width.intValue());
 			}
 
 			Long height = node.getInt(NodeProp.IMG_HEIGHT);
-			if (height != null) {
+			if (ok(height)) {
 				imageSize.setHeight(height.intValue());
 			}
 		} catch (Exception e) {
@@ -226,7 +227,7 @@ public class Convert extends ServiceBase {
 			SubNodePropVal p = entry.getValue();
 
 			/* lazy create props */
-			if (props == null) {
+			if (no(props)) {
 				props = new LinkedList<>();
 			}
 
@@ -236,7 +237,7 @@ public class Convert extends ServiceBase {
 			props.add(propInfo);
 		}
 
-		if (props != null) {
+		if (ok(props)) {
 			props.sort((a, b) -> a.getName().compareTo(b.getName()));
 		}
 		return props;
@@ -245,7 +246,7 @@ public class Convert extends ServiceBase {
 	public List<AccessControlInfo> buildAccessControlList(SessionContext sc, SubNode node) {
 		List<AccessControlInfo> ret = null;
 		HashMap<String, AccessControl> ac = node.getAc();
-		if (ac == null)
+		if (no(ac))
 			return null;
 
 		for (Map.Entry<String, AccessControl> entry : ac.entrySet()) {
@@ -253,7 +254,7 @@ public class Convert extends ServiceBase {
 			AccessControl acval = entry.getValue();
 
 			/* lazy create list */
-			if (ret == null) {
+			if (no(ret)) {
 				ret = new LinkedList<>();
 			}
 
@@ -268,15 +269,15 @@ public class Convert extends ServiceBase {
 		AccessControlInfo acInfo = new AccessControlInfo();
 		acInfo.setPrincipalNodeId(principalId);
 
-		if (ac.getPrvs() != null && ac.getPrvs().contains(PrivilegeType.READ.s())) {
+		if (ok(ac.getPrvs()) && ac.getPrvs().contains(PrivilegeType.READ.s())) {
 			acInfo.addPrivilege(new PrivilegeInfo(PrivilegeType.READ.s()));
 		}
 
-		if (ac.getPrvs() != null && ac.getPrvs().contains(PrivilegeType.WRITE.s())) {
+		if (ok(ac.getPrvs()) && ac.getPrvs().contains(PrivilegeType.WRITE.s())) {
 			acInfo.addPrivilege(new PrivilegeInfo(PrivilegeType.WRITE.s()));
 		}
 
-		if (principalId != null) {
+		if (ok(principalId)) {
 			arun.run(s -> {
 				acInfo.setPrincipalName(auth.getUserNameFromAccountNodeId(s, principalId));
 				acInfo.setDisplayName(auth.getDisplayNameFromAccountNodeId(s, principalId));
@@ -285,7 +286,7 @@ public class Convert extends ServiceBase {
 				// CPU cycles to get it.
 				// if (!"public".equals(principalId)) {
 				// SubNode accountNode = read.getNode(s, principalId);
-				// if (accountNode != null) {
+				// if (ok(accountNode )) {
 				// acInfo.setAvatarVer(accountNode.getStrProp(NodeProp.BIN));
 				// }
 				// }

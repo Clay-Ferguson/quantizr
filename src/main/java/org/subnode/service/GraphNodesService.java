@@ -16,6 +16,7 @@ import org.subnode.response.GraphResponse;
 import org.subnode.util.ExUtil;
 import org.subnode.util.ThreadLocals;
 import org.subnode.util.XString;
+import static org.subnode.util.Util.*;
 
 @Component
 public class GraphNodesService extends ServiceBase {
@@ -47,8 +48,8 @@ public class GraphNodesService extends ServiceBase {
 			// If search text provided run subgraph search.
 			else {
 				int limit = ThreadLocals.getSC().isAdmin() ? Integer.MAX_VALUE : 1000;
-				results = read.searchSubGraph(ms, node, "content", req.getSearchText(), null, null, limit, 0, true, false,
-						null, true, false);
+				results = read.searchSubGraph(ms, node, "content", req.getSearchText(), null, null, limit, 0, true, false, null,
+						true, false);
 			}
 
 			// Construct the GraphNode object for each result and add to mapByPath
@@ -75,7 +76,7 @@ public class GraphNodesService extends ServiceBase {
 
 	private String getNodeName(SubNode node) {
 		String content = node.getContent();
-		if (content == null)
+		if (no(content))
 			return "";
 		String name = null;
 
@@ -125,7 +126,7 @@ public class GraphNodesService extends ServiceBase {
 			String parentPath = XString.truncateAfterLast(n.getPath(), "/");
 			// log.debug("Looking for Parent (b): " + parentPath);
 			GraphNode parent = mapByPath.get(parentPath);
-			if (parent != null) {
+			if (ok(parent)) {
 				parent.addChild(n);
 				// log.debug("Parent Name "+parent.getName()+" now has
 				// childCount="+parent.getChildren().size());
@@ -136,7 +137,7 @@ public class GraphNodesService extends ServiceBase {
 	}
 
 	public void ensureEnoughParents(String rootPath, int rootLevel, String path, HashMap<String, GraphNode> mapByPath) {
-		if (path == null || path.length() < 3)
+		if (no(path) || path.length() < 3)
 			return;
 
 		String parentPath = XString.truncateAfterLast(path, "/");
@@ -145,7 +146,7 @@ public class GraphNodesService extends ServiceBase {
 
 		GraphNode parent = mapByPath.get(parentPath);
 
-		if (parent == null) {
+		if (no(parent)) {
 			// We only need guid on this name, to ensure D3 works, but the actual name on these
 			// is queries for during mouseover because otherwise it could be a large number
 			// of queries to populate them here now, when that's not needed.

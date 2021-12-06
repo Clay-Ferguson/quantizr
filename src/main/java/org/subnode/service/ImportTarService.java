@@ -13,6 +13,7 @@ import org.subnode.mongo.model.SubNode;
 import org.subnode.util.ExUtil;
 import org.subnode.util.StreamUtil;
 import org.subnode.util.ThreadLocals;
+import static org.subnode.util.Util.*;
 
 @Component
 @Scope("prototype")
@@ -22,15 +23,14 @@ public class ImportTarService extends ImportArchiveBase {
 	private TarArchiveInputStream zis;
 
 	/* Returns the first node created which is always the root of the import */
-	public SubNode importFromStream(MongoSession ms, InputStream is, SubNode node,
-			boolean isNonRequestThread) {
+	public SubNode importFromStream(MongoSession ms, InputStream is, SubNode node, boolean isNonRequestThread) {
 		if (used) {
 			throw new RuntimeEx("Prototype bean used multiple times is not allowed.");
 		}
 		used = true;
 
 		SubNode userNode = read.getUserNodeByUserName(auth.getAdminSession(), ThreadLocals.getSC().getUserName());
-		if (userNode == null) {
+		if (no(userNode)) {
 			throw new RuntimeEx("UserNode not found: " + ThreadLocals.getSC().getUserName());
 		}
 
@@ -40,7 +40,7 @@ public class ImportTarService extends ImportArchiveBase {
 
 			zis = new TarArchiveInputStream(is);
 			TarArchiveEntry entry;
-			while ((entry = zis.getNextTarEntry()) != null) {
+			while (ok(entry = zis.getNextTarEntry())) {
 				if (!entry.isDirectory()) {
 					processFile(entry, zis, userNode.getOwner());
 				}

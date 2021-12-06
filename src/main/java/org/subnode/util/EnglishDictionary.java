@@ -14,6 +14,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Component;
 import org.subnode.config.SpringContextUtil;
+import static org.subnode.util.Util.*;
 
 @Component
 public class EnglishDictionary {
@@ -41,7 +42,7 @@ public class EnglishDictionary {
 			BufferedReader in = new BufferedReader(new InputStreamReader(is));
 			try {
 				String line;
-				while ((line = in.readLine()) != null) {
+				while (ok(line = in.readLine())) {
 					StringTokenizer tokens = new StringTokenizer(line, " \n\r\t.,", false);
 					while (tokens.hasMoreTokens()) {
 						stopWords.add(tokens.nextToken().trim());
@@ -80,7 +81,7 @@ public class EnglishDictionary {
 	}
 
 	public boolean isStopWord(String word) {
-		if (word == null)
+		if (no(word))
 			return true;
 		return stopWords.contains(word.toLowerCase());
 	}
@@ -96,7 +97,7 @@ public class EnglishDictionary {
 			BufferedReader in = new BufferedReader(new InputStreamReader(is));
 			try {
 				String line;
-				while ((line = in.readLine()) != null) {
+				while (ok(line = in.readLine())) {
 					dictWords.add(line.trim().toLowerCase());
 				}
 			} finally {
@@ -120,7 +121,7 @@ public class EnglishDictionary {
 	public boolean isEnglish(String text) {
 		if (dictWords.size() == 0)
 			throw new RuntimeException("called isEnglish before dictionary was loaded.");
-		if (text == null)
+		if (no(text))
 			return false;
 
 		// log.debug("Checking english: " + text);

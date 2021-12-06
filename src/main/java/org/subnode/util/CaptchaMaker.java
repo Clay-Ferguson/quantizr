@@ -12,12 +12,12 @@ import java.io.IOException;
 import java.util.Random;
 
 import javax.imageio.ImageIO;
+import static org.subnode.util.Util.*;
 
 /**
- * Implements the captcha image as seen on the Signup Page. I would normally use
- * some existing framework for something like this but I wrote this a long time
- * ago and it works well, so I always kept it. It's just too simple for me to
- * have found fault with.
+ * Implements the captcha image as seen on the Signup Page. I would normally use some existing
+ * framework for something like this but I wrote this a long time ago and it works well, so I always
+ * kept it. It's just too simple for me to have found fault with.
  */
 public class CaptchaMaker {
 
@@ -58,11 +58,10 @@ public class CaptchaMaker {
         g.setColor(Color.black);
 
         /*
-         * due to wierdness on various comptuers the rendering size of any given font is
-         * not known and we must iterate to find the appropriate font to match our image
-         * size
+         * due to wierdness on various comptuers the rendering size of any given font is not known and we
+         * must iterate to find the appropriate font to match our image size
          */
-        if (fontKnown != null) {
+        if (ok(fontKnown)) {
             g.setFont(fontKnown);
         } else {
             int fontPoints = 12;
@@ -70,8 +69,8 @@ public class CaptchaMaker {
                 g.setFont(fontKnown = new Font("Courier New", Font.BOLD, fontPoints));
 
                 /*
-                 * if our font is big enough break out (+5 is just a hack cuz it looks like
-                 * there is always room for slightly bigger characters
+                 * if our font is big enough break out (+5 is just a hack cuz it looks like there is always room for
+                 * slightly bigger characters
                  */
                 if (g.getFontMetrics().getHeight() >= CAPTCHA_CHAR_SIZE + 7) {
                     break;

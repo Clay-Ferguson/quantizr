@@ -67,6 +67,7 @@ import org.subnode.util.ThreadLocals;
 import org.subnode.util.Util;
 import org.subnode.util.Val;
 import org.subnode.util.XString;
+import static org.subnode.util.Util.*;
 
 // IPFS Reference: https://docs.ipfs.io/reference/http/api
 
@@ -141,7 +142,7 @@ public class IPFSService extends ServiceBase {
     public void doSwarmConnect() {
         arun.run(ms -> {
             List<String> adrsList = getSwarmConnectAddresses(ms);
-            if (adrsList != null) {
+            if (ok(adrsList)) {
                 for (String adrs : adrsList) {
                     if (adrs.startsWith("/")) {
                         swarmConnect(adrs);
@@ -155,7 +156,7 @@ public class IPFSService extends ServiceBase {
     public List<String> getSwarmConnectAddresses(MongoSession ms) {
         List<String> ret = null;
         SubNode node = read.getNode(ms, ":ipfsSwarmAddresses");
-        if (node != null) {
+        if (ok(node)) {
             log.debug("swarmAddresses: " + node.getContent());
             ret = XString.tokenize(node.getContent(), "\n", true);
         }
@@ -217,7 +218,7 @@ public class IPFSService extends ServiceBase {
 
     public LinkedHashMap<String, Object> getInstanceId() {
         synchronized (instanceIdLock) {
-            if (instanceId == null) {
+            if (no(instanceId)) {
                 instanceId = Cast.toLinkedHashMap(postForJsonReply(API_ID, LinkedHashMap.class));
             }
             return instanceId;
@@ -235,7 +236,7 @@ public class IPFSService extends ServiceBase {
             Util.sleep(3000);
             SubNode node = read.getNode(ms, nodeId, false, 10);
 
-            if (node == null)
+            if (no(node))
                 return;
             String ipfsLink = node.getStr(NodeProp.IPFS_LINK);
             addPin(ipfsLink);
@@ -249,7 +250,7 @@ public class IPFSService extends ServiceBase {
 
             /* And finally update this user's quota for the added storage */
             SubNode accountNode = read.getUserNodeByUserName(ms, null);
-            if (accountNode != null) {
+            if (ok(accountNode)) {
                 user.addBytesToUserNodeBytes(ms, stat.getCumulativeSize(), accountNode, 1);
             }
         });
@@ -262,10 +263,10 @@ public class IPFSService extends ServiceBase {
         String fileName = node.getStr(NodeProp.FILENAME);
 
         InputStream is = attach.getStreamByNode(node, "");
-        if (is != null) {
+        if (ok(is)) {
             try {
                 MerkleLink ret = addFromStream(ms, is, fileName, mime, null, null, false);
-                if (ret != null) {
+                if (ok(ret)) {
                     cid = ret.getHash();
                 }
             } catch (Exception e) {
@@ -318,24 +319,24 @@ public class IPFSService extends ServiceBase {
     public boolean removePin(String cid) {
         // log.debug("Remove Pin: " + cid);
         String url = API_PIN + "/rm?arg=" + cid;
-        return postForJsonReply(url, Object.class) != null;
+        return ok(postForJsonReply(url, Object.class));
     }
 
     public boolean addPin(String cid) {
         // log.debug("Add Pin: " + cid);
         String url = API_PIN + "/add?arg=" + cid;
-        return postForJsonReply(url, Object.class) != null;
+        return ok(postForJsonReply(url, Object.class));
     }
 
     /* Deletes the file or if a folder deletes it recursively */
     public boolean deletePath(String path) {
         String url = API_FILES + "/rm?arg=" + path + "&force=true";
-        return postForJsonReply(url, Object.class) != null;
+        return ok(postForJsonReply(url, Object.class));
     }
 
     public boolean flushFiles(String path) {
         String url = API_FILES + "/flush?arg=" + path;
-        return postForJsonReply(url, Object.class) != null;
+        return ok(postForJsonReply(url, Object.class));
     }
 
     public LinkedHashMap<String, Object> getPins() {
@@ -346,7 +347,7 @@ public class IPFSService extends ServiceBase {
             res = Cast.toLinkedHashMap(postForJsonReply(url, LinkedHashMap.class));
             // log.debug("RAW PINS LIST RESULT: " + XString.prettyPrint(res));
 
-            if (res != null) {
+            if (ok(res)) {
                 pins = Cast.toLinkedHashMap(res.get("Keys"));
             }
         } catch (Exception e) {
@@ -521,13 +522,13 @@ public class IPFSService extends ServiceBase {
 
                     // log.debug("writeFromStream Response JSON: " + XString.prettyPrint(ret));
 
-                    if (cid != null) {
+                    if (ok(cid)) {
                         cid.setVal(ret.getHash());
                     }
                 }
             }
 
-            if (streamSize != null) {
+            if (ok(streamSize)) {
                 streamSize.setVal((int) lis.getCount());
             }
         } catch (Exception e) {
@@ -552,7 +553,7 @@ public class IPFSService extends ServiceBase {
     public Map<String, Object> ipnsPublish(MongoSession ms, String key, String cid) {
         Map<String, Object> ret = null;
         try {
-            String url = API_NAME + "/publish?arg=" + cid + (key != null ? "&=" + key : "");
+            String url = API_NAME + "/publish?arg=" + cid + (ok(key) ? "&=" + key : "");
 
             HttpHeaders headers = new HttpHeaders();
             MultiValueMap<String, Object> bodyMap = new LinkedMultiValueMap<>();
@@ -661,7 +662,7 @@ public class IPFSService extends ServiceBase {
         SubNode exportParent =
                 read.getUserNodeByType(ms, ms.getUserName(), null, "### Exports", NodeType.EXPORTS.s(), null, null);
 
-        if (exportParent != null) {
+        if (ok(exportParent)) {
             SubNode node =
                     create.createNode(ms, exportParent, null, NodeType.NONE.s(), 0L, CreateNodeLocation.FIRST, null, null, true);
 
@@ -674,7 +675,7 @@ public class IPFSService extends ServiceBase {
             node.set(NodeProp.BIN_FILENAME.s(), fileName);
             update.save(ms, node);
 
-            if (childrenFiles != null) {
+            if (ok(childrenFiles)) {
                 for (ExportIpfsFile file : childrenFiles) {
                     SubNode child =
                             create.createNode(ms, node, null, NodeType.NONE.s(), 0L, CreateNodeLocation.LAST, null, null, true);
@@ -755,7 +756,7 @@ public class IPFSService extends ServiceBase {
     }
 
     public InputStream getStream(MongoSession ms, String hash) {
-        if (failedCIDs.get(hash) != null) {
+        if (ok(failedCIDs.get(hash))) {
             // log.debug("Abort CID already failed: " + hash);
             throw new RuntimeException("failed CIDs: " + hash);
         }
@@ -809,10 +810,10 @@ public class IPFSService extends ServiceBase {
     public void traverseDir(String path, HashSet<String> allFilePaths) {
         log.debug("dumpDir: " + path);
         IPFSDir dir = getDir(path);
-        if (dir != null) {
+        if (ok(dir)) {
             log.debug("Dir: " + XString.prettyPrint(dir));
 
-            if (dir.getEntries() == null) {
+            if (no(dir.getEntries())) {
                 log.debug("DEL EMPTY FOLDER: " + path);
                 ipfs.deletePath(path);
                 return;
@@ -834,7 +835,7 @@ public class IPFSService extends ServiceBase {
                         log.debug("dump: " + entryPath);
                         // String readTest = readFile(entryPath);
                         // log.debug("readTest: " + readTest);
-                        if (allFilePaths != null) {
+                        if (ok(allFilePaths)) {
                             allFilePaths.add(entryPath);
                         }
                     }
@@ -855,10 +856,10 @@ public class IPFSService extends ServiceBase {
             // JSON in the contentType, so we just ignore it
             if (response.getStatusCode().value() == 200 /* && MediaType.APPLICATION_JSON.equals(contentType) */) {
                 if (clazz == String.class) {
-                    return response.getBody() == null ? "success" : response.getBody();
+                    return no(response.getBody()) ? "success" : response.getBody();
                 } else {
                     // log.debug("postForJsonReply: " + response.getBody());
-                    if (response.getBody() == null) {
+                    if (no(response.getBody())) {
                         ret = "success";
                     } else {
                         ret = XString.jsonMapper.readValue(response.getBody(), clazz);

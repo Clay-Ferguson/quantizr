@@ -20,6 +20,7 @@ import org.subnode.mongo.model.SubNode;
 import org.subnode.util.SubNodeUtil;
 import org.subnode.util.ThreadLocals;
 import org.subnode.util.XString;
+import static org.subnode.util.Util.*;
 
 public class MongoEventListener extends AbstractMongoEventListener<SubNode> {
 	private static final Logger log = LoggerFactory.getLogger(MongoEventListener.class);
@@ -63,7 +64,7 @@ public class MongoEventListener extends AbstractMongoEventListener<SubNode> {
 		 * Note: There's a special case in MongoApi#createUser where the new User root node ID is assigned
 		 * there, along with setting that on the owner property so we can do one save and have both updated
 		 */
-		if (id == null) {
+		if (no(id)) {
 			id = new ObjectId();
 			node.setId(id);
 			isNew = true;
@@ -73,7 +74,7 @@ public class MongoEventListener extends AbstractMongoEventListener<SubNode> {
 
 		// Force ordinal to have an integer value (non-null). How to do
 		// "constraints" in MongoDB (todo-1)
-		if (node.getOrdinal() == null) {
+		if (no(node.getOrdinal())) {
 			node.setOrdinal(0L);
 			dbObj.put(SubNode.FIELD_ORDINAL, 0L);
 		}
@@ -90,7 +91,7 @@ public class MongoEventListener extends AbstractMongoEventListener<SubNode> {
 		// }
 
 		/* if no owner is assigned... */
-		if (node.getOwner() == null) {
+		if (no(node.getOwner())) {
 			/*
 			 * if we are saving the root node, we make it be the owner of itself. This is also the admin owner,
 			 * and we only allow this to run during initialiation when the server may be creating the database,
@@ -100,7 +101,7 @@ public class MongoEventListener extends AbstractMongoEventListener<SubNode> {
 				dbObj.put(SubNode.FIELD_OWNER, id);
 				node.setOwner(id);
 			} else {
-				if (auth.getAdminSession() != null) {
+				if (ok(auth.getAdminSession())) {
 					ObjectId ownerId = auth.getAdminSession().getUserNodeId();
 					dbObj.put(SubNode.FIELD_OWNER, ownerId);
 					node.setOwner(ownerId);
@@ -116,16 +117,16 @@ public class MongoEventListener extends AbstractMongoEventListener<SubNode> {
 		Date now = null;
 
 		/* If no create/mod time has been set, then set it */
-		if (node.getCreateTime() == null) {
-			if (now == null) {
+		if (no(node.getCreateTime())) {
+			if (no(now)) {
 				now = Calendar.getInstance().getTime();
 			}
 			dbObj.put(SubNode.FIELD_CREATE_TIME, now);
 			node.setCreateTime(now);
 		}
 
-		if (node.getModifyTime() == null) {
-			if (now == null) {
+		if (no(node.getModifyTime())) {
+			if (no(now)) {
 				now = Calendar.getInstance().getTime();
 			}
 			dbObj.put(SubNode.FIELD_MODIFY_TIME, now);
@@ -146,14 +147,14 @@ public class MongoEventListener extends AbstractMongoEventListener<SubNode> {
 
 		/* Node name not allowed to contain : or ~ */
 		String nodeName = node.getName();
-		if (nodeName != null) {
+		if (ok(nodeName)) {
 			nodeName = nodeName.replace(":", "-");
 			nodeName = nodeName.replace("~", "-");
 			nodeName = nodeName.replace("/", "-");
 
 			// Warning: this is not a redundant null check. Some code in this block CAN set
 			// to null.
-			if (nodeName != null) {
+			if (ok(nodeName)) {
 				dbObj.put(SubNode.FIELD_NAME, nodeName);
 				node.setName(nodeName);
 			}
@@ -161,7 +162,7 @@ public class MongoEventListener extends AbstractMongoEventListener<SubNode> {
 
 		snUtil.removeDefaultProps(node);
 
-		if (node.getAc() != null) {
+		if (ok(node.getAc())) {
 			/*
 			 * we need to ensure that we never save an empty Acl, but null instead, because some parts of the
 			 * code assume that if the AC is non-null then there ARE some shares on the node.
@@ -175,8 +176,8 @@ public class MongoEventListener extends AbstractMongoEventListener<SubNode> {
 			}
 			// Remove any share to self because that never makes sense
 			else {
-				if (node.getOwner() != null) {
-					if (node.getAc().remove(node.getOwner().toHexString()) != null) {
+				if (ok(node.getOwner())) {
+					if (ok(node.getAc().remove(node.getOwner().toHexString()))) {
 						dbObj.put(SubNode.FIELD_AC, node.getAc());
 					}
 				}
@@ -189,7 +190,7 @@ public class MongoEventListener extends AbstractMongoEventListener<SubNode> {
 	@Override
 	public void onAfterSave(AfterSaveEvent<SubNode> event) {
 		SubNode node = event.getSource();
-		if (node != null) {
+		if (ok(node)) {
 			ThreadLocals.cacheNode(node);
 		}
 	}
@@ -204,8 +205,8 @@ public class MongoEventListener extends AbstractMongoEventListener<SubNode> {
 	@Override
 	public void onAfterConvert(AfterConvertEvent<SubNode> event) {
 		SubNode node = event.getSource();
-		if (node.getOwner() == null) {
-			if (auth.getAdminSession() != null) {
+		if (no(node.getOwner())) {
+			if (ok(auth.getAdminSession())) {
 				ObjectId ownerId = auth.getAdminSession().getUserNodeId();
 				node.setOwner(ownerId);
 				log.debug("Assigning admin as owner of node that had no owner (on load): " + node.getIdStr());
@@ -219,11 +220,11 @@ public class MongoEventListener extends AbstractMongoEventListener<SubNode> {
 	public void onBeforeDelete(BeforeDeleteEvent<SubNode> event) {
 		Document doc = event.getDocument();
 
-		if (doc != null) {
+		if (ok(doc)) {
 			Object id = doc.get("_id");
 			if (id instanceof ObjectId) {
 				SubNode node = ops.findById(id, SubNode.class);
-				if (node != null) {
+				if (ok(node)) {
 					log.trace("MDB del: " + node.getPath());
 					auth.ownerAuthByThread(node);
 					ThreadLocals.clean(node);
@@ -245,7 +246,7 @@ public class MongoEventListener extends AbstractMongoEventListener<SubNode> {
 			log.trace("saveAuth in MongoListener");
 
 		MongoSession ms = ThreadLocals.getMongoSession();
-		if (ms != null) {
+		if (ok(ms)) {
 			if (ms.isAdmin())
 				return;
 
@@ -255,7 +256,7 @@ public class MongoEventListener extends AbstractMongoEventListener<SubNode> {
 			// only if this is creating a new node do we need to chech that the parent will allow it
 			if (isNew) {
 				SubNode parent = read.getParent(ms, node);
-				if (parent == null)
+				if (no(parent))
 					throw new RuntimeException("unable to get node parent: " + node.getParentPath());
 
 				auth.authForChildNodeCreate(ms, parent);

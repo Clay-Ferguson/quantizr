@@ -16,6 +16,7 @@ import org.subnode.actpub.model.APONote;
 import org.subnode.actpub.model.APObj;
 import org.subnode.actpub.model.APProp;
 import org.subnode.service.ServiceBase;
+import static org.subnode.util.Util.*;
 
 @Controller
 public class ActPubFactory extends ServiceBase {
@@ -47,7 +48,7 @@ public class ActPubFactory extends ServiceBase {
 				.put(APProp.sensitive, false) //
 				.put(APProp.content, content);
 
-		if (inReplyTo != null) {
+		if (ok(inReplyTo)) {
 			ret = ret.put(APProp.inReplyTo, inReplyTo);
 		}
 
@@ -58,7 +59,7 @@ public class ActPubFactory extends ServiceBase {
 		for (String userName : toUserNames) {
 			try {
 				String actorUrl = apUtil.getActorUrlFromUserName(userName);
-				if (actorUrl == null)
+				if (no(actorUrl))
 					continue;
 
 				/*
@@ -92,7 +93,7 @@ public class ActPubFactory extends ServiceBase {
 			 * attributedTo)
 			 */
 			APObj actor = apCache.actorsByUrl.get(attributedTo);
-			if (actor != null) {
+			if (ok(actor)) {
 				ccList.add(AP.str(actor, APProp.followers));
 			}
 		}
@@ -122,7 +123,7 @@ public class ActPubFactory extends ServiceBase {
 		for (String userName : toUserNames) {
 			try {
 				String actorUrl = apUtil.getActorUrlFromUserName(userName);
-				if (actorUrl == null)
+				if (no(actorUrl))
 					continue;
 
 				// if public message put all the individuals in the 'cc' and "...#Public" as the only 'to', else

@@ -4,6 +4,7 @@ import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.subnode.model.client.PrincipalName;
+import static org.subnode.util.Util.*;
 
 public class MongoSession {
 	private static final Logger log = LoggerFactory.getLogger(MongoSession.class);
@@ -29,7 +30,7 @@ public class MongoSession {
 	}
 
 	public boolean isAnon() {
-		return userName == null || PrincipalName.ANON.s().equals(userName);
+		return no(userName) || PrincipalName.ANON.s().equals(userName);
 	}
 
 	public String getUserName() {

@@ -72,6 +72,7 @@ import org.subnode.util.ExUtil;
 import org.subnode.util.ThreadLocals;
 import org.subnode.util.Val;
 import org.subnode.util.XString;
+import static org.subnode.util.Util.*;
 
 /**
  * Service methods for processing user management functions. Login, logout, signup, user
@@ -99,7 +100,7 @@ public class UserManagerService extends ServiceBase {
 		// log.debug("login: " + XString.prettyPrint(req));
 
 		/* Anonymous user */
-		if (req.getUserName() == null || PrincipalName.ANON.s().equals(req.getUserName())) {
+		if (no(req.getUserName()) || PrincipalName.ANON.s().equals(req.getUserName())) {
 			log.debug("Anonymous user login.");
 			// just as a precaution update the sc userName to anon values
 			sc.setUserName(PrincipalName.ANON.s());
@@ -134,9 +135,9 @@ public class UserManagerService extends ServiceBase {
 		sc.setTimeZoneAbbrev(DateUtil.getUSTimezone(-req.getTzOffset() / 60, req.getDst()));
 
 		res.setAnonUserLandingPageNode(prop.getUserLandingPageNode());
-		log.debug("Processing Login: urlId=" + (sc.getUrlId() != null ? sc.getUrlId() : "null"));
+		log.debug("Processing Login: urlId=" + (ok(sc.getUrlId()) ? sc.getUrlId() : "null"));
 
-		if (sc.getUrlId() != null) {
+		if (ok(sc.getUrlId())) {
 			// log.debug("setHomeNodeOverride (from session urlId): " + sc.getUrlId());
 			res.setHomeNodeOverride(sc.getUrlId());
 		}
@@ -174,12 +175,12 @@ public class UserManagerService extends ServiceBase {
 
 	public void ensureUserHomeNodeExists(MongoSession ms, String userName, String content, String type, String name) {
 		SubNode userNode = read.getUserNodeByUserName(ms, userName);
-		if (userNode != null) {
+		if (ok(userNode)) {
 			SubNode userHomeNode = read.getNodeByName(ms, userName + ":" + name);
-			if (userHomeNode == null) {
+			if (no(userHomeNode)) {
 				SubNode node = create.createNode(ms, userNode, null, type, 0L, CreateNodeLocation.LAST, null, null, true);
 				node.setOwner(userNode.getId());
-				if (name != null) {
+				if (ok(name)) {
 					node.setName(name);
 				}
 				node.setContent(content);
@@ -195,12 +196,12 @@ public class UserManagerService extends ServiceBase {
 		// log.debug("processLogin: " + userName);
 		SubNode userNode = read.getUserNodeByUserName(auth.getAdminSession(), userName);
 
-		if (userNode == null) {
+		if (no(userNode)) {
 			throw new RuntimeEx("User not found: " + userName);
 		}
 
 		String id = userNode.getIdStr();
-		if (id == null) {
+		if (no(id)) {
 			throw new RuntimeException("userNode id is null for user: " + userName);
 		}
 		sc.setRootId(id);
@@ -235,7 +236,7 @@ public class UserManagerService extends ServiceBase {
 	public void ensureValidCryptoKeys(SubNode userNode) {
 		try {
 			String publicKey = userNode.getStr(NodeProp.CRYPTO_KEY_PUBLIC.s());
-			if (publicKey == null) {
+			if (no(publicKey)) {
 				KeyPairGenerator kpg = KeyPairGenerator.getInstance("RSA");
 				kpg.initialize(2048);
 				KeyPair pair = kpg.generateKeyPair();
@@ -258,7 +259,7 @@ public class UserManagerService extends ServiceBase {
 			String userName = ThreadLocals.getSC().getUserName();
 
 			SubNode ownerNode = read.getUserNodeByUserName(session, userName);
-			if (ownerNode != null) {
+			if (ok(ownerNode)) {
 				delete.delete(session, ownerNode, false);
 			}
 			return null;
@@ -274,7 +275,7 @@ public class UserManagerService extends ServiceBase {
 	public void writeUserStats(MongoSession ms, HashMap<ObjectId, UserStats> userStats) {
 		userStats.forEach((ObjectId key, UserStats stat) -> {
 			SubNode node = read.getNode(ms, key);
-			if (node != null) {
+			if (ok(node)) {
 				// log.debug("Setting stat.binUsage=" + stat.binUsage);
 				node.set(NodeProp.BIN_TOTAL.s(), stat.binUsage);
 			} else {
@@ -291,7 +292,7 @@ public class UserManagerService extends ServiceBase {
 	 * @param sign Controls if this is a subtract or an add (should be always 1 or -1)
 	 */
 	public void addNodeBytesToUserNodeBytes(MongoSession ms, SubNode node, SubNode userNode, int sign) {
-		if (node == null) {
+		if (no(node)) {
 			/*
 			 * todo-1: need to investigate this. I did a public shared node from one user and had a conversation
 			 * thread under it and got this thrown upon deleting the root of that. For now ignoring a null node
@@ -306,7 +307,7 @@ public class UserManagerService extends ServiceBase {
 		if (binSize > 0L) {
 			// log.debug("Will +/- amt: " + binSize);
 
-			if (userNode == null) {
+			if (no(userNode)) {
 				userNode = read.getUserNodeByUserName(null, null);
 			}
 
@@ -319,13 +320,13 @@ public class UserManagerService extends ServiceBase {
 	 * amount
 	 */
 	public void addBytesToUserNodeBytes(MongoSession ms, long binSize, SubNode userNode, int sign) {
-		if (userNode == null) {
+		if (no(userNode)) {
 			userNode = read.getUserNodeByUserName(null, null);
 		}
 
 		// get the current binTotal on the user account (max they are allowed to upload)
 		Long binTotal = userNode.getInt(NodeProp.BIN_TOTAL);
-		if (binTotal == null) {
+		if (no(binTotal)) {
 			binTotal = 0L;
 		}
 
@@ -361,7 +362,7 @@ public class UserManagerService extends ServiceBase {
 			// who could possibly know this unguessable value.
 			SubNode node = read.getNode(session, signupCode);
 
-			if (node != null) {
+			if (ok(node)) {
 				if (!node.getBool(NodeProp.SIGNUP_PENDING)) {
 					return "Signup Complete. You may login now.";
 				} else {
@@ -383,7 +384,7 @@ public class UserManagerService extends ServiceBase {
 
 	public void initNewUser(MongoSession ms, String userName, String password, String email, boolean automated) {
 		SubNode userNode = mongoUtil.createUser(ms, userName, email, password, automated);
-		if (userNode != null) {
+		if (ok(userNode)) {
 			log.debug("Successful signup complete.");
 		}
 	}
@@ -415,19 +416,19 @@ public class UserManagerService extends ServiceBase {
 
 			/* throw exceptions of the username or password are not valid */
 			String userError = validator.checkUserName(userName);
-			if (userError != null) {
+			if (ok(userError)) {
 				res.setUserError(userError);
 				res.setSuccess(false);
 			}
 
 			String passwordError = validator.checkPassword(password);
-			if (passwordError != null) {
+			if (ok(passwordError)) {
 				res.setPasswordError(passwordError);
 				res.setSuccess(false);
 			}
 
 			String emailError = validator.checkEmail(email);
-			if (emailError != null) {
+			if (ok(emailError)) {
 				res.setEmailError(emailError);
 				res.setSuccess(false);
 			}
@@ -473,7 +474,7 @@ public class UserManagerService extends ServiceBase {
 	public void initiateSignup(MongoSession ms, String userName, String password, String email) {
 
 		SubNode ownerNode = read.getUserNodeByUserName(ms, userName);
-		if (ownerNode != null) {
+		if (ok(ownerNode)) {
 			throw new RuntimeEx("User already exists.");
 		}
 
@@ -514,7 +515,7 @@ public class UserManagerService extends ServiceBase {
 		arun.run(session -> {
 			SubNode userNode = read.getUserNodeByUserName(session, userName);
 
-			if (userNode != null) {
+			if (ok(userNode)) {
 				userNode.set(NodeProp.USER_PREF_PUBLIC_KEY.s(), req.getKeyJson());
 			} else {
 				log.debug("savePublicKey failed to find userName: " + userName);
@@ -536,7 +537,7 @@ public class UserManagerService extends ServiceBase {
 
 		arun.run(session -> {
 			SubNode userNode = read.getUserNodeByUserName(session, userName);
-			if (userNode == null) {
+			if (no(userNode)) {
 				res.setMessage("unknown user: " + userName);
 				res.setSuccess(false);
 			}
@@ -547,8 +548,8 @@ public class UserManagerService extends ServiceBase {
 				Long binTotal = userNode.getInt(NodeProp.BIN_TOTAL);
 
 				// I really need to convert these props to Integers not Strings
-				res.setBinQuota(binQuota == null ? -1 : binQuota.intValue());
-				res.setBinTotal(binTotal == null ? -1 : binTotal.intValue());
+				res.setBinQuota(no(binQuota) ? -1 : binQuota.intValue());
+				res.setBinTotal(no(binTotal) ? -1 : binTotal.intValue());
 			} catch (Exception e) {
 			}
 
@@ -563,7 +564,7 @@ public class UserManagerService extends ServiceBase {
 
 		UserPreferences userPreferences = ThreadLocals.getSC().getUserPreferences();
 		// note: This will be null if session has timed out.
-		if (userPreferences == null) {
+		if (no(userPreferences)) {
 			return res;
 		}
 
@@ -621,7 +622,7 @@ public class UserManagerService extends ServiceBase {
 			// validator.checkUserName(req.getUserName());
 
 			// SubNode nodeFound = api.getUserNodeByUserName(session, req.getUserName());
-			// if (nodeFound != null) {
+			// if (ok(nodeFound )) {
 			// res.setMessage("User already exists.");
 			// res.setSuccess(false);
 			// failed = true;
@@ -654,9 +655,9 @@ public class UserManagerService extends ServiceBase {
 		 * lookup to see if this will be a duplicate
 		 */
 		SubNode userNode = read.findNodeByUserAndType(ms, blockedList, req.getUserName(), NodeType.FRIEND.s());
-		if (userNode == null) {
+		if (no(userNode)) {
 			userNode = edit.createFriendNode(ms, blockedList, req.getUserName());
-			if (userNode != null) {
+			if (ok(userNode)) {
 				res.setMessage(
 						"Blocked user " + req.getUserName() + ". To manage blocks, go to `Menu -> Friends -> Blocked Users`");
 			} else {
@@ -687,7 +688,7 @@ public class UserManagerService extends ServiceBase {
 		// This loop over friendNodes could be done all in a single delete query command, but for now let's
 		// just do the delete this way using our existing methods.
 		List<SubNode> friendNodes = getSpecialNodesList(ms, NodeType.FRIEND_LIST.s(), null, true);
-		if (friendNodes != null) {
+		if (ok(friendNodes)) {
 			for (SubNode friendNode : friendNodes) {
 				// the USER_NODE_ID property on friends nodes contains the actual account ID of this friend.
 				String userNodeId = friendNode.getStr(NodeProp.USER_NODE_ID);
@@ -735,21 +736,21 @@ public class UserManagerService extends ServiceBase {
 			SubNode friendNode = read.findNodeByUserAndType(mst, followerFriendList, newUserName, NodeType.FRIEND.s());
 
 			// if friendNode was non-null here it means we were already following the user.
-			if (friendNode == null) {
+			if (no(friendNode)) {
 				apUtil.log("loadForeignUser: " + newUserName);
 				apub.loadForeignUser(newUserName);
 
 				apUtil.log("Creating friendNode for " + newUserName);
 				friendNode = edit.createFriendNode(mst, followerFriendList, newUserName);
 
-				if (friendNode != null) {
+				if (ok(friendNode)) {
 					Val<SubNode> userNode = new Val<SubNode>();
 					arun.run(s -> {
 						userNode.setVal(read.getUserNodeByUserName(s, newUserName));
 						return null;
 					});
 
-					if (userNode.getVal() != null) {
+					if (ok(userNode.getVal())) {
 						friendNode.set(NodeProp.USER_NODE_ID.s(), userNode.getVal().getIdStr());
 					}
 
@@ -776,13 +777,13 @@ public class UserManagerService extends ServiceBase {
 		arun.run(session -> {
 			SubNode userNode = null;
 
-			if (req.getUserId() == null) {
+			if (no(req.getUserId())) {
 				userNode = read.getUserNodeByUserName(session, sessionUserName);
 			} else {
 				userNode = read.getNode(session, req.getUserId(), false);
 			}
 
-			if (userNode != null) {
+			if (ok(userNode)) {
 				UserProfile userProfile = new UserProfile();
 
 				String nodeUserName = userNode.getStr(NodeProp.USER.s());
@@ -793,7 +794,7 @@ public class UserManagerService extends ServiceBase {
 				userProfile.setUserName(nodeUserName);
 				userProfile.setDisplayName(displayName);
 
-				if (userHomeNode != null) {
+				if (ok(userHomeNode)) {
 					userProfile.setHomeNodeId(userHomeNode.getIdStr());
 				}
 
@@ -838,7 +839,7 @@ public class UserManagerService extends ServiceBase {
 		SubNode friendsList =
 				read.getUserNodeByType(ms, userName, null, null, NodeType.FRIEND_LIST.s(), null, NodeName.BLOCKED_USERS);
 		SubNode userNode = read.findNodeByUserAndType(ms, friendsList, maybeFollowedUser, NodeType.FRIEND.s());
-		return userNode != null;
+		return ok(userNode);
 	}
 
 	public boolean userIsBlockedByMe(MongoSession ms, String maybeBlockedUser) {
@@ -846,7 +847,7 @@ public class UserManagerService extends ServiceBase {
 		SubNode blockedList =
 				read.getUserNodeByType(ms, userName, null, null, NodeType.BLOCKED_USERS.s(), null, NodeName.BLOCKED_USERS);
 		SubNode userNode = read.findNodeByUserAndType(ms, blockedList, maybeBlockedUser, NodeType.FRIEND.s());
-		return userNode != null;
+		return ok(userNode);
 	}
 
 	public UserPreferences getDefaultUserPreferences() {
@@ -860,7 +861,7 @@ public class UserManagerService extends ServiceBase {
 
 		arun.run(session -> {
 			SubNode prefsNode = _prefsNode;
-			if (prefsNode == null) {
+			if (no(prefsNode)) {
 				prefsNode = read.getUserNodeByUserName(session, userName);
 			}
 			userPrefs.setEditMode(prefsNode.getBool(NodeProp.USER_PREF_EDIT_MODE));
@@ -896,7 +897,7 @@ public class UserManagerService extends ServiceBase {
 		Val<String> userName = new Val<>();
 
 		String passCode = req.getPassCode();
-		if (passCode != null) {
+		if (ok(passCode)) {
 			/*
 			 * We can run this block as admin, because the codePart below is secret and is checked for a match
 			 */
@@ -904,12 +905,12 @@ public class UserManagerService extends ServiceBase {
 
 				String userNodeId = XString.truncateAfterFirst(passCode, "-");
 
-				if (userNodeId == null) {
+				if (no(userNodeId)) {
 					throw new RuntimeEx("Unable to find userNodeId: " + userNodeId);
 				}
 				userNode.setVal(read.getNode(as, userNodeId));
 
-				if (userNode.getVal() == null) {
+				if (no(userNode.getVal())) {
 					throw ExUtil.wrapEx("Invald password reset code.");
 				}
 
@@ -936,7 +937,7 @@ public class UserManagerService extends ServiceBase {
 		} else {
 			userNode.setVal(read.getUserNodeByUserName(ms, ms.getUserName()));
 
-			if (userNode.getVal() == null) {
+			if (no(userNode.getVal())) {
 				throw ExUtil.wrapEx("changePassword cannot find user.");
 			}
 
@@ -977,7 +978,7 @@ public class UserManagerService extends ServiceBase {
 			}
 
 			SubNode ownerNode = read.getUserNodeByUserName(session, user);
-			if (ownerNode == null) {
+			if (no(ownerNode)) {
 				res.setMessage("User does not exist.");
 				res.setSuccess(false);
 				return null;
@@ -991,7 +992,7 @@ public class UserManagerService extends ServiceBase {
 			 * account simply by issuing a password change to that account!
 			 */
 			String nodeEmail = ownerNode.getStr(NodeProp.EMAIL.s());
-			if (nodeEmail == null || !nodeEmail.equals(email)) {
+			if (no(nodeEmail) || !nodeEmail.equals(email)) {
 				res.setMessage("Wrong user name and/or email.");
 				res.setSuccess(false);
 				return null;
@@ -1034,24 +1035,24 @@ public class UserManagerService extends ServiceBase {
 
 		List<SubNode> friendNodes = getSpecialNodesList(ms, NodeType.FRIEND_LIST.s(), null, true);
 
-		if (friendNodes != null) {
+		if (ok(friendNodes)) {
 			List<FriendInfo> friends = new LinkedList<>();
 
 			for (SubNode friendNode : friendNodes) {
 				String userName = friendNode.getStr(NodeProp.USER.s());
-				if (userName != null) {
+				if (ok(userName)) {
 					FriendInfo fi = new FriendInfo();
 					fi.setUserName(userName);
 
 					SubNode userNode = read.getUserNodeByUserName(null, userName);
-					if (userNode != null) {
+					if (ok(userNode)) {
 						fi.setDisplayName(userNode.getStr(NodeProp.DISPLAY_NAME.s()));
 					}
 
 					String userNodeId = friendNode.getStr(NodeProp.USER_NODE_ID);
 
 					SubNode friendAccountNode = read.getNode(ms, userNodeId, false);
-					if (friendAccountNode != null) {
+					if (ok(friendAccountNode)) {
 						fi.setAvatarVer(friendAccountNode.getStr(NodeProp.BIN));
 					}
 					fi.setUserNodeId(userNodeId);
@@ -1073,11 +1074,11 @@ public class UserManagerService extends ServiceBase {
 		ms = ThreadLocals.ensure(ms);
 		List<SubNode> nodeList = new LinkedList<>();
 		SubNode userNode = read.getUserNodeByUserName(ms, userName);
-		if (userNode == null)
+		if (no(userNode))
 			return null;
 
 		SubNode parentNode = read.findTypedNodeUnderPath(ms, userNode.getPath(), underType);
-		if (parentNode == null)
+		if (no(parentNode))
 			return null;
 
 		for (SubNode friendNode : read.getChildren(ms, parentNode,
@@ -1106,7 +1107,7 @@ public class UserManagerService extends ServiceBase {
 		// String userName = accountNode.getStrProp(NodeProp.USER);
 
 		// // if account is a 'foreign server' one, then clean it up
-		// if (userName != null) {
+		// if (ok(userName )) {
 		// log.debug("userName: " + userName);
 
 		// if (userName.contains("@")) {
@@ -1128,12 +1129,11 @@ public class UserManagerService extends ServiceBase {
 		int foreignUserCount = 0;
 
 		StringBuilder sb = new StringBuilder();
-		Iterable<SubNode> accountNodes =
-				read.getChildrenUnderPath(ms, NodeName.ROOT_OF_ALL_USERS, null, null, 0, null, null);
+		Iterable<SubNode> accountNodes = read.getChildrenUnderPath(ms, NodeName.ROOT_OF_ALL_USERS, null, null, 0, null, null);
 
 		for (SubNode accountNode : accountNodes) {
 			String userName = accountNode.getStr(NodeProp.USER);
-			if (userName != null) {
+			if (ok(userName)) {
 				// if account is a 'foreign server' one, then clean it up
 				if (userName.contains("@")) {
 					foreignUserCount++;
@@ -1150,7 +1150,7 @@ public class UserManagerService extends ServiceBase {
 	public void updateLastActiveTime(SessionContext sc) {
 		MongoSession ms = auth.getAdminSession();
 		SubNode userNode = read.getUserNodeByUserName(ms, sc.getUserName());
-		if (userNode != null) {
+		if (ok(userNode)) {
 			userNode.set(NodeProp.LAST_ACTIVE_TIME.s(), sc.getLastActiveTime());
 			update.save(ms, userNode);
 		}

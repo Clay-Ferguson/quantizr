@@ -14,6 +14,7 @@ import org.springframework.data.annotation.PersistenceConstructor;
 import org.springframework.data.annotation.TypeAlias;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
+import static org.subnode.util.Util.*;
 
 /* We're going to be caching every Fediverse username we encounter for future unspecified purposes */
 @Document(collection = "fediNames")
@@ -58,7 +59,7 @@ public class FediverseName {
 
 	@JsonGetter(FIELD_ID)
 	public String jsonId() {
-		return id != null ? id.toHexString() : null;
+		return ok(id) ? id.toHexString() : null;
 	}
 
 	@JsonProperty(FIELD_CREATE_TIME)

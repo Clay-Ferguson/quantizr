@@ -30,6 +30,7 @@ import org.subnode.request.NodeFeedRequest;
 import org.subnode.response.CheckMessagesResponse;
 import org.subnode.response.NodeFeedResponse;
 import org.subnode.util.ThreadLocals;
+import static org.subnode.util.Util.*;
 
 @Component
 public class UserFeedService extends ServiceBase {
@@ -110,10 +111,10 @@ public class UserFeedService extends ServiceBase {
 		 * if we're doing a 'feed' under a specific root node this is like the 'chat feature' and is
 		 * normally only called for a chat-room type node.
 		 */
-		if (req.getNodeId() != null) {
+		if (ok(req.getNodeId())) {
 			// Get the chat room node (root of the chat room query)
 			SubNode rootNode = read.getNode(ms, req.getNodeId());
-			if (rootNode == null) {
+			if (no(rootNode)) {
 				throw new RuntimeException("Node not found: " + req.getNodeId());
 			}
 			pathToSearch = rootNode.getPath();
@@ -163,7 +164,7 @@ public class UserFeedService extends ServiceBase {
 		if (!testQuery && doAuth && req.getToMe()) {
 			myAcntNode = read.getNode(ms, sc.getRootId());
 
-			if (myAcntNode != null) {
+			if (ok(myAcntNode)) {
 				orCriteria.add(Criteria.where(SubNode.FIELD_AC + "." + myAcntNode.getOwner().toHexString()).ne(null));
 
 				SubNode _myAcntNode = myAcntNode;
@@ -190,7 +191,7 @@ public class UserFeedService extends ServiceBase {
 		Criteria criteria = Criteria.where(SubNode.FIELD_PATH).regex(mongoUtil.regexRecursiveChildrenOfPath(pathToSearch)); //
 
 		// DO NOT DELETE (keep as an example of how to do this)
-		// if (req.getNodeId() == null) {
+		// if (no(req.getNodeId() )) {
 		// criteria = criteria.and(SubNode.FIELD_TYPE).nin(excludeTypes);
 		// }
 
@@ -220,11 +221,11 @@ public class UserFeedService extends ServiceBase {
 		}
 
 		if (!testQuery && doAuth && req.getFromMe()) {
-			if (myAcntNode == null) {
+			if (no(myAcntNode)) {
 				myAcntNode = read.getNode(ms, sc.getRootId());
 			}
 
-			if (myAcntNode != null) {
+			if (ok(myAcntNode)) {
 				orCriteria.add(
 						// where node is owned by us.
 						Criteria.where(SubNode.FIELD_OWNER).is(myAcntNode.getOwner()) //
@@ -235,7 +236,7 @@ public class UserFeedService extends ServiceBase {
 
 		if (!testQuery && doAuth && req.getFromFriends()) {
 			List<SubNode> friendNodes = user.getSpecialNodesList(ms, NodeType.FRIEND_LIST.s(), null, true);
-			if (friendNodes != null) {
+			if (ok(friendNodes)) {
 				List<ObjectId> friendIds = new LinkedList<>();
 
 				for (SubNode friendNode : friendNodes) {
@@ -243,7 +244,7 @@ public class UserFeedService extends ServiceBase {
 					String userNodeId = friendNode.getStr(NodeProp.USER_NODE_ID);
 
 					// if we have a userNodeId and they aren't in the blocked list.
-					if (userNodeId != null && !blockedIdStrings.contains(userNodeId)) {
+					if (ok(userNodeId) && !blockedIdStrings.contains(userNodeId)) {
 						friendIds.add(new ObjectId(userNodeId));
 					}
 				}
@@ -274,7 +275,7 @@ public class UserFeedService extends ServiceBase {
 		query.addCriteria(criteria);
 
 		// if we have a node id this is like a chat room type, and so we sort by create time.
-		if (req.getNodeId() != null) {
+		if (ok(req.getNodeId())) {
 			query.with(Sort.by(Sort.Direction.DESC, SubNode.FIELD_CREATE_TIME));
 		} else {
 			query.with(Sort.by(Sort.Direction.DESC, SubNode.FIELD_MODIFY_TIME));
@@ -311,7 +312,7 @@ public class UserFeedService extends ServiceBase {
 	public void getBlockedUserIds(HashSet<ObjectId> set) {
 		arun.run(ms -> {
 			List<SubNode> nodeList = user.getSpecialNodesList(ms, NodeType.BLOCKED_USERS.s(), null, false);
-			if (nodeList == null)
+			if (no(nodeList))
 				return null;
 
 			for (SubNode node : nodeList) {

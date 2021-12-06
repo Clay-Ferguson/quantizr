@@ -28,6 +28,7 @@ import org.subnode.util.ExUtil;
 import org.subnode.util.FileUtils;
 import org.subnode.util.ThreadLocals;
 import org.subnode.util.XString;
+import static org.subnode.util.Util.*;
 
 /**
  * Exporter using PDFBox
@@ -61,9 +62,8 @@ public class ExportPdfServicePdfBox extends ServiceBase {
 	private ExportRequest req;
 
 	/*
-	 * Exports the node specified in the req. If the node specified is "/", or the
-	 * repository root, then we don't expect a filename, because we will generate a
-	 * timestamped one.
+	 * Exports the node specified in the req. If the node specified is "/", or the repository root, then
+	 * we don't expect a filename, because we will generate a timestamped one.
 	 */
 	public void export(MongoSession ms, ExportRequest req, ExportResponse res) {
 		ms = ThreadLocals.ensure(ms);
@@ -95,7 +95,7 @@ public class ExportPdfServicePdfBox extends ServiceBase {
 
 		SubNode exportNode = read.getNode(ms, nodeId, true);
 		String fileName = snUtil.getExportFileName(req.getFileName(), exportNode);
-		shortFileName = fileName + ".pdf"; 
+		shortFileName = fileName + ".pdf";
 		fullFileName = prop.getAdminDataFolder() + File.separator + shortFileName;
 
 		try {
@@ -107,7 +107,7 @@ public class ExportPdfServicePdfBox extends ServiceBase {
 			throw ExUtil.wrapEx(ex);
 		} finally {
 			try {
-				if (stream != null) {
+				if (ok(stream)) {
 					stream.close();
 				}
 
@@ -123,7 +123,7 @@ public class ExportPdfServicePdfBox extends ServiceBase {
 
 	private void newPage() {
 		try {
-			if (stream != null) {
+			if (ok(stream)) {
 				stream.close();
 			}
 
@@ -145,7 +145,7 @@ public class ExportPdfServicePdfBox extends ServiceBase {
 	}
 
 	private void recurseNode(SubNode node, int level) {
-		if (node == null)
+		if (no(node))
 			return;
 
 		processNode(node);
@@ -170,21 +170,21 @@ public class ExportPdfServicePdfBox extends ServiceBase {
 	private void writeImage(SubNode node) {
 		try {
 			String bin = node.getStr(NodeProp.BIN.s());
-			if (bin == null) {
+			if (no(bin)) {
 				return;
 			}
 			String mime = node.getStr(NodeProp.BIN_MIME.s());
 
 			String imgSize = node.getStr(NodeProp.IMG_SIZE.s());
 			float sizeFactor = 1f;
-			if (imgSize != null && imgSize.endsWith("%")) {
+			if (ok(imgSize) && imgSize.endsWith("%")) {
 				imgSize = XString.stripIfEndsWith(imgSize, "%");
 				int size = Integer.parseInt(imgSize);
 				sizeFactor = Float.valueOf(size).floatValue() / 100;
 			}
 
 			InputStream is = attach.getStream(session, "", node, false);
-			if (is == null)
+			if (no(is))
 				return;
 
 			PDImageXObject pdImage = null;
@@ -199,7 +199,7 @@ public class ExportPdfServicePdfBox extends ServiceBase {
 				IOUtils.closeQuietly(is);
 			}
 
-			if (pdImage == null)
+			if (no(pdImage))
 				return;
 
 			float imgWidth = width * sizeFactor;

@@ -7,6 +7,7 @@ import org.springframework.stereotype.Component;
 import org.subnode.AppServer;
 import org.subnode.service.ServiceBase;
 import org.subnode.util.ThreadLocals;
+import static org.subnode.util.Util.*;
 
 @Component
 public class MongoRepository extends ServiceBase {
@@ -40,7 +41,7 @@ public class MongoRepository extends ServiceBase {
 		Runtime.getRuntime().addShutdownHook(new Thread(new Runnable() {
 			@Override
 			public void run() {
-				if (instance != null) {
+				if (ok(instance)) {
 					log.debug("********** runtime shutdownHook executing. **********");
 					instance.close();
 				}
@@ -93,7 +94,7 @@ public class MongoRepository extends ServiceBase {
 
 	public void close() {
 		AppServer.setShuttingDown(true);
-		if (instance == null)
+		if (no(instance))
 			return;
 
 		synchronized (lock) {

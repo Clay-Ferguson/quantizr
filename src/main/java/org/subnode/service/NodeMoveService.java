@@ -21,6 +21,7 @@ import org.subnode.response.MoveNodesResponse;
 import org.subnode.response.SelectAllNodesResponse;
 import org.subnode.response.SetNodePositionResponse;
 import org.subnode.util.ThreadLocals;
+import static org.subnode.util.Util.*;
 
 /**
  * Service for controlling the positions (ordinals) of nodes relative to their parents and/or moving
@@ -47,7 +48,7 @@ public class NodeMoveService extends ServiceBase {
 
 		SubNode node = read.getNode(ms, nodeId);
 		auth.ownerAuth(ms, node);
-		if (node == null) {
+		if (no(node)) {
 			throw new RuntimeEx("Node not found: " + nodeId);
 		}
 
@@ -69,7 +70,7 @@ public class NodeMoveService extends ServiceBase {
 
 	public void moveNodeUp(MongoSession ms, SubNode node) {
 		SubNode nodeAbove = read.getSiblingAbove(ms, node);
-		if (nodeAbove != null) {
+		if (ok(nodeAbove)) {
 			Long saveOrdinal = nodeAbove.getOrdinal();
 			nodeAbove.setOrdinal(node.getOrdinal());
 			node.setOrdinal(saveOrdinal);
@@ -79,7 +80,7 @@ public class NodeMoveService extends ServiceBase {
 
 	public void moveNodeDown(MongoSession ms, SubNode node) {
 		SubNode nodeBelow = read.getSiblingBelow(ms, node);
-		if (nodeBelow != null) {
+		if (ok(nodeBelow)) {
 			Long saveOrdinal = nodeBelow.getOrdinal();
 			nodeBelow.setOrdinal(node.getOrdinal());
 			node.setOrdinal(saveOrdinal);
@@ -89,7 +90,7 @@ public class NodeMoveService extends ServiceBase {
 
 	public void moveNodeToTop(MongoSession ms, SubNode node) {
 		SubNode parentNode = read.getParent(ms, node);
-		if (parentNode == null) {
+		if (no(parentNode)) {
 			return;
 		}
 		create.insertOrdinal(ms, parentNode, 0L, 1L);
@@ -107,7 +108,7 @@ public class NodeMoveService extends ServiceBase {
 
 	public void moveNodeToBottom(MongoSession ms, SubNode node) {
 		SubNode parentNode = read.getParent(ms, node);
-		if (parentNode == null) {
+		if (no(parentNode)) {
 			return;
 		}
 		long ordinal = read.getMaxChildOrdinal(ms, parentNode) + 1L;
@@ -130,7 +131,7 @@ public class NodeMoveService extends ServiceBase {
 		for (String nodeId : req.getNodeIds()) {
 			SubNode node = read.getNode(ms, nodeId);
 
-			if (parentPath == null) {
+			if (no(parentPath)) {
 				parentPath = node.getParentPath();
 			} else if (!parentPath.equals(node.getParentPath())) {
 				res.setMessage("Failed: All nodes must be under the same parent node.");
@@ -149,7 +150,7 @@ public class NodeMoveService extends ServiceBase {
 		int counter = 0;
 
 		for (SubNode n : nodes) {
-			if (firstNode == null) {
+			if (no(firstNode)) {
 				firstNode = n;
 			}
 			if (counter > 0) {
@@ -164,7 +165,7 @@ public class NodeMoveService extends ServiceBase {
 
 			if (counter > 0) {
 				/* If node has an attachment we don't delete the node, but just set it's content to null */
-				if (n.getStr(NodeProp.BIN) != null || n.getStr(NodeProp.IPFS_LINK) != null) {
+				if (ok(n.getStr(NodeProp.BIN)) || ok(n.getStr(NodeProp.IPFS_LINK))) {
 					n.setContent(null);
 					n.touch();
 					update.save(ms, n);
@@ -192,7 +193,7 @@ public class NodeMoveService extends ServiceBase {
 		ms = ThreadLocals.ensure(ms);
 
 		SubNode userNode = read.getUserNodeByUserName(null, null);
-		if (userNode == null) {
+		if (no(userNode)) {
 			throw new RuntimeEx("User not found.");
 		}
 

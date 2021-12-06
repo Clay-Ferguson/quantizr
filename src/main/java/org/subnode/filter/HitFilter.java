@@ -13,6 +13,7 @@ import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.GenericFilterBean;
 import org.subnode.util.Util;
+import static org.subnode.util.Util.*;
 
 @Component
 @Order(3)
@@ -38,9 +39,9 @@ public class HitFilter extends GenericFilterBean {
 		String ip = Util.getClientIpAddr(httpReq);
 
 		synchronized (uniqueIpHits) {
-			Integer hitCount = ip != null ? uniqueIpHits.get(ip) : null;
+			Integer hitCount = ok(ip) ? uniqueIpHits.get(ip) : null;
 
-			if (hitCount == null) {
+			if (no(hitCount)) {
 				uniqueIpHits.put(ip, 1);
 			} else {
 				hitCount = hitCount.intValue() + 1;

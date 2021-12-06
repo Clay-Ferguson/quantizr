@@ -26,6 +26,7 @@ import org.subnode.service.AttachmentService;
 import org.subnode.service.UserManagerService;
 import org.subnode.util.LimitedInputStreamEx;
 import org.subnode.util.ThreadLocals;
+import static org.subnode.util.Util.*;
 
 @Component("MongoTest")
 public class MongoTest implements TestIntf {
@@ -63,14 +64,14 @@ public class MongoTest implements TestIntf {
 
 		// // Verify we can lookup the node we just inserted, by ObjectId
 		// SubNode nodeFoundById = read.getNode(adminSession, node.getId());
-		// if (nodeFoundById == null) {
+		// if (no(nodeFoundById )) {
 		// throw new RuntimeEx("Unable to find node by id.");
 		// }
 
 		// // Verify a lookup by hex string
 		// SubNode nodeFoundByStrId = read.getNode(adminSession,
 		// node.getIdStr());
-		// if (nodeFoundByStrId == null) {
+		// if (no(nodeFoundByStrId )) {
 		// throw new RuntimeEx("Unable to find node by id: " +
 		// node.getIdStr());
 		// }
@@ -109,7 +110,7 @@ public class MongoTest implements TestIntf {
 		MongoSession adminSession = asUser(PrincipalName.ADMIN.s());
 
 		SubNode adminNode = read.getUserNodeByUserName(adminSession, PrincipalName.ADMIN.s());
-		if (adminNode == null) {
+		if (no(adminNode)) {
 			throw new RuntimeEx("Unable to find admin user node.");
 		}
 
@@ -170,7 +171,7 @@ public class MongoTest implements TestIntf {
 		// adam successfully inserts node in his root
 		SubNode adamsNode = null;
 		SubNode adamsRootNode = read.getUserNodeByUserName(adamSession, "adam");
-		if (adamsRootNode != null) {
+		if (ok(adamsRootNode)) {
 			adamsNode = create.createNode(adamSession, adamsRootNode.getPath() + "/?");
 			adamsNode.setContent("adam's test node " + System.currentTimeMillis());
 			update.save(adamSession, adamsNode);
@@ -250,7 +251,7 @@ public class MongoTest implements TestIntf {
 
 	private MongoSession asUser(String userName) {
 		SubNode userNode = read.getUserNodeByUserName(auth.getAdminSession(), userName);
-		if (userNode == null) {
+		if (no(userNode)) {
 			throw new RuntimeException("UserNode not found for userName " + userName);
 		}
 		MongoSession ms = new MongoSession(userName, userNode.getId());
