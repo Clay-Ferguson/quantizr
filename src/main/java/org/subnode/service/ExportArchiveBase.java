@@ -165,7 +165,7 @@ public abstract class ExportArchiveBase extends ServiceBase {
 		/* process the current node */
 		Val<String> fileName = new Val<>();
 
-		Iterable<SubNode> iter = read.getChildren(session, node, Sort.by(Sort.Direction.ASC, SubNode.FIELD_ORDINAL), null, 0);
+		Iterable<SubNode> iter = read.getChildren(session, node, Sort.by(Sort.Direction.ASC, SubNode.ORDINAL), null, 0);
 		List<SubNode> children = read.iterateToList(iter);
 
 		/*
@@ -214,7 +214,7 @@ public abstract class ExportArchiveBase extends ServiceBase {
 	}
 
 	private void inlineChildren(StringBuilder html, SubNode node, String parentFolder, String deeperPath, int level) {
-		Iterable<SubNode> iter = read.getChildren(session, node, Sort.by(Sort.Direction.ASC, SubNode.FIELD_ORDINAL), null, 0);
+		Iterable<SubNode> iter = read.getChildren(session, node, Sort.by(Sort.Direction.ASC, SubNode.ORDINAL), null, 0);
 		List<SubNode> children = read.iterateToList(iter);
 
 		if (ok(children)) {

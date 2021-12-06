@@ -1082,7 +1082,7 @@ public class UserManagerService extends ServiceBase {
 			return null;
 
 		for (SubNode friendNode : read.getChildren(ms, parentNode,
-				sort ? Sort.by(Sort.Direction.ASC, SubNode.FIELD_ORDINAL) : null, null, 0)) {
+				sort ? Sort.by(Sort.Direction.ASC, SubNode.ORDINAL) : null, null, 0)) {
 			nodeList.add(friendNode);
 		}
 		return nodeList;

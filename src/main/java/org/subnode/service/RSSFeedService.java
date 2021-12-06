@@ -869,7 +869,7 @@ public class RSSFeedService extends ServiceBase {
 		List<SyndEntry> entries = new LinkedList<>();
 		feed.setEntries(entries);
 
-		Iterable<SubNode> iter = read.getChildren(ms, node, Sort.by(Sort.Direction.ASC, SubNode.FIELD_ORDINAL), null, 0);
+		Iterable<SubNode> iter = read.getChildren(ms, node, Sort.by(Sort.Direction.ASC, SubNode.ORDINAL), null, 0);
 		List<SubNode> children = read.iterateToList(iter);
 
 		if (ok(children)) {

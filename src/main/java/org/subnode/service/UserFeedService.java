@@ -59,10 +59,10 @@ public class UserFeedService extends ServiceBase {
 		String pathToSearch = NodeName.ROOT_OF_ALL_USERS;
 
 		Query query = new Query();
-		Criteria criteria = Criteria.where(SubNode.FIELD_PATH).regex(mongoUtil.regexRecursiveChildrenOfPath(pathToSearch)); //
+		Criteria criteria = Criteria.where(SubNode.PATH).regex(mongoUtil.regexRecursiveChildrenOfPath(pathToSearch)); //
 
 		// limit to just markdown types (no type)
-		criteria = criteria.and(SubNode.FIELD_TYPE).is(NodeType.NONE.s());
+		criteria = criteria.and(SubNode.TYPE).is(NodeType.NONE.s());
 
 		// DO NOT DELETE (keep as example)
 		// This pattern is what is required when you have multiple conditions added to a single field.
@@ -78,9 +78,9 @@ public class UserFeedService extends ServiceBase {
 		}
 
 		/* new nodes since last active time */
-		criteria = criteria.and(SubNode.FIELD_MODIFY_TIME).gt(new Date(lastActiveLong));
+		criteria = criteria.and(SubNode.MODIFY_TIME).gt(new Date(lastActiveLong));
 		String myId = searchRoot.getOwner().toHexString();
-		criteria = criteria.and(SubNode.FIELD_AC + "." + myId).ne(null);
+		criteria = criteria.and(SubNode.AC + "." + myId).ne(null);
 
 		query.addCriteria(criteria);
 
@@ -155,7 +155,7 @@ public class UserFeedService extends ServiceBase {
 		 * for all public nodes why "OR" into that any friends?
 		 */
 		if (!testQuery && doAuth && req.getToPublic()) {
-			orCriteria.add(Criteria.where(SubNode.FIELD_AC + "." + PrincipalName.PUBLIC.s()).ne(null));
+			orCriteria.add(Criteria.where(SubNode.AC + "." + PrincipalName.PUBLIC.s()).ne(null));
 		}
 
 		SubNode myAcntNode = null;
@@ -165,7 +165,7 @@ public class UserFeedService extends ServiceBase {
 			myAcntNode = read.getNode(ms, sc.getRootId());
 
 			if (ok(myAcntNode)) {
-				orCriteria.add(Criteria.where(SubNode.FIELD_AC + "." + myAcntNode.getOwner().toHexString()).ne(null));
+				orCriteria.add(Criteria.where(SubNode.AC + "." + myAcntNode.getOwner().toHexString()).ne(null));
 
 				SubNode _myAcntNode = myAcntNode;
 				MongoSession _s = ms;
@@ -188,7 +188,7 @@ public class UserFeedService extends ServiceBase {
 		Query query = new Query();
 
 		// initialize criteria using the Path to select the correct sub-graph of the tree
-		Criteria criteria = Criteria.where(SubNode.FIELD_PATH).regex(mongoUtil.regexRecursiveChildrenOfPath(pathToSearch)); //
+		Criteria criteria = Criteria.where(SubNode.PATH).regex(mongoUtil.regexRecursiveChildrenOfPath(pathToSearch)); //
 
 		// DO NOT DELETE (keep as an example of how to do this)
 		// if (no(req.getNodeId() )) {
@@ -196,11 +196,11 @@ public class UserFeedService extends ServiceBase {
 		// }
 
 		// limit to just markdown types (no type)
-		criteria = criteria.and(SubNode.FIELD_TYPE).is(NodeType.NONE.s());
+		criteria = criteria.and(SubNode.TYPE).is(NodeType.NONE.s());
 
 		// add the criteria for sensitive flag
 		if (!req.getNsfw()) {
-			criteria = criteria.and(SubNode.FIELD_PROPERTIES + "." + NodeProp.ACT_PUB_SENSITIVE + ".value").is(null);
+			criteria = criteria.and(SubNode.PROPERTIES + "." + NodeProp.ACT_PUB_SENSITIVE + ".value").is(null);
 		}
 
 		HashSet<ObjectId> blockedUserIds = new HashSet<>();
@@ -208,7 +208,7 @@ public class UserFeedService extends ServiceBase {
 		// Add criteria for blocking users using the 'not in' list (nin)
 		getBlockedUserIds(blockedUserIds);
 		if (blockedUserIds.size() > 0) {
-			criteria = criteria.and(SubNode.FIELD_OWNER).nin(blockedUserIds);
+			criteria = criteria.and(SubNode.OWNER).nin(blockedUserIds);
 		}
 
 		/*
@@ -228,9 +228,9 @@ public class UserFeedService extends ServiceBase {
 			if (ok(myAcntNode)) {
 				orCriteria.add(
 						// where node is owned by us.
-						Criteria.where(SubNode.FIELD_OWNER).is(myAcntNode.getOwner()) //
+						Criteria.where(SubNode.OWNER).is(myAcntNode.getOwner()) //
 								// and the node has any sharing on it.
-								.and(SubNode.FIELD_AC).ne(null));
+								.and(SubNode.AC).ne(null));
 			}
 		}
 
@@ -250,7 +250,7 @@ public class UserFeedService extends ServiceBase {
 				}
 
 				if (friendIds.size() > 0) {
-					orCriteria.add(Criteria.where(SubNode.FIELD_OWNER).in(friendIds));
+					orCriteria.add(Criteria.where(SubNode.OWNER).in(friendIds));
 				}
 			}
 		}
@@ -262,7 +262,7 @@ public class UserFeedService extends ServiceBase {
 		// use attributedTo proptery to determine whether a node is 'local' (posted by this server) or not.
 		if (req.getLocalOnly()) {
 			// todo-1: should be checking apid property instead?
-			criteria = criteria.and(SubNode.FIELD_PROPERTIES + "." + NodeProp.ACT_PUB_OBJ_ATTRIBUTED_TO.s() + ".value").is(null);
+			criteria = criteria.and(SubNode.PROPERTIES + "." + NodeProp.ACT_PUB_OBJ_ATTRIBUTED_TO.s() + ".value").is(null);
 		}
 
 		if (!StringUtils.isEmpty(req.getSearchText())) {
@@ -276,9 +276,9 @@ public class UserFeedService extends ServiceBase {
 
 		// if we have a node id this is like a chat room type, and so we sort by create time.
 		if (ok(req.getNodeId())) {
-			query.with(Sort.by(Sort.Direction.DESC, SubNode.FIELD_CREATE_TIME));
+			query.with(Sort.by(Sort.Direction.DESC, SubNode.CREATE_TIME));
 		} else {
-			query.with(Sort.by(Sort.Direction.DESC, SubNode.FIELD_MODIFY_TIME));
+			query.with(Sort.by(Sort.Direction.DESC, SubNode.MODIFY_TIME));
 		}
 		query.limit(MAX_FEED_ITEMS);
 

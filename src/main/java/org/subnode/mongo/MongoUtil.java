@@ -177,7 +177,7 @@ public class MongoUtil extends ServiceBase {
 			}
 
 			Query query = new Query();
-			query.addCriteria(Criteria.where(SubNode.FIELD_PATH).is(path));
+			query.addCriteria(Criteria.where(SubNode.PATH).is(path));
 
 			if (!ops.exists(query, SubNode.class)) {
 				return path;
@@ -440,7 +440,7 @@ public class MongoUtil extends ServiceBase {
 
 		ops.indexOps(FediverseName.class).ensureIndex(new Index().on(FediverseName.FIELD_NAME, Direction.ASC).unique());
 
-		createUniqueIndex(ms, SubNode.class, SubNode.FIELD_PATH);
+		createUniqueIndex(ms, SubNode.class, SubNode.PATH);
 
 		// Other indexes that *could* be added but we don't, just as a performance enhancer is
 		// Unique node names: Key = node.owner+node.name (or just node.name for admin)
@@ -449,7 +449,7 @@ public class MongoUtil extends ServiceBase {
 
 		// dropIndex(session, SubNode.class, "unique-apid");
 		createPartialUniqueIndex(ms, "unique-apid", SubNode.class,
-				SubNode.FIELD_PROPERTIES + "." + NodeProp.ACT_PUB_ID.s() + ".value");
+				SubNode.PROPERTIES + "." + NodeProp.ACT_PUB_ID.s() + ".value");
 
 		createUniqueFriendsIndex(ms);
 		createUniqueNodeNameIndex(ms);
@@ -458,13 +458,13 @@ public class MongoUtil extends ServiceBase {
 		 * NOTE: Every non-admin owned noded must have only names that are prefixed with "UserName--" of the
 		 * user. That is, prefixed by their username followed by two dashes
 		 */
-		createIndex(ms, SubNode.class, SubNode.FIELD_NAME);
-		createIndex(ms, SubNode.class, SubNode.FIELD_TYPE);
+		createIndex(ms, SubNode.class, SubNode.NAME);
+		createIndex(ms, SubNode.class, SubNode.TYPE);
 
-		createIndex(ms, SubNode.class, SubNode.FIELD_OWNER);
-		createIndex(ms, SubNode.class, SubNode.FIELD_ORDINAL);
-		createIndex(ms, SubNode.class, SubNode.FIELD_MODIFY_TIME, Direction.DESC);
-		createIndex(ms, SubNode.class, SubNode.FIELD_CREATE_TIME, Direction.DESC);
+		createIndex(ms, SubNode.class, SubNode.OWNER);
+		createIndex(ms, SubNode.class, SubNode.ORDINAL);
+		createIndex(ms, SubNode.class, SubNode.MODIFY_TIME, Direction.DESC);
+		createIndex(ms, SubNode.class, SubNode.CREATE_TIME, Direction.DESC);
 		createTextIndexes(ms, SubNode.class);
 
 		logIndexes(ms, SubNode.class);
@@ -483,11 +483,11 @@ public class MongoUtil extends ServiceBase {
 
 		try {
 			ops.indexOps(SubNode.class).ensureIndex(//
-					new Index().on(SubNode.FIELD_OWNER, Direction.ASC) //
-							.on(SubNode.FIELD_PROPERTIES + "." + NodeProp.USER_NODE_ID.s() + ".value", Direction.ASC) //
+					new Index().on(SubNode.OWNER, Direction.ASC) //
+							.on(SubNode.PROPERTIES + "." + NodeProp.USER_NODE_ID.s() + ".value", Direction.ASC) //
 							.unique() //
 							.named(indexName) //
-							.partial(PartialIndexFilter.of(Criteria.where(SubNode.FIELD_TYPE).is(NodeType.FRIEND.s()))));
+							.partial(PartialIndexFilter.of(Criteria.where(SubNode.TYPE).is(NodeType.FRIEND.s()))));
 		} catch (Exception e) {
 			ExUtil.error(log, "Failed to create partial unique index: " + indexName, e);
 		}
@@ -501,11 +501,11 @@ public class MongoUtil extends ServiceBase {
 
 		try {
 			ops.indexOps(SubNode.class).ensureIndex(//
-					new Index().on(SubNode.FIELD_OWNER, Direction.ASC) //
-							.on(SubNode.FIELD_NAME, Direction.ASC) //
+					new Index().on(SubNode.OWNER, Direction.ASC) //
+							.on(SubNode.NAME, Direction.ASC) //
 							.unique() //
 							.named(indexName) //
-							.partial(PartialIndexFilter.of(Criteria.where(SubNode.FIELD_NAME).gt(""))));
+							.partial(PartialIndexFilter.of(Criteria.where(SubNode.NAME).gt(""))));
 		} catch (Exception e) {
 			ExUtil.error(log, "Failed to create partial unique index: " + indexName, e);
 		}

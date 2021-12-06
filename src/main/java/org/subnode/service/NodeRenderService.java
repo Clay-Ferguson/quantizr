@@ -270,7 +270,7 @@ public class NodeRenderService extends ServiceBase {
 
 		if (no(sort)) {
 			// log.debug("processRenderNode querying by ordinal.");
-			sort = Sort.by(Sort.Direction.ASC, SubNode.FIELD_ORDINAL);
+			sort = Sort.by(Sort.Direction.ASC, SubNode.ORDINAL);
 		}
 
 		Iterable<SubNode> nodeIter = read.getChildren(ms, node, sort, queryLimit, offset);
@@ -435,7 +435,7 @@ public class NodeRenderService extends ServiceBase {
 			String orderByProp = orderBy.substring(0, spaceIdx);
 			dir = orderBy.substring(spaceIdx + 1);
 			sort = Sort.by(dir.equals("asc") ? Sort.Direction.ASC : Sort.Direction.DESC,
-					SubNode.FIELD_PROPERTIES + "." + orderByProp);
+					SubNode.PROPERTIES + "." + orderByProp);
 
 			// when sorting by priority always do second leve REV-CHRON sort, so newest un-prioritized nodes
 			// appear at top
@@ -443,7 +443,7 @@ public class NodeRenderService extends ServiceBase {
 			// list
 			// which is not a difficult change
 			if (orderByProp.equals(NodeProp.PRIORITY.s())) {
-				sort = sort.and(Sort.by(Sort.Direction.DESC, SubNode.FIELD_MODIFY_TIME));
+				sort = sort.and(Sort.by(Sort.Direction.DESC, SubNode.MODIFY_TIME));
 			}
 		}
 		return sort;

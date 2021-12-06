@@ -70,7 +70,7 @@ public class ExportJsonService extends ServiceBase {
 			byte[] newLine = "\n,\n".getBytes(StandardCharsets.UTF_8);
 
 			Query query = new Query();
-			Criteria criteria = Criteria.where(SubNode.FIELD_PATH).regex(mongoUtil.regexRecursiveChildrenOfPath(pathPrefix));
+			Criteria criteria = Criteria.where(SubNode.PATH).regex(mongoUtil.regexRecursiveChildrenOfPath(pathPrefix));
 			query.addCriteria(criteria);
 
 			Iterable<SubNode> iter = mongoUtil.find(query);

@@ -135,7 +135,7 @@ public class MongoCreate extends ServiceBase {
 		 * ordinal to 0L. What we really need is a global fix to all existing databases and then we can
 		 * remove this check (todo-1)
 		 */
-		Criteria criteria = Criteria.where(SubNode.FIELD_ORDINAL).is(null);
+		Criteria criteria = Criteria.where(SubNode.ORDINAL).is(null);
 		for (SubNode child : read.getChildrenUnderPath(ms, node.getPath(), null, null, 0, null, criteria)) {
 			child.setOrdinal(0L);
 		}
@@ -143,8 +143,8 @@ public class MongoCreate extends ServiceBase {
 		// save all if there's any to save.
 		update.saveSession(ms);
 
-		criteria = Criteria.where(SubNode.FIELD_ORDINAL).gte(ordinal);
-		for (SubNode child : read.getChildrenUnderPath(ms, node.getPath(), Sort.by(Sort.Direction.ASC, SubNode.FIELD_ORDINAL),
+		criteria = Criteria.where(SubNode.ORDINAL).gte(ordinal);
+		for (SubNode child : read.getChildrenUnderPath(ms, node.getPath(), Sort.by(Sort.Direction.ASC, SubNode.ORDINAL),
 				null, 0, null, criteria)) {
 			child.setOrdinal(maxOrdinal++);
 		}

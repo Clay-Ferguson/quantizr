@@ -35,7 +35,7 @@ public class MongoDelete extends ServiceBase {
 	 */
 	public void removeAbandonedNodes(MongoSession ms) {
 		Query query = new Query();
-		query.addCriteria(Criteria.where(SubNode.FIELD_MODIFY_TIME).is(null));
+		query.addCriteria(Criteria.where(SubNode.MODIFY_TIME).is(null));
 
 		DeleteResult res = ops.remove(query, SubNode.class);
 		log.debug("Num abandoned nodes deleted: " + res.getDeletedCount());
@@ -52,9 +52,9 @@ public class MongoDelete extends ServiceBase {
 		LocalDate ldt = LocalDate.now().minusDays(30);
 		Date date = Date.from(ldt.atStartOfDay(ZoneId.systemDefault()).toInstant());
 
-		Criteria criteria = Criteria.where(SubNode.FIELD_PATH).regex(mongoUtil.regexRecursiveChildrenOfPath(parent.getPath())) //
-				.and(SubNode.FIELD_PROPERTIES + "." + NodeProp.ACT_PUB_ID + ".value").ne(null) //
-				.and(SubNode.FIELD_MODIFY_TIME).lt(date);
+		Criteria criteria = Criteria.where(SubNode.PATH).regex(mongoUtil.regexRecursiveChildrenOfPath(parent.getPath())) //
+				.and(SubNode.PROPERTIES + "." + NodeProp.ACT_PUB_ID + ".value").ne(null) //
+				.and(SubNode.MODIFY_TIME).lt(date);
 
 		query.addCriteria(criteria);
 		DeleteResult res = ops.remove(query, SubNode.class);
@@ -68,8 +68,8 @@ public class MongoDelete extends ServiceBase {
 		LocalDate ldt = LocalDate.now().minusDays(5);
 		Date date = Date.from(ldt.atStartOfDay(ZoneId.systemDefault()).toInstant());
 
-		Criteria criteria = Criteria.where(SubNode.FIELD_PATH).regex(mongoUtil.regexRecursiveChildrenOfPath(userNode.getPath())) //
-				.and(SubNode.FIELD_MODIFY_TIME).lt(date); //
+		Criteria criteria = Criteria.where(SubNode.PATH).regex(mongoUtil.regexRecursiveChildrenOfPath(userNode.getPath())) //
+				.and(SubNode.MODIFY_TIME).lt(date); //
 
 		/*
 		 * once we've had the TEMP prop in place for 7 days, we can then process this code from the root
@@ -93,7 +93,7 @@ public class MongoDelete extends ServiceBase {
 		// log.debug("Deleting under path: " + path);
 		update.saveSession(ms);
 		Query query = new Query();
-		query.addCriteria(Criteria.where(SubNode.FIELD_PATH).regex(mongoUtil.regexRecursiveChildrenOfPath(path)));
+		query.addCriteria(Criteria.where(SubNode.PATH).regex(mongoUtil.regexRecursiveChildrenOfPath(path)));
 
 		DeleteResult res = ops.remove(query, SubNode.class);
 		// log.debug("Num of SubGraph deleted: " + res.getDeletedCount());
@@ -133,7 +133,7 @@ public class MongoDelete extends ServiceBase {
 		 * single operation! Nice!
 		 */
 		Query query = new Query();
-		query.addCriteria(Criteria.where(SubNode.FIELD_PATH).regex(mongoUtil.regexRecursiveChildrenOfPath(node.getPath())));
+		query.addCriteria(Criteria.where(SubNode.PATH).regex(mongoUtil.regexRecursiveChildrenOfPath(node.getPath())));
 
 		DeleteResult res = ops.remove(query, SubNode.class);
 		log.debug("Num of SubGraph deleted: " + res.getDeletedCount());
@@ -163,7 +163,7 @@ public class MongoDelete extends ServiceBase {
 	public void deleteBySubNodePropVal(String prop, String val) {
 		// log.debug("Deleting by prop=" + prop + " val=" + val);
 		Query query = new Query();
-		Criteria criteria = Criteria.where(SubNode.FIELD_PROPERTIES + "." + prop + ".value").is(val);
+		Criteria criteria = Criteria.where(SubNode.PROPERTIES + "." + prop + ".value").is(val);
 		query.addCriteria(criteria);
 		DeleteResult res = ops.remove(query, SubNode.class);
 		// log.debug("Nodes deleted: " + res.getDeletedCount());

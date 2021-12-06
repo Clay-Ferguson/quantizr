@@ -15,43 +15,43 @@ import org.slf4j.LoggerFactory;
  * to get involved (no PersistenceConstructor issues)
  */
 @JsonInclude(Include.NON_NULL)
-@JsonPropertyOrder({SubNode.FIELD_PATH, SubNode.FIELD_CONTENT, SubNode.FIELD_NAME, SubNode.FIELD_ID,
-		SubNode.FIELD_ORDINAL, SubNode.FIELD_OWNER, SubNode.FIELD_CREATE_TIME,
-		SubNode.FIELD_MODIFY_TIME, SubNode.FIELD_AC, SubNode.FIELD_PROPERTIES})
+@JsonPropertyOrder({SubNode.PATH, SubNode.CONTENT, SubNode.NAME, SubNode.ID,
+		SubNode.ORDINAL, SubNode.OWNER, SubNode.CREATE_TIME,
+		SubNode.MODIFY_TIME, SubNode.AC, SubNode.PROPERTIES})
 public class SubNodePojo {
 	private static final Logger log = LoggerFactory.getLogger(SubNodePojo.class);
 
-	@JsonProperty(SubNode.FIELD_ID)
+	@JsonProperty(SubNode.ID)
 	private ObjectId id;
 
-	@JsonProperty(SubNode.FIELD_ORDINAL)
+	@JsonProperty(SubNode.ORDINAL)
 	private Long ordinal;
 
-	@JsonProperty(SubNode.FIELD_PATH)
+	@JsonProperty(SubNode.PATH)
 	private String path;
 
-	@JsonProperty(SubNode.FIELD_TYPE)
+	@JsonProperty(SubNode.TYPE)
 	private String type;
 
-	@JsonProperty(SubNode.FIELD_CONTENT)
+	@JsonProperty(SubNode.CONTENT)
 	private String content;
 
-	@JsonProperty(SubNode.FIELD_NAME)
+	@JsonProperty(SubNode.NAME)
 	private String name;
 
-	@JsonProperty(SubNode.FIELD_OWNER)
+	@JsonProperty(SubNode.OWNER)
 	private ObjectId owner;
 
-	@JsonProperty(SubNode.FIELD_CREATE_TIME)
+	@JsonProperty(SubNode.CREATE_TIME)
 	private Date createTime;
 
-	@JsonProperty(SubNode.FIELD_MODIFY_TIME)
+	@JsonProperty(SubNode.MODIFY_TIME)
 	private Date modifyTime;
 
-	@JsonProperty(SubNode.FIELD_PROPERTIES)
+	@JsonProperty(SubNode.PROPERTIES)
 	private SubNodePropertyMap properties;
 
-	@JsonProperty(SubNode.FIELD_AC)
+	@JsonProperty(SubNode.AC)
 	private HashMap<String, AccessControl> ac;
 
 	public SubNodePojo() {

@@ -545,12 +545,12 @@ public class MongoAuth extends ServiceBase {
 		}
 
 		Query query = new Query();
-		Criteria criteria = Criteria.where(SubNode.FIELD_PATH).regex(mongoUtil.regexRecursiveChildrenOfPath(pathToSearch));
+		Criteria criteria = Criteria.where(SubNode.PATH).regex(mongoUtil.regexRecursiveChildrenOfPath(pathToSearch));
 
 		if (ok(sharedToAny) && sharedToAny.size() > 0) {
 			List<Criteria> orCriteria = new LinkedList<>();
 			for (String share : sharedToAny) {
-				orCriteria.add(Criteria.where(SubNode.FIELD_AC + "." + share).ne(null));
+				orCriteria.add(Criteria.where(SubNode.AC + "." + share).ne(null));
 			}
 
 			criteria = criteria
@@ -558,7 +558,7 @@ public class MongoAuth extends ServiceBase {
 		}
 
 		if (ok(ownerIdMatch)) {
-			criteria = criteria.and(SubNode.FIELD_OWNER).is(ownerIdMatch);
+			criteria = criteria.and(SubNode.OWNER).is(ownerIdMatch);
 		}
 
 		query.addCriteria(criteria);
@@ -606,11 +606,11 @@ public class MongoAuth extends ServiceBase {
 		 * string. Without the trailing (.+)$ we would be including the node itself in addition to all its
 		 * children.
 		 */
-		Criteria criteria = Criteria.where(SubNode.FIELD_PATH).regex(mongoUtil.regexRecursiveChildrenOfPath(pathToSearch)) //
-				.and(SubNode.FIELD_AC).ne(null);
+		Criteria criteria = Criteria.where(SubNode.PATH).regex(mongoUtil.regexRecursiveChildrenOfPath(pathToSearch)) //
+				.and(SubNode.AC).ne(null);
 
 		if (ok(ownerIdMatch)) {
-			criteria = criteria.and(SubNode.FIELD_OWNER).is(ownerIdMatch);
+			criteria = criteria.and(SubNode.OWNER).is(ownerIdMatch);
 		}
 
 		query.addCriteria(criteria);

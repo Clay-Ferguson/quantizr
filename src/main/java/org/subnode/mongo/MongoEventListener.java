@@ -70,13 +70,13 @@ public class MongoEventListener extends AbstractMongoEventListener<SubNode> {
 			isNew = true;
 			// log.debug("New Node ID generated: " + id);
 		}
-		dbObj.put(SubNode.FIELD_ID, id);
+		dbObj.put(SubNode.ID, id);
 
 		// Force ordinal to have an integer value (non-null). How to do
 		// "constraints" in MongoDB (todo-1)
 		if (no(node.getOrdinal())) {
 			node.setOrdinal(0L);
-			dbObj.put(SubNode.FIELD_ORDINAL, 0L);
+			dbObj.put(SubNode.ORDINAL, 0L);
 		}
 
 		// log.debug("onBeforeSave: ID: " + node.getIdStr());
@@ -98,12 +98,12 @@ public class MongoEventListener extends AbstractMongoEventListener<SubNode> {
 			 * and is not yet processing user requests
 			 */
 			if (node.getPath().equals("/" + NodeName.ROOT) && !MongoRepository.fullInit) {
-				dbObj.put(SubNode.FIELD_OWNER, id);
+				dbObj.put(SubNode.OWNER, id);
 				node.setOwner(id);
 			} else {
 				if (ok(auth.getAdminSession())) {
 					ObjectId ownerId = auth.getAdminSession().getUserNodeId();
-					dbObj.put(SubNode.FIELD_OWNER, ownerId);
+					dbObj.put(SubNode.OWNER, ownerId);
 					node.setOwner(ownerId);
 					log.debug("Assigning admin as owner of node that had no owner (on save): " + id);
 				}
@@ -121,7 +121,7 @@ public class MongoEventListener extends AbstractMongoEventListener<SubNode> {
 			if (no(now)) {
 				now = Calendar.getInstance().getTime();
 			}
-			dbObj.put(SubNode.FIELD_CREATE_TIME, now);
+			dbObj.put(SubNode.CREATE_TIME, now);
 			node.setCreateTime(now);
 		}
 
@@ -129,7 +129,7 @@ public class MongoEventListener extends AbstractMongoEventListener<SubNode> {
 			if (no(now)) {
 				now = Calendar.getInstance().getTime();
 			}
-			dbObj.put(SubNode.FIELD_MODIFY_TIME, now);
+			dbObj.put(SubNode.MODIFY_TIME, now);
 			node.setModifyTime(now);
 		}
 
@@ -139,7 +139,7 @@ public class MongoEventListener extends AbstractMongoEventListener<SubNode> {
 		 */
 		if (node.getPath().endsWith("/?")) {
 			String path = mongoUtil.findAvailablePath(XString.removeLastChar(node.getPath()));
-			dbObj.put(SubNode.FIELD_PATH, path);
+			dbObj.put(SubNode.PATH, path);
 			node.setPath(path);
 		}
 
@@ -155,7 +155,7 @@ public class MongoEventListener extends AbstractMongoEventListener<SubNode> {
 			// Warning: this is not a redundant null check. Some code in this block CAN set
 			// to null.
 			if (ok(nodeName)) {
-				dbObj.put(SubNode.FIELD_NAME, nodeName);
+				dbObj.put(SubNode.NAME, nodeName);
 				node.setName(nodeName);
 			}
 		}
@@ -172,13 +172,13 @@ public class MongoEventListener extends AbstractMongoEventListener<SubNode> {
 			 */
 			if (node.getAc().size() == 0) {
 				node.setAc(null);
-				dbObj.put(SubNode.FIELD_AC, null);
+				dbObj.put(SubNode.AC, null);
 			}
 			// Remove any share to self because that never makes sense
 			else {
 				if (ok(node.getOwner())) {
 					if (ok(node.getAc().remove(node.getOwner().toHexString()))) {
-						dbObj.put(SubNode.FIELD_AC, node.getAc());
+						dbObj.put(SubNode.AC, node.getAc());
 					}
 				}
 			}

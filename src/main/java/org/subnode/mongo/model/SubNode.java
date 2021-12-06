@@ -35,50 +35,50 @@ import static org.subnode.util.Util.*;
 @Document(collection = "nodes")
 @TypeAlias("n1")
 @JsonInclude(Include.NON_NULL)
-@JsonPropertyOrder({SubNode.FIELD_PATH, SubNode.FIELD_CONTENT, SubNode.FIELD_NAME, SubNode.FIELD_ID, SubNode.FIELD_ORDINAL,
-		SubNode.FIELD_OWNER, SubNode.FIELD_CREATE_TIME, SubNode.FIELD_MODIFY_TIME, SubNode.FIELD_AC, SubNode.FIELD_PROPERTIES})
+@JsonPropertyOrder({SubNode.PATH, SubNode.CONTENT, SubNode.NAME, SubNode.ID, SubNode.ORDINAL,
+		SubNode.OWNER, SubNode.CREATE_TIME, SubNode.MODIFY_TIME, SubNode.AC, SubNode.PROPERTIES})
 public class SubNode {
 	private static final Logger log = LoggerFactory.getLogger(SubNode.class);
-	public static final String FIELD_ID = "_id";
 
+	public static final String ID = "_id";
 	@Id
-	@Field(FIELD_ID)
+	@Field(ID)
 	private ObjectId id;
 
-	public static final String FIELD_ORDINAL = "ord";
-	@Field(FIELD_ORDINAL)
+	public static final String ORDINAL = "ord";
+	@Field(ORDINAL)
 	private Long ordinal;
 
-	public static final String FIELD_PATH = "pth";
-	@Field(FIELD_PATH)
+	public static final String PATH = "pth";
+	@Field(PATH)
 	private String path;
 
-	public static final String FIELD_TYPE = "typ";
-	@Field(FIELD_TYPE)
+	public static final String TYPE = "typ";
+	@Field(TYPE)
 	private String type;
 
-	public static final String FIELD_CONTENT = "cont";
-	@Field(FIELD_CONTENT)
+	public static final String CONTENT = "cont";
+	@Field(CONTENT)
 	private String content;
 
-	public static final String FIELD_NAME = "name";
-	@Field(FIELD_NAME)
+	public static final String NAME = "name";
+	@Field(NAME)
 	private String name;
 
-	public static final String FIELD_OWNER = "own";
-	@Field(FIELD_OWNER)
+	public static final String OWNER = "own";
+	@Field(OWNER)
 	private ObjectId owner;
 
-	public static final String FIELD_CREATE_TIME = "ctm";
-	@Field(FIELD_CREATE_TIME)
+	public static final String CREATE_TIME = "ctm";
+	@Field(CREATE_TIME)
 	private Date createTime;
 
-	public static final String FIELD_MODIFY_TIME = "mtm";
-	@Field(FIELD_MODIFY_TIME)
+	public static final String MODIFY_TIME = "mtm";
+	@Field(MODIFY_TIME)
 	private Date modifyTime;
 
-	public static final String FIELD_PROPERTIES = "prp";
-	@Field(FIELD_PROPERTIES)
+	public static final String PROPERTIES = "prp";
+	@Field(PROPERTIES)
 	private SubNodePropertyMap properties;
 
 	@Transient
@@ -92,8 +92,8 @@ public class SubNode {
 	 * However in addition to userNodeIds identifying users the additional key of "public" is allowed as
 	 * a key which indicates privileges granted to everyone (the entire public)
 	 */
-	public static final String FIELD_AC = "ac";
-	@Field(FIELD_AC)
+	public static final String AC = "ac";
+	@Field(AC)
 	private HashMap<String, AccessControl> ac;
 
 	@Transient
@@ -101,17 +101,17 @@ public class SubNode {
 	private Object acLock = new Object();
 
 	public static final String[] ALL_FIELDS = { //
-			SubNode.FIELD_PATH, //
-			SubNode.FIELD_TYPE, //
-			SubNode.FIELD_CONTENT, //
-			SubNode.FIELD_NAME, //
-			SubNode.FIELD_ID, //
-			SubNode.FIELD_ORDINAL, //
-			SubNode.FIELD_OWNER, //
-			SubNode.FIELD_CREATE_TIME, //
-			SubNode.FIELD_MODIFY_TIME, //
-			SubNode.FIELD_AC, //
-			SubNode.FIELD_PROPERTIES};
+			SubNode.PATH, //
+			SubNode.TYPE, //
+			SubNode.CONTENT, //
+			SubNode.NAME, //
+			SubNode.ID, //
+			SubNode.ORDINAL, //
+			SubNode.OWNER, //
+			SubNode.CREATE_TIME, //
+			SubNode.MODIFY_TIME, //
+			SubNode.AC, //
+			SubNode.PROPERTIES};
 
 	private boolean disableParentCheck;
 
@@ -153,7 +153,7 @@ public class SubNode {
 	}
 
 	/* Auth: Anyone can write the id as there's no pre-existing id */
-	@JsonProperty(FIELD_ID)
+	@JsonProperty(ID)
 	public void setId(ObjectId id) {
 		// IDs are allowed to be set to null and ImportArchiveBase does this to force nodes to get saved
 		// as a new document when they're being imported.
@@ -163,12 +163,12 @@ public class SubNode {
 		this.id = id;
 	}
 
-	@JsonGetter(FIELD_ID)
+	@JsonGetter(ID)
 	public String jsonId() {
 		return ok(id) ? id.toHexString() : null;
 	}
 
-	@JsonProperty(FIELD_PATH)
+	@JsonProperty(PATH)
 	public String getPath() {
 		return path;
 	}
@@ -193,7 +193,7 @@ public class SubNode {
 	 * Auth: As long as the current user owns this node they can set it's path to any path, but only
 	 * when the save is done is the final validation done
 	 */
-	@JsonProperty(FIELD_PATH)
+	@JsonProperty(PATH)
 	public void setPath(String path) {
 		if (Util.equalObjs(path, this.path))
 			return;
@@ -206,12 +206,12 @@ public class SubNode {
 		// is done and MongoEventListener, so this node is currently "untrusted" with it's new path.
 	}
 
-	@JsonProperty(FIELD_ORDINAL)
+	@JsonProperty(ORDINAL)
 	public Long getOrdinal() {
 		return ordinal;
 	}
 
-	@JsonProperty(FIELD_ORDINAL)
+	@JsonProperty(ORDINAL)
 	public void setOrdinal(Long ordinal) {
 		if (Util.equalObjs(ordinal, this.ordinal))
 			return;
@@ -226,7 +226,7 @@ public class SubNode {
 		return owner;
 	}
 
-	@JsonProperty(FIELD_OWNER)
+	@JsonProperty(OWNER)
 	public void setOwner(ObjectId owner) {
 		if (Util.equalObjs(owner, this.owner))
 			return;
@@ -234,28 +234,28 @@ public class SubNode {
 		this.owner = owner;
 	}
 
-	@JsonGetter(FIELD_OWNER)
+	@JsonGetter(OWNER)
 	public String jsonOwner() {
 		return ok(owner) ? owner.toHexString() : null;
 	}
 
-	@JsonProperty(FIELD_CREATE_TIME)
+	@JsonProperty(CREATE_TIME)
 	public Date getCreateTime() {
 		return createTime;
 	}
 
-	@JsonProperty(FIELD_CREATE_TIME)
+	@JsonProperty(CREATE_TIME)
 	public void setCreateTime(Date createTime) {
 		ThreadLocals.dirty(this);
 		this.createTime = createTime;
 	}
 
-	@JsonProperty(FIELD_MODIFY_TIME)
+	@JsonProperty(MODIFY_TIME)
 	public Date getModifyTime() {
 		return modifyTime;
 	}
 
-	@JsonProperty(FIELD_MODIFY_TIME)
+	@JsonProperty(MODIFY_TIME)
 	public void setModifyTime(Date modifyTime) {
 		ThreadLocals.dirty(this);
 		this.modifyTime = modifyTime;
@@ -265,7 +265,7 @@ public class SubNode {
 		setModifyTime(Calendar.getInstance().getTime());
 	}
 
-	@JsonProperty(FIELD_AC)
+	@JsonProperty(AC)
 	public HashMap<String, AccessControl> getAc() {
 		synchronized (acLock) {
 			return ac;
@@ -283,7 +283,7 @@ public class SubNode {
 		}
 	}
 
-	@JsonProperty(FIELD_AC)
+	@JsonProperty(AC)
 	public void setAc(HashMap<String, AccessControl> ac) {
 		ThreadLocals.dirty(this);
 		synchronized (acLock) {
@@ -303,14 +303,14 @@ public class SubNode {
 		}
 	}
 
-	@JsonProperty(FIELD_PROPERTIES)
+	@JsonProperty(PROPERTIES)
 	public SubNodePropertyMap getProperties() {
 		synchronized (propLock) {
 			return properties;
 		}
 	}
 
-	@JsonProperty(FIELD_PROPERTIES)
+	@JsonProperty(PROPERTIES)
 	public void setProperties(SubNodePropertyMap properties) {
 		ThreadLocals.dirty(this);
 		synchronized (propLock) {
@@ -503,12 +503,12 @@ public class SubNode {
 		}
 	}
 
-	@JsonProperty(FIELD_TYPE)
+	@JsonProperty(TYPE)
 	public String getType() {
 		return type;
 	}
 
-	@JsonProperty(FIELD_TYPE)
+	@JsonProperty(TYPE)
 	public void setType(String type) {
 		if (Util.equalObjs(type, this.type))
 			return;
@@ -516,12 +516,12 @@ public class SubNode {
 		this.type = type;
 	}
 
-	@JsonProperty(FIELD_NAME)
+	@JsonProperty(NAME)
 	public String getName() {
 		return name;
 	}
 
-	@JsonProperty(FIELD_NAME)
+	@JsonProperty(NAME)
 	public void setName(String name) {
 		if (Util.equalObjs(name, this.name))
 			return;
@@ -529,12 +529,12 @@ public class SubNode {
 		this.name = name;
 	}
 
-	@JsonProperty(FIELD_CONTENT)
+	@JsonProperty(CONTENT)
 	public String getContent() {
 		return content;
 	}
 
-	@JsonProperty(FIELD_CONTENT)
+	@JsonProperty(CONTENT)
 	public void setContent(String content) {
 		if (Util.equalObjs(content, this.content))
 			return;

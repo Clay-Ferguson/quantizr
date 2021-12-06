@@ -159,11 +159,11 @@ public class NodeSearchService extends ServiceBase {
 		Criteria moreCriteria = null;
 		// searching only Foreign users
 		if (Constant.SEARCH_TYPE_USER_FOREIGN.s().equals(req.getSearchType())) {
-			moreCriteria = Criteria.where(SubNode.FIELD_PROPERTIES + "." + NodeProp.ACT_PUB_ACTOR_URL.s() + ".value").ne(null);
+			moreCriteria = Criteria.where(SubNode.PROPERTIES + "." + NodeProp.ACT_PUB_ACTOR_URL.s() + ".value").ne(null);
 		}
 		// searching only Local users
 		else if (Constant.SEARCH_TYPE_USER_LOCAL.s().equals(req.getSearchType())) {
-			moreCriteria = Criteria.where(SubNode.FIELD_PROPERTIES + "." + NodeProp.ACT_PUB_ACTOR_URL.s() + ".value").is(null);
+			moreCriteria = Criteria.where(SubNode.PROPERTIES + "." + NodeProp.ACT_PUB_ACTOR_URL.s() + ".value").is(null);
 		}
 
 		Iterable<SubNode> accountNodes = read.getChildrenUnderPath(ms, NodeName.ROOT_OF_ALL_USERS, null,
@@ -232,7 +232,7 @@ public class NodeSearchService extends ServiceBase {
 		 * here
 		 */
 		for (SubNode node : auth.searchSubGraphByAcl(ms, req.getPage() * ConstantInt.ROWS_PER_PAGE.val(), searchRoot.getPath(),
-				searchRoot.getOwner(), Sort.by(Sort.Direction.DESC, SubNode.FIELD_MODIFY_TIME),
+				searchRoot.getOwner(), Sort.by(Sort.Direction.DESC, SubNode.MODIFY_TIME),
 				ConstantInt.ROWS_PER_PAGE.val())) {
 
 			if (no(node.getAc()) || node.getAc().size() == 0)
@@ -342,26 +342,26 @@ public class NodeSearchService extends ServiceBase {
 			List<Criteria> ands = new LinkedList<>();
 			Query query = new Query();
 			Criteria criteria =
-					Criteria.where(SubNode.FIELD_PATH).regex(mongoUtil.regexRecursiveChildrenOfPath(NodeName.ROOT_OF_ALL_USERS));
+					Criteria.where(SubNode.PATH).regex(mongoUtil.regexRecursiveChildrenOfPath(NodeName.ROOT_OF_ALL_USERS));
 
 			// This pattern is what is required when you have multiple conditions added to a
 			// single field.
-			ands.add(Criteria.where(SubNode.FIELD_TYPE).ne(NodeType.FRIEND.s())); //
-			ands.add(Criteria.where(SubNode.FIELD_TYPE).ne(NodeType.POSTS.s())); //
-			ands.add(Criteria.where(SubNode.FIELD_TYPE).ne(NodeType.ACT_PUB_POSTS.s()));
+			ands.add(Criteria.where(SubNode.TYPE).ne(NodeType.FRIEND.s())); //
+			ands.add(Criteria.where(SubNode.TYPE).ne(NodeType.POSTS.s())); //
+			ands.add(Criteria.where(SubNode.TYPE).ne(NodeType.ACT_PUB_POSTS.s()));
 
 			List<Criteria> orCriteria = new LinkedList<>();
 
 			// or a node that is shared to any of the sharedToAny users
 			for (String share : sharedToAny) {
-				orCriteria.add(Criteria.where(SubNode.FIELD_AC + "." + share).ne(null));
+				orCriteria.add(Criteria.where(SubNode.AC + "." + share).ne(null));
 			}
 
 			ands.add(new Criteria().orOperator((Criteria[]) orCriteria.toArray(new Criteria[orCriteria.size()])));
 			criteria.andOperator(ands);
 
 			query.addCriteria(criteria);
-			query.with(Sort.by(Sort.Direction.DESC, SubNode.FIELD_MODIFY_TIME));
+			query.with(Sort.by(Sort.Direction.DESC, SubNode.MODIFY_TIME));
 			query.limit(TRENDING_LIMIT);
 
 			iter = mongoUtil.find(query);
@@ -377,7 +377,7 @@ public class NodeSearchService extends ServiceBase {
 			Sort sort = null;
 			int limit = 0;
 			if (req.isTrending()) {
-				sort = Sort.by(Sort.Direction.DESC, SubNode.FIELD_MODIFY_TIME);
+				sort = Sort.by(Sort.Direction.DESC, SubNode.MODIFY_TIME);
 				limit = TRENDING_LIMIT;
 			}
 

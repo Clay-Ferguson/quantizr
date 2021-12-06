@@ -386,9 +386,9 @@ public class ActPubFollowing extends ServiceBase {
             return null;
 
         // query all the friends under
-        Criteria criteria = Criteria.where(SubNode.FIELD_PATH) //
+        Criteria criteria = Criteria.where(SubNode.PATH) //
                 .regex(mongoUtil.regexRecursiveChildrenOfPath(friendsListNode.getPath())) //
-                .and(SubNode.FIELD_TYPE).is(NodeType.FRIEND.s());
+                .and(SubNode.TYPE).is(NodeType.FRIEND.s());
 
         query.addCriteria(criteria);
         return query;

@@ -20,7 +20,7 @@ import static org.subnode.util.Util.*;
 @Document(collection = "fediNames")
 @TypeAlias("fn")
 @JsonInclude(Include.NON_NULL)
-@JsonPropertyOrder({SubNode.FIELD_ID, SubNode.FIELD_NAME, SubNode.FIELD_CREATE_TIME})
+@JsonPropertyOrder({SubNode.ID, SubNode.NAME, SubNode.CREATE_TIME})
 public class FediverseName {
 	private static final Logger log = LoggerFactory.getLogger(FediverseName.class);
 	

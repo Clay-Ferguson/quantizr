@@ -108,7 +108,7 @@ public class ExportTextService extends ServiceBase {
 		/* process the current node */
 		processNode(node);
 
-		Sort sort = Sort.by(Sort.Direction.ASC, SubNode.FIELD_ORDINAL);
+		Sort sort = Sort.by(Sort.Direction.ASC, SubNode.ORDINAL);
 
 		for (SubNode n : read.getChildren(session, node, sort, null, 0)) {
 			recurseNode(n, level + 1);

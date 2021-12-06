@@ -215,9 +215,9 @@ public class ActPubFollower extends ServiceBase {
     public Query getFriendsByUserName_query(MongoSession ms, String userName) {
         Query query = new Query();
         Criteria criteria =
-                Criteria.where(SubNode.FIELD_PATH).regex(mongoUtil.regexRecursiveChildrenOfPath(NodeName.ROOT_OF_ALL_USERS)) //
-                        .and(SubNode.FIELD_PROPERTIES + "." + NodeProp.USER.s() + ".value").is(userName) //
-                        .and(SubNode.FIELD_TYPE).is(NodeType.FRIEND.s());
+                Criteria.where(SubNode.PATH).regex(mongoUtil.regexRecursiveChildrenOfPath(NodeName.ROOT_OF_ALL_USERS)) //
+                        .and(SubNode.PROPERTIES + "." + NodeProp.USER.s() + ".value").is(userName) //
+                        .and(SubNode.TYPE).is(NodeType.FRIEND.s());
 
         query.addCriteria(criteria);
         return query;

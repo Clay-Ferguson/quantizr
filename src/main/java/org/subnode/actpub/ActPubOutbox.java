@@ -229,7 +229,7 @@ public class ActPubOutbox extends ServiceBase {
                 sharedToList.add(sharedTo);
 
                 for (SubNode child : auth.searchSubGraphByAclUser(as, null, sharedToList,
-                        Sort.by(Sort.Direction.DESC, SubNode.FIELD_MODIFY_TIME), MAX_PER_PAGE, userNode.getOwner())) {
+                        Sort.by(Sort.Direction.DESC, SubNode.MODIFY_TIME), MAX_PER_PAGE, userNode.getOwner())) {
 
                     String replyTo = null;
                     SubNode parent = read.getParent(as, child, false);
