@@ -17,18 +17,18 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (s: Singletons) => {
     S = s;
 });
 
-interface LocalState {
+interface LS {
     user: string;
 }
 
-export class ResetPasswordDlg extends DialogBase<LocalState> {
+export class ResetPasswordDlg extends DialogBase {
 
     userState: ValidatedState<any> = new ValidatedState<any>();
     emailState: ValidatedState<any> = new ValidatedState<any>();
 
     constructor(user: string, state: AppState) {
         super("Reset Password", "app-modal-content-narrow-width", false, state);
-        this.mergeState({ user });
+        this.mergeState<LS>({ user });
     }
 
     renderDlg(): CompIntf[] {

@@ -17,13 +17,13 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
     S = ctx;
 });
 
-interface LocalState {
+interface LS {
     selectedName?: string;
     loading?: boolean;
     friends?: J.FriendInfo[];
 }
 
-export class FriendsDlg extends DialogBase<LocalState> {
+export class FriendsDlg extends DialogBase {
 
     selectionValueIntf: ValueIntf;
 
@@ -32,7 +32,7 @@ export class FriendsDlg extends DialogBase<LocalState> {
 
         this.selectionValueIntf = {
             setValue: (val: string): void => {
-                this.mergeState({ selectedName: val });
+                this.mergeState<LS>({ selectedName: val });
                 if (this.instantSelect) {
                     // this timeout IS required for correct state management, but is also ideal
                     // so user has a chance to see their selection get highlighted.
@@ -42,17 +42,17 @@ export class FriendsDlg extends DialogBase<LocalState> {
             },
 
             getValue: (): string => {
-                return this.getState().selectedName;
+                return this.getState<LS>().selectedName;
             }
         };
 
-        this.mergeState({
+        this.mergeState<LS>({
             loading: true
         });
 
         (async () => {
             let res: J.GetFriendsResponse = await S.util.ajax<J.GetFriendsRequest, J.GetFriendsResponse>("getFriends");
-            this.mergeState({
+            this.mergeState<LS>({
                 friends: res.friends,
                 loading: false
             });
@@ -61,19 +61,19 @@ export class FriendsDlg extends DialogBase<LocalState> {
 
     renderDlg(): CompIntf[] {
         let message = null;
-        if (this.getState().loading) {
+        if (this.getState<LS>().loading) {
             message = "Loading...";
         }
-        else if (!this.getState().friends) {
+        else if (!this.getState<LS>().friends) {
             message = "You haven't yet added any friends yet!";
         }
 
         return [
             new Form(null, [
-                !this.getState().friends ? new Div(message)
-                    : new FriendsTable(this.getState().friends, this.selectionValueIntf),
+                !this.getState<LS>().friends ? new Div(message)
+                    : new FriendsTable(this.getState<LS>().friends, this.selectionValueIntf),
                 new ButtonBar([
-                    (this.getState().friends && !this.instantSelect) ? new Button("Choose", () => {
+                    (this.getState<LS>().friends && !this.instantSelect) ? new Button("Choose", () => {
                         this.close();
                     }, null, "btn-primary") : null,
                     new Button("Close", this.close)

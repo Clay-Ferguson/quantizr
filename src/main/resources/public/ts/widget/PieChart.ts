@@ -10,6 +10,9 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
     S = ctx;
 });
 
+interface LS {
+}
+
 export class PieChart extends Div {
 
     constructor(private data: any[]) {
@@ -23,7 +26,7 @@ export class PieChart extends Div {
 
     domPreUpdateEvent(): void {
         // console.log("domPreUpdateEvent: " + S.util.prettyPrint(this.data));
-        let state = this.getState();
+        let state = this.getState<LS>();
 
         let svg = d3.select(".d3PieChart");
 

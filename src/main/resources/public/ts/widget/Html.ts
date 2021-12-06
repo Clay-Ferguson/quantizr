@@ -26,7 +26,11 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
 //     return newValue;
 // };
 
-export class Html<StateType = any> extends Comp<StateType> {
+interface LS {
+    content?: string;
+}
+
+export class Html extends Comp {
     constructor(content: string = "", attribs: Object = {}, initialChildren: CompIntf[] = null) {
         super(attribs);
         this.domPreUpdateEvent = this.domPreUpdateEvent.bind(this);
@@ -35,25 +39,25 @@ export class Html<StateType = any> extends Comp<StateType> {
     }
 
     setText = (content: string) => {
-        this.mergeState({ content } as any);
+        this.mergeState<LS>({ content });
     }
 
     compRender(): React.ReactNode {
         if (this.hasChildren()) {
             console.error("dangerouslySetInnerHTML component had children. This is a bug: id=" + this.getId() + " constructor.name=" + this.constructor.name);
         }
-        this.attribs.dangerouslySetInnerHTML = { __html: (this.getState() as any).content };
+        this.attribs.dangerouslySetInnerHTML = { __html: (this.getState<LS>() as any).content };
         return this.e("div", this.attribs);
 
         // ************* DO NOT DELETE. Method 1 and 2 both work, except #2 would need to be updated to
         // enable the attribs! These are the two older ways of parsing emojis. For now we're just letting
         // the font itself do all the work, and don't need this.
         // METHOD 1:
-        // this.attribs.dangerouslySetInnerHTML = { __html: S.render.parseEmojis(this.getState().content) };
+        // this.attribs.dangerouslySetInnerHTML = { __html: S.render.parseEmojis(this.getState<LS>().content) };
         // return this.e("div", this.attribs);
         //
         // METHOD 2: (note: You'll need to rename this file to '.tsx' extention to use JSX here)
-        // return <div>{parseEmojisAndHtml(this.getState().content)}</div>;
+        // return <div>{parseEmojisAndHtml(this.getState<LS>().content)}</div>;
     }
 
     /* change all "a" tags inside this div to have a target=_blank */

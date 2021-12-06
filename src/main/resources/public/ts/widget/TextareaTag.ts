@@ -10,11 +10,11 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
     S = ctx;
 });
 
-interface LocalState {
+interface LS {
     value: string;
 }
 
-export class TextareaTag extends Comp<LocalState> {
+export class TextareaTag extends Comp {
     static CHAR_THRESHOLD = 40;
     static MIN_ROWS = 3;
     static MAX_ROWS = 15;
@@ -22,7 +22,7 @@ export class TextareaTag extends Comp<LocalState> {
     constructor(attribs: Object = {}, s?: State<any>, private calcRows: boolean = false) {
         super(attribs, s);
         this.attribs.onChange = (evt) => {
-            this.mergeState({ value: evt.target.value });
+            this.mergeState<LS>({ value: evt.target.value });
         };
     }
 
@@ -63,7 +63,7 @@ export class TextareaTag extends Comp<LocalState> {
     }
 
     compRender(): ReactNode {
-        this.attribs.value = this.getState().value;
+        this.attribs.value = this.getState<LS>().value;
         if (this.calcRows) {
             this.attribs.rows = "" + this.calcRowsFunc(this.attribs.value);
         }

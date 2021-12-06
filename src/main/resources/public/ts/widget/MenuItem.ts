@@ -11,6 +11,12 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
     S = ctx;
 });
 
+interface LS {
+    visible: boolean;
+    enabled: boolean;
+    content: string;
+}
+
 export class MenuItem extends Div {
 
     constructor(public name: string, public clickFunc: Function, enabled: boolean = true, private stateFunc: Function = null,
@@ -21,7 +27,7 @@ export class MenuItem extends Div {
     }
 
     compRender(): ReactNode {
-        let state = this.getState();
+        let state: LS = this.getState<LS>();
         let _style = { display: (state.visible ? "" : "none") };
         let enablement = state.enabled ? {} : { disabled: "disabled" };
         let enablementClass = state.enabled ? "mainMenuItemEnabled" : "disabled mainMenuItemDisabled";
@@ -46,7 +52,7 @@ export class MenuItem extends Div {
     }
 
     onClick(): void {
-        let state = this.getState();
+        let state = this.getState<LS>();
         if (!state.enabled) return;
 
         if (S.quanta.mainMenu) {

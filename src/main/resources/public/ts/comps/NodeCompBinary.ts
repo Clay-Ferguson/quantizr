@@ -22,17 +22,17 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
     S = ctx;
 });
 
-interface LocalState {
+interface LS {
     node: J.NodeInfo;
 }
 
 /* General Widget that doesn't fit any more reusable or specific category other than a plain Div, but inherits capability of Comp class */
-export class NodeCompBinary extends Div<LocalState> {
+export class NodeCompBinary extends Div {
 
     /* editorEmbed is true when this component is inside the node editor dialog */
     constructor(public node: J.NodeInfo, private isEditorEmbed: boolean, private isFullScreenEmbed: boolean, public imgSizeOverride: string) {
         super();
-        this.mergeState({ node });
+        this.mergeState<LS>({ node });
     }
 
     makeImageTag = (node: J.NodeInfo, state: AppState): Img => {
@@ -99,7 +99,7 @@ export class NodeCompBinary extends Div<LocalState> {
 
     preRender(): void {
         let state: AppState = useSelector((state: AppState) => state);
-        let node = this.getState().node;
+        let node = this.getState<LS>().node;
         if (!node) {
             this.setChildren(null);
             return;

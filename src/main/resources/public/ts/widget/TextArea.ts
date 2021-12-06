@@ -13,11 +13,11 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
     S = ctx;
 });
 
-interface LocalState {
+interface LS {
     wordWrap: boolean;
 }
 
-export class TextArea extends Span<LocalState> implements I.TextEditorIntf {
+export class TextArea extends Span implements I.TextEditorIntf {
 
     input: TextareaTag;
     textareaAttribs: any = {};
@@ -66,7 +66,7 @@ export class TextArea extends Span<LocalState> implements I.TextEditorIntf {
     }
 
     setWordWrap(wordWrap: boolean): void {
-        this.mergeState({ wordWrap });
+        this.mergeState<LS>({ wordWrap });
     }
 
     focus(): void {
@@ -78,7 +78,7 @@ export class TextArea extends Span<LocalState> implements I.TextEditorIntf {
     }
 
     preRender(): void {
-        let state = this.getState();
+        let state = this.getState<LS>();
         let children = [];
 
         children.push(new ErrorDiv(this.valState.e));

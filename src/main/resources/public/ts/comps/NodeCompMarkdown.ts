@@ -11,13 +11,13 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
     S = ctx;
 });
 
-interface LocalState {
+interface LS {
     content: string;
     pendingDecrypt?: string;
 }
 
 /* General Widget that doesn't fit any more reusable or specific category other than a plain Div, but inherits capability of Comp class */
-export class NodeCompMarkdown extends Html<LocalState> {
+export class NodeCompMarkdown extends Html {
 
     /* This makes the encrypted text visible without editing the node which is important to have
     on so nodes shared to you can be seen, because a user can't edit nodes they don't own */
@@ -35,7 +35,7 @@ export class NodeCompMarkdown extends Html<LocalState> {
         this.attribs.className = "markdown-content " + widthStyle;
 
         let content = node.content || "";
-        let att: LocalState = {
+        let att: LS = {
             content: null
         };
 
@@ -49,7 +49,7 @@ export class NodeCompMarkdown extends Html<LocalState> {
             att.content = this.renderRawMarkdown(node);
         }
 
-        this.mergeState(att);
+        this.mergeState<LS>(att);
     }
 
     /* If content is passed in it will be used. It will only be passed in when the node is encrypted and the text
@@ -123,7 +123,7 @@ export class NodeCompMarkdown extends Html<LocalState> {
     }
 
     preRender(): void {
-        let state = this.getState();
+        let state: LS = this.getState<LS>();
 
         if (this.autoDecrypting && state.pendingDecrypt) {
             let cipherText = state.pendingDecrypt.substring(J.Constant.ENC_TAG.length);
@@ -135,7 +135,7 @@ export class NodeCompMarkdown extends Html<LocalState> {
                 let clearText = S.quanta.decryptCache.get(cipherHash);
                 clearText = this.renderRawMarkdown(this.node, clearText);
 
-                this.mergeState({
+                this.mergeState<LS>({
                     content: clearText,
                     pendingDecrypt: null
                 });
@@ -149,7 +149,7 @@ export class NodeCompMarkdown extends Html<LocalState> {
     }
 
     decrypt = async () => {
-        let state = this.getState();
+        let state: LS = this.getState<LS>();
         if (!state.pendingDecrypt) return;
         let appState: AppState = store.getState();
         let cipherText = state.pendingDecrypt.substring(J.Constant.ENC_TAG.length);
@@ -166,7 +166,7 @@ export class NodeCompMarkdown extends Html<LocalState> {
 
             clearText = this.renderRawMarkdown(this.node, clearText);
 
-            this.mergeState({
+            this.mergeState<LS>({
                 content: clearText,
                 pendingDecrypt: null
             });

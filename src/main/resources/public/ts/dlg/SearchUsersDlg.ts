@@ -21,13 +21,13 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
     S = ctx;
 });
 
-interface LocalState {
+interface LS {
     fuzzy?: boolean;
     searchType?: string;
     caseSensitive?: boolean;
 }
 
-export class SearchUsersDlg extends DialogBase<LocalState> {
+export class SearchUsersDlg extends DialogBase {
     static helpExpanded: boolean = false;
     static defaultSearchText: string = "";
     searchTextField: TextField;
@@ -40,7 +40,7 @@ export class SearchUsersDlg extends DialogBase<LocalState> {
             this.searchTextField.focus();
         });
 
-        this.mergeState({
+        this.mergeState<LS>({
             fuzzy: false,
             searchType: J.Constant.SEARCH_TYPE_USER_LOCAL,
             caseSensitive: false
@@ -59,31 +59,31 @@ export class SearchUsersDlg extends DialogBase<LocalState> {
             this.appState.isAdminUser ? new RadioButton("All Users", false, "optionsGroup", null, {
                 setValue: (checked: boolean): void => {
                     if (checked) {
-                        this.mergeState({ searchType: J.Constant.SEARCH_TYPE_USER_ALL });
+                        this.mergeState<LS>({ searchType: J.Constant.SEARCH_TYPE_USER_ALL });
                     }
                 },
                 getValue: (): boolean => {
-                    return this.getState().searchType === J.Constant.SEARCH_TYPE_USER_ALL;
+                    return this.getState<LS>().searchType === J.Constant.SEARCH_TYPE_USER_ALL;
                 }
             }) : null,
             new RadioButton("Local Users", true, "optionsGroup", null, {
                 setValue: (checked: boolean): void => {
                     if (checked) {
-                        this.mergeState({ searchType: J.Constant.SEARCH_TYPE_USER_LOCAL });
+                        this.mergeState<LS>({ searchType: J.Constant.SEARCH_TYPE_USER_LOCAL });
                     }
                 },
                 getValue: (): boolean => {
-                    return this.getState().searchType === J.Constant.SEARCH_TYPE_USER_LOCAL;
+                    return this.getState<LS>().searchType === J.Constant.SEARCH_TYPE_USER_LOCAL;
                 }
             }),
             new RadioButton("Foreign Users", false, "optionsGroup", null, {
                 setValue: (checked: boolean): void => {
                     if (checked) {
-                        this.mergeState({ searchType: J.Constant.SEARCH_TYPE_USER_FOREIGN });
+                        this.mergeState<LS>({ searchType: J.Constant.SEARCH_TYPE_USER_FOREIGN });
                     }
                 },
                 getValue: (): boolean => {
-                    return this.getState().searchType === J.Constant.SEARCH_TYPE_USER_FOREIGN;
+                    return this.getState<LS>().searchType === J.Constant.SEARCH_TYPE_USER_FOREIGN;
                 }
             })
         ], "marginBottom");
@@ -95,18 +95,18 @@ export class SearchUsersDlg extends DialogBase<LocalState> {
                     // Allow fuzzy search for admin only. It's cpu intensive.
                     new Checkbox("Regex", null, {
                         setValue: (checked: boolean): void => {
-                            this.mergeState({ fuzzy: checked });
+                            this.mergeState<LS>({ fuzzy: checked });
                         },
                         getValue: (): boolean => {
-                            return this.getState().fuzzy;
+                            return this.getState<LS>().fuzzy;
                         }
                     }),
                     new Checkbox("Case Sensitive", null, {
                         setValue: (checked: boolean): void => {
-                            this.mergeState({ caseSensitive: checked });
+                            this.mergeState<LS>({ caseSensitive: checked });
                         },
                         getValue: (): boolean => {
-                            return this.getState().caseSensitive;
+                            return this.getState<LS>().caseSensitive;
                         }
                     })
                 ], "displayTable marginBottom"),
@@ -137,8 +137,8 @@ export class SearchUsersDlg extends DialogBase<LocalState> {
         SearchUsersDlg.defaultSearchText = this.searchTextState.getValue();
 
         let desc = "User " + SearchUsersDlg.defaultSearchText;
-        S.srch.search(null, "", SearchUsersDlg.defaultSearchText, this.appState, this.getState().searchType, desc,
-            this.getState().fuzzy,
-            this.getState().caseSensitive, 0, true, "mtm", "DESC", false, this.close);
+        S.srch.search(null, "", SearchUsersDlg.defaultSearchText, this.appState, this.getState<LS>().searchType, desc,
+            this.getState<LS>().fuzzy,
+            this.getState<LS>().caseSensitive, 0, true, "mtm", "DESC", false, this.close);
     }
 }

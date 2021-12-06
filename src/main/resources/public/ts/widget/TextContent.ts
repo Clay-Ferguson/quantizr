@@ -9,11 +9,11 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
     S = ctx;
 });
 
-interface LocalState {
+interface LS {
     text: string;
 }
 
-export class TextContent extends Comp<LocalState> {
+export class TextContent extends Comp {
 
     constructor(text: string, classes: string = null, public preformatted: boolean = false) {
         super(null);
@@ -22,11 +22,11 @@ export class TextContent extends Comp<LocalState> {
     }
 
     setText = (text: string) => {
-        this.mergeState({ text });
+        this.mergeState<LS>({ text });
     }
 
     compRender(): ReactNode {
-        let state = this.getState();
+        let state = this.getState<LS>();
 
         // todo-2: Not sure I want to keep detecting HTML this way, because we can just use
         // the HTML class explicity when we need to support HTML

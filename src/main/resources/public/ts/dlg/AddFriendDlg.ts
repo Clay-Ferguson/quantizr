@@ -17,6 +17,9 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
     S = ctx;
 });
 
+interface LS {
+}
+
 export class AddFriendDlg extends DialogBase {
     userState: ValidatedState<any> = new ValidatedState<any>();
 
@@ -56,7 +59,7 @@ export class AddFriendDlg extends DialogBase {
         }
         let userName = this.userState.getValue();
         if (userName) {
-            const state: any = this.getState();
+            const state: any = this.getState<LS>();
             let res: J.AddFriendResponse = await S.util.ajax<J.AddFriendRequest, J.AddFriendResponse>("addFriend", {
                 userName
             });

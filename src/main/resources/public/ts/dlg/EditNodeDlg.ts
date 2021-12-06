@@ -49,8 +49,10 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
     S = ctx;
 });
 
-interface LocalState {
-    // todo-0 (waiting on this one, until the rest are proven)
+interface LS {
+    node?: J.NodeInfo;
+    selectedProps?: Set<string>;
+    toIpfs?: boolean;
 }
 
 export class EditNodeDlg extends DialogBase {
@@ -93,7 +95,7 @@ export class EditNodeDlg extends DialogBase {
             }
             EditNodeDlg.embedInstance = this;
         }
-        this.mergeState({
+        this.mergeState<LS>({
             node,
             // selected props is used as a set of all 'selected' (via checkbox) property names
             selectedProps: new Set<string>()
@@ -113,7 +115,7 @@ export class EditNodeDlg extends DialogBase {
     }
 
     initStates = (): void => {
-        let state = this.getState();
+        let state = this.getState<LS>();
 
         /* Init main content text on node */
         let value = state.node.content || "";
@@ -219,7 +221,7 @@ export class EditNodeDlg extends DialogBase {
             { key: "c4", val: "4 columns" },
             { key: "c5", val: "5 columns" },
             { key: "c6", val: "6 columns" }
-        ], "width-7rem", "col-3", new PropValueHolder(this.getState().node, J.NodeProp.LAYOUT, "v"));
+        ], "width-7rem", "col-3", new PropValueHolder(this.getState<LS>().node, J.NodeProp.LAYOUT, "v"));
         return selection;
     }
 
@@ -231,7 +233,7 @@ export class EditNodeDlg extends DialogBase {
             { key: "3", val: "Medium" },
             { key: "4", val: "Low" },
             { key: "5", val: "Backlog" }
-        ], "width-7rem", "col-3", new PropValueHolder(this.getState().node, J.NodeProp.PRIORITY, "0"));
+        ], "width-7rem", "col-3", new PropValueHolder(this.getState<LS>().node, J.NodeProp.PRIORITY, "0"));
     }
 
     createImgSizeSelection = (label: string, allowNone: boolean, extraClasses: string, valueIntf: ValueIntf): Selection => {
@@ -264,7 +266,7 @@ export class EditNodeDlg extends DialogBase {
     }
 
     getTitleIconComp(): CompIntf {
-        let state = this.getState();
+        let state = this.getState<LS>();
         let span: Span = null;
 
         let typeHandler: TypeHandlerIntf = S.plugin.getTypeHandler(state.node.type);
@@ -306,7 +308,7 @@ export class EditNodeDlg extends DialogBase {
     // DO NOT DELETE
     // Editor actually looks much better without any title text.
     // getTitleText(): string {
-    //     let state = this.getState();
+    //     let state = this.getState<LS>();
     //     let ret = null;
 
     //     let typeHandler: TypeHandlerIntf = S.plugin.getTypeHandler(state.node.type);
@@ -320,7 +322,7 @@ export class EditNodeDlg extends DialogBase {
     // }
 
     getExtraTitleBarComps(): CompIntf[] {
-        let state = this.getState();
+        let state = this.getState<LS>();
         let comps: CompIntf[] = [];
 
         if (S.props.isEncrypted(state.node)) {
@@ -332,7 +334,7 @@ export class EditNodeDlg extends DialogBase {
     }
 
     renderDlg(): CompIntf[] {
-        let state = this.getState();
+        let state = this.getState<LS>();
         let hasAttachment: boolean = S.props.hasBinary(state.node);
 
         this.editorHelp = null;
@@ -382,7 +384,7 @@ export class EditNodeDlg extends DialogBase {
         let selectionsBar = new Div(null, { className: "row marginTop" }, [
             state.node.hasChildren ? this.createLayoutSelection() : null,
             state.node.hasChildren ? this.createImgSizeSelection("Images", true, "col-3", //
-                new PropValueHolder(this.getState().node, J.NodeProp.CHILDREN_IMG_SIZES, "n")) : null,
+                new PropValueHolder(this.getState<LS>().node, J.NodeProp.CHILDREN_IMG_SIZES, "n")) : null,
             this.createPrioritySelection()
         ]);
 
@@ -394,7 +396,7 @@ export class EditNodeDlg extends DialogBase {
         ]);
 
         let imgSizeSelection = S.props.hasImage(state.node) ? this.createImgSizeSelection("Image Size", false, "float-end", //
-            new PropValueHolder(this.getState().node, J.NodeProp.IMG_SIZE, "100%")) : null;
+            new PropValueHolder(this.getState<LS>().node, J.NodeProp.IMG_SIZE, "100%")) : null;
 
         // This is the table that contains the custom editable properties inside the collapsable panel at the bottom.
         let propsTable: Comp = null;
@@ -498,7 +500,7 @@ export class EditNodeDlg extends DialogBase {
                             this.deleteProperty(J.NodeProp.IPFS_REF);
                         }
                         else {
-                            S.props.setNodePropVal(J.NodeProp.IPFS_REF, this.getState().node, "1");
+                            S.props.setNodePropVal(J.NodeProp.IPFS_REF, this.getState<LS>().node, "1");
                         }
                     },
                     getValue: (): boolean => {
@@ -589,7 +591,7 @@ export class EditNodeDlg extends DialogBase {
     }
 
     countPropsShowing = (): number => {
-        let state = this.getState();
+        let state = this.getState<LS>();
         let typeHandler: TypeHandlerIntf = S.plugin.getTypeHandler(state.node.type);
         let customProps: string[] = null;
         if (typeHandler) {
@@ -624,16 +626,16 @@ export class EditNodeDlg extends DialogBase {
     makeCheckboxPropValueHandler(propName: string): I.ValueIntf {
         return {
             setValue: (checked: boolean): void => {
-                S.props.setNodePropVal(propName, this.getState().node, checked ? "1" : null);
+                S.props.setNodePropVal(propName, this.getState<LS>().node, checked ? "1" : null);
             },
             getValue: (): boolean => {
-                return S.props.getNodePropVal(propName, this.getState().node) === "1";
+                return S.props.getNodePropVal(propName, this.getState<LS>().node) === "1";
             }
         };
     }
 
     renderButtons(): CompIntf {
-        let state = this.getState();
+        let state = this.getState<LS>();
         let hasAttachment: boolean = S.props.hasBinary(state.node);
 
         let typeHandler: TypeHandlerIntf = S.plugin.getTypeHandler(state.node.type);
@@ -648,8 +650,8 @@ export class EditNodeDlg extends DialogBase {
         // //regardless of value, if this property is present we consider the type locked
         // let typeLocked = !!S.props.getNodePropVal(J.NodeProp.TYPE_LOCK, state.node);
 
-        let allowUpload: boolean = typeHandler ? (state.isAdminUser || typeHandler.allowAction(NodeActionType.upload, state.node, this.appState)) : true;
-        let allowShare: boolean = typeHandler ? (state.isAdminUser || typeHandler.allowAction(NodeActionType.share, state.node, this.appState)) : true;
+        let allowUpload: boolean = typeHandler ? (this.appState.isAdminUser || typeHandler.allowAction(NodeActionType.upload, state.node, this.appState)) : true;
+        let allowShare: boolean = typeHandler ? (this.appState.isAdminUser || typeHandler.allowAction(NodeActionType.share, state.node, this.appState)) : true;
 
         // let typeLocked = !!S.props.getNodePropVal(J.NodeProp.TYPE_LOCK, state.node);
         let datePropExists = S.props.getNodeProp(J.NodeProp.DATE, state.node);
@@ -745,7 +747,7 @@ export class EditNodeDlg extends DialogBase {
     }
 
     addProperty = async (): Promise<void> => {
-        let state = this.getState();
+        let state: LS = this.getState<LS>();
         let dlg = new EditPropertyDlg(state.node, this.appState);
         await dlg.open();
 
@@ -757,7 +759,7 @@ export class EditNodeDlg extends DialogBase {
                 name: dlg.nameState.getValue(),
                 value: ""
             });
-            this.mergeState({ state });
+            this.mergeState<LS>(state);
         }
         // we don't need to return an actual promise here
         return null;
@@ -790,7 +792,7 @@ export class EditNodeDlg extends DialogBase {
     }
 
     addDateProperty = (): void => {
-        let state = this.getState();
+        let state = this.getState<LS>();
         if (!state.node.properties) {
             state.node.properties = [];
         }
@@ -812,27 +814,27 @@ export class EditNodeDlg extends DialogBase {
         // Ensure the have the panel expanded so we can see the new date.
         // nope, i decided I don't like this auto-expanding.
         // EditNodeDlg.morePanelExpanded = true;
-        this.mergeState({ state });
+        this.mergeState<LS>(state);
     }
 
     openChangeNodeTypeDlg = (): void => {
-        new ChangeNodeTypeDlg(this.getState().node.type, this.setNodeType, this.appState).open();
+        new ChangeNodeTypeDlg(this.getState<LS>().node.type, this.setNodeType, this.appState).open();
     }
 
     share = async (): Promise<void> => {
-        let state = this.getState();
+        let state = this.getState<LS>();
         await S.edit.editNodeSharing(this.appState, state.node);
-        this.mergeState({ node: state.node });
+        this.mergeState<LS>({ node: state.node });
         return null;
     }
 
     upload = async (): Promise<void> => {
-        let state = this.getState();
+        let state = this.getState<LS>();
 
         let dlg = new UploadFromFileDropzoneDlg(state.node.id, "", state.toIpfs, null, false, true, this.appState, async () => {
             await this.refreshBinaryPropsFromServer(state.node);
             this.initPropStates(state.node, true);
-            this.mergeState({ node: state.node });
+            this.mergeState<LS>({ node: state.node });
             this.binaryDirty = true;
         });
         await dlg.open();
@@ -862,7 +864,7 @@ export class EditNodeDlg extends DialogBase {
     }
 
     deleteUpload = async (): Promise<void> => {
-        let state = this.getState();
+        let state = this.getState<LS>();
 
         /* Note: This doesn't resolve until either user clicks no on confirmation dialog or else has clicked yes and the delete
         call has fully completed. */
@@ -871,7 +873,7 @@ export class EditNodeDlg extends DialogBase {
         if (deleted) {
             S.attachment.removeBinaryProperties(state.node);
             this.initPropStates(state.node, true);
-            this.mergeState({ node: state.node });
+            this.mergeState<LS>({ node: state.node });
 
             if (this.mode === DialogMode.EMBED) {
                 dispatch("Action_editNodeUpdated", (s: AppState): AppState => {
@@ -885,7 +887,7 @@ export class EditNodeDlg extends DialogBase {
     }
 
     setEncryption = (encrypt: boolean): void => {
-        let state = this.getState();
+        let state = this.getState<LS>();
         if (this.pendingEncryptionChange) return;
 
         (async () => {
@@ -924,7 +926,7 @@ export class EditNodeDlg extends DialogBase {
                         }
                     }
 
-                    this.mergeState(state);
+                    this.mergeState<LS>(state);
                 }
                 finally {
                     this.pendingEncryptionChange = false;
@@ -934,27 +936,27 @@ export class EditNodeDlg extends DialogBase {
     }
 
     setNodeType = (newType: string): void => {
-        let state = this.getState();
+        let state = this.getState<LS>();
         state.node.type = newType;
-        this.mergeState({ node: state.node });
+        this.mergeState<LS>({ node: state.node });
     }
 
     deleteProperty = async (propName: string) => {
         let res: J.DeletePropertyResponse = await S.util.ajax<J.DeletePropertyRequest, J.DeletePropertyResponse>("deleteProperty", {
-            nodeId: this.getState().node.id,
+            nodeId: this.getState<LS>().node.id,
             propName
         });
 
         if (S.util.checkSuccess("Delete property", res)) {
-            let state = this.getState();
+            let state = this.getState<LS>();
             S.props.deleteProp(state.node, propName);
-            this.mergeState(state);
+            this.mergeState<LS>(state);
         }
     }
 
     // Takes all the propStates values and converts them into node properties on the node
     savePropsToNode = () => {
-        let state = this.getState();
+        let state = this.getState<LS>();
         if (state.node.properties) {
             state.node.properties.forEach((prop: J.PropertyInfo) => {
                 // console.log("Save prop iterator: name=" + prop.name);
@@ -980,7 +982,7 @@ export class EditNodeDlg extends DialogBase {
     }
 
     saveNode = async (): Promise<void> => {
-        let state = this.getState();
+        let state = this.getState<LS>();
 
         let content: string;
         if (this.contentEditor) {
@@ -1060,7 +1062,7 @@ export class EditNodeDlg extends DialogBase {
             if (allowCheckbox) {
                 let checkbox: Checkbox = new Checkbox(label, null, {
                     setValue: (checked: boolean): void => {
-                        let state = this.getState();
+                        let state = this.getState<LS>();
                         if (checked) {
                             state.selectedProps.add(propEntry.name);
                         }
@@ -1070,7 +1072,7 @@ export class EditNodeDlg extends DialogBase {
                         this.deletePropButton.setEnabled(state.selectedProps.size > 0);
                     },
                     getValue: (): boolean => {
-                        return this.getState().selectedProps.has(propEntry.name);
+                        return this.getState<LS>().selectedProps.has(propEntry.name);
                     }
                 });
                 editItems.push(checkbox);
@@ -1085,7 +1087,7 @@ export class EditNodeDlg extends DialogBase {
             if (multiLine) {
                 valEditor = new TextArea(null, {
                     rows: "" + rows,
-                    id: "prop_" + this.getState().node.id
+                    id: "prop_" + this.getState<LS>().node.id
                 }, propState, "textarea-min-4 displayCell");
             }
             else {
@@ -1116,7 +1118,7 @@ export class EditNodeDlg extends DialogBase {
         // console.log("making field editor for val[" + value + "]");
 
         this.contentEditor = new TextArea(null, {
-            id: C.ID_PREFIX_EDIT + this.getState().node.id,
+            id: C.ID_PREFIX_EDIT + this.getState<LS>().node.id,
             rows
         }, this.contentEditorState, "font-inherit displayCell", true);
 
@@ -1164,7 +1166,7 @@ export class EditNodeDlg extends DialogBase {
     deleteSelectedProperties = (): void => {
         /* todo-1: This was a quick and dirty approach, calling the server for each property to delete. Should
         simply allow the server to accept an array */
-        this.getState().selectedProps.forEach(propName => this.deleteProperty(propName), this);
+        this.getState<LS>().selectedProps.forEach(propName => this.deleteProperty(propName), this);
     }
 
     speechRecognition = (): void => {
@@ -1183,7 +1185,9 @@ export class EditNodeDlg extends DialogBase {
         });
 
         S.speech.toggleActive();
-        this.mergeState({ state: this.getState() });
+
+        // todo-0: this refactored into a bizar looking redundant thing. retest this.
+        this.mergeState<LS>(this.getState<LS>());
 
         setTimeout(() => {
             if (this.contentEditor) {
@@ -1196,7 +1200,7 @@ export class EditNodeDlg extends DialogBase {
         this.close();
 
         // rollback properties.
-        this.getState().node.properties = this.initialProps;
+        this.getState<LS>().node.properties = this.initialProps;
 
         if (this.binaryDirty) {
             S.quanta.refresh(this.appState);

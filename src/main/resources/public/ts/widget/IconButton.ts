@@ -9,6 +9,11 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
     S = ctx;
 });
 
+interface LS {
+    visible: boolean;
+    disabled: boolean;
+}
+
 export class IconButton extends Comp {
 
     constructor(public iconClass: string = "", public text: string, attribs: Object = {}, private specialClasses: string = "btn-secondary", private toggle: string = "", private imageUrl: string = null) {
@@ -19,7 +24,7 @@ export class IconButton extends Comp {
     }
 
     compRender(): ReactNode {
-        let state = this.getState();
+        let state = this.getState<LS>();
         this.attribs.style = { display: (state.visible && !state.disabled ? "" : "none") };
 
         let iconClazz: string = "fa " + this.iconClass;

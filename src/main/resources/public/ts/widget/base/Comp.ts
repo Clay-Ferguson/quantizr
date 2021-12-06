@@ -354,7 +354,7 @@ export abstract class Comp<StateType = any> implements CompIntf {
     /* This is how you can add properties and overwrite them in existing state. Since all components are assumed to have
        both visible/enbled properties, this is the safest way to set other state that leaves visible/enabled props intact
        */
-    mergeState(moreState: StateType): any {
+    mergeState<ST = StateType>(moreState: ST): any {
         this.s.mergeState(moreState);
     }
 
@@ -362,7 +362,7 @@ export abstract class Comp<StateType = any> implements CompIntf {
         this.mergeState({ forceRender: Comp.nextGuid() } as any);
     }
 
-    setState = (newState: StateType): any => {
+    setState = <ST = StateType>(newState: ST): any => {
         this.s.setState(newState);
     }
 
@@ -376,11 +376,11 @@ export abstract class Comp<StateType = any> implements CompIntf {
 
     There are places where 'mergeState' works but 'setState' fails, that needs investigation like EditNodeDlg.
     */
-    setStateEx(state: StateType) {
+    setStateEx<ST = StateType>(state: ST) {
         this.s.setStateEx(state);
     }
 
-    getState(): StateType {
+    getState<ST = StateType>(): ST {
         return this.s.state;
     }
 

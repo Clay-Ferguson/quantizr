@@ -14,11 +14,11 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (s: Singletons) => {
     S = s;
 });
 
-interface LocalState {
+interface LS {
     welcomeNode: J.NodeInfo;
 }
 
-export class WelcomePanel extends Div<LocalState> {
+export class WelcomePanel extends Div {
 
     constructor(attribs: Object = {}) {
         super(null, attribs);
@@ -36,17 +36,17 @@ export class WelcomePanel extends Div<LocalState> {
                 singleNode: false
             });
 
-            this.mergeState({ welcomeNode: res.node });
+            this.mergeState<LS>({ welcomeNode: res.node });
         }, 20);
     }
 
     preRender(): void {
         const state: AppState = store.getState();
-        if (this.getState().welcomeNode) {
+        if (this.getState<LS>().welcomeNode) {
             this.setChildren([
-                new NodeCompContent(this.getState().welcomeNode, false, false, null, null, null, true),
-                !state.mobileMode ? new NodeCompTableRowLayout(this.getState().welcomeNode, 1, "c", false, false)
-                    : new NodeCompVerticalRowLayout(this.getState().welcomeNode, 1, false, false)
+                new NodeCompContent(this.getState<LS>().welcomeNode, false, false, null, null, null, true),
+                !state.mobileMode ? new NodeCompTableRowLayout(this.getState<LS>().welcomeNode, 1, "c", false, false)
+                    : new NodeCompVerticalRowLayout(this.getState<LS>().welcomeNode, 1, false, false)
             ]);
         }
         else {

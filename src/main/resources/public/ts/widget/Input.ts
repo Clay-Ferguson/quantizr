@@ -10,21 +10,21 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
     S = ctx;
 });
 
-interface LocalState {
+interface LS {
     value: string;
 }
 
-export class Input extends Comp<LocalState> {
+export class Input extends Comp {
 
     constructor(attribs: Object = {}, s?: State<any>) {
         super(attribs, s);
         this.attribs.onChange = (evt) => {
-            this.mergeState({ value: evt.target.value });
+            this.mergeState<LS>({ value: evt.target.value });
         };
     }
 
     compRender(): ReactNode {
-        this.attribs.value = this.getState().value || "";
+        this.attribs.value = this.getState<LS>().value || "";
         return this.e("input", this.attribs);
     }
 }

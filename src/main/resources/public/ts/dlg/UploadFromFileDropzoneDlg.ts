@@ -21,6 +21,9 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
     S = ctx;
 });
 
+interface LS {
+}
+
 export class UploadFromFileDropzoneDlg extends DialogBase {
     hiddenInputContainer: Div;
     uploadButton: Button;
@@ -122,33 +125,33 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
     }
 
     uploadFromUrl = (): void => {
-        let state = this.getState();
+        let state: LS = this.getState<LS>();
         S.attachment.openUploadFromUrlDlg(this.nodeId, null, () => {
             this.close();
             if (this.afterUploadFunc) {
                 this.afterUploadFunc();
             }
-        }, state);
+        }, this.appState);
     }
 
     uploadFromTorrent = (): void => {
-        let state = this.getState();
+        let state = this.getState<LS>();
         S.attachment.openUploadFromTorrentDlg(this.nodeId, null, () => {
             this.close();
             if (this.afterUploadFunc) {
                 this.afterUploadFunc();
             }
-        }, state);
+        }, this.appState);
     }
 
     uploadFromIPFS = (): void => {
-        let state = this.getState();
+        let state = this.getState<LS>();
         S.attachment.openUploadFromIPFSDlg(this.nodeId, null, () => {
             this.close();
             if (this.afterUploadFunc) {
                 this.afterUploadFunc();
             }
-        }, state);
+        }, this.appState);
     }
 
     // https://developer.mozilla.org/en-US/docs/Web/API/Clipboard/read
@@ -242,7 +245,7 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
     }
 
     configureDropZone = (): void => {
-        let state = this.getState();
+        let state = this.getState<LS>();
 
         /* Limit based on user quota for our user accounts */
         let maxFileSize = this.appState.userPreferences.maxUploadFileSize;

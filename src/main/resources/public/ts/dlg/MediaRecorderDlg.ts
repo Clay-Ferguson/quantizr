@@ -26,7 +26,7 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (s: Singletons) => {
     S = s;
 });
 
-interface LocalState {
+interface LS {
     status?: string;
     recording?: boolean;
     audioInput?: string;
@@ -35,7 +35,7 @@ interface LocalState {
     videoInputOptions?: any[];
 }
 
-export class MediaRecorderDlg extends DialogBase<LocalState> {
+export class MediaRecorderDlg extends DialogBase {
     stream: any;
     chunks = [];
     recorder: any;
@@ -55,7 +55,7 @@ export class MediaRecorderDlg extends DialogBase<LocalState> {
 
     constructor(state: AppState, public videoMode: boolean, private allowSave: boolean) {
         super(videoMode ? "Video Recorder" : "Audio Recorder", null, false, state);
-        this.mergeState({
+        this.mergeState<LS>({
             status: "",
             recording: false
         });
@@ -106,7 +106,7 @@ export class MediaRecorderDlg extends DialogBase<LocalState> {
             }
         });
 
-        this.mergeState({ audioInput, videoInput, audioInputOptions, videoInputOptions });
+        this.mergeState<LS>({ audioInput, videoInput, audioInputOptions, videoInputOptions });
 
         /* if videoMode and we don't have at least one audio and video input then abort */
         if (this.videoMode) {
@@ -123,7 +123,7 @@ export class MediaRecorderDlg extends DialogBase<LocalState> {
     }
 
     renderDlg(): CompIntf[] {
-        let state: any = this.getState();
+        let state: any = this.getState<LS>();
 
         // This creates the video display showing just the live feed of the camera always, regardless of whether currently recrding.
         if (this.videoMode) {
@@ -155,13 +155,13 @@ export class MediaRecorderDlg extends DialogBase<LocalState> {
         let audioSelect = new Selection(null, "Audio", state.audioInputOptions, "mediaStreamInputOption", "", {
             setValue: (val: string): void => {
                 S.localDB.setVal(C.LOCALDB_AUDIO_SOURCE, val, this.appState.userName);
-                this.mergeState({ audioInput: val });
+                this.mergeState<LS>({ audioInput: val });
                 setTimeout(() => {
                     this.resetStream();
                 }, 250);
             },
             getValue: (): string => {
-                return this.getState().audioInput;
+                return this.getState<LS>().audioInput;
             }
         });
 
@@ -170,14 +170,14 @@ export class MediaRecorderDlg extends DialogBase<LocalState> {
             videoSelect = new Selection(null, "Video", state.videoInputOptions, "mediaStreamInputOption", "", {
                 setValue: (val: string): void => {
                     S.localDB.setVal(C.LOCALDB_VIDEO_SOURCE, val, this.appState.userName);
-                    this.mergeState({ videoInput: val });
+                    this.mergeState<LS>({ videoInput: val });
 
                     setTimeout(() => {
                         this.resetStream();
                     }, 250);
                 },
                 getValue: (): string => {
-                    return this.getState().videoInput;
+                    return this.getState<LS>().videoInput;
                 }
             });
         }
@@ -211,7 +211,7 @@ export class MediaRecorderDlg extends DialogBase<LocalState> {
             // we force it to recreate the recorder object.
             this.recorder = null;
 
-            let state = this.getState();
+            let state = this.getState<LS>();
             let constraints: any = { audio: { deviceId: state.audioInput } };
             if (this.videoMode) {
                 constraints.video = { deviceId: state.videoInput };
@@ -260,7 +260,7 @@ export class MediaRecorderDlg extends DialogBase<LocalState> {
         this.recorder.start();
         this.recordingTime = 0;
 
-        this.mergeState({ status: this.videoMode ? "Recording Video..." : "Recording Audio...", recording: true });
+        this.mergeState<LS>({ status: this.videoMode ? "Recording Video..." : "Recording Audio...", recording: true });
         this.recordingTimer = setInterval(() => {
             this.recordingTimeslice();
         }, 1000);
@@ -294,7 +294,7 @@ export class MediaRecorderDlg extends DialogBase<LocalState> {
         if (!this.recordingTimer) return;
         this.continuable = true;
         this.cancelTimer();
-        this.mergeState({ status: "Paused", recording: false });
+        this.mergeState<LS>({ status: "Paused", recording: false });
         if (this.recorder) {
             this.recorder.stop();
         }

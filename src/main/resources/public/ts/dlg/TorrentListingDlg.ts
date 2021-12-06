@@ -17,7 +17,7 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
     S = ctx;
 });
 
-interface LocalState {
+interface LS {
     done?: boolean;
     files?: any[];
     noSeeders?: boolean;
@@ -28,12 +28,12 @@ interface LocalState {
  from the webpack config script) */
 // import WebTorrent from "webtorrent/webtorrent.min.js";
 
-export class TorrentListingDlg extends DialogBase<LocalState> {
+export class TorrentListingDlg extends DialogBase {
     torrentSeeded = false;
 
     constructor(private torrentId: string, dialogMode: DialogMode, state: AppState) {
         super("Torrent", null, false, state, dialogMode);
-        this.mergeState({ done: false, files: [] });
+        this.mergeState<LS>({ done: false, files: [] });
         this.whenElm(() => {
             this.load();
         });
@@ -41,7 +41,7 @@ export class TorrentListingDlg extends DialogBase<LocalState> {
         // wait a few seconds before displaying message this torrent may be dead.
         setTimeout(() => {
             if (!this.torrentSeeded) {
-                this.mergeState({ noSeeders: true });
+                this.mergeState<LS>({ noSeeders: true });
             }
         }, 6000);
     }
@@ -49,15 +49,15 @@ export class TorrentListingDlg extends DialogBase<LocalState> {
     renderDlg(): CompIntf[] {
         let children: CompIntf[] = [];
 
-        if (!this.getState().files || this.getState().files.length === 0) {
+        if (!this.getState<LS>().files || this.getState<LS>().files.length === 0) {
             children.push(new Div("Loading Torrent..."));
             children.push(new Div(null, { className: "torrentSpinnerDiv" }, [new Spinner()]));
-            if (this.getState().noSeeders) {
+            if (this.getState<LS>().noSeeders) {
                 children.push(new Div("No seeders found yet. This torrent may be dead?"));
             }
         }
 
-        this.getState().files.forEach((f: any) => {
+        this.getState<LS>().files.forEach((f: any) => {
             children.push(new Div(f.tf.name, {
                 className: "torrentListItem",
                 onClick: () => {
@@ -66,7 +66,7 @@ export class TorrentListingDlg extends DialogBase<LocalState> {
             }));
         });
 
-        if (this.getState().done) {
+        if (this.getState<LS>().done) {
             children.push(new Div("Torrent complete."));
         }
 
@@ -101,8 +101,8 @@ export class TorrentListingDlg extends DialogBase<LocalState> {
             // Some type of bizarre state bug exists where if we do a merge state even asynchronously
             // but just too soon, things fail.
             setTimeout(() => {
-                let files = this.getState().files;
-                this.mergeState({ files: [...files, { tf: f, url }] });
+                let files = this.getState<LS>().files;
+                this.mergeState<LS>({ files: [...files, { tf: f, url }] });
             }, 250);
         })
     }
@@ -111,7 +111,7 @@ export class TorrentListingDlg extends DialogBase<LocalState> {
         // console.log("Torrent added: " + this.torrentId);
 
         torrent.on("done", () => {
-            this.mergeState({ done: true });
+            this.mergeState<LS>({ done: true });
         });
 
         // Torrents can contain many files. For now instead of letting user pick from files just

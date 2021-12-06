@@ -9,12 +9,12 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
     S = ctx;
 });
 
-interface LocalState {
+interface LS {
     text?: string;
     enabled?: boolean;
 }
 
-export class Button extends Comp<LocalState> {
+export class Button extends Comp {
 
     constructor(text: string, public callback: Function, _attribs: Object = null, moreClasses: string = "btn-secondary") {
         super(_attribs);
@@ -30,11 +30,11 @@ export class Button extends Comp<LocalState> {
     }
 
     setText(text: string): void {
-        this.mergeState({ text });
+        this.mergeState<LS>({ text });
     }
 
     compRender(): ReactNode {
-        let text: string = this.getState().text;
+        let text: string = this.getState<LS>().text;
         let icon: any;
         if (this.attribs.iconclass) {
             icon = this.e("i", {
@@ -46,7 +46,7 @@ export class Button extends Comp<LocalState> {
             });
         }
 
-        if (this.getState().enabled) {
+        if (this.getState<LS>().enabled) {
             delete this.attribs.disabled;
         }
         else {
@@ -61,7 +61,7 @@ export class Button extends Comp<LocalState> {
         // https://stackoverflow.com/questions/16226268/hide-button-in-btn-group-twitter-bootstrap
         // https://stackoverflow.com/questions/28187567/how-to-ignore-hidden-elements-in-a-bootstrap-button-group
         // this.attribs.style = {
-        //     display : this.getState().visible ? "inline-block" : "none"
+        //     display : this.getState<LS>().visible ? "inline-block" : "none"
         // };
 
         return this.e("button", this.attribs, [icon, text]);

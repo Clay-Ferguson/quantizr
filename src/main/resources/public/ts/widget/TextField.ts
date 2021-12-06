@@ -16,11 +16,11 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
     S = ctx;
 });
 
-interface LocalState {
+interface LS {
     inputType?: string;
 }
 
-export class TextField extends Div<LocalState> implements I.TextEditorIntf, I.ValueIntf {
+export class TextField extends Div implements I.TextEditorIntf, I.ValueIntf {
     input: Input;
     icon: ToggleIcon;
 
@@ -34,7 +34,7 @@ export class TextField extends Div<LocalState> implements I.TextEditorIntf, I.Va
             className: "form-group" + (labelOnLeft ? " form-inline " : " ") + this.outterClass
         });
 
-        this.mergeState({
+        this.mergeState<LS>({
             inputType: isPassword ? "password" : "text"
         });
     }
@@ -68,7 +68,7 @@ export class TextField extends Div<LocalState> implements I.TextEditorIntf, I.Va
     }
 
     preRender(): void {
-        let state = this.getState();
+        let state = this.getState<LS>();
 
         let label = this.label ? new Label(this.label, {
             key: this.getId() + "_label",
@@ -88,7 +88,7 @@ export class TextField extends Div<LocalState> implements I.TextEditorIntf, I.Va
             new Anchor(null, null, {
                 onClick: (evt) => {
                     evt.preventDefault();
-                    this.mergeState({
+                    this.mergeState<LS>({
                         inputType: state.inputType === "password" ? "text" : "password"
                     });
                     this.icon._toggleClass();

@@ -16,11 +16,11 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
     S = ctx;
 });
 
-interface LocalState {
+interface LS {
     data: J.GraphNode;
 }
 
-export class FullScreenGraphViewer extends Main<LocalState> {
+export class FullScreenGraphViewer extends Main {
     nodeId: string;
     simulation: any;
     tooltip: any;
@@ -44,7 +44,7 @@ export class FullScreenGraphViewer extends Main<LocalState> {
                 searchText: appState.graphSearchText,
                 nodeId: this.nodeId
             });
-            this.mergeState({ data: res.rootNode });
+            this.mergeState<LS>({ data: res.rootNode });
         })();
     }
 
@@ -53,7 +53,7 @@ export class FullScreenGraphViewer extends Main<LocalState> {
     }
 
     domPreUpdateEvent(): void {
-        let state = this.getState();
+        let state = this.getState<LS>();
         if (!state.data) return;
 
         let customForceDirectedTree = this.forceDirectedTree();

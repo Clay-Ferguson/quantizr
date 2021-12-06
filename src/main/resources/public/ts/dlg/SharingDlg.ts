@@ -20,22 +20,22 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
     S = ctx;
 });
 
-interface LocalState {
+interface LS {
     nodePrivsInfo: J.GetNodePrivilegesResponse;
 }
 
-export class SharingDlg extends DialogBase<LocalState> {
+export class SharingDlg extends DialogBase {
     dirty: boolean = false;
 
     constructor(private node: J.NodeInfo, state: AppState) {
         super("Node Sharing", "app-modal-content-medium-width", null, state);
-        this.mergeState({ nodePrivsInfo: null });
+        this.mergeState<LS>({ nodePrivsInfo: null });
     }
 
     renderDlg(): CompIntf[] {
         return [
             new Form(null, [
-                new EditPrivsTable(this.getState().nodePrivsInfo, this.removePrivilege),
+                new EditPrivsTable(this.getState<LS>().nodePrivsInfo, this.removePrivilege),
                 S.props.isShared(this.node) ? new Div("Remove All", {
                     className: "marginBottom marginRight float-end clickable",
                     onClick: this.removeAllPrivileges
@@ -88,7 +88,7 @@ export class SharingDlg extends DialogBase<LocalState> {
             includeOwners: true
         });
         this.node.ac = res.aclEntries;
-        this.mergeState({ nodePrivsInfo: res });
+        this.mergeState<LS>({ nodePrivsInfo: res });
     }
 
     removeAllPrivileges = async () => {
@@ -124,7 +124,7 @@ export class SharingDlg extends DialogBase<LocalState> {
         });
 
         this.node.ac = res.aclEntries;
-        this.mergeState({ nodePrivsInfo: res });
+        this.mergeState<LS>({ nodePrivsInfo: res });
     }
 
     shareToPersonDlg = async (): Promise<void> => {

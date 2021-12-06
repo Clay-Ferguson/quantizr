@@ -26,18 +26,18 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
     S = ctx;
 });
 
-interface LocalState {
+interface LS {
     downloadLink: string;
 }
 
-export class VideoTorrentPlayerDlg extends DialogBase<LocalState> {
+export class VideoTorrentPlayerDlg extends DialogBase {
     videoDiv: Div = new Div(null, {
         className: "webTorrentPlayer"
     });
 
     constructor(private torrentId: string, dialogMode: DialogMode, state: AppState) {
         super("Torrents", null, false, state, dialogMode);
-        this.mergeState({ downloadLink: null });
+        this.mergeState<LS>({ downloadLink: null });
         this.videoDiv.whenElm((elm: HTMLElement) => {
             this.load();
         });
@@ -45,7 +45,7 @@ export class VideoTorrentPlayerDlg extends DialogBase<LocalState> {
 
     renderDlg(): CompIntf[] {
         let children: CompIntf[] = [this.videoDiv];
-        children.push(new Anchor(this.getState().downloadLink, "Download", { target: "_blank" }));
+        children.push(new Anchor(this.getState<LS>().downloadLink, "Download", { target: "_blank" }));
         return children;
     }
 
@@ -74,7 +74,7 @@ export class VideoTorrentPlayerDlg extends DialogBase<LocalState> {
 
                 setTimeout(() => {
                     console.log("url=" + url);
-                    this.mergeState({ downloadLink: url });
+                    this.mergeState<LS>({ downloadLink: url });
 
                     // Display the file by adding it to the DOM.
                     // Supports video, audio, image files, and more!

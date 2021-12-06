@@ -7,11 +7,11 @@ import { ButtonBar } from "../widget/ButtonBar";
 import { Form } from "../widget/Form";
 import { NodeTypeListBox } from "../widget/NodeTypeListBox";
 
-interface LocalState {
+interface LS {
     selType: string;
 }
 
-export class ChangeNodeTypeDlg extends DialogBase<LocalState> {
+export class ChangeNodeTypeDlg extends DialogBase {
 
     selTypeValueIntf: ValueIntf;
     selCallback: Function = null;
@@ -23,15 +23,15 @@ export class ChangeNodeTypeDlg extends DialogBase<LocalState> {
 
         this.selTypeValueIntf = {
             setValue: (val: string): void => {
-                this.mergeState({ selType: val });
+                this.mergeState<LS>({ selType: val });
             },
 
             getValue: (): string => {
-                return this.getState().selType;
+                return this.getState<LS>().selType;
             }
         };
 
-        this.mergeState({ selType: curType || "u" });
+        this.mergeState<LS>({ selType: curType || "u" });
     }
 
     renderDlg(): CompIntf[] {
@@ -47,7 +47,7 @@ export class ChangeNodeTypeDlg extends DialogBase<LocalState> {
     }
 
     setNodeType = (): void => {
-        this.selCallback(this.getState().selType);
+        this.selCallback(this.getState<LS>().selType);
         this.close();
     }
 }

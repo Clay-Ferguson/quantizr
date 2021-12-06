@@ -9,11 +9,11 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
     S = ctx;
 });
 
-interface LocalState {
+interface LS {
     expanded?: boolean;
 }
 
-export class CollapsiblePanel extends Comp<LocalState> {
+export class CollapsiblePanel extends Comp {
 
     constructor(private collapsedButtonText: string,
         private expandedButtonText: string,
@@ -30,15 +30,15 @@ export class CollapsiblePanel extends Comp<LocalState> {
         this.setChildren(initialChildren);
         this.collapsedButtonText = collapsedButtonText || "More ";
         this.expandedButtonText = expandedButtonText || "Less ";
-        this.mergeState({ expanded });
+        this.mergeState<LS>({ expanded });
     }
 
     setExpanded(expanded: boolean) {
-        this.mergeState({ expanded });
+        this.mergeState<LS>({ expanded });
     }
 
     compRender(): ReactNode {
-        let state = this.getState();
+        let state = this.getState<LS>();
         let style = this.textLink ? "collapse-panel-link" : "btn btn-info ";
         let collapseClass = state.expanded ? "expand" : "collapse";
 
@@ -94,7 +94,7 @@ export class CollapsiblePanel extends Comp<LocalState> {
     }
 
     onToggle = (): void => {
-        let expanded = !this.getState().expanded;
+        let expanded = !this.getState<LS>().expanded;
         this.setExpanded(expanded);
         if (this.stateCallback) {
             this.stateCallback(expanded);

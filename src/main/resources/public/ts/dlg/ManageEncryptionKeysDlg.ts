@@ -13,11 +13,11 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
     S = ctx;
 });
 
-interface LocalState {
+interface LS {
     keyJson: string;
 }
 
-export class ManageEncryptionKeysDlg extends DialogBase<LocalState> {
+export class ManageEncryptionKeysDlg extends DialogBase {
 
     constructor(state: AppState) {
         super("Encryption Keys", null, false, state);
@@ -25,7 +25,7 @@ export class ManageEncryptionKeysDlg extends DialogBase<LocalState> {
 
     renderDlg(): CompIntf[] {
         return [
-            new TextContent(this.getState().keyJson, "tallTextContent", true),
+            new TextContent(this.getState<LS>().keyJson, "tallTextContent", true),
             new ButtonBar([
                 new Button("Close", this.close)
             ], "marginTop")
@@ -34,6 +34,6 @@ export class ManageEncryptionKeysDlg extends DialogBase<LocalState> {
 
     async preLoad(): Promise<void> {
         let keyJson: string = await S.encryption.exportKeys();
-        this.mergeState({ keyJson });
+        this.mergeState<LS>({ keyJson });
     }
 }

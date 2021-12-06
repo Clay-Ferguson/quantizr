@@ -9,6 +9,12 @@ let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (s: Singletons) => {
     S = s;
 });
+
+interface LS {
+    visible: boolean;
+    disabled: boolean;
+}
+
 export class Menu extends Div {
 
     static userClickedMenu: boolean = false;
@@ -21,7 +27,7 @@ export class Menu extends Div {
     }
 
     compRender(): ReactNode {
-        let state = this.getState();
+        let state = this.getState<LS>();
         this.attribs.style = { display: (state.visible && !state.disabled ? "" : "none") };
         let show = Menu.activeMenu === this.name;
         // console.log("MENU: " + this.name + " active=" + show);

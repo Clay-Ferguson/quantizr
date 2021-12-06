@@ -15,11 +15,11 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
     S = ctx;
 });
 
-interface LocalState {
+interface LS {
     selectedEmoji: string;
 }
 
-export class EmojiPickerDlg extends DialogBase<LocalState> {
+export class EmojiPickerDlg extends DialogBase {
 
     selectionValueIntf: ValueIntf;
 
@@ -28,12 +28,12 @@ export class EmojiPickerDlg extends DialogBase<LocalState> {
 
         this.selectionValueIntf = {
             setValue: (val: string): void => {
-                this.mergeState({ selectedEmoji: val });
+                this.mergeState<LS>({ selectedEmoji: val });
                 this.close();
             },
 
             getValue: (): string => {
-                return this.getState().selectedEmoji;
+                return this.getState<LS>().selectedEmoji;
             }
         };
     }

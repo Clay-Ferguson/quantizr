@@ -20,7 +20,7 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
     S = ctx;
 });
 
-interface LocalState {
+interface LS {
     sortField?: string;
     requirePriority?: boolean;
     caseSensitive?: boolean;
@@ -29,7 +29,7 @@ interface LocalState {
     sortDir?: string;
 }
 
-export class SearchContentDlg extends DialogBase<LocalState> {
+export class SearchContentDlg extends DialogBase {
     static defaultSearchText: string = "";
     static dlgState: any = {
         fuzzy: false,
@@ -50,21 +50,21 @@ export class SearchContentDlg extends DialogBase<LocalState> {
             this.searchTextField.focus();
         });
 
-        this.mergeState(SearchContentDlg.dlgState);
+        this.mergeState<LS>(SearchContentDlg.dlgState);
         this.searchTextState.setValue(SearchContentDlg.defaultSearchText);
     }
 
     renderDlg(): CompIntf[] {
 
         let requirePriorityCheckbox = null;
-        if (this.getState().sortField === "prp.priority.value") {
+        if (this.getState<LS>().sortField === "prp.priority.value") {
             requirePriorityCheckbox = new Checkbox("Require Priority", null, {
                 setValue: (checked: boolean): void => {
                     SearchContentDlg.dlgState.requirePriority = checked;
-                    this.mergeState({ requirePriority: checked });
+                    this.mergeState<LS>({ requirePriority: checked });
                 },
                 getValue: (): boolean => {
-                    return this.getState().requirePriority;
+                    return this.getState<LS>().requirePriority;
                 }
             });
         }
@@ -77,28 +77,28 @@ export class SearchContentDlg extends DialogBase<LocalState> {
                     new Checkbox("Regex", null, {
                         setValue: (checked: boolean): void => {
                             SearchContentDlg.dlgState.fuzzy = checked;
-                            this.mergeState({ fuzzy: checked });
+                            this.mergeState<LS>({ fuzzy: checked });
                         },
                         getValue: (): boolean => {
-                            return this.getState().fuzzy;
+                            return this.getState<LS>().fuzzy;
                         }
                     }),
                     new Checkbox("Case Sensitive", null, {
                         setValue: (checked: boolean): void => {
                             SearchContentDlg.dlgState.caseSensitive = checked;
-                            this.mergeState({ caseSensitive: checked });
+                            this.mergeState<LS>({ caseSensitive: checked });
                         },
                         getValue: (): boolean => {
-                            return this.getState().caseSensitive;
+                            return this.getState<LS>().caseSensitive;
                         }
                     }),
                     new Checkbox("Recursive", null, {
                         setValue: (checked: boolean): void => {
                             SearchContentDlg.dlgState.recursive = checked;
-                            this.mergeState({ recursive: checked });
+                            this.mergeState<LS>({ recursive: checked });
                         },
                         getValue: (): boolean => {
-                            return this.getState().recursive;
+                            return this.getState<LS>().recursive;
                         }
                     })
                     // requirePriorityCheckbox
@@ -119,13 +119,13 @@ export class SearchContentDlg extends DialogBase<LocalState> {
                             SearchContentDlg.dlgState.sortField = val;
                             SearchContentDlg.dlgState.sortDir = sortDir;
 
-                            this.mergeState({
+                            this.mergeState<LS>({
                                 sortField: val,
                                 sortDir
                             });
                         },
                         getValue: (): string => {
-                            return this.getState().sortField;
+                            return this.getState<LS>().sortField;
                         }
                     }),
                     requirePriorityCheckbox
@@ -174,16 +174,16 @@ export class SearchContentDlg extends DialogBase<LocalState> {
 
         let desc = SearchContentDlg.defaultSearchText ? ("Content: " + SearchContentDlg.defaultSearchText) : "";
 
-        let requirePriority = this.getState().requirePriority;
-        if (this.getState().sortField !== "prp.priority.value") {
+        let requirePriority = this.getState<LS>().requirePriority;
+        if (this.getState<LS>().sortField !== "prp.priority.value") {
             requirePriority = false;
         }
 
-        S.srch.search(node, null, SearchContentDlg.defaultSearchText, this.appState, null, desc, this.getState().fuzzy,
-            this.getState().caseSensitive, 0,
-            this.getState().recursive,
-            this.getState().sortField,
-            this.getState().sortDir,
+        S.srch.search(node, null, SearchContentDlg.defaultSearchText, this.appState, null, desc, this.getState<LS>().fuzzy,
+            this.getState<LS>().caseSensitive, 0,
+            this.getState<LS>().recursive,
+            this.getState<LS>().sortField,
+            this.getState<LS>().sortDir,
             requirePriority,
             this.close);
     }

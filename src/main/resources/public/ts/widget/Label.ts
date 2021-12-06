@@ -1,11 +1,11 @@
 import { ReactNode } from "react";
 import { Comp } from "./base/Comp";
 
-interface LocalState {
+interface LS {
     content: string;
 }
 
-export class Label extends Comp<LocalState> {
+export class Label extends Comp {
 
     constructor(content: string = "", attribs: Object = {}) {
         super(attribs);
@@ -13,10 +13,10 @@ export class Label extends Comp<LocalState> {
     }
 
     setText = (content: string) => {
-        this.mergeState({ content });
+        this.mergeState<LS>({ content });
     }
 
     compRender(): ReactNode {
-        return this.tagRender("label", this.getState().content, this.attribs);
+        return this.tagRender("label", this.getState<LS>().content, this.attribs);
     }
 }

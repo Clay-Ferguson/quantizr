@@ -16,20 +16,20 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
     S = ctx;
 });
 
-interface LocalState {
+interface LS {
     info: string;
     binQuota: number;
     binTotal: number;
 }
 
-export class ManageAccountDlg extends DialogBase<LocalState> {
+export class ManageAccountDlg extends DialogBase {
 
     constructor(state: AppState) {
         super("Manage Account", "app-modal-content-narrow-width", false, state);
     }
 
     renderDlg(): CompIntf[] {
-        let state: any = this.getState();
+        let state: any = this.getState<LS>();
 
         let data = null;
         if (state.binQuota) {
@@ -40,7 +40,7 @@ export class ManageAccountDlg extends DialogBase<LocalState> {
         }
 
         return [
-            new TextContent(this.getState().info, null, true),
+            new TextContent(this.getState<LS>().info, null, true),
             data ? new PieChart(data) : null,
 
             new CollapsiblePanel(null, null, null, [
@@ -75,7 +75,7 @@ export class ManageAccountDlg extends DialogBase<LocalState> {
             "Storage Used: " + S.util.formatMemory(res.binTotal) + "\n" +//
             "Percent Used: " + used;
 
-        this.mergeState({
+        this.mergeState<LS>({
             info,
             binQuota: res.binQuota,
             binTotal: res.binTotal

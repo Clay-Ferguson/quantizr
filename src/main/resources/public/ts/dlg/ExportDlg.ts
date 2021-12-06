@@ -24,19 +24,19 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
     S = ctx;
 });
 
-interface LocalState {
+interface LS {
     exportType: string;
     toIpfs?: boolean;
 }
 
-export class ExportDlg extends DialogBase<LocalState> {
+export class ExportDlg extends DialogBase {
 
     fileNameState: ValidatedState<any> = new ValidatedState<any>();
     saveToIpfsState: CompValueHolder<boolean> = new CompValueHolder<boolean>(this, "toIpfs");
 
     constructor(state: AppState, private node: NodeInfo) {
         super("Export", null, false, state);
-        this.mergeState({
+        this.mergeState<LS>({
             exportType: "zip"
             // toIpfs: false <--- set by 'saveToIpfsState'
         });
@@ -64,17 +64,17 @@ export class ExportDlg extends DialogBase<LocalState> {
         return new RadioButton(name, false, "exportTypeGroup", null, {
             setValue: (checked: boolean): void => {
                 if (checked) {
-                    this.mergeState({ exportType });
+                    this.mergeState<LS>({ exportType });
                 }
             },
             getValue: (): boolean => {
-                return this.getState().exportType === exportType;
+                return this.getState<LS>().exportType === exportType;
             }
         });
     }
 
     exportNodes = async (): Promise<void> => {
-        let state = this.getState();
+        let state = this.getState<LS>();
         let res: J.ExportResponse = await S.util.ajax<J.ExportRequest, J.ExportResponse>("export", {
             nodeId: this.node.id,
             exportExt: state.exportType,

@@ -15,13 +15,13 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
     S = ctx;
 });
 
-interface LocalState {
+interface LS {
     og: J.OpenGraph;
     loading?: boolean;
 }
 
 /* General Widget that doesn't fit any more reusable or specific category other than a plain Div, but inherits capability of Comp class */
-export class OpenGraphPanel extends Div<LocalState> {
+export class OpenGraphPanel extends Div {
     loading: boolean;
 
     constructor(private appState: AppState, key: string, private url: string) {
@@ -35,13 +35,13 @@ export class OpenGraphPanel extends Div<LocalState> {
          pull of the open graph data should result in og being an empty object and not null. */
         let og: J.OpenGraph = S.quanta.openGraphData.get(url);
         if (og) {
-            this.mergeState({ og });
+            this.mergeState<LS>({ og });
         }
     }
 
     domAddEvent(): void {
         let elm: HTMLElement = this.getRef();
-        if (!elm || !elm.isConnected || this.getState().og) return;
+        if (!elm || !elm.isConnected || this.getState<LS>().og) return;
         let og: J.OpenGraph = S.quanta.openGraphData.get(this.url);
         if (!og) {
             let observer = new IntersectionObserver(entries => {
@@ -64,12 +64,12 @@ export class OpenGraphPanel extends Div<LocalState> {
                                     // observer.disconnect();
                                     S.quanta.openGraphData.set(this.url, og);
                                     if (!elm.isConnected) return;
-                                    this.mergeState({ og });
+                                    this.mergeState<LS>({ og });
                                 });
                             }
                         }
                         else {
-                            this.mergeState({ og });
+                            this.mergeState<LS>({ og });
                         }
                         this.loadNext();
                     }
@@ -78,7 +78,7 @@ export class OpenGraphPanel extends Div<LocalState> {
             observer.observe(elm.parentElement);
         }
         else {
-            this.mergeState({ og });
+            this.mergeState<LS>({ og });
         }
         super.domAddEvent();
     }
@@ -123,7 +123,7 @@ export class OpenGraphPanel extends Div<LocalState> {
     }
 
     preRender(): void {
-        let state = this.getState();
+        let state = this.getState<LS>();
         if (state.loading || !state.og) {
             this.setChildren(null);
             return;

@@ -18,13 +18,13 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
     S = ctx;
 });
 
-interface LocalState {
+interface LS {
     splitMode?: string;
     splitType?: string;
     delimiter?: string;
 }
 
-export class SplitNodeDlg extends DialogBase<LocalState> {
+export class SplitNodeDlg extends DialogBase {
 
     delimiterState: ValidatedState<any> = new ValidatedState<any>();
 
@@ -46,7 +46,7 @@ export class SplitNodeDlg extends DialogBase<LocalState> {
             splitMode = "custom";
         }
 
-        this.mergeState({
+        this.mergeState<LS>({
             splitMode, // can be: custom | double | triple (todo-2: make an enum)
             splitType: "inline", // can be: inline | children (todo-2: make an enum)
             delimiter: "{split}"
@@ -61,21 +61,21 @@ export class SplitNodeDlg extends DialogBase<LocalState> {
                 new RadioButton("Split Inline", false, "splitTypeGroup", null, {
                     setValue: (checked: boolean): void => {
                         if (checked) {
-                            this.mergeState({ splitType: "inline" });
+                            this.mergeState<LS>({ splitType: "inline" });
                         }
                     },
                     getValue: (): boolean => {
-                        return this.getState().splitType === "inline";
+                        return this.getState<LS>().splitType === "inline";
                     }
                 }),
                 new RadioButton("Split into Children", true, "splitTypeGroup", null, {
                     setValue: (checked: boolean): void => {
                         if (checked) {
-                            this.mergeState({ splitType: "children" });
+                            this.mergeState<LS>({ splitType: "children" });
                         }
                     },
                     getValue: (): boolean => {
-                        return this.getState().splitType === "children";
+                        return this.getState<LS>().splitType === "children";
                     }
                 })
             ], "form-group-border splitNodeRadioButtonGroup"),
@@ -84,36 +84,36 @@ export class SplitNodeDlg extends DialogBase<LocalState> {
                 new RadioButton("Single Blank Line", true, "splitSpacingGroup", null, {
                     setValue: (checked: boolean): void => {
                         if (checked) {
-                            this.mergeState({ splitMode: "double" });
+                            this.mergeState<LS>({ splitMode: "double" });
                         }
                     },
                     getValue: (): boolean => {
-                        return this.getState().splitMode === "double";
+                        return this.getState<LS>().splitMode === "double";
                     }
                 }),
                 new RadioButton("Double Blank Line", false, "splitSpacingGroup", null, {
                     setValue: (checked: boolean): void => {
                         if (checked) {
-                            this.mergeState({ splitMode: "triple" });
+                            this.mergeState<LS>({ splitMode: "triple" });
                         }
                     },
                     getValue: (): boolean => {
-                        return this.getState().splitMode === "triple";
+                        return this.getState<LS>().splitMode === "triple";
                     }
                 }),
                 new RadioButton("Custom Delimiter", false, "splitSpacingGroup", null, {
                     setValue: (checked: boolean): void => {
                         if (checked) {
-                            this.mergeState({ splitMode: "custom" });
+                            this.mergeState<LS>({ splitMode: "custom" });
                         }
                     },
                     getValue: (): boolean => {
-                        return this.getState().splitMode === "custom";
+                        return this.getState<LS>().splitMode === "custom";
                     }
                 })
             ], "form-group-border splitNodeRadioButtonGroup"),
 
-            (this.getState().splitMode === "custom") ? new TextField("Delimiter", false, null, null, false, this.delimiterState) : null,
+            (this.getState<LS>().splitMode === "custom") ? new TextField("Delimiter", false, null, null, false, this.delimiterState) : null,
 
             new ButtonBar([
                 new Button("Split Node", this.splitNodes, null, "btn-primary"),
@@ -123,7 +123,7 @@ export class SplitNodeDlg extends DialogBase<LocalState> {
     }
 
     splitNodes = (): void => {
-        let state = this.getState();
+        let state = this.getState<LS>();
 
         let delim = "";
         if (state.splitMode === "double") {

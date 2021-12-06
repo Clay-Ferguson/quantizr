@@ -6,12 +6,12 @@ import { CompIntf } from "./base/CompIntf";
 import { Div } from "./Div";
 import { HorizontalLayout } from "./HorizontalLayout";
 
-interface LocalState {
+interface LS {
     idx?: number;
     counter?: number;
 }
 
-export class CompDemoButton extends Div<LocalState> {
+export class CompDemoButton extends Div {
 
     constructor(public idx: number) {
         super(null, {
@@ -23,7 +23,7 @@ export class CompDemoButton extends Div<LocalState> {
 
     preRender(): void {
         let state: AppState = useSelector((state: AppState) => state);
-        let cstate = this.getState();
+        let cstate = this.getState<LS>();
         let children: CompIntf[] = [];
 
         children.push(new HorizontalLayout([
@@ -33,7 +33,7 @@ export class CompDemoButton extends Div<LocalState> {
                 onClick: () => {
                     Comp.renderCounter = 0;
                     // this.setStateEx({ counter: ++cstate.counter, cstate.idx });
-                    this.mergeState({ counter: ++cstate.counter });
+                    this.mergeState<LS>({ counter: ++cstate.counter });
 
                     dispatch("Action_DemoAppIncCounter", (s: AppState): AppState => {
                         s.compDemoIdActive = cstate.idx;

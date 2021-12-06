@@ -18,18 +18,18 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
     S = ctx;
 });
 
-interface LocalState {
+interface LS {
     recursive: boolean;
 }
 
-export class SearchAndReplaceDlg extends DialogBase<LocalState> {
+export class SearchAndReplaceDlg extends DialogBase {
 
     searchState: ValidatedState<any> = new ValidatedState<any>();
     replaceState: ValidatedState<any> = new ValidatedState<any>();
 
     constructor(state: AppState) {
         super("Search and Replace", "app-modal-content-narrow-width", false, state);
-        this.mergeState({ recursive: true });
+        this.mergeState<LS>({ recursive: true });
     }
 
     renderDlg(): CompIntf[] {
@@ -42,10 +42,10 @@ export class SearchAndReplaceDlg extends DialogBase<LocalState> {
                 new HorizontalLayout([
                     new Checkbox("Include Sub-Nodes", null, {
                         setValue: (checked: boolean): void => {
-                            this.mergeState({ recursive: checked });
+                            this.mergeState<LS>({ recursive: checked });
                         },
                         getValue: (): boolean => {
-                            return this.getState().recursive;
+                            return this.getState<LS>().recursive;
                         }
                     })
                 ]),
@@ -90,7 +90,7 @@ export class SearchAndReplaceDlg extends DialogBase<LocalState> {
             return;
         }
 
-        S.srch.searchAndReplace(this.getState().recursive, node.id, this.searchState.getValue(), this.replaceState.getValue(), this.appState);
+        S.srch.searchAndReplace(this.getState<LS>().recursive, node.id, this.searchState.getValue(), this.replaceState.getValue(), this.appState);
         this.close();
     }
 }

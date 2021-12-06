@@ -26,11 +26,11 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
     S = ctx;
 });
 
-interface LocalState {
+interface LS {
     userProfile: any; // todo-0: fix type
 }
 
-export class UserProfileDlg extends DialogBase<LocalState> {
+export class UserProfileDlg extends DialogBase {
     readOnly: boolean;
     bioState: ValidatedState<any> = new ValidatedState<any>();
     displayNameState: ValidatedState<any> = new ValidatedState<any>();
@@ -43,11 +43,11 @@ export class UserProfileDlg extends DialogBase<LocalState> {
             userNodeId = state.userProfile.userNodeId;
         }
         this.readOnly = state.userProfile == null || state.userProfile.userNodeId !== userNodeId;
-        this.mergeState({ userProfile: null });
+        this.mergeState<LS>({ userProfile: null });
     }
 
     getTitleText(): string {
-        const state: any = this.getState();
+        const state: any = this.getState<LS>();
         if (!state.userProfile) return "";
         let userName = state.userProfile.userName;
         if (userName.indexOf("@") === -1) {
@@ -57,7 +57,7 @@ export class UserProfileDlg extends DialogBase<LocalState> {
     }
 
     renderDlg(): CompIntf[] {
-        const state: any = this.getState();
+        const state: any = this.getState<LS>();
         if (!state.userProfile) {
             return [new Label("Loading...")];
         }
@@ -194,7 +194,7 @@ export class UserProfileDlg extends DialogBase<LocalState> {
         if (res?.userProfile) {
             this.bioState.setValue(res.userProfile.userBio);
             this.displayNameState.setValue(res.userProfile.displayName);
-            this.mergeState({
+            this.mergeState<LS>({
                 userProfile: res.userProfile
             });
         }
@@ -210,7 +210,7 @@ export class UserProfileDlg extends DialogBase<LocalState> {
     }
 
     addFriend = async () => {
-        const state: any = this.getState();
+        const state: any = this.getState<LS>();
         let res: J.AddFriendResponse = await S.util.ajax<J.AddFriendRequest, J.AddFriendResponse>("addFriend", {
             userName: state.userProfile.userName
         });
@@ -225,7 +225,7 @@ export class UserProfileDlg extends DialogBase<LocalState> {
     }
 
     blockUser = async () => {
-        const state: any = this.getState();
+        const state: any = this.getState<LS>();
         await S.util.ajax<J.BlockUserRequest, J.BlockUserResponse>("blockUser", {
             userName: state.userProfile.userName
         });
@@ -249,7 +249,7 @@ export class UserProfileDlg extends DialogBase<LocalState> {
 
     makeProfileImg(hasHeaderImg: boolean): CompIntf {
         let src: string = null;
-        let state: any = this.getState();
+        let state: any = this.getState<LS>();
 
         // if ActivityPub icon exists, we know that's the one to use.
         if (state.userProfile.apIconUrl) {
@@ -272,7 +272,7 @@ export class UserProfileDlg extends DialogBase<LocalState> {
                 if (res?.userProfile) {
                     state.userProfile.avatarVer = res.userProfile.avatarVer;
                     state.userProfile.userNodeId = res.userProfile.userNodeId;
-                    this.mergeState({
+                    this.mergeState<LS>({
                         userProfile: state.userProfile
                     });
                 }
@@ -309,7 +309,7 @@ export class UserProfileDlg extends DialogBase<LocalState> {
 
     makeProfileHeaderImg(): CompIntf {
         let src: string = null;
-        const state: any = this.getState();
+        const state: any = this.getState<LS>();
 
         if (state.userProfile.apImageUrl) {
             src = state.userProfile.apImageUrl;
@@ -331,7 +331,7 @@ export class UserProfileDlg extends DialogBase<LocalState> {
                 if (res?.userProfile) {
                     state.userProfile.headerImageVer = res.userProfile.headerImageVer;
                     state.userProfile.userNodeId = res.userProfile.userNodeId;
-                    this.mergeState({
+                    this.mergeState<LS>({
                         userProfile: state.userProfile
                     });
                 }

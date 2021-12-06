@@ -10,7 +10,7 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
 });
 
 /* General Widget that doesn't fit any more reusable or specific category other than a plain Div, but inherits capability of Comp class */
-export class Span<LocalState = any> extends Comp<LocalState> {
+export class Span<LocalState = any> extends Comp {
 
     constructor(public content: string = "", attribs: Object = {}, initialChildren: Comp[] = null) {
         super(attribs);

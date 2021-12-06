@@ -18,18 +18,18 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
     S = ctx;
 });
 
-interface LocalState {
+interface LS {
     recursive?: boolean;
 }
 
-export class TransferNodeDlg extends DialogBase<LocalState> {
+export class TransferNodeDlg extends DialogBase {
 
     toUserState: ValidatedState<any> = new ValidatedState<any>();
     fromUserState: ValidatedState<any> = new ValidatedState<any>();
 
     constructor(state: AppState) {
         super("Transfer Node", "app-modal-content-narrow-width", false, state);
-        this.mergeState({
+        this.mergeState<LS>({
             recursive: false
         });
     }
@@ -45,10 +45,10 @@ export class TransferNodeDlg extends DialogBase<LocalState> {
                 new HorizontalLayout([
                     new Checkbox("Include Sub-Nodes", null, {
                         setValue: (checked: boolean): void => {
-                            this.mergeState({ recursive: checked });
+                            this.mergeState<LS>({ recursive: checked });
                         },
                         getValue: (): boolean => {
-                            return this.getState().recursive;
+                            return this.getState<LS>().recursive;
                         }
                     })
                 ]),
@@ -85,7 +85,7 @@ export class TransferNodeDlg extends DialogBase<LocalState> {
         }
 
         let res: J.TransferNodeResponse = await S.util.ajax<J.TransferNodeRequest, J.TransferNodeResponse>("transferNode", {
-            recursive: this.getState().recursive,
+            recursive: this.getState<LS>().recursive,
             nodeId: node.id,
             fromUser: this.fromUserState.getValue(),
             toUser: this.toUserState.getValue()
