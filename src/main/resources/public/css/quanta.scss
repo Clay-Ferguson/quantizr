@@ -1378,7 +1378,7 @@ i'm backing out for now
     table-layout: fixed;
     // remove border-collapse for round borders
     // border-collapse: collapse;
-    border-spacing: 16px;
+    border-spacing: 8px;
 }
 
 .node-grid-item {
@@ -1393,11 +1393,9 @@ i'm backing out for now
 
 .node-grid-cell {
     border: 2px solid $nodeBorderBottomColor;
-
     display: table-cell;
-    padding-top: 5px;
+    padding-top: 8px;
     padding-bottom: 5px;
-    
     border-radius: 6px;
 }
 

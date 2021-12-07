@@ -279,10 +279,11 @@ public class MongoRead extends ServiceBase {
         return ret;
     }
 
-    // todo-1: Need to implement a save hook/callback capability in the MongoListener so we can get
-    // notifications sent to any threads that are waiting to lookup a node
-    // once it exists, but we will STILL probably need to DO the lookup so we don't
-    // have concurrent access threading bug.
+    /*
+     * todo-1: Need to implement a save hook/callback capability in the MongoListener so we can get
+     * notifications sent to any threads that are waiting to lookup a node once it exists, but we will
+     * STILL probably need to DO the lookup so we don't have concurrent access threading bug.
+     */
     public SubNode getNode(MongoSession ms, ObjectId objId, boolean allowAuth, int retries) {
         SubNode ret = getNode(ms, objId, allowAuth);
         while (no(ret) && retries-- > 0) {
@@ -325,8 +326,7 @@ public class MongoRead extends ServiceBase {
     }
 
     public List<SubNode> getChildrenAsList(MongoSession ms, SubNode node, boolean ordered, Integer limit) {
-        Iterable<SubNode> iter =
-                getChildren(ms, node, ordered ? Sort.by(Sort.Direction.ASC, SubNode.ORDINAL) : null, limit, 0);
+        Iterable<SubNode> iter = getChildren(ms, node, ordered ? Sort.by(Sort.Direction.ASC, SubNode.ORDINAL) : null, limit, 0);
         return iterateToList(iter);
     }
 
@@ -550,9 +550,6 @@ public class MongoRead extends ServiceBase {
          * This regex finds all that START WITH path, have some characters after path, before the end of the
          * string. Without the trailing (.+)$ we would be including the node itself in addition to all its
          * children.
-         * 
-         * todo-1: Look for places we could be passing COMPILED regex object into all calls like this, and
-         * not the string!
          */
         Criteria criteria = Criteria.where(SubNode.PATH).regex(mongoUtil.regexRecursiveChildrenOfPath(node.getPath()));
         query.addCriteria(criteria);

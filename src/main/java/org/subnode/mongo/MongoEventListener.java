@@ -72,8 +72,6 @@ public class MongoEventListener extends AbstractMongoEventListener<SubNode> {
 		}
 		dbObj.put(SubNode.ID, id);
 
-		// Force ordinal to have an integer value (non-null). How to do
-		// "constraints" in MongoDB (todo-1)
 		if (no(node.getOrdinal())) {
 			node.setOrdinal(0L);
 			dbObj.put(SubNode.ORDINAL, 0L);
