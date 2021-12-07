@@ -32,6 +32,7 @@ import { App } from "./comp/App";
 import { Comp } from "./comp/base/Comp";
 import { CompIntf } from "./comp/base/CompIntf";
 import { WelcomePanel } from "./comp/WelcomePanel";
+import { FeedViewProps } from "./tabs/FeedViewProps";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (s: Singletons) => {
@@ -648,10 +649,9 @@ export class Quanta implements QuantaIntf {
                     name: "Feed",
                     id: C.TAB_FEED,
                     isVisible: () => true,
-                    constructView: (data: TabDataIntf) => new FeedView(s, data),
+                    constructView: (data: TabDataIntf<FeedViewProps>) => new FeedView(s, data),
                     rsInfo: null,
                     scrollPos: 0,
-                    // need typesafe props (todo-1)
                     props: {
                         page: 0,
                         refreshCounter: 0,
@@ -674,7 +674,7 @@ export class Quanta implements QuantaIntf {
                         // must be true to allow NSFW materials.
                         feedFilterNSFW: true,
 
-                        feedResults: null, // NodeInfo[];
+                        feedResults: null,
                         feedEndReached: false
                     }
                 },

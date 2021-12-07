@@ -15,6 +15,7 @@ import { Button } from "./comp/Button";
 import { ButtonBar } from "./comp/ButtonBar";
 import { Heading } from "./comp/Heading";
 import { VerticalLayout } from "./comp/VerticalLayout";
+import { FeedViewProps } from "./tabs/FeedViewProps";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (s: Singletons) => {
@@ -505,7 +506,7 @@ export class Nav implements NavIntf {
         return newNode;
     }
 
-    messages = (props: Object): void => {
+    messages = (props: FeedViewProps): void => {
         let feedData: TabDataIntf = S.quanta.getTabDataById(null, C.TAB_FEED);
         if (!feedData) {
             return;

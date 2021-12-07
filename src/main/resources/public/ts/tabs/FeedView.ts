@@ -25,6 +25,7 @@ import { Span } from "../comp/Span";
 import { Spinner } from "../comp/Spinner";
 import { TextContent } from "../comp/TextContent";
 import { TextField } from "../comp/TextField";
+import { FeedViewProps } from "./FeedViewProps";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
@@ -33,9 +34,9 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
 
 /* General Widget that doesn't fit any more reusable or specific category other than a plain Div,
 but inherits capability of Comp class */
-export class FeedView extends AppTab {
+export class FeedView extends AppTab<FeedViewProps> {
 
-    constructor(state: AppState, data: TabDataIntf) {
+    constructor(state: AppState, data: TabDataIntf<FeedViewProps>) {
         super(state, data);
         data.inst = this;
     }
@@ -129,7 +130,6 @@ export class FeedView extends AppTab {
 
         let children: Comp[] = [];
         children.push(new Div(null, { className: "marginBottom" }, topChildren));
-
         let childCount = this.data.props.feedResults ? this.data.props.feedResults.length : 0;
 
         // if we're editing an existing item determine that before starting to render rows.

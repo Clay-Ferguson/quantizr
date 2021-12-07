@@ -1,7 +1,7 @@
 import { ResultSetInfo } from "../ResultSetInfo";
 import { CompIntf } from "../comp/base/CompIntf";
 
-export interface TabDataIntf {
+export interface TabDataIntf<PropsType = any> {
     // display name shown on the tab
     name: string;
 
@@ -20,5 +20,5 @@ export interface TabDataIntf {
     isVisible(): boolean;
 
     rsInfo: ResultSetInfo;
-    props: any;
+    props: PropsType;
 }

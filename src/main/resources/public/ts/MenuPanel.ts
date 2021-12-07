@@ -31,10 +31,6 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (s: Singletons) => {
     S = s;
 });
 
-/* todo-1: We don't need to be generating NEW function instances (fat arrows) in here every time
- because we can just pre-create each function and hold in static vars
- and each one can query for the state dynamically. This is all fixed except for the admin ones because those only
- affect the admin and are lower priority to fix */
 export class MenuPanel extends Div {
     constructor(state: AppState) {
         super(null, {

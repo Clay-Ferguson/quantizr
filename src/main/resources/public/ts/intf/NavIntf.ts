@@ -1,5 +1,6 @@
 import { AppState } from "../AppState";
 import * as J from "../JavaIntf";
+import { FeedViewProps } from "../tabs/FeedViewProps";
 
 export interface NavIntf {
     _UID_ROWID_PREFIX: string;
@@ -35,5 +36,5 @@ export interface NavIntf {
     prevFullScreenImgViewer(appState: AppState): void;
     nextFullScreenImgViewer(appState: AppState): void;
     getAdjacentNode(dir: string, state: AppState): J.NodeInfo;
-    messages(props: Object): void;
+    messages(props: FeedViewProps): void;
 }

@@ -10,16 +10,13 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
     S = ctx;
 });
 
-export class AppTab extends Div {
-    data: TabDataIntf;
-
-    constructor(state: AppState, data: TabDataIntf, private extraEditModeClass: string = null) {
+export class AppTab<PropType = any> extends Div {
+    constructor(state: AppState, public data: TabDataIntf<PropType>, private extraEditModeClass: string = null) {
         super(null, {
             id: data.id,
             // tabIndex is required or else scrolling by arrow keys breaks.
             tabIndex: "2"
         });
-        this.data = data;
         this.domAddEvent = this.domAddEvent.bind(this);
         this.domPreUpdateEvent = this.domPreUpdateEvent.bind(this);
     }
