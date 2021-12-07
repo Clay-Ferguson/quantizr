@@ -53,6 +53,7 @@ interface LS {
     node?: J.NodeInfo;
     selectedProps?: Set<string>;
     toIpfs?: boolean;
+    speechActive?: boolean;
 }
 
 export class EditNodeDlg extends DialogBase {
@@ -1185,9 +1186,7 @@ export class EditNodeDlg extends DialogBase {
         });
 
         S.speech.toggleActive();
-
-        // todo-0: this refactored into a bizar looking redundant thing. retest this.
-        this.mergeState<LS>(this.getState<LS>());
+        this.mergeState<LS>({ speechActive: S.speech.speechActive });
 
         setTimeout(() => {
             if (this.contentEditor) {

@@ -27,7 +27,7 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
 });
 
 interface LS {
-    userProfile: any; // todo-0: fix type
+    userProfile: J.UserProfile;
 }
 
 export class UserProfileDlg extends DialogBase {

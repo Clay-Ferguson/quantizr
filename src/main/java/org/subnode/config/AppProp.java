@@ -91,7 +91,6 @@ public class AppProp {
 				is = resource.getInputStream();
 
 				map = yamlMapper.readValue(is, new TypeReference<HashMap<String, Object>>() {});
-
 				if (no(map)) {
 					map = new HashMap<>();
 				}
