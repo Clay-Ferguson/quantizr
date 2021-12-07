@@ -41,9 +41,6 @@ export class InboxNodeTypeHandler extends TypeBase {
     render(node: J.NodeInfo, rowStyling: boolean, isTreeView: boolean, state: AppState): Comp {
         return new HorizontalLayout([
             new Heading(4, "Inbox"),
-
-            // todo-1: based on redesign of HorizontalLayout we probably want this button bar at TOP
-            // and then remove the clearfix
             new ButtonBar([
                 new Button("Clear Inbox", () => {
                     S.edit.clearInbox(state);

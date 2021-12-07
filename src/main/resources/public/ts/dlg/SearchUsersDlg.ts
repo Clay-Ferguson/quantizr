@@ -115,7 +115,7 @@ export class SearchUsersDlg extends DialogBase {
                     new Button("Search", this.search, null, "btn-primary"),
                     new HelpButton(() => S.quanta?.config?.help?.search?.dialog),
                     // this Graph button will work, but why graph users? ... there are no linkages between them... yet.
-                    // todo-1: however the VERY amazing feature of showing a true "Graph of Who is Following Who" would be
+                    // todo: however the VERY amazing feature of showing a true "Graph of Who is Following Who" would be
                     // possible and not even all that difficult based on the existing code already written.
                     // new Button("Graph", this.graph, null, "btn-primary"),
                     // we can steal the 'graph' from from the other dialogs when needed.
