@@ -2,8 +2,8 @@ import { State } from "./State";
 
 /* todo-2: Finish making this type safe, and don't use 'any' inside here */
 export class ValidatedState<S> {
-    v: State<S> = new State<S>();
-    e: State<S> = new State<S>();
+    v: State = new State();
+    e: State = new State();
 
     constructor(val: any = null) {
         this.setValue(val);

@@ -22,7 +22,7 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
  * This base class is a hybrid that can render React components or can be used to render plain HTML to be used in innerHTML of elements.
  * The innerHTML approach is being phased out in order to transition fully over to normal ReactJS.
  */
-export abstract class Comp<StateType = any> implements CompIntf {
+export abstract class Comp implements CompIntf {
     static renderCounter: number = 0;
     static focusElmId: string = null;
     public rendered: boolean = false;
@@ -57,14 +57,14 @@ export abstract class Comp<StateType = any> implements CompIntf {
      * allowRect can be set to false for components that are known to be used in cases where not all of their subchildren are react or for
      * whatever reason we want to disable react rendering, and fall back on render-to-text approach
      */
-    constructor(attribs?: any, private s?: State<StateType>) {
+    constructor(attribs?: any, private stateMgr?: State) {
         this.domAddEvent = this.domAddEvent.bind(this);
         this.domRemoveEvent = this.domRemoveEvent.bind(this);
         this.domUpdateEvent = this.domUpdateEvent.bind(this);
         this.domPreUpdateEvent = this.domPreUpdateEvent.bind(this);
 
-        if (!s) {
-            this.s = new State<StateType>();
+        if (!stateMgr) {
+            this.stateMgr = new State();
         }
         this.attribs = attribs || {};
 
@@ -310,20 +310,10 @@ export abstract class Comp<StateType = any> implements CompIntf {
         });
     }
 
-    updateVisAndEnablement() {
-        if (this.s.state.enabled === undefined) {
-            this.s.state.enabled = true;
-        }
-
-        if (this.s.state.visible === undefined) {
-            this.s.state.visible = true;
-        }
-    }
-
     /* Renders this node to a specific tag, including support for non-React children anywhere in the subgraph */
     tagRender(tag: any, content: string, props: any) {
         // console.log("Comp.tagRender: " + this.jsClassName + " id=" + props.id);
-        this.updateVisAndEnablement();
+        this.stateMgr.updateVisAndEnablement();
 
         try {
             let children: any[] = this.buildChildren();
@@ -354,16 +344,16 @@ export abstract class Comp<StateType = any> implements CompIntf {
     /* This is how you can add properties and overwrite them in existing state. Since all components are assumed to have
        both visible/enbled properties, this is the safest way to set other state that leaves visible/enabled props intact
        */
-    mergeState<ST = StateType>(moreState: ST): any {
-        this.s.mergeState(moreState);
+    mergeState<ST = any>(moreState: ST): any {
+        this.stateMgr.mergeState<ST>(moreState);
+    }
+
+    setState = <ST = any>(newState: ST): any => {
+        this.stateMgr.setState<ST>(newState);
     }
 
     forceRender() {
         this.mergeState({ forceRender: Comp.nextGuid() } as any);
-    }
-
-    setState = <ST = StateType>(newState: ST): any => {
-        this.s.setState(newState);
     }
 
     /* Note: this method performs a direct state mod, until react overrides it using useState return value
@@ -376,12 +366,12 @@ export abstract class Comp<StateType = any> implements CompIntf {
 
     There are places where 'mergeState' works but 'setState' fails, that needs investigation like EditNodeDlg.
     */
-    setStateEx<ST = StateType>(state: ST) {
-        this.s.setStateEx(state);
+    setStateEx<ST = any>(state: ST) {
+        this.stateMgr.setStateEx<ST>(state);
     }
 
-    getState<ST = StateType>(): ST {
-        return this.s.state;
+    getState<ST = any>(): ST {
+        return this.stateMgr.state;
     }
 
     // Core 'render' function used by react. Never really any need to override this, but it's theoretically possible.
@@ -393,7 +383,7 @@ export abstract class Comp<StateType = any> implements CompIntf {
 
         let ret: ReactNode = null;
         try {
-            this.s.useState();
+            this.stateMgr.useState();
 
             // With 'useRef()' we sometimes get error:
             // Function components cannot be given refs. Attempts to access this ref will fail. Did you mean to use React.forwardRef(
@@ -407,7 +397,7 @@ export abstract class Comp<StateType = any> implements CompIntf {
             // useLayoutEffect(() => this.domPreUpdateEvent(), []);
             useEffect(() => this.domRemoveEvent, []);
 
-            this.updateVisAndEnablement();
+            this.stateMgr.updateVisAndEnablement();
 
             /* Theoretically we could avoid calling preRender if it weren't for the fact that React monitors
             which hooks get called at each render cycle, so if we bypass the preRender because we wont' be using

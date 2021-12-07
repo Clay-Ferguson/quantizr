@@ -16,7 +16,7 @@ interface LS {
 
 export class Input extends Comp {
 
-    constructor(attribs: Object = {}, s?: State<any>) {
+    constructor(attribs: Object = {}, s?: State) {
         super(attribs, s);
         this.attribs.onChange = (evt) => {
             this.mergeState<LS>({ value: evt.target.value });

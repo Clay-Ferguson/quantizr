@@ -197,8 +197,6 @@ export class ServerPush implements ServerPushIntf {
             return;
         }
 
-        // todo-1: I think this dispatch is working, but another full FeedView refresh (from actual server query too) is somehow following after also
-        // so need to check and see how to avoid that.
         dispatch("Action_RenderFeedResults", (s: AppState): AppState => {
             feedData.props.feedResults = feedData.props.feedResults || [];
 

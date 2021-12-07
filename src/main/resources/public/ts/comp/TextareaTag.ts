@@ -19,7 +19,7 @@ export class TextareaTag extends Comp {
     static MIN_ROWS = 3;
     static MAX_ROWS = 15;
 
-    constructor(attribs: Object = {}, s?: State<any>, private calcRows: boolean = false) {
+    constructor(attribs: Object = {}, s?: State, private calcRows: boolean = false) {
         super(attribs, s);
         this.attribs.onChange = (evt) => {
             this.mergeState<LS>({ value: evt.target.value });
