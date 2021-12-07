@@ -7,10 +7,10 @@ import * as J from "../JavaIntf";
 import { PubSub } from "../PubSub";
 import { Singletons } from "../Singletons";
 import { TrendingRSInfo } from "../TrendingRSInfo";
-import { AppTab } from "../widget/AppTab";
-import { Div } from "../widget/Div";
-import { Heading } from "../widget/Heading";
-import { Span } from "../widget/Span";
+import { AppTab } from "../comp/AppTab";
+import { Div } from "../comp/Div";
+import { Heading } from "../comp/Heading";
+import { Span } from "../comp/Span";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {

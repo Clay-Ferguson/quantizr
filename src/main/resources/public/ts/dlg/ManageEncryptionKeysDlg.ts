@@ -3,10 +3,10 @@ import { Constants as C } from "../Constants";
 import { DialogBase } from "../DialogBase";
 import { PubSub } from "../PubSub";
 import { Singletons } from "../Singletons";
-import { CompIntf } from "../widget/base/CompIntf";
-import { Button } from "../widget/Button";
-import { ButtonBar } from "../widget/ButtonBar";
-import { TextContent } from "../widget/TextContent";
+import { CompIntf } from "../comp/base/CompIntf";
+import { Button } from "../comp/Button";
+import { ButtonBar } from "../comp/ButtonBar";
+import { TextContent } from "../comp/TextContent";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {

@@ -11,10 +11,10 @@ import { TabDataIntf } from "./intf/TabDataIntf";
 import * as J from "./JavaIntf";
 import { PubSub } from "./PubSub";
 import { Singletons } from "./Singletons";
-import { Button } from "./widget/Button";
-import { ButtonBar } from "./widget/ButtonBar";
-import { Heading } from "./widget/Heading";
-import { VerticalLayout } from "./widget/VerticalLayout";
+import { Button } from "./comp/Button";
+import { ButtonBar } from "./comp/ButtonBar";
+import { Heading } from "./comp/Heading";
+import { VerticalLayout } from "./comp/VerticalLayout";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (s: Singletons) => {

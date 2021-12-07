@@ -1,8 +1,8 @@
 import { appState, dispatch, store } from "./AppRedux";
 import { AppState } from "./AppState";
-import { NodeCompContent } from "./comps/NodeCompContent";
-import { NodeCompRowFooter } from "./comps/NodeCompRowFooter";
-import { NodeCompRowHeader } from "./comps/NodeCompRowHeader";
+import { NodeCompContent } from "./comp/node/NodeCompContent";
+import { NodeCompRowFooter } from "./comp/node/NodeCompRowFooter";
+import { NodeCompRowHeader } from "./comp/node/NodeCompRowHeader";
 import { Constants as C } from "./Constants";
 import { MessageDlg } from "./dlg/MessageDlg";
 import { FollowersRSInfo } from "./FollowersRSInfo";
@@ -14,8 +14,8 @@ import { PubSub } from "./PubSub";
 import { SharesRSInfo } from "./SharesRSInfo";
 import { Singletons } from "./Singletons";
 import { TimelineRSInfo } from "./TimelineRSInfo";
-import { Comp } from "./widget/base/Comp";
-import { Div } from "./widget/Div";
+import { Comp } from "./comp/base/Comp";
+import { Div } from "./comp/Div";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (s: Singletons) => {

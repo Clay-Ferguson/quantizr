@@ -4,12 +4,12 @@ import { Constants as C } from "../Constants";
 import { TabDataIntf } from "../intf/TabDataIntf";
 import { PubSub } from "../PubSub";
 import { Singletons } from "../Singletons";
-import { AppTab } from "../widget/AppTab";
-import { Comp } from "../widget/base/Comp";
-import { CompIntf } from "../widget/base/CompIntf";
-import { Div } from "../widget/Div";
-import { Heading } from "../widget/Heading";
-import { HelpButton } from "../widget/HelpButton";
+import { AppTab } from "../comp/AppTab";
+import { Comp } from "../comp/base/Comp";
+import { CompIntf } from "../comp/base/CompIntf";
+import { Div } from "../comp/Div";
+import { Heading } from "../comp/Heading";
+import { HelpButton } from "../comp/HelpButton";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {

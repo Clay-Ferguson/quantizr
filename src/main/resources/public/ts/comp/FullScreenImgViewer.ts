@@ -1,6 +1,6 @@
 import { useSelector } from "react-redux";
 import { AppState } from "../AppState";
-import { NodeCompBinary } from "../comps/NodeCompBinary";
+import { NodeCompBinary } from "../comp/node/NodeCompBinary";
 import { Constants as C } from "../Constants";
 import * as J from "../JavaIntf";
 import { PubSub } from "../PubSub";

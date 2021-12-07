@@ -15,7 +15,7 @@ import * as J from "./JavaIntf";
 import { PubSub } from "./PubSub";
 import { Singletons } from "./Singletons";
 import { NodeHistoryItem } from "./NodeHistoryItem";
-import { Comp } from "./widget/base/Comp";
+import { Comp } from "./comp/base/Comp";
 import DOMPurify from "dompurify";
 
 let S: Singletons;

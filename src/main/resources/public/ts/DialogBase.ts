@@ -7,10 +7,10 @@ import { DialogBaseImpl } from "./DialogBaseImpl";
 import { DialogMode } from "./enums/DialogMode";
 import { PubSub } from "./PubSub";
 import { Singletons } from "./Singletons";
-import { Comp } from "./widget/base/Comp";
-import { CompIntf } from "./widget/base/CompIntf";
-import { Div } from "./widget/Div";
-import { Span } from "./widget/Span";
+import { Comp } from "./comp/base/Comp";
+import { CompIntf } from "./comp/base/CompIntf";
+import { Div } from "./comp/Div";
+import { Span } from "./comp/Span";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (s: Singletons) => {

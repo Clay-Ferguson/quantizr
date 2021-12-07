@@ -4,11 +4,11 @@ import { DialogBase } from "../DialogBase";
 import { PubSub } from "../PubSub";
 import { Singletons } from "../Singletons";
 import { ValidatedState } from "../ValidatedState";
-import { CompIntf } from "../widget/base/CompIntf";
-import { Button } from "../widget/Button";
-import { ButtonBar } from "../widget/ButtonBar";
-import { Form } from "../widget/Form";
-import { TextField } from "../widget/TextField";
+import { CompIntf } from "../comp/base/CompIntf";
+import { Button } from "../comp/Button";
+import { ButtonBar } from "../comp/ButtonBar";
+import { Form } from "../comp/Form";
+import { TextField } from "../comp/TextField";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {

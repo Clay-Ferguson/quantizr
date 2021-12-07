@@ -1,6 +1,6 @@
 import { appState, dispatch, store } from "./AppRedux";
 import { AppState } from "./AppState";
-import { OpenGraphPanel } from "./comps/OpenGraphPanel";
+import { OpenGraphPanel } from "./comp/OpenGraphPanel";
 import { Constants as C } from "./Constants";
 import { AudioPlayerDlg } from "./dlg/AudioPlayerDlg";
 import { ChangePasswordDlg } from "./dlg/ChangePasswordDlg";
@@ -19,7 +19,6 @@ import { Singletons } from "./Singletons";
 import { FeedView } from "./tabs/FeedView";
 import { FollowersResultSetView } from "./tabs/FollowersResultSetView";
 import { FollowingResultSetView } from "./tabs/FollowingResultSetView";
-import { IPSMView } from "./tabs/IPSMView";
 import { MainTabComp } from "./tabs/MainTabComp";
 import { SearchResultSetView } from "./tabs/SearchResultSetView";
 import { ServerInfoView } from "./tabs/ServerInfoView";
@@ -29,10 +28,10 @@ import { TrendingView } from "./tabs/TrendingView";
 import { TimelineRSInfo } from "./TimelineRSInfo";
 import { TrendingRSInfo } from "./TrendingRSInfo";
 import { ValidatedState } from "./ValidatedState";
-import { App } from "./widget/App";
-import { Comp } from "./widget/base/Comp";
-import { CompIntf } from "./widget/base/CompIntf";
-import { WelcomePanel } from "./widget/WelcomePanel";
+import { App } from "./comp/App";
+import { Comp } from "./comp/base/Comp";
+import { CompIntf } from "./comp/base/CompIntf";
+import { WelcomePanel } from "./comp/WelcomePanel";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (s: Singletons) => {

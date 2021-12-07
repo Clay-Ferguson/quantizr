@@ -4,12 +4,12 @@ import { NodeActionType } from "../enums/NodeActionType";
 import * as J from "../JavaIntf";
 import { PubSub } from "../PubSub";
 import { Singletons } from "../Singletons";
-import { Comp } from "../widget/base/Comp";
-import { Button } from "../widget/Button";
-import { ButtonBar } from "../widget/ButtonBar";
-import { Clearfix } from "../widget/Clearfix";
-import { Heading } from "../widget/Heading";
-import { HorizontalLayout } from "../widget/HorizontalLayout";
+import { Comp } from "../comp/base/Comp";
+import { Button } from "../comp/Button";
+import { ButtonBar } from "../comp/ButtonBar";
+import { Clearfix } from "../comp/Clearfix";
+import { Heading } from "../comp/Heading";
+import { HorizontalLayout } from "../comp/HorizontalLayout";
 import { TypeBase } from "./base/TypeBase";
 
 let S: Singletons;

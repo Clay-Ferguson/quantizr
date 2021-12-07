@@ -1,15 +1,15 @@
 import { AppState } from "../../AppState";
-import { NodeCompMarkdown } from "../../comps/NodeCompMarkdown";
-import { OpenGraphPanel } from "../../comps/OpenGraphPanel";
+import { NodeCompMarkdown } from "../../comp/node/NodeCompMarkdown";
+import { OpenGraphPanel } from "../../comp/OpenGraphPanel";
 import { Constants as C } from "../../Constants";
 import { NodeActionType } from "../../enums/NodeActionType";
 import { TypeHandlerIntf } from "../../intf/TypeHandlerIntf";
 import * as J from "../../JavaIntf";
 import { PubSub } from "../../PubSub";
 import { Singletons } from "../../Singletons";
-import { Comp } from "../../widget/base/Comp";
-import { CompIntf } from "../../widget/base/CompIntf";
-import { Div } from "../../widget/Div";
+import { Comp } from "../../comp/base/Comp";
+import { CompIntf } from "../../comp/base/CompIntf";
+import { Div } from "../../comp/Div";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {

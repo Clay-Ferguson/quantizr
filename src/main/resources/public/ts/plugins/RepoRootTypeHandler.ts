@@ -1,8 +1,8 @@
 import { AppState } from "../AppState";
 import * as J from "../JavaIntf";
-import { Comp } from "../widget/base/Comp";
-import { Heading } from "../widget/Heading";
-import { HorizontalLayout } from "../widget/HorizontalLayout";
+import { Comp } from "../comp/base/Comp";
+import { Heading } from "../comp/Heading";
+import { HorizontalLayout } from "../comp/HorizontalLayout";
 import { TypeBase } from "./base/TypeBase";
 
 export class RepoRootTypeHandler extends TypeBase {

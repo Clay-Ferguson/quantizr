@@ -10,7 +10,6 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
 });
 
 export class AudioPlayer extends Comp {
-
     compRender(): ReactNode {
         return this.e("audio", this.attribs);
     }

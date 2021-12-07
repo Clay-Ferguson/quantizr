@@ -2,12 +2,12 @@ import { AppState } from "../AppState";
 import { Constants as C } from "../Constants";
 import { PubSub } from "../PubSub";
 import { Singletons } from "../Singletons";
-import { Anchor } from "../widget/Anchor";
-import { CompIntf } from "../widget/base/CompIntf";
-import { Div } from "../widget/Div";
-import { HorizontalLayout } from "../widget/HorizontalLayout";
-import { Icon } from "../widget/Icon";
-import { Img } from "../widget/Img";
+import { Anchor } from "../comp/Anchor";
+import { CompIntf } from "../comp/base/CompIntf";
+import { Div } from "../comp/Div";
+import { HorizontalLayout } from "../comp/HorizontalLayout";
+import { Icon } from "../comp/Icon";
+import { Img } from "../comp/Img";
 import * as J from "../JavaIntf";
 
 let S: Singletons;

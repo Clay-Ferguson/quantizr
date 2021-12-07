@@ -1,6 +1,6 @@
 import { ReactNode } from "react";
 import { store } from "../AppRedux";
-import { Markdown } from "../comps/Markdown";
+import { Markdown } from "../comp/Markdown";
 import { Constants as C } from "../Constants";
 import { MessageDlg } from "../dlg/MessageDlg";
 import { PubSub } from "../PubSub";

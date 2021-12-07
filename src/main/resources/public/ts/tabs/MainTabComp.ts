@@ -4,13 +4,13 @@ import { Constants as C } from "../Constants";
 import { TabDataIntf } from "../intf/TabDataIntf";
 import { PubSub } from "../PubSub";
 import { Singletons } from "../Singletons";
-import { AppTab } from "../widget/AppTab";
-import { BreadcrumbsPanel } from "../widget/BreadcrumbsPanel";
-import { Div } from "../widget/Div";
-import { Html } from "../widget/Html";
-import { NodeCompMainList } from "../comps/NodeCompMainList";
-import { NodeCompMainNode } from "../comps/NodeCompMainNode";
-import { Clearfix } from "../widget/Clearfix";
+import { AppTab } from "../comp/AppTab";
+import { BreadcrumbsPanel } from "../comp/BreadcrumbsPanel";
+import { Div } from "../comp/Div";
+import { Html } from "../comp/Html";
+import { NodeCompMainList } from "../comp/node/NodeCompMainList";
+import { NodeCompMainNode } from "../comp/node/NodeCompMainNode";
+import { Clearfix } from "../comp/Clearfix";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {

@@ -1,9 +1,9 @@
 import { AppState } from "../AppState";
-import { OpenGraphPanel } from "../comps/OpenGraphPanel";
+import { OpenGraphPanel } from "../comp/OpenGraphPanel";
 import { MainMenuDlg } from "../dlg/MainMenuDlg";
 import * as J from "../JavaIntf";
 import { NodeHistoryItem } from "../NodeHistoryItem";
-import { CompIntf } from "../widget/base/CompIntf";
+import { CompIntf } from "../comp/base/CompIntf";
 import { TabDataIntf } from "./TabDataIntf";
 
 export interface QuantaIntf {

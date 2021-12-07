@@ -4,11 +4,11 @@ import { NodeActionType } from "../enums/NodeActionType";
 import * as J from "../JavaIntf";
 import { PubSub } from "../PubSub";
 import { Singletons } from "../Singletons";
-import { Comp } from "../widget/base/Comp";
-import { Clearfix } from "../widget/Clearfix";
-import { Div } from "../widget/Div";
-import { Heading } from "../widget/Heading";
-import { HelpButton } from "../widget/HelpButton";
+import { Comp } from "../comp/base/Comp";
+import { Clearfix } from "../comp/Clearfix";
+import { Div } from "../comp/Div";
+import { Heading } from "../comp/Heading";
+import { HelpButton } from "../comp/HelpButton";
 import { TypeBase } from "./base/TypeBase";
 
 let S: Singletons;

@@ -4,9 +4,9 @@ import { PropsIntf } from "./intf/PropsIntf";
 import * as J from "./JavaIntf";
 import { PubSub } from "./PubSub";
 import { Singletons } from "./Singletons";
-import { PropTable } from "./widget/PropTable";
-import { PropTableCell } from "./widget/PropTableCell";
-import { PropTableRow } from "./widget/PropTableRow";
+import { PropTable } from "./comp/PropTable";
+import { PropTableCell } from "./comp/PropTableCell";
+import { PropTableRow } from "./comp/PropTableRow";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (s: Singletons) => {

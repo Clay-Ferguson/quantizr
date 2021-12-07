@@ -4,16 +4,16 @@ import { DialogBase } from "../DialogBase";
 import { PubSub } from "../PubSub";
 import { Singletons } from "../Singletons";
 import { ValidatedState } from "../ValidatedState";
-import { CompIntf } from "../widget/base/CompIntf";
-import { Button } from "../widget/Button";
-import { ButtonBar } from "../widget/ButtonBar";
-import { Checkbox } from "../widget/Checkbox";
-import { Div } from "../widget/Div";
-import { Form } from "../widget/Form";
-import { HelpButton } from "../widget/HelpButton";
-import { HorizontalLayout } from "../widget/HorizontalLayout";
-import { Selection } from "../widget/Selection";
-import { TextField } from "../widget/TextField";
+import { CompIntf } from "../comp/base/CompIntf";
+import { Button } from "../comp/Button";
+import { ButtonBar } from "../comp/ButtonBar";
+import { Checkbox } from "../comp/Checkbox";
+import { Div } from "../comp/Div";
+import { Form } from "../comp/Form";
+import { HelpButton } from "../comp/HelpButton";
+import { HorizontalLayout } from "../comp/HorizontalLayout";
+import { Selection } from "../comp/Selection";
+import { TextField } from "../comp/TextField";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {

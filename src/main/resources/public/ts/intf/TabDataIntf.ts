@@ -1,5 +1,5 @@
 import { ResultSetInfo } from "../ResultSetInfo";
-import { CompIntf } from "../widget/base/CompIntf";
+import { CompIntf } from "../comp/base/CompIntf";
 
 export interface TabDataIntf {
     // display name shown on the tab

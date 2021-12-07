@@ -4,11 +4,11 @@ import { DialogBase } from "../DialogBase";
 import { DialogMode } from "../enums/DialogMode";
 import { PubSub } from "../PubSub";
 import { Singletons } from "../Singletons";
-import { CompIntf } from "../widget/base/CompIntf";
-import { Button } from "../widget/Button";
-import { ButtonBar } from "../widget/ButtonBar";
-import { Div } from "../widget/Div";
-import { Spinner } from "../widget/Spinner";
+import { CompIntf } from "../comp/base/CompIntf";
+import { Button } from "../comp/Button";
+import { ButtonBar } from "../comp/ButtonBar";
+import { Div } from "../comp/Div";
+import { Spinner } from "../comp/Spinner";
 import { AudioPlayerDlg } from "./AudioPlayerDlg";
 import { VideoPlayerDlg } from "./VideoPlayerDlg";
 

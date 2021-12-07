@@ -4,11 +4,11 @@ import { DialogBase } from "../DialogBase";
 import { ValueIntf } from "../Interfaces";
 import { PubSub } from "../PubSub";
 import { Singletons } from "../Singletons";
-import { CompIntf } from "../widget/base/CompIntf";
-import { Button } from "../widget/Button";
-import { ButtonBar } from "../widget/ButtonBar";
-import { EmojiPicker } from "../widget/EmojiPicker";
-import { Form } from "../widget/Form";
+import { CompIntf } from "../comp/base/CompIntf";
+import { Button } from "../comp/Button";
+import { ButtonBar } from "../comp/ButtonBar";
+import { EmojiPicker } from "../comp/EmojiPicker";
+import { Form } from "../comp/Form";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {

@@ -4,9 +4,9 @@ import { DialogBase } from "../DialogBase";
 import { DialogMode } from "../enums/DialogMode";
 import { PubSub } from "../PubSub";
 import { Singletons } from "../Singletons";
-import { Anchor } from "../widget/Anchor";
-import { CompIntf } from "../widget/base/CompIntf";
-import { Div } from "../widget/Div";
+import { Anchor } from "../comp/Anchor";
+import { CompIntf } from "../comp/base/CompIntf";
+import { Div } from "../comp/Div";
 
 /* IMPORTANT:
 This class is no longer being used because all the appendTo function of WebTorrent actually

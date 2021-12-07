@@ -1,4 +1,4 @@
-import { CompIntf } from "./widget/base/CompIntf";
+import { CompIntf } from "./comp/base/CompIntf";
 
 export interface DialogBaseImpl {
 

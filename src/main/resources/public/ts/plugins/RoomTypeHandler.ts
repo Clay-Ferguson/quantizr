@@ -4,10 +4,10 @@ import { NodeActionType } from "../enums/NodeActionType";
 import * as J from "../JavaIntf";
 import { PubSub } from "../PubSub";
 import { Singletons } from "../Singletons";
-import { Comp } from "../widget/base/Comp";
-import { Button } from "../widget/Button";
-import { ButtonBar } from "../widget/ButtonBar";
-import { Div } from "../widget/Div";
+import { Comp } from "../comp/base/Comp";
+import { Button } from "../comp/Button";
+import { ButtonBar } from "../comp/ButtonBar";
+import { Div } from "../comp/Div";
 import { TypeBase } from "./base/TypeBase";
 
 let S: Singletons;

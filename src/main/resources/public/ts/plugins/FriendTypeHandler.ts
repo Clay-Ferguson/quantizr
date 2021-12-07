@@ -5,7 +5,7 @@ import { NodeActionType } from "../enums/NodeActionType";
 import * as J from "../JavaIntf";
 import { PubSub } from "../PubSub";
 import { Singletons } from "../Singletons";
-import { Comp } from "../widget/base/Comp";
+import { Comp } from "../comp/base/Comp";
 import { TypeBase } from "./base/TypeBase";
 
 let S: Singletons;

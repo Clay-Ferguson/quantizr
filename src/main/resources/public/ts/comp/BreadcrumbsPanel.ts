@@ -14,7 +14,6 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
 });
 
 export class BreadcrumbsPanel extends Div {
-
     constructor() {
         super(null, {
             className: "breadcrumbPanel"

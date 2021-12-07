@@ -6,9 +6,9 @@ import { TabDataIntf } from "../intf/TabDataIntf";
 import { Log } from "../Log";
 import { PubSub } from "../PubSub";
 import { Singletons } from "../Singletons";
-import { AppTab } from "../widget/AppTab";
-import { Heading } from "../widget/Heading";
-import { Html } from "../widget/Html";
+import { AppTab } from "../comp/AppTab";
+import { Heading } from "../comp/Heading";
+import { Html } from "../comp/Html";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {

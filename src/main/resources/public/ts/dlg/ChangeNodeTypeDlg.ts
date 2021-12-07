@@ -1,11 +1,11 @@
 import { AppState } from "../AppState";
 import { DialogBase } from "../DialogBase";
 import { ValueIntf } from "../Interfaces";
-import { CompIntf } from "../widget/base/CompIntf";
-import { Button } from "../widget/Button";
-import { ButtonBar } from "../widget/ButtonBar";
-import { Form } from "../widget/Form";
-import { NodeTypeListBox } from "../widget/NodeTypeListBox";
+import { CompIntf } from "../comp/base/CompIntf";
+import { Button } from "../comp/Button";
+import { ButtonBar } from "../comp/ButtonBar";
+import { Form } from "../comp/Form";
+import { NodeTypeListBox } from "../comp/NodeTypeListBox";
 
 interface LS {
     selType: string;

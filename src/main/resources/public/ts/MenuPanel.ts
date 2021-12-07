@@ -20,11 +20,11 @@ import { TypeHandlerIntf } from "./intf/TypeHandlerIntf";
 import * as J from "./JavaIntf";
 import { PubSub } from "./PubSub";
 import { Singletons } from "./Singletons";
-import { Div } from "./widget/Div";
-import { Icon } from "./widget/Icon";
-import { Menu } from "./widget/Menu";
-import { MenuItem } from "./widget/MenuItem";
-import { MenuItemSeparator } from "./widget/MenuItemSeparator";
+import { Div } from "./comp/Div";
+import { Icon } from "./comp/Icon";
+import { Menu } from "./comp/Menu";
+import { MenuItem } from "./comp/MenuItem";
+import { MenuItemSeparator } from "./comp/MenuItemSeparator";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (s: Singletons) => {

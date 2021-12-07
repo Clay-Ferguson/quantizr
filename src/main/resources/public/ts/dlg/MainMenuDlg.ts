@@ -2,7 +2,7 @@ import { store } from "../AppRedux";
 import { DialogBase } from "../DialogBase";
 import { DialogMode } from "../enums/DialogMode";
 import { MenuPanel } from "../MenuPanel";
-import { CompIntf } from "../widget/base/CompIntf";
+import { CompIntf } from "../comp/base/CompIntf";
 
 export class MainMenuDlg extends DialogBase {
 

@@ -5,14 +5,14 @@ import { TabDataIntf } from "../intf/TabDataIntf";
 import * as J from "../JavaIntf";
 import { PubSub } from "../PubSub";
 import { Singletons } from "../Singletons";
-import { AppTab } from "../widget/AppTab";
-import { CompIntf } from "../widget/base/CompIntf";
-import { ButtonBar } from "../widget/ButtonBar";
-import { Div } from "../widget/Div";
-import { Heading } from "../widget/Heading";
-import { IconButton } from "../widget/IconButton";
-import { Span } from "../widget/Span";
-import { TextContent } from "../widget/TextContent";
+import { AppTab } from "../comp/AppTab";
+import { CompIntf } from "../comp/base/CompIntf";
+import { ButtonBar } from "../comp/ButtonBar";
+import { Div } from "../comp/Div";
+import { Heading } from "../comp/Heading";
+import { IconButton } from "../comp/IconButton";
+import { Span } from "../comp/Span";
+import { TextContent } from "../comp/TextContent";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {

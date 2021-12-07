@@ -1,7 +1,7 @@
 import { Constants as C } from "../Constants";
 import { PubSub } from "../PubSub";
 import { Singletons } from "../Singletons";
-import { Html } from "../widget/Html";
+import { Html } from "../comp/Html";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {

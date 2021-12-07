@@ -1,6 +1,6 @@
 import { AppState } from "../AppState";
 import * as J from "../JavaIntf";
-import { PropTable } from "../widget/PropTable";
+import { PropTable } from "../comp/PropTable";
 
 export interface PropsIntf {
     allBinaryProps: Set<string>;

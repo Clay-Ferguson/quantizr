@@ -1,11 +1,11 @@
 import { AppState } from "../AppState";
 import { DialogBase } from "../DialogBase";
 import { DialogMode } from "../enums/DialogMode";
-import { CompIntf } from "../widget/base/CompIntf";
-import { Div } from "../widget/Div";
-import { Form } from "../widget/Form";
-import { TextContent } from "../widget/TextContent";
-import { VideoPlayer } from "../widget/VideoPlayer";
+import { CompIntf } from "../comp/base/CompIntf";
+import { Div } from "../comp/Div";
+import { Form } from "../comp/Form";
+import { TextContent } from "../comp/TextContent";
+import { VideoPlayer } from "../comp/VideoPlayer";
 
 /**
  * See also: AudioPlayerDlg (which is very similar)

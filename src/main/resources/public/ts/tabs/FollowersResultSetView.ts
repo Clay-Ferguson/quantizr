@@ -6,8 +6,8 @@ import { TabDataIntf } from "../intf/TabDataIntf";
 import * as J from "../JavaIntf";
 import { PubSub } from "../PubSub";
 import { Singletons } from "../Singletons";
-import { CompIntf } from "../widget/base/CompIntf";
-import { Heading } from "../widget/Heading";
+import { CompIntf } from "../comp/base/CompIntf";
+import { Heading } from "../comp/Heading";
 import { ResultSetView } from "./ResultSetView";
 
 let S: Singletons;

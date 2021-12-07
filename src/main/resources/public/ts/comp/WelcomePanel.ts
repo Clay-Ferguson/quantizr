@@ -1,8 +1,8 @@
 import { store } from "../AppRedux";
 import { AppState } from "../AppState";
-import { NodeCompContent } from "../comps/NodeCompContent";
-import { NodeCompTableRowLayout } from "../comps/NodeCompTableRowLayout";
-import { NodeCompVerticalRowLayout } from "../comps/NodeCompVerticalRowLayout";
+import { NodeCompContent } from "../comp/node/NodeCompContent";
+import { NodeCompTableRowLayout } from "../comp/node/NodeCompTableRowLayout";
+import { NodeCompVerticalRowLayout } from "../comp/node/NodeCompVerticalRowLayout";
 import { Constants as C } from "../Constants";
 import * as J from "../JavaIntf";
 import { PubSub } from "../PubSub";

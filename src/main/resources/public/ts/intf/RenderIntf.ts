@@ -2,9 +2,9 @@
 import { AppState } from "../AppState";
 import { NodeActionType } from "../enums/NodeActionType";
 import * as J from "../JavaIntf";
-import { Comp } from "../widget/base/Comp";
-import { CompIntf } from "../widget/base/CompIntf";
-import { Img } from "../widget/Img";
+import { Comp } from "../comp/base/Comp";
+import { CompIntf } from "../comp/base/CompIntf";
+import { Img } from "../comp/Img";
 import { TypeHandlerIntf } from "./TypeHandlerIntf";
 
 export interface RenderIntf {
