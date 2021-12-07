@@ -1,0 +1,102 @@
+.profileImageBase {
+    cursor: pointer;
+    top: -55px;
+    left: 30px;
+    position: relative;
+    background-color: $modal-content-bg;
+    max-width: 120px;
+    border-radius: $border-radius;
+}
+
+.profileImageBaseNoHeader {
+    cursor: pointer;
+    background-color: $modal-content-bg;
+    max-width: 120px;
+    border-radius: $border-radius;
+}
+
+.profileImageBaseNoHeaderSmall {
+    cursor: pointer;
+    background-color: $modal-content-bg;
+    max-width: 25%;
+    border-radius: $border-radius;
+}
+
+.profileHeaderImageBase {
+    cursor: pointer;
+    width: 100%;
+    height: 200px;
+    max-height: $profileImgSize;
+    object-fit: cover;
+    border-radius: $border-radius;
+}
+
+.profileImage {
+    @extend .profileImageBase;
+    border: 5px dotted $nodeBorderBottomColor;
+}
+
+.profileImageNoHeader {
+    @extend .profileImageBaseNoHeader;
+    border: 5px dotted $nodeBorderBottomColor;
+}
+
+.readOnlyProfileImage {
+    @extend .profileImageBase;
+    border: 5px solid $modal-content-bg;
+}
+
+.readOnlyProfileImageNoHeader {
+    @extend .profileImageBaseNoHeader;
+    border: 5px solid $modal-content-bg;
+}
+
+.profileImageRHS {
+    @extend .profileImageBaseNoHeaderSmall;
+    top: -45px;
+    left: 30px;
+    position: relative;
+    border: 5px solid $body-bg; 
+}
+
+.profileImageRHSNoOffset {
+    @extend .profileImageBaseNoHeaderSmall;
+    position: relative;
+    border: 1px solid $nodeBorderBottomColor;
+    margin-bottom: 20px;
+}
+
+.profileHeaderImage {
+    @extend .profileHeaderImageBase;
+    border: 4px dotted $nodeBorderBottomColor;
+}
+
+.readOnlyProfileHeaderImage {
+    @extend .profileHeaderImageBase;
+    border: 1px solid $nodeBorderBottomColor;
+}
+
+.userBio {
+    margin: 15px 10px 10px 10px;
+}
+
+.profileImageHolder {
+    @extend .profileImageBase;
+    border: 4px dotted $nodeBorderBottomColor;
+    padding: 12px;
+    min-height: 120px;
+}
+
+.profileImageHolderNoHeader {
+    @extend .profileImageBaseNoHeader;
+    border: 4px dotted $nodeBorderBottomColor;
+    padding: 12px;
+    min-height: 120px;
+}
+
+.profileHeaderImageHolder {
+    @extend .profileHeaderImageBase;
+    border: 4px dotted $nodeBorderBottomColor;
+    min-height: 120px;
+    padding: 12px;
+}

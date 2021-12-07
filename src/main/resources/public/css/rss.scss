@@ -1,0 +1,100 @@
+.rssLinkIcon {
+    cursor: pointer;
+    margin-right: 12px;
+}
+
+.rssPostIcon {
+    cursor: pointer;
+    margin-right: 12px;
+}
+
+.rssChapterDiv {
+    cursor: pointer;
+    padding-top: 10px;
+    padding-bottom: 10px;
+
+    &:not(:last-child) { 
+        border-bottom: 2px solid $nodeBorderBottomColor;
+    }
+}
+
+.rssChapterLink {
+    cursor: pointer;
+    font-size: 18px;
+    margin-left: 12px;
+}
+
+.rssChapterTitle {
+    cursor: pointer;
+    font-size: 18px;
+}
+
+.rssChapterImage {
+    border: 1px solid $nodeBorderBottomColor;
+    max-width: 80px;
+    margin: 8px;
+    display: inline-block;
+    cursor: pointer;
+    border-radius: $border-radius;
+}
+
+.rssChapterPanel {
+    border: 2px solid $nodeBorderBottomColor;
+    margin-top: 12px;
+    padding: 13px;
+    border-radius: $border-radius;
+}
+
+.rssAnchor {
+    cursor: pointer;
+    font-size: 25px;
+    text-decoration: none;
+}
+
+.rssMediaButtons {
+    display: block;
+    margin-top: 15px;
+    margin-bottom: 15px;
+}
+
+.rssDownloadLink {
+    margin-left: 15px;
+}
+
+.rssParentTitle {
+    font-size: 125%;
+}
+
+.rssFeedTitle {
+    font-size: 150%;
+    text-decoration: none;
+}
+
+.rssSubTitle {
+    font-size: 110%;
+}
+
+.rss-feed-image {
+    border: 1px solid $nodeBorderBottomColor;
+
+    /* Warning: this 40% is also enforced in the JS code, by post-processing the HTML but before render in react,
+    search for this class name in "RssTypeHandler" */
+    margin-bottom: 12px;
+   
+    border-radius: $border-radius;
+}
+
+.rss-feed-item {
+    border-top: 2px solid $nodeBorderBottomColor;
+    padding: 12px;
+}
+
+.rss-feed-item:last-child {
+    border-bottom: 2px solid $nodeBorderBottomColor;
+}
+
+.rss-feed-listing {
+    margin-top: $smallGap;
+    margin-left: $smallGap;
+    max-width: 800px;
+}

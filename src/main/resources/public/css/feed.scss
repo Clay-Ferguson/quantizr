@@ -1,0 +1,33 @@
+.feedClearButton {
+    display: inline-block;
+}
+
+.feedSearchField {
+    width: 15em;
+    display: inline-block;
+    margin-right: 5px;
+}
+
+.feedView {
+    margin-bottom: $smallGap;
+}
+
+.feedFilterRadioButtons {
+    display: inline-block;
+    margin-bottom: $smallGap;
+    margin-right: $smallGap;
+}
+
+.feed-node-table-row {
+    position: relative;
+}
+
+.inactive-feed-row {
+    border-left: 2px solid $nodeBorderBottomColor;
+    // margin-left: 25px;
+}
+
+.inactive-feed-row-parent {
+    border-bottom: 2px solid $nodeBorderBottomColor;
+}
+
