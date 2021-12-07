@@ -39,7 +39,7 @@ public class ImportBookService extends ServiceBase {
 		 * for now we don't check book name. Only one book exists: War and Peace
 		 */
 		ImportWarAndPeace iwap = SpringContextUtil.getApplicationContext().getBean(ImportWarAndPeace.class);
-		iwap.importBook(ms, "classpath:war-and-peace.txt", node, safeBooleanVal(req.getTruncated()) ? 2 : Integer.MAX_VALUE);
+		iwap.importBook(ms, "classpath:public/data/war-and-peace.txt", node, safeBooleanVal(req.getTruncated()) ? 2 : Integer.MAX_VALUE);
 
 		update.saveSession(ms);
 		res.setSuccess(true);

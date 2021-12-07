@@ -35,7 +35,7 @@ public class GlobalFilter extends GenericFilterBean {
 			if (sreq.getRequestURI().contains("/images/") || //
 					sreq.getRequestURI().contains("/fonts/") || //
 					sreq.getRequestURI().endsWith("/bundle.js") || //
-					sreq.getRequestURI().endsWith("/favicon.ico") || //
+					sreq.getRequestURI().endsWith("/images/favicon.ico") || //
 					// This is the tricky one. If we have versioned the URL we detect it this hacky way also picking up
 					// v param.
 					sreq.getRequestURI().contains("?v=")) {

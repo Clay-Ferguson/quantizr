@@ -2,7 +2,7 @@
   "name": "SubNode",
   "short_name": "SubNode",
   "icons": [{
-        "src": "favicon.ico",
+        "src": "images/favicon.ico",
         "type": "image/png"
       }],
   "display": "standalone"

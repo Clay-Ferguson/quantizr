@@ -37,7 +37,7 @@ public class EnglishDictionary {
 			 * bottom or wherever then you can just uncomment the section (with the text
 			 * '/tmp/stop-words-new.txt') below to write them into a new sorted file with dupliates removed
 			 */
-			Resource resource = SpringContextUtil.getApplicationContext().getResource("classpath:stop-words.txt");
+			Resource resource = SpringContextUtil.getApplicationContext().getResource("classpath:public/data/stop-words.txt");
 			InputStream is = resource.getInputStream();
 			BufferedReader in = new BufferedReader(new InputStreamReader(is));
 			try {
@@ -92,7 +92,7 @@ public class EnglishDictionary {
 			return;
 
 		try {
-			Resource resource = SpringContextUtil.getApplicationContext().getResource("classpath:english-dictionary.txt");
+			Resource resource = SpringContextUtil.getApplicationContext().getResource("classpath:public/data/english-dictionary.txt");
 			InputStream is = resource.getInputStream();
 			BufferedReader in = new BufferedReader(new InputStreamReader(is));
 			try {
