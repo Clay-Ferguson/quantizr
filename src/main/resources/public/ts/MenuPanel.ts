@@ -223,7 +223,7 @@ export class MenuPanel extends Div {
     static toggleEditMode = () => S.edit.toggleEditMode(appState(null));
     static toggleMetaData = () => S.edit.toggleShowMetaData(appState(null));
     static browserInfo = () => S.util.showBrowserInfo();
-    static mobileToggle = () => S.util.switchBrowsingMode(appState(null));
+    static mobileToggle = () => S.util.switchBrowsingMode();
 
     preRender(): void {
         const state: AppState = useSelector((state: AppState) => state);

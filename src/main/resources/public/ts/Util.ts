@@ -1530,8 +1530,7 @@ export class Util implements UtilIntf {
         this.showMessage(info, "Browser Info");
     }
 
-    // remove unused arg (todo-1)
-    switchBrowsingMode = (state: AppState): void => {
+    switchBrowsingMode = (): void => {
         dispatch("Action_SwitchBrowsingMode", (s: AppState): AppState => {
             s.mobileMode = !s.mobileMode;
             return s;

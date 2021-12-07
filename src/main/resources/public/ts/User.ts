@@ -65,7 +65,7 @@ export class User implements UserIntf {
         // if (tab === "feed") {
         if (window.location.href.endsWith("/app")) {
             setTimeout(() => {
-                S.quanta.showPublicFediverse();
+                S.nav.showPublicFediverse();
             }, 10);
         }
         else {
@@ -240,7 +240,7 @@ export class User implements UserIntf {
                 // if (tab === "feed") {
                 setTimeout(() => {
                     // todo-1: new logic, always send anon users to fediverse view
-                    S.quanta.showPublicFediverse();
+                    S.nav.showPublicFediverse();
                 }, 10);
                 // }
             }

@@ -476,7 +476,7 @@ export class EditNodeDlg extends DialogBase {
                         title: "Add property"
                     }),
                     this.deletePropButton = new IconButton("fa fa-minus", null, {
-                        onClick: this.deletePropertyButtonClick,
+                        onClick: this.deletePropertiesButtonClick,
                         title: "Delete property"
                     })
                 ], null, "float-end");
@@ -498,7 +498,7 @@ export class EditNodeDlg extends DialogBase {
                 pinCheckbox = new Checkbox("IPFS Pinned", { className: "ipfsPinnedCheckbox" }, {
                     setValue: (checked: boolean): void => {
                         if (checked) {
-                            this.deleteProperty(J.NodeProp.IPFS_REF);
+                            this.deleteProperties([J.NodeProp.IPFS_REF]);
                         }
                         else {
                             S.props.setNodePropVal(J.NodeProp.IPFS_REF, this.getState<LS>().node, "1");
@@ -942,15 +942,17 @@ export class EditNodeDlg extends DialogBase {
         this.mergeState<LS>({ node: state.node });
     }
 
-    deleteProperty = async (propName: string) => {
-        let res: J.DeletePropertyResponse = await S.util.ajax<J.DeletePropertyRequest, J.DeletePropertyResponse>("deleteProperty", {
+    deleteProperties = async (propNames: string[]) => {
+        let res: J.DeletePropertyResponse = await S.util.ajax<J.DeletePropertyRequest, J.DeletePropertyResponse>("deleteProperties", {
             nodeId: this.getState<LS>().node.id,
-            propName
+            propNames
         });
 
         if (S.util.checkSuccess("Delete property", res)) {
             let state = this.getState<LS>();
-            S.props.deleteProp(state.node, propName);
+            propNames.forEach(propName => {
+                S.props.deleteProp(state.node, propName);
+            });
             this.mergeState<LS>(state);
         }
     }
@@ -1155,7 +1157,7 @@ export class EditNodeDlg extends DialogBase {
         return new Div(null, null, editItems);
     }
 
-    deletePropertyButtonClick = async (): Promise<void> => {
+    deletePropertiesButtonClick = async (): Promise<void> => {
         let dlg: ConfirmDlg = new ConfirmDlg("Delete the selected properties?", "Confirm Delete",
             null, null, this.appState);
         await dlg.open();
@@ -1165,9 +1167,9 @@ export class EditNodeDlg extends DialogBase {
     }
 
     deleteSelectedProperties = (): void => {
-        /* todo-1: This was a quick and dirty approach, calling the server for each property to delete. Should
-        simply allow the server to accept an array */
-        this.getState<LS>().selectedProps.forEach(propName => this.deleteProperty(propName), this);
+        let keys: string[] = [];
+        this.getState<LS>().selectedProps.forEach(prop => keys.push(prop));
+        this.deleteProperties(keys);
     }
 
     speechRecognition = (): void => {

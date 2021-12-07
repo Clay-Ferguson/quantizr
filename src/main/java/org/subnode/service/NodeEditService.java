@@ -525,15 +525,17 @@ public class NodeEditService extends ServiceBase {
 	/*
 	 * Removes the property specified in the request from the node specified in the request
 	 */
-	public DeletePropertyResponse deleteProperty(MongoSession ms, DeletePropertyRequest req) {
+	public DeletePropertyResponse deleteProperties(MongoSession ms, DeletePropertyRequest req) {
 		DeletePropertyResponse res = new DeletePropertyResponse();
 		ms = ThreadLocals.ensure(ms);
 		String nodeId = req.getNodeId();
 		SubNode node = read.getNode(ms, nodeId);
 		auth.ownerAuthByThread(node);
 
-		String propertyName = req.getPropName();
-		node.delete(propertyName);
+		for (String propName : req.getPropNames()) {
+			node.delete(propName);
+		}
+
 		update.save(ms, node);
 		res.setSuccess(true);
 		return res;

@@ -40,7 +40,6 @@ export class App extends Main {
             return;
         }
 
-        // todo-1: put this in a function called 'getTopDialog'
         if (state.dialogStack.length > 0) {
             let dialog = state.dialogStack[state.dialogStack.length - 1];
             if (dialog) {

@@ -112,7 +112,7 @@ export interface UtilIntf {
     getSharingNames(node: J.NodeInfo, multiLine: boolean): string;
     insertString(val: string, text: string, position: number): string;
     showBrowserInfo(): void;
-    switchBrowsingMode(state: AppState): void;
+    switchBrowsingMode(): void;
     isLocalUserName(userName: string): boolean;
     getPropFromDom(evt: Event, prop: string): string;
     getShortContent(node: J.NodeInfo): string;

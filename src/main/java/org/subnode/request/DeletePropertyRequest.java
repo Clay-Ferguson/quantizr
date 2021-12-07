@@ -1,10 +1,11 @@
 package org.subnode.request;
 
+import java.util.List;
 import org.subnode.request.base.RequestBase;
 
 public class DeletePropertyRequest extends RequestBase {
 	private String nodeId;
-	private String propName;
+	private List<String> propNames;
 
 	public String getNodeId() {
 		return nodeId;
@@ -14,11 +15,11 @@ public class DeletePropertyRequest extends RequestBase {
 		this.nodeId = nodeId;
 	}
 
-	public String getPropName() {
-		return propName;
+	public List<String> getPropNames() {
+		return propNames;
 	}
 
-	public void setPropName(String propName) {
-		this.propName = propName;
+	public void setPropNames(List<String> propNames) {
+		this.propNames = propNames;
 	}
 }

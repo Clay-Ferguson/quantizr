@@ -144,7 +144,7 @@ export interface DeleteNodesRequest extends RequestBase {
 
 export interface DeletePropertyRequest extends RequestBase {
     nodeId: string;
-    propName: string;
+    propNames: string[];
 }
 
 export interface ExportRequest extends RequestBase {

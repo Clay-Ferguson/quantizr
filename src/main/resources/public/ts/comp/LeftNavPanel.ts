@@ -67,7 +67,7 @@ export class LeftNavPanel extends Div {
                 // which is in a different class.
                 messages ? new Span(messages, {
                     className: "logo-text-small float-end",
-                    onClick: e => { S.quanta.showMyNewMessages(); },
+                    onClick: e => { S.nav.showMyNewMessages(); },
                     title: "Show new messages"
                 }) : null
             ]),

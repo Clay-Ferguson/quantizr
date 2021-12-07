@@ -37,4 +37,6 @@ export interface NavIntf {
     nextFullScreenImgViewer(appState: AppState): void;
     getAdjacentNode(dir: string, state: AppState): J.NodeInfo;
     messages(props: FeedViewProps): void;
+    showMyNewMessages(): void;
+    showPublicFediverse(): void;
 }

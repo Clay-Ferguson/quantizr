@@ -1045,29 +1045,4 @@ export class Quanta implements QuantaIntf {
     ctrlKeyCheck = (): boolean => {
         return this.ctrlKey && (new Date().getTime() - this.ctrlKeyTime) < 2500;
     }
-
-    // todo-1: both these two methods below should be moved to 'nav.ts'
-    showMyNewMessages = (): void => {
-        S.nav.messages({
-            feedFilterFriends: false,
-            feedFilterToMe: true,
-            feedFilterFromMe: true,
-            feedFilterToPublic: false,
-            feedFilterLocalServer: false,
-            feedFilterRootNode: null,
-            feedResults: null
-        });
-    }
-
-    showPublicFediverse = (): void => {
-        S.nav.messages({
-            feedFilterFriends: false,
-            feedFilterToMe: false,
-            feedFilterFromMe: false,
-            feedFilterToPublic: true,
-            feedFilterLocalServer: false,
-            feedFilterRootNode: null,
-            feedResults: null
-        });
-    }
 }

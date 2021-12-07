@@ -523,4 +523,28 @@ export class Nav implements NavIntf {
         });
         setTimeout(S.srch.refreshFeed, 10);
     }
+
+    showMyNewMessages = (): void => {
+        S.nav.messages({
+            feedFilterFriends: false,
+            feedFilterToMe: true,
+            feedFilterFromMe: true,
+            feedFilterToPublic: false,
+            feedFilterLocalServer: false,
+            feedFilterRootNode: null,
+            feedResults: null
+        });
+    }
+
+    showPublicFediverse = (): void => {
+        S.nav.messages({
+            feedFilterFriends: false,
+            feedFilterToMe: false,
+            feedFilterFromMe: false,
+            feedFilterToPublic: true,
+            feedFilterLocalServer: false,
+            feedFilterRootNode: null,
+            feedResults: null
+        });
+    }
 }

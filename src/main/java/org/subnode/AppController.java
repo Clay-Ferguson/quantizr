@@ -771,10 +771,10 @@ public class AppController extends ServiceBase implements ErrorController {
 		});
 	}
 
-	@RequestMapping(value = API_PATH + "/deleteProperty", method = RequestMethod.POST)
-	public @ResponseBody Object deleteProperty(@RequestBody DeletePropertyRequest req, HttpSession session) {
-		return callProc.run("deleteProperty", req, session, ms -> {
-			return edit.deleteProperty(ms, req);
+	@RequestMapping(value = API_PATH + "/deleteProperties", method = RequestMethod.POST)
+	public @ResponseBody Object deleteProperties(@RequestBody DeletePropertyRequest req, HttpSession session) {
+		return callProc.run("deleteProperties", req, session, ms -> {
+			return edit.deleteProperties(ms, req);
 		});
 	}
 
