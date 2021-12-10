@@ -1,6 +1,7 @@
-import { appState, dispatch } from "./AppRedux";
+import { appState, dispatch, store } from "./AppRedux";
 import { AppState } from "./AppState";
 import { Constants as C } from "./Constants";
+import { LoadNodeFromIpfsDlg } from "./dlg/LoadNodeFromIpfsDlg";
 import { TabDataIntf } from "./intf/TabDataIntf";
 import * as J from "./JavaIntf";
 import { Log } from "./Log";
@@ -221,5 +222,119 @@ export class NodeUtil {
             return state.node.children.find(node => node.name === name);
         }
         return null;
+    }
+
+    getPathPartForNamedNode = (node: J.NodeInfo): string => {
+        if (!node || !node.name) return null;
+
+        if (node.owner === "admin") {
+            return "/n/" + node.name;
+        }
+        else {
+            return "/u/" + node.owner + "/" + node.name;
+        }
+    }
+
+    getPathPartForNamedNodeAttachment = (node: J.NodeInfo): string => {
+        if (!node || !node.name) return null;
+
+        if (node.owner === "admin") {
+            return "/f/" + node.name;
+        }
+        else {
+            return "/f/" + node.owner + "/" + node.name;
+        }
+    }
+
+    getShortContent = (node: J.NodeInfo): string => {
+        let content = node.content;
+        if (!content) {
+            if (node.name) {
+                content = "Node Name: " + node.name;
+            }
+            else {
+                return content;
+            }
+        }
+
+        content = S.util.replaceAll(content, "{{imgUpperRight}}", "");
+        content = S.util.replaceAll(content, "{{imgUpperLeft}}", "");
+        content = S.util.replaceAll(content, "{{img}}", "");
+        content = content.trim();
+
+        let idx = content.indexOf("\n");
+        if (idx !== -1) {
+            content = content.substring(0, idx);
+        }
+
+        if (content.length > 140) content = content.substring(0, 140) + "...";
+        while (content.startsWith("#")) {
+            content = content.substring(1);
+        }
+        return content.trim();
+    }
+
+     // returns true if all children are same owner as parent
+     allChildrenAreSameOwner = (node: J.NodeInfo): boolean => {
+        if (!node || !node.children) return true;
+
+        for (let child of node.children) {
+            if (node.ownerId !== child.ownerId) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    publishNodeToIpfs = async (node: J.NodeInfo) => {
+        let res: J.PublishNodeToIpfsResponse = await S.util.ajax<J.PublishNodeToIpfsRequest, J.PublishNodeToIpfsResponse>("publishNodeToIpfs", {
+            nodeId: node.id
+        });
+        S.util.showMessage(res.message, "Server Reply", true);
+    }
+
+    loadNodeFromIpfs = (node: J.NodeInfo): any => {
+        let state: AppState = store.getState();
+        new LoadNodeFromIpfsDlg(state).open();
+    }
+
+    getSharingNames = (node: J.NodeInfo, multiLine: boolean): string => {
+        if (!node || !node.ac) return null;
+        let delimiter = multiLine ? "\n" : ", ";
+
+        let names = S.props.isPublic(node) ? ("public [" + this.getPublicPrivilegesDisplay(node) + "]") : "";
+        for (let ac of node.ac) {
+
+            if (!ac.principalName) {
+                console.log("missing principalName on acl: " + S.util.prettyPrint(ac));
+            }
+
+            if (ac.principalName && ac.principalName !== "public") {
+                if (names) {
+                    names += delimiter;
+                }
+                names += "@" + ac.principalName;
+            }
+        }
+
+        return names;
+    }
+
+    getPublicPrivilegesDisplay = (node: J.NodeInfo): string => {
+        if (!node || !node.ac) return "";
+        let val = "";
+        for (let ac of node.ac) {
+            if (ac.principalName === "public") {
+                // console.log("AC: " + S.util.prettyPrint(ac));
+                for (let p of ac.privileges) {
+                    if (val) {
+                        val += ",";
+                    }
+                    val += p.privilegeName;
+                }
+                break;
+            }
+        }
+        return val;
     }
 }

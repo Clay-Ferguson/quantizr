@@ -311,7 +311,7 @@ export class Edit {
                 return h.id === node.id;
             });
             if (histItem) {
-                histItem.content = S.util.getShortContent(node);
+                histItem.content = S.nodeUtil.getShortContent(node);
             }
 
             // It's possible to end up editing a node that's not even on the page, or a child of a node on the page,

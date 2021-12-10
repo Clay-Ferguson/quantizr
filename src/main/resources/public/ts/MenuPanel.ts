@@ -523,9 +523,9 @@ export class MenuPanel extends Div {
         // eslint-disable-next-line no-constant-condition
         if (state.isAdminUser) {
             children.push(new Menu("IPFS", [
-                new MenuItem("Sync: To IPFS", () => S.util.publishNodeToIpfs(hltNode), //
+                new MenuItem("Sync: To IPFS", () => S.nodeUtil.publishNodeToIpfs(hltNode), //
                     state.isAdminUser || (S.user.isTestUserAccount(state) && selNodeIsMine)), //
-                new MenuItem("Sync: From IPFS", () => S.util.loadNodeFromIpfs(hltNode), //
+                new MenuItem("Sync: From IPFS", () => S.nodeUtil.loadNodeFromIpfs(hltNode), //
                     state.isAdminUser || (S.user.isTestUserAccount(state) && selNodeIsMine)) //
             ]));
         }

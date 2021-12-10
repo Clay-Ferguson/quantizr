@@ -51,7 +51,7 @@ export class FeedView extends AppTab<FeedViewProps> {
          */
         let rowCount = 0;
         let topChildren: Comp[] = [];
-        let content = this.data.props.feedFilterRootNode ? S.util.getShortContent(this.data.props.feedFilterRootNode) : null;
+        let content = this.data.props.feedFilterRootNode ? S.nodeUtil.getShortContent(this.data.props.feedFilterRootNode) : null;
         let showBookmarkIcon: boolean = false;
 
         // set showBookmarkIcon visible if we don't already have it bookmarked

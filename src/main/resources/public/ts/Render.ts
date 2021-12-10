@@ -259,7 +259,7 @@ export class Render {
             }));
 
         if (node.name) {
-            let byNameUrl = window.location.origin + S.util.getPathPartForNamedNode(node);
+            let byNameUrl = window.location.origin + S.nodeUtil.getPathPartForNamedNode(node);
             children.push(new Heading(5, "By Name"), //
                 new Div(byNameUrl, {
                     className: "anchorBigMarginBottom",
@@ -314,7 +314,7 @@ export class Render {
                 }));
 
             if (node.name) {
-                let attByNameUrl = window.location.origin + S.util.getPathPartForNamedNodeAttachment(node);
+                let attByNameUrl = window.location.origin + S.nodeUtil.getPathPartForNamedNodeAttachment(node);
                 attachmentComps.push(new Heading(5, "View By Name"), //
                     new Div(attByNameUrl, {
                         className: "anchorBigMarginBottom",

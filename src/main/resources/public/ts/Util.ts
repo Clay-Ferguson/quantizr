@@ -9,7 +9,6 @@ import { DialogBase } from "./DialogBase";
 import { AudioPlayerDlg } from "./dlg/AudioPlayerDlg";
 import { ChangePasswordDlg } from "./dlg/ChangePasswordDlg";
 import { ConfirmDlg } from "./dlg/ConfirmDlg";
-import { LoadNodeFromIpfsDlg } from "./dlg/LoadNodeFromIpfsDlg";
 import { MessageDlg } from "./dlg/MessageDlg";
 import { ProgressDlg } from "./dlg/ProgressDlg";
 import * as I from "./Interfaces";
@@ -798,34 +797,6 @@ export class Util {
         return (date.getMonth() + 1) + "/" + date.getDate() + "/" + date.getFullYear();
     }
 
-    getShortContent = (node: J.NodeInfo): string => {
-        let content = node.content;
-        if (!content) {
-            if (node.name) {
-                content = "Node Name: " + node.name;
-            }
-            else {
-                return content;
-            }
-        }
-
-        content = S.util.replaceAll(content, "{{imgUpperRight}}", "");
-        content = S.util.replaceAll(content, "{{imgUpperLeft}}", "");
-        content = S.util.replaceAll(content, "{{img}}", "");
-        content = content.trim();
-
-        let idx = content.indexOf("\n");
-        if (idx !== -1) {
-            content = content.substring(0, idx);
-        }
-
-        if (content.length > 140) content = content.substring(0, 140) + "...";
-        while (content.startsWith("#")) {
-            content = content.substring(1);
-        }
-        return content.trim();
-    }
-
     /* NOTE: There's also a 'history.replaceState()' which doesn't build onto the history but modifies what it thinks
     the current location is. */
     updateHistory = (node: J.NodeInfo, childNode: J.NodeInfo = null, appState: AppState): void => {
@@ -841,11 +812,11 @@ export class Util {
             S.localDB.setVal(C.LOCALDB_LAST_CHILD_NODEID, childNode.id);
         }
 
-        let content = this.getShortContent(node);
+        let content = S.nodeUtil.getShortContent(node);
         // console.log("updateHistory: id=" + node.id + " subId=" + childNodeId + " cont=" + content);
         let url, title, state;
         if (node.name) {
-            const queryPath = this.getPathPartForNamedNode(node);
+            const queryPath = S.nodeUtil.getPathPartForNamedNode(node);
             url = window.location.origin + queryPath;
 
             if (childNode && childNode.id && childNode.id !== node.id) {
@@ -938,7 +909,7 @@ export class Util {
                     // if this child at at a top level now, don't let it be appended as a child second level item.
                     if (!childFound) {
                         // new NodeHistoryItem
-                        subItems.unshift({ id: childNode.id, type: childNode.type, content: this.getShortContent(childNode), subIds: null });
+                        subItems.unshift({ id: childNode.id, type: childNode.type, content: S.nodeUtil.getShortContent(childNode), subIds: null });
                     }
                 }
             }
@@ -950,29 +921,7 @@ export class Util {
         });
 
         // now add to top.
-        S.quanta.nodeHistory.unshift({ id: node.id, type: node.type, content: this.getShortContent(node), subItems });
-    }
-
-    getPathPartForNamedNode = (node: J.NodeInfo): string => {
-        if (!node || !node.name) return null;
-
-        if (node.owner === "admin") {
-            return "/n/" + node.name;
-        }
-        else {
-            return "/u/" + node.owner + "/" + node.name;
-        }
-    }
-
-    getPathPartForNamedNodeAttachment = (node: J.NodeInfo): string => {
-        if (!node || !node.name) return null;
-
-        if (node.owner === "admin") {
-            return "/f/" + node.name;
-        }
-        else {
-            return "/f/" + node.owner + "/" + node.name;
-        }
+        S.quanta.nodeHistory.unshift({ id: node.id, type: node.type, content: S.nodeUtil.getShortContent(node), subItems });
     }
 
     removeHtmlTags = (text: string) => {
@@ -1173,72 +1122,8 @@ export class Util {
         return DOMPurify.sanitize(val, Util.DOM_PURIFY_CONFIG);
     }
 
-    // returns true if all children are same owner as parent
-    allChildrenAreSameOwner = (node: J.NodeInfo): boolean => {
-        if (!node || !node.children) return true;
-
-        for (let child of node.children) {
-            if (node.ownerId !== child.ownerId) {
-                return false;
-            }
-        }
-        return true;
-    }
-
     formatCurrency = (n: number): string => {
         return currencyFormatter.format(n);
-    }
-
-    publishNodeToIpfs = async (node: J.NodeInfo) => {
-        let res: J.PublishNodeToIpfsResponse = await this.ajax<J.PublishNodeToIpfsRequest, J.PublishNodeToIpfsResponse>("publishNodeToIpfs", {
-            nodeId: node.id
-        });
-        this.showMessage(res.message, "Server Reply", true);
-    }
-
-    loadNodeFromIpfs = (node: J.NodeInfo): any => {
-        let state: AppState = store.getState();
-        new LoadNodeFromIpfsDlg(state).open();
-    }
-
-    getSharingNames = (node: J.NodeInfo, multiLine: boolean): string => {
-        if (!node || !node.ac) return null;
-        let delimiter = multiLine ? "\n" : ", ";
-
-        let names = S.props.isPublic(node) ? ("public [" + this.getPublicPrivilegesDisplay(node) + "]") : "";
-        for (let ac of node.ac) {
-
-            if (!ac.principalName) {
-                console.log("missing principalName on acl: " + S.util.prettyPrint(ac));
-            }
-
-            if (ac.principalName && ac.principalName !== "public") {
-                if (names) {
-                    names += delimiter;
-                }
-                names += "@" + ac.principalName;
-            }
-        }
-
-        return names;
-    }
-
-    getPublicPrivilegesDisplay = (node: J.NodeInfo): string => {
-        if (!node || !node.ac) return "";
-        let val = "";
-        for (let ac of node.ac) {
-            if (ac.principalName === "public") {
-                // console.log("AC: " + S.util.prettyPrint(ac));
-                for (let p of ac.privileges) {
-                    if (val) {
-                        val += ",";
-                    }
-                    val += p.privilegeName;
-                }
-                break;
-            }
-        }
-        return val;
     }
 
     showBrowserInfo = (): void => {

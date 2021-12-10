@@ -559,7 +559,7 @@ export class EditNodeDlg extends DialogBase {
             ]);
         }
 
-        let sharingNames = S.util.getSharingNames(state.node, false);
+        let sharingNames = S.nodeUtil.getSharingNames(state.node, false);
         let sharingDiv = null;
         let sharingDivClearFix = null;
         if (sharingNames) {

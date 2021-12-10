@@ -47,7 +47,7 @@ export abstract class ResultSetView extends AppTab {
         let content = null;
         if (this.data.rsInfo.prop !== "node.id" && //
             this.data.rsInfo.prop !== "node.name") {
-            content = this.data.rsInfo.node ? S.util.getShortContent(this.data.rsInfo.node) : null;
+            content = this.data.rsInfo.node ? S.nodeUtil.getShortContent(this.data.rsInfo.node) : null;
         }
 
         children.push(new Div(null, null, [
