@@ -1,4 +1,3 @@
-import { PluginMgrIntf } from "./intf/PluginMgrIntf";
 import { TypeHandlerIntf } from "./intf/TypeHandlerIntf";
 import { AccountTypeHandler } from "./plugins/AccountTypeHandler";
 import { CalcTypeHandler } from "./plugins/CalcTypeHandler";
@@ -18,7 +17,7 @@ import { TextTypeHandler } from "./plugins/TextTypeHandler";
 import { BookmarkTypeHandler } from "./plugins/BookmarkTypeHandler";
 import { BookmarkListTypeHandler } from "./plugins/BookmarkListTypeHandler";
 
-export class PluginMgr implements PluginMgrIntf {
+export class PluginMgr {
 
     private typeHandlers: Map<string, TypeHandlerIntf> = new Map<string, TypeHandlerIntf>();
 

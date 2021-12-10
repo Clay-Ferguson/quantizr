@@ -7,7 +7,6 @@ import { ChangePasswordDlg } from "./dlg/ChangePasswordDlg";
 import { MainMenuDlg } from "./dlg/MainMenuDlg";
 import { FollowersRSInfo } from "./FollowersRSInfo";
 import { FollowingRSInfo } from "./FollowingRSInfo";
-import { QuantaIntf } from "./intf/QuantaIntf";
 import { TabDataIntf } from "./intf/TabDataIntf";
 import * as J from "./JavaIntf";
 import { Log } from "./Log";
@@ -39,7 +38,7 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (s: Singletons) => {
     S = s;
 });
 
-export class Quanta implements QuantaIntf {
+export class Quanta {
     config: any;
     mainMenu: MainMenuDlg;
     hiddenRenderingEnabled: boolean = true;
@@ -91,7 +90,7 @@ export class Quanta implements QuantaIntf {
     openGraphComps: OpenGraphPanel[] = [];
 
     nodeHistory: NodeHistoryItem[] = [];
-    nodeHistoryLocked: false;
+    nodeHistoryLocked: boolean;
 
     sendTestEmail = async () => {
         await S.util.ajax<J.SendTestEmailRequest, J.SendTestEmailResponse>("sendTestEmail");

@@ -1,6 +1,5 @@
 import { Constants as C } from "./Constants";
 import { EncryptionKeyPair } from "./EncryptionKeyPair";
-import { EncryptionIntf, SymKeyDataPackage } from "./intf/EncryptionIntf";
 import * as J from "./JavaIntf";
 import { PubSub } from "./PubSub";
 import { Singletons } from "./Singletons";
@@ -9,6 +8,12 @@ let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
     S = ctx;
 });
+
+interface SymKeyDataPackage {
+    cipherText: string;
+    cipherKey: string;
+    symKey?: CryptoKey;
+}
 
 /*
 SYMMETRIC ENCRYPTION and PUBLIC KEY ENCRYPTION
@@ -28,7 +33,7 @@ Original way I had for creating a hashe-based key from a password:
     let keyPromise = this.crypto.subtle.importKey("raw", hash, { name: "AES-CBC" }, false, ["encrypt", "decrypt"]);
 */
 
-export class Encryption implements EncryptionIntf {
+export class Encryption {
 
     static FORMAT_PEM: string = "pem";
 

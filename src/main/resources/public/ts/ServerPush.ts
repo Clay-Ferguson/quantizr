@@ -2,7 +2,6 @@ import { dispatch, store } from "./AppRedux";
 import { AppState } from "./AppState";
 import { Constants as C } from "./Constants";
 import { MessageDlg } from "./dlg/MessageDlg";
-import { ServerPushIntf } from "./intf/ServerPushIntf";
 import { TabDataIntf } from "./intf/TabDataIntf";
 import * as J from "./JavaIntf";
 import { PubSub } from "./PubSub";
@@ -15,7 +14,7 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (s: Singletons) => {
 
 // reference: https://www.baeldung.com/spring-server-sent-events
 // See also: AppController.java#serverPush
-export class ServerPush implements ServerPushIntf {
+export class ServerPush {
     eventSource: EventSource;
 
     close = (): any => {

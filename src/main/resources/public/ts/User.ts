@@ -3,7 +3,6 @@ import { AppState } from "./AppState";
 import { Constants as C } from "./Constants";
 import { ConfirmDlg } from "./dlg/ConfirmDlg";
 import { SignupDlg } from "./dlg/SignupDlg";
-import { UserIntf } from "./intf/UserIntf";
 import * as J from "./JavaIntf";
 import { PubSub } from "./PubSub";
 import { Singletons } from "./Singletons";
@@ -13,7 +12,7 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (s: Singletons) => {
     S = s;
 });
 
-export class User implements UserIntf {
+export class User {
 
     closeAccountResponse = (): void => {
         /* Remove warning dialog to ask user about leaving the page */

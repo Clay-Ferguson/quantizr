@@ -36,7 +36,7 @@ export class Factory {
 
     /*
      * Just like in a SpringContext, we init all singletons up front and this allows circular references
-     * to exist with no problems.
+     * to exist in any of the imports with no problems.
      */
     constructor() {
         try {

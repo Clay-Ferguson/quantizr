@@ -8,7 +8,6 @@ import { DialogMode } from "../enums/DialogMode";
 import { NodeActionType } from "../enums/NodeActionType";
 import * as I from "../Interfaces";
 import { ValueIntf } from "../Interfaces";
-import { SymKeyDataPackage } from "../intf/EncryptionIntf";
 import { TypeHandlerIntf } from "../intf/TypeHandlerIntf";
 import * as J from "../JavaIntf";
 import { PropValueHolder } from "../PropValueHolder";
@@ -48,6 +47,13 @@ let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
     S = ctx;
 });
+
+// export this from elsewhere, it's dupliated two places right now (todo-0)
+interface SymKeyDataPackage {
+    cipherText: string;
+    cipherKey: string;
+    symKey?: CryptoKey;
+}
 
 interface LS {
     node?: J.NodeInfo;

@@ -1,5 +1,4 @@
 import { Constants as C } from "./Constants";
-import { SpeechRecogIntf } from "./intf/ SpeechRecogIntf";
 import { PubSub } from "./PubSub";
 import { Singletons } from "./Singletons";
 
@@ -11,7 +10,7 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (s: Singletons) => {
     S = s;
 });
 
-export class SpeechRecog implements SpeechRecogIntf {
+export class SpeechRecog {
     recognition = null;
     speechActive: boolean = false;
     private callback: (text: string) => void;

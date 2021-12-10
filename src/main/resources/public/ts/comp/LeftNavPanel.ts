@@ -155,5 +155,4 @@ export class LeftNavPanel extends Div {
     //     });
     //     super.domAddEvent();
     // }
-
 }

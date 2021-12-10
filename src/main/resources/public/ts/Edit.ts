@@ -10,7 +10,6 @@ import { ManageAccountDlg } from "./dlg/ManageAccountDlg";
 import { PrefsDlg } from "./dlg/PrefsDlg";
 import { SharingDlg } from "./dlg/SharingDlg";
 import { UploadFromFileDropzoneDlg } from "./dlg/UploadFromFileDropzoneDlg";
-import { EditIntf } from "./intf/EditIntf";
 import { TabDataIntf } from "./intf/TabDataIntf";
 import * as J from "./JavaIntf";
 import { NodeHistoryItem } from "./NodeHistoryItem";
@@ -23,7 +22,7 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (s: Singletons) => {
     S = s;
 });
 
-export class Edit implements EditIntf {
+export class Edit {
 
     showReadOnlyProperties: boolean = false;
 

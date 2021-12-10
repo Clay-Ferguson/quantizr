@@ -1,7 +1,5 @@
-import { LocalDBIntf } from "./intf/LocalDBIntf";
-
 /* Wraps a transaction of the CRUD operations for access to JavaScript local storage IndexedDB API */
-export class LocalDB implements LocalDBIntf {
+export class LocalDB {
 
     // For performance, I think it may be better to just never close the database once opened, but this flag allows
     // the logic to flow either way if we ever need to (close always or not)

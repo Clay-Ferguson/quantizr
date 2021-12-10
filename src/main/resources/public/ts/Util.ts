@@ -10,7 +10,6 @@ import { LoadNodeFromIpfsDlg } from "./dlg/LoadNodeFromIpfsDlg";
 import { MessageDlg } from "./dlg/MessageDlg";
 import { ProgressDlg } from "./dlg/ProgressDlg";
 import * as I from "./Interfaces";
-import { UtilIntf } from "./intf/UtilIntf";
 import * as J from "./JavaIntf";
 import { PubSub } from "./PubSub";
 import { Singletons } from "./Singletons";
@@ -33,7 +32,7 @@ let currencyFormatter = new Intl.NumberFormat("en-US", {
     // maximumFractionDigits: 0,
 });
 
-export class Util implements UtilIntf {
+export class Util {
 
     weekday: string[] = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
 
@@ -460,7 +459,7 @@ export class Util implements UtilIntf {
         return this.getRemoteHost() + "/mobile/api/";
     }
 
-    ajax = <RequestType extends J.RequestBase, ResponseType>(postName: string, postData: RequestType,
+    ajax = <RequestType extends J.RequestBase, ResponseType>(postName: string, postData: RequestType = null,
         background: boolean = false): Promise<ResponseType> => {
         postData = postData || {} as RequestType;
         let reqPromise: Promise<ResponseType> = null;
@@ -719,7 +718,7 @@ export class Util implements UtilIntf {
         new MessageDlg(message, title, null, null, preformatted, 3000, null, null).open();
     }
 
-    showMessage = (message: string, title: string, preformatted: boolean = false, sizeStyle: string = null): Promise<DialogBase> => {
+    showMessage = (message: string, title: string = null, preformatted: boolean = false, sizeStyle: string = null): Promise<DialogBase> => {
         if (!message) return;
         return new MessageDlg(message, title, null, null, preformatted, 0, null, null).open();
     }

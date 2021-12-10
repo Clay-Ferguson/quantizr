@@ -1,6 +1,5 @@
 import { AppState } from "./AppState";
 import { Constants as C } from "./Constants";
-import { PropsIntf } from "./intf/PropsIntf";
 import * as J from "./JavaIntf";
 import { PubSub } from "./PubSub";
 import { Singletons } from "./Singletons";
@@ -13,7 +12,7 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (s: Singletons) => {
     S = s;
 });
 
-export class Props implements PropsIntf {
+export class Props {
 
     readOnlyPropertyList: Set<string> = new Set<string>();
     allBinaryProps: Set<string> = new Set<string>();

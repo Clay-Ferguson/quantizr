@@ -7,7 +7,6 @@ import { Constants as C } from "./Constants";
 import { MessageDlg } from "./dlg/MessageDlg";
 import { FollowersRSInfo } from "./FollowersRSInfo";
 import { FollowingRSInfo } from "./FollowingRSInfo";
-import { SearchIntf } from "./intf/SearchIntf";
 import { TabDataIntf } from "./intf/TabDataIntf";
 import * as J from "./JavaIntf";
 import { PubSub } from "./PubSub";
@@ -22,7 +21,7 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (s: Singletons) => {
     S = s;
 });
 
-export class Search implements SearchIntf {
+export class Search {
     _UID_ROWID_PREFIX: string = "srch_row_";
 
     idToNodeMap: Map<string, J.NodeInfo> = new Map<string, J.NodeInfo>();

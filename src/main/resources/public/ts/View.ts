@@ -2,7 +2,6 @@ import { dispatch, store } from "./AppRedux";
 import { AppState } from "./AppState";
 import { Constants as C } from "./Constants";
 import { NodeStatsDlg } from "./dlg/NodeStatsDlg";
-import { ViewIntf } from "./intf/ViewIntf";
 import * as J from "./JavaIntf";
 import { PubSub } from "./PubSub";
 import { Singletons } from "./Singletons";
@@ -16,7 +15,7 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (s: Singletons) => {
 declare var BUILDTIME;
 declare var PROFILE;
 
-export class View implements ViewIntf {
+export class View {
 
     docElm: any = (document.documentElement || document.body.parentNode || document.body);
 

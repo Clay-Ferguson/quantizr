@@ -6,7 +6,6 @@ import { MainMenuDlg } from "./dlg/MainMenuDlg";
 import { MessageDlg } from "./dlg/MessageDlg";
 import { PrefsDlg } from "./dlg/PrefsDlg";
 import { SearchContentDlg } from "./dlg/SearchContentDlg";
-import { NavIntf } from "./intf/NavIntf";
 import { TabDataIntf } from "./intf/TabDataIntf";
 import * as J from "./JavaIntf";
 import { PubSub } from "./PubSub";
@@ -22,7 +21,7 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (s: Singletons) => {
     S = s;
 });
 
-export class Nav implements NavIntf {
+export class Nav {
     _UID_ROWID_PREFIX: string = "row_";
 
     login = (state: AppState): void => {

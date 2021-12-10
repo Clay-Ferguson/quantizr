@@ -5,7 +5,6 @@ import { UploadFromFileDropzoneDlg } from "./dlg/UploadFromFileDropzoneDlg";
 import { UploadFromIPFSDlg } from "./dlg/UploadFromIPFSDlg";
 import { UploadFromTorrentDlg } from "./dlg/UploadFromTorrentDlg";
 import { UploadFromUrlDlg } from "./dlg/UploadFromUrlDlg";
-import { AttachmentIntf } from "./intf/AttachmentIntf";
 import * as J from "./JavaIntf";
 import { PubSub } from "./PubSub";
 import { Singletons } from "./Singletons";
@@ -15,7 +14,7 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (s: Singletons) => {
     S = s;
 });
 
-export class Attachment implements AttachmentIntf {
+export class Attachment {
 
     openUploadFromFileDlg = (toIpfs: boolean, node: J.NodeInfo, autoAddFile: File, state: AppState): void => {
         if (node == null) {

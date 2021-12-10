@@ -2,7 +2,6 @@ import WebTorrent from "webtorrent";
 import { dispatch } from "./AppRedux";
 import { AppState } from "./AppState";
 import { Constants as C } from "./Constants";
-import { TorrentIntf } from "./intf/TorrentIntf";
 import { PubSub } from "./PubSub";
 import { Singletons } from "./Singletons";
 
@@ -11,7 +10,7 @@ PubSub.sub(C.PUBSUB_SingletonsReady, (s: Singletons) => {
     S = s;
 });
 
-export class Torrent implements TorrentIntf {
+export class Torrent {
     wtc: WebTorrent.Instance = new WebTorrent();
 
     constructor() {

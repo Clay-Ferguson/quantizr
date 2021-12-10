@@ -10,7 +10,6 @@ import { Constants as C } from "./Constants";
 import { MessageDlg } from "./dlg/MessageDlg";
 import { UserProfileDlg } from "./dlg/UserProfileDlg";
 import { NodeActionType } from "./enums/NodeActionType";
-import { RenderIntf } from "./intf/RenderIntf";
 import { TypeHandlerIntf } from "./intf/TypeHandlerIntf";
 import * as J from "./JavaIntf";
 import { PubSub } from "./PubSub";
@@ -36,7 +35,7 @@ function imageErrorFunc(evt: any) {
     return true;
 }
 
-export class Render implements RenderIntf {
+export class Render {
     private debug: boolean = false;
     private markedRenderer = null;
 
