@@ -51,7 +51,7 @@ export class ImportDlg extends DialogBase {
             return;
         }
 
-        let hltNode = S.quanta.getHighlightedNode(this.appState);
+        let hltNode = S.nodeUtil.getHighlightedNode(this.appState);
         if (!hltNode) {
             new MessageDlg("Select a node to import into.", "Import", null, null, false, 0, null, this.appState).open();
             return;

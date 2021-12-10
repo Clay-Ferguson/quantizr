@@ -168,7 +168,7 @@ export class MenuPanel extends Div {
     }
 
     static messagesNodeFeed = (state: AppState) => {
-        const hltNode: J.NodeInfo = S.quanta.getHighlightedNode(state);
+        const hltNode: J.NodeInfo = S.nodeUtil.getHighlightedNode(state);
         if (!hltNode) return;
         let feedData = S.tabUtil.getTabDataById(state, C.TAB_FEED);
         if (feedData) {
@@ -228,7 +228,7 @@ export class MenuPanel extends Div {
     preRender(): void {
         const state: AppState = useSelector((state: AppState) => state);
 
-        const hltNode: J.NodeInfo = S.quanta.getHighlightedNode(state);
+        const hltNode: J.NodeInfo = S.nodeUtil.getHighlightedNode(state);
         const selNodeIsMine = !!hltNode && (hltNode.owner === state.userName || state.userName === "admin");
 
         const importFeatureEnabled = selNodeIsMine || (!!hltNode && state.homeNodeId === hltNode.id);
@@ -325,7 +325,7 @@ export class MenuPanel extends Div {
 
         children.push(new Menu("Edit", [
             state.editNode ? new MenuItem("Continue editing...", MenuPanel.continueEditing, !state.isAnonUser) : null, //
-            new MenuItem("Clear Selections", S.quanta.clearSelNodes, !state.isAnonUser && state.selectedNodes.size > 0), //
+            new MenuItem("Clear Selections", S.nodeUtil.clearSelNodes, !state.isAnonUser && state.selectedNodes.size > 0), //
 
             // new MenuItem("Cut", S.edit.cutSelNodes, () => { return !state.isAnonUser && selNodeCount > 0 && selNodeIsMine }), //
             new MenuItem("Undo Cut", S.edit.undoCutSelNodes, !state.isAnonUser && !!state.nodesToMove), //

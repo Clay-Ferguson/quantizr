@@ -32,7 +32,7 @@ export class SplitNodeDlg extends DialogBase {
         super("Split Node", null, false, state);
 
         if (!this.node) {
-            this.node = S.quanta.getHighlightedNode(this.appState);
+            this.node = S.nodeUtil.getHighlightedNode(this.appState);
         }
 
         let splitMode: string;

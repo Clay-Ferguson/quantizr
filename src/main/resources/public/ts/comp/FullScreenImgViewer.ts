@@ -22,7 +22,7 @@ export class FullScreenImgViewer extends Main {
     preRender(): void {
         let state: AppState = useSelector((state: AppState) => state);
         let nodeId = state.fullScreenViewId;
-        let node: J.NodeInfo = S.quanta.findNodeById(state, nodeId);
+        let node: J.NodeInfo = S.nodeUtil.findNodeById(state, nodeId);
 
         if (!node) {
             console.log("Can't find nodeId " + nodeId);

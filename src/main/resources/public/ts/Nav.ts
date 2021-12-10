@@ -86,7 +86,7 @@ export class Nav {
     }
 
     navOpenSelectedNode = (state: AppState): void => {
-        const currentSelNode: J.NodeInfo = S.quanta.getHighlightedNode(state);
+        const currentSelNode: J.NodeInfo = S.nodeUtil.getHighlightedNode(state);
         if (!currentSelNode) return;
         if (C.DEBUG_SCROLLING) {
             console.log("navOpenSelectedNode");
@@ -121,7 +121,7 @@ export class Nav {
             this.upLevelResponse(res, null, true, state);
         }
         catch (e) {
-            S.quanta.clearLastNodeIds();
+            S.nodeUtil.clearLastNodeIds();
             this.navHome(state);
         }
     }
@@ -164,7 +164,7 @@ export class Nav {
             }
         }
         catch (e) {
-            S.quanta.clearLastNodeIds();
+            S.nodeUtil.clearLastNodeIds();
             this.navHome(state);
         }
     }
@@ -173,7 +173,7 @@ export class Nav {
      * turn of row selection DOM element of whatever row is currently selected
      */
     getSelectedDomElement = (state: AppState): HTMLElement => {
-        var currentSelNode = S.quanta.getHighlightedNode(state);
+        var currentSelNode = S.nodeUtil.getHighlightedNode(state);
         if (currentSelNode) {
             /* get node by node identifier */
             const node: J.NodeInfo = state.idToNodeMap.get(currentSelNode.id);
@@ -200,7 +200,7 @@ export class Nav {
             state = appState(state);
 
             /* First check if this node is already highlighted and if so just return */
-            const hltNode = S.quanta.getHighlightedNode();
+            const hltNode = S.nodeUtil.getHighlightedNode();
             if (hltNode && hltNode.id === id) {
                 resolve();
                 return;
@@ -216,7 +216,7 @@ export class Nav {
             /*
              * sets which node is selected on this page (i.e. parent node of this page being the 'key')
              */
-            S.quanta.highlightNode(node, false, state);
+            S.nodeUtil.highlightNode(node, false, state);
 
             // todo-1: without this timeout checkboxes on main tab don't work reliably. Need their state stored in global state to fix it
             // in a good way.
@@ -251,7 +251,7 @@ export class Nav {
             this.navPageNodeResponse(res, state);
         }
         catch (e) {
-            S.quanta.clearLastNodeIds();
+            S.nodeUtil.clearLastNodeIds();
             this.navHome(state);
         }
     }
@@ -260,7 +260,7 @@ export class Nav {
         id = S.util.allowIdFromEvent(evt, id);
         state = appState(state);
         const node: J.NodeInfo = state.idToNodeMap.get(id);
-        S.quanta.highlightNode(node, false, state);
+        S.nodeUtil.highlightNode(node, false, state);
 
         if (!node) {
             S.util.showMessage("Unknown nodeId in openNodeByUid: " + id, "Warning");
@@ -344,7 +344,7 @@ export class Nav {
                 this.navPageNodeResponse(res, state);
             }
             catch (e) {
-                S.quanta.clearLastNodeIds();
+                S.nodeUtil.clearLastNodeIds();
             }
         }
     }
@@ -415,7 +415,7 @@ export class Nav {
             });
 
             if (!res.node) return;
-            S.quanta.updateNodeMap(res.node, state);
+            S.nodeUtil.updateNodeMap(res.node, state);
             let feedData = S.tabUtil.getTabDataById(state, C.TAB_FEED);
             if (feedData) {
                 feedData.props.searchTextState.setValue("");

@@ -116,7 +116,7 @@ export class Search {
         including when the page==0 because user is just jumping to beginning. Need a specific param for saying
         it's ok to reset node or not */
         if (!node) {
-            node = S.quanta.getHighlightedNode(state);
+            node = S.nodeUtil.getHighlightedNode(state);
         }
 
         if (!node) {
@@ -459,7 +459,7 @@ export class Search {
     /* If target is non-null we only return shares to that particlar person (or public) */
     findShares = (state: AppState = null, shareTarget: string = null, accessOption: string = null): void => {
         state = appState(state);
-        const focusNode: J.NodeInfo = S.quanta.getHighlightedNode(state);
+        const focusNode: J.NodeInfo = S.nodeUtil.getHighlightedNode(state);
         if (focusNode == null) {
             return;
         }

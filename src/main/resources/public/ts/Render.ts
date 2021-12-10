@@ -200,7 +200,7 @@ export class Render {
     /* nodeId is parent node to query for calendar content */
     showCalendar = async (nodeId: string, state: AppState) => {
         if (!nodeId) {
-            let node = S.quanta.getHighlightedNode(state);
+            let node = S.nodeUtil.getHighlightedNode(state);
             if (node) {
                 nodeId = node.id;
             }
@@ -222,7 +222,7 @@ export class Render {
 
     showNodeUrl = (node: J.NodeInfo, state: AppState): void => {
         if (!node) {
-            node = S.quanta.getHighlightedNode(state);
+            node = S.nodeUtil.getHighlightedNode(state);
         }
         if (!node) {
             S.util.showMessage("You must first click on a node.", "Warning");
@@ -434,7 +434,7 @@ export class Render {
 
                     s.idToNodeMap = new Map<string, J.NodeInfo>();
                     if (res) {
-                        S.quanta.updateNodeMap(res.node, s);
+                        S.nodeUtil.updateNodeMap(res.node, s);
                     }
 
                     let targetNode: J.NodeInfo = null;
@@ -443,7 +443,7 @@ export class Render {
                         // so we have to call getNodeByName() to get the 'id' that goes with that node name.
                         if (targetNodeId.startsWith(":")) {
                             targetNodeId = targetNodeId.substring(1);
-                            targetNode = S.quanta.getNodeByName(res.node, targetNodeId, s);
+                            targetNode = S.nodeUtil.getNodeByName(res.node, targetNodeId, s);
                             if (targetNode) {
                                 targetNodeId = targetNode.id;
                             }
@@ -481,7 +481,7 @@ export class Render {
                         // Note: the substring(1) trims the "#" character off.
                         if (allowScroll) {
                             // console.log("highlight: pendingLocationHash (allowScroll)");
-                            S.quanta.highlightRowById(s.pendingLocationHash.substring(1), true, s);
+                            S.nodeUtil.highlightRowById(s.pendingLocationHash.substring(1), true, s);
 
                             if (S.quanta.hiddenRenderingEnabled) {
                                 s.rendering = true;
@@ -491,7 +491,7 @@ export class Render {
                     }
                     else if (allowScroll && targetNodeId) {
                         // console.log("highlight: byId");
-                        if (!S.quanta.highlightRowById(targetNodeId, true, s)) {
+                        if (!S.nodeUtil.highlightRowById(targetNodeId, true, s)) {
                             // anything to do here? didn't find node.
                         }
 
@@ -499,7 +499,7 @@ export class Render {
                             s.rendering = true;
                         }
                     } //
-                    else if (allowScroll && (scrollToTop || !S.quanta.getHighlightedNode(s))) {
+                    else if (allowScroll && (scrollToTop || !S.nodeUtil.getHighlightedNode(s))) {
                         if (C.DEBUG_SCROLLING) {
                             console.log("rendering highlight: scrollTop");
                         }
@@ -723,7 +723,7 @@ export class Render {
 
     showGraph = (node: J.NodeInfo, searchText: string, state: AppState): void => {
         if (!node) {
-            node = S.quanta.getHighlightedNode(state);
+            node = S.nodeUtil.getHighlightedNode(state);
         }
 
         dispatch("Action_ShowGraph", (s: AppState): AppState => {

@@ -146,7 +146,7 @@ export class SearchContentDlg extends DialogBase {
         }
 
         // until we have better validation
-        let node = S.quanta.getHighlightedNode(this.appState);
+        let node = S.nodeUtil.getHighlightedNode(this.appState);
         if (!node) {
             S.util.showMessage("No node is selected to search under.", "Warning");
             return;
@@ -164,7 +164,7 @@ export class SearchContentDlg extends DialogBase {
         }
 
         // until we have better validation
-        let node = S.quanta.getHighlightedNode(this.appState);
+        let node = S.nodeUtil.getHighlightedNode(this.appState);
         if (!node) {
             S.util.showMessage("No node is selected to search under.", "Warning");
             return;

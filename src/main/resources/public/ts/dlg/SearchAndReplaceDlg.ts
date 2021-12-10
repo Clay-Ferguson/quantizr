@@ -84,7 +84,7 @@ export class SearchAndReplaceDlg extends DialogBase {
             return;
         }
 
-        let node: J.NodeInfo = S.quanta.getHighlightedNode(this.appState);
+        let node: J.NodeInfo = S.nodeUtil.getHighlightedNode(this.appState);
         if (!node) {
             S.util.showMessage("No node was selected.", "Warning");
             return;

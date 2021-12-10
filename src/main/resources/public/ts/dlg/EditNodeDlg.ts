@@ -865,7 +865,7 @@ export class EditNodeDlg extends DialogBase {
             S.props.transferBinaryProps(res.node, node);
 
             if (res.node) {
-                S.quanta.updateNodeMap(res.node, this.appState);
+                S.nodeUtil.updateNodeMap(res.node, this.appState);
             }
         }
     }

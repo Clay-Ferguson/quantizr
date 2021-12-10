@@ -41,7 +41,7 @@ export class View {
         }
 
         if (!highlightId) {
-            const currentSelNode: J.NodeInfo = S.quanta.getHighlightedNode(state);
+            const currentSelNode: J.NodeInfo = S.nodeUtil.getHighlightedNode(state);
             highlightId = currentSelNode ? currentSelNode.id : nodeId;
         }
 
@@ -78,7 +78,7 @@ export class View {
             S.render.renderPageFromData(res, scrollToTop, highlightId, setTab, allowScroll);
         }
         catch (e) {
-            S.quanta.clearLastNodeIds();
+            S.nodeUtil.clearLastNodeIds();
             S.nav.navHome(state);
         }
     }
@@ -188,14 +188,14 @@ export class View {
             }
         }
         catch (e) {
-            S.quanta.clearLastNodeIds();
+            S.nodeUtil.clearLastNodeIds();
             S.nav.navHome(state);
         }
     }
 
     // todo-2: need to add logic to detect if this is root node on the page, and if so, we consider the first child the target
     scrollRelativeToNode = (dir: string, state: AppState) => {
-        const currentSelNode: J.NodeInfo = S.quanta.getHighlightedNode(state);
+        const currentSelNode: J.NodeInfo = S.nodeUtil.getHighlightedNode(state);
         if (!currentSelNode) return;
 
         let newNode: J.NodeInfo = null;
@@ -204,7 +204,7 @@ export class View {
         if (currentSelNode.id === state.node.id) {
             // if going down that means first child node.
             if (dir === "down" && state.node.children && state.node.children.length > 0) {
-                S.quanta.highlightNode(state.node.children[0], true, state);
+                S.nodeUtil.highlightNode(state.node.children[0], true, state);
             }
             else if (dir === "up") {
                 S.nav.navUpLevel(false);
@@ -220,7 +220,7 @@ export class View {
                 if (nodeFound && dir === "down") {
                     ret = true;
                     newNode = child;
-                    S.quanta.highlightNode(child, true, state);
+                    S.nodeUtil.highlightNode(child, true, state);
                 }
 
                 if (child.id === currentSelNode.id) {
@@ -228,11 +228,11 @@ export class View {
                         if (prevChild) {
                             ret = true;
                             newNode = prevChild;
-                            S.quanta.highlightNode(prevChild, true, state);
+                            S.nodeUtil.highlightNode(prevChild, true, state);
                         }
                         else {
                             newNode = state.node;
-                            S.quanta.highlightNode(state.node, true, state);
+                            S.nodeUtil.highlightNode(state.node, true, state);
                         }
                     }
                     nodeFound = true;
@@ -284,7 +284,7 @@ export class View {
             /* Check to see if we are rendering the top node (page root), and if so
             it is better looking to just scroll to zero index, because that will always
             be what user wants to see */
-            const currentSelNode: J.NodeInfo = S.quanta.getHighlightedNode(state);
+            const currentSelNode: J.NodeInfo = S.nodeUtil.getHighlightedNode(state);
 
             /* the scrolling got slightly convoluted, so I invented 'editNodeId' just to be able to detect
              a case where the user is editing a node and we KNOW we don't need to scroll after editing,
@@ -336,7 +336,7 @@ export class View {
     }
 
     getNodeStats = async (state: AppState, trending: boolean, feed: boolean): Promise<any> => {
-        const node = S.quanta.getHighlightedNode(state);
+        const node = S.nodeUtil.getHighlightedNode(state);
 
         let res: J.GetNodeStatsResponse = await S.util.ajax<J.GetNodeStatsRequest, J.GetNodeStatsResponse>("getNodeStats", {
             nodeId: node ? node.id : null,
@@ -347,7 +347,7 @@ export class View {
     }
 
     runServerCommand = async (command: string, dlgTitle: string, dlgDescription: string, state: AppState): Promise<void> => {
-        const node = S.quanta.getHighlightedNode(state);
+        const node = S.nodeUtil.getHighlightedNode(state);
 
         let res: J.GetServerInfoResponse = await S.util.ajax<J.GetServerInfoRequest, J.GetServerInfoResponse>("getServerInfo", {
             command,

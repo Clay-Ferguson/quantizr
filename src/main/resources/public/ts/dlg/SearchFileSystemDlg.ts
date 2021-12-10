@@ -68,7 +68,7 @@ export class SearchFileSystemDlg extends DialogBase {
         }
 
         // until we have better validation
-        let node = S.quanta.getHighlightedNode(state);
+        let node = S.nodeUtil.getHighlightedNode(state);
         if (!node) {
             S.util.showMessage("No node is selected to search under.", "Warning");
             return;

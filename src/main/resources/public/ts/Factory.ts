@@ -17,6 +17,7 @@ import { Edit } from "./Edit";
 import { Encryption } from "./Encryption";
 import { LocalDB } from "./LocalDB";
 import { Nav } from "./Nav";
+import { NodeUtil } from "./NodeUtil";
 import { PluginMgr } from "./PluginMgr";
 import { Props } from "./Props";
 import { PubSub } from "./PubSub";
@@ -46,6 +47,7 @@ export class Factory {
                 plugin: new PluginMgr(),
                 util: new Util(),
                 tabUtil: new TabUtil(),
+                nodeUtil: new NodeUtil(),
                 push: new ServerPush(),
                 edit: new Edit(),
                 attachment: new Attachment(),

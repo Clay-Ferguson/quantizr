@@ -39,7 +39,7 @@ export class Edit {
     }
 
     openImportDlg = (state: AppState): void => {
-        const node: J.NodeInfo = S.quanta.getHighlightedNode(state);
+        const node: J.NodeInfo = S.nodeUtil.getHighlightedNode(state);
         if (!node) {
             S.util.showMessage("No node is selected.", "Warning");
             return;
@@ -53,7 +53,7 @@ export class Edit {
     }
 
     openExportDlg = (state: AppState): void => {
-        let node = S.quanta.getHighlightedNode(state);
+        let node = S.nodeUtil.getHighlightedNode(state);
         if (node) {
             new ExportDlg(state, node).open();
         }
@@ -69,7 +69,7 @@ export class Edit {
     private joinNodesResponse = (res: J.JoinNodesResponse, state: AppState): void => {
         state = appState(state);
         if (S.util.checkSuccess("Join node", res)) {
-            S.quanta.clearSelNodes(state);
+            S.nodeUtil.clearSelNodes(state);
             S.view.refreshTree(state.node.id, false, false, null, false, false, true, true, false, state);
         }
     }
@@ -83,8 +83,8 @@ export class Edit {
                 // these conditions determine if we want to run editing in popup, instead of inline in the page.
                 let editInPopup = forceUsePopup || state.mobileMode ||
                     // node not found on tree.
-                    (!S.quanta.getDisplayingNode(state, res.nodeInfo.id) &&
-                        !S.quanta.getDisplayingNode(state, S.quanta.newNodeTargetId)) ||
+                    (!S.nodeUtil.getDisplayingNode(state, res.nodeInfo.id) &&
+                        !S.nodeUtil.getDisplayingNode(state, S.quanta.newNodeTargetId)) ||
                     // not currently viewing tree
                     S.quanta.activeTab !== C.TAB_MAIN ||
                     S.quanta.fullscreenViewerActive(state);
@@ -271,8 +271,8 @@ export class Edit {
 
     insertNodeResponse = (res: J.InsertNodeResponse, state: AppState): void => {
         if (S.util.checkSuccess("Insert node", res)) {
-            S.quanta.updateNodeMap(res.newNode, state);
-            S.quanta.highlightNode(res.newNode, false, state);
+            S.nodeUtil.updateNodeMap(res.newNode, state);
+            S.nodeUtil.highlightNode(res.newNode, false, state);
             this.runEditNode(null, res.newNode.id, false, false, false, null, state);
         }
     }
@@ -283,7 +283,7 @@ export class Edit {
                 S.quanta.refresh(state);
             }
             else {
-                S.quanta.updateNodeMap(res.newNode, state);
+                S.nodeUtil.updateNodeMap(res.newNode, state);
                 this.runEditNode(null, res.newNode.id, forceUsePopup, res.encrypt, false, replyToId, state);
             }
         }
@@ -328,7 +328,7 @@ export class Edit {
             }
 
             // if 'node.id' is not being displayed on the page we need to jump to it from scratch
-            if (!S.quanta.getDisplayingNode(state, node.id)) {
+            if (!S.nodeUtil.getDisplayingNode(state, node.id)) {
                 S.view.jumpToId(node.id);
             }
             // otherwise we just pull down the new node data and replace it into our 'state.node.children' (or page root) and we're done.
@@ -376,7 +376,7 @@ export class Edit {
                     }
                 });
             }
-            S.quanta.updateNodeMap(res.node, s);
+            S.nodeUtil.updateNodeMap(res.node, s);
             return s;
         });
     }
@@ -434,7 +434,7 @@ export class Edit {
         id = S.util.allowIdFromEvent(evt, id);
         state = appState(state);
         if (!id) {
-            const selNode: J.NodeInfo = S.quanta.getHighlightedNode(state);
+            const selNode: J.NodeInfo = S.nodeUtil.getHighlightedNode(state);
             id = selNode.id;
         }
 
@@ -452,7 +452,7 @@ export class Edit {
         id = S.util.allowIdFromEvent(evt, id);
         state = appState(state);
         if (!id) {
-            const selNode: J.NodeInfo = S.quanta.getHighlightedNode(state);
+            const selNode: J.NodeInfo = S.nodeUtil.getHighlightedNode(state);
             id = selNode.id;
         }
 
@@ -469,7 +469,7 @@ export class Edit {
     moveNodeToTop = async (id: string = null, state: AppState = null): Promise<void> => {
         state = appState(state);
         if (!id) {
-            const selNode: J.NodeInfo = S.quanta.getHighlightedNode(state);
+            const selNode: J.NodeInfo = S.nodeUtil.getHighlightedNode(state);
             id = selNode.id;
         }
         const node: J.NodeInfo = state.idToNodeMap.get(id);
@@ -485,7 +485,7 @@ export class Edit {
     moveNodeToBottom = async (id: string = null, state: AppState = null): Promise<void> => {
         state = appState(state);
         if (!id) {
-            const selNode: J.NodeInfo = S.quanta.getHighlightedNode(state);
+            const selNode: J.NodeInfo = S.nodeUtil.getHighlightedNode(state);
             id = selNode.id;
         }
         const node: J.NodeInfo = state.idToNodeMap.get(id);
@@ -523,7 +523,7 @@ export class Edit {
         id = S.util.allowIdFromEvent(evt, id);
         state = appState(state);
         if (!id) {
-            let node = S.quanta.getHighlightedNode(state);
+            let node = S.nodeUtil.getHighlightedNode(state);
             if (node) {
                 id = node.id;
             }
@@ -555,7 +555,7 @@ export class Edit {
          */
         let node: J.NodeInfo = null;
         if (!id) {
-            node = S.quanta.getHighlightedNode(state);
+            node = S.nodeUtil.getHighlightedNode(state);
         } else {
             node = state.idToNodeMap.get(id);
         }
@@ -590,7 +590,7 @@ export class Edit {
          * node if there is a selected node.
          */
         if (!id) {
-            const node: J.NodeInfo = S.quanta.getHighlightedNode(state);
+            const node: J.NodeInfo = S.nodeUtil.getHighlightedNode(state);
             if (node) {
                 parentNode = node;
             }
@@ -610,15 +610,15 @@ export class Edit {
     }
 
     selectAllNodes = async (state: AppState): Promise<void> => {
-        const highlightNode = S.quanta.getHighlightedNode(state);
+        const highlightNode = S.nodeUtil.getHighlightedNode(state);
         let res: J.SelectAllNodesResponse = await S.util.ajax<J.SelectAllNodesRequest, J.SelectAllNodesResponse>("selectAllNodes", {
             parentNodeId: highlightNode.id
         });
-        S.quanta.selectAllNodes(res.nodeIds);
+        S.nodeUtil.selectAllNodes(res.nodeIds);
     }
 
     clearInbox = async (state: AppState): Promise<void> => {
-        S.quanta.clearSelNodes(state);
+        S.nodeUtil.clearSelNodes(state);
 
         let dlg: ConfirmDlg = new ConfirmDlg("Permanently delete the nodes in your Inbox", "Cleaer Inbox",
             "btn-danger", "alert alert-danger", state);
@@ -635,7 +635,7 @@ export class Edit {
     joinNodes = async (state?: AppState): Promise<void> => {
         state = appState(state);
 
-        const selNodesArray = S.quanta.getSelNodeIdsArray(state);
+        const selNodesArray = S.nodeUtil.getSelNodeIdsArray(state);
         if (!selNodesArray || selNodesArray.length === 0) {
             S.util.showMessage("Select some nodes to join.", "Warning");
             return;
@@ -670,7 +670,7 @@ export class Edit {
         }
 
         // note: the setNodeSel above isn't causing this to get anything here
-        const selNodesArray = S.quanta.getSelNodeIdsArray(state);
+        const selNodesArray = S.nodeUtil.getSelNodeIdsArray(state);
 
         if (!selNodesArray || selNodesArray.length === 0) {
             S.util.showMessage("Select some nodes to delete.", "Warning");
@@ -779,7 +779,7 @@ export class Edit {
 
         dispatch("Action_SetNodesToMove", (s: AppState): AppState => {
             S.nav.setNodeSel(true, id, s);
-            let selNodesArray = S.quanta.getSelNodeIdsArray(s);
+            let selNodesArray = S.nodeUtil.getSelNodeIdsArray(s);
             s.nodesToMove = selNodesArray;
             s.selectedNodes.clear();
             return s;
@@ -824,7 +824,7 @@ export class Edit {
         await dlg.open();
         if (dlg.yes) {
             /* inserting under whatever node user has focused */
-            const node = S.quanta.getHighlightedNode(state);
+            const node = S.nodeUtil.getHighlightedNode(state);
 
             if (!node) {
                 S.util.showMessage("No node is selected.", "Warning");
@@ -883,7 +883,7 @@ export class Edit {
 
     splitNode = async (node: J.NodeInfo, splitType: string, delimiter: string, state: AppState): Promise<void> => {
         if (!node) {
-            node = S.quanta.getHighlightedNode(state);
+            node = S.nodeUtil.getHighlightedNode(state);
         }
 
         if (!node) {
@@ -1026,7 +1026,7 @@ export class Edit {
 
     updateHeadings = async (state: AppState): Promise<void> => {
         state = appState(state);
-        const node: J.NodeInfo = S.quanta.getHighlightedNode(state);
+        const node: J.NodeInfo = S.nodeUtil.getHighlightedNode(state);
         if (node) {
             await S.util.ajax<J.UpdateHeadingsRequest, J.UpdateHeadingsResponse>("updateHeadings", {
                 nodeId: node.id
@@ -1040,7 +1040,7 @@ export class Edit {
      */
     editNodeSharing = async (state: AppState, node: J.NodeInfo): Promise<void> => {
         if (!node) {
-            node = S.quanta.getHighlightedNode(state);
+            node = S.nodeUtil.getHighlightedNode(state);
         }
 
         if (!node) {

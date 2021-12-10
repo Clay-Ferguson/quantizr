@@ -18,7 +18,7 @@ export class Attachment {
 
     openUploadFromFileDlg = (toIpfs: boolean, node: J.NodeInfo, autoAddFile: File, state: AppState): void => {
         if (node == null) {
-            node = S.quanta.getHighlightedNode(state);
+            node = S.nodeUtil.getHighlightedNode(state);
         }
         if (!node) {
             S.util.showMessage("No node is selected.", "Warning");
@@ -39,7 +39,7 @@ export class Attachment {
 
     openUploadFromUrlDlg = (nodeId: string, defaultUrl: string, onUploadFunc: Function, state: AppState): void => {
         if (!nodeId) {
-            let node = S.quanta.getHighlightedNode(state);
+            let node = S.nodeUtil.getHighlightedNode(state);
             if (!node) {
                 S.util.showMessage("No node is selected.", "Warning");
                 return;
@@ -53,7 +53,7 @@ export class Attachment {
 
     openUploadFromTorrentDlg = (nodeId: string, defaultUrl: string, onUploadFunc: Function, state: AppState): void => {
         if (!nodeId) {
-            let node = S.quanta.getHighlightedNode(state);
+            let node = S.nodeUtil.getHighlightedNode(state);
             if (!node) {
                 S.util.showMessage("No node is selected.", "Warning");
                 return;
@@ -67,7 +67,7 @@ export class Attachment {
 
     openUploadFromIPFSDlg = (nodeId: string, defaultCid: string, onUploadFunc: Function, state: AppState): void => {
         if (!nodeId) {
-            let node = S.quanta.getHighlightedNode(state);
+            let node = S.nodeUtil.getHighlightedNode(state);
             if (!node) {
                 S.util.showMessage("No node is selected.", "Warning");
                 return;
@@ -80,7 +80,7 @@ export class Attachment {
     };
 
     deleteAttachment = async (node: J.NodeInfo, state: AppState): Promise<boolean> => {
-        node = node || S.quanta.getHighlightedNode(state);
+        node = node || S.nodeUtil.getHighlightedNode(state);
 
         if (node) {
             let dlg: ConfirmDlg = new ConfirmDlg("Delete the Attachment on the Node?", "Confirm", null, null, state);
