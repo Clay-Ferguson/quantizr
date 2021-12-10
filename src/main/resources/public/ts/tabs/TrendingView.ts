@@ -118,7 +118,7 @@ export class TrendingView extends AppTab {
 
         // expand so users can see what's going on with the search string and know they can clear it.
         // If feed tab exists, expand the filter part
-        let feedData = S.quanta.getTabDataById(null, C.TAB_FEED);
+        let feedData = S.tabUtil.getTabDataById(null, C.TAB_FEED);
         if (feedData) {
             feedData.props.searchTextState.setValue(word);
         }

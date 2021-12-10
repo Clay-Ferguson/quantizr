@@ -36,7 +36,7 @@ export class Search {
         if (res.searchResults?.length > 0) {
             dispatch("Action_RenderSearchResults", (s: AppState): AppState => {
                 S.util.focusId(C.TAB_SHARES);
-                S.quanta.tabScrollTop(s, C.TAB_SHARES);
+                S.tabUtil.tabScrollTop(s, C.TAB_SHARES);
                 let data = s.tabData.find(d => d.id === C.TAB_SHARES);
                 if (!data) return;
                 let info = data.rsInfo as SharesRSInfo;
@@ -49,7 +49,7 @@ export class Search {
                 info.accessOption = accessOption;
                 info.endReached = !res.searchResults || res.searchResults.length < J.ConstantInt.ROWS_PER_PAGE;
 
-                S.quanta.selectTabStateOnly(data.id, s);
+                S.tabUtil.selectTabStateOnly(data.id, s);
                 return s;
             });
         }
@@ -82,7 +82,7 @@ export class Search {
 
             dispatch("Action_RenderSearchResults", (s: AppState): AppState => {
                 S.util.focusId(C.TAB_SEARCH);
-                S.quanta.tabScrollTop(s, C.TAB_SEARCH);
+                S.tabUtil.tabScrollTop(s, C.TAB_SEARCH);
                 let data = s.tabData.find(d => d.id === C.TAB_SEARCH);
                 if (!data) return;
 
@@ -100,7 +100,7 @@ export class Search {
                 data.rsInfo.prop = prop;
                 data.rsInfo.endReached = !res.searchResults || res.searchResults.length < J.ConstantInt.ROWS_PER_PAGE;
 
-                S.quanta.selectTabStateOnly(data.id, s);
+                S.tabUtil.selectTabStateOnly(data.id, s);
                 return s;
             });
         }
@@ -142,7 +142,7 @@ export class Search {
 
         dispatch("Action_RenderTimelineResults", (s: AppState): AppState => {
             S.util.focusId(C.TAB_TIMELINE);
-            S.quanta.tabScrollTop(s, C.TAB_TIMELINE);
+            S.tabUtil.tabScrollTop(s, C.TAB_TIMELINE);
             let data = s.tabData.find(d => d.id === C.TAB_TIMELINE);
             if (!data) return;
             let info = data.rsInfo as TimelineRSInfo;
@@ -156,7 +156,7 @@ export class Search {
             info.endReached = !res.searchResults || res.searchResults.length < J.ConstantInt.ROWS_PER_PAGE;
             info.page = page;
 
-            S.quanta.selectTabStateOnly(data.id, s);
+            S.tabUtil.selectTabStateOnly(data.id, s);
             return s;
         });
     }
@@ -182,7 +182,7 @@ export class Search {
     delayedRefreshFeed = (state: AppState): void => {
         // put in a delay timer since we call this from other state processing functions.
         setTimeout(() => {
-            let feedData: TabDataIntf = S.quanta.getTabDataById(state, C.TAB_FEED);
+            let feedData: TabDataIntf = S.tabUtil.getTabDataById(state, C.TAB_FEED);
             if (!feedData.props.feedLoading) {
                 this.refreshFeed();
             }
@@ -190,7 +190,7 @@ export class Search {
     }
 
     refreshFeed = () => {
-        let feedData: TabDataIntf = S.quanta.getTabDataById(null, C.TAB_FEED);
+        let feedData: TabDataIntf = S.tabUtil.getTabDataById(null, C.TAB_FEED);
         if (feedData) {
             feedData.props.page = 0;
             feedData.props.refreshCounter++;
@@ -207,7 +207,7 @@ export class Search {
     /* growResults==true is the "infinite scrolling" support */
     feed = async (page: number, searchText: string, forceMetadataOn: boolean, growResults: boolean) => {
         let appState = store.getState();
-        let feedData: TabDataIntf = S.quanta.getTabDataById(appState, C.TAB_FEED);
+        let feedData: TabDataIntf = S.tabUtil.getTabDataById(appState, C.TAB_FEED);
         if (!feedData) {
             return;
         }
@@ -271,7 +271,7 @@ export class Search {
             feedData.props.feedLoading = false;
 
             if (scrollToTop) {
-                S.quanta.selectTabStateOnly(C.TAB_FEED, s);
+                S.tabUtil.selectTabStateOnly(C.TAB_FEED, s);
                 setTimeout(() => {
                     S.view.scrollAllTop(s);
                 }, 1000);
@@ -308,7 +308,7 @@ export class Search {
         if (res.searchResults?.length > 0) {
             dispatch("Action_RenderSearchResults", (s: AppState): AppState => {
                 S.util.focusId(C.TAB_FOLLOWERS);
-                S.quanta.tabScrollTop(s, C.TAB_FOLLOWERS);
+                S.tabUtil.tabScrollTop(s, C.TAB_FOLLOWERS);
                 let data = s.tabData.find(d => d.id === C.TAB_FOLLOWERS);
                 if (!data) return;
                 let info = data.rsInfo as FollowersRSInfo;
@@ -325,7 +325,7 @@ export class Search {
                 info.endReached = !res.searchResults || res.searchResults.length < J.ConstantInt.ROWS_PER_PAGE;
                 info.showingFollowersOfUser = userName;
 
-                S.quanta.selectTabStateOnly(data.id, s);
+                S.tabUtil.selectTabStateOnly(data.id, s);
                 return s;
             });
         }
@@ -350,7 +350,7 @@ export class Search {
         if (res.searchResults && res.searchResults.length > 0) {
             dispatch("Action_RenderSearchResults", (s: AppState): AppState => {
                 S.util.focusId(C.TAB_FOLLOWING);
-                S.quanta.tabScrollTop(s, C.TAB_FOLLOWING);
+                S.tabUtil.tabScrollTop(s, C.TAB_FOLLOWING);
                 let data = s.tabData.find(d => d.id === C.TAB_FOLLOWING);
                 if (!data) return;
                 let info = data.rsInfo as FollowingRSInfo;
@@ -367,7 +367,7 @@ export class Search {
                 info.endReached = !res.searchResults || res.searchResults.length < J.ConstantInt.ROWS_PER_PAGE;
                 info.showingFollowingOfUser = userName;
 
-                S.quanta.selectTabStateOnly(data.id, s);
+                S.tabUtil.selectTabStateOnly(data.id, s);
                 return s;
             });
         }

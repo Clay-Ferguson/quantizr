@@ -285,7 +285,7 @@ export class Nav {
 
     navPageNodeResponse = (res: J.RenderNodeResponse, state: AppState): void => {
         S.render.renderPageFromData(res, true, null, true, true);
-        S.quanta.selectTab(C.TAB_MAIN);
+        S.tabUtil.selectTab(C.TAB_MAIN);
     }
 
     geoLocation = (state: AppState): void => {
@@ -384,7 +384,7 @@ export class Nav {
         // Try to get node from local memory...
         if (node) {
             setTimeout(() => {
-                let feedData = S.quanta.getTabDataById(state, C.TAB_FEED);
+                let feedData = S.tabUtil.getTabDataById(state, C.TAB_FEED);
                 if (feedData) {
                     feedData.props.searchTextState.setValue("");
                 }
@@ -416,7 +416,7 @@ export class Nav {
 
             if (!res.node) return;
             S.quanta.updateNodeMap(res.node, state);
-            let feedData = S.quanta.getTabDataById(state, C.TAB_FEED);
+            let feedData = S.tabUtil.getTabDataById(state, C.TAB_FEED);
             if (feedData) {
                 feedData.props.searchTextState.setValue("");
             }
@@ -506,14 +506,14 @@ export class Nav {
     }
 
     messages = (props: FeedViewProps): void => {
-        let feedData: TabDataIntf = S.quanta.getTabDataById(null, C.TAB_FEED);
+        let feedData: TabDataIntf = S.tabUtil.getTabDataById(null, C.TAB_FEED);
         if (!feedData) {
             return;
         }
 
         dispatch("Action_SelectTab", (s: AppState): AppState => {
             s.guiReady = true;
-            S.quanta.tabChanging(s.activeTab, C.TAB_FEED, s);
+            S.tabUtil.tabChanging(s.activeTab, C.TAB_FEED, s);
             s.activeTab = S.quanta.activeTab = C.TAB_FEED;
 
             // merge props prarmeter into the feed data props.

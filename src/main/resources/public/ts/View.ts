@@ -255,7 +255,7 @@ export class View {
         if (C.DEBUG_SCROLLING) {
             console.log("scrollAllTop");
         }
-        let activeTabComp = S.quanta.getActiveTabComp(state);
+        let activeTabComp = S.tabUtil.getActiveTabComp(state);
         if (activeTabComp && activeTabComp.getRef()) {
             activeTabComp.getRef().scrollTop = 0;
         }
@@ -370,7 +370,7 @@ export class View {
                 }
 
                 dispatch("Action_showServerInfo", (s: AppState): AppState => {
-                    S.quanta.tabChanging(s.activeTab, C.TAB_SERVERINFO, s);
+                    S.tabUtil.tabChanging(s.activeTab, C.TAB_SERVERINFO, s);
                     s.activeTab = S.quanta.activeTab = C.TAB_SERVERINFO;
                     s.serverInfoText = m.message;
                     s.serverInfoCommand = command;

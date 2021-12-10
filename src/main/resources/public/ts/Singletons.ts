@@ -12,6 +12,7 @@ import type { Search } from "./Search";
 import type { ServerPush } from "./ServerPush";
 import type { User } from "./User";
 import type { Util } from "./Util";
+import type { TabUtil } from "./TabUtil";
 import type { View } from "./View";
 import type { Torrent } from "./Torrent";
 
@@ -21,6 +22,7 @@ export interface Singletons {
     quanta: Quanta;
     plugin: PluginMgr;
     util: Util;
+    tabUtil: TabUtil;
     push: ServerPush;
     edit: Edit;
     attachment: Attachment;

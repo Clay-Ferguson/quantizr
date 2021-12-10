@@ -158,7 +158,7 @@ export class ServerPush {
     }
 
     ipsmPushItem = (payload: string, state: AppState) => {
-        let feedData: TabDataIntf = S.quanta.getTabDataById(null, C.TAB_IPSM);
+        let feedData: TabDataIntf = S.tabUtil.getTabDataById(null, C.TAB_IPSM);
         if (!feedData) return;
 
         dispatch("Action_RenderIPSMFeedResults", (s: AppState): AppState => {
@@ -175,7 +175,7 @@ export class ServerPush {
 
         console.log("feedPushItem: " + nodeInfo.content);
 
-        let feedData: TabDataIntf = S.quanta.getTabDataById(null, C.TAB_FEED);
+        let feedData: TabDataIntf = S.tabUtil.getTabDataById(null, C.TAB_FEED);
         if (!feedData) return;
 
         let isMine = S.props.isMine(nodeInfo, state);

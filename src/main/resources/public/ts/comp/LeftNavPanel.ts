@@ -37,7 +37,7 @@ export class LeftNavPanel extends Div {
 
     preRender(): void {
         let state: AppState = useSelector((state: AppState) => state);
-        let feedData: TabDataIntf = S.quanta.getTabDataById(state, C.TAB_FEED);
+        let feedData: TabDataIntf = S.tabUtil.getTabDataById(state, C.TAB_FEED);
 
         let s = state.newMessageCount > 1 ? "s" : "";
         let messages = state.newMessageCount > 0

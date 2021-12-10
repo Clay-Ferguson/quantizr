@@ -410,7 +410,7 @@ export class Render {
                 // console.log("update state in Action_RenderPage");
 
                 if (!s.activeTab || clickTab) {
-                    S.quanta.tabChanging(s.activeTab, C.TAB_MAIN, s);
+                    S.tabUtil.tabChanging(s.activeTab, C.TAB_MAIN, s);
                     s.activeTab = S.quanta.activeTab = C.TAB_MAIN;
                 }
 

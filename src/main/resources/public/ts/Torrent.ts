@@ -39,7 +39,7 @@ export class Torrent {
         }
 
         dispatch("Action_showServerInfo", (s: AppState): AppState => {
-            S.quanta.tabChanging(s.activeTab, C.TAB_SERVERINFO, s);
+            S.tabUtil.tabChanging(s.activeTab, C.TAB_SERVERINFO, s);
             s.activeTab = S.quanta.activeTab = C.TAB_SERVERINFO;
             s.serverInfoText = msg;
             s.serverInfoCommand = null;

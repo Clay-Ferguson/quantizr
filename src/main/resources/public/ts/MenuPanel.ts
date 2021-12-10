@@ -109,7 +109,7 @@ export class MenuPanel extends Div {
         dispatch("Action_enableIpsm", (s: AppState): AppState => {
             s.ipsmActive = true;
             setTimeout(() => {
-                S.quanta.selectTab(C.TAB_IPSM);
+                S.tabUtil.selectTab(C.TAB_IPSM);
             }, 250);
             return s;
         });
@@ -120,7 +120,7 @@ export class MenuPanel extends Div {
     };
 
     static messagesToFromMe = () => {
-        let feedData = S.quanta.getTabDataById(null, C.TAB_FEED);
+        let feedData = S.tabUtil.getTabDataById(null, C.TAB_FEED);
         if (feedData) {
             feedData.props.searchTextState.setValue("");
         }
@@ -136,7 +136,7 @@ export class MenuPanel extends Div {
     }
 
     static messagesFromFriends = () => {
-        let feedData = S.quanta.getTabDataById(null, C.TAB_FEED);
+        let feedData = S.tabUtil.getTabDataById(null, C.TAB_FEED);
         if (feedData) {
             feedData.props.searchTextState.setValue("");
         }
@@ -152,7 +152,7 @@ export class MenuPanel extends Div {
     }
 
     static messagesLocal = () => {
-        let feedData = S.quanta.getTabDataById(null, C.TAB_FEED);
+        let feedData = S.tabUtil.getTabDataById(null, C.TAB_FEED);
         if (feedData) {
             feedData.props.searchTextState.setValue("");
         }
@@ -170,7 +170,7 @@ export class MenuPanel extends Div {
     static messagesNodeFeed = (state: AppState) => {
         const hltNode: J.NodeInfo = S.quanta.getHighlightedNode(state);
         if (!hltNode) return;
-        let feedData = S.quanta.getTabDataById(state, C.TAB_FEED);
+        let feedData = S.tabUtil.getTabDataById(state, C.TAB_FEED);
         if (feedData) {
             feedData.props.searchTextState.setValue("");
         }
@@ -186,7 +186,7 @@ export class MenuPanel extends Div {
     }
 
     static messagesFediverse = () => {
-        let feedData = S.quanta.getTabDataById(null, C.TAB_FEED);
+        let feedData = S.tabUtil.getTabDataById(null, C.TAB_FEED);
         if (feedData) {
             feedData.props.searchTextState.setValue("");
         }
@@ -604,7 +604,7 @@ export class MenuPanel extends Div {
                                 func = MenuPanel.messagesFediverse;
                             }
                             else {
-                                func = () => S.quanta.selectTab(tab);
+                                func = () => S.tabUtil.selectTab(tab);
                             }
                         }
                         // covers http and https
@@ -636,7 +636,7 @@ export class MenuPanel extends Div {
 
     getTabMenuItem(state: AppState, data: TabDataIntf): MenuItem {
         return new MenuItem(data.name, (event) => {
-            S.quanta.selectTab(data.id);
+            S.tabUtil.selectTab(data.id);
         }, true, () => state.activeTab === data.id);
     }
 }

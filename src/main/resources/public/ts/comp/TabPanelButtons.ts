@@ -46,7 +46,7 @@ export class TabPanelButtons extends Div {
 
     getTabButton(state: AppState, data: TabDataIntf): Li {
         let tabName = data.name;
-        let feedData: TabDataIntf = S.quanta.getTabDataById(state, C.TAB_FEED);
+        let feedData: TabDataIntf = S.tabUtil.getTabDataById(state, C.TAB_FEED);
 
         // slight hack until we have 'name' as a function and not a string.
         if (tabName === "Feed" && feedData?.props?.feedFilterRootNode) {
@@ -59,7 +59,7 @@ export class TabPanelButtons extends Div {
             onClick: (event) => {
                 event.stopPropagation();
                 event.preventDefault();
-                S.quanta.selectTab(data.id);
+                S.tabUtil.selectTab(data.id);
             }
         }, [
             new Anchor("#" + data.id, tabName, {

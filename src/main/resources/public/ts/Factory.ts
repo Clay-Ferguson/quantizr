@@ -26,6 +26,7 @@ import { Search } from "./Search";
 import { ServerPush } from "./ServerPush";
 import { Singletons } from "./Singletons";
 import { SpeechRecog } from "./SpeechRecog";
+import { TabUtil } from "./TabUtil";
 import { Torrent } from "./Torrent";
 import { User } from "./User";
 import { Util } from "./Util";
@@ -44,6 +45,7 @@ export class Factory {
                 quanta: new Quanta(),
                 plugin: new PluginMgr(),
                 util: new Util(),
+                tabUtil: new TabUtil(),
                 push: new ServerPush(),
                 edit: new Edit(),
                 attachment: new Attachment(),
