@@ -1,11 +1,5 @@
 import { dispatch } from "../AppRedux";
 import { AppState } from "../AppState";
-import { Constants as C } from "../Constants";
-import { AudioPlayerDlg } from "../dlg/AudioPlayerDlg";
-import { NodeActionType } from "../enums/NodeActionType";
-import * as J from "../JavaIntf";
-import { PubSub } from "../PubSub";
-import { Singletons } from "../Singletons";
 import { Anchor } from "../comp/Anchor";
 import { Comp } from "../comp/base/Comp";
 import { CompIntf } from "../comp/base/CompIntf";
@@ -22,6 +16,12 @@ import { Img } from "../comp/Img";
 import { Span } from "../comp/Span";
 import { Spinner } from "../comp/Spinner";
 import { TextContent } from "../comp/TextContent";
+import { Constants as C } from "../Constants";
+import { AudioPlayerDlg } from "../dlg/AudioPlayerDlg";
+import { NodeActionType } from "../enums/NodeActionType";
+import * as J from "../JavaIntf";
+import { PubSub } from "../PubSub";
+import { Singletons } from "../Singletons";
 import { TypeBase } from "./base/TypeBase";
 
 let S: Singletons;
