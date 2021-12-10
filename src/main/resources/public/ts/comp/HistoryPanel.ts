@@ -171,7 +171,7 @@ export class HistoryPanel extends Div {
 
     /* We use the standard trick of storing the ID on the dom so we can avoid unnecessary function scopes */
     jumpToId = (evt: any): void => {
-        let id = S.util.getPropFromDom(evt, "nid");
+        let id = S.domUtil.getPropFromDom(evt, "nid");
         S.view.jumpToId(id);
     }
 }

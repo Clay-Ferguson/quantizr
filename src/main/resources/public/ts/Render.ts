@@ -549,7 +549,7 @@ export class Render {
                     // so we don't want to set the MAIN tab as the focus and mess that up.
                     // console.log("focus MAIN_TAB during render.");
                     if (!s.editNode) {
-                        S.util.focusId(C.TAB_MAIN);
+                        S.domUtil.focusId(C.TAB_MAIN);
                     }
                 }
                 return s;

@@ -4,7 +4,6 @@ import * as marked from "marked";
 import { appState, dispatch, store } from "./AppRedux";
 import { AppState } from "./AppState";
 import clientInfo from "./ClientInfo";
-import { Comp } from "./comp/base/Comp";
 import { Constants as C } from "./Constants";
 import { DialogBase } from "./DialogBase";
 import { AudioPlayerDlg } from "./dlg/AudioPlayerDlg";
@@ -117,28 +116,7 @@ export class Util {
     function object creates per page render */
     allowIdFromEvent = (evt: Event, id: string): string => {
         if (id) return id;
-        return this.getPropFromDom(evt, "nid");
-    }
-
-    getPropFromDom = (evt: Event, prop: string): string => {
-        let val = null;
-
-        // get the id from this node or any parent node.
-        if (evt && evt.target) {
-            let target: any = evt.target;
-            while (target) {
-                // console.log("Checking target.id " + target.id + " for nid");
-                val = target.getAttribute(prop);
-                if (val) return val;
-                target = target.parentElement;
-            }
-        }
-
-        if (!val) {
-            console.log("Unable to get prop " + prop + " from parameter or html element or any parents.");
-        }
-
-        return val;
+        return S.domUtil.getPropFromDom(evt, "nid");
     }
 
     // #mouseEffects (do not delete tag)
@@ -370,16 +348,6 @@ export class Util {
     private _ajaxCounter: number = 0;
 
     daylightSavingsTime: boolean = (this.dst(new Date())) ? true : false;
-
-    getCheckBoxStateById = (id: string): boolean => {
-        const checkbox = this.domElm(id);
-        if (checkbox) {
-            return (<any>checkbox).checked;
-        }
-        else {
-            throw new Error("checkbox not found: " + id);
-        }
-    }
 
     toJson = (obj: Object): string => {
         return JSON.stringify(obj, null, 4);
@@ -668,41 +636,6 @@ export class Util {
         return elm && elm.offsetHeight > 0;
     }
 
-    restoreFocus = (): void => {
-        if (!Comp.focusElmId) return;
-        // console.log("Restore focus: " + Comp.focusElmId);
-        setTimeout(() => {
-            // console.log("delayed Focusing Id: " + id);
-            const elm: HTMLElement = this.domElm(Comp.focusElmId);
-            if (elm) {
-                // console.log(`Element found (${id}), focusing`);
-                elm.focus();
-            }
-        }, 750);
-    }
-
-    /* set focus to element by id */
-    focusId = (id: string): void => {
-        if (!id) return;
-        // console.log("*** focusId = " + id);
-        Comp.focusElmId = id;
-        setTimeout(() => {
-            // console.log("delayed Focusing Id: " + id);
-            const elm: HTMLElement = this.domElm(id);
-            if (elm) {
-                /* This is a fix to a focus bug using the 'safest' way to do this without any redesign.
-                 If the current focus is on an 'editor' then don't let this logic focus AWAY
-                 from the editor. That breaks user input/keyboard. */
-                if (S.quanta.currentFocusId?.startsWith(C.ID_PREFIX_EDIT) && document.getElementById(S.quanta.currentFocusId)) {
-                    // console.log("Ignoring call to focus away from editor while editing.");
-                    return;
-                }
-                // console.log(`Element found (${id}), focusing`);
-                elm.focus();
-            }
-        }, 750);
-    }
-
     /*
      * We could have put this logic inside the json method itself, but I can forsee cases where we don't want a
      * message to appear when the json response returns success==false, so we will have to call checkSuccess inside
@@ -737,126 +670,6 @@ export class Util {
         return obj === null || obj === undefined;
     }
 
-    elementExists = (id: string): boolean => {
-        if (!id) return false;
-        if (id.startsWith("#")) {
-            id = id.substring(1);
-        }
-
-        if (id.includes("#")) {
-            console.log("Invalid # in domElm");
-            return null;
-        }
-
-        const e = document.getElementById(id);
-        return !!e;
-    }
-
-    /* Takes textarea dom Id (# optional) and returns its value */
-    getTextAreaValById = (id: string): string => {
-        const de: HTMLInputElement = <HTMLInputElement>this.domElm(id);
-        return de.value;
-    }
-
-    setInnerHTMLById = (id: string, val: string): void => {
-        this.getElm(id, (elm: HTMLElement) => {
-            this.setInnerHTML(elm, val);
-        });
-    }
-
-    setInnerHTML = (elm: HTMLElement, val: string): void => {
-        if (elm) {
-            elm.innerHTML = val;
-        }
-    }
-
-    domElmObjCss = (elm: HTMLElement, prop: string, val: string): void => {
-        if (elm) {
-            elm.style[prop] = val;
-        }
-    }
-
-    // This may fail. oddly the API where i get the object from here wants to reutrn Elements not HTMLElements.
-    domElmObjRemove = (elm: Element): void => {
-        if (elm) {
-            elm.parentNode.removeChild(elm);
-        }
-    }
-
-    domElmRemove = (id: string): void => {
-        const elm = this.domElm(id);
-        if (elm) {
-            elm.parentNode.removeChild(elm);
-        }
-    }
-
-    /* We return a promise that resolves to the element, but also support a callback function
-    that can be used optionally whenver that's more convenient */
-    getElm = (id: string, exResolve: (elm: HTMLElement) => void = null): Promise<HTMLElement> => {
-        // Promise is used here instead of async/await because of the resolve being done inside the timer.
-        return new Promise<HTMLElement>((resolve, reject) => {
-
-            // First we immediately try to get the element.
-            const e: HTMLElement = document.getElementById(id);
-            if (e) {
-                // console.log("ELM found immediately: "+id);
-                if (exResolve) {
-                    exResolve(e);
-                }
-                resolve(e);
-            }
-            // If element not found we just go into a wait for it (polling)
-            // (is there a better native JS approach than polling for the element?)
-            else {
-                let accumWaitTime = 0;
-                const timeSlice = 100;
-
-                // don't hang the promise more than 5 seconds, before reporting error and continuing.
-                const maxWaitTime = 5000;
-
-                const interval = setInterval(() => {
-                    // oops I only want this on PROD because when debugging it can timeout too much when breakpoints are set.
-                    accumWaitTime += timeSlice;
-                    if (accumWaitTime >= maxWaitTime) {
-                        console.error("waited for but never found element: " + id);
-                        clearInterval(interval);
-                        resolve(null);
-                    }
-
-                    const e: HTMLElement = document.getElementById(id);
-                    // console.log("waiting for elm: "+id);
-                    if (e) {
-                        clearInterval(interval);
-                        // console.log("Got Elm: "+id);
-                        if (exResolve) {
-                            exResolve(e);
-                        }
-                        resolve(e);
-                    }
-                }, timeSlice);
-            }
-        });
-    }
-
-    /*
-    * Gets the RAW DOM element and displays an error message if it's not found. Do not prefix with "#"
-    */
-    domElm = (id: string): HTMLElement => {
-        if (!id) return null;
-        if (id.startsWith("#")) {
-            console.log("whenElm removed obsolete preceding # from ID " + id);
-            id = id.substring(1);
-        }
-
-        if (id.includes("#")) {
-            console.log("Invalid # in domElm");
-            return null;
-        }
-
-        const e: HTMLElement = document.getElementById(id);
-        return e;
-    }
-
     isObject = (obj: any): boolean => {
         return obj && obj.length !== 0;
     }
@@ -867,24 +680,11 @@ export class Util {
     }
 
     getInputVal = (id: string): any => {
-        return (<any>this.domElm(id)).value;
+        return (<any>S.domUtil.domElm(id)).value;
     }
 
     insertString = (val: string, text: string, position: number): string => {
         return [val.slice(0, position), text, val.slice(position)].join("");
-    }
-
-    /* returns true if element was found, or false if element not found */
-    setInputVal = (id: string, val: string): boolean => {
-        if (val == null) {
-            val = "";
-        }
-        const elm = this.domElm(id);
-        if (elm) {
-            // elm.node.value = val;
-            (<any>elm).value = val;
-        }
-        return !!elm;
     }
 
     /*
@@ -898,67 +698,12 @@ export class Util {
         return true;
     }
 
-    setHtml = (id: string, content: string): void => {
-        if (content == null) {
-            content = "";
-        }
-
-        const elm: HTMLElement = this.domElm(id);
-        if (!elm) {
-            console.log("Unable to setHtml on ID: " + id + ". Not found.");
-            return;
-        }
-        elm.innerHTML = content;
-    }
-
-    /* Finds all elements that are under selectors[0], and then finds all under THOSE that are under selectors[1], etc,
-    and executes 'func' on the leaf nodes of that kind of search. There may be a way that querySelectorAll can do this all
-    at once but i want to get in the chain here in case i need to do other processing along this chain of selections
-    */
-    domSelExec = (selectors: string[], func: Function, level: number = 0) => {
-        if (!selectors || selectors.length === 0) return;
-
-        const elements = document.querySelectorAll(selectors[level]);
-        Array.prototype.forEach.call(elements, (el: HTMLElement) => {
-            // if at final dept level, exec the function
-            if (selectors.length - 1 === level) {
-                func(el);
-            }
-            // else drill deeper, using recursion
-            else {
-                this.domSelExec(selectors, func, level + 1);
-            }
-        }
-        );
-    }
-
-    setElmDisplayById = (id: string, showing: boolean) => {
-        const elm: HTMLElement = this.domElm(id);
-        if (elm) {
-            this.setElmDisplay(elm, showing);
-        }
-    }
-
-    setElmDisplay = (elm: HTMLElement, showing: boolean) => {
-        if (showing) {
-            elm.style.display = "";
-        }
-        else {
-            elm.style.display = "none";
-        }
-    }
-
     /* Note: There is also Object.keys(obj).length, which computes internally an entire array, as part of processing
     so it's debatable wether the overhead of that is better for large objects */
     getPropertyCount = (obj: Object): number => {
         if (!obj) return 0;
         const names: string[] = Object.getOwnPropertyNames(obj);
         return names ? names.length : 0;
-    }
-
-    forEachElmBySel = (sel: string, callback: Function): void => {
-        const elements = document.querySelectorAll(sel);
-        Array.prototype.forEach.call(elements, callback);
     }
 
     /* Iterates by callling callback with property key/value pairs for each property in the object
@@ -993,28 +738,6 @@ export class Util {
             return true;
         });
         return val;
-    }
-
-    /*
-     * Makes eleId enabled based on vis flag
-     *
-     * eleId can be a DOM element or the ID of a dom element, with or without leading #
-     */
-    setEnablement = (elmId: string, enable: boolean): void => {
-
-        let elm: HTMLElement = null;
-        if (typeof elmId === "string") {
-            elm = this.domElm(elmId);
-        } else {
-            elm = elmId;
-        }
-
-        if (elm == null) {
-            console.log("setVisibility couldn't find item: " + elmId);
-            return;
-        }
-
-        (<any>elm).disabled = !enable;
     }
 
     /* Programatically creates objects by name, similar to what Java reflection does
@@ -1702,7 +1425,7 @@ export class Util {
     }
 
     displaySignupMessage = (): void => {
-        const signupElm = S.util.domElm("signupCodeResponse");
+        const signupElm = S.domUtil.domElm("signupCodeResponse");
         if (signupElm) {
             const signupResponse = signupElm.textContent;
             if (signupResponse === "ok") {

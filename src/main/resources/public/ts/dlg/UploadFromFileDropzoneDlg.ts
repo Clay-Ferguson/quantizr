@@ -371,7 +371,7 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
             }
         };
 
-        S.util.getElm(this.dropzoneDiv.getId(), (elm: HTMLElement) => {
+        S.domUtil.getElm(this.dropzoneDiv.getId(), (elm: HTMLElement) => {
             this.dropzone = new Dropzone("#" + this.dropzoneDiv.getId(), config);
             let maxUploadSize = this.appState.userPreferences.maxUploadFileSize;
 

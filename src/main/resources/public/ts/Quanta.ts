@@ -323,7 +323,7 @@ export class Quanta {
                 // after the timer we check for the counter still being greater than zero (not an ==1 this time).
                 if (Quanta.overlayCounter > 0) {
                     // Log.log("showing overlay.");
-                    const elm = S.util.domElm("overlayDiv");
+                    const elm = S.domUtil.domElm("overlayDiv");
                     if (elm) {
                         elm.style.display = "block";
                         elm.style.cursor = "wait";
@@ -333,7 +333,7 @@ export class Quanta {
         }
         else if (Quanta.overlayCounter === 0) {
             // Log.log("hiding overlay.");
-            const elm = S.util.domElm("overlayDiv");
+            const elm = S.domUtil.domElm("overlayDiv");
             if (elm) {
                 elm.style.display = "none";
             }

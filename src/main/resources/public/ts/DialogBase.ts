@@ -104,7 +104,7 @@ export abstract class DialogBase extends Div implements DialogBaseImpl {
                 if (this.closeByOutsideClick) {
                     this.backdrop.addEventListener("click", (evt: any) => {
                         // get our dialog itself.
-                        const contentElm: any = S.util.domElm(this.getId());
+                        const contentElm: any = S.domUtil.domElm(this.getId());
 
                         // check if the click was outside the dialog.
                         if (!!contentElm && !contentElm.contains(evt.target)) {
@@ -179,8 +179,8 @@ export abstract class DialogBase extends Div implements DialogBaseImpl {
             if (this.getRef()) {
                 this.preUnmount();
                 ReactDOM.unmountComponentAtNode(this.backdrop);
-                S.util.domElmRemove(this.getId());
-                S.util.domElmRemove(DialogBase.BACKDROP_PREFIX + this.getId());
+                S.domUtil.domElmRemove(this.getId());
+                S.domUtil.domElmRemove(DialogBase.BACKDROP_PREFIX + this.getId());
 
                 if (--DialogBase.refCounter <= 0) {
                     if (this.appState.mobileMode) {

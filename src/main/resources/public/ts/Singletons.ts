@@ -15,6 +15,7 @@ import type { TabUtil } from "./TabUtil";
 import type { Torrent } from "./Torrent";
 import type { User } from "./User";
 import type { Util } from "./Util";
+import type { DomUtil } from "./DomUtil";
 import type { View } from "./View";
 
 /* Similar to a SpringContext in a Java app, these singletons are all pre-instantiated and guaranteed not
@@ -23,6 +24,7 @@ export interface Singletons {
     quanta: Quanta;
     plugin: PluginMgr;
     util: Util;
+    domUtil: DomUtil;
     nodeUtil: NodeUtil;
     tabUtil: TabUtil;
     push: ServerPush;

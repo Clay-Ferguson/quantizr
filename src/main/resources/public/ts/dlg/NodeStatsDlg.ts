@@ -80,7 +80,7 @@ export class NodeStatsDlg extends DialogBase {
     searchWord = (evt: Event) => {
         this.close();
 
-        let word = S.util.getPropFromDom(evt, "word");
+        let word = S.domUtil.getPropFromDom(evt, "word");
         if (!word) return;
 
         if (this.feed) {

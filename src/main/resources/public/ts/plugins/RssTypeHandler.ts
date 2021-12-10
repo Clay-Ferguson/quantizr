@@ -142,7 +142,7 @@ export class RssTypeHandler extends TypeBase {
                 }
                 else {
                     dispatch("Action_RSSUpdated", (s: AppState): AppState => {
-                        S.util.focusId(C.TAB_MAIN);
+                        S.domUtil.focusId(C.TAB_MAIN);
                         S.tabUtil.tabScrollTop(s, C.TAB_MAIN);
                         setTimeout(() => {
                             S.tabUtil.tabScrollTop(s, C.TAB_MAIN);
@@ -452,7 +452,7 @@ export class RssTypeHandler extends TypeBase {
         // DO NOT DELETE: This is an important example of how to detect dupliate images
         // const urlSet: Set<string> = new Set<string>();
 
-        S.util.forEachElmBySel("#" + parent.getId() + " .rss-feed-listing img", (el: HTMLElement, i) => {
+        S.domUtil.forEachElmBySel("#" + parent.getId() + " .rss-feed-listing img", (el: HTMLElement, i) => {
 
             /* Because some feeds use the same image in the header and content we try to detect that here
             and remove any but the first ocurrance of any given image on the entire page.
@@ -490,7 +490,7 @@ export class RssTypeHandler extends TypeBase {
             el.removeAttribute("height");
         });
 
-        // S.util.forEachElmBySel("#" + parent.getId() + " .rss-feed-image", (el, i) => {
+        // S.domUtil.forEachElmBySel("#" + parent.getId() + " .rss-feed-image", (el, i) => {
         //     el.style.maxWidth = "40%";
         // });
     }

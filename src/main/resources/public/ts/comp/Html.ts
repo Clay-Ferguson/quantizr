@@ -64,7 +64,7 @@ export class Html extends Comp {
     domPreUpdateEvent(): void {
         let elm = this.getRef();
         if (!elm) return;
-        S.util.forEachElmBySel("#" + this.getId() + " a", (el, i) => {
+        S.domUtil.forEachElmBySel("#" + this.getId() + " a", (el, i) => {
             let href = el.getAttribute("href");
 
             // Detect this is a link to this instance we are being served from...

@@ -264,11 +264,11 @@ export class View {
             window.scrollTo(0, 0);
         }
         else {
-            S.util.getElm(C.ID_LHS, (elm: HTMLElement) => {
+            S.domUtil.getElm(C.ID_LHS, (elm: HTMLElement) => {
                 elm.scrollTop = 0;
             });
 
-            S.util.getElm(C.ID_RHS, (elm: HTMLElement) => {
+            S.domUtil.getElm(C.ID_RHS, (elm: HTMLElement) => {
                 elm.scrollTop = 0;
             });
         }

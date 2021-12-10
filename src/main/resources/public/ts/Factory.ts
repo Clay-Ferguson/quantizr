@@ -13,6 +13,7 @@ but only the interface of it.
 */
 import { Attachment } from "./Attachment";
 import { Constants as C } from "./Constants";
+import { DomUtil } from "./DomUtil";
 import { Edit } from "./Edit";
 import { Encryption } from "./Encryption";
 import { LocalDB } from "./LocalDB";
@@ -46,6 +47,7 @@ export class Factory {
                 quanta: new Quanta(),
                 plugin: new PluginMgr(),
                 util: new Util(),
+                domUtil: new DomUtil(),
                 tabUtil: new TabUtil(),
                 nodeUtil: new NodeUtil(),
                 push: new ServerPush(),

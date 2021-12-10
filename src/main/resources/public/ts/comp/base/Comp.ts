@@ -108,7 +108,7 @@ export abstract class Comp implements CompIntf {
     // This is the original implementation of whenElm which uses a timer to wait for the element to come into existence
     // and is only used in one odd place where we manually attach Dialogs to the DOM (see DialogBase.ts)
     whenElmEx(func: (elm: HTMLElement) => void) {
-        S.util.getElm(this.getId(), func);
+        S.domUtil.getElm(this.getId(), func);
     }
 
     // WARNING: Use whenElmEx for DialogBase derived components!
@@ -225,7 +225,7 @@ export abstract class Comp implements CompIntf {
         // if (!this.render) {
         //     throw new Error("Attempted to treat non-react component as react: " + this.constructor.name);
         // }
-        S.util.getElm(id, (elm: HTMLElement) => {
+        S.domUtil.getElm(id, (elm: HTMLElement) => {
             // See #RulesOfHooks in this file, for the reason we blow away the existing element to force a rebuild.
             ReactDOM.unmountComponentAtNode(elm);
 
@@ -257,7 +257,7 @@ export abstract class Comp implements CompIntf {
         //     let func = obj.onClick;
         //     // wrap the click function to maintain focus element.
         //     obj.onClick = (arg: any) => {
-        //         S.util.focusId(obj.id);
+        //         S.domUtil.focusId(obj.id);
         //         // console.log("Click (wrapped): " + this.jsClassName + " obj: " + S.util.prettyPrint(obj));
         //         func(arg);
         //     };
@@ -306,7 +306,7 @@ export abstract class Comp implements CompIntf {
         this.whenElm((elm: HTMLElement) => {
             Comp.focusElmId = this.getId();
             // console.log("elm focus: id=" + this.getId());
-            S.util.focusId(Comp.focusElmId);
+            S.domUtil.focusId(Comp.focusElmId);
         });
     }
 
@@ -447,7 +447,7 @@ export abstract class Comp implements CompIntf {
             /* React can loose focus so we manage that state ourselves using Comp.focusElmId */
             if (Comp.focusElmId && this.attribs.id === Comp.focusElmId) {
                 // console.log("React render auto focus.");
-                S.util.focusId(Comp.focusElmId);
+                S.domUtil.focusId(Comp.focusElmId);
             }
         }
 

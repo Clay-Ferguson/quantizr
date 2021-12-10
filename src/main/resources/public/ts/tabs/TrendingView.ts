@@ -113,7 +113,7 @@ export class TrendingView extends AppTab {
     }
 
     searchWord = (evt: Event) => {
-        let word = S.util.getPropFromDom(evt, "word");
+        let word = S.domUtil.getPropFromDom(evt, "word");
         if (!word) return;
 
         // expand so users can see what's going on with the search string and know they can clear it.

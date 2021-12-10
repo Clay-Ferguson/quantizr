@@ -185,7 +185,7 @@ export class Nav {
                 const nodeId: string = this._UID_ROWID_PREFIX + node.id;
                 // console.log("looking up using element id: "+nodeId);
 
-                return S.util.domElm(nodeId);
+                return S.domUtil.domElm(nodeId);
             }
         }
         return null;
@@ -226,7 +226,7 @@ export class Nav {
                 });
 
                 // console.log("nodeClickRow. Focusing Main tab");
-                S.util.focusId(C.TAB_MAIN);
+                S.domUtil.focusId(C.TAB_MAIN);
                 resolve();
             }, 100);
         });

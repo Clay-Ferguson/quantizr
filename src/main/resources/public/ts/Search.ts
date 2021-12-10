@@ -35,7 +35,7 @@ export class Search {
         });
         if (res.searchResults?.length > 0) {
             dispatch("Action_RenderSearchResults", (s: AppState): AppState => {
-                S.util.focusId(C.TAB_SHARES);
+                S.domUtil.focusId(C.TAB_SHARES);
                 S.tabUtil.tabScrollTop(s, C.TAB_SHARES);
                 let data = s.tabData.find(d => d.id === C.TAB_SHARES);
                 if (!data) return;
@@ -81,7 +81,7 @@ export class Search {
             }
 
             dispatch("Action_RenderSearchResults", (s: AppState): AppState => {
-                S.util.focusId(C.TAB_SEARCH);
+                S.domUtil.focusId(C.TAB_SEARCH);
                 S.tabUtil.tabScrollTop(s, C.TAB_SEARCH);
                 let data = s.tabData.find(d => d.id === C.TAB_SEARCH);
                 if (!data) return;
@@ -141,7 +141,7 @@ export class Search {
         });
 
         dispatch("Action_RenderTimelineResults", (s: AppState): AppState => {
-            S.util.focusId(C.TAB_TIMELINE);
+            S.domUtil.focusId(C.TAB_TIMELINE);
             S.tabUtil.tabScrollTop(s, C.TAB_TIMELINE);
             let data = s.tabData.find(d => d.id === C.TAB_TIMELINE);
             if (!data) return;
@@ -277,7 +277,7 @@ export class Search {
                 }, 1000);
             }
 
-            S.util.focusId(C.TAB_FEED);
+            S.domUtil.focusId(C.TAB_FEED);
             return s;
         });
     }
@@ -307,7 +307,7 @@ export class Search {
 
         if (res.searchResults?.length > 0) {
             dispatch("Action_RenderSearchResults", (s: AppState): AppState => {
-                S.util.focusId(C.TAB_FOLLOWERS);
+                S.domUtil.focusId(C.TAB_FOLLOWERS);
                 S.tabUtil.tabScrollTop(s, C.TAB_FOLLOWERS);
                 let data = s.tabData.find(d => d.id === C.TAB_FOLLOWERS);
                 if (!data) return;
@@ -349,7 +349,7 @@ export class Search {
 
         if (res.searchResults && res.searchResults.length > 0) {
             dispatch("Action_RenderSearchResults", (s: AppState): AppState => {
-                S.util.focusId(C.TAB_FOLLOWING);
+                S.domUtil.focusId(C.TAB_FOLLOWING);
                 S.tabUtil.tabScrollTop(s, C.TAB_FOLLOWING);
                 let data = s.tabData.find(d => d.id === C.TAB_FOLLOWING);
                 if (!data) return;
