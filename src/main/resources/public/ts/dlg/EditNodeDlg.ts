@@ -687,7 +687,7 @@ export class EditNodeDlg extends DialogBase {
             this.editorHelp ? new HelpButton(() => this.editorHelp) : null,
 
             // show delete button only if we're in a fullscreen viewer (like Calendar view)
-            S.quanta.fullscreenViewerActive(this.appState)
+            S.util.fullscreenViewerActive(this.appState)
                 ? new Button("Delete", () => {
                     S.edit.deleteSelNodes(null, state.node.id);
                     this.close();
@@ -1035,7 +1035,7 @@ export class EditNodeDlg extends DialogBase {
         // if we just saved a bookmark, reload bookmarks menu
         if ((state.node as J.NodeInfo).type === J.NodeType.BOOKMARK) {
             setTimeout(() => {
-                S.quanta.loadBookmarks();
+                S.util.loadBookmarks();
             }, 250);
         }
     }

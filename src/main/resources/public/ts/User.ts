@@ -68,7 +68,7 @@ export class User {
             }, 10);
         }
         else {
-            S.quanta.loadAnonPageHome(null);
+            S.util.loadAnonPageHome(null);
         }
     }
 
@@ -119,7 +119,7 @@ export class User {
                     this.loginResponse(res, res.userName, callPwd, false, state);
                 } else {
                     if (res.success) {
-                        S.quanta.setStateVarsUsingLoginResponse(res);
+                        S.util.setStateVarsUsingLoginResponse(res);
                     }
 
                     this.defaultHandleAnonUser(state);
@@ -127,7 +127,7 @@ export class User {
             }
             catch (e) {
                 await S.user.deleteAllUserLocalDbEntries();
-                S.quanta.loadAnonPageHome(null);
+                S.util.loadAnonPageHome(null);
             }
         }
     }
@@ -196,12 +196,12 @@ export class User {
 
                 this.checkMessages();
                 setTimeout(() => {
-                    S.quanta.loadBookmarks();
+                    S.util.loadBookmarks();
                     S.push.init();
                 }, 1000);
             }
 
-            S.quanta.setStateVarsUsingLoginResponse(res);
+            S.util.setStateVarsUsingLoginResponse(res);
 
             // we just processed a dispatch so we need to get the current state now.
             state = store.getState();

@@ -52,7 +52,7 @@ export class RightNavPanel extends Div {
         let displayName = state.displayName ? state.displayName : state.title;
 
         let allowEditMode = state.node && !state.isAnonUser;
-        let fullScreenViewer = S.quanta.fullscreenViewerActive(state);
+        let fullScreenViewer = S.util.fullscreenViewerActive(state);
 
         let clipboardPasteButton = !state.isAnonUser ? new IconButton("fa-clipboard", null, {
             onClick: e => {
@@ -123,7 +123,7 @@ export class RightNavPanel extends Div {
                             addNoteButton,
                             new IconButton("fa-home", null, {
                                 title: g_brandingAppName + " Home",
-                                onClick: S.quanta.loadAnonPageHome
+                                onClick: S.util.loadAnonPageHome
                             }),
                             displayName && !state.isAnonUser ? new IconButton("fa-database", null, {
                                 title: "Go to your Account Root Node",

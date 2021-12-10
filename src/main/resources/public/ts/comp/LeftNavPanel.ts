@@ -60,7 +60,7 @@ export class LeftNavPanel extends Div {
                 }),
                 new Span(g_brandingAppName, {
                     className: "logo-text",
-                    onClick: e => { S.quanta.loadAnonPageHome(null); },
+                    onClick: S.util.loadAnonPageHome,
                     title: "Go to Portal Home Node"
                 }),
                 // todo-1: need to add a similar message over to the 'logo-text' that's active for mobile

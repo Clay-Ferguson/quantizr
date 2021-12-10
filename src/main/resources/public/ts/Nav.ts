@@ -326,7 +326,7 @@ export class Nav {
 
         // console.log("navHome()");
         if (state.isAnonUser) {
-            S.quanta.loadAnonPageHome(null);
+            S.util.loadAnonPageHome(null);
         } else {
             try {
                 // console.log("renderNode (navHome): " + state.homeNodeId);
@@ -350,7 +350,7 @@ export class Nav {
     }
 
     navPublicHome = (state: AppState): void => {
-        S.quanta.loadAnonPageHome(null);
+        S.util.loadAnonPageHome(null);
     }
 
     runSearch = (evt: Event): void => {

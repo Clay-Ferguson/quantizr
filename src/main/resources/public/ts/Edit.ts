@@ -87,7 +87,7 @@ export class Edit {
                         !S.nodeUtil.getDisplayingNode(state, S.quanta.newNodeTargetId)) ||
                     // not currently viewing tree
                     S.quanta.activeTab !== C.TAB_MAIN ||
-                    S.quanta.fullscreenViewerActive(state);
+                    S.util.fullscreenViewerActive(state);
 
                 /* If we're editing on the feed tab, we set the 'state.editNode' which makes the gui know to render
                 the editor at that place rather than opening a popup now */
@@ -210,7 +210,7 @@ export class Edit {
             return;
         }
 
-        if (S.quanta.ctrlKeyCheck()) {
+        if (S.util.ctrlKeyCheck()) {
             let dlg: ConfirmDlg = new ConfirmDlg("Paste your clipboard content into a new node?", "Create from Clipboard", //
                 null, null, state);
             await dlg.open();
@@ -395,12 +395,12 @@ export class Edit {
 
     setRssHeadlinesOnly = async (state: AppState, val: boolean): Promise<void> => {
         state.userPreferences.rssHeadlinesOnly = val;
-        S.quanta.saveUserPreferences(state);
+        S.util.saveUserPreferences(state);
     }
 
     toggleEditMode = async (state: AppState): Promise<void> => {
         state.userPreferences.editMode = !state.userPreferences.editMode;
-        S.quanta.saveUserPreferences(state);
+        S.util.saveUserPreferences(state);
 
         /* scrolling is required because nodes will have scrolled out of view by the page just now updating */
         S.view.scrollToSelectedNode(state);
@@ -410,7 +410,7 @@ export class Edit {
         setTimeout(() => {
             let state = store.getState();
             state.userPreferences.mainPanelCols = val;
-            S.quanta.saveUserPreferences(state);
+            S.util.saveUserPreferences(state);
         }, 100);
     };
 
@@ -418,13 +418,13 @@ export class Edit {
         setTimeout(() => {
             let state = store.getState();
             state.userPreferences.showMetaData = val;
-            S.quanta.saveUserPreferences(state);
+            S.util.saveUserPreferences(state);
         }, 100);
     };
 
     toggleShowMetaData = (state: AppState): void => {
         state.userPreferences.showMetaData = !state.userPreferences.showMetaData;
-        S.quanta.saveUserPreferences(state);
+        S.util.saveUserPreferences(state);
 
         /* scrolling is required because nodes will have scrolled out of view by the page just now updating */
         S.view.scrollToSelectedNode(state);
@@ -570,7 +570,7 @@ export class Edit {
     newSubNode = async (evt: Event, id: string): Promise<void> => {
         id = S.util.allowIdFromEvent(evt, id);
         const state = store.getState();
-        if (S.quanta.ctrlKeyCheck()) {
+        if (S.util.ctrlKeyCheck()) {
             let dlg: ConfirmDlg = new ConfirmDlg("Paste your clipboard content into a new node?", "Create from Clipboard", //
                 null, null, state);
             await dlg.open();
@@ -729,7 +729,7 @@ export class Edit {
              we just deleted some. This could be slightly improved to KNOW if we deleted any bookmarks, but
             the added complexity to achieve that for recursive tree deletes doesn't pay off */
             setTimeout(() => {
-                S.quanta.loadBookmarks();
+                S.util.loadBookmarks();
             }, 1000);
         }
     }

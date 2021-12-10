@@ -141,7 +141,7 @@ export class ServerPush {
         /* if the reciept of this server push makes us have new knowledge that one of our nodes
            that didn't have children before now has children then update the state to have 'hasChildren'
            on this node so the 'open' button will appear */
-        // S.quanta.refreshOpenButtonOnNode(nodeInfo, state);
+        // S.util.refreshOpenButtonOnNode(nodeInfo, state);
 
         // if updates existing item we refresh it even if autoRefresh is off
         if (updatesExistingItem) {
@@ -205,7 +205,7 @@ export class ServerPush {
             /* if the reciept of this server push makes us have new knowledge that one of our nodes
                that didn't have children before now has children then update the state to have 'hasChildren'
                on this node so the 'open' button will appear */
-            // S.quanta.refreshOpenButtonOnNode(nodeInfo, s);
+            // S.util.refreshOpenButtonOnNode(nodeInfo, s);
 
             // if updates existing item we refresh it even if autoRefresh is off
             if (updatesExistingItem) {
@@ -229,7 +229,7 @@ export class ServerPush {
                 feedData.props.feedResults.unshift(nodeInfo);
 
                 if (!isMine) {
-                    S.quanta.showSystemNotification("New Message", "From " + nodeInfo.owner + ": " + nodeInfo.content);
+                    S.util.showSystemNotification("New Message", "From " + nodeInfo.owner + ": " + nodeInfo.content);
                 }
 
                 // scan for any nodes in feedResults where nodeInfo.parent.id is found in the list nodeInfo.id, and
@@ -241,7 +241,7 @@ export class ServerPush {
             else {
                 // console.log("Setting feed dirty.");
                 if (!isMine) {
-                    S.quanta.showSystemNotification("New Message", "From " + nodeInfo.owner + ": " + nodeInfo.content);
+                    S.util.showSystemNotification("New Message", "From " + nodeInfo.owner + ": " + nodeInfo.content);
                 }
 
                 /* note: we could que up the incomming nodeInfo, and then avoid a call to the server but for now we just

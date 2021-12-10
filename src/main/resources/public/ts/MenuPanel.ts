@@ -59,7 +59,7 @@ export class MenuPanel extends Div {
     // every bookmark has an edit icon to make this no longer needed.
     // static openBookmarksNode = () => {
     //     let state = store.getState();
-    //     S.quanta.setUserPreferences(state, true);
+    //     S.util.setUserPreferences(state, true);
     //     S.nav.openContentNode("~" + J.NodeType.BOOKMARK_LIST);
     // };
 
@@ -98,7 +98,7 @@ export class MenuPanel extends Div {
     static export = () => S.edit.openExportDlg(appState(null));
     static testMicrophone = () => { new MediaRecorderDlg(appState(null), false, false).open(); };
     static testWebCam = () => { new MediaRecorderDlg(appState(null), true, false).open(); };
-    static mouseEffects = () => { S.quanta.toggleMouseEffect(); };
+    static mouseEffects = () => { S.util.toggleMouseEffect(); };
     static showUrls = () => S.render.showNodeUrl(null, appState(null));
     static showRawData = () => S.view.runServerCommand("getJson", "Node Data", "", appState(null));
     static nodeStats = () => S.view.getNodeStats(appState(null), false, false);
@@ -116,7 +116,7 @@ export class MenuPanel extends Div {
 
         let state = appState(null);
         state.userPreferences.enableIPSM = true;
-        S.quanta.saveUserPreferences(state);
+        S.util.saveUserPreferences(state);
     };
 
     static messagesToFromMe = () => {
@@ -257,7 +257,7 @@ export class MenuPanel extends Div {
                             onClick: (event: any) => {
                                 event.stopPropagation();
                                 event.preventDefault();
-                                S.quanta.setUserPreferences(state, true);
+                                S.util.setUserPreferences(state, true);
 
                                 // we have to do this Menu close manually here since this is not a MenuItem wrapped function.
                                 if (S.quanta.mainMenu) {
@@ -557,8 +557,8 @@ export class MenuPanel extends Div {
 
             children.push(new Menu("Admin - Test", [
                 new MenuItem("IPFS PubSub", () => S.view.runServerCommand("ipfsPubSubTest", "PubSub Test", null, state)), //
-                new MenuItem("Send Email", () => S.quanta.sendTestEmail()),
-                new MenuItem("Notification Display", () => S.quanta.showSystemNotification("Test Title", "This is a test message")),
+                new MenuItem("Send Email", () => S.util.sendTestEmail()),
+                new MenuItem("Notification Display", () => S.util.showSystemNotification("Test Title", "This is a test message")),
                 new MenuItem("Encryption", async () => {
                     await S.encryption.test();
                     S.util.showMessage("Encryption Test Complete. Check browser console for output.", "Note", true);

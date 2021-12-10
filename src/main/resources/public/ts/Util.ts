@@ -1,21 +1,24 @@
 import { EventInput } from "@fullcalendar/react";
+import DOMPurify from "dompurify";
 import * as marked from "marked";
-import { dispatch, store } from "./AppRedux";
+import { appState, dispatch, store } from "./AppRedux";
 import { AppState } from "./AppState";
 import clientInfo from "./ClientInfo";
+import { Comp } from "./comp/base/Comp";
 import { Constants as C } from "./Constants";
 import { DialogBase } from "./DialogBase";
+import { AudioPlayerDlg } from "./dlg/AudioPlayerDlg";
+import { ChangePasswordDlg } from "./dlg/ChangePasswordDlg";
 import { ConfirmDlg } from "./dlg/ConfirmDlg";
 import { LoadNodeFromIpfsDlg } from "./dlg/LoadNodeFromIpfsDlg";
 import { MessageDlg } from "./dlg/MessageDlg";
 import { ProgressDlg } from "./dlg/ProgressDlg";
 import * as I from "./Interfaces";
 import * as J from "./JavaIntf";
+import { Log } from "./Log";
+import { NodeHistoryItem } from "./NodeHistoryItem";
 import { PubSub } from "./PubSub";
 import { Singletons } from "./Singletons";
-import { NodeHistoryItem } from "./NodeHistoryItem";
-import { Comp } from "./comp/base/Comp";
-import DOMPurify from "dompurify";
 
 let S: Singletons;
 PubSub.sub(C.PUBSUB_SingletonsReady, (s: Singletons) => {
@@ -1552,5 +1555,250 @@ export class Util {
         catch (e) {
             callback(null);
         }
+    }
+
+    sendTestEmail = async () => {
+        await S.util.ajax<J.SendTestEmailRequest, J.SendTestEmailResponse>("sendTestEmail");
+        S.util.showMessage("Send Test Email Initiated.", "Note");
+    }
+
+    showSystemNotification = (title: string, message: string): void => {
+        if (window.Notification && Notification.permission !== "denied") {
+            Notification.requestPermission(function (status) { // status is "granted", if accepted by user
+                message = S.util.removeHtmlTags(message);
+
+                let n = new Notification(title, {
+                    body: message,
+
+                    /* Chrome is showing it's own icon/image instead of the custom one and I'm not sure why. I've tried
+                     both image and icon here and neither works. */
+                    image: window.location.origin + "/branding/logo-50px-tr.jpg"
+                });
+            });
+        }
+    }
+
+    loadBookmarks = async (): Promise<void> => {
+        let state: AppState = store.getState();
+        if (!state.isAnonUser) {
+            let res: J.GetBookmarksResponse = await S.util.ajax<J.GetBookmarksRequest, J.GetBookmarksResponse>("getBookmarks");
+            // let count = res.bookmarks ? res.bookmarks.length : 0;
+            // Log.log("bookmark count=" + count);
+            dispatch("Action_loadBookmarks", (s: AppState): AppState => {
+                s.bookmarks = res.bookmarks;
+                return s;
+            });
+        }
+    }
+
+    /* We look at the node, and get the parent path from it, and then if there is a node matching that's being displayed
+    in the tree we ensure that the "Open" button is visible. This normally indicates this node has been replied to
+
+    If a reducer is running, just pass the state, because it will be the state we need, but if not we will be doing a
+    getState and then dispatching the change.
+    */
+    refreshOpenButtonOnNode = (node: J.NodeInfo, state: AppState): void => {
+        if (!node || !state.node || !state.node.children) return;
+        let doDispatch = state == null;
+        if (!state) {
+            state = store.getState();
+        }
+        let path = node.path;
+        let slashIdx: number = path.lastIndexOf("/");
+        if (slashIdx === -1) return;
+        let parentPath = path.substring(0, slashIdx);
+
+        /* scan all children being displayed and of one of them is the target parent set the hasChildren
+        on it so it'll display the "open" button */
+        for (let node of state.node.children) {
+            if (node.path === parentPath) {
+                node.hasChildren = true;
+                if (doDispatch) {
+                    dispatch("Action_NodeChanges", (s: AppState): AppState => {
+                        return state;
+                    });
+                }
+                // break out of loop, we're done here.
+                break;
+            }
+        }
+    }
+
+    enableMouseEffect = async () => {
+        let mouseEffect = await S.localDB.getVal(C.LOCALDB_MOUSE_EFFECT, "allUsers");
+        dispatch("Action_ToggleMouseEffect", (s: AppState): AppState => {
+            s.mouseEffect = mouseEffect === "1";
+            return s;
+        });
+    }
+
+    /* #mouseEffects (do not delete tag) */
+    toggleMouseEffect = () => {
+        dispatch("Action_ToggleMouseEffect", (s: AppState): AppState => {
+            s.mouseEffect = !s.mouseEffect;
+            S.localDB.setVal(C.LOCALDB_MOUSE_EFFECT, s.mouseEffect ? "1" : "0", "allUsers");
+            return s;
+        });
+    }
+
+    /*
+    The other part of this is contained in click-effects.scss
+    */
+    initClickEffect = () => {
+        let clickEffect = (e) => {
+            let state = store.getState();
+            /* looks like for some events there's not a good mouse position (happened on clicks to drop down cobo boxes),
+             and is apparently 0, 0, so we just check the sanity of the coordinates here */
+            if (!state.mouseEffect || (e.clientX < 10 && e.clientY < 10)) return;
+            this.runClickAnimation(e.clientX, e.clientY);
+        };
+        document.addEventListener("click", clickEffect);
+    }
+
+    runClickAnimation = (x: number, y: number) => {
+        let d = document.createElement("div");
+        d.className = "clickEffect";
+
+        /* todo-2: make this 5 and 12 offset user configurable. I'm using a custom moust pointer that draws a yellow
+        circle around my mouse for use with this effect, to record screencast videos, and that icon circle is not centered
+        around the actual mouse click arrow tip location, so we have to use an offset here (only when that Linux OS mouse theme is used)
+        to get our expanding circle in CSS to be perfectly centered with the one in the mouse theme, becasue an off center look
+        is terrible but the 5 and 12 makes it perfect */
+        d.style.left = `${x + 5}px`;
+        d.style.top = `${y + 12}px`;
+        document.body.appendChild(d);
+
+        // This proved not to be reliable and was able to leave
+        // dangling orphans not in use, but the timer approach below
+        // should be bulletproof.
+        // let func = () => {
+        //     d.parentElement.removeChild(d);
+        // };
+        // d.addEventListener("animationend", func);
+
+        setTimeout(() => {
+            d.parentElement.removeChild(d);
+        }, 400); // this val is in 3 places. put the TS two in a constantas file.
+    }
+
+    playAudioIfRequested = () => {
+        let audioUrl = S.util.getParameterByName("audioUrl");
+        if (audioUrl) {
+            let startTimeStr = S.util.getParameterByName("t");
+            let startTime = startTimeStr ? parseInt(startTimeStr) : 0;
+            setTimeout(() => {
+                new AudioPlayerDlg(null, null, null, audioUrl, startTime, store.getState()).open();
+            }, 500);
+        }
+    }
+
+    processUrlParams = (state: AppState): void => {
+        var passCode = S.util.getParameterByName("passCode");
+        if (passCode) {
+            setTimeout(() => {
+                new ChangePasswordDlg(passCode, state).open();
+            }, 100);
+        }
+    }
+
+    displaySignupMessage = (): void => {
+        const signupElm = S.util.domElm("signupCodeResponse");
+        if (signupElm) {
+            const signupResponse = signupElm.textContent;
+            if (signupResponse === "ok") {
+                S.util.showMessage("Signup complete.", "Note");
+            }
+        }
+    }
+
+    loadAnonPageHome = async (state: AppState): Promise<void> => {
+        Log.log("loadAnonPageHome()");
+
+        try {
+            let res: J.RenderNodeResponse = await S.util.ajax<J.RenderNodeRequest, J.RenderNodeResponse>("anonPageLoad");
+
+            // if we have trouble accessing even the anon page just drop out to landing page.
+            if (!res.success || res.errorType === J.ErrorType.AUTH) {
+                window.location.href = window.location.origin;
+                return;
+            }
+            state = appState(state);
+            S.render.renderPageFromData(res, false, null, true, true);
+        }
+        catch (e) {
+            Log.log("loadAnonPage Home ajax fail");
+            S.nav.login(state);
+        }
+    }
+
+    setUserPreferences = (state: AppState, flag: boolean) => {
+        if (flag !== state.userPreferences.editMode) {
+            state.userPreferences.editMode = flag;
+            this.saveUserPreferences(state);
+        }
+    }
+
+    saveUserPreferences = async (state: AppState): Promise<void> => {
+        if (!state.isAnonUser) {
+            await S.util.ajax<J.SaveUserPreferencesRequest, J.SaveUserPreferencesResponse>("saveUserPreferences", {
+                userPreferences: state.userPreferences
+            });
+        }
+
+        dispatch("Action_SetUserPreferences", (s: AppState): AppState => {
+            s.userPreferences = state.userPreferences;
+            return s;
+        });
+    }
+
+    setStateVarsUsingLoginResponse = (res: J.LoginResponse): void => {
+        if (!res) return;
+
+        dispatch("Action_LoginResponse", (s: AppState): AppState => {
+            if (res.rootNode) {
+                s.homeNodeId = res.rootNode;
+                s.homeNodePath = res.rootNodePath;
+            }
+            s.userName = res.userName;
+            s.isAdminUser = res.userName === "admin";
+            s.isAnonUser = res.userName === J.PrincipalName.ANON;
+
+            Log.log("LoginResponse userName = " + res.userName);
+
+            // bash scripting is an experimental feature, and i'll only enable for admin for now, until i'm
+            // sure i'm keeping this feature.
+            s.allowBashScripting = false;
+
+            s.anonUserLandingPageNode = res.anonUserLandingPageNode;
+            s.allowFileSystemSearch = res.allowFileSystemSearch;
+            s.userPreferences = res.userPreferences;
+            s.title = !s.isAnonUser ? res.userName : "";
+            s.displayName = !s.isAnonUser ? res.displayName : "";
+            return s;
+        });
+    }
+
+    // todo-2: need to decide if I want this. It's disabled currently (not called)
+    removeRedundantFeedItems = (feedRes: J.NodeInfo[]): J.NodeInfo[] => {
+        if (!feedRes || feedRes.length === 0) return feedRes;
+
+        // first build teh set of ids that that are in 'ni.parent.id'
+        const idSet: Set<string> = new Set<string>();
+        feedRes.forEach((ni: J.NodeInfo) => {
+            if (ni.parent) {
+                idSet.add(ni.parent.id);
+            }
+        });
+
+        // now return filtered list only for items where 'id' is not in the set above.
+        return feedRes.filter(ni => !idSet.has(ni.id));
+    }
+
+    fullscreenViewerActive = (state: AppState): boolean => {
+        return !!(state.fullScreenViewId || state.fullScreenGraphId || state.fullScreenCalendarId);
+    }
+
+    ctrlKeyCheck = (): boolean => {
+        return S.quanta.ctrlKey && (new Date().getTime() - S.quanta.ctrlKeyTime) < 2500;
     }
 }

@@ -135,7 +135,7 @@ export class App extends Main {
                 // title: "Show Main Menu"
             }, "btn-secondary marginRight", "off");
 
-            let fullScreenViewer = S.quanta.fullscreenViewerActive(state);
+            let fullScreenViewer = S.util.fullscreenViewerActive(state);
 
             let prefsButton = !fullScreenViewer
                 ? new Checkbox("Info", { className: "marginLeft" }, {
@@ -163,7 +163,7 @@ export class App extends Main {
 
             // let appName = new Span(g_brandingAppName + messagesSuffix, {
             //     className: "logo-text",
-            //     onClick: e => { S.quanta.loadAnonPageHome(null); },
+            //     onClick: e => { S.util.loadAnonPageHome(null); },
             //     title: "Go to Portal Home Node"
             // });
 
