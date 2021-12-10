@@ -4,8 +4,15 @@ import org.subnode.actpub.APConst;
 
 public class APOAccept extends APObj {
     public APOAccept() {
-        put(APProp.context, APConst.CONTEXT_STREAMS);
-        put(APProp.type, APType.Accept);
+        put(context, APConst.CONTEXT_STREAMS);
+        put(type, APType.Accept);
+    }
+
+    public APOAccept(String summary, String actor, APObj object) {
+        this();
+        put(APObj.summary, summary);
+        put(APObj.actor, actor);
+        put(APObj.object, object); 
     }
 
     @Override

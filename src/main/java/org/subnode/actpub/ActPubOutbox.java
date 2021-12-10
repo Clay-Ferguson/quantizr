@@ -18,7 +18,6 @@ import org.subnode.actpub.model.APONote;
 import org.subnode.actpub.model.APOOrderedCollection;
 import org.subnode.actpub.model.APOOrderedCollectionPage;
 import org.subnode.actpub.model.APObj;
-import org.subnode.actpub.model.APProp;
 import org.subnode.actpub.model.APType;
 import org.subnode.config.NodeName;
 import org.subnode.model.client.NodeProp;
@@ -62,7 +61,7 @@ public class ActPubOutbox extends ServiceBase {
              * Query all existing known outbox items we have already saved for this foreign user
              */
             Iterable<SubNode> outboxItems = read.getSubGraph(ms, outboxNode, null, 0, true);
-            String outboxUrl = AP.str(actor, APProp.outbox);
+            String outboxUrl = AP.str(actor, APObj.outbox);
             APObj outbox = getOutbox(outboxUrl);
             if (no(outbox)) {
                 log.debug("Unable to get outbox for AP user: " + apUserName);
@@ -91,9 +90,9 @@ public class ActPubOutbox extends ServiceBase {
                     // log.debug("orderedCollection Item: OBJ=" + XString.prettyPrint(obj));
                     // }
 
-                    String apId = AP.str(obj, APProp.id);
+                    String apId = AP.str(obj, APObj.id);
                     if (!apIdSet.contains(apId)) {
-                        Object object = AP.obj(obj, APProp.object);
+                        Object object = AP.obj(obj, APObj.object);
 
                         if (ok(object)) {
                             if (object instanceof String) {
@@ -153,11 +152,8 @@ public class ActPubOutbox extends ServiceBase {
         String url = prop.getProtocolHostAndPort() + APConst.PATH_OUTBOX + "/" + userName;
         Long totalItems = getOutboxItemCount(userName, PrincipalName.PUBLIC.s());
 
-        APOOrderedCollection ret = new APOOrderedCollection() //
-                .put(APProp.id, url) //
-                .put(APProp.totalItems, totalItems) //
-                .put(APProp.first, url + "?page=true") //
-                .put(APProp.last, url + "?min_id=0&page=true");
+        APOOrderedCollection ret = new APOOrderedCollection(url, totalItems, url + "?page=true", //
+                url + "?min_id=0&page=true");
         return ret;
     }
 
@@ -191,11 +187,8 @@ public class ActPubOutbox extends ServiceBase {
         // this is a self-reference url (id)
         String url = prop.getProtocolHostAndPort() + APConst.PATH_OUTBOX + "/" + userName + "?min_id=" + minId + "&page=true";
 
-        APOOrderedCollectionPage ret = new APOOrderedCollectionPage() //
-                .put(APProp.partOf, prop.getProtocolHostAndPort() + APConst.PATH_OUTBOX + "/" + userName) //
-                .put(APProp.id, url) //
-                .put(APProp.orderedItems, items) //
-                .put(APProp.totalItems, items.size());
+        APOOrderedCollectionPage ret = new APOOrderedCollectionPage(url, items,
+                prop.getProtocolHostAndPort() + APConst.PATH_OUTBOX + "/" + userName, items.size());
         return ret;
     }
 
@@ -248,27 +241,17 @@ public class ActPubOutbox extends ServiceBase {
                         String published = DateUtil.isoStringFromDate(child.getModifyTime());
                         String actor = apUtil.makeActorUrlForUserName(userName);
 
-                        APONote note = new APONote() //
-                                .put(APProp.id, nodeIdBase + hexId) //
-                                .put(APProp.summary, null) //
-                                .put(APProp.published, published) //
-                                .put(APProp.url, nodeIdBase + hexId) //
-                                .put(APProp.attributedTo, actor) //
-                                .put(APProp.to, new APList().val(APConst.CONTEXT_STREAMS_PUBLIC)) //
-                                .put(APProp.sensitive, false) //
-                                .put(APProp.content, child.getContent());
+                        APONote note = new APONote(nodeIdBase + hexId, published, actor, null, nodeIdBase + hexId, false,
+                                child.getContent(), new APList().val(APConst.CONTEXT_STREAMS_PUBLIC));
 
                         if (ok(replyTo)) {
-                            note = note.put(APProp.inReplyTo, replyTo);
+                            note = note.put(APObj.inReplyTo, replyTo);
                         }
 
-                        items.add(new APOCreate() //
+                        items.add(new APOCreate(
                                 // todo-1: what is the create=t here? That was part of my own temporary test right?
-                                .put(APProp.id, nodeIdBase + hexId + "&create=t") //
-                                .put(APProp.actor, actor) //
-                                .put(APProp.published, published) //
-                                .put(APProp.to, new APList().val(APConst.CONTEXT_STREAMS_PUBLIC)) //
-                                .put(APProp.object, note));
+                                nodeIdBase + hexId + "&create=t", actor, published, note,
+                                new APList().val(APConst.CONTEXT_STREAMS_PUBLIC)));
                     }
                 }
 

@@ -18,7 +18,6 @@ import org.subnode.actpub.model.APOOrderedCollection;
 import org.subnode.actpub.model.APOOrderedCollectionPage;
 import org.subnode.actpub.model.APOUndo;
 import org.subnode.actpub.model.APObj;
-import org.subnode.actpub.model.APProp;
 import org.subnode.config.NodeName;
 import org.subnode.model.NodeInfo;
 import org.subnode.model.client.ConstantInt;
@@ -61,10 +60,9 @@ public class ActPubFollowing extends ServiceBase {
 
             arun.run(session -> {
                 String sessionActorUrl = apUtil.makeActorUrlForUserName(followerUserName);
-                APOFollow followAction = new APOFollow()
-                        .put(APProp.id, prop.getProtocolHostAndPort() + "/follow/" + String.valueOf(new Date().getTime())) //
-                        .put(APProp.actor, sessionActorUrl) //
-                        .put(APProp.object, actorUrlOfUserBeingFollowed);
+                APOFollow followAction =
+                        new APOFollow(prop.getProtocolHostAndPort() + "/follow/" + String.valueOf(new Date().getTime()),
+                                sessionActorUrl, actorUrlOfUserBeingFollowed);
                 APObj action = null;
 
                 // send follow action
@@ -73,15 +71,14 @@ public class ActPubFollowing extends ServiceBase {
                 }
                 // send unfollow action
                 else {
-                    action = new APOUndo()//
-                            .put(APProp.id, prop.getProtocolHostAndPort() + "/unfollow/" + String.valueOf(new Date().getTime())) //
-                            .put(APProp.actor, sessionActorUrl) //
-                            .put(APProp.object, followAction);
+                    action = new APOUndo(prop.getProtocolHostAndPort() + "/unfollow/" + String.valueOf(new Date().getTime()), //
+                            sessionActorUrl, //
+                            followAction);
                 }
 
                 APObj toActor = apUtil.getActorByUrl(actorUrlOfUserBeingFollowed);
                 if (ok(toActor)) {
-                    String toInbox = AP.str(toActor, APProp.inbox);
+                    String toInbox = AP.str(toActor, APObj.inbox);
                     apUtil.securePost(followerUserName, session, null, toInbox, sessionActorUrl, action, null);
                 } else {
                     apUtil.log("Unable to get actor to post to: " + actorUrlOfUserBeingFollowed);
@@ -103,7 +100,7 @@ public class ActPubFollowing extends ServiceBase {
     public void processFollowAction(Object followAction, boolean unFollow) {
 
         // Actor URL of actor doing the following
-        String followerActorUrl = AP.str(followAction, APProp.actor);
+        String followerActorUrl = AP.str(followAction, APObj.actor);
         if (no(followerActorUrl)) {
             log.debug("no 'actor' found on follows action request posted object");
             return;
@@ -129,7 +126,7 @@ public class ActPubFollowing extends ServiceBase {
                     apub.userEncountered(followerUserName, false);
 
                     // Actor being followed (local to our server)
-                    String actorBeingFollowedUrl = AP.str(followAction, APProp.object);
+                    String actorBeingFollowedUrl = AP.str(followAction, APObj.object);
                     if (no(actorBeingFollowedUrl)) {
                         log.debug("no 'object' found on follows action request posted object");
                         return null;
@@ -173,16 +170,17 @@ public class ActPubFollowing extends ServiceBase {
                     Thread.sleep(2000);
 
                     // Must send either Accept or Reject. Currently we auto-accept all.
-                    APObj acceptPayload = unFollow ? new APOUndo() : new APOFollow();
-                    acceptPayload.put(APProp.actor, followerActorUrl) //
-                            .put(APProp.object, actorBeingFollowedUrl);
+                    APObj acceptPayload = unFollow ? new APOUndo(null, followerActorUrl, actorBeingFollowedUrl) : //
+                    new APOFollow();
+                    acceptPayload.put(APObj.actor, followerActorUrl) //
+                            .put(APObj.object, actorBeingFollowedUrl);
 
-                    APOAccept accept = new APOAccept() //
-                            .put(APProp.summary, "Accepted " + (unFollow ? "unfollow" : "follow") + " request") //
-                            .put(APProp.actor, actorBeingFollowedUrl) //
-                            .put(APProp.object, acceptPayload); //
+                    APOAccept accept = new APOAccept(//
+                            "Accepted " + (unFollow ? "unfollow" : "follow") + " request", //
+                            actorBeingFollowedUrl, //
+                            acceptPayload); //
 
-                    String followerInbox = AP.str(followerActor, APProp.inbox);
+                    String followerInbox = AP.str(followerActor, APObj.inbox);
 
                     log.debug("Sending Accept of Follow Request to inbox " + followerInbox);
 
@@ -203,11 +201,8 @@ public class ActPubFollowing extends ServiceBase {
         String url = prop.getProtocolHostAndPort() + APConst.PATH_FOLLOWING + "/" + userName;
         Long totalItems = getFollowingCount(userName);
 
-        APOOrderedCollection ret = new APOOrderedCollection() //
-                .put(APProp.id, url) //
-                .put(APProp.totalItems, totalItems) //
-                .put(APProp.first, url + "?page=true") //
-                .put(APProp.last, url + "?min_id=0&page=true");
+        APOOrderedCollection ret = new APOOrderedCollection(url, totalItems, url + "?page=true", //
+                url + "?min_id=0&page=true");
         return ret;
     }
 
@@ -222,25 +217,23 @@ public class ActPubFollowing extends ServiceBase {
         if (ok(minId)) {
             url += "&min_id=" + minId;
         }
-        APOOrderedCollectionPage ret = new APOOrderedCollectionPage() //
-                .put(APProp.id, url) //
-                .put(APProp.orderedItems, following) //
-                .put(APProp.partOf, prop.getProtocolHostAndPort() + APConst.PATH_FOLLOWING + "/" + userName)//
-                .put(APProp.totalItems, following.size());
+
+        APOOrderedCollectionPage ret = new APOOrderedCollectionPage(url, following,
+                prop.getProtocolHostAndPort() + APConst.PATH_FOLLOWING + "/" + userName, following.size());
         return ret;
     }
 
     /* Calls saveFediverseName for each person who is a 'follower' of actor */
     public int loadRemoteFollowing(MongoSession ms, APObj actor) {
 
-        String followingUrl = (String) AP.str(actor, APProp.following);
+        String followingUrl = (String) AP.str(actor, APObj.following);
         APObj followings = getFollowing(followingUrl);
         if (no(followings)) {
             log.debug("Unable to get followings for AP user: " + followingUrl);
             return 0;
         }
 
-        int ret = AP.integer(followings, APProp.totalItems);
+        int ret = AP.integer(followings, APObj.totalItems);
 
         apUtil.iterateOrderedCollection(followings, Integer.MAX_VALUE, obj -> {
             try {
@@ -356,12 +349,12 @@ public class ActPubFollowing extends ServiceBase {
             if (ok(actorUrl)) {
                 APObj actor = apUtil.getActorByUrl(actorUrl);
                 if (ok(actor)) {
-                    String followingUrl = (String) AP.str(actor, APProp.following);
+                    String followingUrl = (String) AP.str(actor, APObj.following);
                     APObj following = getFollowing(followingUrl);
                     if (no(following)) {
                         log.debug("Unable to get followers for AP user: " + followingUrl);
                     }
-                    ret = AP.integer(following, APProp.totalItems);
+                    ret = AP.integer(following, APObj.totalItems);
                 }
             }
             return ret;

@@ -14,7 +14,6 @@ import org.subnode.actpub.model.APOCreate;
 import org.subnode.actpub.model.APOMention;
 import org.subnode.actpub.model.APONote;
 import org.subnode.actpub.model.APObj;
-import org.subnode.actpub.model.APProp;
 import org.subnode.service.ServiceBase;
 import static org.subnode.util.Util.*;
 
@@ -39,17 +38,11 @@ public class ActPubFactory extends ServiceBase {
 	 */
 	public APONote newNoteObject(List<String> toUserNames, String attributedTo, String inReplyTo, String content, String noteUrl,
 			ZonedDateTime now, boolean privateMessage, APList attachments) {
-		APONote ret = new APONote() //
-				.put(APProp.id, noteUrl) //
-				.put(APProp.published, now.format(DateTimeFormatter.ISO_INSTANT)) //
-				.put(APProp.attributedTo, attributedTo) //
-				.put(APProp.summary, null) //
-				.put(APProp.url, noteUrl) //
-				.put(APProp.sensitive, false) //
-				.put(APProp.content, content);
+		APONote ret =
+				new APONote(noteUrl, now.format(DateTimeFormatter.ISO_INSTANT), attributedTo, null, noteUrl, false, content, null);
 
 		if (ok(inReplyTo)) {
-			ret = ret.put(APProp.inReplyTo, inReplyTo);
+			ret = ret.put(APObj.inReplyTo, inReplyTo);
 		}
 
 		LinkedList<String> toList = new LinkedList<>();
@@ -73,9 +66,7 @@ public class ActPubFactory extends ServiceBase {
 				}
 
 				// prepend character to make it like '@user@server.com'
-				tagList.val(new APOMention() //
-						.put(APProp.href, actorUrl) //
-						.put(APProp.name, "@" + userName));
+				tagList.val(new APOMention(actorUrl, "@" + userName));
 			}
 			// log and continue if any loop (user) fails here.
 			catch (Exception e) {
@@ -83,7 +74,7 @@ public class ActPubFactory extends ServiceBase {
 			}
 		}
 
-		ret.put(APProp.tag, tagList);
+		ret.put(APObj.tag, tagList);
 
 		if (!privateMessage) {
 			toList.add(APConst.CONTEXT_STREAMS_PUBLIC);
@@ -94,19 +85,19 @@ public class ActPubFactory extends ServiceBase {
 			 */
 			APObj actor = apCache.actorsByUrl.get(attributedTo);
 			if (ok(actor)) {
-				ccList.add(AP.str(actor, APProp.followers));
+				ccList.add(AP.str(actor, APObj.followers));
 			}
 		}
 
 		if (toList.size() > 0) {
-			ret.put(APProp.to, toList);
+			ret.put(APObj.to, toList);
 		}
 
 		if (ccList.size() > 0) {
-			ret.put(APProp.cc, ccList);
+			ret.put(APObj.cc, ccList);
 		}
 
-		ret.put(APProp.attachment, attachments);
+		ret.put(APObj.attachment, attachments);
 		return ret;
 	}
 
@@ -148,20 +139,16 @@ public class ActPubFactory extends ServiceBase {
 			throw new RuntimeException("toActors was empty.");
 		}
 
-		APOCreate ret = new APOCreate() //
-				// this 'id' was an early WAG, and needs a fresh look now that AP code is more complete.
-				.put(APProp.id, noteUrl + "&apCreateTime=" + idTime) //
-				.put(APProp.actor, fromActor) //
-				.put(APProp.published, now.format(DateTimeFormatter.ISO_INSTANT)) //
-				.put(APProp.object, object);
+		APOCreate ret = new APOCreate(noteUrl + "&apCreateTime=" + idTime, fromActor, //
+				now.format(DateTimeFormatter.ISO_INSTANT), object, null);
 
 		if (toActors.size() > 0) {
-			ret.put(APProp.to, new APList() //
+			ret.put(APObj.to, new APList() //
 					.vals(toActors)); //
 		}
 
 		if (ccActors.size() > 0) {
-			ret.put(APProp.cc, new APList() //
+			ret.put(APObj.cc, new APList() //
 					.vals(ccActors)); //
 		}
 		return ret;

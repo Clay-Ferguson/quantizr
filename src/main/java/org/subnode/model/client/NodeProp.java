@@ -21,10 +21,10 @@ public enum NodeProp {
     ACT_PUB_SHARED_INBOX("ap:sharedInbox", "s"), //
     ACT_PUB_USER_IMAGE_URL("ap:userImage", "s"), //
 
-    // points to URL of actor object (APProp.id prop on actual Actor Objects)
+    // points to URL of actor object (APObj.id prop on actual Actor Objects)
     ACT_PUB_ACTOR_ID("ap:actorId", "s"), //
 
-    // this is the url of the HTML for the user (APProp.url prop on actual Actor Objects)
+    // this is the url of the HTML for the user (APObj.url prop on actual Actor Objects)
     ACT_PUB_ACTOR_URL("ap:actorUrl", "s"), //
     
     ACT_PUB_ACTOR_INBOX("ap:actorInbox", "s"), //

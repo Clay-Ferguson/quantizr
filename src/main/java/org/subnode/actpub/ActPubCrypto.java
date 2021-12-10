@@ -14,7 +14,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import org.subnode.actpub.model.AP;
-import org.subnode.actpub.model.APProp;
+import org.subnode.actpub.model.APObj;
 import org.subnode.model.client.NodeProp;
 import org.subnode.mongo.MongoSession;
 import org.subnode.mongo.model.SubNode;
@@ -133,11 +133,11 @@ public class ActPubCrypto extends ServiceBase {
 
     public PublicKey getPublicKeyFromActor(Object actorObj) {
         PublicKey pubKey = null;
-        Object pubKeyObj = AP.obj(actorObj, APProp.publicKey);
+        Object pubKeyObj = AP.obj(actorObj, APObj.publicKey);
         if (no(pubKeyObj))
             return null;
 
-        String pkeyEncoded = AP.str(pubKeyObj, APProp.publicKeyPem);
+        String pkeyEncoded = AP.str(pubKeyObj, APObj.publicKeyPem);
         if (no(pkeyEncoded))
             return null;
 

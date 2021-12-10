@@ -14,7 +14,6 @@ import org.subnode.actpub.model.AP;
 import org.subnode.actpub.model.APOOrderedCollection;
 import org.subnode.actpub.model.APOOrderedCollectionPage;
 import org.subnode.actpub.model.APObj;
-import org.subnode.actpub.model.APProp;
 import org.subnode.config.NodeName;
 import org.subnode.model.NodeInfo;
 import org.subnode.model.client.ConstantInt;
@@ -44,25 +43,22 @@ public class ActPubFollower extends ServiceBase {
         String url = prop.getProtocolHostAndPort() + APConst.PATH_FOLLOWERS + "/" + userName;
         Long totalItems = getFollowersCount(userName);
 
-        APOOrderedCollection ret = new APOOrderedCollection() //
-                .put(APProp.id, url) //
-                .put(APProp.totalItems, totalItems) //
-                .put(APProp.first, url + "?page=true") //
-                .put(APProp.last, url + "?min_id=0&page=true");
+        APOOrderedCollection ret = new APOOrderedCollection(url, totalItems, url + "?page=true", //
+                url + "?min_id=0&page=true");
         return ret;
     }
 
     /* Calls saveFediverseName for each person who is a 'follower' of actor */
     public int loadRemoteFollowers(MongoSession ms, APObj actor) {
 
-        String followersUrl = (String) AP.str(actor, APProp.followers);
+        String followersUrl = (String) AP.str(actor, APObj.followers);
         APObj followers = getFollowers(followersUrl);
         if (no(followers)) {
             log.debug("Unable to get followers for AP user: " + followersUrl);
             return 0;
         }
 
-        int ret = AP.integer(followers, APProp.totalItems);
+        int ret = AP.integer(followers, APObj.totalItems);
 
         apUtil.iterateOrderedCollection(followers, Integer.MAX_VALUE, obj -> {
             try {
@@ -139,11 +135,9 @@ public class ActPubFollower extends ServiceBase {
         if (ok(minId)) {
             url += "&min_id=" + minId;
         }
-        APOOrderedCollectionPage ret = new APOOrderedCollectionPage() //
-                .put(APProp.id, url) //
-                .put(APProp.orderedItems, followers) //
-                .put(APProp.partOf, prop.getProtocolHostAndPort() + APConst.PATH_FOLLOWERS + "/" + userName)//
-                .put(APProp.totalItems, followers.size());
+        
+        APOOrderedCollectionPage ret = new APOOrderedCollectionPage(url, followers,
+                prop.getProtocolHostAndPort() + APConst.PATH_FOLLOWERS + "/" + userName, followers.size());
         return ret;
     }
 
@@ -193,12 +187,12 @@ public class ActPubFollower extends ServiceBase {
             if (ok(actorUrl)) {
                 APObj actor = apUtil.getActorByUrl(actorUrl);
                 if (ok(actor)) {
-                    String followersUrl = (String) AP.str(actor, APProp.followers);
+                    String followersUrl = (String) AP.str(actor, APObj.followers);
                     APObj followers = getFollowers(followersUrl);
                     if (no(followers)) {
                         log.debug("Unable to get followers for AP user: " + followersUrl);
                     }
-                    ret = AP.integer(followers, APProp.totalItems);
+                    ret = AP.integer(followers, APObj.totalItems);
                 }
             }
             return ret;
@@ -214,10 +208,9 @@ public class ActPubFollower extends ServiceBase {
 
     public Query getFriendsByUserName_query(MongoSession ms, String userName) {
         Query query = new Query();
-        Criteria criteria =
-                Criteria.where(SubNode.PATH).regex(mongoUtil.regexRecursiveChildrenOfPath(NodeName.ROOT_OF_ALL_USERS)) //
-                        .and(SubNode.PROPERTIES + "." + NodeProp.USER.s() + ".value").is(userName) //
-                        .and(SubNode.TYPE).is(NodeType.FRIEND.s());
+        Criteria criteria = Criteria.where(SubNode.PATH).regex(mongoUtil.regexRecursiveChildrenOfPath(NodeName.ROOT_OF_ALL_USERS)) //
+                .and(SubNode.PROPERTIES + "." + NodeProp.USER.s() + ".value").is(userName) //
+                .and(SubNode.TYPE).is(NodeType.FRIEND.s());
 
         query.addCriteria(criteria);
         return query;

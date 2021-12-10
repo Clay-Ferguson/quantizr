@@ -26,7 +26,7 @@ public class AP {
     public static boolean isType(Object obj, String type) {
         if (no(obj))
             return false;
-        return type.equalsIgnoreCase(str(obj, APProp.type));
+        return type.equalsIgnoreCase(str(obj, APObj.type));
     }
 
     public static String str(Object obj, String prop) {
