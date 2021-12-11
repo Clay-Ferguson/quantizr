@@ -269,7 +269,8 @@ export class View {
         }
     }
 
-    scrollToSelectedNode = (state: AppState): void => {
+    // todo-0: rename this to scrollToNode
+    scrollToSelectedNode = (state: AppState, node: J.NodeInfo = null): void => {
         // S.quanta.setOverlay(true);
 
         let func = () => {
@@ -279,22 +280,37 @@ export class View {
             /* Check to see if we are rendering the top node (page root), and if so
             it is better looking to just scroll to zero index, because that will always
             be what user wants to see */
-            const currentSelNode: J.NodeInfo = S.nodeUtil.getHighlightedNode(state);
+            if (!node) {
+                node = S.nodeUtil.getHighlightedNode(state);
+            }
 
             /* the scrolling got slightly convoluted, so I invented 'editNodeId' just to be able to detect
              a case where the user is editing a node and we KNOW we don't need to scroll after editing,
              so this is where we detect and reset that scenario. */
-            if (currentSelNode && currentSelNode.id === S.quanta.noScrollToId) {
-                S.quanta.noScrollToId = null;
+            if (node && node.id === S.quanta.noScrollToId) {
+                // console.log("noScrollToId flag");
                 return;
             }
 
-            if (currentSelNode && state.node.id === currentSelNode.id) {
+            if (node && state.node.id === node.id) {
+                // console.log("is root, scroll to top");
                 this.scrollAllTop(state);
                 return;
             }
 
-            let elm: any = S.nav.getSelectedDomElement(state);
+            let elm: any = null;
+            if (node) {
+                const nodeId: string = S.nav._UID_ROWID_PREFIX + node.id;
+                // console.log("looking up using element id: " + nodeId);
+
+                elm = S.domUtil.domElm(nodeId);
+            }
+
+            if (!elm) {
+                // console.log("didn't find element yet. looking up selected one");
+                elm = S.nav.getSelectedDomElement(state);
+            }
+
             if (elm) {
                 if (elm.firstElementChild) {
                     // console.log("Got first element: " + elm.firstElementChild);
@@ -307,9 +323,13 @@ export class View {
                 elm.scrollIntoView(true);
             }
             else {
+                if (C.DEBUG_SCROLLING) {
+                    console.log("getSelectedDomElement was null. Scroll top now.")
+                }
                 this.scrollAllTop(state);
             }
         };
+
         //     } finally {
         //         setTimeout(() => {
         //             S.quanta.setOverlay(false);
@@ -318,7 +338,7 @@ export class View {
         // }, 100);
 
         PubSub.subSingleOnce(C.PUBSUB_mainWindowScroll, () => {
-            // console.log("execute: C.PUBSUB_mainRenderComplete");
+            // console.log("execute: C.PUBSUB_mainRenderComplete: run scrollToSelectedNode");
             func();
         });
     }

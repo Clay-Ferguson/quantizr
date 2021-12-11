@@ -509,6 +509,11 @@ export class Edit {
         // scrolled to this ID so any scrolling will be unnecessary
         S.quanta.noScrollToId = id;
         this.runEditNode(null, id, false, false, false, null, state);
+
+        // it's safest and best to just disable scrolling for a couple of seconds during which editing is being initiated.
+        setTimeout(() => {
+            S.quanta.noScrollToId = null;
+        }, 2000);
     }
 
     /* This can run as an actuall click event function in which only 'evt' is non-null here */

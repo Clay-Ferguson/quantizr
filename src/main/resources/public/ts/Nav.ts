@@ -167,7 +167,7 @@ export class Nav {
      * turn of row selection DOM element of whatever row is currently selected
      */
     getSelectedDomElement = (state: AppState): HTMLElement => {
-        var currentSelNode = S.nodeUtil.getHighlightedNode(state);
+        let currentSelNode = S.nodeUtil.getHighlightedNode(state);
         if (currentSelNode) {
             /* get node by node identifier */
             const node: J.NodeInfo = state.idToNodeMap.get(currentSelNode.id);

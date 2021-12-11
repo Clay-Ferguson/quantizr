@@ -488,9 +488,11 @@ export class Render {
                         s.pendingLocationHash = null;
                     }
                     else if (allowScroll && targetNodeId) {
-                        // console.log("highlight: byId");
+                        if (C.DEBUG_SCROLLING) {
+                            console.log("highlight: byId");
+                        }
                         if (!S.nodeUtil.highlightRowById(targetNodeId, true, s)) {
-                            // anything to do here? didn't find node.
+                            // console.log("highlight: byId...didn't find node: " + targetNodeId);
                         }
 
                         if (S.quanta.hiddenRenderingEnabled) {

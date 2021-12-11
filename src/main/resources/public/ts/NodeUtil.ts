@@ -97,9 +97,10 @@ export class NodeUtil {
         let node: J.NodeInfo = state.idToNodeMap.get(id);
         let ret = true;
 
-        /* If node now known, resort to taking the best, previous node we had */
+        /* If node not known, resort to taking the best, previous node we had */
         if (!node) {
             node = this.getHighlightedNode(state);
+            // console.log("state.idToNodeMap missing: " + id);
         }
 
         if (node) {
@@ -116,6 +117,7 @@ export class NodeUtil {
     }
 
     highlightNode = (node: J.NodeInfo, scroll: boolean, state: AppState): void => {
+        // console.log("highlightNode: " + node.id);
         if (!node || !state.node) {
             return;
         }
@@ -126,7 +128,7 @@ export class NodeUtil {
         S.quanta.parentIdToFocusNodeMap.set(state.node.id, node.id);
 
         if (scroll) {
-            S.view.scrollToSelectedNode(state);
+            S.view.scrollToSelectedNode(state, node);
         }
     }
 
@@ -186,6 +188,8 @@ export class NodeUtil {
 
     updateNodeMap = (node: J.NodeInfo, state: AppState): void => {
         if (!node) return;
+
+        // console.log("NODE MAPPED: " + node.id);
         state.idToNodeMap.set(node.id, node);
 
         // NOTE: only the getFeed call (Feed tab) will have items with some parents populated.
@@ -268,8 +272,8 @@ export class NodeUtil {
         return content.trim();
     }
 
-     // returns true if all children are same owner as parent
-     allChildrenAreSameOwner = (node: J.NodeInfo): boolean => {
+    // returns true if all children are same owner as parent
+    allChildrenAreSameOwner = (node: J.NodeInfo): boolean => {
         if (!node || !node.children) return true;
 
         for (let child of node.children) {
