@@ -2,7 +2,7 @@ import { useSelector } from "react-redux";
 import { AppState } from "../AppState";
 import { Constants as C } from "../Constants";
 import { PubSub } from "../PubSub";
-import { Singletons } from "../Singletons";
+import { S } from "../Singletons";
 import { CompIntf } from "./base/CompIntf";
 import { Button } from "./Button";
 import { Checkbox } from "./Checkbox";
@@ -18,11 +18,6 @@ import { LeftNavPanel } from "./LeftNavPanel";
 import { Main } from "./Main";
 import { RightNavPanel } from "./RightNavPanel";
 import { TabPanel } from "./TabPanel";
-
-let S: Singletons;
-PubSub.sub(C.PUBSUB_SingletonsReady, (s: Singletons) => {
-    S = s;
-});
 
 declare var g_brandingAppName;
 

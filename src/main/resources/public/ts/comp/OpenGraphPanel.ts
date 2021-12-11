@@ -1,7 +1,4 @@
 import { AppState } from "../AppState";
-import { Constants as C } from "../Constants";
-import { PubSub } from "../PubSub";
-import { Singletons } from "../Singletons";
 import { Anchor } from "../comp/Anchor";
 import { CompIntf } from "../comp/base/CompIntf";
 import { Div } from "../comp/Div";
@@ -9,11 +6,7 @@ import { HorizontalLayout } from "../comp/HorizontalLayout";
 import { Icon } from "../comp/Icon";
 import { Img } from "../comp/Img";
 import * as J from "../JavaIntf";
-
-let S: Singletons;
-PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
-    S = ctx;
-});
+import { S } from "../Singletons";
 
 interface LS {
     og: J.OpenGraph;

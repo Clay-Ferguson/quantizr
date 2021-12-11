@@ -1,16 +1,9 @@
 import { AppState } from "../AppState";
-import { Constants as C } from "../Constants";
 import { ValueIntf } from "../Interfaces";
 import { TypeHandlerIntf } from "../intf/TypeHandlerIntf";
-import { PubSub } from "../PubSub";
-import { Singletons } from "../Singletons";
+import { S } from "../Singletons";
 import { ListBox } from "./ListBox";
 import { NodeTypeListBoxRow } from "./NodeTypeListBoxRow";
-
-let S: Singletons;
-PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
-    S = ctx;
-});
 
 export class NodeTypeListBox extends ListBox {
 

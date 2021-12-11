@@ -4,12 +4,7 @@ import { Constants as C } from "./Constants";
 import { NodeStatsDlg } from "./dlg/NodeStatsDlg";
 import * as J from "./JavaIntf";
 import { PubSub } from "./PubSub";
-import { Singletons } from "./Singletons";
-
-let S: Singletons;
-PubSub.sub(C.PUBSUB_SingletonsReady, (s: Singletons) => {
-    S = s;
-});
+import { S } from "./Singletons";
 
 // This is magically defined in webpack.common.js;
 declare var BUILDTIME;

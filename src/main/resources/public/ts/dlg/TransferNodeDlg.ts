@@ -1,10 +1,4 @@
 import { AppState } from "../AppState";
-import { Constants as C } from "../Constants";
-import { DialogBase } from "../DialogBase";
-import * as J from "../JavaIntf";
-import { PubSub } from "../PubSub";
-import { Singletons } from "../Singletons";
-import { ValidatedState } from "../ValidatedState";
 import { CompIntf } from "../comp/base/CompIntf";
 import { Button } from "../comp/Button";
 import { ButtonBar } from "../comp/ButtonBar";
@@ -12,11 +6,10 @@ import { Checkbox } from "../comp/Checkbox";
 import { Form } from "../comp/Form";
 import { HorizontalLayout } from "../comp/HorizontalLayout";
 import { TextField } from "../comp/TextField";
-
-let S: Singletons;
-PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
-    S = ctx;
-});
+import { DialogBase } from "../DialogBase";
+import * as J from "../JavaIntf";
+import { S } from "../Singletons";
+import { ValidatedState } from "../ValidatedState";
 
 interface LS {
     recursive?: boolean;

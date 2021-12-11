@@ -1,19 +1,12 @@
 import { AppState } from "../AppState";
-import { Constants as C } from "../Constants";
+import { CompIntf } from "../comp/base/CompIntf";
+import { Heading } from "../comp/Heading";
 import { UserProfileDlg } from "../dlg/UserProfileDlg";
 import { FollowersRSInfo } from "../FollowersRSInfo";
 import { TabDataIntf } from "../intf/TabDataIntf";
 import * as J from "../JavaIntf";
-import { PubSub } from "../PubSub";
-import { Singletons } from "../Singletons";
-import { CompIntf } from "../comp/base/CompIntf";
-import { Heading } from "../comp/Heading";
+import { S } from "../Singletons";
 import { ResultSetView } from "./ResultSetView";
-
-let S: Singletons;
-PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
-    S = ctx;
-});
 
 export class FollowersResultSetView<I extends FollowersRSInfo> extends ResultSetView {
 

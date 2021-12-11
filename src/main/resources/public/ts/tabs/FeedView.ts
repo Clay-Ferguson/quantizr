@@ -1,13 +1,6 @@
 import { useSelector } from "react-redux";
-import { dispatch, store } from "../AppRedux";
+import { dispatch } from "../AppRedux";
 import { AppState } from "../AppState";
-import { Constants as C } from "../Constants";
-import { EditNodeDlg } from "../dlg/EditNodeDlg";
-import { DialogMode } from "../enums/DialogMode";
-import { TabDataIntf } from "../intf/TabDataIntf";
-import * as J from "../JavaIntf";
-import { PubSub } from "../PubSub";
-import { Singletons } from "../Singletons";
 import { AppTab } from "../comp/AppTab";
 import { Comp } from "../comp/base/Comp";
 import { CompIntf } from "../comp/base/CompIntf";
@@ -25,12 +18,13 @@ import { Span } from "../comp/Span";
 import { Spinner } from "../comp/Spinner";
 import { TextContent } from "../comp/TextContent";
 import { TextField } from "../comp/TextField";
+import { Constants as C } from "../Constants";
+import { EditNodeDlg } from "../dlg/EditNodeDlg";
+import { DialogMode } from "../enums/DialogMode";
+import { TabDataIntf } from "../intf/TabDataIntf";
+import * as J from "../JavaIntf";
+import { S } from "../Singletons";
 import { FeedViewProps } from "./FeedViewProps";
-
-let S: Singletons;
-PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
-    S = ctx;
-});
 
 /* General Widget that doesn't fit any more reusable or specific category other than a plain Div,
 but inherits capability of Comp class */

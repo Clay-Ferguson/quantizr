@@ -1,13 +1,6 @@
-import { Constants as C } from "./Constants";
 import { ValueIntf } from "./Interfaces";
 import { NodeInfo } from "./JavaIntf";
-import { PubSub } from "./PubSub";
-import { Singletons } from "./Singletons";
-
-let S: Singletons;
-PubSub.sub(C.PUBSUB_SingletonsReady, (s: Singletons) => {
-    S = s;
-});
+import { S } from "./Singletons";
 
 /* encapsulates setting and getting a state variable property on behalf of a node */
 export class PropValueHolder implements ValueIntf {

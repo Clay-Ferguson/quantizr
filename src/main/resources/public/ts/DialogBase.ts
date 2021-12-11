@@ -2,20 +2,13 @@ import * as ReactDOM from "react-dom";
 import { Provider } from "react-redux";
 import { dispatch, store } from "./AppRedux";
 import { AppState } from "./AppState";
-import { Constants as C } from "./Constants";
-import { DialogBaseImpl } from "./DialogBaseImpl";
-import { DialogMode } from "./enums/DialogMode";
-import { PubSub } from "./PubSub";
-import { Singletons } from "./Singletons";
 import { Comp } from "./comp/base/Comp";
 import { CompIntf } from "./comp/base/CompIntf";
 import { Div } from "./comp/Div";
 import { Span } from "./comp/Span";
-
-let S: Singletons;
-PubSub.sub(C.PUBSUB_SingletonsReady, (s: Singletons) => {
-    S = s;
-});
+import { DialogBaseImpl } from "./DialogBaseImpl";
+import { DialogMode } from "./enums/DialogMode";
+import { S } from "./Singletons";
 
 export abstract class DialogBase extends Div implements DialogBaseImpl {
 

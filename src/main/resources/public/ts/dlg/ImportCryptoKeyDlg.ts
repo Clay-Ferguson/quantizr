@@ -1,20 +1,13 @@
 import { AppState } from "../AppState";
-import { Constants as C } from "../Constants";
-import { DialogBase } from "../DialogBase";
-import { PubSub } from "../PubSub";
-import { Singletons } from "../Singletons";
-import { ValidatedState } from "../ValidatedState";
 import { CompIntf } from "../comp/base/CompIntf";
 import { Button } from "../comp/Button";
 import { ButtonBar } from "../comp/ButtonBar";
 import { Form } from "../comp/Form";
 import { TextArea } from "../comp/TextArea";
 import { TextContent } from "../comp/TextContent";
-
-let S: Singletons;
-PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
-    S = ctx;
-});
+import { DialogBase } from "../DialogBase";
+import { S } from "../Singletons";
+import { ValidatedState } from "../ValidatedState";
 
 export class ImportCryptoKeyDlg extends DialogBase {
     keyState: ValidatedState<any> = new ValidatedState<any>();

@@ -1,21 +1,16 @@
 import { useSelector } from "react-redux";
 import { dispatch } from "../AppRedux";
 import { AppState } from "../AppState";
-import { Constants as C } from "../Constants";
-import { TabDataIntf } from "../intf/TabDataIntf";
-import * as J from "../JavaIntf";
-import { PubSub } from "../PubSub";
-import { Singletons } from "../Singletons";
-import { TrendingRSInfo } from "../TrendingRSInfo";
 import { AppTab } from "../comp/AppTab";
 import { Div } from "../comp/Div";
 import { Heading } from "../comp/Heading";
 import { Span } from "../comp/Span";
-
-let S: Singletons;
-PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
-    S = ctx;
-});
+import { Constants as C } from "../Constants";
+import { TabDataIntf } from "../intf/TabDataIntf";
+import * as J from "../JavaIntf";
+import { PubSub } from "../PubSub";
+import { S } from "../Singletons";
+import { TrendingRSInfo } from "../TrendingRSInfo";
 
 export class TrendingView extends AppTab {
 

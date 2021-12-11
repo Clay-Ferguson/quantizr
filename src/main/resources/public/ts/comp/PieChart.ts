@@ -1,14 +1,6 @@
 import * as d3 from "d3";
-import { PubSub } from "../PubSub";
-import { Singletons } from "../Singletons";
 import { Div } from "./Div";
 import { Svg } from "./Svg";
-import { Constants as C } from "../Constants";
-
-let S: Singletons;
-PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
-    S = ctx;
-});
 
 interface LS {
 }

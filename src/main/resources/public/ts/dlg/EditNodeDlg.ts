@@ -1,19 +1,5 @@
 import { dispatch } from "../AppRedux";
 import { AppState } from "../AppState";
-import { NodeCompBinary } from "../comp/node/NodeCompBinary";
-import { Constants as C } from "../Constants";
-import { DialogBase } from "../DialogBase";
-import { SplitNodeDlg } from "../dlg/SplitNodeDlg";
-import { DialogMode } from "../enums/DialogMode";
-import { NodeActionType } from "../enums/NodeActionType";
-import * as I from "../Interfaces";
-import { ValueIntf } from "../Interfaces";
-import { TypeHandlerIntf } from "../intf/TypeHandlerIntf";
-import * as J from "../JavaIntf";
-import { PropValueHolder } from "../PropValueHolder";
-import { PubSub } from "../PubSub";
-import { Singletons } from "../Singletons";
-import { ValidatedState } from "../ValidatedState";
 import { Comp } from "../comp/base/Comp";
 import { CompIntf } from "../comp/base/CompIntf";
 import { Button } from "../comp/Button";
@@ -31,22 +17,30 @@ import { Icon } from "../comp/Icon";
 import { IconButton } from "../comp/IconButton";
 import { Label } from "../comp/Label";
 import { LayoutRow } from "../comp/LayoutRow";
+import { NodeCompBinary } from "../comp/node/NodeCompBinary";
 import { Selection } from "../comp/Selection";
 import { Span } from "../comp/Span";
 import { TextArea } from "../comp/TextArea";
 import { TextContent } from "../comp/TextContent";
 import { TextField } from "../comp/TextField";
+import { Constants as C } from "../Constants";
+import { DialogBase } from "../DialogBase";
+import { SplitNodeDlg } from "../dlg/SplitNodeDlg";
+import { DialogMode } from "../enums/DialogMode";
+import { NodeActionType } from "../enums/NodeActionType";
+import * as I from "../Interfaces";
+import { ValueIntf } from "../Interfaces";
+import { TypeHandlerIntf } from "../intf/TypeHandlerIntf";
+import * as J from "../JavaIntf";
+import { PropValueHolder } from "../PropValueHolder";
+import { S } from "../Singletons";
+import { ValidatedState } from "../ValidatedState";
 import { ChangeNodeTypeDlg } from "./ChangeNodeTypeDlg";
 import { ConfirmDlg } from "./ConfirmDlg";
 import { EditPropertyDlg } from "./EditPropertyDlg";
 import { EmojiPickerDlg } from "./EmojiPickerDlg";
 import { FriendsDlg } from "./FriendsDlg";
 import { UploadFromFileDropzoneDlg } from "./UploadFromFileDropzoneDlg";
-
-let S: Singletons;
-PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
-    S = ctx;
-});
 
 // export this from elsewhere, it's dupliated two places right now (todo-0)
 interface SymKeyDataPackage {

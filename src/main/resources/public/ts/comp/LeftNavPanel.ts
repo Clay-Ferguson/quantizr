@@ -4,16 +4,10 @@ import { AppState } from "../AppState";
 import { Constants as C } from "../Constants";
 import { TabDataIntf } from "../intf/TabDataIntf";
 import { MenuPanel } from "../MenuPanel";
-import { PubSub } from "../PubSub";
-import { Singletons } from "../Singletons";
+import { S } from "../Singletons";
 import { Div } from "./Div";
 import { Img } from "./Img";
 import { Span } from "./Span";
-
-let S: Singletons;
-PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
-    S = ctx;
-});
 
 declare var g_brandingAppName;
 

@@ -1,9 +1,7 @@
 import { useSelector } from "react-redux";
 import { AppState } from "../AppState";
-import { Constants as C } from "../Constants";
 import * as J from "../JavaIntf";
-import { PubSub } from "../PubSub";
-import { Singletons } from "../Singletons";
+import { S } from "../Singletons";
 import { Main } from "./Main";
 import React, { ReactNode } from "react";
 import { dispatch } from "../AppRedux";
@@ -15,11 +13,6 @@ import FullCalendar, { EventApi, DateSelectArg, EventClickArg, EventContentArg, 
 import dayGridPlugin from "@fullcalendar/daygrid";
 import timeGridPlugin from "@fullcalendar/timegrid";
 import interactionPlugin, { DateClickArg } from "@fullcalendar/interaction";
-
-let S: Singletons;
-PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
-    S = ctx;
-});
 
 export class FullScreenCalendar extends Main {
 

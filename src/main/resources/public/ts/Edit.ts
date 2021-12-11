@@ -13,15 +13,8 @@ import { UploadFromFileDropzoneDlg } from "./dlg/UploadFromFileDropzoneDlg";
 import { TabDataIntf } from "./intf/TabDataIntf";
 import * as J from "./JavaIntf";
 import { NodeHistoryItem } from "./NodeHistoryItem";
-import { PubSub } from "./PubSub";
-import { Singletons } from "./Singletons";
+import { S } from "./Singletons";
 import { FeedView } from "./tabs/FeedView";
-
-let S: Singletons;
-PubSub.sub(C.PUBSUB_SingletonsReady, (s: Singletons) => {
-    S = s;
-});
-
 export class Edit {
 
     showReadOnlyProperties: boolean = false;

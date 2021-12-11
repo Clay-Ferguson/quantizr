@@ -1,12 +1,5 @@
 import { LogViewIntf } from "./intf/LogViewIntf";
-import { PubSub } from "./PubSub";
-import { Singletons } from "./Singletons";
-import { Constants as C } from "./Constants";
-
-let S: Singletons;
-PubSub.sub(C.PUBSUB_SingletonsReady, (s: Singletons) => {
-    S = s;
-});
+import { S } from "./Singletons";
 
 export class Log {
     static errorCount: number = 0;

@@ -1,9 +1,4 @@
 import { AppState } from "../AppState";
-import { Constants as C } from "../Constants";
-import { DialogBase } from "../DialogBase";
-import { DialogMode } from "../enums/DialogMode";
-import { PubSub } from "../PubSub";
-import { Singletons } from "../Singletons";
 import { CompIntf } from "../comp/base/CompIntf";
 import { Button } from "../comp/Button";
 import { ButtonBar } from "../comp/ButtonBar";
@@ -12,6 +7,10 @@ import { Form } from "../comp/Form";
 import { Heading } from "../comp/Heading";
 import { Selection } from "../comp/Selection";
 import { VideoPlayer } from "../comp/VideoPlayer";
+import { Constants as C } from "../Constants";
+import { DialogBase } from "../DialogBase";
+import { DialogMode } from "../enums/DialogMode";
+import { S } from "../Singletons";
 import { AudioPlayerDlg } from "./AudioPlayerDlg";
 import { ConfirmDlg } from "./ConfirmDlg";
 import { VideoPlayerDlg } from "./VideoPlayerDlg";
@@ -20,11 +19,6 @@ import { VideoPlayerDlg } from "./VideoPlayerDlg";
 // Need to persist in LOCAL browser storage which input selections (audio/video) are the current choice at all times.
 
 declare var MediaRecorder;
-
-let S: Singletons;
-PubSub.sub(C.PUBSUB_SingletonsReady, (s: Singletons) => {
-    S = s;
-});
 
 interface LS {
     status?: string;

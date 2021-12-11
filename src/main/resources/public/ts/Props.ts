@@ -1,16 +1,9 @@
 import { AppState } from "./AppState";
-import { Constants as C } from "./Constants";
-import * as J from "./JavaIntf";
-import { PubSub } from "./PubSub";
-import { Singletons } from "./Singletons";
 import { PropTable } from "./comp/PropTable";
 import { PropTableCell } from "./comp/PropTableCell";
 import { PropTableRow } from "./comp/PropTableRow";
-
-let S: Singletons;
-PubSub.sub(C.PUBSUB_SingletonsReady, (s: Singletons) => {
-    S = s;
-});
+import * as J from "./JavaIntf";
+import { S } from "./Singletons";
 
 export class Props {
 

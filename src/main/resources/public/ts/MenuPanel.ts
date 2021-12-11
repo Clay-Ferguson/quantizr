@@ -1,6 +1,11 @@
 import { useSelector } from "react-redux";
 import { appState, dispatch, store } from "./AppRedux";
 import { AppState } from "./AppState";
+import { Div } from "./comp/Div";
+import { Icon } from "./comp/Icon";
+import { Menu } from "./comp/Menu";
+import { MenuItem } from "./comp/MenuItem";
+import { MenuItemSeparator } from "./comp/MenuItemSeparator";
 import { Constants as C } from "./Constants";
 import { AddFriendDlg } from "./dlg/AddFriendDlg";
 import { ConfirmDlg } from "./dlg/ConfirmDlg";
@@ -18,18 +23,7 @@ import { UserProfileDlg } from "./dlg/UserProfileDlg";
 import { TabDataIntf } from "./intf/TabDataIntf";
 import { TypeHandlerIntf } from "./intf/TypeHandlerIntf";
 import * as J from "./JavaIntf";
-import { PubSub } from "./PubSub";
-import { Singletons } from "./Singletons";
-import { Div } from "./comp/Div";
-import { Icon } from "./comp/Icon";
-import { Menu } from "./comp/Menu";
-import { MenuItem } from "./comp/MenuItem";
-import { MenuItemSeparator } from "./comp/MenuItemSeparator";
-
-let S: Singletons;
-PubSub.sub(C.PUBSUB_SingletonsReady, (s: Singletons) => {
-    S = s;
-});
+import { S } from "./Singletons";
 
 export class MenuPanel extends Div {
     constructor(state: AppState) {

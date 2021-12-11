@@ -43,7 +43,6 @@ export class Constants {
 
     /* ======================================================================== */
 
-    static readonly PUBSUB_SingletonsReady = "PUBSUB_SingletonsReady";
     static readonly PUBSUB_mainWindowScroll = "PUBSUB_mainWindowScroll";
     static readonly PUBSUB_postMainWindowScroll = "PUBSUB_postMainWindowScroll";
     static readonly PUBSUB_tabChanging = "PUBSUB_tabChanging";

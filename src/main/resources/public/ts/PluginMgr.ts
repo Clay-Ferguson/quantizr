@@ -1,9 +1,10 @@
 import { TypeHandlerIntf } from "./intf/TypeHandlerIntf";
 import { AccountTypeHandler } from "./plugins/AccountTypeHandler";
-import { CalcTypeHandler } from "./plugins/CalcTypeHandler";
-import { RoomTypeHandler } from "./plugins/RoomTypeHandler";
-import { FriendsListTypeHandler } from "./plugins/FriendsListTypeHandler";
 import { BlockedUsersTypeHandler } from "./plugins/BlockedUsersTypeHandler";
+import { BookmarkListTypeHandler } from "./plugins/BookmarkListTypeHandler";
+import { BookmarkTypeHandler } from "./plugins/BookmarkTypeHandler";
+import { CalcTypeHandler } from "./plugins/CalcTypeHandler";
+import { FriendsListTypeHandler } from "./plugins/FriendsListTypeHandler";
 import { FriendTypeHandler } from "./plugins/FriendTypeHandler";
 import { InboxEntryTypeHandler } from "./plugins/InboxEntryTypeHandler";
 import { InboxNodeTypeHandler } from "./plugins/InboxNodeTypeHandler";
@@ -11,12 +12,10 @@ import { IPFSNodeTypeHandler } from "./plugins/IPFSNodeTypeHandler";
 import { MarkdownTypeHandler } from "./plugins/MarkdownTypeHandler";
 import { NotesNodeTypeHandler } from "./plugins/NotesNodeTypeHandler";
 import { RepoRootTypeHandler } from "./plugins/RepoRootTypeHandler";
+import { RoomTypeHandler } from "./plugins/RoomTypeHandler";
 import { RssFeedsTypeHandler } from "./plugins/RssFeedsTypeHandler";
 import { RssTypeHandler } from "./plugins/RssTypeHandler";
 import { TextTypeHandler } from "./plugins/TextTypeHandler";
-import { BookmarkTypeHandler } from "./plugins/BookmarkTypeHandler";
-import { BookmarkListTypeHandler } from "./plugins/BookmarkListTypeHandler";
-
 export class PluginMgr {
 
     private typeHandlers: Map<string, TypeHandlerIntf> = new Map<string, TypeHandlerIntf>();

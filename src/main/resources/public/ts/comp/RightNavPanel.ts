@@ -3,10 +3,8 @@ import { AppState } from "../AppState";
 import { Constants as C, Constants } from "../Constants";
 import { UserProfileDlg } from "../dlg/UserProfileDlg";
 import * as J from "../JavaIntf";
-import { PubSub } from "../PubSub";
-import { Singletons } from "../Singletons";
+import { S } from "../Singletons";
 import { CompIntf } from "./base/CompIntf";
-import { Button } from "./Button";
 import { ButtonBar } from "./ButtonBar";
 import { Checkbox } from "./Checkbox";
 import { CollapsiblePanel } from "./CollapsiblePanel";
@@ -15,11 +13,6 @@ import { HistoryPanel } from "./HistoryPanel";
 import { IconButton } from "./IconButton";
 import { Img } from "./Img";
 import { TabPanelButtons } from "./TabPanelButtons";
-
-let S: Singletons;
-PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
-    S = ctx;
-});
 
 declare var g_brandingAppName;
 

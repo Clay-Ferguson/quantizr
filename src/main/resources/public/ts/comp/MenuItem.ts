@@ -1,15 +1,8 @@
 import { ReactNode } from "react";
-import { Constants as C } from "../Constants";
-import { PubSub } from "../PubSub";
-import { Singletons } from "../Singletons";
+import { S } from "../Singletons";
 import { CompIntf } from "./base/CompIntf";
 import { Div } from "./Div";
 import { Span } from "./Span";
-
-let S: Singletons;
-PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
-    S = ctx;
-});
 
 interface LS {
     visible: boolean;

@@ -1,10 +1,5 @@
 import { useSelector } from "react-redux";
 import { AppState } from "../AppState";
-import { Constants as C } from "../Constants";
-import { TabDataIntf } from "../intf/TabDataIntf";
-import * as J from "../JavaIntf";
-import { PubSub } from "../PubSub";
-import { Singletons } from "../Singletons";
 import { AppTab } from "../comp/AppTab";
 import { CompIntf } from "../comp/base/CompIntf";
 import { ButtonBar } from "../comp/ButtonBar";
@@ -13,11 +8,9 @@ import { Heading } from "../comp/Heading";
 import { IconButton } from "../comp/IconButton";
 import { Span } from "../comp/Span";
 import { TextContent } from "../comp/TextContent";
-
-let S: Singletons;
-PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
-    S = ctx;
-});
+import { TabDataIntf } from "../intf/TabDataIntf";
+import * as J from "../JavaIntf";
+import { S } from "../Singletons";
 
 /* General Widget that doesn't fit any more reusable or specific category other than a plain Div, but inherits capability of Comp class */
 export abstract class ResultSetView extends AppTab {

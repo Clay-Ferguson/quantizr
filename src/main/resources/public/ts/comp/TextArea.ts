@@ -1,17 +1,10 @@
-import { Constants as C } from "../Constants";
 import * as I from "../Interfaces";
-import { PubSub } from "../PubSub";
-import { Singletons } from "../Singletons";
+import { S } from "../Singletons";
 import { ValidatedState } from "../ValidatedState";
 import { ErrorDiv } from "./ErrorDiv";
 import { Label } from "./Label";
 import { Span } from "./Span";
 import { TextareaTag } from "./TextareaTag";
-
-let S: Singletons;
-PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
-    S = ctx;
-});
 
 interface LS {
     wordWrap: boolean;

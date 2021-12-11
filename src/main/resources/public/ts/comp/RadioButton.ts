@@ -1,14 +1,6 @@
 import { ReactNode } from "react";
-import { Constants as C } from "../Constants";
 import { ValueIntf } from "../Interfaces";
-import { PubSub } from "../PubSub";
-import { Singletons } from "../Singletons";
 import { Comp } from "./base/Comp";
-
-let S: Singletons;
-PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
-    S = ctx;
-});
 
 /* I never got state management working with this radio button properly.
 

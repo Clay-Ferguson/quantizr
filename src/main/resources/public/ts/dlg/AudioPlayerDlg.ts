@@ -1,10 +1,4 @@
 import { AppState } from "../AppState";
-import { Constants as C } from "../Constants";
-import { DialogBase } from "../DialogBase";
-import * as I from "../Interfaces";
-import { PubSub } from "../PubSub";
-import { Singletons } from "../Singletons";
-import { ValidatedState } from "../ValidatedState";
 import { AudioPlayer } from "../comp/AudioPlayer";
 import { CompIntf } from "../comp/base/CompIntf";
 import { Button } from "../comp/Button";
@@ -13,11 +7,10 @@ import { Div } from "../comp/Div";
 import { Form } from "../comp/Form";
 import { Icon } from "../comp/Icon";
 import { TextField } from "../comp/TextField";
-
-let S: Singletons;
-PubSub.sub(C.PUBSUB_SingletonsReady, (s: Singletons) => {
-    S = s;
-});
+import { DialogBase } from "../DialogBase";
+import * as I from "../Interfaces";
+import { S } from "../Singletons";
+import { ValidatedState } from "../ValidatedState";
 
 /**
  * NOTE: currently the AD-skip (Advertisement Skip) feature is a proof-of-concept (and it does functionally work!), but croud sourcing

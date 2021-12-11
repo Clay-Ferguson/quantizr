@@ -1,15 +1,8 @@
-import { Constants as C } from "../Constants";
-import { PubSub } from "../PubSub";
-import { Singletons } from "../Singletons";
+import { S } from "../Singletons";
 import { ValidatedState } from "../ValidatedState";
 import { DateField } from "./DateField";
 import { Span } from "./Span";
 import { TimeField } from "./TimeField";
-
-let S: Singletons;
-PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
-    S = ctx;
-});
 
 export class DateTimeField extends Span {
     dateState: ValidatedState<any> = new ValidatedState<any>();

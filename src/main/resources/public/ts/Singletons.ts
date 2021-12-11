@@ -1,9 +1,10 @@
 import type { Attachment } from "./Attachment";
+import type { DomUtil } from "./DomUtil";
 import type { Edit } from "./Edit";
 import type { Encryption } from "./Encryption";
 import type { LocalDB } from "./LocalDB";
 import type { Nav } from "./Nav";
-import { NodeUtil } from "./NodeUtil";
+import type { NodeUtil } from "./NodeUtil";
 import type { PluginMgr } from "./PluginMgr";
 import type { Props } from "./Props";
 import type { Quanta } from "./Quanta";
@@ -15,7 +16,6 @@ import type { TabUtil } from "./TabUtil";
 import type { Torrent } from "./Torrent";
 import type { User } from "./User";
 import type { Util } from "./Util";
-import type { DomUtil } from "./DomUtil";
 import type { View } from "./View";
 
 /* Similar to a SpringContext in a Java app, these singletons are all pre-instantiated and guaranteed not
@@ -41,3 +41,6 @@ export interface Singletons {
     speech: SpeechRecog;
     torrent: Torrent;
 }
+
+let S: Singletons = {} as any;
+export { S };

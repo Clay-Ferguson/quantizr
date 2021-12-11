@@ -1,16 +1,9 @@
 import { ReactNode } from "react";
 import { store } from "../AppRedux";
-import { Constants as C } from "../Constants";
 import { ValueIntf } from "../Interfaces";
-import { PubSub } from "../PubSub";
-import { Singletons } from "../Singletons";
+import { S } from "../Singletons";
 import { Comp } from "./base/Comp";
 import { SelectionOption } from "./SelectionOption";
-
-let S: Singletons;
-PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
-    S = ctx;
-});
 
 export class Selection extends Comp {
 

@@ -2,21 +2,14 @@
 // https://reactjs.org/docs/hooks-reference.html#usestate
 // #RulesOfHooks: https://fb.me/rules-of-hooks
 
-import { createElement, ReactElement, ReactNode, useEffect, useLayoutEffect, useRef } from "react";
+import { createElement, ReactElement, ReactNode, useEffect, useLayoutEffect } from "react";
 import * as ReactDOM from "react-dom";
 import { renderToString } from "react-dom/server";
 import { Provider } from "react-redux";
 import { store } from "../../AppRedux";
-import { Constants as C } from "../../Constants";
-import { PubSub } from "../../PubSub";
-import { Singletons } from "../../Singletons";
+import { S } from "../../Singletons";
 import { State } from "../../State";
 import { CompIntf } from "./CompIntf";
-
-let S: Singletons;
-PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
-    S = ctx;
-});
 
 /**
  * This base class is a hybrid that can render React components or can be used to render plain HTML to be used in innerHTML of elements.

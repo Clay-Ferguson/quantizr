@@ -1,14 +1,6 @@
 import { ReactNode } from "react";
-import { Constants as C } from "../Constants";
-import { PubSub } from "../PubSub";
-import { Singletons } from "../Singletons";
 import { Comp } from "./base/Comp";
 import { Div } from "./Div";
-
-let S: Singletons;
-PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
-    S = ctx;
-});
 
 /* WARNING: This class doesn't expect 'this.children' to be directly added to, but always only the
 'this.comps' should be considered the children to be modified if they need to be modified after the

@@ -1,5 +1,9 @@
 import { appState, dispatch } from "./AppRedux";
 import { AppState } from "./AppState";
+import { Button } from "./comp/Button";
+import { ButtonBar } from "./comp/ButtonBar";
+import { Heading } from "./comp/Heading";
+import { VerticalLayout } from "./comp/VerticalLayout";
 import { Constants as C } from "./Constants";
 import { LoginDlg } from "./dlg/LoginDlg";
 import { MainMenuDlg } from "./dlg/MainMenuDlg";
@@ -8,18 +12,8 @@ import { PrefsDlg } from "./dlg/PrefsDlg";
 import { SearchContentDlg } from "./dlg/SearchContentDlg";
 import { TabDataIntf } from "./intf/TabDataIntf";
 import * as J from "./JavaIntf";
-import { PubSub } from "./PubSub";
-import { Singletons } from "./Singletons";
-import { Button } from "./comp/Button";
-import { ButtonBar } from "./comp/ButtonBar";
-import { Heading } from "./comp/Heading";
-import { VerticalLayout } from "./comp/VerticalLayout";
+import { S } from "./Singletons";
 import { FeedViewProps } from "./tabs/FeedViewProps";
-
-let S: Singletons;
-PubSub.sub(C.PUBSUB_SingletonsReady, (s: Singletons) => {
-    S = s;
-});
 
 export class Nav {
     _UID_ROWID_PREFIX: string = "row_";

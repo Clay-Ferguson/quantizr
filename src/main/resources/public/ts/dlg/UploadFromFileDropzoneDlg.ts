@@ -1,9 +1,5 @@
+import Dropzone from "dropzone";
 import { AppState } from "../AppState";
-import { Constants as C, Constants } from "../Constants";
-import { DialogBase } from "../DialogBase";
-import * as J from "../JavaIntf";
-import { PubSub } from "../PubSub";
-import { Singletons } from "../Singletons";
 import { CompIntf } from "../comp/base/CompIntf";
 import { Button } from "../comp/Button";
 import { ButtonBar } from "../comp/ButtonBar";
@@ -12,14 +8,12 @@ import { Div } from "../comp/Div";
 import { Form } from "../comp/Form";
 import { HorizontalLayout } from "../comp/HorizontalLayout";
 import { IconButton } from "../comp/IconButton";
+import { Constants } from "../Constants";
+import { DialogBase } from "../DialogBase";
+import * as J from "../JavaIntf";
+import { S } from "../Singletons";
 import { ConfirmDlg } from "./ConfirmDlg";
 import { MediaRecorderDlg } from "./MediaRecorderDlg";
-import Dropzone from "dropzone";
-
-let S: Singletons;
-PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
-    S = ctx;
-});
 
 interface LS {
 }

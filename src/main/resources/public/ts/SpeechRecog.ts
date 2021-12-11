@@ -1,14 +1,7 @@
-import { Constants as C } from "./Constants";
-import { PubSub } from "./PubSub";
-import { Singletons } from "./Singletons";
+import { S } from "./Singletons";
 
 declare var webkitSpeechRecognition;
 declare var SpeechRecognition;
-
-let S: Singletons;
-PubSub.sub(C.PUBSUB_SingletonsReady, (s: Singletons) => {
-    S = s;
-});
 
 export class SpeechRecog {
     recognition = null;

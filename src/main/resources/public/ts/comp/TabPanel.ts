@@ -2,17 +2,10 @@ import { useSelector } from "react-redux";
 import { store } from "../AppRedux";
 import { AppState } from "../AppState";
 import { Constants as C } from "../Constants";
-import { DialogBase } from "../DialogBase";
-import { PubSub } from "../PubSub";
-import { Singletons } from "../Singletons";
+import { S } from "../Singletons";
 import { CompIntf } from "./base/CompIntf";
 import { Div } from "./Div";
 import { IconButton } from "./IconButton";
-
-let S: Singletons;
-PubSub.sub(C.PUBSUB_SingletonsReady, (s: Singletons) => {
-    S = s;
-});
 
 export class TabPanel extends Div {
 

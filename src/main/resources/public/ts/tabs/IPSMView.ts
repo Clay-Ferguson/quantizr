@@ -1,20 +1,12 @@
 import { useSelector } from "react-redux";
 import { AppState } from "../AppState";
-import { Constants as C } from "../Constants";
-import { TabDataIntf } from "../intf/TabDataIntf";
-import { PubSub } from "../PubSub";
-import { Singletons } from "../Singletons";
 import { AppTab } from "../comp/AppTab";
 import { Comp } from "../comp/base/Comp";
 import { CompIntf } from "../comp/base/CompIntf";
 import { Div } from "../comp/Div";
 import { Heading } from "../comp/Heading";
 import { HelpButton } from "../comp/HelpButton";
-
-let S: Singletons;
-PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
-    S = ctx;
-});
+import { TabDataIntf } from "../intf/TabDataIntf";
 
 export class IPSMView extends AppTab {
     constructor(state: AppState, data: TabDataIntf) {

@@ -1,16 +1,8 @@
 import { ReactNode } from "react";
 import { store } from "../AppRedux";
 import { Markdown } from "../comp/Markdown";
-import { Constants as C } from "../Constants";
 import { MessageDlg } from "../dlg/MessageDlg";
-import { PubSub } from "../PubSub";
-import { Singletons } from "../Singletons";
 import { Comp } from "./base/Comp";
-
-let S: Singletons;
-PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
-    S = ctx;
-});
 
 export class HelpButton extends Comp {
 

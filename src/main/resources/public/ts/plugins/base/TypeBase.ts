@@ -1,20 +1,13 @@
 import { AppState } from "../../AppState";
-import { NodeCompMarkdown } from "../../comp/node/NodeCompMarkdown";
-import { OpenGraphPanel } from "../../comp/OpenGraphPanel";
-import { Constants as C } from "../../Constants";
-import { NodeActionType } from "../../enums/NodeActionType";
-import { TypeHandlerIntf } from "../../intf/TypeHandlerIntf";
-import * as J from "../../JavaIntf";
-import { PubSub } from "../../PubSub";
-import { Singletons } from "../../Singletons";
 import { Comp } from "../../comp/base/Comp";
 import { CompIntf } from "../../comp/base/CompIntf";
 import { Div } from "../../comp/Div";
-
-let S: Singletons;
-PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
-    S = ctx;
-});
+import { NodeCompMarkdown } from "../../comp/node/NodeCompMarkdown";
+import { OpenGraphPanel } from "../../comp/OpenGraphPanel";
+import { NodeActionType } from "../../enums/NodeActionType";
+import { TypeHandlerIntf } from "../../intf/TypeHandlerIntf";
+import * as J from "../../JavaIntf";
+import { S } from "../../Singletons";
 
 /* NOTE: Defaults to only allowing 'admin' to edit unless allowPropertyEdit is overridden */
 export class TypeBase implements TypeHandlerIntf {

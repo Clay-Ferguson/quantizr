@@ -1,7 +1,4 @@
-import { Constants as C } from "../Constants";
 import * as I from "../Interfaces";
-import { PubSub } from "../PubSub";
-import { Singletons } from "../Singletons";
 import { ValidatedState } from "../ValidatedState";
 import { Anchor } from "./Anchor";
 import { Div } from "./Div";
@@ -10,11 +7,6 @@ import { Input } from "./Input";
 import { Label } from "./Label";
 import { Span } from "./Span";
 import { ToggleIcon } from "./ToggleIcon";
-
-let S: Singletons;
-PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
-    S = ctx;
-});
 
 interface LS {
     inputType?: string;

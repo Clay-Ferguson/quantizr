@@ -1,18 +1,12 @@
 import { Constants as C } from "../Constants";
 import { TypeHandlerIntf } from "../intf/TypeHandlerIntf";
 import { NodeHistoryItem } from "../NodeHistoryItem";
-import { PubSub } from "../PubSub";
-import { Singletons } from "../Singletons";
+import { S } from "../Singletons";
 import { CompIntf } from "./base/CompIntf";
 import { Checkbox } from "./Checkbox";
 import { Div } from "./Div";
 import { Icon } from "./Icon";
 import { Span } from "./Span";
-
-let S: Singletons;
-PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
-    S = ctx;
-});
 
 export class HistoryPanel extends Div {
     private static MAX_SUBITEMS = 5;

@@ -1,14 +1,7 @@
 import React from "react";
-import { Constants as C } from "../Constants";
-import { PubSub } from "../PubSub";
-import { Singletons } from "../Singletons";
+import { S } from "../Singletons";
 import { Comp } from "./base/Comp";
 import { CompIntf } from "./base/CompIntf";
-
-let S: Singletons;
-PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
-    S = ctx;
-});
 
 // see: https://www.npmjs.com/package/react-emoji-render
 // https://codesandbox.io/s/xjpy58llxq

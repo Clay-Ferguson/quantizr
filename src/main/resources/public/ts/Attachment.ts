@@ -1,21 +1,13 @@
 import { AppState } from "./AppState";
-import { Constants as C } from "./Constants";
 import { ConfirmDlg } from "./dlg/ConfirmDlg";
 import { UploadFromFileDropzoneDlg } from "./dlg/UploadFromFileDropzoneDlg";
 import { UploadFromIPFSDlg } from "./dlg/UploadFromIPFSDlg";
 import { UploadFromTorrentDlg } from "./dlg/UploadFromTorrentDlg";
 import { UploadFromUrlDlg } from "./dlg/UploadFromUrlDlg";
 import * as J from "./JavaIntf";
-import { PubSub } from "./PubSub";
-import { Singletons } from "./Singletons";
-
-let S: Singletons;
-PubSub.sub(C.PUBSUB_SingletonsReady, (s: Singletons) => {
-    S = s;
-});
+import { S } from "./Singletons";
 
 export class Attachment {
-
     openUploadFromFileDlg = (toIpfs: boolean, node: J.NodeInfo, autoAddFile: File, state: AppState): void => {
         if (node == null) {
             node = S.nodeUtil.getHighlightedNode(state);

@@ -1,15 +1,7 @@
-import { Constants as C } from "../Constants";
 import * as I from "../Interfaces";
-import { PubSub } from "../PubSub";
-import { Singletons } from "../Singletons";
 import { ValidatedState } from "../ValidatedState";
 import { Div } from "./Div";
 import { Input } from "./Input";
-
-let S: Singletons;
-PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
-    S = ctx;
-});
 
 export class TimeField extends Div implements I.ValueIntf {
 

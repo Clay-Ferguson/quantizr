@@ -1,12 +1,4 @@
 import { AppState } from "../AppState";
-import { CompValueHolder } from "../CompValueHolder";
-import { Constants as C } from "../Constants";
-import { DialogBase } from "../DialogBase";
-import * as J from "../JavaIntf";
-import { NodeInfo } from "../JavaIntf";
-import { PubSub } from "../PubSub";
-import { Singletons } from "../Singletons";
-import { ValidatedState } from "../ValidatedState";
 import { Anchor } from "../comp/Anchor";
 import { CompIntf } from "../comp/base/CompIntf";
 import { Button } from "../comp/Button";
@@ -17,12 +9,13 @@ import { RadioButton } from "../comp/RadioButton";
 import { RadioButtonGroup } from "../comp/RadioButtonGroup";
 import { TextField } from "../comp/TextField";
 import { VerticalLayout } from "../comp/VerticalLayout";
+import { CompValueHolder } from "../CompValueHolder";
+import { DialogBase } from "../DialogBase";
+import * as J from "../JavaIntf";
+import { NodeInfo } from "../JavaIntf";
+import { S } from "../Singletons";
+import { ValidatedState } from "../ValidatedState";
 import { MessageDlg } from "./MessageDlg";
-
-let S: Singletons;
-PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
-    S = ctx;
-});
 
 interface LS {
     exportType: string;

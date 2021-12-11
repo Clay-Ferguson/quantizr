@@ -1,19 +1,11 @@
 import { store } from "../AppRedux";
 import { AppState } from "../AppState";
-import { Constants as C } from "../Constants";
-import { LogViewIntf } from "../intf/LogViewIntf";
-import { TabDataIntf } from "../intf/TabDataIntf";
-import { Log } from "../Log";
-import { PubSub } from "../PubSub";
-import { Singletons } from "../Singletons";
 import { AppTab } from "../comp/AppTab";
 import { Heading } from "../comp/Heading";
 import { Html } from "../comp/Html";
-
-let S: Singletons;
-PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
-    S = ctx;
-});
+import { LogViewIntf } from "../intf/LogViewIntf";
+import { TabDataIntf } from "../intf/TabDataIntf";
+import { Log } from "../Log";
 
 export class LogView extends AppTab implements LogViewIntf {
     static logs: string = "";

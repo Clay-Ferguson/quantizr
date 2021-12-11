@@ -1,20 +1,14 @@
 import * as d3 from "d3";
 import { AppState } from "../AppState";
+import { Constants as C } from "../Constants";
 import * as J from "../JavaIntf";
-import { PubSub } from "../PubSub";
-import { Singletons } from "../Singletons";
+import { S } from "../Singletons";
 import { Div } from "./Div";
 import { Main } from "./Main";
-import { Constants as C } from "../Constants";
 
 // https://observablehq.com/@d3/force-directed-tree
 // https://www.npmjs.com/package/d3
 // https://d3js.org/
-
-let S: Singletons;
-PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
-    S = ctx;
-});
 
 interface LS {
     data: J.GraphNode;

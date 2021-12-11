@@ -1,21 +1,14 @@
 import { AppState } from "../AppState";
-import { Constants as C } from "../Constants";
-import { DialogBase } from "../DialogBase";
-import { DialogMode } from "../enums/DialogMode";
-import { PubSub } from "../PubSub";
-import { Singletons } from "../Singletons";
 import { CompIntf } from "../comp/base/CompIntf";
 import { Button } from "../comp/Button";
 import { ButtonBar } from "../comp/ButtonBar";
 import { Div } from "../comp/Div";
 import { Spinner } from "../comp/Spinner";
+import { DialogBase } from "../DialogBase";
+import { DialogMode } from "../enums/DialogMode";
+import { S } from "../Singletons";
 import { AudioPlayerDlg } from "./AudioPlayerDlg";
 import { VideoPlayerDlg } from "./VideoPlayerDlg";
-
-let S: Singletons;
-PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
-    S = ctx;
-});
 
 interface LS {
     done?: boolean;

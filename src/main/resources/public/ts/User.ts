@@ -4,16 +4,9 @@ import { Constants as C } from "./Constants";
 import { ConfirmDlg } from "./dlg/ConfirmDlg";
 import { SignupDlg } from "./dlg/SignupDlg";
 import * as J from "./JavaIntf";
-import { PubSub } from "./PubSub";
-import { Singletons } from "./Singletons";
-
-let S: Singletons;
-PubSub.sub(C.PUBSUB_SingletonsReady, (s: Singletons) => {
-    S = s;
-});
+import { S } from "./Singletons";
 
 export class User {
-
     closeAccountResponse = (): void => {
         /* Remove warning dialog to ask user about leaving the page */
         window.onbeforeunload = null;

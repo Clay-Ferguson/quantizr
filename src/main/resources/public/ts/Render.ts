@@ -4,8 +4,15 @@ import marked from "marked";
 import { toArray } from "react-emoji-render";
 import { dispatch } from "./AppRedux";
 import { AppState } from "./AppState";
+import { Comp } from "./comp/base/Comp";
+import { CollapsiblePanel } from "./comp/CollapsiblePanel";
+import { Div } from "./comp/Div";
+import { Heading } from "./comp/Heading";
+import { HorizontalLayout } from "./comp/HorizontalLayout";
+import { Img } from "./comp/Img";
 import { NodeCompTableRowLayout } from "./comp/node/NodeCompTableRowLayout";
 import { NodeCompVerticalRowLayout } from "./comp/node/NodeCompVerticalRowLayout";
+import { Span } from "./comp/Span";
 import { Constants as C } from "./Constants";
 import { MessageDlg } from "./dlg/MessageDlg";
 import { UserProfileDlg } from "./dlg/UserProfileDlg";
@@ -13,20 +20,7 @@ import { NodeActionType } from "./enums/NodeActionType";
 import { TypeHandlerIntf } from "./intf/TypeHandlerIntf";
 import * as J from "./JavaIntf";
 import { PubSub } from "./PubSub";
-import { Singletons } from "./Singletons";
-import { Comp } from "./comp/base/Comp";
-import { CollapsiblePanel } from "./comp/CollapsiblePanel";
-import { Div } from "./comp/Div";
-import { Heading } from "./comp/Heading";
-import { HorizontalLayout } from "./comp/HorizontalLayout";
-import { Img } from "./comp/Img";
-import { Span } from "./comp/Span";
-
-let S: Singletons;
-PubSub.sub(C.PUBSUB_SingletonsReady, (s: Singletons) => {
-    S = s;
-    highlightjs.initHighlightingOnLoad();
-});
+import { S } from "./Singletons";
 
 function imageErrorFunc(evt: any) {
     console.log("remove broken img");
@@ -47,6 +41,10 @@ export class Render {
 
     fadeInId: string;
     allowFadeInId: boolean = false;
+
+    constructor() {
+        highlightjs.initHighlightingOnLoad();
+    }
 
     injectSubstitutions = (node: J.NodeInfo, val: string): string => {
         val = S.util.replaceAll(val, "{{locationOrigin}}", window.location.origin);

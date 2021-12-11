@@ -1,16 +1,10 @@
 import { useSelector } from "react-redux";
 import { AppState } from "../AppState";
 import { Constants as C } from "../Constants";
-import { PubSub } from "../PubSub";
-import { Singletons } from "../Singletons";
+import { S } from "../Singletons";
 import { Comp } from "./base/Comp";
 import { Div } from "./Div";
 import { IconButton } from "./IconButton";
-
-let S: Singletons;
-PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
-    S = ctx;
-});
 
 export class FullScreenControlBar extends Div {
 

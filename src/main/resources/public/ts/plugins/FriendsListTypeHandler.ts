@@ -3,17 +3,10 @@ import { Comp } from "../comp/base/Comp";
 import { Div } from "../comp/Div";
 import { Heading } from "../comp/Heading";
 import { HelpButton } from "../comp/HelpButton";
-import { Constants as C } from "../Constants";
 import { NodeActionType } from "../enums/NodeActionType";
 import * as J from "../JavaIntf";
-import { PubSub } from "../PubSub";
-import { Singletons } from "../Singletons";
+import { S } from "../Singletons";
 import { TypeBase } from "./base/TypeBase";
-
-let S: Singletons;
-PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
-    S = ctx;
-});
 
 export class FriendsListTypeHandler extends TypeBase {
     constructor() {

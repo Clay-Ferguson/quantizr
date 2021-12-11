@@ -2,13 +2,7 @@ import WebTorrent from "webtorrent";
 import { dispatch } from "./AppRedux";
 import { AppState } from "./AppState";
 import { Constants as C } from "./Constants";
-import { PubSub } from "./PubSub";
-import { Singletons } from "./Singletons";
-
-let S: Singletons;
-PubSub.sub(C.PUBSUB_SingletonsReady, (s: Singletons) => {
-    S = s;
-});
+import { S } from "./Singletons";
 
 export class Torrent {
     wtc: WebTorrent.Instance = new WebTorrent();

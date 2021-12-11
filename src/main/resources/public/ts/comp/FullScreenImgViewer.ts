@@ -3,14 +3,8 @@ import { AppState } from "../AppState";
 import { NodeCompBinary } from "../comp/node/NodeCompBinary";
 import { Constants as C } from "../Constants";
 import * as J from "../JavaIntf";
-import { PubSub } from "../PubSub";
-import { Singletons } from "../Singletons";
+import { S } from "../Singletons";
 import { Main } from "./Main";
-
-let S: Singletons;
-PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
-    S = ctx;
-});
 
 export class FullScreenImgViewer extends Main {
 

@@ -2,17 +2,11 @@ import { useSelector } from "react-redux";
 import { AppState } from "../AppState";
 import { Constants as C } from "../Constants";
 import { TabDataIntf } from "../intf/TabDataIntf";
-import { PubSub } from "../PubSub";
-import { Singletons } from "../Singletons";
+import { S } from "../Singletons";
 import { Anchor } from "./Anchor";
 import { Div } from "./Div";
 import { Li } from "./Li";
 import { Ul } from "./Ul";
-
-let S: Singletons;
-PubSub.sub(C.PUBSUB_SingletonsReady, (s: Singletons) => {
-    S = s;
-});
 
 export class TabPanelButtons extends Div {
 

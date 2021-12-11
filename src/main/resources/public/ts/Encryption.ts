@@ -1,14 +1,6 @@
-import { Constants as C } from "./Constants";
 import { EncryptionKeyPair } from "./EncryptionKeyPair";
 import * as J from "./JavaIntf";
-import { PubSub } from "./PubSub";
-import { Singletons } from "./Singletons";
-
-let S: Singletons;
-PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
-    S = ctx;
-});
-
+import { S } from "./Singletons";
 interface SymKeyDataPackage {
     cipherText: string;
     cipherKey: string;

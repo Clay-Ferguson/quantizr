@@ -1,19 +1,12 @@
 import { AppState } from "../AppState";
-import { Constants as C } from "../Constants";
-import { NodeActionType } from "../enums/NodeActionType";
-import * as J from "../JavaIntf";
-import { PubSub } from "../PubSub";
-import { Singletons } from "../Singletons";
 import { Comp } from "../comp/base/Comp";
 import { Button } from "../comp/Button";
 import { ButtonBar } from "../comp/ButtonBar";
 import { Div } from "../comp/Div";
+import { NodeActionType } from "../enums/NodeActionType";
+import * as J from "../JavaIntf";
+import { S } from "../Singletons";
 import { TypeBase } from "./base/TypeBase";
-
-let S: Singletons;
-PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
-    S = ctx;
-});
 
 export class RoomTypeHandler extends TypeBase {
     static helpExpanded: boolean;

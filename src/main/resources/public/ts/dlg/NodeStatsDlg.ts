@@ -1,10 +1,4 @@
 import { AppState } from "../AppState";
-import { Constants as C } from "../Constants";
-import { DialogBase } from "../DialogBase";
-import * as J from "../JavaIntf";
-import { PubSub } from "../PubSub";
-import { Singletons } from "../Singletons";
-import { FeedView } from "../tabs/FeedView";
 import { CompIntf } from "../comp/base/CompIntf";
 import { Button } from "../comp/Button";
 import { ButtonBar } from "../comp/ButtonBar";
@@ -13,12 +7,11 @@ import { Heading } from "../comp/Heading";
 import { HelpButton } from "../comp/HelpButton";
 import { Span } from "../comp/Span";
 import { TextContent } from "../comp/TextContent";
+import { Constants as C } from "../Constants";
+import { DialogBase } from "../DialogBase";
+import * as J from "../JavaIntf";
+import { S } from "../Singletons";
 import { SearchContentDlg } from "./SearchContentDlg";
-
-let S: Singletons;
-PubSub.sub(C.PUBSUB_SingletonsReady, (s: Singletons) => {
-    S = s;
-});
 
 export class NodeStatsDlg extends DialogBase {
     constructor(private res: J.GetNodeStatsResponse, public trending: boolean, public feed: boolean, state: AppState) {

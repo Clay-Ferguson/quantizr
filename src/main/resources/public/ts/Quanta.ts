@@ -10,13 +10,7 @@ import { MainMenuDlg } from "./dlg/MainMenuDlg";
 import * as J from "./JavaIntf";
 import { Log } from "./Log";
 import { NodeHistoryItem } from "./NodeHistoryItem";
-import { PubSub } from "./PubSub";
-import { Singletons } from "./Singletons";
-
-let S: Singletons;
-PubSub.sub(C.PUBSUB_SingletonsReady, (s: Singletons) => {
-    S = s;
-});
+import { S } from "./Singletons";
 
 export class Quanta {
     config: any;

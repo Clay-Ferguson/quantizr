@@ -1,21 +1,13 @@
 import { useSelector } from "react-redux";
 import { AppState } from "../AppState";
-import { Constants as C } from "../Constants";
-import { TabDataIntf } from "../intf/TabDataIntf";
-import { PubSub } from "../PubSub";
-import { Singletons } from "../Singletons";
 import { AppTab } from "../comp/AppTab";
 import { BreadcrumbsPanel } from "../comp/BreadcrumbsPanel";
+import { Clearfix } from "../comp/Clearfix";
 import { Div } from "../comp/Div";
 import { Html } from "../comp/Html";
 import { NodeCompMainList } from "../comp/node/NodeCompMainList";
 import { NodeCompMainNode } from "../comp/node/NodeCompMainNode";
-import { Clearfix } from "../comp/Clearfix";
-
-let S: Singletons;
-PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
-    S = ctx;
-});
+import { TabDataIntf } from "../intf/TabDataIntf";
 
 /* General Widget that doesn't fit any more reusable or specific category other than a plain Div, but inherits capability of Comp class */
 export class MainTabComp extends AppTab {

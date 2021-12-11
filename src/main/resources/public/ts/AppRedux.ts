@@ -1,17 +1,9 @@
 import { useSelector } from "react-redux";
 import { createStore } from "redux";
 import { AppState } from "./AppState";
-import { Constants as C } from "./Constants";
 import { AppAction } from "./Interfaces";
-import { PubSub } from "./PubSub";
-import { Singletons } from "./Singletons";
 
 export const initialState = new AppState();
-
-let S: Singletons;
-PubSub.sub(C.PUBSUB_SingletonsReady, (s: Singletons) => {
-    S = s;
-});
 
 /**
  * Takes a state as input, does the action on it, and returns the resulting new state.

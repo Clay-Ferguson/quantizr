@@ -1,19 +1,12 @@
 import { useSelector } from "react-redux";
 import { AppState } from "../AppState";
-import { Constants as C } from "../Constants";
-import { TabDataIntf } from "../intf/TabDataIntf";
-import { PubSub } from "../PubSub";
-import { Singletons } from "../Singletons";
 import { AppTab } from "../comp/AppTab";
 import { Button } from "../comp/Button";
 import { Div } from "../comp/Div";
 import { Heading } from "../comp/Heading";
 import { Pre } from "../comp/Pre";
-
-let S: Singletons;
-PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
-    S = ctx;
-});
+import { TabDataIntf } from "../intf/TabDataIntf";
+import { S } from "../Singletons";
 
 export class ServerInfoView extends AppTab {
 

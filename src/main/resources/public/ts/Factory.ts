@@ -12,7 +12,6 @@ being a problem is by having the rule that no other modules are allowed to impor
 but only the interface of it.
 */
 import { Attachment } from "./Attachment";
-import { Constants as C } from "./Constants";
 import { DomUtil } from "./DomUtil";
 import { Edit } from "./Edit";
 import { Encryption } from "./Encryption";
@@ -21,12 +20,11 @@ import { Nav } from "./Nav";
 import { NodeUtil } from "./NodeUtil";
 import { PluginMgr } from "./PluginMgr";
 import { Props } from "./Props";
-import { PubSub } from "./PubSub";
 import { Quanta } from "./Quanta";
 import { Render } from "./Render";
 import { Search } from "./Search";
 import { ServerPush } from "./ServerPush";
-import { Singletons } from "./Singletons";
+import { S } from "./Singletons";
 import { SpeechRecog } from "./SpeechRecog";
 import { TabUtil } from "./TabUtil";
 import { Torrent } from "./Torrent";
@@ -34,8 +32,9 @@ import { User } from "./User";
 import { Util } from "./Util";
 import { View } from "./View";
 
+// let S: Singletons = {} as any;
+
 export class Factory {
-    S: Singletons;
 
     /*
      * Just like in a SpringContext, we init all singletons up front and this allows circular references
@@ -43,33 +42,29 @@ export class Factory {
      */
     constructor() {
         try {
-            this.S = {
-                quanta: new Quanta(),
-                plugin: new PluginMgr(),
-                util: new Util(),
-                domUtil: new DomUtil(),
-                tabUtil: new TabUtil(),
-                nodeUtil: new NodeUtil(),
-                push: new ServerPush(),
-                edit: new Edit(),
-                attachment: new Attachment(),
-                encryption: new Encryption(),
-                nav: new Nav(),
-                props: new Props(),
-                render: new Render(),
-                srch: new Search(),
-                user: new User(),
-                view: new View(),
-                localDB: new LocalDB(),
-                speech: new SpeechRecog(),
-                torrent: new Torrent()
-            };
-
-            PubSub.pub(C.PUBSUB_SingletonsReady, this.S);
+            S.quanta = new Quanta();
+            S.plugin = new PluginMgr();
+            S.util = new Util();
+            S.domUtil = new DomUtil();
+            S.tabUtil = new TabUtil();
+            S.nodeUtil = new NodeUtil();
+            S.push = new ServerPush();
+            S.edit = new Edit();
+            S.attachment = new Attachment();
+            S.encryption = new Encryption();
+            S.nav = new Nav();
+            S.props = new Props();
+            S.render = new Render();
+            S.srch = new Search();
+            S.user = new User();
+            S.view = new View();
+            S.localDB = new LocalDB();
+            S.speech = new SpeechRecog();
+            S.torrent = new Torrent();
 
             // This is basically our main entrypoint into the app. This must ONLY be called after the SingletonsReady has been
             // called (line above) initializing all of them and wiring them all up.
-            this.S.quanta.initApp();
+            S.quanta.initApp();
         }
         catch (e) {
             alert("app failed to initialize components.");

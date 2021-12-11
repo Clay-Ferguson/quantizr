@@ -1,12 +1,10 @@
 import { AppState } from "../AppState";
-import { Constants as C } from "../Constants";
-import { DialogBase } from "../DialogBase";
-import { DialogMode } from "../enums/DialogMode";
-import { PubSub } from "../PubSub";
-import { Singletons } from "../Singletons";
 import { Anchor } from "../comp/Anchor";
 import { CompIntf } from "../comp/base/CompIntf";
 import { Div } from "../comp/Div";
+import { DialogBase } from "../DialogBase";
+import { DialogMode } from "../enums/DialogMode";
+import { S } from "../Singletons";
 
 /* IMPORTANT:
 This class is no longer being used because all the appendTo function of WebTorrent actually
@@ -20,11 +18,6 @@ with unknown file types.
  pull in the JS like below (in which case we can also remove NodePolyfillPlugin too
  from the webpack config script) */
 // import WebTorrent from "webtorrent/webtorrent.min.js";
-
-let S: Singletons;
-PubSub.sub(C.PUBSUB_SingletonsReady, (ctx: Singletons) => {
-    S = ctx;
-});
 
 interface LS {
     downloadLink: string;

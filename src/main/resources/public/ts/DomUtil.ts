@@ -1,12 +1,6 @@
 import { Comp } from "./comp/base/Comp";
 import { Constants as C } from "./Constants";
-import { PubSub } from "./PubSub";
-import { Singletons } from "./Singletons";
-
-let S: Singletons;
-PubSub.sub(C.PUBSUB_SingletonsReady, (s: Singletons) => {
-    S = s;
-});
+import { S } from "./Singletons";
 
 export class DomUtil {
     getPropFromDom = (evt: Event, prop: string): string => {

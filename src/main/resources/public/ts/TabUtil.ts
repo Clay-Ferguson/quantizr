@@ -8,7 +8,7 @@ import { TabDataIntf } from "./intf/TabDataIntf";
 import { PubSub } from "./PubSub";
 import { ResultSetInfo } from "./ResultSetInfo";
 import { SharesRSInfo } from "./SharesRSInfo";
-import { Singletons } from "./Singletons";
+import { S } from "./Singletons";
 import { FeedView } from "./tabs/FeedView";
 import { FeedViewProps } from "./tabs/FeedViewProps";
 import { FollowersResultSetView } from "./tabs/FollowersResultSetView";
@@ -22,11 +22,6 @@ import { TrendingView } from "./tabs/TrendingView";
 import { TimelineRSInfo } from "./TimelineRSInfo";
 import { TrendingRSInfo } from "./TrendingRSInfo";
 import { ValidatedState } from "./ValidatedState";
-
-let S: Singletons;
-PubSub.sub(C.PUBSUB_SingletonsReady, (s: Singletons) => {
-    S = s;
-});
 
 export class TabUtil {
     selectTab = (tabName: string): void => {

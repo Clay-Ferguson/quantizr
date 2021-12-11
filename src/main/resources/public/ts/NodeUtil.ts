@@ -5,13 +5,7 @@ import { LoadNodeFromIpfsDlg } from "./dlg/LoadNodeFromIpfsDlg";
 import { TabDataIntf } from "./intf/TabDataIntf";
 import * as J from "./JavaIntf";
 import { Log } from "./Log";
-import { PubSub } from "./PubSub";
-import { Singletons } from "./Singletons";
-
-let S: Singletons;
-PubSub.sub(C.PUBSUB_SingletonsReady, (s: Singletons) => {
-    S = s;
-});
+import { S } from "./Singletons";
 
 export class NodeUtil {
     getSelNodeIdsArray = (state: AppState): string[] => {

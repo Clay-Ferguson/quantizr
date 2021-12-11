@@ -3,16 +3,9 @@ import { AppState } from "../AppState";
 import { NodeCompContent } from "../comp/node/NodeCompContent";
 import { NodeCompTableRowLayout } from "../comp/node/NodeCompTableRowLayout";
 import { NodeCompVerticalRowLayout } from "../comp/node/NodeCompVerticalRowLayout";
-import { Constants as C } from "../Constants";
 import * as J from "../JavaIntf";
-import { PubSub } from "../PubSub";
-import { Singletons } from "../Singletons";
+import { S } from "../Singletons";
 import { Div } from "./Div";
-
-let S: Singletons;
-PubSub.sub(C.PUBSUB_SingletonsReady, (s: Singletons) => {
-    S = s;
-});
 
 interface LS {
     welcomeNode: J.NodeInfo;
