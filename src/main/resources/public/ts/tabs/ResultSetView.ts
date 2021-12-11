@@ -7,7 +7,7 @@ import { Div } from "../comp/core/Div";
 import { Heading } from "../comp/core/Heading";
 import { IconButton } from "../comp/core/IconButton";
 import { Span } from "../comp/core/Span";
-import { TextContent } from "../comp/TextContent";
+import { TextContent } from "../comp/core/TextContent";
 import { TabDataIntf } from "../intf/TabDataIntf";
 import * as J from "../JavaIntf";
 import { S } from "../Singletons";

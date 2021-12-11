@@ -1,5 +1,5 @@
 import { ReactNode } from "react";
-import { Comp } from "./base/Comp";
+import { Comp } from "../base/Comp";
 
 export class Progress extends Comp {
 

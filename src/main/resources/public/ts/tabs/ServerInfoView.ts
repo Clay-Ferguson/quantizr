@@ -4,7 +4,7 @@ import { AppTab } from "../comp/AppTab";
 import { Button } from "../comp/core/Button";
 import { Div } from "../comp/core/Div";
 import { Heading } from "../comp/core/Heading";
-import { Pre } from "../comp/Pre";
+import { Pre } from "../comp/core/Pre";
 import { TabDataIntf } from "../intf/TabDataIntf";
 import { S } from "../Singletons";
 

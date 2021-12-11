@@ -1,5 +1,5 @@
 import { ReactNode } from "react";
-import { Comp } from "../comp/base/Comp";
+import { Comp } from "../base/Comp";
 
 interface LS {
     text: string;

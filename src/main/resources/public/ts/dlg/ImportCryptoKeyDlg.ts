@@ -4,7 +4,7 @@ import { Button } from "../comp/core/Button";
 import { ButtonBar } from "../comp/core/ButtonBar";
 import { Form } from "../comp/core/Form";
 import { TextArea } from "../comp/core/TextArea";
-import { TextContent } from "../comp/TextContent";
+import { TextContent } from "../comp/core/TextContent";
 import { DialogBase } from "../DialogBase";
 import { S } from "../Singletons";
 import { ValidatedState } from "../ValidatedState";

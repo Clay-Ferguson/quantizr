@@ -16,7 +16,7 @@ import { Icon } from "../comp/core/Icon";
 import { IconButton } from "../comp/core/IconButton";
 import { Span } from "../comp/core/Span";
 import { Spinner } from "../comp/core/Spinner";
-import { TextContent } from "../comp/TextContent";
+import { TextContent } from "../comp/core/TextContent";
 import { TextField } from "../comp/core/TextField";
 import { Constants as C } from "../Constants";
 import { EditNodeDlg } from "../dlg/EditNodeDlg";

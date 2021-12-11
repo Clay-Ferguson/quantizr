@@ -6,7 +6,7 @@ import { Div } from "../comp/core/Div";
 import { Heading } from "../comp/core/Heading";
 import { HelpButton } from "../comp/core/HelpButton";
 import { Span } from "../comp/core/Span";
-import { TextContent } from "../comp/TextContent";
+import { TextContent } from "../comp/core/TextContent";
 import { Constants as C } from "../Constants";
 import { DialogBase } from "../DialogBase";
 import * as J from "../JavaIntf";

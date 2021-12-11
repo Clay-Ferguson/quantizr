@@ -5,7 +5,7 @@ import { TabDataIntf } from "../intf/TabDataIntf";
 import { S } from "../Singletons";
 import { Anchor } from "../comp/core/Anchor";
 import { Div } from "../comp/core/Div";
-import { Li } from "./Li";
+import { Li } from "./core/Li";
 import { Ul } from "./core/Ul";
 
 export class TabPanelButtons extends Div {

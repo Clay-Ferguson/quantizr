@@ -4,7 +4,7 @@ import { CompIntf } from "../comp/base/CompIntf";
 import { Button } from "../comp/core/Button";
 import { ButtonBar } from "../comp/core/ButtonBar";
 import { Form } from "../comp/core/Form";
-import { TextContent } from "../comp/TextContent";
+import { TextContent } from "../comp/core/TextContent";
 import { TextField } from "../comp/core/TextField";
 import { DialogBase } from "../DialogBase";
 import * as J from "../JavaIntf";

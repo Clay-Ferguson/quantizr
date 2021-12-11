@@ -15,7 +15,7 @@ import { IconButton } from "../comp/core/IconButton";
 import { Img } from "../comp/core/Img";
 import { Span } from "../comp/core/Span";
 import { Spinner } from "../comp/core/Spinner";
-import { TextContent } from "../comp/TextContent";
+import { TextContent } from "../comp/core/TextContent";
 import { Constants as C } from "../Constants";
 import { AudioPlayerDlg } from "../dlg/AudioPlayerDlg";
 import { NodeActionType } from "../enums/NodeActionType";

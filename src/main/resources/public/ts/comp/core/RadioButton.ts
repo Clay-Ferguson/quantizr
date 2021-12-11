@@ -1,6 +1,6 @@
 import { ReactNode } from "react";
-import { ValueIntf } from "../Interfaces";
-import { Comp } from "./base/Comp";
+import { ValueIntf } from "../../Interfaces";
+import { Comp } from "../base/Comp";
 
 /* I never got state management working with this radio button properly.
 
