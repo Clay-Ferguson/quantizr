@@ -3,10 +3,10 @@ import { AppState } from "../AppState";
 import { Constants as C } from "../Constants";
 import { TabDataIntf } from "../intf/TabDataIntf";
 import { S } from "../Singletons";
-import { Anchor } from "./Anchor";
-import { Div } from "./Div";
+import { Anchor } from "../comp/core/Anchor";
+import { Div } from "../comp/core/Div";
 import { Li } from "./Li";
-import { Ul } from "./Ul";
+import { Ul } from "./core/Ul";
 
 export class TabPanelButtons extends Div {
 

@@ -1,7 +1,7 @@
 import { AppState } from "../AppState";
 import { Comp } from "../comp/base/Comp";
-import { Div } from "../comp/Div";
-import { Heading } from "../comp/Heading";
+import { Div } from "../comp/core/Div";
+import { Heading } from "../comp/core/Heading";
 import { UserProfileDlg } from "../dlg/UserProfileDlg";
 import { NodeActionType } from "../enums/NodeActionType";
 import * as J from "../JavaIntf";

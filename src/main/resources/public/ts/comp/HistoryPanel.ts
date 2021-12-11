@@ -3,10 +3,10 @@ import { TypeHandlerIntf } from "../intf/TypeHandlerIntf";
 import { NodeHistoryItem } from "../NodeHistoryItem";
 import { S } from "../Singletons";
 import { CompIntf } from "./base/CompIntf";
-import { Checkbox } from "./Checkbox";
-import { Div } from "./Div";
-import { Icon } from "./Icon";
-import { Span } from "./Span";
+import { Checkbox } from "../comp/core/Checkbox";
+import { Div } from "../comp/core/Div";
+import { Icon } from "../comp/core/Icon";
+import { Span } from "../comp/core/Span";
 
 export class HistoryPanel extends Div {
     private static MAX_SUBITEMS = 5;

@@ -1,8 +1,8 @@
 import { useSelector } from "react-redux";
 import { appState, dispatch, store } from "./AppRedux";
 import { AppState } from "./AppState";
-import { Div } from "./comp/Div";
-import { Icon } from "./comp/Icon";
+import { Div } from "./comp/core/Div";
+import { Icon } from "./comp/core/Icon";
 import { Menu } from "./comp/Menu";
 import { MenuItem } from "./comp/MenuItem";
 import { MenuItemSeparator } from "./comp/MenuItemSeparator";

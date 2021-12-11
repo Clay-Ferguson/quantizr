@@ -1,9 +1,9 @@
 import { AppState } from "../AppState";
 import { CompIntf } from "../comp/base/CompIntf";
-import { Button } from "../comp/Button";
-import { ButtonBar } from "../comp/ButtonBar";
-import { Form } from "../comp/Form";
-import { TextField } from "../comp/TextField";
+import { Button } from "../comp/core/Button";
+import { ButtonBar } from "../comp/core/ButtonBar";
+import { Form } from "../comp/core/Form";
+import { TextField } from "../comp/core/TextField";
 import { DialogBase } from "../DialogBase";
 import * as J from "../JavaIntf";
 import { S } from "../Singletons";

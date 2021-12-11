@@ -3,7 +3,7 @@ import { AppState } from "../AppState";
 import { Constants as C } from "../Constants";
 import * as J from "../JavaIntf";
 import { S } from "../Singletons";
-import { Div } from "./Div";
+import { Div } from "../comp/core/Div";
 import { Main } from "./Main";
 
 // https://observablehq.com/@d3/force-directed-tree

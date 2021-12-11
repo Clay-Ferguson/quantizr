@@ -1,8 +1,8 @@
 import { AppState } from "../AppState";
 import { Comp } from "../comp/base/Comp";
-import { Div } from "../comp/Div";
-import { Heading } from "../comp/Heading";
-import { HelpButton } from "../comp/HelpButton";
+import { Div } from "../comp/core/Div";
+import { Heading } from "../comp/core/Heading";
+import { HelpButton } from "../comp/core/HelpButton";
 import { NodeActionType } from "../enums/NodeActionType";
 import * as J from "../JavaIntf";
 import { S } from "../Singletons";

@@ -3,8 +3,8 @@ import { dispatch } from "../AppRedux";
 import { AppState } from "../AppState";
 import { Comp } from "./base/Comp";
 import { CompIntf } from "./base/CompIntf";
-import { Div } from "./Div";
-import { HorizontalLayout } from "./HorizontalLayout";
+import { Div } from "./core/Div";
+import { HorizontalLayout } from "./core/HorizontalLayout";
 
 interface LS {
     idx?: number;

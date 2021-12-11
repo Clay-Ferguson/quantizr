@@ -1,9 +1,9 @@
 import { AppState } from "../AppState";
 import { CompIntf } from "../comp/base/CompIntf";
-import { Button } from "../comp/Button";
-import { ButtonBar } from "../comp/ButtonBar";
-import { Div } from "../comp/Div";
-import { Form } from "../comp/Form";
+import { Button } from "../comp/core/Button";
+import { ButtonBar } from "../comp/core/ButtonBar";
+import { Div } from "../comp/core/Div";
+import { Form } from "../comp/core/Form";
 import { FriendsTable } from "../comp/FriendsTable";
 import { DialogBase } from "../DialogBase";
 import { ValueIntf } from "../Interfaces";

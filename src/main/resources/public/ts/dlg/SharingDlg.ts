@@ -1,12 +1,12 @@
 import { AppState } from "../AppState";
 import { CompIntf } from "../comp/base/CompIntf";
-import { Button } from "../comp/Button";
-import { ButtonBar } from "../comp/ButtonBar";
-import { Clearfix } from "../comp/Clearfix";
-import { Div } from "../comp/Div";
+import { Button } from "../comp/core/Button";
+import { ButtonBar } from "../comp/core/ButtonBar";
+import { Clearfix } from "../comp/core/Clearfix";
+import { Div } from "../comp/core/Div";
 import { EditPrivsTable } from "../comp/EditPrivsTable";
-import { Form } from "../comp/Form";
-import { HelpButton } from "../comp/HelpButton";
+import { Form } from "../comp/core/Form";
+import { HelpButton } from "../comp/core/HelpButton";
 import { Constants as C } from "../Constants";
 import { DialogBase } from "../DialogBase";
 import * as J from "../JavaIntf";

@@ -1,8 +1,8 @@
 import { TypeHandlerIntf } from "../intf/TypeHandlerIntf";
-import { FlexLayout } from "./FlexLayout";
-import { Icon } from "./Icon";
+import { FlexLayout } from "./core/FlexLayout";
+import { Icon } from "./core/Icon";
 import { ListBoxRow } from "./ListBoxRow";
-import { Span } from "./Span";
+import { Span } from "./core/Span";
 
 /* NOTE: This class doesn't hold any state and is re-rendered when the state in the parent owning it is rendered. */
 export class NodeTypeListBoxRow extends ListBoxRow {

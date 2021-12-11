@@ -1,10 +1,10 @@
 import { AppState } from "../AppState";
 import { Comp } from "../comp/base/Comp";
-import { Button } from "../comp/Button";
-import { ButtonBar } from "../comp/ButtonBar";
-import { Clearfix } from "../comp/Clearfix";
-import { Heading } from "../comp/Heading";
-import { HorizontalLayout } from "../comp/HorizontalLayout";
+import { Button } from "../comp/core/Button";
+import { ButtonBar } from "../comp/core/ButtonBar";
+import { Clearfix } from "../comp/core/Clearfix";
+import { Heading } from "../comp/core/Heading";
+import { HorizontalLayout } from "../comp/core/HorizontalLayout";
 import { NodeActionType } from "../enums/NodeActionType";
 import * as J from "../JavaIntf";
 import { S } from "../Singletons";

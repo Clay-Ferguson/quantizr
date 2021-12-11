@@ -1,6 +1,6 @@
 import { AppState } from "../AppState";
 import { CompIntf } from "../comp/base/CompIntf";
-import { Heading } from "../comp/Heading";
+import { Heading } from "../comp/core/Heading";
 import { FollowingRSInfo } from "../FollowingRSInfo";
 import { TabDataIntf } from "../intf/TabDataIntf";
 import { S } from "../Singletons";

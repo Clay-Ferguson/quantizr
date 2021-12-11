@@ -1,8 +1,8 @@
 import * as I from "../Interfaces";
 import { ValidatedState } from "../ValidatedState";
 import { CompIntf } from "./base/CompIntf";
-import { DateTimeField } from "./DateTimeField";
-import { Div } from "./Div";
+import { DateTimeField } from "./core/DateTimeField";
+import { Div } from "./core/Div";
 
 export class CompDemo extends Div {
     textarea: I.TextEditorIntf;

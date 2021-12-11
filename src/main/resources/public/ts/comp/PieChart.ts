@@ -1,6 +1,6 @@
 import * as d3 from "d3";
-import { Div } from "./Div";
-import { Svg } from "./Svg";
+import { Div } from "../comp/core/Div";
+import { Svg } from "../comp/core/Svg";
 
 interface LS {
 }

@@ -5,7 +5,7 @@ import { NodeCompTableRowLayout } from "../comp/node/NodeCompTableRowLayout";
 import { NodeCompVerticalRowLayout } from "../comp/node/NodeCompVerticalRowLayout";
 import * as J from "../JavaIntf";
 import { S } from "../Singletons";
-import { Div } from "./Div";
+import { Div } from "../comp/core/Div";
 
 interface LS {
     welcomeNode: J.NodeInfo;

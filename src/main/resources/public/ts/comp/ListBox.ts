@@ -1,5 +1,5 @@
 import { ValueIntf } from "../Interfaces";
-import { Div } from "./Div";
+import { Div } from "../comp/core/Div";
 
 export class ListBox extends Div {
 

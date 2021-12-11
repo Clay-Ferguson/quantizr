@@ -3,10 +3,10 @@ import { dispatch } from "../AppRedux";
 import { AppState } from "../AppState";
 import { runClassDemoTest } from "../ClassDemoTest";
 import { Comp } from "./base/Comp";
-import { Button } from "./Button";
-import { CompDemo } from "./CompDemo";
-import { Div } from "./Div";
-import { HorizontalLayout } from "./HorizontalLayout";
+import { Button } from "../comp/core/Button";
+import { CompDemo } from "../comp/CompDemo";
+import { Div } from "../comp/core/Div";
+import { HorizontalLayout } from "../comp/core/HorizontalLayout";
 
 export class AppDemo extends Div {
 

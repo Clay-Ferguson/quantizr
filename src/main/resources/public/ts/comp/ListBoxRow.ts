@@ -1,4 +1,4 @@
-import { Div } from "./Div";
+import { Div } from "../comp/core/Div";
 
 export class ListBoxRow extends Div {
 

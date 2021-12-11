@@ -1,7 +1,7 @@
 import { AppState } from "../../AppState";
 import { Comp } from "../../comp/base/Comp";
 import { CompIntf } from "../../comp/base/CompIntf";
-import { Div } from "../../comp/Div";
+import { Div } from "../../comp/core/Div";
 import { NodeCompMarkdown } from "../../comp/node/NodeCompMarkdown";
 import { OpenGraphPanel } from "../../comp/OpenGraphPanel";
 import { NodeActionType } from "../../enums/NodeActionType";

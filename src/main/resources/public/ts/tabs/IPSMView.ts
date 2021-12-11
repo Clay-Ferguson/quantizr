@@ -3,9 +3,9 @@ import { AppState } from "../AppState";
 import { AppTab } from "../comp/AppTab";
 import { Comp } from "../comp/base/Comp";
 import { CompIntf } from "../comp/base/CompIntf";
-import { Div } from "../comp/Div";
-import { Heading } from "../comp/Heading";
-import { HelpButton } from "../comp/HelpButton";
+import { Div } from "../comp/core/Div";
+import { Heading } from "../comp/core/Heading";
+import { HelpButton } from "../comp/core/HelpButton";
 import { TabDataIntf } from "../intf/TabDataIntf";
 
 export class IPSMView extends AppTab {

@@ -1,8 +1,8 @@
 import { AppState } from "../AppState";
 import { CompIntf } from "../comp/base/CompIntf";
-import { Button } from "../comp/Button";
-import { ButtonBar } from "../comp/ButtonBar";
-import { CollapsiblePanel } from "../comp/CollapsiblePanel";
+import { Button } from "../comp/core/Button";
+import { ButtonBar } from "../comp/core/ButtonBar";
+import { CollapsiblePanel } from "../comp/core/CollapsiblePanel";
 import { PieChart } from "../comp/PieChart";
 import { TextContent } from "../comp/TextContent";
 import { DialogBase } from "../DialogBase";

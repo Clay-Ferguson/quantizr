@@ -1,6 +1,6 @@
 import { AppState } from "../AppState";
 import { Comp } from "../comp/base/Comp";
-import { Div } from "../comp/Div";
+import { Div } from "../comp/core/Div";
 import { Pre } from "../comp/Pre";
 import { NodeActionType } from "../enums/NodeActionType";
 import * as J from "../JavaIntf";

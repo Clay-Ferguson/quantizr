@@ -1,11 +1,11 @@
 import { AppState } from "../AppState";
 import { CompIntf } from "../comp/base/CompIntf";
-import { Button } from "../comp/Button";
-import { ButtonBar } from "../comp/ButtonBar";
+import { Button } from "../comp/core/Button";
+import { ButtonBar } from "../comp/core/ButtonBar";
 import { RadioButton } from "../comp/RadioButton";
 import { RadioButtonGroup } from "../comp/RadioButtonGroup";
 import { TextContent } from "../comp/TextContent";
-import { TextField } from "../comp/TextField";
+import { TextField } from "../comp/core/TextField";
 import { DialogBase } from "../DialogBase";
 import * as J from "../JavaIntf";
 import { S } from "../Singletons";

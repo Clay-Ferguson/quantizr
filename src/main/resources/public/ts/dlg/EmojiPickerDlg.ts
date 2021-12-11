@@ -1,9 +1,9 @@
 import { AppState } from "../AppState";
 import { CompIntf } from "../comp/base/CompIntf";
-import { Button } from "../comp/Button";
-import { ButtonBar } from "../comp/ButtonBar";
-import { EmojiPicker } from "../comp/EmojiPicker";
-import { Form } from "../comp/Form";
+import { Button } from "../comp/core/Button";
+import { ButtonBar } from "../comp/core/ButtonBar";
+import { EmojiPicker } from "../comp/core/EmojiPicker";
+import { Form } from "../comp/core/Form";
 import { DialogBase } from "../DialogBase";
 import { ValueIntf } from "../Interfaces";
 

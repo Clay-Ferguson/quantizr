@@ -1,6 +1,6 @@
 import { ReactNode } from "react";
 import { CompIntf } from "./base/CompIntf";
-import { Div } from "./Div";
+import { Div } from "../comp/core/Div";
 
 interface LS {
     visible: boolean;

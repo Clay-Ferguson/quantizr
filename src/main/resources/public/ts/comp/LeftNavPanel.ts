@@ -5,9 +5,9 @@ import { Constants as C } from "../Constants";
 import { TabDataIntf } from "../intf/TabDataIntf";
 import { MenuPanel } from "../MenuPanel";
 import { S } from "../Singletons";
-import { Div } from "./Div";
-import { Img } from "./Img";
-import { Span } from "./Span";
+import { Div } from "../comp/core/Div";
+import { Img } from "../comp/core/Img";
+import { Span } from "../comp/core/Span";
 
 declare var g_brandingAppName;
 

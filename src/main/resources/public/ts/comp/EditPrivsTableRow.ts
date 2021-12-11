@@ -2,13 +2,13 @@ import { appState } from "../AppRedux";
 import { UserProfileDlg } from "../dlg/UserProfileDlg";
 import * as J from "../JavaIntf";
 import { S } from "../Singletons";
-import { Button } from "./Button";
-import { ButtonBar } from "./ButtonBar";
-import { Div } from "./Div";
-import { Heading } from "./Heading";
-import { Img } from "./Img";
+import { Button } from "../comp/core//Button";
+import { ButtonBar } from "../comp/core/ButtonBar";
+import { Div } from "../comp/core/Div";
+import { Heading } from "../comp/core/Heading";
+import { Img } from "../comp/core/Img";
 import { ListBoxRow } from "./ListBoxRow";
-import { Span } from "./Span";
+import { Span } from "../comp/core/Span";
 
 export class EditPrivsTableRow extends ListBoxRow {
 

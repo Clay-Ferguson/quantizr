@@ -1,8 +1,8 @@
 import { AppState } from "../AppState";
 import { DialogBase } from "../DialogBase";
 import { CompIntf } from "../comp/base/CompIntf";
-import { Div } from "../comp/Div";
-import { Spinner } from "../comp/Spinner";
+import { Div } from "../comp/core/Div";
+import { Spinner } from "../comp/core/Spinner";
 
 export class ProgressDlg extends DialogBase {
 

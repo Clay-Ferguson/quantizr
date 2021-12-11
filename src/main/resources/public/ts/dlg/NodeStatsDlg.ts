@@ -1,11 +1,11 @@
 import { AppState } from "../AppState";
 import { CompIntf } from "../comp/base/CompIntf";
-import { Button } from "../comp/Button";
-import { ButtonBar } from "../comp/ButtonBar";
-import { Div } from "../comp/Div";
-import { Heading } from "../comp/Heading";
-import { HelpButton } from "../comp/HelpButton";
-import { Span } from "../comp/Span";
+import { Button } from "../comp/core/Button";
+import { ButtonBar } from "../comp/core/ButtonBar";
+import { Div } from "../comp/core/Div";
+import { Heading } from "../comp/core/Heading";
+import { HelpButton } from "../comp/core/HelpButton";
+import { Span } from "../comp/core/Span";
 import { TextContent } from "../comp/TextContent";
 import { Constants as C } from "../Constants";
 import { DialogBase } from "../DialogBase";

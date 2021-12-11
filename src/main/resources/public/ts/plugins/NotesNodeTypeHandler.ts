@@ -1,8 +1,8 @@
 import { AppState } from "../AppState";
 import * as J from "../JavaIntf";
 import { Comp } from "../comp/base/Comp";
-import { Div } from "../comp/Div";
-import { Heading } from "../comp/Heading";
+import { Div } from "../comp/core/Div";
+import { Heading } from "../comp/core/Heading";
 import { TypeBase } from "./base/TypeBase";
 
 export class NotesNodeTypeHandler extends TypeBase {

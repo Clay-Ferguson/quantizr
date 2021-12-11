@@ -1,5 +1,5 @@
 import * as I from "../Interfaces";
-import { Div } from "./Div";
+import { Div } from "../comp/core/Div";
 import { EditPrivsTableRow } from "./EditPrivsTableRow";
 import { ListBox } from "./ListBox";
 

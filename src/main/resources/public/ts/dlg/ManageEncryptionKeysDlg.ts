@@ -1,7 +1,7 @@
 import { AppState } from "../AppState";
 import { CompIntf } from "../comp/base/CompIntf";
-import { Button } from "../comp/Button";
-import { ButtonBar } from "../comp/ButtonBar";
+import { Button } from "../comp/core/Button";
+import { ButtonBar } from "../comp/core/ButtonBar";
 import { TextContent } from "../comp/TextContent";
 import { DialogBase } from "../DialogBase";
 import { S } from "../Singletons";

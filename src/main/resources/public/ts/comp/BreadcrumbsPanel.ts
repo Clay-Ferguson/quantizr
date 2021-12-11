@@ -3,8 +3,8 @@ import { AppState } from "../AppState";
 import { TypeHandlerIntf } from "../intf/TypeHandlerIntf";
 import { S } from "../Singletons";
 import { Comp } from "./base/Comp";
-import { Div } from "./Div";
-import { Span } from "./Span";
+import { Div } from "../comp/core/Div";
+import { Span } from "../comp/core/Span";
 
 export class BreadcrumbsPanel extends Div {
     constructor() {

@@ -1,10 +1,10 @@
 import { AppState } from "../AppState";
-import { Anchor } from "../comp/Anchor";
+import { Anchor } from "../comp/core/Anchor";
 import { CompIntf } from "../comp/base/CompIntf";
-import { Div } from "../comp/Div";
-import { HorizontalLayout } from "../comp/HorizontalLayout";
-import { Icon } from "../comp/Icon";
-import { Img } from "../comp/Img";
+import { Div } from "../comp/core/Div";
+import { HorizontalLayout } from "./core/HorizontalLayout";
+import { Icon } from "../comp/core/Icon";
+import { Img } from "../comp/core/Img";
 import * as J from "../JavaIntf";
 import { S } from "../Singletons";
 

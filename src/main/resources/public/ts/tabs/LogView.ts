@@ -1,8 +1,8 @@
 import { store } from "../AppRedux";
 import { AppState } from "../AppState";
 import { AppTab } from "../comp/AppTab";
-import { Heading } from "../comp/Heading";
-import { Html } from "../comp/Html";
+import { Heading } from "../comp/core/Heading";
+import { Html } from "../comp/core/Html";
 import { LogViewIntf } from "../intf/LogViewIntf";
 import { TabDataIntf } from "../intf/TabDataIntf";
 import { Log } from "../Log";

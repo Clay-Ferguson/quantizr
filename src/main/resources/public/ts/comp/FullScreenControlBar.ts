@@ -3,8 +3,8 @@ import { AppState } from "../AppState";
 import { Constants as C } from "../Constants";
 import { S } from "../Singletons";
 import { Comp } from "./base/Comp";
-import { Div } from "./Div";
-import { IconButton } from "./IconButton";
+import { Div } from "../comp/core/Div";
+import { IconButton } from "../comp/core/IconButton";
 
 export class FullScreenControlBar extends Div {
 

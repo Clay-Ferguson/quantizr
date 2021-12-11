@@ -1,7 +1,7 @@
 import { appState, dispatch, store } from "./AppRedux";
 import { AppState } from "./AppState";
 import { Comp } from "./comp/base/Comp";
-import { Div } from "./comp/Div";
+import { Div } from "./comp/core/Div";
 import { NodeCompContent } from "./comp/node/NodeCompContent";
 import { NodeCompRowFooter } from "./comp/node/NodeCompRowFooter";
 import { NodeCompRowHeader } from "./comp/node/NodeCompRowHeader";

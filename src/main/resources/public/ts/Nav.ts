@@ -1,9 +1,9 @@
 import { appState, dispatch } from "./AppRedux";
 import { AppState } from "./AppState";
-import { Button } from "./comp/Button";
-import { ButtonBar } from "./comp/ButtonBar";
-import { Heading } from "./comp/Heading";
-import { VerticalLayout } from "./comp/VerticalLayout";
+import { Button } from "./comp/core/Button";
+import { ButtonBar } from "./comp/core/ButtonBar";
+import { Heading } from "./comp/core/Heading";
+import { VerticalLayout } from "./comp/core/VerticalLayout";
 import { Constants as C } from "./Constants";
 import { LoginDlg } from "./dlg/LoginDlg";
 import { MainMenuDlg } from "./dlg/MainMenuDlg";

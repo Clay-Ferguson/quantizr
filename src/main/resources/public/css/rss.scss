@@ -76,11 +76,7 @@
 
 .rss-feed-image {
     border: 1px solid $nodeBorderBottomColor;
-
-    /* Warning: this 40% is also enforced in the JS code, by post-processing the HTML but before render in react,
-    search for this class name in "RssTypeHandler" */
-    margin-bottom: 12px;
-   
+    margin-bottom: 10px 0px 10px 0px;
     border-radius: $border-radius;
 }
 

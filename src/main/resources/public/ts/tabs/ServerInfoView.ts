@@ -1,9 +1,9 @@
 import { useSelector } from "react-redux";
 import { AppState } from "../AppState";
 import { AppTab } from "../comp/AppTab";
-import { Button } from "../comp/Button";
-import { Div } from "../comp/Div";
-import { Heading } from "../comp/Heading";
+import { Button } from "../comp/core/Button";
+import { Div } from "../comp/core/Div";
+import { Heading } from "../comp/core/Heading";
 import { Pre } from "../comp/Pre";
 import { TabDataIntf } from "../intf/TabDataIntf";
 import { S } from "../Singletons";

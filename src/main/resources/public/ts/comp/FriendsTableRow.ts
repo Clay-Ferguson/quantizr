@@ -2,10 +2,10 @@ import { appState } from "../AppRedux";
 import { UserProfileDlg } from "../dlg/UserProfileDlg";
 import { FriendInfo } from "../JavaIntf";
 import { S } from "../Singletons";
-import { Div } from "./Div";
-import { Img } from "./Img";
+import { Div } from "../comp/core/Div";
+import { Img } from "../comp/core/Img";
 import { ListBoxRow } from "./ListBoxRow";
-import { Span } from "./Span";
+import { Span } from "../comp/core/Span";
 
 export class FriendsTableRow extends ListBoxRow {
 
