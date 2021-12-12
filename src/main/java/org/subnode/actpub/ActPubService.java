@@ -626,7 +626,7 @@ public class ActPubService extends ServiceBase {
         /*
          * First look to see if there is a target node already existing for this so we don't add a duplicate
          */
-        SubNode dupNode = read.findSubNodeByProp(ms, parentNode.getPath(), NodeProp.ACT_PUB_ID.s(), id);
+        SubNode dupNode = read.findNodeByProp(ms, parentNode.getPath(), NodeProp.ACT_PUB_ID.s(), id);
         if (ok(dupNode)) {
             // apUtil.log("duplicate ActivityPub post ignored: " + id);
             return;

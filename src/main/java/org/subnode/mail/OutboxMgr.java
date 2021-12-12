@@ -50,7 +50,7 @@ public class OutboxMgr extends ServiceBase {
 				 * the node in question
 				 */
 				SubNode notifyNode =
-						read.findSubNodeByProp(session, userInbox.getPath(), NodeProp.TARGET_ID.s(), node.getIdStr());
+						read.findNodeByProp(session, userInbox.getPath(), NodeProp.TARGET_ID.s(), node.getIdStr());
 
 				/*
 				 * If there's no notification for this node already in the user's inbox then add one

@@ -973,7 +973,7 @@ public class MongoRead extends ServiceBase {
      * Returns one (or first) node contained directly under path (non-recursively) that has a matching
      * propName and propVal
      */
-    public SubNode findSubNodeByProp(MongoSession ms, String path, String propName, String propVal) {
+    public SubNode findNodeByProp(MongoSession ms, String path, String propName, String propVal) {
 
         // Other wise for ordinary users root is based off their username
         Query query = new Query();
@@ -991,7 +991,7 @@ public class MongoRead extends ServiceBase {
      * Same as findSubNodeByProp but returns multiples. Finda ALL nodes contained directly under path
      * (non-recursively) that has a matching propName and propVal
      */
-    public Iterable<SubNode> findSubNodesByProp(MongoSession ms, String path, String propName, String propVal) {
+    public Iterable<SubNode> findNodesByProp(MongoSession ms, String path, String propName, String propVal) {
 
         // Other wise for ordinary users root is based off their username
         Query query = new Query();
@@ -1006,7 +1006,7 @@ public class MongoRead extends ServiceBase {
     /*
      * Returns one (or first) node that has a matching propName and propVal
      */
-    public SubNode findSubNodeByProp(MongoSession ms, String propName, String propVal) {
+    public SubNode findNodeByProp(MongoSession ms, String propName, String propVal) {
         Query query = new Query();
         Criteria criteria = Criteria.where(SubNode.PROPERTIES + "." + propName + ".value").is(propVal);
         query.addCriteria(criteria);
