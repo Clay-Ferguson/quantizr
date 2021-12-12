@@ -51,7 +51,7 @@ services:
             - "${MONGO_PORT}:${MONGO_PORT}"
         environment:
             MONGO_INITDB_ROOT_USERNAME: root
-            MONGO_INITDB_ROOT_PASSWORD: ${subnodePassword}
+            MONGO_INITDB_ROOT_PASSWORD: ${adminPassword}
         networks:
             - net-distro
         # Always specify version of mongo. When it upgrades automatically there can be database issues that need to be resolved
@@ -86,7 +86,7 @@ services:
         environment:
             XMS: "${XMS}"
             XMX: "${XMX}"
-            mongoAdminPassword: "${subnodePassword}"
+            mongoAdminPassword: "${adminPassword}"
             mongoSecurity: "true"
 
             # NOTE: '>-' removes all newline characters and makes one long string

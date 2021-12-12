@@ -63,7 +63,7 @@ services:
             # examples are "MongoTest,MongoFediverseNamesTest,IPFSTest"
             runTests:
             
-            mongoAdminPassword: "${subnodePassword}"
+            mongoAdminPassword: "${adminPassword}"
             mongoSecurity: "true"
 
             # NOTE: '>-' removes all newline characters and makes one long string

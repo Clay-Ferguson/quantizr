@@ -3,7 +3,7 @@
 
 source ./setenv-distro-runner.sh
 
-mongorestore --username=root --password=${subnodePassword} --authenticationDatabase=admin \
+mongorestore --username=root --password=${adminPassword} --authenticationDatabase=admin \
     --host=${MONGO_HOST} --port=${MONGO_PORT} --gzip --drop --stopOnError --objcheck --verbose \
     --archive="/dumps/dump-to-restore.gz"
 
