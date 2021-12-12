@@ -129,17 +129,6 @@ public class MongoCreate extends ServiceBase {
 
 		auth.auth(ms, node, PrivilegeType.READ);
 
-		// /*
-		//  * First detect any nodes that have no ordinal, and set ordinal to 0. This is basically a data
-		//  * repair because we originally didn't have the MongoEventListener capable of setting any null
-		//  * ordinal to 0L. What we really need is a global fix to all existing databases and then we can
-		//  * remove this check (todo-1)
-		//  */
-		// Criteria criteria = Criteria.where(SubNode.ORDINAL).is(null);
-		// for (SubNode child : read.getChildrenUnderPath(ms, node.getPath(), null, null, 0, null, criteria)) {
-		// 	child.setOrdinal(0L);
-		// }
-
 		// save all if there's any to save.
 		update.saveSession(ms);
 
