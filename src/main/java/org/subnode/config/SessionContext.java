@@ -25,6 +25,9 @@ import org.subnode.util.ThreadLocals;
 import org.subnode.util.Util;
 import static org.subnode.util.Util.*;
 
+/**
+ * Session object holding state per user session.
+ */
 @Component
 @Scope("prototype")
 public class SessionContext {

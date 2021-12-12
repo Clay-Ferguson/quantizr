@@ -41,6 +41,9 @@ import org.subnode.util.ThreadLocals;
 import org.subnode.util.XString;
 import static org.subnode.util.Util.*;
 
+/**
+ * General AP functions
+ */
 @Component
 public class ActPubService extends ServiceBase {
     private static final Logger log = LoggerFactory.getLogger(ActPubService.class);

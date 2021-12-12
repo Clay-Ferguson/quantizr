@@ -11,6 +11,9 @@ import java.util.concurrent.TimeUnit;
 
 /* see: https://dzone.com/articles/graceful-shutdown-spring-boot-applications */
 
+/**
+ * Handles Tomcat shutdown
+ */
 public class GracefulShutdown implements TomcatConnectorCustomizer, ApplicationListener<ContextClosedEvent> {
     private static final Logger log = LoggerFactory.getLogger(GracefulShutdown.class);
     private volatile Connector connector;

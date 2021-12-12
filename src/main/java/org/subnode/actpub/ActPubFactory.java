@@ -17,6 +17,9 @@ import org.subnode.actpub.model.APObj;
 import org.subnode.service.ServiceBase;
 import static org.subnode.util.Util.*;
 
+/**
+ * Convenience factory for some types of AP objects
+ */
 @Controller
 public class ActPubFactory extends ServiceBase {
 	private static final Logger log = LoggerFactory.getLogger(ActPubFactory.class);

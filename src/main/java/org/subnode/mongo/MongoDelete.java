@@ -16,6 +16,9 @@ import org.subnode.mongo.model.SubNode;
 import org.subnode.service.ServiceBase;
 import static org.subnode.util.Util.*;
 
+/**
+ * Performs the 'deletes' (as in CRUD) operations for deleting nodes in MongoDB
+ */
 @Component
 public class MongoDelete extends ServiceBase {
 	private static final Logger log = LoggerFactory.getLogger(MongoDelete.class);

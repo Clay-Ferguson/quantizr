@@ -19,6 +19,9 @@ import org.subnode.model.IPInfo;
 import org.subnode.util.Util;
 import static org.subnode.util.Util.*;
 
+/**
+ * ServletFilter for throttling access
+ */
 @Component
 @Order(3)
 public class ThrottleFilter extends GenericFilterBean {

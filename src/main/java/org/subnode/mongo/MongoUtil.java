@@ -42,6 +42,9 @@ import org.subnode.util.Val;
 import org.subnode.util.XString;
 import static org.subnode.util.Util.*;
 
+/**
+ * Verious utilities related to MongoDB persistence
+ */
 @Component
 public class MongoUtil extends ServiceBase {
 	private static final Logger log = LoggerFactory.getLogger(MongoUtil.class);

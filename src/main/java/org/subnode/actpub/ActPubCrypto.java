@@ -23,6 +23,9 @@ import org.subnode.service.UserManagerService;
 import org.subnode.util.XString;
 import static org.subnode.util.Util.*;
 
+/**
+ * Crypto functions for AP
+ */
 @Component
 public class ActPubCrypto extends ServiceBase {
     private static final Logger log = LoggerFactory.getLogger(ActPubCrypto.class);

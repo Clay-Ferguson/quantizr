@@ -24,6 +24,9 @@ import static org.subnode.util.Util.*;
 
 // @CrossOrigin --> Access-Control-Allow-Credentials
 
+/**
+ * Main REST Controller endpoint for AP
+ */
 @Controller
 // @CrossOrigin (done by AppFilter. Spring doesn't do it.)
 public class ActPubController extends ServiceBase {

@@ -3,6 +3,9 @@ package org.subnode.actpub.model;
 import java.util.LinkedList;
 import java.util.List;
 
+/**
+ * List of objects
+ */
 public class APList extends LinkedList<Object> {
     private static final long serialVersionUID = 1L;
 

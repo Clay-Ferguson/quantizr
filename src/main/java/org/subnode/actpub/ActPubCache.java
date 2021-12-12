@@ -5,6 +5,9 @@ import org.springframework.stereotype.Component;
 import org.subnode.actpub.model.APObj;
 import org.subnode.mongo.model.SubNode;
 
+/**
+ * Holds all the global caches related to AP
+ */
 @Component
 public class ActPubCache {
     /*

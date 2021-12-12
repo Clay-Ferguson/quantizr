@@ -1,5 +1,7 @@
 package org.subnode.service;
 
+import static org.subnode.util.Util.no;
+import static org.subnode.util.Util.ok;
 import java.awt.image.BufferedImage;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
@@ -60,7 +62,6 @@ import org.subnode.model.ipfs.dag.MerkleLink;
 import org.subnode.mongo.CreateNodeLocation;
 import org.subnode.mongo.MongoSession;
 import org.subnode.mongo.model.SubNode;
-import org.subnode.mongo.model.SubNodePropVal;
 import org.subnode.request.DeleteAttachmentRequest;
 import org.subnode.request.UploadFromIPFSRequest;
 import org.subnode.request.UploadFromTorrentRequest;
@@ -79,7 +80,6 @@ import org.subnode.util.StreamUtil;
 import org.subnode.util.ThreadLocals;
 import org.subnode.util.Util;
 import org.subnode.util.Val;
-import static org.subnode.util.Util.*;
 
 /**
  * Service for managing node attachments.

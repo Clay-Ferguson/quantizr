@@ -17,6 +17,9 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.filter.GenericFilterBean;
 import static org.subnode.util.Util.*;
 
+/**
+ * Filter for logging details of any request/response
+ */
 @Component
 @Order(1)
 public class AuditFilter extends GenericFilterBean {

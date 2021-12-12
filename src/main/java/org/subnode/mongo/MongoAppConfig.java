@@ -36,6 +36,9 @@ import static org.subnode.util.Util.*;
 
 // Ref: http://mongodb.github.io/mongo-java-driver/3.7/driver/getting-started/quick-start-pojo/
 
+/**
+ * Spring configuration bean responsible for initializing and setting up MongoDD connection.
+ */
 @Configuration
 @EnableMongoRepositories(basePackages = "org.subnode.mongo")
 // see also: ServerMonitorListener to detect heartbeats, etc.

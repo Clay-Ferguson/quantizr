@@ -30,7 +30,9 @@ import org.subnode.util.Util;
 import org.subnode.util.XString;
 import static org.subnode.util.Util.*;
 
-/*
+/**
+ * Performs the 'create' (as in CRUD) operations for creating new nodes in MongoDB
+ * <p>
  * There are many more opportunities in this class to use the ThreadLocals.nodeCache to store
  * information in the thread for use during context of one call
  */

@@ -29,7 +29,12 @@ cd ${PRJROOT}/src/main/resources/public
 npm config set ignore-scripts true
 
 cd ${PRJROOT}/pom/common
-mvn install
+
+# build with apidocs
+# mvn install javadoc:javadoc 
+
+# build without apidocs
+mvn install -Dmaven.javadoc.skip=true
 
 cd ${PRJROOT}
 # These aren't normally needed, so I'll just keep commented out most of time. 

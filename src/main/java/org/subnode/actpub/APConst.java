@@ -4,6 +4,9 @@ import java.nio.charset.StandardCharsets;
 import java.util.Map;
 import org.springframework.http.MediaType;
 
+/**
+ * Ap-related constants.
+ */
 public class APConst {
     public static final String PATH_WEBFINGER = "/.well-known/webfinger";
     public static final String PATH_INBOX = "/ap/inbox";

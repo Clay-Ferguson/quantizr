@@ -30,6 +30,10 @@ import org.subnode.util.ThreadLocals;
 import org.subnode.util.XString;
 import static org.subnode.util.Util.*;
 
+/**
+ * Service for checking authorization for access to nodes. Checks what users are accessing what
+ * nodes and checks their privileges againts the ACL on the Nodes.
+ */
 @Component
 public class MongoAuth extends ServiceBase {
 	private static final Logger log = LoggerFactory.getLogger(MongoAuth.class);

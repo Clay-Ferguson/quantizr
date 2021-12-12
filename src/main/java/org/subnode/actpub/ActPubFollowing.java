@@ -33,6 +33,9 @@ import org.subnode.util.ThreadLocals;
 import org.subnode.util.XString;
 import static org.subnode.util.Util.*;
 
+/**
+ * Methods relating to AP following
+ */
 @Component
 public class ActPubFollowing extends ServiceBase {
     private static final Logger log = LoggerFactory.getLogger(ActPubFollowing.class);

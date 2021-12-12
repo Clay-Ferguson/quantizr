@@ -14,6 +14,9 @@ import org.subnode.mongo.model.SubNode;
 import org.subnode.service.ServiceBase;
 import static org.subnode.util.Util.*;
 
+/**
+ * Performs the 'create' (as in CRUD) operations for creating new nodes in MongoDB
+ */
 @Component
 public class MongoCreate extends ServiceBase {
 	private static final Logger log = LoggerFactory.getLogger(MongoCreate.class);

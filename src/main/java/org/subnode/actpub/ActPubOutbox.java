@@ -32,6 +32,9 @@ import org.subnode.util.Val;
 import org.subnode.util.XString;
 import static org.subnode.util.Util.*;
 
+/**
+ * AP Outbox
+ */
 @Component
 public class ActPubOutbox extends ServiceBase {
     private static final Logger log = LoggerFactory.getLogger(ActPubOutbox.class);

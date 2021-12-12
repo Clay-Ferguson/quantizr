@@ -15,6 +15,9 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.filter.GenericFilterBean;
 import org.subnode.config.SessionContext;
 
+/**
+ * Global Servlet filter for cross-cutting concerns across all web requests
+ */
 @Component
 @Order(2)
 public class GlobalFilter extends GenericFilterBean {

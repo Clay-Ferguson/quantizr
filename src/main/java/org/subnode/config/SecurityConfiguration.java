@@ -17,6 +17,9 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.subnode.AppController;
 import org.subnode.filter.AuditFilter;
 
+/**
+ * Spring security support
+ */
 // @EnableWebSecurity(debug = true) // #DEBUG-SECURITY
 @EnableWebSecurity
 public class SecurityConfiguration extends WebSecurityConfigurerAdapter {

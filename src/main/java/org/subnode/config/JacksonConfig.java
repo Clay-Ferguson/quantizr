@@ -7,6 +7,8 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 
 /**
+ * Jackson JSON stuff.
+ * 
  * see: spring.jackson.serialization.indent_output=true
  */
 @Configuration

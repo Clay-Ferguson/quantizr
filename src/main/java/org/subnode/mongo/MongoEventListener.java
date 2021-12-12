@@ -22,6 +22,10 @@ import org.subnode.util.ThreadLocals;
 import org.subnode.util.XString;
 import static org.subnode.util.Util.*;
 
+/**
+ * Listener that MongoDB driver hooks into so we can inject processing into various phases of the
+ * persistence (reads/writes) of the MongoDB objects.
+ */
 public class MongoEventListener extends AbstractMongoEventListener<SubNode> {
 	private static final Logger log = LoggerFactory.getLogger(MongoEventListener.class);
 	private static final boolean verbose = false;

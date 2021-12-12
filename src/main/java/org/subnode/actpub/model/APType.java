@@ -1,5 +1,8 @@
 package org.subnode.actpub.model;
 
+/**
+ * ActivityPub types
+ */
 public class APType {
     public static final String Create = "Create";
     public static final String Note = "Note";

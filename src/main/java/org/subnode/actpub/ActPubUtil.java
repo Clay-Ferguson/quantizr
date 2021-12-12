@@ -42,6 +42,9 @@ import org.subnode.util.Util;
 import org.subnode.util.XString;
 import static org.subnode.util.Util.*;
 
+/**
+ * AP-related utilities
+ */
 @Component
 public class ActPubUtil extends ServiceBase {
     private static final Logger log = LoggerFactory.getLogger(ActPubUtil.class);

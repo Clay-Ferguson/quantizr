@@ -6,6 +6,9 @@ import org.slf4j.LoggerFactory;
 import org.subnode.model.client.PrincipalName;
 import static org.subnode.util.Util.*;
 
+/**
+ * Wraps the identity information about a specific user for access privileges to MongoDb
+ */
 public class MongoSession {
 	private static final Logger log = LoggerFactory.getLogger(MongoSession.class);
 

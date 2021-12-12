@@ -18,6 +18,9 @@ import org.subnode.util.Val;
 import org.subnode.util.XString;
 import static org.subnode.util.Util.*;
 
+/**
+ * Performs update (as in CRUD) operations for MongoDB
+ */
 @Component
 public class MongoUpdate extends ServiceBase {
 	private static final Logger log = LoggerFactory.getLogger(MongoUpdate.class);

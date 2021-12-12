@@ -15,6 +15,9 @@ import org.springframework.web.filter.GenericFilterBean;
 import org.subnode.util.Util;
 import static org.subnode.util.Util.*;
 
+/**
+ * Servlet filter for monitoring load statistics
+ */
 @Component
 @Order(3)
 public class HitFilter extends GenericFilterBean {

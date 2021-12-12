@@ -20,6 +20,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import static org.subnode.util.Util.*;
 
+/**
+ * Component that sends emails
+ */
 @Component
 public class EmailSender implements TransportListener {
 	private static final Logger log = LoggerFactory.getLogger(EmailSender.class);

@@ -3,6 +3,9 @@ package org.subnode.actpub.model;
 import org.subnode.actpub.APConst;
 import static org.subnode.util.Util.*;
 
+/**
+ * Follow object
+ */
 public class APOFollow extends APObj {
     public APOFollow() {
         put(context, APConst.CONTEXT_STREAMS);

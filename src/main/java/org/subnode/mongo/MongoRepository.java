@@ -8,7 +8,9 @@ import org.subnode.AppServer;
 import org.subnode.service.ServiceBase;
 import org.subnode.util.ThreadLocals;
 import static org.subnode.util.Util.*;
-
+/**
+ * Models the MongoDB repository connection.
+ */
 @Component
 public class MongoRepository extends ServiceBase {
 	private static final Logger log = LoggerFactory.getLogger(MongoRepository.class);

@@ -3,6 +3,9 @@ package org.subnode.actpub.model;
 import org.subnode.actpub.APConst;
 import static org.subnode.util.Util.*;
 
+/**
+ * Note object
+ */
 public class APONote extends APObj {
     public APONote() {
         put(context, new APList() //

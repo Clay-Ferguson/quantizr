@@ -13,8 +13,9 @@ import static org.subnode.util.Util.*;
 
 /**
  * Because the ActivityPup spec has lots of places where the object types are completely variable,
- * there's no way to use perfect type safety on all objects, so instead of having a POJO for the the
- * various types of objects we use the accessor methods and properties in this object.
+ * there's no clean way to use perfect type safety on all objects (hard coded properties), so
+ * instead of having a POJO for the the various types of objects we use the accessor methods and
+ * properties in this object.
  */
 public class AP {
     private static final Logger log = LoggerFactory.getLogger(AP.class);

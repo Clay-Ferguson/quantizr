@@ -7,7 +7,9 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
-/* UserDetails for Spring Security */
+/**
+ * UserDetails for Spring Security
+ */
 public class AppUserDetails implements UserDetails {
 
     private String userName;
@@ -15,8 +17,7 @@ public class AppUserDetails implements UserDetails {
     private boolean active;
     private List<GrantedAuthority> authorities;
 
-    public AppUserDetails() {
-    }
+    public AppUserDetails() {}
 
     public AppUserDetails(String userName, String password) {
         this.userName = userName;

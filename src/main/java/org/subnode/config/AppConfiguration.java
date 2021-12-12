@@ -30,10 +30,7 @@ import static org.subnode.util.Util.*;
 
 /**
  * Standard Spring WebMvcConfigurerAdapter-derived class.
- * 
- * There's a lot of commented code in here, but most of it I'm keeping just for future reference,
- * because there's always numerous different ways to do things, and I want to keep all that stuff as
- * FYI, and to remind the other ways of doing things.
+
  */
 @Configuration
 @EnableAsync

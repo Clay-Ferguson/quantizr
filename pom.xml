@@ -133,19 +133,25 @@ that's used during builds.
 					</plugin>
 					-->
 
-					<!--
-			Disabling javadocs until I have enough of it in the code to be worth using.
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-javadoc-plugin</artifactId>
-				<version>2.10.4</version>
-				<configuration>
-					<noqualifier>all</noqualifier>
-					<reportOutputDirectory>./apidocs</reportOutputDirectory>
-					<destDir>apidocs</destDir>
-				</configuration>
-			</plugin>
-			-->
+					<!-- uncomment this to start generating javadocs. -->
+					<!-- <plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-javadoc-plugin</artifactId>
+						<version>3.3.1</version>
+						<configuration>
+							<reportOutputDirectory>./JavaDocs</reportOutputDirectory>
+							<destDir>JavaDocs</destDir>
+						</configuration>
+						<executions>
+							<execution>
+								<id>attach-javadocs</id>
+								<goals>
+									<goal>jar</goal>
+								</goals>
+							</execution>
+						</executions>
+					</plugin> -->
+
 					<plugin>
 						<groupId>org.springframework.boot</groupId>
 						<artifactId>spring-boot-maven-plugin</artifactId>
@@ -433,19 +439,6 @@ that's used during builds.
 					</plugin>
 					-->
 
-					<!--
-			Disabling javadocs until I have enough of it in the code to be worth using.
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-javadoc-plugin</artifactId>
-				<version>2.10.4</version>
-				<configuration>
-					<noqualifier>all</noqualifier>
-					<reportOutputDirectory>./apidocs</reportOutputDirectory>
-					<destDir>apidocs</destDir>
-				</configuration>
-			</plugin>
-			-->
 					<plugin>
 						<groupId>org.springframework.boot</groupId>
 						<artifactId>spring-boot-maven-plugin</artifactId>
@@ -594,19 +587,6 @@ that's used during builds.
 					</plugin>
 	-->
 
-					<!--
-			Disabling javadocs until I have enough of it in the code to be worth using.
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-javadoc-plugin</artifactId>
-				<version>2.10.4</version>
-				<configuration>
-					<noqualifier>all</noqualifier>
-					<reportOutputDirectory>./apidocs</reportOutputDirectory>
-					<destDir>apidocs</destDir>
-				</configuration>
-			</plugin>
-			-->
 					<plugin>
 						<groupId>org.springframework.boot</groupId>
 						<artifactId>spring-boot-maven-plugin</artifactId>

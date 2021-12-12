@@ -22,7 +22,7 @@ import static org.subnode.util.Util.*;
  * <p>
  * The system always sends emails out in a batch operation every 30seconds or so, by emptying out
  * this queue.
- * 
+
  */
 @Component
 public class OutboxMgr extends ServiceBase {
