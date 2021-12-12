@@ -21,8 +21,8 @@ import org.springframework.stereotype.Component;
 import static org.subnode.util.Util.*;
 
 @Component
-public class MailSender implements TransportListener {
-	private static final Logger log = LoggerFactory.getLogger(MailSender.class);
+public class EmailSender implements TransportListener {
+	private static final Logger log = LoggerFactory.getLogger(EmailSender.class);
 
 	@Autowired
 	private AppProp appProp;

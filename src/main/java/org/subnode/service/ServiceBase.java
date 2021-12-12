@@ -15,8 +15,8 @@ import org.subnode.actpub.ActPubService;
 import org.subnode.actpub.ActPubUtil;
 import org.subnode.config.AppProp;
 import org.subnode.lucene.FileIndexer;
-import org.subnode.mail.MailSender;
-import org.subnode.mail.NotificationDaemon;
+import org.subnode.mail.EmailSender;
+import org.subnode.mail.EmailSenderDaemon;
 import org.subnode.mail.OutboxMgr;
 import org.subnode.mongo.AdminRun;
 import org.subnode.mongo.MongoAppConfig;
@@ -156,10 +156,10 @@ public class ServiceBase {
 	protected NodeEditService edit;
 
 	@Autowired
-	protected MailSender mail;
+	protected EmailSender mail;
 
 	@Autowired
-	protected NotificationDaemon notify;
+	protected EmailSenderDaemon notify;
 
 	@Autowired
 	protected NodeSearchService search;

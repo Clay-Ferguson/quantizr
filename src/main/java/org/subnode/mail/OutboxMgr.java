@@ -114,7 +114,6 @@ public class OutboxMgr extends ServiceBase {
 	}
 
 	private void queueMailUsingAdminSession(MongoSession ms, String recipients, String subject, String content) {
-
 		SubNode outboxNode = getSystemOutbox(ms);
 		SubNode outboundEmailNode = create.createNode(ms, outboxNode.getPath() + "/?", NodeType.NONE.s());
 

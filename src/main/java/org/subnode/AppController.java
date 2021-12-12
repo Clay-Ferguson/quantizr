@@ -38,7 +38,7 @@ import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 import org.subnode.config.SessionContext;
 import org.subnode.config.SpringContextUtil;
 import org.subnode.exception.base.RuntimeEx;
-import org.subnode.mail.MailSender;
+import org.subnode.mail.EmailSender;
 import org.subnode.model.client.NodeProp;
 import org.subnode.model.client.PrincipalName;
 import org.subnode.mongo.MongoRepository;
@@ -1353,7 +1353,7 @@ public class AppController extends ServiceBase implements ErrorController {
 			log.debug("SendEmailTest detected on server.");
 
 			String timeString = new Date().toString();
-			synchronized (MailSender.getLock()) {
+			synchronized (EmailSender.getLock()) {
 				try {
 					mail.init();
 					mail.sendMail("wclayf@gmail.com", null,
