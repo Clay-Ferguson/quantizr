@@ -12,7 +12,7 @@ export ipfs_staging=${DEPLOY_TARGET}/ipfs/staging
 
 export QUANTA_VER=1.0.20
 
-export JAR_FILE=./org.subnode-0.0.1-SNAPSHOT.jar
+export JAR_FILE=./quanta-0.0.1-SNAPSHOT.jar
 export PORT=8185
 export PORT_DEBUG=8000
 export XMS=1000m

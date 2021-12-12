@@ -48,11 +48,11 @@
         <appender-ref ref="Console" />
     </root>
 
-    <logger name="org.subnode.config.AuditFilter" level="trace" additivity="false">
+    <logger name="quanta.config.AuditFilter" level="trace" additivity="false">
         <appender-ref ref="AuditRollingFile" />
     </logger>
 
-    <logger name="org.subnode.config.AppFilter" level="trace" additivity="false">
+    <logger name="quanta.config.AppFilter" level="trace" additivity="false">
         <appender-ref ref="AuditRollingFile" />
     </logger>
 
@@ -62,7 +62,7 @@
     </logger>
     -->
 
-    <logger name="org.subnode.actpub.ActPubUtil" level="trace" additivity="false">
+    <logger name="quanta.actpub.ActPubUtil" level="trace" additivity="false">
         <appender-ref ref="AuditRollingFile" />
     </logger>
 
@@ -101,12 +101,12 @@
         <appender-ref ref="Console" />
     </logger>
 
-    <!-- <logger name="org.subnode.mongo.MongoEventListener" level="trace" additivity="false">
+    <!-- <logger name="quanta.mongo.MongoEventListener" level="trace" additivity="false">
         <appender-ref ref="RollingFile" />
         <appender-ref ref="Console" />
     </logger>
 
-    <logger name="org.subnode.mongo.MongoAuth" level="trace" additivity="false">
+    <logger name="quanta.mongo.MongoAuth" level="trace" additivity="false">
         <appender-ref ref="RollingFile" />
         <appender-ref ref="Console" />
     </logger> -->

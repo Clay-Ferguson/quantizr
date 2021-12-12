@@ -9,8 +9,8 @@ that's used during builds.
 
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-	<groupId>org.subnode</groupId>
-	<artifactId>org.subnode</artifactId>
+	<groupId>quanta</groupId>
+	<artifactId>quanta</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<packaging>jar</packaging>
 	<name>Quanta</name>
@@ -49,13 +49,13 @@ that's used during builds.
 				<webpack.args>--config webpack.dev.js</webpack.args>
 
 				<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-				<start-class>org.subnode.AppServer</start-class>
+				<start-class>quanta.AppServer</start-class>
 				<java.version>11</java.version>
 			</properties>
 
 			<dependencies>
 				<dependency>
-					<groupId>org.subnode</groupId>
+					<groupId>quanta</groupId>
 					<artifactId>common</artifactId>
 					<version>1.0</version>
 					<type>pom</type>
@@ -260,13 +260,13 @@ that's used during builds.
 			</activation>
 			<properties>
 				<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-				<start-class>org.subnode.AppServer</start-class>
+				<start-class>quanta.AppServer</start-class>
 				<java.version>11</java.version>
 			</properties>
 
 			<dependencies>
 				<dependency>
-					<groupId>org.subnode</groupId>
+					<groupId>quanta</groupId>
 					<artifactId>common</artifactId>
 					<version>1.0</version>
 					<type>pom</type>
@@ -315,13 +315,13 @@ that's used during builds.
 			</activation>
 			<properties>
 				<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-				<start-class>org.subnode.AppServer</start-class>
+				<start-class>quanta.AppServer</start-class>
 				<java.version>11</java.version>
 			</properties>
 
 			<dependencies>
 				<dependency>
-					<groupId>org.subnode</groupId>
+					<groupId>quanta</groupId>
 					<artifactId>common</artifactId>
 					<version>1.0</version>
 					<type>pom</type>
@@ -386,9 +386,9 @@ that's used during builds.
 							-->
 
 							<classPatterns>
-								<pattern>org.subnode.model.client.**</pattern>
-								<pattern>org.subnode.request.**</pattern>
-								<pattern>org.subnode.response.**</pattern>
+								<pattern>quanta.model.client.**</pattern>
+								<pattern>quanta.request.**</pattern>
+								<pattern>quanta.response.**</pattern>
 							</classPatterns>
 							<outputKind>module</outputKind>
 							<outputFile>src/main/resources/public/ts/JavaIntf.d.ts</outputFile>
@@ -523,13 +523,13 @@ that's used during builds.
 			<properties>
 				<webpack.args>--mode production --config webpack.prod.js</webpack.args>
 				<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-				<start-class>org.subnode.AppServer</start-class>
+				<start-class>quanta.AppServer</start-class>
 				<java.version>11</java.version>
 			</properties>
 
 			<dependencies>
 				<dependency>
-					<groupId>org.subnode</groupId>
+					<groupId>quanta</groupId>
 					<artifactId>common</artifactId>
 					<version>1.0</version>
 					<type>pom</type>
@@ -689,7 +689,7 @@ that's used during builds.
 			<properties>
 				<webpack.args>--config webpack.dev.js</webpack.args>
 				<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-				<start-class>org.subnode.AppServer</start-class>
+				<start-class>quanta.AppServer</start-class>
 				<java.version>11</java.version>
 			</properties>
 

@@ -23,7 +23,7 @@ export docker_compose_yaml=docker-compose-dev1.yaml
 
 export mvn_profile=dev
 
-export JAR_FILE=target/org.subnode-0.0.1-SNAPSHOT.jar
+export JAR_FILE=target/quanta-0.0.1-SNAPSHOT.jar
 export PORT=8184
 export PORT_DEBUG=8000
 export XMS=512m

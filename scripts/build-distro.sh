@@ -60,7 +60,7 @@ mkdir -p ${ipfs_data}
 mkdir -p ${ipfs_staging}
 
 # Wipe previous springboot fat jar to ensure it can't be used again.
-rm -f ${PRJROOT}/target/org.subnode-0.0.1-SNAPSHOT.jar
+rm -f ${PRJROOT}/target/quanta-0.0.1-SNAPSHOT.jar
 
 # build the project (comile source)
 cd ${PRJROOT}
@@ -72,7 +72,7 @@ cd ${PRJROOT}
 # if we wanted to and since the image is local it won't be pulling from Public Docker Repo, but as 
 # stated in the note below once we do publish to the repo then the TAR file we just created in this script
 # will work on all machines anywhere across the web.
-cp ${PRJROOT}/target/org.subnode-0.0.1-SNAPSHOT.jar ${DEPLOY_TARGET}
+cp ${PRJROOT}/target/quanta-0.0.1-SNAPSHOT.jar ${DEPLOY_TARGET}
 verifySuccess "JAR copied to build distro"
 
  ${SCRIPTS}/gen-mongod-conf-file.sh 
@@ -84,7 +84,7 @@ dockerBuild
 
 # Now fix up the DEPLOY_TARGET and for end users, and zip it
 cp ${PRJROOT}/docker-compose-distro.yaml ${DEPLOY_TARGET}
-rm -f ${DEPLOY_TARGET}/org.subnode-0.0.1-SNAPSHOT.jar
+rm -f ${DEPLOY_TARGET}/quanta-0.0.1-SNAPSHOT.jar
 
 # Copy over the Backup/Restore scripts
 cp ${SCRIPTS}/tools/_backup.sh          ${DEPLOY_TARGET}/dumps
