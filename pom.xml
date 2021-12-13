@@ -26,7 +26,7 @@ that's used during builds.
 			enable this line in _build.sh: "mvn dependency:sources", so you get
 			all new source AND remove all the old stuff
 		-->
-		<version>2.5.2</version>
+		<version>2.6.1</version>
 		<relativePath />
 		<!-- lookup parent from repository -->
 	</parent>
