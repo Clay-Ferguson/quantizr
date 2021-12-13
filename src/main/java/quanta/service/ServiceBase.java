@@ -42,11 +42,7 @@ import quanta.util.Validator;
  * conventional OOP rules. There are no disadvantages whatsoever to doing this, and huge advantages
  * in keeping code clean.
  */
-@Component
 public class ServiceBase {
-	@Autowired
-	protected MongoTemplate ops;
-
 	@Autowired
 	protected MongoCreate create;
 

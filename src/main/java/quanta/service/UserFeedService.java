@@ -12,6 +12,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.TextCriteria;
@@ -35,6 +36,9 @@ import static quanta.util.Util.*;
 @Component
 public class UserFeedService extends ServiceBase {
 	private static final Logger log = LoggerFactory.getLogger(UserFeedService.class);
+
+	@Autowired
+	protected MongoTemplate ops;
 
 	static final int MAX_FEED_ITEMS = 25;
 

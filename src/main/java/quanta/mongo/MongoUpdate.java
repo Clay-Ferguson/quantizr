@@ -7,6 +7,8 @@ import java.util.List;
 import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.stereotype.Component;
 import quanta.model.UserStats;
 import quanta.model.client.NodeProp;
@@ -24,6 +26,9 @@ import static quanta.util.Util.*;
 @Component
 public class MongoUpdate extends ServiceBase {
 	private static final Logger log = LoggerFactory.getLogger(MongoUpdate.class);
+
+	@Autowired
+	protected MongoTemplate ops;
 
 	private static final ThreadLocal<Boolean> saving = new ThreadLocal<>();
 

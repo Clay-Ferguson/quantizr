@@ -8,6 +8,8 @@ import com.mongodb.client.result.DeleteResult;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Component;
@@ -22,6 +24,9 @@ import static quanta.util.Util.*;
 @Component
 public class MongoDelete extends ServiceBase {
 	private static final Logger log = LoggerFactory.getLogger(MongoDelete.class);
+
+	@Autowired
+	protected MongoTemplate ops;
 
 	public void deleteNode(MongoSession ms, SubNode node, boolean childrenOnly) {
 		if (!childrenOnly) {

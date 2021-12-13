@@ -8,7 +8,9 @@ import org.apache.commons.lang3.StringUtils;
 import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.aggregation.Aggregation;
 import org.springframework.data.mongodb.core.aggregation.AggregationOperation;
 import org.springframework.data.mongodb.core.aggregation.AggregationResults;
@@ -39,6 +41,9 @@ import static quanta.util.Util.*;
 @Component
 public class MongoRead extends ServiceBase {
     private static final Logger log = LoggerFactory.getLogger(MongoRead.class);
+
+    @Autowired
+	protected MongoTemplate ops;
 
     private static final Object dbRootLock = new Object();
     private SubNode dbRoot;
