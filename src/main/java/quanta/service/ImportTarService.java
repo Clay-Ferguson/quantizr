@@ -5,9 +5,12 @@ import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
 import org.apache.commons.compress.archivers.tar.TarArchiveInputStream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import quanta.exception.base.RuntimeEx;
+import quanta.mongo.MongoAuth;
+import quanta.mongo.MongoRead;
 import quanta.mongo.MongoSession;
 import quanta.mongo.model.SubNode;
 import quanta.util.ExUtil;
@@ -19,6 +22,12 @@ import static quanta.util.Util.*;
 @Scope("prototype")
 public class ImportTarService extends ImportArchiveBase {
 	private static final Logger log = LoggerFactory.getLogger(ImportZipService.class);
+
+	@Autowired
+	protected MongoAuth auth;
+
+	@Autowired
+	protected MongoRead read;
 
 	private TarArchiveInputStream zis;
 

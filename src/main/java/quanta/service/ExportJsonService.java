@@ -13,14 +13,18 @@ import com.fasterxml.jackson.databind.ObjectWriter;
 import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.core.io.Resource;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Component;
+import quanta.config.AppProp;
 import quanta.config.SpringContextUtil;
 import quanta.model.client.NodeProp;
 import quanta.mongo.MongoSession;
+import quanta.mongo.MongoUpdate;
+import quanta.mongo.MongoUtil;
 import quanta.mongo.model.SubNode;
 import quanta.util.ExUtil;
 import quanta.util.FileUtils;
@@ -35,8 +39,23 @@ import static quanta.util.Util.*;
  */
 @Component
 @Scope("prototype")
-public class ExportJsonService extends ServiceBase {
+public class ExportJsonService  {
 	private static final Logger log = LoggerFactory.getLogger(ExportJsonService.class);
+
+	@Autowired
+	protected AttachmentService attach;
+
+	@Autowired
+	protected AppProp prop;
+
+	@Autowired
+	protected UserManagerService user;
+
+	@Autowired
+	protected MongoUtil mongoUtil;
+
+	@Autowired
+	protected MongoUpdate update;
 
 	/* This object is Threadsafe so this is the correct usage 'static final' */
 	private static final ObjectMapper objectMapper = new ObjectMapper();

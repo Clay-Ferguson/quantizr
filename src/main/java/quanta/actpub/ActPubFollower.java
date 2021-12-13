@@ -15,16 +15,21 @@ import quanta.actpub.model.AP;
 import quanta.actpub.model.APOOrderedCollection;
 import quanta.actpub.model.APOOrderedCollectionPage;
 import quanta.actpub.model.APObj;
+import quanta.config.AppProp;
 import quanta.config.NodeName;
 import quanta.model.NodeInfo;
 import quanta.model.client.ConstantInt;
 import quanta.model.client.NodeProp;
 import quanta.model.client.NodeType;
+import quanta.mongo.AdminRun;
+import quanta.mongo.MongoAuth;
 import quanta.mongo.MongoSession;
+import quanta.mongo.MongoUtil;
 import quanta.mongo.model.SubNode;
 import quanta.request.GetFollowersRequest;
 import quanta.response.GetFollowersResponse;
-import quanta.service.ServiceBase;
+
+import quanta.util.Convert;
 import quanta.util.ThreadLocals;
 import quanta.util.XString;
 import static quanta.util.Util.*;
@@ -33,11 +38,32 @@ import static quanta.util.Util.*;
  * Methods related to AP Follower
  */
 @Component
-public class ActPubFollower extends ServiceBase {
+public class ActPubFollower  {
     private static final Logger log = LoggerFactory.getLogger(ActPubFollower.class);
 
     @Autowired
 	protected MongoTemplate ops;
+
+    @Autowired
+	protected Convert convert;
+
+    @Autowired
+	protected ActPubUtil apUtil;
+
+    @Autowired
+	protected ActPubService apub;
+
+    @Autowired
+	protected AdminRun arun;
+
+    @Autowired
+	protected AppProp prop;
+
+    @Autowired
+	protected MongoUtil mongoUtil;
+
+    @Autowired
+	protected MongoAuth auth;
 
     @Autowired
     @Qualifier("threadPoolTaskExecutor")

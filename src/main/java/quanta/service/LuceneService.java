@@ -2,7 +2,10 @@ package quanta.service;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import quanta.lucene.FileIndexer;
+import quanta.mongo.MongoRead;
 import quanta.mongo.MongoSession;
 import quanta.mongo.model.SubNode;
 import quanta.response.LuceneIndexResponse;
@@ -13,8 +16,14 @@ import static quanta.util.Util.*;
  * Service for processing Lucene-related functions.
  */
 @Component
-public class LuceneService extends ServiceBase {
+public class LuceneService  {
 	private static final Logger log = LoggerFactory.getLogger(LuceneService.class);
+
+	@Autowired
+	protected FileIndexer fileIndexer;
+
+	@Autowired
+	protected MongoRead read;
 
 	public LuceneIndexResponse reindex(MongoSession ms, String nodeId, String searchFolder) {
 		LuceneIndexResponse res = new LuceneIndexResponse();

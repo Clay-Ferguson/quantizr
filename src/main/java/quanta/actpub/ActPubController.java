@@ -7,6 +7,7 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -18,7 +19,8 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import quanta.actpub.model.APObj;
-import quanta.service.ServiceBase;
+import quanta.config.AppProp;
+
 import quanta.util.XString;
 import static quanta.util.Util.*;
 
@@ -29,8 +31,26 @@ import static quanta.util.Util.*;
  */
 @Controller
 // @CrossOrigin (done by AppFilter. Spring doesn't do it.)
-public class ActPubController extends ServiceBase {
+public class ActPubController  {
 	private static final Logger log = LoggerFactory.getLogger(ActPubController.class);
+
+	@Autowired
+	protected ActPubUtil apUtil;
+
+	@Autowired
+	protected ActPubOutbox apOutbox;
+
+	@Autowired
+	protected ActPubFollower apFollower;
+
+	@Autowired
+	protected ActPubFollowing apFollowing;
+
+	@Autowired
+	protected ActPubService apub;
+
+	@Autowired
+	protected AppProp prop;
 
 	private static final ObjectMapper mapper = new ObjectMapper();
 

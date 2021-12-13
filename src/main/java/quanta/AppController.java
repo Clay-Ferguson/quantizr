@@ -35,12 +35,18 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
+import quanta.actpub.ActPubFollower;
+import quanta.actpub.ActPubFollowing;
+import quanta.actpub.ActPubService;
+import quanta.config.AppProp;
 import quanta.config.SessionContext;
 import quanta.config.SpringContextUtil;
 import quanta.exception.base.RuntimeEx;
 import quanta.mail.EmailSender;
 import quanta.model.client.NodeProp;
 import quanta.model.client.PrincipalName;
+import quanta.mongo.AdminRun;
+import quanta.mongo.MongoRead;
 import quanta.mongo.MongoRepository;
 import quanta.mongo.model.SubNode;
 import quanta.request.AddFriendRequest;
@@ -116,12 +122,27 @@ import quanta.response.InfoMessage;
 import quanta.response.LogoutResponse;
 import quanta.response.PingResponse;
 import quanta.response.SendTestEmailResponse;
+import quanta.service.AclService;
+import quanta.service.AttachmentService;
 import quanta.service.ExportServiceFlexmark;
 import quanta.service.ExportTarService;
 import quanta.service.ExportTextService;
 import quanta.service.ExportZipService;
+import quanta.service.GraphNodesService;
+import quanta.service.IPFSService;
+import quanta.service.ImportBookService;
+import quanta.service.ImportService;
+import quanta.service.JSoupService;
+import quanta.service.LuceneService;
+import quanta.service.NodeEditService;
+import quanta.service.NodeMoveService;
+import quanta.service.NodeRenderService;
+import quanta.service.NodeSearchService;
 import quanta.service.RSSFeedService;
-import quanta.service.ServiceBase;
+
+import quanta.service.SystemService;
+import quanta.service.UserFeedService;
+import quanta.service.UserManagerService;
 import quanta.util.CaptchaMaker;
 import quanta.util.Const;
 import quanta.util.ExUtil;
@@ -147,8 +168,77 @@ import static quanta.util.Util.*;
  * in certain layers (abstraction related and for loose-coupling).
  */
 @Controller
-public class AppController extends ServiceBase implements ErrorController {
+public class AppController  implements ErrorController {
 	private static final Logger log = LoggerFactory.getLogger(AppController.class);
+
+	@Autowired
+	protected IPFSService ipfs;
+
+	@Autowired
+	protected GraphNodesService graphNodes;
+
+	@Autowired
+	protected ImportBookService importBookService;
+
+	@Autowired
+	protected ImportService importService;
+
+	@Autowired
+	protected LuceneService lucene;
+
+	@Autowired
+	protected SystemService system;
+
+	@Autowired
+	protected RSSFeedService rssFeed;
+
+	@Autowired
+	protected UserFeedService userFeed;
+
+	@Autowired
+	protected JSoupService jsoup;
+
+	@Autowired
+	protected NodeMoveService move;
+
+	@Autowired
+	protected NodeSearchService search;
+
+	@Autowired
+	protected EmailSender mail;
+
+	@Autowired
+	protected NodeEditService edit;
+
+	@Autowired
+	protected ActPubFollower apFollower;
+
+	@Autowired
+	protected ActPubFollowing apFollowing;
+
+	@Autowired
+	protected ActPubService apub;
+
+	@Autowired
+	protected NodeRenderService render;
+
+	@Autowired
+	protected AttachmentService attach;
+
+	@Autowired
+	protected AdminRun arun;
+
+	@Autowired
+	protected AppProp prop;
+
+	@Autowired
+	protected UserManagerService user;
+
+	@Autowired
+	protected AclService acl;
+
+	@Autowired
+	protected MongoRead read;
 
 	public static final String API_PATH = "/mobile/api";
 

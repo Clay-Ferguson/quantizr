@@ -26,6 +26,7 @@ import org.apache.http.impl.client.HttpClientBuilder;
 import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.ContentDisposition;
 import org.springframework.http.HttpEntity;
@@ -38,6 +39,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
+import quanta.config.AppProp;
 import quanta.config.SpringContextUtil;
 import quanta.exception.base.RuntimeEx;
 import quanta.model.client.NodeProp;
@@ -49,14 +51,19 @@ import quanta.model.ipfs.file.IPFSDir;
 import quanta.model.ipfs.file.IPFSDirEntry;
 import quanta.model.ipfs.file.IPFSDirStat;
 import quanta.model.ipfs.file.IPFSObjectStat;
+import quanta.mongo.AdminRun;
 import quanta.mongo.CreateNodeLocation;
+import quanta.mongo.MongoCreate;
+import quanta.mongo.MongoRead;
 import quanta.mongo.MongoRepository;
 import quanta.mongo.MongoSession;
+import quanta.mongo.MongoUpdate;
 import quanta.mongo.model.SubNode;
 import quanta.request.LoadNodeFromIpfsRequest;
 import quanta.request.PublishNodeToIpfsRequest;
 import quanta.response.LoadNodeFromIpfsResponse;
 import quanta.response.PublishNodeToIpfsResponse;
+import quanta.util.AsyncExec;
 import quanta.util.Cast;
 import quanta.util.Const;
 import quanta.util.DateUtil;
@@ -78,8 +85,35 @@ import static quanta.util.Util.*;
  */
 
 @Component
-public class IPFSService extends ServiceBase {
+public class IPFSService  {
     private static final Logger log = LoggerFactory.getLogger(IPFSService.class);
+
+    @Autowired
+	protected IPFSService ipfs;
+
+    @Autowired
+	protected AsyncExec asyncExec;
+
+    @Autowired
+	protected AttachmentService attach;
+
+    @Autowired
+	protected AdminRun arun;
+
+    @Autowired
+	protected AppProp prop;
+
+    @Autowired
+	protected UserManagerService user;
+
+    @Autowired
+	protected MongoUpdate update;
+
+    @Autowired
+	protected MongoRead read;
+
+    @Autowired
+	protected MongoCreate create;
 
     public static String API_BASE;
     public static String API_CAT;

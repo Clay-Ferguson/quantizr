@@ -9,11 +9,15 @@ import java.util.Set;
 import java.util.StringTokenizer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import quanta.exception.base.RuntimeEx;
 import quanta.model.client.NodeProp;
 import quanta.model.client.PrincipalName;
+import quanta.mongo.MongoAuth;
+import quanta.mongo.MongoRead;
 import quanta.mongo.MongoSession;
+import quanta.mongo.MongoUpdate;
 import quanta.mongo.model.AccessControl;
 import quanta.mongo.model.MongoPrincipal;
 import quanta.mongo.model.SubNode;
@@ -35,8 +39,20 @@ import static quanta.util.Util.*;
  * on nodes.
  */
 @Component
-public class AclService extends ServiceBase {
+public class AclService  {
 	private static final Logger log = LoggerFactory.getLogger(AclService.class);
+
+	@Autowired
+	protected UserManagerService user;
+
+	@Autowired
+	protected MongoAuth auth;
+
+	@Autowired
+	protected MongoUpdate update;
+
+	@Autowired
+	protected MongoRead read;
 
 	/**
 	 * Returns the privileges that exist on the node identified in the request.

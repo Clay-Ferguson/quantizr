@@ -16,6 +16,7 @@ import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Component;
+import quanta.actpub.ActPubService;
 import quanta.config.NodeName;
 import quanta.exception.NodeAuthFailedException;
 import quanta.exception.base.RuntimeEx;
@@ -27,7 +28,7 @@ import quanta.model.client.PrincipalName;
 import quanta.model.client.PrivilegeType;
 import quanta.mongo.model.AccessControl;
 import quanta.mongo.model.SubNode;
-import quanta.service.ServiceBase;
+
 import quanta.util.ThreadLocals;
 import quanta.util.XString;
 import static quanta.util.Util.*;
@@ -37,11 +38,26 @@ import static quanta.util.Util.*;
  * nodes and checks their privileges againts the ACL on the Nodes.
  */
 @Component
-public class MongoAuth extends ServiceBase {
+public class MongoAuth  {
 	private static final Logger log = LoggerFactory.getLogger(MongoAuth.class);
 
 	@Autowired
 	protected MongoTemplate ops;
+
+	@Autowired
+	protected ActPubService apub;
+
+	@Autowired
+	protected MongoUtil mongoUtil;
+
+	@Autowired
+	protected MongoAuth auth;
+
+	@Autowired
+	protected MongoUpdate update;
+
+	@Autowired
+	protected MongoRead read;
 
 	private static final boolean verbose = false;
 

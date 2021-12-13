@@ -18,13 +18,16 @@ import com.vladsch.flexmark.util.ast.Node;
 import com.vladsch.flexmark.util.data.MutableDataSet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;
 import quanta.AppController;
+import quanta.config.AppProp;
 import quanta.model.client.NodeProp;
 import quanta.model.ipfs.dag.MerkleLink;
 import quanta.model.ipfs.dag.MerkleNode;
+import quanta.mongo.MongoRead;
 import quanta.mongo.MongoSession;
 import quanta.mongo.model.SubNode;
 import quanta.request.ExportRequest;
@@ -32,6 +35,7 @@ import quanta.response.ExportResponse;
 import quanta.util.ExUtil;
 import quanta.util.FileUtils;
 import quanta.util.StreamUtil;
+import quanta.util.SubNodeUtil;
 import quanta.util.ThreadLocals;
 import quanta.util.XString;
 import static quanta.util.Util.*;
@@ -41,8 +45,20 @@ import static quanta.util.Util.*;
  */
 @Component
 @Scope("prototype")
-public class ExportServiceFlexmark extends ServiceBase {
+public class ExportServiceFlexmark  {
 	private static final Logger log = LoggerFactory.getLogger(ExportServiceFlexmark.class);
+
+	@Autowired
+	protected IPFSService ipfs;
+
+	@Autowired
+	private SubNodeUtil snUtil;
+
+	@Autowired
+	protected AppProp prop;
+
+	@Autowired
+	protected MongoRead read;
 
 	private MongoSession session;
 

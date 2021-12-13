@@ -5,10 +5,17 @@ import java.util.List;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import quanta.exception.base.RuntimeEx;
 import quanta.model.client.NodeProp;
+import quanta.mongo.AdminRun;
+import quanta.mongo.MongoAuth;
+import quanta.mongo.MongoCreate;
+import quanta.mongo.MongoDelete;
+import quanta.mongo.MongoRead;
 import quanta.mongo.MongoSession;
+import quanta.mongo.MongoUpdate;
 import quanta.mongo.model.SubNode;
 import quanta.request.DeleteNodesRequest;
 import quanta.request.JoinNodesRequest;
@@ -31,8 +38,29 @@ import static quanta.util.Util.*;
  * of course.
  */
 @Component
-public class NodeMoveService extends ServiceBase {
+public class NodeMoveService  {
 	private static final Logger log = LoggerFactory.getLogger(NodeMoveService.class);
+
+	@Autowired
+	protected AdminRun arun;
+
+	@Autowired
+	protected UserManagerService user;
+
+	@Autowired
+	protected MongoAuth auth;
+
+	@Autowired
+	protected MongoDelete delete;
+
+	@Autowired
+	protected MongoUpdate update;
+
+	@Autowired
+	protected MongoRead read;
+
+	@Autowired
+	protected MongoCreate create;
 
 	/*
 	 * Moves the the node to a new ordinal/position location (relative to parent)

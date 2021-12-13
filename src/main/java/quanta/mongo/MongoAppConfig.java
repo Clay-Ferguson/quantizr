@@ -31,6 +31,7 @@ import org.springframework.data.mongodb.gridfs.GridFsTemplate;
 import org.springframework.data.mongodb.repository.config.EnableMongoRepositories;
 import quanta.config.AppProp;
 import quanta.exception.base.RuntimeEx;
+import quanta.util.Convert;
 import quanta.util.ExUtil;
 import static quanta.util.Util.*;
 
@@ -61,6 +62,9 @@ public class MongoAppConfig extends AbstractMongoClientConfiguration {
 
 	@Autowired
 	MappingMongoConverter converter;
+
+	@Autowired
+	protected Convert convert;
 
 	@PostConstruct
 	public void postConstruct() {

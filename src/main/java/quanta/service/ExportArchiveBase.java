@@ -23,6 +23,8 @@ import quanta.config.SpringContextUtil;
 import quanta.exception.base.RuntimeEx;
 import quanta.model.client.NodeProp;
 import quanta.model.client.NodeType;
+import quanta.mongo.MongoAuth;
+import quanta.mongo.MongoRead;
 import quanta.mongo.MongoSession;
 import quanta.mongo.model.SubNode;
 import quanta.request.ExportRequest;
@@ -30,6 +32,7 @@ import quanta.response.ExportResponse;
 import quanta.util.ExUtil;
 import quanta.util.FileUtils;
 import quanta.util.StreamUtil;
+import quanta.util.SubNodeUtil;
 import quanta.util.ThreadLocals;
 import quanta.util.Val;
 import quanta.util.XString;
@@ -42,8 +45,23 @@ import quanta.util.XString;
  * created that is dedicated just do doing that one export and so any member varibles in this class
  * have just that one export as their 'scope'
  */
-public abstract class ExportArchiveBase extends ServiceBase {
+public abstract class ExportArchiveBase  {
 	private static final Logger log = LoggerFactory.getLogger(ExportArchiveBase.class);
+
+	@Autowired
+	protected FileUtils fileUtil;
+
+	@Autowired
+	protected AttachmentService attach;
+
+	@Autowired
+	private SubNodeUtil snUtil;
+
+	@Autowired
+	protected MongoAuth auth;
+
+	@Autowired
+	protected MongoRead read;
 
 	private String shortFileName;
 	private String fullFileName;

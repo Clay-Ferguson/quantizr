@@ -13,7 +13,8 @@ import org.springframework.stereotype.Component;
 import quanta.model.UserStats;
 import quanta.model.client.NodeProp;
 import quanta.mongo.model.SubNode;
-import quanta.service.ServiceBase;
+import quanta.service.IPFSService;
+
 import quanta.util.Cast;
 import quanta.util.ThreadLocals;
 import quanta.util.Val;
@@ -24,11 +25,23 @@ import static quanta.util.Util.*;
  * Performs update (as in CRUD) operations for MongoDB
  */
 @Component
-public class MongoUpdate extends ServiceBase {
+public class MongoUpdate  {
 	private static final Logger log = LoggerFactory.getLogger(MongoUpdate.class);
 
 	@Autowired
+	protected IPFSService ipfs;
+
+	@Autowired
 	protected MongoTemplate ops;
+
+	@Autowired
+	protected AdminRun arun;
+
+	@Autowired
+	protected MongoAuth auth;
+
+	@Autowired
+	protected MongoRead read;
 
 	private static final ThreadLocal<Boolean> saving = new ThreadLocal<>();
 

@@ -19,17 +19,25 @@ import quanta.actpub.model.APOOrderedCollection;
 import quanta.actpub.model.APOOrderedCollectionPage;
 import quanta.actpub.model.APOUndo;
 import quanta.actpub.model.APObj;
+import quanta.config.AppProp;
 import quanta.config.NodeName;
 import quanta.model.NodeInfo;
 import quanta.model.client.ConstantInt;
 import quanta.model.client.NodeProp;
 import quanta.model.client.NodeType;
 import quanta.model.client.PrincipalName;
+import quanta.mongo.AdminRun;
+import quanta.mongo.MongoAuth;
+import quanta.mongo.MongoDelete;
+import quanta.mongo.MongoRead;
 import quanta.mongo.MongoSession;
+import quanta.mongo.MongoUtil;
 import quanta.mongo.model.SubNode;
 import quanta.request.GetFollowingRequest;
 import quanta.response.GetFollowingResponse;
-import quanta.service.ServiceBase;
+import quanta.service.NodeEditService;
+
+import quanta.util.Convert;
 import quanta.util.ThreadLocals;
 import quanta.util.XString;
 import static quanta.util.Util.*;
@@ -38,11 +46,44 @@ import static quanta.util.Util.*;
  * Methods relating to AP following
  */
 @Component
-public class ActPubFollowing extends ServiceBase {
+public class ActPubFollowing  {
     private static final Logger log = LoggerFactory.getLogger(ActPubFollowing.class);
 
     @Autowired
 	protected MongoTemplate ops;
+
+    @Autowired
+	protected Convert convert;
+
+    @Autowired
+	protected NodeEditService edit;
+
+    @Autowired
+	protected ActPubCrypto apCrypto;
+
+    @Autowired
+	protected ActPubUtil apUtil;
+
+    @Autowired
+	protected ActPubService apub;
+
+    @Autowired
+	protected AdminRun arun;
+
+    @Autowired
+	protected AppProp prop;
+
+    @Autowired
+	protected MongoUtil mongoUtil;
+
+    @Autowired
+	protected MongoAuth auth;
+
+    @Autowired
+	protected MongoDelete delete;
+
+    @Autowired
+	protected MongoRead read;
 
     @Autowired
     @Qualifier("threadPoolTaskExecutor")

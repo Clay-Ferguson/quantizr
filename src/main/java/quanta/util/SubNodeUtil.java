@@ -7,18 +7,24 @@ import java.util.UUID;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import quanta.AppController;
+import quanta.config.AppProp;
 import quanta.model.NodeMetaInfo;
 import quanta.model.client.NodeProp;
 import quanta.model.client.PrincipalName;
 import quanta.model.client.PrivilegeType;
 import quanta.mongo.CreateNodeLocation;
+import quanta.mongo.MongoCreate;
+import quanta.mongo.MongoRead;
 import quanta.mongo.MongoSession;
+import quanta.mongo.MongoUpdate;
 import quanta.mongo.model.AccessControl;
 import quanta.mongo.model.SubNode;
 import quanta.mongo.model.SubNodePropertyMap;
-import quanta.service.ServiceBase;
+import quanta.service.NodeRenderService;
+
 import static quanta.util.Util.*;
 
 /**
@@ -28,8 +34,23 @@ import static quanta.util.Util.*;
  * scope bean and non-static methods.
  */
 @Component
-public class SubNodeUtil extends ServiceBase {
+public class SubNodeUtil  {
 	private static final Logger log = LoggerFactory.getLogger(SubNodeUtil.class);
+
+	@Autowired
+	protected NodeRenderService render;
+
+	@Autowired
+	protected AppProp prop;
+
+	@Autowired
+	protected MongoUpdate update;
+
+	@Autowired
+	protected MongoRead read;
+
+	@Autowired
+	protected MongoCreate create;
 
 	/*
 	 * These are properties we should never allow the client to send back as part of a save operation.

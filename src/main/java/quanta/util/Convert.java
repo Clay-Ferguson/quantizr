@@ -10,6 +10,7 @@ import java.util.Map;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;
 import quanta.config.SessionContext;
@@ -20,21 +21,45 @@ import quanta.model.PropertyInfo;
 import quanta.model.client.NodeProp;
 import quanta.model.client.PrincipalName;
 import quanta.model.client.PrivilegeType;
+import quanta.mongo.AdminRun;
+import quanta.mongo.MongoAuth;
+import quanta.mongo.MongoRead;
 import quanta.mongo.MongoSession;
+import quanta.mongo.MongoUtil;
 import quanta.mongo.model.AccessControl;
 import quanta.mongo.model.SubNode;
 import quanta.mongo.model.SubNodePropVal;
 import quanta.mongo.model.SubNodePropertyMap;
-import quanta.service.ServiceBase;
+import quanta.service.AttachmentService;
+
 import quanta.types.TypeBase;
+import quanta.types.TypePluginMgr;
 import static quanta.util.Util.*;
 
 /**
  * Converting objects from one type to another, and formatting.
  */
 @Component
-public class Convert extends ServiceBase {
+public class Convert  {
 	private static final Logger log = LoggerFactory.getLogger(Convert.class);
+
+	@Autowired
+	protected TypePluginMgr typePluginMgr;
+
+	@Autowired
+	protected AttachmentService attach;
+
+	@Autowired
+	protected AdminRun arun;
+
+	@Autowired
+	protected MongoUtil mongoUtil;
+
+	@Autowired
+	protected MongoAuth auth;
+
+	@Autowired
+	protected MongoRead read;
 
 	/*
 	 * Generates a NodeInfo object, which is the primary data type that is also used on the

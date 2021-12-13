@@ -24,20 +24,34 @@ import quanta.actpub.model.AP;
 import quanta.actpub.model.APList;
 import quanta.actpub.model.APObj;
 import quanta.actpub.model.APType;
+import quanta.config.AppProp;
 import quanta.config.NodeName;
 import quanta.model.client.NodeProp;
 import quanta.model.client.NodeType;
 import quanta.model.client.PrincipalName;
 import quanta.model.client.PrivilegeType;
+import quanta.mongo.AdminRun;
 import quanta.mongo.CreateNodeLocation;
+import quanta.mongo.MongoAuth;
+import quanta.mongo.MongoCreate;
+import quanta.mongo.MongoDelete;
+import quanta.mongo.MongoRead;
 import quanta.mongo.MongoRepository;
 import quanta.mongo.MongoSession;
+import quanta.mongo.MongoUpdate;
+import quanta.mongo.MongoUtil;
 import quanta.mongo.model.AccessControl;
 import quanta.mongo.model.FediverseName;
 import quanta.mongo.model.SubNode;
+import quanta.service.AclService;
+import quanta.service.AttachmentService;
 import quanta.service.NodeSearchService;
-import quanta.service.ServiceBase;
+import quanta.service.PushService;
+
+import quanta.service.UserManagerService;
+import quanta.util.AsyncExec;
 import quanta.util.DateUtil;
+import quanta.util.EnglishDictionary;
 import quanta.util.ThreadLocals;
 import quanta.util.XString;
 import static quanta.util.Util.*;
@@ -46,11 +60,74 @@ import static quanta.util.Util.*;
  * General AP functions
  */
 @Component
-public class ActPubService extends ServiceBase {
+public class ActPubService  {
     private static final Logger log = LoggerFactory.getLogger(ActPubService.class);
 
     @Autowired
 	protected MongoTemplate ops;
+
+    @Autowired
+	protected EnglishDictionary english;
+
+    @Autowired
+	protected PushService push;
+
+    @Autowired
+	protected ActPubFactory apFactory;
+
+    @Autowired
+	protected ActPubCrypto apCrypto;
+
+    @Autowired
+	public ActPubCache apCache;
+
+    @Autowired
+	protected ActPubUtil apUtil;
+
+    @Autowired
+	protected ActPubOutbox apOutbox;
+
+    @Autowired
+	protected ActPubFollower apFollower;
+
+    @Autowired
+	protected ActPubFollowing apFollowing;
+
+    @Autowired
+	protected AsyncExec asyncExec;
+
+    @Autowired
+	protected AttachmentService attach;
+
+    @Autowired
+	protected AdminRun arun;
+
+    @Autowired
+	protected AppProp prop;
+
+    @Autowired
+	protected UserManagerService user;
+
+    @Autowired
+	protected AclService acl;
+
+    @Autowired
+	protected MongoUtil mongoUtil;
+
+    @Autowired
+	protected MongoAuth auth;
+
+    @Autowired
+	protected MongoDelete delete;
+
+    @Autowired
+	protected MongoUpdate update;
+
+    @Autowired
+	protected MongoRead read;
+
+    @Autowired
+	protected MongoCreate create;
 
     public static final boolean ENGLISH_LANGUAGE_CHECK = false;
     public static final int MAX_MESSAGES = 10;

@@ -22,6 +22,7 @@ import javax.imageio.stream.ImageInputStream;
 import javax.servlet.http.HttpServletResponse;
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBObject;
+import com.mongodb.client.gridfs.GridFSBucket;
 import com.mongodb.client.gridfs.GridFSFindIterable;
 import com.mongodb.client.gridfs.model.GridFSFile;
 import org.apache.commons.io.FilenameUtils;
@@ -37,12 +38,14 @@ import org.bson.Document;
 import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.ResourceRegion;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.gridfs.GridFsResource;
+import org.springframework.data.mongodb.gridfs.GridFsTemplate;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpRange;
 import org.springframework.http.HttpStatus;
@@ -51,6 +54,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBody;
+import quanta.config.AppProp;
 import quanta.config.NodeName;
 import quanta.config.SpringContextUtil;
 import quanta.exception.OutOfSpaceException;
@@ -59,8 +63,14 @@ import quanta.model.UserStats;
 import quanta.model.client.NodeProp;
 import quanta.model.client.PrivilegeType;
 import quanta.model.ipfs.dag.MerkleLink;
+import quanta.mongo.AdminRun;
 import quanta.mongo.CreateNodeLocation;
+import quanta.mongo.MongoAuth;
+import quanta.mongo.MongoCreate;
+import quanta.mongo.MongoRead;
 import quanta.mongo.MongoSession;
+import quanta.mongo.MongoUpdate;
+import quanta.mongo.MongoUtil;
 import quanta.mongo.model.SubNode;
 import quanta.request.DeleteAttachmentRequest;
 import quanta.request.UploadFromIPFSRequest;
@@ -90,8 +100,41 @@ import quanta.util.Val;
  * Otherwise a download link is what gets displayed on the node.
  */
 @Component
-public class AttachmentService extends ServiceBase {
+public class AttachmentService  {
 	private static final Logger log = LoggerFactory.getLogger(AttachmentService.class);
+
+	@Autowired
+	protected IPFSService ipfs;
+
+	@Autowired
+	private GridFsTemplate grid;
+
+	@Autowired
+	protected GridFSBucket gridBucket;
+
+	@Autowired
+	protected AdminRun arun;
+
+	@Autowired
+	protected AppProp prop;
+
+	@Autowired
+	protected UserManagerService user;
+
+	@Autowired
+	protected MongoUtil mongoUtil;
+
+	@Autowired
+	protected MongoAuth auth;
+
+	@Autowired
+	protected MongoUpdate update;
+
+	@Autowired
+	protected MongoRead read;
+
+	@Autowired
+	protected MongoCreate create;
 
 	/*
 	 * Upload from User's computer. Standard HTML form-based uploading of a file from user machine

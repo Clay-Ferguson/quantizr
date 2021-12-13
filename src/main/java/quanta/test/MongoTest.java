@@ -1,5 +1,7 @@
 package quanta.test;
 
+import static quanta.util.Util.no;
+import static quanta.util.Util.ok;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
@@ -10,7 +12,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Component;
-import quanta.config.AppProp;
 import quanta.exception.NodeAuthFailedException;
 import quanta.exception.base.RuntimeEx;
 import quanta.model.client.PrincipalName;
@@ -18,7 +19,6 @@ import quanta.mongo.MongoAuth;
 import quanta.mongo.MongoCreate;
 import quanta.mongo.MongoRead;
 import quanta.mongo.MongoSession;
-
 import quanta.mongo.MongoUpdate;
 import quanta.mongo.MongoUtil;
 import quanta.mongo.model.SubNode;
@@ -26,7 +26,6 @@ import quanta.service.AttachmentService;
 import quanta.service.UserManagerService;
 import quanta.util.LimitedInputStreamEx;
 import quanta.util.ThreadLocals;
-import static quanta.util.Util.*;
 
 @Component("MongoTest")
 public class MongoTest implements TestIntf {

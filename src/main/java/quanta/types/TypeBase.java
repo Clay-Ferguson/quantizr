@@ -8,11 +8,11 @@ import quanta.model.NodeInfo;
 import quanta.mongo.MongoSession;
 import quanta.mongo.model.SubNode;
 import quanta.request.CreateSubNodeRequest;
-import quanta.service.ServiceBase;
+
 import quanta.util.Val;
 
 @Component
-public abstract class TypeBase extends ServiceBase {
+public abstract class TypeBase  {
     private static final Logger log = LoggerFactory.getLogger(TypeBase.class);
 
     @PostConstruct

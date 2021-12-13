@@ -8,18 +8,42 @@ import org.apache.commons.io.IOUtils;
 import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import quanta.exception.base.RuntimeEx;
 import quanta.model.client.NodeProp;
+import quanta.mongo.AdminRun;
+import quanta.mongo.MongoRead;
 import quanta.mongo.MongoSession;
+import quanta.mongo.MongoUpdate;
 import quanta.mongo.model.SubNode;
 import quanta.util.ExUtil;
+import quanta.util.FileUtils;
 import quanta.util.LimitedInputStreamEx;
+import quanta.util.MimeUtil;
 import quanta.util.Val;
 import quanta.util.XString;
 import static quanta.util.Util.*;
 
-public abstract class ImportArchiveBase extends ServiceBase {
+public abstract class ImportArchiveBase  {
 	private static final Logger log = LoggerFactory.getLogger(ImportArchiveBase.class);
+
+	@Autowired
+	protected MimeUtil mimeUtil;
+
+	@Autowired
+	protected FileUtils fileUtil;
+
+	@Autowired
+	protected AttachmentService attach;
+
+	@Autowired
+	protected AdminRun arun;
+
+	@Autowired
+	protected MongoUpdate update;
+
+	@Autowired
+	protected MongoRead read;
 
 	public static final ObjectMapper jsonMapper = new ObjectMapper();
 

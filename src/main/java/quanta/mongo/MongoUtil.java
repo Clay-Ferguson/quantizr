@@ -24,6 +24,7 @@ import org.springframework.data.mongodb.core.index.TextIndexDefinition.TextIndex
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Component;
+import quanta.config.AppProp;
 import quanta.config.NodeName;
 import quanta.model.client.NodeProp;
 import quanta.model.client.NodeType;
@@ -33,12 +34,15 @@ import quanta.mongo.model.AccessControl;
 import quanta.mongo.model.FediverseName;
 import quanta.mongo.model.SubNode;
 import quanta.request.SignupRequest;
-import quanta.service.ServiceBase;
+import quanta.service.AclService;
+
+import quanta.service.UserManagerService;
 import quanta.util.Const;
 import quanta.util.Convert;
 import quanta.util.ExUtil;
 import quanta.util.ImageSize;
 import quanta.util.ImageUtil;
+import quanta.util.SubNodeUtil;
 import quanta.util.ThreadLocals;
 import quanta.util.Val;
 import quanta.util.XString;
@@ -48,11 +52,44 @@ import static quanta.util.Util.*;
  * Verious utilities related to MongoDB persistence
  */
 @Component
-public class MongoUtil extends ServiceBase {
+public class MongoUtil  {
 	private static final Logger log = LoggerFactory.getLogger(MongoUtil.class);
 
 	@Autowired
 	protected MongoTemplate ops;
+
+	@Autowired
+	protected AdminRun arun;
+
+	@Autowired
+	private SubNodeUtil snUtil;
+
+	@Autowired
+	protected AppProp prop;
+
+	@Autowired
+	protected UserManagerService user;
+
+	@Autowired
+	protected AclService acl;
+
+	@Autowired
+	protected MongoUtil mongoUtil;
+
+	@Autowired
+	protected MongoAuth auth;
+
+	@Autowired
+	protected MongoDelete delete;
+
+	@Autowired
+	protected MongoUpdate update;
+
+	@Autowired
+	protected MongoRead read;
+
+	@Autowired
+	protected MongoCreate create;
 
 	private static HashSet<String> testAccountNames = new HashSet<>();
 	private static SubNode systemRootNode;

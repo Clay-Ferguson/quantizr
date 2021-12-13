@@ -1,5 +1,7 @@
 package quanta.service;
 
+import static quanta.util.Util.no;
+import static quanta.util.Util.ok;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 import java.util.Arrays;
@@ -24,10 +26,16 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.WebAuthenticationDetails;
 import org.springframework.stereotype.Component;
+import quanta.actpub.ActPubFollower;
+import quanta.actpub.ActPubFollowing;
+import quanta.actpub.ActPubService;
+import quanta.actpub.ActPubUtil;
+import quanta.config.AppProp;
 import quanta.config.NodeName;
 import quanta.config.SessionContext;
 import quanta.exception.OutOfSpaceException;
 import quanta.exception.base.RuntimeEx;
+import quanta.mail.OutboxMgr;
 import quanta.model.UserPreferences;
 import quanta.model.UserStats;
 import quanta.model.client.NodeProp;
@@ -35,8 +43,15 @@ import quanta.model.client.NodeType;
 import quanta.model.client.PrincipalName;
 import quanta.model.client.PrivilegeType;
 import quanta.model.client.UserProfile;
+import quanta.mongo.AdminRun;
 import quanta.mongo.CreateNodeLocation;
+import quanta.mongo.MongoAuth;
+import quanta.mongo.MongoCreate;
+import quanta.mongo.MongoDelete;
+import quanta.mongo.MongoRead;
 import quanta.mongo.MongoSession;
+import quanta.mongo.MongoUpdate;
+import quanta.mongo.MongoUtil;
 import quanta.mongo.model.SubNode;
 import quanta.request.AddFriendRequest;
 import quanta.request.BlockUserRequest;
@@ -66,26 +81,78 @@ import quanta.response.SavePublicKeyResponse;
 import quanta.response.SaveUserPreferencesResponse;
 import quanta.response.SaveUserProfileResponse;
 import quanta.response.SignupResponse;
+import quanta.util.AsyncExec;
 import quanta.util.Const;
 import quanta.util.DateUtil;
 import quanta.util.ExUtil;
 import quanta.util.ThreadLocals;
 import quanta.util.Val;
+import quanta.util.Validator;
 import quanta.util.XString;
-import static quanta.util.Util.*;
 
 /**
  * Service methods for processing user management functions. Login, logout, signup, user
  * preferences, and settings persisted per-user
  */
 @Component
-public class UserManagerService extends ServiceBase {
+public class UserManagerService  {
 	private static final Logger log = LoggerFactory.getLogger(UserManagerService.class);
 
 	private static final Random rand = new Random();
 
 	@Autowired
 	protected AuthenticationManager authenticationManager;
+
+	@Autowired
+	protected Validator validator;
+
+	@Autowired
+	protected NodeEditService edit;
+
+	@Autowired
+	protected OutboxMgr outbox;
+
+	@Autowired
+	protected ActPubUtil apUtil;
+
+	@Autowired
+	protected ActPubFollower apFollower;
+
+	@Autowired
+	protected ActPubFollowing apFollowing;
+
+	@Autowired
+	protected ActPubService apub;
+
+	@Autowired
+	protected AsyncExec asyncExec;
+
+	@Autowired
+	protected AdminRun arun;
+
+	@Autowired
+	protected AppProp prop;
+
+	@Autowired
+	protected AclService acl;
+
+	@Autowired
+	protected MongoUtil mongoUtil;
+
+	@Autowired
+	protected MongoAuth auth;
+
+	@Autowired
+	protected MongoDelete delete;
+
+	@Autowired
+	protected MongoUpdate update;
+
+	@Autowired
+	protected MongoRead read;
+
+	@Autowired
+	protected MongoCreate create;
 
 	/* Private keys of each user by user name as key */
 	public static final ConcurrentHashMap<String, String> privateKeysByUserName = new ConcurrentHashMap<>();

@@ -9,7 +9,12 @@ import org.apache.commons.lang3.StringUtils;
 import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import quanta.actpub.ActPubFollower;
+import quanta.actpub.ActPubFollowing;
+import quanta.actpub.ActPubService;
+import quanta.actpub.ActPubUtil;
 import quanta.actpub.model.APList;
 import quanta.config.NodeName;
 import quanta.exception.base.RuntimeEx;
@@ -19,8 +24,14 @@ import quanta.model.client.NodeProp;
 import quanta.model.client.NodeType;
 import quanta.model.client.PrincipalName;
 import quanta.model.client.PrivilegeType;
+import quanta.mongo.AdminRun;
 import quanta.mongo.CreateNodeLocation;
+import quanta.mongo.MongoAuth;
+import quanta.mongo.MongoCreate;
+import quanta.mongo.MongoRead;
 import quanta.mongo.MongoSession;
+import quanta.mongo.MongoUpdate;
+import quanta.mongo.MongoUtil;
 import quanta.mongo.model.AccessControl;
 import quanta.mongo.model.SubNode;
 import quanta.request.AppDropRequest;
@@ -42,6 +53,9 @@ import quanta.response.SplitNodeResponse;
 import quanta.response.TransferNodeResponse;
 import quanta.response.UpdateHeadingsResponse;
 import quanta.types.TypeBase;
+import quanta.types.TypePluginMgr;
+import quanta.util.AsyncExec;
+import quanta.util.Convert;
 import quanta.util.SubNodeUtil;
 import quanta.util.ThreadLocals;
 import quanta.util.Util;
@@ -55,8 +69,59 @@ import static quanta.util.Util.*;
  * service that performs those operations on the server, directly called from the HTML 'controller'
  */
 @Component
-public class NodeEditService extends ServiceBase {
+public class NodeEditService  {
 	private static final Logger log = LoggerFactory.getLogger(NodeEditService.class);
+
+	@Autowired
+	protected Convert convert;
+
+	@Autowired
+	protected IPFSService ipfs;
+
+	@Autowired
+	protected TypePluginMgr typePluginMgr;
+
+	@Autowired
+	protected PushService push;
+
+	@Autowired
+	protected ActPubUtil apUtil;
+
+	@Autowired
+	protected ActPubFollower apFollower;
+
+	@Autowired
+	protected ActPubService apub;
+
+	@Autowired
+	protected ActPubFollowing apFollowing;
+
+	@Autowired
+	protected AsyncExec asyncExec;
+
+	@Autowired
+	protected AdminRun arun;
+
+	@Autowired
+	private SubNodeUtil snUtil;
+
+	@Autowired
+	protected AclService acl;
+
+	@Autowired
+	protected MongoUtil mongoUtil;
+
+	@Autowired
+	protected MongoAuth auth;
+
+	@Autowired
+	protected MongoUpdate update;
+
+	@Autowired
+	protected MongoRead read;
+
+	@Autowired
+	protected MongoCreate create;
 
 	/*
 	 * Creates a new node as a *child* node of the node specified in the request. Should ONLY be called

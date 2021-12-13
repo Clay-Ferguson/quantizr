@@ -5,6 +5,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import quanta.actpub.APConst;
+import quanta.actpub.ActPubFollower;
 import quanta.actpub.ActPubFollowing;
 import quanta.actpub.ActPubUtil;
 import quanta.actpub.model.APObj;
@@ -24,6 +25,9 @@ public class ActPubTest implements TestIntf {
 
     @Autowired
     private ActPubFollowing apFollowing;
+
+    @Autowired
+	protected ActPubFollower apFollower;
 
     @Override
     public void test() throws Exception {

@@ -4,6 +4,7 @@ import java.util.List;
 import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.stereotype.Component;
@@ -11,15 +12,27 @@ import quanta.model.PropertyInfo;
 import quanta.model.client.NodeType;
 import quanta.model.client.PrivilegeType;
 import quanta.mongo.model.SubNode;
-import quanta.service.ServiceBase;
+
 import static quanta.util.Util.*;
 
 /**
  * Performs the 'create' (as in CRUD) operations for creating new nodes in MongoDB
  */
 @Component
-public class MongoCreate extends ServiceBase {
+public class MongoCreate  {
 	private static final Logger log = LoggerFactory.getLogger(MongoCreate.class);
+
+	@Autowired
+	protected AdminRun arun;
+
+	@Autowired
+	protected MongoAuth auth;
+
+	@Autowired
+	protected MongoUpdate update;
+
+	@Autowired
+	protected MongoRead read;
 
 	public SubNode createNode(MongoSession ms, SubNode parent, String type, Long ordinal, CreateNodeLocation location,
 			boolean updateParentOrdinals) {

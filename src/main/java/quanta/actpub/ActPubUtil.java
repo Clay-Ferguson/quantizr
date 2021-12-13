@@ -21,6 +21,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -34,10 +35,13 @@ import org.springframework.web.client.RestTemplate;
 import quanta.actpub.model.AP;
 import quanta.actpub.model.APList;
 import quanta.actpub.model.APObj;
+import quanta.config.AppProp;
 import quanta.model.client.NodeProp;
+import quanta.mongo.MongoAuth;
+import quanta.mongo.MongoRead;
 import quanta.mongo.MongoSession;
 import quanta.mongo.model.SubNode;
-import quanta.service.ServiceBase;
+
 import quanta.util.Util;
 import quanta.util.XString;
 import static quanta.util.Util.*;
@@ -46,8 +50,29 @@ import static quanta.util.Util.*;
  * AP-related utilities
  */
 @Component
-public class ActPubUtil extends ServiceBase {
+public class ActPubUtil  {
     private static final Logger log = LoggerFactory.getLogger(ActPubUtil.class);
+
+    @Autowired
+	protected ActPubCrypto apCrypto;
+
+    @Autowired
+	public ActPubCache apCache;
+
+    @Autowired
+	protected ActPubUtil apUtil;
+
+    @Autowired
+	protected ActPubService apub;
+
+    @Autowired
+	protected AppProp prop;
+
+    @Autowired
+	protected MongoAuth auth;
+
+    @Autowired
+	protected MongoRead read;
 
     /*
      * RestTemplate is thread-safe and reusable, and has no state, so we need only one final static

@@ -3,16 +3,24 @@ package quanta.mail;
 import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import quanta.config.AppProp;
 import quanta.config.NodeName;
 import quanta.config.SessionContext;
 import quanta.model.client.NodeProp;
 import quanta.model.client.NodeType;
+import quanta.mongo.AdminRun;
 import quanta.mongo.CreateNodeLocation;
+import quanta.mongo.MongoCreate;
+import quanta.mongo.MongoRead;
 import quanta.mongo.MongoSession;
+import quanta.mongo.MongoUpdate;
 import quanta.mongo.model.SubNode;
 import quanta.response.NotificationMessage;
-import quanta.service.ServiceBase;
+import quanta.service.PushService;
+
+import quanta.util.SubNodeUtil;
 import quanta.util.ThreadLocals;
 import quanta.util.XString;
 import static quanta.util.Util.*;
@@ -25,8 +33,32 @@ import static quanta.util.Util.*;
 
  */
 @Component
-public class OutboxMgr extends ServiceBase {
+public class OutboxMgr  {
 	private static final Logger log = LoggerFactory.getLogger(OutboxMgr.class);
+
+	@Autowired
+	protected EmailSenderDaemon notify;
+
+	@Autowired
+	protected PushService push;
+
+	@Autowired
+	protected AdminRun arun;
+
+	@Autowired
+	private SubNodeUtil snUtil;
+
+	@Autowired
+	protected AppProp prop;
+
+	@Autowired
+	protected MongoUpdate update;
+
+	@Autowired
+	protected MongoRead read;
+
+	@Autowired
+	protected MongoCreate create;
 
 	private String mailBatchSize = "10";
 	private static SubNode outboxNode = null;

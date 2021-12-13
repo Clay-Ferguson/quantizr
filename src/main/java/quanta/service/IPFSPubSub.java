@@ -14,6 +14,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -30,6 +31,7 @@ import quanta.model.client.IPSMMessage;
 import quanta.mongo.MongoRepository;
 import quanta.response.IPSMPushInfo;
 import quanta.response.ServerPushInfo;
+import quanta.util.AsyncExec;
 import quanta.util.Cast;
 import quanta.util.DateUtil;
 import quanta.util.Util;
@@ -39,8 +41,17 @@ import static quanta.util.Util.*;
 // IPFS Reference: https://docs.ipfs.io/reference/http/api
 
 @Component
-public class IPFSPubSub extends ServiceBase {
+public class IPFSPubSub  {
     private static final Logger log = LoggerFactory.getLogger(IPFSPubSub.class);
+
+    @Autowired
+	protected IPFSService ipfs;
+
+    @Autowired
+	protected PushService push;
+
+    @Autowired
+	protected AsyncExec asyncExec;
 
     private static final boolean IPSM_ENABLE = false;
     private static final String IPSM_TOPIC_HEARTBEAT = "ipsm-heartbeat";

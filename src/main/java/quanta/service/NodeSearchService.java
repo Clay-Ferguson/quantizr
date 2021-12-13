@@ -8,11 +8,13 @@ import java.util.StringTokenizer;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.TextCriteria;
 import org.springframework.stereotype.Component;
+import quanta.actpub.ActPubService;
 import quanta.config.NodeName;
 import quanta.model.NodeInfo;
 import quanta.model.client.Bookmark;
@@ -22,7 +24,11 @@ import quanta.model.client.NodeProp;
 import quanta.model.client.NodeType;
 import quanta.model.client.PrincipalName;
 import quanta.model.client.PrivilegeType;
+import quanta.mongo.AdminRun;
+import quanta.mongo.MongoAuth;
+import quanta.mongo.MongoRead;
 import quanta.mongo.MongoSession;
+import quanta.mongo.MongoUtil;
 import quanta.mongo.model.AccessControl;
 import quanta.mongo.model.SubNode;
 import quanta.request.GetBookmarksRequest;
@@ -33,6 +39,8 @@ import quanta.response.GetBookmarksResponse;
 import quanta.response.GetNodeStatsResponse;
 import quanta.response.GetSharedNodesResponse;
 import quanta.response.NodeSearchResponse;
+import quanta.util.Convert;
+import quanta.util.EnglishDictionary;
 import quanta.util.ExUtil;
 import quanta.util.ThreadLocals;
 import quanta.util.XString;
@@ -48,8 +56,35 @@ import static quanta.util.Util.*;
  * searching but I'm not fully doing so yet I don't believe.
  */
 @Component
-public class NodeSearchService extends ServiceBase {
+public class NodeSearchService  {
 	private static final Logger log = LoggerFactory.getLogger(NodeSearchService.class);
+	
+	@Autowired
+	protected Convert convert;
+
+	@Autowired
+	protected EnglishDictionary english;
+
+	@Autowired
+	protected ActPubService apub;
+
+	@Autowired
+	protected NodeRenderService render;
+
+	@Autowired
+	protected AdminRun arun;
+
+	@Autowired
+	protected UserManagerService user;
+
+	@Autowired
+	protected MongoUtil mongoUtil;
+
+	@Autowired
+	protected MongoAuth auth;
+
+	@Autowired
+	protected MongoRead read;
 
 	public static Object trendingFeedInfoLock = new Object();
 	public static GetNodeStatsResponse trendingFeedInfo;

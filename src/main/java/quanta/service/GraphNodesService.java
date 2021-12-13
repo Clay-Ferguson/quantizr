@@ -6,9 +6,12 @@ import java.util.List;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import quanta.model.GraphNode;
 import quanta.model.client.PrivilegeType;
+import quanta.mongo.MongoAuth;
+import quanta.mongo.MongoRead;
 import quanta.mongo.MongoSession;
 import quanta.mongo.model.SubNode;
 import quanta.request.GraphRequest;
@@ -19,8 +22,14 @@ import quanta.util.XString;
 import static quanta.util.Util.*;
 
 @Component
-public class GraphNodesService extends ServiceBase {
+public class GraphNodesService  {
 	private static final Logger log = LoggerFactory.getLogger(GraphNodesService.class);
+
+	@Autowired
+	protected MongoAuth auth;
+
+	@Autowired
+	protected MongoRead read;
 
 	static int guid = 0;
 

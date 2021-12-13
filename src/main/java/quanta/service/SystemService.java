@@ -13,15 +13,23 @@ import org.bson.Document;
 import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import quanta.actpub.ActPubService;
+import quanta.config.AppProp;
 import quanta.config.AppSessionListener;
 import quanta.config.SessionContext;
 import quanta.filter.HitFilter;
 import quanta.model.UserStats;
 import quanta.model.client.NodeProp;
 import quanta.model.ipfs.file.IPFSObjectStat;
+import quanta.mongo.AdminRun;
 import quanta.mongo.MongoAppConfig;
+import quanta.mongo.MongoDelete;
+import quanta.mongo.MongoRead;
 import quanta.mongo.MongoSession;
+import quanta.mongo.MongoUpdate;
+import quanta.mongo.MongoUtil;
 import quanta.mongo.model.SubNode;
 import quanta.util.Const;
 import quanta.util.ExUtil;
@@ -34,8 +42,41 @@ import static quanta.util.Util.*;
  * Service methods for System related functions. Admin functions.
  */
 @Component
-public class SystemService extends ServiceBase {
+public class SystemService  {
 	private static final Logger log = LoggerFactory.getLogger(SystemService.class);
+
+	@Autowired
+	protected IPFSService ipfs;
+
+	@Autowired
+	protected ActPubService apub;
+
+	@Autowired
+	protected AttachmentService attach;
+
+	@Autowired
+	protected AdminRun arun;
+
+	@Autowired
+	protected AppProp prop;
+
+	@Autowired
+	protected UserManagerService user;
+
+	@Autowired
+	protected MongoAppConfig mac;
+
+	@Autowired
+	protected MongoUtil mongoUtil;
+
+	@Autowired
+	protected MongoDelete delete;
+
+	@Autowired
+	protected MongoUpdate update;
+
+	@Autowired
+	protected MongoRead read;
 
 	public String rebuildIndexes() {
 		if (!ThreadLocals.getSC().isAdmin()) {

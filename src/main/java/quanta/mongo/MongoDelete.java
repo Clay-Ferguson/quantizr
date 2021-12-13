@@ -15,18 +15,31 @@ import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Component;
 import quanta.model.client.NodeProp;
 import quanta.mongo.model.SubNode;
-import quanta.service.ServiceBase;
+import quanta.service.AttachmentService;
+
 import static quanta.util.Util.*;
 
 /**
  * Performs the 'deletes' (as in CRUD) operations for deleting nodes in MongoDB
  */
 @Component
-public class MongoDelete extends ServiceBase {
+public class MongoDelete  {
 	private static final Logger log = LoggerFactory.getLogger(MongoDelete.class);
 
 	@Autowired
 	protected MongoTemplate ops;
+
+	@Autowired
+	protected AttachmentService attach;
+
+	@Autowired
+	protected MongoUtil mongoUtil;
+
+	@Autowired
+	protected MongoAuth auth;
+
+	@Autowired
+	protected MongoUpdate update;
 
 	public void deleteNode(MongoSession ms, SubNode node, boolean childrenOnly) {
 		if (!childrenOnly) {

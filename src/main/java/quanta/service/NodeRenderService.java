@@ -7,9 +7,11 @@ import java.util.List;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;
 import org.springframework.ui.Model;
+import quanta.config.AppProp;
 import quanta.config.SpringContextUtil;
 import quanta.exception.NodeAuthFailedException;
 import quanta.exception.base.RuntimeEx;
@@ -21,6 +23,8 @@ import quanta.model.client.ConstantInt;
 import quanta.model.client.ErrorType;
 import quanta.model.client.NodeMetaIntf;
 import quanta.model.client.NodeProp;
+import quanta.mongo.MongoAuth;
+import quanta.mongo.MongoRead;
 import quanta.mongo.MongoSession;
 import quanta.mongo.model.SubNode;
 import quanta.request.GetNodeMetaInfoRequest;
@@ -31,7 +35,9 @@ import quanta.response.GetNodeMetaInfoResponse;
 import quanta.response.InitNodeEditResponse;
 import quanta.response.RenderCalendarResponse;
 import quanta.response.RenderNodeResponse;
+import quanta.util.Convert;
 import quanta.util.DateUtil;
+import quanta.util.SubNodeUtil;
 import quanta.util.ThreadLocals;
 import quanta.util.XString;
 import static quanta.util.Util.*;
@@ -43,8 +49,26 @@ import static quanta.util.Util.*;
  * rendering the pages on the client as the user browses around on the tree.
  */
 @Component
-public class NodeRenderService extends ServiceBase {
+public class NodeRenderService  {
 	private static final Logger log = LoggerFactory.getLogger(NodeRenderService.class);
+
+	@Autowired
+	protected Convert convert;
+
+	@Autowired
+	protected NodeRenderService render;
+
+	@Autowired
+	private SubNodeUtil snUtil;
+
+	@Autowired
+	protected AppProp prop;
+
+	@Autowired
+	protected MongoAuth auth;
+
+	@Autowired
+	protected MongoRead read;
 
 	private static RenderNodeResponse welcomePage;
 

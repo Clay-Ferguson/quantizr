@@ -16,6 +16,7 @@ import org.springframework.security.crypto.password.NoOpPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import quanta.AppController;
 import quanta.filter.AuditFilter;
+import quanta.mongo.MongoAuth;
 
 /**
  * Spring security support
@@ -30,6 +31,9 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 
     @Autowired
     UserDetailsService userDetailsService;
+
+    @Autowired
+	protected MongoAuth auth;
 
     @Bean(name = BeanIds.AUTHENTICATION_MANAGER)
     @Override

@@ -24,21 +24,52 @@ import quanta.model.client.NodeProp;
 import quanta.model.client.NodeType;
 import quanta.model.client.PrincipalName;
 import quanta.model.client.PrivilegeType;
+import quanta.mongo.AdminRun;
+import quanta.mongo.MongoAuth;
+import quanta.mongo.MongoRead;
 import quanta.mongo.MongoSession;
+import quanta.mongo.MongoUpdate;
+import quanta.mongo.MongoUtil;
 import quanta.mongo.model.SubNode;
 import quanta.request.CheckMessagesRequest;
 import quanta.request.NodeFeedRequest;
 import quanta.response.CheckMessagesResponse;
 import quanta.response.NodeFeedResponse;
+import quanta.util.AsyncExec;
+import quanta.util.Convert;
 import quanta.util.ThreadLocals;
 import static quanta.util.Util.*;
 
 @Component
-public class UserFeedService extends ServiceBase {
+public class UserFeedService  {
 	private static final Logger log = LoggerFactory.getLogger(UserFeedService.class);
 
 	@Autowired
+	protected Convert convert;
+
+	@Autowired
 	protected MongoTemplate ops;
+
+	@Autowired
+	protected AsyncExec asyncExec;
+
+	@Autowired
+	protected AdminRun arun;
+
+	@Autowired
+	protected UserManagerService user;
+
+	@Autowired
+	protected MongoUtil mongoUtil;
+
+	@Autowired
+	protected MongoAuth auth;
+
+	@Autowired
+	protected MongoUpdate update;
+
+	@Autowired
+	protected MongoRead read;
 
 	static final int MAX_FEED_ITEMS = 25;
 

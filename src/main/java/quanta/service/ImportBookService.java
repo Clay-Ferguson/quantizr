@@ -2,9 +2,13 @@ package quanta.service;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import quanta.config.SpringContextUtil;
+import quanta.mongo.MongoAuth;
+import quanta.mongo.MongoRead;
 import quanta.mongo.MongoSession;
+import quanta.mongo.MongoUpdate;
 import quanta.mongo.model.SubNode;
 import quanta.request.InsertBookRequest;
 import quanta.response.InsertBookResponse;
@@ -20,8 +24,17 @@ import static quanta.util.Util.*;
  * reasonable sized chunk of data (i.e. the entire book)
  */
 @Component
-public class ImportBookService extends ServiceBase {
+public class ImportBookService  {
 	private static final Logger log = LoggerFactory.getLogger(ImportBookService.class);
+
+	@Autowired
+	protected MongoAuth auth;
+
+	@Autowired
+	protected MongoUpdate update;
+
+	@Autowired
+	protected MongoRead read;
 
 	public InsertBookResponse insertBook(MongoSession ms, InsertBookRequest req) {
 		InsertBookResponse res = new InsertBookResponse();

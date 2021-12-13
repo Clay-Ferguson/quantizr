@@ -19,15 +19,20 @@ import quanta.actpub.model.APOOrderedCollection;
 import quanta.actpub.model.APOOrderedCollectionPage;
 import quanta.actpub.model.APObj;
 import quanta.actpub.model.APType;
+import quanta.config.AppProp;
 import quanta.config.NodeName;
 import quanta.model.client.NodeProp;
 import quanta.model.client.NodeType;
 import quanta.model.client.PrincipalName;
 import quanta.model.client.PrivilegeType;
+import quanta.mongo.AdminRun;
+import quanta.mongo.MongoAuth;
+import quanta.mongo.MongoRead;
 import quanta.mongo.MongoSession;
 import quanta.mongo.model.SubNode;
-import quanta.service.ServiceBase;
+
 import quanta.util.DateUtil;
+import quanta.util.SubNodeUtil;
 import quanta.util.Val;
 import quanta.util.XString;
 import static quanta.util.Util.*;
@@ -36,8 +41,29 @@ import static quanta.util.Util.*;
  * AP Outbox
  */
 @Component
-public class ActPubOutbox extends ServiceBase {
+public class ActPubOutbox  {
     private static final Logger log = LoggerFactory.getLogger(ActPubOutbox.class);
+
+    @Autowired
+	protected ActPubUtil apUtil;
+
+    @Autowired
+	protected ActPubService apub;
+
+    @Autowired
+	protected SubNodeUtil snUtil;
+
+    @Autowired
+	protected AppProp prop;
+
+    @Autowired
+	protected AdminRun arun;
+
+    @Autowired
+	protected MongoAuth auth;
+
+    @Autowired
+	protected MongoRead read;
 
     @Autowired
     @Qualifier("threadPoolTaskExecutor")

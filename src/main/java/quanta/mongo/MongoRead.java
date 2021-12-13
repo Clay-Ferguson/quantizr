@@ -19,6 +19,7 @@ import org.springframework.data.mongodb.core.query.CriteriaDefinition;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.TextCriteria;
 import org.springframework.stereotype.Component;
+import quanta.config.AppProp;
 import quanta.config.NodeName;
 import quanta.exception.base.RuntimeEx;
 import quanta.model.client.NodeProp;
@@ -26,7 +27,8 @@ import quanta.model.client.NodeType;
 import quanta.model.client.PrincipalName;
 import quanta.model.client.PrivilegeType;
 import quanta.mongo.model.SubNode;
-import quanta.service.ServiceBase;
+import quanta.service.AclService;
+
 import quanta.util.ThreadLocals;
 import quanta.util.Util;
 import quanta.util.XString;
@@ -39,11 +41,29 @@ import static quanta.util.Util.*;
  * information in the thread for use during context of one call
  */
 @Component
-public class MongoRead extends ServiceBase {
+public class MongoRead  {
     private static final Logger log = LoggerFactory.getLogger(MongoRead.class);
 
     @Autowired
 	protected MongoTemplate ops;
+
+    @Autowired
+	protected AppProp prop;
+
+    @Autowired
+	protected AclService acl;
+
+    @Autowired
+	protected MongoUtil mongoUtil;
+
+    @Autowired
+	protected MongoAuth auth;
+
+    @Autowired
+	protected MongoUpdate update;
+
+    @Autowired
+	protected MongoCreate create;
 
     private static final Object dbRootLock = new Object();
     private SubNode dbRoot;
