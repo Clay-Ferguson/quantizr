@@ -128,7 +128,7 @@ export class NodeUtil {
         S.quanta.parentIdToFocusNodeMap.set(state.node.id, node.id);
 
         if (scroll) {
-            S.view.scrollToSelectedNode(state, node);
+            S.view.scrollToNode(state, node);
         }
     }
 

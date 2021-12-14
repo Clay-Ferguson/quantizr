@@ -512,7 +512,7 @@ export class Render {
                         if (C.DEBUG_SCROLLING) {
                             console.log("highlight: scrollToSelected");
                         }
-                        S.view.scrollToSelectedNode(s);
+                        S.view.scrollToNode(s);
                         if (S.quanta.hiddenRenderingEnabled) {
                             s.rendering = true;
                         }

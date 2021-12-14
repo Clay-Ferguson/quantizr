@@ -106,7 +106,7 @@ export class ExportDlg extends DialogBase {
                 ]), false, 0, null, this.appState
             ).open();
 
-            S.view.scrollToSelectedNode(this.appState);
+            S.view.scrollToNode(this.appState);
         }
     }
 

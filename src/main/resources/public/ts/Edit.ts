@@ -56,7 +56,7 @@ export class Edit {
         S.util.checkSuccess("Insert Book", res);
 
         S.view.refreshTree(null, true, false, null, false, true, true, true, false, state);
-        S.view.scrollToSelectedNode(state);
+        S.view.scrollToNode(state);
     }
 
     private joinNodesResponse = (res: J.JoinNodesResponse, state: AppState): void => {
@@ -396,7 +396,7 @@ export class Edit {
         S.util.saveUserPreferences(state);
 
         /* scrolling is required because nodes will have scrolled out of view by the page just now updating */
-        S.view.scrollToSelectedNode(state);
+        S.view.scrollToNode(state);
     }
 
     setMainPanelCols = (val: number): void => {
@@ -420,7 +420,7 @@ export class Edit {
         S.util.saveUserPreferences(state);
 
         /* scrolling is required because nodes will have scrolled out of view by the page just now updating */
-        S.view.scrollToSelectedNode(state);
+        S.view.scrollToNode(state);
     }
 
     moveNodeUp = async (evt: Event, id: string, state?: AppState): Promise<void> => {
@@ -900,7 +900,7 @@ export class Edit {
     splitNodeResponse = (res: J.SplitNodeResponse, state: AppState): void => {
         if (S.util.checkSuccess("Split content", res)) {
             S.view.refreshTree(null, false, false, null, false, false, true, true, false, state);
-            S.view.scrollToSelectedNode(state);
+            S.view.scrollToNode(state);
         }
     }
 

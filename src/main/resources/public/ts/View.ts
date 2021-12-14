@@ -269,8 +269,7 @@ export class View {
         }
     }
 
-    // todo-0: rename this to scrollToNode
-    scrollToSelectedNode = (state: AppState, node: J.NodeInfo = null): void => {
+    scrollToNode = (state: AppState, node: J.NodeInfo = null): void => {
         // S.quanta.setOverlay(true);
 
         let func = () => {
@@ -338,7 +337,7 @@ export class View {
         // }, 100);
 
         PubSub.subSingleOnce(C.PUBSUB_mainWindowScroll, () => {
-            // console.log("execute: C.PUBSUB_mainRenderComplete: run scrollToSelectedNode");
+            // console.log("execute: C.PUBSUB_mainRenderComplete: run scrollToNode");
             func();
         });
     }
