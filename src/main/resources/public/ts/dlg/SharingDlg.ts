@@ -12,7 +12,6 @@ import { DialogBase } from "../DialogBase";
 import * as J from "../JavaIntf";
 import { S } from "../Singletons";
 import { FriendsDlg } from "./FriendsDlg";
-import { ShareToPersonDlg } from "./ShareToPersonDlg";
 
 interface LS {
     nodePrivsInfo: J.GetNodePrivilegesResponse;
@@ -36,11 +35,11 @@ export class SharingDlg extends DialogBase {
                 }) : null,
                 new Clearfix(),
                 new ButtonBar([
-                    new Button("Add User", this.shareToPersonDlg, null, "btn-primary"),
-                    new Button("Add Friend", async () => {
-                        let friendsDlg: FriendsDlg = new FriendsDlg(this.appState, true);
+                    new Button("Add Person", async () => {
+                        let friendsDlg: FriendsDlg = new FriendsDlg(this.node, this.appState, true);
                         await friendsDlg.open();
                         if (friendsDlg.getState().selectedName) {
+                            this.dirty = true;
                             this.shareImmediate(friendsDlg.getState().selectedName);
                         }
                     }, null, "btn-primary"),
@@ -119,15 +118,6 @@ export class SharingDlg extends DialogBase {
 
         this.node.ac = res.aclEntries;
         this.mergeState<LS>({ nodePrivsInfo: res });
-    }
-
-    shareToPersonDlg = async (): Promise<void> => {
-        this.dirty = true;
-        let dlg = new ShareToPersonDlg(this.node, this.reload, this.appState);
-        await dlg.open();
-
-        // this promise currently isn't needed
-        return null;
     }
 
     shareNodeToPublic = async (allowAppends: boolean) => {

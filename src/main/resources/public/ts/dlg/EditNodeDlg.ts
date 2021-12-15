@@ -768,7 +768,7 @@ export class EditNodeDlg extends DialogBase {
 
     insertMention = async (): Promise<void> => {
         if (this.contentEditor) {
-            let dlg: FriendsDlg = new FriendsDlg(this.appState, true);
+            let dlg: FriendsDlg = new FriendsDlg(null, this.appState, true);
             await dlg.open();
             if (dlg.getState().selectedName) {
                 this.contentEditor.insertTextAtCursor(" @" + dlg.getState().selectedName + " ");

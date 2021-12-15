@@ -9,6 +9,7 @@ import { DialogBase } from "../DialogBase";
 import { ValueIntf } from "../Interfaces";
 import * as J from "../JavaIntf";
 import { S } from "../Singletons";
+import { ShareToPersonDlg } from "./ShareToPersonDlg";
 
 interface LS {
     selectedName?: string;
@@ -20,7 +21,7 @@ export class FriendsDlg extends DialogBase {
 
     selectionValueIntf: ValueIntf;
 
-    constructor(state: AppState, private instantSelect: boolean) {
+    constructor(private node: J.NodeInfo, state: AppState, private instantSelect: boolean) {
         super("Friends", "app-modal-content-medium-width", null, state);
 
         this.selectionValueIntf = {
@@ -66,6 +67,7 @@ export class FriendsDlg extends DialogBase {
                 !this.getState<LS>().friends ? new Div(message)
                     : new FriendsTable(this.getState<LS>().friends, this.selectionValueIntf),
                 new ButtonBar([
+                    this.node ? new Button("Add by Username", this.shareToPersonDlg, null, "btn-primary") : null,
                     (this.getState<LS>().friends && !this.instantSelect) ? new Button("Choose", () => {
                         this.close();
                     }, null, "btn-primary") : null,
@@ -73,5 +75,17 @@ export class FriendsDlg extends DialogBase {
                 ], "marginTop")
             ])
         ];
+    }
+
+    shareToPersonDlg = async (): Promise<void> => {
+        let dlg = new ShareToPersonDlg(this.node, null, this.appState);
+        await dlg.open();
+
+        if (dlg.userNameState.getValue()) {
+            this.selectionValueIntf.setValue(dlg.userNameState.getValue());
+        }
+
+        // this promise currently isn't needed
+        return null;
     }
 }
