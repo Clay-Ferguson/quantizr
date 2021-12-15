@@ -42,7 +42,7 @@ export class RightNavPanel extends Div {
         let headerImg = this.makeHeaderDiv(state);
         let avatarImg = this.makeAvatarDiv(state, !!headerImg);
 
-        let displayName = state.displayName ? state.displayName : state.title;
+        let displayName = state.displayName ? state.displayName : (!state.isAnonUser ? state.userName : null);
 
         let allowEditMode = state.node && !state.isAnonUser;
         let fullScreenViewer = S.util.fullscreenViewerActive(state);

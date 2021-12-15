@@ -40,9 +40,6 @@ export class AppState {
 
     /* name of currently logged in user */
     userName: string = J.PrincipalName.ANON;
-
-    // todo-1: need to rename 'title', actually holds userName
-    title: string = "";
     displayName: string = "";
 
     node: J.NodeInfo;

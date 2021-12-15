@@ -1374,7 +1374,7 @@ export class Util {
             s.anonUserLandingPageNode = res.anonUserLandingPageNode;
             s.allowFileSystemSearch = res.allowFileSystemSearch;
             s.userPreferences = res.userPreferences;
-            s.title = !s.isAnonUser ? res.userName : "";
+            // s.title = !s.isAnonUser ? res.userName : "";
             s.displayName = !s.isAnonUser ? res.displayName : "";
             return s;
         });

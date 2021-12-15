@@ -47,8 +47,6 @@ export abstract class DialogBase extends Div implements DialogBaseImpl {
         this.close = this.close.bind(this);
 
         this.appState = appState;
-
-        // new on 3/14/2021 (MessageDlg sending null into here)
         if (!appState) {
             this.appState = store.getState();
         }

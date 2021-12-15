@@ -41,13 +41,7 @@ import { EditPropertyDlg } from "./EditPropertyDlg";
 import { EmojiPickerDlg } from "./EmojiPickerDlg";
 import { FriendsDlg } from "./FriendsDlg";
 import { UploadFromFileDropzoneDlg } from "./UploadFromFileDropzoneDlg";
-
-// export this from elsewhere, it's dupliated two places right now (todo-0)
-interface SymKeyDataPackage {
-    cipherText: string;
-    cipherKey: string;
-    symKey?: CryptoKey;
-}
+import { SymKeyDataPackage } from "../SymKeyDataPackage";
 
 interface LS {
     node?: J.NodeInfo;

@@ -1,11 +1,7 @@
 import { EncryptionKeyPair } from "./EncryptionKeyPair";
 import * as J from "./JavaIntf";
 import { S } from "./Singletons";
-interface SymKeyDataPackage {
-    cipherText: string;
-    cipherKey: string;
-    symKey?: CryptoKey;
-}
+import { SymKeyDataPackage } from "./SymKeyDataPackage";
 
 /*
 SYMMETRIC ENCRYPTION and PUBLIC KEY ENCRYPTION
