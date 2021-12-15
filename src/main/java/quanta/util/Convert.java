@@ -304,8 +304,8 @@ public class Convert  {
 
 		if (ok(principalId)) {
 			arun.run(s -> {
-				acInfo.setPrincipalName(auth.getUserNameFromAccountNodeId(s, principalId));
-				acInfo.setDisplayName(auth.getDisplayNameFromAccountNodeId(s, principalId));
+				acInfo.setPrincipalName(auth.getAccountPropById(s, principalId, NodeProp.USER.s()));
+				acInfo.setDisplayName(auth.getAccountPropById(s, principalId, NodeProp.DISPLAY_NAME.s()));
 
 				// currently don't ever need this info for displaying rows, so don't waste the
 				// CPU cycles to get it.

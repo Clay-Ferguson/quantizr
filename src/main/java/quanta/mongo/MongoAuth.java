@@ -38,7 +38,7 @@ import static quanta.util.Util.*;
  * nodes and checks their privileges againts the ACL on the Nodes.
  */
 @Component
-public class MongoAuth  {
+public class MongoAuth {
 	private static final Logger log = LoggerFactory.getLogger(MongoAuth.class);
 
 	@Autowired
@@ -71,8 +71,7 @@ public class MongoAuth  {
 	private static final Object anonSessionLck = new Object();
 	private static MongoSession anonSession;
 
-	private static final HashMap<String, String> userNamesByAccountId = new HashMap<>();
-	private static final HashMap<String, String> displayNamesByAccountId = new HashMap<>();
+	private static final HashMap<String, SubNode> userNodesById = new HashMap<>();
 
 	@PostConstruct
 	public void postConstruct() {
@@ -115,72 +114,43 @@ public class MongoAuth  {
 				// get user account node for this sharing entry
 				String userNodeId = info.getPrincipalNodeId();
 				if (ok(userNodeId)) {
-					info.setPrincipalName(getUserNameFromAccountNodeId(ms, userNodeId));
+					info.setPrincipalName(getAccountPropById(ms, userNodeId, NodeProp.USER.s()));
 				}
 			}
 		}
 	}
 
-	/* todo-1: need to unify getDisplayNameFrom... and getUserNameFrom... below (next two functions) */
-	public String getDisplayNameFromAccountNodeId(MongoSession ms, String accountId) {
-
+	public String getAccountPropById(MongoSession ms, String accountId, String prop) {
 		// special case of a public share
-		if (PrincipalName.PUBLIC.s().equals(accountId)) {
+		if (PrincipalName.PUBLIC.s().equals(accountId)
+				&& (prop.equals(NodeProp.DISPLAY_NAME.s()) || prop.equals(NodeProp.USER.s()))) {
 			return PrincipalName.PUBLIC.s();
 		}
 
-		String displayName = null;
-		// if the userName is cached get it from the cache.
-		synchronized (displayNamesByAccountId) {
-			displayName = displayNamesByAccountId.get(accountId);
+		String propVal = null;
+		SubNode accntNode = null;
+
+		// try to get the node from the cache of nodes
+		synchronized (userNodesById) {
+			accntNode = userNodesById.get(accountId);
 		}
 
-		if (ok(displayName)) {
-			return displayName;
-		}
-
-		// if userName not found in cache we read the node to get the userName from it.
-		SubNode accountNode = read.getNode(ms, accountId);
-		if (ok(accountNode)) {
-			// get the userName from the node, then put it in 'info' and cache it also.
-			displayName = accountNode.getStr(NodeProp.DISPLAY_NAME);
-
-			synchronized (displayNamesByAccountId) {
-				displayNamesByAccountId.put(accountId, displayName);
-				return displayName;
+		// if we found the node get property from it to return.
+		if (ok(accntNode)) {
+			propVal = accntNode.getStr(prop);
+		} 
+		// else we have to lookup the node from the DB, and then cache it if found
+		else {
+			accntNode = read.getNode(ms, accountId);
+			if (ok(accntNode)) {
+				propVal = accntNode.getStr(prop);
+				synchronized (userNodesById) {
+					userNodesById.put(accountId, accntNode);
+				}
 			}
 		}
-		return null;
-	}
 
-	public String getUserNameFromAccountNodeId(MongoSession ms, String accountId) {
-		// special case of a public share
-		if (PrincipalName.PUBLIC.s().equals(accountId)) {
-			return PrincipalName.PUBLIC.s();
-		}
-
-		String userName = null;
-		// if the userName is cached get it from the cache.
-		synchronized (userNamesByAccountId) {
-			userName = userNamesByAccountId.get(accountId);
-		}
-
-		if (ok(userName)) {
-			return userName;
-		}
-
-		// if userName not found in cache we read the node to get the userName from it.
-		SubNode accountNode = read.getNode(ms, accountId);
-		if (ok(accountNode)) {
-			// get the userName from the node, then put it in 'info' and cache it also.
-			userName = accountNode.getStr(NodeProp.USER);
-
-			synchronized (userNamesByAccountId) {
-				userNamesByAccountId.put(accountId, userName);
-				return userName;
-			}
-		}
-		return null;
+		return propVal;
 	}
 
 	/*

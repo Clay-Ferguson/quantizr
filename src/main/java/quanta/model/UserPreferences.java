@@ -11,7 +11,7 @@ public class UserPreferences {
 	private boolean rssHeadlinesOnly;
 	private long mainPanelCols = 5;
 
-	// not persisted to DB yet. (todo-1)
+	// not persisted to DB yet. ipsm was just an experiment using IPFSSubPub for messaging
 	@JsonProperty(required = false)
 	private boolean enableIPSM;
 

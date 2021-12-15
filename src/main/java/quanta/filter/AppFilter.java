@@ -149,7 +149,7 @@ public class AppFilter extends GenericFilterBean {
 		}
 	}
 
-	// todo-1: app is too fragile if you forget to add one here. fix this.
+	// todo-1: app is too fragile if you forget to add a path here. fix this.
 	private boolean isSecurePath(String path) {
 		// todo-1: /bin & /stream is an unusual case: can be ../bin/avatar or just ../bin
 		if (
