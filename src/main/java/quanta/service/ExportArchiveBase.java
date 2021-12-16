@@ -46,7 +46,7 @@ import quanta.util.XString;
  * created that is dedicated just do doing that one export and so any member varibles in this class
  * have just that one export as their 'scope'
  */
-public abstract class ExportArchiveBase  {
+public abstract class ExportArchiveBase {
 	private static final Logger log = LoggerFactory.getLogger(ExportArchiveBase.class);
 
 	@Autowired
@@ -69,9 +69,11 @@ public abstract class ExportArchiveBase  {
 	@Lazy
 	protected MongoRead read;
 
+	@Autowired
+	private AppProp appProp;
+
 	private String shortFileName;
 	private String fullFileName;
-
 	private String rootPathParent;
 
 	/*
@@ -79,9 +81,6 @@ public abstract class ExportArchiveBase  {
 	 * to detect that and number them, so we use this hashset to detect existing filenames.
 	 */
 	private final HashSet<String> fileNameSet = new HashSet<>();
-
-	@Autowired
-	private AppProp appProp;
 
 	private MongoSession session;
 

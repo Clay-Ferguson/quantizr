@@ -1,5 +1,7 @@
 package quanta.mongo;
 
+import static quanta.util.Util.no;
+import static quanta.util.Util.ok;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -29,17 +31,16 @@ import quanta.model.client.PrincipalName;
 import quanta.model.client.PrivilegeType;
 import quanta.mongo.model.AccessControl;
 import quanta.mongo.model.SubNode;
-
 import quanta.util.ThreadLocals;
 import quanta.util.XString;
-import static quanta.util.Util.*;
 
 
 /**
  * Service for checking authorization for access to nodes. Checks what users are accessing what
  * nodes and checks their privileges againts the ACL on the Nodes.
  */
-@Lazy @Component
+@Lazy
+@Component
 public class MongoAuth {
 	private static final Logger log = LoggerFactory.getLogger(MongoAuth.class);
 
@@ -80,10 +81,6 @@ public class MongoAuth {
 	private static MongoSession anonSession;
 
 	private static final HashMap<String, SubNode> userNodesById = new HashMap<>();
-
-	public MongoAuth() {
-		log.debug("Bean Construct: MongoAuth");
-	}
 
 	@PostConstruct
 	public void postConstruct() {
@@ -150,7 +147,7 @@ public class MongoAuth {
 		// if we found the node get property from it to return.
 		if (ok(accntNode)) {
 			propVal = accntNode.getStr(prop);
-		} 
+		}
 		// else we have to lookup the node from the DB, and then cache it if found
 		else {
 			accntNode = read.getNode(ms, accountId);

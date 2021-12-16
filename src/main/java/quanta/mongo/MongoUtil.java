@@ -1,5 +1,7 @@
 package quanta.mongo;
 
+import static quanta.util.Util.no;
+import static quanta.util.Util.ok;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -36,7 +38,6 @@ import quanta.mongo.model.FediverseName;
 import quanta.mongo.model.SubNode;
 import quanta.request.SignupRequest;
 import quanta.service.AclService;
-
 import quanta.service.UserManagerService;
 import quanta.util.Const;
 import quanta.util.Convert;
@@ -47,18 +48,18 @@ import quanta.util.SubNodeUtil;
 import quanta.util.ThreadLocals;
 import quanta.util.Val;
 import quanta.util.XString;
-import static quanta.util.Util.*;
 
 
 /**
  * Verious utilities related to MongoDB persistence
  */
-@Lazy @Component
-public class MongoUtil  {
+@Lazy
+@Component
+public class MongoUtil {
 	private static final Logger log = LoggerFactory.getLogger(MongoUtil.class);
 
 	@Autowired
-    @Lazy
+	@Lazy
 	protected MongoTemplate ops;
 
 	@Autowired
@@ -507,8 +508,7 @@ public class MongoUtil  {
 		// account)
 
 		// dropIndex(session, SubNode.class, "unique-apid");
-		createPartialUniqueIndex(ms, "unique-apid", SubNode.class,
-				SubNode.PROPERTIES + "." + NodeProp.ACT_PUB_ID.s() + ".value");
+		createPartialUniqueIndex(ms, "unique-apid", SubNode.class, SubNode.PROPERTIES + "." + NodeProp.ACT_PUB_ID.s() + ".value");
 
 		createUniqueFriendsIndex(ms);
 		createUniqueNodeNameIndex(ms);

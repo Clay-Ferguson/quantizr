@@ -1,5 +1,6 @@
 package quanta.test;
 
+import static quanta.util.Util.no;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,9 +13,9 @@ import quanta.actpub.ActPubUtil;
 import quanta.actpub.model.APObj;
 import quanta.config.AppProp;
 import quanta.util.XString;
-import static quanta.util.Util.*;
 
-@Lazy @Component("ActPubTest")
+@Lazy
+@Component("ActPubTest")
 public class ActPubTest implements TestIntf {
     private static final Logger log = LoggerFactory.getLogger(ActPubTest.class);
 
@@ -32,7 +33,7 @@ public class ActPubTest implements TestIntf {
 
     @Autowired
     @Lazy
-	protected ActPubFollower apFollower;
+    protected ActPubFollower apFollower;
 
     @Override
     public void test() throws Exception {

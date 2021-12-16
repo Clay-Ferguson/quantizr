@@ -1,5 +1,7 @@
 package quanta.service;
 
+import static quanta.util.Util.no;
+import static quanta.util.Util.ok;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -45,7 +47,6 @@ import quanta.util.EnglishDictionary;
 import quanta.util.ExUtil;
 import quanta.util.ThreadLocals;
 import quanta.util.XString;
-import static quanta.util.Util.*;
 
 /**
  * Service for searching the repository. This searching is currently very basic, and just grabs the
@@ -56,10 +57,11 @@ import static quanta.util.Util.*;
  * NOTE: the Query class DOES have a 'skip' and 'limit' which I can take advantage of in all my
  * searching but I'm not fully doing so yet I don't believe.
  */
-@Lazy @Component
-public class NodeSearchService  {
+@Lazy
+@Component
+public class NodeSearchService {
 	private static final Logger log = LoggerFactory.getLogger(NodeSearchService.class);
-	
+
 	@Autowired
 	@Lazy
 	protected Convert convert;
@@ -277,8 +279,7 @@ public class NodeSearchService  {
 		 * here
 		 */
 		for (SubNode node : auth.searchSubGraphByAcl(ms, req.getPage() * ConstantInt.ROWS_PER_PAGE.val(), searchRoot.getPath(),
-				searchRoot.getOwner(), Sort.by(Sort.Direction.DESC, SubNode.MODIFY_TIME),
-				ConstantInt.ROWS_PER_PAGE.val())) {
+				searchRoot.getOwner(), Sort.by(Sort.Direction.DESC, SubNode.MODIFY_TIME), ConstantInt.ROWS_PER_PAGE.val())) {
 
 			if (no(node.getAc()) || node.getAc().size() == 0)
 				continue;

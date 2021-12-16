@@ -1,5 +1,7 @@
 package quanta.service;
 
+import static quanta.util.Util.no;
+import static quanta.util.Util.ok;
 import java.util.ArrayList;
 import java.util.List;
 import org.apache.commons.lang3.StringUtils;
@@ -29,7 +31,6 @@ import quanta.response.MoveNodesResponse;
 import quanta.response.SelectAllNodesResponse;
 import quanta.response.SetNodePositionResponse;
 import quanta.util.ThreadLocals;
-import static quanta.util.Util.*;
 
 /**
  * Service for controlling the positions (ordinals) of nodes relative to their parents and/or moving
@@ -38,8 +39,9 @@ import static quanta.util.Util.*;
  * move any existing nodes they have to any new location they want, subject to security constraints
  * of course.
  */
-@Lazy @Component
-public class NodeMoveService  {
+@Lazy
+@Component
+public class NodeMoveService {
 	private static final Logger log = LoggerFactory.getLogger(NodeMoveService.class);
 
 	@Autowired

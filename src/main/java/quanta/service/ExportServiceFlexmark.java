@@ -1,5 +1,7 @@
 package quanta.service;
 
+import static quanta.util.Util.no;
+import static quanta.util.Util.ok;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -39,14 +41,14 @@ import quanta.util.StreamUtil;
 import quanta.util.SubNodeUtil;
 import quanta.util.ThreadLocals;
 import quanta.util.XString;
-import static quanta.util.Util.*;
 
 /**
  * https://github.com/vsch/flexmark-java
  */
-@Lazy @Component
+@Lazy
+@Component
 @Scope("prototype")
-public class ExportServiceFlexmark  {
+public class ExportServiceFlexmark {
 	private static final Logger log = LoggerFactory.getLogger(ExportServiceFlexmark.class);
 
 	@Autowired

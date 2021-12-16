@@ -1,5 +1,6 @@
 package quanta.types;
 
+import static quanta.util.Util.ok;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
@@ -10,18 +11,18 @@ import quanta.mongo.model.SubNode;
 import quanta.request.CreateSubNodeRequest;
 import quanta.service.NodeRenderService;
 import quanta.util.Val;
-import static quanta.util.Util.*;
 
-@Lazy @Component
+@Lazy
+@Component
 public class BookmarkType extends TypeBase {
 
     @Autowired
     @Lazy
-	protected NodeRenderService render;
+    protected NodeRenderService render;
 
     @Autowired
     @Lazy
-	protected MongoRead read;
+    protected MongoRead read;
 
     @Override
     public String getName() {

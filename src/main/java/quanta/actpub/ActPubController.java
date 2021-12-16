@@ -1,5 +1,6 @@
 package quanta.actpub;
 
+import static quanta.util.Util.ok;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -21,9 +22,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import quanta.actpub.model.APObj;
 import quanta.config.AppProp;
-
 import quanta.util.XString;
-import static quanta.util.Util.*;
 
 // @CrossOrigin --> Access-Control-Allow-Credentials
 
@@ -32,7 +31,7 @@ import static quanta.util.Util.*;
  */
 @Controller
 // @CrossOrigin (done by AppFilter. Spring doesn't do it.)
-public class ActPubController  {
+public class ActPubController {
 	private static final Logger log = LoggerFactory.getLogger(ActPubController.class);
 
 	@Autowired

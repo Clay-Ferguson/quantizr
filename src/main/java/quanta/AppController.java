@@ -264,6 +264,9 @@ public class AppController  implements ErrorController {
 	@Lazy
 	protected MongoRead read;
 
+	@Autowired
+	private CallProcessor callProc;
+
 	public static final String API_PATH = "/mobile/api";
 
 	private static boolean THYMELEAF_VARS_FROM_TREE = false;
@@ -278,9 +281,6 @@ public class AppController  implements ErrorController {
 	 * instance ever
 	 */
 	private static final RestTemplate restTemplate = new RestTemplate(Util.getClientHttpRequestFactory(10000));
-
-	@Autowired
-	private CallProcessor callProc;
 
 	// NOTE: server.error.path app property points to this.
 	private static final String ERROR_MAPPING = "/error";

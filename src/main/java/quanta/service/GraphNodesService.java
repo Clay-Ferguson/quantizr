@@ -1,5 +1,7 @@
 package quanta.service;
 
+import static quanta.util.Util.no;
+import static quanta.util.Util.ok;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -20,10 +22,10 @@ import quanta.response.GraphResponse;
 import quanta.util.ExUtil;
 import quanta.util.ThreadLocals;
 import quanta.util.XString;
-import static quanta.util.Util.*;
 
-@Lazy @Component
-public class GraphNodesService  {
+@Lazy
+@Component
+public class GraphNodesService {
 	private static final Logger log = LoggerFactory.getLogger(GraphNodesService.class);
 
 	@Autowired

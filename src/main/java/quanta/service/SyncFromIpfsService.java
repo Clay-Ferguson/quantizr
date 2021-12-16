@@ -1,5 +1,7 @@
 package quanta.service;
 
+import static quanta.util.Util.no;
+import static quanta.util.Util.ok;
 import java.util.HashSet;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -25,11 +27,11 @@ import quanta.response.LoadNodeFromIpfsResponse;
 import quanta.util.ExUtil;
 import quanta.util.ThreadLocals;
 import quanta.util.XString;
-import static quanta.util.Util.*;
 
-@Lazy @Component
+@Lazy
+@Component
 @Scope("prototype")
-public class SyncFromIpfsService  {
+public class SyncFromIpfsService {
 	private static final Logger log = LoggerFactory.getLogger(SyncFromIpfsService.class);
 
 	@Autowired

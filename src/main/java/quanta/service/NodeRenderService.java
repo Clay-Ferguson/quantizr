@@ -1,5 +1,7 @@
 package quanta.service;
 
+import static quanta.util.Util.no;
+import static quanta.util.Util.ok;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -41,7 +43,6 @@ import quanta.util.DateUtil;
 import quanta.util.SubNodeUtil;
 import quanta.util.ThreadLocals;
 import quanta.util.XString;
-import static quanta.util.Util.*;
 
 /**
  * Service for rendering the content of a page. The actual page is not rendered on the server side.
@@ -49,8 +50,9 @@ import static quanta.util.Util.*;
  * to the client. But regardless of format this is the primary service for pulling content up for
  * rendering the pages on the client as the user browses around on the tree.
  */
-@Lazy @Component
-public class NodeRenderService  {
+@Lazy
+@Component
+public class NodeRenderService {
 	private static final Logger log = LoggerFactory.getLogger(NodeRenderService.class);
 
 	@Autowired

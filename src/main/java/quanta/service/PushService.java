@@ -1,5 +1,7 @@
 package quanta.service;
 
+import static quanta.util.Util.no;
+import static quanta.util.Util.ok;
 import java.util.HashSet;
 import java.util.List;
 import java.util.concurrent.Executor;
@@ -22,10 +24,10 @@ import quanta.response.ServerPushInfo;
 import quanta.response.SessionTimeoutPushInfo;
 import quanta.util.Convert;
 import quanta.util.ThreadLocals;
-import static quanta.util.Util.*;
 
-@Lazy @Component
-public class PushService  {
+@Lazy
+@Component
+public class PushService {
 	private static final Logger log = LoggerFactory.getLogger(PushService.class);
 
 	@Autowired
@@ -36,11 +38,11 @@ public class PushService  {
 	@Lazy
 	protected MongoAuth auth;
 
-	static final int MAX_FEED_ITEMS = 25;
-
 	@Autowired
 	@Qualifier("threadPoolTaskExecutor")
 	private Executor executor;
+
+	static final int MAX_FEED_ITEMS = 25;
 
 	/* Notify all users being shared to on this node */
 	public void pushNodeUpdateToBrowsers(MongoSession ms, HashSet<Integer> sessionsPushed, SubNode node) {

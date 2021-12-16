@@ -13,7 +13,8 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import quanta.util.ExUtil;
 
-@Lazy @Component
+@Lazy
+@Component
 @Scope("prototype")
 public class ExportTarService extends ExportArchiveBase {
     private static final Logger log = LoggerFactory.getLogger(ExportTarService.class);
@@ -92,8 +93,7 @@ public class ExportTarService extends ExportArchiveBase {
             IOUtils.copyLarge(stream, out, 0, length);
         } catch (Exception ex) {
             throw ExUtil.wrapEx(ex);
-        }
-        finally {
+        } finally {
             try {
                 out.closeArchiveEntry();
             } catch (Exception e) {

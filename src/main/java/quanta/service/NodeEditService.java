@@ -1,5 +1,7 @@
 package quanta.service;
 
+import static quanta.util.Util.no;
+import static quanta.util.Util.ok;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -62,15 +64,15 @@ import quanta.util.ThreadLocals;
 import quanta.util.Util;
 import quanta.util.Val;
 import quanta.util.XString;
-import static quanta.util.Util.*;
 
 /**
  * Service for editing content of nodes. That is, this method updates property values of nodes. As
  * the user is using the application and moving, copy+paste, or editing node content this is the
  * service that performs those operations on the server, directly called from the HTML 'controller'
  */
-@Lazy @Component
-public class NodeEditService  {
+@Lazy
+@Component
+public class NodeEditService {
 	private static final Logger log = LoggerFactory.getLogger(NodeEditService.class);
 
 	@Autowired

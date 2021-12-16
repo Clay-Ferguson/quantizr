@@ -12,16 +12,17 @@ import quanta.mongo.model.SubNode;
 import quanta.request.CreateSubNodeRequest;
 import quanta.util.Val;
 
-@Lazy @Component
+@Lazy
+@Component
 public class RssFeedType extends TypeBase {
 
     @Autowired
     @Lazy
-	protected MongoUpdate update;
+    protected MongoUpdate update;
 
     @Autowired
     @Lazy
-	protected MongoCreate create;
+    protected MongoCreate create;
 
     @Override
     public String getName() {

@@ -1,9 +1,10 @@
 package quanta.util;
 
+import static quanta.util.Util.no;
+import static quanta.util.Util.ok;
 import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,7 +19,6 @@ import quanta.mongo.MongoCreate;
 import quanta.mongo.MongoSession;
 import quanta.mongo.MongoUpdate;
 import quanta.mongo.model.SubNode;
-import static quanta.util.Util.*;
 
 // todo-2: need to look into bulk-ops for doing this
 // tips:
@@ -36,7 +36,8 @@ import static quanta.util.Util.*;
  * book 'War and Peace' to load into the repository, because we use this book as sample/example
  * content.
  */
-@Lazy @Component
+@Lazy
+@Component
 @Scope("prototype")
 public class ImportWarAndPeace {
 	private static final Logger log = LoggerFactory.getLogger(ImportWarAndPeace.class);

@@ -26,6 +26,8 @@ import static quanta.util.Util.*;
 /**
  * Listener that MongoDB driver hooks into so we can inject processing into various phases of the
  * persistence (reads/writes) of the MongoDB objects.
+ * 
+ * can this be done with @Compoent instead of @Bean ? todo-0
  */
 public class MongoEventListener extends AbstractMongoEventListener<SubNode> {
 	private static final Logger log = LoggerFactory.getLogger(MongoEventListener.class);

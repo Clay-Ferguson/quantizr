@@ -1,5 +1,6 @@
 package quanta.service;
 
+import static quanta.util.Util.ok;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
@@ -22,7 +23,6 @@ import quanta.util.ExUtil;
 import quanta.util.SubNodeUtil;
 import quanta.util.ThreadLocals;
 import quanta.util.XString;
-import static quanta.util.Util.*;
 
 /**
  * 
@@ -38,9 +38,10 @@ import static quanta.util.Util.*;
  * 
  * Spring 'Prototype-scope Bean': We instantiate a new instance of this bean every time it's run.
  */
-@Lazy @Component
+@Lazy
+@Component
 @Scope("prototype")
-public class SyncToIpfsService  {
+public class SyncToIpfsService {
 	private static final Logger log = LoggerFactory.getLogger(SyncToIpfsService.class);
 
 	@Autowired

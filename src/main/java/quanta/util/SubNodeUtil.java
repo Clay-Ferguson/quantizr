@@ -1,5 +1,7 @@
 package quanta.util;
 
+import static quanta.util.Util.no;
+import static quanta.util.Util.ok;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -26,16 +28,15 @@ import quanta.mongo.model.SubNode;
 import quanta.mongo.model.SubNodePropertyMap;
 import quanta.service.NodeRenderService;
 
-import static quanta.util.Util.*;
-
 /**
  * Assorted general utility functions related to SubNodes.
  * 
  * todo-2: there's a lot of code calling these static methods, but need to transition to singleton
  * scope bean and non-static methods.
  */
-@Lazy @Component
-public class SubNodeUtil  {
+@Lazy
+@Component
+public class SubNodeUtil {
 	private static final Logger log = LoggerFactory.getLogger(SubNodeUtil.class);
 
 	@Autowired

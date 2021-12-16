@@ -1,5 +1,7 @@
 package quanta.service;
 
+import static quanta.util.Util.no;
+import static quanta.util.Util.ok;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Reader;
@@ -75,11 +77,11 @@ import quanta.util.StreamUtil;
 import quanta.util.SubNodeUtil;
 import quanta.util.Util;
 import quanta.util.XString;
-import static quanta.util.Util.*;
 
 /* Proof of Concept RSS Publishing */
-@Lazy @Component
-public class RSSFeedService  {
+@Lazy
+@Component
+public class RSSFeedService {
 	private static final Logger log = LoggerFactory.getLogger(RSSFeedService.class);
 
 	@Autowired

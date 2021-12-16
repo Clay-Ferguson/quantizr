@@ -15,7 +15,8 @@ import org.springframework.stereotype.Component;
 import quanta.mongo.MongoUpdate;
 import quanta.mongo.model.FediverseName;
 
-@Lazy @Component("MongoFediverseNamesTest")
+@Lazy
+@Component("MongoFediverseNamesTest")
 public class MongoFediverseNamesTest implements TestIntf {
 	private static final Logger log = LoggerFactory.getLogger(MongoFediverseNamesTest.class);
 

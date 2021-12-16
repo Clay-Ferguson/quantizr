@@ -1,16 +1,20 @@
 package quanta.util;
 
+import static quanta.util.Util.no;
+import static quanta.util.Util.ok;
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileFilter;
+import java.io.FileWriter;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.attribute.BasicFileAttributes;
+import java.nio.file.attribute.PosixFilePermission;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
-
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.comparator.NameFileComparator;
@@ -22,13 +26,8 @@ import org.springframework.stereotype.Component;
 import quanta.config.SpringContextUtil;
 import quanta.exception.base.RuntimeEx;
 
-import java.io.BufferedWriter;
-import java.io.FileWriter;
-
-import java.nio.file.attribute.PosixFilePermission;
-import static quanta.util.Util.*;
-
-@Lazy @Component
+@Lazy
+@Component
 public class FileUtils {
 	private static final Logger log = LoggerFactory.getLogger(FileUtils.class);
 

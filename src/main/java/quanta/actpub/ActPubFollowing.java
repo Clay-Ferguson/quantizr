@@ -47,57 +47,58 @@ import static quanta.util.Util.*;
 /**
  * Methods relating to AP following
  */
-@Lazy @Component
-public class ActPubFollowing  {
+@Lazy
+@Component
+public class ActPubFollowing {
     private static final Logger log = LoggerFactory.getLogger(ActPubFollowing.class);
 
     @Autowired
     @Lazy
-	protected MongoTemplate ops;
+    protected MongoTemplate ops;
 
     @Autowired
     @Lazy
-	protected Convert convert;
+    protected Convert convert;
 
     @Autowired
     @Lazy
-	protected NodeEditService edit;
+    protected NodeEditService edit;
 
     @Autowired
     @Lazy
-	protected ActPubCrypto apCrypto;
+    protected ActPubCrypto apCrypto;
 
     @Autowired
     @Lazy
-	protected ActPubUtil apUtil;
+    protected ActPubUtil apUtil;
 
     @Autowired
     @Lazy
-	protected ActPubService apub;
+    protected ActPubService apub;
 
     @Autowired
     @Lazy
-	protected AdminRun arun;
+    protected AdminRun arun;
 
     @Autowired
     @Lazy
-	protected AppProp prop;
+    protected AppProp prop;
 
     @Autowired
     @Lazy
-	protected MongoUtil mongoUtil;
+    protected MongoUtil mongoUtil;
 
     @Autowired
     @Lazy
-	protected MongoAuth auth;
+    protected MongoAuth auth;
 
     @Autowired
     @Lazy
-	protected MongoDelete delete;
+    protected MongoDelete delete;
 
     @Autowired
     @Lazy
-	protected MongoRead read;
+    protected MongoRead read;
 
     @Autowired
     @Qualifier("threadPoolTaskExecutor")

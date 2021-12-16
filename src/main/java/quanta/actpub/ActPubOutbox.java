@@ -41,37 +41,38 @@ import static quanta.util.Util.*;
 /**
  * AP Outbox
  */
-@Lazy @Component
-public class ActPubOutbox  {
+@Lazy
+@Component
+public class ActPubOutbox {
     private static final Logger log = LoggerFactory.getLogger(ActPubOutbox.class);
 
     @Autowired
     @Lazy
-	protected ActPubUtil apUtil;
+    protected ActPubUtil apUtil;
 
     @Autowired
     @Lazy
-	protected ActPubService apub;
+    protected ActPubService apub;
 
     @Autowired
     @Lazy
-	protected SubNodeUtil snUtil;
+    protected SubNodeUtil snUtil;
 
     @Autowired
     @Lazy
-	protected AppProp prop;
+    protected AppProp prop;
 
     @Autowired
     @Lazy
-	protected AdminRun arun;
+    protected AdminRun arun;
 
     @Autowired
     @Lazy
-	protected MongoAuth auth;
+    protected MongoAuth auth;
 
     @Autowired
     @Lazy
-	protected MongoRead read;
+    protected MongoRead read;
 
     @Autowired
     @Qualifier("threadPoolTaskExecutor")

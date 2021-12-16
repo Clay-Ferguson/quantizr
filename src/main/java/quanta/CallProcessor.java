@@ -27,6 +27,7 @@ import quanta.util.ThreadLocals;
 import quanta.util.XString;
 import static quanta.util.Util.*;
 
+@Lazy
 @Component
 public class CallProcessor {
 	private static final Logger log = LoggerFactory.getLogger(CallProcessor.class);

@@ -1,5 +1,7 @@
 package quanta.actpub;
 
+import static quanta.util.Util.no;
+import static quanta.util.Util.ok;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.security.KeyFactory;
@@ -42,45 +44,44 @@ import quanta.mongo.MongoAuth;
 import quanta.mongo.MongoRead;
 import quanta.mongo.MongoSession;
 import quanta.mongo.model.SubNode;
-
 import quanta.util.Util;
 import quanta.util.XString;
-import static quanta.util.Util.*;
 
 /**
  * AP-related utilities
  */
-@Lazy @Component
-public class ActPubUtil  {
+@Lazy
+@Component
+public class ActPubUtil {
     private static final Logger log = LoggerFactory.getLogger(ActPubUtil.class);
 
     @Autowired
     @Lazy
-	protected ActPubCrypto apCrypto;
+    protected ActPubCrypto apCrypto;
 
     @Autowired
     @Lazy
-	public ActPubCache apCache;
+    public ActPubCache apCache;
 
     @Autowired
     @Lazy
-	protected ActPubUtil apUtil;
+    protected ActPubUtil apUtil;
 
     @Autowired
     @Lazy
-	protected ActPubService apub;
+    protected ActPubService apub;
 
     @Autowired
     @Lazy
-	protected AppProp prop;
+    protected AppProp prop;
 
     @Autowired
     @Lazy
-	protected MongoAuth auth;
+    protected MongoAuth auth;
 
     @Autowired
     @Lazy
-	protected MongoRead read;
+    protected MongoRead read;
 
     /*
      * RestTemplate is thread-safe and reusable, and has no state, so we need only one final static

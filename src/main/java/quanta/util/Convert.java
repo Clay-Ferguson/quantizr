@@ -1,5 +1,7 @@
 package quanta.util;
 
+import static quanta.util.Util.no;
+import static quanta.util.Util.ok;
 import java.net.URLConnection;
 import java.util.Date;
 import java.util.HashMap;
@@ -32,16 +34,15 @@ import quanta.mongo.model.SubNode;
 import quanta.mongo.model.SubNodePropVal;
 import quanta.mongo.model.SubNodePropertyMap;
 import quanta.service.AttachmentService;
-
 import quanta.types.TypeBase;
 import quanta.types.TypePluginMgr;
-import static quanta.util.Util.*;
 
 /**
  * Converting objects from one type to another, and formatting.
  */
-@Lazy @Component
-public class Convert  {
+@Lazy
+@Component
+public class Convert {
 	private static final Logger log = LoggerFactory.getLogger(Convert.class);
 
 	@Autowired
@@ -200,8 +201,7 @@ public class Convert  {
 		if (allowInlineChildren) {
 			boolean hasInlineChildren = node.getBool(NodeProp.INLINE_CHILDREN);
 			if (hasInlineChildren) {
-				Iterable<SubNode> nodeIter =
-						read.getChildren(ms, node, Sort.by(Sort.Direction.ASC, SubNode.ORDINAL), 100, 0);
+				Iterable<SubNode> nodeIter = read.getChildren(ms, node, Sort.by(Sort.Direction.ASC, SubNode.ORDINAL), 100, 0);
 				Iterator<SubNode> iterator = nodeIter.iterator();
 				long inlineOrdinal = 0;
 				while (true) {

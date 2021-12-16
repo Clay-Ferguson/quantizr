@@ -1,5 +1,7 @@
 package quanta.service;
 
+import static quanta.util.Util.no;
+import static quanta.util.Util.ok;
 import java.util.concurrent.ConcurrentHashMap;
 import org.jsoup.Connection;
 import org.jsoup.Jsoup;
@@ -12,9 +14,9 @@ import org.springframework.stereotype.Component;
 import quanta.model.client.OpenGraph;
 import quanta.request.GetOpenGraphRequest;
 import quanta.response.GetOpenGraphResponse;
-import static quanta.util.Util.*;
 
-@Lazy @Component
+@Lazy
+@Component
 public class JSoupService {
 	private static final Logger log = LoggerFactory.getLogger(JSoupService.class);
 

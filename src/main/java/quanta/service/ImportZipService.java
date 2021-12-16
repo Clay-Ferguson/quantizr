@@ -1,5 +1,7 @@
 package quanta.service;
 
+import static quanta.util.Util.no;
+import static quanta.util.Util.ok;
 import java.io.InputStream;
 import org.apache.commons.compress.archivers.zip.ZipArchiveEntry;
 import org.apache.commons.compress.archivers.zip.ZipArchiveInputStream;
@@ -23,7 +25,6 @@ import quanta.util.ExUtil;
 import quanta.util.LimitedInputStreamEx;
 import quanta.util.StreamUtil;
 import quanta.util.ThreadLocals;
-import static quanta.util.Util.*;
 
 /**
  * Import from ZIP files. Imports zip files that have the same type of directory structure and
@@ -31,7 +32,8 @@ import static quanta.util.Util.*;
  * have been actually exported from SubNode in order to import it, but merely have the proper
  * layout/content.
  */
-@Lazy @Component
+@Lazy
+@Component
 @Scope("prototype")
 public class ImportZipService extends ImportArchiveBase {
 	private static final Logger log = LoggerFactory.getLogger(ImportZipService.class);

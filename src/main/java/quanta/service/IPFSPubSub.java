@@ -1,5 +1,6 @@
 package quanta.service;
 
+import static quanta.util.Util.no;
 import static quanta.util.Util.ok;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -37,22 +38,22 @@ import quanta.util.Cast;
 import quanta.util.DateUtil;
 import quanta.util.Util;
 import quanta.util.XString;
-import static quanta.util.Util.*;
 
 // IPFS Reference: https://docs.ipfs.io/reference/http/api
 
-@Lazy @Component
-public class IPFSPubSub  {
+@Lazy
+@Component
+public class IPFSPubSub {
     private static final Logger log = LoggerFactory.getLogger(IPFSPubSub.class);
 
     @Autowired
-	protected IPFSService ipfs;
+    protected IPFSService ipfs;
 
     @Autowired
-	protected PushService push;
+    protected PushService push;
 
     @Autowired
-	protected AsyncExec asyncExec;
+    protected AsyncExec asyncExec;
 
     private static final boolean IPSM_ENABLE = false;
     private static final String IPSM_TOPIC_HEARTBEAT = "ipsm-heartbeat";

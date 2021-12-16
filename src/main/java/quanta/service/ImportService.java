@@ -1,5 +1,6 @@
 package quanta.service;
 
+import static quanta.util.Util.no;
 import java.io.BufferedInputStream;
 import org.apache.commons.io.input.AutoCloseInputStream;
 import org.apache.commons.lang3.StringUtils;
@@ -19,10 +20,10 @@ import quanta.mongo.model.SubNode;
 import quanta.util.ExUtil;
 import quanta.util.StreamUtil;
 import quanta.util.ThreadLocals;
-import static quanta.util.Util.*;
 
-@Lazy @Component
-public class ImportService  {
+@Lazy
+@Component
+public class ImportService {
 	private static final Logger log = LoggerFactory.getLogger(ImportService.class);
 
 	@Autowired

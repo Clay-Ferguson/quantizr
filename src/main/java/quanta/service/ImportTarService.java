@@ -1,5 +1,7 @@
 package quanta.service;
 
+import static quanta.util.Util.no;
+import static quanta.util.Util.ok;
 import java.io.InputStream;
 import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
 import org.apache.commons.compress.archivers.tar.TarArchiveInputStream;
@@ -17,9 +19,9 @@ import quanta.mongo.model.SubNode;
 import quanta.util.ExUtil;
 import quanta.util.StreamUtil;
 import quanta.util.ThreadLocals;
-import static quanta.util.Util.*;
 
-@Lazy @Component
+@Lazy
+@Component
 @Scope("prototype")
 public class ImportTarService extends ImportArchiveBase {
 	private static final Logger log = LoggerFactory.getLogger(ImportZipService.class);

@@ -1,5 +1,7 @@
 package quanta.service;
 
+import static quanta.util.Util.no;
+import static quanta.util.Util.ok;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.FileInputStream;
@@ -75,7 +77,6 @@ import quanta.util.ThreadLocals;
 import quanta.util.Util;
 import quanta.util.Val;
 import quanta.util.XString;
-import static quanta.util.Util.*;
 
 // IPFS Reference: https://docs.ipfs.io/reference/http/api
 
@@ -85,41 +86,42 @@ import static quanta.util.Util.*;
  * converter convert do this for us always instead
  */
 
-@Lazy @Component
-public class IPFSService  {
+@Lazy
+@Component
+public class IPFSService {
     private static final Logger log = LoggerFactory.getLogger(IPFSService.class);
 
     @Autowired
     @Lazy
-	protected AsyncExec asyncExec;
+    protected AsyncExec asyncExec;
 
     @Autowired
     @Lazy
-	protected AttachmentService attach;
+    protected AttachmentService attach;
 
     @Autowired
     @Lazy
-	protected AdminRun arun;
+    protected AdminRun arun;
 
     @Autowired
     @Lazy
-	protected AppProp prop;
+    protected AppProp prop;
 
     @Autowired
     @Lazy
-	protected UserManagerService user;
+    protected UserManagerService user;
 
     @Autowired
     @Lazy
-	protected MongoUpdate update;
+    protected MongoUpdate update;
 
     @Autowired
     @Lazy
-	protected MongoRead read;
+    protected MongoRead read;
 
     @Autowired
     @Lazy
-	protected MongoCreate create;
+    protected MongoCreate create;
 
     public static String API_BASE;
     public static String API_CAT;

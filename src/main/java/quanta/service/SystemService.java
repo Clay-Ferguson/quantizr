@@ -1,5 +1,7 @@
 package quanta.service;
 
+import static quanta.util.Util.no;
+import static quanta.util.Util.ok;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.lang.management.ManagementFactory;
@@ -37,13 +39,13 @@ import quanta.util.ExUtil;
 import quanta.util.StopwatchEntry;
 import quanta.util.ThreadLocals;
 import quanta.util.XString;
-import static quanta.util.Util.*;
 
 /**
  * Service methods for System related functions. Admin functions.
  */
-@Lazy @Component
-public class SystemService  {
+@Lazy
+@Component
+public class SystemService {
 	private static final Logger log = LoggerFactory.getLogger(SystemService.class);
 
 	@Autowired

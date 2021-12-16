@@ -95,11 +95,10 @@ import quanta.util.XString;
  * Service methods for processing user management functions. Login, logout, signup, user
  * preferences, and settings persisted per-user
  */
-@Lazy @Component
-public class UserManagerService  {
+@Lazy
+@Component
+public class UserManagerService {
 	private static final Logger log = LoggerFactory.getLogger(UserManagerService.class);
-
-	private static final Random rand = new Random();
 
 	@Autowired
 	@Lazy
@@ -172,6 +171,8 @@ public class UserManagerService  {
 	@Autowired
 	@Lazy
 	protected MongoCreate create;
+
+	private static final Random rand = new Random();
 
 	/* Private keys of each user by user name as key */
 	public static final ConcurrentHashMap<String, String> privateKeysByUserName = new ConcurrentHashMap<>();
@@ -1166,8 +1167,8 @@ public class UserManagerService  {
 		if (no(parentNode))
 			return null;
 
-		for (SubNode friendNode : read.getChildren(ms, parentNode,
-				sort ? Sort.by(Sort.Direction.ASC, SubNode.ORDINAL) : null, null, 0)) {
+		for (SubNode friendNode : read.getChildren(ms, parentNode, sort ? Sort.by(Sort.Direction.ASC, SubNode.ORDINAL) : null,
+				null, 0)) {
 			nodeList.add(friendNode);
 		}
 		return nodeList;

@@ -1,5 +1,7 @@
 package quanta.actpub;
 
+import static quanta.util.Util.no;
+import static quanta.util.Util.ok;
 import java.nio.charset.StandardCharsets;
 import java.security.KeyFactory;
 import java.security.PublicKey;
@@ -21,21 +23,20 @@ import quanta.model.client.NodeProp;
 import quanta.mongo.MongoRead;
 import quanta.mongo.MongoSession;
 import quanta.mongo.model.SubNode;
-
 import quanta.service.UserManagerService;
 import quanta.util.XString;
-import static quanta.util.Util.*;
 
 /**
  * Crypto functions for AP
  */
-@Lazy @Component
-public class ActPubCrypto  {
+@Lazy
+@Component
+public class ActPubCrypto {
     private static final Logger log = LoggerFactory.getLogger(ActPubCrypto.class);
 
     @Autowired
     @Lazy
-	protected MongoRead read;
+    protected MongoRead read;
 
     /* Gets private RSA key from current user session */
     public String getPrivateKey(MongoSession ms, String userName) {

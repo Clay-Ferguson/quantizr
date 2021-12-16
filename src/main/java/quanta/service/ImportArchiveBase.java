@@ -1,5 +1,7 @@
 package quanta.service;
 
+import static quanta.util.Util.no;
+import static quanta.util.Util.ok;
 import java.io.InputStream;
 import java.util.HashMap;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -23,9 +25,8 @@ import quanta.util.LimitedInputStreamEx;
 import quanta.util.MimeUtil;
 import quanta.util.Val;
 import quanta.util.XString;
-import static quanta.util.Util.*;
 
-public abstract class ImportArchiveBase  {
+public abstract class ImportArchiveBase {
 	private static final Logger log = LoggerFactory.getLogger(ImportArchiveBase.class);
 
 	@Autowired

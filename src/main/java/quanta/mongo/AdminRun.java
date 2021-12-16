@@ -26,10 +26,6 @@ public class AdminRun {
 	@Lazy
 	private MongoAuth auth;
 
-	public AdminRun() {
-		log.debug("Bean Construct: AdminRun");
-	}
-
 	public <T> T run(MongoRunnableEx<T> runner) {
 		MongoSession ms = null;
 		MongoSession savedMs = null;

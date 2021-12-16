@@ -19,8 +19,9 @@ import static quanta.util.Util.*;
 /**
  * Performs the 'create' (as in CRUD) operations for creating new nodes in MongoDB
  */
-@Lazy @Component
-public class MongoCreate  {
+@Lazy
+@Component
+public class MongoCreate {
 	private static final Logger log = LoggerFactory.getLogger(MongoCreate.class);
 
 	@Autowired
@@ -154,8 +155,8 @@ public class MongoCreate  {
 		update.saveSession(ms);
 
 		Criteria criteria = Criteria.where(SubNode.ORDINAL).gte(ordinal);
-		for (SubNode child : read.getChildrenUnderPath(ms, node.getPath(), Sort.by(Sort.Direction.ASC, SubNode.ORDINAL),
-				null, 0, null, criteria)) {
+		for (SubNode child : read.getChildrenUnderPath(ms, node.getPath(), Sort.by(Sort.Direction.ASC, SubNode.ORDINAL), null, 0,
+				null, criteria)) {
 			child.setOrdinal(maxOrdinal++);
 		}
 	}

@@ -1,5 +1,7 @@
 package quanta.config;
 
+import static quanta.util.Util.no;
+import static quanta.util.Util.ok;
 import java.io.File;
 import java.io.InputStream;
 import java.util.HashMap;
@@ -20,12 +22,12 @@ import quanta.actpub.APConst;
 import quanta.util.ExUtil;
 import quanta.util.StreamUtil;
 import quanta.util.XString;
-import static quanta.util.Util.*;
 
 /**
  * Wrapper to access application properties.
  */
-@Lazy @Component
+@Lazy
+@Component
 public class AppProp {
 	private static final Logger log = LoggerFactory.getLogger(AppProp.class);
 

@@ -1,7 +1,6 @@
 package quanta.test;
 
 import java.util.Map;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,7 +13,8 @@ import quanta.service.IPFSService;
 import quanta.util.Val;
 import quanta.util.XString;
 
-@Lazy @Component("IPFSTest")
+@Lazy
+@Component("IPFSTest")
 public class IPFSTest implements TestIntf {
     private static final Logger log = LoggerFactory.getLogger(IPFSTest.class);
 

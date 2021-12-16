@@ -1,5 +1,7 @@
 package quanta.mongo;
 
+import static quanta.util.Util.no;
+import static quanta.util.Util.ok;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.LinkedList;
@@ -29,12 +31,9 @@ import quanta.model.client.PrincipalName;
 import quanta.model.client.PrivilegeType;
 import quanta.mongo.model.SubNode;
 import quanta.service.AclService;
-
 import quanta.util.ThreadLocals;
 import quanta.util.Util;
 import quanta.util.XString;
-import static quanta.util.Util.*;
-
 
 /**
  * Performs the 'create' (as in CRUD) operations for creating new nodes in MongoDB
@@ -42,37 +41,38 @@ import static quanta.util.Util.*;
  * There are many more opportunities in this class to use the ThreadLocals.nodeCache to store
  * information in the thread for use during context of one call
  */
-@Lazy @Component
-public class MongoRead  {
+@Lazy
+@Component
+public class MongoRead {
     private static final Logger log = LoggerFactory.getLogger(MongoRead.class);
 
     @Autowired
     @Lazy
-	protected MongoTemplate ops;
+    protected MongoTemplate ops;
 
     @Autowired
     @Lazy
-	protected AppProp prop;
+    protected AppProp prop;
 
     @Autowired
     @Lazy
-	protected AclService acl;
+    protected AclService acl;
 
     @Autowired
     @Lazy
-	protected MongoUtil mongoUtil;
+    protected MongoUtil mongoUtil;
 
     @Autowired
     @Lazy
-	protected MongoAuth auth;
+    protected MongoAuth auth;
 
     @Autowired
     @Lazy
-	protected MongoUpdate update;
+    protected MongoUpdate update;
 
     @Autowired
     @Lazy
-	protected MongoCreate create;
+    protected MongoCreate create;
 
     private static final Object dbRootLock = new Object();
     private SubNode dbRoot;

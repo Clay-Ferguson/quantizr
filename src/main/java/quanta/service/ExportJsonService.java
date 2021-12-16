@@ -1,5 +1,6 @@
 package quanta.service;
 
+import static quanta.util.Util.ok;
 import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
 import java.io.File;
@@ -33,14 +34,14 @@ import quanta.util.LimitedInputStreamEx;
 import quanta.util.StreamUtil;
 import quanta.util.ThreadLocals;
 import quanta.util.Val;
-import static quanta.util.Util.*;
 
 /**
  * Import/Export of Raw JSON and Binaries to and from filesystem/classpath)
  */
-@Lazy @Component
+@Lazy
+@Component
 @Scope("prototype")
-public class ExportJsonService  {
+public class ExportJsonService {
 	private static final Logger log = LoggerFactory.getLogger(ExportJsonService.class);
 
 	@Autowired

@@ -28,7 +28,8 @@ import quanta.service.UserManagerService;
 import quanta.util.LimitedInputStreamEx;
 import quanta.util.ThreadLocals;
 
-@Lazy @Component("MongoTest")
+@Lazy
+@Component("MongoTest")
 public class MongoTest implements TestIntf {
 	private static final Logger log = LoggerFactory.getLogger(MongoTest.class);
 

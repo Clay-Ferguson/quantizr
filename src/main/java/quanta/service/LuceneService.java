@@ -1,5 +1,6 @@
 package quanta.service;
 
+import static quanta.util.Util.ok;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,13 +12,13 @@ import quanta.mongo.MongoSession;
 import quanta.mongo.model.SubNode;
 import quanta.response.LuceneIndexResponse;
 import quanta.response.LuceneSearchResponse;
-import static quanta.util.Util.*;
 
 /**
  * Service for processing Lucene-related functions.
  */
-@Lazy @Component
-public class LuceneService  {
+@Lazy
+@Component
+public class LuceneService {
 	private static final Logger log = LoggerFactory.getLogger(LuceneService.class);
 
 	@Autowired

@@ -9,11 +9,11 @@ import quanta.model.NodeInfo;
 import quanta.mongo.MongoSession;
 import quanta.mongo.model.SubNode;
 import quanta.request.CreateSubNodeRequest;
-
 import quanta.util.Val;
 
-@Lazy @Component
-public abstract class TypeBase  {
+@Lazy
+@Component
+public abstract class TypeBase {
     private static final Logger log = LoggerFactory.getLogger(TypeBase.class);
 
     @PostConstruct

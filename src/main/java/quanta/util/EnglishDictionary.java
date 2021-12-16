@@ -1,5 +1,7 @@
 package quanta.util;
 
+import static quanta.util.Util.no;
+import static quanta.util.Util.ok;
 import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
 import java.io.FileOutputStream;
@@ -15,9 +17,9 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Component;
 import quanta.config.SpringContextUtil;
-import static quanta.util.Util.*;
 
-@Lazy @Component
+@Lazy
+@Component
 public class EnglishDictionary {
 	private static final Logger log = LoggerFactory.getLogger(EnglishDictionary.class);
 	private static final HashSet<String> dictWords = new HashSet<>();
@@ -93,7 +95,8 @@ public class EnglishDictionary {
 			return;
 
 		try {
-			Resource resource = SpringContextUtil.getApplicationContext().getResource("classpath:public/data/english-dictionary.txt");
+			Resource resource =
+					SpringContextUtil.getApplicationContext().getResource("classpath:public/data/english-dictionary.txt");
 			InputStream is = resource.getInputStream();
 			BufferedReader in = new BufferedReader(new InputStreamReader(is));
 			try {

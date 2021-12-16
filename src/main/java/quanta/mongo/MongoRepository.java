@@ -1,5 +1,7 @@
 package quanta.mongo;
 
+import static quanta.util.Util.no;
+import static quanta.util.Util.ok;
 import javax.annotation.PreDestroy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -8,14 +10,14 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 import quanta.AppServer;
 import quanta.actpub.ActPubService;
-
 import quanta.util.ThreadLocals;
-import static quanta.util.Util.*;
+
 /**
  * Models the MongoDB repository connection.
  */
-@Lazy @Component
-public class MongoRepository  {
+@Lazy
+@Component
+public class MongoRepository {
 	private static final Logger log = LoggerFactory.getLogger(MongoRepository.class);
 
 	@Autowired

@@ -1,5 +1,7 @@
 package quanta.actpub;
 
+import static quanta.util.Util.no;
+import static quanta.util.Util.ok;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.Executor;
@@ -29,50 +31,49 @@ import quanta.mongo.MongoUtil;
 import quanta.mongo.model.SubNode;
 import quanta.request.GetFollowersRequest;
 import quanta.response.GetFollowersResponse;
-
 import quanta.util.Convert;
 import quanta.util.ThreadLocals;
 import quanta.util.XString;
-import static quanta.util.Util.*;
 
 /**
  * Methods related to AP Follower
  */
-@Lazy @Component
-public class ActPubFollower  {
+@Lazy
+@Component
+public class ActPubFollower {
     private static final Logger log = LoggerFactory.getLogger(ActPubFollower.class);
 
     @Autowired
     @Lazy
-	protected MongoTemplate ops;
+    protected MongoTemplate ops;
 
     @Autowired
     @Lazy
-	protected Convert convert;
+    protected Convert convert;
 
     @Autowired
     @Lazy
-	protected ActPubUtil apUtil;
+    protected ActPubUtil apUtil;
 
     @Autowired
     @Lazy
-	protected ActPubService apub;
+    protected ActPubService apub;
 
     @Autowired
     @Lazy
-	protected AdminRun arun;
+    protected AdminRun arun;
 
     @Autowired
     @Lazy
-	protected AppProp prop;
+    protected AppProp prop;
 
     @Autowired
     @Lazy
-	protected MongoUtil mongoUtil;
+    protected MongoUtil mongoUtil;
 
     @Autowired
     @Lazy
-	protected MongoAuth auth;
+    protected MongoAuth auth;
 
     @Autowired
     @Qualifier("threadPoolTaskExecutor")
@@ -177,7 +178,7 @@ public class ActPubFollower  {
         if (ok(minId)) {
             url += "&min_id=" + minId;
         }
-        
+
         APOOrderedCollectionPage ret = new APOOrderedCollectionPage(url, followers,
                 prop.getProtocolHostAndPort() + APConst.PATH_FOLLOWERS + "/" + userName, followers.size());
         return ret;

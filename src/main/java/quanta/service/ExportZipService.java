@@ -12,7 +12,8 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import quanta.util.ExUtil;
 
-@Lazy @Component
+@Lazy
+@Component
 @Scope("prototype")
 public class ExportZipService extends ExportArchiveBase {
     private static final Logger log = LoggerFactory.getLogger(ExportZipService.class);
@@ -31,7 +32,7 @@ public class ExportZipService extends ExportArchiveBase {
     @Override
     public void closeOutputStream() {
         try {
-            out.finish(); 
+            out.finish();
             out.close();
         } catch (Exception ex) {
             throw ExUtil.wrapEx(ex);

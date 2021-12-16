@@ -10,12 +10,13 @@ import quanta.request.CreateSubNodeRequest;
 import quanta.util.SubNodeUtil;
 import quanta.util.Val;
 
-@Lazy @Component
+@Lazy
+@Component
 public class RoomType extends TypeBase {
 
     @Autowired
     @Lazy
-	private SubNodeUtil snUtil;
+    private SubNodeUtil snUtil;
 
     @Override
     public String getName() {

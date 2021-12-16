@@ -6,13 +6,14 @@ import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 
-@Lazy @Component
+@Lazy
+@Component
 public class TypePluginMgr {
     private static final Logger log = LoggerFactory.getLogger(TypePluginMgr.class);
     private static HashMap<String, TypeBase> types = new HashMap<>();
 
     public static void addType(TypeBase type) {
-        log.debug("Plugin: "+type.getClass().getName());
+        log.debug("Plugin: " + type.getClass().getName());
         types.put(type.getName().toLowerCase(), type);
     }
 

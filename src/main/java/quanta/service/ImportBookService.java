@@ -1,5 +1,6 @@
 package quanta.service;
 
+import static quanta.util.Util.ok;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,15 +18,15 @@ import quanta.util.ExUtil;
 import quanta.util.ImportWarAndPeace;
 import quanta.util.ThreadLocals;
 import quanta.util.XString;
-import static quanta.util.Util.*;
 
 /**
  * Special-purpose code for importing the book War and Peace which ships with SubNode, and is used
  * for demonstration purposes to show how browsing, searching, etc. works, and for testing with a
  * reasonable sized chunk of data (i.e. the entire book)
  */
-@Lazy @Component
-public class ImportBookService  {
+@Lazy
+@Component
+public class ImportBookService {
 	private static final Logger log = LoggerFactory.getLogger(ImportBookService.class);
 
 	@Autowired
@@ -56,7 +57,8 @@ public class ImportBookService  {
 		 * for now we don't check book name. Only one book exists: War and Peace
 		 */
 		ImportWarAndPeace iwap = SpringContextUtil.getApplicationContext().getBean(ImportWarAndPeace.class);
-		iwap.importBook(ms, "classpath:public/data/war-and-peace.txt", node, safeBooleanVal(req.getTruncated()) ? 2 : Integer.MAX_VALUE);
+		iwap.importBook(ms, "classpath:public/data/war-and-peace.txt", node,
+				safeBooleanVal(req.getTruncated()) ? 2 : Integer.MAX_VALUE);
 
 		update.saveSession(ms);
 		res.setSuccess(true);

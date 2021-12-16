@@ -100,8 +100,9 @@ import quanta.util.Val;
  * attachment. If the attachment is an 'image' type then it gets displayed right on the page.
  * Otherwise a download link is what gets displayed on the node.
  */
-@Lazy @Component
-public class AttachmentService  {
+@Lazy
+@Component
+public class AttachmentService {
 	private static final Logger log = LoggerFactory.getLogger(AttachmentService.class);
 
 	@Autowired

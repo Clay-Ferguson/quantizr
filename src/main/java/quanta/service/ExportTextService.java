@@ -1,5 +1,6 @@
 package quanta.service;
 
+import static quanta.util.Util.no;
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -24,11 +25,11 @@ import quanta.util.FileUtils;
 import quanta.util.StreamUtil;
 import quanta.util.SubNodeUtil;
 import quanta.util.ThreadLocals;
-import static quanta.util.Util.*;
 
-@Lazy @Component
+@Lazy
+@Component
 @Scope("prototype")
-public class ExportTextService  {
+public class ExportTextService {
 	private static final Logger log = LoggerFactory.getLogger(ExportTextService.class);
 
 	@Autowired

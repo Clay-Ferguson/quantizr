@@ -7,7 +7,8 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 import quanta.util.DateUtil;
 
-@Lazy @Component("UtilsTest")
+@Lazy
+@Component("UtilsTest")
 public class UtilsTest implements TestIntf {
 	private static final Logger log = LoggerFactory.getLogger(UtilsTest.class);
 

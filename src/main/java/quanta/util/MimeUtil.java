@@ -6,11 +6,13 @@ import org.springframework.stereotype.Component;
 /**
  * Mime-Type (content type) utilities
  */
-@Lazy @Component
+@Lazy
+@Component
 public class MimeUtil {
 
 	public boolean isTextTypeFileName(String fileName) {
-		if (!fileName.contains(".")) return false;
+		if (!fileName.contains("."))
+			return false;
 
 		String ext = XString.parseAfterLast(fileName, ".");
 
@@ -24,7 +26,8 @@ public class MimeUtil {
 	}
 
 	public boolean isHtmlTypeFileName(String fileName) {
-		if (!fileName.contains(".")) return false;
+		if (!fileName.contains("."))
+			return false;
 
 		String ext = XString.parseAfterLast(fileName, ".");
 
@@ -37,8 +40,10 @@ public class MimeUtil {
 	}
 
 	public boolean isJsonFileType(String fileName) {
-		if (!fileName.contains(".")) return false;
-		if (fileName.toLowerCase().endsWith(".json.txt")) return true;
+		if (!fileName.contains("."))
+			return false;
+		if (fileName.toLowerCase().endsWith(".json.txt"))
+			return true;
 		String ext = XString.parseAfterLast(fileName, ".");
 		return ext.equalsIgnoreCase("json");
 	}

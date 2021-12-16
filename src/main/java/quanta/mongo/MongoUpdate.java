@@ -1,5 +1,7 @@
 package quanta.mongo;
 
+import static quanta.util.Util.no;
+import static quanta.util.Util.ok;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
@@ -15,19 +17,17 @@ import quanta.model.UserStats;
 import quanta.model.client.NodeProp;
 import quanta.mongo.model.SubNode;
 import quanta.service.IPFSService;
-
 import quanta.util.Cast;
 import quanta.util.ThreadLocals;
 import quanta.util.Val;
 import quanta.util.XString;
-import static quanta.util.Util.*;
-
 
 /**
  * Performs update (as in CRUD) operations for MongoDB
  */
-@Lazy @Component
-public class MongoUpdate  {
+@Lazy
+@Component
+public class MongoUpdate {
 	private static final Logger log = LoggerFactory.getLogger(MongoUpdate.class);
 
 	@Autowired
@@ -35,7 +35,7 @@ public class MongoUpdate  {
 	protected IPFSService ipfs;
 
 	@Autowired
-    @Lazy
+	@Lazy
 	protected MongoTemplate ops;
 
 	@Autowired

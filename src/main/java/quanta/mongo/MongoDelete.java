@@ -1,5 +1,6 @@
 package quanta.mongo;
 
+import static quanta.util.Util.no;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.Date;
@@ -18,18 +19,16 @@ import quanta.model.client.NodeProp;
 import quanta.mongo.model.SubNode;
 import quanta.service.AttachmentService;
 
-import static quanta.util.Util.*;
-
-
 /**
  * Performs the 'deletes' (as in CRUD) operations for deleting nodes in MongoDB
  */
-@Lazy @Component
-public class MongoDelete  {
+@Lazy
+@Component
+public class MongoDelete {
 	private static final Logger log = LoggerFactory.getLogger(MongoDelete.class);
 
 	@Autowired
-    @Lazy
+	@Lazy
 	protected MongoTemplate ops;
 
 	@Autowired

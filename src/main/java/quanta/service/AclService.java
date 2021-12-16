@@ -1,5 +1,7 @@
 package quanta.service;
 
+import static quanta.util.Util.no;
+import static quanta.util.Util.ok;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -33,14 +35,14 @@ import quanta.response.SetCipherKeyResponse;
 import quanta.util.ExUtil;
 import quanta.util.ThreadLocals;
 import quanta.util.XString;
-import static quanta.util.Util.*;
 
 /**
  * Service methods for (ACL): processing security, privileges, and Access Control List information
  * on nodes.
  */
-@Lazy @Component
-public class AclService  {
+@Lazy
+@Component
+public class AclService {
 	private static final Logger log = LoggerFactory.getLogger(AclService.class);
 
 	@Autowired

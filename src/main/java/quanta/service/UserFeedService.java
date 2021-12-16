@@ -41,9 +41,9 @@ import quanta.util.Convert;
 import quanta.util.ThreadLocals;
 import static quanta.util.Util.*;
 
-
-@Lazy @Component
-public class UserFeedService  {
+@Lazy
+@Component
+public class UserFeedService {
 	private static final Logger log = LoggerFactory.getLogger(UserFeedService.class);
 
 	@Autowired
@@ -51,7 +51,7 @@ public class UserFeedService  {
 	protected Convert convert;
 
 	@Autowired
-    @Lazy
+	@Lazy
 	protected MongoTemplate ops;
 
 	@Autowired
@@ -82,11 +82,11 @@ public class UserFeedService  {
 	@Lazy
 	protected MongoRead read;
 
-	static final int MAX_FEED_ITEMS = 25;
-
 	@Autowired
 	@Qualifier("threadPoolTaskExecutor")
 	private Executor executor;
+
+	static final int MAX_FEED_ITEMS = 25;
 
 	// DO NOT DELETE (part of example to keep below)
 	// private static List<String> excludeTypes = Arrays.asList( //

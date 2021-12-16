@@ -1,5 +1,7 @@
 package quanta.service;
 
+import static quanta.util.Util.no;
+import static quanta.util.Util.ok;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.InputStream;
@@ -33,14 +35,14 @@ import quanta.util.FileUtils;
 import quanta.util.SubNodeUtil;
 import quanta.util.ThreadLocals;
 import quanta.util.XString;
-import static quanta.util.Util.*;
 
 /**
  * Exporter using PDFBox
  */
-@Lazy @Component
+@Lazy
+@Component
 @Scope("prototype")
-public class ExportPdfServicePdfBox  {
+public class ExportPdfServicePdfBox {
 	private static final Logger log = LoggerFactory.getLogger(ExportPdfServicePdfBox.class);
 
 	@Autowired

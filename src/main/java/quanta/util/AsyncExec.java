@@ -1,15 +1,16 @@
 package quanta.util;
 
+import static quanta.util.Util.ok;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
-import static quanta.util.Util.*;
 
 /*
  * Warning do not call this run method from INSIDE this class. Due to the spring proxy 'issue' you
  * can't do that
  */
-@Lazy @Component
+@Lazy
+@Component
 public class AsyncExec {
     /*
      * *** DO NOT DELETE *** This is left here as an example of what NOT TO DO. Because of the way

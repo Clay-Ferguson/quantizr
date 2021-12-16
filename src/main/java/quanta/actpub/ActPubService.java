@@ -1,5 +1,7 @@
 package quanta.actpub;
 
+import static quanta.util.Util.no;
+import static quanta.util.Util.ok;
 import java.security.PublicKey;
 import java.util.Arrays;
 import java.util.Calendar;
@@ -48,110 +50,108 @@ import quanta.service.AclService;
 import quanta.service.AttachmentService;
 import quanta.service.NodeSearchService;
 import quanta.service.PushService;
-
 import quanta.service.UserManagerService;
 import quanta.util.AsyncExec;
 import quanta.util.DateUtil;
 import quanta.util.EnglishDictionary;
 import quanta.util.ThreadLocals;
 import quanta.util.XString;
-import static quanta.util.Util.*;
-
 
 /**
  * General AP functions
  */
-@Lazy @Component
-public class ActPubService  {
+@Lazy
+@Component
+public class ActPubService {
     private static final Logger log = LoggerFactory.getLogger(ActPubService.class);
 
-	@Autowired
-	@Lazy
-	protected MongoTemplate ops;
+    @Autowired
+    @Lazy
+    protected MongoTemplate ops;
 
     @Autowired
     @Lazy
-	protected EnglishDictionary english;
+    protected EnglishDictionary english;
 
     @Autowired
     @Lazy
-	protected PushService push;
+    protected PushService push;
 
     @Autowired
     @Lazy
-	protected ActPubFactory apFactory;
+    protected ActPubFactory apFactory;
 
     @Autowired
     @Lazy
-	protected ActPubCrypto apCrypto;
+    protected ActPubCrypto apCrypto;
 
     @Autowired
     @Lazy
-	public ActPubCache apCache;
+    public ActPubCache apCache;
 
     @Autowired
     @Lazy
-	protected ActPubUtil apUtil;
+    protected ActPubUtil apUtil;
 
     @Autowired
     @Lazy
-	protected ActPubOutbox apOutbox;
+    protected ActPubOutbox apOutbox;
 
     @Autowired
     @Lazy
-	protected ActPubFollower apFollower;
+    protected ActPubFollower apFollower;
 
     @Autowired
     @Lazy
-	protected ActPubFollowing apFollowing;
+    protected ActPubFollowing apFollowing;
 
     @Autowired
     @Lazy
-	protected AsyncExec asyncExec;
+    protected AsyncExec asyncExec;
 
     @Autowired
     @Lazy
-	protected AttachmentService attach;
+    protected AttachmentService attach;
 
     @Autowired
     @Lazy
-	protected AdminRun arun;
+    protected AdminRun arun;
 
     @Autowired
     @Lazy
-	protected AppProp prop;
+    protected AppProp prop;
 
     @Autowired
     @Lazy
-	protected UserManagerService user;
+    protected UserManagerService user;
 
     @Autowired
     @Lazy
-	protected AclService acl;
+    protected AclService acl;
 
     @Autowired
     @Lazy
-	protected MongoUtil mongoUtil;
+    protected MongoUtil mongoUtil;
 
     @Autowired
     @Lazy
-	protected MongoAuth auth;
+    protected MongoAuth auth;
 
     @Autowired
     @Lazy
-	protected MongoDelete delete;
+    protected MongoDelete delete;
 
     @Autowired
     @Lazy
-	protected MongoUpdate update;
+    protected MongoUpdate update;
 
     @Autowired
     @Lazy
-	protected MongoRead read;
+    protected MongoRead read;
 
     @Autowired
     @Lazy
-	protected MongoCreate create;
+    protected MongoCreate create;
 
     public static final boolean ENGLISH_LANGUAGE_CHECK = false;
     public static final int MAX_MESSAGES = 10;
@@ -1212,9 +1212,9 @@ public class ActPubService  {
      * statuses to accounts for these cases or at least a PASS/FAIL so the admin can optionally clean up
      * old/dead accounts)
      * 
-     * get webFinger: Alice5401@mastodon.online 2021-08-20 17:33:48,996 DEBUG
-     * quanta.actpub.ActPubUtil [threadPoolTaskExecutor-1] failed getting json:
-     * https://mastodon.online/users/Alice5401 -> 410 Gone: [{"error":"Gone"}]
+     * get webFinger: Alice5401@mastodon.online 2021-08-20 17:33:48,996 DEBUG quanta.actpub.ActPubUtil
+     * [threadPoolTaskExecutor-1] failed getting json: https://mastodon.online/users/Alice5401 -> 410
+     * Gone: [{"error":"Gone"}]
      * 
      * and ths... get webFinger: reddit@societal.co 2021-08-20 17:33:46,824 DEBUG
      * quanta.actpub.ActPubUtil [threadPoolTaskExecutor-1] failed getting json:
