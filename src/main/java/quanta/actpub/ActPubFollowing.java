@@ -227,9 +227,9 @@ public class ActPubFollowing {
 
                     String privateKey = apCrypto.getPrivateKey(session, userToFollow);
 
-                    // todo-1: what's this sleep doing? I'm pretty sure I just wanted to give the caller (i.e. the
-                    // remote Fedi instance) a chance to get a return code back for this call before posting
-                    // back to it
+                    /* todo-1: what's this sleep doing? It's ugly, bad practice. I'm pretty sure I just wanted to give the caller (i.e. the
+                    remote Fedi instance) a chance to get a return code back for this call before posting
+                    back to it */
                     Thread.sleep(2000);
 
                     // Must send either Accept or Reject. Currently we auto-accept all.

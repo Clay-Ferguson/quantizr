@@ -23,7 +23,7 @@ public class MimeTypeUtils {
     private static Map<String, String> mimeMap;
     static {
         mimeMap = new HashMap<>();
-        // todo-1: why this tiny list here? If doing this why not many many more?
+        // todo-2: why this tiny list here? If doing this why not many many more?
         mimeMap.put("mp4", "video/mp4");
         mimeMap.put("mp3", "audio/mp3");
         mimeMap.put("flv", "video/flv");
@@ -42,10 +42,6 @@ public class MimeTypeUtils {
 
             // If that getContentType didn't find anything specific, try again.
             if ("application/octet-stream".equals(ret)) {
-                /*
-                 * todo-1: we have some direct calls to guessContentTypeFromName, that should perhaps all be calling
-                 * this method (getMimeType) instead.
-                 */
                 ret = URLConnection.guessContentTypeFromName(fileName);
             }
             return ret;

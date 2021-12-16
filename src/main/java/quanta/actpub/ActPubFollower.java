@@ -192,7 +192,6 @@ public class ActPubFollower {
         return mongoUtil.find(query);
     }
 
-    // todo-1: review how do functions like this recieves the admin session?
     public GetFollowersResponse getFollowers(MongoSession ms, GetFollowersRequest req) {
         GetFollowersResponse res = new GetFollowersResponse();
         ms = ThreadLocals.ensure(ms);

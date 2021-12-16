@@ -356,7 +356,7 @@ public class SubNodeUtil {
 			bin = node.getStr(NodeProp.BIN_URL);
 		}
 
-		// todo-1: will this fail to find "data:" type inline image data?
+		// todo-2: will this fail to find "data:" type inline image data?
 		return bin;
 	}
 

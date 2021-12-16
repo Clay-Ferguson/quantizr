@@ -361,9 +361,10 @@ public class ActPubService {
             return acctNode;
         }
 
-        // todo-1: if we ALWAYS read from DB like this the data (Actor props) can get stale over time (solve
-        // this)
-        // (to not have the 'stale issue', let's just not read from DB ever right here)
+        /*
+         * todo-1: if we ALWAYS read from DB like this the data (Actor props) can get stale over time (solve
+         * this) (to not have the 'stale issue', let's just not read from DB ever right here)
+         */
         // acctNode = read.getUserNodeByUserName(ms, apUserName);
 
         // if (no(acctNode )) {
@@ -536,8 +537,10 @@ public class ActPubService {
      * follow a user on this server
      */
     public void processInboxPost(HttpServletRequest httpReq, Object payload) {
-        // todo-1: for now we mutext the inbox becasue I noticed a scenario where Mastodon post TWO
-        // simultaneous calls for the SAME node, and we shouldn't allow that.
+        /*
+         * todo-1: for now we mutext the inbox becasue I noticed a scenario where Mastodon post TWO
+         * simultaneous calls for the SAME node, and we shouldn't allow that.
+         */
         synchronized (inboxLock) {
             String type = AP.str(payload, APObj.type);
             if (no(type))
