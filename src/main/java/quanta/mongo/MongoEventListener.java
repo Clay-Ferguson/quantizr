@@ -1,5 +1,7 @@
 package quanta.mongo;
 
+import static quanta.util.Util.no;
+import static quanta.util.Util.ok;
 import java.util.Calendar;
 import java.util.Date;
 import org.bson.Document;
@@ -17,12 +19,11 @@ import org.springframework.data.mongodb.core.mapping.event.BeforeDeleteEvent;
 import org.springframework.data.mongodb.core.mapping.event.BeforeSaveEvent;
 import org.springframework.stereotype.Component;
 import quanta.actpub.ActPubService;
-import quanta.config.NodeName;
+import quanta.config.NodePath;
 import quanta.mongo.model.SubNode;
 import quanta.util.SubNodeUtil;
 import quanta.util.ThreadLocals;
 import quanta.util.XString;
-import static quanta.util.Util.*;
 
 /**
  * Listener that MongoDB driver hooks into so we can inject processing into various phases of the
@@ -108,7 +109,7 @@ public class MongoEventListener extends AbstractMongoEventListener<SubNode> {
 			 * and we only allow this to run during initialiation when the server may be creating the database,
 			 * and is not yet processing user requests
 			 */
-			if (node.getPath().equals("/" + NodeName.ROOT) && !MongoRepository.fullInit) {
+			if (node.getPath().equals("/" + NodePath.ROOT) && !MongoRepository.fullInit) {
 				dbObj.put(SubNode.OWNER, id);
 				node.setOwner(id);
 			} else {

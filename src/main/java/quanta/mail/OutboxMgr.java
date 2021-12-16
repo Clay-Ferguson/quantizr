@@ -8,6 +8,7 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 import quanta.config.AppProp;
 import quanta.config.NodeName;
+import quanta.config.NodePath;
 import quanta.config.SessionContext;
 import quanta.model.client.NodeProp;
 import quanta.model.client.NodeType;
@@ -189,9 +190,9 @@ public class OutboxMgr  {
 				return OutboxMgr.outboxNode;
 			}
 
-			snUtil.ensureNodeExists(ms, "/" + NodeName.ROOT, NodeName.OUTBOX, null, "Outbox", null, true, null, null);
+			snUtil.ensureNodeExists(ms, "/" + NodePath.ROOT, NodeName.OUTBOX, null, "Outbox", null, true, null, null);
 
-			OutboxMgr.outboxNode = snUtil.ensureNodeExists(ms, "/" + NodeName.ROOT, NodeName.OUTBOX + "/" + NodeName.SYSTEM, null,
+			OutboxMgr.outboxNode = snUtil.ensureNodeExists(ms, "/" + NodePath.ROOT, NodeName.OUTBOX + "/" + NodeName.SYSTEM, null,
 					"System Messages", null, true, null, null);
 			return OutboxMgr.outboxNode;
 		}

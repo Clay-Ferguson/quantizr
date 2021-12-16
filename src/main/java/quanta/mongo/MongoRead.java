@@ -24,6 +24,7 @@ import org.springframework.data.mongodb.core.query.TextCriteria;
 import org.springframework.stereotype.Component;
 import quanta.config.AppProp;
 import quanta.config.NodeName;
+import quanta.config.NodePath;
 import quanta.exception.base.RuntimeEx;
 import quanta.model.client.NodeProp;
 import quanta.model.client.NodeType;
@@ -81,7 +82,7 @@ public class MongoRead {
     public SubNode getDbRoot() {
         synchronized (dbRootLock) {
             if (no(dbRoot)) {
-                dbRoot = findNodeByPath("/" + NodeName.ROOT);
+                dbRoot = findNodeByPath("/" + NodePath.ROOT);
             }
             return dbRoot;
         }
@@ -346,7 +347,7 @@ public class MongoRead {
             return null;
 
         String pendingPath = NodeName.PENDING_PATH + "/";
-        String rootPath = "/" + NodeName.ROOT + "/";
+        String rootPath = "/" + NodePath.ROOT + "/";
 
         /*
          * If node is in pending area take the pending part out of the path to get the real parent

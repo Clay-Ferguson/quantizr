@@ -67,11 +67,6 @@ public class ActPubController {
 		mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 	}
 
-	/*
-	 * todo-1: I'm not sure if the CHARSET version of the produces is needed here (in any of the methods
-	 * below), but afaik is harmless, so I'm keeping it for now.
-	 */
-
 	/**
 	 * WebFinger GET
 	 */

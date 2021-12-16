@@ -29,6 +29,7 @@ import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Component;
 import quanta.config.AppProp;
 import quanta.config.NodeName;
+import quanta.config.NodePath;
 import quanta.model.client.NodeProp;
 import quanta.model.client.NodeType;
 import quanta.model.client.PrincipalName;
@@ -320,7 +321,7 @@ public class MongoUtil {
 	 */
 	public void setPendingPath(SubNode node, boolean pending) {
 		String pendingPath = NodeName.PENDING_PATH + "/";
-		String rootPath = "/" + NodeName.ROOT + "/";
+		String rootPath = "/" + NodePath.ROOT + "/";
 
 		// ensure node starts with /r/p
 		if (pending && !node.getPath().startsWith(pendingPath)) {
@@ -793,7 +794,7 @@ public class MongoUtil {
 
 		SubNode adminNode = read.getUserNodeByUserName(ms, adminUser);
 		if (no(adminNode)) {
-			adminNode = snUtil.ensureNodeExists(ms, "/", NodeName.ROOT, null, "Root", NodeType.REPO_ROOT.s(), true, null, null);
+			adminNode = snUtil.ensureNodeExists(ms, "/", NodePath.ROOT, null, "Root", NodeType.REPO_ROOT.s(), true, null, null);
 
 			adminNode.set(NodeProp.USER.s(), PrincipalName.ADMIN.s());
 			adminNode.set(NodeProp.USER_PREF_EDIT_MODE.s(), false);
@@ -806,7 +807,7 @@ public class MongoUtil {
 			 */
 			ms.setUserNodeId(adminNode.getId());
 
-			snUtil.ensureNodeExists(ms, "/" + NodeName.ROOT, NodeName.USER, null, "Users", null, true, null, null);
+			snUtil.ensureNodeExists(ms, "/" + NodePath.ROOT, NodeName.USER, null, "Users", null, true, null, null);
 		}
 
 		createPublicNodes(ms);
@@ -816,7 +817,7 @@ public class MongoUtil {
 		log.debug("creating Public Nodes");
 		Val<Boolean> created = new Val<>(Boolean.FALSE);
 		SubNode publicNode =
-				snUtil.ensureNodeExists(ms, "/" + NodeName.ROOT, NodeName.PUBLIC, null, "Public", null, true, null, created);
+				snUtil.ensureNodeExists(ms, "/" + NodePath.ROOT, NodeName.PUBLIC, null, "Public", null, true, null, created);
 
 		if (created.getVal()) {
 			acl.addPrivilege(ms, publicNode, PrincipalName.PUBLIC.s(), Arrays.asList(PrivilegeType.READ.s()), null);
@@ -825,7 +826,7 @@ public class MongoUtil {
 		created = new Val<>(Boolean.FALSE);
 
 		// create home node (admin owned node named 'home').
-		SubNode publicHome = snUtil.ensureNodeExists(ms, "/" + NodeName.ROOT + "/" + NodeName.PUBLIC, NodeName.HOME,
+		SubNode publicHome = snUtil.ensureNodeExists(ms, "/" + NodePath.ROOT + "/" + NodeName.PUBLIC, NodeName.HOME,
 				NodeName.HOME, "Public Home", null, true, null, created);
 
 		// make node public
@@ -841,7 +842,7 @@ public class MongoUtil {
 		 * to it, so we default it to being directly in the server root, which is a private node
 		 */
 		created = new Val<>(Boolean.FALSE);
-		SubNode publicWelcome = snUtil.ensureNodeExists(ms, "/" + NodeName.ROOT, NodeName.WELCOME, "welcome-page",
+		SubNode publicWelcome = snUtil.ensureNodeExists(ms, "/" + NodePath.ROOT, NodeName.WELCOME, "welcome-page",
 				"### Welcome Node\n\nDefault landing page content. Admin should edit this node, named 'welcome-page'", null, true,
 				null, created);
 
@@ -862,11 +863,11 @@ public class MongoUtil {
 		// // importZipService.inputZipFileFromResource(session, "classpath:home.zip",
 		// // publicNode, NodeName.HOME);
 		// // ---------------------------------------------------------
-		// SubNode node = getNode(session, "/" + NodeName.ROOT + "/" + NodeName.PUBLIC +
+		// SubNode node = getNode(session, "/" + NodePath.ROOT + "/" + NodeName.PUBLIC +
 		// "/" + NodeName.HOME);
 		// if (no(node )) {
 		// log.debug("Public node didn't exist. Creating.");
-		// node = getNode(session, "/" + NodeName.ROOT + "/" + NodeName.PUBLIC + "/" +
+		// node = getNode(session, "/" + NodePath.ROOT + "/" + NodeName.PUBLIC + "/" +
 		// NodeName.HOME);
 		// if (no(node )) {
 		// log.debug("Error reading node that was just imported.");
