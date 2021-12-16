@@ -29,6 +29,7 @@ import quanta.actpub.model.APObj;
 import quanta.actpub.model.APType;
 import quanta.config.AppProp;
 import quanta.config.NodeName;
+import quanta.config.NodePath;
 import quanta.model.client.NodeProp;
 import quanta.model.client.NodeType;
 import quanta.model.client.PrincipalName;
@@ -1233,7 +1234,7 @@ public class ActPubService {
             arun.run(session -> {
                 // Query to pull all user accounts
                 Iterable<SubNode> accountNodes =
-                        read.findTypedNodesUnderPath(session, NodeName.ROOT_OF_ALL_USERS, NodeType.ACCOUNT.s());
+                        read.findTypedNodesUnderPath(session, NodePath.ROOT_OF_ALL_USERS, NodeType.ACCOUNT.s());
 
                 for (SubNode acctNode : accountNodes) {
 
@@ -1355,7 +1356,7 @@ public class ActPubService {
 
         arun.run(session -> {
             Iterable<SubNode> accountNodes =
-                    read.findTypedNodesUnderPath(session, NodeName.ROOT_OF_ALL_USERS, NodeType.ACCOUNT.s());
+                    read.findTypedNodesUnderPath(session, NodePath.ROOT_OF_ALL_USERS, NodeType.ACCOUNT.s());
 
             for (SubNode node : accountNodes) {
                 if (!prop.isDaemonsEnabled())
@@ -1384,7 +1385,7 @@ public class ActPubService {
 
         return arun.run(session -> {
             Iterable<SubNode> accountNodes =
-                    read.findTypedNodesUnderPath(session, NodeName.ROOT_OF_ALL_USERS, NodeType.ACCOUNT.s());
+                    read.findTypedNodesUnderPath(session, NodePath.ROOT_OF_ALL_USERS, NodeType.ACCOUNT.s());
 
             // Load the list of all known users
             HashSet<String> knownUsers = new HashSet<>();
@@ -1432,7 +1433,7 @@ public class ActPubService {
         return arun.run(session -> {
             long totalDelCount = 0;
             Iterable<SubNode> accountNodes =
-                    read.findTypedNodesUnderPath(session, NodeName.ROOT_OF_ALL_USERS, NodeType.ACCOUNT.s());
+                    read.findTypedNodesUnderPath(session, NodePath.ROOT_OF_ALL_USERS, NodeType.ACCOUNT.s());
 
             for (SubNode node : accountNodes) {
                 String userName = node.getStr(NodeProp.USER.s());

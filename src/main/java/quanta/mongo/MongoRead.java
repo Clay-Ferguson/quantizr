@@ -145,11 +145,11 @@ public class MongoRead {
 
         String parentPath = getParentPath(node);
         if (no(parentPath) || parentPath.equals("") || parentPath.equals("/") || parentPath.equals("/r")
-                || parentPath.equals(NodeName.PENDING_PATH) || parentPath.equals(NodeName.PENDING_PATH + "/"))
+                || parentPath.equals(NodePath.PENDING_PATH) || parentPath.equals(NodePath.PENDING_PATH + "/"))
             return;
 
-        if (parentPath.startsWith(NodeName.PENDING_PATH + "/")) {
-            parentPath = parentPath.replace(NodeName.PENDING_PATH + "/", "/r/");
+        if (parentPath.startsWith(NodePath.PENDING_PATH + "/")) {
+            parentPath = parentPath.replace(NodePath.PENDING_PATH + "/", "/r/");
         }
 
         // no need to check root.
@@ -346,7 +346,7 @@ public class MongoRead {
         if (StringUtils.isEmpty(parentPath))
             return null;
 
-        String pendingPath = NodeName.PENDING_PATH + "/";
+        String pendingPath = NodePath.PENDING_PATH + "/";
         String rootPath = "/" + NodePath.ROOT + "/";
 
         /*
@@ -918,7 +918,7 @@ public class MongoRead {
         // Other wise for ordinary users root is based off their username
         Query query = new Query();
         Criteria criteria = Criteria.where(//
-                SubNode.PATH).regex(mongoUtil.regexDirectChildrenOfPath(NodeName.ROOT_OF_ALL_USERS)) //
+                SubNode.PATH).regex(mongoUtil.regexDirectChildrenOfPath(NodePath.ROOT_OF_ALL_USERS)) //
                 // .and(SubNode.FIELD_PROPERTIES + "." + NodeProp.USER + ".value").is(user);
                 // case-insensitive lookup of username:
                 .and(SubNode.PROPERTIES + "." + NodeProp.USER + ".value").regex("^" + user + "$", "i");

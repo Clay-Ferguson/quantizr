@@ -19,6 +19,7 @@ import org.springframework.data.mongodb.core.query.TextCriteria;
 import org.springframework.stereotype.Component;
 import quanta.actpub.ActPubService;
 import quanta.config.NodeName;
+import quanta.config.NodePath;
 import quanta.model.NodeInfo;
 import quanta.model.client.Bookmark;
 import quanta.model.client.Constant;
@@ -213,7 +214,7 @@ public class NodeSearchService {
 			moreCriteria = Criteria.where(SubNode.PROPERTIES + "." + NodeProp.ACT_PUB_ACTOR_URL.s() + ".value").is(null);
 		}
 
-		Iterable<SubNode> accountNodes = read.getChildrenUnderPath(ms, NodeName.ROOT_OF_ALL_USERS, null,
+		Iterable<SubNode> accountNodes = read.getChildrenUnderPath(ms, NodePath.ROOT_OF_ALL_USERS, null,
 				ConstantInt.ROWS_PER_PAGE.val(), ConstantInt.ROWS_PER_PAGE.val() * req.getPage(), textCriteria, moreCriteria);
 		/*
 		 * scan all userAccountNodes, and set a zero amount for those not found (which will be the correct
@@ -388,7 +389,7 @@ public class NodeSearchService {
 			List<Criteria> ands = new LinkedList<>();
 			Query query = new Query();
 			Criteria criteria =
-					Criteria.where(SubNode.PATH).regex(mongoUtil.regexRecursiveChildrenOfPath(NodeName.ROOT_OF_ALL_USERS));
+					Criteria.where(SubNode.PATH).regex(mongoUtil.regexRecursiveChildrenOfPath(NodePath.ROOT_OF_ALL_USERS));
 
 			// This pattern is what is required when you have multiple conditions added to a
 			// single field.

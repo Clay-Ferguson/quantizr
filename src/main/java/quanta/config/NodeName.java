@@ -7,18 +7,10 @@ package quanta.config;
  * consistent, and create a class called NodePathName to hold the path ones.
  */
 public class NodeName {
-	public static final String USER = "usr";
-	public static final String SYSTEM = "sys";
-	public static final String LINKS = "links";
-	public static final String PUBLIC = "public";
 	public static final String HOME = "home";
 	public static final String INBOX = "inbox";
-	public static final String OUTBOX = "outbox";
 	public static final String FRIENDS = "friends";
 	public static final String BLOCKED_USERS = "blocked";
 	public static final String POSTS = "posts";
 	public static final String WELCOME = "welcome";
-	public static final String FEEDS = "feeds";
-	public static final String ROOT_OF_ALL_USERS = "/" + NodePath.ROOT + "/" + NodeName.USER;
-	public static final String PENDING_PATH = "/" + NodePath.ROOT + "/p";
 }

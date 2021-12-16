@@ -19,6 +19,7 @@ import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.TextCriteria;
 import org.springframework.stereotype.Component;
 import quanta.config.NodeName;
+import quanta.config.NodePath;
 import quanta.config.SessionContext;
 import quanta.model.NodeInfo;
 import quanta.model.client.NodeProp;
@@ -102,7 +103,7 @@ public class UserFeedService {
 			return res;
 
 		ms = ThreadLocals.ensure(ms);
-		String pathToSearch = NodeName.ROOT_OF_ALL_USERS;
+		String pathToSearch = NodePath.ROOT_OF_ALL_USERS;
 
 		Query query = new Query();
 		Criteria criteria = Criteria.where(SubNode.PATH).regex(mongoUtil.regexRecursiveChildrenOfPath(pathToSearch)); //
@@ -150,7 +151,7 @@ public class UserFeedService {
 		NodeFeedResponse res = new NodeFeedResponse();
 		ms = ThreadLocals.ensure(ms);
 
-		String pathToSearch = testQuery ? "/r" : NodeName.ROOT_OF_ALL_USERS;
+		String pathToSearch = testQuery ? "/r" : NodePath.ROOT_OF_ALL_USERS;
 		boolean doAuth = true;
 
 		/*

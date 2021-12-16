@@ -21,6 +21,7 @@ import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Component;
 import quanta.actpub.ActPubService;
 import quanta.config.NodeName;
+import quanta.config.NodePath;
 import quanta.exception.NodeAuthFailedException;
 import quanta.exception.base.RuntimeEx;
 import quanta.model.AccessControlInfo;
@@ -545,7 +546,7 @@ public class MongoAuth {
 		// this will be node.getPath() to search under the node, or null for searching
 		// under all user content.
 		if (no(pathToSearch)) {
-			pathToSearch = NodeName.ROOT_OF_ALL_USERS;
+			pathToSearch = NodePath.ROOT_OF_ALL_USERS;
 		}
 
 		Query query = new Query();
@@ -602,7 +603,7 @@ public class MongoAuth {
 		Query query = new Query();
 
 		if (no(pathToSearch)) {
-			pathToSearch = NodeName.ROOT_OF_ALL_USERS;
+			pathToSearch = NodePath.ROOT_OF_ALL_USERS;
 		}
 
 		/*

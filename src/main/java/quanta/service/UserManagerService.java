@@ -33,6 +33,7 @@ import quanta.actpub.ActPubService;
 import quanta.actpub.ActPubUtil;
 import quanta.config.AppProp;
 import quanta.config.NodeName;
+import quanta.config.NodePath;
 import quanta.config.SessionContext;
 import quanta.exception.OutOfSpaceException;
 import quanta.exception.base.RuntimeEx;
@@ -1187,7 +1188,7 @@ public class UserManagerService {
 
 		// adminRunner.run(session -> {
 		// final Iterable<SubNode> accountNodes =
-		// read.getChildrenUnderParentPath(session, NodeName.ROOT_OF_ALL_USERS, null, null, 0, null, null);
+		// read.getChildrenUnderParentPath(session, NodePath.ROOT_OF_ALL_USERS, null, null, 0, null, null);
 
 		// for (final SubNode accountNode : accountNodes) {
 		// String userName = accountNode.getStrProp(NodeProp.USER);
@@ -1215,7 +1216,7 @@ public class UserManagerService {
 		int foreignUserCount = 0;
 
 		StringBuilder sb = new StringBuilder();
-		Iterable<SubNode> accountNodes = read.getChildrenUnderPath(ms, NodeName.ROOT_OF_ALL_USERS, null, null, 0, null, null);
+		Iterable<SubNode> accountNodes = read.getChildrenUnderPath(ms, NodePath.ROOT_OF_ALL_USERS, null, null, 0, null, null);
 
 		for (SubNode accountNode : accountNodes) {
 			String userName = accountNode.getStr(NodeProp.USER);

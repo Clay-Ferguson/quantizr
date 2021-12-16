@@ -320,7 +320,7 @@ public class MongoUtil {
 	 * if they cancel the node gets orphaned and eventually cleaned up by the system automatically.
 	 */
 	public void setPendingPath(SubNode node, boolean pending) {
-		String pendingPath = NodeName.PENDING_PATH + "/";
+		String pendingPath = NodePath.PENDING_PATH + "/";
 		String rootPath = "/" + NodePath.ROOT + "/";
 
 		// ensure node starts with /r/p
@@ -747,7 +747,7 @@ public class MongoUtil {
 		// }
 
 		auth.requireAdmin(ms);
-		String newUserNodePath = NodeName.ROOT_OF_ALL_USERS + "/?";
+		String newUserNodePath = NodePath.ROOT_OF_ALL_USERS + "/?";
 		// todo-2: is user validated here (no invalid characters, etc. and invalid
 		// flowpaths tested?)
 
@@ -807,7 +807,7 @@ public class MongoUtil {
 			 */
 			ms.setUserNodeId(adminNode.getId());
 
-			snUtil.ensureNodeExists(ms, "/" + NodePath.ROOT, NodeName.USER, null, "Users", null, true, null, null);
+			snUtil.ensureNodeExists(ms, "/" + NodePath.ROOT, NodePath.USER, null, "Users", null, true, null, null);
 		}
 
 		createPublicNodes(ms);
@@ -817,7 +817,7 @@ public class MongoUtil {
 		log.debug("creating Public Nodes");
 		Val<Boolean> created = new Val<>(Boolean.FALSE);
 		SubNode publicNode =
-				snUtil.ensureNodeExists(ms, "/" + NodePath.ROOT, NodeName.PUBLIC, null, "Public", null, true, null, created);
+				snUtil.ensureNodeExists(ms, "/" + NodePath.ROOT, NodePath.PUBLIC, null, "Public", null, true, null, created);
 
 		if (created.getVal()) {
 			acl.addPrivilege(ms, publicNode, PrincipalName.PUBLIC.s(), Arrays.asList(PrivilegeType.READ.s()), null);
@@ -826,7 +826,7 @@ public class MongoUtil {
 		created = new Val<>(Boolean.FALSE);
 
 		// create home node (admin owned node named 'home').
-		SubNode publicHome = snUtil.ensureNodeExists(ms, "/" + NodePath.ROOT + "/" + NodeName.PUBLIC, NodeName.HOME,
+		SubNode publicHome = snUtil.ensureNodeExists(ms, "/" + NodePath.ROOT + "/" + NodePath.PUBLIC, NodeName.HOME,
 				NodeName.HOME, "Public Home", null, true, null, created);
 
 		// make node public
@@ -863,11 +863,11 @@ public class MongoUtil {
 		// // importZipService.inputZipFileFromResource(session, "classpath:home.zip",
 		// // publicNode, NodeName.HOME);
 		// // ---------------------------------------------------------
-		// SubNode node = getNode(session, "/" + NodePath.ROOT + "/" + NodeName.PUBLIC +
+		// SubNode node = getNode(session, "/" + NodePath.ROOT + "/" + NodePath.PUBLIC +
 		// "/" + NodeName.HOME);
 		// if (no(node )) {
 		// log.debug("Public node didn't exist. Creating.");
-		// node = getNode(session, "/" + NodePath.ROOT + "/" + NodeName.PUBLIC + "/" +
+		// node = getNode(session, "/" + NodePath.ROOT + "/" + NodePath.PUBLIC + "/" +
 		// NodeName.HOME);
 		// if (no(node )) {
 		// log.debug("Error reading node that was just imported.");

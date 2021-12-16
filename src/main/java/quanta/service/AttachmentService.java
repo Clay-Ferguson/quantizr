@@ -57,6 +57,7 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBody;
 import quanta.config.AppProp;
 import quanta.config.NodeName;
+import quanta.config.NodePath;
 import quanta.config.SpringContextUtil;
 import quanta.exception.OutOfSpaceException;
 import quanta.exception.base.RuntimeEx;
@@ -1272,7 +1273,7 @@ public class AttachmentService {
 			}
 
 			Iterable<SubNode> accountNodes =
-					read.getChildrenUnderPath(session, NodeName.ROOT_OF_ALL_USERS, null, null, 0, null, null);
+					read.getChildrenUnderPath(session, NodePath.ROOT_OF_ALL_USERS, null, null, 0, null, null);
 
 			/*
 			 * scan all userAccountNodes, and set a zero amount for those not found (which will be the correct

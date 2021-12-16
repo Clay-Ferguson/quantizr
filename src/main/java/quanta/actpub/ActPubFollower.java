@@ -20,6 +20,7 @@ import quanta.actpub.model.APOOrderedCollectionPage;
 import quanta.actpub.model.APObj;
 import quanta.config.AppProp;
 import quanta.config.NodeName;
+import quanta.config.NodePath;
 import quanta.model.NodeInfo;
 import quanta.model.client.ConstantInt;
 import quanta.model.client.NodeProp;
@@ -251,7 +252,7 @@ public class ActPubFollower {
 
     public Query getFriendsByUserName_query(MongoSession ms, String userName) {
         Query query = new Query();
-        Criteria criteria = Criteria.where(SubNode.PATH).regex(mongoUtil.regexRecursiveChildrenOfPath(NodeName.ROOT_OF_ALL_USERS)) //
+        Criteria criteria = Criteria.where(SubNode.PATH).regex(mongoUtil.regexRecursiveChildrenOfPath(NodePath.ROOT_OF_ALL_USERS)) //
                 .and(SubNode.PROPERTIES + "." + NodeProp.USER.s() + ".value").is(userName) //
                 .and(SubNode.TYPE).is(NodeType.FRIEND.s());
 

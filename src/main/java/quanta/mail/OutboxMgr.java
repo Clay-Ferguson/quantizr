@@ -190,9 +190,9 @@ public class OutboxMgr  {
 				return OutboxMgr.outboxNode;
 			}
 
-			snUtil.ensureNodeExists(ms, "/" + NodePath.ROOT, NodeName.OUTBOX, null, "Outbox", null, true, null, null);
+			snUtil.ensureNodeExists(ms, "/" + NodePath.ROOT, NodePath.OUTBOX, null, "Outbox", null, true, null, null);
 
-			OutboxMgr.outboxNode = snUtil.ensureNodeExists(ms, "/" + NodePath.ROOT, NodeName.OUTBOX + "/" + NodeName.SYSTEM, null,
+			OutboxMgr.outboxNode = snUtil.ensureNodeExists(ms, "/" + NodePath.ROOT, NodePath.OUTBOX + "/" + NodePath.SYSTEM, null,
 					"System Messages", null, true, null, null);
 			return OutboxMgr.outboxNode;
 		}
