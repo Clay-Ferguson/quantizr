@@ -11,6 +11,7 @@ import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
@@ -33,30 +34,37 @@ import quanta.util.ThreadLocals;
 import quanta.util.XString;
 import static quanta.util.Util.*;
 
+
 /**
  * Service for checking authorization for access to nodes. Checks what users are accessing what
  * nodes and checks their privileges againts the ACL on the Nodes.
  */
-@Component
+@Lazy @Component
 public class MongoAuth {
 	private static final Logger log = LoggerFactory.getLogger(MongoAuth.class);
 
 	@Autowired
+	@Lazy
 	protected MongoTemplate ops;
 
 	@Autowired
+	@Lazy
 	protected ActPubService apub;
 
 	@Autowired
+	@Lazy
 	protected MongoUtil mongoUtil;
 
 	@Autowired
+	@Lazy
 	protected MongoAuth auth;
 
 	@Autowired
+	@Lazy
 	protected MongoUpdate update;
 
 	@Autowired
+	@Lazy
 	protected MongoRead read;
 
 	private static final boolean verbose = false;
@@ -72,6 +80,10 @@ public class MongoAuth {
 	private static MongoSession anonSession;
 
 	private static final HashMap<String, SubNode> userNodesById = new HashMap<>();
+
+	public MongoAuth() {
+		log.debug("Bean Construct: MongoAuth");
+	}
 
 	@PostConstruct
 	public void postConstruct() {

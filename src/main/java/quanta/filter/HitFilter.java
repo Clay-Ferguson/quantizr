@@ -1,5 +1,7 @@
 package quanta.filter;
 
+import static quanta.util.Util.no;
+import static quanta.util.Util.ok;
 import java.io.IOException;
 import java.util.HashMap;
 import javax.servlet.FilterChain;
@@ -13,7 +15,6 @@ import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.GenericFilterBean;
 import quanta.util.Util;
-import static quanta.util.Util.*;
 
 /**
  * Servlet filter for monitoring load statistics

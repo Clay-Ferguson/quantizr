@@ -5,6 +5,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
@@ -22,23 +23,28 @@ import static quanta.util.Util.*;
 /**
  * Deamon for sending emails. 
  */
-@Component
+@Lazy @Component
 public class EmailSenderDaemon  {
 	private static final Logger log = LoggerFactory.getLogger(EmailSenderDaemon.class);
 
 	@Autowired
+	@Lazy
 	protected EmailSender mail;
 
 	@Autowired
+	@Lazy
 	protected OutboxMgr outbox;
 
 	@Autowired
+	@Lazy
 	protected AdminRun arun;
 
 	@Autowired
+	@Lazy
 	protected AppProp prop;
 
 	@Autowired
+	@Lazy
 	protected MongoDelete delete;
 
 	private int runCounter = 0;

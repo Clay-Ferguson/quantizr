@@ -43,6 +43,7 @@ import org.apache.tika.sax.BodyContentHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import quanta.config.AppProp;
 import quanta.util.DateUtil;
 import quanta.util.ExUtil;
@@ -73,7 +74,7 @@ import static quanta.util.Util.*;
 // org.apache.commons.compress.compressors.deflate.DeflateCompressorInputStream;
 // org.apache.commons.compress.compressors.pack200.Pack200CompressorInputStream;
 // org.apache.commons.compress.compressors.zstandard.ZstdCompressorInputStream;
-@Component
+@Lazy @Component
 public class FileIndexer {
 	private static final Logger log = LoggerFactory.getLogger(FileIndexer.class);
 

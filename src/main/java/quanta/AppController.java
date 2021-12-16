@@ -14,6 +14,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.web.servlet.error.ErrorController;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.core.io.support.ResourceRegion;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -172,72 +173,95 @@ public class AppController  implements ErrorController {
 	private static final Logger log = LoggerFactory.getLogger(AppController.class);
 
 	@Autowired
+	@Lazy
 	protected IPFSService ipfs;
 
 	@Autowired
+	@Lazy
 	protected GraphNodesService graphNodes;
 
 	@Autowired
+	@Lazy
 	protected ImportBookService importBookService;
 
 	@Autowired
+	@Lazy
 	protected ImportService importService;
 
 	@Autowired
+	@Lazy
 	protected LuceneService lucene;
 
 	@Autowired
+	@Lazy
 	protected SystemService system;
 
 	@Autowired
+	@Lazy
 	protected RSSFeedService rssFeed;
 
 	@Autowired
+	@Lazy
 	protected UserFeedService userFeed;
 
 	@Autowired
+	@Lazy
 	protected JSoupService jsoup;
 
 	@Autowired
+	@Lazy
 	protected NodeMoveService move;
 
 	@Autowired
+	@Lazy
 	protected NodeSearchService search;
 
 	@Autowired
+	@Lazy
 	protected EmailSender mail;
 
 	@Autowired
+	@Lazy
 	protected NodeEditService edit;
 
 	@Autowired
+	@Lazy
 	protected ActPubFollower apFollower;
 
 	@Autowired
+	@Lazy
 	protected ActPubFollowing apFollowing;
 
 	@Autowired
+	@Lazy
 	protected ActPubService apub;
 
 	@Autowired
+	@Lazy
 	protected NodeRenderService render;
 
 	@Autowired
+	@Lazy
 	protected AttachmentService attach;
 
 	@Autowired
+	@Lazy
 	protected AdminRun arun;
 
 	@Autowired
+	@Lazy
 	protected AppProp prop;
 
 	@Autowired
+	@Lazy
 	protected UserManagerService user;
 
 	@Autowired
+	@Lazy
 	protected AclService acl;
 
 	@Autowired
+	@Lazy
 	protected MongoRead read;
 
 	public static final String API_PATH = "/mobile/api";

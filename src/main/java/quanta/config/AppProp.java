@@ -12,6 +12,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.core.env.Environment;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Component;
@@ -24,11 +25,12 @@ import static quanta.util.Util.*;
 /**
  * Wrapper to access application properties.
  */
-@Component
+@Lazy @Component
 public class AppProp {
 	private static final Logger log = LoggerFactory.getLogger(AppProp.class);
 
 	@Autowired
+	@Lazy
 	private Environment env;
 
 	// if false this disables all backgrouind processing.

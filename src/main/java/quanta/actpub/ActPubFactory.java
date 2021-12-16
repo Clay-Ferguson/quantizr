@@ -8,6 +8,7 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Controller;
 import quanta.actpub.model.AP;
 import quanta.actpub.model.APList;
@@ -26,9 +27,11 @@ public class ActPubFactory  {
 	private static final Logger log = LoggerFactory.getLogger(ActPubFactory.class);
 
 	@Autowired
+	@Lazy
 	public ActPubCache apCache;
 
 	@Autowired
+	@Lazy
 	protected ActPubUtil apUtil;
 
 	/**

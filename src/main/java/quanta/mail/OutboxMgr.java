@@ -4,6 +4,7 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 import quanta.config.AppProp;
 import quanta.config.NodeName;
@@ -32,32 +33,40 @@ import static quanta.util.Util.*;
  * this queue.
 
  */
-@Component
+@Lazy @Component
 public class OutboxMgr  {
 	private static final Logger log = LoggerFactory.getLogger(OutboxMgr.class);
 
 	@Autowired
+	@Lazy
 	protected EmailSenderDaemon notify;
 
 	@Autowired
+	@Lazy
 	protected PushService push;
 
 	@Autowired
+	@Lazy
 	protected AdminRun arun;
 
 	@Autowired
+	@Lazy
 	private SubNodeUtil snUtil;
 
 	@Autowired
+	@Lazy
 	protected AppProp prop;
 
 	@Autowired
+	@Lazy
 	protected MongoUpdate update;
 
 	@Autowired
+	@Lazy
 	protected MongoRead read;
 
 	@Autowired
+	@Lazy
 	protected MongoCreate create;
 
 	private String mailBatchSize = "10";

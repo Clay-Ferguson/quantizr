@@ -9,6 +9,7 @@ import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
@@ -39,12 +40,15 @@ public class SessionContext {
 	private boolean live = true;
 
 	@Autowired
+	@Lazy
 	private PushService pushService;
 
 	@Autowired
+	@Lazy
 	private MongoAuth auth;
 
 	@Autowired
+	@Lazy
 	private MongoRead read;
 
 	/* Identification of user's account root node. */
@@ -107,7 +111,7 @@ public class SessionContext {
 	/*
 	 * When the user is viewing the Node Feed for a specific node, this will be the path of that root
 	 * node, and we use this so we can easily do a 'browser push' to any user whenever something new is
-	 * created under a that feed. todo-1: we could rename this to "chatNodePath", because it's basically
+	 * created under a that feed. todo-2: we could rename this to "chatNodePath", because it's basically
 	 * the chat node when the user is in a chat room.
 	 */
 	private String watchingPath;

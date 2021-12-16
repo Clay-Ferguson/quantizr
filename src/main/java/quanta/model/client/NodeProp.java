@@ -81,9 +81,6 @@ public enum NodeProp {
 
     // Goes on 'Friend' nodes, and is added automatically by server (not user)
     USER_NODE_ID("sn:userNodeId", "s"), //
-
-    // this pre-existed when i created FS_FILENAME (may be unused?)
-    FILENAME("sn:fileName", "s"), //
     NAME("sn:name", "s"), //
 
     // FS_FILE("fs:file"), //
@@ -142,10 +139,6 @@ public enum NodeProp {
      * will be stored as text in the 'attachment' of the node
      */
     BIN_DATA_URL("sn:dataUrl", "s"), //
-
-    // This is for bash script names to whow up when browing on the tree
-    // todo-1: oops we have THREE properties in there that all mapp to sn:fileName
-    FILE_NAME("sn:fileName", "s"), //
 
     JSON_FILE_SEARCH_RESULT("sn:json", "s"), //
     NOWRAP("sn:nowrap", "s"), //

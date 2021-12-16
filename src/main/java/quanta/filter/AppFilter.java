@@ -149,14 +149,25 @@ public class AppFilter extends GenericFilterBean {
 		}
 	}
 
-	// todo-1: app is too fragile if you forget to add a path here. fix this.
+	// todo-0: The emergency bug-fixing in here after moving to Spring 2.6 turned this method
+	// into an absolute trainwreak. Get rid of it completely.
 	private boolean isSecurePath(String path) {
-		// todo-1: /bin & /stream is an unusual case: can be ../bin/avatar or just ../bin
+		// log.debug("Check Path: " + path);
+		if (path.equals("/") || path.equals("/app") || path.equals("/site.webmanifest")) {
+			return false;
+		}
+
+		// todo-2: /bin & /stream is an unusual case: can be ../bin/avatar or just ../bin
 		if (
 		// CONTAINS
 		// ========
 		path.contains("/bin") || //
 				path.contains("/stream") || //
+				path.contains("/dist/") || //
+				path.contains("/branding/") || //
+				path.contains("/u/") || //
+				path.contains("/n/") || //
+
 
 				// ENDS WITH
 				// =========

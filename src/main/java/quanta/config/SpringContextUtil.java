@@ -6,6 +6,7 @@ import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 import quanta.AppController;
 import quanta.exception.base.RuntimeEx;
@@ -17,6 +18,8 @@ import static quanta.util.Util.*;
 /**
  * Manages certain aspects of Spring application context.
  */
+
+//WARNING: DO NOT USE @Lazy here. That breaks spring.
 @Component
 public class SpringContextUtil implements ApplicationContextAware {
 	private static final Logger log = LoggerFactory.getLogger(SpringContextUtil.class);
@@ -24,18 +27,23 @@ public class SpringContextUtil implements ApplicationContextAware {
 	private static ApplicationContext context;
 
 	@Autowired
+	@Lazy
 	private MongoRepository mongoRepo;
 
 	@Autowired
+	@Lazy
 	private AppController appController;
 
 	@Autowired
+	@Lazy
 	private EnglishDictionary english;
 
 	@Autowired
+	@Lazy
 	private TestRunner testRunner;
 
 	@Autowired
+	@Lazy
 	private IPFSPubSub pubSub;
 
 	@Override

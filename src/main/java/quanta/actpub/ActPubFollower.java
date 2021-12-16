@@ -7,6 +7,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
@@ -37,32 +38,40 @@ import static quanta.util.Util.*;
 /**
  * Methods related to AP Follower
  */
-@Component
+@Lazy @Component
 public class ActPubFollower  {
     private static final Logger log = LoggerFactory.getLogger(ActPubFollower.class);
 
     @Autowired
+    @Lazy
 	protected MongoTemplate ops;
 
     @Autowired
+    @Lazy
 	protected Convert convert;
 
     @Autowired
+    @Lazy
 	protected ActPubUtil apUtil;
 
     @Autowired
+    @Lazy
 	protected ActPubService apub;
 
     @Autowired
+    @Lazy
 	protected AdminRun arun;
 
     @Autowired
+    @Lazy
 	protected AppProp prop;
 
     @Autowired
+    @Lazy
 	protected MongoUtil mongoUtil;
 
     @Autowired
+    @Lazy
 	protected MongoAuth auth;
 
     @Autowired

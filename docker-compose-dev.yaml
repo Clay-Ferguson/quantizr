@@ -41,7 +41,7 @@ services:
     # 
     # Here's a complete yaml example of how one other project seems to be enabling
     # their pubsub, without the need for a specific dockerfile like we're using.
-    # (todo-1: need to decide if this is better or not)
+    # (todo-2: need to decide if this is better or not)
     #    version: '2'
     #    services:
     #    ipfs-daemon:

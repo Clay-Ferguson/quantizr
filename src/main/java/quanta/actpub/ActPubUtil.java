@@ -22,6 +22,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -49,29 +50,36 @@ import static quanta.util.Util.*;
 /**
  * AP-related utilities
  */
-@Component
+@Lazy @Component
 public class ActPubUtil  {
     private static final Logger log = LoggerFactory.getLogger(ActPubUtil.class);
 
     @Autowired
+    @Lazy
 	protected ActPubCrypto apCrypto;
 
     @Autowired
+    @Lazy
 	public ActPubCache apCache;
 
     @Autowired
+    @Lazy
 	protected ActPubUtil apUtil;
 
     @Autowired
+    @Lazy
 	protected ActPubService apub;
 
     @Autowired
+    @Lazy
 	protected AppProp prop;
 
     @Autowired
+    @Lazy
 	protected MongoAuth auth;
 
     @Autowired
+    @Lazy
 	protected MongoRead read;
 
     /*
@@ -319,7 +327,7 @@ public class ActPubUtil  {
                 apCache.actorsByUserName.put(userName, actor);
             }
         } catch (Exception e) {
-            // todo-1: eating this for now.
+            // ignoring this for now.
         }
         // log.debug("Actor: " + XString.prettyPrint(actor));
         return actor;
@@ -359,7 +367,7 @@ public class ActPubUtil  {
         apub.saveFediverseName(resource);
 
         return getWebFingerSec(resource, true);
-        // need to re-enable this again if we plan on doing localhost fediverse testing (todo-1)
+        // need to re-enable this again if we plan on doing localhost fediverse testing (todo-2)
         // // For non-secure domains, they're required to have a port in their name,
         // // so this is users like bob@q1:8184 (for example), and that port is expected
         // // also to NOT be https 443 port.

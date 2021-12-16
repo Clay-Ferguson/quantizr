@@ -9,6 +9,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;
 import quanta.actpub.model.AP;
@@ -40,29 +41,36 @@ import static quanta.util.Util.*;
 /**
  * AP Outbox
  */
-@Component
+@Lazy @Component
 public class ActPubOutbox  {
     private static final Logger log = LoggerFactory.getLogger(ActPubOutbox.class);
 
     @Autowired
+    @Lazy
 	protected ActPubUtil apUtil;
 
     @Autowired
+    @Lazy
 	protected ActPubService apub;
 
     @Autowired
+    @Lazy
 	protected SubNodeUtil snUtil;
 
     @Autowired
+    @Lazy
 	protected AppProp prop;
 
     @Autowired
+    @Lazy
 	protected AdminRun arun;
 
     @Autowired
+    @Lazy
 	protected MongoAuth auth;
 
     @Autowired
+    @Lazy
 	protected MongoRead read;
 
     @Autowired

@@ -20,6 +20,7 @@ import org.springframework.stereotype.Component;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import quanta.config.AppProp;
 import quanta.util.StreamUtil;
 import static quanta.util.Util.*;
@@ -35,7 +36,7 @@ import static quanta.util.Util.*;
  * order either by score or by date (rev chron)
  */
 // todo-2: make this a prototype-scope bean?
-@Component
+@Lazy @Component
 public class FileSearcher {
 	private static final Logger log = LoggerFactory.getLogger(FileSearcher.class);
 
