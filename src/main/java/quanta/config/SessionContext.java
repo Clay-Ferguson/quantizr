@@ -264,6 +264,25 @@ public class SessionContext {
 		return false;
 	}
 
+	public static void checkReqToken() {
+		SessionContext sc = ThreadLocals.getSC();
+		if (no(sc)) {
+			throw new RuntimeException("Unable to get SessionContext to check token.");
+		}
+		String bearer = ThreadLocals.getReqBearerToken();
+
+		// otherwise require secure header
+		if (no(bearer)) {
+			throw new RuntimeException("Auth failed. no bearer token.");
+		}
+
+		if (!validToken(bearer, sc.getUserName())) {
+			throw new RuntimeException("Auth failed. Invalid bearer token: " + bearer);
+		} else {
+			// log.debug("Bearer accepted: " + bearer);
+		}
+	}
+
 	public String getUserToken() {
 		return userToken;
 	}

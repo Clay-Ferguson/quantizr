@@ -85,10 +85,7 @@ public class AppFilter extends GenericFilterBean {
 					sc.setUserName(PrincipalName.ANON.s());
 				}
 
-				// for paths that require a user check bearer token.
-				if (isSecurePath(httpReq.getRequestURI())) {
-					checkApiSecurity(bearer, httpReq, sc);
-				}
+				ThreadLocals.setReqBearerToken(bearer);
 
 				sc.setIp(Util.getClientIpAddr(httpReq));
 				ThreadLocals.setHttpSession(session);
@@ -130,70 +127,5 @@ public class AppFilter extends GenericFilterBean {
 			/* Set thread back to clean slate, for it's next cycle time in threadpool */
 			ThreadLocals.removeAll();
 		}
-	}
-
-	/*
-	 * Secure path check requires a non-anonymous user to be on this session and also already
-	 * authenticated
-	 */
-	private void checkApiSecurity(String bearer, HttpServletRequest req, SessionContext sc) {
-		// otherwise require secure header
-		if (no(bearer)) {
-			throw new RuntimeException("Auth failed. no bearer token: " + req.getRequestURI());
-		}
-
-		if (!SessionContext.validToken(bearer, sc.getUserName())) {
-			throw new RuntimeException("Auth failed. Invalid bearer token: " + bearer + " " + req.getRequestURI());
-		} else {
-			// log.debug("Bearer accepted: " + bearer);
-		}
-	}
-
-	// todo-0: The emergency bug-fixing in here after moving to Spring 2.6 turned this method
-	// into an absolute trainwreak. Get rid of it completely.
-	private boolean isSecurePath(String path) {
-		// log.debug("Check Path: " + path);
-		if (path.equals("/") || path.equals("/app") || path.equals("/site.webmanifest")) {
-			return false;
-		}
-
-		// todo-2: /bin & /stream is an unusual case: can be ../bin/avatar or just ../bin
-		if (
-		// CONTAINS
-		// ========
-		path.contains("/bin") || //
-				path.contains("/stream") || //
-				path.contains("/dist/") || //
-				path.contains("/branding/") || //
-				path.contains("/u/") || //
-				path.contains("/n/") || //
-
-
-				// ENDS WITH
-				// =========
-				path.endsWith("/login") || //
-				path.endsWith("/signup") || //
-				path.endsWith("/savePublicKey") || //
-				path.endsWith("/changePassword") || //
-				path.endsWith("/getConfig") || //
-				path.endsWith("/serverPush") || //
-				path.endsWith("/renderNode") || //
-				path.endsWith("/getNodeMetaInfo") || //
-				path.endsWith("/captcha") || //
-				path.endsWith("/getUserProfile") || //
-				path.endsWith("/nodeFeed") || //
-				path.endsWith("/getFollowers") || //
-				path.endsWith("/getFollowing") || //
-				path.endsWith("/nodeSearch") || //
-				path.endsWith("/graphNodes") || //
-				path.endsWith("/resetPassword") || //
-				path.endsWith("/getNodeStats") || //
-				path.endsWith("/getUserAccountInfo") || //
-				path.endsWith("/anonPageLoad") || //
-				path.endsWith("/getOpenGraph") || //
-				path.endsWith("/getMultiRssFeed")) {
-			return false;
-		}
-		return true;
 	}
 }

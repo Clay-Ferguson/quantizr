@@ -26,12 +26,14 @@ import static quanta.util.Util.*;
  */
 public class ThreadLocals {
 	private static final Logger log = LoggerFactory.getLogger(ThreadLocal.class);
+
 	private static final ThreadLocal<HttpServletResponse> servletResponse = new ThreadLocal<>();
 	private static final ThreadLocal<HttpSession> httpSession = new ThreadLocal<>();
 	private static final ThreadLocal<SessionContext> sessionContext = new ThreadLocal<>();
 	private static final ThreadLocal<ResponseBase> response = new ThreadLocal<>();
 	private static final ThreadLocal<Long> stopwatchTime = new ThreadLocal<>();
 	private static final ThreadLocal<MongoSession> session = new ThreadLocal<>();
+	private static final ThreadLocal<String> reqBearerToken = new ThreadLocal<>();
 
 	/*
 	 * dirtyNodes is where we accumulate the set of nodes that will all be updated after processing is
@@ -61,6 +63,7 @@ public class ThreadLocals {
 		servletResponse.remove();
 		response.remove();
 		stopwatchTime.remove();
+		reqBearerToken.remove();
 
 		getDirtyNodes().clear();
 		getCachedNodes().clear();
@@ -119,6 +122,14 @@ public class ThreadLocals {
 
 	public static ResponseBase getResponse() {
 		return response.get();
+	}
+
+	public static void setReqBearerToken(String token) {
+		reqBearerToken.set(token);
+	}
+
+	public static String getReqBearerToken() {
+		return reqBearerToken.get();
 	}
 
 	public static void setStopwatchTime(Long val) {
