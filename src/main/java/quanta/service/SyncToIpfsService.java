@@ -7,6 +7,7 @@ import java.util.HashSet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import quanta.model.client.NodeProp;
@@ -37,21 +38,25 @@ import static quanta.util.Util.*;
  * 
  * Spring 'Prototype-scope Bean': We instantiate a new instance of this bean every time it's run.
  */
-@Component
+@Lazy @Component
 @Scope("prototype")
 public class SyncToIpfsService  {
 	private static final Logger log = LoggerFactory.getLogger(SyncToIpfsService.class);
 
 	@Autowired
+	@Lazy
 	protected IPFSService ipfs;
 
 	@Autowired
+	@Lazy
 	private SubNodeUtil snUtil;
 
 	@Autowired
+	@Lazy
 	protected MongoAuth auth;
 
 	@Autowired
+	@Lazy
 	protected MongoRead read;
 
 	MongoSession session;

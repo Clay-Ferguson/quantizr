@@ -45,6 +45,7 @@ import org.owasp.html.Sanitizers;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpMethod;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -77,20 +78,24 @@ import quanta.util.XString;
 import static quanta.util.Util.*;
 
 /* Proof of Concept RSS Publishing */
-@Component
+@Lazy @Component
 public class RSSFeedService  {
 	private static final Logger log = LoggerFactory.getLogger(RSSFeedService.class);
 
 	@Autowired
+	@Lazy
 	protected AdminRun arun;
 
 	@Autowired
+	@Lazy
 	private SubNodeUtil snUtil;
 
 	@Autowired
+	@Lazy
 	protected AppProp prop;
 
 	@Autowired
+	@Lazy
 	protected MongoRead read;
 
 	private static boolean refreshingCache = false;

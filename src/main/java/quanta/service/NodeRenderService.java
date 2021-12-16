@@ -8,6 +8,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;
 import org.springframework.ui.Model;
@@ -48,26 +49,32 @@ import static quanta.util.Util.*;
  * to the client. But regardless of format this is the primary service for pulling content up for
  * rendering the pages on the client as the user browses around on the tree.
  */
-@Component
+@Lazy @Component
 public class NodeRenderService  {
 	private static final Logger log = LoggerFactory.getLogger(NodeRenderService.class);
 
 	@Autowired
+	@Lazy
 	protected Convert convert;
 
 	@Autowired
+	@Lazy
 	protected NodeRenderService render;
 
 	@Autowired
+	@Lazy
 	private SubNodeUtil snUtil;
 
 	@Autowired
+	@Lazy
 	protected AppProp prop;
 
 	@Autowired
+	@Lazy
 	protected MongoAuth auth;
 
 	@Autowired
+	@Lazy
 	protected MongoRead read;
 
 	private static RenderNodeResponse welcomePage;

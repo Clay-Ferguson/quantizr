@@ -9,6 +9,7 @@ import org.apache.commons.codec.digest.DigestUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
@@ -19,26 +20,32 @@ import quanta.service.AttachmentService;
 
 import static quanta.util.Util.*;
 
+
 /**
  * Performs the 'deletes' (as in CRUD) operations for deleting nodes in MongoDB
  */
-@Component
+@Lazy @Component
 public class MongoDelete  {
 	private static final Logger log = LoggerFactory.getLogger(MongoDelete.class);
 
 	@Autowired
+    @Lazy
 	protected MongoTemplate ops;
 
 	@Autowired
+	@Lazy
 	protected AttachmentService attach;
 
 	@Autowired
+	@Lazy
 	protected MongoUtil mongoUtil;
 
 	@Autowired
+	@Lazy
 	protected MongoAuth auth;
 
 	@Autowired
+	@Lazy
 	protected MongoUpdate update;
 
 	public void deleteNode(MongoSession ms, SubNode node, boolean childrenOnly) {

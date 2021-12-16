@@ -39,6 +39,7 @@ import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.ResourceRegion;
@@ -99,41 +100,52 @@ import quanta.util.Val;
  * attachment. If the attachment is an 'image' type then it gets displayed right on the page.
  * Otherwise a download link is what gets displayed on the node.
  */
-@Component
+@Lazy @Component
 public class AttachmentService  {
 	private static final Logger log = LoggerFactory.getLogger(AttachmentService.class);
 
 	@Autowired
+	@Lazy
 	protected IPFSService ipfs;
 
 	@Autowired
+	@Lazy
 	private GridFsTemplate grid;
 
 	@Autowired
+	@Lazy
 	protected GridFSBucket gridBucket;
 
 	@Autowired
+	@Lazy
 	protected AdminRun arun;
 
 	@Autowired
+	@Lazy
 	protected AppProp prop;
 
 	@Autowired
+	@Lazy
 	protected UserManagerService user;
 
 	@Autowired
+	@Lazy
 	protected MongoUtil mongoUtil;
 
 	@Autowired
+	@Lazy
 	protected MongoAuth auth;
 
 	@Autowired
+	@Lazy
 	protected MongoUpdate update;
 
 	@Autowired
+	@Lazy
 	protected MongoRead read;
 
 	@Autowired
+	@Lazy
 	protected MongoCreate create;
 
 	/*

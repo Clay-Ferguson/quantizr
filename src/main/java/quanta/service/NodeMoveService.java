@@ -6,6 +6,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 import quanta.exception.base.RuntimeEx;
 import quanta.model.client.NodeProp;
@@ -37,29 +38,36 @@ import static quanta.util.Util.*;
  * move any existing nodes they have to any new location they want, subject to security constraints
  * of course.
  */
-@Component
+@Lazy @Component
 public class NodeMoveService  {
 	private static final Logger log = LoggerFactory.getLogger(NodeMoveService.class);
 
 	@Autowired
+	@Lazy
 	protected AdminRun arun;
 
 	@Autowired
+	@Lazy
 	protected UserManagerService user;
 
 	@Autowired
+	@Lazy
 	protected MongoAuth auth;
 
 	@Autowired
+	@Lazy
 	protected MongoDelete delete;
 
 	@Autowired
+	@Lazy
 	protected MongoUpdate update;
 
 	@Autowired
+	@Lazy
 	protected MongoRead read;
 
 	@Autowired
+	@Lazy
 	protected MongoCreate create;
 
 	/*

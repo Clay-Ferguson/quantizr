@@ -17,6 +17,7 @@ import org.apache.pdfbox.pdmodel.graphics.image.PDImageXObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.context.annotation.Scope;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;
@@ -37,21 +38,25 @@ import static quanta.util.Util.*;
 /**
  * Exporter using PDFBox
  */
-@Component
+@Lazy @Component
 @Scope("prototype")
 public class ExportPdfServicePdfBox  {
 	private static final Logger log = LoggerFactory.getLogger(ExportPdfServicePdfBox.class);
 
 	@Autowired
+	@Lazy
 	protected AttachmentService attach;
 
 	@Autowired
+	@Lazy
 	private SubNodeUtil snUtil;
 
 	@Autowired
+	@Lazy
 	protected AppProp prop;
 
 	@Autowired
+	@Lazy
 	protected MongoRead read;
 
 	private MongoSession session;

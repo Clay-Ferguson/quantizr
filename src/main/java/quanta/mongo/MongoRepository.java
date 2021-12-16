@@ -4,6 +4,7 @@ import javax.annotation.PreDestroy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 import quanta.AppServer;
 import quanta.actpub.ActPubService;
@@ -13,23 +14,28 @@ import static quanta.util.Util.*;
 /**
  * Models the MongoDB repository connection.
  */
-@Component
+@Lazy @Component
 public class MongoRepository  {
 	private static final Logger log = LoggerFactory.getLogger(MongoRepository.class);
 
 	@Autowired
+	@Lazy
 	protected MongoAppConfig mac;
 
 	@Autowired
+	@Lazy
 	protected ActPubService apub;
 
 	@Autowired
+	@Lazy
 	protected MongoUtil mongoUtil;
 
 	@Autowired
+	@Lazy
 	protected MongoAuth auth;
 
 	@Autowired
+	@Lazy
 	protected MongoDelete delete;
 
 	// hack for now to make RSS deamon wait.

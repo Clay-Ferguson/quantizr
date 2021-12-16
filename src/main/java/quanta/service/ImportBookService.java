@@ -3,6 +3,7 @@ package quanta.service;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 import quanta.config.SpringContextUtil;
 import quanta.mongo.MongoAuth;
@@ -23,17 +24,20 @@ import static quanta.util.Util.*;
  * for demonstration purposes to show how browsing, searching, etc. works, and for testing with a
  * reasonable sized chunk of data (i.e. the entire book)
  */
-@Component
+@Lazy @Component
 public class ImportBookService  {
 	private static final Logger log = LoggerFactory.getLogger(ImportBookService.class);
 
 	@Autowired
+	@Lazy
 	protected MongoAuth auth;
 
 	@Autowired
+	@Lazy
 	protected MongoUpdate update;
 
 	@Autowired
+	@Lazy
 	protected MongoRead read;
 
 	public InsertBookResponse insertBook(MongoSession ms, InsertBookRequest req) {

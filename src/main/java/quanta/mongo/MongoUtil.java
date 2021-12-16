@@ -13,6 +13,7 @@ import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.Sort.Direction;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.index.Index;
@@ -48,47 +49,60 @@ import quanta.util.Val;
 import quanta.util.XString;
 import static quanta.util.Util.*;
 
+
 /**
  * Verious utilities related to MongoDB persistence
  */
-@Component
+@Lazy @Component
 public class MongoUtil  {
 	private static final Logger log = LoggerFactory.getLogger(MongoUtil.class);
 
 	@Autowired
+    @Lazy
 	protected MongoTemplate ops;
 
 	@Autowired
+	@Lazy
 	protected AdminRun arun;
 
 	@Autowired
+	@Lazy
 	private SubNodeUtil snUtil;
 
 	@Autowired
+	@Lazy
 	protected AppProp prop;
 
 	@Autowired
+	@Lazy
 	protected UserManagerService user;
 
 	@Autowired
+	@Lazy
 	protected AclService acl;
 
 	@Autowired
+	@Lazy
 	protected MongoUtil mongoUtil;
 
 	@Autowired
+	@Lazy
 	protected MongoAuth auth;
 
 	@Autowired
+	@Lazy
 	protected MongoDelete delete;
 
 	@Autowired
+	@Lazy
 	protected MongoUpdate update;
 
 	@Autowired
+	@Lazy
 	protected MongoRead read;
 
 	@Autowired
+	@Lazy
 	protected MongoCreate create;
 
 	private static HashSet<String> testAccountNames = new HashSet<>();

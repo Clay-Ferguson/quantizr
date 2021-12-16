@@ -27,6 +27,7 @@ import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.ContentDisposition;
 import org.springframework.http.HttpEntity;
@@ -84,35 +85,40 @@ import static quanta.util.Util.*;
  * converter convert do this for us always instead
  */
 
-@Component
+@Lazy @Component
 public class IPFSService  {
     private static final Logger log = LoggerFactory.getLogger(IPFSService.class);
 
     @Autowired
-	protected IPFSService ipfs;
-
-    @Autowired
+    @Lazy
 	protected AsyncExec asyncExec;
 
     @Autowired
+    @Lazy
 	protected AttachmentService attach;
 
     @Autowired
+    @Lazy
 	protected AdminRun arun;
 
     @Autowired
+    @Lazy
 	protected AppProp prop;
 
     @Autowired
+    @Lazy
 	protected UserManagerService user;
 
     @Autowired
+    @Lazy
 	protected MongoUpdate update;
 
     @Autowired
+    @Lazy
 	protected MongoRead read;
 
     @Autowired
+    @Lazy
 	protected MongoCreate create;
 
     public static String API_BASE;
@@ -294,7 +300,7 @@ public class IPFSService  {
     public String saveNodeAttachmentToIpfs(MongoSession ms, SubNode node) {
         String cid = null;
         String mime = node.getStr(NodeProp.BIN_MIME);
-        String fileName = node.getStr(NodeProp.FILENAME);
+        String fileName = node.getStr(NodeProp.BIN_FILENAME);
 
         InputStream is = attach.getStreamByNode(node, "");
         if (ok(is)) {
@@ -849,7 +855,7 @@ public class IPFSService  {
 
             if (no(dir.getEntries())) {
                 log.debug("DEL EMPTY FOLDER: " + path);
-                ipfs.deletePath(path);
+                deletePath(path);
                 return;
             }
 

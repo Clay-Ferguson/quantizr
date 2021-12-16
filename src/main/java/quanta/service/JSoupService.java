@@ -7,13 +7,14 @@ import org.jsoup.nodes.Document;
 import org.jsoup.select.Elements;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 import quanta.model.client.OpenGraph;
 import quanta.request.GetOpenGraphRequest;
 import quanta.response.GetOpenGraphResponse;
 import static quanta.util.Util.*;
 
-@Component
+@Lazy @Component
 public class JSoupService {
 	private static final Logger log = LoggerFactory.getLogger(JSoupService.class);
 

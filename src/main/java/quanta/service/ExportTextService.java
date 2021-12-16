@@ -8,6 +8,7 @@ import java.nio.charset.StandardCharsets;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.context.annotation.Scope;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;
@@ -25,21 +26,25 @@ import quanta.util.SubNodeUtil;
 import quanta.util.ThreadLocals;
 import static quanta.util.Util.*;
 
-@Component
+@Lazy @Component
 @Scope("prototype")
 public class ExportTextService  {
 	private static final Logger log = LoggerFactory.getLogger(ExportTextService.class);
 
 	@Autowired
+	@Lazy
 	protected IPFSService ipfs;
 
 	@Autowired
+	@Lazy
 	private SubNodeUtil snUtil;
 
 	@Autowired
+	@Lazy
 	protected AppProp prop;
 
 	@Autowired
+	@Lazy
 	protected MongoRead read;
 
 	private MongoSession session;

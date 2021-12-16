@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import quanta.model.client.NodeProp;
@@ -26,18 +27,21 @@ import quanta.util.ThreadLocals;
 import quanta.util.XString;
 import static quanta.util.Util.*;
 
-@Component
+@Lazy @Component
 @Scope("prototype")
 public class SyncFromIpfsService  {
 	private static final Logger log = LoggerFactory.getLogger(SyncFromIpfsService.class);
 
 	@Autowired
+	@Lazy
 	protected IPFSService ipfs;
 
 	@Autowired
+	@Lazy
 	protected MongoUpdate update;
 
 	@Autowired
+	@Lazy
 	protected MongoRead read;
 
 	public static final ObjectMapper jsonMapper = new ObjectMapper();

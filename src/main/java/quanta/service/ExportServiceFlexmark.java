@@ -19,6 +19,7 @@ import com.vladsch.flexmark.util.data.MutableDataSet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.context.annotation.Scope;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;
@@ -43,21 +44,25 @@ import static quanta.util.Util.*;
 /**
  * https://github.com/vsch/flexmark-java
  */
-@Component
+@Lazy @Component
 @Scope("prototype")
 public class ExportServiceFlexmark  {
 	private static final Logger log = LoggerFactory.getLogger(ExportServiceFlexmark.class);
 
 	@Autowired
+	@Lazy
 	protected IPFSService ipfs;
 
 	@Autowired
+	@Lazy
 	private SubNodeUtil snUtil;
 
 	@Autowired
+	@Lazy
 	protected AppProp prop;
 
 	@Autowired
+	@Lazy
 	protected MongoRead read;
 
 	private MongoSession session;
@@ -162,7 +167,7 @@ public class ExportServiceFlexmark  {
 				out = new FileOutputStream(new File(fullFileName));
 
 				/*
-				 * todo-1: we're writing to a physical file here EVEN when all we need it for is to put out on IPFS.
+				 * todo-2: we're writing to a physical file here EVEN when all we need it for is to put out on IPFS.
 				 * This can be improved to not need the physica file but do it either all as streams or in byte
 				 * array.
 				 */
@@ -275,7 +280,7 @@ public class ExportServiceFlexmark  {
 		String src = null;
 
 		if (req.isToIpfs() && "html".equals(format)) {
-			String fileName = node.getStr(NodeProp.FILENAME);
+			String fileName = node.getStr(NodeProp.BIN_FILENAME);
 			String mime = node.getStr(NodeProp.BIN_MIME);
 
 			if (ok(bin)) {

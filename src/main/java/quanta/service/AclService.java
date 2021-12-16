@@ -10,6 +10,7 @@ import java.util.StringTokenizer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 import quanta.exception.base.RuntimeEx;
 import quanta.model.client.NodeProp;
@@ -38,20 +39,24 @@ import static quanta.util.Util.*;
  * Service methods for (ACL): processing security, privileges, and Access Control List information
  * on nodes.
  */
-@Component
+@Lazy @Component
 public class AclService  {
 	private static final Logger log = LoggerFactory.getLogger(AclService.class);
 
 	@Autowired
+	@Lazy
 	protected UserManagerService user;
 
 	@Autowired
+	@Lazy
 	protected MongoAuth auth;
 
 	@Autowired
+	@Lazy
 	protected MongoUpdate update;
 
 	@Autowired
+	@Lazy
 	protected MongoRead read;
 
 	/**
@@ -246,7 +251,7 @@ public class AclService  {
 			// String fromUserName = fromUserNode.getStrProp(NodeProp.USER);
 			// SubNode toOwnerNode = read.getUserNodeByUserName(auth.getAdminSession(), principal);
 			// /*
-			// * todo-1: Although I am disabling these for now both of these lines of code do work perfectly: we
+			// * todo-2: Although I am disabling these for now both of these lines of code do work perfectly: we
 			// * can send an email notification here about node edits (first line), and the line below that
 			// works
 			// * fine and adds a node to the user's inbox that links to this newly shared node.

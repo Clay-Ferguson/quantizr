@@ -11,6 +11,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
@@ -40,35 +41,45 @@ import quanta.util.Convert;
 import quanta.util.ThreadLocals;
 import static quanta.util.Util.*;
 
-@Component
+
+@Lazy @Component
 public class UserFeedService  {
 	private static final Logger log = LoggerFactory.getLogger(UserFeedService.class);
 
 	@Autowired
+	@Lazy
 	protected Convert convert;
 
 	@Autowired
+    @Lazy
 	protected MongoTemplate ops;
 
 	@Autowired
+	@Lazy
 	protected AsyncExec asyncExec;
 
 	@Autowired
+	@Lazy
 	protected AdminRun arun;
 
 	@Autowired
+	@Lazy
 	protected UserManagerService user;
 
 	@Autowired
+	@Lazy
 	protected MongoUtil mongoUtil;
 
 	@Autowired
+	@Lazy
 	protected MongoAuth auth;
 
 	@Autowired
+	@Lazy
 	protected MongoUpdate update;
 
 	@Autowired
+	@Lazy
 	protected MongoRead read;
 
 	static final int MAX_FEED_ITEMS = 25;

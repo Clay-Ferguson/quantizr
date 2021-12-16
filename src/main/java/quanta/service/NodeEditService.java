@@ -10,6 +10,7 @@ import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 import quanta.actpub.ActPubFollower;
 import quanta.actpub.ActPubFollowing;
@@ -68,59 +69,76 @@ import static quanta.util.Util.*;
  * the user is using the application and moving, copy+paste, or editing node content this is the
  * service that performs those operations on the server, directly called from the HTML 'controller'
  */
-@Component
+@Lazy @Component
 public class NodeEditService  {
 	private static final Logger log = LoggerFactory.getLogger(NodeEditService.class);
 
 	@Autowired
+	@Lazy
 	protected Convert convert;
 
 	@Autowired
+	@Lazy
 	protected IPFSService ipfs;
 
 	@Autowired
+	@Lazy
 	protected TypePluginMgr typePluginMgr;
 
 	@Autowired
+	@Lazy
 	protected PushService push;
 
 	@Autowired
+	@Lazy
 	protected ActPubUtil apUtil;
 
 	@Autowired
+	@Lazy
 	protected ActPubFollower apFollower;
 
 	@Autowired
+	@Lazy
 	protected ActPubService apub;
 
 	@Autowired
+	@Lazy
 	protected ActPubFollowing apFollowing;
 
 	@Autowired
+	@Lazy
 	protected AsyncExec asyncExec;
 
 	@Autowired
+	@Lazy
 	protected AdminRun arun;
 
 	@Autowired
+	@Lazy
 	private SubNodeUtil snUtil;
 
 	@Autowired
+	@Lazy
 	protected AclService acl;
 
 	@Autowired
+	@Lazy
 	protected MongoUtil mongoUtil;
 
 	@Autowired
+	@Lazy
 	protected MongoAuth auth;
 
 	@Autowired
+	@Lazy
 	protected MongoUpdate update;
 
 	@Autowired
+	@Lazy
 	protected MongoRead read;
 
 	@Autowired
+	@Lazy
 	protected MongoCreate create;
 
 	/*

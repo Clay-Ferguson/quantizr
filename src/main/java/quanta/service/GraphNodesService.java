@@ -7,6 +7,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 import quanta.model.GraphNode;
 import quanta.model.client.PrivilegeType;
@@ -21,14 +22,16 @@ import quanta.util.ThreadLocals;
 import quanta.util.XString;
 import static quanta.util.Util.*;
 
-@Component
+@Lazy @Component
 public class GraphNodesService  {
 	private static final Logger log = LoggerFactory.getLogger(GraphNodesService.class);
 
 	@Autowired
+	@Lazy
 	protected MongoAuth auth;
 
 	@Autowired
+	@Lazy
 	protected MongoRead read;
 
 	static int guid = 0;

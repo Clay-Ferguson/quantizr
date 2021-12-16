@@ -7,10 +7,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter.SseEventBuilder;
-import org.yaml.snakeyaml.scanner.Constant;
 import quanta.config.SessionContext;
 import quanta.model.NodeInfo;
 import quanta.mongo.MongoAuth;
@@ -24,14 +24,16 @@ import quanta.util.Convert;
 import quanta.util.ThreadLocals;
 import static quanta.util.Util.*;
 
-@Component
+@Lazy @Component
 public class PushService  {
 	private static final Logger log = LoggerFactory.getLogger(PushService.class);
 
 	@Autowired
+	@Lazy
 	protected Convert convert;
 
 	@Autowired
+	@Lazy
 	protected MongoAuth auth;
 
 	static final int MAX_FEED_ITEMS = 25;

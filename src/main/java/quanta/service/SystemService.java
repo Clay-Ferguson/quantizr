@@ -14,6 +14,7 @@ import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 import quanta.actpub.ActPubService;
 import quanta.config.AppProp;
@@ -41,41 +42,52 @@ import static quanta.util.Util.*;
 /**
  * Service methods for System related functions. Admin functions.
  */
-@Component
+@Lazy @Component
 public class SystemService  {
 	private static final Logger log = LoggerFactory.getLogger(SystemService.class);
 
 	@Autowired
+	@Lazy
 	protected IPFSService ipfs;
 
 	@Autowired
+	@Lazy
 	protected ActPubService apub;
 
 	@Autowired
+	@Lazy
 	protected AttachmentService attach;
 
 	@Autowired
+	@Lazy
 	protected AdminRun arun;
 
 	@Autowired
+	@Lazy
 	protected AppProp prop;
 
 	@Autowired
+	@Lazy
 	protected UserManagerService user;
 
 	@Autowired
+	@Lazy
 	protected MongoAppConfig mac;
 
 	@Autowired
+	@Lazy
 	protected MongoUtil mongoUtil;
 
 	@Autowired
+	@Lazy
 	protected MongoDelete delete;
 
 	@Autowired
+	@Lazy
 	protected MongoUpdate update;
 
 	@Autowired
+	@Lazy
 	protected MongoRead read;
 
 	public String rebuildIndexes() {

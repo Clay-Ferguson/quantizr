@@ -8,6 +8,7 @@ import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.stereotype.Component;
 import quanta.model.UserStats;
@@ -21,26 +22,32 @@ import quanta.util.Val;
 import quanta.util.XString;
 import static quanta.util.Util.*;
 
+
 /**
  * Performs update (as in CRUD) operations for MongoDB
  */
-@Component
+@Lazy @Component
 public class MongoUpdate  {
 	private static final Logger log = LoggerFactory.getLogger(MongoUpdate.class);
 
 	@Autowired
+	@Lazy
 	protected IPFSService ipfs;
 
 	@Autowired
+    @Lazy
 	protected MongoTemplate ops;
 
 	@Autowired
+	@Lazy
 	protected AdminRun arun;
 
 	@Autowired
+	@Lazy
 	protected MongoAuth auth;
 
 	@Autowired
+	@Lazy
 	protected MongoRead read;
 
 	private static final ThreadLocal<Boolean> saving = new ThreadLocal<>();

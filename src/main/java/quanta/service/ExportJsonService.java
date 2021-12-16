@@ -14,6 +14,7 @@ import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.context.annotation.Scope;
 import org.springframework.core.io.Resource;
 import org.springframework.data.mongodb.core.query.Criteria;
@@ -37,24 +38,29 @@ import static quanta.util.Util.*;
 /**
  * Import/Export of Raw JSON and Binaries to and from filesystem/classpath)
  */
-@Component
+@Lazy @Component
 @Scope("prototype")
 public class ExportJsonService  {
 	private static final Logger log = LoggerFactory.getLogger(ExportJsonService.class);
 
 	@Autowired
+	@Lazy
 	protected AttachmentService attach;
 
 	@Autowired
+	@Lazy
 	protected AppProp prop;
 
 	@Autowired
+	@Lazy
 	protected UserManagerService user;
 
 	@Autowired
+	@Lazy
 	protected MongoUtil mongoUtil;
 
 	@Autowired
+	@Lazy
 	protected MongoUpdate update;
 
 	/* This object is Threadsafe so this is the correct usage 'static final' */

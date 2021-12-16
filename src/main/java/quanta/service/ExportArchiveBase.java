@@ -16,6 +16,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.core.io.Resource;
 import org.springframework.data.domain.Sort;
 import quanta.config.AppProp;
@@ -49,18 +50,23 @@ public abstract class ExportArchiveBase  {
 	private static final Logger log = LoggerFactory.getLogger(ExportArchiveBase.class);
 
 	@Autowired
+	@Lazy
 	protected FileUtils fileUtil;
 
 	@Autowired
+	@Lazy
 	protected AttachmentService attach;
 
 	@Autowired
+	@Lazy
 	private SubNodeUtil snUtil;
 
 	@Autowired
+	@Lazy
 	protected MongoAuth auth;
 
 	@Autowired
+	@Lazy
 	protected MongoRead read;
 
 	private String shortFileName;

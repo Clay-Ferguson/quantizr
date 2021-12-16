@@ -9,6 +9,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
@@ -55,35 +56,44 @@ import static quanta.util.Util.*;
  * NOTE: the Query class DOES have a 'skip' and 'limit' which I can take advantage of in all my
  * searching but I'm not fully doing so yet I don't believe.
  */
-@Component
+@Lazy @Component
 public class NodeSearchService  {
 	private static final Logger log = LoggerFactory.getLogger(NodeSearchService.class);
 	
 	@Autowired
+	@Lazy
 	protected Convert convert;
 
 	@Autowired
+	@Lazy
 	protected EnglishDictionary english;
 
 	@Autowired
+	@Lazy
 	protected ActPubService apub;
 
 	@Autowired
+	@Lazy
 	protected NodeRenderService render;
 
 	@Autowired
+	@Lazy
 	protected AdminRun arun;
 
 	@Autowired
+	@Lazy
 	protected UserManagerService user;
 
 	@Autowired
+	@Lazy
 	protected MongoUtil mongoUtil;
 
 	@Autowired
+	@Lazy
 	protected MongoAuth auth;
 
 	@Autowired
+	@Lazy
 	protected MongoRead read;
 
 	public static Object trendingFeedInfoLock = new Object();

@@ -9,6 +9,7 @@ import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.aggregation.Aggregation;
@@ -34,35 +35,43 @@ import quanta.util.Util;
 import quanta.util.XString;
 import static quanta.util.Util.*;
 
+
 /**
  * Performs the 'create' (as in CRUD) operations for creating new nodes in MongoDB
  * <p>
  * There are many more opportunities in this class to use the ThreadLocals.nodeCache to store
  * information in the thread for use during context of one call
  */
-@Component
+@Lazy @Component
 public class MongoRead  {
     private static final Logger log = LoggerFactory.getLogger(MongoRead.class);
 
     @Autowired
+    @Lazy
 	protected MongoTemplate ops;
 
     @Autowired
+    @Lazy
 	protected AppProp prop;
 
     @Autowired
+    @Lazy
 	protected AclService acl;
 
     @Autowired
+    @Lazy
 	protected MongoUtil mongoUtil;
 
     @Autowired
+    @Lazy
 	protected MongoAuth auth;
 
     @Autowired
+    @Lazy
 	protected MongoUpdate update;
 
     @Autowired
+    @Lazy
 	protected MongoCreate create;
 
     private static final Object dbRootLock = new Object();
@@ -307,7 +316,7 @@ public class MongoRead  {
     }
 
     /*
-     * todo-1: Need to implement a save hook/callback capability in the MongoListener so we can get
+     * todo-2: Need to implement a save hook/callback capability in the MongoListener so we can get
      * notifications sent to any threads that are waiting to lookup a node once it exists, but we will
      * STILL probably need to DO the lookup so we don't have concurrent access threading bug.
      */
@@ -830,7 +839,7 @@ public class MongoRead  {
         }
 
         /*
-         * todo-1: fix this? Ensure if "sn:posts" node type does exist that it's also named 'posts' this is
+         * todo-2: fix this? Ensure if "sn:posts" node type does exist that it's also named 'posts' this is
          * a retrofit (data repair) here, and not the standard flow.
          */
         if (ok(node) && NodeType.POSTS.s().equals(type) && !NodeName.POSTS.equals(node.getName())) {

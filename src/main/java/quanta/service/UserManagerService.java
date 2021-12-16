@@ -18,6 +18,7 @@ import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.Sort;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -94,64 +95,82 @@ import quanta.util.XString;
  * Service methods for processing user management functions. Login, logout, signup, user
  * preferences, and settings persisted per-user
  */
-@Component
+@Lazy @Component
 public class UserManagerService  {
 	private static final Logger log = LoggerFactory.getLogger(UserManagerService.class);
 
 	private static final Random rand = new Random();
 
 	@Autowired
+	@Lazy
 	protected AuthenticationManager authenticationManager;
 
 	@Autowired
+	@Lazy
 	protected Validator validator;
 
 	@Autowired
+	@Lazy
 	protected NodeEditService edit;
 
 	@Autowired
+	@Lazy
 	protected OutboxMgr outbox;
 
 	@Autowired
+	@Lazy
 	protected ActPubUtil apUtil;
 
 	@Autowired
+	@Lazy
 	protected ActPubFollower apFollower;
 
 	@Autowired
+	@Lazy
 	protected ActPubFollowing apFollowing;
 
 	@Autowired
+	@Lazy
 	protected ActPubService apub;
 
 	@Autowired
+	@Lazy
 	protected AsyncExec asyncExec;
 
 	@Autowired
+	@Lazy
 	protected AdminRun arun;
 
 	@Autowired
+	@Lazy
 	protected AppProp prop;
 
 	@Autowired
+	@Lazy
 	protected AclService acl;
 
 	@Autowired
+	@Lazy
 	protected MongoUtil mongoUtil;
 
 	@Autowired
+	@Lazy
 	protected MongoAuth auth;
 
 	@Autowired
+	@Lazy
 	protected MongoDelete delete;
 
 	@Autowired
+	@Lazy
 	protected MongoUpdate update;
 
 	@Autowired
+	@Lazy
 	protected MongoRead read;
 
 	@Autowired
+	@Lazy
 	protected MongoCreate create;
 
 	/* Private keys of each user by user name as key */
