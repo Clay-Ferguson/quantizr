@@ -15,6 +15,7 @@ import org.springframework.data.mongodb.core.mapping.event.AfterLoadEvent;
 import org.springframework.data.mongodb.core.mapping.event.AfterSaveEvent;
 import org.springframework.data.mongodb.core.mapping.event.BeforeDeleteEvent;
 import org.springframework.data.mongodb.core.mapping.event.BeforeSaveEvent;
+import org.springframework.stereotype.Component;
 import quanta.actpub.ActPubService;
 import quanta.config.NodeName;
 import quanta.mongo.model.SubNode;
@@ -29,6 +30,7 @@ import static quanta.util.Util.*;
  * 
  * can this be done with @Compoent instead of @Bean ? todo-0
  */
+@Component
 public class MongoEventListener extends AbstractMongoEventListener<SubNode> {
 	private static final Logger log = LoggerFactory.getLogger(MongoEventListener.class);
 	private static final boolean verbose = false;
@@ -216,6 +218,7 @@ public class MongoEventListener extends AbstractMongoEventListener<SubNode> {
 	@Override
 	public void onAfterConvert(AfterConvertEvent<SubNode> event) {
 		SubNode node = event.getSource();
+		// log.debug("onAfterConvert: "+node.getContent());
 		if (no(node.getOwner())) {
 			if (ok(auth.getAdminSession())) {
 				ObjectId ownerId = auth.getAdminSession().getUserNodeId();
