@@ -11,12 +11,13 @@ import java.util.StringTokenizer;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Component;
 import quanta.config.SpringContextUtil;
 import static quanta.util.Util.*;
 
-@Component
+@Lazy @Component
 public class EnglishDictionary {
 	private static final Logger log = LoggerFactory.getLogger(EnglishDictionary.class);
 	private static final HashSet<String> dictWords = new HashSet<>();

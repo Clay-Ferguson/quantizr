@@ -1,7 +1,7 @@
 import { AppState } from "../AppState";
+import { Div } from "../comp/core/Div";
 import { Constants as C } from "../Constants";
 import { TabDataIntf } from "../intf/TabDataIntf";
-import { Div } from "../comp/core/Div";
 
 export class AppTab<PropType = any> extends Div {
     constructor(state: AppState, public data: TabDataIntf<PropType>, private extraEditModeClass: string = null) {

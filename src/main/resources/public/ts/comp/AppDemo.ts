@@ -2,11 +2,11 @@ import { useSelector } from "react-redux";
 import { dispatch } from "../AppRedux";
 import { AppState } from "../AppState";
 import { runClassDemoTest } from "../ClassDemoTest";
-import { Comp } from "./base/Comp";
-import { Button } from "../comp/core/Button";
 import { CompDemo } from "../comp/CompDemo";
+import { Button } from "../comp/core/Button";
 import { Div } from "../comp/core/Div";
 import { HorizontalLayout } from "../comp/core/HorizontalLayout";
+import { Comp } from "./base/Comp";
 
 export class AppDemo extends Div {
 

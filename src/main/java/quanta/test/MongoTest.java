@@ -10,6 +10,7 @@ import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Component;
 import quanta.exception.NodeAuthFailedException;
@@ -27,29 +28,36 @@ import quanta.service.UserManagerService;
 import quanta.util.LimitedInputStreamEx;
 import quanta.util.ThreadLocals;
 
-@Component("MongoTest")
+@Lazy @Component("MongoTest")
 public class MongoTest implements TestIntf {
 	private static final Logger log = LoggerFactory.getLogger(MongoTest.class);
 
 	@Autowired
+	@Lazy
 	private MongoUtil mongoUtil;
 
 	@Autowired
+	@Lazy
 	private MongoCreate create;
 
 	@Autowired
+	@Lazy
 	private MongoRead read;
 
 	@Autowired
+	@Lazy
 	private MongoUpdate update;
 
 	@Autowired
+	@Lazy
 	private MongoAuth auth;
 
 	@Autowired
+	@Lazy
 	private AttachmentService attach;
 
 	@Autowired
+	@Lazy
 	private UserManagerService usrMgr;
 
 	@Override

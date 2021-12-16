@@ -1,13 +1,15 @@
 package quanta.util;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 import quanta.mongo.MongoAuth;
 
-@Component
+@Lazy @Component
 public class Validator {
 
 	@Autowired
+	@Lazy
 	private MongoAuth auth;
 
 	/*

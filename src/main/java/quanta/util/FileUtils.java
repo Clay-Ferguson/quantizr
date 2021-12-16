@@ -16,6 +16,7 @@ import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.comparator.NameFileComparator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Component;
 import quanta.config.SpringContextUtil;
@@ -27,7 +28,7 @@ import java.io.FileWriter;
 import java.nio.file.attribute.PosixFilePermission;
 import static quanta.util.Util.*;
 
-@Component
+@Lazy @Component
 public class FileUtils {
 	private static final Logger log = LoggerFactory.getLogger(FileUtils.class);
 

@@ -11,6 +11,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;
 import quanta.config.SessionContext;
@@ -39,26 +40,32 @@ import static quanta.util.Util.*;
 /**
  * Converting objects from one type to another, and formatting.
  */
-@Component
+@Lazy @Component
 public class Convert  {
 	private static final Logger log = LoggerFactory.getLogger(Convert.class);
 
 	@Autowired
+	@Lazy
 	protected TypePluginMgr typePluginMgr;
 
 	@Autowired
+	@Lazy
 	protected AttachmentService attach;
 
 	@Autowired
+	@Lazy
 	protected AdminRun arun;
 
 	@Autowired
+	@Lazy
 	protected MongoUtil mongoUtil;
 
 	@Autowired
+	@Lazy
 	protected MongoAuth auth;
 
 	@Autowired
+	@Lazy
 	protected MongoRead read;
 
 	/*

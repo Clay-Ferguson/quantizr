@@ -7,6 +7,7 @@ import java.io.InputStreamReader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.context.annotation.Scope;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Component;
@@ -35,15 +36,17 @@ import static quanta.util.Util.*;
  * book 'War and Peace' to load into the repository, because we use this book as sample/example
  * content.
  */
-@Component
+@Lazy @Component
 @Scope("prototype")
 public class ImportWarAndPeace {
 	private static final Logger log = LoggerFactory.getLogger(ImportWarAndPeace.class);
 
 	@Autowired
+	@Lazy
 	private MongoCreate create;
 
 	@Autowired
+	@Lazy
 	private MongoUpdate update;
 
 	private int maxLines = Integer.MAX_VALUE;

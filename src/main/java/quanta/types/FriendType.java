@@ -1,6 +1,7 @@
 package quanta.types;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 import quanta.model.NodeInfo;
 import quanta.model.PropertyInfo;
@@ -11,10 +12,11 @@ import quanta.mongo.MongoSession;
 import quanta.mongo.model.SubNode;
 import static quanta.util.Util.*;
 
-@Component
+@Lazy @Component
 public class FriendType extends TypeBase {
 
     @Autowired
+    @Lazy
 	protected MongoRead read;
 
     @Override

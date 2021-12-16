@@ -222,7 +222,6 @@ export abstract class DialogBase extends Div implements DialogBaseImpl {
         const extraHeaderComps = this.getExtraTitleBarComps();
         let useTitle = titleText || this.title;
 
-        // slight hack. we need a 'showTitle' flag separately (todo-1)
         if (useTitle === "[none]") useTitle = null;
         let titleChildren: CompIntf[] = [titleIconComp,
             useTitle ? new Span(useTitle) : null
@@ -238,7 +237,6 @@ export abstract class DialogBase extends Div implements DialogBaseImpl {
             title: "Close Dialog"
         }));
 
-        // NOTE: title will be null for the main menu, which is actually implemented as a dialog using this base class.
         if (this.title) {
             children.push(new Div(null, {
                 className: "app-modal-title"

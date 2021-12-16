@@ -3,6 +3,7 @@ package quanta.types;
 import javax.annotation.PostConstruct;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 import quanta.model.NodeInfo;
 import quanta.mongo.MongoSession;
@@ -11,7 +12,7 @@ import quanta.request.CreateSubNodeRequest;
 
 import quanta.util.Val;
 
-@Component
+@Lazy @Component
 public abstract class TypeBase  {
     private static final Logger log = LoggerFactory.getLogger(TypeBase.class);
 

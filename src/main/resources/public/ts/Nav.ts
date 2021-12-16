@@ -212,7 +212,7 @@ export class Nav {
              */
             S.nodeUtil.highlightNode(node, false, state);
 
-            // todo-1: without this timeout checkboxes on main tab don't work reliably. Need their state stored in global state to fix it
+            // todo-2: without this timeout checkboxes on main tab don't work reliably. Need their state stored in global state to fix it
             // in a good way.
             setTimeout(() => {
                 dispatch("Action_FastRefresh", (s: AppState): AppState => {
@@ -285,7 +285,7 @@ export class Nav {
     geoLocation = (state: AppState): void => {
         if (navigator.geolocation) {
             navigator.geolocation.getCurrentPosition((location) => {
-                // todo-1: make this string a configurable property template
+                // todo-2: make this string a configurable property template
                 let googleUrl = "https://www.google.com/maps/search/?api=1&query=" + location.coords.latitude + "," + location.coords.longitude;
 
                 new MessageDlg("Your current location...", "GEO Location", null,

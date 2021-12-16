@@ -5,6 +5,7 @@ import com.mongodb.client.result.DeleteResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.Sort.Direction;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.index.Index;
@@ -14,14 +15,16 @@ import org.springframework.stereotype.Component;
 import quanta.mongo.MongoUpdate;
 import quanta.mongo.model.FediverseName;
 
-@Component("MongoFediverseNamesTest")
+@Lazy @Component("MongoFediverseNamesTest")
 public class MongoFediverseNamesTest implements TestIntf {
 	private static final Logger log = LoggerFactory.getLogger(MongoFediverseNamesTest.class);
 
 	@Autowired
+	@Lazy
 	private MongoUpdate update;
 
 	@Autowired
+	@Lazy
 	private MongoTemplate ops;
 
 	@Override

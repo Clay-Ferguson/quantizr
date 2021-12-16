@@ -1,11 +1,12 @@
 package quanta.util;
 
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 
 /**
  * Mime-Type (content type) utilities
  */
-@Component
+@Lazy @Component
 public class MimeUtil {
 
 	public boolean isTextTypeFileName(String fileName) {

@@ -8,6 +8,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 import quanta.AppController;
 import quanta.config.AppProp;
@@ -33,23 +34,28 @@ import static quanta.util.Util.*;
  * todo-2: there's a lot of code calling these static methods, but need to transition to singleton
  * scope bean and non-static methods.
  */
-@Component
+@Lazy @Component
 public class SubNodeUtil  {
 	private static final Logger log = LoggerFactory.getLogger(SubNodeUtil.class);
 
 	@Autowired
+	@Lazy
 	protected NodeRenderService render;
 
 	@Autowired
+	@Lazy
 	protected AppProp prop;
 
 	@Autowired
+	@Lazy
 	protected MongoUpdate update;
 
 	@Autowired
+	@Lazy
 	protected MongoRead read;
 
 	@Autowired
+	@Lazy
 	protected MongoCreate create;
 
 	/*

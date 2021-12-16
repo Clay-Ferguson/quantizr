@@ -2,9 +2,9 @@ package quanta.mongo;
 
 import static org.bson.codecs.configuration.CodecRegistries.fromProviders;
 import static org.bson.codecs.configuration.CodecRegistries.fromRegistries;
-
+import static quanta.util.Util.no;
+import static quanta.util.Util.ok;
 import javax.annotation.PostConstruct;
-
 import com.mongodb.ConnectionString;
 import com.mongodb.MongoClientSettings;
 import com.mongodb.MongoCredential;
@@ -13,7 +13,6 @@ import com.mongodb.client.MongoClients;
 import com.mongodb.client.MongoDatabase;
 import com.mongodb.client.gridfs.GridFSBucket;
 import com.mongodb.client.gridfs.GridFSBuckets;
-
 import org.bson.codecs.configuration.CodecRegistry;
 import org.bson.codecs.pojo.PojoCodecProvider;
 import org.slf4j.Logger;
@@ -21,6 +20,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.data.mongodb.MongoDatabaseFactory;
 import org.springframework.data.mongodb.config.AbstractMongoClientConfiguration;
 import org.springframework.data.mongodb.core.MongoTemplate;
@@ -33,7 +33,6 @@ import quanta.config.AppProp;
 import quanta.exception.base.RuntimeEx;
 import quanta.util.Convert;
 import quanta.util.ExUtil;
-import static quanta.util.Util.*;
 
 // Ref: http://mongodb.github.io/mongo-java-driver/3.7/driver/getting-started/quick-start-pojo/
 
@@ -49,6 +48,8 @@ public class MongoAppConfig extends AbstractMongoClientConfiguration {
 	public static final String databaseName = "database";
 	private MongoClient mongoClient;
 	private GridFSBucket gridFsBucket;
+	private MongoTemplate ops;
+	private GridFsTemplate grid;
 	private SimpleMongoClientDatabaseFactory factory;
 
 	/**
@@ -58,12 +59,15 @@ public class MongoAppConfig extends AbstractMongoClientConfiguration {
 	public static boolean connectionFailed = false;
 
 	@Autowired
+	@Lazy
 	private AppProp appProp;
 
 	@Autowired
+	@Lazy
 	MappingMongoConverter converter;
 
 	@Autowired
+	@Lazy
 	protected Convert convert;
 
 	@PostConstruct
@@ -188,14 +192,19 @@ public class MongoAppConfig extends AbstractMongoClientConfiguration {
 	 */
 	@Bean
 	public MongoTemplate mongoTemplate() throws Exception {
-		MongoDatabaseFactory mdbf = mongoDbFactory();
-		if (ok(mdbf)) {
-			MongoTemplate mt = new MongoTemplate(mdbf);
-			mt.setWriteResultChecking(WriteResultChecking.EXCEPTION);
-			return mt;
-		} else {
+		if (connectionFailed)
 			return null;
+
+		if (no(ops)) {
+			MongoDatabaseFactory mdbf = mongoDbFactory();
+			if (ok(mdbf)) {
+				ops = new MongoTemplate(mdbf);
+				ops.setWriteResultChecking(WriteResultChecking.EXCEPTION);
+			} else {
+				return null;
+			}
 		}
+		return ops;
 	}
 
 	@Override
@@ -210,11 +219,17 @@ public class MongoAppConfig extends AbstractMongoClientConfiguration {
 
 	@Bean
 	public GridFsTemplate gridFsTemplate() throws Exception {
-		MongoDatabaseFactory mdbf = mongoDbFactory();
-		if (ok(mdbf)) {
-			return new GridFsTemplate(mdbf, converter);
-		} else {
+		if (connectionFailed)
 			return null;
+
+		if (no(grid)) {
+			MongoDatabaseFactory mdbf = mongoDbFactory();
+			if (ok(mdbf)) {
+				grid = new GridFsTemplate(mdbf, converter);
+			} else {
+				return null;
+			}
 		}
+		return grid;
 	}
 }

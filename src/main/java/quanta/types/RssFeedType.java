@@ -1,6 +1,7 @@
 package quanta.types;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 import quanta.model.client.NodeType;
 import quanta.mongo.CreateNodeLocation;
@@ -11,13 +12,15 @@ import quanta.mongo.model.SubNode;
 import quanta.request.CreateSubNodeRequest;
 import quanta.util.Val;
 
-@Component
+@Lazy @Component
 public class RssFeedType extends TypeBase {
 
     @Autowired
+    @Lazy
 	protected MongoUpdate update;
 
     @Autowired
+    @Lazy
 	protected MongoCreate create;
 
     @Override

@@ -3,10 +3,11 @@ package quanta.test;
 import java.util.Date;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 import quanta.util.DateUtil;
 
-@Component("UtilsTest")
+@Lazy @Component("UtilsTest")
 public class UtilsTest implements TestIntf {
 	private static final Logger log = LoggerFactory.getLogger(UtilsTest.class);
 
