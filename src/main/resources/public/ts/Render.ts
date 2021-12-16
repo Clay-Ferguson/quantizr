@@ -773,7 +773,7 @@ export class Render {
 
                     // I'm removing this becasue we can click on the image and to these thru the Profile Dialog of the user.
                     // new ButtonBar([
-                    //     // todo-1: need to make ALL calls be able to do a newSubNode here without so we don't need
+                    //     // todo-2: need to make ALL calls be able to do a newSubNode here without so we don't need
                     //     // the showMessagesButton flag.
                     //     showMessageButton ? new Button("Message", S.edit.newSubNode, {
                     //         title: "Send Private Message",

@@ -87,9 +87,6 @@ public class FriendType extends TypeBase {
                 if (ok(userIconUrl)) {
                     nodeInfo.safeGetClientProps().add(new PropertyInfo(NodeProp.ACT_PUB_USER_ICON_URL.s(), userIconUrl));
                 }
-
-                // todo-1: for now the client isn't rendering the header image so there's no ACT_PUB_USER_IMAGE_URL
-                // right here which is how we can do that at some point in the future maybe.
             }
         }
     }

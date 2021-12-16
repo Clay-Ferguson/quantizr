@@ -152,7 +152,7 @@ public class Convert {
 			displayName = userNode.getStr(NodeProp.DISPLAY_NAME.s());
 
 			/*
-			 * todo-1: right here, get user profile off 'userNode', and put it into a map that will be sent back
+			 * todo-2: right here, get user profile off 'userNode', and put it into a map that will be sent back
 			 * to client packaged in this response, so that tooltip on the browser can display it, and the
 			 * browser will simply contain this same 'map' that maps userIds to profile text, for good
 			 * performance.

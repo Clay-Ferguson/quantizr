@@ -77,7 +77,7 @@ export class TorrentListingDlg extends DialogBase {
         else if (S.util.isAudioFileName(f.tf.name)) {
             new AudioPlayerDlg(f.tf.name, null, null, f.url, 0, this.appState).open();
         }
-        // todo-1: if a torrent contains multiple images, need ability to show them the same way we can display multiple fullscreen
+        // todo-2: if a torrent contains multiple images, need ability to show them the same way we can display multiple fullscreen
         // images for a node that contains multiple images in children.
         else {
             window.open(f.url, "_blank");

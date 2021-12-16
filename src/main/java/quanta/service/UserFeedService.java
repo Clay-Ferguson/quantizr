@@ -184,7 +184,7 @@ public class UserFeedService {
 			/*
 			 * Then we set the public chat to indicate to the rest of the code below not to do any further
 			 * authorization, becasue the way ACL works on chart rooms is if a person is authorized to READ
-			 * (what about WRITE? todo-1: probably should make the above read and write) the actual CHAT NODE
+			 * (what about WRITE? todo-2: probably should make the above read and write) the actual CHAT NODE
 			 * itself (the root of the chat nodes) then they are known to be granted access to all children
 			 */
 			doAuth = false;
@@ -197,7 +197,7 @@ public class UserFeedService {
 		List<Criteria> orCriteria = new LinkedList<>();
 
 		/*
-		 * todo-1: should the 'friends' and 'public' options be mutually exclusive?? If someone's looking
+		 * 2: should the 'friends' and 'public' options be mutually exclusive?? If someone's looking
 		 * for all public nodes why "OR" into that any friends?
 		 */
 		if (!testQuery && doAuth && req.getToPublic()) {

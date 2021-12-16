@@ -68,7 +68,8 @@ export class UserProfileDlg extends DialogBase {
                 ]) : null,
 
                 profileImg,
-                // todo-1: currently there's no 'unblock' user has to go do that in their blocked users node.
+                // todo-2: currently there's no 'unblock' user has to go do that in their blocked users node.
+                // (is this still true?)
                 new Div(null, { className: "marginBottom" }, [
                     new Div(null, { className: "float-end" }, [
                         state.userProfile.blocked ? new Span("BLOCKED", { className: "blockingText" }) : null,

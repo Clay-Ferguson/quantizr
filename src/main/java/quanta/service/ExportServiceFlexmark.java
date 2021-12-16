@@ -232,7 +232,7 @@ public class ExportServiceFlexmark {
 		 * of the IPFS internet gateways will hopefully ignore that unknown parameter.
 		 */
 		for (ExportIpfsFile file : files) {
-			// todo-1: is there a way to add multiple files to a DAG all at once? Post this
+			// todo-2: is there a way to add multiple files to a DAG all at once? Post this
 			// question on discuss.ipfs.io?
 			// log.debug("Add file: " + file.getFileName() + " cid=" + file.getCid());
 			rootDir = ipfs.addFileToDagRoot(rootDir.getHash(), file.getFileName(), file.getCid());

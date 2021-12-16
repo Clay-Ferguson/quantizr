@@ -523,7 +523,7 @@ export class EditNodeDlg extends DialogBase {
                     pinCheckbox
                 ])
 
-                // todo-1: this is not doing what I want but it unimportant so removing it for now.
+                // todo-2: this is not doing what I want but it unimportant so removing it for now.
                 // ipfsLink ? new Button("IPFS Link", () => S.render.showNodeUrl(state.node, this.appState), { title: "Show the IPFS URL for the attached file." }) : null
             ]);
 
@@ -1088,7 +1088,7 @@ export class EditNodeDlg extends DialogBase {
                 }, propState, "textarea-min-4 displayCell");
             }
             else {
-                /* todo-1: eventually we will have data types, but for now we use a hack
+                /* todo-2: eventually we will have data types, but for now we use a hack
                 to detect to treat a string as a date based on its property name. */
                 if (propEntry.name === J.NodeProp.DATE) {
                     valEditor = new DateTimeField(propState);

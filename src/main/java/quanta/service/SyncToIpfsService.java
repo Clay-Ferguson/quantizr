@@ -141,7 +141,7 @@ public class SyncToIpfsService {
 			/*
 			 * if any file path is not a node path, it needes to be deleted.
 			 * 
-			 * todo-1: this will run more efficiently if we put path values into a list and then sort that list
+			 * todo-2: this will run more efficiently if we put path values into a list and then sort that list
 			 * ascending by the length of the string, so any parent folders are guaranteed to get deleted before
 			 * any of their subfolders (as a convenient consequence of children having to have longer paths than
 			 * their parents!) are encountered, and we run therefore the minimal number of deletes required to
@@ -161,7 +161,7 @@ public class SyncToIpfsService {
 					 * I'm expecting this to fail when it attempts to delete any subfolders under folders that were
 					 * already deleted because we may have just deleted their parents already in this same loop so...
 					 * 
-					 * todo-1: when we delete a folder, scan for all other folders that have that matching prefix and
+					 * todo-2: when we delete a folder, scan for all other folders that have that matching prefix and
 					 * remove them too, because there's no need to call deleteFile on those.
 					 */
 				}
@@ -170,13 +170,13 @@ public class SyncToIpfsService {
 	}
 
 	private void processNode(SubNode node) {
-		// todo-1: This should be unnecessary but for now we need it.
+		// todo-2: This should be unnecessary but for now we need it.
 		snUtil.removeDefaultProps(node);
 
 		snUtil.removeUnwantedPropsForIPFS(node);
 
 		/*
-		 * todo-1: this and other places needs to generate canonical JSON (basically just sorted properties
+		 * todo-2: this and other places needs to generate canonical JSON (basically just sorted properties
 		 * ?) using this??
 		 */
 		// objectMapper.configure(SerializationFeature.ORDER_MAP_ENTRIES_BY_KEYS, true);
@@ -190,7 +190,7 @@ public class SyncToIpfsService {
 	}
 
 	/*
-	 * todo-1: there *is* a way to eliminate the need for the 'checkExisting' flag and make it always
+	 * todo-2: there *is* a way to eliminate the need for the 'checkExisting' flag and make it always
 	 * true but for now the only way to return a CID even if not existing is to attempt to re-add every
 	 * time so we do that for now because it's simpler
 	 */

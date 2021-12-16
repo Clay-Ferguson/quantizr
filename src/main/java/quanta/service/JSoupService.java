@@ -39,7 +39,7 @@ public class JSoupService {
 				}
 				res.setOpenGraph(openGraph);
 			} catch (Exception e) {
-				// ignore this error, for now (todo-1)
+				// ignore this error, for now (todo-2)
 				// ExUtil.error(log, "failed parsing OpenGraph", e);
 			}
 		}
@@ -58,7 +58,7 @@ public class JSoupService {
 		con.userAgent(BROWSER_USER_AGENT);
 		Document doc = con.get();
 
-		// todo-1: add site_name, type, url, twitter:url, twitter:card (like og:type)
+		// todo-2: add site_name, type, url, twitter:url, twitter:card (like og:type)
 
 		openGraph.setTitle(getOg(doc, "og:title"));
 		if (no(openGraph.getTitle())) {

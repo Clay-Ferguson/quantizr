@@ -755,7 +755,7 @@ public class UserManagerService {
 			res.setSuccess(true);
 		} else {
 			/*
-			 * todo-1: for this AND the friend request (similar places), we need to make it where the user can
+			 * todo-2: for this AND the friend request (similar places), we need to make it where the user can
 			 * never get here or click a button if this is redundant. also we don't yet have in the GUI the
 			 * indication of "Follows You" and "[You're] Following" when someone views a user, which is part of
 			 * what's needed for this.
@@ -842,7 +842,7 @@ public class UserManagerService {
 
 					edit.updateSavedFriendNode(friendNode);
 
-					// todo-1: eventually we can have a design that pushes these results back to the browser async
+					// todo-2: eventually we can have a design that pushes these results back to the browser async
 					// instead of optimistically saying 'Added friend'
 					// res.setMessage("Added Friend: " + newUserName);
 				} else {
@@ -912,7 +912,7 @@ public class UserManagerService {
 					userProfile.setFollowing(following);
 				}
 
-				// todo-1: add ability to know "follows you" state (for display on UserProfileDlg)
+				// todo-2: add ability to know "follows you" state (for display on UserProfileDlg)
 				res.setSuccess(true);
 			}
 			return null;
@@ -1178,7 +1178,7 @@ public class UserManagerService {
 	 * For all foreign servers we remove posts that are older than a certain number of days just to keep
 	 * our DB from growing too large.
 	 * 
-	 * todo-1: Is this a dupliate of "ActPub Maintenance" menu option logic?
+	 * todo-2: Is this a dupliate of "ActPub Maintenance" menu option logic?
 	 */
 	public void cleanUserAccounts() {
 		// not currently used.

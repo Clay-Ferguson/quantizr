@@ -21,6 +21,7 @@ public class AccessControl {
 	@Field(FIELD_PRVS)
 	private String prvs;
 
+	// This is Encryption Cypher key for this ACL entry.
 	public static final String FIELD_KEY = "key";
 	@Field(FIELD_KEY)
 	private String key;
@@ -28,7 +29,6 @@ public class AccessControl {
 	public AccessControl() {
 	}
 
-	// Check places that call this with null key. Is that correct ? todo-1
 	public AccessControl(String key, String prvs) {
 		this.key = key;
 		this.prvs = prvs;

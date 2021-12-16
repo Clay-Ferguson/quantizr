@@ -834,10 +834,11 @@ public class MongoUtil {
 		log.debug("Public Home Node exists at id: " + publicHome.getId() + " path=" + publicHome.getPath());
 
 		/*
-		 * create welcome page if not existing. This is the main landing page. (todo-1: document this in
-		 * User Guide admin session). This node need not be public, because the system reads it, and it can
-		 * be placed somewhere that users are not able to navigate directly to it, so we default it to being
-		 * directly in the server root, which is a private node
+		 * create welcome page if not existing. This is the main landing page.
+		 * 
+		 * (todo-2: document this in User Guide technical section). This node need not be public, because
+		 * the system reads it, and it can be placed somewhere that users are not able to navigate directly
+		 * to it, so we default it to being directly in the server root, which is a private node
 		 */
 		created = new Val<>(Boolean.FALSE);
 		SubNode publicWelcome = snUtil.ensureNodeExists(ms, "/" + NodeName.ROOT, NodeName.WELCOME, "welcome-page",

@@ -81,7 +81,7 @@ import quanta.util.XString;
 // IPFS Reference: https://docs.ipfs.io/reference/http/api
 
 /*
- * todo-1: There are several places in here where we're getting back a "String" from a
+ * todo-2: There are several places in here where we're getting back a "String" from a
  * restTemplate.exchange for getting back JSON, and we can probably define a POJO and let the spring
  * converter convert do this for us always instead
  */
@@ -271,7 +271,7 @@ public class IPFSService {
         asyncExec.run(ThreadLocals.getContext(), () -> {
             // wait for node to be saved. Waits up to 30 seconds, because of the 10 retries.
             /*
-             * todo-1: What we could do here instead of what is essentially polling we're doing is hook into the
+             * todo-2: What we could do here instead of what is essentially polling we're doing is hook into the
              * MongoEventListener class and have a pub/sub model in effect so we can detect immediately when the
              * node is saved.
              */
@@ -533,7 +533,7 @@ public class IPFSService {
 
     // https://medium.com/red6-es/uploading-a-file-with-a-filename-with-spring-resttemplate-8ec5e7dc52ca
     /*
-     * todo-1: addition of 'fileName' is very new and very important here. Evaluate everywhere we can
+     * todo-2: addition of 'fileName' is very new and very important here. Evaluate everywhere we can
      * pass this in and also check if there are ways we can avoid the old need for mime guessing by
      * always basing off extension on this filename?
      */
@@ -591,7 +591,7 @@ public class IPFSService {
         return fileEntity;
     }
 
-    // todo-1: convert to actual type, not map.
+    // todo-2: convert to actual type, not map.
     public Map<String, Object> ipnsPublish(MongoSession ms, String key, String cid) {
         Map<String, Object> ret = null;
         try {
@@ -616,7 +616,7 @@ public class IPFSService {
         return ret;
     }
 
-    // todo-1: convert return val to a type (not map)
+    // todo-2: convert return val to a type (not map)
     public Map<String, Object> ipnsResolve(MongoSession ms, String name) {
         Map<String, Object> ret = null;
         try {
@@ -692,7 +692,7 @@ public class IPFSService {
      * Creates a node holding this CID in the current user (SessionContext) account under their EXPORTS
      * node type.
      * 
-     * todo-1: need to document this (and how user must delete the export node to release their pins) in
+     * todo-2: need to document this (and how user must delete the export node to release their pins) in
      * the User Guide
      *
      * Note: childerenFiles will be all the files linked into this resource under a common DAG, and we

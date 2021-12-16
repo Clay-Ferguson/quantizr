@@ -395,9 +395,7 @@ public class NodeEditService {
 		}
 		// if we're setting node name to a different node name
 		else if (ok(nodeInfo.getName()) && nodeInfo.getName().length() > 0 && !nodeInfo.getName().equals(node.getName())) {
-
-			// todo-1: do better name validation here.
-			if (nodeInfo.getName().contains(":")) {
+			if (!StringUtils.isAlphanumeric(nodeInfo.getName())) {
 				throw new RuntimeEx("Node names can only contain alpha numeric characters");
 			}
 			String nodeName = nodeInfo.getName().trim();
@@ -542,7 +540,7 @@ public class NodeEditService {
 				convert.convertToNodeInfo(ThreadLocals.getSC(), ms, node, true, false, -1, false, false, true, false);
 		res.setNode(newNodeInfo);
 
-		// todo-1: for now we only push nodes if public, up to browsers rather than doing a specific check
+		// todo-2: for now we only push nodes if public, up to browsers rather than doing a specific check
 		// to send only to users who should see it.
 		if (AclService.isPublic(ms, node)) {
 			push.pushTimelineUpdateToBrowsers(ms, newNodeInfo);

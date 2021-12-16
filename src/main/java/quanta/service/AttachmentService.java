@@ -727,7 +727,7 @@ public class AttachmentService {
 
 	private ResourceRegion resourceRegion(Resource resource, HttpHeaders headers) throws IOException {
 		/*
-		 * todo-1: Will a smaller chunk size be better to get the video playing sooner after first clicked,
+		 * todo-2: Will a smaller chunk size be better to get the video playing sooner after first clicked,
 		 * or will it do that at the cost of less overall resource effeciency? Need to research
 		 */
 		long chunkSize = 500000L;
@@ -1082,7 +1082,7 @@ public class AttachmentService {
 		String ipfsHash = node.getStr(NodeProp.IPFS_LINK.s() + binSuffix);
 		if (ok(ipfsHash)) {
 			/*
-			 * todo-1: When the IPFS link happens to be unreachable/invalid (or IFPS disabled?), this can
+			 * todo-2: When the IPFS link happens to be unreachable/invalid (or IFPS disabled?), this can
 			 * timeout here by taking too long. This wreaks havoc on the browser thread during some scenarios.
 			 * log.debug("Getting IPFS Stream for NodeId " + node.getIdStr() + " IPFS_CID=" + ipfsHash);
 			 */

@@ -164,7 +164,7 @@ export class TabUtil {
                 //     constructView: (data: TabDataIntf) => new IPSMView(s, data),
                 //     rsInfo: null,
                 //     scrollPos: 0,
-                //     // need typesafe props (todo-1)
+                //     // need typesafe props (todo-2)
                 //     props: {
                 //         events: null // for now string[]
                 //     }

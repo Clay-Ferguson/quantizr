@@ -52,7 +52,7 @@ export class UploadFromIPFSDlg extends DialogBase {
                     new Button("Close", this.close)
                 ], "marginTop")
 
-                // todo-1: this would be very nice to have!
+                // todo-2: this would be very nice to have!
                 // new Span(null, { className: "marginLeft" }, [
                 //     new Checkbox("PIN a copy on this server", null, {
                 //         setValue: (checked: boolean): void => {

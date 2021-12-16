@@ -239,7 +239,7 @@ public class NodeRenderService {
 			NodeRenderService.welcomePage = res;
 		}
 
-		// todo-1: this was a quick fix, and this urlId handling is also a slight bit awkward and maybe
+		// todo-2: this was a quick fix, and this urlId handling is also a slight bit awkward and maybe
 		// needs to be reworked.
 		ThreadLocals.getSC().setUrlId(null);
 
@@ -283,7 +283,7 @@ public class NodeRenderService {
 		}
 
 		/*
-		 * todo-1: needed optimization to work well with large numbers of child nodes: If scanToNode is in
+		 * todo-2: needed optimization to work well with large numbers of child nodes: If scanToNode is in
 		 * use, we should instead look up the node itself, and then get it's ordinal, and use that as a '>='
 		 * in the query to pull up the list when the node ordering is ordinal. Note, if sort order is by a
 		 * timestamp we'd need a ">=" on the timestamp itself instead. We request ROWS_PER_PAGE+1, because
@@ -470,8 +470,8 @@ public class NodeRenderService {
 			sort = Sort.by(dir.equals("asc") ? Sort.Direction.ASC : Sort.Direction.DESC, SubNode.PROPERTIES + "." + orderByProp);
 
 			/*
-			 * when sorting by priority always do second leve REV-CHRON sort, so newest un-prioritized nodes
-			 * appear at top todo-1: probably would be better to to just make this orderBy parser handle
+			 * when sorting by priority always do second level REV-CHRON sort, so newest un-prioritized nodes
+			 * appear at top. todo-2: probably would be better to to just make this orderBy parser handle
 			 * comma-delimited sort list which is not a difficult change
 			 */
 			if (orderByProp.equals(NodeProp.PRIORITY.s())) {

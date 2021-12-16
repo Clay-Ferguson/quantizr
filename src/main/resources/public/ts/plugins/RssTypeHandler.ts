@@ -292,13 +292,13 @@ export class RssTypeHandler extends TypeBase {
         let children: Comp[] = [];
         let headerDivChildren = [];
 
-        /* todo-1: Sometimes entry.category can be an Object (not a String) here which will
+        /* todo-2: Sometimes entry.category can be an Object (not a String) here which will
         make React fail badly and render the entire page blank,
         blowing up the hole app, so we need probably validate EVERY
         property on entry with 'instanceof' like we're doing here to protect
         against that kind of chaos */
         // if (entry.category instanceof Object) {
-        //     // todo-1: put this kind of typeof in "S.util.isString"
+        //     // todo-2: put this kind of typeof in "S.util.isString"
         //     if (entry.category.$ && (typeof entry.category.$.term === "string")) {
         //         // Some feeds have the category text buried under "$.term" so we just fix that here. This is a quick fix
         //         // only applicable to one feed afaik, and I'm not going to dig deeper into why we got this scenario (for now)

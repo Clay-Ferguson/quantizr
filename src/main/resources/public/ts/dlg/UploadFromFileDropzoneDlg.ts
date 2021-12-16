@@ -206,7 +206,7 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
 
             if (files) {
                 if (this.toWebTorrent) {
-                    // todo-1: verify this is really true (multi-files not working)
+                    // todo-2: verify this is really true (multi-files not working)
                     if (files.length > 1) {
                         S.util.showMessage("Multi-file WebTorrent are not yet supported.", "Warning");
                         return;

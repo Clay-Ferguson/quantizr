@@ -67,7 +67,7 @@ public class SyncFromIpfsService {
 	 * NOTE: req.path can be a path or CID. Path must of course be a LOCAL path, and is assumed if the
 	 * string starts with '/', otherwise is treated as a CID.
 	 *
-	 * todo-1: currently this is an inefficient AND imcomplete algo, and needs these two enhancements:
+	 * todo-2: currently this is an inefficient AND imcomplete algo, and needs these two enhancements:
 	 * 
 	 * 1) Do a subGraph query at the root first (req.getPath()) and build up a HashSet of all IDs, then
 	 * use that to know which nodes already do exist, as a performance aid.
@@ -219,7 +219,7 @@ public class SyncFromIpfsService {
 								 * UPDATE: Now that we have SubNodePojo.java for deseralizing we no longer need SubNodeIdentity
 								 * and we can refactor it out.
 								 * 
-								 * todo-1: WARNING! Simply deserializing a SubNode object causes it to become a REAL node and
+								 * todo-2: WARNING! Simply deserializing a SubNode object causes it to become a REAL node and
 								 * behave as if it were inserted into the DB, so that after json parses it 'read.getNode()' Mongo
 								 * query will immediately find it and 'claim' that it's been inserted into the DB already.
 								 * 
@@ -234,7 +234,7 @@ public class SyncFromIpfsService {
 								if (ok(findNode)) {
 									log.debug("Node existed: " + node.getId());
 									matchingFiles++;
-									// todo-1: check if node is same content here.
+									// todo-2: check if node is same content here.
 								} else {
 									SubNode realNode = jsonMapper.readValue(json, SubNode.class);
 									update.save(session, realNode);

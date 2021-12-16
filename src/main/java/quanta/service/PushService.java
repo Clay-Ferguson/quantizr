@@ -175,7 +175,7 @@ public class PushService {
 					log.error("FAILED Pushing to Session User: " + sc.getUserName());
 					pushEmitter.completeWithError(ex);
 				} finally {
-					// todo-1: this can be done in a slightly cleaner way (more decoupled)
+					// todo-2: this can be done in a slightly cleaner way (more decoupled)
 					if (info instanceof SessionTimeoutPushInfo) {
 						ThreadLocals.setMongoSession(null);
 						sc.setLive(false);

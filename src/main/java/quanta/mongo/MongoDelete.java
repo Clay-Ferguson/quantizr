@@ -69,8 +69,7 @@ public class MongoDelete {
 	}
 
 	/**
-	 * Deletes old activity pub posts, just to save space on our server. This destroys perfectly good
-	 * data so we need to make it an admin option (todo-1)
+	 * Deletes old activity pub posts, just to save space on our server. Admin option only.
 	 */
 	public long deleteOldActPubPosts(SubNode parent, MongoSession ms) {
 		Query query = new Query();
