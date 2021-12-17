@@ -1,5 +1,7 @@
 package quanta.config;
 
+import static quanta.util.Util.no;
+import static quanta.util.Util.ok;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -24,7 +26,6 @@ import quanta.service.PushService;
 import quanta.util.StopwatchEntry;
 import quanta.util.ThreadLocals;
 import quanta.util.Util;
-import static quanta.util.Util.*;
 
 /**
  * Session object holding state per user session.

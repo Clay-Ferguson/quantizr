@@ -1,10 +1,10 @@
 package quanta.mongo;
 
+import static quanta.util.Util.no;
 import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import quanta.model.client.PrincipalName;
-import static quanta.util.Util.*;
 
 /**
  * Wraps the identity information about a specific user for access privileges to MongoDb

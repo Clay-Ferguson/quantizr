@@ -1,5 +1,7 @@
 package quanta.actpub;
 
+import static quanta.util.Util.no;
+import static quanta.util.Util.ok;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
@@ -37,11 +39,9 @@ import quanta.mongo.model.SubNode;
 import quanta.request.GetFollowingRequest;
 import quanta.response.GetFollowingResponse;
 import quanta.service.NodeEditService;
-
 import quanta.util.Convert;
 import quanta.util.ThreadLocals;
 import quanta.util.XString;
-import static quanta.util.Util.*;
 
 
 /**

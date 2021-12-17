@@ -1,5 +1,7 @@
 package quanta.mail;
 
+import static quanta.util.Util.no;
+import static quanta.util.Util.ok;
 import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,21 +23,20 @@ import quanta.mongo.MongoUpdate;
 import quanta.mongo.model.SubNode;
 import quanta.response.NotificationMessage;
 import quanta.service.PushService;
-
 import quanta.util.SubNodeUtil;
 import quanta.util.ThreadLocals;
 import quanta.util.XString;
-import static quanta.util.Util.*;
 
 /**
  * Manages the node where we store all emails that are queued up to be sent.
  * <p>
  * The system always sends emails out in a batch operation every 30seconds or so, by emptying out
  * this queue.
-
+ * 
  */
-@Lazy @Component
-public class OutboxMgr  {
+@Lazy
+@Component
+public class OutboxMgr {
 	private static final Logger log = LoggerFactory.getLogger(OutboxMgr.class);
 
 	@Autowired
@@ -91,8 +92,7 @@ public class OutboxMgr  {
 				 * First look to see if there is a target node already existing in this persons inbox that points to
 				 * the node in question
 				 */
-				SubNode notifyNode =
-						read.findNodeByProp(session, userInbox.getPath(), NodeProp.TARGET_ID.s(), node.getIdStr());
+				SubNode notifyNode = read.findNodeByProp(session, userInbox.getPath(), NodeProp.TARGET_ID.s(), node.getIdStr());
 
 				/*
 				 * If there's no notification for this node already in the user's inbox then add one
@@ -145,17 +145,17 @@ public class OutboxMgr  {
 				String.format(prop.getConfigText("brandingAppName") + " user '%s' shared a node to your '%s' account.<p>\n\n" + //
 						"%s", fromUserName, toUserName, nodeUrl);
 
-		queueMailUsingAdminSession(ms, email, "A " + prop.getConfigText("brandingAppName") + " Node was shared to you!", content);
+		queueMail(ms, email, "A " + prop.getConfigText("brandingAppName") + " Node was shared to you!", content);
 	}
 
 	public void queueEmail(String recipients, String subject, String content) {
 		arun.run(session -> {
-			queueMailUsingAdminSession(session, recipients, subject, content);
+			queueMail(session, recipients, subject, content);
 			return null;
 		});
 	}
 
-	private void queueMailUsingAdminSession(MongoSession ms, String recipients, String subject, String content) {
+	private void queueMail(MongoSession ms, String recipients, String subject, String content) {
 		SubNode outboxNode = getSystemOutbox(ms);
 		SubNode outboundEmailNode = create.createNode(ms, outboxNode.getPath() + "/?", NodeType.NONE.s());
 

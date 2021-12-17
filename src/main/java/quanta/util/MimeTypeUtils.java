@@ -1,5 +1,6 @@
 package quanta.util;
 
+import static quanta.util.Util.no;
 import java.io.File;
 import java.io.IOException;
 import java.net.URLConnection;
@@ -7,14 +8,11 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Map;
-
 import javax.activation.MimetypesFileTypeMap;
-
 import org.apache.commons.io.FilenameUtils;
 import org.apache.tika.Tika;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import static quanta.util.Util.*;
 
 public class MimeTypeUtils {
     private static final Logger log = LoggerFactory.getLogger(MimeTypeUtils.class);

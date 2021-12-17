@@ -1,11 +1,11 @@
 package quanta.mongo;
 
+import static quanta.util.Util.ok;
 import java.util.Iterator;
-import quanta.mongo.model.SubNode;
-import quanta.util.ThreadLocals;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import static quanta.util.Util.*;
+import quanta.mongo.model.SubNode;
+import quanta.util.ThreadLocals;
 
 /**
  * Wraps iterators we get from queries so that one by one we can detect any nodes that are already

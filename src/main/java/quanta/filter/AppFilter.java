@@ -1,5 +1,6 @@
 package quanta.filter;
 
+import static quanta.util.Util.no;
 import java.io.IOException;
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
@@ -21,7 +22,6 @@ import quanta.mongo.MongoRepository;
 import quanta.util.ThreadLocals;
 import quanta.util.Util;
 import quanta.util.XString;
-import static quanta.util.Util.*;
 
 /**
  * This is Web Filter for processing AppController.API_PATH endpoints(path configured in

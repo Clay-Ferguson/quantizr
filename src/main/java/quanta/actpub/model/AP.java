@@ -1,5 +1,7 @@
 package quanta.actpub.model;
 
+import static quanta.util.Util.no;
+import static quanta.util.Util.ok;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -9,7 +11,6 @@ import org.slf4j.LoggerFactory;
 import quanta.actpub.APConst;
 import quanta.util.DateUtil;
 import quanta.util.XString;
-import static quanta.util.Util.*;
 
 /**
  * Because the ActivityPup spec has lots of places where the object types are completely variable,

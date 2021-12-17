@@ -1,5 +1,6 @@
 package quanta.util;
 
+import static quanta.util.Util.ok;
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Font;
@@ -10,9 +11,7 @@ import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.Random;
-
 import javax.imageio.ImageIO;
-import static quanta.util.Util.*;
 
 /**
  * Implements the captcha image as seen on the Signup Page. I would normally use some existing

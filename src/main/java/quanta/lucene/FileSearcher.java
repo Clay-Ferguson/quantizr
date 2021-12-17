@@ -1,8 +1,8 @@
 package quanta.lucene;
 
+import static quanta.util.Util.ok;
 import java.io.IOException;
 import java.nio.file.Paths;
-
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.document.Document;
@@ -14,16 +14,13 @@ import org.apache.lucene.search.Query;
 import org.apache.lucene.search.ScoreDoc;
 import org.apache.lucene.search.TopDocs;
 import org.apache.lucene.store.FSDirectory;
-
-import org.springframework.stereotype.Component;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
+import org.springframework.stereotype.Component;
 import quanta.config.AppProp;
 import quanta.util.StreamUtil;
-import static quanta.util.Util.*;
 
 /**
  * Searches files indexed by Lucene (i.e. a Lucene Search). This code assumes that Lucene index

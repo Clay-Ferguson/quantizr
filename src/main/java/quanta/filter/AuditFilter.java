@@ -1,5 +1,7 @@
 package quanta.filter;
 
+import static quanta.util.Util.no;
+import static quanta.util.Util.ok;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.Enumeration;
@@ -15,7 +17,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.GenericFilterBean;
-import static quanta.util.Util.*;
 
 /**
  * Filter for logging details of any request/response

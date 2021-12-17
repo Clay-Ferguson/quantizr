@@ -1,5 +1,7 @@
 package quanta.util;
 
+import static quanta.util.Util.no;
+import static quanta.util.Util.ok;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.OffsetDateTime;
@@ -13,7 +15,6 @@ import java.util.Locale;
 import java.util.TimeZone;
 import org.apache.commons.lang3.StringUtils;
 import quanta.exception.base.RuntimeEx;
-import static quanta.util.Util.*;
 
 /**
  * Date-related functions

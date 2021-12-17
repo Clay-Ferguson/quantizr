@@ -1,17 +1,16 @@
 package quanta.model;
 
+import static quanta.util.Util.no;
+import static quanta.util.Util.ok;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.data.annotation.Transient;
-
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
-import static quanta.util.Util.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.data.annotation.Transient;
 
 /**
  * Primary object passed back to client to represent a 'node'. Client sees the JSON version of this,

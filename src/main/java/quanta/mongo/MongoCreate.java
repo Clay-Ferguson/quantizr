@@ -1,5 +1,7 @@
 package quanta.mongo;
 
+import static quanta.util.Util.no;
+import static quanta.util.Util.ok;
 import java.util.List;
 import org.bson.types.ObjectId;
 import org.slf4j.Logger;
@@ -13,8 +15,6 @@ import quanta.model.PropertyInfo;
 import quanta.model.client.NodeType;
 import quanta.model.client.PrivilegeType;
 import quanta.mongo.model.SubNode;
-
-import static quanta.util.Util.*;
 
 /**
  * Performs the 'create' (as in CRUD) operations for creating new nodes in MongoDB

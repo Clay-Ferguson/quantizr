@@ -1,8 +1,8 @@
 package quanta.util;
 
+import static quanta.util.Util.ok;
 import java.awt.Image;
 import java.awt.image.BufferedImage;
-import static quanta.util.Util.*;
 
 /**
  * Image manipulation utilities

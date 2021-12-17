@@ -1,5 +1,7 @@
 package quanta.mongo.model;
 
+import static quanta.util.Util.no;
+import static quanta.util.Util.ok;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
@@ -25,7 +27,6 @@ import quanta.util.ExUtil;
 import quanta.util.ThreadLocals;
 import quanta.util.Util;
 import quanta.util.XString;
-import static quanta.util.Util.*;
 
 /**
  * The primary element of storage for the entire Quanta DB.

@@ -1,13 +1,12 @@
 package quanta.model;
 
+import static quanta.util.Util.no;
+import static quanta.util.Util.ok;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
-
 import com.fasterxml.jackson.annotation.JsonIgnore;
-
 import org.springframework.data.annotation.Transient;
-import static quanta.util.Util.*;
 
 public class GraphNode {
     private String id;

@@ -1,17 +1,14 @@
 package quanta.config;
 
+import static quanta.util.Util.ok;
 import javax.servlet.http.HttpSession;
 import javax.servlet.http.HttpSessionEvent;
 import javax.servlet.http.HttpSessionListener;
-
-import quanta.util.LockEx;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import org.springframework.web.util.WebUtils;
-
-import static quanta.util.Util.*;
+import quanta.util.LockEx;
 
 /**
  * For keeping track of sessions.

@@ -3,10 +3,10 @@
  */
 package quanta.util;
 
+import static quanta.util.Util.no;
 import java.util.ArrayList;
 import java.util.StringTokenizer;
 import java.util.regex.Pattern;
-import static quanta.util.Util.*;
 
 /**
  * Some simple string pattern matching utilities.

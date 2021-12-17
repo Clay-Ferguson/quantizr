@@ -1,17 +1,15 @@
 package quanta.mail;
 
+import static quanta.util.Util.no;
+import static quanta.util.Util.ok;
 import java.util.Date;
 import java.util.Properties;
-
 import javax.mail.Message;
 import javax.mail.Session;
 import javax.mail.event.TransportEvent;
 import javax.mail.event.TransportListener;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
-
-import quanta.config.AppProp;
-import quanta.util.ExUtil;
 import com.sun.mail.smtp.SMTPTransport;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -19,12 +17,14 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
-import static quanta.util.Util.*;
+import quanta.config.AppProp;
+import quanta.util.ExUtil;
 
 /**
  * Component that sends emails
  */
-@Lazy @Component
+@Lazy
+@Component
 public class EmailSender implements TransportListener {
 	private static final Logger log = LoggerFactory.getLogger(EmailSender.class);
 

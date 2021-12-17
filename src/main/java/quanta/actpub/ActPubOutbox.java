@@ -1,5 +1,7 @@
 package quanta.actpub;
 
+import static quanta.util.Util.no;
+import static quanta.util.Util.ok;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -31,12 +33,10 @@ import quanta.mongo.MongoAuth;
 import quanta.mongo.MongoRead;
 import quanta.mongo.MongoSession;
 import quanta.mongo.model.SubNode;
-
 import quanta.util.DateUtil;
 import quanta.util.SubNodeUtil;
 import quanta.util.Val;
 import quanta.util.XString;
-import static quanta.util.Util.*;
 
 /**
  * AP Outbox

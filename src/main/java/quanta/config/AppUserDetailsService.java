@@ -1,5 +1,6 @@
 package quanta.config;
 
+import static quanta.util.Util.ok;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,8 +13,6 @@ import quanta.model.client.PrincipalName;
 import quanta.mongo.MongoAuth;
 import quanta.mongo.MongoRead;
 import quanta.mongo.model.SubNode;
-
-import static quanta.util.Util.*;
 
 /**
  * Part of SpringSecurity implementation

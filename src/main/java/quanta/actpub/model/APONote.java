@@ -1,7 +1,7 @@
 package quanta.actpub.model;
 
+import static quanta.util.Util.ok;
 import quanta.actpub.APConst;
-import static quanta.util.Util.*;
 
 /**
  * Note object

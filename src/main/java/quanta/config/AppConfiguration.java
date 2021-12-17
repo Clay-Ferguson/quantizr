@@ -1,5 +1,6 @@
 package quanta.config;
 
+import static quanta.util.Util.ok;
 import org.apache.catalina.Context;
 import org.apache.catalina.connector.Connector;
 import org.apache.tomcat.util.descriptor.web.SecurityCollection;
@@ -22,12 +23,11 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.servlet.ViewResolver;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
-import quanta.AppController;
-import quanta.filter.AppFilter;
 import org.thymeleaf.spring5.SpringTemplateEngine;
 import org.thymeleaf.spring5.view.ThymeleafViewResolver;
 import org.thymeleaf.templateresolver.ClassLoaderTemplateResolver;
-import static quanta.util.Util.*;
+import quanta.AppController;
+import quanta.filter.AppFilter;
 
 /**
  * Standard Spring WebMvcConfigurerAdapter-derived class.

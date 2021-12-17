@@ -1,5 +1,6 @@
 package quanta.mail;
 
+import static quanta.util.Util.ok;
 import java.util.List;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -18,13 +19,12 @@ import quanta.mongo.MongoRepository;
 import quanta.mongo.MongoSession;
 import quanta.mongo.model.SubNode;
 
-import static quanta.util.Util.*;
-
 /**
- * Deamon for sending emails. 
+ * Deamon for sending emails.
  */
-@Lazy @Component
-public class EmailSenderDaemon  {
+@Lazy
+@Component
+public class EmailSenderDaemon {
 	private static final Logger log = LoggerFactory.getLogger(EmailSenderDaemon.class);
 
 	@Autowired

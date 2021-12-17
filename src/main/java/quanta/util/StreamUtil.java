@@ -1,14 +1,12 @@
 package quanta.util;
 
+import static quanta.util.Util.ok;
 import java.io.BufferedInputStream;
 import java.io.Closeable;
 import java.io.InputStream;
-
 import javax.imageio.ImageReader;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import static quanta.util.Util.*;
 
 public class StreamUtil {
 	private static final Logger log = LoggerFactory.getLogger(StreamUtil.class);

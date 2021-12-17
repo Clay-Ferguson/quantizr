@@ -1,9 +1,9 @@
 package quanta.util;
 
+import static quanta.util.Util.ok;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import quanta.exception.base.RuntimeEx;
-import static quanta.util.Util.*;
 
 /**
  * We use RuntimeExceptions primarily for all exception handling, throughout the app because of the

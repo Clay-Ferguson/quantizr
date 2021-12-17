@@ -1,11 +1,10 @@
 package quanta.model;
 
+import static quanta.util.Util.no;
 import java.util.LinkedList;
 import java.util.List;
-
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
-import static quanta.util.Util.*;
 
 /**
  * Represents a certain principal and a set of privileges the principal has.

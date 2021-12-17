@@ -1,5 +1,6 @@
 package quanta.config;
 
+import static quanta.util.Util.no;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeansException;
@@ -13,7 +14,6 @@ import quanta.exception.base.RuntimeEx;
 import quanta.mongo.MongoRepository;
 import quanta.service.IPFSPubSub;
 import quanta.util.EnglishDictionary;
-import static quanta.util.Util.*;
 
 /**
  * Manages certain aspects of Spring application context.

@@ -1,19 +1,20 @@
 package quanta.util;
 
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import quanta.config.SessionContext;
-import quanta.response.base.ResponseBase;
+import static quanta.util.Util.no;
+import static quanta.util.Util.ok;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 import org.apache.commons.lang3.StringUtils;
 import org.bson.types.ObjectId;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import quanta.config.SessionContext;
 import quanta.mongo.MongoSession;
 import quanta.mongo.model.SubNode;
-import static quanta.util.Util.*;
+import quanta.response.base.ResponseBase;
 
 /**
  * Thread Local Storage

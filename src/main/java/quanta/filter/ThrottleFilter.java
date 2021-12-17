@@ -1,5 +1,7 @@
 package quanta.filter;
 
+import static quanta.util.Util.no;
+import static quanta.util.Util.ok;
 import java.io.IOException;
 import java.util.HashMap;
 import javax.annotation.PostConstruct;
@@ -18,7 +20,6 @@ import org.springframework.web.filter.GenericFilterBean;
 import quanta.config.AppProp;
 import quanta.model.IPInfo;
 import quanta.util.Util;
-import static quanta.util.Util.*;
 
 /**
  * ServletFilter for throttling access

@@ -1,5 +1,6 @@
 package quanta.util;
 
+import static quanta.util.Util.no;
 import java.io.File;
 import java.io.InputStream;
 import java.io.StringWriter;
@@ -18,7 +19,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.core.io.Resource;
 import quanta.config.SpringContextUtil;
 import quanta.exception.base.RuntimeEx;
-import static quanta.util.Util.*;
 
 /**
  * General string utilities.

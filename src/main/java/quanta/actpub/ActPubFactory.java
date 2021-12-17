@@ -1,5 +1,7 @@
 package quanta.actpub;
 
+import static quanta.util.Util.no;
+import static quanta.util.Util.ok;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
@@ -16,8 +18,6 @@ import quanta.actpub.model.APOCreate;
 import quanta.actpub.model.APOMention;
 import quanta.actpub.model.APONote;
 import quanta.actpub.model.APObj;
-
-import static quanta.util.Util.*;
 
 /**
  * Convenience factory for some types of AP objects

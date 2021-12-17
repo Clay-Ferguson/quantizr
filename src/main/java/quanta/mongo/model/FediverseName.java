@@ -1,5 +1,6 @@
 package quanta.mongo.model;
 
+import static quanta.util.Util.ok;
 import java.util.Date;
 import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -14,7 +15,6 @@ import org.springframework.data.annotation.PersistenceConstructor;
 import org.springframework.data.annotation.TypeAlias;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
-import static quanta.util.Util.*;
 
 /* We're going to be caching every Fediverse username we encounter for future unspecified purposes */
 @Document(collection = "fediNames")

@@ -1,12 +1,11 @@
 package quanta.util;
 
+import static quanta.util.Util.no;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReentrantLock;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import quanta.exception.base.RuntimeEx;
-import static quanta.util.Util.*;
 
 public class LockEx extends ReentrantLock {
 	private static final Logger log = LoggerFactory.getLogger(LockEx.class);
