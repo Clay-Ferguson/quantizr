@@ -173,7 +173,7 @@ public class MongoUtil {
 	}
 
 	/**
-	 * This find method should wrap ALL queries to that we can run out code inside this NodeIterable
+	 * This find method should wrap ALL queries so that we can run our code inside this NodeIterable
 	 * wrapper which will detect any query results that reference objects cached in memory and point to
 	 * the in-memory copy of the object during iterating.
 	 */
@@ -191,8 +191,6 @@ public class MongoUtil {
 	 */
 	public SubNode findOne(Query query) {
 		SubNode node = ops.findOne(query, SubNode.class);
-
-		// todo-0: Investigate building this into the MongoEventListener.
 		return nodeOrDirtyNode(node);
 	}
 
@@ -209,6 +207,10 @@ public class MongoUtil {
 			node = ops.findById(objId, SubNode.class);
 		}
 		return nodeOrDirtyNode(node);
+	}
+
+	public SubNode findByIdNoCache(ObjectId objId) {
+		return ops.findById(objId, SubNode.class);
 	}
 
 	/*

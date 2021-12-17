@@ -35,7 +35,7 @@ public class MongoEventListener extends AbstractMongoEventListener<SubNode> {
 	private static final boolean verbose = false;
 
 	@Autowired
-    @Lazy
+	@Lazy
 	protected MongoTemplate ops;
 
 	@Autowired
@@ -210,14 +210,18 @@ public class MongoEventListener extends AbstractMongoEventListener<SubNode> {
 	@Override
 	public void onAfterLoad(AfterLoadEvent<SubNode> event) {
 		// Document dbObj = event.getDocument();
-		// log.debug("onAfterLoad:
-		// id="+dbObj.getObjectId(SubNode.FIELD_ID).toHexString());
+		// String id = dbObj.getObjectId(SubNode.ID).toHexString();
+		// log.debug("onAfterLoad: id=" + id);
+
+		// if (ThreadLocals.hasDirtyNode(dbObj.getObjectId(SubNode.ID))) {
+		// 	log.error("WARNING: DIRTY READ: " + id);
+		// }
 	}
 
 	@Override
 	public void onAfterConvert(AfterConvertEvent<SubNode> event) {
 		SubNode node = event.getSource();
-		// log.debug("onAfterConvert: "+node.getContent());
+		// log.debug("MongoEventListener.onAfterConvert: " + node.getContent());
 		if (no(node.getOwner())) {
 			if (ok(auth.getAdminSession())) {
 				ObjectId ownerId = auth.getAdminSession().getUserNodeId();
@@ -225,6 +229,13 @@ public class MongoEventListener extends AbstractMongoEventListener<SubNode> {
 				log.debug("Assigning admin as owner of node that had no owner (on load): " + node.getIdStr());
 			}
 		}
+
+		// NOTE: All resultsets should be wrapped in NodeIterator, which will make sure reading dirty
+		// nodes from the DB will pick up the dirty ones (already in memory) and substitute those
+		// into the result sets.
+		// if (ThreadLocals.hasDirtyNode(node.getId())) {
+		// 	log.error("WARNING: DIRTY READ: " + node.getIdStr());
+		// }
 
 		ThreadLocals.cacheNode(node);
 	}

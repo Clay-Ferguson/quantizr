@@ -28,6 +28,10 @@ import quanta.service.UserManagerService;
 import quanta.util.LimitedInputStreamEx;
 import quanta.util.ThreadLocals;
 
+/**
+ * This is actually where I just run various experiments related to MongoDB, and this is not
+ * supposed to be any thing like a unit test for the mongo stuff.
+ */
 @Lazy
 @Component("MongoTest")
 public class MongoTest implements TestIntf {
@@ -66,7 +70,9 @@ public class MongoTest implements TestIntf {
 		log.debug("*****************************************************************************************");
 		log.debug("MongoTest Running!");
 
-		testPathRegex();
+		testDirtyReads();
+
+		// testPathRegex();
 
 		// authTest();
 
@@ -112,6 +118,21 @@ public class MongoTest implements TestIntf {
 
 		log.debug("Mongo Test Ok.");
 		log.debug("*****************************************************************************************");
+	}
+
+	public void testDirtyReads() {
+		String nodeId = "61bcdd5b47596e66a7a11ce5";
+		MongoSession as = asUser(PrincipalName.ADMIN.s());
+
+		SubNode node1 = mongoUtil.findByIdNoCache(new ObjectId(nodeId));
+		node1.setContent("content from MongoTest.testDirtyReads");
+		log.debug("node1: hashCode=" + node1.hashCode());
+
+		// This will verify that the MongoEventListener is capable of detecting the dirty read and
+		// logging a warning about it.
+		SubNode node2 = mongoUtil.findByIdNoCache(new ObjectId(nodeId));
+		log.debug("node2: hashCode=" + node2.hashCode());
+		// update.saveSession(ms);
 	}
 
 	public void authTest() {
