@@ -51,10 +51,6 @@ export class User {
     }
 
     defaultHandleAnonUser = (state: AppState) => {
-        // todo-1: new logic: always send anon users to fediverse view.
-        // but we need to make this an admin-configurable behavior.
-        // var tab = S.util.getParameterByName("tab");
-        // if (tab === "feed") {
         if (window.location.href.endsWith("/app")) {
             setTimeout(() => {
                 S.nav.showPublicFediverse();
@@ -227,14 +223,9 @@ export class User {
 
             // console.log("Window: " + window.location.href);
             if (window.location.href.endsWith("/app") && usr === J.PrincipalName.ANON) {
-                // console.log("login is refreshingTree with ID=" + id);
-                // var tab = S.util.getParameterByName("tab");
-                // if (tab === "feed") {
                 setTimeout(() => {
-                    // todo-1: new logic, always send anon users to fediverse view
                     S.nav.showPublicFediverse();
                 }, 10);
-                // }
             }
             else {
                 // console.log("loginResponse final refresh id chosen: " + id);

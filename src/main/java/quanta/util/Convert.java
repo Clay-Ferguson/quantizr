@@ -139,9 +139,12 @@ public class Convert {
 		String displayName = null;
 
 		if (no(userNode)) {
-			// todo-1: looks like import corrupts the 'owner' (needs research), but the code
-			// below sets to owner to 'admin' which will
-			// be safe for now because the admin is the only user capable of import/export.
+			/*
+			 * todo-1: looks like import corrupts the 'owner' (needs research), but the code below sets to owner
+			 * to 'admin' which will be safe for now because the admin is the only user capable of
+			 * import/export.
+			 */
+
 			// log.debug("Unable to find userNode from nodeOwner: " + //
 			// (ok(node.getOwner()) ? ownerId : ("null owner on node: " +
 			// node.getIdStr())) + //

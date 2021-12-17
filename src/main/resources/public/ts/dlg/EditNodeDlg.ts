@@ -197,7 +197,7 @@ export class EditNodeDlg extends DialogBase {
             let val = S.props.getNodePropVal(propEntry.name, node);
             propState.setValue(val);
 
-            /* todo-1: eventually we will have data types, but for now we use a hack
+            /* todo-2: eventually we will have data types, but for now we use a hack
             to detect to treat a string as a date based on its property name. */
             if (propEntry.name === J.NodeProp.DATE) {
                 // Ensure we have set the default time if none is yet set.
