@@ -12,7 +12,7 @@ import quanta.util.ThreadLocals;
  * being operated on in memory and make sure we point to THOSE in memory nodes, to avoid types of
  * dirty writes.
  * 
- * todo-2: need to review all this (thread locals dirtyNodes stuff), and also see if there's a
+ * todo-0: need to review all this (thread locals dirtyNodes stuff), and also see if there's a
  * cleaner way to build it directly into the MongoEventListener class
  */
 class NodeIterator implements Iterator<SubNode> {
@@ -28,6 +28,7 @@ class NodeIterator implements Iterator<SubNode> {
     public SubNode next() {
         SubNode node = iter.next();
         if (ok(node)) {
+            // similar to nodeOrDirtyNode logic...
             SubNode dirty = ThreadLocals.getDirtyNodes().get(node.getId());
             if (ok(dirty)) {
                 // log.debug("ITER-WRAPPER: Got a dirty one: " + dirty.getIdStr());

@@ -191,6 +191,8 @@ public class MongoUtil {
 	 */
 	public SubNode findOne(Query query) {
 		SubNode node = ops.findOne(query, SubNode.class);
+
+		// todo-0: Investigate building this into the MongoEventListener.
 		return nodeOrDirtyNode(node);
 	}
 

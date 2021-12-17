@@ -436,7 +436,6 @@ public class AttachmentService {
 			}
 		}
 
-		// ThreadLocals.clearDirtyNodes();
 		update.save(ms, node);
 	}
 

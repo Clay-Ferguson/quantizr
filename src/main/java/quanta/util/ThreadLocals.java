@@ -206,7 +206,7 @@ public class ThreadLocals {
 
 	/*
 	 * Sets 'node' to dirty thus guaranteeing any changes made to it, even if made later on in the
-	 * request, are guaranteed to be written out
+	 * request, are guaranteed to be saved to the DB.
 	 */
 	public static void dirty(SubNode node) {
 		if (no(node.getId())) {

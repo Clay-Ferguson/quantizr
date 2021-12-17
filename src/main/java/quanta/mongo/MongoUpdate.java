@@ -50,6 +50,7 @@ public class MongoUpdate {
 	@Lazy
 	protected MongoRead read;
 
+	// NOTE: Since this is a threadlocal we have no concurrency protection (not needed)
 	private static final ThreadLocal<Boolean> saving = new ThreadLocal<>();
 
 	public void saveObj(Object obj) {
@@ -83,8 +84,12 @@ public class MongoUpdate {
 		saveSession(ms, false);
 	}
 
+	private boolean isSaving() {
+		return ok(saving.get()) && saving.get().booleanValue();
+	}
+
 	public void saveSession(MongoSession ms, boolean asAdmin) {
-		if (no(ms) || (ok(saving.get()) && saving.get().booleanValue()) || !ThreadLocals.hasDirtyNodes())
+		if (no(ms) || isSaving() || !ThreadLocals.hasDirtyNodes())
 			return;
 
 		try {
@@ -92,13 +97,10 @@ public class MongoUpdate {
 			saving.set(true);
 
 			synchronized (ms) {
-				// recheck hasDirtyNodes again after we get inside the lock.
-				if (!ThreadLocals.hasDirtyNodes()) {
-					return;
-				}
-
 				/*
-				 * We use 'nodes' list to avoid a concurrent modification
+				 * We use 'nodes' list to avoid a concurrent modification, because calling 'save()' on a node
+				 * will have the side effect of removing it from dirtyNodes, and that can't happen during
+				 * the loop below because we're iterating over dirtyNodes.
 				 */
 				List<SubNode> nodes = new LinkedList<>();
 
@@ -106,6 +108,11 @@ public class MongoUpdate {
 				 * check that we are allowed to write all, before we start writing any
 				 */
 				for (SubNode node : ThreadLocals.getDirtyNodes().values()) {
+
+					/*
+					 * If we're not running this as admin user we have to auth to be sure we're allowed to save this
+					 * node
+					 */
 					if (!asAdmin) {
 						try {
 							auth.ownerAuth(ms, node);

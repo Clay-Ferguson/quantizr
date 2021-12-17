@@ -192,7 +192,7 @@ public class NodeSearchService {
 			textCriteria = TextCriteria.forDefaultLanguage();
 
 			// make sure name is quoted for exact search, since it will contain delimiters
-			// which would other wise dirty up a search
+			// which would other wise mess up a search
 			String name = findUserName;
 			if (!name.startsWith("\"")) {
 				name = "\"" + name;
@@ -321,7 +321,7 @@ public class NodeSearchService {
 		return res;
 	}
 
-	// replace #<span> with " #". This is a quick and dirty way to fix the way
+	// replace #<span> with " #". This is a quick and easy way to fix the way
 	// Mastodon mangles hashes in the text.
 	public String fixMastodonMangles(String content) {
 		if (no(content))
