@@ -224,11 +224,11 @@ public class ThreadLocals {
 		 * memory, this is a problem and will mean whichever node happens to be saved 'last' will overwrite,
 		 * so this *may* result in data loss.
 		 * 
-		 * todo-1: Should we find a way to be sure this never happens? This is basically another way of
-		 * saying with non-ACID databases transactions don't really 'work'
+		 * Normally NodeIterator.java, and all places we ready from the DB should be wrapped in a way as to
+		 * let the dirty nodes be correctly referenced, so this message should never get printed.
 		 */
 		if (ok(nodeFound) && nodeFound.hashCode() != node.hashCode()) {
-			log.debug("*************** WARNING: multiple instances of objectId " + node.getIdStr() + " are in memory.");
+			log.debug("WARNING: multiple instances of objectId " + node.getIdStr() + " are in memory.");
 			return;
 		}
 
