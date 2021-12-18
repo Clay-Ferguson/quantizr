@@ -1110,8 +1110,13 @@ public class AppController implements ErrorController {
 	public void getFile(//
 			@PathVariable("fileName") String fileName, //
 			@RequestParam(name = "disp", required = false) String disposition, //
-			HttpSession session, HttpServletResponse response) {
-		SessionContext.checkReqToken();
+			@RequestParam(name = "token", required = true) String token, //
+			HttpSession session, //
+			HttpServletResponse response) {
+		if (!SessionContext.validToken(token)) {
+			throw new RuntimeException("Invalid token.");
+		}
+
 		callProc.run("file", null, session, ms -> {
 			attach.getFile(ms, fileName, disposition, response);
 			return null;

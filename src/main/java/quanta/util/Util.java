@@ -95,15 +95,10 @@ public class Util {
 	 * Generates a very strong unguessable token. We could also use JWT here, but for our architecture
 	 * the only requirement is unique and unguessable.
 	 */
+	static long counter = 1357;
 	public static String genStrongToken() {
-		// Warning: SimpleDateFormat is not threadsafe. Always create here.
-		SimpleDateFormat dateFormat = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss z", Locale.US);
-		String str = dateFormat.format(new Date()) + "-" + String.valueOf(Math.abs(rand.nextLong()));
-		try {
-			return Base64.getEncoder().encodeToString(MessageDigest.getInstance("SHA-256").digest(str.getBytes()));
-		} catch (Exception e) {
-			throw new RuntimeException("SHA-256 failed");
-		}
+		return String.valueOf(Math.abs(++counter + (new Date().getTime()) ^ Math.abs(rand.nextLong())));
+		
 	}
 
 	public static boolean equalObjs(Object o1, Object o2) {

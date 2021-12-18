@@ -265,6 +265,21 @@ public class SessionContext {
 		return false;
 	}
 
+	public static boolean validToken(String token) {
+		if (no(token))
+			return false;
+
+		synchronized (allSessions) {
+			// great candidate for a stream() here.
+			for (SessionContext sc : allSessions) {
+				if (token.equals(sc.getUserToken())) {
+					return true;
+				}
+			}
+		}
+		return false;
+	}
+
 	public static void checkReqToken() {
 		SessionContext sc = ThreadLocals.getSC();
 		if (no(sc)) {

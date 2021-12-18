@@ -83,7 +83,8 @@ export class ExportDlg extends DialogBase {
         /* the 'v' arg is for cachebusting. Browser won't download same file once cached, but eventually
         the plan is to have the export return the actual md5 of the export for use here */
 
-        let downloadLink = hostAndPort + "/file/" + res.fileName + "?disp=attachment&v=" + (new Date().getTime());
+        // disp=inline (is the other)
+        let downloadLink = hostAndPort + "/file/" + res.fileName + "?disp=attachment&v=" + (new Date().getTime()) + "&token=" + S.quanta.authToken;
 
         if (S.util.checkSuccess("Export", res)) {
             new MessageDlg(
@@ -91,9 +92,7 @@ export class ExportDlg extends DialogBase {
                 "Export",
                 null,
                 new VerticalLayout([
-                    // new Anchor(hostAndPort + "/file/" + res.fileName + "?disp=inline", "Raw View", { "target": "_blank" }),
-                    // new Anchor(hostAndPort + "/view/" + res.fileName, "Formatted View", { "target": "_blank" }),
-                    !res.ipfsCid ? new Anchor(downloadLink, "Download: " + downloadLink, null) : null,
+                    !res.ipfsCid ? new Anchor(downloadLink, "Download", { target: "_blank" }) : null,
                     res.ipfsCid ? new Div("IPFS CID: " + res.ipfsCid, {
                         className: "ipfsCidText",
                         title: "Click -> Copy to clipboard",
