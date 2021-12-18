@@ -238,6 +238,9 @@ public class NodeMoveService {
 		for (String nodeId : req.getNodeIds()) {
 			// lookup the node we're going to delete
 			SubNode node = read.getNode(ms, nodeId);
+			if (no(node))
+				continue;
+
 			auth.ownerAuthByThread(node);
 
 			// back out the number of bytes it was using

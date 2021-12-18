@@ -381,13 +381,7 @@ public class UserManagerService {
 	 */
 	public void addNodeBytesToUserNodeBytes(MongoSession ms, SubNode node, SubNode userNode, int sign) {
 		if (no(node)) {
-			/*
-			 * todo-1: need to investigate this. I did a public shared node from one user and had a conversation
-			 * thread under it and got this thrown upon deleting the root of that. For now ignoring a null node
-			 * here.
-			 */
 			return;
-			// throw new RuntimeEx("node was null.");
 		}
 
 		// get the size of the attachment on this node

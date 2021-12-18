@@ -138,18 +138,7 @@ public class Convert {
 		SubNode userNode = read.getNode(ms, node.getOwner(), false);
 		String displayName = null;
 
-		if (no(userNode)) {
-			/*
-			 * todo-1: looks like import corrupts the 'owner' (needs research), but the code below sets to owner
-			 * to 'admin' which will be safe for now because the admin is the only user capable of
-			 * import/export.
-			 */
-
-			// log.debug("Unable to find userNode from nodeOwner: " + //
-			// (ok(node.getOwner()) ? ownerId : ("null owner on node: " +
-			// node.getIdStr())) + //
-			// " tried to find owner=" + node.getOwner().toHexString());
-		} else {
+		if (ok(userNode)) {
 			nameProp = userNode.getStr(NodeProp.USER.s());
 			avatarVer = userNode.getStr(NodeProp.BIN.s());
 			displayName = userNode.getStr(NodeProp.DISPLAY_NAME.s());
@@ -378,10 +367,6 @@ public class Convert {
 	 * Searches in 'val' anywhere there is a line that begins with http:// (or https), and replaces that
 	 * with the normal way of doing a link in markdown. So we are injecting a snippet of markdown (not
 	 * html)
-	 * 
-	 * todo-1: I noticed this method gets called during the 'saveNode' processing and then is called
-	 * again when the server refreshes the whole page. This is something that is a slight bit of wasted
-	 * processing.
 	 */
 	public static String convertLinksToMarkdown(String val) {
 		while (true) {

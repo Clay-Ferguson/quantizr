@@ -1051,6 +1051,7 @@ public class AttachmentService {
 	}
 
 	public void deleteBinary(MongoSession ms, String binSuffix, SubNode node, SubNode userNode) {
+		if (no(node)) return;
 		auth.ownerAuthByThread(node);
 		String id = node.getStr(NodeProp.BIN.s() + binSuffix);
 		if (no(id)) {
