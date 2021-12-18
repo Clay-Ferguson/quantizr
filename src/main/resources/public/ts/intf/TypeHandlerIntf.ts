@@ -3,12 +3,13 @@ import { NodeActionType } from "../enums/NodeActionType";
 import * as J from "../JavaIntf";
 import { Comp } from "../comp/base/Comp";
 import { CompIntf } from "../comp/base/CompIntf";
+import { TabDataIntf } from "./TabDataIntf";
 
 /* This interface is how Type Plugins are handled */
 export interface TypeHandlerIntf {
     getTypeName(): string;
     getName(): string;
-    render(node: J.NodeInfo, rowStyling: boolean, isTreeView: boolean, state: AppState): Comp;
+    render(node: J.NodeInfo, tabData: TabDataIntf<any>, rowStyling: boolean, isTreeView: boolean, state: AppState): Comp;
     getIconClass(): string;
     allowAction(action : NodeActionType, node: J.NodeInfo, appState: AppState): boolean;
     allowPropertyEdit(typeName: string, state: AppState): boolean;

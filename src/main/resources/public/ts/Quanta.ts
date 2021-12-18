@@ -58,11 +58,6 @@ export class Quanta {
     /* Map of all URLs and the openGraph object retrieved for it */
     openGraphData: Map<string, J.OpenGraph> = new Map<string, J.OpenGraph>();
 
-    /* Map of all OpenGraphPanels in top to bottom rendered order. Each instance of an OpenGraphPanel
-    needs to somehow associate to an array like this that's TAB SPECIFIC (todo-1), and for now we
-    just let this apply to the Feed tab */
-    openGraphComps: OpenGraphPanel[] = [];
-
     nodeHistory: NodeHistoryItem[] = [];
     nodeHistoryLocked: boolean;
 

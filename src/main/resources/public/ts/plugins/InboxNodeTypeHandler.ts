@@ -6,6 +6,7 @@ import { Clearfix } from "../comp/core/Clearfix";
 import { Heading } from "../comp/core/Heading";
 import { HorizontalLayout } from "../comp/core/HorizontalLayout";
 import { NodeActionType } from "../enums/NodeActionType";
+import { TabDataIntf } from "../intf/TabDataIntf";
 import * as J from "../JavaIntf";
 import { S } from "../Singletons";
 import { TypeBase } from "./base/TypeBase";
@@ -30,7 +31,7 @@ export class InboxNodeTypeHandler extends TypeBase {
         return false;
     }
 
-    render(node: J.NodeInfo, rowStyling: boolean, isTreeView: boolean, state: AppState): Comp {
+    render(node: J.NodeInfo, tabData: TabDataIntf<any>, rowStyling: boolean, isTreeView: boolean, state: AppState): Comp {
         return new HorizontalLayout([
             new Heading(4, "Inbox"),
             new ButtonBar([

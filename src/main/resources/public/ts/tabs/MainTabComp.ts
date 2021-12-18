@@ -45,8 +45,8 @@ export class MainTabComp extends AppTab {
                 renderableCrumbs > 0 && !state.mobileMode ? new BreadcrumbsPanel() : null,
                 state.pageMessage ? new Html(state.pageMessage, { className: "alert alert-info float-end" }) : null,
                 state.pageMessage ? new Clearfix() : null,
-                new NodeCompMainNode(state, null),
-                new NodeCompMainList()
+                new NodeCompMainNode(state, this.data, null),
+                new NodeCompMainList(this.data)
             ])
         ]);
     }

@@ -72,7 +72,8 @@ export class TabUtil {
                     constructView: (data: TabDataIntf) => new MainTabComp(s, data),
                     rsInfo: null,
                     scrollPos: 0,
-                    props: {}
+                    props: {},
+                    openGraphComps: []
                 },
                 {
                     name: "Search",
@@ -81,7 +82,8 @@ export class TabUtil {
                     constructView: (data: TabDataIntf) => new SearchResultSetView(s, data),
                     rsInfo: new ResultSetInfo(),
                     scrollPos: 0,
-                    props: {}
+                    props: {},
+                    openGraphComps: []
                 },
                 {
                     name: "Shared Nodes",
@@ -90,7 +92,8 @@ export class TabUtil {
                     constructView: (data: TabDataIntf) => new SharedNodesResultSetView<SharesRSInfo>(s, data),
                     rsInfo: new SharesRSInfo(),
                     scrollPos: 0,
-                    props: {}
+                    props: {},
+                    openGraphComps: []
                 },
                 {
                     name: "Timeline",
@@ -99,7 +102,8 @@ export class TabUtil {
                     constructView: (data: TabDataIntf) => new TimelineResultSetView<TimelineRSInfo>(s, data),
                     rsInfo: new TimelineRSInfo(),
                     scrollPos: 0,
-                    props: {}
+                    props: {},
+                    openGraphComps: []
                 },
                 {
                     name: "Followers",
@@ -108,7 +112,8 @@ export class TabUtil {
                     constructView: (data: TabDataIntf) => new FollowersResultSetView<FollowersRSInfo>(s, data),
                     rsInfo: new FollowersRSInfo(),
                     scrollPos: 0,
-                    props: {}
+                    props: {},
+                    openGraphComps: []
                 },
                 {
                     name: "Following",
@@ -117,7 +122,8 @@ export class TabUtil {
                     constructView: (data: TabDataIntf) => new FollowingResultSetView<FollowingRSInfo>(s, data),
                     rsInfo: new FollowingRSInfo(),
                     scrollPos: 0,
-                    props: {}
+                    props: {},
+                    openGraphComps: []
                 },
                 {
                     name: "Feed",
@@ -150,7 +156,8 @@ export class TabUtil {
 
                         feedResults: null,
                         feedEndReached: false
-                    }
+                    },
+                    openGraphComps: []
                 },
                 // DO NOT DELETE
                 // The IPSMView will be repurposed as a server event log viewer
@@ -176,7 +183,8 @@ export class TabUtil {
                     constructView: (data: TabDataIntf) => new TrendingView(s, data),
                     rsInfo: new TrendingRSInfo(),
                     scrollPos: 0,
-                    props: {}
+                    props: {},
+                    openGraphComps: []
                 },
                 {
                     name: "Server Info",
@@ -188,7 +196,8 @@ export class TabUtil {
                     constructView: (data: TabDataIntf) => new ServerInfoView(s, data),
                     rsInfo: null,
                     scrollPos: 0,
-                    props: {}
+                    props: {},
+                    openGraphComps: []
                 }
 
                 // this is throwing a react error, but we don't need this now anyaay

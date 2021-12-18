@@ -21,6 +21,7 @@ import { TypeHandlerIntf } from "./intf/TypeHandlerIntf";
 import * as J from "./JavaIntf";
 import { PubSub } from "./PubSub";
 import { S } from "./Singletons";
+import { TabDataIntf } from "./intf/TabDataIntf";
 
 function imageErrorFunc(evt: any) {
     console.log("remove broken img");
@@ -415,6 +416,12 @@ export class Render {
                 s.guiReady = true;
                 s.pageMessage = null;
 
+                debugger;
+                let data: TabDataIntf = S.tabUtil.getTabDataById(s, C.TAB_MAIN);
+                if (data) {
+                    data.openGraphComps = [];
+                }
+
                 /* Note: This try block is solely to enforce the finally block to happen to guarantee setting s.rendering
                 back to false, no matter what */
                 try {
@@ -556,7 +563,7 @@ export class Render {
             });
         }
         catch (err) {
-            console.error("render failed.");
+            console.error("render failed: " + S.util.prettyPrint(err));
         }
     }
 
@@ -615,7 +622,7 @@ export class Render {
         }
     }
 
-    renderChildren = (node: J.NodeInfo, level: number, allowNodeMove: boolean, state: AppState): Comp => {
+    renderChildren = (node: J.NodeInfo, tabData: TabDataIntf<any>, level: number, allowNodeMove: boolean, state: AppState): Comp => {
         if (!node || !node.children) return null;
         let allowAvatars = true;
 
@@ -627,14 +634,14 @@ export class Render {
 
         /* Note: for edit mode, or on mobile devices, always use vertical layout. */
         if (state.userPreferences.editMode || state.mobileMode || !layout || layout === "v") {
-            return new NodeCompVerticalRowLayout(node, level, allowNodeMove, true);
+            return new NodeCompVerticalRowLayout(node, tabData, level, allowNodeMove, true);
         }
         else if (layout.indexOf("c") === 0) {
-            return new NodeCompTableRowLayout(node, level, layout, allowNodeMove, true);
+            return new NodeCompTableRowLayout(node, tabData, level, layout, allowNodeMove, true);
         }
         else {
             // of no layout is valid, fall back on vertical.
-            return new NodeCompVerticalRowLayout(node, level, allowNodeMove, true);
+            return new NodeCompVerticalRowLayout(node, tabData, level, allowNodeMove, true);
         }
     }
 

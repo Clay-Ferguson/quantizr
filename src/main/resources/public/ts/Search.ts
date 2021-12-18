@@ -80,6 +80,8 @@ export class Search {
                 let data = s.tabData.find(d => d.id === C.TAB_SEARCH);
                 if (!data) return;
 
+                data.openGraphComps = [];
+
                 data.rsInfo.results = res.searchResults;
                 data.rsInfo.page = page;
                 data.rsInfo.searchType = searchType;
@@ -139,6 +141,8 @@ export class Search {
             S.tabUtil.tabScrollTop(s, C.TAB_TIMELINE);
             let data = s.tabData.find(d => d.id === C.TAB_TIMELINE);
             if (!data) return;
+
+            data.openGraphComps = [];
             let info = data.rsInfo as TimelineRSInfo;
 
             info.results = res.searchResults;
@@ -219,7 +223,8 @@ export class Search {
         });
 
         dispatch("Action_RenderFeedResults", (s: AppState): AppState => {
-            S.quanta.openGraphComps = [];
+            // need to initialized for all other types of tabs too now. (todo-0)
+            feedData.openGraphComps = [];
             // s.feedResults = S.quanta.removeRedundantFeedItems(res.searchResults || []);
 
             // once user requests their stuff, turn off the new messages count indicator.
@@ -373,7 +378,7 @@ export class Search {
     /*
      * Renders a single line of search results on the search results page.
      */
-    renderSearchResultAsListItem = (node: J.NodeInfo, index: number, count: number, rowCount: number, prefix: string,
+    renderSearchResultAsListItem = (node: J.NodeInfo, tabData: TabDataIntf<any>, index: number, count: number, rowCount: number, prefix: string,
         isFeed: boolean, isParent: boolean, allowAvatars: boolean, jumpButton: boolean, allowHeader: boolean, allowFooter: boolean, state: AppState): Comp => {
         if (!node) return;
 
@@ -381,11 +386,11 @@ export class Search {
         item we are rendering */
         let parentItem: Comp = null;
         if (node.parent) {
-            parentItem = this.renderSearchResultAsListItem(node.parent, index, count, rowCount, prefix, isFeed, true, allowAvatars, jumpButton, allowHeader, allowFooter, state);
+            parentItem = this.renderSearchResultAsListItem(node.parent, tabData, index, count, rowCount, prefix, isFeed, true, allowAvatars, jumpButton, allowHeader, allowFooter, state);
         }
 
         const cssId = this._UID_ROWID_PREFIX + node.id;
-        const content = new NodeCompContent(node, true, true, prefix, true, null, false);
+        const content = new NodeCompContent(node, tabData, true, true, prefix, true, null, false);
 
         let clazz = isFeed ? "feed-node-table-row" : "results-node-table-row";
         if (S.render.enableRowFading && S.render.fadeInId === node.id && S.render.allowFadeInId) {

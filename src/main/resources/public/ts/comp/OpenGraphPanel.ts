@@ -7,6 +7,7 @@ import { Icon } from "../comp/core/Icon";
 import { Img } from "../comp/core/Img";
 import * as J from "../JavaIntf";
 import { S } from "../Singletons";
+import { TabDataIntf } from "../intf/TabDataIntf";
 
 interface LS {
     og: J.OpenGraph;
@@ -17,7 +18,7 @@ interface LS {
 export class OpenGraphPanel extends Div {
     loading: boolean;
 
-    constructor(private appState: AppState, key: string, private url: string) {
+    constructor(private appState: AppState, private tabData: TabDataIntf<any>, key: string, private url: string) {
         super(null, {
             title: url,
             key
@@ -76,11 +77,15 @@ export class OpenGraphPanel extends Div {
         super.domAddEvent();
     }
 
-    /* This loads the next upcomming OpenGraph assuming the user is scrolling down */
+    /* This loads the next upcomming OpenGraph assuming the user is scrolling down. This is purely a
+    performance optimization to help the user experience and is not a core part of the logic for
+     'correct' functioning */
     loadNext = (): void => {
         let found = false;
         let count = 0;
-        S.quanta.openGraphComps.forEach(o => {
+        if (!this.tabData) return;
+
+        this.tabData.openGraphComps.forEach(o => {
             if (found) {
                 /* I think it's counterproductive for smooth scrolling to preload more than one */
                 if (count++ < 1) {

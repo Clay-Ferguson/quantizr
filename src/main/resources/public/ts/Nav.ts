@@ -510,7 +510,7 @@ export class Nav {
             S.tabUtil.tabChanging(s.activeTab, C.TAB_FEED, s);
             s.activeTab = S.quanta.activeTab = C.TAB_FEED;
 
-            // merge props prarmeter into the feed data props.
+            // merge props parameter into the feed data props.
             feedData.props = { ...feedData.props, ...props };
             return s;
         });

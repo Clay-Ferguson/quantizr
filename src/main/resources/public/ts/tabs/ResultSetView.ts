@@ -84,7 +84,7 @@ export abstract class ResultSetView extends AppTab {
 
     /* overridable (don't use arrow function) */
     renderItem(node: J.NodeInfo, i: number, childCount: number, rowCount: number, jumpButton: boolean, state: AppState): CompIntf {
-        return S.srch.renderSearchResultAsListItem(node, i, childCount, rowCount, this.data.id, false, false, true, jumpButton, this.allowHeader, this.allowFooter, state);
+        return S.srch.renderSearchResultAsListItem(node, this.data, i, childCount, rowCount, this.data.id, false, false, true, jumpButton, this.allowHeader, this.allowFooter, state);
     }
 
     addPaginationBar = (state: AppState, children: CompIntf[]): void => {

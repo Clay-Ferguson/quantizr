@@ -1,5 +1,6 @@
 import { ResultSetInfo } from "../ResultSetInfo";
 import { CompIntf } from "../comp/base/CompIntf";
+import { OpenGraphPanel } from "../comp/OpenGraphPanel";
 
 export interface TabDataIntf<PropsType = any> {
     // display name shown on the tab
@@ -21,4 +22,6 @@ export interface TabDataIntf<PropsType = any> {
 
     rsInfo: ResultSetInfo;
     props: PropsType;
+
+    openGraphComps: OpenGraphPanel[];
 }

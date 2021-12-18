@@ -3,6 +3,7 @@ import { Comp } from "../comp/base/Comp";
 import { Div } from "../comp/core/Div";
 import { Pre } from "../comp/core/Pre";
 import { NodeActionType } from "../enums/NodeActionType";
+import { TabDataIntf } from "../intf/TabDataIntf";
 import * as J from "../JavaIntf";
 import { S } from "../Singletons";
 import { TypeBase } from "./base/TypeBase";
@@ -27,7 +28,7 @@ export class CalcTypeHandler extends TypeBase {
         return true;
     }
 
-    render(node: J.NodeInfo, rowStyling: boolean, isTreeView: boolean, state: AppState): Comp {
+    render(node: J.NodeInfo, tabData: TabDataIntf<any>, rowStyling: boolean, isTreeView: boolean, state: AppState): Comp {
         if (!S.props.isMine(node, state)) {
             return new Div("Only the Owner of a Calculation node can run the calculation.");
         }

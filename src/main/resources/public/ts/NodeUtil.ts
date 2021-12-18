@@ -134,7 +134,7 @@ export class NodeUtil {
 
     /* Find node by looking everywhere we possibly can on local storage for it */
     findNodeById = (state: AppState, nodeId: string): J.NodeInfo => {
-        let feedData: TabDataIntf = S.tabUtil.getTabDataById(null, C.TAB_FEED);
+        let feedData: TabDataIntf = S.tabUtil.getTabDataById(state, C.TAB_FEED);
 
         // first look in normal tree map for main view.
         let node: J.NodeInfo = state.idToNodeMap.get(nodeId);

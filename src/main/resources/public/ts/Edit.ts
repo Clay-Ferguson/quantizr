@@ -288,7 +288,7 @@ export class Edit {
 
             // if on feed tab, and it became dirty while we were editing then refresh it.
             if (state.activeTab === C.TAB_FEED) {
-                let feedData: TabDataIntf = S.tabUtil.getTabDataById(null, C.TAB_FEED);
+                let feedData: TabDataIntf = S.tabUtil.getTabDataById(state, C.TAB_FEED);
                 if (feedData?.props?.feedDirtyList) {
                     FeedView.updateFromFeedDirtyList(feedData, state);
                 }
