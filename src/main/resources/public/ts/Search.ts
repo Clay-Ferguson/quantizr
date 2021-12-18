@@ -223,7 +223,6 @@ export class Search {
         });
 
         dispatch("Action_RenderFeedResults", (s: AppState): AppState => {
-            // need to initialized for all other types of tabs too now. (todo-0)
             feedData.openGraphComps = [];
             // s.feedResults = S.quanta.removeRedundantFeedItems(res.searchResults || []);
 

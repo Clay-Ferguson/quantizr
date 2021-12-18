@@ -416,7 +416,6 @@ export class Render {
                 s.guiReady = true;
                 s.pageMessage = null;
 
-                debugger;
                 let data: TabDataIntf = S.tabUtil.getTabDataById(s, C.TAB_MAIN);
                 if (data) {
                     data.openGraphComps = [];
