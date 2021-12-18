@@ -6,6 +6,7 @@ import { UserProfileDlg } from "../dlg/UserProfileDlg";
 import { NodeActionType } from "../enums/NodeActionType";
 import { TabDataIntf } from "../intf/TabDataIntf";
 import * as J from "../JavaIntf";
+import { S } from "../Singletons";
 import { TypeBase } from "./base/TypeBase";
 
 export class AccountTypeHandler extends TypeBase {
@@ -16,10 +17,10 @@ export class AccountTypeHandler extends TypeBase {
 
     allowAction(action: NodeActionType, node: J.NodeInfo, appState: AppState): boolean {
         switch (action) {
-        case NodeActionType.editNode:
-            return false;
-        default:
-            return true;
+            case NodeActionType.editNode:
+                return false;
+            default:
+                return true;
         }
     }
 
@@ -29,12 +30,18 @@ export class AccountTypeHandler extends TypeBase {
 
     render(node: J.NodeInfo, tabData: TabDataIntf<any>, rowStyling: boolean, isTreeView: boolean, state: AppState): Comp {
         return new Div(null, {
-            className: "clickable marginAll",
-            onClick: (evt: any) => {
-                new UserProfileDlg(node.ownerId, state).open();
-            }
+            className: "marginAll"
         }, [
-            new Heading(4, "User: " + node.owner)
+            new Heading(4, "User: " + node.owner, {
+                className: "clickable",
+                onClick: (evt: any) => {
+                    // If we're clicking on our own Account Node, then don't open the UserProfileDlg. For a person editing
+                    // their own account this is not a way to do it.
+                    if (!S.props.isMine(node, state)) {
+                        new UserProfileDlg(node.ownerId, state).open();
+                    }
+                }
+            })
         ]);
     }
 }
