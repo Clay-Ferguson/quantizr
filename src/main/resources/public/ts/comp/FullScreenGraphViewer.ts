@@ -10,7 +10,7 @@ import { Main } from "./Main";
 // https://www.npmjs.com/package/d3
 // https://d3js.org/
 
-interface LS {
+interface LS { // Local State
     data: J.GraphNode;
 }
 

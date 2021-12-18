@@ -19,7 +19,7 @@ with unknown file types.
  from the webpack config script) */
 // import WebTorrent from "webtorrent/webtorrent.min.js";
 
-interface LS {
+interface LS { // Local State
     downloadLink: string;
 }
 

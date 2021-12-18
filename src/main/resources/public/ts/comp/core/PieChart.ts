@@ -2,7 +2,7 @@ import * as d3 from "d3";
 import { Div } from "./Div";
 import { Svg } from "./Svg";
 
-interface LS {
+interface LS { // Local State
 }
 
 export class PieChart extends Div {

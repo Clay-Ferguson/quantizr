@@ -14,7 +14,7 @@ import * as J from "../JavaIntf";
 import { S } from "../Singletons";
 import { ValidatedState } from "../ValidatedState";
 
-interface LS {
+interface LS { // Local State
     fuzzy?: boolean;
     searchType?: string;
     caseSensitive?: boolean;

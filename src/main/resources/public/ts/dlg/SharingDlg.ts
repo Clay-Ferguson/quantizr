@@ -13,7 +13,7 @@ import * as J from "../JavaIntf";
 import { S } from "../Singletons";
 import { FriendsDlg } from "./FriendsDlg";
 
-interface LS {
+interface LS { // Local State
     nodePrivsInfo: J.GetNodePrivilegesResponse;
 }
 

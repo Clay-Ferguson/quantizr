@@ -11,7 +11,7 @@ import * as J from "../JavaIntf";
 import { S } from "../Singletons";
 import { ValidatedState } from "../ValidatedState";
 
-interface LS {
+interface LS { // Local State
     splitMode?: string;
     splitType?: string;
     delimiter?: string;

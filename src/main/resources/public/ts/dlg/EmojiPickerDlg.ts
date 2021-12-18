@@ -7,7 +7,7 @@ import { Form } from "../comp/core/Form";
 import { DialogBase } from "../DialogBase";
 import { ValueIntf } from "../Interfaces";
 
-interface LS {
+interface LS { // Local State
     selectedEmoji: string;
 }
 

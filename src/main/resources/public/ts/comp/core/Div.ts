@@ -5,7 +5,7 @@ import { CompIntf } from "../base/CompIntf";
 // So that users of this class don't need a state deriving from one with a 'content' prop
 // we use an 'as any' in here. Just a convenient tradeoff.
 
-interface LS {
+interface LS { // Local State
     content?: string;
 }
 

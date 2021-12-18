@@ -11,7 +11,7 @@ import * as J from "../JavaIntf";
 import { S } from "../Singletons";
 import { ShareToPersonDlg } from "./ShareToPersonDlg";
 
-interface LS {
+interface LS { // Local State
     selectedName?: string;
     loading?: boolean;
     friends?: J.FriendInfo[];

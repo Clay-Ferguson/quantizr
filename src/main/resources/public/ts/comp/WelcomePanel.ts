@@ -7,7 +7,7 @@ import * as J from "../JavaIntf";
 import { S } from "../Singletons";
 import { Div } from "../comp/core/Div";
 
-interface LS {
+interface LS { // Local State
     welcomeNode: J.NodeInfo;
 }
 

@@ -9,7 +9,7 @@ import { DialogBase } from "../DialogBase";
 import * as J from "../JavaIntf";
 import { S } from "../Singletons";
 
-interface LS {
+interface LS { // Local State
     info: string;
     binQuota: number;
     binTotal: number;

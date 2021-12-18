@@ -15,7 +15,7 @@ import { S } from "../Singletons";
 import { ConfirmDlg } from "./ConfirmDlg";
 import { MediaRecorderDlg } from "./MediaRecorderDlg";
 
-interface LS {
+interface LS { // Local State
 }
 
 export class UploadFromFileDropzoneDlg extends DialogBase {

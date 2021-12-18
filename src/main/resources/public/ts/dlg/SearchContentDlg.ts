@@ -13,7 +13,7 @@ import { DialogBase } from "../DialogBase";
 import { S } from "../Singletons";
 import { ValidatedState } from "../ValidatedState";
 
-interface LS {
+interface LS { // Local State
     sortField?: string;
     requirePriority?: boolean;
     caseSensitive?: boolean;

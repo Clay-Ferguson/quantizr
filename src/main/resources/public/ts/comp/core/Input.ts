@@ -2,7 +2,7 @@ import { ReactNode } from "react";
 import { State } from "../../State";
 import { Comp } from "../base/Comp";
 
-interface LS {
+interface LS { // Local State
     value: string;
 }
 

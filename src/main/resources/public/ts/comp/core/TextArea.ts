@@ -6,7 +6,7 @@ import { Label } from "./Label";
 import { Span } from "./Span";
 import { TextareaTag } from "./TextareaTag";
 
-interface LS {
+interface LS { // Local State
     wordWrap: boolean;
 }
 

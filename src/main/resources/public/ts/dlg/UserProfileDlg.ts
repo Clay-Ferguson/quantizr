@@ -19,7 +19,7 @@ import { S } from "../Singletons";
 import { ValidatedState } from "../ValidatedState";
 import { UploadFromFileDropzoneDlg } from "./UploadFromFileDropzoneDlg";
 
-interface LS {
+interface LS { // Local State
     userProfile: J.UserProfile;
 }
 

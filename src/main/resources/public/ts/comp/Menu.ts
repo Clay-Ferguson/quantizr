@@ -2,7 +2,7 @@ import { ReactNode } from "react";
 import { CompIntf } from "./base/CompIntf";
 import { Div } from "../comp/core/Div";
 
-interface LS {
+interface LS { // Local State
     visible: boolean;
     disabled: boolean;
 }

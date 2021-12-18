@@ -1,6 +1,6 @@
 import { AppState } from "../AppState";
-import { Anchor } from "../comp/core/Anchor";
 import { CompIntf } from "../comp/base/CompIntf";
+import { Anchor } from "../comp/core/Anchor";
 import { Button } from "../comp/core/Button";
 import { ButtonBar } from "../comp/core/ButtonBar";
 import { Checkbox } from "../comp/core/Checkbox";
@@ -17,7 +17,7 @@ import { S } from "../Singletons";
 import { ValidatedState } from "../ValidatedState";
 import { MessageDlg } from "./MessageDlg";
 
-interface LS {
+interface LS { // Local State
     exportType: string;
     toIpfs?: boolean;
 }
@@ -28,7 +28,7 @@ export class ExportDlg extends DialogBase {
     saveToIpfsState: CompValueHolder<boolean> = new CompValueHolder<boolean>(this, "toIpfs");
 
     constructor(state: AppState, private node: NodeInfo) {
-        super("Export", null, false, state);
+        super("Export Node: " + node.id, null, false, state);
         this.mergeState<LS>({
             exportType: "zip"
             // toIpfs: false <--- set by 'saveToIpfsState'

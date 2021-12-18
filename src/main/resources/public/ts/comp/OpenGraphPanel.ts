@@ -9,7 +9,7 @@ import * as J from "../JavaIntf";
 import { S } from "../Singletons";
 import { TabDataIntf } from "../intf/TabDataIntf";
 
-interface LS {
+interface LS { // Local State
     og: J.OpenGraph;
     loading?: boolean;
 }

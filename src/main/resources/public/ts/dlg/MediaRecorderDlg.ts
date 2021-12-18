@@ -20,7 +20,7 @@ import { VideoPlayerDlg } from "./VideoPlayerDlg";
 
 declare var MediaRecorder;
 
-interface LS {
+interface LS { // Local State
     status?: string;
     recording?: boolean;
     audioInput?: string;

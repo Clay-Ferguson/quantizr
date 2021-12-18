@@ -8,7 +8,7 @@ import { Label } from "./Label";
 import { Span } from "./Span";
 import { ToggleIcon } from "./ToggleIcon";
 
-interface LS {
+interface LS { // Local State
     inputType?: string;
 }
 

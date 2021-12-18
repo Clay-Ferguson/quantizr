@@ -19,7 +19,7 @@ import { CompIntf } from "../base/CompIntf";
 //     return newValue;
 // };
 
-interface LS {
+interface LS { // Local State
     content?: string;
 }
 

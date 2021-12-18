@@ -7,7 +7,7 @@ import { ButtonBar } from "../comp/core/ButtonBar";
 import { Form } from "../comp/core/Form";
 import { NodeTypeListBox } from "../comp/NodeTypeListBox";
 
-interface LS {
+interface LS { // Local State
     selType: string;
 }
 

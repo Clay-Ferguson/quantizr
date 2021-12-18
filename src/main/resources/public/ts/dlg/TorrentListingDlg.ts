@@ -10,7 +10,7 @@ import { S } from "../Singletons";
 import { AudioPlayerDlg } from "./AudioPlayerDlg";
 import { VideoPlayerDlg } from "./VideoPlayerDlg";
 
-interface LS {
+interface LS { // Local State
     done?: boolean;
     files?: any[];
     noSeeders?: boolean;

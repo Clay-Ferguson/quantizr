@@ -43,7 +43,7 @@ import { FriendsDlg } from "./FriendsDlg";
 import { UploadFromFileDropzoneDlg } from "./UploadFromFileDropzoneDlg";
 import { SymKeyDataPackage } from "../SymKeyDataPackage";
 
-interface LS {
+interface LS { // Local State
     node?: J.NodeInfo;
     selectedProps?: Set<string>;
     toIpfs?: boolean;

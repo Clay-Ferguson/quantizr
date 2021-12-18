@@ -6,7 +6,7 @@ import { TextContent } from "../comp/core/TextContent";
 import { DialogBase } from "../DialogBase";
 import { S } from "../Singletons";
 
-interface LS {
+interface LS { // Local State
     keyJson: string;
 }
 

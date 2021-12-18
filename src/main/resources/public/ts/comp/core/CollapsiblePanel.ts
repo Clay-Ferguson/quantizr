@@ -1,7 +1,7 @@
 import { ReactNode } from "react";
 import { Comp } from "../base/Comp";
 
-interface LS {
+interface LS { // Local State
     expanded?: boolean;
 }
 

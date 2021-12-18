@@ -6,7 +6,7 @@ import { CompIntf } from "./base/CompIntf";
 import { Div } from "./core/Div";
 import { HorizontalLayout } from "./core/HorizontalLayout";
 
-interface LS {
+interface LS { // Local State
     idx?: number;
     counter?: number;
 }
