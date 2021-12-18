@@ -15,7 +15,7 @@ export class SpeechRecog {
             this.recognition = new SpeechRecognition();
         }
         else if (webkitSpeechRecognition) {
-            // todo-1: fix linter rule to make this cleaner (the first letter upper case is the issue here)
+            // todo-2: fix linter rule to make this cleaner (the first letter upper case is the issue here)
             let WebkitSpeechRecognition = webkitSpeechRecognition;
             this.recognition = new WebkitSpeechRecognition();
         }

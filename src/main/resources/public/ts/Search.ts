@@ -160,7 +160,6 @@ export class Search {
     }
 
     removeNodeById = (id: string, state: AppState) => {
-        // todo-1: we could do this a more polymorphic way and delegate deleting to each results view type.
         state.tabData.forEach((td: TabDataIntf) => {
 
             // for normal resultsets

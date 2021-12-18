@@ -960,7 +960,7 @@ export class EditNodeDlg extends DialogBase {
                 let propState = this.propStates.get(prop.name);
                 if (propState) {
 
-                    // hack to store dates as numeric prop (todo-1: need a systematic way to assign JSON types to properties)
+                    // hack to store dates as numeric prop (todo-2: need a systematic way to assign JSON types to properties)
                     if (prop.name === J.NodeProp.DATE && (typeof propState.getValue() === "string")) {
                         try {
                             prop.value = parseInt(propState.getValue());
@@ -1045,7 +1045,7 @@ export class EditNodeDlg extends DialogBase {
         // WARNING: propState.setValue() calls will have been done in initStates, and should NOT be set here, because this can run during render callstacks
         // which is not a valid time to be updating states
 
-        // todo-1: actually this is wrong to just do a Textarea when it's readonly. It might be a non-multiline item here
+        // todo-2: actually this is wrong to just do a Textarea when it's readonly. It might be a non-multiline item here
         // and be better with a Textfield based editor
         if (!allowEditAllProps && isReadOnly) {
             let textarea = new TextArea(label + " (read-only)", {
