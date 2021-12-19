@@ -252,8 +252,13 @@ public class UserFeedService {
 
 		HashSet<ObjectId> blockedUserIds = new HashSet<>();
 
+		// this logic makes it so that any feeds using 'public' checkbox will have the admin-blocked users removed from it.
+		if (req.getToPublic()) {
+			getBlockedUserIds(blockedUserIds, PrincipalName.ADMIN.s());
+		}
+
 		// Add criteria for blocking users using the 'not in' list (nin)
-		getBlockedUserIds(blockedUserIds);
+		getBlockedUserIds(blockedUserIds, null);
 		if (blockedUserIds.size() > 0) {
 			criteria = criteria.and(SubNode.OWNER).nin(blockedUserIds);
 		}
@@ -356,9 +361,13 @@ public class UserFeedService {
 		return res;
 	}
 
-	public void getBlockedUserIds(HashSet<ObjectId> set) {
+	/*
+	 * Blocked from the perspective of 'userName', and a null userName here indicates, current session
+	 * user.
+	 */
+	public void getBlockedUserIds(HashSet<ObjectId> set, String userName) {
 		arun.run(ms -> {
-			List<SubNode> nodeList = user.getSpecialNodesList(ms, NodeType.BLOCKED_USERS.s(), null, false);
+			List<SubNode> nodeList = user.getSpecialNodesList(ms, NodeType.BLOCKED_USERS.s(), userName, false);
 			if (no(nodeList))
 				return null;
 
