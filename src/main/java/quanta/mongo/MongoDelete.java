@@ -16,6 +16,7 @@ import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Component;
 import quanta.model.client.NodeProp;
+import quanta.model.client.NodeType;
 import quanta.mongo.model.SubNode;
 import quanta.service.AttachmentService;
 
@@ -66,6 +67,30 @@ public class MongoDelete {
 
 		DeleteResult res = ops.remove(query, SubNode.class);
 		log.debug("Num abandoned nodes deleted: " + res.getDeletedCount());
+	}
+
+	public void removeFriendConstraintViolations(MongoSession ms) {
+		Query query = new Query();
+
+		// query for all FRIEND nodes (will represent both blocks and friends)
+		Criteria criteria = Criteria.where(SubNode.TYPE).is(NodeType.FRIEND.s());
+		query.addCriteria(criteria);
+
+		HashSet<String> keys = new HashSet<>();
+
+		Iterable<SubNode> nodes = mongoUtil.find(query);
+		for (SubNode node : nodes) {
+			if (no(node.getOwner())) continue;
+
+			String key = node.getOwner().toHexString() + "-" + node.getStr(NodeProp.USER_NODE_ID.s());
+			if (keys.contains(key)) {
+				delete(node);
+			} else {
+				keys.add(key);
+			}
+		}
+
+		update.saveSession(ms);
 	}
 
 	/**

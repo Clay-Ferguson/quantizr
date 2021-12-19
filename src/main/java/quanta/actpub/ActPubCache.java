@@ -8,6 +8,7 @@ import quanta.mongo.model.SubNode;
 /**
  * Holds all the global caches related to AP
  */
+// @Lazy
 @Component
 public class ActPubCache {
     /*

@@ -515,8 +515,19 @@ public class MongoUtil {
 		// dropIndex(session, SubNode.class, "unique-apid");
 		createPartialUniqueIndex(ms, "unique-apid", SubNode.class, SubNode.PROPERTIES + "." + NodeProp.ACT_PUB_ID.s() + ".value");
 
+		// DO NOT DELETE:
+		// This is a good example of how to cleanup the DB of all constraint violations prior to adding some new constraint.
+		// And this one was for making sure the "UniqueFriends" Index could be built ok. You can't create such an index until
+		// violations of it are already removed.
+		// delete.removeFriendConstraintViolations(ms);
+		
 		createUniqueFriendsIndex(ms);
 		createUniqueNodeNameIndex(ms);
+		
+		// I had done this temporarily to fix a constraint violation 
+		// Leaving fow now.
+		// dropIndex(ms, SubNode.class, "unique-friends");
+		// dropIndex(ms, SubNode.class, "unique-node-name");
 
 		/*
 		 * NOTE: Every non-admin owned noded must have only names that are prefixed with "UserName--" of the
@@ -532,6 +543,8 @@ public class MongoUtil {
 		createTextIndexes(ms, SubNode.class);
 
 		logIndexes(ms, SubNode.class);
+
+		log.debug("finished checking all indexes.");
 	}
 
 	/*
@@ -582,10 +595,14 @@ public class MongoUtil {
 	}
 
 	public void dropIndex(MongoSession ms, Class<?> clazz, String indexName) {
-		auth.requireAdmin(ms);
-		log.debug("Dropping index: " + indexName);
-		update.saveSession(ms);
-		ops.indexOps(clazz).dropIndex(indexName);
+		try {
+			auth.requireAdmin(ms);
+			log.debug("Dropping index: " + indexName);
+			update.saveSession(ms);
+			ops.indexOps(clazz).dropIndex(indexName);
+		} catch (Exception e) {
+			//ignoring for not (todo-0)
+		}
 	}
 
 	public void logIndexes(MongoSession ms, Class<?> clazz) {

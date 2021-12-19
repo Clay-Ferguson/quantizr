@@ -9,6 +9,8 @@ import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.context.ApplicationEventPublisherAware;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.mapping.event.AbstractMongoEventListener;
@@ -18,7 +20,6 @@ import org.springframework.data.mongodb.core.mapping.event.AfterSaveEvent;
 import org.springframework.data.mongodb.core.mapping.event.BeforeDeleteEvent;
 import org.springframework.data.mongodb.core.mapping.event.BeforeSaveEvent;
 import org.springframework.stereotype.Component;
-import quanta.actpub.ActPubService;
 import quanta.config.NodePath;
 import quanta.mongo.model.SubNode;
 import quanta.util.SubNodeUtil;
@@ -30,7 +31,7 @@ import quanta.util.XString;
  * persistence (reads/writes) of the MongoDB objects.
  */
 @Component
-public class MongoEventListener extends AbstractMongoEventListener<SubNode> {
+public class MongoEventListener extends AbstractMongoEventListener<SubNode> implements ApplicationEventPublisherAware {
 	private static final Logger log = LoggerFactory.getLogger(MongoEventListener.class);
 	private static final boolean verbose = false;
 
@@ -48,15 +49,19 @@ public class MongoEventListener extends AbstractMongoEventListener<SubNode> {
 
 	@Autowired
 	@Lazy
-	private ActPubService actPub;
-
-	@Autowired
-	@Lazy
 	private MongoUtil mongoUtil;
 
 	@Autowired
 	@Lazy
 	private SubNodeUtil snUtil;
+
+	// NOT autowired.
+	private ApplicationEventPublisher publisher;
+
+	@Override
+	public void setApplicationEventPublisher(ApplicationEventPublisher publisher) {
+		this.publisher = publisher;
+	}
 
 	/**
 	 * What we are doing in this method is assigning the ObjectId ourselves, because our path must
@@ -214,7 +219,7 @@ public class MongoEventListener extends AbstractMongoEventListener<SubNode> {
 		// log.debug("onAfterLoad: id=" + id);
 
 		// if (ThreadLocals.hasDirtyNode(dbObj.getObjectId(SubNode.ID))) {
-		// 	log.error("WARNING: DIRTY READ: " + id);
+		// log.error("WARNING: DIRTY READ: " + id);
 		// }
 	}
 
@@ -234,7 +239,7 @@ public class MongoEventListener extends AbstractMongoEventListener<SubNode> {
 		// nodes from the DB will pick up the dirty ones (already in memory) and substitute those
 		// into the result sets.
 		// if (ThreadLocals.hasDirtyNode(node.getId())) {
-		// 	log.error("WARNING: DIRTY READ: " + node.getIdStr());
+		// log.error("WARNING: DIRTY READ: " + node.getIdStr());
 		// }
 
 		ThreadLocals.cacheNode(node);
@@ -242,6 +247,8 @@ public class MongoEventListener extends AbstractMongoEventListener<SubNode> {
 
 	@Override
 	public void onBeforeDelete(BeforeDeleteEvent<SubNode> event) {
+		if (!MongoRepository.fullInit)
+			return;
 		Document doc = event.getDocument();
 
 		if (ok(doc)) {
@@ -254,8 +261,11 @@ public class MongoEventListener extends AbstractMongoEventListener<SubNode> {
 					ThreadLocals.clean(node);
 				}
 				// because nodes can be orphaned, we clear the entire cache any time any nodes are deleted
+				// Actually we could iterate over the cache here, and remove all that start with the 'path'
+				// of the node we just deleted becase only THOSE will now be gone. todo-0
 				ThreadLocals.clearCachedNodes();
-				actPub.deleteNodeNotify((ObjectId) id);
+
+				publisher.publishEvent(new MongoDeleteEvent(id));
 			}
 		}
 	}

@@ -12,7 +12,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.Executor;
 import javax.servlet.http.HttpServletRequest;
-import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -87,7 +86,9 @@ public class ActPubService {
     protected ActPubCrypto apCrypto;
 
     @Autowired
-    @Lazy
+    // @Lazy
+    // was getting in this class with apCache non null but having null props?????? Troubleshooting without lazy.
+    // Lazy WAS wrong here anyway, too...but I need to solve the mystery. todo-0
     public ActPubCache apCache;
 
     @Autowired
@@ -1063,29 +1064,6 @@ public class ActPubService {
     }
 
     /*
-     * Every node getting deleted will call into here (via a hook in MongoEventListener), so we can do
-     * whatever we need to in this hook, which for now is just used to manage unfollowing a Friend if a
-     * friend is deleted, but later will also entail (todo-1) deleting nodes that were posted to foreign
-     * servers by posting an 'undo' action to the foreign servers
-     */
-    public void deleteNodeNotify(ObjectId nodeId) {
-        arun.run(session -> {
-            SubNode node = read.getNode(session, nodeId);
-            if (ok(node) && node.getType().equals(NodeType.FRIEND.s())) {
-                String friendUserName = node.getStr(NodeProp.USER.s());
-                if (ok(friendUserName)) {
-                    // if a foreign user, update thru ActivityPub
-                    if (friendUserName.contains("@")) {
-                        String followerUser = ThreadLocals.getSC().getUserName();
-                        apFollowing.setFollowing(followerUser, friendUserName, false);
-                    }
-                }
-            }
-            return null;
-        });
-    }
-
-    /*
      * Be careful, becasue any user you queue into here will have their outbox loaded into Quanta, and
      * it's easy to set off a chain reaction where more users keep comming in like a FediCrawler
      */
@@ -1111,6 +1089,16 @@ public class ActPubService {
         // lazy job of detecting garbage names
         if (name.indexOf("\n") != -1 || name.indexOf("\r") != -1 || name.indexOf("\t") != -1)
             return false;
+
+        if (no(apCache)) {
+            log.debug("apCache null in saveFediverseName");
+            return false;
+        }
+
+        if (no(apCache.allUserNames)) {
+            log.debug("apCache.allUserNames null in saveFediverseName");
+            return false;
+        }
 
         if (!apCache.allUserNames.contains(name)) {
             apCache.allUserNames.put(name, false);

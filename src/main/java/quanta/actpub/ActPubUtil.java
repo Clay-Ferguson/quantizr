@@ -21,9 +21,11 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.lang3.StringUtils;
+import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationListener;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -40,10 +42,15 @@ import quanta.actpub.model.APList;
 import quanta.actpub.model.APObj;
 import quanta.config.AppProp;
 import quanta.model.client.NodeProp;
+import quanta.model.client.NodeType;
+import quanta.mongo.AdminRun;
+import quanta.mongo.MongoDeleteEvent;
 import quanta.mongo.MongoAuth;
 import quanta.mongo.MongoRead;
+import quanta.mongo.MongoRepository;
 import quanta.mongo.MongoSession;
 import quanta.mongo.model.SubNode;
+import quanta.util.ThreadLocals;
 import quanta.util.Util;
 import quanta.util.XString;
 
@@ -52,7 +59,7 @@ import quanta.util.XString;
  */
 @Lazy
 @Component
-public class ActPubUtil {
+public class ActPubUtil implements ApplicationListener<MongoDeleteEvent> {
     private static final Logger log = LoggerFactory.getLogger(ActPubUtil.class);
 
     @Autowired
@@ -60,8 +67,12 @@ public class ActPubUtil {
     protected ActPubCrypto apCrypto;
 
     @Autowired
-    @Lazy
+    // @Lazy
     public ActPubCache apCache;
+
+    @Autowired
+    @Lazy
+    protected ActPubFollowing apFollowing;
 
     @Autowired
     @Lazy
@@ -82,6 +93,10 @@ public class ActPubUtil {
     @Autowired
     @Lazy
     protected MongoRead read;
+
+    @Autowired
+    @Lazy
+    protected AdminRun arun;
 
     /*
      * RestTemplate is thread-safe and reusable, and has no state, so we need only one final static
@@ -734,5 +749,34 @@ public class ActPubUtil {
         if (prop.isApLog()) {
             log.trace(message);
         }
+    }
+
+ /*
+     * Every node getting deleted will call into here (via a hook in MongoEventListener), so we can do
+     * whatever we need to in this hook, which for now is just used to manage unfollowing a Friend if a
+     * friend is deleted, but later will also entail (todo-1) deleting nodes that were posted to foreign
+     * servers by posting an 'undo' action to the foreign servers
+     */
+    public void deleteNodeNotify(ObjectId nodeId) {
+        if (!MongoRepository.fullInit) return;
+        arun.run(session -> {
+            SubNode node = read.getNode(session, nodeId);
+            if (ok(node) && node.getType().equals(NodeType.FRIEND.s())) {
+                String friendUserName = node.getStr(NodeProp.USER.s());
+                if (ok(friendUserName)) {
+                    // if a foreign user, update thru ActivityPub
+                    if (friendUserName.contains("@")) {
+                        String followerUser = ThreadLocals.getSC().getUserName();
+                        apFollowing.setFollowing(followerUser, friendUserName, false);
+                    }
+                }
+            }
+            return null;
+        });
+    }
+
+    @Override
+    public void onApplicationEvent(MongoDeleteEvent event) {
+        deleteNodeNotify((ObjectId) event.getSource());
     }
 }
