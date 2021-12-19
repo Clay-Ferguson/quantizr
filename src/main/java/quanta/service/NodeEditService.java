@@ -154,7 +154,7 @@ public class NodeEditService {
 
 		boolean linkBookmark = "linkBookmark".equals(req.getPayloadType());
 		String nodeId = req.getNodeId();
-		boolean makePublic = false;
+		boolean makePublicWritable = false;
 		SubNode node = null;
 
 		/*
@@ -167,7 +167,7 @@ public class NodeEditService {
 
 			if (ok(node)) {
 				nodeId = node.getIdStr();
-				makePublic = true;
+				makePublicWritable = true;
 			}
 		}
 
@@ -211,6 +211,11 @@ public class NodeEditService {
 			newNode.set(NodeProp.TYPE_LOCK.s(), Boolean.valueOf(true));
 		}
 
+		// If we're inserting a node under the POSTS it should be public, rather than inherit.
+		if (node.isType(NodeType.POSTS)) {
+			makePublicWritable = true;
+		}
+
 		// if a user to share to (a Direct Message) is provided, add it.
 		if (ok(req.getShareToUserId())) {
 			HashMap<String, AccessControl> ac = new HashMap<>();
@@ -218,7 +223,7 @@ public class NodeEditService {
 			newNode.setAc(ac);
 		}
 		// else maybe public.
-		else if (makePublic) {
+		else if (makePublicWritable) {
 			acl.addPrivilege(ms, newNode, PrincipalName.PUBLIC.s(),
 					Arrays.asList(PrivilegeType.READ.s(), PrivilegeType.WRITE.s()), null);
 		}
@@ -338,8 +343,15 @@ public class NodeEditService {
 			mongoUtil.setPendingPath(newNode, true);
 		}
 
-		// we always copy the access controls from the parent for any new nodes
-		auth.setDefaultReplyAcl(null, parentNode, newNode);
+		// If we're inserting a node under the POSTS it should be public, rather than inherit.
+		// todo-0: some logic shold be common between this insertNode() and the createSubNode() 
+		if (parentNode.isType(NodeType.POSTS)) {
+			acl.addPrivilege(ms, newNode, PrincipalName.PUBLIC.s(),
+					Arrays.asList(PrivilegeType.READ.s(), PrivilegeType.WRITE.s()), null);
+		} else {
+			// we always copy the access controls from the parent for any new nodes
+			auth.setDefaultReplyAcl(null, parentNode, newNode);
+		}
 
 		update.save(ms, newNode);
 		res.setNewNode(convert.convertToNodeInfo(ThreadLocals.getSC(), ms, newNode, true, false, -1, false, false, false, false));

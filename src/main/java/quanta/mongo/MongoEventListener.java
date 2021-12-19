@@ -262,7 +262,7 @@ public class MongoEventListener extends AbstractMongoEventListener<SubNode> impl
 				}
 				// because nodes can be orphaned, we clear the entire cache any time any nodes are deleted
 				// Actually we could iterate over the cache here, and remove all that start with the 'path'
-				// of the node we just deleted becase only THOSE will now be gone. todo-0
+				// of the node we just deleted becase only THOSE will now be gone. todo-2
 				ThreadLocals.clearCachedNodes();
 
 				publisher.publishEvent(new MongoDeleteEvent(id));

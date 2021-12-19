@@ -87,8 +87,6 @@ public class ActPubService {
 
     @Autowired
     // @Lazy
-    // was getting in this class with apCache non null but having null props?????? Troubleshooting without lazy.
-    // Lazy WAS wrong here anyway, too...but I need to solve the mystery. todo-0
     public ActPubCache apCache;
 
     @Autowired
