@@ -47,6 +47,7 @@ import quanta.config.SpringContextUtil;
 import quanta.exception.base.RuntimeEx;
 import quanta.mail.EmailSender;
 import quanta.model.client.NodeProp;
+import quanta.model.client.NodeType;
 import quanta.model.client.PrincipalName;
 import quanta.mongo.AdminRun;
 import quanta.mongo.MongoRead;
@@ -1349,7 +1350,7 @@ public class AppController implements ErrorController {
 	public @ResponseBody Object deleteFriend(@RequestBody DeleteFriendRequest req, HttpSession session) {
 		SessionContext.checkReqToken();
 		return callProc.run("deleteFriend", req, session, ms -> {
-			return user.deleteFriend(ms, req);
+			return user.deleteFriend(ms, req, NodeType.FRIEND_LIST.s());
 		});
 	}
 
@@ -1358,6 +1359,14 @@ public class AppController implements ErrorController {
 		SessionContext.checkReqToken();
 		return callProc.run("blockUser", req, session, ms -> {
 			return user.blockUser(ms, req);
+		});
+	}
+
+	@RequestMapping(value = API_PATH + "/unblockUser", method = RequestMethod.POST)
+	public @ResponseBody Object unblockUser(@RequestBody DeleteFriendRequest req, HttpSession session) {
+		SessionContext.checkReqToken();
+		return callProc.run("unblockUser", req, session, ms -> {
+			return user.deleteFriend(ms, req, NodeType.BLOCKED_USERS.s());
 		});
 	}
 

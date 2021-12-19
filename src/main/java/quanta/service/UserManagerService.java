@@ -761,14 +761,14 @@ public class UserManagerService {
 		return res;
 	}
 
-	public DeleteFriendResponse deleteFriend(MongoSession ms, DeleteFriendRequest req) {
+	public DeleteFriendResponse deleteFriend(MongoSession ms, DeleteFriendRequest req, String parentType) {
 		// apUtil.log("deleteFriend request: " + XString.prettyPrint(req));
 		DeleteFriendResponse res = new DeleteFriendResponse();
 		ms = ThreadLocals.ensure(ms);
 
 		// This loop over friendNodes could be done all in a single delete query command, but for now let's
 		// just do the delete this way using our existing methods.
-		List<SubNode> friendNodes = getSpecialNodesList(ms, NodeType.FRIEND_LIST.s(), null, true);
+		List<SubNode> friendNodes = getSpecialNodesList(ms, parentType, null, true);
 		if (ok(friendNodes)) {
 			for (SubNode friendNode : friendNodes) {
 				// the USER_NODE_ID property on friends nodes contains the actual account ID of this friend.

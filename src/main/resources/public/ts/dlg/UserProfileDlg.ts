@@ -72,7 +72,11 @@ export class UserProfileDlg extends DialogBase {
                 // (is this still true?)
                 new Div(null, { className: "marginBottom" }, [
                     new Div(null, { className: "float-end" }, [
-                        state.userProfile.blocked ? new Span("BLOCKED", { className: "blockingText" }) : null,
+                        state.userProfile.blocked ? new Span("You Blocked", {
+                            className: "blockingText",
+                            onClick: this.unblockUser,
+                            title: "Click to Unblock user"
+                        }) : null,
                         state.userProfile.following ? new Span("You Follow", {
                             className: "followingText",
                             onClick: this.deleteFriend,
@@ -152,6 +156,13 @@ export class UserProfileDlg extends DialogBase {
 
     deleteFriend = async () => {
         let res: J.DeleteFriendResponse = await S.util.ajax<J.DeleteFriendRequest, J.DeleteFriendResponse>("deleteFriend", {
+            userNodeId: this.userNodeId
+        });
+        this.reload(this.userNodeId);
+    }
+
+    unblockUser = async () => {
+        let res: J.DeleteFriendResponse = await S.util.ajax<J.DeleteFriendRequest, J.DeleteFriendResponse>("unblockUser", {
             userNodeId: this.userNodeId
         });
         this.reload(this.userNodeId);

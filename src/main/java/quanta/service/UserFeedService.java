@@ -198,8 +198,8 @@ public class UserFeedService {
 		List<Criteria> orCriteria = new LinkedList<>();
 
 		/*
-		 * 2: should the 'friends' and 'public' options be mutually exclusive?? If someone's looking
-		 * for all public nodes why "OR" into that any friends?
+		 * 2: should the 'friends' and 'public' options be mutually exclusive?? If someone's looking for all
+		 * public nodes why "OR" into that any friends?
 		 */
 		if (!testQuery && doAuth && req.getToPublic()) {
 			orCriteria.add(Criteria.where(SubNode.AC + "." + PrincipalName.PUBLIC.s()).ne(null));
@@ -364,6 +364,7 @@ public class UserFeedService {
 
 			for (SubNode node : nodeList) {
 				String userNodeId = node.getStr(NodeProp.USER_NODE_ID.s());
+				// log.debug("BLOCKED: " + userNodeId);
 				ObjectId oid = new ObjectId(userNodeId);
 				set.add(oid);
 			}
