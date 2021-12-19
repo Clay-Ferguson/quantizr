@@ -737,6 +737,18 @@ public class UserManagerService {
 		 */
 		SubNode userNode = read.findNodeByUserAndType(ms, blockedList, req.getUserName(), NodeType.FRIEND.s());
 		if (no(userNode)) {
+			SubNode accntNode = arun.run(s -> {
+				return read.getUserNodeByUserName(s, req.getUserName());
+			});
+
+			if (no(accntNode))
+				throw new RuntimeException("User not found.");
+
+			// We can't have both a FRIEND and a BLOCK so remove the friend. There's also a unique constring on
+			// the DB enforcing this.
+			deleteFriend(ms, accntNode.getIdStr(), NodeType.FRIEND_LIST.s());
+			update.saveSession(ms);
+
 			userNode = edit.createFriendNode(ms, blockedList, req.getUserName());
 			if (ok(userNode)) {
 				res.setMessage(
@@ -746,7 +758,6 @@ public class UserManagerService {
 			}
 
 			edit.updateSavedFriendNode(userNode);
-
 			res.setSuccess(true);
 		} else {
 			/*
@@ -761,7 +772,7 @@ public class UserManagerService {
 		return res;
 	}
 
-	public DeleteFriendResponse deleteFriend(MongoSession ms, DeleteFriendRequest req, String parentType) {
+	public DeleteFriendResponse deleteFriend(MongoSession ms, String delUserNodeId, String parentType) {
 		// apUtil.log("deleteFriend request: " + XString.prettyPrint(req));
 		DeleteFriendResponse res = new DeleteFriendResponse();
 		ms = ThreadLocals.ensure(ms);
@@ -773,7 +784,7 @@ public class UserManagerService {
 			for (SubNode friendNode : friendNodes) {
 				// the USER_NODE_ID property on friends nodes contains the actual account ID of this friend.
 				String userNodeId = friendNode.getStr(NodeProp.USER_NODE_ID);
-				if (req.getUserNodeId().equals(userNodeId)) {
+				if (delUserNodeId.equals(userNodeId)) {
 					delete.delete(ms, friendNode, false);
 				}
 			}
@@ -821,20 +832,22 @@ public class UserManagerService {
 				apUtil.log("loadForeignUser: " + newUserName);
 				apub.loadForeignUser(newUserName);
 
+				SubNode userNode = arun.run(s -> {
+					return read.getUserNodeByUserName(s, newUserName);
+				});
+
+				if (no(userNode))
+					return;
+
+				// We can't have both a FRIEND and a BLOCK so remove the friend. There's also a unique constring on
+				// the DB enforcing this.
+				deleteFriend(mst, userNode.getIdStr(), NodeType.BLOCKED_USERS.s());
+
 				apUtil.log("Creating friendNode for " + newUserName);
 				friendNode = edit.createFriendNode(mst, followerFriendList, newUserName);
 
 				if (ok(friendNode)) {
-					Val<SubNode> userNode = new Val<SubNode>();
-					arun.run(s -> {
-						userNode.setVal(read.getUserNodeByUserName(s, newUserName));
-						return null;
-					});
-
-					if (ok(userNode.getVal())) {
-						friendNode.set(NodeProp.USER_NODE_ID.s(), userNode.getVal().getIdStr());
-					}
-
+					friendNode.set(NodeProp.USER_NODE_ID.s(), userNode.getIdStr());
 					edit.updateSavedFriendNode(friendNode);
 
 					// todo-2: eventually we can have a design that pushes these results back to the browser async

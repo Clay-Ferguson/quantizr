@@ -1350,7 +1350,7 @@ public class AppController implements ErrorController {
 	public @ResponseBody Object deleteFriend(@RequestBody DeleteFriendRequest req, HttpSession session) {
 		SessionContext.checkReqToken();
 		return callProc.run("deleteFriend", req, session, ms -> {
-			return user.deleteFriend(ms, req, NodeType.FRIEND_LIST.s());
+			return user.deleteFriend(ms, req.getUserNodeId(), NodeType.FRIEND_LIST.s());
 		});
 	}
 
@@ -1366,7 +1366,7 @@ public class AppController implements ErrorController {
 	public @ResponseBody Object unblockUser(@RequestBody DeleteFriendRequest req, HttpSession session) {
 		SessionContext.checkReqToken();
 		return callProc.run("unblockUser", req, session, ms -> {
-			return user.deleteFriend(ms, req, NodeType.BLOCKED_USERS.s());
+			return user.deleteFriend(ms, req.getUserNodeId(), NodeType.BLOCKED_USERS.s());
 		});
 	}
 
