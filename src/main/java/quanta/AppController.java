@@ -42,6 +42,7 @@ import quanta.actpub.ActPubFollower;
 import quanta.actpub.ActPubFollowing;
 import quanta.actpub.ActPubService;
 import quanta.config.AppProp;
+import quanta.config.GracefulShutdown;
 import quanta.config.SessionContext;
 import quanta.config.SpringContextUtil;
 import quanta.exception.base.RuntimeEx;
@@ -268,6 +269,13 @@ public class AppController implements ErrorController {
 
 	@Autowired
 	private CallProcessor callProc;
+
+	@Autowired
+	private GracefulShutdown gracefulShutdown;
+
+	@Autowired
+	@Lazy
+	private AppProp appProp;
 
 	public static final String API_PATH = "/mobile/api";
 
@@ -1605,6 +1613,25 @@ public class AppController implements ErrorController {
 			String captcha = CaptchaMaker.createCaptchaString();
 			ThreadLocals.getSC().setCaptcha(captcha);
 			return CaptchaMaker.makeCaptcha(captcha);
+		});
+	}
+
+	/*
+	 * We have this because docker-compose stop seems to be incapable of sending a graceful termination
+	 * command to the app, so we'll just use curl from a shell script
+	 * 
+	 * So doing this request terminates the server: 
+	 * curl http://${quanta_domain}:${PORT}/mobile/api/shutdown?password=${adminPassword}
+	 */
+	@RequestMapping(value = API_PATH + "/shutdown", method = RequestMethod.GET)
+	public @ResponseBody String shutdown(HttpSession session,
+			@RequestParam(value = "password", required = true) String password) {
+		// NO NOT HERE -> SessionContext.checkReqToken();
+		return (String) callProc.run("shutdown", null, session, ms -> {
+			if (appProp.getMongoAdminPassword().equals(password)) {
+				gracefulShutdown.initiateShutdown(0);
+			}
+			return null;
 		});
 	}
 }

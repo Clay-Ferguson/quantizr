@@ -31,7 +31,6 @@ import quanta.filter.AppFilter;
 
 /**
  * Standard Spring WebMvcConfigurerAdapter-derived class.
-
  */
 @Configuration
 @EnableAsync
@@ -80,6 +79,7 @@ public class AppConfiguration implements WebMvcConfigurer {
 		executor = new ThreadPoolTaskExecutor();
 		executor.setCorePoolSize(20);
 		executor.setMaxPoolSize(45);
+		// executor.setAwaitTerminationSeconds(20);
 		// t.setAllowCoreThreadTimeOut(true);
 		// t.setKeepAliveSeconds(120);
 		return executor;
@@ -137,11 +137,6 @@ public class AppConfiguration implements WebMvcConfigurer {
 	// }
 
 	@Bean
-	public GracefulShutdown gracefulShutdown() {
-		return new GracefulShutdown();
-	}
-
-	@Bean
 	public ServletWebServerFactory servletContainer(GracefulShutdown gracefulShutdown) {
 		TomcatServletWebServerFactory factory = null;
 
@@ -164,6 +159,7 @@ public class AppConfiguration implements WebMvcConfigurer {
 		}
 
 		factory.addConnectorCustomizers(gracefulShutdown);
+		log.debug("GracefulShutdown configured.");
 		return factory;
 	}
 

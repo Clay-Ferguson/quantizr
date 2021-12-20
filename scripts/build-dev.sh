@@ -14,6 +14,13 @@ cd ${script_folder}
 # set -x
 source ./setenv-dev.sh
 
+echo "Stopping any existing server instance..."
+curl http://${quanta_domain}:${PORT}/mobile/api/shutdown?password=${adminPassword}
+
+# I think when this curl returns, there's no need to wait. it's done.
+# echo "waiting 30s for graceful shutdown."
+# sleep 30s
+
 makeDirs
 rm -rf ${QUANTA_BASE}/log/*
 

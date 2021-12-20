@@ -68,16 +68,20 @@ public class MongoRepository {
 		Runtime.getRuntime().addShutdownHook(new Thread(new Runnable() {
 			@Override
 			public void run() {
-				if (ok(instance)) {
-					log.debug("********** runtime shutdownHook executing. **********");
-					instance.close();
+				synchronized (lock) {
+					if (ok(instance)) {
+						log.debug("********** runtime shutdownHook executing. **********");
+						instance.close();
+					}
 				}
 			}
 		}));
 	}
 
+
 	@PreDestroy
 	public void preDestroy() {
+		log.debug("MongoRepository.preDestroy running.");
 		close();
 	}
 
