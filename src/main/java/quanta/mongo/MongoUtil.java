@@ -85,10 +85,6 @@ public class MongoUtil {
 
 	@Autowired
 	@Lazy
-	protected MongoUtil mongoUtil;
-
-	@Autowired
-	@Lazy
 	protected MongoAuth auth;
 
 	@Autowired
@@ -337,7 +333,7 @@ public class MongoUtil {
 			String path = node.getPath().replace(pendingPath, rootPath);
 
 			// and finally ensure we have an UNUSED (not duplicate) path
-			path = mongoUtil.findAvailablePath(path);
+			path = findAvailablePath(path);
 			node.setPath(path);
 		}
 	}

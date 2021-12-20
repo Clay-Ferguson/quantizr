@@ -16,7 +16,8 @@ import quanta.util.Val;
 public abstract class TypeBase {
     private static final Logger log = LoggerFactory.getLogger(TypeBase.class);
 
-    @PostConstruct
+    // For all @Lazy beans that need postConstruct to happen at app start time, it must be done manually.
+    // @PostConstruct
     public void postContruct() {
         TypePluginMgr.addType(this);
     }

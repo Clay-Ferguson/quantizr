@@ -83,15 +83,13 @@ export class NodeCompRowHeader extends Div {
         }));
 
         // Allow bookmarking any kind of node other than bookmark nodes.
-        // todo-0: noticed bug: bookmarked node is SHARED to the node being bookmarked's shares. Don't do that!
-        // disabling until this is fixed.
-        // if (!state.isAnonUser && node.type !== J.NodeType.BOOKMARK && node.type !== J.NodeType.BOOKMARK_LIST) {
-        //     children.push(new Icon({
-        //         className: "fa fa-bookmark fa-lg marginRight",
-        //         title: "Bookmark this Node",
-        //         onClick: () => S.edit.addBookmark(node, state)
-        //     }));
-        // }
+        if (!state.isAnonUser && node.type !== J.NodeType.BOOKMARK && node.type !== J.NodeType.BOOKMARK_LIST) {
+            children.push(new Icon({
+                className: "fa fa-bookmark fa-lg marginRight",
+                title: "Bookmark this Node",
+                onClick: () => S.edit.addBookmark(node, state)
+            }));
+        }
 
         let publicReadOnly = S.props.isPublicReadOnly(node);
         let actPubId = S.props.getNodePropVal(J.NodeProp.ACT_PUB_ID, node);
