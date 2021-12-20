@@ -59,10 +59,6 @@ public class MongoAuth {
 
 	@Autowired
 	@Lazy
-	protected MongoAuth auth;
-
-	@Autowired
-	@Lazy
 	protected MongoUpdate update;
 
 	@Autowired

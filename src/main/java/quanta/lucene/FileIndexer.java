@@ -69,7 +69,8 @@ import quanta.util.XString;
 // org.apache.commons.compress.compressors.deflate.DeflateCompressorInputStream;
 // org.apache.commons.compress.compressors.pack200.Pack200CompressorInputStream;
 // org.apache.commons.compress.compressors.zstandard.ZstdCompressorInputStream;
-@Lazy @Component
+@Lazy
+@Component
 public class FileIndexer {
 	private static final Logger log = LoggerFactory.getLogger(FileIndexer.class);
 

@@ -14,7 +14,8 @@ import quanta.util.ThreadLocals;
  * similar to what is also known as an AOP aspect, although not using an 'aspect' but mainly just a
  * Lambda (i.e. 'Functional Interface')
  */
-@Lazy @Component
+@Lazy
+@Component
 public class AdminRun {
 	private static final Logger log = LoggerFactory.getLogger(AdminRun.class);
 
@@ -35,12 +36,10 @@ public class AdminRun {
 			ThreadLocals.setMongoSession(ms = auth.getAdminSession());
 			ret = runner.run(ms);
 			update.saveSession(ms, true);
-		}
-		catch (Exception ex) {
+		} catch (Exception ex) {
 			log.error("error", ex);
 			throw ex;
-		}
-		finally {
+		} finally {
 			ThreadLocals.setMongoSession(savedMs);
 		}
 		return ret;

@@ -12,7 +12,8 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
-@Lazy @Component
+@Lazy
+@Component
 public class TestRunner {
 	private static final Logger log = LoggerFactory.getLogger(TestRunner.class);
 
@@ -23,8 +24,8 @@ public class TestRunner {
 	private AppProp appProp;
 
 	/*
-	 * I've removed JUnit (for now) so that we can alway test *only* in a full
-	 * environment and inside a docker container. on a *real* setup/instance.
+	 * I've removed JUnit (for now) so that we can alway test *only* in a full environment and inside a
+	 * docker container. on a *real* setup/instance.
 	 */
 	public void test() {
 		List<String> tests = appProp.getRunTests();

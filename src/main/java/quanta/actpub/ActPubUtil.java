@@ -76,10 +76,6 @@ public class ActPubUtil {
 
     @Autowired
     @Lazy
-    protected ActPubUtil apUtil;
-
-    @Autowired
-    @Lazy
     protected ActPubService apub;
 
     @Autowired
@@ -264,7 +260,7 @@ public class ActPubUtil {
     public void securePost(String userDoingPost, MongoSession ms, String privateKey, String toInbox, String actor, APObj message,
             MediaType acceptType) {
         try {
-            apUtil.log("Secure post to " + toInbox);
+            log("Secure post to " + toInbox);
             /* if private key not sent then get it using the session */
             if (no(privateKey)) {
                 privateKey = apCrypto.getPrivateKey(ms, userDoingPost);
@@ -276,7 +272,7 @@ public class ActPubUtil {
 
             String body = XString.prettyPrint(message);
             byte[] bodyBytes = body.getBytes(StandardCharsets.UTF_8);
-            apUtil.log("Posting Object:\n" + body);
+            log("Posting Object:\n" + body);
 
             byte[] privKeyBytes = Base64.getDecoder().decode(privateKey);
             KeyFactory kf = KeyFactory.getInstance("RSA");
@@ -498,7 +494,7 @@ public class ActPubUtil {
                                                     .put(APObj.type, APConst.CTYPE_ACT_JSON) //
                                                     .put(APObj.href, makeActorUrlForUserName(username))));
 
-                            apUtil.log("Reply with WebFinger: " + XString.prettyPrint(webFinger));
+                            log("Reply with WebFinger: " + XString.prettyPrint(webFinger));
                             return webFinger;
                         }
                     }

@@ -33,7 +33,8 @@ import quanta.util.StreamUtil;
  * order either by score or by date (rev chron)
  */
 // todo-2: make this a prototype-scope bean?
-@Lazy @Component
+@Lazy
+@Component
 public class FileSearcher {
 	private static final Logger log = LoggerFactory.getLogger(FileSearcher.class);
 
