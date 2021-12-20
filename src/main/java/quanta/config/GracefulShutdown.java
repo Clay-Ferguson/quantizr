@@ -13,6 +13,8 @@ import java.util.concurrent.TimeUnit;
 
 /**
  * Handles Tomcat shutdown
+ * 
+ * NOTE: This is a spring bean instantiated with @Bean elsewhere.
  */
 public class GracefulShutdown implements TomcatConnectorCustomizer, ApplicationListener<ContextClosedEvent> {
     private static final Logger log = LoggerFactory.getLogger(GracefulShutdown.class);

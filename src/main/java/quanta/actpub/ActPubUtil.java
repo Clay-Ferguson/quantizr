@@ -25,8 +25,8 @@ import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationListener;
 import org.springframework.context.annotation.Lazy;
+import org.springframework.context.event.EventListener;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -59,7 +59,7 @@ import quanta.util.XString;
  */
 @Lazy
 @Component
-public class ActPubUtil implements ApplicationListener<MongoDeleteEvent> {
+public class ActPubUtil { 
     private static final Logger log = LoggerFactory.getLogger(ActPubUtil.class);
 
     @Autowired
@@ -775,7 +775,7 @@ public class ActPubUtil implements ApplicationListener<MongoDeleteEvent> {
         });
     }
 
-    @Override
+    @EventListener
     public void onApplicationEvent(MongoDeleteEvent event) {
         deleteNodeNotify((ObjectId) event.getSource());
     }
