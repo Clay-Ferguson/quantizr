@@ -155,6 +155,7 @@ public class NodeEditService {
 		boolean linkBookmark = "linkBookmark".equals(req.getPayloadType());
 		String nodeId = req.getNodeId();
 		boolean makePublicWritable = false;
+		boolean allowSharing = true;
 		SubNode node = null;
 
 		/*
@@ -205,6 +206,9 @@ public class NodeEditService {
 
 		if (NodeType.BOOKMARK.s().equals(req.getTypeName())) {
 			newNode.set(NodeProp.TARGET_ID.s(), req.getNodeId());
+
+			// adding bookmark should disallow sharing.
+			allowSharing = false;
 		}
 
 		if (req.isTypeLock()) {
@@ -216,25 +220,27 @@ public class NodeEditService {
 			makePublicWritable = true;
 		}
 
-		// if a user to share to (a Direct Message) is provided, add it.
-		if (ok(req.getShareToUserId())) {
-			HashMap<String, AccessControl> ac = new HashMap<>();
-			ac.put(req.getShareToUserId(), new AccessControl(null, PrivilegeType.READ.s() + "," + PrivilegeType.WRITE.s()));
-			newNode.setAc(ac);
-		}
-		// else maybe public.
-		else if (makePublicWritable) {
-			acl.addPrivilege(ms, newNode, PrincipalName.PUBLIC.s(),
-					Arrays.asList(PrivilegeType.READ.s(), PrivilegeType.WRITE.s()), null);
-		}
-		// else add default sharing
-		else {
-			// we always determine the access controls from the parent for any new nodes
-			auth.setDefaultReplyAcl(null, node, newNode);
+		if (allowSharing) {
+			// if a user to share to (a Direct Message) is provided, add it.
+			if (ok(req.getShareToUserId())) {
+				HashMap<String, AccessControl> ac = new HashMap<>();
+				ac.put(req.getShareToUserId(), new AccessControl(null, PrivilegeType.READ.s() + "," + PrivilegeType.WRITE.s()));
+				newNode.setAc(ac);
+			}
+			// else maybe public.
+			else if (makePublicWritable) {
+				acl.addPrivilege(ms, newNode, PrincipalName.PUBLIC.s(),
+						Arrays.asList(PrivilegeType.READ.s(), PrivilegeType.WRITE.s()), null);
+			}
+			// else add default sharing
+			else {
+				// we always determine the access controls from the parent for any new nodes
+				auth.setDefaultReplyAcl(null, node, newNode);
 
-			String cipherKey = node.getStr(NodeProp.ENC_KEY.s());
-			if (ok(cipherKey)) {
-				res.setEncrypt(true);
+				String cipherKey = node.getStr(NodeProp.ENC_KEY.s());
+				if (ok(cipherKey)) {
+					res.setEncrypt(true);
+				}
 			}
 		}
 
@@ -343,14 +349,22 @@ public class NodeEditService {
 			mongoUtil.setPendingPath(newNode, true);
 		}
 
-		// If we're inserting a node under the POSTS it should be public, rather than inherit.
-		// todo-0: some logic shold be common between this insertNode() and the createSubNode() 
-		if (parentNode.isType(NodeType.POSTS)) {
-			acl.addPrivilege(ms, newNode, PrincipalName.PUBLIC.s(),
-					Arrays.asList(PrivilegeType.READ.s(), PrivilegeType.WRITE.s()), null);
-		} else {
-			// we always copy the access controls from the parent for any new nodes
-			auth.setDefaultReplyAcl(null, parentNode, newNode);
+		boolean allowSharing = true;
+		if (NodeType.BOOKMARK.s().equals(req.getTypeName())) {
+			// adding bookmark should disallow sharing.
+			allowSharing = false;
+		}
+
+		if (allowSharing) {
+			// If we're inserting a node under the POSTS it should be public, rather than inherit.
+			// todo-0: some logic shold be common between this insertNode() and the createSubNode()
+			if (parentNode.isType(NodeType.POSTS)) {
+				acl.addPrivilege(ms, newNode, PrincipalName.PUBLIC.s(),
+						Arrays.asList(PrivilegeType.READ.s(), PrivilegeType.WRITE.s()), null);
+			} else {
+				// we always copy the access controls from the parent for any new nodes
+				auth.setDefaultReplyAcl(null, parentNode, newNode);
+			}
 		}
 
 		update.save(ms, newNode);
