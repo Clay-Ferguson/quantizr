@@ -7,6 +7,9 @@ cd ${script_folder}
 
 source ./setenv-distro-runner.sh
 
+echo "Stopping any existing server instance..."
+curl http://${quanta_domain}:${PORT}/mobile/api/shutdown?password=${adminPassword}
+
 dockerDown quanta-distro
 dockerDown mongo-distro
 
