@@ -73,9 +73,17 @@ export class EditPrivsTableRow extends ListBoxRow {
                 img,
                 isPublic
                     ? new Heading(4, "Public")
-                    : new Span(displayName, { className: img ? "marginLeft" : "" }),
+                    : new Span(displayName, {
+                        className: "clickable " + (img ? "marginLeft" : ""),
+                        onClick: (evt: any) => {
+                            new UserProfileDlg(this.aclEntry.principalNodeId, appState(null)).open();
+                        }
+                    }),
                 descript
-                    ? new Span(descript)
+                    ? new Span(descript, {
+                        className: "clickable",
+                        onClick: (evt: any) => { new UserProfileDlg(this.aclEntry.principalNodeId, appState(null)).open(); }
+                    })
                     : null,
                 this.renderAclPrivileges(this.aclEntry)
             ])
