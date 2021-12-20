@@ -357,7 +357,7 @@ public class NodeEditService {
 
 		if (allowSharing) {
 			// If we're inserting a node under the POSTS it should be public, rather than inherit.
-			// todo-0: some logic shold be common between this insertNode() and the createSubNode()
+			// Note: some logic may be common between this insertNode() and the createSubNode()
 			if (parentNode.isType(NodeType.POSTS)) {
 				acl.addPrivilege(ms, newNode, PrincipalName.PUBLIC.s(),
 						Arrays.asList(PrivilegeType.READ.s(), PrivilegeType.WRITE.s()), null);

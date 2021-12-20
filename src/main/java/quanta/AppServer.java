@@ -90,9 +90,6 @@ public class AppServer {
 		// Note: See SpringContextUtil.java for more code that runs at startup time.
 	}
 
-	// todo-0: do this newer pattern everywhere we can for app eventing:
-	// https://www.baeldung.com/running-setup-logic-on-startup-in-spring
-	// Search code for ApplicationListener
 	@EventListener
 	public void handleContextRefresh(ContextRefreshedEvent event) {
 		log.info("ContextRefreshedEvent.");

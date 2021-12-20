@@ -42,6 +42,7 @@ public class GracefulShutdown implements TomcatConnectorCustomizer, ApplicationL
         SpringApplication.exit(appContext, () -> returnCode);
     }
 
+    // WARNING: Using @ApplicationEvent here doesn't work for some reason, so don't try that.
     @Override
     public void onApplicationEvent(ContextClosedEvent event) {
         log.debug("GracefulShudown: Pausing connector");
