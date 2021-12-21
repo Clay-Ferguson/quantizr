@@ -35,7 +35,7 @@ import quanta.util.ExUtil;
  * other.
  */
 // @EnableAutoConfiguration(exclude = {ErrorMvcAutoConfiguration.class})
-public class AppServer {
+public class AppServer { 
 	private static final Logger log = LoggerFactory.getLogger(AppServer.class);
 
 	@Autowired

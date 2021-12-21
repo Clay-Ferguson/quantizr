@@ -9,8 +9,6 @@ import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationEventPublisher;
-import org.springframework.context.ApplicationEventPublisherAware;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.mapping.event.AbstractMongoEventListener;
@@ -20,6 +18,7 @@ import org.springframework.data.mongodb.core.mapping.event.AfterSaveEvent;
 import org.springframework.data.mongodb.core.mapping.event.BeforeDeleteEvent;
 import org.springframework.data.mongodb.core.mapping.event.BeforeSaveEvent;
 import org.springframework.stereotype.Component;
+import quanta.EventPublisher;
 import quanta.config.NodePath;
 import quanta.mongo.model.SubNode;
 import quanta.util.SubNodeUtil;
@@ -33,7 +32,7 @@ import quanta.util.XString;
  * todo-0: put ApplicationEventPublisherAware in something like AppConfig and reference that from everywhere.
  */
 @Component
-public class MongoEventListener extends AbstractMongoEventListener<SubNode> implements ApplicationEventPublisherAware {
+public class MongoEventListener extends AbstractMongoEventListener<SubNode> { 
 	private static final Logger log = LoggerFactory.getLogger(MongoEventListener.class);
 	private static final boolean verbose = false;
 
@@ -57,13 +56,9 @@ public class MongoEventListener extends AbstractMongoEventListener<SubNode> impl
 	@Lazy
 	private SubNodeUtil snUtil;
 
-	// NOT autowired.
-	private ApplicationEventPublisher publisher;
-
-	@Override
-	public void setApplicationEventPublisher(ApplicationEventPublisher publisher) {
-		this.publisher = publisher;
-	}
+	@Autowired
+	@Lazy
+	private EventPublisher publisher;
 
 	/**
 	 * What we are doing in this method is assigning the ObjectId ourselves, because our path must
@@ -267,7 +262,7 @@ public class MongoEventListener extends AbstractMongoEventListener<SubNode> impl
 				// of the node we just deleted becase only THOSE will now be gone. todo-2
 				ThreadLocals.clearCachedNodes();
 
-				publisher.publishEvent(new MongoDeleteEvent(id));
+				publisher.getPublisher().publishEvent(new MongoDeleteEvent(id));
 			}
 		}
 	}

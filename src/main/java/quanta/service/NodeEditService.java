@@ -528,6 +528,7 @@ public class NodeEditService {
 				// don't send notifications when 'admin' is the one doing the editing.
 				&& !PrincipalName.ADMIN.s().equals(sessionUserName)) {
 
+			// todo-0: can we broadcast an even to cause this? ...and even invent a way to do async broadcast of events?
 			arun.run(s -> {
 				HashSet<Integer> sessionsPushed = new HashSet<>();
 
