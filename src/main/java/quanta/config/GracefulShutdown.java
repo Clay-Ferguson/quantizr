@@ -45,7 +45,7 @@ public class GracefulShutdown implements TomcatConnectorCustomizer, ApplicationL
     // WARNING: Using @ApplicationEvent here doesn't work for some reason, so don't try that.
     @Override
     public void onApplicationEvent(ContextClosedEvent event) {
-        log.debug("GracefulShudown: Pausing connector");
+        log.debug("GracefulShudown: ContextClosedEvent");
         this.connector.pause();
         Executor executor = this.connector.getProtocolHandler().getExecutor();
         if (executor instanceof ThreadPoolExecutor) {
@@ -53,8 +53,7 @@ public class GracefulShutdown implements TomcatConnectorCustomizer, ApplicationL
                 ThreadPoolExecutor threadPoolExecutor = (ThreadPoolExecutor) executor;
                 threadPoolExecutor.shutdown();
                 if (!threadPoolExecutor.awaitTermination(30, TimeUnit.SECONDS)) {
-                    log.warn("Tomcat thread pool did not shut down gracefully within "
-                            + "30 seconds. Proceeding with forceful shutdown");
+                    log.warn("Tomcat thread pool did not shut down gracefully within 30 seconds. Proceeding with forceful shutdown");
                 }
             } catch (InterruptedException ex) {
                 Thread.currentThread().interrupt();

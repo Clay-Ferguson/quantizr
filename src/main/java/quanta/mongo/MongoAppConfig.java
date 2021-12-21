@@ -113,14 +113,6 @@ public class MongoAppConfig extends AbstractMongoClientConfiguration {
 		return gridFsBucket;
 	}
 
-	// DO NOT DELETE YET:
-	// I changed this to use @Component on the class instead of this way
-	// and soon I can delete this old code, but will keep for now.
-	// @Bean
-	// public MongoEventListener userCascadingMongoEventListener() {
-	// 	return new MongoEventListener();
-	// }
-
 	@Override
 	public MongoClient mongoClient() {
 		if (connectionFailed)

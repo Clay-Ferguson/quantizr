@@ -136,22 +136,22 @@ public class MongoTest implements TestIntf {
 	}
 
 	public void authTest() {
-		MongoSession adminSession = asUser(PrincipalName.ADMIN.s());
+		MongoSession as = asUser(PrincipalName.ADMIN.s());
 
-		SubNode adminNode = read.getUserNodeByUserName(adminSession, PrincipalName.ADMIN.s());
+		SubNode adminNode = read.getUserNodeByUserName(as, PrincipalName.ADMIN.s());
 		if (no(adminNode)) {
 			throw new RuntimeEx("Unable to find admin user node.");
 		}
 
 		// root for all testing
-		SubNode testingRoot = create.createNode(adminSession, "/r/?");
+		SubNode testingRoot = create.createNode(as, "/r/?");
 		testingRoot.setContent("Root for Testing");
-		update.save(adminSession, testingRoot);
+		update.save(as, testingRoot);
 
 		// Insert a test node
-		SubNode adminsNode = create.createNode(adminSession, testingRoot.getPath() + "/?");
+		SubNode adminsNode = create.createNode(as, testingRoot.getPath() + "/?");
 		adminsNode.setContent("admin's test node " + System.currentTimeMillis());
-		update.save(adminSession, adminsNode);
+		update.save(as, adminsNode);
 		ObjectId insertedId = adminsNode.getId();
 		log.debug("admin inserted a node: " + insertedId.toString());
 
@@ -180,7 +180,7 @@ public class MongoTest implements TestIntf {
 			log.debug("Insecure root insert test.");
 			SubNode adamsNode = create.createNode(adamSession, testingRoot.getPath() + "/?");
 			adamsNode.setContent("adam's test node " + System.currentTimeMillis());
-			update.save(adminSession, adamsNode);
+			update.save(as, adamsNode);
 			throw new RuntimeException("allowed node in secure area");
 		} catch (NodeAuthFailedException e) {
 			log.debug("successfully blocked invalid create (in root)");
@@ -191,7 +191,7 @@ public class MongoTest implements TestIntf {
 			log.debug("Insecure insert test (under adminsNode)");
 			SubNode adamsNode = create.createNode(adamSession, adminsNode.getPath() + "/?");
 			adamsNode.setContent("adam's test node " + System.currentTimeMillis());
-			update.save(adminSession, adamsNode);
+			update.save(as, adamsNode);
 			throw new RuntimeException("allowed node in secure area");
 		} catch (NodeAuthFailedException e) {
 			log.debug("successfully blocked invalid create (in an admin node)");
@@ -209,11 +209,11 @@ public class MongoTest implements TestIntf {
 		}
 
 		// admin tries to save a duplicated path
-		asSession(adminSession);
+		asSession(as);
 		adamsNode.setPath(adminsNode.getPath());
 		try {
-			ThreadLocals.setMongoSession(adminSession);
-			update.save(adminSession, adamsNode);
+			ThreadLocals.setMongoSession(as);
+			update.save(as, adamsNode);
 			throw new RuntimeException("failed to detect keydup.");
 		} catch (DuplicateKeyException e) {
 			log.debug("Successfully rejected key dup.");

@@ -153,6 +153,10 @@ public class ActPubService {
     @Lazy
     protected MongoCreate create;
 
+    @Autowired
+    @Qualifier("threadPoolTaskExecutor")
+    private Executor executor;
+
     public static final boolean ENGLISH_LANGUAGE_CHECK = false;
     public static final int MAX_MESSAGES = 10;
     public static final int MAX_FOLLOWERS = 20;
@@ -166,10 +170,6 @@ public class ActPubService {
     public static int inboxCount = 0;
     public static boolean userRefresh = false;
     public static boolean bigRefresh = false;
-
-    @Autowired
-    @Qualifier("threadPoolTaskExecutor")
-    private Executor executor;
 
     private static final Object inboxLock = new Object();
 

@@ -97,9 +97,9 @@ public class MongoRepository {
 			if (initialized)
 				return;
 
-			MongoSession adminSession = auth.getAdminSession();
-			ThreadLocals.setMongoSession(adminSession);
-			mongoUtil.createAdminUser(adminSession);
+			MongoSession as = auth.getAdminSession();
+			ThreadLocals.setMongoSession(as);
+			mongoUtil.createAdminUser(as);
 
 			/* can shutdown during startup. */
 			if (AppServer.isShuttingDown())
@@ -112,13 +112,13 @@ public class MongoRepository {
 			 * this method because of calls to getRepository() always doing an init.
 			 */
 			initialized = true;
-			mongoUtil.createAllIndexes(adminSession);
+			mongoUtil.createAllIndexes(as);
 			mongoUtil.createTestAccounts();
 
 			log.debug("MongoRepository fully initialized.");
 			fullInit = true;
 
-			delete.removeAbandonedNodes(adminSession);
+			delete.removeAbandonedNodes(as);
 			apub.refreshForeignUsers();
 		}
 	}

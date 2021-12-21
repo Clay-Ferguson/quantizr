@@ -43,7 +43,6 @@ import quanta.util.Convert;
 import quanta.util.ThreadLocals;
 import quanta.util.XString;
 
-
 /**
  * Methods relating to AP following
  */

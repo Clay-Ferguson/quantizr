@@ -59,7 +59,7 @@ import quanta.util.XString;
  */
 @Lazy
 @Component
-public class ActPubUtil { 
+public class ActPubUtil {
     private static final Logger log = LoggerFactory.getLogger(ActPubUtil.class);
 
     @Autowired
@@ -747,14 +747,15 @@ public class ActPubUtil {
         }
     }
 
- /*
+    /*
      * Every node getting deleted will call into here (via a hook in MongoEventListener), so we can do
      * whatever we need to in this hook, which for now is just used to manage unfollowing a Friend if a
      * friend is deleted, but later will also entail (todo-1) deleting nodes that were posted to foreign
      * servers by posting an 'undo' action to the foreign servers
      */
     public void deleteNodeNotify(ObjectId nodeId) {
-        if (!MongoRepository.fullInit) return;
+        if (!MongoRepository.fullInit)
+            return;
         arun.run(session -> {
             SubNode node = read.getNode(session, nodeId);
             if (ok(node) && node.getType().equals(NodeType.FRIEND.s())) {
