@@ -116,7 +116,7 @@ export class Nav {
         }
         catch (e) {
             S.nodeUtil.clearLastNodeIds();
-            this.navHome(state);
+            // this.navHome(state);
         }
     }
 
@@ -159,7 +159,7 @@ export class Nav {
         }
         catch (e) {
             S.nodeUtil.clearLastNodeIds();
-            this.navHome(state);
+            // this.navHome(state);
         }
     }
 
@@ -246,7 +246,7 @@ export class Nav {
         }
         catch (e) {
             S.nodeUtil.clearLastNodeIds();
-            this.navHome(state);
+            // this.navHome(state);
         }
     }
 

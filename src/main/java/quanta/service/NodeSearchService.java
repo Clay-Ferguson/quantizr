@@ -18,7 +18,6 @@ import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.TextCriteria;
 import org.springframework.stereotype.Component;
 import quanta.actpub.ActPubService;
-import quanta.config.NodeName;
 import quanta.config.NodePath;
 import quanta.model.NodeInfo;
 import quanta.model.client.Bookmark;
@@ -68,7 +67,6 @@ public class NodeSearchService {
 	protected Convert convert;
 
 	@Autowired
-	@Lazy
 	protected EnglishDictionary english;
 
 	@Autowired

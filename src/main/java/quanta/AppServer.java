@@ -47,7 +47,6 @@ public class AppServer {
 	private AppController appController;
 
 	@Autowired
-	@Lazy
 	private EnglishDictionary english;
 
 	@Autowired

@@ -849,6 +849,7 @@ export class EditNodeDlg extends DialogBase {
             singleNode: true
         });
 
+        if (!res.node) return;
         if (res.node?.properties) {
             S.props.transferBinaryProps(res.node, node);
 

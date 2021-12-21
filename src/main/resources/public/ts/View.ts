@@ -67,6 +67,7 @@ export class View {
                 forceIPFSRefresh,
                 singleNode: false
             });
+            if (!res.node) return;
             if (C.DEBUG_SCROLLING) {
                 console.log("refreshTree -> renderPageFromData (scrollTop=" + scrollToTop + ")");
             }
@@ -74,7 +75,7 @@ export class View {
         }
         catch (e) {
             S.nodeUtil.clearLastNodeIds();
-            S.nav.navHome(state);
+            // S.nav.navHome(state);
         }
     }
 
@@ -135,6 +136,8 @@ export class View {
                 singleNode: false
             });
 
+            if (!res.node) return;
+
             // if this is an "infinite scroll" call to load in additional nodes
             if (growingPage) {
                 let scrollToTop = true;
@@ -184,7 +187,7 @@ export class View {
         }
         catch (e) {
             S.nodeUtil.clearLastNodeIds();
-            S.nav.navHome(state);
+            // S.nav.navHome(state);
         }
     }
 

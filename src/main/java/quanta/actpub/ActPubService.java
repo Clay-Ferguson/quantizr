@@ -70,7 +70,6 @@ public class ActPubService {
     protected MongoTemplate ops;
 
     @Autowired
-    @Lazy
     protected EnglishDictionary english;
 
     @Autowired
