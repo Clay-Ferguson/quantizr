@@ -144,6 +144,14 @@ $mobileHeaderHeight: 3.5em;
     border-radius: $border-radius;
 }
 
+.typeName {
+    border: 2px solid gray;
+    padding: 0px 4px 0px 4px;
+    white-space: nowrap;
+    display: inline-block;
+    border-radius: $border-radius;
+}
+
 .mainAppRow {
     margin-left: 0px !important;
     margin-right: 0px !important;

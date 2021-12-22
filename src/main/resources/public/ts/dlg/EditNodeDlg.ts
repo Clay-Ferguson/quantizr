@@ -50,6 +50,12 @@ interface LS { // Local State
     speechActive?: boolean;
 }
 
+/**
+ * Node Editor Dialog
+ *
+ * Yeah I know this file grew way to large and has other ugliness too, but it will be cleaned up soon
+ * (todo-0)
+ */
 export class EditNodeDlg extends DialogBase {
 
     static embedInstance: EditNodeDlg;
@@ -299,22 +305,6 @@ export class EditNodeDlg extends DialogBase {
         }
         return span;
     }
-
-    // DO NOT DELETE
-    // Editor actually looks much better without any title text.
-    // getTitleText(): string {
-    //     let state = this.getState<LS>();
-    //     let ret = null;
-
-    //     let typeHandler: TypeHandlerIntf = S.plugin.getTypeHandler(state.node.type);
-    //     if (typeHandler) {
-    //         ret = "Edit (" + typeHandler.getName() + ")";
-    //     }
-    //     else {
-    //         ret = "Edit";
-    //     }
-    //     return ret;
-    // }
 
     getExtraTitleBarComps(): CompIntf[] {
         let state = this.getState<LS>();
@@ -709,6 +699,9 @@ export class EditNodeDlg extends DialogBase {
                 className: "fa fa-smile-o fa-lg editorButtonIcon",
                 title: "Insert emoji at cursor",
                 onClick: this.insertEmoji
+            }) : null,
+            typeHandler && typeHandler.getName() && typeHandler.getTypeName() !== "u" ? new Span(typeHandler.getName(), {
+                className: "float-end typeName"
             }) : null
         ]);
     }
