@@ -17,15 +17,14 @@ import { Icon } from "../comp/core/Icon";
 import { IconButton } from "../comp/core/IconButton";
 import { Label } from "../comp/core/Label";
 import { LayoutRow } from "../comp/core/LayoutRow";
-import { NodeCompBinary } from "../comp/node/NodeCompBinary";
 import { Selection } from "../comp/core/Selection";
 import { Span } from "../comp/core/Span";
 import { TextArea } from "../comp/core/TextArea";
 import { TextContent } from "../comp/core/TextContent";
 import { TextField } from "../comp/core/TextField";
+import { NodeCompBinary } from "../comp/node/NodeCompBinary";
 import { Constants as C } from "../Constants";
 import { DialogBase } from "../DialogBase";
-import { SplitNodeDlg } from "../dlg/SplitNodeDlg";
 import { DialogMode } from "../enums/DialogMode";
 import { NodeActionType } from "../enums/NodeActionType";
 import * as I from "../Interfaces";
@@ -36,19 +35,10 @@ import { PropValueHolder } from "../PropValueHolder";
 import { S } from "../Singletons";
 import { ValidatedState } from "../ValidatedState";
 import { ChangeNodeTypeDlg } from "./ChangeNodeTypeDlg";
-import { ConfirmDlg } from "./ConfirmDlg";
-import { EditPropertyDlg } from "./EditPropertyDlg";
+import { LS } from "./EditNodeDlgState";
+import { EditNodeDlgUtil } from "./EditNodeDlgUtil";
 import { EmojiPickerDlg } from "./EmojiPickerDlg";
 import { FriendsDlg } from "./FriendsDlg";
-import { UploadFromFileDropzoneDlg } from "./UploadFromFileDropzoneDlg";
-import { SymKeyDataPackage } from "../SymKeyDataPackage";
-
-interface LS { // Local State
-    node?: J.NodeInfo;
-    selectedProps?: Set<string>;
-    toIpfs?: boolean;
-    speechActive?: boolean;
-}
 
 /**
  * Node Editor Dialog
@@ -57,6 +47,8 @@ interface LS { // Local State
  * (todo-0)
  */
 export class EditNodeDlg extends DialogBase {
+
+    utl: EditNodeDlgUtil = new EditNodeDlgUtil();
 
     static embedInstance: EditNodeDlg;
     editorHelp: string = null;
@@ -110,7 +102,7 @@ export class EditNodeDlg extends DialogBase {
         an encrypted node. (i.e. the parent of this node is encrypted) */
         if (encrypt) {
             setTimeout(() => {
-                this.setEncryption(true);
+                this.utl.setEncryption(this, true);
             }, 500);
         }
     }
@@ -160,7 +152,7 @@ export class EditNodeDlg extends DialogBase {
                 // if onlyBinaries and this is NOT a binary prop then skip it.
                 if (onlyBinaries) {
                     if (S.props.allBinaryProps.has(prop.name)) {
-                        this.initPropState(node, typeHandler, prop, false);
+                        this.utl.initPropState(this, node, typeHandler, prop, false);
                     }
                     return;
                 }
@@ -175,42 +167,10 @@ export class EditNodeDlg extends DialogBase {
 
                     if (!this.isGuiControlBasedProp(prop)) {
                         let allowSelection = !customProps || !customProps.find(p => p === prop.name);
-                        this.initPropState(node, typeHandler, prop, allowSelection);
+                        this.utl.initPropState(this, node, typeHandler, prop, allowSelection);
                     }
                 }
             });
-        }
-    }
-
-    initPropState = (node: J.NodeInfo, typeHandler: TypeHandlerIntf, propEntry: J.PropertyInfo, allowCheckbox: boolean): void => {
-        let allowEditAllProps: boolean = this.appState.isAdminUser;
-        let isReadOnly = S.render.isReadOnlyProperty(propEntry.name);
-        let propVal = propEntry.value;
-        let propValStr = propVal || "";
-        // console.log("making single prop editor: prop[" + propEntry.property.name + "] val[" + propEntry.property.value
-        //     + "] fieldId=" + propEntry.id);
-
-        let propState: ValidatedState<any> = this.propStates.get(propEntry.name);
-        if (!propState) {
-            propState = new ValidatedState<any>();
-            this.propStates.set(propEntry.name, propState);
-        }
-
-        if (!allowEditAllProps && isReadOnly) {
-            propState.setValue(propValStr);
-        }
-        else {
-            let val = S.props.getNodePropVal(propEntry.name, node);
-            propState.setValue(val);
-
-            /* todo-2: eventually we will have data types, but for now we use a hack
-            to detect to treat a string as a date based on its property name. */
-            if (propEntry.name === J.NodeProp.DATE) {
-                // Ensure we have set the default time if none is yet set.
-                if (!propState.getValue()) {
-                    propState.setValue("" + new Date().getTime());
-                }
-            }
         }
     }
 
@@ -346,7 +306,7 @@ export class EditNodeDlg extends DialogBase {
 
         let encryptCheckBox: Checkbox = !customProps ? new Checkbox("Encrypt", { className: "marginLeft" }, {
             setValue: (checked: boolean): void => {
-                this.setEncryption(checked);
+                this.utl.setEncryption(this, checked);
             },
             getValue: (): boolean => {
                 return S.props.isEncrypted(state.node);
@@ -456,11 +416,11 @@ export class EditNodeDlg extends DialogBase {
                 let propsButtonBar: ButtonBar = new ButtonBar([
 
                     new IconButton("fa fa-plus", null, {
-                        onClick: this.addProperty,
+                        onClick: () => this.utl.addProperty(this),
                         title: "Add property"
                     }),
                     this.deletePropButton = new IconButton("fa fa-minus", null, {
-                        onClick: this.deletePropertiesButtonClick,
+                        onClick: () => this.utl.deletePropertiesButtonClick(this),
                         title: "Delete property"
                     })
                 ], null, "float-end");
@@ -482,7 +442,7 @@ export class EditNodeDlg extends DialogBase {
                 pinCheckbox = new Checkbox("IPFS Pinned", { className: "ipfsPinnedCheckbox" }, {
                     setValue: (checked: boolean): void => {
                         if (checked) {
-                            this.deleteProperties([J.NodeProp.IPFS_REF]);
+                            this.utl.deleteProperties(this, [J.NodeProp.IPFS_REF]);
                         }
                         else {
                             S.props.setNodePropVal(J.NodeProp.IPFS_REF, this.getState<LS>().node, "1");
@@ -503,7 +463,7 @@ export class EditNodeDlg extends DialogBase {
                     new NodeCompBinary(state.node, true, false, null),
                     this.deleteUploadButton = new Div("Delete", {
                         className: "deleteAttachmentLink",
-                        onClick: this.deleteUpload,
+                        onClick: () => this.utl.deleteUpload(this),
                         title: "Delete this attachment"
                     })
                 ]),
@@ -545,7 +505,7 @@ export class EditNodeDlg extends DialogBase {
 
             sharingDiv = new Div("Shared to: " + sharingNames, {
                 className: "marginBottom float-end sharingLabel",
-                onClick: this.share
+                onClick: () => this.utl.share(this)
             });
             sharingDivClearFix = new Clearfix();
         }
@@ -558,7 +518,7 @@ export class EditNodeDlg extends DialogBase {
         let collapsiblePanel = !customProps ? new CollapsiblePanel(null, null, null, [
             new Div(null, { className: "marginBottom marginRight marginTop" }, [
                 new Button("Type", this.openChangeNodeTypeDlg),
-                allowPropertyAdd && numPropsShowing === 0 ? new Button("Props", this.addProperty) : null
+                allowPropertyAdd && numPropsShowing === 0 ? new Button("Props", () => this.utl.addProperty(this)) : null
             ]),
             nodeNameTextField, selectionsBar, checkboxesBar, propsTable
         ], false,
@@ -573,39 +533,6 @@ export class EditNodeDlg extends DialogBase {
         this.propertyEditFieldContainer.setChildren([mainPropsTable, sharingDiv, sharingDivClearFix, binarySection, rightFloatButtons,
             new Clearfix()]);
         return children;
-    }
-
-    countPropsShowing = (): number => {
-        let state = this.getState<LS>();
-        let typeHandler: TypeHandlerIntf = S.plugin.getTypeHandler(state.node.type);
-        let customProps: string[] = null;
-        if (typeHandler) {
-            customProps = typeHandler.getCustomProperties();
-            typeHandler.ensureDefaultProperties(state.node);
-            this.editorHelp = typeHandler.getEditorHelp();
-        }
-
-        let numPropsShowing: number = 0;
-        if (state.node.properties) {
-            // This loop creates all the editor input fields for all the properties
-            state.node.properties.forEach((prop: J.PropertyInfo) => {
-                // console.log("prop=" + S.util.prettyPrint(prop));
-
-                if (!this.allowEditAllProps && !S.render.allowPropertyEdit(state.node, prop.name, this.appState)) {
-                    // console.log("Hiding property: " + prop.name);
-                    return;
-                }
-
-                if (this.allowEditAllProps || (
-                    !S.render.isReadOnlyProperty(prop.name) || S.edit.showReadOnlyProperties)) {
-
-                    if (!this.isGuiControlBasedProp(prop)) {
-                        numPropsShowing++;
-                    }
-                }
-            });
-        }
-        return numPropsShowing;
     }
 
     makeCheckboxPropValueHandler(propName: string): I.ValueIntf {
@@ -641,24 +568,24 @@ export class EditNodeDlg extends DialogBase {
         // let typeLocked = !!S.props.getNodePropVal(J.NodeProp.TYPE_LOCK, state.node);
         let datePropExists = S.props.getNodeProp(J.NodeProp.DATE, state.node);
 
-        let numPropsShowing = this.countPropsShowing();
+        let numPropsShowing = this.utl.countPropsShowing(this);
         let advancedButtons: boolean = !!this.contentEditor;
 
         return new ButtonBar([
             new Button("Save", () => {
-                this.saveNode();
+                this.utl.saveNode(this);
                 this.close();
             }, { title: "Save this node and close editor." }, "btn-primary"),
 
             new Button("Cancel", this.cancelEdit, null),
 
             this.uploadButton = allowUpload ? new IconButton("fa-upload", null, {
-                onClick: this.upload,
+                onClick: () => this.utl.upload(this),
                 title: "Upload file attachment"
             }) : null,
 
             allowShare ? new IconButton("fa-users", null, {
-                onClick: this.share,
+                onClick: () => this.utl.share(this),
                 title: "Share Node"
             }) : null,
 
@@ -686,7 +613,7 @@ export class EditNodeDlg extends DialogBase {
             advancedButtons && !datePropExists ? new Icon({
                 className: "fa fa-calendar fa-lg editorButtonIcon",
                 title: "Add 'date' property to node (makes Calendar entry)",
-                onClick: this.addDateProperty
+                onClick: () => this.utl.addDateProperty(this)
             }) : null,
 
             advancedButtons ? new Icon({
@@ -734,25 +661,6 @@ export class EditNodeDlg extends DialogBase {
         // instead so I don't need to parse any DOM or domIds inorder to iterate over the list of them????
     }
 
-    addProperty = async (): Promise<void> => {
-        let state: LS = this.getState<LS>();
-        let dlg = new EditPropertyDlg(state.node, this.appState);
-        await dlg.open();
-
-        if (dlg.nameState.getValue()) {
-            if (!state.node.properties) {
-                state.node.properties = [];
-            }
-            state.node.properties.push({
-                name: dlg.nameState.getValue(),
-                value: ""
-            });
-            this.mergeState<LS>(state);
-        }
-        // we don't need to return an actual promise here
-        return null;
-    }
-
     insertTime = (): void => {
         if (this.contentEditor) {
             this.contentEditor.insertTextAtCursor("[" + S.util.formatDate(new Date()) + "]");
@@ -779,247 +687,8 @@ export class EditNodeDlg extends DialogBase {
         }
     }
 
-    addDateProperty = (): void => {
-        let state = this.getState<LS>();
-        if (!state.node.properties) {
-            state.node.properties = [];
-        }
-
-        if (S.props.getNodeProp(J.NodeProp.DATE, state.node)) {
-            return;
-        }
-
-        state.node.properties.push({
-            name: J.NodeProp.DATE,
-            value: new Date().getTime()
-        });
-
-        state.node.properties.push({
-            name: J.NodeProp.DURATION,
-            value: "01:00"
-        });
-
-        // Ensure the have the panel expanded so we can see the new date.
-        // nope, i decided I don't like this auto-expanding.
-        // EditNodeDlg.morePanelExpanded = true;
-        this.mergeState<LS>(state);
-    }
-
     openChangeNodeTypeDlg = (): void => {
-        new ChangeNodeTypeDlg(this.getState<LS>().node.type, this.setNodeType, this.appState).open();
-    }
-
-    share = async (): Promise<void> => {
-        let state = this.getState<LS>();
-        await S.edit.editNodeSharing(this.appState, state.node);
-        this.mergeState<LS>({ node: state.node });
-        return null;
-    }
-
-    upload = async (): Promise<void> => {
-        let state = this.getState<LS>();
-
-        let dlg = new UploadFromFileDropzoneDlg(state.node.id, "", state.toIpfs, null, false, true, this.appState, async () => {
-            await this.refreshBinaryPropsFromServer(state.node);
-            this.initPropStates(state.node, true);
-            this.mergeState<LS>({ node: state.node });
-            this.binaryDirty = true;
-        });
-        await dlg.open();
-    }
-
-    /* Queries the server for the purpose of just loading the binary properties into node, and leaving everything else intact */
-    refreshBinaryPropsFromServer = async (node: J.NodeInfo): Promise<void> => {
-        let res: J.RenderNodeResponse = await S.util.ajax<J.RenderNodeRequest, J.RenderNodeResponse>("renderNode", {
-            nodeId: node.id,
-            upLevel: false,
-            siblingOffset: 0,
-            renderParentIfLeaf: false,
-            forceRenderParent: false,
-            offset: 0,
-            goToLastPage: false,
-            forceIPFSRefresh: false,
-            singleNode: true
-        });
-
-        if (!res.node) return;
-        if (res.node?.properties) {
-            S.props.transferBinaryProps(res.node, node);
-
-            if (res.node) {
-                S.nodeUtil.updateNodeMap(res.node, this.appState);
-            }
-        }
-    }
-
-    deleteUpload = async (): Promise<void> => {
-        let state = this.getState<LS>();
-
-        /* Note: This doesn't resolve until either user clicks no on confirmation dialog or else has clicked yes and the delete
-        call has fully completed. */
-        let deleted: boolean = await S.attachment.deleteAttachment(state.node, this.appState);
-
-        if (deleted) {
-            S.attachment.removeBinaryProperties(state.node);
-            this.initPropStates(state.node, true);
-            this.mergeState<LS>({ node: state.node });
-
-            if (this.mode === DialogMode.EMBED) {
-                dispatch("Action_editNodeUpdated", (s: AppState): AppState => {
-                    s.editNode = state.node;
-                    return s;
-                });
-            }
-
-            this.binaryDirty = true;
-        }
-    }
-
-    setEncryption = (encrypt: boolean): void => {
-        let state = this.getState<LS>();
-        if (this.pendingEncryptionChange) return;
-
-        (async () => {
-            let encrypted: boolean = S.props.isEncrypted(state.node);
-
-            if (encrypt && S.props.isPublic(state.node)) {
-                S.util.showMessage("Cannot encrypt a node that is shared to public. Remove public share first.", "Warning");
-                return;
-            }
-
-            /* only if the encryption setting changed do we need to do anything here */
-            if (encrypted !== encrypt) {
-                this.pendingEncryptionChange = true;
-                try {
-                    /* If we're turning off encryption for the node */
-                    if (!encrypt) {
-                        /* Take what's in the editor and put
-                        that into this.node.content, because it's the correct and only place the correct updated text is guaranteed to be
-                        in the case where the user made some changes before disabling encryption. */
-                        state.node.content = this.contentEditor.getValue();
-                        S.props.setNodePropVal(J.NodeProp.ENC_KEY, state.node, null);
-                    }
-                    /* Else need to ensure node is encrypted */
-                    else {
-                        // if we need to encrypt and the content is not currently encrypted.
-                        if (!state.node.content?.startsWith(J.Constant.ENC_TAG)) {
-                            let content = this.contentEditor.getValue();
-
-                            let skdp: SymKeyDataPackage = await S.encryption.encryptSharableString(null, content);
-                            state.node.content = J.Constant.ENC_TAG + skdp.cipherText;
-
-                            /* Set ENC_KEY to be the encrypted key, which when decrypted can be used to decrypt
-                            the content of the node. This ENC_KEY was encrypted with the public key of the owner of this node,
-                            and so can only be decrypted with their private key. */
-                            S.props.setNodePropVal(J.NodeProp.ENC_KEY, state.node, skdp.cipherKey);
-                        }
-                    }
-
-                    this.mergeState<LS>(state);
-                }
-                finally {
-                    this.pendingEncryptionChange = false;
-                }
-            }
-        })();
-    }
-
-    setNodeType = (newType: string): void => {
-        let state = this.getState<LS>();
-        state.node.type = newType;
-        this.mergeState<LS>({ node: state.node });
-    }
-
-    deleteProperties = async (propNames: string[]) => {
-        let res: J.DeletePropertyResponse = await S.util.ajax<J.DeletePropertyRequest, J.DeletePropertyResponse>("deleteProperties", {
-            nodeId: this.getState<LS>().node.id,
-            propNames
-        });
-
-        if (S.util.checkSuccess("Delete property", res)) {
-            let state = this.getState<LS>();
-            propNames.forEach(propName => {
-                S.props.deleteProp(state.node, propName);
-            });
-            this.mergeState<LS>(state);
-        }
-    }
-
-    // Takes all the propStates values and converts them into node properties on the node
-    savePropsToNode = () => {
-        let state = this.getState<LS>();
-        if (state.node.properties) {
-            state.node.properties.forEach((prop: J.PropertyInfo) => {
-                // console.log("Save prop iterator: name=" + prop.name);
-                let propState = this.propStates.get(prop.name);
-                if (propState) {
-
-                    // hack to store dates as numeric prop (todo-2: need a systematic way to assign JSON types to properties)
-                    if (prop.name === J.NodeProp.DATE && (typeof propState.getValue() === "string")) {
-                        try {
-                            prop.value = parseInt(propState.getValue());
-                        }
-                        catch (e) {
-                            console.error("failed to parse date number: " + propState.getValue());
-                        }
-                    }
-                    else {
-                        prop.value = propState.getValue();
-                        // console.log("   val=" + prop.value);
-                    }
-                }
-            });
-        }
-    }
-
-    saveNode = async (): Promise<void> => {
-        let state = this.getState<LS>();
-
-        let content: string;
-        if (this.contentEditor) {
-            content = this.contentEditor.getValue();
-            let cipherKey = S.props.getCryptoKey(state.node, this.appState);
-            if (cipherKey) {
-                content = await S.encryption.symEncryptStringWithCipherKey(cipherKey, content);
-                content = J.Constant.ENC_TAG + content;
-            }
-        }
-        if (content) {
-            content = content.trim();
-        }
-        state.node.content = content;
-        state.node.name = this.nameState.getValue();
-
-        let askToSplit = state.node.content && ((state.node as J.NodeInfo).content.indexOf("{split}") !== -1 ||
-            (state.node as J.NodeInfo).content.indexOf("\n\n\n") !== -1);
-
-        this.savePropsToNode();
-        // console.log("calling saveNode(). PostData=" + S.util.prettyPrint(state.node));
-
-        let res: J.SaveNodeResponse = await S.util.ajax<J.SaveNodeRequest, J.SaveNodeResponse>("saveNode", {
-            node: state.node
-        });
-
-        // if we're saving a bookmark but NOT viewing the bookmark list then we don't need to do any
-        // page refreshing after the edit.
-        if (res.node.type === J.NodeType.BOOKMARK && this.appState.node.type !== J.NodeType.BOOKMARK_LIST) {
-            // do nothing.
-        }
-        else {
-            S.render.fadeInId = state.node.id;
-            S.edit.saveNodeResponse(state.node, res, true, this.appState);
-
-            if (askToSplit) {
-                new SplitNodeDlg(state.node, this.appState).open();
-            }
-        }
-
-        // if we just saved a bookmark, reload bookmarks menu
-        if ((state.node as J.NodeInfo).type === J.NodeType.BOOKMARK) {
-            setTimeout(() => {
-                S.util.loadBookmarks();
-            }, 250);
-        }
+        new ChangeNodeTypeDlg(this.getState<LS>().node.type, (type: string) => this.utl.setNodeType(this, type), this.appState).open();
     }
 
     makePropEditor = (typeHandler: TypeHandlerIntf, propEntry: J.PropertyInfo, allowCheckbox: boolean, rows: number): Div => {
@@ -1143,21 +812,6 @@ export class EditNodeDlg extends DialogBase {
 
         editItems.push(this.contentEditor as any as Comp);
         return new Div(null, null, editItems);
-    }
-
-    deletePropertiesButtonClick = async (): Promise<void> => {
-        let dlg: ConfirmDlg = new ConfirmDlg("Delete the selected properties?", "Confirm Delete",
-            null, null, this.appState);
-        await dlg.open();
-        if (dlg.yes) {
-            this.deleteSelectedProperties();
-        }
-    }
-
-    deleteSelectedProperties = (): void => {
-        let keys: string[] = [];
-        this.getState<LS>().selectedProps.forEach(prop => keys.push(prop));
-        this.deleteProperties(keys);
     }
 
     speechRecognition = (): void => {
