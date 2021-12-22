@@ -702,21 +702,24 @@ export class Edit {
                     state.node.children = state.node.children.filter(child => !selNodesArray.find(id => id === child.id));
                 }
 
-                dispatch("Action_NodeDeleteComplete", (s: AppState): AppState => {
-                    // remove this node from all data from all the tabs, so they all refresh without
-                    // the deleted node without being queries from the server again.
-                    selNodesArray.forEach(id => {
-                        S.srch.removeNodeById(id, s);
-                    });
-                    s.selectedNodes.clear();
-                    return s;
-                });
-
                 if (state.node.children.length === 0) {
+                    dispatch("Action_NodeDeleteComplete", (s: AppState): AppState => {
+                        // remove this node from all data from all the tabs, so they all refresh without
+                        // the deleted node without being queries from the server again.
+                        selNodesArray.forEach(id => {
+                            S.srch.removeNodeById(id, s);
+                        });
+                        s.selectedNodes.clear();
+                        return s;
+                    });
                     S.view.jumpToId(state.node.id);
                 }
                 else {
                     dispatch("Action_UpdateChildren", (s: AppState): AppState => {
+                        selNodesArray.forEach(id => {
+                            S.srch.removeNodeById(id, s);
+                        });
+                        s.selectedNodes.clear();
                         s.node.children = state.node.children;
                         return s;
                     });
