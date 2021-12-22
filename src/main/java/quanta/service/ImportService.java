@@ -57,22 +57,33 @@ public class ImportService {
 
 			BufferedInputStream in = null;
 			try {
+				// Import ZIP files
 				if (fileName.toLowerCase().endsWith(".zip")) {
 					log.debug("Import ZIP to Node: " + node.getPath());
 					in = new BufferedInputStream(new AutoCloseInputStream(uploadFile.getInputStream()));
 
-					ImportZipService importZipService = (ImportZipService) SpringContextUtil.getBean(ImportZipService.class);
-					importZipService.importFromStream(ms, in, node, false);
+					ImportZipService impSvc = (ImportZipService) SpringContextUtil.getBean(ImportZipService.class);
+					impSvc.importFromStream(ms, in, node, false);
 					update.saveSession(ms);
-				} else if (fileName.toLowerCase().endsWith(".tar")) {
+				} 
+				// Import TAR files (non GZipped)
+				else if (fileName.toLowerCase().endsWith(".tar")) {
 					log.debug("Import TAR to Node: " + node.getPath());
 					in = new BufferedInputStream(new AutoCloseInputStream(uploadFile.getInputStream()));
-
-					ImportTarService importTarService = (ImportTarService) SpringContextUtil.getBean(ImportTarService.class);
-					importTarService.importFromStream(ms, in, node, false);
+					ImportTarService impSvc = (ImportTarService) SpringContextUtil.getBean(ImportTarService.class);
+					impSvc.importFromStream(ms, in, node, false);
 					update.saveSession(ms);
-				} else {
-					throw ExUtil.wrapEx("Only ZIP or TAR files are supported for importing.");
+				} 
+				// Import TAR.GZ (GZipped TAR)
+				else if (fileName.toLowerCase().endsWith(".tar.gz")) {
+					log.debug("Import TAR.GZ to Node: " + node.getPath());
+					in = new BufferedInputStream(new AutoCloseInputStream(uploadFile.getInputStream()));
+					ImportTarService impSvc = (ImportTarService) SpringContextUtil.getBean(ImportTarService.class);
+					impSvc.importFromZippedStream(ms, in, node, false);
+					update.saveSession(ms);
+				} 
+				else {
+					throw ExUtil.wrapEx("Only ZIP, TAR, TAR.GZ files are supported for importing.");
 				}
 			} catch (Exception ex) {
 				throw ExUtil.wrapEx(ex);

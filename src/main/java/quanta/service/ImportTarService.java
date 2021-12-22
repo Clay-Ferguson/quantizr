@@ -5,6 +5,7 @@ import static quanta.util.Util.ok;
 import java.io.InputStream;
 import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
 import org.apache.commons.compress.archivers.tar.TarArchiveInputStream;
+import org.apache.commons.compress.compressors.gzip.GzipCompressorInputStream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,6 +36,18 @@ public class ImportTarService extends ImportArchiveBase {
 	protected MongoRead read;
 
 	private TarArchiveInputStream zis;
+
+	public SubNode importFromZippedStream(MongoSession ms, InputStream is, SubNode node, boolean isNonRequestThread) {
+		InputStream gis = null;
+		try {
+			gis = new GzipCompressorInputStream(is);
+			return importFromStream(ms, gis, node, isNonRequestThread);
+		} catch (Exception e) {
+			throw ExUtil.wrapEx(e);
+		} finally {
+			StreamUtil.close(gis);
+		}
+	}
 
 	/* Returns the first node created which is always the root of the import */
 	public SubNode importFromStream(MongoSession ms, InputStream is, SubNode node, boolean isNonRequestThread) {
