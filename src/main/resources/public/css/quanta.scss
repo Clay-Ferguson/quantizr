@@ -105,6 +105,15 @@ body {
     font-family: "QuantaCustomFont" !important;
 }
 
+.markdown-content table, th, td {
+    border: 1px solid $nodeBorderBottomColor;
+    border-collapse: collapse;
+}
+
+.markdown-content th, td {
+   padding: $tinyGap;
+}
+
 .fullWidth {
     width: 100%;
 }
