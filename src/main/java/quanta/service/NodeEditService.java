@@ -527,40 +527,7 @@ public class NodeEditService {
 		if (!StringUtils.isEmpty(node.getContent()) //
 				// don't send notifications when 'admin' is the one doing the editing.
 				&& !PrincipalName.ADMIN.s().equals(sessionUserName)) {
-
-			// todo-0: can we broadcast an even to cause this? ...and even invent a way to do async broadcast of events?
-			arun.run(s -> {
-				HashSet<Integer> sessionsPushed = new HashSet<>();
-
-				// push any chat messages that need to go out.
-				push.pushNodeToMonitoringBrowsers(s, sessionsPushed, node);
-
-				SubNode parent = read.getParent(ms, node, false);
-				if (ok(parent)) {
-					auth.saveMentionsToNodeACL(s, node);
-
-					if (ok(node.getAc())) {
-
-						// Get the inReplyTo from the parent property (foreign node) or if not found generate one based on
-						// what the local server version of it is.
-						String inReplyTo = parent.getStr(NodeProp.ACT_PUB_OBJ_URL);
-						if (no(inReplyTo)) {
-							inReplyTo = snUtil.getIdBasedUrl(parent);
-						}
-
-						APList attachments = apub.createAttachmentsList(node);
-						String nodeUrl = snUtil.getIdBasedUrl(node);
-
-						apub.sendNotificationForNodeEdit(s, inReplyTo, snUtil.cloneAcl(node), attachments, node.getContent(),
-								nodeUrl);
-						push.pushNodeUpdateToBrowsers(s, sessionsPushed, node);
-					}
-					return null;
-				} else {
-					log.error("Unable to find parent node for path: " + node.getPath());
-				}
-				return null;
-			});
+			processAfterSave(ms, node);
 		}
 
 		NodeInfo newNodeInfo =
@@ -575,6 +542,40 @@ public class NodeEditService {
 
 		res.setSuccess(true);
 		return res;
+	}
+
+	public void processAfterSave(MongoSession ms, SubNode node) {
+		arun.run(s -> {
+			HashSet<Integer> sessionsPushed = new HashSet<>();
+
+			// push any chat messages that need to go out.
+			push.pushNodeToMonitoringBrowsers(s, sessionsPushed, node);
+
+			SubNode parent = read.getParent(ms, node, false);
+			if (ok(parent)) {
+				auth.saveMentionsToNodeACL(s, node);
+
+				if (ok(node.getAc())) {
+					// Get the inReplyTo from the parent property (foreign node) or if not found generate one based on
+					// what the local server version of it is.
+					String inReplyTo = parent.getStr(NodeProp.ACT_PUB_OBJ_URL);
+					if (no(inReplyTo)) {
+						inReplyTo = snUtil.getIdBasedUrl(parent);
+					}
+
+					APList attachments = apub.createAttachmentsList(node);
+					String nodeUrl = snUtil.getIdBasedUrl(node);
+
+					apub.sendNotificationForNodeEdit(s, inReplyTo, snUtil.cloneAcl(node), attachments, node.getContent(),
+							nodeUrl);
+					push.pushNodeUpdateToBrowsers(s, sessionsPushed, node);
+				}
+				return null;
+			} else {
+				log.error("Unable to find parent node for path: " + node.getPath());
+			}
+			return null;
+		});
 	}
 
 	/*

@@ -35,7 +35,6 @@ import quanta.mongo.model.SubNode;
 import quanta.util.ThreadLocals;
 import quanta.util.XString;
 
-
 /**
  * Service for checking authorization for access to nodes. Checks what users are accessing what
  * nodes and checks their privileges againts the ACL on the Nodes.

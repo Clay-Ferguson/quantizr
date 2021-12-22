@@ -28,8 +28,6 @@ import quanta.util.XString;
 /**
  * Listener that MongoDB driver hooks into so we can inject processing into various phases of the
  * persistence (reads/writes) of the MongoDB objects.
- * 
- * todo-0: put ApplicationEventPublisherAware in something like AppConfig and reference that from everywhere.
  */
 @Component
 public class MongoEventListener extends AbstractMongoEventListener<SubNode> { 
