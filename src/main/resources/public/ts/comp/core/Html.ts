@@ -39,6 +39,7 @@ export class Html extends Comp {
         if (this.hasChildren()) {
             console.error("dangerouslySetInnerHTML component had children. This is a bug: id=" + this.getId() + " constructor.name=" + this.constructor.name);
         }
+        // todo-0: where are we doing the sanitize? It it necessary?
         this.attribs.dangerouslySetInnerHTML = { __html: (this.getState<LS>() as any).content };
         return this.e("div", this.attribs);
 

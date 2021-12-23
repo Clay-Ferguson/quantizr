@@ -30,6 +30,9 @@ public enum NodeProp {
     ACT_PUB_ACTOR_INBOX("ap:actorInbox", "s"), //
     ACT_PUB_SENSITIVE("ap:nsfw", "s"), //
 
+    // this 's' probably needs to change to JSON or Object ? (todo-0)
+    ACT_PUB_TAG("ap:tag", "s"), //
+
     /*
      * This is the encrypted symetric key to the node data, that was encrypted using
      * the private key of the owner of the node. When nodes are shared to other

@@ -82,6 +82,7 @@ export class NodeCompMarkdown extends Html {
 
             val = S.render.injectSubstitutions(node, content);
             val = S.util.markdown(val);
+            val = S.util.insertActPubTags(val, node);
 
             /* parse tags, to build OpenGraph */
             let state: AppState = store.getState();

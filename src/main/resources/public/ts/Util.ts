@@ -1116,6 +1116,20 @@ export class Util {
         return DOMPurify.sanitize(val, Util.DOM_PURIFY_CONFIG);
     }
 
+    // External Emojis!
+    insertActPubTags = (val: string, node: J.NodeInfo) => {
+        let tags: any = S.props.getNodePropValObj(J.NodeProp.ACT_PUB_TAG, node);
+        if (tags) {
+            tags.forEach(t => {
+                if (t.name && t.icon?.url && t.type === "Emoji") {
+                    let img = `<img src='${t.icon.url}'">`;
+                    val = S.util.replaceAll(val, t.name, img);
+                }
+            })
+        }
+        return val;
+    }
+
     formatCurrency = (n: number): string => {
         return currencyFormatter.format(n);
     }

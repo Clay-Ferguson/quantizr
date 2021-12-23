@@ -437,9 +437,7 @@ public class ActPubService {
 
         // if userNode unknown then get and/or create one. May be creating a brand new one even.
         if (no(userNode)) {
-            String apUserName = apUtil.getLongUserNameFromActor(actor);
-
-            apUserName = apUserName.trim();
+            String apUserName = apUtil.getLongUserNameFromActor(actor).trim();
 
             // This checks for both the non-port and has-port versions of the host (host may or may not have
             // port)
@@ -730,7 +728,7 @@ public class ActPubService {
      */
     public void saveNote(MongoSession ms, SubNode toAccountNode, SubNode parentNode, Object obj, boolean forcePublic,
             boolean temp) {
-        apUtil.log("saveNote");
+        apUtil.log("saveNote"); // + XString.prettyPrint(obj));
         String id = AP.str(obj, APObj.id);
 
         /*
@@ -749,6 +747,7 @@ public class ActPubService {
         String objAttributedTo = AP.str(obj, APObj.attributedTo);
         String objType = AP.str(obj, APObj.type);
         Boolean sensitive = AP.bool(obj, APObj.sensitive);
+        Object tagArray = AP.list(obj, APObj.tag);
 
         // Ignore non-english for now (later we can make this a user-defined language selection)
         String lang = "0";
@@ -790,6 +789,11 @@ public class ActPubService {
         // we could be clever and just detect if it DOES have tags and does NOT have
         // '```'
         newNode.setContent(contentHtml);
+
+        // If we have a tagArray object save it on the node properties.
+        if (tagArray != null) {
+            newNode.set(NodeProp.ACT_PUB_TAG.s(), tagArray);
+        }
 
         // todo-1: I haven't yet tested that mentions are parsable in any Mastodon text using this method
         // but we at least know other instances of Quanta will have these extractable this way.

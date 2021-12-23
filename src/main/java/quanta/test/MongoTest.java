@@ -13,8 +13,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Component;
+import quanta.actpub.model.APList;
+import quanta.actpub.model.APObj;
 import quanta.exception.NodeAuthFailedException;
 import quanta.exception.base.RuntimeEx;
+import quanta.model.client.NodeProp;
 import quanta.model.client.PrincipalName;
 import quanta.mongo.MongoAuth;
 import quanta.mongo.MongoCreate;
@@ -27,6 +30,7 @@ import quanta.service.AttachmentService;
 import quanta.service.UserManagerService;
 import quanta.util.LimitedInputStreamEx;
 import quanta.util.ThreadLocals;
+import quanta.util.XString;
 
 /**
  * This is actually where I just run various experiments related to MongoDB, and this is not
@@ -70,7 +74,9 @@ public class MongoTest implements TestIntf {
 		log.debug("*****************************************************************************************");
 		log.debug("MongoTest Running!");
 
-		testDirtyReads();
+		testComplexProperties();
+
+		// testDirtyReads();
 
 		// testPathRegex();
 
@@ -118,6 +124,33 @@ public class MongoTest implements TestIntf {
 
 		log.debug("Mongo Test Ok.");
 		log.debug("*****************************************************************************************");
+	}
+
+	// "name": ":catjam:",
+	// "updated": "2020-08-25T14:05:01Z",
+	// "icon": {
+	// "type": "Image",
+	// "mediaType": "image/gif",
+	// "url":
+	// "https://files.mastodon.social/custom_emojis/images/000/224/097/original/d9c5e447581399a9.gif"
+	// }
+
+	// Verify we can read-write these kinds of properties
+	public void testComplexProperties() {
+		String nodeId = "61bffa8a0e86eb44d1f04dc6";
+		MongoSession as = asUser(PrincipalName.ADMIN.s());
+
+		SubNode node = mongoUtil.findByIdNoCache(new ObjectId(nodeId));
+
+		// APObj payload = new APObj().put("tag", new APList().val(new APObj().put("propname", "propval")));
+		node.set(NodeProp.ACT_PUB_TAG.s(), new APList().val(new APObj() //
+				.put("name", ":catjam:") //
+				.put("icon", new APObj() //
+						.put("url",
+								"https://files.mastodon.social/custom_emojis/images/000/224/097/original/d9c5e447581399a9.gif"))));
+
+		log.debug("Complex Object (5): " + XString.prettyPrint(node));
+		update.saveSession(as);
 	}
 
 	public void testDirtyReads() {

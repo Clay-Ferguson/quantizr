@@ -39,6 +39,7 @@ public class AppProp {
 	private boolean daemonsEnabled = true;
 
 	// turns on verbose ActivityPub Logging
+	// todo-2: need an admin console where stuff like this can be turned on/off live.
 	private boolean apLog = false;
 
 	private String protocolHostAndPort = null;

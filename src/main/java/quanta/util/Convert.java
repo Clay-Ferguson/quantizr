@@ -323,8 +323,22 @@ public class Convert {
 	public PropertyInfo convertToPropertyInfo(SessionContext sc, SubNode node, String propName, SubNodePropVal prop,
 			boolean htmlOnly, boolean initNodeEdit) {
 		try {
-			String value = "content".equals(propName) ? formatValue(sc, prop.getValue(), false, initNodeEdit)
-					: prop.getValue().toString();
+			Object value = null;
+			switch (propName) {
+				case "content":
+					value = formatValue(sc, prop.getValue(), false, initNodeEdit);
+					break;
+
+				// Special processing (need to build this kind of stuff into the "Plugin" architecture for types)
+				case "ap:tag": //NodeProp.ACT_PUB_TAG
+					value = prop.getValue();
+					break;
+					
+				default:
+					value = prop.getValue().toString();
+					break;
+			}
+
 			/* log.trace(String.format("prop[%s]=%s", prop.getName(), value)); */
 
 			PropertyInfo propInfo = new PropertyInfo(propName, value);

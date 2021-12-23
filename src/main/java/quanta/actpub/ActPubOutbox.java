@@ -129,6 +129,8 @@ public class ActPubOutbox {
                     // }
 
                     String apId = AP.str(obj, APObj.id);
+
+                    // If this is a new post our server hasn't yet injested.
                     if (!apIdSet.contains(apId)) {
                         Object object = AP.obj(obj, APObj.object);
 

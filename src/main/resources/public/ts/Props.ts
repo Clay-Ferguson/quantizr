@@ -228,6 +228,11 @@ export class Props {
         return prop ? prop.value : null;
     }
 
+    getNodePropValObj = (propertyName: string, node: J.NodeInfo): any => {
+        const prop: J.PropertyInfo = this.getNodeProp(propertyName, node);
+        return prop ? prop.value : null;
+    }
+
     getClientPropVal = (propertyName: string, node: J.NodeInfo): string => {
         const prop: J.PropertyInfo = this.getClientProp(propertyName, node);
         return prop ? prop.value : null;

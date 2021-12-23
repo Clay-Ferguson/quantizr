@@ -26,6 +26,7 @@ verifySuccess "Cleaned deploy target"
 
 mkdir -p ${DEPLOY_TARGET}
 
+# copy some configs and scripts to deploy target
 cd ${PRJROOT}
 cp ${PRJROOT}/docker-compose-distro.yaml    ${DEPLOY_TARGET}
 cp ${PRJROOT}/dockerfile                    ${DEPLOY_TARGET}

@@ -46,13 +46,19 @@ export class NodeCompRowHeader extends Div {
         // see 'admin' on all admin nodes. too noisy
         if (node.owner && node.owner !== "?" && node.owner !== "admin") {
             let displayName = node.displayName || ("@" + node.owner);
-            children.push(new Span(displayName, {
+
+            displayName = S.util.insertActPubTags(displayName, node);
+
+            let span: Span = null;
+            children.push(span = new Span(displayName, {
                 className: (node.owner === state.userName) ? "created-by-me" : "created-by-other",
                 title: "Show Profile",
                 onClick: (evt: any) => {
                     new UserProfileDlg(node.ownerId, state).open();
                 }
             }));
+
+            span.renderRawHtml = true;
         }
 
         let typeHandler: TypeHandlerIntf = S.plugin.getTypeHandler(node.type);
