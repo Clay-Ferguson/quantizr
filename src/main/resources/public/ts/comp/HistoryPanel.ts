@@ -69,7 +69,6 @@ export class HistoryPanel extends Div {
             ]));
 
             this.makeDropTarget(parentDropTarg.attribs, h.id);
-            // do we need to sanitize html here?
             d.renderRawHtml = true;
 
             if (h.subItems) {

@@ -1,5 +1,7 @@
+import DOMPurify from "dompurify";
 import React from "react";
 import { S } from "../../Singletons";
+import { Util } from "../../Util";
 import { Comp } from "../base/Comp";
 import { CompIntf } from "../base/CompIntf";
 
@@ -39,8 +41,9 @@ export class Html extends Comp {
         if (this.hasChildren()) {
             console.error("dangerouslySetInnerHTML component had children. This is a bug: id=" + this.getId() + " constructor.name=" + this.constructor.name);
         }
-        // todo-0: where are we doing the sanitize? It it necessary?
-        this.attribs.dangerouslySetInnerHTML = { __html: (this.getState<LS>() as any).content };
+        let content =
+            DOMPurify.sanitize((this.getState<LS>() as any).content, Util.DOM_PURIFY_CONFIG);
+        this.attribs.dangerouslySetInnerHTML = { __html: content };
         return this.e("div", this.attribs);
 
         // ************* DO NOT DELETE. Method 1 and 2 both work, except #2 would need to be updated to

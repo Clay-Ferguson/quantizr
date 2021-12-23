@@ -1,5 +1,4 @@
 import { EventInput } from "@fullcalendar/react";
-import DOMPurify from "dompurify";
 import * as marked from "marked";
 import { appState, dispatch, store } from "./AppRedux";
 import { AppState } from "./AppState";
@@ -1112,8 +1111,7 @@ export class Util {
         val = val.trim();
         val = this.stripIfStartsWith(val, "<p>");
         val = this.stripIfEndsWith(val, "</p>");
-
-        return DOMPurify.sanitize(val, Util.DOM_PURIFY_CONFIG);
+        return val;
     }
 
     // External Emojis!
