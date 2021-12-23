@@ -42,9 +42,6 @@ import { FriendsDlg } from "./FriendsDlg";
 
 /**
  * Node Editor Dialog
- *
- * Yeah I know this file grew way to large and has other ugliness too, but it will be cleaned up soon
- * (todo-0)
  */
 export class EditNodeDlg extends DialogBase {
 
