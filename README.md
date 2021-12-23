@@ -2,7 +2,7 @@
 
 # Quanta Web Platform
 
-### Social Media and Content Mangement/Publishing App
+### Social Media and Content Mangement/Publishing
 
 Join the Fediverse!
 
@@ -16,6 +16,9 @@ Designed to allow a more fine-grained hierarchical approach to content managemen
 
 https://quanta.wiki
 
+## How to Build
+
+Basic DEV builder is called `./scripts/dev-build.sh` and shows how to build the project. Other builders (for PROD for example) are there as well and all similar. Builds the SpringBoot app, and starts it running in a docker container.
 
 ## Search Tags
 

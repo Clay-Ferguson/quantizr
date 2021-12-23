@@ -1,5 +1,9 @@
 # Quanta Distro
 
+IMPORTNAT: 
+
+This doc is about how to build the distribution files for Quanta, and is not the 'builder', in case that's what you're looking for.
+
 NOTE: The tar file in this folder was created by running `build-distro.sh`. Note: Before you run this build script you should edit `setenv-distro-runner.sh` and `setenv-distro.sh` script files to bump up the QUANTA_VER to some future version number.
 
 Extracting this tar file is the minimal (simplest) way to run an instance of Quanta. The `setenv-distro.sh` file is where most of the configuration parameters are. One such parameter is the `DEPLOY_TARGET` env variable, which controls where the content of this tar file will go before being zipped. This folder will be a place where you can also run Quanta from, since it's already there and unzipped.

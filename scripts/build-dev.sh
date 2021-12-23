@@ -2,7 +2,7 @@
 # Script for doing a dev build for localhost testing of a single instance (no ActivityPub support)
 ###############################################################################
 # This script is for normal localhost development. After running this script 
-# you should have an instance running at http://localhost:port, for testing/debugging
+# you should have an instance running at http(s)://${quanta_domain}:${PORT}, for testing/debugging
 ###############################################################################
 
 # force current dir to be this script
