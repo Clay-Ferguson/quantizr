@@ -78,7 +78,8 @@ export class TextArea extends Span implements I.TextEditorIntf {
 
         if (this.label) {
             children.push(new Label(this.label, {
-                htmlFor: this.getId() + "_textarea"
+                htmlFor: this.getId() + "_textarea",
+                className: "marginTop"
             }));
         }
 
