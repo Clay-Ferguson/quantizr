@@ -1,5 +1,8 @@
 package quanta.actpub;
 
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import org.springframework.stereotype.Component;
 import quanta.actpub.model.APObj;
@@ -43,5 +46,5 @@ public class ActPubCache {
     public final ConcurrentHashMap<String, APObj> webFingerCacheByUserName = new ConcurrentHashMap<>();
 
     /* Cache WebFinger fails, so we don't try them again */
-    public final ConcurrentHashMap<String, Boolean> webFingerFailsByUserName = new ConcurrentHashMap<>();
+    public final Set<String> webFingerFailsByUserName = Collections.synchronizedSet(new HashSet<String>());
 }

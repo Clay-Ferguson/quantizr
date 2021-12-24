@@ -30,7 +30,7 @@ public enum NodeProp {
     ACT_PUB_ACTOR_INBOX("ap:actorInbox", "s"), //
     ACT_PUB_SENSITIVE("ap:nsfw", "s"), //
 
-    // this 's' probably needs to change to JSON or Object ? (todo-0)
+    // this 's' probably needs to change to JSON or Object ? (todo-1)
     ACT_PUB_TAG("ap:tag", "s"), //
 
     /*

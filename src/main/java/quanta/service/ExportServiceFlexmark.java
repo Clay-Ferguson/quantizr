@@ -275,7 +275,7 @@ public class ExportServiceFlexmark {
 
 		String style = "";
 		String imgSize = node.getStr(NodeProp.IMG_SIZE.s());
-		if (ok(imgSize) && imgSize.endsWith("%") || imgSize.endsWith("px")) {
+		if (ok(imgSize) && (imgSize.endsWith("%") || imgSize.endsWith("px"))) {
 			style = " style='width:" + imgSize + "'";
 		}
 

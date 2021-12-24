@@ -1091,16 +1091,6 @@ public class ActPubService {
         if (name.indexOf("\n") != -1 || name.indexOf("\r") != -1 || name.indexOf("\t") != -1)
             return false;
 
-        if (no(apCache)) {
-            log.debug("apCache null in saveFediverseName");
-            return false;
-        }
-
-        if (no(apCache.allUserNames)) {
-            log.debug("apCache.allUserNames null in saveFediverseName");
-            return false;
-        }
-
         if (!apCache.allUserNames.contains(name)) {
             apCache.allUserNames.put(name, false);
             return true;

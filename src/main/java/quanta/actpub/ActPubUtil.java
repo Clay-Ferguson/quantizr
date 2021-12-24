@@ -403,8 +403,7 @@ public class ActPubUtil {
         }
         String host = (secure ? "https://" : "http://") + getHostFromUserName(userName);
 
-        Boolean failed = apCache.webFingerFailsByUserName.get(userName);
-        if (ok(failed)) {
+        if (apCache.webFingerFailsByUserName.contains(userName)) {
             return null;
         }
 
@@ -421,7 +420,7 @@ public class ActPubUtil {
             // log.debug("Caching WebFinger: " + XString.prettyPrint(finger));
             apCache.webFingerCacheByUserName.put(userName, finger);
         } else {
-            apCache.webFingerFailsByUserName.put(userName, true);
+            apCache.webFingerFailsByUserName.add(userName);
         }
         return finger;
     }
