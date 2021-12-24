@@ -13,7 +13,6 @@ import quanta.mongo.model.SubNode;
  */
 // I think I confirmed that for a @Lazy loaded bean it's initialization won't be done unti it's first METHOD
 // is called so this was broken as lazy. no methods here.
-// @Lazy
 @Component
 public class ActPubCache {
     /*

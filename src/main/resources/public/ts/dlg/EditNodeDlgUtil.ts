@@ -10,6 +10,8 @@ import { ConfirmDlg } from "./ConfirmDlg";
 import { EditNodeDlg } from "./EditNodeDlg";
 import { LS } from "./EditNodeDlgState";
 import { EditPropertyDlg } from "./EditPropertyDlg";
+import { EmojiPickerDlg } from "./EmojiPickerDlg";
+import { FriendsDlg } from "./FriendsDlg";
 import { SplitNodeDlg } from "./SplitNodeDlg";
 import { UploadFromFileDropzoneDlg } from "./UploadFromFileDropzoneDlg";
 
@@ -181,7 +183,7 @@ export class EditNodeDlgUtil {
 
         let uploadDlg = new UploadFromFileDropzoneDlg(state.node.id, "", state.toIpfs, null, false, true, dlg.appState, async () => {
             await this.refreshBinaryPropsFromServer(dlg, state.node);
-            dlg.initPropStates(state.node, true);
+            this.initPropStates(dlg, state.node, true);
             dlg.mergeState<LS>({ node: state.node });
             dlg.binaryDirty = true;
         });
@@ -282,7 +284,7 @@ export class EditNodeDlgUtil {
 
         if (deleted) {
             S.attachment.removeBinaryProperties(state.node);
-            dlg.initPropStates(state.node, true);
+            this.initPropStates(dlg, state.node, true);
             dlg.mergeState<LS>({ node: state.node });
 
             if (dlg.mode === DialogMode.EMBED) {
@@ -349,6 +351,135 @@ export class EditNodeDlgUtil {
                     propState.setValue("" + new Date().getTime());
                 }
             }
+        }
+    }
+
+    speechRecognition = (dlg: EditNodeDlg): void => {
+        S.speech.setCallback((transcript: string) => {
+            if (dlg.contentEditor && transcript) {
+                // Capitalize and put period at end. This may be annoying in the long run but for now i "think"
+                // I will like it? Time will tell.
+                if (transcript.trim().length > 0) {
+                    transcript = transcript.charAt(0).toUpperCase() + transcript.slice(1);
+                    dlg.contentEditor.insertTextAtCursor(transcript + ". ");
+                }
+                else {
+                    dlg.contentEditor.insertTextAtCursor(transcript);
+                }
+            }
+        });
+
+        S.speech.toggleActive();
+        dlg.mergeState<LS>({ speechActive: S.speech.speechActive });
+
+        setTimeout(() => {
+            if (dlg.contentEditor) {
+                dlg.contentEditor.focus();
+            }
+        }, 250);
+    }
+
+    initStates = (dlg: EditNodeDlg): void => {
+        let state = dlg.getState<LS>();
+
+        /* Init main content text on node */
+        let value = state.node.content || "";
+        if (!value.startsWith(J.Constant.ENC_TAG)) {
+            dlg.contentEditorState.setValue(value);
+        }
+        else {
+            dlg.contentEditorState.setValue("");
+        }
+
+        /* Initialize node name state */
+        dlg.nameState.setValue(state.node.name);
+        this.initPropStates(dlg, state.node, false);
+    }
+
+        /* Initializes the propStates for every property in 'node', and optionally if 'onlyBinaries==true' then we process ONLY
+    the properties on node that are in 'S.props.allBinaryProps' list, which is how we have to update the propStates after
+    an upload has been added or removed. */
+    initPropStates = (dlg: EditNodeDlg, node: J.NodeInfo, onlyBinaries: boolean): any => {
+        let typeHandler: TypeHandlerIntf = S.plugin.getTypeHandler(node.type);
+        let customProps: string[] = null;
+        if (typeHandler) {
+            customProps = typeHandler.getCustomProperties();
+            typeHandler.ensureDefaultProperties(node);
+        }
+
+        /* If we're updating binaries from the node properties, we need to wipe all the existing ones first to account for
+        props that need to be removed */
+        if (onlyBinaries) {
+            S.props.allBinaryProps.forEach(s => {
+                if (dlg.propStates.get(s)) {
+                    dlg.propStates.delete(s);
+                }
+            });
+        }
+
+        if (node.properties) {
+            node.properties.forEach((prop: J.PropertyInfo) => {
+                // console.log("prop: " + S.util.prettyPrint(prop));
+
+                // if onlyBinaries and this is NOT a binary prop then skip it.
+                if (onlyBinaries) {
+                    if (S.props.allBinaryProps.has(prop.name)) {
+                        this.initPropState(dlg, node, typeHandler, prop, false);
+                    }
+                    return;
+                }
+
+                if (!dlg.allowEditAllProps && !S.render.allowPropertyEdit(node, prop.name, dlg.appState)) {
+                    // ("Hiding property: " + prop.name);
+                    return;
+                }
+
+                if (dlg.allowEditAllProps || (
+                    !S.render.isReadOnlyProperty(prop.name) || S.edit.showReadOnlyProperties)) {
+
+                    if (!dlg.isGuiControlBasedProp(prop)) {
+                        let allowSelection = !customProps || !customProps.find(p => p === prop.name);
+                        this.initPropState(dlg, node, typeHandler, prop, allowSelection);
+                    }
+                }
+            });
+        }
+    }
+
+    insertTime = (dlg: EditNodeDlg): void => {
+        if (dlg.contentEditor) {
+            dlg.contentEditor.insertTextAtCursor("[" + S.util.formatDate(new Date()) + "]");
+        }
+    }
+
+    insertMention = async (dlg: EditNodeDlg): Promise<void> => {
+        if (dlg.contentEditor) {
+            let friendDlg: FriendsDlg = new FriendsDlg(null, dlg.appState, true);
+            await friendDlg.open();
+            if (friendDlg.getState().selectedName) {
+                dlg.contentEditor.insertTextAtCursor(" @" + friendDlg.getState().selectedName + " ");
+            }
+        }
+    }
+
+    insertEmoji = async (dlg: EditNodeDlg): Promise<void> => {
+        if (dlg.contentEditor) {
+            let emojiDlg: EmojiPickerDlg = new EmojiPickerDlg(dlg.appState);
+            await emojiDlg.open();
+            if (emojiDlg.getState().selectedEmoji) {
+                dlg.contentEditor.insertTextAtCursor(emojiDlg.getState().selectedEmoji);
+            }
+        }
+    }
+
+    cancelEdit = (dlg: EditNodeDlg): void => {
+        dlg.close();
+
+        // rollback properties.
+        dlg.getState<LS>().node.properties = dlg.initialProps;
+
+        if (dlg.binaryDirty) {
+            S.quanta.refresh(dlg.appState);
         }
     }
 }

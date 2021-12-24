@@ -27,7 +27,6 @@ public class ActPubFactory  {
 	private static final Logger log = LoggerFactory.getLogger(ActPubFactory.class);
 
 	@Autowired
-	// @Lazy
 	public ActPubCache apCache;
 
 	@Autowired

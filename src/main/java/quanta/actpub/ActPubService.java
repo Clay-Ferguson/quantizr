@@ -85,7 +85,6 @@ public class ActPubService {
     protected ActPubCrypto apCrypto;
 
     @Autowired
-    // @Lazy
     public ActPubCache apCache;
 
     @Autowired

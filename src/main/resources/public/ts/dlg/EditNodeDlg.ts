@@ -37,8 +37,6 @@ import { ValidatedState } from "../ValidatedState";
 import { ChangeNodeTypeDlg } from "./ChangeNodeTypeDlg";
 import { LS } from "./EditNodeDlgState";
 import { EditNodeDlgUtil } from "./EditNodeDlgUtil";
-import { EmojiPickerDlg } from "./EmojiPickerDlg";
-import { FriendsDlg } from "./FriendsDlg";
 
 /**
  * Node Editor Dialog
@@ -54,7 +52,7 @@ export class EditNodeDlg extends DialogBase {
     uploadButton: IconButton;
     deleteUploadButton: Div;
     deletePropButton: IconButton;
-    contentEditor: I.TextEditorIntf;
+    public contentEditor: I.TextEditorIntf;
     contentEditorState: ValidatedState<any> = new ValidatedState<any>();
     nameState: ValidatedState<any> = new ValidatedState<any>();
 
@@ -92,7 +90,7 @@ export class EditNodeDlg extends DialogBase {
         });
 
         this.allowEditAllProps = this.appState.isAdminUser;
-        this.initStates();
+        this.utl.initStates(this);
         this.initialProps = S.util.arrayClone(node.properties);
 
         /* This 'encrypt' will trigger this node to be encrypted whenever we're replying to
@@ -101,73 +99,6 @@ export class EditNodeDlg extends DialogBase {
             setTimeout(() => {
                 this.utl.setEncryption(this, true);
             }, 500);
-        }
-    }
-
-    initStates = (): void => {
-        let state = this.getState<LS>();
-
-        /* Init main content text on node */
-        let value = state.node.content || "";
-        if (!value.startsWith(J.Constant.ENC_TAG)) {
-            this.contentEditorState.setValue(value);
-        }
-        else {
-            this.contentEditorState.setValue("");
-        }
-
-        /* Initialize node name state */
-        this.nameState.setValue(state.node.name);
-        this.initPropStates(state.node, false);
-    }
-
-    /* Initializes the propStates for every property in 'node', and optionally if 'onlyBinaries==true' then we process ONLY
-    the properties on node that are in 'S.props.allBinaryProps' list, which is how we have to update the propStates after
-    an upload has been added or removed. */
-    initPropStates = (node: J.NodeInfo, onlyBinaries: boolean): any => {
-        let typeHandler: TypeHandlerIntf = S.plugin.getTypeHandler(node.type);
-        let customProps: string[] = null;
-        if (typeHandler) {
-            customProps = typeHandler.getCustomProperties();
-            typeHandler.ensureDefaultProperties(node);
-        }
-
-        /* If we're updating binaries from the node properties, we need to wipe all the existing ones first to account for
-        props that need to be removed */
-        if (onlyBinaries) {
-            S.props.allBinaryProps.forEach(s => {
-                if (this.propStates.get(s)) {
-                    this.propStates.delete(s);
-                }
-            });
-        }
-
-        if (node.properties) {
-            node.properties.forEach((prop: J.PropertyInfo) => {
-                // console.log("prop: " + S.util.prettyPrint(prop));
-
-                // if onlyBinaries and this is NOT a binary prop then skip it.
-                if (onlyBinaries) {
-                    if (S.props.allBinaryProps.has(prop.name)) {
-                        this.utl.initPropState(this, node, typeHandler, prop, false);
-                    }
-                    return;
-                }
-
-                if (!this.allowEditAllProps && !S.render.allowPropertyEdit(node, prop.name, this.appState)) {
-                    // ("Hiding property: " + prop.name);
-                    return;
-                }
-
-                if (this.allowEditAllProps || (
-                    !S.render.isReadOnlyProperty(prop.name) || S.edit.showReadOnlyProperties)) {
-
-                    if (!this.isGuiControlBasedProp(prop)) {
-                        let allowSelection = !customProps || !customProps.find(p => p === prop.name);
-                        this.utl.initPropState(this, node, typeHandler, prop, allowSelection);
-                    }
-                }
-            });
         }
     }
 
@@ -254,7 +185,7 @@ export class EditNodeDlg extends DialogBase {
                 title: "Jump to Node",
                 className: "fa fa-arrow-right fa-lg jumpButton",
                 onClick: () => {
-                    this.cancelEdit();
+                    this.utl.cancelEdit(this);
                     S.nav.closeFullScreenViewer(this.appState);
                     S.view.jumpToId(state.node.id);
                 }
@@ -407,8 +338,8 @@ export class EditNodeDlg extends DialogBase {
             });
         }
 
-        let allowPropertyAdd: boolean = typeHandler ? typeHandler.getAllowPropertyAdd() : true;
-        if (allowPropertyAdd) {
+        let allowPropAdd: boolean = typeHandler ? typeHandler.getAllowPropertyAdd() : true;
+        if (allowPropAdd) {
             if (numPropsShowing > 0) {
                 let propsButtonBar: ButtonBar = new ButtonBar([
 
@@ -515,7 +446,7 @@ export class EditNodeDlg extends DialogBase {
         let collapsiblePanel = !customProps ? new CollapsiblePanel(null, null, null, [
             new Div(null, { className: "marginBottom marginRight marginTop" }, [
                 new Button("Type", this.openChangeNodeTypeDlg),
-                allowPropertyAdd && numPropsShowing === 0 ? new Button("Props", () => this.utl.addProperty(this)) : null
+                allowPropAdd && numPropsShowing === 0 ? new Button("Props", () => this.utl.addProperty(this)) : null
             ]),
             nodeNameTextField, selectionsBar, checkboxesBar, propsTable
         ], false,
@@ -574,7 +505,7 @@ export class EditNodeDlg extends DialogBase {
                 this.close();
             }, { title: "Save this node and close editor." }, "btn-primary"),
 
-            new Button("Cancel", this.cancelEdit, null),
+            new Button("Cancel", () => this.utl.cancelEdit(this), null),
 
             this.uploadButton = allowUpload ? new IconButton("fa-upload", null, {
                 onClick: () => this.utl.upload(this),
@@ -598,13 +529,13 @@ export class EditNodeDlg extends DialogBase {
             advancedButtons ? new Icon({
                 className: "fa " + (S.speech.speechActive ? "fa-microphone-slash" : "fa-microphone") + " fa-lg editorButtonIcon",
                 title: "Toggle on/off Speech Recognition to input text",
-                onClick: this.speechRecognition
+                onClick: () => this.utl.speechRecognition(this)
             }) : null,
 
             advancedButtons ? new Icon({
                 className: "fa fa-clock-o fa-lg editorButtonIcon",
                 title: "Insert current time at cursor",
-                onClick: this.insertTime
+                onClick: () => this.utl.insertTime(this)
             }) : null,
 
             advancedButtons && !datePropExists ? new Icon({
@@ -616,13 +547,13 @@ export class EditNodeDlg extends DialogBase {
             advancedButtons ? new Icon({
                 className: "fa fa-user fa-lg editorButtonIcon",
                 title: "Insert username/mention at cursor",
-                onClick: this.insertMention
+                onClick: () => this.utl.insertMention(this)
             }) : null,
 
             advancedButtons ? new Icon({
                 className: "fa fa-smile-o fa-lg editorButtonIcon",
                 title: "Insert emoji at cursor",
-                onClick: this.insertEmoji
+                onClick: () => this.utl.insertEmoji(this)
             }) : null,
             typeHandler && typeHandler.getName() && typeHandler.getTypeName() !== "u" ? new Span(typeHandler.getName(), {
                 className: "float-end typeName"
@@ -656,32 +587,6 @@ export class EditNodeDlg extends DialogBase {
         // see saveNode for how to iterate all properties, although I wonder why I didn't just use a map/set of
         // properties elements
         // instead so I don't need to parse any DOM or domIds inorder to iterate over the list of them????
-    }
-
-    insertTime = (): void => {
-        if (this.contentEditor) {
-            this.contentEditor.insertTextAtCursor("[" + S.util.formatDate(new Date()) + "]");
-        }
-    }
-
-    insertMention = async (): Promise<void> => {
-        if (this.contentEditor) {
-            let dlg: FriendsDlg = new FriendsDlg(null, this.appState, true);
-            await dlg.open();
-            if (dlg.getState().selectedName) {
-                this.contentEditor.insertTextAtCursor(" @" + dlg.getState().selectedName + " ");
-            }
-        }
-    }
-
-    insertEmoji = async (): Promise<void> => {
-        if (this.contentEditor) {
-            let dlg: EmojiPickerDlg = new EmojiPickerDlg(this.appState);
-            await dlg.open();
-            if (dlg.getState().selectedEmoji) {
-                this.contentEditor.insertTextAtCursor(dlg.getState().selectedEmoji);
-            }
-        }
     }
 
     openChangeNodeTypeDlg = (): void => {
@@ -809,41 +714,5 @@ export class EditNodeDlg extends DialogBase {
 
         editItems.push(this.contentEditor as any as Comp);
         return new Div(null, null, editItems);
-    }
-
-    speechRecognition = (): void => {
-        S.speech.setCallback((transcript: string) => {
-            if (this.contentEditor && transcript) {
-                // Capitalize and put period at end. This may be annoying in the long run but for now i "think"
-                // I will like it? Time will tell.
-                if (transcript.trim().length > 0) {
-                    transcript = transcript.charAt(0).toUpperCase() + transcript.slice(1);
-                    this.contentEditor.insertTextAtCursor(transcript + ". ");
-                }
-                else {
-                    this.contentEditor.insertTextAtCursor(transcript);
-                }
-            }
-        });
-
-        S.speech.toggleActive();
-        this.mergeState<LS>({ speechActive: S.speech.speechActive });
-
-        setTimeout(() => {
-            if (this.contentEditor) {
-                this.contentEditor.focus();
-            }
-        }, 250);
-    }
-
-    cancelEdit = (): void => {
-        this.close();
-
-        // rollback properties.
-        this.getState<LS>().node.properties = this.initialProps;
-
-        if (this.binaryDirty) {
-            S.quanta.refresh(this.appState);
-        }
     }
 }

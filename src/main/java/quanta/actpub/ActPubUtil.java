@@ -67,7 +67,6 @@ public class ActPubUtil {
     protected ActPubCrypto apCrypto;
 
     @Autowired
-    // @Lazy
     public ActPubCache apCache;
 
     @Autowired
