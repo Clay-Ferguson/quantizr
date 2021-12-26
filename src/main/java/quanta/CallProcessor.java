@@ -10,8 +10,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 import org.springframework.web.util.WebUtils;
 import quanta.config.ServiceBase;
@@ -19,7 +17,6 @@ import quanta.exception.NotLoggedInException;
 import quanta.exception.OutOfSpaceException;
 import quanta.model.client.ErrorType;
 import quanta.mongo.MongoSession;
-import quanta.mongo.MongoUpdate;
 import quanta.request.LogoutRequest;
 import quanta.request.base.RequestBase;
 import quanta.response.base.ResponseBase;
@@ -28,7 +25,6 @@ import quanta.util.LockEx;
 import quanta.util.MongoRunnableEx;
 import quanta.util.ThreadLocals;
 import quanta.util.XString;
-
 
 @Component
 public class CallProcessor extends ServiceBase {
@@ -85,7 +81,6 @@ public class CallProcessor extends ServiceBase {
 				ret = runner.run(ms);
 				update.saveSession(ms);
 			}
-
 		} catch (NotLoggedInException e1) {
 			HttpServletResponse res = ThreadLocals.getServletResponse();
 			try {

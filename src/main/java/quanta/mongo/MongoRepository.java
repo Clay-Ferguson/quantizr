@@ -6,6 +6,8 @@ import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.event.ContextRefreshedEvent;
+import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 import quanta.AppServer;
 import quanta.config.ServiceBase;
@@ -71,7 +73,9 @@ public class MongoRepository extends ServiceBase {
 	 * Called from SpringContextUtil#setApplicationContext, because we want to call only after all of
 	 * Spring context is fully initialized
 	 */
-	public void init() {
+	@EventListener
+	public void handleContextRefresh(ContextRefreshedEvent event) {
+		log.debug("ContextRefreshedEvent");
 		if (initialized)
 			return;
 

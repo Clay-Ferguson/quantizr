@@ -2,7 +2,6 @@ package quanta;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.web.servlet.ServletComponentScan;
@@ -10,9 +9,7 @@ import org.springframework.context.event.ContextClosedEvent;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.scheduling.annotation.EnableScheduling;
-import quanta.config.AppProp;
 import quanta.config.ServiceBase;
-import quanta.exception.base.RuntimeEx;
 import quanta.util.ExUtil;
 
 /**
@@ -50,22 +47,13 @@ public class AppServer extends ServiceBase {
 
 	@EventListener
 	public void handleContextRefresh(ContextRefreshedEvent event) {
-		log.info("ContextRefreshedEvent.");
-		log.debug("PROFILE: " + prop.getProfileName());
-		log.trace("test trace message.");
-
-		try {
-			mongoRepo.init();
-			english.init();
-			ipfsPubSub.init();
-		} catch (Exception e) {
-			log.error("application startup failed.");
-			throw new RuntimeEx(e);
-		}
+		log.info("log.info: ContextRefreshedEvent.");
+		log.debug("log.debug: PROFILE: " + prop.getProfileName());
+		log.trace("log.trace: test trace message.");
 	}
 
 	@EventListener
-	public void handleContextRefresh(ContextClosedEvent event) {
+	public void handleContextClose(ContextClosedEvent event) {
 		log.info("ContextClosedEvent");
 	}
 

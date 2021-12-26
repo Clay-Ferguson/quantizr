@@ -16,6 +16,8 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.event.ContextRefreshedEvent;
+import org.springframework.context.event.EventListener;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -60,6 +62,23 @@ public class IPFSPubSub extends ServiceBase {
 		ipfsPubSub = this;
 	}
 
+    @EventListener
+	public void handleContextRefresh(ContextRefreshedEvent event) {
+        log.debug("ContextRefreshedEvent");
+        // log.debug("Checking swarmPeers");
+        // swarmPeers();
+
+        if (IPSM_ENABLE) {
+            asyncExec.run(null, () -> {
+                setOptions();
+                ipfs.doSwarmConnect();
+                Util.sleep(3000);
+                openChannel(IPSM_TOPIC_HEARTBEAT);
+                openChannel(IPSM_TOPIC_TEST);
+            });
+        }
+    }
+
     public void setOptions() {
         // Only used this for some testing (shouldn't be required?)
         // if these are the defaults ?
@@ -86,21 +105,6 @@ public class IPFSPubSub extends ServiceBase {
     // pub(IPSM_TOPIC_HEARTBEAT, (String) ipfs.instanceId.get("ID") + "-ipsm-" +
     // String.valueOf(heartbeatCounter++) + "\n");
     // }}
-
-    public void init() {
-        // log.debug("Checking swarmPeers");
-        // swarmPeers();
-
-        if (IPSM_ENABLE) {
-            asyncExec.run(null, () -> {
-                setOptions();
-                ipfs.doSwarmConnect();
-                Util.sleep(3000);
-                openChannel(IPSM_TOPIC_HEARTBEAT);
-                openChannel(IPSM_TOPIC_TEST);
-            });
-        }
-    }
 
     public void openChannel(String topic) {
         if (IPSM_ENABLE) {

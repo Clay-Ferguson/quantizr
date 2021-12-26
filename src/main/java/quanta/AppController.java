@@ -188,6 +188,7 @@ public class AppController extends ServiceBase implements ErrorController {
 
 	@EventListener
 	public void handleContextRefresh(ContextRefreshedEvent event) {
+		log.debug("ContextRefreshedEvent");
 		init();
 	}
 
