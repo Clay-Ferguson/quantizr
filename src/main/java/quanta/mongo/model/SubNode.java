@@ -20,9 +20,9 @@ import org.springframework.data.annotation.Transient;
 import org.springframework.data.annotation.TypeAlias;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
+import quanta.config.ServiceBase;
 import quanta.model.client.NodeProp;
 import quanta.model.client.NodeType;
-import quanta.mongo.MongoAuth;
 import quanta.util.ExUtil;
 import quanta.util.ThreadLocals;
 import quanta.util.Util;
@@ -199,7 +199,7 @@ public class SubNode {
 		if (Util.equalObjs(path, this.path))
 			return;
 
-		MongoAuth.inst.ownerAuthByThread(this);
+		ServiceBase.auth.ownerAuthByThread(this);
 		ThreadLocals.dirty(this);
 		this.path = path;
 

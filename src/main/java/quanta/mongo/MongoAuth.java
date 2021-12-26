@@ -12,9 +12,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
-import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Component;
@@ -42,15 +40,7 @@ import quanta.util.XString;
 public class MongoAuth extends ServiceBase {
 	private static final Logger log = LoggerFactory.getLogger(MongoAuth.class);
 
-	@Autowired
-    public MongoTemplate ops;
-
-
 	private static final boolean verbose = false;
-
-	// in order for non-spring beans (namely just SubNode.java) to access this we cheat by using this
-	// static.
-	public static MongoAuth inst;
 
 	private static final Object adminSessionLck = new Object();
 	private static MongoSession adminSession;
@@ -62,8 +52,6 @@ public class MongoAuth extends ServiceBase {
 
 	@PostConstruct
 	public void postConstruct() {
-		// this instance can come from base class now (todo-0)
-		inst = this;
 		auth = this;
 	}
 

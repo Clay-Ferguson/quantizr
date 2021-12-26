@@ -6,9 +6,6 @@ import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Lazy;
-import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.stereotype.Component;
 import quanta.AppServer;
 import quanta.config.ServiceBase;
@@ -20,9 +17,6 @@ import quanta.util.ThreadLocals;
 @Component
 public class MongoRepository extends ServiceBase {
 	private static final Logger log = LoggerFactory.getLogger(MongoRepository.class);
-
-	@Autowired
-    public MongoTemplate ops;
 
 	// hack for now to make RSS deamon wait.
 	public static boolean fullInit = false;

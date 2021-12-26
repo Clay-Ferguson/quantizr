@@ -12,7 +12,7 @@ import quanta.model.client.PrincipalName;
 import quanta.mongo.model.SubNode;
 
 /**
- * Part of SpringSecurity implementation
+ * Part of Spring Security implementation
  */
 @Service
 public class AppUserDetailsService extends ServiceBase implements UserDetailsService {

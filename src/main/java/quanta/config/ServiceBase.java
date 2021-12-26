@@ -5,6 +5,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.data.mongodb.core.MongoTemplate;
 import quanta.CallProcessor;
 import quanta.actpub.ActPubCache;
 import quanta.actpub.ActPubCrypto;
@@ -123,12 +124,13 @@ public class ServiceBase {
 	public static FileUtils fileUtil;
 	public static MimeUtil mimeUtil;
 	public static MongoAppConfig mac;
-
+	
 	public static BookmarkType bookmarkType;
 	public static FriendType friendType;
 	public static RoomType roomType;
 	public static RssFeedType rssType;
 
+	public static MongoTemplate ops;
 	public static MongoRepository mongoRepo;
 
 	public ServiceBase() {

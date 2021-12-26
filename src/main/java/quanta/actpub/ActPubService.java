@@ -14,8 +14,6 @@ import javax.annotation.PostConstruct;
 import javax.servlet.http.HttpServletRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
@@ -48,9 +46,6 @@ import quanta.util.XString;
 @Component
 public class ActPubService extends ServiceBase {
     private static final Logger log = LoggerFactory.getLogger(ActPubService.class);
-
-    @Autowired
-    public MongoTemplate ops;
 
     public static final boolean ENGLISH_LANGUAGE_CHECK = false;
     public static final int MAX_MESSAGES = 10;

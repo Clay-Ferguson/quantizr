@@ -4,9 +4,7 @@ import java.util.Calendar;
 import com.mongodb.client.result.DeleteResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort.Direction;
-import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.index.Index;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
@@ -18,9 +16,6 @@ import quanta.mongo.model.FediverseName;
 @Component("MongoFediverseNamesTest")
 public class MongoFediverseNamesTest extends ServiceBase implements TestIntf {
 	private static final Logger log = LoggerFactory.getLogger(MongoFediverseNamesTest.class);
-
-	@Autowired
-    public MongoTemplate ops;
 
 	@Override
 	public void test() throws Exception {

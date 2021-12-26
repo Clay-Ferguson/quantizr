@@ -15,9 +15,7 @@ import org.apache.commons.codec.digest.DigestUtils;
 import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort.Direction;
-import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.index.Index;
 import org.springframework.data.mongodb.core.index.IndexField;
 import org.springframework.data.mongodb.core.index.IndexInfo;
@@ -54,9 +52,6 @@ import quanta.util.XString;
 @Component
 public class MongoUtil extends ServiceBase {
 	private static final Logger log = LoggerFactory.getLogger(MongoUtil.class);
-
-	@Autowired
-    public MongoTemplate ops;
 
 	private static HashSet<String> testAccountNames = new HashSet<>();
 	private static SubNode systemRootNode;

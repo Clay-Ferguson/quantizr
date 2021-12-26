@@ -4,7 +4,6 @@ import static org.bson.codecs.configuration.CodecRegistries.fromProviders;
 import static org.bson.codecs.configuration.CodecRegistries.fromRegistries;
 import static quanta.util.Util.no;
 import static quanta.util.Util.ok;
-import javax.annotation.PostConstruct;
 import com.mongodb.ConnectionString;
 import com.mongodb.MongoClientSettings;
 import com.mongodb.MongoCredential;
@@ -20,16 +19,15 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.data.mongodb.MongoDatabaseFactory;
 import org.springframework.data.mongodb.config.AbstractMongoClientConfiguration;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.SimpleMongoClientDatabaseFactory;
 import org.springframework.data.mongodb.core.WriteResultChecking;
-import org.springframework.data.mongodb.core.convert.MappingMongoConverter;
 import org.springframework.data.mongodb.gridfs.GridFsTemplate;
 import org.springframework.data.mongodb.repository.config.EnableMongoRepositories;
 import quanta.config.AppProp;
+import quanta.config.ServiceBase;
 import quanta.exception.base.RuntimeEx;
 import quanta.util.ExUtil;
 
@@ -46,9 +44,9 @@ public class MongoAppConfig extends AbstractMongoClientConfiguration {
 
 	public static final String databaseName = "database";
 
+	private MongoTemplate ops;
 	private MongoClient mongoClient;
 	private GridFSBucket gridFsBucket;
-	private MongoTemplate ops;
 	private GridFsTemplate grid;
 	private SimpleMongoClientDatabaseFactory factory;
 
@@ -61,18 +59,9 @@ public class MongoAppConfig extends AbstractMongoClientConfiguration {
 	@Autowired
 	private AppProp appProp;
 
-	@Autowired
-	@Lazy // todo-0: non-lazy here blows up circular refs
-	private MappingMongoConverter converter;
-
-	@PostConstruct
-	public void postConstruct() {
-		// log.debug("MongoAppConfig.postConstruct: mongoAdminPassword=" +
-		// appProp.getMongoAdminPassword());
-	}
-
 	@Bean
 	public MongoDatabaseFactory mongoDbFactory() {
+		log.debug("create mongoDbFactory");
 		if (connectionFailed)
 			return null;
 
@@ -81,6 +70,10 @@ public class MongoAppConfig extends AbstractMongoClientConfiguration {
 				MongoClient mc = mongoClient();
 				if (ok(mc)) {
 					factory = new SimpleMongoClientDatabaseFactory(mc, databaseName);
+
+					ops = new MongoTemplate(factory);
+					ops.setWriteResultChecking(WriteResultChecking.EXCEPTION);
+					ServiceBase.ops = ops;
 				} else {
 					return null;
 				}
@@ -95,6 +88,7 @@ public class MongoAppConfig extends AbstractMongoClientConfiguration {
 
 	@Bean
 	public GridFSBucket gridFsBucket() {
+		log.debug("create gridFdBucket");
 		if (connectionFailed)
 			return null;
 
@@ -110,6 +104,7 @@ public class MongoAppConfig extends AbstractMongoClientConfiguration {
 
 	@Override
 	public MongoClient mongoClient() {
+		log.debug("create mongoClient");
 		if (connectionFailed)
 			return null;
 
@@ -182,19 +177,27 @@ public class MongoAppConfig extends AbstractMongoClientConfiguration {
 	 */
 	@Bean
 	public MongoTemplate mongoTemplate() throws Exception {
+		if (no(ops)) {
+			throw new RuntimeException("Accessed mongoTemplate before mongoFactory complete.");
+		}
+		return ops;
+	}
+
+	@Bean
+	public GridFsTemplate gridFsTemplate() throws Exception {
+		log.debug("create gridFsTemplate");
 		if (connectionFailed)
 			return null;
 
-		if (no(ops)) {
+		if (no(grid)) {
 			MongoDatabaseFactory mdbf = mongoDbFactory();
 			if (ok(mdbf)) {
-				ops = new MongoTemplate(mdbf);
-				ops.setWriteResultChecking(WriteResultChecking.EXCEPTION);
+				grid = new GridFsTemplate(mdbf, mongoTemplate().getConverter());
 			} else {
 				return null;
 			}
 		}
-		return ops;
+		return grid;
 	}
 
 	@Override
@@ -205,21 +208,5 @@ public class MongoAppConfig extends AbstractMongoClientConfiguration {
 	@Override
 	protected String getMappingBasePackage() {
 		return "quanta.mongo";
-	}
-
-	@Bean
-	public GridFsTemplate gridFsTemplate() throws Exception {
-		if (connectionFailed)
-			return null;
-
-		if (no(grid)) {
-			MongoDatabaseFactory mdbf = mongoDbFactory();
-			if (ok(mdbf)) {
-				grid = new GridFsTemplate(mdbf, converter);
-			} else {
-				return null;
-			}
-		}
-		return grid;
 	}
 }
