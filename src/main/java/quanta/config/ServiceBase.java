@@ -60,14 +60,13 @@ import quanta.util.SubNodeUtil;
 import quanta.util.Validator;
 
 /**
- * We have lots of circular references in our services, and since Spring has decided it doesn't
- * support that without setting a flag to disable, I just solved it all in this monolithic way. I
- * don't see a problem with components that depend on each other in a system like Quanta.
+ * We have lots of circular references in our services, and since SpringBoot has decided it doesn't
+ * support that without setting a flag to disable checking, I just solved it in this monolithic way.
  * 
  * To make all services able to access others we break convention here and use inheritance in a non
  * "is-a" way but the benefit to this small design choice is huge in numbers of saved lines of code.
- * The fact that it creates a monolith of all these services is fine too. None of this code shares
- * to other projects.
+ * The fact that it creates a monolith of all these services is fine too, because none of this code
+ * shares to other projects.
  */
 public class ServiceBase {
 	private static final Logger log = LoggerFactory.getLogger(ServiceBase.class);
@@ -124,7 +123,7 @@ public class ServiceBase {
 	public static FileUtils fileUtil;
 	public static MimeUtil mimeUtil;
 	public static MongoAppConfig mac;
-	
+
 	public static BookmarkType bookmarkType;
 	public static FriendType friendType;
 	public static RoomType roomType;

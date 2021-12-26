@@ -28,7 +28,10 @@ public class AdminRun extends ServiceBase {
 		MongoSession savedMs = null;
 		T ret = null;
 		try {
+			// get current MongoSession to restore on exit in finally below
 			savedMs = ThreadLocals.getMongoSession();
+
+			// set current session to admin session
 			ThreadLocals.setMongoSession(ms = auth.getAdminSession());
 			ret = runner.run(ms);
 			update.saveSession(ms, true);

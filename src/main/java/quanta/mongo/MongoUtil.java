@@ -128,8 +128,8 @@ public class MongoUtil extends ServiceBase {
 	 * wrapper which will detect any query results that reference objects cached in memory and point to
 	 * the in-memory copy of the object during iterating.
 	 */
-	public NodeIterable find(Query query) {
-		Iterable<SubNode> iter = ops.find(query, SubNode.class);
+	public NodeIterable find(Query q) {
+		Iterable<SubNode> iter = ops.find(q, SubNode.class);
 		if (no(iter)) {
 			return null;
 		}
@@ -140,8 +140,8 @@ public class MongoUtil extends ServiceBase {
 	 * Runs the mongo 'findOne' but if it finds a node that's already in memory we return the memory
 	 * object
 	 */
-	public SubNode findOne(Query query) {
-		SubNode node = ops.findOne(query, SubNode.class);
+	public SubNode findOne(Query q) {
+		SubNode node = ops.findOne(q, SubNode.class);
 		return nodeOrDirtyNode(node);
 	}
 
@@ -192,10 +192,10 @@ public class MongoUtil extends ServiceBase {
 				path += PATH_CHARS.charAt(rand.nextInt(PATH_CHARS.length()));
 			}
 
-			Query query = new Query();
-			query.addCriteria(Criteria.where(SubNode.PATH).is(path));
+			Query q = new Query();
+			q.addCriteria(Criteria.where(SubNode.PATH).is(path));
 
-			if (!ops.exists(query, SubNode.class)) {
+			if (!ops.exists(q, SubNode.class)) {
 				return path;
 			}
 			tries++;

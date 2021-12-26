@@ -44,7 +44,6 @@ public class AppConfiguration implements WebMvcConfigurer {
 
 	private static ThreadPoolTaskExecutor executor;
 
-	/* NOTE: The AppFilter is the only one of our filters that we limit the path for */
 	@Bean
 	public FilterRegistrationBean<AppFilter> appFilterRegistration() {
 		FilterRegistrationBean<AppFilter> registration = new FilterRegistrationBean<>();

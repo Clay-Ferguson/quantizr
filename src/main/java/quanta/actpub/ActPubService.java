@@ -145,11 +145,11 @@ public class ActPubService extends ServiceBase {
         MongoSession as = auth.getAdminSession();
 
         // This query gets the FRIEND nodes that specifify userName on them
-        Query query = apFollower.getFriendsByUserName_query(as, userName);
-        if (no(query))
+        Query q = apFollower.getFriendsByUserName_query(as, userName);
+        if (no(q))
             return null;
 
-        Iterable<SubNode> iterable = mongoUtil.find(query);
+        Iterable<SubNode> iterable = mongoUtil.find(q);
 
         for (SubNode node : iterable) {
             // log.debug("follower: " + XString.prettyPrint(node));

@@ -57,10 +57,10 @@ public class MongoFediverseNamesTest extends ServiceBase implements TestIntf {
 	}
 
 	private void removeAll() {
-		Query query = new Query();
-		query.addCriteria(Criteria.where(FediverseName.FIELD_NAME).ne(null));
+		Query q = new Query();
+		q.addCriteria(Criteria.where(FediverseName.FIELD_NAME).ne(null));
 
-		DeleteResult res = ops.remove(query, FediverseName.class);
+		DeleteResult res = ops.remove(q, FediverseName.class);
 		log.debug("Objects deleted: " + res.getDeletedCount());
 	}
 }

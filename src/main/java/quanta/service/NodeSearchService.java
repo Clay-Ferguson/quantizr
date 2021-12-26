@@ -347,8 +347,8 @@ public class NodeSearchService extends ServiceBase  {
 			sharedToAny.add(PrincipalName.PUBLIC.s());
 
 			List<Criteria> ands = new LinkedList<>();
-			Query query = new Query();
-			Criteria criteria =
+			Query q = new Query();
+			Criteria crit =
 					Criteria.where(SubNode.PATH).regex(mongoUtil.regexRecursiveChildrenOfPath(NodePath.ROOT_OF_ALL_USERS));
 
 			// This pattern is what is required when you have multiple conditions added to a
@@ -365,13 +365,13 @@ public class NodeSearchService extends ServiceBase  {
 			}
 
 			ands.add(new Criteria().orOperator((Criteria[]) orCriteria.toArray(new Criteria[orCriteria.size()])));
-			criteria.andOperator(ands);
+			crit.andOperator(ands);
 
-			query.addCriteria(criteria);
-			query.with(Sort.by(Sort.Direction.DESC, SubNode.MODIFY_TIME));
-			query.limit(TRENDING_LIMIT);
+			q.addCriteria(crit);
+			q.with(Sort.by(Sort.Direction.DESC, SubNode.MODIFY_TIME));
+			q.limit(TRENDING_LIMIT);
 
-			iter = mongoUtil.find(query);
+			iter = mongoUtil.find(q);
 		}
 		/*
 		 * Otherwise this is not a Feed Tab query but just an arbitrary node stats request, like a user

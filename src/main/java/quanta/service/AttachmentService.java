@@ -1205,12 +1205,12 @@ public class AttachmentService extends ServiceBase {
 								log.debug("Grid Orphan Delete: " + id.toHexString());
 
 								// Query query = new Query(GridFsCriteria.where("_id").is(file.getId());
-								Query query = new Query(Criteria.where("_id").is(file.getId()));
+								Query q = new Query(Criteria.where("_id").is(file.getId()));
 
 								// Note: It's not a bug that we don't call this here:
 								// usrMgr.addNodeBytesToUserNodeBytes(session, node, null, -1);
 								// Because all the userstats are updated at the end of this scan.
-								grid.delete(query);
+								grid.delete(q);
 								delCount++;
 							}
 							/*

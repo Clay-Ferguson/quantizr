@@ -60,11 +60,11 @@ public class UserFeedService extends ServiceBase  {
 		ms = ThreadLocals.ensure(ms);
 		String pathToSearch = NodePath.ROOT_OF_ALL_USERS;
 
-		Query query = new Query();
-		Criteria criteria = Criteria.where(SubNode.PATH).regex(mongoUtil.regexRecursiveChildrenOfPath(pathToSearch)); //
+		Query q = new Query();
+		Criteria crit = Criteria.where(SubNode.PATH).regex(mongoUtil.regexRecursiveChildrenOfPath(pathToSearch)); //
 
 		// limit to just markdown types (no type)
-		criteria = criteria.and(SubNode.TYPE).is(NodeType.NONE.s());
+		crit = crit.and(SubNode.TYPE).is(NodeType.NONE.s());
 
 		// DO NOT DELETE (keep as example)
 		// This pattern is what is required when you have multiple conditions added to a single field.
@@ -80,13 +80,13 @@ public class UserFeedService extends ServiceBase  {
 		}
 
 		/* new nodes since last active time */
-		criteria = criteria.and(SubNode.MODIFY_TIME).gt(new Date(lastActiveLong));
+		crit = crit.and(SubNode.MODIFY_TIME).gt(new Date(lastActiveLong));
 		String myId = searchRoot.getOwner().toHexString();
-		criteria = criteria.and(SubNode.AC + "." + myId).ne(null);
+		crit = crit.and(SubNode.AC + "." + myId).ne(null);
 
-		query.addCriteria(criteria);
+		q.addCriteria(crit);
 
-		long count = ops.count(query, SubNode.class);
+		long count = ops.count(q, SubNode.class);
 		res.setNumNew((int) count);
 		return res;
 	}
@@ -187,10 +187,10 @@ public class UserFeedService extends ServiceBase  {
 		List<NodeInfo> searchResults = new LinkedList<>();
 		res.setSearchResults(searchResults);
 
-		Query query = new Query();
+		Query q = new Query();
 
 		// initialize criteria using the Path to select the correct sub-graph of the tree
-		Criteria criteria = Criteria.where(SubNode.PATH).regex(mongoUtil.regexRecursiveChildrenOfPath(pathToSearch)); //
+		Criteria crit = Criteria.where(SubNode.PATH).regex(mongoUtil.regexRecursiveChildrenOfPath(pathToSearch)); //
 
 		// DO NOT DELETE (keep as an example of how to do this)
 		// if (no(req.getNodeId() )) {
@@ -198,11 +198,11 @@ public class UserFeedService extends ServiceBase  {
 		// }
 
 		// limit to just markdown types (no type)
-		criteria = criteria.and(SubNode.TYPE).is(NodeType.NONE.s());
+		crit = crit.and(SubNode.TYPE).is(NodeType.NONE.s());
 
 		// add the criteria for sensitive flag
 		if (!req.getNsfw()) {
-			criteria = criteria.and(SubNode.PROPERTIES + "." + NodeProp.ACT_PUB_SENSITIVE + ".value").is(null);
+			crit = crit.and(SubNode.PROPERTIES + "." + NodeProp.ACT_PUB_SENSITIVE + ".value").is(null);
 		}
 
 		HashSet<ObjectId> blockedUserIds = new HashSet<>();
@@ -215,7 +215,7 @@ public class UserFeedService extends ServiceBase  {
 		// Add criteria for blocking users using the 'not in' list (nin)
 		getBlockedUserIds(blockedUserIds, null);
 		if (blockedUserIds.size() > 0) {
-			criteria = criteria.and(SubNode.OWNER).nin(blockedUserIds);
+			crit = crit.and(SubNode.OWNER).nin(blockedUserIds);
 		}
 
 		/*
@@ -263,38 +263,38 @@ public class UserFeedService extends ServiceBase  {
 		}
 
 		if (orCriteria.size() > 0) {
-			criteria = criteria.orOperator((Criteria[]) orCriteria.toArray(new Criteria[orCriteria.size()]));
+			crit = crit.orOperator((Criteria[]) orCriteria.toArray(new Criteria[orCriteria.size()]));
 		}
 
 		// use attributedTo proptery to determine whether a node is 'local' (posted by this server) or not.
 		if (req.getLocalOnly()) {
 			// todo-1: should be checking apid property instead?
-			criteria = criteria.and(SubNode.PROPERTIES + "." + NodeProp.ACT_PUB_OBJ_ATTRIBUTED_TO.s() + ".value").is(null);
+			crit = crit.and(SubNode.PROPERTIES + "." + NodeProp.ACT_PUB_OBJ_ATTRIBUTED_TO.s() + ".value").is(null);
 		}
 
 		if (!StringUtils.isEmpty(req.getSearchText())) {
 			TextCriteria textCriteria = TextCriteria.forDefaultLanguage();
 			textCriteria.matching(req.getSearchText());
 			textCriteria.caseSensitive(false);
-			query.addCriteria(textCriteria);
+			q.addCriteria(textCriteria);
 		}
 
-		query.addCriteria(criteria);
+		q.addCriteria(crit);
 
 		// if we have a node id this is like a chat room type, and so we sort by create time.
 		if (ok(req.getNodeId())) {
-			query.with(Sort.by(Sort.Direction.DESC, SubNode.CREATE_TIME));
+			q.with(Sort.by(Sort.Direction.DESC, SubNode.CREATE_TIME));
 		} else {
-			query.with(Sort.by(Sort.Direction.DESC, SubNode.MODIFY_TIME));
+			q.with(Sort.by(Sort.Direction.DESC, SubNode.MODIFY_TIME));
 		}
-		query.limit(MAX_FEED_ITEMS);
+		q.limit(MAX_FEED_ITEMS);
 
 		if (req.getPage() > 0) {
-			query.skip(MAX_FEED_ITEMS * req.getPage());
+			q.skip(MAX_FEED_ITEMS * req.getPage());
 		}
 
 		sc.stopwatch("NodeFeedQuery--Start");
-		Iterable<SubNode> iter = mongoUtil.find(query);
+		Iterable<SubNode> iter = mongoUtil.find(q);
 		sc.stopwatch("NodeFeedQuery--Complete");
 
 		for (SubNode node : iter) {

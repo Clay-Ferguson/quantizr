@@ -145,10 +145,10 @@ public class ActPubFollower extends ServiceBase {
     }
 
     public Iterable<SubNode> getFriendsByUserName(MongoSession ms, String userName) {
-        Query query = getFriendsByUserName_query(ms, userName);
-        if (no(query))
+        Query q = getFriendsByUserName_query(ms, userName);
+        if (no(q))
             return null;
-        return mongoUtil.find(query);
+        return mongoUtil.find(q);
     }
 
     public GetFollowersResponse getFollowers(MongoSession ms, GetFollowersRequest req) {
@@ -156,14 +156,14 @@ public class ActPubFollower extends ServiceBase {
         ms = ThreadLocals.ensure(ms);
 
         MongoSession as = auth.getAdminSession();
-        Query query = getFriendsByUserName_query(as, req.getTargetUserName());
-        if (no(query))
+        Query q = getFriendsByUserName_query(as, req.getTargetUserName());
+        if (no(q))
             return null;
 
-        query.limit(ConstantInt.ROWS_PER_PAGE.val());
-        query.skip(ConstantInt.ROWS_PER_PAGE.val() * req.getPage());
+        q.limit(ConstantInt.ROWS_PER_PAGE.val());
+        q.skip(ConstantInt.ROWS_PER_PAGE.val() * req.getPage());
 
-        Iterable<SubNode> iterable = mongoUtil.find(query);
+        Iterable<SubNode> iterable = mongoUtil.find(q);
         List<NodeInfo> searchResults = new LinkedList<NodeInfo>();
         int counter = 0;
 
@@ -202,19 +202,19 @@ public class ActPubFollower extends ServiceBase {
     }
 
     public long countFollowersOfLocalUser(MongoSession ms, String userName) {
-        Query query = getFriendsByUserName_query(ms, userName);
-        if (no(query))
+        Query q = getFriendsByUserName_query(ms, userName);
+        if (no(q))
             return 0L;
-        return ops.count(query, SubNode.class);
+        return ops.count(q, SubNode.class);
     }
 
     public Query getFriendsByUserName_query(MongoSession ms, String userName) {
-        Query query = new Query();
-        Criteria criteria = Criteria.where(SubNode.PATH).regex(mongoUtil.regexRecursiveChildrenOfPath(NodePath.ROOT_OF_ALL_USERS)) //
+        Query q = new Query();
+        Criteria crit = Criteria.where(SubNode.PATH).regex(mongoUtil.regexRecursiveChildrenOfPath(NodePath.ROOT_OF_ALL_USERS)) //
                 .and(SubNode.PROPERTIES + "." + NodeProp.USER.s() + ".value").is(userName) //
                 .and(SubNode.TYPE).is(NodeType.FRIEND.s());
 
-        query.addCriteria(criteria);
-        return query;
+        q.addCriteria(crit);
+        return q;
     }
 }

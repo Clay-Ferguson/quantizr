@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.concurrent.ConcurrentHashMap;
 import javax.annotation.PostConstruct;
 import org.apache.commons.lang3.StringUtils;
 import org.bson.types.ObjectId;
@@ -48,7 +49,7 @@ public class MongoAuth extends ServiceBase {
 	private static final Object anonSessionLck = new Object();
 	private static MongoSession anonSession;
 
-	private static final HashMap<String, SubNode> userNodesById = new HashMap<>();
+	private static final ConcurrentHashMap<String, SubNode> userNodesById = new ConcurrentHashMap<>();
 
 	@PostConstruct
 	public void postConstruct() {
@@ -108,9 +109,7 @@ public class MongoAuth extends ServiceBase {
 		SubNode accntNode = null;
 
 		// try to get the node from the cache of nodes
-		synchronized (userNodesById) {
-			accntNode = userNodesById.get(accountId);
-		}
+		accntNode = userNodesById.get(accountId);
 
 		// if we found the node get property from it to return.
 		if (ok(accntNode)) {
@@ -121,9 +120,7 @@ public class MongoAuth extends ServiceBase {
 			accntNode = read.getNode(ms, accountId);
 			if (ok(accntNode)) {
 				propVal = accntNode.getStr(prop);
-				synchronized (userNodesById) {
-					userNodesById.put(accountId, accntNode);
-				}
+				userNodesById.put(accountId, accntNode);
 			}
 		}
 
@@ -483,16 +480,16 @@ public class MongoAuth extends ServiceBase {
 			int limit, ObjectId ownerIdMatch) {
 
 		update.saveSession(ms);
-		Query query = subGraphByAclUser_query(ms, pathToSearch, sharedToAny, ownerIdMatch);
-		if (no(query))
+		Query q = subGraphByAclUser_query(ms, pathToSearch, sharedToAny, ownerIdMatch);
+		if (no(q))
 			return null;
 
 		if (ok(sort)) {
-			query.with(sort);
+			q.with(sort);
 		}
 
-		query.limit(limit);
-		return mongoUtil.find(query);
+		q.limit(limit);
+		return mongoUtil.find(q);
 	}
 
 	/*
@@ -502,10 +499,10 @@ public class MongoAuth extends ServiceBase {
 	 */
 	public long countSubGraphByAclUser(MongoSession ms, String pathToSearch, List<String> sharedToAny, ObjectId ownerIdMatch) {
 		update.saveSession(ms);
-		Query query = subGraphByAclUser_query(ms, pathToSearch, sharedToAny, ownerIdMatch);
-		if (no(query))
+		Query q = subGraphByAclUser_query(ms, pathToSearch, sharedToAny, ownerIdMatch);
+		if (no(q))
 			return 0L;
-		Long ret = ops.count(query, SubNode.class);
+		Long ret = ops.count(q, SubNode.class);
 		return ret;
 	}
 
@@ -516,8 +513,8 @@ public class MongoAuth extends ServiceBase {
 			pathToSearch = NodePath.ROOT_OF_ALL_USERS;
 		}
 
-		Query query = new Query();
-		Criteria criteria = Criteria.where(SubNode.PATH).regex(mongoUtil.regexRecursiveChildrenOfPath(pathToSearch));
+		Query q = new Query();
+		Criteria crit = Criteria.where(SubNode.PATH).regex(mongoUtil.regexRecursiveChildrenOfPath(pathToSearch));
 
 		if (ok(sharedToAny) && sharedToAny.size() > 0) {
 			List<Criteria> orCriteria = new LinkedList<>();
@@ -525,16 +522,16 @@ public class MongoAuth extends ServiceBase {
 				orCriteria.add(Criteria.where(SubNode.AC + "." + share).ne(null));
 			}
 
-			criteria = criteria
+			crit = crit
 					.andOperator(new Criteria().orOperator((Criteria[]) orCriteria.toArray(new Criteria[orCriteria.size()])));
 		}
 
 		if (ok(ownerIdMatch)) {
-			criteria = criteria.and(SubNode.OWNER).is(ownerIdMatch);
+			crit = crit.and(SubNode.OWNER).is(ownerIdMatch);
 		}
 
-		query.addCriteria(criteria);
-		return query;
+		q.addCriteria(crit);
+		return q;
 	}
 
 	// ========================================================================
@@ -545,29 +542,29 @@ public class MongoAuth extends ServiceBase {
 	public Iterable<SubNode> searchSubGraphByAcl(MongoSession ms, int skip, String pathToSearch, ObjectId ownerIdMatch, Sort sort,
 			int limit) {
 		update.saveSession(ms);
-		Query query = subGraphByAcl_query(ms, pathToSearch, ownerIdMatch);
+		Query q = subGraphByAcl_query(ms, pathToSearch, ownerIdMatch);
 
 		if (ok(sort)) {
-			query.with(sort);
+			q.with(sort);
 		}
 
 		if (skip > 0) {
-			query.skip(skip);
+			q.skip(skip);
 		}
 
-		query.limit(limit);
-		return mongoUtil.find(query);
+		q.limit(limit);
+		return mongoUtil.find(q);
 	}
 
 	/* Finds nodes that have any sharing on them at all */
 	public long countSubGraphByAcl(MongoSession ms, String pathToSearch, ObjectId ownerIdMatch) {
 		update.saveSession(ms);
-		Query query = subGraphByAcl_query(ms, pathToSearch, ownerIdMatch);
-		return ops.count(query, SubNode.class);
+		Query q = subGraphByAcl_query(ms, pathToSearch, ownerIdMatch);
+		return ops.count(q, SubNode.class);
 	}
 
 	public Query subGraphByAcl_query(MongoSession ms, String pathToSearch, ObjectId ownerIdMatch) {
-		Query query = new Query();
+		Query q = new Query();
 
 		if (no(pathToSearch)) {
 			pathToSearch = NodePath.ROOT_OF_ALL_USERS;
@@ -585,8 +582,8 @@ public class MongoAuth extends ServiceBase {
 			criteria = criteria.and(SubNode.OWNER).is(ownerIdMatch);
 		}
 
-		query.addCriteria(criteria);
-		return query;
+		q.addCriteria(criteria);
+		return q;
 	}
 
 	public HashSet<String> parseMentions(String message) {

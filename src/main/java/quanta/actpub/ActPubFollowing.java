@@ -310,14 +310,14 @@ public class ActPubFollowing extends ServiceBase  {
         ms = ThreadLocals.ensure(ms);
 
         MongoSession as = auth.getAdminSession();
-        Query query = findFollowingOfUser_query(as, req.getTargetUserName());
-        if (no(query))
+        Query q = findFollowingOfUser_query(as, req.getTargetUserName());
+        if (no(q))
             return null;
 
-        query.limit(ConstantInt.ROWS_PER_PAGE.val());
-        query.skip(ConstantInt.ROWS_PER_PAGE.val() * req.getPage());
+        q.limit(ConstantInt.ROWS_PER_PAGE.val());
+        q.skip(ConstantInt.ROWS_PER_PAGE.val() * req.getPage());
 
-        Iterable<SubNode> iterable = mongoUtil.find(query);
+        Iterable<SubNode> iterable = mongoUtil.find(q);
         List<NodeInfo> searchResults = new LinkedList<>();
         int counter = 0;
 
@@ -333,11 +333,11 @@ public class ActPubFollowing extends ServiceBase  {
 
     /* Returns FRIEND nodes for every user 'userName' is following */
     public Iterable<SubNode> findFollowingOfUser(MongoSession ms, String userName) {
-        Query query = findFollowingOfUser_query(ms, userName);
-        if (no(query))
+        Query q = findFollowingOfUser_query(ms, userName);
+        if (no(q))
             return null;
 
-        return mongoUtil.find(query);
+        return mongoUtil.find(q);
     }
 
     public long countFollowingOfUser(MongoSession ms, String userName, String actorUrl) {
@@ -365,15 +365,15 @@ public class ActPubFollowing extends ServiceBase  {
     }
 
     public long countFollowingOfLocalUser(MongoSession ms, String userName) {
-        Query query = findFollowingOfUser_query(ms, userName);
-        if (no(query))
+        Query q = findFollowingOfUser_query(ms, userName);
+        if (no(q))
             return 0;
 
-        return ops.count(query, SubNode.class);
+        return ops.count(q, SubNode.class);
     }
 
     private Query findFollowingOfUser_query(MongoSession ms, String userName) {
-        Query query = new Query();
+        Query q = new Query();
 
         // get friends list node
         SubNode friendsListNode =
@@ -386,7 +386,7 @@ public class ActPubFollowing extends ServiceBase  {
                 .regex(mongoUtil.regexRecursiveChildrenOfPath(friendsListNode.getPath())) //
                 .and(SubNode.TYPE).is(NodeType.FRIEND.s());
 
-        query.addCriteria(criteria);
-        return query;
+        q.addCriteria(criteria);
+        return q;
     }
 }

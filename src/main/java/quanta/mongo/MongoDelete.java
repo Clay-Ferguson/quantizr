@@ -44,23 +44,23 @@ public class MongoDelete extends ServiceBase  {
 	 * only at startup, cleans up any and all of the orphans
 	 */
 	public void removeAbandonedNodes(MongoSession ms) {
-		Query query = new Query();
-		query.addCriteria(Criteria.where(SubNode.MODIFY_TIME).is(null));
+		Query q = new Query();
+		q.addCriteria(Criteria.where(SubNode.MODIFY_TIME).is(null));
 
-		DeleteResult res = ops.remove(query, SubNode.class);
+		DeleteResult res = ops.remove(q, SubNode.class);
 		log.debug("Num abandoned nodes deleted: " + res.getDeletedCount());
 	}
 
 	public void removeFriendConstraintViolations(MongoSession ms) {
-		Query query = new Query();
+		Query q = new Query();
 
 		// query for all FRIEND nodes (will represent both blocks and friends)
-		Criteria criteria = Criteria.where(SubNode.TYPE).is(NodeType.FRIEND.s());
-		query.addCriteria(criteria);
+		Criteria crit = Criteria.where(SubNode.TYPE).is(NodeType.FRIEND.s());
+		q.addCriteria(crit);
 
 		HashSet<String> keys = new HashSet<>();
 
-		Iterable<SubNode> nodes = mongoUtil.find(query);
+		Iterable<SubNode> nodes = mongoUtil.find(q);
 		for (SubNode node : nodes) {
 			if (no(node.getOwner())) continue;
 
@@ -79,29 +79,29 @@ public class MongoDelete extends ServiceBase  {
 	 * Deletes old activity pub posts, just to save space on our server. Admin option only.
 	 */
 	public long deleteOldActPubPosts(SubNode parent, MongoSession ms) {
-		Query query = new Query();
+		Query q = new Query();
 
 		// date 30 days ago.
 		LocalDate ldt = LocalDate.now().minusDays(30);
 		Date date = Date.from(ldt.atStartOfDay(ZoneId.systemDefault()).toInstant());
 
-		Criteria criteria = Criteria.where(SubNode.PATH).regex(mongoUtil.regexRecursiveChildrenOfPath(parent.getPath())) //
+		Criteria crit = Criteria.where(SubNode.PATH).regex(mongoUtil.regexRecursiveChildrenOfPath(parent.getPath())) //
 				.and(SubNode.PROPERTIES + "." + NodeProp.ACT_PUB_ID + ".value").ne(null) //
 				.and(SubNode.MODIFY_TIME).lt(date);
 
-		query.addCriteria(criteria);
-		DeleteResult res = ops.remove(query, SubNode.class);
+		q.addCriteria(crit);
+		DeleteResult res = ops.remove(q, SubNode.class);
 		return res.getDeletedCount();
 	}
 
 	/* This is a way to cleanup old records, but it's needed yet */
 	public void cleanupOldTempNodesForUser(MongoSession ms, SubNode userNode) {
-		Query query = new Query();
+		Query q = new Query();
 
 		LocalDate ldt = LocalDate.now().minusDays(5);
 		Date date = Date.from(ldt.atStartOfDay(ZoneId.systemDefault()).toInstant());
 
-		Criteria criteria = Criteria.where(SubNode.PATH).regex(mongoUtil.regexRecursiveChildrenOfPath(userNode.getPath())) //
+		Criteria crit = Criteria.where(SubNode.PATH).regex(mongoUtil.regexRecursiveChildrenOfPath(userNode.getPath())) //
 				.and(SubNode.MODIFY_TIME).lt(date); //
 
 		/*
@@ -110,12 +110,12 @@ public class MongoDelete extends ServiceBase  {
 		 * from method name and(SubNode.FIELD_PROPERTIES + "." + NodeProp.TEMP.s() + ".value").ne(null));
 		 */
 
-		query.addCriteria(criteria);
+		q.addCriteria(crit);
 
 		// Example: Time Range check:
 		// query.addCriteria(Criteria.where("startDate").gte(startDate).lt(endDate));
 
-		DeleteResult res = ops.remove(query, SubNode.class);
+		DeleteResult res = ops.remove(q, SubNode.class);
 		if (res.getDeletedCount() > 0) {
 			log.debug("Temp Records Deleted (Under User: " + userNode.getIdStr() + "): " + res.getDeletedCount());
 		}
@@ -125,10 +125,10 @@ public class MongoDelete extends ServiceBase  {
 	public long deleteUnderPath(MongoSession ms, String path) {
 		// log.debug("Deleting under path: " + path);
 		update.saveSession(ms);
-		Query query = new Query();
-		query.addCriteria(Criteria.where(SubNode.PATH).regex(mongoUtil.regexRecursiveChildrenOfPath(path)));
+		Query q = new Query();
+		q.addCriteria(Criteria.where(SubNode.PATH).regex(mongoUtil.regexRecursiveChildrenOfPath(path)));
 
-		DeleteResult res = ops.remove(query, SubNode.class);
+		DeleteResult res = ops.remove(q, SubNode.class);
 		// log.debug("Num of SubGraph deleted: " + res.getDeletedCount());
 		long totalDelCount = res.getDeletedCount();
 		return totalDelCount;
@@ -165,10 +165,10 @@ public class MongoDelete extends ServiceBase  {
 		 * (as substring) this path. Note how efficient it is that we can delete an entire subgraph in one
 		 * single operation! Nice!
 		 */
-		Query query = new Query();
-		query.addCriteria(Criteria.where(SubNode.PATH).regex(mongoUtil.regexRecursiveChildrenOfPath(node.getPath())));
+		Query q = new Query();
+		q.addCriteria(Criteria.where(SubNode.PATH).regex(mongoUtil.regexRecursiveChildrenOfPath(node.getPath())));
 
-		DeleteResult res = ops.remove(query, SubNode.class);
+		DeleteResult res = ops.remove(q, SubNode.class);
 		log.debug("Num of SubGraph deleted: " + res.getDeletedCount());
 		long totalDelCount = res.getDeletedCount();
 
@@ -195,10 +195,10 @@ public class MongoDelete extends ServiceBase  {
 
 	public void deleteBySubNodePropVal(String prop, String val) {
 		// log.debug("Deleting by prop=" + prop + " val=" + val);
-		Query query = new Query();
-		Criteria criteria = Criteria.where(SubNode.PROPERTIES + "." + prop + ".value").is(val);
-		query.addCriteria(criteria);
-		DeleteResult res = ops.remove(query, SubNode.class);
+		Query q = new Query();
+		Criteria crit = Criteria.where(SubNode.PROPERTIES + "." + prop + ".value").is(val);
+		q.addCriteria(crit);
+		DeleteResult res = ops.remove(q, SubNode.class);
 		// log.debug("Nodes deleted: " + res.getDeletedCount());
 	}
 
@@ -216,10 +216,10 @@ public class MongoDelete extends ServiceBase  {
 			ms = auth.getAdminSession();
 		}
 
-		Query query = new Query();
+		Query q = new Query();
 
 		/* Scan every node in the database and store it's path hash in the set */
-		Iterable<SubNode> nodes = mongoUtil.find(query);
+		Iterable<SubNode> nodes = mongoUtil.find(q);
 		for (SubNode node : nodes) {
 			pathHashSet.add(DigestUtils.sha256Hex(node.getPath()));
 		}
@@ -238,7 +238,7 @@ public class MongoDelete extends ServiceBase  {
 			 * Now scan every node again and any PARENT not in the set means that parent doesn't exist and so
 			 * the node is an orphan and can be deleted.
 			 */
-			nodes = mongoUtil.find(query);
+			nodes = mongoUtil.find(q);
 			int deleteCount = 0;
 			for (SubNode node : nodes) {
 				// ignore the root node and any of it's children.
