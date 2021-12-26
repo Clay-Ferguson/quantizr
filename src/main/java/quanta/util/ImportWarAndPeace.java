@@ -12,6 +12,7 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.context.annotation.Scope;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Component;
+import quanta.config.ServiceBase;
 import quanta.config.SpringContextUtil;
 import quanta.model.client.NodeType;
 import quanta.mongo.CreateNodeLocation;
@@ -36,19 +37,11 @@ import quanta.mongo.model.SubNode;
  * book 'War and Peace' to load into the repository, because we use this book as sample/example
  * content.
  */
-@Lazy
+
 @Component
 @Scope("prototype")
-public class ImportWarAndPeace {
+public class ImportWarAndPeace extends ServiceBase {
 	private static final Logger log = LoggerFactory.getLogger(ImportWarAndPeace.class);
-
-	@Autowired
-	@Lazy
-	private MongoCreate create;
-
-	@Autowired
-	@Lazy
-	private MongoUpdate update;
 
 	private int maxLines = Integer.MAX_VALUE;
 	private int maxBooks = Integer.MAX_VALUE;

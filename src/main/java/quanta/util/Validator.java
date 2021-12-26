@@ -1,17 +1,16 @@
 package quanta.util;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Lazy;
+import javax.annotation.PostConstruct;
 import org.springframework.stereotype.Component;
-import quanta.mongo.MongoAuth;
+import quanta.config.ServiceBase;
 
-@Lazy
 @Component
-public class Validator {
-
-	@Autowired
-	@Lazy
-	private MongoAuth auth;
+public class Validator extends ServiceBase {
+	
+	@PostConstruct
+	public void postConstruct() {
+		validator = this;
+	}
 
 	/*
 	 * UserName requirements, between 5 and 100 characters (inclusive) long, and only allowing digits,

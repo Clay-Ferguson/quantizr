@@ -6,27 +6,22 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.UUID;
+import javax.annotation.PostConstruct;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 import quanta.AppController;
-import quanta.config.AppProp;
+import quanta.config.ServiceBase;
 import quanta.model.NodeMetaInfo;
 import quanta.model.client.NodeProp;
 import quanta.model.client.PrincipalName;
 import quanta.model.client.PrivilegeType;
 import quanta.mongo.CreateNodeLocation;
-import quanta.mongo.MongoCreate;
-import quanta.mongo.MongoRead;
 import quanta.mongo.MongoSession;
-import quanta.mongo.MongoUpdate;
 import quanta.mongo.model.AccessControl;
 import quanta.mongo.model.SubNode;
 import quanta.mongo.model.SubNodePropertyMap;
-import quanta.service.NodeRenderService;
 
 /**
  * Assorted general utility functions related to SubNodes.
@@ -34,30 +29,9 @@ import quanta.service.NodeRenderService;
  * todo-2: there's a lot of code calling these static methods, but need to transition to singleton
  * scope bean and non-static methods.
  */
-@Lazy
 @Component
-public class SubNodeUtil {
+public class SubNodeUtil extends ServiceBase {
 	private static final Logger log = LoggerFactory.getLogger(SubNodeUtil.class);
-
-	@Autowired
-	@Lazy
-	protected NodeRenderService render;
-
-	@Autowired
-	@Lazy
-	protected AppProp prop;
-
-	@Autowired
-	@Lazy
-	protected MongoUpdate update;
-
-	@Autowired
-	@Lazy
-	protected MongoRead read;
-
-	@Autowired
-	@Lazy
-	protected MongoCreate create;
 
 	/*
 	 * These are properties we should never allow the client to send back as part of a save operation.
@@ -68,6 +42,11 @@ public class SubNodeUtil {
 		nonSavableProperties.add(NodeProp.BIN.s());
 		nonSavableProperties.add(NodeProp.BIN_TOTAL.s());
 		nonSavableProperties.add(NodeProp.BIN_QUOTA.s());
+	}
+
+	@PostConstruct
+	public void postConstruct() {
+		snUtil = this;
 	}
 
 	public void removeUnwantedPropsForIPFS(SubNode node) {

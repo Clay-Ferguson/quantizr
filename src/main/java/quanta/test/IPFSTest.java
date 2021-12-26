@@ -6,6 +6,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
+import quanta.config.ServiceBase;
 import quanta.model.ipfs.dag.MerkleLink;
 import quanta.model.ipfs.dag.MerkleNode;
 import quanta.mongo.AdminRun;
@@ -13,18 +14,10 @@ import quanta.service.IPFSService;
 import quanta.util.Val;
 import quanta.util.XString;
 
-@Lazy
+
 @Component("IPFSTest")
-public class IPFSTest implements TestIntf {
+public class IPFSTest extends ServiceBase implements TestIntf {
     private static final Logger log = LoggerFactory.getLogger(IPFSTest.class);
-
-    @Autowired
-    @Lazy
-    private IPFSService ipfs;
-
-    @Autowired
-    @Lazy
-    private AdminRun arun;
 
     @Override
     public void test() throws Exception {

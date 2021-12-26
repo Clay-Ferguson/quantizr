@@ -3,43 +3,22 @@ package quanta.test;
 import static quanta.util.Util.no;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 import quanta.actpub.APConst;
-import quanta.actpub.ActPubFollower;
-import quanta.actpub.ActPubFollowing;
-import quanta.actpub.ActPubUtil;
 import quanta.actpub.model.APObj;
-import quanta.config.AppProp;
+import quanta.config.ServiceBase;
 import quanta.util.XString;
 
-@Lazy
+
 @Component("ActPubTest")
-public class ActPubTest implements TestIntf {
+public class ActPubTest extends ServiceBase implements TestIntf {
     private static final Logger log = LoggerFactory.getLogger(ActPubTest.class);
-
-    @Autowired
-    @Lazy
-    private AppProp appProp;
-
-    @Autowired
-    @Lazy
-    private ActPubUtil apUtil;
-
-    @Autowired
-    @Lazy
-    private ActPubFollowing apFollowing;
-
-    @Autowired
-    @Lazy
-    protected ActPubFollower apFollower;
 
     @Override
     public void test() throws Exception {
         try {
-            log.debug("Running ActPubTest: Host " + appProp.getHostAndPort());
-            if (appProp.getHostAndPort().contains("//q2:")) {
+            log.debug("Running ActPubTest: Host " + prop.getHostAndPort());
+            if (prop.getHostAndPort().contains("//q2:")) {
                 testConnection("q1:8184");
             }
         } finally {

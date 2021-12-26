@@ -14,6 +14,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import javax.annotation.PostConstruct;
 import com.rometools.modules.content.ContentModuleImpl;
 import com.rometools.modules.itunes.EntryInformationImpl;
 import com.rometools.modules.mediarss.MediaEntryModuleImpl;
@@ -46,15 +47,13 @@ import org.owasp.html.PolicyFactory;
 import org.owasp.html.Sanitizers;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpMethod;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 import quanta.AppServer;
-import quanta.config.AppProp;
+import quanta.config.ServiceBase;
 import quanta.exception.NodeAuthFailedException;
 import quanta.model.NodeMetaInfo;
 import quanta.model.client.NodeProp;
@@ -62,8 +61,6 @@ import quanta.model.client.RssFeed;
 import quanta.model.client.RssFeedEnclosure;
 import quanta.model.client.RssFeedEntry;
 import quanta.model.client.RssFeedMediaContent;
-import quanta.mongo.AdminRun;
-import quanta.mongo.MongoRead;
 import quanta.mongo.MongoRepository;
 import quanta.mongo.MongoSession;
 import quanta.mongo.model.SubNode;
@@ -74,31 +71,14 @@ import quanta.util.DateUtil;
 import quanta.util.ExUtil;
 import quanta.util.LimitedInputStreamEx;
 import quanta.util.StreamUtil;
-import quanta.util.SubNodeUtil;
 import quanta.util.Util;
 import quanta.util.XString;
 
 /* Proof of Concept RSS Publishing */
-@Lazy
+
 @Component
-public class RSSFeedService {
+public class RSSFeedService extends ServiceBase {
 	private static final Logger log = LoggerFactory.getLogger(RSSFeedService.class);
-
-	@Autowired
-	@Lazy
-	protected AdminRun arun;
-
-	@Autowired
-	@Lazy
-	private SubNodeUtil snUtil;
-
-	@Autowired
-	@Lazy
-	protected AppProp prop;
-
-	@Autowired
-	@Lazy
-	protected MongoRead read;
 
 	private static boolean refreshingCache = false;
 
@@ -144,6 +124,11 @@ public class RSSFeedService {
 
 	private static final int MAX_FEEDS_PER_AGGREGATE = 40;
 	static boolean run = false;
+
+	@PostConstruct
+	public void postConstruct() {
+		rssFeed = this;
+	}
 
 	/*
 	 * Runs immediately at startup, and then every 30 minutes, to refresh the feedCache.

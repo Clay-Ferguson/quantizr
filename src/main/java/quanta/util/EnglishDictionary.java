@@ -10,18 +10,25 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.StringTokenizer;
+import javax.annotation.PostConstruct;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Component;
+import quanta.config.ServiceBase;
 import quanta.config.SpringContextUtil;
 
 @Component
-public class EnglishDictionary {
+public class EnglishDictionary extends ServiceBase {
 	private static final Logger log = LoggerFactory.getLogger(EnglishDictionary.class);
 	private static final HashSet<String> dictWords = new HashSet<>();
 	private static final HashSet<String> stopWords = new HashSet<>();
+
+	@PostConstruct
+	public void postConstruct() {
+		english = this;
+	}
 
 	public void init() {
 		initDictWords();

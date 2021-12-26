@@ -6,12 +6,12 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
+import javax.annotation.PostConstruct;
 import org.apache.commons.lang3.StringUtils;
 import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.aggregation.Aggregation;
@@ -22,16 +22,15 @@ import org.springframework.data.mongodb.core.query.CriteriaDefinition;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.TextCriteria;
 import org.springframework.stereotype.Component;
-import quanta.config.AppProp;
 import quanta.config.NodeName;
 import quanta.config.NodePath;
+import quanta.config.ServiceBase;
 import quanta.exception.base.RuntimeEx;
 import quanta.model.client.NodeProp;
 import quanta.model.client.NodeType;
 import quanta.model.client.PrincipalName;
 import quanta.model.client.PrivilegeType;
 import quanta.mongo.model.SubNode;
-import quanta.service.AclService;
 import quanta.util.ThreadLocals;
 import quanta.util.Util;
 import quanta.util.XString;
@@ -42,41 +41,20 @@ import quanta.util.XString;
  * There are many more opportunities in this class to use the ThreadLocals.nodeCache to store
  * information in the thread for use during context of one call
  */
-@Lazy
 @Component
-public class MongoRead {
+public class MongoRead extends ServiceBase {
     private static final Logger log = LoggerFactory.getLogger(MongoRead.class);
-
-    @Autowired
-    @Lazy
-    protected MongoTemplate ops;
-
-    @Autowired
-    @Lazy
-    protected AppProp prop;
-
-    @Autowired
-    @Lazy
-    protected AclService acl;
-
-    @Autowired
-    @Lazy
-    protected MongoUtil mongoUtil;
-
-    @Autowired
-    @Lazy
-    protected MongoAuth auth;
-
-    @Autowired
-    @Lazy
-    protected MongoUpdate update;
-
-    @Autowired
-    @Lazy
-    protected MongoCreate create;
 
     private static final Object dbRootLock = new Object();
     private SubNode dbRoot;
+
+    @Autowired
+    public MongoTemplate ops;
+
+    @PostConstruct
+	public void postConstruct() {
+		read = this;
+	}
 
     // we call this during app init so we don't need to have thread safety here the rest of the time.
     public SubNode getDbRoot() {

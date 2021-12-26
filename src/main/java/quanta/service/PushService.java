@@ -4,45 +4,33 @@ import static quanta.util.Util.no;
 import static quanta.util.Util.ok;
 import java.util.HashSet;
 import java.util.List;
-import java.util.concurrent.Executor;
+import javax.annotation.PostConstruct;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter.SseEventBuilder;
+import quanta.config.ServiceBase;
 import quanta.config.SessionContext;
 import quanta.model.NodeInfo;
-import quanta.mongo.MongoAuth;
 import quanta.mongo.MongoSession;
 import quanta.mongo.model.SubNode;
 import quanta.response.FeedPushInfo;
 import quanta.response.NodeEditedPushInfo;
 import quanta.response.ServerPushInfo;
 import quanta.response.SessionTimeoutPushInfo;
-import quanta.util.Convert;
 import quanta.util.ThreadLocals;
 
-@Lazy
 @Component
-public class PushService {
+public class PushService extends ServiceBase {
 	private static final Logger log = LoggerFactory.getLogger(PushService.class);
 
-	@Autowired
-	@Lazy
-	protected Convert convert;
-
-	@Autowired
-	@Lazy
-	protected MongoAuth auth;
-
-	@Autowired
-	@Qualifier("threadPoolTaskExecutor")
-	private Executor executor;
-
 	static final int MAX_FEED_ITEMS = 25;
+
+	@PostConstruct
+	public void postConstruct() {
+		push = this;
+	}
 
 	/* Notify all users being shared to on this node */
 	public void pushNodeUpdateToBrowsers(MongoSession ms, HashSet<Integer> sessionsPushed, SubNode node) {

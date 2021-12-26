@@ -15,17 +15,13 @@ import org.apache.commons.lang3.StringEscapeUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.core.io.Resource;
 import org.springframework.data.domain.Sort;
-import quanta.config.AppProp;
+import quanta.config.ServiceBase;
 import quanta.config.SpringContextUtil;
 import quanta.exception.base.RuntimeEx;
 import quanta.model.client.NodeProp;
 import quanta.model.client.NodeType;
-import quanta.mongo.MongoAuth;
-import quanta.mongo.MongoRead;
 import quanta.mongo.MongoSession;
 import quanta.mongo.model.SubNode;
 import quanta.request.ExportRequest;
@@ -33,7 +29,6 @@ import quanta.response.ExportResponse;
 import quanta.util.ExUtil;
 import quanta.util.FileUtils;
 import quanta.util.StreamUtil;
-import quanta.util.SubNodeUtil;
 import quanta.util.ThreadLocals;
 import quanta.util.Val;
 import quanta.util.XString;
@@ -46,31 +41,8 @@ import quanta.util.XString;
  * created that is dedicated just do doing that one export and so any member varibles in this class
  * have just that one export as their 'scope'
  */
-public abstract class ExportArchiveBase {
+public abstract class ExportArchiveBase extends ServiceBase {
 	private static final Logger log = LoggerFactory.getLogger(ExportArchiveBase.class);
-
-	@Autowired
-	@Lazy
-	protected FileUtils fileUtil;
-
-	@Autowired
-	@Lazy
-	protected AttachmentService attach;
-
-	@Autowired
-	@Lazy
-	private SubNodeUtil snUtil;
-
-	@Autowired
-	@Lazy
-	protected MongoAuth auth;
-
-	@Autowired
-	@Lazy
-	protected MongoRead read;
-
-	@Autowired
-	private AppProp appProp;
 
 	private String shortFileName;
 	private String fullFileName;
@@ -88,15 +60,15 @@ public abstract class ExportArchiveBase {
 		ms = ThreadLocals.ensure(ms);
 		this.session = ms;
 
-		if (!FileUtils.dirExists(appProp.getAdminDataFolder())) {
-			throw ExUtil.wrapEx("adminDataFolder does not exist: " + appProp.getAdminDataFolder());
+		if (!FileUtils.dirExists(prop.getAdminDataFolder())) {
+			throw ExUtil.wrapEx("adminDataFolder does not exist: " + prop.getAdminDataFolder());
 		}
 
 		String nodeId = req.getNodeId();
 		SubNode node = read.getNode(ms, nodeId);
 		String fileName = snUtil.getExportFileName(req.getFileName(), node);
 		shortFileName = fileName + "." + getFileExtension();
-		fullFileName = appProp.getAdminDataFolder() + File.separator + shortFileName;
+		fullFileName = prop.getAdminDataFolder() + File.separator + shortFileName;
 
 		boolean success = false;
 		try {

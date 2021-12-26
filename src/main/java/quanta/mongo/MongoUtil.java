@@ -10,12 +10,12 @@ import java.util.List;
 import java.util.Random;
 import java.util.StringTokenizer;
 import java.util.regex.Pattern;
+import javax.annotation.PostConstruct;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.Sort.Direction;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.index.Index;
@@ -27,9 +27,9 @@ import org.springframework.data.mongodb.core.index.TextIndexDefinition.TextIndex
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Component;
-import quanta.config.AppProp;
 import quanta.config.NodeName;
 import quanta.config.NodePath;
+import quanta.config.ServiceBase;
 import quanta.model.client.NodeProp;
 import quanta.model.client.NodeType;
 import quanta.model.client.PrincipalName;
@@ -38,14 +38,11 @@ import quanta.mongo.model.AccessControl;
 import quanta.mongo.model.FediverseName;
 import quanta.mongo.model.SubNode;
 import quanta.request.SignupRequest;
-import quanta.service.AclService;
-import quanta.service.UserManagerService;
 import quanta.util.Const;
 import quanta.util.Convert;
 import quanta.util.ExUtil;
 import quanta.util.ImageSize;
 import quanta.util.ImageUtil;
-import quanta.util.SubNodeUtil;
 import quanta.util.ThreadLocals;
 import quanta.util.Val;
 import quanta.util.XString;
@@ -54,54 +51,12 @@ import quanta.util.XString;
 /**
  * Verious utilities related to MongoDB persistence
  */
-@Lazy
 @Component
-public class MongoUtil {
+public class MongoUtil extends ServiceBase {
 	private static final Logger log = LoggerFactory.getLogger(MongoUtil.class);
 
 	@Autowired
-	@Lazy
-	protected MongoTemplate ops;
-
-	@Autowired
-	@Lazy
-	protected AdminRun arun;
-
-	@Autowired
-	@Lazy
-	private SubNodeUtil snUtil;
-
-	@Autowired
-	@Lazy
-	protected AppProp prop;
-
-	@Autowired
-	@Lazy
-	protected UserManagerService user;
-
-	@Autowired
-	@Lazy
-	protected AclService acl;
-
-	@Autowired
-	@Lazy
-	protected MongoAuth auth;
-
-	@Autowired
-	@Lazy
-	protected MongoDelete delete;
-
-	@Autowired
-	@Lazy
-	protected MongoUpdate update;
-
-	@Autowired
-	@Lazy
-	protected MongoRead read;
-
-	@Autowired
-	@Lazy
-	protected MongoCreate create;
+    public MongoTemplate ops;
 
 	private static HashSet<String> testAccountNames = new HashSet<>();
 	private static SubNode systemRootNode;
@@ -112,6 +67,11 @@ public class MongoUtil {
 	 * performant way to translate from /r/p to /r path and vice verse
 	 */
 	static final String PATH_CHARS = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnoqstuvwxyz";
+
+	@PostConstruct
+	public void postConstruct() {
+		mongoUtil = this;
+	}
 
 	/*
 	 * The set of nodes in here MUST be known to be from an UNFILTERED and COMPLETE SubGraph query or

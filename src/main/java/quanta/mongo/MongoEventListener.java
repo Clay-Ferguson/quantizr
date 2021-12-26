@@ -9,7 +9,6 @@ import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.mapping.event.AbstractMongoEventListener;
 import org.springframework.data.mongodb.core.mapping.event.AfterConvertEvent;
@@ -35,27 +34,21 @@ public class MongoEventListener extends AbstractMongoEventListener<SubNode> {
 	private static final boolean verbose = false;
 
 	@Autowired
-	@Lazy
 	protected MongoTemplate ops;
 
 	@Autowired
-	@Lazy
 	private MongoRead read;
 
 	@Autowired
-	@Lazy
 	private MongoAuth auth;
 
 	@Autowired
-	@Lazy
 	private MongoUtil mongoUtil;
 
 	@Autowired
-	@Lazy
 	private SubNodeUtil snUtil;
 
 	@Autowired
-	@Lazy
 	private EventPublisher publisher;
 
 	/**

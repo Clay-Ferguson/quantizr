@@ -7,18 +7,17 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.StringTokenizer;
+import javax.annotation.PostConstruct;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.TextCriteria;
 import org.springframework.stereotype.Component;
-import quanta.actpub.ActPubService;
 import quanta.config.NodePath;
+import quanta.config.ServiceBase;
 import quanta.model.NodeInfo;
 import quanta.model.client.Bookmark;
 import quanta.model.client.Constant;
@@ -27,11 +26,7 @@ import quanta.model.client.NodeProp;
 import quanta.model.client.NodeType;
 import quanta.model.client.PrincipalName;
 import quanta.model.client.PrivilegeType;
-import quanta.mongo.AdminRun;
-import quanta.mongo.MongoAuth;
-import quanta.mongo.MongoRead;
 import quanta.mongo.MongoSession;
-import quanta.mongo.MongoUtil;
 import quanta.mongo.model.AccessControl;
 import quanta.mongo.model.SubNode;
 import quanta.request.GetBookmarksRequest;
@@ -42,8 +37,6 @@ import quanta.response.GetBookmarksResponse;
 import quanta.response.GetNodeStatsResponse;
 import quanta.response.GetSharedNodesResponse;
 import quanta.response.NodeSearchResponse;
-import quanta.util.Convert;
-import quanta.util.EnglishDictionary;
 import quanta.util.ExUtil;
 import quanta.util.ThreadLocals;
 import quanta.util.XString;
@@ -57,45 +50,9 @@ import quanta.util.XString;
  * NOTE: the Query class DOES have a 'skip' and 'limit' which I can take advantage of in all my
  * searching but I'm not fully doing so yet I don't believe.
  */
-@Lazy
 @Component
-public class NodeSearchService {
+public class NodeSearchService extends ServiceBase  {
 	private static final Logger log = LoggerFactory.getLogger(NodeSearchService.class);
-
-	@Autowired
-	@Lazy
-	protected Convert convert;
-
-	@Autowired
-	protected EnglishDictionary english;
-
-	@Autowired
-	@Lazy
-	protected ActPubService apub;
-
-	@Autowired
-	@Lazy
-	protected NodeRenderService render;
-
-	@Autowired
-	@Lazy
-	protected AdminRun arun;
-
-	@Autowired
-	@Lazy
-	protected UserManagerService user;
-
-	@Autowired
-	@Lazy
-	protected MongoUtil mongoUtil;
-
-	@Autowired
-	@Lazy
-	protected MongoAuth auth;
-
-	@Autowired
-	@Lazy
-	protected MongoRead read;
 
 	public static Object trendingFeedInfoLock = new Object();
 	public static GetNodeStatsResponse trendingFeedInfo;
@@ -105,6 +62,11 @@ public class NodeSearchService {
 	static final String WORD_DELIMS = " \n\r\t,-;:\"'`()*{}[]<>=\\/.!?&“";
 
 	static final int TRENDING_LIMIT = 10000;
+
+	@PostConstruct
+	public void postConstruct() {
+		search = this;
+	}
 
 	public NodeSearchResponse search(MongoSession ms, NodeSearchRequest req) {
 		NodeSearchResponse res = new NodeSearchResponse();

@@ -4,6 +4,7 @@ import static quanta.util.Util.no;
 import static quanta.util.Util.ok;
 import java.util.Date;
 import java.util.Properties;
+import javax.annotation.PostConstruct;
 import javax.mail.Message;
 import javax.mail.Session;
 import javax.mail.event.TransportEvent;
@@ -15,17 +16,16 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 import quanta.config.AppProp;
+import quanta.config.ServiceBase;
 import quanta.util.ExUtil;
 
 /**
  * Component that sends emails
  */
-@Lazy
 @Component
-public class EmailSender implements TransportListener {
+public class EmailSender extends ServiceBase implements TransportListener {
 	private static final Logger log = LoggerFactory.getLogger(EmailSender.class);
 
 	@Autowired
@@ -41,6 +41,11 @@ public class EmailSender implements TransportListener {
 	private Properties props;
 	private Session mailSession;
 	private SMTPTransport transport;
+
+	@PostConstruct
+	public void postConstruct() {
+		this.mail = this;
+	}
 
 	/*
 	 * This method can and should be called before sending mails, close() method should be called after

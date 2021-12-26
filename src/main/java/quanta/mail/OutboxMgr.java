@@ -3,27 +3,20 @@ package quanta.mail;
 import static quanta.util.Util.no;
 import static quanta.util.Util.ok;
 import java.util.List;
+import javax.annotation.PostConstruct;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
-import quanta.config.AppProp;
 import quanta.config.NodeName;
 import quanta.config.NodePath;
+import quanta.config.ServiceBase;
 import quanta.config.SessionContext;
 import quanta.model.client.NodeProp;
 import quanta.model.client.NodeType;
-import quanta.mongo.AdminRun;
 import quanta.mongo.CreateNodeLocation;
-import quanta.mongo.MongoCreate;
-import quanta.mongo.MongoRead;
 import quanta.mongo.MongoSession;
-import quanta.mongo.MongoUpdate;
 import quanta.mongo.model.SubNode;
 import quanta.response.NotificationMessage;
-import quanta.service.PushService;
-import quanta.util.SubNodeUtil;
 import quanta.util.ThreadLocals;
 import quanta.util.XString;
 
@@ -34,46 +27,18 @@ import quanta.util.XString;
  * this queue.
  * 
  */
-@Lazy
 @Component
-public class OutboxMgr {
+public class OutboxMgr extends ServiceBase {
 	private static final Logger log = LoggerFactory.getLogger(OutboxMgr.class);
-
-	@Autowired
-	@Lazy
-	protected EmailSenderDaemon notify;
-
-	@Autowired
-	@Lazy
-	protected PushService push;
-
-	@Autowired
-	@Lazy
-	protected AdminRun arun;
-
-	@Autowired
-	@Lazy
-	private SubNodeUtil snUtil;
-
-	@Autowired
-	@Lazy
-	protected AppProp prop;
-
-	@Autowired
-	@Lazy
-	protected MongoUpdate update;
-
-	@Autowired
-	@Lazy
-	protected MongoRead read;
-
-	@Autowired
-	@Lazy
-	protected MongoCreate create;
 
 	private String mailBatchSize = "10";
 	private static SubNode outboxNode = null;
 	private static final Object outboxLock = new Object();
+
+	@PostConstruct
+	public void postConstruct() {
+		outbox = this;
+	}
 
 	/**
 	 * Adds a node into the user's "Inbox" as an indicator to them that the 'node' added needs their

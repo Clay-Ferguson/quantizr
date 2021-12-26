@@ -15,20 +15,20 @@ import java.nio.file.attribute.PosixFilePermission;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
+import javax.annotation.PostConstruct;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.comparator.NameFileComparator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Component;
+import quanta.config.ServiceBase;
 import quanta.config.SpringContextUtil;
 import quanta.exception.base.RuntimeEx;
 
-@Lazy
 @Component
-public class FileUtils {
+public class FileUtils extends ServiceBase {
 	private static final Logger log = LoggerFactory.getLogger(FileUtils.class);
 
 	/*
@@ -47,6 +47,11 @@ public class FileUtils {
 		imageExtensions.add("png");
 		imageExtensions.add("gif");
 		imageExtensions.add("bmp");
+	}
+
+	@PostConstruct
+	public void postConstruct() {
+		fileUtil = this;
 	}
 
 	public String genHashOfClasspathResource(String resourceName) {

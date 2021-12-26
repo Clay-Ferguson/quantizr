@@ -31,7 +31,6 @@ import org.springframework.data.mongodb.gridfs.GridFsTemplate;
 import org.springframework.data.mongodb.repository.config.EnableMongoRepositories;
 import quanta.config.AppProp;
 import quanta.exception.base.RuntimeEx;
-import quanta.util.Convert;
 import quanta.util.ExUtil;
 
 // Ref: http://mongodb.github.io/mongo-java-driver/3.7/driver/getting-started/quick-start-pojo/
@@ -46,6 +45,7 @@ public class MongoAppConfig extends AbstractMongoClientConfiguration {
 	private static final Logger log = LoggerFactory.getLogger(MongoAppConfig.class);
 
 	public static final String databaseName = "database";
+
 	private MongoClient mongoClient;
 	private GridFSBucket gridFsBucket;
 	private MongoTemplate ops;
@@ -59,16 +59,11 @@ public class MongoAppConfig extends AbstractMongoClientConfiguration {
 	public static boolean connectionFailed = false;
 
 	@Autowired
-	@Lazy
 	private AppProp appProp;
 
 	@Autowired
-	@Lazy
-	MappingMongoConverter converter;
-
-	@Autowired
-	@Lazy
-	protected Convert convert;
+	@Lazy // todo-0: non-lazy here blows up circular refs
+	private MappingMongoConverter converter;
 
 	@PostConstruct
 	public void postConstruct() {

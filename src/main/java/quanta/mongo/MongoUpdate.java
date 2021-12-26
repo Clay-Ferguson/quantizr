@@ -6,17 +6,17 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
+import javax.annotation.PostConstruct;
 import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.stereotype.Component;
+import quanta.config.ServiceBase;
 import quanta.model.UserStats;
 import quanta.model.client.NodeProp;
 import quanta.mongo.model.SubNode;
-import quanta.service.IPFSService;
 import quanta.util.Cast;
 import quanta.util.ThreadLocals;
 import quanta.util.Val;
@@ -25,33 +25,21 @@ import quanta.util.XString;
 /**
  * Performs update (as in CRUD) operations for MongoDB
  */
-@Lazy
 @Component
-public class MongoUpdate {
+public class MongoUpdate extends ServiceBase  {
 	private static final Logger log = LoggerFactory.getLogger(MongoUpdate.class);
 
 	@Autowired
-	@Lazy
-	protected IPFSService ipfs;
+    public MongoTemplate ops;
 
-	@Autowired
-	@Lazy
-	protected MongoTemplate ops;
-
-	@Autowired
-	@Lazy
-	protected AdminRun arun;
-
-	@Autowired
-	@Lazy
-	protected MongoAuth auth;
-
-	@Autowired
-	@Lazy
-	protected MongoRead read;
 
 	// NOTE: Since this is a threadlocal we have no concurrency protection (not needed)
 	private static final ThreadLocal<Boolean> saving = new ThreadLocal<>();
+
+	@PostConstruct
+	public void postConstruct() {
+		update = this;
+	}
 
 	public void saveObj(Object obj) {
 		ops.save(obj);

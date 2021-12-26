@@ -7,19 +7,15 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import javax.annotation.PostConstruct;
 import org.apache.commons.lang3.StringUtils;
 import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
-import quanta.actpub.ActPubFollower;
-import quanta.actpub.ActPubFollowing;
-import quanta.actpub.ActPubService;
-import quanta.actpub.ActPubUtil;
 import quanta.actpub.model.APList;
 import quanta.config.NodeName;
+import quanta.config.ServiceBase;
 import quanta.exception.base.RuntimeEx;
 import quanta.model.NodeInfo;
 import quanta.model.PropertyInfo;
@@ -27,14 +23,8 @@ import quanta.model.client.NodeProp;
 import quanta.model.client.NodeType;
 import quanta.model.client.PrincipalName;
 import quanta.model.client.PrivilegeType;
-import quanta.mongo.AdminRun;
 import quanta.mongo.CreateNodeLocation;
-import quanta.mongo.MongoAuth;
-import quanta.mongo.MongoCreate;
-import quanta.mongo.MongoRead;
 import quanta.mongo.MongoSession;
-import quanta.mongo.MongoUpdate;
-import quanta.mongo.MongoUtil;
 import quanta.mongo.model.AccessControl;
 import quanta.mongo.model.SubNode;
 import quanta.request.AppDropRequest;
@@ -56,9 +46,6 @@ import quanta.response.SplitNodeResponse;
 import quanta.response.TransferNodeResponse;
 import quanta.response.UpdateHeadingsResponse;
 import quanta.types.TypeBase;
-import quanta.types.TypePluginMgr;
-import quanta.util.AsyncExec;
-import quanta.util.Convert;
 import quanta.util.SubNodeUtil;
 import quanta.util.ThreadLocals;
 import quanta.util.Util;
@@ -70,78 +57,14 @@ import quanta.util.XString;
  * the user is using the application and moving, copy+paste, or editing node content this is the
  * service that performs those operations on the server, directly called from the HTML 'controller'
  */
-@Lazy
 @Component
-public class NodeEditService {
+public class NodeEditService extends ServiceBase {
 	private static final Logger log = LoggerFactory.getLogger(NodeEditService.class);
 
-	@Autowired
-	@Lazy
-	protected Convert convert;
-
-	@Autowired
-	@Lazy
-	protected IPFSService ipfs;
-
-	@Autowired
-	@Lazy
-	protected TypePluginMgr typePluginMgr;
-
-	@Autowired
-	@Lazy
-	protected PushService push;
-
-	@Autowired
-	@Lazy
-	protected ActPubUtil apUtil;
-
-	@Autowired
-	@Lazy
-	protected ActPubFollower apFollower;
-
-	@Autowired
-	@Lazy
-	protected ActPubService apub;
-
-	@Autowired
-	@Lazy
-	protected ActPubFollowing apFollowing;
-
-	@Autowired
-	@Lazy
-	protected AsyncExec asyncExec;
-
-	@Autowired
-	@Lazy
-	protected AdminRun arun;
-
-	@Autowired
-	@Lazy
-	private SubNodeUtil snUtil;
-
-	@Autowired
-	@Lazy
-	protected AclService acl;
-
-	@Autowired
-	@Lazy
-	protected MongoUtil mongoUtil;
-
-	@Autowired
-	@Lazy
-	protected MongoAuth auth;
-
-	@Autowired
-	@Lazy
-	protected MongoUpdate update;
-
-	@Autowired
-	@Lazy
-	protected MongoRead read;
-
-	@Autowired
-	@Lazy
-	protected MongoCreate create;
+	@PostConstruct
+	public void postConstruct() {
+		edit = this;
+	}
 
 	/*
 	 * Creates a new node as a *child* node of the node specified in the request. Should ONLY be called

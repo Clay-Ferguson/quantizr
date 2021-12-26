@@ -1,17 +1,23 @@
 package quanta.util;
 
 import static quanta.util.Util.ok;
-import org.springframework.context.annotation.Lazy;
+import javax.annotation.PostConstruct;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
+import quanta.config.ServiceBase;
 
 /*
  * Warning do not call this run method from INSIDE this class. Due to the spring proxy 'issue' you
  * can't do that
  */
-@Lazy
 @Component
-public class AsyncExec {
+public class AsyncExec extends ServiceBase {
+    
+    @PostConstruct
+	public void postConstruct() {
+	    asyncExec = this;
+	}
+
     /*
      * *** DO NOT DELETE *** This is left here as an example of what NOT TO DO. Because of the way
      * Spring Annotated methods use the 'proxy' interface (i.e. like AOP) if you call an annotated

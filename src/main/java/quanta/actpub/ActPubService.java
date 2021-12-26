@@ -10,13 +10,11 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.concurrent.Executor;
+import javax.annotation.PostConstruct;
 import javax.servlet.http.HttpServletRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -26,134 +24,33 @@ import quanta.actpub.model.AP;
 import quanta.actpub.model.APList;
 import quanta.actpub.model.APObj;
 import quanta.actpub.model.APType;
-import quanta.config.AppProp;
 import quanta.config.NodeName;
 import quanta.config.NodePath;
+import quanta.config.ServiceBase;
 import quanta.model.client.NodeProp;
 import quanta.model.client.NodeType;
 import quanta.model.client.PrincipalName;
 import quanta.model.client.PrivilegeType;
-import quanta.mongo.AdminRun;
 import quanta.mongo.CreateNodeLocation;
-import quanta.mongo.MongoAuth;
-import quanta.mongo.MongoCreate;
-import quanta.mongo.MongoDelete;
-import quanta.mongo.MongoRead;
 import quanta.mongo.MongoRepository;
 import quanta.mongo.MongoSession;
-import quanta.mongo.MongoUpdate;
-import quanta.mongo.MongoUtil;
 import quanta.mongo.model.AccessControl;
 import quanta.mongo.model.FediverseName;
 import quanta.mongo.model.SubNode;
-import quanta.service.AclService;
-import quanta.service.AttachmentService;
 import quanta.service.NodeSearchService;
-import quanta.service.PushService;
-import quanta.service.UserManagerService;
-import quanta.util.AsyncExec;
 import quanta.util.DateUtil;
-import quanta.util.EnglishDictionary;
 import quanta.util.ThreadLocals;
 import quanta.util.XString;
 
 /**
  * General AP functions
  */
-@Lazy
 @Component
-public class ActPubService {
+public class ActPubService extends ServiceBase {
     private static final Logger log = LoggerFactory.getLogger(ActPubService.class);
 
     @Autowired
-    @Lazy
-    protected MongoTemplate ops;
-
-    @Autowired
-    protected EnglishDictionary english;
-
-    @Autowired
-    @Lazy
-    protected PushService push;
-
-    @Autowired
-    @Lazy
-    protected ActPubFactory apFactory;
-
-    @Autowired
-    @Lazy
-    protected ActPubCrypto apCrypto;
-
-    @Autowired
-    public ActPubCache apCache;
-
-    @Autowired
-    @Lazy
-    protected ActPubUtil apUtil;
-
-    @Autowired
-    @Lazy
-    protected ActPubOutbox apOutbox;
-
-    @Autowired
-    @Lazy
-    protected ActPubFollower apFollower;
-
-    @Autowired
-    @Lazy
-    protected ActPubFollowing apFollowing;
-
-    @Autowired
-    @Lazy
-    protected AsyncExec asyncExec;
-
-    @Autowired
-    @Lazy
-    protected AttachmentService attach;
-
-    @Autowired
-    @Lazy
-    protected AdminRun arun;
-
-    @Autowired
-    @Lazy
-    protected AppProp prop;
-
-    @Autowired
-    @Lazy
-    protected UserManagerService user;
-
-    @Autowired
-    @Lazy
-    protected AclService acl;
-
-    @Autowired
-    @Lazy
-    protected MongoUtil mongoUtil;
-
-    @Autowired
-    @Lazy
-    protected MongoAuth auth;
-
-    @Autowired
-    @Lazy
-    protected MongoDelete delete;
-
-    @Autowired
-    @Lazy
-    protected MongoUpdate update;
-
-    @Autowired
-    @Lazy
-    protected MongoRead read;
-
-    @Autowired
-    @Lazy
-    protected MongoCreate create;
-
-    @Autowired
-    @Qualifier("threadPoolTaskExecutor")
-    private Executor executor;
+    public MongoTemplate ops;
 
     public static final boolean ENGLISH_LANGUAGE_CHECK = false;
     public static final int MAX_MESSAGES = 10;
@@ -170,6 +67,11 @@ public class ActPubService {
     public static boolean bigRefresh = false;
 
     private static final Object inboxLock = new Object();
+
+    @PostConstruct
+	public void postConstruct() {
+		apub = this;
+	}
 
     /*
      * When 'node' has been created under 'parent' (by the sessionContext user) this will send a

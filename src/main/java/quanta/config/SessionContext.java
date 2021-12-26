@@ -10,19 +10,14 @@ import javax.servlet.http.HttpSession;
 import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 import quanta.model.UserPreferences;
 import quanta.model.client.PrincipalName;
-import quanta.mongo.MongoAuth;
-import quanta.mongo.MongoRead;
 import quanta.mongo.MongoUtil;
 import quanta.mongo.model.SubNode;
 import quanta.response.SessionTimeoutPushInfo;
-import quanta.service.PushService;
 import quanta.util.StopwatchEntry;
 import quanta.util.ThreadLocals;
 import quanta.util.Util;
@@ -32,25 +27,13 @@ import quanta.util.Util;
  */
 @Component
 @Scope("prototype")
-public class SessionContext {
+public class SessionContext extends ServiceBase {
 	// DO NOT DELETE (keep for future ref)
 	// implements InitializingBean, DisposableBean {
 	private static final Logger log = LoggerFactory.getLogger(SessionContext.class);
 
 	public static final String QSC = "QSC";
 	private boolean live = true;
-
-	@Autowired
-	@Lazy
-	private PushService pushService;
-
-	@Autowired
-	@Lazy
-	private MongoAuth auth;
-
-	@Autowired
-	@Lazy
-	private MongoRead read;
 
 	/* Identification of user's account root node. */
 	private String rootId;
@@ -349,7 +332,7 @@ public class SessionContext {
 
 	public void sessionTimeout() {
 		log.trace(String.format("Destroying Session object hashCode[%d] of user %s", hashCode(), userName));
-		pushService.sendServerPushInfo(this, new SessionTimeoutPushInfo());
+		push.sendServerPushInfo(this, new SessionTimeoutPushInfo());
 
 		synchronized (allSessions) {
 			/*

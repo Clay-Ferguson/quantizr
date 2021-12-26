@@ -16,6 +16,7 @@ import java.net.URLConnection;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Iterator;
+import javax.annotation.PostConstruct;
 import javax.imageio.ImageIO;
 import javax.imageio.ImageReader;
 import javax.imageio.stream.ImageInputStream;
@@ -39,7 +40,6 @@ import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.ResourceRegion;
@@ -55,9 +55,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBody;
-import quanta.config.AppProp;
-import quanta.config.NodeName;
 import quanta.config.NodePath;
+import quanta.config.ServiceBase;
 import quanta.config.SpringContextUtil;
 import quanta.exception.OutOfSpaceException;
 import quanta.exception.base.RuntimeEx;
@@ -65,14 +64,8 @@ import quanta.model.UserStats;
 import quanta.model.client.NodeProp;
 import quanta.model.client.PrivilegeType;
 import quanta.model.ipfs.dag.MerkleLink;
-import quanta.mongo.AdminRun;
 import quanta.mongo.CreateNodeLocation;
-import quanta.mongo.MongoAuth;
-import quanta.mongo.MongoCreate;
-import quanta.mongo.MongoRead;
 import quanta.mongo.MongoSession;
-import quanta.mongo.MongoUpdate;
-import quanta.mongo.MongoUtil;
 import quanta.mongo.model.SubNode;
 import quanta.request.DeleteAttachmentRequest;
 import quanta.request.UploadFromIPFSRequest;
@@ -101,54 +94,20 @@ import quanta.util.Val;
  * attachment. If the attachment is an 'image' type then it gets displayed right on the page.
  * Otherwise a download link is what gets displayed on the node.
  */
-@Lazy
 @Component
-public class AttachmentService {
+public class AttachmentService extends ServiceBase {
 	private static final Logger log = LoggerFactory.getLogger(AttachmentService.class);
 
 	@Autowired
-	@Lazy
-	protected IPFSService ipfs;
+	public GridFsTemplate grid;
 
 	@Autowired
-	@Lazy
-	private GridFsTemplate grid;
+	public GridFSBucket gridBucket;
 
-	@Autowired
-	@Lazy
-	protected GridFSBucket gridBucket;
-
-	@Autowired
-	@Lazy
-	protected AdminRun arun;
-
-	@Autowired
-	@Lazy
-	protected AppProp prop;
-
-	@Autowired
-	@Lazy
-	protected UserManagerService user;
-
-	@Autowired
-	@Lazy
-	protected MongoUtil mongoUtil;
-
-	@Autowired
-	@Lazy
-	protected MongoAuth auth;
-
-	@Autowired
-	@Lazy
-	protected MongoUpdate update;
-
-	@Autowired
-	@Lazy
-	protected MongoRead read;
-
-	@Autowired
-	@Lazy
-	protected MongoCreate create;
+	@PostConstruct
+	public void postConstruct() {
+		attach = this;
+	}
 
 	/*
 	 * Upload from User's computer. Standard HTML form-based uploading of a file from user machine

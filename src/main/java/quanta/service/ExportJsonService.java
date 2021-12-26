@@ -14,19 +14,15 @@ import com.fasterxml.jackson.databind.ObjectWriter;
 import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.context.annotation.Scope;
 import org.springframework.core.io.Resource;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Component;
-import quanta.config.AppProp;
+import quanta.config.ServiceBase;
 import quanta.config.SpringContextUtil;
 import quanta.model.client.NodeProp;
 import quanta.mongo.MongoSession;
-import quanta.mongo.MongoUpdate;
-import quanta.mongo.MongoUtil;
 import quanta.mongo.model.SubNode;
 import quanta.util.ExUtil;
 import quanta.util.FileUtils;
@@ -38,31 +34,11 @@ import quanta.util.Val;
 /**
  * Import/Export of Raw JSON and Binaries to and from filesystem/classpath)
  */
-@Lazy
+
 @Component
 @Scope("prototype")
-public class ExportJsonService {
+public class ExportJsonService extends ServiceBase {
 	private static final Logger log = LoggerFactory.getLogger(ExportJsonService.class);
-
-	@Autowired
-	@Lazy
-	protected AttachmentService attach;
-
-	@Autowired
-	@Lazy
-	protected AppProp prop;
-
-	@Autowired
-	@Lazy
-	protected UserManagerService user;
-
-	@Autowired
-	@Lazy
-	protected MongoUtil mongoUtil;
-
-	@Autowired
-	@Lazy
-	protected MongoUpdate update;
 
 	/* This object is Threadsafe so this is the correct usage 'static final' */
 	private static final ObjectMapper objectMapper = new ObjectMapper();

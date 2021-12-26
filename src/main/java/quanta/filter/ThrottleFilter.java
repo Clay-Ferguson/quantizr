@@ -13,7 +13,6 @@ import javax.servlet.http.HttpServletRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.GenericFilterBean;
@@ -30,7 +29,6 @@ public class ThrottleFilter extends GenericFilterBean {
 	private static final Logger log = LoggerFactory.getLogger(ThrottleFilter.class);
 
 	@Autowired
-	@Lazy
 	private AppProp appProp;
 
 	private static boolean THROTTLE_ENABLED = false;

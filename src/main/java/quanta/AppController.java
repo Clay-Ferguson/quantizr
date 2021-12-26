@@ -16,7 +16,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.web.servlet.error.ErrorController;
-import org.springframework.context.annotation.Lazy;
+import org.springframework.context.event.ContextRefreshedEvent;
+import org.springframework.context.event.EventListener;
 import org.springframework.core.io.support.ResourceRegion;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -38,11 +39,8 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
-import quanta.actpub.ActPubFollower;
-import quanta.actpub.ActPubFollowing;
-import quanta.actpub.ActPubService;
-import quanta.config.AppProp;
 import quanta.config.GracefulShutdown;
+import quanta.config.ServiceBase;
 import quanta.config.SessionContext;
 import quanta.config.SpringContextUtil;
 import quanta.exception.base.RuntimeEx;
@@ -50,8 +48,6 @@ import quanta.mail.EmailSender;
 import quanta.model.client.NodeProp;
 import quanta.model.client.NodeType;
 import quanta.model.client.PrincipalName;
-import quanta.mongo.AdminRun;
-import quanta.mongo.MongoRead;
 import quanta.mongo.MongoRepository;
 import quanta.mongo.model.SubNode;
 import quanta.request.AddFriendRequest;
@@ -127,26 +123,11 @@ import quanta.response.InfoMessage;
 import quanta.response.LogoutResponse;
 import quanta.response.PingResponse;
 import quanta.response.SendTestEmailResponse;
-import quanta.service.AclService;
-import quanta.service.AttachmentService;
 import quanta.service.ExportServiceFlexmark;
 import quanta.service.ExportTarService;
 import quanta.service.ExportTextService;
 import quanta.service.ExportZipService;
-import quanta.service.GraphNodesService;
-import quanta.service.IPFSService;
-import quanta.service.ImportBookService;
-import quanta.service.ImportService;
-import quanta.service.JSoupService;
-import quanta.service.LuceneService;
-import quanta.service.NodeEditService;
-import quanta.service.NodeMoveService;
-import quanta.service.NodeRenderService;
-import quanta.service.NodeSearchService;
 import quanta.service.RSSFeedService;
-import quanta.service.SystemService;
-import quanta.service.UserFeedService;
-import quanta.service.UserManagerService;
 import quanta.util.CaptchaMaker;
 import quanta.util.Const;
 import quanta.util.ExUtil;
@@ -172,110 +153,11 @@ import quanta.util.Util;
  * in certain layers (abstraction related and for loose-coupling).
  */
 @Controller
-public class AppController implements ErrorController {
+public class AppController extends ServiceBase implements ErrorController {
 	private static final Logger log = LoggerFactory.getLogger(AppController.class);
 
 	@Autowired
-	@Lazy
-	protected IPFSService ipfs;
-
-	@Autowired
-	@Lazy
-	protected GraphNodesService graphNodes;
-
-	@Autowired
-	@Lazy
-	protected ImportBookService importBookService;
-
-	@Autowired
-	@Lazy
-	protected ImportService importService;
-
-	@Autowired
-	@Lazy
-	protected LuceneService lucene;
-
-	@Autowired
-	@Lazy
-	protected SystemService system;
-
-	@Autowired
-	@Lazy
-	protected RSSFeedService rssFeed;
-
-	@Autowired
-	@Lazy
-	protected UserFeedService userFeed;
-
-	@Autowired
-	@Lazy
-	protected JSoupService jsoup;
-
-	@Autowired
-	@Lazy
-	protected NodeMoveService move;
-
-	@Autowired
-	@Lazy
-	protected NodeSearchService search;
-
-	@Autowired
-	@Lazy
-	protected EmailSender mail;
-
-	@Autowired
-	@Lazy
-	protected NodeEditService edit;
-
-	@Autowired
-	@Lazy
-	protected ActPubFollower apFollower;
-
-	@Autowired
-	@Lazy
-	protected ActPubFollowing apFollowing;
-
-	@Autowired
-	@Lazy
-	protected ActPubService apub;
-
-	@Autowired
-	@Lazy
-	protected NodeRenderService render;
-
-	@Autowired
-	@Lazy
-	protected AttachmentService attach;
-
-	@Autowired
-	@Lazy
-	protected AdminRun arun;
-
-	@Autowired
-	@Lazy
-	protected AppProp prop;
-
-	@Autowired
-	@Lazy
-	protected UserManagerService user;
-
-	@Autowired
-	@Lazy
-	protected AclService acl;
-
-	@Autowired
-	@Lazy
-	protected MongoRead read;
-
-	@Autowired
-	private CallProcessor callProc;
-
-	@Autowired
 	private GracefulShutdown gracefulShutdown;
-
-	@Autowired
-	@Lazy
-	private AppProp appProp;
 
 	public static final String API_PATH = "/mobile/api";
 
@@ -302,6 +184,11 @@ public class AppController implements ErrorController {
 		model.addAllAttributes(thymeleafAttribs);
 		// pulls up error.html
 		return "error";
+	}
+
+	@EventListener
+	public void handleContextRefresh(ContextRefreshedEvent event) {
+		init();
 	}
 
 	public void init() {
@@ -1628,7 +1515,7 @@ public class AppController implements ErrorController {
 			@RequestParam(value = "password", required = true) String password) {
 		// NO NOT HERE -> SessionContext.checkReqToken();
 		return (String) callProc.run("shutdown", null, session, ms -> {
-			if (appProp.getMongoAdminPassword().equals(password)) {
+			if (prop.getMongoAdminPassword().equals(password)) {
 				gracefulShutdown.initiateShutdown(0);
 			}
 			return null;

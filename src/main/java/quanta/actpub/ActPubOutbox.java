@@ -6,12 +6,9 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.concurrent.Executor;
+import javax.annotation.PostConstruct;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;
 import quanta.actpub.model.AP;
@@ -22,61 +19,29 @@ import quanta.actpub.model.APOOrderedCollection;
 import quanta.actpub.model.APOOrderedCollectionPage;
 import quanta.actpub.model.APObj;
 import quanta.actpub.model.APType;
-import quanta.config.AppProp;
 import quanta.config.NodeName;
+import quanta.config.ServiceBase;
 import quanta.model.client.NodeProp;
 import quanta.model.client.NodeType;
 import quanta.model.client.PrincipalName;
 import quanta.model.client.PrivilegeType;
-import quanta.mongo.AdminRun;
-import quanta.mongo.MongoAuth;
-import quanta.mongo.MongoRead;
 import quanta.mongo.MongoSession;
 import quanta.mongo.model.SubNode;
 import quanta.util.DateUtil;
-import quanta.util.SubNodeUtil;
 import quanta.util.Val;
 import quanta.util.XString;
 
 /**
  * AP Outbox
  */
-@Lazy
 @Component
-public class ActPubOutbox {
+public class ActPubOutbox extends ServiceBase {
     private static final Logger log = LoggerFactory.getLogger(ActPubOutbox.class);
 
-    @Autowired
-    @Lazy
-    protected ActPubUtil apUtil;
-
-    @Autowired
-    @Lazy
-    protected ActPubService apub;
-
-    @Autowired
-    @Lazy
-    protected SubNodeUtil snUtil;
-
-    @Autowired
-    @Lazy
-    protected AppProp prop;
-
-    @Autowired
-    @Lazy
-    protected AdminRun arun;
-
-    @Autowired
-    @Lazy
-    protected MongoAuth auth;
-
-    @Autowired
-    @Lazy
-    protected MongoRead read;
-
-    @Autowired
-    @Qualifier("threadPoolTaskExecutor")
-    private Executor executor;
+    @PostConstruct
+	public void postConstruct() {
+		apOutbox = this;
+	}
 
     /**
      * Caller can pass in userNode if it's already available, but if not just pass null and the

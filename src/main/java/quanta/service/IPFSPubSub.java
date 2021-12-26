@@ -11,12 +11,11 @@ import java.util.Base64;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import javax.annotation.PostConstruct;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -27,13 +26,13 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 import quanta.AppServer;
+import quanta.config.ServiceBase;
 import quanta.config.SessionContext;
 import quanta.model.client.IPSMData;
 import quanta.model.client.IPSMMessage;
 import quanta.mongo.MongoRepository;
 import quanta.response.IPSMPushInfo;
 import quanta.response.ServerPushInfo;
-import quanta.util.AsyncExec;
 import quanta.util.Cast;
 import quanta.util.DateUtil;
 import quanta.util.Util;
@@ -41,19 +40,9 @@ import quanta.util.XString;
 
 // IPFS Reference: https://docs.ipfs.io/reference/http/api
 
-@Lazy
 @Component
-public class IPFSPubSub {
+public class IPFSPubSub extends ServiceBase {
     private static final Logger log = LoggerFactory.getLogger(IPFSPubSub.class);
-
-    @Autowired
-    protected IPFSService ipfs;
-
-    @Autowired
-    protected PushService push;
-
-    @Autowired
-    protected AsyncExec asyncExec;
 
     private static final boolean IPSM_ENABLE = false;
     private static final String IPSM_TOPIC_HEARTBEAT = "ipsm-heartbeat";
@@ -65,6 +54,11 @@ public class IPFSPubSub {
     // private static int heartbeatCounter = 0;
 
     private static final HashMap<String, Integer> fromCounter = new HashMap<>();
+
+    @PostConstruct
+	public void postConstruct() {
+		ipfsPubSub = this;
+	}
 
     public void setOptions() {
         // Only used this for some testing (shouldn't be required?)

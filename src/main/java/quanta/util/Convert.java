@@ -9,13 +9,13 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import javax.annotation.PostConstruct;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;
+import quanta.config.ServiceBase;
 import quanta.config.SessionContext;
 import quanta.model.AccessControlInfo;
 import quanta.model.NodeInfo;
@@ -24,50 +24,24 @@ import quanta.model.PropertyInfo;
 import quanta.model.client.NodeProp;
 import quanta.model.client.PrincipalName;
 import quanta.model.client.PrivilegeType;
-import quanta.mongo.AdminRun;
-import quanta.mongo.MongoAuth;
-import quanta.mongo.MongoRead;
 import quanta.mongo.MongoSession;
-import quanta.mongo.MongoUtil;
 import quanta.mongo.model.AccessControl;
 import quanta.mongo.model.SubNode;
 import quanta.mongo.model.SubNodePropVal;
 import quanta.mongo.model.SubNodePropertyMap;
-import quanta.service.AttachmentService;
 import quanta.types.TypeBase;
-import quanta.types.TypePluginMgr;
 
 /**
  * Converting objects from one type to another, and formatting.
  */
-@Lazy
 @Component
-public class Convert {
+public class Convert extends ServiceBase {
 	private static final Logger log = LoggerFactory.getLogger(Convert.class);
 
-	@Autowired
-	@Lazy
-	protected TypePluginMgr typePluginMgr;
-
-	@Autowired
-	@Lazy
-	protected AttachmentService attach;
-
-	@Autowired
-	@Lazy
-	protected AdminRun arun;
-
-	@Autowired
-	@Lazy
-	protected MongoUtil mongoUtil;
-
-	@Autowired
-	@Lazy
-	protected MongoAuth auth;
-
-	@Autowired
-	@Lazy
-	protected MongoRead read;
+	@PostConstruct
+	public void postConstruct() {
+		convert = this;
+	}
 
 	/*
 	 * Generates a NodeInfo object, which is the primary data type that is also used on the

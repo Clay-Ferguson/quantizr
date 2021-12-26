@@ -6,20 +6,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.web.servlet.ServletComponentScan;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.context.event.ContextClosedEvent;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import quanta.config.AppProp;
+import quanta.config.ServiceBase;
 import quanta.exception.base.RuntimeEx;
-import quanta.mongo.MongoRepository;
-import quanta.service.IPFSPubSub;
-import quanta.types.BookmarkType;
-import quanta.types.FriendType;
-import quanta.types.RoomType;
-import quanta.types.RssFeedType;
-import quanta.util.EnglishDictionary;
 import quanta.util.ExUtil;
 
 /**
@@ -35,42 +28,8 @@ import quanta.util.ExUtil;
  * other.
  */
 // @EnableAutoConfiguration(exclude = {ErrorMvcAutoConfiguration.class})
-public class AppServer { 
+public class AppServer extends ServiceBase { 
 	private static final Logger log = LoggerFactory.getLogger(AppServer.class);
-
-	@Autowired
-	@Lazy
-	private MongoRepository mongoRepo;
-
-	@Autowired
-	@Lazy
-	private AppController appController;
-
-	@Autowired
-	private EnglishDictionary english;
-
-	@Autowired
-	@Lazy
-	private IPFSPubSub pubSub;
-
-	@Autowired
-	@Lazy
-	protected BookmarkType bookmarkType;
-
-	@Autowired
-	@Lazy
-	protected FriendType friendType;
-
-	@Autowired
-	@Lazy
-	protected RoomType roomType;
-
-	@Autowired
-	@Lazy
-	protected RssFeedType rssType;
-
-	@Autowired
-	private AppProp appProp;
 
 	private static boolean shuttingDown;
 	private static boolean enableScheduling;
@@ -92,22 +51,13 @@ public class AppServer {
 	@EventListener
 	public void handleContextRefresh(ContextRefreshedEvent event) {
 		log.info("ContextRefreshedEvent.");
-		log.debug("PROFILE: " + appProp.getProfileName());
+		log.debug("PROFILE: " + prop.getProfileName());
 		log.trace("test trace message.");
 
 		try {
-			// This is our current (slightly ugly) solution to running postConstruct on @Lazy beans
-			// at startup time.
-			bookmarkType.postContruct();
-			friendType.postContruct();
-			roomType.postContruct();
-			rssType.postContruct();
-
-
 			mongoRepo.init();
-			appController.init();
 			english.init();
-			pubSub.init();
+			ipfsPubSub.init();
 		} catch (Exception e) {
 			log.error("application startup failed.");
 			throw new RuntimeEx(e);

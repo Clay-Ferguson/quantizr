@@ -3,27 +3,32 @@ package quanta.service;
 import static quanta.util.Util.no;
 import static quanta.util.Util.ok;
 import java.util.concurrent.ConcurrentHashMap;
+import javax.annotation.PostConstruct;
 import org.jsoup.Connection;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.select.Elements;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
+import quanta.config.ServiceBase;
 import quanta.model.client.OpenGraph;
 import quanta.request.GetOpenGraphRequest;
 import quanta.response.GetOpenGraphResponse;
 
-@Lazy
 @Component
-public class JSoupService {
+public class JSoupService extends ServiceBase {
 	private static final Logger log = LoggerFactory.getLogger(JSoupService.class);
 
 	public final ConcurrentHashMap<String, OpenGraph> ogCache = new ConcurrentHashMap<>();
 
 	public static final String BROWSER_USER_AGENT =
 			"Browser: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.114 Safari/537.36";
+
+	@PostConstruct
+	public void postConstruct() {
+		jsoup = this;
+	}
 
 	public GetOpenGraphResponse getOpenGraph(GetOpenGraphRequest ogReq) {
 		GetOpenGraphResponse res = new GetOpenGraphResponse();

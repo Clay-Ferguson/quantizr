@@ -1,10 +1,10 @@
 package quanta.mongo;
 
+import javax.annotation.PostConstruct;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
+import quanta.config.ServiceBase;
 import quanta.util.MongoRunnableEx;
 import quanta.util.ThreadLocals;
 
@@ -14,18 +14,14 @@ import quanta.util.ThreadLocals;
  * similar to what is also known as an AOP aspect, although not using an 'aspect' but mainly just a
  * Lambda (i.e. 'Functional Interface')
  */
-@Lazy
 @Component
-public class AdminRun {
+public class AdminRun extends ServiceBase {
 	private static final Logger log = LoggerFactory.getLogger(AdminRun.class);
 
-	@Autowired
-	@Lazy
-	private MongoUpdate update;
-
-	@Autowired
-	@Lazy
-	private MongoAuth auth;
+	@PostConstruct
+	public void postConstruct() {
+		arun = this;
+	}
 
 	public <T> T run(MongoRunnableEx<T> runner) {
 		MongoSession ms = null;

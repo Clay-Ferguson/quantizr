@@ -8,12 +8,11 @@ import org.apache.commons.compress.compressors.gzip.GzipCompressorOutputStream;
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import quanta.util.ExUtil;
 
-@Lazy
+
 @Component
 @Scope("prototype")
 public class ExportTarService extends ExportArchiveBase {

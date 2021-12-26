@@ -2,37 +2,32 @@ package quanta.service;
 
 import static quanta.util.Util.no;
 import java.io.BufferedInputStream;
+import javax.annotation.PostConstruct;
 import org.apache.commons.io.input.AutoCloseInputStream;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
+import quanta.config.ServiceBase;
 import quanta.config.SpringContextUtil;
-import quanta.mongo.MongoRead;
 import quanta.mongo.MongoSession;
-import quanta.mongo.MongoUpdate;
 import quanta.mongo.model.SubNode;
 import quanta.util.ExUtil;
 import quanta.util.StreamUtil;
 import quanta.util.ThreadLocals;
 
-@Lazy
+
 @Component
-public class ImportService {
+public class ImportService extends ServiceBase {
 	private static final Logger log = LoggerFactory.getLogger(ImportService.class);
 
-	@Autowired
-	@Lazy
-	protected MongoUpdate update;
-
-	@Autowired
-	@Lazy
-	protected MongoRead read;
+	@PostConstruct
+	public void postConstruct() {
+		importService = this;
+	}
 
 	public ResponseEntity<?> streamImport(MongoSession ms, String nodeId, MultipartFile[] uploadFiles) {
 		if (no(nodeId)) {

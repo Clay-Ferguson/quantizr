@@ -7,15 +7,12 @@ import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 import quanta.exception.base.RuntimeEx;
 
 /**
  * Manages certain aspects of Spring application context.
  */
-
-//WARNING: DO NOT USE @Lazy here. That breaks spring.
 @Component
 public class SpringContextUtil implements ApplicationContextAware {
 	private static final Logger log = LoggerFactory.getLogger(SpringContextUtil.class);
@@ -23,9 +20,7 @@ public class SpringContextUtil implements ApplicationContextAware {
 	private static ApplicationContext context;
 
 	@Autowired
-	@Lazy
 	private TestRunner testRunner;
-
 
 	@Override
 	public void setApplicationContext(ApplicationContext context) throws BeansException {

@@ -13,7 +13,6 @@ import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.boot.web.servlet.server.ServletWebServerFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.context.annotation.Scope;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.scheduling.TaskScheduler;
@@ -38,11 +37,9 @@ public class AppConfiguration implements WebMvcConfigurer {
 	private static final Logger log = LoggerFactory.getLogger(AppConfiguration.class);
 
 	@Autowired
-	@Lazy
 	private AppProp appProp;
 
 	@Autowired
-	@Lazy
 	private AppFilter appFilter;
 
 	private static ThreadPoolTaskExecutor executor;

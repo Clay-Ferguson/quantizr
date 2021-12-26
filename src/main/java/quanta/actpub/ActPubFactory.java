@@ -7,10 +7,9 @@ import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.LinkedList;
 import java.util.List;
+import javax.annotation.PostConstruct;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Controller;
 import quanta.actpub.model.AP;
 import quanta.actpub.model.APList;
@@ -18,20 +17,19 @@ import quanta.actpub.model.APOCreate;
 import quanta.actpub.model.APOMention;
 import quanta.actpub.model.APONote;
 import quanta.actpub.model.APObj;
+import quanta.config.ServiceBase;
 
 /**
  * Convenience factory for some types of AP objects
  */
 @Controller
-public class ActPubFactory  {
+public class ActPubFactory extends ServiceBase {
 	private static final Logger log = LoggerFactory.getLogger(ActPubFactory.class);
 
-	@Autowired
-	public ActPubCache apCache;
-
-	@Autowired
-	@Lazy
-	protected ActPubUtil apUtil;
+	@PostConstruct
+	public void postConstruct() {
+		apFactory = this;
+	}
 
 	/**
 	 * Creates a new 'note' message

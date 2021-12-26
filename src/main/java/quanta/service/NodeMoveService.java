@@ -4,21 +4,15 @@ import static quanta.util.Util.no;
 import static quanta.util.Util.ok;
 import java.util.ArrayList;
 import java.util.List;
+import javax.annotation.PostConstruct;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
+import quanta.config.ServiceBase;
 import quanta.exception.base.RuntimeEx;
 import quanta.model.client.NodeProp;
-import quanta.mongo.AdminRun;
-import quanta.mongo.MongoAuth;
-import quanta.mongo.MongoCreate;
-import quanta.mongo.MongoDelete;
-import quanta.mongo.MongoRead;
 import quanta.mongo.MongoSession;
-import quanta.mongo.MongoUpdate;
 import quanta.mongo.model.SubNode;
 import quanta.request.DeleteNodesRequest;
 import quanta.request.JoinNodesRequest;
@@ -39,38 +33,14 @@ import quanta.util.ThreadLocals;
  * move any existing nodes they have to any new location they want, subject to security constraints
  * of course.
  */
-@Lazy
 @Component
-public class NodeMoveService {
+public class NodeMoveService extends ServiceBase {
 	private static final Logger log = LoggerFactory.getLogger(NodeMoveService.class);
 
-	@Autowired
-	@Lazy
-	protected AdminRun arun;
-
-	@Autowired
-	@Lazy
-	protected UserManagerService user;
-
-	@Autowired
-	@Lazy
-	protected MongoAuth auth;
-
-	@Autowired
-	@Lazy
-	protected MongoDelete delete;
-
-	@Autowired
-	@Lazy
-	protected MongoUpdate update;
-
-	@Autowired
-	@Lazy
-	protected MongoRead read;
-
-	@Autowired
-	@Lazy
-	protected MongoCreate create;
+	@PostConstruct
+	public void postConstruct() {
+		move = this;
+	}
 
 	/*
 	 * Moves the the node to a new ordinal/position location (relative to parent)

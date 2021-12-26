@@ -7,18 +7,15 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
+import quanta.config.ServiceBase;
 import quanta.model.client.NodeProp;
 import quanta.model.ipfs.dag.DagLink;
 import quanta.model.ipfs.dag.DagNode;
 import quanta.model.ipfs.file.IPFSDir;
 import quanta.model.ipfs.file.IPFSDirEntry;
-import quanta.mongo.MongoRead;
 import quanta.mongo.MongoSession;
-import quanta.mongo.MongoUpdate;
 import quanta.mongo.model.SubNode;
 import quanta.mongo.model.SubNodeIdentity;
 import quanta.mongo.model.SubNodePojo;
@@ -28,23 +25,11 @@ import quanta.util.ExUtil;
 import quanta.util.ThreadLocals;
 import quanta.util.XString;
 
-@Lazy
+
 @Component
 @Scope("prototype")
-public class SyncFromIpfsService {
+public class SyncFromIpfsService extends ServiceBase {
 	private static final Logger log = LoggerFactory.getLogger(SyncFromIpfsService.class);
-
-	@Autowired
-	@Lazy
-	protected IPFSService ipfs;
-
-	@Autowired
-	@Lazy
-	protected MongoUpdate update;
-
-	@Autowired
-	@Lazy
-	protected MongoRead read;
 
 	public static final ObjectMapper jsonMapper = new ObjectMapper();
 	{

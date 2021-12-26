@@ -9,25 +9,17 @@ import org.apache.commons.io.FileUtils;
 import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.stereotype.Component;
 import quanta.actpub.model.APList;
 import quanta.actpub.model.APObj;
+import quanta.config.ServiceBase;
 import quanta.exception.NodeAuthFailedException;
 import quanta.exception.base.RuntimeEx;
 import quanta.model.client.NodeProp;
 import quanta.model.client.PrincipalName;
-import quanta.mongo.MongoAuth;
-import quanta.mongo.MongoCreate;
-import quanta.mongo.MongoRead;
 import quanta.mongo.MongoSession;
-import quanta.mongo.MongoUpdate;
-import quanta.mongo.MongoUtil;
 import quanta.mongo.model.SubNode;
-import quanta.service.AttachmentService;
-import quanta.service.UserManagerService;
 import quanta.util.LimitedInputStreamEx;
 import quanta.util.ThreadLocals;
 import quanta.util.XString;
@@ -36,45 +28,17 @@ import quanta.util.XString;
  * This is actually where I just run various experiments related to MongoDB, and this is not
  * supposed to be any thing like a unit test for the mongo stuff.
  */
-@Lazy
+
 @Component("MongoTest")
-public class MongoTest implements TestIntf {
+public class MongoTest extends ServiceBase implements TestIntf {
 	private static final Logger log = LoggerFactory.getLogger(MongoTest.class);
-
-	@Autowired
-	@Lazy
-	private MongoUtil mongoUtil;
-
-	@Autowired
-	@Lazy
-	private MongoCreate create;
-
-	@Autowired
-	@Lazy
-	private MongoRead read;
-
-	@Autowired
-	@Lazy
-	private MongoUpdate update;
-
-	@Autowired
-	@Lazy
-	private MongoAuth auth;
-
-	@Autowired
-	@Lazy
-	private AttachmentService attach;
-
-	@Autowired
-	@Lazy
-	private UserManagerService usrMgr;
 
 	@Override
 	public void test() throws Exception {
 		log.debug("*****************************************************************************************");
 		log.debug("MongoTest Running!");
 
-		testComplexProperties();
+		// testComplexProperties();
 
 		// testDirtyReads();
 
@@ -295,7 +259,7 @@ public class MongoTest implements TestIntf {
 		try {
 			SubNode node = create.createNode(ms, "/binaries");
 			update.save(ms, node);
-			int maxFileSize = usrMgr.getMaxUploadSize(ms);
+			int maxFileSize = user.getMaxUploadSize(ms);
 			attach.writeStream(ms, "", node,
 					new LimitedInputStreamEx(new FileInputStream("/home/clay/test-image.png"), maxFileSize), null, "image/png",
 					null);

@@ -2,43 +2,27 @@ package quanta.mongo;
 
 import static quanta.util.Util.no;
 import static quanta.util.Util.ok;
+import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
+import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.stereotype.Component;
 import quanta.AppServer;
-import quanta.actpub.ActPubService;
+import quanta.config.ServiceBase;
 import quanta.util.ThreadLocals;
 
 /**
  * Models the MongoDB repository connection.
  */
-@Lazy
 @Component
-public class MongoRepository {
+public class MongoRepository extends ServiceBase {
 	private static final Logger log = LoggerFactory.getLogger(MongoRepository.class);
 
 	@Autowired
-	@Lazy
-	protected MongoAppConfig mac;
-
-	@Autowired
-	@Lazy
-	protected ActPubService apub;
-
-	@Autowired
-	@Lazy
-	protected MongoUtil mongoUtil;
-
-	@Autowired
-	@Lazy
-	protected MongoAuth auth;
-
-	@Autowired
-	@Lazy
-	protected MongoDelete delete;
+    public MongoTemplate ops;
 
 	// hack for now to make RSS deamon wait.
 	public static boolean fullInit = false;
@@ -57,6 +41,11 @@ public class MongoRepository {
 	private static final Object lock = new Object();
 
 	private boolean initialized = false;
+
+	@PostConstruct
+	public void postConstruct() {
+		ServiceBase.mongoRepo = this;
+	}
 
 	/*
 	 * Warning: Spring will NOT be fully initialized in this constructor when this runs.
@@ -77,7 +66,6 @@ public class MongoRepository {
 			}
 		}));
 	}
-
 
 	@PreDestroy
 	public void preDestroy() {

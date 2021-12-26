@@ -11,16 +11,15 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Base64;
 import java.util.List;
+import javax.annotation.PostConstruct;
 import javax.servlet.http.HttpServletRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 import quanta.actpub.model.AP;
 import quanta.actpub.model.APObj;
+import quanta.config.ServiceBase;
 import quanta.model.client.NodeProp;
-import quanta.mongo.MongoRead;
 import quanta.mongo.MongoSession;
 import quanta.mongo.model.SubNode;
 import quanta.service.UserManagerService;
@@ -29,14 +28,14 @@ import quanta.util.XString;
 /**
  * Crypto functions for AP
  */
-@Lazy
 @Component
-public class ActPubCrypto {
+public class ActPubCrypto extends ServiceBase {
     private static final Logger log = LoggerFactory.getLogger(ActPubCrypto.class);
 
-    @Autowired
-    @Lazy
-    protected MongoRead read;
+    @PostConstruct
+	public void postConstruct() {
+		apCrypto = this;
+	}
 
     /* Gets private RSA key from current user session */
     public String getPrivateKey(MongoSession ms, String userName) {

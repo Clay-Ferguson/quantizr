@@ -13,15 +13,14 @@ import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Component;
-import quanta.actpub.ActPubService;
 import quanta.config.NodeName;
 import quanta.config.NodePath;
+import quanta.config.ServiceBase;
 import quanta.exception.NodeAuthFailedException;
 import quanta.exception.base.RuntimeEx;
 import quanta.model.AccessControlInfo;
@@ -39,30 +38,13 @@ import quanta.util.XString;
  * Service for checking authorization for access to nodes. Checks what users are accessing what
  * nodes and checks their privileges againts the ACL on the Nodes.
  */
-@Lazy
 @Component
-public class MongoAuth {
+public class MongoAuth extends ServiceBase {
 	private static final Logger log = LoggerFactory.getLogger(MongoAuth.class);
 
 	@Autowired
-	@Lazy
-	protected MongoTemplate ops;
+    public MongoTemplate ops;
 
-	@Autowired
-	@Lazy
-	protected ActPubService apub;
-
-	@Autowired
-	@Lazy
-	protected MongoUtil mongoUtil;
-
-	@Autowired
-	@Lazy
-	protected MongoUpdate update;
-
-	@Autowired
-	@Lazy
-	protected MongoRead read;
 
 	private static final boolean verbose = false;
 
@@ -80,7 +62,9 @@ public class MongoAuth {
 
 	@PostConstruct
 	public void postConstruct() {
+		// this instance can come from base class now (todo-0)
 		inst = this;
+		auth = this;
 	}
 
 	public MongoSession getAdminSession() {

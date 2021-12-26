@@ -7,6 +7,7 @@ import java.io.InputStream;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import javax.annotation.PostConstruct;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
@@ -14,7 +15,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.core.env.Environment;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Component;
@@ -26,13 +26,11 @@ import quanta.util.XString;
 /**
  * Wrapper to access application properties.
  */
-@Lazy
 @Component
 public class AppProp {
 	private static final Logger log = LoggerFactory.getLogger(AppProp.class);
 
 	@Autowired
-	@Lazy
 	private Environment env;
 
 	// if false this disables all backgrouind processing.
@@ -47,6 +45,11 @@ public class AppProp {
 	public static final ObjectMapper yamlMapper = new ObjectMapper(new YAMLFactory());
 	HashMap<String, Object> configMap = null;
 
+	@PostConstruct
+	public void postConstruct() {
+		ServiceBase.prop = this;
+	}
+	
 	public HashMap<String, Object> getConfig() {
 		if (ok(configMap)) {
 			return configMap;

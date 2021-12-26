@@ -4,17 +4,19 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import javax.annotation.PostConstruct;
 import org.springframework.stereotype.Component;
 import quanta.actpub.model.APObj;
+import quanta.config.ServiceBase;
 import quanta.mongo.model.SubNode;
 
 /**
  * Holds all the global caches related to AP
  */
-// I think I confirmed that for a @Lazy loaded bean it's initialization won't be done unti it's first METHOD
+// I think I confirmed that for a @ Lazy loaded bean it's initialization won't be done unti it's first METHOD
 // is called so this was broken as lazy. no methods here.
 @Component
-public class ActPubCache {
+public class ActPubCache extends ServiceBase {
     /*
      * Holds users for which messages need refreshing (false value) but sets value to 'true' once
      * completed
@@ -46,4 +48,9 @@ public class ActPubCache {
 
     /* Cache WebFinger fails, so we don't try them again */
     public final Set<String> webFingerFailsByUserName = Collections.synchronizedSet(new HashSet<String>());
+
+    @PostConstruct
+	public void postConstruct() {
+		apCache = this;
+	}
 }

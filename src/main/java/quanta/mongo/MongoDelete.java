@@ -5,48 +5,35 @@ import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.Date;
 import java.util.HashSet;
+import javax.annotation.PostConstruct;
 import com.mongodb.client.result.DeleteResult;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Component;
+import quanta.config.ServiceBase;
 import quanta.model.client.NodeProp;
 import quanta.model.client.NodeType;
 import quanta.mongo.model.SubNode;
-import quanta.service.AttachmentService;
 
 /**
  * Performs the 'deletes' (as in CRUD) operations for deleting nodes in MongoDB
  */
-@Lazy
 @Component
-public class MongoDelete {
+public class MongoDelete extends ServiceBase  {
 	private static final Logger log = LoggerFactory.getLogger(MongoDelete.class);
 
 	@Autowired
-	@Lazy
-	protected MongoTemplate ops;
+    public MongoTemplate ops;
 
-	@Autowired
-	@Lazy
-	protected AttachmentService attach;
-
-	@Autowired
-	@Lazy
-	protected MongoUtil mongoUtil;
-
-	@Autowired
-	@Lazy
-	protected MongoAuth auth;
-
-	@Autowired
-	@Lazy
-	protected MongoUpdate update;
+	@PostConstruct
+	public void postConstruct() {
+		delete = this;
+	}
 
 	public void deleteNode(MongoSession ms, SubNode node, boolean childrenOnly) {
 		if (!childrenOnly) {

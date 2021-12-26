@@ -2,19 +2,16 @@ package quanta.mail;
 
 import static quanta.util.Util.ok;
 import java.util.List;
+import javax.annotation.PostConstruct;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 import quanta.AppServer;
-import quanta.config.AppProp;
+import quanta.config.ServiceBase;
 import quanta.model.client.NodeProp;
-import quanta.mongo.AdminRun;
-import quanta.mongo.MongoDelete;
 import quanta.mongo.MongoRepository;
 import quanta.mongo.MongoSession;
 import quanta.mongo.model.SubNode;
@@ -22,35 +19,19 @@ import quanta.mongo.model.SubNode;
 /**
  * Deamon for sending emails.
  */
-@Lazy
 @Component
-public class EmailSenderDaemon {
+public class EmailSenderDaemon extends ServiceBase {
 	private static final Logger log = LoggerFactory.getLogger(EmailSenderDaemon.class);
-
-	@Autowired
-	@Lazy
-	protected EmailSender mail;
-
-	@Autowired
-	@Lazy
-	protected OutboxMgr outbox;
-
-	@Autowired
-	@Lazy
-	protected AdminRun arun;
-
-	@Autowired
-	@Lazy
-	protected AppProp prop;
-
-	@Autowired
-	@Lazy
-	protected MongoDelete delete;
 
 	private int runCounter = 0;
 	public static final int INTERVAL_SECONDS = 10;
 	private int runCountdown = INTERVAL_SECONDS;
 	static boolean run = false;
+
+	@PostConstruct
+	public void postConstruct() {
+		this.notify = this;
+	}
 
 	/*
 	 * Note: Spring does correctly protect against concurrent runs. It will always wait until the last

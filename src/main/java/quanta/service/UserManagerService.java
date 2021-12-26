@@ -12,13 +12,13 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
 import java.util.concurrent.ConcurrentHashMap;
+import javax.annotation.PostConstruct;
 import javax.servlet.http.HttpServletRequest;
 import org.apache.commons.lang3.StringUtils;
 import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.Sort;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -27,17 +27,12 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.WebAuthenticationDetails;
 import org.springframework.stereotype.Component;
-import quanta.actpub.ActPubFollower;
-import quanta.actpub.ActPubFollowing;
-import quanta.actpub.ActPubService;
-import quanta.actpub.ActPubUtil;
-import quanta.config.AppProp;
 import quanta.config.NodeName;
 import quanta.config.NodePath;
+import quanta.config.ServiceBase;
 import quanta.config.SessionContext;
 import quanta.exception.OutOfSpaceException;
 import quanta.exception.base.RuntimeEx;
-import quanta.mail.OutboxMgr;
 import quanta.model.UserPreferences;
 import quanta.model.UserStats;
 import quanta.model.client.NodeProp;
@@ -45,21 +40,13 @@ import quanta.model.client.NodeType;
 import quanta.model.client.PrincipalName;
 import quanta.model.client.PrivilegeType;
 import quanta.model.client.UserProfile;
-import quanta.mongo.AdminRun;
 import quanta.mongo.CreateNodeLocation;
-import quanta.mongo.MongoAuth;
-import quanta.mongo.MongoCreate;
-import quanta.mongo.MongoDelete;
-import quanta.mongo.MongoRead;
 import quanta.mongo.MongoSession;
-import quanta.mongo.MongoUpdate;
-import quanta.mongo.MongoUtil;
 import quanta.mongo.model.SubNode;
 import quanta.request.AddFriendRequest;
 import quanta.request.BlockUserRequest;
 import quanta.request.ChangePasswordRequest;
 import quanta.request.CloseAccountRequest;
-import quanta.request.DeleteFriendRequest;
 import quanta.request.GetUserAccountInfoRequest;
 import quanta.request.GetUserProfileRequest;
 import quanta.request.LoginRequest;
@@ -83,100 +70,33 @@ import quanta.response.SavePublicKeyResponse;
 import quanta.response.SaveUserPreferencesResponse;
 import quanta.response.SaveUserProfileResponse;
 import quanta.response.SignupResponse;
-import quanta.util.AsyncExec;
 import quanta.util.Const;
 import quanta.util.DateUtil;
 import quanta.util.ExUtil;
 import quanta.util.ThreadLocals;
 import quanta.util.Val;
-import quanta.util.Validator;
 import quanta.util.XString;
 
 /**
  * Service methods for processing user management functions. Login, logout, signup, user
  * preferences, and settings persisted per-user
  */
-@Lazy
 @Component
-public class UserManagerService {
+public class UserManagerService extends ServiceBase {
 	private static final Logger log = LoggerFactory.getLogger(UserManagerService.class);
-
-	@Autowired
-	@Lazy
-	protected AuthenticationManager authenticationManager;
-
-	@Autowired
-	@Lazy
-	protected Validator validator;
-
-	@Autowired
-	@Lazy
-	protected NodeEditService edit;
-
-	@Autowired
-	@Lazy
-	protected OutboxMgr outbox;
-
-	@Autowired
-	@Lazy
-	protected ActPubUtil apUtil;
-
-	@Autowired
-	@Lazy
-	protected ActPubFollower apFollower;
-
-	@Autowired
-	@Lazy
-	protected ActPubFollowing apFollowing;
-
-	@Autowired
-	@Lazy
-	protected ActPubService apub;
-
-	@Autowired
-	@Lazy
-	protected AsyncExec asyncExec;
-
-	@Autowired
-	@Lazy
-	protected AdminRun arun;
-
-	@Autowired
-	@Lazy
-	protected AppProp prop;
-
-	@Autowired
-	@Lazy
-	protected AclService acl;
-
-	@Autowired
-	@Lazy
-	protected MongoUtil mongoUtil;
-
-	@Autowired
-	@Lazy
-	protected MongoAuth auth;
-
-	@Autowired
-	@Lazy
-	protected MongoDelete delete;
-
-	@Autowired
-	@Lazy
-	protected MongoUpdate update;
-
-	@Autowired
-	@Lazy
-	protected MongoRead read;
-
-	@Autowired
-	@Lazy
-	protected MongoCreate create;
 
 	private static final Random rand = new Random();
 
+	@Autowired
+	public AuthenticationManager authenticationManager;
+
 	/* Private keys of each user by user name as key */
 	public static final ConcurrentHashMap<String, String> privateKeysByUserName = new ConcurrentHashMap<>();
+
+	@PostConstruct
+	public void postConstruct() {
+		user = this;
+	}
 
 	/*
 	 * Note that this function does 'succeed' even with ANON user given, and just considers that an

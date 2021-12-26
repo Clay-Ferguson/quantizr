@@ -28,8 +28,6 @@ import org.apache.http.impl.client.HttpClientBuilder;
 import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.ContentDisposition;
 import org.springframework.http.HttpEntity;
@@ -42,7 +40,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
-import quanta.config.AppProp;
+import quanta.config.ServiceBase;
 import quanta.config.SpringContextUtil;
 import quanta.exception.base.RuntimeEx;
 import quanta.model.client.NodeProp;
@@ -54,19 +52,14 @@ import quanta.model.ipfs.file.IPFSDir;
 import quanta.model.ipfs.file.IPFSDirEntry;
 import quanta.model.ipfs.file.IPFSDirStat;
 import quanta.model.ipfs.file.IPFSObjectStat;
-import quanta.mongo.AdminRun;
 import quanta.mongo.CreateNodeLocation;
-import quanta.mongo.MongoCreate;
-import quanta.mongo.MongoRead;
 import quanta.mongo.MongoRepository;
 import quanta.mongo.MongoSession;
-import quanta.mongo.MongoUpdate;
 import quanta.mongo.model.SubNode;
 import quanta.request.LoadNodeFromIpfsRequest;
 import quanta.request.PublishNodeToIpfsRequest;
 import quanta.response.LoadNodeFromIpfsResponse;
 import quanta.response.PublishNodeToIpfsResponse;
-import quanta.util.AsyncExec;
 import quanta.util.Cast;
 import quanta.util.Const;
 import quanta.util.DateUtil;
@@ -86,42 +79,9 @@ import quanta.util.XString;
  * converter convert do this for us always instead
  */
 
-@Lazy
 @Component
-public class IPFSService {
+public class IPFSService extends ServiceBase {
     private static final Logger log = LoggerFactory.getLogger(IPFSService.class);
-
-    @Autowired
-    @Lazy
-    protected AsyncExec asyncExec;
-
-    @Autowired
-    @Lazy
-    protected AttachmentService attach;
-
-    @Autowired
-    @Lazy
-    protected AdminRun arun;
-
-    @Autowired
-    @Lazy
-    protected AppProp prop;
-
-    @Autowired
-    @Lazy
-    protected UserManagerService user;
-
-    @Autowired
-    @Lazy
-    protected MongoUpdate update;
-
-    @Autowired
-    @Lazy
-    protected MongoRead read;
-
-    @Autowired
-    @Lazy
-    protected MongoCreate create;
 
     public static String API_BASE;
     public static String API_CAT;
@@ -158,6 +118,8 @@ public class IPFSService {
 
     @PostConstruct
     public void init() {
+        ipfs = this;
+        
         API_BASE = prop.getIPFSApiHostAndPort() + "/api/v0";
         API_CAT = API_BASE + "/cat";
         API_FILES = API_BASE + "/files";

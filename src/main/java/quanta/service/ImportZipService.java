@@ -7,18 +7,13 @@ import org.apache.commons.compress.archivers.zip.ZipArchiveEntry;
 import org.apache.commons.compress.archivers.zip.ZipArchiveInputStream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.context.annotation.Scope;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Component;
 import quanta.config.SessionContext;
 import quanta.config.SpringContextUtil;
 import quanta.exception.base.RuntimeEx;
-import quanta.mongo.MongoAuth;
-import quanta.mongo.MongoRead;
 import quanta.mongo.MongoSession;
-import quanta.mongo.MongoUpdate;
 import quanta.mongo.model.SubNode;
 import quanta.util.Const;
 import quanta.util.ExUtil;
@@ -32,23 +27,11 @@ import quanta.util.ThreadLocals;
  * have been actually exported from SubNode in order to import it, but merely have the proper
  * layout/content.
  */
-@Lazy
+
 @Component
 @Scope("prototype")
 public class ImportZipService extends ImportArchiveBase {
 	private static final Logger log = LoggerFactory.getLogger(ImportZipService.class);
-
-	@Autowired
-	@Lazy
-	protected MongoAuth auth;
-
-	@Autowired
-	@Lazy
-	protected MongoUpdate update;
-
-	@Autowired
-	@Lazy
-	protected MongoRead read;
 
 	private ZipArchiveInputStream zis;
 

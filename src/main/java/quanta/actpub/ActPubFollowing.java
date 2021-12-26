@@ -5,12 +5,10 @@ import static quanta.util.Util.ok;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.concurrent.Executor;
+import javax.annotation.PostConstruct;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
@@ -22,86 +20,35 @@ import quanta.actpub.model.APOOrderedCollection;
 import quanta.actpub.model.APOOrderedCollectionPage;
 import quanta.actpub.model.APOUndo;
 import quanta.actpub.model.APObj;
-import quanta.config.AppProp;
 import quanta.config.NodeName;
+import quanta.config.ServiceBase;
 import quanta.model.NodeInfo;
 import quanta.model.client.ConstantInt;
 import quanta.model.client.NodeProp;
 import quanta.model.client.NodeType;
 import quanta.model.client.PrincipalName;
-import quanta.mongo.AdminRun;
-import quanta.mongo.MongoAuth;
-import quanta.mongo.MongoDelete;
-import quanta.mongo.MongoRead;
 import quanta.mongo.MongoSession;
-import quanta.mongo.MongoUtil;
 import quanta.mongo.model.SubNode;
 import quanta.request.GetFollowingRequest;
 import quanta.response.GetFollowingResponse;
-import quanta.service.NodeEditService;
-import quanta.util.Convert;
 import quanta.util.ThreadLocals;
 import quanta.util.XString;
 
 /**
  * Methods relating to AP following
  */
-@Lazy
 @Component
-public class ActPubFollowing {
+public class ActPubFollowing extends ServiceBase  {
     private static final Logger log = LoggerFactory.getLogger(ActPubFollowing.class);
 
     @Autowired
-    @Lazy
-    protected MongoTemplate ops;
+    public MongoTemplate ops;
 
-    @Autowired
-    @Lazy
-    protected Convert convert;
 
-    @Autowired
-    @Lazy
-    protected NodeEditService edit;
-
-    @Autowired
-    @Lazy
-    protected ActPubCrypto apCrypto;
-
-    @Autowired
-    @Lazy
-    protected ActPubUtil apUtil;
-
-    @Autowired
-    @Lazy
-    protected ActPubService apub;
-
-    @Autowired
-    @Lazy
-    protected AdminRun arun;
-
-    @Autowired
-    @Lazy
-    protected AppProp prop;
-
-    @Autowired
-    @Lazy
-    protected MongoUtil mongoUtil;
-
-    @Autowired
-    @Lazy
-    protected MongoAuth auth;
-
-    @Autowired
-    @Lazy
-    protected MongoDelete delete;
-
-    @Autowired
-    @Lazy
-    protected MongoRead read;
-
-    @Autowired
-    @Qualifier("threadPoolTaskExecutor")
-    private Executor executor;
+    @PostConstruct
+	public void postConstruct() {
+		apFollowing = this;
+	}
 
     /**
      * Outbound message to foreign servers to follow/unfollow users
@@ -214,7 +161,7 @@ public class ActPubFollowing {
                         if (!unFollow) {
                             apUtil.log("unable to find user node by name: " + followerUserName + " so creating.");
                             friendNode = edit.createFriendNode(session, followerFriendList, userToFollow);
-                            // userFeedService.sendServerPushInfo(localUserName,
+                            // userFeed.sendServerPushInfo(localUserName,
                             // new NotificationMessage("apReply", null, contentHtml, toUserName));
                         }
                     } else {

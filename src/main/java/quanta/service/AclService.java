@@ -9,18 +9,15 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 import java.util.StringTokenizer;
+import javax.annotation.PostConstruct;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
+import quanta.config.ServiceBase;
 import quanta.exception.base.RuntimeEx;
 import quanta.model.client.NodeProp;
 import quanta.model.client.PrincipalName;
-import quanta.mongo.MongoAuth;
-import quanta.mongo.MongoRead;
 import quanta.mongo.MongoSession;
-import quanta.mongo.MongoUpdate;
 import quanta.mongo.model.AccessControl;
 import quanta.mongo.model.MongoPrincipal;
 import quanta.mongo.model.SubNode;
@@ -40,26 +37,15 @@ import quanta.util.XString;
  * Service methods for (ACL): processing security, privileges, and Access Control List information
  * on nodes.
  */
-@Lazy
+
 @Component
-public class AclService {
+public class AclService extends ServiceBase  {
 	private static final Logger log = LoggerFactory.getLogger(AclService.class);
 
-	@Autowired
-	@Lazy
-	protected UserManagerService user;
-
-	@Autowired
-	@Lazy
-	protected MongoAuth auth;
-
-	@Autowired
-	@Lazy
-	protected MongoUpdate update;
-
-	@Autowired
-	@Lazy
-	protected MongoRead read;
+	@PostConstruct
+	public void postConstruct() {
+		acl = this;
+	}
 
 	/**
 	 * Returns the privileges that exist on the node identified in the request.

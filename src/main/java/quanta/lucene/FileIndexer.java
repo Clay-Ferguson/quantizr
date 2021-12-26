@@ -15,6 +15,7 @@ import java.text.SimpleDateFormat;
 import java.util.HashSet;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
+import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import org.apache.commons.compress.archivers.ArchiveEntry;
 import org.apache.commons.compress.archivers.tar.TarArchiveInputStream;
@@ -44,9 +45,9 @@ import org.apache.tika.sax.BodyContentHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 import quanta.config.AppProp;
+import quanta.config.ServiceBase;
 import quanta.util.DateUtil;
 import quanta.util.ExUtil;
 import quanta.util.StreamUtil;
@@ -69,9 +70,8 @@ import quanta.util.XString;
 // org.apache.commons.compress.compressors.deflate.DeflateCompressorInputStream;
 // org.apache.commons.compress.compressors.pack200.Pack200CompressorInputStream;
 // org.apache.commons.compress.compressors.zstandard.ZstdCompressorInputStream;
-@Lazy
 @Component
-public class FileIndexer {
+public class FileIndexer extends ServiceBase {
 	private static final Logger log = LoggerFactory.getLogger(FileIndexer.class);
 
 	@Autowired
@@ -88,6 +88,11 @@ public class FileIndexer {
 
 	private enum CompressionType {
 		NONE, GZIP, XZIP
+	}
+
+	@PostConstruct
+	public void postConstruct() {
+		fileIndexer = this;
 	}
 
 	public void index(String dirToIndex, String luceneIndexDataSubDir, String suffixes, boolean forceRebuild) {

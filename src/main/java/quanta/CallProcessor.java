@@ -3,6 +3,7 @@ package quanta;
 import static quanta.util.Util.no;
 import static quanta.util.Util.ok;
 import java.util.Date;
+import javax.annotation.PostConstruct;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import org.apache.commons.lang3.StringUtils;
@@ -13,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 import org.springframework.web.util.WebUtils;
+import quanta.config.ServiceBase;
 import quanta.exception.NotLoggedInException;
 import quanta.exception.OutOfSpaceException;
 import quanta.model.client.ErrorType;
@@ -27,17 +29,18 @@ import quanta.util.MongoRunnableEx;
 import quanta.util.ThreadLocals;
 import quanta.util.XString;
 
-@Lazy
-@Component
-public class CallProcessor {
-	private static final Logger log = LoggerFactory.getLogger(CallProcessor.class);
 
-	@Autowired
-	@Lazy
-	private MongoUpdate update;
+@Component
+public class CallProcessor extends ServiceBase {
+	private static final Logger log = LoggerFactory.getLogger(CallProcessor.class);
 
 	private static final boolean logRequests = true;
 	// private static int mutexCounter = 0;
+
+	@PostConstruct
+	public void postConstruct() {
+		callProc = this;
+	}
 
 	/*
 	 * Wraps the processing of any command by using whatever info is on the session and/or the request

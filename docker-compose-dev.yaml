@@ -115,7 +115,7 @@ services:
             
             # Can be a comma-delimited list of TestIntf-derived tests to run
             # examples are "UtilsTest,MongoTest,MongoFediverseNamesTest,IPFSTest"
-            runTests:
+            runTests: MongoTest
             
             mongoAdminPassword: "${adminPassword}"
             mongoSecurity: "true"

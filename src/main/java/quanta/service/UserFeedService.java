@@ -6,14 +6,12 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.concurrent.Executor;
+import javax.annotation.PostConstruct;
 import org.apache.commons.lang3.StringUtils;
 import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
@@ -21,71 +19,29 @@ import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.TextCriteria;
 import org.springframework.stereotype.Component;
 import quanta.config.NodePath;
+import quanta.config.ServiceBase;
 import quanta.config.SessionContext;
 import quanta.model.NodeInfo;
 import quanta.model.client.NodeProp;
 import quanta.model.client.NodeType;
 import quanta.model.client.PrincipalName;
 import quanta.model.client.PrivilegeType;
-import quanta.mongo.AdminRun;
-import quanta.mongo.MongoAuth;
-import quanta.mongo.MongoRead;
 import quanta.mongo.MongoSession;
-import quanta.mongo.MongoUpdate;
-import quanta.mongo.MongoUtil;
 import quanta.mongo.model.SubNode;
 import quanta.request.CheckMessagesRequest;
 import quanta.request.NodeFeedRequest;
 import quanta.response.CheckMessagesResponse;
 import quanta.response.NodeFeedResponse;
-import quanta.util.AsyncExec;
-import quanta.util.Convert;
 import quanta.util.ThreadLocals;
 
-@Lazy
+
 @Component
-public class UserFeedService {
+public class UserFeedService extends ServiceBase  {
 	private static final Logger log = LoggerFactory.getLogger(UserFeedService.class);
 
 	@Autowired
-	@Lazy
-	protected Convert convert;
+    public MongoTemplate ops;
 
-	@Autowired
-	@Lazy
-	protected MongoTemplate ops;
-
-	@Autowired
-	@Lazy
-	protected AsyncExec asyncExec;
-
-	@Autowired
-	@Lazy
-	protected AdminRun arun;
-
-	@Autowired
-	@Lazy
-	protected UserManagerService user;
-
-	@Autowired
-	@Lazy
-	protected MongoUtil mongoUtil;
-
-	@Autowired
-	@Lazy
-	protected MongoAuth auth;
-
-	@Autowired
-	@Lazy
-	protected MongoUpdate update;
-
-	@Autowired
-	@Lazy
-	protected MongoRead read;
-
-	@Autowired
-	@Qualifier("threadPoolTaskExecutor")
-	private Executor executor;
 
 	static final int MAX_FEED_ITEMS = 25;
 
@@ -94,6 +50,11 @@ public class UserFeedService {
 	// NodeType.FRIEND.s(), //
 	// NodeType.POSTS.s(), //
 	// NodeType.ACT_PUB_POSTS.s());
+
+	@PostConstruct
+	public void postConstruct() {
+		this.userFeed = this;
+	}
 
 	public CheckMessagesResponse checkMessages(MongoSession ms, CheckMessagesRequest req) {
 		SessionContext sc = ThreadLocals.getSC();

@@ -4,12 +4,10 @@ import static quanta.util.Util.no;
 import static quanta.util.Util.ok;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.concurrent.Executor;
+import javax.annotation.PostConstruct;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
@@ -18,67 +16,33 @@ import quanta.actpub.model.AP;
 import quanta.actpub.model.APOOrderedCollection;
 import quanta.actpub.model.APOOrderedCollectionPage;
 import quanta.actpub.model.APObj;
-import quanta.config.AppProp;
-import quanta.config.NodeName;
 import quanta.config.NodePath;
+import quanta.config.ServiceBase;
 import quanta.model.NodeInfo;
 import quanta.model.client.ConstantInt;
 import quanta.model.client.NodeProp;
 import quanta.model.client.NodeType;
-import quanta.mongo.AdminRun;
-import quanta.mongo.MongoAuth;
 import quanta.mongo.MongoSession;
-import quanta.mongo.MongoUtil;
 import quanta.mongo.model.SubNode;
 import quanta.request.GetFollowersRequest;
 import quanta.response.GetFollowersResponse;
-import quanta.util.Convert;
 import quanta.util.ThreadLocals;
 import quanta.util.XString;
 
 /**
  * Methods related to AP Follower
  */
-@Lazy
 @Component
-public class ActPubFollower {
+public class ActPubFollower extends ServiceBase {
     private static final Logger log = LoggerFactory.getLogger(ActPubFollower.class);
 
     @Autowired
-    @Lazy
-    protected MongoTemplate ops;
+    public MongoTemplate ops;
 
-    @Autowired
-    @Lazy
-    protected Convert convert;
-
-    @Autowired
-    @Lazy
-    protected ActPubUtil apUtil;
-
-    @Autowired
-    @Lazy
-    protected ActPubService apub;
-
-    @Autowired
-    @Lazy
-    protected AdminRun arun;
-
-    @Autowired
-    @Lazy
-    protected AppProp prop;
-
-    @Autowired
-    @Lazy
-    protected MongoUtil mongoUtil;
-
-    @Autowired
-    @Lazy
-    protected MongoAuth auth;
-
-    @Autowired
-    @Qualifier("threadPoolTaskExecutor")
-    private Executor executor;
+    @PostConstruct
+	public void postConstruct() {
+		apFollower = this;
+	}
 
     /**
      * Generates outbound followers data

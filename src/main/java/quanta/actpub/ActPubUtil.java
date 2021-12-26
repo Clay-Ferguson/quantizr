@@ -17,6 +17,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 import java.util.TimeZone;
+import javax.annotation.PostConstruct;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -24,8 +25,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.context.event.EventListener;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -40,13 +39,10 @@ import org.springframework.web.client.RestTemplate;
 import quanta.actpub.model.AP;
 import quanta.actpub.model.APList;
 import quanta.actpub.model.APObj;
-import quanta.config.AppProp;
+import quanta.config.ServiceBase;
 import quanta.model.client.NodeProp;
 import quanta.model.client.NodeType;
-import quanta.mongo.AdminRun;
 import quanta.mongo.MongoDeleteEvent;
-import quanta.mongo.MongoAuth;
-import quanta.mongo.MongoRead;
 import quanta.mongo.MongoRepository;
 import quanta.mongo.MongoSession;
 import quanta.mongo.model.SubNode;
@@ -57,41 +53,9 @@ import quanta.util.XString;
 /**
  * AP-related utilities
  */
-@Lazy
 @Component
-public class ActPubUtil {
+public class ActPubUtil extends ServiceBase {
     private static final Logger log = LoggerFactory.getLogger(ActPubUtil.class);
-
-    @Autowired
-    @Lazy
-    protected ActPubCrypto apCrypto;
-
-    @Autowired
-    public ActPubCache apCache;
-
-    @Autowired
-    @Lazy
-    protected ActPubFollowing apFollowing;
-
-    @Autowired
-    @Lazy
-    protected ActPubService apub;
-
-    @Autowired
-    @Lazy
-    protected AppProp prop;
-
-    @Autowired
-    @Lazy
-    protected MongoAuth auth;
-
-    @Autowired
-    @Lazy
-    protected MongoRead read;
-
-    @Autowired
-    @Lazy
-    protected AdminRun arun;
 
     /*
      * RestTemplate is thread-safe and reusable, and has no state, so we need only one final static
@@ -106,6 +70,11 @@ public class ActPubUtil {
     {
         mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
     }
+
+    @PostConstruct
+	public void postConstruct() {
+		apUtil = this;
+	}
 
     /*
      * input: clay@server.com

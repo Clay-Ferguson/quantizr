@@ -3,14 +3,14 @@ package quanta.mongo;
 import static quanta.util.Util.no;
 import static quanta.util.Util.ok;
 import java.util.List;
+import javax.annotation.PostConstruct;
 import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.stereotype.Component;
+import quanta.config.ServiceBase;
 import quanta.model.PropertyInfo;
 import quanta.model.client.NodeType;
 import quanta.model.client.PrivilegeType;
@@ -19,26 +19,14 @@ import quanta.mongo.model.SubNode;
 /**
  * Performs the 'create' (as in CRUD) operations for creating new nodes in MongoDB
  */
-@Lazy
 @Component
-public class MongoCreate {
+public class MongoCreate extends ServiceBase {
 	private static final Logger log = LoggerFactory.getLogger(MongoCreate.class);
 
-	@Autowired
-	@Lazy
-	protected AdminRun arun;
-
-	@Autowired
-	@Lazy
-	protected MongoAuth auth;
-
-	@Autowired
-	@Lazy
-	protected MongoUpdate update;
-
-	@Autowired
-	@Lazy
-	protected MongoRead read;
+	@PostConstruct
+	public void postConstruct() {
+		create = this;
+	}
 
 	public SubNode createNode(MongoSession ms, SubNode parent, String type, Long ordinal, CreateNodeLocation location,
 			boolean updateParentOrdinals) {

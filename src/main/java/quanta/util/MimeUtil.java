@@ -1,14 +1,19 @@
 package quanta.util;
 
-import org.springframework.context.annotation.Lazy;
+import javax.annotation.PostConstruct;
 import org.springframework.stereotype.Component;
+import quanta.config.ServiceBase;
 
 /**
  * Mime-Type (content type) utilities
  */
-@Lazy
 @Component
-public class MimeUtil {
+public class MimeUtil extends ServiceBase {
+
+	@PostConstruct
+	public void postConstruct() {
+		mimeUtil = this;
+	}
 
 	public boolean isTextTypeFileName(String fileName) {
 		if (!fileName.contains("."))

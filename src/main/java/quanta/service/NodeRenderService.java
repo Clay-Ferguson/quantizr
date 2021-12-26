@@ -6,15 +6,14 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import javax.annotation.PostConstruct;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;
 import org.springframework.ui.Model;
-import quanta.config.AppProp;
+import quanta.config.ServiceBase;
 import quanta.config.SpringContextUtil;
 import quanta.exception.NodeAuthFailedException;
 import quanta.exception.base.RuntimeEx;
@@ -26,8 +25,6 @@ import quanta.model.client.ConstantInt;
 import quanta.model.client.ErrorType;
 import quanta.model.client.NodeMetaIntf;
 import quanta.model.client.NodeProp;
-import quanta.mongo.MongoAuth;
-import quanta.mongo.MongoRead;
 import quanta.mongo.MongoSession;
 import quanta.mongo.model.SubNode;
 import quanta.request.GetNodeMetaInfoRequest;
@@ -38,9 +35,7 @@ import quanta.response.GetNodeMetaInfoResponse;
 import quanta.response.InitNodeEditResponse;
 import quanta.response.RenderCalendarResponse;
 import quanta.response.RenderNodeResponse;
-import quanta.util.Convert;
 import quanta.util.DateUtil;
-import quanta.util.SubNodeUtil;
 import quanta.util.ThreadLocals;
 import quanta.util.XString;
 
@@ -50,36 +45,16 @@ import quanta.util.XString;
  * to the client. But regardless of format this is the primary service for pulling content up for
  * rendering the pages on the client as the user browses around on the tree.
  */
-@Lazy
 @Component
-public class NodeRenderService {
+public class NodeRenderService extends ServiceBase {
 	private static final Logger log = LoggerFactory.getLogger(NodeRenderService.class);
 
-	@Autowired
-	@Lazy
-	protected Convert convert;
-
-	@Autowired
-	@Lazy
-	protected NodeRenderService render;
-
-	@Autowired
-	@Lazy
-	private SubNodeUtil snUtil;
-
-	@Autowired
-	@Lazy
-	protected AppProp prop;
-
-	@Autowired
-	@Lazy
-	protected MongoAuth auth;
-
-	@Autowired
-	@Lazy
-	protected MongoRead read;
-
 	private static RenderNodeResponse welcomePage;
+
+	@PostConstruct
+	public void postConstruct() {
+		render = this;
+	}
 
 	public GetNodeMetaInfoResponse getNodeMetaInfo(MongoSession ms, GetNodeMetaInfoRequest req) {
 		GetNodeMetaInfoResponse res = new GetNodeMetaInfoResponse();

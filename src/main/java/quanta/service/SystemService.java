@@ -9,6 +9,7 @@ import java.lang.management.RuntimeMXBean;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import javax.annotation.PostConstruct;
 import com.mongodb.client.MongoDatabase;
 import org.apache.commons.lang3.StringUtils;
 import org.bson.Document;
@@ -16,23 +17,16 @@ import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
-import quanta.actpub.ActPubService;
-import quanta.config.AppProp;
 import quanta.config.AppSessionListener;
+import quanta.config.ServiceBase;
 import quanta.config.SessionContext;
 import quanta.filter.HitFilter;
 import quanta.model.UserStats;
 import quanta.model.client.NodeProp;
 import quanta.model.ipfs.file.IPFSObjectStat;
-import quanta.mongo.AdminRun;
 import quanta.mongo.MongoAppConfig;
-import quanta.mongo.MongoDelete;
-import quanta.mongo.MongoRead;
 import quanta.mongo.MongoSession;
-import quanta.mongo.MongoUpdate;
-import quanta.mongo.MongoUtil;
 import quanta.mongo.model.SubNode;
 import quanta.util.Const;
 import quanta.util.ExUtil;
@@ -43,54 +37,18 @@ import quanta.util.XString;
 /**
  * Service methods for System related functions. Admin functions.
  */
-@Lazy
+
 @Component
-public class SystemService {
+public class SystemService extends ServiceBase {
 	private static final Logger log = LoggerFactory.getLogger(SystemService.class);
 
 	@Autowired
-	@Lazy
-	protected IPFSService ipfs;
+	public static MongoAppConfig mac;
 
-	@Autowired
-	@Lazy
-	protected ActPubService apub;
-
-	@Autowired
-	@Lazy
-	protected AttachmentService attach;
-
-	@Autowired
-	@Lazy
-	protected AdminRun arun;
-
-	@Autowired
-	@Lazy
-	protected AppProp prop;
-
-	@Autowired
-	@Lazy
-	protected UserManagerService user;
-
-	@Autowired
-	@Lazy
-	protected MongoAppConfig mac;
-
-	@Autowired
-	@Lazy
-	protected MongoUtil mongoUtil;
-
-	@Autowired
-	@Lazy
-	protected MongoDelete delete;
-
-	@Autowired
-	@Lazy
-	protected MongoUpdate update;
-
-	@Autowired
-	@Lazy
-	protected MongoRead read;
+	@PostConstruct
+	public void postConstruct() {
+		system = this;
+	}
 
 	public String rebuildIndexes() {
 		if (!ThreadLocals.getSC().isAdmin()) {
