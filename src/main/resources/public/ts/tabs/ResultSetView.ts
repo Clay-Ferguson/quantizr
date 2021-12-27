@@ -17,6 +17,7 @@ export abstract class ResultSetView extends AppTab {
 
     allowHeader: boolean = true;
     allowFooter: boolean = true;
+    showContentHeading: boolean = true;
 
     constructor(state: AppState, data: TabDataIntf) {
         super(state, data);
@@ -38,7 +39,8 @@ export abstract class ResultSetView extends AppTab {
         let children: CompIntf[] = [];
 
         let content = null;
-        if (this.data.rsInfo.prop !== "node.id" && //
+        if (this.showContentHeading && //
+            this.data.rsInfo.prop !== "node.id" && //
             this.data.rsInfo.prop !== "node.name") {
             content = this.data.rsInfo.node ? S.nodeUtil.getShortContent(this.data.rsInfo.node) : null;
         }
@@ -46,7 +48,9 @@ export abstract class ResultSetView extends AppTab {
         children.push(new Div(null, null, [
             new Div(null, { className: "marginBottom marginTop" }, [
                 this.renderHeading(state),
-                this.data.rsInfo.node ? new Span(null, { className: "float-end" }, [
+
+                // include back button if we have a central node this panel is about.
+                this.data.rsInfo.node && this.showContentHeading ? new Span(null, { className: "float-end" }, [
                     new IconButton("fa-arrow-left", "Back", {
                         onClick: () => S.view.jumpToId(this.data.rsInfo.node.id),
                         title: "Back to Node"

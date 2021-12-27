@@ -10,6 +10,7 @@ export class SharedNodesResultSetView<I extends SharesRSInfo> extends ResultSetV
     constructor(state: AppState, data: TabDataIntf) {
         super(state, data);
         data.inst = this;
+        this.showContentHeading = false;
     }
 
     pageChange(delta: number): void {

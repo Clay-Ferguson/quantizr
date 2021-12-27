@@ -13,6 +13,7 @@ export class FollowersResultSetView<I extends FollowersRSInfo> extends ResultSet
     constructor(state: AppState, data: TabDataIntf) {
         super(state, data);
         data.inst = this;
+        this.showContentHeading = false;
     }
 
     pageChange(delta: number): void {

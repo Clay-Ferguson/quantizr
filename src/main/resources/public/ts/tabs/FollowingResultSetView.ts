@@ -13,6 +13,7 @@ export class FollowingResultSetView<I extends FollowingRSInfo> extends ResultSet
         this.allowHeader = false;
         this.allowFooter = false;
         data.inst = this;
+        this.showContentHeading = false;
     }
 
     pageChange(delta: number): void {
