@@ -837,7 +837,7 @@ public class MongoUtil extends ServiceBase {
 		// Synced
 		// // "content" folder which we currently use.
 		// // ImportZipService importZipService = (ImportZipService)
-		// // SpringContextUtil.getBean(ImportZipService.class);
+		// // context.getBean(ImportZipService.class);
 		// // importZipService.inputZipFileFromResource(session, "classpath:home.zip",
 		// // publicNode, NodeName.HOME);
 		// // ---------------------------------------------------------

@@ -40,6 +40,7 @@ import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.ResourceRegion;
@@ -58,7 +59,6 @@ import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBo
 import quanta.config.AppProp;
 import quanta.config.NodePath;
 import quanta.config.ServiceBase;
-import quanta.config.SpringContextUtil;
 import quanta.exception.OutOfSpaceException;
 import quanta.exception.base.RuntimeEx;
 import quanta.model.UserStats;
@@ -107,6 +107,9 @@ public class AttachmentService extends ServiceBase {
 	
 	@Autowired
     private AppProp prop;
+
+	@Autowired
+	private ApplicationContext context;
 
 	@PostConstruct
 	public void postConstruct() {
@@ -264,7 +267,7 @@ public class AttachmentService extends ServiceBase {
 			/*
 			 * This is a prototype-scope bean, with state for processing one import at a time
 			 */
-			ImportZipService importZipStreamService = (ImportZipService) SpringContextUtil.getBean(ImportZipService.class);
+			ImportZipService importZipStreamService = (ImportZipService) context.getBean(ImportZipService.class);
 			importZipStreamService.importFromStream(ms, is, node, false);
 		} else {
 			saveBinaryStreamToNode(ms, binSuffix, is, mimeType, fileName, size, width, height, node, toIpfs, calcImageSize,

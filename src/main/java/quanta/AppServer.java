@@ -46,8 +46,6 @@ public class AppServer extends ServiceBase {
 		 */
 		enableScheduling = true;
 		SpringApplication.run(AppServer.class, args);
-
-		// Note: See SpringContextUtil.java for more code that runs at startup time.
 	}
 
 	@EventListener

@@ -12,6 +12,8 @@ import javax.servlet.http.HttpSession;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
@@ -31,6 +33,9 @@ import quanta.util.XString;
 @Order(4)
 public class AppFilter extends GenericFilterBean {
 	private static final Logger log = LoggerFactory.getLogger(AppFilter.class);
+
+	@Autowired
+	private ApplicationContext context;
 
 	private static int reqId = 0;
 	private static boolean logRequests = true;
@@ -64,7 +69,7 @@ public class AppFilter extends GenericFilterBean {
 
 				log.trace(httpReq.getRequestURI() + " -> " + httpReq.getQueryString());
 				session = httpReq.getSession(true);
-				SessionContext sc = SessionContext.init(session);
+				SessionContext sc = SessionContext.init(context, session);
 
 				sc.addAction(httpReq.getRequestURI());
 				String bearer = httpReq.getHeader("Bearer");

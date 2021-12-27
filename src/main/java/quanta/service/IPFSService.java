@@ -29,6 +29,7 @@ import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.ContentDisposition;
 import org.springframework.http.HttpEntity;
@@ -43,7 +44,6 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 import quanta.config.AppProp;
 import quanta.config.ServiceBase;
-import quanta.config.SpringContextUtil;
 import quanta.exception.base.RuntimeEx;
 import quanta.model.client.NodeProp;
 import quanta.model.client.NodeType;
@@ -87,6 +87,9 @@ public class IPFSService extends ServiceBase {
 
     @Autowired
     private AppProp prop;
+
+    @Autowired
+	private ApplicationContext context;
 
     public static String API_BASE;
     public static String API_CAT;
@@ -799,7 +802,7 @@ public class IPFSService extends ServiceBase {
         }
 
         PublishNodeToIpfsResponse res = new PublishNodeToIpfsResponse();
-        SyncToIpfsService svc = (SyncToIpfsService) SpringContextUtil.getBean(SyncToIpfsService.class);
+        SyncToIpfsService svc = (SyncToIpfsService) context.getBean(SyncToIpfsService.class);
         svc.writeIpfsFiles(ms, req, res);
         return res;
     }
@@ -810,7 +813,7 @@ public class IPFSService extends ServiceBase {
         }
 
         LoadNodeFromIpfsResponse res = new LoadNodeFromIpfsResponse();
-        SyncFromIpfsService svc = (SyncFromIpfsService) SpringContextUtil.getBean(SyncFromIpfsService.class);
+        SyncFromIpfsService svc = (SyncFromIpfsService) context.getBean(SyncFromIpfsService.class);
         svc.writeNodes(ms, req, res);
         return res;
     }

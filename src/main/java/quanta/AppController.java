@@ -16,6 +16,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.web.servlet.error.ErrorController;
+import org.springframework.context.ApplicationContext;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.core.io.support.ResourceRegion;
@@ -43,7 +44,6 @@ import quanta.config.AppProp;
 import quanta.config.GracefulShutdown;
 import quanta.config.ServiceBase;
 import quanta.config.SessionContext;
-import quanta.config.SpringContextUtil;
 import quanta.exception.base.RuntimeEx;
 import quanta.mail.EmailSender;
 import quanta.model.client.NodeProp;
@@ -158,10 +158,13 @@ public class AppController extends ServiceBase implements ErrorController {
 	private static final Logger log = LoggerFactory.getLogger(AppController.class);
 
 	@Autowired
-    private AppProp prop;
+	private AppProp prop;
 
 	@Autowired
 	private GracefulShutdown gracefulShutdown;
+
+	@Autowired
+	private ApplicationContext context;
 
 	public static final String API_PATH = "/mobile/api";
 
@@ -193,6 +196,9 @@ public class AppController extends ServiceBase implements ErrorController {
 	@EventListener
 	public void handleContextRefresh(ContextRefreshedEvent event) {
 		log.debug("ContextRefreshedEvent");
+		if (no(context)) {
+			throw new RuntimeException("Failed to autowire ApplicationContext");
+		}
 		init();
 	}
 
@@ -650,11 +656,11 @@ public class AppController extends ServiceBase implements ErrorController {
 			});
 
 			if ("pdf".equalsIgnoreCase(req.getExportExt())) {
-				ExportServiceFlexmark svc = (ExportServiceFlexmark) SpringContextUtil.getBean(ExportServiceFlexmark.class);
+				ExportServiceFlexmark svc = (ExportServiceFlexmark) context.getBean(ExportServiceFlexmark.class);
 				svc.export(ms, "pdf", req, res);
 			} //
 			else if ("html".equalsIgnoreCase(req.getExportExt())) {
-				ExportServiceFlexmark svc = (ExportServiceFlexmark) SpringContextUtil.getBean(ExportServiceFlexmark.class);
+				ExportServiceFlexmark svc = (ExportServiceFlexmark) context.getBean(ExportServiceFlexmark.class);
 				svc.export(ms, "html", req, res);
 			} //
 			else if ("md".equalsIgnoreCase(req.getExportExt())) {
@@ -662,7 +668,7 @@ public class AppController extends ServiceBase implements ErrorController {
 					res.setMessage("Export of Markdown to IPFS not yet available.");
 					res.setSuccess(false);
 				}
-				ExportTextService svc = (ExportTextService) SpringContextUtil.getBean(ExportTextService.class);
+				ExportTextService svc = (ExportTextService) context.getBean(ExportTextService.class);
 				svc.export(ms, req, res);
 			} //
 			else if ("zip".equalsIgnoreCase(req.getExportExt())) {
@@ -670,7 +676,7 @@ public class AppController extends ServiceBase implements ErrorController {
 					res.setMessage("Export of ZIP to IPFS not yet available.");
 					res.setSuccess(false);
 				}
-				ExportZipService svc = (ExportZipService) SpringContextUtil.getBean(ExportZipService.class);
+				ExportZipService svc = (ExportZipService) context.getBean(ExportZipService.class);
 				svc.export(ms, req, res);
 			} //
 			else if ("tar".equalsIgnoreCase(req.getExportExt())) {
@@ -678,7 +684,7 @@ public class AppController extends ServiceBase implements ErrorController {
 					res.setMessage("Export of TAR to IPFS not yet available.");
 					res.setSuccess(false);
 				}
-				ExportTarService svc = (ExportTarService) SpringContextUtil.getBean(ExportTarService.class);
+				ExportTarService svc = (ExportTarService) context.getBean(ExportTarService.class);
 				svc.export(ms, req, res);
 			} //
 			else if ("tar.gz".equalsIgnoreCase(req.getExportExt())) {
@@ -686,7 +692,7 @@ public class AppController extends ServiceBase implements ErrorController {
 					res.setMessage("Export of TAR.GZ to IPFS not yet available.");
 					res.setSuccess(false);
 				}
-				ExportTarService svc = (ExportTarService) SpringContextUtil.getBean(ExportTarService.class);
+				ExportTarService svc = (ExportTarService) context.getBean(ExportTarService.class);
 				svc.setUseGZip(true);
 				svc.export(ms, req, res);
 			} //
@@ -1512,8 +1518,8 @@ public class AppController extends ServiceBase implements ErrorController {
 	 * We have this because docker-compose stop seems to be incapable of sending a graceful termination
 	 * command to the app, so we'll just use curl from a shell script
 	 * 
-	 * So doing this request terminates the server: 
-	 * curl http://${quanta_domain}:${PORT}/mobile/api/shutdown?password=${adminPassword}
+	 * So doing this request terminates the server: curl
+	 * http://${quanta_domain}:${PORT}/mobile/api/shutdown?password=${adminPassword}
 	 */
 	@RequestMapping(value = API_PATH + "/shutdown", method = RequestMethod.GET)
 	public @ResponseBody String shutdown(HttpSession session,

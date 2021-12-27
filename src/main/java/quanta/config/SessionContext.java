@@ -10,6 +10,8 @@ import javax.servlet.http.HttpSession;
 import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
@@ -28,6 +30,9 @@ import quanta.util.Util;
 @Component
 @Scope("prototype")
 public class SessionContext extends ServiceBase {
+	@Autowired
+	private ApplicationContext context;
+	
 	// DO NOT DELETE (keep for future ref)
 	// implements InitializingBean, DisposableBean {
 	private static final Logger log = LoggerFactory.getLogger(SessionContext.class);
@@ -111,7 +116,7 @@ public class SessionContext extends ServiceBase {
 		}
 	}
 
-	public static SessionContext init(HttpSession session) {
+	public static SessionContext init(ApplicationContext context, HttpSession session) {
 		// Ensure we have a Quanta Session Context
 		SessionContext sc = (SessionContext) session.getAttribute(SessionContext.QSC);
 
@@ -122,7 +127,7 @@ public class SessionContext extends ServiceBase {
 			 * becasue all our code makes the assumption there will be a SessionContext on the thread.
 			 * log.debug("Creating new session at req "+httpReq.getRequestURI());
 			 */
-			sc = (SessionContext) SpringContextUtil.getBean(SessionContext.class);
+			sc = (SessionContext) context.getBean(SessionContext.class);
 			session.setAttribute(SessionContext.QSC, sc);
 		}
 		ThreadLocals.setSC(sc);
@@ -141,7 +146,7 @@ public class SessionContext extends ServiceBase {
 
 	/* Creates a new instance that inherits all the values that could be used by a different thread */
 	public SessionContext cloneForThread() {
-		SessionContext sc = (SessionContext) SpringContextUtil.getBean(SessionContext.class);
+		SessionContext sc = (SessionContext) context.getBean(SessionContext.class);
 		sc.live = live;
 		sc.rootId = rootId;
 		sc.timelinePath = timelinePath;

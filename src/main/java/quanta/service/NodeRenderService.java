@@ -11,12 +11,12 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;
 import org.springframework.ui.Model;
 import quanta.config.AppProp;
 import quanta.config.ServiceBase;
-import quanta.config.SpringContextUtil;
 import quanta.exception.NodeAuthFailedException;
 import quanta.exception.base.RuntimeEx;
 import quanta.model.BreadcrumbInfo;
@@ -53,6 +53,9 @@ public class NodeRenderService extends ServiceBase {
 
 	@Autowired
     private AppProp prop;
+
+	@Autowired
+	private ApplicationContext context;
 
 	private static RenderNodeResponse welcomePage;
 
@@ -120,7 +123,7 @@ public class NodeRenderService extends ServiceBase {
 		}
 
 		if (ok(node.getStr(NodeProp.IPFS_SCID))) {
-			SyncFromIpfsService svc = (SyncFromIpfsService) SpringContextUtil.getBean(SyncFromIpfsService.class);
+			SyncFromIpfsService svc = (SyncFromIpfsService) context.getBean(SyncFromIpfsService.class);
 			svc.loadNode(ms, node);
 		}
 

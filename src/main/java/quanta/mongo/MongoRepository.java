@@ -65,10 +65,6 @@ public class MongoRepository extends ServiceBase {
 		close();
 	}
 
-	/*
-	 * Called from SpringContextUtil#setApplicationContext, because we want to call only after all of
-	 * Spring context is fully initialized
-	 */
 	@EventListener
 	public void handleContextRefresh(ContextRefreshedEvent event) {
 		log.debug("ContextRefreshedEvent");

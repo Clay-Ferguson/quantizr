@@ -7,12 +7,13 @@ import org.apache.commons.io.input.AutoCloseInputStream;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 import quanta.config.ServiceBase;
-import quanta.config.SpringContextUtil;
 import quanta.mongo.MongoSession;
 import quanta.mongo.model.SubNode;
 import quanta.util.ExUtil;
@@ -23,6 +24,9 @@ import quanta.util.ThreadLocals;
 @Component
 public class ImportService extends ServiceBase {
 	private static final Logger log = LoggerFactory.getLogger(ImportService.class);
+
+	@Autowired
+	private ApplicationContext context;
 
 	@PostConstruct
 	public void postConstruct() {
@@ -57,7 +61,7 @@ public class ImportService extends ServiceBase {
 					log.debug("Import ZIP to Node: " + node.getPath());
 					in = new BufferedInputStream(new AutoCloseInputStream(uploadFile.getInputStream()));
 
-					ImportZipService impSvc = (ImportZipService) SpringContextUtil.getBean(ImportZipService.class);
+					ImportZipService impSvc = (ImportZipService) context.getBean(ImportZipService.class);
 					impSvc.importFromStream(ms, in, node, false);
 					update.saveSession(ms);
 				} 
@@ -65,7 +69,7 @@ public class ImportService extends ServiceBase {
 				else if (fileName.toLowerCase().endsWith(".tar")) {
 					log.debug("Import TAR to Node: " + node.getPath());
 					in = new BufferedInputStream(new AutoCloseInputStream(uploadFile.getInputStream()));
-					ImportTarService impSvc = (ImportTarService) SpringContextUtil.getBean(ImportTarService.class);
+					ImportTarService impSvc = (ImportTarService) context.getBean(ImportTarService.class);
 					impSvc.importFromStream(ms, in, node, false);
 					update.saveSession(ms);
 				} 
@@ -73,7 +77,7 @@ public class ImportService extends ServiceBase {
 				else if (fileName.toLowerCase().endsWith(".tar.gz")) {
 					log.debug("Import TAR.GZ to Node: " + node.getPath());
 					in = new BufferedInputStream(new AutoCloseInputStream(uploadFile.getInputStream()));
-					ImportTarService impSvc = (ImportTarService) SpringContextUtil.getBean(ImportTarService.class);
+					ImportTarService impSvc = (ImportTarService) context.getBean(ImportTarService.class);
 					impSvc.importFromZippedStream(ms, in, node, false);
 					update.saveSession(ms);
 				} 
