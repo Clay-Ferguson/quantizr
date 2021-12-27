@@ -9,10 +9,11 @@ import { Heading } from "../comp/core/Heading";
 import { Img } from "../comp/core/Img";
 import { ListBoxRow } from "./ListBoxRow";
 import { Span } from "../comp/core/Span";
+import { Checkbox } from "./core/Checkbox";
 
 export class EditPrivsTableRow extends ListBoxRow {
 
-    constructor(public aclEntry: J.AccessControlInfo, private removePrivilege: (principalNodeId: string, privilege: string) => void) {
+    constructor(private publicChangedFunc: Function, public aclEntry: J.AccessControlInfo, private removePrivilege: (principalNodeId: string, privilege: string) => void) {
         super();
     }
 
@@ -58,15 +59,7 @@ export class EditPrivsTableRow extends ListBoxRow {
 
         let isPublic = this.aclEntry.principalName === "public";
         let publicWritable = S.props.hasPrivilege(this.aclEntry, J.PrivilegeType.WRITE);
-        let descript = "";
-        if (isPublic) {
-            if (publicWritable) {
-                descript = "Visible to everyone. Anyone can reply.";
-            }
-            else {
-                descript = "Visible to everyone. (NO REPLIES ALLOWED)";
-            }
-        }
+        // console.log("publicWritable = " + publicWritable);
 
         this.setChildren([
             new Div(null, { className: "marginAll" }, [
@@ -79,12 +72,16 @@ export class EditPrivsTableRow extends ListBoxRow {
                             new UserProfileDlg(this.aclEntry.principalNodeId, appState(null)).open();
                         }
                     }),
-                descript
-                    ? new Span(descript, {
-                        className: "clickable",
-                        onClick: (evt: any) => { new UserProfileDlg(this.aclEntry.principalNodeId, appState(null)).open(); }
-                    })
-                    : null,
+                isPublic
+                    ? new Checkbox("Allow Replies", { className: "marginLeft" }, {
+                        setValue: (checked: boolean): void => {
+                            this.publicChangedFunc(checked);
+                        },
+                        getValue: (): boolean => {
+                            return publicWritable;
+                        }
+                    }) : null,
+
                 this.renderAclPrivileges(this.aclEntry)
             ])
         ]);

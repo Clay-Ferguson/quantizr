@@ -34,9 +34,7 @@ export class HelpButton extends Comp {
     }
 
     compRender(): ReactNode {
-        let icon: any;
-
-        icon = this.e("i", {
+        let icon = this.e("i", {
             key: "s_" + this.getId(),
             className: "fa fa-question-circle"
         });

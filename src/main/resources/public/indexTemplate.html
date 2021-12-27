@@ -35,14 +35,6 @@
     <script th:inline="javascript">
         var __page = "index";
 
-        // it's annoying to see the spinner popup, so make sure it's taking up to 3 seconds before we even show it.
-        setTimeout(()=> {
-            var e = document.getElementById("bigSpinner");
-            if (e) {
-                e.style.display = "block";
-            }
-        }, 3000);
-
         /* Thymeleaf vars */
         var g_brandingAppName = [[${brandingAppName}]];
     </script>
@@ -55,11 +47,7 @@
     </noscript>
 
     <div id="app">
-        <div id="bigSpinner" class="col-6 mx-auto text-center" style="margin-top: 6rem; display: none;">
-            <div class="spinner-border text-success" style="border-width: 0.4rem; width: 6rem; height: 6rem;" role="status">
-                <span class="sr-only">Loading...</span>
-            </div>
-        </div>
+        <h4>Loading...</h4>
     </div>
 
     <div id="overlayDiv" class="overlay"></div>

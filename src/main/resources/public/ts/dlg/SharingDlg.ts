@@ -26,9 +26,13 @@ export class SharingDlg extends DialogBase {
     }
 
     renderDlg(): CompIntf[] {
+        let isPublic = S.props.isPublic(this.node);
+
         return [
             new Form(null, [
-                new EditPrivsTable(this.getState<LS>().nodePrivsInfo, this.removePrivilege),
+                new EditPrivsTable((allowAppends: boolean) => {
+                    this.shareNodeToPublic(allowAppends);
+                }, this.getState<LS>().nodePrivsInfo, this.removePrivilege),
                 S.props.isShared(this.node) ? new Div("Remove All", {
                     className: "marginBottom marginRight float-end clickable",
                     onClick: this.removeAllPrivileges
@@ -43,8 +47,7 @@ export class SharingDlg extends DialogBase {
                             this.shareImmediate(friendsDlg.getState().selectedName);
                         }
                     }, null, "btn-primary"),
-                    new Button("Public (Allow replies)", () => { this.shareNodeToPublic(true); }, null, "btn-secondary"),
-                    new Button("Public (No replies)", () => { this.shareNodeToPublic(false); }, null, "btn-secondary"),
+                    isPublic ? null : new Button("Make Public", () => this.shareNodeToPublic(false), null, "btn-secondary"),
                     new Button("Close", () => {
                         this.close();
                         if (this.dirty && this.appState.activeTab === C.TAB_MAIN) {
@@ -138,6 +141,7 @@ export class SharingDlg extends DialogBase {
             principal: "public",
             privileges: allowAppends ? [J.PrivilegeType.READ, J.PrivilegeType.WRITE] : [J.PrivilegeType.READ]
         });
+
         this.reload();
     }
 }

@@ -5,7 +5,7 @@ import { ListBox } from "./ListBox";
 
 export class EditPrivsTable extends ListBox {
 
-    constructor(public nodePrivsInfo: I.NodePrivilegesInfo, private removePrivilege: (principalNodeId: string, privilege: string) => void) {
+    constructor(public publicChangedFunc: Function, public nodePrivsInfo: I.NodePrivilegesInfo, private removePrivilege: (principalNodeId: string, privilege: string) => void) {
         super(null);
     }
 
@@ -14,7 +14,7 @@ export class EditPrivsTable extends ListBox {
 
         if (this.nodePrivsInfo && this.nodePrivsInfo.aclEntries) {
             this.nodePrivsInfo.aclEntries.forEach(function (aclEntry) {
-                children.push(new EditPrivsTableRow(aclEntry, this.removePrivilege));
+                children.push(new EditPrivsTableRow(this.publicChangedFunc, aclEntry, this.removePrivilege));
             }, this);
         }
 
