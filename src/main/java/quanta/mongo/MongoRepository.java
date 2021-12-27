@@ -24,13 +24,6 @@ public class MongoRepository extends ServiceBase {
 	public static boolean fullInit = false;
 
 	/*
-	 * Because of the criticality of this variable, I am not using the Spring getter to get it, but just
-	 * using a private static. It's slightly safer and better for the purpose of cleanup in the shutdown
-	 * hook which is all it's used for.
-	 */
-	private static MongoRepository instance;
-
-	/*
 	 * We only need this lock to protect against startup and/or shutdown concurrency. Remember during
 	 * debugging, etc the server process can be shutdown (CTRL-C) even while it's in the startup phase.
 	 */
@@ -48,15 +41,13 @@ public class MongoRepository extends ServiceBase {
 	 * Use @PostConstruct instead for spring processing.
 	 */
 	public MongoRepository() {
-		instance = this;
-
 		Runtime.getRuntime().addShutdownHook(new Thread(new Runnable() {
 			@Override
 			public void run() {
 				synchronized (lock) {
-					if (ok(instance)) {
+					if (ok(ServiceBase.mongoRepo)) {
 						log.debug("********** runtime shutdownHook executing. **********");
-						instance.close();
+						ServiceBase.mongoRepo.close();
 					}
 				}
 			}
@@ -111,7 +102,7 @@ public class MongoRepository extends ServiceBase {
 
 	public void close() {
 		AppServer.setShuttingDown(true);
-		if (no(instance))
+		if (no(ServiceBase.mongoRepo))
 			return;
 
 		synchronized (lock) {
@@ -119,7 +110,7 @@ public class MongoRepository extends ServiceBase {
 				log.debug("Closing MongoClient connection.");
 				mac.mongoClient().close();
 			} finally {
-				instance = null;
+				ServiceBase.mongoRepo = null;
 			}
 		}
 	}

@@ -45,7 +45,6 @@ import quanta.util.ThreadLocals;
 import quanta.util.Val;
 import quanta.util.XString;
 
-
 /**
  * Verious utilities related to MongoDB persistence
  */
