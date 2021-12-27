@@ -10,10 +10,13 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.concurrent.Executor;
 import javax.annotation.PostConstruct;
 import javax.servlet.http.HttpServletRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
@@ -22,6 +25,7 @@ import quanta.actpub.model.AP;
 import quanta.actpub.model.APList;
 import quanta.actpub.model.APObj;
 import quanta.actpub.model.APType;
+import quanta.config.AppProp;
 import quanta.config.NodeName;
 import quanta.config.NodePath;
 import quanta.config.ServiceBase;
@@ -47,6 +51,9 @@ import quanta.util.XString;
 public class ActPubService extends ServiceBase {
     private static final Logger log = LoggerFactory.getLogger(ActPubService.class);
 
+    @Autowired
+    private AppProp prop;
+
     public static final boolean ENGLISH_LANGUAGE_CHECK = false;
     public static final int MAX_MESSAGES = 10;
     public static final int MAX_FOLLOWERS = 20;
@@ -67,6 +74,11 @@ public class ActPubService extends ServiceBase {
 	public void postConstruct() {
 		apub = this;
 	}
+
+    // todo-0: should all these just run thru asyncExec.run() bean that I have???
+    @Autowired
+	@Qualifier("threadPoolTaskExecutor")
+	public Executor executor;
 
     /*
      * When 'node' has been created under 'parent' (by the sessionContext user) this will send a

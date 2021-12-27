@@ -20,10 +20,13 @@ import com.vladsch.flexmark.util.ast.Node;
 import com.vladsch.flexmark.util.data.MutableDataSet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Scope;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;
 import quanta.AppController;
+import quanta.config.AppProp;
 import quanta.config.ServiceBase;
 import quanta.model.client.NodeProp;
 import quanta.model.ipfs.dag.MerkleLink;
@@ -46,6 +49,12 @@ import quanta.util.XString;
 @Scope("prototype")
 public class ExportServiceFlexmark extends ServiceBase {
 	private static final Logger log = LoggerFactory.getLogger(ExportServiceFlexmark.class);
+
+	@Autowired
+	private ApplicationContext context;
+
+	@Autowired
+	private AppProp prop;
 
 	private MongoSession session;
 
@@ -314,7 +323,7 @@ public class ExportServiceFlexmark extends ServiceBase {
 	 * Wraps the generated content (html body part) into a larger complete HTML file
 	 */
 	private String generateHtml(String body) {
-		String ret = XString.getResourceAsString("/public/export-includes/flexmark/html-template.html");
+		String ret = XString.getResourceAsString(context, "/public/export-includes/flexmark/html-template.html");
 		ret = ret.replace("{{hostAndPort}}", prop.getHostAndPort());
 		ret = ret.replace("{{body}}", body);
 		return ret;

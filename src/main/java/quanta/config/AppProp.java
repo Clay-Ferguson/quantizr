@@ -7,7 +7,6 @@ import java.io.InputStream;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
-import javax.annotation.PostConstruct;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
@@ -15,6 +14,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
 import org.springframework.core.env.Environment;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Component;
@@ -25,6 +25,9 @@ import quanta.util.XString;
 
 /**
  * Wrapper to access application properties.
+ * 
+ * WARNING: Don't put this in ServiceBase with other singletons, because this one needs to be accessible
+ * immediately to be used by other beans before all are fully initialized.
  */
 @Component
 public class AppProp {
@@ -32,6 +35,9 @@ public class AppProp {
 
 	@Autowired
 	private Environment env;
+
+	@Autowired
+	private ApplicationContext context;
 
 	// if false this disables all backgrouind processing.
 	private boolean daemonsEnabled = true;
@@ -44,11 +50,6 @@ public class AppProp {
 
 	public static final ObjectMapper yamlMapper = new ObjectMapper(new YAMLFactory());
 	HashMap<String, Object> configMap = null;
-
-	@PostConstruct
-	public void postConstruct() {
-		ServiceBase.prop = this;
-	}
 	
 	public HashMap<String, Object> getConfig() {
 		if (ok(configMap)) {
@@ -88,14 +89,14 @@ public class AppProp {
 	/*
 	 * Reads a yaml file into a map from internal file at "classname:[fileName]
 	 */
-	public static HashMap<String, Object> readYamlInternal(String fileName) {
+	public HashMap<String, Object> readYamlInternal(String fileName) {
 		synchronized (yamlMapper) {
 			InputStream is = null;
 			HashMap<String, Object> map = null;
 
 			try {
 				log.debug("Loading config from internal classpath: " + fileName);
-				Resource resource = SpringContextUtil.getApplicationContext().getResource("classpath:" + fileName);
+				Resource resource = context.getResource("classpath:" + fileName);
 				is = resource.getInputStream();
 
 				map = yamlMapper.readValue(is, new TypeReference<HashMap<String, Object>>() {});
@@ -112,7 +113,7 @@ public class AppProp {
 		}
 	}
 
-	public static HashMap<String, Object> readYamlExternal(String fileName) {
+	public HashMap<String, Object> readYamlExternal(String fileName) {
 		synchronized (yamlMapper) {
 			HashMap<String, Object> map = null;
 			try {

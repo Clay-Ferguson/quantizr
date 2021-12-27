@@ -4,9 +4,10 @@ import static quanta.util.Util.ok;
 import javax.annotation.PostConstruct;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
 import quanta.config.ServiceBase;
-import quanta.config.SpringContextUtil;
 import quanta.mongo.MongoSession;
 import quanta.mongo.model.SubNode;
 import quanta.request.InsertBookRequest;
@@ -24,6 +25,9 @@ import quanta.util.XString;
 @Component
 public class ImportBookService extends ServiceBase {
 	private static final Logger log = LoggerFactory.getLogger(ImportBookService.class);
+
+	@Autowired
+	private ApplicationContext context;
 
 	@PostConstruct
 	public void postConstruct() {
@@ -45,7 +49,7 @@ public class ImportBookService extends ServiceBase {
 		/*
 		 * for now we don't check book name. Only one book exists: War and Peace
 		 */
-		ImportWarAndPeace iwap = SpringContextUtil.getApplicationContext().getBean(ImportWarAndPeace.class);
+		ImportWarAndPeace iwap = context.getBean(ImportWarAndPeace.class);
 		iwap.importBook(ms, "classpath:public/data/war-and-peace.txt", node,
 				safeBooleanVal(req.getTruncated()) ? 2 : Integer.MAX_VALUE);
 

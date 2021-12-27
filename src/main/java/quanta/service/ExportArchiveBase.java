@@ -15,10 +15,12 @@ import org.apache.commons.lang3.StringEscapeUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
 import org.springframework.core.io.Resource;
 import org.springframework.data.domain.Sort;
+import quanta.config.AppProp;
 import quanta.config.ServiceBase;
-import quanta.config.SpringContextUtil;
 import quanta.exception.base.RuntimeEx;
 import quanta.model.client.NodeProp;
 import quanta.model.client.NodeType;
@@ -43,6 +45,12 @@ import quanta.util.XString;
  */
 public abstract class ExportArchiveBase extends ServiceBase {
 	private static final Logger log = LoggerFactory.getLogger(ExportArchiveBase.class);
+
+	@Autowired
+	private ApplicationContext context;
+
+	@Autowired
+    private AppProp prop;
 
 	private String shortFileName;
 	private String fullFileName;
@@ -105,7 +113,7 @@ public abstract class ExportArchiveBase extends ServiceBase {
 		InputStream is = null;
 		String resourceName = "classpath:/public/export-includes/" + fileName;
 		try {
-			Resource resource = SpringContextUtil.getApplicationContext().getResource(resourceName);
+			Resource resource = context.getResource(resourceName);
 			is = resource.getInputStream();
 			byte[] targetArray = IOUtils.toByteArray(is);
 			addFileEntry(fileName, targetArray);

@@ -8,17 +8,14 @@ import java.io.InputStreamReader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Lazy;
+import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Scope;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Component;
 import quanta.config.ServiceBase;
-import quanta.config.SpringContextUtil;
 import quanta.model.client.NodeType;
 import quanta.mongo.CreateNodeLocation;
-import quanta.mongo.MongoCreate;
 import quanta.mongo.MongoSession;
-import quanta.mongo.MongoUpdate;
 import quanta.mongo.model.SubNode;
 
 // todo-2: need to look into bulk-ops for doing this
@@ -43,6 +40,9 @@ import quanta.mongo.model.SubNode;
 public class ImportWarAndPeace extends ServiceBase {
 	private static final Logger log = LoggerFactory.getLogger(ImportWarAndPeace.class);
 
+	@Autowired
+	private ApplicationContext context;
+
 	private int maxLines = Integer.MAX_VALUE;
 	private int maxBooks = Integer.MAX_VALUE;
 
@@ -62,7 +62,7 @@ public class ImportWarAndPeace extends ServiceBase {
 			this.root = root;
 			this.session = ms;
 			this.maxBooks = maxBooks;
-			Resource resource = SpringContextUtil.getApplicationContext().getResource(resourceName);
+			Resource resource = context.getResource(resourceName);
 			InputStream is = resource.getInputStream();
 			BufferedReader in = new BufferedReader(new InputStreamReader(is));
 

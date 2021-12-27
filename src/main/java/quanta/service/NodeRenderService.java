@@ -10,9 +10,11 @@ import javax.annotation.PostConstruct;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;
 import org.springframework.ui.Model;
+import quanta.config.AppProp;
 import quanta.config.ServiceBase;
 import quanta.config.SpringContextUtil;
 import quanta.exception.NodeAuthFailedException;
@@ -49,6 +51,9 @@ import quanta.util.XString;
 public class NodeRenderService extends ServiceBase {
 	private static final Logger log = LoggerFactory.getLogger(NodeRenderService.class);
 
+	@Autowired
+    private AppProp prop;
+
 	private static RenderNodeResponse welcomePage;
 
 	@PostConstruct
@@ -58,7 +63,6 @@ public class NodeRenderService extends ServiceBase {
 
 	public GetNodeMetaInfoResponse getNodeMetaInfo(MongoSession ms, GetNodeMetaInfoRequest req) {
 		GetNodeMetaInfoResponse res = new GetNodeMetaInfoResponse();
-
 		List<NodeMetaIntf> list = new LinkedList<>();
 		res.setNodeIntf(list);
 
@@ -90,7 +94,6 @@ public class NodeRenderService extends ServiceBase {
 
 		RenderNodeResponse res = new RenderNodeResponse();
 		ms = ThreadLocals.ensure(ms);
-
 		String targetId = req.getNodeId();
 		boolean isActualUplevelRequest = req.isUpLevel();
 
@@ -459,7 +462,6 @@ public class NodeRenderService extends ServiceBase {
 	public InitNodeEditResponse initNodeEdit(MongoSession ms, InitNodeEditRequest req) {
 		InitNodeEditResponse res = new InitNodeEditResponse();
 		ms = ThreadLocals.ensure(ms);
-
 		String nodeId = req.getNodeId();
 		SubNode node = read.getNode(ms, nodeId);
 		auth.ownerAuth(ms, node);
@@ -574,7 +576,6 @@ public class NodeRenderService extends ServiceBase {
 			}
 
 			item.setEnd(item.getStart() + duration);
-
 			items.add(item);
 		}
 
@@ -649,7 +650,6 @@ public class NodeRenderService extends ServiceBase {
 			return null;
 
 		content = stripRenderTags(content);
-
 		content = XString.truncateAfterFirst(content, "\n");
 		content = XString.truncateAfterFirst(content, "\r");
 		while (content.startsWith("#")) {

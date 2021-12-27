@@ -25,7 +25,6 @@ import quanta.util.ExUtil;
 import quanta.util.ThreadLocals;
 import quanta.util.XString;
 
-
 @Component
 @Scope("prototype")
 public class SyncFromIpfsService extends ServiceBase {

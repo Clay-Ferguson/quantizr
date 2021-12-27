@@ -41,7 +41,6 @@ public class SyncToIpfsService extends ServiceBase {
 	private static final Logger log = LoggerFactory.getLogger(SyncToIpfsService.class);
 
 	MongoSession session;
-
 	HashSet<String> allNodePaths = new HashSet<>();
 	HashSet<String> allFilePaths = new HashSet<>();
 

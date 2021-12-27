@@ -47,12 +47,14 @@ import org.owasp.html.PolicyFactory;
 import org.owasp.html.Sanitizers;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpMethod;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 import quanta.AppServer;
+import quanta.config.AppProp;
 import quanta.config.ServiceBase;
 import quanta.exception.NodeAuthFailedException;
 import quanta.model.NodeMetaInfo;
@@ -75,10 +77,12 @@ import quanta.util.Util;
 import quanta.util.XString;
 
 /* Proof of Concept RSS Publishing */
-
 @Component
 public class RSSFeedService extends ServiceBase {
 	private static final Logger log = LoggerFactory.getLogger(RSSFeedService.class);
+
+	@Autowired
+    private AppProp prop;
 
 	private static boolean refreshingCache = false;
 
@@ -304,7 +308,6 @@ public class RSSFeedService extends ServiceBase {
 								}
 							}
 						}
-
 						entries.add(entry);
 					}
 				}

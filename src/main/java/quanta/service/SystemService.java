@@ -18,6 +18,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import quanta.config.AppProp;
 import quanta.config.AppSessionListener;
 import quanta.config.ServiceBase;
 import quanta.config.SessionContext;
@@ -44,6 +45,9 @@ public class SystemService extends ServiceBase {
 
 	@Autowired
 	public static MongoAppConfig mac;
+
+	@Autowired
+    private AppProp prop;
 
 	@PostConstruct
 	public void postConstruct() {

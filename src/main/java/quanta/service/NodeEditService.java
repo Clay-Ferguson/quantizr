@@ -117,7 +117,6 @@ public class NodeEditService extends ServiceBase {
 
 		auth.authForChildNodeCreate(ms, node);
 		CreateNodeLocation createLoc = req.isCreateAtTop() ? CreateNodeLocation.FIRST : CreateNodeLocation.LAST;
-
 		SubNode newNode = create.createNode(ms, node, null, req.getTypeName(), 0L, createLoc, req.getProperties(), null, true);
 
 		if (req.isPendingEdit()) {
@@ -169,7 +168,6 @@ public class NodeEditService extends ServiceBase {
 
 		update.save(ms, newNode);
 		res.setNewNode(convert.convertToNodeInfo(ThreadLocals.getSC(), ms, newNode, true, false, -1, false, false, false, false));
-
 		res.setSuccess(true);
 		return res;
 	}
@@ -198,7 +196,6 @@ public class NodeEditService extends ServiceBase {
 
 			apUtil.log("Saved Friend Node (as a Follow): " + XString.prettyPrint(newNode));
 			update.save(ms, newNode);
-
 			return newNode;
 		} else {
 			throw new RuntimeException("User not found: " + userToFollow);
@@ -309,7 +306,6 @@ public class NodeEditService extends ServiceBase {
 
 		_ms = ThreadLocals.ensure(_ms);
 		MongoSession ms = _ms;
-
 		NodeInfo nodeInfo = req.getNode();
 		String nodeId = nodeInfo.getId();
 

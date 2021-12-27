@@ -1,5 +1,9 @@
 package quanta.config;
 
+import static quanta.util.Util.ok;
+import java.util.concurrent.Executor;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 import org.apache.catalina.connector.Connector;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -10,9 +14,6 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextClosedEvent;
 import org.springframework.stereotype.Component;
-import java.util.concurrent.Executor;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
 
 /* see: https://dzone.com/articles/graceful-shutdown-spring-boot-applications */
 
@@ -51,12 +52,20 @@ public class GracefulShutdown implements TomcatConnectorCustomizer, ApplicationL
         if (executor instanceof ThreadPoolExecutor) {
             try {
                 ThreadPoolExecutor threadPoolExecutor = (ThreadPoolExecutor) executor;
+
+                log.debug("GracefulShutdown closing executor with hashCode=" + executor.hashCode() + " class="
+                        + executor.getClass().getName());
                 threadPoolExecutor.shutdown();
                 if (!threadPoolExecutor.awaitTermination(30, TimeUnit.SECONDS)) {
-                    log.warn("Tomcat thread pool did not shut down gracefully within 30 seconds. Proceeding with forceful shutdown");
+                    log.warn(
+                            "Tomcat thread pool did not shut down gracefully within 30 seconds. Proceeding with forceful shutdown");
                 }
             } catch (InterruptedException ex) {
                 Thread.currentThread().interrupt();
+            }
+        } else {
+            if (ok(executor)) {
+                log.debug("Unexpected executor: " + executor.getClass().getName());
             }
         }
 

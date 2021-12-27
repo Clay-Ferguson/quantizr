@@ -25,6 +25,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.event.EventListener;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -39,6 +40,7 @@ import org.springframework.web.client.RestTemplate;
 import quanta.actpub.model.AP;
 import quanta.actpub.model.APList;
 import quanta.actpub.model.APObj;
+import quanta.config.AppProp;
 import quanta.config.ServiceBase;
 import quanta.model.client.NodeProp;
 import quanta.model.client.NodeType;
@@ -56,6 +58,9 @@ import quanta.util.XString;
 @Component
 public class ActPubUtil extends ServiceBase {
     private static final Logger log = LoggerFactory.getLogger(ActPubUtil.class);
+
+    @Autowired
+    private AppProp prop;
 
     /*
      * RestTemplate is thread-safe and reusable, and has no state, so we need only one final static

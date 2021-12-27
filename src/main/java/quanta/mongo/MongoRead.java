@@ -11,6 +11,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.aggregation.Aggregation;
 import org.springframework.data.mongodb.core.aggregation.AggregationOperation;
@@ -20,6 +21,7 @@ import org.springframework.data.mongodb.core.query.CriteriaDefinition;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.TextCriteria;
 import org.springframework.stereotype.Component;
+import quanta.config.AppProp;
 import quanta.config.NodeName;
 import quanta.config.NodePath;
 import quanta.config.ServiceBase;
@@ -42,6 +44,9 @@ import quanta.util.XString;
 @Component
 public class MongoRead extends ServiceBase {
     private static final Logger log = LoggerFactory.getLogger(MongoRead.class);
+
+    @Autowired
+    private AppProp prop;
 
     private static final Object dbRootLock = new Object();
     private SubNode dbRoot;

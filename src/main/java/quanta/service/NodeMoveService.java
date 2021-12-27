@@ -53,7 +53,6 @@ public class NodeMoveService extends ServiceBase {
 		ms = ThreadLocals.ensure(ms);
 
 		String nodeId = req.getNodeId();
-
 		SubNode node = read.getNode(ms, nodeId);
 		auth.ownerAuth(ms, node);
 		if (no(node)) {
@@ -109,7 +108,6 @@ public class NodeMoveService extends ServiceBase {
 		 * get to it, but is low priority for now.
 		 */
 		update.saveSession(ms);
-
 		node.setOrdinal(0L);
 		update.saveSession(ms);
 	}
@@ -256,7 +254,6 @@ public class NodeMoveService extends ServiceBase {
 	private void moveNodesInternal(MongoSession ms, String location, String targetId, List<String> nodeIds) {
 		log.debug("moveNodesInternal: targetId=" + targetId + " location=" + location);
 		SubNode targetNode = read.getNode(ms, targetId);
-
 		SubNode parentToPasteInto = location.equalsIgnoreCase("inside") ? targetNode : read.getParent(ms, targetNode);
 
 		auth.ownerAuth(ms, parentToPasteInto);

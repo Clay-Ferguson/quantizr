@@ -1,47 +1,46 @@
 package quanta.util;
 
 import static quanta.util.Util.ok;
+import java.util.concurrent.Executor;
 import javax.annotation.PostConstruct;
-import org.springframework.scheduling.annotation.Async;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 import quanta.config.ServiceBase;
 
 /*
- * Warning do not call this run method from INSIDE this class. Due to the spring proxy 'issue' you
- * can't do that
+ * Encapsulates any thread runs we need which need "ThreadLocals.setContext(tlc);"
  */
 @Component
 public class AsyncExec extends ServiceBase {
-    
+
+    @Autowired
+    @Qualifier("threadPoolTaskExecutor")
+    public Executor executor;
+
     @PostConstruct
-	public void postConstruct() {
-	    asyncExec = this;
-	}
+    public void postConstruct() {
+        asyncExec = this;
+    }
 
-    /*
-     * *** DO NOT DELETE *** This is left here as an example of what NOT TO DO. Because of the way
-     * Spring Annotated methods use the 'proxy' interface (i.e. like AOP) if you call an annotated
-     * method from another method INSIDE the same class, the annotation gets ignored, because in that
-     * case it goes around the proxy (not calling thru proxy) and therefore the method below will FAIL
-     * by executing the @Async SYNCHRONOUSLY in the same thread. Note that the exception that can be
-     * thrown based by checking threadId is also protecting us against this mistake.
-     */
-    // public void run(Runnable runnable) {
-    // run(ThreadLocals.getContext(), runnable);
-    // }
-
-    @Async("threadPoolTaskExecutor")
+    // Async seems to be tricky to configure after recent changes. It just doesn't work, so we just use
+    // 'executor.execute' instead.
+    // @Async("threadPoolTaskExecutor")
     public void run(ThreadLocalsContext tlc, Runnable runnable) {
-        if (ok(tlc)) {
-            /*
-             * if the currently executing threadId is the same as the one from the passed in 'tlc' we definitely
-             * have a bug, and the @Async annotation is not having an effect.
-             */
-            if (Thread.currentThread().getId() == tlc.threadId) {
-                throw new RuntimeException("AsyncExec ran running synchronously!");
+        executor.execute(new Runnable() {
+            public void run() {
+                if (ok(tlc)) {
+                    /*
+                     * if the currently executing threadId is the same as the one from the passed in 'tlc' we definitely
+                     * have a bug, and the @Async annotation is not having an effect.
+                     */
+                    if (Thread.currentThread().getId() == tlc.threadId) {
+                        throw new RuntimeException("AsyncExec ran synchronously! @Async got ignored.");
+                    }
+                    ThreadLocals.setContext(tlc);
+                }
+                runnable.run();
             }
-            ThreadLocals.setContext(tlc);
-        }
-        runnable.run();
+        });
     }
 }

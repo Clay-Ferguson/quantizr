@@ -37,7 +37,6 @@ import quanta.util.XString;
  * Service methods for (ACL): processing security, privileges, and Access Control List information
  * on nodes.
  */
-
 @Component
 public class AclService extends ServiceBase  {
 	private static final Logger log = LoggerFactory.getLogger(AclService.class);
@@ -217,7 +216,6 @@ public class AclService extends ServiceBase  {
 
 		/* Scan all the privileges to be added to this principal (rd, rw, etc) */
 		for (String priv : privileges) {
-
 			/* If this privilege is not already on ac.prvs string then append it */
 			if (prvs.indexOf(priv) == -1) {
 				authAdded = true;

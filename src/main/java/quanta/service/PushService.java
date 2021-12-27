@@ -4,9 +4,12 @@ import static quanta.util.Util.no;
 import static quanta.util.Util.ok;
 import java.util.HashSet;
 import java.util.List;
+import java.util.concurrent.Executor;
 import javax.annotation.PostConstruct;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter.SseEventBuilder;
@@ -31,6 +34,10 @@ public class PushService extends ServiceBase {
 	public void postConstruct() {
 		push = this;
 	}
+
+	@Autowired
+	@Qualifier("threadPoolTaskExecutor")
+	public Executor executor;
 
 	/* Notify all users being shared to on this node */
 	public void pushNodeUpdateToBrowsers(MongoSession ms, HashSet<Integer> sessionsPushed, SubNode node) {

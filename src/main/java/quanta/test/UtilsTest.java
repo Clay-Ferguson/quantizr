@@ -4,15 +4,31 @@ import java.util.Date;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
+import quanta.config.ServiceBase;
 import quanta.util.DateUtil;
-
+import quanta.util.ThreadLocals;
 
 @Component("UtilsTest")
-public class UtilsTest implements TestIntf {
+public class UtilsTest extends ServiceBase implements TestIntf {
 	private static final Logger log = LoggerFactory.getLogger(UtilsTest.class);
 
 	@Override
 	public void test() throws Exception {
+		asyncExecTest();
+	}
+
+	private void asyncExecTest() {
+		asyncExec.run(ThreadLocals.getContext(), () -> {
+			log.debug("Running asyncExecTest");
+			try {
+				Thread.sleep(3000);
+			} catch (InterruptedException e) {
+			}
+			log.debug("Exiting asyncExecTest thread");
+		});
+	}
+
+	public void timesTest() throws Exception {
 		log.debug("*****************************************************************************************");
 		log.debug("UtilsTest Running!");
 

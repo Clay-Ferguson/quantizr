@@ -30,6 +30,10 @@ import quanta.filter.AppFilter;
 
 /**
  * Standard Spring WebMvcConfigurerAdapter-derived class.
+ * 
+ * NOTE: I'm leaving @EnableAsync for now but I had problems with @Async not being reliable anyway
+ * in ways I never understood although my hunch is it was BeanProxy related (proxies Spring can wrap
+ * beans with sometimes)
  */
 @Configuration
 @EnableAsync
@@ -42,6 +46,7 @@ public class AppConfiguration implements WebMvcConfigurer {
 	@Autowired
 	private AppFilter appFilter;
 
+	private static Object execInitLock = new Object();
 	private static ThreadPoolTaskExecutor executor;
 
 	@Bean
@@ -72,17 +77,25 @@ public class AppConfiguration implements WebMvcConfigurer {
 			return executor;
 		}
 
-		executor = new ThreadPoolTaskExecutor();
-		executor.setCorePoolSize(20);
-		executor.setMaxPoolSize(45);
-		// executor.setAwaitTerminationSeconds(20);
-		// t.setAllowCoreThreadTimeOut(true);
-		// t.setKeepAliveSeconds(120);
-		return executor;
+		synchronized (execInitLock) {
+			ThreadPoolTaskExecutor exec = new ThreadPoolTaskExecutor();
+			exec.setCorePoolSize(20);
+			exec.setMaxPoolSize(45);
+			// executor.setAwaitTerminationSeconds(20);
+			// t.setAllowCoreThreadTimeOut(true);
+			// t.setKeepAliveSeconds(120);
+
+			// only set the instance variable once the object is fully ready.
+			executor = exec;
+			log.debug("Created threadPoolTaskExecutor: hashCode=" + exec.hashCode());
+			return exec;
+		}
 	}
 
 	public static void shutdown() {
 		if (ok(executor)) {
+			log.debug("Shutting down global executor: executor.hashCode=" + executor.hashCode() + " class="
+					+ executor.getClass().getName());
 			executor.shutdown();
 		}
 	}

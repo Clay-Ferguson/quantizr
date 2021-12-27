@@ -5,9 +5,12 @@ import static quanta.util.Util.ok;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.concurrent.Executor;
 import javax.annotation.PostConstruct;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Component;
@@ -18,6 +21,7 @@ import quanta.actpub.model.APOOrderedCollection;
 import quanta.actpub.model.APOOrderedCollectionPage;
 import quanta.actpub.model.APOUndo;
 import quanta.actpub.model.APObj;
+import quanta.config.AppProp;
 import quanta.config.NodeName;
 import quanta.config.ServiceBase;
 import quanta.model.NodeInfo;
@@ -38,6 +42,13 @@ import quanta.util.XString;
 @Component
 public class ActPubFollowing extends ServiceBase  {
     private static final Logger log = LoggerFactory.getLogger(ActPubFollowing.class);
+
+    @Autowired
+    private AppProp prop;
+
+    @Autowired
+	@Qualifier("threadPoolTaskExecutor")
+	public Executor executor;
 
     @PostConstruct
 	public void postConstruct() {

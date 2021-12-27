@@ -3,10 +3,9 @@ package quanta.config;
 import static quanta.util.Util.no;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.BeansException;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
-import org.springframework.context.ApplicationContextAware;
+import org.springframework.context.event.ContextRefreshedEvent;
+import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 import quanta.exception.base.RuntimeEx;
 
@@ -14,23 +13,18 @@ import quanta.exception.base.RuntimeEx;
  * Manages certain aspects of Spring application context.
  */
 @Component
-public class SpringContextUtil implements ApplicationContextAware {
+public class SpringContextUtil {
 	private static final Logger log = LoggerFactory.getLogger(SpringContextUtil.class);
 
+	// WARNING: Trying to @Autowire context here did NOT work. Not sure if it was because of the 'static'
+	// I needed here, but this entire class actually can go away and is no longer serving a purpose
+	// due to other design changes.
 	private static ApplicationContext context;
 
-	@Autowired
-	private TestRunner testRunner;
-
-	@Override
-	public void setApplicationContext(ApplicationContext context) throws BeansException {
-		log.debug("SpringContextUtil initialized context.");
-		SpringContextUtil.context = context;
-		testRunner.test();
-	}
-
-	public static ApplicationContext getApplicationContext() {
-		return context;
+	@EventListener
+	public void handleContextRefresh(ContextRefreshedEvent event) {
+		context = event.getApplicationContext();
+		log.debug("SpringContextUtil.ContextRefreshedEvent context=" + context.hashCode());
 	}
 
 	public static Object getBean(Class clazz) {

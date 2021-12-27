@@ -16,8 +16,8 @@ import com.fasterxml.jackson.databind.ObjectWriter;
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.ApplicationContext;
 import org.springframework.core.io.Resource;
-import quanta.config.SpringContextUtil;
 import quanta.exception.base.RuntimeEx;
 
 /**
@@ -148,12 +148,12 @@ public class XString {
 		return val.substring(0, maxLen - 1);
 	}
 
-	public static String getResourceAsString(String resourceName) {
+	public static String getResourceAsString(ApplicationContext context, String resourceName) {
 		InputStream is = null;
 		String ret = null;
 		resourceName = "classpath:" + resourceName; // "classpath:/public/export-includes/flexmark/html-template.html";
 		try {
-			Resource resource = SpringContextUtil.getApplicationContext().getResource(resourceName);
+			Resource resource = context.getResource(resourceName);
 			is = resource.getInputStream();
 			ret = IOUtils.toString(is, StandardCharsets.UTF_8.name());
 		} catch (Exception e) {

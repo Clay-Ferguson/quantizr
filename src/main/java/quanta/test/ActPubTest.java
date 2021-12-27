@@ -3,16 +3,20 @@ package quanta.test;
 import static quanta.util.Util.no;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import quanta.actpub.APConst;
 import quanta.actpub.model.APObj;
+import quanta.config.AppProp;
 import quanta.config.ServiceBase;
 import quanta.util.XString;
-
 
 @Component("ActPubTest")
 public class ActPubTest extends ServiceBase implements TestIntf {
     private static final Logger log = LoggerFactory.getLogger(ActPubTest.class);
+
+    @Autowired
+    private AppProp prop;
 
     @Override
     public void test() throws Exception {

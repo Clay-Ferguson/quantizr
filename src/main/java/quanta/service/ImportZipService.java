@@ -7,11 +7,12 @@ import org.apache.commons.compress.archivers.zip.ZipArchiveEntry;
 import org.apache.commons.compress.archivers.zip.ZipArchiveInputStream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Scope;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Component;
 import quanta.config.SessionContext;
-import quanta.config.SpringContextUtil;
 import quanta.exception.base.RuntimeEx;
 import quanta.mongo.MongoSession;
 import quanta.mongo.model.SubNode;
@@ -33,6 +34,9 @@ import quanta.util.ThreadLocals;
 public class ImportZipService extends ImportArchiveBase {
 	private static final Logger log = LoggerFactory.getLogger(ImportZipService.class);
 
+	@Autowired
+	private ApplicationContext context;
+
 	private ZipArchiveInputStream zis;
 
 	/*
@@ -41,7 +45,7 @@ public class ImportZipService extends ImportArchiveBase {
 	 */
 	public SubNode inportFromResource(MongoSession ms, String resourceName, SubNode node, String nodeName) {
 
-		Resource resource = SpringContextUtil.getApplicationContext().getResource(resourceName);
+		Resource resource = context.getResource(resourceName);
 		InputStream is = null;
 		SubNode rootNode = null;
 		try {

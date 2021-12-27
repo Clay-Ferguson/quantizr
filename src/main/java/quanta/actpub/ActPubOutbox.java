@@ -9,6 +9,7 @@ import java.util.List;
 import javax.annotation.PostConstruct;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;
 import quanta.actpub.model.AP;
@@ -19,6 +20,7 @@ import quanta.actpub.model.APOOrderedCollection;
 import quanta.actpub.model.APOOrderedCollectionPage;
 import quanta.actpub.model.APObj;
 import quanta.actpub.model.APType;
+import quanta.config.AppProp;
 import quanta.config.NodeName;
 import quanta.config.ServiceBase;
 import quanta.model.client.NodeProp;
@@ -37,6 +39,9 @@ import quanta.util.XString;
 @Component
 public class ActPubOutbox extends ServiceBase {
     private static final Logger log = LoggerFactory.getLogger(ActPubOutbox.class);
+
+    @Autowired
+    private AppProp prop;
 
     @PostConstruct
 	public void postConstruct() {

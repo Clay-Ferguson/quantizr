@@ -32,7 +32,6 @@ import quanta.response.CheckMessagesResponse;
 import quanta.response.NodeFeedResponse;
 import quanta.util.ThreadLocals;
 
-
 @Component
 public class UserFeedService extends ServiceBase  {
 	private static final Logger log = LoggerFactory.getLogger(UserFeedService.class);
@@ -85,7 +84,6 @@ public class UserFeedService extends ServiceBase  {
 		crit = crit.and(SubNode.AC + "." + myId).ne(null);
 
 		q.addCriteria(crit);
-
 		long count = ops.count(q, SubNode.class);
 		res.setNumNew((int) count);
 		return res;
@@ -93,7 +91,6 @@ public class UserFeedService extends ServiceBase  {
 
 	/*
 	 * Generated content of the "Feed" for a user.
-	 * 
 	 */
 	public NodeFeedResponse generateFeed(MongoSession ms, NodeFeedRequest req) {
 		/*
@@ -101,7 +98,6 @@ public class UserFeedService extends ServiceBase  {
 		 * without 'real' data.
 		 */
 		boolean testQuery = false;
-
 		SessionContext sc = ThreadLocals.getSC();
 		NodeFeedResponse res = new NodeFeedResponse();
 		ms = ThreadLocals.ensure(ms);

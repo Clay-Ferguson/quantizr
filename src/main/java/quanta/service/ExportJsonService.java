@@ -14,13 +14,15 @@ import com.fasterxml.jackson.databind.ObjectWriter;
 import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Scope;
 import org.springframework.core.io.Resource;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Component;
+import quanta.config.AppProp;
 import quanta.config.ServiceBase;
-import quanta.config.SpringContextUtil;
 import quanta.model.client.NodeProp;
 import quanta.mongo.MongoSession;
 import quanta.mongo.model.SubNode;
@@ -39,6 +41,12 @@ import quanta.util.Val;
 @Scope("prototype")
 public class ExportJsonService extends ServiceBase {
 	private static final Logger log = LoggerFactory.getLogger(ExportJsonService.class);
+
+	@Autowired
+	private ApplicationContext context;
+
+	@Autowired
+	private AppProp prop;
 
 	/* This object is Threadsafe so this is the correct usage 'static final' */
 	private static final ObjectMapper objectMapper = new ObjectMapper();
@@ -126,7 +134,7 @@ public class ExportJsonService extends ServiceBase {
 			LimitedInputStreamEx lis = null;
 			try {
 				String resourceName = "classpath:/nodes/" + subFolder + "/" + oid.toHexString() + "-" + binFileName;
-				Resource resource = SpringContextUtil.getApplicationContext().getResource(resourceName);
+				Resource resource = context.getResource(resourceName);
 				is = resource.getInputStream();
 				lis = new LimitedInputStreamEx(is, user.getMaxUploadSize(ms));
 				attach.writeStream(ms, "", node, lis, binFileName, binMime, null);
@@ -182,7 +190,7 @@ public class ExportJsonService extends ServiceBase {
 			ThreadLocals.setParentCheckEnabled(false);
 
 			String resourceName = "classpath:/nodes/" + subFolder + "/" + subFolder + ".json";
-			Resource resource = SpringContextUtil.getApplicationContext().getResource(resourceName);
+			Resource resource = context.getResource(resourceName);
 			InputStream is = resource.getInputStream();
 			BufferedReader in = new BufferedReader(new InputStreamReader(is));
 

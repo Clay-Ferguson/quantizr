@@ -6,10 +6,12 @@ import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 import quanta.AppServer;
+import quanta.EventPublisher;
 import quanta.config.ServiceBase;
 import quanta.util.ThreadLocals;
 
@@ -19,6 +21,9 @@ import quanta.util.ThreadLocals;
 @Component
 public class MongoRepository extends ServiceBase {
 	private static final Logger log = LoggerFactory.getLogger(MongoRepository.class);
+
+	@Autowired
+	private EventPublisher publisher;
 
 	// hack for now to make RSS deamon wait.
 	public static boolean fullInit = false;
@@ -94,6 +99,9 @@ public class MongoRepository extends ServiceBase {
 
 			log.debug("MongoRepository fully initialized.");
 			fullInit = true;
+
+			// broadcast to all other parts of the app that the DB is now live and ready.
+			publisher.getPublisher().publishEvent(new AppStartupEvent());
 
 			delete.removeAbandonedNodes(as);
 			apub.refreshForeignUsers();

@@ -27,6 +27,7 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.WebAuthenticationDetails;
 import org.springframework.stereotype.Component;
+import quanta.config.AppProp;
 import quanta.config.NodeName;
 import quanta.config.NodePath;
 import quanta.config.ServiceBase;
@@ -85,10 +86,13 @@ import quanta.util.XString;
 public class UserManagerService extends ServiceBase {
 	private static final Logger log = LoggerFactory.getLogger(UserManagerService.class);
 
-	private static final Random rand = new Random();
+	@Autowired
+    private AppProp prop;
 
 	@Autowired
 	public AuthenticationManager authenticationManager;
+
+	private static final Random rand = new Random();
 
 	/* Private keys of each user by user name as key */
 	public static final ConcurrentHashMap<String, String> privateKeysByUserName = new ConcurrentHashMap<>();
@@ -799,7 +803,6 @@ public class UserManagerService extends ServiceBase {
 
 			if (ok(userNode)) {
 				UserProfile userProfile = new UserProfile();
-
 				String nodeUserName = userNode.getStr(NodeProp.USER.s());
 				String displayName = userNode.getStr(NodeProp.DISPLAY_NAME.s());
 				SubNode userHomeNode = read.getNodeByName(session, nodeUserName + ":" + NodeName.HOME);
@@ -1073,7 +1076,6 @@ public class UserManagerService extends ServiceBase {
 					friends.add(fi);
 				}
 			}
-
 			res.setFriends(friends);
 		}
 		res.setSuccess(true);

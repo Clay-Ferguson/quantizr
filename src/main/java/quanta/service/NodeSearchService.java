@@ -71,7 +71,6 @@ public class NodeSearchService extends ServiceBase  {
 	public NodeSearchResponse search(MongoSession ms, NodeSearchRequest req) {
 		NodeSearchResponse res = new NodeSearchResponse();
 		ms = ThreadLocals.ensure(ms);
-
 		String searchText = req.getSearchText();
 
 		// if no search text OR sort order specified that's a bad request.
@@ -218,7 +217,6 @@ public class NodeSearchService extends ServiceBase  {
 	public GetSharedNodesResponse getSharedNodes(MongoSession ms, GetSharedNodesRequest req) {
 		GetSharedNodesResponse res = new GetSharedNodesResponse();
 		ms = ThreadLocals.ensure(ms);
-
 		List<NodeInfo> searchResults = new LinkedList<>();
 		res.setSearchResults(searchResults);
 		int counter = 0;

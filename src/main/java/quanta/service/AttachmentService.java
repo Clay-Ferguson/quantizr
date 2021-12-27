@@ -55,6 +55,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBody;
+import quanta.config.AppProp;
 import quanta.config.NodePath;
 import quanta.config.ServiceBase;
 import quanta.config.SpringContextUtil;
@@ -103,6 +104,9 @@ public class AttachmentService extends ServiceBase {
 
 	@Autowired
 	public GridFSBucket gridBucket;
+	
+	@Autowired
+    private AppProp prop;
 
 	@PostConstruct
 	public void postConstruct() {
@@ -253,7 +257,7 @@ public class AttachmentService extends ServiceBase {
 
 		/* mimeType can be passed as null if it's not yet determined */
 		if (no(mimeType)) {
-			mimeType = getBestMimeFromFileTypeName(fileName);
+			mimeType = getMimeFromFileType(fileName);
 		}
 
 		if (explodeZips && "application/zip".equalsIgnoreCase(mimeType)) {
@@ -268,7 +272,7 @@ public class AttachmentService extends ServiceBase {
 		}
 	}
 
-	public String getBestMimeFromFileTypeName(String fileName) {
+	public String getMimeFromFileType(String fileName) {
 		String mimeType = null;
 
 		/* mimeType can be passed as null if it's not yet determined */
@@ -302,13 +306,10 @@ public class AttachmentService extends ServiceBase {
 
 		int maxFileSize = user.getMaxUploadSize(ms);
 
-		/*
-		 * Clear out any pre-existing binary properties
-		 */
+		// Clear out any pre-existing binary properties
 		deleteAllBinaryProperties(node, binSuffix);
 
 		// log.debug("Node JSON after BIN props removed: " + XString.prettyPrint(node));
-
 		if (ImageUtil.isImageMime(mimeType)) {
 
 			// default image to be 100% size
@@ -781,7 +782,6 @@ public class AttachmentService extends ServiceBase {
 		}
 
 		ms = ThreadLocals.ensure(ms);
-
 		String mimeType = Util.getMimeFromDataUrl(sourceUrl);
 
 		if (ImageUtil.isImageMime(mimeType)) {

@@ -14,18 +14,22 @@ import javax.annotation.PostConstruct;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Component;
 import quanta.config.ServiceBase;
-import quanta.config.SpringContextUtil;
 
 @Component
 public class EnglishDictionary extends ServiceBase {
 	private static final Logger log = LoggerFactory.getLogger(EnglishDictionary.class);
 	private static final HashSet<String> dictWords = new HashSet<>();
 	private static final HashSet<String> stopWords = new HashSet<>();
+
+	@Autowired
+	private ApplicationContext context;
 
 	@PostConstruct
 	public void postConstruct() {
@@ -49,7 +53,7 @@ public class EnglishDictionary extends ServiceBase {
 			 * bottom or wherever then you can just uncomment the section (with the text
 			 * '/tmp/stop-words-new.txt') below to write them into a new sorted file with dupliates removed
 			 */
-			Resource resource = SpringContextUtil.getApplicationContext().getResource("classpath:public/data/stop-words.txt");
+			Resource resource = context.getResource("classpath:public/data/stop-words.txt");
 			InputStream is = resource.getInputStream();
 			BufferedReader in = new BufferedReader(new InputStreamReader(is));
 			try {
@@ -104,8 +108,7 @@ public class EnglishDictionary extends ServiceBase {
 			return;
 
 		try {
-			Resource resource =
-					SpringContextUtil.getApplicationContext().getResource("classpath:public/data/english-dictionary.txt");
+			Resource resource = context.getResource("classpath:public/data/english-dictionary.txt");
 			InputStream is = resource.getInputStream();
 			BufferedReader in = new BufferedReader(new InputStreamReader(is));
 			try {

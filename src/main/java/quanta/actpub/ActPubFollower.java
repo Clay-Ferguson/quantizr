@@ -7,6 +7,7 @@ import java.util.List;
 import javax.annotation.PostConstruct;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Component;
@@ -14,6 +15,7 @@ import quanta.actpub.model.AP;
 import quanta.actpub.model.APOOrderedCollection;
 import quanta.actpub.model.APOOrderedCollectionPage;
 import quanta.actpub.model.APObj;
+import quanta.config.AppProp;
 import quanta.config.NodePath;
 import quanta.config.ServiceBase;
 import quanta.model.NodeInfo;
@@ -33,6 +35,9 @@ import quanta.util.XString;
 @Component
 public class ActPubFollower extends ServiceBase {
     private static final Logger log = LoggerFactory.getLogger(ActPubFollower.class);
+
+    @Autowired
+    private AppProp prop;
 
     @PostConstruct
 	public void postConstruct() {

@@ -10,8 +10,10 @@ import javax.annotation.PostConstruct;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import quanta.AppController;
+import quanta.config.AppProp;
 import quanta.config.ServiceBase;
 import quanta.model.NodeMetaInfo;
 import quanta.model.client.NodeProp;
@@ -32,6 +34,9 @@ import quanta.mongo.model.SubNodePropertyMap;
 @Component
 public class SubNodeUtil extends ServiceBase {
 	private static final Logger log = LoggerFactory.getLogger(SubNodeUtil.class);
+
+	@Autowired
+    private AppProp prop;
 
 	/*
 	 * These are properties we should never allow the client to send back as part of a save operation.

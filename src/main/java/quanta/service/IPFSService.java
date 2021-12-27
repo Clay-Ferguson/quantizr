@@ -28,6 +28,7 @@ import org.apache.http.impl.client.HttpClientBuilder;
 import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.ContentDisposition;
 import org.springframework.http.HttpEntity;
@@ -40,6 +41,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
+import quanta.config.AppProp;
 import quanta.config.ServiceBase;
 import quanta.config.SpringContextUtil;
 import quanta.exception.base.RuntimeEx;
@@ -82,6 +84,9 @@ import quanta.util.XString;
 @Component
 public class IPFSService extends ServiceBase {
     private static final Logger log = LoggerFactory.getLogger(IPFSService.class);
+
+    @Autowired
+    private AppProp prop;
 
     public static String API_BASE;
     public static String API_CAT;

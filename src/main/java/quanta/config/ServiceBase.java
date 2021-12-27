@@ -1,10 +1,7 @@
 package quanta.config;
 
-import java.util.concurrent.Executor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import quanta.CallProcessor;
 import quanta.actpub.ActPubCache;
@@ -71,11 +68,6 @@ import quanta.util.Validator;
 public class ServiceBase {
 	private static final Logger log = LoggerFactory.getLogger(ServiceBase.class);
 
-	@Autowired
-	@Qualifier("threadPoolTaskExecutor")
-	public Executor executor;
-
-	public static AppProp prop;
 	public static UserFeedService userFeed;
 	public static Convert convert;
 	public static TypePluginMgr typePluginMgr;
