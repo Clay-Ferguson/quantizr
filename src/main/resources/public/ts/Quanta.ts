@@ -246,21 +246,24 @@ export class Quanta {
          * This call checks the server to see if we have a session already, and gets back the login information from
          * the session, and then renders page content, after that.
          */
-        S.user.refreshLogin(store.getState());
+        await S.user.refreshLogin(store.getState());
+        console.log("refreshLogin completed.");
 
         S.util.initProgressMonitor();
         S.util.processUrlParams(null);
         this.setOverlay(false);
         S.util.playAudioIfRequested();
 
-        let res: J.GetConfigResponse = await S.util.ajax<J.GetConfigRequest, J.GetConfigResponse>("getConfig");
-        if (res.config) {
-            S.quanta.config = res.config;
-            debugger;
-            if (S.quanta.config.userMessage) {
-                S.util.showMessage(S.quanta.config.userMessage, "");
+        setTimeout(async () => {
+            let res: J.GetConfigResponse = await S.util.ajax<J.GetConfigRequest, J.GetConfigResponse>("getConfig");
+            if (res.config) {
+                S.quanta.config = res.config;
+                if (S.quanta.config.userMessage) {
+                    S.util.showMessage(S.quanta.config.userMessage, "");
+                }
             }
-        }
+            // todo-0: this timer is part of an emergency fix, to make this happen after logins.
+        }, 2500);
 
         Log.log("initApp complete.");
         S.util.enableMouseEffect();

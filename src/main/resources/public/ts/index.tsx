@@ -6,6 +6,7 @@ import TsxApp from "./TsxApp";
 
 import "../css/quanta.scss";
 import "font-awesome/css/font-awesome.min.css";
+import PayPalButton from "./PayPalButton";
 
 // set in index.html
 declare var __page;
@@ -17,6 +18,7 @@ else if ((window as any).__page === "tsx-test") {
     ReactDOM.render(
         <React.StrictMode>
             <TsxApp />
+            <PayPalButton />
         </React.StrictMode>,
         document.getElementById("app")
     );

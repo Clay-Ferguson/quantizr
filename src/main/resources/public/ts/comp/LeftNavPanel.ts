@@ -50,7 +50,8 @@ export class LeftNavPanel extends Div {
                 new Img(this.getId() + "_logo", {
                     className: "smallLogoButton",
                     src: "/branding/logo-50px-tr.jpg",
-                    onClick: () => { window.location.href = window.location.origin; }
+                    onClick: S.util.loadAnonPageHome,
+                    title: "Go to Portal Home Node"
                 }),
                 new Span(g_brandingAppName, {
                     className: "logo-text",

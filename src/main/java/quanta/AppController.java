@@ -48,7 +48,6 @@ import quanta.exception.base.RuntimeEx;
 import quanta.mail.EmailSender;
 import quanta.model.client.NodeProp;
 import quanta.model.client.NodeType;
-import quanta.model.client.PrincipalName;
 import quanta.mongo.MongoRepository;
 import quanta.mongo.model.SubNode;
 import quanta.request.AddFriendRequest;
@@ -222,9 +221,9 @@ public class AppController extends ServiceBase implements ErrorController {
 	 * 
 	 * passCode is an auth code for a password reset
 	 * 
-	 * Renders with Thymeleaf
-	 * todo-0: we can get rid of "/app" now AFTER removing all references to /app in any urls, but leave 
-	 * the mapping HERE for a while after, to be sure. Do this tweak in a dedicated commit.
+	 * Renders with Thymeleaf todo-0: we can get rid of "/app" now AFTER removing all references to /app
+	 * in any urls, but leave the mapping HERE for a while after, to be sure. Do this tweak in a
+	 * dedicated commit.
 	 */
 	@RequestMapping(value = {"/", "/app", "/n/{nameOnAdminNode}", "/u/{userName}/{nameOnUserNode}"})
 	public String index(//
@@ -1233,13 +1232,14 @@ public class AppController extends ServiceBase implements ErrorController {
 	public @ResponseBody Object getConfig(@RequestBody GetConfigRequest req, HttpSession session) {
 		// NO NOT HERE -> SessionContext.checkReqToken();
 		GetConfigResponse res = new GetConfigResponse();
+		HashMap<String, Object> map = prop.getConfig();
 
 		// if we have a 'userMessage' on the session send it back now, and then forget it.
-		if (ok(ThreadLocals.getSC().getUserMessage())) {
-			prop.getConfig().put("userMessage", ThreadLocals.getSC().getUserMessage());
+		if (ok(ThreadLocals.getSC()) && ok(ThreadLocals.getSC().getUserMessage())) {
+			map.put("userMessage", ThreadLocals.getSC().getUserMessage());
 			ThreadLocals.getSC().setUserMessage(null);
 		}
-		res.setConfig(prop.getConfig());
+		res.setConfig(map);
 		return res;
 	}
 
