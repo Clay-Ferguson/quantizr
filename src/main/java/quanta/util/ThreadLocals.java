@@ -84,7 +84,9 @@ public class ThreadLocals {
 	public static void setContext(ThreadLocalsContext ctx) {
 		// log.debug("setting context into thread: " + Thread.currentThread().getName());
 		setHttpSession(ctx.httpSession);
-		setSC(ctx.sessionContext.cloneForThread());
+		if (ctx.sessionContext != null) {
+			setSC(ctx.sessionContext.cloneForThread());
+		}
 	}
 
 	public static void setHttpSession(HttpSession session) {

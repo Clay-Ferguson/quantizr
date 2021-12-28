@@ -6,7 +6,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import quanta.config.ServiceBase;
 import quanta.util.DateUtil;
-import quanta.util.ThreadLocals;
+import quanta.util.ExUtil;
 
 @Component("UtilsTest")
 public class UtilsTest extends ServiceBase implements TestIntf {
@@ -18,14 +18,18 @@ public class UtilsTest extends ServiceBase implements TestIntf {
 	}
 
 	private void asyncExecTest() {
-		asyncExec.run(ThreadLocals.getContext(), () -> {
-			log.debug("Running asyncExecTest");
-			try {
-				Thread.sleep(3000);
-			} catch (InterruptedException e) {
-			}
-			log.debug("Exiting asyncExecTest thread");
-		});
+		for (int i = 0; i < 100; i++) {
+			final int _i = i;
+			exec.run(() -> {
+				log.debug("Running asyncExecTest");
+				try {
+					log.debug("Sleep " + _i);
+					Thread.sleep(_i * 1000);
+				} catch (Exception e) {
+					ExUtil.error(log, "exception AsyncExec", e);
+				}
+			});
+		}
 	}
 
 	public void timesTest() throws Exception {

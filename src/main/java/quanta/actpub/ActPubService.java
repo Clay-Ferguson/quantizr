@@ -10,13 +10,11 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.concurrent.Executor;
 import javax.annotation.PostConstruct;
 import javax.servlet.http.HttpServletRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
@@ -75,12 +73,7 @@ public class ActPubService extends ServiceBase {
 		apub = this;
 	}
 
-    // todo-0: should all these just run thru asyncExec.run() bean that I have???
-    @Autowired
-	@Qualifier("threadPoolTaskExecutor")
-	public Executor executor;
-
-    /*
+/*
      * When 'node' has been created under 'parent' (by the sessionContext user) this will send a
      * notification to foreign servers. This call returns immediately and delegates the actuall
      * proccessing to a daemon thread.
@@ -90,7 +83,7 @@ public class ActPubService extends ServiceBase {
      */
     public void sendNotificationForNodeEdit(MongoSession ms, String inReplyTo, HashMap<String, AccessControl> acl,
             APList attachments, String content, String noteUrl) {
-        asyncExec.run(ThreadLocals.getContext(), () -> {
+        exec.run(() -> {
             try {
                 List<String> toUserNames = new LinkedList<>();
                 boolean privateMessage = true;
@@ -1162,7 +1155,7 @@ public class ActPubService extends ServiceBase {
                 return null;
             });
         };
-        executor.execute(runnable);
+        exec.run(runnable);
     }
 
     public void loadForeignUser(String userName) {

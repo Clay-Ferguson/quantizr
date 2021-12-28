@@ -5,12 +5,10 @@ import static quanta.util.Util.ok;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.concurrent.Executor;
 import javax.annotation.PostConstruct;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Component;
@@ -45,10 +43,6 @@ public class ActPubFollowing extends ServiceBase  {
 
     @Autowired
     private AppProp prop;
-
-    @Autowired
-	@Qualifier("threadPoolTaskExecutor")
-	public Executor executor;
 
     @PostConstruct
 	public void postConstruct() {
@@ -205,7 +199,7 @@ public class ActPubFollowing extends ServiceBase  {
                 return null;
             });
         };
-        executor.execute(runnable);
+        exec.run(runnable);
     }
 
     /**

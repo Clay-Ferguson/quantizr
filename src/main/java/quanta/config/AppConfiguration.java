@@ -79,9 +79,9 @@ public class AppConfiguration implements WebMvcConfigurer {
 
 		synchronized (execInitLock) {
 			ThreadPoolTaskExecutor exec = new ThreadPoolTaskExecutor();
-			exec.setCorePoolSize(20);
-			exec.setMaxPoolSize(45);
-			// executor.setAwaitTerminationSeconds(20);
+			exec.setCorePoolSize(8);
+
+			// t.setAwaitTerminationSeconds(20);
 			// t.setAllowCoreThreadTimeOut(true);
 			// t.setKeepAliveSeconds(120);
 

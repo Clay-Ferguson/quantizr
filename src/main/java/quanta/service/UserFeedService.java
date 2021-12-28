@@ -169,7 +169,7 @@ public class UserFeedService extends ServiceBase  {
 				MongoSession _s = ms;
 				long lastActiveTime = sc.getLastActiveTime();
 				// do this work in async thread to make this query more performant
-				asyncExec.run(ThreadLocals.getContext(), () -> {
+				exec.run(() -> {
 					/*
 					 * setting last active time to this current time, will stop the GUI from showing the user an
 					 * indication that they have new messages, because we know they're querying messages NOW, so this is

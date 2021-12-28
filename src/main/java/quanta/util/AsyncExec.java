@@ -3,43 +3,58 @@ package quanta.util;
 import static quanta.util.Util.ok;
 import java.util.concurrent.Executor;
 import javax.annotation.PostConstruct;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 import quanta.config.ServiceBase;
 
 /*
- * Encapsulates any thread runs we need which need "ThreadLocals.setContext(tlc);"
+ * Wraps execution of a Runnable by the spring executor service. Warning: Don't try to refactor to use
+ * @Async annotation. That approach is dangerous and won't work in all scenarios
  */
 @Component
 public class AsyncExec extends ServiceBase {
+    private static final Logger log = LoggerFactory.getLogger(AsyncExec.class);
 
     @Autowired
     @Qualifier("threadPoolTaskExecutor")
     public Executor executor;
 
+    // Reflects the true concurrently count, and should represent the current number of running threads
+    // at all times.
+    int execCounter = 0;
+    int maxExecCounter = 0; // max value for execCounter ever
+
     @PostConstruct
     public void postConstruct() {
-        asyncExec = this;
+        exec = this;
     }
 
-    // Async seems to be tricky to configure after recent changes. It just doesn't work, so we just use
-    // 'executor.execute' instead.
-    // @Async("threadPoolTaskExecutor")
+    public void run(Runnable runnable) {
+        run(ThreadLocals.getContext(), runnable);
+    }
+
     public void run(ThreadLocalsContext tlc, Runnable runnable) {
         executor.execute(new Runnable() {
             public void run() {
-                if (ok(tlc)) {
-                    /*
-                     * if the currently executing threadId is the same as the one from the passed in 'tlc' we definitely
-                     * have a bug, and the @Async annotation is not having an effect.
-                     */
-                    if (Thread.currentThread().getId() == tlc.threadId) {
-                        throw new RuntimeException("AsyncExec ran synchronously! @Async got ignored.");
+                try {
+                    execCounter++;
+                    if (execCounter > maxExecCounter) {
+                        maxExecCounter = execCounter;
                     }
-                    ThreadLocals.setContext(tlc);
+                    if (ok(tlc)) {
+                        ThreadLocals.setContext(tlc);
+                    }
+                    runnable.run();
+                } catch (Exception e) {
+                    ExUtil.error(log, "exception in AsyncExec", e);
+                } finally {
+                    execCounter--;
+                    //log.debug("Finished thread: " + Thread.currentThread().getName() + " execCounter="
+                    //       + String.valueOf(execCounter) + " maxConcurrency=" + String.valueOf(maxExecCounter));
                 }
-                runnable.run();
             }
         });
     }

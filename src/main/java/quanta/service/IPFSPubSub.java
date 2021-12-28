@@ -69,7 +69,7 @@ public class IPFSPubSub extends ServiceBase {
         // swarmPeers();
 
         if (IPSM_ENABLE) {
-            asyncExec.run(null, () -> {
+            exec.run(null, () -> {
                 setOptions();
                 ipfs.doSwarmConnect();
                 Util.sleep(3000);
@@ -108,7 +108,7 @@ public class IPFSPubSub extends ServiceBase {
 
     public void openChannel(String topic) {
         if (IPSM_ENABLE) {
-            asyncExec.run(null, () -> {
+            exec.run(null, () -> {
                 log.debug("openChannel: " + topic);
                 // we do some reads every few seconds so we should pick up several heartbeats
                 // if there are any being sent from other servers

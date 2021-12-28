@@ -737,9 +737,9 @@ public class UserManagerService extends ServiceBase {
 			return res;
 		}
 
-		// This is concurrency safe because by the time we get to this asyncExec, we're done processing in
+		// This is concurrency safe because by the time we get to this async exec, we're done processing in
 		// this request thread.
-		asyncExec.run(ThreadLocals.getContext(), () -> {
+		exec.run(() -> {
 			MongoSession mst = ThreadLocals.getMongoSession();
 
 			// get the Friend List of the follower

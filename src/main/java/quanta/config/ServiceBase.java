@@ -99,7 +99,7 @@ public class ServiceBase {
 	public static GraphNodesService graphNodes;
 	public static ActPubOutbox apOutbox;
 	public static EnglishDictionary english;
-	public static AsyncExec asyncExec;
+	public static AsyncExec exec;
 	public static NodeSearchService search;
 	public static CallProcessor callProc;
 	public static NodeMoveService move;

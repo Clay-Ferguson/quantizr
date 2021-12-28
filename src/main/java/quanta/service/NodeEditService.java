@@ -522,7 +522,7 @@ public class NodeEditService extends ServiceBase {
 				 * search of them, and a load/update of their outbox
 				 */
 				if (friendUserName.contains("@")) {
-					asyncExec.run(ThreadLocals.getContext(), () -> {
+					exec.run(() -> {
 						arun.run(s -> {
 							if (!ThreadLocals.getSC().isAdmin()) {
 								apub.getAcctNodeByUserName(s, friendUserName);

@@ -238,7 +238,7 @@ public class IPFSService extends ServiceBase {
     }
 
     public void ipfsAsyncPinNode(MongoSession ms, ObjectId nodeId) {
-        asyncExec.run(ThreadLocals.getContext(), () -> {
+        exec.run(() -> {
             // wait for node to be saved. Waits up to 30 seconds, because of the 10 retries.
             /*
              * todo-2: What we could do here instead of what is essentially polling we're doing is hook into the
