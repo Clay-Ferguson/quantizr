@@ -1,5 +1,7 @@
 #!/bin/bash
 
+# NOTE: First run 'build-distro.sh' before running this.
+
 source ./setenv-distro.sh
 
 # to publish, first login (signup here if needed: https://hub.docker.com)

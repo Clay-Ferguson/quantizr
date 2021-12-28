@@ -2,7 +2,7 @@
 
 IMPORTNAT: 
 
-This doc is about how to build the distribution files for Quanta, and is not the 'builder', in case that's what you're looking for.
+This doc is about how to build the distribution files for Quanta, but is not the 'builder', in case that's what you're looking for.
 
 NOTE: The tar file in this folder was created by running `build-distro.sh`. Note: Before you run this build script you should edit `setenv-distro-runner.sh` and `setenv-distro.sh` script files to bump up the QUANTA_VER to some future version number.
 
