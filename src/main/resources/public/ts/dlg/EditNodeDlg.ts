@@ -166,7 +166,7 @@ export class EditNodeDlg extends DialogBase {
                 if (!span) span = new Span();
                 span.addChild(new Icon({
                     title: `Node is a '${typeHandler.getName()}' type.`,
-                    className: iconClass + " iconMarginRight",
+                    className: iconClass + " iconMarginRight clickable",
                     onClick: this.openChangeNodeTypeDlg
                 }));
             }

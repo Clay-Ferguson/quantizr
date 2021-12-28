@@ -1255,7 +1255,7 @@ public class AppController extends ServiceBase implements ErrorController {
 
 	@RequestMapping(value = API_PATH + "/getNodeStats", method = RequestMethod.POST)
 	public @ResponseBody Object getNodeStats(@RequestBody GetNodeStatsRequest req, HttpSession session) {
-		SessionContext.checkReqToken();
+		// NO NOT HERE -> SessionContext.checkReqToken();
 		return callProc.run("getNodeStats", req, session, ms -> {
 			GetNodeStatsResponse res = new GetNodeStatsResponse();
 			search.getNodeStats(ms, req, res);
