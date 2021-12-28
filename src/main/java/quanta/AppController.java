@@ -168,10 +168,6 @@ public class AppController extends ServiceBase implements ErrorController {
 
 	public static final String API_PATH = "/mobile/api";
 
-	private static boolean THYMELEAF_VARS_FROM_TREE = false;
-	private static HashMap<String, String> welcomeMap = null;
-	private static final Object welcomeMapLock = new Object();
-
 	// maps classpath resource names to their md5 values
 	private static HashMap<String, String> thymeleafAttribs = null;
 
@@ -186,7 +182,6 @@ public class AppController extends ServiceBase implements ErrorController {
 
 	@RequestMapping(value = ERROR_MAPPING)
 	public String error(Model model) {
-		init();
 		model.addAttribute("hostAndPort", prop.getHostAndPort());
 		model.addAllAttributes(thymeleafAttribs);
 		// pulls up error.html
@@ -199,10 +194,6 @@ public class AppController extends ServiceBase implements ErrorController {
 		if (no(context)) {
 			throw new RuntimeException("Failed to autowire ApplicationContext");
 		}
-		init();
-	}
-
-	public void init() {
 		initThymeleafAttribs();
 	}
 
@@ -221,9 +212,6 @@ public class AppController extends ServiceBase implements ErrorController {
 		thymeleafAttribs.put("brandingAppName", prop.getConfigText("brandingAppName"));
 		thymeleafAttribs.put("brandingMetaContent", prop.getConfigText("brandingMetaContent"));
 		thymeleafAttribs.put("hostUrl", prop.getProtocolHostAndPort());
-		thymeleafAttribs.put("introSubtitle", prop.getConfigText("introSubtitle"));
-		thymeleafAttribs.put("intro1", prop.getConfigText("intro1"));
-		thymeleafAttribs.put("intro2", prop.getConfigText("intro2"));
 	}
 
 	/*
@@ -235,8 +223,10 @@ public class AppController extends ServiceBase implements ErrorController {
 	 * passCode is an auth code for a password reset
 	 * 
 	 * Renders with Thymeleaf
+	 * todo-0: we can get rid of "/app" now AFTER removing all references to /app in any urls, but leave 
+	 * the mapping HERE for a while after, to be sure. Do this tweak in a dedicated commit.
 	 */
-	@RequestMapping(value = {"/app", "/n/{nameOnAdminNode}", "/u/{userName}/{nameOnUserNode}"})
+	@RequestMapping(value = {"/", "/app", "/n/{nameOnAdminNode}", "/u/{userName}/{nameOnUserNode}"})
 	public String index(//
 			// node name on 'admin' account. Non-admin named nodes use url
 			// "/u/userName/nodeName"
@@ -251,6 +241,7 @@ public class AppController extends ServiceBase implements ErrorController {
 			// so we will need to change that to the path format.
 			@RequestParam(value = "n", required = false) String name, //
 			@RequestParam(value = "passCode", required = false) String passCode, //
+			@RequestParam(value = "signupCode", required = false) String signupCode, //
 			Model model) {
 		try {
 			if (!MongoRepository.fullInit) {
@@ -298,47 +289,11 @@ public class AppController extends ServiceBase implements ErrorController {
 			ExUtil.error(log, "exception in call processor", e);
 		}
 
-		return "index";
-	}
-
-	/*
-	 * Renders with Thymeleaf
-	 */
-	@RequestMapping(value = {"/"})
-	public String welcome(@RequestParam(value = "signupCode", required = false) String signupCode, //
-			Model model) {
-		if (!MongoRepository.fullInit) {
-			throw new RuntimeException("Server temporarily offline.");
-		}
-		initThymeleafAttribs();
-
-		// NOTE: Not currently used. For now we are not initializing any of these page
-		// properties from the
-		// tree (database)
-		if (THYMELEAF_VARS_FROM_TREE) {
-			/*
-			 * Note: this refreshes only when ADMIN is accessing it, so it's slow in this case.
-			 */
-			if (no(welcomeMap) || PrincipalName.ADMIN.s().equals(ThreadLocals.getSC().getUserName())) {
-				synchronized (welcomeMapLock) {
-					HashMap<String, String> newMap = new HashMap<>();
-					// load content from a place that will not be a node visible to users
-					// leaving this commented here to show where/how to use it if needed in the
-					// future.
-					// nodeRenderService.thymeleafRenderNode(newMap, "pg_welcome");
-					welcomeMap = newMap;
-				}
-			}
-			model.addAllAttributes(welcomeMap);
-		}
-
 		if (ok(signupCode)) {
-			String signupResponse = user.processSignupCode(signupCode);
-			model.addAttribute("signupResponse", signupResponse);
+			ThreadLocals.getSC().setUserMessage(user.processSignupCode(signupCode));
 		}
 
-		model.addAllAttributes(thymeleafAttribs);
-		return "welcome";
+		return "index";
 	}
 
 	/*
@@ -352,16 +307,6 @@ public class AppController extends ServiceBase implements ErrorController {
 	public String demo(@PathVariable(value = "file", required = false) String file, //
 			Model model) {
 		initThymeleafAttribs();
-
-		// if (no(welcomeMap) ||
-		// PrincipalName.ADMIN.s().equals(sessionContext.getUserName())) {
-		// synchronized (welcomeMapLock) {
-		// HashMap<String, String> newMap = new HashMap<>();
-		// welcomePagePresent = nodeRenderService.thymeleafRenderNode(newMap,
-		// "pg_welcome");
-		// welcomeMap = newMap;
-		// }
-		// }
 
 		model.addAllAttributes(thymeleafAttribs);
 		return "demo/" + file;
@@ -1288,6 +1233,12 @@ public class AppController extends ServiceBase implements ErrorController {
 	public @ResponseBody Object getConfig(@RequestBody GetConfigRequest req, HttpSession session) {
 		// NO NOT HERE -> SessionContext.checkReqToken();
 		GetConfigResponse res = new GetConfigResponse();
+
+		// if we have a 'userMessage' on the session send it back now, and then forget it.
+		if (ok(ThreadLocals.getSC().getUserMessage())) {
+			prop.getConfig().put("userMessage", ThreadLocals.getSC().getUserMessage());
+			ThreadLocals.getSC().setUserMessage(null);
+		}
 		res.setConfig(prop.getConfig());
 		return res;
 	}

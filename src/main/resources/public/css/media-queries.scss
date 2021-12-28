@@ -4,10 +4,6 @@ Media Queries below are per Bootstap 4 standard */
 /* Small devices (tiny, 320px and up) */
 @media (min-width: 320px) {
 
-    .landingPageLogo {
-        width: 100%;
-    }
-
     .modal-lg {
         width: 300px;
         height: 400px;
@@ -20,10 +16,6 @@ Media Queries below are per Bootstap 4 standard */
 
 /* Small devices (portrait phones?, 576px and up) */
 @media (min-width: 576px) {
-
-    .landingPageLogo {
-        width: unset;
-    }
 
     .modal-lg {
         width: 500px;
@@ -38,10 +30,6 @@ Media Queries below are per Bootstap 4 standard */
 /* Medium devices (tablets, 768px and up) */
 @media (min-width: 768px) {
 
-    .landingPageLogo {
-        width: unset;
-    }
-
     .modal-lg {
         width: 700px;
         height: 700px;
@@ -54,10 +42,6 @@ Media Queries below are per Bootstap 4 standard */
 
 /* Large devices (desktops, 992px and up) */
 @media (min-width: 992px) {
-
-    .landingPageLogo {
-        width: unset;
-    }
 
     .modal-lg {
         width: 900px;
@@ -73,10 +57,6 @@ Media Queries below are per Bootstap 4 standard */
 
 @media (min-width: 1200px) {
 
-    .landingPageLogo {
-        width: unset;
-    }
-
     .modal-lg {
         width: 1198px;
         height: 1198px;
@@ -89,10 +69,6 @@ Media Queries below are per Bootstap 4 standard */
 
 //this size is non-standard and larger than anything bootstrap considers.
 @media (min-width: 1500px) {
-
-    .landingPageLogo {
-        width: unset;
-    }
 
     .modal-lg {
         width: 1498px;

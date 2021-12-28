@@ -99,16 +99,6 @@ module.exports = {
         }),
 
         new HtmlWebpackPlugin({
-            filename: "../../templates/welcome.html",
-            template: "welcomeTemplate.html",
-
-            // we don't want any path prefix on our bundle file so this is empty.
-            publicPath: "/dist",
-            scriptLoading: "blocking",
-            inject: "head"
-        }),
-
-        new HtmlWebpackPlugin({
             filename: "../../templates/demo/tsx-test.html",
             template: "tsx-testTemplate.html",
 

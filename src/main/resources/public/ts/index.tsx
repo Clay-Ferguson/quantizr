@@ -10,8 +10,7 @@ import "font-awesome/css/font-awesome.min.css";
 // set in index.html
 declare var __page;
 
-if ((window as any).__page === "index" || //
-    (window as any).__page === "welcome") {
+if ((window as any).__page === "index") {
     let factory = new Factory();
 }
 else if ((window as any).__page === "tsx-test") {

@@ -811,51 +811,5 @@ public class MongoUtil extends ServiceBase {
 		acl.addPrivilege(ms, publicHome, PrincipalName.PUBLIC.s(), Arrays.asList(PrivilegeType.READ.s()), null);
 
 		log.debug("Public Home Node exists at id: " + publicHome.getId() + " path=" + publicHome.getPath());
-
-		/*
-		 * create welcome page if not existing. This is the main landing page.
-		 * 
-		 * (todo-2: document this in User Guide technical section). This node need not be public, because
-		 * the system reads it, and it can be placed somewhere that users are not able to navigate directly
-		 * to it, so we default it to being directly in the server root, which is a private node
-		 */
-		created = new Val<>(Boolean.FALSE);
-		SubNode publicWelcome = snUtil.ensureNodeExists(ms, "/" + NodePath.ROOT, NodeName.WELCOME, "welcome-page",
-				"### Welcome Node\n\nDefault landing page content. Admin should edit this node, named 'welcome-page'", null, true,
-				null, created);
-
-		if (created.getVal()) {
-			acl.addPrivilege(ms, publicWelcome, PrincipalName.PUBLIC.s(), Arrays.asList(PrivilegeType.READ.s()), null);
-		}
-
-		log.debug("Welcome Page Node exists at id: " + publicWelcome.getId() + " path=" + publicWelcome.getPath());
-
-		// // ---------------------------------------------------------
-		// // NOTE: Do not delete this. May need this example in the future. This is
-		// // formerly the way we loaded the static
-		// // site content (landing page, etc) for the app, before using the Folder
-		// Synced
-		// // "content" folder which we currently use.
-		// // ImportZipService importZipService = (ImportZipService)
-		// // context.getBean(ImportZipService.class);
-		// // importZipService.inputZipFileFromResource(session, "classpath:home.zip",
-		// // publicNode, NodeName.HOME);
-		// // ---------------------------------------------------------
-		// SubNode node = getNode(session, "/" + NodePath.ROOT + "/" + NodePath.PUBLIC +
-		// "/" + NodeName.HOME);
-		// if (no(node )) {
-		// log.debug("Public node didn't exist. Creating.");
-		// node = getNode(session, "/" + NodePath.ROOT + "/" + NodePath.PUBLIC + "/" +
-		// NodeName.HOME);
-		// if (no(node )) {
-		// log.debug("Error reading node that was just imported.");
-		// } else {
-		// long childCount = getChildCount(node);
-		// log.debug("Verified Home Node has " + childCount + " children.");
-		// }
-		// } else {
-		// long childCount = getChildCount(node);
-		// log.debug("Home node already existed with " + childCount + " children");
-		// }
 	}
 }

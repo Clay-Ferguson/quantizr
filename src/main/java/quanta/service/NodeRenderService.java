@@ -57,8 +57,6 @@ public class NodeRenderService extends ServiceBase {
 	@Autowired
 	private ApplicationContext context;
 
-	private static RenderNodeResponse welcomePage;
-
 	@PostConstruct
 	public void postConstruct() {
 		render = this;
@@ -85,16 +83,6 @@ public class NodeRenderService extends ServiceBase {
 	 * page, this method gets called once per page and retrieves all the data for that page.
 	 */
 	public RenderNodeResponse renderNode(MongoSession ms, RenderNodeRequest req) {
-		boolean isWelcomePage = req.getNodeId().equals(":welcome-page");
-
-		/*
-		 * Return cached version of welcome page if generated, but not for admin because admin should be
-		 * able to make edits and then those edits update the cache
-		 */
-		if (isWelcomePage && ok(welcomePage) && !ms.isAdmin()) {
-			return welcomePage;
-		}
-
 		RenderNodeResponse res = new RenderNodeResponse();
 		ms = ThreadLocals.ensure(ms);
 		String targetId = req.getNodeId();
@@ -199,10 +187,6 @@ public class NodeRenderService extends ServiceBase {
 			}
 		}
 
-		if ("welcome-page".equals(node.getName())) {
-			isWelcomePage = true;
-		}
-
 		int limit = ConstantInt.ROWS_PER_PAGE.val();
 		if (ok(node)) {
 			// add pageSize hack to docs and admin part of user guide.
@@ -215,10 +199,6 @@ public class NodeRenderService extends ServiceBase {
 		NodeInfo nodeInfo = processRenderNode(ms, req, res, node, scanToNode, -1, 0, limit);
 		res.setNode(nodeInfo);
 		res.setSuccess(true);
-
-		if (isWelcomePage) {
-			NodeRenderService.welcomePage = res;
-		}
 
 		// todo-2: this was a quick fix, and this urlId handling is also a slight bit awkward and maybe
 		// needs to be reworked.

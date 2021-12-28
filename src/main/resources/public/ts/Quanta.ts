@@ -3,8 +3,6 @@ import { AppState } from "./AppState";
 import { App } from "./comp/App";
 import { Comp } from "./comp/base/Comp";
 import { CompIntf } from "./comp/base/CompIntf";
-import { OpenGraphPanel } from "./comp/OpenGraphPanel";
-import { WelcomePanel } from "./comp/WelcomePanel";
 import { Constants as C } from "./Constants";
 import { MainMenuDlg } from "./dlg/MainMenuDlg";
 import * as J from "./JavaIntf";
@@ -207,9 +205,7 @@ export class Quanta {
         }
 
         this.appInitialized = true;
-
         S.props.initConstants();
-        S.util.displaySignupMessage();
 
         window.addEventListener("orientationchange", () => {
             // we force the page to re-render with an all new state.
@@ -245,10 +241,6 @@ export class Quanta {
         if ((window as any).__page === "index") {
             this.app.updateDOM(store, "app");
         }
-        else if ((window as any).__page === "welcome") {
-            let welcomePanel = new WelcomePanel();
-            welcomePanel.updateDOM(store, "welcomePanel");
-        }
 
         /*
          * This call checks the server to see if we have a session already, and gets back the login information from
@@ -264,6 +256,10 @@ export class Quanta {
         let res: J.GetConfigResponse = await S.util.ajax<J.GetConfigRequest, J.GetConfigResponse>("getConfig");
         if (res.config) {
             S.quanta.config = res.config;
+            debugger;
+            if (S.quanta.config.userMessage) {
+                S.util.showMessage(S.quanta.config.userMessage, "");
+            }
         }
 
         Log.log("initApp complete.");

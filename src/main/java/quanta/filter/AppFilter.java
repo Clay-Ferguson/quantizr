@@ -76,7 +76,7 @@ public class AppFilter extends GenericFilterBean {
 
 				/*
 				 * if auth token is privided and doesn't exist that's a timed out session so send user back to
-				 * welcome page. Should also blow away all browser memory. New browser page load.
+				 * landing page. Should also blow away all browser memory. New browser page load.
 				 */
 				if (!StringUtils.isEmpty(bearer) && !SessionContext.validToken(bearer, null)) {
 					// just ignore an invalid token like it was not there.

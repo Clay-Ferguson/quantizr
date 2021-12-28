@@ -114,10 +114,6 @@ export class RightNavPanel extends Div {
                             }) : null,
                             clipboardPasteButton,
                             addNoteButton,
-                            new IconButton("fa-home", null, {
-                                title: g_brandingAppName + " Home",
-                                onClick: S.util.loadAnonPageHome
-                            }),
                             displayName && !state.isAnonUser ? new IconButton("fa-database", null, {
                                 title: "Go to your Account Root Node",
                                 onClick: e => S.nav.navHome(state)

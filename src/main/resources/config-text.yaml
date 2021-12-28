@@ -1,10 +1,5 @@
 brandingAppName: Quanta
 brandingMetaContent: "Quanta: Social Media Micro-blogging Platform for the Fediverse!"
-introSubtitle: Welcome to the Fediverse!
-intro1: >- 
-  A federated wiki, micro-blogging, social media, and publishing platform. 
-  Join the Fediverse Revolution!
-# intro2:
 
 # Tip: This 'menu' property is seen in TypeScript JSON as an array of objects in 
 # variable 'S.quanta.config'

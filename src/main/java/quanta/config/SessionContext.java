@@ -58,6 +58,9 @@ public class SessionContext extends ServiceBase {
 	private String timezone;
 	private String timeZoneAbbrev;
 
+	// Message to display to user at first convenient time.
+	private String userMessage;
+
 	// variable not currently being used (due to refactoring)
 	private long lastLoginTime;
 	private long lastActiveTime;
@@ -169,6 +172,7 @@ public class SessionContext extends ServiceBase {
 		sc.userToken = userToken;
 		sc.watchingPath = watchingPath;
 		sc.enableIPSM = enableIPSM;
+		sc.userMessage = userMessage;
 		return sc;
 	}
 
@@ -537,5 +541,13 @@ public class SessionContext extends ServiceBase {
 
 	public void setUserNodeId(ObjectId userNodeId) {
 		this.userNodeId = userNodeId;
+	}
+
+	public String getUserMessage() {
+		return userMessage;
+	}
+
+	public void setUserMessage(String userMessage) {
+		this.userMessage = userMessage;
 	}
 }

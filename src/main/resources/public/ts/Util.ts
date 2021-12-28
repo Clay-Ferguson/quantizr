@@ -1315,16 +1315,6 @@ export class Util {
         }
     }
 
-    displaySignupMessage = (): void => {
-        const signupElm = S.domUtil.domElm("signupCodeResponse");
-        if (signupElm) {
-            const signupResponse = signupElm.textContent;
-            if (signupResponse === "ok") {
-                S.util.showMessage("Signup complete.", "Note");
-            }
-        }
-    }
-
     loadAnonPageHome = async (state: AppState): Promise<void> => {
         Log.log("loadAnonPageHome()");
 
