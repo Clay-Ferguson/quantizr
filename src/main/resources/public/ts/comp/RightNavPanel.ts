@@ -49,16 +49,17 @@ export class RightNavPanel extends Div {
 
         let clipboardPasteButton = !state.isAnonUser ? new IconButton("fa-clipboard", null, {
             onClick: e => {
+                // todo-1: would be nice if this detected an image and saved as attachment.
                 S.edit.saveClipboardToChildNode("~" + J.NodeType.NOTES);
             },
-            title: "Save clipboard (under Notes node)"
+            title: "Save clipboard"
         }, "btn-secondary", "off") : null;
 
         let addNoteButton = !state.isAnonUser ? new IconButton("fa-sticky-note", null, {
             onClick: e => {
                 S.edit.addNode("~" + J.NodeType.NOTES, null, null, null, state);
             },
-            title: "Create new Note (under Notes node)"
+            title: "Create new Note"
         }, "btn-secondary", "off") : null;
 
         let panelCols = state.userPreferences.mainPanelCols || 5;

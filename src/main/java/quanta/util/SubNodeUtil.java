@@ -113,7 +113,7 @@ public class SubNodeUtil extends ServiceBase {
 	public String getFriendlyNodeUrl(MongoSession ms, SubNode node) {
 		// if node doesn't thave a name, make ID-based url
 		if (StringUtils.isEmpty(node.getName())) {
-			return String.format("%s/app?id=%s", prop.getHostAndPort(), node.getIdStr());
+			return String.format("%s?id=%s", prop.getHostAndPort(), node.getIdStr());
 		}
 		// else format this node name based on whether the node is admin owned or not.
 		else {
@@ -323,7 +323,7 @@ public class SubNodeUtil extends ServiceBase {
 
 		ret.setAttachmentUrl(url);
 		ret.setAttachmentMime(mime);
-		ret.setUrl(prop.getHostAndPort() + "/app?id=" + node.getIdStr());
+		ret.setUrl(prop.getHostAndPort() + "?id=" + node.getIdStr());
 		return ret;
 	}
 
@@ -345,6 +345,6 @@ public class SubNodeUtil extends ServiceBase {
 	}
 
 	public String getIdBasedUrl(SubNode node) {
-		return prop.getProtocolHostAndPort() + "/app?id=" + node.getIdStr();
+		return prop.getProtocolHostAndPort() + "?id=" + node.getIdStr();
 	}
 }

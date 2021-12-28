@@ -56,7 +56,7 @@ export class Render {
         to be able to have a link to a node of a specific name
 
         However, this also works and may be the more 'clear' way:
-        [Link Test App](/app?id=:my-test-name)
+        [Link Test App](?id=:my-test-name)
         */
         val = S.util.replaceAll(val, "{{byName}}", window.location.origin + window.location.pathname + "?id=:");
         val = S.util.replaceAll(val, "{{url}}", window.location.origin + window.location.pathname);
@@ -233,7 +233,7 @@ export class Render {
         /* we need this holder object because we don't have the dialog until it's created */
         const dlgHolder: any = {};
 
-        let byIdUrl = window.location.origin + "/app?id=" + node.id;
+        let byIdUrl = window.location.origin + "?id=" + node.id;
         children.push(new Heading(5, "By ID"), //
             new Div(byIdUrl, {
                 className: "anchorBigMarginBottom",
@@ -245,7 +245,7 @@ export class Render {
                 }
             }));
 
-        let markdownIdUrl = "[link](/app?id=" + node.id + ")";
+        let markdownIdUrl = "[link](?id=" + node.id + ")";
         children.push(new Heading(5, "Markdown Link"), //
             new Div(markdownIdUrl, {
                 className: "anchorBigMarginBottom",

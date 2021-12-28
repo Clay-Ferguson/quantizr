@@ -174,7 +174,7 @@ export class FullScreenGraphViewer extends Main {
                         .style("top", (event.pageY - 50) + "px");
 
                     if (d.data.id) {
-                        window.open(S.util.getHostAndPort() + "/app?id=" + d.data.id, "_blank");
+                        window.open(S.util.getHostAndPort() + "?id=" + d.data.id, "_blank");
                     }
                 })
 

@@ -822,7 +822,7 @@ export class Util {
             title = node.name;
         }
         else {
-            url = window.location.origin + "/app?id=" + node.id;
+            url = window.location.origin + "?id=" + node.id;
             if (childNode && childNode.id && childNode.id !== node.id) {
                 url += "#" + childNode.id;
             }

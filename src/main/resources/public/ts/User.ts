@@ -50,17 +50,6 @@ export class User {
         new SignupDlg(state).open();
     }
 
-    defaultHandleAnonUser = (state: AppState) => {
-        if (window.location.href.endsWith("/app")) {
-            setTimeout(() => {
-                S.nav.showPublicFediverse();
-            }, 10);
-        }
-        else {
-            S.util.loadAnonPageHome(null);
-        }
-    }
-
     refreshLogin = async (state: AppState): Promise<void> => {
         console.log("refreshLogin.");
 
@@ -68,7 +57,7 @@ export class User {
         /* if we have known state as logged out, then do nothing here */
         if (loginState === "0") {
             // console.log("loginState known as logged out.");
-            this.defaultHandleAnonUser(state);
+            S.util.loadAnonPageHome(null);
             return;
         }
 
@@ -85,7 +74,7 @@ export class User {
         console.log("refreshLogin with name: " + callUsr);
 
         if (!callUsr) {
-            this.defaultHandleAnonUser(state);
+            S.util.loadAnonPageHome(null);
         } else {
             try {
                 let res: J.LoginResponse = await S.util.ajax<J.LoginRequest, J.LoginResponse>("login", {
@@ -111,7 +100,7 @@ export class User {
                         S.util.setStateVarsUsingLoginResponse(res);
                     }
 
-                    this.defaultHandleAnonUser(state);
+                    S.util.loadAnonPageHome(null);
                 }
             }
             catch (e) {
@@ -148,7 +137,7 @@ export class User {
         S.push.close();
         S.quanta.authToken = null;
         S.quanta.userName = null;
-        window.location.href = window.location.origin; // + "/app";
+        window.location.href = window.location.origin;
     }
 
     deleteAllUserLocalDbEntries = (): Promise<any> => {
@@ -220,17 +209,8 @@ export class User {
                     // console.log("Node selected from homeNodeId: id=" + id);
                 }
             }
-
-            // console.log("Window: " + window.location.href);
-            if (window.location.href.endsWith("/app") && usr === J.PrincipalName.ANON) {
-                setTimeout(() => {
-                    S.nav.showPublicFediverse();
-                }, 10);
-            }
-            else {
-                // console.log("loginResponse final refresh id chosen: " + id);
-                S.view.refreshTree(id, true, renderLeafIfParent, childId, false, false, true, true, false, state);
-            }
+            // console.log("loginResponse final refresh id chosen: " + id);
+            S.view.refreshTree(id, true, renderLeafIfParent, childId, false, false, true, true, false, state);
         } else {
             console.log("LocalDb login failed.");
 

@@ -1031,7 +1031,7 @@ public class UserManagerService extends ServiceBase {
 			update.save(session, ownerNode);
 
 			String passCode = ownerNode.getIdStr() + "-" + String.valueOf(authCode);
-			String link = prop.getHostAndPort() + "/app?passCode=" + passCode;
+			String link = prop.getHostAndPort() + "?passCode=" + passCode;
 
 			String brandingAppName = prop.getConfigText("brandingAppName");
 

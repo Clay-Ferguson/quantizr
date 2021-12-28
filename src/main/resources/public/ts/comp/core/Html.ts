@@ -66,13 +66,13 @@ export class Html extends Comp {
 
             // Detect this is a link to this instance we are being served from...
             if (href && href.indexOf && (href.indexOf("/") === 0 || href.indexOf(window.location.origin) !== -1)) {
-                /* This code makes it where it where links to our own app that point to
+                /* This code makes it where links to our own app that point to
                 specific named locations on the tree will NOT open in separate browser tab but
                 will open in the current browser tab as is the default without the 'target='
                 attribute on an anchor tag. */
-                if (href.indexOf("/app?id=:") !== -1 ||
-                    href.indexOf("/app?id=~") !== -1 ||
-                    href.indexOf("/app?tab=") !== -1) {
+                if (href.indexOf("?id=:") !== -1 ||
+                    href.indexOf("?id=~") !== -1 ||
+                    href.indexOf("?tab=") !== -1) {
                     return;
                 }
             }

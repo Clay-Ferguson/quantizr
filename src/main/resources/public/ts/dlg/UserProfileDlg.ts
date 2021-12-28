@@ -178,7 +178,7 @@ export class UserProfileDlg extends DialogBase {
             /* This is the ID-based url (leave this here as FYI), but we use the more user-friendly one
              instead which ends with '/home'.
 
-             let url = window.location.origin + "/app?id=" + state.userProfile.homeNodeId;
+             let url = window.location.origin + "?id=" + state.userProfile.homeNodeId;
              */
             let url = window.location.origin + "/u/" + state.userProfile.userName + "/" + nodeName;
             window.open(url, "_blank");

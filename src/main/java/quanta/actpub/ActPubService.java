@@ -581,7 +581,7 @@ public class ActPubService extends ServiceBase {
         SubNode nodeBeingRepliedTo = null;
 
         /*
-         * Detect if inReplyTo is formatted like this: 'https://domain.com/app?id=xxxxx' (proprietary URL
+         * Detect if inReplyTo is formatted like this: 'https://domain.com?id=xxxxx' (proprietary URL
          * format for this server) and if so lookup the nodeBeingRepliedTo by using that nodeId
          */
         if (apUtil.isLocalUrl(inReplyTo)) {

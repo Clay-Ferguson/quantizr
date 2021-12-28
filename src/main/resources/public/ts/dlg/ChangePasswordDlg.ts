@@ -84,7 +84,7 @@ export class ChangePasswordDlg extends DialogBase {
             let dlg = new MessageDlg(msg, "Password Change",
                 () => {
                     if (this.passCode) {
-                        window.location.href = window.location.origin + "/app";
+                        window.location.href = window.location.origin;
                     }
                 }, null, false, 0, null, this.appState
             );

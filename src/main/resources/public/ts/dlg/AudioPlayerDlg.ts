@@ -215,7 +215,7 @@ export class AudioPlayerDlg extends DialogBase {
 
     getLink = (): string => {
         let port = (location.port !== "80" && location.port !== "443") ? (":" + location.port) : "";
-        let link = location.protocol + "//" + location.hostname + port + "/app?audioUrl=" + this.sourceUrl + "&t=" + Math.trunc(this.player.currentTime);
+        let link = location.protocol + "//" + location.hostname + port + "?audioUrl=" + this.sourceUrl + "&t=" + Math.trunc(this.player.currentTime);
         return link;
     }
 

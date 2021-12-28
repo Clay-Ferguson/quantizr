@@ -211,7 +211,7 @@ public class ActPubOutbox extends ServiceBase {
 
         String host = prop.getProtocolHostAndPort();
         APList retItems = null;
-        String nodeIdBase = host + "/app?id=";
+        String nodeIdBase = host + "?id=";
 
         try {
             SubNode userNode = read.getUserNodeByUserName(null, userName);

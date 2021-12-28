@@ -43,7 +43,7 @@ export class ServerPush {
             // this might work ok, but for now, let's just force a page repload
             let state = store.getState();
             // S.nav.login(state);
-            // window.location.href = window.location.origin + "/app";
+            // window.location.href = window.location.origin;
 
             new MessageDlg("Session ended.", "Quanta",
                 () => {
