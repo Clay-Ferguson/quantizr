@@ -50,6 +50,7 @@ export class EditNodeDlg extends DialogBase {
     header: Header;
     propertyEditFieldContainer: Div;
     uploadButton: IconButton;
+    propsButton: IconButton;
     deleteUploadButton: Div;
     deletePropButton: IconButton;
     public contentEditor: I.TextEditorIntf;
@@ -165,7 +166,8 @@ export class EditNodeDlg extends DialogBase {
                 if (!span) span = new Span();
                 span.addChild(new Icon({
                     title: `Node is a '${typeHandler.getName()}' type.`,
-                    className: iconClass + " iconMarginRight"
+                    className: iconClass + " iconMarginRight",
+                    onClick: this.openChangeNodeTypeDlg
                 }));
             }
         }
@@ -444,10 +446,6 @@ export class EditNodeDlg extends DialogBase {
         }
 
         let collapsiblePanel = !customProps ? new CollapsiblePanel(null, null, null, [
-            new Div(null, { className: "marginBottom marginRight marginTop" }, [
-                new Button("Type", this.openChangeNodeTypeDlg),
-                allowPropAdd && numPropsShowing === 0 ? new Button("Props", () => this.utl.addProperty(this)) : null
-            ]),
             nodeNameTextField, selectionsBar, checkboxesBar, propsTable
         ], false,
             (state: boolean) => {
@@ -483,10 +481,7 @@ export class EditNodeDlg extends DialogBase {
             typeHandler.ensureDefaultProperties(state.node);
         }
 
-        let allowPropertyAdd: boolean = typeHandler ? typeHandler.getAllowPropertyAdd() : true;
-
         // let allowContentEdit: boolean = typeHandler ? typeHandler.getAllowContentEdit() : true;
-
         // //regardless of value, if this property is present we consider the type locked
         // let typeLocked = !!S.props.getNodePropVal(J.NodeProp.TYPE_LOCK, state.node);
 
@@ -498,6 +493,7 @@ export class EditNodeDlg extends DialogBase {
 
         let numPropsShowing = this.utl.countPropsShowing(this);
         let advancedButtons: boolean = !!this.contentEditor;
+        let allowPropAdd: boolean = typeHandler ? typeHandler.getAllowPropertyAdd() : true;
 
         return new ButtonBar([
             new Button("Save", () => {
@@ -515,6 +511,14 @@ export class EditNodeDlg extends DialogBase {
             allowShare ? new IconButton("fa-users", null, {
                 onClick: () => this.utl.share(this),
                 title: "Share Node"
+            }) : null,
+
+            this.propsButton = allowPropAdd && numPropsShowing === 0 ? new IconButton("fa-th-list", null, {
+                onClick: () => {
+                    EditNodeDlg.morePanelExpanded = true;
+                    this.utl.addProperty(this);
+                },
+                title: "Add Property"
             }) : null,
 
             this.editorHelp ? new HelpButton(() => this.editorHelp) : null,
