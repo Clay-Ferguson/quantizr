@@ -26,13 +26,16 @@ import quanta.util.Util;
 
 /**
  * Session object holding state per user session.
+ * 
+ * todo-0: Need to refactor so that the only session-specific data are things that apply to THIS
+ * server node instance and wouldn't be something that would make load balancer nodes have issues.
  */
 @Component
 @Scope("prototype")
 public class SessionContext extends ServiceBase {
 	@Autowired
 	private ApplicationContext context;
-	
+
 	// DO NOT DELETE (keep for future ref)
 	// implements InitializingBean, DisposableBean {
 	private static final Logger log = LoggerFactory.getLogger(SessionContext.class);

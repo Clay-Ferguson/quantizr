@@ -48,10 +48,6 @@ export class EditNodeDlg extends DialogBase {
     static embedInstance: EditNodeDlg;
     editorHelp: string = null;
     header: Header;
-    propertyEditFieldContainer: Div;
-    uploadButton: IconButton;
-    propsButton: IconButton;
-    deleteUploadButton: Div;
     deletePropButton: IconButton;
     public contentEditor: I.TextEditorIntf;
     contentEditorState: ValidatedState<any> = new ValidatedState<any>();
@@ -105,12 +101,12 @@ export class EditNodeDlg extends DialogBase {
 
     createLayoutSelection = (): Selection => {
         let selection: Selection = new Selection(null, "Layout", [
-            { key: "v", val: "1 column" },
-            { key: "c2", val: "2 columns" },
-            { key: "c3", val: "3 columns" },
-            { key: "c4", val: "4 columns" },
-            { key: "c5", val: "5 columns" },
-            { key: "c6", val: "6 columns" }
+            { key: "v", val: "1 col" },
+            { key: "c2", val: "2 col" },
+            { key: "c3", val: "3 col" },
+            { key: "c4", val: "4 col" },
+            { key: "c5", val: "5 col" },
+            { key: "c6", val: "6 col" }
         ], "width-7rem", "col-3", new PropValueHolder(this.getState<LS>().node, J.NodeProp.LAYOUT, "v"));
         return selection;
     }
@@ -222,39 +218,17 @@ export class EditNodeDlg extends DialogBase {
         }
 
         let allowContentEdit: boolean = typeHandler ? typeHandler.getAllowContentEdit() : true;
-
+        let propertyEditFieldContainer: Div = null;
         let children = [
             S.speech.speechActive ? new TextContent("Speech-to-Text active. Mic listening...", "alert alert-primary") : null,
             new Form(null, [
                 new Div(null, {
                 }, [
-                    this.propertyEditFieldContainer = new Div("", {
+                    propertyEditFieldContainer = new Div("", {
                     })
                 ])
             ])
         ];
-
-        let encryptCheckBox: Checkbox = !customProps ? new Checkbox("Encrypt", { className: "marginLeft" }, {
-            setValue: (checked: boolean): void => {
-                this.utl.setEncryption(this, checked);
-            },
-            getValue: (): boolean => {
-                return S.props.isEncrypted(state.node);
-            }
-        }, "col-3") : null;
-
-        let wordWrapCheckbox = new Checkbox("Word Wrap", { className: "marginLeft" }, {
-            setValue: (checked: boolean): void => {
-                // this is counter-intuitive that we invert here because 'NOWRAP' is a negation of "wrap"
-                S.props.setNodePropVal(J.NodeProp.NOWRAP, state.node, checked ? null : "1");
-                if (this.contentEditor) {
-                    this.contentEditor.setWordWrap(checked);
-                }
-            },
-            getValue: (): boolean => {
-                return S.props.getNodePropVal(J.NodeProp.NOWRAP, state.node) !== "1";
-            }
-        }, "col-3");
 
         let selectionsBar = new Div(null, { className: "row marginTop" }, [
             state.node.hasChildren ? this.createLayoutSelection() : null,
@@ -263,15 +237,7 @@ export class EditNodeDlg extends DialogBase {
             this.createPrioritySelection()
         ]);
 
-        let checkboxesBar = new Div(null, { className: "row marginLeft marginTop" }, [
-            state.node.hasChildren ? new Checkbox("Inline Children", null,
-                this.makeCheckboxPropValueHandler(J.NodeProp.INLINE_CHILDREN), "col-3") : null,
-            wordWrapCheckbox,
-            encryptCheckBox
-        ]);
-
-        let imgSizeSelection = S.props.hasImage(state.node) ? this.createImgSizeSelection("Image Size", false, "float-end", //
-            new PropValueHolder(this.getState<LS>().node, J.NodeProp.IMG_SIZE, "100%")) : null;
+        let checkboxesBar = this.makeCheckboxesRow(state, customProps);
 
         // This is the table that contains the custom editable properties inside the collapsable panel at the bottom.
         let propsTable: Comp = null;
@@ -299,7 +265,7 @@ export class EditNodeDlg extends DialogBase {
 
         let nodeNameTextField = null;
         if (!customProps) {
-            nodeNameTextField = new TextField("Node Name", false, null, null, false, this.nameState);
+            nodeNameTextField = new TextField("Node Name", false, null, "nodeNameTextField", false, this.nameState);
         }
 
         if (allowContentEdit) {
@@ -362,70 +328,7 @@ export class EditNodeDlg extends DialogBase {
             }
         }
 
-        let binarySection: LayoutRow = null;
-        if (hasAttachment) {
-            let ipfsLink = S.props.getNodePropVal(J.NodeProp.IPFS_LINK, state.node);
-            let mime = S.props.getNodePropVal(J.NodeProp.BIN_MIME, state.node);
-
-            let pinCheckbox: Checkbox = null;
-            if (ipfsLink) {
-                pinCheckbox = new Checkbox("IPFS Pinned", { className: "ipfsPinnedCheckbox" }, {
-                    setValue: (checked: boolean): void => {
-                        if (checked) {
-                            this.utl.deleteProperties(this, [J.NodeProp.IPFS_REF]);
-                        }
-                        else {
-                            S.props.setNodePropVal(J.NodeProp.IPFS_REF, this.getState<LS>().node, "1");
-                        }
-                    },
-                    getValue: (): boolean => {
-                        return S.props.getNodeProp(J.NodeProp.IPFS_REF, state.node) ? false : true;
-                    }
-                });
-            }
-
-            // NOTE: col numbers in the children of LayoutRow must add up to 12 (per bootstrap)!
-            let topBinRow = new HorizontalLayout([
-                new Div(null, { className: "bigMarginRight" }, [
-                    new Div((ipfsLink ? "IPFS " : "") + "Attachment", {
-                        className: "smallHeading"
-                    }),
-                    new NodeCompBinary(state.node, true, false, null),
-                    this.deleteUploadButton = new Div("Delete", {
-                        className: "deleteAttachmentLink",
-                        onClick: () => this.utl.deleteUpload(this),
-                        title: "Delete this attachment"
-                    })
-                ]),
-
-                new HorizontalLayout([
-                    imgSizeSelection,
-                    pinCheckbox
-                ])
-
-                // todo-2: this is not doing what I want but it unimportant so removing it for now.
-                // ipfsLink ? new Button("IPFS Link", () => S.render.showNodeUrl(state.node, this.appState), { title: "Show the IPFS URL for the attached file." }) : null
-            ]);
-
-            let bottomBinRow = null;
-            if (ipfsLink) {
-                bottomBinRow = new Div(null, { className: "marginLeft marginBottom" }, [
-                    ipfsLink ? new Div(`CID: ${ipfsLink}`, {
-                        className: "clickable",
-                        title: "Click -> Copy to clipboard",
-                        onClick: () => {
-                            S.util.copyToClipboard(`ipfs://${ipfsLink}`);
-                            S.util.flashMessage("Copied IPFS link to Clipboard", "Clipboard", true);
-                        }
-                    }) : null,
-                    ipfsLink ? new Div(`Type: ${mime}`) : null
-                ]);
-            }
-
-            binarySection = new Div(null, { className: "marginLeft binaryEditorSection editBinaryContainer" }, [
-                topBinRow, bottomBinRow
-            ]);
-        }
+        let binarySection: LayoutRow = hasAttachment ? this.makeBinarySection(state) : null;
 
         let sharingNames = S.nodeUtil.getSharingNames(state.node, false);
         let sharingDiv = null;
@@ -456,9 +359,110 @@ export class EditNodeDlg extends DialogBase {
             collapsiblePanel
         ]);
 
-        this.propertyEditFieldContainer.setChildren([mainPropsTable, sharingDiv, sharingDivClearFix, binarySection, rightFloatButtons,
+        propertyEditFieldContainer.setChildren([mainPropsTable, sharingDiv, sharingDivClearFix, binarySection, rightFloatButtons,
             new Clearfix()]);
         return children;
+    }
+
+    // Generate GUI for handling the display info about any Node Attachments
+    makeBinarySection = (state: LS) => {
+        let ipfsLink = S.props.getNodePropVal(J.NodeProp.IPFS_LINK, state.node);
+        let mime = S.props.getNodePropVal(J.NodeProp.BIN_MIME, state.node);
+
+        let pinCheckbox: Checkbox = null;
+        if (ipfsLink) {
+            pinCheckbox = new Checkbox("IPFS Pinned", { className: "ipfsPinnedCheckbox" }, {
+                setValue: (checked: boolean): void => {
+                    if (checked) {
+                        this.utl.deleteProperties(this, [J.NodeProp.IPFS_REF]);
+                    }
+                    else {
+                        S.props.setNodePropVal(J.NodeProp.IPFS_REF, this.getState<LS>().node, "1");
+                    }
+                },
+                getValue: (): boolean => {
+                    return S.props.getNodeProp(J.NodeProp.IPFS_REF, state.node) ? false : true;
+                }
+            });
+        }
+
+        let imgSizeSelection = S.props.hasImage(state.node) ? this.createImgSizeSelection("Image Size", false, "float-end", //
+            new PropValueHolder(this.getState<LS>().node, J.NodeProp.IMG_SIZE, "100%")) : null;
+
+        // NOTE: col numbers in the children of LayoutRow must add up to 12 (per bootstrap)!
+        let topBinRow = new HorizontalLayout([
+            new Div(null, { className: "bigMarginRight" }, [
+                new Div((ipfsLink ? "IPFS " : "") + "Attachment", {
+                    className: "smallHeading"
+                }),
+                new NodeCompBinary(state.node, true, false, null)
+            ]),
+
+            new HorizontalLayout([
+                new Button("Remove", () => this.utl.deleteUpload(this), {
+                    className: "marginRight",
+                    title: "Remove this attachment"
+                }),
+                imgSizeSelection,
+                pinCheckbox
+            ])
+
+            // todo-2: this is not doing what I want but is unimportant so removing it for now.
+            // ipfsLink ? new Button("IPFS Link", () => S.render.showNodeUrl(state.node, this.appState), { title: "Show the IPFS URL for the attached file." }) : null
+        ]);
+
+        let bottomBinRow = null;
+        if (ipfsLink) {
+            bottomBinRow = new Div(null, { className: "marginLeft marginBottom" }, [
+                ipfsLink ? new Div(`CID: ${ipfsLink}`, {
+                    className: "clickable",
+                    title: "Click -> Copy to clipboard",
+                    onClick: () => {
+                        S.util.copyToClipboard(`ipfs://${ipfsLink}`);
+                        S.util.flashMessage("Copied IPFS link to Clipboard", "Clipboard", true);
+                    }
+                }) : null,
+                ipfsLink ? new Div(`Type: ${mime}`) : null
+            ]);
+        }
+
+        return new Div(null, { className: "marginLeft binaryEditorSection editBinaryContainer" }, [
+            topBinRow, bottomBinRow
+        ]);
+    }
+
+    // Creates the row of checkboxes for Encryption, Word Wrap, and Inlinen Children options.
+    makeCheckboxesRow = (state: LS, customProps: string[]): Div => {
+        let encryptCheckBox: Checkbox = !customProps ? new Checkbox("Encrypt", { className: "marginLeft" }, {
+            setValue: (checked: boolean): void => {
+                this.utl.setEncryption(this, checked);
+            },
+            getValue: (): boolean => {
+                return S.props.isEncrypted(state.node);
+            }
+        }, "col-3") : null;
+
+        let wordWrapCheckbox = new Checkbox("Word Wrap", { className: "marginLeft" }, {
+            setValue: (checked: boolean): void => {
+                // this is counter-intuitive that we invert here because 'NOWRAP' is a negation of "wrap"
+                S.props.setNodePropVal(J.NodeProp.NOWRAP, state.node, checked ? null : "1");
+                if (this.contentEditor) {
+                    this.contentEditor.setWordWrap(checked);
+                }
+            },
+            getValue: (): boolean => {
+                return S.props.getNodePropVal(J.NodeProp.NOWRAP, state.node) !== "1";
+            }
+        }, "col-3");
+
+        let inlineChildrenCheckbox = state.node.hasChildren ? new Checkbox("Inline Children", null,
+            this.makeCheckboxPropValueHandler(J.NodeProp.INLINE_CHILDREN), "col-3") : null;
+
+        return new Div(null, { className: "row marginLeft marginTop" }, [
+            inlineChildrenCheckbox,
+            wordWrapCheckbox,
+            encryptCheckBox
+        ]);
     }
 
     makeCheckboxPropValueHandler(propName: string): I.ValueIntf {
@@ -503,7 +507,7 @@ export class EditNodeDlg extends DialogBase {
 
             new Button("Cancel", () => this.utl.cancelEdit(this), null),
 
-            this.uploadButton = allowUpload ? new IconButton("fa-upload", null, {
+            allowUpload ? new IconButton("fa-upload", null, {
                 onClick: () => this.utl.upload(this),
                 title: "Upload file attachment"
             }) : null,
@@ -513,7 +517,7 @@ export class EditNodeDlg extends DialogBase {
                 title: "Share Node"
             }) : null,
 
-            this.propsButton = allowPropAdd && numPropsShowing === 0 ? new IconButton("fa-th-list", null, {
+            allowPropAdd && numPropsShowing === 0 ? new IconButton("fa-th-list", null, {
                 onClick: () => {
                     EditNodeDlg.morePanelExpanded = true;
                     this.utl.addProperty(this);

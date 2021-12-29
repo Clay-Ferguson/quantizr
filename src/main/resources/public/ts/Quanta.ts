@@ -254,6 +254,7 @@ export class Quanta {
         this.setOverlay(false);
         S.util.playAudioIfRequested();
 
+        // This timer delay is just for asthetics and should not be required.
         setTimeout(async () => {
             let res: J.GetConfigResponse = await S.util.ajax<J.GetConfigRequest, J.GetConfigResponse>("getConfig");
             if (res.config) {
@@ -262,7 +263,6 @@ export class Quanta {
                     S.util.showMessage(S.quanta.config.userMessage, "");
                 }
             }
-            // todo-0: this timer is part of an emergency fix, to make this happen after logins.
         }, 2500);
 
         Log.log("initApp complete.");

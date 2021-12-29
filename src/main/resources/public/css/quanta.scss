@@ -128,6 +128,10 @@ body {
     margin-left: 10px;
 }
 
+.nodeNameTextField {
+    max-width: 30em;
+}
+
 .displayNameTextField {
     max-width: 50%;
 }
@@ -1590,10 +1594,6 @@ i'm backing out for now
     cursor: pointer;
     border: 1px solid gray;
     border-radius: $border-radius;
-}
-
-.deleteAttachmentLink {
-    cursor: pointer;
 }
 
 .dialogContentArea {
