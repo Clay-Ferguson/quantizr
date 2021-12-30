@@ -142,7 +142,7 @@ export class UserProfileDlg extends DialogBase {
 
                     !this.appState.isAnonUser && this.readOnly && state.userProfile.userName !== this.appState.userName ? new Button("Message", this.sendMessage) : null,
                     !this.appState.isAnonUser && !state.userProfile.following && this.readOnly && state.userProfile.userName !== this.appState.userName ? new Button("Follow", this.addFriend) : null,
-                    !this.appState.isAnonUser && !state.userProfile.blocked && this.readOnly && state.userProfile.userName !== this.appState.userName ? new Button("Block User", this.blockUser) : null,
+                    !this.appState.isAnonUser && !state.userProfile.blocked && this.readOnly && state.userProfile.userName !== this.appState.userName ? new Button("Block", this.blockUser) : null,
                     state.userProfile.actorUrl ? new Button("Go to User Page", () => {
                         window.open(state.userProfile.actorUrl, "_blank");
                     }) : null,
@@ -219,7 +219,14 @@ export class UserProfileDlg extends DialogBase {
         let res: J.AddFriendResponse = await S.util.ajax<J.AddFriendRequest, J.AddFriendResponse>("addFriend", {
             userName: state.userProfile.userName
         });
-        S.util.showMessage(res.message, "New Friend");
+
+        if (res.success) {
+            state.userProfile.following = true;
+            state.userProfile.blocked = false;
+            this.mergeState<LS>({
+                userProfile: state.userProfile
+            });
+        }
     }
 
     sendMessage = (): void => {
@@ -231,10 +238,17 @@ export class UserProfileDlg extends DialogBase {
 
     blockUser = async () => {
         const state: any = this.getState<LS>();
-        await S.util.ajax<J.BlockUserRequest, J.BlockUserResponse>("blockUser", {
+        let res: J.BlockUserResponse = await S.util.ajax<J.BlockUserRequest, J.BlockUserResponse>("blockUser", {
             userName: state.userProfile.userName
         });
-        S.util.showMessage("Blocked User: " + state.userProfile.userName);
+
+        if (res.success) {
+            state.userProfile.blocked = true;
+            state.userProfile.following = false;
+            this.mergeState<LS>({
+                userProfile: state.userProfile
+            });
+        }
     }
 
     close(): void {
