@@ -52,7 +52,6 @@ public class MongoAppConfig extends AbstractMongoClientConfiguration {
 	private GridFSBucket gridFsBucket;
 	private GridFsTemplate grid;
 	private SimpleMongoClientDatabaseFactory factory;
-	private MappingMongoConverter converter;
 
 	/**
 	 * we have this so we can set it to true and know that MongoDb failed and gracefully run in case we
@@ -191,8 +190,6 @@ public class MongoAppConfig extends AbstractMongoClientConfiguration {
 	@Bean
 	public MongoTemplate mongoTemplate(MongoDatabaseFactory databaseFactory, MappingMongoConverter converter) {
 		if (no(ops)) {
-			// todo-0: slight hack here. Is there a better way to just 'get' the converter when needed
-			this.converter = converter;
 			log.debug("create mongoTemplate");
 			ops = super.mongoTemplate(databaseFactory, converter);
 			ops.setWriteResultChecking(WriteResultChecking.EXCEPTION);
@@ -210,10 +207,10 @@ public class MongoAppConfig extends AbstractMongoClientConfiguration {
 		if (no(grid)) {
 			MongoDatabaseFactory mdbf = mongoDbFactory();
 			if (ok(mdbf)) {
-				if (no(converter)) {
-					log.debug("no converter is ready yet in gridFsTemplate");
+				if (no(ops)) {
+					throw new RuntimeException("called gridFsTemplate before mongoTemplate is ready");
 				}
-				grid = new GridFsTemplate(mdbf, converter);
+				grid = new GridFsTemplate(mdbf, ops.getConverter());
 			} else {
 				return null;
 			}
