@@ -564,7 +564,7 @@ export class EditNodeDlg extends DialogBase {
                 onClick: () => this.utl.insertEmoji(this)
             }) : null,
             typeHandler && typeHandler.getName() && typeHandler.getTypeName() !== "u" ? new Span(typeHandler.getName(), {
-                className: "float-end typeName"
+                className: "float-end typeName marginRight"
             }) : null
         ]);
     }
