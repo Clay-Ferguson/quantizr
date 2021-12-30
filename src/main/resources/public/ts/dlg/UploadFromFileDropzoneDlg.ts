@@ -41,6 +41,13 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
     constructor(private nodeId: string, private binSuffix: string, private toIpfs: boolean, //
         private autoAddFile: File, private importMode: boolean, public allowRecording: boolean, state: AppState, public afterUploadFunc: Function) {
         super(importMode ? "Import File" : "Upload File", null, false, state);
+
+        // if control key is down we trigger a click on the "Clipboard" button for the user.
+        if (S.util.ctrlKeyCheck()) {
+            setTimeout(() => {
+                this.uploadFromClipboard();
+            }, 700);
+        }
     }
 
     renderDlg(): CompIntf[] {

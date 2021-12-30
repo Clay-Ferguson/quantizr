@@ -204,35 +204,30 @@ export class Edit {
         }
 
         if (S.util.ctrlKeyCheck()) {
-            let dlg: ConfirmDlg = new ConfirmDlg("Paste your clipboard content into a new node?", "Create from Clipboard", //
-                null, null, state);
-            await dlg.open();
-            if (dlg.yes) {
-                let clipboardText = await (navigator as any).clipboard.readText();
-                if (nodeInsertTarget) {
-                    await S.util.ajax<J.InsertNodeRequest, J.InsertNodeResponse>("insertNode", {
-                        pendingEdit: false,
-                        parentId: parentNode.id,
-                        targetOrdinal: nodeInsertTarget.ordinal + ordinalOffset,
-                        newNodeName: "",
-                        typeName: typeName || "u",
-                        initialValue: clipboardText
-                    });
-                } else {
-                    await S.util.ajax<J.CreateSubNodeRequest, J.CreateSubNodeResponse>("createSubNode", {
-                        pendingEdit: false,
-                        nodeId: parentNode.id,
-                        newNodeName: "",
-                        typeName: typeName || "u",
-                        createAtTop,
-                        content: clipboardText,
-                        typeLock: false,
-                        properties: null,
-                        shareToUserId: null
-                    });
-                }
-                S.quanta.refresh(state);
+            let clipboardText = await (navigator as any).clipboard.readText();
+            if (nodeInsertTarget) {
+                await S.util.ajax<J.InsertNodeRequest, J.InsertNodeResponse>("insertNode", {
+                    pendingEdit: false,
+                    parentId: parentNode.id,
+                    targetOrdinal: nodeInsertTarget.ordinal + ordinalOffset,
+                    newNodeName: "",
+                    typeName: typeName || "u",
+                    initialValue: clipboardText
+                });
+            } else {
+                await S.util.ajax<J.CreateSubNodeRequest, J.CreateSubNodeResponse>("createSubNode", {
+                    pendingEdit: false,
+                    nodeId: parentNode.id,
+                    newNodeName: "",
+                    typeName: typeName || "u",
+                    createAtTop,
+                    content: clipboardText,
+                    typeLock: false,
+                    properties: null,
+                    shareToUserId: null
+                });
             }
+            S.quanta.refresh(state);
         }
         else {
             if (nodeInsertTarget) {
@@ -569,12 +564,7 @@ export class Edit {
         id = S.util.allowIdFromEvent(evt, id);
         const state = store.getState();
         if (S.util.ctrlKeyCheck()) {
-            let dlg: ConfirmDlg = new ConfirmDlg("Paste your clipboard content into a new node?", "Create from Clipboard", //
-                null, null, state);
-            await dlg.open();
-            if (dlg.yes) {
-                this.saveClipboardToChildNode(id);
-            }
+            this.saveClipboardToChildNode(id);
         }
         else {
             this.createSubNode(id, null, true, state.node, null);
@@ -874,12 +864,10 @@ export class Edit {
             shareToUserId: null
         });
 
-        let message = parentId ? "Clipboard saved" : "Clipboard text saved under Notes node.";
-        S.util.flashMessage(message + "...\n\n" + clipText, "Note", true);
         setTimeout(() => {
             let state: AppState = store.getState();
             S.view.refreshTree(null, true, false, null, false, false, true, true, false, state);
-        }, 4200);
+        }, 1000);
     }
 
     splitNode = async (node: J.NodeInfo, splitType: string, delimiter: string, state: AppState): Promise<void> => {
