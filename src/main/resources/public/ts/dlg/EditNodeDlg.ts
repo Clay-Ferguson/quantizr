@@ -505,7 +505,7 @@ export class EditNodeDlg extends DialogBase {
                 this.close();
             }, { title: "Save this node and close editor." }, "btn-primary"),
 
-            new Button("Cancel", () => this.utl.cancelEdit(this), null),
+            new Button("Cancel", () => this.utl.cancelEdit(this), null, "btn-secondary float-end"),
 
             allowUpload ? new IconButton("fa-upload", null, {
                 onClick: () => this.utl.upload(this),

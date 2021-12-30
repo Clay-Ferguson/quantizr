@@ -71,7 +71,7 @@ export class FriendsDlg extends DialogBase {
                     (this.getState<LS>().friends && !this.instantSelect) ? new Button("Choose", () => {
                         this.close();
                     }, null, "btn-primary") : null,
-                    new Button("Close", this.close)
+                    new Button("Close", this.close, null, "btn-secondary float-end")
                 ], "marginTop")
             ])
         ];

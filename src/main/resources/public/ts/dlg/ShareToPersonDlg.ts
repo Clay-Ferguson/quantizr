@@ -47,7 +47,7 @@ export class ShareToPersonDlg extends DialogBase {
                 new ButtonBar([
                     new Button("Share", this.shareNodeToPerson, null, "btn-primary"),
 
-                    new Button("Close", this.close)
+                    new Button("Close", this.close, null, "btn-secondary float-end")
                 ], "marginTop")
             ])
         ];

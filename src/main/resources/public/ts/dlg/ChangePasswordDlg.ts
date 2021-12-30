@@ -30,7 +30,7 @@ export class ChangePasswordDlg extends DialogBase {
                 this.passwordField = new TextField("New Password", true, null, null, false, this.pwdState),
                 new ButtonBar([
                     new Button("Change Password", this.changePassword, null, "btn-primary"),
-                    new Button("Close", this.close)
+                    new Button("Close", this.close, null, "btn-secondary float-end")
                 ], "marginTop")
             ])
         ];

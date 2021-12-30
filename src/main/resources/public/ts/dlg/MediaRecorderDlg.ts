@@ -189,7 +189,7 @@ export class MediaRecorderDlg extends DialogBase {
                     state.recording ? new Button("Stop", this.stop, null) : null,
                     state.recording || !this.continuable ? null : new Button("Play", this.play, null),
                     (!this.allowSave || (state.recording || !this.continuable)) ? null : new Button("Save", this.save, null),
-                    new Button(this.allowSave ? "Cancel" : "Close", this.cancel)
+                    new Button(this.allowSave ? "Cancel" : "Close", this.cancel, null, "btn-secondary float-end")
                 ], "marginTop"),
                 this.videoMode ? this.videoPlayer : null,
                 new Div("", { className: "marginTop" }, [audioSelect, videoSelect])

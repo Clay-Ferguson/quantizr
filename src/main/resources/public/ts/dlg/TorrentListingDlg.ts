@@ -64,7 +64,7 @@ export class TorrentListingDlg extends DialogBase {
         }
 
         children.push(new ButtonBar([
-            new Button("Close", this.close)
+            new Button("Close", this.close, null, "btn-secondary float-end")
         ], "marginTop"));
         return children;
     }

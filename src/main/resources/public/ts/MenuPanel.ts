@@ -7,7 +7,6 @@ import { Menu } from "./comp/Menu";
 import { MenuItem } from "./comp/MenuItem";
 import { MenuItemSeparator } from "./comp/MenuItemSeparator";
 import { Constants as C } from "./Constants";
-import { AddFriendDlg } from "./dlg/AddFriendDlg";
 import { ConfirmDlg } from "./dlg/ConfirmDlg";
 import { ImportCryptoKeyDlg } from "./dlg/ImportCryptoKeyDlg";
 import { ManageEncryptionKeysDlg } from "./dlg/ManageEncryptionKeysDlg";
@@ -40,12 +39,6 @@ export class MenuPanel extends Div {
 
     static openFriendsNode = () => {
         S.nav.openContentNode("~" + J.NodeType.FRIEND_LIST);
-    };
-
-    static addFriend = () => {
-        let state = store.getState();
-        let dlg = new AddFriendDlg(state);
-        dlg.open();
     };
 
     // DO NOT DELETE
@@ -197,12 +190,7 @@ export class MenuPanel extends Div {
 
     static showKeys = (): void => {
         let f = async () => {
-            let dlg: ConfirmDlg = new ConfirmDlg("Warning: Be sure you aren't sharing your screen. Security keys will be displayed!!", "Show Encryption Keys",
-                "btn-danger", "alert alert-danger", appState(null));
-            await dlg.open();
-            if (dlg.yes) {
-                new ManageEncryptionKeysDlg(appState(null)).open();
-            }
+            new ManageEncryptionKeysDlg(appState(null)).open();
         };
         f();
     };
@@ -305,11 +293,6 @@ export class MenuPanel extends Div {
         ]));
 
         children.push(new Menu("Friends", [
-            // DO NOT DELETE (keep for future reference)
-            // This addFriend feature does work just fine, but things are simpler if we just let users be discovered thru
-            // the search menu, and they'll be addable as friends from there.
-            // new MenuItem("Add Friend", MenuPanel.addFriend, !state.isAnonUser),
-
             new MenuItem("Friends", MenuPanel.openFriendsNode, !state.isAnonUser),
             new MenuItem("Followers", MenuPanel.showFollowers, !state.isAnonUser),
             new MenuItem("Blocked", MenuPanel.openBlockedUsersNode, !state.isAnonUser),

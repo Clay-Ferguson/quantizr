@@ -138,7 +138,7 @@ export class AudioPlayerDlg extends DialogBase {
                     new ButtonBar([
                         new Button("Copy", this.copyToClipboard),
                         !this.appState.isAnonUser ? new Button("Post", this.postComment) : null,
-                        new Button("Close", this.destroyPlayer)
+                        new Button("Close", this.destroyPlayer, null, "btn-secondary float-end")
                     ], "col-9 d-flex align-items-end"),
                     new Div(null, { className: "col-3 float-end" }, [
                         this.timeLeftTextField = new TextField("Timer (mins.)", false, null, "timeRemainingEditField", true, this.timeLeftState)

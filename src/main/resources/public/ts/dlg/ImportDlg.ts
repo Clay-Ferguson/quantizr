@@ -22,7 +22,7 @@ export class ImportDlg extends DialogBase {
             new TextField("File Name to Import", null, null, null, false, this.fileNameState),
             new ButtonBar([
                 new Button("Import", this.importNodes, null, "btn-primary"),
-                new Button("Close", this.close)
+                new Button("Close", this.close, null, "btn-secondary float-end")
             ], "marginTop")
         ];
     }

@@ -53,7 +53,7 @@ export class SharingDlg extends DialogBase {
                         if (this.dirty && this.appState.activeTab === C.TAB_MAIN) {
                             S.quanta.refresh(this.appState);
                         }
-                    }),
+                    }, null, "btn-secondary float-end"),
                     new HelpButton(() => S.quanta?.config?.help?.sharing?.dialog)
                 ], "marginTop")
             ])

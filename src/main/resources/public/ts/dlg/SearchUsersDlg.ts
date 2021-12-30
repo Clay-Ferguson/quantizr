@@ -112,7 +112,7 @@ export class SearchUsersDlg extends DialogBase {
                     // possible and not even all that difficult based on the existing code already written.
                     // new Button("Graph", this.graph, null, "btn-primary"),
                     // we can steal the 'graph' from from the other dialogs when needed.
-                    new Button("Close", this.close)
+                    new Button("Close", this.close, null, "btn-secondary float-end")
                 ], "marginTop")
             ])
         ];

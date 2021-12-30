@@ -146,7 +146,7 @@ export class UserProfileDlg extends DialogBase {
                     state.userProfile.actorUrl ? new Button("Go to User Page", () => {
                         window.open(state.userProfile.actorUrl, "_blank");
                     }) : null,
-                    new Button("Close", this.close, null)
+                    new Button("Close", this.close, null, "btn-secondary float-end")
                 ], "marginTop")
             ])
         ];

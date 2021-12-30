@@ -23,7 +23,7 @@ export class UploadFromTorrentDlg extends DialogBase {
                 new TextField("Existing Torrent/Magnet Link", false, null, null, false, this.urlState),
                 new ButtonBar([
                     this.uploadButton = new Button("Save", this.upload, null, "btn-primary"),
-                    new Button("Close", this.close)
+                    new Button("Close", this.close, null, "btn-secondary float-end")
                 ], "marginTop")
             ])];
 

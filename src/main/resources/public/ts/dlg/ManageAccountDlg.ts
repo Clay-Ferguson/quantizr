@@ -36,13 +36,10 @@ export class ManageAccountDlg extends DialogBase {
             new TextContent(this.getState<LS>().info, null, true),
             data ? new PieChart(data) : null,
 
-            new CollapsiblePanel(null, null, null, [
-                new Button("Close Account", this.closeAccount),
-                new Button("Change Password", this.changePassword)
-            ], false, null, false, "float-end"),
-
             new ButtonBar([
-                new Button("Close", this.close)
+                !this.appState.isAdminUser ? new Button("Close Account", this.closeAccount) : null,
+                new Button("Change Password", this.changePassword),
+                new Button("Close", this.close, null, "btn-secondary float-end")
             ], "marginTop")
         ];
     }

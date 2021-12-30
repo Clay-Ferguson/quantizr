@@ -107,7 +107,7 @@ export class LoginDlg extends DialogBase {
     renderButtons(): CompIntf {
         return new ButtonBar([
             new Button("Login", this.login, null, "btn-primary"),
-            new Button("Close", this.close)
+            new Button("Close", this.close, null, "btn-secondary float-end")
         ], "marginTop");
     }
 }

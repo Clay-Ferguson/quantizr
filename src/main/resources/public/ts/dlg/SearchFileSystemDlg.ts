@@ -45,7 +45,7 @@ export class SearchFileSystemDlg extends DialogBase {
                     this.searchTextState),
                 new ButtonBar([
                     new Button("Search", this.searchNodes),
-                    new Button("Close", this.close)
+                    new Button("Close", this.close, null, "btn-secondary float-end")
                 ], "marginTop")
             ])
         ];
