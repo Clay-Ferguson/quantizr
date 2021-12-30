@@ -27,7 +27,7 @@ import quanta.util.Util;
 /**
  * Session object holding state per user session.
  * 
- * todo-0: Need to refactor so that the only session-specific data are things that apply to THIS
+ * 1: Need to refactor so that the only session-specific data are things that apply to THIS
  * server node instance and wouldn't be something that would make load balancer nodes have issues.
  */
 @Component

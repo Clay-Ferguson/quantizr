@@ -221,7 +221,7 @@ public class AppController extends ServiceBase implements ErrorController {
 	 * 
 	 * passCode is an auth code for a password reset
 	 * 
-	 * Renders with Thymeleaf todo-0: we can get rid of "/app" now AFTER removing all references to /app
+	 * Renders with Thymeleaf. todo-0: we can get rid of "/app" now AFTER removing all references to /app
 	 * in any urls, but leave the mapping HERE for a while after, to be sure. Do this tweak in a
 	 * dedicated commit.
 	 */
@@ -281,7 +281,6 @@ public class AppController extends ServiceBase implements ErrorController {
 			} else {
 				ThreadLocals.getSC().setUrlId(null);
 			}
-
 		} catch (Exception e) {
 			// need to add some kind of message to exception to indicate to user something
 			// with the arguments went wrong.
@@ -291,7 +290,6 @@ public class AppController extends ServiceBase implements ErrorController {
 		if (ok(signupCode)) {
 			ThreadLocals.getSC().setUserMessage(user.processSignupCode(signupCode));
 		}
-
 		return "index";
 	}
 
