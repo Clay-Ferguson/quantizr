@@ -4,6 +4,7 @@ import static quanta.util.Util.no;
 import static quanta.util.Util.ok;
 import java.util.Calendar;
 import java.util.Date;
+import javax.annotation.PostConstruct;
 import org.bson.Document;
 import org.bson.types.ObjectId;
 import org.slf4j.Logger;
@@ -29,7 +30,7 @@ import quanta.util.XString;
  * persistence (reads/writes) of the MongoDB objects.
  */
 @Component
-public class MongoEventListener extends AbstractMongoEventListener<SubNode> { 
+public class MongoEventListener extends AbstractMongoEventListener<SubNode> {
 	private static final Logger log = LoggerFactory.getLogger(MongoEventListener.class);
 	private static final boolean verbose = false;
 
@@ -50,6 +51,11 @@ public class MongoEventListener extends AbstractMongoEventListener<SubNode> {
 
 	@Autowired
 	private EventPublisher publisher;
+
+	@PostConstruct
+	public void postConstruct() {
+		log.debug("MongoEventListener created.");
+	}
 
 	/**
 	 * What we are doing in this method is assigning the ObjectId ourselves, because our path must
@@ -142,8 +148,10 @@ public class MongoEventListener extends AbstractMongoEventListener<SubNode> {
 		 * New nodes can be given a path where they will allow the ID to play the role of the leaf 'name'
 		 * part of the path
 		 */
+		// log.debug("onBeforeSave: " + node.getPath() + " content=" + node.getContent() + " id=" + node.getIdStr());
 		if (node.getPath().endsWith("/?")) {
 			String path = mongoUtil.findAvailablePath(XString.removeLastChar(node.getPath()));
+			// log.debug("Actual Path Saved: " + path);
 			dbObj.put(SubNode.PATH, path);
 			node.setPath(path);
 		}

@@ -19,11 +19,14 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.event.ContextRefreshedEvent;
+import org.springframework.context.event.EventListener;
 import org.springframework.data.mongodb.MongoDatabaseFactory;
 import org.springframework.data.mongodb.config.AbstractMongoClientConfiguration;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.SimpleMongoClientDatabaseFactory;
 import org.springframework.data.mongodb.core.WriteResultChecking;
+import org.springframework.data.mongodb.core.convert.MappingMongoConverter;
 import org.springframework.data.mongodb.gridfs.GridFsTemplate;
 import org.springframework.data.mongodb.repository.config.EnableMongoRepositories;
 import quanta.config.AppProp;
@@ -49,6 +52,7 @@ public class MongoAppConfig extends AbstractMongoClientConfiguration {
 	private GridFSBucket gridFsBucket;
 	private GridFsTemplate grid;
 	private SimpleMongoClientDatabaseFactory factory;
+	private MappingMongoConverter converter;
 
 	/**
 	 * we have this so we can set it to true and know that MongoDb failed and gracefully run in case we
@@ -59,6 +63,12 @@ public class MongoAppConfig extends AbstractMongoClientConfiguration {
 	@Autowired
 	private AppProp appProp;
 
+	@EventListener
+	public void handleContextRefresh(ContextRefreshedEvent event) {
+		log.debug("MongoAppConfig. Context refreshed.");
+	}
+
+	@Override
 	@Bean
 	public MongoDatabaseFactory mongoDbFactory() {
 		log.debug("create mongoDbFactory");
@@ -70,10 +80,6 @@ public class MongoAppConfig extends AbstractMongoClientConfiguration {
 				MongoClient mc = mongoClient();
 				if (ok(mc)) {
 					factory = new SimpleMongoClientDatabaseFactory(mc, databaseName);
-
-					ops = new MongoTemplate(factory);
-					ops.setWriteResultChecking(WriteResultChecking.EXCEPTION);
-					ServiceBase.ops = ops;
 				} else {
 					return null;
 				}
@@ -100,6 +106,12 @@ public class MongoAppConfig extends AbstractMongoClientConfiguration {
 			}
 		}
 		return gridFsBucket;
+	}
+
+	// DO NOT REMOVE THIS. IT IS REQUIRED FOR THIS BEAN TO WORK.
+	@Bean
+	public MongoEventListener userCascadingMongoEventListener() {
+		return new MongoEventListener();
 	}
 
 	@Override
@@ -175,10 +187,16 @@ public class MongoAppConfig extends AbstractMongoClientConfiguration {
 	/**
 	 * MongoTemplate is thread-safe and can be reused everywhere in all threads.
 	 */
+	@Override
 	@Bean
-	public MongoTemplate mongoTemplate() throws Exception {
+	public MongoTemplate mongoTemplate(MongoDatabaseFactory databaseFactory, MappingMongoConverter converter) {
 		if (no(ops)) {
-			throw new RuntimeException("Accessed mongoTemplate before mongoFactory complete.");
+			// todo-0: slight hack here. Is there a better way to just 'get' the converter when needed
+			this.converter = converter;
+			log.debug("create mongoTemplate");
+			ops = super.mongoTemplate(databaseFactory, converter);
+			ops.setWriteResultChecking(WriteResultChecking.EXCEPTION);
+			ServiceBase.ops = ops;
 		}
 		return ops;
 	}
@@ -192,7 +210,10 @@ public class MongoAppConfig extends AbstractMongoClientConfiguration {
 		if (no(grid)) {
 			MongoDatabaseFactory mdbf = mongoDbFactory();
 			if (ok(mdbf)) {
-				grid = new GridFsTemplate(mdbf, mongoTemplate().getConverter());
+				if (no(converter)) {
+					log.debug("no converter is ready yet in gridFsTemplate");
+				}
+				grid = new GridFsTemplate(mdbf, converter);
 			} else {
 				return null;
 			}

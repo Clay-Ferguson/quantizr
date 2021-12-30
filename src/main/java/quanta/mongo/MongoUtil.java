@@ -55,7 +55,7 @@ public class MongoUtil extends ServiceBase {
 	private static final Logger log = LoggerFactory.getLogger(MongoUtil.class);
 
 	@Autowired
-    private AppProp prop;
+	private AppProp prop;
 
 	private static HashSet<String> testAccountNames = new HashSet<>();
 	private static SubNode systemRootNode;
@@ -173,8 +173,26 @@ public class MongoUtil extends ServiceBase {
 	 * Note that since we don't require to end with "/" this function can be extending an existing leaf
 	 * name, or if the path does end with "/", then it has the effect of finding a new leaf from
 	 * scratch.
+	 * 
+	 * If node is non-null we allow that node to have the path, but only that node, and if so we accept
+	 * that existing path as ok and valid.
 	 */
 	public String findAvailablePath(String path) {
+		// log.debug("findAvailablePath In: " + path);
+
+		/*
+		 * If the path we want doesn't exist at all we can use it, so check that case first, but only if we
+		 * don't have a path ending with slash because that means we KNOW we need to always find a new child
+		 * regardless of any existing ones
+		 */
+		if (!path.endsWith("/")) {
+			Query q = new Query();
+			q.addCriteria(Criteria.where(SubNode.PATH).is(path));
+			if (!ops.exists(q, SubNode.class)) {
+				return path;
+			}
+		}
+
 		int tries = 0;
 		while (true) {
 			/*
@@ -288,10 +306,8 @@ public class MongoUtil extends ServiceBase {
 		}
 		// ensure node starts with /r and not /r/p
 		else if (!pending && node.getPath().startsWith(pendingPath)) {
-			// get 'p' out of the path, first
+			// get pendingPath out of the path, first
 			String path = node.getPath().replace(pendingPath, rootPath);
-
-			// and finally ensure we have an UNUSED (not duplicate) path
 			path = findAvailablePath(path);
 			node.setPath(path);
 		}

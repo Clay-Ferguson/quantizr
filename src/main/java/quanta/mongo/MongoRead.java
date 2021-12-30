@@ -52,15 +52,15 @@ public class MongoRead extends ServiceBase {
     private SubNode dbRoot;
 
     @PostConstruct
-	public void postConstruct() {
-		read = this;
-	}
+    public void postConstruct() {
+        read = this;
+    }
 
     // we call this during app init so we don't need to have thread safety here the rest of the time.
     public SubNode getDbRoot() {
         synchronized (dbRootLock) {
             if (no(dbRoot)) {
-                dbRoot = findNodeByPath("/" + NodePath.ROOT);
+                dbRoot = findNodeByPath("/" + NodePath.ROOT, true);
             }
             return dbRoot;
         }
@@ -256,7 +256,7 @@ public class MongoRead extends ServiceBase {
         }
         // otherwise this is a path lookup
         else {
-            ret = findNodeByPath(identifier);
+            ret = findNodeByPath(identifier, true);
         }
 
         if (allowAuth) {
@@ -265,9 +265,9 @@ public class MongoRead extends ServiceBase {
         return ret;
     }
 
-    public SubNode findNodeByPath(String path) {
+    public SubNode findNodeByPath(String path, boolean useCache) {
         path = XString.stripIfEndsWith(path, "/");
-        SubNode ret = ThreadLocals.getCachedNode(path);
+        SubNode ret = useCache ? ThreadLocals.getCachedNode(path) : null;
         if (no(ret)) {
             Query q = new Query();
             q.addCriteria(Criteria.where(SubNode.PATH).is(path));
@@ -373,8 +373,7 @@ public class MongoRead extends ServiceBase {
          * ^\/aa\/bb\/([^\/])*$ (Note that in the java string the \ becomes \\ below...)
          * 
          */
-        Criteria crit =
-                Criteria.where(SubNode.PATH).regex(mongoUtil.regexDirectChildrenOfPath(no(node) ? "" : node.getPath()));
+        Criteria crit = Criteria.where(SubNode.PATH).regex(mongoUtil.regexDirectChildrenOfPath(no(node) ? "" : node.getPath()));
         if (ordered) {
             q.with(Sort.by(Sort.Direction.ASC, SubNode.ORDINAL));
         }
@@ -773,8 +772,8 @@ public class MongoRead extends ServiceBase {
     }
 
     /*
-     * Accepts either the 'userName' or the 'userNode' for the user. It's best to pass userNode if you have
-     * it, to avoid a DB query.
+     * Accepts either the 'userName' or the 'userNode' for the user. It's best to pass userNode if you
+     * have it, to avoid a DB query.
      */
     public SubNode getUserNodeByType(MongoSession ms, String userName, SubNode userNode, String content, String type,
             List<String> defaultPrivs, String defaultName) {
