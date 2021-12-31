@@ -198,9 +198,8 @@ public class SystemService extends ServiceBase {
 			sb.append(arg + "\n");
 		}
 
-		// oops this is worthless, because it's inside the docker image, but I'm leaving
-		// in place just in case in the future we do need to run some commands docker
-		// sb.append(runBashCommand("DISK STORAGE", "df -h"));
+		// Run command inside container 
+		//sb.append(runBashCommand("DISK STORAGE (Docker Container)", "df -h"));
 		return sb.toString();
 	}
 
@@ -244,8 +243,10 @@ public class SystemService extends ServiceBase {
 		// pb.redirectErrorStream(true);
 
 		StringBuilder output = new StringBuilder();
-		output.append("<pre>");
+		output.append("\n\n");
 		output.append(title);
+		output.append("\n");
+
 		try {
 			Process p = pb.start();
 			String s;
@@ -261,9 +262,9 @@ public class SystemService extends ServiceBase {
 			// p.getOutputStream().close();
 			// p.getErrorStream().close();
 		} catch (Exception e) {
-			// todo-2: do something here.
+			ExUtil.error(log, "Unable to run script", e);
 		}
-		output.append("</pre><p>");
+		output.append("\n\n");
 		return output.toString();
 	}
 
