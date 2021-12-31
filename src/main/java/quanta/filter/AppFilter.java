@@ -38,7 +38,7 @@ public class AppFilter extends GenericFilterBean {
 	private ApplicationContext context;
 
 	private static int reqId = 0;
-	private static boolean logRequests = true;
+	private static boolean logRequests = false;
 	private static boolean logResponses = false;
 
 	/*

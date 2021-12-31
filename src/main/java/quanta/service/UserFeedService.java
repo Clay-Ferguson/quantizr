@@ -289,9 +289,9 @@ public class UserFeedService extends ServiceBase  {
 			q.skip(MAX_FEED_ITEMS * req.getPage());
 		}
 
-		sc.stopwatch("NodeFeedQuery--Start");
+		// sc.stopwatch("NodeFeedQuery--Start");
 		Iterable<SubNode> iter = mongoUtil.find(q);
-		sc.stopwatch("NodeFeedQuery--Complete");
+		// sc.stopwatch("NodeFeedQuery--Complete");
 
 		for (SubNode node : iter) {
 			try {
@@ -301,7 +301,7 @@ public class UserFeedService extends ServiceBase  {
 			}
 		}
 
-		sc.stopwatch("NodeFeedQuery--Iterated");
+		// sc.stopwatch("NodeFeedQuery--Iterated");
 
 		if (searchResults.size() < MAX_FEED_ITEMS) {
 			res.setEndReached(true);

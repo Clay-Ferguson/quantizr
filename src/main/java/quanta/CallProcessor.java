@@ -64,7 +64,7 @@ public class CallProcessor extends ServiceBase {
 		}
 
 		try {
-			ThreadLocals.getSC().stopwatch("> " + command);
+			// ThreadLocals.getSC().stopwatch("> " + command);
 			if (ok(mutex)) {
 				mutex.lockEx();
 			}
@@ -115,7 +115,7 @@ public class CallProcessor extends ServiceBase {
 				orb.setStackTrace(ExceptionUtils.getStackTrace(e));
 			}
 		} finally {
-			ThreadLocals.getSC().stopwatch("< " + command);
+			// ThreadLocals.getSC().stopwatch("< " + command);
 			if (ok(mutex)) {
 				mutex.unlockEx();
 			}
