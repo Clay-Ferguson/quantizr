@@ -279,7 +279,7 @@ export class MenuPanel extends Div {
         let messagesSuffix = state.newMessageCount > 0
             ? " (" + state.newMessageCount + " new)" : "";
 
-        children.push(new Menu("Messages" + messagesSuffix, [
+        children.push(new Menu("Feed" + messagesSuffix, [
             // This works, but will confuse users. Lets make them just create a "Chat Type" node and think of that as their chat room
             // because while Quanta is capable of rendering ANY node as a chat room, mankind really isn't ready for that!
             // new MenuItem("Node Feed (Chat)", () => MenuPanel.messagesNodeFeed(state), !state.isAnonUser && hltNode?.id != null),

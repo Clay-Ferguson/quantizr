@@ -143,7 +143,7 @@ export class UserProfileDlg extends DialogBase {
                     !this.appState.isAnonUser && this.readOnly && state.userProfile.userName !== this.appState.userName ? new Button("Message", this.sendMessage) : null,
                     !this.appState.isAnonUser && !state.userProfile.following && this.readOnly && state.userProfile.userName !== this.appState.userName ? new Button("Follow", this.addFriend) : null,
                     !this.appState.isAnonUser && !state.userProfile.blocked && this.readOnly && state.userProfile.userName !== this.appState.userName ? new Button("Block", this.blockUser) : null,
-                    state.userProfile.actorUrl ? new Button("Go to User Page", () => {
+                    state.userProfile.actorUrl ? new Button("User Page", () => {
                         window.open(state.userProfile.actorUrl, "_blank");
                     }) : null,
                     new Button("Close", this.close, null, "btn-secondary float-end")
