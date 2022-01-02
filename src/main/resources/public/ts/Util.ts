@@ -550,7 +550,7 @@ export class Util {
                     const info = "Status: " + status + " message: " + error.message + " stack: " + error.stack;
                     console.log("HTTP RESP [" + postName + "]: Error: " + info);
 
-                    if (error.response && error.response.status === 401) {
+                    if (error.response?.status === 401) {
                         console.log("Not logged in detected.");
                         if (!this.timeoutMessageShown) {
                             this.timeoutMessageShown = true;

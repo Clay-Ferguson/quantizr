@@ -1039,24 +1039,10 @@ Will come back later and study this more. todo-1 */
 
 .markdown-content kbd,
 .markdown-content pre,
-.markdown-content samp {
-    /*
-    background-color: black;
-    color: green;
-    font-weight: bold;
-    
-    display: block;
-    font-family: monospace;
-    white-space: pre;
-    */
-    //font-size: 10%;
-    /* overflow: auto; 
-    max-height: 15em;
-    border: 1px dotted gray;
-    */
-    
+.markdown-content samp { 
     width: 100%; 
     border: 1px solid green;
+    padding: 8px;
 }
 
 .full-screen-img {

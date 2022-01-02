@@ -120,6 +120,7 @@ export class User {
 
         if (updateLocalDb) {
             await S.localDB.setVal(C.LOCALDB_LOGIN_STATE, "0");
+
             /* Setting logged in state for non-user also */
             await S.localDB.setVal(C.LOCALDB_LOGIN_STATE, "0", "anon");
         }
@@ -144,7 +145,8 @@ export class User {
         return Promise.all([
             // S.localDB.setVal(C.LOCALDB_LOGIN_USR, null),
             S.localDB.setVal(C.LOCALDB_LOGIN_PWD, null),
-            S.localDB.setVal(C.LOCALDB_LOGIN_STATE, null)
+            S.localDB.setVal(C.LOCALDB_LOGIN_STATE, "0"),
+            S.localDB.setVal(C.LOCALDB_LOGIN_STATE, "0", "anon")
         ]);
     }
 
@@ -176,7 +178,7 @@ export class User {
                 setTimeout(() => {
                     S.util.loadBookmarks();
                     S.push.init();
-                }, 1000);
+                }, 600);
             }
 
             S.util.setStateVarsUsingLoginResponse(res);
