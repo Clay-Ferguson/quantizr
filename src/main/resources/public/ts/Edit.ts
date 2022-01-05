@@ -1005,7 +1005,6 @@ export class Edit {
                     false, // setTab
                     false, // forceRenderParent
                     state);
-                S.util.flashMessage("Node moved successfully.", "Move", true);
             }
         }
         else {
