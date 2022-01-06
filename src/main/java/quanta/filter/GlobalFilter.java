@@ -16,6 +16,7 @@ import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.GenericFilterBean;
 import quanta.config.SessionContext;
+import quanta.util.ThreadLocals;
 
 /**
  * Global Servlet filter for cross-cutting concerns across all web requests
@@ -32,31 +33,38 @@ public class GlobalFilter extends GenericFilterBean {
 	public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
 			throws IOException, ServletException {
 
-		HttpServletRequest sreq = null;
-		if (request instanceof HttpServletRequest) {
-			sreq = (HttpServletRequest) request;
+		try {
+			ThreadLocals.removeAll();
+			HttpServletRequest sreq = null;
+			if (request instanceof HttpServletRequest) {
+				sreq = (HttpServletRequest) request;
 
-			HttpSession session = sreq.getSession(true);
-			SessionContext.init(context, session);
+				HttpSession session = sreq.getSession(true);
+				SessionContext.init(context, session);
 
-			// Special checks for Cache-Controls
-			if (sreq.getRequestURI().contains("/images/") || //
-					sreq.getRequestURI().contains("/fonts/") || //
-					sreq.getRequestURI().endsWith("/bundle.js") || //
-					sreq.getRequestURI().endsWith("/images/favicon.ico") || //
-					// This is the tricky one. If we have versioned the URL we detect it this hacky way also picking up
-					// v param.
-					sreq.getRequestURI().contains("?v=")) {
-				((HttpServletResponse) response).setHeader("Cache-Control", "public, must-revalidate, max-age=31536000");
+				// Special checks for Cache-Controls
+				if (sreq.getRequestURI().contains("/images/") || //
+						sreq.getRequestURI().contains("/fonts/") || //
+						sreq.getRequestURI().endsWith("/bundle.js") || //
+						sreq.getRequestURI().endsWith("/images/favicon.ico") || //
+						// This is the tricky one. If we have versioned the URL we detect it this hacky way also picking up
+						// v param.
+						sreq.getRequestURI().contains("?v=")) {
+					((HttpServletResponse) response).setHeader("Cache-Control", "public, must-revalidate, max-age=31536000");
+				}
+
+				// Special check for CORS
+				if (sreq.getRequestURI().contains("/.well-known/") || //
+						sreq.getRequestURI().contains("/ap/")) {
+					((HttpServletResponse) response).setHeader("Access-Control-Allow-Origin", "*");
+				}
 			}
-
-			// Special check for CORS
-			if (sreq.getRequestURI().contains("/.well-known/") || //
-					sreq.getRequestURI().contains("/ap/")) {
-				((HttpServletResponse) response).setHeader("Access-Control-Allow-Origin", "*");
-			}
+			// log.debug("GlobalFilter->doFilter");
+			chain.doFilter(request, response);
+		} finally {
+			/* Set thread back to clean slate, for it's next cycle time in threadpool */
+			ThreadLocals.removeAll();
 		}
-		chain.doFilter(request, response);
 	}
 
 	public void destroy() {}

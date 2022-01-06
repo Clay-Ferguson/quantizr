@@ -136,6 +136,7 @@ public class SessionContext extends ServiceBase {
 			sc = (SessionContext) context.getBean(SessionContext.class);
 			session.setAttribute(SessionContext.QSC, sc);
 		}
+		ThreadLocals.setHttpSession(session);
 		ThreadLocals.setSC(sc);
 		return sc;
 	}

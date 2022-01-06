@@ -47,7 +47,6 @@ public class CallProcessor extends ServiceBase {
 			throw ExUtil.wrapEx("Server not available.");
 		}
 
-		ThreadLocals.setHttpSession(httpSession);
 		logRequest(command, req, httpSession);
 
 		/*
@@ -121,7 +120,6 @@ public class CallProcessor extends ServiceBase {
 			}
 			// mutexCounter--;
 			// log.debug("Exit: mutexCounter: "+String.valueOf(mutexCounter));
-			ThreadLocals.removeAll();
 		}
 
 		logResponse(ret);

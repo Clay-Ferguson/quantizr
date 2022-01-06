@@ -30,12 +30,9 @@ import quanta.util.XString;
  * AppConfiguration.java)
  */
 @Component
-@Order(4)
+@Order(5)
 public class AppFilter extends GenericFilterBean {
 	private static final Logger log = LoggerFactory.getLogger(AppFilter.class);
-
-	@Autowired
-	private ApplicationContext context;
 
 	private static int reqId = 0;
 	private static boolean logRequests = false;
@@ -55,12 +52,11 @@ public class AppFilter extends GenericFilterBean {
 
 		HttpServletResponse httpRes = null;
 		try {
-			ThreadLocals.removeAll();
 			ThreadLocals.setStopwatchTime(System.currentTimeMillis());
 			int thisReqId = ++reqId;
 
 			HttpServletRequest httpReq = null;
-			HttpSession session = null;
+
 			if (req instanceof HttpServletRequest) {
 				// log.debug("***** SC: User: " + sc.getUserName());
 
@@ -68,8 +64,7 @@ public class AppFilter extends GenericFilterBean {
 				httpRes = (HttpServletResponse) res;
 
 				log.trace(httpReq.getRequestURI() + " -> " + httpReq.getQueryString());
-				session = httpReq.getSession(true);
-				SessionContext sc = SessionContext.init(context, session);
+				SessionContext sc = ThreadLocals.getSC();
 
 				sc.addAction(httpReq.getRequestURI());
 				String bearer = httpReq.getHeader("Bearer");
@@ -91,9 +86,7 @@ public class AppFilter extends GenericFilterBean {
 				}
 
 				ThreadLocals.setReqBearerToken(bearer);
-
 				sc.setIp(Util.getClientIpAddr(httpReq));
-				ThreadLocals.setHttpSession(session);
 
 				if (simulateSlowServer > 0) {
 					Util.sleep(simulateSlowServer);
@@ -128,9 +121,6 @@ public class AppFilter extends GenericFilterBean {
 			 * cause it to send back the html error page.
 			 */
 			httpRes.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-		} finally {
-			/* Set thread back to clean slate, for it's next cycle time in threadpool */
-			ThreadLocals.removeAll();
-		}
+		} 
 	}
 }

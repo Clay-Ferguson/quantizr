@@ -20,7 +20,7 @@ import quanta.util.Util;
  * Servlet filter for monitoring load statistics
  */
 @Component
-@Order(3)
+@Order(4)
 public class HitFilter extends GenericFilterBean {
 	private static final Logger log = LoggerFactory.getLogger(HitFilter.class);
 
