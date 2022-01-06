@@ -54,21 +54,22 @@ export class FriendsDlg extends DialogBase {
     }
 
     renderDlg(): CompIntf[] {
+        let state: LS = this.getState();
         let message = null;
-        if (this.getState<LS>().loading) {
+        if (state.loading) {
             message = "Loading...";
         }
-        else if (!this.getState<LS>().friends) {
-            message = "You haven't yet added any friends yet!";
+        else if (!state.friends || state.friends.length === 0) {
+            message = "Once you add some friends you can pick from a list here, but for now you can use the button below to find people by name.";
         }
 
         return [
             new Form(null, [
-                !this.getState<LS>().friends ? new Div(message)
-                    : new FriendsTable(this.getState<LS>().friends, this.selectionValueIntf),
+                message ? new Div(message)
+                    : new FriendsTable(state.friends, this.selectionValueIntf),
                 new ButtonBar([
-                    this.node ? new Button("Add by Username", this.shareToPersonDlg, null, "btn-primary") : null,
-                    (this.getState<LS>().friends && !this.instantSelect) ? new Button("Choose", () => {
+                    this.node ? new Button("Add by User Name", this.shareToPersonDlg, null, "btn-primary") : null,
+                    (state.friends && !this.instantSelect) ? new Button("Choose", () => {
                         this.close();
                     }, null, "btn-primary") : null,
                     new Button("Close", this.close, null, "btn-secondary float-end")
