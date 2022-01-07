@@ -1,0 +1,66 @@
+version: '3.7'
+services:
+    # Note: Container Names are automatically available as 'host names' (as in networking http://host:port)
+    # Networked service-to-service communication use the CONTAINER_PORT in [host]:[container] pairs below.
+
+    # https://hub.docker.com/r/ipfs/go-ipfs/
+    # ipns://dist.ipfs.io/go-ipfs/versions
+    # NOTES: To run a prodution IPFS instance be sure port 4001 is open
+    # and set the IPFS_PROFILE to "server"
+    # 4001 is swarm port required to connect IPFS to outside world. Don't forget to open up 
+    # this port in your firewall (and ISP/Router configs)
+    # 
+    # Here's a complete yaml example of how one other project seems to be enabling
+    # their pubsub, without the need for a specific dockerfile like we're using.
+    # (todo-2: need to decide if this is better or not)
+    #    version: '2'
+    #    services:
+    #    ipfs-daemon:
+    #        image: 'ipfs/go-ipfs:v0.6.0'
+    #        ports:
+    #        - "4001:4001"
+    #        - "5001:5001"
+    #        user: "ipfs"
+    #        command: [ "daemon", "--enable-pubsub-experiment" ] 
+    #
+    ipfs-dev: 
+        # We only have this build and custom docker file for ipfs pubsub enablement
+        build: 
+            context: .
+            dockerfile: ./dockerfile-ipfs
+        deploy:
+            resources:
+              limits:
+                # limit IPFS usage to 15% CPU. IPFS is a hog and will consume all your CPU if you let it.
+                cpus: '0.15'
+        container_name: ipfs-dev 
+        environment:
+            # IPFS_PROFILE options (lowpower | server)
+            IPFS_PROFILE: "server" 
+            IPFS_PATH: "/data/ipfs"
+        expose:
+            - '4001'
+            - '5001'
+        # WARNING: volumes will not handle '~' character for home folder. Do not use.
+        volumes:
+            - '${ipfs_staging}:/export'
+            - '${ipfs_test_root}:/ipfs_test_root'
+            - '${ipfs_data}:/data/ipfs'
+        ports:
+            - "4001:4001"
+            - "4001:4001/udp"
+            - "5001:5001"
+        networks:
+            - net-dev
+        # We could have this actual image if we weren't building from a custom dockerfile
+        # image: ipfs/go-ipfs:v0.9.0
+        image: ipfs-dev
+
+# https://docs.docker.com/compose/networking/
+
+networks:
+  net-dev:
+    driver: bridge
+    external: false
+    name: net-dev
+

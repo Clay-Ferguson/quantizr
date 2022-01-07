@@ -20,6 +20,7 @@ export CLEAN=true
 
 # Docker files are relative to project root
 export docker_compose_yaml=docker-compose-dev-app.yaml
+export docker_compose_ipfs_yaml=docker-compose-dev-ipfs.yaml
 export docker_compose_mongo_yaml=docker-compose-dev-mongo.yaml
 
 export mvn_profile=dev

@@ -21,9 +21,9 @@ makeDirs
 rm -rf ${QUANTA_BASE}/log/*
 
 cd ${PRJROOT}
-dockerDown quanta-dev1
-dockerDown mongo-dev1
-# dockerDown ipfs-dev1
+dockerDown ${docker_compose_yaml} quanta-dev1
+dockerDown ${docker_compose_yaml} mongo-dev1
+# dockerDown ${docker_compose_yaml} ipfs-dev1
 
 cd ${PRJROOT}
 . ${SCRIPTS}/_build.sh

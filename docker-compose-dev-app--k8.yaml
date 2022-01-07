@@ -1,0 +1,68 @@
+networks:
+  net-dev:
+    driver: bridge
+    external: false
+    name: net-dev
+services:
+  quanta-dev:
+    build:
+      context: /home/clay/ferguson/Quantizr
+      dockerfile: ./dockerfile
+    container_name: quanta-dev
+    environment:
+      JAVA_TOOL_OPTIONS: -agentlib:jdwp=transport=dt_socket,address=0.0.0.0:8000,server=y,suspend=n
+      XMS: 512m
+      XMX: 4g
+      actPubEnabled: "false"
+      adminDataFolder: /tmp
+      allowFileSystemSearch: "false"
+      httpProtocol: http
+      instanceId: dev
+      ipfs.apiPort: '5001'
+      ipfs.gatewayPort: '8080'
+      ipfs.host: http://ipfs-dev
+      mail.from: admin@quanta.wiki
+      mail.host: smtp.mailgun.org
+      mail.password: c613da1a69375c3dcb1ea5c5c46d6218-5645b1f9-a99b979d
+      mail.port: ''
+      mail.user: postmaster@quantizr.com
+      metaHost: localhost
+      mongoAdminPassword: TrojMajVel24x
+      mongoSecurity: "true"
+      mongodb.host: mongo-dev
+      mongodb.port: '27016'
+      profileName: dev
+      rssAggregatePreCacheNodeId_XX: :podcast-set
+      runTests: null
+      server.port: '8182'
+      spring.config.location: classpath:/application.properties
+      spring.http.multipart.max-file-size: 200MB
+      spring.http.multipart.max-request-size: 200MB
+      spring.servlet.multipart.max-file-size: 200MB
+      spring.servlet.multipart.max-request-size: 200MB
+      testPassword: ucantevenguessit
+      testUserAccounts: adam:ucantevenguessit:wclayf@gmail.com, bob:ucantevenguessit:wclayf@gmail.com,
+        cory:ucantevenguessit:wclayf@gmail.com, dan:ucantevenguessit:wclayf@gmail.com,
+        eric:ucantevenguessit:wclayf@gmail.com
+      throttleTime: '0'
+    expose:
+    - '8182'
+    - '8000'
+    image: quanta-dev
+    networks:
+      net-dev: null
+    ports:
+    - published: 8182
+      target: 8182
+    - published: 8000
+      target: 8000
+    volumes:
+    - /home/clay/quanta-localhost-dev/tmp:/tmp:rw
+    - /home/clay/quanta-localhost-dev/log:/log:rw
+    - /home/clay/quanta-localhost-dev/config:/config:rw
+    - /home/clay/quanta-localhost-dev/lucene:/subnode-lucene:rw
+    - /home/clay/ferguson/Quantizr/src/main/resources/public:/dev-resource-base:rw
+    - /home/clay/ferguson/Quantizr/target/classes:/loader-path:rw
+    - /home/clay/ferguson/Quantizr:/app:rw
+version: '3.7'
+

@@ -26,11 +26,12 @@ rm -rf ${QUANTA_BASE}/log/*
 
 # Take all the services offline
 cd ${PRJROOT}
-dockerDown quanta-dev
-dockerDown mongo-dev
-dockerDown ipfs-dev
+dockerDown ${docker_compose_yaml} quanta-dev
+dockerDown ${docker_compose_mongo_yaml} mongo-dev
+dockerDown ${docker_compose_ipfs_yaml} ipfs-dev
 
 cd ${PRJROOT}
+# eval $(minikube docker-env)
 . ${SCRIPTS}/_build.sh
 
 # IMPORTANT: Use this to troubeshoot the variable substitutions in the yaml file

@@ -63,6 +63,14 @@ dockerUp () {
     # https://stackoverflow.com/questions/35231362/dockerfile-and-docker-compose-not-updating-with-new-instructions
     echo "dockerUp"
 
+    if [[ -z ${docker_compose_ipfs_yaml} ]];  
+    then  
+        echo "ipfs not enabled"
+    else
+        docker-compose -f ${docker_compose_ipfs_yaml} up -d
+        verifySuccess "IPFS Compose: up"
+    fi
+
     docker-compose -f ${docker_compose_mongo_yaml} up -d
     verifySuccess "MongoDB Compose: up"
 
@@ -84,21 +92,22 @@ dockerBuildUp () {
 }
 export -f dockerBuildUp
 
+# Arg1=yaml file name, Arg2=service
 dockerDown () {
-    echo "dockerDown ${docker_compose_yaml} serivce $1"
+    echo "dockerDown $1 serivce $2"
 
     # NOTE: with remove-orphans it takes down not just what's in our YAML but 
     # also every other docker thing running on the machine!
     # docker-compose -f ${docker_compose_yaml} down --remove-orphans
-    # docker-compose -f ${docker_compose_yaml} stop $1
+    # docker-compose -f ${docker_compose_yaml} stop $2
     #
     # NOTE: If you get errors that your network is still in use do this:
     #     docker network disconnect -f net-distro quanta-distro
     #     docker network disconnect -f net-distro quanta-distro
-    docker-compose -f ${docker_compose_yaml} stop -t 30 $1
-    docker-compose -f ${docker_compose_yaml} rm -f -s $1
+    docker-compose -f $1 stop -t 30 $2
+    docker-compose -f $1 rm -f -s $2
     # docker ps
-    # read -p "service $1 should be missing in above"
+    # read -p "service $2 should be missing in above"
 }
 export -f dockerDown
 

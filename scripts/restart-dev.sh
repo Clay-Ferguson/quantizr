@@ -22,7 +22,7 @@ sudo rm -rf ${QUANTA_BASE}/log/*
 docker-compose --compatibility -f ${docker_compose_yaml} restart quanta-dev
 
 # This is another way, but slower. Not needed.
-# dockerDown quanta-dev
+# dockerDown ${docker_compose_yaml} quanta-dev
 # sudo rm -rf ${QUANTA_BASE}/log/*
 # dockerBuildUp
 
