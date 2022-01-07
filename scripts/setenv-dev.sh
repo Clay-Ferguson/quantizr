@@ -20,18 +20,11 @@ export CLEAN=true
 
 # For more rapid development cycles you can set this to false once you know MONGO is up, and then
 # this build script will just continue using that mongo without restarting it.
-export RESTART_MONGO=false
+export RESTART_MONGO=true
 
 # Docker files are relative to project root
-# IMPORTANT: Either enable this ONE yaml line --OR-- the TWO just below it.
-# 1) For MongoDB instance embedded in same yaml:
-export docker_compose_yaml=docker-compose-dev.yaml
-# 2) For MongoDB configured external to the app yaml
-#export docker_compose_yaml=docker-compose-dev-nomongo.yaml
-#export docker_compose_yaml_mongo=docker-compose-dev-mongo.yaml
-
-# Not used: mongo is setup inside the docker-compose-dev.yaml for now
-# export docker_compose_mongo_yaml=docker-compose-dev-mongo.yaml
+export docker_compose_yaml=docker-compose-dev-app.yaml
+export docker_compose_mongo_yaml=docker-compose-dev-mongo.yaml
 
 export mvn_profile=dev
 

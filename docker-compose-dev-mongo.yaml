@@ -1,6 +1,5 @@
 version: '3.7'
 services:
-
     # Note: Container Names are automatically available as 'host names' (as in networking http://host:port)
     # Networked service-to-service communication use the CONTAINER_PORT in [host]:[container] pairs below.
 

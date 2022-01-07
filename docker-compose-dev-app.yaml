@@ -3,35 +3,6 @@ services:
     # Note: Container Names are automatically available as 'host names' (as in networking http://host:port)
     # Networked service-to-service communication use the CONTAINER_PORT in [host]:[container] pairs below.
 
-    # Theoretically it should have been possible to let mongo run internally on 27017 (it's default) and then expose it
-    # to the outside as 27016, but I never could get that to work, so I'm just setting it up to run at 27016 both
-    # internaly and externally
-    #
-    # NOTE: Minimal requirements for the mongod.conf is to have the port set as 27016, and the data db set
-    mongo-dev: 
-        container_name: mongo-dev 
-        # WARNING: volumes will not handle '~' character for home folder. Do not use.
-        volumes:
-            - '${MONGO_BASE}/mongodb-data-dev:/data/db'
-            - '${MONGO_BASE}/mongo-scripts-dev:/mongo-scripts'
-            - '${MONGOD_CONF}:/etc/mongod.conf'
-        command: mongod --config /etc/mongod.conf
-        #entrypoint: ["mongod","--config","/etc/mongod.conf"]
-        ports:
-            - '${MONGO_PORT}:${MONGO_PORT}'
-
-        # NOTE: Leave this as an example of how to read env from a file.    
-        # env_file: 
-        #     - '${SECRETS}/mongo.env'
-        environment:
-            MONGO_INITDB_ROOT_USERNAME: root
-            MONGO_INITDB_ROOT_PASSWORD: ${adminPassword}
-        networks:
-           - net-dev
-        # Always specify version of mongo. When it upgrades automatically there can be database issues that need to be resolved
-        # and we don't want that happening unexpectedly
-        image: mongo:4.0
-
     # https://hub.docker.com/r/ipfs/go-ipfs/
     # ipns://dist.ipfs.io/go-ipfs/versions
     # NOTES: To run a prodution IPFS instance be sure port 4001 is open
@@ -161,7 +132,6 @@ services:
             rssAggregatePreCacheNodeId_XX: ":podcast-set"
         image: quanta-dev
         depends_on:
-            - mongo-dev
             - ipfs-dev
 
 # https://docs.docker.com/compose/networking/
