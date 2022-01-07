@@ -18,10 +18,6 @@ export quanta_domain=localhost
 # IMPORTANT: ***** You must set this to 'true' to regenerate the Java->TypeScript interfaces.
 export CLEAN=true
 
-# For more rapid development cycles you can set this to false once you know MONGO is up, and then
-# this build script will just continue using that mongo without restarting it.
-export RESTART_MONGO=true
-
 # Docker files are relative to project root
 export docker_compose_yaml=docker-compose-dev-app.yaml
 export docker_compose_mongo_yaml=docker-compose-dev-mongo.yaml

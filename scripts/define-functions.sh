@@ -63,10 +63,8 @@ dockerUp () {
     # https://stackoverflow.com/questions/35231362/dockerfile-and-docker-compose-not-updating-with-new-instructions
     echo "dockerUp"
 
-    if [ "$RESTART_MONGO" == "true" ]; then
-        docker-compose -f ${docker_compose_mongo_yaml} up -d
-        verifySuccess "MongoDB Compose: up"
-    fi
+    docker-compose -f ${docker_compose_mongo_yaml} up -d
+    verifySuccess "MongoDB Compose: up"
 
     # NOTE: --compatibility switch is required for the CPUS limitier to work,
     # in a non-swarm docker setup, which we have

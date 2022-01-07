@@ -27,10 +27,7 @@ rm -rf ${QUANTA_BASE}/log/*
 # Take all the services offline
 cd ${PRJROOT}
 dockerDown quanta-dev
-
-if [ "$RESTART_MONGO" == "true" ]; then
-    dockerDown mongo-dev
-fi
+dockerDown mongo-dev
 dockerDown ipfs-dev
 
 cd ${PRJROOT}
