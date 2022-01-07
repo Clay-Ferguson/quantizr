@@ -47,7 +47,7 @@ public class SystemService extends ServiceBase {
 	public static MongoAppConfig mac;
 
 	@Autowired
-    private AppProp prop;
+	private AppProp prop;
 
 	@PostConstruct
 	public void postConstruct() {
@@ -198,14 +198,13 @@ public class SystemService extends ServiceBase {
 			sb.append(arg + "\n");
 		}
 
-		// Run command inside container 
-		//sb.append(runBashCommand("DISK STORAGE (Docker Container)", "df -h"));
+		// Run command inside container
+		// sb.append(runBashCommand("DISK STORAGE (Docker Container)", "df -h"));
 		return sb.toString();
 	}
 
 	public String getSessionActivity() {
 		StringBuilder sb = new StringBuilder();
-		sb.append("Live Sessions:\n");
 
 		List<SessionContext> sessions = SessionContext.getHistoricalSessions();
 		sessions.sort((s1, s2) -> {
@@ -214,6 +213,7 @@ public class SystemService extends ServiceBase {
 			return s1key.compareTo(s2key);
 		});
 
+		sb.append("Live Sessions:\n");
 		for (SessionContext s : sessions) {
 			if (s.isLive()) {
 				sb.append("User: ");

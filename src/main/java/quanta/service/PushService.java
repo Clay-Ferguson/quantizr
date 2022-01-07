@@ -49,7 +49,7 @@ public class PushService extends ServiceBase {
 		usersSharedToSet.addAll(usersSharedTo);
 
 		/* Scan all sessions and push message to the ones that need to see it */
-		for (SessionContext sc : SessionContext.getAllSessions()) {
+		for (SessionContext sc : SessionContext.getAllSessions(true)) {
 			// if we know we already just pushed to this session, we can skip it in here.
 			if (ok(sessionsPushed) && sessionsPushed.contains(sc.hashCode())) {
 				continue;
@@ -82,7 +82,7 @@ public class PushService extends ServiceBase {
 		// log.debug("Push to monitoring Browsers: node.content=" + node.getContent());
 
 		/* Scan all sessions and push message to the ones that need to see it */
-		for (SessionContext sc : SessionContext.getAllSessions()) {
+		for (SessionContext sc : SessionContext.getAllSessions(true)) {
 			/* Anonymous sessions won't have userName and can be ignored */
 			if (no(sc.getUserName()))
 				continue;
@@ -112,7 +112,7 @@ public class PushService extends ServiceBase {
 	/* Notify all browser timelines if they have new info */
 	public void pushTimelineUpdateToBrowsers(MongoSession ms, NodeInfo nodeInfo) {
 		/* Scan all sessions and push message to the ones that need to see it */
-		for (SessionContext sc : SessionContext.getAllSessions()) {
+		for (SessionContext sc : SessionContext.getAllSessions(true)) {
 			/* Anonymous sessions can be ignored */
 			if (no(sc.getUserName()))
 				continue;

@@ -27,8 +27,8 @@ import quanta.util.Util;
 /**
  * Session object holding state per user session.
  * 
- * 1: Need to refactor so that the only session-specific data are things that apply to THIS
- * server node instance and wouldn't be something that would make load balancer nodes have issues.
+ * 1: Need to refactor so that the only session-specific data are things that apply to THIS server
+ * node instance and wouldn't be something that would make load balancer nodes have issues.
  */
 @Component
 @Scope("prototype")
@@ -299,19 +299,21 @@ public class SessionContext extends ServiceBase {
 		return userToken;
 	}
 
-	/*
-	 * UPDATE: This is simply happening becasue the WebFilter is not able to detect when something is a
-	 * static file and so it generates SessionContext on every session it sees.
-	 */
-	public static List<SessionContext> getAllSessions() {
+	public static List<SessionContext> getAllSessions(boolean requireToken) {
 		List<SessionContext> ret = new LinkedList<>();
 		HashSet<String> tokens = new HashSet<>();
 		synchronized (allSessions) {
 			for (SessionContext sc : allSessions) {
-				if (sc.isLive() && ok(sc.getUserToken())) {
-					if (!tokens.contains(sc.getUserToken())) {
+				if (sc.isLive()) {
+					if (requireToken) {
+						if (ok(sc.getUserToken())) {
+							if (!tokens.contains(sc.getUserToken())) {
+								ret.add(sc);
+								tokens.add(sc.getUserToken());
+							}
+						}
+					} else {
 						ret.add(sc);
-						tokens.add(sc.getUserToken());
 					}
 				}
 			}

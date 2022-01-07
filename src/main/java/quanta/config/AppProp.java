@@ -26,8 +26,8 @@ import quanta.util.XString;
 /**
  * Wrapper to access application properties.
  * 
- * WARNING: Don't put this in ServiceBase with other singletons, because this one needs to be accessible
- * immediately to be used by other beans before all are fully initialized.
+ * WARNING: Don't put this in ServiceBase with other singletons, because this one needs to be
+ * accessible immediately to be used by other beans before all are fully initialized.
  */
 @Component
 public class AppProp {
@@ -50,34 +50,37 @@ public class AppProp {
 
 	public static final ObjectMapper yamlMapper = new ObjectMapper(new YAMLFactory());
 	HashMap<String, Object> configMap = null;
-	
+	private static final Object configLock = new Object();
+
 	public HashMap<String, Object> getConfig() {
-		if (ok(configMap)) {
-			return configMap;
-		}
+		synchronized (configLock) {
+			if (ok(configMap)) {
+				return configMap;
+			}
 
-		synchronized (yamlMapper) {
-			try {
-				HashMap<String, Object> configMapInternal = readYamlInternal("config-text.yaml");
-				HashMap<String, Object> configMapExternal = readYamlExternal("config-text.yaml");
+			synchronized (yamlMapper) {
+				try {
+					HashMap<String, Object> configMapInternal = readYamlInternal("config-text.yaml");
+					HashMap<String, Object> configMapExternal = readYamlExternal("config-text.yaml");
 
-				/* For every key in internal set, override with the external val if found */
-				for (String key : configMapInternal.keySet()) {
-					Object val = configMapExternal.get(key);
-					if (ok(val)) {
-						configMapInternal.put(key, val);
+					/* For every key in internal set, override with the external val if found */
+					for (String key : configMapInternal.keySet()) {
+						Object val = configMapExternal.get(key);
+						if (ok(val)) {
+							configMapInternal.put(key, val);
+						}
 					}
+
+					configMap = configMapInternal;
+				} catch (Exception e) {
+					ExUtil.error(log, "failed to load help-text.yaml", e);
 				}
 
-				configMap = configMapInternal;
-			} catch (Exception e) {
-				ExUtil.error(log, "failed to load help-text.yaml", e);
+				if (no(configMap)) {
+					configMap = new HashMap<>();
+				}
+				return configMap;
 			}
-
-			if (no(configMap)) {
-				configMap = new HashMap<>();
-			}
-			return configMap;
 		}
 	}
 
@@ -89,7 +92,7 @@ public class AppProp {
 	/*
 	 * Reads a yaml file into a map from internal file at "classname:[fileName]
 	 */
-	public HashMap<String, Object> readYamlInternal(String fileName) {
+	private HashMap<String, Object> readYamlInternal(String fileName) {
 		synchronized (yamlMapper) {
 			InputStream is = null;
 			HashMap<String, Object> map = null;
@@ -113,7 +116,7 @@ public class AppProp {
 		}
 	}
 
-	public HashMap<String, Object> readYamlExternal(String fileName) {
+	private HashMap<String, Object> readYamlExternal(String fileName) {
 		synchronized (yamlMapper) {
 			HashMap<String, Object> map = null;
 			try {

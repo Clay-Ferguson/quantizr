@@ -221,8 +221,8 @@ public class AppController extends ServiceBase implements ErrorController {
 	 * 
 	 * passCode is an auth code for a password reset
 	 * 
-	 * Renders with Thymeleaf. todo-0: we can get rid of "/app" now AFTER removing all references to /app
-	 * in any urls, but leave the mapping HERE for a while after, to be sure. Do this tweak in a
+	 * Renders with Thymeleaf. todo-0: we can get rid of "/app" now AFTER removing all references to
+	 * /app in any urls, but leave the mapping HERE for a while after, to be sure. Do this tweak in a
 	 * dedicated commit.
 	 */
 	@RequestMapping(value = {"/", "/app", "/n/{nameOnAdminNode}", "/u/{userName}/{nameOnUserNode}"})
@@ -1234,6 +1234,12 @@ public class AppController extends ServiceBase implements ErrorController {
 
 		// if we have a 'userMessage' on the session send it back now, and then forget it.
 		if (ok(ThreadLocals.getSC()) && ok(ThreadLocals.getSC().getUserMessage())) {
+			/*
+			 * important! If we're going to alter the map we MUST clone it because otherwise we're altering the
+			 * same copy ALL users will see!
+			 */
+			map = (HashMap<String, Object>)map.clone();
+
 			map.put("userMessage", ThreadLocals.getSC().getUserMessage());
 			ThreadLocals.getSC().setUserMessage(null);
 		}
