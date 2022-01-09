@@ -14,12 +14,19 @@ cd ${script_folder}
 # set -x
 source ./setenv-dev.sh
 
+if [[ -z ${TARGET_K8} ]];  
+then  
+    echo "Targeting host machine (not minikube)"
+else
+    echo "Targeting Minikube"
+    # NOTE: This will cause the docker images to go into the 
+    # minikube environment so that for example `docker images` will show the build
+    # image only from inside minikube, and not on the actual host machine.
+    eval $(minikube docker-env)
+fi
+
 echo "Stopping any existing server instance..."
 curl http://${quanta_domain}:${PORT}/mobile/api/shutdown?password=${adminPassword}
-
-# I think when this curl returns, there's no need to wait. it's done.
-# echo "waiting 30s for graceful shutdown."
-# sleep 30s
 
 makeDirs
 rm -rf ${QUANTA_BASE}/log/*
@@ -27,11 +34,17 @@ rm -rf ${QUANTA_BASE}/log/*
 # Take all the services offline
 cd ${PRJROOT}
 dockerDown ${docker_compose_yaml} quanta-dev
-dockerDown ${docker_compose_mongo_yaml} mongo-dev
+
+if [[ -z ${START_MONGO} ]];  
+then  
+    echo "Not stopping MongoDB"
+else
+    dockerDown ${docker_compose_mongo_yaml} mongo-dev
+fi
+
 dockerDown ${docker_compose_ipfs_yaml} ipfs-dev
 
 cd ${PRJROOT}
-# eval $(minikube docker-env)
 . ${SCRIPTS}/_build.sh
 
 # IMPORTANT: Use this to troubeshoot the variable substitutions in the yaml file
@@ -41,10 +54,18 @@ cd ${PRJROOT}
 ${SCRIPTS}/gen-mongod-conf-file.sh
 
 cd ${PRJROOT}
-dockerBuildUp
+dockerBuild
+dockerUp
 
 dockerCheck quanta-dev
-dockerCheck mongo-dev
+
+if [[ -z ${START_MONGO} ]];  
+then  
+    echo "Not checking MongoDB"
+else
+    dockerCheck mongo-dev
+fi
+
 dockerCheck ipfs-dev
 
 # configure ipfs 
@@ -53,8 +74,7 @@ dockerCheck ipfs-dev
 # Disabling this for now. Only needed to enable HTTP API over port 5001, and also needs to be run just once instead
 # of every time we build.
 # ipfsConfig ipfs-dev
-
 # check ipfs again
-dockerCheck ipfs-dev
+# dockerCheck ipfs-dev
 
 # read -p "Build and Start Complete. press a key"

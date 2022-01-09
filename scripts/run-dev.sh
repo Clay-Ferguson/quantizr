@@ -14,6 +14,7 @@ source ./setenv-dev.sh
 makeDirs
 rm -rf ${QUANTA_BASE}/log/*
 
-dockerBuildUp
+dockerBuild
+dockerUp
 
 # read -p "Build and Start Complete. press a key"

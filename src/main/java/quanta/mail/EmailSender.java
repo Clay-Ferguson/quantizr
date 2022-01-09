@@ -59,6 +59,7 @@ public class EmailSender extends ServiceBase implements TransportListener {
 		String mailHost = appProp.getMailHost();
 		String mailUser = appProp.getMailUser();
 		String mailPassword = appProp.getMailPassword();
+		// log.debug("mailPassword=" + mailPassword);
 
 		if (no(mailSession)) {
 			props = new Properties();

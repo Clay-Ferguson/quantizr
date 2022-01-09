@@ -34,7 +34,8 @@ ${SCRIPTS}/gen-mongod-conf-file.sh
 # docker-compose -f ${docker_compose_yaml} config 
 # read -p "Config look ok?"
 cd ${PRJROOT}
-dockerBuildUp
+dockerBuild
+dockerUp
 
 dockerCheck quanta-dev1
 dockerCheck mongo-dev1

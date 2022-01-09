@@ -29,7 +29,8 @@ dockerDown ${docker_compose_yaml} mongo-dev2
 ${SCRIPTS}/gen-mongod-conf-file.sh
 
 cd ${PRJROOT}
-dockerBuildUp
+dockerBuild
+dockerUp
 
 dockerCheck quanta-dev2
 dockerCheck mongo-dev2

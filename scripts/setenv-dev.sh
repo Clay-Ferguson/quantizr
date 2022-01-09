@@ -18,6 +18,12 @@ export quanta_domain=localhost
 # IMPORTANT: ***** You must set this to 'true' to regenerate the Java->TypeScript interfaces.
 export CLEAN=true
 
+# If this string is defined it causes the build/run to deploy to the minikube environment insead of the host machine.
+export TARGET_K8=
+
+# Set this to empty string if you want to not start mongo for whatever reason.
+export START_MONGO=true
+
 # Docker files are relative to project root
 export docker_compose_yaml=docker-compose-dev-app.yaml
 export docker_compose_ipfs_yaml=docker-compose-dev-ipfs.yaml

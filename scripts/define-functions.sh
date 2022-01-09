@@ -71,8 +71,13 @@ dockerUp () {
         verifySuccess "IPFS Compose: up"
     fi
 
-    docker-compose -f ${docker_compose_mongo_yaml} up -d
-    verifySuccess "MongoDB Compose: up"
+    if [[ -z ${START_MONGO} ]];  
+    then  
+        echo "Not starting MongoDB"
+    else
+        docker-compose -f ${docker_compose_mongo_yaml} up -d
+        verifySuccess "MongoDB Compose: up"
+    fi
 
     # NOTE: --compatibility switch is required for the CPUS limitier to work,
     # in a non-swarm docker setup, which we have
@@ -85,12 +90,6 @@ dockerUp () {
     # verifySuccess "Docker Compose: logs"
 }
 export -f dockerUp
-
-dockerBuildUp () {
-    dockerBuild
-    dockerUp
-}
-export -f dockerBuildUp
 
 # Arg1=yaml file name, Arg2=service
 dockerDown () {

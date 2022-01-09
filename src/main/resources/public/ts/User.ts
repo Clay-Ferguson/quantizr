@@ -47,7 +47,8 @@ export class User {
     }
 
     openSignupPg = (state: AppState): void => {
-        new SignupDlg(state).open();
+        S.util.showMessage("Signups are temporarily unavailable. Check back in a few hours.", "Note");
+        // new SignupDlg(state).open();
     }
 
     refreshLogin = async (state: AppState): Promise<void> => {
