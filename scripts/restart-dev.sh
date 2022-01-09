@@ -19,10 +19,10 @@ sudo rm -rf ${QUANTA_BASE}/log/*
 
 # NOTE: --compatibility switch is required for the CPUS limitier to work,
 # in a non-swarm docker setup, which we have
-docker-compose --compatibility -f ${docker_compose_yaml} restart quanta-dev
+docker-compose --compatibility -f ${dc_app_yaml} restart quanta-dev
 
 # This is another way, but slower. Not needed.
-# dockerDown ${docker_compose_yaml} quanta-dev
+# dockerDown ${dc_app_yaml} quanta-dev
 # sudo rm -rf ${QUANTA_BASE}/log/*
 # dockerBuild
 # dockerUp

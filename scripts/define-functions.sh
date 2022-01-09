@@ -27,15 +27,15 @@ ipfsConfig () {
 
     # todo-1: I'm pretty sure maybe only the API headers need to be set and not Gateway, but haven't confirmed yet
     # (Also there's probably a way to do this inside an actual config text file, rather than on command line)
-    docker-compose -f ${docker_compose_yaml} exec $1 ipfs config --json API.HTTPHeaders.Access-Control-Allow-Origin '["*"]'
-    docker-compose -f ${docker_compose_yaml} exec $1 ipfs config --json API.HTTPHeaders.Access-Control-Allow-Methods '["PUT", "GET", "POST"]'
+    docker-compose -f ${dc_app_yaml} exec $1 ipfs config --json API.HTTPHeaders.Access-Control-Allow-Origin '["*"]'
+    docker-compose -f ${dc_app_yaml} exec $1 ipfs config --json API.HTTPHeaders.Access-Control-Allow-Methods '["PUT", "GET", "POST"]'
 
-    docker-compose -f ${docker_compose_yaml} exec $1 ipfs config --json Gateway.HTTPHeaders.Access-Control-Allow-Origin '["*"]'
-    docker-compose -f ${docker_compose_yaml} exec $1 ipfs config --json Gateway.HTTPHeaders.Access-Control-Allow-Methods '["PUT", "GET", "POST"]'
+    docker-compose -f ${dc_app_yaml} exec $1 ipfs config --json Gateway.HTTPHeaders.Access-Control-Allow-Origin '["*"]'
+    docker-compose -f ${dc_app_yaml} exec $1 ipfs config --json Gateway.HTTPHeaders.Access-Control-Allow-Methods '["PUT", "GET", "POST"]'
 
     echo "Sleeping again before restarting ipfs"
     sleep 10s
-    docker-compose -f ${docker_compose_yaml} restart $1
+    docker-compose -f ${dc_app_yaml} restart $1
 }
 export -f ipfsConfig
 
@@ -45,7 +45,7 @@ dockerBuild () {
     # https://stackoverflow.com/questions/35231362/dockerfile-and-docker-compose-not-updating-with-new-instructions
     echo "dockerBuild"
 
-    docker-compose -f ${docker_compose_yaml} build --no-cache \
+    docker-compose -f ${dc_app_yaml} build --no-cache \
         --build-arg PORT="${PORT}" \
         --build-arg PORT_DEBUG="${PORT_DEBUG}" \
         --build-arg PORT_SEC="${PORT_SEC}" \
@@ -63,11 +63,11 @@ dockerUp () {
     # https://stackoverflow.com/questions/35231362/dockerfile-and-docker-compose-not-updating-with-new-instructions
     echo "dockerUp"
 
-    if [[ -z ${docker_compose_ipfs_yaml} ]];  
+    if [[ -z ${dc_ipfs_yaml} ]];  
     then  
         echo "ipfs not enabled"
     else
-        docker-compose -f ${docker_compose_ipfs_yaml} up -d
+        docker-compose -f ${dc_ipfs_yaml} up -d
         verifySuccess "IPFS Compose: up"
     fi
 
@@ -75,18 +75,18 @@ dockerUp () {
     then  
         echo "Not starting MongoDB"
     else
-        docker-compose -f ${docker_compose_mongo_yaml} up -d
+        docker-compose -f ${dc_mongo_yaml} up -d
         verifySuccess "MongoDB Compose: up"
     fi
 
     # NOTE: --compatibility switch is required for the CPUS limitier to work,
     # in a non-swarm docker setup, which we have
-    docker-compose --compatibility -f ${docker_compose_yaml} up -d
+    docker-compose --compatibility -f ${dc_app_yaml} up -d
     verifySuccess "Docker Compose: up"
 
     # sleep 10
     # echo "Sleeping 10 seconds before checking logs"
-    # docker-compose -f ${docker_compose_yaml} logs $1
+    # docker-compose -f ${dc_app_yaml} logs $1
     # verifySuccess "Docker Compose: logs"
 }
 export -f dockerUp
@@ -97,8 +97,8 @@ dockerDown () {
 
     # NOTE: with remove-orphans it takes down not just what's in our YAML but 
     # also every other docker thing running on the machine!
-    # docker-compose -f ${docker_compose_yaml} down --remove-orphans
-    # docker-compose -f ${docker_compose_yaml} stop $2
+    # docker-compose -f ${dc_app_yaml} down --remove-orphans
+    # docker-compose -f ${dc_app_yaml} stop $2
     #
     # NOTE: If you get errors that your network is still in use do this:
     #     docker network disconnect -f net-distro quanta-distro

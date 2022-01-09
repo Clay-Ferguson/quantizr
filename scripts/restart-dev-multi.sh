@@ -24,7 +24,7 @@ cd $PRJROOT
 
 mvn --offline compiler:compile -DskipTests=true -Pjava-compile
 
-docker-compose -f ${docker_compose_yaml} restart quanta-dev1
+docker-compose -f ${dc_app_yaml} restart quanta-dev1
 verifySuccess "Docker Restart quanta-dev1"
 
 # ==========
@@ -38,7 +38,7 @@ cd $PRJROOT
 
 # read -p "About to start second instance. Connect debugger now if you need to... (press any key)"
 
-docker-compose -f ${docker_compose_yaml} restart quanta-dev2
+docker-compose -f ${dc_app_yaml} restart quanta-dev2
 verifySuccess "Docker Restart quanta-dev2"
 
 echo "wait for servers to start..."

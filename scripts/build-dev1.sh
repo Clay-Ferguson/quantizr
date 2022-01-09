@@ -21,9 +21,9 @@ makeDirs
 rm -rf ${QUANTA_BASE}/log/*
 
 cd ${PRJROOT}
-dockerDown ${docker_compose_yaml} quanta-dev1
-dockerDown ${docker_compose_yaml} mongo-dev1
-# dockerDown ${docker_compose_yaml} ipfs-dev1
+dockerDown ${dc_app_yaml} quanta-dev1
+dockerDown ${dc_app_yaml} mongo-dev1
+# dockerDown ${dc_app_yaml} ipfs-dev1
 
 cd ${PRJROOT}
 . ${SCRIPTS}/_build.sh
@@ -31,7 +31,7 @@ cd ${PRJROOT}
 ${SCRIPTS}/gen-mongod-conf-file.sh 
 
 # IMPORTANT: Use this to troubeshoot the variable substitutions in the yaml file
-# docker-compose -f ${docker_compose_yaml} config 
+# docker-compose -f ${dc_app_yaml} config 
 # read -p "Config look ok?"
 cd ${PRJROOT}
 dockerBuild

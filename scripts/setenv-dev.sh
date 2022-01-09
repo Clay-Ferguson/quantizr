@@ -25,9 +25,9 @@ export TARGET_K8=
 export START_MONGO=true
 
 # Docker files are relative to project root
-export docker_compose_yaml=docker-compose-dev-app.yaml
-export docker_compose_ipfs_yaml=docker-compose-dev-ipfs.yaml
-export docker_compose_mongo_yaml=docker-compose-dev-mongo.yaml
+export dc_app_yaml=docker-compose-dev-app.yaml
+export dc_ipfs_yaml=docker-compose-dev-ipfs.yaml
+export dc_mongo_yaml=docker-compose-dev-mongo.yaml
 
 export mvn_profile=dev
 

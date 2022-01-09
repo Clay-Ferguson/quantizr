@@ -9,9 +9,9 @@ cd ${script_folder}
 source ./setenv-dev.sh
 
 cd ${PRJROOT}
-dockerDown ${docker_compose_yaml} quanta-dev
-dockerDown ${docker_compose_mongo_yaml} mongo-dev
-dockerDown ${docker_compose_ipfs_yaml} ipfs-dev
+dockerDown ${dc_app_yaml} quanta-dev
+dockerDown ${dc_mongo_yaml} mongo-dev
+dockerDown ${dc_ipfs_yaml} ipfs-dev
 
 # docker ps
 sleep 3

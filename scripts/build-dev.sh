@@ -33,28 +33,37 @@ rm -rf ${QUANTA_BASE}/log/*
 
 # Take all the services offline
 cd ${PRJROOT}
-dockerDown ${docker_compose_yaml} quanta-dev
+dockerDown ${dc_app_yaml} quanta-dev
 
 if [[ -z ${START_MONGO} ]];  
 then  
     echo "Not stopping MongoDB"
 else
-    dockerDown ${docker_compose_mongo_yaml} mongo-dev
+    dockerDown ${dc_mongo_yaml} mongo-dev
 fi
 
-dockerDown ${docker_compose_ipfs_yaml} ipfs-dev
+dockerDown ${dc_ipfs_yaml} ipfs-dev
 
 cd ${PRJROOT}
 . ${SCRIPTS}/_build.sh
 
 # IMPORTANT: Use this to troubeshoot the variable substitutions in the yaml file
-# docker-compose -f ${docker_compose_yaml} config 
+# docker-compose -f ${dc_app_yaml} config 
 # read -p "Config look ok?"
 
 ${SCRIPTS}/gen-mongod-conf-file.sh
 
 cd ${PRJROOT}
 dockerBuild
+
+if [[ -z ${TARGET_K8} ]];  
+then  
+    echo "Docker build complete..."
+else
+    echo "For K8, we're done after docker build. Exiting script."
+    exit 0
+fi
+
 dockerUp
 
 dockerCheck quanta-dev

@@ -1,4 +1,4 @@
-# Docker Compose file for a basic Quanta Distro
+# Docker Compose file for a basic Quanta Distro, which packages the MongoDB and App together.
 # (for now IPFS is omitted)
 
 version: '3.7'

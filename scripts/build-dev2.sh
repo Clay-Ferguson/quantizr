@@ -23,8 +23,8 @@ makeDirs
 rm -rf ${QUANTA_BASE}/log/*
 
 cd ${PRJROOT}
-dockerDown ${docker_compose_yaml} quanta-dev2
-dockerDown ${docker_compose_yaml} mongo-dev2
+dockerDown ${dc_app_yaml} quanta-dev2
+dockerDown ${dc_app_yaml} mongo-dev2
 
 ${SCRIPTS}/gen-mongod-conf-file.sh
 

@@ -30,7 +30,7 @@ rm -rf ./log/*
 
 # Uncomment this to troubeshoot the variable substitutions in the yaml file, and will
 # display a copy of the yaml file after all environment variables have been substituted/evaluated
-# docker-compose -f ${docker_compose_yaml} config
+# docker-compose -f ${dc_app_yaml} config
 # read -p "Config look ok?"
 
 ./gen-mongod-conf-file.sh 
@@ -45,7 +45,7 @@ dockerUp
 dockerCheck quanta-distro
 dockerCheck mongo-distro
 
-# docker-compose -f ${docker_compose_yaml} logs --tail="all" quanta-distro
+# docker-compose -f ${dc_app_yaml} logs --tail="all" quanta-distro
 
 echo ================================================
 echo Quanta Distro Started OK!
