@@ -26,7 +26,7 @@ dockerDown ${dc_app_yaml} mongo-dev1
 # dockerDown ${dc_app_yaml} ipfs-dev1
 
 cd ${PRJROOT}
-. ${SCRIPTS}/_build.sh
+. ${SCRIPTS}/build.sh
 
 ${SCRIPTS}/gen-mongod-conf-file.sh 
 

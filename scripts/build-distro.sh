@@ -65,7 +65,7 @@ rm -f ${PRJROOT}/target/quanta-0.0.1-SNAPSHOT.jar
 
 # build the project (comile source)
 cd ${PRJROOT}
-. ${SCRIPTS}/_build.sh
+. ${SCRIPTS}/build.sh
 
 # Create Image
 #

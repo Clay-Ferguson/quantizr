@@ -45,7 +45,7 @@ fi
 dockerDown ${dc_ipfs_yaml} ipfs-dev
 
 cd ${PRJROOT}
-. ${SCRIPTS}/_build.sh
+. ${SCRIPTS}/build.sh
 
 # IMPORTANT: Use this to troubeshoot the variable substitutions in the yaml file
 # docker-compose -f ${dc_app_yaml} config 

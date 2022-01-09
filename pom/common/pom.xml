@@ -15,7 +15,7 @@ https://books.sonatype.com/mvnref-book/reference/pom-relationships-sect-pom-best
         <!--
 			Tip: When upgrading this verison it's a good ideal to blow away
 			the '.m2' hidden folder on your machine (maven cache) and also 
-			enable this line in _build.sh: "mvn dependency:sources", so you get
+			enable this line in build.sh: "mvn dependency:sources", so you get
 			all new source AND remove all the old stuff
 		-->
         <version>2.6.1</version>

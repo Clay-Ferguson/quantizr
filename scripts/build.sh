@@ -10,7 +10,7 @@ then
     exit
 fi
 
-echo "Running _build.sh for $quanta_domain"
+echo "Running build.sh for $quanta_domain"
 
 # Wipe some existing stuff to ensure it gets rebuilt
 if [ "$CLEAN" == "true" ]; then
