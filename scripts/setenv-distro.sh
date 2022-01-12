@@ -22,6 +22,9 @@ export mvn_profile=prod
 export DEPLOY_TARGET=/home/clay/ferguson/quanta-distro
 mkdir -p ${DEPLOY_TARGET}
 
+export MONGO_SCRIPTS=/home/clay/ferguson/scripts/mongo
+mkdir -p ${MONGO_SCRIPTS}
+
 export ipfs_data=${DEPLOY_TARGET}/ipfs
 export ipfs_staging=${DEPLOY_TARGET}/ipfs/staging
 

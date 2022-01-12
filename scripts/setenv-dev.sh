@@ -6,6 +6,9 @@ source ./define-functions-dev.sh
 export PRJROOT=/home/clay/ferguson/Quantizr
 export SCRIPTS=${PRJROOT}/scripts
 
+export MONGO_SCRIPTS=/home/clay/ferguson/scripts/mongo
+mkdir -p ${MONGO_SCRIPTS}
+
 export SECRETS=/home/clay/ferguson/secrets
 source ${SECRETS}/secrets.sh
 
