@@ -7,11 +7,7 @@
 # two separate instances of the app, for testing Fediverse functionality, or for
 # testing load-balancer functionality
 #
-
-# force current dir to be this script
-script_file=$(realpath $0)
-script_folder="$(dirname "${script_file}")"
-cd ${script_folder}
+cd $(dirname $(realpath $0))
 
 echo "========================================"
 echo "Starting Server #1 Instance Build+Deploy"

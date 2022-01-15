@@ -16,11 +16,7 @@
 # one it finds locally if it does fine it. 
 # ===================================================================
 
-# force current dir to be this script
-script_file=$(realpath $0)
-script_folder="$(dirname "${script_file}")"
-cd ${script_folder}
-
+cd $(dirname $(realpath $0))
 source ./setenv-distro-runner.sh
 
 ./stop-distro.sh

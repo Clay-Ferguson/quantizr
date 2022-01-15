@@ -6,11 +6,7 @@
 #   LoadBalancer types have a working EXTERNAL-IP, or else the external IP will be stuck in 'pending' status.
 # - login to container instance with `minikube ssh`
 
-# force current dir to be this script
-script_file=$(realpath $0)
-script_folder="$(dirname "${script_file}")"
-cd ${script_folder}
-
+cd $(dirname $(realpath $0))
 # show commands as they are run.
 # set -x
 source ./setenv-dev.sh
