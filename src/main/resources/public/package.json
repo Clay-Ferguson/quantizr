@@ -26,7 +26,7 @@
     "font-awesome": "^4.7.0",
     "highlight.js": "^11.3.1",
     "html-loader": "^3.0.0",
-    "marked": "^3.0.8",
+    "marked": "^4.0.10",
     "node-polyfill-webpack-plugin": "^1.1.4",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
