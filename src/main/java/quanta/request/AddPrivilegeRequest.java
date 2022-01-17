@@ -12,9 +12,18 @@ public class AddPrivilegeRequest extends RequestBase {
 	private List<String> privileges;
 
 	private String principal;
+	private boolean recursive;
 
 	public String getNodeId() {
 		return nodeId;
+	}
+
+	public boolean isRecursive() {
+		return recursive;
+	}
+
+	public void setRecursive(boolean recursive) {
+		this.recursive = recursive;
 	}
 
 	public void setNodeId(String nodeId) {

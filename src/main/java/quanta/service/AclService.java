@@ -38,7 +38,7 @@ import quanta.util.XString;
  * on nodes.
  */
 @Component
-public class AclService extends ServiceBase  {
+public class AclService extends ServiceBase {
 	private static final Logger log = LoggerFactory.getLogger(AclService.class);
 
 	@PostConstruct
@@ -87,6 +87,18 @@ public class AclService extends ServiceBase  {
 		auth.ownerAuth(ms, node);
 
 		boolean success = addPrivilege(ms, node, req.getPrincipal(), req.getPrivileges(), res);
+
+		if (req.isRecursive()) {
+			for (SubNode n : read.getSubGraph(ms, node, null, 0, true)) {
+				try {
+					addPrivilege(ms, n, req.getPrincipal(), req.getPrivileges(), res);
+				} catch (Exception e) {
+					// ignore any exceptions, which can happen for any nodes we don't own for example, and this is
+					// normal
+				}
+			}
+		}
+
 		res.setSuccess(success);
 		return res;
 	}
@@ -332,6 +344,19 @@ public class AclService extends ServiceBase  {
 		auth.ownerAuth(ms, node);
 
 		removeAclEntry(ms, node, req.getPrincipalNodeId(), req.getPrivilege());
+
+		if (req.isRecursive()) {
+			for (SubNode n : read.getSubGraph(ms, node, null, 0, true)) {
+				// log.debug("Node: path=" + path + " content=" + n.getContent());
+				try {
+					removeAclEntry(ms, n, req.getPrincipalNodeId(), req.getPrivilege());
+				} catch (Exception e) {
+					// ignore any exceptions, which can happen for any nodes we don't own for example, and this is
+					// normal
+				}
+			}
+		}
+
 		res.setSuccess(true);
 		return res;
 	}

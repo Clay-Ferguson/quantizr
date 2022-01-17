@@ -91,6 +91,7 @@ export interface AddPrivilegeRequest extends RequestBase {
     nodeId: string;
     privileges: string[];
     principal: string;
+    recursive: boolean;
 }
 
 export interface AppDropRequest extends RequestBase {
@@ -333,6 +334,7 @@ export interface RemovePrivilegeRequest extends RequestBase {
     nodeId: string;
     principalNodeId: string;
     privilege: string;
+    recursive: boolean;
 }
 
 export interface RenderCalendarRequest extends RequestBase {

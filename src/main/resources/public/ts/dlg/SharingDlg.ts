@@ -2,11 +2,12 @@ import { AppState } from "../AppState";
 import { CompIntf } from "../comp/base/CompIntf";
 import { Button } from "../comp/core/Button";
 import { ButtonBar } from "../comp/core/ButtonBar";
+import { Checkbox } from "../comp/core/Checkbox";
 import { Clearfix } from "../comp/core/Clearfix";
 import { Div } from "../comp/core/Div";
-import { EditPrivsTable } from "../comp/EditPrivsTable";
 import { Form } from "../comp/core/Form";
 import { HelpButton } from "../comp/core/HelpButton";
+import { EditPrivsTable } from "../comp/EditPrivsTable";
 import { Constants as C } from "../Constants";
 import { DialogBase } from "../DialogBase";
 import * as J from "../JavaIntf";
@@ -14,7 +15,8 @@ import { S } from "../Singletons";
 import { FriendsDlg } from "./FriendsDlg";
 
 interface LS { // Local State
-    nodePrivsInfo: J.GetNodePrivilegesResponse;
+    nodePrivsInfo?: J.GetNodePrivilegesResponse;
+    recursive?: boolean;
 }
 
 export class SharingDlg extends DialogBase {
@@ -22,22 +24,31 @@ export class SharingDlg extends DialogBase {
 
     constructor(private node: J.NodeInfo, state: AppState) {
         super("Node Sharing", "app-modal-content-medium-width", null, state);
-        this.mergeState<LS>({ nodePrivsInfo: null });
+        this.mergeState<LS>({ nodePrivsInfo: null, recursive: false });
     }
 
     renderDlg(): CompIntf[] {
         let isPublic = S.props.isPublic(this.node);
+        let state: LS = this.getState<LS>();
 
         return [
             new Form(null, [
                 new EditPrivsTable((allowAppends: boolean) => {
-                    this.shareNodeToPublic(allowAppends);
+                    this.shareNodeToPublic(allowAppends, state.recursive);
                 }, this.getState<LS>().nodePrivsInfo, this.removePrivilege),
                 S.props.isShared(this.node) ? new Div("Remove All", {
                     className: "marginBottom marginRight float-end clickable",
                     onClick: this.removeAllPrivileges
                 }) : null,
                 new Clearfix(),
+                new Checkbox("Apply changes recursively", null, {
+                    setValue: (checked: boolean): void => {
+                        this.mergeState<LS>({ recursive: checked });
+                    },
+                    getValue: (): boolean => {
+                        return state.recursive;
+                    }
+                }),
                 new ButtonBar([
                     new Button("Add Person", async () => {
                         let friendsDlg: FriendsDlg = new FriendsDlg(this.node, this.appState, true);
@@ -47,12 +58,9 @@ export class SharingDlg extends DialogBase {
                             this.shareImmediate(friendsDlg.getState().selectedName);
                         }
                     }, null, "btn-primary"),
-                    isPublic ? null : new Button("Make Public", () => this.shareNodeToPublic(false), null, "btn-secondary"),
+                    isPublic ? null : new Button("Make Public", () => this.shareNodeToPublic(false, state.recursive), null, "btn-secondary"),
                     new Button("Close", () => {
                         this.close();
-                        if (this.dirty && this.appState.activeTab === C.TAB_MAIN) {
-                            S.quanta.refresh(this.appState);
-                        }
                     }, null, "btn-secondary float-end"),
                     new HelpButton(() => S.quanta?.config?.help?.sharing?.dialog)
                 ], "marginTop")
@@ -61,10 +69,13 @@ export class SharingDlg extends DialogBase {
     }
 
     shareImmediate = async (userName: string) => {
+        let state: LS = this.getState<LS>();
+
         await S.util.ajax<J.AddPrivilegeRequest, J.AddPrivilegeResponse>("addPrivilege", {
             nodeId: this.node.id,
             principal: userName,
-            privileges: [J.PrivilegeType.READ, J.PrivilegeType.WRITE]
+            privileges: [J.PrivilegeType.READ, J.PrivilegeType.WRITE],
+            recursive: state.recursive
         });
         this.reload();
     }
@@ -92,14 +103,19 @@ export class SharingDlg extends DialogBase {
         let res: J.RemovePrivilegeResponse = await S.util.ajax<J.RemovePrivilegeRequest, J.RemovePrivilegeResponse>("removePrivilege", {
             nodeId: this.node.id,
             principalNodeId: "*",
-            privilege: "*"
+            privilege: "*",
+            recursive: this.getState<LS>().recursive
         });
-        this.removePrivilegeResponse();
 
-        // Give user time to see the removal, and then close out the dialog.
-        setTimeout(() => {
-            this.close();
-        }, 1000);
+        this.removePrivilegeResponse();
+    }
+
+    public close(): void {
+        super.close();
+        if (this.dirty && this.appState.activeTab === C.TAB_MAIN) {
+            console.log("Sharing dirty=true. Full refresh pending.");
+            S.quanta.refresh(this.appState);
+        }
     }
 
     removePrivilege = async (principalNodeId: string, privilege: string) => {
@@ -107,7 +123,8 @@ export class SharingDlg extends DialogBase {
         let res: J.RemovePrivilegeResponse = await S.util.ajax<J.RemovePrivilegeRequest, J.RemovePrivilegeResponse>("removePrivilege", {
             nodeId: this.node.id,
             principalNodeId,
-            privilege
+            privilege,
+            recursive: false
         });
         this.removePrivilegeResponse();
     }
@@ -123,7 +140,7 @@ export class SharingDlg extends DialogBase {
         this.mergeState<LS>({ nodePrivsInfo: res });
     }
 
-    shareNodeToPublic = async (allowAppends: boolean) => {
+    shareNodeToPublic = async (allowAppends: boolean, recursive: boolean) => {
         this.dirty = true;
         let encrypted = S.props.isEncrypted(this.node);
         if (encrypted) {
@@ -139,7 +156,8 @@ export class SharingDlg extends DialogBase {
         await S.util.ajax<J.AddPrivilegeRequest, J.AddPrivilegeResponse>("addPrivilege", {
             nodeId: this.node.id,
             principal: "public",
-            privileges: allowAppends ? [J.PrivilegeType.READ, J.PrivilegeType.WRITE] : [J.PrivilegeType.READ]
+            privileges: allowAppends ? [J.PrivilegeType.READ, J.PrivilegeType.WRITE] : [J.PrivilegeType.READ],
+            recursive
         });
 
         this.reload();
