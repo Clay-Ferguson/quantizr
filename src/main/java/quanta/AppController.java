@@ -221,11 +221,9 @@ public class AppController extends ServiceBase implements ErrorController {
 	 * 
 	 * passCode is an auth code for a password reset
 	 * 
-	 * Renders with Thymeleaf. todo-0: we can get rid of "/app" now AFTER removing all references to
-	 * /app in any urls, but leave the mapping HERE for a while after, to be sure. Do this tweak in a
-	 * dedicated commit.
+	 * Renders with Thymeleaf.
 	 */
-	@RequestMapping(value = {"/", "/app", "/n/{nameOnAdminNode}", "/u/{userName}/{nameOnUserNode}"})
+	@RequestMapping(value = {"/", "/n/{nameOnAdminNode}", "/u/{userName}/{nameOnUserNode}"})
 	public String index(//
 			// node name on 'admin' account. Non-admin named nodes use url
 			// "/u/userName/nodeName"
