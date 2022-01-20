@@ -788,7 +788,7 @@ export class Edit {
         state = appState(state);
         /*
          * For now, we will just cram the nodes onto the end of the children of the currently selected
-         * page. Later on we can get more specific about allowing precise destination location for moved
+         * page (for the 'inside' option). Later on we can get more specific about allowing precise destination location for moved
          * nodes.
          */
         let res: J.MoveNodesResponse = await S.util.ajax<J.MoveNodesRequest, J.MoveNodesResponse>("moveNodes", {

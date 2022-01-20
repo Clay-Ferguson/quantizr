@@ -25,6 +25,7 @@ import quanta.response.MoveNodesResponse;
 import quanta.response.SelectAllNodesResponse;
 import quanta.response.SetNodePositionResponse;
 import quanta.util.ThreadLocals;
+import quanta.util.Val;
 
 /**
  * Service for controlling the positions (ordinals) of nodes relative to their parents and/or moving
@@ -277,24 +278,52 @@ public class NodeMoveService extends ServiceBase {
 			create.insertOrdinal(ms, parentToPasteInto, curTargetOrdinal, nodeIds.size());
 		}
 
+		String sourceParentPath = null;
+		List<SubNode> nodesToMove = new ArrayList<SubNode>();
+		SubNode nodeParent = null;
+
 		for (String nodeId : nodeIds) {
 			// log.debug("Moving ID: " + nodeId);
 
 			SubNode node = read.getNode(ms, nodeId);
 			auth.ownerAuth(ms, node);
-			SubNode nodeParent = read.getParent(ms, node);
+			nodesToMove.add(node);
+
+			// If we're detecting a different parent path from other nodes to move we fail. We only allow
+			// pasting nodes that are all under the same parent.
+			if (ok(sourceParentPath) && !sourceParentPath.equals(node.getParentPath())) {
+				throw new RuntimeException("Nodes to move must be all from the same parent.");
+			}
+			sourceParentPath = node.getParentPath();
+
+			// get the nodeParent if we don't have it already.
+			if (no(nodeParent)) {
+				nodeParent = read.getParent(ms, node);
+			}
+		}
+
+		nodesToMove.sort((n1, n2) -> (int) (n1.getOrdinal() - n2.getOrdinal()));
+
+		// set to true if we're sure at least one node changed ordinal.
+		final Val<Boolean> dirty = new Val<>(Boolean.FALSE);
+
+		for (SubNode node : nodesToMove) {
+			// log.debug("Moving ID: " + nodeId);
 
 			Long _targetOrdinal = curTargetOrdinal;
+			final SubNode _nodeParent = nodeParent;
 			arun.run(as -> {
 				/*
 				 * If this 'node' will be changing parents (moving to new parent) we need to update its subgraph, of
 				 * all children and also update its own path, otherwise it's staying under same parent and only it's
 				 * ordinal will change.
 				 */
-				if (nodeParent.getId().compareTo(parentToPasteInto.getId()) != 0) {
+				if (_nodeParent.getId().compareTo(parentToPasteInto.getId()) != 0) {
 
-					// if a parent node is attempting to be pasted into one of it's children that's an impossible move
-					// so we fail
+					/*
+					 * if a parent node is attempting to be pasted into one of it's children that's an impossible move
+					 * so we reject the attempt.
+					 */
 					if (parentToPasteInto.getPath().startsWith(node.getPath())) {
 						throw new RuntimeException("Impossible node move requested.");
 					}
@@ -302,17 +331,24 @@ public class NodeMoveService extends ServiceBase {
 					node.setPath(parentPath + "/" + node.getLastPathPart());
 				}
 
-				node.setOrdinal(_targetOrdinal);
-				node.setDisableParentCheck(true);
+				// if this ordinal somehow is NOT changing (which CAN happen), then do nothing here
+				if (!node.getOrdinal().equals(_targetOrdinal)) {
+					dirty.setVal(true);
+
+					node.setOrdinal(_targetOrdinal);
+					node.setDisableParentCheck(true);
+				}
 				return null;
 			});
 			curTargetOrdinal++;
 		}
 
-		arun.run(as -> {
-			update.saveSession(as);
-			return null;
-		});
+		if (dirty.getVal()) {
+			arun.run(as -> {
+				update.saveSession(as);
+				return null;
+			});
+		}
 	}
 
 	private void changePathOfSubGraph(MongoSession ms, SubNode graphRoot, String newPathPrefix) {
