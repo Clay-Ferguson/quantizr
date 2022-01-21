@@ -340,8 +340,8 @@ public class NodeEditService extends ServiceBase {
 		}
 		// if we're setting node name to a different node name
 		else if (ok(nodeInfo.getName()) && nodeInfo.getName().length() > 0 && !nodeInfo.getName().equals(node.getName())) {
-			if (!StringUtils.isAlphanumeric(nodeInfo.getName())) {
-				throw new RuntimeEx("Node names can only contain alpha numeric characters");
+			if (!snUtil.validNodeName(nodeInfo.getName())) {
+				throw new RuntimeEx("Node names can only contain letter, digit, underscore, dash, and period characters.");
 			}
 			String nodeName = nodeInfo.getName().trim();
 

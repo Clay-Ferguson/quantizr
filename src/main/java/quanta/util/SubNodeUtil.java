@@ -36,7 +36,7 @@ public class SubNodeUtil extends ServiceBase {
 	private static final Logger log = LoggerFactory.getLogger(SubNodeUtil.class);
 
 	@Autowired
-    private AppProp prop;
+	private AppProp prop;
 
 	/*
 	 * These are properties we should never allow the client to send back as part of a save operation.
@@ -56,6 +56,22 @@ public class SubNodeUtil extends ServiceBase {
 
 	public void removeUnwantedPropsForIPFS(SubNode node) {
 		node.delete(NodeProp.IPFS_CID.s());
+	}
+
+	public boolean validNodeName(String name) {
+		if (name == null || name.length() == 0) {
+			return false;
+		}
+		int sz = name.length();
+		for (int i = 0; i < sz; i++) {
+			char c = name.charAt(i);
+			if (c == '-' || c == '_' || c == '.')
+				continue;
+			if (!Character.isLetterOrDigit(c)) {
+				return false;
+			}
+		}
+		return true;
 	}
 
 	/*
