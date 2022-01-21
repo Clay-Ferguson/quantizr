@@ -73,6 +73,10 @@ public class NodeInfo {
 
 	private List<NodeInfo> children;
 
+	// This is optional, and will be non-empty whenever we're wanting not just the children of this node
+	// but all the parents up to a certain number of parents, up towards the root, however many levels up.
+	private LinkedList<NodeInfo> parents;
+
 	private String imgId;
 	private String displayName;
 	private String owner;
@@ -371,5 +375,13 @@ public class NodeInfo {
 
 	public void setDisplayName(String displayName) {
 		this.displayName = displayName;
+	}
+
+	public LinkedList<NodeInfo> getParents() {
+		return parents;
+	}
+
+	public void setParents(LinkedList<NodeInfo> parents) {
+		this.parents = parents;
 	}
 }

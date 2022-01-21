@@ -8,6 +8,8 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 public class UserPreferences {
 	private boolean editMode;
 	private boolean showMetaData;
+	private boolean showParents;
+
 	private boolean rssHeadlinesOnly;
 	private long mainPanelCols = 5;
 
@@ -68,5 +70,13 @@ public class UserPreferences {
 	@JsonProperty(required = false)
 	public void setMainPanelCols(long mainPanelCols) {
 		this.mainPanelCols = mainPanelCols;
+	}
+
+	public boolean isShowParents() {
+		return showParents;
+	}
+
+	public void setShowParents(boolean showParents) {
+		this.showParents = showParents;
 	}
 }

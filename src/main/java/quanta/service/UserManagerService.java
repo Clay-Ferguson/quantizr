@@ -593,6 +593,9 @@ public class UserManagerService extends ServiceBase {
 			boolean showMetaData = reqUserPrefs.isShowMetaData();
 			prefsNode.set(NodeProp.USER_PREF_SHOW_METADATA.s(), showMetaData);
 
+			boolean showParents = reqUserPrefs.isShowParents();
+			prefsNode.set(NodeProp.USER_PREF_SHOW_PARENTS.s(), showParents);
+
 			boolean rssHeadingsOnly = reqUserPrefs.isRssHeadlinesOnly();
 			prefsNode.set(NodeProp.USER_PREF_RSS_HEADINGS_ONLY.s(), rssHeadingsOnly);
 

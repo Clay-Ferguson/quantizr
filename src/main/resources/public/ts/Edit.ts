@@ -332,6 +332,8 @@ export class Edit {
 
     refreshNodeFromServer = async (nodeId: string): Promise<void> => {
         // console.log("refreshNodeFromServer: " + nodeId);
+        let state = store.getState();
+
         let res: J.RenderNodeResponse = await S.util.ajax<J.RenderNodeRequest, J.RenderNodeResponse>("renderNode", {
             nodeId,
             upLevel: false,
@@ -341,7 +343,8 @@ export class Edit {
             offset: 0,
             goToLastPage: false,
             forceIPFSRefresh: false,
-            singleNode: true
+            singleNode: true,
+            parentCount: state.userPreferences.showParents ? 1 : 0
         });
 
         if (!res?.node) {
@@ -416,6 +419,12 @@ export class Edit {
 
         /* scrolling is required because nodes will have scrolled out of view by the page just now updating */
         S.view.scrollToNode(state);
+    }
+
+    toggleShowParents = (state: AppState): void => {
+        state.userPreferences.showParents = !state.userPreferences.showParents;
+        S.util.saveUserPreferences(state, false);
+        S.quanta.refresh(state);
     }
 
     moveNodeUp = async (evt: Event, id: string, state?: AppState): Promise<void> => {

@@ -204,6 +204,7 @@ export class MenuPanel extends Div {
 
     static toggleEditMode = () => S.edit.toggleEditMode(appState(null));
     static toggleMetaData = () => S.edit.toggleShowMetaData(appState(null));
+    static toggleParents = () => S.edit.toggleShowParents(appState(null));
     static browserInfo = () => S.util.showBrowserInfo();
     static mobileToggle = () => S.util.switchBrowsingMode();
 
@@ -479,6 +480,7 @@ export class MenuPanel extends Div {
 
             new MenuItem("Edit", MenuPanel.toggleEditMode, !state.isAnonUser, () => state.userPreferences.editMode), //
             new MenuItem("Info", MenuPanel.toggleMetaData, true, () => state.userPreferences.showMetaData), //
+            new MenuItem("Context", MenuPanel.toggleParents, true, () => state.userPreferences.showParents), //
 
             // For now there is only ONE button on the Perferences dialog that is accessible as a toolbar button already, so
             // until we have at least one more preference the preferences dialog is not needed.

@@ -27,6 +27,9 @@ public class RenderNodeRequest extends RequestBase {
 	private boolean renderParentIfLeaf;
 	private boolean forceRenderParent;
 
+	// specifies how many levels ABOVE the requested node to get. To load parentNodes property in the response.
+	private int parentCount;
+
 	public boolean isForceRenderParent() {
 		return forceRenderParent;
 	}
@@ -108,5 +111,13 @@ public class RenderNodeRequest extends RequestBase {
 
 	public void setUpLevel(boolean upLevel) {
 		this.upLevel = upLevel;
+	}
+
+	public int getParentCount() {
+		return parentCount;
+	}
+
+	public void setParentCount(int parentCount) {
+		this.parentCount = parentCount;
 	}
 }

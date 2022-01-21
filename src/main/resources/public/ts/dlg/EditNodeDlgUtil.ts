@@ -309,7 +309,8 @@ export class EditNodeDlgUtil {
             offset: 0,
             goToLastPage: false,
             forceIPFSRefresh: false,
-            singleNode: true
+            singleNode: true,
+            parentCount: 0
         });
 
         if (!res.node) return;

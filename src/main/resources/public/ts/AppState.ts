@@ -74,6 +74,7 @@ export class AppState {
     userPreferences: J.UserPreferences = {
         editMode: false,
         showMetaData: false,
+        showParents: false,
         rssHeadlinesOnly: true,
         maxUploadFileSize: 0,
         enableIPSM: false,

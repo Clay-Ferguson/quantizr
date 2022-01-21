@@ -5,6 +5,7 @@ import { Span } from "../comp/core/Span";
 import { TypeHandlerIntf } from "../intf/TypeHandlerIntf";
 import { S } from "../Singletons";
 import { Comp } from "./base/Comp";
+import { Icon } from "./core/Icon";
 
 export class BreadcrumbsPanel extends Div {
     constructor() {
@@ -51,6 +52,14 @@ export class BreadcrumbsPanel extends Div {
                 children.push(new Span("...", { className: "marginRight" }));
             }
         });
+
+        if (children.length > 0) {
+            children.push(new Icon({
+                className: "fa " + (state.userPreferences.showParents ? "fa-arrow-circle-up" : "fa-arrow-circle-down") + " fa-lg showParentsIcon",
+                title: "Toggle: Show Parent on page",
+                onClick: () => S.edit.toggleShowParents(state)
+            }));
+        }
 
         return new Div(null, null, children);
     }

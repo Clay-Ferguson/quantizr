@@ -9,6 +9,7 @@ import { DialogBase } from "../DialogBase";
 import * as J from "../JavaIntf";
 import { S } from "../Singletons";
 
+// NOTE: THIS DIALOG IS CURRENTLY NOT USED BUT WE NEED TO KEEP IT BECAUSE IN THE FUTURE IT LIKELY WILL BE
 export class PrefsDlg extends DialogBase {
 
     constructor(state: AppState) {
@@ -42,6 +43,7 @@ export class PrefsDlg extends DialogBase {
                 userPreferences: {
                     editMode: this.appState.userPreferences.editMode,
                     showMetaData: this.appState.userPreferences.showMetaData,
+                    showParents: this.appState.userPreferences.showParents,
                     rssHeadlinesOnly: this.appState.userPreferences.rssHeadlinesOnly,
                     mainPanelCols: this.appState.userPreferences.mainPanelCols,
                     maxUploadFileSize: -1,

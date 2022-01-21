@@ -52,7 +52,7 @@ public class NodeRenderService extends ServiceBase {
 	private static final Logger log = LoggerFactory.getLogger(NodeRenderService.class);
 
 	@Autowired
-    private AppProp prop;
+	private AppProp prop;
 
 	@Autowired
 	private ApplicationContext context;
@@ -114,10 +114,6 @@ public class NodeRenderService extends ServiceBase {
 			SyncFromIpfsService svc = (SyncFromIpfsService) context.getBean(SyncFromIpfsService.class);
 			svc.loadNode(ms, node);
 		}
-
-		LinkedList<BreadcrumbInfo> breadcrumbs = new LinkedList<>();
-		res.setBreadcrumbs(breadcrumbs);
-		getBreadcrumbs(ms, node, breadcrumbs);
 
 		/* If only the single node was requested return that */
 		if (req.isSingleNode()) {
@@ -196,7 +192,33 @@ public class NodeRenderService extends ServiceBase {
 			}
 		}
 
+		// Collect all the parents we need to based on parentCount
+		LinkedList<NodeInfo> parentNodes = new LinkedList<>();
+		SubNode highestUpParent = node;
+		int parentCount = req.getParentCount();
+		boolean done = false;
+		while (!done && parentCount-- > 0) {
+			try {
+				highestUpParent = read.getParent(ms, highestUpParent);
+				if (ok(highestUpParent)) {
+					NodeInfo nodeInfo = convert.convertToNodeInfo(ThreadLocals.getSC(), ms, highestUpParent, true, false, 0,
+							false, false, false, false);
+
+					// each parent up goes on top of list for correct rendering order on client.
+					parentNodes.addFirst(nodeInfo);
+				}
+			} catch (Exception e) {
+				done = true;
+				// if we run into any errors collecting children we can ignore them.
+			}
+		}
+
+		LinkedList<BreadcrumbInfo> breadcrumbs = new LinkedList<>();
+		res.setBreadcrumbs(breadcrumbs);
+		getBreadcrumbs(ms, highestUpParent, breadcrumbs);
+
 		NodeInfo nodeInfo = processRenderNode(ms, req, res, node, scanToNode, -1, 0, limit);
+		nodeInfo.setParents(parentNodes);
 		res.setNode(nodeInfo);
 		res.setSuccess(true);
 

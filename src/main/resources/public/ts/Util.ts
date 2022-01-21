@@ -1342,17 +1342,22 @@ export class Util {
         }
     }
 
-    saveUserPreferences = async (state: AppState): Promise<void> => {
+    saveUserPreferences = async (state: AppState, dispatchNow: boolean = true): Promise<void> => {
         if (!state.isAnonUser) {
             await S.util.ajax<J.SaveUserPreferencesRequest, J.SaveUserPreferencesResponse>("saveUserPreferences", {
                 userPreferences: state.userPreferences
             });
         }
 
-        dispatch("Action_SetUserPreferences", (s: AppState): AppState => {
-            s.userPreferences = state.userPreferences;
-            return s;
-        });
+        if (dispatchNow) {
+            dispatch("Action_SetUserPreferences", (s: AppState): AppState => {
+                s.userPreferences = state.userPreferences;
+                if (!s.userPreferences.showParents) {
+                    s.node.parents = null;
+                }
+                return s;
+            });
+        }
     }
 
     setStateVarsUsingLoginResponse = (res: J.LoginResponse): void => {

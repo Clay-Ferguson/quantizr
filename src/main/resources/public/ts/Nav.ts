@@ -17,6 +17,7 @@ import { FeedViewProps } from "./tabs/FeedViewProps";
 
 export class Nav {
     _UID_ROWID_PREFIX: string = "row_";
+    _UID_PARENT_ROWID_PREFIX: string = "parent_";
 
     login = (state: AppState): void => {
         new LoginDlg(null, state).open();
@@ -64,7 +65,6 @@ export class Nav {
             });
 
             this.delayedClearPageMessage();
-
         } else {
             S.render.renderPageFromData(res, scrollToTop, id, true, true);
         }
@@ -110,7 +110,8 @@ export class Nav {
                 offset: 0,
                 goToLastPage: false,
                 forceIPFSRefresh: false,
-                singleNode: false
+                singleNode: false,
+                parentCount: state.userPreferences.showParents ? 1 : 0
             });
             this.upLevelResponse(res, null, true, state);
         }
@@ -147,7 +148,8 @@ export class Nav {
                 offset: 0,
                 goToLastPage: false,
                 forceIPFSRefresh: false,
-                singleNode: false
+                singleNode: false,
+                parentCount: state.userPreferences.showParents ? 1 : 0
             });
 
             if (processingDelete) {
@@ -240,7 +242,8 @@ export class Nav {
                 offset: 0,
                 goToLastPage: false,
                 forceIPFSRefresh: false,
-                singleNode: false
+                singleNode: false,
+                parentCount: state.userPreferences.showParents ? 1 : 0
             });
             this.navPageNodeResponse(res, state);
         }
@@ -333,7 +336,8 @@ export class Nav {
                     offset: 0,
                     goToLastPage: false,
                     forceIPFSRefresh: false,
-                    singleNode: false
+                    singleNode: false,
+                    parentCount: state.userPreferences.showParents ? 1 : 0
                 });
                 this.navPageNodeResponse(res, state);
             }
@@ -405,7 +409,8 @@ export class Nav {
                 offset: 0,
                 goToLastPage: false,
                 forceIPFSRefresh: false,
-                singleNode: true
+                singleNode: true,
+                parentCount: 0
             });
 
             if (!res.node) return;

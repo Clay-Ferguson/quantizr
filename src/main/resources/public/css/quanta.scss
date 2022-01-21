@@ -1161,6 +1161,16 @@ Will come back later and study this more. todo-1 */
     margin-top: 8px;
 }
 
+.parentNodeContentStyle {
+    border: 2px solid $gray-700;
+    border-radius: $border-radius;
+    
+    padding-right: 8px;
+    padding-top: 8px;
+    margin-bottom: 8px;
+    margin-top: 8px;
+}
+
 .vertical-layout-row {
     margin-bottom: $smallGap;
 }
@@ -1398,6 +1408,12 @@ i'm backing out for now
     position: absolute;
     top: 0;
     right: 0;
+}
+
+.showParentsIcon {
+    margin-top: 4px;
+    cursor: pointer;
+    color: gray;
 }
 
 .active-row {
