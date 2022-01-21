@@ -51,7 +51,11 @@ public class Convert extends ServiceBase {
 	public NodeInfo convertToNodeInfo(SessionContext sc, MongoSession ms, SubNode node, boolean htmlOnly, boolean initNodeEdit,
 			long ordinal, boolean allowInlineChildren, boolean lastChild, boolean childrenCheck, boolean getFollowers) {
 
-		/* If session user shouldn't be able to see secrets on this node remove them */
+		/* If session user shouldn't be able to see secrets on this node remove them 
+		
+		todo-0: Under most circumstances we want to remove at least the crypto private key one of these EVEN
+		if we are the owner.
+		*/
 		if (ms.isAnon() || (ok(ms.getUserNodeId()) && !ms.getUserNodeId().equals(node.getOwner()))) {
 			if (!ms.isAdmin()) {
 				node.clearSecretProperties();
