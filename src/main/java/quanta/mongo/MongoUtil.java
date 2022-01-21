@@ -686,12 +686,18 @@ public class MongoUtil extends ServiceBase {
 	public void createTextIndexes(MongoSession ms, Class<?> clazz) {
 		auth.requireAdmin(ms);
 
-		TextIndexDefinition textIndex = new TextIndexDefinitionBuilder().onAllFields()
-				// .onField(SubNode.FIELD_PROPERTIES+"."+NodeProp.CONTENT)
-				.build();
+		try {
+			TextIndexDefinition textIndex = new TextIndexDefinitionBuilder()//
+					// note: onAllFields was always used until 1/21/22
+					// .onAllFields()
+					.onField(SubNode.CONTENT).build();
 
-		update.saveSession(ms);
-		ops.indexOps(clazz).ensureIndex(textIndex);
+			update.saveSession(ms);
+			ops.indexOps(clazz).ensureIndex(textIndex);
+			log.debug("createTextIndex successful.");
+		} catch (Exception e) {
+			log.debug("createTextIndex failed.");
+		}
 	}
 
 	public void dropCollection(MongoSession ms, Class<?> clazz) {

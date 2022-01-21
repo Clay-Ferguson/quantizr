@@ -25,7 +25,7 @@ export class NodeStatsDlg extends DialogBase {
             this.res.topTags.forEach((word: string) => {
                 tagPanel.addChild(new Span(word.substring(1), {
                     className: "statsWord",
-                    word: "\"" + word + "\"",
+                    word: "\"#" + word + "\"",
                     onClick: this.searchWord
                 }));
             });
@@ -37,7 +37,7 @@ export class NodeStatsDlg extends DialogBase {
             this.res.topMentions.forEach((word: string) => {
                 mentionPanel.addChild(new Span(word.substring(1), {
                     className: "statsWord",
-                    word: "\"" + word + "\"",
+                    word: "\"@" + word + "\"",
                     onClick: this.searchWord
                 }));
             });

@@ -273,6 +273,10 @@ public class UserFeedService extends ServiceBase  {
 			textCriteria.matching(req.getSearchText());
 			textCriteria.caseSensitive(false);
 			q.addCriteria(textCriteria);
+
+			// Didn't use this. Not sure if it's more performant.
+			// Criteria textCrit = Criteria.where(SubNode.CONTENT).regex(req.getSearchText(), "i");
+			// q.addCriteria(textCrit);
 		}
 
 		q.addCriteria(crit);
