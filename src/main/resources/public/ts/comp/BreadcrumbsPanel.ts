@@ -54,10 +54,9 @@ export class BreadcrumbsPanel extends Div {
             });
         }
 
-        // This first 'if' is so we don't show the up arrow when there's obviously nothing it would do.
-        if (!(state.userPreferences.showParents && (!state.node.parents || state.node.parents.length === 0))) {
+        if (children.length > 0 && !state.userPreferences.showParents) {
             children.push(new Icon({
-                className: "fa " + (state.userPreferences.showParents ? "fa-arrow-circle-up" : "fa-arrow-circle-down") + " fa-lg showParentsIcon",
+                className: "fa fa-arrow-circle-down fa-lg showParentsIcon",
                 title: "Toggle: Show Parent on page",
                 onClick: () => S.edit.toggleShowParents(state)
             }));

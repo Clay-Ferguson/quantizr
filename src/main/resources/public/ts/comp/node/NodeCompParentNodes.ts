@@ -3,6 +3,7 @@ import { AppState } from "../../AppState";
 import { TabDataIntf } from "../../intf/TabDataIntf";
 import { S } from "../../Singletons";
 import { Div } from "../core/Div";
+import { Icon } from "../core/Icon";
 import { NodeCompContent } from "./NodeCompContent";
 import { NodeCompRowHeader } from "./NodeCompRowHeader";
 
@@ -31,8 +32,15 @@ export class NodeCompParentNodes extends Div {
 
         this.attribs.className = "parentNodeContentStyle";
 
+        let showCloseParentsIcon = state.userPreferences.showParents && state.node.parents?.length > 0;
+
         this.setChildren([
             state.userPreferences.showMetaData ? new NodeCompRowHeader(node, true, true, false, false) : null,
+            showCloseParentsIcon ? new Icon({
+                className: "fa fa-arrow-circle-up fa-lg showParentsIcon float-end",
+                title: "Toggle: Show Parent on page",
+                onClick: () => S.edit.toggleShowParents(state)
+            }) : null,
             new NodeCompContent(node, this.tabData, false, true, null, null, this.imgSizeOverride, true)
         ]);
     }
