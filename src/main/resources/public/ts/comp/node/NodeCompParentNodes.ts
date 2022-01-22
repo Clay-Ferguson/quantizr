@@ -37,7 +37,7 @@ export class NodeCompParentNodes extends Div {
         this.setChildren([
             state.userPreferences.showMetaData ? new NodeCompRowHeader(node, true, true, false, false) : null,
             showCloseParentsIcon ? new Icon({
-                className: "fa fa-arrow-circle-up fa-lg showParentsIcon float-end",
+                className: "fa fa-level-up fa-lg showParentsIcon float-end",
                 title: "Toggle: Show Parent on page",
                 onClick: () => S.edit.toggleShowParents(state)
             }) : null,

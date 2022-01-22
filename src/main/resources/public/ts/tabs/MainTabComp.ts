@@ -1,20 +1,24 @@
 import { useSelector } from "react-redux";
+import { dispatch } from "../AppRedux";
 import { AppState } from "../AppState";
 import { AppTab } from "../comp/AppTab";
 import { BreadcrumbsPanel } from "../comp/BreadcrumbsPanel";
 import { Clearfix } from "../comp/core/Clearfix";
 import { Div } from "../comp/core/Div";
 import { Html } from "../comp/core/Html";
+import { Icon } from "../comp/core/Icon";
+import { Span } from "../comp/core/Span";
 import { NodeCompMainList } from "../comp/node/NodeCompMainList";
 import { NodeCompMainNode } from "../comp/node/NodeCompMainNode";
 import { NodeCompParentNodes } from "../comp/node/NodeCompParentNodes";
 import { TabDataIntf } from "../intf/TabDataIntf";
+import { S } from "../Singletons";
 
 /* General Widget that doesn't fit any more reusable or specific category other than a plain Div, but inherits capability of Comp class */
 export class MainTabComp extends AppTab {
 
     constructor(state: AppState, data: TabDataIntf) {
-        super(state, data, "my-tab-pane-editmode");
+        super(state, data, null);
         this.attribs.key = "mainTabCompKey";
         data.inst = this;
     }
@@ -39,7 +43,33 @@ export class MainTabComp extends AppTab {
         //     });
         // }
 
+        let panelCols = state.userPreferences.mainPanelCols || 5;
+
+        let widthSizerPanel = !state.mobileMode ? new Span(null, { className: "widthSizerPanel float-end" }, [
+            panelCols > 4 ? new Icon({
+                className: "fa fa-step-backward fa-lg widthSizerIcon",
+                title: "Narrower view",
+                onClick: () => {
+                    dispatch("Action_widthAdjust", (s: AppState): AppState => {
+                        S.edit.setMainPanelCols(--s.userPreferences.mainPanelCols);
+                        return s;
+                    });
+                }
+            }) : null,
+            panelCols < 8 ? new Icon({
+                className: "fa fa-step-forward fa-lg widthSizerIcon",
+                title: "Wider view",
+                onClick: () => {
+                    dispatch("Action_widthAdjust", (s: AppState): AppState => {
+                        S.edit.setMainPanelCols(++s.userPreferences.mainPanelCols);
+                        return s;
+                    });
+                }
+            }) : null
+        ]) : null;
+
         this.setChildren([
+            widthSizerPanel,
             new Div(null, {
                 // This visibility setting makes the main content not visible until final scrolling is complete
                 // I'm not sure this rendering animation is still needed, or even noticeable. todo-2
@@ -52,8 +82,10 @@ export class MainTabComp extends AppTab {
                 // if we have some parents to display well then let's just do that...
                 state.node.parents?.length > 0 ? new NodeCompParentNodes(state, this.data, null) : null,
 
-                new NodeCompMainNode(state, this.data, null),
-                new NodeCompMainList(this.data)
+                new Div(null, { className: state.userPreferences.editMode ? "my-tab-pane-editmode" : null }, [
+                    new NodeCompMainNode(state, this.data, null),
+                    new NodeCompMainList(this.data)
+                ])
             ])
         ]);
     }

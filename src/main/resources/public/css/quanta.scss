@@ -1404,6 +1404,17 @@ i'm backing out for now
     border-radius: 6px;
 }
 
+.widthSizerPanel {
+    display: inline-block;
+    margin-top: 8px;
+}
+
+.widthSizerIcon {
+    display: inline-block;
+    margin-left: 12px;
+    cursor: pointer;
+}
+
 .node-table-row .top-right-image {
     position: absolute;
     top: 0;

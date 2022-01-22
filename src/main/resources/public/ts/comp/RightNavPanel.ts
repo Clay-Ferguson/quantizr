@@ -1,17 +1,17 @@
-import { appState, dispatch, store } from "../AppRedux";
+import { appState, store } from "../AppRedux";
 import { AppState } from "../AppState";
-import { Constants as C, Constants } from "../Constants";
+import { Checkbox } from "../comp/core/Checkbox";
+import { CollapsiblePanel } from "../comp/core/CollapsiblePanel";
+import { Div } from "../comp/core/Div";
+import { IconButton } from "../comp/core/IconButton";
+import { Img } from "../comp/core/Img";
+import { Constants as C } from "../Constants";
 import { UserProfileDlg } from "../dlg/UserProfileDlg";
 import * as J from "../JavaIntf";
 import { S } from "../Singletons";
 import { CompIntf } from "./base/CompIntf";
-import { ButtonBar } from "../comp/core/ButtonBar";
-import { Checkbox } from "../comp/core/Checkbox";
-import { CollapsiblePanel } from "../comp/core/CollapsiblePanel";
-import { Div } from "../comp/core/Div";
+import { Icon } from "./core/Icon";
 import { HistoryPanel } from "./HistoryPanel";
-import { IconButton } from "../comp/core/IconButton";
-import { Img } from "../comp/core/Img";
 import { TabPanelButtons } from "./TabPanelButtons";
 
 declare var g_brandingAppName;
@@ -58,22 +58,22 @@ export class RightNavPanel extends Div {
         let allowEditMode = state.node && !state.isAnonUser;
         let fullScreenViewer = S.util.fullscreenViewerActive(state);
 
-        let clipboardPasteButton = !state.isAnonUser ? new IconButton("fa-clipboard", null, {
+        let clipboardPasteButton = state.userPreferences.editMode ? new Icon({
+            className: "fa fa-clipboard fa-lg marginRight clickable",
             onClick: e => {
                 // todo-1: would be nice if this detected an image and saved as attachment.
                 S.edit.saveClipboardToChildNode("~" + J.NodeType.NOTES);
             },
             title: "Save clipboard"
-        }, "btn-secondary", "off") : null;
+        }) : null;
 
-        let addNoteButton = !state.isAnonUser ? new IconButton("fa-sticky-note", null, {
+        let addNoteButton = state.userPreferences.editMode ? new Icon({
+            className: "fa fa-sticky-note fa-lg marginRight clickable",
             onClick: e => {
                 S.edit.addNode("~" + J.NodeType.NOTES, null, null, null, state);
             },
             title: "Create new Note"
-        }, "btn-secondary", "off") : null;
-
-        let panelCols = state.userPreferences.mainPanelCols || 5;
+        }) : null;
 
         this.setChildren([
             new Div(null, { className: "float-left" }, [
@@ -82,6 +82,15 @@ export class RightNavPanel extends Div {
                         className: "signupLinkText",
                         onClick: e => { S.nav.login(state); }
                     }) : null,
+
+                    new Div(null, { className: "marginBottom" }, [
+                        displayName && !state.isAnonUser ? new IconButton("fa-database", "Account", {
+                            title: "Go to Account Root Node",
+                            onClick: e => S.nav.navHome(state)
+                        }, "marginRight btn-primary") : null,
+                        clipboardPasteButton,
+                        addNoteButton
+                    ]),
 
                     new Div(null, { className: "bigMarginBottom" }, [
                         (allowEditMode && !fullScreenViewer) ? new Checkbox("Edit", null, {
@@ -92,7 +101,8 @@ export class RightNavPanel extends Div {
                                 return state.userPreferences.editMode;
                             }
                         }, "form-switch form-check-inline") : null,
-                        !fullScreenViewer ? new Checkbox("Info", null, {
+
+                        !fullScreenViewer ? new Checkbox("Meta", null, {
                             setValue: (checked: boolean): void => {
                                 S.edit.toggleShowMetaData(state);
                             },
@@ -102,36 +112,16 @@ export class RightNavPanel extends Div {
                         }, "form-switch form-check-inline") : null
                     ]),
 
-                    new Div(null, { className: "marginBottom" }, [
-                        new ButtonBar([
-                            panelCols > 4 ? new IconButton("fa-caret-left", null, {
-                                className: "widthAdjustLink",
-                                title: "Narrower view",
-                                onClick: () => {
-                                    dispatch("Action_widthAdjust", (s: AppState): AppState => {
-                                        S.edit.setMainPanelCols(--s.userPreferences.mainPanelCols);
-                                        return s;
-                                    });
-                                }
-                            }) : null,
-                            panelCols < 8 ? new IconButton("fa-caret-right", null, {
-                                className: "widthAdjustLink",
-                                title: "Wider view",
-                                onClick: () => {
-                                    dispatch("Action_widthAdjust", (s: AppState): AppState => {
-                                        S.edit.setMainPanelCols(++s.userPreferences.mainPanelCols);
-                                        return s;
-                                    });
-                                }
-                            }) : null,
-                            clipboardPasteButton,
-                            addNoteButton,
-                            displayName && !state.isAnonUser ? new IconButton("fa-database", null, {
-                                title: "Go to your Account Root Node",
-                                onClick: e => S.nav.navHome(state)
-                            }) : null
-                        ])
-                    ]),
+                    // new Div(null, { className: "marginBottom" }, [
+                    //     new ButtonBar([
+                    //         clipboardPasteButton,
+                    //         addNoteButton,
+                    //         displayName && !state.isAnonUser ? new IconButton("fa-database", null, {
+                    //             title: "Go to your Account Root Node",
+                    //             onClick: e => S.nav.navHome(state)
+                    //         }) : null
+                    //     ])
+                    // ]),
                     displayName && !state.isAnonUser ? new Div(displayName, {
                         className: "clickable",
                         onClick: () => { new UserProfileDlg(null, appState(null)).open(); }

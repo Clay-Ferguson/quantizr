@@ -1,11 +1,11 @@
 import { useSelector } from "react-redux";
 import { store } from "../AppRedux";
 import { AppState } from "../AppState";
+import { Div } from "../comp/core/Div";
+import { IconButton } from "../comp/core/IconButton";
 import { Constants as C } from "../Constants";
 import { S } from "../Singletons";
 import { CompIntf } from "./base/CompIntf";
-import { Div } from "../comp/core/Div";
-import { IconButton } from "../comp/core/IconButton";
 
 export class TabPanel extends Div {
 
