@@ -24,8 +24,6 @@ export class Constants {
 
     static BOOKMARKS_MENU_TEXT = "Bookmarks";
 
-    static leftNavPanelCols: number = 3;
-
     static readonly ONE_MB = 1048576; // 1024 * 1024;
     static readonly MAX_UPLOAD_MB = 20;
     static readonly DEBUG_SCROLLING = false;

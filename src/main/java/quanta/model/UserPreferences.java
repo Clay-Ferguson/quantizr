@@ -11,6 +11,8 @@ public class UserPreferences {
 	private boolean showParents;
 
 	private boolean rssHeadlinesOnly;
+
+	// valid Range = 4 thru 8, inclusive.
 	private long mainPanelCols = 5;
 
 	// not persisted to DB yet. ipsm was just an experiment using IPFSSubPub for messaging

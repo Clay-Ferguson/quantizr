@@ -26,11 +26,22 @@ export class RightNavPanel extends Div {
             // tabIndex is required or else scrolling by arrow keys breaks.
             tabIndex: "3"
         });
+
         let state: AppState = store.getState();
         let panelCols = state.userPreferences.mainPanelCols || 5;
-        let delta = panelCols === 4 ? -1 : 0;
-        let cols = 12 - Constants.leftNavPanelCols - state.userPreferences.mainPanelCols + delta;
-        this.attribs.className = "col-" + cols + " rightNavPanel customScrollbar";
+        if (panelCols < 4) panelCols = 4;
+        if (panelCols > 8) panelCols = 8;
+        let rightCols = 4;
+
+        if (panelCols >= 5) {
+            rightCols--;
+        }
+        if (panelCols >= 7) {
+            rightCols--;
+        }
+
+        // console.log("right Cols: " + rightCols);
+        this.attribs.className = "col-" + rightCols + " rightNavPanel customScrollbar";
     }
 
     preRender(): void {
@@ -103,7 +114,7 @@ export class RightNavPanel extends Div {
                                     });
                                 }
                             }) : null,
-                            panelCols < 7 ? new IconButton("fa-caret-right", null, {
+                            panelCols < 8 ? new IconButton("fa-caret-right", null, {
                                 className: "widthAdjustLink",
                                 title: "Wider view",
                                 onClick: () => {
