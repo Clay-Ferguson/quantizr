@@ -55,7 +55,6 @@ public class Instrument {
 				userName = sc.getUserName();
 			}
 
-			// log.debug(jp.getSignature().getName() + "-" + userName);
 			value = jp.proceed();
 		} catch (Throwable e) {
 			throw e;
