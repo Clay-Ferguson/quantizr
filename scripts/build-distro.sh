@@ -104,3 +104,4 @@ echo "${DEPLOY_TARGET}/run-distro.sh"
 echo "======================================================================"
 echo 
 echo "Build Complete: ${PRJROOT}/distro/quanta${QUANTA_VER}.tar.gz"
+read -p "Press any Key"
