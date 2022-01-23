@@ -2,8 +2,8 @@ package quanta.service;
 
 import static quanta.util.Util.no;
 import static quanta.util.Util.ok;
-import java.util.concurrent.ConcurrentHashMap;
 import javax.annotation.PostConstruct;
+import org.apache.commons.collections4.map.LRUMap;
 import org.jsoup.Connection;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -20,7 +20,7 @@ import quanta.response.GetOpenGraphResponse;
 public class JSoupService extends ServiceBase {
 	private static final Logger log = LoggerFactory.getLogger(JSoupService.class);
 
-	public final ConcurrentHashMap<String, OpenGraph> ogCache = new ConcurrentHashMap<>();
+	public final LRUMap<String, OpenGraph> ogCache = new LRUMap(500);
 
 	public static final String BROWSER_USER_AGENT =
 			"Browser: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.114 Safari/537.36";
@@ -32,7 +32,10 @@ public class JSoupService extends ServiceBase {
 
 	public GetOpenGraphResponse getOpenGraph(GetOpenGraphRequest ogReq) {
 		GetOpenGraphResponse res = new GetOpenGraphResponse();
-		OpenGraph openGraph = ogCache.get(ogReq.getUrl());
+		OpenGraph openGraph = null;
+		synchronized (ogCache) {
+			openGraph = ogCache.get(ogReq.getUrl());
+		}
 
 		if (ok(openGraph)) {
 			res.setOpenGraph(openGraph);
@@ -40,7 +43,9 @@ public class JSoupService extends ServiceBase {
 			try {
 				openGraph = parseOpenGraph(ogReq.getUrl());
 				if (ok(openGraph)) {
-					ogCache.put(ogReq.getUrl(), openGraph);
+					synchronized (ogCache) {
+						ogCache.put(ogReq.getUrl(), openGraph);
+					}
 				}
 				res.setOpenGraph(openGraph);
 			} catch (Exception e) {
