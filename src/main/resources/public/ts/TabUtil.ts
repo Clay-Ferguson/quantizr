@@ -66,7 +66,7 @@ export class TabUtil {
         dispatch("Action_initTabs", (s: AppState): AppState => {
             s.tabData = [
                 {
-                    name: "Main",
+                    name: "Tree",
                     id: C.TAB_MAIN,
                     isVisible: () => true,
                     constructView: (data: TabDataIntf) => new MainTabComp(s, data),

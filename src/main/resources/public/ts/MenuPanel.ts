@@ -268,9 +268,9 @@ export class MenuPanel extends Div {
             Menu.activeMenu = bookmarkItems.length > 0 ? C.BOOKMARKS_MENU_TEXT : null;
         }
 
-        children.push(new Menu("My Nodes", [
-            new MenuItem("Account", S.nav.navHome, !state.isAnonUser),
-            new MenuItem("Home", MenuPanel.openHomeNode, !state.isAnonUser),
+        children.push(new Menu("Tree", [
+            new MenuItem("My Account", S.nav.navHome, !state.isAnonUser),
+            new MenuItem("Portal Home", MenuPanel.openHomeNode, !state.isAnonUser),
             new MenuItemSeparator(), //
             new MenuItem("RSS Feeds", MenuPanel.openRSSFeedsNode, !state.isAnonUser),
             new MenuItem("Notes", MenuPanel.openNotesNode, !state.isAnonUser),
