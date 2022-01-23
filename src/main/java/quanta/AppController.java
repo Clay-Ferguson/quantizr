@@ -45,6 +45,8 @@ import quanta.config.GracefulShutdown;
 import quanta.config.ServiceBase;
 import quanta.config.SessionContext;
 import quanta.exception.base.RuntimeEx;
+import quanta.instrument.Instrument;
+import quanta.instrument.PerfMon;
 import quanta.mail.EmailSender;
 import quanta.model.client.NodeProp;
 import quanta.model.client.NodeType;
@@ -223,6 +225,7 @@ public class AppController extends ServiceBase implements ErrorController {
 	 * 
 	 * Renders with Thymeleaf.
 	 */
+	@PerfMon
 	@RequestMapping(value = {"/", "/n/{nameOnAdminNode}", "/u/{userName}/{nameOnUserNode}"})
 	public String index(//
 			// node name on 'admin' account. Non-admin named nodes use url
@@ -298,6 +301,7 @@ public class AppController extends ServiceBase implements ErrorController {
 	 * 
 	 * Renders files in './src/main/resources/templates/demo' folder.
 	 */
+	@PerfMon
 	@RequestMapping(value = {"/demo/{file}"})
 	public String demo(@PathVariable(value = "file", required = false) String file, //
 			Model model) {
@@ -310,21 +314,25 @@ public class AppController extends ServiceBase implements ErrorController {
 	/*
 	 * DO NOT DELETE: Leave as example for how to render plain HTML directly from a string
 	 */
+	@PerfMon
 	@GetMapping(value = {"/sp/{systemPage}"}, produces = MediaType.TEXT_HTML_VALUE)
 	public @ResponseBody String systemPage(@PathVariable(value = "systemPage", required = false) String systemPage) {
 		return "<html><body>My Full Page: " + systemPage + "</body></html>";
 	}
 
+	@PerfMon
 	@GetMapping(value = {"/fediverse-users"}, produces = MediaType.TEXT_PLAIN_VALUE)
 	public @ResponseBody String fediverseUsers() {
 		return apub.dumpFediverseUsers();
 	}
 
+	// NOPE! No performance monitor for this. @PerfMon
 	@GetMapping(value = {"/performance-report"}, produces = MediaType.TEXT_PLAIN_VALUE)
 	public @ResponseBody String performanceReport() {
-		return system.getPerformancerReport();
+		return Instrument.getPerformancerReport();
 	}
 
+	@PerfMon
 	@GetMapping(value = {"/multiRss"}, produces = MediaType.APPLICATION_RSS_XML_VALUE)
 	public void multiRss(@RequestParam(value = "id", required = true) String nodeId, //
 			HttpServletResponse response) {
@@ -342,6 +350,7 @@ public class AppController extends ServiceBase implements ErrorController {
 	/*
 	 * This was sort of experimental, but I need to document how it works and put in the User Guide
 	 */
+	@PerfMon
 	@GetMapping(value = {"/rss"}, produces = MediaType.APPLICATION_RSS_XML_VALUE)
 	public void getRss(@RequestParam(value = "id", required = true) String nodeId, //
 			HttpServletResponse response, //
@@ -366,6 +375,7 @@ public class AppController extends ServiceBase implements ErrorController {
 	 * 
 	 * todo-2: need a 'useCache' url param option
 	 */
+	@PerfMon
 	@GetMapping(value = {"/proxyGet"})
 	public void proxyGet(@RequestParam(value = "url", required = true) String url, //
 			HttpSession session, HttpServletResponse response//
@@ -412,6 +422,7 @@ public class AppController extends ServiceBase implements ErrorController {
 		});
 	}
 
+	@PerfMon
 	@RequestMapping(value = API_PATH + "/getMultiRssFeed", method = RequestMethod.POST)
 	public @ResponseBody Object getMultiRssFeed(@RequestBody GetMultiRssRequest req, HttpSession session) {
 		// NO NOT HERE -> SessionContext.checkReqToken();
@@ -423,6 +434,7 @@ public class AppController extends ServiceBase implements ErrorController {
 		});
 	}
 
+	@PerfMon
 	@RequestMapping(value = API_PATH + "/signup", method = RequestMethod.POST)
 	public @ResponseBody Object signup(@RequestBody SignupRequest req, HttpSession session) {
 		// NO NOT HERE -> SessionContext.checkReqToken();
@@ -431,6 +443,7 @@ public class AppController extends ServiceBase implements ErrorController {
 		});
 	}
 
+	@PerfMon
 	@RequestMapping(value = API_PATH + "/login", method = RequestMethod.POST)
 	public @ResponseBody Object login(@RequestBody LoginRequest req, HttpServletRequest httpReq, HttpSession session) {
 		// NO NOT HERE -> SessionContext.checkReqToken();
@@ -439,6 +452,7 @@ public class AppController extends ServiceBase implements ErrorController {
 		});
 	}
 
+	@PerfMon
 	@RequestMapping(value = API_PATH + "/closeAccount", method = RequestMethod.POST)
 	public @ResponseBody Object closeAccount(@RequestBody CloseAccountRequest req, HttpSession session) {
 		SessionContext.checkReqToken();
@@ -449,6 +463,7 @@ public class AppController extends ServiceBase implements ErrorController {
 		});
 	}
 
+	@PerfMon
 	@RequestMapping(value = API_PATH + "/logout", method = RequestMethod.POST)
 	public @ResponseBody Object logout(@RequestBody LogoutRequest req, HttpServletRequest sreq, HttpServletResponse sres,
 			HttpSession session) {
@@ -471,6 +486,7 @@ public class AppController extends ServiceBase implements ErrorController {
 		});
 	}
 
+	@PerfMon
 	@RequestMapping(value = API_PATH + "/renderCalendar", method = RequestMethod.POST)
 	public @ResponseBody Object renderCalendarNodes(@RequestBody RenderCalendarRequest req, //
 			HttpServletRequest httpReq, HttpSession session) {
@@ -480,6 +496,7 @@ public class AppController extends ServiceBase implements ErrorController {
 		});
 	}
 
+	@PerfMon
 	@RequestMapping(value = API_PATH + "/getNodeMetaInfo", method = RequestMethod.POST)
 	public @ResponseBody Object getNodeMetaInfo(@RequestBody GetNodeMetaInfoRequest req, //
 			HttpServletRequest httpReq, HttpSession session) {
@@ -489,6 +506,7 @@ public class AppController extends ServiceBase implements ErrorController {
 		});
 	}
 
+	@PerfMon
 	@RequestMapping(value = API_PATH + "/renderNode", method = RequestMethod.POST)
 	public @ResponseBody Object renderNode(@RequestBody RenderNodeRequest req, //
 			HttpServletRequest httpReq, HttpSession session) {
@@ -498,6 +516,7 @@ public class AppController extends ServiceBase implements ErrorController {
 		});
 	}
 
+	@PerfMon
 	@RequestMapping(value = API_PATH + "/initNodeEdit", method = RequestMethod.POST)
 	public @ResponseBody Object initNodeEdit(@RequestBody InitNodeEditRequest req, HttpSession session) {
 		SessionContext.checkReqToken();
@@ -511,6 +530,7 @@ public class AppController extends ServiceBase implements ErrorController {
 	 * 
 	 * NOTE: Looks like this is currently not enabled in TypeScript
 	 */
+	@PerfMon
 	@RequestMapping(value = API_PATH + "/appDrop", method = RequestMethod.POST)
 	public @ResponseBody Object appDrop(@RequestBody AppDropRequest req, HttpSession session) {
 		SessionContext.checkReqToken();
@@ -519,12 +539,14 @@ public class AppController extends ServiceBase implements ErrorController {
 		});
 	}
 
+	// We don't perfMonitor this because the bottleneck is hopefully the foreign server. @PerfMon
 	@RequestMapping(value = API_PATH + "/getOpenGraph", method = RequestMethod.POST)
 	public @ResponseBody Object getOpenGraph(@RequestBody GetOpenGraphRequest req, HttpSession session) {
 		// NO NOT HERE -> SessionContext.checkReqToken();
 		return jsoup.getOpenGraph(req);
 	}
 
+	@PerfMon
 	@RequestMapping(value = API_PATH + "/getNodePrivileges", method = RequestMethod.POST)
 	public @ResponseBody Object getNodePrivileges(@RequestBody GetNodePrivilegesRequest req, HttpSession session) {
 		SessionContext.checkReqToken();
@@ -533,6 +555,7 @@ public class AppController extends ServiceBase implements ErrorController {
 		});
 	}
 
+	@PerfMon
 	@RequestMapping(value = API_PATH + "/getFriends", method = RequestMethod.POST)
 	public @ResponseBody Object getFriends(@RequestBody GetFriendsRequest req, HttpSession session) {
 		SessionContext.checkReqToken();
@@ -541,6 +564,7 @@ public class AppController extends ServiceBase implements ErrorController {
 		});
 	}
 
+	@PerfMon
 	@RequestMapping(value = API_PATH + "/addPrivilege", method = RequestMethod.POST)
 	public @ResponseBody Object addPrivilege(@RequestBody AddPrivilegeRequest req, HttpSession session) {
 		SessionContext.checkReqToken();
@@ -549,6 +573,7 @@ public class AppController extends ServiceBase implements ErrorController {
 		});
 	}
 
+	@PerfMon
 	@RequestMapping(value = API_PATH + "/removePrivilege", method = RequestMethod.POST)
 	public @ResponseBody Object removePrivilege(@RequestBody RemovePrivilegeRequest req, HttpSession session) {
 		SessionContext.checkReqToken();
@@ -557,6 +582,7 @@ public class AppController extends ServiceBase implements ErrorController {
 		});
 	}
 
+	@PerfMon
 	@RequestMapping(value = API_PATH + "/savePublicKey", method = RequestMethod.POST)
 	public @ResponseBody Object savePublicKey(@RequestBody SavePublicKeyRequest req, HttpSession session) {
 		// NO NOT HERE -> SessionContext.checkReqToken();
@@ -565,6 +591,7 @@ public class AppController extends ServiceBase implements ErrorController {
 		});
 	}
 
+	@PerfMon
 	@RequestMapping(value = API_PATH + "/setCipherKey", method = RequestMethod.POST)
 	public @ResponseBody Object setCipherKey(@RequestBody SetCipherKeyRequest req, HttpSession session) {
 		SessionContext.checkReqToken();
@@ -573,6 +600,7 @@ public class AppController extends ServiceBase implements ErrorController {
 		});
 	}
 
+	@PerfMon
 	@RequestMapping(value = API_PATH + "/export", method = RequestMethod.POST)
 	public @ResponseBody Object export(@RequestBody ExportRequest req, HttpSession session) {
 		SessionContext.checkReqToken();
@@ -643,6 +671,7 @@ public class AppController extends ServiceBase implements ErrorController {
 		});
 	}
 
+	@PerfMon
 	@RequestMapping(value = API_PATH + "/transferNode", method = RequestMethod.POST)
 	public @ResponseBody Object transferNode(@RequestBody TransferNodeRequest req, HttpSession session) {
 		SessionContext.checkReqToken();
@@ -654,6 +683,7 @@ public class AppController extends ServiceBase implements ErrorController {
 		});
 	}
 
+	@PerfMon
 	@RequestMapping(value = API_PATH + "/searchAndReplace", method = RequestMethod.POST)
 	public @ResponseBody Object searchAndReplace(@RequestBody SearchAndReplaceRequest req, HttpSession session) {
 		SessionContext.checkReqToken();
@@ -662,6 +692,7 @@ public class AppController extends ServiceBase implements ErrorController {
 		});
 	}
 
+	@PerfMon
 	@RequestMapping(value = API_PATH + "/publishNodeToIpfs", method = RequestMethod.POST)
 	public @ResponseBody Object publishNodeToIpfs(@RequestBody PublishNodeToIpfsRequest req, HttpSession session) {
 		SessionContext.checkReqToken();
@@ -670,6 +701,7 @@ public class AppController extends ServiceBase implements ErrorController {
 		});
 	}
 
+	@PerfMon
 	@RequestMapping(value = API_PATH + "/loadNodeFromIpfs", method = RequestMethod.POST)
 	public @ResponseBody Object loadNodeFromIpfs(@RequestBody LoadNodeFromIpfsRequest req, HttpSession session) {
 		SessionContext.checkReqToken();
@@ -678,6 +710,7 @@ public class AppController extends ServiceBase implements ErrorController {
 		});
 	}
 
+	@PerfMon
 	@RequestMapping(value = API_PATH + "/streamImport", method = RequestMethod.POST)
 	public @ResponseBody Object streamImport(//
 			@RequestParam(value = "nodeId", required = true) String nodeId, //
@@ -688,6 +721,7 @@ public class AppController extends ServiceBase implements ErrorController {
 		});
 	}
 
+	@PerfMon
 	@RequestMapping(value = API_PATH + "/setNodePosition", method = RequestMethod.POST)
 	public @ResponseBody Object setNodePosition(@RequestBody SetNodePositionRequest req, HttpSession session) {
 		SessionContext.checkReqToken();
@@ -697,6 +731,7 @@ public class AppController extends ServiceBase implements ErrorController {
 	}
 
 	/* Creates a new node as a child of the specified node */
+	@PerfMon
 	@RequestMapping(value = API_PATH + "/createSubNode", method = RequestMethod.POST)
 	public @ResponseBody Object createSubNode(@RequestBody CreateSubNodeRequest req, HttpSession session) {
 		SessionContext.checkReqToken();
@@ -708,6 +743,7 @@ public class AppController extends ServiceBase implements ErrorController {
 	/*
 	 * Inserts node 'inline' at the position specified in the InsertNodeRequest.targetName
 	 */
+	@PerfMon
 	@RequestMapping(value = API_PATH + "/insertNode", method = RequestMethod.POST)
 	public @ResponseBody Object insertNode(@RequestBody InsertNodeRequest req, HttpSession session) {
 		SessionContext.checkReqToken();
@@ -716,6 +752,7 @@ public class AppController extends ServiceBase implements ErrorController {
 		});
 	}
 
+	@PerfMon
 	@RequestMapping(value = API_PATH + "/insertBook", method = RequestMethod.POST)
 	public @ResponseBody Object insertBook(@RequestBody InsertBookRequest req, HttpSession session) {
 		SessionContext.checkReqToken();
@@ -728,6 +765,7 @@ public class AppController extends ServiceBase implements ErrorController {
 		});
 	}
 
+	@PerfMon
 	@RequestMapping(value = API_PATH + "/deleteNodes", method = RequestMethod.POST)
 	public @ResponseBody Object deleteNodes(@RequestBody DeleteNodesRequest req, HttpSession session) {
 		SessionContext.checkReqToken();
@@ -736,6 +774,7 @@ public class AppController extends ServiceBase implements ErrorController {
 		});
 	}
 
+	@PerfMon
 	@RequestMapping(value = API_PATH + "/joinNodes", method = RequestMethod.POST)
 	public @ResponseBody Object joinNodes(@RequestBody JoinNodesRequest req, HttpSession session) {
 		SessionContext.checkReqToken();
@@ -744,6 +783,7 @@ public class AppController extends ServiceBase implements ErrorController {
 		});
 	}
 
+	@PerfMon
 	@RequestMapping(value = API_PATH + "/selectAllNodes", method = RequestMethod.POST)
 	public @ResponseBody Object selectAllNodes(@RequestBody SelectAllNodesRequest req, HttpSession session) {
 		SessionContext.checkReqToken();
@@ -752,6 +792,7 @@ public class AppController extends ServiceBase implements ErrorController {
 		});
 	}
 
+	@PerfMon
 	@RequestMapping(value = API_PATH + "/updateHeadings", method = RequestMethod.POST)
 	public @ResponseBody Object updateHeadings(@RequestBody UpdateHeadingsRequest req, HttpSession session) {
 		SessionContext.checkReqToken();
@@ -760,6 +801,7 @@ public class AppController extends ServiceBase implements ErrorController {
 		});
 	}
 
+	@PerfMon
 	@RequestMapping(value = API_PATH + "/moveNodes", method = RequestMethod.POST)
 	public @ResponseBody Object moveNodes(@RequestBody MoveNodesRequest req, HttpSession session) {
 		SessionContext.checkReqToken();
@@ -768,6 +810,7 @@ public class AppController extends ServiceBase implements ErrorController {
 		});
 	}
 
+	@PerfMon
 	@RequestMapping(value = API_PATH + "/deleteProperties", method = RequestMethod.POST)
 	public @ResponseBody Object deleteProperties(@RequestBody DeletePropertyRequest req, HttpSession session) {
 		SessionContext.checkReqToken();
@@ -776,6 +819,7 @@ public class AppController extends ServiceBase implements ErrorController {
 		});
 	}
 
+	@PerfMon
 	@RequestMapping(value = API_PATH + "/saveNode", method = RequestMethod.POST)
 	public @ResponseBody Object saveNode(@RequestBody SaveNodeRequest req, HttpSession session) {
 		SessionContext.checkReqToken();
@@ -784,6 +828,7 @@ public class AppController extends ServiceBase implements ErrorController {
 		});
 	}
 
+	@PerfMon
 	@RequestMapping(value = API_PATH + "/changePassword", method = RequestMethod.POST)
 	public @ResponseBody Object changePassword(@RequestBody ChangePasswordRequest req, HttpSession session) {
 		// NO NOT HERE -> SessionContext.checkReqToken();
@@ -792,6 +837,7 @@ public class AppController extends ServiceBase implements ErrorController {
 		});
 	}
 
+	@PerfMon
 	@RequestMapping(value = API_PATH + "/resetPassword", method = RequestMethod.POST)
 	public @ResponseBody Object resetPassword(@RequestBody ResetPasswordRequest req, HttpSession session) {
 		// NO NOT HERE -> SessionContext.checkReqToken();
@@ -804,6 +850,7 @@ public class AppController extends ServiceBase implements ErrorController {
 	 * An alternative way to get the binary attachment from a node allowing more friendly url format
 	 * (named nodes)
 	 */
+	@PerfMon
 	@RequestMapping(value = {"/f/id/{id}", "/f/{nameOnAdminNode}", "/f/{userName}/{nameOnUserNode}"})
 	public void attachment(//
 			// node name on 'admin' account. Non-admin named nodes use url
@@ -884,6 +931,7 @@ public class AppController extends ServiceBase implements ErrorController {
 	 * 
 	 * Note: binId path param will be 'ipfs' for an ipfs attachment on the node.
 	 */
+	@PerfMon
 	@RequestMapping(value = API_PATH + "/bin/{binId}", method = RequestMethod.GET)
 	public void getBinary(@PathVariable("binId") String binId, //
 			@RequestParam(value = "nodeId", required = false) String nodeId, //
@@ -953,6 +1001,7 @@ public class AppController extends ServiceBase implements ErrorController {
 	 * https://stackoverflow.com/questions/16332092/spring-mvc-pathvariable-with-dot
 	 * -is-getting-truncated
 	 */
+	@PerfMon
 	@RequestMapping(value = "/file/{fileName:.+}", method = RequestMethod.GET)
 	public void getFile(//
 			@PathVariable("fileName") String fileName, //
@@ -991,6 +1040,7 @@ public class AppController extends ServiceBase implements ErrorController {
 	 * https://stackoverflow.com/questions/38957245/spring-mvc-streamingresponsebody
 	 * -return-chunked-file </pre>
 	 */
+	@PerfMon
 	@RequestMapping(value = "/filesys-xxx/{nodeId}", method = RequestMethod.GET)
 	public Object getFileSystemResourceStream(//
 			@PathVariable("nodeId") String nodeId, //
@@ -1012,7 +1062,7 @@ public class AppController extends ServiceBase implements ErrorController {
 	// .contentType(MediaTypeFactory.getMediaType(video).orElse(MediaType.APPLICATION_OCTET_STREAM))
 	// .body(video);
 	// }
-
+	@PerfMon
 	@RequestMapping(value = API_PATH + "/stream/{fileName}", method = RequestMethod.GET)
 	public ResponseEntity<ResourceRegion> streamMultiPart(//
 			@PathVariable("fileName") String fileName, //
@@ -1048,6 +1098,7 @@ public class AppController extends ServiceBase implements ErrorController {
 	 * possible from the normal node attachment. For normal attachments this is an empty string, which
 	 * makes it no suffix (no effect of concatenating)
 	 */
+	@PerfMon
 	@RequestMapping(value = API_PATH + "/upload", method = RequestMethod.POST)
 	public @ResponseBody Object upload(//
 			@RequestParam(value = "nodeId", required = true) String nodeId, //
@@ -1068,6 +1119,7 @@ public class AppController extends ServiceBase implements ErrorController {
 		});
 	}
 
+	@PerfMon
 	@RequestMapping(value = API_PATH + "/deleteAttachment", method = RequestMethod.POST)
 	public @ResponseBody Object deleteAttachment(@RequestBody DeleteAttachmentRequest req, HttpSession session) {
 		SessionContext.checkReqToken();
@@ -1076,6 +1128,7 @@ public class AppController extends ServiceBase implements ErrorController {
 		});
 	}
 
+	@PerfMon
 	@RequestMapping(value = API_PATH + "/uploadFromUrl", method = RequestMethod.POST)
 	public @ResponseBody Object uploadFromUrl(@RequestBody UploadFromUrlRequest req, HttpSession session) {
 		SessionContext.checkReqToken();
@@ -1084,6 +1137,7 @@ public class AppController extends ServiceBase implements ErrorController {
 		});
 	}
 
+	@PerfMon
 	@RequestMapping(value = API_PATH + "/uploadFromTorrent", method = RequestMethod.POST)
 	public @ResponseBody Object uploadFromTorrent(@RequestBody UploadFromTorrentRequest req, HttpSession session) {
 		SessionContext.checkReqToken();
@@ -1092,6 +1146,7 @@ public class AppController extends ServiceBase implements ErrorController {
 		});
 	}
 
+	@PerfMon
 	@RequestMapping(value = API_PATH + "/uploadFromIPFS", method = RequestMethod.POST)
 	public @ResponseBody Object uploadFromIPFS(@RequestBody UploadFromIPFSRequest req, HttpSession session) {
 		SessionContext.checkReqToken();
@@ -1100,6 +1155,7 @@ public class AppController extends ServiceBase implements ErrorController {
 		});
 	}
 
+	@PerfMon
 	@RequestMapping(value = API_PATH + "/anonPageLoad", method = RequestMethod.POST)
 	public @ResponseBody Object anonPageLoad(@RequestBody RenderNodeRequest req, HttpSession session) {
 		// NO NOT HERE -> SessionContext.checkReqToken();
@@ -1108,6 +1164,7 @@ public class AppController extends ServiceBase implements ErrorController {
 		});
 	}
 
+	@PerfMon
 	@RequestMapping(value = API_PATH + "/nodeSearch", method = RequestMethod.POST)
 	public @ResponseBody Object nodeSearch(@RequestBody NodeSearchRequest req, HttpSession session) {
 		// SessionContext.checkReqToken();
@@ -1116,6 +1173,7 @@ public class AppController extends ServiceBase implements ErrorController {
 		});
 	}
 
+	@PerfMon
 	@RequestMapping(value = API_PATH + "/getFollowers", method = RequestMethod.POST)
 	public @ResponseBody Object getFollowers(@RequestBody GetFollowersRequest req, HttpSession session) {
 		// NO NOT HERE -> SessionContext.checkReqToken();
@@ -1129,6 +1187,7 @@ public class AppController extends ServiceBase implements ErrorController {
 	 * consider it to be the odd man out which will eventually need to support paging (currently
 	 * doesn't) and go ahead and duplicate that functionality here in a way analogous to getFollowers
 	 */
+	@PerfMon
 	@RequestMapping(value = API_PATH + "/getFollowing", method = RequestMethod.POST)
 	public @ResponseBody Object getFollowing(@RequestBody GetFollowingRequest req, HttpSession session) {
 		// NO NOT HERE -> SessionContext.checkReqToken();
@@ -1137,6 +1196,7 @@ public class AppController extends ServiceBase implements ErrorController {
 		});
 	}
 
+	@PerfMon
 	@RequestMapping(value = API_PATH + "/nodeFeed", method = RequestMethod.POST)
 	public @ResponseBody Object nodeFeed(@RequestBody NodeFeedRequest req, HttpSession session) {
 		// NO NOT HERE -> SessionContext.checkReqToken();
@@ -1145,6 +1205,7 @@ public class AppController extends ServiceBase implements ErrorController {
 		});
 	}
 
+	@PerfMon
 	@RequestMapping(value = API_PATH + "/checkMessages", method = RequestMethod.POST)
 	public @ResponseBody Object checkMessages(@RequestBody CheckMessagesRequest req, HttpSession session) {
 		SessionContext.checkReqToken();
@@ -1153,6 +1214,7 @@ public class AppController extends ServiceBase implements ErrorController {
 		});
 	}
 
+	@PerfMon
 	@RequestMapping(value = API_PATH + "/getSharedNodes", method = RequestMethod.POST)
 	public @ResponseBody Object getSharedNodes(@RequestBody GetSharedNodesRequest req, HttpSession session) {
 		return callProc.run("getSharedNodes", req, session, ms -> {
@@ -1160,6 +1222,7 @@ public class AppController extends ServiceBase implements ErrorController {
 		});
 	}
 
+	@PerfMon
 	@RequestMapping(value = API_PATH + "/saveUserPreferences", method = RequestMethod.POST)
 	public @ResponseBody Object saveUserPreferences(@RequestBody SaveUserPreferencesRequest req, HttpSession session) {
 		SessionContext.checkReqToken();
@@ -1168,6 +1231,7 @@ public class AppController extends ServiceBase implements ErrorController {
 		});
 	}
 
+	@PerfMon
 	@RequestMapping(value = API_PATH + "/getUserProfile", method = RequestMethod.POST)
 	public @ResponseBody Object getUserProfile(@RequestBody GetUserProfileRequest req, HttpSession session) {
 		// NO NOT HERE -> SessionContext.checkReqToken();
@@ -1176,6 +1240,7 @@ public class AppController extends ServiceBase implements ErrorController {
 		});
 	}
 
+	@PerfMon
 	@RequestMapping(value = API_PATH + "/saveUserProfile", method = RequestMethod.POST)
 	public @ResponseBody Object saveUserProfile(@RequestBody SaveUserProfileRequest req, HttpSession session) {
 		SessionContext.checkReqToken();
@@ -1184,6 +1249,7 @@ public class AppController extends ServiceBase implements ErrorController {
 		});
 	}
 
+	@PerfMon
 	@RequestMapping(value = API_PATH + "/addFriend", method = RequestMethod.POST)
 	public @ResponseBody Object addFriend(@RequestBody AddFriendRequest req, HttpSession session) {
 		SessionContext.checkReqToken();
@@ -1192,6 +1258,7 @@ public class AppController extends ServiceBase implements ErrorController {
 		});
 	}
 
+	@PerfMon
 	@RequestMapping(value = API_PATH + "/deleteFriend", method = RequestMethod.POST)
 	public @ResponseBody Object deleteFriend(@RequestBody DeleteFriendRequest req, HttpSession session) {
 		SessionContext.checkReqToken();
@@ -1200,6 +1267,7 @@ public class AppController extends ServiceBase implements ErrorController {
 		});
 	}
 
+	@PerfMon
 	@RequestMapping(value = API_PATH + "/blockUser", method = RequestMethod.POST)
 	public @ResponseBody Object blockUser(@RequestBody BlockUserRequest req, HttpSession session) {
 		SessionContext.checkReqToken();
@@ -1208,6 +1276,7 @@ public class AppController extends ServiceBase implements ErrorController {
 		});
 	}
 
+@PerfMon
 	@RequestMapping(value = API_PATH + "/unblockUser", method = RequestMethod.POST)
 	public @ResponseBody Object unblockUser(@RequestBody DeleteFriendRequest req, HttpSession session) {
 		SessionContext.checkReqToken();
@@ -1216,6 +1285,7 @@ public class AppController extends ServiceBase implements ErrorController {
 		});
 	}
 
+	@PerfMon
 	@RequestMapping(value = API_PATH + "/getUserAccountInfo", method = RequestMethod.POST)
 	public @ResponseBody Object getUserAccountInfo(@RequestBody GetUserAccountInfoRequest req, HttpSession session) {
 		// NO NOT HERE -> SessionContext.checkReqToken();
@@ -1224,6 +1294,7 @@ public class AppController extends ServiceBase implements ErrorController {
 		});
 	}
 
+	@PerfMon
 	@RequestMapping(value = API_PATH + "/getConfig", method = RequestMethod.POST)
 	public @ResponseBody Object getConfig(@RequestBody GetConfigRequest req, HttpSession session) {
 		// NO NOT HERE -> SessionContext.checkReqToken();
@@ -1245,6 +1316,7 @@ public class AppController extends ServiceBase implements ErrorController {
 		return res;
 	}
 
+	@PerfMon
 	@RequestMapping(value = API_PATH + "/getBookmarks", method = RequestMethod.POST)
 	public @ResponseBody Object getBookmarks(@RequestBody GetBookmarksRequest req, HttpSession session) {
 		SessionContext.checkReqToken();
@@ -1255,6 +1327,7 @@ public class AppController extends ServiceBase implements ErrorController {
 		});
 	}
 
+	@PerfMon
 	@RequestMapping(value = API_PATH + "/getNodeStats", method = RequestMethod.POST)
 	public @ResponseBody Object getNodeStats(@RequestBody GetNodeStatsRequest req, HttpSession session) {
 		// NO NOT HERE -> SessionContext.checkReqToken();
@@ -1265,6 +1338,7 @@ public class AppController extends ServiceBase implements ErrorController {
 		});
 	}
 
+	@PerfMon
 	@RequestMapping(value = API_PATH + "/getServerInfo", method = RequestMethod.POST)
 	public @ResponseBody Object getServerInfo(@RequestBody GetServerInfoRequest req, HttpSession session) {
 		SessionContext.checkReqToken();
@@ -1350,6 +1424,7 @@ public class AppController extends ServiceBase implements ErrorController {
 		});
 	}
 
+	@PerfMon
 	@RequestMapping(value = API_PATH + "/graphNodes", method = RequestMethod.POST)
 	public @ResponseBody Object graphNodes(@RequestBody GraphRequest req, HttpSession session) {
 		SessionContext.checkReqToken();
@@ -1360,6 +1435,7 @@ public class AppController extends ServiceBase implements ErrorController {
 		});
 	}
 
+	@PerfMon
 	@RequestMapping(value = API_PATH + "/luceneIndex", method = RequestMethod.POST)
 	public @ResponseBody Object luceneIndex(@RequestBody LuceneIndexRequest req, HttpSession session) {
 		SessionContext.checkReqToken();
@@ -1377,6 +1453,7 @@ public class AppController extends ServiceBase implements ErrorController {
 		});
 	}
 
+	@PerfMon
 	@RequestMapping(value = API_PATH + "/luceneSearch", method = RequestMethod.POST)
 	public @ResponseBody Object luceneSearch(@RequestBody LuceneSearchRequest req, HttpSession session) {
 		SessionContext.checkReqToken();
@@ -1388,6 +1465,7 @@ public class AppController extends ServiceBase implements ErrorController {
 		});
 	}
 
+	@PerfMon
 	@RequestMapping(value = API_PATH + "/ping", method = RequestMethod.POST)
 	public @ResponseBody Object ping(@RequestBody PingRequest req, HttpSession session) {
 		return callProc.run("ping", req, session, ms -> {
@@ -1399,6 +1477,7 @@ public class AppController extends ServiceBase implements ErrorController {
 		});
 	}
 
+	@PerfMon
 	@RequestMapping(value = API_PATH + "/sendTestEmail", method = RequestMethod.POST)
 	public @ResponseBody Object sendTestEmail(@RequestBody SendTestEmailRequest req, HttpSession session) {
 		SessionContext.checkReqToken();
@@ -1426,6 +1505,7 @@ public class AppController extends ServiceBase implements ErrorController {
 		});
 	}
 
+	@PerfMon
 	@RequestMapping(value = API_PATH + "/splitNode", method = RequestMethod.POST)
 	public @ResponseBody Object splitNode(@RequestBody SplitNodeRequest req, HttpSession session) {
 		SessionContext.checkReqToken();
@@ -1447,6 +1527,7 @@ public class AppController extends ServiceBase implements ErrorController {
 	// }
 
 	// reference: https://www.baeldung.com/spring-server-sent-events
+	@PerfMon
 	@GetMapping(API_PATH + "/serverPush")
 	public SseEmitter serverPush(HttpSession session) {
 		// NO NOT HERE -> SessionContext.checkReqToken();
@@ -1457,6 +1538,7 @@ public class AppController extends ServiceBase implements ErrorController {
 		});
 	}
 
+	@PerfMon
 	@RequestMapping(value = API_PATH + "/captcha", method = RequestMethod.GET, produces = MediaType.IMAGE_PNG_VALUE)
 	public @ResponseBody byte[] captcha(HttpSession session) {
 		// NO NOT HERE -> SessionContext.checkReqToken();
@@ -1474,6 +1556,7 @@ public class AppController extends ServiceBase implements ErrorController {
 	 * So doing this request terminates the server: curl
 	 * http://${quanta_domain}:${PORT}/mobile/api/shutdown?password=${adminPassword}
 	 */
+	@PerfMon
 	@RequestMapping(value = API_PATH + "/shutdown", method = RequestMethod.GET)
 	public @ResponseBody String shutdown(HttpSession session,
 			@RequestParam(value = "password", required = true) String password) {

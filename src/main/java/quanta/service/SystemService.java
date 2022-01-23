@@ -31,7 +31,6 @@ import quanta.mongo.MongoSession;
 import quanta.mongo.model.SubNode;
 import quanta.util.Const;
 import quanta.util.ExUtil;
-import quanta.util.StopwatchEntry;
 import quanta.util.ThreadLocals;
 import quanta.util.XString;
 
@@ -150,26 +149,6 @@ public class SystemService extends ServiceBase {
 		} else {
 			return "node not found!";
 		}
-	}
-
-	public String getPerformancerReport() {
-		StringBuilder sb = new StringBuilder();
-		sb.append("Performance Report: " + ThreadLocals.getSC().getUserName() + "\n");
-		int idx = 1;
-		synchronized (ThreadLocals.getSC().getStopwatchData()) {
-			for (StopwatchEntry se : ThreadLocals.getSC().getStopwatchData()) {
-				sb.append(String.valueOf(idx));
-				sb.append(": ");
-				sb.append(se.getThreadName());
-				sb.append(" ");
-				sb.append(se.getEvent());
-				sb.append(" ");
-				sb.append(String.valueOf(se.getDuration()));
-				sb.append("\n");
-				idx++;
-			}
-		}
-		return sb.toString();
 	}
 
 	public String getSystemInfo() {

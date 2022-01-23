@@ -52,7 +52,6 @@ public class AppFilter extends GenericFilterBean {
 
 		HttpServletResponse httpRes = null;
 		try {
-			ThreadLocals.setStopwatchTime(System.currentTimeMillis());
 			int thisReqId = ++reqId;
 
 			HttpServletRequest httpReq = null;

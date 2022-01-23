@@ -20,7 +20,6 @@ import quanta.model.client.PrincipalName;
 import quanta.mongo.MongoUtil;
 import quanta.mongo.model.SubNode;
 import quanta.response.SessionTimeoutPushInfo;
-import quanta.util.StopwatchEntry;
 import quanta.util.ThreadLocals;
 import quanta.util.Util;
 
@@ -86,8 +85,6 @@ public class SessionContext extends ServiceBase {
 
 	/* keeps track of total calls to each URI */
 	public HashMap<String, Integer> actionCounters = new HashMap<>();
-
-	public List<StopwatchEntry> stopwatchData = new LinkedList<>();
 
 	private String captcha;
 	private int captchaFails = 0;
@@ -170,7 +167,6 @@ public class SessionContext extends ServiceBase {
 		sc.counter = counter;
 		sc.pushEmitter = pushEmitter;
 		sc.actionCounters = new HashMap<>();
-		sc.stopwatchData = new LinkedList<>();
 		sc.captcha = captcha;
 		sc.captchaFails = captchaFails;
 		sc.userToken = userToken;
@@ -178,10 +174,6 @@ public class SessionContext extends ServiceBase {
 		sc.enableIPSM = enableIPSM;
 		sc.userMessage = userMessage;
 		return sc;
-	}
-
-	public List<StopwatchEntry> getStopwatchData() {
-		return stopwatchData;
 	}
 
 	public void addAction(String actionName) {
@@ -507,31 +499,6 @@ public class SessionContext extends ServiceBase {
 	// // From InitializingBean interface
 	// @Override
 	// public void afterPropertiesSet() throws Exception {}
-
-	public void stopwatch(String action) {
-		// for now only admin user has stopwatch capability
-		if (no(userName) || !userName.equals(PrincipalName.ADMIN.s()))
-			return;
-
-		StopwatchEntry se = null;
-
-		String threadName = Thread.currentThread().getName();
-		threadName = threadName.replace("https-jsse-nio-443-exec-", "T");
-
-		if (ThreadLocals.getStopwatchTime() == -1) {
-			se = new StopwatchEntry(action, -1, threadName);
-			log.debug("Stopwatch: " + action);
-		} else {
-			Integer duration = (int) (System.currentTimeMillis() - ThreadLocals.getStopwatchTime());
-			se = new StopwatchEntry(action, duration, threadName);
-			log.debug("Stopwatch: " + action + " elapsed: " + String.valueOf(duration) + "ms");
-		}
-
-		synchronized (stopwatchData) {
-			stopwatchData.add(se);
-		}
-		ThreadLocals.setStopwatchTime(System.currentTimeMillis());
-	}
 
 	public String getWatchingPath() {
 		return watchingPath;

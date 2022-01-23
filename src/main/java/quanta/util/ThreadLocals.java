@@ -32,7 +32,6 @@ public class ThreadLocals {
 	private static final ThreadLocal<HttpSession> httpSession = new ThreadLocal<>();
 	private static final ThreadLocal<SessionContext> sessionContext = new ThreadLocal<>();
 	private static final ThreadLocal<ResponseBase> response = new ThreadLocal<>();
-	private static final ThreadLocal<Long> stopwatchTime = new ThreadLocal<>();
 	private static final ThreadLocal<MongoSession> session = new ThreadLocal<>();
 	private static final ThreadLocal<String> reqBearerToken = new ThreadLocal<>();
 
@@ -63,7 +62,6 @@ public class ThreadLocals {
 		sessionContext.remove();
 		servletResponse.remove();
 		response.remove();
-		stopwatchTime.remove();
 		reqBearerToken.remove();
 
 		getDirtyNodes().clear();
@@ -133,16 +131,6 @@ public class ThreadLocals {
 
 	public static String getReqBearerToken() {
 		return reqBearerToken.get();
-	}
-
-	public static void setStopwatchTime(Long val) {
-		stopwatchTime.set(val);
-	}
-
-	public static Long getStopwatchTime() {
-		if (no(stopwatchTime.get()))
-			return -1L;
-		return stopwatchTime.get();
 	}
 
 	public static void setParentCheckEnabled(Boolean val) {
