@@ -18,10 +18,15 @@ import quanta.util.DateUtil;
 import quanta.util.ThreadLocals;
 
 /*
+ * Instrumentation for the app (for Performance Monitoring)
+ * 
+ * Any method can be annotated with @PerfMon to gather performance statistics but mainly we just do
+ * this on our external-facing REST controller interface.
+ * 
  * Eventually we can perhaps use OpenTelemetry+SigNoz for performance metrics, but for now to be
- * able to gather specific targeted metrics in the simplest way possible, we just use this Stopwatch
- * class internally rather than more complex approaches like OpenTelemetry. Of course in any true
- * Production environment we'd be using OpenTelemetry.
+ * able to gather specific targeted metrics in the simplest way possible, we just use this class
+ * internally in the app rather than more complex approaches, since we were able to implement this
+ * letting AOP do all the work, and since perfMonAdvice() method below is so trivial.
  */
 @Aspect
 @Component
