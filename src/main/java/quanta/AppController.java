@@ -1110,7 +1110,7 @@ public class AppController extends ServiceBase implements ErrorController {
 
 	@RequestMapping(value = API_PATH + "/nodeSearch", method = RequestMethod.POST)
 	public @ResponseBody Object nodeSearch(@RequestBody NodeSearchRequest req, HttpSession session) {
-		SessionContext.checkReqToken();
+		// SessionContext.checkReqToken();
 		return callProc.run("nodeSearch", req, session, ms -> {
 			return search.search(ms, req);
 		});
