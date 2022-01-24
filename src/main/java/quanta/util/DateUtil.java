@@ -23,6 +23,7 @@ public class DateUtil {
 	public static final int SECOND_MILLIS = 1000;
 	public static final int MINUTE_MILLIS = 60 * SECOND_MILLIS;
 	public static final int HOUR_MILLIS = 60 * MINUTE_MILLIS;
+	public static final int DAY_MILLIS = 24 * HOUR_MILLIS;
 
 	/** Used to format date values */
 	// public static final String ECMA_DATE_FORMAT = "EEE MMM dd yyyy HH:mm:ss
@@ -158,27 +159,28 @@ public class DateUtil {
 		}
 	}
 
+	public static String formatDurationMillis(long different) {
+		return formatDurationMillis(different, false);
+	}
+
 	/*
 	 * Formats this duration into a string that describes the time about the way a human would say it.
 	 * For example if it was a number of days ago you don't include minutes and seconds etc.
 	 */
-	public static String formatDurationMillis(long different) {
+	public static String formatDurationMillis(long different, boolean showMillis) {
 		StringBuilder sb = new StringBuilder();
-		long secondsInMilli = 1000;
-		long minutesInMilli = secondsInMilli * 60;
-		long hoursInMilli = minutesInMilli * 60;
-		long daysInMilli = hoursInMilli * 24;
 
-		long days = different / daysInMilli;
-		different = different % daysInMilli;
+		long days = different / DAY_MILLIS;
+		different = different % DAY_MILLIS;
 
-		long hours = different / hoursInMilli;
-		different = different % hoursInMilli;
+		long hours = different / HOUR_MILLIS;
+		different = different % HOUR_MILLIS;
 
-		long minutes = different / minutesInMilli;
-		different = different % minutesInMilli;
+		long minutes = different / MINUTE_MILLIS;
+		different = different % MINUTE_MILLIS;
 
-		long seconds = different / secondsInMilli;
+		long seconds = different / SECOND_MILLIS;
+		long millis = different % SECOND_MILLIS;
 
 		if (days > 0) {
 			sb.append(String.valueOf(days));
@@ -192,6 +194,7 @@ public class DateUtil {
 			sb.append("h");
 		}
 
+		// only show resolution of minutes if not over a day
 		if (days == 0 && minutes > 0) {
 			if (sb.length() > 0)
 				sb.append(" ");
@@ -199,11 +202,20 @@ public class DateUtil {
 			sb.append("m");
 		}
 
-		if (days == 0 && hours == 0 && minutes < 3 && seconds > 0) {
+		// only show seconds if not over a day or hour.
+		if (days == 0 && hours == 0 && seconds > 0) {
 			if (sb.length() > 0)
 				sb.append(" ");
 			sb.append(String.valueOf(seconds));
 			sb.append("s");
+		}
+
+		// only show milliseconds if not over a minute
+		if (days == 0 && hours == 0 && minutes == 0) {
+			if (sb.length() > 0)
+				sb.append(" ");
+			sb.append(String.valueOf(millis));
+			sb.append("ms");
 		}
 
 		return sb.toString();

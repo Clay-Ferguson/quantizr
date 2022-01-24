@@ -45,8 +45,8 @@ import quanta.config.GracefulShutdown;
 import quanta.config.ServiceBase;
 import quanta.config.SessionContext;
 import quanta.exception.base.RuntimeEx;
-import quanta.instrument.Instrument;
 import quanta.instrument.PerfMon;
+import quanta.instrument.PerformanceReport;
 import quanta.mail.EmailSender;
 import quanta.model.client.NodeProp;
 import quanta.model.client.NodeType;
@@ -329,7 +329,7 @@ public class AppController extends ServiceBase implements ErrorController {
 	// NOPE! No performance monitor for this. @PerfMon
 	@GetMapping(value = {"/performance-report"}, produces = MediaType.TEXT_PLAIN_VALUE)
 	public @ResponseBody String performanceReport() {
-		return Instrument.getPerformancerReport();
+		return PerformanceReport.getReport();
 	}
 
 	@PerfMon
