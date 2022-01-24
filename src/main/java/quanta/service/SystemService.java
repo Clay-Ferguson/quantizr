@@ -43,9 +43,6 @@ public class SystemService extends ServiceBase {
 	private static final Logger log = LoggerFactory.getLogger(SystemService.class);
 
 	@Autowired
-	public static MongoAppConfig mac;
-
-	@Autowired
 	private AppProp prop;
 
 	@PostConstruct
@@ -113,7 +110,7 @@ public class SystemService extends ServiceBase {
 	}
 
 	public String runMongoDbCommand(Document doc) {
-		MongoDatabase database = mac.mongoClient().getDatabase(MongoAppConfig.databaseName);
+		MongoDatabase database = mdbf.getMongoDatabase(MongoAppConfig.databaseName);
 		Document result = database.runCommand(doc);
 
 		StringBuilder ret = new StringBuilder();

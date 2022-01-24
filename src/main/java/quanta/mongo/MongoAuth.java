@@ -8,7 +8,6 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
-import javax.annotation.PostConstruct;
 import org.apache.commons.lang3.StringUtils;
 import org.bson.types.ObjectId;
 import org.slf4j.Logger;
@@ -22,6 +21,7 @@ import quanta.config.NodePath;
 import quanta.config.ServiceBase;
 import quanta.exception.NodeAuthFailedException;
 import quanta.exception.base.RuntimeEx;
+import quanta.instrument.PerfMon;
 import quanta.model.AccessControlInfo;
 import quanta.model.PrivilegeInfo;
 import quanta.model.client.NodeProp;
@@ -51,10 +51,6 @@ public class MongoAuth extends ServiceBase {
 
 	private static final ConcurrentHashMap<String, SubNode> userNodesById = new ConcurrentHashMap<>();
 
-	@PostConstruct
-	public void postConstruct() {
-		auth = this;
-	}
 
 	public MongoSession getAdminSession() {
 		if (ok(adminSession)) {
@@ -219,6 +215,7 @@ public class MongoAuth extends ServiceBase {
 				!userName.equalsIgnoreCase(PrincipalName.ANON.s());
 	}
 
+	@PerfMon(category = "auth")
 	public void ownerAuth(MongoSession ms, SubNode node) {
 		if (no(ms)) {
 			throw new RuntimeEx("null session passed to ownerAuth.");
@@ -259,6 +256,7 @@ public class MongoAuth extends ServiceBase {
 		}
 	}
 
+	@PerfMon(category = "auth")
 	public void auth(MongoSession ms, SubNode node, PrivilegeType... privs) {
 		// during server init no auth is required.
 		if (no(node) || !MongoRepository.fullInit) {
@@ -522,8 +520,7 @@ public class MongoAuth extends ServiceBase {
 				orCriteria.add(Criteria.where(SubNode.AC + "." + share).ne(null));
 			}
 
-			crit = crit
-					.andOperator(new Criteria().orOperator((Criteria[]) orCriteria.toArray(new Criteria[orCriteria.size()])));
+			crit = crit.andOperator(new Criteria().orOperator((Criteria[]) orCriteria.toArray(new Criteria[orCriteria.size()])));
 		}
 
 		if (ok(ownerIdMatch)) {

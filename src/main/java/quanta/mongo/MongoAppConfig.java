@@ -70,11 +70,11 @@ public class MongoAppConfig extends AbstractMongoClientConfiguration {
 	@Override
 	@Bean
 	public MongoDatabaseFactory mongoDbFactory() {
-		log.debug("create mongoDbFactory");
 		if (connectionFailed)
 			return null;
 
 		if (no(factory)) {
+			log.debug("create mongoDbFactory");
 			try {
 				MongoClient mc = mongoClient();
 				if (ok(mc)) {
@@ -88,16 +88,17 @@ public class MongoAppConfig extends AbstractMongoClientConfiguration {
 				return null;
 			}
 		}
+		ServiceBase.mdbf = factory;
 		return factory;
 	}
 
 	@Bean
 	public GridFSBucket gridFsBucket() {
-		log.debug("create gridFdBucket");
 		if (connectionFailed)
 			return null;
 
 		if (no(gridFsBucket)) {
+			log.debug("create gridFdBucket");
 			MongoDatabaseFactory mdbf = mongoDbFactory();
 			if (ok(mdbf)) {
 				MongoDatabase db = mdbf.getMongoDatabase();
@@ -115,11 +116,11 @@ public class MongoAppConfig extends AbstractMongoClientConfiguration {
 
 	@Override
 	public MongoClient mongoClient() {
-		log.debug("create mongoClient");
 		if (connectionFailed)
 			return null;
 
 		if (no(mongoClient)) {
+			log.debug("create mongoClient");
 			MongoCredential credential = null;
 
 			if (appProp.getMongoSecurity()) {
@@ -200,11 +201,11 @@ public class MongoAppConfig extends AbstractMongoClientConfiguration {
 
 	@Bean
 	public GridFsTemplate gridFsTemplate() throws Exception {
-		log.debug("create gridFsTemplate");
 		if (connectionFailed)
 			return null;
 
 		if (no(grid)) {
+			log.debug("create gridFsTemplate");
 			MongoDatabaseFactory mdbf = mongoDbFactory();
 			if (ok(mdbf)) {
 				if (no(ops)) {

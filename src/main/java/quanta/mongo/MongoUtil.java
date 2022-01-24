@@ -30,6 +30,7 @@ import quanta.config.AppProp;
 import quanta.config.NodeName;
 import quanta.config.NodePath;
 import quanta.config.ServiceBase;
+import quanta.instrument.PerfMon;
 import quanta.model.client.NodeProp;
 import quanta.model.client.NodeType;
 import quanta.model.client.PrincipalName;
@@ -153,6 +154,7 @@ public class MongoUtil extends ServiceBase {
 	 * Runs the mongo 'findById' but if it finds a node that's already in memory we return the memory
 	 * object
 	 */
+	@PerfMon
 	public SubNode findById(ObjectId objId) {
 		if (no(objId))
 			return null;

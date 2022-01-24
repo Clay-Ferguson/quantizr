@@ -41,8 +41,7 @@ export class AccountTypeHandler extends TypeBase {
                         new UserProfileDlg(node.ownerId, state).open();
                     }
                 }
-            }),
-            new Div("This is your Account Root node. All your data will be contained under this top-level root.")
+            })
         ]);
     }
 }

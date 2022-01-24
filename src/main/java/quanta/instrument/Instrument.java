@@ -1,12 +1,14 @@
 package quanta.instrument;
 
 import static quanta.util.Util.ok;
+import java.lang.reflect.Method;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
+import org.aspectj.lang.reflect.MethodSignature;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -30,14 +32,14 @@ import quanta.util.ThreadLocals;
 public class Instrument {
 	private static final Logger log = LoggerFactory.getLogger(Instrument.class);
 
-	// Any calls that complete faster than this time, are not even considered. They're not a problem.
-	public static final int TIME_THRESHOLD = 1000;
-
 	private static final int MAX_EVENTS = 10000;
 	public static List<PerfMonEvent> data = Collections.synchronizedList(new LinkedList());
 
+	// NOTE: I think full path to annotation also works in the
+	// is this an option? --> @Around("@annotation(PerfMon)")
 	// Wrap PerfMon (PerformanceMonitor) methods.
-	@Around("execution(@PerfMon * *(..))")
+	// @Around("execution(@PerfMon * *(..))")
+	@Around("@annotation(PerfMon)")
 	public Object perfMonAdvice(ProceedingJoinPoint jp) throws Throwable {
 		if (data.size() > MAX_EVENTS) {
 			data.clear();
@@ -58,13 +60,42 @@ public class Instrument {
 		} finally {
 			int duration = (int) (System.currentTimeMillis() - startTime);
 
-			if (duration > TIME_THRESHOLD) {
-				PerfMonEvent event = new PerfMonEvent();
-				event.duration = duration;
-				event.event = jp.getSignature().getName();
-				event.user = userName;
-				data.add(event);
-			}
+			MethodSignature signature = (MethodSignature) jp.getSignature();
+
+			///////////////////
+			// DO NOT DELETE:
+			// The following are untested examples, in case we ever need more info...
+			// log.debug("full method description: " + signature.getMethod());
+			// log.debug("method name: " + signature.getMethod().getName());
+			// log.debug("declaring type: " + signature.getDeclaringType());
+
+			// // Method args
+			// log.debug("Method args names:");
+			// Arrays.stream(signature.getParameterNames()).forEach(s -> log.debug("arg name: " + s));
+
+			// log.debug("Method args types:");
+			// Arrays.stream(signature.getParameterTypes()).forEach(s -> log.debug("arg type: " + s));
+
+			// log.debug("Method args values:");
+			// if (ok(jp.getArgs())) {
+			// Arrays.stream(jp.getArgs()).forEach(o -> log.debug("arg value: " + o.toString()));
+			// }
+
+			// // Additional Information
+			// log.debug("returning type: " + signature.getReturnType());
+			// log.debug("method modifier: " + Modifier.toString(signature.getModifiers()));
+			// Arrays.stream(signature.getExceptionTypes()).forEach(aClass -> log.debug("exception type: " +
+			// aClass));
+
+			Method method = signature.getMethod();
+			PerfMon annotation = method.getAnnotation(PerfMon.class);
+
+			PerfMonEvent event = new PerfMonEvent();
+			event.duration = duration;
+			event.event = annotation.category().equals("") ? signature.getName() : //
+					(annotation.category() + "." + signature.getName());
+			event.user = userName;
+			data.add(event);
 		}
 		return value;
 	}

@@ -11,28 +11,35 @@ import quanta.util.DateUtil;
 public class PerformanceReport {
 	private static final Logger log = LoggerFactory.getLogger(PerformanceReport.class);
 
+	// Any calls that complete faster than this time, are not even considered. They're not a problem.
+	public static final int TIME_THRESHOLD = 1000;
+
 	public static String getReport() {
 		StringBuilder sb = new StringBuilder();
-		sb.append("Performance Report\n\n");
+		sb.append("Performance Report\n");
 
 		// Sort list by whichever are consuming the most time (i.e. by duration, descending order)
 		List<PerfMonEvent> orderedData;
 		synchronized (Instrument.data) {
 			if (Instrument.data.size() == 0) {
-				sb.append("No methods have taken above the threshold time of " + Instrument.TIME_THRESHOLD + "ms");
+				sb.append("No data available yet.");
 				return sb.toString();
 			}
 			orderedData = new ArrayList<>(Instrument.data);
 			orderedData.sort((s1, s2) -> (int) (s2.duration - s1.duration));
 		}
 
+		sb.append("\nEvents over Threshold of " + String.valueOf(TIME_THRESHOLD) + ": \n");
 		for (PerfMonEvent se : orderedData) {
-			sb.append(ok(se.user) ? se.user : "anon");
-			sb.append(" ");
-			sb.append(se.event);
-			sb.append(" ");
-			sb.append(DateUtil.formatDurationMillis(se.duration, true));
-			sb.append("\n");
+			// enable this threshold for prod (todo-0)
+			// if (se.duration > TIME_THRESHOLD) {
+				sb.append(ok(se.user) ? se.user : "anon");
+				sb.append(" ");
+				sb.append(se.event);
+				sb.append(" ");
+				sb.append(DateUtil.formatDurationMillis(se.duration, true));
+				sb.append("\n");
+			// }
 		}
 
 		// totals per person

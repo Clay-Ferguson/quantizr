@@ -1276,7 +1276,7 @@ public class AppController extends ServiceBase implements ErrorController {
 		});
 	}
 
-@PerfMon
+	@PerfMon
 	@RequestMapping(value = API_PATH + "/unblockUser", method = RequestMethod.POST)
 	public @ResponseBody Object unblockUser(@RequestBody DeleteFriendRequest req, HttpSession session) {
 		SessionContext.checkReqToken();
@@ -1307,7 +1307,7 @@ public class AppController extends ServiceBase implements ErrorController {
 			 * important! If we're going to alter the map we MUST clone it because otherwise we're altering the
 			 * same copy ALL users will see!
 			 */
-			map = (HashMap<String, Object>)map.clone();
+			map = (HashMap<String, Object>) map.clone();
 
 			map.put("userMessage", ThreadLocals.getSC().getUserMessage());
 			ThreadLocals.getSC().setUserMessage(null);

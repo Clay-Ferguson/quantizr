@@ -17,6 +17,7 @@ import quanta.actpub.model.APList;
 import quanta.config.NodeName;
 import quanta.config.ServiceBase;
 import quanta.exception.base.RuntimeEx;
+import quanta.instrument.PerfMon;
 import quanta.model.NodeInfo;
 import quanta.model.PropertyInfo;
 import quanta.model.client.NodeProp;
@@ -300,6 +301,7 @@ public class NodeEditService extends ServiceBase {
 		return res;
 	}
 
+	@PerfMon(category = "edit")
 	public SaveNodeResponse saveNode(MongoSession _ms, SaveNodeRequest req) {
 		SaveNodeResponse res = new SaveNodeResponse();
 		// log.debug("Controller saveNode: " + Thread.currentThread().getName());

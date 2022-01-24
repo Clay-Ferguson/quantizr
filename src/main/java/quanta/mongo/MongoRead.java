@@ -26,6 +26,7 @@ import quanta.config.NodeName;
 import quanta.config.NodePath;
 import quanta.config.ServiceBase;
 import quanta.exception.base.RuntimeEx;
+import quanta.instrument.PerfMon;
 import quanta.model.client.NodeProp;
 import quanta.model.client.NodeType;
 import quanta.model.client.PrincipalName;
@@ -51,10 +52,6 @@ public class MongoRead extends ServiceBase {
     private static final Object dbRootLock = new Object();
     private SubNode dbRoot;
 
-    @PostConstruct
-    public void postConstruct() {
-        read = this;
-    }
 
     // we call this during app init so we don't need to have thread safety here the rest of the time.
     public SubNode getDbRoot() {
@@ -159,6 +156,7 @@ public class MongoRead extends ServiceBase {
      * 
      * 2) "userName:nodeName" (a named node some user has created)
      */
+    @PerfMon(category = "read")
     public SubNode getNodeByName(MongoSession ms, String name, boolean allowAuth) {
         Query q = new Query();
 
@@ -229,6 +227,7 @@ public class MongoRead extends ServiceBase {
      *    (we support just '~inbox' also as a type shorthand where the sn: is missing)
      * </pre>
      */
+    @PerfMon(category = "read")
     public SubNode getNode(MongoSession ms, String identifier, boolean allowAuth) {
         if (no(identifier))
             return null;
@@ -265,6 +264,7 @@ public class MongoRead extends ServiceBase {
         return ret;
     }
 
+    @PerfMon(category = "read")
     public SubNode findNodeByPath(String path, boolean useCache) {
         path = XString.stripIfEndsWith(path, "/");
         SubNode ret = useCache ? ThreadLocals.getCachedNode(path) : null;
@@ -775,6 +775,7 @@ public class MongoRead extends ServiceBase {
      * Accepts either the 'userName' or the 'userNode' for the user. It's best to pass userNode if you
      * have it, to avoid a DB query.
      */
+    @PerfMon(category = "read")
     public SubNode getUserNodeByType(MongoSession ms, String userName, SubNode userNode, String content, String type,
             List<String> defaultPrivs, String defaultName) {
         if (no(userNode)) {

@@ -46,7 +46,7 @@ public class UserFeedService extends ServiceBase  {
 
 	@PostConstruct
 	public void postConstruct() {
-		this.userFeed = this;
+		userFeed = this;
 	}
 
 	public CheckMessagesResponse checkMessages(MongoSession ms, CheckMessagesRequest req) {
