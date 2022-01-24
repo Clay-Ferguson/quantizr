@@ -14,7 +14,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import javax.annotation.PostConstruct;
 import com.rometools.modules.content.ContentModuleImpl;
 import com.rometools.modules.itunes.EntryInformationImpl;
 import com.rometools.modules.mediarss.MediaEntryModuleImpl;
@@ -128,11 +127,6 @@ public class RSSFeedService extends ServiceBase {
 
 	private static final int MAX_FEEDS_PER_AGGREGATE = 40;
 	static boolean run = false;
-
-	@PostConstruct
-	public void postConstruct() {
-		rssFeed = this;
-	}
 
 	/*
 	 * Runs immediately at startup, and then every 30 minutes, to refresh the feedCache.

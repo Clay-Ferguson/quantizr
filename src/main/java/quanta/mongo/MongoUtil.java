@@ -10,7 +10,6 @@ import java.util.List;
 import java.util.Random;
 import java.util.StringTokenizer;
 import java.util.regex.Pattern;
-import javax.annotation.PostConstruct;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.bson.types.ObjectId;
 import org.slf4j.Logger;
@@ -67,11 +66,6 @@ public class MongoUtil extends ServiceBase {
 	 * performant way to translate from /r/p to /r path and vice verse
 	 */
 	static final String PATH_CHARS = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnoqstuvwxyz";
-
-	@PostConstruct
-	public void postConstruct() {
-		mongoUtil = this;
-	}
 
 	/*
 	 * The set of nodes in here MUST be known to be from an UNFILTERED and COMPLETE SubGraph query or

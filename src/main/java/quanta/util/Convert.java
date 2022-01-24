@@ -9,7 +9,6 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import javax.annotation.PostConstruct;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,12 +36,7 @@ import quanta.types.TypeBase;
 @Component
 public class Convert extends ServiceBase {
 	private static final Logger log = LoggerFactory.getLogger(Convert.class);
-
-	@PostConstruct
-	public void postConstruct() {
-		convert = this;
-	}
-
+	
 	/*
 	 * Generates a NodeInfo object, which is the primary data type that is also used on the
 	 * browser/client to encapsulate the data for a given node which is used by the browser to render

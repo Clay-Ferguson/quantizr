@@ -7,7 +7,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
-import javax.annotation.PostConstruct;
 import org.apache.commons.lang3.StringUtils;
 import org.bson.types.ObjectId;
 import org.slf4j.Logger;
@@ -61,11 +60,6 @@ import quanta.util.XString;
 @Component
 public class NodeEditService extends ServiceBase {
 	private static final Logger log = LoggerFactory.getLogger(NodeEditService.class);
-
-	@PostConstruct
-	public void postConstruct() {
-		edit = this;
-	}
 
 	/*
 	 * Creates a new node as a *child* node of the node specified in the request. Should ONLY be called

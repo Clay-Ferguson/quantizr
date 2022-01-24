@@ -9,7 +9,6 @@ import java.lang.management.RuntimeMXBean;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import javax.annotation.PostConstruct;
 import com.mongodb.client.MongoDatabase;
 import org.apache.commons.lang3.StringUtils;
 import org.bson.Document;
@@ -44,11 +43,6 @@ public class SystemService extends ServiceBase {
 
 	@Autowired
 	private AppProp prop;
-
-	@PostConstruct
-	public void postConstruct() {
-		system = this;
-	}
 
 	public String rebuildIndexes() {
 		if (!ThreadLocals.getSC().isAdmin()) {

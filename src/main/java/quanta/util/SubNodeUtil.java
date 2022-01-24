@@ -6,7 +6,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.UUID;
-import javax.annotation.PostConstruct;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -47,11 +46,6 @@ public class SubNodeUtil extends ServiceBase {
 		nonSavableProperties.add(NodeProp.BIN.s());
 		nonSavableProperties.add(NodeProp.BIN_TOTAL.s());
 		nonSavableProperties.add(NodeProp.BIN_QUOTA.s());
-	}
-
-	@PostConstruct
-	public void postConstruct() {
-		snUtil = this;
 	}
 
 	public void removeUnwantedPropsForIPFS(SubNode node) {

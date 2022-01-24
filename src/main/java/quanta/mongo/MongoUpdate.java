@@ -6,7 +6,6 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
-import javax.annotation.PostConstruct;
 import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,11 +28,6 @@ public class MongoUpdate extends ServiceBase  {
 
 	// NOTE: Since this is a threadlocal we have no concurrency protection (not needed)
 	private static final ThreadLocal<Boolean> saving = new ThreadLocal<>();
-
-	@PostConstruct
-	public void postConstruct() {
-		update = this;
-	}
 
 	public void saveObj(Object obj) {
 		ops.save(obj);

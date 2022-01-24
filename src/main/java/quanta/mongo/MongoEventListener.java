@@ -4,7 +4,6 @@ import static quanta.util.Util.no;
 import static quanta.util.Util.ok;
 import java.util.Calendar;
 import java.util.Date;
-import javax.annotation.PostConstruct;
 import org.bson.Document;
 import org.bson.types.ObjectId;
 import org.slf4j.Logger;
@@ -51,11 +50,6 @@ public class MongoEventListener extends AbstractMongoEventListener<SubNode> {
 
 	@Autowired
 	private EventPublisher publisher;
-
-	@PostConstruct
-	public void postConstruct() {
-		log.debug("MongoEventListener created.");
-	}
 
 	/**
 	 * What we are doing in this method is assigning the ObjectId ourselves, because our path must

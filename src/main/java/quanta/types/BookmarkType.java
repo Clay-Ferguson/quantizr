@@ -1,7 +1,6 @@
 package quanta.types;
 
 import static quanta.util.Util.ok;
-import javax.annotation.PostConstruct;
 import org.springframework.stereotype.Component;
 import quanta.model.client.NodeType;
 import quanta.mongo.MongoSession;
@@ -17,11 +16,6 @@ public class BookmarkType extends TypeBase {
     public String getName() {
         return NodeType.BOOKMARK.s();
     }
-
-    @PostConstruct
-	public void postConstruct() {
-		bookmarkType = this;
-	}
 
     public void createSubNode(MongoSession ms, Val<SubNode> node, CreateSubNodeRequest req, boolean linkBookmark) {
         // Note: if 'linkBookmark' is true then 'node' will be null here, and that's ok.

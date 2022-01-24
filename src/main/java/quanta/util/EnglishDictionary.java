@@ -10,7 +10,6 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.StringTokenizer;
-import javax.annotation.PostConstruct;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,11 +29,6 @@ public class EnglishDictionary extends ServiceBase {
 
 	@Autowired
 	private ApplicationContext context;
-
-	@PostConstruct
-	public void postConstruct() {
-		english = this;
-	}
 
 	@EventListener
 	public void handleContextRefresh(ContextRefreshedEvent event) {

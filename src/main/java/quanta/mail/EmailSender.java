@@ -4,7 +4,6 @@ import static quanta.util.Util.no;
 import static quanta.util.Util.ok;
 import java.util.Date;
 import java.util.Properties;
-import javax.annotation.PostConstruct;
 import javax.mail.Message;
 import javax.mail.Session;
 import javax.mail.event.TransportEvent;
@@ -41,11 +40,6 @@ public class EmailSender extends ServiceBase implements TransportListener {
 	private Properties props;
 	private Session mailSession;
 	private SMTPTransport transport;
-
-	@PostConstruct
-	public void postConstruct() {
-		this.mail = this;
-	}
 
 	/*
 	 * This method can and should be called before sending mails, close() method should be called after

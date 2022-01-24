@@ -1,7 +1,6 @@
 package quanta.types;
 
 import static quanta.util.Util.ok;
-import javax.annotation.PostConstruct;
 import org.springframework.stereotype.Component;
 import quanta.model.NodeInfo;
 import quanta.model.PropertyInfo;
@@ -10,7 +9,6 @@ import quanta.model.client.NodeType;
 import quanta.mongo.MongoSession;
 import quanta.mongo.model.SubNode;
 
-
 @Component
 public class FriendType extends TypeBase {
 
@@ -18,11 +16,6 @@ public class FriendType extends TypeBase {
     public String getName() {
         return NodeType.FRIEND.s();
     }
-
-    @PostConstruct
-	public void postConstruct() {
-		friendType = this;
-	}
 
     @Override
     public void convert(MongoSession ms, NodeInfo nodeInfo, SubNode node, boolean getFollowers) {

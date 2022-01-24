@@ -4,7 +4,6 @@ import static quanta.util.Util.no;
 import static quanta.util.Util.ok;
 import java.util.ArrayList;
 import java.util.List;
-import javax.annotation.PostConstruct;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,11 +36,6 @@ import quanta.util.Val;
 @Component
 public class NodeMoveService extends ServiceBase {
 	private static final Logger log = LoggerFactory.getLogger(NodeMoveService.class);
-
-	@PostConstruct
-	public void postConstruct() {
-		move = this;
-	}
 
 	/*
 	 * Moves the the node to a new ordinal/position location (relative to parent)

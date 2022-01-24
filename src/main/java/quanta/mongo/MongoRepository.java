@@ -2,7 +2,6 @@ package quanta.mongo;
 
 import static quanta.util.Util.no;
 import static quanta.util.Util.ok;
-import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,11 +34,6 @@ public class MongoRepository extends ServiceBase {
 	private static final Object lock = new Object();
 
 	private boolean initialized = false;
-
-	@PostConstruct
-	public void postConstruct() {
-		ServiceBase.mongoRepo = this;
-	}
 
 	/*
 	 * Warning: Spring will NOT be fully initialized in this constructor when this runs.

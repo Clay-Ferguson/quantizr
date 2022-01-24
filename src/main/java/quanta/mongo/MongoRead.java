@@ -6,7 +6,6 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
-import javax.annotation.PostConstruct;
 import org.apache.commons.lang3.StringUtils;
 import org.bson.types.ObjectId;
 import org.slf4j.Logger;
@@ -51,7 +50,6 @@ public class MongoRead extends ServiceBase {
 
     private static final Object dbRootLock = new Object();
     private SubNode dbRoot;
-
 
     // we call this during app init so we don't need to have thread safety here the rest of the time.
     public SubNode getDbRoot() {

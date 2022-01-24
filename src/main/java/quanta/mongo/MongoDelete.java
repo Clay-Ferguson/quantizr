@@ -5,7 +5,6 @@ import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.Date;
 import java.util.HashSet;
-import javax.annotation.PostConstruct;
 import com.mongodb.client.result.DeleteResult;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.slf4j.Logger;
@@ -24,11 +23,6 @@ import quanta.mongo.model.SubNode;
 @Component
 public class MongoDelete extends ServiceBase  {
 	private static final Logger log = LoggerFactory.getLogger(MongoDelete.class);
-
-	@PostConstruct
-	public void postConstruct() {
-		delete = this;
-	}
 
 	public void deleteNode(MongoSession ms, SubNode node, boolean childrenOnly) {
 		if (!childrenOnly) {

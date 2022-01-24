@@ -6,7 +6,6 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
-import javax.annotation.PostConstruct;
 import org.apache.commons.lang3.StringUtils;
 import org.bson.types.ObjectId;
 import org.slf4j.Logger;
@@ -43,11 +42,6 @@ public class UserFeedService extends ServiceBase  {
 	// NodeType.FRIEND.s(), //
 	// NodeType.POSTS.s(), //
 	// NodeType.ACT_PUB_POSTS.s());
-
-	@PostConstruct
-	public void postConstruct() {
-		userFeed = this;
-	}
 
 	public CheckMessagesResponse checkMessages(MongoSession ms, CheckMessagesRequest req) {
 		SessionContext sc = ThreadLocals.getSC();

@@ -63,7 +63,10 @@ import quanta.util.Validator;
 
 /**
  * We have lots of circular references in our services, and since SpringBoot has decided it doesn't
- * support that without setting a flag to disable checking, I just solved it in this monolithic way.
+ * support that without setting a flag to disable checking, I just solved it in this monolithic way,
+ * because I don't consider circular references among beans to be a bad thing, nor am I going to
+ * refactor Quanta to eliminate them because of this stupid presumptuious opinionated decision made
+ * by Spring Boot developers.
  * 
  * To make all services able to access other services we break convention here and use inheritance
  * in a non "is-a" way, which is normally bad practice. However the benefit to this small design
@@ -79,10 +82,13 @@ public class ServiceBase {
 	@Autowired
 	private ApplicationContext ctx;
 
-	// todo-0: All these need to be initialized AFTER spring beans are created (using getBean(clazz))
-	// rather than in the
-	// @PostConstruct (by setting to 'this') becasue setting to 'this' will not get a reference to the
-	// Spring PROXY Object, and that will therefore break AOP (stop any AOP from working)
+	/*
+	 * todo-0: All these need to be initialized AFTER spring beans are created (using getBean(clazz))
+	 * rather than in the
+	 * 
+	 * @PostConstruct (by setting to 'this') becasue setting to 'this' will not get a reference to the
+	 * Spring PROXY Object, and that will therefore break AOP (stop any AOP from working)
+	 */
 	public static UserFeedService userFeed;
 	public static Convert convert;
 	public static TypePluginMgr typePluginMgr;
@@ -130,12 +136,10 @@ public class ServiceBase {
 	public static FileUtils fileUtil;
 	public static MimeUtil mimeUtil;
 	public static MongoAppConfig mac;
-
 	public static BookmarkType bookmarkType;
 	public static FriendType friendType;
 	public static RoomType roomType;
 	public static RssFeedType rssType;
-
 	public static MongoTemplate ops;
 	public static MongoRepository mongoRepo;
 	public static SimpleMongoClientDatabaseFactory mdbf;
@@ -147,62 +151,57 @@ public class ServiceBase {
 	@EventListener
 	public void handleContextRefresh(ContextRefreshedEvent event) {
 		log.debug("Setting ServiceBase Proxy Instances...");
-		
-		// public static UserFeedService userFeed;
-		// public static Convert convert;
-		// public static TypePluginMgr typePluginMgr;
-		// public static MongoCreate create;
+
+		userFeed = ctx.getBean(UserFeedService.class);
+		convert = ctx.getBean(Convert.class);
+		typePluginMgr = ctx.getBean(TypePluginMgr.class);
+		create = ctx.getBean(MongoCreate.class);
 		read = ctx.getBean(MongoRead.class);
-		// public static MongoUpdate update;
-		// public static MongoDelete delete;
+		update = ctx.getBean(MongoUpdate.class);
+		delete = ctx.getBean(MongoDelete.class);
 		auth = ctx.getBean(MongoAuth.class);
-		// public static MongoUtil mongoUtil;
-		// public static SubNodeUtil snUtil;
-		// public static AclService acl;
-		// public static UserManagerService user;
-		// public static AdminRun arun;
-		// public static IPFSService ipfs;
-		// public static IPFSPubSub ipfsPubSub;
-		// public static AttachmentService attach;
-		// public static ActPubService apub;
-		// public static NodeRenderService render;
-		// public static NodeEditService edit;
-		// public static ActPubCache apCache;
-		// public static Validator validator;
-		// public static OutboxMgr outbox;
-		// public static EmailSenderDaemon notify;
-		// public static EmailSender mail;
-		// public static PushService push;
-		// public static ActPubUtil apUtil;
-		// public static ActPubFollower apFollower;
-		// public static ActPubFollowing apFollowing;
-		// public static GraphNodesService graphNodes;
-		// public static ActPubOutbox apOutbox;
-		// public static EnglishDictionary english;
-		// public static AsyncExec exec;
-		// public static NodeSearchService search;
-		// public static CallProcessor callProc;
-		// public static NodeMoveService move;
-		// public static ImportBookService importBookService;
-		// public static ActPubCrypto apCrypto;
-		// public static ImportService importService;
-		// public static LuceneService lucene;
-		// public static FileIndexer fileIndexer;
-		// public static SystemService system;
-		// public static RSSFeedService rssFeed;
-		// public static JSoupService jsoup;
-		// public static ActPubFactory apFactory;
-		// public static FileUtils fileUtil;
-		// public static MimeUtil mimeUtil;
-		// public static MongoAppConfig mac;
-
-		// public static BookmarkType bookmarkType;
-		// public static FriendType friendType;
-		// public static RoomType roomType;
-		// public static RssFeedType rssType;
-
-		// public static MongoTemplate ops;
-		// public static MongoRepository mongoRepo;
-		// public static SimpleMongoClientDatabaseFactory mdbf;
+		mongoUtil = ctx.getBean(MongoUtil.class);
+		snUtil = ctx.getBean(SubNodeUtil.class);
+		acl = ctx.getBean(AclService.class);
+		user = ctx.getBean(UserManagerService.class);
+		arun = ctx.getBean(AdminRun.class);
+		ipfs = ctx.getBean(IPFSService.class);
+		ipfsPubSub = ctx.getBean(IPFSPubSub.class);
+		attach = ctx.getBean(AttachmentService.class);
+		apub = ctx.getBean(ActPubService.class);
+		render = ctx.getBean(NodeRenderService.class);
+		edit = ctx.getBean(NodeEditService.class);
+		apCache = ctx.getBean(ActPubCache.class);
+		validator = ctx.getBean(Validator.class);
+		outbox = ctx.getBean(OutboxMgr.class);
+		notify = ctx.getBean(EmailSenderDaemon.class);
+		mail = ctx.getBean(EmailSender.class);
+		push = ctx.getBean(PushService.class);
+		apUtil = ctx.getBean(ActPubUtil.class);
+		apFollower = ctx.getBean(ActPubFollower.class);
+		apFollowing = ctx.getBean(ActPubFollowing.class);
+		graphNodes = ctx.getBean(GraphNodesService.class);
+		apOutbox = ctx.getBean(ActPubOutbox.class);
+		english = ctx.getBean(EnglishDictionary.class);
+		exec = ctx.getBean(AsyncExec.class);
+		search = ctx.getBean(NodeSearchService.class);
+		callProc = ctx.getBean(CallProcessor.class);
+		move = ctx.getBean(NodeMoveService.class);
+		importBookService = ctx.getBean(ImportBookService.class);
+		apCrypto = ctx.getBean(ActPubCrypto.class);
+		importService = ctx.getBean(ImportService.class);
+		lucene = ctx.getBean(LuceneService.class);
+		fileIndexer = ctx.getBean(FileIndexer.class);
+		system = ctx.getBean(SystemService.class);
+		rssFeed = ctx.getBean(RSSFeedService.class);
+		jsoup = ctx.getBean(JSoupService.class);
+		apFactory = ctx.getBean(ActPubFactory.class);
+		fileUtil = ctx.getBean(FileUtils.class);
+		mimeUtil = ctx.getBean(MimeUtil.class);
+		bookmarkType = ctx.getBean(BookmarkType.class);
+		friendType = ctx.getBean(FriendType.class);
+		roomType = ctx.getBean(RoomType.class);
+		rssType = ctx.getBean(RssFeedType.class);
+		mongoRepo = ctx.getBean(MongoRepository.class);
 	}
 }

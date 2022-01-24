@@ -7,7 +7,6 @@ import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.LinkedList;
 import java.util.List;
-import javax.annotation.PostConstruct;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
@@ -25,11 +24,6 @@ import quanta.config.ServiceBase;
 @Controller
 public class ActPubFactory extends ServiceBase {
 	private static final Logger log = LoggerFactory.getLogger(ActPubFactory.class);
-
-	@PostConstruct
-	public void postConstruct() {
-		apFactory = this;
-	}
 
 	/**
 	 * Creates a new 'note' message

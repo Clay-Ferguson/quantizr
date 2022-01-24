@@ -10,7 +10,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
-import javax.annotation.PostConstruct;
+
 import javax.servlet.http.HttpServletRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -68,12 +68,7 @@ public class ActPubService extends ServiceBase {
 
     private static final Object inboxLock = new Object();
 
-    @PostConstruct
-	public void postConstruct() {
-		apub = this;
-	}
-
-/*
+    /*
      * When 'node' has been created under 'parent' (by the sessionContext user) this will send a
      * notification to foreign servers. This call returns immediately and delegates the actuall
      * proccessing to a daemon thread.
@@ -581,8 +576,8 @@ public class ActPubService extends ServiceBase {
         SubNode nodeBeingRepliedTo = null;
 
         /*
-         * Detect if inReplyTo is formatted like this: 'https://domain.com?id=xxxxx' (proprietary URL
-         * format for this server) and if so lookup the nodeBeingRepliedTo by using that nodeId
+         * Detect if inReplyTo is formatted like this: 'https://domain.com?id=xxxxx' (proprietary URL format
+         * for this server) and if so lookup the nodeBeingRepliedTo by using that nodeId
          */
         if (apUtil.isLocalUrl(inReplyTo)) {
             int lastIdx = inReplyTo.lastIndexOf("=");

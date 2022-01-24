@@ -12,7 +12,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
 import java.util.concurrent.ConcurrentHashMap;
-import javax.annotation.PostConstruct;
 import javax.servlet.http.HttpServletRequest;
 import org.apache.commons.lang3.StringUtils;
 import org.bson.types.ObjectId;
@@ -96,11 +95,6 @@ public class UserManagerService extends ServiceBase {
 
 	/* Private keys of each user by user name as key */
 	public static final ConcurrentHashMap<String, String> privateKeysByUserName = new ConcurrentHashMap<>();
-
-	@PostConstruct
-	public void postConstruct() {
-		user = this;
-	}
 
 	/*
 	 * Note that this function does 'succeed' even with ANON user given, and just considers that an

@@ -3,7 +3,6 @@ package quanta.mail;
 import static quanta.util.Util.no;
 import static quanta.util.Util.ok;
 import java.util.List;
-import javax.annotation.PostConstruct;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,11 +38,6 @@ public class OutboxMgr extends ServiceBase {
 	private String mailBatchSize = "10";
 	private static SubNode outboxNode = null;
 	private static final Object outboxLock = new Object();
-
-	@PostConstruct
-	public void postConstruct() {
-		outbox = this;
-	}
 
 	/**
 	 * Adds a node into the user's "Inbox" as an indicator to them that the 'node' added needs their

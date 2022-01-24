@@ -2,7 +2,6 @@ package quanta.service;
 
 import static quanta.util.Util.no;
 import java.io.BufferedInputStream;
-import javax.annotation.PostConstruct;
 import org.apache.commons.io.input.AutoCloseInputStream;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -27,11 +26,6 @@ public class ImportService extends ServiceBase {
 
 	@Autowired
 	private ApplicationContext context;
-
-	@PostConstruct
-	public void postConstruct() {
-		importService = this;
-	}
 
 	public ResponseEntity<?> streamImport(MongoSession ms, String nodeId, MultipartFile[] uploadFiles) {
 		if (no(nodeId)) {

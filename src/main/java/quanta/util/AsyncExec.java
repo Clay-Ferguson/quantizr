@@ -2,7 +2,6 @@ package quanta.util;
 
 import static quanta.util.Util.ok;
 import java.util.concurrent.Executor;
-import javax.annotation.PostConstruct;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,11 +25,6 @@ public class AsyncExec extends ServiceBase {
     // at all times.
     int execCounter = 0;
     int maxExecCounter = 0; // max value for execCounter ever
-
-    @PostConstruct
-    public void postConstruct() {
-        exec = this;
-    }
 
     public void run(Runnable runnable) {
         run(ThreadLocals.getContext(), runnable);

@@ -3,7 +3,6 @@ package quanta;
 import static quanta.util.Util.no;
 import static quanta.util.Util.ok;
 import java.util.Date;
-import javax.annotation.PostConstruct;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import org.apache.commons.lang3.StringUtils;
@@ -32,11 +31,6 @@ public class CallProcessor extends ServiceBase {
 
 	private static final boolean logRequests = true;
 	// private static int mutexCounter = 0;
-
-	@PostConstruct
-	public void postConstruct() {
-		callProc = this;
-	}
 
 	/*
 	 * Wraps the processing of any command by using whatever info is on the session and/or the request

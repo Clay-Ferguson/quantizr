@@ -126,8 +126,6 @@ public class IPFSService extends ServiceBase {
 
     @PostConstruct
     public void init() {
-        ipfs = this;
-        
         API_BASE = prop.getIPFSApiHostAndPort() + "/api/v0";
         API_CAT = API_BASE + "/cat";
         API_FILES = API_BASE + "/files";

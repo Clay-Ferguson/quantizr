@@ -4,7 +4,6 @@ import static quanta.util.Util.no;
 import static quanta.util.Util.ok;
 import java.util.HashSet;
 import java.util.List;
-import javax.annotation.PostConstruct;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -26,11 +25,6 @@ public class PushService extends ServiceBase {
 	private static final Logger log = LoggerFactory.getLogger(PushService.class);
 
 	static final int MAX_FEED_ITEMS = 25;
-
-	@PostConstruct
-	public void postConstruct() {
-		push = this;
-	}
 
 	/* Notify all users being shared to on this node */
 	public void pushNodeUpdateToBrowsers(MongoSession ms, HashSet<Integer> sessionsPushed, SubNode node) {

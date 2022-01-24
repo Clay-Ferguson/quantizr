@@ -1,17 +1,11 @@
 package quanta.util;
 
-import javax.annotation.PostConstruct;
 import org.springframework.stereotype.Component;
 import quanta.config.ServiceBase;
 
 @Component
 public class Validator extends ServiceBase {
 	
-	@PostConstruct
-	public void postConstruct() {
-		validator = this;
-	}
-
 	/*
 	 * UserName requirements, between 5 and 100 characters (inclusive) long, and only allowing digits,
 	 * letters, underscore, dash, and space.

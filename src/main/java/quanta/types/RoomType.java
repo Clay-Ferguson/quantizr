@@ -1,6 +1,5 @@
 package quanta.types;
 
-import javax.annotation.PostConstruct;
 import org.springframework.stereotype.Component;
 import quanta.model.client.NodeType;
 import quanta.mongo.MongoSession;
@@ -15,11 +14,6 @@ public class RoomType extends TypeBase {
     public String getName() {
         return NodeType.ROOM.s();
     }
-
-    @PostConstruct
-	public void postConstruct() {
-		roomType = this;
-	}
 
     public void createSubNode(MongoSession ms, Val<SubNode> node, CreateSubNodeRequest req, boolean linkBookmark) {
         snUtil.setNodePublicWritable(node.getVal());

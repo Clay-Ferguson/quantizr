@@ -15,7 +15,6 @@ import java.text.SimpleDateFormat;
 import java.util.HashSet;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
-import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import org.apache.commons.compress.archivers.ArchiveEntry;
 import org.apache.commons.compress.archivers.tar.TarArchiveInputStream;
@@ -88,11 +87,6 @@ public class FileIndexer extends ServiceBase {
 
 	private enum CompressionType {
 		NONE, GZIP, XZIP
-	}
-
-	@PostConstruct
-	public void postConstruct() {
-		fileIndexer = this;
 	}
 
 	public void index(String dirToIndex, String luceneIndexDataSubDir, String suffixes, boolean forceRebuild) {

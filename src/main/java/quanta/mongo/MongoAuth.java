@@ -51,7 +51,6 @@ public class MongoAuth extends ServiceBase {
 
 	private static final ConcurrentHashMap<String, SubNode> userNodesById = new ConcurrentHashMap<>();
 
-
 	public MongoSession getAdminSession() {
 		if (ok(adminSession)) {
 			return adminSession;

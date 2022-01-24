@@ -2,7 +2,6 @@ package quanta.mail;
 
 import static quanta.util.Util.ok;
 import java.util.List;
-import javax.annotation.PostConstruct;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,11 +31,6 @@ public class EmailSenderDaemon extends ServiceBase {
 	public static final int INTERVAL_SECONDS = 10;
 	private int runCountdown = INTERVAL_SECONDS;
 	static boolean run = false;
-
-	@PostConstruct
-	public void postConstruct() {
-		this.notify = this;
-	}
 
 	/*
 	 * Note: Spring does correctly protect against concurrent runs. It will always wait until the last

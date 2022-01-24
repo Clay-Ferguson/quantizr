@@ -7,7 +7,6 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.StringTokenizer;
-import javax.annotation.PostConstruct;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -62,11 +61,6 @@ public class NodeSearchService extends ServiceBase  {
 	static final String WORD_DELIMS = " \n\r\t,-;:\"'`()*{}[]<>=\\/.!?&“";
 
 	static final int TRENDING_LIMIT = 10000;
-
-	@PostConstruct
-	public void postConstruct() {
-		search = this;
-	}
 
 	public NodeSearchResponse search(MongoSession ms, NodeSearchRequest req) {
 		NodeSearchResponse res = new NodeSearchResponse();

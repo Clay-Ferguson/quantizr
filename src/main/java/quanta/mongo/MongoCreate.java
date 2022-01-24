@@ -3,7 +3,6 @@ package quanta.mongo;
 import static quanta.util.Util.no;
 import static quanta.util.Util.ok;
 import java.util.List;
-import javax.annotation.PostConstruct;
 import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,11 +21,6 @@ import quanta.mongo.model.SubNode;
 @Component
 public class MongoCreate extends ServiceBase {
 	private static final Logger log = LoggerFactory.getLogger(MongoCreate.class);
-
-	@PostConstruct
-	public void postConstruct() {
-		create = this;
-	}
 
 	public SubNode createNode(MongoSession ms, SubNode parent, String type, Long ordinal, CreateNodeLocation location,
 			boolean updateParentOrdinals) {

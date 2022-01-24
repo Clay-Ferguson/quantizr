@@ -1,6 +1,5 @@
 package quanta.types;
 
-import javax.annotation.PostConstruct;
 import org.springframework.stereotype.Component;
 import quanta.model.client.NodeType;
 import quanta.mongo.CreateNodeLocation;
@@ -16,11 +15,6 @@ public class RssFeedType extends TypeBase {
     public String getName() {
         return NodeType.RSS_FEED.s();
     }
-
-    @PostConstruct
-	public void postConstruct() {
-		rssType = this;
-	}
 
     public void createSubNode(MongoSession ms, Val<SubNode> node, CreateSubNodeRequest req, boolean linkBookmark) {
         SubNode holderNode = create.createNode(ms, node.getVal(), null, NodeType.NONE.s(), 0L, CreateNodeLocation.FIRST,

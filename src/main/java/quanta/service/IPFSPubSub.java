@@ -11,7 +11,6 @@ import java.util.Base64;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
-import javax.annotation.PostConstruct;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
@@ -56,11 +55,6 @@ public class IPFSPubSub extends ServiceBase {
     // private static int heartbeatCounter = 0;
 
     private static final HashMap<String, Integer> fromCounter = new HashMap<>();
-
-    @PostConstruct
-	public void postConstruct() {
-		ipfsPubSub = this;
-	}
 
     @EventListener
 	public void handleContextRefresh(ContextRefreshedEvent event) {

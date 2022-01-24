@@ -5,7 +5,6 @@ import static quanta.util.Util.ok;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
-import javax.annotation.PostConstruct;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,11 +25,6 @@ public class GraphNodesService extends ServiceBase {
 	private static final Logger log = LoggerFactory.getLogger(GraphNodesService.class);
 
 	static int guid = 0;
-
-	@PostConstruct
-	public void postConstruct() {
-		graphNodes = this;
-	}
 
 	public GraphResponse graphNodes(MongoSession ms, GraphRequest req) {
 		HashMap<String, GraphNode> mapByPath = new HashMap<>();

@@ -16,7 +16,6 @@ import java.net.URLConnection;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Iterator;
-import javax.annotation.PostConstruct;
 import javax.imageio.ImageIO;
 import javax.imageio.ImageReader;
 import javax.imageio.stream.ImageInputStream;
@@ -110,11 +109,6 @@ public class AttachmentService extends ServiceBase {
 
 	@Autowired
 	private ApplicationContext context;
-
-	@PostConstruct
-	public void postConstruct() {
-		attach = this;
-	}
 
 	/*
 	 * Upload from User's computer. Standard HTML form-based uploading of a file from user machine

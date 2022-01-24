@@ -6,7 +6,6 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
-import javax.annotation.PostConstruct;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,11 +41,6 @@ public class ActPubOutbox extends ServiceBase {
 
     @Autowired
     private AppProp prop;
-
-    @PostConstruct
-	public void postConstruct() {
-		apOutbox = this;
-	}
 
     /**
      * Caller can pass in userNode if it's already available, but if not just pass null and the

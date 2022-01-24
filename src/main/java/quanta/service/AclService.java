@@ -9,7 +9,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 import java.util.StringTokenizer;
-import javax.annotation.PostConstruct;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -40,11 +39,6 @@ import quanta.util.XString;
 @Component
 public class AclService extends ServiceBase {
 	private static final Logger log = LoggerFactory.getLogger(AclService.class);
-
-	@PostConstruct
-	public void postConstruct() {
-		acl = this;
-	}
 
 	/**
 	 * Returns the privileges that exist on the node identified in the request.

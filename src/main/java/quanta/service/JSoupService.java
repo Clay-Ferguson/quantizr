@@ -2,7 +2,6 @@ package quanta.service;
 
 import static quanta.util.Util.no;
 import static quanta.util.Util.ok;
-import javax.annotation.PostConstruct;
 import org.apache.commons.collections4.map.LRUMap;
 import org.jsoup.Connection;
 import org.jsoup.Jsoup;
@@ -24,11 +23,6 @@ public class JSoupService extends ServiceBase {
 
 	public static final String BROWSER_USER_AGENT =
 			"Browser: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.114 Safari/537.36";
-
-	@PostConstruct
-	public void postConstruct() {
-		jsoup = this;
-	}
 
 	public GetOpenGraphResponse getOpenGraph(GetOpenGraphRequest ogReq) {
 		GetOpenGraphResponse res = new GetOpenGraphResponse();

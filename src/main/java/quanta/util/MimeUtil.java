@@ -1,6 +1,5 @@
 package quanta.util;
 
-import javax.annotation.PostConstruct;
 import org.springframework.stereotype.Component;
 import quanta.config.ServiceBase;
 
@@ -9,11 +8,6 @@ import quanta.config.ServiceBase;
  */
 @Component
 public class MimeUtil extends ServiceBase {
-
-	@PostConstruct
-	public void postConstruct() {
-		mimeUtil = this;
-	}
 
 	public boolean isTextTypeFileName(String fileName) {
 		if (!fileName.contains("."))

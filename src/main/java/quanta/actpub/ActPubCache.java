@@ -4,7 +4,6 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
-import javax.annotation.PostConstruct;
 import org.springframework.stereotype.Component;
 import quanta.actpub.model.APObj;
 import quanta.config.ServiceBase;
@@ -48,9 +47,4 @@ public class ActPubCache extends ServiceBase {
 
     /* Cache WebFinger fails, so we don't try them again */
     public final Set<String> webFingerFailsByUserName = Collections.synchronizedSet(new HashSet<String>());
-
-    @PostConstruct
-	public void postConstruct() {
-		apCache = this;
-	}
 }

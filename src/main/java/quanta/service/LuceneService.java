@@ -1,7 +1,6 @@
 package quanta.service;
 
 import static quanta.util.Util.ok;
-import javax.annotation.PostConstruct;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -17,11 +16,6 @@ import quanta.response.LuceneSearchResponse;
 @Component
 public class LuceneService extends ServiceBase  {
 	private static final Logger log = LoggerFactory.getLogger(LuceneService.class);
-
-	@PostConstruct
-	public void postConstruct() {
-		lucene = this;
-	}
 
 	public LuceneIndexResponse reindex(MongoSession ms, String nodeId, String searchFolder) {
 		LuceneIndexResponse res = new LuceneIndexResponse();

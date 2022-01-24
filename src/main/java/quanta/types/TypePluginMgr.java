@@ -1,7 +1,6 @@
 package quanta.types;
 
 import java.util.HashMap;
-import javax.annotation.PostConstruct;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.event.ContextRefreshedEvent;
@@ -13,11 +12,6 @@ import quanta.config.ServiceBase;
 public class TypePluginMgr extends ServiceBase {
     private static final Logger log = LoggerFactory.getLogger(TypePluginMgr.class);
     private static HashMap<String, TypeBase> types = new HashMap<>();
-
-    @PostConstruct
-    public void postConstruct() {
-        typePluginMgr = this;
-    }
 
     @EventListener
     public void handleContextRefresh(ContextRefreshedEvent event) {

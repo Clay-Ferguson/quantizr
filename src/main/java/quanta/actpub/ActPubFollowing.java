@@ -5,7 +5,6 @@ import static quanta.util.Util.ok;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
-import javax.annotation.PostConstruct;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,11 +42,6 @@ public class ActPubFollowing extends ServiceBase  {
 
     @Autowired
     private AppProp prop;
-
-    @PostConstruct
-	public void postConstruct() {
-		apFollowing = this;
-	}
 
     /**
      * Outbound message to foreign servers to follow/unfollow users

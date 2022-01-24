@@ -1,6 +1,5 @@
 package quanta.mongo;
 
-import javax.annotation.PostConstruct;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -17,11 +16,6 @@ import quanta.util.ThreadLocals;
 @Component
 public class AdminRun extends ServiceBase {
 	private static final Logger log = LoggerFactory.getLogger(AdminRun.class);
-
-	@PostConstruct
-	public void postConstruct() {
-		arun = this;
-	}
 
 	public <T> T run(MongoRunnableEx<T> runner) {
 		MongoSession ms = null;

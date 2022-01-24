@@ -1,7 +1,6 @@
 package quanta.service;
 
 import static quanta.util.Util.ok;
-import javax.annotation.PostConstruct;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,11 +27,6 @@ public class ImportBookService extends ServiceBase {
 
 	@Autowired
 	private ApplicationContext context;
-
-	@PostConstruct
-	public void postConstruct() {
-		importBookService = this;
-	}
 
 	public InsertBookResponse insertBook(MongoSession ms, InsertBookRequest req) {
 		InsertBookResponse res = new InsertBookResponse();

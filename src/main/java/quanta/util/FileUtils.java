@@ -15,7 +15,6 @@ import java.nio.file.attribute.PosixFilePermission;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
-import javax.annotation.PostConstruct;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.comparator.NameFileComparator;
@@ -51,11 +50,6 @@ public class FileUtils extends ServiceBase {
 		imageExtensions.add("png");
 		imageExtensions.add("gif");
 		imageExtensions.add("bmp");
-	}
-
-	@PostConstruct
-	public void postConstruct() {
-		fileUtil = this;
 	}
 
 	public String genHashOfClasspathResource(String resourceName) {
