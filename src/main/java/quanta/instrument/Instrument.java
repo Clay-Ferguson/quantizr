@@ -32,13 +32,12 @@ import quanta.util.ThreadLocals;
 public class Instrument {
 	private static final Logger log = LoggerFactory.getLogger(Instrument.class);
 
+	public static final int CAPTURE_THRESHOLD = 100; 
+
 	private static final int MAX_EVENTS = 10000;
 	public static List<PerfMonEvent> data = Collections.synchronizedList(new LinkedList());
 
-	// NOTE: I think full path to annotation also works in the
-	// is this an option? --> @Around("@annotation(PerfMon)")
-	// Wrap PerfMon (PerformanceMonitor) methods.
-	// @Around("execution(@PerfMon * *(..))")
+	// @Around("execution(@PerfMon * *(..))") <--- this one also did work, but I changed to the simpler looking version.
 	@Around("@annotation(PerfMon)")
 	public Object perfMonAdvice(ProceedingJoinPoint jp) throws Throwable {
 		if (data.size() > MAX_EVENTS) {
@@ -59,7 +58,6 @@ public class Instrument {
 			throw e;
 		} finally {
 			int duration = (int) (System.currentTimeMillis() - startTime);
-
 			MethodSignature signature = (MethodSignature) jp.getSignature();
 
 			///////////////////
@@ -95,8 +93,14 @@ public class Instrument {
 			event.event = annotation.category().equals("") ? signature.getName() : //
 					(annotation.category() + "." + signature.getName());
 			event.user = userName;
-			data.add(event);
+			record(event);
 		}
 		return value;
+	}
+
+	public static void record(PerfMonEvent event) {
+		if (event.duration > CAPTURE_THRESHOLD) {
+			data.add(event);
+		}
 	}
 }

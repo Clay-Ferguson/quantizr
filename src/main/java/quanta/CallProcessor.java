@@ -14,6 +14,8 @@ import org.springframework.web.util.WebUtils;
 import quanta.config.ServiceBase;
 import quanta.exception.NotLoggedInException;
 import quanta.exception.OutOfSpaceException;
+import quanta.instrument.Instrument;
+import quanta.instrument.PerfMonEvent;
 import quanta.model.client.ErrorType;
 import quanta.mongo.MongoSession;
 import quanta.request.LogoutRequest;
@@ -56,6 +58,9 @@ public class CallProcessor extends ServiceBase {
 			log.error("Session mutex lock is null.");
 		}
 
+		long startTime = 0;
+		String userName = null;
+
 		try {
 			if (ok(mutex)) {
 				mutex.lockEx();
@@ -68,7 +73,8 @@ public class CallProcessor extends ServiceBase {
 				// mutexCounter++;
 				// log.debug("Enter: mutexCounter: "+String.valueOf(mutexCounter));
 				Date now = new Date();
-				ThreadLocals.getSC().setLastActiveTime(now.getTime());
+				ThreadLocals.getSC().setLastActiveTime(startTime = now.getTime());
+				userName = ThreadLocals.getSC().getUserName();
 				MongoSession ms = ThreadLocals.getMongoSession();
 				ret = runner.run(ms);
 				update.saveSession(ms);
@@ -107,6 +113,15 @@ public class CallProcessor extends ServiceBase {
 				orb.setStackTrace(ExceptionUtils.getStackTrace(e));
 			}
 		} finally {
+			int duration = (int) (System.currentTimeMillis() - startTime);
+			if (duration > Instrument.CAPTURE_THRESHOLD) {
+				PerfMonEvent event = new PerfMonEvent();
+				event.duration = duration;
+				event.event = "callProc." + command;
+				event.user = userName;
+				Instrument.record(event);
+			}
+
 			if (ok(mutex)) {
 				mutex.unlockEx();
 			}

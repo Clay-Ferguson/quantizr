@@ -12,7 +12,7 @@ public class PerformanceReport {
 	private static final Logger log = LoggerFactory.getLogger(PerformanceReport.class);
 
 	// Any calls that complete faster than this time, are not even considered. They're not a problem.
-	public static final int TIME_THRESHOLD = 1000;
+	public static final int REPORT_THRESHOLD = 1000;
 
 	public static String getReport() {
 		StringBuilder sb = new StringBuilder();
@@ -29,17 +29,12 @@ public class PerformanceReport {
 			orderedData.sort((s1, s2) -> (int) (s2.duration - s1.duration));
 		}
 
-		sb.append("\nEvents over Threshold of " + String.valueOf(TIME_THRESHOLD) + ": \n");
+		sb.append("\nEvents over Threshold of " + String.valueOf(REPORT_THRESHOLD) + ": \n");
 		for (PerfMonEvent se : orderedData) {
-			// enable this threshold for prod (todo-0)
-			// if (se.duration > TIME_THRESHOLD) {
-				sb.append(ok(se.user) ? se.user : "anon");
-				sb.append(" ");
-				sb.append(se.event);
-				sb.append(" ");
-				sb.append(DateUtil.formatDurationMillis(se.duration, true));
+			if (se.duration > REPORT_THRESHOLD) {
+				sb.append(formatEvent(se, true, true));
 				sb.append("\n");
-			// }
+			}
 		}
 
 		// totals per person
@@ -83,6 +78,41 @@ public class PerformanceReport {
 			sb.append(DateUtil.formatDurationMillis(se.totalTime / se.totalCalls, true));
 			sb.append("\n");
 		}
+
+		return sb.toString();
+	}
+
+	public static String formatEvent(PerfMonEvent se, boolean showSubEvents, boolean printRoot) {
+		StringBuilder sb = new StringBuilder();
+		sb.append(ok(se.user) ? se.user : "anon");
+		sb.append(" ");
+		sb.append(se.event);
+		sb.append(" ");
+		sb.append(DateUtil.formatDurationMillis(se.duration, true));
+
+		if (printRoot && ok(se.root)) {
+			sb.append(" r=");
+			sb.append(se.root.hashCode());
+		}
+
+		sb.append(" e=");
+		sb.append(se.hashCode());
+
+		// This is not needed. We can search for the root id and tie together the info that way without dumping
+		// this massive amount of data on each one.
+		// // If this event happens to be the head/root of a series of events
+		// if (showSubEvents && ok(se.root) && ok(se.root.subEvents)) {
+		// 	sb.append("\n  Set:\n");
+		// 	for (PerfMonEvent subEvent : se.root.subEvents) {
+		// 		// if we run across same 'se' we're processing, skip it
+		// 		if (subEvent != se) {
+		// 			sb.append("    ");
+		// 			sb.append(formatEvent(subEvent, false, false));
+		// 			sb.append("\n");
+		// 		}
+		// 	}
+		// 	sb.append("\n");
+		// }
 
 		return sb.toString();
 	}

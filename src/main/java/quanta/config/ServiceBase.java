@@ -82,13 +82,6 @@ public class ServiceBase {
 	@Autowired
 	private ApplicationContext ctx;
 
-	/*
-	 * todo-0: All these need to be initialized AFTER spring beans are created (using getBean(clazz))
-	 * rather than in the
-	 * 
-	 * @PostConstruct (by setting to 'this') becasue setting to 'this' will not get a reference to the
-	 * Spring PROXY Object, and that will therefore break AOP (stop any AOP from working)
-	 */
 	public static UserFeedService userFeed;
 	public static Convert convert;
 	public static TypePluginMgr typePluginMgr;

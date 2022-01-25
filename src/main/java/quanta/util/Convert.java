@@ -16,6 +16,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;
 import quanta.config.ServiceBase;
 import quanta.config.SessionContext;
+import quanta.instrument.PerfMon;
 import quanta.model.AccessControlInfo;
 import quanta.model.NodeInfo;
 import quanta.model.PrivilegeInfo;
@@ -36,12 +37,13 @@ import quanta.types.TypeBase;
 @Component
 public class Convert extends ServiceBase {
 	private static final Logger log = LoggerFactory.getLogger(Convert.class);
-	
+
 	/*
 	 * Generates a NodeInfo object, which is the primary data type that is also used on the
 	 * browser/client to encapsulate the data for a given node which is used by the browser to render
 	 * the node.
 	 */
+	@PerfMon(category = "convert")
 	public NodeInfo convertToNodeInfo(SessionContext sc, MongoSession ms, SubNode node, boolean htmlOnly, boolean initNodeEdit,
 			long ordinal, boolean allowInlineChildren, boolean lastChild, boolean childrenCheck, boolean getFollowers) {
 
@@ -298,10 +300,10 @@ public class Convert extends ServiceBase {
 					break;
 
 				// Special processing (need to build this kind of stuff into the "Plugin" architecture for types)
-				case "ap:tag": //NodeProp.ACT_PUB_TAG
+				case "ap:tag": // NodeProp.ACT_PUB_TAG
 					value = prop.getValue();
 					break;
-					
+
 				default:
 					value = prop.getValue().toString();
 					break;

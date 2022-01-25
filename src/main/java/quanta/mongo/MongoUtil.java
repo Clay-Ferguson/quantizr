@@ -507,6 +507,7 @@ public class MongoUtil extends ServiceBase {
 
 		createIndex(ms, SubNode.class, SubNode.OWNER);
 		createIndex(ms, SubNode.class, SubNode.ORDINAL);
+		createIndex(ms, SubNode.class, SubNode.AC); // <---Not sure this will work (AC is an Object with random properties)
 		createIndex(ms, SubNode.class, SubNode.MODIFY_TIME, Direction.DESC);
 		createIndex(ms, SubNode.class, SubNode.CREATE_TIME, Direction.DESC);
 		createTextIndexes(ms, SubNode.class);

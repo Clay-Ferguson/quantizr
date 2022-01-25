@@ -83,6 +83,7 @@ public class MongoRead extends ServiceBase {
         return ops.count(q, SubNode.class);
     }
 
+    @PerfMon(category = "read")
     public boolean hasChildren(MongoSession ms, SubNode node) {
         Query q = new Query();
         Criteria crit = Criteria.where(SubNode.PATH).regex(mongoUtil.regexDirectChildrenOfPath(node.getPath()));
@@ -229,6 +230,7 @@ public class MongoRead extends ServiceBase {
     public SubNode getNode(MongoSession ms, String identifier, boolean allowAuth) {
         if (no(identifier))
             return null;
+
         if (identifier.equals("/")) {
             throw new RuntimeEx(
                     "SubNode doesn't implement the root node. Root is implicit and never needs an actual node to represent it.");

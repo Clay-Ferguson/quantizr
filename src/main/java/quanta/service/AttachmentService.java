@@ -60,6 +60,7 @@ import quanta.config.NodePath;
 import quanta.config.ServiceBase;
 import quanta.exception.OutOfSpaceException;
 import quanta.exception.base.RuntimeEx;
+import quanta.instrument.PerfMon;
 import quanta.model.UserStats;
 import quanta.model.client.NodeProp;
 import quanta.model.client.PrivilegeType;
@@ -103,9 +104,9 @@ public class AttachmentService extends ServiceBase {
 
 	@Autowired
 	public GridFSBucket gridBucket;
-	
+
 	@Autowired
-    private AppProp prop;
+	private AppProp prop;
 
 	@Autowired
 	private ApplicationContext context;
@@ -448,6 +449,7 @@ public class AttachmentService extends ServiceBase {
 	 * 
 	 * node can be passed in -or- nodeId. If node is passed nodeId can be null.
 	 */
+	@PerfMon(category = "attach")
 	public void getBinary(MongoSession ms, String binSuffix, SubNode node, String nodeId, boolean download,
 			HttpServletResponse response) {
 		BufferedInputStream inStream = null;
@@ -1007,7 +1009,8 @@ public class AttachmentService extends ServiceBase {
 	}
 
 	public void deleteBinary(MongoSession ms, String binSuffix, SubNode node, SubNode userNode) {
-		if (no(node)) return;
+		if (no(node))
+			return;
 		auth.ownerAuthByThread(node);
 		String id = node.getStr(NodeProp.BIN.s() + binSuffix);
 		if (no(id)) {

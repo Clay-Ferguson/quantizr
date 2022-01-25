@@ -12,6 +12,7 @@ import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import quanta.config.SessionContext;
+import quanta.instrument.PerfMonEvent;
 import quanta.mongo.MongoSession;
 import quanta.mongo.model.SubNode;
 import quanta.response.base.ResponseBase;
@@ -34,6 +35,13 @@ public class ThreadLocals {
 	private static final ThreadLocal<ResponseBase> response = new ThreadLocal<>();
 	private static final ThreadLocal<MongoSession> session = new ThreadLocal<>();
 	private static final ThreadLocal<String> reqBearerToken = new ThreadLocal<>();
+
+	/*
+	 * Each thread will set this when a root event is created and any other events that get created,
+	 * will be added as top level children under it. Currently we don't do a hierarchy, but just one
+	 * level of containment
+	 */
+	private static final ThreadLocal<PerfMonEvent> rootEvent = new ThreadLocal<>();
 
 	/*
 	 * dirtyNodes is where we accumulate the set of nodes that will all be updated after processing is
@@ -63,6 +71,7 @@ public class ThreadLocals {
 		servletResponse.remove();
 		response.remove();
 		reqBearerToken.remove();
+		rootEvent.remove();
 
 		getDirtyNodes().clear();
 		getCachedNodes().clear();
@@ -115,6 +124,14 @@ public class ThreadLocals {
 
 	public static HttpServletResponse getServletResponse() {
 		return servletResponse.get();
+	}
+
+	public static void setRootEvent(PerfMonEvent res) {
+		rootEvent.set(res);
+	}
+
+	public static PerfMonEvent getRootEvent() {
+		return rootEvent.get();
 	}
 
 	public static void setResponse(ResponseBase res) {
