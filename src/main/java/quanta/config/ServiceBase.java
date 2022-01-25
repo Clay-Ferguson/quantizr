@@ -2,10 +2,7 @@ package quanta.config;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
-import org.springframework.context.event.ContextRefreshedEvent;
-import org.springframework.context.event.EventListener;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.SimpleMongoClientDatabaseFactory;
 import quanta.CallProcessor;
@@ -79,9 +76,6 @@ import quanta.util.Validator;
 public class ServiceBase {
 	private static final Logger log = LoggerFactory.getLogger(ServiceBase.class);
 
-	@Autowired
-	private ApplicationContext ctx;
-
 	public static UserFeedService userFeed;
 	public static Convert convert;
 	public static TypePluginMgr typePluginMgr;
@@ -141,8 +135,7 @@ public class ServiceBase {
 		log.debug("ServiceBase: " + getClass().getName());
 	}
 
-	@EventListener
-	public void handleContextRefresh(ContextRefreshedEvent event) {
+	public static void init(ApplicationContext ctx) {
 		log.debug("Setting ServiceBase Proxy Instances...");
 
 		userFeed = ctx.getBean(UserFeedService.class);

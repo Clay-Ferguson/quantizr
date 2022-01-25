@@ -119,7 +119,7 @@ public class CallProcessor extends ServiceBase {
 				event.duration = duration;
 				event.event = "callProc." + command;
 				event.user = userName;
-				Instrument.record(event);
+				Instrument.data.add(event);
 			}
 
 			if (ok(mutex)) {

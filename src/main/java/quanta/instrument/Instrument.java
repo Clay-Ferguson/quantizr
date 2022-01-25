@@ -32,12 +32,13 @@ import quanta.util.ThreadLocals;
 public class Instrument {
 	private static final Logger log = LoggerFactory.getLogger(Instrument.class);
 
-	public static final int CAPTURE_THRESHOLD = 100; 
+	public static final int CAPTURE_THRESHOLD = 10; // 10 for prod 
 
 	private static final int MAX_EVENTS = 10000;
 	public static List<PerfMonEvent> data = Collections.synchronizedList(new LinkedList());
 
-	// @Around("execution(@PerfMon * *(..))") <--- this one also did work, but I changed to the simpler looking version.
+	// @Around("execution(@PerfMon * *(..))") <--- this one also did work, but I changed to the simpler
+	// looking version.
 	@Around("@annotation(PerfMon)")
 	public Object perfMonAdvice(ProceedingJoinPoint jp) throws Throwable {
 		if (data.size() > MAX_EVENTS) {
@@ -88,19 +89,15 @@ public class Instrument {
 			Method method = signature.getMethod();
 			PerfMon annotation = method.getAnnotation(PerfMon.class);
 
-			PerfMonEvent event = new PerfMonEvent();
-			event.duration = duration;
-			event.event = annotation.category().equals("") ? signature.getName() : //
-					(annotation.category() + "." + signature.getName());
-			event.user = userName;
-			record(event);
+			if (duration > CAPTURE_THRESHOLD) {
+				PerfMonEvent event = new PerfMonEvent();
+				event.duration = duration;
+				event.event = annotation.category().equals("") ? signature.getName() : //
+						(annotation.category() + "." + signature.getName());
+				event.user = userName;
+				data.add(event);
+			}
 		}
 		return value;
-	}
-
-	public static void record(PerfMonEvent event) {
-		if (event.duration > CAPTURE_THRESHOLD) {
-			data.add(event);
-		}
 	}
 }

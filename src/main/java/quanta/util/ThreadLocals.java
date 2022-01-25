@@ -185,6 +185,7 @@ public class ThreadLocals {
 
 	private static LinkedHashMap<String, SubNode> getCachedNodes() {
 		if (no(cachedNodes.get())) {
+			// #LRU
 			LinkedHashMap<String, SubNode> cn = new LinkedHashMap<String, SubNode>(MAX_CACHE_SIZE + 1, .75F, false) {
 				protected boolean removeEldestEntry(Map.Entry<String, SubNode> eldest) {
 					return size() > MAX_CACHE_SIZE;

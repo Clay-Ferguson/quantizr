@@ -76,7 +76,6 @@ public class UserFeedService extends ServiceBase  {
 		crit = crit.and(SubNode.MODIFY_TIME).gt(new Date(lastActiveLong));
 		String myId = searchRoot.getOwner().toHexString();
 
-		// todo-0: do we have a usable index on this ???
 		crit = crit.and(SubNode.AC + "." + myId).ne(null);
 
 		q.addCriteria(crit);

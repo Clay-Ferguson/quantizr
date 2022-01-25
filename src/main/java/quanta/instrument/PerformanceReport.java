@@ -1,6 +1,7 @@
 package quanta.instrument;
 
 import static quanta.util.Util.ok;
+import static quanta.util.Util.no;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -12,7 +13,7 @@ public class PerformanceReport {
 	private static final Logger log = LoggerFactory.getLogger(PerformanceReport.class);
 
 	// Any calls that complete faster than this time, are not even considered. They're not a problem.
-	public static final int REPORT_THRESHOLD = 1000;
+	public static final int REPORT_THRESHOLD = 1300; // 1300 for prod
 
 	public static String getReport() {
 		StringBuilder sb = new StringBuilder();
@@ -30,9 +31,10 @@ public class PerformanceReport {
 		}
 
 		sb.append("\nEvents over Threshold of " + String.valueOf(REPORT_THRESHOLD) + ": \n");
+		int counter = 0;
 		for (PerfMonEvent se : orderedData) {
 			if (se.duration > REPORT_THRESHOLD) {
-				sb.append(formatEvent(se, true, true));
+				sb.append(formatEvent(se, counter++ < 20, false));
 				sb.append("\n");
 			}
 		}
@@ -53,7 +55,7 @@ public class PerformanceReport {
 		List<UserPerf> upiList = new ArrayList<>(userPerfInfo.values());
 
 		upiList.sort((s1, s2) -> (int) (s2.totalCalls - s1.totalCalls));
-		sb.append("\n\nCall Counts: \n");
+		sb.append("\nCall Counts: \n");
 		for (UserPerf se : upiList) {
 			sb.append(se.user);
 			sb.append(" ");
@@ -62,7 +64,7 @@ public class PerformanceReport {
 		}
 
 		upiList.sort((s1, s2) -> (int) (s2.totalTime - s1.totalTime));
-		sb.append("\n\nTime Usage: \n");
+		sb.append("\nTime Usage: \n");
 		for (UserPerf se : upiList) {
 			sb.append(se.user);
 			sb.append(" ");
@@ -71,7 +73,7 @@ public class PerformanceReport {
 		}
 
 		upiList.sort((s1, s2) -> (int) (s2.totalTime / s2.totalCalls - s1.totalTime / s1.totalCalls));
-		sb.append("\n\nAvgerage Time Per Call: \n");
+		sb.append("\nAvgerage Time Per Call: \n");
 		for (UserPerf se : upiList) {
 			sb.append(se.user);
 			sb.append(" ");
@@ -79,18 +81,60 @@ public class PerformanceReport {
 			sb.append("\n");
 		}
 
+		sb.append(getTimesPerCategory());
+
 		return sb.toString();
 	}
 
-	public static String formatEvent(PerfMonEvent se, boolean showSubEvents, boolean printRoot) {
+	static class MethodStat {
+		String category;
+		int totalTime;
+		int totalCount;
+	}
+
+	/* This is the most 'powerful/useful' feature, because it displays time usage for each category */
+	public static String getTimesPerCategory() {
 		StringBuilder sb = new StringBuilder();
-		sb.append(ok(se.user) ? se.user : "anon");
-		sb.append(" ");
+		HashMap<String, MethodStat> stats = new HashMap<>();
+		sb.append("\nTimes Per Category\n");
+		for (PerfMonEvent event : Instrument.data) {
+			MethodStat stat = stats.get(event.event);
+			if (no(stat)) {
+				stats.put(event.event, stat = new MethodStat());
+				stat.category = event.event;
+			}
+			stat.totalTime += event.duration;
+			stat.totalCount++;
+		}
+
+		List<MethodStat> orderedStats = new ArrayList<>(stats.values());
+		orderedStats.sort((s1, s2) -> (int) (s2.totalTime / s2.totalCount - s1.totalTime / s1.totalCount));
+
+		for (MethodStat stat : orderedStats) {
+			sb.append(stat.category);
+			sb.append(" count=");
+			sb.append(String.valueOf(stat.totalCount));
+			sb.append(" avg=");
+			sb.append(DateUtil.formatDurationMillis(stat.totalTime / stat.totalCount, true));
+			sb.append("\n");
+		}
+		sb.append("\n");
+
+		return sb.toString();
+	}
+
+	public static String formatEvent(PerfMonEvent se, boolean showSubEvents, boolean isSubItem) {
+		StringBuilder sb = new StringBuilder();
+
+		if (!isSubItem) {
+			sb.append(ok(se.user) ? se.user : "anon");
+			sb.append(" ");
+		}
 		sb.append(se.event);
 		sb.append(" ");
 		sb.append(DateUtil.formatDurationMillis(se.duration, true));
 
-		if (printRoot && ok(se.root)) {
+		if (!isSubItem && ok(se.root)) {
 			sb.append(" r=");
 			sb.append(se.root.hashCode());
 		}
@@ -98,21 +142,19 @@ public class PerformanceReport {
 		sb.append(" e=");
 		sb.append(se.hashCode());
 
-		// This is not needed. We can search for the root id and tie together the info that way without dumping
-		// this massive amount of data on each one.
-		// // If this event happens to be the head/root of a series of events
-		// if (showSubEvents && ok(se.root) && ok(se.root.subEvents)) {
-		// 	sb.append("\n  Set:\n");
-		// 	for (PerfMonEvent subEvent : se.root.subEvents) {
-		// 		// if we run across same 'se' we're processing, skip it
-		// 		if (subEvent != se) {
-		// 			sb.append("    ");
-		// 			sb.append(formatEvent(subEvent, false, false));
-		// 			sb.append("\n");
-		// 		}
-		// 	}
-		// 	sb.append("\n");
-		// }
+		// If this event happens to be the head/root of a series of events
+		if (showSubEvents && ok(se.root) && ok(se.root.subEvents)) {
+			sb.append("\n  Set:\n");
+			for (PerfMonEvent subEvent : se.root.subEvents) {
+				// if we run across same 'se' we're processing, skip it
+				if (subEvent != se) {
+					sb.append("    ");
+					sb.append(formatEvent(subEvent, false, true));
+					sb.append("\n");
+				}
+			}
+			sb.append("\n");
+		}
 
 		return sb.toString();
 	}

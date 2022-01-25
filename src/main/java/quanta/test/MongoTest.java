@@ -42,7 +42,7 @@ public class MongoTest extends ServiceBase implements TestIntf {
 
 		// testDirtyReads();
 
-		// testPathRegex();
+		testPathRegex();
 
 		// authTest();
 
@@ -232,7 +232,14 @@ public class MongoTest extends ServiceBase implements TestIntf {
 		// Direct Children Test
 		String dc = mongoUtil.regexDirectChildrenOfPath("/abc");
 		verify("/abc/def".matches(dc));
+		verify("/abc/abc".matches(dc));
 		verify(!"/abc/def/x".matches(dc));
+		verify(!"/abc/def/x/".matches(dc));
+		verify(!"/abc/def/".matches(dc));
+		verify(!"/abc/def/abc".matches(dc));
+		verify(!"/arq/def/abc".matches(dc));
+		verify(!"/abc/def/abc/".matches(dc));
+		verify(!"/abc/abc/abc/".matches(dc));
 		verify(!"/abcx".matches(dc));
 
 		// Recursive Children Test
@@ -245,6 +252,8 @@ public class MongoTest extends ServiceBase implements TestIntf {
 
 		// the final slash is built into the query.
 		verify(!"/abc".matches(rc));
+
+		log.debug("All REGEX Path tests ok.");
 	}
 
 	public void verify(boolean val) {

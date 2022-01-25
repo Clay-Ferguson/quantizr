@@ -492,7 +492,7 @@ public class AppController extends ServiceBase implements ErrorController {
 	public @ResponseBody Object getNodeMetaInfo(@RequestBody GetNodeMetaInfoRequest req, //
 			HttpServletRequest httpReq, HttpSession session) {
 		// NO NOT HERE -> SessionContext.checkReqToken();
-		return callProc.run("rendergetNodeMetaInfoNode", req, session, ms -> {
+		return callProc.run("getNodeMetaInfo", req, session, ms -> {
 			return render.getNodeMetaInfo(ms, req);
 		});
 	}

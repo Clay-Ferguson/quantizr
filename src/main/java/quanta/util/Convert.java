@@ -105,7 +105,11 @@ public class Convert extends ServiceBase {
 		 * ownership info we need to show user.
 		 */
 		String nameProp = null;
-		SubNode userNode = read.getNode(ms, node.getOwner(), false);
+
+		// todo-0: for endpoints like 'renderNode' we can optimize these calls to get owner nodes to come as the LAST
+		// step and get them all (will only be up to 25 at a time) in a single "in clause" type query! But for now 
+		// this doesn't appear to be a bottleneck so we won't bother.
+		SubNode userNode = read.getOwner(ms, node, false);
 		String displayName = null;
 
 		if (ok(userNode)) {

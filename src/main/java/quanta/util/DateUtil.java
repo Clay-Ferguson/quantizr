@@ -211,7 +211,7 @@ public class DateUtil {
 		}
 
 		// only show milliseconds if not over a minute
-		if (days == 0 && hours == 0 && minutes == 0) {
+		if (showMillis && days == 0 && hours == 0 && minutes == 0) {
 			if (sb.length() > 0)
 				sb.append(" ");
 			sb.append(String.valueOf(millis));

@@ -155,10 +155,17 @@ public class MongoUtil extends ServiceBase {
 
 		SubNode node = ThreadLocals.getCachedNode(objId.toHexString());
 		if (no(node)) {
-			node = ops.findById(objId, SubNode.class);
+			// NOTE: For AOP Instrumentation we have to call thru the bean proxy ref, not 'this'
+			node = mongoUtil.ops_findById(objId);
 		}
 		return nodeOrDirtyNode(node);
 	}
+
+	@PerfMon
+	public SubNode ops_findById(ObjectId objId) {
+		return ops.findById(objId, SubNode.class);
+	}
+
 
 	public SubNode findByIdNoCache(ObjectId objId) {
 		return ops.findById(objId, SubNode.class);
@@ -173,6 +180,7 @@ public class MongoUtil extends ServiceBase {
 	 * If node is non-null we allow that node to have the path, but only that node, and if so we accept
 	 * that existing path as ok and valid.
 	 */
+	@PerfMon
 	public String findAvailablePath(String path) {
 		// log.debug("findAvailablePath In: " + path);
 
@@ -507,7 +515,10 @@ public class MongoUtil extends ServiceBase {
 
 		createIndex(ms, SubNode.class, SubNode.OWNER);
 		createIndex(ms, SubNode.class, SubNode.ORDINAL);
-		createIndex(ms, SubNode.class, SubNode.AC); // <---Not sure this will work (AC is an Object with random properties)
+		
+		// This blows up in PROD because nodes shared with too many people exceed the size allowed for an index field.
+		//createIndex(ms, SubNode.class, SubNode.AC); // <---Not sure this will work (AC is an Object with random properties)
+		
 		createIndex(ms, SubNode.class, SubNode.MODIFY_TIME, Direction.DESC);
 		createIndex(ms, SubNode.class, SubNode.CREATE_TIME, Direction.DESC);
 		createTextIndexes(ms, SubNode.class);
@@ -710,7 +721,18 @@ public class MongoUtil extends ServiceBase {
 	 */
 	public String regexDirectChildrenOfPath(String path) {
 		path = XString.stripIfEndsWith(path, "/");
+	
+		// NOTES: 
+		//   - The leftmost caret (^) matches path to first part of the string.
+		//   - The caret inside the ([]) means "not" containing the '/' char.
+		//   - \\/ is basically just '/' (escaped properly)
+		//   - The '*' means we match the "not /" condition one or more times.
+		
+		// legacy version (asterisk ouside group)
 		return "^" + Pattern.quote(path) + "\\/([^\\/])*$";
+		
+		// This version also works (node the '*' location), but testing didn't show any performance difference
+		// return "^" + Pattern.quote(path) + "\\/([^\\/]*)$"; 
 	}
 
 	/*

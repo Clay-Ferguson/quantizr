@@ -64,11 +64,12 @@ public class MongoRead extends ServiceBase {
     /**
      * Gets account name from the root node associated with whoever owns 'node'
      */
+    @PerfMon(category = "read")
     public String getNodeOwner(MongoSession ms, SubNode node) {
         if (no(node.getOwner())) {
             throw new RuntimeEx("Node has null owner: " + XString.prettyPrint(node));
         }
-        SubNode userNode = getNode(ms, node.getOwner());
+        SubNode userNode = read.getNode(ms, node.getOwner());
         return userNode.getStr(NodeProp.USER.s());
     }
 
@@ -76,6 +77,7 @@ public class MongoRead extends ServiceBase {
         return XString.truncateAfterLast(node.getPath(), "/");
     }
 
+    @PerfMon(category = "read")
     public long getChildCount(MongoSession ms, SubNode node) {
         Query q = new Query();
         Criteria crit = Criteria.where(SubNode.PATH).regex(mongoUtil.regexDirectChildrenOfPath(node.getPath()));
@@ -83,7 +85,15 @@ public class MongoRead extends ServiceBase {
         return ops.count(q, SubNode.class);
     }
 
-    @PerfMon(category = "read")
+    @PerfMon(category = "read(m,pth)")
+    public boolean hasChildren(MongoSession ms, String path) {
+        Query q = new Query();
+        Criteria crit = Criteria.where(SubNode.PATH).regex(mongoUtil.regexDirectChildrenOfPath(path));
+        q.addCriteria(crit);
+        return ops.exists(q, SubNode.class);
+    }
+
+    @PerfMon(category = "read(m,n)")
     public boolean hasChildren(MongoSession ms, SubNode node) {
         Query q = new Query();
         Criteria crit = Criteria.where(SubNode.PATH).regex(mongoUtil.regexDirectChildrenOfPath(node.getPath()));
@@ -91,6 +101,7 @@ public class MongoRead extends ServiceBase {
         return ops.exists(q, SubNode.class);
     }
 
+    @PerfMon(category = "read")
     public long getNodeCount(MongoSession ms) {
         if (no(ms)) {
             ms = auth.getAdminSession();
@@ -99,6 +110,7 @@ public class MongoRead extends ServiceBase {
         return ops.count(q, SubNode.class);
     }
 
+    @PerfMon(category = "read")
     public SubNode getChildAt(MongoSession ms, SubNode node, long idx) {
         auth.auth(ms, node, PrivilegeType.READ);
         Query q = new Query();
@@ -131,7 +143,7 @@ public class MongoRead extends ServiceBase {
             return;
         }
 
-        SubNode parentNode = getNode(ms, parentPath, false);
+        SubNode parentNode = read.getNode(ms, parentPath, false);
         if (ok(parentNode))
             return;
 
@@ -144,6 +156,7 @@ public class MongoRead extends ServiceBase {
         }
     }
 
+    @PerfMon(category = "read")
     public SubNode getNodeByName(MongoSession ms, String name) {
         return getNodeByName(ms, name, true);
     }
@@ -209,8 +222,10 @@ public class MongoRead extends ServiceBase {
         return ret;
     }
 
+    @PerfMon(category = "read(m,i)")
     public SubNode getNode(MongoSession ms, String identifier) {
-        return getNode(ms, identifier, true);
+        // calling thru proxy for AOP here.
+        return read.getNode(ms, identifier, true);
     }
 
     /**
@@ -226,7 +241,7 @@ public class MongoRead extends ServiceBase {
      *    (we support just '~inbox' also as a type shorthand where the sn: is missing)
      * </pre>
      */
-    @PerfMon(category = "read")
+    @PerfMon(category = "read(m,i,a)")
     public SubNode getNode(MongoSession ms, String identifier, boolean allowAuth) {
         if (no(identifier))
             return null;
@@ -243,19 +258,19 @@ public class MongoRead extends ServiceBase {
             if (!typeName.startsWith("sn:")) {
                 typeName = "sn:" + typeName;
             }
-            ret = getUserNodeByType(ms, ms.getUserName(), null, null, typeName, null, null);
+            ret = read.getUserNodeByType(ms, ms.getUserName(), null, null, typeName, null, null);
         }
         // Node name lookups are done by prefixing the search with a colon (:)
         else if (identifier.startsWith(":")) {
-            ret = getNodeByName(ms, identifier.substring(1), allowAuth);
+            ret = read.getNodeByName(ms, identifier.substring(1), allowAuth);
         }
         // If search doesn't start with a slash then it's a nodeId and not a path
         else if (!identifier.startsWith("/")) {
-            ret = getNode(ms, new ObjectId(identifier), allowAuth);
+            ret = read.getNode(ms, new ObjectId(identifier), allowAuth);
         }
         // otherwise this is a path lookup
         else {
-            ret = findNodeByPath(identifier, true);
+            ret = read.findNodeByPath(identifier, true);
         }
 
         if (allowAuth) {
@@ -282,10 +297,17 @@ public class MongoRead extends ServiceBase {
         return ops.exists(q, SubNode.class);
     }
 
+    @PerfMon(category = "read(m,o)")
     public SubNode getNode(MongoSession ms, ObjectId objId) {
-        return getNode(ms, objId, true);
+        return read.getNode(ms, objId, true);
     }
 
+    @PerfMon(category = "read")
+    public SubNode getOwner(MongoSession ms, SubNode node, boolean allowAuth) {
+        return read.getNode(ms, node.getOwner(), allowAuth);
+    }
+
+    @PerfMon(category = "read(m,o,a)")
     public SubNode getNode(MongoSession ms, ObjectId objId, boolean allowAuth) {
         SubNode ret = mongoUtil.findById(objId);
         if (ok(ret) && allowAuth) {
@@ -299,11 +321,12 @@ public class MongoRead extends ServiceBase {
      * notifications sent to any threads that are waiting to lookup a node once it exists, but we will
      * STILL probably need to DO the lookup so we don't have concurrent access threading bug.
      */
+    @PerfMon(category = "read(m,o,a,r)")
     public SubNode getNode(MongoSession ms, ObjectId objId, boolean allowAuth, int retries) {
-        SubNode ret = getNode(ms, objId, allowAuth);
+        SubNode ret = read.getNode(ms, objId, allowAuth);
         while (no(ret) && retries-- > 0) {
             Util.sleep(3000);
-            ret = getNode(ms, objId, allowAuth);
+            ret = read.getNode(ms, objId, allowAuth);
         }
         return ret;
     }
@@ -315,6 +338,7 @@ public class MongoRead extends ServiceBase {
     /*
      * WARNING: This always converts a 'pending' path to a non-pending one (/r/p/ v.s. /r/)
      */
+    @PerfMon(category = "read")
     public SubNode getParent(MongoSession ms, SubNode node, boolean allowAuth) {
         String path = node.getPath();
         if ("/".equals(path)) {
@@ -332,7 +356,7 @@ public class MongoRead extends ServiceBase {
          */
         parentPath = parentPath.replace(pendingPath, rootPath);
 
-        SubNode ret = getNode(ms, parentPath);
+        SubNode ret = read.getNode(ms, parentPath);
         if (ok(ret) && allowAuth) {
             auth.auth(ms, ret, PrivilegeType.READ);
         }
@@ -354,6 +378,7 @@ public class MongoRead extends ServiceBase {
         return list;
     }
 
+    @PerfMon(category = "read")
     public List<String> getChildrenIds(MongoSession ms, SubNode node, boolean ordered, Integer limit) {
         auth.auth(ms, node, PrivilegeType.READ);
 
@@ -389,8 +414,9 @@ public class MongoRead extends ServiceBase {
 
     /*
      * If node is null it's path is considered empty string, and it represents the 'root' of the tree.
-     * There is no actual NODE that is root node,
+     * There is no actual NODE that is root node.
      */
+    @PerfMon(category = "read")
     public Iterable<SubNode> getChildrenUnderPath(MongoSession ms, String path, Sort sort, Integer limit, int skip,
             TextCriteria textCriteria, Criteria moreCriteria) {
 
@@ -438,12 +464,12 @@ public class MongoRead extends ServiceBase {
      */
     public Iterable<SubNode> getChildren(MongoSession ms, SubNode node, Sort sort, Integer limit, int skip) {
         auth.auth(ms, node, PrivilegeType.READ);
-        return getChildrenUnderPath(ms, node.getPath(), sort, limit, skip, null, null);
+        return read.getChildrenUnderPath(ms, node.getPath(), sort, limit, skip, null, null);
     }
 
     public Iterable<SubNode> getChildren(MongoSession ms, SubNode node) {
         auth.auth(ms, node, PrivilegeType.READ);
-        return getChildrenUnderPath(ms, node.getPath(), null, null, 0, null, null);
+        return read.getChildrenUnderPath(ms, node.getPath(), null, null, 0, null, null);
     }
 
     /*
@@ -453,6 +479,7 @@ public class MongoRead extends ServiceBase {
      * top one and using that for my MAX operation. AFAIK this might even be the most efficient
      * approach. Who knows.
      */
+    @PerfMon(category = "read")
     public Long getMaxChildOrdinal(MongoSession ms, SubNode node) {
         // Do not delete this commented stuff. Can be helpful to get aggregates
         // working.
@@ -490,6 +517,7 @@ public class MongoRead extends ServiceBase {
         return nodeFound.getOrdinal();
     }
 
+    @PerfMon(category = "read")
     public SubNode getNewestChild(MongoSession ms, SubNode node) {
         auth.auth(ms, node, PrivilegeType.READ);
 
@@ -502,6 +530,7 @@ public class MongoRead extends ServiceBase {
         return nodeFound;
     }
 
+    @PerfMon(category = "read")
     public SubNode getSiblingAbove(MongoSession ms, SubNode node) {
         auth.auth(ms, node, PrivilegeType.READ);
 
@@ -524,6 +553,7 @@ public class MongoRead extends ServiceBase {
         return nodeFound;
     }
 
+    @PerfMon(category = "read")
     public SubNode getSiblingBelow(MongoSession ms, SubNode node) {
         auth.auth(ms, node, PrivilegeType.READ);
         if (no(node.getOrdinal())) {
@@ -587,6 +617,7 @@ public class MongoRead extends ServiceBase {
      * 
      * timeRangeType: futureOnly, pastOnly, all
      */
+    @PerfMon(category = "read")
     public Iterable<SubNode> searchSubGraph(MongoSession ms, SubNode node, String prop, String text, String sortField,
             String sortDir, int limit, int skip, boolean fuzzy, boolean caseSensitive, String timeRangeType, boolean recursive,
             boolean requirePriority) {
@@ -868,6 +899,7 @@ public class MongoRead extends ServiceBase {
         return getUserNodeByUserName(ms, user, true);
     }
 
+    @PerfMon(category = "read")
     public SubNode getUserNodeByUserName(MongoSession ms, String user, boolean allowAuth) {
         String cacheKey = "USRNODE-" + user;
         SubNode ret = ThreadLocals.getCachedNode(cacheKey);
@@ -917,6 +949,7 @@ public class MongoRead extends ServiceBase {
      * Finds and returns the first node matching userName and type under the 'node', or null if not
      * existing
      */
+    @PerfMon(category = "read")
     public SubNode findNodeByUserAndType(MongoSession ms, SubNode node, String userName, String type) {
 
         // Other wise for ordinary users root is based off their username
@@ -935,6 +968,7 @@ public class MongoRead extends ServiceBase {
     /*
      * Finds the first node matching 'type' under 'path' (non-recursively, direct children only)
      */
+    @PerfMon(category = "read")
     public SubNode findTypedNodeUnderPath(MongoSession ms, String path, String type) {
 
         // Other wise for ordinary users root is based off their username
@@ -985,6 +1019,7 @@ public class MongoRead extends ServiceBase {
      * Returns one (or first) node contained directly under path (non-recursively) that has a matching
      * propName and propVal
      */
+    @PerfMon(category = "read")
     public SubNode findNodeByProp(MongoSession ms, String path, String propName, String propVal) {
 
         // Other wise for ordinary users root is based off their username
@@ -1003,6 +1038,7 @@ public class MongoRead extends ServiceBase {
      * Same as findSubNodeByProp but returns multiples. Finda ALL nodes contained directly under path
      * (non-recursively) that has a matching propName and propVal
      */
+    @PerfMon(category = "read")
     public Iterable<SubNode> findNodesByProp(MongoSession ms, String path, String propName, String propVal) {
 
         // Other wise for ordinary users root is based off their username

@@ -13,8 +13,9 @@ import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.boot.web.servlet.server.ServletWebServerFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.EnableAspectJAutoProxy;
 import org.springframework.context.annotation.Scope;
+import org.springframework.context.event.ContextRefreshedEvent;
+import org.springframework.context.event.EventListener;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.scheduling.TaskScheduler;
 import org.springframework.scheduling.annotation.EnableAsync;
@@ -50,6 +51,11 @@ public class AppConfiguration implements WebMvcConfigurer {
 
 	private static Object execInitLock = new Object();
 	private static ThreadPoolTaskExecutor executor;
+
+	@EventListener
+	public void handleContextRefresh(ContextRefreshedEvent event) {
+		ServiceBase.init(event.getApplicationContext());
+	}
 
 	@Bean
 	public FilterRegistrationBean<AppFilter> appFilterRegistration() {

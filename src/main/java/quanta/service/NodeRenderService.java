@@ -18,6 +18,7 @@ import quanta.config.AppProp;
 import quanta.config.ServiceBase;
 import quanta.exception.NodeAuthFailedException;
 import quanta.exception.base.RuntimeEx;
+import quanta.instrument.PerfMon;
 import quanta.model.BreadcrumbInfo;
 import quanta.model.CalendarItem;
 import quanta.model.NodeInfo;
@@ -56,16 +57,30 @@ public class NodeRenderService extends ServiceBase {
 	@Autowired
 	private ApplicationContext context;
 
+	/*
+	 * Note: Client is allowed to send just IDs, or also "id/path", and if the path part is appended to
+	 * an id we can use that to skip a 'getNode' call and improve performance
+	 */
 	public GetNodeMetaInfoResponse getNodeMetaInfo(MongoSession ms, GetNodeMetaInfoRequest req) {
 		GetNodeMetaInfoResponse res = new GetNodeMetaInfoResponse();
 		List<NodeMetaIntf> list = new LinkedList<>();
 		res.setNodeIntf(list);
 
 		for (String id : req.getIds()) {
-			SubNode node = read.getNode(ms, id);
-			if (ok(node)) {
-				boolean hasChildren = read.hasChildren(ms, node);
+			int pathStart = id.indexOf("/");
+			if (pathStart != -1) {
+				String path = id.substring(pathStart);
+				id = id.substring(0, pathStart);
+				boolean hasChildren = read.hasChildren(ms, path);
 				list.add(new NodeMetaIntf(id, hasChildren));
+			} 
+			// this is obsolete execution path, but let's keep for now, to support calls without path
+			else {
+				SubNode node = read.getNode(ms, id);
+				if (ok(node)) {
+					boolean hasChildren = read.hasChildren(ms, node);
+					list.add(new NodeMetaIntf(id, hasChildren));
+				}
 			}
 		}
 		res.setSuccess(true);
@@ -76,6 +91,7 @@ public class NodeRenderService extends ServiceBase {
 	 * This is the call that gets all the data to show on a page. Whenever user is browsing to a new
 	 * page, this method gets called once per page and retrieves all the data for that page.
 	 */
+	@PerfMon(category = "render")
 	public RenderNodeResponse renderNode(MongoSession ms, RenderNodeRequest req) {
 		RenderNodeResponse res = new RenderNodeResponse();
 		ms = ThreadLocals.ensure(ms);
@@ -209,9 +225,9 @@ public class NodeRenderService extends ServiceBase {
 
 		LinkedList<BreadcrumbInfo> breadcrumbs = new LinkedList<>();
 		res.setBreadcrumbs(breadcrumbs);
-		getBreadcrumbs(ms, highestUpParent, breadcrumbs);
+		render.getBreadcrumbs(ms, highestUpParent, breadcrumbs);
 
-		NodeInfo nodeInfo = processRenderNode(ms, req, res, node, scanToNode, -1, 0, limit);
+		NodeInfo nodeInfo = render.processRenderNode(ms, req, res, node, scanToNode, -1, 0, limit);
 		nodeInfo.setParents(parentNodes);
 		res.setNode(nodeInfo);
 		res.setSuccess(true);
@@ -224,6 +240,7 @@ public class NodeRenderService extends ServiceBase {
 		return res;
 	}
 
+	@PerfMon(category = "render")
 	private NodeInfo processRenderNode(MongoSession ms, RenderNodeRequest req, RenderNodeResponse res, SubNode node,
 			SubNode scanToNode, long logicalOrdinal, int level, int limit) {
 
@@ -339,7 +356,7 @@ public class NodeRenderService extends ServiceBase {
 							for (int i = count - 1; i >= 0; i--) {
 								SubNode sn = slidingWindow.get(i);
 								relativeIdx--;
-								ninfo = processRenderNode(ms, req, res, sn, null, relativeIdx, level + 1, limit);
+								ninfo = render.processRenderNode(ms, req, res, sn, null, relativeIdx, level + 1, limit);
 								nodeInfo.getChildren().add(0, ninfo);
 
 								/*
@@ -381,7 +398,7 @@ public class NodeRenderService extends ServiceBase {
 			}
 
 			/* if we get here we're accumulating rows */
-			ninfo = processRenderNode(ms, req, res, n, null, idx - 1L, level + 1, limit);
+			ninfo = render.processRenderNode(ms, req, res, n, null, idx - 1L, level + 1, limit);
 			nodeInfo.getChildren().add(ninfo);
 
 			if (nodeInfo.getChildren().size() >= limit) {
@@ -406,7 +423,7 @@ public class NodeRenderService extends ServiceBase {
 					SubNode sn = slidingWindow.get(i);
 					relativeIdx--;
 
-					ninfo = processRenderNode(ms, req, res, sn, null, (long) relativeIdx, level + 1, limit);
+					ninfo = render.processRenderNode(ms, req, res, sn, null, (long) relativeIdx, level + 1, limit);
 					nodeInfo.getChildren().add(0, ninfo);
 
 					// If we have enough records we're done
@@ -581,6 +598,7 @@ public class NodeRenderService extends ServiceBase {
 		return res;
 	}
 
+	@PerfMon(category = "render")
 	public void getBreadcrumbs(MongoSession ms, SubNode node, LinkedList<BreadcrumbInfo> list) {
 		ms = ThreadLocals.ensure(ms);
 

@@ -584,7 +584,9 @@ export class Render {
 
             for (let child of node.children) {
                 if (!(child as any).metaInfDone) {
-                    ids.push(child.id);
+                    // console.log("Getting Meta Info of path: " + child.path);
+                    // Note: The first character of path is a slash and also serves as the delimiter between id and path.
+                    ids.push(child.id + child.path);
                 }
             }
 
