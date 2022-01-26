@@ -35,16 +35,6 @@ import quanta.util.ThreadLocals;
 import quanta.util.Util;
 import quanta.util.XString;
 
-// Methods due for optimization with new parentId capability!
-// (Also will be more like 'getParent' which will be trivial now.)
-
-// todo-0: finish these...
-// getChildrenIds (not done yet)
-// getNewestChild(ms,node)
-// getSiblingAbove(ms,node)
-// getSiblingBelow(ms,node)
-// searchSubGraph (non recursive)
-
 /**
  * Performs the 'create' (as in CRUD) operations for creating new nodes in MongoDB
  * <p>
