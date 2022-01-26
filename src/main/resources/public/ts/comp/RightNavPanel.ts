@@ -28,7 +28,7 @@ export class RightNavPanel extends Div {
         });
 
         let state: AppState = store.getState();
-        let panelCols = state.userPreferences.mainPanelCols || 5;
+        let panelCols = state.userPreferences.mainPanelCols || 6;
         if (panelCols < 4) panelCols = 4;
         if (panelCols > 8) panelCols = 8;
         let rightCols = 4;

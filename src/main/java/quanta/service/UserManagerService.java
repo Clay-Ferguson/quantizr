@@ -891,7 +891,7 @@ public class UserManagerService extends ServiceBase {
 
 			long mainPanelCols = prefsNode.getInt(NodeProp.USER_PREF_MAIN_PANEL_COLS);
 			if (mainPanelCols == 0) {
-				mainPanelCols = 5;
+				mainPanelCols = 6;
 			}
 			userPrefs.setMainPanelCols(mainPanelCols);
 

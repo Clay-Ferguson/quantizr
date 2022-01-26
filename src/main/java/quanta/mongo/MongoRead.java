@@ -1093,6 +1093,7 @@ public class MongoRead extends ServiceBase {
     /*
      * Finds the first node matching 'type' under 'path' (non-recursively, direct children only)
      */
+    // todo-0: how is this still using path not PARENT ID. I thougt I refactored all ?
     public Iterable<SubNode> findTypedNodesUnderPath(MongoSession ms, String path, String type) {
         Query q = typedNodesUnderPath_query(ms, path, type);
         return mongoUtil.find(q);

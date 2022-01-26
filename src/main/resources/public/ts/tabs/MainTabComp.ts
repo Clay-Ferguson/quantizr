@@ -43,7 +43,7 @@ export class MainTabComp extends AppTab {
         //     });
         // }
 
-        let panelCols = state.userPreferences.mainPanelCols || 5;
+        let panelCols = state.userPreferences.mainPanelCols || 6;
 
         let widthSizerPanel = !state.mobileMode ? new Span(null, { className: "widthSizerPanel float-end" }, [
             panelCols > 4 ? new Icon({

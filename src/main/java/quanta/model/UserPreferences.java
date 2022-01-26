@@ -13,7 +13,7 @@ public class UserPreferences {
 	private boolean rssHeadlinesOnly;
 
 	// valid Range = 4 thru 8, inclusive.
-	private long mainPanelCols = 5;
+	private long mainPanelCols = 6;
 
 	// not persisted to DB yet. ipsm was just an experiment using IPFSSubPub for messaging
 	@JsonProperty(required = false)

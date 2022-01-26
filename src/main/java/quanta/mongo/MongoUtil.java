@@ -468,6 +468,19 @@ public class MongoUtil extends ServiceBase {
 		// shortenPathParts(session);
 	}
 
+	public void processAccounts(MongoSession ms) {
+		// Query to pull all user accounts
+		Iterable<SubNode> accountNodes = read.findTypedNodesUnderPath(ms, NodePath.ROOT_OF_ALL_USERS, NodeType.ACCOUNT.s());
+
+		for (SubNode acctNode : accountNodes) {
+			acctNode.set(NodeProp.USER_PREF_MAIN_PANEL_COLS.s(), 6);
+
+			if (ThreadLocals.getDirtyNodeCount() > 200) {
+				update.saveSession(ms);
+			}
+		}
+	}
+
 	/*
 	 * todo-0: need to make the system capable of doing this logic during a "Full Maintenance"
 	 * operation, like right after a DB compaction etc. Also the current code just updates path ONLY if
