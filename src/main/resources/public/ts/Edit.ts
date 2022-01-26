@@ -421,7 +421,6 @@ export class Edit {
         S.view.scrollToNode(state);
     }
 
-    // todo-0: make all these toggle methods take a string as the property and assess like obj['prop']
     toggleNsfw = (state: AppState): void => {
         state.userPreferences.nsfw = !state.userPreferences.nsfw;
         S.util.saveUserPreferences(state, true);

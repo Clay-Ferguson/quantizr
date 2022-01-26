@@ -523,7 +523,7 @@ export class Nav {
     }
 
     showMyNewMessages = (): void => {
-        S.nav.messages({
+        this.messages({
             feedFilterFriends: false,
             feedFilterToMe: true,
             feedFilterFromMe: true,
@@ -535,7 +535,121 @@ export class Nav {
     }
 
     showPublicFediverse = (): void => {
-        S.nav.messages({
+        this.messages({
+            feedFilterFriends: false,
+            feedFilterToMe: false,
+            feedFilterFromMe: false,
+            feedFilterToPublic: true,
+            feedFilterLocalServer: false,
+            feedFilterRootNode: null,
+            feedResults: null
+        });
+    }
+
+    messagesToFromMe = () => {
+        let feedData = S.tabUtil.getTabDataById(null, C.TAB_FEED);
+        if (feedData) {
+            feedData.props.searchTextState.setValue("");
+        }
+        this.messages({
+            feedFilterFriends: false,
+            feedFilterToMe: true,
+            feedFilterFromMe: true,
+            feedFilterToPublic: false,
+            feedFilterLocalServer: false,
+            feedFilterRootNode: null,
+            feedResults: null
+        });
+    }
+
+    messagesToMe = () => {
+        let feedData = S.tabUtil.getTabDataById(null, C.TAB_FEED);
+        if (feedData) {
+            feedData.props.searchTextState.setValue("");
+        }
+        this.messages({
+            feedFilterFriends: false,
+            feedFilterToMe: true,
+            feedFilterFromMe: false,
+            feedFilterToPublic: false,
+            feedFilterLocalServer: false,
+            feedFilterRootNode: null,
+            feedResults: null
+        });
+    }
+
+    messagesFromMe = () => {
+        let feedData = S.tabUtil.getTabDataById(null, C.TAB_FEED);
+        if (feedData) {
+            feedData.props.searchTextState.setValue("");
+        }
+        this.messages({
+            feedFilterFriends: false,
+            feedFilterToMe: false,
+            feedFilterFromMe: true,
+            feedFilterToPublic: false,
+            feedFilterLocalServer: false,
+            feedFilterRootNode: null,
+            feedResults: null
+        });
+    }
+
+    messagesFromFriends = () => {
+        let feedData = S.tabUtil.getTabDataById(null, C.TAB_FEED);
+        if (feedData) {
+            feedData.props.searchTextState.setValue("");
+        }
+        this.messages({
+            feedFilterFriends: true,
+            feedFilterToMe: false,
+            feedFilterFromMe: false,
+            feedFilterToPublic: false,
+            feedFilterLocalServer: false,
+            feedFilterRootNode: null,
+            feedResults: null
+        });
+    }
+
+    messagesLocal = () => {
+        let feedData = S.tabUtil.getTabDataById(null, C.TAB_FEED);
+        if (feedData) {
+            feedData.props.searchTextState.setValue("");
+        }
+        this.messages({
+            feedFilterFriends: false,
+            feedFilterToMe: false,
+            feedFilterFromMe: false,
+            feedFilterToPublic: true,
+            feedFilterLocalServer: true,
+            feedFilterRootNode: null,
+            feedResults: null
+        });
+    }
+
+    messagesNodeFeed = (state: AppState) => {
+        const hltNode: J.NodeInfo = S.nodeUtil.getHighlightedNode(state);
+        if (!hltNode) return;
+        let feedData = S.tabUtil.getTabDataById(state, C.TAB_FEED);
+        if (feedData) {
+            feedData.props.searchTextState.setValue("");
+        }
+        this.messages({
+            feedFilterFriends: false,
+            feedFilterToMe: false,
+            feedFilterFromMe: false,
+            feedFilterToPublic: true,
+            feedFilterLocalServer: true,
+            feedFilterRootNode: hltNode,
+            feedResults: null
+        });
+    }
+
+    messagesFediverse = () => {
+        let feedData = S.tabUtil.getTabDataById(null, C.TAB_FEED);
+        if (feedData) {
+            feedData.props.searchTextState.setValue("");
+        }
+        this.messages({
             feedFilterFriends: false,
             feedFilterToMe: false,
             feedFilterFromMe: false,

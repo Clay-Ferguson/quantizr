@@ -107,121 +107,6 @@ export class MenuPanel extends Div {
         S.util.saveUserPreferences(state);
     };
 
-    // todo-0: move all these message functions to a better place. maybe search.ts?
-    static messagesToFromMe = () => {
-        let feedData = S.tabUtil.getTabDataById(null, C.TAB_FEED);
-        if (feedData) {
-            feedData.props.searchTextState.setValue("");
-        }
-        S.nav.messages({
-            feedFilterFriends: false,
-            feedFilterToMe: true,
-            feedFilterFromMe: true,
-            feedFilterToPublic: false,
-            feedFilterLocalServer: false,
-            feedFilterRootNode: null,
-            feedResults: null
-        });
-    }
-
-    static messagesToMe = () => {
-        let feedData = S.tabUtil.getTabDataById(null, C.TAB_FEED);
-        if (feedData) {
-            feedData.props.searchTextState.setValue("");
-        }
-        S.nav.messages({
-            feedFilterFriends: false,
-            feedFilterToMe: true,
-            feedFilterFromMe: false,
-            feedFilterToPublic: false,
-            feedFilterLocalServer: false,
-            feedFilterRootNode: null,
-            feedResults: null
-        });
-    }
-
-    static messagesFromMe = () => {
-        let feedData = S.tabUtil.getTabDataById(null, C.TAB_FEED);
-        if (feedData) {
-            feedData.props.searchTextState.setValue("");
-        }
-        S.nav.messages({
-            feedFilterFriends: false,
-            feedFilterToMe: false,
-            feedFilterFromMe: true,
-            feedFilterToPublic: false,
-            feedFilterLocalServer: false,
-            feedFilterRootNode: null,
-            feedResults: null
-        });
-    }
-
-    static messagesFromFriends = () => {
-        let feedData = S.tabUtil.getTabDataById(null, C.TAB_FEED);
-        if (feedData) {
-            feedData.props.searchTextState.setValue("");
-        }
-        S.nav.messages({
-            feedFilterFriends: true,
-            feedFilterToMe: false,
-            feedFilterFromMe: false,
-            feedFilterToPublic: false,
-            feedFilterLocalServer: false,
-            feedFilterRootNode: null,
-            feedResults: null
-        });
-    }
-
-    static messagesLocal = () => {
-        let feedData = S.tabUtil.getTabDataById(null, C.TAB_FEED);
-        if (feedData) {
-            feedData.props.searchTextState.setValue("");
-        }
-        S.nav.messages({
-            feedFilterFriends: false,
-            feedFilterToMe: false,
-            feedFilterFromMe: false,
-            feedFilterToPublic: true,
-            feedFilterLocalServer: true,
-            feedFilterRootNode: null,
-            feedResults: null
-        });
-    }
-
-    static messagesNodeFeed = (state: AppState) => {
-        const hltNode: J.NodeInfo = S.nodeUtil.getHighlightedNode(state);
-        if (!hltNode) return;
-        let feedData = S.tabUtil.getTabDataById(state, C.TAB_FEED);
-        if (feedData) {
-            feedData.props.searchTextState.setValue("");
-        }
-        S.nav.messages({
-            feedFilterFriends: false,
-            feedFilterToMe: false,
-            feedFilterFromMe: false,
-            feedFilterToPublic: true,
-            feedFilterLocalServer: true,
-            feedFilterRootNode: hltNode,
-            feedResults: null
-        });
-    }
-
-    static messagesFediverse = () => {
-        let feedData = S.tabUtil.getTabDataById(null, C.TAB_FEED);
-        if (feedData) {
-            feedData.props.searchTextState.setValue("");
-        }
-        S.nav.messages({
-            feedFilterFriends: false,
-            feedFilterToMe: false,
-            feedFilterFromMe: false,
-            feedFilterToPublic: true,
-            feedFilterLocalServer: false,
-            feedFilterRootNode: null,
-            feedResults: null
-        });
-    }
-
     static showKeys = (): void => {
         let f = async () => {
             new ManageEncryptionKeysDlg(appState(null)).open();
@@ -321,13 +206,13 @@ export class MenuPanel extends Div {
             // because while Quanta is capable of rendering ANY node as a chat room, mankind really isn't ready for that!
             // new MenuItem("Node Feed (Chat)", () => MenuPanel.messagesNodeFeed(state), !state.isAnonUser && hltNode?.id != null),
             // new MenuItemSeparator(), //
-            new MenuItem("To/From Me" + messagesSuffix, MenuPanel.messagesToFromMe, !state.isAnonUser),
-            new MenuItem("To Me" + messagesSuffix, MenuPanel.messagesToMe, !state.isAnonUser),
-            new MenuItem("From Me" + messagesSuffix, MenuPanel.messagesFromMe, !state.isAnonUser),
+            new MenuItem("To/From Me" + messagesSuffix, S.nav.messagesToFromMe, !state.isAnonUser),
+            new MenuItem("To Me" + messagesSuffix, S.nav.messagesToMe, !state.isAnonUser),
+            new MenuItem("From Me" + messagesSuffix, S.nav.messagesFromMe, !state.isAnonUser),
             new MenuItemSeparator(),
-            new MenuItem("From Friends", MenuPanel.messagesFromFriends, !state.isAnonUser),
-            new MenuItem("From Local Users", MenuPanel.messagesLocal, !state.isAnonUser),
-            new MenuItem("All Fediverse", MenuPanel.messagesFediverse, !state.isAnonUser)
+            new MenuItem("From Friends", S.nav.messagesFromFriends, !state.isAnonUser),
+            new MenuItem("From Local Users", S.nav.messagesLocal, !state.isAnonUser),
+            new MenuItem("All Fediverse", S.nav.messagesFediverse, !state.isAnonUser)
         ]));
 
         children.push(new Menu("Friends", [
@@ -618,7 +503,7 @@ export class MenuPanel extends Div {
 
                             /* special case for feed tab */
                             if (tab === C.TAB_FEED) {
-                                func = MenuPanel.messagesFediverse;
+                                func = S.nav.messagesFediverse;
                             }
                             else {
                                 func = () => S.tabUtil.selectTab(tab);

@@ -59,7 +59,7 @@ export class FeedView extends AppTab<FeedViewProps> {
         // if this is mobile don't even show search field unless it's currently in use (like from a trending click)
         if (!state.mobileMode || this.data.props.searchTextState.getValue()) {
             topRightControls = [
-                new Span(null, { className: "feedSearchField" }, [new TextField(null, false, null, null, false, this.data.props.searchTextState, null, "Enter search text...")]),
+                new Span(null, { className: "feedSearchField" }, [new TextField(null, false, null, null, false, this.data.props.searchTextState, null, "Search for...")]),
                 new Button("Clear", () => this.clearSearch(), { className: "feedClearButton" })
             ];
         }
@@ -83,7 +83,9 @@ export class FeedView extends AppTab<FeedViewProps> {
                         onClick: () => S.srch.refreshFeed(),
                         title: "Refresh"
                     }),
+
                     new HelpButton(() => S.quanta?.config?.help?.fediverse?.feed),
+
                     // NOTE: state.feedFilterRootNode?.id will be null here, for full fediverse (not a node chat/node feed) scenario.
                     state.isAnonUser ? null : new Button("Post", () => S.edit.addNode(this.data.props.feedFilterRootNode?.id, null, null, null, state), {
                         title: this.data.props.feedFilterRootNode?.id ? "Post to this Chat Room" : "Post something to the Fediverse!"
