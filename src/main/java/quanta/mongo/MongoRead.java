@@ -136,19 +136,6 @@ public class MongoRead extends ServiceBase {
         return ops.count(q, SubNode.class);
     }
 
-    @PerfMon(category = "read")
-    public SubNode getChildAt(MongoSession ms, SubNode node, long idx) {
-        auth.auth(ms, node, PrivilegeType.READ);
-        Query q = new Query();
-        Criteria crit = Criteria.where(//
-                SubNode.PATH).regex(mongoUtil.regexDirectChildrenOfPath(node.getPath()))//
-                .and(SubNode.ORDINAL).is(idx);
-        q.addCriteria(crit);
-
-        SubNode ret = mongoUtil.findOne(q);
-        return ret;
-    }
-
     /* Throws an exception if the parent of 'node' does not exist */
     public void checkParentExists(MongoSession ms, SubNode node) {
         boolean isRootPath = mongoUtil.isRootPath(node.getPath());
@@ -428,7 +415,13 @@ public class MongoRead extends ServiceBase {
          * ^\/aa\/bb\/([^\/])*$ (Note that in the java string the \ becomes \\ below...)
          * 
          */
-        Criteria crit = Criteria.where(SubNode.PATH).regex(mongoUtil.regexDirectChildrenOfPath(no(node) ? "" : node.getPath()));
+        Criteria crit = null;
+        if (MongoRepository.PARENT_OPTIMIZATION && ok(node.getParent())) {
+            crit = Criteria.where(SubNode.PARENT).is(node.getParent());
+        } else {
+            crit = Criteria.where(SubNode.PATH).regex(mongoUtil.regexDirectChildrenOfPath(no(node) ? "" : node.getPath()));
+        }
+
         if (ordered) {
             q.with(Sort.by(Sort.Direction.ASC, SubNode.ORDINAL));
         }
@@ -590,19 +583,6 @@ public class MongoRead extends ServiceBase {
     }
 
     @PerfMon(category = "read")
-    public SubNode getNewestChild(MongoSession ms, SubNode node) {
-        auth.auth(ms, node, PrivilegeType.READ);
-
-        Query q = new Query();
-        Criteria crit = Criteria.where(SubNode.PATH).regex(mongoUtil.regexDirectChildrenOfPath(node.getPath()));
-        q.with(Sort.by(Sort.Direction.DESC, SubNode.MODIFY_TIME));
-        q.addCriteria(crit);
-
-        SubNode nodeFound = mongoUtil.findOne(q);
-        return nodeFound;
-    }
-
-    @PerfMon(category = "read")
     public SubNode getSiblingAbove(MongoSession ms, SubNode node) {
         auth.auth(ms, node, PrivilegeType.READ);
 
@@ -613,7 +593,12 @@ public class MongoRead extends ServiceBase {
         // todo-2: research if there's a way to query for just one, rather than simply
         // calling findOne at the end? What's best practice here?
         Query q = new Query();
-        Criteria crit = Criteria.where(SubNode.PATH).regex(mongoUtil.regexDirectChildrenOfPath(node.getParentPath()));
+        Criteria crit = null;
+        if (MongoRepository.PARENT_OPTIMIZATION && ok(node.getParent())) {
+            crit = Criteria.where(SubNode.PARENT).is(node.getParent());
+        } else {
+            crit = Criteria.where(SubNode.PATH).regex(mongoUtil.regexDirectChildrenOfPath(node.getParentPath()));
+        }
         q.with(Sort.by(Sort.Direction.DESC, SubNode.ORDINAL));
         q.addCriteria(crit);
 
@@ -635,7 +620,13 @@ public class MongoRead extends ServiceBase {
         // todo-2: research if there's a way to query for just one, rather than simply
         // calling findOne at the end? What's best practice here?
         Query q = new Query();
-        Criteria crit = Criteria.where(SubNode.PATH).regex(mongoUtil.regexDirectChildrenOfPath(node.getParentPath()));
+        Criteria crit = null;
+        if (MongoRepository.PARENT_OPTIMIZATION && ok(node.getParent())) {
+            crit = Criteria.where(SubNode.PARENT).is(node.getParent());
+        } else {
+            crit = Criteria.where(SubNode.PATH).regex(mongoUtil.regexDirectChildrenOfPath(node.getParentPath()));
+        }
+
         q.with(Sort.by(Sort.Direction.ASC, SubNode.ORDINAL));
         q.addCriteria(crit);
 
@@ -703,9 +694,16 @@ public class MongoRead extends ServiceBase {
          * string. Without the trailing (.+)$ we would be including the node itself in addition to all its
          * children.
          */
-        Criteria crit = recursive ? //
-                Criteria.where(SubNode.PATH).regex(mongoUtil.regexRecursiveChildrenOfPath(node.getPath())) //
-                : Criteria.where(SubNode.PATH).regex(mongoUtil.regexDirectChildrenOfPath(node.getPath()));
+        Criteria crit = null;
+        if (recursive) {
+            crit = Criteria.where(SubNode.PATH).regex(mongoUtil.regexRecursiveChildrenOfPath(node.getPath())); //
+        } else {
+            if (MongoRepository.PARENT_OPTIMIZATION && ok(node.getParent())) {
+                crit = Criteria.where(SubNode.PARENT).is(node.getParent());
+            } else {
+                crit = Criteria.where(SubNode.PATH).regex(mongoUtil.regexDirectChildrenOfPath(node.getPath()));
+            }
+        }
         criterias.add(crit);
 
         if (!StringUtils.isEmpty(text)) {
