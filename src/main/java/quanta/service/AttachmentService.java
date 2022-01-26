@@ -56,7 +56,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBody;
 import quanta.config.AppProp;
-import quanta.config.NodePath;
 import quanta.config.ServiceBase;
 import quanta.exception.OutOfSpaceException;
 import quanta.exception.base.RuntimeEx;
@@ -67,6 +66,7 @@ import quanta.model.client.PrivilegeType;
 import quanta.model.ipfs.dag.MerkleLink;
 import quanta.mongo.CreateNodeLocation;
 import quanta.mongo.MongoSession;
+import quanta.mongo.MongoUtil;
 import quanta.mongo.model.SubNode;
 import quanta.request.DeleteAttachmentRequest;
 import quanta.request.UploadFromIPFSRequest;
@@ -1232,7 +1232,7 @@ public class AttachmentService extends ServiceBase {
 			}
 
 			Iterable<SubNode> accountNodes =
-					read.getChildrenUnderPath(session, NodePath.ROOT_OF_ALL_USERS, null, null, 0, null, null);
+					read.getChildren(session, MongoUtil.allUsersRootNode.getId(), null, null, 0, null, null);
 
 			/*
 			 * scan all userAccountNodes, and set a zero amount for those not found (which will be the correct

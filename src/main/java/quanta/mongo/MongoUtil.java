@@ -12,6 +12,7 @@ import java.util.StringTokenizer;
 import java.util.regex.Pattern;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.bson.types.ObjectId;
+import org.bson.Document;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -60,6 +61,8 @@ public class MongoUtil extends ServiceBase {
 	private static HashSet<String> testAccountNames = new HashSet<>();
 	private static SubNode systemRootNode;
 	private static final Random rand = new Random();
+
+	public static SubNode allUsersRootNode = null;
 
 	/*
 	 * removed 'r' and 'p' since those are 'root' and 'pending' (see setPendingPath), and we need very
@@ -120,6 +123,56 @@ public class MongoUtil extends ServiceBase {
 			}
 		}
 		return ret;
+	}
+
+	public void validateParent(SubNode node, Document dbObj) {
+		// log.debug("validateParent of node: " + node.getIdStr());
+
+		// If this node is on a 'pending path' (user has never clicked 'save' to save it), then we always
+		// need to set it's parent to NULL or else it will be visible in queries we don't want to see it.
+		if (ok(node.getPath()) && node.getPath().startsWith(NodePath.PENDING_PATH + "/")) {
+			// log.debug("path was pending, so parent set to null");
+			if (ok(dbObj)) {
+				dbObj.put(SubNode.PARENT, null);
+			}
+			node.setParent(null);
+			return;
+		}
+
+		boolean updateParent = false;
+
+		// if we have no parent at all need to update
+		if (no(node.getParent())) {
+			// log.debug("updating parent first time.");
+			updateParent = true;
+		}
+		// Otherwise check parent for correctness
+		else {
+			// log.debug("checking existing parent");
+			SubNode parent = read.getNode(auth.getAdminSession(), node.getParent());
+
+			// if we didn't find parent or it's path is not a match then update parent.
+			if (!ok(parent) || !parent.getPath().equals(node.getParentPath())) {
+				// log.debug("path was invalid, will be udated.");
+				updateParent = true;
+			} else {
+				// log.debug("path matched ok");
+			}
+		}
+
+		if (updateParent) {
+			SubNode parent = read.findNodeByPath(node.getParentPath(), true);
+			if (!ok(parent)) {
+				// log.debug("Updating of parent id failed. Not able to find parent: " + node.getParentPath());
+				// throw exception if parent not found? No, we want to allow the save
+			} else {
+				// log.debug("Setting parent to id=" + parent.getIdStr());
+				if (ok(dbObj)) {
+					dbObj.put(SubNode.PARENT, parent.getId());
+				}
+				node.setParent(parent.getId());
+			}
+		}
 	}
 
 	/**
@@ -415,6 +468,48 @@ public class MongoUtil extends ServiceBase {
 		// shortenPathParts(session);
 	}
 
+	/*
+	 * todo-0: need to make the system capable of doing this logic during a "Full Maintenance"
+	 * operation, like right after a DB compaction etc. Also the current code just updates path ONLY if
+	 * it's currently null rather than what maintenance would do which is additionally look up the
+	 * parent to verify the path IS indeed the correct parent.
+	 */
+	public void setParentNodes(MongoSession ms) {
+		log.debug("Processing setParentNodes");
+		Iterable<SubNode> nodes = ops.findAll(SubNode.class);
+		int counter = 0;
+
+		for (SubNode node : nodes) {
+
+			// If this node is on a 'pending path' (user has never clicked 'save' to save it), then we always
+			// need to set it's parent to NULL or else it will be visible in queries we don't want to see it.
+			if (ok(node.getPath()) && node.getPath().startsWith(NodePath.PENDING_PATH + "/") && ok(node.getParent())) {
+				node.setParent(null);
+				continue;
+			}
+
+			if (no(node.getParent())) {
+				SubNode parent = read.findNodeByPath(node.getParentPath(), true);
+				if (!ok(parent)) {
+					log.error("Didn't find parent for node: " + node.getIdStr());
+				} else {
+					node.setParent(parent.getId());
+
+					if (ThreadLocals.getDirtyNodeCount() > 200) {
+						update.saveSession(ms);
+					}
+				}
+			}
+
+			if (++counter % 1000 == 0) {
+				log.debug("SPN: " + String.valueOf(counter));
+			}
+		}
+
+		log.debug("setParentNodes completed.");
+	}
+
+
 	// Alters all paths parts that are over 10 characters long, on all nodes
 	public void shortenPathParts(MongoSession ms) {
 		int lenLimit = 10;
@@ -514,11 +609,14 @@ public class MongoUtil extends ServiceBase {
 		createIndex(ms, SubNode.class, SubNode.TYPE);
 
 		createIndex(ms, SubNode.class, SubNode.OWNER);
+		createIndex(ms, SubNode.class, SubNode.PARENT);
 		createIndex(ms, SubNode.class, SubNode.ORDINAL);
-		
-		// This blows up in PROD because nodes shared with too many people exceed the size allowed for an index field.
-		//createIndex(ms, SubNode.class, SubNode.AC); // <---Not sure this will work (AC is an Object with random properties)
-		
+
+		// This blows up in PROD because nodes shared with too many people exceed the size allowed for an
+		// index field.
+		// createIndex(ms, SubNode.class, SubNode.AC); // <---Not sure this will work (AC is an Object with
+		// random properties)
+
 		createIndex(ms, SubNode.class, SubNode.MODIFY_TIME, Direction.DESC);
 		createIndex(ms, SubNode.class, SubNode.CREATE_TIME, Direction.DESC);
 		createTextIndexes(ms, SubNode.class);
@@ -721,18 +819,19 @@ public class MongoUtil extends ServiceBase {
 	 */
 	public String regexDirectChildrenOfPath(String path) {
 		path = XString.stripIfEndsWith(path, "/");
-	
-		// NOTES: 
-		//   - The leftmost caret (^) matches path to first part of the string.
-		//   - The caret inside the ([]) means "not" containing the '/' char.
-		//   - \\/ is basically just '/' (escaped properly)
-		//   - The '*' means we match the "not /" condition one or more times.
-		
+
+		// NOTES:
+		// - The leftmost caret (^) matches path to first part of the string.
+		// - The caret inside the ([]) means "not" containing the '/' char.
+		// - \\/ is basically just '/' (escaped properly)
+		// - The '*' means we match the "not /" condition one or more times.
+
 		// legacy version (asterisk ouside group)
 		return "^" + Pattern.quote(path) + "\\/([^\\/])*$";
-		
-		// This version also works (node the '*' location), but testing didn't show any performance difference
-		// return "^" + Pattern.quote(path) + "\\/([^\\/]*)$"; 
+
+		// This version also works (node the '*' location), but testing didn't show any performance
+		// difference
+		// return "^" + Pattern.quote(path) + "\\/([^\\/]*)$";
 	}
 
 	/*
@@ -826,7 +925,8 @@ public class MongoUtil extends ServiceBase {
 			 */
 			ms.setUserNodeId(adminNode.getId());
 
-			snUtil.ensureNodeExists(ms, "/" + NodePath.ROOT, NodePath.USER, null, "Users", null, true, null, null);
+			allUsersRootNode =
+					snUtil.ensureNodeExists(ms, "/" + NodePath.ROOT, NodePath.USER, null, "Users", null, true, null, null);
 		}
 
 		createPublicNodes(ms);

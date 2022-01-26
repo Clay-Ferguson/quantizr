@@ -21,6 +21,12 @@ import quanta.util.ThreadLocals;
 public class MongoRepository extends ServiceBase {
 	private static final Logger log = LoggerFactory.getLogger(MongoRepository.class);
 
+	/*
+	 * Without this we function by only using PATH (pth) property to find parents, but with this
+	 * optimization it's much faster but *does* rely on ParentId being perfecly maintained on nodes.
+	 */
+	public static boolean PARENT_OPTIMIZATION = true;
+
 	@Autowired
 	private EventPublisher publisher;
 
@@ -71,6 +77,8 @@ public class MongoRepository extends ServiceBase {
 
 			MongoSession as = auth.getAdminSession();
 			ThreadLocals.setMongoSession(as);
+
+			mongoUtil.setParentNodes(as);
 			mongoUtil.createAdminUser(as);
 
 			/* can shutdown during startup. */

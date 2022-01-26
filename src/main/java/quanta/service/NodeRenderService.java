@@ -7,6 +7,7 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import org.apache.commons.lang3.StringUtils;
+import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -57,31 +58,14 @@ public class NodeRenderService extends ServiceBase {
 	@Autowired
 	private ApplicationContext context;
 
-	/*
-	 * Note: Client is allowed to send just IDs, or also "id/path", and if the path part is appended to
-	 * an id we can use that to skip a 'getNode' call and improve performance
-	 */
 	public GetNodeMetaInfoResponse getNodeMetaInfo(MongoSession ms, GetNodeMetaInfoRequest req) {
 		GetNodeMetaInfoResponse res = new GetNodeMetaInfoResponse();
 		List<NodeMetaIntf> list = new LinkedList<>();
 		res.setNodeIntf(list);
 
 		for (String id : req.getIds()) {
-			int pathStart = id.indexOf("/");
-			if (pathStart != -1) {
-				String path = id.substring(pathStart);
-				id = id.substring(0, pathStart);
-				boolean hasChildren = read.hasChildren(ms, path);
-				list.add(new NodeMetaIntf(id, hasChildren));
-			} 
-			// this is obsolete execution path, but let's keep for now, to support calls without path
-			else {
-				SubNode node = read.getNode(ms, id);
-				if (ok(node)) {
-					boolean hasChildren = read.hasChildren(ms, node);
-					list.add(new NodeMetaIntf(id, hasChildren));
-				}
-			}
+			boolean hasChildren = read.hasChildren(ms, new ObjectId(id));
+			list.add(new NodeMetaIntf(id, hasChildren));
 		}
 		res.setSuccess(true);
 		return res;
@@ -241,7 +225,7 @@ public class NodeRenderService extends ServiceBase {
 	}
 
 	@PerfMon(category = "render")
-	private NodeInfo processRenderNode(MongoSession ms, RenderNodeRequest req, RenderNodeResponse res, SubNode node,
+	public NodeInfo processRenderNode(MongoSession ms, RenderNodeRequest req, RenderNodeResponse res, SubNode node,
 			SubNode scanToNode, long logicalOrdinal, int level, int limit) {
 
 		/*

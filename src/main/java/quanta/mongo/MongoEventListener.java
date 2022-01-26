@@ -95,6 +95,8 @@ public class MongoEventListener extends AbstractMongoEventListener<SubNode> {
 		// node.setName(id.toHexString())
 		// }
 
+		mongoUtil.validateParent(node, dbObj);
+
 		/* if no owner is assigned... */
 		if (no(node.getOwner())) {
 			/*
@@ -142,7 +144,8 @@ public class MongoEventListener extends AbstractMongoEventListener<SubNode> {
 		 * New nodes can be given a path where they will allow the ID to play the role of the leaf 'name'
 		 * part of the path
 		 */
-		// log.debug("onBeforeSave: " + node.getPath() + " content=" + node.getContent() + " id=" + node.getIdStr());
+		// log.debug("onBeforeSave: " + node.getPath() + " content=" + node.getContent() + " id=" +
+		// node.getIdStr());
 		if (node.getPath().endsWith("/?")) {
 			String path = mongoUtil.findAvailablePath(XString.removeLastChar(node.getPath()));
 			// log.debug("Actual Path Saved: " + path);

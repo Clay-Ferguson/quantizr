@@ -200,6 +200,10 @@ public class ThreadLocals {
 		return getDirtyNodes().size() > 0;
 	}
 
+	public static int getDirtyNodeCount() {
+		return getDirtyNodes().size();
+	}
+
 	public static boolean hasDirtyNode(ObjectId nodeId) {
 		return getDirtyNodes().containsKey(nodeId);
 	}

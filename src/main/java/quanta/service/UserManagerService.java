@@ -28,7 +28,6 @@ import org.springframework.security.web.authentication.WebAuthenticationDetails;
 import org.springframework.stereotype.Component;
 import quanta.config.AppProp;
 import quanta.config.NodeName;
-import quanta.config.NodePath;
 import quanta.config.ServiceBase;
 import quanta.config.SessionContext;
 import quanta.exception.OutOfSpaceException;
@@ -42,6 +41,7 @@ import quanta.model.client.PrivilegeType;
 import quanta.model.client.UserProfile;
 import quanta.mongo.CreateNodeLocation;
 import quanta.mongo.MongoSession;
+import quanta.mongo.MongoUtil;
 import quanta.mongo.model.SubNode;
 import quanta.request.AddFriendRequest;
 import quanta.request.BlockUserRequest;
@@ -1091,7 +1091,7 @@ public class UserManagerService extends ServiceBase {
 		if (no(userNode))
 			return null;
 
-		SubNode parentNode = read.findTypedNodeUnderPath(ms, userNode.getPath(), underType);
+		SubNode parentNode = read.findSubNodeByType(ms, userNode, underType);
 		if (no(parentNode))
 			return null;
 
@@ -1143,7 +1143,7 @@ public class UserManagerService extends ServiceBase {
 		int foreignUserCount = 0;
 
 		StringBuilder sb = new StringBuilder();
-		Iterable<SubNode> accountNodes = read.getChildrenUnderPath(ms, NodePath.ROOT_OF_ALL_USERS, null, null, 0, null, null);
+		Iterable<SubNode> accountNodes = read.getChildren(ms, MongoUtil.allUsersRootNode.getId(), null, null, 0, null, null);
 
 		for (SubNode accountNode : accountNodes) {
 			String userName = accountNode.getStr(NodeProp.USER);

@@ -137,7 +137,7 @@ public class MongoCreate extends ServiceBase {
 		update.saveSession(ms);
 
 		Criteria crit = Criteria.where(SubNode.ORDINAL).gte(ordinal);
-		for (SubNode child : read.getChildrenUnderPath(ms, node.getPath(), Sort.by(Sort.Direction.ASC, SubNode.ORDINAL), null, 0,
+		for (SubNode child : read.getChildren(ms, node.getId(), Sort.by(Sort.Direction.ASC, SubNode.ORDINAL), null, 0,
 				null, crit)) {
 			child.setOrdinal(maxOrdinal++);
 		}

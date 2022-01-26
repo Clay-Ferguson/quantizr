@@ -26,6 +26,7 @@ import quanta.model.client.NodeType;
 import quanta.model.client.PrincipalName;
 import quanta.model.client.PrivilegeType;
 import quanta.mongo.MongoSession;
+import quanta.mongo.MongoUtil;
 import quanta.mongo.model.AccessControl;
 import quanta.mongo.model.SubNode;
 import quanta.request.GetBookmarksRequest;
@@ -167,7 +168,7 @@ public class NodeSearchService extends ServiceBase  {
 			moreCriteria = Criteria.where(SubNode.PROPERTIES + "." + NodeProp.ACT_PUB_ACTOR_URL.s() + ".value").is(null);
 		}
 
-		Iterable<SubNode> accountNodes = read.getChildrenUnderPath(ms, NodePath.ROOT_OF_ALL_USERS, null,
+		Iterable<SubNode> accountNodes = read.getChildren(ms, MongoUtil.allUsersRootNode.getId(), null,
 				ConstantInt.ROWS_PER_PAGE.val(), ConstantInt.ROWS_PER_PAGE.val() * req.getPage(), textCriteria, moreCriteria);
 		/*
 		 * scan all userAccountNodes, and set a zero amount for those not found (which will be the correct

@@ -35,6 +35,16 @@ import quanta.util.ThreadLocals;
 import quanta.util.Util;
 import quanta.util.XString;
 
+// Methods due for optimization with new parentId capability!
+// (Also will be more like 'getParent' which will be trivial now.)
+
+// todo-0: finish these...
+// getChildrenIds (not done yet)
+// getNewestChild(ms,node)
+// getSiblingAbove(ms,node)
+// getSiblingBelow(ms,node)
+// searchSubGraph (non recursive)
+
 /**
  * Performs the 'create' (as in CRUD) operations for creating new nodes in MongoDB
  * <p>
@@ -79,10 +89,36 @@ public class MongoRead extends ServiceBase {
 
     @PerfMon(category = "read")
     public long getChildCount(MongoSession ms, SubNode node) {
+        if (MongoRepository.PARENT_OPTIMIZATION && ok(node.getId())) {
+            return getChildCount(ms, node.getId());
+        } else {
+            return getChildCount(ms, node.getPath());
+        }
+    }
+
+    @PerfMon(category = "read")
+    public long getChildCount(MongoSession ms, ObjectId parentId) {
         Query q = new Query();
-        Criteria crit = Criteria.where(SubNode.PATH).regex(mongoUtil.regexDirectChildrenOfPath(node.getPath()));
+        Criteria crit = Criteria.where(SubNode.PARENT).is(parentId);
         q.addCriteria(crit);
         return ops.count(q, SubNode.class);
+    }
+
+    @PerfMon(category = "read")
+    public long getChildCount(MongoSession ms, String path) {
+        Query q = new Query();
+        Criteria crit = Criteria.where(SubNode.PATH).regex(mongoUtil.regexDirectChildrenOfPath(path));
+        q.addCriteria(crit);
+        return ops.count(q, SubNode.class);
+    }
+
+    @PerfMon(category = "read(m,n)")
+    public boolean hasChildren(MongoSession ms, SubNode node) {
+        if (MongoRepository.PARENT_OPTIMIZATION && ok(node.getId())) {
+            return hasChildren(ms, node.getId());
+        } else {
+            return hasChildren(ms, node.getPath());
+        }
     }
 
     @PerfMon(category = "read(m,pth)")
@@ -93,10 +129,10 @@ public class MongoRead extends ServiceBase {
         return ops.exists(q, SubNode.class);
     }
 
-    @PerfMon(category = "read(m,n)")
-    public boolean hasChildren(MongoSession ms, SubNode node) {
+    @PerfMon(category = "read")
+    public boolean hasChildren(MongoSession ms, ObjectId parentId) {
         Query q = new Query();
-        Criteria crit = Criteria.where(SubNode.PATH).regex(mongoUtil.regexDirectChildrenOfPath(node.getPath()));
+        Criteria crit = Criteria.where(SubNode.PARENT).is(parentId);
         q.addCriteria(crit);
         return ops.exists(q, SubNode.class);
     }
@@ -335,12 +371,16 @@ public class MongoRead extends ServiceBase {
         return getParent(ms, node, true);
     }
 
+    public SubNode getParent(MongoSession ms, SubNode node, boolean allowAuth) {
+        return MongoRepository.PARENT_OPTIMIZATION && ok(node.getParent()) ? //
+                read.getNode(ms, node.getParent(), allowAuth) : getParentByPath(ms, node.getPath(), allowAuth);
+    }
+
     /*
      * WARNING: This always converts a 'pending' path to a non-pending one (/r/p/ v.s. /r/)
      */
     @PerfMon(category = "read")
-    public SubNode getParent(MongoSession ms, SubNode node, boolean allowAuth) {
-        String path = node.getPath();
+    public SubNode getParentByPath(MongoSession ms, String path, boolean allowAuth) {
         if ("/".equals(path)) {
             return null;
         }
@@ -413,11 +453,47 @@ public class MongoRead extends ServiceBase {
     }
 
     /*
+     * Gets children under the parent of parentId. Relies on PARENTs of all nodes to be set properly
+     * which theoretically CAN be wrong, and so bewear that only getChildrenUnderPath is guaranteed to
+     * be correct, because the single source of truth about tree structure is path (PTH)
+     */
+    @PerfMon(category = "read")
+    public Iterable<SubNode> getChildren(MongoSession ms, ObjectId parentId, Sort sort, Integer limit, int skip,
+            TextCriteria textCriteria, Criteria moreCriteria) {
+
+        Query q = new Query();
+        if (ok(limit) && limit.intValue() > 0) {
+            q.limit(limit.intValue());
+        }
+
+        if (skip > 0) {
+            q.skip(skip);
+        }
+
+        Criteria crit = Criteria.where(SubNode.PARENT).is(parentId);
+
+        if (ok(textCriteria)) {
+            q.addCriteria(textCriteria);
+        }
+
+        if (ok(moreCriteria)) {
+            q.addCriteria(moreCriteria);
+        }
+
+        if (ok(sort)) {
+            q.with(sort);
+        }
+
+        q.addCriteria(crit);
+        return mongoUtil.find(q);
+    }
+
+    /*
      * If node is null it's path is considered empty string, and it represents the 'root' of the tree.
      * There is no actual NODE that is root node.
      */
-    @PerfMon(category = "read")
-    public Iterable<SubNode> getChildrenUnderPath(MongoSession ms, String path, Sort sort, Integer limit, int skip,
+    @PerfMon(category = "read(pth)")
+    public Iterable<SubNode> getChildren(MongoSession ms, String path, Sort sort, Integer limit, int skip,
             TextCriteria textCriteria, Criteria moreCriteria) {
 
         Query q = new Query();
@@ -464,12 +540,16 @@ public class MongoRead extends ServiceBase {
      */
     public Iterable<SubNode> getChildren(MongoSession ms, SubNode node, Sort sort, Integer limit, int skip) {
         auth.auth(ms, node, PrivilegeType.READ);
-        return read.getChildrenUnderPath(ms, node.getPath(), sort, limit, skip, null, null);
+
+        if (MongoRepository.PARENT_OPTIMIZATION && ok(node.getId())) {
+            return read.getChildren(ms, node.getId(), sort, limit, skip, null, null);
+        } else {
+            return read.getChildren(ms, node.getPath(), sort, limit, skip, null, null);
+        }
     }
 
     public Iterable<SubNode> getChildren(MongoSession ms, SubNode node) {
-        auth.auth(ms, node, PrivilegeType.READ);
-        return read.getChildrenUnderPath(ms, node.getPath(), null, null, 0, null, null);
+        return read.getChildren(ms, node, null, null, 0);
     }
 
     /*
@@ -504,7 +584,9 @@ public class MongoRead extends ServiceBase {
         // todo-2: research if there's a way to query for just one, rather than simply
         // callingfindOne at the end? What's best practice here?
         Query q = new Query();
-        Criteria crit = Criteria.where(SubNode.PATH).regex(mongoUtil.regexDirectChildrenOfPath(node.getPath()));
+        Criteria crit = MongoRepository.PARENT_OPTIMIZATION && ok(node.getId()) ? //
+                Criteria.where(SubNode.PARENT).is(node.getId())
+                : Criteria.where(SubNode.PATH).regex(mongoUtil.regexDirectChildrenOfPath(node.getPath()));
         q.with(Sort.by(Sort.Direction.DESC, SubNode.ORDINAL));
         q.addCriteria(crit);
 
@@ -821,8 +903,7 @@ public class MongoRead extends ServiceBase {
             return null;
         }
 
-        String path = userNode.getPath();
-        SubNode node = findTypedNodeUnderPath(ms, path, type);
+        SubNode node = findSubNodeByType(ms, userNode, type);
 
         if (no(node)) {
             node = create.createNode(ms, userNode, null, type, 0L, CreateNodeLocation.LAST, null, null, true);
@@ -927,11 +1008,20 @@ public class MongoRead extends ServiceBase {
 
         // Other wise for ordinary users root is based off their username
         Query q = new Query();
-        Criteria crit = Criteria.where(//
-                SubNode.PATH).regex(mongoUtil.regexDirectChildrenOfPath(NodePath.ROOT_OF_ALL_USERS)) //
-                // .and(SubNode.FIELD_PROPERTIES + "." + NodeProp.USER + ".value").is(user);
-                // case-insensitive lookup of username:
-                .and(SubNode.PROPERTIES + "." + NodeProp.USER + ".value").regex("^" + user + "$", "i");
+
+        Criteria crit = null;
+
+        // Note: This one CAN get called before allUsersRootNode is set.
+        if (MongoRepository.PARENT_OPTIMIZATION && ok(MongoUtil.allUsersRootNode)) {
+            crit = Criteria.where(SubNode.PARENT).is(MongoUtil.allUsersRootNode.getId()) //
+                    .and(SubNode.PROPERTIES + "." + NodeProp.USER + ".value").regex("^" + user + "$", "i");
+        } else {
+            crit = Criteria.where(//
+                    SubNode.PATH).regex(mongoUtil.regexDirectChildrenOfPath(NodePath.ROOT_OF_ALL_USERS)) //
+                    // .and(SubNode.FIELD_PROPERTIES + "." + NodeProp.USER + ".value").is(user);
+                    // case-insensitive lookup of username:
+                    .and(SubNode.PROPERTIES + "." + NodeProp.USER + ".value").regex("^" + user + "$", "i");
+        }
 
         q.addCriteria(crit);
 
@@ -954,9 +1044,15 @@ public class MongoRead extends ServiceBase {
 
         // Other wise for ordinary users root is based off their username
         Query q = new Query();
-        Criteria crit = Criteria.where(//
-                SubNode.PATH).regex(mongoUtil.regexDirectChildrenOfPath(node.getPath()))//
-                .and(SubNode.TYPE).is(type).and(SubNode.PROPERTIES + "." + NodeProp.USER + ".value").is(userName);
+        Criteria crit = null;
+        if (MongoRepository.PARENT_OPTIMIZATION && ok(node.getId())) {
+            crit = Criteria.where(SubNode.PARENT).is(node.getId()) //
+                    .and(SubNode.TYPE).is(type).and(SubNode.PROPERTIES + "." + NodeProp.USER + ".value").is(userName);
+        } else {
+            crit = Criteria.where(//
+                    SubNode.PATH).regex(mongoUtil.regexDirectChildrenOfPath(node.getPath()))//
+                    .and(SubNode.TYPE).is(type).and(SubNode.PROPERTIES + "." + NodeProp.USER + ".value").is(userName);
+        }
 
         q.addCriteria(crit);
         SubNode ret = mongoUtil.findOne(q);
@@ -969,13 +1065,19 @@ public class MongoRead extends ServiceBase {
      * Finds the first node matching 'type' under 'path' (non-recursively, direct children only)
      */
     @PerfMon(category = "read")
-    public SubNode findTypedNodeUnderPath(MongoSession ms, String path, String type) {
+    public SubNode findSubNodeByType(MongoSession ms, SubNode node, String type) {
 
         // Other wise for ordinary users root is based off their username
         Query q = new Query();
-        Criteria crit = Criteria.where(//
-                SubNode.PATH).regex(mongoUtil.regexDirectChildrenOfPath(path))//
-                .and(SubNode.TYPE).is(type);
+        Criteria crit = null;
+        if (MongoRepository.PARENT_OPTIMIZATION && ok(node.getId())) {
+            crit = Criteria.where(SubNode.PARENT).is(node.getId()) //
+                    .and(SubNode.TYPE).is(type);
+        } else {
+            crit = Criteria.where(//
+                    SubNode.PATH).regex(mongoUtil.regexDirectChildrenOfPath(node.getPath()))//
+                    .and(SubNode.TYPE).is(type);
+        }
 
         q.addCriteria(crit);
         SubNode ret = mongoUtil.findOne(q);
@@ -1020,13 +1122,20 @@ public class MongoRead extends ServiceBase {
      * propName and propVal
      */
     @PerfMon(category = "read")
-    public SubNode findNodeByProp(MongoSession ms, String path, String propName, String propVal) {
+    public SubNode findNodeByProp(MongoSession ms, SubNode node, String propName, String propVal) {
 
         // Other wise for ordinary users root is based off their username
         Query q = new Query();
-        Criteria crit = Criteria.where(//
-                SubNode.PATH).regex(mongoUtil.regexDirectChildrenOfPath(path))//
-                .and(SubNode.PROPERTIES + "." + propName + ".value").is(propVal);
+        Criteria crit = null;
+
+        if (MongoRepository.PARENT_OPTIMIZATION && ok(node.getId())) {
+            crit = Criteria.where(SubNode.PARENT).is(node.getId()) //
+                    .and(SubNode.PROPERTIES + "." + propName + ".value").is(propVal);
+        } else {
+            crit = Criteria.where(//
+                    SubNode.PATH).regex(mongoUtil.regexDirectChildrenOfPath(node.getPath()))//
+                    .and(SubNode.PROPERTIES + "." + propName + ".value").is(propVal);
+        }
 
         q.addCriteria(crit);
         SubNode ret = mongoUtil.findOne(q);
