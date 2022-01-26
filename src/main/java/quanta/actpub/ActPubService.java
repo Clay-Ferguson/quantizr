@@ -34,6 +34,7 @@ import quanta.model.client.PrivilegeType;
 import quanta.mongo.CreateNodeLocation;
 import quanta.mongo.MongoRepository;
 import quanta.mongo.MongoSession;
+import quanta.mongo.MongoUtil;
 import quanta.mongo.model.AccessControl;
 import quanta.mongo.model.FediverseName;
 import quanta.mongo.model.SubNode;
@@ -1112,7 +1113,7 @@ public class ActPubService extends ServiceBase {
             arun.run(session -> {
                 // Query to pull all user accounts
                 Iterable<SubNode> accountNodes =
-                        read.findTypedNodesUnderPath(session, NodePath.ROOT_OF_ALL_USERS, NodeType.ACCOUNT.s());
+                        read.findSubNodesByType(session, MongoUtil.allUsersRootNode, NodeType.ACCOUNT.s());
 
                 for (SubNode acctNode : accountNodes) {
 
@@ -1234,7 +1235,7 @@ public class ActPubService extends ServiceBase {
 
         arun.run(session -> {
             Iterable<SubNode> accountNodes =
-                    read.findTypedNodesUnderPath(session, NodePath.ROOT_OF_ALL_USERS, NodeType.ACCOUNT.s());
+                    read.findSubNodesByType(session, MongoUtil.allUsersRootNode, NodeType.ACCOUNT.s());
 
             for (SubNode node : accountNodes) {
                 if (!prop.isDaemonsEnabled())
@@ -1263,7 +1264,7 @@ public class ActPubService extends ServiceBase {
 
         return arun.run(session -> {
             Iterable<SubNode> accountNodes =
-                    read.findTypedNodesUnderPath(session, NodePath.ROOT_OF_ALL_USERS, NodeType.ACCOUNT.s());
+                    read.findSubNodesByType(session, MongoUtil.allUsersRootNode, NodeType.ACCOUNT.s());
 
             // Load the list of all known users
             HashSet<String> knownUsers = new HashSet<>();
@@ -1311,7 +1312,7 @@ public class ActPubService extends ServiceBase {
         return arun.run(session -> {
             long totalDelCount = 0;
             Iterable<SubNode> accountNodes =
-                    read.findTypedNodesUnderPath(session, NodePath.ROOT_OF_ALL_USERS, NodeType.ACCOUNT.s());
+                    read.findSubNodesByType(session, MongoUtil.allUsersRootNode, NodeType.ACCOUNT.s());
 
             for (SubNode node : accountNodes) {
                 String userName = node.getStr(NodeProp.USER.s());

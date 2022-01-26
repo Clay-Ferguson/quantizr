@@ -470,7 +470,7 @@ public class MongoUtil extends ServiceBase {
 
 	public void processAccounts(MongoSession ms) {
 		// Query to pull all user accounts
-		Iterable<SubNode> accountNodes = read.findTypedNodesUnderPath(ms, NodePath.ROOT_OF_ALL_USERS, NodeType.ACCOUNT.s());
+		Iterable<SubNode> accountNodes = read.findSubNodesByType(ms, MongoUtil.allUsersRootNode, NodeType.ACCOUNT.s());
 
 		for (SubNode acctNode : accountNodes) {
 			acctNode.set(NodeProp.USER_PREF_MAIN_PANEL_COLS.s(), 6);

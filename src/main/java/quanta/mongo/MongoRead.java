@@ -1093,23 +1093,22 @@ public class MongoRead extends ServiceBase {
     /*
      * Finds the first node matching 'type' under 'path' (non-recursively, direct children only)
      */
-    // todo-0: how is this still using path not PARENT ID. I thougt I refactored all ?
-    public Iterable<SubNode> findTypedNodesUnderPath(MongoSession ms, String path, String type) {
-        Query q = typedNodesUnderPath_query(ms, path, type);
+    public Iterable<SubNode> findSubNodesByType(MongoSession ms, SubNode node, String type) {
+        Query q = typedNodesUnderPath_query(ms, node, type);
         return mongoUtil.find(q);
     }
 
     /*
      * Finds the first node matching 'type' under 'path' (non-recursively, direct children only)
      */
-    public long countTypedNodesUnderPath(MongoSession ms, String path, String type) {
-        Query q = typedNodesUnderPath_query(ms, path, type);
+    public long countTypedNodesUnderPath(MongoSession ms, SubNode node, String type) {
+        Query q = typedNodesUnderPath_query(ms, node, type);
         return ops.count(q, SubNode.class);
     }
 
-    public Query typedNodesUnderPath_query(MongoSession ms, String path, String type) {
+    public Query typedNodesUnderPath_query(MongoSession ms, SubNode node, String type) {
         Query q = new Query();
-        Criteria crit = Criteria.where(SubNode.PATH).regex(mongoUtil.regexRecursiveChildrenOfPath(path))//
+        Criteria crit = Criteria.where(SubNode.PATH).regex(mongoUtil.regexRecursiveChildrenOfPath(node.getPath()))//
                 .and(SubNode.TYPE).is(type);
 
         q.addCriteria(crit);

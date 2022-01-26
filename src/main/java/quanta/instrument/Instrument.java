@@ -27,7 +27,8 @@ import quanta.util.ThreadLocals;
  * internally in the app rather than more complex approaches, since we were able to implement this
  * letting AOP do all the work, and since perfMonAdvice() method below is so trivial.
  * 
- * todo-0: I think the instrumentation is ONLY picking up PUBLIC methods??
+ * todo-0: Does instrumentation is ONLY picking up PUBLIC methods?? I think I noticed that happening
+ * but didn't prove it yet or look into it yet.
  */
 @Aspect
 @Component
