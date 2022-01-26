@@ -7,7 +7,6 @@ import { Menu } from "./comp/Menu";
 import { MenuItem } from "./comp/MenuItem";
 import { MenuItemSeparator } from "./comp/MenuItemSeparator";
 import { Constants as C } from "./Constants";
-import { ConfirmDlg } from "./dlg/ConfirmDlg";
 import { ImportCryptoKeyDlg } from "./dlg/ImportCryptoKeyDlg";
 import { ManageEncryptionKeysDlg } from "./dlg/ManageEncryptionKeysDlg";
 import { MediaRecorderDlg } from "./dlg/MediaRecorderDlg";
@@ -55,6 +54,8 @@ export class MenuPanel extends Div {
         S.view.jumpToId(state.editNode.id);
     };
 
+    // We pre-create all these functions so that the re-rendering of this component doesn't also create functions
+    // which can be slow in JS.
     static openBlockedUsersNode = () => S.nav.openContentNode("~" + J.NodeType.BLOCKED_USERS);
     static openRSSFeedsNode = () => S.nav.openContentNode("~" + J.NodeType.RSS_FEEDS);
     static openPostsNode = () => S.nav.openContentNode("~" + J.NodeType.POSTS);
@@ -269,8 +270,9 @@ export class MenuPanel extends Div {
         }
 
         children.push(new Menu("Tree", [
-            new MenuItem("My Account", S.nav.navHome, !state.isAnonUser),
+            new MenuItem("Account", S.nav.navHome, !state.isAnonUser),
             new MenuItem("Portal Home", MenuPanel.openHomeNode, !state.isAnonUser),
+            new MenuItem("Public Posts", MenuPanel.openPostsNode, !state.isAnonUser),
             new MenuItemSeparator(), //
             new MenuItem("RSS Feeds", MenuPanel.openRSSFeedsNode, !state.isAnonUser),
             new MenuItem("Notes", MenuPanel.openNotesNode, !state.isAnonUser),
@@ -288,9 +290,7 @@ export class MenuPanel extends Div {
             new MenuItem("To/From Me" + messagesSuffix, MenuPanel.messagesToFromMe, !state.isAnonUser),
             new MenuItem("From Friends", MenuPanel.messagesFromFriends, !state.isAnonUser),
             new MenuItem("From Local Users", MenuPanel.messagesLocal, !state.isAnonUser),
-            new MenuItem("All Fediverse", MenuPanel.messagesFediverse, !state.isAnonUser),
-            new MenuItemSeparator(), //
-            new MenuItem("My Posts", MenuPanel.openPostsNode, !state.isAnonUser)
+            new MenuItem("All Fediverse", MenuPanel.messagesFediverse, !state.isAnonUser)
         ]));
 
         children.push(new Menu("Friends", [
