@@ -368,6 +368,7 @@ export interface SavePublicKeyRequest extends RequestBase {
 }
 
 export interface SaveUserPreferencesRequest extends RequestBase {
+    userNodeId: string;
     userPreferences: UserPreferences;
 }
 

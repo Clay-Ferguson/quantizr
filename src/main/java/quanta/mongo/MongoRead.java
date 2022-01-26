@@ -965,7 +965,7 @@ public class MongoRead extends ServiceBase {
     }
 
     public SubNode getUserNodeByUserName(MongoSession ms, String user) {
-        return getUserNodeByUserName(ms, user, true);
+        return read.getUserNodeByUserName(ms, user, true);
     }
 
     @PerfMon(category = "read")
@@ -1002,13 +1002,13 @@ public class MongoRead extends ServiceBase {
         // Note: This one CAN get called before allUsersRootNode is set.
         if (MongoRepository.PARENT_OPTIMIZATION && ok(MongoUtil.allUsersRootNode)) {
             crit = Criteria.where(SubNode.PARENT).is(MongoUtil.allUsersRootNode.getId()) //
-                    .and(SubNode.PROPERTIES + "." + NodeProp.USER + ".value").regex("^" + user + "$", "i");
+                    .and(SubNode.PROPERTIES + "." + NodeProp.USER + ".value").regex("^" + user + "$");
         } else {
             crit = Criteria.where(//
                     SubNode.PATH).regex(mongoUtil.regexDirectChildrenOfPath(NodePath.ROOT_OF_ALL_USERS)) //
                     // .and(SubNode.FIELD_PROPERTIES + "." + NodeProp.USER + ".value").is(user);
                     // case-insensitive lookup of username:
-                    .and(SubNode.PROPERTIES + "." + NodeProp.USER + ".value").regex("^" + user + "$", "i");
+                    .and(SubNode.PROPERTIES + "." + NodeProp.USER + ".value").regex("^" + user + "$");
         }
 
         q.addCriteria(crit);

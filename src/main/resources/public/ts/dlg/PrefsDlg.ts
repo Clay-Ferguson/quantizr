@@ -40,6 +40,7 @@ export class PrefsDlg extends DialogBase {
     savePreferences = async (): Promise<void> => {
         if (!this.appState.isAnonUser) {
             let res: J.SaveUserPreferencesResponse = await S.util.ajax<J.SaveUserPreferencesRequest, J.SaveUserPreferencesResponse>("saveUserPreferences", {
+                userNodeId: this.appState.homeNodeId,
                 userPreferences: {
                     editMode: this.appState.userPreferences.editMode,
                     showMetaData: this.appState.userPreferences.showMetaData,

@@ -86,7 +86,7 @@ public class UserManagerService extends ServiceBase {
 	private static final Logger log = LoggerFactory.getLogger(UserManagerService.class);
 
 	@Autowired
-    private AppProp prop;
+	private AppProp prop;
 
 	@Autowired
 	public AuthenticationManager authenticationManager;
@@ -561,9 +561,9 @@ public class UserManagerService extends ServiceBase {
 	public SaveUserPreferencesResponse saveUserPreferences(SaveUserPreferencesRequest req) {
 		SaveUserPreferencesResponse res = new SaveUserPreferencesResponse();
 
-		UserPreferences userPreferences = ThreadLocals.getSC().getUserPreferences();
+		UserPreferences userPrefs = ThreadLocals.getSC().getUserPreferences();
 		// note: This will be null if session has timed out.
-		if (no(userPreferences)) {
+		if (no(userPrefs)) {
 			return res;
 		}
 
@@ -573,40 +573,32 @@ public class UserManagerService extends ServiceBase {
 		if (reqUserPrefs.isEnableIPSM()) {
 			ThreadLocals.getSC().setEnableIPSM(true);
 		}
-		String userName = ThreadLocals.getSC().getUserName();
 
-		arun.run(session -> {
-			SubNode prefsNode = read.getUserNodeByUserName(session, userName);
+		arun.run(ms -> {
+			SubNode prefsNode = read.getNode(ms, req.getUserNodeId());
+			if (no(prefsNode)) throw new RuntimeException("Unable to update preferences.");
+
+			// Make sure the account node we're about to modify does belong to the current user.
+			if (!ThreadLocals.getSC().getUserName().equals(prefsNode.getStr(NodeProp.USER.s()))) {
+				throw new RuntimeException("Not your node.");
+			}
 
 			/*
 			 * Assign preferences as properties on this node,
 			 */
-			boolean editMode = reqUserPrefs.isEditMode();
-			prefsNode.set(NodeProp.USER_PREF_EDIT_MODE.s(), editMode);
+			prefsNode.set(NodeProp.USER_PREF_EDIT_MODE.s(), reqUserPrefs.isEditMode());
+			prefsNode.set(NodeProp.USER_PREF_SHOW_METADATA.s(), reqUserPrefs.isShowMetaData());
+			prefsNode.set(NodeProp.USER_PREF_NSFW.s(), reqUserPrefs.isNsfw());
+			prefsNode.set(NodeProp.USER_PREF_SHOW_PARENTS.s(), reqUserPrefs.isShowParents());
+			prefsNode.set(NodeProp.USER_PREF_RSS_HEADINGS_ONLY.s(), reqUserPrefs.isRssHeadlinesOnly());
+			prefsNode.set(NodeProp.USER_PREF_MAIN_PANEL_COLS.s(), reqUserPrefs.getMainPanelCols());
 
-			boolean showMetaData = reqUserPrefs.isShowMetaData();
-			prefsNode.set(NodeProp.USER_PREF_SHOW_METADATA.s(), showMetaData);
-
-			boolean nsfw = reqUserPrefs.isNsfw();
-			prefsNode.set(NodeProp.USER_PREF_NSFW.s(), nsfw);
-
-			boolean showParents = reqUserPrefs.isShowParents();
-			prefsNode.set(NodeProp.USER_PREF_SHOW_PARENTS.s(), showParents);
-
-			boolean rssHeadingsOnly = reqUserPrefs.isRssHeadlinesOnly();
-			prefsNode.set(NodeProp.USER_PREF_RSS_HEADINGS_ONLY.s(), rssHeadingsOnly);
-
-			Long v = reqUserPrefs.getMainPanelCols();
-			prefsNode.set(NodeProp.USER_PREF_MAIN_PANEL_COLS.s(), v);
-
-			/*
-			 * Also update session-scope object, because server-side functions that need preference information
-			 * will get it from there instead of loading it from repository. The only time we load user
-			 * preferences from repository is during login when we can't get it from anywhere else at that time.
-			 */
-			userPreferences.setEditMode(editMode);
-			userPreferences.setShowMetaData(showMetaData);
-			userPreferences.setNsfw(nsfw);
+			userPrefs.setEditMode(reqUserPrefs.isEditMode());
+			userPrefs.setShowMetaData(reqUserPrefs.isShowMetaData());
+			userPrefs.setNsfw(reqUserPrefs.isNsfw());
+			userPrefs.setShowParents(reqUserPrefs.isShowParents());
+			userPrefs.setRssHeadlinesOnly(reqUserPrefs.isRssHeadlinesOnly());
+			userPrefs.setMainPanelCols(reqUserPrefs.getMainPanelCols());
 
 			res.setSuccess(true);
 			return null;
@@ -1040,7 +1032,7 @@ public class UserManagerService extends ServiceBase {
 			String brandingAppName = prop.getConfigText("brandingAppName");
 
 			String content = "Password reset was requested on " + brandingAppName + " account: " + user + //
-			"<p>\nGo to this link to reset your password: <br>\n" + link;
+					"<p>\nGo to this link to reset your password: <br>\n" + link;
 
 			outbox.queueEmail(email, brandingAppName + " Password Reset", content);
 

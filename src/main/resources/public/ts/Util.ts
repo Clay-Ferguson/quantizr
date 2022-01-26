@@ -1345,6 +1345,7 @@ export class Util {
     saveUserPreferences = async (state: AppState, dispatchNow: boolean = true): Promise<void> => {
         if (!state.isAnonUser) {
             await S.util.ajax<J.SaveUserPreferencesRequest, J.SaveUserPreferencesResponse>("saveUserPreferences", {
+                userNodeId: state.homeNodeId,
                 userPreferences: state.userPreferences
             });
         }
