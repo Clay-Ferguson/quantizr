@@ -78,8 +78,10 @@ public class MongoRepository extends ServiceBase {
 			MongoSession as = auth.getAdminSession();
 			ThreadLocals.setMongoSession(as);
 
-			mongoUtil.setParentNodes(as);
-			mongoUtil.processAccounts(as);
+			// DO NOT DELETE
+			// mongoUtil.setParentNodes(as);
+			// mongoUtil.processAccounts(as);
+
 			mongoUtil.createAdminUser(as);
 
 			/* can shutdown during startup. */

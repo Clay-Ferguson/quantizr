@@ -895,7 +895,7 @@ public class MongoRead extends ServiceBase {
             if (no(userName)) {
                 userName = ThreadLocals.getSC().getUserName();
             }
-            userNode = getUserNodeByUserName(ms, userName);
+            userNode = read.getUserNodeByUserName(ms, userName);
         }
 
         if (no(userNode)) {
@@ -903,7 +903,7 @@ public class MongoRead extends ServiceBase {
             return null;
         }
 
-        SubNode node = findSubNodeByType(ms, userNode, type);
+        SubNode node = read.findSubNodeByType(ms, userNode, type);
 
         if (no(node)) {
             node = create.createNode(ms, userNode, null, type, 0L, CreateNodeLocation.LAST, null, null, true);

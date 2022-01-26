@@ -860,7 +860,7 @@ public class MongoUtil extends ServiceBase {
 		// Based on this page:
 		// https://docs.mongodb.com/manual/reference/operator/query/regex/#index-use
 		// It looks like this might be the best performance here:
-		return "^" + Pattern.quote(path) + "\\/.*";
+		return "^" + Pattern.quote(path) + "\\/";
 
 		// Legacy implementation
 		// return "^" + Pattern.quote(path) + "\\/(.+)$";
@@ -937,11 +937,9 @@ public class MongoUtil extends ServiceBase {
 			 * yet and it needs to for all subsequent operations.
 			 */
 			ms.setUserNodeId(adminNode.getId());
-
-			allUsersRootNode =
-					snUtil.ensureNodeExists(ms, "/" + NodePath.ROOT, NodePath.USER, null, "Users", null, true, null, null);
 		}
 
+		allUsersRootNode = snUtil.ensureNodeExists(ms, "/" + NodePath.ROOT, NodePath.USER, null, "Users", null, true, null, null);
 		createPublicNodes(ms);
 	}
 
