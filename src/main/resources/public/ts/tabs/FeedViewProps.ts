@@ -14,7 +14,6 @@ export interface FeedViewProps {
     feedFilterRootNode?: J.NodeInfo;
     feedDirty?: boolean;
     feedLoading?: boolean;
-    feedFilterNSFW?: boolean;
     feedResults?: J.NodeInfo[];
     feedEndReached?: boolean;
     feedDirtyList?: boolean;

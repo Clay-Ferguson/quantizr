@@ -587,6 +587,9 @@ public class UserManagerService extends ServiceBase {
 			boolean showMetaData = reqUserPrefs.isShowMetaData();
 			prefsNode.set(NodeProp.USER_PREF_SHOW_METADATA.s(), showMetaData);
 
+			boolean nsfw = reqUserPrefs.isNsfw();
+			prefsNode.set(NodeProp.USER_PREF_NSFW.s(), nsfw);
+
 			boolean showParents = reqUserPrefs.isShowParents();
 			prefsNode.set(NodeProp.USER_PREF_SHOW_PARENTS.s(), showParents);
 
@@ -603,6 +606,7 @@ public class UserManagerService extends ServiceBase {
 			 */
 			userPreferences.setEditMode(editMode);
 			userPreferences.setShowMetaData(showMetaData);
+			userPreferences.setNsfw(nsfw);
 
 			res.setSuccess(true);
 			return null;
@@ -867,6 +871,7 @@ public class UserManagerService extends ServiceBase {
 	public UserPreferences getDefaultUserPreferences() {
 		UserPreferences userPrefs = new UserPreferences();
 		userPrefs.setShowMetaData(true);
+		userPrefs.setNsfw(false);
 		return userPrefs;
 	}
 
@@ -880,6 +885,7 @@ public class UserManagerService extends ServiceBase {
 			}
 			userPrefs.setEditMode(prefsNode.getBool(NodeProp.USER_PREF_EDIT_MODE));
 			userPrefs.setShowMetaData(prefsNode.getBool(NodeProp.USER_PREF_SHOW_METADATA));
+			userPrefs.setNsfw(prefsNode.getBool(NodeProp.USER_PREF_NSFW));
 			userPrefs.setShowParents(prefsNode.getBool(NodeProp.USER_PREF_SHOW_PARENTS));
 			userPrefs.setRssHeadlinesOnly(prefsNode.getBool(NodeProp.USER_PREF_RSS_HEADINGS_ONLY));
 

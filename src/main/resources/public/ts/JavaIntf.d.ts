@@ -794,6 +794,7 @@ export interface NodeInfo {
 export interface UserPreferences {
     editMode: boolean;
     showMetaData: boolean;
+    nsfw: boolean;
     showParents: boolean;
     rssHeadlinesOnly: boolean;
     mainPanelCols: number;
@@ -873,6 +874,7 @@ export const enum NodeProp {
     USER_PREF_PUBLIC_KEY = "sn:publicKey",
     USER_PREF_EDIT_MODE = "sn:editMode",
     USER_PREF_SHOW_METADATA = "sn:showMetaData",
+    USER_PREF_NSFW = "sn:nsfw",
     USER_PREF_SHOW_PARENTS = "sn:showParents",
     USER_PREF_PASSWORD_RESET_AUTHCODE = "sn:pwdResetAuth",
     USER_PREF_RSS_HEADINGS_ONLY = "sn:rssHeadingsOnly",

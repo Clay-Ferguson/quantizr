@@ -107,6 +107,7 @@ export class MenuPanel extends Div {
         S.util.saveUserPreferences(state);
     };
 
+    // todo-0: move all these message functions to a better place. maybe search.ts?
     static messagesToFromMe = () => {
         let feedData = S.tabUtil.getTabDataById(null, C.TAB_FEED);
         if (feedData) {
@@ -115,6 +116,38 @@ export class MenuPanel extends Div {
         S.nav.messages({
             feedFilterFriends: false,
             feedFilterToMe: true,
+            feedFilterFromMe: true,
+            feedFilterToPublic: false,
+            feedFilterLocalServer: false,
+            feedFilterRootNode: null,
+            feedResults: null
+        });
+    }
+
+    static messagesToMe = () => {
+        let feedData = S.tabUtil.getTabDataById(null, C.TAB_FEED);
+        if (feedData) {
+            feedData.props.searchTextState.setValue("");
+        }
+        S.nav.messages({
+            feedFilterFriends: false,
+            feedFilterToMe: true,
+            feedFilterFromMe: false,
+            feedFilterToPublic: false,
+            feedFilterLocalServer: false,
+            feedFilterRootNode: null,
+            feedResults: null
+        });
+    }
+
+    static messagesFromMe = () => {
+        let feedData = S.tabUtil.getTabDataById(null, C.TAB_FEED);
+        if (feedData) {
+            feedData.props.searchTextState.setValue("");
+        }
+        S.nav.messages({
+            feedFilterFriends: false,
+            feedFilterToMe: false,
             feedFilterFromMe: true,
             feedFilterToPublic: false,
             feedFilterLocalServer: false,
@@ -205,6 +238,7 @@ export class MenuPanel extends Div {
 
     static toggleEditMode = () => S.edit.toggleEditMode(appState(null));
     static toggleMetaData = () => S.edit.toggleShowMetaData(appState(null));
+    static toggleNsfw = () => S.edit.toggleNsfw(appState(null));
     static toggleParents = () => S.edit.toggleShowParents(appState(null));
     static browserInfo = () => S.util.showBrowserInfo();
     static mobileToggle = () => S.util.switchBrowsingMode();
@@ -288,6 +322,9 @@ export class MenuPanel extends Div {
             // new MenuItem("Node Feed (Chat)", () => MenuPanel.messagesNodeFeed(state), !state.isAnonUser && hltNode?.id != null),
             // new MenuItemSeparator(), //
             new MenuItem("To/From Me" + messagesSuffix, MenuPanel.messagesToFromMe, !state.isAnonUser),
+            new MenuItem("To Me" + messagesSuffix, MenuPanel.messagesToMe, !state.isAnonUser),
+            new MenuItem("From Me" + messagesSuffix, MenuPanel.messagesFromMe, !state.isAnonUser),
+            new MenuItemSeparator(),
             new MenuItem("From Friends", MenuPanel.messagesFromFriends, !state.isAnonUser),
             new MenuItem("From Local Users", MenuPanel.messagesLocal, !state.isAnonUser),
             new MenuItem("All Fediverse", MenuPanel.messagesFediverse, !state.isAnonUser)
@@ -480,6 +517,7 @@ export class MenuPanel extends Div {
 
             new MenuItem("Edit", MenuPanel.toggleEditMode, !state.isAnonUser, () => state.userPreferences.editMode), //
             new MenuItem("Metadata", MenuPanel.toggleMetaData, true, () => state.userPreferences.showMetaData), //
+            new MenuItem("NSFW", MenuPanel.toggleNsfw, true, () => state.userPreferences.nsfw), //
             new MenuItem("Context", MenuPanel.toggleParents, true, () => state.userPreferences.showParents), //
 
             // For now there is only ONE button on the Perferences dialog that is accessible as a toolbar button already, so
@@ -489,7 +527,7 @@ export class MenuPanel extends Div {
             new MenuItemSeparator(), //
 
             new MenuItem("Browser Info", MenuPanel.browserInfo), //
-            new MenuItem(state.mobileMode ? "Desktop App" : "Mobile App", MenuPanel.mobileToggle) //
+            new MenuItem(state.mobileMode ? "Desktop Layout" : "Mobile Layout", MenuPanel.mobileToggle) //
 
             // menuItem("Full Repository Export", "fullRepositoryExport", "
             // S.edit.fullRepositoryExport();") + //

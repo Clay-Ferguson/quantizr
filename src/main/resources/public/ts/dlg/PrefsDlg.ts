@@ -43,6 +43,7 @@ export class PrefsDlg extends DialogBase {
                 userPreferences: {
                     editMode: this.appState.userPreferences.editMode,
                     showMetaData: this.appState.userPreferences.showMetaData,
+                    nsfw: this.appState.userPreferences.nsfw,
                     showParents: this.appState.userPreferences.showParents,
                     rssHeadlinesOnly: this.appState.userPreferences.rssHeadlinesOnly,
                     mainPanelCols: this.appState.userPreferences.mainPanelCols,

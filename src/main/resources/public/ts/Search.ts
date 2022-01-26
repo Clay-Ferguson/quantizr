@@ -217,7 +217,7 @@ export class Search {
             toPublic: feedData.props.feedFilterToPublic,
             localOnly: feedData.props.feedFilterLocalServer,
             fromFriends: feedData.props.feedFilterFriends,
-            nsfw: feedData.props.feedFilterNSFW,
+            nsfw: appState.userPreferences.nsfw,
             searchText
         });
 

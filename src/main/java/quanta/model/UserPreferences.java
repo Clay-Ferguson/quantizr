@@ -8,6 +8,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 public class UserPreferences {
 	private boolean editMode;
 	private boolean showMetaData;
+	private boolean nsfw;
 	private boolean showParents;
 
 	private boolean rssHeadlinesOnly;
@@ -80,5 +81,13 @@ public class UserPreferences {
 
 	public void setShowParents(boolean showParents) {
 		this.showParents = showParents;
+	}
+
+	public boolean isNsfw() {
+		return nsfw;
+	}
+
+	public void setNsfw(boolean nsfw) {
+		this.nsfw = nsfw;
 	}
 }

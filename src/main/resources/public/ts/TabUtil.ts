@@ -150,10 +150,6 @@ export class TabUtil {
 
                         feedDirty: false,
                         feedLoading: false,
-
-                        // must be true to allow NSFW materials.
-                        feedFilterNSFW: true,
-
                         feedResults: null,
                         feedEndReached: false
                     },

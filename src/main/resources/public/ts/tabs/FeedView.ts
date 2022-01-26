@@ -59,7 +59,7 @@ export class FeedView extends AppTab<FeedViewProps> {
         // if this is mobile don't even show search field unless it's currently in use (like from a trending click)
         if (!state.mobileMode || this.data.props.searchTextState.getValue()) {
             topRightControls = [
-                new Span(null, { className: "feedSearchField" }, [new TextField("Search", false, null, null, false, this.data.props.searchTextState)]),
+                new Span(null, { className: "feedSearchField" }, [new TextField(null, false, null, null, false, this.data.props.searchTextState, null, "Enter search text...")]),
                 new Button("Clear", () => this.clearSearch(), { className: "feedClearButton" })
             ];
         }
@@ -104,12 +104,13 @@ export class FeedView extends AppTab<FeedViewProps> {
             content ? new TextContent(content, "resultsContentHeading alert alert-secondary") : null
         ]));
 
-        topChildren.push(new CollapsiblePanel("Options", "Options", null, [
-            this.makeFilterButtonsBar(state)
-        ], false,
-            (state: boolean) => {
-                this.data.props.filterExpanded = state;
-            }, this.data.props.filterExpanded, "", "", "", "span"));
+        // DO NOT DELETE (we may bring this back for some future purpose)
+        // topChildren.push(new CollapsiblePanel("Options", "Options", null, [
+        //     this.makeFilterButtonsBar(state)
+        // ], false,
+        //     (state: boolean) => {
+        //         this.data.props.filterExpanded = state;
+        //     }, this.data.props.filterExpanded, "", "", "", "span"));
 
         if (this.data.props.feedFilterRootNode) {
             topChildren.push(new Checkbox("Auto-refresh", { className: "marginLeft" }, {
@@ -225,7 +226,62 @@ export class FeedView extends AppTab<FeedViewProps> {
 
     /* overridable (don't use arrow function) */
     renderHeading(state: AppState): CompIntf {
-        return new Heading(4, this.data.props.feedFilterRootNode ? "Chat Room" : "Feed", { className: "resultsTitle" });
+        return new Heading(4, this.data.props.feedFilterRootNode ? "Chat Room" : "Feed " + this.getFeedSubHeading(), { className: "resultsTitle" });
+    }
+
+    getFeedSubHeading = () => {
+        let subHeading = null;
+
+        if (!this.data.props.feedFilterFriends && //
+            this.data.props.feedFilterToMe && //
+            this.data.props.feedFilterFromMe && //
+            !this.data.props.feedFilterToPublic && //
+            !this.data.props.feedFilterLocalServer && //
+            !this.data.props.feedFilterRootNode) {
+            subHeading = "To/From Me";
+        }
+        else if (!this.data.props.feedFilterFriends && //
+            this.data.props.feedFilterToMe && //
+            !this.data.props.feedFilterFromMe && //
+            !this.data.props.feedFilterToPublic && //
+            !this.data.props.feedFilterLocalServer && //
+            !this.data.props.feedFilterRootNode) {
+            subHeading = "To Me";
+        }
+        else if (!this.data.props.feedFilterFriends && //
+            !this.data.props.feedFilterToMe && //
+            this.data.props.feedFilterFromMe && //
+            !this.data.props.feedFilterToPublic && //
+            !this.data.props.feedFilterLocalServer && //
+            !this.data.props.feedFilterRootNode) {
+            subHeading = "From Me";
+        }
+        else if (this.data.props.feedFilterFriends && //
+            !this.data.props.feedFilterToMe && //
+            !this.data.props.feedFilterFromMe && //
+            !this.data.props.feedFilterToPublic && //
+            !this.data.props.feedFilterLocalServer && //
+            !this.data.props.feedFilterRootNode) {
+            subHeading = "From Friends";
+        }
+        else if (!this.data.props.feedFilterFriends && //
+            !this.data.props.feedFilterToMe && //
+            !this.data.props.feedFilterFromMe && //
+            this.data.props.feedFilterToPublic && //
+            this.data.props.feedFilterLocalServer && //
+            !this.data.props.feedFilterRootNode) {
+            subHeading = "From Local Users";
+        }
+        else if (!this.data.props.feedFilterFriends && //
+            !this.data.props.feedFilterToMe && //
+            !this.data.props.feedFilterFromMe && //
+            this.data.props.feedFilterToPublic && //
+            !this.data.props.feedFilterLocalServer && //
+            !this.data.props.feedFilterRootNode) {
+            subHeading = "All Fediverse";
+        }
+
+        return subHeading ? ": " + subHeading : "";
     }
 
     clearSearch = () => {
@@ -310,20 +366,6 @@ export class FeedView extends AppTab<FeedViewProps> {
                 },
                 getValue: (): boolean => {
                     return this.data.props.feedFilterLocalServer;
-                }
-            }),
-
-            new Checkbox("NSFW", {
-                title: "Include NSFW Content (Allows material flagged as 'Sensitive')"
-            }, {
-                setValue: (checked: boolean): void => {
-                    dispatch("Action_SetFeedFilterType", (s: AppState): AppState => {
-                        this.data.props.feedFilterNSFW = checked;
-                        return s;
-                    });
-                },
-                getValue: (): boolean => {
-                    return this.data.props.feedFilterNSFW;
                 }
             })
         ]);

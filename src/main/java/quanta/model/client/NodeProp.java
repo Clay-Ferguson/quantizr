@@ -55,6 +55,7 @@ public enum NodeProp {
     USER_PREF_PUBLIC_KEY("sn:publicKey", "s"), //
     USER_PREF_EDIT_MODE("sn:editMode", "s"), //
     USER_PREF_SHOW_METADATA("sn:showMetaData", "s"), //
+    USER_PREF_NSFW("sn:nsfw", "s"), //
     USER_PREF_SHOW_PARENTS("sn:showParents", "s"), //
     USER_PREF_PASSWORD_RESET_AUTHCODE("sn:pwdResetAuth", "s"), //
     USER_PREF_RSS_HEADINGS_ONLY("sn:rssHeadingsOnly", "s"), //

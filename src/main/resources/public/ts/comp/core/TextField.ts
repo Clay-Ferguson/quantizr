@@ -17,7 +17,8 @@ export class TextField extends Div implements I.TextEditorIntf, I.ValueIntf {
     icon: ToggleIcon;
 
     constructor(public label: string, private isPassword: boolean, private onEnterKey: () => void, private inputClasses: string, //
-        private labelOnLeft: boolean, private valState: ValidatedState<any> = null, private outterClass: string = "") {
+        private labelOnLeft: boolean, private valState: ValidatedState<any> = null, private outterClass: string = "",
+        private placeholder: string = "") {
         // do not pass valState into base class, we want it to have state separately
         super(null);
 
@@ -69,6 +70,7 @@ export class TextField extends Div implements I.TextEditorIntf, I.ValueIntf {
         }) : null;
 
         let input = this.input = new Input({
+            placeholder: this.placeholder,
             className: "form-control pre-textfield " + (this.inputClasses || "") + (this.valState.getError() ? " validationErrorBorder" : ""),
             type: state.inputType,
             id: "inputId_" + this.getId()
