@@ -100,7 +100,7 @@ public class SubNode {
 	 * todo-0: Need to investigate wether this should have just been a String of the format like:
 	 * [userId]r,[userId]rw,...
 	 * because we can index strings and get good search performance right? This would rely on a substring search,
-	 * so it might be something we'd need to add as one of the TextCriteria searches however, not which is the 
+	 * so it might be something we'd need to add as one of the TextCriteria searches however, which is the 
 	 * special "full text" searching. In general need to see if there's a way to speed up queries that use
      * AccessControls
 	 */

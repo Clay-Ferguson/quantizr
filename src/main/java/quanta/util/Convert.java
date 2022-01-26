@@ -98,24 +98,26 @@ public class Convert extends ServiceBase {
 
 		String ownerId = node.getOwner().toHexString();
 		String avatarVer = null;
+		String nameProp = null;
+		String displayName = null;
+		String apAvatar = null;
+		String apImage = null;
+		String owner = PrincipalName.ADMIN.s();
 
 		/*
-		 * todo-2: this is a spot that can be optimized. We should be able to send just the userNodeId back
-		 * to client, and the client should be able to deal with that (i think). depends on how much
-		 * ownership info we need to show user.
+		 * todo-0: for endpoints like 'renderNode' we can optimize these calls to get owner nodes to come as
+		 * the LAST step and get them all (will only be up to 25 at a time) in a single "in clause" type
+		 * query! But for now this doesn't appear to be a bottleneck so we won't bother.
 		 */
-		String nameProp = null;
-
-		// todo-0: for endpoints like 'renderNode' we can optimize these calls to get owner nodes to come as the LAST
-		// step and get them all (will only be up to 25 at a time) in a single "in clause" type query! But for now 
-		// this doesn't appear to be a bottleneck so we won't bother.
 		SubNode userNode = read.getOwner(ms, node, false);
-		String displayName = null;
 
 		if (ok(userNode)) {
 			nameProp = userNode.getStr(NodeProp.USER.s());
 			avatarVer = userNode.getStr(NodeProp.BIN.s());
 			displayName = userNode.getStr(NodeProp.DISPLAY_NAME.s());
+			apAvatar = userNode.getStr(NodeProp.ACT_PUB_USER_ICON_URL);
+			apImage = userNode.getStr(NodeProp.ACT_PUB_USER_IMAGE_URL);
+			owner = nameProp;
 
 			/*
 			 * todo-2: right here, get user profile off 'userNode', and put it into a map that will be sent back
@@ -124,8 +126,6 @@ public class Convert extends ServiceBase {
 			 * performance.
 			 */
 		}
-
-		String owner = no(userNode) ? PrincipalName.ADMIN.s() : nameProp;
 
 		log.trace("RENDER ID=" + node.getIdStr() + " rootId=" + ownerId + " session.rootId=" + sc.getRootId() + " node.content="
 				+ node.getContent() + " owner=" + owner);
@@ -147,9 +147,6 @@ public class Convert extends ServiceBase {
 				}
 			}
 		}
-
-		String apAvatar = ok(userNode) ? userNode.getStr(NodeProp.ACT_PUB_USER_ICON_URL) : null;
-		String apImage = ok(userNode) ? userNode.getStr(NodeProp.ACT_PUB_USER_IMAGE_URL) : null;
 
 		NodeInfo nodeInfo = new NodeInfo(node.jsonId(), node.getPath(), node.getName(), node.getContent(), displayName, owner,
 				ownerId, node.getOrdinal(), //

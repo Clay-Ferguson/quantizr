@@ -482,7 +482,7 @@ public class MongoUtil extends ServiceBase {
 	}
 
 	/*
-	 * todo-0: need to make the system capable of doing this logic during a "Full Maintenance"
+	 * todo-1: need to make the system capable of doing this logic during a "Full Maintenance"
 	 * operation, like right after a DB compaction etc. Also the current code just updates path ONLY if
 	 * it's currently null rather than what maintenance would do which is additionally look up the
 	 * parent to verify the path IS indeed the correct parent.
@@ -501,17 +501,11 @@ public class MongoUtil extends ServiceBase {
 				continue;
 			}
 
-			if (no(node.getParent())) {
-				SubNode parent = read.findNodeByPath(node.getParentPath(), true);
-				if (!ok(parent)) {
-					log.error("Didn't find parent for node: " + node.getIdStr());
-				} else {
-					node.setParent(parent.getId());
+			// this is what the MongoListener does....
+			mongoUtil.validateParent(node, null);
 
-					if (ThreadLocals.getDirtyNodeCount() > 200) {
-						update.saveSession(ms);
-					}
-				}
+			if (ThreadLocals.getDirtyNodeCount() > 200) {
+				update.saveSession(ms);
 			}
 
 			if (++counter % 1000 == 0) {
