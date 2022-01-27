@@ -44,7 +44,6 @@ export class NodeCompButtonBar extends Div {
         let selButton: Checkbox;
         let createSubNodeButton: Button;
         let editNodeButton: Button;
-        let insertNodeButton: Button;
         let cutNodeButton: Icon;
         let moveNodeUpButton: Icon;
         let moveNodeDownButton: Icon;
@@ -173,14 +172,6 @@ export class NodeCompButtonBar extends Div {
                 });
             }
 
-            if (C.INS_ON_TOOLBAR) {
-                // todo-1: this button should have same enablement as "new" button, on the page root ???
-                insertNodeButton = new Button("Ins", S.edit.toolbarInsertNode, {
-                    title: "Insert new Node at this location.",
-                    nid: node.id
-                });
-            }
-
             let userCanPaste = S.props.isMine(node, state) || state.isAdminUser || node.id === state.homeNodeId;
 
             if (editingAllowed) {
@@ -296,7 +287,7 @@ export class NodeCompButtonBar extends Div {
             });
         }
 
-        let btnArray: Comp[] = [openButton, upLevelButton, insertNodeButton, createSubNodeButton, editNodeButton, prevButton, nextButton,
+        let btnArray: Comp[] = [openButton, upLevelButton, createSubNodeButton, editNodeButton, prevButton, nextButton,
             new Span(null, { className: "float-end" }, [moveNodeUpButton, //
                 moveNodeDownButton, cutNodeButton, deleteNodeButton, nodeFeedButton, searchButton, timelineButton, pasteButtons])];
 

@@ -35,7 +35,6 @@ export class Constants {
 
     static readonly NEW_ON_ROOT: boolean = false;
     static readonly NEW_ON_TOOLBAR: boolean = true;
-    static readonly INS_ON_TOOLBAR: boolean = false;
     static readonly MOVE_UPDOWN_ON_TOOLBAR: boolean = true;
     static readonly SHOW_CLEAR_BUTTON_IN_EDITOR: boolean = false;
 

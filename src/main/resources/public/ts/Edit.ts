@@ -547,11 +547,6 @@ export class Edit {
         this.initNodeEditResponse(res, forceUsePopup, encrypt, showJumpButton, replyToId, state);
     }
 
-    toolbarInsertNode = (evt: Event, id: string): void => {
-        id = S.util.allowIdFromEvent(evt, id);
-        this.insertNode(id, null, 0);
-    }
-
     insertNode = (id: string, typeName: string, ordinalOffset: number, state?: AppState): void => {
         state = appState(state);
         if (!state.node || !state.node.children) return;
