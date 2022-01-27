@@ -1,12 +1,13 @@
 package quanta.instrument;
 
-import static quanta.util.Util.ok;
 import static quanta.util.Util.no;
+import static quanta.util.Util.ok;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import quanta.model.client.PrincipalName;
 import quanta.util.DateUtil;
 
 public class PerformanceReport {
@@ -42,7 +43,7 @@ public class PerformanceReport {
 		// totals per person
 		HashMap<String, UserPerf> userPerfInfo = new HashMap<>();
 		for (PerfMonEvent se : orderedData) {
-			String user = ok(se.user) ? se.user : "anon";
+			String user = ok(se.user) ? se.user : PrincipalName.ANON.s();
 			UserPerf up = userPerfInfo.get(user);
 			if (up == null) {
 				userPerfInfo.put(user, up = new UserPerf());
@@ -127,7 +128,7 @@ public class PerformanceReport {
 		StringBuilder sb = new StringBuilder();
 
 		if (!isSubItem) {
-			sb.append(ok(se.user) ? se.user : "anon");
+			sb.append(ok(se.user) ? se.user : PrincipalName.ANON.s());
 			sb.append(" ");
 		}
 		sb.append(se.event);

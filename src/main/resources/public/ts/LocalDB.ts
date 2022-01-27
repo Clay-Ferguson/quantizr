@@ -1,3 +1,4 @@
+import * as J from "./JavaIntf";
 
 /* Wraps a transaction of the CRUD operations for access to JavaScript local storage IndexedDB API */
 export class LocalDB {
@@ -128,7 +129,7 @@ export class LocalDB {
 
         // allow parameter userName to override with special case handled for 'anon'
         if (userName) {
-            if (userName === "anon") {
+            if (userName === J.PrincipalName.ANON) {
                 userName = null;
             }
             prefix = userName ? (userName + "_") : "kv_";

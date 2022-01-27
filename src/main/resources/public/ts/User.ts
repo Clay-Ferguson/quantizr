@@ -123,7 +123,7 @@ export class User {
             await S.localDB.setVal(C.LOCALDB_LOGIN_STATE, "0");
 
             /* Setting logged in state for non-user also */
-            await S.localDB.setVal(C.LOCALDB_LOGIN_STATE, "0", "anon");
+            await S.localDB.setVal(C.LOCALDB_LOGIN_STATE, "0", J.PrincipalName.ANON);
         }
 
         S.quanta.loggingOut = true;
@@ -147,7 +147,7 @@ export class User {
             // S.localDB.setVal(C.LOCALDB_LOGIN_USR, null),
             S.localDB.setVal(C.LOCALDB_LOGIN_PWD, null),
             S.localDB.setVal(C.LOCALDB_LOGIN_STATE, "0"),
-            S.localDB.setVal(C.LOCALDB_LOGIN_STATE, "0", "anon")
+            S.localDB.setVal(C.LOCALDB_LOGIN_STATE, "0", J.PrincipalName.ANON)
         ]);
     }
 
@@ -159,16 +159,16 @@ export class User {
                 if (usr) {
                     await S.localDB.setVal(C.LOCALDB_LOGIN_USR, usr);
                     // set this user for the 'anon' case also meaning it'll be default when user it not logged in
-                    await S.localDB.setVal(C.LOCALDB_LOGIN_USR, usr, "anon");
+                    await S.localDB.setVal(C.LOCALDB_LOGIN_USR, usr, J.PrincipalName.ANON);
                 }
 
                 if (pwd) {
                     await S.localDB.setVal(C.LOCALDB_LOGIN_PWD, pwd);
                     // set this pwd for the 'anon' case also meaning it'll be default when user it not logged in
-                    await S.localDB.setVal(C.LOCALDB_LOGIN_PWD, pwd, "anon");
+                    await S.localDB.setVal(C.LOCALDB_LOGIN_PWD, pwd, J.PrincipalName.ANON);
                 }
                 await S.localDB.setVal(C.LOCALDB_LOGIN_STATE, "1");
-                await S.localDB.setVal(C.LOCALDB_LOGIN_STATE, "1", "anon");
+                await S.localDB.setVal(C.LOCALDB_LOGIN_STATE, "1", J.PrincipalName.ANON);
 
                 S.quanta.userName = usr;
                 console.log("Logged in as: " + usr);
