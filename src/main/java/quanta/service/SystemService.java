@@ -80,8 +80,8 @@ public class SystemService extends ServiceBase {
 		attach.gridMaintenanceScan(statsMap);
 		String ret = ipfsGarbageCollect(statsMap);
 
-		arun.run(session -> {
-			user.writeUserStats(session, statsMap);
+		arun.run(ms -> {
+			user.writeUserStats(ms, statsMap);
 			return null;
 		});
 

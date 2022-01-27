@@ -716,19 +716,19 @@ public class ActPubUtil extends ServiceBase {
     /*
      * Every node getting deleted will call into here (via a hook in MongoEventListener), so we can do
      * whatever we need to in this hook, which for now is just used to manage unfollowing a Friend if a
-     * friend is deleted, but later will also entail (todo-1) deleting nodes that were posted to foreign
-     * servers by posting an 'undo' action to the foreign servers
+     * friend is deleted
      */
     public void deleteNodeNotify(ObjectId nodeId) {
         if (!MongoRepository.fullInit)
             return;
-        arun.run(session -> {
-            SubNode node = read.getNode(session, nodeId);
+        // look for this pattern and refactor to 'ms' var name (todo-0)
+        arun.run(ms -> {
+            SubNode node = read.getNode(ms, nodeId);
             if (ok(node) && node.getType().equals(NodeType.FRIEND.s())) {
                 String friendUserName = node.getStr(NodeProp.USER.s());
                 if (ok(friendUserName)) {
                     // if a foreign user, update thru ActivityPub
-                    if (friendUserName.contains("@")) {
+                    if (friendUserName.contains("@") && ok(ThreadLocals.getSC()) && !ThreadLocals.getSC().isAdmin()) {
                         String followerUser = ThreadLocals.getSC().getUserName();
                         apFollowing.setFollowing(followerUser, friendUserName, false);
                     }

@@ -261,12 +261,12 @@ public class UserManagerService extends ServiceBase {
 	public CloseAccountResponse closeAccount(CloseAccountRequest req) {
 		CloseAccountResponse res = new CloseAccountResponse();
 		log.debug("Closing Account: " + ThreadLocals.getSC().getUserName());
-		arun.run(session -> {
+		arun.run(ms -> {
 			String userName = ThreadLocals.getSC().getUserName();
 
-			SubNode ownerNode = read.getUserNodeByUserName(session, userName);
+			SubNode ownerNode = read.getUserNodeByUserName(ms, userName);
 			if (ok(ownerNode)) {
-				delete.delete(session, ownerNode, false);
+				delete.delete(ms, ownerNode, false);
 			}
 			return null;
 		});
@@ -355,12 +355,12 @@ public class UserManagerService extends ServiceBase {
 	 */
 	public String processSignupCode(String signupCode) {
 		log.debug("User is trying signupCode: " + signupCode);
-		return arun.run(session -> {
+		return arun.run(ms -> {
 
 			// signupCode is just the new account node id? I guess that's secure, if user
 			// has this value it's the only user
 			// who could possibly know this unguessable value.
-			SubNode node = read.getNode(session, signupCode);
+			SubNode node = read.getNode(ms, signupCode);
 
 			if (ok(node)) {
 				if (!node.getBool(NodeProp.SIGNUP_PENDING)) {
@@ -372,7 +372,7 @@ public class UserManagerService extends ServiceBase {
 						return "processSignupCode should not be called for admin user.";
 					} else {
 						node.delete(NodeProp.SIGNUP_PENDING.s());
-						update.save(session, node);
+						update.save(ms, node);
 						return "Signup Successful. You may login now.";
 					}
 				}
@@ -391,8 +391,8 @@ public class UserManagerService extends ServiceBase {
 
 	public List<String> getOwnerNames(SubNode node) {
 		Val<List<String>> ret = new Val<List<String>>();
-		arun.run(session -> {
-			ret.setVal(acl.getOwnerNames(session, node));
+		arun.run(ms -> {
+			ret.setVal(acl.getOwnerNames(ms, node));
 			return null;
 		});
 		return ret.getVal();
@@ -405,7 +405,7 @@ public class UserManagerService extends ServiceBase {
 	 */
 	public SignupResponse signup(SignupRequest req, boolean automated) {
 		SignupResponse res = new SignupResponse();
-		arun.run(session -> {
+		arun.run(ms -> {
 			String userName = req.getUserName().trim();
 			String password = req.getPassword().trim();
 			String email = req.getEmail();
@@ -455,9 +455,9 @@ public class UserManagerService extends ServiceBase {
 			}
 
 			if (!automated) {
-				initiateSignup(session, userName, password, email);
+				initiateSignup(ms, userName, password, email);
 			} else {
-				initNewUser(session, userName, password, email, automated);
+				initNewUser(ms, userName, password, email, automated);
 			}
 			return null;
 		});
@@ -511,8 +511,8 @@ public class UserManagerService extends ServiceBase {
 		SavePublicKeyResponse res = new SavePublicKeyResponse();
 		String userName = ThreadLocals.getSC().getUserName();
 
-		arun.run(session -> {
-			SubNode userNode = read.getUserNodeByUserName(session, userName);
+		arun.run(ms -> {
+			SubNode userNode = read.getUserNodeByUserName(ms, userName);
 
 			if (ok(userNode)) {
 				userNode.set(NodeProp.USER_PREF_PUBLIC_KEY.s(), req.getKeyJson());
@@ -534,8 +534,8 @@ public class UserManagerService extends ServiceBase {
 		GetUserAccountInfoResponse res = new GetUserAccountInfoResponse();
 		String userName = ThreadLocals.getSC().getUserName();
 
-		arun.run(session -> {
-			SubNode userNode = read.getUserNodeByUserName(session, userName);
+		arun.run(ms -> {
+			SubNode userNode = read.getUserNodeByUserName(ms, userName);
 			if (no(userNode)) {
 				res.setMessage("unknown user: " + userName);
 				res.setSuccess(false);
@@ -610,9 +610,9 @@ public class UserManagerService extends ServiceBase {
 		SaveUserProfileResponse res = new SaveUserProfileResponse();
 		String userName = ThreadLocals.getSC().getUserName();
 
-		arun.run(session -> {
+		arun.run(ms -> {
 			boolean failed = false;
-			SubNode userNode = read.getUserNodeByUserName(session, userName);
+			SubNode userNode = read.getUserNodeByUserName(ms, userName);
 
 			// DO NOT DELETE: This is temporaryly disabled (no ability to edit userNaem)
 			// If userName is changing, validate it first.
@@ -632,7 +632,7 @@ public class UserManagerService extends ServiceBase {
 				userNode.set(NodeProp.USER_BIO.s(), req.getUserBio());
 				userNode.set(NodeProp.DISPLAY_NAME.s(), req.getDisplayName());
 				// sessionContext.setUserName(req.getUserName());
-				update.save(session, userNode);
+				update.save(ms, userNode);
 				res.setSuccess(true);
 			}
 			return null;
@@ -756,7 +756,7 @@ public class UserManagerService extends ServiceBase {
 				if (no(userNode))
 					return;
 
-				// We can't have both a FRIEND and a BLOCK so remove the friend. There's also a unique constring on
+				// We can't have both a FRIEND and a BLOCK so remove the friend. There's also a unique constraint on
 				// the DB enforcing this.
 				deleteFriend(mst, userNode.getIdStr(), NodeType.BLOCKED_USERS.s());
 
@@ -785,20 +785,20 @@ public class UserManagerService extends ServiceBase {
 		GetUserProfileResponse res = new GetUserProfileResponse();
 		String sessionUserName = ThreadLocals.getSC().getUserName();
 
-		arun.run(session -> {
+		arun.run(ms -> {
 			SubNode userNode = null;
 
 			if (no(req.getUserId())) {
-				userNode = read.getUserNodeByUserName(session, sessionUserName);
+				userNode = read.getUserNodeByUserName(ms, sessionUserName);
 			} else {
-				userNode = read.getNode(session, req.getUserId(), false);
+				userNode = read.getNode(ms, req.getUserId(), false);
 			}
 
 			if (ok(userNode)) {
 				UserProfile userProfile = new UserProfile();
 				String nodeUserName = userNode.getStr(NodeProp.USER.s());
 				String displayName = userNode.getStr(NodeProp.DISPLAY_NAME.s());
-				SubNode userHomeNode = read.getNodeByName(session, nodeUserName + ":" + NodeName.HOME);
+				SubNode userHomeNode = read.getNodeByName(ms, nodeUserName + ":" + NodeName.HOME);
 
 				res.setUserProfile(userProfile);
 				userProfile.setUserName(nodeUserName);
@@ -818,10 +818,10 @@ public class UserManagerService extends ServiceBase {
 				userProfile.setApImageUrl(userNode.getStr(NodeProp.ACT_PUB_USER_IMAGE_URL));
 				userProfile.setActorUrl(actorUrl);
 
-				Long followerCount = apFollower.countFollowersOfUser(session, nodeUserName, actorUrl);
+				Long followerCount = apFollower.countFollowersOfUser(ms, nodeUserName, actorUrl);
 				userProfile.setFollowerCount(followerCount.intValue());
 
-				Long followingCount = apFollowing.countFollowingOfUser(session, nodeUserName, actorUrl);
+				Long followingCount = apFollowing.countFollowingOfUser(ms, nodeUserName, actorUrl);
 				userProfile.setFollowingCount(followingCount.intValue());
 
 				if (!ThreadLocals.getSC().isAnonUser()) {
@@ -829,10 +829,10 @@ public class UserManagerService extends ServiceBase {
 					 * Only for local users do we attemp to generate followers and following, but theoretically we can
 					 * use the ActPub API to query for this for foreign users also.
 					 */
-					boolean blocked = userIsBlockedByMe(session, nodeUserName);
+					boolean blocked = userIsBlockedByMe(ms, nodeUserName);
 					userProfile.setBlocked(blocked);
 
-					boolean following = userIsFollowedByMe(session, nodeUserName);
+					boolean following = userIsFollowedByMe(ms, nodeUserName);
 					userProfile.setFollowing(following);
 				}
 
@@ -870,10 +870,10 @@ public class UserManagerService extends ServiceBase {
 	public UserPreferences getUserPreferences(String userName, SubNode _prefsNode) {
 		UserPreferences userPrefs = new UserPreferences();
 
-		arun.run(session -> {
+		arun.run(ms -> {
 			SubNode prefsNode = _prefsNode;
 			if (no(prefsNode)) {
-				prefsNode = read.getUserNodeByUserName(session, userName);
+				prefsNode = read.getUserNodeByUserName(ms, userName);
 			}
 			userPrefs.setEditMode(prefsNode.getBool(NodeProp.USER_PREF_EDIT_MODE));
 			userPrefs.setShowMetaData(prefsNode.getBool(NodeProp.USER_PREF_SHOW_METADATA));
@@ -978,7 +978,7 @@ public class UserManagerService extends ServiceBase {
 
 	public ResetPasswordResponse resetPassword(ResetPasswordRequest req) {
 		ResetPasswordResponse res = new ResetPasswordResponse();
-		arun.run(session -> {
+		arun.run(ms -> {
 
 			String user = req.getUser();
 			String email = req.getEmail();
@@ -990,7 +990,7 @@ public class UserManagerService extends ServiceBase {
 				return null;
 			}
 
-			SubNode ownerNode = read.getUserNodeByUserName(session, user);
+			SubNode ownerNode = read.getUserNodeByUserName(ms, user);
 			if (no(ownerNode)) {
 				res.setMessage("User does not exist.");
 				res.setSuccess(false);
@@ -1024,7 +1024,7 @@ public class UserManagerService extends ServiceBase {
 			long authCode = new Date().getTime() + oneDayMillis + rand.nextInt(oneDayMillis);
 
 			ownerNode.set(NodeProp.USER_PREF_PASSWORD_RESET_AUTHCODE.s(), String.valueOf(authCode));
-			update.save(session, ownerNode);
+			update.save(ms, ownerNode);
 
 			String passCode = ownerNode.getIdStr() + "-" + String.valueOf(authCode);
 			String link = prop.getHostAndPort() + "?passCode=" + passCode;

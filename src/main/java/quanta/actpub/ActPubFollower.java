@@ -109,8 +109,8 @@ public class ActPubFollower extends ServiceBase {
     public List<String> getFollowers(String userName, String minId) {
         List<String> followers = new LinkedList<>();
 
-        arun.run(session -> {
-            Iterable<SubNode> iter = getFriendsByUserName(session, userName);
+        arun.run(ms -> {
+            Iterable<SubNode> iter = getFriendsByUserName(ms, userName);
 
             for (SubNode n : iter) {
                 // log.debug("Follower found: " + XString.prettyPrint(n));
@@ -123,8 +123,8 @@ public class ActPubFollower extends ServiceBase {
     }
 
     public Long getFollowersCount(String userName) {
-        return (Long) arun.run(session -> {
-            Long count = countFollowersOfUser(session, userName, null);
+        return (Long) arun.run(ms -> {
+            Long count = countFollowersOfUser(ms, userName, null);
             return count;
         });
     }

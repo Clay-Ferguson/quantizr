@@ -10,7 +10,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
-
 import javax.servlet.http.HttpServletRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,7 +24,6 @@ import quanta.actpub.model.APObj;
 import quanta.actpub.model.APType;
 import quanta.config.AppProp;
 import quanta.config.NodeName;
-import quanta.config.NodePath;
 import quanta.config.ServiceBase;
 import quanta.model.client.NodeProp;
 import quanta.model.client.NodeType;
@@ -1110,10 +1108,10 @@ public class ActPubService extends ServiceBase {
         Runnable runnable = () -> {
             accountsRefreshed = 0;
 
-            arun.run(session -> {
+            arun.run(ms -> {
                 // Query to pull all user accounts
                 Iterable<SubNode> accountNodes =
-                        read.findSubNodesByType(session, MongoUtil.allUsersRootNode, NodeType.ACCOUNT.s());
+                        read.findSubNodesByType(ms, MongoUtil.allUsersRootNode, NodeType.ACCOUNT.s());
 
                 for (SubNode acctNode : accountNodes) {
 
@@ -1137,7 +1135,7 @@ public class ActPubService extends ServiceBase {
 
                                 // since we're passing in the account node this importActor will basically just update the
                                 // properties on it and save it.
-                                importActor(session, acctNode, actor);
+                                importActor(ms, acctNode, actor);
                                 // log.debug("import ok");
                                 accountsRefreshed++;
                             }
@@ -1155,9 +1153,9 @@ public class ActPubService extends ServiceBase {
     }
 
     public void loadForeignUser(String userName) {
-        arun.run(session -> {
+        arun.run(ms -> {
             apUtil.log("Reload user outbox: " + userName);
-            SubNode userNode = getAcctNodeByUserName(session, userName);
+            SubNode userNode = getAcctNodeByUserName(ms, userName);
             if (no(userNode)) {
                 // log.debug("Unable to getAccount Node for userName: "+userName);
                 return null;
@@ -1166,14 +1164,14 @@ public class ActPubService extends ServiceBase {
             String actorUrl = userNode.getStr(NodeProp.ACT_PUB_ACTOR_ID.s());
             APObj actor = apUtil.getActorByUrl(actorUrl);
             if (ok(actor)) {
-                apOutbox.loadForeignOutbox(session, actor, userNode, userName);
+                apOutbox.loadForeignOutbox(ms, actor, userNode, userName);
 
                 /*
                  * I was going to load followerCounts into userNode, but I decided to just query them live when
                  * needed on the UserPreferences dialog
                  */
-                int followerCount = apFollower.loadRemoteFollowers(session, actor);
-                int followingCount = apFollowing.loadRemoteFollowing(session, actor);
+                int followerCount = apFollower.loadRemoteFollowers(ms, actor);
+                int followingCount = apFollowing.loadRemoteFollowing(ms, actor);
             } else {
                 log.debug("Unable to get actor from url: " + actorUrl);
             }
@@ -1233,9 +1231,9 @@ public class ActPubService extends ServiceBase {
         cycleOutboxQueryCount = 0;
         newPostsInCycle = 0;
 
-        arun.run(session -> {
+        arun.run(ms -> {
             Iterable<SubNode> accountNodes =
-                    read.findSubNodesByType(session, MongoUtil.allUsersRootNode, NodeType.ACCOUNT.s());
+                    read.findSubNodesByType(ms, MongoUtil.allUsersRootNode, NodeType.ACCOUNT.s());
 
             for (SubNode node : accountNodes) {
                 if (!prop.isDaemonsEnabled())
@@ -1262,9 +1260,9 @@ public class ActPubService extends ServiceBase {
         if (!prop.isActPubEnabled())
             return "ActivityPub not enabled";
 
-        return arun.run(session -> {
+        return arun.run(ms -> {
             Iterable<SubNode> accountNodes =
-                    read.findSubNodesByType(session, MongoUtil.allUsersRootNode, NodeType.ACCOUNT.s());
+                    read.findSubNodesByType(ms, MongoUtil.allUsersRootNode, NodeType.ACCOUNT.s());
 
             // Load the list of all known users
             HashSet<String> knownUsers = new HashSet<>();
@@ -1309,17 +1307,17 @@ public class ActPubService extends ServiceBase {
         if (!prop.isActPubEnabled())
             return "ActivityPub not enabled";
 
-        return arun.run(session -> {
+        return arun.run(ms -> {
             long totalDelCount = 0;
             Iterable<SubNode> accountNodes =
-                    read.findSubNodesByType(session, MongoUtil.allUsersRootNode, NodeType.ACCOUNT.s());
+                    read.findSubNodesByType(ms, MongoUtil.allUsersRootNode, NodeType.ACCOUNT.s());
 
             for (SubNode node : accountNodes) {
                 String userName = node.getStr(NodeProp.USER.s());
                 if (no(userName) || !userName.contains("@"))
                     continue;
 
-                long delCount = delete.deleteOldActPubPosts(node, session);
+                long delCount = delete.deleteOldActPubPosts(node, ms);
                 totalDelCount += delCount;
                 log.debug("Foreign User: " + userName + ". Deleted " + delCount);
             }

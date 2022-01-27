@@ -60,7 +60,7 @@ public class ActPubFollowing extends ServiceBase  {
             APObj webFingerOfUserBeingFollowed = apUtil.getWebFinger(apUserName);
             String actorUrlOfUserBeingFollowed = apUtil.getActorUrlFromWebFingerObj(webFingerOfUserBeingFollowed);
 
-            arun.run(session -> {
+            arun.run(ms -> {
                 String sessionActorUrl = apUtil.makeActorUrlForUserName(followerUserName);
                 APOFollow followAction =
                         new APOFollow(prop.getProtocolHostAndPort() + "/follow/" + String.valueOf(new Date().getTime()),
@@ -81,7 +81,7 @@ public class ActPubFollowing extends ServiceBase  {
                 APObj toActor = apUtil.getActorByUrl(actorUrlOfUserBeingFollowed);
                 if (ok(toActor)) {
                     String toInbox = AP.str(toActor, APObj.inbox);
-                    apUtil.securePost(followerUserName, session, null, toInbox, sessionActorUrl, action, null);
+                    apUtil.securePost(followerUserName, ms, null, toInbox, sessionActorUrl, action, null);
                 } else {
                     apUtil.log("Unable to get actor to post to: " + actorUrlOfUserBeingFollowed);
                 }
@@ -284,8 +284,8 @@ public class ActPubFollowing extends ServiceBase  {
     public List<String> getFollowing(String userName, String minId) {
         final List<String> following = new LinkedList<>();
 
-        arun.run(session -> {
-            Iterable<SubNode> iter = findFollowingOfUser(session, userName);
+        arun.run(ms -> {
+            Iterable<SubNode> iter = findFollowingOfUser(ms, userName);
 
             for (SubNode n : iter) {
                 // log.debug("Follower found: " + XString.prettyPrint(n));
@@ -298,8 +298,8 @@ public class ActPubFollowing extends ServiceBase  {
     }
 
     public Long getFollowingCount(String userName) {
-        return (Long) arun.run(session -> {
-            Long count = countFollowingOfUser(session, userName, null);
+        return (Long) arun.run(ms -> {
+            Long count = countFollowingOfUser(ms, userName, null);
             return count;
         });
     }
