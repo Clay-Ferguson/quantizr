@@ -70,6 +70,11 @@ export class Quanta {
     initApp = async (): Promise<void> => {
         Log.log("initApp()");
 
+        if (this.appInitialized) {
+            throw new Error("initApp called multiple times.");
+        }
+        this.appInitialized = true;
+
         if (history.scrollRestoration) {
             history.scrollRestoration = "manual";
         }
@@ -200,11 +205,6 @@ export class Quanta {
             });
         }, 250);
 
-        if (this.appInitialized) {
-            return;
-        }
-
-        this.appInitialized = true;
         S.props.initConstants();
 
         window.addEventListener("orientationchange", () => {

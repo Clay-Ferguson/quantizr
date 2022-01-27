@@ -61,13 +61,15 @@ export class Factory {
             S.localDB = new LocalDB();
             S.speech = new SpeechRecog();
             S.torrent = new Torrent();
-
-            // This is basically our main entrypoint into the app. This must ONLY be called after the SingletonsReady has been
-            // called (line above) initializing all of them and wiring them all up.
-            S.quanta.initApp();
         }
         catch (e) {
             alert("app failed to initialize components.");
         }
+    }
+
+    initApp() {
+        // This is basically our main entrypoint into the app. This must ONLY be called after the SingletonsReady has been
+        // called (line above) initializing all of them and wiring them all up.
+        S.quanta.initApp();
     }
 }

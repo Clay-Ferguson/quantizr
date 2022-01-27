@@ -12,7 +12,13 @@ import PayPalButton from "./PayPalButton";
 declare var __page;
 
 if ((window as any).__page === "index") {
+    console.log("Constructing Factory.");
     let factory = new Factory();
+
+    window.addEventListener("load", (event) => {
+        console.log("factory.initApp");
+        factory.initApp();
+    });
 }
 else if ((window as any).__page === "tsx-test") {
     ReactDOM.render(
