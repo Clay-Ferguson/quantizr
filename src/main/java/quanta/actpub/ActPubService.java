@@ -40,6 +40,7 @@ import quanta.service.NodeSearchService;
 import quanta.util.DateUtil;
 import quanta.util.ThreadLocals;
 import quanta.util.XString;
+import quanta.instrument.PerfMon;
 
 /**
  * General AP functions
@@ -427,6 +428,7 @@ public class ActPubService extends ServiceBase {
      * Processes incoming INBOX requests for (Follow, Undo Follow), to be called by foreign servers to
      * follow a user on this server
      */
+    @PerfMon(category = "actPub")
     public void processInboxPost(HttpServletRequest httpReq, Object payload) {
         /*
          * todo-1: for now we mutext the inbox becasue I noticed a scenario where Mastodon post TWO
@@ -881,6 +883,7 @@ public class ActPubService extends ServiceBase {
     /*
      * Generates an Actor object for one of our own local users
      */
+    @PerfMon(category = "apub")
     public APObj generateActor(String userName) {
         String host = prop.getProtocolHostAndPort();
 

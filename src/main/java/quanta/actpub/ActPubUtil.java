@@ -41,6 +41,7 @@ import quanta.actpub.model.APList;
 import quanta.actpub.model.APObj;
 import quanta.config.AppProp;
 import quanta.config.ServiceBase;
+import quanta.instrument.PerfMon;
 import quanta.model.client.NodeProp;
 import quanta.model.client.NodeType;
 import quanta.mongo.MongoDeleteEvent;
@@ -435,6 +436,7 @@ public class ActPubUtil extends ServiceBase {
     /*
      * Generate webfinger response from our server
      */
+    @PerfMon(category = "apUtil")
     public APObj generateWebFinger(String resource) {
         try {
             if (StringUtils.isNotEmpty(resource) && resource.startsWith("acct:")) {

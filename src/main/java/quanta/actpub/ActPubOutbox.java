@@ -22,6 +22,7 @@ import quanta.actpub.model.APType;
 import quanta.config.AppProp;
 import quanta.config.NodeName;
 import quanta.config.ServiceBase;
+import quanta.instrument.PerfMon;
 import quanta.model.client.NodeProp;
 import quanta.model.client.NodeType;
 import quanta.model.client.PrincipalName;
@@ -185,6 +186,7 @@ public class ActPubOutbox extends ServiceBase {
     /*
      * if minId=="0" that means "last page", and if minId==null it means first page
      */
+    @PerfMon(category = "apOutbox")
     public APOOrderedCollectionPage generateOutboxPage(String userName, String minId) {
         APList items = getOutboxItems(userName, minId);
 

@@ -21,6 +21,7 @@ import quanta.actpub.model.APObj;
 import quanta.config.AppProp;
 import quanta.config.NodeName;
 import quanta.config.ServiceBase;
+import quanta.instrument.PerfMon;
 import quanta.model.NodeInfo;
 import quanta.model.client.ConstantInt;
 import quanta.model.client.NodeProp;
@@ -199,6 +200,7 @@ public class ActPubFollowing extends ServiceBase  {
     /**
      * Generates outbound following data
      */
+    @PerfMon(category = "apFollowing")
     public APOOrderedCollection generateFollowing(String userName) {
         String url = prop.getProtocolHostAndPort() + APConst.PATH_FOLLOWING + "/" + userName;
         Long totalItems = getFollowingCount(userName);
@@ -211,6 +213,7 @@ public class ActPubFollowing extends ServiceBase  {
     /**
      * Generates one page of results for the outbound 'following' request
      */
+    @PerfMon(category = "apFolloweing")
     public APOOrderedCollectionPage generateFollowingPage(String userName, String minId) {
         List<String> following = getFollowing(userName, minId);
 
