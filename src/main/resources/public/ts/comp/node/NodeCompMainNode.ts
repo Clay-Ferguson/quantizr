@@ -100,7 +100,8 @@ export class NodeCompMainNode extends Div {
                 new Clearfix("bbcf_" + node.id),
                 jumpButton,
                 new NodeCompContent(node, this.tabData, false, true, null, null, this.imgSizeOverride, true),
-                new NodeCompRowFooter(node, false)
+                new NodeCompRowFooter(node, false),
+                new Clearfix()
             ]);
         }
     }

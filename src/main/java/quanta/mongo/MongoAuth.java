@@ -16,6 +16,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Component;
+import opennlp.tools.util.StringUtil;
 import quanta.config.NodeName;
 import quanta.config.NodePath;
 import quanta.config.ServiceBase;
@@ -160,11 +161,9 @@ public class MongoAuth extends ServiceBase {
 	/*
 	 * When a child is created under a parent we want to default the sharing on the child so that
 	 * there's an explicit share to the parent which is redundant in terms of sharing auth, but is
-	 * necessary and desiret for User Feeds and social media queries to work. Also we be sure to remove
-	 * any share to 'child' user that may be in the parent Acl, because that would represent 'child' not
-	 * sharing to himselv which is never done.
-	 * 
-	 * session should be null, or else an existing admin session.
+	 * necessary and desired for User Feeds and social media queries to work. Also we remove any share
+	 * to 'child' user that may be in the parent Acl, because that would represent 'child' node sharing
+	 * to himself which is never done.
 	 */
 	public void setDefaultReplyAcl(MongoSession ms, SubNode parent, SubNode child) {
 		if (no(parent) || no(child))
@@ -203,6 +202,13 @@ public class MongoAuth extends ServiceBase {
 		 */
 		else {
 			ac.put(parent.getOwner().toHexString(), new AccessControl(null, "rd,wr"));
+
+			if (StringUtil.isEmpty(child.getContent())) {
+				SubNode parentUserNode = read.getNode(ms, parent.getOwner());
+				if (ok(parentUserNode)) {
+					child.setContent("@" + parentUserNode.getStr(NodeProp.USER) + " ");
+				}
+			}
 		}
 		child.setAc(ac);
 	}

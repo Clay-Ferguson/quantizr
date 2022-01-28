@@ -137,8 +137,11 @@ export class UserProfileDlg extends DialogBase {
                     this.appState.isAnonUser || this.readOnly ? null : new Button("Save", this.save, null, "btn-primary"),
                     this.appState.isAnonUser || this.readOnly ? null : new Button("Manage Account", () => S.edit.openManageAccountDlg(state)), //
 
-                    localUser && state.userProfile.homeNodeId ? new Button("Home Node", () => this.openUserHomePage(state, "home")) : null, //
-                    localUser ? new Button("Posts", () => this.openUserHomePage(state, "posts")) : null, //
+                    // only local users might have set their 'home' node (named a node 'home')
+                    localUser && state.userProfile.homeNodeId ? new Button("Home", () => this.openUserHomePage(state, "home")) : null, //
+
+                    // but all users we know of will have a posts node simply from having their posts imported
+                    new Button("Posts", () => this.openUserHomePage(state, "posts")), //
 
                     !this.appState.isAnonUser && this.readOnly && state.userProfile.userName !== this.appState.userName ? new Button("Message", this.sendMessage) : null,
                     !this.appState.isAnonUser && !state.userProfile.following && this.readOnly && state.userProfile.userName !== this.appState.userName ? new Button("Follow", this.addFriend) : null,
@@ -173,21 +176,10 @@ export class UserProfileDlg extends DialogBase {
      * a named node (which are: via url, or via a parameter on the url)
      */
     openUserHomePage = (state: any, nodeName: string) => {
-        /* If this is not our account we open in separate browser tab */
-        if (this.readOnly) {
-            /* This is the ID-based url (leave this here as FYI), but we use the more user-friendly one
-             instead which ends with '/home'.
-
-             let url = window.location.origin + "?id=" + state.userProfile.homeNodeId;
-             */
-            let url = window.location.origin + "/u/" + state.userProfile.userName + "/" + nodeName;
-            window.open(url, "_blank");
-        }
-        /* Else this is our node so we close the dialog and then navitage to the home node */
-        else {
-            this.close();
-            setTimeout(() => S.nav.openContentNode(":" + this.appState.userName + ":" + nodeName), 250);
-        }
+        // let url = window.location.origin + "/u/" + state.userProfile.userName + "/" + nodeName;
+        // window.open(url, "_blank");
+        this.close();
+        setTimeout(() => S.nav.openContentNode(":" + state.userProfile.userName + ":" + nodeName), 250);
     }
 
     reload = async (userNodeId: string) => {

@@ -206,9 +206,9 @@ export class MenuPanel extends Div {
             // because while Quanta is capable of rendering ANY node as a chat room, mankind really isn't ready for that!
             // new MenuItem("Node Feed (Chat)", () => MenuPanel.messagesNodeFeed(state), !state.isAnonUser && hltNode?.id != null),
             // new MenuItemSeparator(), //
-            new MenuItem("To/From Me" + messagesSuffix, S.nav.messagesToFromMe, !state.isAnonUser),
-            new MenuItem("To Me" + messagesSuffix, S.nav.messagesToMe, !state.isAnonUser),
-            new MenuItem("From Me" + messagesSuffix, S.nav.messagesFromMe, !state.isAnonUser),
+            new MenuItem("To/From Me", S.nav.messagesToFromMe, !state.isAnonUser),
+            new MenuItem("To Me", S.nav.messagesToMe, !state.isAnonUser),
+            new MenuItem("From Me", S.nav.messagesFromMe, !state.isAnonUser),
             new MenuItemSeparator(),
             new MenuItem("From Friends", S.nav.messagesFromFriends, !state.isAnonUser),
             new MenuItem("From Local Users", S.nav.messagesLocal, !state.isAnonUser),

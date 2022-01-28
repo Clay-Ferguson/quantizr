@@ -1,6 +1,7 @@
 import { appState, dispatch, store } from "./AppRedux";
 import { AppState } from "./AppState";
 import { Comp } from "./comp/base/Comp";
+import { Clearfix } from "./comp/core/Clearfix";
 import { Div } from "./comp/core/Div";
 import { NodeCompContent } from "./comp/node/NodeCompContent";
 import { NodeCompRowFooter } from "./comp/node/NodeCompRowFooter";
@@ -415,7 +416,8 @@ export class Search {
         }, [
             allowHeader ? new NodeCompRowHeader(node, true, false, isFeed, jumpButton) : null,
             content,
-            allowFooter ? new NodeCompRowFooter(node, isFeed) : null
+            allowFooter ? new NodeCompRowFooter(node, isFeed) : null,
+            allowFooter ? new Clearfix() : null
         ]);
 
         let divClass: string = state.highlightSearchNode?.id === node.id ? "userFeedItemHighlight" : "userFeedItem";

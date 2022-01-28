@@ -154,7 +154,8 @@ export class NodeCompRow extends Div {
             buttonBar ? new Clearfix("button_bar_clearfix_" + node.id) : null,
             jumpButton,
             new NodeCompContent(node, this.tabData, true, true, null, null, this.imgSizeOverride, true),
-            this.allowHeaders ? new NodeCompRowFooter(node, false) : null
+            this.allowHeaders ? new NodeCompRowFooter(node, false) : null,
+            this.allowHeaders ? new Clearfix() : null
         ]);
     }
 }

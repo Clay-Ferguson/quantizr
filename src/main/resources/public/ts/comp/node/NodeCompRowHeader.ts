@@ -130,6 +130,10 @@ export class NodeCompRowHeader extends Div {
             floatUpperRightDiv.addChild(new Span(S.util.formatDate(new Date(node.lastModified))));
         }
 
+        if (node.name) {
+            floatUpperRightDiv.addChild(new Span(node.name, { className: "sharingNamesDisp", title: "Node name" }));
+        }
+
         if (S.props.isPublic(node)) {
             let appendNode = S.props.isPublicWritable(node) ? "Anyone can reply" : "No Replies Allowed";
             floatUpperRightDiv.addChild(new Icon({
