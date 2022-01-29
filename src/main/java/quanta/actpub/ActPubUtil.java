@@ -723,7 +723,6 @@ public class ActPubUtil extends ServiceBase {
     public void deleteNodeNotify(ObjectId nodeId) {
         if (!MongoRepository.fullInit)
             return;
-        // look for this pattern and refactor to 'ms' var name (todo-0)
         arun.run(ms -> {
             SubNode node = read.getNode(ms, nodeId);
             if (ok(node) && node.getType().equals(NodeType.FRIEND.s())) {
