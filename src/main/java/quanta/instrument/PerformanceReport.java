@@ -14,11 +14,12 @@ public class PerformanceReport {
 	private static final Logger log = LoggerFactory.getLogger(PerformanceReport.class);
 
 	// Any calls that complete faster than this time, are not even considered. They're not a problem.
-	public static final int REPORT_THRESHOLD = 1300; // 1300 for prod
+	public static final int REPORT_THRESHOLD = 1300; // todo-0 1300 for prod
 
 	public static String getReport() {
 		StringBuilder sb = new StringBuilder();
-		sb.append("Performance Report\n");
+		sb.append("<html><head>" + htmlStyle() + "</head><body>");
+		sb.append(htmlH(2, "Performance Report"));
 
 		// Sort list by whichever are consuming the most time (i.e. by duration, descending order)
 		List<PerfMonEvent> orderedData;
@@ -31,16 +32,27 @@ public class PerformanceReport {
 			orderedData.sort((s1, s2) -> (int) (s2.duration - s1.duration));
 		}
 
-		sb.append("\nEvents over Threshold of " + String.valueOf(REPORT_THRESHOLD) + ": \n");
+		sb.append(htmlH(3, "Events over Threshold of " + String.valueOf(REPORT_THRESHOLD)));
+
 		int counter = 0;
+		String rows = "";
 		for (PerfMonEvent se : orderedData) {
 			if (se.duration > REPORT_THRESHOLD) {
-				sb.append(formatEvent(se, counter++ < 20, false));
-				sb.append("\n");
+				rows += formatEvent(se, counter++ < 20, false);
 			}
 		}
 
-		// totals per person
+		if (!rows.isEmpty()) {
+			sb.append(htmlTable(htmlTr( //
+					htmlTh("user") + //
+							htmlTh("event") + //
+							htmlTh("time") + //
+							htmlTh("roodId") + //
+							htmlTh("eventId"))
+					+ rows));
+		}
+
+		// calculate totals per person
 		HashMap<String, UserPerf> userPerfInfo = new HashMap<>();
 		for (PerfMonEvent se : orderedData) {
 			String user = ok(se.user) ? se.user : PrincipalName.ANON.s();
@@ -54,36 +66,51 @@ public class PerformanceReport {
 		}
 
 		List<UserPerf> upiList = new ArrayList<>(userPerfInfo.values());
-
 		upiList.sort((s1, s2) -> (int) (s2.totalCalls - s1.totalCalls));
-		sb.append("\nCall Counts: \n");
+
+		// -------------------------------------------
+		sb.append(htmlH(3, "Call Counts"));
+		rows = "";
 		for (UserPerf se : upiList) {
-			sb.append(se.user);
-			sb.append(" ");
-			sb.append(se.totalCalls);
-			sb.append("\n");
+			rows += htmlTr(htmlTd(se.user) + htmlTdRt(String.valueOf(se.totalCalls)));
+		}
+		if (!rows.isEmpty()) {
+			sb.append(htmlTable(htmlTr( //
+					htmlTh("user") + //
+							htmlTh("Call Count")) //
+					+ rows));
 		}
 
+		// -------------------------------------------
 		upiList.sort((s1, s2) -> (int) (s2.totalTime - s1.totalTime));
-		sb.append("\nTime Usage: \n");
+		sb.append(htmlH(3, "Time Usage by User"));
+		rows = "";
 		for (UserPerf se : upiList) {
-			sb.append(se.user);
-			sb.append(" ");
-			sb.append(DateUtil.formatDurationMillis(se.totalTime, true));
-			sb.append("\n");
+			rows += htmlTr(htmlTd(se.user) + htmlTdRt(DateUtil.formatDurationMillis(se.totalTime, true)));
+		}
+		if (!rows.isEmpty()) {
+			sb.append(htmlTable(htmlTr( //
+					htmlTh("user") + //
+							htmlTh("Total Time")) //
+					+ rows));
 		}
 
+		// -------------------------------------------
 		upiList.sort((s1, s2) -> (int) (s2.totalTime / s2.totalCalls - s1.totalTime / s1.totalCalls));
-		sb.append("\nAvgerage Time Per Call: \n");
+		sb.append(htmlH(3, "Avgerage Time Per Call"));
+		rows = "";
 		for (UserPerf se : upiList) {
-			sb.append(se.user);
-			sb.append(" ");
-			sb.append(DateUtil.formatDurationMillis(se.totalTime / se.totalCalls, true));
-			sb.append("\n");
+			rows += htmlTr(htmlTd(se.user) + htmlTdRt(DateUtil.formatDurationMillis(se.totalTime / se.totalCalls, true)));
+		}
+		if (!rows.isEmpty()) {
+			sb.append(htmlTable(htmlTr( //
+					htmlTh("user") + //
+							htmlTh("Avg. Time")) //
+					+ rows));
 		}
 
 		sb.append(getTimesPerCategory());
-
+		sb.append("</body></html>");
 		return sb.toString();
 	}
 
@@ -95,9 +122,8 @@ public class PerformanceReport {
 
 	/* This is the most 'powerful/useful' feature, because it displays time usage for each category */
 	public static String getTimesPerCategory() {
-		StringBuilder sb = new StringBuilder();
 		HashMap<String, MethodStat> stats = new HashMap<>();
-		sb.append("\nTimes Per Category\n");
+
 		for (PerfMonEvent event : Instrument.data) {
 			MethodStat stat = stats.get(event.event);
 			if (no(stat)) {
@@ -111,52 +137,101 @@ public class PerformanceReport {
 		List<MethodStat> orderedStats = new ArrayList<>(stats.values());
 		orderedStats.sort((s1, s2) -> (int) (s2.totalTime / s2.totalCount - s1.totalTime / s1.totalCount));
 
-		for (MethodStat stat : orderedStats) {
-			sb.append(stat.category);
-			sb.append(" count=");
-			sb.append(String.valueOf(stat.totalCount));
-			sb.append(" avg=");
-			sb.append(DateUtil.formatDurationMillis(stat.totalTime / stat.totalCount, true));
-			sb.append("\n");
-		}
-		sb.append("\n");
+		String table = htmlTr( //
+				htmlTh("Category") + //
+						htmlTh("Call Count") + //
+						htmlTh("Avg. Call Time"));
 
-		return sb.toString();
+		for (MethodStat stat : orderedStats) {
+			table += htmlTr( //
+					htmlTd(stat.category) + //
+							htmlTdRt(String.valueOf(stat.totalCount)) + //
+							htmlTdRt(DateUtil.formatDurationMillis(stat.totalTime / stat.totalCount, true)));
+		}
+
+		return htmlH(3, "Times Per Category") + htmlTable(table);
 	}
 
+	/* returns as an HTML Row (user, event, rootEvent, eventId */
 	public static String formatEvent(PerfMonEvent se, boolean showSubEvents, boolean isSubItem) {
-		StringBuilder sb = new StringBuilder();
+		String tr = "";
+
+		// too verbose, keeping this capability turned off for now.)
+		boolean embedSubEvents = false;
 
 		if (!isSubItem) {
-			sb.append(ok(se.user) ? se.user : PrincipalName.ANON.s());
-			sb.append(" ");
+			tr += htmlTd(ok(se.user) ? se.user : PrincipalName.ANON.s());
 		}
-		sb.append(se.event);
-		sb.append(" ");
-		sb.append(DateUtil.formatDurationMillis(se.duration, true));
-
-		if (!isSubItem && ok(se.root)) {
-			sb.append(" r=");
-			sb.append(se.root.hashCode());
-		}
-
-		sb.append(" e=");
-		sb.append(se.hashCode());
 
 		// If this event happens to be the head/root of a series of events
-		if (showSubEvents && ok(se.root) && ok(se.root.subEvents)) {
-			sb.append("\n  Set:\n");
-			for (PerfMonEvent subEvent : se.root.subEvents) {
-				// if we run across same 'se' we're processing, skip it
-				if (subEvent != se) {
-					sb.append("    ");
-					sb.append(formatEvent(subEvent, false, true));
-					sb.append("\n");
+		String set = "";
+		if (embedSubEvents) {
+			String rows = "";
+			if (showSubEvents && ok(se.root) && ok(se.root.subEvents)) {
+				// sb.append("\n Set:\n");
+				for (PerfMonEvent subEvent : se.root.subEvents) {
+					// if we run across same 'se' we're processing, skip it
+					if (subEvent != se) {
+						rows += formatEvent(subEvent, false, true);
+					}
+				}
+				if (!rows.isEmpty()) {
+					set += "<br>" + htmlTable(htmlTr( //
+							htmlTh("user") + //
+									htmlTh("event") + //
+									htmlTh("time") + //
+									htmlTh("Root Id") + //
+									htmlTh("Event Id"))
+							+ rows) + "<br>";
 				}
 			}
-			sb.append("\n");
 		}
 
-		return sb.toString();
+		tr += htmlTd(se.event + set);
+		tr += htmlTdRt(DateUtil.formatDurationMillis(se.duration, true));
+
+		if (!isSubItem && ok(se.root)) {
+			tr += htmlTdRt(String.valueOf(se.root.hashCode()));
+		}
+
+		tr += htmlTdRt(String.valueOf(se.hashCode()));
+
+		return htmlTr(tr);
+	}
+
+	public static String htmlH(int level, String heading) {
+		return "<h" + String.valueOf(level) + ">\n" + heading + "</h" + String.valueOf(level) + ">\n";
+	}
+
+	public static String htmlTable(String table) {
+		return "<table>\n" + table + "</table>\n";
+	}
+
+	public static String htmlTr(String row) {
+		return "<tr>\n" + row + "</tr>\n";
+	}
+
+	public static String htmlTd(String td) {
+		return "<td>\n" + td + "</td>\n";
+	}
+
+	public static String htmlTdRt(String td) {
+		return "<td align='right'>\n" + td + "</td>\n";
+	}
+
+	public static String htmlTh(String td) {
+		return "<th>\n" + td + "</th>\n";
+	}
+
+	public static String htmlStyle() {
+		return "<style>\n" + //
+				"table, th, td {\n" + //
+				"padding: 5px;\n" + //
+				"border: 1px solid black;\n" + //
+				"border-collapse: collapse;\n" + //
+				"}\n" + //
+				"body {padding: 20px;}" + //
+				"html, body {font-family: 'Courier New', 'Courier', 'Roboto', 'Verdana', 'Helvetica', 'Arial', 'sans-serif' !important}" + //
+				"</style>";
 	}
 }

@@ -36,7 +36,7 @@ import quanta.util.ThreadLocals;
 public class Instrument {
 	private static final Logger log = LoggerFactory.getLogger(Instrument.class);
 
-	public static final int CAPTURE_THRESHOLD = 10; // 10 for prod
+	public static final int CAPTURE_THRESHOLD = 10; //todo-0 10 for prod
 
 	private static final int MAX_EVENTS = 10000;
 	public static List<PerfMonEvent> data = Collections.synchronizedList(new LinkedList());

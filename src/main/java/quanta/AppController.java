@@ -327,7 +327,7 @@ public class AppController extends ServiceBase implements ErrorController {
 	}
 
 	// NOPE! No performance monitor for this. @PerfMon
-	@GetMapping(value = {"/performance-report"}, produces = MediaType.TEXT_PLAIN_VALUE)
+	@GetMapping(value = {"/performance-report"}, produces = MediaType.TEXT_HTML_VALUE)
 	public @ResponseBody String performanceReport() {
 		return PerformanceReport.getReport();
 	}
