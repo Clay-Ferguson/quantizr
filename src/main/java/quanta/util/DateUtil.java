@@ -202,16 +202,25 @@ public class DateUtil {
 			sb.append("m");
 		}
 
+		boolean msDone = false;
 		// only show seconds if not over a day or hour.
 		if (days == 0 && hours == 0 && seconds > 0) {
 			if (sb.length() > 0)
 				sb.append(" ");
-			sb.append(String.valueOf(seconds));
+
+			// Always show like 1.5s rather than '1s 500ms'
+			if (showMillis && days == 0 && hours == 0 && minutes == 0 && millis > 0) {
+				sb.append(String.format("%.2f", (float)seconds + (float)millis / 1000f));
+				msDone = true;
+			} else {
+				sb.append(String.valueOf(seconds));
+			}
+
 			sb.append("s");
 		}
 
 		// only show milliseconds if not over a minute
-		if (showMillis && days == 0 && hours == 0 && minutes == 0) {
+		if (!msDone && showMillis && days == 0 && hours == 0 && minutes == 0 && millis > 0) {
 			if (sb.length() > 0)
 				sb.append(" ");
 			sb.append(String.valueOf(millis));
