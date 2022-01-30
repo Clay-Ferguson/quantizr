@@ -296,12 +296,14 @@ public class NodeEditService extends ServiceBase {
 	}
 
 	@PerfMon(category = "edit")
-	public SaveNodeResponse saveNode(MongoSession _ms, SaveNodeRequest req) {
+	public SaveNodeResponse saveNode(MongoSession ms, SaveNodeRequest req) {
 		SaveNodeResponse res = new SaveNodeResponse();
-		// log.debug("Controller saveNode: " + Thread.currentThread().getName());
+		// log.debug("Controller saveNode");
 
-		_ms = ThreadLocals.ensure(_ms);
-		MongoSession ms = _ms;
+		// todo-0: find and remove all unneeded code patterna like this.
+		// _ms = ThreadLocals.ensure(_ms);
+		// MongoSession ms = _ms;
+
 		NodeInfo nodeInfo = req.getNode();
 		String nodeId = nodeInfo.getId();
 

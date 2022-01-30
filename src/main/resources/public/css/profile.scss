@@ -33,22 +33,22 @@
 
 .profileImage {
     @extend .profileImageBase;
-    border: 5px dotted $nodeBorderBottomColor;
+    border: 3px dotted $nodeBorderBottomColor;
 }
 
 .profileImageNoHeader {
     @extend .profileImageBaseNoHeader;
-    border: 5px dotted $nodeBorderBottomColor;
+    border: 3px dotted $nodeBorderBottomColor;
 }
 
 .readOnlyProfileImage {
     @extend .profileImageBase;
-    border: 5px solid $modal-content-bg;
+    border: 2px solid $modal-content-bg;
 }
 
 .readOnlyProfileImageNoHeader {
     @extend .profileImageBaseNoHeader;
-    border: 5px solid $modal-content-bg;
+    border: 2px solid $modal-content-bg;
 }
 
 .profileImageRHS {
@@ -56,24 +56,24 @@
     top: -45px;
     left: 30px;
     position: relative;
-    border: 5px solid $body-bg; 
+    border: 2px solid $body-bg; 
 }
 
 .profileImageRHSNoOffset {
     @extend .profileImageBaseNoHeaderSmall;
     position: relative;
-    border: 1px solid $nodeBorderBottomColor;
+    border: 2px solid $nodeBorderBottomColor;
     margin-bottom: 20px;
 }
 
 .profileHeaderImage {
     @extend .profileHeaderImageBase;
-    border: 4px dotted $nodeBorderBottomColor;
+    border: 3px dotted $nodeBorderBottomColor;
 }
 
 .readOnlyProfileHeaderImage {
     @extend .profileHeaderImageBase;
-    border: 1px solid $nodeBorderBottomColor;
+    border: 2px solid $nodeBorderBottomColor;
 }
 
 .userBio {
@@ -82,21 +82,21 @@
 
 .profileImageHolder {
     @extend .profileImageBase;
-    border: 4px dotted $nodeBorderBottomColor;
+    border: 3px dotted $nodeBorderBottomColor;
     padding: 12px;
     min-height: 120px;
 }
 
 .profileImageHolderNoHeader {
     @extend .profileImageBaseNoHeader;
-    border: 4px dotted $nodeBorderBottomColor;
+    border: 3px dotted $nodeBorderBottomColor;
     padding: 12px;
     min-height: 120px;
 }
 
 .profileHeaderImageHolder {
     @extend .profileHeaderImageBase;
-    border: 4px dotted $nodeBorderBottomColor;
+    border: 3px dotted $nodeBorderBottomColor;
     min-height: 120px;
     padding: 12px;
 }

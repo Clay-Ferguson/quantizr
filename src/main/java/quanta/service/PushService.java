@@ -26,7 +26,7 @@ public class PushService extends ServiceBase {
 
 	static final int MAX_FEED_ITEMS = 25;
 
-	/* Notify all users being shared to on this node */
+	/* Notify all users being shared to on this node, or everyone if the node is public. */
 	public void pushNodeUpdateToBrowsers(MongoSession ms, HashSet<Integer> sessionsPushed, SubNode node) {
 		// log.debug("Pushing update to all friends: id=" + node.getIdStr());
 
@@ -58,9 +58,9 @@ public class PushService extends ServiceBase {
 			FeedPushInfo pushInfo = new FeedPushInfo(nodeInfo);
 
 			/*
-			 * push if the sc user is in the shared set or this session is OURs,
+			 * push if the sc user is in the shared set or this session is OURs
 			 */
-			if (usersSharedToSet.contains(sc.getUserName())) {
+			if (usersSharedToSet.contains("public") || usersSharedToSet.contains(sc.getUserName())) {
 				// push notification message to browser
 				sendServerPushInfo(sc, pushInfo);
 			}
@@ -70,11 +70,10 @@ public class PushService extends ServiceBase {
 	/*
 	 * Send a push to all users who are monitoring this node or any ancestor of it. This will be the
 	 * users who have opened some ancestor node as their "Feed Node" (viewing feed of that specific
-	 * node)
+	 * node. This means 'viewing that node as a chat room')
 	 */
 	public void pushNodeToMonitoringBrowsers(MongoSession ms, HashSet<Integer> sessionsPushed, SubNode node) {
 		// log.debug("Push to monitoring Browsers: node.content=" + node.getContent());
-
 		/* Scan all sessions and push message to the ones that need to see it */
 		for (SessionContext sc : SessionContext.getAllSessions(true)) {
 			/* Anonymous sessions won't have userName and can be ignored */

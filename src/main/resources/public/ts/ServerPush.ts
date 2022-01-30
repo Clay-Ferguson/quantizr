@@ -150,9 +150,9 @@ export class ServerPush {
             nodeInfo.content = "[Encrypted]";
         }
 
-        // Ignore changes comming in during edit if we're editing on feed tab (inline)
-        // which will be fine because in this case when we are done editing we always
-        // process all the accumulated feedDirtyList items.
+        /* Ignore changes comming in during edit if we're editing on feed tab (inline)
+         which will be fine because in this case when we are done editing we always
+         process all the accumulated feedDirtyList items. */
         if (state.activeTab === C.TAB_FEED && state.editNode) {
             // console.log("editing, so adding to feedDirty");
             if (!feedData.props.feedDirtyList) {
