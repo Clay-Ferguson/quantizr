@@ -53,14 +53,22 @@ public class PushService extends ServiceBase {
 			if (no(sc.getUserName()))
 				continue;
 
-			/* build our push message payload */
-			NodeInfo nodeInfo = convert.convertToNodeInfo(sc, ms, node, true, false, 1, false, false, true, false);
-			FeedPushInfo pushInfo = new FeedPushInfo(nodeInfo);
-
 			/*
 			 * push if the sc user is in the shared set or this session is OURs
+			 * 
+			 * Having "public" option here (pushing public nodes to everyone) floods in too many messages to be
+			 * practical, becuase the ActivityPub deamon that reads messages pushes them. Handling that firehose
+			 * of posts is a cool feature but will take some time to think thru the usability issues, so for now
+			 * we only live-push messages to the browser that created them (the guy who did the save), and the
+			 * people a node is specifically shared to.
 			 */
-			if (usersSharedToSet.contains("public") || usersSharedToSet.contains(sc.getUserName())) {
+			if (sc.getRootId().equals(node.getOwner().toHexString()) || // node owned by this 'sc' user
+			// usersSharedToSet.contains("public") ||
+					usersSharedToSet.contains(sc.getUserName())) {
+				/* build our push message payload */
+				NodeInfo nodeInfo = convert.convertToNodeInfo(sc, ms, node, true, false, 1, false, false, true, false);
+				FeedPushInfo pushInfo = new FeedPushInfo(nodeInfo);
+
 				// push notification message to browser
 				sendServerPushInfo(sc, pushInfo);
 			}
