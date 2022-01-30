@@ -641,6 +641,8 @@ public class ActPubService extends ServiceBase {
 
         /*
          * First look to see if there is a target node already existing for this so we don't add a duplicate
+         * 
+         * note: partial index "unique-apid", is what makes this lookup fast.
          */
         SubNode dupNode = read.findNodeByProp(ms, parentNode, NodeProp.ACT_PUB_ID.s(), id);
         if (ok(dupNode)) {

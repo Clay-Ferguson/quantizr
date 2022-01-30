@@ -97,7 +97,7 @@ public class SubNode {
 	 * However in addition to userNodeIds identifying users the additional key of "public" is allowed as
 	 * a key which indicates privileges granted to everyone (the entire public)
 	 * 
-	 * todo-0: Need to investigate wether this should have just been a String of the format like:
+	 * todo-1: Need to investigate wether this should have just been a String of the format like:
 	 * [userId]r,[userId]rw,...
 	 * because we can index strings and get good search performance right? This would rely on a substring search,
 	 * so it might be something we'd need to add as one of the TextCriteria searches however, which is the 

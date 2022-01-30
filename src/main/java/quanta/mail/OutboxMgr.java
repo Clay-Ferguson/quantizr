@@ -45,6 +45,10 @@ public class OutboxMgr extends ServiceBase {
 	 */
 	public void addInboxNotification(String recieverUserName, SubNode userNode, SubNode node, String notifyMessage) {
 
+		// if you re-enable this code be sure to add a new partialIndex on "pro."+NodeProp.TARGET_ID.s(), so the
+		// findNodeByProp will be fast.
+		if (true) throw new RuntimeException("currently not used.");
+
 		arun.run(ms -> {
 			SubNode userInbox =
 					read.getUserNodeByType(ms, null, userNode, "### Inbox", NodeType.INBOX.s(), null, NodeName.INBOX);

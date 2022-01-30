@@ -45,7 +45,6 @@ public class NodeMoveService extends ServiceBase {
 	 */
 	public SetNodePositionResponse setNodePosition(MongoSession ms, SetNodePositionRequest req) {
 		SetNodePositionResponse res = new SetNodePositionResponse();
-		ms = ThreadLocals.ensure(ms);
 
 		String nodeId = req.getNodeId();
 		SubNode node = read.getNode(ms, nodeId);
@@ -123,7 +122,6 @@ public class NodeMoveService extends ServiceBase {
 	 */
 	public JoinNodesResponse joinNodes(MongoSession ms, JoinNodesRequest req) {
 		JoinNodesResponse res = new JoinNodesResponse();
-		ms = ThreadLocals.ensure(ms);
 
 		// add to list becasue we will sort
 		ArrayList<SubNode> nodes = new ArrayList<SubNode>();
@@ -191,7 +189,6 @@ public class NodeMoveService extends ServiceBase {
 	 */
 	public DeleteNodesResponse deleteNodes(MongoSession ms, DeleteNodesRequest req) {
 		DeleteNodesResponse res = new DeleteNodesResponse();
-		ms = ThreadLocals.ensure(ms);
 
 		SubNode userNode = read.getUserNodeByUserName(null, null);
 		if (no(userNode)) {

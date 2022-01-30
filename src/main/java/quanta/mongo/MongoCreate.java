@@ -149,7 +149,7 @@ public class MongoCreate extends ServiceBase {
 		 * todo-0: MASSIVE PERFORMANCE BOTTLENECK
 		 * 
 		 * For operations like this we DO need to use the BULK insert operation (is BULK the right
-		 * word,...batch?) todo-0: Also need to find out how to avoid this call whenever possible...
+		 * word,...batch?) Also just need to try to avoid this call whenever possible...
 		 */
 		for (SubNode child : read.getChildren(ms, node.getId(), Sort.by(Sort.Direction.ASC, SubNode.ORDINAL), null, 0, null,
 				crit)) {

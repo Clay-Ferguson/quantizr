@@ -155,7 +155,6 @@ public class ActPubFollower extends ServiceBase {
 
     public GetFollowersResponse getFollowers(MongoSession ms, GetFollowersRequest req) {
         GetFollowersResponse res = new GetFollowersResponse();
-        ms = ThreadLocals.ensure(ms);
 
         MongoSession as = auth.getAdminSession();
         Query q = getFriendsByUserName_query(as, req.getTargetUserName());

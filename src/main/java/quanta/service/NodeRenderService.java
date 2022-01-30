@@ -461,7 +461,6 @@ public class NodeRenderService extends ServiceBase {
 
 	public InitNodeEditResponse initNodeEdit(MongoSession ms, InitNodeEditRequest req) {
 		InitNodeEditResponse res = new InitNodeEditResponse();
-		ms = ThreadLocals.ensure(ms);
 		String nodeId = req.getNodeId();
 		SubNode node = read.getNode(ms, nodeId);
 		auth.ownerAuth(ms, node);
@@ -549,7 +548,6 @@ public class NodeRenderService extends ServiceBase {
 
 	public RenderCalendarResponse renderCalendar(MongoSession ms, RenderCalendarRequest req) {
 		RenderCalendarResponse res = new RenderCalendarResponse();
-		ms = ThreadLocals.ensure(ms);
 
 		SubNode node = read.getNode(ms, req.getNodeId());
 		if (no(node)) {

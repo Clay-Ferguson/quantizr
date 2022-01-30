@@ -45,7 +45,6 @@ public class AclService extends ServiceBase {
 	 */
 	public GetNodePrivilegesResponse getNodePrivileges(MongoSession ms, GetNodePrivilegesRequest req) {
 		GetNodePrivilegesResponse res = new GetNodePrivilegesResponse();
-		ms = ThreadLocals.ensure(ms);
 
 		String nodeId = req.getNodeId();
 		SubNode node = read.getNode(ms, nodeId);
@@ -73,7 +72,6 @@ public class AclService extends ServiceBase {
 	 */
 	public AddPrivilegeResponse addPrivilege(MongoSession ms, AddPrivilegeRequest req) {
 		AddPrivilegeResponse res = new AddPrivilegeResponse();
-		ms = ThreadLocals.ensure(ms);
 
 		String nodeId = req.getNodeId();
 		req.setPrincipal(XString.stripIfStartsWith(req.getPrincipal(), "@"));
@@ -102,7 +100,6 @@ public class AclService extends ServiceBase {
 	 */
 	public SetCipherKeyResponse setCipherKey(MongoSession ms, SetCipherKeyRequest req) {
 		SetCipherKeyResponse res = new SetCipherKeyResponse();
-		ms = ThreadLocals.ensure(ms);
 
 		String nodeId = req.getNodeId();
 		SubNode node = read.getNode(ms, nodeId);
@@ -331,7 +328,6 @@ public class AclService extends ServiceBase {
 	 */
 	public RemovePrivilegeResponse removePrivilege(MongoSession ms, RemovePrivilegeRequest req) {
 		RemovePrivilegeResponse res = new RemovePrivilegeResponse();
-		ms = ThreadLocals.ensure(ms);
 
 		String nodeId = req.getNodeId();
 		SubNode node = read.getNode(ms, nodeId);

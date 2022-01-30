@@ -145,7 +145,8 @@ public class PushService extends ServiceBase {
 			if (no(pushEmitter))
 				return;
 
-			// todo-0: do we need this synchronizing here? bottleneck?
+			// Note: Each session has it's own pushEmitter, so this will not be a bottleck, and is desirable even
+			// probably to be sure each session is only doing one emit at a time.
 			synchronized (pushEmitter) {
 				log.debug("Pushing to User: " + sc.getUserName());
 				try {

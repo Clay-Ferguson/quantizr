@@ -121,8 +121,6 @@ public class AttachmentService extends ServiceBase {
 		}
 
 		try {
-			ms = ThreadLocals.ensure(ms);
-
 			/*
 			 * OLD LOGIC: Uploading a single file attaches to the current node, but uploading multiple files
 			 * creates each file on it's own subnode (child nodes)
@@ -402,8 +400,6 @@ public class AttachmentService extends ServiceBase {
 	 */
 	public DeleteAttachmentResponse deleteAttachment(MongoSession ms, DeleteAttachmentRequest req) {
 		DeleteAttachmentResponse res = new DeleteAttachmentResponse();
-		ms = ThreadLocals.ensure(ms);
-
 		String nodeId = req.getNodeId();
 		SubNode node = read.getNode(ms, nodeId);
 		auth.ownerAuthByThread(node);
@@ -642,8 +638,6 @@ public class AttachmentService extends ServiceBase {
 		BufferedInputStream inStream = null;
 		ResponseEntity<ResourceRegion> ret = null;
 		try {
-			ms = ThreadLocals.ensure(ms);
-
 			SubNode node = read.getNode(ms, nodeId, false);
 			auth.auth(ms, node, PrivilegeType.READ);
 

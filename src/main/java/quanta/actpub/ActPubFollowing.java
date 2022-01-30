@@ -309,7 +309,6 @@ public class ActPubFollowing extends ServiceBase  {
 
     public GetFollowingResponse getFollowing(MongoSession ms, GetFollowingRequest req) {
         GetFollowingResponse res = new GetFollowingResponse();
-        ms = ThreadLocals.ensure(ms);
 
         MongoSession as = auth.getAdminSession();
         Query q = findFollowingOfUser_query(as, req.getTargetUserName());

@@ -68,7 +68,6 @@ public class NodeEditService extends ServiceBase {
 	public CreateSubNodeResponse createSubNode(MongoSession ms, CreateSubNodeRequest req) {
 		// log.debug("createSubNode");
 		CreateSubNodeResponse res = new CreateSubNodeResponse();
-		ms = ThreadLocals.ensure(ms);
 
 		boolean linkBookmark = "linkBookmark".equals(req.getPayloadType());
 		String nodeId = req.getNodeId();
@@ -199,7 +198,6 @@ public class NodeEditService extends ServiceBase {
 
 	public AppDropResponse appDrop(MongoSession ms, AppDropRequest req) {
 		AppDropResponse res = new AppDropResponse();
-		ms = ThreadLocals.ensure(ms);
 		String data = req.getData();
 		String lcData = data.toLowerCase();
 
@@ -240,7 +238,6 @@ public class NodeEditService extends ServiceBase {
 	 */
 	public InsertNodeResponse insertNode(MongoSession ms, InsertNodeRequest req) {
 		InsertNodeResponse res = new InsertNodeResponse();
-		ms = ThreadLocals.ensure(ms);
 		String parentNodeId = req.getParentId();
 		log.debug("Inserting under parent: " + parentNodeId);
 		SubNode parentNode = read.getNode(ms, parentNodeId);
@@ -299,10 +296,6 @@ public class NodeEditService extends ServiceBase {
 	public SaveNodeResponse saveNode(MongoSession ms, SaveNodeRequest req) {
 		SaveNodeResponse res = new SaveNodeResponse();
 		// log.debug("Controller saveNode");
-
-		// todo-0: find and remove all unneeded code patterna like this.
-		// _ms = ThreadLocals.ensure(_ms);
-		// MongoSession ms = _ms;
 
 		NodeInfo nodeInfo = req.getNode();
 		String nodeId = nodeInfo.getId();
@@ -555,7 +548,6 @@ public class NodeEditService extends ServiceBase {
 	 */
 	public DeletePropertyResponse deleteProperties(MongoSession ms, DeletePropertyRequest req) {
 		DeletePropertyResponse res = new DeletePropertyResponse();
-		ms = ThreadLocals.ensure(ms);
 		String nodeId = req.getNodeId();
 		SubNode node = read.getNode(ms, nodeId);
 		auth.ownerAuthByThread(node);
@@ -576,7 +568,6 @@ public class NodeEditService extends ServiceBase {
 	 */
 	public SplitNodeResponse splitNode(MongoSession ms, SplitNodeRequest req) {
 		SplitNodeResponse res = new SplitNodeResponse();
-		ms = ThreadLocals.ensure(ms);
 		String nodeId = req.getNodeId();
 
 		// log.debug("Splitting node: " + nodeId);
@@ -646,7 +637,6 @@ public class NodeEditService extends ServiceBase {
 
 	public TransferNodeResponse transferNode(MongoSession ms, TransferNodeRequest req) {
 		TransferNodeResponse res = new TransferNodeResponse();
-		ms = ThreadLocals.ensure(ms);
 		int transfers = 0;
 		String nodeId = req.getNodeId();
 
@@ -716,7 +706,6 @@ public class NodeEditService extends ServiceBase {
 	 */
 	public UpdateHeadingsResponse updateHeadings(MongoSession ms, UpdateHeadingsRequest req) {
 		UpdateHeadingsResponse res = new UpdateHeadingsResponse();
-		ms = ThreadLocals.ensure(ms);
 
 		SubNode node = read.getNode(ms, req.getNodeId(), true);
 		String content = node.getContent();
@@ -798,7 +787,6 @@ public class NodeEditService extends ServiceBase {
 
 	public SearchAndReplaceResponse searchAndReplace(MongoSession ms, SearchAndReplaceRequest req) {
 		SearchAndReplaceResponse res = new SearchAndReplaceResponse();
-		ms = ThreadLocals.ensure(ms);
 		int replacements = 0;
 		String nodeId = req.getNodeId();
 

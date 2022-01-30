@@ -50,7 +50,6 @@ public class UserFeedService extends ServiceBase  {
 		if (sc.isAnonUser())
 			return res;
 
-		ms = ThreadLocals.ensure(ms);
 		String pathToSearch = NodePath.ROOT_OF_ALL_USERS;
 
 		Query q = new Query();
@@ -95,7 +94,6 @@ public class UserFeedService extends ServiceBase  {
 		boolean testQuery = false;
 		SessionContext sc = ThreadLocals.getSC();
 		NodeFeedResponse res = new NodeFeedResponse();
-		ms = ThreadLocals.ensure(ms);
 
 		String pathToSearch = testQuery ? "/r" : NodePath.ROOT_OF_ALL_USERS;
 		boolean doAuth = true;

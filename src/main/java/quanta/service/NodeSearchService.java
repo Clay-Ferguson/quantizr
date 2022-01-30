@@ -65,7 +65,6 @@ public class NodeSearchService extends ServiceBase  {
 
 	public NodeSearchResponse search(MongoSession ms, NodeSearchRequest req) {
 		NodeSearchResponse res = new NodeSearchResponse();
-		ms = ThreadLocals.ensure(ms);
 		String searchText = req.getSearchText();
 
 		// if no search text OR sort order specified that's a bad request.

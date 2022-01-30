@@ -643,7 +643,6 @@ public class UserManagerService extends ServiceBase {
 	public BlockUserResponse blockUser(MongoSession ms, BlockUserRequest req) {
 		BlockUserResponse res = new BlockUserResponse();
 		String userName = ThreadLocals.getSC().getUserName();
-		ms = ThreadLocals.ensure(ms);
 
 		// get the node that holds all blocked users
 		SubNode blockedList =
@@ -718,7 +717,6 @@ public class UserManagerService extends ServiceBase {
 		// apUtil.log("addFriend request: " + XString.prettyPrint(req));
 		AddFriendResponse res = new AddFriendResponse();
 		String userName = ThreadLocals.getSC().getUserName();
-		ms = ThreadLocals.ensure(ms);
 
 		String _newUserName = req.getUserName().trim();
 		_newUserName = XString.stripIfStartsWith(_newUserName, "@");

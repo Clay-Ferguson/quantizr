@@ -444,10 +444,6 @@ public class SessionContext extends ServiceBase {
 		return pushEmitter;
 	}
 
-	public void setPushEmitter(SseEmitter pushEmitter) {
-		this.pushEmitter = pushEmitter;
-	}
-
 	public String getCaptcha() {
 		return captcha;
 	}

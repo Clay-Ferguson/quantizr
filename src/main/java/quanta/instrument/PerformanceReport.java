@@ -14,7 +14,7 @@ public class PerformanceReport {
 	private static final Logger log = LoggerFactory.getLogger(PerformanceReport.class);
 
 	// Any calls that complete faster than this time, are not even considered. They're not a problem.
-	public static final int REPORT_THRESHOLD = 1300; // todo-0 1300 for prod
+	public static final int REPORT_THRESHOLD = 1300; // 1300 for prod
 
 	public static String getReport() {
 		StringBuilder sb = new StringBuilder();
