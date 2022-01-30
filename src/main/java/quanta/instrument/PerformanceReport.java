@@ -45,10 +45,10 @@ public class PerformanceReport {
 		if (!rows.isEmpty()) {
 			sb.append(htmlTable(htmlTr( //
 					htmlTh("user") + //
-							htmlTh("event") + //
-							htmlTh("time") + //
-							htmlTh("roodId") + //
-							htmlTh("eventId"))
+							htmlTh("Event") + //
+							htmlTh("Time") + //
+							htmlTh("Root Id") + //
+							htmlTh("Event Id"))
 					+ rows));
 		}
 
@@ -77,7 +77,7 @@ public class PerformanceReport {
 		if (!rows.isEmpty()) {
 			sb.append(htmlTable(htmlTr( //
 					htmlTh("user") + //
-							htmlTh("Call Count")) //
+							htmlTh("Count")) //
 					+ rows));
 		}
 
@@ -97,7 +97,7 @@ public class PerformanceReport {
 
 		// -------------------------------------------
 		upiList.sort((s1, s2) -> (int) (s2.totalTime / s2.totalCalls - s1.totalTime / s1.totalCalls));
-		sb.append(htmlH(3, "Avgerage Time Per Call"));
+		sb.append(htmlH(3, "Avg Time Per Call"));
 		rows = "";
 		for (UserPerf se : upiList) {
 			rows += htmlTr(htmlTd(se.user) + htmlTdRt(DateUtil.formatDurationMillis(se.totalTime / se.totalCalls, true)));
@@ -105,7 +105,7 @@ public class PerformanceReport {
 		if (!rows.isEmpty()) {
 			sb.append(htmlTable(htmlTr( //
 					htmlTh("user") + //
-							htmlTh("Avg. Time")) //
+							htmlTh("Avg Time")) //
 					+ rows));
 		}
 
@@ -139,8 +139,8 @@ public class PerformanceReport {
 
 		String table = htmlTr( //
 				htmlTh("Category") + //
-						htmlTh("Call Count") + //
-						htmlTh("Avg. Call Time"));
+						htmlTh("Count") + //
+						htmlTh("Avg. Time"));
 
 		for (MethodStat stat : orderedStats) {
 			table += htmlTr( //
@@ -178,8 +178,8 @@ public class PerformanceReport {
 				if (!rows.isEmpty()) {
 					set += "<br>" + htmlTable(htmlTr( //
 							htmlTh("user") + //
-									htmlTh("event") + //
-									htmlTh("time") + //
+									htmlTh("Event") + //
+									htmlTh("Time") + //
 									htmlTh("Root Id") + //
 									htmlTh("Event Id"))
 							+ rows) + "<br>";

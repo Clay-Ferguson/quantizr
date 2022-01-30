@@ -10,6 +10,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.stereotype.Component;
 import quanta.config.ServiceBase;
+import quanta.instrument.PerfMon;
 import quanta.model.PropertyInfo;
 import quanta.model.client.NodeType;
 import quanta.model.client.PrivilegeType;
@@ -56,6 +57,7 @@ public class MongoCreate extends ServiceBase {
 	 * 
 	 * relPath can be null if no path is known
 	 */
+	@PerfMon(category = "create")
 	public SubNode createNode(MongoSession ms, SubNode parent, String relPath, String type, Long ordinal,
 			CreateNodeLocation location, List<PropertyInfo> properties, ObjectId ownerId, boolean updateParentOrdinals) {
 		if (no(relPath)) {
@@ -79,6 +81,10 @@ public class MongoCreate extends ServiceBase {
 		if (no(parent)) {
 			ordinal = 0L;
 		} else {
+			/*
+			 * todo-0: this branch is a bottleck (except for location==LAST case) on large nodes (many
+			 * children). Get rid of this as parameter also and just allow null location to indicate NOT this.
+			 */
 			if (updateParentOrdinals) {
 				if (no(ordinal)) {
 					ordinal = 0L;
@@ -87,7 +93,7 @@ public class MongoCreate extends ServiceBase {
 				Long _ordinal = ordinal;
 				// this updates the parent so we run as admin.
 				ordinal = (Long) arun.run(as -> {
-					return prepOrdinalForLocation(as, location, parent, _ordinal);
+					return create.prepOrdinalForLocation(as, location, parent, _ordinal);
 				});
 			}
 		}
@@ -103,17 +109,18 @@ public class MongoCreate extends ServiceBase {
 		return node;
 	}
 
+	@PerfMon(category = "create")
 	private Long prepOrdinalForLocation(MongoSession ms, CreateNodeLocation location, SubNode parent, Long ordinal) {
 		switch (location) {
 			case FIRST:
 				ordinal = 0L;
-				insertOrdinal(ms, parent, 0L, 1L);
+				create.insertOrdinal(ms, parent, 0L, 1L);
 				break;
 			case LAST:
 				ordinal = read.getMaxChildOrdinal(ms, parent) + 1;
 				break;
 			case ORDINAL:
-				insertOrdinal(ms, parent, ordinal, 1L);
+				create.insertOrdinal(ms, parent, ordinal, 1L);
 				break;
 			default:
 				throw new RuntimeException("Unknown ordinal");
@@ -128,6 +135,7 @@ public class MongoCreate extends ServiceBase {
 	 * slot for the new ordinal positions for some new nodes to be inserted into this newly available
 	 * range of unused sequential ordinal values (range of 'ordinal+1' thru 'ordinal+1+rangeSize')
 	 */
+	@PerfMon(category = "create")
 	public void insertOrdinal(MongoSession ms, SubNode node, long ordinal, long rangeSize) {
 		long maxOrdinal = ordinal + rangeSize;
 
@@ -137,8 +145,14 @@ public class MongoCreate extends ServiceBase {
 		update.saveSession(ms);
 
 		Criteria crit = Criteria.where(SubNode.ORDINAL).gte(ordinal);
-		for (SubNode child : read.getChildren(ms, node.getId(), Sort.by(Sort.Direction.ASC, SubNode.ORDINAL), null, 0,
-				null, crit)) {
+		/*
+		 * todo-0: MASSIVE PERFORMANCE BOTTLENECK
+		 * 
+		 * For operations like this we DO need to use the BULK insert operation (is BULK the right
+		 * word,...batch?) todo-0: Also need to find out how to avoid this call whenever possible...
+		 */
+		for (SubNode child : read.getChildren(ms, node.getId(), Sort.by(Sort.Direction.ASC, SubNode.ORDINAL), null, 0, null,
+				crit)) {
 			child.setOrdinal(maxOrdinal++);
 		}
 	}

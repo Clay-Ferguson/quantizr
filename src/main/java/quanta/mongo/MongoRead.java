@@ -1108,6 +1108,8 @@ public class MongoRead extends ServiceBase {
     /*
      * Returns one (or first) node contained directly under path (non-recursively) that has a matching
      * propName and propVal
+     * 
+     * todo-0: How many places do we need a partial index for very common operations? Namely ActivityPub processing.
      */
     @PerfMon(category = "read")
     public SubNode findNodeByProp(MongoSession ms, SubNode node, String propName, String propVal) {

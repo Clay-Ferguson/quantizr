@@ -280,7 +280,7 @@ export class FeedView extends AppTab<FeedViewProps> {
             this.data.props.feedFilterToPublic && //
             !this.data.props.feedFilterLocalServer && //
             !this.data.props.feedFilterRootNode) {
-            subHeading = "Public Posts";
+            subHeading = "Public Fediverse";
         }
 
         return subHeading ? ": " + subHeading : "";

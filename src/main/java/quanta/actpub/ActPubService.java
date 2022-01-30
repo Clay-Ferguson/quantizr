@@ -66,8 +66,6 @@ public class ActPubService extends ServiceBase {
     public static boolean userRefresh = false;
     public static boolean bigRefresh = false;
 
-    private static final Object inboxLock = new Object();
-
     /*
      * When 'node' has been created under 'parent' (by the sessionContext user) this will send a
      * notification to foreign servers. This call returns immediately and delegates the actuall
@@ -301,6 +299,7 @@ public class ActPubService extends ServiceBase {
     /**
      * Gets foreign account SubNode using actorUrl, using the cached copy of found.
      */
+    @PerfMon(category = "apub")
     public SubNode getAcctNodeByActorUrl(MongoSession ms, String actorUrl) {
         saveFediverseName(actorUrl);
 
@@ -314,7 +313,7 @@ public class ActPubService extends ServiceBase {
 
         // if webfinger was successful, ensure the user is imported into our system.
         if (ok(actor)) {
-            acctNode = importActor(ms, null, actor);
+            acctNode = apub.importActor(ms, null, actor);
             if (ok(acctNode)) {
                 // Any time we have an account node being cached we should cache it by it's ID too right away.
                 apCache.acctNodesById.put(acctNode.getIdStr(), acctNode);
@@ -329,6 +328,7 @@ public class ActPubService extends ServiceBase {
      * exists and the caller happens to have it we can pass in as non-null userNode and it will get
      * used.
      */
+    @PerfMon(category = "apub")
     public SubNode importActor(MongoSession ms, SubNode userNode, Object actor) {
 
         // if userNode unknown then get and/or create one. May be creating a brand new one even.
@@ -428,13 +428,16 @@ public class ActPubService extends ServiceBase {
      * Processes incoming INBOX requests for (Follow, Undo Follow), to be called by foreign servers to
      * follow a user on this server
      */
-    @PerfMon(category = "actPub")
+    @PerfMon(category = "apub")
     public void processInboxPost(HttpServletRequest httpReq, Object payload) {
+        String actorUrl = AP.str(payload, APObj.actor);
+
         /*
-         * todo-1: for now we mutext the inbox becasue I noticed a scenario where Mastodon post TWO
-         * simultaneous calls for the SAME node, and we shouldn't allow that.
+         * I noticed a scenario where Mastodon post TWO simultaneous calls for the SAME node, and we
+         * shouldn't allow that, so we lock on each actor so no actor can have two concurrent threads
+         * working on it.
          */
-        synchronized (inboxLock) {
+        synchronized (apUtil.getActorLock(actorUrl)) {
             String type = AP.str(payload, APObj.type);
             if (no(type))
                 return;
@@ -443,7 +446,7 @@ public class ActPubService extends ServiceBase {
 
             switch (type) {
                 case APType.Create:
-                    processCreateAction(httpReq, payload);
+                    apub.processCreateAction(httpReq, payload);
                     break;
 
                 case APType.Follow:
@@ -451,11 +454,11 @@ public class ActPubService extends ServiceBase {
                     break;
 
                 case APType.Undo:
-                    processUndoAction(payload);
+                    apub.processUndoAction(payload);
                     break;
 
                 case APType.Delete:
-                    processDeleteAction(httpReq, payload);
+                    apub.processDeleteAction(httpReq, payload);
                     break;
 
                 default:
@@ -466,6 +469,7 @@ public class ActPubService extends ServiceBase {
     }
 
     /* Process inbound undo actions (coming from foreign servers) */
+    @PerfMon(category = "apub")
     public void processUndoAction(Object payload) {
         Object obj = AP.obj(payload, APObj.object);
         String type = AP.str(obj, APObj.type);
@@ -481,15 +485,19 @@ public class ActPubService extends ServiceBase {
         }
     }
 
+    @PerfMon(category = "apub")
     public void processCreateAction(HttpServletRequest httpReq, Object payload) {
-        arun.<Object>run(session -> {
+        arun.<Object>run(ms -> {
             apUtil.log("processCreateAction");
+
+            // get actor url from payload object
             String actorUrl = AP.str(payload, APObj.actor);
             if (no(actorUrl)) {
                 log.debug("no 'actor' found on create action request posted object");
                 return null;
             }
 
+            // Get ActorObject from actor url.
             APObj actorObj = apUtil.getActorByUrl(actorUrl);
             if (no(actorObj)) {
                 log.debug("Unable to load actorUrl: " + actorUrl);
@@ -505,7 +513,7 @@ public class ActPubService extends ServiceBase {
 
             switch (type) {
                 case APType.Note:
-                    processCreateNote(session, actorUrl, actorObj, object);
+                    apub.processCreateNote(ms, actorUrl, actorObj, object);
                     break;
 
                 default:
@@ -517,6 +525,7 @@ public class ActPubService extends ServiceBase {
         });
     }
 
+    @PerfMon(category = "apub")
     public void processDeleteAction(HttpServletRequest httpReq, Object payload) {
         arun.<Object>run(session -> {
             apUtil.log("processDeleteAction");
@@ -564,6 +573,7 @@ public class ActPubService extends ServiceBase {
     }
 
     /* obj is the 'Note' object */
+    @PerfMon(category = "apub")
     public void processCreateNote(MongoSession ms, String actorUrl, Object actorObj, Object obj) {
         apUtil.log("processCreateNote");
         /*
@@ -594,7 +604,7 @@ public class ActPubService extends ServiceBase {
          */
         if (ok(nodeBeingRepliedTo)) {
             apUtil.log("foreign actor replying to a quanta node.");
-            saveNote(ms, null, nodeBeingRepliedTo, obj, false, false);
+            apub.saveNote(ms, null, nodeBeingRepliedTo, obj, false, false);
         }
         /*
          * Otherwise the node is not a reply so we put it under POSTS node inside the foreign account node
@@ -603,12 +613,12 @@ public class ActPubService extends ServiceBase {
          */
         else {
             apUtil.log("not reply to existing Quanta node.");
-            SubNode actorAccountNode = getAcctNodeByActorUrl(ms, actorUrl);
+            SubNode actorAccountNode = apub.getAcctNodeByActorUrl(ms, actorUrl);
             if (ok(actorAccountNode)) {
                 String userName = actorAccountNode.getStr(NodeProp.USER.s());
                 SubNode postsNode = read.getUserNodeByType(ms, userName, actorAccountNode, "### Posts",
                         NodeType.ACT_PUB_POSTS.s(), Arrays.asList(PrivilegeType.READ.s()), NodeName.POSTS);
-                saveNote(ms, actorAccountNode, postsNode, obj, false, false);
+                apub.saveNote(ms, actorAccountNode, postsNode, obj, false, false);
             }
         }
     }
@@ -623,6 +633,7 @@ public class ActPubService extends ServiceBase {
      * a local user so the node should be considered 'temporary' and can be deleted after a week or so
      * to clean the Db.
      */
+    @PerfMon(category = "apub")
     public void saveNote(MongoSession ms, SubNode toAccountNode, SubNode parentNode, Object obj, boolean forcePublic,
             boolean temp) {
         apUtil.log("saveNote"); // + XString.prettyPrint(obj));
@@ -677,7 +688,7 @@ public class ActPubService extends ServiceBase {
             toAccountNode = getAcctNodeByActorUrl(ms, objAttributedTo);
         }
         SubNode newNode =
-                create.createNode(ms, parentNode, null, null, 0L, CreateNodeLocation.FIRST, null, toAccountNode.getId(), true);
+                create.createNode(ms, parentNode, null, null, 0L, CreateNodeLocation.LAST, null, toAccountNode.getId(), true);
 
         apUtil.log("createNode");
 
@@ -719,8 +730,8 @@ public class ActPubService extends ServiceBase {
         // part of troubleshooting the non-english language detection
         // newNode.setProp("lang", lang);
 
-        shareToAllObjectRecipients(ms, newNode, obj, APObj.to);
-        shareToAllObjectRecipients(ms, newNode, obj, APObj.cc);
+        apub.shareToAllObjectRecipients(ms, newNode, obj, APObj.to);
+        apub.shareToAllObjectRecipients(ms, newNode, obj, APObj.cc);
 
         if (forcePublic) {
             acl.addPrivilege(ms, newNode, PrincipalName.PUBLIC.s(),
@@ -729,6 +740,7 @@ public class ActPubService extends ServiceBase {
 
         update.save(ms, newNode);
         addAttachmentIfExists(ms, newNode, obj);
+
         try {
             push.pushNodeUpdateToBrowsers(ms, null, newNode);
         } catch (Exception e) {
@@ -741,6 +753,7 @@ public class ActPubService extends ServiceBase {
      * 
      * The node save is expected to be done external to this function after this function runs.
      */
+    @PerfMon(category = "apub")
     private void shareToAllObjectRecipients(MongoSession ms, SubNode node, Object obj, String propName) {
         List<?> list = AP.list(obj, propName);
         if (ok(list)) {
@@ -775,7 +788,7 @@ public class ActPubService extends ServiceBase {
          * try that first
          */
         if (!url.contains("/followers")) {
-            shareNodeToActorByUrl(ms, node, url);
+            apub.shareNodeToActorByUrl(ms, node, url);
         }
         /*
          * else assume this is a 'followers' url. Sharing normally will include a 'followers' and run this
@@ -814,6 +827,7 @@ public class ActPubService extends ServiceBase {
      * Shares this node to the designated user using their actorUrl and is expected to work even if the
      * actorUrl points to a local user
      */
+    @PerfMon(category = "apub")
     private void shareNodeToActorByUrl(MongoSession ms, SubNode node, String actorUrl) {
         apUtil.log("Sharing node to actorUrl: " + actorUrl);
         /*
@@ -1113,8 +1127,7 @@ public class ActPubService extends ServiceBase {
 
             arun.run(ms -> {
                 // Query to pull all user accounts
-                Iterable<SubNode> accountNodes =
-                        read.findSubNodesByType(ms, MongoUtil.allUsersRootNode, NodeType.ACCOUNT.s());
+                Iterable<SubNode> accountNodes = read.findSubNodesByType(ms, MongoUtil.allUsersRootNode, NodeType.ACCOUNT.s());
 
                 for (SubNode acctNode : accountNodes) {
 
@@ -1235,8 +1248,7 @@ public class ActPubService extends ServiceBase {
         newPostsInCycle = 0;
 
         arun.run(ms -> {
-            Iterable<SubNode> accountNodes =
-                    read.findSubNodesByType(ms, MongoUtil.allUsersRootNode, NodeType.ACCOUNT.s());
+            Iterable<SubNode> accountNodes = read.findSubNodesByType(ms, MongoUtil.allUsersRootNode, NodeType.ACCOUNT.s());
 
             for (SubNode node : accountNodes) {
                 if (!prop.isDaemonsEnabled())
@@ -1264,8 +1276,7 @@ public class ActPubService extends ServiceBase {
             return "ActivityPub not enabled";
 
         return arun.run(ms -> {
-            Iterable<SubNode> accountNodes =
-                    read.findSubNodesByType(ms, MongoUtil.allUsersRootNode, NodeType.ACCOUNT.s());
+            Iterable<SubNode> accountNodes = read.findSubNodesByType(ms, MongoUtil.allUsersRootNode, NodeType.ACCOUNT.s());
 
             // Load the list of all known users
             HashSet<String> knownUsers = new HashSet<>();
@@ -1312,8 +1323,7 @@ public class ActPubService extends ServiceBase {
 
         return arun.run(ms -> {
             long totalDelCount = 0;
-            Iterable<SubNode> accountNodes =
-                    read.findSubNodesByType(ms, MongoUtil.allUsersRootNode, NodeType.ACCOUNT.s());
+            Iterable<SubNode> accountNodes = read.findSubNodesByType(ms, MongoUtil.allUsersRootNode, NodeType.ACCOUNT.s());
 
             for (SubNode node : accountNodes) {
                 String userName = node.getStr(NodeProp.USER.s());

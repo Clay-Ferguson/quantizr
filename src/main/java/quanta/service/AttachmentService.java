@@ -766,6 +766,7 @@ public class AttachmentService extends ServiceBase {
 	 *        method and get an inputStream handed back that can be read from. Normally the inputStream
 	 *        Val is null and not used.
 	 */
+	@PerfMon(category = "attach")
 	public void readFromUrl(MongoSession ms, String sourceUrl, String nodeId, String mimeHint, int maxFileSize,
 			boolean storeLocally) {
 		if (sourceUrl.startsWith("data:")) {

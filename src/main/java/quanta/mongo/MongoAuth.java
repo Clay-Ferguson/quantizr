@@ -127,6 +127,7 @@ public class MongoAuth extends ServiceBase {
 	 * Returns a list of all user names that are shared to on this node, including "public" if any are
 	 * public.
 	 */
+	@PerfMon(category = "auth")
 	public List<String> getUsersSharedTo(MongoSession ms, SubNode node) {
 		List<String> userNames = null;
 

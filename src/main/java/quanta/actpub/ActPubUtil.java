@@ -17,6 +17,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 import java.util.TimeZone;
+import java.util.concurrent.ConcurrentHashMap;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -61,6 +62,9 @@ public class ActPubUtil extends ServiceBase {
 
     @Autowired
     private AppProp prop;
+
+    // Holds an actor lock object for each actor url (key=url, val=lock)
+    public final ConcurrentHashMap<String, Object> actorLocks = new ConcurrentHashMap<>();
 
     /*
      * RestTemplate is thread-safe and reusable, and has no state, so we need only one final static
@@ -173,6 +177,7 @@ public class ActPubUtil extends ServiceBase {
      * @param waitSeconds Number of seconds to wait for server to come online before giving up
      * @return
      */
+    @PerfMon(category = "apUtil")
     public APObj getJson(String url, MediaType mediaType, int waitSeconds) {
         // log.debug("getJson: " + url);
         APObj ret = null;
@@ -286,6 +291,7 @@ public class ActPubUtil extends ServiceBase {
      * Effeciently gets the Actor by using a cache to ensure we never get the same Actor twice until the
      * app restarts at least, o
      */
+    @PerfMon(category = "apUtil")
     public APObj getActorByUrl(String url) {
         if (no(url))
             return null;
@@ -299,7 +305,7 @@ public class ActPubUtil extends ServiceBase {
         }
 
         try {
-            actor = getJson(url, APConst.MTYPE_ACT_JSON);
+            actor = apUtil.getJson(url, APConst.MTYPE_ACT_JSON);
 
             if (ok(actor)) {
                 String userName = getLongUserNameFromActor(actor);
@@ -737,6 +743,14 @@ public class ActPubUtil extends ServiceBase {
             }
             return null;
         });
+    }
+
+    public Object getActorLock(String actorUrl) {
+        if (actorUrl == null) {
+            actorUrl = "n"; // none is allowed/tolerated
+        }
+        actorUrl = actorUrl.replace("https://", ""); // shorten a bit
+        return actorLocks.putIfAbsent(actorUrl, new Object());
     }
 
     @EventListener

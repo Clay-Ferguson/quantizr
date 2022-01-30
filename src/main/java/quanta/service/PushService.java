@@ -11,6 +11,7 @@ import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter.SseEventBuilder;
 import quanta.config.ServiceBase;
 import quanta.config.SessionContext;
+import quanta.instrument.PerfMon;
 import quanta.model.NodeInfo;
 import quanta.mongo.MongoSession;
 import quanta.mongo.model.SubNode;
@@ -28,51 +29,53 @@ public class PushService extends ServiceBase {
 
 	/* Notify all users being shared to on this node, or everyone if the node is public. */
 	public void pushNodeUpdateToBrowsers(MongoSession ms, HashSet<Integer> sessionsPushed, SubNode node) {
-		// log.debug("Pushing update to all friends: id=" + node.getIdStr());
+		exec.run(() -> {
+			// log.debug("Pushing update to all friends: id=" + node.getIdStr());
 
-		/* get list of userNames this node is shared to (one of them may be 'public') */
-		List<String> usersSharedTo = auth.getUsersSharedTo(ms, node);
+			/* get list of userNames this node is shared to (one of them may be 'public') */
+			List<String> usersSharedTo = auth.getUsersSharedTo(ms, node);
 
-		// if node has no sharing we're done here
-		if (no(usersSharedTo)) {
-			return;
-		}
-
-		// put user names in a hash set for faster performance
-		HashSet<String> usersSharedToSet = new HashSet<>();
-		usersSharedToSet.addAll(usersSharedTo);
-
-		/* Scan all sessions and push message to the ones that need to see it */
-		for (SessionContext sc : SessionContext.getAllSessions(true)) {
-			// if we know we already just pushed to this session, we can skip it in here.
-			if (ok(sessionsPushed) && sessionsPushed.contains(sc.hashCode())) {
-				continue;
+			// if node has no sharing we're done here
+			if (no(usersSharedTo)) {
+				return;
 			}
 
-			/* Anonymous sessions won't have userName and can be ignored */
-			if (no(sc.getUserName()))
-				continue;
+			// put user names in a hash set for faster performance
+			HashSet<String> usersSharedToSet = new HashSet<>();
+			usersSharedToSet.addAll(usersSharedTo);
 
-			/*
-			 * push if the sc user is in the shared set or this session is OURs
-			 * 
-			 * Having "public" option here (pushing public nodes to everyone) floods in too many messages to be
-			 * practical, becuase the ActivityPub deamon that reads messages pushes them. Handling that firehose
-			 * of posts is a cool feature but will take some time to think thru the usability issues, so for now
-			 * we only live-push messages to the browser that created them (the guy who did the save), and the
-			 * people a node is specifically shared to.
-			 */
-			if (sc.getRootId().equals(node.getOwner().toHexString()) || // node owned by this 'sc' user
-			// usersSharedToSet.contains("public") ||
-					usersSharedToSet.contains(sc.getUserName())) {
-				/* build our push message payload */
-				NodeInfo nodeInfo = convert.convertToNodeInfo(sc, ms, node, true, false, 1, false, false, true, false);
-				FeedPushInfo pushInfo = new FeedPushInfo(nodeInfo);
+			/* Scan all sessions and push message to the ones that need to see it */
+			for (SessionContext sc : SessionContext.getAllSessions(true)) {
+				// if we know we already just pushed to this session, we can skip it in here.
+				if (ok(sessionsPushed) && sessionsPushed.contains(sc.hashCode())) {
+					continue;
+				}
 
-				// push notification message to browser
-				sendServerPushInfo(sc, pushInfo);
+				/* Anonymous sessions won't have userName and can be ignored */
+				if (no(sc.getUserName()))
+					continue;
+
+				/*
+				 * push if the sc user is in the shared set or this session is OURs
+				 * 
+				 * Having "public" option here (pushing public nodes to everyone) floods in too many messages to be
+				 * practical, becuase the ActivityPub deamon that reads messages pushes them. Handling that firehose
+				 * of posts is a cool feature but will take some time to think thru the usability issues, so for now
+				 * we only live-push messages to the browser that created them (the guy who did the save), and the
+				 * people a node is specifically shared to.
+				 */
+				if (sc.getRootId().equals(node.getOwner().toHexString()) || // node owned by this 'sc' user
+				// usersSharedToSet.contains("public") ||
+						usersSharedToSet.contains(sc.getUserName())) {
+					/* build our push message payload */
+					NodeInfo nodeInfo = convert.convertToNodeInfo(sc, ms, node, true, false, 1, false, false, true, false);
+					FeedPushInfo pushInfo = new FeedPushInfo(nodeInfo);
+
+					// push notification message to browser
+					push.sendServerPushInfo(sc, pushInfo);
+				}
 			}
-		}
+		});
 	}
 
 	/*
@@ -131,6 +134,7 @@ public class PushService extends ServiceBase {
 		}
 	}
 
+	@PerfMon(category = "push")
 	public void sendServerPushInfo(SessionContext sc, ServerPushInfo info) {
 		// If user is currently logged in we have a session here.
 		if (no(sc))
@@ -141,6 +145,7 @@ public class PushService extends ServiceBase {
 			if (no(pushEmitter))
 				return;
 
+			// todo-0: do we need this synchronizing here? bottleneck?
 			synchronized (pushEmitter) {
 				log.debug("Pushing to User: " + sc.getUserName());
 				try {

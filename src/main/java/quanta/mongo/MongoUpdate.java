@@ -11,6 +11,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import quanta.config.ServiceBase;
+import quanta.instrument.PerfMon;
 import quanta.model.UserStats;
 import quanta.model.client.NodeProp;
 import quanta.mongo.model.SubNode;
@@ -23,7 +24,7 @@ import quanta.util.XString;
  * Performs update (as in CRUD) operations for MongoDB
  */
 @Component
-public class MongoUpdate extends ServiceBase  {
+public class MongoUpdate extends ServiceBase {
 	private static final Logger log = LoggerFactory.getLogger(MongoUpdate.class);
 
 	// NOTE: Since this is a threadlocal we have no concurrency protection (not needed)
@@ -37,6 +38,7 @@ public class MongoUpdate extends ServiceBase  {
 		save(ms, node, true);
 	}
 
+	@PerfMon(category = "update")
 	public void save(MongoSession ms, SubNode node, boolean allowAuth) {
 		if (allowAuth) {
 			auth.ownerAuth(ms, node);
@@ -57,13 +59,14 @@ public class MongoUpdate extends ServiceBase  {
 	}
 
 	public void saveSession(MongoSession ms) {
-		saveSession(ms, false);
+		update.saveSession(ms, false);
 	}
 
 	private boolean isSaving() {
 		return ok(saving.get()) && saving.get().booleanValue();
 	}
 
+	@PerfMon(category = "update")
 	public void saveSession(MongoSession ms, boolean asAdmin) {
 		if (no(ms) || isSaving() || !ThreadLocals.hasDirtyNodes())
 			return;
@@ -74,9 +77,9 @@ public class MongoUpdate extends ServiceBase  {
 
 			synchronized (ms) {
 				/*
-				 * We use 'nodes' list to avoid a concurrent modification, because calling 'save()' on a node
-				 * will have the side effect of removing it from dirtyNodes, and that can't happen during
-				 * the loop below because we're iterating over dirtyNodes.
+				 * We use 'nodes' list to avoid a concurrent modification, because calling 'save()' on a node will
+				 * have the side effect of removing it from dirtyNodes, and that can't happen during the loop below
+				 * because we're iterating over dirtyNodes.
 				 */
 				List<SubNode> nodes = new LinkedList<>();
 
@@ -105,7 +108,7 @@ public class MongoUpdate extends ServiceBase  {
 				for (SubNode node : nodes) {
 					// log.debug("saveSession: Saving Dirty. nodeId=" + (node.getId()==null ? "null
 					// (new node?)" : node.getIdStr()));
-					save(ms, node, false);
+					update.save(ms, node, false);
 				}
 
 				/*

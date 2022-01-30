@@ -591,6 +591,7 @@ public class MongoUtil extends ServiceBase {
 
 		// dropIndex(session, SubNode.class, "unique-apid");
 		createPartialUniqueIndex(ms, "unique-apid", SubNode.class, SubNode.PROPERTIES + "." + NodeProp.ACT_PUB_ID.s() + ".value");
+		createPartialUniqueIndex(ms, "unique-user", SubNode.class, SubNode.PROPERTIES + "." + NodeProp.USER.s() + ".value");
 
 		// DO NOT DELETE:
 		// This is a good example of how to cleanup the DB of all constraint violations prior to adding some
@@ -860,6 +861,7 @@ public class MongoUtil extends ServiceBase {
 		// return "^" + Pattern.quote(path) + "\\/(.+)$";
 	}
 
+	@PerfMon(category = "mongoUtil")
 	public SubNode createUser(MongoSession ms, String user, String email, String password, boolean automated) {
 		SubNode userNode = read.getUserNodeByUserName(ms, user);
 		if (ok(userNode)) {
