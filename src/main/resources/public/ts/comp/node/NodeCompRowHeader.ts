@@ -49,6 +49,11 @@ export class NodeCompRowHeader extends Div {
 
             displayName = S.util.insertActPubTags(displayName, node);
 
+            // If user had nothin but ":tags:" in their display name, then display there userName
+            if (!displayName) {
+                displayName = node.owner;
+            }
+
             let span: Span = null;
             children.push(span = new Span(displayName, {
                 className: (node.owner === state.userName) ? "created-by-me" : "created-by-other",

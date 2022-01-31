@@ -1127,7 +1127,7 @@ export class Util {
         }
 
         // the above algo isn't working fully yet so we rip out any ":tag:" items still in the text
-        if (val.indexOf(":") !== -1 && val.indexOf(" ") !== -1) {
+        if (val.indexOf(":") !== -1) {
 
             // split val into words (space delimited)
             tags = val.split(/ /);
