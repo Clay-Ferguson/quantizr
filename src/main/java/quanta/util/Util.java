@@ -29,6 +29,19 @@ public class Util {
 	private static final Logger log = LoggerFactory.getLogger(Util.class);
 	private static final Random rand = new Random();
 
+	private static final String[] IP_HEADERS_TO_TRY = {
+		"X-Forwarded-For",
+		"Proxy-Client-IP",
+		"WL-Proxy-Client-IP",
+		"HTTP_X_FORWARDED_FOR",
+		"HTTP_X_FORWARDED",
+		"HTTP_X_CLUSTER_CLIENT_IP",
+		"HTTP_CLIENT_IP",
+		"HTTP_FORWARDED_FOR",
+		"HTTP_FORWARDED",
+		"HTTP_VIA",
+		"REMOTE_ADDR" };
+
 	public static boolean no(Object o) {
 		return o == null;
 	}
@@ -50,31 +63,13 @@ public class Util {
 	 * way you can try determining the source IP.
 	 */
 	public static String getClientIpAddr(HttpServletRequest request) {
-		String ip = request.getHeader("X-Forwarded-For");
-		if (!unknownIp(ip))
-			return ip;
-
-		ip = request.getHeader("Proxy-Client-IP");
-		if (!unknownIp(ip))
-			return ip;
-
-		ip = request.getHeader("WL-Proxy-Client-IP");
-		if (!unknownIp(ip))
-			return ip;
-
-		ip = request.getHeader("HTTP_CLIENT_IP");
-		if (!unknownIp(ip))
-			return ip;
-
-		ip = request.getHeader("HTTP_X_FORWARDED_FOR");
-		if (!unknownIp(ip))
-			return ip;
-
-		ip = request.getRemoteAddr();
-		if (!unknownIp(ip))
-			return ip;
-
-		return "unknown";
+		for (String header : IP_HEADERS_TO_TRY) {
+			String ip = request.getHeader(header);
+			if (StringUtils.isNotEmpty(ip) && !"unknown".equalsIgnoreCase(ip)) {
+				return ip;
+			}
+		}
+		return request.getRemoteAddr();
 	}
 
 	public static boolean unknownIp(String ip) {

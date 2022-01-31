@@ -14,6 +14,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.GenericFilterBean;
+import quanta.util.ThreadLocals;
 import quanta.util.Util;
 
 /**
@@ -40,16 +41,22 @@ public class HitFilter extends GenericFilterBean {
 	}
 
 	private void updateHitCounter(HttpServletRequest httpReq) {
-		String ip = Util.getClientIpAddr(httpReq);
+		ThreadLocals.setIp(Util.getClientIpAddr(httpReq));
+		addHit(uniqueIpHits);
+	}
 
-		synchronized (uniqueIpHits) {
-			Integer hitCount = ok(ip) ? uniqueIpHits.get(ip) : null;
+	public static void addHit(HashMap<String, Integer> hashMap) {
+		String ip = ThreadLocals.getIp();
+		if (no(ip)) return;
+
+		synchronized (hashMap) {
+			Integer hitCount = ok(ip) ? hashMap.get(ip) : null;
 
 			if (no(hitCount)) {
-				uniqueIpHits.put(ip, 1);
+				hashMap.put(ip, 1);
 			} else {
 				hitCount = hitCount.intValue() + 1;
-				uniqueIpHits.put(ip, hitCount);
+				hashMap.put(ip, hitCount);
 			}
 		}
 	}

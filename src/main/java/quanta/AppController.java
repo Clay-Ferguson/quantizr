@@ -45,6 +45,7 @@ import quanta.config.GracefulShutdown;
 import quanta.config.ServiceBase;
 import quanta.config.SessionContext;
 import quanta.exception.base.RuntimeEx;
+import quanta.filter.HitFilter;
 import quanta.instrument.PerfMon;
 import quanta.instrument.PerformanceReport;
 import quanta.mail.EmailSender;
@@ -157,6 +158,8 @@ import quanta.util.Util;
 @Controller
 public class AppController extends ServiceBase implements ErrorController {
 	private static final Logger log = LoggerFactory.getLogger(AppController.class);
+
+	public static final HashMap<String, Integer> uniqueUserIpHits = new HashMap<>();
 
 	@Autowired
 	private AppProp prop;
@@ -291,6 +294,7 @@ public class AppController extends ServiceBase implements ErrorController {
 		if (ok(signupCode)) {
 			ThreadLocals.getSC().setUserMessage(user.processSignupCode(signupCode));
 		}
+		HitFilter.addHit(uniqueUserIpHits);
 		return "index";
 	}
 

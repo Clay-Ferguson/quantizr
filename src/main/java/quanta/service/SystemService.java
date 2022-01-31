@@ -17,6 +17,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import quanta.AppController;
 import quanta.config.AppProp;
 import quanta.config.AppSessionListener;
 import quanta.config.ServiceBase;
@@ -236,8 +237,14 @@ public class SystemService extends ServiceBase {
 		return output.toString();
 	}
 
+	/*
+	 * uniqueIps are all IPs even comming from foreign FediverseServers, but uniqueUserIps are the ones
+	 * that represent actual users accessing thru their browsers
+	 */
 	private static String getIpReport() {
-		return "Number of Unique IPs since startup: " + HitFilter.getUniqueIpHits().size() + "\n";
+		return "Unique IPs: " + HitFilter.getUniqueIpHits().size() + "\n" + "Unique USER IPs: " //
+				+ AppController.uniqueUserIpHits.size() + "\n";
+
 		// StringBuilder sb = new StringBuilder();
 		// sb.append("Unique IPs During Run<br>");
 		// int count = 0;

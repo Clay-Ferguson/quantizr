@@ -35,6 +35,7 @@ public class ThreadLocals {
 	private static final ThreadLocal<ResponseBase> response = new ThreadLocal<>();
 	private static final ThreadLocal<MongoSession> session = new ThreadLocal<>();
 	private static final ThreadLocal<String> reqBearerToken = new ThreadLocal<>();
+	private static final ThreadLocal<String> ip = new ThreadLocal<>();
 
 	/*
 	 * Each thread will set this when a root event is created and any other events that get created,
@@ -72,6 +73,7 @@ public class ThreadLocals {
 		response.remove();
 		reqBearerToken.remove();
 		rootEvent.remove();
+		ip.remove();
 
 		getDirtyNodes().clear();
 		getCachedNodes().clear();
@@ -154,6 +156,14 @@ public class ThreadLocals {
 
 	public static String getReqBearerToken() {
 		return reqBearerToken.get();
+	}
+
+	public static void setIp(String val) {
+		ip.set(val);
+	}
+
+	public static String getIp() {
+		return ip.get();
 	}
 
 	public static void setParentCheckEnabled(Boolean val) {
