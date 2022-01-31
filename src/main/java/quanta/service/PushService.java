@@ -148,7 +148,7 @@ public class PushService extends ServiceBase {
 			// Note: Each session has it's own pushEmitter, so this will not be a bottleck, and is desirable even
 			// probably to be sure each session is only doing one emit at a time.
 			synchronized (pushEmitter) {
-				log.debug("Pushing to User: " + sc.getUserName());
+				// log.debug("Pushing to User: " + sc.getUserName());
 				try {
 					SseEventBuilder event = SseEmitter.event() //
 							.data(info) //
@@ -165,7 +165,6 @@ public class PushService extends ServiceBase {
 					 * 
 					 * pushEmitter.send(info, MediaType.APPLICATION_JSON);
 					 */
-					log.debug("Pushed ok");
 				} catch (Exception ex) {
 					log.error("FAILED Pushing to Session User: " + sc.getUserName());
 					pushEmitter.completeWithError(ex);

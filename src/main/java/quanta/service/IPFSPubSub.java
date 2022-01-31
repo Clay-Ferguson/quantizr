@@ -238,7 +238,7 @@ public class IPFSPubSub extends ServiceBase {
                 continue;
             }
 
-            log.debug("Pushing to session: sc.user: " + sc.getUserName() + " " + payload);
+            // log.debug("Pushing to session: sc.user: " + sc.getUserName() + " " + payload);
             push.sendServerPushInfo(sc, pushInfo);
         }
     }

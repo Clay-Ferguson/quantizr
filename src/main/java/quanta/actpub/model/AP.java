@@ -47,11 +47,10 @@ public class AP {
                         + (ok(val) ? val.getClass().getName() : "null\n\non object:" + XString.prettyPrint(obj)));
                 return null;
             }
-        } else {
-            return null;
-        }
-        // throw new RuntimeException("unhandled type on str(): " + (ok(obj) ? obj.getClass().getName()
-        // : "null"));
+        } 
+
+        log.warn("unhandled type on str(): " + (ok(obj) ? obj.getClass().getName() : "null"));
+        return null;
     }
 
     public static Boolean bool(Object obj, String prop) {
@@ -63,12 +62,11 @@ public class AP {
                 return ((String) val).equalsIgnoreCase(APConst.TRUE);
             } else if (val instanceof Boolean) {
                 return ((Boolean) val).booleanValue();
-            } else {
-                throw new RuntimeException(
-                        "unhandled type on bool() return val: " + (ok(val) ? val.getClass().getName() : "null"));
             }
         }
-        throw new RuntimeException("unhandled type on bool(): " + (ok(obj) ? obj.getClass().getName() : "null"));
+
+        log.warn("unhandled type on bool(): " + (ok(obj) ? obj.getClass().getName() : "null"));
+        return false;
     }
 
     public static Integer integer(Object obj, String prop) {
@@ -82,12 +80,10 @@ public class AP {
                 return ((Long) val).intValue();
             } else if (val instanceof String) {
                 return Integer.valueOf((String) val);
-            } else {
-                throw new RuntimeException(
-                        "unhandled type on integer() return val: " + (ok(val) ? val.getClass().getName() : "null"));
-            }
+            } 
         }
-        throw new RuntimeException("unhandled type on integer(): " + (ok(obj) ? obj.getClass().getName() : "null"));
+        log.warn("unhandled type on integer(): " + (ok(obj) ? obj.getClass().getName() : "null"));
+        return 0;
     }
 
     public static Date date(Object obj, String prop) {
@@ -97,12 +93,10 @@ public class AP {
                 return null;
             } else if (val instanceof String) {
                 return DateUtil.parseISOTime((String) val);
-            } else {
-                throw new RuntimeException(
-                        "unhandled type on date() return val: " + (ok(val) ? val.getClass().getName() : "null"));
-            }
+            } 
         }
-        throw new RuntimeException("unhandled type on date(): " + (ok(obj) ? obj.getClass().getName() : "null"));
+        log.warn("unhandled type on date(): " + (ok(obj) ? obj.getClass().getName() : "null"));
+        return null;
     }
 
     public static List<?> list(Object obj, String prop) {
@@ -112,18 +106,18 @@ public class AP {
                 return null;
             } else if (val instanceof List<?>) {
                 return (List<?>) val;
-            } else {
-                throw new RuntimeException(
-                        "unhandled type on list() return val: " + (ok(val) ? val.getClass().getName() : "null"));
-            }
+            } 
         }
-        throw new RuntimeException("unhandled type on list(): " + (ok(obj) ? obj.getClass().getName() : "null"));
+
+        log.warn("unhandled type on list(): " + (ok(obj) ? obj.getClass().getName() : "null"));
+        return null;
     }
 
     public static Object obj(Object obj, String prop) {
         if (obj instanceof Map<?, ?>) {
             return ((Map<?, ?>) obj).get(prop);
         }
-        throw new RuntimeException("unhandled type on obj(): " + (ok(obj) ? obj.getClass().getName() : "null"));
+        log.warn("unhandled type on obj(): " + (ok(obj) ? obj.getClass().getName() : "null"));
+        return null;
     }
 }
