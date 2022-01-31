@@ -93,7 +93,7 @@ export class RightNavPanel extends Div {
                     ]),
 
                     new Div(null, { className: "bigMarginBottom" }, [
-                        (allowEditMode && !fullScreenViewer) ? new Checkbox("Edit", null, {
+                        (allowEditMode && !fullScreenViewer) ? new Checkbox("Edit", { title: "Allow editing content" }, {
                             setValue: (checked: boolean): void => {
                                 S.edit.toggleEditMode(state);
                             },
@@ -102,7 +102,7 @@ export class RightNavPanel extends Div {
                             }
                         }, "form-switch form-check-inline") : null,
 
-                        !fullScreenViewer ? new Checkbox("Meta", null, {
+                        !fullScreenViewer ? new Checkbox("Meta", { title: "Metadata: Avatars, timestamps, etc." }, {
                             setValue: (checked: boolean): void => {
                                 S.edit.toggleShowMetaData(state);
                             },
