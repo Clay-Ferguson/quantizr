@@ -51,7 +51,7 @@ import quanta.util.XString;
  * searching but I'm not fully doing so yet I don't believe.
  */
 @Component
-public class NodeSearchService extends ServiceBase  {
+public class NodeSearchService extends ServiceBase {
 	private static final Logger log = LoggerFactory.getLogger(NodeSearchService.class);
 
 	public static Object trendingFeedInfoLock = new Object();
@@ -87,10 +87,13 @@ public class NodeSearchService extends ServiceBase  {
 				searchResults.add(info);
 			}
 		} else if ("node.name".equals(req.getSearchProp())) {
-			if (ThreadLocals.getSC().isAdmin()) {
-				searchText = ":" + searchText;
-			} else {
-				searchText = ":" + ThreadLocals.getSC().getUserName() + ":" + searchText;
+			/* Undocumented Feature: You can find named nodes using format ":userName:nodeName" */
+			if (!searchText.contains(":")) {
+				if (ThreadLocals.getSC().isAdmin()) {
+					searchText = ":" + searchText;
+				} else {
+					searchText = ":" + ThreadLocals.getSC().getUserName() + ":" + searchText;
+				}
 			}
 			SubNode node = read.getNode(ms, searchText, true);
 			if (ok(node)) {

@@ -33,12 +33,12 @@
 
 .profileImage {
     @extend .profileImageBase;
-    border: 3px dotted $nodeBorderBottomColor;
+    border: 2px dotted $nodeBorderBottomColor;
 }
 
 .profileImageNoHeader {
     @extend .profileImageBaseNoHeader;
-    border: 3px dotted $nodeBorderBottomColor;
+    border: 2px dotted $nodeBorderBottomColor;
 }
 
 .readOnlyProfileImage {
@@ -68,7 +68,7 @@
 
 .profileHeaderImage {
     @extend .profileHeaderImageBase;
-    border: 3px dotted $nodeBorderBottomColor;
+    border: 2px dotted $nodeBorderBottomColor;
 }
 
 .readOnlyProfileHeaderImage {
@@ -82,21 +82,21 @@
 
 .profileImageHolder {
     @extend .profileImageBase;
-    border: 3px dotted $nodeBorderBottomColor;
+    border: 2px dotted $nodeBorderBottomColor;
     padding: 12px;
     min-height: 120px;
 }
 
 .profileImageHolderNoHeader {
     @extend .profileImageBaseNoHeader;
-    border: 3px dotted $nodeBorderBottomColor;
+    border: 2px dotted $nodeBorderBottomColor;
     padding: 12px;
     min-height: 120px;
 }
 
 .profileHeaderImageHolder {
     @extend .profileHeaderImageBase;
-    border: 3px dotted $nodeBorderBottomColor;
+    border: 2px dotted $nodeBorderBottomColor;
     min-height: 120px;
     padding: 12px;
 }
