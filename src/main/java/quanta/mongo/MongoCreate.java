@@ -64,7 +64,7 @@ public class MongoCreate extends ServiceBase {
 	 */
 	@PerfMon(category = "create")
 	public SubNode createNode(MongoSession ms, SubNode parent, String relPath, String type, Long ordinal,
-			CreateNodeLocation location, List<PropertyInfo> properties, ObjectId ownerId, boolean updateParentOrdinals) {
+			CreateNodeLocation location, List<PropertyInfo> properties, ObjectId ownerId, boolean updateOrdinals) {
 		if (no(relPath)) {
 			/*
 			 * Adding a node ending in '?' will trigger for the system to generate a leaf node automatically.
@@ -86,11 +86,7 @@ public class MongoCreate extends ServiceBase {
 		if (no(parent)) {
 			ordinal = 0L;
 		} else {
-			/*
-			 * todo-0: this branch is a bottleck (except for location==LAST case) on large nodes (many
-			 * children). Get rid of this as parameter also and just allow null location to indicate NOT this.
-			 */
-			if (updateParentOrdinals) {
+			if (updateOrdinals) {
 				if (no(ordinal)) {
 					ordinal = 0L;
 				}
@@ -139,9 +135,6 @@ public class MongoCreate extends ServiceBase {
 	 * Shifts all child ordinals down (increments them by rangeSize), that are >= 'ordinal' to make a
 	 * slot for the new ordinal positions for some new nodes to be inserted into this newly available
 	 * range of unused sequential ordinal values (range of 'ordinal+1' thru 'ordinal+1+rangeSize')
-	 * 
-	 * todo-0: Even with the bulk update being used, need to find all calls to this and see if there are
-	 * any we can eliminate or optimize in some way.
 	 */
 	@PerfMon(category = "create")
 	public void insertOrdinal(MongoSession ms, SubNode node, long ordinal, long rangeSize) {
