@@ -795,10 +795,7 @@ public class IPFSService extends ServiceBase {
     }
 
     public PublishNodeToIpfsResponse publishNodeToIpfs(MongoSession ms, PublishNodeToIpfsRequest req) {
-        if (!ThreadLocals.getSC().isAdmin()) {
-            throw ExUtil.wrapEx("admin only function.");
-        }
-
+        ThreadLocals.requireAdmin();
         PublishNodeToIpfsResponse res = new PublishNodeToIpfsResponse();
         SyncToIpfsService svc = (SyncToIpfsService) context.getBean(SyncToIpfsService.class);
         svc.writeIpfsFiles(ms, req, res);
@@ -806,10 +803,7 @@ public class IPFSService extends ServiceBase {
     }
 
     public LoadNodeFromIpfsResponse loadNodeFromIpfs(MongoSession ms, LoadNodeFromIpfsRequest req) {
-        if (!ThreadLocals.getSC().isAdmin()) {
-            throw ExUtil.wrapEx("admin only function.");
-        }
-
+        ThreadLocals.requireAdmin();
         LoadNodeFromIpfsResponse res = new LoadNodeFromIpfsResponse();
         SyncFromIpfsService svc = (SyncFromIpfsService) context.getBean(SyncFromIpfsService.class);
         svc.writeNodes(ms, req, res);

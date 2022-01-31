@@ -31,9 +31,7 @@ public class ImportBookService extends ServiceBase {
 	public InsertBookResponse insertBook(MongoSession ms, InsertBookRequest req) {
 		InsertBookResponse res = new InsertBookResponse();
 		ms = ThreadLocals.ensure(ms);
-		if (!ThreadLocals.getSC().isAdmin() && !ThreadLocals.getSC().isTestAccount()) {
-			throw ExUtil.wrapEx("insertBook is an admin-only feature.");
-		}
+		ThreadLocals.requireAdmin();
 
 		String nodeId = req.getNodeId();
 		SubNode node = read.getNode(ms, nodeId);

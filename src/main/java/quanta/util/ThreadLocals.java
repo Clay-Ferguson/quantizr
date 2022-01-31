@@ -79,6 +79,12 @@ public class ThreadLocals {
 		session.remove();
 	}
 
+	public static void requireAdmin() {
+		if (!getSC().isAdmin()) {
+			throw ExUtil.wrapEx("admin only function.");
+		}
+	}
+
 	public static ThreadLocalsContext getContext() {
 		// log.debug("getting context from thread: " + Thread.currentThread().getName());
 		ThreadLocalsContext ctx = new ThreadLocalsContext();

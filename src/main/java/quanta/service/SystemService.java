@@ -45,9 +45,7 @@ public class SystemService extends ServiceBase {
 	private AppProp prop;
 
 	public String rebuildIndexes() {
-		if (!ThreadLocals.getSC().isAdmin()) {
-			throw ExUtil.wrapEx("admin only function.");
-		}
+		ThreadLocals.requireAdmin();
 
 		arun.run(mongoSession -> {
 			mongoUtil.rebuildIndexes(mongoSession);

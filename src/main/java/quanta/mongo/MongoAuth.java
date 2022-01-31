@@ -204,7 +204,9 @@ public class MongoAuth extends ServiceBase {
 		else {
 			ac.put(parent.getOwner().toHexString(), new AccessControl(null, "rd,wr"));
 
-			if (StringUtil.isEmpty(child.getContent())) {
+			// if no content, and the parent isn't our own node
+			if (StringUtil.isEmpty(child.getContent()) && // 
+					!parent.getOwner().toHexString().equals(ThreadLocals.getSC().getRootId())) {
 				SubNode parentUserNode = read.getNode(ms, parent.getOwner());
 				if (ok(parentUserNode)) {
 					child.setContent("@" + parentUserNode.getStr(NodeProp.USER) + " ");

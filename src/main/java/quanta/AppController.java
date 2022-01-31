@@ -152,7 +152,7 @@ import quanta.util.Util;
  * 
  * There's a lot of boiler-plate code in here, but it's just required. This is probably the only
  * code in the system that looks 'redundant' (non-DRY), but this is because we want certain things
- * in certain layers (abstraction related and for loose-coupling). 
+ * in certain layers (abstraction related and for loose-coupling).
  */
 @Controller
 public class AppController extends ServiceBase implements ErrorController {
@@ -323,12 +323,14 @@ public class AppController extends ServiceBase implements ErrorController {
 	@PerfMon
 	@GetMapping(value = {"/fediverse-users"}, produces = MediaType.TEXT_PLAIN_VALUE)
 	public @ResponseBody String fediverseUsers() {
+		ThreadLocals.requireAdmin();
 		return apub.dumpFediverseUsers();
 	}
 
 	// NOPE! No performance monitor for this. @PerfMon
 	@GetMapping(value = {"/performance-report"}, produces = MediaType.TEXT_HTML_VALUE)
 	public @ResponseBody String performanceReport() {
+		ThreadLocals.requireAdmin();
 		return PerformanceReport.getReport();
 	}
 
@@ -656,9 +658,7 @@ public class AppController extends ServiceBase implements ErrorController {
 	public @ResponseBody Object transferNode(@RequestBody TransferNodeRequest req, HttpSession session) {
 		SessionContext.checkReqToken();
 		return callProc.run("export", req, session, ms -> {
-			if (!ThreadLocals.getSC().isAdmin()) {
-				throw ExUtil.wrapEx("admin only function.");
-			}
+			ThreadLocals.requireAdmin();
 			return edit.transferNode(ms, req);
 		});
 	}
@@ -729,10 +729,7 @@ public class AppController extends ServiceBase implements ErrorController {
 	public @ResponseBody Object insertBook(@RequestBody InsertBookRequest req, HttpSession session) {
 		SessionContext.checkReqToken();
 		return callProc.run("insertBook", req, session, ms -> {
-			if (!ThreadLocals.getSC().isAdmin()) {
-				throw ExUtil.wrapEx("admin only function.");
-			}
-
+			ThreadLocals.requireAdmin();
 			return importBookService.insertBook(ms, req);
 		});
 	}
@@ -1286,8 +1283,8 @@ public class AppController extends ServiceBase implements ErrorController {
 
 			if (req.getCommand().equalsIgnoreCase("getJson")) {
 				// allow this one if user owns node.
-			} else if (!ThreadLocals.getSC().isAdmin()) {
-				throw ExUtil.wrapEx("admin only function.");
+			} else {
+				ThreadLocals.requireAdmin();
 			}
 
 			log.debug("Command: " + req.getCommand());
@@ -1375,9 +1372,7 @@ public class AppController extends ServiceBase implements ErrorController {
 	public @ResponseBody Object luceneIndex(@RequestBody LuceneIndexRequest req, HttpSession session) {
 		SessionContext.checkReqToken();
 		return callProc.run("luceneIndex", req, session, ms -> {
-			if (!ThreadLocals.getSC().isAdmin()) {
-				throw ExUtil.wrapEx("admin only function.");
-			}
+			ThreadLocals.requireAdmin();
 
 			/*
 			 * We need to run this in a thread, and return control back to browser imediately, and then have the
@@ -1392,9 +1387,7 @@ public class AppController extends ServiceBase implements ErrorController {
 	public @ResponseBody Object luceneSearch(@RequestBody LuceneSearchRequest req, HttpSession session) {
 		SessionContext.checkReqToken();
 		return callProc.run("luceneSearch", req, session, ms -> {
-			if (!ThreadLocals.getSC().isAdmin()) {
-				throw ExUtil.wrapEx("admin only function.");
-			}
+			ThreadLocals.requireAdmin();
 			return lucene.search(ms, req.getNodeId(), req.getText());
 		});
 	}
@@ -1415,9 +1408,7 @@ public class AppController extends ServiceBase implements ErrorController {
 		SessionContext.checkReqToken();
 		return callProc.run("sendTestEmail", req, session, ms -> {
 			SendTestEmailResponse res = new SendTestEmailResponse();
-			if (!ThreadLocals.getSC().isAdmin()) {
-				throw ExUtil.wrapEx("admin only function.");
-			}
+			ThreadLocals.requireAdmin();
 			log.debug("SendEmailTest detected on server.");
 
 			String timeString = new Date().toString();
