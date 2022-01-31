@@ -3,11 +3,16 @@ package quanta.mongo;
 import static quanta.util.Util.no;
 import static quanta.util.Util.ok;
 import java.util.List;
+import com.mongodb.bulk.BulkWriteResult;
 import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.mongodb.core.BulkOperations;
+import org.springframework.data.mongodb.core.BulkOperations.BulkMode;
 import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.Query;
+import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Component;
 import quanta.config.ServiceBase;
 import quanta.instrument.PerfMon;
@@ -134,6 +139,9 @@ public class MongoCreate extends ServiceBase {
 	 * Shifts all child ordinals down (increments them by rangeSize), that are >= 'ordinal' to make a
 	 * slot for the new ordinal positions for some new nodes to be inserted into this newly available
 	 * range of unused sequential ordinal values (range of 'ordinal+1' thru 'ordinal+1+rangeSize')
+	 * 
+	 * todo-0: Even with the bulk update being used, need to find all calls to this and see if there are
+	 * any we can eliminate or optimize in some way.
 	 */
 	@PerfMon(category = "create")
 	public void insertOrdinal(MongoSession ms, SubNode node, long ordinal, long rangeSize) {
@@ -145,15 +153,33 @@ public class MongoCreate extends ServiceBase {
 		update.saveSession(ms);
 
 		Criteria crit = Criteria.where(SubNode.ORDINAL).gte(ordinal);
-		/*
-		 * todo-0: MASSIVE PERFORMANCE BOTTLENECK
-		 * 
-		 * For operations like this we DO need to use the BULK insert operation (is BULK the right
-		 * word,...batch?) Also just need to try to avoid this call whenever possible...
-		 */
+
+		// DO NOT DELETE
+		// (this is the equivalent non-bulk way to perform the operations)
+		// for (SubNode child : read.getChildren(ms, node.getId(), Sort.by(Sort.Direction.ASC,
+		// SubNode.ORDINAL), null, 0, null,
+		// crit)) {
+		// child.setOrdinal(maxOrdinal++);
+		// }
+
+		BulkOperations bulkOps = null;
+
 		for (SubNode child : read.getChildren(ms, node.getId(), Sort.by(Sort.Direction.ASC, SubNode.ORDINAL), null, 0, null,
 				crit)) {
-			child.setOrdinal(maxOrdinal++);
+
+			// lazy create bulkOps (in case no children were found)
+			if (no(bulkOps)) {
+				bulkOps = ops.bulkOps(BulkMode.UNORDERED, SubNode.class);
+			}
+
+			Query query = new Query().addCriteria(new Criteria("id").is(child.getId()));
+			Update update = new Update().set(SubNode.ORDINAL, maxOrdinal++);
+			bulkOps.updateOne(query, update);
+		}
+
+		if (ok(bulkOps)) {
+			BulkWriteResult results = bulkOps.execute();
+			// log.debug("Bulk Ordinal: updated " + results.getModifiedCount() + " nodes.");
 		}
 	}
 }
