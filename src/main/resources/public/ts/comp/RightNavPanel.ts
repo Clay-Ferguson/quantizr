@@ -54,11 +54,14 @@ export class RightNavPanel extends Div {
         let avatarImg = this.makeAvatarDiv(state, !!headerImg);
 
         let displayName = state.displayName ? state.displayName : (!state.isAnonUser ? state.userName : null);
-        displayName = S.util.insertActPubTags(displayName, state.node);
 
-        // If user had nothin but ":tags:" in their display name, then display there userName
-        if (!displayName) {
-            displayName = state.node.owner;
+        if (displayName && state.node) {
+            displayName = S.util.insertActPubTags(displayName, state.node);
+
+            // If user had nothing left after insertion after ":tags:" replacement in their display name, then display their userName
+            if (!displayName) {
+                displayName = state.node.owner;
+            }
         }
 
         let allowEditMode = state.node && !state.isAnonUser;

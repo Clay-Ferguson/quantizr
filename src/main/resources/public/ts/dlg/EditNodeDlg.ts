@@ -334,12 +334,14 @@ export class EditNodeDlg extends DialogBase {
         let sharingDiv = null;
         let sharingDivClearFix = null;
         if (sharingNames) {
-            // let isPublic = sharingNames.toLowerCase().indexOf("public") !== -1;
-
-            sharingDiv = new Div("Shared to: " + sharingNames, {
-                className: "marginBottom float-end sharingLabel",
+            sharingDiv = new Div(null, {
+                className: "marginBottom float-end",
                 onClick: () => this.utl.share(this)
-            });
+            }, [
+                new Span("Shared to: "),
+                new Span(sharingNames, {
+                    className: "sharingLabel"
+                })]);
             sharingDivClearFix = new Clearfix();
         }
 

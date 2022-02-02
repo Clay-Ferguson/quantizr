@@ -300,9 +300,8 @@ export class NodeUtil {
         if (!node || !node.ac) return null;
         let delimiter = multiLine ? "\n" : ", ";
 
-        let names = S.props.isPublic(node) ? ("public [" + this.getPublicPrivilegesDisplay(node) + "]") : "";
+        let names = S.props.isPublic(node) ? ("Public " + this.getPublicPrivilegesDisplay(node)) : "";
         for (let ac of node.ac) {
-
             if (!ac.principalName) {
                 console.log("missing principalName on acl: " + S.util.prettyPrint(ac));
             }
@@ -324,11 +323,18 @@ export class NodeUtil {
         for (let ac of node.ac) {
             if (ac.principalName === "public") {
                 // console.log("AC: " + S.util.prettyPrint(ac));
+                // Note: I'm leaving this loop, but really all this will generate in 'val' is either nothing
+                // at all or "(+Replies)" (for now)
                 for (let p of ac.privileges) {
                     if (val) {
                         val += ",";
                     }
-                    val += p.privilegeName;
+
+                    // todo-0: I'm seeing a single privilegeName in here as "rd,wr" (both in a single string) is this correct or a bug?
+                    if (p.privilegeName.indexOf(J.PrivilegeType.WRITE) !== -1) {
+                        val += "+Replies";
+                    }
+                    // val += p.privilegeName;
                 }
                 break;
             }
