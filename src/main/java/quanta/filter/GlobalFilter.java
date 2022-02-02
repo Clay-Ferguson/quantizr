@@ -45,7 +45,7 @@ public class GlobalFilter extends GenericFilterBean {
 				// Special checks for Cache-Controls
 				if (sreq.getRequestURI().contains("/images/") || //
 						sreq.getRequestURI().contains("/fonts/") || //
-						sreq.getRequestURI().endsWith("/bundle.js") || //
+						sreq.getRequestURI().contains("/dist/main.") || // JS bundle file
 						sreq.getRequestURI().endsWith("/images/favicon.ico") || //
 						// This is the tricky one. If we have versioned the URL we detect it this hacky way also picking up
 						// v param.
