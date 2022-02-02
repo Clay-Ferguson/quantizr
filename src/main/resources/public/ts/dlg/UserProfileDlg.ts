@@ -307,9 +307,10 @@ export class UserProfileDlg extends DialogBase {
         }
         else {
             if (this.readOnly) {
-                return new Div(null, {
+                return new Div("User has not set their Avatar Image.", {
                     className: hasHeaderImg ? "readOnlyProfileImage" : "readOnlyProfileImageNoHeader"
                 });
+
             }
             return new Div("Click to upload Avatar Image", {
                 className: hasHeaderImg ? "profileImageHolder" : "profileImageHolderNoHeader",

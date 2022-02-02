@@ -136,7 +136,7 @@ export class NodeCompRowHeader extends Div {
         }
 
         if (node.name) {
-            floatUpperRightDiv.addChild(new Span(node.name, { className: "sharingNamesDisp", title: "Node name" }));
+            floatUpperRightDiv.addChild(new Span(node.name, { className: "nodeNameDisp", title: "Node name" }));
         }
 
         if (S.props.isPublic(node)) {
