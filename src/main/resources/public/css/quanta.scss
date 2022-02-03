@@ -164,7 +164,7 @@ $mobileHeaderHeight: 3.5em;
 
 .signupLinkText {
     cursor: pointer;
-    font-size: 125%;
+    font-size: small;
     margin-bottom: 16px;
 }
 
@@ -172,7 +172,6 @@ $mobileHeaderHeight: 3.5em;
     display: inline-block;
     margin-top: 16px;
     cursor: pointer;
-    font-size: 125%;
 }
 
 .fullScreenToolbar {
@@ -401,7 +400,6 @@ a {
 .trendingSectionTitle {
     margin-bottom: 10px;
     padding-bottom: 10px;
-    border-bottom: 4px solid $nodeBorderBottomColor;
 }
 
 .headerImageRHS {
