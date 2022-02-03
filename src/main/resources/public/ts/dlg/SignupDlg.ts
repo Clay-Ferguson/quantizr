@@ -38,14 +38,13 @@ export class SignupDlg extends DialogBase {
                         className: "captchaImage"
                     }),
                     new Div(null, null, [
-                        new TextField("Captcha", false, null, null, false, this.captchaState),
-
-                        new ButtonBar([
-                            new Button("Create Account", this.signup, null, "btn-primary"),
-                            new Button("Cancel", this.close)
-                        ], "marginTop")
+                        new TextField("Captcha", false, null, null, false, this.captchaState)
                     ])
-                ])
+                ]),
+                new ButtonBar([
+                    new Button("Create Account", this.signup, null, "btn-primary"),
+                    new Button("Cancel", this.close)
+                ], "marginTop")
             ])
         ];
     }

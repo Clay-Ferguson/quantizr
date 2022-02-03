@@ -1779,6 +1779,14 @@ audio::-webkit-media-controls-play-button {
     border-spacing: 10px;
 }
 
+.horizontalLayout {
+    display: table;
+    border-spacing: 10px;
+    border-collapse: collapse;
+    margin-top: $smallGap;
+    margin-bottom: $smallGap;
+}
+
 .displayTableNoSpacing {
     display: table;
 }

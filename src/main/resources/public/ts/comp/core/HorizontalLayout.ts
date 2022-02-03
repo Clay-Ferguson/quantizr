@@ -8,7 +8,7 @@ constructor is called. This is because we dynamically render a table layout here
 children dynamically at render time */
 export class HorizontalLayout extends Div {
 
-    constructor(public comps: Comp[] = null, classes: string = "displayTable", attribs: any = {}) {
+    constructor(public comps: Comp[] = null, classes: string = "horizontalLayout", attribs: any = {}) {
         super(null, attribs || {});
         this.attribs.className = classes;
     }

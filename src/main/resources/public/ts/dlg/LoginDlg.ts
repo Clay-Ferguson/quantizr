@@ -4,6 +4,7 @@ import { Button } from "../comp/core/Button";
 import { ButtonBar } from "../comp/core/ButtonBar";
 import { Div } from "../comp/core/Div";
 import { Form } from "../comp/core/Form";
+import { Span } from "../comp/core/Span";
 import { TextField } from "../comp/core/TextField";
 import { Constants as C } from "../Constants";
 import { DialogBase } from "../DialogBase";
@@ -27,8 +28,10 @@ export class LoginDlg extends DialogBase {
             new Form(null, [
                 new TextField("User", false, this.login, null, false, this.userState),
                 new TextField("Password", true, this.login, null, false, this.pwdState),
-                new Div("Signup", { className: "clickable marginTop", onClick: this.signup }),
-                new Div("Forgot Password", { className: "clickable marginTop", onClick: this.resetPassword })
+                new Div(null, { className: "marginTop marginBottom" }, [
+                    new Span("Signup", { className: "clickable", onClick: this.signup }),
+                    new Span("Reset Password", { className: "clickable float-end", onClick: this.resetPassword })
+                ])
             ])
         ];
     }

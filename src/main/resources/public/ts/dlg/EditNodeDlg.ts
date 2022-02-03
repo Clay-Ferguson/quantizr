@@ -391,7 +391,6 @@ export class EditNodeDlg extends DialogBase {
         let imgSizeSelection = S.props.hasImage(state.node) ? this.createImgSizeSelection("Image Size", false, "float-end", //
             new PropValueHolder(this.getState<LS>().node, J.NodeProp.IMG_SIZE, "100%")) : null;
 
-        // NOTE: col numbers in the children of LayoutRow must add up to 12 (per bootstrap)!
         let topBinRow = new HorizontalLayout([
             new Div(null, { className: "bigMarginRight" }, [
                 new Div((ipfsLink ? "IPFS " : "") + "Attachment", {
