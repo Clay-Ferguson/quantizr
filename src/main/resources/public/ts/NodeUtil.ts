@@ -330,7 +330,6 @@ export class NodeUtil {
                         val += ",";
                     }
 
-                    // todo-0: I'm seeing a single privilegeName in here as "rd,wr" (both in a single string) is this correct or a bug?
                     if (p.privilegeName.indexOf(J.PrivilegeType.WRITE) !== -1) {
                         val += "+Replies";
                     }

@@ -20,6 +20,11 @@ menu:
     #   link: "tab:feedTab"
 
 help:
+  menu:
+    account: |
+      Account Node
+      Navigates you to the root node of your account.
+
   nodeStats:
     dialog: |
       Node Stats

@@ -3,6 +3,7 @@ import { appState, dispatch, store } from "./AppRedux";
 import { AppState } from "./AppState";
 import { Div } from "./comp/core/Div";
 import { Icon } from "./comp/core/Icon";
+import { Markdown } from "./comp/core/Markdown";
 import { Menu } from "./comp/Menu";
 import { MenuItem } from "./comp/MenuItem";
 import { MenuItemSeparator } from "./comp/MenuItemSeparator";
@@ -10,6 +11,7 @@ import { Constants as C } from "./Constants";
 import { ImportCryptoKeyDlg } from "./dlg/ImportCryptoKeyDlg";
 import { ManageEncryptionKeysDlg } from "./dlg/ManageEncryptionKeysDlg";
 import { MediaRecorderDlg } from "./dlg/MediaRecorderDlg";
+import { MessageDlg } from "./dlg/MessageDlg";
 import { SearchAndReplaceDlg } from "./dlg/SearchAndReplaceDlg";
 import { SearchByIDDlg } from "./dlg/SearchByIDDlg";
 import { SearchByNameDlg } from "./dlg/SearchByNameDlg";
@@ -189,7 +191,7 @@ export class MenuPanel extends Div {
         }
 
         children.push(new Menu("Tree", [
-            new MenuItem("Account", S.nav.navHome, !state.isAnonUser),
+            new MenuItem("Account", S.nav.navHome, !state.isAnonUser, null), // This works, but not being used yet -> this.makeHelpIcon(() => S.quanta?.config?.help?.menu?.account)),
             new MenuItem("Portal Home", MenuPanel.openHomeNode, !state.isAnonUser),
             new MenuItem("Public Posts", MenuPanel.openPostsNode, !state.isAnonUser),
             new MenuItemSeparator(), //
@@ -483,6 +485,29 @@ export class MenuPanel extends Div {
         }
 
         this.setChildren(children);
+    }
+
+    /* The textGetter must be a fuction because the config text is loaded asynchronously */
+    makeHelpIcon = (textGetter: () => string): Icon => {
+        return new Icon({
+            className: "fa fa-question-circle fa-lg float-end menuIcon",
+            title: "Display help info for this menu item",
+            onClick: (event: any) => {
+                let text: string = textGetter();
+                event.stopPropagation();
+                event.preventDefault();
+                if (!text) return;
+                let idx = text.indexOf("\n");
+                if (idx !== -1) {
+                    let title = text.substring(0, idx);
+                    let content = text.substring(idx);
+                    // content = content.replace("\n\n", "[nl]");
+                    // content = content.replace("\n", " ");
+                    // content = content.replace("[nl]", "\n\n");
+                    new MessageDlg(null, title, null, new Markdown(content), false, 0, null, store.getState()).open();
+                }
+            }
+        })
     }
 
     siteNavCustomItems = (state: AppState): Div[] => {
