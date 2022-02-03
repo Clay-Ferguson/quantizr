@@ -65,8 +65,7 @@ export class ShareToPersonDlg extends DialogBase {
         let res: J.AddPrivilegeResponse = await S.util.ajax<J.AddPrivilegeRequest, J.AddPrivilegeResponse>("addPrivilege", {
             nodeId: this.node.id,
             principal: userName,
-            privileges: [J.PrivilegeType.READ, J.PrivilegeType.WRITE],
-            recursive: false
+            privileges: [J.PrivilegeType.READ, J.PrivilegeType.WRITE]
         });
         this.reload(res);
     }

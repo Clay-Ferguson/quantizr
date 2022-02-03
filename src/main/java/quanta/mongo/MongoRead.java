@@ -908,7 +908,7 @@ public class MongoRead extends ServiceBase {
             }
 
             if (ok(defaultPrivs)) {
-                acl.addPrivilege(ms, node, PrincipalName.PUBLIC.s(), defaultPrivs, null);
+                acl.addPrivilege(ms, null, node, PrincipalName.PUBLIC.s(), defaultPrivs, null);
             }
 
             update.save(ms, node);
@@ -920,7 +920,7 @@ public class MongoRead extends ServiceBase {
          */
         if (ok(node) && NodeType.POSTS.s().equals(type) && !NodeName.POSTS.equals(node.getName())) {
             node.setName(NodeName.POSTS);
-            acl.addPrivilege(ms, node, PrincipalName.PUBLIC.s(), Arrays.asList(PrivilegeType.READ.s()), null);
+            acl.addPrivilege(ms, null, node, PrincipalName.PUBLIC.s(), Arrays.asList(PrivilegeType.READ.s()), null);
             update.save(ms, node);
         }
         return node;

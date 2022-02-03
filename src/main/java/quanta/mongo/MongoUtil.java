@@ -946,7 +946,7 @@ public class MongoUtil extends ServiceBase {
 				snUtil.ensureNodeExists(ms, "/" + NodePath.ROOT, NodePath.PUBLIC, null, "Public", null, true, null, created);
 
 		if (created.getVal()) {
-			acl.addPrivilege(ms, publicNode, PrincipalName.PUBLIC.s(), Arrays.asList(PrivilegeType.READ.s()), null);
+			acl.addPrivilege(ms, null, publicNode, PrincipalName.PUBLIC.s(), Arrays.asList(PrivilegeType.READ.s()), null);
 		}
 
 		created = new Val<>(Boolean.FALSE);
@@ -956,7 +956,7 @@ public class MongoUtil extends ServiceBase {
 				NodeName.HOME, "Public Home", null, true, null, created);
 
 		// make node public
-		acl.addPrivilege(ms, publicHome, PrincipalName.PUBLIC.s(), Arrays.asList(PrivilegeType.READ.s()), null);
+		acl.addPrivilege(ms, null, publicHome, PrincipalName.PUBLIC.s(), Arrays.asList(PrivilegeType.READ.s()), null);
 
 		log.debug("Public Home Node exists at id: " + publicHome.getId() + " path=" + publicHome.getPath());
 	}

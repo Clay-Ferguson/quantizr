@@ -9,6 +9,8 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.Map.Entry;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -216,20 +218,22 @@ public class Convert extends ServiceBase {
 
 		List<PropertyInfo> props = null;
 		SubNodePropertyMap propMap = node.getProperties();
+		Set<Entry<String,SubNodePropVal>> set = propMap.entrySet();
+		if (ok(set)) {
+			for (Map.Entry<String, SubNodePropVal> entry :set) {
+				String propName = entry.getKey();
+				SubNodePropVal p = entry.getValue();
 
-		for (Map.Entry<String, SubNodePropVal> entry : propMap.entrySet()) {
-			String propName = entry.getKey();
-			SubNodePropVal p = entry.getValue();
+				/* lazy create props */
+				if (no(props)) {
+					props = new LinkedList<>();
+				}
 
-			/* lazy create props */
-			if (no(props)) {
-				props = new LinkedList<>();
+				PropertyInfo propInfo = convertToPropertyInfo(sc, node, propName, p, htmlOnly, initNodeEdit);
+				// log.debug(" PROP Name: " + propName + " val=" + p.getValue().toString());
+
+				props.add(propInfo);
 			}
-
-			PropertyInfo propInfo = convertToPropertyInfo(sc, node, propName, p, htmlOnly, initNodeEdit);
-			// log.debug(" PROP Name: " + propName + " val=" + p.getValue().toString());
-
-			props.add(propInfo);
 		}
 
 		if (ok(props)) {

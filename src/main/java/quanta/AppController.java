@@ -60,6 +60,7 @@ import quanta.request.BlockUserRequest;
 import quanta.request.ChangePasswordRequest;
 import quanta.request.CheckMessagesRequest;
 import quanta.request.CloseAccountRequest;
+import quanta.request.CopySharingRequest;
 import quanta.request.CreateSubNodeRequest;
 import quanta.request.DeleteAttachmentRequest;
 import quanta.request.DeleteFriendRequest;
@@ -561,6 +562,14 @@ public class AppController extends ServiceBase implements ErrorController {
 		SessionContext.checkReqToken();
 		return callProc.run("addPrivilege", req, session, ms -> {
 			return acl.addPrivilege(ms, req);
+		});
+	}
+
+	@RequestMapping(value = API_PATH + "/copySharing", method = RequestMethod.POST)
+	public @ResponseBody Object copySharing(@RequestBody CopySharingRequest req, HttpSession session) {
+		SessionContext.checkReqToken();
+		return callProc.run("copySharing", req, session, ms -> {
+			return acl.copySharing(ms, req);
 		});
 	}
 

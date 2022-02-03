@@ -145,7 +145,7 @@ public class NodeEditService extends ServiceBase {
 			}
 			// else maybe public.
 			else if (makePublicWritable) {
-				acl.addPrivilege(ms, newNode, PrincipalName.PUBLIC.s(),
+				acl.addPrivilege(ms, null, newNode, PrincipalName.PUBLIC.s(),
 						Arrays.asList(PrivilegeType.READ.s(), PrivilegeType.WRITE.s()), null);
 			}
 			// else add default sharing
@@ -271,7 +271,7 @@ public class NodeEditService extends ServiceBase {
 			// If we're inserting a node under the POSTS it should be public, rather than inherit.
 			// Note: some logic may be common between this insertNode() and the createSubNode()
 			if (parentNode.isType(NodeType.POSTS)) {
-				acl.addPrivilege(ms, newNode, PrincipalName.PUBLIC.s(),
+				acl.addPrivilege(ms, null, newNode, PrincipalName.PUBLIC.s(),
 						Arrays.asList(PrivilegeType.READ.s(), PrivilegeType.WRITE.s()), null);
 			} else {
 				// we always copy the access controls from the parent for any new nodes

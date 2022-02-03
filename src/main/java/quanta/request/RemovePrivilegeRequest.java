@@ -10,16 +10,6 @@ public class RemovePrivilegeRequest extends RequestBase {
 	/* for now only 'public' is the only option we support */
 	private String privilege;
 
-	private boolean recursive;
-
-	public boolean isRecursive() {
-		return recursive;
-	}
-
-	public void setRecursive(boolean recursive) {
-		this.recursive = recursive;
-	}
-
 	public String getNodeId() {
 		return nodeId;
 	}

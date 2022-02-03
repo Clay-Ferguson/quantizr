@@ -736,7 +736,7 @@ public class ActPubService extends ServiceBase {
         apub.shareToAllObjectRecipients(ms, newNode, obj, APObj.cc);
 
         if (forcePublic) {
-            acl.addPrivilege(ms, newNode, PrincipalName.PUBLIC.s(),
+            acl.addPrivilege(ms, null, newNode, PrincipalName.PUBLIC.s(),
                     Arrays.asList(PrivilegeType.READ.s(), PrivilegeType.WRITE.s()), null);
         }
 

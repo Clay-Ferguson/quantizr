@@ -41,7 +41,7 @@ export class SharingDlg extends DialogBase {
                     onClick: this.removeAllPrivileges
                 }) : null,
                 new Clearfix(),
-                new Checkbox("Apply changes recursively", null, {
+                new Checkbox("Apply to all children", null, {
                     setValue: (checked: boolean): void => {
                         this.mergeState<LS>({ recursive: checked });
                     },
@@ -74,8 +74,7 @@ export class SharingDlg extends DialogBase {
         await S.util.ajax<J.AddPrivilegeRequest, J.AddPrivilegeResponse>("addPrivilege", {
             nodeId: this.node.id,
             principal: userName,
-            privileges: [J.PrivilegeType.READ, J.PrivilegeType.WRITE],
-            recursive: state.recursive
+            privileges: [J.PrivilegeType.READ, J.PrivilegeType.WRITE]
         });
         this.reload();
     }
@@ -102,8 +101,7 @@ export class SharingDlg extends DialogBase {
         let res: J.RemovePrivilegeResponse = await S.util.ajax<J.RemovePrivilegeRequest, J.RemovePrivilegeResponse>("removePrivilege", {
             nodeId: this.node.id,
             principalNodeId: "*",
-            privilege: "*",
-            recursive: this.getState<LS>().recursive
+            privilege: "*"
         });
 
         this.removePrivilegeResponse();
@@ -112,8 +110,19 @@ export class SharingDlg extends DialogBase {
     public close(): void {
         super.close();
         if (this.dirty && this.appState.activeTab === C.TAB_MAIN) {
-            console.log("Sharing dirty=true. Full refresh pending.");
-            S.quanta.refresh(this.appState);
+            // console.log("Sharing dirty=true. Full refresh pending.");
+
+            if (this.getState<LS>().recursive) {
+                setTimeout(async () => {
+                    let res: J.CopySharingResponse = await S.util.ajax<J.CopySharingRequest, J.CopySharingResponse>("copySharing", {
+                        nodeId: this.node.id
+                    });
+                    S.quanta.refresh(this.appState);
+                }, 100);
+            }
+            else {
+                S.quanta.refresh(this.appState);
+            }
         }
     }
 
@@ -122,8 +131,7 @@ export class SharingDlg extends DialogBase {
         let res: J.RemovePrivilegeResponse = await S.util.ajax<J.RemovePrivilegeRequest, J.RemovePrivilegeResponse>("removePrivilege", {
             nodeId: this.node.id,
             principalNodeId,
-            privilege,
-            recursive: false
+            privilege
         });
         this.removePrivilegeResponse();
     }
@@ -155,8 +163,7 @@ export class SharingDlg extends DialogBase {
         await S.util.ajax<J.AddPrivilegeRequest, J.AddPrivilegeResponse>("addPrivilege", {
             nodeId: this.node.id,
             principal: "public",
-            privileges: allowAppends ? [J.PrivilegeType.READ, J.PrivilegeType.WRITE] : [J.PrivilegeType.READ],
-            recursive
+            privileges: allowAppends ? [J.PrivilegeType.READ, J.PrivilegeType.WRITE] : [J.PrivilegeType.READ]
         });
 
         this.reload();

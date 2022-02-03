@@ -191,7 +191,7 @@ public class UserManagerService extends ServiceBase {
 				}
 				node.setContent(content);
 				node.touch();
-				acl.addPrivilege(ms, node, PrincipalName.PUBLIC.s(), Arrays.asList(PrivilegeType.READ.s()), null);
+				acl.addPrivilege(ms, null, node, PrincipalName.PUBLIC.s(), Arrays.asList(PrivilegeType.READ.s()), null);
 				update.save(ms, node);
 			}
 		}

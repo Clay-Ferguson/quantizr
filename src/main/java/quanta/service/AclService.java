@@ -9,8 +9,14 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 import java.util.StringTokenizer;
+import com.mongodb.bulk.BulkWriteResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.mongodb.core.BulkOperations;
+import org.springframework.data.mongodb.core.BulkOperations.BulkMode;
+import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.Query;
+import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Component;
 import quanta.config.ServiceBase;
 import quanta.exception.base.RuntimeEx;
@@ -21,15 +27,16 @@ import quanta.mongo.model.AccessControl;
 import quanta.mongo.model.MongoPrincipal;
 import quanta.mongo.model.SubNode;
 import quanta.request.AddPrivilegeRequest;
+import quanta.request.CopySharingRequest;
 import quanta.request.GetNodePrivilegesRequest;
 import quanta.request.RemovePrivilegeRequest;
 import quanta.request.SetCipherKeyRequest;
 import quanta.response.AddPrivilegeResponse;
+import quanta.response.CopySharingResponse;
 import quanta.response.GetNodePrivilegesResponse;
 import quanta.response.RemovePrivilegeResponse;
 import quanta.response.SetCipherKeyResponse;
 import quanta.util.ExUtil;
-import quanta.util.ThreadLocals;
 import quanta.util.XString;
 
 /**
@@ -67,6 +74,33 @@ public class AclService extends ServiceBase {
 		return res;
 	}
 
+	public CopySharingResponse copySharing(MongoSession ms, CopySharingRequest req) {
+		CopySharingResponse res = new CopySharingResponse();
+
+		SubNode node = read.getNode(ms, req.getNodeId());
+		auth.ownerAuth(ms, node);
+		BulkOperations bops = ops.bulkOps(BulkMode.UNORDERED, SubNode.class);
+
+		for (SubNode n : read.getSubGraph(ms, node, null, 0, true)) {
+			try {
+				auth.ownerAuth(ms, n);
+				Query query = new Query().addCriteria(new Criteria("id").is(n.getId()));
+				// log.debug("Setting [" + n.getIdStr() + "] AC to " + XString.prettyPrint(n.getAc()));
+
+				Update update = new Update().set(SubNode.AC, node.getAc());
+				bops.updateOne(query, update);
+			} catch (Exception e) {
+				// ignore any exceptions, which can happen for any nodes we don't own for example, and this is
+				// normal
+			}
+		}
+
+		BulkWriteResult results = bops.execute();
+		// log.debug("Bulk Privileges: updated " + results.getModifiedCount() + " nodes.");
+		res.setSuccess(true);
+		return res;
+	}
+
 	/*
 	 * Adds or updates a new privilege to a node
 	 */
@@ -78,19 +112,7 @@ public class AclService extends ServiceBase {
 		SubNode node = read.getNode(ms, nodeId);
 		auth.ownerAuth(ms, node);
 
-		boolean success = addPrivilege(ms, node, req.getPrincipal(), req.getPrivileges(), res);
-
-		if (req.isRecursive()) {
-			for (SubNode n : read.getSubGraph(ms, node, null, 0, true)) {
-				try {
-					addPrivilege(ms, n, req.getPrincipal(), req.getPrivileges(), res);
-				} catch (Exception e) {
-					// ignore any exceptions, which can happen for any nodes we don't own for example, and this is
-					// normal
-				}
-			}
-		}
-
+		boolean success = addPrivilege(ms, null, node, req.getPrincipal(), req.getPrivileges(), res);
 		res.setSuccess(success);
 		return res;
 	}
@@ -133,8 +155,10 @@ public class AclService extends ServiceBase {
 	/**
 	 * Adds the privileges to the node sharing this node to principal, which will be either a userName
 	 * or 'public' (when the node is being shared to public)
+	 * 
+	 * If BulkOperations is non-null we use it instead of a non-bulk operation
 	 */
-	public boolean addPrivilege(MongoSession ms, SubNode node, String principal, List<String> privileges,
+	public boolean addPrivilege(MongoSession ms, BulkOperations bops, SubNode node, String principal, List<String> privileges,
 			AddPrivilegeResponse res) {
 
 		if (no(principal) || no(node))
@@ -232,8 +256,18 @@ public class AclService extends ServiceBase {
 		if (authAdded) {
 			ac.setPrvs(prvs);
 			acl.put(mapKey, ac);
-			node.setAc(acl);
-			update.save(ms, node);
+
+			// if bulk operation
+			if (ok(bops)) {
+				Query query = new Query().addCriteria(new Criteria("id").is(node.getId()));
+				Update update = new Update().set(SubNode.AC, acl);
+				bops.updateOne(query, update);
+			}
+			// else non-bulk
+			else {
+				node.setAc(acl);
+				update.save(ms, node);
+			}
 
 			// if (!principal.equalsIgnoreCase(PrincipalName.PUBLIC.s())) {
 			// SubNode fromUserNode = read.getNode(session, node.getOwner());
@@ -334,18 +368,6 @@ public class AclService extends ServiceBase {
 		auth.ownerAuth(ms, node);
 
 		removeAclEntry(ms, node, req.getPrincipalNodeId(), req.getPrivilege());
-
-		if (req.isRecursive()) {
-			for (SubNode n : read.getSubGraph(ms, node, null, 0, true)) {
-				// log.debug("Node: path=" + path + " content=" + n.getContent());
-				try {
-					removeAclEntry(ms, n, req.getPrincipalNodeId(), req.getPrivilege());
-				} catch (Exception e) {
-					// ignore any exceptions, which can happen for any nodes we don't own for example, and this is
-					// normal
-				}
-			}
-		}
 
 		res.setSuccess(true);
 		return res;

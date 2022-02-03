@@ -155,23 +155,23 @@ public class MongoCreate extends ServiceBase {
 		// child.setOrdinal(maxOrdinal++);
 		// }
 
-		BulkOperations bulkOps = null;
+		BulkOperations bops = null;
 
 		for (SubNode child : read.getChildren(ms, node.getId(), Sort.by(Sort.Direction.ASC, SubNode.ORDINAL), null, 0, null,
 				crit)) {
 
 			// lazy create bulkOps (in case no children were found)
-			if (no(bulkOps)) {
-				bulkOps = ops.bulkOps(BulkMode.UNORDERED, SubNode.class);
+			if (no(bops)) {
+				bops = ops.bulkOps(BulkMode.UNORDERED, SubNode.class);
 			}
 
 			Query query = new Query().addCriteria(new Criteria("id").is(child.getId()));
 			Update update = new Update().set(SubNode.ORDINAL, maxOrdinal++);
-			bulkOps.updateOne(query, update);
+			bops.updateOne(query, update);
 		}
 
-		if (ok(bulkOps)) {
-			BulkWriteResult results = bulkOps.execute();
+		if (ok(bops)) {
+			BulkWriteResult results = bops.execute();
 			// log.debug("Bulk Ordinal: updated " + results.getModifiedCount() + " nodes.");
 		}
 	}

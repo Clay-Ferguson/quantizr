@@ -91,7 +91,6 @@ export interface AddPrivilegeRequest extends RequestBase {
     nodeId: string;
     privileges: string[];
     principal: string;
-    recursive: boolean;
 }
 
 export interface AppDropRequest extends RequestBase {
@@ -115,6 +114,10 @@ export interface CheckMessagesRequest extends RequestBase {
 }
 
 export interface CloseAccountRequest extends RequestBase {
+}
+
+export interface CopySharingRequest extends RequestBase {
+    nodeId: string;
 }
 
 export interface CreateSubNodeRequest extends RequestBase {
@@ -334,7 +337,6 @@ export interface RemovePrivilegeRequest extends RequestBase {
     nodeId: string;
     principalNodeId: string;
     privilege: string;
-    recursive: boolean;
 }
 
 export interface RenderCalendarRequest extends RequestBase {
@@ -475,6 +477,9 @@ export interface CheckMessagesResponse extends ResponseBase {
 }
 
 export interface CloseAccountResponse extends ResponseBase {
+}
+
+export interface CopySharingResponse extends ResponseBase {
 }
 
 export interface CreateSubNodeResponse extends ResponseBase {
