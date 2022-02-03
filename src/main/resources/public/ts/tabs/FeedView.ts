@@ -8,7 +8,6 @@ import { Button } from "../comp/core/Button";
 import { ButtonBar } from "../comp/core/ButtonBar";
 import { Checkbox } from "../comp/core/Checkbox";
 import { Clearfix } from "../comp/core/Clearfix";
-import { CollapsiblePanel } from "../comp/core/CollapsiblePanel";
 import { Div } from "../comp/core/Div";
 import { Heading } from "../comp/core/Heading";
 import { HelpButton } from "../comp/core/HelpButton";
@@ -59,7 +58,12 @@ export class FeedView extends AppTab<FeedViewProps> {
         // if this is mobile don't even show search field unless it's currently in use (like from a trending click)
         if (!state.mobileMode || this.data.props.searchTextState.getValue()) {
             topRightControls = [
-                new Span(null, { className: "feedSearchField" }, [new TextField(null, false, null, null, false, this.data.props.searchTextState, null, "Search for...")]),
+                new Span(null, { className: "feedSearchField" }, [
+                    new TextField({
+                        val: this.data.props.searchTextState,
+                        placeholder: "Search for...",
+                        enter: S.srch.refreshFeed
+                    })]),
                 new Button("Clear", () => this.clearSearch(), { className: "feedClearButton" })
             ];
         }

@@ -19,7 +19,7 @@ export class ImportDlg extends DialogBase {
 
     renderDlg(): CompIntf[] {
         return [
-            new TextField("File Name to Import", null, null, null, false, this.fileNameState),
+            new TextField({ label: "File Name to Import", val: this.fileNameState }),
             new ButtonBar([
                 new Button("Import", this.importNodes, null, "btn-primary"),
                 new Button("Close", this.close, null, "btn-secondary float-end")

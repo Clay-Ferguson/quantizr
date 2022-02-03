@@ -263,9 +263,9 @@ export class EditNodeDlg extends DialogBase {
         let propsParent: CompIntf = customProps ? mainPropsTable : propsTable;
         let isWordWrap = !S.props.getNodePropVal(J.NodeProp.NOWRAP, state.node);
 
-        let nodeNameTextField = null;
+        let nodeNameTextField: TextField = null;
         if (!customProps) {
-            nodeNameTextField = new TextField("Node Name", false, null, "nodeNameTextField", false, this.nameState);
+            nodeNameTextField = new TextField({ label: "Node Name", inputClass: "nodeNameTextField", val: this.nameState });
         }
 
         if (allowContentEdit) {
@@ -669,7 +669,7 @@ export class EditNodeDlg extends DialogBase {
                 }
                 else {
                     // console.log("Creating TextField for property: " + propEntry.name + " value=" + propValStr);
-                    valEditor = new TextField(null, false, null, S.props.getInputClassForType(propEntry.name), false, propState);
+                    valEditor = new TextField({ inputClass: S.props.getInputClassForType(propEntry.name), val: propState });
                 }
             }
 

@@ -12,28 +12,37 @@ interface LS { // Local State
     inputType?: string;
 }
 
+export interface TextFieldConfig {
+    label?: string;
+    pwd?: boolean;
+    enter?: () => void;
+    inputClass?: string;
+    labelLeft?: boolean;
+    val?: ValidatedState<any>;
+    outterClass?: string;
+    placeholder?: string;
+}
+
 export class TextField extends Div implements I.TextEditorIntf, I.ValueIntf {
     input: Input;
     icon: ToggleIcon;
 
-    constructor(public label: string, private isPassword: boolean, private onEnterKey: () => void, private inputClasses: string, //
-        private labelOnLeft: boolean, private valState: ValidatedState<any> = null, private outterClass: string = "",
-        private placeholder: string = "") {
+    constructor(public cfg: TextFieldConfig) {
         // do not pass valState into base class, we want it to have state separately
         super(null);
 
         Object.assign(this.attribs, {
             name: this.getId(),
-            className: "form-group" + (labelOnLeft ? " form-inline " : " ") + this.outterClass
+            className: "form-group" + (this.cfg.labelLeft ? " form-inline " : " ") + (this.cfg.outterClass || "")
         });
 
         this.mergeState<LS>({
-            inputType: isPassword ? "password" : "text"
+            inputType: this.cfg.pwd ? "password" : "text"
         });
     }
 
     setError(error: string): void {
-        this.valState.setError(error);
+        this.cfg.val.setError(error);
     }
 
     // Overriding base class so we can focus the correct part of this composite component.
@@ -53,30 +62,30 @@ export class TextField extends Div implements I.TextEditorIntf, I.ValueIntf {
     }
 
     setValue(value: string): void {
-        this.valState.setValue(value);
+        this.cfg.val.setValue(value);
     }
 
     getValue(): string {
-        return this.valState.getValue();
+        return this.cfg.val.getValue();
     }
 
     preRender(): void {
         let state = this.getState<LS>();
 
-        let label = this.label ? new Label(this.label, {
+        let label = this.cfg.label ? new Label(this.cfg.label, {
             key: this.getId() + "_label",
             className: "txtFieldLabel",
             htmlFor: "inputId_" + this.getId()
         }) : null;
 
         let input = this.input = new Input({
-            placeholder: this.placeholder,
-            className: "form-control pre-textfield " + (this.inputClasses || "") + (this.valState.getError() ? " validationErrorBorder" : ""),
+            placeholder: this.cfg.placeholder || "",
+            className: "form-control pre-textfield " + (this.cfg.inputClass || "") + (this.cfg.val.getError() ? " validationErrorBorder" : ""),
             type: state.inputType,
             id: "inputId_" + this.getId()
-        }, this.valState.v);
+        }, this.cfg.val.v);
 
-        let passwordEye = this.isPassword ? new Span(null, {
+        let passwordEye = this.cfg.pwd ? new Span(null, {
             className: "input-group-addon"
         }, [
             new Anchor(null, null, {
@@ -107,13 +116,13 @@ export class TextField extends Div implements I.TextEditorIntf, I.ValueIntf {
                 input,
                 passwordEye
             ]),
-            new ErrorDiv(this.valState.e)
+            new ErrorDiv(this.cfg.val.e)
         ]);
 
-        if (this.onEnterKey) {
+        if (this.cfg.enter) {
             this.input.attribs.onKeyPress = (e: KeyboardEvent) => {
-                if (e.which === 13) { // 13==enter key code
-                    this.onEnterKey();
+                if (e.key === "Enter") {
+                    this.cfg.enter();
                     return false;
                 }
             };

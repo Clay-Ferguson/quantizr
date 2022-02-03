@@ -7,7 +7,7 @@ import { Checkbox } from "../comp/core/Checkbox";
 import { Div } from "../comp/core/Div";
 import { RadioButton } from "../comp/core/RadioButton";
 import { RadioButtonGroup } from "../comp/core/RadioButtonGroup";
-import { TextField } from "../comp/core/TextField";
+import { TextFieldConfig, TextField } from "../comp/core/TextField";
 import { VerticalLayout } from "../comp/core/VerticalLayout";
 import { CompValueHolder } from "../CompValueHolder";
 import { DialogBase } from "../DialogBase";
@@ -37,8 +37,10 @@ export class ExportDlg extends DialogBase {
     }
 
     renderDlg(): CompIntf[] {
+        let tfc: TextFieldConfig = null;
+
         return [
-            new TextField("Export File Name (without extension)", false, null, null, false, this.fileNameState),
+            new TextField({ label: "Export File Name (without extension)", val: this.fileNameState }),
             new RadioButtonGroup([
                 this.createRadioButton("ZIP", "zip"),
                 this.createRadioButton("TAR", "tar"),

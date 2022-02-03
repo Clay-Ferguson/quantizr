@@ -22,7 +22,7 @@ export class LoadNodeFromIpfsDlg extends DialogBase {
         return [
             new Form(null, [
                 new HorizontalLayout([
-                    new TextField("IPFS Path", false, this.load, null, false, this.ipfsPathState)
+                    new TextField({ label: "IPFS Path", enter: this.load, val: this.ipfsPathState })
                 ]),
                 new ButtonBar([
                     new Button("Load", this.load, null, "btn-primary"),

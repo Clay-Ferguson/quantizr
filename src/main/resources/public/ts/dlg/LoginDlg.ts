@@ -26,8 +26,8 @@ export class LoginDlg extends DialogBase {
     renderDlg(): CompIntf[] {
         return [
             new Form(null, [
-                new TextField("User", false, this.login, null, false, this.userState),
-                new TextField("Password", true, this.login, null, false, this.pwdState),
+                new TextField({ label: "User", enter: this.login, val: this.userState }),
+                new TextField({ label: "Password", pwd: true, enter: this.login, val: this.pwdState }),
                 new Div(null, { className: "marginTop marginBottom" }, [
                     new Span("Signup", { className: "clickable", onClick: this.signup }),
                     new Span("Reset Password", { className: "clickable float-end", onClick: this.resetPassword })

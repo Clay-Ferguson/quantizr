@@ -45,8 +45,8 @@ export class UploadFromIPFSDlg extends DialogBase {
     renderDlg(): CompIntf[] {
         return [
             new Form(null, [
-                new TextField("Upload from IPFS CID", false, null, null, false, this.cidState),
-                new TextField("Mime Type (or Filename Extension)", false, null, null, false, this.mimeState),
+                new TextField({ label: "Upload from IPFS CID", val: this.cidState }),
+                new TextField({ label: "Mime Type (or Filename Extension)", val: this.mimeState }),
                 new ButtonBar([
                     this.uploadButton = new Button("Save", this.upload, null, "btn-primary"),
                     new Button("Close", this.close, null, "btn-secondary float-end")

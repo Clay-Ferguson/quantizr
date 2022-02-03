@@ -1,7 +1,7 @@
 import { dispatch } from "../AppRedux";
 import { AppState } from "../AppState";
-import { Anchor } from "../comp/core/Anchor";
 import { CompIntf } from "../comp/base/CompIntf";
+import { Anchor } from "../comp/core/Anchor";
 import { Button } from "../comp/core/Button";
 import { ButtonBar } from "../comp/core/ButtonBar";
 import { Clearfix } from "../comp/core/Clearfix";
@@ -121,7 +121,7 @@ export class UserProfileDlg extends DialogBase {
 
                     this.readOnly
                         ? new Heading(4, state.userProfile.displayName || "")
-                        : new TextField("Display Name", false, null, "displayNameTextField", false, this.displayNameState),
+                        : new TextField({ label: "Display Name", inputClass: "displayNameTextField", val: this.displayNameState }),
 
                     this.readOnly
                         ? new Html(S.util.markdown(state.userProfile.userBio) || "")

@@ -32,8 +32,8 @@ export class TransferNodeDlg extends DialogBase {
             new Form(null, [
                 new HorizontalLayout([
                     // Only the admin user can transfer from anyone to anyone. Other users can only transfer nodes they own
-                    this.appState.isAdminUser ? new TextField("From User", null, null, null, false, this.fromUserState) : null,
-                    new TextField("To User", null, null, null, false, this.toUserState)
+                    this.appState.isAdminUser ? new TextField({ label: "From User", val: this.fromUserState }) : null,
+                    new TextField({ label: "To User", val: this.toUserState })
                 ]),
                 new HorizontalLayout([
                     new Checkbox("Include Sub-Nodes", null, {

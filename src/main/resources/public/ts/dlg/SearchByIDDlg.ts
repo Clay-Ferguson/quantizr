@@ -40,7 +40,7 @@ export class SearchByIDDlg extends DialogBase {
     renderDlg(): CompIntf[] {
         return [
             new Form(null, [
-                this.searchTextField = new TextField("Node ID", false, this.search, null, false, this.searchTextState),
+                this.searchTextField = new TextField({ label: "Node ID", enter: this.search, val: this.searchTextState }),
                 new ButtonBar([
                     new Button("Search", this.search, null, "btn-primary"),
                     new Button("Close", this.close, null, "btn-secondary float-end")

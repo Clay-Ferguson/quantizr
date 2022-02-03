@@ -23,7 +23,7 @@ export class EditPropertyDlg extends DialogBase {
     renderDlg(): CompIntf[] {
         return [
             new Div(null, null, [
-                new TextField("Name", false, null, null, false, this.nameState)
+                new TextField({ label: "Name", val: this.nameState })
             ])
         ];
     }

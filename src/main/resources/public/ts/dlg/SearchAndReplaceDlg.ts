@@ -29,8 +29,8 @@ export class SearchAndReplaceDlg extends DialogBase {
         return [
             new Form(null, [
                 new HorizontalLayout([
-                    new TextField("Search for", null, null, null, false, this.searchState),
-                    new TextField("Replace with", null, null, null, false, this.replaceState)
+                    new TextField({ label: "Search for", val: this.searchState }),
+                    new TextField({ label: "Replace with", val: this.replaceState })
                 ]),
                 new HorizontalLayout([
                     new Checkbox("Include Sub-Nodes", null, {

@@ -1,6 +1,6 @@
 import { AppState } from "../AppState";
-import { AudioPlayer } from "../comp/core/AudioPlayer";
 import { CompIntf } from "../comp/base/CompIntf";
+import { AudioPlayer } from "../comp/core/AudioPlayer";
 import { Button } from "../comp/core/Button";
 import { ButtonBar } from "../comp/core/ButtonBar";
 import { Div } from "../comp/core/Div";
@@ -141,7 +141,12 @@ export class AudioPlayerDlg extends DialogBase {
                         new Button("Close", this.destroyPlayer, null, "btn-secondary float-end")
                     ], "col-9 d-flex align-items-end"),
                     new Div(null, { className: "col-3 float-end" }, [
-                        this.timeLeftTextField = new TextField("Timer (mins.)", false, null, "timeRemainingEditField", true, this.timeLeftState)
+                        this.timeLeftTextField = new TextField({
+                            label: "Timer (mins.)",
+                            inputClass: "timeRemainingEditField",
+                            labelLeft: true,
+                            val: this.timeLeftState
+                        })
                     ])
                 ]),
                 this.customDiv

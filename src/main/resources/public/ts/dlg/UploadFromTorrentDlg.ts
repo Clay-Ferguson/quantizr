@@ -20,7 +20,7 @@ export class UploadFromTorrentDlg extends DialogBase {
     renderDlg(): CompIntf[] {
         let children = [
             new Form(null, [
-                new TextField("Existing Torrent/Magnet Link", false, null, null, false, this.urlState),
+                new TextField({ label: "Existing Torrent/Magnet Link", val: this.urlState }),
                 new ButtonBar([
                     this.uploadButton = new Button("Save", this.upload, null, "btn-primary"),
                     new Button("Close", this.close, null, "btn-secondary float-end")

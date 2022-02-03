@@ -27,7 +27,9 @@ export class ChangePasswordDlg extends DialogBase {
         return [
             new Form(null, [
                 new TextContent("Enter your new password below..."),
-                this.passwordField = new TextField("New Password", true, null, null, false, this.pwdState),
+                this.passwordField = new TextField({
+                    label: "New Password", pwd: true, val: this.pwdState
+                }),
                 new ButtonBar([
                     new Button("Change Password", this.changePassword, null, "btn-primary"),
                     new Button("Close", this.close, null, "btn-secondary float-end")

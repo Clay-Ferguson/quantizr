@@ -83,7 +83,7 @@ export class SearchUsersDlg extends DialogBase {
 
         return [
             new Form(null, [
-                this.searchTextField = new TextField("User Name", false, this.search, null, false, this.searchTextState),
+                this.searchTextField = new TextField({ label: "User Name", enter: this.search, val: this.searchTextState }),
                 new HorizontalLayout([
                     // Allow fuzzy search for admin only. It's cpu intensive.
                     new Checkbox("Regex", null, {

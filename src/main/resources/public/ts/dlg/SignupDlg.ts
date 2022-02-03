@@ -28,9 +28,9 @@ export class SignupDlg extends DialogBase {
     renderDlg(): CompIntf[] {
         return [
             new Form(null, [
-                new TextField("User Name", false, null, null, false, this.userState),
-                new TextField("Password", true, null, null, false, this.passwordState),
-                new TextField("Email", false, null, null, false, this.emailState),
+                new TextField({ label: "User Name", val: this.userState }),
+                new TextField({ label: "Password", pwd: true, val: this.passwordState }),
+                new TextField({ label: "Email", val: this.emailState }),
 
                 new HorizontalLayout([
                     new Img(null, {
@@ -38,7 +38,7 @@ export class SignupDlg extends DialogBase {
                         className: "captchaImage"
                     }),
                     new Div(null, null, [
-                        new TextField("Captcha", false, null, null, false, this.captchaState)
+                        new TextField({ label: "Captcha", val: this.captchaState })
                     ])
                 ]),
                 new ButtonBar([
