@@ -24,7 +24,7 @@ export class NodeCompMainList extends Div {
         if (state.node && state.node.children) {
             this.addPaginationButtons(children, state.endReached, "", state, true);
 
-            let orderByProp = S.props.getNodePropVal(J.NodeProp.ORDER_BY, state.node);
+            let orderByProp = S.props.getPropStr(J.NodeProp.ORDER_BY, state.node);
 
             let isMineOrImAdmin = state.isAdminUser || S.props.isMine(state.node, state);
             let allowNodeMove: boolean = !orderByProp && isMineOrImAdmin;

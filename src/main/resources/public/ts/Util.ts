@@ -1116,7 +1116,7 @@ export class Util {
 
     // External Emojis!
     insertActPubTags = (val: string, node: J.NodeInfo) => {
-        let tags: any = S.props.getNodePropValObj(J.NodeProp.ACT_PUB_TAG, node);
+        let tags: any = S.props.getPropObj(J.NodeProp.ACT_PUB_TAG, node);
         if (tags) {
             tags.forEach(t => {
                 if (t.name && t.icon?.url && t.type === "Emoji") {

@@ -75,7 +75,7 @@ export class NodeCompContent extends Div {
     }
 
     maybeRenderDateTime = (children: CompIntf[], propName: string, displayName: string, node: J.NodeInfo): void => {
-        let timestampVal = S.props.getNodePropVal(propName, node);
+        let timestampVal = S.props.getPropStr(propName, node);
         if (timestampVal) {
             let dateVal: Date = new Date(parseInt(timestampVal));
             let diffTime = dateVal.getTime() - (new Date().getTime());

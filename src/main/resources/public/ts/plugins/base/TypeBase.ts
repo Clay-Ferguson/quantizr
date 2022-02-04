@@ -80,7 +80,7 @@ export class TypeBase implements TypeHandlerIntf {
     }
 
     render(node: J.NodeInfo, tabData: TabDataIntf<any>, rowStyling: boolean, isTreeView: boolean, state: AppState): Comp {
-        let prop: J.PropertyInfo = S.props.getNodeProp(J.NodeProp.ORDER_BY, node);
+        let prop: J.PropertyInfo = S.props.getProp(J.NodeProp.ORDER_BY, node);
 
         // I was trying to let this button decrypt, but react is saying the component got unmounted
         // and thrownging an error when the decrypt call below tries to update the state on a component
@@ -145,7 +145,7 @@ export class TypeBase implements TypeHandlerIntf {
     }
 
     ensureStringPropExists(node: J.NodeInfo, propName: string) {
-        let prop: J.PropertyInfo = S.props.getNodeProp(propName, node);
+        let prop: J.PropertyInfo = S.props.getProp(propName, node);
         if (!prop) {
             if (!node.properties) {
                 node.properties = [];

@@ -105,7 +105,7 @@ export class NodeCompButtonBar extends Div {
         }
         */
 
-        let isInlineChildren = !!S.props.getNodePropVal(J.NodeProp.INLINE_CHILDREN, node);
+        let isInlineChildren = !!S.props.getPropStr(J.NodeProp.INLINE_CHILDREN, node);
 
         /*
         We always enable for fs:folder, to that by clicking to open a folder that will cause the server to re-check and see if there are

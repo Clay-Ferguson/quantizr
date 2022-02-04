@@ -139,7 +139,7 @@ export class MenuPanel extends Div {
         const importFeatureEnabled = selNodeIsMine || (!!hltNode && state.homeNodeId === hltNode.id);
         const exportFeatureEnabled = selNodeIsMine || (!!hltNode && state.homeNodeId === hltNode.id);
 
-        const orderByProp = S.props.getNodePropVal(J.NodeProp.ORDER_BY, hltNode);
+        const orderByProp = S.props.getPropStr(J.NodeProp.ORDER_BY, hltNode);
         const allowNodeMove: boolean = !orderByProp && S.edit.isInsertAllowed(state.node, state);
         const isPageRootNode = state.node && hltNode && state.node.id === hltNode.id;
         const canMoveUp = !isPageRootNode && !state.isAnonUser && (allowNodeMove && hltNode && hltNode.logicalOrdinal > 0);

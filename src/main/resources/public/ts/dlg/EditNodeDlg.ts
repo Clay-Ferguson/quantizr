@@ -168,7 +168,7 @@ export class EditNodeDlg extends DialogBase {
             }
         }
 
-        if (S.props.getNodePropVal(J.NodeProp.DATE, state.node)) {
+        if (S.props.getPropStr(J.NodeProp.DATE, state.node)) {
             EditNodeDlg.morePanelExpanded = true;
             if (!span) span = new Span();
             span.addChild(new Icon({
@@ -261,7 +261,7 @@ export class EditNodeDlg extends DialogBase {
         }
 
         let propsParent: CompIntf = customProps ? mainPropsTable : propsTable;
-        let isWordWrap = !S.props.getNodePropVal(J.NodeProp.NOWRAP, state.node);
+        let isWordWrap = !S.props.getPropStr(J.NodeProp.NOWRAP, state.node);
 
         let nodeNameTextField: TextField = null;
         if (!customProps) {
@@ -368,8 +368,8 @@ export class EditNodeDlg extends DialogBase {
 
     // Generate GUI for handling the display info about any Node Attachments
     makeBinarySection = (state: LS) => {
-        let ipfsLink = S.props.getNodePropVal(J.NodeProp.IPFS_LINK, state.node);
-        let mime = S.props.getNodePropVal(J.NodeProp.BIN_MIME, state.node);
+        let ipfsLink = S.props.getPropStr(J.NodeProp.IPFS_LINK, state.node);
+        let mime = S.props.getPropStr(J.NodeProp.BIN_MIME, state.node);
 
         let pinCheckbox: Checkbox = null;
         if (ipfsLink) {
@@ -379,11 +379,11 @@ export class EditNodeDlg extends DialogBase {
                         this.utl.deleteProperties(this, [J.NodeProp.IPFS_REF]);
                     }
                     else {
-                        S.props.setNodePropVal(J.NodeProp.IPFS_REF, this.getState<LS>().node, "1");
+                        S.props.setPropVal(J.NodeProp.IPFS_REF, this.getState<LS>().node, "1");
                     }
                 },
                 getValue: (): boolean => {
-                    return S.props.getNodeProp(J.NodeProp.IPFS_REF, state.node) ? false : true;
+                    return S.props.getProp(J.NodeProp.IPFS_REF, state.node) ? false : true;
                 }
             });
         }
@@ -446,13 +446,13 @@ export class EditNodeDlg extends DialogBase {
         let wordWrapCheckbox = new Checkbox("Word Wrap", { className: "marginLeft" }, {
             setValue: (checked: boolean): void => {
                 // this is counter-intuitive that we invert here because 'NOWRAP' is a negation of "wrap"
-                S.props.setNodePropVal(J.NodeProp.NOWRAP, state.node, checked ? null : "1");
+                S.props.setPropVal(J.NodeProp.NOWRAP, state.node, checked ? null : "1");
                 if (this.contentEditor) {
                     this.contentEditor.setWordWrap(checked);
                 }
             },
             getValue: (): boolean => {
-                return S.props.getNodePropVal(J.NodeProp.NOWRAP, state.node) !== "1";
+                return S.props.getPropStr(J.NodeProp.NOWRAP, state.node) !== "1";
             }
         }, "col-3");
 
@@ -469,10 +469,10 @@ export class EditNodeDlg extends DialogBase {
     makeCheckboxPropValueHandler(propName: string): I.ValueIntf {
         return {
             setValue: (checked: boolean): void => {
-                S.props.setNodePropVal(propName, this.getState<LS>().node, checked ? "1" : null);
+                S.props.setPropVal(propName, this.getState<LS>().node, checked ? "1" : null);
             },
             getValue: (): boolean => {
-                return S.props.getNodePropVal(propName, this.getState<LS>().node) === "1";
+                return S.props.getPropStr(propName, this.getState<LS>().node) === "1";
             }
         };
     }
@@ -494,7 +494,7 @@ export class EditNodeDlg extends DialogBase {
         let allowShare: boolean = typeHandler ? (this.appState.isAdminUser || typeHandler.allowAction(NodeActionType.share, state.node, this.appState)) : true;
 
         // let typeLocked = !!S.props.getNodePropVal(J.NodeProp.TYPE_LOCK, state.node);
-        let datePropExists = S.props.getNodeProp(J.NodeProp.DATE, state.node);
+        let datePropExists = S.props.getProp(J.NodeProp.DATE, state.node);
 
         let numPropsShowing = this.utl.countPropsShowing(this);
         let advancedButtons: boolean = !!this.contentEditor;
@@ -693,7 +693,7 @@ export class EditNodeDlg extends DialogBase {
             rows
         }, this.contentEditorState, "font-inherit displayCell", true);
 
-        let wrap: boolean = S.props.getNodePropVal(J.NodeProp.NOWRAP, this.appState.node) !== "1";
+        let wrap: boolean = S.props.getPropStr(J.NodeProp.NOWRAP, this.appState.node) !== "1";
         this.contentEditor.setWordWrap(wrap);
 
         this.contentEditor.whenElm((elm: HTMLElement) => {

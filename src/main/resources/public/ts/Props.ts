@@ -6,10 +6,8 @@ import * as J from "./JavaIntf";
 import { S } from "./Singletons";
 
 export class Props {
-
     readOnlyPropertyList: Set<string> = new Set<string>();
     allBinaryProps: Set<string> = new Set<string>();
-    // allProps: Map<string, J.NodeProp> = new Map<string, J.NodeProp>();
 
     /* Holds the list of properties that are edited using something like a checkbox, or dropdown menu, or whatever, such
     that it would never make sense to display an edit field for editing their value in the editor */
@@ -32,9 +30,9 @@ export class Props {
         dstNode.properties = dstNode.properties || [];
 
         this.allBinaryProps.forEach(k => {
-            let propVal = this.getNodePropVal(k, srcNode);
+            let propVal = this.getPropStr(k, srcNode);
             if (propVal) {
-                this.setNodePropVal(k, dstNode, propVal);
+                this.setPropVal(k, dstNode, propVal);
             }
             else {
                 this.deleteProp(dstNode, k);
@@ -65,16 +63,6 @@ export class Props {
                     node.properties.splice(i, 1);
                     break;
                 }
-            }
-        }
-    }
-
-    /* Moves all the properties listed in propList array to the end of the list of properties and keeps them in the order specified */
-    private movePropsToTop = (propsList: string[], props: J.PropertyInfo[]) => {
-        for (const prop of propsList) {
-            const tagIdx = S.util.arrayIndexOfItemByProp(props, "name", prop);
-            if (tagIdx !== -1) {
-                S.util.arrayMoveItem(props, tagIdx, 0);
             }
         }
     }
@@ -122,18 +110,6 @@ export class Props {
         }
     }
 
-    /*
-     * brute force searches on node (NodeInfo.java) object properties list, and returns the first property
-     * (PropertyInfo.java) with name matching propertyName, else null.
-     */
-    getNodeProp = (propName: string, node: J.NodeInfo): J.PropertyInfo => {
-        if (!node || !node.properties) {
-            return null;
-        }
-
-        return node.properties.find(p => p.name === propName);
-    }
-
     getClientProp = (propName: string, node: J.NodeInfo): J.PropertyInfo => {
         if (!node || !node.clientProps) {
             return null;
@@ -152,7 +128,7 @@ export class Props {
 
         /* if we own this node then this cipherKey for it will be ENC_KEY for us */
         if (state.userName === node.owner) {
-            cipherKey = this.getNodePropVal(J.NodeProp.ENC_KEY, node);
+            cipherKey = this.getPropStr(J.NodeProp.ENC_KEY, node);
             // console.log("getting cipherKey for node, from ENC_KEY: " + cipherKey);
         }
         /* else if the server has provided the cipher key to us from the ACL (AccessControl) then use it. */
@@ -194,52 +170,64 @@ export class Props {
     }
 
     isEncrypted = (node: J.NodeInfo): boolean => {
-        return !!this.getNodePropVal(J.NodeProp.ENC_KEY, node);
+        return !!this.getPropStr(J.NodeProp.ENC_KEY, node);
     }
 
     hasBinary = (node: J.NodeInfo): boolean => {
-        return !!this.getNodePropVal(J.NodeProp.BIN, node) ||
-            !!this.getNodePropVal(J.NodeProp.BIN_URL, node) ||
-            !!this.getNodePropVal(J.NodeProp.IPFS_LINK, node);
+        return !!this.getPropStr(J.NodeProp.BIN, node) ||
+            !!this.getPropStr(J.NodeProp.BIN_URL, node) ||
+            !!this.getPropStr(J.NodeProp.IPFS_LINK, node);
     }
 
     hasImage = (node: J.NodeInfo): boolean => {
-        const target = this.getNodePropVal(J.NodeProp.BIN_MIME, node);
+        const target = this.getPropStr(J.NodeProp.BIN_MIME, node);
         return (target && target.startsWith("image/"));
     }
 
     hasAudio = (node: J.NodeInfo): boolean => {
-        const target = this.getNodePropVal(J.NodeProp.BIN_MIME, node);
+        const target = this.getPropStr(J.NodeProp.BIN_MIME, node);
         return (target && target.startsWith("audio/"));
     }
 
     hasVideo = (node: J.NodeInfo): boolean => {
-        const target = this.getNodePropVal(J.NodeProp.BIN_MIME, node);
+        const target = this.getPropStr(J.NodeProp.BIN_MIME, node);
         return (target && target.startsWith("video/"));
     }
 
     hasTorrent = (node: J.NodeInfo): boolean => {
-        const target = this.getNodePropVal(J.NodeProp.BIN_URL, node);
+        const target = this.getPropStr(J.NodeProp.BIN_URL, node);
         return target && target.startsWith("magnet:");
     }
 
-    getNodePropVal = (propertyName: string, node: J.NodeInfo): string => {
-        const prop: J.PropertyInfo = this.getNodeProp(propertyName, node);
+    /*
+     * brute force searches on node (NodeInfo.java) object properties list, and returns the first property
+     * (PropertyInfo.java) with name matching propertyName, else null.
+     */
+    getProp = (propName: string, node: J.NodeInfo): J.PropertyInfo => {
+        if (!node || !node.properties) {
+            return null;
+        }
+
+        return node.properties.find(p => p.name === propName);
+    }
+
+    getPropStr = (propertyName: string, node: J.NodeInfo): string => {
+        const prop: J.PropertyInfo = this.getProp(propertyName, node);
         return prop ? prop.value : null;
     }
 
-    getNodePropValObj = (propertyName: string, node: J.NodeInfo): any => {
-        const prop: J.PropertyInfo = this.getNodeProp(propertyName, node);
+    getPropObj = (propertyName: string, node: J.NodeInfo): any => {
+        const prop: J.PropertyInfo = this.getProp(propertyName, node);
         return prop ? prop.value : null;
     }
 
-    getClientPropVal = (propertyName: string, node: J.NodeInfo): string => {
+    getClientPropStr = (propertyName: string, node: J.NodeInfo): string => {
         const prop: J.PropertyInfo = this.getClientProp(propertyName, node);
         return prop ? prop.value : null;
     }
 
-    setNodePropVal = (propertyName: string, node: J.NodeInfo, val: any): void => {
-        let prop: J.PropertyInfo = this.getNodeProp(propertyName, node);
+    setPropVal = (propertyName: string, node: J.NodeInfo, val: any): void => {
+        let prop: J.PropertyInfo = this.getProp(propertyName, node);
 
         /* If we found a property by propertyName, then set it's value */
         if (prop) {
@@ -258,9 +246,9 @@ export class Props {
         }
     }
 
-    setNodeProp = (node: J.NodeInfo, newProp: J.PropertyInfo): void => {
+    setProp = (node: J.NodeInfo, newProp: J.PropertyInfo): void => {
         if (!newProp) return;
-        const prop: J.PropertyInfo = this.getNodeProp(newProp.name, node);
+        const prop: J.PropertyInfo = this.getProp(newProp.name, node);
 
         /* If we found a property by propertyName, then set it's value */
         if (prop) {

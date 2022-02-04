@@ -12,10 +12,10 @@ export class PropValueHolder implements ValueIntf {
     }
 
     setValue(val: string): void {
-        S.props.setNodePropVal(this.propName, this.node, val);
+        S.props.setPropVal(this.propName, this.node, val);
     }
 
     getValue(): string {
-        return S.props.getNodePropVal(this.propName, this.node);
+        return S.props.getPropStr(this.propName, this.node);
     }
 }

@@ -39,7 +39,7 @@ export class NodeCompRowHeader extends Div {
             }
         }
 
-        let priorityVal = S.props.getNodePropVal(J.NodeProp.PRIORITY, node);
+        let priorityVal = S.props.getPropStr(J.NodeProp.PRIORITY, node);
         let priority = (priorityVal && priorityVal !== "0") ? "P" + priorityVal : "";
 
         // now that we have this stuff visible by default on all nodes, we don't want users to need to
@@ -103,7 +103,7 @@ export class NodeCompRowHeader extends Div {
         }
 
         let publicReadOnly = S.props.isPublicReadOnly(node);
-        let actPubId = S.props.getNodePropVal(J.NodeProp.ACT_PUB_ID, node);
+        let actPubId = S.props.getPropStr(J.NodeProp.ACT_PUB_ID, node);
 
         // always show a reply if activity pub, or else only if on feed view.
         if ((this.isFeed && !publicReadOnly) || actPubId) {
@@ -221,7 +221,7 @@ export class NodeCompRowHeader extends Div {
         takes to be a functional bookmark to the id.
         */
         if (this.isMainTree) {
-            const targetId = S.props.getNodePropVal(J.NodeProp.TARGET_ID, this.node);
+            const targetId = S.props.getPropStr(J.NodeProp.TARGET_ID, this.node);
             if (targetId) {
                 jumpButtonAdded = true;
                 jumpButton = new IconButton("fa-arrow-right", null, {

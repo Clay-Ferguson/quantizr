@@ -151,7 +151,7 @@ export class EditNodeDlgUtil {
             state.node.properties = [];
         }
 
-        if (S.props.getNodeProp(J.NodeProp.DATE, state.node)) {
+        if (S.props.getProp(J.NodeProp.DATE, state.node)) {
             return;
         }
 
@@ -248,7 +248,7 @@ export class EditNodeDlgUtil {
                         that into this.node.content, because it's the correct and only place the correct updated text is guaranteed to be
                         in the case where the user made some changes before disabling encryption. */
                         state.node.content = dlg.contentEditor.getValue();
-                        S.props.setNodePropVal(J.NodeProp.ENC_KEY, state.node, null);
+                        S.props.setPropVal(J.NodeProp.ENC_KEY, state.node, null);
                     }
                     /* Else need to ensure node is encrypted */
                     else {
@@ -262,7 +262,7 @@ export class EditNodeDlgUtil {
                             /* Set ENC_KEY to be the encrypted key, which when decrypted can be used to decrypt
                             the content of the node. This ENC_KEY was encrypted with the public key of the owner of this node,
                             and so can only be decrypted with their private key. */
-                            S.props.setNodePropVal(J.NodeProp.ENC_KEY, state.node, skdp.cipherKey);
+                            S.props.setPropVal(J.NodeProp.ENC_KEY, state.node, skdp.cipherKey);
                         }
                     }
 
@@ -341,7 +341,7 @@ export class EditNodeDlgUtil {
             propState.setValue(propValStr);
         }
         else {
-            let val = S.props.getNodePropVal(propEntry.name, node);
+            let val = S.props.getPropStr(propEntry.name, node);
             propState.setValue(val);
 
             /* todo-2: eventually we will have data types, but for now we use a hack

@@ -100,13 +100,13 @@ export class NodeCompRow extends Div {
         }
 
         let layoutClass = this.isTableCell ? "node-grid-item" : "node-table-row";
-        const layout = S.props.getNodePropVal(J.NodeProp.LAYOUT, this.node);
+        const layout = S.props.getPropStr(J.NodeProp.LAYOUT, this.node);
 
         // if this node has children as columnar layout, and is rendering as the root node of a page or a node that is expanded inline,
         // that means there will be a grid below this node so we don't show the border (bottom divider line) because it's more attractive not to.
         if (this.isTableCell) {
         }
-        else if (layout && layout.indexOf("c") === 0 && (!!S.props.getNodePropVal(J.NodeProp.INLINE_CHILDREN, this.node) || this.node.id === state.node.id)) {
+        else if (layout && layout.indexOf("c") === 0 && (!!S.props.getPropStr(J.NodeProp.INLINE_CHILDREN, this.node) || this.node.id === state.node.id)) {
         }
         else {
             layoutClass += state.userPreferences.editMode || state.userPreferences.showMetaData ? " row-border-edit" : " row-border";
@@ -133,7 +133,7 @@ export class NodeCompRow extends Div {
             header = new NodeCompRowHeader(node, true, true, false, false);
         }
         else {
-            const targetId = S.props.getNodePropVal(J.NodeProp.TARGET_ID, node);
+            const targetId = S.props.getPropStr(J.NodeProp.TARGET_ID, node);
             if (targetId) {
                 jumpButton = new IconButton("fa-arrow-right", null, {
                     onClick: () => S.view.jumpToId(targetId),

@@ -49,14 +49,14 @@ export class FollowersResultSetView<I extends FollowersRSInfo> extends ResultSet
         // let userNodeId: string = S.props.getNodePropVal(J.NodeProp.USER_NODE_ID, node);
 
         // let actorUrl = S.props.getClientPropVal(J.NodeProp.ACT_PUB_ACTOR_URL, node);
-        let displayName = S.props.getClientPropVal(J.NodeProp.DISPLAY_NAME, node);
-        let accntUser = S.props.getClientPropVal("accntUser", node);
-        let imgSrc = S.props.getClientPropVal(J.NodeProp.ACT_PUB_USER_ICON_URL, node);
+        let displayName = S.props.getClientPropStr(J.NodeProp.DISPLAY_NAME, node);
+        let accntUser = S.props.getClientPropStr("accntUser", node);
+        let imgSrc = S.props.getClientPropStr(J.NodeProp.ACT_PUB_USER_ICON_URL, node);
 
         /* If not ActivityPub try as local user */
         if (!imgSrc) {
-            let avatarVer: string = S.props.getClientPropVal("avatarVer", node);
-            let accntId: string = S.props.getClientPropVal("accntId", node);
+            let avatarVer: string = S.props.getClientPropStr("avatarVer", node);
+            let accntId: string = S.props.getClientPropStr("accntId", node);
             if (avatarVer) {
                 imgSrc = S.render.getAvatarImgUrl(accntId, avatarVer);
             }

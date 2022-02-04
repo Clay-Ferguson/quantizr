@@ -43,7 +43,7 @@ export class NodeCompVerticalRowLayout extends Div {
                     comps.push(EditNodeDlg.embedInstance || new EditNodeDlg(state.editNode, state.editEncrypt, state.editShowJumpButton, state, DialogMode.EMBED));
                 }
                 else {
-                    let childrenImgSizes = S.props.getNodePropVal(J.NodeProp.CHILDREN_IMG_SIZES, this.node);
+                    let childrenImgSizes = S.props.getPropStr(J.NodeProp.CHILDREN_IMG_SIZES, this.node);
                     let typeHandler: TypeHandlerIntf = S.plugin.getTypeHandler(n.type);
 
                     // special case where we aren't in edit mode, and we run across a markdown type with blank content, then don't render it.

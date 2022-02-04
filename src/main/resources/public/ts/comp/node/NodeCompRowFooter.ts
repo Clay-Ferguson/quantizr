@@ -17,7 +17,7 @@ export class NodeCompRowFooter extends Div {
         /* When rendering local Quanta nodes, on the browser, we have no need to show a LINK to the parent node, or a link
          to the actual node because all that's internal. */
         if (this.node.owner.indexOf("@") !== -1) {
-            let inReplTo = S.props.getNodePropVal(J.NodeProp.ACT_PUB_OBJ_INREPLYTO, this.node);
+            let inReplTo = S.props.getPropStr(J.NodeProp.ACT_PUB_OBJ_INREPLYTO, this.node);
             if (inReplTo) {
                 children.push(new Anchor(inReplTo, "Parent", {
                     className: "footerLink",
@@ -25,7 +25,7 @@ export class NodeCompRowFooter extends Div {
                 }));
             }
 
-            let objUrl = S.props.getNodePropVal(J.NodeProp.ACT_PUB_OBJ_URL, this.node);
+            let objUrl = S.props.getPropStr(J.NodeProp.ACT_PUB_OBJ_URL, this.node);
             if (objUrl) {
                 children.push(new Anchor(objUrl, "Link", {
                     className: "footerLink",

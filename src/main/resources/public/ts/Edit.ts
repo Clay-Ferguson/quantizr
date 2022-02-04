@@ -1058,7 +1058,7 @@ export class Edit {
         // console.log("PrincipalPublicKeyStr:" + principalPublicKeyStr + " principalNodeId:" + principalNodeId);
 
         // get the asym-encrypted sym Key to this node (decryptable by owner of node only, which is us)
-        const cipherKey = S.props.getNodePropVal(J.NodeProp.ENC_KEY, node);
+        const cipherKey = S.props.getPropStr(J.NodeProp.ENC_KEY, node);
         // console.log("cipherKey on ENC_KEY: "+cipherKey);
 
         // get this broswer's private key from browser storage

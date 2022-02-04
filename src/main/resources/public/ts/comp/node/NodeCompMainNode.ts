@@ -85,7 +85,7 @@ export class NodeCompMainNode extends Div {
                 header = new NodeCompRowHeader(node, true, true, false, false);
             }
             else {
-                const targetId = S.props.getNodePropVal(J.NodeProp.TARGET_ID, node);
+                const targetId = S.props.getPropStr(J.NodeProp.TARGET_ID, node);
                 if (targetId) {
                     jumpButton = new IconButton("fa-arrow-right", null, {
                         onClick: () => S.view.jumpToId(targetId),

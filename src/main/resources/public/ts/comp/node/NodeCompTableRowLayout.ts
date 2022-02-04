@@ -56,7 +56,7 @@ export class NodeCompTableRowLayout extends Div {
                     console.log("RENDER ROW[" + rowIdx + "]: node.id=" + n.id);
                 }
 
-                let childrenImgSizes = S.props.getNodePropVal(J.NodeProp.CHILDREN_IMG_SIZES, this.node);
+                let childrenImgSizes = S.props.getPropStr(J.NodeProp.CHILDREN_IMG_SIZES, this.node);
                 let typeHandler: TypeHandlerIntf = S.plugin.getTypeHandler(n.type);
 
                 // special case where we aren't in edit mode, and we run across a markdown type with blank content AND no attachment, then don't even render it.

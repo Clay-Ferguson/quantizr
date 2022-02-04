@@ -48,7 +48,7 @@ export class EditPropertyDlg extends DialogBase {
         let name = this.nameState.getValue();
 
         /* verify first that this property doesn't already exist */
-        if (S.props.getNodeProp(name, this.editNode)) {
+        if (S.props.getProp(name, this.editNode)) {
             S.util.showMessage("Property already exists: " + name, "Warning");
             return;
         }

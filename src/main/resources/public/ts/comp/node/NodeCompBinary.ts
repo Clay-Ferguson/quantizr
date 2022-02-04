@@ -41,7 +41,7 @@ export class NodeCompBinary extends Div {
             imgSize = "150px";
         }
         else {
-            imgSize = (this.imgSizeOverride && this.imgSizeOverride !== "n") ? this.imgSizeOverride : S.props.getNodePropVal(J.NodeProp.IMG_SIZE, node);
+            imgSize = (this.imgSizeOverride && this.imgSizeOverride !== "n") ? this.imgSizeOverride : S.props.getPropStr(J.NodeProp.IMG_SIZE, node);
         }
         let style: any = {};
 
@@ -128,7 +128,7 @@ export class NodeCompBinary extends Div {
             ])]);
         }
         else if (S.props.hasTorrent(node)) {
-            const torrentId = S.props.getNodePropVal(J.NodeProp.BIN_URL, node);
+            const torrentId = S.props.getPropStr(J.NodeProp.BIN_URL, node);
             this.setChildren([new HorizontalLayout([
                 new IconButton("fa-magnet", "Torrent", {
                     onClick: () => {
@@ -141,9 +141,9 @@ export class NodeCompBinary extends Div {
          * If not an image we render a link to the attachment, so that it can be downloaded.
          */
         else {
-            let fileName: string = S.props.getNodePropVal(J.NodeProp.BIN_FILENAME, node);
-            let fileSize: string = S.props.getNodePropVal(J.NodeProp.BIN_SIZE, node);
-            let fileType: string = S.props.getNodePropVal(J.NodeProp.BIN_MIME, node);
+            let fileName: string = S.props.getPropStr(J.NodeProp.BIN_FILENAME, node);
+            let fileSize: string = S.props.getPropStr(J.NodeProp.BIN_SIZE, node);
+            let fileType: string = S.props.getPropStr(J.NodeProp.BIN_MIME, node);
 
             let viewFileLink: Anchor = null;
             if (fileType && (fileType === "application/pdf" || fileType.startsWith("text/"))) {

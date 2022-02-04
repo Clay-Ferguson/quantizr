@@ -70,7 +70,7 @@ export class Render {
         let imgInline = "<img class=\"img-block\" width=\"{{imgSize}}\" src=\"{{imgUrl}}\">";
         val = S.util.replaceAll(val, "{{img}}", imgInline);
 
-        let imgSize = S.props.getNodePropVal(J.NodeProp.IMG_SIZE, node);
+        let imgSize = S.props.getPropStr(J.NodeProp.IMG_SIZE, node);
         // actual size prop is saved as "0"
         if (imgSize && imgSize !== "0") {
             val = S.util.replaceAll(val, "{{imgSize}}", imgSize);
@@ -283,7 +283,7 @@ export class Render {
                 }
             }));
 
-        let bin = S.props.getNodePropVal(J.NodeProp.BIN, node);
+        let bin = S.props.getPropStr(J.NodeProp.BIN, node);
         if (bin) {
             let attachmentComps: Comp[] = [];
             attachmentComps.push(new Heading(3, "Attachment URLs"));
@@ -343,7 +343,7 @@ export class Render {
             }, state.linksToAttachmentsExpanded, "marginAll", "attachmentLinksPanel", ""));
         }
 
-        let ipfsLink = S.props.getNodePropVal(J.NodeProp.IPFS_LINK, node);
+        let ipfsLink = S.props.getPropStr(J.NodeProp.IPFS_LINK, node);
         if (ipfsLink) {
             children.push(new Heading(5, "IPFS LINK"), //
                 new Div("ipfs://" + ipfsLink, {
@@ -357,7 +357,7 @@ export class Render {
                 }));
         }
 
-        let ipfsCid = S.props.getNodePropVal(J.NodeProp.IPFS_CID, node);
+        let ipfsCid = S.props.getPropStr(J.NodeProp.IPFS_CID, node);
         if (ipfsCid) {
             children.push(new Heading(5, "IPFS CID"), //
                 new Div("ipfs://" + ipfsCid, {
@@ -371,7 +371,7 @@ export class Render {
                 }));
         }
 
-        let ipnsCid = S.props.getNodePropVal(J.NodeProp.IPNS_CID, node);
+        let ipnsCid = S.props.getPropStr(J.NodeProp.IPNS_CID, node);
         if (ipnsCid) {
             children.push(new Heading(5, "IPNS Name"), //
                 new Div("ipns://" + ipnsCid, {
@@ -629,7 +629,7 @@ export class Render {
          * Number of rows that have actually made it onto the page to far. Note: some nodes get filtered out on
          * the client side for various reasons.
          */
-        const layout = S.props.getNodePropVal(J.NodeProp.LAYOUT, node);
+        const layout = S.props.getPropStr(J.NodeProp.LAYOUT, node);
 
         /* Note: for edit mode, or on mobile devices, always use vertical layout. */
         if (state.userPreferences.editMode || state.mobileMode || !layout || layout === "v") {
@@ -646,13 +646,13 @@ export class Render {
 
     getAttachmentUrl = (urlPart: string, node: J.NodeInfo, downloadLink: boolean): string => {
         /* If this node attachment points to external URL return that url */
-        let imgUrl = S.props.getNodePropVal(J.NodeProp.BIN_URL, node);
+        let imgUrl = S.props.getPropStr(J.NodeProp.BIN_URL, node);
         if (imgUrl) {
             return imgUrl;
         }
 
-        const ipfsLink = S.props.getNodePropVal(J.NodeProp.IPFS_LINK, node);
-        let bin = S.props.getNodePropVal(J.NodeProp.BIN, node);
+        const ipfsLink = S.props.getPropStr(J.NodeProp.IPFS_LINK, node);
+        let bin = S.props.getPropStr(J.NodeProp.BIN, node);
 
         if (bin || ipfsLink) {
             if (ipfsLink) {

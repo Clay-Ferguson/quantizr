@@ -79,7 +79,7 @@ export class RssTypeHandler extends TypeBase {
     render(node: J.NodeInfo, tabData: TabDataIntf<any>, rowStyling: boolean, isTreeView: boolean, state: AppState): Comp {
 
         // console.log("RSSTypeHandler.render");
-        let feedSrc: string = S.props.getNodePropVal(J.NodeProp.RSS_FEED_SRC, node);
+        let feedSrc: string = S.props.getPropStr(J.NodeProp.RSS_FEED_SRC, node);
         if (!feedSrc) {
             return (new TextContent("Set the '" + J.NodeProp.RSS_FEED_SRC + "' node property to the RSS Feed URL.", "alert alert-info marginLeft marginTop"));
         }
