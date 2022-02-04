@@ -1,3 +1,36 @@
+.userProfileDlgAvatar {
+    background-color: $modal-content-bg;
+    max-width: 120px;
+    min-width: 120px;
+    border-radius: $border-radius;
+    border: 2px solid $modal-content-bg;
+    top: -55px;
+    left: 0px;
+    position: relative;
+    cursor: pointer;
+}
+
+.userProfileDlgHeader{
+    background-color: $modal-content-bg;
+    cursor: pointer;
+    width: 100%;
+    height: 300px;
+    object-fit: cover;
+    border-radius: $border-radius;
+    border: 2px solid $modal-content-bg;
+}
+
+.avatarAndNamePanel {
+    margin-left: 30px;
+    border-collapse: collapse;
+}
+
+.userDisplayName {
+    padding-top: $smallGap;
+    padding-left: $smallGap;
+    width: 40em;
+}
+
 .profileImageBase {
     cursor: pointer;
     top: -55px;
@@ -22,35 +55,6 @@
     border-radius: $border-radius;
 }
 
-.profileHeaderImageBase {
-    cursor: pointer;
-    width: 100%;
-    height: 200px;
-    max-height: $profileImgSize;
-    object-fit: cover;
-    border-radius: $border-radius;
-}
-
-.profileImage {
-    @extend .profileImageBase;
-    border: 2px dotted $nodeBorderBottomColor;
-}
-
-.profileImageNoHeader {
-    @extend .profileImageBaseNoHeader;
-    border: 2px dotted $nodeBorderBottomColor;
-}
-
-.readOnlyProfileImage {
-    @extend .profileImageBase;
-    border: 2px solid $modal-content-bg;
-}
-
-.readOnlyProfileImageNoHeader {
-    @extend .profileImageBaseNoHeader;
-    border: 2px solid $modal-content-bg;
-}
-
 .profileImageRHS {
     @extend .profileImageBaseNoHeaderSmall;
     top: -45px;
@@ -66,37 +70,6 @@
     margin-bottom: 20px;
 }
 
-.profileHeaderImage {
-    @extend .profileHeaderImageBase;
-    border: 2px dotted $nodeBorderBottomColor;
-}
-
-.readOnlyProfileHeaderImage {
-    @extend .profileHeaderImageBase;
-    border: 2px solid $nodeBorderBottomColor;
-}
-
 .userBio {
     margin: 15px 10px 10px 10px;
-}
-
-.profileImageHolder {
-    @extend .profileImageBase;
-    border: 2px dotted $nodeBorderBottomColor;
-    padding: 12px;
-    min-height: 120px;
-}
-
-.profileImageHolderNoHeader {
-    @extend .profileImageBaseNoHeader;
-    border: 2px dotted $nodeBorderBottomColor;
-    padding: 12px;
-    min-height: 120px;
-}
-
-.profileHeaderImageHolder {
-    @extend .profileHeaderImageBase;
-    border: 2px dotted $nodeBorderBottomColor;
-    min-height: 120px;
-    padding: 12px;
 }

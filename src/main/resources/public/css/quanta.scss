@@ -133,7 +133,7 @@ body {
 }
 
 .displayNameTextField {
-    max-width: 50%;
+    max-width: 40em;
 }
 
 $mobileHeaderHeight: 3.5em;
@@ -1754,7 +1754,10 @@ audio::-webkit-media-controls-play-button {
     display: table-row;
 }
 
+// todo-0: use @extends? base class for these three.
 .followingText {
+    display: inline-block;
+    margin-top: $smallGap;
     font-weight: bold;
     margin-left: 15px;
     padding: 8px;
@@ -1765,6 +1768,8 @@ audio::-webkit-media-controls-play-button {
 }
 
 .blockingText {
+    display: inline-block;
+    margin-top: $smallGap;
     font-weight: bold;
     margin-left: 15px;
     padding: 8px;
@@ -1775,6 +1780,8 @@ audio::-webkit-media-controls-play-button {
 }
 
 .followCount {
+    display: inline-block;
+    margin-top: $smallGap;
     margin-left: 15px;
     padding: 8px;
     border: 2px solid $nodeBorderBottomColor;
@@ -1790,10 +1797,16 @@ audio::-webkit-media-controls-play-button {
 .horizontalLayoutComp {
     display: table;
     border-spacing: 10px;
-    // border-collapse: collapse;
     margin-top: $smallGap;
     margin-bottom: $smallGap;
 }
+
+.horizontalLayoutCompBorderCollapse {
+    @extend .horizontalLayoutComp;
+
+    border-collapse: collapse;
+}
+
 
 .displayTableNoSpacing {
     display: table;

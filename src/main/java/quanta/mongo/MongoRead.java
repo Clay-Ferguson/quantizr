@@ -48,6 +48,8 @@ public class MongoRead extends ServiceBase {
     @Autowired
     private AppProp prop;
 
+    // todo-1: All cached nodes like this will NOT work once we have a multi-instance load-balanced web
+    // app. (I think this may be the ONLY place where we have a globally cached node)
     private static final Object dbRootLock = new Object();
     private SubNode dbRoot;
 

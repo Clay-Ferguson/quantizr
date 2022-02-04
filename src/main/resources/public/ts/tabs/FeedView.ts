@@ -163,7 +163,6 @@ export class FeedView extends AppTab<FeedViewProps> {
         }
         else if (!this.data.props.feedResults || this.data.props.feedResults.length === 0) {
             children.push(new Div("Nothing to display."));
-            children.push(new TextContent("Tip: Select 'Public' checkbox, to see the entire Fediverse (all public posts)."));
         }
         else {
             let i = 0;

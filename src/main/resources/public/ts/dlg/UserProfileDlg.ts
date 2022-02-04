@@ -4,9 +4,9 @@ import { CompIntf } from "../comp/base/CompIntf";
 import { Anchor } from "../comp/core/Anchor";
 import { Button } from "../comp/core/Button";
 import { ButtonBar } from "../comp/core/ButtonBar";
-import { Clearfix } from "../comp/core/Clearfix";
 import { Div } from "../comp/core/Div";
 import { Heading } from "../comp/core/Heading";
+import { HorizontalLayout } from "../comp/core/HorizontalLayout";
 import { Html } from "../comp/core/Html";
 import { Img } from "../comp/core/Img";
 import { Label } from "../comp/core/Label";
@@ -67,69 +67,69 @@ export class UserProfileDlg extends DialogBase {
                     ])
                 ]) : null,
 
-                profileImg,
-                // todo-2: currently there's no 'unblock' user has to go do that in their blocked users node.
-                // (is this still true?)
-                new Div(null, { className: "marginBottom" }, [
-                    new Div(null, { className: "float-end" }, [
-                        state.userProfile.blocked ? new Span("You Blocked", {
-                            className: "blockingText",
-                            onClick: this.unblockUser,
-                            title: "Click to Unblock user"
-                        }) : null,
-                        state.userProfile.following ? new Span("You Follow", {
-                            className: "followingText",
-                            onClick: this.deleteFriend,
-                            title: "Click to Unfollow user"
-                        }) : null,
+                new HorizontalLayout([
+                    profileImg,
+                    new Div(null, { className: "userDisplayName" }, [
+                        new Div(null, null, [
+                        this.readOnly
+                            ? new Heading(4, state.userProfile.displayName || "")
+                            : new TextField({ label: "Display Name", inputClass: "displayNameTextField", val: this.displayNameState })
+                        ]),
+                        new Div(null, { className: "float-end" }, [
+                            state.userProfile.blocked ? new Span("You Blocked", {
+                                className: "blockingText",
+                                onClick: this.unblockUser,
+                                title: "Click to Unblock user"
+                            }) : null,
+                            state.userProfile.following ? new Span("You Follow", {
+                                className: "followingText",
+                                onClick: this.deleteFriend,
+                                title: "Click to Unfollow user"
+                            }) : null,
 
-                        state.userProfile.followerCount > 0 ? new Span(state.userProfile.followerCount + " followers", {
-                            onClick: () => {
-                                if (state.userProfile.followerCount) {
-                                    this.close();
-                                    if (localUser) {
-                                        S.srch.showFollowers(0, state.userProfile.userName);
+                            state.userProfile.followerCount > 0 ? new Span(state.userProfile.followerCount + " followers", {
+                                onClick: () => {
+                                    if (state.userProfile.followerCount) {
+                                        this.close();
+                                        if (localUser) {
+                                            S.srch.showFollowers(0, state.userProfile.userName);
+                                        }
+                                        else {
+                                            window.open(state.userProfile.actorUrl, "_blank");
+                                        }
                                     }
-                                    else {
-                                        window.open(state.userProfile.actorUrl, "_blank");
+                                },
+                                className: "followCount"
+                            }) : null,
+
+                            state.userProfile.followingCount > 0 ? new Span(state.userProfile.followingCount + " following", {
+                                onClick: () => {
+                                    if (state.userProfile.followingCount) {
+                                        this.close();
+                                        if (localUser) {
+                                            S.srch.showFollowing(0, state.userProfile.userName);
+                                        }
+                                        else {
+                                            window.open(state.userProfile.actorUrl, "_blank");
+                                        }
+
+                                        // It would be 'inconsistent' to just jump to the FRIEND_LIST? if this user is looking
+                                        // at their own user profile dialog? There's also even the Friend Picker dialog too!
+                                        // S.nav.openContentNode("~" + J.NodeType.FRIEND_LIST);
                                     }
-                                }
-                            },
-                            className: "followCount"
-                        }) : null,
+                                },
+                                className: "followCount"
+                            }) : null
+                        ])
+                    ])
+                ], "avatarAndNamePanel"),
 
-                        state.userProfile.followingCount > 0 ? new Span(state.userProfile.followingCount + " following", {
-                            onClick: () => {
-                                if (state.userProfile.followingCount) {
-                                    this.close();
-                                    if (localUser) {
-                                        S.srch.showFollowing(0, state.userProfile.userName);
-                                    }
-                                    else {
-                                        window.open(state.userProfile.actorUrl, "_blank");
-                                    }
-
-                                    // It would be 'inconsistent' to just jump to the FRIEND_LIST? if this user is looking
-                                    // at their own user profile dialog? There's also even the Friend Picker dialog too!
-                                    // S.nav.openContentNode("~" + J.NodeType.FRIEND_LIST);
-                                }
-                            },
-                            className: "followCount"
-                        }) : null
-                    ]),
-                    new Clearfix(),
-
-                    this.readOnly
-                        ? new Heading(4, state.userProfile.displayName || "")
-                        : new TextField({ label: "Display Name", inputClass: "displayNameTextField", val: this.displayNameState }),
-
-                    this.readOnly
-                        ? new Html(S.util.markdown(state.userProfile.userBio) || "")
-                        : new TextArea("About Me", {
-                            rows: 5
-                        },
-                            this.bioState)
-                ]),
+                this.readOnly
+                    ? new Html(S.util.markdown(state.userProfile.userBio) || "")
+                    : new TextArea("About Me", {
+                        rows: 5
+                    },
+                        this.bioState),
 
                 this.readOnly ? null : new Anchor(null, "Logout", { className: "float-end logoutLink", onClick: S.nav.logout }),
 
@@ -293,8 +293,7 @@ export class UserProfileDlg extends DialogBase {
 
         if (src) {
             let att: any = {
-                className: hasHeaderImg ? (this.readOnly ? "readOnlyProfileImage" : "profileImage")
-                    : (this.readOnly ? "readOnlyProfileImageNoHeader" : "profileImageNoHeader"),
+                className: "userProfileDlgAvatar",
                 src,
                 onClick
             };
@@ -307,13 +306,13 @@ export class UserProfileDlg extends DialogBase {
         }
         else {
             if (this.readOnly) {
-                return new Div("User has not set their Avatar Image.", {
-                    className: hasHeaderImg ? "readOnlyProfileImage" : "readOnlyProfileImageNoHeader"
+                return new Div("No avatar image", {
+                    className: "userProfileDlgAvatar"
                 });
 
             }
             return new Div("Click to upload Avatar Image", {
-                className: hasHeaderImg ? "profileImageHolder" : "profileImageHolderNoHeader",
+                className: "userProfileDlgAvatar",
                 onClick
             });
         }
@@ -353,7 +352,7 @@ export class UserProfileDlg extends DialogBase {
 
         if (src) {
             let att: any = {
-                className: this.readOnly ? "readOnlyProfileHeaderImage" : "profileHeaderImage",
+                className: "userProfileDlgHeader",
                 src,
                 onClick
             };
@@ -366,10 +365,12 @@ export class UserProfileDlg extends DialogBase {
         }
         else {
             if (this.readOnly) {
-                return null;
+                return new Div("No header image", {
+                    className: "userProfileDlgHeader"
+                });
             }
             return new Div("Click to upload Header Image", {
-                className: "profileHeaderImageHolder",
+                className: "userProfileDlgHeader",
                 onClick
             });
         }

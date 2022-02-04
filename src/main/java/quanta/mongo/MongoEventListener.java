@@ -206,8 +206,6 @@ public class MongoEventListener extends AbstractMongoEventListener<SubNode> {
 			ThreadLocals.cacheNode(node);
 		}
 
-		// todo-0: All cached nodes like this will NOT work once we have a multi-instance load-balanced web
-		// app.
 		String dbRoot = "/" + NodePath.ROOT;
 		if (dbRoot.equals(node.getPath())) {
 			read.setDbRoot(node);

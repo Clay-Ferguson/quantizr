@@ -1,5 +1,6 @@
 import { ReactNode } from "react";
 import { Comp } from "../base/Comp";
+import { CompIntf } from "../base/CompIntf";
 import { Div } from "./Div";
 
 /* WARNING: This class doesn't expect 'this.children' to be directly added to, but always only the
@@ -8,7 +9,7 @@ constructor is called. This is because we dynamically render a table layout here
 children dynamically at render time */
 export class HorizontalLayout extends Div {
 
-    constructor(public comps: Comp[] = null, classes: string = "horizontalLayoutComp", attribs: any = {}) {
+    constructor(public comps: CompIntf[] = null, classes: string = "horizontalLayoutComp", attribs: any = {}) {
         super(null, attribs || {});
         this.attribs.className = classes;
     }
