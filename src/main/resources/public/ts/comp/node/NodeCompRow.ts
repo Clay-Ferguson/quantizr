@@ -32,7 +32,7 @@ export class NodeCompRow extends Div {
         });
 
         /* If we're in edit mode allow dragging. Note nodes with subOrdinals can't be dragged */
-        if ((typeHandler == null || typeHandler.subOrdinal() === -1) && appState.userPreferences.editMode && !appState.inlineEditId) {
+        if ((!typeHandler || typeHandler.subOrdinal() === -1) && appState.userPreferences.editMode && !appState.inlineEditId) {
             this.attribs.draggable = "true";
             this.attribs.onDragStart = (evt) => this.dragStart(evt, node.id);
             this.attribs.onDragEnd = this.dragEnd;

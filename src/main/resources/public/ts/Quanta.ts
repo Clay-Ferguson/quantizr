@@ -87,7 +87,7 @@ export class Quanta {
         S.plugin.initPlugins();
 
         (window as any).addEvent = (object: any, type: any, callback: any) => {
-            if (object == null || typeof (object) === "undefined") {
+            if (!object || typeof (object) === "undefined") {
                 return;
             }
             if (object.addEventListener) {

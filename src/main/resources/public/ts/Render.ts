@@ -390,7 +390,7 @@ export class Render {
     }
 
     allowAction = (typeHandler: TypeHandlerIntf, action: NodeActionType, node: J.NodeInfo, appState: AppState): boolean => {
-        return typeHandler == null || typeHandler.allowAction(action, node, appState);
+        return !typeHandler || typeHandler.allowAction(action, node, appState);
     }
 
     renderPageFromData = (res: J.RenderNodeResponse, scrollToTop: boolean, targetNodeId: string, clickTab: boolean = true, allowScroll: boolean = true): void => {

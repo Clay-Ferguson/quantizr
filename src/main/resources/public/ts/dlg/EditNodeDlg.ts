@@ -705,7 +705,7 @@ export class EditNodeDlg extends DialogBase {
                     if (cipherKey) {
                         let clearText: string = await S.encryption.decryptSharableString(null, { cipherKey, cipherText });
 
-                        if (clearText == null) {
+                        if (!clearText) {
                             this.contentEditorState.setError("Decryption Failed");
                         }
                         else {

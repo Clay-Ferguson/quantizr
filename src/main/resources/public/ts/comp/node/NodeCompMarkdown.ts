@@ -154,7 +154,7 @@ export class NodeCompMarkdown extends Html {
             // console.log("CIPHERKEY " + cipherKey);
             let clearText: string = await S.encryption.decryptSharableString(null, { cipherKey, cipherText });
 
-            if (clearText === null) {
+            if (!clearText) {
                 clearText = "[Decrypt Failed]";
             }
 

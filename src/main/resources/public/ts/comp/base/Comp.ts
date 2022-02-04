@@ -157,7 +157,7 @@ export abstract class Comp implements CompIntf {
     }
 
     addChildren(comps: Comp[]): void {
-        if (comps == null || comps.length === 0) return;
+        if (!comps || comps.length === 0) return;
         if (!this.children) {
             this.children = [...comps];
         }
@@ -168,7 +168,7 @@ export abstract class Comp implements CompIntf {
 
     /* Returns true if there are any non-null children */
     hasChildren(): boolean {
-        if (this.children == null || this.children.length === 0) return false;
+        if (!this.children || this.children.length === 0) return false;
         return this.children.some(child => !!child);
     }
 
@@ -266,7 +266,7 @@ export abstract class Comp implements CompIntf {
 
     buildChildren(): ReactNode[] {
         // console.log("buildChildren: " + this.jsClassName);
-        if (this.children == null || this.children.length === 0) return null;
+        if (!this.children || this.children.length === 0) return null;
         let reChildren: ReactNode[] = [];
 
         this.children.forEach((child: CompIntf) => {

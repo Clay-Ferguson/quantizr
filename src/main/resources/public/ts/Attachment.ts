@@ -9,7 +9,7 @@ import { S } from "./Singletons";
 
 export class Attachment {
     openUploadFromFileDlg = (toIpfs: boolean, node: J.NodeInfo, autoAddFile: File, state: AppState): void => {
-        if (node == null) {
+        if (!node) {
             node = S.nodeUtil.getHighlightedNode(state);
         }
         if (!node) {

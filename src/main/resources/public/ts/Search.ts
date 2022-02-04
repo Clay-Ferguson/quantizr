@@ -459,7 +459,7 @@ export class Search {
     findShares = (state: AppState = null, shareTarget: string = null, accessOption: string = null): void => {
         state = appState(state);
         const focusNode: J.NodeInfo = S.nodeUtil.getHighlightedNode(state);
-        if (focusNode == null) {
+        if (!focusNode) {
             return;
         }
 

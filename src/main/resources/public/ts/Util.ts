@@ -275,7 +275,7 @@ export class Util {
     }
 
     arrayClone(a: any[]): any[] {
-        if (a == null) return null;
+        if (!a) return null;
         if (a.length === 0) return [];
         return a.slice(0);
     };
@@ -1232,7 +1232,7 @@ export class Util {
     */
     refreshOpenButtonOnNode = (node: J.NodeInfo, state: AppState): void => {
         if (!node || !state.node || !state.node.children) return;
-        let doDispatch = state == null;
+        let doDispatch = !state;
         if (!state) {
             state = store.getState();
         }
