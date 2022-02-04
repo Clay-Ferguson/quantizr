@@ -86,7 +86,6 @@ export class User {
                 });
                 S.quanta.authToken = res.authToken;
 
-                // console.log("login: " + S.util.prettyPrint(res));
                 if (res && !res.success) {
                     await S.user.deleteAllUserLocalDbEntries();
                 }

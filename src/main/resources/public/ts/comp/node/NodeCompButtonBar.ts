@@ -20,7 +20,7 @@ export class NodeCompButtonBar extends Div {
     constructor(public node: J.NodeInfo, public allowNodeMove: boolean, private level: number, private extraButtons: IconButton[], private extraClass: string) {
         super(null, {
             id: "NodeCompButtonBar_" + node.id,
-            className: "marginLeft " + extraClass
+            className: "nodeCompButtonBar " + (extraClass || "")
         });
     }
 

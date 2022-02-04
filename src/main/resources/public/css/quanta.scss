@@ -67,7 +67,7 @@ $lightenRowFactor: 5;
 
 $fatBorderSize: 8px;
 $mediumBorderSize: 6px;
-$highlightBorderSize: 10px;
+$highlightBorderSize: 6px;
 $smallBorderSize: 3px;
 
 // @keyframes animatedBackground {
@@ -821,6 +821,10 @@ Will come back later and study this more. todo-1 */
     border-radius: $border-radius;
 }
 
+.nodeCompButtonBar {
+    margin-left: 8px;
+}
+
 .marginLeftIfNotFirst {
     margin-left: $smallGap;
 }
@@ -1162,8 +1166,8 @@ Will come back later and study this more. todo-1 */
 }
 
 .parentNodeContentStyle {
-    border: 2px solid $gray-700;
-    border-radius: $border-radius;
+    // border: 1px solid $gray-700;
+    // border-radius: $border-radius;
     
     padding-right: 8px;
     padding-top: 8px;
@@ -1235,7 +1239,7 @@ Will come back later and study this more. todo-1 */
 
 .header-text {
     font-size: small;
-    margin-left: 10px;
+    margin-left: 8px;
     cursor: pointer;
 
     // warning: don't be tempted again to make this less than 2em!
@@ -1447,8 +1451,10 @@ i'm backing out for now
 
 .active-row-main {
     @if $rootNodeBorder {
-        border-bottom: $highlightBorderSize solid $primary;
-        border-left: $highlightBorderSize solid $primary;
+        // border-bottom: $highlightBorderSize solid $primary;
+        // border-left: $highlightBorderSize solid $primary;
+        border: $highlightBorderSize solid $primary;
+        border-radius: 12px;
     } 
     @else {
         border-left: $mediumBorderSize solid $primary; 
@@ -1461,8 +1467,10 @@ i'm backing out for now
 
 .inactive-row-main {
     @if $rootNodeBorder {
-        border-bottom: $highlightBorderSize solid $nodeBorderBottomColor; 
-        border-left: $highlightBorderSize solid $nodeBorderBottomColor; 
+        // border-bottom: $highlightBorderSize solid $nodeBorderBottomColor; 
+        // border-left: $highlightBorderSize solid $nodeBorderBottomColor; 
+        border: $highlightBorderSize solid $nodeBorderBottomColor; 
+        border-radius: 12px;
     }
     @else {
         border-left: $mediumBorderSize solid $nodeBorderBottomColor; 
@@ -1779,10 +1787,10 @@ audio::-webkit-media-controls-play-button {
     border-spacing: 10px;
 }
 
-.horizontalLayout {
+.horizontalLayoutComp {
     display: table;
     border-spacing: 10px;
-    border-collapse: collapse;
+    // border-collapse: collapse;
     margin-top: $smallGap;
     margin-bottom: $smallGap;
 }
