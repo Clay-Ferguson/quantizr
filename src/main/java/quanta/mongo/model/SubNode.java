@@ -36,8 +36,8 @@ import quanta.util.XString;
 @Document(collection = "nodes")
 @TypeAlias("n1")
 @JsonInclude(Include.NON_NULL)
-@JsonPropertyOrder({SubNode.PATH, SubNode.CONTENT, SubNode.NAME, SubNode.ID, SubNode.ORDINAL,
-		SubNode.OWNER, SubNode.CREATE_TIME, SubNode.MODIFY_TIME, SubNode.AC, SubNode.PROPERTIES})
+@JsonPropertyOrder({SubNode.PATH, SubNode.CONTENT, SubNode.NAME, SubNode.ID, SubNode.ORDINAL, SubNode.OWNER, SubNode.CREATE_TIME,
+		SubNode.MODIFY_TIME, SubNode.AC, SubNode.PROPERTIES})
 public class SubNode {
 	private static final Logger log = LoggerFactory.getLogger(SubNode.class);
 
@@ -98,11 +98,10 @@ public class SubNode {
 	 * a key which indicates privileges granted to everyone (the entire public)
 	 * 
 	 * todo-1: Need to investigate wether this should have just been a String of the format like:
-	 * [userId]r,[userId]rw,...
-	 * because we can index strings and get good search performance right? This would rely on a substring search,
-	 * so it might be something we'd need to add as one of the TextCriteria searches however, which is the 
-	 * special "full text" searching. In general need to see if there's a way to speed up queries that use
-     * AccessControls
+	 * [userId]r,[userId]rw,... because we can index strings and get good search performance right? This
+	 * would rely on a substring search, so it might be something we'd need to add as one of the
+	 * TextCriteria searches however, which is the special "full text" searching. In general need to see
+	 * if there's a way to speed up queries that use AccessControls
 	 */
 	public static final String AC = "ac";
 	@Field(AC)
@@ -492,9 +491,10 @@ public class SubNode {
 				if (no(v) || no(v.getValue()))
 					return false;
 
-				// Our current property editor only knows how to save strings, so we just cope
-				// with that here, but eventually we will have
-				// typesafety and types even in the editor.
+				/*
+				 * Our current property editor only knows how to save strings, so we just cope with that here, but
+				 * eventually we will have type-safety and types even in the editor.
+				 */
 				if (v.getValue() instanceof String) {
 					String s = ((String) v.getValue()).toLowerCase();
 					// detect true or 1.

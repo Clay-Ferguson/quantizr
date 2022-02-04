@@ -114,6 +114,7 @@ public class UserManagerService extends ServiceBase {
 		}
 		/* Admin Login */
 		else if (PrincipalName.ADMIN.s().equals(req.getUserName())) {
+			// log.debug("AdminLogin root=: " + XString.prettyPrint(mongoUtil.getSystemRootNode()));
 			// springLogin throws exception if it fails.
 			springLogin(req.getUserName(), req.getPassword(), httpReq);
 			sc.setAuthenticated(req.getUserName(), null);
@@ -576,7 +577,8 @@ public class UserManagerService extends ServiceBase {
 
 		arun.run(ms -> {
 			SubNode prefsNode = read.getNode(ms, req.getUserNodeId());
-			if (no(prefsNode)) throw new RuntimeException("Unable to update preferences.");
+			if (no(prefsNode))
+				throw new RuntimeException("Unable to update preferences.");
 
 			// Make sure the account node we're about to modify does belong to the current user.
 			if (!ThreadLocals.getSC().getUserName().equals(prefsNode.getStr(NodeProp.USER.s()))) {
@@ -600,6 +602,7 @@ public class UserManagerService extends ServiceBase {
 			userPrefs.setRssHeadlinesOnly(reqUserPrefs.isRssHeadlinesOnly());
 			userPrefs.setMainPanelCols(reqUserPrefs.getMainPanelCols());
 
+			//log.debug("saveUserPreferences: " + XString.prettyPrint(prefsNode));
 			res.setSuccess(true);
 			return null;
 		});
@@ -873,6 +876,7 @@ public class UserManagerService extends ServiceBase {
 			if (no(prefsNode)) {
 				prefsNode = read.getUserNodeByUserName(ms, userName);
 			}
+
 			userPrefs.setEditMode(prefsNode.getBool(NodeProp.USER_PREF_EDIT_MODE));
 			userPrefs.setShowMetaData(prefsNode.getBool(NodeProp.USER_PREF_SHOW_METADATA));
 			userPrefs.setNsfw(prefsNode.getBool(NodeProp.USER_PREF_NSFW));

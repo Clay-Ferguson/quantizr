@@ -195,6 +195,8 @@ public class MongoEventListener extends AbstractMongoEventListener<SubNode> {
 		}
 
 		ThreadLocals.clean(node);
+		// log.debug(
+		// 		"MONGO EVENT BeforeSave: Node=" + node.getContent() + " EditMode=" + node.getBool(NodeProp.USER_PREF_EDIT_MODE));
 	}
 
 	@Override
@@ -202,6 +204,13 @@ public class MongoEventListener extends AbstractMongoEventListener<SubNode> {
 		SubNode node = event.getSource();
 		if (ok(node)) {
 			ThreadLocals.cacheNode(node);
+		}
+
+		// todo-0: All cached nodes like this will NOT work once we have a multi-instance load-balanced web
+		// app.
+		String dbRoot = "/" + NodePath.ROOT;
+		if (dbRoot.equals(node.getPath())) {
+			read.setDbRoot(node);
 		}
 	}
 
@@ -236,6 +245,9 @@ public class MongoEventListener extends AbstractMongoEventListener<SubNode> {
 		// }
 
 		ThreadLocals.cacheNode(node);
+
+		// log.debug("MONGO EVENT AfterConvert: Node=" + node.getContent() + " EditMode="
+		// 		+ node.getBool(NodeProp.USER_PREF_EDIT_MODE));
 	}
 
 	@Override

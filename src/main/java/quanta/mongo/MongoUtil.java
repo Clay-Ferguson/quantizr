@@ -59,7 +59,6 @@ public class MongoUtil extends ServiceBase {
 	private AppProp prop;
 
 	private static HashSet<String> testAccountNames = new HashSet<>();
-	private static SubNode systemRootNode;
 	private static final Random rand = new Random();
 
 	public static SubNode allUsersRootNode = null;
@@ -900,13 +899,6 @@ public class MongoUtil extends ServiceBase {
 
 		update.save(ms, userNode);
 		return userNode;
-	}
-
-	public SubNode getSystemRootNode() {
-		if (no(systemRootNode)) {
-			systemRootNode = read.getNode(auth.getAdminSession(), "/r");
-		}
-		return systemRootNode;
 	}
 
 	/*

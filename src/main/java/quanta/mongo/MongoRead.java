@@ -61,6 +61,13 @@ public class MongoRead extends ServiceBase {
         }
     }
 
+    public SubNode setDbRoot(SubNode node) {
+        synchronized (dbRootLock) {
+            dbRoot = node;
+            return dbRoot;
+        }
+    }
+
     /**
      * Gets account name from the root node associated with whoever owns 'node'
      */
@@ -200,7 +207,7 @@ public class MongoRead extends ServiceBase {
          * a user prefix
          */
         if ((colonIdx = name.indexOf(":")) == -1) {
-            nodeOwnerId = mongoUtil.getSystemRootNode().getOwner();
+            nodeOwnerId = getDbRoot().getOwner();
             // log.debug("no leading colon, so this is expected to have admin owner=" +
             // nodeOwnerId.toHexString());
         }
@@ -973,6 +980,7 @@ public class MongoRead extends ServiceBase {
         String cacheKey = "USRNODE-" + user;
         SubNode ret = ThreadLocals.getCachedNode(cacheKey);
         if (ok(ret)) {
+            // log.debug("Got Cached Node [key=" + cacheKey + "]: " + XString.prettyPrint(ret));
             return ret;
         }
         if (no(user)) {
