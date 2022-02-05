@@ -414,7 +414,7 @@ export class MenuPanel extends Div {
             new MenuItemSeparator(), //
 
             new MenuItem("Browser Info", MenuPanel.browserInfo), //
-            new MenuItem(state.mobileMode ? "Desktop Layout" : "Mobile Layout", MenuPanel.mobileToggle) //
+            new MenuItem(state.mobileMode ? "Desktop Browser" : "Moble Browser", MenuPanel.mobileToggle) //
 
             // menuItem("Full Repository Export", "fullRepositoryExport", "
             // S.edit.fullRepositoryExport();") + //

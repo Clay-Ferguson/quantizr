@@ -17,8 +17,8 @@ $scrollTrack: $gray-900;
 $scrollThumb: $gray-700;
 $scrollBarWidth: 20px;
 
-//rgb(21,32,43); twitter background
-$body-bg: darken(rgb(32, 34, 36), 7%);
+$baseBgColor: rgb(32, 34, 36);
+$body-bg: darken($baseBgColor, 7%);
 $body-color: white;
 $font-size-base: 1rem !default;
 // $fontSize: 120%;
@@ -1409,7 +1409,6 @@ i'm backing out for now
 
 .widthSizerPanel {
     display: inline-block;
-    margin-top: 8px;
     background: $body-bg
 }
 
@@ -1845,6 +1844,7 @@ audio::-webkit-media-controls-play-button {
     margin-bottom: $smallGap;
     border-radius: $border-radius;
     overflow-x: hidden;
+    background-color: $baseBgColor;
 }
 
 .openGraphImage {

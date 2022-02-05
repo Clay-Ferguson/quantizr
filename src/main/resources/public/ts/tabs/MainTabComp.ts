@@ -47,7 +47,7 @@ export class MainTabComp extends AppTab {
 
         let widthSizerPanel = !state.mobileMode ? new Span(null, { className: "widthSizerPanel float-end" }, [
             panelCols > 4 ? new Icon({
-                className: "fa fa-step-backward fa-lg widthSizerIcon",
+                className: "fa fa-step-backward widthSizerIcon",
                 title: "Narrower view",
                 onClick: () => {
                     dispatch("Action_widthAdjust", (s: AppState): AppState => {
@@ -57,7 +57,7 @@ export class MainTabComp extends AppTab {
                 }
             }) : null,
             panelCols < 8 ? new Icon({
-                className: "fa fa-step-forward fa-lg widthSizerIcon",
+                className: "fa fa-step-forward widthSizerIcon",
                 title: "Wider view",
                 onClick: () => {
                     dispatch("Action_widthAdjust", (s: AppState): AppState => {
