@@ -54,7 +54,7 @@ export class TrendingView extends AppTab {
         let res = data ? (data.rsInfo as TrendingRSInfo).res : null;
 
         if (!res) {
-            this.setChildren([new Heading(4, "Generating statistics...")]);
+            this.setChildren([new Heading(4, "Generating statistics...", { className: "marginTop" })]);
             return;
         }
 
@@ -95,8 +95,8 @@ export class TrendingView extends AppTab {
         }
 
         this.setChildren([
-            new Heading(3, "Trending: Top 100s", { className: "trendingTitle" }),
-            new Div("Words listed by frequency of use. Click one to search...", { className: "marginBottom" }),
+            new Heading(4, "Trending", { className: "trendingTitle" }),
+            new Div("Click any word...", { className: "marginBottom" }),
 
             // this should be correct data but we don't need it here.
             // new TextContent(res.stats, null, false),

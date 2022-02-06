@@ -197,19 +197,21 @@ $mobileHeaderHeight: 3.5em;
 }
 
 .wordStatsArea {
-    border: 2px solid $nodeBorderBottomColor;
+    border: 1px solid $nodeBorderBottomColor;
     padding: $smallGap;
     margin-bottom: $smallGap;
     max-height: 200px;
     overflow-y: auto;
     border-radius: $border-radius;
+    background-color: $baseBgColor;
 }
 
 .trendingWordStatsArea {
-    border: 2px solid $nodeBorderBottomColor;
+    border: 1px solid $nodeBorderBottomColor;
     padding: $smallGap;
     margin-bottom: $smallGap;
     border-radius: $border-radius;
+    background-color: $baseBgColor;
 }
 
 .d3Graph {
@@ -266,10 +268,6 @@ a {
     max-width: 100% !important;
     min-height: 100vh !important;
 }
-
-// .warpdrive {
-//     animation: animatedBackground 2s ease-in;
-// }
 
 .mediaStreamInputOption {
     width: 30rem;
@@ -1761,39 +1759,29 @@ audio::-webkit-media-controls-play-button {
     display: table-row;
 }
 
-// todo-0: use @extends? base class for these three.
-.followingText {
+.profileInfoButton {
     display: inline-block;
     margin-top: $smallGap;
     font-weight: bold;
     margin-left: 15px;
     padding: 8px;
     border: 2px solid $nodeBorderBottomColor;
-    background-color: green;
     border-radius: 100px;
     cursor: pointer;
+}
+
+.followingText {
+    @extend .profileInfoButton;
+    background-color: green;
 }
 
 .blockingText {
-    display: inline-block;
-    margin-top: $smallGap;
-    font-weight: bold;
-    margin-left: 15px;
-    padding: 8px;
-    border: 2px solid $nodeBorderBottomColor;
+    @extend .profileInfoButton;
     background-color: orangered;
-    border-radius: 100px;
-    cursor: pointer;
 }
 
 .followCount {
-    display: inline-block;
-    margin-top: $smallGap;
-    margin-left: 15px;
-    padding: 8px;
-    border: 2px solid $nodeBorderBottomColor;
-    border-radius: 100px;
-    cursor: pointer;
+    @extend .profileInfoButton;
 }
 
 .displayTable {
