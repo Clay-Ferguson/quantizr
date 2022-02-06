@@ -28,11 +28,12 @@ export class LeftNavPanel extends Div {
         let panelCols = state.userPreferences.mainPanelCols || 6;
         if (panelCols < 4) panelCols = 4;
         if (panelCols > 8) panelCols = 8;
+
         let leftCols = 4;
-        if (panelCols >= 6) {
+        if (panelCols >= 5) {
             leftCols--;
         }
-        if (panelCols >= 8) {
+        if (panelCols >= 7) {
             leftCols--;
         }
 
@@ -59,7 +60,7 @@ export class LeftNavPanel extends Div {
         this.setChildren([
             new Div(null, null, [
                 new Img(this.getId() + "_logo", {
-                    className: "smallLogoButton",
+                    className: "leftNavLogoImg",
                     src: "/branding/logo-50px-tr.jpg",
                     onClick: S.util.loadAnonPageHome,
                     title: "Go to Portal Home Node"

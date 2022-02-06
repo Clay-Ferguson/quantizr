@@ -26,22 +26,6 @@ export class RightNavPanel extends Div {
             // tabIndex is required or else scrolling by arrow keys breaks.
             tabIndex: "3"
         });
-
-        let state: AppState = store.getState();
-        let panelCols = state.userPreferences.mainPanelCols || 6;
-        if (panelCols < 4) panelCols = 4;
-        if (panelCols > 8) panelCols = 8;
-        let rightCols = 4;
-
-        if (panelCols >= 5) {
-            rightCols--;
-        }
-        if (panelCols >= 7) {
-            rightCols--;
-        }
-
-        // console.log("right Cols: " + rightCols);
-        this.attribs.className = "col-" + rightCols + " rightNavPanel customScrollbar";
     }
 
     preRender(): void {
@@ -50,7 +34,29 @@ export class RightNavPanel extends Div {
         // mobile mode doesn't render the RHS at all.
         if (state.mobileMode) return;
 
-        let headerImg = this.makeHeaderDiv(state);
+        let panelCols = state.userPreferences.mainPanelCols || 6;
+        if (panelCols < 4) panelCols = 4;
+        if (panelCols > 8) panelCols = 8;
+        let rightCols = 4;
+
+        if (panelCols >= 6) {
+            rightCols--;
+        }
+        if (panelCols >= 8) {
+            rightCols--;
+        }
+
+        // console.log("right Cols: " + rightCols);
+        this.attribs.className = "col-" + rightCols + " rightNavPanel customScrollbar";
+
+        // DO NOT DELETE
+        // show header image only if not super narrow.
+        // let headerImg = rightCols > 2 ? this.makeHeaderDiv(state) : null;
+
+        // hack for now. I decided showing the header image isn't very attractive when user has a narrow
+        // window, becuase it gets too large, and users maybe don't need to see their own header all the time anyway.
+        let headerImg = null;
+
         let avatarImg = this.makeAvatarDiv(state, !!headerImg);
 
         let displayName = state.displayName ? state.displayName : (!state.isAnonUser ? state.userName : null);

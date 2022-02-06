@@ -400,6 +400,8 @@ export class Edit {
     setMainPanelCols = (val: number): void => {
         setTimeout(() => {
             let state = store.getState();
+            if (val < 4) val = 4;
+            if (val > 8) val = 8;
             state.userPreferences.mainPanelCols = val;
             S.util.saveUserPreferences(state);
         }, 100);

@@ -70,10 +70,10 @@ export class UserProfileDlg extends DialogBase {
                 new HorizontalLayout([
                     profileImg,
                     new Div(null, { className: "userDisplayName" }, [
-                        new Div(null, null, [
-                        this.readOnly
-                            ? new Heading(4, state.userProfile.displayName || "")
-                            : new TextField({ label: "Display Name", inputClass: "displayNameTextField", val: this.displayNameState })
+                        new Div(null, { className: "marginLeft" }, [
+                            this.readOnly
+                                ? new Heading(4, state.userProfile.displayName || "")
+                                : new TextField({ label: "Display Name", inputClass: "displayNameTextField", val: this.displayNameState })
                         ]),
                         new Div(null, { className: "float-end" }, [
                             state.userProfile.blocked ? new Span("You Blocked", {
@@ -149,7 +149,7 @@ export class UserProfileDlg extends DialogBase {
                     state.userProfile.actorUrl ? new Button("User Page", () => {
                         window.open(state.userProfile.actorUrl, "_blank");
                     }) : null,
-                    new Button("Close", this.close, null, "btn-secondary float-end")
+                    new Button(this.readOnly ? "Close" : "Cancel", this.close, null, "btn-secondary float-end")
                 ], "marginTop")
             ])
         ];

@@ -319,6 +319,13 @@ a {
     padding: 5px;
 }
 
+.leftNavLogoImg {
+    border: 2px solid lightgray;
+    cursor: pointer;
+    border-radius: 4px;
+    padding: 5px;
+}
+
 .logo-text {
     cursor: pointer;
     font-size: 1.5rem;
@@ -562,7 +569,8 @@ strong em {
 }
 
 .logoutLink {
-    margin-left: $smallGap
+    margin-left: $smallGap;
+    margin-top: $smallGap
 }
 
 .ogBookmarkIcon {
@@ -1400,7 +1408,7 @@ i'm backing out for now
 }
 
 .node-grid-cell {
-    border: 2px solid $nodeBorderBottomColor;
+    border: 1px solid $nodeBorderBottomColor;
     display: table-cell;
     padding-top: 8px;
     padding-bottom: 5px;
@@ -1409,7 +1417,7 @@ i'm backing out for now
 
 .widthSizerPanel {
     display: inline-block;
-    background: $body-bg
+    background: $body-bg;
 }
 
 .widthSizerIcon {
