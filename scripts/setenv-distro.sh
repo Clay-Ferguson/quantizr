@@ -28,7 +28,7 @@ mkdir -p ${MONGO_SCRIPTS}
 export ipfs_data=${DEPLOY_TARGET}/ipfs
 export ipfs_staging=${DEPLOY_TARGET}/ipfs/staging
 
-export QUANTA_VER=1.0.21
+export QUANTA_VER=1.0.22
 
 # Note: define-functions.sh is where we pass the ARGS into dockerfile
 export JAR_FILE=./quanta-0.0.1-SNAPSHOT.jar
