@@ -877,6 +877,7 @@ export const enum NodeProp {
     ENC_KEY = "sn:encKey",
     TEMP = "tmp",
     RSS_FEED_SRC = "sn:rssFeedSrc",
+    AUDIO_URL = "sn:audioUrl",
     USER_PREF_PUBLIC_KEY = "sn:publicKey",
     USER_PREF_EDIT_MODE = "sn:editMode",
     USER_PREF_SHOW_METADATA = "sn:showMetaData",

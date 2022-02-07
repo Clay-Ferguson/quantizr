@@ -910,9 +910,22 @@ export class Edit {
         this.createNode(node, J.NodeType.BOOKMARK, true, true, null, null, state);
     }
 
-    addLinkBookmark = (content: any, state: AppState): void => {
+    addLinkBookmark = async (content: any, audioUrl: string, state: AppState): Promise<void> => {
         state = appState(state);
-        this.createNode(null, J.NodeType.BOOKMARK, true, true, "linkBookmark", content, state);
+
+        let res: J.CreateSubNodeResponse = await S.util.ajax<J.CreateSubNodeRequest, J.CreateSubNodeResponse>("createSubNode", {
+            pendingEdit: true,
+            nodeId: null,
+            newNodeName: "",
+            typeName: J.NodeType.BOOKMARK,
+            createAtTop: true,
+            content,
+            typeLock: true,
+            payloadType: "linkBookmark",
+            properties: [{ name: J.NodeProp.AUDIO_URL, value: audioUrl }],
+            shareToUserId: null
+        });
+        this.createSubNodeResponse(res, true, null, state);
     }
 
     addNode = async (nodeId: string, content: string, shareToUserId: string, replyToId: string, state: AppState) => {

@@ -51,6 +51,7 @@ public enum NodeProp {
      * overwritten ever by the code
      */
     RSS_FEED_SRC("sn:rssFeedSrc", "s"),
+    AUDIO_URL("sn:audioUrl", "s"),
 
     USER_PREF_PUBLIC_KEY("sn:publicKey", "s"), //
     USER_PREF_EDIT_MODE("sn:editMode", "s"), //

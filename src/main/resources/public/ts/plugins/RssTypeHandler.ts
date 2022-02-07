@@ -336,9 +336,11 @@ export class RssTypeHandler extends TypeBase {
         children.push(new Div(null, null, headerDivChildren));
 
         // process audio enclosures
+        let audioUrl = null;
         if (entry.enclosures) {
             entry.enclosures.forEach(enc => {
                 if (enc.type && enc.type.indexOf("audio/") !== -1) {
+                    audioUrl = enc.url;
                     let downloadLink = new Anchor(enc.url, "[ Download " + enc.type + " ]", { className: "rssDownloadLink" }, null, true);
                     let audioButton = new Button("Play Audio", () => {
                         let dlg = new AudioPlayerDlg(feed.title, entry.title, null, enc.url, 0, state);
@@ -417,14 +419,7 @@ export class RssTypeHandler extends TypeBase {
             className: "fa fa-bookmark fa-lg rssLinkIcon",
             title: "Bookmark this RSS entry",
             onClick: () => {
-                // Now that we have "Open Graph" we don't
-                // need the content. User can still enter it at will.
-                // let content = "#### " + shortTitle + "\n";
-                // if (feedTitle) {
-                //     content += "\nFeed: " + feedTitle + "\n";
-                // }
-                // content += "\n" + entry.link;
-                S.edit.addLinkBookmark(entry.link, state);
+                S.edit.addLinkBookmark("#### " + feed.title + ": " + entry.title + "\n\n" + entry.link + "\n\n" + audioUrl, audioUrl, state);
             }
         }) : null;
 

@@ -1373,7 +1373,7 @@ public class AppController extends ServiceBase implements ErrorController {
 
 	@RequestMapping(value = API_PATH + "/graphNodes", method = RequestMethod.POST)
 	public @ResponseBody Object graphNodes(@RequestBody GraphRequest req, HttpSession session) {
-		SessionContext.checkReqToken();
+		// SessionContext.checkReqToken();
 		return callProc.run("graphNodes", req, session, ms -> {
 			GraphResponse res = graphNodes.graphNodes(ms, req);
 			res.setSuccess(true);
