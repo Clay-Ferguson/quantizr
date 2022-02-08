@@ -419,7 +419,9 @@ export class RssTypeHandler extends TypeBase {
             className: "fa fa-bookmark fa-lg rssLinkIcon",
             title: "Bookmark this RSS entry",
             onClick: () => {
-                S.edit.addLinkBookmark("#### " + feed.title + ": " + entry.title + "\n\n" + entry.link + "\n\n" + audioUrl, audioUrl, state);
+                let content = "#### " + feed.title + ": " + entry.title + "\n\n" + entry.link;
+                if (audioUrl) content += "\n\n" + audioUrl;
+                S.edit.addLinkBookmark(content, audioUrl, state);
             }
         }) : null;
 

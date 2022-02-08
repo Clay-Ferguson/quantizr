@@ -922,7 +922,7 @@ export class Edit {
             content,
             typeLock: true,
             payloadType: "linkBookmark",
-            properties: [{ name: J.NodeProp.AUDIO_URL, value: audioUrl }],
+            properties: audioUrl ? [{ name: J.NodeProp.AUDIO_URL, value: audioUrl }] : null,
             shareToUserId: null
         });
         this.createSubNodeResponse(res, true, null, state);
