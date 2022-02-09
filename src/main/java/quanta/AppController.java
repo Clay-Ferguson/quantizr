@@ -1405,6 +1405,10 @@ public class AppController extends ServiceBase implements ErrorController {
 		});
 	}
 
+	/*
+	 * Used to keep session from timing out when browser is doing something long-running like playing an
+	 * audio file, and the user may not be interacting at all.
+	 */
 	@RequestMapping(value = API_PATH + "/ping", method = RequestMethod.POST)
 	public @ResponseBody Object ping(@RequestBody PingRequest req, HttpSession session) {
 		return callProc.run("ping", req, session, ms -> {

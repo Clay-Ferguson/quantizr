@@ -10,6 +10,7 @@ import { TextField } from "../comp/core/TextField";
 import { DialogBase } from "../DialogBase";
 import * as I from "../Interfaces";
 import { S } from "../Singletons";
+import * as J from "../JavaIntf";
 import { ValidatedState } from "../ValidatedState";
 
 /**
@@ -35,6 +36,7 @@ export class AudioPlayerDlg extends DialogBase {
     */
     private adSegments: I.AdSegment[] = null;
     private saveTimer: any = null;
+    private longTimer: any = null;
     urlHash: string;
 
     timeLeftTextField: TextField;
@@ -52,6 +54,13 @@ export class AudioPlayerDlg extends DialogBase {
             this.oneMinuteTimeslice();
         }, 60000);
 
+        // ping server at 10 minute intervals (if audio playing), to avoid session timeout
+        this.longTimer = setInterval(() => {
+            if (!this.player.paused && !this.player.ended) {
+                S.util.ajax<J.PingRequest, J.PingResponse>("ping");
+            }
+        }, 600000);
+
         setTimeout(() => {
             this.updatePlayButton();
         }, 750);
@@ -60,7 +69,14 @@ export class AudioPlayerDlg extends DialogBase {
     preUnmount(): any {
         if (this.intervalTimer) {
             clearInterval(this.intervalTimer);
+        }
+
+        if (this.saveTimer) {
             clearInterval(this.saveTimer);
+        }
+
+        if (this.longTimer) {
+            clearInterval(this.longTimer);
         }
     }
 
