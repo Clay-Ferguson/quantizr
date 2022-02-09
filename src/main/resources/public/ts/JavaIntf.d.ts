@@ -772,6 +772,7 @@ export interface NodeInfo {
     path: string;
     name: string;
     content: string;
+    tags: string;
     lastModified: Date;
     logicalOrdinal: number;
     ordinal: number;

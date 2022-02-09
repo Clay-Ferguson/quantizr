@@ -803,7 +803,9 @@ public class MongoUtil extends ServiceBase {
 			TextIndexDefinition textIndex = new TextIndexDefinitionBuilder()//
 					// note: onAllFields was always used until 1/21/22
 					// .onAllFields()
-					.onField(SubNode.CONTENT).build();
+					.onField(SubNode.CONTENT) //
+					.onField(SubNode.TAGS) //
+					.build();
 
 			update.saveSession(ms);
 			ops.indexOps(clazz).ensureIndex(textIndex);

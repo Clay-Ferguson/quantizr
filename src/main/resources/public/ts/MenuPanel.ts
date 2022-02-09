@@ -404,9 +404,9 @@ export class MenuPanel extends Div {
             new MenuItemSeparator(), //
 
             new MenuItem("Edit", MenuPanel.toggleEditMode, !state.isAnonUser, () => state.userPreferences.editMode), //
-            new MenuItem("Metadata", MenuPanel.toggleMetaData, true, () => state.userPreferences.showMetaData), //
+            new MenuItem("Show Metadata", MenuPanel.toggleMetaData, true, () => state.userPreferences.showMetaData), //
             new MenuItem("NSFW", MenuPanel.toggleNsfw, true, () => state.userPreferences.nsfw), //
-            new MenuItem("Context", MenuPanel.toggleParents, true, () => state.userPreferences.showParents), //
+            new MenuItem("Show Parent", MenuPanel.toggleParents, true, () => state.userPreferences.showParents), //
 
             // For now there is only ONE button on the Perferences dialog that is accessible as a toolbar button already, so
             // until we have at least one more preference the preferences dialog is not needed.

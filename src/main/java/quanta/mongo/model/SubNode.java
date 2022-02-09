@@ -62,6 +62,10 @@ public class SubNode {
 	@Field(CONTENT)
 	private String content;
 
+	public static final String TAGS = "tag";
+	@Field(TAGS)
+	private String tags;
+
 	public static final String NAME = "name";
 	@Field(NAME)
 	private String name;
@@ -115,6 +119,7 @@ public class SubNode {
 			SubNode.PATH, //
 			SubNode.TYPE, //
 			SubNode.CONTENT, //
+			SubNode.TAGS, //
 			SubNode.NAME, //
 			SubNode.ID, //
 			SubNode.ORDINAL, //
@@ -570,6 +575,19 @@ public class SubNode {
 			return;
 		ThreadLocals.dirty(this);
 		this.content = content;
+	}
+
+	@JsonProperty(TAGS)
+	public String getTags() {
+		return tags;
+	}
+
+	@JsonProperty(TAGS)
+	public void setTags(String tags) {
+		if (Util.equalObjs(tags, this.tags))
+			return;
+		ThreadLocals.dirty(this);
+		this.tags = tags;
 	}
 
 	@Transient

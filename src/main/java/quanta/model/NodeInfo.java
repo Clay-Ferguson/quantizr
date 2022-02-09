@@ -24,6 +24,8 @@ public class NodeInfo {
 	private String path;
 	private String name;
 	private String content;
+	private String tags;
+
 	private Date lastModified;
 
 	// todo-2: make this show something like 1hr ago or 2d ago, etc using DateUtil.formatDurationMillis,
@@ -89,7 +91,7 @@ public class NodeInfo {
 
 	public NodeInfo() {}
 
-	public NodeInfo(String id, String path, String name, String content, String displayName, String owner, String ownerId,
+	public NodeInfo(String id, String path, String name, String content, String tags, String displayName, String owner, String ownerId,
 			Long ordinal, Date lastModified, List<PropertyInfo> properties, List<AccessControlInfo> ac, boolean hasChildren,
 			int width, int height, String type, long logicalOrdinal, boolean lastChild, String cipherKey, String dataUrl,
 			String avatarVer, String apAvatar, String apImage) {
@@ -97,6 +99,7 @@ public class NodeInfo {
 		this.path = path;
 		this.name = name;
 		this.content = content;
+		this.tags = tags;
 		this.lastModified = lastModified;
 		this.displayName = displayName;
 		this.owner = owner;
@@ -157,6 +160,14 @@ public class NodeInfo {
 
 	public void setContent(String content) {
 		this.content = content;
+	}
+
+	public String getTags() {
+		return tags;
+	}
+
+	public void setTag(String tags) {
+		this.tags = tags;
 	}
 
 	public String getCipherKey() {

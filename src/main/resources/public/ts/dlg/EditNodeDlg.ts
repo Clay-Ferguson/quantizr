@@ -52,6 +52,7 @@ export class EditNodeDlg extends DialogBase {
     public contentEditor: I.TextEditorIntf;
     contentEditorState: ValidatedState<any> = new ValidatedState<any>();
     nameState: ValidatedState<any> = new ValidatedState<any>();
+    tagsState: ValidatedState<any> = new ValidatedState<any>();
 
     // holds a map of states by property names.
     propStates: Map<string, ValidatedState<any>> = new Map<string, ValidatedState<any>>();
@@ -279,6 +280,8 @@ export class EditNodeDlg extends DialogBase {
                 let contentTableRow = this.makeContentEditor(state.node, isWordWrap, rows);
                 mainPropsTable.addChild(contentTableRow);
                 this.contentEditor.setWordWrap(isWordWrap);
+
+                mainPropsTable.addChild(new TextField({ label: "Tags", val: this.tagsState }));
             }
         }
 

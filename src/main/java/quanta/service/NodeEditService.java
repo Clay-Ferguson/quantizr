@@ -320,6 +320,7 @@ public class NodeEditService extends ServiceBase {
 		}
 
 		node.setContent(nodeInfo.getContent());
+		node.setTags(nodeInfo.getTags());
 		node.touch();
 		node.setType(nodeInfo.getType());
 

@@ -150,7 +150,7 @@ public class Convert extends ServiceBase {
 			}
 		}
 
-		NodeInfo nodeInfo = new NodeInfo(node.jsonId(), node.getPath(), node.getName(), node.getContent(), displayName, owner,
+		NodeInfo nodeInfo = new NodeInfo(node.jsonId(), node.getPath(), node.getName(), node.getContent(), node.getTags(), displayName, owner,
 				ownerId, node.getOrdinal(), //
 				node.getModifyTime(), propList, acList, hasChildren, //
 				ok(imageSize) ? imageSize.getWidth() : 0, //

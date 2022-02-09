@@ -66,6 +66,7 @@ export class EditNodeDlgUtil {
         }
         state.node.content = content;
         state.node.name = dlg.nameState.getValue();
+        state.node.tags = dlg.tagsState.getValue();
 
         let askToSplit = state.node.content && ((state.node as J.NodeInfo).content.indexOf("{split}") !== -1 ||
             (state.node as J.NodeInfo).content.indexOf("\n\n\n") !== -1);
@@ -394,6 +395,7 @@ export class EditNodeDlgUtil {
 
         /* Initialize node name state */
         dlg.nameState.setValue(state.node.name);
+        dlg.tagsState.setValue(state.node.tags);
         this.initPropStates(dlg, state.node, false);
     }
 
