@@ -95,7 +95,7 @@ export class NodeCompMarkdown extends Html {
         if (val.indexOf("<") === -1 ||
             val.indexOf(">") === -1) return;
 
-        this.urls = [];
+        this.urls = null;
         let elm = document.createElement("html");
         elm.innerHTML = val;
         elm.querySelectorAll("a").forEach((e: any) => {
@@ -112,6 +112,10 @@ export class NodeCompMarkdown extends Html {
             if (content.indexOf("(" + href + ")") !== -1) return;
             if (content.indexOf("* " + href) !== -1) return;
 
+            // lazy instantiate
+            if (!this.urls) {
+                this.urls = [];
+            }
             this.urls.push(href);
         });
     }

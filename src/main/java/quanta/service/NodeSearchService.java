@@ -393,6 +393,9 @@ public class NodeSearchService extends ServiceBase {
 				continue;
 
 			String content = node.getContent();
+			if (ok(node.getTags())) {
+				content += " "+node.getTags();
+			}
 			content = fixMastodonMangles(content);
 
 			StringTokenizer tokens = new StringTokenizer(content, WORD_DELIMS, false);

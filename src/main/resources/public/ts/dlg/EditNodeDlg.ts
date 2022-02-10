@@ -280,8 +280,6 @@ export class EditNodeDlg extends DialogBase {
                 let contentTableRow = this.makeContentEditor(state.node, isWordWrap, rows);
                 mainPropsTable.addChild(contentTableRow);
                 this.contentEditor.setWordWrap(isWordWrap);
-
-                mainPropsTable.addChild(new TextField({ label: "Tags", val: this.tagsState }));
             }
         }
 
@@ -354,6 +352,7 @@ export class EditNodeDlg extends DialogBase {
         }
 
         let collapsiblePanel = !customProps ? new CollapsiblePanel(null, null, null, [
+            new TextField({ label: "Tags", val: this.tagsState }),
             nodeNameTextField, selectionsBar, checkboxesBar, propsTable
         ], false,
             (state: boolean) => {
@@ -413,7 +412,7 @@ export class EditNodeDlg extends DialogBase {
 
             // todo-2: this is not doing what I want but is unimportant so removing it for now.
             // ipfsLink ? new Button("IPFS Link", () => S.render.showNodeUrl(state.node, this.appState), { title: "Show the IPFS URL for the attached file." }) : null
-        ]);
+        ], "horizontalLayoutCompCompact");
 
         let bottomBinRow = null;
         if (ipfsLink) {

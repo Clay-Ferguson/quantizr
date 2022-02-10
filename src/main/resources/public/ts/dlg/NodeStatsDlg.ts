@@ -21,11 +21,11 @@ export class NodeStatsDlg extends DialogBase {
     renderDlg = (): CompIntf[] => {
         let tagPanel = new Div(null, { className: "wordStatsArea" });
         if (this.res.topTags?.length > 0) {
-            tagPanel.addChild(new Heading(4, this.trending ? "Hashtags" : "Top Hashtags"));
+            tagPanel.addChild(new Heading(4, "Hashtags"));
             this.res.topTags.forEach((word: string) => {
-                tagPanel.addChild(new Span(word.substring(1), {
+                tagPanel.addChild(new Span(word, {
                     className: "statsWord",
-                    word: "\"#" + word + "\"",
+                    word: "\"" + word + "\"",
                     onClick: this.searchWord
                 }));
             });
@@ -33,11 +33,11 @@ export class NodeStatsDlg extends DialogBase {
 
         let mentionPanel = new Div(null, { className: "wordStatsArea" });
         if (this.res.topMentions?.length > 0) {
-            mentionPanel.addChild(new Heading(4, this.trending ? "Mentions" : "Top Mentions"));
+            mentionPanel.addChild(new Heading(4, "Mentions"));
             this.res.topMentions.forEach((word: string) => {
-                mentionPanel.addChild(new Span(word.substring(1), {
+                mentionPanel.addChild(new Span(word, {
                     className: "statsWord",
-                    word: "\"@" + word + "\"",
+                    word: "\"" + word + "\"",
                     onClick: this.searchWord
                 }));
             });
@@ -45,7 +45,7 @@ export class NodeStatsDlg extends DialogBase {
 
         let wordPanel = new Div(null, { className: "wordStatsArea" });
         if (this.res.topWords?.length > 0) {
-            wordPanel.addChild(new Heading(4, this.trending ? "Words" : "Top Words"));
+            wordPanel.addChild(new Heading(4, "Words"));
             this.res.topWords.forEach((word: string) => {
                 wordPanel.addChild(new Span(word, {
                     className: "statsWord",
