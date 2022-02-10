@@ -32,7 +32,7 @@ import quanta.response.NodeFeedResponse;
 import quanta.util.ThreadLocals;
 
 @Component
-public class UserFeedService extends ServiceBase  {
+public class UserFeedService extends ServiceBase {
 	private static final Logger log = LoggerFactory.getLogger(UserFeedService.class);
 
 	static final int MAX_FEED_ITEMS = 25;
@@ -196,7 +196,8 @@ public class UserFeedService extends ServiceBase  {
 
 		HashSet<ObjectId> blockedUserIds = new HashSet<>();
 
-		// this logic makes it so that any feeds using 'public' checkbox will have the admin-blocked users removed from it.
+		// this logic makes it so that any feeds using 'public' checkbox will have the admin-blocked users
+		// removed from it.
 		if (req.getToPublic()) {
 			getBlockedUserIds(blockedUserIds, PrincipalName.ADMIN.s());
 		}
@@ -263,7 +264,17 @@ public class UserFeedService extends ServiceBase  {
 
 		if (!StringUtils.isEmpty(req.getSearchText())) {
 			TextCriteria textCriteria = TextCriteria.forDefaultLanguage();
-			textCriteria.matching(req.getSearchText());
+			String text = req.getSearchText();
+			/*
+			 * If searching for a tag name or a username, be smart enough to enclose it in quotes for user,
+			 * because if we don't then searches for "#mytag" WILL end up finding also just instances of mytag
+			 * (not a tag) which is incorrect.
+			 */
+			if ((text.startsWith("#") || text.startsWith("@")) && !text.contains(" ")) {
+				text = "\"" + text + "\"";
+			}
+		
+			textCriteria.matching(text);
 			textCriteria.caseSensitive(false);
 			q.addCriteria(textCriteria);
 		}
@@ -283,7 +294,7 @@ public class UserFeedService extends ServiceBase  {
 		}
 
 		Iterable<SubNode> iter = mongoUtil.find(q);
-	
+
 		for (SubNode node : iter) {
 			try {
 				NodeInfo info = convert.convertToNodeInfo(sc, ms, node, true, false, counter + 1, false, false, false, false);

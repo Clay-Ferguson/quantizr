@@ -801,10 +801,13 @@ public class MongoUtil extends ServiceBase {
 
 		try {
 			TextIndexDefinition textIndex = new TextIndexDefinitionBuilder()//
-					// note: onAllFields was always used until 1/21/22
-					// .onAllFields()
-					.onField(SubNode.CONTENT) //
-					.onField(SubNode.TAGS) //
+					// note: Switching BACK to "all fields" because of how Mastodon mangles hashtags like this:
+					// "#<span>tag</span> making the only place we can find "#tag" as an actual string be inside
+					// the properties array attached to each node.
+					.onAllFields()
+
+					// .onField(SubNode.CONTENT) //
+					// .onField(SubNode.TAGS) //
 					.build();
 
 			update.saveSession(ms);

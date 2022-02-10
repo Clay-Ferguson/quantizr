@@ -728,11 +728,21 @@ public class MongoRead extends ServiceBase {
                     criterias.add(Criteria.where(prop).regex(text, "i"));
                 }
             } else {
+                // todo-1: take another look at these to see if any can be useful for more powerful searching.
                 // .matchingAny("search term1", "search term2")
-                // .matching("search term") // matches any that contain "serch" OR "term"
+                // .matching("search term") // matches any that contain "search" OR "term"
                 // .matchingPhrase("search term")
 
                 TextCriteria textCriteria = TextCriteria.forDefaultLanguage();
+
+                /*
+                 * If searching for a tag name or a username, be smart enough to enclose it in quotes for user,
+                 * because if we don't then searches for "#mytag" WILL end up finding also just instances of mytag
+                 * (not a tag) which is incorrect.
+                 */
+                if ((text.startsWith("#") || text.startsWith("@")) && !text.contains(" ")) {
+                    text = "\"" + text + "\"";
+                }
                 textCriteria.matching(text);
                 textCriteria.caseSensitive(caseSensitive);
                 criterias.add(textCriteria);
