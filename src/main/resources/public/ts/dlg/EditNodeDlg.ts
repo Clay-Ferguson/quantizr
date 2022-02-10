@@ -266,7 +266,7 @@ export class EditNodeDlg extends DialogBase {
 
         let nodeNameTextField: TextField = null;
         if (!customProps) {
-            nodeNameTextField = new TextField({ label: "Node Name", inputClass: "nodeNameTextField", val: this.nameState });
+            nodeNameTextField = new TextField({ label: "Node Name", outterClass: "marginTop", inputClass: "nodeNameTextField", val: this.nameState });
         }
 
         if (allowContentEdit) {
@@ -311,12 +311,11 @@ export class EditNodeDlg extends DialogBase {
         if (allowPropAdd) {
             if (numPropsShowing > 0) {
                 let propsButtonBar: ButtonBar = new ButtonBar([
-
                     new IconButton("fa fa-plus", null, {
                         onClick: () => this.utl.addProperty(this),
                         title: "Add property"
                     }),
-                    this.deletePropButton = new IconButton("fa fa-minus", null, {
+                    this.deletePropButton = new IconButton("fa fa-trash", null, {
                         onClick: () => this.utl.deletePropertiesButtonClick(this),
                         title: "Delete property"
                     })
@@ -325,7 +324,7 @@ export class EditNodeDlg extends DialogBase {
                 this.deletePropButton.setEnabled(false);
 
                 // adds the button bar to the top of the list of children.
-                propsParent.safeGetChildren().unshift(propsButtonBar, new Clearfix());
+                propsParent.safeGetChildren().unshift(new Span("Properties"), propsButtonBar, new Clearfix());
             }
         }
 
@@ -352,7 +351,7 @@ export class EditNodeDlg extends DialogBase {
         }
 
         let collapsiblePanel = !customProps ? new CollapsiblePanel(null, null, null, [
-            new TextField({ label: "Tags", val: this.tagsState }),
+            new TextField({ label: "Tags", outterClass: "marginTop", val: this.tagsState }),
             nodeNameTextField, selectionsBar, checkboxesBar, propsTable
         ], false,
             (state: boolean) => {

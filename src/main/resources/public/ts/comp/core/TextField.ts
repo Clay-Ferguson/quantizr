@@ -33,7 +33,7 @@ export class TextField extends Div implements I.TextEditorIntf, I.ValueIntf {
 
         Object.assign(this.attribs, {
             name: this.getId(),
-            className: "form-group" + (this.cfg.labelLeft ? " form-inline " : " ") + (this.cfg.outterClass || "")
+            className: (this.cfg.labelLeft ? "form-inline " : " ") + (this.cfg.outterClass || "")
         });
 
         this.mergeState<LS>({

@@ -172,7 +172,8 @@ export class SearchContentDlg extends DialogBase {
             requirePriority = false;
         }
 
-        S.srch.search(node, null, SearchContentDlg.defaultSearchText, this.appState, null, desc, this.getState<LS>().fuzzy,
+        S.srch.search(node, null, SearchContentDlg.defaultSearchText, this.appState, null, desc,
+            this.getState<LS>().fuzzy,
             this.getState<LS>().caseSensitive, 0,
             this.getState<LS>().recursive,
             this.getState<LS>().sortField,
