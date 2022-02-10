@@ -99,7 +99,7 @@ public class NodeMoveService extends ServiceBase {
 		/*
 		 * todo-2: there is a slight ineffieiency here in that 'node' does end up getting saved both as part
 		 * of the insertOrdinal, and also then with the setting of it to zero. Will be easy to fix when I
-		 * get to it, but is low priority for now.
+		 * get to it.
 		 */
 		update.saveSession(ms);
 		node.setOrdinal(0L);

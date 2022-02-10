@@ -99,7 +99,6 @@ public class ThrottleFilter extends GenericFilterBean {
 				httpReq.getRequestURI().endsWith("/serverPush") || //
 				httpReq.getRequestURI().endsWith("/anonPageLoad") || //
 				httpReq.getRequestURI().endsWith("/getOpenGraph")) {
-			// these have priority
 		} else {
 			if (THROTTLE_ENABLED) {
 				long wait = THROTTLE_INTERVAL - (curTime - info.getLastRequestTime());
