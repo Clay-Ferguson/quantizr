@@ -108,7 +108,7 @@ export class EditNodeDlg extends DialogBase {
             { key: "c4", val: "4 col" },
             { key: "c5", val: "5 col" },
             { key: "c6", val: "6 col" }
-        ], "width-7rem", "col-3", new PropValueHolder(this.getState<LS>().node, J.NodeProp.LAYOUT, "v"));
+        ], null, "layoutSelection", new PropValueHolder(this.getState<LS>().node, J.NodeProp.LAYOUT, "v"));
         return selection;
     }
 
@@ -120,7 +120,7 @@ export class EditNodeDlg extends DialogBase {
             { key: "3", val: "Medium" },
             { key: "4", val: "Low" },
             { key: "5", val: "Backlog" }
-        ], "width-7rem", "col-3", new PropValueHolder(this.getState<LS>().node, J.NodeProp.PRIORITY, "0"));
+        ], null, "col-3", new PropValueHolder(this.getState<LS>().node, J.NodeProp.PRIORITY, "0"));
     }
 
     createImgSizeSelection = (label: string, allowNone: boolean, extraClasses: string, valueIntf: ValueIntf): Selection => {
@@ -149,7 +149,7 @@ export class EditNodeDlg extends DialogBase {
             { key: "1000px", val: "1000px" }
         ]);
 
-        return new Selection(null, label, options, "width-7rem", extraClasses, valueIntf);
+        return new Selection(null, label, options, null, extraClasses, valueIntf);
     }
 
     getTitleIconComp(): CompIntf {
@@ -231,14 +231,15 @@ export class EditNodeDlg extends DialogBase {
             ])
         ];
 
-        let selectionsBar = new Div(null, { className: "row marginTop" }, [
-            state.node.hasChildren ? this.createLayoutSelection() : null,
-            state.node.hasChildren ? this.createImgSizeSelection("Images", true, "col-3", //
-                new PropValueHolder(this.getState<LS>().node, J.NodeProp.CHILDREN_IMG_SIZES, "n")) : null,
-            this.createPrioritySelection()
-        ]);
+        let flowPanel: Div = new Div(null, { className: "marginTop d-flex flex-row flex-wrap" });
 
-        let checkboxesBar = this.makeCheckboxesRow(state, customProps);
+        if (state.node.hasChildren) {
+            flowPanel.addChild(this.createLayoutSelection());
+            flowPanel.addChild(this.createImgSizeSelection("Images", true, "imagesSelection", //
+                new PropValueHolder(this.getState<LS>().node, J.NodeProp.CHILDREN_IMG_SIZES, "n")));
+        }
+
+        flowPanel.addChildren(this.makeCheckboxesRow(state, customProps));
 
         // This is the table that contains the custom editable properties inside the collapsable panel at the bottom.
         let propsTable: Comp = null;
@@ -266,7 +267,7 @@ export class EditNodeDlg extends DialogBase {
 
         let nodeNameTextField: TextField = null;
         if (!customProps) {
-            nodeNameTextField = new TextField({ label: "Node Name", outterClass: "marginTop", inputClass: "nodeNameTextField", val: this.nameState });
+            nodeNameTextField = new TextField({ label: "Node Name", outterClass: "col-9", val: this.nameState });
         }
 
         if (allowContentEdit) {
@@ -352,7 +353,12 @@ export class EditNodeDlg extends DialogBase {
 
         let collapsiblePanel = !customProps ? new CollapsiblePanel(null, null, null, [
             new TextField({ label: "Tags", outterClass: "marginTop", val: this.tagsState }),
-            nodeNameTextField, selectionsBar, checkboxesBar, propsTable
+            new Div(null, { className: "row marginTop" }, [
+                nodeNameTextField,
+                this.createPrioritySelection()
+            ]),
+            flowPanel,
+            propsTable
         ], false,
             (state: boolean) => {
                 EditNodeDlg.morePanelExpanded = state;
@@ -433,18 +439,17 @@ export class EditNodeDlg extends DialogBase {
         ]);
     }
 
-    // Creates the row of checkboxes for Encryption, Word Wrap, and Inlinen Children options.
-    makeCheckboxesRow = (state: LS, customProps: string[]): Div => {
-        let encryptCheckBox: Checkbox = !customProps ? new Checkbox("Encrypt", { className: "marginLeft" }, {
+    makeCheckboxesRow = (state: LS, customProps: string[]): Comp[] => {
+        let encryptCheckBox: Checkbox = !customProps ? new Checkbox("Encrypt", null, {
             setValue: (checked: boolean): void => {
                 this.utl.setEncryption(this, checked);
             },
             getValue: (): boolean => {
                 return S.props.isEncrypted(state.node);
             }
-        }, "col-3") : null;
+        }) : null;
 
-        let wordWrapCheckbox = new Checkbox("Word Wrap", { className: "marginLeft" }, {
+        let wordWrapCheckbox = new Checkbox("Word Wrap", null, {
             setValue: (checked: boolean): void => {
                 // this is counter-intuitive that we invert here because 'NOWRAP' is a negation of "wrap"
                 S.props.setPropVal(J.NodeProp.NOWRAP, state.node, checked ? null : "1");
@@ -455,16 +460,12 @@ export class EditNodeDlg extends DialogBase {
             getValue: (): boolean => {
                 return S.props.getPropStr(J.NodeProp.NOWRAP, state.node) !== "1";
             }
-        }, "col-3");
+        });
 
         let inlineChildrenCheckbox = state.node.hasChildren ? new Checkbox("Inline Children", null,
-            this.makeCheckboxPropValueHandler(J.NodeProp.INLINE_CHILDREN), "col-3") : null;
+            this.makeCheckboxPropValueHandler(J.NodeProp.INLINE_CHILDREN)) : null;
 
-        return new Div(null, { className: "row marginLeft marginTop" }, [
-            inlineChildrenCheckbox,
-            wordWrapCheckbox,
-            encryptCheckBox
-        ]);
+        return [inlineChildrenCheckbox, wordWrapCheckbox, encryptCheckBox];
     }
 
     makeCheckboxPropValueHandler(propName: string): I.ValueIntf {

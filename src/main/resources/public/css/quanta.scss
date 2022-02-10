@@ -128,10 +128,6 @@ body {
     margin-left: 10px;
 }
 
-.nodeNameTextField {
-    max-width: 30em;
-}
-
 .nodeTags {
     display: inline-block;
     border: 1px solid olivedrab;
@@ -1581,6 +1577,16 @@ i'm backing out for now
 
 .searchDlgOrderBy {
     width: 12em;
+}
+
+.layoutSelection {
+    max-width: 7em;
+    margin-right: $smallGap;
+}
+
+.imagesSelection {
+    max-width: 7em;
+    margin-right: $smallGap;
 }
 
 .selectLabel {
