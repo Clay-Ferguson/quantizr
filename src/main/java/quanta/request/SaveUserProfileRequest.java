@@ -5,6 +5,8 @@ import quanta.request.base.RequestBase;
 public class SaveUserProfileRequest extends RequestBase {
 	private String userName;
 	private String userBio;
+	private String userTags;
+
 	private String displayName;
 
 	public String getUserName() {
@@ -18,6 +20,15 @@ public class SaveUserProfileRequest extends RequestBase {
 	public void setUserBio(String userBio) {
 		this.userBio = userBio;
 	}
+
+	public String getUserTags() {
+		return userTags;
+	}
+
+	public void setUserTags(String userTags) {
+		this.userTags = userTags;
+	}
+
 
 	public void setUserName(String userName) {
 		this.userName = userName;

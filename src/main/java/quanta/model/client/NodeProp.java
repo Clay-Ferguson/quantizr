@@ -10,12 +10,12 @@ public enum NodeProp {
 
     ACT_PUB_OBJ_CONTENT("ap:objContent", "s"), //
 
-      // For "AP Note" Objects (per spec) this is the "inReplyTo" property on the node.
+    // For "AP Note" Objects (per spec) this is the "inReplyTo" property on the node.
     ACT_PUB_OBJ_INREPLYTO("ap:objInReplyTo", "s"), //
 
     // For "AP Note" Objects (per spec) this is the "url" property on the node.
     ACT_PUB_OBJ_URL("ap:objUrl", "s"), //
-    
+
     ACT_PUB_OBJ_ATTRIBUTED_TO("ap:objAttributedTo", "s"), //
     ACT_PUB_USER_ICON_URL("ap:userIcon", "s"), //
     ACT_PUB_SHARED_INBOX("ap:sharedInbox", "s"), //
@@ -26,7 +26,7 @@ public enum NodeProp {
 
     // this is the url of the HTML for the user (APObj.url prop on actual Actor Objects)
     ACT_PUB_ACTOR_URL("ap:actorUrl", "s"), //
-    
+
     ACT_PUB_ACTOR_INBOX("ap:actorInbox", "s"), //
     ACT_PUB_SENSITIVE("ap:nsfw", "s"), //
 
@@ -34,11 +34,10 @@ public enum NodeProp {
     ACT_PUB_TAG("ap:tag", "s"), //
 
     /*
-     * This is the encrypted symetric key to the node data, that was encrypted using
-     * the private key of the owner of the node. When nodes are shared to other
-     * users the cleartext copy of this key is encrypted with the public key of the
-     * user it's being shared to so that user can use their private key to decrypt
-     * this key and gain access to the actual data.
+     * This is the encrypted symetric key to the node data, that was encrypted using the private key of
+     * the owner of the node. When nodes are shared to other users the cleartext copy of this key is
+     * encrypted with the public key of the user it's being shared to so that user can use their private
+     * key to decrypt this key and gain access to the actual data.
      */
     ENC_KEY("sn:encKey", "s"),
 
@@ -47,11 +46,10 @@ public enum NodeProp {
     TEMP("tmp", "s"),
 
     /*
-     * this is the one entered by the admin which DEFINES the feed, and is not to be
-     * overwritten ever by the code
+     * this is the one entered by the admin which DEFINES the feed, and is not to be overwritten ever by
+     * the code
      */
-    RSS_FEED_SRC("sn:rssFeedSrc", "s"),
-    AUDIO_URL("sn:audioUrl", "s"),
+    RSS_FEED_SRC("sn:rssFeedSrc", "s"), AUDIO_URL("sn:audioUrl", "s"),
 
     USER_PREF_PUBLIC_KEY("sn:publicKey", "s"), //
     USER_PREF_EDIT_MODE("sn:editMode", "s"), //
@@ -68,19 +66,19 @@ public enum NodeProp {
     EMAIL_SUBJECT("sn:subject", "s"), //
 
     /*
-     * when a node id pointing to some other node, we set it's target id to the node
-     * it points to. For now used only for inbox to point to nodes
+     * when a node id pointing to some other node, we set it's target id to the node it points to. For
+     * now used only for inbox to point to nodes
      */
     TARGET_ID("sn:target_id", "s"), //
 
     /*
-     * WARNING: Only the User Account Root nodes have this property of the actual
-     * user name. All other nodes reference their OWNER as an OwnerId that points to
-     * these nodes.
+     * WARNING: Only the User Account Root nodes have this property of the actual user name. All other
+     * nodes reference their OWNER as an OwnerId that points to these nodes.
      */
     USER("sn:user", "s"), //
     DISPLAY_NAME("sn:displayName", "s"), //
     USER_BIO("sn:userBio", "s"), //
+    USER_TAGS("sn:tags", "s"), //
     PWD_HASH("sn:pwdHash", "s"), //
 
     FILE_SYNC_LINK("fs:link", "s"), //
@@ -98,16 +96,17 @@ public enum NodeProp {
 
     // To create an "Explorable" (by user) tree of content assign this property to a node, and set the
     // type of the node to "sn:ipfsNode" (IPFS_NODE)
-    IPFS_CID("ipfs:cid", "s"),
-    IPNS_CID("ipns:cid", "s"),
+    IPFS_CID("ipfs:cid", "s"), IPNS_CID("ipns:cid", "s"),
 
     // Represents an IPFS CID that is aht "Source" for the data in such a way that we assume
     // the IPFS content will supercede (and take precedence), so that we can always read from IPFS
     // and make that content be the content in our DB with fear of overwriting anything.
     IPFS_SCID("ipfs:scid", "s"),
-    
-    // When a node has this IPFS_REF property it means the IPFS_LINK on the node is completely external to us
-    // and might not even be pinned on our gateway. REF means reference (external reference, from some other gateway)
+
+    // When a node has this IPFS_REF property it means the IPFS_LINK on the node is completely external
+    // to us
+    // and might not even be pinned on our gateway. REF means reference (external reference, from some
+    // other gateway)
     IPFS_REF("ipfs:ref", "s"), //
 
     JSON_HASH("ipfs:json", "s"), //
@@ -121,14 +120,14 @@ public enum NodeProp {
     FS_LINK("fs:link", "s"), //
 
     /*
-     * property used to indicate we should not query the IPFS network again for this
-     * conten becasue we have already loaded it
+     * property used to indicate we should not query the IPFS network again for this conten becasue we
+     * have already loaded it
      */
     IPFS_OK("ipfs:ok", "s"), //
 
     /*
-     * mime type expressed as a file extension. Invented so we can set 'txt' v.s.
-     * 'md' to turn off metadata rendering
+     * mime type expressed as a file extension. Invented so we can set 'txt' v.s. 'md' to turn off
+     * metadata rendering
      */
     MIME_EXT("sn:ext", "s"), //
 
@@ -140,9 +139,9 @@ public enum NodeProp {
     BIN_SIZE("sn:size", "s"), //
 
     /*
-     * if this is present it indicates we have a "data:" url stored here which means
-     * we hava an image (for example) with data encoded inline, and this data url
-     * will be stored as text in the 'attachment' of the node
+     * if this is present it indicates we have a "data:" url stored here which means we hava an image
+     * (for example) with data encoded inline, and this data url will be stored as text in the
+     * 'attachment' of the node
      */
     BIN_DATA_URL("sn:dataUrl", "s"), //
 
@@ -172,9 +171,10 @@ public enum NodeProp {
     /*
      * NOTE: These two crypto keys are ONLY used for ActivityPub.
      * 
-     * For the E2E Encryption capabilities of the platform, the "sn:publicKey" is the key that's used and
-     * only the public key exists on the server for that E2E encryption. In other words, "sn:publicKey" is used to encrypt actual
-     * data and these two defined here are only used as part of the ActivityPub user authentication process.
+     * For the E2E Encryption capabilities of the platform, the "sn:publicKey" is the key that's used
+     * and only the public key exists on the server for that E2E encryption. In other words,
+     * "sn:publicKey" is used to encrypt actual data and these two defined here are only used as part of
+     * the ActivityPub user authentication process.
      */
     CRYPTO_KEY_PUBLIC("sn:cryptoKeyPublic", "s"), //
     CRYPTO_KEY_PRIVATE("sn:cryptoKeyPrivate", "s"), //
@@ -182,8 +182,7 @@ public enum NodeProp {
     INLINE_CHILDREN("inlineChildren", "s"), //
     PRIORITY("priority", "s"), //
     LAYOUT("layout", "s"), //
-    ORDER_BY("orderBy", "s"),
-    NO_OPEN_GRAPH("noOpenGraph", "s"), //
+    ORDER_BY("orderBy", "s"), NO_OPEN_GRAPH("noOpenGraph", "s"), //
 
     TYPE_LOCK("sn:typLoc", "s"), //
     DATE("date", "s"), //

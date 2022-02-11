@@ -71,6 +71,7 @@ export interface UserProfile {
     userName: string;
     homeNodeId: string;
     userBio: string;
+    userTags: string;
     avatarVer: string;
     headerImageVer: string;
     userNodeId: string;
@@ -377,6 +378,7 @@ export interface SaveUserPreferencesRequest extends RequestBase {
 export interface SaveUserProfileRequest extends RequestBase {
     userName: string;
     userBio: string;
+    userTags: string;
     displayName: string;
 }
 
@@ -895,6 +897,7 @@ export const enum NodeProp {
     USER = "sn:user",
     DISPLAY_NAME = "sn:displayName",
     USER_BIO = "sn:userBio",
+    USER_TAGS = "sn:tags",
     PWD_HASH = "sn:pwdHash",
     FILE_SYNC_LINK = "fs:link",
     USER_NODE_ID = "sn:userNodeId",

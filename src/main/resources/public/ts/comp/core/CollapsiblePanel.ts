@@ -7,6 +7,7 @@ interface LS { // Local State
 
 export class CollapsiblePanel extends Comp {
 
+    // todo-0: Need to switch this to the 'config' param pattern (like TextField?), there's one example already, look for cfg arg to find it.
     constructor(private collapsedButtonText: string,
         private expandedButtonText: string,
         attribs: Object = {},

@@ -117,7 +117,7 @@ export class RightNavPanel extends Div {
                             }
                         }, "form-switch form-check-inline") : null,
 
-                        !fullScreenViewer ? new Checkbox("Metadata", { title: "Metadata: Avatars, timestamps, etc." }, {
+                        !fullScreenViewer ? new Checkbox("Info", { title: "Metadata: Avatars, timestamps, etc." }, {
                             setValue: (checked: boolean): void => {
                                 S.edit.toggleShowMetaData(state);
                             },

@@ -1,4 +1,5 @@
 import { AppState } from "../AppState";
+import { Comp } from "../comp/base/Comp";
 import { CompIntf } from "../comp/base/CompIntf";
 import { Button } from "../comp/core/Button";
 import { ButtonBar } from "../comp/core/ButtonBar";
@@ -7,11 +8,13 @@ import { Div } from "../comp/core/Div";
 import { Form } from "../comp/core/Form";
 import { HelpButton } from "../comp/core/HelpButton";
 import { HorizontalLayout } from "../comp/core/HorizontalLayout";
+import { IconButton } from "../comp/core/IconButton";
 import { Selection } from "../comp/core/Selection";
 import { TextField } from "../comp/core/TextField";
 import { DialogBase } from "../DialogBase";
 import { S } from "../Singletons";
 import { ValidatedState } from "../ValidatedState";
+import { SelectTagsDlg } from "./SelectTagsDlg";
 
 interface LS { // Local State
     sortField?: string;
@@ -48,7 +51,6 @@ export class SearchContentDlg extends DialogBase {
     }
 
     renderDlg(): CompIntf[] {
-
         let requirePriorityCheckbox = null;
         if (this.getState<LS>().sortField === "prp.priority.value") {
             requirePriorityCheckbox = new Checkbox("Require Priority", null, {
@@ -64,7 +66,10 @@ export class SearchContentDlg extends DialogBase {
 
         return [
             new Form(null, [
-                this.searchTextField = new TextField({ enter: this.search, val: this.searchTextState }),
+                new Div(null, { className: "row" }, [
+                    this.searchTextField = new TextField({ enter: this.search, val: this.searchTextState, outterClass: "col-10" }),
+                    !this.appState.isAnonUser ? this.createSearchFieldIconButtons() : null
+                ]),
                 new HorizontalLayout([
                     // Allow fuzzy search for admin only. It's cpu intensive.
                     new Checkbox("Regex", null, {
@@ -131,6 +136,35 @@ export class SearchContentDlg extends DialogBase {
                 ], "marginTop")
             ])
         ];
+    }
+
+    createSearchFieldIconButtons = (): Comp => {
+        return new ButtonBar([
+            new IconButton("fa-tag fa-lg", "", {
+                onClick: async e => {
+                    let dlg: SelectTagsDlg = new SelectTagsDlg(this.appState);
+                    await dlg.open();
+                    this.addTagsToSearchField(dlg);
+                },
+                title: "Select Hashtags to Search"
+            }, "btn-primary", "off")
+        ], "col-2");
+    }
+
+    /* todo-1: put typesafety here on dlgState */
+    addTagsToSearchField = (dlg: any) => {
+        let val = this.searchTextState.getValue();
+        dlg.getState().selectedTags.forEach(tag => {
+            if (val.indexOf(tag) !== -1) return;
+            if (val) val += " ";
+            if (dlg.matchAny) {
+                val += tag;
+            }
+            else {
+                val += "\"" + tag + "\"";
+            }
+        });
+        this.searchTextState.setValue(SearchContentDlg.defaultSearchText = val);
     }
 
     graph = () => {

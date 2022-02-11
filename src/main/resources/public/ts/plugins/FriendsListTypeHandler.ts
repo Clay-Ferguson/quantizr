@@ -11,7 +11,7 @@ import { TypeBase } from "./base/TypeBase";
 
 export class FriendsListTypeHandler extends TypeBase {
     constructor() {
-        super(J.NodeType.FRIEND_LIST, "Friends List", "fa-users", false);
+        super(J.NodeType.FRIEND_LIST, "Friends", "fa-users", false);
     }
 
     allowAction(action: NodeActionType, node: J.NodeInfo, appState: AppState): boolean {
@@ -21,7 +21,7 @@ export class FriendsListTypeHandler extends TypeBase {
     render(node: J.NodeInfo, tabData: TabDataIntf<any>, rowStyling: boolean, isTreeView: boolean, state: AppState): Comp {
         return new Div(null, null, [
             new HelpButton(() => S.quanta?.config?.help?.type?.friendsList?.render, null, "btn-secondary float-end"),
-            new Heading(4, "Friends List", {
+            new Heading(4, "Friends", {
                 className: "marginAll"
             })
         ]);

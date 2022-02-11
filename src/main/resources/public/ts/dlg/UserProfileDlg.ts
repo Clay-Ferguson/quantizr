@@ -200,6 +200,7 @@ export class UserProfileDlg extends DialogBase {
     save = async () => {
         let res: J.SaveUserProfileResponse = await S.util.ajax<J.SaveUserProfileRequest, J.SaveUserProfileResponse>("saveUserProfile", {
             userName: null,
+            userTags: this.appState.userProfile.userTags,
             userBio: this.bioState.getValue(),
             displayName: this.displayNameState.getValue()
         });

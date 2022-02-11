@@ -404,7 +404,7 @@ export class MenuPanel extends Div {
             new MenuItemSeparator(), //
 
             new MenuItem("Edit", MenuPanel.toggleEditMode, !state.isAnonUser, () => state.userPreferences.editMode), //
-            new MenuItem("Show Metadata", MenuPanel.toggleMetaData, true, () => state.userPreferences.showMetaData), //
+            new MenuItem("Show Node Info", MenuPanel.toggleMetaData, true, () => state.userPreferences.showMetaData), //
             new MenuItem("NSFW", MenuPanel.toggleNsfw, true, () => state.userPreferences.nsfw), //
             new MenuItem("Show Parent", MenuPanel.toggleParents, true, () => state.userPreferences.showParents), //
 

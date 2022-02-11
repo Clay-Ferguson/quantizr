@@ -8,6 +8,7 @@ public class UserProfile {
 	private String homeNodeId;
 
 	private String userBio;
+	private String userTags;
 
 	// version (which is now just the GRID ID) needed to retrieve profile image (account node binary
 	// attachment)
@@ -46,6 +47,14 @@ public class UserProfile {
 
 	public void setUserBio(String userBio) {
 		this.userBio = userBio;
+	}
+
+	public String getUserTags() {
+		return userTags;
+	}
+
+	public void setUserTags(String userTags) {
+		this.userTags = userTags;
 	}
 
 	public void setUserName(String userName) {

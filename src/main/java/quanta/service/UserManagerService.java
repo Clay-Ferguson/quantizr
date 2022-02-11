@@ -602,7 +602,7 @@ public class UserManagerService extends ServiceBase {
 			userPrefs.setRssHeadlinesOnly(reqUserPrefs.isRssHeadlinesOnly());
 			userPrefs.setMainPanelCols(reqUserPrefs.getMainPanelCols());
 
-			//log.debug("saveUserPreferences: " + XString.prettyPrint(prefsNode));
+			// log.debug("saveUserPreferences: " + XString.prettyPrint(prefsNode));
 			res.setSuccess(true);
 			return null;
 		});
@@ -633,6 +633,7 @@ public class UserManagerService extends ServiceBase {
 			if (!failed) {
 				// userNode.setProp(NodeProp.USER.s(), req.getUserName());
 				userNode.set(NodeProp.USER_BIO.s(), req.getUserBio());
+				userNode.set(NodeProp.USER_TAGS.s(), req.getUserTags());
 				userNode.set(NodeProp.DISPLAY_NAME.s(), req.getDisplayName());
 				// sessionContext.setUserName(req.getUserName());
 				update.save(ms, userNode);
@@ -812,6 +813,7 @@ public class UserManagerService extends ServiceBase {
 				String actorUrl = userNode.getStr(NodeProp.ACT_PUB_ACTOR_URL);
 
 				userProfile.setUserBio(userNode.getStr(NodeProp.USER_BIO.s()));
+				userProfile.setUserTags(userNode.getStr(NodeProp.USER_TAGS.s()));
 				userProfile.setAvatarVer(userNode.getStr(NodeProp.BIN.s()));
 				userProfile.setHeaderImageVer(userNode.getStr(NodeProp.BIN.s() + "Header"));
 				userProfile.setUserNodeId(userNode.getIdStr());

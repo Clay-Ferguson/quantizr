@@ -9,7 +9,7 @@ import { TabDataIntf } from "../intf/TabDataIntf";
 
 export class BookmarkListTypeHandler extends TypeBase {
     constructor() {
-        super(J.NodeType.BOOKMARK_LIST, "Bookmark List", "fa-bookmark", false);
+        super(J.NodeType.BOOKMARK_LIST, "Bookmarks", "fa-bookmark", false);
     }
 
     allowAction(action: NodeActionType, node: J.NodeInfo, appState: AppState): boolean {
