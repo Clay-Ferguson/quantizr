@@ -124,8 +124,8 @@ export class TypeBase implements TypeHandlerIntf {
         }
         else {
             // console.log("node [" + node.content + "] tags=" + node.tags)
-            // If this node has tags render them below the content (if we're in edit mode or have meta turned on)
-            if (node.tags && (state.userPreferences.editMode || state.userPreferences.showMetaData)) {
+            // If this node has tags render them below the content (if we have info turned on)
+            if (node.tags && state.userPreferences.showMetaData) {
                 return new Div(null, null, [
                     comp,
                     new Div(node.tags, { className: "nodeTags float-end" })
