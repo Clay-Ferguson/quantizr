@@ -19,8 +19,7 @@ import quanta.util.ThreadLocals;
 /*
  * Instrumentation for the app (for Performance Monitoring)
  * 
- * Any method can be annotated with @PerfMon to gather performance statistics but mainly we just do
- * this on our external-facing REST controller interface.
+ * Any method can be annotated with @PerfMon to gather performance statistics .
  * 
  * Eventually we can perhaps use OpenTelemetry+SigNoz for performance metrics, but for now to be
  * able to gather specific targeted metrics in the simplest way possible, we just use this class
@@ -30,9 +29,18 @@ import quanta.util.ThreadLocals;
  * todo-1: Does instrumentation ONLY work on PUBLIC methods?? I think I noticed that happening but
  * didn't prove it yet or look into it yet. If this is true it might be that only public methods are
  * proxied by spring which would make sense, but I don't kow if that's the case.
+ * 
+ * Commenting class annotations to turn all the proxy objects back into direct object references
+ * for all wired beans. Proxy objects is a MASSIVE mess when debugging, because the callstack is mostly
+ * cluttered with proxy crap and is not performant and unwieldy for debugging. So we disable the Instrumentation
+ * unless turning on temporarily for performance analysis.
+ * 
+ * For reference:
+ * import org.aspectj.lang.annotation.Aspect;
+ * import org.springframework.stereotype.Component;
  */
-@Aspect
-@Component
+// @Aspect
+// @Component
 public class Instrument {
 	private static final Logger log = LoggerFactory.getLogger(Instrument.class);
 
