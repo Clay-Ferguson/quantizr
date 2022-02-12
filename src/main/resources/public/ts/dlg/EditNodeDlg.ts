@@ -37,6 +37,7 @@ import { ValidatedState } from "../ValidatedState";
 import { ChangeNodeTypeDlg } from "./ChangeNodeTypeDlg";
 import { LS } from "./EditNodeDlgState";
 import { EditNodeDlgUtil } from "./EditNodeDlgUtil";
+import { SelectTagsDlg } from "./SelectTagsDlg";
 
 /**
  * Node Editor Dialog
@@ -352,7 +353,10 @@ export class EditNodeDlg extends DialogBase {
         }
 
         let collapsiblePanel = !customProps ? new CollapsiblePanel(null, null, null, [
-            new TextField({ label: "Tags", outterClass: "marginTop", val: this.tagsState }),
+            new Div(null, { className: "row align-items-end" }, [
+                new TextField({ label: "Tags", outterClass: "marginTop col-10", val: this.tagsState }),
+                this.createSearchFieldIconButtons()
+            ]),
             new Div(null, { className: "row marginTop" }, [
                 nodeNameTextField,
                 this.createPrioritySelection()
@@ -371,6 +375,30 @@ export class EditNodeDlg extends DialogBase {
         propertyEditFieldContainer.setChildren([mainPropsTable, sharingDiv, sharingDivClearFix, binarySection, rightFloatButtons,
             new Clearfix()]);
         return children;
+    }
+
+    createSearchFieldIconButtons = (): Comp => {
+        return new ButtonBar([
+            new IconButton("fa-tag fa-lg", "", {
+                onClick: async e => {
+                    let dlg: SelectTagsDlg = new SelectTagsDlg("edit", this.appState);
+                    await dlg.open();
+                    this.addTagsToTextField(dlg);
+                },
+                title: "Select Hashtags to Search"
+            }, "btn-primary", "off")
+        ], "col-2");
+    }
+
+    /* todo-1: put typesafety here on dlgState */
+    addTagsToTextField = (dlg: any) => {
+        let val = this.tagsState.getValue();
+        dlg.getState().selectedTags.forEach(tag => {
+            if (val.indexOf(tag) !== -1) return;
+            if (val) val += " ";
+            val += tag;
+        });
+        this.tagsState.setValue(val);
     }
 
     // Generate GUI for handling the display info about any Node Attachments

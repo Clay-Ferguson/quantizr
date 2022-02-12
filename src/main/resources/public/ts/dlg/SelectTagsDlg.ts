@@ -20,16 +20,17 @@ export class SelectTagsDlg extends DialogBase {
     matchAny = false;
     matchAll = false;
 
-    constructor(state: AppState) {
-        super("Search for Hashtags", "app-modal-content-medium-width", false, state);
+    /* modeOption = search | edit */
+    constructor(private modeOption: string, state: AppState) {
+        super("Select Hashtags", "app-modal-content-medium-width", false, state);
         this.mergeState({ selectedTags: new Set<string>() });
     }
 
     renderDlg(): CompIntf[] {
-        return [
-            new Form(null, [
-                this.createTagsPickerList(),
-                new ButtonBar([
+        let buttons: Button[] = null;
+        switch (this.modeOption) {
+            case "search":
+                buttons = [
                     new Button("Match Any", () => {
                         this.matchAny = true;
                         this.select();
@@ -37,7 +38,23 @@ export class SelectTagsDlg extends DialogBase {
                     new Button("Match All", () => {
                         this.matchAll = true;
                         this.select();
-                    }),
+                    })
+                ];
+                break;
+            case "edit":
+                buttons = [
+                    new Button("Select", () => {
+                        this.select();
+                    })
+                ];
+                break;
+        }
+
+        return [
+            new Form(null, [
+                this.createTagsPickerList(),
+                new ButtonBar([
+                    ...buttons,
                     new Button("Edit Tags", this.edit),
                     new Button("Cancel", this.close, null, "btn-secondary float-end")
                 ], "marginTop")
