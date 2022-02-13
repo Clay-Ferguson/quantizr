@@ -86,9 +86,8 @@ public class AclService extends ServiceBase {
 			if (no(bops)) {
 				bops = ops.bulkOps(BulkMode.UNORDERED, SubNode.class);
 			}
-			// todo-0: look for more ownerAuth calls like this which are no longer necessary because the query
-			// itself is safe.
-			// auth.ownerAuth(ms, n);
+			
+			auth.ownerAuth(ms, n);
 
 			Query query = new Query().addCriteria(new Criteria("id").is(n.getId()));
 			// log.debug("Setting [" + n.getIdStr() + "] AC to " + XString.prettyPrint(n.getAc()));

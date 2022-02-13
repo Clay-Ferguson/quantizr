@@ -190,8 +190,7 @@ public class MongoAuth extends ServiceBase {
 			ac.put(parent.getOwner().toHexString(), new AccessControl(null, "rd,wr"));
 
 			// if no content, and the parent isn't our own node
-			if (StringUtil.isEmpty(child.getContent()) && //
-					!parent.getOwner().toHexString().equals(ThreadLocals.getSC().getRootId())) {
+			if (StringUtil.isEmpty(child.getContent()) && !auth.ownedByThreadUser(parent)) {
 				SubNode parentUserNode = read.getNode(ms, parent.getOwner());
 				if (ok(parentUserNode)) {
 					child.setContent("@" + parentUserNode.getStr(NodeProp.USER) + " ");
@@ -308,6 +307,10 @@ public class MongoAuth extends ServiceBase {
 		}
 
 		auth(ms, node, Arrays.asList(privs));
+	}
+
+	public boolean ownedByThreadUser(SubNode node) {
+		return ok(node) && ok(node.getOwner()) && node.getOwner().toHexString().equals(ThreadLocals.getSC().getRootId());
 	}
 
 	/*

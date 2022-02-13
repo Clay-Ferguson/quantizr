@@ -613,8 +613,7 @@ public class AppController extends ServiceBase implements ErrorController {
 				if (no(node))
 					throw new RuntimeException("Node not found: " + req.getNodeId());
 
-				// todo-0: put this pattern in method auth.ownedBy(sc, node)
-				if (!node.getOwner().toHexString().equals(ThreadLocals.getSC().getRootId())) {
+				if (!auth.ownedByThreadUser(node)) {
 					throw new RuntimeException("You can only export nodes you own");
 				}
 				return null;
