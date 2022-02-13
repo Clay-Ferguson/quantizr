@@ -240,7 +240,7 @@ public class ActPubUtil extends ServiceBase {
             }
 
             if (no(privateKey)) {
-                throw new RuntimeException("Unable to get provate key for user sending message.");
+                throw new RuntimeException("Unable to get private key for user sending message.");
             }
 
             String body = XString.prettyPrint(message);
@@ -427,6 +427,9 @@ public class ActPubUtil extends ServiceBase {
             if (ok(digestHeader)) {
                 headers.add("Digest", digestHeader);
             }
+
+            // todo-0: added 2/12/22 (need to verify this is correct)
+            headers.setContentType(APConst.MTYPE_ACT_JSON);
 
             // HttpEntity<byte[]> requestEntity = new HttpEntity<>(bodyBytes, headers);
             HttpEntity<String> requestEntity = new HttpEntity<>(body, headers);
