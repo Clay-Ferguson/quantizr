@@ -29,16 +29,16 @@ public class IPFSTest extends ServiceBase implements TestIntf {
 
 
     private void testUploadDirectory() {
-        arun.run(mongoSession -> {
+        arun.run(as -> {
             // create the root directory
             MerkleNode rootDir = ipfs.newObject();
             log.debug("rootDir: " + XString.prettyPrint(rootDir));
 
             // create a file to put in the directory.
-            MerkleLink file1 = ipfs.addFileFromString(mongoSession, "Test file one (new)", "fileone.txt", "text/plain", false);
+            MerkleLink file1 = ipfs.addFileFromString(as, "Test file one (new)", "fileone.txt", "text/plain", false);
             log.debug("file1: " + XString.prettyPrint(file1));
 
-            MerkleLink file2 = ipfs.addFileFromString(mongoSession, "Test file two", "filetwo.txt", "text/plain", false);
+            MerkleLink file2 = ipfs.addFileFromString(as, "Test file two", "filetwo.txt", "text/plain", false);
             log.debug("file2: " + XString.prettyPrint(file2));
 
             MerkleNode newRootDir = ipfs.addFileToDagRoot(rootDir.getHash(), "subfolder/fileone.txt", file1.getHash());
@@ -49,19 +49,19 @@ public class IPFSTest extends ServiceBase implements TestIntf {
 
     public void oldTest2() throws Exception {
         // ipfs.getPins();
-        arun.run(mongoSession -> {
+        arun.run(as -> {
             Val<String> cid = new Val<>();
-            ipfs.dagPutFromString(mongoSession, "{\"data\": \"MY FIRST DAG PUT\"}", null, null, cid);
+            ipfs.dagPutFromString(as, "{\"data\": \"MY FIRST DAG PUT\"}", null, null, cid);
             log.debug("Cid=" + cid.getVal());
 
             String verify = ipfs.dagGet(cid.getVal());
             log.debug("verify: " + verify);
 
-            Map<String, Object> ret = ipfs.ipnsPublish(mongoSession, "ClaysKey", cid.getVal());
+            Map<String, Object> ret = ipfs.ipnsPublish(as, "ClaysKey", cid.getVal());
             log.debug("ipnsPublishRet: " + XString.prettyPrint(ret));
 
             String ipnsName = (String) ret.get("Name");
-            ret = ipfs.ipnsResolve(mongoSession, ipnsName);
+            ret = ipfs.ipnsResolve(as, ipnsName);
             log.debug("ipnsResolveRet: " + XString.prettyPrint(ret));
 
             // verify = ipfs.dagGet(ipnsName);
@@ -69,17 +69,17 @@ public class IPFSTest extends ServiceBase implements TestIntf {
 
             // --------------
 
-            ipfs.dagPutFromString(mongoSession, "{\"data\": \"MY SECOND DAG PUT\"}", null, null, cid);
+            ipfs.dagPutFromString(as, "{\"data\": \"MY SECOND DAG PUT\"}", null, null, cid);
             log.debug("Cid (Second Version)=" + cid.getVal());
 
             verify = ipfs.dagGet(cid.getVal());
             log.debug("verify (second): " + verify);
 
-            ret = ipfs.ipnsPublish(mongoSession, "ClaysKey", cid.getVal());
+            ret = ipfs.ipnsPublish(as, "ClaysKey", cid.getVal());
             log.debug("ipnsPublishRet (second): " + XString.prettyPrint(ret));
 
             ipnsName = (String) ret.get("Name");
-            ret = ipfs.ipnsResolve(mongoSession, ipnsName);
+            ret = ipfs.ipnsResolve(as, ipnsName);
             log.debug("ipnsResolveRet (second): " + XString.prettyPrint(ret));
             return null;
         });

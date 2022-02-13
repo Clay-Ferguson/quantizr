@@ -110,7 +110,7 @@ public class ActPubFollowing extends ServiceBase  {
         }
 
         Runnable runnable = () -> {
-            arun.<APObj>run(session -> {
+            arun.<APObj>run(as -> {
                 try {
                     APObj followerActor = apUtil.getActorByUrl(followerActorUrl);
                     if (no(followerActor)) {
@@ -121,7 +121,7 @@ public class ActPubFollowing extends ServiceBase  {
                     String followerUserName = apUtil.getLongUserNameFromActor(followerActor);
 
                     // this will lookup the user AND import it it's a non-existant user
-                    SubNode followerAccountNode = apub.getAcctNodeByUserName(session, followerUserName);
+                    SubNode followerAccountNode = apub.getAcctNodeByUserName(as, followerUserName);
                     if (no(followerAccountNode)) {
                         throw new RuntimeException("Unable to get or import user: " + followerUserName);
                     }
@@ -142,30 +142,30 @@ public class ActPubFollowing extends ServiceBase  {
                     }
 
                     // get the Friend List of the follower
-                    SubNode followerFriendList = read.getUserNodeByType(session, followerUserName, null, null,
+                    SubNode followerFriendList = read.getUserNodeByType(as, followerUserName, null, null,
                             NodeType.FRIEND_LIST.s(), null, NodeName.FRIENDS);
 
                     /*
                      * lookup to see if this followerFriendList node already has userToFollow already under it
                      */
                     SubNode friendNode =
-                            read.findNodeByUserAndType(session, followerFriendList, userToFollow, NodeType.FRIEND.s());
+                            read.findNodeByUserAndType(as, followerFriendList, userToFollow, NodeType.FRIEND.s());
 
                     if (no(friendNode)) {
                         if (!unFollow) {
                             apUtil.log("unable to find user node by name: " + followerUserName + " so creating.");
-                            friendNode = edit.createFriendNode(session, followerFriendList, userToFollow);
+                            friendNode = edit.createFriendNode(as, followerFriendList, userToFollow);
                             // userFeed.sendServerPushInfo(localUserName,
                             // new NotificationMessage("apReply", null, contentHtml, toUserName));
                         }
                     } else {
                         // if this is an unfollow delete the friend node
                         if (unFollow) {
-                            delete.deleteNode(session, friendNode, false);
+                            delete.deleteNode(as, friendNode, false);
                         }
                     }
 
-                    String privateKey = apCrypto.getPrivateKey(session, userToFollow);
+                    String privateKey = apCrypto.getPrivateKey(as, userToFollow);
 
                     /* todo-1: what's this sleep doing? It's ugly, bad practice. I'm pretty sure I just wanted to give the caller (i.e. the
                     remote Fedi instance) a chance to get a return code back for this call before posting
@@ -187,7 +187,7 @@ public class ActPubFollowing extends ServiceBase  {
 
                     log.debug("Sending Accept of Follow Request to inbox " + followerInbox);
 
-                    apUtil.securePost(null, session, privateKey, followerInbox, actorBeingFollowedUrl, accept, null);
+                    apUtil.securePost(null, as, privateKey, followerInbox, actorBeingFollowedUrl, accept, null);
                 } catch (Exception e) {
                     log.error("Failed sending follow reply.", e);
                 }

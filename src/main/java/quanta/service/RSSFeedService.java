@@ -162,9 +162,9 @@ public class RSSFeedService extends ServiceBase {
 		if (StringUtils.isEmpty(rssNodeId))
 			return;
 
-		arun.run(mongoSession -> {
+		arun.run(as -> {
 			log.debug("startupPreCache: node=" + rssNodeId);
-			multiRss(mongoSession, rssNodeId, null);
+			multiRss(as, rssNodeId, null);
 			return null;
 		});
 	}

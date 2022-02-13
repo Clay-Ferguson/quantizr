@@ -48,8 +48,8 @@ public class SystemService extends ServiceBase {
 	public String rebuildIndexes() {
 		ThreadLocals.requireAdmin();
 
-		arun.run(mongoSession -> {
-			mongoUtil.rebuildIndexes(mongoSession);
+		arun.run(as -> {
+			mongoUtil.rebuildIndexes(as);
 			return null;
 		});
 		return "success.";

@@ -527,7 +527,7 @@ public class ActPubService extends ServiceBase {
 
     @PerfMon(category = "apub")
     public void processDeleteAction(HttpServletRequest httpReq, Object payload) {
-        arun.<Object>run(session -> {
+        arun.<Object>run(as -> {
             apUtil.log("processDeleteAction");
             String actorUrl = AP.str(payload, APObj.actor);
             if (no(actorUrl)) {
@@ -554,7 +554,7 @@ public class ActPubService extends ServiceBase {
 
             switch (type) {
                 case APType.Tombstone:
-                    processCreateTombstone(session, actorUrl, actorObj, object);
+                    processCreateTombstone(as, actorUrl, actorObj, object);
                     break;
 
                 default:

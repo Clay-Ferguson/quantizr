@@ -484,9 +484,9 @@ public class IPFSService extends ServiceBase {
     }
 
     public Map<String, Object> addTarFromFile(String fileName) {
-        arun.run(mongoSession -> {
+        arun.run(as -> {
             try {
-                addTarFromStream(mongoSession, new BufferedInputStream(new FileInputStream(fileName)), null, null);
+                addTarFromStream(as, new BufferedInputStream(new FileInputStream(fileName)), null, null);
             } catch (Exception e) {
                 log.error("Failed in restTemplate.exchange", e);
             }
