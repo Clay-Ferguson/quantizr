@@ -59,7 +59,7 @@ export class SharingDlg extends DialogBase {
                         }
                     }, null, "btn-primary"),
                     isPublic ? null : new Button("Make Public", () => this.shareNodeToPublic(false, state.recursive), null, "btn-secondary"),
-                    new Button("Close", () => {
+                    new Button("Done", () => {
                         this.close();
                     }, null, "btn-secondary float-end"),
                     new HelpButton(() => S.quanta?.config?.help?.sharing?.dialog)

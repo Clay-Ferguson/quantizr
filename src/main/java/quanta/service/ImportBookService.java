@@ -35,7 +35,7 @@ public class ImportBookService extends ServiceBase {
 
 		String nodeId = req.getNodeId();
 		SubNode node = read.getNode(ms, nodeId);
-		auth.ownerAuthByThread(node);
+		auth.ownerAuth(node);
 		log.debug("Insert Root: " + XString.prettyPrint(node));
 
 		/*

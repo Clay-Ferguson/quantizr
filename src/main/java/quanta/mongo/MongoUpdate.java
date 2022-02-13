@@ -87,21 +87,15 @@ public class MongoUpdate extends ServiceBase {
 				 * check that we are allowed to write all, before we start writing any
 				 */
 				for (SubNode node : ThreadLocals.getDirtyNodes().values()) {
-
-					/*
-					 * If we're not running this as admin user we have to auth to be sure we're allowed to save this
-					 * node
-					 */
-					if (!asAdmin) {
-						try {
-							auth.ownerAuth(ms, node);
-						} catch (Exception e) {
-							log.debug("Dirty node save attempt failed: " + XString.prettyPrint(node));
-							log.debug("Your mongoSession has user: " + ms.getUserName() + //
-									" and your ThreadLocal session is: " + ThreadLocals.getSC().getUserName());
-							throw e;
-						}
+					try {
+						auth.ownerAuth(ms, node);
+					} catch (Exception e) {
+						log.debug("Dirty node save attempt failed: " + XString.prettyPrint(node));
+						log.debug("Your mongoSession has user: " + ms.getUserName() + //
+								" and your ThreadLocal session is: " + ThreadLocals.getSC().getUserName());
+						throw e;
 					}
+
 					nodes.add(node);
 				}
 

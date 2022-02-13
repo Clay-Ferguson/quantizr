@@ -78,25 +78,29 @@ public class AclService extends ServiceBase {
 		CopySharingResponse res = new CopySharingResponse();
 
 		SubNode node = read.getNode(ms, req.getNodeId());
-		auth.ownerAuth(ms, node);
-		BulkOperations bops = ops.bulkOps(BulkMode.UNORDERED, SubNode.class);
+		BulkOperations bops = null;
 
 		for (SubNode n : read.getSubGraph(ms, node, null, 0, true)) {
-			try {
-				auth.ownerAuth(ms, n);
-				Query query = new Query().addCriteria(new Criteria("id").is(n.getId()));
-				// log.debug("Setting [" + n.getIdStr() + "] AC to " + XString.prettyPrint(n.getAc()));
 
-				Update update = new Update().set(SubNode.AC, node.getAc());
-				bops.updateOne(query, update);
-			} catch (Exception e) {
-				// ignore any exceptions, which can happen for any nodes we don't own for example, and this is
-				// normal
+			// lazy instantiate
+			if (no(bops)) {
+				bops = ops.bulkOps(BulkMode.UNORDERED, SubNode.class);
 			}
+			// todo-0: look for more ownerAuth calls like this which are no longer necessary because the query
+			// itself is safe.
+			// auth.ownerAuth(ms, n);
+
+			Query query = new Query().addCriteria(new Criteria("id").is(n.getId()));
+			// log.debug("Setting [" + n.getIdStr() + "] AC to " + XString.prettyPrint(n.getAc()));
+
+			Update update = new Update().set(SubNode.AC, node.getAc());
+			bops.updateOne(query, update);
 		}
 
-		BulkWriteResult results = bops.execute();
-		// log.debug("Bulk Privileges: updated " + results.getModifiedCount() + " nodes.");
+		if (ok(bops)) {
+			BulkWriteResult results = bops.execute();
+			// log.debug("Bulk Privileges: updated " + results.getModifiedCount() + " nodes.");
+		}
 		res.setSuccess(true);
 		return res;
 	}

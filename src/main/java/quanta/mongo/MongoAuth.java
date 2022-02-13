@@ -17,9 +17,9 @@ import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Component;
 import opennlp.tools.util.StringUtil;
-import quanta.config.NodeName;
 import quanta.config.NodePath;
 import quanta.config.ServiceBase;
+import quanta.config.SessionContext;
 import quanta.exception.NodeAuthFailedException;
 import quanta.exception.base.RuntimeEx;
 import quanta.instrument.PerfMon;
@@ -76,21 +76,6 @@ public class MongoAuth extends ServiceBase {
 				anonSession = new MongoSession(PrincipalName.ANON.s(), null);
 			}
 			return anonSession;
-		}
-	}
-
-	public void populateUserNamesInAcl(MongoSession ms, SubNode node) {
-		// iterate all acls on the node
-		List<AccessControlInfo> acList = getAclEntries(ms, node);
-		if (ok(acList)) {
-			for (AccessControlInfo info : acList) {
-
-				// get user account node for this sharing entry
-				String userNodeId = info.getPrincipalNodeId();
-				if (ok(userNodeId)) {
-					info.setPrincipalName(getAccountPropById(ms, userNodeId, NodeProp.USER.s()));
-				}
-			}
 		}
 	}
 
@@ -205,7 +190,7 @@ public class MongoAuth extends ServiceBase {
 			ac.put(parent.getOwner().toHexString(), new AccessControl(null, "rd,wr"));
 
 			// if no content, and the parent isn't our own node
-			if (StringUtil.isEmpty(child.getContent()) && // 
+			if (StringUtil.isEmpty(child.getContent()) && //
 					!parent.getOwner().toHexString().equals(ThreadLocals.getSC().getRootId())) {
 				SubNode parentUserNode = read.getNode(ms, parent.getOwner());
 				if (ok(parentUserNode)) {
@@ -223,10 +208,57 @@ public class MongoAuth extends ServiceBase {
 				!userName.equalsIgnoreCase(PrincipalName.ANON.s());
 	}
 
+	/*
+	 * Adds authorization to any Criteria and returns the updated criteria. Filters to get only nodes
+	 * that are publi OR are shared to the current user. For single node lookups we won't need this
+	 * because we can do it the old way and be faster, but for queries of multiple records (page
+	 * rendering, timeline, search, etc.) we need to build this security right into the query using this
+	 * method.
+	 */
+	public Criteria addSecurityCriteria(MongoSession ms, Criteria crit) {
+		// NOTE: If we're the admin we return criteria without adding security.
+		if (ms.isAdmin())
+			return crit;
+
+		List<Criteria> orCriteria = new LinkedList<>();
+
+		SessionContext sc = ThreadLocals.getSC();
+		SubNode myAcntNode = null;
+
+		// note, anonymous users end up keeping myAcntNode null here. anon will nave null rootID here.
+		if (ok(sc.getRootId())) {
+			myAcntNode = read.getNode(ms, sc.getRootId());
+		}
+
+		// node is public
+		orCriteria.add(Criteria.where(SubNode.AC + "." + PrincipalName.PUBLIC.s()).ne(null));
+
+		// if we have a user add their privileges in addition to public.
+		if (ok(myAcntNode)) {
+			// or node is shared to us
+			orCriteria.add(Criteria.where(SubNode.AC + "." + myAcntNode.getOwner().toHexString()).ne(null));
+
+			// or node is OWNED by us
+			orCriteria.add(Criteria.where(SubNode.OWNER).is(myAcntNode.getOwner()));
+		}
+
+		if (orCriteria.size() > 0) {
+			if (no(crit)) {
+				crit = new Criteria();
+			}
+			crit = crit.orOperator((Criteria[]) orCriteria.toArray(new Criteria[orCriteria.size()]));
+		}
+		return crit;
+	}
+
+	public void ownerAuth(SubNode node) {
+		ownerAuth(null, node);
+	}
+
 	@PerfMon(category = "auth")
 	public void ownerAuth(MongoSession ms, SubNode node) {
 		if (no(ms)) {
-			throw new RuntimeEx("null session passed to ownerAuth.");
+			ms = ThreadLocals.getMongoSession();
 		}
 
 		if (no(node)) {
@@ -251,10 +283,6 @@ public class MongoAuth extends ServiceBase {
 	public void requireAdmin(MongoSession ms) {
 		if (!ms.isAdmin())
 			throw new RuntimeEx("auth fail");
-	}
-
-	public void ownerAuthByThread(SubNode node) {
-		ownerAuth(ThreadLocals.getMongoSession(), node);
 	}
 
 	public void authForChildNodeCreate(MongoSession ms, SubNode node) {
@@ -308,17 +336,12 @@ public class MongoAuth extends ServiceBase {
 		if (verbose)
 			log.trace("auth path " + node.getPath() + " for " + ms.getUserName());
 
-		/* Special case if this node is named 'home' it is readable by anyone */
-		if (ok(node) && NodeName.HOME.equals(node.getName()) && priv.size() == 1 && priv.get(0).name().equals("READ")) {
-			return;
-		}
-
 		if (no(priv) || priv.size() == 0) {
 			throw new RuntimeEx("privileges not specified.");
 		}
 
 		if (no(node.getOwner())) {
-			throw new RuntimeEx("node had no owner: " + node.getPath());
+			throw new RuntimeEx("node had no owner: " + node.getIdStr());
 		}
 
 		// if this session user is the owner of this node, then they have full power
@@ -328,51 +351,15 @@ public class MongoAuth extends ServiceBase {
 			return;
 		}
 
-		// Find any ancestor that has priv shared to this user.
-		if (ancestorAuth(ms, node, priv)) {
-			log.trace("ancestor auth success.");
+		String sessionUserNodeId = ok(ms.getUserNodeId()) ? ms.getUserNodeId().toHexString() : null;
+		if (nodeAuth(node, sessionUserNodeId, priv)) {
+			if (verbose)
+				log.trace("nodeAuth success");
 			return;
 		}
 
 		log.trace("Unauthorized attempt at node id=" + node.getId() + " path=" + node.getPath());
 		throw new NodeAuthFailedException();
-	}
-
-	/*
-	 * Returns true if the user in 'session' has 'priv' access to node.
-	 */
-	private boolean ancestorAuth(MongoSession ms, SubNode node, List<PrivilegeType> privs) {
-		if (ms.isAdmin())
-			return true;
-		if (verbose)
-			log.trace("ancestorAuth: path=" + node.getPath());
-
-		/* get the non-null sessionUserNodeId if not anonymous user */
-		String sessionUserNodeId = ok(ms.getUserNodeId()) ? ms.getUserNodeId().toHexString() : null;
-		ObjectId sessId = ok(ms.getUserNodeId()) ? ms.getUserNodeId() : null;
-
-		// scan up the tree until we find a node that allows access
-		while (ok(node)) {
-			// if this session user is the owner of this node, then they have full power
-			if (ok(sessId) && sessId.equals(node.getOwner())) {
-				if (verbose)
-					log.trace("auth success. node is owned.");
-				return true;
-			}
-
-			if (nodeAuth(node, sessionUserNodeId, privs)) {
-				if (verbose)
-					log.trace("nodeAuth success");
-				return true;
-			}
-
-			node = read.getParent(ms, node, false);
-			if (ok(node)) {
-				if (verbose)
-					log.trace("parent path=" + node.getPath());
-			}
-		}
-		return false;
 	}
 
 	/*
@@ -543,7 +530,11 @@ public class MongoAuth extends ServiceBase {
 	// SubGraphByAcl (query and count)
 	// ========================================================================
 
-	/* Finds nodes that have any sharing on them at all */
+	/*
+	 * Finds nodes that have any sharing on them at all. This query is secure and can't leak any
+	 * incorrect nodes to wrong users because ownerIdMatch forces only the owner running the query to
+	 * see their own nodes only
+	 */
 	public Iterable<SubNode> searchSubGraphByAcl(MongoSession ms, int skip, String pathToSearch, ObjectId ownerIdMatch, Sort sort,
 			int limit) {
 		update.saveSession(ms);

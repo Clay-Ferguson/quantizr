@@ -215,7 +215,7 @@ public class SubNode {
 		if (Util.equalObjs(path, this.path))
 			return;
 
-		ServiceBase.auth.ownerAuthByThread(this);
+		ServiceBase.auth.ownerAuth(this);
 		ThreadLocals.dirty(this);
 		this.path = path;
 

@@ -99,7 +99,7 @@ export class RightNavPanel extends Div {
                     }) : null,
 
                     new Div(null, { className: "marginBottom" }, [
-                        displayName && !state.isAnonUser ? new IconButton("fa-database", "Account", {
+                        displayName && !state.isAnonUser ? new IconButton("fa-database", "Root", {
                             title: "Go to Account Root Node",
                             onClick: e => S.nav.navHome(state)
                         }, "marginRight btn-primary") : null,

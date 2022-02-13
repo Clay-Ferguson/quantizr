@@ -25,6 +25,7 @@ public class MongoDelete extends ServiceBase  {
 	private static final Logger log = LoggerFactory.getLogger(MongoDelete.class);
 
 	public void deleteNode(MongoSession ms, SubNode node, boolean childrenOnly) {
+		auth.ownerAuth(ms, node);
 		if (!childrenOnly) {
 			attach.deleteBinary(ms, "", node, null);
 		}
@@ -121,6 +122,7 @@ public class MongoDelete extends ServiceBase  {
 		update.saveSession(ms);
 		Query q = new Query();
 		q.addCriteria(Criteria.where(SubNode.PATH).regex(mongoUtil.regexRecursiveChildrenOfPath(path)));
+		q.addCriteria(auth.addSecurityCriteria(ms, null));
 
 		DeleteResult res = ops.remove(q, SubNode.class);
 		// log.debug("Num of SubGraph deleted: " + res.getDeletedCount());
@@ -180,17 +182,18 @@ public class MongoDelete extends ServiceBase  {
 	}
 
 	/*
-	 * Note: We don't even use this becasue it wouldn'd delete the orphans. We always delete using the
+	 * Note: We don't even use this becasue it wouldn't delete the orphans. We always delete using the
 	 * path prefix query so all subnodes in the subgraph go away (no orphans)
 	 */
 	public void delete(SubNode node) {
 		ops.remove(node);
 	}
 
-	public void deleteBySubNodePropVal(String prop, String val) {
+	public void deleteBySubNodePropVal(MongoSession ms, String prop, String val) {
 		// log.debug("Deleting by prop=" + prop + " val=" + val);
 		Query q = new Query();
 		Criteria crit = Criteria.where(SubNode.PROPERTIES + "." + prop + ".value").is(val);
+		crit = auth.addSecurityCriteria(ms, crit);
 		q.addCriteria(crit);
 		DeleteResult res = ops.remove(q, SubNode.class);
 		// log.debug("Nodes deleted: " + res.getDeletedCount());

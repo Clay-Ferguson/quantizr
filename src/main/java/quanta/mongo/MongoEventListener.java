@@ -260,7 +260,7 @@ public class MongoEventListener extends AbstractMongoEventListener<SubNode> {
 				SubNode node = ops.findById(id, SubNode.class);
 				if (ok(node)) {
 					log.trace("MDB del: " + node.getPath());
-					auth.ownerAuthByThread(node);
+					auth.ownerAuth(node);
 					ThreadLocals.clean(node);
 				}
 				// because nodes can be orphaned, we clear the entire cache any time any nodes are deleted
@@ -288,7 +288,7 @@ public class MongoEventListener extends AbstractMongoEventListener<SubNode> {
 				return;
 
 			// Must have write privileges to this node or one of it's parents.
-			auth.ownerAuthByThread(node);
+			auth.ownerAuth(node);
 
 			// only if this is creating a new node do we need to chech that the parent will allow it
 			if (isNew) {

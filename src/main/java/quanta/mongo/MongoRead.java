@@ -99,6 +99,7 @@ public class MongoRead extends ServiceBase {
     public long getChildCount(MongoSession ms, ObjectId parentId) {
         Query q = new Query();
         Criteria crit = Criteria.where(SubNode.PARENT).is(parentId);
+        crit = auth.addSecurityCriteria(ms, crit);
         q.addCriteria(crit);
         return ops.count(q, SubNode.class);
     }
@@ -107,6 +108,7 @@ public class MongoRead extends ServiceBase {
     public long getChildCount(MongoSession ms, String path) {
         Query q = new Query();
         Criteria crit = Criteria.where(SubNode.PATH).regex(mongoUtil.regexDirectChildrenOfPath(path));
+        crit = auth.addSecurityCriteria(ms, crit);
         q.addCriteria(crit);
         return ops.count(q, SubNode.class);
     }
@@ -124,6 +126,7 @@ public class MongoRead extends ServiceBase {
     public boolean hasChildren(MongoSession ms, String path) {
         Query q = new Query();
         Criteria crit = Criteria.where(SubNode.PATH).regex(mongoUtil.regexDirectChildrenOfPath(path));
+        crit = auth.addSecurityCriteria(ms, crit);
         q.addCriteria(crit);
         return ops.exists(q, SubNode.class);
     }
@@ -132,6 +135,7 @@ public class MongoRead extends ServiceBase {
     public boolean hasChildren(MongoSession ms, ObjectId parentId) {
         Query q = new Query();
         Criteria crit = Criteria.where(SubNode.PARENT).is(parentId);
+        crit = auth.addSecurityCriteria(ms, crit);
         q.addCriteria(crit);
         return ops.exists(q, SubNode.class);
     }
@@ -142,6 +146,7 @@ public class MongoRead extends ServiceBase {
             ms = auth.getAdminSession();
         }
         Query q = new Query();
+        q.addCriteria(auth.addSecurityCriteria(ms, null));
         return ops.count(q, SubNode.class);
     }
 
@@ -431,6 +436,8 @@ public class MongoRead extends ServiceBase {
             crit = Criteria.where(SubNode.PATH).regex(mongoUtil.regexDirectChildrenOfPath(no(node) ? "" : node.getPath()));
         }
 
+        crit = auth.addSecurityCriteria(ms, crit);
+
         if (ordered) {
             q.with(Sort.by(Sort.Direction.ASC, SubNode.ORDINAL));
         }
@@ -446,7 +453,7 @@ public class MongoRead extends ServiceBase {
 
     /*
      * Gets children under the parent of parentId. Relies on PARENTs of all nodes to be set properly
-     * which theoretically CAN be wrong, and so bewear that only getChildrenUnderPath is guaranteed to
+     * which theoretically CAN be wrong, and so beware that only getChildrenUnderPath is guaranteed to
      * be correct, because the single source of truth about tree structure is path (PTH)
      */
     @PerfMon(category = "read")
@@ -476,6 +483,7 @@ public class MongoRead extends ServiceBase {
             q.with(sort);
         }
 
+        crit = auth.addSecurityCriteria(ms, crit);
         q.addCriteria(crit);
         return mongoUtil.find(q);
     }
@@ -522,6 +530,7 @@ public class MongoRead extends ServiceBase {
             q.with(sort);
         }
 
+        crit = auth.addSecurityCriteria(ms, crit);
         q.addCriteria(crit);
         return mongoUtil.find(q);
     }
@@ -609,6 +618,7 @@ public class MongoRead extends ServiceBase {
             crit = Criteria.where(SubNode.PATH).regex(mongoUtil.regexDirectChildrenOfPath(node.getParentPath()));
         }
         q.with(Sort.by(Sort.Direction.DESC, SubNode.ORDINAL));
+        crit = auth.addSecurityCriteria(ms, crit);
         q.addCriteria(crit);
 
         // leave this example. you can do a RANGE like this.
@@ -637,6 +647,7 @@ public class MongoRead extends ServiceBase {
         }
 
         q.with(Sort.by(Sort.Direction.ASC, SubNode.ORDINAL));
+        crit = auth.addSecurityCriteria(ms, crit);
         q.addCriteria(crit);
 
         // leave this example. you can do a RANGE like this.
@@ -668,6 +679,7 @@ public class MongoRead extends ServiceBase {
          * children.
          */
         Criteria crit = Criteria.where(SubNode.PATH).regex(mongoUtil.regexRecursiveChildrenOfPath(node.getPath()));
+        crit = auth.addSecurityCriteria(ms, crit);
         q.addCriteria(crit);
 
         if (ok(sort)) {
@@ -713,6 +725,8 @@ public class MongoRead extends ServiceBase {
                 crit = Criteria.where(SubNode.PATH).regex(mongoUtil.regexDirectChildrenOfPath(node.getPath()));
             }
         }
+
+        crit = auth.addSecurityCriteria(ms, crit); 
         criterias.add(crit);
 
         if (!StringUtils.isEmpty(text)) {
@@ -870,6 +884,7 @@ public class MongoRead extends ServiceBase {
          * node currently being crafted
          */
         crit = crit.and(SubNode.MODIFY_TIME).ne(null);
+        crit = auth.addSecurityCriteria(ms, crit);
         q.addCriteria(crit);
         q.addCriteria(Criteria.where(SubNode.PROPERTIES + "." + NodeProp.DATE + ".value").ne(null));
 
@@ -886,6 +901,7 @@ public class MongoRead extends ServiceBase {
         Query q = new Query();
         Criteria crit = Criteria.where(SubNode.PATH).regex(mongoUtil.regexRecursiveChildrenOfPath(node.getPath()));
         crit = crit.and(SubNode.NAME).ne(null);
+        crit = auth.addSecurityCriteria(ms, crit);
         q.addCriteria(crit);
 
         return mongoUtil.find(q);
@@ -897,7 +913,7 @@ public class MongoRead extends ServiceBase {
      */
     @PerfMon(category = "read")
     public SubNode getUserNodeByType(MongoSession ms, String userName, SubNode userNode, String content, String type,
-            List<String> defaultPrivs, String defaultName) {
+            List<String> publicPrivs, String defaultName) {
         if (no(userNode)) {
             if (no(userName)) {
                 userName = ThreadLocals.getSC().getUserName();
@@ -926,8 +942,8 @@ public class MongoRead extends ServiceBase {
                 node.setName(defaultName);
             }
 
-            if (ok(defaultPrivs)) {
-                acl.addPrivilege(ms, null, node, PrincipalName.PUBLIC.s(), defaultPrivs, null);
+            if (ok(publicPrivs)) {
+                acl.addPrivilege(ms, null, node, PrincipalName.PUBLIC.s(), publicPrivs, null);
             }
 
             update.save(ms, node);
@@ -1062,10 +1078,9 @@ public class MongoRead extends ServiceBase {
                     .and(SubNode.TYPE).is(type).and(SubNode.PROPERTIES + "." + NodeProp.USER + ".value").is(userName);
         }
 
+        crit = auth.addSecurityCriteria(ms, crit);
         q.addCriteria(crit);
         SubNode ret = mongoUtil.findOne(q);
-
-        // auth.auth(session, ret, PrivilegeType.READ);
         return ret;
     }
 
@@ -1119,6 +1134,7 @@ public class MongoRead extends ServiceBase {
         Criteria crit = Criteria.where(SubNode.PATH).regex(mongoUtil.regexRecursiveChildrenOfPath(node.getPath()))//
                 .and(SubNode.TYPE).is(type);
 
+        crit = auth.addSecurityCriteria(ms, crit);
         q.addCriteria(crit);
         return q;
     }
@@ -1164,6 +1180,7 @@ public class MongoRead extends ServiceBase {
                 SubNode.PATH).regex(mongoUtil.regexDirectChildrenOfPath(path))//
                 .and(SubNode.PROPERTIES + "." + propName + ".value").is(propVal);
 
+        crit = auth.addSecurityCriteria(ms, crit);
         q.addCriteria(crit);
         return mongoUtil.find(q);
     }

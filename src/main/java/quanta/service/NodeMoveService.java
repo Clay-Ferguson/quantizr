@@ -201,8 +201,6 @@ public class NodeMoveService extends ServiceBase {
 			if (no(node))
 				continue;
 
-			auth.ownerAuthByThread(node);
-
 			// back out the number of bytes it was using
 			if (!ms.isAdmin()) {
 				/*

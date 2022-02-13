@@ -551,7 +551,7 @@ public class NodeEditService extends ServiceBase {
 		DeletePropertyResponse res = new DeletePropertyResponse();
 		String nodeId = req.getNodeId();
 		SubNode node = read.getNode(ms, nodeId);
-		auth.ownerAuthByThread(node);
+		auth.ownerAuth(node);
 
 		for (String propName : req.getPropNames()) {
 			node.delete(propName);

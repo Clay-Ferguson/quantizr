@@ -178,6 +178,8 @@ public class MongoUtil extends ServiceBase {
 	 * This find method should wrap ALL queries so that we can run our code inside this NodeIterable
 	 * wrapper which will detect any query results that reference objects cached in memory and point to
 	 * the in-memory copy of the object during iterating.
+	 * 
+	 * NOTE: All security checks are done external to this method. 
 	 */
 	public NodeIterable find(Query q) {
 		Iterable<SubNode> iter = ops.find(q, SubNode.class);
@@ -189,7 +191,9 @@ public class MongoUtil extends ServiceBase {
 
 	/**
 	 * Runs the mongo 'findOne' but if it finds a node that's already in memory we return the memory
-	 * object
+	 * object.
+	 * 
+	 * NOTE: All security checks are done external to this method. 
 	 */
 	public SubNode findOne(Query q) {
 		SubNode node = ops.findOne(q, SubNode.class);
@@ -198,7 +202,9 @@ public class MongoUtil extends ServiceBase {
 
 	/**
 	 * Runs the mongo 'findById' but if it finds a node that's already in memory we return the memory
-	 * object
+	 * object.
+	 * 
+	 * NOTE: All security checks are done external to this method. 
 	 */
 	@PerfMon
 	public SubNode findById(ObjectId objId) {

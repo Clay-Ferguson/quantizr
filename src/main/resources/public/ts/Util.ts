@@ -1335,14 +1335,15 @@ export class Util {
     }
 
     loadAnonPageHome = async (state: AppState): Promise<void> => {
-        Log.log("loadAnonPageHome()");
+        // console.log("loadAnonPageHome()");
 
         try {
             let res: J.RenderNodeResponse = await S.util.ajax<J.RenderNodeRequest, J.RenderNodeResponse>("anonPageLoad");
 
             // if we have trouble accessing even the anon page just drop out to landing page.
             if (!res.success || res.errorType === J.ErrorType.AUTH) {
-                window.location.href = window.location.origin;
+                // NO!!! I think this can send server into infinte loop of page loading!
+                // window.location.href = window.location.origin;
                 return;
             }
             state = appState(state);

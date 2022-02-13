@@ -77,7 +77,7 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
                 new Div("Click to Add Files (or Drag and Drop)"),
                 this.dropzoneDiv = new Div("", { className: "dropzone" }),
                 this.hiddenInputContainer = new Div(null, { style: { display: "none" } }),
-                new Div("From other sources..."),
+                this.importMode ? null : new Div("From other sources..."),
                 new ButtonBar([
                     this.importMode ? null : new Button("URL", this.uploadFromUrl),
                     this.importMode ? null : new Button("IPFS", this.uploadFromIPFS),

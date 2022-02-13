@@ -357,7 +357,7 @@ export class EditNodeDlg extends DialogBase {
                 new TextField({ label: "Tags", outterClass: "marginTop col-10", val: this.tagsState }),
                 this.createSearchFieldIconButtons()
             ]),
-            new Div(null, { className: "row marginTop" }, [
+            new Div(null, { className: "row align-items-end" }, [
                 nodeNameTextField,
                 this.createPrioritySelection()
             ]),

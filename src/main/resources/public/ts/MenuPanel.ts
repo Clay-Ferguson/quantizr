@@ -190,15 +190,16 @@ export class MenuPanel extends Div {
             Menu.activeMenu = bookmarkItems.length > 0 ? C.BOOKMARKS_MENU_TEXT : null;
         }
 
-        children.push(new Menu("Tree", [
-            new MenuItem("Account", S.nav.navHome, !state.isAnonUser, null), // This works, but not being used yet -> this.makeHelpIcon(() => S.quanta?.config?.help?.menu?.account)),
-            new MenuItem("Portal Home", MenuPanel.openHomeNode, !state.isAnonUser),
-            new MenuItem("Public Posts", MenuPanel.openPostsNode, !state.isAnonUser),
-            new MenuItemSeparator(), //
-            new MenuItem("RSS Feeds", MenuPanel.openRSSFeedsNode, !state.isAnonUser),
-            new MenuItem("Notes", MenuPanel.openNotesNode, !state.isAnonUser),
-            new MenuItem("Exports", MenuPanel.openExportsNode, !state.isAnonUser)
-        ]));
+        if (!state.isAnonUser) {
+            children.push(new Menu("Account", [
+                new MenuItem("Root Node", S.nav.navHome, !state.isAnonUser, null), // This works, but not being used yet -> this.makeHelpIcon(() => S.quanta?.config?.help?.menu?.account)),
+                new MenuItem("Public Node", MenuPanel.openHomeNode, !state.isAnonUser),
+                new MenuItem("Public Posts", MenuPanel.openPostsNode, !state.isAnonUser),
+                new MenuItem("RSS Feeds", MenuPanel.openRSSFeedsNode, !state.isAnonUser),
+                new MenuItem("Notes", MenuPanel.openNotesNode, !state.isAnonUser),
+                new MenuItem("Exports", MenuPanel.openExportsNode, !state.isAnonUser)
+            ]));
+        }
 
         let messagesSuffix = state.newMessageCount > 0
             ? " (" + state.newMessageCount + " new)" : "";
@@ -283,7 +284,7 @@ export class MenuPanel extends Div {
             // new MenuItem("Edit Node Sharing", () => S.edit.editNodeSharing(state), //
             //     !state.isAnonUser && !!highlightNode && selNodeIsMine), //
 
-            new MenuItem("Show All Shares", MenuPanel.showAllShares, //
+            new MenuItem("Show All Shared Nodes", MenuPanel.showAllShares, //
                 !state.isAnonUser && !!hltNode),
 
             new MenuItem("Show Public Read-only", MenuPanel.showPublicReadonlyShares, //
@@ -350,7 +351,6 @@ export class MenuPanel extends Div {
         ]));
 
         children.push(new Menu("Node Info", [
-
             // I decided with this on the toolbar we don't need it repliated here.
             // !state.isAnonUser ? new MenuItem("Save clipboard (under Notes node)", () => S.edit.saveClipboardToChildNode("~" + J.NodeType.NOTES)) : null, //
 
@@ -368,6 +368,29 @@ export class MenuPanel extends Div {
             // because you'd need a document with many thousands of nodes before the "top 500" will have any real significance as a 'trending' definition.
             // new MenuItem("Trending Stats", () => S.view.getNodeStats(state, true, false), //
             //     !state.isAnonUser /* state.isAdminUser */) //
+        ]));
+
+        children.push(new Menu("Settings", [
+            new MenuItem("Edit", MenuPanel.toggleEditMode, !state.isAnonUser, () => state.userPreferences.editMode), //
+            new MenuItem("Show Node Info", MenuPanel.toggleMetaData, true, () => state.userPreferences.showMetaData), //
+            new MenuItem("NSFW", MenuPanel.toggleNsfw, true, () => state.userPreferences.nsfw), //
+            new MenuItem("Show Parent", MenuPanel.toggleParents, true, () => state.userPreferences.showParents), //
+
+            // For now there is only ONE button on the Perferences dialog that is accessible as a toolbar button already, so
+            // until we have at least one more preference the preferences dialog is not needed.
+            // new MenuItem("Preferences", () => S.edit.editPreferences(state), !state.isAnonUser), // "fa-gear"
+
+            new MenuItemSeparator(), //
+
+            new MenuItem("Browser Info", MenuPanel.browserInfo), //
+            new MenuItem(state.mobileMode ? "Desktop Browser" : "Moble Browser", MenuPanel.mobileToggle), //
+
+            new MenuItem("Profile", MenuPanel.profile, !state.isAnonUser), //
+            !state.isAnonUser ? new MenuItem("Logout", S.nav.logout, !state.isAnonUser) : null, //
+            state.isAnonUser ? new MenuItem("Signup", S.nav.signup, state.isAnonUser) : null //
+
+            // menuItem("Full Repository Export", "fullRepositoryExport", "
+            // S.edit.fullRepositoryExport();") + //
         ]));
 
         children.push(new Menu("Encrypt", [
@@ -396,30 +419,6 @@ export class MenuPanel extends Div {
         //     menuItem("Search", "fileSysSearchButton", "systemfolder.search();"); //
         //     //menuItem("Browse", "fileSysBrowseButton", "systemfolder.browse();");
         // let fileSystemMenu = makeTopLevelMenu("FileSys", fileSystemMenuItems);
-
-        children.push(new Menu("Account", [
-            new MenuItem("Profile", MenuPanel.profile, !state.isAnonUser), //
-            !state.isAnonUser ? new MenuItem("Logout", S.nav.logout, !state.isAnonUser) : null,
-            state.isAnonUser ? new MenuItem("Signup", S.nav.signup, state.isAnonUser) : null,
-            new MenuItemSeparator(), //
-
-            new MenuItem("Edit", MenuPanel.toggleEditMode, !state.isAnonUser, () => state.userPreferences.editMode), //
-            new MenuItem("Show Node Info", MenuPanel.toggleMetaData, true, () => state.userPreferences.showMetaData), //
-            new MenuItem("NSFW", MenuPanel.toggleNsfw, true, () => state.userPreferences.nsfw), //
-            new MenuItem("Show Parent", MenuPanel.toggleParents, true, () => state.userPreferences.showParents), //
-
-            // For now there is only ONE button on the Perferences dialog that is accessible as a toolbar button already, so
-            // until we have at least one more preference the preferences dialog is not needed.
-            // new MenuItem("Preferences", () => S.edit.editPreferences(state), !state.isAnonUser), // "fa-gear"
-
-            new MenuItemSeparator(), //
-
-            new MenuItem("Browser Info", MenuPanel.browserInfo), //
-            new MenuItem(state.mobileMode ? "Desktop Browser" : "Moble Browser", MenuPanel.mobileToggle) //
-
-            // menuItem("Full Repository Export", "fullRepositoryExport", "
-            // S.edit.fullRepositoryExport();") + //
-        ]));
 
         /* This was experimental, and does work perfectly well (based on a small aount of testing done).
           These menu items can save a node subgraph to IPFS files (MFS) and then restore those nodes back

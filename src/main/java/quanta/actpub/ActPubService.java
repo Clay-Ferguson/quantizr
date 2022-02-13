@@ -569,7 +569,7 @@ public class ActPubService extends ServiceBase {
     public void processCreateTombstone(MongoSession ms, String actorUrl, Object actorObj, Object obj) {
         apUtil.log("processCreateTombstone");
         String id = AP.str(obj, APObj.id);
-        delete.deleteBySubNodePropVal(NodeProp.ACT_PUB_ID.s(), id);
+        delete.deleteBySubNodePropVal(ms, NodeProp.ACT_PUB_ID.s(), id);
     }
 
     /* obj is the 'Note' object */

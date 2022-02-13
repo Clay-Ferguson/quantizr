@@ -39,6 +39,7 @@ import quanta.response.GetSharedNodesResponse;
 import quanta.response.NodeSearchResponse;
 import quanta.util.ExUtil;
 import quanta.util.ThreadLocals;
+import quanta.util.Val;
 import quanta.util.XString;
 
 /**
@@ -123,7 +124,6 @@ public class NodeSearchService extends ServiceBase {
 						req.getFuzzy(), req.getCaseSensitive(), req.getTimeRangeType(), req.isRecursive(),
 						req.isRequirePriority())) {
 					try {
-						auth.auth(ms, node, PrivilegeType.READ);
 						NodeInfo info = convert.convertToNodeInfo(ThreadLocals.getSC(), ms, node, true, false, counter + 1, false,
 								false, false, false);
 						searchResults.add(info);
@@ -170,19 +170,30 @@ public class NodeSearchService extends ServiceBase {
 			moreCriteria = Criteria.where(SubNode.PROPERTIES + "." + NodeProp.ACT_PUB_ACTOR_URL.s() + ".value").is(null);
 		}
 
-		Iterable<SubNode> accountNodes = read.getChildren(ms, MongoUtil.allUsersRootNode.getId(), null,
-				ConstantInt.ROWS_PER_PAGE.val(), ConstantInt.ROWS_PER_PAGE.val() * req.getPage(), textCriteria, moreCriteria);
-		/*
-		 * scan all userAccountNodes, and set a zero amount for those not found (which will be the correct
-		 * amount).
-		 */
-		for (SubNode node : accountNodes) {
-			try {
-				NodeInfo info = convert.convertToNodeInfo(ThreadLocals.getSC(), ms, node, true, false, counter + 1, false, false,
-						false, false);
-				searchResults.add(info);
-			} catch (Exception e) {
-				ExUtil.error(log, "faild converting user node", e);
+		Val<Iterable<SubNode>> accountNodes = new Val<>();;
+		final TextCriteria _textCriteria = textCriteria;
+		final Criteria _moreCriteria = moreCriteria;
+
+		// Run this as admin because ordinary users don't have access to account nodes.
+		arun.run(as -> {
+			accountNodes.setVal(read.getChildren(as, MongoUtil.allUsersRootNode.getId(), null, ConstantInt.ROWS_PER_PAGE.val(),
+					ConstantInt.ROWS_PER_PAGE.val() * req.getPage(), _textCriteria, _moreCriteria));
+			return null;
+		});
+
+		if (ok(accountNodes.getVal())) {
+			/*
+			 * scan all userAccountNodes, and set a zero amount for those not found (which will be the correct
+			 * amount).
+			 */
+			for (SubNode node : accountNodes.getVal()) {
+				try {
+					NodeInfo info = convert.convertToNodeInfo(ThreadLocals.getSC(), ms, node, true, false, counter + 1, false,
+							false, false, false);
+					searchResults.add(info);
+				} catch (Exception e) {
+					ExUtil.error(log, "failed converting user node", e);
+				}
 			}
 		}
 
@@ -310,8 +321,8 @@ public class NodeSearchService extends ServiceBase {
 
 	public void getNodeStats(MongoSession ms, GetNodeStatsRequest req, GetNodeStatsResponse res) {
 		/*
-		 * If this is the 'feed' being queried, then get the data from trendingFeedInfo (the cache), or else
-		 * cache it
+		 * If this is the 'feed' being queried (i.e. the Trending tab on the app), then get the data from
+		 * trendingFeedInfo (the cache), or else cache it
 		 */
 		synchronized (NodeSearchService.trendingFeedInfoLock) {
 			if (req.isFeed() && ok(NodeSearchService.trendingFeedInfo)) {
@@ -337,10 +348,6 @@ public class NodeSearchService extends ServiceBase {
 		 * a bunch of options but just the public feed query
 		 */
 		if (req.isFeed()) {
-			/* Finds nodes that have shares to any of the people listed in sharedToAny */
-			List<String> sharedToAny = new LinkedList<>();
-			sharedToAny.add(PrincipalName.PUBLIC.s());
-
 			List<Criteria> ands = new LinkedList<>();
 			Query q = new Query();
 			Criteria crit =
@@ -352,14 +359,9 @@ public class NodeSearchService extends ServiceBase {
 			ands.add(Criteria.where(SubNode.TYPE).ne(NodeType.POSTS.s())); //
 			ands.add(Criteria.where(SubNode.TYPE).ne(NodeType.ACT_PUB_POSTS.s()));
 
-			List<Criteria> orCriteria = new LinkedList<>();
+			// For public feed statistics only consider PUBLIC nodes.
+			ands.add(Criteria.where(SubNode.AC + "." + PrincipalName.PUBLIC.s()).ne(null));
 
-			// or a node that is shared to any of the sharedToAny users
-			for (String share : sharedToAny) {
-				orCriteria.add(Criteria.where(SubNode.AC + "." + share).ne(null));
-			}
-
-			ands.add(new Criteria().orOperator((Criteria[]) orCriteria.toArray(new Criteria[orCriteria.size()])));
 			crit.andOperator(ands);
 
 			q.addCriteria(crit);
@@ -394,7 +396,7 @@ public class NodeSearchService extends ServiceBase {
 
 			String content = node.getContent();
 			if (ok(node.getTags())) {
-				content += " "+node.getTags();
+				content += " " + node.getTags();
 			}
 			content = fixMastodonMangles(content);
 

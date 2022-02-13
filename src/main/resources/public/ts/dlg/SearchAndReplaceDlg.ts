@@ -28,10 +28,8 @@ export class SearchAndReplaceDlg extends DialogBase {
     renderDlg(): CompIntf[] {
         return [
             new Form(null, [
-                new HorizontalLayout([
-                    new TextField({ label: "Search for", val: this.searchState }),
-                    new TextField({ label: "Replace with", val: this.replaceState })
-                ]),
+                new TextField({ label: "Search for", val: this.searchState }),
+                new TextField({ label: "Replace with", val: this.replaceState }),
                 new HorizontalLayout([
                     new Checkbox("Include Sub-Nodes", null, {
                         setValue: (checked: boolean): void => {
