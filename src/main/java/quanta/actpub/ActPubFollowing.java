@@ -32,13 +32,14 @@ import quanta.mongo.model.SubNode;
 import quanta.request.GetFollowingRequest;
 import quanta.response.GetFollowingResponse;
 import quanta.util.ThreadLocals;
+import quanta.util.Util;
 import quanta.util.XString;
 
 /**
  * Methods relating to AP following
  */
 @Component
-public class ActPubFollowing extends ServiceBase  {
+public class ActPubFollowing extends ServiceBase {
     private static final Logger log = LoggerFactory.getLogger(ActPubFollowing.class);
 
     @Autowired
@@ -148,8 +149,7 @@ public class ActPubFollowing extends ServiceBase  {
                     /*
                      * lookup to see if this followerFriendList node already has userToFollow already under it
                      */
-                    SubNode friendNode =
-                            read.findNodeByUserAndType(as, followerFriendList, userToFollow, NodeType.FRIEND.s());
+                    SubNode friendNode = read.findNodeByUserAndType(as, followerFriendList, userToFollow, NodeType.FRIEND.s());
 
                     if (no(friendNode)) {
                         if (!unFollow) {
@@ -165,29 +165,29 @@ public class ActPubFollowing extends ServiceBase  {
                         }
                     }
 
-                    String privateKey = apCrypto.getPrivateKey(as, userToFollow);
+                    // Now we send back to the server the Accept response, asynchronously
+                    exec.run(() -> {
+                        String privateKey = apCrypto.getPrivateKey(as, userToFollow);
 
-                    /* todo-1: what's this sleep doing? It's ugly, bad practice. I'm pretty sure I just wanted to give the caller (i.e. the
-                    remote Fedi instance) a chance to get a return code back for this call before posting
-                    back to it */
-                    Thread.sleep(2000);
+                        // Try to give the server a bit of time, before sending back the accept/reject
+                        Util.sleep(2000);
 
-                    // Must send either Accept or Reject. Currently we auto-accept all.
-                    APObj acceptPayload = unFollow ? new APOUndo(null, followerActorUrl, actorBeingFollowedUrl) : //
-                    new APOFollow();
-                    acceptPayload.put(APObj.actor, followerActorUrl) //
-                            .put(APObj.object, actorBeingFollowedUrl);
+                        // Must send either Accept or Reject. Currently we auto-accept all.
+                        APObj acceptPayload = unFollow ? new APOUndo(null, followerActorUrl, actorBeingFollowedUrl) : //
+                                new APOFollow();
+                        acceptPayload.put(APObj.actor, followerActorUrl) //
+                                .put(APObj.object, actorBeingFollowedUrl);
 
-                    APOAccept accept = new APOAccept(//
-                            "Accepted " + (unFollow ? "unfollow" : "follow") + " request", //
-                            actorBeingFollowedUrl, //
-                            acceptPayload); //
+                        APOAccept accept = new APOAccept(//
+                                "Accepted " + (unFollow ? "unfollow" : "follow") + " request", //
+                                actorBeingFollowedUrl, //
+                                acceptPayload); //
 
-                    String followerInbox = AP.str(followerActor, APObj.inbox);
+                        String followerInbox = AP.str(followerActor, APObj.inbox);
+                        log.debug("Sending Accept of Follow Request to inbox " + followerInbox);
 
-                    log.debug("Sending Accept of Follow Request to inbox " + followerInbox);
-
-                    apUtil.securePost(null, as, privateKey, followerInbox, actorBeingFollowedUrl, accept, null);
+                        apUtil.securePost(null, as, privateKey, followerInbox, actorBeingFollowedUrl, accept, null);
+                    });
                 } catch (Exception e) {
                     log.error("Failed sending follow reply.", e);
                 }

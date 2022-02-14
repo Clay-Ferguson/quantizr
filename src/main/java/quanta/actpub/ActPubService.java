@@ -118,7 +118,14 @@ public class ActPubService extends ServiceBase {
                                 privateMessage, attachments);
 
                         for (String inbox : sharedInboxes) {
-                            apUtil.securePost(fromUser, ms, null, inbox, fromActor, message, null);
+                            apUtil.log("Posting to Shared Inbox: " + inbox);
+                            try {
+                                apUtil.securePost(fromUser, ms, null, inbox, fromActor, message, null);
+                            } 
+                            // catch error from any server, and ignore, go to next server to send to.
+                            catch (Exception e) {
+                                apUtil.log("failed to post to: " + inbox);
+                            }
                         }
                     }
                 }
@@ -461,6 +468,10 @@ public class ActPubService extends ServiceBase {
                     apub.processDeleteAction(httpReq, payload);
                     break;
 
+                case APType.Accept:
+                    apub.processAcceptAction(payload);
+                    break;
+
                 default:
                     log.debug("Unsupported type:" + XString.prettyPrint(payload));
                     break;
@@ -484,6 +495,23 @@ public class ActPubService extends ServiceBase {
                 break;
         }
     }
+
+    @PerfMon(category = "apub")
+    public void processAcceptAction(Object payload) {
+        Object obj = AP.obj(payload, APObj.object);
+        String type = AP.str(obj, APObj.type);
+        apUtil.log("Accept Type: " + type);
+        switch (type) {
+            case APType.Follow:
+                apUtil.log("Nothing to do for Follow Acceptance. no op.");
+                break;
+
+            default:
+                log.debug("Unsupported payload object type:" + XString.prettyPrint(obj));
+                break;
+        }
+    }
+
 
     @PerfMon(category = "apub")
     public void processCreateAction(HttpServletRequest httpReq, Object payload) {

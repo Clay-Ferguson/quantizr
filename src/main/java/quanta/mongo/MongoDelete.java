@@ -1,6 +1,7 @@
 package quanta.mongo;
 
 import static quanta.util.Util.no;
+import static quanta.util.Util.ok;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.Date;
@@ -122,7 +123,11 @@ public class MongoDelete extends ServiceBase  {
 		update.saveSession(ms);
 		Query q = new Query();
 		q.addCriteria(Criteria.where(SubNode.PATH).regex(mongoUtil.regexRecursiveChildrenOfPath(path)));
-		q.addCriteria(auth.addSecurityCriteria(ms, null));
+
+		Criteria crit = auth.addSecurityCriteria(ms, null);
+        if (ok(crit)) {
+            q.addCriteria(crit);
+        }
 
 		DeleteResult res = ops.remove(q, SubNode.class);
 		// log.debug("Num of SubGraph deleted: " + res.getDeletedCount());

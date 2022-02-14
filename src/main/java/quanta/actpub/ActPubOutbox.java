@@ -29,6 +29,7 @@ import quanta.model.client.PrincipalName;
 import quanta.model.client.PrivilegeType;
 import quanta.mongo.MongoSession;
 import quanta.mongo.model.SubNode;
+import quanta.service.AclService;
 import quanta.util.DateUtil;
 import quanta.util.Val;
 import quanta.util.XString;
@@ -230,12 +231,6 @@ public class ActPubOutbox extends ServiceBase {
                 for (SubNode child : auth.searchSubGraphByAclUser(as, null, sharedToList,
                         Sort.by(Sort.Direction.DESC, SubNode.MODIFY_TIME), MAX_PER_PAGE, userNode.getOwner())) {
 
-                    String replyTo = null;
-                    SubNode parent = read.getParent(as, child, false);
-                    if (ok(parent)) {
-                        replyTo = snUtil.getIdBasedUrl(parent);
-                    }
-
                     if (items.size() >= MAX_PER_PAGE) {
                         // ocPage.setPrev(outboxBase + "?page=" + String.valueOf(pgNo - 1));
                         // ocPage.setNext(outboxBase + "?page=" + String.valueOf(pgNo + 1));
@@ -243,21 +238,10 @@ public class ActPubOutbox extends ServiceBase {
                     }
 
                     if (collecting) {
-                        String hexId = child.getIdStr();
-                        String published = DateUtil.isoStringFromDate(child.getModifyTime());
-                        String actor = apUtil.makeActorUrlForUserName(userName);
-
-                        APONote note = new APONote(nodeIdBase + hexId, published, actor, null, nodeIdBase + hexId, false,
-                                child.getContent(), new APList().val(APConst.CONTEXT_STREAMS_PUBLIC));
-
-                        if (ok(replyTo)) {
-                            note = note.put(APObj.inReplyTo, replyTo);
+                        APObj ret = makeAPActivityForNote(as, userName, nodeIdBase, child);
+                        if (ok(ret)) {
+                            items.add(ret);
                         }
-
-                        items.add(new APOCreate(
-                                // todo-1: what is the create=t here? That was part of my own temporary test right?
-                                nodeIdBase + hexId + "&create=t", actor, published, note,
-                                new APList().val(APConst.CONTEXT_STREAMS_PUBLIC)));
                     }
                 }
 
@@ -269,5 +253,71 @@ public class ActPubOutbox extends ServiceBase {
             throw new RuntimeException(e);
         }
         return retItems;
+    }
+
+    public APObj getResource(String nodeId) {
+        return (APObj) arun.run(as -> {
+            String host = prop.getProtocolHostAndPort();
+            String nodeIdBase = host + "?id=";
+
+            SubNode node = read.getNode(as, nodeId);
+            if (!ok(node)) {
+                throw new RuntimeException("Node not found: " + nodeId);
+            }
+
+            // currently this is our security hack (todo-0: fix)
+            if (!AclService.isPublic(as, node) && !node.getContent().contains("#allowPublicAccess")) {
+                throw new RuntimeException("Insecure request rejected.");
+            }
+
+            String userName = read.getNodeOwner(as, node);
+            APObj ret = makeAPForNote(as, userName, nodeIdBase, node);
+            if (ok(ret)) {
+                apUtil.log("Reply with Object: " + XString.prettyPrint(ret));
+            }
+            return ret;
+        });
+    }
+
+    public APObj makeAPForNote(MongoSession as, String userName, String nodeIdBase, SubNode child) {
+        SubNode parent = read.getParent(as, child, false);
+
+        String hexId = child.getIdStr();
+        String published = DateUtil.isoStringFromDate(child.getModifyTime());
+        String actor = apUtil.makeActorUrlForUserName(userName);
+
+        APONote note = new APONote(nodeIdBase + hexId, published, actor, null, nodeIdBase + hexId, false, child.getContent(),
+                new APList().val(APConst.CONTEXT_STREAMS_PUBLIC));
+
+        if (ok(parent)) {
+            String replyTo = apUtil.buildUrlForReplyTo(as, parent);
+            if (ok(replyTo)) {
+                note = note.put(APObj.inReplyTo, replyTo);
+            }
+        }
+
+        return note;
+    }
+
+    public APObj makeAPActivityForNote(MongoSession as, String userName, String nodeIdBase, SubNode child) {
+        SubNode parent = read.getParent(as, child, false);
+
+        String hexId = child.getIdStr();
+        String published = DateUtil.isoStringFromDate(child.getModifyTime());
+        String actor = apUtil.makeActorUrlForUserName(userName);
+
+        APONote note = new APONote(nodeIdBase + hexId, published, actor, null, nodeIdBase + hexId, false, child.getContent(),
+                new APList().val(APConst.CONTEXT_STREAMS_PUBLIC));
+
+        if (ok(parent)) {
+            String replyTo = apUtil.buildUrlForReplyTo(as, parent);
+            if (ok(replyTo)) {
+                note = note.put(APObj.inReplyTo, replyTo);
+            }
+        }
+
+        return new APOCreate(
+                // todo-1: what is the create=t here? That was part of my own temporary test right?
+                nodeIdBase + hexId + "&create=t", actor, published, note, new APList().val(APConst.CONTEXT_STREAMS_PUBLIC));
     }
 }

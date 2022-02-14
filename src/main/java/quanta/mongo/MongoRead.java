@@ -146,7 +146,10 @@ public class MongoRead extends ServiceBase {
             ms = auth.getAdminSession();
         }
         Query q = new Query();
-        q.addCriteria(auth.addSecurityCriteria(ms, null));
+        Criteria crit = auth.addSecurityCriteria(ms, null);
+        if (ok(crit)) {
+            q.addCriteria(crit);
+        }
         return ops.count(q, SubNode.class);
     }
 
@@ -726,7 +729,7 @@ public class MongoRead extends ServiceBase {
             }
         }
 
-        crit = auth.addSecurityCriteria(ms, crit); 
+        crit = auth.addSecurityCriteria(ms, crit);
         criterias.add(crit);
 
         if (!StringUtils.isEmpty(text)) {

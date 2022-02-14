@@ -127,6 +127,7 @@ import quanta.response.InfoMessage;
 import quanta.response.LogoutResponse;
 import quanta.response.PingResponse;
 import quanta.response.SendTestEmailResponse;
+import quanta.service.AclService;
 import quanta.service.ExportServiceFlexmark;
 import quanta.service.ExportTarService;
 import quanta.service.ExportTextService;
@@ -270,16 +271,19 @@ public class AppController extends ServiceBase implements ErrorController {
 				ThreadLocals.getSC().setUrlId(id);
 				// log.debug("ID specified on url=" + id);
 				String _id = id;
+
 				arun.run(ms -> {
 					// we don't check ownership of node at this time, but merely check sanity of
 					// whether this ID is even existing or not.
 					SubNode node = read.getNode(ms, _id);
-					render.populateSocialCardProps(node, model);
+
 					if (no(node)) {
 						log.debug("Node did not exist.");
-						ThreadLocals.getSC().setUrlId(null);
-					} else {
-						// log.debug("Node exists.");
+						ThreadLocals.getSC().setUrlId(null); // <--- why is this here? todo-0
+					}
+
+					if (AclService.isPublic(ms, node)) {
+						render.populateSocialCardProps(node, model);
 					}
 					return null;
 				});

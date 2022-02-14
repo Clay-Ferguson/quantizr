@@ -49,6 +49,7 @@ import quanta.mongo.MongoDeleteEvent;
 import quanta.mongo.MongoRepository;
 import quanta.mongo.MongoSession;
 import quanta.mongo.model.SubNode;
+import quanta.service.AclService;
 import quanta.util.ThreadLocals;
 import quanta.util.Util;
 import quanta.util.XString;
@@ -722,6 +723,26 @@ public class ActPubUtil extends ServiceBase {
         if (prop.isApLog()) {
             log.trace(message);
         }
+    }
+
+    /* Try to generate the best 'inReplyTo' that TARGETS this node */
+    public String buildUrlForReplyTo(MongoSession ms, SubNode node) {
+        if (no(node)) return null;
+
+        // try this property first.
+        String replyTo = node.getStr(NodeProp.ACT_PUB_OBJ_URL);
+
+        // fall back to this...
+        if (no(replyTo)) {
+            replyTo = node.getStr(NodeProp.ACT_PUB_ID);
+        }
+
+        // or finally reference pointing to our own server node, if it's not private
+        if (no(replyTo) && (AclService.isPublic(ms, node) || node.getContent().contains("#allowPublicAccess"))) {
+            replyTo = snUtil.getIdBasedUrl(node);
+        }
+
+        return replyTo;
     }
 
     /*

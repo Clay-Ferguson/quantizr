@@ -35,7 +35,7 @@ public class ActPubController extends ServiceBase {
 	private static final Logger log = LoggerFactory.getLogger(ActPubController.class);
 
 	@Autowired
-    private AppProp prop;
+	private AppProp prop;
 
 	private static final ObjectMapper mapper = new ObjectMapper();
 
@@ -135,8 +135,8 @@ public class ActPubController extends ServiceBase {
 	 * 
 	 * WARNING: This inbox and the Shared inbox (above) can both be called simultaneously in cases when
 	 * someone is doing a public reply to a Quanta node, and so Mastodon sends out the public inbox post
-	 * and the post to the user simultaneously. We have apUtil.getActorLock() for being sure this
-	 * won't cause duplicate records
+	 * and the post to the user simultaneously. We have apUtil.getActorLock() for being sure this won't
+	 * cause duplicate records
 	 */
 	@RequestMapping(value = APConst.PATH_INBOX + "/{userName}", method = RequestMethod.POST, produces = { //
 			APConst.CTYPE_LD_JSON, //
@@ -153,6 +153,21 @@ public class ActPubController extends ServiceBase {
 			ActPubService.inboxCount++;
 			apub.processInboxPost(httpReq, payload);
 			return new ResponseEntity<String>(HttpStatus.OK);
+		} catch (Exception e) {
+			return new ResponseEntity<String>(HttpStatus.BAD_REQUEST);
+		}
+	}
+
+	@RequestMapping(value = {"/"}, method = RequestMethod.GET, produces = {//
+			APConst.CTYPE_LD_JSON, //
+			APConst.CTYPE_LD_JSON + "; " + APConst.CHARSET, //
+			APConst.CTYPE_LD_JSON + "; " + APConst.APS_PROFILE //
+	})
+	public @ResponseBody Object getJsonObj(HttpServletRequest httpReq, //
+			@RequestParam(value = "id", required = false) String id) {
+		try {
+			APObj ret = apOutbox.getResource(id);
+			return ret;
 		} catch (Exception e) {
 			return new ResponseEntity<String>(HttpStatus.BAD_REQUEST);
 		}

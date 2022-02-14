@@ -129,8 +129,8 @@ public class Convert extends ServiceBase {
 			 */
 		}
 
-		log.trace("RENDER ID=" + node.getIdStr() + " rootId=" + ownerId + " session.rootId=" + sc.getRootId() + " node.content="
-				+ node.getContent() + " owner=" + owner);
+		// log.trace("RENDER ID=" + node.getIdStr() + " rootId=" + ownerId + " session.rootId=" + sc.getRootId() + " node.content="
+		// 		+ node.getContent() + " owner=" + owner);
 
 		// log.debug("RENDER nodeId: " + node.getIdStr()+" -- json:
 		// "+XString.prettyPrint(node));

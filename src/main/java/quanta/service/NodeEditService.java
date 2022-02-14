@@ -469,14 +469,12 @@ public class NodeEditService extends ServiceBase {
 				if (ok(node.getAc())) {
 					// Get the inReplyTo from the parent property (foreign node) or if not found generate one based on
 					// what the local server version of it is.
-					String inReplyTo = parent.getStr(NodeProp.ACT_PUB_OBJ_URL);
-					if (no(inReplyTo)) {
-						inReplyTo = snUtil.getIdBasedUrl(parent);
-					}
+					String inReplyTo = apUtil.buildUrlForReplyTo(s, parent);
 
 					APList attachments = apub.createAttachmentsList(node);
 					String nodeUrl = snUtil.getIdBasedUrl(node);
 
+					// This broadcasts out to the shared inboxes of all the followers of the user
 					apub.sendNotificationForNodeEdit(s, inReplyTo, snUtil.cloneAcl(node), attachments, node.getContent(),
 							nodeUrl);
 					push.pushNodeUpdateToBrowsers(s, sessionsPushed, node);
