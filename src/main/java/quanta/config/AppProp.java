@@ -44,7 +44,7 @@ public class AppProp {
 
 	// turns on verbose ActivityPub Logging
 	// todo-2: need an admin console where stuff like this can be turned on/off live.
-	private boolean apLog = false;
+	private boolean apLog = true; // todo-0: FYI this is on.
 
 	private String protocolHostAndPort = null;
 

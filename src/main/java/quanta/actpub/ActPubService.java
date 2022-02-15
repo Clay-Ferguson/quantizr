@@ -74,8 +74,8 @@ public class ActPubService extends ServiceBase {
      * For concurrency reasons, note that we pass in the nodeId to this method rather than the node even
      * if we do have the node, becuase we want to make sure there's no concurrent access.
      */
-    public void sendNotificationForNodeEdit(MongoSession ms, String inReplyTo, HashMap<String, AccessControl> acl,
-            APList attachments, String content, String noteUrl) {
+    public void sendNotificationForNodeEdit(MongoSession ms, String inReplyTo, String replyToType,
+            HashMap<String, AccessControl> acl, APList attachments, String content, String noteUrl) {
         exec.run(() -> {
             try {
                 List<String> toUserNames = new LinkedList<>();
@@ -114,14 +114,15 @@ public class ActPubService extends ServiceBase {
                     HashSet<String> sharedInboxes = getSharedInboxesOfFollowers(fromUser);
 
                     if (sharedInboxes.size() > 0) {
-                        APObj message = apFactory.newCreateMessageForNote(toUserNames, fromActor, inReplyTo, content, noteUrl,
-                                privateMessage, attachments);
+                        APObj message = apFactory.newCreateMessageForNote(toUserNames, fromActor, inReplyTo, replyToType, content,
+                                noteUrl, privateMessage, attachments);
 
                         for (String inbox : sharedInboxes) {
                             apUtil.log("Posting to Shared Inbox: " + inbox);
                             try {
-                                apUtil.securePost(fromUser, ms, null, inbox, fromActor, message, null);
-                            } 
+                                apUtil.securePost(fromUser, ms, null, inbox, fromActor, message, null,
+                                        APConst.MTYPE_LD_JSON_PROF);
+                            }
                             // catch error from any server, and ignore, go to next server to send to.
                             catch (Exception e) {
                                 apUtil.log("failed to post to: " + inbox);
@@ -131,7 +132,7 @@ public class ActPubService extends ServiceBase {
                 }
 
                 if (toUserNames.size() > 0) {
-                    sendNote(ms, toUserNames, fromUser, inReplyTo, content, attachments, noteUrl, privateMessage);
+                    sendNote(ms, toUserNames, fromUser, inReplyTo, replyToType, content, attachments, noteUrl, privateMessage);
                 }
             } //
             catch (Exception e) {
@@ -193,8 +194,8 @@ public class ActPubService extends ServiceBase {
     }
 
     /* Sends note outbound to other servers */
-    public void sendNote(MongoSession ms, List<String> toUserNames, String fromUser, String inReplyTo, String content,
-            APList attachments, String noteUrl, boolean privateMessage) {
+    public void sendNote(MongoSession ms, List<String> toUserNames, String fromUser, String inReplyTo, String replyToType,
+            String content, APList attachments, String noteUrl, boolean privateMessage) {
         if (no(toUserNames))
             return;
 
@@ -232,11 +233,11 @@ public class ActPubService extends ServiceBase {
                     fromActor = apUtil.makeActorUrlForUserName(fromUser);
                 }
 
-                APObj message = apFactory.newCreateMessageForNote(toUserNames, fromActor, inReplyTo, content, noteUrl,
-                        privateMessage, attachments);
+                APObj message = apFactory.newCreateMessageForNote(toUserNames, fromActor, inReplyTo, replyToType, content,
+                        noteUrl, privateMessage, attachments);
 
                 String userDoingPost = ThreadLocals.getSC().getUserName();
-                apUtil.securePost(userDoingPost, ms, null, inbox, fromActor, message, null);
+                apUtil.securePost(userDoingPost, ms, null, inbox, fromActor, message, null, APConst.MTYPE_LD_JSON_PROF);
             }
         }
     }
@@ -437,45 +438,36 @@ public class ActPubService extends ServiceBase {
      */
     @PerfMon(category = "apub")
     public void processInboxPost(HttpServletRequest httpReq, Object payload) {
-        String actorUrl = AP.str(payload, APObj.actor);
+        String type = AP.str(payload, APObj.type);
+        if (no(type))
+            return;
+        type = type.trim();
+        apUtil.log("inbox type: " + type);
 
-        /*
-         * I noticed a scenario where Mastodon post TWO simultaneous calls for the SAME node, and we
-         * shouldn't allow that, so we lock on each actor so no actor can have two concurrent threads
-         * working on it.
-         */
-        synchronized (apUtil.getActorLock(actorUrl)) {
-            String type = AP.str(payload, APObj.type);
-            if (no(type))
-                return;
-            type = type.trim();
-            apUtil.log("inbox type: " + type);
+        switch (type) {
+            case APType.Create:
+                apub.processCreateAction(httpReq, payload);
+                break;
 
-            switch (type) {
-                case APType.Create:
-                    apub.processCreateAction(httpReq, payload);
-                    break;
+            case APType.Follow:
+                apFollowing.processFollowAction(payload, false);
+                break;
 
-                case APType.Follow:
-                    apFollowing.processFollowAction(payload, false);
-                    break;
+            case APType.Undo:
+                apub.processUndoAction(payload);
+                break;
 
-                case APType.Undo:
-                    apub.processUndoAction(payload);
-                    break;
+            case APType.Delete:
+                apub.processDeleteAction(httpReq, payload);
+                break;
 
-                case APType.Delete:
-                    apub.processDeleteAction(httpReq, payload);
-                    break;
+            case APType.Accept:
+                apub.processAcceptAction(payload);
+                break;
 
-                case APType.Accept:
-                    apub.processAcceptAction(payload);
-                    break;
-
-                default:
-                    log.debug("Unsupported type:" + XString.prettyPrint(payload));
-                    break;
-            }
+            default:
+                log.debug("Unsupported type:" + XString.prettyPrint(payload));
+                break;
         }
     }
 
@@ -540,6 +532,7 @@ public class ActPubService extends ServiceBase {
             apUtil.log("create type: " + type);
 
             switch (type) {
+                case APType.ChatMessage:
                 case APType.Note:
                     apub.processCreateNote(ms, actorUrl, actorObj, object);
                     break;
@@ -652,7 +645,7 @@ public class ActPubService extends ServiceBase {
     }
 
     /*
-     * Saves inbound note comming from other foreign servers
+     * Saves inbound note (or CharMessage) comming from other foreign servers
      * 
      * todo-1: when importing users in bulk (like at startup or the admin menu), some of these queries
      * in here will be redundant. Look for ways to optimize.
@@ -660,6 +653,8 @@ public class ActPubService extends ServiceBase {
      * temp = true, means we are loading an outbox of a user and not recieving a message specifically to
      * a local user so the node should be considered 'temporary' and can be deleted after a week or so
      * to clean the Db.
+     * 
+     * This saves correctly either a obj.type==Note or obj.type==ChatMessage (maybe more to come?)
      */
     @PerfMon(category = "apub")
     public void saveNote(MongoSession ms, SubNode toAccountNode, SubNode parentNode, Object obj, boolean forcePublic,

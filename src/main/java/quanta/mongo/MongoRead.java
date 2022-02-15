@@ -82,6 +82,18 @@ public class MongoRead extends ServiceBase {
         return userNode.getStr(NodeProp.USER.s());
     }
 
+    // Used this for troubleshooting a constraint violation on one of the partial indexes
+    public void dumpByPropertyMatch(String prop, String val) {
+        log.debug("Dump for: prop " + prop + "=" + val);
+        Query q = new Query();
+        Criteria crit = Criteria.where(SubNode.PROPERTIES + "." + prop + ".value").is(val);
+        q.addCriteria(crit);
+        Iterable<SubNode> iter = mongoUtil.find(q);
+        for (SubNode node : iter) {
+            log.debug("NODE: " + XString.prettyPrint(node));
+        }
+    }
+
     public String getParentPath(SubNode node) {
         return XString.truncateAfterLast(node.getPath(), "/");
     }

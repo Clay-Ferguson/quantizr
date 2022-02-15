@@ -473,9 +473,10 @@ public class NodeEditService extends ServiceBase {
 
 					APList attachments = apub.createAttachmentsList(node);
 					String nodeUrl = snUtil.getIdBasedUrl(node);
+					String replyToType = parent.getStr(NodeProp.ACT_PUB_OBJ_TYPE);
 
 					// This broadcasts out to the shared inboxes of all the followers of the user
-					apub.sendNotificationForNodeEdit(s, inReplyTo, snUtil.cloneAcl(node), attachments, node.getContent(),
+					apub.sendNotificationForNodeEdit(s, inReplyTo, replyToType, snUtil.cloneAcl(node), attachments, node.getContent(),
 							nodeUrl);
 					push.pushNodeUpdateToBrowsers(s, sessionsPushed, node);
 				}

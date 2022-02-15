@@ -38,6 +38,8 @@ public class APConst {
     public static final MediaType MTYPE_JRD_JSON = new MediaType("application", "jrd+json");
 
     // Note: does this need a charset?
+    // Note: Smitherene does it like this: 
+    //    MediaType.parse("application/ld+json; profile=\"https://www.w3.org/ns/activitystreams\"")
     public static final MediaType MTYPE_LD_JSON_PROF =
             new MediaType("application", "ld+json", Map.of("profile", "\"https://www.w3.org/ns/activitystreams\""));
 

@@ -17,7 +17,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 import java.util.TimeZone;
-import java.util.concurrent.ConcurrentHashMap;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -49,7 +48,6 @@ import quanta.mongo.MongoDeleteEvent;
 import quanta.mongo.MongoRepository;
 import quanta.mongo.MongoSession;
 import quanta.mongo.model.SubNode;
-import quanta.service.AclService;
 import quanta.util.ThreadLocals;
 import quanta.util.Util;
 import quanta.util.XString;
@@ -63,9 +61,6 @@ public class ActPubUtil extends ServiceBase {
 
     @Autowired
     private AppProp prop;
-
-    // Holds an actor lock object for each actor url (key=url, val=lock)
-    public final ConcurrentHashMap<String, Object> actorLocks = new ConcurrentHashMap<>();
 
     /*
      * RestTemplate is thread-safe and reusable, and has no state, so we need only one final static
@@ -232,7 +227,7 @@ public class ActPubUtil extends ServiceBase {
      * WARNING: If privateKey is passed as 'null' you MUST be calling this from HTTP request thread.
      */
     public void securePost(String userDoingPost, MongoSession ms, String privateKey, String toInbox, String actor, APObj message,
-            MediaType acceptType) {
+            MediaType acceptType, MediaType postType) {
         try {
             log("Secure post to " + toInbox);
             /* if private key not sent then get it using the session */
@@ -281,9 +276,9 @@ public class ActPubUtil extends ServiceBase {
             String headerSig = "keyId=\"" + actor + "#main-key" + "\",headers=\"(request-target) host date digest\",signature=\""
                     + Base64.getEncoder().encodeToString(signature) + "\"";
 
-            postJson(toInbox, url.getHost(), date, headerSig, digestHeader, body, acceptType);
+            postJson(toInbox, url.getHost(), date, headerSig, digestHeader, body, acceptType, postType);
         } catch (Exception e) {
-            log.error("secure http post failed", e);
+            log.error("secure http post failed to: " + toInbox, e);
             throw new RuntimeException(e);
         }
     }
@@ -401,7 +396,7 @@ public class ActPubUtil extends ServiceBase {
     }
 
     public APObj postJson(String url, String headerHost, String headerDate, String headerSig, String digestHeader, String body,
-            MediaType acceptType) {
+            MediaType acceptType, MediaType postType) {
         APObj ret = null;
         try {
             // log.debug("postJson to: " + url);
@@ -429,8 +424,7 @@ public class ActPubUtil extends ServiceBase {
                 headers.add("Digest", digestHeader);
             }
 
-            // todo-0: added 2/12/22 (need to verify this is correct)
-            headers.setContentType(APConst.MTYPE_ACT_JSON);
+            headers.setContentType(postType);
 
             // HttpEntity<byte[]> requestEntity = new HttpEntity<>(bodyBytes, headers);
             HttpEntity<String> requestEntity = new HttpEntity<>(body, headers);
@@ -727,7 +721,8 @@ public class ActPubUtil extends ServiceBase {
 
     /* Try to generate the best 'inReplyTo' that TARGETS this node */
     public String buildUrlForReplyTo(MongoSession ms, SubNode node) {
-        if (no(node)) return null;
+        if (no(node))
+            return null;
 
         // try this property first.
         String replyTo = node.getStr(NodeProp.ACT_PUB_OBJ_URL);
@@ -738,7 +733,7 @@ public class ActPubUtil extends ServiceBase {
         }
 
         // or finally reference pointing to our own server node, if it's not private
-        if (no(replyTo) && (AclService.isPublic(ms, node) || node.getContent().contains("#allowPublicAccess"))) {
+        if (no(replyTo)) {
             replyTo = snUtil.getIdBasedUrl(node);
         }
 
@@ -767,14 +762,6 @@ public class ActPubUtil extends ServiceBase {
             }
             return null;
         });
-    }
-
-    public Object getActorLock(String actorUrl) {
-        if (actorUrl == null) {
-            actorUrl = "n"; // none is allowed/tolerated
-        }
-        actorUrl = actorUrl.replace("https://", ""); // shorten a bit
-        return actorLocks.putIfAbsent(actorUrl, new Object());
     }
 
     @EventListener

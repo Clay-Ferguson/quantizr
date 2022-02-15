@@ -56,7 +56,7 @@ public class LockEx extends ReentrantLock {
 			success = tryLock(loopTimeoutSecs, TimeUnit.SECONDS);
 
 			if (success) {
-				log.trace("GOT LOCK: " + lockName + "\nSTACK: " + getStackTrace(null));
+				// log.trace("GOT LOCK: " + lockName + "\nSTACK: " + getStackTrace(null));
 			}
 		} catch (Exception e) {
 			if (!allowRetries) {
@@ -87,8 +87,8 @@ public class LockEx extends ReentrantLock {
 					success = tryLock(loopTimeoutSecs, TimeUnit.SECONDS);
 
 					if (success) {
-						log.trace("finally GOT LOCK: " + lockName + ". Waited " + totalWaitTime + " ms.\nSTACK: "
-								+ getStackTrace(null));
+						// log.trace("finally GOT LOCK: " + lockName + ". Waited " + totalWaitTime + " ms.\nSTACK: "
+						// 		+ getStackTrace(null));
 					}
 				} catch (Exception e) {
 					success = false;

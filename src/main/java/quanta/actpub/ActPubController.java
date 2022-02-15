@@ -22,6 +22,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import quanta.actpub.model.APObj;
 import quanta.config.AppProp;
 import quanta.config.ServiceBase;
+import quanta.exception.NodeAuthFailedException;
 import quanta.util.XString;
 
 // @CrossOrigin --> Access-Control-Allow-Credentials
@@ -51,7 +52,10 @@ public class ActPubController extends ServiceBase {
 	 */
 	@RequestMapping(value = APConst.PATH_WEBFINGER, method = RequestMethod.GET, produces = { //
 			APConst.CTYPE_JRD_JSON, //
-			APConst.CTYPE_JRD_JSON + "; " + APConst.CHARSET //
+			APConst.CTYPE_JRD_JSON + "; " + APConst.CHARSET, //
+			APConst.CTYPE_ACT_JSON, //
+			APConst.CTYPE_ACT_JSON + "; " + APConst.CHARSET, //
+			APConst.CTYPE_ACT_JSON + "; " + APConst.APS_PROFILE //
 	})
 	public @ResponseBody Object webFinger(//
 			@RequestParam(value = "resource", required = true) String resource) {
@@ -92,7 +96,8 @@ public class ActPubController extends ServiceBase {
 	@RequestMapping(value = APConst.ACTOR_PATH + "/{userName}", method = RequestMethod.GET, produces = { //
 			APConst.CTYPE_ACT_JSON, //
 			APConst.CTYPE_ACT_JSON + "; " + APConst.CHARSET, //
-			APConst.CTYPE_LD_JSON + "; " + APConst.APS_PROFILE //
+			APConst.CTYPE_LD_JSON + "; " + APConst.APS_PROFILE, //
+			APConst.CTYPE_ACT_JSON + "; " + APConst.APS_PROFILE //
 	})
 	public @ResponseBody Object actor(//
 			@PathVariable(value = "userName", required = true) String userName) {
@@ -101,6 +106,8 @@ public class ActPubController extends ServiceBase {
 		if (ok(ret)) {
 			// This pattern is needed to ENSURE a specific content type.
 			HttpHeaders hdr = new HttpHeaders();
+
+			// todo-0: doublecheck ALL these endpoints are settingn content type in response.
 			hdr.setContentType(APConst.MTYPE_ACT_JSON);
 			return new ResponseEntity<Object>(ret, hdr, HttpStatus.OK);
 		}
@@ -114,7 +121,10 @@ public class ActPubController extends ServiceBase {
 	@RequestMapping(value = APConst.PATH_INBOX, method = RequestMethod.POST, produces = {//
 			APConst.CTYPE_LD_JSON, //
 			APConst.CTYPE_LD_JSON + "; " + APConst.CHARSET, //
-			APConst.CTYPE_LD_JSON + "; " + APConst.APS_PROFILE //
+			APConst.CTYPE_LD_JSON + "; " + APConst.APS_PROFILE, //
+			APConst.CTYPE_ACT_JSON, //
+			APConst.CTYPE_ACT_JSON + "; " + APConst.CHARSET, //
+			APConst.CTYPE_ACT_JSON + "; " + APConst.APS_PROFILE //
 	})
 	public @ResponseBody Object sharedInboxPost(//
 			@RequestBody String body, //
@@ -135,13 +145,15 @@ public class ActPubController extends ServiceBase {
 	 * 
 	 * WARNING: This inbox and the Shared inbox (above) can both be called simultaneously in cases when
 	 * someone is doing a public reply to a Quanta node, and so Mastodon sends out the public inbox post
-	 * and the post to the user simultaneously. We have apUtil.getActorLock() for being sure this won't
-	 * cause duplicate records
+	 * and the post to the user simultaneously. 
 	 */
 	@RequestMapping(value = APConst.PATH_INBOX + "/{userName}", method = RequestMethod.POST, produces = { //
 			APConst.CTYPE_LD_JSON, //
 			APConst.CTYPE_LD_JSON + "; " + APConst.CHARSET, //
-			APConst.CTYPE_LD_JSON + "; " + APConst.APS_PROFILE //
+			APConst.CTYPE_LD_JSON + "; " + APConst.APS_PROFILE, //
+			APConst.CTYPE_ACT_JSON, //
+			APConst.CTYPE_ACT_JSON + "; " + APConst.CHARSET, //
+			APConst.CTYPE_ACT_JSON + "; " + APConst.APS_PROFILE //
 	})
 	public @ResponseBody Object inboxPost(//
 			@RequestBody String body, //
@@ -161,14 +173,21 @@ public class ActPubController extends ServiceBase {
 	@RequestMapping(value = {"/"}, method = RequestMethod.GET, produces = {//
 			APConst.CTYPE_LD_JSON, //
 			APConst.CTYPE_LD_JSON + "; " + APConst.CHARSET, //
-			APConst.CTYPE_LD_JSON + "; " + APConst.APS_PROFILE //
+			APConst.CTYPE_LD_JSON + "; " + APConst.APS_PROFILE, //
+			APConst.CTYPE_ACT_JSON, //
+			APConst.CTYPE_ACT_JSON + "; " + APConst.CHARSET, //
+			APConst.CTYPE_ACT_JSON + "; " + APConst.APS_PROFILE //
 	})
 	public @ResponseBody Object getJsonObj(HttpServletRequest httpReq, //
 			@RequestParam(value = "id", required = false) String id) {
 		try {
 			APObj ret = apOutbox.getResource(id);
 			return ret;
-		} catch (Exception e) {
+		} 
+		catch (NodeAuthFailedException nafe) {
+			return new ResponseEntity<String>(HttpStatus.NOT_FOUND);
+		}
+		catch (Exception e) {
 			return new ResponseEntity<String>(HttpStatus.BAD_REQUEST);
 		}
 	}
@@ -179,7 +198,8 @@ public class ActPubController extends ServiceBase {
 	@RequestMapping(value = APConst.PATH_OUTBOX + "/{userName}", method = RequestMethod.GET, produces = { //
 			APConst.CTYPE_ACT_JSON, //
 			APConst.CTYPE_ACT_JSON + "; " + APConst.CHARSET, //
-			APConst.CTYPE_LD_JSON + "; " + APConst.APS_PROFILE //
+			APConst.CTYPE_LD_JSON + "; " + APConst.APS_PROFILE, //
+			APConst.CTYPE_ACT_JSON + "; " + APConst.APS_PROFILE //
 	})
 	public @ResponseBody Object outbox(//
 			@PathVariable(value = "userName", required = true) String userName,
@@ -214,7 +234,8 @@ public class ActPubController extends ServiceBase {
 	@RequestMapping(value = APConst.PATH_FOLLOWERS + "/{userName}", method = RequestMethod.GET, produces = { //
 			APConst.CTYPE_ACT_JSON, //
 			APConst.CTYPE_ACT_JSON + "; " + APConst.CHARSET, //
-			APConst.CTYPE_LD_JSON + "; " + APConst.APS_PROFILE //
+			APConst.CTYPE_LD_JSON + "; " + APConst.APS_PROFILE, //
+			APConst.CTYPE_ACT_JSON + "; " + APConst.APS_PROFILE //
 	})
 	public @ResponseBody Object getFollowers(//
 			@PathVariable(value = "userName", required = false) String userName,
@@ -239,7 +260,8 @@ public class ActPubController extends ServiceBase {
 	@RequestMapping(value = APConst.PATH_FOLLOWING + "/{userName}", method = RequestMethod.GET, produces = { //
 			APConst.CTYPE_ACT_JSON, //
 			APConst.CTYPE_ACT_JSON + "; " + APConst.CHARSET, //
-			APConst.CTYPE_LD_JSON + "; " + APConst.APS_PROFILE //
+			APConst.CTYPE_LD_JSON + "; " + APConst.APS_PROFILE, //
+			APConst.CTYPE_ACT_JSON + "; " + APConst.APS_PROFILE //
 	})
 	public @ResponseBody Object getFollowing(//
 			@PathVariable(value = "userName", required = false) String userName,

@@ -361,7 +361,8 @@ public class MongoAuth extends ServiceBase {
 			return;
 		}
 
-		log.trace("Unauthorized attempt at node id=" + node.getId() + " path=" + node.getPath());
+		log.error(
+				"Unauthorized access. NodeId=" + node.getId() + " path=" + node.getPath() + " by user: " + ms.getUserName());
 		throw new NodeAuthFailedException();
 	}
 

@@ -13,6 +13,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;
 import quanta.actpub.model.AP;
 import quanta.actpub.model.APList;
+import quanta.actpub.model.APOChatMessage;
 import quanta.actpub.model.APOCreate;
 import quanta.actpub.model.APONote;
 import quanta.actpub.model.APOOrderedCollection;
@@ -22,6 +23,7 @@ import quanta.actpub.model.APType;
 import quanta.config.AppProp;
 import quanta.config.NodeName;
 import quanta.config.ServiceBase;
+import quanta.exception.NodeAuthFailedException;
 import quanta.instrument.PerfMon;
 import quanta.model.client.NodeProp;
 import quanta.model.client.NodeType;
@@ -117,7 +119,8 @@ public class ActPubOutbox extends ServiceBase {
                                 // AP.object : "https://mastodon.sdf.org/users/stunder/statuses/105612925260202844"
                                 // }
                             } //
-                            else if (AP.isType(object, APType.Note)) {
+                            else if (AP.isType(object, APType.Note) || //
+                                    AP.isType(object, APType.ChatMessage)) {
                                 try {
                                     ActPubService.newPostsInCycle++;
                                     apub.saveNote(ms, _userNode, outboxNode, object, false, true);
@@ -266,8 +269,8 @@ public class ActPubOutbox extends ServiceBase {
             }
 
             // currently this is our security hack (todo-0: fix)
-            if (!AclService.isPublic(as, node) && !node.getContent().contains("#allowPublicAccess")) {
-                throw new RuntimeException("Insecure request rejected.");
+            if (!AclService.isPublic(as, node)) { 
+                throw new NodeAuthFailedException();
             }
 
             String userName = read.getNodeOwner(as, node);
@@ -285,39 +288,60 @@ public class ActPubOutbox extends ServiceBase {
         String hexId = child.getIdStr();
         String published = DateUtil.isoStringFromDate(child.getModifyTime());
         String actor = apUtil.makeActorUrlForUserName(userName);
+        String objType = child.getStr(NodeProp.ACT_PUB_OBJ_TYPE);
+        APObj ret = null;
 
-        APONote note = new APONote(nodeIdBase + hexId, published, actor, null, nodeIdBase + hexId, false, child.getContent(),
-                new APList().val(APConst.CONTEXT_STREAMS_PUBLIC));
+        // if objType is ChatMessage use that
+        if (APType.ChatMessage.equals(objType)) {
+            ret = new APOChatMessage(nodeIdBase + hexId, published, actor, null, nodeIdBase + hexId, false, child.getContent(),
+                    new APList().val(APConst.CONTEXT_STREAMS_PUBLIC));
+        }
+        // or fall back to 'Note' type for everything else.
+        else {
+            ret = new APONote(nodeIdBase + hexId, published, actor, null, nodeIdBase + hexId, false, child.getContent(),
+                    new APList().val(APConst.CONTEXT_STREAMS_PUBLIC));
+        }
 
         if (ok(parent)) {
             String replyTo = apUtil.buildUrlForReplyTo(as, parent);
             if (ok(replyTo)) {
-                note = note.put(APObj.inReplyTo, replyTo);
+                ret = ret.put(APObj.inReplyTo, replyTo);
             }
         }
 
-        return note;
+        return ret;
     }
 
+    // todo-0: The bulk of this method IS existing two places, in our code and needs to be consolidated
     public APObj makeAPActivityForNote(MongoSession as, String userName, String nodeIdBase, SubNode child) {
         SubNode parent = read.getParent(as, child, false);
 
         String hexId = child.getIdStr();
         String published = DateUtil.isoStringFromDate(child.getModifyTime());
         String actor = apUtil.makeActorUrlForUserName(userName);
+        String objType = child.getStr(NodeProp.ACT_PUB_OBJ_TYPE);
+        APObj ret = null;
 
-        APONote note = new APONote(nodeIdBase + hexId, published, actor, null, nodeIdBase + hexId, false, child.getContent(),
-                new APList().val(APConst.CONTEXT_STREAMS_PUBLIC));
+        // if objType is ChatMessage use that
+        if (APType.ChatMessage.equals(objType)) {
+            ret = new APOChatMessage(nodeIdBase + hexId, published, actor, null, nodeIdBase + hexId, false, child.getContent(),
+                    new APList().val(APConst.CONTEXT_STREAMS_PUBLIC));
+        }
+        // or fall back to 'Note' type for everything else.
+        else {
+            ret = new APONote(nodeIdBase + hexId, published, actor, null, nodeIdBase + hexId, false, child.getContent(),
+                    new APList().val(APConst.CONTEXT_STREAMS_PUBLIC));
+        }
 
         if (ok(parent)) {
             String replyTo = apUtil.buildUrlForReplyTo(as, parent);
             if (ok(replyTo)) {
-                note = note.put(APObj.inReplyTo, replyTo);
+                ret = ret.put(APObj.inReplyTo, replyTo);
             }
         }
 
         return new APOCreate(
                 // todo-1: what is the create=t here? That was part of my own temporary test right?
-                nodeIdBase + hexId + "&create=t", actor, published, note, new APList().val(APConst.CONTEXT_STREAMS_PUBLIC));
+                nodeIdBase + hexId + "&create=t", actor, published, ret, new APList().val(APConst.CONTEXT_STREAMS_PUBLIC));
     }
 }

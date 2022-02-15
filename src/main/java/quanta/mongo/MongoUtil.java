@@ -179,7 +179,7 @@ public class MongoUtil extends ServiceBase {
 	 * wrapper which will detect any query results that reference objects cached in memory and point to
 	 * the in-memory copy of the object during iterating.
 	 * 
-	 * NOTE: All security checks are done external to this method. 
+	 * NOTE: All security checks are done external to this method.
 	 */
 	public NodeIterable find(Query q) {
 		Iterable<SubNode> iter = ops.find(q, SubNode.class);
@@ -193,7 +193,7 @@ public class MongoUtil extends ServiceBase {
 	 * Runs the mongo 'findOne' but if it finds a node that's already in memory we return the memory
 	 * object.
 	 * 
-	 * NOTE: All security checks are done external to this method. 
+	 * NOTE: All security checks are done external to this method.
 	 */
 	public SubNode findOne(Query q) {
 		SubNode node = ops.findOne(q, SubNode.class);
@@ -204,7 +204,7 @@ public class MongoUtil extends ServiceBase {
 	 * Runs the mongo 'findById' but if it finds a node that's already in memory we return the memory
 	 * object.
 	 * 
-	 * NOTE: All security checks are done external to this method. 
+	 * NOTE: All security checks are done external to this method.
 	 */
 	@PerfMon
 	public SubNode findById(ObjectId objId) {
@@ -585,6 +585,9 @@ public class MongoUtil extends ServiceBase {
 		preprocessDatabase(ms);
 		log.debug("checking all indexes.");
 
+		// DO NOT DELETE. This is able to check contstraint volations.
+		// read.dumpByPropertyMatch(NodeProp.USER.s(), "adam");
+
 		ops.indexOps(FediverseName.class).ensureIndex(new Index().on(FediverseName.FIELD_NAME, Direction.ASC).unique());
 
 		createUniqueIndex(ms, SubNode.class, SubNode.PATH);
@@ -596,14 +599,15 @@ public class MongoUtil extends ServiceBase {
 
 		// dropIndex(session, SubNode.class, "unique-apid");
 		createPartialUniqueIndex(ms, "unique-apid", SubNode.class, SubNode.PROPERTIES + "." + NodeProp.ACT_PUB_ID.s() + ".value");
-		createPartialUniqueIndex(ms, "unique-user", SubNode.class, SubNode.PROPERTIES + "." + NodeProp.USER.s() + ".value");
 
-		// DO NOT DELETE:
-		// This is a good example of how to cleanup the DB of all constraint violations prior to adding some
-		// new constraint.
-		// And this one was for making sure the "UniqueFriends" Index could be built ok. You can't create
-		// such an index until
-		// violations of it are already removed.
+		createPartialUniqueIndexForType(ms, "unique-user-acct", SubNode.class,
+				SubNode.PROPERTIES + "." + NodeProp.USER.s() + ".value", NodeType.ACCOUNT.s());
+
+		/*
+		 * DO NOT DELETE: This is a good example of how to cleanup the DB of all constraint violations prior
+		 * to adding some new constraint. And this one was for making sure the "UniqueFriends" Index could
+		 * be built ok. You can't create such an index until violations of it are already removed.
+		 */
 		// delete.removeFriendConstraintViolations(ms);
 
 		createUniqueFriendsIndex(ms);
@@ -728,6 +732,7 @@ public class MongoUtil extends ServiceBase {
 							.named(name) //
 							// Note: also instead of exists, something like ".gt('')" would probably work too
 							.partial(PartialIndexFilter.of(Criteria.where(property1).exists(true).and(property2).exists(true))));
+			log.debug("Index verified: " + name);
 		} catch (Exception e) {
 			ExUtil.error(log, "Failed to create partial unique index: " + name, e);
 		}
@@ -749,6 +754,26 @@ public class MongoUtil extends ServiceBase {
 							.named(name) //
 							// Note: also instead of exists, something like ".gt('')" would probably work too
 							.partial(PartialIndexFilter.of(Criteria.where(property).exists(true))));
+			log.debug("Index verified: " + name);
+		} catch (Exception e) {
+			ExUtil.error(log, "Failed to create partial unique index: " + name, e);
+		}
+	}
+
+	public void createPartialUniqueIndexForType(MongoSession ms, String name, Class<?> clazz, String property, String type) {
+		auth.requireAdmin(ms);
+		update.saveSession(ms);
+
+		try {
+			// Ensures unque values for 'property' (but allows duplicates of nodes missing the property)
+			ops.indexOps(clazz).ensureIndex(//
+					new Index().on(property, Direction.ASC) //
+							.unique() //
+							.named(name) //
+							// Note: also instead of exists, something like ".gt('')" would probably work too
+							.partial(PartialIndexFilter.of(//
+									Criteria.where(SubNode.TYPE).is(type) //
+											.and(property).exists(true))));
 		} catch (Exception e) {
 			ExUtil.error(log, "Failed to create partial unique index: " + name, e);
 		}

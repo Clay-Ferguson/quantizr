@@ -64,6 +64,8 @@ public class ActPubFollowing extends ServiceBase {
 
             arun.run(ms -> {
                 String sessionActorUrl = apUtil.makeActorUrlForUserName(followerUserName);
+
+                // todo-0: for now we generate a bogus id follow id here.
                 APOFollow followAction =
                         new APOFollow(prop.getProtocolHostAndPort() + "/follow/" + String.valueOf(new Date().getTime()),
                                 sessionActorUrl, actorUrlOfUserBeingFollowed);
@@ -83,7 +85,8 @@ public class ActPubFollowing extends ServiceBase {
                 APObj toActor = apUtil.getActorByUrl(actorUrlOfUserBeingFollowed);
                 if (ok(toActor)) {
                     String toInbox = AP.str(toActor, APObj.inbox);
-                    apUtil.securePost(followerUserName, ms, null, toInbox, sessionActorUrl, action, null);
+                    apUtil.securePost(followerUserName, ms, null, toInbox, sessionActorUrl, action, null,
+                            APConst.MTYPE_LD_JSON_PROF);
                 } else {
                     apUtil.log("Unable to get actor to post to: " + actorUrlOfUserBeingFollowed);
                 }
@@ -106,7 +109,7 @@ public class ActPubFollowing extends ServiceBase {
         // Actor URL of actor doing the following
         String followerActorUrl = AP.str(followAction, APObj.actor);
         if (no(followerActorUrl)) {
-            log.debug("no 'actor' found on follows action request posted object");
+            apUtil.log("no 'actor' found on follows action request posted object");
             return;
         }
 
@@ -115,24 +118,45 @@ public class ActPubFollowing extends ServiceBase {
                 try {
                     APObj followerActor = apUtil.getActorByUrl(followerActorUrl);
                     if (no(followerActor)) {
+                        apUtil.log("no followerActor object gettable from actor: " + followerActorUrl);
                         return null;
                     }
 
-                    log.debug("getLongUserNameFromActorUrl: " + followerActor + "\n" + XString.prettyPrint(followerActor));
+                    log.debug("getLongUserNameFromActorUrl: " + followerActor); // + "\n" + XString.prettyPrint(followerActor));
                     String followerUserName = apUtil.getLongUserNameFromActor(followerActor);
 
-                    // this will lookup the user AND import it it's a non-existant user
+                    // this will lookup the user AND import if it's a non-existant user
                     SubNode followerAccountNode = apub.getAcctNodeByUserName(as, followerUserName);
                     if (no(followerAccountNode)) {
+                        apUtil.log("unable to import user " + followerUserName);
                         throw new RuntimeException("Unable to get or import user: " + followerUserName);
                     }
 
                     apub.userEncountered(followerUserName, false);
 
+                    String actorBeingFollowedUrl = null;
+
                     // Actor being followed (local to our server)
-                    String actorBeingFollowedUrl = AP.str(followAction, APObj.object);
+                    Object followObj = AP.obj(followAction, APObj.object);
+
+                    if (no(followObj)) {
+                        log.debug("Can't get followObj from: " + XString.prettyPrint(followAction));
+                        throw new RuntimeException("no followObj");
+                    }
+
+                    log.debug("followObj.type=" + followObj.getClass().getName());
+                    if (followObj instanceof String) {
+                        actorBeingFollowedUrl = (String) followObj;
+                        log.debug("Got actorBeingFollowedUrl from direct object being a string.");
+                    } else {
+                        actorBeingFollowedUrl = AP.str(followObj, APObj.id);
+                        log.debug("Got actorBeingFollowedUrl from object.id");
+                    }
+
+                    log.debug("actorBeingFollowedUrl: " + actorBeingFollowedUrl);
+
                     if (no(actorBeingFollowedUrl)) {
-                        log.debug("no 'object' found on follows action request posted object");
+                        log.debug("failed to get actorBeingFollowed from this object: " + XString.prettyPrint(followAction));
                         return null;
                     }
 
@@ -165,28 +189,36 @@ public class ActPubFollowing extends ServiceBase {
                         }
                     }
 
+                    String _actorBeingFollowedUrl = actorBeingFollowedUrl;
+
                     // Now we send back to the server the Accept response, asynchronously
                     exec.run(() -> {
+                        apUtil.log("Sending Follow Accepted.");
                         String privateKey = apCrypto.getPrivateKey(as, userToFollow);
 
                         // Try to give the server a bit of time, before sending back the accept/reject
                         Util.sleep(2000);
 
                         // Must send either Accept or Reject. Currently we auto-accept all.
-                        APObj acceptPayload = unFollow ? new APOUndo(null, followerActorUrl, actorBeingFollowedUrl) : //
+                        APObj acceptPayload = unFollow ? new APOUndo(null, followerActorUrl, _actorBeingFollowedUrl) : //
                                 new APOFollow();
-                        acceptPayload.put(APObj.actor, followerActorUrl) //
-                                .put(APObj.object, actorBeingFollowedUrl);
+
+                        // put in response object the ID of the follow action.
+                        acceptPayload.put(APObj.id, AP.str(followAction, APObj.id));
 
                         APOAccept accept = new APOAccept(//
-                                "Accepted " + (unFollow ? "unfollow" : "follow") + " request", //
-                                actorBeingFollowedUrl, //
-                                acceptPayload); //
+                                _actorBeingFollowedUrl, // actor
+                                followerActorUrl, // to
+                                // for now we generate bogus accepts and hope for the best (todo-0)
+                                prop.getProtocolHostAndPort() + "/accepts/" + String.valueOf(new Date().getTime()), // id
+                                acceptPayload); // object
 
                         String followerInbox = AP.str(followerActor, APObj.inbox);
                         log.debug("Sending Accept of Follow Request to inbox " + followerInbox);
 
-                        apUtil.securePost(null, as, privateKey, followerInbox, actorBeingFollowedUrl, accept, null);
+                        apUtil.securePost(null, as, privateKey, followerInbox, _actorBeingFollowedUrl, accept, null,
+                                APConst.MTYPE_LD_JSON_PROF);
+                        log.debug("Secure post completed.");
                     });
                 } catch (Exception e) {
                     log.error("Failed sending follow reply.", e);

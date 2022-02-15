@@ -12,10 +12,12 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
 import quanta.actpub.model.AP;
 import quanta.actpub.model.APList;
+import quanta.actpub.model.APOChatMessage;
 import quanta.actpub.model.APOCreate;
 import quanta.actpub.model.APOMention;
 import quanta.actpub.model.APONote;
 import quanta.actpub.model.APObj;
+import quanta.actpub.model.APType;
 import quanta.config.ServiceBase;
 
 /**
@@ -28,22 +30,31 @@ public class ActPubFactory extends ServiceBase {
 	/**
 	 * Creates a new 'note' message
 	 */
-	public APObj newCreateMessageForNote(List<String> toUserNames, String fromActor, String inReplyTo, String content,
-			String noteUrl, boolean privateMessage, APList attachments) {
+	public APObj newCreateMessageForNote(List<String> toUserNames, String fromActor, String inReplyTo, String replyToType,
+			String content, String noteUrl, boolean privateMessage, APList attachments) {
 		ZonedDateTime now = ZonedDateTime.now(ZoneOffset.UTC);
 		// log.debug("sending note from actor[" + fromActor + "] inReplyTo[" + inReplyTo);
-		return newCreateMessage(
-				newNoteObject(toUserNames, fromActor, inReplyTo, content, noteUrl, now, privateMessage, attachments), fromActor,
-				toUserNames, noteUrl, now, privateMessage);
+
+		APObj payload = newNoteObject(toUserNames, fromActor, inReplyTo, replyToType, content, noteUrl, now,
+				privateMessage, attachments);
+
+		return newCreateMessage(payload, fromActor, toUserNames, noteUrl, now, privateMessage);
 	}
 
 	/**
-	 * Creates a new 'note' object
+	 * Creates a new 'Note' or 'ChatMessage' object, depending on what's being replied to.
 	 */
-	public APONote newNoteObject(List<String> toUserNames, String attributedTo, String inReplyTo, String content, String noteUrl,
-			ZonedDateTime now, boolean privateMessage, APList attachments) {
-		APONote ret =
-				new APONote(noteUrl, now.format(DateTimeFormatter.ISO_INSTANT), attributedTo, null, noteUrl, false, content, null);
+	public APObj newNoteObject(List<String> toUserNames, String attributedTo, String inReplyTo, String replyToType,
+			String content, String noteUrl, ZonedDateTime now, boolean privateMessage, APList attachments) {
+		APObj ret = null;
+		
+		if (APType.ChatMessage.equals(replyToType)) {
+			ret = new APOChatMessage(noteUrl, now.format(DateTimeFormatter.ISO_INSTANT), attributedTo, null, noteUrl, false,
+					content, null);
+		} else {
+			ret = new APONote(noteUrl, now.format(DateTimeFormatter.ISO_INSTANT), attributedTo, null, noteUrl, false, content,
+					null);
+		}
 
 		if (ok(inReplyTo)) {
 			ret = ret.put(APObj.inReplyTo, inReplyTo);

@@ -31,7 +31,6 @@ import quanta.util.XString;
 public class CallProcessor extends ServiceBase {
 	private static final Logger log = LoggerFactory.getLogger(CallProcessor.class);
 
-	private static final boolean logRequests = true;
 	// private static int mutexCounter = 0;
 
 	/*
@@ -140,14 +139,10 @@ public class CallProcessor extends ServiceBase {
 	}
 
 	private static void logRequest(String url, Object req, HttpSession httpSession) {
-		if (logRequests) {
-			log.trace("REQ=" + url + " " + (no(req) ? "none" : XString.prettyPrint(req)));
-		}
+		log.trace("REQ=" + url + " " + (no(req) ? "none" : XString.prettyPrint(req)));
 	}
 
 	private static void logResponse(Object res) {
-		if (logRequests) {
-			log.trace("RES=" + (no(res) ? "none" : XString.prettyPrint(res)));
-		}
+		log.trace("RES=" + (no(res) ? "none" : XString.prettyPrint(res)));
 	}
 }
