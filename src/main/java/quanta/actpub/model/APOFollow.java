@@ -13,15 +13,21 @@ public class APOFollow extends APObj {
     }
 
     /* 'actor' is person doing the following, and 'target' is the person being followed */
-    public APOFollow(String id, String actor, Object target) {
+    public APOFollow(String id, String actor, String target) {
         this();
         if (ok(id)) {
             put(APObj.id, id);
         }
         put(APObj.actor, actor); 
-        put(APObj.cc, new APList()); //todo-0: test that adding empty 'cc' doesn't break mastodon (it worked without on masto)
-        put(APObj.to, new APList().val(target)); // todo-0: test that adding 'to' doesn't break mastodon (it worked without on masto)
+        put(APObj.cc, new APList()); 
+        put(APObj.to, new APList().val(target));
+        
+        // This format is known to work on all platforms except Pleroma. Never have gotten Pleroma to work
+        // Pleroma always sends back a 400 error.
         put(APObj.object, target); 
+
+        // NOTE: This Person object is the format I've seen some servers use, and we do support this format for inbount follows.
+        // put(APObj.object, new APOPerson(target));
     }
 
     @Override
