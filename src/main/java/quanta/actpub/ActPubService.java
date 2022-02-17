@@ -114,7 +114,7 @@ public class ActPubService extends ServiceBase {
                     HashSet<String> sharedInboxes = getSharedInboxesOfFollowers(fromUser);
 
                     if (sharedInboxes.size() > 0) {
-                        APObj message = apFactory.newCreateMessageForNote(toUserNames, fromActor, inReplyTo, replyToType, content,
+                        APObj message = apFactory.newCreateForNote(toUserNames, fromActor, inReplyTo, replyToType, content,
                                 noteUrl, privateMessage, attachments);
 
                         for (String inbox : sharedInboxes) {
@@ -233,7 +233,7 @@ public class ActPubService extends ServiceBase {
                     fromActor = apUtil.makeActorUrlForUserName(fromUser);
                 }
 
-                APObj message = apFactory.newCreateMessageForNote(toUserNames, fromActor, inReplyTo, replyToType, content,
+                APObj message = apFactory.newCreateForNote(toUserNames, fromActor, inReplyTo, replyToType, content,
                         noteUrl, privateMessage, attachments);
 
                 String userDoingPost = ThreadLocals.getSC().getUserName();

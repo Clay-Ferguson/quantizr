@@ -30,11 +30,10 @@ public class APConst {
     // (Mastodon was tolerating this, but other servers may not. Anyway leave commented for a while
     // in case it broke something)
     // public static final MediaType MTYPE_ACT_JSON = new MediaType("application", "activity+json", StandardCharsets.UTF_8);
-    // public static final MediaType MTYPE_LD_JSON = new MediaType("application", "ld+json", StandardCharsets.UTF_8);
     // public static final MediaType MTYPE_JRD_JSON = new MediaType("application", "jrd+json", StandardCharsets.UTF_8);
 
     public static final MediaType MTYPE_ACT_JSON = new MediaType("application", "activity+json");
-    public static final MediaType MTYPE_LD_JSON = new MediaType("application", "ld+json");
+    // public static final MediaType MTYPE_LD_JSON = new MediaType("application", "ld+json");
     public static final MediaType MTYPE_JRD_JSON = new MediaType("application", "jrd+json");
 
     // Note: does this need a charset?

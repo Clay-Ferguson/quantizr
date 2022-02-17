@@ -107,7 +107,7 @@ public class ActPubController extends ServiceBase {
 			// This pattern is needed to ENSURE a specific content type.
 			HttpHeaders hdr = new HttpHeaders();
 
-			// todo-0: doublecheck ALL these endpoints are settingn content type in response.
+			// todo-0: doublecheck that ALL these endpoints are setting content type in response.
 			hdr.setContentType(APConst.MTYPE_ACT_JSON);
 			return new ResponseEntity<Object>(ret, hdr, HttpStatus.OK);
 		}
@@ -170,6 +170,8 @@ public class ActPubController extends ServiceBase {
 		}
 	}
 
+	// todo-0: for this and all similar methods with tons of 'produces' I need to research and
+	// find out of these CHARSETS an PROFILES are ever needed.
 	@RequestMapping(value = {"/"}, method = RequestMethod.GET, produces = {//
 			APConst.CTYPE_LD_JSON, //
 			APConst.CTYPE_LD_JSON + "; " + APConst.CHARSET, //

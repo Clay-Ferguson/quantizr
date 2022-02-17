@@ -15,7 +15,10 @@ public class APOAccept extends APObj {
     // compatibility with Pleroma
     public APOAccept(String actor, String toActor, String id, APObj object) {
         this();
-        put(APObj.cc, new APList()); // todo-0: also hoping empty cc array is compatible with Masto and maybe required for Pleroma?
+
+        // trying to be compatable with other platforms which seem to have an empty cc array, rather than omitting it.
+        put(APObj.cc, new APList()); 
+
         put(APObj.actor, actor);
         put(APObj.to, new APList().val(toActor));
         put(APObj.id, id);

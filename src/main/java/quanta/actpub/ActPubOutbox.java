@@ -268,7 +268,6 @@ public class ActPubOutbox extends ServiceBase {
                 throw new RuntimeException("Node not found: " + nodeId);
             }
 
-            // currently this is our security hack (todo-0: fix)
             if (!AclService.isPublic(as, node)) { 
                 throw new NodeAuthFailedException();
             }

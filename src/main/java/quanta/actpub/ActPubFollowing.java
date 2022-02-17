@@ -65,7 +65,7 @@ public class ActPubFollowing extends ServiceBase {
             arun.run(ms -> {
                 String sessionActorUrl = apUtil.makeActorUrlForUserName(followerUserName);
 
-                // todo-0: for now we generate a bogus id follow id here.
+                // generate a bogus id follow id here. We don't need anything more
                 APOFollow followAction =
                         new APOFollow(prop.getProtocolHostAndPort() + "/follow/" + String.valueOf(new Date().getTime()),
                                 sessionActorUrl, actorUrlOfUserBeingFollowed);

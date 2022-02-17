@@ -302,14 +302,14 @@ public class ActPubUtil extends ServiceBase {
 
         try {
             actor = apUtil.getJson(url, APConst.MTYPE_ACT_JSON);
-
-            if (ok(actor)) {
-                String userName = getLongUserNameFromActor(actor);
-                apCache.actorsByUrl.put(url, actor);
-                apCache.actorsByUserName.put(userName, actor);
-            }
         } catch (Exception e) {
-            // ignoring this for now.
+            log.error("Unable to get actor from url: " + url);
+        }
+
+        if (ok(actor)) {
+            String userName = getLongUserNameFromActor(actor);
+            apCache.actorsByUrl.put(url, actor);
+            apCache.actorsByUserName.put(userName, actor);
         }
         // log.debug("Actor: " + XString.prettyPrint(actor));
         return actor;
@@ -426,7 +426,6 @@ public class ActPubUtil extends ServiceBase {
 
             headers.setContentType(postType);
 
-            // HttpEntity<byte[]> requestEntity = new HttpEntity<>(bodyBytes, headers);
             HttpEntity<String> requestEntity = new HttpEntity<>(body, headers);
             ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.POST, requestEntity, String.class);
             log.debug("POST TO: " + url + " RESULT: " + response.getStatusCode() + " response=" + response.getBody());
@@ -748,6 +747,7 @@ public class ActPubUtil extends ServiceBase {
     public void deleteNodeNotify(ObjectId nodeId) {
         if (!MongoRepository.fullInit)
             return;
+            
         arun.run(ms -> {
             SubNode node = read.getNode(ms, nodeId);
             if (ok(node) && node.getType().equals(NodeType.FRIEND.s())) {

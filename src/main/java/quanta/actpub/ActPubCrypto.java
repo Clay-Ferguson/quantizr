@@ -108,8 +108,7 @@ public class ActPubCrypto extends ServiceBase {
         if (!headers.contains("host"))
             throw new RuntimeException("host is not in signed headers");
 
-        // todo-1: on localhost peer-to-peer testing I discovered a bug here, so I'm disabling this time
-        // check for now.
+        // todo-1: currently not validating time
         // String date = httpReq.getHeader("date");
         // apUtil.validateRequestTime(date);
 
@@ -119,7 +118,6 @@ public class ActPubCrypto extends ServiceBase {
          * simply verify that they are who they claim to be using the signature check below, and that is all
          * we want. (i.e. unknown users can post in)
          */
-
         byte[] signableBytes = getHeaderSignatureBytes(httpReq, headers);
         byte[] sigBytes = Base64.getDecoder().decode(signature);
 
@@ -145,8 +143,6 @@ public class ActPubCrypto extends ServiceBase {
         if (no(pkeyEncoded))
             return null;
 
-        // I took this replacement logic from 'Smitherene' project, and it seems to work
-        // ok, but I haven't really fully vetted it myself.
         // WARNING: This is a REGEX. replaceAll() uses REGEX.
         pkeyEncoded = pkeyEncoded.replaceAll("-----(BEGIN|END) (RSA )?PUBLIC KEY-----", "").replace("\n", "").trim();
 
@@ -156,12 +152,9 @@ public class ActPubCrypto extends ServiceBase {
             pubKey = KeyFactory.getInstance("RSA").generatePublic(spec);
         } catch (Exception ex) {
             log.debug("Failed to generate publicKey from encoded: " + pkeyEncoded);
-            // As long as this code path is never needed for Mastodon/Pleroma I'm not going
-            // to worry about it, but I can always
-            // dig this implementation out of my saved copy of Smitherene if ever needed.
-            //
+            // Notes from other Platform code:
             // a simpler RSA key format, used at least by Misskey
-            // FWIW, Misskey user objects also contain a key "isCat" which I ignore
+            // Misskey user objects also contain a key "isCat" which I ignore
             // RSAPublicKeySpec spec=decodeSimpleRSAKey(key);
             // pubKey=KeyFactory.getInstance("RSA").generatePublic(spec);
         }

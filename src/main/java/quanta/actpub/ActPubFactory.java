@@ -9,7 +9,7 @@ import java.util.LinkedList;
 import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Controller;
+import org.springframework.stereotype.Component;
 import quanta.actpub.model.AP;
 import quanta.actpub.model.APList;
 import quanta.actpub.model.APOChatMessage;
@@ -23,31 +23,31 @@ import quanta.config.ServiceBase;
 /**
  * Convenience factory for some types of AP objects
  */
-@Controller
+@Component
 public class ActPubFactory extends ServiceBase {
 	private static final Logger log = LoggerFactory.getLogger(ActPubFactory.class);
 
 	/**
 	 * Creates a new 'note' message
 	 */
-	public APObj newCreateMessageForNote(List<String> toUserNames, String fromActor, String inReplyTo, String replyToType,
+	public APObj newCreateForNote(List<String> toUserNames, String fromActor, String inReplyTo, String replyToType,
 			String content, String noteUrl, boolean privateMessage, APList attachments) {
 		ZonedDateTime now = ZonedDateTime.now(ZoneOffset.UTC);
 		// log.debug("sending note from actor[" + fromActor + "] inReplyTo[" + inReplyTo);
 
-		APObj payload = newNoteObject(toUserNames, fromActor, inReplyTo, replyToType, content, noteUrl, now,
-				privateMessage, attachments);
+		APObj payload =
+				newNote(toUserNames, fromActor, inReplyTo, replyToType, content, noteUrl, now, privateMessage, attachments);
 
-		return newCreateMessage(payload, fromActor, toUserNames, noteUrl, now, privateMessage);
+		return newCreate(payload, fromActor, toUserNames, noteUrl, now, privateMessage);
 	}
 
 	/**
 	 * Creates a new 'Note' or 'ChatMessage' object, depending on what's being replied to.
 	 */
-	public APObj newNoteObject(List<String> toUserNames, String attributedTo, String inReplyTo, String replyToType,
+	public APObj newNote(List<String> toUserNames, String attributedTo, String inReplyTo, String replyToType,
 			String content, String noteUrl, ZonedDateTime now, boolean privateMessage, APList attachments) {
 		APObj ret = null;
-		
+
 		if (APType.ChatMessage.equals(replyToType)) {
 			ret = new APOChatMessage(noteUrl, now.format(DateTimeFormatter.ISO_INSTANT), attributedTo, null, noteUrl, false,
 					content, null);
@@ -120,7 +120,7 @@ public class ActPubFactory extends ServiceBase {
 	 * Need to check if this works using the 'to and cc' arrays that are the same as the ones built
 	 * above (in newNoteObject() function)
 	 */
-	public APOCreate newCreateMessage(APObj object, String fromActor, List<String> toUserNames, String noteUrl, ZonedDateTime now,
+	public APOCreate newCreate(APObj object, String fromActor, List<String> toUserNames, String noteUrl, ZonedDateTime now,
 			boolean privateMessage) {
 		String idTime = String.valueOf(now.toInstant().toEpochMilli());
 
