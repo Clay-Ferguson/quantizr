@@ -51,7 +51,7 @@ export class RssTypeHandler extends TypeBase {
 
     getEditorRowsForProp(propName: string): number {
         if (propName === J.NodeProp.RSS_FEED_SRC) {
-            return 20;
+            return 10;
         }
         return 1;
     }

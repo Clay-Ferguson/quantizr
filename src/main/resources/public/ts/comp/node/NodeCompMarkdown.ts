@@ -22,10 +22,10 @@ export class NodeCompMarkdown extends Html {
     constructor(public node: J.NodeInfo, private appState: AppState) {
         super(null, { key: "ncmkd_" + node.id });
 
-        // Set the content display to wider if there is a code block. This makes the non-code text also wrap at a wider
-        // width but we have to tolerate that for now, becasue there's not a cleaner 'easy' solution.
-        let widthStyle = node.content && node.content.indexOf("```") !== 1 ? "content-medium" : "content-narrow";
-        this.attribs.className = "markdown-content " + widthStyle;
+        // Now that users can resize their center view width, maybe we don't need width style?
+        // let widthStyle = node.content && node.content.indexOf("```") !== 1 ? "content-medium" : "content-narrow";
+        // this.attribs.className = "markdown-content " + widthStyle;
+        this.attribs.className = "markdown-content";
 
         let content = node.content || "";
         let att: LS = {

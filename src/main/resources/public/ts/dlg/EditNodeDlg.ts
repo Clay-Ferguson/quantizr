@@ -167,6 +167,7 @@ export class EditNodeDlg extends DialogBase {
                     className: iconClass + " iconMarginRight clickable",
                     onClick: this.openChangeNodeTypeDlg
                 }));
+                span.addChild(new Span("Edit: " + typeHandler.getName()))
             }
         }
 
@@ -593,9 +594,6 @@ export class EditNodeDlg extends DialogBase {
                 className: "fa fa-smile-o fa-lg editorButtonIcon",
                 title: "Insert emoji at cursor",
                 onClick: () => this.utl.insertEmoji(this)
-            }) : null,
-            typeHandler && typeHandler.getName() && typeHandler.getTypeName() !== "u" ? new Span(typeHandler.getName(), {
-                className: "float-end typeName marginRight"
             }) : null
         ]);
     }

@@ -138,7 +138,7 @@ export class NodeCompRow extends Div {
                 jumpButton = new IconButton("fa-arrow-right", null, {
                     onClick: () => S.view.jumpToId(targetId),
                     title: "Jump to the Node"
-                }, "float-end");
+                }, "btn-secondary float-end");
             }
         }
 

@@ -99,7 +99,7 @@ export class RightNavPanel extends Div {
                     }) : null,
 
                     new Div(null, { className: "marginBottom" }, [
-                        displayName && !state.isAnonUser ? new IconButton("fa-database", "Root", {
+                        displayName && !state.isAnonUser ? new IconButton("fa-database", null, {
                             title: "Go to Account Root Node",
                             onClick: e => S.nav.navHome(state)
                         }, "marginRight btn-primary") : null,
@@ -146,12 +146,13 @@ export class RightNavPanel extends Div {
                     new TabPanelButtons(true, "rhsMenu")
                 ]),
 
-                new CollapsiblePanel("History", "History", null, [
+                // note: Anonymouse users don't have nodeHistory
+                S.quanta.nodeHistory && S.quanta.nodeHistory.length > 0 ? new CollapsiblePanel("History", "History", null, [
                     new HistoryPanel()
                 ], true,
                     (state: boolean) => {
                         RightNavPanel.historyExpanded = state;
-                    }, RightNavPanel.historyExpanded, "", "histPanelExpanded", "histPanelCollapsed", "div")
+                    }, RightNavPanel.historyExpanded, "", "histPanelExpanded", "histPanelCollapsed", "div") : null
             ])
         ]);
     }

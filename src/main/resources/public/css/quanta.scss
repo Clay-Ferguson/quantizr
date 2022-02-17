@@ -63,6 +63,8 @@ $bigGap: 24px;
 $tinyGap: 8px;
 $microGap: 4px;
 
+$smallerFont: 80%;
+
 $lightenRowFactor: 5;
 
 $fatBorderSize: 8px;
@@ -130,10 +132,8 @@ body {
 
 .nodeTags {
     display: inline-block;
-    border: 1px solid olivedrab;
+    background-color: darkolivegreen;
     border-radius: 6px;
-    margin-left: 15px;
-    margin-bottom: 4px;
     padding: 0 5px 0 5px;
 }
 
@@ -527,11 +527,13 @@ strong em {
     margin-left: $smallGap;
     border: 2px solid $nodeBorderBottomColor;
     border-radius: $border-radius;
+    font-size: $smallerFont;
 }
 
 .histPanelCollapsed {
     margin-top: 40px;
     margin-left: 25px;
+    font-size: $smallerFont;
 }
 
 .collapse-panel-link {
@@ -1047,12 +1049,14 @@ Will come back later and study this more. todo-1 */
     margin-bottom: 0px;
 }
 
+// Note: Don't try border-radius here, becasue that's ugly with horizontal scrollbar (corner sticks out over round edge)
 .markdown-content kbd,
 .markdown-content pre,
 .markdown-content samp { 
     width: 100%; 
-    border: 1px solid green;
+    border: 1px solid olivedrab;
     padding: 8px;
+    background-color: $baseBgColor;
 }
 
 .full-screen-img {
@@ -1933,8 +1937,7 @@ audio::-webkit-media-controls-play-button {
 }
 
 .nodeHistoryPanel {
-    margin-left: 15px;
-    margin-right: 15px;
+    margin: 15px;
 }
 
 .lockFont {
@@ -1942,7 +1945,6 @@ audio::-webkit-media-controls-play-button {
 }
 
 .nodeHistoryItem {
-    margin-top: 8px;
     cursor: pointer;
     border: 4px solid transparent; 
 }
