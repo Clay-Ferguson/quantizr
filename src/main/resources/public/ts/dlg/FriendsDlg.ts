@@ -2,6 +2,7 @@ import { AppState } from "../AppState";
 import { CompIntf } from "../comp/base/CompIntf";
 import { Button } from "../comp/core/Button";
 import { ButtonBar } from "../comp/core/ButtonBar";
+import { Clearfix } from "../comp/core/Clearfix";
 import { Div } from "../comp/core/Div";
 import { Form } from "../comp/core/Form";
 import { FriendsTable } from "../comp/FriendsTable";
@@ -73,7 +74,8 @@ export class FriendsDlg extends DialogBase {
                         this.close();
                     }, null, "btn-primary") : null,
                     new Button("Close", this.close, null, "btn-secondary float-end")
-                ], "marginTop")
+                ], "marginTop"),
+                new Clearfix() // required in case only ButtonBar children are float-end, which would break layout
             ])
         ];
     }

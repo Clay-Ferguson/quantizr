@@ -580,7 +580,7 @@ strong em {
 }
 
 .app-modal-title {
-    margin-bottom: 4px;
+    margin-bottom: 12px;
     font-size: 130%;
 }
 
@@ -883,6 +883,10 @@ Will come back later and study this more. todo-1 */
 
 .marginTop {
     margin-top: $smallGap;
+}
+
+.smallMarginBottom {
+    margin-bottom: $tinyGap; 
 }
 
 .bigMarginBottom {

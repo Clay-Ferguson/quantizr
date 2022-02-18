@@ -123,12 +123,13 @@ export class TypeBase implements TypeHandlerIntf {
             return new Div(null, null, children);
         }
         else {
+            let isRoot = node.id === state.node.id;
             // console.log("node [" + node.content + "] tags=" + node.tags)
             // If this node has tags render them below the content (if we have info turned on)
             if (node.tags && state.userPreferences.showMetaData) {
                 return new Div(null, null, [
                     comp,
-                    new Div(node.tags, { className: "nodeTags float-end" })
+                    new Div(node.tags, { className: "nodeTags float-end " + (isRoot ? "smallMarginBottom" : "") })
                 ])
             }
             // otherwise just return the content component itself.

@@ -10,8 +10,13 @@ import { ValidatedState } from "../ValidatedState";
 import { EditTagsDlg } from "./EditTagsDlg";
 
 interface LS { // Local State
+    tags: Tag[];
     selectedTags?: Set<string>;
-    forceRefresh: number;
+}
+
+interface Tag {
+    tag: string;
+    description: string;
 }
 
 // need to disable this for anonymous
@@ -23,31 +28,36 @@ export class SelectTagsDlg extends DialogBase {
     /* modeOption = search | edit */
     constructor(private modeOption: string, state: AppState) {
         super("Select Hashtags", "app-modal-content-medium-width", false, state);
-        this.mergeState({ selectedTags: new Set<string>() });
+        let tags = this.parseTags(this.appState);
+        this.mergeState({ selectedTags: new Set<string>(), tags });
     }
 
     renderDlg(): CompIntf[] {
-        let buttons: Button[] = null;
-        switch (this.modeOption) {
-            case "search":
-                buttons = [
-                    new Button("Match Any", () => {
-                        this.matchAny = true;
-                        this.select();
-                    }, null, "btn-primary"),
-                    new Button("Match All", () => {
-                        this.matchAll = true;
-                        this.select();
-                    })
-                ];
-                break;
-            case "edit":
-                buttons = [
-                    new Button("Select", () => {
-                        this.select();
-                    })
-                ];
-                break;
+        let buttons: Button[] = [];
+        let state = this.getState();
+
+        if (state.tags?.length > 0) {
+            switch (this.modeOption) {
+                case "search":
+                    buttons = [
+                        new Button("Match Any", () => {
+                            this.matchAny = true;
+                            this.select();
+                        }, null, "btn-primary"),
+                        new Button("Match All", () => {
+                            this.matchAll = true;
+                            this.select();
+                        })
+                    ];
+                    break;
+                case "edit":
+                    buttons = [
+                        new Button("Select", () => {
+                            this.select();
+                        })
+                    ];
+                    break;
+            }
         }
 
         return [
@@ -56,16 +66,16 @@ export class SelectTagsDlg extends DialogBase {
                 new ButtonBar([
                     ...buttons,
                     new Button("Edit Tags", this.edit),
-                    new Button("Cancel", this.close, null, "btn-secondary float-end")
+                    new Button("Close", this.close, null, "btn-secondary float-end")
                 ], "marginTop")
             ])
         ];
     }
 
     /* returns an array of objects like {tag, description} */
-    parseTags = (state: AppState) => {
+    parseTags = (state: AppState): Tag[] => {
         if (!state.userProfile?.userTags) return null;
-        let tags: any[] = [];
+        let tags: Tag[] = [];
         let lines: string[] = state.userProfile.userTags.split(/\r?\n/);
         lines.forEach(line => {
             let tag = null;
@@ -86,11 +96,12 @@ export class SelectTagsDlg extends DialogBase {
     }
 
     createTagsPickerList = (): Div => {
-        let tags = this.parseTags(this.appState);
+        let state = this.getState();
+
         let div: Div = null;
-        if (tags) {
+        if (state.tags?.length > 0) {
             div = new Div();
-            tags.forEach(tagObj => {
+            state.tags.forEach(tagObj => {
                 let checkbox: Checkbox = new Checkbox(tagObj.tag, null, {
                     setValue: (checked: boolean): void => {
                         let state = this.getState<LS>();
@@ -124,6 +135,7 @@ export class SelectTagsDlg extends DialogBase {
     edit = async () => {
         let dlg = new EditTagsDlg(this.appState);
         await dlg.open();
-        this.forceRender();
+        let tags = this.parseTags(this.appState);
+        this.mergeState({ tags });
     }
 }

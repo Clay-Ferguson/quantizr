@@ -167,8 +167,8 @@ export class EditNodeDlg extends DialogBase {
                     className: iconClass + " iconMarginRight clickable",
                     onClick: this.openChangeNodeTypeDlg
                 }));
-                span.addChild(new Span("Edit: " + typeHandler.getName()))
             }
+            span.addChild(new Span(typeHandler.getName(), { className: "marginRight" }));
         }
 
         if (S.props.getPropStr(J.NodeProp.DATE, state.node)) {

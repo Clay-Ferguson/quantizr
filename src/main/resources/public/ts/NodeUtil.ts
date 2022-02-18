@@ -297,10 +297,10 @@ export class NodeUtil {
     }
 
     getSharingNames = (node: J.NodeInfo, multiLine: boolean): string => {
-        if (!node || !node.ac) return null;
+        if (!node?.ac) return null;
         let delimiter = multiLine ? "\n" : ", ";
 
-        let names = S.props.isPublic(node) ? ("Public " + this.getPublicPrivilegesDisplay(node)) : "";
+        let names = S.props.isPublic(node) ? ("Public" + this.getPublicPrivilegesDisplay(node)) : "";
         for (let ac of node.ac) {
             if (!ac.principalName) {
                 console.log("missing principalName on acl: " + S.util.prettyPrint(ac));
