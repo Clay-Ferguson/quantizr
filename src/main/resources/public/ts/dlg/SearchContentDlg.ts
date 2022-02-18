@@ -40,7 +40,7 @@ export class SearchContentDlg extends DialogBase {
     searchTextState: ValidatedState<any> = new ValidatedState<any>();
 
     constructor(state: AppState) {
-        super("Search", "app-modal-content-medium-width", null, state);
+        super("Search", null, null, state);
 
         this.whenElm((elm: HTMLElement) => {
             this.searchTextField.focus();

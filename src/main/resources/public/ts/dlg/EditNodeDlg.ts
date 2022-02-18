@@ -386,7 +386,7 @@ export class EditNodeDlg extends DialogBase {
                     await dlg.open();
                     this.addTagsToTextField(dlg);
                 },
-                title: "Select Hashtags to Search"
+                title: "Select Hashtags"
             }, "btn-primary", "off")
         ], "col-2");
     }

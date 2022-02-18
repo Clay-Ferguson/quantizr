@@ -5,6 +5,7 @@ import { ButtonBar } from "../comp/core/ButtonBar";
 import { Checkbox } from "../comp/core/Checkbox";
 import { Div } from "../comp/core/Div";
 import { Form } from "../comp/core/Form";
+import { Heading } from "../comp/core/Heading";
 import { DialogBase } from "../DialogBase";
 import { ValidatedState } from "../ValidatedState";
 import { EditTagsDlg } from "./EditTagsDlg";
@@ -15,7 +16,8 @@ interface LS { // Local State
 }
 
 interface Tag {
-    tag: string;
+    // Note: A Tag with only a description (no 'tag') is considered to be a heading/section
+    tag?: string;
     description: string;
 }
 
@@ -28,7 +30,7 @@ export class SelectTagsDlg extends DialogBase {
     /* modeOption = search | edit */
     constructor(private modeOption: string, state: AppState) {
         super("Select Hashtags", "app-modal-content-medium-width", false, state);
-        let tags = this.parseTags(this.appState);
+        let tags = this.parseTags();
         this.mergeState({ selectedTags: new Set<string>(), tags });
     }
 
@@ -40,6 +42,11 @@ export class SelectTagsDlg extends DialogBase {
             switch (this.modeOption) {
                 case "search":
                     buttons = [
+                        // todo-1: Match Any is currently broken for tag searches becasue MongoDb will treat
+                        // a search for "#tag1 #tag2" as just "tag1 tag2" and find anything containing the words.
+                        // This appears to be a MongoDb with no viable workaround, so doing "any" matches will
+                        // consider NON-tags as well as TAGS in the results.
+
                         new Button("Match Any", () => {
                             this.matchAny = true;
                             this.select();
@@ -65,7 +72,7 @@ export class SelectTagsDlg extends DialogBase {
                 this.createTagsPickerList(),
                 new ButtonBar([
                     ...buttons,
-                    new Button("Edit Tags", this.edit),
+                    new Button("Edit", this.edit),
                     new Button("Close", this.close, null, "btn-secondary float-end")
                 ], "marginTop")
             ])
@@ -73,23 +80,34 @@ export class SelectTagsDlg extends DialogBase {
     }
 
     /* returns an array of objects like {tag, description} */
-    parseTags = (state: AppState): Tag[] => {
-        if (!state.userProfile?.userTags) return null;
+    parseTags = (): Tag[] => {
+        if (!this.appState.userProfile?.userTags) return null;
         let tags: Tag[] = [];
-        let lines: string[] = state.userProfile.userTags.split(/\r?\n/);
+        let lines: string[] = this.appState.userProfile.userTags.split(/\r?\n/);
         lines.forEach(line => {
-            let tag = null;
-            let description = null;
-            if (line) {
-                let spaceIdx = line.indexOf(" ");
-                if (spaceIdx !== -1) {
-                    tag = line.substring(0, spaceIdx);
-                    description = line.substring(spaceIdx);
+            if (line?.startsWith("#")) {
+                let tag = null;
+                let description = null;
+
+                let delimIdx = line.indexOf(":");
+                if (delimIdx !== -1) {
+                    tag = line.substring(0, delimIdx);
+                    description = line.substring(delimIdx + 1).trim();
                 }
                 else {
                     tag = line;
                 }
                 tags.push({ tag, description });
+            }
+            else if (line?.startsWith("//")) {
+                // ignore comments
+            }
+            else {
+                // additional lines below a heading to describe the heading can be done as long as they are indented by
+                // at least one space on lines below the heading
+                if (line && !line.startsWith(" ")) {
+                    tags.push({ description: line });
+                }
             }
         });
         return tags;
@@ -101,23 +119,35 @@ export class SelectTagsDlg extends DialogBase {
         let div: Div = null;
         if (state.tags?.length > 0) {
             div = new Div();
+            let indenting = false;
             state.tags.forEach(tagObj => {
-                let checkbox: Checkbox = new Checkbox(tagObj.tag, null, {
-                    setValue: (checked: boolean): void => {
-                        let state = this.getState<LS>();
-                        if (checked) {
-                            state.selectedTags.add(tagObj.tag);
+                let attribs: any = null;
+                if (tagObj.description && tagObj.tag) {
+                    attribs = { title: tagObj.tag };
+                }
+
+                if (!tagObj.tag) {
+                    div.addChild(new Heading(4, tagObj.description, { className: "marginTop" }));
+                    indenting = true;
+                }
+                else {
+                    let checkbox: Checkbox = new Checkbox(tagObj.description || tagObj.tag, attribs, {
+                        setValue: (checked: boolean): void => {
+                            let state = this.getState<LS>();
+                            if (checked) {
+                                state.selectedTags.add(tagObj.tag);
+                            }
+                            else {
+                                state.selectedTags.delete(tagObj.tag);
+                            }
+                            this.mergeState(state);
+                        },
+                        getValue: (): boolean => {
+                            return this.getState<LS>().selectedTags.has(tagObj.tag);
                         }
-                        else {
-                            state.selectedTags.delete(tagObj.tag);
-                        }
-                        this.mergeState(state);
-                    },
-                    getValue: (): boolean => {
-                        return this.getState<LS>().selectedTags.has(tagObj.tag);
-                    }
-                });
-                div.addChild(new Div(null, null, [checkbox]));
+                    });
+                    div.addChild(new Div(null, { className: indenting ? "tagIndent" : "" }, [checkbox]));
+                }
             });
         }
 
@@ -135,7 +165,7 @@ export class SelectTagsDlg extends DialogBase {
     edit = async () => {
         let dlg = new EditTagsDlg(this.appState);
         await dlg.open();
-        let tags = this.parseTags(this.appState);
+        let tags = this.parseTags();
         this.mergeState({ tags });
     }
 }

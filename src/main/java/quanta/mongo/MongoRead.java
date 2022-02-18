@@ -765,13 +765,19 @@ public class MongoRead extends ServiceBase {
                 TextCriteria textCriteria = TextCriteria.forDefaultLanguage();
 
                 /*
-                 * If searching for a tag name or a username, be smart enough to enclose it in quotes for user,
-                 * because if we don't then searches for "#mytag" WILL end up finding also just instances of mytag
-                 * (not a tag) which is incorrect.
+                 * If searching for a pure tag name or a username (no spaces in search string), be smart enough to
+                 * enclose it in quotes for user, because if we don't then searches for "#mytag" WILL end up finding
+                 * also just instances of mytag (not a tag) which is incorrect.
                  */
                 if ((text.startsWith("#") || text.startsWith("@")) && !text.contains(" ")) {
                     text = "\"" + text + "\"";
                 }
+                
+                // This reurns ONLY nodes containing BOTH (not any) #tag1 and #tag2 so this is definitely a MongoDb bug.
+                // (or a Lucene bug possibly to be exact), so I've confirmed it's basically impossible to do an OR search
+                // on strings containing special characters, without the special characters basically being ignored.
+                //textCriteria.matchingAny("\"#tag1\"", "\"#tag2\"");
+                
                 textCriteria.matching(text);
                 textCriteria.caseSensitive(caseSensitive);
                 criterias.add(textCriteria);

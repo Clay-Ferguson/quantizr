@@ -61,7 +61,8 @@ export class Checkbox extends Comp implements I.CheckboxIntf {
             this.e("label", {
                 key: this.attribs.id + "_label",
                 className: "form-check-label clickable " + (this.label ? "checkboxLabel" : ""),
-                htmlFor: this.attribs.id
+                htmlFor: this.attribs.id,
+                title: this.attribs.title
             }, this.label || ""));
     }
 }
