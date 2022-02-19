@@ -311,7 +311,7 @@ public class ActPubOutbox extends ServiceBase {
         return ret;
     }
 
-    // todo-0: The bulk of this method IS existing two places, in our code and needs to be consolidated
+    // todo-1: The bulk of this method IS existing two places, in our code and needs to be consolidated
     public APObj makeAPActivityForNote(MongoSession as, String userName, String nodeIdBase, SubNode child) {
         SubNode parent = read.getParent(as, child, false);
 

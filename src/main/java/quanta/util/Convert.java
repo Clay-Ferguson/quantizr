@@ -288,7 +288,6 @@ public class Convert extends ServiceBase {
 		return acInfo;
 	}
 
-	// find calls to this and be sure 'prop' passed in is correct (todo-0)
 	public PropertyInfo convertToPropertyInfo(SessionContext sc, SubNode node, String propName, Object prop,
 			boolean htmlOnly, boolean initNodeEdit) {
 		try {

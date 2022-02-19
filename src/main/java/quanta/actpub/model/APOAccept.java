@@ -11,7 +11,7 @@ public class APOAccept extends APObj {
         put(type, APType.Accept);
     }
 
-    // todo-0: Mastodon definitely works WITHOUT the 'toActor', but we may need it for
+    // todo-1: Mastodon definitely works WITHOUT the 'toActor', but we may need it for
     // compatibility with Pleroma
     public APOAccept(String actor, String toActor, String id, APObj object) {
         this();

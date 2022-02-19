@@ -361,7 +361,7 @@ public class SubNode {
 			if (no(val)) {
 				changed = props().containsKey(key);
 
-				//todo-0: we can use the return value of 'remove' to set 'changed'.
+				//todo-1: we can use the return value of 'remove' to set 'changed'.
 				props().remove(key);
 			} else {
 				Object curVal = props().get(key);

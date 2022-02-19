@@ -6,7 +6,7 @@ import quanta.actpub.APConst;
 /**
  * ChatMessage type
  * 
- * todo-0: This was a bandaid to add this type, and I think my actor object
+ * todo-1: This was a bandaid to add this type, and I think my actor object
  * needs to specify if it supports this AND I haven't even looked at the AP
  * spec regarding this type yet. 
  */

@@ -209,7 +209,7 @@ public class ActPubFollowing extends ServiceBase {
                         APOAccept accept = new APOAccept(//
                                 _actorBeingFollowedUrl, // actor
                                 followerActorUrl, // to
-                                // for now we generate bogus accepts and hope for the best (todo-0)
+                                // for now we generate bogus accepts
                                 prop.getProtocolHostAndPort() + "/accepts/" + String.valueOf(new Date().getTime()), // id
                                 acceptPayload); // object
 

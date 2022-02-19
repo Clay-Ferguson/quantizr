@@ -521,58 +521,6 @@ public class MongoUtil extends ServiceBase {
 		log.debug("setParentNodes completed.");
 	}
 
-	// todo-0: delete soon
-	// public void convertProperties(MongoSession ms) {
-	// 	dropAllIndexes(ms);
-	// 	log.debug("Processing convertProperties");
-
-	// 	// get all nodes in the DB
-	// 	Iterable<SubNode> nodes = ops.findAll(SubNode.class);
-	// 	int counter = 0;
-
-	// 	// iterate each node
-	// 	for (SubNode node : nodes) {
-	// 		try {
-	// 			// get the old map, but skip if none
-	// 			SubNodePropertyMap oldMap = node.getProperties();
-	// 			if (no(oldMap) || oldMap.size() == 0)
-	// 				continue;
-
-	// 			// create new map of new format
-	// 			HashMap<String, Object> newMap = new HashMap<>();
-
-	// 			// iterate old map to load new map
-	// 			for (String prop : oldMap.keySet()) {
-	// 				SubNodePropVal pVal = oldMap.get(prop);
-	// 				if (ok(pVal)) {
-	// 					Object v = pVal.getValue();
-	// 					if (ok(v)) {
-	// 						newMap.put(prop, v);
-	// 					}
-	// 				}
-	// 			}
-
-	// 			// set the new prop on the object
-	// 			node.setProps(newMap);
-	// 			node.setProperties(null);
-
-	// 			if (ThreadLocals.getDirtyNodeCount() > 200) {
-	// 				update.saveSession(ms);
-	// 			}
-
-	// 			if (++counter % 2000 == 0) {
-	// 				log.debug("SPN: " + String.valueOf(counter));
-	// 			}
-	// 		}
-	// 		// if we fail to convert any nodes, print error and continue
-	// 		catch (Exception e) {
-	// 			ExUtil.error(log, "Failed to convert props. id: " + node.getIdStr(), e);
-	// 		}
-	// 	}
-
-	// 	log.debug("convertProperties completed.");
-	// }
-
 	// Alters all paths parts that are over 10 characters long, on all nodes
 	public void shortenPathParts(MongoSession ms) {
 		int lenLimit = 10;
@@ -663,9 +611,7 @@ public class MongoUtil extends ServiceBase {
 		// delete.removeFriendConstraintViolations(ms);
 
 		createUniqueFriendsIndex(ms);
-
-		// todo-0: this appears to be stopping app from successfully starting. &&&
-		// createUniqueNodeNameIndex(ms);
+		createUniqueNodeNameIndex(ms);
 
 		// I had done this temporarily to fix a constraint violation
 		// Leaving for now.
@@ -723,6 +669,7 @@ public class MongoUtil extends ServiceBase {
 
 	/* Creates an index which will guarantee no duplicate node names can exist, for any user */
 	public void createUniqueNodeNameIndex(MongoSession ms) {
+		log.debug("createUniqueNodeNameIndex()");
 		auth.requireAdmin(ms);
 		update.saveSession(ms);
 		String indexName = "unique-node-name";

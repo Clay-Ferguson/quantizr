@@ -26,7 +26,7 @@ public class APConst {
     public static final String CTYPE_LD_JSON = "application/ld+json";
     public static final String CTYPE_JRD_JSON = "application/jrd+json";
 
-    // todo-0: added 2/12/22 (need to verify this is correct)
+    // todo-1: added 2/12/22 (need to verify this is correct)
     // (Mastodon was tolerating this, but other servers may not. Anyway leave commented for a while
     // in case it broke something)
     // public static final MediaType MTYPE_ACT_JSON = new MediaType("application", "activity+json", StandardCharsets.UTF_8);
