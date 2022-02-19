@@ -15,6 +15,7 @@ import { DialogBase } from "../DialogBase";
 import { S } from "../Singletons";
 import { ValidatedState } from "../ValidatedState";
 import { SelectTagsDlg } from "./SelectTagsDlg";
+import * as J from "../JavaIntf";
 
 interface LS { // Local State
     sortField?: string;
@@ -52,8 +53,7 @@ export class SearchContentDlg extends DialogBase {
 
     renderDlg(): CompIntf[] {
         let requirePriorityCheckbox = null;
-        // todo-0: SubNode.PROP here==p
-        if (this.getState<LS>().sortField === "p.priority") {
+        if (this.getState<LS>().sortField === J.NodeProp.PRIORITY_FULL) {
             requirePriorityCheckbox = new Checkbox("Require Priority", null, {
                 setValue: (checked: boolean): void => {
                     SearchContentDlg.dlgState.requirePriority = checked;
@@ -108,11 +108,11 @@ export class SearchContentDlg extends DialogBase {
                         { key: "ctm", val: "Create Time" },
                         { key: "mtm", val: "Modify Time" },
                         { key: "contentLength", val: "Text Length" },
-                        { key: "p.priority", val: "Priority" } // todo-0: p==SubNode.PROP
+                        { key: J.NodeProp.PRIORITY_FULL, val: "Priority" }
                     ], "m-2", "searchDlgOrderBy", {
                         setValue: (val: string): void => {
                             let sortDir = val === "0" ? "" : "DESC";
-                            if (val === "p.priority") { // todo-0: p==SubNode.PROP
+                            if (val === J.NodeProp.PRIORITY_FULL) {
                                 sortDir = "asc";
                             }
                             SearchContentDlg.dlgState.sortField = val;
@@ -203,7 +203,7 @@ export class SearchContentDlg extends DialogBase {
         let desc = SearchContentDlg.defaultSearchText ? ("Content: " + SearchContentDlg.defaultSearchText) : "";
 
         let requirePriority = this.getState<LS>().requirePriority;
-        if (this.getState<LS>().sortField !== "p.priority") { // todo-0: p==SubNode.PROP
+        if (this.getState<LS>().sortField !== J.NodeProp.PRIORITY_FULL) {
             requirePriority = false;
         }
 

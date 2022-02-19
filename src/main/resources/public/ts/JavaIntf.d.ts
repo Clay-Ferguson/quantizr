@@ -937,11 +937,13 @@ export const enum NodeProp {
     CRYPTO_KEY_PRIVATE = "sn:cryptoKeyPrivate",
     INLINE_CHILDREN = "inlineChildren",
     PRIORITY = "priority",
+    PRIORITY_FULL = "p.priority",
     LAYOUT = "layout",
     ORDER_BY = "orderBy",
     NO_OPEN_GRAPH = "noOpenGraph",
     TYPE_LOCK = "sn:typLoc",
     DATE = "date",
+    DATE_FULL = "p.date",
     DURATION = "duration",
 }
 

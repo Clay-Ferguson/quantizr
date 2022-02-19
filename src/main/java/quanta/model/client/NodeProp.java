@@ -3,7 +3,6 @@ package quanta.model.client;
 import com.fasterxml.jackson.annotation.JsonValue;
 
 public enum NodeProp {
-
     // Activity Pub Properties
     ACT_PUB_ID("apid", "s"), //
     ACT_PUB_OBJ_TYPE("ap:objType", "s"), //
@@ -180,12 +179,18 @@ public enum NodeProp {
     CRYPTO_KEY_PRIVATE("sn:cryptoKeyPrivate", "s"), //
 
     INLINE_CHILDREN("inlineChildren", "s"), //
+    
     PRIORITY("priority", "s"), //
+    PRIORITY_FULL("p.priority", "s"), //
+
     LAYOUT("layout", "s"), //
     ORDER_BY("orderBy", "s"), NO_OPEN_GRAPH("noOpenGraph", "s"), //
 
     TYPE_LOCK("sn:typLoc", "s"), //
+    
     DATE("date", "s"), //
+    DATE_FULL("p.date", "s"), //
+
     DURATION("duration", "s");
 
     @JsonValue

@@ -86,6 +86,7 @@ public class SubNode {
 	@Field(MODIFY_TIME)
 	private Date modifyTime;
 
+	// Also defined in NodeProp.SUBNODE_PROPS
 	public static final String PROPS = "p";
 	@Field(PROPS)
 	private HashMap<String, Object> props;
