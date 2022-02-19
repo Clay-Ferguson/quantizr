@@ -357,16 +357,20 @@ public class SubNode {
 	public boolean set(String key, Object val) {
 		ThreadLocals.dirty(this);
 		synchronized (propLock) {
+			if (no(props)) {
+				props = props();
+			}
+
 			boolean changed = false;
 			if (no(val)) {
-				changed = props().containsKey(key);
+				changed = props.containsKey(key);
 
 				//todo-1: we can use the return value of 'remove' to set 'changed'.
-				props().remove(key);
+				props.remove(key);
 			} else {
-				Object curVal = props().get(key);
+				Object curVal = props.get(key);
 				changed = no(curVal) || !val.equals(curVal);
-				props().put(key, val);
+				props.put(key, val);
 			}
 			return changed;
 		}
@@ -375,6 +379,7 @@ public class SubNode {
 	@Transient
 	@JsonIgnore
 	public void delete(String key) {
+		if (no(props)) return;
 		ThreadLocals.dirty(this);
 		synchronized (propLock) {
 			props().remove(key);
@@ -390,6 +395,7 @@ public class SubNode {
 	@Transient
 	@JsonIgnore
 	public String getStr(String key) {
+		if (no(props)) return null;
 		try {
 			synchronized (propLock) {
 				Object v = props().get(key);
@@ -413,6 +419,7 @@ public class SubNode {
 	@Transient
 	@JsonIgnore
 	public Long getInt(String key) {
+		if (no(props)) return 0L;
 		try {
 			synchronized (propLock) {
 				Object v = props().get(key);
@@ -448,6 +455,7 @@ public class SubNode {
 	@Transient
 	@JsonIgnore
 	public Date getDate(String key) {
+		if (no(props)) return null;
 		try {
 			synchronized (propLock) {
 				Object v = props().get(key);
@@ -466,12 +474,10 @@ public class SubNode {
 		return getFloat(prop.s());
 	}
 
-	// for pure getters like this, make to NOT create 'props'
-	// if props is currently null. leave null. (todo-0)
-	// look for all calls to 'props()' for this kind of readonly access
 	@Transient
 	@JsonIgnore
 	public Double getFloat(String key) {
+		if (no(props)) return 0.0;
 		try {
 			synchronized (propLock) {
 				Object v = props().get(key);
@@ -494,6 +500,7 @@ public class SubNode {
 	@Transient
 	@JsonIgnore
 	public Boolean getBool(String key) {
+		if (no(props)) return false;
 		try {
 			synchronized (propLock) {
 				Object v = props().get(key);
