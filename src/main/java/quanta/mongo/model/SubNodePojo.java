@@ -11,13 +11,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Pure Pojo equivalent of SubNode.java, so we can do serialization to/from JSON without MongoDB trying 
- * to get involved (no PersistenceConstructor issues)
+ * Pure Pojo equivalent of SubNode.java, so we can do serialization to/from JSON without MongoDB
+ * trying to get involved (no PersistenceConstructor issues)
  */
 @JsonInclude(Include.NON_NULL)
-@JsonPropertyOrder({SubNode.PATH, SubNode.CONTENT, SubNode.NAME, SubNode.ID,
-		SubNode.ORDINAL, SubNode.OWNER, SubNode.CREATE_TIME,
-		SubNode.MODIFY_TIME, SubNode.AC, SubNode.PROPERTIES})
+@JsonPropertyOrder({SubNode.PATH, SubNode.CONTENT, SubNode.NAME, SubNode.ID, SubNode.ORDINAL, SubNode.OWNER, SubNode.CREATE_TIME,
+		SubNode.MODIFY_TIME, SubNode.AC, SubNode.PROPS})
 public class SubNodePojo {
 	private static final Logger log = LoggerFactory.getLogger(SubNodePojo.class);
 
@@ -48,14 +47,13 @@ public class SubNodePojo {
 	@JsonProperty(SubNode.MODIFY_TIME)
 	private Date modifyTime;
 
-	@JsonProperty(SubNode.PROPERTIES)
-	private SubNodePropertyMap properties;
+	@JsonProperty(SubNode.PROPS)
+	private HashMap<String, Object> props;
 
 	@JsonProperty(SubNode.AC)
 	private HashMap<String, AccessControl> ac;
 
-	public SubNodePojo() {
-	}
+	public SubNodePojo() {}
 
 	public ObjectId getId() {
 		return id;
@@ -129,12 +127,12 @@ public class SubNodePojo {
 		this.modifyTime = modifyTime;
 	}
 
-	public SubNodePropertyMap getProperties() {
-		return properties;
+	public HashMap<String, Object> getProps() {
+		return props;
 	}
 
-	public void setProperties(SubNodePropertyMap properties) {
-		this.properties = properties;
+	public void setProps(HashMap<String, Object> props) {
+		this.props = props;
 	}
 
 	public HashMap<String, AccessControl> getAc() {

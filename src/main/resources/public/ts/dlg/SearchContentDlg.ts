@@ -52,7 +52,8 @@ export class SearchContentDlg extends DialogBase {
 
     renderDlg(): CompIntf[] {
         let requirePriorityCheckbox = null;
-        if (this.getState<LS>().sortField === "prp.priority.value") {
+        // todo-0: SubNode.PROP here==p
+        if (this.getState<LS>().sortField === "p.priority") {
             requirePriorityCheckbox = new Checkbox("Require Priority", null, {
                 setValue: (checked: boolean): void => {
                     SearchContentDlg.dlgState.requirePriority = checked;
@@ -107,11 +108,11 @@ export class SearchContentDlg extends DialogBase {
                         { key: "ctm", val: "Create Time" },
                         { key: "mtm", val: "Modify Time" },
                         { key: "contentLength", val: "Text Length" },
-                        { key: "prp.priority.value", val: "Priority" }
+                        { key: "p.priority", val: "Priority" } // todo-0: p==SubNode.PROP
                     ], "m-2", "searchDlgOrderBy", {
                         setValue: (val: string): void => {
                             let sortDir = val === "0" ? "" : "DESC";
-                            if (val === "prp.priority.value") {
+                            if (val === "p.priority") { // todo-0: p==SubNode.PROP
                                 sortDir = "asc";
                             }
                             SearchContentDlg.dlgState.sortField = val;
@@ -202,7 +203,7 @@ export class SearchContentDlg extends DialogBase {
         let desc = SearchContentDlg.defaultSearchText ? ("Content: " + SearchContentDlg.defaultSearchText) : "";
 
         let requirePriority = this.getState<LS>().requirePriority;
-        if (this.getState<LS>().sortField !== "prp.priority.value") {
+        if (this.getState<LS>().sortField !== "p.priority") { // todo-0: p==SubNode.PROP
             requirePriority = false;
         }
 

@@ -61,7 +61,7 @@ public class MongoTest extends ServiceBase implements TestIntf {
 		// }
 
 		// // Set a property on the node and save the node
-		// node.setProp("testKeyA", new SubNodePropVal("tesetValA"));
+		// node.setProp("testKeyA", "tesetValA");
 		// update.save(adminSession, node);
 		// log.debug("updated first node.");
 

@@ -9,8 +9,6 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
-import java.util.Map.Entry;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,8 +27,6 @@ import quanta.model.client.PrivilegeType;
 import quanta.mongo.MongoSession;
 import quanta.mongo.model.AccessControl;
 import quanta.mongo.model.SubNode;
-import quanta.mongo.model.SubNodePropVal;
-import quanta.mongo.model.SubNodePropertyMap;
 import quanta.types.TypeBase;
 
 /**
@@ -129,8 +125,9 @@ public class Convert extends ServiceBase {
 			 */
 		}
 
-		// log.trace("RENDER ID=" + node.getIdStr() + " rootId=" + ownerId + " session.rootId=" + sc.getRootId() + " node.content="
-		// 		+ node.getContent() + " owner=" + owner);
+		// log.trace("RENDER ID=" + node.getIdStr() + " rootId=" + ownerId + " session.rootId=" +
+		// sc.getRootId() + " node.content="
+		// + node.getContent() + " owner=" + owner);
 
 		// log.debug("RENDER nodeId: " + node.getIdStr()+" -- json:
 		// "+XString.prettyPrint(node));
@@ -150,8 +147,8 @@ public class Convert extends ServiceBase {
 			}
 		}
 
-		NodeInfo nodeInfo = new NodeInfo(node.jsonId(), node.getPath(), node.getName(), node.getContent(), node.getTags(), displayName, owner,
-				ownerId, node.getOrdinal(), //
+		NodeInfo nodeInfo = new NodeInfo(node.jsonId(), node.getPath(), node.getName(), node.getContent(), node.getTags(),
+				displayName, owner, ownerId, node.getOrdinal(), //
 				node.getModifyTime(), propList, acList, hasChildren, //
 				ok(imageSize) ? imageSize.getWidth() : 0, //
 				ok(imageSize) ? imageSize.getHeight() : 0, //
@@ -217,19 +214,15 @@ public class Convert extends ServiceBase {
 			boolean htmlOnly, boolean initNodeEdit) {
 
 		List<PropertyInfo> props = null;
-		SubNodePropertyMap propMap = node.getProperties();
-		Set<Entry<String,SubNodePropVal>> set = propMap.entrySet();
-		if (ok(set)) {
-			for (Map.Entry<String, SubNodePropVal> entry :set) {
-				String propName = entry.getKey();
-				SubNodePropVal p = entry.getValue();
-
+		HashMap<String, Object> propMap = node.getProps();
+		if (ok(propMap) && ok(propMap.keySet())) {
+			for (String propName : propMap.keySet()) {
 				/* lazy create props */
 				if (no(props)) {
 					props = new LinkedList<>();
 				}
 
-				PropertyInfo propInfo = convertToPropertyInfo(sc, node, propName, p, htmlOnly, initNodeEdit);
+				PropertyInfo propInfo = convertToPropertyInfo(sc, node, propName, propMap.get(propName), htmlOnly, initNodeEdit);
 				// log.debug(" PROP Name: " + propName + " val=" + p.getValue().toString());
 
 				props.add(propInfo);
@@ -295,22 +288,23 @@ public class Convert extends ServiceBase {
 		return acInfo;
 	}
 
-	public PropertyInfo convertToPropertyInfo(SessionContext sc, SubNode node, String propName, SubNodePropVal prop,
+	// find calls to this and be sure 'prop' passed in is correct (todo-0)
+	public PropertyInfo convertToPropertyInfo(SessionContext sc, SubNode node, String propName, Object prop,
 			boolean htmlOnly, boolean initNodeEdit) {
 		try {
 			Object value = null;
 			switch (propName) {
 				case "content":
-					value = formatValue(sc, prop.getValue(), false, initNodeEdit);
+					value = formatValue(sc, prop, false, initNodeEdit);
 					break;
 
 				// Special processing (need to build this kind of stuff into the "Plugin" architecture for types)
 				case "ap:tag": // NodeProp.ACT_PUB_TAG
-					value = prop.getValue();
+					value = prop;
 					break;
 
 				default:
-					value = prop.getValue().toString();
+					value = prop.toString();
 					break;
 			}
 

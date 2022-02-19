@@ -37,7 +37,7 @@ import quanta.util.XString;
 @TypeAlias("n1")
 @JsonInclude(Include.NON_NULL)
 @JsonPropertyOrder({SubNode.PATH, SubNode.CONTENT, SubNode.NAME, SubNode.ID, SubNode.ORDINAL, SubNode.OWNER, SubNode.CREATE_TIME,
-		SubNode.MODIFY_TIME, SubNode.AC, SubNode.PROPERTIES})
+		SubNode.MODIFY_TIME, SubNode.AC, SubNode.PROPS})
 public class SubNode {
 	private static final Logger log = LoggerFactory.getLogger(SubNode.class);
 
@@ -86,9 +86,9 @@ public class SubNode {
 	@Field(MODIFY_TIME)
 	private Date modifyTime;
 
-	public static final String PROPERTIES = "prp";
-	@Field(PROPERTIES)
-	private SubNodePropertyMap properties;
+	public static final String PROPS = "p";
+	@Field(PROPS)
+	private HashMap<String, Object> props;
 
 	@Transient
 	@JsonIgnore
@@ -128,7 +128,7 @@ public class SubNode {
 			SubNode.CREATE_TIME, //
 			SubNode.MODIFY_TIME, //
 			SubNode.AC, //
-			SubNode.PROPERTIES};
+			SubNode.PROPS};
 
 	private boolean disableParentCheck;
 
@@ -327,28 +327,28 @@ public class SubNode {
 
 	public void clearSecretProperties() {
 		synchronized (propLock) {
-			if (ok(properties)) {
-				properties.remove(NodeProp.CRYPTO_KEY_PRIVATE.s());
-				properties.remove(NodeProp.EMAIL.s());
-				properties.remove(NodeProp.CODE.s());
-				properties.remove(NodeProp.ENC_KEY.s());
-				properties.remove(NodeProp.PWD_HASH.s());
+			if (ok(props)) {
+				props.remove(NodeProp.CRYPTO_KEY_PRIVATE.s());
+				props.remove(NodeProp.EMAIL.s());
+				props.remove(NodeProp.CODE.s());
+				props.remove(NodeProp.ENC_KEY.s());
+				props.remove(NodeProp.PWD_HASH.s());
 			}
 		}
 	}
 
-	@JsonProperty(PROPERTIES)
-	public SubNodePropertyMap getProperties() {
+	@JsonProperty(PROPS)
+	public HashMap<String, Object> getProps() {
 		synchronized (propLock) {
-			return properties;
+			return props;
 		}
 	}
 
-	@JsonProperty(PROPERTIES)
-	public void setProperties(SubNodePropertyMap properties) {
+	@JsonProperty(PROPS)
+	public void setProps(HashMap<String, Object> props) {
 		ThreadLocals.dirty(this);
 		synchronized (propLock) {
-			this.properties = properties;
+			this.props = props;
 		}
 	}
 
@@ -359,12 +359,14 @@ public class SubNode {
 		synchronized (propLock) {
 			boolean changed = false;
 			if (no(val)) {
-				changed = properties().containsKey(key);
-				properties().remove(key);
+				changed = props().containsKey(key);
+
+				//todo-0: we can use the return value of 'remove' to set 'changed'.
+				props().remove(key);
 			} else {
-				SubNodePropVal curVal = properties().get(key);
-				changed = no(curVal) || !val.equals(curVal.getValue());
-				properties().put(key, new SubNodePropVal(val));
+				Object curVal = props().get(key);
+				changed = no(curVal) || !val.equals(curVal);
+				props().put(key, val);
 			}
 			return changed;
 		}
@@ -375,7 +377,7 @@ public class SubNode {
 	public void delete(String key) {
 		ThreadLocals.dirty(this);
 		synchronized (propLock) {
-			properties().remove(key);
+			props().remove(key);
 		}
 	}
 
@@ -390,11 +392,11 @@ public class SubNode {
 	public String getStr(String key) {
 		try {
 			synchronized (propLock) {
-				SubNodePropVal v = properties().get(key);
-				if (no(v) || no(v.getValue()))
+				Object v = props().get(key);
+				if (no(v))
 					return null;
 
-				return v.getValue().toString();
+				return v.toString();
 			}
 		} catch (Exception e) {
 			ExUtil.error(log, "failed to get String from key: " + key, e);
@@ -413,24 +415,23 @@ public class SubNode {
 	public Long getInt(String key) {
 		try {
 			synchronized (propLock) {
-				SubNodePropVal v = properties().get(key);
-				if (no(v) || no(v.getValue()))
+				Object v = props().get(key);
+				if (no(v))
 					return 0L;
-				Object val = v.getValue();
 
-				if (val instanceof Integer) {
-					return Long.valueOf((Integer) val);
+				if (v instanceof Integer) {
+					return Long.valueOf((Integer) v);
 				}
 
 				// todo-2: When saving from client the values are always sent as strings, and
 				// this is a workaround until that changes.
-				if (val instanceof String) {
-					if (((String) val).length() == 0) {
+				if (v instanceof String) {
+					if (((String) v).length() == 0) {
 						return 0L;
 					}
-					return Long.parseLong((String) val);
+					return Long.parseLong((String) v);
 				}
-				return (Long) v.getValue();
+				return (Long) v;
 			}
 		} catch (Exception e) {
 			ExUtil.error(log, "failed to get Long from key: " + key, e);
@@ -449,10 +450,10 @@ public class SubNode {
 	public Date getDate(String key) {
 		try {
 			synchronized (propLock) {
-				SubNodePropVal v = properties().get(key);
-				if (no(v) || no(v.getValue()))
+				Object v = props().get(key);
+				if (no(v))
 					return null;
-				return (Date) v.getValue();
+				return (Date) v;
 			}
 		} catch (Exception e) {
 			return null;
@@ -465,15 +466,18 @@ public class SubNode {
 		return getFloat(prop.s());
 	}
 
+	// for pure getters like this, make to NOT create 'props'
+	// if props is currently null. leave null. (todo-0)
+	// look for all calls to 'props()' for this kind of readonly access
 	@Transient
 	@JsonIgnore
 	public Double getFloat(String key) {
 		try {
 			synchronized (propLock) {
-				SubNodePropVal v = properties().get(key);
-				if (no(v) || no(v.getValue()))
+				Object v = props().get(key);
+				if (no(v))
 					return 0.0;
-				return (Double) v.getValue();
+				return (Double) v;
 			}
 		} catch (Exception e) {
 			ExUtil.error(log, "failed to get Float from key: " + key, e);
@@ -492,20 +496,20 @@ public class SubNode {
 	public Boolean getBool(String key) {
 		try {
 			synchronized (propLock) {
-				SubNodePropVal v = properties().get(key);
-				if (no(v) || no(v.getValue()))
+				Object v = props().get(key);
+				if (no(v))
 					return false;
 
 				/*
 				 * Our current property editor only knows how to save strings, so we just cope with that here, but
 				 * eventually we will have type-safety and types even in the editor.
 				 */
-				if (v.getValue() instanceof String) {
-					String s = ((String) v.getValue()).toLowerCase();
+				if (v instanceof String) {
+					String s = ((String) v).toLowerCase();
 					// detect true or 1.
 					return s.contains("t") || s.contains("1");
 				}
-				return (Boolean) v.getValue();
+				return (Boolean) v;
 			}
 		} catch (Exception e) {
 			ExUtil.error(log, "failed to get Boolean from key: " + key, e);
@@ -515,12 +519,12 @@ public class SubNode {
 
 	@Transient
 	@JsonIgnore
-	private SubNodePropertyMap properties() {
+	private HashMap<String, Object> props() {
 		synchronized (propLock) {
-			if (no(properties)) {
-				properties = new SubNodePropertyMap();
+			if (no(props)) {
+				props = new HashMap<String, Object>();
 			}
-			return properties;
+			return props;
 		}
 	}
 
@@ -528,14 +532,6 @@ public class SubNode {
 	@JsonIgnore
 	public boolean isType(NodeType type) {
 		return type.s().equals(this.type);
-	}
-
-	@Transient
-	@JsonIgnore
-	public boolean hasProperty(NodeProp prop) {
-		synchronized (propLock) {
-			return ok(properties) && properties.containsKey(prop.s());
-		}
 	}
 
 	@JsonProperty(TYPE)
@@ -602,10 +598,10 @@ public class SubNode {
 		this.disableParentCheck = disableParentCheck;
 	}
 
-	public void addProperties(SubNodePropertyMap properties) {
+	public void addProps(HashMap<String, Object> props) {
 		ThreadLocals.dirty(this);
 		synchronized (propLock) {
-			properties().putAll(properties);
+			props().putAll(props);
 		}
 	}
 

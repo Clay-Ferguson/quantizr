@@ -86,7 +86,7 @@ public class MongoRead extends ServiceBase {
     public void dumpByPropertyMatch(String prop, String val) {
         log.debug("Dump for: prop " + prop + "=" + val);
         Query q = new Query();
-        Criteria crit = Criteria.where(SubNode.PROPERTIES + "." + prop + ".value").is(val);
+        Criteria crit = Criteria.where(SubNode.PROPS + "." + prop).is(val);
         q.addCriteria(crit);
         Iterable<SubNode> iter = mongoUtil.find(q);
         for (SubNode node : iter) {
@@ -712,8 +712,6 @@ public class MongoRead extends ServiceBase {
     /**
      * prop is optional and if non-null means we should search only that one field.
      * 
-     * WARNING. "SubNode.prp" is a COLLECTION and therefore not searchable. Beware.
-     * 
      * timeRangeType: futureOnly, pastOnly, all
      */
     @PerfMon(category = "read")
@@ -772,12 +770,14 @@ public class MongoRead extends ServiceBase {
                 if ((text.startsWith("#") || text.startsWith("@")) && !text.contains(" ")) {
                     text = "\"" + text + "\"";
                 }
-                
-                // This reurns ONLY nodes containing BOTH (not any) #tag1 and #tag2 so this is definitely a MongoDb bug.
-                // (or a Lucene bug possibly to be exact), so I've confirmed it's basically impossible to do an OR search
+
+                // This reurns ONLY nodes containing BOTH (not any) #tag1 and #tag2 so this is definitely a MongoDb
+                // bug.
+                // (or a Lucene bug possibly to be exact), so I've confirmed it's basically impossible to do an OR
+                // search
                 // on strings containing special characters, without the special characters basically being ignored.
-                //textCriteria.matchingAny("\"#tag1\"", "\"#tag2\"");
-                
+                // textCriteria.matchingAny("\"#tag1\"", "\"#tag2\"");
+
                 textCriteria.matching(text);
                 textCriteria.caseSensitive(caseSensitive);
                 criterias.add(textCriteria);
@@ -785,11 +785,11 @@ public class MongoRead extends ServiceBase {
         }
 
         if (requirePriority) {
-            criterias.add(Criteria.where("prp.priority.value").gt("0"));
+            criterias.add(Criteria.where(SubNode.PROPS + ".priority").gt("0"));
         }
 
         if (!StringUtils.isEmpty(sortField)) {
-            if ("prp.date.value".equals(sortField) && ok(timeRangeType)) {
+            if ((SubNode.PROPS + ".date").equals(sortField) && ok(timeRangeType)) {
                 sortDir = "DESC";
                 // example date RANGE condition:
                 // query.addCriteria(Criteria.where("startDate").gte(startDate).lt(endDate));
@@ -907,7 +907,7 @@ public class MongoRead extends ServiceBase {
         crit = crit.and(SubNode.MODIFY_TIME).ne(null);
         crit = auth.addSecurityCriteria(ms, crit);
         q.addCriteria(crit);
-        q.addCriteria(Criteria.where(SubNode.PROPERTIES + "." + NodeProp.DATE + ".value").ne(null));
+        q.addCriteria(Criteria.where(SubNode.PROPS + "." + NodeProp.DATE).ne(null));
 
         return mongoUtil.find(q);
     }
@@ -1059,13 +1059,13 @@ public class MongoRead extends ServiceBase {
         // Note: This one CAN get called before allUsersRootNode is set.
         if (MongoRepository.PARENT_OPTIMIZATION && ok(MongoUtil.allUsersRootNode)) {
             crit = Criteria.where(SubNode.PARENT).is(MongoUtil.allUsersRootNode.getId()) //
-                    .and(SubNode.PROPERTIES + "." + NodeProp.USER + ".value").regex("^" + user + "$");
+                    .and(SubNode.PROPS + "." + NodeProp.USER).regex("^" + user + "$");
         } else {
             crit = Criteria.where(//
                     SubNode.PATH).regex(mongoUtil.regexDirectChildrenOfPath(NodePath.ROOT_OF_ALL_USERS)) //
-                    // .and(SubNode.FIELD_PROPERTIES + "." + NodeProp.USER + ".value").is(user);
+                    // .and(SubNode.PROPS + "." + NodeProp.USER).is(user);
                     // case-insensitive lookup of username:
-                    .and(SubNode.PROPERTIES + "." + NodeProp.USER + ".value").regex("^" + user + "$");
+                    .and(SubNode.PROPS + "." + NodeProp.USER).regex("^" + user + "$");
         }
 
         q.addCriteria(crit);
@@ -1092,11 +1092,11 @@ public class MongoRead extends ServiceBase {
         Criteria crit = null;
         if (MongoRepository.PARENT_OPTIMIZATION && ok(node.getId())) {
             crit = Criteria.where(SubNode.PARENT).is(node.getId()) //
-                    .and(SubNode.TYPE).is(type).and(SubNode.PROPERTIES + "." + NodeProp.USER + ".value").is(userName);
+                    .and(SubNode.TYPE).is(type).and(SubNode.PROPS + "." + NodeProp.USER).is(userName);
         } else {
             crit = Criteria.where(//
                     SubNode.PATH).regex(mongoUtil.regexDirectChildrenOfPath(node.getPath()))//
-                    .and(SubNode.TYPE).is(type).and(SubNode.PROPERTIES + "." + NodeProp.USER + ".value").is(userName);
+                    .and(SubNode.TYPE).is(type).and(SubNode.PROPS + "." + NodeProp.USER).is(userName);
         }
 
         crit = auth.addSecurityCriteria(ms, crit);
@@ -1175,11 +1175,11 @@ public class MongoRead extends ServiceBase {
 
         if (MongoRepository.PARENT_OPTIMIZATION && ok(node.getId())) {
             crit = Criteria.where(SubNode.PARENT).is(node.getId()) //
-                    .and(SubNode.PROPERTIES + "." + propName + ".value").is(propVal);
+                    .and(SubNode.PROPS + "." + propName).is(propVal);
         } else {
             crit = Criteria.where(//
                     SubNode.PATH).regex(mongoUtil.regexDirectChildrenOfPath(node.getPath()))//
-                    .and(SubNode.PROPERTIES + "." + propName + ".value").is(propVal);
+                    .and(SubNode.PROPS + "." + propName).is(propVal);
         }
 
         q.addCriteria(crit);
@@ -1199,7 +1199,7 @@ public class MongoRead extends ServiceBase {
         Query q = new Query();
         Criteria crit = Criteria.where(//
                 SubNode.PATH).regex(mongoUtil.regexDirectChildrenOfPath(path))//
-                .and(SubNode.PROPERTIES + "." + propName + ".value").is(propVal);
+                .and(SubNode.PROPS + "." + propName).is(propVal);
 
         crit = auth.addSecurityCriteria(ms, crit);
         q.addCriteria(crit);
@@ -1211,7 +1211,7 @@ public class MongoRead extends ServiceBase {
      */
     public SubNode findNodeByProp(MongoSession ms, String propName, String propVal) {
         Query q = new Query();
-        Criteria crit = Criteria.where(SubNode.PROPERTIES + "." + propName + ".value").is(propVal);
+        Criteria crit = Criteria.where(SubNode.PROPS + "." + propName).is(propVal);
         q.addCriteria(crit);
         SubNode ret = mongoUtil.findOne(q);
         auth.auth(ms, ret, PrivilegeType.READ);
@@ -1222,10 +1222,10 @@ public class MongoRead extends ServiceBase {
         Query q = new Query();
 
         /* Match the PIN to cid */
-        Criteria crit = Criteria.where(SubNode.PROPERTIES + "." + NodeProp.IPFS_LINK.s() + ".value").is(cid);
+        Criteria crit = Criteria.where(SubNode.PROPS + "." + NodeProp.IPFS_LINK.s()).is(cid);
 
         /* And only consider nodes that are NOT REFs (meaning IPFS_REF prop==null) */
-        crit = crit.and(SubNode.PROPERTIES + "." + NodeProp.IPFS_REF.s() + ".value").is(null);
+        crit = crit.and(SubNode.PROPS + "." + NodeProp.IPFS_REF.s()).is(null);
 
         q.addCriteria(crit);
         SubNode ret = mongoUtil.findOne(q);

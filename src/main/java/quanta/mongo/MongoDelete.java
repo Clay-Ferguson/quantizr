@@ -82,7 +82,7 @@ public class MongoDelete extends ServiceBase  {
 		Date date = Date.from(ldt.atStartOfDay(ZoneId.systemDefault()).toInstant());
 
 		Criteria crit = Criteria.where(SubNode.PATH).regex(mongoUtil.regexRecursiveChildrenOfPath(parent.getPath())) //
-				.and(SubNode.PROPERTIES + "." + NodeProp.ACT_PUB_ID + ".value").ne(null) //
+				.and(SubNode.PROPS + "." + NodeProp.ACT_PUB_ID).ne(null) //
 				.and(SubNode.MODIFY_TIME).lt(date);
 
 		q.addCriteria(crit);
@@ -103,7 +103,7 @@ public class MongoDelete extends ServiceBase  {
 		/*
 		 * once we've had the TEMP prop in place for 7 days, we can then process this code from the root
 		 * path of all users rather than running it once on each foreign user node, and remove 'ForUser'
-		 * from method name and(SubNode.FIELD_PROPERTIES + "." + NodeProp.TEMP.s() + ".value").ne(null));
+		 * from method name and(SubNode.PROPS+ "." + NodeProp.TEMP.s()).ne(null));
 		 */
 
 		q.addCriteria(crit);
@@ -194,10 +194,10 @@ public class MongoDelete extends ServiceBase  {
 		ops.remove(node);
 	}
 
-	public void deleteBySubNodePropVal(MongoSession ms, String prop, String val) {
+	public void deleteByPropVal(MongoSession ms, String prop, String val) {
 		// log.debug("Deleting by prop=" + prop + " val=" + val);
 		Query q = new Query();
-		Criteria crit = Criteria.where(SubNode.PROPERTIES + "." + prop + ".value").is(val);
+		Criteria crit = Criteria.where(SubNode.PROPS + "." + prop).is(val);
 		crit = auth.addSecurityCriteria(ms, crit);
 		q.addCriteria(crit);
 		DeleteResult res = ops.remove(q, SubNode.class);

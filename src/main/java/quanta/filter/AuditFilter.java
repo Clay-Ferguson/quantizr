@@ -28,7 +28,7 @@ public class AuditFilter extends GenericFilterBean {
 
 	private static String INDENT = "    ";
 	private static boolean enabled = true;
-	private static boolean verbose = true; // todo-0: make this optional setting live by admin
+	private static boolean verbose = false; // todo-0: make this optional setting live by admin
 
 	@Override
 	public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)

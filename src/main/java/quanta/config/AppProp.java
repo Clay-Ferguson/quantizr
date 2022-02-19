@@ -40,11 +40,12 @@ public class AppProp {
 	private ApplicationContext context;
 
 	// if false this disables all backgrouind processing.
+	// todo-0: warning, does Feed tab show up with "Nothing to Display" when this is false? Server started with it false here.
 	private boolean daemonsEnabled = true;
 
 	// turns on verbose ActivityPub Logging
 	// todo-2: need an admin console where stuff like this can be turned on/off live.
-	private boolean apLog = true; // todo-0: FYI this is on.
+	private boolean apLog = false; // todo-0: document this, and create a way to turn it on from admin menu.
 
 	private String protocolHostAndPort = null;
 

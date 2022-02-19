@@ -12,6 +12,7 @@ import org.springframework.stereotype.Component;
 import quanta.AppServer;
 import quanta.EventPublisher;
 import quanta.config.ServiceBase;
+import quanta.util.ExUtil;
 import quanta.util.ThreadLocals;
 
 /**
@@ -79,8 +80,12 @@ public class MongoRepository extends ServiceBase {
 			ThreadLocals.setMongoSession(as);
 
 			// DO NOT DELETE
+			// WARNING: When running this kind of conversion stuff
+			// be sure to disable the deamon processing also, which can be
+			// done with setDaemonsEnabled(false)
 			// mongoUtil.setParentNodes(as);
 			// mongoUtil.processAccounts(as);
+			// mongoUtil.convertProperties(as);
 
 			mongoUtil.createAdminUser(as);
 
@@ -95,8 +100,18 @@ public class MongoRepository extends ServiceBase {
 			 * this method because of calls to getRepository() always doing an init.
 			 */
 			initialized = true;
-			mongoUtil.createAllIndexes(as);
-			mongoUtil.createTestAccounts();
+
+			try {
+				mongoUtil.createAllIndexes(as);
+			} catch (Exception e) {
+				ExUtil.error(log, "Failed in createAlIndexes", e);
+			}
+
+			try {
+				mongoUtil.createTestAccounts();
+			} catch (Exception e) {
+				ExUtil.error(log, "Failed in createTestAccounts", e);
+			}
 
 			log.debug("MongoRepository fully initialized.");
 			fullInit = true;

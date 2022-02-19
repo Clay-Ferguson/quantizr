@@ -80,9 +80,10 @@ export class MenuPanel extends Div {
     static timelineByCreatedNonRecursive = () => S.srch.timeline(null, "ctm", appState(null), null, "Rev-chron by Create Time (non-Recursive)", 0, false);
     static timelineByModifiedNonRecursive = () => S.srch.timeline(null, "mtm", appState(null), null, "Rev-chron by Modify Time (non-Recursive)", 0, false);
     static showCalendar = () => { S.render.showCalendar(null, appState(null)); }
-    static calendarFutureDates = () => S.srch.timeline(null, "prp.date.value", appState(null), "futureOnly", "Future calendar dates (Soonest at the top)", 0, true);
-    static calendarPastDates = () => S.srch.timeline(null, "prp.date.value", appState(null), "pastOnly", "Past calendar dates (Newest at the top)", 0, true);
-    static calendarAllDates = () => S.srch.timeline(null, "prp.date.value", appState(null), "all", "All calendar dates", 0, true);
+    // todo-0: is SubNode.PROP available on client to use for 'p' here?
+    static calendarFutureDates = () => S.srch.timeline(null, "p.date", appState(null), "futureOnly", "Future calendar dates (Soonest at the top)", 0, true);
+    static calendarPastDates = () => S.srch.timeline(null, "p.date", appState(null), "pastOnly", "Past calendar dates (Newest at the top)", 0, true);
+    static calendarAllDates = () => S.srch.timeline(null, "p.date", appState(null), "all", "All calendar dates", 0, true);
     static toolsShowClipboard = () => S.edit.saveClipboardToChildNode("~" + J.NodeType.NOTES);
     static import = () => S.edit.openImportDlg(appState(null));
     static export = () => S.edit.openExportDlg(appState(null));

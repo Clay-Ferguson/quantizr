@@ -163,11 +163,11 @@ public class NodeSearchService extends ServiceBase {
 		Criteria moreCriteria = null;
 		// searching only Foreign users
 		if (Constant.SEARCH_TYPE_USER_FOREIGN.s().equals(req.getSearchType())) {
-			moreCriteria = Criteria.where(SubNode.PROPERTIES + "." + NodeProp.ACT_PUB_ACTOR_URL.s() + ".value").ne(null);
+			moreCriteria = Criteria.where(SubNode.PROPS + "." + NodeProp.ACT_PUB_ACTOR_URL.s()).ne(null);
 		}
 		// searching only Local users
 		else if (Constant.SEARCH_TYPE_USER_LOCAL.s().equals(req.getSearchType())) {
-			moreCriteria = Criteria.where(SubNode.PROPERTIES + "." + NodeProp.ACT_PUB_ACTOR_URL.s() + ".value").is(null);
+			moreCriteria = Criteria.where(SubNode.PROPS + "." + NodeProp.ACT_PUB_ACTOR_URL.s()).is(null);
 		}
 
 		Val<Iterable<SubNode>> accountNodes = new Val<>();;

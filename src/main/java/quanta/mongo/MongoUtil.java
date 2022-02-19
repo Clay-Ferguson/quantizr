@@ -11,8 +11,8 @@ import java.util.Random;
 import java.util.StringTokenizer;
 import java.util.regex.Pattern;
 import org.apache.commons.codec.digest.DigestUtils;
-import org.bson.types.ObjectId;
 import org.bson.Document;
+import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -521,6 +521,57 @@ public class MongoUtil extends ServiceBase {
 		log.debug("setParentNodes completed.");
 	}
 
+	// todo-0: delete soon
+	// public void convertProperties(MongoSession ms) {
+	// 	dropAllIndexes(ms);
+	// 	log.debug("Processing convertProperties");
+
+	// 	// get all nodes in the DB
+	// 	Iterable<SubNode> nodes = ops.findAll(SubNode.class);
+	// 	int counter = 0;
+
+	// 	// iterate each node
+	// 	for (SubNode node : nodes) {
+	// 		try {
+	// 			// get the old map, but skip if none
+	// 			SubNodePropertyMap oldMap = node.getProperties();
+	// 			if (no(oldMap) || oldMap.size() == 0)
+	// 				continue;
+
+	// 			// create new map of new format
+	// 			HashMap<String, Object> newMap = new HashMap<>();
+
+	// 			// iterate old map to load new map
+	// 			for (String prop : oldMap.keySet()) {
+	// 				SubNodePropVal pVal = oldMap.get(prop);
+	// 				if (ok(pVal)) {
+	// 					Object v = pVal.getValue();
+	// 					if (ok(v)) {
+	// 						newMap.put(prop, v);
+	// 					}
+	// 				}
+	// 			}
+
+	// 			// set the new prop on the object
+	// 			node.setProps(newMap);
+	// 			node.setProperties(null);
+
+	// 			if (ThreadLocals.getDirtyNodeCount() > 200) {
+	// 				update.saveSession(ms);
+	// 			}
+
+	// 			if (++counter % 2000 == 0) {
+	// 				log.debug("SPN: " + String.valueOf(counter));
+	// 			}
+	// 		}
+	// 		// if we fail to convert any nodes, print error and continue
+	// 		catch (Exception e) {
+	// 			ExUtil.error(log, "Failed to convert props. id: " + node.getIdStr(), e);
+	// 		}
+	// 	}
+
+	// 	log.debug("convertProperties completed.");
+	// }
 
 	// Alters all paths parts that are over 10 characters long, on all nodes
 	public void shortenPathParts(MongoSession ms) {
@@ -588,6 +639,7 @@ public class MongoUtil extends ServiceBase {
 		// DO NOT DELETE. This is able to check contstraint volations.
 		// read.dumpByPropertyMatch(NodeProp.USER.s(), "adam");
 
+		log.debug("Creating FediverseName unique index.");
 		ops.indexOps(FediverseName.class).ensureIndex(new Index().on(FediverseName.FIELD_NAME, Direction.ASC).unique());
 
 		createUniqueIndex(ms, SubNode.class, SubNode.PATH);
@@ -598,10 +650,10 @@ public class MongoUtil extends ServiceBase {
 		// account)
 
 		// dropIndex(session, SubNode.class, "unique-apid");
-		createPartialUniqueIndex(ms, "unique-apid", SubNode.class, SubNode.PROPERTIES + "." + NodeProp.ACT_PUB_ID.s() + ".value");
+		createPartialUniqueIndex(ms, "unique-apid", SubNode.class, SubNode.PROPS + "." + NodeProp.ACT_PUB_ID.s());
 
-		createPartialUniqueIndexForType(ms, "unique-user-acct", SubNode.class,
-				SubNode.PROPERTIES + "." + NodeProp.USER.s() + ".value", NodeType.ACCOUNT.s());
+		createPartialUniqueIndexForType(ms, "unique-user-acct", SubNode.class, SubNode.PROPS + "." + NodeProp.USER.s(),
+				NodeType.ACCOUNT.s());
 
 		/*
 		 * DO NOT DELETE: This is a good example of how to cleanup the DB of all constraint violations prior
@@ -611,10 +663,12 @@ public class MongoUtil extends ServiceBase {
 		// delete.removeFriendConstraintViolations(ms);
 
 		createUniqueFriendsIndex(ms);
-		createUniqueNodeNameIndex(ms);
+
+		// todo-0: this appears to be stopping app from successfully starting. &&&
+		// createUniqueNodeNameIndex(ms);
 
 		// I had done this temporarily to fix a constraint violation
-		// Leaving fow now.
+		// Leaving for now.
 		// dropIndex(ms, SubNode.class, "unique-friends");
 		// dropIndex(ms, SubNode.class, "unique-node-name");
 
@@ -644,12 +698,13 @@ public class MongoUtil extends ServiceBase {
 	}
 
 	/*
-	 * Creates an index which will guarantee no duplicate friends can be created. Note this one index
-	 * also makes it impossible to have the same user both blocked and followed becasue those are both
-	 * saved as FRIEND nodes on the tree and therefore would violate this constraint which is exactly
-	 * what we want.
+	 * Creates an index which will guarantee no duplicate friends can be created for a given user. Note
+	 * this one index also makes it impossible to have the same user both blocked and followed becasue
+	 * those are both saved as FRIEND nodes on the tree and therefore would violate this constraint
+	 * which is exactly what we want.
 	 */
 	public void createUniqueFriendsIndex(MongoSession ms) {
+		log.debug("Creating unique friends index.");
 		auth.requireAdmin(ms);
 		update.saveSession(ms);
 		String indexName = "unique-friends";
@@ -657,7 +712,7 @@ public class MongoUtil extends ServiceBase {
 		try {
 			ops.indexOps(SubNode.class).ensureIndex(//
 					new Index().on(SubNode.OWNER, Direction.ASC) //
-							.on(SubNode.PROPERTIES + "." + NodeProp.USER_NODE_ID.s() + ".value", Direction.ASC) //
+							.on(SubNode.PROPS + "." + NodeProp.USER_NODE_ID.s(), Direction.ASC) //
 							.unique() //
 							.named(indexName) //
 							.partial(PartialIndexFilter.of(Criteria.where(SubNode.TYPE).is(NodeType.FRIEND.s()))));
@@ -704,6 +759,7 @@ public class MongoUtil extends ServiceBase {
 	public void logIndexes(MongoSession ms, Class<?> clazz) {
 		StringBuilder sb = new StringBuilder();
 		update.saveSession(ms);
+		sb.append("INDEXES LIST\n:");
 		List<IndexInfo> indexes = ops.indexOps(clazz).getIndexInfo();
 		for (IndexInfo idx : indexes) {
 			List<IndexField> indexFields = idx.getIndexFields();
@@ -739,10 +795,11 @@ public class MongoUtil extends ServiceBase {
 	}
 
 	/*
-	 * NOTE: Properties like this don't appear to be supported: "prp['ap:id'].value", but prp.apid.value
-	 * works
+	 * NOTE: Properties like this don't appear to be supported: "prp['ap:id'].value", but prp.apid
+	 * works,
 	 */
 	public void createPartialUniqueIndex(MongoSession ms, String name, Class<?> clazz, String property) {
+		log.debug("Ensuring unique partial index named: " + name);
 		auth.requireAdmin(ms);
 		update.saveSession(ms);
 
@@ -761,6 +818,7 @@ public class MongoUtil extends ServiceBase {
 	}
 
 	public void createPartialUniqueIndexForType(MongoSession ms, String name, Class<?> clazz, String property, String type) {
+		log.debug("Ensuring unique partial index (for type) named: " + name);
 		auth.requireAdmin(ms);
 		update.saveSession(ms);
 
@@ -780,21 +838,36 @@ public class MongoUtil extends ServiceBase {
 	}
 
 	public void createUniqueIndex(MongoSession ms, Class<?> clazz, String property) {
-		auth.requireAdmin(ms);
-		update.saveSession(ms);
-		ops.indexOps(clazz).ensureIndex(new Index().on(property, Direction.ASC).unique());
+		log.debug("Ensuring unique index on: " + property);
+		try {
+			auth.requireAdmin(ms);
+			update.saveSession(ms);
+			ops.indexOps(clazz).ensureIndex(new Index().on(property, Direction.ASC).unique());
+		} catch (Exception e) {
+			ExUtil.error(log, "Failed in createUniqueIndex: " + property, e);
+		}
 	}
 
 	public void createIndex(MongoSession ms, Class<?> clazz, String property) {
-		auth.requireAdmin(ms);
-		update.saveSession(ms);
-		ops.indexOps(clazz).ensureIndex(new Index().on(property, Direction.ASC));
+		log.debug("createIndex: " + property);
+		try {
+			auth.requireAdmin(ms);
+			update.saveSession(ms);
+			ops.indexOps(clazz).ensureIndex(new Index().on(property, Direction.ASC));
+		} catch (Exception e) {
+			ExUtil.error(log, "Failed in createIndex: " + property, e);
+		}
 	}
 
 	public void createIndex(MongoSession ms, Class<?> clazz, String property, Direction dir) {
-		auth.requireAdmin(ms);
-		update.saveSession(ms);
-		ops.indexOps(clazz).ensureIndex(new Index().on(property, dir));
+		log.debug("createIndex: " + property + " dir=" + dir);
+		try {
+			auth.requireAdmin(ms);
+			update.saveSession(ms);
+			ops.indexOps(clazz).ensureIndex(new Index().on(property, dir));
+		} catch (Exception e) {
+			ExUtil.error(log, "Failed in createIndex: " + property + " dir=" + dir, e);
+		}
 	}
 
 	/*
@@ -828,6 +901,7 @@ public class MongoUtil extends ServiceBase {
 	// }
 
 	public void createTextIndexes(MongoSession ms, Class<?> clazz) {
+		log.debug("creatingText Indexes.");
 		auth.requireAdmin(ms);
 
 		try {

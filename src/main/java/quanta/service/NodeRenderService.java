@@ -445,7 +445,7 @@ public class NodeRenderService extends ServiceBase {
 		if (spaceIdx != -1) {
 			String orderByProp = orderBy.substring(0, spaceIdx);
 			dir = orderBy.substring(spaceIdx + 1);
-			sort = Sort.by(dir.equals("asc") ? Sort.Direction.ASC : Sort.Direction.DESC, SubNode.PROPERTIES + "." + orderByProp);
+			sort = Sort.by(dir.equals("asc") ? Sort.Direction.ASC : Sort.Direction.DESC, SubNode.PROPS + "." + orderByProp);
 
 			/*
 			 * when sorting by priority always do second level REV-CHRON sort, so newest un-prioritized nodes

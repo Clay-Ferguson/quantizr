@@ -22,7 +22,6 @@ import quanta.mongo.CreateNodeLocation;
 import quanta.mongo.MongoSession;
 import quanta.mongo.model.AccessControl;
 import quanta.mongo.model.SubNode;
-import quanta.mongo.model.SubNodePropertyMap;
 
 /**
  * Assorted general utility functions related to SubNodes.
@@ -94,8 +93,8 @@ public class SubNodeUtil extends ServiceBase {
 			node.delete(NodeProp.PRIORITY.s());
 		}
 
-		if (ok(node.getProperties()) && node.getProperties().size() == 0) {
-			node.setProperties(null);
+		if (ok(node.getProps()) && node.getProps().size() == 0) {
+			node.setProps(null);
 		}
 	}
 
@@ -145,7 +144,7 @@ public class SubNodeUtil extends ServiceBase {
 	 * provides), by creating said node if not already existing or leaving it as is if it does exist.
 	 */
 	public SubNode ensureNodeExists(MongoSession ms, String parentPath, String pathName, String nodeName, String defaultContent,
-			String primaryTypeName, boolean saveImmediate, SubNodePropertyMap props, Val<Boolean> created) {
+			String primaryTypeName, boolean saveImmediate, HashMap<String, Object> props, Val<Boolean> created) {
 
 		if (ok(nodeName)) {
 			SubNode nodeByName = read.getNodeByName(ms, nodeName);
@@ -228,7 +227,7 @@ public class SubNodeUtil extends ServiceBase {
 		}
 
 		if (ok(props)) {
-			parent.addProperties(props);
+			parent.addProps(props);
 		}
 
 		if (saveImmediate && nodesCreated) {

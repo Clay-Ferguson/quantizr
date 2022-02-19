@@ -191,7 +191,7 @@ public class UserFeedService extends ServiceBase {
 
 		// add the criteria for sensitive flag
 		if (!req.getNsfw()) {
-			crit = crit.and(SubNode.PROPERTIES + "." + NodeProp.ACT_PUB_SENSITIVE + ".value").is(null);
+			crit = crit.and(SubNode.PROPS + "." + NodeProp.ACT_PUB_SENSITIVE).is(null);
 		}
 
 		HashSet<ObjectId> blockedUserIds = new HashSet<>();
@@ -259,7 +259,7 @@ public class UserFeedService extends ServiceBase {
 		// use attributedTo proptery to determine whether a node is 'local' (posted by this server) or not.
 		if (req.getLocalOnly()) {
 			// todo-1: should be checking apid property instead?
-			crit = crit.and(SubNode.PROPERTIES + "." + NodeProp.ACT_PUB_OBJ_ATTRIBUTED_TO.s() + ".value").is(null);
+			crit = crit.and(SubNode.PROPS + "." + NodeProp.ACT_PUB_OBJ_ATTRIBUTED_TO.s()).is(null);
 		}
 
 		if (!StringUtils.isEmpty(req.getSearchText())) {
