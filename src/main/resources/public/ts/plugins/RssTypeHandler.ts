@@ -475,9 +475,10 @@ export class RssTypeHandler extends TypeBase {
             el.style.border = "1px solid gray";
             el.style.marginBottom = "12px";
 
-            /* Setting width to 100% and always removing height ensures the image does fit into our colum display
-            and also will not stretch */
-            el.style.maxWidth = "100%";
+            /* Setting width and removing height ensures the image does fit into our colum display
+            and also will not stretch. We set images to max of 50% because for displaying RSS feeds we don't
+            want any huge images going full width of the view. It hinders scrolling, by just consuming too much space. */
+            el.style.maxWidth = "50%";
             delete el.style.width;
             el.removeAttribute("height");
         });
