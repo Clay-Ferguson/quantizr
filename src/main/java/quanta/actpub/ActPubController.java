@@ -11,6 +11,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -19,6 +20,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+import opennlp.tools.util.StringUtil;
 import quanta.actpub.model.APObj;
 import quanta.config.AppProp;
 import quanta.config.ServiceBase;
@@ -29,9 +31,13 @@ import quanta.util.XString;
 
 /**
  * Main REST Controller endpoint for AP
+ * 
+ * todo-0: For methods that specify multiple 'produces' content types, should we detect which JSON
+ * subtype is being requested for and be sure to SET that type in the response, and when do we need
+ * to also respond with charset and profile? Ever?
  */
 @Controller
-// @CrossOrigin (done by AppFilter. Spring doesn't do it.)
+// @CrossOrigin is done by AppFilter.
 public class ActPubController extends ServiceBase {
 	private static final Logger log = LoggerFactory.getLogger(ActPubController.class);
 
@@ -52,17 +58,25 @@ public class ActPubController extends ServiceBase {
 	 */
 	@RequestMapping(value = APConst.PATH_WEBFINGER, method = RequestMethod.GET, produces = { //
 			APConst.CTYPE_JRD_JSON, //
-			APConst.CTYPE_JRD_JSON + "; " + APConst.CHARSET, //
+			// APConst.CTYPE_JRD_JSON + "; " + APConst.CHARSET, //
 			APConst.CTYPE_ACT_JSON, //
-			APConst.CTYPE_ACT_JSON + "; " + APConst.CHARSET, //
-			APConst.CTYPE_ACT_JSON + "; " + APConst.APS_PROFILE //
+			// APConst.CTYPE_ACT_JSON + "; " + APConst.CHARSET, //
+			// APConst.CTYPE_ACT_JSON + "; " + APConst.APS_PROFILE //
 	})
 	public @ResponseBody Object webFinger(//
-			@RequestParam(value = "resource", required = true) String resource) {
+			@RequestParam(value = "resource", required = true) String resource, //
+			HttpServletRequest req) {
 		apUtil.log("getWebFinger: " + resource);
 		Object ret = apUtil.generateWebFinger(resource);
-		if (ok(ret))
-			return ret;
+		if (ok(ret)) {
+			HttpHeaders hdr = new HttpHeaders();
+			/*
+			 * todo-0: My example calls to Mastodon servers DID include char charset in the returned content
+			 * type, so it's an open question whether it's better to include charset here?
+			 */
+			setContentType(hdr, req, APConst.MTYPE_JRD_JSON);
+			return new ResponseEntity<Object>(ret, hdr, HttpStatus.OK);
+		}
 		return new ResponseEntity<String>(HttpStatus.NOT_FOUND);
 	}
 
@@ -84,10 +98,10 @@ public class ActPubController extends ServiceBase {
 	public void mastodonGetUser(//
 			@PathVariable(value = "userName", required = true) String userName, //
 			HttpServletRequest req, //
-			HttpServletResponse response) throws Exception {
+			HttpServletResponse res) throws Exception {
 		String url = prop.getProtocolHostAndPort() + "/u/" + userName + "/home";
 		apUtil.log("Redirecting to: " + url);
-		response.sendRedirect(url);
+		res.sendRedirect(url);
 	}
 
 	/**
@@ -95,20 +109,18 @@ public class ActPubController extends ServiceBase {
 	 */
 	@RequestMapping(value = APConst.ACTOR_PATH + "/{userName}", method = RequestMethod.GET, produces = { //
 			APConst.CTYPE_ACT_JSON, //
-			APConst.CTYPE_ACT_JSON + "; " + APConst.CHARSET, //
-			APConst.CTYPE_LD_JSON + "; " + APConst.APS_PROFILE, //
-			APConst.CTYPE_ACT_JSON + "; " + APConst.APS_PROFILE //
+			APConst.CTYPE_LD_JSON
+			// APConst.CTYPE_ACT_JSON + "; " + APConst.CHARSET, //
+			// APConst.CTYPE_LD_JSON + "; " + APConst.APS_PROFILE, //
+			// APConst.CTYPE_ACT_JSON + "; " + APConst.APS_PROFILE //
 	})
 	public @ResponseBody Object actor(//
-			@PathVariable(value = "userName", required = true) String userName) {
+			@PathVariable(value = "userName", required = true) String userName, HttpServletRequest req) {
 		apUtil.log("getActor: " + userName);
 		Object ret = apub.generateActor(userName);
 		if (ok(ret)) {
-			// This pattern is needed to ENSURE a specific content type.
 			HttpHeaders hdr = new HttpHeaders();
-
-			// todo-0: doublecheck that ALL these endpoints are setting content type in response.
-			hdr.setContentType(APConst.MTYPE_ACT_JSON);
+			setContentType(hdr, req, APConst.MTYPE_ACT_JSON);
 			return new ResponseEntity<Object>(ret, hdr, HttpStatus.OK);
 		}
 
@@ -120,20 +132,20 @@ public class ActPubController extends ServiceBase {
 	 */
 	@RequestMapping(value = APConst.PATH_INBOX, method = RequestMethod.POST, produces = {//
 			APConst.CTYPE_LD_JSON, //
-			APConst.CTYPE_LD_JSON + "; " + APConst.CHARSET, //
-			APConst.CTYPE_LD_JSON + "; " + APConst.APS_PROFILE, //
+			// APConst.CTYPE_LD_JSON + "; " + APConst.CHARSET, //
+			// APConst.CTYPE_LD_JSON + "; " + APConst.APS_PROFILE, //
 			APConst.CTYPE_ACT_JSON, //
-			APConst.CTYPE_ACT_JSON + "; " + APConst.CHARSET, //
-			APConst.CTYPE_ACT_JSON + "; " + APConst.APS_PROFILE //
+			// APConst.CTYPE_ACT_JSON + "; " + APConst.CHARSET, //
+			// APConst.CTYPE_ACT_JSON + "; " + APConst.APS_PROFILE //
 	})
 	public @ResponseBody Object sharedInboxPost(//
 			@RequestBody String body, //
-			HttpServletRequest httpReq) {
+			HttpServletRequest req) {
 		try {
 			APObj payload = mapper.readValue(body, new TypeReference<>() {});
 			apUtil.log("shared INBOX incoming payload: " + XString.prettyPrint(payload));
 			ActPubService.inboxCount++;
-			apub.processInboxPost(httpReq, payload);
+			apub.processInboxPost(req, payload);
 			return new ResponseEntity<String>(HttpStatus.OK);
 		} catch (Exception e) {
 			return new ResponseEntity<String>(HttpStatus.BAD_REQUEST);
@@ -145,15 +157,15 @@ public class ActPubController extends ServiceBase {
 	 * 
 	 * WARNING: This inbox and the Shared inbox (above) can both be called simultaneously in cases when
 	 * someone is doing a public reply to a Quanta node, and so Mastodon sends out the public inbox post
-	 * and the post to the user simultaneously. 
+	 * and the post to the user simultaneously.
 	 */
 	@RequestMapping(value = APConst.PATH_INBOX + "/{userName}", method = RequestMethod.POST, produces = { //
 			APConst.CTYPE_LD_JSON, //
-			APConst.CTYPE_LD_JSON + "; " + APConst.CHARSET, //
-			APConst.CTYPE_LD_JSON + "; " + APConst.APS_PROFILE, //
+			// APConst.CTYPE_LD_JSON + "; " + APConst.CHARSET, //
+			// APConst.CTYPE_LD_JSON + "; " + APConst.APS_PROFILE, //
 			APConst.CTYPE_ACT_JSON, //
-			APConst.CTYPE_ACT_JSON + "; " + APConst.CHARSET, //
-			APConst.CTYPE_ACT_JSON + "; " + APConst.APS_PROFILE //
+			// APConst.CTYPE_ACT_JSON + "; " + APConst.CHARSET, //
+			// APConst.CTYPE_ACT_JSON + "; " + APConst.APS_PROFILE //
 	})
 	public @ResponseBody Object inboxPost(//
 			@RequestBody String body, //
@@ -171,25 +183,29 @@ public class ActPubController extends ServiceBase {
 	}
 
 	// todo-0: for this and all similar methods with tons of 'produces' I need to research and
-	// find out of these CHARSETS an PROFILES are ever needed.
+	// find out if these CHARSETS an PROFILES are always needed.
 	@RequestMapping(value = {"/"}, method = RequestMethod.GET, produces = {//
 			APConst.CTYPE_LD_JSON, //
-			APConst.CTYPE_LD_JSON + "; " + APConst.CHARSET, //
-			APConst.CTYPE_LD_JSON + "; " + APConst.APS_PROFILE, //
+			// APConst.CTYPE_LD_JSON + "; " + APConst.CHARSET, //
+			// APConst.CTYPE_LD_JSON + "; " + APConst.APS_PROFILE, //
 			APConst.CTYPE_ACT_JSON, //
-			APConst.CTYPE_ACT_JSON + "; " + APConst.CHARSET, //
-			APConst.CTYPE_ACT_JSON + "; " + APConst.APS_PROFILE //
+			// APConst.CTYPE_ACT_JSON + "; " + APConst.CHARSET, //
+			// APConst.CTYPE_ACT_JSON + "; " + APConst.APS_PROFILE //
 	})
-	public @ResponseBody Object getJsonObj(HttpServletRequest httpReq, //
+	public @ResponseBody Object getJsonObj(HttpServletRequest req, //
 			@RequestParam(value = "id", required = false) String id) {
 		try {
 			APObj ret = apOutbox.getResource(id);
-			return ret;
-		} 
-		catch (NodeAuthFailedException nafe) {
+			if (ok(ret)) {
+				HttpHeaders hdr = new HttpHeaders();
+				setContentType(hdr, req, APConst.MTYPE_ACT_JSON);
+				return new ResponseEntity<Object>(ret, hdr, HttpStatus.OK);
+			} else {
+				return new ResponseEntity<String>(HttpStatus.NOT_FOUND);
+			}
+		} catch (NodeAuthFailedException nafe) {
 			return new ResponseEntity<String>(HttpStatus.NOT_FOUND);
-		}
-		catch (Exception e) {
+		} catch (Exception e) {
 			return new ResponseEntity<String>(HttpStatus.BAD_REQUEST);
 		}
 	}
@@ -199,14 +215,15 @@ public class ActPubController extends ServiceBase {
 	 */
 	@RequestMapping(value = APConst.PATH_OUTBOX + "/{userName}", method = RequestMethod.GET, produces = { //
 			APConst.CTYPE_ACT_JSON, //
-			APConst.CTYPE_ACT_JSON + "; " + APConst.CHARSET, //
-			APConst.CTYPE_LD_JSON + "; " + APConst.APS_PROFILE, //
-			APConst.CTYPE_ACT_JSON + "; " + APConst.APS_PROFILE //
+			APConst.CTYPE_LD_JSON
+			// APConst.CTYPE_ACT_JSON + "; " + APConst.CHARSET, //
+			// APConst.CTYPE_LD_JSON + "; " + APConst.APS_PROFILE, //
+			// APConst.CTYPE_ACT_JSON + "; " + APConst.APS_PROFILE //
 	})
 	public @ResponseBody Object outbox(//
 			@PathVariable(value = "userName", required = true) String userName,
 			@RequestParam(value = "min_id", required = false) String minId,
-			@RequestParam(value = "page", required = false) String page) {
+			@RequestParam(value = "page", required = false) String page, HttpServletRequest req) {
 		APObj ret = null;
 		if (APConst.TRUE.equals(page)) {
 			ret = apOutbox.generateOutboxPage(userName, minId);
@@ -223,11 +240,15 @@ public class ActPubController extends ServiceBase {
 			 */
 			ret = apOutbox.generateOutbox(userName);
 		}
+
 		if (ok(ret)) {
 			apUtil.log("Reply with Outbox: " + XString.prettyPrint(ret));
-			return ret;
+			HttpHeaders hdr = new HttpHeaders();
+			setContentType(hdr, req, APConst.MTYPE_ACT_JSON);
+			return new ResponseEntity<Object>(ret, hdr, HttpStatus.OK);
+		} else {
+			return new ResponseEntity<String>(HttpStatus.NOT_FOUND);
 		}
-		return new ResponseEntity<String>(HttpStatus.OK);
 	}
 
 	/**
@@ -235,25 +256,31 @@ public class ActPubController extends ServiceBase {
 	 */
 	@RequestMapping(value = APConst.PATH_FOLLOWERS + "/{userName}", method = RequestMethod.GET, produces = { //
 			APConst.CTYPE_ACT_JSON, //
-			APConst.CTYPE_ACT_JSON + "; " + APConst.CHARSET, //
-			APConst.CTYPE_LD_JSON + "; " + APConst.APS_PROFILE, //
-			APConst.CTYPE_ACT_JSON + "; " + APConst.APS_PROFILE //
+			APConst.CTYPE_LD_JSON
+			// APConst.CTYPE_ACT_JSON + "; " + APConst.CHARSET, //
+			// APConst.CTYPE_LD_JSON + "; " + APConst.APS_PROFILE, //
+			// APConst.CTYPE_ACT_JSON + "; " + APConst.APS_PROFILE //
 	})
 	public @ResponseBody Object getFollowers(//
 			@PathVariable(value = "userName", required = false) String userName,
 			@RequestParam(value = "min_id", required = false) String minId,
-			@RequestParam(value = "page", required = false) String page) {
+			@RequestParam(value = "page", required = false) String page, HttpServletRequest req) {
 		APObj ret = null;
+
 		if (APConst.TRUE.equals(page)) {
 			ret = apFollower.generateFollowersPage(userName, minId);
 		} else {
 			ret = apFollower.generateFollowers(userName);
 		}
+
 		if (ok(ret)) {
 			apUtil.log("Reply with Followers: " + XString.prettyPrint(ret));
-			return ret;
+			HttpHeaders hdr = new HttpHeaders();
+			setContentType(hdr, req, APConst.MTYPE_ACT_JSON);
+			return new ResponseEntity<Object>(ret, hdr, HttpStatus.OK);
+		} else {
+			return new ResponseEntity<String>(HttpStatus.NOT_FOUND);
 		}
-		return new ResponseEntity<String>(HttpStatus.OK);
 	}
 
 	/**
@@ -261,24 +288,41 @@ public class ActPubController extends ServiceBase {
 	 */
 	@RequestMapping(value = APConst.PATH_FOLLOWING + "/{userName}", method = RequestMethod.GET, produces = { //
 			APConst.CTYPE_ACT_JSON, //
-			APConst.CTYPE_ACT_JSON + "; " + APConst.CHARSET, //
-			APConst.CTYPE_LD_JSON + "; " + APConst.APS_PROFILE, //
-			APConst.CTYPE_ACT_JSON + "; " + APConst.APS_PROFILE //
+			APConst.CTYPE_LD_JSON
+			// APConst.CTYPE_ACT_JSON + "; " + APConst.CHARSET, //
+			// APConst.CTYPE_LD_JSON + "; " + APConst.APS_PROFILE, //
+			// APConst.CTYPE_ACT_JSON + "; " + APConst.APS_PROFILE //
 	})
 	public @ResponseBody Object getFollowing(//
 			@PathVariable(value = "userName", required = false) String userName,
 			@RequestParam(value = "min_id", required = false) String minId,
-			@RequestParam(value = "page", required = false) String page) {
+			@RequestParam(value = "page", required = false) String page, HttpServletRequest req) {
 		APObj ret = null;
 		if (APConst.TRUE.equals(page)) {
 			ret = apFollowing.generateFollowingPage(userName, minId);
 		} else {
 			ret = apFollowing.generateFollowing(userName);
 		}
+
 		if (ok(ret)) {
 			apUtil.log("Reply with Following: " + XString.prettyPrint(ret));
-			return ret;
+			HttpHeaders hdr = new HttpHeaders();
+			setContentType(hdr, req, APConst.MTYPE_ACT_JSON);
+			return new ResponseEntity<Object>(ret, hdr, HttpStatus.OK);
+		} else {
+			return new ResponseEntity<String>(HttpStatus.NOT_FOUND);
 		}
-		return new ResponseEntity<String>(HttpStatus.OK);
+	}
+
+	/*
+	 * We set in the header whatever it was the request called for, or else if none specified set to the
+	 * default type
+	 */
+	private void setContentType(HttpHeaders hdr, HttpServletRequest req, MediaType defaultType) {
+		if (!StringUtil.isEmpty(req.getContentType())) {
+			hdr.setContentType(MediaType.valueOf(req.getContentType()));
+		} else {
+			hdr.setContentType(defaultType);
+		}
 	}
 }
