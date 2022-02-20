@@ -279,7 +279,7 @@ public class AppController extends ServiceBase implements ErrorController {
 
 					if (no(node)) {
 						log.debug("Node did not exist.");
-						ThreadLocals.getSC().setUrlId(null); // <--- why is this here? todo-0
+						ThreadLocals.getSC().setUrlId(null);
 					}
 
 					if (AclService.isPublic(ms, node)) {

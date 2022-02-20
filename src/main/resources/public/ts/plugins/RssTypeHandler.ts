@@ -345,7 +345,7 @@ export class RssTypeHandler extends TypeBase {
                     let audioButton = new Button("Play Audio", () => {
                         let dlg = new AudioPlayerDlg(feed.title, entry.title, null, enc.url, 0, state);
                         dlg.open();
-                    }, null, "btn-primary");
+                    }, { className: "marginTop" }, "btn-primary");
                     children.push(new ButtonBar([audioButton, downloadLink], null, "rssMediaButtons"));
                 }
             });

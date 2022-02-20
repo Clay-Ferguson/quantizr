@@ -1357,7 +1357,7 @@ public class ActPubService extends ServiceBase {
 
                 long delCount = delete.deleteOldActPubPosts(node, ms);
                 totalDelCount += delCount;
-                log.debug("Foreign User: " + userName + ". Deleted " + delCount);
+                log.debug("User: " + userName + ". Deletes: " + delCount);
             }
             String message = "AP Maintence Complete. Deleted " + String.valueOf(totalDelCount) + " old posts.";
             log.debug(message);

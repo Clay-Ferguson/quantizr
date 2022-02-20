@@ -77,8 +77,8 @@ public class MongoDelete extends ServiceBase  {
 	public long deleteOldActPubPosts(SubNode parent, MongoSession ms) {
 		Query q = new Query();
 
-		// date 30 days ago.
-		LocalDate ldt = LocalDate.now().minusDays(30);
+		// date 90 days ago.
+		LocalDate ldt = LocalDate.now().minusDays(90);
 		Date date = Date.from(ldt.atStartOfDay(ZoneId.systemDefault()).toInstant());
 
 		Criteria crit = Criteria.where(SubNode.PATH).regex(mongoUtil.regexRecursiveChildrenOfPath(parent.getPath())) //
