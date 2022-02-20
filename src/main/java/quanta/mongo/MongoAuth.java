@@ -16,7 +16,6 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Component;
-import opennlp.tools.util.StringUtil;
 import quanta.config.NodePath;
 import quanta.config.ServiceBase;
 import quanta.config.SessionContext;
@@ -190,7 +189,7 @@ public class MongoAuth extends ServiceBase {
 			ac.put(parent.getOwner().toHexString(), new AccessControl(null, "rd,wr"));
 
 			// if no content, and the parent isn't our own node
-			if (StringUtil.isEmpty(child.getContent()) && !auth.ownedByThreadUser(parent)) {
+			if (StringUtils.isEmpty(child.getContent()) && !auth.ownedByThreadUser(parent)) {
 				SubNode parentUserNode = read.getNode(ms, parent.getOwner());
 				if (ok(parentUserNode)) {
 					child.setContent("@" + parentUserNode.getStr(NodeProp.USER) + " ");

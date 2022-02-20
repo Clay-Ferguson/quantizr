@@ -122,7 +122,7 @@ public class ActPubFollowing extends ServiceBase {
                         return null;
                     }
 
-                    log.debug("getLongUserNameFromActorUrl: " + followerActor); // + "\n" + XString.prettyPrint(followerActor));
+                    log.debug("getLongUserNameFromActorUrl: " + followerActorUrl); // + "\n" + XString.prettyPrint(followerActor));
                     String followerUserName = apUtil.getLongUserNameFromActor(followerActor);
 
                     // this will lookup the user AND import if it's a non-existant user

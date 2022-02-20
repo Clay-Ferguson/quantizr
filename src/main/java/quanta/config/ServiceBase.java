@@ -132,7 +132,7 @@ public class ServiceBase {
 	public static SimpleMongoClientDatabaseFactory mdbf;
 
 	public ServiceBase() {
-		log.debug("ServiceBase: " + getClass().getName());
+		// log.debug("ServiceBase: " + getClass().getName());
 	}
 
 	public static void init(ApplicationContext ctx) {

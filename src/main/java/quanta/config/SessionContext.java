@@ -109,7 +109,7 @@ public class SessionContext extends ServiceBase {
 	private String watchingPath;
 
 	public SessionContext() {
-		log.trace(String.format("Creating Session object hashCode[%d]", hashCode()));
+		// log.trace(String.format("Creating Session object hashCode[%d]", hashCode()));
 
 		synchronized (allSessions) {
 			allSessions.add(this);

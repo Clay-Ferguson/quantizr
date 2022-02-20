@@ -6,6 +6,7 @@ import javax.servlet.http.HttpServletResponse;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,7 +21,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
-import opennlp.tools.util.StringUtil;
 import quanta.actpub.model.APObj;
 import quanta.config.AppProp;
 import quanta.config.ServiceBase;
@@ -31,10 +31,6 @@ import quanta.util.XString;
 
 /**
  * Main REST Controller endpoint for AP
- * 
- * todo-0: For methods that specify multiple 'produces' content types, should we detect which JSON
- * subtype is being requested for and be sure to SET that type in the response, and when do we need
- * to also respond with charset and profile? Ever?
  */
 @Controller
 // @CrossOrigin is done by AppFilter.
@@ -70,10 +66,6 @@ public class ActPubController extends ServiceBase {
 		Object ret = apUtil.generateWebFinger(resource);
 		if (ok(ret)) {
 			HttpHeaders hdr = new HttpHeaders();
-			/*
-			 * todo-0: My example calls to Mastodon servers DID include char charset in the returned content
-			 * type, so it's an open question whether it's better to include charset here?
-			 */
 			setContentType(hdr, req, APConst.MTYPE_JRD_JSON);
 			return new ResponseEntity<Object>(ret, hdr, HttpStatus.OK);
 		}
@@ -182,8 +174,6 @@ public class ActPubController extends ServiceBase {
 		}
 	}
 
-	// todo-0: for this and all similar methods with tons of 'produces' I need to research and
-	// find out if these CHARSETS an PROFILES are always needed.
 	@RequestMapping(value = {"/"}, method = RequestMethod.GET, produces = {//
 			APConst.CTYPE_LD_JSON, //
 			// APConst.CTYPE_LD_JSON + "; " + APConst.CHARSET, //
@@ -319,7 +309,7 @@ public class ActPubController extends ServiceBase {
 	 * default type
 	 */
 	private void setContentType(HttpHeaders hdr, HttpServletRequest req, MediaType defaultType) {
-		if (!StringUtil.isEmpty(req.getContentType())) {
+		if (ok(req) && !StringUtils.isEmpty(req.getContentType())) {
 			hdr.setContentType(MediaType.valueOf(req.getContentType()));
 		} else {
 			hdr.setContentType(defaultType);
