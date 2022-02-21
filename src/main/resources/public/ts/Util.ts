@@ -208,9 +208,9 @@ export class Util {
         // return Array.prototype.map.call(new Uint8Array(buffer), x => ('00' + x.toString(16)).slice(-2)).join('');
 
         // Diferent Algorithm:
-        var hexStr = "";
-        for (var i = 0; i < arr.length; i++) {
-            var hex = (arr[i] & 0xff).toString(16);
+        let hexStr = "";
+        for (let i = 0; i < arr.length; i++) {
+            let hex = (arr[i] & 0xff).toString(16);
             hex = (hex.length === 1) ? "0" + hex : hex;
             hexStr += hex;
         }
@@ -222,9 +222,9 @@ export class Util {
             return new Uint8Array([]);
         }
 
-        var a = [];
-        for (var i = 0, len = str.length; i < len; i += 2) {
-            a.push(parseInt(str.substr(i, 2), 16));
+        let a = [];
+        for (let i = 0, len = str.length; i < len; i += 2) {
+            a.push(parseInt(str.substring(i, i + 2), 16));
         }
 
         return new Uint8Array(a);
@@ -1326,7 +1326,7 @@ export class Util {
     }
 
     processUrlParams = (state: AppState): void => {
-        var passCode = S.util.getParameterByName("passCode");
+        let passCode = S.util.getParameterByName("passCode");
         if (passCode) {
             setTimeout(() => {
                 new ChangePasswordDlg(passCode, state).open();
