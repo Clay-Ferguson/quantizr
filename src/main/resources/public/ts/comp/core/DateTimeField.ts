@@ -12,7 +12,7 @@ export class DateTimeField extends Span {
     constructor(private dateTimeState: ValidatedState<any>) {
         super(null);
         Object.assign(this.attribs, {
-            className: "input-group"
+            className: "input-group marginTop"
         });
 
         this.dateState.v.stateTranslator = (s: any): any => {
@@ -59,7 +59,7 @@ export class DateTimeField extends Span {
         let isoStr = dateTime.toISOString();
         // console.log("isoStr: " + isoStr);
 
-        let dateStr = isoStr.substr(0, 10);
+        let dateStr = isoStr.substring(0, 10);
         this.dateState.setValue(dateStr);
 
         let hourStr: string = "" + dateTime.getUTCHours();

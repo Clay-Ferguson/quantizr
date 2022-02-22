@@ -49,7 +49,6 @@ export class EditNodeDlg extends DialogBase {
     static embedInstance: EditNodeDlg;
     editorHelp: string = null;
     header: Header;
-    deletePropButton: IconButton;
     public contentEditor: I.TextEditorIntf;
     contentEditorState: ValidatedState<any> = new ValidatedState<any>();
     nameState: ValidatedState<any> = new ValidatedState<any>();
@@ -287,6 +286,7 @@ export class EditNodeDlg extends DialogBase {
         }
 
         let numPropsShowing: number = 0;
+        // put the this property processing in a method (todo-0)
         if (state.node.properties) {
             // This loop creates all the editor input fields for all the properties
             state.node.properties.forEach((prop: J.PropertyInfo) => {
@@ -313,25 +313,24 @@ export class EditNodeDlg extends DialogBase {
         let allowPropAdd: boolean = typeHandler ? typeHandler.getAllowPropertyAdd() : true;
         if (allowPropAdd) {
             if (numPropsShowing > 0) {
+                let state = this.getState<LS>();
                 let propsButtonBar: ButtonBar = new ButtonBar([
-                    new IconButton("fa fa-plus", null, {
+                    new IconButton("fa-plus", null, {
                         onClick: () => this.utl.addProperty(this),
                         title: "Add property"
                     }),
-                    this.deletePropButton = new IconButton("fa fa-trash", null, {
+                    state.selectedProps.size > 0 ? new IconButton("fa-trash", null, {
                         onClick: () => this.utl.deletePropertiesButtonClick(this),
                         title: "Delete property"
-                    })
+                    }) : null
                 ], null, "float-end");
-
-                this.deletePropButton.setEnabled(false);
 
                 // adds the button bar to the top of the list of children.
                 propsParent.safeGetChildren().unshift(new Span("Properties"), propsButtonBar, new Clearfix());
             }
         }
 
-        let binarySection: LayoutRow = hasAttachment ? this.makeBinarySection(state) : null;
+        let binarySection: LayoutRow = hasAttachment ? this.makeAttachmentPanel(state) : null;
 
         let sharingNames = S.nodeUtil.getSharingNames(state.node, false);
         let sharingDiv = null;
@@ -403,7 +402,7 @@ export class EditNodeDlg extends DialogBase {
     }
 
     // Generate GUI for handling the display info about any Node Attachments
-    makeBinarySection = (state: LS) => {
+    makeAttachmentPanel = (state: LS) => {
         let ipfsLink = S.props.getPropStr(J.NodeProp.IPFS_LINK, state.node);
         let mime = S.props.getPropStr(J.NodeProp.BIN_MIME, state.node);
 
@@ -428,18 +427,18 @@ export class EditNodeDlg extends DialogBase {
             new PropValueHolder(this.getState<LS>().node, J.NodeProp.IMG_SIZE, "100%")) : null;
 
         let topBinRow = new HorizontalLayout([
-            new Div(null, { className: "bigMarginRight" }, [
-                new Div((ipfsLink ? "IPFS " : "") + "Attachment", {
-                    className: "smallHeading"
-                }),
-                new NodeCompBinary(state.node, true, false, null)
-            ]),
+            new NodeCompBinary(state.node, true, false, null),
 
             new HorizontalLayout([
-                new Button("Remove", () => this.utl.deleteUpload(this), {
-                    className: "marginRight",
-                    title: "Remove this attachment"
-                }),
+                new Div(null, { className: "bigPaddingRight" }, [
+                    new Div((ipfsLink ? "IPFS " : "") + "Attachment", {
+                        className: "smallHeading"
+                    }),
+                    new Button("Remove", () => this.utl.deleteUpload(this), {
+                        className: "marginRight",
+                        title: "Remove this attachment"
+                    })
+                ]),
                 imgSizeSelection,
                 pinCheckbox
             ])
@@ -557,8 +556,6 @@ export class EditNodeDlg extends DialogBase {
                 title: "Add Property"
             }) : null,
 
-            this.editorHelp ? new HelpButton(() => this.editorHelp) : null,
-
             // show delete button only if we're in a fullscreen viewer (like Calendar view)
             S.util.fullscreenViewerActive(this.appState)
                 ? new Button("Delete", () => {
@@ -566,35 +563,32 @@ export class EditNodeDlg extends DialogBase {
                     this.close();
                 }) : null,
 
-            advancedButtons ? new Icon({
-                className: "fa " + (S.speech.speechActive ? "fa-microphone-slash" : "fa-microphone") + " fa-lg editorButtonIcon",
+            advancedButtons ? new IconButton((S.speech.speechActive ? "fa-microphone-slash" : "fa-microphone"), null, {
                 title: "Toggle on/off Speech Recognition to input text",
                 onClick: () => this.utl.speechRecognition(this)
             }) : null,
 
-            advancedButtons ? new Icon({
-                className: "fa fa-clock-o fa-lg editorButtonIcon",
+            advancedButtons ? new IconButton("fa-clock-o", null, {
                 title: "Insert current time at cursor",
                 onClick: () => this.utl.insertTime(this)
             }) : null,
 
-            advancedButtons && !datePropExists ? new Icon({
-                className: "fa fa-calendar fa-lg editorButtonIcon",
+            advancedButtons && !datePropExists ? new IconButton("fa-calendar", null, {
                 title: "Add 'date' property to node (makes Calendar entry)",
                 onClick: () => this.utl.addDateProperty(this)
             }) : null,
 
-            advancedButtons ? new Icon({
-                className: "fa fa-user fa-lg editorButtonIcon",
+            advancedButtons ? new IconButton("fa-user", null, {
                 title: "Insert username/mention at cursor",
                 onClick: () => this.utl.insertMention(this)
             }) : null,
 
-            advancedButtons ? new Icon({
-                className: "fa fa-smile-o fa-lg editorButtonIcon",
+            advancedButtons ? new IconButton("fa-smile-o", null, {
                 title: "Insert emoji at cursor",
                 onClick: () => this.utl.insertEmoji(this)
-            }) : null
+            }) : null,
+
+            this.editorHelp ? new HelpButton(() => this.editorHelp) : null
         ]);
     }
 
@@ -631,7 +625,8 @@ export class EditNodeDlg extends DialogBase {
     }
 
     makePropEditor = (typeHandler: TypeHandlerIntf, propEntry: J.PropertyInfo, allowCheckbox: boolean, rows: number): Div => {
-        let tableRow = new Div();
+        let tableRow = new Div(null, { className: "marginBottomIfNotLast" });
+
         let allowEditAllProps: boolean = this.appState.isAdminUser;
         let isReadOnly = S.render.isReadOnlyProperty(propEntry.name);
         let editItems = [];
@@ -668,7 +663,7 @@ export class EditNodeDlg extends DialogBase {
                         else {
                             state.selectedProps.delete(propEntry.name);
                         }
-                        this.deletePropButton.setEnabled(state.selectedProps.size > 0);
+                        this.mergeState<LS>({ selectedProps: state.selectedProps });
                     },
                     getValue: (): boolean => {
                         return this.getState<LS>().selectedProps.has(propEntry.name);
@@ -703,7 +698,7 @@ export class EditNodeDlg extends DialogBase {
 
             editItems.push(valEditor as any as Comp);
         }
-        tableRow.addChildren([new Div(null, null, editItems)]);
+        tableRow.setChildren(editItems);
         return tableRow;
     }
 

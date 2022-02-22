@@ -897,6 +897,10 @@ Will come back later and study this more. todo-1 */
     margin-right: $bigGap; 
 }
 
+.bigPaddingRight {
+    padding-right: $bigGap; 
+}
+
 .bigMarginTop {
     margin-top: $bigGap; 
 }
@@ -920,6 +924,12 @@ Will come back later and study this more. todo-1 */
 
 .marginBottom {
     margin-bottom: $smallGap;
+}
+
+.marginBottomIfNotLast {
+    &:not(:last-child) { 
+        margin-bottom: $smallGap;
+    }
 }
 
 .marginAll {
@@ -1162,11 +1172,6 @@ Will come back later and study this more. todo-1 */
 .timelinePanel {
     // padding: $smallGap;
     // margin: $smallGap;
-}
-
-.editorButtonIcon {
-    margin-left: $smallGap;
-    cursor: pointer;
 }
 
 .mainNodeContentStyle {
