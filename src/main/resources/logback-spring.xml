@@ -55,6 +55,11 @@ should do normal editing in /src/main/resources/logback-spring.xml which is the 
         <appender-ref ref="RollingFile" />
     </logger>
 
+    <!-- To activate AuditFilter let level to DEBUG or TRACE, and yes there IS more info in TRACE mode than DEBUG -->
+    <logger name="quanta.filter.AuditFilter" level="info" additivity="false">
+        <appender-ref ref="RollingFile" />
+    </logger>
+
     <logger name="org.springframework" level="warn" additivity="false">
         <appender-ref ref="RollingFile" />
         <appender-ref ref="Console" />

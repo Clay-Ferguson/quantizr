@@ -28,7 +28,6 @@ public class AuditFilter extends GenericFilterBean {
 
 	private static String INDENT = "    ";
 	private static boolean enabled = true;
-	private static boolean verbose = false; // todo-0: make this optional setting live by admin
 
 	@Override
 	public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
@@ -46,7 +45,7 @@ public class AuditFilter extends GenericFilterBean {
 			chain.doFilter(request, response);
 		} finally {
 			if (enabled) {
-				if (verbose) {
+				if (log.isTraceEnabled()) {
 					if (response instanceof HttpServletResponse) {
 						HttpServletResponse sres = (HttpServletResponse) response;
 						postProcess(sreq, sres);
@@ -265,8 +264,8 @@ public class AuditFilter extends GenericFilterBean {
 		if (no(sreq))
 			return;
 
-		// NON-VERBOSE
-		if (!verbose) {
+		// NON-VERBOSE Logging
+		if (log.isDebugEnabled() && !log.isTraceEnabled()) {
 			StringBuilder sb = new StringBuilder();
 			sb.append("REQ: ");
 			sb.append(sreq.getMethod());
@@ -280,25 +279,25 @@ public class AuditFilter extends GenericFilterBean {
 			sb.append(sreq.getRemoteAddr());
 			sb.append("]");
 			// sb.append(" SpringAuth=" + Util.isSpringAuthenticated());
-			log.trace(sb.toString());
-			return;
-		}
-
-		// VERBOSE
-		try {
-			StringBuilder sb = new StringBuilder();
-			sb.append("\n>\n");
-			sb.append(getConfigParamInfo());
-			sb.append(getRequestInfo(sreq));
-			sb.append(getRequestParameterInfo(sreq));
-			sb.append(getHeaderInfo(sreq));
-			sb.append(getParameterInfo(sreq));
-			sb.append(getAttributeInfo(sreq));
-			sb.append(getSessionAttributeInfo(sreq));
-			// sb.append(" SpringAuth=" + Util.isSpringAuthenticated());
-			log.trace(sb.toString());
-		} catch (Exception e) {
-			log.error("error", e);
+			log.debug(sb.toString());
+		} 
+		// VERBOSE Logging
+		else if (log.isTraceEnabled()) {
+			try {
+				StringBuilder sb = new StringBuilder();
+				sb.append("\n>\n");
+				sb.append(getConfigParamInfo());
+				sb.append(getRequestInfo(sreq));
+				sb.append(getRequestParameterInfo(sreq));
+				sb.append(getHeaderInfo(sreq));
+				sb.append(getParameterInfo(sreq));
+				sb.append(getAttributeInfo(sreq));
+				sb.append(getSessionAttributeInfo(sreq));
+				// sb.append(" SpringAuth=" + Util.isSpringAuthenticated());
+				log.trace(sb.toString());
+			} catch (Exception e) {
+				log.error("error", e);
+			}
 		}
 	}
 
