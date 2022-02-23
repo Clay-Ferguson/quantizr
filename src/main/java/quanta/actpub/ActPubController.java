@@ -38,6 +38,9 @@ public class ActPubController extends ServiceBase {
 	private static final Logger log = LoggerFactory.getLogger(ActPubController.class);
 
 	@Autowired
+    private ActPubLog apLog;
+
+	@Autowired
 	private AppProp prop;
 
 	private static final ObjectMapper mapper = new ObjectMapper();
@@ -62,7 +65,7 @@ public class ActPubController extends ServiceBase {
 	public @ResponseBody Object webFinger(//
 			@RequestParam(value = "resource", required = true) String resource, //
 			HttpServletRequest req) {
-		apUtil.log("getWebFinger: " + resource);
+		apLog.trace("getWebFinger: " + resource);
 		Object ret = apUtil.generateWebFinger(resource);
 		if (ok(ret)) {
 			HttpHeaders hdr = new HttpHeaders();
@@ -92,7 +95,7 @@ public class ActPubController extends ServiceBase {
 			HttpServletRequest req, //
 			HttpServletResponse res) throws Exception {
 		String url = prop.getProtocolHostAndPort() + "/u/" + userName + "/home";
-		apUtil.log("Redirecting to: " + url);
+		apLog.trace("Redirecting to: " + url);
 		res.sendRedirect(url);
 	}
 
@@ -108,7 +111,7 @@ public class ActPubController extends ServiceBase {
 	})
 	public @ResponseBody Object actor(//
 			@PathVariable(value = "userName", required = true) String userName, HttpServletRequest req) {
-		apUtil.log("getActor: " + userName);
+		apLog.trace("getActor: " + userName);
 		Object ret = apub.generateActor(userName);
 		if (ok(ret)) {
 			HttpHeaders hdr = new HttpHeaders();
@@ -135,7 +138,7 @@ public class ActPubController extends ServiceBase {
 			HttpServletRequest req) {
 		try {
 			APObj payload = mapper.readValue(body, new TypeReference<>() {});
-			apUtil.log("shared INBOX incoming payload: " + XString.prettyPrint(payload));
+			apLog.trace("shared INBOX incoming payload: " + XString.prettyPrint(payload));
 			ActPubService.inboxCount++;
 			apub.processInboxPost(req, payload);
 			return new ResponseEntity<String>(HttpStatus.OK);
@@ -165,7 +168,7 @@ public class ActPubController extends ServiceBase {
 			HttpServletRequest httpReq) {
 		try {
 			APObj payload = mapper.readValue(body, new TypeReference<>() {});
-			apUtil.log("AP INBOX incoming: " + XString.prettyPrint(payload));
+			apLog.trace("AP INBOX incoming: " + XString.prettyPrint(payload));
 			ActPubService.inboxCount++;
 			apub.processInboxPost(httpReq, payload);
 			return new ResponseEntity<String>(HttpStatus.OK);
@@ -232,7 +235,7 @@ public class ActPubController extends ServiceBase {
 		}
 
 		if (ok(ret)) {
-			apUtil.log("Reply with Outbox: " + XString.prettyPrint(ret));
+			apLog.trace("Reply with Outbox: " + XString.prettyPrint(ret));
 			HttpHeaders hdr = new HttpHeaders();
 			setContentType(hdr, req, APConst.MTYPE_ACT_JSON);
 			return new ResponseEntity<Object>(ret, hdr, HttpStatus.OK);
@@ -264,7 +267,7 @@ public class ActPubController extends ServiceBase {
 		}
 
 		if (ok(ret)) {
-			apUtil.log("Reply with Followers: " + XString.prettyPrint(ret));
+			apLog.trace("Reply with Followers: " + XString.prettyPrint(ret));
 			HttpHeaders hdr = new HttpHeaders();
 			setContentType(hdr, req, APConst.MTYPE_ACT_JSON);
 			return new ResponseEntity<Object>(ret, hdr, HttpStatus.OK);
@@ -295,7 +298,7 @@ public class ActPubController extends ServiceBase {
 		}
 
 		if (ok(ret)) {
-			apUtil.log("Reply with Following: " + XString.prettyPrint(ret));
+			apLog.trace("Reply with Following: " + XString.prettyPrint(ret));
 			HttpHeaders hdr = new HttpHeaders();
 			setContentType(hdr, req, APConst.MTYPE_ACT_JSON);
 			return new ResponseEntity<Object>(ret, hdr, HttpStatus.OK);

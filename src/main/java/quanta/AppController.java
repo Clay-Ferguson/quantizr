@@ -40,6 +40,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
+import quanta.actpub.ActPubLog;
 import quanta.config.AppProp;
 import quanta.config.GracefulShutdown;
 import quanta.config.ServiceBase;
@@ -164,6 +165,9 @@ public class AppController extends ServiceBase implements ErrorController {
 	private static final Logger log = LoggerFactory.getLogger(AppController.class);
 
 	public static final HashMap<String, Integer> uniqueUserIpHits = new HashMap<>();
+
+	@Autowired
+	private ActPubLog apLog;
 
 	@Autowired
 	private AppProp prop;
@@ -1458,6 +1462,9 @@ public class AppController extends ServiceBase implements ErrorController {
 			log.debug("DEBUG: " + req.getText());
 			log.info("INFO: " + req.getText());
 			log.trace("TRACE: " + req.getText());
+
+			// log this one to get test ActPubLog log level
+			apLog.trace("apLog TRACE: "+req.getText());
 			res.setSuccess(true);
 			return res;
 		});

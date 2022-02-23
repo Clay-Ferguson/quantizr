@@ -60,6 +60,9 @@ public class ActPubUtil extends ServiceBase {
     private static final Logger log = LoggerFactory.getLogger(ActPubUtil.class);
 
     @Autowired
+    private ActPubLog apLog;
+
+    @Autowired
     private AppProp prop;
 
     /*
@@ -229,7 +232,7 @@ public class ActPubUtil extends ServiceBase {
     public void securePost(String userDoingPost, MongoSession ms, String privateKey, String toInbox, String actor, APObj message,
             MediaType acceptType, MediaType postType) {
         try {
-            log("Secure post to " + toInbox);
+            apLog.trace("Secure post to " + toInbox);
             /* if private key not sent then get it using the session */
             if (no(privateKey)) {
                 privateKey = apCrypto.getPrivateKey(ms, userDoingPost);
@@ -241,7 +244,7 @@ public class ActPubUtil extends ServiceBase {
 
             String body = XString.prettyPrint(message);
             byte[] bodyBytes = body.getBytes(StandardCharsets.UTF_8);
-            log("Posting Object:\n" + body);
+            apLog.trace("Posting Object:\n" + body);
 
             byte[] privKeyBytes = Base64.getDecoder().decode(privateKey);
             KeyFactory kf = KeyFactory.getInstance("RSA");
@@ -465,7 +468,7 @@ public class ActPubUtil extends ServiceBase {
                                                     .put(APObj.type, APConst.CTYPE_ACT_JSON) //
                                                     .put(APObj.href, makeActorUrlForUserName(username))));
 
-                            log("Reply with WebFinger: " + XString.prettyPrint(webFinger));
+                            apLog.trace("Reply with WebFinger: " + XString.prettyPrint(webFinger));
                             return webFinger;
                         }
                     }
@@ -708,13 +711,6 @@ public class ActPubUtil extends ServiceBase {
                         return;
                 }
             }
-        }
-    }
-
-    // see logback-spring.xml!
-    public void log(String message) {
-        if (prop.isApLog()) {
-            log.trace(message);
         }
     }
 

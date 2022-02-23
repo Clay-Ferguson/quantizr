@@ -26,6 +26,7 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.WebAuthenticationDetails;
 import org.springframework.stereotype.Component;
+import quanta.actpub.ActPubLog;
 import quanta.config.AppProp;
 import quanta.config.NodeName;
 import quanta.config.ServiceBase;
@@ -84,6 +85,9 @@ import quanta.util.XString;
 @Component
 public class UserManagerService extends ServiceBase {
 	private static final Logger log = LoggerFactory.getLogger(UserManagerService.class);
+
+	@Autowired
+    private ActPubLog apLog;
 
 	@Autowired
 	private AppProp prop;
@@ -693,7 +697,7 @@ public class UserManagerService extends ServiceBase {
 	}
 
 	public DeleteFriendResponse deleteFriend(MongoSession ms, String delUserNodeId, String parentType) {
-		// apUtil.log("deleteFriend request: " + XString.prettyPrint(req));
+		// apLog.trace("deleteFriend request: " + XString.prettyPrint(req));
 		DeleteFriendResponse res = new DeleteFriendResponse();
 		ms = ThreadLocals.ensure(ms);
 
@@ -718,7 +722,7 @@ public class UserManagerService extends ServiceBase {
 	 * if the user wasn't already a friend
 	 */
 	public AddFriendResponse addFriend(MongoSession ms, AddFriendRequest req) {
-		// apUtil.log("addFriend request: " + XString.prettyPrint(req));
+		// apLog.trace("addFriend request: " + XString.prettyPrint(req));
 		AddFriendResponse res = new AddFriendResponse();
 		String userName = ThreadLocals.getSC().getUserName();
 
@@ -748,7 +752,7 @@ public class UserManagerService extends ServiceBase {
 
 			// if friendNode was non-null here it means we were already following the user.
 			if (no(friendNode)) {
-				apUtil.log("loadForeignUser: " + newUserName);
+				apLog.trace("loadForeignUser: " + newUserName);
 				apub.loadForeignUser(newUserName);
 
 				SubNode userNode = arun.run(s -> {
@@ -762,7 +766,7 @@ public class UserManagerService extends ServiceBase {
 				// the DB enforcing this.
 				deleteFriend(mst, userNode.getIdStr(), NodeType.BLOCKED_USERS.s());
 
-				apUtil.log("Creating friendNode for " + newUserName);
+				apLog.trace("Creating friendNode for " + newUserName);
 				friendNode = edit.createFriendNode(mst, followerFriendList, newUserName);
 
 				if (ok(friendNode)) {

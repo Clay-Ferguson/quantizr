@@ -37,6 +37,9 @@ public class ActPubFollower extends ServiceBase {
     private static final Logger log = LoggerFactory.getLogger(ActPubFollower.class);
 
     @Autowired
+    private ActPubLog apLog;
+
+    @Autowired
     private AppProp prop;
 
     /**
@@ -98,7 +101,7 @@ public class ActPubFollower extends ServiceBase {
         APObj outbox = apUtil.getJson(url, APConst.MTYPE_ACT_JSON);
         // ActPubService.outboxQueryCount++;
         // ActPubService.cycleOutboxQueryCount++;
-        apUtil.log("Followers: " + XString.prettyPrint(outbox));
+        apLog.trace("Followers: " + XString.prettyPrint(outbox));
         return outbox;
     }
 

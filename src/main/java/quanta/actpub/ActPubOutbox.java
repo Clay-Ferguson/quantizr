@@ -44,6 +44,9 @@ public class ActPubOutbox extends ServiceBase {
     private static final Logger log = LoggerFactory.getLogger(ActPubOutbox.class);
 
     @Autowired
+    private ActPubLog apLog;
+
+    @Autowired
     private AppProp prop;
 
     /**
@@ -152,7 +155,7 @@ public class ActPubOutbox extends ServiceBase {
         APObj outbox = apUtil.getJson(url, APConst.MTYPE_ACT_JSON);
         ActPubService.outboxQueryCount++;
         ActPubService.cycleOutboxQueryCount++;
-        apUtil.log("Outbox [" + url + "]\n" + XString.prettyPrint(outbox));
+        apLog.trace("Outbox [" + url + "]\n" + XString.prettyPrint(outbox));
         return outbox;
     }
 
@@ -275,7 +278,7 @@ public class ActPubOutbox extends ServiceBase {
             String userName = read.getNodeOwner(as, node);
             APObj ret = makeAPForNote(as, userName, nodeIdBase, node);
             if (ok(ret)) {
-                apUtil.log("Reply with Object: " + XString.prettyPrint(ret));
+                apLog.trace("Reply with Object: " + XString.prettyPrint(ret));
             }
             return ret;
         });

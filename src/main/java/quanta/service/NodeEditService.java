@@ -11,7 +11,9 @@ import org.apache.commons.lang3.StringUtils;
 import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import quanta.actpub.ActPubLog;
 import quanta.actpub.model.APList;
 import quanta.config.NodeName;
 import quanta.config.ServiceBase;
@@ -60,6 +62,9 @@ import quanta.util.XString;
 @Component
 public class NodeEditService extends ServiceBase {
 	private static final Logger log = LoggerFactory.getLogger(NodeEditService.class);
+
+	@Autowired
+    private ActPubLog apLog;
 
 	/*
 	 * Creates a new node as a *child* node of the node specified in the request. Should ONLY be called
@@ -188,7 +193,7 @@ public class NodeEditService extends ServiceBase {
 				newNode.set(NodeProp.ACT_PUB_ACTOR_URL.s(), userToFollowActorUrl);
 			}
 
-			apUtil.log("Saved Friend Node (as a Follow): " + XString.prettyPrint(newNode));
+			apLog.trace("Saved Friend Node (as a Follow): " + XString.prettyPrint(newNode));
 			update.save(ms, newNode);
 			return newNode;
 		} else {
@@ -499,7 +504,7 @@ public class NodeEditService extends ServiceBase {
 		if (ok(friendUserName)) {
 			// if a foreign user, update thru ActivityPub.
 			if (friendUserName.contains("@") && !ThreadLocals.getSC().isAdmin()) {
-				apUtil.log("calling setFollowing=true, to post follow to foreign server.");
+				apLog.trace("calling setFollowing=true, to post follow to foreign server.");
 				String followerUser = ThreadLocals.getSC().getUserName();
 				apFollowing.setFollowing(followerUser, friendUserName, true);
 			}

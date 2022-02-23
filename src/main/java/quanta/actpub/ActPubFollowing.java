@@ -43,6 +43,9 @@ public class ActPubFollowing extends ServiceBase {
     private static final Logger log = LoggerFactory.getLogger(ActPubFollowing.class);
 
     @Autowired
+    private ActPubLog apLog;
+
+    @Autowired
     private AppProp prop;
 
     /**
@@ -52,7 +55,7 @@ public class ActPubFollowing extends ServiceBase {
      */
     public void setFollowing(String followerUserName, String apUserName, boolean following) {
         try {
-            apUtil.log("Local Follower User (person doing the): " + followerUserName + " setFollowing: " + apUserName
+            apLog.trace("Local Follower User (person doing the): " + followerUserName + " setFollowing: " + apUserName
                     + "following=" + following);
             // admin doesn't follow/unfollow
             if (PrincipalName.ADMIN.s().equalsIgnoreCase(followerUserName)) {
@@ -88,7 +91,7 @@ public class ActPubFollowing extends ServiceBase {
                     apUtil.securePost(followerUserName, ms, null, toInbox, sessionActorUrl, action, null,
                             APConst.MTYPE_LD_JSON_PROF);
                 } else {
-                    apUtil.log("Unable to get actor to post to: " + actorUrlOfUserBeingFollowed);
+                    apLog.trace("Unable to get actor to post to: " + actorUrlOfUserBeingFollowed);
                 }
                 return null;
             });
@@ -109,7 +112,7 @@ public class ActPubFollowing extends ServiceBase {
         // Actor URL of actor doing the following
         String followerActorUrl = AP.str(followAction, APObj.actor);
         if (no(followerActorUrl)) {
-            apUtil.log("no 'actor' found on follows action request posted object");
+            apLog.trace("no 'actor' found on follows action request posted object");
             return;
         }
 
@@ -118,7 +121,7 @@ public class ActPubFollowing extends ServiceBase {
                 try {
                     APObj followerActor = apUtil.getActorByUrl(followerActorUrl);
                     if (no(followerActor)) {
-                        apUtil.log("no followerActor object gettable from actor: " + followerActorUrl);
+                        apLog.trace("no followerActor object gettable from actor: " + followerActorUrl);
                         return null;
                     }
 
@@ -128,7 +131,7 @@ public class ActPubFollowing extends ServiceBase {
                     // this will lookup the user AND import if it's a non-existant user
                     SubNode followerAccountNode = apub.getAcctNodeByUserName(as, followerUserName);
                     if (no(followerAccountNode)) {
-                        apUtil.log("unable to import user " + followerUserName);
+                        apLog.trace("unable to import user " + followerUserName);
                         throw new RuntimeException("Unable to get or import user: " + followerUserName);
                     }
 
@@ -177,7 +180,7 @@ public class ActPubFollowing extends ServiceBase {
 
                     if (no(friendNode)) {
                         if (!unFollow) {
-                            apUtil.log("unable to find user node by name: " + followerUserName + " so creating.");
+                            apLog.trace("unable to find user node by name: " + followerUserName + " so creating.");
                             friendNode = edit.createFriendNode(as, followerFriendList, userToFollow);
                             // userFeed.sendServerPushInfo(localUserName,
                             // new NotificationMessage("apReply", null, contentHtml, toUserName));
@@ -193,7 +196,7 @@ public class ActPubFollowing extends ServiceBase {
 
                     // Now we send back to the server the Accept response, asynchronously
                     exec.run(() -> {
-                        apUtil.log("Sending Follow Accepted.");
+                        apLog.trace("Sending Follow Accepted.");
                         String privateKey = apCrypto.getPrivateKey(as, userToFollow);
 
                         // Try to give the server a bit of time, before sending back the accept/reject
@@ -306,7 +309,7 @@ public class ActPubFollowing extends ServiceBase {
         APObj outbox = apUtil.getJson(url, APConst.MTYPE_ACT_JSON);
         // ActPubService.outboxQueryCount++;
         // ActPubService.cycleOutboxQueryCount++;
-        apUtil.log("Following: " + XString.prettyPrint(outbox));
+        apLog.trace("Following: " + XString.prettyPrint(outbox));
         return outbox;
     }
 

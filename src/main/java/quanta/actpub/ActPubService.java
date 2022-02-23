@@ -50,6 +50,9 @@ public class ActPubService extends ServiceBase {
     private static final Logger log = LoggerFactory.getLogger(ActPubService.class);
 
     @Autowired
+    private ActPubLog apLog;
+
+    @Autowired
     private AppProp prop;
 
     public static final boolean ENGLISH_LANGUAGE_CHECK = false;
@@ -118,14 +121,14 @@ public class ActPubService extends ServiceBase {
                                 noteUrl, privateMessage, attachments);
 
                         for (String inbox : sharedInboxes) {
-                            apUtil.log("Posting to Shared Inbox: " + inbox);
+                            apLog.trace("Posting to Shared Inbox: " + inbox);
                             try {
                                 apUtil.securePost(fromUser, ms, null, inbox, fromActor, message, null,
                                         APConst.MTYPE_LD_JSON_PROF);
                             }
                             // catch error from any server, and ignore, go to next server to send to.
                             catch (Exception e) {
-                                apUtil.log("failed to post to: " + inbox);
+                                apLog.trace("failed to post to: " + inbox);
                             }
                         }
                     }
@@ -219,7 +222,7 @@ public class ActPubService extends ServiceBase {
 
             APObj webFinger = apUtil.getWebFinger(toUserName);
             if (no(webFinger)) {
-                apUtil.log("Unable to get webfinger for " + toUserName);
+                apLog.trace("Unable to get webfinger for " + toUserName);
                 continue;
             }
 
@@ -350,7 +353,7 @@ public class ActPubService extends ServiceBase {
                 log.debug("Can't import a user that's not from a foreign server.");
                 return null;
             }
-            apUtil.log("importing Actor: " + apUserName);
+            apLog.trace("importing Actor: " + apUserName);
 
             saveFediverseName(apUserName);
 
@@ -442,7 +445,7 @@ public class ActPubService extends ServiceBase {
         if (no(type))
             return;
         type = type.trim();
-        apUtil.log("inbox type: " + type);
+        apLog.trace("inbox type: " + type);
 
         switch (type) {
             case APType.Create:
@@ -476,7 +479,7 @@ public class ActPubService extends ServiceBase {
     public void processUndoAction(Object payload) {
         Object obj = AP.obj(payload, APObj.object);
         String type = AP.str(obj, APObj.type);
-        apUtil.log("Undo Type: " + type);
+        apLog.trace("Undo Type: " + type);
         switch (type) {
             case APType.Follow:
                 apFollowing.processFollowAction(obj, true);
@@ -492,10 +495,10 @@ public class ActPubService extends ServiceBase {
     public void processAcceptAction(Object payload) {
         Object obj = AP.obj(payload, APObj.object);
         String type = AP.str(obj, APObj.type);
-        apUtil.log("Accept Type: " + type);
+        apLog.trace("Accept Type: " + type);
         switch (type) {
             case APType.Follow:
-                apUtil.log("Nothing to do for Follow Acceptance. no op.");
+                apLog.trace("Nothing to do for Follow Acceptance. no op.");
                 break;
 
             default:
@@ -508,7 +511,7 @@ public class ActPubService extends ServiceBase {
     @PerfMon(category = "apub")
     public void processCreateAction(HttpServletRequest httpReq, Object payload) {
         arun.<Object>run(ms -> {
-            apUtil.log("processCreateAction");
+            apLog.trace("processCreateAction");
 
             // get actor url from payload object
             String actorUrl = AP.str(payload, APObj.actor);
@@ -529,7 +532,7 @@ public class ActPubService extends ServiceBase {
 
             Object object = AP.obj(payload, APObj.object);
             String type = AP.str(object, APObj.type);
-            apUtil.log("create type: " + type);
+            apLog.trace("create type: " + type);
 
             switch (type) {
                 case APType.ChatMessage:
@@ -549,7 +552,7 @@ public class ActPubService extends ServiceBase {
     @PerfMon(category = "apub")
     public void processDeleteAction(HttpServletRequest httpReq, Object payload) {
         arun.<Object>run(as -> {
-            apUtil.log("processDeleteAction");
+            apLog.trace("processDeleteAction");
             String actorUrl = AP.str(payload, APObj.actor);
             if (no(actorUrl)) {
                 log.debug("no 'actor' found on create action request posted object");
@@ -571,7 +574,7 @@ public class ActPubService extends ServiceBase {
                 log.error("No delete type specified in delete request: " + XString.prettyPrint(payload));
                 return null;
             }
-            apUtil.log("delete type: " + type);
+            apLog.trace("delete type: " + type);
 
             switch (type) {
                 case APType.Tombstone:
@@ -588,7 +591,7 @@ public class ActPubService extends ServiceBase {
     }
 
     public void processCreateTombstone(MongoSession ms, String actorUrl, Object actorObj, Object obj) {
-        apUtil.log("processCreateTombstone");
+        apLog.trace("processCreateTombstone");
         String id = AP.str(obj, APObj.id);
         delete.deleteByPropVal(ms, NodeProp.ACT_PUB_ID.s(), id);
     }
@@ -596,7 +599,7 @@ public class ActPubService extends ServiceBase {
     /* obj is the 'Note' object */
     @PerfMon(category = "apub")
     public void processCreateNote(MongoSession ms, String actorUrl, Object actorObj, Object obj) {
-        apUtil.log("processCreateNote");
+        apLog.trace("processCreateNote");
         /*
          * If this is a 'reply' post then parse the ID out of this, and if we can find that node by that id
          * then insert the reply under that, instead of the default without this id which is to put in
@@ -624,7 +627,7 @@ public class ActPubService extends ServiceBase {
          * If a foreign user is replying to a specific node, we put the reply under that node
          */
         if (ok(nodeBeingRepliedTo)) {
-            apUtil.log("foreign actor replying to a quanta node.");
+            apLog.trace("foreign actor replying to a quanta node.");
             apub.saveNote(ms, null, nodeBeingRepliedTo, obj, false, false);
         }
         /*
@@ -633,7 +636,7 @@ public class ActPubService extends ServiceBase {
          * node will show up in those people's FEEDs
          */
         else {
-            apUtil.log("not reply to existing Quanta node.");
+            apLog.trace("not reply to existing Quanta node.");
             SubNode actorAccountNode = apub.getAcctNodeByActorUrl(ms, actorUrl);
             if (ok(actorAccountNode)) {
                 String userName = actorAccountNode.getStr(NodeProp.USER.s());
@@ -659,7 +662,7 @@ public class ActPubService extends ServiceBase {
     @PerfMon(category = "apub")
     public void saveNote(MongoSession ms, SubNode toAccountNode, SubNode parentNode, Object obj, boolean forcePublic,
             boolean temp) {
-        apUtil.log("saveNote"); // + XString.prettyPrint(obj));
+        apLog.trace("saveNote"); // + XString.prettyPrint(obj));
         String id = AP.str(obj, APObj.id);
 
         /*
@@ -669,7 +672,7 @@ public class ActPubService extends ServiceBase {
          */
         SubNode dupNode = read.findNodeByProp(ms, parentNode, NodeProp.ACT_PUB_ID.s(), id);
         if (ok(dupNode)) {
-            // apUtil.log("duplicate ActivityPub post ignored: " + id);
+            // apLog.trace("duplicate ActivityPub post ignored: " + id);
             return;
         }
 
@@ -715,7 +718,7 @@ public class ActPubService extends ServiceBase {
         SubNode newNode =
                 create.createNode(ms, parentNode, null, null, 0L, CreateNodeLocation.LAST, null, toAccountNode.getId(), true);
 
-        apUtil.log("createNode");
+        apLog.trace("createNode");
 
         // todo-1: need a new node prop type that is just 'html' and tells us to render
         // content as raw html if set, or for now
@@ -788,11 +791,11 @@ public class ActPubService extends ServiceBase {
                     /* The spec allows either a 'followers' URL here or an 'actor' URL here */
                     shareToUsersForUrl(ms, node, (String) to);
                 } else {
-                    apUtil.log("to list entry not supported: " + to.getClass().getName());
+                    apLog.trace("to list entry not supported: " + to.getClass().getName());
                 }
             }
         } else {
-            apUtil.log("No addressing to " + propName);
+            apLog.trace("No addressing to " + propName);
         }
     }
 
@@ -801,7 +804,7 @@ public class ActPubService extends ServiceBase {
      * shares the node to either all the followers or the specific actor
      */
     private void shareToUsersForUrl(MongoSession ms, SubNode node, String url) {
-        apUtil.log("shareToUsersForUrl: " + url);
+        apLog.trace("shareToUsersForUrl: " + url);
 
         if (apUtil.isPublicAddressed(url)) {
             node.safeGetAc().put(PrincipalName.PUBLIC.s(), new AccessControl(null, PrivilegeType.READ.s()));
@@ -854,7 +857,7 @@ public class ActPubService extends ServiceBase {
      */
     @PerfMon(category = "apub")
     private void shareNodeToActorByUrl(MongoSession ms, SubNode node, String actorUrl) {
-        apUtil.log("Sharing node to actorUrl: " + actorUrl);
+        apLog.trace("Sharing node to actorUrl: " + actorUrl);
         /*
          * Yes we tolerate for this to execute with the 'public' designation in place of an actorUrl here
          */
@@ -894,10 +897,10 @@ public class ActPubService extends ServiceBase {
         }
 
         if (ok(acctId)) {
-            apUtil.log("node shared to UserNodeId: " + acctId);
+            apLog.trace("node shared to UserNodeId: " + acctId);
             node.safeGetAc().put(acctId, new AccessControl(null, PrivilegeType.READ.s() + "," + PrivilegeType.WRITE.s()));
         } else {
-            apUtil.log("not sharing to this user.");
+            apLog.trace("not sharing to this user.");
         }
     }
 
@@ -991,7 +994,7 @@ public class ActPubService extends ServiceBase {
 
                         .put(APObj.supportsFriendRequests, true);
 
-                apUtil.log("Reply with Actor: " + XString.prettyPrint(actor));
+                apLog.trace("Reply with Actor: " + XString.prettyPrint(actor));
                 return actor;
             }
         } catch (Exception e) {
@@ -1195,7 +1198,7 @@ public class ActPubService extends ServiceBase {
 
     public void loadForeignUser(String userName) {
         arun.run(ms -> {
-            apUtil.log("Reload user outbox: " + userName);
+            apLog.trace("Reload user outbox: " + userName);
             SubNode userNode = getAcctNodeByUserName(ms, userName);
             if (no(userNode)) {
                 // log.debug("Unable to getAccount Node for userName: "+userName);

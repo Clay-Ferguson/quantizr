@@ -42,10 +42,6 @@ public class AppProp {
 	// if false this disables all backgrouind processing.
 	private boolean daemonsEnabled = true;
 
-	// turns on verbose ActivityPub Logging
-	// todo-2: need an admin console where stuff like this can be turned on/off live.
-	private boolean apLog = false; // todo-0: document this, and create a way to turn it on from admin menu.
-
 	private String protocolHostAndPort = null;
 
 	public static final ObjectMapper yamlMapper = new ObjectMapper(new YAMLFactory());
@@ -316,13 +312,5 @@ public class AppProp {
 	public void setDaemonsEnabled(boolean daemonsEnabled) {
 		this.daemonsEnabled = daemonsEnabled;
 		log.debug("setDaemonsEnabled: " + String.valueOf(daemonsEnabled));
-	}
-
-	public boolean isApLog() {
-		return apLog;
-	}
-
-	public void setApLog(boolean apLog) {
-		this.apLog = apLog;
 	}
 }

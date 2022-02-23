@@ -48,7 +48,10 @@ should do normal editing in /src/main/resources/logback-spring.xml which is the 
     </logger>
     -->
 
-    <logger name="quanta.actpub.ActPubUtil" level="trace" additivity="false">
+    <!-- This is the single point to turn on 'trace' level debugging (level=trace) for pretty much all
+        of the ActivityPub processing. Leaving as 'debug' level here turns it all of, but setting trace
+        turns it all on. -->
+    <logger name="quanta.actpub.ActPubLog" level="debug" additivity="false">
         <appender-ref ref="RollingFile" />
     </logger>
 
