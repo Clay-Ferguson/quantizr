@@ -578,8 +578,7 @@ export class Util {
                     console.error("Request failed: msg=" + msg);
 
                     status = error.response ? error.response.status : "";
-                    this.showMessage("Failed: " + status +
-                        (error.message ? (": " + error.message) : ""), "Warning", true);
+                    this.showMessage("Failed: " + status + " " + (error.message || ""), "Warning", true);
                 } catch (ex) {
                     this.logAndReThrow("Failed processing: " + postName, ex);
                 }

@@ -285,51 +285,7 @@ export class EditNodeDlg extends DialogBase {
             }
         }
 
-        let numPropsShowing: number = 0;
-        // put the this property processing in a method (todo-0)
-        if (state.node.properties) {
-            // This loop creates all the editor input fields for all the properties
-            state.node.properties.forEach((prop: J.PropertyInfo) => {
-                // console.log("prop=" + S.util.prettyPrint(prop));
-
-                if (!this.allowEditAllProps && !S.render.allowPropertyEdit(state.node, prop.name, this.appState)) {
-                    // console.log("Hiding property: " + prop.name);
-                    return;
-                }
-
-                if (this.allowEditAllProps || (
-                    !S.render.isReadOnlyProperty(prop.name) || S.edit.showReadOnlyProperties)) {
-
-                    if (!this.isGuiControlBasedProp(prop)) {
-                        let allowSelection = !customProps || !customProps.find(p => p === prop.name);
-                        let tableRow = this.makePropEditor(typeHandler, prop, allowSelection, typeHandler ? typeHandler.getEditorRowsForProp(prop.name) : 1);
-                        numPropsShowing++;
-                        propsParent.addChild(tableRow);
-                    }
-                }
-            });
-        }
-
-        let allowPropAdd: boolean = typeHandler ? typeHandler.getAllowPropertyAdd() : true;
-        if (allowPropAdd) {
-            if (numPropsShowing > 0) {
-                let state = this.getState<LS>();
-                let propsButtonBar: ButtonBar = new ButtonBar([
-                    new IconButton("fa-plus", null, {
-                        onClick: () => this.utl.addProperty(this),
-                        title: "Add property"
-                    }),
-                    state.selectedProps.size > 0 ? new IconButton("fa-trash", null, {
-                        onClick: () => this.utl.deletePropertiesButtonClick(this),
-                        title: "Delete property"
-                    }) : null
-                ], null, "float-end");
-
-                // adds the button bar to the top of the list of children.
-                propsParent.safeGetChildren().unshift(new Span("Properties"), propsButtonBar, new Clearfix());
-            }
-        }
-
+        this.buildPropertiesEditing(propsParent, state, typeHandler, customProps);
         let binarySection: LayoutRow = hasAttachment ? this.makeAttachmentPanel(state) : null;
 
         let sharingNames = S.nodeUtil.getSharingNames(state.node, false);
@@ -375,6 +331,53 @@ export class EditNodeDlg extends DialogBase {
         propertyEditFieldContainer.setChildren([mainPropsTable, sharingDiv, sharingDivClearFix, binarySection, rightFloatButtons,
             new Clearfix()]);
         return children;
+    }
+
+    buildPropertiesEditing = (propsParent: CompIntf, state: LS, typeHandler: TypeHandlerIntf, customProps: string[]): void => {
+        let numPropsShowing: number = 0;
+        // put the this property processing in a method (todo-0)
+        if (state.node.properties) {
+            // This loop creates all the editor input fields for all the properties
+            state.node.properties.forEach((prop: J.PropertyInfo) => {
+                // console.log("prop=" + S.util.prettyPrint(prop));
+
+                if (!this.allowEditAllProps && !S.render.allowPropertyEdit(state.node, prop.name, this.appState)) {
+                    // console.log("Hiding property: " + prop.name);
+                    return;
+                }
+
+                if (this.allowEditAllProps || (
+                    !S.render.isReadOnlyProperty(prop.name) || S.edit.showReadOnlyProperties)) {
+
+                    if (!this.isGuiControlBasedProp(prop)) {
+                        let allowSelection = !customProps || !customProps.find(p => p === prop.name);
+                        let tableRow = this.makePropEditor(typeHandler, prop, allowSelection, typeHandler ? typeHandler.getEditorRowsForProp(prop.name) : 1);
+                        numPropsShowing++;
+                        propsParent.addChild(tableRow);
+                    }
+                }
+            });
+        }
+
+        let allowPropAdd: boolean = typeHandler ? typeHandler.getAllowPropertyAdd() : true;
+        if (allowPropAdd) {
+            if (numPropsShowing > 0) {
+                let state = this.getState<LS>();
+                let propsButtonBar: ButtonBar = new ButtonBar([
+                    new IconButton("fa-plus", null, {
+                        onClick: () => this.utl.addProperty(this),
+                        title: "Add property"
+                    }),
+                    state.selectedProps.size > 0 ? new IconButton("fa-trash", null, {
+                        onClick: () => this.utl.deletePropertiesButtonClick(this),
+                        title: "Delete property"
+                    }) : null
+                ], null, "float-end");
+
+                // adds the button bar to the top of the list of children.
+                propsParent.safeGetChildren().unshift(new Span("Properties"), propsButtonBar, new Clearfix());
+            }
+        }
     }
 
     createSearchFieldIconButtons = (): Comp => {
@@ -646,6 +649,7 @@ export class EditNodeDlg extends DialogBase {
         // and be better with a Textfield based editor
         if (!allowEditAllProps && isReadOnly) {
             let textarea = new TextArea(label + " (read-only)", {
+                placeholder: "Enter property value...",
                 readOnly: "readOnly",
                 disabled: "disabled"
             }, propState);
@@ -692,7 +696,11 @@ export class EditNodeDlg extends DialogBase {
                 }
                 else {
                     // console.log("Creating TextField for property: " + propEntry.name + " value=" + propValStr);
-                    valEditor = new TextField({ inputClass: S.props.getInputClassForType(propEntry.name), val: propState });
+                    valEditor = new TextField({
+                        placeholder: "Enter property value...",
+                        inputClass: S.props.getInputClassForType(propEntry.name),
+                        val: propState
+                    });
                 }
             }
 
