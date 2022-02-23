@@ -10,18 +10,19 @@ import { Div } from "./comp/core/Div";
 import { Heading } from "./comp/core/Heading";
 import { HorizontalLayout } from "./comp/core/HorizontalLayout";
 import { Img } from "./comp/core/Img";
+import { Span } from "./comp/core/Span";
 import { NodeCompTableRowLayout } from "./comp/node/NodeCompTableRowLayout";
 import { NodeCompVerticalRowLayout } from "./comp/node/NodeCompVerticalRowLayout";
-import { Span } from "./comp/core/Span";
 import { Constants as C } from "./Constants";
 import { MessageDlg } from "./dlg/MessageDlg";
 import { UserProfileDlg } from "./dlg/UserProfileDlg";
 import { NodeActionType } from "./enums/NodeActionType";
+import { TabDataIntf } from "./intf/TabDataIntf";
 import { TypeHandlerIntf } from "./intf/TypeHandlerIntf";
 import * as J from "./JavaIntf";
+import { NodeMetaIntf } from "./JavaIntf";
 import { PubSub } from "./PubSub";
 import { S } from "./Singletons";
-import { TabDataIntf } from "./intf/TabDataIntf";
 
 function imageErrorFunc(evt: any) {
     console.log("remove broken img");
@@ -566,7 +567,7 @@ export class Render {
         }
     }
 
-    /* Get information for each node. Namely for now just the 'hasChildren' state because it takes a actual query
+    /* Get information for each node. Namely for now just the 'hasChildren' state because it takes an actual query
     per node to find that out.
 
     Note: Users will be able to see the fading in fadeInRowBkgClz class for the length of time it takes
@@ -574,7 +575,7 @@ export class Render {
     by keeping user busy watching something.
 
     This function will perform well even if called repeatedly. Only does the work once as neccessary so we can call this
-    safely after every time we get new data from the server, with no unnecessarey performance hit.
+    safely after every time we get new data from the server, with no significant performance hit.
     */
     getNodeMetaInfo = async (node: J.NodeInfo) => {
         if (node && node.children) {
@@ -582,11 +583,7 @@ export class Render {
             // haven't yet pulled the metadata yet.
             let ids: string[] = [];
 
-            for (let child of node.children) {
-                if (!(child as any).metaInfDone) {
-                    ids.push(child.id);
-                }
-            }
+            this.getIncompleteMetaIds(node, ids);
 
             if (ids.length > 0) {
                 // console.log("MetaQuery idCount=" + ids.length);
@@ -597,27 +594,48 @@ export class Render {
                 dispatch("Action_updateNodeMetaInfo", (s: AppState): AppState => {
                     if (s.node && s.node.children) {
                         s.node.hasChildren = true;
-
-                        // iterate all children
-                        for (let child of s.node.children) {
-
-                            // if this is a child we will have just pulled down
-                            if (!(child as any).metaInfDone) {
-
-                                // find the child in what we just pulled down.
-                                let inf: J.NodeMetaIntf = res.nodeIntf.find(v => v.id === child.id);
-
-                                // set the hasChildren to the value we just pulled down.
-                                if (inf) {
-                                    child.hasChildren = inf.hasChildren;
-                                }
-                                (child as any).metaInfDone = true;
-                            }
-                        }
+                        this.updateHasChildren(s.node, res.nodeIntf);
                     }
                     return s;
                 });
             }
+        }
+    }
+
+    getIncompleteMetaIds = (node: J.NodeInfo, ids: string[]): void => {
+        if (!node || !node.children) return;
+
+        for (let child of node.children) {
+            if (!(child as any).metaInfDone) {
+                ids.push(child.id);
+            }
+
+            // call recursively to process any sub-children
+            this.getIncompleteMetaIds(child, ids);
+        }
+    }
+
+    updateHasChildren = (node: J.NodeInfo, nodeIntf: NodeMetaIntf[]): void => {
+        if (!node || !node.children) return;
+        node.hasChildren = true;
+
+        for (let child of node.children) {
+
+            // if this is a child we will have just pulled down
+            if (!(child as any).metaInfDone) {
+
+                // find the child in what we just pulled down.
+                let inf: J.NodeMetaIntf = nodeIntf.find(v => v.id === child.id);
+
+                // set the hasChildren to the value we just pulled down.
+                if (inf) {
+                    child.hasChildren = inf.hasChildren;
+                }
+                (child as any).metaInfDone = true;
+            }
+
+            // call recursively to process any sub-children
+            this.updateHasChildren(child, nodeIntf);
         }
     }
 
