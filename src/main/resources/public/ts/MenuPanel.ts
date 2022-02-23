@@ -462,6 +462,7 @@ export class MenuPanel extends Div {
             children.push(new Menu("Admin - Test", [
                 new MenuItem("IPFS PubSub", () => S.view.runServerCommand("ipfsPubSubTest", "PubSub Test", null, state)), //
                 new MenuItem("Send Email", () => S.util.sendTestEmail()),
+                new MenuItem("Server Log Text", () => S.util.sendLogText()),
                 new MenuItem("Notification Display", () => S.util.showSystemNotification("Test Title", "This is a test message")),
                 new MenuItem("Encryption", async () => {
                     await S.encryption.test();

@@ -64,6 +64,7 @@ services:
         network_mode: host 
 
         environment:
+            logging.config: /log/logback.xml
             XMS: "${XMS}"
             XMX: "${XMX}"
             # Can be a comma-delimited list of TestIntf-derived tests to run

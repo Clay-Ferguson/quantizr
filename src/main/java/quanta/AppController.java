@@ -106,6 +106,7 @@ import quanta.request.SaveUserPreferencesRequest;
 import quanta.request.SaveUserProfileRequest;
 import quanta.request.SearchAndReplaceRequest;
 import quanta.request.SelectAllNodesRequest;
+import quanta.request.SendLogTextRequest;
 import quanta.request.SendTestEmailRequest;
 import quanta.request.SetCipherKeyRequest;
 import quanta.request.SetNodePositionRequest;
@@ -126,6 +127,7 @@ import quanta.response.GraphResponse;
 import quanta.response.InfoMessage;
 import quanta.response.LogoutResponse;
 import quanta.response.PingResponse;
+import quanta.response.SendLogTextResponse;
 import quanta.response.SendTestEmailResponse;
 import quanta.service.AclService;
 import quanta.service.ExportServiceFlexmark;
@@ -273,8 +275,6 @@ public class AppController extends ServiceBase implements ErrorController {
 				String _id = id;
 
 				arun.run(ms -> {
-					// we don't check ownership of node at this time, but merely check sanity of
-					// whether this ID is even existing or not.
 					SubNode node = read.getNode(ms, _id);
 
 					if (no(node)) {
@@ -1444,6 +1444,20 @@ public class AppController extends ServiceBase implements ErrorController {
 					mail.close();
 				}
 			}
+			res.setSuccess(true);
+			return res;
+		});
+	}
+
+	@RequestMapping(value = API_PATH + "/sendLogText", method = RequestMethod.POST)
+	public @ResponseBody Object sendLogText(@RequestBody SendLogTextRequest req, HttpSession session) {
+		SessionContext.checkReqToken();
+		return callProc.run("sendLogText", req, session, ms -> {
+			ThreadLocals.requireAdmin();
+			SendLogTextResponse res = new SendLogTextResponse();
+			log.debug("DEBUG: " + req.getText());
+			log.info("INFO: " + req.getText());
+			log.trace("TRACE: " + req.getText());
 			res.setSuccess(true);
 			return res;
 		});

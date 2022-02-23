@@ -10,7 +10,7 @@ export dc_app_yaml=docker-compose-distro.yaml
 export ipfs_data=${DEPLOY_TARGET}/ipfs
 export ipfs_staging=${DEPLOY_TARGET}/ipfs/staging
 
-export QUANTA_VER=1.0.22
+export QUANTA_VER=1.0.23
 
 export JAR_FILE=./quanta-0.0.1-SNAPSHOT.jar
 export PORT=8185

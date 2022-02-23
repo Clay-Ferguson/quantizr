@@ -1195,6 +1195,17 @@ export class Util {
         S.util.showMessage("Send Test Email Initiated.", "Note");
     }
 
+    // Used to sent a message to the server simply to log into the log file as DEBUG, INFO, TRACE, for the purpose of
+    // either checking that logging is working, after a live edit of the logger config file or as a text marker
+    // for identifying when specific things are happening by injecting into log file some notes or text.
+    sendLogText = async () => {
+        let text = window.prompt("Enter text to log on server: ");
+        if (text) {
+            await S.util.ajax<J.SendLogTextRequest, J.SendLogTextResponse>("sendLogText", { text });
+            S.util.showMessage("Send log text completed.", "Note");
+        }
+    }
+
     showSystemNotification = (title: string, message: string): void => {
         if (window.Notification && Notification.permission !== "denied") {
             Notification.requestPermission(function (status) { // status is "granted", if accepted by user

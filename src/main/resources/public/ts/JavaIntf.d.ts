@@ -393,6 +393,10 @@ export interface SelectAllNodesRequest extends RequestBase {
     parentNodeId: string;
 }
 
+export interface SendLogTextRequest extends RequestBase {
+    text: string;
+}
+
 export interface SendTestEmailRequest extends RequestBase {
 }
 
@@ -714,6 +718,9 @@ export interface SearchAndReplaceResponse extends ResponseBase {
 
 export interface SelectAllNodesResponse extends ResponseBase {
     nodeIds: string[];
+}
+
+export interface SendLogTextResponse extends ResponseBase {
 }
 
 export interface SendTestEmailResponse extends ResponseBase {

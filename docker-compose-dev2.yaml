@@ -55,6 +55,7 @@ services:
         network_mode: host
 
         environment:
+            logging.config: /log/logback.xml
             XMS: "${XMS}"
             XMX: "${XMX}"
 

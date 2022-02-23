@@ -22,7 +22,8 @@ source ./setenv-distro-runner.sh
 ./stop-distro.sh
 
 echo "removing logs"
-rm -rf ./log/*
+rm -rf ./log/archived/*
+rm -rf ./log/*.log
 
 # Uncomment this to troubeshoot the variable substitutions in the yaml file, and will
 # display a copy of the yaml file after all environment variables have been substituted/evaluated

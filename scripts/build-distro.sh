@@ -1,5 +1,6 @@
 #!/bin/bash
 
+
 # =================================================================================================
 # Builds a production distro zip file, which should be able to be unzipped and run on any
 # linux box to run an instance of the app, with all default settings. Startup scripts in this zip file should
@@ -21,6 +22,12 @@ sudo rm -rf ${DEPLOY_TARGET}/*
 verifySuccess "Cleaned deploy target"
 
 mkdir -p ${DEPLOY_TARGET}
+
+mkdir -p ${DEPLOY_TARGET}/log
+# Copy our primary logger file out to the live-loadable confured location
+# (note: without the 'logging.config' being set in the docker yaml this file would
+# load right from /src/mai/resouces which is the spring default location.)
+cp ${PRJROOT}/src/main/resources/logback-spring.xml ${DEPLOY_TARGET}/log/logback.xml
 
 # copy some configs and scripts to deploy target
 cd ${PRJROOT}

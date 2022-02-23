@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<configuration>
+<!-- NOTE: This file is copied over to /log/logback.xml and configured to exist there in deployments/runtime, but you 
+should do normal editing in /src/main/resources/logback-spring.xml which is the 'master' copy of the file. -->
+<configuration scan="true" scanPeriod="120 seconds">
 
     <property name="LOGS" value="/log" />
 

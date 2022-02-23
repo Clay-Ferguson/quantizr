@@ -28,6 +28,7 @@ services:
         networks:
             - net-dev
         environment:
+            logging.config: /log/logback.xml
             XMS: "${XMS}"
             XMX: "${XMX}"
             

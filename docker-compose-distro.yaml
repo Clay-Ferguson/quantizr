@@ -84,6 +84,7 @@ services:
         networks:
             - net-distro
         environment:
+            logging.config: /log/logback.xml
             XMS: "${XMS}"
             XMX: "${XMX}"
             mongoAdminPassword: "${adminPassword}"

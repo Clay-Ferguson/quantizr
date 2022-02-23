@@ -27,6 +27,11 @@ curl http://${quanta_domain}:${PORT}/mobile/api/shutdown?password=${adminPasswor
 makeDirs
 rm -rf ${QUANTA_BASE}/log/*
 
+# Copy our primary logger file out to the live-loadable confured location
+# (note: without the 'logging.config' being set in the docker yaml this file would
+# load right from /src/mai/resouces which is the spring default location.)
+cp ${PRJROOT}/src/main/resources/logback-spring.xml ${QUANTA_BASE}/log/logback.xml
+
 # Take all the services offline
 cd ${PRJROOT}
 dockerDown ${dc_app_yaml} quanta-dev
