@@ -15,6 +15,7 @@ import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.TextCriteria;
 import org.springframework.stereotype.Component;
+import quanta.config.NodeName;
 import quanta.config.NodePath;
 import quanta.config.ServiceBase;
 import quanta.config.SessionContext;
@@ -261,6 +262,10 @@ public class UserFeedService extends ServiceBase {
 			// todo-1: should be checking apid property instead?
 			crit = crit.and(SubNode.PROPS + "." + NodeProp.ACT_PUB_OBJ_ATTRIBUTED_TO.s()).is(null);
 		}
+
+		// exclude all user's home nodes from appearing in the results. When a user signs up they'll get something like
+		// a node with text "Clay's Node" created and it will be empty, and we don't need them showing up in the feeds.
+		crit = crit.and(SubNode.NAME).ne(NodeName.HOME);
 
 		if (!StringUtils.isEmpty(req.getSearchText())) {
 			TextCriteria textCriteria = TextCriteria.forDefaultLanguage();
