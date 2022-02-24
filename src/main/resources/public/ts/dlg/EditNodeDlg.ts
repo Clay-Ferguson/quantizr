@@ -335,7 +335,6 @@ export class EditNodeDlg extends DialogBase {
 
     buildPropertiesEditing = (propsParent: CompIntf, state: LS, typeHandler: TypeHandlerIntf, customProps: string[]): void => {
         let numPropsShowing: number = 0;
-        // put the this property processing in a method (todo-0)
         if (state.node.properties) {
             // This loop creates all the editor input fields for all the properties
             state.node.properties.forEach((prop: J.PropertyInfo) => {
