@@ -4,10 +4,12 @@ import static quanta.util.Util.no;
 import static quanta.util.Util.ok;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.StringTokenizer;
 import org.apache.commons.lang3.StringUtils;
+import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Sort;
@@ -361,6 +363,15 @@ public class NodeSearchService extends ServiceBase {
 
 			// For public feed statistics only consider PUBLIC nodes.
 			ands.add(Criteria.where(SubNode.AC + "." + PrincipalName.PUBLIC.s()).ne(null));
+
+			HashSet<ObjectId> blockedUserIds = new HashSet<>();
+
+			// filter out any nodes owned by users the admin has blocked.		
+			userFeed.getBlockedUserIds(blockedUserIds, PrincipalName.ADMIN.s());
+			
+			if (blockedUserIds.size() > 0) {
+				ands.add(Criteria.where(SubNode.OWNER).nin(blockedUserIds));
+			}
 
 			crit.andOperator(ands);
 
