@@ -197,8 +197,10 @@ public class UserFeedService extends ServiceBase {
 
 		HashSet<ObjectId> blockedUserIds = new HashSet<>();
 
-		// this logic makes it so that any feeds using 'public' checkbox will have the admin-blocked users
-		// removed from it.
+		/*
+		 * this logic makes it so that any feeds using 'public' checkbox will have the admin-blocked users
+		 * removed from it.
+		 */
 		if (req.getToPublic()) {
 			getBlockedUserIds(blockedUserIds, PrincipalName.ADMIN.s());
 		}
@@ -263,8 +265,10 @@ public class UserFeedService extends ServiceBase {
 			crit = crit.and(SubNode.PROPS + "." + NodeProp.ACT_PUB_OBJ_ATTRIBUTED_TO.s()).is(null);
 		}
 
-		// exclude all user's home nodes from appearing in the results. When a user signs up they'll get something like
-		// a node with text "Clay's Node" created and it will be empty, and we don't need them showing up in the feeds.
+		// exclude all user's home nodes from appearing in the results. When a user signs up they'll get
+		// something like
+		// a node with text "Clay's Node" created and it will be empty, and we don't need them showing up in
+		// the feeds.
 		crit = crit.and(SubNode.NAME).ne(NodeName.HOME);
 
 		if (!StringUtils.isEmpty(req.getSearchText())) {
@@ -278,7 +282,7 @@ public class UserFeedService extends ServiceBase {
 			if ((text.startsWith("#") || text.startsWith("@")) && !text.contains(" ")) {
 				text = "\"" + text + "\"";
 			}
-		
+
 			textCriteria.matching(text);
 			textCriteria.caseSensitive(false);
 			q.addCriteria(textCriteria);

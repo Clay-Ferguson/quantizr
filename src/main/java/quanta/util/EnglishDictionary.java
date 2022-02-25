@@ -42,10 +42,12 @@ public class EnglishDictionary extends ServiceBase {
 			return;
 
 		try {
-			/*
-			 * If you read in a new file here with new stop words in it which you may have just pasted in at the
-			 * bottom or wherever then you can just uncomment the section (with the text
-			 * '/tmp/stop-words-new.txt') below to write them into a new sorted file with dupliates removed
+			/* 
+			 * todo-0: Update: I have a shell script now and here's the entirity of it, which starts with
+			 * unsorted ununique 'servers.txt' and processes it into unique sorted list in 'servers-unique.txt'
+			 * 
+			 *    sed 's/[[:blank:]]//g' servers.txt > cleaned.txt
+			 *    awk '!seen[$0]++' cleaned.txt | sort > servers-unique.txt
 			 */
 			Resource resource = context.getResource("classpath:public/data/stop-words.txt");
 			InputStream is = resource.getInputStream();
@@ -58,12 +60,6 @@ public class EnglishDictionary extends ServiceBase {
 						stopWords.add(tokens.nextToken().trim());
 					}
 				}
-				// ---------------------------------------------------------------
-				// DO NOT DELETE (See note above)
-				// ArrayList<String> wordList = new ArrayList<String>(stopWords);
-				// java.util.Collections.sort(wordList);
-				// writeStringArrayToFile(wordList, "/tmp/stop-words-new.txt");
-				// ---------------------------------------------------------------
 			} finally {
 				StreamUtil.close(in);
 			}
@@ -95,7 +91,6 @@ public class EnglishDictionary extends ServiceBase {
 			return true;
 		return stopWords.contains(word.toLowerCase());
 	}
-
 
 	public void initDictWords() {
 		if (dictWords.size() > 0)

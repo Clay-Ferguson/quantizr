@@ -254,6 +254,8 @@ public class MongoDelete extends ServiceBase  {
 					// + node.getContent());
 					orphanCount++;
 					deleteCount++;
+
+					// todo-0: we should do this in a 'bulk' operation.
 					ops.remove(node);
 
 					/*
