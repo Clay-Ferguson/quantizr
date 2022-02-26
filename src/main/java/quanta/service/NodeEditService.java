@@ -13,6 +13,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import quanta.actpub.APConst;
 import quanta.actpub.ActPubLog;
 import quanta.actpub.model.APList;
 import quanta.config.NodeName;
@@ -145,7 +146,7 @@ public class NodeEditService extends ServiceBase {
 			// if a user to share to (a Direct Message) is provided, add it.
 			if (ok(req.getShareToUserId())) {
 				HashMap<String, AccessControl> ac = new HashMap<>();
-				ac.put(req.getShareToUserId(), new AccessControl(null, PrivilegeType.READ.s() + "," + PrivilegeType.WRITE.s()));
+				ac.put(req.getShareToUserId(), new AccessControl(null, APConst.RDWR));
 				newNode.setAc(ac);
 			}
 			// else maybe public.

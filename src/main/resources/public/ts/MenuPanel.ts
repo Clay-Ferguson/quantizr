@@ -454,6 +454,7 @@ export class MenuPanel extends Div {
                 new MenuItem("Crawl Fediverse", () => S.view.runServerCommand("crawlUsers", "ActPub Crawl Response", null, state)), //
                 new MenuItem("Validate", () => S.view.runServerCommand("validateDb", "Validate DB Response", null, state)), //
                 new MenuItem("Compact", () => S.view.runServerCommand("compactDb", "Compact DB Response", null, state)), //
+                new MenuItem("Run DB Conversion", () => S.view.runServerCommand("runConversion", "Run DB Conversion", null, state)), //
                 new MenuItem("Rebuild Indexes", () => S.view.runServerCommand("rebuildIndexes", "Rebuild Indexes Response", null, state)), //
                 new MenuItem("Lucene: Refresh", () => S.view.runServerCommand("refreshLuceneIndex", null, null, state)),
                 new MenuItem("Delete Node (w/ Orphans)", () => S.view.runServerCommand("deleteLeavingOrphans", "Delete node leaving orphans", null, state)) //

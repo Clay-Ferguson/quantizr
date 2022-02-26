@@ -62,10 +62,13 @@ public class NodeSearchService extends ServiceBase {
 
 	static final String SENTENCE_DELIMS = ".!?";
 
-	/* Warning: Do not add '#' or '@' to this list becasue we're using it to parse text for hashtags and/or usernames
-	so those characters are part of the text. Also since urls sometimes contain something like "/path/#hash=" where a hashtag
-	is used as a parameter in the url we also don't want / or ? or & characters in this delimiters list, and to support
-	hyphenated terms we don't want '-' character as a delimiter either */
+	/*
+	 * Warning: Do not add '#' or '@' to this list becasue we're using it to parse text for hashtags
+	 * and/or usernames so those characters are part of the text. Also since urls sometimes contain
+	 * something like "/path/#hash=" where a hashtag is used as a parameter in the url we also don't
+	 * want / or ? or & characters in this delimiters list, and to support hyphenated terms we don't
+	 * want '-' character as a delimiter either
+	 */
 	static final String WORD_DELIMS = " \n\r\t,;:\"'`()*{}[]<>=\\.!“";
 
 	static final int TRENDING_LIMIT = 10000;
@@ -235,9 +238,10 @@ public class NodeSearchService extends ServiceBase {
 		res.setSearchResults(searchResults);
 		int counter = 0;
 
-		// DO NOT DELETE (may want searching under selected node as an option some day)
-		// we can remove nodeId from req, because we always search from account root
-		// now.
+		/*
+		 * DO NOT DELETE (may want searching under selected node as an option some day) we can remove nodeId
+		 * from req, because we always search from account root now.
+		 */
 		// SubNode searchRoot = api.getNode(session, req.getNodeId());
 
 		// search under account root only
@@ -262,13 +266,14 @@ public class NodeSearchService extends ServiceBase {
 			 */
 			if (ok(req.getShareTarget())) {
 
-				if (!node.safeGetAc().containsKey(req.getShareTarget())) {
+				if (!node.getAc().containsKey(req.getShareTarget())) {
 					continue;
 				}
 
 				// if specifically searching for rd or wr
 				if (ok(req.getAccessOption())) {
-					AccessControl ac = node.safeGetAc().get(req.getShareTarget());
+					AccessControl ac = node.getAc().get(req.getShareTarget());
+
 					// log.debug("NodeId: " + node.getIdStr() + " req=" + req.getAccessOption() + " privs="
 					// + ac.getPrvs());
 					if (req.getAccessOption().contains(PrivilegeType.READ.s()) && //
@@ -370,9 +375,9 @@ public class NodeSearchService extends ServiceBase {
 
 			HashSet<ObjectId> blockedUserIds = new HashSet<>();
 
-			// filter out any nodes owned by users the admin has blocked.		
+			// filter out any nodes owned by users the admin has blocked.
 			userFeed.getBlockedUserIds(blockedUserIds, PrincipalName.ADMIN.s());
-			
+
 			if (blockedUserIds.size() > 0) {
 				ands.add(Criteria.where(SubNode.OWNER).nin(blockedUserIds));
 			}

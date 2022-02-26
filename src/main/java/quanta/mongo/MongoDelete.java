@@ -223,12 +223,12 @@ public class MongoDelete extends ServiceBase {
 		int loops = 0;
 
 		/*
-		 * Run this up to 10 per call. Note that for large orphaned subgraphs we only end up pruning off the
+		 * Run this up to 3 per call. Note that for large orphaned subgraphs we only end up pruning off the
 		 * 10 deepest levels at a time, so running this multiple times will be required, but this is ideal.
 		 * We could raise this 10 to a larger number larger than any possible tree depth, but there's no
 		 * need. Running this several times has the same effect
 		 */
-		while (++loops < 10) {
+		while (++loops < 3) {
 			int nodesProcessed = 0;
 			int deleteCount = 0;
 

@@ -236,8 +236,8 @@ public class ActPubService extends ServiceBase {
                     fromActor = apUtil.makeActorUrlForUserName(fromUser);
                 }
 
-                APObj message = apFactory.newCreateForNote(toUserNames, fromActor, inReplyTo, replyToType, content,
-                        noteUrl, privateMessage, attachments);
+                APObj message = apFactory.newCreateForNote(toUserNames, fromActor, inReplyTo, replyToType, content, noteUrl,
+                        privateMessage, attachments);
 
                 String userDoingPost = ThreadLocals.getSC().getUserName();
                 apUtil.securePost(userDoingPost, ms, null, inbox, fromActor, message, null, APConst.MTYPE_LD_JSON_PROF);
@@ -662,7 +662,7 @@ public class ActPubService extends ServiceBase {
     @PerfMon(category = "apub")
     public void saveNote(MongoSession ms, SubNode toAccountNode, SubNode parentNode, Object obj, boolean forcePublic,
             boolean temp) {
-        apLog.trace("saveNote"); // + XString.prettyPrint(obj));
+        apLog.trace("saveNote" + XString.prettyPrint(obj));
         String id = AP.str(obj, APObj.id);
 
         /*
@@ -807,7 +807,7 @@ public class ActPubService extends ServiceBase {
         apLog.trace("shareToUsersForUrl: " + url);
 
         if (apUtil.isPublicAddressed(url)) {
-            node.safeGetAc().put(PrincipalName.PUBLIC.s(), new AccessControl(null, PrivilegeType.READ.s()));
+            node.safeGetAc().put(PrincipalName.PUBLIC.s(), new AccessControl(null, APConst.RDWR));
             return;
         }
 
@@ -862,7 +862,7 @@ public class ActPubService extends ServiceBase {
          * Yes we tolerate for this to execute with the 'public' designation in place of an actorUrl here
          */
         if (actorUrl.endsWith("#Public")) {
-            node.safeGetAc().put(PrincipalName.PUBLIC.s(), new AccessControl(null, PrivilegeType.READ.s()));
+            node.safeGetAc().put(PrincipalName.PUBLIC.s(), new AccessControl(null, APConst.RDWR));
             return;
         }
 
@@ -898,7 +898,7 @@ public class ActPubService extends ServiceBase {
 
         if (ok(acctId)) {
             apLog.trace("node shared to UserNodeId: " + acctId);
-            node.safeGetAc().put(acctId, new AccessControl(null, PrivilegeType.READ.s() + "," + PrivilegeType.WRITE.s()));
+            node.safeGetAc().put(acctId, new AccessControl(null, APConst.RDWR));
         } else {
             apLog.trace("not sharing to this user.");
         }
@@ -1059,7 +1059,7 @@ public class ActPubService extends ServiceBase {
         apCache.usersPendingRefresh.put(apUserName, false);
     }
 
-    /* every 90 minutes ping all the outboxes */
+    /* every 90 minutes read all the outboxes of all users */
     @Scheduled(fixedDelay = 90 * DateUtil.MINUTE_MILLIS)
     public void bigRefresh() {
         if (!prop.isDaemonsEnabled() || !MongoRepository.fullInit)
@@ -1115,7 +1115,7 @@ public class ActPubService extends ServiceBase {
                  * This is killing performance of the app so let's throttle it way back. Not sure if it's Disk or
                  * network I/O that's the problem but either way let's not read these so fast
                  */
-                Thread.sleep(5000);
+                Thread.sleep(2000);
 
                 // flag as done (even if it fails we still want it flagged as done. no retries will be done).
                 apCache.usersPendingRefresh.put(userName, true);
@@ -1223,6 +1223,7 @@ public class ActPubService extends ServiceBase {
         });
     }
 
+    /* Saves all the pending new FediverseName objects we've accumulated */
     private void saveUserNames() {
         List<String> names = new LinkedList<>(apCache.allUserNames.keySet());
 

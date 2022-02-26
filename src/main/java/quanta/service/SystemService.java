@@ -65,26 +65,53 @@ public class SystemService extends ServiceBase {
 		return "Success.";
 	}
 
+	public String runConversion() {
+		String ret = "";
+		try {
+			prop.setDaemonsEnabled(false);
+
+			arun.run(ms -> {
+				// different types of database conversions can be put here as needed
+				// mongoUtil.fixSharing(ms);
+				return null;
+			});
+			ret = "Completed ok.";
+		} //
+		finally {
+			prop.setDaemonsEnabled(true);
+		}
+		return ret;
+	}
+
 	public String compactDb() {
-		delete.deleteNodeOrphans(null);
-		// do not delete.
-		// usrMgr.cleanUserAccounts();
+		String ret = "";
+		try {
+			prop.setDaemonsEnabled(false);
 
-		/*
-		 * Create map to hold all user account storage statistics which gets updated by the various
-		 * processing in here and then written out in 'writeUserStats' below
-		 */
-		final HashMap<ObjectId, UserStats> statsMap = new HashMap<>();
+			delete.deleteNodeOrphans(null);
+			// do not delete.
+			// usrMgr.cleanUserAccounts();
 
-		attach.gridMaintenanceScan(statsMap);
-		String ret = ipfsGarbageCollect(statsMap);
+			/*
+			 * Create map to hold all user account storage statistics which gets updated by the various
+			 * processing in here and then written out in 'writeUserStats' below
+			 */
+			final HashMap<ObjectId, UserStats> statsMap = new HashMap<>();
 
-		arun.run(ms -> {
-			user.writeUserStats(ms, statsMap);
-			return null;
-		});
+			attach.gridMaintenanceScan(statsMap);
+			ret = ipfsGarbageCollect(statsMap);
 
-		ret += runMongoDbCommand(new Document("compact", "nodes"));
+			arun.run(ms -> {
+				user.writeUserStats(ms, statsMap);
+				return null;
+			});
+
+			ret += runMongoDbCommand(new Document("compact", "nodes"));
+		}
+		//
+		finally {
+			prop.setDaemonsEnabled(true);
+		}
 		return ret;
 	}
 

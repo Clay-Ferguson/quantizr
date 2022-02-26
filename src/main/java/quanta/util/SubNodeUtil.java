@@ -12,12 +12,12 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import quanta.AppController;
+import quanta.actpub.APConst;
 import quanta.config.AppProp;
 import quanta.config.ServiceBase;
 import quanta.model.NodeMetaInfo;
 import quanta.model.client.NodeProp;
 import quanta.model.client.PrincipalName;
-import quanta.model.client.PrivilegeType;
 import quanta.mongo.CreateNodeLocation;
 import quanta.mongo.MongoSession;
 import quanta.mongo.model.AccessControl;
@@ -115,7 +115,7 @@ public class SubNodeUtil extends ServiceBase {
 
 	public void setNodePublicWritable(SubNode node) {
 		HashMap<String, AccessControl> ac = new HashMap<>();
-		ac.put(PrincipalName.PUBLIC.s(), new AccessControl(null, PrivilegeType.READ.s() + "," + PrivilegeType.WRITE.s()));
+		ac.put(PrincipalName.PUBLIC.s(), new AccessControl(null, APConst.RDWR));
 		node.setAc(ac);
 	}
 

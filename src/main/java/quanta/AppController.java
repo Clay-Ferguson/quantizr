@@ -1322,6 +1322,10 @@ public class AppController extends ServiceBase implements ErrorController {
 					res.getMessages().add(new InfoMessage(system.compactDb(), null));
 					break;
 
+				case "runConversion":
+					res.getMessages().add(new InfoMessage(system.runConversion(), null));
+					break;
+
 				case "deleteLeavingOrphans":
 					res.getMessages().add(new InfoMessage(system.deleteLeavingOrphans(ms, req.getNodeId()), null));
 					break;
@@ -1464,7 +1468,7 @@ public class AppController extends ServiceBase implements ErrorController {
 			log.trace("TRACE: " + req.getText());
 
 			// log this one to get test ActPubLog log level
-			apLog.trace("apLog TRACE: "+req.getText());
+			apLog.trace("apLog TRACE: " + req.getText());
 			res.setSuccess(true);
 			return res;
 		});

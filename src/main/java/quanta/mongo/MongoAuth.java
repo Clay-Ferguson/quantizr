@@ -16,6 +16,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Component;
+import quanta.actpub.APConst;
 import quanta.config.NodePath;
 import quanta.config.ServiceBase;
 import quanta.config.SessionContext;
@@ -178,7 +179,7 @@ public class MongoAuth extends ServiceBase {
 			if (ok(userName)) {
 				SubNode accountNode = read.getUserNodeByUserName(ms, userName);
 				if (ok(accountNode)) {
-					ac.put(accountNode.getIdStr(), new AccessControl(null, "rd,wr"));
+					ac.put(accountNode.getIdStr(), new AccessControl(null, APConst.RDWR));
 				}
 			}
 		}
@@ -186,7 +187,7 @@ public class MongoAuth extends ServiceBase {
 		 * otherwise if not a FRIEND node we just share to the owner of the parent node
 		 */
 		else {
-			ac.put(parent.getOwner().toHexString(), new AccessControl(null, "rd,wr"));
+			ac.put(parent.getOwner().toHexString(), new AccessControl(null, APConst.RDWR));
 
 			// if no content, and the parent isn't our own node
 			if (StringUtils.isEmpty(child.getContent()) && !auth.ownedByThreadUser(parent)) {
@@ -660,7 +661,8 @@ public class MongoAuth extends ServiceBase {
 						ac = new HashMap<String, AccessControl>();
 					}
 					acChanged = true;
-					ac.put(acctNodeId, new AccessControl(null, PrivilegeType.READ.s() + "," + PrivilegeType.WRITE.s()));
+					// look for 'rd,wr' in code and convert to this: todo-0, actually make a constant for RDWR
+					ac.put(acctNodeId, new AccessControl(null, APConst.RDWR));
 				}
 			} else {
 				log.debug("Mentioned user not found: " + userName);

@@ -313,9 +313,20 @@ public class SubNode {
 		synchronized (acLock) {
 			if (no(ac)) {
 				ac = new HashMap<>();
+				ThreadLocals.dirty(this);
 			}
 			return ac;
 		}
+	}
+
+	// Write an access control value (todo-0: make this smart enough to only set
+	// dirty when something is changing). Implement an equals method on AccessControl
+	// and use that to check if this method will change anything.
+	@Transient
+	@JsonIgnore
+	public void putAc(String key, AccessControl ac) {
+		safeGetAc().put(key, ac);
+		ThreadLocals.dirty(this);
 	}
 
 	@JsonProperty(AC)

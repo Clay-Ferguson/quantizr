@@ -26,6 +26,7 @@ import org.springframework.data.mongodb.core.index.TextIndexDefinition.TextIndex
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Component;
+import quanta.actpub.APConst;
 import quanta.config.AppProp;
 import quanta.config.NodeName;
 import quanta.config.NodePath;
@@ -39,6 +40,7 @@ import quanta.mongo.model.AccessControl;
 import quanta.mongo.model.FediverseName;
 import quanta.mongo.model.SubNode;
 import quanta.request.SignupRequest;
+import quanta.service.AclService;
 import quanta.util.Const;
 import quanta.util.Convert;
 import quanta.util.ExUtil;
@@ -484,6 +486,35 @@ public class MongoUtil extends ServiceBase {
 				update.saveSession(ms);
 			}
 		}
+	}
+
+	/*
+	 * This process finds all nodes that are remote-outbox loaded items (i.e. have an 'apid' prop), and
+	 * for any that have Public sharing set the sharing on it to RDRW
+	 * 
+	 * This code is being kept as an example, but is no longer itself needed.
+	 */
+	public void fixSharing(MongoSession ms) {
+		log.debug("Processing fixSharing");
+		Iterable<SubNode> nodes = ops.findAll(SubNode.class);
+		int counter = 0;
+
+		for (SubNode node : nodes) {
+			// essentially this converts any 'rd' to 'rdrw', or if 'rdrw' already then nothing is done.
+			if (ok(node.getStr(NodeProp.ACT_PUB_ID)) && AclService.isPublic(ms, node)) {
+				acl.makePublic(ms, node, APConst.RDWR);
+			}
+
+			if (ThreadLocals.getDirtyNodeCount() > 200) {
+				update.saveSession(ms);
+			}
+
+			if (++counter % 2000 == 0) {
+				log.debug("fixShare: " + String.valueOf(counter));
+			}
+		}
+
+		log.debug("fixSharing completed.");
 	}
 
 	/*

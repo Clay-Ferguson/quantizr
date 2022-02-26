@@ -1,8 +1,8 @@
 package quanta.actpub;
 
-import java.nio.charset.StandardCharsets;
 import java.util.Map;
 import org.springframework.http.MediaType;
+import quanta.model.client.PrivilegeType;
 
 /**
  * Ap-related constants.
@@ -43,4 +43,6 @@ public class APConst {
             new MediaType("application", "ld+json", Map.of("profile", "\"https://www.w3.org/ns/activitystreams\""));
 
     public static final String TRUE = "true";
+
+    public static final String RDWR = PrivilegeType.READ.s() + "," + PrivilegeType.WRITE.s();
 }

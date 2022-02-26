@@ -86,7 +86,7 @@ public class AclService extends ServiceBase {
 			if (no(bops)) {
 				bops = ops.bulkOps(BulkMode.UNORDERED, SubNode.class);
 			}
-			
+
 			auth.ownerAuth(ms, n);
 
 			Query query = new Query().addCriteria(new Criteria("id").is(n.getId()));
@@ -422,5 +422,27 @@ public class AclService extends ServiceBase {
 
 	public static boolean isPublic(MongoSession ms, SubNode node) {
 		return ok(node) && ok(node.getAc()) && node.getAc().containsKey(PrincipalName.PUBLIC.s());
+	}
+
+	// todo-0: need to do this everywhere we can (look for 'new AccessControl(' to find places)
+	// The effeciency of using this function is it won't set the node to dirty of nothing changed.
+	public void makePublic(MongoSession ms, SubNode node, String prvs) {
+		// if no privileges exist at all just add the one we need to add
+		if (no(node.getAc())) {
+			node.putAc(PrincipalName.PUBLIC.s(), new AccessControl(null, prvs));
+		}
+		// otherwise first check to see if it's already added
+		else {
+			AccessControl ac = node.getAc().get(PrincipalName.PUBLIC.s());
+			if (ok(ac) && ac.getPrvs().equals(prvs)) {
+				// already had the correct ac, nothing to do here
+			}
+			// else need to add it.
+			else {
+				// todo-0: this kind of code is not setting th dirty flag! 
+				// need fix that across the board.
+				node.putAc(PrincipalName.PUBLIC.s(), new AccessControl(null, prvs));
+			}
+		}
 	}
 }
