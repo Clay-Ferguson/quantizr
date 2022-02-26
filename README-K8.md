@@ -1,6 +1,7 @@
 # Kubernetes Notes
 
 This doc should contain all the relevant info about how to run (at least the DEV environment) in minikube rather than on the host.
+(NOTE: This is a work in progress and Quanta is not YET capable of deploying to K8)
 
 
 Run `k8-start-minikube.sh` first to boot minikube.

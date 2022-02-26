@@ -61,8 +61,12 @@ public class NodeSearchService extends ServiceBase {
 	public static GetNodeStatsResponse trendingFeedInfo;
 
 	static final String SENTENCE_DELIMS = ".!?";
-	// Warning: Do not add '#' or '@', those are special (see below)
-	static final String WORD_DELIMS = " \n\r\t,-;:\"'`()*{}[]<>=\\/.!?&“";
+
+	/* Warning: Do not add '#' or '@' to this list becasue we're using it to parse text for hashtags and/or usernames
+	so those characters are part of the text. Also since urls sometimes contain something like "/path/#hash=" where a hashtag
+	is used as a parameter in the url we also don't want / or ? or & characters in this delimiters list, and to support
+	hyphenated terms we don't want '-' character as a delimiter either */
+	static final String WORD_DELIMS = " \n\r\t,;:\"'`()*{}[]<>=\\.!“";
 
 	static final int TRENDING_LIMIT = 10000;
 
@@ -290,7 +294,7 @@ public class NodeSearchService extends ServiceBase {
 	}
 
 	// replace #<span> with " #". This is a quick and easy way to fix the way
-	// Mastodon mangles hashes in the text.
+	// Mastodon mangles hashtags in the text, to convert them back to hashtags
 	public String fixMastodonMangles(String content) {
 		if (no(content))
 			return null;
