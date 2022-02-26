@@ -161,11 +161,6 @@ public class AclService extends ServiceBase {
 	 * or 'public' (when the node is being shared to public)
 	 * 
 	 * If BulkOperations is non-null we use it instead of a non-bulk operation
-	 * 
-	 * todo-0: check that all mods done in here will set ThreadLocal.dirty(node)
-	 * todo-0: When we're using bops (bulk ops) how do we keep from having the dirty nodes get written duplicating work??????
-	 * ( I think we need to find every place we're doing batch work and call clean() for the node if it's been touched.)
-	 * 
 	 */
 	public boolean addPrivilege(MongoSession ms, BulkOperations bops, SubNode node, String principal, List<String> privileges,
 			AddPrivilegeResponse res) {
