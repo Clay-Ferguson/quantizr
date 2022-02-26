@@ -1243,7 +1243,7 @@ public class AttachmentService extends ServiceBase {
 				}
 			}
 
-			log.debug(String.valueOf(delCount) + " orphans found and deleted.");
+			log.debug(String.valueOf(delCount) + " grid orphans deleted.");
 			return null;
 		});
 	}

@@ -380,7 +380,7 @@ public class MongoUtil extends ServiceBase {
 		return path.startsWith("/") && path.substring(1).indexOf("/") == -1;
 	}
 
-	public Iterable<SubNode> findAllNodes(MongoSession ms) {
+	public Iterable<SubNode> findAll(MongoSession ms) {
 		auth.requireAdmin(ms);
 		update.saveSession(ms);
 		return ops.findAll(SubNode.class);

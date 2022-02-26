@@ -106,10 +106,16 @@ export class NodeCompMainList extends Div {
         }
         else {
             if (!pageTop && !S.nav.displayingRepositoryRoot(state)) {
-                nextNodeButton = new IconButton("fa-chevron-circle-right", null, {
-                    onClick: S.nav.navToNext,
-                    title: "Go to Next Node"
-                });
+
+                // I decided this is too easily mistaken for paging, but what it does is navigate to next sibling node
+                // which is too confusing, so I'm backing this out for now. This same button still *IS* available at
+                // the top of the page on the page root node, and seems more intuitive to be only there, but I want to leave
+                // this commented (not deleted) for now.
+                // nextNodeButton =
+                // new IconButton("fa-chevron-circle-right", null, {
+                //     onClick: S.nav.navToNext,
+                //     title: "Go to Next Node"
+                // });
             }
         }
 

@@ -6,23 +6,28 @@ import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.Date;
 import java.util.HashSet;
+import com.mongodb.bulk.BulkWriteResult;
 import com.mongodb.client.result.DeleteResult;
-import org.apache.commons.codec.digest.DigestUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.mongodb.core.BulkOperations;
+import org.springframework.data.mongodb.core.BulkOperations.BulkMode;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Component;
 import quanta.config.ServiceBase;
+import quanta.exception.base.RuntimeEx;
 import quanta.model.client.NodeProp;
 import quanta.model.client.NodeType;
 import quanta.mongo.model.SubNode;
+import quanta.request.DeleteNodesRequest;
+import quanta.response.DeleteNodesResponse;
 
 /**
  * Performs the 'deletes' (as in CRUD) operations for deleting nodes in MongoDB
  */
 @Component
-public class MongoDelete extends ServiceBase  {
+public class MongoDelete extends ServiceBase {
 	private static final Logger log = LoggerFactory.getLogger(MongoDelete.class);
 
 	public void deleteNode(MongoSession ms, SubNode node, boolean childrenOnly) {
@@ -58,7 +63,8 @@ public class MongoDelete extends ServiceBase  {
 
 		Iterable<SubNode> nodes = mongoUtil.find(q);
 		for (SubNode node : nodes) {
-			if (no(node.getOwner())) continue;
+			if (no(node.getOwner()))
+				continue;
 
 			String key = node.getOwner().toHexString() + "-" + node.getStr(NodeProp.USER_NODE_ID.s());
 			if (keys.contains(key)) {
@@ -125,9 +131,9 @@ public class MongoDelete extends ServiceBase  {
 		q.addCriteria(Criteria.where(SubNode.PATH).regex(mongoUtil.regexRecursiveChildrenOfPath(path)));
 
 		Criteria crit = auth.addSecurityCriteria(ms, null);
-        if (ok(crit)) {
-            q.addCriteria(crit);
-        }
+		if (ok(crit)) {
+			q.addCriteria(crit);
+		}
 
 		DeleteResult res = ops.remove(q, SubNode.class);
 		// log.debug("Num of SubGraph deleted: " + res.getDeletedCount());
@@ -164,7 +170,7 @@ public class MongoDelete extends ServiceBase  {
 		/*
 		 * First delete all the children of the node by using the path, knowing all their paths 'start with'
 		 * (as substring) this path. Note how efficient it is that we can delete an entire subgraph in one
-		 * single operation! Nice!
+		 * single operation!
 		 */
 		Query q = new Query();
 		q.addCriteria(Criteria.where(SubNode.PATH).regex(mongoUtil.regexRecursiveChildrenOfPath(node.getPath())));
@@ -204,26 +210,13 @@ public class MongoDelete extends ServiceBase  {
 		// log.debug("Nodes deleted: " + res.getDeletedCount());
 	}
 
-	/*
-	 * This algorithm requires on the order of one hash value of memory for every non-leaf node in the
-	 * DB to run so it's very fast but at the cost of memory use
-	 */
 	public void deleteNodeOrphans(MongoSession ms) {
 		log.debug("deleteNodeOrphans()");
 		// long nodeCount = read.getNodeCount(null);
 		// log.debug("initial Node Count: " + nodeCount);
 
-		HashSet<String> pathHashSet = new HashSet<>();
 		if (no(ms)) {
 			ms = auth.getAdminSession();
-		}
-
-		Query q = new Query();
-
-		/* Scan every node in the database and store it's path hash in the set */
-		Iterable<SubNode> nodes = mongoUtil.find(q);
-		for (SubNode node : nodes) {
-			pathHashSet.add(DigestUtils.sha256Hex(node.getPath()));
 		}
 
 		int orphanCount = 0;
@@ -236,37 +229,51 @@ public class MongoDelete extends ServiceBase  {
 		 * need. Running this several times has the same effect
 		 */
 		while (++loops < 10) {
+			int nodesProcessed = 0;
+			int deleteCount = 0;
+
+			// bulk operations is scoped only to one iteration, just so it itself can't be too large
+			BulkOperations bops = null;
+
 			/*
 			 * Now scan every node again and any PARENT not in the set means that parent doesn't exist and so
 			 * the node is an orphan and can be deleted.
 			 */
-			nodes = mongoUtil.find(q);
-			int deleteCount = 0;
+			Iterable<SubNode> nodes = ops.findAll(SubNode.class);
+
 			for (SubNode node : nodes) {
+				// print progress every 2000th node
+				if (++nodesProcessed % 2000 == 0) {
+					log.debug("Nodes Processed: " + nodesProcessed);
+				}
+
 				// ignore the root node and any of it's children.
 				if ("/r".equalsIgnoreCase(node.getPath()) || //
 						"/r".equalsIgnoreCase(node.getParentPath())) {
 					continue;
 				}
 
-				if (!pathHashSet.contains(DigestUtils.sha256Hex(node.getParentPath()))) {
-					// log.debug("ORPHAN NODE id=" + node.getIdStr() + " path=" + node.getPath() + " Content="
-					// + node.getContent());
+				/*
+				 * if there's a parent specified (always should be except for root), but we can't find the parent
+				 * then this node is an orphan to be deleted
+				 */
+				if (ok(node.getParent()) && no(ops.findById(node.getParent(), SubNode.class))) {
+					log.debug("DEL ORPHAN id=" + node.getIdStr() + " path=" + node.getPath() + " Content=" + node.getContent());
 					orphanCount++;
 					deleteCount++;
 
-					// todo-0: we should do this in a 'bulk' operation.
-					ops.remove(node);
+					if (no(bops)) {
+						bops = ops.bulkOps(BulkMode.UNORDERED, SubNode.class);
+					}
 
-					/*
-					 * Theoretically the node.getPathHash() should already contain this hash, but to be super paranoid
-					 * we just recalculate that hash here since the consequences of it being out of sync could be data
-					 * loss. Also I do realize we alrady calculated this hash above and could have stored it in memory
-					 * to use here, but we already have pathHashSet being a large memory use here, so we opt to burn
-					 * more CPU cycles for this second hash calc than to burn the memory by storing it above.
-					 */
-					pathHashSet.remove(DigestUtils.sha256Hex(node.getPath()));
+					Query query = new Query().addCriteria(new Criteria("id").is(node.getId()));
+					bops.remove(query);
 				}
+			}
+
+			if (ok(bops)) {
+				BulkWriteResult results = bops.execute();
+				log.debug("Orphans Deleted: " + results.getDeletedCount());
 			}
 
 			// if no deletes were done, break out of while loop and return.
@@ -275,8 +282,59 @@ public class MongoDelete extends ServiceBase  {
 			}
 		}
 
-		// log.debug("ORPHAN NODES DELETED=" + orphanCount);
+		log.debug("TOTAL ORPHANS DELETED=" + orphanCount);
 		// nodeCount = read.getNodeCount(null);
 		// log.debug("final Node Count: " + nodeCount);
+	}
+
+	/*
+	 * Deletes the set of nodes specified in the request
+	 */
+	public DeleteNodesResponse deleteNodes(MongoSession ms, DeleteNodesRequest req) {
+		DeleteNodesResponse res = new DeleteNodesResponse();
+
+		SubNode userNode = read.getUserNodeByUserName(null, null);
+		if (no(userNode)) {
+			throw new RuntimeEx("User not found.");
+		}
+
+		BulkOperations bops = null;
+
+		for (String nodeId : req.getNodeIds()) {
+			// lookup the node we're going to delete
+			SubNode node = read.getNode(ms, nodeId);
+			if (no(node))
+				continue;
+
+			// back out the number of bytes it was using
+			if (!ms.isAdmin()) {
+				/*
+				 * NOTE: There is no equivalent to this on the IPFS code path for deleting ipfs becuase since we
+				 * don't do reference counting we let the garbage collecion cleanup be the only way user quotas are
+				 * deducted from
+				 */
+				user.addNodeBytesToUserNodeBytes(ms, node, userNode, -1);
+			}
+
+			// to directly delete a node by it's specified ID the user doing the delete must own it, or be admin
+			if (ms.isAdmin() || auth.ownedByThreadUser(node)) {
+				// lazy create bulkOps
+				if (no(bops)) {
+					bops = ops.bulkOps(BulkMode.UNORDERED, SubNode.class);
+				}
+
+				Query query = new Query().addCriteria(new Criteria("id").is(node.getId()));
+				bops.remove(query);
+			}
+		}
+
+		if (ok(bops)) {
+			BulkWriteResult results = bops.execute();
+			log.debug("Nodes Deleted: " + results.getDeletedCount());
+		}
+
+		update.saveSession(ms);
+		res.setSuccess(true);
+		return res;
 	}
 }

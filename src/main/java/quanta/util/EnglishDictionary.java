@@ -43,11 +43,11 @@ public class EnglishDictionary extends ServiceBase {
 
 		try {
 			/* 
-			 * todo-0: Update: I have a shell script now and here's the entirity of it, which starts with
-			 * unsorted ununique 'servers.txt' and processes it into unique sorted list in 'servers-unique.txt'
+			 * todo-1: Update: I have a shell script now and here's the entirity of it (below), which starts with
+			 * unsorted ununique 'words.txt' and processes it into unique sorted list in 'words-unique.txt'
 			 * 
-			 *    sed 's/[[:blank:]]//g' servers.txt > cleaned.txt
-			 *    awk '!seen[$0]++' cleaned.txt | sort > servers-unique.txt
+			 *    sed 's/[[:blank:]]//g' words.txt > cleaned.txt
+			 *    awk '!seen[$0]++' cleaned.txt | sort > words-unique.txt
 			 */
 			Resource resource = context.getResource("classpath:public/data/stop-words.txt");
 			InputStream is = resource.getInputStream();

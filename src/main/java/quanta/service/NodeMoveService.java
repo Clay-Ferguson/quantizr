@@ -13,12 +13,10 @@ import quanta.exception.base.RuntimeEx;
 import quanta.model.client.NodeProp;
 import quanta.mongo.MongoSession;
 import quanta.mongo.model.SubNode;
-import quanta.request.DeleteNodesRequest;
 import quanta.request.JoinNodesRequest;
 import quanta.request.MoveNodesRequest;
 import quanta.request.SelectAllNodesRequest;
 import quanta.request.SetNodePositionRequest;
-import quanta.response.DeleteNodesResponse;
 import quanta.response.JoinNodesResponse;
 import quanta.response.MoveNodesResponse;
 import quanta.response.SelectAllNodesResponse;
@@ -179,45 +177,6 @@ public class NodeMoveService extends ServiceBase {
 
 		firstNode.setContent(sb.toString());
 		firstNode.touch();
-		update.saveSession(ms);
-		res.setSuccess(true);
-		return res;
-	}
-
-	/*
-	 * Deletes the set of nodes specified in the request
-	 */
-	public DeleteNodesResponse deleteNodes(MongoSession ms, DeleteNodesRequest req) {
-		DeleteNodesResponse res = new DeleteNodesResponse();
-
-		SubNode userNode = read.getUserNodeByUserName(null, null);
-		if (no(userNode)) {
-			throw new RuntimeEx("User not found.");
-		}
-
-		for (String nodeId : req.getNodeIds()) {
-			// lookup the node we're going to delete
-			SubNode node = read.getNode(ms, nodeId);
-			if (no(node))
-				continue;
-
-			// back out the number of bytes it was using
-			if (!ms.isAdmin()) {
-				/*
-				 * NOTE: There is no equivalent to this on the IPFS code path for deleting ipfs becuase since we
-				 * don't do reference counting we let the garbage collecion cleanup be the only way user quotas are
-				 * deducted from
-				 */
-				user.addNodeBytesToUserNodeBytes(ms, node, userNode, -1);
-			}
-
-			try {
-				delete.deleteNode(ms, node, req.isChildrenOnly());
-			} catch (Exception e) {
-				// ignore failed deletes.
-			}
-		}
-
 		update.saveSession(ms);
 		res.setSuccess(true);
 		return res;
