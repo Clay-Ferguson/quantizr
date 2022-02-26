@@ -128,7 +128,7 @@ export class App extends Main {
                 id: "mainMenu"
                 // only applies to mobile. just don't show title for now.
                 // title: "Show Main Menu"
-            }, "btn-secondary marginRight", "off");
+            }, "btn-secondary menuButton", "off");
 
             let fullScreenViewer = S.util.fullscreenViewerActive(state);
 

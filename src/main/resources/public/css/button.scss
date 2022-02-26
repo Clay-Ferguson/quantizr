@@ -1,5 +1,10 @@
 /* Warning: setting any kind of left margin won't work becasue the btn-group? style of bootstrap overrides it in button groups */
 
+.menuButton {
+    margin-right: $smallGap;
+    width: 10em;
+}
+
 .myNavTab {
     white-space: nowrap;
     min-width: 10em;
