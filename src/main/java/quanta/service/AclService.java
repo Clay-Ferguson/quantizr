@@ -18,6 +18,7 @@ import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Component;
+import quanta.actpub.APConst;
 import quanta.config.ServiceBase;
 import quanta.exception.base.RuntimeEx;
 import quanta.model.client.NodeProp;
@@ -160,6 +161,11 @@ public class AclService extends ServiceBase {
 	 * or 'public' (when the node is being shared to public)
 	 * 
 	 * If BulkOperations is non-null we use it instead of a non-bulk operation
+	 * 
+	 * todo-0: check that all mods done in here will set ThreadLocal.dirty(node)
+	 * todo-0: When we're using bops (bulk ops) how do we keep from having the dirty nodes get written duplicating work??????
+	 * ( I think we need to find every place we're doing batch work and call clean() for the node if it's been touched.)
+	 * 
 	 */
 	public boolean addPrivilege(MongoSession ms, BulkOperations bops, SubNode node, String principal, List<String> privileges,
 			AddPrivilegeResponse res) {
@@ -424,24 +430,25 @@ public class AclService extends ServiceBase {
 		return ok(node) && ok(node.getAc()) && node.getAc().containsKey(PrincipalName.PUBLIC.s());
 	}
 
-	// todo-0: need to do this everywhere we can (look for 'new AccessControl(' to find places)
+	public void makePublicAppendable(MongoSession ms, SubNode node) {
+		setKeylessPriv(ms, node, PrincipalName.PUBLIC.s(), APConst.RDWR);
+	}
+
 	// The effeciency of using this function is it won't set the node to dirty of nothing changed.
-	public void makePublic(MongoSession ms, SubNode node, String prvs) {
+	public void setKeylessPriv(MongoSession ms, SubNode node, String key, String prvs) {
 		// if no privileges exist at all just add the one we need to add
 		if (no(node.getAc())) {
-			node.putAc(PrincipalName.PUBLIC.s(), new AccessControl(null, prvs));
+			node.putAc(key, new AccessControl(null, prvs));
 		}
 		// otherwise first check to see if it's already added
 		else {
-			AccessControl ac = node.getAc().get(PrincipalName.PUBLIC.s());
+			AccessControl ac = node.getAc().get(key);
 			if (ok(ac) && ac.getPrvs().equals(prvs)) {
 				// already had the correct ac, nothing to do here
 			}
 			// else need to add it.
 			else {
-				// todo-0: this kind of code is not setting th dirty flag! 
-				// need fix that across the board.
-				node.putAc(PrincipalName.PUBLIC.s(), new AccessControl(null, prvs));
+				node.putAc(key, new AccessControl(null, prvs));
 			}
 		}
 	}

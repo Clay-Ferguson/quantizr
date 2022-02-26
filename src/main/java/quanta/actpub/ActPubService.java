@@ -807,7 +807,7 @@ public class ActPubService extends ServiceBase {
         apLog.trace("shareToUsersForUrl: " + url);
 
         if (apUtil.isPublicAddressed(url)) {
-            node.safeGetAc().put(PrincipalName.PUBLIC.s(), new AccessControl(null, APConst.RDWR));
+            acl.makePublicAppendable(ms, node);
             return;
         }
 
@@ -862,7 +862,7 @@ public class ActPubService extends ServiceBase {
          * Yes we tolerate for this to execute with the 'public' designation in place of an actorUrl here
          */
         if (actorUrl.endsWith("#Public")) {
-            node.safeGetAc().put(PrincipalName.PUBLIC.s(), new AccessControl(null, APConst.RDWR));
+            acl.makePublicAppendable(ms, node);
             return;
         }
 
@@ -898,7 +898,7 @@ public class ActPubService extends ServiceBase {
 
         if (ok(acctId)) {
             apLog.trace("node shared to UserNodeId: " + acctId);
-            node.safeGetAc().put(acctId, new AccessControl(null, APConst.RDWR));
+            acl.setKeylessPriv(ms, node, acctId, APConst.RDWR);
         } else {
             apLog.trace("not sharing to this user.");
         }

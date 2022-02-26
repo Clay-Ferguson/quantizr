@@ -16,6 +16,6 @@ public class RoomType extends TypeBase {
     }
 
     public void createSubNode(MongoSession ms, Val<SubNode> node, CreateSubNodeRequest req, boolean linkBookmark) {
-        snUtil.setNodePublicWritable(node.getVal());
+        snUtil.setNodePublicAppendable(node.getVal());
     }
 }

@@ -502,7 +502,7 @@ public class MongoUtil extends ServiceBase {
 		for (SubNode node : nodes) {
 			// essentially this converts any 'rd' to 'rdrw', or if 'rdrw' already then nothing is done.
 			if (ok(node.getStr(NodeProp.ACT_PUB_ID)) && AclService.isPublic(ms, node)) {
-				acl.makePublic(ms, node, APConst.RDWR);
+				acl.makePublicAppendable(ms, node);
 			}
 
 			if (ThreadLocals.getDirtyNodeCount() > 200) {

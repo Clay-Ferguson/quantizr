@@ -661,7 +661,6 @@ public class MongoAuth extends ServiceBase {
 						ac = new HashMap<String, AccessControl>();
 					}
 					acChanged = true;
-					// look for 'rd,wr' in code and convert to this: todo-0, actually make a constant for RDWR
 					ac.put(acctNodeId, new AccessControl(null, APConst.RDWR));
 				}
 			} else {

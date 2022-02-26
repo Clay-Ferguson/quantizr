@@ -113,10 +113,11 @@ public class SubNodeUtil extends ServiceBase {
 		return !nonSavableProperties.contains(propertyName);
 	}
 
-	public void setNodePublicWritable(SubNode node) {
-		HashMap<String, AccessControl> ac = new HashMap<>();
-		ac.put(PrincipalName.PUBLIC.s(), new AccessControl(null, APConst.RDWR));
-		node.setAc(ac);
+	public void setNodePublicAppendable(SubNode node) {
+		arun.run(ms -> {
+			acl.makePublicAppendable(ms, node);
+			return null;
+		});
 	}
 
 	public String getFriendlyNodeUrl(MongoSession ms, SubNode node) {

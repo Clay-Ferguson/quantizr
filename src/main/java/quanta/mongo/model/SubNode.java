@@ -319,14 +319,20 @@ public class SubNode {
 		}
 	}
 
-	// Write an access control value (todo-0: make this smart enough to only set
-	// dirty when something is changing). Implement an equals method on AccessControl
-	// and use that to check if this method will change anything.
+	// Write an access control value. Does nothing if same value is already existing.
 	@Transient
 	@JsonIgnore
 	public void putAc(String key, AccessControl ac) {
-		safeGetAc().put(key, ac);
-		ThreadLocals.dirty(this);
+
+		// look up any ac already existing for this key
+		AccessControl thisAc = safeGetAc().get(key);
+
+		// only put the new ac key in the map if the existing was not found or if it's not the same value we
+		// already have
+		if (no(thisAc) || !thisAc.eq(ac)) {
+			safeGetAc().put(key, ac);
+			ThreadLocals.dirty(this);
+		}
 	}
 
 	@JsonProperty(AC)
@@ -377,7 +383,7 @@ public class SubNode {
 			if (no(val)) {
 				changed = props.containsKey(key);
 
-				//todo-1: we can use the return value of 'remove' to set 'changed'.
+				// todo-1: we can use the return value of 'remove' to set 'changed'.
 				props.remove(key);
 			} else {
 				Object curVal = props.get(key);
@@ -391,7 +397,8 @@ public class SubNode {
 	@Transient
 	@JsonIgnore
 	public void delete(String key) {
-		if (no(props)) return;
+		if (no(props))
+			return;
 		ThreadLocals.dirty(this);
 		synchronized (propLock) {
 			props().remove(key);
@@ -407,7 +414,8 @@ public class SubNode {
 	@Transient
 	@JsonIgnore
 	public String getStr(String key) {
-		if (no(props)) return null;
+		if (no(props))
+			return null;
 		try {
 			synchronized (propLock) {
 				Object v = props().get(key);
@@ -431,7 +439,8 @@ public class SubNode {
 	@Transient
 	@JsonIgnore
 	public Long getInt(String key) {
-		if (no(props)) return 0L;
+		if (no(props))
+			return 0L;
 		try {
 			synchronized (propLock) {
 				Object v = props().get(key);
@@ -467,7 +476,8 @@ public class SubNode {
 	@Transient
 	@JsonIgnore
 	public Date getDate(String key) {
-		if (no(props)) return null;
+		if (no(props))
+			return null;
 		try {
 			synchronized (propLock) {
 				Object v = props().get(key);
@@ -489,7 +499,8 @@ public class SubNode {
 	@Transient
 	@JsonIgnore
 	public Double getFloat(String key) {
-		if (no(props)) return 0.0;
+		if (no(props))
+			return 0.0;
 		try {
 			synchronized (propLock) {
 				Object v = props().get(key);
@@ -512,7 +523,8 @@ public class SubNode {
 	@Transient
 	@JsonIgnore
 	public Boolean getBool(String key) {
-		if (no(props)) return false;
+		if (no(props))
+			return false;
 		try {
 			synchronized (propLock) {
 				Object v = props().get(key);
