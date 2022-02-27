@@ -45,7 +45,7 @@ export class ServerPush {
             // S.nav.login(state);
             // window.location.href = window.location.origin;
 
-            new MessageDlg("Session ended.", "Quanta",
+            new MessageDlg("Your session has ended due to inactivity.", "Quanta",
                 () => {
                     history.go(0);
                 }, null, false, 0, "app-modal-content-tiny-width", state
