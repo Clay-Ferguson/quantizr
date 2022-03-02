@@ -268,20 +268,42 @@ public class ActPubUtil extends ServiceBase {
 
             URL url = new URL(toInbox);
             // log.debug("secure post to host: " + url.getHost());
-            String strToSign = "(request-target): post " + url.getPath() + "\nhost: " + url.getHost() + "\ndate: " + date
-                    + "\ndigest: " + digestHeader;
+            String strToSign = "(request-target): post " + url.getPath() + "\n" + //
+                    "host: " + url.getHost() + "\n" + //
+                    "date: " + date + "\n" + //
+                    "digest: " + digestHeader;
 
             Signature sig = Signature.getInstance("SHA256withRSA");
             sig.initSign(privKey);
             sig.update(strToSign.getBytes(StandardCharsets.UTF_8));
             byte[] signature = sig.sign();
 
+            // todo-0: Pleroma is including content-length in the headers list below as headers="(request-target) content-length date digest host", so 
+            // I need to know if Pleroma accepts MY ordering AND list (excluding content-length)
+            // Does the new 'rsa-sha256' map perfectly to my SHA256withRSA string above? (i.e. should they be identical strings?)
+
             String headerSig = "keyId=\"" + actor + "#main-key" + "\",headers=\"(request-target) host date digest\",signature=\""
                     + Base64.getEncoder().encodeToString(signature) + "\"";
 
-            postJson(toInbox, url.getHost(), date, headerSig, digestHeader, body, acceptType, postType);
+            // Run this in a test environment, before going live, to be sure
+            // we haven't broken what little Mastodon support we already have.
+            // String headerSig = "keyId=\"" + actor + "#main-key" + "\",algorithm=\"rsa-sha256\",headers=\"(request-target) host date digest\",signature=\""
+            //         + Base64.getEncoder().encodeToString(signature) + "\"";
+
+            try {
+                postJson(toInbox, url.getHost(), date, headerSig, digestHeader, body, acceptType, postType);
+            }
+            // if a post with 'postType' fails then fallback to trying with known mime type that Pleroma might
+            // be expecting
+            // This is not a PROVEN solution (yet), but experimental attempt at compatability across fediverse
+            // platform types
+            catch (Exception e) {
+                log.error("initial (pre-fallback) secure http post failed to: " + toInbox, e);
+                log.error("trying fallback. Post type: " + APConst.MTYPE_ACT_JSON.toString());
+                postJson(toInbox, url.getHost(), date, headerSig, digestHeader, body, acceptType, APConst.MTYPE_ACT_JSON);
+            }
         } catch (Exception e) {
-            log.error("secure http post failed to: " + toInbox, e);
+            log.error("ALL secure http post failed to: " + toInbox, e);
             throw new RuntimeException(e);
         }
     }
@@ -743,7 +765,7 @@ public class ActPubUtil extends ServiceBase {
     public void deleteNodeNotify(ObjectId nodeId) {
         if (!MongoRepository.fullInit)
             return;
-            
+
         arun.run(ms -> {
             SubNode node = read.getNode(ms, nodeId);
             if (ok(node) && node.getType().equals(NodeType.FRIEND.s())) {

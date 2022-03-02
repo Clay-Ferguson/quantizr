@@ -55,7 +55,7 @@ public class ActPubFollowing extends ServiceBase {
      */
     public void setFollowing(String followerUserName, String apUserName, boolean following) {
         try {
-            apLog.trace("Local Follower User (person doing the): " + followerUserName + " setFollowing: " + apUserName
+            apLog.trace("Local Follower User (person doing the following): " + followerUserName + " setFollowing: " + apUserName
                     + "following=" + following);
             // admin doesn't follow/unfollow
             if (PrincipalName.ADMIN.s().equalsIgnoreCase(followerUserName)) {
@@ -88,6 +88,7 @@ public class ActPubFollowing extends ServiceBase {
                 APObj toActor = apUtil.getActorByUrl(actorUrlOfUserBeingFollowed);
                 if (ok(toActor)) {
                     String toInbox = AP.str(toActor, APObj.inbox);
+
                     apUtil.securePost(followerUserName, ms, null, toInbox, sessionActorUrl, action, null,
                             APConst.MTYPE_LD_JSON_PROF);
                 } else {
@@ -125,7 +126,8 @@ public class ActPubFollowing extends ServiceBase {
                         return null;
                     }
 
-                    log.debug("getLongUserNameFromActorUrl: " + followerActorUrl); // + "\n" + XString.prettyPrint(followerActor));
+                    log.debug("getLongUserNameFromActorUrl: " + followerActorUrl); // + "\n" +
+                                                                                   // XString.prettyPrint(followerActor));
                     String followerUserName = apUtil.getLongUserNameFromActor(followerActor);
 
                     // this will lookup the user AND import if it's a non-existant user

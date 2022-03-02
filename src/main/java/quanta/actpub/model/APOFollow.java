@@ -8,7 +8,13 @@ import quanta.actpub.APConst;
  */
 public class APOFollow extends APObj {
     public APOFollow() {
+        // Worked for non-Pleroma
+        // todo-0: make sure the new way below wont break Mastodon
         put(context, APConst.CONTEXT_STREAMS);
+
+        // Checking if Pleroma is requiring their OWN format
+        // put(context, new APList().val(APConst.CONTEXT_STREAMS).val(new APObj().put("@language", "und")));
+
         put(type, APType.Follow);
     }
 
@@ -19,6 +25,12 @@ public class APOFollow extends APObj {
             put(APObj.id, id);
         }
         put(APObj.actor, actor); 
+
+        // Pleroma hacking (nothing with pleroma has ever worked)
+        // put("state", "pending");
+
+        // NOTE: I saw on a Pleroma forum that they DO need these cc and to as LISTS
+        // even though the AP SPEC allows for strings.
         put(APObj.cc, new APList()); 
         put(APObj.to, new APList().val(target));
         
