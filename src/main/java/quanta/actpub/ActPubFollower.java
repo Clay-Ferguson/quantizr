@@ -59,7 +59,7 @@ public class ActPubFollower extends ServiceBase {
     public int loadRemoteFollowers(MongoSession ms, APObj actor) {
 
         String followersUrl = (String) AP.str(actor, APObj.followers);
-        APObj followers = getFollowers(followersUrl);
+        APObj followers = getRemoteFollowers(followersUrl);
         if (no(followers)) {
             log.debug("Unable to get followers for AP user: " + followersUrl);
             return 0;
@@ -94,7 +94,7 @@ public class ActPubFollower extends ServiceBase {
         return ret;
     }
 
-    public APObj getFollowers(String url) {
+    public APObj getRemoteFollowers(String url) {
         if (no(url))
             return null;
 
@@ -111,15 +111,44 @@ public class ActPubFollower extends ServiceBase {
      * 
      * Returns a list of all the 'actor urls' for all the users that are following user 'userName'
      */
-    public List<String> getFollowers(String userName, String minId) {
+    public List<String> getFollowersPage(String userName, String minId) {
         List<String> followers = new LinkedList<>();
+        log.debug("getFollowers of " + userName + " minId=" + minId);
 
         arun.run(ms -> {
+            // Gets nodes of type 'sn:friend' who are targeting this 'userName' (i.e. friend nodes, i.e. representing followers
+            // of this user)
             Iterable<SubNode> iter = getFriendsByUserName(ms, userName);
 
             for (SubNode n : iter) {
-                // log.debug("Follower found: " + XString.prettyPrint(n));
-                followers.add(n.getStr(NodeProp.ACT_PUB_ACTOR_ID));
+                log.debug("Follower Node found: " + n.getIdStr());
+
+                // todo-0: need to check that the "getFollowing()" processing, is working correctly. Recent
+                // bug-fixes were made in here.
+
+                // the owner of the friend node is the "Follower".
+                SubNode ownerOfFriendNode = read.getNode(ms, n.getOwner());
+
+                if (ok(ownerOfFriendNode)) {
+                    log.debug("    owner (follower): " + ownerOfFriendNode.getIdStr());
+                    // todo-0: check actual spec to see if this is actor ID or URL.
+                    String remoteActorUrl = ownerOfFriendNode.getStr(NodeProp.ACT_PUB_ACTOR_URL);
+
+                    // this will be non-null if it's a remote account.
+                    if (ok(remoteActorUrl)) {
+                        followers.add(remoteActorUrl);
+                    }
+                    // otherwise, it's a local user, and we know how to build the Actor URL of our own users.
+                    else {
+                        // the name on the account that owns the Friend node in his Friends List, is the "Follower"
+                        String followerUserName = ownerOfFriendNode.getStr(NodeProp.USER);
+
+                        // sanity check that name doesn't contain '@' making it a foreign user.
+                        if (!followerUserName.contains("@")) {
+                            followers.add(apUtil.makeActorUrlForUserName(followerUserName));
+                        }
+                    }
+                }
             }
             return null;
         });
@@ -136,7 +165,7 @@ public class ActPubFollower extends ServiceBase {
 
     @PerfMon(category = "apFollower")
     public APOOrderedCollectionPage generateFollowersPage(String userName, String minId) {
-        List<String> followers = getFollowers(userName, minId);
+        List<String> followers = getFollowersPage(userName, minId);
 
         // this is a self-reference url (id)
         String url = prop.getProtocolHostAndPort() + APConst.PATH_FOLLOWERS + "/" + userName + "?page=true";
@@ -194,7 +223,7 @@ public class ActPubFollower extends ServiceBase {
                 APObj actor = apUtil.getActorByUrl(actorUrl);
                 if (ok(actor)) {
                     String followersUrl = (String) AP.str(actor, APObj.followers);
-                    APObj followers = getFollowers(followersUrl);
+                    APObj followers = getRemoteFollowers(followersUrl);
                     if (no(followers)) {
                         log.debug("Unable to get followers for AP user: " + followersUrl);
                     }

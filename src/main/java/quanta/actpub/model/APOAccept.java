@@ -6,13 +6,11 @@ import quanta.actpub.APConst;
  * Accept object
  */
 public class APOAccept extends APObj {
-    public APOAccept() {
+    public APOAccept() { 
         put(context, APConst.CONTEXT_STREAMS);
         put(type, APType.Accept);
     }
 
-    // todo-1: Mastodon definitely works WITHOUT the 'toActor', but we may need it for
-    // compatibility with Pleroma
     public APOAccept(String actor, String toActor, String id, APObj object) {
         this();
 

@@ -228,6 +228,8 @@ public class ActPubUtil extends ServiceBase {
      * Note: 'actor' here is the actor URL of the local (non-federated) user doing the post
      * 
      * WARNING: If privateKey is passed as 'null' you MUST be calling this from HTTP request thread.
+     * 
+     * todo-0: check all callers acceptType value. Should be: 'application/activity+json' + 'application/json' ?
      */
     public void securePost(String userDoingPost, MongoSession ms, String privateKey, String toInbox, String actor, APObj message,
             MediaType acceptType, MediaType postType) {
@@ -278,26 +280,19 @@ public class ActPubUtil extends ServiceBase {
             sig.update(strToSign.getBytes(StandardCharsets.UTF_8));
             byte[] signature = sig.sign();
 
-            // todo-0: Pleroma is including content-length in the headers list below as headers="(request-target) content-length date digest host", so 
-            // I need to know if Pleroma accepts MY ordering AND list (excluding content-length)
-            // Does the new 'rsa-sha256' map perfectly to my SHA256withRSA string above? (i.e. should they be identical strings?)
+            // todo-0: Pleroma is including content-length in this headers list but we don't.
+            // I should probably add it but be sure not to break compatability doing so.
 
-            String headerSig = "keyId=\"" + actor + "#main-key" + "\",headers=\"(request-target) host date digest\",signature=\""
-                    + Base64.getEncoder().encodeToString(signature) + "\"";
-
-            // Run this in a test environment, before going live, to be sure
-            // we haven't broken what little Mastodon support we already have.
-            // String headerSig = "keyId=\"" + actor + "#main-key" + "\",algorithm=\"rsa-sha256\",headers=\"(request-target) host date digest\",signature=\""
-            //         + Base64.getEncoder().encodeToString(signature) + "\"";
+            String headerSig = "keyId=\"" + actor + "#main-key\"" //
+                    + ",headers=\"(request-target) host date digest\"" //
+                    + ",algorithm=\"rsa-sha256\"" //
+                    + ",signature=\"" + Base64.getEncoder().encodeToString(signature) + "\"";
 
             try {
                 postJson(toInbox, url.getHost(), date, headerSig, digestHeader, body, acceptType, postType);
             }
-            // if a post with 'postType' fails then fallback to trying with known mime type that Pleroma might
-            // be expecting
-            // This is not a PROVEN solution (yet), but experimental attempt at compatability across fediverse
-            // platform types
             catch (Exception e) {
+                // This codeblock may be dead now? todo-0: check into it.
                 log.error("initial (pre-fallback) secure http post failed to: " + toInbox, e);
                 log.error("trying fallback. Post type: " + APConst.MTYPE_ACT_JSON.toString());
                 postJson(toInbox, url.getHost(), date, headerSig, digestHeader, body, acceptType, APConst.MTYPE_ACT_JSON);
@@ -428,11 +423,25 @@ public class ActPubUtil extends ServiceBase {
 
             HttpHeaders headers = new HttpHeaders();
             if (ok(acceptType)) {
+                // todo-0: right now this is a dead codepath
                 List<MediaType> acceptableMediaTypes = new LinkedList<>();
                 acceptableMediaTypes.add(acceptType);
                 headers.setAccept(acceptableMediaTypes);
             }
+            else {
+                List<MediaType> acceptableMediaTypes = new LinkedList<>();
 
+                // these came from Pleroma code (need to verify) todo-0
+                acceptableMediaTypes.add(APConst.MTYPE_ACT_JSON);
+                acceptableMediaTypes.add(APConst.MTYPE_JSON);
+                headers.setAccept(acceptableMediaTypes);
+            }
+
+            // Trying to get Pleroma to work (hoping this helps)
+            // todo-0: This string needs to use host property!
+            headers.add("user-agent", "Quanta; https://quanta.wiki <fake@email.com>");
+
+            // NOTE: no longer includes this
             if (ok(headerHost)) {
                 headers.add("Host", headerHost);
             }

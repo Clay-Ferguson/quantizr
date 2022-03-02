@@ -33,6 +33,7 @@ public class APConst {
     // public static final MediaType MTYPE_JRD_JSON_CHARSET = new MediaType("application", "jrd+json", StandardCharsets.UTF_8);
 
     public static final MediaType MTYPE_ACT_JSON = new MediaType("application", "activity+json");
+    public static final MediaType MTYPE_JSON = new MediaType("application", "json");
     // public static final MediaType MTYPE_LD_JSON = new MediaType("application", "ld+json");
     public static final MediaType MTYPE_JRD_JSON = new MediaType("application", "jrd+json");
 

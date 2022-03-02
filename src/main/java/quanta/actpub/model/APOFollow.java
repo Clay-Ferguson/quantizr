@@ -8,11 +8,9 @@ import quanta.actpub.APConst;
  */
 public class APOFollow extends APObj {
     public APOFollow() {
-        // Worked for non-Pleroma
-        // todo-0: make sure the new way below wont break Mastodon
         put(context, APConst.CONTEXT_STREAMS);
 
-        // Checking if Pleroma is requiring their OWN format
+        // NOTE: Pleroma uses an array similar to this.
         // put(context, new APList().val(APConst.CONTEXT_STREAMS).val(new APObj().put("@language", "und")));
 
         put(type, APType.Follow);

@@ -208,8 +208,12 @@ public class ActPubFollowing extends ServiceBase {
                         APObj acceptPayload = unFollow ? new APOUndo(null, followerActorUrl, _actorBeingFollowedUrl) : //
                                 new APOFollow();
 
-                        // put in response object the ID of the follow action.
+                        // todo-0: These parameters are definitely correct for 'Follow', but need to verify for an 'undo'
+                        // unfollow if they are acceptable
                         acceptPayload.put(APObj.id, AP.str(followAction, APObj.id));
+                        acceptPayload.put(APObj.actor, followerActorUrl);
+                        acceptPayload.put(APObj.object, _actorBeingFollowedUrl);
+
 
                         APOAccept accept = new APOAccept(//
                                 _actorBeingFollowedUrl, // actor
@@ -250,7 +254,7 @@ public class ActPubFollowing extends ServiceBase {
     /**
      * Generates one page of results for the outbound 'following' request
      */
-    @PerfMon(category = "apFolloweing")
+    @PerfMon(category = "apFollowing")
     public APOOrderedCollectionPage generateFollowingPage(String userName, String minId) {
         List<String> following = getFollowing(userName, minId);
 
@@ -323,13 +327,32 @@ public class ActPubFollowing extends ServiceBase {
      */
     public List<String> getFollowing(String userName, String minId) {
         final List<String> following = new LinkedList<>();
+        log.debug("getFollowing of user: " + userName + " minId=" + minId);
 
         arun.run(ms -> {
             Iterable<SubNode> iter = findFollowingOfUser(ms, userName);
 
             for (SubNode n : iter) {
-                // log.debug("Follower found: " + XString.prettyPrint(n));
-                following.add(n.getStr(NodeProp.ACT_PUB_ACTOR_ID));
+                log.debug("    Found Friend Node: " + n.getIdStr());
+                // if this Friend node is a foreign one it will have the actor url property
+                // todo-0: check spec and see if Actor URL or ID should be used here (and in the getFollowers
+                // similar place)
+                String remoteActorUrl = n.getStr(NodeProp.ACT_PUB_ACTOR_URL);
+
+                // this will be non-null if it's a remote account.
+                if (ok(remoteActorUrl)) {
+                    following.add(remoteActorUrl);
+                }
+                // otherwise, it's a local user, and we know how to build the Actor URL of our own users.
+                else {
+                    // the name on the account that owns the Friend node in his Friends List, is the "Follower"
+                    String followingUserName = n.getStr(NodeProp.USER);
+
+                    // sanity check that name doesn't contain '@' making it a foreign user.
+                    if (!followingUserName.contains("@")) {
+                        following.add(apUtil.makeActorUrlForUserName(followingUserName));
+                    }
+                }
             }
             return null;
         });
@@ -420,6 +443,8 @@ public class ActPubFollowing extends ServiceBase {
             return null;
 
         // query all the friends under
+        // todo-0: This shouldn't be recursive, and also we should do a query using the ParentId, so that
+        // we don't do the regex on the path at all.
         Criteria criteria = Criteria.where(SubNode.PATH) //
                 .regex(mongoUtil.regexRecursiveChildrenOfPath(friendsListNode.getPath())) //
                 .and(SubNode.TYPE).is(NodeType.FRIEND.s());
