@@ -50,6 +50,8 @@ public class AppServer extends ServiceBase {
 
 	@EventListener
 	public void handleContextRefresh(ContextRefreshedEvent event) {
+		ServiceBase.init(event.getApplicationContext());
+		
 		log.info("log.info: ContextRefreshedEvent.");
 		log.debug("log.debug: PROFILE: " + prop.getProfileName());
 		log.trace("log.trace: test trace message.");

@@ -2,6 +2,7 @@ package quanta.config;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.SimpleMongoClientDatabaseFactory;
@@ -131,63 +132,84 @@ public class ServiceBase {
 	public static MongoRepository mongoRepo;
 	public static SimpleMongoClientDatabaseFactory mdbf;
 
+	public static boolean initComplete = false;
+	public static final Object initLock = new Object();
+
 	public ServiceBase() {
 		// log.debug("ServiceBase: " + getClass().getName());
 	}
 
+	/*
+	 * Note: All` @EventListener public void handleContextRefresh(ContextRefreshedEvent event)` should
+	 * call this method immediately before doing anything else, and this is fine because nothing happens
+	 * on subsequent runs. The reason is because we cannot predict WHICH @EventListener will be called
+	 * first, so we must allow any sequence that Spring happens to run with, in a non-deterministic way.
+	 */
 	public static void init(ApplicationContext ctx) {
-		log.debug("Setting ServiceBase Proxy Instances...");
+		synchronized (initLock) {
+			if (initComplete) {
+				return;
+			}
+			log.debug("Setting ServiceBase Proxy Instances...");
 
-		userFeed = ctx.getBean(UserFeedService.class);
-		convert = ctx.getBean(Convert.class);
-		typePluginMgr = ctx.getBean(TypePluginMgr.class);
-		create = ctx.getBean(MongoCreate.class);
-		read = ctx.getBean(MongoRead.class);
-		update = ctx.getBean(MongoUpdate.class);
-		delete = ctx.getBean(MongoDelete.class);
-		auth = ctx.getBean(MongoAuth.class);
-		mongoUtil = ctx.getBean(MongoUtil.class);
-		snUtil = ctx.getBean(SubNodeUtil.class);
-		acl = ctx.getBean(AclService.class);
-		user = ctx.getBean(UserManagerService.class);
-		arun = ctx.getBean(AdminRun.class);
-		ipfs = ctx.getBean(IPFSService.class);
-		ipfsPubSub = ctx.getBean(IPFSPubSub.class);
-		attach = ctx.getBean(AttachmentService.class);
-		apub = ctx.getBean(ActPubService.class);
-		render = ctx.getBean(NodeRenderService.class);
-		edit = ctx.getBean(NodeEditService.class);
-		apCache = ctx.getBean(ActPubCache.class);
-		validator = ctx.getBean(Validator.class);
-		outbox = ctx.getBean(OutboxMgr.class);
-		notify = ctx.getBean(EmailSenderDaemon.class);
-		mail = ctx.getBean(EmailSender.class);
-		push = ctx.getBean(PushService.class);
-		apUtil = ctx.getBean(ActPubUtil.class);
-		apFollower = ctx.getBean(ActPubFollower.class);
-		apFollowing = ctx.getBean(ActPubFollowing.class);
-		graphNodes = ctx.getBean(GraphNodesService.class);
-		apOutbox = ctx.getBean(ActPubOutbox.class);
-		english = ctx.getBean(EnglishDictionary.class);
-		exec = ctx.getBean(AsyncExec.class);
-		search = ctx.getBean(NodeSearchService.class);
-		callProc = ctx.getBean(CallProcessor.class);
-		move = ctx.getBean(NodeMoveService.class);
-		importBookService = ctx.getBean(ImportBookService.class);
-		apCrypto = ctx.getBean(ActPubCrypto.class);
-		importService = ctx.getBean(ImportService.class);
-		lucene = ctx.getBean(LuceneService.class);
-		fileIndexer = ctx.getBean(FileIndexer.class);
-		system = ctx.getBean(SystemService.class);
-		rssFeed = ctx.getBean(RSSFeedService.class);
-		jsoup = ctx.getBean(JSoupService.class);
-		apFactory = ctx.getBean(ActPubFactory.class);
-		fileUtil = ctx.getBean(FileUtils.class);
-		mimeUtil = ctx.getBean(MimeUtil.class);
-		bookmarkType = ctx.getBean(BookmarkType.class);
-		friendType = ctx.getBean(FriendType.class);
-		roomType = ctx.getBean(RoomType.class);
-		rssType = ctx.getBean(RssFeedType.class);
-		mongoRepo = ctx.getBean(MongoRepository.class);
+			userFeed = getBean(ctx, UserFeedService.class);
+			convert = getBean(ctx, Convert.class);
+			typePluginMgr = getBean(ctx, TypePluginMgr.class);
+			create = getBean(ctx, MongoCreate.class);
+			read = getBean(ctx, MongoRead.class);
+			update = getBean(ctx, MongoUpdate.class);
+			delete = getBean(ctx, MongoDelete.class);
+			auth = getBean(ctx, MongoAuth.class);
+			mongoUtil = getBean(ctx, MongoUtil.class);
+			snUtil = getBean(ctx, SubNodeUtil.class);
+			acl = getBean(ctx, AclService.class);
+			user = getBean(ctx, UserManagerService.class);
+			arun = getBean(ctx, AdminRun.class);
+			ipfs = getBean(ctx, IPFSService.class);
+			ipfsPubSub = getBean(ctx, IPFSPubSub.class);
+			attach = getBean(ctx, AttachmentService.class);
+			apub = getBean(ctx, ActPubService.class);
+			render = getBean(ctx, NodeRenderService.class);
+			edit = getBean(ctx, NodeEditService.class);
+			apCache = getBean(ctx, ActPubCache.class);
+			validator = getBean(ctx, Validator.class);
+			outbox = getBean(ctx, OutboxMgr.class);
+			notify = getBean(ctx, EmailSenderDaemon.class);
+			mail = getBean(ctx, EmailSender.class);
+			push = getBean(ctx, PushService.class);
+			apUtil = getBean(ctx, ActPubUtil.class);
+			apFollower = getBean(ctx, ActPubFollower.class);
+			apFollowing = getBean(ctx, ActPubFollowing.class);
+			graphNodes = getBean(ctx, GraphNodesService.class);
+			apOutbox = getBean(ctx, ActPubOutbox.class);
+			english = getBean(ctx, EnglishDictionary.class);
+			exec = getBean(ctx, AsyncExec.class);
+			search = getBean(ctx, NodeSearchService.class);
+			callProc = getBean(ctx, CallProcessor.class);
+			move = getBean(ctx, NodeMoveService.class);
+			importBookService = getBean(ctx, ImportBookService.class);
+			apCrypto = getBean(ctx, ActPubCrypto.class);
+			importService = getBean(ctx, ImportService.class);
+			lucene = getBean(ctx, LuceneService.class);
+			fileIndexer = getBean(ctx, FileIndexer.class);
+			system = getBean(ctx, SystemService.class);
+			rssFeed = getBean(ctx, RSSFeedService.class);
+			jsoup = getBean(ctx, JSoupService.class);
+			apFactory = getBean(ctx, ActPubFactory.class);
+			fileUtil = getBean(ctx, FileUtils.class);
+			mimeUtil = getBean(ctx, MimeUtil.class);
+			bookmarkType = getBean(ctx, BookmarkType.class);
+			friendType = getBean(ctx, FriendType.class);
+			roomType = getBean(ctx, RoomType.class);
+			rssType = getBean(ctx, RssFeedType.class);
+			mongoRepo = getBean(ctx, MongoRepository.class);
+
+			initComplete = true;
+		}
+	}
+
+	static <T> T getBean(ApplicationContext ctx, Class<T> requiredType) throws BeansException {
+		log.debug("getBean: " + requiredType.getSimpleName());
+		return ctx.getBean(requiredType);
 	}
 }

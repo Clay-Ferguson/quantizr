@@ -202,6 +202,7 @@ public class AppController extends ServiceBase implements ErrorController {
 
 	@EventListener
 	public void handleContextRefresh(ContextRefreshedEvent event) {
+		ServiceBase.init(event.getApplicationContext());
 		log.debug("ContextRefreshedEvent");
 		if (no(context)) {
 			throw new RuntimeException("Failed to autowire ApplicationContext");

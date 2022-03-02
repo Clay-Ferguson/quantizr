@@ -58,6 +58,7 @@ public class IPFSPubSub extends ServiceBase {
 
     @EventListener
 	public void handleContextRefresh(ContextRefreshedEvent event) {
+        ServiceBase.init(event.getApplicationContext());
         log.debug("ContextRefreshedEvent");
         // log.debug("Checking swarmPeers");
         // swarmPeers();

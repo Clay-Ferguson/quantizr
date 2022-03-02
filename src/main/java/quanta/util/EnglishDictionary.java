@@ -32,6 +32,7 @@ public class EnglishDictionary extends ServiceBase {
 
 	@EventListener
 	public void handleContextRefresh(ContextRefreshedEvent event) {
+		ServiceBase.init(event.getApplicationContext());
 		log.debug("ContextRefreshedEvent");
 		initDictWords();
 		initStopWords();

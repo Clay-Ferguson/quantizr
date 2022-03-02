@@ -64,6 +64,7 @@ public class MongoAppConfig extends AbstractMongoClientConfiguration {
 
 	@EventListener
 	public void handleContextRefresh(ContextRefreshedEvent event) {
+		ServiceBase.init(event.getApplicationContext());
 		log.debug("MongoAppConfig. Context refreshed.");
 	}
 
