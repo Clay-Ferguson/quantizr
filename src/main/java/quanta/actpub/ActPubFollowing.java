@@ -131,7 +131,7 @@ public class ActPubFollowing extends ServiceBase {
                     String followerUserName = apUtil.getLongUserNameFromActor(followerActor);
 
                     // this will lookup the user AND import if it's a non-existant user
-                    SubNode followerAccountNode = apub.getAcctNodeByUserName(as, followerUserName);
+                    SubNode followerAccountNode = apub.getAcctNodeByUserName(as, followerUserName, false);
                     if (no(followerAccountNode)) {
                         apLog.trace("unable to import user " + followerUserName);
                         throw new RuntimeException("Unable to get or import user: " + followerUserName);
@@ -208,12 +208,12 @@ public class ActPubFollowing extends ServiceBase {
                         APObj acceptPayload = unFollow ? new APOUndo(null, followerActorUrl, _actorBeingFollowedUrl) : //
                                 new APOFollow();
 
-                        // todo-0: These parameters are definitely correct for 'Follow', but need to verify for an 'undo'
-                        // unfollow if they are acceptable
+                        // todo-0: These parameters are definitely correct for 'Follow', but I need to verify for an 'undo'
+                        // unfollow if they are acceptable (do this by letting both Pleroma AND Mastodon unfollow quanta users
+                        // and see what the format of the message is sent from those)
                         acceptPayload.put(APObj.id, AP.str(followAction, APObj.id));
                         acceptPayload.put(APObj.actor, followerActorUrl);
                         acceptPayload.put(APObj.object, _actorBeingFollowedUrl);
-
 
                         APOAccept accept = new APOAccept(//
                                 _actorBeingFollowedUrl, // actor

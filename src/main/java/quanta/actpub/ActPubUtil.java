@@ -339,7 +339,7 @@ public class ActPubUtil extends ServiceBase {
         String actorUrl = null;
 
         MongoSession as = auth.getAdminSession();
-        SubNode userNode = apub.getAcctNodeByUserName(as, userName);
+        SubNode userNode = apub.getAcctNodeByUserName(as, userName, false);
         if (ok(userNode)) {
             actorUrl = userNode.getStr(NodeProp.ACT_PUB_ACTOR_ID.s());
         }
@@ -438,7 +438,7 @@ public class ActPubUtil extends ServiceBase {
             }
 
             // Trying to get Pleroma to work (hoping this helps)
-            // todo-0: This string needs to use host property!
+            // todo-0: This string needs to use host from application properties!
             headers.add("user-agent", "Quanta; https://quanta.wiki <fake@email.com>");
 
             // NOTE: no longer includes this

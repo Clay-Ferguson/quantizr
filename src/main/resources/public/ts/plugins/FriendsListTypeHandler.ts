@@ -23,7 +23,8 @@ export class FriendsListTypeHandler extends TypeBase {
             new HelpButton(() => S.quanta?.config?.help?.type?.friendsList?.render, null, "btn-secondary float-end"),
             new Heading(4, "Friends", {
                 className: "marginAll"
-            })
+            }),
+            new Div("These are the people you follow. Deleting any of these nodes unfollows the person.")
         ]);
     }
 

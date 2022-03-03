@@ -247,10 +247,10 @@ public class ActPubService extends ServiceBase {
 
     /**
      * Gets the account SubNode representing foreign user apUserName (like someuser@fosstodon.org), by
-     * first checking the 'acctNodesByUserName' cache, or else by reading in the user from the
-     * Fediverse, and updating the cache.
+     * first checking the 'acctNodesByUserName' cache, or else by reading in the user from, the database
+     * (if preferDbNode==true) or else the we read from the Fediverse, and updating the cache.
      */
-    public SubNode getAcctNodeByUserName(MongoSession ms, String apUserName) {
+    public SubNode getAcctNodeByUserName(MongoSession ms, String apUserName, boolean preferDbNode) {
         apUserName = XString.stripIfStartsWith(apUserName, "@");
         if (!apUserName.contains("@")) {
             log.debug("Invalid foreign user name: " + apUserName);
@@ -264,21 +264,19 @@ public class ActPubService extends ServiceBase {
             return acctNode;
         }
 
-        /*
-         * todo-1: if we ALWAYS read from DB like this the data (Actor props) can get stale over time (solve
-         * this) (to not have the 'stale issue', let's just not read from DB ever right here)
-         */
-        // acctNode = read.getUserNodeByUserName(ms, apUserName);
-
-        // if (no(acctNode )) {
-        /* First try to get a cached actor APObj */
-        APObj actor = apCache.actorsByUserName.get(apUserName);
-
-        // if we have actor object skip the step of getting it and import using it.
-        if (ok(actor)) {
-            acctNode = importActor(ms, null, actor);
+        if (preferDbNode) {
+            acctNode = read.getUserNodeByUserName(ms, apUserName);
         }
-        // }
+
+        if (no(acctNode)) {
+            /* First try to get a cached actor APObj */
+            APObj actor = apCache.actorsByUserName.get(apUserName);
+
+            // if we have actor object skip the step of getting it and import using it.
+            if (ok(actor)) {
+                acctNode = importActor(ms, null, actor);
+            }
+        }
 
         /*
          * if we were unable to get the acctNode, then we need to read it from scratch meaning starting at
@@ -731,9 +729,15 @@ public class ActPubService extends ServiceBase {
             newNode.set(NodeProp.ACT_PUB_TAG.s(), tagArray);
         }
 
-        // todo-1: I haven't yet tested that mentions are parsable in any Mastodon text using this method
-        // but we at least know other instances of Quanta will have these extractable this way.
+        /*
+         * todo-1: I haven't yet tested that mentions are parsable in any Mastodon text using this method
+         * but we at least know other instances of Quanta will have these extractable this way.
+         * 
+         * todo-0: need to be parsing mentions out of mastodon posts somehow. Try to do it at the JSON level
+         * of course right when the message is loaded
+         */
         HashSet<String> mentionsSet = auth.parseMentions(contentHtml);
+        importUsers(ms, mentionsSet);
         if (ok(mentionsSet)) {
             for (String mentionName : mentionsSet) {
                 saveFediverseName(mentionName);
@@ -774,6 +778,22 @@ public class ActPubService extends ServiceBase {
         } catch (Exception e) {
             log.error("pushNodeUpdateToBrowsers failed (ignoring error)", e);
         }
+    }
+
+    // imports the list of foreign users into the system
+    public void importUsers(MongoSession ms, HashSet<String> users) {
+        users.forEach(user -> {
+            // clean user if it's in '@mention' format
+            user = XString.stripIfStartsWith(user, "@");
+
+            // make sure username contains @ making it a foreign user.
+            if (user.contains("@")) {
+                SubNode userNode = apub.getAcctNodeByUserName(ms, user, true);
+                if (!ok(userNode)) {
+                    log.debug("Unable to import user: " + user);
+                }
+            }
+        });
     }
 
     /*
@@ -1199,7 +1219,7 @@ public class ActPubService extends ServiceBase {
     public void loadForeignUser(String userName) {
         arun.run(ms -> {
             apLog.trace("Reload user outbox: " + userName);
-            SubNode userNode = getAcctNodeByUserName(ms, userName);
+            SubNode userNode = getAcctNodeByUserName(ms, userName, false);
             if (no(userNode)) {
                 // log.debug("Unable to getAccount Node for userName: "+userName);
                 return null;

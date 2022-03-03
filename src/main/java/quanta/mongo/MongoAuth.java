@@ -620,6 +620,7 @@ public class MongoAuth extends ServiceBase {
 	 */
 	public HashSet<String> saveMentionsToNodeACL(MongoSession ms, SubNode node) {
 		HashSet<String> mentionsSet = parseMentions(node.getContent());
+		apub.importUsers(ms, mentionsSet);
 		if (no(mentionsSet)) {
 			return null;
 		}

@@ -21,7 +21,6 @@ export class TrendingView extends AppTab {
         data.inst = this;
 
         PubSub.subSingleOnce(C.PUBSUB_tabChanging, (tabName: string) => {
-            // console.log("Tab Changing recieved in TrendingView: " + tabName);
             if (tabName === this.data.id) {
 
                 // only ever do this once, just to save CPU load on server.
@@ -96,7 +95,7 @@ export class TrendingView extends AppTab {
 
         this.setChildren([
             new Heading(4, "Trending", { className: "trendingTitle" }),
-            new Div("Click any word...", { className: "marginBottom" }),
+            new Div("Top 100s, listed in order of frequency of use. Click any word...", { className: "marginBottom" }),
 
             // this should be correct data but we don't need it here.
             // new TextContent(res.stats, null, false),

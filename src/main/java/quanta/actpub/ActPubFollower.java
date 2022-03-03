@@ -121,16 +121,13 @@ public class ActPubFollower extends ServiceBase {
             Iterable<SubNode> iter = getFriendsByUserName(ms, userName);
 
             for (SubNode n : iter) {
-                log.debug("Follower Node found: " + n.getIdStr());
-
-                // todo-0: need to check that the "getFollowing()" processing, is working correctly. Recent
-                // bug-fixes were made in here.
+                // log.debug("Follower Node found: " + n.getIdStr());
 
                 // the owner of the friend node is the "Follower".
                 SubNode ownerOfFriendNode = read.getNode(ms, n.getOwner());
 
                 if (ok(ownerOfFriendNode)) {
-                    log.debug("    owner (follower): " + ownerOfFriendNode.getIdStr());
+                    // log.debug("    owner (follower): " + ownerOfFriendNode.getIdStr());
                     // todo-0: check actual spec to see if this is actor ID or URL.
                     String remoteActorUrl = ownerOfFriendNode.getStr(NodeProp.ACT_PUB_ACTOR_URL);
 

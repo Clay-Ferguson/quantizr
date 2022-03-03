@@ -215,7 +215,7 @@ public class NodeSearchService extends ServiceBase {
 			findUserName = XString.stripIfStartsWith(findUserName, "@");
 			final String _findUserName = findUserName;
 			arun.run(as -> {
-				SubNode userNode = apub.getAcctNodeByUserName(as, _findUserName);
+				SubNode userNode = apub.getAcctNodeByUserName(as, _findUserName, false);
 				if (ok(userNode)) {
 					try {
 						NodeInfo info = convert.convertToNodeInfo(ThreadLocals.getSC(), as, userNode, true, false, counter + 1,
