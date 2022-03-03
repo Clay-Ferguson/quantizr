@@ -741,6 +741,10 @@ export class Util {
         return <T>instance;
     }
 
+    clipboardReadable = (): boolean => {
+        return (typeof (navigator as any).clipboard?.read) === "function";
+    }
+
     copyToClipboard = (text: string) => {
         (<any>navigator).clipboard.writeText(text).then(() => {
             console.log("Copied to clipboard successfully!");

@@ -81,7 +81,7 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
                 new ButtonBar([
                     this.importMode ? null : new Button("URL", this.uploadFromUrl),
                     this.importMode ? null : new Button("IPFS", this.uploadFromIPFS),
-                    this.importMode ? null : new Button("Clipboard", this.uploadFromClipboard),
+                    this.importMode || !S.util.clipboardReadable() ? null : new Button("Clipboard", this.uploadFromClipboard),
                     this.importMode ? null : new Button("Torrent", this.uploadFromTorrent),
 
                     this.importMode || !this.allowRecording ? null : new IconButton("fa-microphone", /* "From Mic" */ null, {
@@ -161,6 +161,10 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
     // todo-2: I have a feature that pastes from clipboard to a node as text, but it needs to detect images and if image is in
     // clipboard create a node and put that image in it.
     uploadFromClipboard = async () => {
+        if (!S.util.clipboardReadable()) {
+            return;
+        }
+
         (navigator as any).clipboard.read().then(async (data) => {
             let done: boolean = false;
             for (const clipboardItem of data) {
