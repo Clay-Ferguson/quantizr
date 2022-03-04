@@ -96,7 +96,7 @@ public class MongoDelete extends ServiceBase {
 		return res.getDeletedCount();
 	}
 
-	/* This is a way to cleanup old records, but it's needed yet */
+	/* This is a way to cleanup old records, but it's not needed yet */
 	public void cleanupOldTempNodesForUser(MongoSession ms, SubNode userNode) {
 		Query q = new Query();
 
@@ -123,7 +123,13 @@ public class MongoDelete extends ServiceBase {
 		}
 	}
 
-	/* This method assumes security check is already done. */
+	/**
+	 * This method assumes security check is already done.
+	 * 
+	 * todo-1: performance enhancement: We could just delete the one node identified by 'path', and then
+	 * run the recursive delete operation in an async thread. That's not ACID, but it's ok here, for the
+	 * performance benefit. Perhaps only for 'admin' user only do it synchronously all without any async.
+	 */
 	public long deleteUnderPath(MongoSession ms, String path) {
 		// log.debug("Deleting under path: " + path);
 		update.saveSession(ms);

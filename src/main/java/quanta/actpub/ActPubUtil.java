@@ -229,7 +229,8 @@ public class ActPubUtil extends ServiceBase {
      * 
      * WARNING: If privateKey is passed as 'null' you MUST be calling this from HTTP request thread.
      * 
-     * todo-0: check all callers acceptType value. Should be: 'application/activity+json' + 'application/json' ?
+     * todo-0: check all callers acceptType value. Should be: 'application/activity+json' +
+     * 'application/json' ?
      */
     public void securePost(String userDoingPost, MongoSession ms, String privateKey, String toInbox, String actor, APObj message,
             MediaType acceptType, MediaType postType) {
@@ -280,8 +281,10 @@ public class ActPubUtil extends ServiceBase {
             sig.update(strToSign.getBytes(StandardCharsets.UTF_8));
             byte[] signature = sig.sign();
 
-            // todo-0: Pleroma is including content-length in this headers list but we don't.
-            // I should probably add it but be sure not to break compatability doing so.
+            /*
+             * todo-1: Pleroma is including content-length in this headers list but we don't. I should probably
+             * add it but be sure not to break compatability when doing so.
+             */
 
             String headerSig = "keyId=\"" + actor + "#main-key\"" //
                     + ",headers=\"(request-target) host date digest\"" //
@@ -290,8 +293,7 @@ public class ActPubUtil extends ServiceBase {
 
             try {
                 postJson(toInbox, url.getHost(), date, headerSig, digestHeader, body, acceptType, postType);
-            }
-            catch (Exception e) {
+            } catch (Exception e) {
                 // This codeblock may be dead now? todo-0: check into it.
                 log.error("initial (pre-fallback) secure http post failed to: " + toInbox, e);
                 log.error("trying fallback. Post type: " + APConst.MTYPE_ACT_JSON.toString());
@@ -427,19 +429,15 @@ public class ActPubUtil extends ServiceBase {
                 List<MediaType> acceptableMediaTypes = new LinkedList<>();
                 acceptableMediaTypes.add(acceptType);
                 headers.setAccept(acceptableMediaTypes);
-            }
-            else {
+            } else {
                 List<MediaType> acceptableMediaTypes = new LinkedList<>();
-
-                // these came from Pleroma code (need to verify) todo-0
                 acceptableMediaTypes.add(APConst.MTYPE_ACT_JSON);
                 acceptableMediaTypes.add(APConst.MTYPE_JSON);
                 headers.setAccept(acceptableMediaTypes);
             }
 
-            // Trying to get Pleroma to work (hoping this helps)
-            // todo-0: This string needs to use host from application properties!
-            headers.add("user-agent", "Quanta; https://quanta.wiki <fake@email.com>");
+            // NOTE: I'm not sure this is ever necessary. Noticed Pleroma doing it and copied it.
+            headers.add("user-agent", "Quanta; https://" + prop.getMetaHost() + " <fake@email.com>");
 
             // NOTE: no longer includes this
             if (ok(headerHost)) {

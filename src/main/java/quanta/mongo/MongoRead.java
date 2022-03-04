@@ -1135,7 +1135,7 @@ public class MongoRead extends ServiceBase {
     // ========================================================================
 
     /*
-     * Finds the first node matching 'type' under 'path' (non-recursively, direct children only)
+     * Finds nodes matching 'type' under 'path' (recursively)
      */
     public Iterable<SubNode> findSubNodesByType(MongoSession ms, SubNode node, String type) {
         Query q = typedNodesUnderPath_query(ms, node, type);
@@ -1143,14 +1143,13 @@ public class MongoRead extends ServiceBase {
     }
 
     /*
-     * Finds the first node matching 'type' under 'path' (non-recursively, direct children only)
+     * Counts nodes matching 'type' under 'path' (recursively)
      */
     public long countTypedNodesUnderPath(MongoSession ms, SubNode node, String type) {
         Query q = typedNodesUnderPath_query(ms, node, type);
         return ops.count(q, SubNode.class);
     }
 
-    // todo-0: Does this always need to be a recursive search? Can a parentId shallow search work here?
     public Query typedNodesUnderPath_query(MongoSession ms, SubNode node, String type) {
         Query q = new Query();
         Criteria crit = Criteria.where(SubNode.PATH).regex(mongoUtil.regexRecursiveChildrenOfPath(node.getPath()))//

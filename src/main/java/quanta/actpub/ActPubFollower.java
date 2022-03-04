@@ -247,8 +247,6 @@ public class ActPubFollower extends ServiceBase {
                  * created any user nodes outside that location so that we can simplify this query and possibly make
                  * it run faster, by exclulding the subgraph check and just querying the entire DB based only on
                  * USER and FRIEND type
-                 * 
-                 * todo-0: look for other places we query under users subgraph when we can really go global on the query
                  */
                 // Criteria.where(SubNode.PATH).regex(mongoUtil.regexRecursiveChildrenOfPath(NodePath.ROOT_OF_ALL_USERS))
                 Criteria.where(SubNode.PROPS + "." + NodeProp.USER.s()).is(userName) //

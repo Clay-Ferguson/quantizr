@@ -732,9 +732,6 @@ public class ActPubService extends ServiceBase {
         /*
          * todo-1: I haven't yet tested that mentions are parsable in any Mastodon text using this method
          * but we at least know other instances of Quanta will have these extractable this way.
-         * 
-         * todo-0: need to be parsing mentions out of mastodon posts somehow. Try to do it at the JSON level
-         * of course right when the message is loaded
          */
         HashSet<String> mentionsSet = auth.parseMentionsFromString(null, contentHtml);
         importUsers(ms, mentionsSet);

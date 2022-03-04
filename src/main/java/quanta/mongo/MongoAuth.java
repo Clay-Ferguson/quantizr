@@ -194,8 +194,6 @@ public class MongoAuth extends ServiceBase {
 		 */
 		else {
 			ac.put(parent.getOwner().toHexString(), new AccessControl(null, APConst.RDWR));
-
-			// todo-0: due for testing in prod
 			HashSet<String> mentions = auth.parseMentionsFromNode(null, parent);
 
 			// if no content, and the parent isn't our own node
@@ -212,6 +210,10 @@ public class MongoAuth extends ServiceBase {
 					content += mention + " ";
 				}
 
+				/*
+				 * This will put a string of all mentioned users right in the text of the message so they can see
+				 * who will be replied to re even remove users they don't want replied to.
+				 */
 				child.setContent(content);
 			}
 		}
@@ -638,12 +640,15 @@ public class MongoAuth extends ServiceBase {
 	}
 
 	/**
+	 * todo-0: We also have a 'tags' field in Quanta Nodes, so we can use code very similar to this method 
+	 * to extract "Tag" types and put them automatically into the Quanta node. That way the code we have for 
+	 * unmangling them (we have that right?) can be removed and we perfectly extract out tags. Note the Word Frequency
+	 * analyzer code is where we're currently dealing with this.
+	 * 
 	 * uses the ap:tag property on the node to build a list of foreign user names in the namesSet. If
 	 * you pass a non-null namesSet then that set will be appended to and returned or else it creates a
-	 * new set.
-	 * 
-	 * Mastodon provides the data in this JSON. todo-0: check mastodon will let us load this property
-	 * too on incoming posts
+	 * new set. Posts comming form Mastodon at least will have Mentions in this format on them. I'm not sure how
+	 * standardized this is (per ActPub Spec, etc)
 	 * 
 	 * <pre>
 			"ap:tag" : [ {
@@ -679,7 +684,8 @@ public class MongoAuth extends ServiceBase {
 						// add a string like host@username
 						URL hrefUrl = new URL((String) href);
 						// build this name without host part if it's a local user, otherwise full fediverse name
-						String user = prop.getMetaHost().equals(hrefUrl.getHost()) ? (String) name :  (String) name + "@" + hrefUrl.getHost();
+						String user = prop.getMetaHost().equals(hrefUrl.getHost()) ? (String) name
+								: (String) name + "@" + hrefUrl.getHost();
 						namesSet.add(user);
 					} else {
 						log.debug("Failed to parse tag on nodeId " + node.getIdStr() + " because it was type="
