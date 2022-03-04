@@ -24,7 +24,7 @@ export class FriendsListTypeHandler extends TypeBase {
             new Heading(4, "Friends", {
                 className: "marginAll"
             }),
-            new Div("These are the people you follow. Deleting any of these nodes unfollows the person.")
+            new Div("These are the people you follow. Deleting any of these nodes unfollows the person.", { className: "marginLeft marginBottom" })
         ]);
     }
 
