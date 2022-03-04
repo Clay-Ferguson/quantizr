@@ -33,6 +33,8 @@ export class SharingDlg extends DialogBase {
 
         return [
             new Form(null, [
+                new Div("Note: All usernames mentioned in the content text will also be automatically added to this sharing list when you save the node, "+
+                "so you don't need to add users here if they're mentioned when you save.", { className: "marginBottom" }),
                 new EditPrivsTable((allowAppends: boolean) => {
                     this.shareNodeToPublic(allowAppends, state.recursive);
                 }, this.getState<LS>().nodePrivsInfo, this.removePrivilege),
