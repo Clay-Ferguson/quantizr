@@ -116,9 +116,10 @@ public class ActPubFollower extends ServiceBase {
         log.debug("getFollowers of " + userName + " minId=" + minId);
 
         arun.run(ms -> {
-            // Gets nodes of type 'sn:friend' who are targeting this 'userName' (i.e. friend nodes, i.e.
-            // representing followers
-            // of this user)
+            /*
+             * Gets nodes of type 'sn:friend' who are targeting this 'userName' (i.e. friend nodes, i.e.
+             * representing followers of this user)
+             */
             Iterable<SubNode> iter = getFriendsByUserName(ms, userName);
 
             for (SubNode n : iter) {
@@ -129,8 +130,8 @@ public class ActPubFollower extends ServiceBase {
 
                 if (ok(ownerOfFriendNode)) {
                     // log.debug(" owner (follower): " + ownerOfFriendNode.getIdStr());
-                    // todo-0: check actual spec to see if this is actor ID or URL.
-                    String remoteActorUrl = ownerOfFriendNode.getStr(NodeProp.ACT_PUB_ACTOR_URL);
+                    // fyi: we had ACT_PUB_ACTOR_URL here before, which was a bug.
+                    String remoteActorUrl = ownerOfFriendNode.getStr(NodeProp.ACT_PUB_ACTOR_ID);
 
                     // this will be non-null if it's a remote account.
                     if (ok(remoteActorUrl)) {
