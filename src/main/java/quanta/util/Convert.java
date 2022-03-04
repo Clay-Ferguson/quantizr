@@ -308,7 +308,6 @@ public class Convert extends ServiceBase {
 			}
 
 			/* log.trace(String.format("prop[%s]=%s", prop.getName(), value)); */
-
 			PropertyInfo propInfo = new PropertyInfo(propName, value);
 			return propInfo;
 		} catch (Exception ex) {

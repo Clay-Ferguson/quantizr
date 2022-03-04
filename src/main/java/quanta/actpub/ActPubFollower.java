@@ -116,7 +116,8 @@ public class ActPubFollower extends ServiceBase {
         log.debug("getFollowers of " + userName + " minId=" + minId);
 
         arun.run(ms -> {
-            // Gets nodes of type 'sn:friend' who are targeting this 'userName' (i.e. friend nodes, i.e. representing followers
+            // Gets nodes of type 'sn:friend' who are targeting this 'userName' (i.e. friend nodes, i.e.
+            // representing followers
             // of this user)
             Iterable<SubNode> iter = getFriendsByUserName(ms, userName);
 
@@ -127,7 +128,7 @@ public class ActPubFollower extends ServiceBase {
                 SubNode ownerOfFriendNode = read.getNode(ms, n.getOwner());
 
                 if (ok(ownerOfFriendNode)) {
-                    // log.debug("    owner (follower): " + ownerOfFriendNode.getIdStr());
+                    // log.debug(" owner (follower): " + ownerOfFriendNode.getIdStr());
                     // todo-0: check actual spec to see if this is actor ID or URL.
                     String remoteActorUrl = ownerOfFriendNode.getStr(NodeProp.ACT_PUB_ACTOR_URL);
 
@@ -240,9 +241,18 @@ public class ActPubFollower extends ServiceBase {
 
     public Query getFriendsByUserName_query(MongoSession ms, String userName) {
         Query q = new Query();
-        Criteria crit = Criteria.where(SubNode.PATH).regex(mongoUtil.regexRecursiveChildrenOfPath(NodePath.ROOT_OF_ALL_USERS)) //
-                .and(SubNode.PROPS + "." + NodeProp.USER.s()).is(userName) //
-                .and(SubNode.TYPE).is(NodeType.FRIEND.s());
+        Criteria crit =
+                /*
+                 * Technically we should be querying only unser Users Root, but I will assume the admin hasn't
+                 * created any user nodes outside that location so that we can simplify this query and possibly make
+                 * it run faster, by exclulding the subgraph check and just querying the entire DB based only on
+                 * USER and FRIEND type
+                 * 
+                 * todo-0: look for other places we query under users subgraph when we can really go global on the query
+                 */
+                // Criteria.where(SubNode.PATH).regex(mongoUtil.regexRecursiveChildrenOfPath(NodePath.ROOT_OF_ALL_USERS))
+                Criteria.where(SubNode.PROPS + "." + NodeProp.USER.s()).is(userName) //
+                        .and(SubNode.TYPE).is(NodeType.FRIEND.s());
 
         q.addCriteria(crit);
         return q;

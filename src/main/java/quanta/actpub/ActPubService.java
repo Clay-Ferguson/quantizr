@@ -736,7 +736,7 @@ public class ActPubService extends ServiceBase {
          * todo-0: need to be parsing mentions out of mastodon posts somehow. Try to do it at the JSON level
          * of course right when the message is loaded
          */
-        HashSet<String> mentionsSet = auth.parseMentions(contentHtml);
+        HashSet<String> mentionsSet = auth.parseMentionsFromString(null, contentHtml);
         importUsers(ms, mentionsSet);
         if (ok(mentionsSet)) {
             for (String mentionName : mentionsSet) {

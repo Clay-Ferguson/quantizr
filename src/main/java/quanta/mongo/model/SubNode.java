@@ -492,6 +492,23 @@ public class SubNode {
 
 	@Transient
 	@JsonIgnore
+	public <T> T getObj(String key, Class<T> classType) {
+		if (no(props))
+			return null;
+
+		synchronized (propLock) {
+			try {
+				return (T) props().get(key);
+			} catch (Exception e) {
+				log.debug("Failed to read prop " + key + " as a type " + classType.getName());
+				return null;
+			}
+		}
+	}
+
+
+	@Transient
+	@JsonIgnore
 	public Double getFloat(NodeProp prop) {
 		return getFloat(prop.s());
 	}

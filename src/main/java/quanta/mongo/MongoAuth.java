@@ -2,21 +2,25 @@ package quanta.mongo;
 
 import static quanta.util.Util.no;
 import static quanta.util.Util.ok;
+import java.net.URL;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import org.apache.commons.lang3.StringUtils;
 import org.bson.types.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Component;
 import quanta.actpub.APConst;
+import quanta.config.AppProp;
 import quanta.config.NodePath;
 import quanta.config.ServiceBase;
 import quanta.config.SessionContext;
@@ -41,6 +45,9 @@ import quanta.util.XString;
 @Component
 public class MongoAuth extends ServiceBase {
 	private static final Logger log = LoggerFactory.getLogger(MongoAuth.class);
+
+	@Autowired
+	private AppProp prop;
 
 	private static final boolean verbose = false;
 
@@ -146,10 +153,9 @@ public class MongoAuth extends ServiceBase {
 
 	/*
 	 * When a child is created under a parent we want to default the sharing on the child so that
-	 * there's an explicit share to the parent which is redundant in terms of sharing auth, but is
-	 * necessary and desired for User Feeds and social media queries to work. Also we remove any share
-	 * to 'child' user that may be in the parent Acl, because that would represent 'child' node sharing
-	 * to himself which is never done.
+	 * there's an explicit share to the owner of the parent. Also we remove any share to 'child' user
+	 * that may be in the parent Acl, because that would represent 'child' node sharing to himself which
+	 * is never done.
 	 */
 	public void setDefaultReplyAcl(MongoSession ms, SubNode parent, SubNode child) {
 		if (no(parent) || no(child))
@@ -189,12 +195,24 @@ public class MongoAuth extends ServiceBase {
 		else {
 			ac.put(parent.getOwner().toHexString(), new AccessControl(null, APConst.RDWR));
 
+			// todo-0: due for testing in prod
+			HashSet<String> mentions = auth.parseMentionsFromNode(null, parent);
+
 			// if no content, and the parent isn't our own node
 			if (StringUtils.isEmpty(child.getContent()) && !auth.ownedByThreadUser(parent)) {
 				SubNode parentUserNode = read.getNode(ms, parent.getOwner());
 				if (ok(parentUserNode)) {
-					child.setContent("@" + parentUserNode.getStr(NodeProp.USER) + " ");
+					mentions.add("@" + parentUserNode.getStr(NodeProp.USER));
 				}
+			}
+
+			if (mentions.size() > 0) {
+				String content = "";
+				for (String mention : mentions) {
+					content += mention + " ";
+				}
+
+				child.setContent(content);
 			}
 		}
 		child.setAc(ac);
@@ -361,8 +379,7 @@ public class MongoAuth extends ServiceBase {
 			return;
 		}
 
-		log.error(
-				"Unauthorized access. NodeId=" + node.getId() + " path=" + node.getPath() + " by user: " + ms.getUserName());
+		log.error("Unauthorized access. NodeId=" + node.getId() + " path=" + node.getPath() + " by user: " + ms.getUserName());
 		throw new NodeAuthFailedException();
 	}
 
@@ -586,10 +603,17 @@ public class MongoAuth extends ServiceBase {
 		return q;
 	}
 
-	public HashSet<String> parseMentions(String message) {
+	/*
+	 * Parses all foreign mentions of forengn usernames from message. Puts them in namesSet if not null,
+	 * and returns namesSet, or if null is passed in for namesSet you get a new set created
+	 */
+	public HashSet<String> parseMentionsFromString(HashSet<String> namesSet, String message) {
 		if (no(message))
 			return null;
-		HashSet<String> userNames = new HashSet<>();
+
+		if (no(namesSet)) {
+			namesSet = new HashSet<>();
+		}
 
 		// prepare so that newlines are compatable with out tokenizing
 		message = message.replace("\n", " ");
@@ -605,12 +629,69 @@ public class MongoAuth extends ServiceBase {
 					// This second 'startsWith' check ensures we ignore patterns that start with
 					// "@@"
 					if (!word.startsWith("@")) {
-						userNames.add(word);
+						namesSet.add(word);
 					}
 				}
 			}
 		}
-		return userNames;
+		return namesSet;
+	}
+
+	/**
+	 * uses the ap:tag property on the node to build a list of foreign user names in the namesSet. If
+	 * you pass a non-null namesSet then that set will be appended to and returned or else it creates a
+	 * new set.
+	 * 
+	 * Mastodon provides the data in this JSON. todo-0: check mastodon will let us load this property
+	 * too on incoming posts
+	 * 
+	 * <pre>
+			"ap:tag" : [ {
+			"type" : "Mention",
+			"href" : "https://fosstodon.org/users/atoponce", (this is ap:actorId)
+			"name" : "@atoponce"
+			} ],
+	 * </pre>
+	 */
+	public HashSet<String> parseMentionsFromNode(HashSet<String> namesSet, SubNode node) {
+		if (no(node))
+			return null;
+
+		if (no(namesSet)) {
+			namesSet = new HashSet<>();
+		}
+
+		// read the list of tags from 'ap:tag' prop
+		List<Object> tags = node.getObj(NodeProp.ACT_PUB_TAG.s(), List.class);
+		if (ok(tags)) {
+			for (Object tag : tags) {
+				try {
+					if (tag instanceof Map) {
+						Map<?, ?> m = (Map) tag;
+						Object type = m.get("type");
+						Object href = m.get("href");
+						Object name = m.get("name");
+						if (!(type instanceof String) || !(href instanceof String) || !(name instanceof String)
+								|| !type.equals("Mention")) {
+							continue;
+						}
+
+						// add a string like host@username
+						URL hrefUrl = new URL((String) href);
+						// build this name without host part if it's a local user, otherwise full fediverse name
+						String user = prop.getMetaHost().equals(hrefUrl.getHost()) ? (String) name :  (String) name + "@" + hrefUrl.getHost();
+						namesSet.add(user);
+					} else {
+						log.debug("Failed to parse tag on nodeId " + node.getIdStr() + " because it was type="
+								+ tag.getClass().getName());
+					}
+				} catch (Exception e) {
+					log.error("Unable to process tag.", e);
+					// ignore errors on any tag and continue
+				}
+			}
+		}
+		return namesSet;
 	}
 
 	/*
@@ -619,7 +700,7 @@ public class MongoAuth extends ServiceBase {
 	 * this node and that it will also appear in their FEED listing
 	 */
 	public HashSet<String> saveMentionsToNodeACL(MongoSession ms, SubNode node) {
-		HashSet<String> mentionsSet = parseMentions(node.getContent());
+		HashSet<String> mentionsSet = parseMentionsFromString(null, node.getContent());
 		apub.importUsers(ms, mentionsSet);
 		if (no(mentionsSet)) {
 			return null;

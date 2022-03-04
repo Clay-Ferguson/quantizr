@@ -1150,6 +1150,7 @@ public class MongoRead extends ServiceBase {
         return ops.count(q, SubNode.class);
     }
 
+    // todo-0: Does this always need to be a recursive search? Can a parentId shallow search work here?
     public Query typedNodesUnderPath_query(MongoSession ms, SubNode node, String type) {
         Query q = new Query();
         Criteria crit = Criteria.where(SubNode.PATH).regex(mongoUtil.regexRecursiveChildrenOfPath(node.getPath()))//

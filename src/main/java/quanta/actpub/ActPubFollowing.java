@@ -208,9 +208,11 @@ public class ActPubFollowing extends ServiceBase {
                         APObj acceptPayload = unFollow ? new APOUndo(null, followerActorUrl, _actorBeingFollowedUrl) : //
                                 new APOFollow();
 
-                        // todo-0: These parameters are definitely correct for 'Follow', but I need to verify for an 'undo'
-                        // unfollow if they are acceptable (do this by letting both Pleroma AND Mastodon unfollow quanta users
-                        // and see what the format of the message is sent from those)
+                        /*
+                         * todo-0: These parameters are definitely correct for 'Follow', but I need to verify for an 'undo'
+                         * unfollow if they are acceptable (do this by letting both Pleroma AND Mastodon unfollow quanta
+                         * users and see what the format of the message is sent from those)
+                         */
                         acceptPayload.put(APObj.id, AP.str(followAction, APObj.id));
                         acceptPayload.put(APObj.actor, followerActorUrl);
                         acceptPayload.put(APObj.object, _actorBeingFollowedUrl);
@@ -442,11 +444,11 @@ public class ActPubFollowing extends ServiceBase {
         if (no(friendsListNode))
             return null;
 
-        // query all the friends under
-        // todo-0: This shouldn't be recursive, and also we should do a query using the ParentId, so that
-        // we don't do the regex on the path at all.
-        Criteria criteria = Criteria.where(SubNode.PATH) //
-                .regex(mongoUtil.regexRecursiveChildrenOfPath(friendsListNode.getPath())) //
+        /*
+         * query all the direct children under the friendsListNode, that are FRIEND type although they
+         * should all be FRIEND types.
+         */
+        Criteria criteria = Criteria.where(SubNode.PARENT).is(friendsListNode.getParent()) //
                 .and(SubNode.TYPE).is(NodeType.FRIEND.s());
 
         q.addCriteria(criteria);
