@@ -231,58 +231,59 @@ export class FeedView extends AppTab<FeedViewProps> {
 
     /* overridable (don't use arrow function) */
     renderHeading(state: AppState): CompIntf {
-        return new Heading(4, this.data.props.feedFilterRootNode ? "Chat Room" : "Feed " + this.getFeedSubHeading(), { className: "resultsTitle" });
+        return new Heading(4, this.data.props.feedFilterRootNode ? "Chat Room" : "Feed " + this.getFeedSubHeading(this.data), { className: "resultsTitle" });
     }
 
-    getFeedSubHeading = () => {
+    // todo-0: put in a utilities class (use for RHS to indicate current selection)
+    getFeedSubHeading = (data: TabDataIntf<FeedViewProps>) => {
         let subHeading = null;
 
-        if (!this.data.props.feedFilterFriends && //
-            this.data.props.feedFilterToMe && //
-            this.data.props.feedFilterFromMe && //
-            !this.data.props.feedFilterToPublic && //
-            !this.data.props.feedFilterLocalServer && //
-            !this.data.props.feedFilterRootNode) {
+        if (!data.props.feedFilterFriends && //
+            data.props.feedFilterToMe && //
+            data.props.feedFilterFromMe && //
+            !data.props.feedFilterToPublic && //
+            !data.props.feedFilterLocalServer && //
+            !data.props.feedFilterRootNode) {
             subHeading = "To/From Me";
         }
-        else if (!this.data.props.feedFilterFriends && //
-            this.data.props.feedFilterToMe && //
-            !this.data.props.feedFilterFromMe && //
-            !this.data.props.feedFilterToPublic && //
-            !this.data.props.feedFilterLocalServer && //
-            !this.data.props.feedFilterRootNode) {
+        else if (!data.props.feedFilterFriends && //
+            data.props.feedFilterToMe && //
+            !data.props.feedFilterFromMe && //
+            !data.props.feedFilterToPublic && //
+            !data.props.feedFilterLocalServer && //
+            !data.props.feedFilterRootNode) {
             subHeading = "To Me";
         }
-        else if (!this.data.props.feedFilterFriends && //
-            !this.data.props.feedFilterToMe && //
-            this.data.props.feedFilterFromMe && //
-            !this.data.props.feedFilterToPublic && //
-            !this.data.props.feedFilterLocalServer && //
-            !this.data.props.feedFilterRootNode) {
+        else if (!data.props.feedFilterFriends && //
+            !data.props.feedFilterToMe && //
+            data.props.feedFilterFromMe && //
+            !data.props.feedFilterToPublic && //
+            !data.props.feedFilterLocalServer && //
+            !data.props.feedFilterRootNode) {
             subHeading = "From Me";
         }
-        else if (this.data.props.feedFilterFriends && //
-            !this.data.props.feedFilterToMe && //
-            !this.data.props.feedFilterFromMe && //
-            !this.data.props.feedFilterToPublic && //
-            !this.data.props.feedFilterLocalServer && //
-            !this.data.props.feedFilterRootNode) {
+        else if (data.props.feedFilterFriends && //
+            !data.props.feedFilterToMe && //
+            !data.props.feedFilterFromMe && //
+            !data.props.feedFilterToPublic && //
+            !data.props.feedFilterLocalServer && //
+            !data.props.feedFilterRootNode) {
             subHeading = "From Friends";
         }
-        else if (!this.data.props.feedFilterFriends && //
-            !this.data.props.feedFilterToMe && //
-            !this.data.props.feedFilterFromMe && //
-            this.data.props.feedFilterToPublic && //
-            this.data.props.feedFilterLocalServer && //
-            !this.data.props.feedFilterRootNode) {
+        else if (!data.props.feedFilterFriends && //
+            !data.props.feedFilterToMe && //
+            !data.props.feedFilterFromMe && //
+            data.props.feedFilterToPublic && //
+            data.props.feedFilterLocalServer && //
+            !data.props.feedFilterRootNode) {
             subHeading = "From Local Users";
         }
-        else if (!this.data.props.feedFilterFriends && //
-            !this.data.props.feedFilterToMe && //
-            !this.data.props.feedFilterFromMe && //
-            this.data.props.feedFilterToPublic && //
-            !this.data.props.feedFilterLocalServer && //
-            !this.data.props.feedFilterRootNode) {
+        else if (!data.props.feedFilterFriends && //
+            !data.props.feedFilterToMe && //
+            !data.props.feedFilterFromMe && //
+            data.props.feedFilterToPublic && //
+            !data.props.feedFilterLocalServer && //
+            !data.props.feedFilterRootNode) {
             subHeading = "Public Fediverse";
         }
 

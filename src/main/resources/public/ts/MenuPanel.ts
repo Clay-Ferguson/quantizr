@@ -206,22 +206,25 @@ export class MenuPanel extends Div {
         let messagesSuffix = state.newMessageCount > 0
             ? " (" + state.newMessageCount + " new)" : "";
 
-        children.push(new Menu("Feed" + messagesSuffix, [
-            // This works, but will confuse users. Lets make them just create a "Chat Type" node and think of that as their chat room
-            // because while Quanta is capable of rendering ANY node as a chat room, mankind really isn't ready for that!
-            // new MenuItem("Node Feed (Chat)", () => MenuPanel.messagesNodeFeed(state), !state.isAnonUser && hltNode?.id != null),
-            // new MenuItemSeparator(), //
-            new MenuItem("To/From Me", S.nav.messagesToFromMe, !state.isAnonUser),
-            new MenuItem("To Me", S.nav.messagesToMe, !state.isAnonUser),
-            new MenuItem("From Me", S.nav.messagesFromMe, !state.isAnonUser),
-            new MenuItemSeparator(),
-            new MenuItem("From Friends", S.nav.messagesFromFriends, !state.isAnonUser),
-            // We need to make this a configurable option.
-            // new MenuItem("From Local Users", S.nav.messagesLocal),
-            new MenuItem("Public Fediverse", S.nav.messagesFediverse)
-        ]));
+        // These options will appear on the RHS for desktop mode
+        if (state.mobileMode) {
+            children.push(new Menu("Feed" + messagesSuffix, [
+                // This works, but will confuse users. Lets make them just create a "Chat Type" node and think of that as their chat room
+                // because while Quanta is capable of rendering ANY node as a chat room, mankind really isn't ready for that!
+                // new MenuItem("Node Feed (Chat)", () => MenuPanel.messagesNodeFeed(state), !state.isAnonUser && hltNode?.id != null),
+                // new MenuItemSeparator(), //
+                new MenuItem("To/From Me", S.nav.messagesToFromMe, !state.isAnonUser),
+                new MenuItem("To Me", S.nav.messagesToMe, !state.isAnonUser),
+                new MenuItem("From Me", S.nav.messagesFromMe, !state.isAnonUser),
+                new MenuItemSeparator(),
+                new MenuItem("From Friends", S.nav.messagesFromFriends, !state.isAnonUser),
+                // We need to make this a configurable option.
+                // new MenuItem("From Local Users", S.nav.messagesLocal),
+                new MenuItem("Public Fediverse", S.nav.messagesFediverse)
+            ]));
+        }
 
-        children.push(new Menu("Friends", [
+        children.push(new Menu("People", [
             new MenuItem("Friends", MenuPanel.openFriendsNode, !state.isAnonUser),
             new MenuItem("Followers", MenuPanel.showFollowers, !state.isAnonUser),
             new MenuItem("Blocked", MenuPanel.openBlockedUsersNode, !state.isAnonUser),

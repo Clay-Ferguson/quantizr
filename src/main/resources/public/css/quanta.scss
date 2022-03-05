@@ -712,6 +712,16 @@ Will come back later and study this more. todo-1 */
     padding-bottom: 20px;
 }
 
+.tabSubOptions {
+    margin-left: 30px;
+    margin-top: 10px;
+}
+
+.tabSubOptionsItem {
+    cursor: pointer;
+    margin-bottom: $smallGap;
+}
+
 .tab-buttons-container {
     margin-bottom: 8px;
     margin-top: 1em;

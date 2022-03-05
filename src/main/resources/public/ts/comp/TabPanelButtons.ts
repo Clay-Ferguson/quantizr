@@ -1,10 +1,11 @@
 import { useSelector } from "react-redux";
 import { AppState } from "../AppState";
+import { Anchor } from "../comp/core/Anchor";
+import { Div } from "../comp/core/Div";
 import { Constants as C } from "../Constants";
 import { TabDataIntf } from "../intf/TabDataIntf";
 import { S } from "../Singletons";
-import { Anchor } from "../comp/core/Anchor";
-import { Div } from "../comp/core/Div";
+import { Comp } from "./base/Comp";
 import { Li } from "./core/Li";
 import { Ul } from "./core/Ul";
 
@@ -30,12 +31,35 @@ export class TabPanelButtons extends Div {
         ]);
     }
 
-    buildTabButtons = (state: AppState): Li[] => {
-        let items: Li[] = [];
+    buildTabButtons = (state: AppState): Comp[] => {
+        let items: Comp[] = [];
         for (let tab of state.tabData) {
             items.push(this.getTabButton(state, tab));
+
+            let tabSubOptions = this.getTabSubOptions(state, tab);
+            if (tabSubOptions) {
+                items.push(tabSubOptions);
+            }
         }
         return items;
+    }
+
+    getTabSubOptions(state: AppState, data: TabDataIntf): Div {
+        let tabName = data.name;
+
+        // todo-1: temp hack for POC (we can move this to a callback on the TabDataIntf to create this extra Div for any tab)
+        if (!state.isAnonUser && tabName === "Feed" /* This would make it show up only when Feed is active: && S.quanta.activeTab === C.TAB_FEED */) {
+            return new Div(null, { className: "tabSubOptions" }, [
+                new Div("To/From Me", { className: "tabSubOptionsItem", onClick: S.nav.messagesToFromMe }),
+                new Div("To Me", { className: "tabSubOptionsItem", onClick: S.nav.messagesToMe }),
+                new Div("From Me", { className: "tabSubOptionsItem", onClick: S.nav.messagesFromMe }),
+                new Div("From Friends", { className: "tabSubOptionsItem", onClick: S.nav.messagesFromFriends }),
+                // We need to make this a configurable option.
+                // new MenuItem("From Local Users", S.nav.messagesLocal),
+                new Div("Public Fediverse", { className: "tabSubOptionsItem", onClick: S.nav.messagesFediverse })
+            ])
+        }
+        return null;
     }
 
     getTabButton(state: AppState, data: TabDataIntf): Li {
