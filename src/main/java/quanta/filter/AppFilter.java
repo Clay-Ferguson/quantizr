@@ -47,6 +47,7 @@ public class AppFilter extends GenericFilterBean {
 	@Override
 	public void doFilter(ServletRequest req, ServletResponse res, FilterChain chain) throws IOException, ServletException {
 		if (!MongoRepository.fullInit) {
+			// todo-0: need to return 503 error code here.
 			throw new RuntimeException("Server temporarily offline.");
 		}
 

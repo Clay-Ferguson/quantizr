@@ -285,8 +285,7 @@ public class ActPubUtil extends ServiceBase {
                 postJson(toInbox, url.getHost(), date, headerSig, digestHeader, body, postType);
             } catch (Exception e) {
                 // This codeblock may be dead now? todo-0: check into it.
-                log.error("initial (pre-fallback) secure http post failed to: " + toInbox, e);
-                log.error("trying fallback. Post type: " + APConst.MTYPE_ACT_JSON.toString());
+                log.error("trying fallback. Post type: " + APConst.MTYPE_ACT_JSON.toString() + " to inbox " + toInbox);
                 postJson(toInbox, url.getHost(), date, headerSig, digestHeader, body, APConst.MTYPE_ACT_JSON);
             }
         } catch (Exception e) {

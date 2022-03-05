@@ -256,7 +256,7 @@ export class Quanta {
 
         // This timer delay is just for asthetics and should not be required.
         setTimeout(async () => {
-            let res: J.GetConfigResponse = await S.util.ajax<J.GetConfigRequest, J.GetConfigResponse>("getConfig");
+            let res: J.GetConfigResponse = await S.util.ajax<J.GetConfigRequest, J.GetConfigResponse>("getConfig", null, true);
             if (res.config) {
                 S.quanta.config = res.config;
                 if (S.quanta.config.userMessage) {

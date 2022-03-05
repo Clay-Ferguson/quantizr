@@ -28,7 +28,7 @@ export class User {
             null, null, state);
         await dlg.open();
         if (dlg.yes) {
-            this.deleteAllUserLocalDbEntries();
+            await this.deleteAllUserLocalDbEntries();
             await S.util.ajax<J.CloseAccountRequest, J.CloseAccountResponse>("closeAccount");
             this.closeAccountResponse();
         }
@@ -87,7 +87,8 @@ export class User {
                 S.quanta.authToken = res.authToken;
 
                 if (res && !res.success) {
-                    await S.user.deleteAllUserLocalDbEntries();
+                    await S.localDB.setVal(C.LOCALDB_LOGIN_STATE, "0");
+                    await S.localDB.setVal(C.LOCALDB_LOGIN_STATE, "0", J.PrincipalName.ANON);
                 }
 
                 if (usingCredentials) {
@@ -104,7 +105,8 @@ export class User {
                 }
             }
             catch (e) {
-                await S.user.deleteAllUserLocalDbEntries();
+                await S.localDB.setVal(C.LOCALDB_LOGIN_STATE, "0");
+                await S.localDB.setVal(C.LOCALDB_LOGIN_STATE, "0", J.PrincipalName.ANON);
                 S.util.loadAnonPageHome(null);
             }
         }
@@ -218,7 +220,8 @@ export class User {
 
             // if we tried a login and it wasn't from a login dialog then just blow away the login state
             // so that any kind of page refresh is guaranteed to just show login dialog and not try to login
-            await this.deleteAllUserLocalDbEntries();
+            S.localDB.setVal(C.LOCALDB_LOGIN_STATE, "0");
+            S.localDB.setVal(C.LOCALDB_LOGIN_STATE, "0", J.PrincipalName.ANON);
 
             // location.reload();
             if (!calledFromLoginDlg) {

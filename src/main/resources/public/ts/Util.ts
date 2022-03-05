@@ -555,15 +555,6 @@ export class Util {
                         if (!this.timeoutMessageShown) {
                             this.timeoutMessageShown = true;
                         }
-
-                        // we wait about a second for user to have time to see the message that their session had timed out.
-                        // setTimeout(async () => {
-                        //     // window.onbeforeunload = null;
-                        //     // window.location.href = window.location.origin;
-                        //     // await S.localDB.setVal(cnst.LOCALDB_LOGIN_STATE, "0");
-                        //     // NOTE: This opens the login dialog. Requires user to click login before attempting a login.
-                        //     S.nav.login(state);
-                        // }, 200);
                         return;
                     }
 
@@ -578,7 +569,10 @@ export class Util {
                     console.error("Request failed: msg=" + msg);
 
                     status = error.response ? error.response.status : "";
-                    this.showMessage("Failed: " + status + " " + (error.message || ""), "Warning", true);
+
+                    if (!background) {
+                        this.showMessage("Failed: " + status + " " + (error.message || ""), "Warning", true);
+                    }
                 } catch (ex) {
                     this.logAndReThrow("Failed processing: " + postName, ex);
                 }
@@ -1352,12 +1346,14 @@ export class Util {
         // console.log("loadAnonPageHome()");
 
         try {
-            let res: J.RenderNodeResponse = await S.util.ajax<J.RenderNodeRequest, J.RenderNodeResponse>("anonPageLoad");
+            let res: J.RenderNodeResponse = await S.util.ajax<J.RenderNodeRequest, J.RenderNodeResponse>("anonPageLoad", null, true);
 
             // if we have trouble accessing even the anon page just drop out to landing page.
             if (!res.success || res.errorType === J.ErrorType.AUTH) {
-                // NO!!! I think this can send server into infinte loop of page loading!
-                // window.location.href = window.location.origin;
+                // check we aren't already at origin (no parameters) then set to origin.
+                if (window.location.href !== window.location.origin) {
+                    window.location.href = window.location.origin;
+                }
                 return;
             }
             state = appState(state);

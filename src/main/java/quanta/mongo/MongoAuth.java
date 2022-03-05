@@ -693,7 +693,7 @@ public class MongoAuth extends ServiceBase {
 					}
 				} catch (Exception e) {
 					log.error("Unable to process tag.", e);
-					// ignore errors on any tag and continue
+					// ignore errors on any tag and continue to next tag
 				}
 			}
 		}
