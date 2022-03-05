@@ -528,6 +528,7 @@ export interface FriendInfo {
     userName: string;
     avatarVer: string;
     userNodeId: string;
+    foreignAvatarUrl: string;
 }
 
 export interface GetBookmarksResponse extends ResponseBase {

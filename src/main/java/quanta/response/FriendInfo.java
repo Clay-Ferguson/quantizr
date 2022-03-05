@@ -6,6 +6,7 @@ public class FriendInfo {
     private String userName;
     private String avatarVer;
     private String userNodeId;
+    private String foreignAvatarUrl;
 
     public String getUserName() {
         return userName;
@@ -37,5 +38,13 @@ public class FriendInfo {
 
     public void setDisplayName(String displayName) {
         this.displayName = displayName;
+    }
+
+    public String getForeignAvatarUrl() {
+        return foreignAvatarUrl;
+    }
+
+    public void setForeignAvatarUrl(String foreignAvatarUrl) {
+        this.foreignAvatarUrl = foreignAvatarUrl;
     }
 }

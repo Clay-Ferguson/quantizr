@@ -87,7 +87,7 @@ public class UserManagerService extends ServiceBase {
 	private static final Logger log = LoggerFactory.getLogger(UserManagerService.class);
 
 	@Autowired
-    private ActPubLog apLog;
+	private ActPubLog apLog;
 
 	@Autowired
 	private AppProp prop;
@@ -1074,7 +1074,14 @@ public class UserManagerService extends ServiceBase {
 
 					SubNode friendAccountNode = read.getNode(ms, userNodeId, false);
 					if (ok(friendAccountNode)) {
-						fi.setAvatarVer(friendAccountNode.getStr(NodeProp.BIN));
+						// if a local user use BIN property on node (account node BIN property is the Avatar)
+						if (userName.indexOf("@") == -1) {
+							fi.setAvatarVer(friendAccountNode.getStr(NodeProp.BIN));
+						}
+						// Otherwise the avatar will be specified as a remote user's Icon.
+						else {
+							fi.setForeignAvatarUrl(friendAccountNode.getStr(NodeProp.ACT_PUB_USER_ICON_URL)); 
+						}
 					}
 					fi.setUserNodeId(userNodeId);
 					friends.add(fi);

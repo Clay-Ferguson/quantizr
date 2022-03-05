@@ -15,12 +15,20 @@ export class FriendsTableRow extends ListBoxRow {
 
     preRender(): void {
         let src: string = null;
+
+        // local users will have this kind of avatar
         if (this.friend.avatarVer) {
             src = S.render.getAvatarImgUrl(this.friend.userNodeId, this.friend.avatarVer);
         }
-        let img: Img = null;
-        let state = appState(null);
+        // foreign users have this kind of avatar
+        else if (this.friend.foreignAvatarUrl) {
+            src = this.friend.foreignAvatarUrl;
+        }
+        else {
+            console.log("no avatarVer on friend: " + this.friend.userNodeId);
+        }
 
+        let img: Img = null;
         if (src) {
             img = new Img(null, {
                 className: "friendListImage",
