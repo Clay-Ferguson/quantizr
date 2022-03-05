@@ -4,6 +4,7 @@ import { Anchor } from "../comp/core/Anchor";
 import { Div } from "../comp/core/Div";
 import { Constants as C } from "../Constants";
 import { TabDataIntf } from "../intf/TabDataIntf";
+import { MenuPanel } from "../MenuPanel";
 import { S } from "../Singletons";
 import { Comp } from "./base/Comp";
 import { Li } from "./core/Li";
@@ -48,16 +49,24 @@ export class TabPanelButtons extends Div {
         let tabName = data.name;
 
         // todo-1: temp hack for POC (we can move this to a callback on the TabDataIntf to create this extra Div for any tab)
-        if (!state.isAnonUser && tabName === "Feed" /* This would make it show up only when Feed is active: && S.quanta.activeTab === C.TAB_FEED */) {
-            return new Div(null, { className: "tabSubOptions" }, [
-                new Div("To/From Me", { className: "tabSubOptionsItem", onClick: S.nav.messagesToFromMe }),
-                new Div("To Me", { className: "tabSubOptionsItem", onClick: S.nav.messagesToMe }),
-                new Div("From Me", { className: "tabSubOptionsItem", onClick: S.nav.messagesFromMe }),
-                new Div("From Friends", { className: "tabSubOptionsItem", onClick: S.nav.messagesFromFriends }),
-                // We need to make this a configurable option.
-                // new MenuItem("From Local Users", S.nav.messagesLocal),
-                new Div("Public Fediverse", { className: "tabSubOptionsItem", onClick: S.nav.messagesFediverse })
-            ])
+        if (!state.isAnonUser) {
+            if (tabName === "Feed" /* This would make it show up only when Feed is active: && S.quanta.activeTab === C.TAB_FEED */) {
+                return new Div(null, { className: "tabSubOptions" }, [
+                    new Div("To/From Me", { className: "tabSubOptionsItem", onClick: S.nav.messagesToFromMe }),
+                    new Div("To Me", { className: "tabSubOptionsItem", onClick: S.nav.messagesToMe }),
+                    new Div("From Me", { className: "tabSubOptionsItem", onClick: S.nav.messagesFromMe }),
+                    new Div("From Friends", { className: "tabSubOptionsItem", onClick: S.nav.messagesFromFriends }),
+                    // We need to make this a configurable option.
+                    // new MenuItem("From Local Users", S.nav.messagesLocal),
+                    new Div("Public Fediverse", { className: "tabSubOptionsItem", onClick: S.nav.messagesFediverse })
+                ]);
+            }
+            else if (tabName === "Tree") {
+                return new Div(null, { className: "tabSubOptions" }, [
+                    new Div("My Root", { className: "tabSubOptionsItem", onClick: () => S.nav.navHome(state) }),
+                    new Div("My Home", { className: "tabSubOptionsItem", onClick: MenuPanel.openHomeNode })
+                ])
+            }
         }
         return null;
     }

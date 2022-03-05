@@ -193,9 +193,9 @@ export class MenuPanel extends Div {
         }
 
         if (!state.isAnonUser) {
-            children.push(new Menu("Account", [
+            children.push(new Menu("My Account", [
                 new MenuItem("Root Node", S.nav.navHome, !state.isAnonUser, null), // This works, but not being used yet -> this.makeHelpIcon(() => S.quanta?.config?.help?.menu?.account)),
-                new MenuItem("Public Node", MenuPanel.openHomeNode, !state.isAnonUser),
+                new MenuItem("Home Node", MenuPanel.openHomeNode, !state.isAnonUser),
                 new MenuItem("Public Posts", MenuPanel.openPostsNode, !state.isAnonUser),
                 new MenuItem("RSS Feeds", MenuPanel.openRSSFeedsNode, !state.isAnonUser),
                 new MenuItem("Notes", MenuPanel.openNotesNode, !state.isAnonUser),

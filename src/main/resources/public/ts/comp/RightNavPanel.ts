@@ -90,6 +90,11 @@ export class RightNavPanel extends Div {
             title: "Create new Note"
         }) : null;
 
+        // These buttons are great, but not rendering them for now, because we need to declutter the GUI, but these can be
+        // an advanced option required to be turned on by the user.
+        // clipboardPasteButton,
+        // addNoteButton
+
         this.setChildren([
             new Div(null, { className: "float-left" }, [
                 new Div(null, { className: "rightNavPanelInner" }, [
@@ -97,15 +102,6 @@ export class RightNavPanel extends Div {
                         className: "signupLinkText",
                         onClick: e => { S.nav.login(state); }
                     }) : null,
-
-                    new Div(null, { className: "marginBottom" }, [
-                        displayName && !state.isAnonUser ? new IconButton("fa-database", null, {
-                            title: "Go to Account Root Node",
-                            onClick: e => S.nav.navHome(state)
-                        }, "marginRight btn-primary") : null,
-                        clipboardPasteButton,
-                        addNoteButton
-                    ]),
 
                     new Div(null, { className: "bigMarginBottom" }, [
                         (allowEditMode && !fullScreenViewer) ? new Checkbox("Edit", { title: "Allow editing content" }, {
