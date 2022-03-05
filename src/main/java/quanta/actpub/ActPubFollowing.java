@@ -89,8 +89,7 @@ public class ActPubFollowing extends ServiceBase {
                 if (ok(toActor)) {
                     String toInbox = AP.str(toActor, APObj.inbox);
 
-                    apUtil.securePost(followerUserName, ms, null, toInbox, sessionActorUrl, action, null,
-                            APConst.MTYPE_LD_JSON_PROF);
+                    apUtil.securePost(followerUserName, ms, null, toInbox, sessionActorUrl, action, APConst.MTYPE_LD_JSON_PROF);
                 } else {
                     apLog.trace("Unable to get actor to post to: " + actorUrlOfUserBeingFollowed);
                 }
@@ -102,6 +101,8 @@ public class ActPubFollowing extends ServiceBase {
     }
 
     /**
+     * Follows or Unfollows foreign users
+     * 
      * Process inbound 'Follow' actions (comming from foreign servers). This results in the follower an
      * account node in our local DB created if not already existing, and then a FRIEND node under his
      * FRIEND_LIST created to represent the person he's following, if not already existing.
@@ -209,9 +210,9 @@ public class ActPubFollowing extends ServiceBase {
                                 new APOFollow();
 
                         /*
-                         * todo-0: These parameters are definitely correct for 'Follow', but I need to verify for an 'undo'
+                         * todo-1: These parameters are definitely correct for 'Follow', but I need to verify for an 'undo'
                          * unfollow if they are acceptable (do this by letting both Pleroma AND Mastodon unfollow quanta
-                         * users and see what the format of the message is sent from those)
+                         * users and see what the format of the message is sent from those).
                          */
                         acceptPayload.put(APObj.id, AP.str(followAction, APObj.id));
                         acceptPayload.put(APObj.actor, followerActorUrl);
@@ -227,7 +228,7 @@ public class ActPubFollowing extends ServiceBase {
                         String followerInbox = AP.str(followerActor, APObj.inbox);
                         log.debug("Sending Accept of Follow Request to inbox " + followerInbox);
 
-                        apUtil.securePost(null, as, privateKey, followerInbox, _actorBeingFollowedUrl, accept, null,
+                        apUtil.securePost(null, as, privateKey, followerInbox, _actorBeingFollowedUrl, accept,
                                 APConst.MTYPE_LD_JSON_PROF);
                         log.debug("Secure post completed.");
                     });

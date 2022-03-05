@@ -228,12 +228,9 @@ public class ActPubUtil extends ServiceBase {
      * Note: 'actor' here is the actor URL of the local (non-federated) user doing the post
      * 
      * WARNING: If privateKey is passed as 'null' you MUST be calling this from HTTP request thread.
-     * 
-     * todo-0: check all callers acceptType value. Should be: 'application/activity+json' +
-     * 'application/json' ?
      */
     public void securePost(String userDoingPost, MongoSession ms, String privateKey, String toInbox, String actor, APObj message,
-            MediaType acceptType, MediaType postType) {
+            MediaType postType) {
         try {
             apLog.trace("Secure post to " + toInbox);
             /* if private key not sent then get it using the session */
@@ -253,13 +250,6 @@ public class ActPubUtil extends ServiceBase {
             KeyFactory kf = KeyFactory.getInstance("RSA");
             PKCS8EncodedKeySpec keySpecPKCS8 = new PKCS8EncodedKeySpec(privKeyBytes);
             PrivateKey privKey = kf.generatePrivate(keySpecPKCS8);
-
-            // import java.security.PublicKey;
-            // import java.security.interfaces.RSAPublicKey;
-            // import java.security.spec.X509EncodedKeySpec;
-            // byte[] publicKeyBytes = Base64.getDecoder().decode(publicKey);
-            // X509EncodedKeySpec keySpecX509 = new X509EncodedKeySpec(publicKeyBytes);
-            // PUblicKey pubKey = (RSAPublicKey) kf.generatePublic(keySpecX509);
 
             // WARNING: dateFormat is NOT threasafe. Always create one here.
             SimpleDateFormat dateFormat = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss z", Locale.US);
@@ -286,23 +276,27 @@ public class ActPubUtil extends ServiceBase {
              * add it but be sure not to break compatability when doing so.
              */
 
-            String headerSig = "keyId=\"" + actor + "#main-key\"" //
-                    + ",headers=\"(request-target) host date digest\"" //
-                    + ",algorithm=\"rsa-sha256\"" //
-                    + ",signature=\"" + Base64.getEncoder().encodeToString(signature) + "\"";
+            String headerSig = headerPair("keyId", actor + "#main-key") + "," + //
+                    headerPair("headers", "(request-target) host date digest") + "," + //
+                    headerPair("algorithm", "rsa-sha256") + "," + //
+                    headerPair("signature", Base64.getEncoder().encodeToString(signature));
 
             try {
-                postJson(toInbox, url.getHost(), date, headerSig, digestHeader, body, acceptType, postType);
+                postJson(toInbox, url.getHost(), date, headerSig, digestHeader, body, postType);
             } catch (Exception e) {
                 // This codeblock may be dead now? todo-0: check into it.
                 log.error("initial (pre-fallback) secure http post failed to: " + toInbox, e);
                 log.error("trying fallback. Post type: " + APConst.MTYPE_ACT_JSON.toString());
-                postJson(toInbox, url.getHost(), date, headerSig, digestHeader, body, acceptType, APConst.MTYPE_ACT_JSON);
+                postJson(toInbox, url.getHost(), date, headerSig, digestHeader, body, APConst.MTYPE_ACT_JSON);
             }
         } catch (Exception e) {
             log.error("ALL secure http post failed to: " + toInbox, e);
             throw new RuntimeException(e);
         }
+    }
+
+    private String headerPair(String key, String val) {
+        return key + "=\"" + val + "\"";
     }
 
     /*
@@ -418,26 +412,20 @@ public class ActPubUtil extends ServiceBase {
     }
 
     public APObj postJson(String url, String headerHost, String headerDate, String headerSig, String digestHeader, String body,
-            MediaType acceptType, MediaType postType) {
+            MediaType postType) {
         APObj ret = null;
         try {
             // log.debug("postJson to: " + url);
 
             HttpHeaders headers = new HttpHeaders();
-            if (ok(acceptType)) {
-                // todo-0: right now this is a dead codepath
-                List<MediaType> acceptableMediaTypes = new LinkedList<>();
-                acceptableMediaTypes.add(acceptType);
-                headers.setAccept(acceptableMediaTypes);
-            } else {
-                List<MediaType> acceptableMediaTypes = new LinkedList<>();
-                acceptableMediaTypes.add(APConst.MTYPE_ACT_JSON);
-                acceptableMediaTypes.add(APConst.MTYPE_JSON);
-                headers.setAccept(acceptableMediaTypes);
-            }
+            headers.setAccept(List.of(APConst.MTYPE_ACT_JSON, APConst.MTYPE_JSON));
+
+            String appName = prop.getConfigText("brandingAppName");
+            if (no(appName))
+                appName = "Quanta";
 
             // NOTE: I'm not sure this is ever necessary. Noticed Pleroma doing it and copied it.
-            headers.add("user-agent", "Quanta; https://" + prop.getMetaHost() + " <fake@email.com>");
+            headers.add("user-agent", appName + "; https://" + prop.getMetaHost() + " <fake@email.com>");
 
             // NOTE: no longer includes this
             if (ok(headerHost)) {

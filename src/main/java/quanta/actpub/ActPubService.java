@@ -123,8 +123,7 @@ public class ActPubService extends ServiceBase {
                         for (String inbox : sharedInboxes) {
                             apLog.trace("Posting to Shared Inbox: " + inbox);
                             try {
-                                apUtil.securePost(fromUser, ms, null, inbox, fromActor, message, null,
-                                        APConst.MTYPE_LD_JSON_PROF);
+                                apUtil.securePost(fromUser, ms, null, inbox, fromActor, message, APConst.MTYPE_LD_JSON_PROF);
                             }
                             // catch error from any server, and ignore, go to next server to send to.
                             catch (Exception e) {
@@ -240,7 +239,7 @@ public class ActPubService extends ServiceBase {
                         privateMessage, attachments);
 
                 String userDoingPost = ThreadLocals.getSC().getUserName();
-                apUtil.securePost(userDoingPost, ms, null, inbox, fromActor, message, null, APConst.MTYPE_LD_JSON_PROF);
+                apUtil.securePost(userDoingPost, ms, null, inbox, fromActor, message, APConst.MTYPE_LD_JSON_PROF);
             }
         }
     }
