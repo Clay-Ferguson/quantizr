@@ -90,15 +90,16 @@ export class LoginDlg extends DialogBase {
                 dst: S.util.daylightSavingsTime
             });
 
-            S.quanta.authToken = res.authToken;
-            S.user.loginResponse(res, usr, pwd, true, this.appState);
-            this.close();
+            if (res.success) {
+                S.quanta.authToken = res.authToken;
+                S.user.loginResponse(res, usr, pwd, true, this.appState);
+                this.close();
+            }
         }
     }
 
     resetPassword = async (): Promise<any> => {
         let usr = this.userState.getValue();
-
         let dlg: ConfirmDlg = new ConfirmDlg("Reset your password ?", "Confirm", null, null, this.appState);
         await dlg.open();
         if (dlg.yes) {

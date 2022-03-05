@@ -53,7 +53,9 @@ export class MenuPanel extends Div {
 
     static continueEditing = () => {
         let state = store.getState();
-        S.view.jumpToId(state.editNode.id);
+        if (state.editNode) {
+            S.view.jumpToId(state.editNode.id);
+        }
     };
 
     // We pre-create all these functions so that the re-rendering of this component doesn't also create functions

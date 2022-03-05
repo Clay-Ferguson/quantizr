@@ -80,7 +80,7 @@ export class NodeCompRow extends Div {
 
             let isPageRootNode = state.node && this.node.id === state.node.id;
 
-            if (this.allowInlineInsertButton && !state.editNode && !isPageRootNode && this.level === 1 && insertAllowed && S.edit.isInsertAllowed(node, state)) {
+            if (this.allowInlineInsertButton && !isPageRootNode && this.level === 1 && insertAllowed && S.edit.isInsertAllowed(node, state)) {
 
                 // todo-1: this button should have same enablement as "new" button, on the page root ???
                 insertInlineButton = new Div(null, { className: "marginLeft" }, [

@@ -512,14 +512,27 @@ export class Edit {
         return state.node.children[state.node.children.length - 1];
     }
 
-    runEditNodeByClick = (evt: Event, id: string, state?: AppState): void => {
+    checkEditPending = (): boolean => {
+        let state: AppState = appState(null);
+
+        // state.editNode holds non-null always whenever there is editing underway.
+        if (state.editNode) {
+            S.util.showMessage("You're already editing a node. Finish that edit first. Tip: Use `Menu -> Edit -> Continue Editing` if you forgot which node you're editing.", "Warning");
+            return true;
+        }
+        return false;
+    }
+
+    runEditNodeByClick = (evt: Event, id: string): void => {
+        if (this.checkEditPending()) return;
+
         id = S.util.allowIdFromEvent(evt, id);
 
         // we set noScrollToId just to block the future attempt (one time) to
         // scroll to this, because this is a hint telling us we are ALREADY
         // scrolled to this ID so any scrolling will be unnecessary
         S.quanta.noScrollToId = id;
-        this.runEditNode(null, id, false, false, false, null, state);
+        this.runEditNode(null, id, false, false, false, null, null);
 
         // it's safest and best to just disable scrolling for a couple of seconds during which editing is being initiated.
         setTimeout(() => {
@@ -550,6 +563,8 @@ export class Edit {
     }
 
     insertNode = (id: string, typeName: string, ordinalOffset: number, state?: AppState): void => {
+        if (this.checkEditPending()) return;
+
         state = appState(state);
         if (!state.node || !state.node.children) return;
 
@@ -572,6 +587,8 @@ export class Edit {
     }
 
     newSubNode = async (evt: Event, id: string): Promise<void> => {
+        if (this.checkEditPending()) return;
+
         id = S.util.allowIdFromEvent(evt, id);
         const state = store.getState();
         if (S.util.ctrlKeyCheck()) {

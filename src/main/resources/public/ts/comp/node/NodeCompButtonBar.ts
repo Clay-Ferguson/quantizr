@@ -161,7 +161,7 @@ export class NodeCompButtonBar extends Div {
             }
             let editInsertAllowed = S.edit.isInsertAllowed(node, state);
 
-            if (C.NEW_ON_TOOLBAR && insertAllowed && editInsertAllowed && !state.editNode) {
+            if (C.NEW_ON_TOOLBAR && insertAllowed && editInsertAllowed) {
                 createSubNodeButton = new Button(null, S.edit.newSubNode, {
                     iconclass: "fa fa-plus",
                     nid: node.id,
@@ -172,7 +172,7 @@ export class NodeCompButtonBar extends Div {
             let userCanPaste = S.props.isMine(node, state) || state.isAdminUser || node.id === state.homeNodeId;
 
             if (editingAllowed) {
-                if (editableNode && !state.editNode) {
+                if (editableNode) {
                     editNodeButton = new Button(null, S.edit.runEditNodeByClick, {
                         iconclass: "fa fa-edit",
                         title: "Edit Node",

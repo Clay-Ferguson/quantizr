@@ -136,7 +136,15 @@ export class NodeCompRowHeader extends Div {
         }
 
         if (node.name) {
-            floatUpperRightDiv.addChild(new Span(node.name, { className: "nodeNameDisp", title: "Node name" }));
+            let byNameUrl = window.location.origin + S.nodeUtil.getPathPartForNamedNode(node);
+            floatUpperRightDiv.addChild(new Span(node.name, {
+                className: "nodeNameDisp",
+                title: "Node name (Click to copy link to clipboard)",
+                onClick: () => {
+                    S.util.copyToClipboard(byNameUrl);
+                    S.util.flashMessage("Copied link to Clipboard", "Clipboard", true);
+                }
+            }));
         }
 
         if (S.props.isPublic(node)) {
@@ -192,7 +200,7 @@ export class NodeCompRowHeader extends Div {
         /* Note: if this is on the main tree then we don't show the edit button here because it'll be
         showing up in a different place. We show here only for timeline, or search results views */
         if (!this.isMainTree && state.userPreferences.editMode) {
-            if (editingAllowed && editableNode && !state.editNode) {
+            if (editingAllowed && editableNode) {
                 editButton = new IconButton("fa-edit", null, {
                     className: "marginLeft",
                     onClick: S.edit.runEditNodeByClick,

@@ -88,21 +88,19 @@ export class NodeCompVerticalRowLayout extends Div {
 
             if (this.level <= 1) {
                 // todo-1: this button should have same enabelement as "new" button, on the page root
-                if (!state.editNode) {
-                    comps.push(new Div(null, { className: "node-table-row" }, [
-                        new Button(null, e => {
-                            if (lastNode) {
-                                S.edit.insertNode(lastNode.id, "u", 1 /* isFirst ? 0 : 1 */, state);
-                            }
-                            else {
-                                S.edit.newSubNode(null, state.node.id);
-                            }
-                        }, {
-                            iconclass: "fa fa-plus",
-                            title: "Insert new node"
-                        }, "btn-secondary plusButtonFloatRight")
-                    ]));
-                }
+                comps.push(new Div(null, { className: "node-table-row" }, [
+                    new Button(null, e => {
+                        if (lastNode) {
+                            S.edit.insertNode(lastNode.id, "u", 1 /* isFirst ? 0 : 1 */, state);
+                        }
+                        else {
+                            S.edit.newSubNode(null, state.node.id);
+                        }
+                    }, {
+                        iconclass: "fa fa-plus",
+                        title: "Insert new node"
+                    }, "btn-secondary plusButtonFloatRight")
+                ]));
 
                 if (lastNode) {
                     let userCanPaste = (S.props.isMine(lastNode, state) || state.isAdminUser) && lastNode.id !== state.homeNodeId;
