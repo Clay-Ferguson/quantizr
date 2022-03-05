@@ -639,6 +639,10 @@ export class Util {
         new MessageDlg(message, title, null, null, preformatted, 3000, null, null).open();
     }
 
+    flashMessageQuick = (message: string, title: string, preformatted: boolean = false, sizeStyle: string = null): void => {
+        new MessageDlg(message, title, null, null, preformatted, 2000, null, null).open();
+    }
+
     showMessage = (message: string, title: string = null, preformatted: boolean = false, sizeStyle: string = null): Promise<DialogBase> => {
         if (!message) return;
         return new MessageDlg(message, title, null, null, preformatted, 0, null, null).open();

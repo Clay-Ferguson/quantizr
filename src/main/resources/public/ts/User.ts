@@ -155,6 +155,8 @@ export class User {
     loginResponse = async (res: J.LoginResponse, usr: string, pwd: string, calledFromLoginDlg: boolean,
         state: AppState): Promise<void> => {
         if (S.util.checkSuccess("Login", res)) {
+
+            // if login was successful and we're an authenticated user
             if (usr !== J.PrincipalName.ANON) {
                 S.localDB.userName = usr;
                 if (usr) {

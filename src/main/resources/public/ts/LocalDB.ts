@@ -1,4 +1,5 @@
 import * as J from "./JavaIntf";
+import { S } from "./Singletons";
 
 /* Wraps a transaction of the CRUD operations for access to JavaScript local storage IndexedDB API */
 export class LocalDB {
@@ -138,6 +139,9 @@ export class LocalDB {
         else {
             prefix = this.userName ? (this.userName + "_") : "kv_";
         }
-        return prefix;
+
+        let ret = prefix + location.host + "_";
+        ret = S.util.replaceAll(ret, ":", "_");
+        return ret;
     }
 }

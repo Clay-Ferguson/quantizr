@@ -71,30 +71,71 @@ export class LoginDlg extends DialogBase {
     }
 
     login = async (): Promise<void> => {
-        if (!this.validate()) {
-            return;
-        }
-        let usr = this.userState.getValue();
 
-        /* The word admin is not a secret so let's make it easy for the admin to login using only his password */
-        if (usr === "a") {
-            usr = "admin";
-        }
-        let pwd = this.pwdState.getValue();
-
-        if (usr && pwd) {
-            let res: J.LoginResponse = await S.util.ajax<J.LoginRequest, J.LoginResponse>("login", {
-                userName: usr,
-                password: pwd,
-                tzOffset: new Date().getTimezoneOffset(),
-                dst: S.util.daylightSavingsTime
-            });
-
-            if (res.success) {
-                S.quanta.authToken = res.authToken;
-                S.user.loginResponse(res, usr, pwd, true, this.appState);
-                this.close();
+        let done = false;
+        // create a function becasue we may be calling it asynchronously
+        let finishLogin = async () => {
+            if (!this.validate()) {
+                return;
             }
+            let usr = this.userState.getValue();
+
+            /* The word admin is not a secret so let's make it easy for the admin to login using only his password */
+            if (usr === "a") {
+                usr = "admin";
+            }
+            let pwd = this.pwdState.getValue();
+
+            if (usr && pwd) {
+                let res: J.LoginResponse = await S.util.ajax<J.LoginRequest, J.LoginResponse>("login", {
+                    userName: usr,
+                    password: pwd,
+                    tzOffset: new Date().getTimezoneOffset(),
+                    dst: S.util.daylightSavingsTime
+                });
+
+                if (res.success) {
+                    S.quanta.authToken = res.authToken;
+                    S.user.loginResponse(res, usr, pwd, true, this.appState);
+                    this.close();
+                }
+            }
+        }
+
+        // if the password field is empty
+        if (!this.pwdState.getValue()) {
+            let usr = this.userState.getValue();
+
+            /* The word admin is not a secret so let's make it easy for the admin to login using only his password */
+            if (usr === "a") {
+                usr = "admin";
+            }
+
+            // and username is entered, then try to use most recent password
+            if (usr) {
+                // this is kind of ugly but we need to set localDb userName for keys to generate properly
+                S.localDB.userName = usr;
+
+                // lookup the password based on known user
+                let pwd = await S.localDB.getVal(C.LOCALDB_LOGIN_PWD, usr);
+                if (pwd) {
+                    // signal below code not to execute.
+                    done = true;
+
+                    // put password in the password field
+                    this.pwdState.setValue(pwd);
+
+                    // show a message to the user
+                    S.util.flashMessageQuick("Using saved password.", "Login");
+
+                    // run the login after the message has had time to show.
+                    setTimeout(finishLogin, 2500);
+                }
+            }
+        }
+
+        if (!done) {
+            finishLogin();
         }
     }
 
