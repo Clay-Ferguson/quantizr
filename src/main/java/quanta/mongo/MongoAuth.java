@@ -640,15 +640,15 @@ public class MongoAuth extends ServiceBase {
 	}
 
 	/**
-	 * todo-0: We also have a 'tags' field in Quanta Nodes, so we can use code very similar to this method 
-	 * to extract "Tag" types and put them automatically into the Quanta node. That way the code we have for 
-	 * unmangling them (we have that right?) can be removed and we perfectly extract out tags. Note the Word Frequency
-	 * analyzer code is where we're currently dealing with this.
+	 * todo-0: We also have a 'tags' field in Quanta Nodes, so we can use code very similar to this
+	 * method to extract "Tag" types and put them automatically into the Quanta node. That way the code
+	 * we have for unmangling them (we have that right?) can be removed and we perfectly extract out
+	 * tags. Note the Word Frequency analyzer code is where we're currently dealing with this.
 	 * 
 	 * uses the ap:tag property on the node to build a list of foreign user names in the namesSet. If
 	 * you pass a non-null namesSet then that set will be appended to and returned or else it creates a
-	 * new set. Posts comming form Mastodon at least will have Mentions in this format on them. I'm not sure how
-	 * standardized this is (per ActPub Spec, etc)
+	 * new set. Posts comming form Mastodon at least will have Mentions in this format on them. I'm not
+	 * sure how standardized this is (per ActPub Spec, etc)
 	 * 
 	 * <pre>
 			"ap:tag" : [ {
@@ -686,7 +686,11 @@ public class MongoAuth extends ServiceBase {
 						// build this name without host part if it's a local user, otherwise full fediverse name
 						String user = prop.getMetaHost().equals(hrefUrl.getHost()) ? (String) name
 								: (String) name + "@" + hrefUrl.getHost();
-						namesSet.add(user);
+
+						// add the name if it's not the current user. No need to self-mention in a reply?
+						if (!user.equals("@" + apUtil.fullFediNameOfThreadUser())) {
+							namesSet.add(user);
+						}
 					} else {
 						log.debug("Failed to parse tag on nodeId " + node.getIdStr() + " because it was type="
 								+ tag.getClass().getName());

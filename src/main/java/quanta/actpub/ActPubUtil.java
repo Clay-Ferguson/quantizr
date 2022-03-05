@@ -554,6 +554,10 @@ public class ActPubUtil extends ServiceBase {
         return actorUrl.startsWith(prop.getProtocolHostAndPort() + APConst.ACTOR_PATH + "/");
     }
 
+    public String fullFediNameOfThreadUser() {
+        return ThreadLocals.getSC().getUserName() + "@" + prop.getMetaHost();
+    }
+
     /*
      * we know our own actor layout is this: https://ourserver.com/ap/u/userName, so this method just
      * strips the user name by taking what's after the rightmost slash
