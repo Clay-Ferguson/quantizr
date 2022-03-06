@@ -231,7 +231,7 @@ export class FeedView extends AppTab<FeedViewProps> {
 
     /* overridable (don't use arrow function) */
     renderHeading(state: AppState): CompIntf {
-        return new Heading(4, this.data.props.feedFilterRootNode ? "Chat Room" : "Feed " + this.getFeedSubHeading(this.data), { className: "resultsTitle" });
+        return new Heading(4, this.data.props.feedFilterRootNode ? "Chat Room" : "Feed" + this.getFeedSubHeading(this.data), { className: "resultsTitle" });
     }
 
     // todo-0: put in a utilities class (use for RHS to indicate current selection)

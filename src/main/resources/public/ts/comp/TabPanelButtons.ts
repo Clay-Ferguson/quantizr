@@ -4,12 +4,11 @@ import { Anchor } from "../comp/core/Anchor";
 import { Div } from "../comp/core/Div";
 import { Constants as C } from "../Constants";
 import { TabDataIntf } from "../intf/TabDataIntf";
-import { MenuPanel } from "../MenuPanel";
+import * as J from "../JavaIntf";
 import { S } from "../Singletons";
 import { Comp } from "./base/Comp";
 import { Li } from "./core/Li";
 import { Ul } from "./core/Ul";
-
 export class TabPanelButtons extends Div {
 
     constructor(private verticalButtons: boolean, public moreClasses: string = "") {
@@ -64,8 +63,9 @@ export class TabPanelButtons extends Div {
             else if (tabName === "Tree") {
                 return new Div(null, { className: "tabSubOptions" }, [
                     new Div("My Root", { className: "tabSubOptionsItem", onClick: () => S.nav.navHome(state) }),
-                    new Div("My Home", { className: "tabSubOptionsItem", onClick: MenuPanel.openHomeNode })
-                ])
+                    new Div("My Home", { className: "tabSubOptionsItem", onClick: () => S.nav.openContentNode(":" + state.userName + ":home") }),
+                    new Div("My Posts", { className: "tabSubOptionsItem", onClick: () => S.nav.openContentNode("~" + J.NodeType.POSTS) })
+                ]);
             }
         }
         return null;

@@ -21,6 +21,9 @@ source ./setenv-distro-runner.sh
 
 ./stop-distro.sh
 
+# take ownership of this directory as current user
+sudo chown -R $USER .
+
 echo "removing logs"
 rm -rf ./log/archived/*
 rm -rf ./log/*.log
