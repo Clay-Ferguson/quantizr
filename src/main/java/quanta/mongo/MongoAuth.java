@@ -607,7 +607,7 @@ public class MongoAuth extends ServiceBase {
 
 	/*
 	 * Parses all foreign mentions of forengn usernames from message. Puts them in namesSet if not null,
-	 * and returns namesSet, or if null is passed in for namesSet you get a new set created
+	 * and returns namesSet, or if null is passed in for namesSet you get a new set created.
 	 */
 	public HashSet<String> parseMentionsFromString(HashSet<String> namesSet, String message) {
 		if (no(message))
@@ -617,7 +617,7 @@ public class MongoAuth extends ServiceBase {
 			namesSet = new HashSet<>();
 		}
 
-		// prepare so that newlines are compatable with out tokenizing
+		// prepare so that newlines are compatable with our tokenizing
 		message = message.replace("\n", " ");
 		message = message.replace("\r", " ");
 
@@ -639,12 +639,7 @@ public class MongoAuth extends ServiceBase {
 		return namesSet;
 	}
 
-	/**
-	 * todo-0: We also have a 'tags' field in Quanta Nodes, so we can use code very similar to this
-	 * method to extract "Tag" types and put them automatically into the Quanta node. That way the code
-	 * we have for unmangling them (we have that right?) can be removed and we perfectly extract out
-	 * tags. Note the Word Frequency analyzer code is where we're currently dealing with this.
-	 * 
+	/** 
 	 * uses the ap:tag property on the node to build a list of foreign user names in the namesSet. If
 	 * you pass a non-null namesSet then that set will be appended to and returned or else it creates a
 	 * new set. Posts comming form Mastodon at least will have Mentions in this format on them. I'm not

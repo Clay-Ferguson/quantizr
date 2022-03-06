@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.StringTokenizer;
 import org.apache.commons.lang3.StringUtils;
 import org.bson.types.ObjectId;
@@ -298,18 +299,6 @@ public class NodeSearchService extends ServiceBase {
 		return res;
 	}
 
-	// replace #<span> with " #". This is a quick and easy way to fix the way
-	// Mastodon mangles hashtags in the text, to convert them back to hashtags
-	public String fixMastodonMangles(String content) {
-		if (no(content))
-			return null;
-		content = content.replace("#\\u003cspan\\u003e", " #");
-		content = content.replace("#<span>", " #");
-		content = content.replace("\\u003c", " ");
-		content = content.replace("\\u003e", " ");
-		return content;
-	}
-
 	public void getBookmarks(MongoSession ms, GetBookmarksRequest req, GetBookmarksResponse res) {
 		List<Bookmark> bookmarks = new LinkedList<>();
 
@@ -418,8 +407,8 @@ public class NodeSearchService extends ServiceBase {
 			if (ok(node.getTags())) {
 				content += " " + node.getTags();
 			}
-			content = fixMastodonMangles(content);
 
+			HashSet<String> knownTokens = null;
 			StringTokenizer tokens = new StringTokenizer(content, WORD_DELIMS, false);
 			while (tokens.hasMoreTokens()) {
 				String token = tokens.nextToken().trim();
@@ -431,6 +420,12 @@ public class NodeSearchService extends ServiceBase {
 					if (token.startsWith("@")) {
 						if (token.length() == 1)
 							continue;
+
+						// lazy create and update knownTokens
+						if (no(knownTokens)) {
+							knownTokens = new HashSet<>();
+						}
+						knownTokens.add(lcToken);
 
 						WordStats ws = mentionMap.get(lcToken);
 						if (no(ws)) {
@@ -448,6 +443,12 @@ public class NodeSearchService extends ServiceBase {
 						String numCheck = token.substring(1);
 						if (StringUtils.isNumeric(numCheck))
 							continue;
+
+						// lazy create and update knownTokens
+						if (no(knownTokens)) {
+							knownTokens = new HashSet<>();
+						}
+						knownTokens.add(lcToken);
 
 						WordStats ws = tagMap.get(lcToken);
 						if (no(ws)) {
@@ -472,6 +473,7 @@ public class NodeSearchService extends ServiceBase {
 				}
 				totalWords++;
 			}
+			extractTagsAndMentions(node, knownTokens, tagMap, mentionMap);
 			nodeCount++;
 		}
 
@@ -520,6 +522,60 @@ public class NodeSearchService extends ServiceBase {
 		if (req.isFeed()) {
 			synchronized (NodeSearchService.trendingFeedInfoLock) {
 				NodeSearchService.trendingFeedInfo = res;
+			}
+		}
+	}
+
+	private void extractTagsAndMentions(SubNode node, HashSet<String> knownTokens, HashMap<String, WordStats> tagMap,
+			HashMap<String, WordStats> mentionMap) {
+		List<Object> tags = node.getObj(NodeProp.ACT_PUB_TAG.s(), List.class);
+		if (no(tags))
+			return;
+
+		for (Object tag : tags) {
+			try {
+				if (tag instanceof Map) {
+					Map<?, ?> m = (Map) tag;
+					Object type = m.get("type");
+					// Object href = m.get("href");
+					Object name = m.get("name");
+					if (!(type instanceof String) || !(name instanceof String)) {
+						continue;
+					}
+
+					String _name = ((String) name).toLowerCase();
+
+					// we use the knownTags to avoid double counting stuff we already counted from the content text
+					if (ok(knownTokens) && knownTokens.contains(_name))
+						continue;
+
+					// counting Mentions
+					if (type.equals("Mention")) {
+						/*
+						 * Technically the fully qualified name would be the perfect identification for user, but to avoid
+						 * double-counting names that are parset out of the content as the short (no instance) version of
+						 * the name we ignore the href, in here, but href *could* be used if we needed the full name, like
+						 * what we do in parseMentionsFromNode()
+						 */
+						WordStats ws = mentionMap.get(_name);
+						if (no(ws)) {
+							ws = new WordStats(_name);
+							mentionMap.put(_name, ws);
+						}
+						ws.count++;
+					}
+					// counting Hashtags
+					else if (type.equals("Hashtag")) {
+						WordStats ws = tagMap.get(_name);
+						if (no(ws)) {
+							ws = new WordStats(_name);
+							tagMap.put(_name, ws);
+						}
+						ws.count++;
+					}
+				}
+			} catch (Exception e) {
+				// just ignore this.
 			}
 		}
 	}
