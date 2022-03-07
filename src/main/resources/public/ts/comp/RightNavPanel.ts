@@ -143,7 +143,7 @@ export class RightNavPanel extends Div {
                 ]),
 
                 // note: Anonymouse users don't have nodeHistory
-                S.quanta.nodeHistory && S.quanta.nodeHistory.length > 0 ? new CollapsiblePanel("History", "History", null, [
+                S.quanta.nodeHistory && S.quanta.nodeHistory.length > 0 ? new CollapsiblePanel("Show History", "Hide History", null, [
                     new HistoryPanel()
                 ], true,
                     (state: boolean) => {

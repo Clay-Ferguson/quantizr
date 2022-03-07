@@ -1042,10 +1042,10 @@ export class Util {
             // console.log("onDragOver: id=" + event.target.id);
             event.dataTransfer.dropEffect = "copy"; // See the section on the DataTransfer object.
             if (fullOutline) {
-                event.currentTarget.style.border = "4px solid green";
+                event.currentTarget.style.border = "2px solid green";
             }
             else {
-                event.currentTarget.style.borderTop = "4px solid green";
+                event.currentTarget.style.borderTop = "2px solid green";
             }
         };
 
@@ -1053,10 +1053,10 @@ export class Util {
             event.stopPropagation();
             event.preventDefault();
             if (fullOutline) {
-                event.currentTarget.style.border = "4px solid transparent";
+                event.currentTarget.style.border = "2px solid transparent";
             }
             else {
-                event.currentTarget.style.borderTop = "4px solid transparent";
+                event.currentTarget.style.borderTop = "2px solid transparent";
             }
         };
 
@@ -1065,10 +1065,10 @@ export class Util {
             event.stopPropagation();
             event.preventDefault();
             if (fullOutline) {
-                event.currentTarget.style.border = "4px solid transparent";
+                event.currentTarget.style.border = "2px solid transparent";
             }
             else {
-                event.currentTarget.style.borderTop = "4px solid transparent";
+                event.currentTarget.style.borderTop = "2px solid transparent";
             }
             func(event);
         };

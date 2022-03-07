@@ -395,7 +395,6 @@ a {
 
 .resultsTitle {
     display: inline-block;
-    margin-bottom: 10px;
 }
 
 .trendingTitle {
@@ -422,12 +421,8 @@ a {
     max-height: 200px;
 }
 
-// this should be roughly half the profileImageRHS vertical offset.
 .rhsMenu {
-    // when we need more vertical space on the right (some day) we can do back to doing this adjustement.
-    // top: -20px;
-    // position: relative;
-    width: 40%;
+    width: 50%;
 }
 
 .userName {
@@ -523,17 +518,13 @@ strong em {
 }
 
 .histPanelExpanded {
-    margin-top: 30px;
+    margin-top: 35px;
     margin-left: $smallGap;
-    border: 2px solid $nodeBorderBottomColor;
-    border-radius: $border-radius;
-    font-size: $smallerFont;
 }
 
 .histPanelCollapsed {
-    margin-top: 40px;
-    margin-left: 25px;
-    font-size: $smallerFont;
+    margin-top: 35px;
+    margin-left: $smallGap;
 }
 
 .collapse-panel-link {
@@ -724,7 +715,6 @@ Will come back later and study this more. todo-1 */
 
 .tab-buttons-container {
     margin-bottom: 8px;
-    margin-top: 1em;
 }
 
 .rightNavPanelInner {
@@ -1961,7 +1951,7 @@ audio::-webkit-media-controls-play-button {
 }
 
 .nodeHistoryPanel {
-    margin: 15px;
+    margin: $smallGap;
 }
 
 .lockFont {
@@ -1970,13 +1960,15 @@ audio::-webkit-media-controls-play-button {
 
 .nodeHistoryItem {
     cursor: pointer;
-    border: 4px solid transparent; 
+    // anything 'draggable' needs a 2px border
+    border: 2px solid transparent; 
 }
 
 .nodeHistorySubItem {
     margin-left: 30px;
     cursor: pointer;
-    border: 4px solid transparent;
+    // anything 'draggable' needs a 2px border
+    border: 2px solid transparent;
 }
 
 .nodeHistorySubItemDots {

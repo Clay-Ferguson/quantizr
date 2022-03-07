@@ -4,6 +4,7 @@ import { BlockedUsersTypeHandler } from "./plugins/BlockedUsersTypeHandler";
 import { BookmarkListTypeHandler } from "./plugins/BookmarkListTypeHandler";
 import { BookmarkTypeHandler } from "./plugins/BookmarkTypeHandler";
 import { CalcTypeHandler } from "./plugins/CalcTypeHandler";
+import { ExportsTypeHandler } from "./plugins/ExportsTypeHandler";
 import { FriendsListTypeHandler } from "./plugins/FriendsListTypeHandler";
 import { FriendTypeHandler } from "./plugins/FriendTypeHandler";
 import { InboxEntryTypeHandler } from "./plugins/InboxEntryTypeHandler";
@@ -11,6 +12,7 @@ import { InboxNodeTypeHandler } from "./plugins/InboxNodeTypeHandler";
 import { IPFSNodeTypeHandler } from "./plugins/IPFSNodeTypeHandler";
 import { MarkdownTypeHandler } from "./plugins/MarkdownTypeHandler";
 import { NotesNodeTypeHandler } from "./plugins/NotesNodeTypeHandler";
+import { PostsTypeHandler } from "./plugins/PostsTypeHandler";
 import { RepoRootTypeHandler } from "./plugins/RepoRootTypeHandler";
 import { RoomTypeHandler } from "./plugins/RoomTypeHandler";
 import { RssFeedsTypeHandler } from "./plugins/RssFeedsTypeHandler";
@@ -29,7 +31,11 @@ export class PluginMgr {
     }
 
     getTypeHandler = (typeName: string): TypeHandlerIntf => {
-        return this.typeHandlers.get(typeName);
+        let handler: TypeHandlerIntf = this.typeHandlers.get(typeName);
+        if (!handler) {
+            console.warn("No type handler for: " + typeName);
+        }
+        return handler;
     }
 
     getAllTypeHandlers = (): Map<string, TypeHandlerIntf> => {
@@ -51,6 +57,8 @@ export class PluginMgr {
         this.addTypeHandler(new IPFSNodeTypeHandler());
         this.addTypeHandler(new RepoRootTypeHandler());
         this.addTypeHandler(new AccountTypeHandler());
+        this.addTypeHandler(new PostsTypeHandler());
+        this.addTypeHandler(new ExportsTypeHandler());
         this.addTypeHandler(new InboxNodeTypeHandler());
         this.addTypeHandler(new InboxEntryTypeHandler());
         this.addTypeHandler(new NotesNodeTypeHandler());

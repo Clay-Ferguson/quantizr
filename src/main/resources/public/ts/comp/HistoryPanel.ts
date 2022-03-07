@@ -7,6 +7,8 @@ import { Checkbox } from "../comp/core/Checkbox";
 import { Div } from "../comp/core/Div";
 import { Icon } from "../comp/core/Icon";
 import { Span } from "../comp/core/Span";
+import { AppState } from "../AppState";
+import { useSelector } from "react-redux";
 
 export class HistoryPanel extends Div {
     private static MAX_SUBITEMS = 5;
@@ -19,6 +21,8 @@ export class HistoryPanel extends Div {
     }
 
     preRender(): void {
+        let state: AppState = useSelector((state: AppState) => state);
+
         if (S.quanta.nodeHistory.length === 0) {
             this.setChildren(null);
             return;
@@ -45,14 +49,24 @@ export class HistoryPanel extends Div {
             if (typeHandler) {
                 let iconClass = typeHandler.getIconClass();
                 if (iconClass) {
+                    let dragProps = state.userPreferences.editMode ? {
+                        onMouseOver: () => { S.quanta.draggableId = h.id; },
+                        onMouseOut: () => { S.quanta.draggableId = null; }
+                    } : {};
+
                     parentIcon = new Icon({
                         className: iconClass + " rowTypeIcon",
                         title: "Node Type: " + typeHandler.getName(),
-                        onMouseOver: () => { S.quanta.draggableId = h.id; },
-                        onMouseOut: () => { S.quanta.draggableId = null; }
+                        ...dragProps
                     });
                 }
             }
+
+            let dragProps = state.userPreferences.editMode ? {
+                draggable: "true",
+                onDragStart: (evt) => this.dragStart(evt, h.id),
+                onDragEnd: this.dragEnd
+            } : {};
 
             // unicode here is the big blue bullet character
             children.push(parentDropTarg = new Div(null, {
@@ -60,9 +74,7 @@ export class HistoryPanel extends Div {
                 nid: h.id,
                 onClick: this.jumpToId,
                 className: "nodeHistoryItem",
-                draggable: "true",
-                onDragStart: (evt) => this.dragStart(evt, h.id),
-                onDragEnd: this.dragEnd
+                ...dragProps
             }, [
                 parentIcon,
                 d = new Span(h.content)
@@ -89,23 +101,31 @@ export class HistoryPanel extends Div {
                         if (typeHandler) {
                             let iconClass = typeHandler.getIconClass();
                             if (iconClass) {
+                                let dragProps = state.userPreferences.editMode ? {
+                                    onMouseOver: () => { S.quanta.draggableId = h.id; },
+                                    onMouseOut: () => { S.quanta.draggableId = null; }
+                                } : {};
+
                                 icon = new Icon({
                                     className: iconClass + " rowTypeIcon",
                                     title: "Node Type: " + typeHandler.getName(),
-                                    onMouseOver: () => { S.quanta.draggableId = h.id; },
-                                    onMouseOut: () => { S.quanta.draggableId = null; }
+                                    ...dragProps
                                 });
                             }
                         }
+
+                        let dragProps = state.userPreferences.editMode ? {
+                            draggable: "true",
+                            onDragStart: (evt) => this.dragStart(evt, h.id),
+                            onDragEnd: this.dragEnd
+                        } : {};
 
                         children.push(dropTarg = new Div(null, {
                             className: "nodeHistorySubItem",
                             id: topLevelId + "_" + h.id + "_subhist",
                             nid: h.id,
                             onClick: this.jumpToId,
-                            draggable: "true",
-                            onDragStart: (evt) => this.dragStart(evt, h.id),
-                            onDragEnd: this.dragEnd
+                            ...dragProps
                         }, [
                             icon,
                             d = new Span(h.content)
