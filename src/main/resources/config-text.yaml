@@ -64,13 +64,7 @@ help:
       This is your Fediverse *feed* that shows a reverse chronological stream of posts, from this server and/or other 
       federated servers.
 
-      Use the `Feed` menu item on the left to filter which messages you want to see (i.e. To Me, From Me, etc.)
-
-      Use your `Account Menu` NSFW setting to choose whether to display "Sensitive" (potentially age-inappropriate) content or not.
-
-      Use any 'Jump' button in the feed to go the the main content tree location of that post. 
-      Quanta stores all content on a Tree-like Database, so in addition to appearing in the Feed, all nodes 
-      have a more permanent location on the tree.
+      Use any 'Jump' button in the feed to go the the tree location of that post. 
 
   gettingStarted: |
     Getting Started

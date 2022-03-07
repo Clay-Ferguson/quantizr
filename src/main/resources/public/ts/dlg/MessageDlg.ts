@@ -1,10 +1,10 @@
 import { AppState } from "../AppState";
-import { DialogBase } from "../DialogBase";
 import { Comp } from "../comp/base/Comp";
 import { CompIntf } from "../comp/base/CompIntf";
 import { Button } from "../comp/core/Button";
 import { ButtonBar } from "../comp/core/ButtonBar";
 import { TextContent } from "../comp/core/TextContent";
+import { DialogBase } from "../DialogBase";
 
 /*
  * Callback can be null if you don't need to run any function when the dialog is closed

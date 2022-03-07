@@ -234,7 +234,6 @@ export class FeedView extends AppTab<FeedViewProps> {
         return new Heading(4, this.data.props.feedFilterRootNode ? "Chat Room" : "Feed" + this.getFeedSubHeading(this.data), { className: "resultsTitle" });
     }
 
-    // todo-0: put in a utilities class (use for RHS to indicate current selection)
     getFeedSubHeading = (data: TabDataIntf<FeedViewProps>) => {
         let subHeading = null;
 
