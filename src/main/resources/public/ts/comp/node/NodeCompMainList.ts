@@ -41,6 +41,7 @@ export class NodeCompMainList extends Div {
         let firstButton: Comp;
         let prevButton: Comp;
         let nextButton: Comp;
+        let prevNodeButton: Comp;
         let nextNodeButton: Comp;
         let firstChild: J.NodeInfo = S.edit.getFirstChildNode(state);
 
@@ -64,7 +65,8 @@ export class NodeCompMainList extends Div {
                     event.stopPropagation();
                     event.preventDefault();
                     S.view.nextPage(state);
-                }
+                },
+                title: "Next Page"
             });
 
             let buttonCreateTime: number = new Date().getTime();
@@ -106,21 +108,20 @@ export class NodeCompMainList extends Div {
         }
         else {
             if (!pageTop && !S.nav.displayingRepositoryRoot(state)) {
+                prevNodeButton = new IconButton("fa-chevron-circle-left", "Previous Node", {
+                    onClick: S.nav.navToPrev,
+                    title: "Go to Previous Node"
+                });
 
-                // I decided this is too easily mistaken for paging, but what it does is navigate to next sibling node
-                // which is too confusing, so I'm backing this out for now. This same button still *IS* available at
-                // the top of the page on the page root node, and seems more intuitive to be only there, but I want to leave
-                // this commented (not deleted) for now.
-                // nextNodeButton =
-                // new IconButton("fa-chevron-circle-right", null, {
-                //     onClick: S.nav.navToNext,
-                //     title: "Go to Next Node"
-                // });
+                nextNodeButton = new IconButton("fa-chevron-circle-right", "Next node", {
+                    onClick: S.nav.navToNext,
+                    title: "Go to Next Node"
+                });
             }
         }
 
-        if (firstButton || prevButton || nextButton || nextNodeButton) {
-            children.push(new ButtonBar([firstButton, prevButton, nextButton, nextNodeButton], "text-center " + moreClasses));
+        if (prevNodeButton || firstButton || prevButton || nextButton || nextNodeButton) {
+            children.push(new ButtonBar([prevNodeButton, firstButton, prevButton, nextButton, nextNodeButton], "text-center " + moreClasses));
             children.push(new Clearfix());
         }
     }
