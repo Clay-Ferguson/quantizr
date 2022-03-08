@@ -12,6 +12,7 @@ import { NodeActionType } from "../../enums/NodeActionType";
 import { TypeHandlerIntf } from "../../intf/TypeHandlerIntf";
 import * as J from "../../JavaIntf";
 import { S } from "../../Singletons";
+import { Comp } from "../base/Comp";
 
 // todo-1: need to switch to the more efficient way of using nid attribute
 // on elements (search for "nid:" in code), to avoid creating new functions
@@ -147,33 +148,25 @@ export class NodeCompRowHeader extends Div {
             }));
         }
 
+        // If node is shared to public we just show the globe icon and not the rest of the shares that may be present.
         if (S.props.isPublic(node)) {
             let appendNode = S.props.isPublicWritable(node) ? "Anyone can reply" : "No Replies Allowed";
             floatUpperRightDiv.addChild(new Icon({
-                className: "fa fa-globe fa-lg iconMarginLeft",
+                className: "fa fa-globe fa-lg sharingGlobeIcon",
                 title: "Node is Public\n(" + appendNode + ")"
             }));
         }
+        // Show all the share names
         else if (S.props.isShared(node)) {
-            let allSharingNames = S.nodeUtil.getSharingNames(node, true);
-            let sharingNames = allSharingNames;
-            let isPublic = sharingNames.toLowerCase().indexOf("public") !== -1;
-
-            let nlIdx = sharingNames.indexOf("\n");
-            if (nlIdx !== -1) {
-                sharingNames = sharingNames.substring(nlIdx) + "+";
-            }
+            let shareComps: Comp[] = S.nodeUtil.getSharingNames(state, node);
             floatUpperRightDiv.addChild(
                 new Span(null, {
-                    className: isPublic ? "sharingNamesDispPublic" : "sharingNamesDisp",
-                    title: "Shared to:\n\n" + allSharingNames
+                    className: "rowHeaderSharingNames"
                 }, [
-
-                    // shos sharing names only if not public
-                    !isPublic ? new Span(sharingNames) : null,
                     new Icon({
-                        className: "fa fa-envelope fa-lg iconMarginLeft"
-                    })
+                        className: "fa fa-envelope fa-lg"
+                    }),
+                    ...shareComps
                 ]));
         }
 

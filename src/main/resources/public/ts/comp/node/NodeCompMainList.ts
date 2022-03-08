@@ -110,12 +110,12 @@ export class NodeCompMainList extends Div {
             if (!pageTop && !S.nav.displayingRepositoryRoot(state)) {
                 prevNodeButton = new IconButton("fa-chevron-circle-left", "Previous Node", {
                     onClick: S.nav.navToPrev,
-                    title: "Go to Previous Node"
+                    title: "Previous Node"
                 });
 
-                nextNodeButton = new IconButton("fa-chevron-circle-right", "Next node", {
+                nextNodeButton = new IconButton("fa-chevron-circle-right", "Next Node", {
                     onClick: S.nav.navToNext,
-                    title: "Go to Next Node"
+                    title: "Next Node"
                 });
             }
         }

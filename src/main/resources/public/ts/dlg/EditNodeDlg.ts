@@ -288,18 +288,17 @@ export class EditNodeDlg extends DialogBase {
         this.buildPropertiesEditing(propsParent, state, typeHandler, customProps);
         let binarySection: LayoutRow = hasAttachment ? this.makeAttachmentPanel(state) : null;
 
-        let sharingNames = S.nodeUtil.getSharingNames(state.node, false);
+        let shareComps: Comp[] = S.nodeUtil.getSharingNames(this.appState, state.node);
         let sharingDiv = null;
         let sharingDivClearFix = null;
-        if (sharingNames) {
+        if (shareComps) {
             sharingDiv = new Div(null, {
-                className: "marginBottom float-end",
+                className: "marginBottom float-end clickable",
                 onClick: () => this.utl.share(this)
             }, [
                 new Span("Shared to: "),
-                new Span(sharingNames, {
-                    className: "sharingLabel"
-                })]);
+                ...shareComps
+            ]);
             sharingDivClearFix = new Clearfix();
         }
 

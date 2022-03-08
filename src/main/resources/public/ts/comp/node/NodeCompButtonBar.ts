@@ -257,12 +257,12 @@ export class NodeCompButtonBar extends Div {
                 if (!S.nav.displayingRepositoryRoot(state)) {
                     prevButton = new IconButton("fa-chevron-circle-left", null, {
                         onClick: S.nav.navToPrev,
-                        title: "Go to Previous Node"
+                        title: "Previous Node"
                     });
 
                     nextButton = new IconButton("fa-chevron-circle-right", null, {
                         onClick: S.nav.navToNext,
-                        title: "Go to Next Node"
+                        title: "Next Node"
                     });
                 }
             }

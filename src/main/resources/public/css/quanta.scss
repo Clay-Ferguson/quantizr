@@ -169,7 +169,6 @@ $mobileHeaderHeight: 3.5em;
 
 .signupLinkText {
     cursor: pointer;
-    font-size: small;
     margin-bottom: 16px;
 }
 
@@ -710,7 +709,7 @@ Will come back later and study this more. todo-1 */
 
 .tabSubOptionsItem {
     cursor: pointer;
-    margin-bottom: 4px;
+    margin-bottom: 6px;
 }
 
 .tab-buttons-container {
@@ -881,6 +880,10 @@ Will come back later and study this more. todo-1 */
     margin-top: $microGap;
 }
 
+.microMarginBottom {
+    margin-bottom: $microGap;
+}
+
 .marginTop {
     margin-top: $smallGap;
 }
@@ -934,6 +937,14 @@ Will come back later and study this more. todo-1 */
 
 .marginAll {
     margin: $smallGap;
+}
+
+.microMarginAll {
+    margin: $microGap;
+}
+
+.tinyMarginAll {
+    margin: $tinyGap;
 }
 
 .small-padding {
@@ -1762,15 +1773,29 @@ audio::-webkit-media-controls-play-button {
     border-radius: $border-radius;
 }
 
-.sharingNamesDisp {
-    margin-left: 6px;
-    padding: 4px;
-    border: 2px solid green;
-    border-radius: $border-radius;
+.sharingGlobeIcon {
+    color: cyan;
+    margin-left: $smallGap;
 }
 
-.sharingNamesDispPublic {
+.sharingName {
+    border: 2px solid cyan;
+    border-radius: 6px;
+    margin-left: 3px;
+    padding: 3px;
+}
+
+.sharingName:first-child {
+    margin-left: 0px;
+}
+
+.rowHeaderSharingNames {
     margin-left: 6px;
+}
+
+.editDlgSharingNames {
+    padding: 3px 4px 3px 4px;
+    cursor: pointer;
 }
 
 .iconMarginRight {
@@ -1911,13 +1936,6 @@ audio::-webkit-media-controls-play-button {
 .rhsLink {
     margin-top: 25px;
     margin-right: 55px;
-    cursor: pointer;
-}
-
-.sharingLabel {
-    padding: 3px 4px 3px 4px;
-    border: 2px solid lightGreen;
-    border-radius: 8px;
     cursor: pointer;
 }
 

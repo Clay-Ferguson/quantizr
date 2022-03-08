@@ -43,7 +43,7 @@ export class SharingDlg extends DialogBase {
                     onClick: this.removeAllPrivileges
                 }) : null,
                 new Clearfix(),
-                new Checkbox("Apply to all children", null, {
+                new Checkbox("Apply to all children (that you own)", null, {
                     setValue: (checked: boolean): void => {
                         this.mergeState<LS>({ recursive: checked });
                     },

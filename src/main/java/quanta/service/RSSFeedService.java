@@ -81,7 +81,7 @@ public class RSSFeedService extends ServiceBase {
 	private static final Logger log = LoggerFactory.getLogger(RSSFeedService.class);
 
 	@Autowired
-    private AppProp prop;
+	private AppProp prop;
 
 	private static boolean refreshingCache = false;
 
@@ -875,49 +875,54 @@ public class RSSFeedService extends ServiceBase {
 		List<SyndEntry> entries = new LinkedList<>();
 		feed.setEntries(entries);
 
-		Iterable<SubNode> iter = read.getChildren(ms, node, Sort.by(Sort.Direction.ASC, SubNode.ORDINAL), null, 0);
-		List<SubNode> children = read.iterateToList(iter);
+		if (AclService.isPublic(ms, node)) {
+			Iterable<SubNode> iter = read.getChildren(ms, node, Sort.by(Sort.Direction.ASC, SubNode.ORDINAL), null, 0);
+			List<SubNode> children = read.iterateToList(iter);
 
-		if (ok(children)) {
-			for (SubNode n : children) {
-				metaInfo = snUtil.getNodeMetaInfo(n);
+			if (ok(children)) {
+				for (SubNode n : children) {
+					if (!AclService.isPublic(ms, n))
+						continue;
 
-				// Currently the link will be an attachment URL, but need to research how ROME
-				// handles attachments.
-				if (no(metaInfo.getAttachmentUrl())) {
-					metaInfo.setAttachmentUrl(metaInfo.getUrl());
+					metaInfo = snUtil.getNodeMetaInfo(n);
+
+					// Currently the link will be an attachment URL, but need to research how ROME
+					// handles attachments.
+					if (no(metaInfo.getAttachmentUrl())) {
+						metaInfo.setAttachmentUrl(metaInfo.getUrl());
+					}
+					SyndEntry entry = new SyndEntryImpl();
+
+					entry.setTitle(ok(metaInfo.getTitle()) ? metaInfo.getTitle() : "ID: " + n.getIdStr());
+					entry.setLink(ok(metaInfo.getAttachmentUrl()) ? metaInfo.getAttachmentUrl() : prop.getProtocolHostAndPort());
+
+					/*
+					 * todo-2: need menu item "Set Create Time", and "Set Modify Time", that prompts with the datetime
+					 * GUI, so publishers have more control over this in the feed, or else have an rssTimestamp as an
+					 * optional property which can be set on any node to override this.
+					 * 
+					 * UPDATE: Now that we have 'date' property as a generic feature of nodes (calendar icon on edit
+					 * dialog) we can use that as our publish time here, and allow that to be the override for the date
+					 * on the node.
+					 */
+					entry.setPublishedDate(n.getCreateTime());
+					SyndContent description = new SyndContentImpl();
+
+					/*
+					 * todo-2: NOTE: I tried putting some HTML into 'content' as a test and setting the mime type, but
+					 * it doesn't render correctly, so I just need to research how to get HTML in RSS descriptions, but
+					 * this is low priority for now so I'm not doing it yet.
+					 * 
+					 * todo-2: NOTE: when org.owasp.html.Sanitizers capability was added, I forgot to revisit this, so I
+					 * need to check what I'm doing here and see if we need "HTML" now here instead.
+					 */
+					description.setType("text/plain");
+					description.setType("text/html");
+					description.setValue(sanitizeHtml(ok(metaInfo.getDescription()) ? metaInfo.getDescription() : ""));
+					entry.setDescription(description);
+
+					entries.add(entry);
 				}
-				SyndEntry entry = new SyndEntryImpl();
-
-				entry.setTitle(ok(metaInfo.getTitle()) ? metaInfo.getTitle() : "ID: " + n.getIdStr());
-				entry.setLink(ok(metaInfo.getAttachmentUrl()) ? metaInfo.getAttachmentUrl() : prop.getProtocolHostAndPort());
-
-				/*
-				 * todo-2: need menu item "Set Create Time", and "Set Modify Time", that prompts with the datetime
-				 * GUI, so publishers have more control over this in the feed, or else have an rssTimestamp as an
-				 * optional property which can be set on any node to override this.
-				 * 
-				 * UPDATE: Now that we have 'date' property as a generic feature of nodes (calendar icon on edit
-				 * dialog) we can use that as our publish time here, and allow that to be the override for the date
-				 * on the node.
-				 */
-				entry.setPublishedDate(n.getCreateTime());
-				SyndContent description = new SyndContentImpl();
-
-				/*
-				 * todo-2: NOTE: I tried putting some HTML into 'content' as a test and setting the mime type, but
-				 * it doesn't render correctly, so I just need to research how to get HTML in RSS descriptions, but
-				 * this is low priority for now so I'm not doing it yet.
-				 * 
-				 * todo-2: NOTE: when org.owasp.html.Sanitizers capability was added, I forgot to revisit this, so I
-				 * need to check what I'm doing here and see if we need "HTML" now here instead.
-				 */
-				description.setType("text/plain");
-				description.setType("text/html");
-				description.setValue(sanitizeHtml(ok(metaInfo.getDescription()) ? metaInfo.getDescription() : ""));
-				entry.setDescription(description);
-
-				entries.add(entry);
 			}
 		}
 

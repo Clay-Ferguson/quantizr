@@ -1,7 +1,10 @@
 import { appState, dispatch, store } from "./AppRedux";
 import { AppState } from "./AppState";
+import { Comp } from "./comp/base/Comp";
+import { Span } from "./comp/core/Span";
 import { Constants as C } from "./Constants";
 import { LoadNodeFromIpfsDlg } from "./dlg/LoadNodeFromIpfsDlg";
+import { UserProfileDlg } from "./dlg/UserProfileDlg";
 import { TabDataIntf } from "./intf/TabDataIntf";
 import * as J from "./JavaIntf";
 import { Log } from "./Log";
@@ -296,25 +299,72 @@ export class NodeUtil {
         new LoadNodeFromIpfsDlg(state).open();
     }
 
-    getSharingNames = (node: J.NodeInfo, multiLine: boolean): string => {
+    getSharingNames = (state: AppState, node: J.NodeInfo): Comp[] => {
         if (!node?.ac) return null;
-        let delimiter = multiLine ? "\n" : ", ";
 
-        let names = S.props.isPublic(node) ? ("Public" + this.getPublicPrivilegesDisplay(node)) : "";
+        let ret: Comp[] = [];
+        if (S.props.isPublic(node)) {
+            ret.push(new Span("Public" + this.getPublicPrivilegesDisplay(node),
+                {
+                    title: "Shared to Public (Everyone)",
+                    className: "marginLeftIfNotFirst"
+                }));
+        }
+
+        let showMore = "";
+        let numShares = 0;
         for (let ac of node.ac) {
             if (!ac.principalName) {
                 console.log("missing principalName on acl: " + S.util.prettyPrint(ac));
             }
 
+            // Skip public here we processed that above.
             if (ac.principalName && ac.principalName !== "public") {
-                if (names) {
-                    names += delimiter;
+                let props = null;
+
+                // If we have a local node for this user we will have the principleNodeId here and show a link
+                // to open the user.
+                if (ac.principalNodeId) {
+                    props = {
+                        onClick: (event: any) => {
+                            event.stopPropagation();
+                            event.preventDefault();
+                            new UserProfileDlg(ac.principalNodeId, state).open();
+                        },
+                        className: "sharingName clickable",
+                        title: "Shared to " + (ac.displayName || ac.principalName || "")
+                    }
                 }
-                names += "@" + ac.principalName;
+                // todo-0: Else this is a foreign user, so is there a way to set a link
+                // here to a foreign account, or should we basically run the equivalent
+                // of a user search here, probably best done with a modifiction to the
+                // UserPreferences server call and dialog
+                else {
+                    props = {
+                        title: "Shared to " + (ac.displayName || ac.principalName || ""),
+                        className: "sharingName"
+                    }
+                }
+
+                if (numShares > 5) {
+                    showMore += "@" + ac.principalName;
+                    if (ac.displayName) {
+                        showMore += " (" + ac.displayName + ")"
+                    }
+                    showMore += "\n";
+                }
+                else {
+                    ret.push(new Span("@" + ac.principalName, props));
+                }
+                numShares++;
             }
         }
 
-        return names;
+        if (showMore) {
+            ret.push(new Span("more...", { className: "sharingName", title: "Also shared to...\n" + showMore }));
+        }
+
+        return ret;
     }
 
     getPublicPrivilegesDisplay = (node: J.NodeInfo): string => {

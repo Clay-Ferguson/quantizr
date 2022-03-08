@@ -1,8 +1,10 @@
 import { AppState } from "../AppState";
 import { Comp } from "../comp/base/Comp";
+import { Button } from "../comp/core/Button";
 import { Div } from "../comp/core/Div";
 import { Heading } from "../comp/core/Heading";
 import { HelpButton } from "../comp/core/HelpButton";
+import { SearchUsersDlg } from "../dlg/SearchUsersDlg";
 import { NodeActionType } from "../enums/NodeActionType";
 import { TabDataIntf } from "../intf/TabDataIntf";
 import * as J from "../JavaIntf";
@@ -24,7 +26,10 @@ export class FriendsListTypeHandler extends TypeBase {
             new Heading(4, "Friends", {
                 className: "marginAll"
             }),
-            new Div("These are the people you follow. Deleting any of these nodes unfollows the person.", { className: "marginLeft marginBottom" })
+            new Div("These are the people you follow. Deleting any of these nodes unfollows the person.", { className: "marginLeft" }),
+            new Button("Find People", () => {
+                new SearchUsersDlg(state).open();
+            }, { className: "marginAll" })
         ]);
     }
 
