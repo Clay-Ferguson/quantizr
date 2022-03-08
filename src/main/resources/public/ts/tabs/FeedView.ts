@@ -237,7 +237,11 @@ export class FeedView extends AppTab<FeedViewProps> {
     getFeedSubHeading = (data: TabDataIntf<FeedViewProps>) => {
         let subHeading = null;
 
-        if (!data.props.feedFilterFriends && //
+        if (data.props.feedFilterToUser && //
+            data.props.feedFilterFromMe) {
+            subHeading = "From me to " + data.props.feedFilterToUser;
+        }
+        else if (!data.props.feedFilterFriends && //
             data.props.feedFilterToMe && //
             data.props.feedFilterFromMe && //
             !data.props.feedFilterToPublic && //

@@ -163,7 +163,7 @@ export class MenuPanel extends Div {
                             title: "Edit this bookmark",
                             onClick: (event: any) => {
                                 event.stopPropagation();
-                                event.preventDefault(); // todo-0: are all my preventDefaults good or bad? is this disabling text highlihting?
+                                event.preventDefault();
                                 S.util.setUserPreferences(state, true);
 
                                 // we have to do this Menu close manually here since this is not a MenuItem wrapped function.

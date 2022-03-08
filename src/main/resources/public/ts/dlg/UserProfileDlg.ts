@@ -143,7 +143,8 @@ export class UserProfileDlg extends DialogBase {
                     // but all users we know of will have a posts node simply from having their posts imported
                     new Button("Posts", () => this.openUserHomePage(state, "posts")), //
 
-                    !this.appState.isAnonUser && this.readOnly && state.userProfile.userName !== this.appState.userName ? new Button("Message", this.sendMessage) : null,
+                    !this.appState.isAnonUser && this.readOnly && state.userProfile.userName !== this.appState.userName ? new Button("Send Message", this.sendMessage) : null,
+                    !this.appState.isAnonUser && this.readOnly && state.userProfile.userName !== this.appState.userName ? new Button("Show Messages", this.previousMessages, { title: "Messages you've sent " + state.userProfile.userName }) : null,
                     !this.appState.isAnonUser && !state.userProfile.following && this.readOnly && state.userProfile.userName !== this.appState.userName ? new Button("Follow", this.addFriend) : null,
                     !this.appState.isAnonUser && !state.userProfile.blocked && this.readOnly && state.userProfile.userName !== this.appState.userName ? new Button("Block", this.blockUser) : null,
                     state.userProfile.actorUrl ? new Button("User Page", () => {
@@ -226,6 +227,14 @@ export class UserProfileDlg extends DialogBase {
         this.close();
         setTimeout(() => {
             S.edit.addNode(null, null, this.userNodeId, null, this.appState);
+        }, 10);
+    }
+
+    previousMessages = (): void => {
+        this.close();
+        setTimeout(() => {
+            const state: any = this.getState<LS>();
+            S.nav.messagesFromMeToUser(state.userProfile.userName);
         }, 10);
     }
 

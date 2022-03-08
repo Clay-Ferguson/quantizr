@@ -9,6 +9,7 @@ public class NodeFeedRequest extends RequestBase {
 
 	/* Note one of the other of these should be non-null, but not both */
 	private String nodeId;
+	private String toUser;
 
 	private Boolean toMe;
 	private Boolean fromMe;
@@ -89,5 +90,13 @@ public class NodeFeedRequest extends RequestBase {
 
 	public void setLocalOnly(Boolean localOnly) {
 		this.localOnly = localOnly;
+	}
+
+	public String getToUser() {
+		return toUser;
+	}
+
+	public void setToUser(String toUser) {
+		this.toUser = toUser;
 	}
 }

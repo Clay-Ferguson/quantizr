@@ -85,6 +85,7 @@ export class NodeStatsDlg extends DialogBase {
                 feedFilterFriends: false,
                 feedFilterToMe: false,
                 feedFilterFromMe: false,
+                feedFilterToUser: null,
                 feedFilterToPublic: true,
                 feedFilterLocalServer: false,
                 feedFilterRootNode: null,

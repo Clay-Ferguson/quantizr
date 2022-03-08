@@ -391,6 +391,7 @@ export class Nav {
                     feedFilterFriends: false,
                     feedFilterToMe: false,
                     feedFilterFromMe: false,
+                    feedFilterToUser: null,
                     feedFilterToPublic: true,
                     feedFilterLocalServer: true,
                     feedFilterRootNode: node,
@@ -423,6 +424,7 @@ export class Nav {
                 feedFilterFriends: false,
                 feedFilterToMe: false,
                 feedFilterFromMe: false,
+                feedFilterToUser: null,
                 feedFilterToPublic: true,
                 feedFilterLocalServer: true,
                 feedFilterRootNode: res.node,
@@ -527,6 +529,7 @@ export class Nav {
             feedFilterFriends: false,
             feedFilterToMe: true,
             feedFilterFromMe: true,
+            feedFilterToUser: null,
             feedFilterToPublic: false,
             feedFilterLocalServer: false,
             feedFilterRootNode: null,
@@ -539,6 +542,7 @@ export class Nav {
             feedFilterFriends: false,
             feedFilterToMe: false,
             feedFilterFromMe: false,
+            feedFilterToUser: null,
             feedFilterToPublic: true,
             feedFilterLocalServer: false,
             feedFilterRootNode: null,
@@ -555,6 +559,7 @@ export class Nav {
             feedFilterFriends: false,
             feedFilterToMe: true,
             feedFilterFromMe: true,
+            feedFilterToUser: null,
             feedFilterToPublic: false,
             feedFilterLocalServer: false,
             feedFilterRootNode: null,
@@ -571,6 +576,24 @@ export class Nav {
             feedFilterFriends: false,
             feedFilterToMe: true,
             feedFilterFromMe: false,
+            feedFilterToUser: null,
+            feedFilterToPublic: false,
+            feedFilterLocalServer: false,
+            feedFilterRootNode: null,
+            feedResults: null
+        });
+    }
+
+    messagesFromMeToUser = (user: string) => {
+        let feedData = S.tabUtil.getTabDataById(null, C.TAB_FEED);
+        if (feedData) {
+            feedData.props.searchTextState.setValue("");
+        }
+        this.messages({
+            feedFilterFriends: false,
+            feedFilterToMe: false,
+            feedFilterFromMe: true,
+            feedFilterToUser: user,
             feedFilterToPublic: false,
             feedFilterLocalServer: false,
             feedFilterRootNode: null,
@@ -587,6 +610,7 @@ export class Nav {
             feedFilterFriends: false,
             feedFilterToMe: false,
             feedFilterFromMe: true,
+            feedFilterToUser: null,
             feedFilterToPublic: false,
             feedFilterLocalServer: false,
             feedFilterRootNode: null,
@@ -603,6 +627,7 @@ export class Nav {
             feedFilterFriends: true,
             feedFilterToMe: false,
             feedFilterFromMe: false,
+            feedFilterToUser: null,
             feedFilterToPublic: false,
             feedFilterLocalServer: false,
             feedFilterRootNode: null,
@@ -619,6 +644,7 @@ export class Nav {
             feedFilterFriends: false,
             feedFilterToMe: false,
             feedFilterFromMe: false,
+            feedFilterToUser: null,
             feedFilterToPublic: true,
             feedFilterLocalServer: true,
             feedFilterRootNode: null,
@@ -637,6 +663,7 @@ export class Nav {
             feedFilterFriends: false,
             feedFilterToMe: false,
             feedFilterFromMe: false,
+            feedFilterToUser: null,
             feedFilterToPublic: true,
             feedFilterLocalServer: true,
             feedFilterRootNode: hltNode,
@@ -653,6 +680,7 @@ export class Nav {
             feedFilterFriends: false,
             feedFilterToMe: false,
             feedFilterFromMe: false,
+            feedFilterToUser: null,
             feedFilterToPublic: true,
             feedFilterLocalServer: false,
             feedFilterRootNode: null,

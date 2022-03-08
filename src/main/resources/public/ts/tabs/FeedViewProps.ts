@@ -9,6 +9,7 @@ export interface FeedViewProps {
     feedFilterFriends?: boolean;
     feedFilterToMe?: boolean;
     feedFilterFromMe?: boolean;
+    feedFilterToUser?: string;
     feedFilterToPublic?: boolean;
     feedFilterLocalServer?: boolean;
     feedFilterRootNode?: J.NodeInfo;

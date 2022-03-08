@@ -8,6 +8,7 @@ import { Img } from "../comp/core/Img";
 import * as J from "../JavaIntf";
 import { S } from "../Singletons";
 import { TabDataIntf } from "../intf/TabDataIntf";
+import { Html } from "./core/Html";
 
 interface LS { // Local State
     og: J.OpenGraph;
@@ -170,7 +171,7 @@ export class OpenGraphPanel extends Div {
                         })
                     ]),
                     new Div(null, { className: "openGraphRhs" }, [
-                        new Div(state.og.description)
+                        new Html(state.og.description)
                     ])
                 ], "displayTableNoSpacing");
             }

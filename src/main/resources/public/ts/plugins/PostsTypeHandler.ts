@@ -1,3 +1,8 @@
+import { AppState } from "../AppState";
+import { Comp } from "../comp/base/Comp";
+import { Div } from "../comp/core/Div";
+import { Heading } from "../comp/core/Heading";
+import { TabDataIntf } from "../intf/TabDataIntf";
 import * as J from "../JavaIntf";
 import { S } from "../Singletons";
 import { TypeBase } from "./base/TypeBase";
@@ -5,6 +10,15 @@ import { TypeBase } from "./base/TypeBase";
 export class PostsTypeHandler extends TypeBase {
     constructor() {
         super(J.NodeType.POSTS, "Posts", "fa-comments-o", true);
+    }
+
+    render(node: J.NodeInfo, tabData: TabDataIntf<any>, rowStyling: boolean, isTreeView: boolean, state: AppState): Comp {
+        return new Div(null, null, [
+            new Heading(4, "Posts", {
+                className: "marginAll"
+            }),
+            new Div("Tip: Use the clock-icon to view a Rev-Chron Timeline of this node.", { className: "marginAll" })
+        ]);
     }
 
     getIconClass(): string {

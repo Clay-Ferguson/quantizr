@@ -168,6 +168,8 @@ public class UserFeedService extends ServiceBase {
 					 * setting last active time to this current time, will stop the GUI from showing the user an
 					 * indication that they have new messages, because we know they're querying messages NOW, so this is
 					 * a way to reset
+					 * 
+					 * todo-1: don't do this? It's better to just have a 'read' button like Pleroma does?
 					 */
 					_myAcntNode.set(NodeProp.LAST_ACTIVE_TIME.s(), lastActiveTime);
 					update.save(_s, _myAcntNode);
@@ -195,20 +197,15 @@ public class UserFeedService extends ServiceBase {
 			crit = crit.and(SubNode.PROPS + "." + NodeProp.ACT_PUB_SENSITIVE).is(null);
 		}
 
-		HashSet<ObjectId> blockedUserIds = new HashSet<>();
+		boolean enableBlocking = true;
+		if (!testQuery && doAuth && StringUtils.isNotEmpty(req.getToUser())) {
+			// make sure blocked users aren't considered below once we enter into here. (todo-0)
+			SubNode toUserNode = read.getUserNodeByUserName(ms, req.getToUser(), false);
 
-		/*
-		 * this logic makes it so that any feeds using 'public' checkbox will have the admin-blocked users
-		 * removed from it.
-		 */
-		if (req.getToPublic()) {
-			getBlockedUserIds(blockedUserIds, PrincipalName.ADMIN.s());
-		}
-
-		// Add criteria for blocking users using the 'not in' list (nin)
-		getBlockedUserIds(blockedUserIds, null);
-		if (blockedUserIds.size() > 0) {
-			crit = crit.and(SubNode.OWNER).nin(blockedUserIds);
+			if (ok(toUserNode)) {
+				crit = crit.and(SubNode.AC + "." + toUserNode.getId().toHexString()).ne(null);
+			}
+			enableBlocking = false;
 		}
 
 		/*
@@ -216,8 +213,26 @@ public class UserFeedService extends ServiceBase {
 		 * users may be following a user that will effectively be blocked
 		 */
 		HashSet<String> blockedIdStrings = new HashSet<>();
-		for (ObjectId blockedId : blockedUserIds) {
-			blockedIdStrings.add(blockedId.toHexString());
+
+		if (enableBlocking) {
+			HashSet<ObjectId> blockedUserIds = new HashSet<>();
+			/*
+			 * this logic makes it so that any feeds using 'public' checkbox will have the admin-blocked users
+			 * removed from it.
+			 */
+			if (req.getToPublic()) {
+				getBlockedUserIds(blockedUserIds, PrincipalName.ADMIN.s());
+			}
+
+			// Add criteria for blocking users using the 'not in' list (nin)
+			getBlockedUserIds(blockedUserIds, null);
+			if (blockedUserIds.size() > 0) {
+				crit = crit.and(SubNode.OWNER).nin(blockedUserIds);
+			}
+
+			for (ObjectId blockedId : blockedUserIds) {
+				blockedIdStrings.add(blockedId.toHexString());
+			}
 		}
 
 		if (!testQuery && doAuth && req.getFromMe()) {

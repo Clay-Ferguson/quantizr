@@ -298,6 +298,7 @@ export interface MoveNodesRequest extends RequestBase {
 export interface NodeFeedRequest extends RequestBase {
     page: number;
     nodeId: string;
+    toUser: string;
     toMe: boolean;
     fromMe: boolean;
     fromFriends: boolean;

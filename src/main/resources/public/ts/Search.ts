@@ -215,6 +215,7 @@ export class Search {
             nodeId: feedData.props.feedFilterRootNode?.id,
             toMe: feedData.props.feedFilterToMe,
             fromMe: feedData.props.feedFilterFromMe,
+            toUser: feedData.props.feedFilterToUser,
             toPublic: feedData.props.feedFilterToPublic,
             localOnly: feedData.props.feedFilterLocalServer,
             fromFriends: feedData.props.feedFilterFriends,

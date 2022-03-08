@@ -141,6 +141,7 @@ export class TabUtil {
                         feedFilterFriends: false,
                         feedFilterToMe: false,
                         feedFilterFromMe: false,
+                        feedFilterToUser: null,
                         feedFilterToPublic: true,
                         feedFilterLocalServer: false,
 
