@@ -289,15 +289,16 @@ export class EditNodeDlg extends DialogBase {
         let binarySection: LayoutRow = hasAttachment ? this.makeAttachmentPanel(state) : null;
 
         let shareComps: Comp[] = S.nodeUtil.getSharingNames(this.appState, state.node);
+        let isPublic = S.props.isPublic(state.node);
         let sharingDiv = null;
         let sharingDivClearFix = null;
         if (shareComps) {
             sharingDiv = new Div(null, {
-                className: "marginBottom float-end clickable",
-                onClick: () => this.utl.share(this)
+                className: "marginBottom float-end clickable"
             }, [
-                new Span("Shared to: "),
-                ...shareComps
+                new Span("Shared to: ", { onClick: () => this.utl.share(this) }),
+                ...shareComps,
+                !isPublic ? new IconButton("fa-globe", "Add Public", { onClick: () => { this.makePublic(state, true); } }, "btn-secondary marginLeft") : null
             ]);
             sharingDivClearFix = new Clearfix();
         }
@@ -330,6 +331,29 @@ export class EditNodeDlg extends DialogBase {
         propertyEditFieldContainer.setChildren([mainPropsTable, sharingDiv, sharingDivClearFix, binarySection, rightFloatButtons,
             new Clearfix()]);
         return children;
+    }
+
+    makePublic = async (state: LS, allowAppends: boolean) => {
+        let encrypted = S.props.isEncrypted(state.node);
+        if (encrypted) {
+            S.util.showMessage("This node is encrypted, and therefore cannot be made public.", "Warning");
+            return;
+        }
+
+        await S.util.ajax<J.AddPrivilegeRequest, J.AddPrivilegeResponse>("addPrivilege", {
+            nodeId: state.node.id,
+            principal: "public",
+            privileges: allowAppends ? [J.PrivilegeType.READ, J.PrivilegeType.WRITE] : [J.PrivilegeType.READ]
+        });
+
+        let res: J.GetNodePrivilegesResponse = await S.util.ajax<J.GetNodePrivilegesRequest, J.GetNodePrivilegesResponse>("getNodePrivileges", {
+            nodeId: state.node.id,
+            includeAcl: true,
+            includeOwners: true
+        });
+        state.node.ac = res.aclEntries;
+
+        this.mergeState<LS>({ node: state.node });
     }
 
     buildPropertiesEditing = (propsParent: CompIntf, state: LS, typeHandler: TypeHandlerIntf, customProps: string[]): void => {

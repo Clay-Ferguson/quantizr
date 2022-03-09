@@ -307,7 +307,7 @@ export class NodeUtil {
             ret.push(new Span("Public" + this.getPublicPrivilegesDisplay(node),
                 {
                     title: "Shared to Public (Everyone)",
-                    className: "marginLeftIfNotFirst"
+                    className: "sharingName marginLeftIfNotFirst"
                 }));
         }
 
