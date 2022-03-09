@@ -190,6 +190,8 @@ public class ActPubService extends ServiceBase {
                     new APObj() //
                             .put(APObj.type, APType.Document) //
                             .put(APObj.mediaType, mime) //
+                            // NOTE: The /f/id endpoint is intentionally wide open, but only for nodes that have at least some sharing
+                            // meaning they can be visible to at least someone other than it's owner.
                             .put(APObj.url, prop.getProtocolHostAndPort() + "/f/id/" + node.getIdStr()));
         }
         return attachments;

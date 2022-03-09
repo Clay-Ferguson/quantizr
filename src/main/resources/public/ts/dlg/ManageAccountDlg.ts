@@ -15,6 +15,8 @@ interface LS { // Local State
     binTotal: number;
 }
 
+// todo-1: Separate this into two dialogs. One for managing storage space, and another for all the rest. Storage one will be the NEW dialog, and will be openable
+// from a button on THIS dialog.
 export class ManageAccountDlg extends DialogBase {
 
     constructor(state: AppState) {

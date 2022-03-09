@@ -226,14 +226,14 @@ export class FeedView extends AppTab<FeedViewProps> {
 
     /* overridable (don't use arrow function) */
     renderHeading(state: AppState): CompIntf {
-        return new Heading(4, this.data.props.feedFilterRootNode ? "Chat Room" : "Feed" + this.getFeedSubHeading(this.data), { className: "resultsTitle" });
+        return new Heading(4, this.data.props.feedFilterRootNode ? "Feed (Chat Room)" : "Feed" + this.getFeedSubHeading(this.data), { className: "resultsTitle" });
     }
 
     getFeedSubHeading = (data: TabDataIntf<FeedViewProps>) => {
         let subHeading = null;
 
         if (data.props.feedFilterToUser) {
-            subHeading = "My interactions with " + data.props.feedFilterToUser;
+            subHeading = "Interactions with " + data.props.feedFilterToUser;
         }
         else if (!data.props.feedFilterFriends && //
             data.props.feedFilterToMe && //

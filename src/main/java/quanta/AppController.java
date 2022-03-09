@@ -852,7 +852,10 @@ public class AppController extends ServiceBase implements ErrorController {
 			HttpServletRequest req, //
 			HttpServletResponse response) {
 		try {
-			SessionContext.checkReqToken();
+			// NOTE: Don't check token here, because we need this to be accessible by foreign fediverse servers,
+			// but check below
+			// only after knowing whether the node has any sharing on it at all or not.
+			// SessionContext.checkReqToken();
 
 			// Node Names are identified using a colon in front of it, to make it detectable
 			if (!StringUtils.isEmpty(nameOnUserNode) && !StringUtils.isEmpty(userName)) {
@@ -867,6 +870,16 @@ public class AppController extends ServiceBase implements ErrorController {
 					// we don't check ownership of node at this time, but merely check sanity of
 					// whether this ID is even existing or not.
 					SubNode node = read.getNode(ms, _id);
+
+					if (no(node)) {
+						throw new RuntimeException("Node not found.");
+					}
+
+					// if there's no sharing at all on the node, then we do the token check, otherwise we allow access. This is for
+					// good fediverse interoperability but still with a level of privacy for completely unshared nodes.
+					if (no(node.getAc()) || node.getAc().size() == 0) {
+						SessionContext.checkReqToken();
+					}
 
 					String _gid = gid;
 
