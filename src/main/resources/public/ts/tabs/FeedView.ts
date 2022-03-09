@@ -54,19 +54,8 @@ export class FeedView extends AppTab<FeedViewProps> {
             });
         }
 
-        let topRightControls = [];
         // if this is mobile don't even show search field unless it's currently in use (like from a trending click)
-        if (!state.mobileMode || this.data.props.searchTextState.getValue()) {
-            topRightControls = [
-                new Span(null, { className: "feedSearchField" }, [
-                    new TextField({
-                        val: this.data.props.searchTextState,
-                        placeholder: "Search for...",
-                        enter: S.srch.refreshFeed
-                    })]),
-                new Button("Clear", () => this.clearSearch(), { className: "feedClearButton" })
-            ];
-        }
+        let hasSearchField = (!state.mobileMode || this.data.props.searchTextState.getValue());
 
         let newItems = null;
         if ((this.data.props.feedDirty || this.data.props.feedDirtyList) && !this.data.props.feedLoading) {
@@ -80,13 +69,19 @@ export class FeedView extends AppTab<FeedViewProps> {
             new Div(null, { className: "marginTop" }, [
                 this.renderHeading(state),
                 new Span(null, { className: "float-end" }, [
-                    ...topRightControls,
-
                     newItems,
-                    new IconButton("fa-refresh", null, {
+                    hasSearchField ? new Span(null, { className: "feedSearchField" }, [
+                        new TextField({
+                            val: this.data.props.searchTextState,
+                            placeholder: "Search for...",
+                            enter: S.srch.refreshFeed
+                        })]) : null,
+                    new IconButton("fa-refresh", "Search", {
                         onClick: () => S.srch.refreshFeed(),
                         title: "Refresh"
                     }),
+                    hasSearchField && this.data.props.searchTextState.getValue() //
+                        ? new Button("Clear", () => this.clearSearch(), { className: "feedClearButton" }) : null,
 
                     new HelpButton(() => S.quanta?.config?.help?.fediverse?.feed),
 
