@@ -22,7 +22,7 @@ export class NodeCompRow extends Div {
     /* we have this flag so we can turn off buttons to troubleshoot performance. */
     static showButtonBar: boolean = true;
 
-    constructor(public node: J.NodeInfo, public tabData: TabDataIntf<any>, typeHandler: TypeHandlerIntf, public index: number, public count: number, public rowCount: number, public level: number,
+    constructor(public node: J.NodeInfo, public tabData: TabDataIntf<any>, private typeHandler: TypeHandlerIntf, public index: number, public count: number, public rowCount: number, public level: number,
         public isTableCell: boolean, public allowNodeMove: boolean, public imgSizeOverride: string, private allowHeaders: boolean,
         public allowInlineInsertButton: boolean, appState: AppState) {
         super(null, {
@@ -129,7 +129,7 @@ export class NodeCompRow extends Div {
 
         let header: CompIntf = null;
         let jumpButton: CompIntf = null;
-        if (this.allowHeaders && state.userPreferences.showMetaData) {
+        if (this.allowHeaders && state.userPreferences.showMetaData && this.typeHandler.getAllowRowHeader()) {
             header = new NodeCompRowHeader(node, true, true, false, false);
         }
         else {

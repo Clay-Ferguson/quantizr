@@ -15,6 +15,10 @@ export class AccountTypeHandler extends TypeBase {
         super(J.NodeType.ACCOUNT, "Account Root", "fa-database", false);
     }
 
+    getAllowRowHeader(): boolean {
+        return false;
+    }
+
     allowAction(action: NodeActionType, node: J.NodeInfo, appState: AppState): boolean {
         switch (action) {
             case NodeActionType.editNode:

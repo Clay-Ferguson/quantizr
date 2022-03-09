@@ -48,6 +48,10 @@ export class TypeBase implements TypeHandlerIntf {
         return true;
     }
 
+    getAllowRowHeader(): boolean {
+        return true;
+    }
+
     getTypeName(): string {
         return this.typeName;
     }

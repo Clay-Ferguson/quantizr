@@ -14,6 +14,10 @@ export class BookmarkTypeHandler extends TypeBase {
         super(J.NodeType.BOOKMARK, "Bookmark", "fa-bookmark", false);
     }
 
+    getAllowRowHeader(): boolean {
+        return false;
+    }
+
     render(node: J.NodeInfo, tabData: TabDataIntf<any>, rowStyling: boolean, isTreeView: boolean, state: AppState): Comp {
         let audioUrl = S.props.getPropStr(J.NodeProp.AUDIO_URL, node);
         let comp: NodeCompMarkdown = new NodeCompMarkdown(node, state);

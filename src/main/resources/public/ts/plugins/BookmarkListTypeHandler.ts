@@ -12,6 +12,10 @@ export class BookmarkListTypeHandler extends TypeBase {
         super(J.NodeType.BOOKMARK_LIST, "Bookmarks", "fa-bookmark", false);
     }
 
+    getAllowRowHeader(): boolean {
+        return false;
+    }
+
     allowAction(action: NodeActionType, node: J.NodeInfo, appState: AppState): boolean {
         return false;
     }
@@ -20,7 +24,8 @@ export class BookmarkListTypeHandler extends TypeBase {
         return new Div(null, null, [
             new Heading(4, this.displayName, {
                 className: "marginAll"
-            })
+            }),
+            new Div("Delete, edit, or order your bookmarks here.", { className: "marginLeft marginBottom" })
         ]);
     }
 

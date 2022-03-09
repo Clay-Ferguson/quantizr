@@ -16,6 +16,10 @@ export class FriendsListTypeHandler extends TypeBase {
         super(J.NodeType.FRIEND_LIST, "Friends", "fa-users", false);
     }
 
+    getAllowRowHeader(): boolean {
+        return false;
+    }
+
     allowAction(action: NodeActionType, node: J.NodeInfo, appState: AppState): boolean {
         return false;
     }
@@ -26,7 +30,7 @@ export class FriendsListTypeHandler extends TypeBase {
             new Heading(4, "Friends", {
                 className: "marginAll"
             }),
-            new Div("These are the people you follow. Deleting any of these nodes unfollows the person.", { className: "marginLeft" }),
+            new Div("These are the people you follow. Delete from this list to unfollow the person.", { className: "marginLeft" }),
             new Button("Find People", () => {
                 new SearchUsersDlg(state).open();
             }, { className: "marginAll" })

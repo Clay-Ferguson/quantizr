@@ -7,6 +7,10 @@ export class ExportsTypeHandler extends TypeBase {
         super(J.NodeType.EXPORTS, "Exports", "fa-briefcase", true);
     }
 
+    getAllowRowHeader(): boolean {
+        return false;
+    }
+
     getIconClass(): string {
         return super.getIconClass();
     }

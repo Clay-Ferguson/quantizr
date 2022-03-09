@@ -18,6 +18,10 @@ export class FriendTypeHandler extends TypeBase {
         return S.quanta?.config?.help?.type?.friend?.editor;
     }
 
+    getAllowRowHeader(): boolean {
+        return false;
+    }
+
     allowAction(action: NodeActionType, node: J.NodeInfo, appState: AppState): boolean {
         switch (action) {
             case NodeActionType.delete:

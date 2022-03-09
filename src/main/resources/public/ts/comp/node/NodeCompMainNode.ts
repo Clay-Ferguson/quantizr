@@ -8,6 +8,7 @@ import { Constants as C } from "../../Constants";
 import { EditNodeDlg } from "../../dlg/EditNodeDlg";
 import { DialogMode } from "../../enums/DialogMode";
 import { TabDataIntf } from "../../intf/TabDataIntf";
+import { TypeHandlerIntf } from "../../intf/TypeHandlerIntf";
 import * as J from "../../JavaIntf";
 import { S } from "../../Singletons";
 import { NodeCompButtonBar } from "./NodeCompButtonBar";
@@ -81,7 +82,8 @@ export class NodeCompMainNode extends Div {
 
             let header: CompIntf = null;
             let jumpButton: CompIntf = null;
-            if (state.userPreferences.showMetaData) {
+            const typeHandler: TypeHandlerIntf = S.plugin.getTypeHandler(node.type);
+            if (state.userPreferences.showMetaData && typeHandler?.getAllowRowHeader()) {
                 header = new NodeCompRowHeader(node, true, true, false, false);
             }
             else {
