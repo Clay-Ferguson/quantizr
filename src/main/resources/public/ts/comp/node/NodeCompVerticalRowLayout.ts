@@ -52,9 +52,9 @@ export class NodeCompVerticalRowLayout extends Div {
                     else {
                         lastNode = n;
                         let row: Comp = null;
-                        // NOTE: This collapsesComps type thing is intentionally not done on the NodeCompTableRowLayout layout type
-                        // because if the user wants their Account root laid out in a grid just let them do that and show everything
-                        // without doing any collapsedComps.
+                        /* NOTE: This collapsesComps type thing is intentionally not done on the NodeCompTableRowLayout layout type
+                         because if the user wants their Account root laid out in a grid just let them do that and show everything
+                         without doing any collapsedComps. */
                         if (typeHandler && typeHandler.isSpecialAccountNode()) {
                             row = new NodeCompRow(n, this.tabData, typeHandler, rowIdx, childCount, rowCount + 1, this.level, false, true, childrenImgSizes, this.allowHeaders, false, state);
 

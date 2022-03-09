@@ -18,4 +18,8 @@ export class ExportsTypeHandler extends TypeBase {
     getEditorHelp(): string {
         return S.quanta?.config?.help?.editor?.dialog;
     }
+
+    isSpecialAccountNode(): boolean {
+        return true;
+    }
 }
