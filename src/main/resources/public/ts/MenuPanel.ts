@@ -9,7 +9,9 @@ import { MenuItem } from "./comp/MenuItem";
 import { MenuItemSeparator } from "./comp/MenuItemSeparator";
 import { Constants as C } from "./Constants";
 import { ImportCryptoKeyDlg } from "./dlg/ImportCryptoKeyDlg";
+import { ManageAccountDlg } from "./dlg/ManageAccountDlg";
 import { ManageEncryptionKeysDlg } from "./dlg/ManageEncryptionKeysDlg";
+import { ManageStorageDlg } from "./dlg/ManageStorageDlg";
 import { MediaRecorderDlg } from "./dlg/MediaRecorderDlg";
 import { MessageDlg } from "./dlg/MessageDlg";
 import { SearchAndReplaceDlg } from "./dlg/SearchAndReplaceDlg";
@@ -121,10 +123,9 @@ export class MenuPanel extends Div {
     static generateKeys = () => { S.util.generateNewCryptoKeys(appState(null)); };
     static publishKeys = () => { S.encryption.initKeys(false, true, true); };
     static importKeys = () => { new ImportCryptoKeyDlg(appState(null)).open(); };
-    static profile = () => {
-        new UserProfileDlg(null, appState(null)).open();
-    };
-
+    static profile = () => { new UserProfileDlg(null, appState(null)).open(); };
+    static accountSettings = () => { new ManageAccountDlg(appState(null)).open(); };
+    static storageSpace = () => { new ManageStorageDlg(appState(null)).open(); };
     static toggleEditMode = () => S.edit.toggleEditMode(appState(null));
     static toggleMetaData = () => S.edit.toggleShowMetaData(appState(null));
     static toggleNsfw = () => S.edit.toggleNsfw(appState(null));
@@ -392,6 +393,8 @@ export class MenuPanel extends Div {
             new MenuItem(state.mobileMode ? "Desktop Browser" : "Moble Browser", MenuPanel.mobileToggle), //
 
             new MenuItem("Profile", MenuPanel.profile, !state.isAnonUser), //
+            new MenuItem("Account Settings", MenuPanel.accountSettings, !state.isAnonUser), //
+            new MenuItem("Storage Space", MenuPanel.storageSpace, !state.isAnonUser), //
             !state.isAnonUser ? new MenuItem("Logout", S.nav.logout, !state.isAnonUser) : null, //
             state.isAnonUser ? new MenuItem("Signup", S.nav.signup, state.isAnonUser) : null //
 

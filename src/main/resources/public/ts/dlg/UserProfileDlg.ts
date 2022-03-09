@@ -135,7 +135,6 @@ export class UserProfileDlg extends DialogBase {
 
                 new ButtonBar([
                     this.appState.isAnonUser || this.readOnly ? null : new Button("Save", this.save, null, "btn-primary"),
-                    this.appState.isAnonUser || this.readOnly ? null : new Button("Manage Account", () => S.edit.openManageAccountDlg(state)), //
 
                     // only local users might have set their 'home' node (named a node 'home')
                     localUser && state.userProfile.homeNodeId ? new Button("Home", () => this.openUserHomePage(state, "home")) : null, //

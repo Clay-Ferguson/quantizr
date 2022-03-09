@@ -7,26 +7,24 @@ interface LS { // Local State
 
 export class PieChart extends Div {
 
-    constructor(private data: any[]) {
+    constructor(private width: number, private className: string, private data: any[]) {
         super(null, { className: "marginBottom" });
         this.domPreUpdateEvent = this.domPreUpdateEvent.bind(this);
     }
 
     preRender(): void {
-        this.setChildren([new Svg(null, { className: "d3PieChart" })]);
+        this.setChildren([new Svg(null, { className: this.className })]);
     }
 
     domPreUpdateEvent(): void {
         // console.log("domPreUpdateEvent: " + S.util.prettyPrint(this.data));
-        let state = this.getState<LS>();
-
-        let svg = d3.select(".d3PieChart");
+        // let state = this.getState<LS>();
+        let svg = d3.select("." + this.className);
 
         // width/height must match d3PieChart scss class
-        let width = 300; // svg.attr("width");
-        let height = 300; // svg.attr("height");
-        let radius = Math.min(width, height) / 2;
-        let g = svg.append("g").attr("transform", "translate(" + width / 2 + "," + height / 2 + ")");
+        let height = this.width;
+        let radius = Math.min(this.width, height) / 2;
+        let g = svg.append("g").attr("transform", "translate(" + this.width / 2 + "," + height / 2 + ")");
 
         let colors = [];
         for (let d of this.data) {
@@ -36,7 +34,7 @@ export class PieChart extends Div {
         var color = d3.scaleOrdinal(colors);
 
         // Generate the pie
-        var pie = d3.pie().value(function (d) { return d.value; });
+        var pie = d3.pie().value((d: any) => { return d.value; });
 
         // Generate the arcs
         var arc = d3.arc()
@@ -44,7 +42,7 @@ export class PieChart extends Div {
             .outerRadius(radius);
 
         // Generate groups
-        var arcs = g.selectAll(".d3PieChart")
+        var arcs = g.selectAll("." + this.className)
             .data(pie(this.data))
             .enter()
             .append("g")
@@ -58,9 +56,9 @@ export class PieChart extends Div {
             .attr("d", arc);
 
         arcs.append("text")
-            .attr("transform", function (d) {
+            .attr("transform", (d) => {
                 d.innerRadius = 0;
-                d.outerRadius = 300;
+                d.outerRadius = this.width;
                 return "translate(" + arc.centroid(d) + ")";
             })
             .attr("text-anchor", "middle")

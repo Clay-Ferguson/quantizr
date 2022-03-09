@@ -7,6 +7,7 @@ import { ConfirmDlg } from "./dlg/ConfirmDlg";
 import { EditNodeDlg } from "./dlg/EditNodeDlg";
 import { ExportDlg } from "./dlg/ExportDlg";
 import { ManageAccountDlg } from "./dlg/ManageAccountDlg";
+import { ManageStorageDlg } from "./dlg/ManageStorageDlg";
 import { PrefsDlg } from "./dlg/PrefsDlg";
 import { SharingDlg } from "./dlg/SharingDlg";
 import { UploadFromFileDropzoneDlg } from "./dlg/UploadFromFileDropzoneDlg";
@@ -25,6 +26,10 @@ export class Edit {
 
     openManageAccountDlg = (state: AppState): void => {
         new ManageAccountDlg(state).open();
+    }
+
+    openManageStorageDlg = (state: AppState): void => {
+        new ManageStorageDlg(state).open();
     }
 
     editPreferences = (state: AppState): void => {
