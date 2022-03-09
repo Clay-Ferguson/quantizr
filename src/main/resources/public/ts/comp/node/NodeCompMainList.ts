@@ -120,9 +120,12 @@ export class NodeCompMainList extends Div {
             }
         }
 
-        if (prevNodeButton || firstButton || prevButton || nextButton || nextNodeButton) {
-            children.push(new ButtonBar([prevNodeButton, firstButton, prevButton, nextButton, nextNodeButton], "text-center " + moreClasses));
-            children.push(new Clearfix());
+        if (firstButton || prevButton || nextButton) {
+            children.push(new ButtonBar([firstButton, prevButton, nextButton], "marginBottom text-center " + moreClasses));
+        }
+
+        if (prevNodeButton || nextNodeButton) {
+            children.push(new ButtonBar([prevNodeButton, nextNodeButton], "marginBottom text-center " + moreClasses));
         }
     }
 }
