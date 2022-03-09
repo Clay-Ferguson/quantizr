@@ -1349,15 +1349,15 @@ Will come back later and study this more. todo-1 */
 }
 
 .content-narrow {
-    max-width: 650px;
+    max-width: 50em;
 }
 
 .content-medium {
-    max-width: 800px;
+    max-width: 60em;
 }
 
 .content-wide {
-    max-width: 950px;
+    max-width: 70em;
 }
 
 .mousePointer {
@@ -1904,6 +1904,7 @@ audio::-webkit-media-controls-play-button {
     border: 1px solid $nodeBorderBottomColor;
     padding: 10px;
     margin-bottom: $smallGap;
+    margin-right: $tinyGap;
     border-radius: $border-radius;
     overflow-x: hidden;
     background-color: $baseBgColor;

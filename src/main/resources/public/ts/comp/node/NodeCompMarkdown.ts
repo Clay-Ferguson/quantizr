@@ -22,10 +22,13 @@ export class NodeCompMarkdown extends Html {
     constructor(public node: J.NodeInfo, private appState: AppState) {
         super(null, { key: "ncmkd_" + node.id });
 
-        // Now that users can resize their center view width, maybe we don't need width style?
-        // let widthStyle = node.content && node.content.indexOf("```") !== 1 ? "content-medium" : "content-narrow";
-        // this.attribs.className = "markdown-content " + widthStyle;
-        this.attribs.className = "markdown-content";
+        if (!appState.mobileMode) {
+            let widthStyle = node.content && node.content.indexOf("```") !== -1 ? "content-wide" : "content-narrow";
+            this.attribs.className = "markdown-content " + widthStyle;
+        }
+        else {
+            this.attribs.className = "markdown-content";
+        }
 
         let content = node.content || "";
         let att: LS = {
