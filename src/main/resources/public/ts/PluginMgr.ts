@@ -1,5 +1,6 @@
 import { TypeHandlerIntf } from "./intf/TypeHandlerIntf";
 import { AccountTypeHandler } from "./plugins/AccountTypeHandler";
+import { APPostsTypeHandler } from "./plugins/APPostsTypeHandler";
 import { BlockedUsersTypeHandler } from "./plugins/BlockedUsersTypeHandler";
 import { BookmarkListTypeHandler } from "./plugins/BookmarkListTypeHandler";
 import { BookmarkTypeHandler } from "./plugins/BookmarkTypeHandler";
@@ -58,6 +59,7 @@ export class PluginMgr {
         this.addTypeHandler(new RepoRootTypeHandler());
         this.addTypeHandler(new AccountTypeHandler());
         this.addTypeHandler(new PostsTypeHandler());
+        this.addTypeHandler(new APPostsTypeHandler());
         this.addTypeHandler(new ExportsTypeHandler());
         this.addTypeHandler(new InboxNodeTypeHandler());
         this.addTypeHandler(new InboxEntryTypeHandler());
