@@ -124,8 +124,19 @@ export class FeedView extends AppTab<FeedViewProps> {
             }));
         }
 
+        if (!state.userPreferences.nsfw) {
+            topChildren.push(new Div("[Show Sensitive Content]", {
+                className: "clickable",
+                onClick: async () => {
+                    await S.edit.toggleNsfw(state);
+                    S.srch.refreshFeed();
+                }
+            }));
+            topChildren.push(new Clearfix());
+        }
+
         let children: Comp[] = [];
-        children.push(new Div(null, { className: "marginBottom" }, topChildren));
+        children.push(new Div(null, { className: "tinyMarginBottom" }, topChildren));
         let childCount = this.data.props.feedResults ? this.data.props.feedResults.length : 0;
 
         // if we're editing an existing item determine that before starting to render rows.

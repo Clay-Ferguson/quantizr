@@ -428,9 +428,9 @@ export class Edit {
         S.view.scrollToNode(state);
     }
 
-    toggleNsfw = (state: AppState): void => {
+    toggleNsfw = async (state: AppState): Promise<void> => {
         state.userPreferences.nsfw = !state.userPreferences.nsfw;
-        S.util.saveUserPreferences(state, true);
+        return S.util.saveUserPreferences(state, true);
     }
 
     toggleShowParents = (state: AppState): void => {

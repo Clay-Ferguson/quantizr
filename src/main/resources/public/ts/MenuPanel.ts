@@ -380,7 +380,7 @@ export class MenuPanel extends Div {
         children.push(new Menu("Settings", [
             new MenuItem("Edit", MenuPanel.toggleEditMode, !state.isAnonUser, () => state.userPreferences.editMode), //
             new MenuItem("Show Node Info", MenuPanel.toggleMetaData, true, () => state.userPreferences.showMetaData), //
-            new MenuItem("NSFW", MenuPanel.toggleNsfw, true, () => state.userPreferences.nsfw), //
+            new MenuItem("Show Sensitive Content", MenuPanel.toggleNsfw, true, () => state.userPreferences.nsfw), //
             new MenuItem("Show Parent", MenuPanel.toggleParents, true, () => state.userPreferences.showParents), //
 
             // For now there is only ONE button on the Perferences dialog that is accessible as a toolbar button already, so
