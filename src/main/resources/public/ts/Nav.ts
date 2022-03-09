@@ -592,7 +592,8 @@ export class Nav {
         this.messages({
             feedFilterFriends: false,
             feedFilterToMe: false,
-            feedFilterFromMe: true,
+            feedFilterFromMe: false,
+            // WARNING: When setting feedFilterToUser, the other filter options should be false!! They're mutually exclusive in that way.
             feedFilterToUser: user,
             feedFilterToPublic: false,
             feedFilterLocalServer: false,

@@ -86,8 +86,15 @@ public class UserFeedService extends ServiceBase {
 
 	/*
 	 * Generated content of the "Feed" for a user.
+	 * 
+	 * Note: When 'req.toUser' is set we query actually for the bidiretional conversatio of us to that person or that person to us
+	 * queried in a single list.
 	 */
 	public NodeFeedResponse generateFeed(MongoSession ms, NodeFeedRequest req) {
+		// if bidirectional means query for the conversation between me and the other person (both senders), and we do that 
+		// always for now when toUser is present.
+		boolean bidirectional = StringUtils.isNotEmpty(req.getToUser());
+
 		/*
 		 * Set this flag to generate large resultset of all nodes in root, just for exercising this method
 		 * without 'real' data.
@@ -152,7 +159,7 @@ public class UserFeedService extends ServiceBase {
 
 		SubNode myAcntNode = null;
 
-		// includes shares TO me.
+		// includes shares TO me (but not in the context of a 'bidirectional' query)
 		if (!testQuery && doAuth && req.getToMe()) {
 			myAcntNode = read.getNode(ms, sc.getRootId());
 
@@ -197,24 +204,13 @@ public class UserFeedService extends ServiceBase {
 			crit = crit.and(SubNode.PROPS + "." + NodeProp.ACT_PUB_SENSITIVE).is(null);
 		}
 
-		boolean enableBlocking = true;
-		if (!testQuery && doAuth && StringUtils.isNotEmpty(req.getToUser())) {
-			// make sure blocked users aren't considered below once we enter into here. (todo-0)
-			SubNode toUserNode = read.getUserNodeByUserName(ms, req.getToUser(), false);
-
-			if (ok(toUserNode)) {
-				crit = crit.and(SubNode.AC + "." + toUserNode.getId().toHexString()).ne(null);
-			}
-			enableBlocking = false;
-		}
-
 		/*
 		 * Save the 'string' representations for blocked user ids for use below, to mask out places where
 		 * users may be following a user that will effectively be blocked
 		 */
 		HashSet<String> blockedIdStrings = new HashSet<>();
 
-		if (enableBlocking) {
+		if (!bidirectional) {
 			HashSet<ObjectId> blockedUserIds = new HashSet<>();
 			/*
 			 * this logic makes it so that any feeds using 'public' checkbox will have the admin-blocked users
@@ -235,6 +231,34 @@ public class UserFeedService extends ServiceBase {
 			}
 		}
 
+		// for bidirectional we do an OR of "us to them" and "them to us" kind of sharing to the other user, to result in what
+		// will end up being all conversations between us and the other person mixed into a single rev-chron.
+		if (bidirectional) {
+			SubNode toUserNode = read.getUserNodeByUserName(ms, req.getToUser(), false);
+
+			if (no(myAcntNode)) {
+				myAcntNode = read.getNode(ms, sc.getRootId());
+			}
+
+			if (ok(myAcntNode)) {
+				// sharing from us to the other user.
+				orCriteria.add(
+						// where node is owned by us.
+						Criteria.where(SubNode.OWNER).is(myAcntNode.getOwner()) //
+								// and the node has any sharing on it.
+								.and(SubNode.AC + "." + toUserNode.getId().toHexString()).ne(null));
+
+				// sharing from the other user to us.
+				if (bidirectional) {
+					orCriteria.add(
+						// where node is owned by us.
+						Criteria.where(SubNode.OWNER).is(toUserNode.getOwner()) //
+								// and the node has any sharing on it.
+								.and(SubNode.AC + "." + myAcntNode.getId().toHexString()).ne(null));
+				}
+			}
+		}
+		
 		if (!testQuery && doAuth && req.getFromMe()) {
 			if (no(myAcntNode)) {
 				myAcntNode = read.getNode(ms, sc.getRootId());
