@@ -27,8 +27,6 @@ import quanta.config.ServiceBase;
 import quanta.exception.NodeAuthFailedException;
 import quanta.util.XString;
 
-// @CrossOrigin --> Access-Control-Allow-Credentials
-
 /**
  * Main REST Controller endpoint for AP
  */
@@ -57,10 +55,7 @@ public class ActPubController extends ServiceBase {
 	 */
 	@RequestMapping(value = APConst.PATH_WEBFINGER, method = RequestMethod.GET, produces = { //
 			APConst.CTYPE_JRD_JSON, //
-			// APConst.CTYPE_JRD_JSON + "; " + APConst.CHARSET, //
 			APConst.CTYPE_ACT_JSON, //
-			// APConst.CTYPE_ACT_JSON + "; " + APConst.CHARSET, //
-			// APConst.CTYPE_ACT_JSON + "; " + APConst.APS_PROFILE //
 	})
 	public @ResponseBody Object webFinger(//
 			@RequestParam(value = "resource", required = true) String resource, //
@@ -105,9 +100,6 @@ public class ActPubController extends ServiceBase {
 	@RequestMapping(value = APConst.ACTOR_PATH + "/{userName}", method = RequestMethod.GET, produces = { //
 			APConst.CTYPE_ACT_JSON, //
 			APConst.CTYPE_LD_JSON
-			// APConst.CTYPE_ACT_JSON + "; " + APConst.CHARSET, //
-			// APConst.CTYPE_LD_JSON + "; " + APConst.APS_PROFILE, //
-			// APConst.CTYPE_ACT_JSON + "; " + APConst.APS_PROFILE //
 	})
 	public @ResponseBody Object actor(//
 			@PathVariable(value = "userName", required = true) String userName, HttpServletRequest req) {
@@ -127,11 +119,7 @@ public class ActPubController extends ServiceBase {
 	 */
 	@RequestMapping(value = APConst.PATH_INBOX, method = RequestMethod.POST, produces = {//
 			APConst.CTYPE_LD_JSON, //
-			// APConst.CTYPE_LD_JSON + "; " + APConst.CHARSET, //
-			// APConst.CTYPE_LD_JSON + "; " + APConst.APS_PROFILE, //
 			APConst.CTYPE_ACT_JSON, //
-			// APConst.CTYPE_ACT_JSON + "; " + APConst.CHARSET, //
-			// APConst.CTYPE_ACT_JSON + "; " + APConst.APS_PROFILE //
 	})
 	public @ResponseBody Object sharedInboxPost(//
 			@RequestBody String body, //
@@ -156,11 +144,7 @@ public class ActPubController extends ServiceBase {
 	 */
 	@RequestMapping(value = APConst.PATH_INBOX + "/{userName}", method = RequestMethod.POST, produces = { //
 			APConst.CTYPE_LD_JSON, //
-			// APConst.CTYPE_LD_JSON + "; " + APConst.CHARSET, //
-			// APConst.CTYPE_LD_JSON + "; " + APConst.APS_PROFILE, //
 			APConst.CTYPE_ACT_JSON, //
-			// APConst.CTYPE_ACT_JSON + "; " + APConst.CHARSET, //
-			// APConst.CTYPE_ACT_JSON + "; " + APConst.APS_PROFILE //
 	})
 	public @ResponseBody Object inboxPost(//
 			@RequestBody String body, //
@@ -168,7 +152,7 @@ public class ActPubController extends ServiceBase {
 			HttpServletRequest httpReq) {
 		try {
 			APObj payload = mapper.readValue(body, new TypeReference<>() {});
-			apLog.trace("AP INBOX incoming: " + XString.prettyPrint(payload));
+			apLog.trace("User INBOX incoming: " + XString.prettyPrint(payload));
 			ActPubService.inboxCount++;
 			apub.processInboxPost(httpReq, payload);
 			return new ResponseEntity<String>(HttpStatus.OK);
@@ -177,13 +161,12 @@ public class ActPubController extends ServiceBase {
 		}
 	}
 
+	/**
+	 * GET JSON of object
+	 */
 	@RequestMapping(value = {"/"}, method = RequestMethod.GET, produces = {//
 			APConst.CTYPE_LD_JSON, //
-			// APConst.CTYPE_LD_JSON + "; " + APConst.CHARSET, //
-			// APConst.CTYPE_LD_JSON + "; " + APConst.APS_PROFILE, //
 			APConst.CTYPE_ACT_JSON, //
-			// APConst.CTYPE_ACT_JSON + "; " + APConst.CHARSET, //
-			// APConst.CTYPE_ACT_JSON + "; " + APConst.APS_PROFILE //
 	})
 	public @ResponseBody Object getJsonObj(HttpServletRequest req, //
 			@RequestParam(value = "id", required = false) String id) {
@@ -209,9 +192,6 @@ public class ActPubController extends ServiceBase {
 	@RequestMapping(value = APConst.PATH_OUTBOX + "/{userName}", method = RequestMethod.GET, produces = { //
 			APConst.CTYPE_ACT_JSON, //
 			APConst.CTYPE_LD_JSON
-			// APConst.CTYPE_ACT_JSON + "; " + APConst.CHARSET, //
-			// APConst.CTYPE_LD_JSON + "; " + APConst.APS_PROFILE, //
-			// APConst.CTYPE_ACT_JSON + "; " + APConst.APS_PROFILE //
 	})
 	public @ResponseBody Object outbox(//
 			@PathVariable(value = "userName", required = true) String userName,
@@ -250,9 +230,6 @@ public class ActPubController extends ServiceBase {
 	@RequestMapping(value = APConst.PATH_FOLLOWERS + "/{userName}", method = RequestMethod.GET, produces = { //
 			APConst.CTYPE_ACT_JSON, //
 			APConst.CTYPE_LD_JSON
-			// APConst.CTYPE_ACT_JSON + "; " + APConst.CHARSET, //
-			// APConst.CTYPE_LD_JSON + "; " + APConst.APS_PROFILE, //
-			// APConst.CTYPE_ACT_JSON + "; " + APConst.APS_PROFILE //
 	})
 	public @ResponseBody Object getFollowers(//
 			@PathVariable(value = "userName", required = false) String userName,
@@ -282,9 +259,6 @@ public class ActPubController extends ServiceBase {
 	@RequestMapping(value = APConst.PATH_FOLLOWING + "/{userName}", method = RequestMethod.GET, produces = { //
 			APConst.CTYPE_ACT_JSON, //
 			APConst.CTYPE_LD_JSON
-			// APConst.CTYPE_ACT_JSON + "; " + APConst.CHARSET, //
-			// APConst.CTYPE_LD_JSON + "; " + APConst.APS_PROFILE, //
-			// APConst.CTYPE_ACT_JSON + "; " + APConst.APS_PROFILE //
 	})
 	public @ResponseBody Object getFollowing(//
 			@PathVariable(value = "userName", required = false) String userName,

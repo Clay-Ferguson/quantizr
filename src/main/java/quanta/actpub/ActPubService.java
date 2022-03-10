@@ -190,7 +190,8 @@ public class ActPubService extends ServiceBase {
                     new APObj() //
                             .put(APObj.type, APType.Document) //
                             .put(APObj.mediaType, mime) //
-                            // NOTE: The /f/id endpoint is intentionally wide open, but only for nodes that have at least some sharing
+                            // NOTE: The /f/id endpoint is intentionally wide open, but only for nodes that have at least some
+                            // sharing
                             // meaning they can be visible to at least someone other than it's owner.
                             .put(APObj.url, prop.getProtocolHostAndPort() + "/f/id/" + node.getIdStr()));
         }
@@ -582,7 +583,7 @@ public class ActPubService extends ServiceBase {
 
                 default:
                     // this captures videos? and other things (todo-1: add more support)
-                    log.debug("Unhandled Create action");
+                    log.debug("Unhandled Create action type: " + type);
                     break;
             }
             return null;
@@ -590,7 +591,6 @@ public class ActPubService extends ServiceBase {
     }
 
     public void processCreateTombstone(MongoSession ms, String actorUrl, Object actorObj, Object obj) {
-        apLog.trace("processCreateTombstone");
         String id = AP.str(obj, APObj.id);
         delete.deleteByPropVal(ms, NodeProp.ACT_PUB_ID.s(), id);
     }
