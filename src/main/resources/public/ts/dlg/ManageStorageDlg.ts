@@ -43,7 +43,6 @@ export class ManageStorageDlg extends DialogBase {
 
             new ButtonBar([
                 new Button("Close", () => {
-                    debugger;
                     this.close();
                 }, null, "btn-secondary")
             ], "marginTop")

@@ -25,7 +25,7 @@ export class FriendsListTypeHandler extends TypeBase {
     }
 
     render(node: J.NodeInfo, tabData: TabDataIntf<any>, rowStyling: boolean, isTreeView: boolean, state: AppState): Comp {
-        return new Div(null, null, [
+        return new Div(null, { className: "systemNodeContent" }, [
             new HelpButton(() => S.quanta?.config?.help?.type?.friendsList?.render, null, "btn-secondary float-end"),
             new Heading(4, "Friends", {
                 className: "marginAll"

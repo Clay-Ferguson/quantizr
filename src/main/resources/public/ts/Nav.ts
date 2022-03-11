@@ -519,6 +519,7 @@ export class Nav {
 
             // merge props parameter into the feed data props.
             feedData.props = { ...feedData.props, ...props };
+            debugger;
             return s;
         });
         setTimeout(S.srch.refreshFeed, 10);

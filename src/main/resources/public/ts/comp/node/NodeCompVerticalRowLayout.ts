@@ -56,13 +56,13 @@ export class NodeCompVerticalRowLayout extends Div {
                          because if the user wants their Account root laid out in a grid just let them do that and show everything
                          without doing any collapsedComps. */
                         if (typeHandler && typeHandler.isSpecialAccountNode()) {
-                            row = new NodeCompRow(n, this.tabData, typeHandler, rowIdx, childCount, rowCount + 1, this.level, false, true, childrenImgSizes, this.allowHeaders, false, state);
+                            row = new NodeCompRow(n, this.tabData, typeHandler, rowIdx, childCount, rowCount + 1, this.level, false, true, childrenImgSizes, this.allowHeaders, false, true, state);
 
                             // I'm gonna be evil here and do this object without a type.
                             collapsedComps.push({ comp: row, subOrdinal: typeHandler.subOrdinal() });
                         }
                         else {
-                            row = new NodeCompRow(n, this.tabData, typeHandler, rowIdx, childCount, rowCount + 1, this.level, false, true, childrenImgSizes, this.allowHeaders, true, state);
+                            row = new NodeCompRow(n, this.tabData, typeHandler, rowIdx, childCount, rowCount + 1, this.level, false, true, childrenImgSizes, this.allowHeaders, true, true, state);
                             comps.push(row);
                         }
                     }

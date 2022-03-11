@@ -24,7 +24,7 @@ export class NodeCompRow extends Div {
 
     constructor(public node: J.NodeInfo, public tabData: TabDataIntf<any>, private typeHandler: TypeHandlerIntf, public index: number, public count: number, public rowCount: number, public level: number,
         public isTableCell: boolean, public allowNodeMove: boolean, public imgSizeOverride: string, private allowHeaders: boolean,
-        public allowInlineInsertButton: boolean, appState: AppState) {
+        public allowInlineInsertButton: boolean, private allowShowThread: boolean, appState: AppState) {
         super(null, {
             id: S.nav._UID_ROWID_PREFIX + node.id
             // WARNING: Leave this tabIndex here. it's required for focsing/scrolling
@@ -130,7 +130,7 @@ export class NodeCompRow extends Div {
         let header: CompIntf = null;
         let jumpButton: CompIntf = null;
         if (this.allowHeaders && state.userPreferences.showMetaData && this.typeHandler.getAllowRowHeader()) {
-            header = new NodeCompRowHeader(node, true, true, false, false);
+            header = new NodeCompRowHeader(node, true, true, false, false, true);
         }
         else {
             const targetId = S.props.getPropStr(J.NodeProp.TARGET_ID, node);
@@ -154,7 +154,7 @@ export class NodeCompRow extends Div {
             buttonBar ? new Clearfix("button_bar_clearfix_" + node.id) : null,
             jumpButton,
             new NodeCompContent(node, this.tabData, true, true, null, null, this.imgSizeOverride, true),
-            this.allowHeaders ? new NodeCompRowFooter(node, false) : null,
+            this.allowHeaders ? new NodeCompRowFooter(node, false, this.allowShowThread) : null,
             this.allowHeaders ? new Clearfix() : null
         ]);
     }

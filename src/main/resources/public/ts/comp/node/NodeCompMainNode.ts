@@ -84,7 +84,7 @@ export class NodeCompMainNode extends Div {
             let jumpButton: CompIntf = null;
             const typeHandler: TypeHandlerIntf = S.plugin.getTypeHandler(node.type);
             if (state.userPreferences.showMetaData && typeHandler?.getAllowRowHeader()) {
-                header = new NodeCompRowHeader(node, true, true, false, false);
+                header = new NodeCompRowHeader(node, true, true, false, false, true);
             }
             else {
                 const targetId = S.props.getPropStr(J.NodeProp.TARGET_ID, node);
@@ -102,7 +102,7 @@ export class NodeCompMainNode extends Div {
                 new Clearfix("bbcf_" + node.id),
                 jumpButton,
                 new NodeCompContent(node, this.tabData, false, true, null, null, this.imgSizeOverride, true),
-                new NodeCompRowFooter(node, false),
+                new NodeCompRowFooter(node, false, true),
                 new Clearfix()
             ]);
         }

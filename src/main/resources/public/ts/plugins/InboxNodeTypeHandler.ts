@@ -40,7 +40,7 @@ export class InboxNodeTypeHandler extends TypeBase {
                 })
             ], null, "float-end marginBottom"),
             new Clearfix()
-        ], "displayTable marginAll");
+        ], "displayTable systemNodeContent marginAll");
     }
 
     isSpecialAccountNode(): boolean {

@@ -542,7 +542,6 @@ export class Render {
                 finally {
                     if (s.rendering) {
                         /* This is a tiny timeout yes, but don't remove this timer. We need it or else this won't work. */
-
                         PubSub.subSingleOnce(C.PUBSUB_postMainWindowScroll, () => {
                             setTimeout(() => {
                                 dispatch("Action_settingVisible", (s: AppState): AppState => {

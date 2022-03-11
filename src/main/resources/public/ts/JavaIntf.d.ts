@@ -169,6 +169,10 @@ export interface FileSystemReindexRequest extends RequestBase {
     nodeId: string;
 }
 
+export interface GetActPubObjectRequest extends RequestBase {
+    url: string;
+}
+
 export interface GetBookmarksRequest extends RequestBase {
 }
 
@@ -223,6 +227,10 @@ export interface GetSharedNodesRequest extends RequestBase {
     nodeId: string;
     shareTarget: string;
     accessOption: string;
+}
+
+export interface GetThreadViewRequest extends RequestBase {
+    nodeId: string;
 }
 
 export interface GetUserAccountInfoRequest extends RequestBase {
@@ -532,6 +540,10 @@ export interface FriendInfo {
     foreignAvatarUrl: string;
 }
 
+export interface GetActPubObjectResponse extends ResponseBase {
+    nodeId: string;
+}
+
 export interface GetBookmarksResponse extends ResponseBase {
     bookmarks: Bookmark[];
 }
@@ -586,6 +598,11 @@ export interface GetServerInfoResponse extends ResponseBase {
 
 export interface GetSharedNodesResponse extends ResponseBase {
     searchResults: NodeInfo[];
+}
+
+export interface GetThreadViewResponse extends ResponseBase {
+    nodes: NodeInfo[];
+    topReached: boolean;
 }
 
 export interface GetUserAccountInfoResponse extends ResponseBase {

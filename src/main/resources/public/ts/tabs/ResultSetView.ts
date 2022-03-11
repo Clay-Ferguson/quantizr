@@ -67,7 +67,9 @@ export abstract class ResultSetView extends AppTab {
 
         let i = 0;
         let jumpButton = state.isAdminUser || !this.data.rsInfo.searchType;
+
         results.forEach((node: J.NodeInfo) => {
+
             S.srch.initSearchNode(node);
             let c = this.renderItem(node, i, childCount, rowCount, jumpButton, state);
             if (c) {
@@ -88,7 +90,7 @@ export abstract class ResultSetView extends AppTab {
 
     /* overridable (don't use arrow function) */
     renderItem(node: J.NodeInfo, i: number, childCount: number, rowCount: number, jumpButton: boolean, state: AppState): CompIntf {
-        return S.srch.renderSearchResultAsListItem(node, this.data, i, childCount, rowCount, this.data.id, false, false, true, jumpButton, this.allowHeader, this.allowFooter, state);
+        return S.srch.renderSearchResultAsListItem(node, this.data, i, childCount, rowCount, this.data.id, false, false, true, jumpButton, this.allowHeader, this.allowFooter, true, state);
     }
 
     addPaginationBar = (state: AppState, children: CompIntf[]): void => {

@@ -10,6 +10,7 @@ import java.security.PrivateKey;
 import java.security.Signature;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
 import java.util.Base64;
 import java.util.Date;
 import java.util.HashSet;
@@ -39,15 +40,20 @@ import org.springframework.web.client.RestTemplate;
 import quanta.actpub.model.AP;
 import quanta.actpub.model.APList;
 import quanta.actpub.model.APObj;
+import quanta.actpub.model.APType;
 import quanta.config.AppProp;
+import quanta.config.NodeName;
 import quanta.config.ServiceBase;
 import quanta.instrument.PerfMon;
+import quanta.model.NodeInfo;
 import quanta.model.client.NodeProp;
 import quanta.model.client.NodeType;
+import quanta.model.client.PrivilegeType;
 import quanta.mongo.MongoDeleteEvent;
 import quanta.mongo.MongoRepository;
 import quanta.mongo.MongoSession;
 import quanta.mongo.model.SubNode;
+import quanta.response.GetThreadViewResponse;
 import quanta.util.ThreadLocals;
 import quanta.util.Util;
 import quanta.util.XString;
@@ -64,6 +70,8 @@ public class ActPubUtil extends ServiceBase {
 
     @Autowired
     private AppProp prop;
+
+    private static final int MAX_THREAD_NODES = 6;
 
     /*
      * RestTemplate is thread-safe and reusable, and has no state, so we need only one final static
@@ -783,5 +791,93 @@ public class ActPubUtil extends ServiceBase {
     @EventListener
     public void onApplicationEvent(MongoDeleteEvent event) {
         deleteNodeNotify((ObjectId) event.getSource());
+    }
+
+    public GetThreadViewResponse getNodeThreadView(MongoSession ms, String nodeId) {
+        GetThreadViewResponse res = new GetThreadViewResponse();
+        LinkedList<NodeInfo> nodes = new LinkedList<>();
+        SubNode node = read.getNode(ms, nodeId);
+        boolean topReached = false;
+
+        // iterate up the parent chain or chain of inReplyTo for ActivityPub
+        while (!topReached && ok(node) && nodes.size() < MAX_THREAD_NODES) {
+            try {
+                nodes.addFirst(
+                        convert.convertToNodeInfo(ThreadLocals.getSC(), ms, node, true, false, -1, false, false, false, false));
+
+                // if inReplyTo exists try to use it first.
+                String inReplyTo = node.getStr(NodeProp.ACT_PUB_OBJ_INREPLYTO);
+                if (ok(inReplyTo)) {
+                    String parentId = apUtil.loadObject(ms, inReplyTo);
+                    if (ok(parentId)) {
+                        SubNode replyParent = read.getNode(ms, parentId);
+                        if (ok(replyParent)) {
+                            node = replyParent;
+                            continue;
+                        }
+                    }
+                }
+
+                // if no database parent, check and see if we can get the node via inReplyTo
+                if (no(node.getParent())) {
+                    topReached = true;
+                } else {
+                    node = read.getParent(ms, node);
+                }
+            } catch (Exception e) {
+                node = null;
+                topReached = true;
+                /*
+                 * ignore this. Every user will eventually end up at some non-root node they don't own, even if it's
+                 * the one above their account, this represents how far up the user is able to read towards the root
+                 * of the tree based on sharing setting of nodes encountered along the way to the root.
+                 */
+            }
+        }
+
+        res.setTopReached(topReached);
+        res.setNodes(nodes);
+        res.setSuccess(true);
+        return res;
+    }
+
+    public String loadObject(MongoSession ms, String url) {
+        APObj obj = apUtil.getJson(url, APConst.MTYPE_ACT_JSON);
+        if (no(obj)) {
+            log.debug("unable to load get json: " + url);
+            return null;
+        }
+
+        String type = AP.str(obj, APObj.type);
+
+        switch (type) {
+            case APType.Note:
+                String ownerActorUrl = AP.str(obj, APObj.attributedTo);
+                if (ok(ownerActorUrl)) {
+                    return (String) arun.run(as -> {
+                        String nodeId = null;
+                        SubNode accountNode = apub.getAcctNodeByActorUrl(as, ownerActorUrl);
+                        if (ok(accountNode)) {
+                            String apUserName = accountNode.getStr(NodeProp.USER);
+                            SubNode outboxNode =
+                                    read.getUserNodeByType(as, apUserName, accountNode, "### Posts", NodeType.ACT_PUB_POSTS.s(),
+                                            Arrays.asList(PrivilegeType.READ.s(), PrivilegeType.WRITE.s()), NodeName.POSTS);
+                            if (no(outboxNode)) {
+                                log.debug("no outbox for user: " + apUserName);
+                                return null;
+                            }
+
+                            SubNode node = apub.saveNote(as, accountNode, outboxNode, obj, false, true);
+                            nodeId = no(node) ? null : node.getIdStr();
+                        }
+                        return nodeId;
+                    });
+                }
+                break;
+            default:
+                log.debug("Unhandled type in loadObject: " + type);
+                break;
+        }
+        return null;
     }
 }

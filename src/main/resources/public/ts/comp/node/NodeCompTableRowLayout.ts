@@ -64,7 +64,7 @@ export class NodeCompTableRowLayout extends Div {
                 }
                 else {
                     lastNode = n;
-                    let row: Comp = new NodeCompRow(n, this.tabData, typeHandler, rowIdx, childCount, rowCount + 1, this.level, true, this.allowNodeMove, childrenImgSizes, this.allowHeaders, true, state);
+                    let row: Comp = new NodeCompRow(n, this.tabData, typeHandler, rowIdx, childCount, rowCount + 1, this.level, true, this.allowNodeMove, childrenImgSizes, this.allowHeaders, true, true, state);
                     comps.push(row);
                 }
 

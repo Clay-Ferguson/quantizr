@@ -81,6 +81,7 @@ export class NodeStatsDlg extends DialogBase {
             if (feedData) {
                 feedData.props.searchTextState.setValue(word);
             }
+
             S.nav.messages({
                 feedFilterFriends: false,
                 feedFilterToMe: false,

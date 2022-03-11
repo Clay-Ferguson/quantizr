@@ -19,6 +19,7 @@ export class Constants {
     static TAB_FEED: string = "feedTab";
     static TAB_IPSM: string = "ipsmTab";
     static TAB_TRENDING: string = "trendingTab";
+    static TAB_THREAD: string = "threadTab";
     static TAB_SERVERINFO: string = "serverInfoTab";
     static TAB_LOG: string = "logTab"
 

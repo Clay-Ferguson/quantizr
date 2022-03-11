@@ -659,7 +659,7 @@ public class ActPubService extends ServiceBase {
      * This saves correctly either a obj.type==Note or obj.type==ChatMessage (maybe more to come?)
      */
     @PerfMon(category = "apub")
-    public void saveNote(MongoSession ms, SubNode toAccountNode, SubNode parentNode, Object obj, boolean forcePublic,
+    public SubNode saveNote(MongoSession ms, SubNode toAccountNode, SubNode parentNode, Object obj, boolean forcePublic,
             boolean temp) {
         apLog.trace("saveNote" + XString.prettyPrint(obj));
         String id = AP.str(obj, APObj.id);
@@ -672,7 +672,7 @@ public class ActPubService extends ServiceBase {
         SubNode dupNode = read.findNodeByProp(ms, parentNode, NodeProp.ACT_PUB_ID.s(), id);
         if (ok(dupNode)) {
             // apLog.trace("duplicate ActivityPub post ignored: " + id);
-            return;
+            return dupNode;
         }
 
         Date published = AP.date(obj, APObj.published);
@@ -693,7 +693,7 @@ public class ActPubService extends ServiceBase {
                 lang = language;
                 if (!"en".equalsIgnoreCase(language)) {
                     log.debug("Ignoring Non-English");
-                    return;
+                    return null;
                 }
             }
         }
@@ -702,7 +702,7 @@ public class ActPubService extends ServiceBase {
             if (lang.equals("0")) {
                 if (!english.isEnglish(contentHtml)) {
                     log.debug("Ignored Foreign: " + XString.prettyPrint(obj));
-                    return;
+                    return null;
                 } else {
                     // this was an arbitrary meaningless value used to detect/test for correct program flow.
                     lang = "en-ck3";
@@ -776,6 +776,7 @@ public class ActPubService extends ServiceBase {
         } catch (Exception e) {
             log.error("pushNodeUpdateToBrowsers failed (ignoring error)", e);
         }
+        return newNode;
     }
 
     // imports the list of foreign users into the system

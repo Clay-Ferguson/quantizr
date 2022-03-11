@@ -23,7 +23,7 @@ export class BlockedUsersTypeHandler extends TypeBase {
     }
 
     render(node: J.NodeInfo, tabData: TabDataIntf<any>, rowStyling: boolean, isTreeView: boolean, state: AppState): Comp {
-        return new Div(null, null, [
+        return new Div(null, { className: "systemNodeContent" }, [
             new Heading(4, this.displayName, {
                 className: "marginAll"
             }),

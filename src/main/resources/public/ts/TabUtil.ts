@@ -17,8 +17,10 @@ import { MainTabComp } from "./tabs/MainTabComp";
 import { SearchResultSetView } from "./tabs/SearchResultSetView";
 import { ServerInfoView } from "./tabs/ServerInfoView";
 import { SharedNodesResultSetView } from "./tabs/SharedNodesResultSetView";
+import { ThreadView } from "./tabs/ThreadView";
 import { TimelineResultSetView } from "./tabs/TimelineResultSetView";
 import { TrendingView } from "./tabs/TrendingView";
+import { ThreadRSInfo } from "./ThreadRSInfo";
 import { TimelineRSInfo } from "./TimelineRSInfo";
 import { TrendingRSInfo } from "./TrendingRSInfo";
 import { ValidatedState } from "./ValidatedState";
@@ -179,6 +181,19 @@ export class TabUtil {
                     isVisible: () => true,
                     constructView: (data: TabDataIntf) => new TrendingView(s, data),
                     rsInfo: new TrendingRSInfo(),
+                    scrollPos: 0,
+                    props: {},
+                    openGraphComps: []
+                },
+                {
+                    name: "Thread",
+                    id: C.TAB_THREAD,
+                    isVisible: () => {
+                        let state: AppState = store.getState();
+                        return !!state.threadViewNodeId;
+                    },
+                    constructView: (data: TabDataIntf) => new ThreadView(s, data),
+                    rsInfo: new ThreadRSInfo(),
                     scrollPos: 0,
                     props: {},
                     openGraphComps: []

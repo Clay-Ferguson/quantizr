@@ -121,6 +121,7 @@ export class TrendingView extends AppTab {
             feedFilterFriends: false,
             feedFilterToMe: false,
             feedFilterFromMe: false,
+            feedFilterToUser: null,
             feedFilterToPublic: true,
             feedFilterLocalServer: false,
             feedFilterRootNode: null,

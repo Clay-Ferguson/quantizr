@@ -21,7 +21,7 @@ import { Comp } from "../base/Comp";
 /* General Widget that doesn't fit any more reusable or specific category other than a plain Div, but inherits capability of Comp class */
 export class NodeCompRowHeader extends Div {
 
-    constructor(private node: J.NodeInfo, private allowAvatars: boolean, private isMainTree: boolean, private isFeed: boolean = false, private jumpButton: boolean = false) {
+    constructor(private node: J.NodeInfo, private allowAvatars: boolean, private isMainTree: boolean, private isFeed: boolean, private jumpButton: boolean, private showThreadButton: boolean) {
         super(null, {
             className: "header-text"
         });
@@ -100,6 +100,14 @@ export class NodeCompRowHeader extends Div {
                 className: "fa fa-bookmark fa-lg marginRight",
                 title: "Bookmark this Node",
                 onClick: () => S.edit.addBookmark(node, state)
+            }));
+        }
+
+        if (this.showThreadButton) {
+            children.push(new Icon({
+                className: "fa fa-th-list fa-lg marginRight",
+                title: "Show Full Thread History",
+                onClick: () => S.srch.showThread(node.id, state)
             }));
         }
 
@@ -237,7 +245,7 @@ export class NodeCompRowHeader extends Div {
             jumpButton = new IconButton("fa-arrow-right", null, {
                 className: "marginLeft",
                 onClick: () => S.srch.clickSearchNode(node.id, state),
-                title: "Jump to this Node in the Main Tab"
+                title: "Jump to Tree"
             });
         }
 

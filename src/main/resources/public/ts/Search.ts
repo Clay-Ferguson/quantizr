@@ -53,6 +53,68 @@ export class Search {
         }
     }
 
+    showThreadAddMore = async (nodeId: string, state: AppState) => {
+        let res: J.GetThreadViewResponse = await S.util.ajax<J.GetThreadViewRequest, J.GetThreadViewResponse>("getNodeThreadView", {
+            nodeId
+        });
+
+        if (res.nodes && res.nodes.length > 0) {
+
+            dispatch("Action_RenderThreadResults", (s: AppState): AppState => {
+                S.domUtil.focusId(C.TAB_THREAD);
+                S.tabUtil.tabScrollTop(s, C.TAB_THREAD);
+                let data = s.tabData.find(d => d.id === C.TAB_THREAD);
+                if (!data) return;
+
+                s.threadViewNodeId = nodeId;
+                data.openGraphComps = [];
+
+                // remove the last element, which will be a duplicate.
+                let moreResults = res.nodes.slice(0, -1);
+
+                data.rsInfo.results = [...moreResults, ...data.rsInfo.results];
+                data.rsInfo.endReached = res.topReached;
+                S.tabUtil.selectTabStateOnly(data.id, s);
+                return s;
+            });
+        }
+        else {
+            new MessageDlg("No search results found.", "Search", null, null, false, 0, null, state).open();
+        }
+    }
+
+    showThread = async (nodeId: string, state: AppState) => {
+        let res: J.GetThreadViewResponse = await S.util.ajax<J.GetThreadViewRequest, J.GetThreadViewResponse>("getNodeThreadView", {
+            nodeId
+        });
+
+        if (res.nodes && res.nodes.length > 0) {
+
+            dispatch("Action_RenderThreadResults", (s: AppState): AppState => {
+                let nodeFound = this.idToNodeMap.get(nodeId);
+                if (nodeFound) {
+                    s.highlightSearchNode = nodeFound;
+                }
+
+                S.domUtil.focusId(C.TAB_THREAD);
+                S.tabUtil.tabScrollTop(s, C.TAB_THREAD);
+                let data = s.tabData.find(d => d.id === C.TAB_THREAD);
+                if (!data) return;
+
+                s.threadViewNodeId = nodeId;
+                data.openGraphComps = [];
+
+                data.rsInfo.results = res.nodes;
+                data.rsInfo.endReached = res.topReached;
+                S.tabUtil.selectTabStateOnly(data.id, s);
+                return s;
+            });
+        }
+        else {
+            new MessageDlg("No search results found.", "Search", null, null, false, 0, null, state).open();
+        }
+    }
+
     search = async (node: J.NodeInfo, prop: string, searchText: string, state: AppState, searchType: string, description: string, fuzzy: boolean, caseSensitive: boolean, page: number, recursive: boolean, sortField: string, sortDir: string, requirePriority: boolean, successCallback: Function): Promise<void> => {
         let res: J.NodeSearchResponse = await S.util.ajax<J.NodeSearchRequest, J.NodeSearchResponse>("nodeSearch", {
             page,
@@ -384,14 +446,14 @@ export class Search {
      * Renders a single line of search results on the search results page.
      */
     renderSearchResultAsListItem = (node: J.NodeInfo, tabData: TabDataIntf<any>, index: number, count: number, rowCount: number, prefix: string,
-        isFeed: boolean, isParent: boolean, allowAvatars: boolean, jumpButton: boolean, allowHeader: boolean, allowFooter: boolean, state: AppState): Comp => {
+        isFeed: boolean, isParent: boolean, allowAvatars: boolean, jumpButton: boolean, allowHeader: boolean, allowFooter: boolean, showThreadButton: boolean, state: AppState): Comp => {
         if (!node) return;
 
         /* If there's a parent on this node it's a 'feed' item and this parent is what the user was replyig to so we display it just above the
         item we are rendering */
         let parentItem: Comp = null;
         if (node.parent) {
-            parentItem = this.renderSearchResultAsListItem(node.parent, tabData, index, count, rowCount, prefix, isFeed, true, allowAvatars, jumpButton, allowHeader, allowFooter, state);
+            parentItem = this.renderSearchResultAsListItem(node.parent, tabData, index, count, rowCount, prefix, isFeed, true, allowAvatars, jumpButton, allowHeader, allowFooter, showThreadButton, state);
         }
 
         const cssId = this._UID_ROWID_PREFIX + node.id;
@@ -420,9 +482,9 @@ export class Search {
             nid: node.id
             // tabIndex: "-1"
         }, [
-            allowHeader ? new NodeCompRowHeader(node, true, false, isFeed, jumpButton) : null,
+            allowHeader ? new NodeCompRowHeader(node, true, false, isFeed, jumpButton, showThreadButton) : null,
             content,
-            allowFooter ? new NodeCompRowFooter(node, isFeed) : null,
+            allowFooter ? new NodeCompRowFooter(node, isFeed, showThreadButton) : null,
             allowFooter ? new Clearfix() : null
         ]);
 

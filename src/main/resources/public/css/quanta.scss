@@ -1336,6 +1336,22 @@ Will come back later and study this more. todo-1 */
     margin-bottom: 20px;
 }
 
+.accountNode {
+    margin: 8px 0 0 8px;
+}
+
+.systemNodeContent {
+    border: 2px solid $nodeBorderBottomColor;
+    border-radius: $border-radius;
+    background-color: $baseBgColor;
+    margin: $tinyGap;
+    padding: $tinyGap;
+}
+
+.threadNodeDivider {
+    width: 100%;
+}
+
 .row-footer {
     font-size: small;
     cursor: pointer;

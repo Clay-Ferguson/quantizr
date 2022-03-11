@@ -127,6 +127,10 @@ export class AppState {
     editShowJumpButton: boolean;
     editEncrypt: boolean;
     serverInfoText: string = null;
+
+    // holds nodeId of the current conversation thread leaf node. The one the thread view was 'executed' on.
+    threadViewNodeId: string = null;
+
     serverInfoCommand: string = null;
     serverInfoTitle: string = null;
 

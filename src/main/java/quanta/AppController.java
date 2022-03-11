@@ -68,6 +68,7 @@ import quanta.request.DeleteFriendRequest;
 import quanta.request.DeleteNodesRequest;
 import quanta.request.DeletePropertyRequest;
 import quanta.request.ExportRequest;
+import quanta.request.GetActPubObjectRequest;
 import quanta.request.GetBookmarksRequest;
 import quanta.request.GetConfigRequest;
 import quanta.request.GetFollowersRequest;
@@ -80,6 +81,7 @@ import quanta.request.GetNodeStatsRequest;
 import quanta.request.GetOpenGraphRequest;
 import quanta.request.GetServerInfoRequest;
 import quanta.request.GetSharedNodesRequest;
+import quanta.request.GetThreadViewRequest;
 import quanta.request.GetUserAccountInfoRequest;
 import quanta.request.GetUserProfileRequest;
 import quanta.request.GraphRequest;
@@ -120,10 +122,12 @@ import quanta.request.UploadFromTorrentRequest;
 import quanta.request.UploadFromUrlRequest;
 import quanta.response.CloseAccountResponse;
 import quanta.response.ExportResponse;
+import quanta.response.GetActPubObjectResponse;
 import quanta.response.GetBookmarksResponse;
 import quanta.response.GetConfigResponse;
 import quanta.response.GetNodeStatsResponse;
 import quanta.response.GetServerInfoResponse;
+import quanta.response.GetThreadViewResponse;
 import quanta.response.GraphResponse;
 import quanta.response.InfoMessage;
 import quanta.response.LogoutResponse;
@@ -510,6 +514,28 @@ public class AppController extends ServiceBase implements ErrorController {
 		// NO NOT HERE -> SessionContext.checkReqToken();
 		return callProc.run("getNodeMetaInfo", req, session, ms -> {
 			return render.getNodeMetaInfo(ms, req);
+		});
+	}
+
+	@RequestMapping(value = API_PATH + "/loadActPubObject", method = RequestMethod.POST)
+	public @ResponseBody Object loadActPubObject(@RequestBody GetActPubObjectRequest req, //
+			HttpServletRequest httpReq, HttpSession session) {
+		SessionContext.checkReqToken();
+		return callProc.run("loadActPubObject", req, session, ms -> {
+			String nodeId = apUtil.loadObject(ms, req.getUrl());
+			GetActPubObjectResponse res = new GetActPubObjectResponse();
+			res.setNodeId(nodeId);
+			res.setSuccess(true);
+			return res;
+		});
+	}
+
+	@RequestMapping(value = API_PATH + "/getNodeThreadView", method = RequestMethod.POST)
+	public @ResponseBody Object getNodeThreadView(@RequestBody GetThreadViewRequest req, HttpSession session) {
+		// SessionContext.checkReqToken();
+		return callProc.run("getNodeThreadView", req, session, ms -> {
+			GetThreadViewResponse res = apUtil.getNodeThreadView(ms, req.getNodeId());
+			return res;
 		});
 	}
 
