@@ -182,6 +182,8 @@ export class TabUtil {
                     constructView: (data: TabDataIntf) => new TrendingView(s, data),
                     rsInfo: new TrendingRSInfo(),
                     scrollPos: 0,
+
+                    // supports props.filter = hashtags, users, words
                     props: {},
                     openGraphComps: []
                 },

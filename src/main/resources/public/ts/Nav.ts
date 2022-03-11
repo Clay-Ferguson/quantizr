@@ -519,7 +519,6 @@ export class Nav {
 
             // merge props parameter into the feed data props.
             feedData.props = { ...feedData.props, ...props };
-            debugger;
             return s;
         });
         setTimeout(S.srch.refreshFeed, 10);
@@ -548,6 +547,23 @@ export class Nav {
             feedFilterLocalServer: false,
             feedFilterRootNode: null,
             feedResults: null
+        });
+    }
+
+    showTrendingFiltered = (filter: string) => {
+        let feedData = S.tabUtil.getTabDataById(null, C.TAB_TRENDING);
+        if (feedData) {
+            feedData.props.filter = filter;
+        }
+
+        dispatch("Action_SelectTab", (s: AppState): AppState => {
+            s.guiReady = true;
+            S.tabUtil.tabChanging(s.activeTab, C.TAB_TRENDING, s);
+            s.activeTab = S.quanta.activeTab = C.TAB_TRENDING;
+
+            // merge props parameter into the feed data props.
+            feedData.props = { ...feedData.props };
+            return s;
         });
     }
 

@@ -198,6 +198,7 @@ $mobileHeaderHeight: 3.5em;
     margin-right: $smallGap;
     display: inline-block;
     cursor: pointer;
+    font-size: x-large;
 }
 
 .wordStatsArea {
@@ -1202,7 +1203,6 @@ Will come back later and study this more. todo-1 */
         border-left: $fatBorderSize solid $nodeBorderBottomColor; 
     }
     
-    padding-right: 8px;
     padding-top: 8px;
     margin-bottom: 8px;
     margin-top: 8px;
@@ -1422,12 +1422,12 @@ Will come back later and study this more. todo-1 */
 }
 
 .row-border {
-    border-bottom: 1px dotted $nodeBorderBottomColor;
+    border-bottom: 1px solid $nodeBorderBottomColor;
 }
 
 /* Ended up deciding I like row-border-edit to be [almost] same as row-border for now */
 .row-border-edit {
-    border-bottom: 2px solid $nodeBorderBottomColor;
+    border-bottom: 1px solid $nodeBorderBottomColor;
 }
 
 /*
@@ -1967,6 +1967,7 @@ audio::-webkit-media-controls-play-button {
 .floatRightHeaderDiv {
     margin-bottom: 6px;
     margin-left: 10px;
+    margin-right: 8px;
 }
 
 .openGraphRhs {

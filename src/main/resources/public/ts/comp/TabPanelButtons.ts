@@ -68,6 +68,16 @@ export class TabPanelButtons extends Div {
                 ]);
             }
         }
+
+        // todo-1: the hardcoded types in here are ugly. fix it.
+        if (tabName === "Trending" /* This would make it show up only when Feed is active: && S.quanta.activeTab === C.TAB_FEED */) {
+            return new Div(null, { className: "tabSubOptions" }, [
+                new Div("Hashtags", { className: "tabSubOptionsItem", onClick: () => S.nav.showTrendingFiltered("hashtags") }),
+                new Div("Mentions", { className: "tabSubOptionsItem", onClick: () => S.nav.showTrendingFiltered("mentions") }),
+                new Div("Words", { className: "tabSubOptionsItem", onClick: () => S.nav.showTrendingFiltered("words") })
+            ]);
+        }
+
         return null;
     }
 

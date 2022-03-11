@@ -58,7 +58,7 @@ export class TrendingView extends AppTab {
         }
 
         let tagPanel = new Div(null, { className: "trendingWordStatsArea" });
-        if (res.topTags && res.topTags.length > 0) {
+        if ((!data.props.filter || data.props.filter === "hashtags") && res.topTags && res.topTags.length > 0) {
             tagPanel.addChild(new Heading(4, "Hashtags", { className: "trendingSectionTitle" }));
             res.topTags.forEach((word: string) => {
                 tagPanel.addChild(new Span(word, {
@@ -70,7 +70,7 @@ export class TrendingView extends AppTab {
         }
 
         let mentionPanel = new Div(null, { className: "trendingWordStatsArea" });
-        if (res.topMentions && res.topMentions.length > 0) {
+        if ((!data.props.filter || data.props.filter === "mentions") && res.topMentions && res.topMentions.length > 0) {
             mentionPanel.addChild(new Heading(4, "Mentions", { className: "trendingSectionTitle" }));
             res.topMentions.forEach((word: string) => {
                 mentionPanel.addChild(new Span(word, {
@@ -82,7 +82,7 @@ export class TrendingView extends AppTab {
         }
 
         let wordPanel = new Div(null, { className: "trendingWordStatsArea" });
-        if (res.topWords && res.topWords.length > 0) {
+        if ((!data.props.filter || data.props.filter === "words") && res.topWords && res.topWords.length > 0) {
             wordPanel.addChild(new Heading(4, "Words", { className: "trendingSectionTitle" }));
             res.topWords.forEach((word: string) => {
                 wordPanel.addChild(new Span(word, {

@@ -47,18 +47,23 @@ export class NodeCompRowFooter extends Div {
                     }));
                 }
 
-                children.push(new Anchor(inReplyTo, "Remote Parent", {
-                    className: "footerLink",
-                    target: "_blank"
-                }));
+                // if this is not our own host then show the Remote Parent link
+                if (inReplyTo.indexOf(location.protocol + "//" + location.hostname) === -1) {
+                    children.push(new Anchor(inReplyTo, "Remote Parent", {
+                        className: "footerLink",
+                        target: "_blank"
+                    }));
+                }
             }
 
             let objUrl = S.props.getPropStr(J.NodeProp.ACT_PUB_OBJ_URL, this.node);
             if (objUrl) {
-                children.push(new Anchor(objUrl, "Remote Link", {
-                    className: "footerLink",
-                    target: "_blank"
-                }));
+                if (objUrl.indexOf(location.protocol + "//" + location.hostname) === -1) {
+                    children.push(new Anchor(objUrl, "Remote Link", {
+                        className: "footerLink",
+                        target: "_blank"
+                    }));
+                }
             }
         }
         this.setChildren(children);
