@@ -1948,10 +1948,17 @@ audio::-webkit-media-controls-play-button {
 
 .openGraphLhs {
     margin: 8px;
-    width: 30%;
+    width: 20%;
     // This min width is required when there are some crazy long strings in the RHS, and the browser
     // crowds out the left hand side smashin it down to zero size unless we give a min size.
     min-width: 100px;
+}
+
+.openGraphRhs {
+    margin: 8px;
+    width: 80%;
+    padding-left: 18px;
+    padding-top: 10px;
 }
 
 .textField {
@@ -1970,11 +1977,8 @@ audio::-webkit-media-controls-play-button {
     margin-right: 8px;
 }
 
-.openGraphRhs {
-    margin: 8px;
-    width: 70%;
-    padding-left: 18px;
-    padding-top: 10px;
+.openGraphDesc {
+    max-width: 45em;
 }
 
 .openGraphTitle {

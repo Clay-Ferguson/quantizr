@@ -171,7 +171,7 @@ export class OpenGraphPanel extends Div {
                         })
                     ]),
                     new Div(null, { className: "openGraphRhs" }, [
-                        new Html(state.og.description)
+                        new Html(state.og.description, { className: "openGraphDesc" })
                     ])
                 ], "displayTableNoSpacing");
             }
