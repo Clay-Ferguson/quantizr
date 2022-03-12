@@ -114,8 +114,8 @@ export class NodeCompRowHeader extends Div {
         let publicReadOnly = S.props.isPublicReadOnly(node);
         let actPubId = S.props.getPropStr(J.NodeProp.ACT_PUB_ID, node);
 
-        // always show a reply if activity pub, or else only if on feed view.
-        if ((this.isFeed && !publicReadOnly) || actPubId) {
+        // always show a reply if activity pub, or else not public non-repliable (all person to person shares ARE replyable)
+        if (!publicReadOnly || actPubId) {
             children.push(new Icon({
                 title: "Reply to this Node",
                 className: "fa fa-reply fa-lg",

@@ -55,14 +55,16 @@ export class User {
         console.log("refreshLogin.");
 
         const loginState: string = await S.localDB.getVal(C.LOCALDB_LOGIN_STATE);
+        console.log("got loginState");
 
         /* if we have known state as logged out, then do nothing here */
-        if (loginState === "0") {
-            // console.log("loginState known as logged out.");
+        if (loginState && loginState === "0") {
+            console.log("loginState known as logged out.");
             S.util.loadAnonPageHome(null);
             return;
         }
 
+        console.log("checking for credentials");
         const usr = await S.localDB.getVal(C.LOCALDB_LOGIN_USR);
         const pwd = await S.localDB.getVal(C.LOCALDB_LOGIN_PWD);
         const usingCredentials: boolean = usr && pwd;

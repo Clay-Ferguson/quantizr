@@ -41,7 +41,6 @@ export class LocalDB {
         if (this.db) {
             const tx: IDBTransaction = this.db.transaction(LocalDB.STORE_NAME, access);
             const store: IDBObjectStore = tx.objectStore(LocalDB.STORE_NAME);
-
             runner(store);
 
             tx.oncomplete = () => {
@@ -77,7 +76,7 @@ export class LocalDB {
             obj = await this.readObject(keyPrefix + key);
             // console.log("LocalDB[" + LocalDB.DB_NAME + "] getVal name=" + keyPrefix + key + " val=" + (!!obj ? obj.val : null));
         }
-        catch {
+        catch (e) {
             // ignore this exception
             console.warn("db key not found: " + key);
         }

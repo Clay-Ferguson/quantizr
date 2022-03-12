@@ -87,6 +87,9 @@
         function checkES6() {
             let fail = false;
             try {
+                // console.log("regexp check");
+                eval("const re = new RegExp('ab+c')");
+
                 // console.log("class check");
                 eval("class Foo {}");
 

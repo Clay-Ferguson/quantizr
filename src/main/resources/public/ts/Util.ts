@@ -1354,6 +1354,7 @@ export class Util {
 
             // if we have trouble accessing even the anon page just drop out to landing page.
             if (!res || !res.success || res.errorType === J.ErrorType.AUTH) {
+                console.log("can't access anonymous page");
                 // check we aren't already at origin (no parameters) then set to origin.
                 if (window.location.href !== window.location.origin) {
                     window.location.href = window.location.origin;
@@ -1361,6 +1362,7 @@ export class Util {
                 return;
             }
             state = appState(state);
+            console.log("renderPageFromData for anonymous");
             S.render.renderPageFromData(res, false, null, true, true);
         }
         catch (e) {

@@ -48,6 +48,11 @@ public class ActPubFactory extends ServiceBase {
 			String content, String noteUrl, ZonedDateTime now, boolean privateMessage, APList attachments) {
 		APObj ret = null;
 
+		if (ok(content)) {
+			// convert all double and single spaced lines to <br> for formatting, for servers that don't understand Markdown
+			content = content.replace("\n", "<br>");
+		}
+
 		if (APType.ChatMessage.equals(replyToType)) {
 			ret = new APOChatMessage(noteUrl, now.format(DateTimeFormatter.ISO_INSTANT), attributedTo, null, noteUrl, false,
 					content, null);
