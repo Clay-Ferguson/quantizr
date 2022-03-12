@@ -1,3 +1,4 @@
+console.log("entering Constants.ts");
 export class Constants {
 
     // max rows to allow to scroll in via infinite scroll capability before we reset back to 25 rows.

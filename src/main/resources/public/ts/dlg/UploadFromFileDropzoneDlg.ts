@@ -35,7 +35,6 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
     uploadFailed: boolean = false;
     errorShown: boolean = false;
     numFiles: number = 0;
-    toWebTorrent: boolean = false;
 
     /* We allow either nodeId or 'node' to be passed in here */
     constructor(private nodeId: string, private binSuffix: string, private toIpfs: boolean, //
@@ -64,14 +63,6 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
                         getValue: (): boolean => {
                             return this.toIpfs;
                         }
-                    }),
-                    new Checkbox("Create WebTorrent", null, {
-                        setValue: (checked: boolean): void => {
-                            this.toWebTorrent = checked;
-                        },
-                        getValue: (): boolean => {
-                            return this.toWebTorrent;
-                        }
                     })
                 ]),
                 new Div("Click to Add Files (or Drag and Drop)"),
@@ -82,7 +73,6 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
                     this.importMode ? null : new Button("URL", this.uploadFromUrl),
                     this.importMode ? null : new Button("IPFS", this.uploadFromIPFS),
                     this.importMode || !S.util.clipboardReadable() ? null : new Button("Clipboard", this.uploadFromClipboard),
-                    this.importMode ? null : new Button("Torrent", this.uploadFromTorrent),
 
                     this.importMode || !this.allowRecording ? null : new IconButton("fa-microphone", /* "From Mic" */ null, {
                         onClick: async () => {
@@ -128,16 +118,6 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
     uploadFromUrl = (): void => {
         let state: LS = this.getState<LS>();
         S.attachment.openUploadFromUrlDlg(this.nodeId, null, () => {
-            this.close();
-            if (this.afterUploadFunc) {
-                this.afterUploadFunc();
-            }
-        }, this.appState);
-    }
-
-    uploadFromTorrent = (): void => {
-        let state = this.getState<LS>();
-        S.attachment.openUploadFromTorrentDlg(this.nodeId, null, () => {
             this.close();
             if (this.afterUploadFunc) {
                 this.afterUploadFunc();
@@ -216,34 +196,8 @@ export class UploadFromFileDropzoneDlg extends DialogBase {
             const files = this.dropzone.getAcceptedFiles();
 
             if (files) {
-                if (this.toWebTorrent) {
-                    // todo-2: verify this is really true (multi-files not working)
-                    if (files.length > 1) {
-                        S.util.showMessage("Multi-file WebTorrent are not yet supported.", "Warning");
-                        return;
-                    }
-
-                    S.torrent.wtc.seed(files, async (torrent) => {
-                        // S.util.showMessage("Created Torrent:\n\n" + torrent.magnetURI, "WebTorrent", true);
-
-                        // send torrend magnet up to server to save on node.
-                        let res: J.UploadFromTorrentResponse = await S.util.ajax<J.UploadFromTorrentRequest, J.UploadFromTorrentResponse>("uploadFromTorrent", {
-                            nodeId: this.nodeId,
-                            torrentId: torrent.magnetURI
-                        });
-
-                        if (S.util.checkSuccess("Upload from Torrent", res)) {
-                            this.close();
-                            if (this.afterUploadFunc) {
-                                this.afterUploadFunc();
-                            }
-                        }
-                    });
-                }
-                else {
-                    this.numFiles = files.length;
-                    this.dropzone.processQueue();
-                }
+                this.numFiles = files.length;
+                this.dropzone.processQueue();
             }
         }
         return true;

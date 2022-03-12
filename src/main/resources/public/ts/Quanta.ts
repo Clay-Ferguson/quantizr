@@ -70,6 +70,10 @@ export class Quanta {
     initApp = async (): Promise<void> => {
         Log.log("initApp()");
 
+        // The JS in index.html will check for this 2 seconds after it knows all the JS has loaded
+        // an if this value isn't set it prints a message just saying the browser isn't supported.
+        (window as any).__initAppStarted = true;
+
         if (this.appInitialized) {
             throw new Error("initApp called multiple times.");
         }
@@ -79,11 +83,16 @@ export class Quanta {
             history.scrollRestoration = "manual";
         }
 
+        console.log("initMarkdown");
         S.render.initMarkdown();
 
+        console.log("createTabs");
         S.tabUtil.createAppTabs();
+
         const state: AppState = store.getState();
         state.pendingLocationHash = window.location.hash;
+
+        console.log("createPlugins");
         S.plugin.initPlugins();
 
         (window as any).addEvent = (object: any, type: any, callback: any) => {
@@ -205,6 +214,7 @@ export class Quanta {
             });
         }, 250);
 
+        Log.log("initConstants");
         S.props.initConstants();
 
         window.addEventListener("orientationchange", () => {
@@ -239,6 +249,7 @@ export class Quanta {
         this.app = new App(); // new AppDemo
 
         if ((window as any).__page === "index") {
+            console.log("DOM app element set.");
             this.app.updateDOM(store, "app");
         }
 

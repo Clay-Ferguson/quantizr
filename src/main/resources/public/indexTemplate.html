@@ -7,7 +7,8 @@
     <meta charset="utf-8" />
     <meta property="instanceId" th:attr="content=${instanceId}" />
     <meta name="description" th:attr="content=${brandingMetaContent}" />
-    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no">
+    <meta name="viewport"
+        content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no">
     <meta name="theme-color" content="#000000" />
 
     <meta name="mobile-web-app-capable" content="yes" />
@@ -32,11 +33,105 @@
 
     <title th:text="${brandingAppName}"></title>
 
+    <script nomodule>
+        alert("Your browser is too old. This app requires a newer browser.\n\nYour Browser: " + (navigator.userAgent || navigator.vendor || window.opera));
+    </script>
+
     <script th:inline="javascript">
+        var _debug = false;
         var __page = "index";
+        var __initAppStarted = false;
+        var browserFailed = false;
+
+        function browserFail() {
+            if (browserFailed) return;
+            browserFailed = true;
+            alert("Your browser is too old. This app requires a newer browser.\n\nYour Browser: " + (navigator.userAgent || navigator.vendor || window.opera));
+        }
+
+        if (location.href.indexOf("-app-debug") != -1) {
+            _debug = true;
+            var cLog = console.log;
+
+            console.log = function (msg) {
+                alert("log: " + msg);
+                cLog(msg);
+            };
+
+            var cError = console.error;
+            console.error = function (msg) {
+                alert("error: " + msg);
+                cError(msg);
+            };
+
+            console.log("Debug is on: " + location.href);
+        }
+
+        function checkES6() {
+            "use strict";
+            let fail = false;
+            try {
+                console.log("class check");
+                // test class support
+                eval("class Foo {}");
+
+                // test let and const
+                console.log("let check");
+                eval("let bar = (x) => x+1; const c = 1;");
+
+                // test Promises
+                console.log("promise check");
+                eval("let promise = new Promise((resolve, reject) => {});");
+
+                // test object literals
+                console.log("object literals check");
+                eval("function f(a) {return {a}}; f('x');");
+
+                // test template literals 
+                // why is this not working? todo-0
+                console.log("template literals check");
+                eval("let ins='a'; let val=`${ins}`;");
+
+                // test destructuring
+                console.log("destructuring check");
+                eval("let letters = ['a', 'b']; let [a, b] = letters;");
+            } catch (e) {
+                fail = true;
+            }
+
+            if (fail) {
+                browserFail();
+            }
+            else {
+                console.log("Browser compatability: OK.");
+            }
+        }
+        checkES6();
+
+        function supportsStaticImport() {
+            const script = document.createElement('script');
+            return 'noModule' in script;
+        }
+
+        if (!supportsStaticImport()) {
+            browserFail();
+        }
+
+        window.addEventListener("load", function (event) {
+            console.log("load event: " + event.target.nodeName);
+
+            setTimeout(function () {
+                // if this is still false a full 2 seconds after we KNOW the browser finished loading the
+                // javascript app bundle, then we can conclude the browser engine's JS is failing and just
+                // tell the user.
+                if (!__initAppStarted) {
+                    alert("App failed to load. Your browser may be outdated: \n\n" + (navigator.userAgent || navigator.vendor || window.opera));
+                }
+            }, 2000);
+        }, true);
 
         /* Thymeleaf vars */
-        var g_brandingAppName = [[${brandingAppName}]];
+        var g_brandingAppName = [[${ brandingAppName }]];
         console.log("Page JS Running");
     </script>
 

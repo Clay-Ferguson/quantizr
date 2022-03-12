@@ -9,7 +9,6 @@ import { Img } from "../../comp/core/Img";
 import { Span } from "../../comp/core/Span";
 import { Constants as C } from "../../Constants";
 import { AudioPlayerDlg } from "../../dlg/AudioPlayerDlg";
-import { TorrentListingDlg } from "../../dlg/TorrentListingDlg";
 import { VideoPlayerDlg } from "../../dlg/VideoPlayerDlg";
 import { DialogMode } from "../../enums/DialogMode";
 import * as J from "../../JavaIntf";
@@ -125,16 +124,6 @@ export class NodeCompBinary extends Div {
                 new Span("", {
                     className: "downloadLink"
                 }, [new Anchor(S.render.getUrlForNodeAttachment(node, true), "Download", { target: "_blank" })])
-            ])]);
-        }
-        else if (S.props.hasTorrent(node)) {
-            const torrentId = S.props.getPropStr(J.NodeProp.BIN_URL, node);
-            this.setChildren([new HorizontalLayout([
-                new IconButton("fa-magnet", "Torrent", {
-                    onClick: () => {
-                        new TorrentListingDlg(torrentId, DialogMode.POPUP, state).open();
-                    }
-                }, "btn-primary")
             ])]);
         }
         /*

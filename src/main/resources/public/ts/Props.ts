@@ -194,11 +194,6 @@ export class Props {
         return (target && target.startsWith("video/"));
     }
 
-    hasTorrent = (node: J.NodeInfo): boolean => {
-        const target = this.getPropStr(J.NodeProp.BIN_URL, node);
-        return target && target.startsWith("magnet:");
-    }
-
     /*
      * brute force searches on node (NodeInfo.java) object properties list, and returns the first property
      * (PropertyInfo.java) with name matching propertyName, else null.

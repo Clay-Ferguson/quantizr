@@ -13,7 +13,6 @@ import type { Search } from "./Search";
 import type { ServerPush } from "./ServerPush";
 import type { SpeechRecog } from "./SpeechRecog";
 import type { TabUtil } from "./TabUtil";
-import type { Torrent } from "./Torrent";
 import type { User } from "./User";
 import type { Util } from "./Util";
 import type { View } from "./View";
@@ -39,7 +38,6 @@ export interface Singletons {
     view: View;
     localDB: LocalDB;
     speech: SpeechRecog;
-    torrent: Torrent;
 }
 
 let S: Singletons = {} as any;

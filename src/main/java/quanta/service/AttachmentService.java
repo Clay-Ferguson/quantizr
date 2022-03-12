@@ -70,11 +70,9 @@ import quanta.mongo.MongoUtil;
 import quanta.mongo.model.SubNode;
 import quanta.request.DeleteAttachmentRequest;
 import quanta.request.UploadFromIPFSRequest;
-import quanta.request.UploadFromTorrentRequest;
 import quanta.request.UploadFromUrlRequest;
 import quanta.response.DeleteAttachmentResponse;
 import quanta.response.UploadFromIPFSResponse;
-import quanta.response.UploadFromTorrentResponse;
 import quanta.response.UploadFromUrlResponse;
 import quanta.util.Const;
 import quanta.util.ExUtil;
@@ -705,20 +703,6 @@ public class AttachmentService extends ServiceBase {
 	public UploadFromUrlResponse readFromUrl(MongoSession ms, UploadFromUrlRequest req) {
 		UploadFromUrlResponse res = new UploadFromUrlResponse();
 		readFromUrl(ms, req.getSourceUrl(), req.getNodeId(), null, 0, req.isStoreLocally());
-		res.setSuccess(true);
-		return res;
-	}
-
-	public UploadFromTorrentResponse uploadFromTorrent(MongoSession ms, UploadFromTorrentRequest req) {
-		UploadFromTorrentResponse res = new UploadFromTorrentResponse();
-		SubNode node = read.getNode(ms, req.getNodeId());
-		if (no(node)) {
-			throw new RuntimeException("node not found: id=" + req.getNodeId());
-		}
-
-		auth.ownerAuth(node);
-		node.set(NodeProp.BIN_URL.s(), req.getTorrentId());
-		update.save(ms, node);
 		res.setSuccess(true);
 		return res;
 	}

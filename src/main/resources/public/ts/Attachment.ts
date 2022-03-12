@@ -2,7 +2,6 @@ import { AppState } from "./AppState";
 import { ConfirmDlg } from "./dlg/ConfirmDlg";
 import { UploadFromFileDropzoneDlg } from "./dlg/UploadFromFileDropzoneDlg";
 import { UploadFromIPFSDlg } from "./dlg/UploadFromIPFSDlg";
-import { UploadFromTorrentDlg } from "./dlg/UploadFromTorrentDlg";
 import { UploadFromUrlDlg } from "./dlg/UploadFromUrlDlg";
 import * as J from "./JavaIntf";
 import { S } from "./Singletons";
@@ -40,20 +39,6 @@ export class Attachment {
         }
 
         const dlg = new UploadFromUrlDlg(nodeId, defaultUrl, onUploadFunc, state);
-        dlg.open();
-    };
-
-    openUploadFromTorrentDlg = (nodeId: string, defaultUrl: string, onUploadFunc: Function, state: AppState): void => {
-        if (!nodeId) {
-            let node = S.nodeUtil.getHighlightedNode(state);
-            if (!node) {
-                S.util.showMessage("No node is selected.", "Warning");
-                return;
-            }
-            nodeId = node.id;
-        }
-
-        const dlg = new UploadFromTorrentDlg(nodeId, defaultUrl, onUploadFunc, state);
         dlg.open();
     };
 

@@ -118,7 +118,6 @@ import quanta.request.SplitNodeRequest;
 import quanta.request.TransferNodeRequest;
 import quanta.request.UpdateHeadingsRequest;
 import quanta.request.UploadFromIPFSRequest;
-import quanta.request.UploadFromTorrentRequest;
 import quanta.request.UploadFromUrlRequest;
 import quanta.response.CloseAccountResponse;
 import quanta.response.ExportResponse;
@@ -1149,14 +1148,6 @@ public class AppController extends ServiceBase implements ErrorController {
 		SessionContext.checkReqToken();
 		return callProc.run("uploadFromUrl", req, session, ms -> {
 			return attach.readFromUrl(ms, req);
-		});
-	}
-
-	@RequestMapping(value = API_PATH + "/uploadFromTorrent", method = RequestMethod.POST)
-	public @ResponseBody Object uploadFromTorrent(@RequestBody UploadFromTorrentRequest req, HttpSession session) {
-		SessionContext.checkReqToken();
-		return callProc.run("uploadFromTorrent", req, session, ms -> {
-			return attach.uploadFromTorrent(ms, req);
 		});
 	}
 

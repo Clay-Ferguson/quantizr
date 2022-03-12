@@ -2,11 +2,6 @@ const path = require("path");
 const CircularDependencyPlugin = require("circular-dependency-plugin");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
 const ESLintPlugin = require("eslint-webpack-plugin");
-
-// NOTE: This is only needed to make WebTorrent work, without
-// WebTorrent we could remove this.
-const NodePolyfillPlugin = require("node-polyfill-webpack-plugin");
-
 const prod = process.argv.indexOf("-p") !== -1;
 const env = prod ? "prod" : "dev";
 
@@ -42,13 +37,16 @@ module.exports = {
             },
 
             // All output '.js' files will have any sourcemaps re-processed by 'source-map-loader'.
-            {
-                test: /\.js$/,
-                enforce: "pre",
-                use: [{
-                    loader: "source-map-loader"
-                }]
-            },
+            // #sourceMap
+            // temp remove: todo-0
+            // {
+            //     test: /\.js$/,
+            //     enforce: "pre",
+            //     use: [{
+            //         loader: "source-map-loader"
+            //     }]
+            // },
+
             {
                 // handles both scss or css files.
                 test: /\.(sc|c)ss$/i,
@@ -79,20 +77,15 @@ module.exports = {
         new HtmlWebpackPlugin({
             filename: "../../templates/index.html",
             template: "indexTemplate.html",
+            publicPath: "/dist",
 
-            // we don't want any path prefix on our bundle file so this is empty.
-            publicPath: "/dist"
-
-            // somehow the app just hangs with these options...
-            // scriptLoading: "blocking",
-            // inject: "head"
+            scriptLoading: "module",
+            inject: "body"
         }),
 
         new HtmlWebpackPlugin({
             filename: "../../templates/error.html",
             template: "errorTemplate.html",
-
-            // we don't want any path prefix on our bundle file so this is empty.
             publicPath: "/dist"
             // scriptLoading: "blocking",
             // inject: "head"
@@ -112,8 +105,6 @@ module.exports = {
             extensions: [".txs", ".ts", ".js"],
             exclude: "node_modules"
         }),
-
-        new NodePolyfillPlugin(),
 
         new CircularDependencyPlugin({
             // `onDetected` is called for each module that is cyclical

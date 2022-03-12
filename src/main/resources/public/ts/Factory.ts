@@ -27,13 +27,11 @@ import { ServerPush } from "./ServerPush";
 import { S } from "./Singletons";
 import { SpeechRecog } from "./SpeechRecog";
 import { TabUtil } from "./TabUtil";
-import { Torrent } from "./Torrent";
 import { User } from "./User";
 import { Util } from "./Util";
 import { View } from "./View";
 
-// let S: Singletons = {} as any;
-
+console.log("Factory.ts imports complete");
 export class Factory {
 
     /*
@@ -42,6 +40,8 @@ export class Factory {
      */
     constructor() {
         try {
+            console.log("Factory.ts creating instances");
+
             S.quanta = new Quanta();
             S.plugin = new PluginMgr();
             S.util = new Util();
@@ -60,16 +60,23 @@ export class Factory {
             S.view = new View();
             S.localDB = new LocalDB();
             S.speech = new SpeechRecog();
-            S.torrent = new Torrent();
+
+            console.log("Factory.ts instances ready.");
         }
         catch (e) {
-            alert("app failed to initialize components.");
+            console.error("app failed to initialize components.");
         }
     }
 
     initApp() {
-        // This is basically our main entrypoint into the app. This must ONLY be called after the SingletonsReady has been
-        // called (line above) initializing all of them and wiring them all up.
-        S.quanta.initApp();
+        try {
+            console.log("calling initApp()");
+            // This is basically our main entrypoint into the app. This must ONLY be called after the SingletonsReady has been
+            // called (line above) initializing all of them and wiring them all up.
+            S.quanta.initApp();
+        }
+        catch (e) {
+            console.error("initApp failed.");
+        }
     }
 }

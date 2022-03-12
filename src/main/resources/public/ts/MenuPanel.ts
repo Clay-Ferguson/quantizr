@@ -350,8 +350,7 @@ export class MenuPanel extends Div {
              the code in place for future reference. */
             new MenuItem("Mouse Effects", MenuPanel.mouseEffects, !state.isAnonUser && !state.mobileMode, () => state.mouseEffect),
 
-            new MenuItem("My GEO Location", S.nav.geoLocation), //
-            new MenuItem("Show WebTorrents", () => S.torrent.dumpTorrents()) //
+            new MenuItem("My GEO Location", S.nav.geoLocation) //
 
             // DO NOT DELETE
             // new MenuItem("Open IPSM Console", MenuPanel.setIpsmActive, !state.isAnonUser) //

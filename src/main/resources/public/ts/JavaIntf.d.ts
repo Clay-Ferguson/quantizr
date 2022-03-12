@@ -451,11 +451,6 @@ export interface UploadFromIPFSRequest extends RequestBase {
     mime: string;
 }
 
-export interface UploadFromTorrentRequest extends RequestBase {
-    nodeId: string;
-    torrentId: string;
-}
-
 export interface UploadFromUrlRequest extends RequestBase {
     storeLocally: boolean;
     nodeId: string;
@@ -775,9 +770,6 @@ export interface UpdateHeadingsResponse extends ResponseBase {
 }
 
 export interface UploadFromIPFSResponse extends ResponseBase {
-}
-
-export interface UploadFromTorrentResponse extends ResponseBase {
 }
 
 export interface UploadFromUrlResponse extends ResponseBase {

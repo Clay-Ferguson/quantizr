@@ -1,3 +1,4 @@
+console.log("entering ClientInfo.ts");
 class ClientInfo {
 
     /* To test mobile layout, hardcode this value to true */
