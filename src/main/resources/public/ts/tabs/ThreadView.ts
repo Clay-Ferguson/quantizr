@@ -36,7 +36,7 @@ export class ThreadView<I extends ThreadRSInfo> extends AppTab {
 
         children.push(new Div(null, null, [
             new Div(null, { className: "marginBottom marginTop" }, [
-                new Heading(4, this.data.name + " (Chain of Replies)", { className: "resultsTitle" }),
+                new Heading(4, this.data.name + " / Hierarchy", { className: "resultsTitle" }),
                 this.data.rsInfo.endReached ? new Div("Showing all available history", { className: "float-end" }) : null,
                 !this.data.rsInfo.endReached ? new Button("More history...", () => { this.moreHistory() }, { className: "float-end" }) : null,
                 new Clearfix()

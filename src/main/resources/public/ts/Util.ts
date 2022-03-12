@@ -1347,13 +1347,13 @@ export class Util {
     }
 
     loadAnonPageHome = async (state: AppState): Promise<void> => {
-        // console.log("loadAnonPageHome()");
+        console.log("loadAnonPageHome()");
 
         try {
             let res: J.RenderNodeResponse = await S.util.ajax<J.RenderNodeRequest, J.RenderNodeResponse>("anonPageLoad", null, true);
 
             // if we have trouble accessing even the anon page just drop out to landing page.
-            if (!res.success || res.errorType === J.ErrorType.AUTH) {
+            if (!res || !res.success || res.errorType === J.ErrorType.AUTH) {
                 // check we aren't already at origin (no parameters) then set to origin.
                 if (window.location.href !== window.location.origin) {
                     window.location.href = window.location.origin;
@@ -1364,7 +1364,7 @@ export class Util {
             S.render.renderPageFromData(res, false, null, true, true);
         }
         catch (e) {
-            Log.log("loadAnonPage Home ajax fail");
+            console.warn("anonPageLoad failed.");
             S.nav.login(state);
         }
     }

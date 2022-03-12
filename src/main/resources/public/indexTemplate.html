@@ -51,52 +51,69 @@
 
         if (location.href.indexOf("-app-debug") != -1) {
             _debug = true;
-            var cLog = console.log;
 
-            console.log = function (msg) {
-                alert("log: " + msg);
-                cLog(msg);
+            var cl = console.log;
+            console.log = function () {
+                alert("log: " + arguments[0]);
+                cl.apply(this, arguments);
             };
 
-            var cError = console.error;
-            console.error = function (msg) {
-                alert("error: " + msg);
-                cError(msg);
+            var cw = console.warn;
+            console.error = function () {
+                alert("warn: " + arguments[0]);
+                cw.apply(this, arguments);
+            };
+
+            var ce = console.error;
+            console.error = function () {
+                alert("error: " + arguments[0]);
+                ce.apply(this, arguments);
             };
 
             console.log("Debug is on: " + location.href);
         }
 
+        window.onerror = function (message, url, line, col, e) {
+            if (!message && e && e.message) {
+                message = e.message;
+            }
+            if (_debug) {
+                alert("ERROR: " + message);
+            }
+            console.error(message, e ? e.stack : "");
+            return true;
+        };
+
         function checkES6() {
-            "use strict";
             let fail = false;
             try {
-                console.log("class check");
-                // test class support
+                // console.log("class check");
                 eval("class Foo {}");
 
-                // test let and const
-                console.log("let check");
+                // console.log("const check");
+                eval("const x = 1;");
+
+                // console.log("let check");
                 eval("let bar = (x) => x+1; const c = 1;");
 
-                // test Promises
-                console.log("promise check");
+                // console.log("promise check");
                 eval("let promise = new Promise((resolve, reject) => {});");
 
-                // test object literals
-                console.log("object literals check");
+                // console.log("object literals check");
                 eval("function f(a) {return {a}}; f('x');");
 
-                // test template literals 
-                // why is this not working? todo-0
-                console.log("template literals check");
+                // console.log("template literals check");
                 eval("let ins='a'; let val=`${ins}`;");
 
-                // test destructuring
-                console.log("destructuring check");
+                // console.log("destructuring check");
                 eval("let letters = ['a', 'b']; let [a, b] = letters;");
+
+                // console.log("async check");
+                eval("let func = async () => {}");
             } catch (e) {
-                fail = true;
+                if (e instanceof SyntaxError) {
+                    fail = true;
+                }
             }
 
             if (fail) {

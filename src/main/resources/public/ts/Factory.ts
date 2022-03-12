@@ -76,7 +76,8 @@ export class Factory {
             S.quanta.initApp();
         }
         catch (e) {
-            console.error("initApp failed.");
+            alert("initApp failed: " + e);
+            console.error("initApp failed." + e);
         }
     }
 }

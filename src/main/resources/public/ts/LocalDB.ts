@@ -79,6 +79,7 @@ export class LocalDB {
         }
         catch {
             // ignore this exception
+            console.warn("db key not found: " + key);
         }
         return obj ? obj.val : null;
     }

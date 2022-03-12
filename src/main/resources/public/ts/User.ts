@@ -55,6 +55,7 @@ export class User {
         console.log("refreshLogin.");
 
         const loginState: string = await S.localDB.getVal(C.LOCALDB_LOGIN_STATE);
+
         /* if we have known state as logged out, then do nothing here */
         if (loginState === "0") {
             // console.log("loginState known as logged out.");

@@ -25,6 +25,7 @@ export class Log {
         // a problem starting up the app, and even the JS console is not usable.
         if (!Log.paramsChecked) {
             Log.paramsChecked = true;
+            // todo-0: alertDebug has been replaced by -app-debug on url, which sets _debug global var.
             if (S.util.getParameterByName("alertDebug")) {
                 Log.alertDebug = true;
             }
@@ -44,7 +45,8 @@ export class Log {
 Note: This will not get called in the main thread of JavaScript that runs during initialization
 but will get called during normal operation when thing are happening as a result of actual user events
 */
-window.onerror = function (message, url, line, col, e) {
-    Log.error(e);
-    return true;
-};
+// move this to indexTemplate.html
+// window.onerror = function (message, url, line, col, e) {
+//     Log.error(e);
+//     return true;
+// };

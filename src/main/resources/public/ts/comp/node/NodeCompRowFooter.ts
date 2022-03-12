@@ -41,7 +41,7 @@ export class NodeCompRowFooter extends Div {
                             //     }, 100);
                             // }
                             // else {
-                            //     // todo-0: here, print message here asking user if they want to see 'inReplyTo' in a separate tab.
+                            //     // here, print message here asking user if they want to see 'inReplyTo' in a separate tab.
                             // }
                         }
                     }));
