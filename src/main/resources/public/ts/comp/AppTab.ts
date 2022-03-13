@@ -31,7 +31,8 @@ export class AppTab<PropType = any> extends Div {
         if (C.DEBUG_SCROLLING) {
             console.log("reScroll [" + this.data.name + "]: " + elm.scrollTop);
         }
-        elm.scrollTop = this.data.scrollPos;
+
+        elm.scrollTop = this.data.scrollPos === -1 ? elm.scrollHeight : this.data.scrollPos;
     }
 
     domAddEvent(): void {
@@ -46,6 +47,7 @@ export class AppTab<PropType = any> extends Div {
                 if (C.DEBUG_SCROLLING) {
                     console.log("Scroll Evt [" + this.data.name + "]: " + elm.scrollTop);
                 }
+
                 this.data.scrollPos = elm.scrollTop;
             }, { passive: true });
         }

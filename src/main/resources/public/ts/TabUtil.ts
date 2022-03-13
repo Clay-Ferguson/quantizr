@@ -246,13 +246,13 @@ export class TabUtil {
         return data ? data.inst : null;
     }
 
-    tabScrollTop = (state: AppState, tabName: string) => {
+    tabScroll = (state: AppState, tabName: string, pos: number) => {
         if (C.DEBUG_SCROLLING) {
-            console.log("Scrolling tab " + tabName + " to top");
+            console.log("Scrolling tab " + tabName + " to offset " + pos);
         }
         let data = state.tabData.find(d => d.id === tabName);
         if (data) {
-            data.scrollPos = 0;
+            data.scrollPos = pos;
         }
     }
 

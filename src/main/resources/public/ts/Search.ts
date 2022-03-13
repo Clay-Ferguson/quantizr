@@ -31,7 +31,7 @@ export class Search {
         if (res.searchResults?.length > 0) {
             dispatch("Action_RenderSearchResults", (s: AppState): AppState => {
                 S.domUtil.focusId(C.TAB_SHARES);
-                S.tabUtil.tabScrollTop(s, C.TAB_SHARES);
+                S.tabUtil.tabScroll(s, C.TAB_SHARES, 0);
                 let data = s.tabData.find(d => d.id === C.TAB_SHARES);
                 if (!data) return;
                 let info = data.rsInfo as SharesRSInfo;
@@ -62,7 +62,7 @@ export class Search {
         if (res.nodes && res.nodes.length > 0) {
             dispatch("Action_RenderThreadResults", (s: AppState): AppState => {
                 S.domUtil.focusId(C.TAB_THREAD);
-                S.tabUtil.tabScrollTop(s, C.TAB_THREAD);
+                S.tabUtil.tabScroll(s, C.TAB_THREAD, 0);
                 let data = s.tabData.find(d => d.id === C.TAB_THREAD);
                 if (!data) return;
 
@@ -104,7 +104,7 @@ export class Search {
                 }
 
                 S.domUtil.focusId(C.TAB_THREAD);
-                S.tabUtil.tabScrollTop(s, C.TAB_THREAD);
+                S.tabUtil.tabScroll(s, C.TAB_THREAD, -1); // -1 scrolls to bottom
                 let data = s.tabData.find(d => d.id === C.TAB_THREAD);
                 if (!data) return;
 
@@ -147,7 +147,7 @@ export class Search {
 
             dispatch("Action_RenderSearchResults", (s: AppState): AppState => {
                 S.domUtil.focusId(C.TAB_SEARCH);
-                S.tabUtil.tabScrollTop(s, C.TAB_SEARCH);
+                S.tabUtil.tabScroll(s, C.TAB_SEARCH, 0);
                 let data = s.tabData.find(d => d.id === C.TAB_SEARCH);
                 if (!data) return;
 
@@ -209,7 +209,7 @@ export class Search {
 
         dispatch("Action_RenderTimelineResults", (s: AppState): AppState => {
             S.domUtil.focusId(C.TAB_TIMELINE);
-            S.tabUtil.tabScrollTop(s, C.TAB_TIMELINE);
+            S.tabUtil.tabScroll(s, C.TAB_TIMELINE, 0);
             let data = s.tabData.find(d => d.id === C.TAB_TIMELINE);
             if (!data) return;
 
@@ -340,7 +340,7 @@ export class Search {
             feedData.props.feedLoading = false;
 
             if (scrollToTop) {
-                S.tabUtil.tabScrollTop(s, C.TAB_FEED);
+                S.tabUtil.tabScroll(s, C.TAB_FEED, 0);
                 S.tabUtil.selectTabStateOnly(C.TAB_FEED, s);
 
                 // Tentatively removing this, becuase we were getting a 'double scroll' effect, but oddly, even with
@@ -382,7 +382,7 @@ export class Search {
         if (res.searchResults?.length > 0) {
             dispatch("Action_RenderSearchResults", (s: AppState): AppState => {
                 S.domUtil.focusId(C.TAB_FOLLOWERS);
-                S.tabUtil.tabScrollTop(s, C.TAB_FOLLOWERS);
+                S.tabUtil.tabScroll(s, C.TAB_FOLLOWERS, 0);
                 let data = s.tabData.find(d => d.id === C.TAB_FOLLOWERS);
                 if (!data) return;
                 let info = data.rsInfo as FollowersRSInfo;
@@ -424,7 +424,7 @@ export class Search {
         if (res.searchResults && res.searchResults.length > 0) {
             dispatch("Action_RenderSearchResults", (s: AppState): AppState => {
                 S.domUtil.focusId(C.TAB_FOLLOWING);
-                S.tabUtil.tabScrollTop(s, C.TAB_FOLLOWING);
+                S.tabUtil.tabScroll(s, C.TAB_FOLLOWING, 0);
                 let data = s.tabData.find(d => d.id === C.TAB_FOLLOWING);
                 if (!data) return;
                 let info = data.rsInfo as FollowingRSInfo;
