@@ -375,11 +375,11 @@ export class UserProfileDlg extends DialogBase {
         else {
             if (this.readOnly) {
                 return new Div("No header image", {
-                    className: "userProfileDlgHeader"
+                    className: "userProfileDlgHeaderNone"
                 });
             }
             return new Div("Click to upload Header Image", {
-                className: "userProfileDlgHeader",
+                className: "userProfileDlgHeaderNone",
                 onClick
             });
         }
