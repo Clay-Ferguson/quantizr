@@ -194,7 +194,7 @@ export class MenuPanel extends Div {
         }
 
         if (!state.isAnonUser) {
-            children.push(new Menu("Account", [
+            children.push(new Menu("Tree", [
                 new MenuItem("My Root", S.nav.navHome, !state.isAnonUser, null), // This works, but not being used yet -> this.makeHelpIcon(() => S.quanta?.config?.help?.menu?.account)),
                 new MenuItem("My Home", MenuPanel.openHomeNode, !state.isAnonUser),
                 new MenuItem("My Posts", MenuPanel.openPostsNode, !state.isAnonUser),
@@ -223,6 +223,12 @@ export class MenuPanel extends Div {
                 // We need to make this a configurable option.
                 // new MenuItem("From Local Users", S.nav.messagesLocal),
                 new MenuItem("Public Fediverse", S.nav.messagesFediverse)
+            ]));
+
+            children.push(new Menu("Trending", [
+                new MenuItem("Hashtags", S.nav.showTrendingHashtags),
+                new MenuItem("Mentions", S.nav.showTrendingMentions),
+                new MenuItem("Words", S.nav.showTrendingWords)
             ]));
         }
 

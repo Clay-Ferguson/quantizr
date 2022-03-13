@@ -550,6 +550,18 @@ export class Nav {
         });
     }
 
+    showTrendingHashtags = () => {
+        this.showTrendingFiltered("hashtags");
+    }
+
+    showTrendingMentions = () => {
+        this.showTrendingFiltered("mentions");
+    }
+
+    showTrendingWords = () => {
+        this.showTrendingFiltered("words");
+    }
+
     showTrendingFiltered = (filter: string) => {
         let feedData = S.tabUtil.getTabDataById(null, C.TAB_TRENDING);
         if (feedData) {

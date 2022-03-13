@@ -3,7 +3,6 @@ import { AppState } from "../AppState";
 import { Checkbox } from "../comp/core/Checkbox";
 import { CollapsiblePanel } from "../comp/core/CollapsiblePanel";
 import { Div } from "../comp/core/Div";
-import { IconButton } from "../comp/core/IconButton";
 import { Img } from "../comp/core/Img";
 import { Constants as C } from "../Constants";
 import { UserProfileDlg } from "../dlg/UserProfileDlg";
