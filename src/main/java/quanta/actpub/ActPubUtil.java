@@ -27,6 +27,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.event.EventListener;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -793,9 +794,17 @@ public class ActPubUtil extends ServiceBase {
         deleteNodeNotify((ObjectId) event.getSource());
     }
 
-    public GetThreadViewResponse getNodeThreadView(MongoSession ms, String nodeId) {
+    /*
+     * Gets the "[Conversation] Thread" for 'nodeId' which is kind of the equivalent of the walk up
+     * towards the root of the tree, also importing as we go along any 'inReplyTo' references we haven't
+     * already loaded
+     */
+    public GetThreadViewResponse getNodeThreadView(MongoSession ms, String nodeId, boolean loadOthers) {
         GetThreadViewResponse res = new GetThreadViewResponse();
         LinkedList<NodeInfo> nodes = new LinkedList<>();
+        LinkedList<NodeInfo> others = loadOthers ? new LinkedList<>() : null;
+
+        // get node that's going to have it's ancestors gathered
         SubNode node = read.getNode(ms, nodeId);
         boolean topReached = false;
 
@@ -824,6 +833,23 @@ public class ActPubUtil extends ServiceBase {
                 } else {
                     node = read.getParent(ms, node);
                 }
+
+                /*
+                 * if we just got the first parent encountered going up, then show all other replies this user or
+                 * anyone else had made. These are all the siblings of NodeId. (i.e. sibling means having same
+                 * parentt
+                 */
+                if (loadOthers && nodes.size() == 1) {
+                    // gets the 10 most recent posts (no need to get them all or even tell user we're not getting them all)
+                    Iterable<SubNode> iter = read.getChildren(ms, node, Sort.by(Sort.Direction.DESC, SubNode.CREATE_TIME), 10, 0);
+                    for (SubNode child : iter) {
+                        // add only if not nodeId becasue nodeId is all the others BUT nodeId, by definition. 
+                        if (!child.getIdStr().equals(nodeId)) {
+                            others.add(convert.convertToNodeInfo(ThreadLocals.getSC(), ms, child, true, false, -1, false, false,
+                                    false, false));
+                        }
+                    }
+                }
             } catch (Exception e) {
                 node = null;
                 topReached = true;
@@ -837,6 +863,7 @@ public class ActPubUtil extends ServiceBase {
 
         res.setTopReached(topReached);
         res.setNodes(nodes);
+        res.setOthers(others);
         res.setSuccess(true);
         return res;
     }

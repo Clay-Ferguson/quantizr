@@ -21,10 +21,9 @@ export class ThreadView<I extends ThreadRSInfo> extends AppTab {
 
     preRender(): void {
         let state: AppState = useSelector((state: AppState) => state);
-        let results = this.data && this.data.rsInfo.results;
+        let results = this.data?.rsInfo?.results;
         this.attribs.className = this.getClass(state);
         if (!results) return;
-
         let childCount = results.length;
 
         /*
@@ -32,30 +31,50 @@ export class ThreadView<I extends ThreadRSInfo> extends AppTab {
          * client side for various reasons.
          */
         let rowCount = 0;
+        let i = 0;
         let children: CompIntf[] = [];
 
         children.push(new Div(null, null, [
             new Div(null, { className: "marginBottom marginTop" }, [
                 new Heading(4, this.data.name + " / Hierarchy", { className: "resultsTitle" }),
-                this.data.rsInfo.endReached ? new Div("Showing all available history", { className: "float-end" }) : null,
-                !this.data.rsInfo.endReached ? new Button("More history...", () => { this.moreHistory() }, { className: "float-end" }) : null,
+                new Div(this.data.rsInfo.endReached ? "Chain of replies going back to original post" //
+                : "Chain of replies going back towards original post", { className: "float-end" }),
+                new Clearfix(),
+                !this.data.rsInfo.endReached ? new Button("Load more...", () => { this.moreHistory() }, { className: "float-end" }) : null,
                 new Clearfix()
             ]),
             this.data.rsInfo.description ? new Div(this.data.rsInfo.description) : null
         ]));
 
-        let i = 0;
         let jumpButton = state.isAdminUser || !this.data.rsInfo.searchType;
+        let others: J.NodeInfo[] = this.data.props.others;
 
         results.forEach((node: J.NodeInfo) => {
             S.srch.initSearchNode(node);
+            // todo-0: check this. Is passing in childCount here right? It's not getting updated during the loop
             let c = this.renderItem(node, i, childCount, rowCount, jumpButton, state);
             if (c) {
                 children.push(c);
             }
             i++;
             rowCount++;
+            if (i === results.length - 1) {
+                children.push(new Heading(4, "Replies to the Above...", { className: "marginTop" }));
+            }
         });
+
+        if (others) {
+            others.forEach((node: J.NodeInfo) => {
+                S.srch.initSearchNode(node);
+                // todo-0: check this. other.length? ditto above similar loop
+                let c = this.renderItem(node, i, others.length, rowCount, jumpButton, state);
+                if (c) {
+                    children.push(c);
+                }
+                i++;
+                rowCount++;
+            });
+        }
 
         this.setChildren(children);
     }

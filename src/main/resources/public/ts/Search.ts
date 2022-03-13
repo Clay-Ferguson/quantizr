@@ -55,7 +55,8 @@ export class Search {
 
     showThreadAddMore = async (nodeId: string, state: AppState) => {
         let res: J.GetThreadViewResponse = await S.util.ajax<J.GetThreadViewRequest, J.GetThreadViewResponse>("getNodeThreadView", {
-            nodeId
+            nodeId,
+            loadOthers: false
         });
 
         if (res.nodes && res.nodes.length > 0) {
@@ -72,6 +73,7 @@ export class Search {
                 // remove the last element, which will be a duplicate.
                 let moreResults = res.nodes.slice(0, -1);
 
+                // data.props.others = res.others
                 data.rsInfo.results = [...moreResults, ...data.rsInfo.results];
                 data.rsInfo.endReached = res.topReached;
                 S.tabUtil.selectTabStateOnly(data.id, s);
@@ -85,7 +87,8 @@ export class Search {
 
     showThread = async (nodeId: string, state: AppState) => {
         let res: J.GetThreadViewResponse = await S.util.ajax<J.GetThreadViewRequest, J.GetThreadViewResponse>("getNodeThreadView", {
-            nodeId
+            nodeId,
+            loadOthers: true
         });
 
         if (res.nodes && res.nodes.length > 0) {
@@ -105,6 +108,7 @@ export class Search {
                 data.openGraphComps = [];
 
                 data.rsInfo.results = res.nodes;
+                data.props.others = res.others;
                 data.rsInfo.endReached = res.topReached;
                 S.tabUtil.selectTabStateOnly(data.id, s);
                 return s;

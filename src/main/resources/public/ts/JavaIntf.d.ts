@@ -231,6 +231,7 @@ export interface GetSharedNodesRequest extends RequestBase {
 
 export interface GetThreadViewRequest extends RequestBase {
     nodeId: string;
+    loadOthers: boolean;
 }
 
 export interface GetUserAccountInfoRequest extends RequestBase {
@@ -597,6 +598,7 @@ export interface GetSharedNodesResponse extends ResponseBase {
 
 export interface GetThreadViewResponse extends ResponseBase {
     nodes: NodeInfo[];
+    others: NodeInfo[];
     topReached: boolean;
 }
 

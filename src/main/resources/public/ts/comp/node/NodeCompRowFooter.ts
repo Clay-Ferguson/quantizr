@@ -22,30 +22,33 @@ export class NodeCompRowFooter extends Div {
         if (this.node.owner.indexOf("@") !== -1) {
             let inReplyTo = S.props.getPropStr(J.NodeProp.ACT_PUB_OBJ_INREPLYTO, this.node);
             if (inReplyTo) {
-                if (this.allowShowThread) {
-                    children.push(new Anchor(null, "Show Thread", {
-                        className: "footerLink",
-                        onClick: () => {
-                            S.srch.showThread(this.node.id, state);
-                            // ===============
-                            // DO NOT DELETE
-                            // keep this for future reference, it does work, but we don't currently need it since showThread is more what the user will want.
-                            // ===============
-                            // let res: J.GetActPubObjectResponse = await S.util.ajax<J.GetActPubObjectRequest, J.GetActPubObjectResponse>("loadActPubObject", {
-                            //     url: inReplyTo
-                            // });
 
-                            // if (res.nodeId) {
-                            //     setTimeout(() => {
-                            //         S.view.jumpToId(res.nodeId);
-                            //     }, 100);
-                            // }
-                            // else {
-                            //     // here, print message here asking user if they want to see 'inReplyTo' in a separate tab.
-                            // }
-                        }
-                    }));
-                }
+                // DO NOT DELETE (yet, but eventually)
+                // Now that there's a thread icon on all nodes this "Show Thread" method is not needed.
+                // if (this.allowShowThread) {
+                //     children.push(new Anchor(null, "Show Thread", {
+                //         className: "footerLink",
+                //         onClick: () => {
+                //             S.srch.showThread(this.node.id, state);
+                //             // ===============
+                //             // DO NOT DELETE
+                //             // keep this for future reference, it does work, but we don't currently need it since showThread is more what the user will want.
+                //             // ===============
+                //             // let res: J.GetActPubObjectResponse = await S.util.ajax<J.GetActPubObjectRequest, J.GetActPubObjectResponse>("loadActPubObject", {
+                //             //     url: inReplyTo
+                //             // });
+
+                //             // if (res.nodeId) {
+                //             //     setTimeout(() => {
+                //             //         S.view.jumpToId(res.nodeId);
+                //             //     }, 100);
+                //             // }
+                //             // else {
+                //             //     // here, print message here asking user if they want to see 'inReplyTo' in a separate tab.
+                //             // }
+                //         }
+                //     }));
+                // }
 
                 // if this is not our own host then show the Remote Parent link
                 if (inReplyTo.indexOf(location.protocol + "//" + location.hostname) === -1) {

@@ -217,6 +217,7 @@ $mobileHeaderHeight: 3.5em;
     margin-bottom: $smallGap;
     border-radius: $border-radius;
     background-color: $baseBgColor;
+    padding: 24px;
 }
 
 .d3Graph {
@@ -1604,7 +1605,7 @@ i'm backing out for now
 
 .userFeedItemHighlight {
     padding-top: 5px;
-    border: 2px solid green;
+    border: 2px solid olivedrab;
     padding-bottom: $smallGap;
 }
 

@@ -533,7 +533,7 @@ public class AppController extends ServiceBase implements ErrorController {
 	public @ResponseBody Object getNodeThreadView(@RequestBody GetThreadViewRequest req, HttpSession session) {
 		// SessionContext.checkReqToken();
 		return callProc.run("getNodeThreadView", req, session, ms -> {
-			GetThreadViewResponse res = apUtil.getNodeThreadView(ms, req.getNodeId());
+			GetThreadViewResponse res = apUtil.getNodeThreadView(ms, req.getNodeId(), req.isLoadOthers());
 			return res;
 		});
 	}
