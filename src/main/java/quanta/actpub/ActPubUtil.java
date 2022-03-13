@@ -808,56 +808,77 @@ public class ActPubUtil extends ServiceBase {
         SubNode node = read.getNode(ms, nodeId);
         boolean topReached = false;
 
-        // iterate up the parent chain or chain of inReplyTo for ActivityPub
-        while (!topReached && ok(node) && nodes.size() < MAX_THREAD_NODES) {
-            try {
-                nodes.addFirst(
-                        convert.convertToNodeInfo(ThreadLocals.getSC(), ms, node, true, false, -1, false, false, false, false));
+        if (ok(node)) {
+            // get the parent first to check if this makes sense to show a conversation on (not root-level post)
+            SubNode parent = read.getParent(ms, node);
 
-                // if inReplyTo exists try to use it first.
-                String inReplyTo = node.getStr(NodeProp.ACT_PUB_OBJ_INREPLYTO);
-                if (ok(inReplyTo)) {
-                    String parentId = apUtil.loadObject(ms, inReplyTo);
-                    if (ok(parentId)) {
-                        SubNode replyParent = read.getNode(ms, parentId);
-                        if (ok(replyParent)) {
-                            node = replyParent;
-                            continue;
+            // if parent is a POSTS node we don't want to try to run this, just bail out, return success with no data
+            if (ok(parent) && (parent.getType().equals(NodeType.POSTS.s()) || parent.getType().equals(NodeType.ACT_PUB_POSTS.s()))) {
+                res.setSuccess(true);
+                return res;
+            }
+
+            // iterate up the parent chain or chain of inReplyTo for ActivityPub
+            while (!topReached && ok(node) && nodes.size() < MAX_THREAD_NODES) {
+                try {
+                    nodes.addFirst(convert.convertToNodeInfo(ThreadLocals.getSC(), ms, node, true, false, -1, false, false, false,
+                            false));
+
+                    // if inReplyTo exists try to use it first.
+                    String inReplyTo = node.getStr(NodeProp.ACT_PUB_OBJ_INREPLYTO);
+                    if (ok(inReplyTo)) {
+                        String parentId = apUtil.loadObject(ms, inReplyTo);
+                        if (ok(parentId)) {
+                            SubNode replyParent = read.getNode(ms, parentId);
+                            if (ok(replyParent)) {
+                                node = replyParent;
+                                continue;
+                            }
                         }
                     }
-                }
 
-                // if no database parent, check and see if we can get the node via inReplyTo
-                if (no(node.getParent())) {
+                    // if no database parent, check and see if we can get the node via inReplyTo
+                    if (no(node.getParent())) {
+                        topReached = true;
+                    } else {
+                        // first time thru here we can use the parent we already looked up, and then set to
+                        // null for future loops
+                        if (ok(parent)) {
+                            node = parent;
+                            parent = null;
+                        } else {
+                            node = read.getParent(ms, node);
+                        }
+                    }
+
+                    /*
+                     * if we just got the first parent encountered going up, then show all other replies this user or
+                     * anyone else had made. These are all the siblings of NodeId. (i.e. sibling means having same
+                     * parentt
+                     */
+                    if (loadOthers && nodes.size() == 1 && !node.getType().equals(NodeType.POSTS.s())
+                            && !node.getType().equals(NodeType.ACT_PUB_POSTS.s())) {
+                        // gets the 10 most recent posts (no need to get them all or even tell user we're not getting them
+                        // all)
+                        Iterable<SubNode> iter =
+                                read.getChildren(ms, node, Sort.by(Sort.Direction.DESC, SubNode.CREATE_TIME), 10, 0);
+                        for (SubNode child : iter) {
+                            // add only if not nodeId becasue nodeId is all the others BUT nodeId, by definition.
+                            if (!child.getIdStr().equals(nodeId)) {
+                                others.add(convert.convertToNodeInfo(ThreadLocals.getSC(), ms, child, true, false, -1, false,
+                                        false, false, false));
+                            }
+                        }
+                    }
+                } catch (Exception e) {
+                    node = null;
                     topReached = true;
-                } else {
-                    node = read.getParent(ms, node);
+                    /*
+                     * ignore this. Every user will eventually end up at some non-root node they don't own, even if it's
+                     * the one above their account, this represents how far up the user is able to read towards the root
+                     * of the tree based on sharing setting of nodes encountered along the way to the root.
+                     */
                 }
-
-                /*
-                 * if we just got the first parent encountered going up, then show all other replies this user or
-                 * anyone else had made. These are all the siblings of NodeId. (i.e. sibling means having same
-                 * parentt
-                 */
-                if (loadOthers && nodes.size() == 1) {
-                    // gets the 10 most recent posts (no need to get them all or even tell user we're not getting them all)
-                    Iterable<SubNode> iter = read.getChildren(ms, node, Sort.by(Sort.Direction.DESC, SubNode.CREATE_TIME), 10, 0);
-                    for (SubNode child : iter) {
-                        // add only if not nodeId becasue nodeId is all the others BUT nodeId, by definition. 
-                        if (!child.getIdStr().equals(nodeId)) {
-                            others.add(convert.convertToNodeInfo(ThreadLocals.getSC(), ms, child, true, false, -1, false, false,
-                                    false, false));
-                        }
-                    }
-                }
-            } catch (Exception e) {
-                node = null;
-                topReached = true;
-                /*
-                 * ignore this. Every user will eventually end up at some non-root node they don't own, even if it's
-                 * the one above their account, this represents how far up the user is able to read towards the root
-                 * of the tree based on sharing setting of nodes encountered along the way to the root.
-                 */
             }
         }
 

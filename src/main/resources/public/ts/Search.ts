@@ -60,7 +60,6 @@ export class Search {
         });
 
         if (res.nodes && res.nodes.length > 0) {
-
             dispatch("Action_RenderThreadResults", (s: AppState): AppState => {
                 S.domUtil.focusId(C.TAB_THREAD);
                 S.tabUtil.tabScrollTop(s, C.TAB_THREAD);
@@ -81,7 +80,13 @@ export class Search {
             });
         }
         else {
-            new MessageDlg("No search results found.", "Search", null, null, false, 0, null, state).open();
+            dispatch("Action_RenderThreadResults", (s: AppState): AppState => {
+                let data = s.tabData.find(d => d.id === C.TAB_THREAD);
+                if (!data) return;
+                data.rsInfo.endReached = true;
+                return s;
+            });
+            new MessageDlg("Nothing more was found.", "Thread", null, null, false, 0, null, state).open();
         }
     }
 
@@ -92,7 +97,6 @@ export class Search {
         });
 
         if (res.nodes && res.nodes.length > 0) {
-
             dispatch("Action_RenderThreadResults", (s: AppState): AppState => {
                 let nodeFound = this.idToNodeMap.get(nodeId);
                 if (nodeFound) {
@@ -115,7 +119,7 @@ export class Search {
             });
         }
         else {
-            new MessageDlg("No search results found.", "Search", null, null, false, 0, null, state).open();
+            new MessageDlg("Top-level post. No conversation to display.", "Thread", null, null, false, 0, null, state).open();
         }
     }
 
