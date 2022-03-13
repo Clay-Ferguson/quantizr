@@ -809,14 +809,6 @@ public class ActPubUtil extends ServiceBase {
         boolean topReached = false;
 
         if (ok(node)) {
-            // get the parent first to check if this makes sense to show a conversation on (not root-level post)
-            SubNode parent = read.getParent(ms, node);
-
-            // if parent is a POSTS node we don't want to try to run this, just bail out, return success with no data
-            if (ok(parent) && (parent.getType().equals(NodeType.POSTS.s()) || parent.getType().equals(NodeType.ACT_PUB_POSTS.s()))) {
-                res.setSuccess(true);
-                return res;
-            }
 
             // iterate up the parent chain or chain of inReplyTo for ActivityPub
             while (!topReached && ok(node) && nodes.size() < MAX_THREAD_NODES) {
@@ -832,6 +824,16 @@ public class ActPubUtil extends ServiceBase {
                             SubNode replyParent = read.getNode(ms, parentId);
                             if (ok(replyParent)) {
                                 node = replyParent;
+
+                                // if this is the first parent we're accessing (nodes.size will be 1), and it's a post node, we
+                                // consider
+                                // this a case where there's no conversation to show and bail out here.
+                                if (ok(node) && nodes.size() == 1 && (node.getType().equals(NodeType.POSTS.s())
+                                        || node.getType().equals(NodeType.ACT_PUB_POSTS.s()))) {
+                                    res.setSuccess(true);
+                                    return res;
+                                }
+
                                 continue;
                             }
                         }
@@ -841,13 +843,15 @@ public class ActPubUtil extends ServiceBase {
                     if (no(node.getParent())) {
                         topReached = true;
                     } else {
-                        // first time thru here we can use the parent we already looked up, and then set to
-                        // null for future loops
-                        if (ok(parent)) {
-                            node = parent;
-                            parent = null;
-                        } else {
-                            node = read.getParent(ms, node);
+                        node = read.getParent(ms, node);
+
+                        // if this is the first parent we're accessing (nodes.size will be 1), and it's a post node, we
+                        // consider
+                        // this a case where there's no conversation to show and bail out here.
+                        if (ok(node) && nodes.size() == 1 && (node.getType().equals(NodeType.POSTS.s())
+                                || node.getType().equals(NodeType.ACT_PUB_POSTS.s()))) {
+                            res.setSuccess(true);
+                            return res;
                         }
                     }
 
