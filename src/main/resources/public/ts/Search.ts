@@ -86,7 +86,6 @@ export class Search {
                 data.rsInfo.endReached = true;
                 return s;
             });
-            new MessageDlg("Nothing more was found.", "Thread", null, null, false, 0, null, state).open();
         }
     }
 

@@ -55,8 +55,8 @@ export class NodeCompBinary extends Div {
             if (!imgSize.endsWith("%") && !imgSize.endsWith("px")) {
                 imgSize += "%";
             }
-            style.maxWidth = `calc(${imgSize} - 12px)`;
-            style.width = `calc(${imgSize} - 12px)`;
+            style.maxWidth = `calc(${imgSize} - 24px)`;
+            style.width = `calc(${imgSize} - 24px)`;
         }
 
         let className = null;
