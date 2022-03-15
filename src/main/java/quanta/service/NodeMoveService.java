@@ -207,7 +207,7 @@ public class NodeMoveService extends ServiceBase {
 
 		auth.ownerAuth(ms, parentToPasteInto);
 		String parentPath = parentToPasteInto.getPath();
-		// log.debug("targetPath: " + targetPath);
+		// log.debug("targetPath: " + parentPath);
 		Long curTargetOrdinal = null;
 
 		// location==inside
@@ -237,8 +237,9 @@ public class NodeMoveService extends ServiceBase {
 			auth.ownerAuth(ms, node);
 			nodesToMove.add(node);
 
-			// If we're detecting a different parent path from other nodes to move we fail. We only allow
-			// pasting nodes that are all under the same parent.
+			/*
+			 * Verify all nodes being pasted are siblings
+			 */
 			if (ok(sourceParentPath) && !sourceParentPath.equals(node.getParentPath())) {
 				throw new RuntimeException("Nodes to move must be all from the same parent.");
 			}
@@ -250,6 +251,7 @@ public class NodeMoveService extends ServiceBase {
 			}
 		}
 
+		// make sure nodes to move are in ordinal order.
 		nodesToMove.sort((n1, n2) -> (int) (n1.getOrdinal() - n2.getOrdinal()));
 
 		// set to true if we're sure at least one node changed ordinal.
@@ -276,7 +278,9 @@ public class NodeMoveService extends ServiceBase {
 						throw new RuntimeException("Impossible node move requested.");
 					}
 					changePathOfSubGraph(as, node, parentPath);
-					node.setPath(parentPath + "/" + node.getLastPathPart());
+
+					String newPath = mongoUtil.findAvailablePath(parentPath + "/" + node.getLastPathPart());
+					node.setPath(newPath);
 				}
 
 				// if this ordinal somehow is NOT changing (which CAN happen), then do nothing here
@@ -313,7 +317,8 @@ public class NodeMoveService extends ServiceBase {
 			String pathSuffix = node.getPath().substring(originalParentPathLen + 1);
 			String newPath = newPathPrefix + "/" + pathSuffix;
 			// log.debug(" newPath: [" + newPathPrefix + "]/[" + pathSuffix + "]");
-			node.setPath(newPath);
+			newPath = mongoUtil.findAvailablePath(newPath);
+			node.setPath(newPath); 
 			node.setDisableParentCheck(true);
 		}
 	}

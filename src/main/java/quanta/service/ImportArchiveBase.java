@@ -60,7 +60,8 @@ public abstract class ImportArchiveBase extends ServiceBase {
 					try {
 						SubNode n = jsonMapper.readValue(json, SubNode.class);
 
-						n.setPath(targetPath + n.getPath());
+						String newPath = mongoUtil.findAvailablePath(targetPath + n.getPath());
+						n.setPath(newPath);
 						oldId.setVal(n.getIdStr());
 
 						/*

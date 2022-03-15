@@ -149,8 +149,6 @@ public class SubNode {
 		this.owner = owner;
 		this.type = type;
 		this.ordinal = ordinal;
-
-		// always user setter, because we are taking a hash of this
 		setPath(path);
 
 		Date now = Calendar.getInstance().getTime();

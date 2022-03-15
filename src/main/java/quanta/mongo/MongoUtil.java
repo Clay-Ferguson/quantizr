@@ -26,7 +26,6 @@ import org.springframework.data.mongodb.core.index.TextIndexDefinition.TextIndex
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Component;
-import quanta.actpub.APConst;
 import quanta.config.AppProp;
 import quanta.config.NodeName;
 import quanta.config.NodePath;
@@ -236,9 +235,6 @@ public class MongoUtil extends ServiceBase {
 	 * Note that since we don't require to end with "/" this function can be extending an existing leaf
 	 * name, or if the path does end with "/", then it has the effect of finding a new leaf from
 	 * scratch.
-	 * 
-	 * If node is non-null we allow that node to have the path, but only that node, and if so we accept
-	 * that existing path as ok and valid.
 	 */
 	@PerfMon
 	public String findAvailablePath(String path) {
