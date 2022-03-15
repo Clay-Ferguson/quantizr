@@ -222,7 +222,7 @@ export class MenuPanel extends Div {
                 new MenuItem("From Friends", S.nav.messagesFromFriends, !state.isAnonUser),
                 // We need to make this a configurable option.
                 // new MenuItem("From Local Users", S.nav.messagesLocal),
-                new MenuItem("Public Fediverse", S.nav.messagesFediverse)
+                new MenuItem("Federated", S.nav.messagesFediverse)
             ]));
 
             children.push(new Menu("Trending", [

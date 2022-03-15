@@ -292,7 +292,7 @@ export class FeedView extends AppTab<FeedViewProps> {
             data.props.feedFilterToPublic && //
             !data.props.feedFilterLocalServer && //
             !data.props.feedFilterRootNode) {
-            subHeading = "Public Fediverse";
+            subHeading = "Federated";
         }
 
         return subHeading ? ": " + subHeading : "";

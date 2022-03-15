@@ -145,7 +145,9 @@
                 // javascript app bundle, then we can conclude the browser engine's JS is failing and just
                 // tell the user.
                 if (!__initAppStarted) {
-                    alert("App failed to load. Your browser may be outdated: \n\n" + (navigator.userAgent || navigator.vendor || window.opera));
+                    // I saw this throw a 'false positive' so I need to think it over more. It was an extreme hack anyway, trying to determine of any browsers
+                    // can pass all the checking above, and still be unable to load the app. I never even saw this happen, so this code is not needed.
+                    // alert("App failed to load. Your browser may be outdated: \n\n" + (navigator.userAgent || navigator.vendor || window.opera));
                 }
             }, 2000);
         }, true);
