@@ -4,7 +4,7 @@ import { Button } from "../comp/core/Button";
 import { ButtonBar } from "../comp/core/ButtonBar";
 import { Div } from "../comp/core/Div";
 import { NodeActionType } from "../enums/NodeActionType";
-import { TabDataIntf } from "../intf/TabDataIntf";
+import { TabIntf } from "../intf/TabIntf";
 import * as J from "../JavaIntf";
 import { S } from "../Singletons";
 import { TypeBase } from "./base/TypeBase";
@@ -24,7 +24,7 @@ export class RoomTypeHandler extends TypeBase {
         return true;
     }
 
-    render(node: J.NodeInfo, tabData: TabDataIntf<any>, rowStyling: boolean, isTreeView: boolean, state: AppState): Comp {
+    render(node: J.NodeInfo, tabData: TabIntf<any>, rowStyling: boolean, isTreeView: boolean, state: AppState): Comp {
         let baseComp = super.render(node, tabData, rowStyling, isTreeView, state);
         return new Div(null, null, [
             baseComp,

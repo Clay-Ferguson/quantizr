@@ -11,7 +11,7 @@ import { ManageStorageDlg } from "./dlg/ManageStorageDlg";
 import { PrefsDlg } from "./dlg/PrefsDlg";
 import { SharingDlg } from "./dlg/SharingDlg";
 import { UploadFromFileDropzoneDlg } from "./dlg/UploadFromFileDropzoneDlg";
-import { TabDataIntf } from "./intf/TabDataIntf";
+import { TabIntf } from "./intf/TabIntf";
 import * as J from "./JavaIntf";
 import { NodeHistoryItem } from "./NodeHistoryItem";
 import { S } from "./Singletons";
@@ -288,7 +288,7 @@ export class Edit {
 
             // if on feed tab, and it became dirty while we were editing then refresh it.
             if (state.activeTab === C.TAB_FEED) {
-                let feedData: TabDataIntf = S.tabUtil.getTabDataById(state, C.TAB_FEED);
+                let feedData: TabIntf = S.tabUtil.getTabDataById(state, C.TAB_FEED);
                 if (feedData?.props?.feedDirtyList) {
                     FeedView.updateFromFeedDirtyList(feedData, state);
                 }

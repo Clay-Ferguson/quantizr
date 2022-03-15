@@ -4,7 +4,7 @@ import { Comp } from "../comp/base/Comp";
 import { Heading } from "../comp/core/Heading";
 import { HorizontalLayout } from "../comp/core/HorizontalLayout";
 import { TypeBase } from "./base/TypeBase";
-import { TabDataIntf } from "../intf/TabDataIntf";
+import { TabIntf } from "../intf/TabIntf";
 
 export class RepoRootTypeHandler extends TypeBase {
 
@@ -16,7 +16,7 @@ export class RepoRootTypeHandler extends TypeBase {
         return true;
     }
 
-    render(node: J.NodeInfo, tabData: TabDataIntf<any>, rowStyling: boolean, isTreeView: boolean, state: AppState): Comp {
+    render(node: J.NodeInfo, tabData: TabIntf<any>, rowStyling: boolean, isTreeView: boolean, state: AppState): Comp {
         return new HorizontalLayout([
             new Heading(4, "Root")
         ], "displayTable systemNodeContent marginAll");

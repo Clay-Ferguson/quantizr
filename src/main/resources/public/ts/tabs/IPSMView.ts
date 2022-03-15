@@ -6,10 +6,10 @@ import { CompIntf } from "../comp/base/CompIntf";
 import { Div } from "../comp/core/Div";
 import { Heading } from "../comp/core/Heading";
 import { HelpButton } from "../comp/core/HelpButton";
-import { TabDataIntf } from "../intf/TabDataIntf";
+import { TabIntf } from "../intf/TabIntf";
 
 export class IPSMView extends AppTab {
-    constructor(state: AppState, data: TabDataIntf) {
+    constructor(state: AppState, data: TabIntf) {
         super(state, data);
         data.inst = this;
     }

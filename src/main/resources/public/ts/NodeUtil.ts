@@ -5,7 +5,7 @@ import { Span } from "./comp/core/Span";
 import { Constants as C } from "./Constants";
 import { LoadNodeFromIpfsDlg } from "./dlg/LoadNodeFromIpfsDlg";
 import { UserProfileDlg } from "./dlg/UserProfileDlg";
-import { TabDataIntf } from "./intf/TabDataIntf";
+import { TabIntf } from "./intf/TabIntf";
 import * as J from "./JavaIntf";
 import { Log } from "./Log";
 import { S } from "./Singletons";
@@ -137,7 +137,7 @@ export class NodeUtil {
 
     /* Find node by looking everywhere we possibly can on local storage for it */
     findNodeById = (state: AppState, nodeId: string): J.NodeInfo => {
-        let feedData: TabDataIntf = S.tabUtil.getTabDataById(state, C.TAB_FEED);
+        let feedData: TabIntf = S.tabUtil.getTabDataById(state, C.TAB_FEED);
 
         // first look in normal tree map for main view.
         let node: J.NodeInfo = state.idToNodeMap.get(nodeId);

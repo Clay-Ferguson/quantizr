@@ -10,7 +10,7 @@ import { Constants as C } from "./Constants";
 import { MessageDlg } from "./dlg/MessageDlg";
 import { FollowersRSInfo } from "./FollowersRSInfo";
 import { FollowingRSInfo } from "./FollowingRSInfo";
-import { TabDataIntf } from "./intf/TabDataIntf";
+import { TabIntf } from "./intf/TabIntf";
 import * as J from "./JavaIntf";
 import { SharesRSInfo } from "./SharesRSInfo";
 import { S } from "./Singletons";
@@ -230,7 +230,7 @@ export class Search {
     }
 
     removeNodeById = (id: string, state: AppState) => {
-        state.tabData.forEach((td: TabDataIntf) => {
+        state.tabData.forEach((td: TabIntf) => {
 
             // for normal resultsets
             if (td.rsInfo?.results) {
@@ -249,7 +249,7 @@ export class Search {
     delayedRefreshFeed = (state: AppState): void => {
         // put in a delay timer since we call this from other state processing functions.
         setTimeout(() => {
-            let feedData: TabDataIntf = S.tabUtil.getTabDataById(state, C.TAB_FEED);
+            let feedData: TabIntf = S.tabUtil.getTabDataById(state, C.TAB_FEED);
             if (!feedData.props.feedLoading) {
                 this.refreshFeed();
             }
@@ -257,7 +257,7 @@ export class Search {
     }
 
     refreshFeed = () => {
-        let feedData: TabDataIntf = S.tabUtil.getTabDataById(null, C.TAB_FEED);
+        let feedData: TabIntf = S.tabUtil.getTabDataById(null, C.TAB_FEED);
         if (feedData) {
             feedData.props.page = 0;
             feedData.props.refreshCounter++;
@@ -274,7 +274,7 @@ export class Search {
     /* growResults==true is the "infinite scrolling" support */
     feed = async (page: number, searchText: string, forceMetadataOn: boolean, growResults: boolean) => {
         let appState = store.getState();
-        let feedData: TabDataIntf = S.tabUtil.getTabDataById(appState, C.TAB_FEED);
+        let feedData: TabIntf = S.tabUtil.getTabDataById(appState, C.TAB_FEED);
         if (!feedData) {
             return;
         }
@@ -452,7 +452,7 @@ export class Search {
     /*
      * Renders a single line of search results on the search results page.
      */
-    renderSearchResultAsListItem = (node: J.NodeInfo, tabData: TabDataIntf<any>, index: number, count: number, rowCount: number, prefix: string,
+    renderSearchResultAsListItem = (node: J.NodeInfo, tabData: TabIntf<any>, index: number, count: number, rowCount: number, prefix: string,
         isFeed: boolean, isParent: boolean, allowAvatars: boolean, jumpButton: boolean, allowHeader: boolean, allowFooter: boolean, showThreadButton: boolean, state: AppState): Comp => {
         if (!node) return;
 

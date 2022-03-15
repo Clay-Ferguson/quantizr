@@ -3,14 +3,14 @@ import { CompIntf } from "../comp/base/CompIntf";
 import { Heading } from "../comp/core/Heading";
 import { UserProfileDlg } from "../dlg/UserProfileDlg";
 import { FollowersRSInfo } from "../FollowersRSInfo";
-import { TabDataIntf } from "../intf/TabDataIntf";
+import { TabIntf } from "../intf/TabIntf";
 import * as J from "../JavaIntf";
 import { S } from "../Singletons";
 import { ResultSetView } from "./ResultSetView";
 
 export class FollowersResultSetView<I extends FollowersRSInfo> extends ResultSetView {
 
-    constructor(state: AppState, data: TabDataIntf) {
+    constructor(state: AppState, data: TabIntf) {
         super(state, data);
         data.inst = this;
         this.showContentHeading = false;

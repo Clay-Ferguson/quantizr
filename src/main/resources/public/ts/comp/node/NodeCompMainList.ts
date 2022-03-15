@@ -7,13 +7,13 @@ import { Clearfix } from "../../comp/core/Clearfix";
 import { Div } from "../../comp/core/Div";
 import { IconButton } from "../../comp/core/IconButton";
 import { Constants as C } from "../../Constants";
-import { TabDataIntf } from "../../intf/TabDataIntf";
+import { TabIntf } from "../../intf/TabIntf";
 import * as J from "../../JavaIntf";
 import { S } from "../../Singletons";
 
 /* General Widget that doesn't fit any more reusable or specific category other than a plain Div, but inherits capability of Comp class */
 export class NodeCompMainList extends Div {
-    constructor(private tabData: TabDataIntf<any>) {
+    constructor(private tabData: TabIntf<any>) {
         super(null, { key: "nodeCompMaiList" });
     }
 

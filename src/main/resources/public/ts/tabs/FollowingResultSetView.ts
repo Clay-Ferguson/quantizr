@@ -2,13 +2,13 @@ import { AppState } from "../AppState";
 import { CompIntf } from "../comp/base/CompIntf";
 import { Heading } from "../comp/core/Heading";
 import { FollowingRSInfo } from "../FollowingRSInfo";
-import { TabDataIntf } from "../intf/TabDataIntf";
+import { TabIntf } from "../intf/TabIntf";
 import { S } from "../Singletons";
 import { ResultSetView } from "./ResultSetView";
 
 export class FollowingResultSetView<I extends FollowingRSInfo> extends ResultSetView {
 
-    constructor(state: AppState, data: TabDataIntf) {
+    constructor(state: AppState, data: TabIntf) {
         super(state, data);
         this.allowHeader = false;
         this.allowFooter = false;

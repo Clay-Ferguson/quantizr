@@ -2,7 +2,7 @@ import { useSelector } from "react-redux";
 import { store } from "../AppRedux";
 import { AppState } from "../AppState";
 import { Constants as C } from "../Constants";
-import { TabDataIntf } from "../intf/TabDataIntf";
+import { TabIntf } from "../intf/TabIntf";
 import { MenuPanel } from "../MenuPanel";
 import { S } from "../Singletons";
 import { Div } from "../comp/core/Div";
@@ -43,7 +43,7 @@ export class LeftNavPanel extends Div {
 
     preRender(): void {
         let state: AppState = useSelector((state: AppState) => state);
-        let feedData: TabDataIntf = S.tabUtil.getTabDataById(state, C.TAB_FEED);
+        let feedData: TabIntf = S.tabUtil.getTabDataById(state, C.TAB_FEED);
 
         let s = state.newMessageCount > 1 ? "s" : "";
         let messages = state.newMessageCount > 0

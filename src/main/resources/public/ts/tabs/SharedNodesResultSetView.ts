@@ -1,13 +1,13 @@
 import { store } from "../AppRedux";
 import { AppState } from "../AppState";
-import { TabDataIntf } from "../intf/TabDataIntf";
+import { TabIntf } from "../intf/TabIntf";
 import { SharesRSInfo } from "../SharesRSInfo";
 import { S } from "../Singletons";
 import { ResultSetView } from "./ResultSetView";
 
 export class SharedNodesResultSetView<I extends SharesRSInfo> extends ResultSetView {
 
-    constructor(state: AppState, data: TabDataIntf) {
+    constructor(state: AppState, data: TabIntf) {
         super(state, data);
         data.inst = this;
         this.showContentHeading = false;

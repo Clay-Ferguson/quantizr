@@ -7,7 +7,7 @@ import { Clearfix } from "../../comp/core/Clearfix";
 import { Div } from "../../comp/core/Div";
 import { IconButton } from "../../comp/core/IconButton";
 import { NodeActionType } from "../../enums/NodeActionType";
-import { TabDataIntf } from "../../intf/TabDataIntf";
+import { TabIntf } from "../../intf/TabIntf";
 import { TypeHandlerIntf } from "../../intf/TypeHandlerIntf";
 import * as J from "../../JavaIntf";
 import { S } from "../../Singletons";
@@ -22,7 +22,7 @@ export class NodeCompRow extends Div {
     /* we have this flag so we can turn off buttons to troubleshoot performance. */
     static showButtonBar: boolean = true;
 
-    constructor(public node: J.NodeInfo, public tabData: TabDataIntf<any>, private typeHandler: TypeHandlerIntf, public index: number, public count: number, public rowCount: number, public level: number,
+    constructor(public node: J.NodeInfo, public tabData: TabIntf<any>, private typeHandler: TypeHandlerIntf, public index: number, public count: number, public rowCount: number, public level: number,
         public isTableCell: boolean, public allowNodeMove: boolean, public imgSizeOverride: string, private allowHeaders: boolean,
         public allowInlineInsertButton: boolean, private allowShowThread: boolean, appState: AppState) {
         super(null, {

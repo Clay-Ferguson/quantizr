@@ -4,14 +4,14 @@ import { Comp } from "../comp/base/Comp";
 import { Div } from "../comp/core/Div";
 import { Heading } from "../comp/core/Heading";
 import { TypeBase } from "./base/TypeBase";
-import { TabDataIntf } from "../intf/TabDataIntf";
+import { TabIntf } from "../intf/TabIntf";
 
 export class NotesNodeTypeHandler extends TypeBase {
     constructor() {
         super(J.NodeType.NOTES, "Notes", "fa-sticky-note", false);
     }
 
-    render(node: J.NodeInfo, tabData: TabDataIntf<any>, rowStyling: boolean, isTreeView: boolean, state: AppState): Comp {
+    render(node: J.NodeInfo, tabData: TabIntf<any>, rowStyling: boolean, isTreeView: boolean, state: AppState): Comp {
         return new Div(null, null, [
             new Heading(4, "Notes", {
                 className: "marginAll"

@@ -5,12 +5,12 @@ import { Button } from "../comp/core/Button";
 import { Div } from "../comp/core/Div";
 import { Heading } from "../comp/core/Heading";
 import { Pre } from "../comp/core/Pre";
-import { TabDataIntf } from "../intf/TabDataIntf";
+import { TabIntf } from "../intf/TabIntf";
 import { S } from "../Singletons";
 
 export class ServerInfoView extends AppTab {
 
-    constructor(state: AppState, data: TabDataIntf) {
+    constructor(state: AppState, data: TabIntf) {
         super(state, data);
         data.inst = this;
     }

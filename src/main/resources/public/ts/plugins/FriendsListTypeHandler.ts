@@ -6,7 +6,7 @@ import { Heading } from "../comp/core/Heading";
 import { HelpButton } from "../comp/core/HelpButton";
 import { SearchUsersDlg } from "../dlg/SearchUsersDlg";
 import { NodeActionType } from "../enums/NodeActionType";
-import { TabDataIntf } from "../intf/TabDataIntf";
+import { TabIntf } from "../intf/TabIntf";
 import * as J from "../JavaIntf";
 import { S } from "../Singletons";
 import { TypeBase } from "./base/TypeBase";
@@ -24,7 +24,7 @@ export class FriendsListTypeHandler extends TypeBase {
         return false;
     }
 
-    render(node: J.NodeInfo, tabData: TabDataIntf<any>, rowStyling: boolean, isTreeView: boolean, state: AppState): Comp {
+    render(node: J.NodeInfo, tabData: TabIntf<any>, rowStyling: boolean, isTreeView: boolean, state: AppState): Comp {
         return new Div(null, { className: "systemNodeContent" }, [
             new HelpButton(() => S.quanta?.config?.help?.type?.friendsList?.render, null, "btn-secondary float-end"),
             new Heading(4, "Friends", {

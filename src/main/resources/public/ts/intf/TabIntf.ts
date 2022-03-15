@@ -2,7 +2,7 @@ import { ResultSetInfo } from "../ResultSetInfo";
 import { CompIntf } from "../comp/base/CompIntf";
 import { OpenGraphPanel } from "../comp/OpenGraphPanel";
 
-export interface TabDataIntf<PropsType = any> {
+export interface TabIntf<PropsType = any> {
     // display name shown on the tab
     name: string;
 
@@ -15,7 +15,7 @@ export interface TabDataIntf<PropsType = any> {
     /* current instance (will change on every render potentially) */
     inst?: CompIntf;
 
-    constructView(data: TabDataIntf): CompIntf;
+    constructView(data: TabIntf): CompIntf;
 
     // controls whether to show tab button or not.
     isVisible(): boolean;

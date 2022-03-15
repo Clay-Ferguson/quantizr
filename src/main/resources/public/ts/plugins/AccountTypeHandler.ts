@@ -4,7 +4,7 @@ import { Div } from "../comp/core/Div";
 import { Heading } from "../comp/core/Heading";
 import { UserProfileDlg } from "../dlg/UserProfileDlg";
 import { NodeActionType } from "../enums/NodeActionType";
-import { TabDataIntf } from "../intf/TabDataIntf";
+import { TabIntf } from "../intf/TabIntf";
 import * as J from "../JavaIntf";
 import { S } from "../Singletons";
 import { TypeBase } from "./base/TypeBase";
@@ -32,7 +32,7 @@ export class AccountTypeHandler extends TypeBase {
         return true;
     }
 
-    render(node: J.NodeInfo, tabData: TabDataIntf<any>, rowStyling: boolean, isTreeView: boolean, state: AppState): Comp {
+    render(node: J.NodeInfo, tabData: TabIntf<any>, rowStyling: boolean, isTreeView: boolean, state: AppState): Comp {
         return new Div(null, {
             className: "marginAll systemNodeContent"
         }, [

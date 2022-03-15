@@ -5,7 +5,7 @@ import { Div } from "../../comp/core/Div";
 import { NodeCompMarkdown } from "../../comp/node/NodeCompMarkdown";
 import { OpenGraphPanel } from "../../comp/OpenGraphPanel";
 import { NodeActionType } from "../../enums/NodeActionType";
-import { TabDataIntf } from "../../intf/TabDataIntf";
+import { TabIntf } from "../../intf/TabIntf";
 import { TypeHandlerIntf } from "../../intf/TypeHandlerIntf";
 import * as J from "../../JavaIntf";
 import { S } from "../../Singletons";
@@ -83,7 +83,7 @@ export class TypeBase implements TypeHandlerIntf {
         return true;
     }
 
-    render(node: J.NodeInfo, tabData: TabDataIntf<any>, rowStyling: boolean, isTreeView: boolean, state: AppState): Comp {
+    render(node: J.NodeInfo, tabData: TabIntf<any>, rowStyling: boolean, isTreeView: boolean, state: AppState): Comp {
         let prop: J.PropertyInfo = S.props.getProp(J.NodeProp.ORDER_BY, node);
 
         // I was trying to let this button decrypt, but react is saying the component got unmounted

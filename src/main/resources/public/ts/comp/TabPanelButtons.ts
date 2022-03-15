@@ -3,7 +3,7 @@ import { AppState } from "../AppState";
 import { Anchor } from "../comp/core/Anchor";
 import { Div } from "../comp/core/Div";
 import { Constants as C } from "../Constants";
-import { TabDataIntf } from "../intf/TabDataIntf";
+import { TabIntf } from "../intf/TabIntf";
 import * as J from "../JavaIntf";
 import { S } from "../Singletons";
 import { Comp } from "./base/Comp";
@@ -44,10 +44,10 @@ export class TabPanelButtons extends Div {
         return items;
     }
 
-    getTabSubOptions(state: AppState, data: TabDataIntf): Div {
+    getTabSubOptions(state: AppState, data: TabIntf): Div {
         let tabName = data.name;
 
-        // todo-1: temp hack for POC (we can move this to a callback on the TabDataIntf to create this extra Div for any tab)
+        // todo-1: temp hack for POC (we can move this to a callback on the TabIntf to create this extra Div for any tab)
         if (!state.isAnonUser) {
             if (tabName === "Feed" /* This would make it show up only when Feed is active: && S.quanta.activeTab === C.TAB_FEED */) {
                 return new Div(null, { className: "tabSubOptions" }, [
@@ -81,9 +81,9 @@ export class TabPanelButtons extends Div {
         return null;
     }
 
-    getTabButton(state: AppState, data: TabDataIntf): Li {
+    getTabButton(state: AppState, data: TabIntf): Li {
         let tabName = data.name;
-        let feedData: TabDataIntf = S.tabUtil.getTabDataById(state, C.TAB_FEED);
+        let feedData: TabIntf = S.tabUtil.getTabDataById(state, C.TAB_FEED);
 
         // slight hack until we have 'name' as a function and not a string.
         if (tabName === "Feed" && feedData?.props?.feedFilterRootNode) {

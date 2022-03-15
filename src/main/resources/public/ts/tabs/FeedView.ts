@@ -20,7 +20,7 @@ import { TextField } from "../comp/core/TextField";
 import { Constants as C } from "../Constants";
 import { EditNodeDlg } from "../dlg/EditNodeDlg";
 import { DialogMode } from "../enums/DialogMode";
-import { TabDataIntf } from "../intf/TabDataIntf";
+import { TabIntf } from "../intf/TabIntf";
 import * as J from "../JavaIntf";
 import { S } from "../Singletons";
 import { FeedViewProps } from "./FeedViewProps";
@@ -29,7 +29,7 @@ import { FeedViewProps } from "./FeedViewProps";
 but inherits capability of Comp class */
 export class FeedView extends AppTab<FeedViewProps> {
 
-    constructor(state: AppState, data: TabDataIntf<FeedViewProps>) {
+    constructor(state: AppState, data: TabIntf<FeedViewProps>) {
         super(state, data);
         data.inst = this;
     }
@@ -240,7 +240,7 @@ export class FeedView extends AppTab<FeedViewProps> {
         return new Heading(4, this.data.props.feedFilterRootNode ? "Feed (Chat Room)" : "Feed" + this.getFeedSubHeading(this.data), { className: "resultsTitle" });
     }
 
-    getFeedSubHeading = (data: TabDataIntf<FeedViewProps>) => {
+    getFeedSubHeading = (data: TabIntf<FeedViewProps>) => {
         let subHeading = null;
 
         if (data.props.feedFilterToUser) {
@@ -385,7 +385,7 @@ export class FeedView extends AppTab<FeedViewProps> {
         ]);
     }
 
-    static updateFromFeedDirtyList = (feedData: TabDataIntf, state: AppState): void => {
+    static updateFromFeedDirtyList = (feedData: TabIntf, state: AppState): void => {
         if (feedData?.props?.feedDirtyList) {
             for (let node of feedData.props.feedDirtyList) {
                 // console.log("Force Feed: " + node.content);

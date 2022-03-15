@@ -8,7 +8,7 @@ import { Heading } from "../comp/core/Heading";
 import { IconButton } from "../comp/core/IconButton";
 import { Span } from "../comp/core/Span";
 import { TextContent } from "../comp/core/TextContent";
-import { TabDataIntf } from "../intf/TabDataIntf";
+import { TabIntf } from "../intf/TabIntf";
 import * as J from "../JavaIntf";
 import { S } from "../Singletons";
 
@@ -19,7 +19,7 @@ export abstract class ResultSetView extends AppTab {
     allowFooter: boolean = true;
     showContentHeading: boolean = true;
 
-    constructor(state: AppState, data: TabDataIntf) {
+    constructor(state: AppState, data: TabIntf) {
         super(state, data);
     }
 

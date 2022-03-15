@@ -2,7 +2,7 @@ import { AppState } from "../AppState";
 import { Comp } from "../comp/base/Comp";
 import { UserProfileDlg } from "../dlg/UserProfileDlg";
 import { NodeActionType } from "../enums/NodeActionType";
-import { TabDataIntf } from "../intf/TabDataIntf";
+import { TabIntf } from "../intf/TabIntf";
 import * as J from "../JavaIntf";
 import { S } from "../Singletons";
 import { TypeBase } from "./base/TypeBase";
@@ -59,7 +59,7 @@ export class FriendTypeHandler extends TypeBase {
         this.ensureStringPropExists(node, J.NodeProp.USER);
     }
 
-    render(node: J.NodeInfo, tabData: TabDataIntf<any>, rowStyling: boolean, isTreeView: boolean, state: AppState): Comp {
+    render(node: J.NodeInfo, tabData: TabIntf<any>, rowStyling: boolean, isTreeView: boolean, state: AppState): Comp {
         let user: string = S.props.getPropStr(J.NodeProp.USER, node);
         let userBio: string = S.props.getClientPropStr(J.NodeProp.USER_BIO, node);
         let userNodeId: string = S.props.getPropStr(J.NodeProp.USER_NODE_ID, node);

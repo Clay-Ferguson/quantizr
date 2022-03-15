@@ -7,7 +7,7 @@ import { Div } from "../../comp/core/Div";
 import { Constants as C } from "../../Constants";
 import { EditNodeDlg } from "../../dlg/EditNodeDlg";
 import { DialogMode } from "../../enums/DialogMode";
-import { TabDataIntf } from "../../intf/TabDataIntf";
+import { TabIntf } from "../../intf/TabIntf";
 import { TypeHandlerIntf } from "../../intf/TypeHandlerIntf";
 import * as J from "../../JavaIntf";
 import { S } from "../../Singletons";
@@ -16,7 +16,7 @@ import { NodeCompRow } from "./NodeCompRow";
 /* General Widget that doesn't fit any more reusable or specific category other than a plain Div, but inherits capability of Comp class */
 export class NodeCompVerticalRowLayout extends Div {
 
-    constructor(public node: J.NodeInfo, private tabData: TabDataIntf<any>, public level: number, public allowNodeMove: boolean, private allowHeaders: boolean) {
+    constructor(public node: J.NodeInfo, private tabData: TabIntf<any>, public level: number, public allowNodeMove: boolean, private allowHeaders: boolean) {
         super();
     }
 

@@ -1,12 +1,12 @@
 import { store } from "../AppRedux";
 import { AppState } from "../AppState";
-import { TabDataIntf } from "../intf/TabDataIntf";
+import { TabIntf } from "../intf/TabIntf";
 import { S } from "../Singletons";
 import { ResultSetView } from "./ResultSetView";
 
 export class SearchResultSetView extends ResultSetView {
 
-    constructor(state: AppState, data: TabDataIntf) {
+    constructor(state: AppState, data: TabIntf) {
         super(state, data);
         data.inst = this;
     }

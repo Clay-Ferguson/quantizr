@@ -7,7 +7,7 @@ import { Icon } from "../comp/core/Icon";
 import { Img } from "../comp/core/Img";
 import * as J from "../JavaIntf";
 import { S } from "../Singletons";
-import { TabDataIntf } from "../intf/TabDataIntf";
+import { TabIntf } from "../intf/TabIntf";
 import { Html } from "./core/Html";
 
 interface LS { // Local State
@@ -19,7 +19,7 @@ interface LS { // Local State
 export class OpenGraphPanel extends Div {
     loading: boolean;
 
-    constructor(private appState: AppState, private tabData: TabDataIntf<any>, key: string, private url: string) {
+    constructor(private appState: AppState, private tabData: TabIntf<any>, key: string, private url: string) {
         super(null, {
             title: url,
             key

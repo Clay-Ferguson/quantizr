@@ -4,7 +4,7 @@ import { CompIntf } from "./comp/base/CompIntf";
 import { Constants as C } from "./Constants";
 import { FollowersRSInfo } from "./FollowersRSInfo";
 import { FollowingRSInfo } from "./FollowingRSInfo";
-import { TabDataIntf } from "./intf/TabDataIntf";
+import { TabIntf } from "./intf/TabIntf";
 import { PubSub } from "./PubSub";
 import { ResultSetInfo } from "./ResultSetInfo";
 import { SharesRSInfo } from "./SharesRSInfo";
@@ -71,7 +71,7 @@ export class TabUtil {
                     name: "Tree",
                     id: C.TAB_MAIN,
                     isVisible: () => true,
-                    constructView: (data: TabDataIntf) => new MainTabComp(s, data),
+                    constructView: (data: TabIntf) => new MainTabComp(s, data),
                     rsInfo: null,
                     scrollPos: 0,
                     props: {},
@@ -81,7 +81,7 @@ export class TabUtil {
                     name: "Search",
                     id: C.TAB_SEARCH,
                     isVisible: () => this.resultSetHasData(C.TAB_SEARCH),
-                    constructView: (data: TabDataIntf) => new SearchResultSetView(s, data),
+                    constructView: (data: TabIntf) => new SearchResultSetView(s, data),
                     rsInfo: new ResultSetInfo(),
                     scrollPos: 0,
                     props: {},
@@ -91,7 +91,7 @@ export class TabUtil {
                     name: "Shared Nodes",
                     id: C.TAB_SHARES,
                     isVisible: () => this.resultSetHasData(C.TAB_SHARES),
-                    constructView: (data: TabDataIntf) => new SharedNodesResultSetView<SharesRSInfo>(s, data),
+                    constructView: (data: TabIntf) => new SharedNodesResultSetView<SharesRSInfo>(s, data),
                     rsInfo: new SharesRSInfo(),
                     scrollPos: 0,
                     props: {},
@@ -101,7 +101,7 @@ export class TabUtil {
                     name: "Timeline",
                     id: C.TAB_TIMELINE,
                     isVisible: () => this.resultSetHasData(C.TAB_TIMELINE),
-                    constructView: (data: TabDataIntf) => new TimelineResultSetView<TimelineRSInfo>(s, data),
+                    constructView: (data: TabIntf) => new TimelineResultSetView<TimelineRSInfo>(s, data),
                     rsInfo: new TimelineRSInfo(),
                     scrollPos: 0,
                     props: {},
@@ -111,7 +111,7 @@ export class TabUtil {
                     name: "Followers",
                     id: C.TAB_FOLLOWERS,
                     isVisible: () => this.resultSetHasData(C.TAB_FOLLOWERS),
-                    constructView: (data: TabDataIntf) => new FollowersResultSetView<FollowersRSInfo>(s, data),
+                    constructView: (data: TabIntf) => new FollowersResultSetView<FollowersRSInfo>(s, data),
                     rsInfo: new FollowersRSInfo(),
                     scrollPos: 0,
                     props: {},
@@ -121,7 +121,7 @@ export class TabUtil {
                     name: "Following",
                     id: C.TAB_FOLLOWING,
                     isVisible: () => this.resultSetHasData(C.TAB_FOLLOWING),
-                    constructView: (data: TabDataIntf) => new FollowingResultSetView<FollowingRSInfo>(s, data),
+                    constructView: (data: TabIntf) => new FollowingResultSetView<FollowingRSInfo>(s, data),
                     rsInfo: new FollowingRSInfo(),
                     scrollPos: 0,
                     props: {},
@@ -131,7 +131,7 @@ export class TabUtil {
                     name: "Feed",
                     id: C.TAB_FEED,
                     isVisible: () => true,
-                    constructView: (data: TabDataIntf<FeedViewProps>) => new FeedView(s, data),
+                    constructView: (data: TabIntf<FeedViewProps>) => new FeedView(s, data),
                     rsInfo: null,
                     scrollPos: 0,
                     props: {
@@ -167,7 +167,7 @@ export class TabUtil {
                 //         let state: AppState = store.getState();
                 //         return state.ipsmActive;
                 //     },
-                //     constructView: (data: TabDataIntf) => new IPSMView(s, data),
+                //     constructView: (data: TabIntf) => new IPSMView(s, data),
                 //     rsInfo: null,
                 //     scrollPos: 0,
                 //     // need typesafe props (todo-2)
@@ -179,7 +179,7 @@ export class TabUtil {
                     name: "Trending",
                     id: C.TAB_TRENDING,
                     isVisible: () => true,
-                    constructView: (data: TabDataIntf) => new TrendingView(s, data),
+                    constructView: (data: TabIntf) => new TrendingView(s, data),
                     rsInfo: new TrendingRSInfo(),
                     scrollPos: 0,
 
@@ -194,7 +194,7 @@ export class TabUtil {
                         let state: AppState = store.getState();
                         return !!state.threadViewNodeId;
                     },
-                    constructView: (data: TabDataIntf) => new ThreadView(s, data),
+                    constructView: (data: TabIntf) => new ThreadView(s, data),
                     rsInfo: new ThreadRSInfo(),
                     scrollPos: 0,
                     props: {},
@@ -207,7 +207,7 @@ export class TabUtil {
                         let state: AppState = store.getState();
                         return !!state.serverInfoText;
                     },
-                    constructView: (data: TabDataIntf) => new ServerInfoView(s, data),
+                    constructView: (data: TabIntf) => new ServerInfoView(s, data),
                     rsInfo: null,
                     scrollPos: 0,
                     props: {},
@@ -223,7 +223,7 @@ export class TabUtil {
                 //         let state = store.getState();
                 //         return state.isAdminUser;
                 //     },
-                //     constructView: (data: TabDataIntf) => new LogView(data),
+                //     constructView: (data: TabIntf) => new LogView(data),
                 //     rsInfo: null,
                 //     props: {}
                 // }
@@ -232,7 +232,7 @@ export class TabUtil {
         });
     }
 
-    getTabDataById = (state: AppState, id: string): TabDataIntf => {
+    getTabDataById = (state: AppState, id: string): TabIntf => {
         if (!state) {
             state = store.getState();
         }

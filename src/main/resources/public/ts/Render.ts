@@ -17,7 +17,7 @@ import { Constants as C } from "./Constants";
 import { MessageDlg } from "./dlg/MessageDlg";
 import { UserProfileDlg } from "./dlg/UserProfileDlg";
 import { NodeActionType } from "./enums/NodeActionType";
-import { TabDataIntf } from "./intf/TabDataIntf";
+import { TabIntf } from "./intf/TabIntf";
 import { TypeHandlerIntf } from "./intf/TypeHandlerIntf";
 import * as J from "./JavaIntf";
 import { NodeMetaIntf } from "./JavaIntf";
@@ -431,7 +431,7 @@ export class Render {
                 s.guiReady = true;
                 s.pageMessage = null;
 
-                let data: TabDataIntf = S.tabUtil.getTabDataById(s, C.TAB_MAIN);
+                let data: TabIntf = S.tabUtil.getTabDataById(s, C.TAB_MAIN);
                 if (data) {
                     data.openGraphComps = [];
                 }
@@ -652,7 +652,7 @@ export class Render {
         }
     }
 
-    renderChildren = (node: J.NodeInfo, tabData: TabDataIntf<any>, level: number, allowNodeMove: boolean, state: AppState): Comp => {
+    renderChildren = (node: J.NodeInfo, tabData: TabIntf<any>, level: number, allowNodeMove: boolean, state: AppState): Comp => {
         if (!node || !node.children) return null;
         let allowAvatars = true;
 

@@ -1,6 +1,6 @@
 import { useSelector } from "react-redux";
 import { AppState } from "../../AppState";
-import { TabDataIntf } from "../../intf/TabDataIntf";
+import { TabIntf } from "../../intf/TabIntf";
 import { S } from "../../Singletons";
 import { Div } from "../core/Div";
 import { Icon } from "../core/Icon";
@@ -9,7 +9,7 @@ import { NodeCompRowHeader } from "./NodeCompRowHeader";
 
 export class NodeCompParentNodes extends Div {
 
-    constructor(private state: AppState, public tabData: TabDataIntf<any>, public imgSizeOverride: string) {
+    constructor(private state: AppState, public tabData: TabIntf<any>, public imgSizeOverride: string) {
         super(null, {
             id: S.nav._UID_PARENT_ROWID_PREFIX + state.node.id
             // WARNING: Leave this tabIndex here. it's required for focsing/scrolling

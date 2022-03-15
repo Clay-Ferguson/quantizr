@@ -10,7 +10,7 @@ import { MainMenuDlg } from "./dlg/MainMenuDlg";
 import { MessageDlg } from "./dlg/MessageDlg";
 import { PrefsDlg } from "./dlg/PrefsDlg";
 import { SearchContentDlg } from "./dlg/SearchContentDlg";
-import { TabDataIntf } from "./intf/TabDataIntf";
+import { TabIntf } from "./intf/TabIntf";
 import * as J from "./JavaIntf";
 import { S } from "./Singletons";
 import { FeedViewProps } from "./tabs/FeedViewProps";
@@ -507,7 +507,7 @@ export class Nav {
     }
 
     messages = (props: FeedViewProps): void => {
-        let feedData: TabDataIntf = S.tabUtil.getTabDataById(null, C.TAB_FEED);
+        let feedData: TabIntf = S.tabUtil.getTabDataById(null, C.TAB_FEED);
         if (!feedData) {
             return;
         }

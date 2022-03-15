@@ -2,7 +2,7 @@ import { useSelector } from "react-redux";
 import { AppState } from "../../AppState";
 import { CompIntf } from "../../comp/base/CompIntf";
 import { Div } from "../../comp/core/Div";
-import { TabDataIntf } from "../../intf/TabDataIntf";
+import { TabIntf } from "../../intf/TabIntf";
 import { TypeHandlerIntf } from "../../intf/TypeHandlerIntf";
 import * as J from "../../JavaIntf";
 import { S } from "../../Singletons";
@@ -14,7 +14,7 @@ export class NodeCompContent extends Div {
     domPreUpdateFunc: Function;
 
     constructor(public node: J.NodeInfo,
-        public tabData: TabDataIntf<any>,
+        public tabData: TabIntf<any>,
         public rowStyling: boolean,
         public showHeader: boolean,
         public idPrefix?: string,

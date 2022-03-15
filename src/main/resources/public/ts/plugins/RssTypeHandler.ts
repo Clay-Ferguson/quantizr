@@ -22,7 +22,7 @@ import { NodeActionType } from "../enums/NodeActionType";
 import * as J from "../JavaIntf";
 import { S } from "../Singletons";
 import { TypeBase } from "./base/TypeBase";
-import { TabDataIntf } from "../intf/TabDataIntf";
+import { TabIntf } from "../intf/TabIntf";
 
 export class RssTypeHandler extends TypeBase {
     static expansionState: any = {};
@@ -76,7 +76,7 @@ export class RssTypeHandler extends TypeBase {
         this.ensureStringPropExists(node, J.NodeProp.RSS_FEED_SRC);
     }
 
-    render(node: J.NodeInfo, tabData: TabDataIntf<any>, rowStyling: boolean, isTreeView: boolean, state: AppState): Comp {
+    render(node: J.NodeInfo, tabData: TabIntf<any>, rowStyling: boolean, isTreeView: boolean, state: AppState): Comp {
 
         // console.log("RSSTypeHandler.render");
         let feedSrc: string = S.props.getPropStr(J.NodeProp.RSS_FEED_SRC, node);

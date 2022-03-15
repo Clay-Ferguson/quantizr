@@ -2,7 +2,7 @@ import { dispatch, store } from "./AppRedux";
 import { AppState } from "./AppState";
 import { Constants as C } from "./Constants";
 import { MessageDlg } from "./dlg/MessageDlg";
-import { TabDataIntf } from "./intf/TabDataIntf";
+import { TabIntf } from "./intf/TabIntf";
 import * as J from "./JavaIntf";
 import { S } from "./Singletons";
 
@@ -93,7 +93,7 @@ export class ServerPush {
         }, false);
     }
 
-    forceFeedItem = (nodeInfo: J.NodeInfo, feedData: TabDataIntf, state: AppState): void => {
+    forceFeedItem = (nodeInfo: J.NodeInfo, feedData: TabIntf, state: AppState): void => {
         if (!nodeInfo) return;
         feedData.props.feedResults = feedData.props.feedResults || [];
 
@@ -124,7 +124,7 @@ export class ServerPush {
     }
 
     ipsmPushItem = (payload: string, state: AppState) => {
-        let feedData: TabDataIntf = S.tabUtil.getTabDataById(state, C.TAB_IPSM);
+        let feedData: TabIntf = S.tabUtil.getTabDataById(state, C.TAB_IPSM);
         if (!feedData) return;
 
         dispatch("Action_RenderIPSMFeedResults", (s: AppState): AppState => {
@@ -141,7 +141,7 @@ export class ServerPush {
 
         console.log("feedPushItem: " + nodeInfo.content);
 
-        let feedData: TabDataIntf = S.tabUtil.getTabDataById(state, C.TAB_FEED);
+        let feedData: TabIntf = S.tabUtil.getTabDataById(state, C.TAB_FEED);
         if (!feedData) return;
 
         let isMine = S.props.isMine(nodeInfo, state);

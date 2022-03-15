@@ -22,7 +22,7 @@ import { SearchUsersDlg } from "./dlg/SearchUsersDlg";
 import { SplitNodeDlg } from "./dlg/SplitNodeDlg";
 import { TransferNodeDlg } from "./dlg/TransferNodeDlg";
 import { UserProfileDlg } from "./dlg/UserProfileDlg";
-import { TabDataIntf } from "./intf/TabDataIntf";
+import { TabIntf } from "./intf/TabIntf";
 import { TypeHandlerIntf } from "./intf/TypeHandlerIntf";
 import * as J from "./JavaIntf";
 import { S } from "./Singletons";
@@ -577,7 +577,7 @@ export class MenuPanel extends Div {
         return items;
     }
 
-    getTabMenuItem(state: AppState, data: TabDataIntf): MenuItem {
+    getTabMenuItem(state: AppState, data: TabIntf): MenuItem {
         return new MenuItem(data.name, (event) => {
             S.tabUtil.selectTab(data.id);
         }, true, () => state.activeTab === data.id);

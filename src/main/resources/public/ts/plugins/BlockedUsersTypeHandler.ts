@@ -3,7 +3,7 @@ import { Comp } from "../comp/base/Comp";
 import { Div } from "../comp/core/Div";
 import { Heading } from "../comp/core/Heading";
 import { NodeActionType } from "../enums/NodeActionType";
-import { TabDataIntf } from "../intf/TabDataIntf";
+import { TabIntf } from "../intf/TabIntf";
 import * as J from "../JavaIntf";
 import { TypeBase } from "./base/TypeBase";
 
@@ -22,7 +22,7 @@ export class BlockedUsersTypeHandler extends TypeBase {
         return false;
     }
 
-    render(node: J.NodeInfo, tabData: TabDataIntf<any>, rowStyling: boolean, isTreeView: boolean, state: AppState): Comp {
+    render(node: J.NodeInfo, tabData: TabIntf<any>, rowStyling: boolean, isTreeView: boolean, state: AppState): Comp {
         return new Div(null, { className: "systemNodeContent" }, [
             new Heading(4, this.displayName, {
                 className: "marginAll"

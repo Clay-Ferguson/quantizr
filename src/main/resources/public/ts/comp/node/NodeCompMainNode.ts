@@ -7,7 +7,7 @@ import { IconButton } from "../../comp/core/IconButton";
 import { Constants as C } from "../../Constants";
 import { EditNodeDlg } from "../../dlg/EditNodeDlg";
 import { DialogMode } from "../../enums/DialogMode";
-import { TabDataIntf } from "../../intf/TabDataIntf";
+import { TabIntf } from "../../intf/TabIntf";
 import { TypeHandlerIntf } from "../../intf/TypeHandlerIntf";
 import * as J from "../../JavaIntf";
 import { S } from "../../Singletons";
@@ -19,7 +19,7 @@ import { NodeCompRowHeader } from "./NodeCompRowHeader";
 /* General Widget that doesn't fit any more reusable or specific category other than a plain Div, but inherits capability of Comp class */
 export class NodeCompMainNode extends Div {
 
-    constructor(private state: AppState, public tabData: TabDataIntf<any>, public imgSizeOverride: string) {
+    constructor(private state: AppState, public tabData: TabIntf<any>, public imgSizeOverride: string) {
         super(null, {
             id: S.nav._UID_ROWID_PREFIX + state.node.id
             // WARNING: Leave this tabIndex here. it's required for focsing/scrolling
