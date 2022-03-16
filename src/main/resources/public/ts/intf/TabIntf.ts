@@ -1,6 +1,8 @@
 import { ResultSetInfo } from "../ResultSetInfo";
 import { CompIntf } from "../comp/base/CompIntf";
 import { OpenGraphPanel } from "../comp/OpenGraphPanel";
+import { AppState } from "../AppState";
+import { Div } from "../comp/core/Div";
 
 export interface TabIntf<PropsType = any> {
     // display name shown on the tab
@@ -16,6 +18,7 @@ export interface TabIntf<PropsType = any> {
     inst?: CompIntf;
 
     constructView(data: TabIntf): CompIntf;
+    getTabSubOptions(state: AppState): Div;
 
     // controls whether to show tab button or not.
     isVisible(): boolean;

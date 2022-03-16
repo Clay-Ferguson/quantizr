@@ -1,10 +1,12 @@
 import { dispatch, store } from "./AppRedux";
 import { AppState } from "./AppState";
 import { CompIntf } from "./comp/base/CompIntf";
+import { Div } from "./comp/core/Div";
 import { Constants as C } from "./Constants";
 import { FollowersRSInfo } from "./FollowersRSInfo";
 import { FollowingRSInfo } from "./FollowingRSInfo";
 import { TabIntf } from "./intf/TabIntf";
+import * as J from "./JavaIntf";
 import { PubSub } from "./PubSub";
 import { ResultSetInfo } from "./ResultSetInfo";
 import { SharesRSInfo } from "./SharesRSInfo";
@@ -72,6 +74,14 @@ export class TabUtil {
                     id: C.TAB_MAIN,
                     isVisible: () => true,
                     constructView: (data: TabIntf) => new MainTabComp(s, data),
+                    getTabSubOptions: (state: AppState): Div => {
+                        return !state.isAnonUser
+                            ? new Div(null, { className: "tabSubOptions" }, [
+                                new Div("My Root", { className: "tabSubOptionsItem", onClick: () => S.nav.navHome(state) }),
+                                new Div("My Home", { className: "tabSubOptionsItem", onClick: () => S.nav.openContentNode(":" + state.userName + ":home") }),
+                                new Div("My Posts", { className: "tabSubOptionsItem", onClick: () => S.nav.openContentNode("~" + J.NodeType.POSTS) })
+                            ]) : null;
+                    },
                     rsInfo: null,
                     scrollPos: 0,
                     props: {},
@@ -82,6 +92,7 @@ export class TabUtil {
                     id: C.TAB_SEARCH,
                     isVisible: () => this.resultSetHasData(C.TAB_SEARCH),
                     constructView: (data: TabIntf) => new SearchResultSetView(s, data),
+                    getTabSubOptions: (state: AppState): Div => { return null; },
                     rsInfo: new ResultSetInfo(),
                     scrollPos: 0,
                     props: {},
@@ -92,6 +103,7 @@ export class TabUtil {
                     id: C.TAB_SHARES,
                     isVisible: () => this.resultSetHasData(C.TAB_SHARES),
                     constructView: (data: TabIntf) => new SharedNodesResultSetView<SharesRSInfo>(s, data),
+                    getTabSubOptions: (state: AppState): Div => { return null; },
                     rsInfo: new SharesRSInfo(),
                     scrollPos: 0,
                     props: {},
@@ -102,6 +114,7 @@ export class TabUtil {
                     id: C.TAB_TIMELINE,
                     isVisible: () => this.resultSetHasData(C.TAB_TIMELINE),
                     constructView: (data: TabIntf) => new TimelineResultSetView<TimelineRSInfo>(s, data),
+                    getTabSubOptions: (state: AppState): Div => { return null; },
                     rsInfo: new TimelineRSInfo(),
                     scrollPos: 0,
                     props: {},
@@ -112,6 +125,7 @@ export class TabUtil {
                     id: C.TAB_FOLLOWERS,
                     isVisible: () => this.resultSetHasData(C.TAB_FOLLOWERS),
                     constructView: (data: TabIntf) => new FollowersResultSetView<FollowersRSInfo>(s, data),
+                    getTabSubOptions: (state: AppState): Div => { return null; },
                     rsInfo: new FollowersRSInfo(),
                     scrollPos: 0,
                     props: {},
@@ -122,6 +136,7 @@ export class TabUtil {
                     id: C.TAB_FOLLOWING,
                     isVisible: () => this.resultSetHasData(C.TAB_FOLLOWING),
                     constructView: (data: TabIntf) => new FollowingResultSetView<FollowingRSInfo>(s, data),
+                    getTabSubOptions: (state: AppState): Div => { return null; },
                     rsInfo: new FollowingRSInfo(),
                     scrollPos: 0,
                     props: {},
@@ -132,6 +147,18 @@ export class TabUtil {
                     id: C.TAB_FEED,
                     isVisible: () => true,
                     constructView: (data: TabIntf<FeedViewProps>) => new FeedView(s, data),
+                    getTabSubOptions: (state: AppState): Div => {
+                        return !state.isAnonUser
+                            ? new Div(null, { className: "tabSubOptions" }, [
+                                new Div("To/From Me", { className: "tabSubOptionsItem", onClick: S.nav.messagesToFromMe }),
+                                new Div("To Me", { className: "tabSubOptionsItem", onClick: S.nav.messagesToMe }),
+                                new Div("From Me", { className: "tabSubOptionsItem", onClick: S.nav.messagesFromMe }),
+                                new Div("From Friends", { className: "tabSubOptionsItem", onClick: S.nav.messagesFromFriends }),
+                                // We need to make this a configurable option.
+                                // new MenuItem("From Local Users", S.nav.messagesLocal),
+                                new Div("Public Fediverse", { className: "tabSubOptionsItem", onClick: S.nav.messagesFediverse })
+                            ]) : null;
+                    },
                     rsInfo: null,
                     scrollPos: 0,
                     props: {
@@ -180,6 +207,13 @@ export class TabUtil {
                     id: C.TAB_TRENDING,
                     isVisible: () => true,
                     constructView: (data: TabIntf) => new TrendingView(s, data),
+                    getTabSubOptions: (state: AppState): Div => {
+                        return new Div(null, { className: "tabSubOptions" }, [
+                            new Div("Hashtags", { className: "tabSubOptionsItem", onClick: S.nav.showTrendingHashtags }),
+                            new Div("Mentions", { className: "tabSubOptionsItem", onClick: S.nav.showTrendingMentions }),
+                            new Div("Words", { className: "tabSubOptionsItem", onClick: S.nav.showTrendingWords })
+                        ]);
+                    },
                     rsInfo: new TrendingRSInfo(),
                     scrollPos: 0,
 
@@ -195,6 +229,7 @@ export class TabUtil {
                         return !!state.threadViewNodeId;
                     },
                     constructView: (data: TabIntf) => new ThreadView(s, data),
+                    getTabSubOptions: (state: AppState): Div => { return null; },
                     rsInfo: new ThreadRSInfo(),
                     scrollPos: 0,
                     props: {},
@@ -208,6 +243,7 @@ export class TabUtil {
                         return !!state.serverInfoText;
                     },
                     constructView: (data: TabIntf) => new ServerInfoView(s, data),
+                    getTabSubOptions: (state: AppState): Div => { return null; },
                     rsInfo: null,
                     scrollPos: 0,
                     props: {},
