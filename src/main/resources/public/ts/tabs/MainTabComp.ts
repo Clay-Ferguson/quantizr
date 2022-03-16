@@ -17,8 +17,8 @@ import { S } from "../Singletons";
 /* General Widget that doesn't fit any more reusable or specific category other than a plain Div, but inherits capability of Comp class */
 export class MainTabComp extends AppTab {
 
-    constructor(state: AppState, data: TabIntf) {
-        super(state, data, null);
+    constructor(data: TabIntf) {
+        super(data, null);
         this.attribs.key = "mainTabCompKey";
         data.inst = this;
     }

@@ -29,8 +29,8 @@ import { FeedViewProps } from "./FeedViewProps";
 but inherits capability of Comp class */
 export class FeedView extends AppTab<FeedViewProps> {
 
-    constructor(state: AppState, data: TabIntf<FeedViewProps>) {
-        super(state, data);
+    constructor(data: TabIntf<FeedViewProps>) {
+        super(data);
         data.inst = this;
     }
 

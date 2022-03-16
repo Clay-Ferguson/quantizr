@@ -14,8 +14,8 @@ import { ThreadRSInfo } from "../ThreadRSInfo";
 
 export class ThreadView<I extends ThreadRSInfo> extends AppTab {
 
-    constructor(state: AppState, data: TabIntf) {
-        super(state, data);
+    constructor(data: TabIntf) {
+        super(data);
         data.inst = this;
     }
 

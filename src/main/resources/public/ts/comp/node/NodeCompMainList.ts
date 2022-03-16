@@ -3,7 +3,6 @@ import { store } from "../../AppRedux";
 import { AppState } from "../../AppState";
 import { Comp } from "../../comp/base/Comp";
 import { ButtonBar } from "../../comp/core/ButtonBar";
-import { Clearfix } from "../../comp/core/Clearfix";
 import { Div } from "../../comp/core/Div";
 import { IconButton } from "../../comp/core/IconButton";
 import { Constants as C } from "../../Constants";

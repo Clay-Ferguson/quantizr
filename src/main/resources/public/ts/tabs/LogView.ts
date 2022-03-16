@@ -10,8 +10,8 @@ import { Log } from "../Log";
 export class LogView extends AppTab implements LogViewIntf {
     static logs: string = "";
 
-    constructor(state: AppState, data: TabIntf) {
-        super(state, data);
+    constructor(data: TabIntf) {
+        super(data);
         data.inst = this;
 
         Log.logView = this;

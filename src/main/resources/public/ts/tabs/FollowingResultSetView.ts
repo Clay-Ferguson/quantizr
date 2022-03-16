@@ -8,8 +8,8 @@ import { ResultSetView } from "./ResultSetView";
 
 export class FollowingResultSetView<I extends FollowingRSInfo> extends ResultSetView {
 
-    constructor(state: AppState, data: TabIntf) {
-        super(state, data);
+    constructor(data: TabIntf) {
+        super(data);
         this.allowHeader = false;
         this.allowFooter = false;
         data.inst = this;

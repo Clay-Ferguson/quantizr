@@ -7,8 +7,8 @@ import { ResultSetView } from "./ResultSetView";
 
 export class SharedNodesResultSetView<I extends SharesRSInfo> extends ResultSetView {
 
-    constructor(state: AppState, data: TabIntf) {
-        super(state, data);
+    constructor(data: TabIntf) {
+        super(data);
         data.inst = this;
         this.showContentHeading = false;
     }

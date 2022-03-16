@@ -19,8 +19,8 @@ export abstract class ResultSetView extends AppTab {
     allowFooter: boolean = true;
     showContentHeading: boolean = true;
 
-    constructor(state: AppState, data: TabIntf) {
-        super(state, data);
+    constructor(data: TabIntf) {
+        super(data);
     }
 
     preRender(): void {

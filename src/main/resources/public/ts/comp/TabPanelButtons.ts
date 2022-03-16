@@ -4,7 +4,6 @@ import { Anchor } from "../comp/core/Anchor";
 import { Div } from "../comp/core/Div";
 import { Constants as C } from "../Constants";
 import { TabIntf } from "../intf/TabIntf";
-import * as J from "../JavaIntf";
 import { S } from "../Singletons";
 import { Comp } from "./base/Comp";
 import { Li } from "./core/Li";

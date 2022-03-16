@@ -14,7 +14,7 @@ export interface TabIntf<PropsType = any> {
     id: string;
     scrollPos: number;
 
-    /* current instance (will change on every render potentially) */
+    // todo-0: is there a common base class for this instead of just CompIntf?
     inst?: CompIntf;
 
     constructView(data: TabIntf): CompIntf;

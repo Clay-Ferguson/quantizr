@@ -16,8 +16,8 @@ export class TrendingView extends AppTab {
 
     loaded: boolean = false;
 
-    constructor(state: AppState, data: TabIntf) {
-        super(state, data);
+    constructor(data: TabIntf) {
+        super(data);
         data.inst = this;
 
         PubSub.subSingleOnce(C.PUBSUB_tabChanging, (tabName: string) => {

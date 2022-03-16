@@ -49,6 +49,7 @@ export class TabPanel extends Div {
     buildTabs = (state: AppState): CompIntf[] => {
         let tabs: CompIntf[] = [];
         for (let tab of state.tabData) {
+            // todo-0: should we only load the 'isVisible()' ones here?
             tabs.push(tab.constructView(tab));
         }
         return tabs;

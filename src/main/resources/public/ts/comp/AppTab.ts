@@ -4,7 +4,7 @@ import { Constants as C } from "../Constants";
 import { TabIntf } from "../intf/TabIntf";
 
 export class AppTab<PropType = any> extends Div {
-    constructor(state: AppState, public data: TabIntf<PropType>, private extraEditModeClass: string = null) {
+    constructor(public data: TabIntf<PropType>, private extraEditModeClass: string = null) {
         super(null, {
             id: data.id,
             // tabIndex is required or else scrolling by arrow keys breaks.

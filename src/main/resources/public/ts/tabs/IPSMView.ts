@@ -9,8 +9,8 @@ import { HelpButton } from "../comp/core/HelpButton";
 import { TabIntf } from "../intf/TabIntf";
 
 export class IPSMView extends AppTab {
-    constructor(state: AppState, data: TabIntf) {
-        super(state, data);
+    constructor(data: TabIntf) {
+        super(data);
         data.inst = this;
     }
 

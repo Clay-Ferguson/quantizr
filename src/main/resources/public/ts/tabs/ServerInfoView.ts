@@ -10,8 +10,8 @@ import { S } from "../Singletons";
 
 export class ServerInfoView extends AppTab {
 
-    constructor(state: AppState, data: TabIntf) {
-        super(state, data);
+    constructor(data: TabIntf) {
+        super(data);
         data.inst = this;
     }
 

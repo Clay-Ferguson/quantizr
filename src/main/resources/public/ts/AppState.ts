@@ -50,7 +50,7 @@ export class AppState {
 
     activeTab: string = null;
 
-    /* data for each tab */
+    /* data for each tab, which we DO want to keep separate from the GUI view components themselves */
     tabData: TabIntf[] = [];
 
     // When the user clicks an image, we switch to a fullscreen viewer for that image, at max size of the display, and any time

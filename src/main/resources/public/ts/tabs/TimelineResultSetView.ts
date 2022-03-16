@@ -7,8 +7,8 @@ import { ResultSetView } from "./ResultSetView";
 
 export class TimelineResultSetView<I extends TimelineRSInfo> extends ResultSetView {
 
-    constructor(state: AppState, data: TabIntf) {
-        super(state, data);
+    constructor(data: TabIntf) {
+        super(data);
         data.inst = this;
     }
 
