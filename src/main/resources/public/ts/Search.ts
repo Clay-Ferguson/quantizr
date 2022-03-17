@@ -452,7 +452,7 @@ export class Search {
     /*
      * Renders a single line of search results on the search results page.
      */
-    renderSearchResultAsListItem = (node: J.NodeInfo, tabData: TabIntf<any>, index: number, count: number, rowCount: number, prefix: string,
+    renderSearchResultAsListItem = (node: J.NodeInfo, tabData: TabIntf<any>, index: number, rowCount: number, prefix: string,
         isFeed: boolean, isParent: boolean, allowAvatars: boolean, jumpButton: boolean, allowHeader: boolean, allowFooter: boolean, showThreadButton: boolean, state: AppState): Comp => {
         if (!node) return;
 
@@ -460,7 +460,7 @@ export class Search {
         item we are rendering */
         let parentItem: Comp = null;
         if (node.parent) {
-            parentItem = this.renderSearchResultAsListItem(node.parent, tabData, index, count, rowCount, prefix, isFeed, true, allowAvatars, jumpButton, allowHeader, allowFooter, showThreadButton, state);
+            parentItem = this.renderSearchResultAsListItem(node.parent, tabData, index, rowCount, prefix, isFeed, true, allowAvatars, jumpButton, allowHeader, allowFooter, showThreadButton, state);
         }
 
         const cssId = this._UID_ROWID_PREFIX + node.id;

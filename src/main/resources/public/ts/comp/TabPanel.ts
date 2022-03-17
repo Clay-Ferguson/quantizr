@@ -5,6 +5,7 @@ import { Div } from "../comp/core/Div";
 import { IconButton } from "../comp/core/IconButton";
 import { Constants as C } from "../Constants";
 import { S } from "../Singletons";
+import { AppTab } from "./AppTab";
 import { CompIntf } from "./base/CompIntf";
 
 export class TabPanel extends Div {
@@ -46,11 +47,12 @@ export class TabPanel extends Div {
         ]);
     }
 
-    buildTabs = (state: AppState): CompIntf[] => {
-        let tabs: CompIntf[] = [];
+    buildTabs = (state: AppState): AppTab[] => {
+        let tabs: AppTab[] = [];
         for (let tab of state.tabData) {
-            // todo-0: should we only load the 'isVisible()' ones here?
-            tabs.push(tab.constructView(tab));
+            if (tab.isVisible()) {
+                tabs.push(tab.constructView(tab));
+            }
         }
         return tabs;
     }

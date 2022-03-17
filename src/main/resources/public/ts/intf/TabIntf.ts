@@ -3,6 +3,7 @@ import { CompIntf } from "../comp/base/CompIntf";
 import { OpenGraphPanel } from "../comp/OpenGraphPanel";
 import { AppState } from "../AppState";
 import { Div } from "../comp/core/Div";
+import { AppTab } from "../comp/AppTab";
 
 export interface TabIntf<PropsType = any> {
     // display name shown on the tab
@@ -13,11 +14,9 @@ export interface TabIntf<PropsType = any> {
     we can in the future support multiple SearchView tabs opened simultaneously, each with a different ID of course */
     id: string;
     scrollPos: number;
+    inst?: AppTab;
 
-    // todo-0: is there a common base class for this instead of just CompIntf?
-    inst?: CompIntf;
-
-    constructView(data: TabIntf): CompIntf;
+    constructView(data: TabIntf): AppTab;
     getTabSubOptions(state: AppState): Div;
 
     // controls whether to show tab button or not.

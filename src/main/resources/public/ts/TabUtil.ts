@@ -130,7 +130,6 @@ export class TabUtil {
         }
     }
 
-    // verify this method isn't repliated after the current refactoring (todo-0)
     resultSetHasData = (id: string) => {
         let state: AppState = store.getState();
         let data = state.tabData.find(d => d.id === id);

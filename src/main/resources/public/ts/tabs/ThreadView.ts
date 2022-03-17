@@ -51,8 +51,7 @@ export class ThreadView<I extends ThreadRSInfo> extends AppTab {
 
         results.forEach((node: J.NodeInfo) => {
             S.srch.initSearchNode(node);
-            // todo-0: check this. Is passing in childCount here right? It's not getting updated during the loop
-            let c = this.renderItem(node, i, childCount, rowCount, jumpButton, state);
+            let c = this.renderItem(node, i, rowCount, jumpButton, state);
             if (c) {
                 children.push(c);
             }
@@ -66,8 +65,7 @@ export class ThreadView<I extends ThreadRSInfo> extends AppTab {
         if (others) {
             others.forEach((node: J.NodeInfo) => {
                 S.srch.initSearchNode(node);
-                // todo-0: check this. other.length? ditto above similar loop
-                let c = this.renderItem(node, i, others.length, rowCount, jumpButton, state);
+                let c = this.renderItem(node, i, rowCount, jumpButton, state);
                 if (c) {
                     children.push(c);
                 }
@@ -87,7 +85,7 @@ export class ThreadView<I extends ThreadRSInfo> extends AppTab {
     }
 
     /* overridable (don't use arrow function) */
-    renderItem(node: J.NodeInfo, i: number, childCount: number, rowCount: number, jumpButton: boolean, state: AppState): CompIntf {
-        return S.srch.renderSearchResultAsListItem(node, this.data, i, childCount, rowCount, this.data.id, false, false, true, jumpButton, true, true, false, state);
+    renderItem(node: J.NodeInfo, i: number, rowCount: number, jumpButton: boolean, state: AppState): CompIntf {
+        return S.srch.renderSearchResultAsListItem(node, this.data, i, rowCount, this.data.id, false, false, true, jumpButton, true, true, false, state);
     }
 }

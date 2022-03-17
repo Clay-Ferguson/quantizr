@@ -41,7 +41,7 @@ export class FollowersResultSetView<I extends FollowersRSInfo> extends ResultSet
     This node needs to share as much implementation for item rendering as possible with what's done in the, FriendTypeHandler
     Probably need a static method on FriendTypeHandler itself which can do everything based on input parameters only.
     */
-    renderItem(node: J.NodeInfo, i: number, childCount: number, rowCount: number, jumpButton: boolean, state: AppState): CompIntf {
+    renderItem(node: J.NodeInfo, i: number, rowCount: number, jumpButton: boolean, state: AppState): CompIntf {
         // console.log("Render Follower: " + S.util.prettyPrint(node));
 
         // let user: string = S.props.getNodePropVal(J.NodeProp.USER, node);
