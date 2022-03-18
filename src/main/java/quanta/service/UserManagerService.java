@@ -1008,9 +1008,7 @@ public class UserManagerService extends ServiceBase {
 			/*
 			 * IMPORTANT!
 			 *
-			 * verify that the email address provides IS A MATCH to the email address for this user! Important
-			 * step here because without this check anyone would be able to completely hijack anyone else's
-			 * account simply by issuing a password change to that account!
+			 * verify that the email address provides IS A MATCH to the email address for this user! 
 			 */
 			String nodeEmail = ownerNode.getStr(NodeProp.EMAIL.s());
 			if (no(nodeEmail) || !nodeEmail.equals(email)) {

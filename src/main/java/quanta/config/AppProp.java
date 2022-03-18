@@ -273,10 +273,6 @@ public class AppProp {
 		return env.getProperty("mail.password");
 	}
 
-	public String getAesKey() {
-		return env.getProperty("aeskey");
-	}
-
 	public boolean isAllowFileSystemSearch() {
 		return getBooleanProp("allowFileSystemSearch");
 	}
