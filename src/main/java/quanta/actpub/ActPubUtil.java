@@ -268,13 +268,7 @@ public class ActPubUtil extends ServiceBase {
                     headerPair("algorithm", "rsa-sha256") + "," + //
                     headerPair("signature", Base64.getEncoder().encodeToString(signature));
 
-            try {
-                postJson(toInbox, url.getHost(), date, headerSig, digestHeader, body, postType);
-            } catch (Exception e) {
-                // This codeblock may be dead now? todo-0: check into it.
-                log.error("trying fallback. Post type: " + APConst.MTYPE_ACT_JSON.toString() + " to inbox " + toInbox);
-                postJson(toInbox, url.getHost(), date, headerSig, digestHeader, body, APConst.MTYPE_ACT_JSON);
-            }
+            postJson(toInbox, url.getHost(), date, headerSig, digestHeader, body, postType);
         } catch (Exception e) {
             log.error("ALL secure http post failed to: " + toInbox, e);
             throw new RuntimeException(e);
