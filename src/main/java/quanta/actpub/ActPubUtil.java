@@ -174,10 +174,6 @@ public class ActPubUtil extends ServiceBase {
         return null;
     }
 
-    public APObj getJson(String url, MediaType mediaType) {
-        return getJson(url, mediaType, 0);
-    }
-
     /**
      * 
      * @param url
@@ -186,48 +182,30 @@ public class ActPubUtil extends ServiceBase {
      * @return
      */
     @PerfMon(category = "apUtil")
-    public APObj getJson(String url, MediaType mediaType, int waitSeconds) {
+    public APObj getJson(String url, MediaType mediaType) {
         // log.debug("getJson: " + url);
         APObj ret = null;
+        int responseCode = 0;
         try {
-            while (true) {
-                try {
-                    HttpHeaders headers = new HttpHeaders();
+            HttpHeaders headers = new HttpHeaders();
 
-                    if (ok(mediaType)) {
-                        List<MediaType> acceptableMediaTypes = new LinkedList<>();
-                        acceptableMediaTypes.add(mediaType);
-                        headers.setAccept(acceptableMediaTypes);
-                    }
-
-                    MultiValueMap<String, Object> bodyMap = new LinkedMultiValueMap<>();
-                    HttpEntity<MultiValueMap<String, Object>> requestEntity = new HttpEntity<>(bodyMap, headers);
-                    ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.GET, requestEntity, String.class);
-                    ret = mapper.readValue(response.getBody(), new TypeReference<>() {});
-                    // log.debug("REQ: " + url + "\nRES: " + XString.prettyPrint(ret));
-                    break;
-                }
-                /*
-                 * in case we are in a multi-peer setup some other peers may not be started so we tolerate that
-                 * scenario by sleeping and looping for 10 retries.
-                 */
-                catch (ResourceAccessException re) {
-                    if (waitSeconds-- > 0) {
-                        log.debug("Waiting for url: " + url);
-                        Thread.sleep(1000);
-                    } else {
-                        throw re;
-                    }
-                }
+            if (ok(mediaType)) {
+                List<MediaType> acceptableMediaTypes = new LinkedList<>();
+                acceptableMediaTypes.add(mediaType);
+                headers.setAccept(acceptableMediaTypes);
             }
+
+            MultiValueMap<String, Object> bodyMap = new LinkedMultiValueMap<>();
+            HttpEntity<MultiValueMap<String, Object>> requestEntity = new HttpEntity<>(bodyMap, headers);
+            ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.GET, requestEntity, String.class);
+            if (ok(response)) {
+                responseCode = response.getStatusCodeValue();
+                ret = mapper.readValue(response.getBody(), new TypeReference<>() {});
+            }
+            // log.debug("REQ: " + url + "\nRES: " + XString.prettyPrint(ret));
         } catch (Exception e) {
-            /*
-             * todo-1: Actually it would be better to put this entire string being logged here into a hashset to
-             * just keep a unique list, and not even log it here, but make it part of the 'systemInfo' available
-             * under the admin menu for checking server status info.
-             */
-            log.debug("failed getting json: " + url + " -> " + e.getMessage());
-            // throw new RuntimeException(e);
+            log.debug("failed getting json: " + url + " -> " + e.getMessage() + " ex.class=" + e.getClass().getName()
+                    + " respCode=" + responseCode);
             return null;
         }
         return ret;
@@ -896,7 +874,7 @@ public class ActPubUtil extends ServiceBase {
     public String loadObject(MongoSession ms, String url) {
         APObj obj = apUtil.getJson(url, APConst.MTYPE_ACT_JSON);
         if (no(obj)) {
-            log.debug("unable to load get json: " + url);
+            log.debug("unable to get json: " + url);
             return null;
         }
 

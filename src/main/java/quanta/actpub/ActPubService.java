@@ -3,8 +3,10 @@ package quanta.actpub;
 import static quanta.util.Util.no;
 import static quanta.util.Util.ok;
 import java.security.PublicKey;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -1122,7 +1124,20 @@ public class ActPubService extends ServiceBase {
     }
 
     private void refreshUsers() {
+        if (!prop.isDaemonsEnabled())
+            return;
+
+        List<String> names = new ArrayList<>();
         for (String userName : apCache.usersPendingRefresh.keySet()) {
+            names.add(userName);
+        }
+
+        // shuffle just to reduce likelyhood we might hit the same server too many times, and yes I realize
+        // keySet wasn't even sorted to begin with
+        // but nor do I want to count on it's randomness.
+        Collections.shuffle(names);
+
+        for (String userName : names) {
             if (!prop.isDaemonsEnabled())
                 break;
             try {
@@ -1131,10 +1146,10 @@ public class ActPubService extends ServiceBase {
                     continue;
 
                 /*
-                 * This is killing performance of the app so let's throttle it way back. Not sure if it's Disk or
-                 * network I/O that's the problem but either way let's not read these so fast
+                 * This may hurt performance of the app so let's throttle it way back to 5 seconds between loops.
+                 * Also we don't want to put too much unwelcome load on other instances.
                  */
-                Thread.sleep(2000);
+                Thread.sleep(5000);
 
                 // flag as done (even if it fails we still want it flagged as done. no retries will be done).
                 apCache.usersPendingRefresh.put(userName, true);

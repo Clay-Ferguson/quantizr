@@ -386,7 +386,7 @@ export class EditNodeDlg extends DialogBase {
             if (numPropsShowing > 0) {
                 let state = this.getState<LS>();
                 let propsButtonBar: ButtonBar = new ButtonBar([
-                    new IconButton("fa-plus", null, {
+                    new IconButton("fa-cog", null, {
                         onClick: () => this.utl.addProperty(this),
                         title: "Add property"
                     }),
@@ -573,7 +573,7 @@ export class EditNodeDlg extends DialogBase {
                 title: "Share Node"
             }) : null,
 
-            allowPropAdd && numPropsShowing === 0 ? new IconButton("fa-th-list", null, {
+            allowPropAdd && numPropsShowing === 0 ? new IconButton("fa-cog", null, {
                 onClick: () => {
                     EditNodeDlg.morePanelExpanded = true;
                     this.utl.addProperty(this);

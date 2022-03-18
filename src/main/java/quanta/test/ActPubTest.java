@@ -48,7 +48,7 @@ public class ActPubTest extends ServiceBase implements TestIntf {
 
         /* ----- GET ACTOR ----- */
         String actorUrl = apUtil.getActorUrlFromWebFingerObj(webFinger);
-        APObj actorObj = apUtil.getJson(actorUrl, APConst.MTYPE_ACT_JSON, 10);
+        APObj actorObj = apUtil.getJson(actorUrl, APConst.MTYPE_ACT_JSON);
         if (no(actorObj)) {
             throw new Exception("Unable to get actor: " + actorUrl);
         }

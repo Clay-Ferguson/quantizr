@@ -60,7 +60,7 @@ export class Attachment {
         node = node || S.nodeUtil.getHighlightedNode(state);
 
         if (node) {
-            let dlg: ConfirmDlg = new ConfirmDlg("Delete the Attachment on the Node?", "Confirm", null, null, state);
+            let dlg: ConfirmDlg = new ConfirmDlg("Delete the Attachment on the Node?", "Confirm", "btn-danger", "alert alert-danger", state);
             await dlg.open();
             if (dlg.yes) {
                 await S.util.ajax<J.DeleteAttachmentRequest, J.DeleteAttachmentResponse>("deleteAttachment", {
