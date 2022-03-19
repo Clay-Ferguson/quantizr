@@ -107,7 +107,7 @@ export class NodeCompRowHeader extends Div {
             children.push(new Icon({
                 className: "fa fa-th-list fa-lg marginRight",
                 title: "Show Full Thread History",
-                onClick: () => S.srch.showThread(node.id, state)
+                onClick: () => S.srch.showThread(node, state)
             }));
         }
 

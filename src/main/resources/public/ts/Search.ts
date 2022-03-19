@@ -89,15 +89,15 @@ export class Search {
         }
     }
 
-    showThread = async (nodeId: string, state: AppState) => {
+    showThread = async (node: J.NodeInfo, state: AppState) => {
         let res: J.GetThreadViewResponse = await S.util.ajax<J.GetThreadViewRequest, J.GetThreadViewResponse>("getNodeThreadView", {
-            nodeId,
+            nodeId: node.id,
             loadOthers: true
         });
 
         if (res.nodes && res.nodes.length > 0) {
             dispatch("Action_RenderThreadResults", (s: AppState): AppState => {
-                let nodeFound = this.idToNodeMap.get(nodeId);
+                let nodeFound = this.idToNodeMap.get(node.id);
                 if (nodeFound) {
                     s.highlightSearchNode = nodeFound;
                 }
@@ -107,7 +107,7 @@ export class Search {
                 let data = s.tabData.find(d => d.id === C.TAB_THREAD);
                 if (!data) return;
 
-                s.threadViewNodeId = nodeId;
+                s.threadViewNodeId = node.id;
                 data.openGraphComps = [];
 
                 data.rsInfo.results = res.nodes;
@@ -118,7 +118,17 @@ export class Search {
             });
         }
         else {
-            new MessageDlg("Top-level post. No conversation to display.", "Thread", null, null, false, 0, null, state).open();
+            let msg = "Top-level post. No conversation to display.";
+
+            // make 'msg' a little more specific if we know there's a 'remote link' showing.
+            let objUrl = S.props.getPropStr(J.NodeProp.ACT_PUB_OBJ_URL, node);
+            if (objUrl) {
+                if (objUrl.indexOf(location.protocol + "//" + location.hostname) === -1) {
+                    msg = "Top-level post. No conversation to display. Click `Remote Link` instead.";
+                }
+            }
+
+            new MessageDlg(msg, "Thread", null, null, false, 0, null, state).open();
         }
     }
 
