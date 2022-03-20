@@ -47,7 +47,7 @@ export class FeedViewData implements TabIntf {
                 new Div("From Friends", { className: "tabSubOptionsItem", onClick: S.nav.messagesFromFriends }),
                 // We need to make this a configurable option.
                 // new MenuItem("From Local Users", S.nav.messagesLocal),
-                new Div("Public Fediverse", { className: "tabSubOptionsItem", onClick: S.nav.messagesFediverse })
+                new Div("Federated", { className: "tabSubOptionsItem", onClick: S.nav.messagesFediverse })
             ]) : null;
     };
 }
