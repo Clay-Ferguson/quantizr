@@ -135,6 +135,7 @@ body {
     background-color: darkolivegreen;
     border-radius: 6px;
     padding: 0 5px 0 5px;
+    margin-right: 8px;
 }
 
 .displayNameTextField {
@@ -427,6 +428,10 @@ a {
 }
 
 .userName {
+    font-weight: bold;
+}
+
+.userNameInContent {
     font-weight: bold;
 }
 
