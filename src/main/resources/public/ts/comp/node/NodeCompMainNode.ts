@@ -83,7 +83,7 @@ export class NodeCompMainNode extends Div {
             let header: CompIntf = null;
             let jumpButton: CompIntf = null;
             const typeHandler: TypeHandlerIntf = S.plugin.getTypeHandler(node.type);
-            if (state.userPreferences.showMetaData && typeHandler?.getAllowRowHeader()) {
+            if (state.userPreferences.showMetaData && (typeHandler == null || typeHandler?.getAllowRowHeader())) {
                 header = new NodeCompRowHeader(node, true, true, false, false, true);
             }
             else {
