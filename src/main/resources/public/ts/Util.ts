@@ -30,7 +30,9 @@ export class Util {
 
     weekday: string[] = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
 
-    static readonly DOM_PURIFY_CONFIG = { USE_PROFILES: { html: true } };
+    // we have the 'target' and 'onclick' here to make our purifier keep those rendered
+    // see also: #onclick-security-note
+    static readonly DOM_PURIFY_CONFIG = { USE_PROFILES: { html: true }, ADD_ATTR: ["target"/*, "onclick" */] };
 
     static escapeMap = {
         "&": "&amp;",

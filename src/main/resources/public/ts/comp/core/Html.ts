@@ -57,27 +57,23 @@ export class Html extends Comp {
         // return <div>{parseEmojisAndHtml(this.getState<LS>().content)}</div>;
     }
 
-    /* change all "a" tags inside this div to have a target=_blank */
-    domPreUpdateEvent(): void {
-        let elm = this.getRef();
-        if (!elm) return;
-        S.domUtil.forEachElmBySel("#" + this.getId() + " a", (el, i) => {
-            let href = el.getAttribute("href");
-
-            // Detect this is a link to this instance we are being served from...
-            if (href && href.indexOf && (href.indexOf("/") === 0 || href.indexOf(window.location.origin) !== -1)) {
-                /* This code makes it where links to our own app that point to
-                specific named locations on the tree will NOT open in separate browser tab but
-                will open in the current browser tab as is the default without the 'target='
-                attribute on an anchor tag. */
-                if (href.indexOf("?id=:") !== -1 ||
-                    href.indexOf("?id=~") !== -1 ||
-                    href.indexOf("?tab=") !== -1) {
-                    return;
-                }
-            }
-            el.setAttribute("target", "_blank");
-        });
-        super.domPreUpdateEvent();
-    }
+    // DO NOT DELETE. KEEP AS EXAMPLE HOW TO ALTER DOM AFTER RENDER
+    // Currently this '_blank' target is being done by the custom markdown renderer, not here.
+    // Future use of this code pattern...
+    // see also: #onclick-security-note
+    // Note: This may end up being the best-practice place to inject the onClick for the userNames (@mentions) to make them clickable, while having
+    // the sanitizer logic specifically REMOVE onclick attributes (which it does), because we can cram in only the ones we know we want right here
+    // and not have to truse any externally created HTML content from other servers.
+    //
+    // make all "a" tags inside this div to have a target=_blank
+    //
+    // domPreUpdateEvent(): void {
+    //     let elm = this.getRef();
+    //     if (!elm) return;
+    //     S.domUtil.forEachElmBySel("#" + this.getId() + " a", (el, i) => {
+    //         // let href = el.getAttribute("href");
+    //         el.setAttribute("target", "_blank");
+    //     });
+    //     super.domPreUpdateEvent();
+    // }
 }

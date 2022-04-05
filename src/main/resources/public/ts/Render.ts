@@ -104,21 +104,40 @@ export class Render {
         if (this.markedRenderer) return;
         this.markedRenderer = new marked.Renderer();
 
-        this.markedRenderer.code = (code, language) => {
-            // Check whether the given language is valid for highlight.js.
-            const validLang = !!(language && highlightjs.getLanguage(language));
+        // This code is discovered to have been dead, for a long time. Look into it.
+        // this.markedRenderer.code = (code, language) => {
+        //     // Check whether the given language is valid for highlight.js.
+        //     const validLang = !!(language && highlightjs.getLanguage(language));
 
-            // Highlight only if the language is valid.
-            const highlighted = validLang ? highlightjs.highlight(language, code).value : code;
+        //     // Highlight only if the language is valid.
+        //     const highlighted = validLang ? highlightjs.highlight(language, code).value : code;
 
-            // Render the highlighted code with `hljs` class.
-            // return `<pre><code class="hljs ${language}">${highlighted}</code></pre>`;
-            return highlighted;
+        //     // Render the highlighted code with `hljs` class.
+        //     // return `<pre><code class="hljs ${language}">${highlighted}</code></pre>`;
+        //     return highlighted;
+        // };
+
+        // From Stack Overflow
+        // https://github.com/markedjs/marked/issues/882
+        this.markedRenderer.link = function (href, title, text) {
+            // console.log(`marked.link [${href}][${title}][${text}]`);
+            if (href.indexOf("mailto:") === 0) {
+                // todo-1: markdown thinks a fediverse username is a 'mailto' becuase the syntax looks like that. Eventually we could
+                // make these usernames clickable to do something, like auto-import into the system and short their profile dialog
+                return `<span class="userNameInContent">${text}</span>`;
+            }
+
+            if (title) {
+                return `<a href="${href}" title="${title}" target="_blank">${text}</a>`;
+            }
+            else {
+                return `<a href="${href}" target="_blank">${text}</a>`;
+            }
         };
 
         // https://marked.js.org/using_advanced#highlight
         marked.setOptions({
-            renderer: new marked.Renderer(),
+            renderer: this.markedRenderer,
 
             highlight: (code, language) => {
                 // Check whether the given language is valid for highlight.js.
@@ -149,6 +168,10 @@ export class Render {
             pedantic: false,
             smartLists: true,
             smartypants: false
+
+            // SANITIZE PARAM IS DEPRECATED (LEAVE THIS NOTE HERE)
+            // Search for 'DOMPurify.sanitize' to see how we do it currently.
+            // sanitize: true
         });
     }
 

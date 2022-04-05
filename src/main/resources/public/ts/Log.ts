@@ -25,7 +25,7 @@ export class Log {
         // a problem starting up the app, and even the JS console is not usable.
         if (!Log.paramsChecked) {
             Log.paramsChecked = true;
-            // todo-0: alertDebug has been replaced by -app-debug on url, which sets _debug global var.
+            // todo-1: alertDebug has been replaced by -app-debug on url, which sets _debug global var.
             if (S.util.getParameterByName("alertDebug")) {
                 Log.alertDebug = true;
             }
