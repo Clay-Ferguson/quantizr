@@ -6,6 +6,7 @@
 #   LoadBalancer types have a working EXTERNAL-IP, or else the external IP will be stuck in 'pending' status.
 # - login to container instance with `minikube ssh`
 
+# change to folder this script file is in
 cd $(dirname $(realpath $0))
 # show commands as they are run.
 # set -x

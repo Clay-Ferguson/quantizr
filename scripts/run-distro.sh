@@ -16,6 +16,7 @@
 # one it finds locally if it does fine it. 
 # ===================================================================
 
+# change to folder this script file is in
 cd $(dirname $(realpath $0))
 source ./setenv-distro-runner.sh
 

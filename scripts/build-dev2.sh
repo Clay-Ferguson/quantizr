@@ -10,6 +10,7 @@
 # appended to make them unique for the 'second' server, and the port numbers in these
 # configs will be different, but everything else will be about the same.
 
+# change to folder this script file is in
 cd $(dirname $(realpath $0))
 source ./setenv-dev2.sh
 

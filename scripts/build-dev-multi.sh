@@ -7,6 +7,8 @@
 # two separate instances of the app, for testing Fediverse functionality, or for
 # testing load-balancer functionality
 #
+
+# change to folder this script file is in
 cd $(dirname $(realpath $0))
 
 echo "========================================"

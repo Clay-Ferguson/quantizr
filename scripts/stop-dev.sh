@@ -1,6 +1,7 @@
 #!/bin/bash
 # set -x
 
+# change to folder this script file is in
 cd $(dirname $(realpath $0))
 source ./setenv-dev.sh
 

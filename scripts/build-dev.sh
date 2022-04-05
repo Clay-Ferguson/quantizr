@@ -4,6 +4,8 @@
 # This script is for normal localhost development. After running this script 
 # you should have an instance running at http(s)://${quanta_domain}:${PORT}, for testing/debugging
 ###############################################################################
+
+# change to folder this script file is in
 cd $(dirname $(realpath $0))
 
 # show commands as they are run.

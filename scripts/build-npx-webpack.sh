@@ -3,6 +3,7 @@
 # NOTE: This will run webpack dev, but was an experiment and is not
 # a part of our official build process.
 
+# change to folder this script file is in
 cd $(dirname $(realpath $0))
 # show commands as they are run.
 # set -x
