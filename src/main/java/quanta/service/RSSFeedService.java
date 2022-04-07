@@ -275,34 +275,17 @@ public class RSSFeedService extends ServiceBase {
 	public void aggregateFeeds(List<String> urls, List<SyndEntry> entries, int page) {
 		try {
 			for (String url : urls) {
-				// reset this to zero for each feed.
-				int badDateCount = 0;
+				log.debug("Processing Feed: " + url);
 
 				SyndFeed inFeed = getFeed(url, true);
 				if (ok(inFeed)) {
 					for (SyndEntry entry : inFeed.getEntries()) {
-
-						/*
-						 * if no PublishedDate exists on the 'entry' itself try to get a reasonable data from some other
-						 * sane property on the feed.
-						 */
-						if (no(entry.getPublishedDate())) {
-							if (ok(entry.getUpdatedDate())) {
-								entry.setPublishedDate(entry.getUpdatedDate());
-
-							} else if (ok(inFeed.getPublishedDate())) {
-								/*
-								 * If we have to take the feed update time from the feed itself because of lack of dates in feed
-								 * entries the only allow a max of 3 of these to exist so that no malformed feeds can flood the
-								 * top of our GUI presentation with more than 3 items
-								 */
-								if (badDateCount < 3) {
-									entry.setPublishedDate(inFeed.getPublishedDate());
-									badDateCount++;
-								}
-							}
+						if (ok(entry.getPublishedDate())) {
+							entries.add(entry);
 						}
-						entries.add(entry);
+						else {
+							// log.debug("ENTRY: Missing Pub Date: " + XString.prettyPrint(entry));
+						}
 					}
 				}
 			}
@@ -595,7 +578,7 @@ public class RSSFeedService extends ServiceBase {
 		if (ok(entry.getPublishedDate())) {
 			e.setPublishDate(DateUtil.shortFormatDate(entry.getPublishedDate().getTime()));
 		} else {
-			log.debug("RSS ENTRY: Missing Pub Date: " + XString.prettyPrint(entry));
+			// log.debug("RSS ENTRY: Missing Pub Date: " + XString.prettyPrint(entry));
 		}
 		e.setAuthor(entry.getAuthor());
 
