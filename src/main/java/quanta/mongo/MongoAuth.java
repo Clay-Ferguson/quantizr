@@ -197,12 +197,16 @@ public class MongoAuth extends ServiceBase {
 			HashSet<String> mentions = auth.parseMentionsFromNode(null, parent);
 
 			// if no content, and the parent isn't our own node
-			if (StringUtils.isEmpty(child.getContent()) && !auth.ownedByThreadUser(parent)) {
-				SubNode parentUserNode = read.getNode(ms, parent.getOwner());
-				if (ok(parentUserNode)) {
-					mentions.add("@" + parentUserNode.getStr(NodeProp.USER));
-				}
-			}
+			// if (StringUtils.isEmpty(child.getContent()) && !auth.ownedByThreadUser(parent)) {
+			// 	SubNode parentUserNode = read.getNode(ms, parent.getOwner());
+			// 	if (ok(parentUserNode)) {
+			// 		// I saw a case where something like "@itmslaves.com:" gets put in here as if that was a user name, so I'm backing
+			// 		// out this code, but really I didn't like it anyway. It was a bit confusing to stuff this into the text when it's 
+			// 		// actually not really needed. Sharing works fine without this.
+			// 		// Leaving commented for now.
+			// 		// mentions.add("@" + parentUserNode.getStr(NodeProp.USER));
+			// 	}
+			// }
 
 			if (mentions.size() > 0) {
 				String content = "";
