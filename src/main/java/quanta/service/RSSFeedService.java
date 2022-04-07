@@ -592,11 +592,11 @@ public class RSSFeedService extends ServiceBase {
 		e.setTitle(entry.getTitle());
 		e.setLink(entry.getLink());
 
-		// if no publish date exists, we reject this entry.
-		if (no(entry.getPublishedDate())) {
-			return false;
+		if (ok(entry.getPublishedDate())) {
+			e.setPublishDate(DateUtil.shortFormatDate(entry.getPublishedDate().getTime()));
+		} else {
+			log.debug("RSS ENTRY: Missing Pub Date: " + XString.prettyPrint(entry));
 		}
-		e.setPublishDate(DateUtil.shortFormatDate(entry.getPublishedDate().getTime()));
 		e.setAuthor(entry.getAuthor());
 
 		if (ok(entry.getContents())) {
