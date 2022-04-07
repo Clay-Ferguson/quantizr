@@ -569,14 +569,20 @@ public class RSSFeedService extends ServiceBase {
 				if (addFeedTitles) {
 					e.setParentFeedTitle(feedNameOfItem.get(entry.hashCode()));
 				}
-				rssEntries.add(e);
-				processEntry(entry, e);
+
+				try {
+					if (processEntry(entry, e)) {
+						rssEntries.add(e);
+					}
+				} catch (Exception ex) {
+					// if anything goes wrong processing the entry, we can ignore it and continue with the next entry.
+				}
 			}
 		}
 		return rf;
 	}
 
-	private void processEntry(SyndEntry entry, RssFeedEntry e) {
+	private boolean processEntry(SyndEntry entry, RssFeedEntry e) {
 		// log.debug("entry: " + entry.getTitle());
 
 		if (ok(entry.getDescription())) {
@@ -585,6 +591,11 @@ public class RSSFeedService extends ServiceBase {
 
 		e.setTitle(entry.getTitle());
 		e.setLink(entry.getLink());
+
+		// if no publish date exists, we reject this entry.
+		if (no(entry.getPublishedDate())) {
+			return false;
+		}
 		e.setPublishDate(DateUtil.shortFormatDate(entry.getPublishedDate().getTime()));
 		e.setAuthor(entry.getAuthor());
 
@@ -614,6 +625,7 @@ public class RSSFeedService extends ServiceBase {
 		}
 
 		processModules(entry, e);
+		return true;
 	}
 
 	private void processModules(SyndFeed entry, RssFeed e) {
